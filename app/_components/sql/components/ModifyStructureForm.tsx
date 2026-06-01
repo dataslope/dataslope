@@ -435,7 +435,6 @@ export function ModifyStructureForm({
     }),
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const toggleStructItem = (name: string, _kind: "index" | "trigger") => {
     const isExpanded = expandedItems.has(name);
     if (!isExpanded && !(name in itemDdls) && engine) {

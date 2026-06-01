@@ -1092,8 +1092,7 @@ export const rAdapter: LanguageAdapter = {
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Loading WebR…");
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
+    // @ts-expect-error -- webr ships without bundled type declarations
     const { WebR } = (await import("webr")) as { WebR: new () => WebRInstance };
 
     setLoadingMessage("Initialising R runtime…");

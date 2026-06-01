@@ -17,12 +17,12 @@ A 64-bit double is a triplet of bit fields:
 | Field | Bits | Meaning |
 | --- | --- | --- |
 | Sign $s$ | 1 | $0$ for positive, $1$ for negative |
-| Exponent $e$ | 11 | Biased integer, $0 \\le e \\le 2047$ |
-| Mantissa (a.k.a. fraction) $m$ | 52 | Binary fraction, $0 \\le m < 1$ |
+| Exponent $e$ | 11 | Biased integer, $0 \le e \le 2047$ |
+| Mantissa (a.k.a. fraction) $m$ | 52 | Binary fraction, $0 \le m < 1$ |
 
 The value represented is
 
-$$ (-1)^s \\cdot (1 + m) \\cdot 2^\{e - 1023\} $$
+$$ (-1)^s \cdot (1 + m) \cdot 2^{e - 1023} $$
 
 for ordinary "normal" numbers. There are also *subnormals*
 (extremely small numbers near zero), *infinities* (`±inf`), and
@@ -58,7 +58,7 @@ A few things to notice:
 ## Machine epsilon
 
 The smallest float strictly greater than $1.0$ is $1 + \epsilon$
-where $\epsilon = 2^\{-52\} \approx 2.22 \times 10^\{-16\}$. This is
+where $\epsilon = 2^{-52} \approx 2.22 \times 10^{-16}$. This is
 called the **machine epsilon** and it is the most important
 constant in numerical analysis.
 
@@ -175,7 +175,7 @@ We have already met *catastrophic cancellation* in the story
 chapters. It is worth restating it as a numerical principle:
 
 > If two floats $a$ and $b$ agree in their first $k$ leading bits,
-> then $a - b$ has only $\\approx 53 - k$ bits of precision left.
+> then $a - b$ has only $\approx 53 - k$ bits of precision left.
 
 If $k$ is large (the numbers are close), the subtraction throws
 away most of the information.
@@ -203,21 +203,21 @@ for k in range(0, 18):
 
 Truncation error shrinks like $h^2$ at first — you can see the
 error drop by a factor of $100$ for each factor-of-10 reduction in
-$h$. But around $h = 10^\{-6\}$, *round-off* takes over and the error
-starts to **grow**. The optimum is somewhere near $h = \sqrt[3]\{\epsilon\}$.
+$h$. But around $h = 10^{-6}$, *round-off* takes over and the error
+starts to **grow**. The optimum is somewhere near $h = \sqrt[3]{\epsilon}$.
 
 This is one of the most important pictures in numerical analysis,
 and we will return to it in *Approximation and Error*.
 
 ## Overflow, underflow, and dynamic range
 
-A float can hold values from roughly $2 \times 10^\{-308\}$ to
-$1.8 \times 10^\{308\}$ before underflow/overflow. Inside that range,
+A float can hold values from roughly $2 \times 10^{-308}$ to
+$1.8 \times 10^{308}$ before underflow/overflow. Inside that range,
 arithmetic is reliable. Outside, things go wrong silently.
 
-The classic trap: computing $\log(\sum_i e^\{x_i\})$ — the *log-sum-exp*
+The classic trap: computing $\log(\sum_i e^{x_i})$ — the *log-sum-exp*
 that appears all over physics and machine learning. If any $x_i$ is
-around $1000$, then $e^\{x_i\}$ overflows to `inf`. The trick is to
+around $1000$, then $e^{x_i}$ overflows to `inf`. The trick is to
 subtract the maximum first.
 
 <CodeBlock

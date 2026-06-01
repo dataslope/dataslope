@@ -1288,7 +1288,6 @@ function ResultViewImpl({
                       onLoadPage(sortedSql, 0);
                     }
                   } else {
-                    // eslint-disable-next-line react-hooks/refs
                     preserveStateForReload({ sortingByIndex: newSortingByIndex });
                     onLoadPage(baseSql, 0);
                   }
@@ -1401,15 +1400,12 @@ function ResultViewImpl({
                   effectiveLazySql = `SELECT * FROM (${baseSql}) AS __sort ORDER BY ${quoteIdentSql(parsed.name)} ${sorting[0].desc ? "DESC" : "ASC"}`;
                 }
               }
-              // eslint-disable-next-line react-hooks/refs
               handlePageChange = (p: number) => {
                 // eslint-disable-next-line react-hooks/refs
                 preserveStateForReload();
                 onLoadPage(effectiveLazySql, p);
               };
-              // eslint-disable-next-line react-hooks/refs
               handlePageSizeChange = (s: number) => {
-                // eslint-disable-next-line react-hooks/refs
                 preserveStateForReload();
                 onSetGlobalPageSize(s);
                 onLoadPage(effectiveLazySql, 0, s);
@@ -2820,7 +2816,6 @@ export function ResultTableBody({
 export function ResultPager({
   totalRows,
   loadedRows,
-  index,
   pageSize,
   page,
   onPageChange,

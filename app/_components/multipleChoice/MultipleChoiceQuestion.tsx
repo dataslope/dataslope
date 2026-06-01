@@ -118,7 +118,7 @@ export default function MultipleChoiceQuestion({
 
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
   const [submitted, setSubmitted] = useState(false);
-  const [attempts, setAttempts] = useState(0);
+  const [, setAttempts] = useState(0);
 
   const toggle = (id: string) => {
     if (submitted) return;
