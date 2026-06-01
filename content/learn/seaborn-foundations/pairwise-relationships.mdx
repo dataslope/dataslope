@@ -189,8 +189,8 @@ result is an unreadable wall of tiny panels. What is the most direct fix?
 - Set \`kind="line"\`.
   > \`pairplot\` shows pairwise scatters and diagonal distributions; there's no line mode that would help here, and lines wouldn't make 144 panels readable.
 
-Because the grid is `n × n`, the lever that matters most for readability is
-reducing `n` — that's exactly what `vars=` does.`}
+Because the grid is \`n × n\`, the lever that matters most for readability is
+reducing \`n\` — that's exactly what \`vars=\` does.`}
 />
 
 ## Under the hood: `PairGrid`
@@ -313,7 +313,7 @@ how?
 - It converts the scatter panels into line plots.
   > \`hue\` only controls color grouping; the off-diagonal panels remain scatter plots.
 
-`hue` is what turns a pair plot from a shapeless overview into a tool for
+\`hue\` is what turns a pair plot from a shapeless overview into a tool for
 seeing how groups separate.`}
 />
 
@@ -329,7 +329,7 @@ seeing how groups separate.`}
 - \`pairplot\` cannot show \`hue\`, but \`PairGrid\` can.
   > \`pairplot\` supports \`hue\` directly; the real distinction is the level of control, not whether color grouping is available.
 
-Use `pairplot` for a fast default and `PairGrid` when you need to customize
+Use \`pairplot\` for a fast default and \`PairGrid\` when you need to customize
 what each region of the matrix draws.`}
 />
 
