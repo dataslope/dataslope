@@ -1610,6 +1610,20 @@ export function ResultTableBody({
     deletable &&
     !allVisibleSelected &&
     originalIndices.some((i) => selectedRows?.has(i));
+  // The editor cell reads the live pending-edit / active-cell state through
+  // refs so the `columns` memo below does NOT depend on them. Without this the
+  // memo recomputes on every keystroke, TanStack rebuilds the columns, and the
+  // inline <input> remounts each keystroke — which re-fires autofocus+select
+  // (so the value re-selects as you type) and resets the caret.
+  const pendingEditsRef = useRef(pendingEdits);
+  pendingEditsRef.current = pendingEdits;
+  const activeEditCellRef = useRef(activeEditCell);
+  activeEditCellRef.current = activeEditCell;
+  // `originalIndices` is rebuilt every render by the parent (new array, same
+  // content) — read it via a ref in the `columns` memo so that memo (and thus
+  // the editor <input>) doesn't churn/remount on each keystroke.
+  const originalIndicesRef = useRef(originalIndices);
+  originalIndicesRef.current = originalIndices;
   const data = useMemo<ResultTableRow[]>(
     () =>
       visible.map((values, ri) => ({
@@ -1632,7 +1646,7 @@ export function ResultTableBody({
                   checked={allVisibleSelected}
                   indeterminate={someVisibleSelected}
                   onCheckedChange={(v) =>
-                    onToggleVisible(originalIndices, v === true)
+                    onToggleVisible(originalIndicesRef.current, v === true)
                   }
                   aria-label={
                     allVisibleSelected
@@ -1951,9 +1965,10 @@ export function ResultTableBody({
               }
               const absoluteRow = info.row.original.absoluteRow;
               const cellKey = `${absoluteRow}:${ci}`;
-              const isActiveEdit = activeEditCell === cellKey;
-              const hasPendingEdit = pendingEdits?.has(cellKey) ?? false;
-              const pendingValue = pendingEdits?.get(cellKey);
+              const isActiveEdit = activeEditCellRef.current === cellKey;
+              const hasPendingEdit =
+                pendingEditsRef.current?.has(cellKey) ?? false;
+              const pendingValue = pendingEditsRef.current?.get(cellKey);
               const rawValue = info.getValue();
               // Binary columns aren't editable inline — a text/date picker
               // would corrupt the bytes. Render a read-only marker; the row
@@ -2081,6 +2096,9 @@ export function ResultTableBody({
                     defaultValue={editVal}
                     autoFocus
                     type="text"
+                    /* size={1} so the input's intrinsic width doesn't widen the
+                       column; `width:100%` still fills the cell. */
+                    size={1}
                     aria-label={`Edit ${c}`}
                     inputMode={isNumeric ? "decimal" : undefined}
                     onFocus={(e) => e.currentTarget.select()}
@@ -2131,24 +2149,23 @@ export function ResultTableBody({
           } satisfies ColumnDef<ResultTableRow>;
       }),
     ],
+    // `activeEditCell` and `pendingEdits` are read via refs (above), and the
+    // `on*` callbacks are stable in behaviour — each is an inline arrow in the
+    // parent that only forwards to a stable setter bound to a stable `idx`, so
+    // a stale identity is equivalent. Excluding both keeps this memo stable
+    // across keystrokes so the editor <input> doesn't remount each keystroke
+    // (which would re-select the value and reset the caret).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
-      activeEditCell,
       allVisibleSelected,
       deletable,
       editable,
       keyHints,
-      onClearPendingEdit,
-      onSetActiveEditCell,
-      onSetPendingEdit,
-      onToggleRow,
-      onToggleVisible,
-      pendingEdits,
       selectedRows,
       set.columns,
       set.columnTypes,
       set.values,
       someVisibleSelected,
-      originalIndices,
     ],
   );
   // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table is required for stable result-table customization.

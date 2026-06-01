@@ -889,6 +889,9 @@
   max-width: 320px;
   overflow: hidden;
   text-overflow: ellipsis;
+  /* Containing block for the absolutely-positioned inline cell editor
+     (.sql-cell-input), so editing never resizes the column/row. */
+  position: relative;
 }
 
 /* Subtle zebra stripes that read more as a tint than a strong band.
@@ -2414,7 +2417,10 @@
 .sql-cell-input {
   box-sizing: border-box;
   width: 100%;
-  min-width: 60px;
+  /* min-width:0 (with size={1} on the <input>) so the editor never inflates
+     the auto-laid-out column's intrinsic width — entering edit mode must not
+     widen the column (it did when the table had no horizontal scroll). */
+  min-width: 0;
   /* The cell's <td> keeps its 5px 10px padding while editing; the input fills
      that content box with NO border or padding of its own and draws its edit
      affordance purely with box-shadow (an outer ring), which paints into the
