@@ -456,6 +456,51 @@ export function queryResultsIdentical(
 
 export const ResultView = memo(ResultViewImpl);
 
+/** Minimum time the filter overlay stays on screen once shown. Mirrors the run
+ *  overlay's `MIN_ANIMATION_MS`: a fast filter would otherwise flash the overlay
+ *  for a single frame ("blink"). Combined with the CSS opacity fade-out, the
+ *  overlay reads as a smooth, deliberate state rather than a glitch. */
+const FILTER_OVERLAY_MIN_MS = 400;
+
+/** Mirror `active`, but once it becomes true keep it true for at least `minMs`
+ *  so a brief activation stays visible long enough to read and to let a CSS
+ *  fade-out play. Re-activating while waiting cancels the pending hide. */
+function useMinVisible(active: boolean, minMs: number): boolean {
+  const [visible, setVisible] = useState(active);
+  const shownAtRef = useRef(0);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (active) {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+      if (!visible) {
+        shownAtRef.current = performance.now();
+        // Show on the activation edge; the delayed hide runs from a timer.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setVisible(true);
+      }
+    } else if (visible && !timerRef.current) {
+      const remaining = Math.max(
+        0,
+        minMs - (performance.now() - shownAtRef.current),
+      );
+      timerRef.current = setTimeout(() => {
+        timerRef.current = null;
+        setVisible(false);
+      }, remaining);
+    }
+  }, [active, visible, minMs]);
+  useEffect(
+    () => () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    },
+    [],
+  );
+  return visible;
+}
+
 function ResultViewImpl({
   result,
   loading,
@@ -566,14 +611,19 @@ function ResultViewImpl({
   );
 
   const [activeSetIdx, setActiveSetIdx] = useState<number>(0);
+  // True while a filter keystroke is debouncing (or its re-query is in flight):
+  // drives a loading overlay over the result table so the wait is visible.
+  const [filterPending, setFilterPending] = useState(false);
+  // Hold the overlay on screen for a minimum time (then fade) so a fast filter
+  // doesn't blink — see `useMinVisible` / FILTER_OVERLAY_MIN_MS.
+  const filterOverlayActive = useMinVisible(filterPending, FILTER_OVERLAY_MIN_MS);
   const flashWrapperRef = useRef<HTMLDivElement>(null);
   const noResultsRef = useRef<HTMLDivElement>(null);
   const resultSetsScrollRef = useRef<HTMLDivElement>(null);
   const prevResultRef = useRef<QueryRunResult | null>(null);
   // After a server-side filter reload (which steals focus), re-focus the
-  // filter input. Plus the pending debounce timer for filter keystrokes.
+  // filter input so typing continues uninterrupted.
   const focusFilterAfterReloadRef = useRef(false);
-  const filterDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     // Save sorting for the outgoing result so it can be restored on tab switch back.
@@ -598,6 +648,9 @@ function ResultViewImpl({
     setSortingByIndex(preserved?.sortingByIndex ?? cachedSorting ?? {});
     setActiveEditCellByIndex({});
     setActiveSetIdx(0);
+    // A fresh result (or a filter/sort/edit reload) settles any pending filter
+    // overlay — the rows shown now already reflect the applied filter.
+    setFilterPending(false);
     // Scroll the result table back to the top whenever a new result arrives
     // (fresh query run or lazy page navigation).
     resultSetsScrollRef.current?.scrollTo(0, 0);
@@ -741,11 +794,11 @@ function ResultViewImpl({
     ],
   );
 
-  // Debounce filter keystrokes for the server-side path: mark the set as
-  // server-filtered immediately (so the grid stops client-filtering the rows
-  // it's about to replace), then re-query after a short idle. Kept as a stable
-  // callback so the debounce ref isn't touched from the render body.
-  const scheduleServerFilter = useCallback(
+  // Apply a server-side (pushdown) filter. The keystroke debounce now lives in
+  // the filter input (`FilterInput`), so this fires on an already-settled value:
+  // mark the set as server-filtered up front (so the grid stops client-filtering
+  // the rows it's about to replace) and re-query immediately.
+  const applyServerFilter = useCallback(
     (
       idx: number,
       value: string,
@@ -758,20 +811,9 @@ function ResultViewImpl({
         else delete next[idx];
         return next;
       });
-      if (filterDebounceRef.current) clearTimeout(filterDebounceRef.current);
-      filterDebounceRef.current = setTimeout(() => {
-        triggerServerFilter(idx, value, columns, unfilteredTotal);
-      }, 300);
+      triggerServerFilter(idx, value, columns, unfilteredTotal);
     },
     [triggerServerFilter],
-  );
-
-  // Clear any pending filter debounce on unmount.
-  useEffect(
-    () => () => {
-      if (filterDebounceRef.current) clearTimeout(filterDebounceRef.current);
-    },
-    [],
   );
 
   const getState = useCallback(
@@ -1402,7 +1444,10 @@ function ResultViewImpl({
               aria-selected={safeSetIdx === idx}
               aria-label={`Result set ${idx + 1} of ${result.sets.length}`}
               className={`sql-result-set-tab${safeSetIdx === idx ? " active" : ""}`}
-              onClick={() => setActiveSetIdx(idx)}
+              onClick={() => {
+                setActiveSetIdx(idx);
+                setFilterPending(false);
+              }}
             >
               {set === null && <CheckCircle size={12} aria-hidden="true" />}
               Set {idx + 1}
@@ -1544,6 +1589,17 @@ function ResultViewImpl({
               );
             })()}
         </div>
+        {activeSetData && (
+          <div
+            className={`sql-result-filter-overlay${
+              filterOverlayActive ? " active" : ""
+            }`}
+            aria-hidden={!filterOverlayActive}
+          >
+            <span className="sql-result-filter-spinner" />
+            <span className="sql-result-filter-overlay-label">Filtering…</span>
+          </div>
+        )}
       </div>
       <div className="sql-result-pagers">
         {activeSetData &&
@@ -1568,7 +1624,6 @@ function ResultViewImpl({
               // already encodes any pushed-down filter + sort — so they keep the
               // filter instead of reverting to the full table.
               const effectiveLazySql = result.lazySql ?? baseSql;
-              // eslint-disable-next-line react-hooks/refs
               handlePageChange = (p: number) => {
                 // eslint-disable-next-line react-hooks/refs
                 preserveStateForReload();
@@ -1612,14 +1667,15 @@ function ResultViewImpl({
             );
             // Filtering: in-memory results filter client-side (exact displayed
             // text); engine-paged (or already server-filtered) results push the
-            // filter down to SQL via a debounced re-query, so infinite scroll is
-            // preserved instead of loading every row.
+            // filter down to SQL and re-query, so infinite scroll is preserved
+            // instead of loading every row. Keystroke debouncing happens in the
+            // filter input, so this runs on an already-settled value.
             const serverMode = isLazy && (!canFilter || serverFiltered);
             const handleFilterChange = (v: string) => {
               setFilter(idx, v);
               if (serverMode) {
                 // eslint-disable-next-line react-hooks/refs
-                scheduleServerFilter(idx, v, set.columns, unfilteredTotal);
+                applyServerFilter(idx, v, set.columns, unfilteredTotal);
               }
             };
             return (
@@ -1645,6 +1701,7 @@ function ResultViewImpl({
                   elapsedIsError={!!result?.error}
                   filterValue={filterByIndex[idx] ?? ""}
                   onFilterChange={handleFilterChange}
+                  onFilterPendingChange={setFilterPending}
                   filterUnfilteredTotal={unfilteredTotal}
                 >
                   {onExportResultSet && (
@@ -2989,6 +3046,124 @@ export function ResultTableBody({
   );
 }
 
+/** Idle delay before a filter keystroke is actually applied (client recompute
+ *  or engine re-query). Typing only updates the input's own local text, so
+ *  characters are never dropped while a heavy render / reload is in flight. */
+const FILTER_DEBOUNCE_MS = 300;
+
+/** The in-grid filter field. Owns its displayed text locally so keystrokes are
+ *  never lost to a re-render or a server-filter reload, and debounces the
+ *  *applied* filter (`onChange`) so the table isn't re-filtered / re-queried on
+ *  every keystroke. `onPendingChange` reports the debounce window so the parent
+ *  can show a loading overlay over the result table. */
+function FilterInput({
+  value,
+  onChange,
+  onPendingChange,
+}: {
+  /** The currently *applied* filter (what the rows reflect). */
+  value: string;
+  /** Commit a new filter — called debounced while typing, immediately on clear. */
+  onChange: (value: string) => void;
+  /** Notified when a debounced commit is pending (true) / settled (false). */
+  onPendingChange?: (pending: boolean) => void;
+}) {
+  const [text, setText] = useState(value);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // The last value we handed to `onChange`. Lets us (a) re-sync the field when
+  // the applied filter changes from the *outside* (a fresh query, a reload that
+  // restores a different filter) without ever clobbering text the user is still
+  // typing, and (b) skip a no-op commit when typing returns to the applied value.
+  const committedRef = useRef(value);
+
+  // External changes to the applied filter (not echoes of our own commits)
+  // reset the field; in-flight typing is left untouched.
+  useEffect(() => {
+    if (value !== committedRef.current) {
+      committedRef.current = value;
+      setText(value);
+    }
+  }, [value]);
+
+  const clearTimer = useCallback(() => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+      debounceRef.current = null;
+    }
+  }, []);
+
+  // Commit with no debounce (clear button / Escape) so clearing is instant.
+  const commitNow = useCallback(
+    (next: string) => {
+      clearTimer();
+      committedRef.current = next;
+      setText(next);
+      onPendingChange?.(false);
+      onChange(next);
+    },
+    [clearTimer, onChange, onPendingChange],
+  );
+
+  const handleType = useCallback(
+    (next: string) => {
+      setText(next); // instant + local: keystrokes are never dropped
+      clearTimer();
+      if (next === committedRef.current) {
+        // Typed back to the applied value — nothing to (re-)apply.
+        onPendingChange?.(false);
+        return;
+      }
+      onPendingChange?.(true);
+      debounceRef.current = setTimeout(() => {
+        debounceRef.current = null;
+        committedRef.current = next;
+        onPendingChange?.(false);
+        onChange(next);
+      }, FILTER_DEBOUNCE_MS);
+    },
+    [clearTimer, onChange, onPendingChange],
+  );
+
+  // Clear any pending debounce (and its overlay) on unmount.
+  useEffect(() => () => clearTimer(), [clearTimer]);
+
+  return (
+    <div className="sql-result-filter">
+      <Search size={12} aria-hidden="true" className="sql-result-filter-icon" />
+      <input
+        className="sql-result-filter-input"
+        type="text"
+        value={text}
+        placeholder="Filter rows…"
+        aria-label="Filter rows in this result"
+        spellCheck={false}
+        autoComplete="off"
+        onChange={(e) => handleType(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Escape" && text) {
+            // Clear (and don't let the document-level Esc handler also
+            // discard pending edits).
+            e.preventDefault();
+            e.stopPropagation();
+            commitNow("");
+          }
+        }}
+      />
+      {text && (
+        <button
+          type="button"
+          className="sql-result-filter-clear"
+          aria-label="Clear filter"
+          title="Clear filter"
+          onClick={() => commitNow("")}
+        >
+          <X size={12} aria-hidden="true" />
+        </button>
+      )}
+    </div>
+  );
+}
+
 export function ResultPager({
   totalRows,
   loadedRows,
@@ -3007,6 +3182,7 @@ export function ResultPager({
   elapsedIsError,
   filterValue,
   onFilterChange,
+  onFilterPendingChange,
   filterUnfilteredTotal,
   children,
 }: {
@@ -3030,6 +3206,9 @@ export function ResultPager({
    *  is shown; omit both to hide it. */
   filterValue?: string;
   onFilterChange?: (value: string) => void;
+  /** Notified while a debounced filter commit is pending, so the parent can
+   *  show a loading overlay over the result table. */
+  onFilterPendingChange?: (pending: boolean) => void;
   /** Full row count before filtering, for the "filtered from N" readout. */
   filterUnfilteredTotal?: number;
   children?: React.ReactNode;
@@ -3071,43 +3250,14 @@ export function ResultPager({
   return (
     <div className="sql-result-pager">
       {showFilter && (
-        <div className="sql-result-filter">
-          <Search
-            size={12}
-            aria-hidden="true"
-            className="sql-result-filter-icon"
-          />
-          <input
-            className="sql-result-filter-input"
-            type="text"
-            value={filterText}
-            placeholder="Filter rows…"
-            aria-label="Filter rows in this result"
-            spellCheck={false}
-            autoComplete="off"
-            onChange={(e) => onFilterChange?.(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Escape" && filterText) {
-                // Clear (and don't let the document-level Esc handler also
-                // discard pending edits).
-                e.preventDefault();
-                e.stopPropagation();
-                onFilterChange?.("");
-              }
-            }}
-          />
-          {filterText && (
-            <button
-              type="button"
-              className="sql-result-filter-clear"
-              aria-label="Clear filter"
-              title="Clear filter"
-              onClick={() => onFilterChange?.("")}
-            >
-              <X size={12} aria-hidden="true" />
-            </button>
-          )}
-        </div>
+        // ResultPager is itself keyed by result-set index at its call site, so
+        // FilterInput remounts (and its local text resets) when the active set
+        // changes — each set keeps its own filter.
+        <FilterInput
+          value={filterText}
+          onChange={(v) => onFilterChange?.(v)}
+          onPendingChange={onFilterPendingChange}
+        />
       )}
       <span className="sql-result-pager-info">
         {editable && editCount > 0 ? (

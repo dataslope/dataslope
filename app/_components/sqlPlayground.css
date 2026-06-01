@@ -773,6 +773,64 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
+  /* Positioning context for the filter loading overlay. */
+  position: relative;
+}
+
+/* ─── Filter loading overlay ───────────────────────────────────────────
+   Shown over the result table while a filter keystroke is debouncing or
+   its engine re-query is in flight. Always mounted so the `.active` class
+   can fade it in *and* out (CSS opacity transition); a minimum on-screen
+   time is enforced in JS (FILTER_OVERLAY_MIN_MS) so a fast filter doesn't
+   blink. `pointer-events: none` keeps the (stale) rows beneath visible but
+   inert during the brief wait. */
+.sql-result-filter-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+  background: color-mix(in oklab, var(--bg) 60%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.26s ease;
+}
+.sql-result-filter-overlay.active {
+  opacity: 1;
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+}
+.sql-result-filter-spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid color-mix(in oklab, var(--primary) 30%, transparent);
+  border-top-color: var(--primary);
+}
+/* Only spin while visible, so the animation isn't burning frames when the
+   overlay is idle (opacity 0). */
+.sql-result-filter-overlay.active .sql-result-filter-spinner {
+  animation: sql-result-filter-spin 0.7s linear infinite;
+}
+.sql-result-filter-overlay-label {
+  font-variant-numeric: tabular-nums;
+}
+@keyframes sql-result-filter-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sql-result-filter-overlay {
+    transition: none;
+  }
+  .sql-result-filter-overlay.active .sql-result-filter-spinner {
+    animation-duration: 1.4s;
+  }
 }
 
 .sql-result-flash-anim {
