@@ -36,10 +36,12 @@ import {
   Hash,
   Lock,
   Minus,
+  Search,
   SearchX,
   ToggleLeft,
   Trash2,
   Type,
+  X,
 } from "lucide-react";
 import { MdOutlineKey } from "react-icons/md";
 import { IoLink } from "react-icons/io5";
@@ -71,6 +73,7 @@ import {
   bytesToBase64,
   type TemporalEditorKind,
 } from "../utils/cellEditing";
+import { filterResultRowIndices } from "../utils/resultFilter";
 
 // ────────────────────────────────────────────────────────────────────────
 // Local helpers
@@ -511,6 +514,11 @@ function ResultViewImpl({
   const [pageStates, setPageStates] = useState<
     Record<number, { page: number }>
   >({});
+  // In-grid filter ("find in results") text, keyed by result-set index. A
+  // view-only narrowing of the materialized rows — see `utils/resultFilter`.
+  const [filterByIndex, setFilterByIndex] = useState<Record<number, string>>(
+    {},
+  );
   const [sortingByIndex, setSortingByIndex] = useState<
     Record<number, SortingState>
   >({});
@@ -559,6 +567,7 @@ function ResultViewImpl({
     preserveOnNextResultRef.current = null;
     /* eslint-disable-next-line react-hooks/set-state-in-effect */
     setPageStates({});
+    setFilterByIndex({});
     setSelectedByIndex(preserved?.selectedByIndex ?? {});
     setPendingDelete(null);
     setPendingDeleteSingleRow(null);
@@ -620,6 +629,19 @@ function ResultViewImpl({
       return { ...prev, [idx]: { ...cur, page } };
     });
     resultSetsScrollRef.current?.scrollTo(0, 0);
+  }, []);
+
+  // Update the in-grid filter for a result set and jump back to its first page
+  // so the user always sees the start of the filtered view.
+  const setFilter = useCallback((idx: number, value: string) => {
+    setFilterByIndex((prev) => {
+      if ((prev[idx] ?? "") === value) return prev;
+      const next = { ...prev };
+      if (value) next[idx] = value;
+      else delete next[idx];
+      return next;
+    });
+    setPageStates((prev) => ({ ...prev, [idx]: { page: 0 } }));
   }, []);
 
   const pkColumnsForSet = useCallback(
@@ -1077,6 +1099,9 @@ function ResultViewImpl({
     const isInfiniteAll = isLazy && result.lazyInfinite === true;
     const sorting = sortingByIndex[idx] ?? [];
     let totalRows: number;
+    // The full (pre-filter) row count. Drives the export button, which always
+    // operates on the whole result regardless of the in-grid filter.
+    let unfilteredTotal: number;
     let currentPage: number;
     let startIdx: number;
     let visibleRows: QueryExecResult["values"];
@@ -1087,6 +1112,7 @@ function ResultViewImpl({
           ? globalPageSize
           : Math.max(result.lazyTotalCount ?? 0, 1);
       totalRows = result.lazyTotalCount ?? set.values.length;
+      unfilteredTotal = totalRows;
       currentPage = isInfiniteAll ? 0 : (result.lazyPage ?? 0);
       startIdx = isInfiniteAll
         ? 0
@@ -1095,16 +1121,29 @@ function ResultViewImpl({
       originalIndices = set.values.map((_, ri) => startIdx + ri);
     } else {
       const st = getState(idx);
-      totalRows = set.values.length;
+      unfilteredTotal = set.values.length;
+      // In-grid filter: narrow the materialized rows to those whose displayed
+      // text matches, *before* sorting/paginating, so the page count and row
+      // readout reflect the filtered view. `originalIndex` stays the index into
+      // the full `set.values` so cell edits, selection and delete remain
+      // correct. Engine-independent and never re-queries the database.
+      const rawFilter = (filterByIndex[idx] ?? "").trim();
+      let indexed = set.values.map((values, i) => ({
+        values,
+        originalIndex: i,
+      }));
+      if (rawFilter) {
+        const matched = new Set(
+          filterResultRowIndices(set.values, set.columns, rawFilter),
+        );
+        indexed = indexed.filter((item) => matched.has(item.originalIndex));
+      }
+      totalRows = indexed.length;
       const effective =
         globalPageSize > 0 ? globalPageSize : Math.max(totalRows, 1);
       const totalPages = Math.max(1, Math.ceil(totalRows / effective));
       currentPage = Math.min(st.page, totalPages - 1);
       startIdx = currentPage * effective;
-      const indexed = set.values.map((values, i) => ({
-        values,
-        originalIndex: i,
-      }));
       let sortedIndexed = indexed;
       if (sorting.length > 0) {
         const parsed = parseColumnId(sorting[0].id);
@@ -1131,6 +1170,7 @@ function ResultViewImpl({
       isInfiniteAll,
       sorting,
       totalRows,
+      unfilteredTotal,
       currentPage,
       startIdx,
       visibleRows,
@@ -1311,6 +1351,7 @@ function ResultViewImpl({
               isInfiniteAll,
               sorting,
               totalRows,
+              unfilteredTotal,
               currentPage,
               visibleRows,
             } = activeSetData;
@@ -1351,17 +1392,22 @@ function ResultViewImpl({
             const selectedCount = selected?.size ?? 0;
             const pendingEdits = pendingEditsByIndex[idx];
             const editCount = pendingEdits?.size ?? 0;
+            // The export button always exports the full result, so its page /
+            // total counts are based on `unfilteredTotal` (identical to
+            // `totalRows` when no in-grid filter is active).
             const effectivePageSize =
-              globalPageSize > 0 ? globalPageSize : Math.max(totalRows, 1);
+              globalPageSize > 0
+                ? globalPageSize
+                : Math.max(unfilteredTotal, 1);
             const hasMultiplePages =
-              globalPageSize > 0 && totalRows > effectivePageSize;
+              globalPageSize > 0 && unfilteredTotal > effectivePageSize;
             const safePage = Math.min(
               currentPage,
-              Math.max(0, Math.ceil(totalRows / effectivePageSize) - 1),
+              Math.max(0, Math.ceil(unfilteredTotal / effectivePageSize) - 1),
             );
             const pageStart = safePage * effectivePageSize;
             const currentPageRows = Math.min(
-              totalRows - pageStart,
+              unfilteredTotal - pageStart,
               effectivePageSize,
             );
             return (
@@ -1385,12 +1431,17 @@ function ResultViewImpl({
                   onDiscardEdits={() => discardEdits(idx)}
                   elapsedMs={result?.elapsedMs}
                   elapsedIsError={!!result?.error}
+                  filterValue={isLazy ? undefined : (filterByIndex[idx] ?? "")}
+                  onFilterChange={
+                    isLazy ? undefined : (v) => setFilter(idx, v)
+                  }
+                  filterUnfilteredTotal={unfilteredTotal}
                 >
                   {onExportResultSet && (
                     <ResultSetExportButton
                       hasMultiplePages={hasMultiplePages}
                       currentPageRows={currentPageRows}
-                      totalRows={totalRows}
+                      totalRows={unfilteredTotal}
                       resultSetExportScope={resultSetExportScope}
                       onExportResultSet={onExportResultSet}
                       onSetResultSetExportScope={setResultSetExportScope}
@@ -2745,6 +2796,9 @@ export function ResultPager({
   onDiscardEdits,
   elapsedMs,
   elapsedIsError,
+  filterValue,
+  onFilterChange,
+  filterUnfilteredTotal,
   children,
 }: {
   totalRows: number;
@@ -2763,6 +2817,12 @@ export function ResultPager({
   onDiscardEdits: () => void;
   elapsedMs?: number;
   elapsedIsError?: boolean;
+  /** In-grid filter text. When `onFilterChange` is provided the filter field
+   *  is shown; omit both to hide it (e.g. for engine-paged/lazy results). */
+  filterValue?: string;
+  onFilterChange?: (value: string) => void;
+  /** Full row count before filtering, for the "filtered from N" readout. */
+  filterUnfilteredTotal?: number;
   children?: React.ReactNode;
 }) {
   const effective = pageSize > 0 ? pageSize : Math.max(totalRows, 1);
@@ -2790,8 +2850,54 @@ export function ResultPager({
     }
   };
 
+  // The in-grid filter field is offered whenever a change handler is wired and
+  // there's at least one row to filter. `isFiltering` (a non-blank value)
+  // switches the row readout to a "of N" / "filtered from N" form.
+  const filterText = filterValue ?? "";
+  const showFilter = !!onFilterChange && (filterUnfilteredTotal ?? 0) > 0;
+  const isFiltering = showFilter && filterText.trim().length > 0;
+
   return (
     <div className="sql-result-pager">
+      {showFilter && (
+        <div className="sql-result-filter">
+          <Search
+            size={12}
+            aria-hidden="true"
+            className="sql-result-filter-icon"
+          />
+          <input
+            className="sql-result-filter-input"
+            type="text"
+            value={filterText}
+            placeholder="Filter rows…"
+            aria-label="Filter rows in this result"
+            spellCheck={false}
+            autoComplete="off"
+            onChange={(e) => onFilterChange?.(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape" && filterText) {
+                // Clear (and don't let the document-level Esc handler also
+                // discard pending edits).
+                e.preventDefault();
+                e.stopPropagation();
+                onFilterChange?.("");
+              }
+            }}
+          />
+          {filterText && (
+            <button
+              type="button"
+              className="sql-result-filter-clear"
+              aria-label="Clear filter"
+              title="Clear filter"
+              onClick={() => onFilterChange?.("")}
+            >
+              <X size={12} aria-hidden="true" />
+            </button>
+          )}
+        </div>
+      )}
       <span className="sql-result-pager-info">
         {editable && editCount > 0 ? (
           <>
@@ -2802,11 +2908,29 @@ export function ResultPager({
             {selectedCount} row{selectedCount === 1 ? "" : "s"} selected
           </>
         ) : totalRows === 0 ? (
-          "0 rows"
+          isFiltering ? (
+            <>
+              No matching rows
+              {filterUnfilteredTotal != null && (
+                <span className="sql-result-pager-filtered-note">
+                  {" "}
+                  (of {filterUnfilteredTotal})
+                </span>
+              )}
+            </>
+          ) : (
+            "0 rows"
+          )
         ) : (
           <>
             Rows {start + 1}–{end} of{" "}
             <strong className="sql-result-pager-total">{totalRows}</strong>
+            {isFiltering && filterUnfilteredTotal != null && (
+              <span className="sql-result-pager-filtered-note">
+                {" "}
+                · filtered from {filterUnfilteredTotal}
+              </span>
+            )}
           </>
         )}
         {elapsedMs != null && (
