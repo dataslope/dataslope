@@ -173,7 +173,6 @@ export async function createWorkspace(
       const writable = await metaFh.createWritable();
       await writable.write(JSON.stringify(meta));
       await writable.close();
-      // Create sub-directories
       await dir.getDirectoryHandle("files", { create: true });
       await dir.getDirectoryHandle("db", { create: true });
     } catch {

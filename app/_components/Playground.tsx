@@ -756,6 +756,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     settingsOpenRef.current = settingsOpen;
     // Reset tab position when settings is closed so it starts at the end
     // next time the user opens it.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional reset synced to the settingsOpen prop
     if (!settingsOpen) setSettingsTabIndex(Infinity);
   }, [settingsOpen]);
   useEffect(() => {

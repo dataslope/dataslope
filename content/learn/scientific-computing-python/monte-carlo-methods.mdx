@@ -11,7 +11,7 @@ numbers do the work.
 
 Three things make Monte Carlo special:
 
-- The error scales as $1/\sqrt\{N\}$ **regardless of dimension**.
+- The error scales as $1/\sqrt{N}$ **regardless of dimension**.
   This is bad for low-dimensional smooth integrals (deterministic
   quadrature crushes it) and *unbeatable* in high dimensions.
 - It needs almost no problem structure — you only have to be
@@ -46,14 +46,14 @@ unaffected by the dimensionality of the problem.
 For any integrable $f$ over a domain $D$ with volume $V$,
 
 $$
-\int_D f \, dV \approx \frac\{V\}\{N\} \sum_\{i=1\}^\{N\} f(x_i),
-\quad x_i \sim \text\{Uniform\}(D).
+\int_D f \, dV \approx \frac{V}{N} \sum_{i=1}^{N} f(x_i),
+\quad x_i \sim \text{Uniform}(D).
 $$
 
 The estimator's standard error is $V \sigma / \sqrt N$ where
-$\sigma^2 = \text\{Var\}\,f$ over the domain. Compare to a $d$-D
+$\sigma^2 = \text{Var}\,f$ over the domain. Compare to a $d$-D
 deterministic grid which requires $n^d$ points: in 10 dimensions,
-$10^\{10\}$ grid points vs Monte Carlo's $10^6$ samples for similar
+$10^{10}$ grid points vs Monte Carlo's $10^6$ samples for similar
 accuracy.
 
 <CodeBlock
@@ -89,8 +89,8 @@ most of its budget. **Importance sampling** draws from a
 distribution $g$ that mirrors $f$'s shape, then re-weights:
 
 $$
-\int f(x)\,dx = \int \frac\{f(x)\}\{g(x)\} \, g(x)\,dx
-\approx \frac\{1\}\{N\}\sum \frac\{f(x_i)\}\{g(x_i)\}, \quad x_i \sim g.
+\int f(x)\,dx = \int \frac{f(x)}{g(x)} \, g(x)\,dx
+\approx \frac{1}{N}\sum \frac{f(x_i)}{g(x_i)}, \quad x_i \sim g.
 $$
 
 <CodeBlock

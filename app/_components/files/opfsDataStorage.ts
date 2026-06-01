@@ -25,15 +25,9 @@ function encodePath(virtualPath: string): string {
   return virtualPath.replace(/\//g, SEP);
 }
 
-function decodePath(encoded: string): string {
-  return encoded.replace(new RegExp(SEP, "g"), "/");
-}
-
 // ---------------------------------------------------------------------------
 // OPFS helpers
 // ---------------------------------------------------------------------------
-
-type IterableDir = AsyncIterable<[string, FileSystemHandle]>;
 
 async function getDataDir(
   workspaceId: string,
@@ -130,7 +124,6 @@ export async function writeDataFile(
     await writable.write(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer);
     await writable.close();
 
-    // Update manifest
     const manifest = await readManifest(dir);
     const filtered = manifest.filter((f) => f.path !== virtualPath);
     filtered.push({ path: virtualPath, size: bytes.length, isFolder: false });

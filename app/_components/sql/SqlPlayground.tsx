@@ -19,14 +19,12 @@
 // user picks a different editor theme.
 
 import React, {
-  startTransition,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
   useSyncExternalStore,
-  type ReactNode,
 } from "react";
 import "../playground.css";
 import "../sqlPlayground.css";
@@ -43,54 +41,28 @@ import { AlertDialog } from "@base-ui-components/react/alert-dialog";
 import { Dialog } from "@base-ui-components/react/dialog";
 import { Tabs } from "@base-ui-components/react/tabs";
 import { Toast } from "@base-ui-components/react/toast";
-import { Select } from "@base-ui-components/react/select";
-import { Checkbox } from "@base-ui-components/react/checkbox";
 import { Menu } from "@base-ui-components/react/menu";
-import { ContextMenu } from "@base-ui-components/react/context-menu";
-import {
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-  type ColumnDef,
-  type SortingState,
-} from "@tanstack/react-table";
 import {
   ArrowDownToLine,
   ArrowUpFromLine,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsDown,
-  ChevronsLeft,
-  ChevronsRight,
-  ChevronsUp,
-  ChevronUp,
   CircleHelp,
   Database,
   FileCode2,
   FilePlus,
   FileText,
   FileJson,
-  GripVertical,
-  Hash,
   History,
   Network,
   Pencil,
-  Play,
   RotateCcw,
   Settings2,
   Table,
-  Trash2,
   TriangleAlert,
   Upload,
   Wand2,
   X,
-  Zap,
 } from "lucide-react";
 import { FaInfo } from "react-icons/fa";
-import { IoLink } from "react-icons/io5";
-import { MdOutlineKey } from "react-icons/md";
 import type { RuntimeInfo } from "../types";
 import { modifyDialogSignature } from "./types";
 import {
@@ -119,19 +91,18 @@ import { RenameDatabaseDialog } from "./components/RenameDatabaseDialog";
 import { SqlEditorToolbar } from "./components/SqlEditorToolbar";
 import { findSampleDatabase } from "../runtime/sqliteSamples";
 import { sqliteAdapter } from "./sqliteAdapter";
+import { DROP_KIND_LABELS, IMPORT_COL_STATUS_LABEL } from "./constants";
+import { computeImportColComparison } from "./utils/importUtils";
 import { ensureActiveWorkspace, switchActiveWorkspace } from "../opfs/activeWorkspace";
 import { acquireWorkspaceLock, createWorkspace } from "../opfs/workspace";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
 import {
   type ColumnConstraintInfo,
-  type ColumnSpec,
   type ForeignKeyInfo,
   type SqliteEngine,
-  type TableColumnInfo,
 } from "../runtime/sqlite";
 
 const SQLITE_SAMPLE_DATABASES = sqliteAdapter.samples;
-import type { QueryExecResult } from "../runtime/sqlite-wasm";
 import dynamic from "next/dynamic";
 
 // ErDiagramPane pulls in @xyflow/react and elkjs/lib/elk.bundled.js
@@ -179,21 +150,11 @@ import {
   dbScopedKey,
   loadActiveTabId,
   loadTabs,
-  newTabId,
   saveTabs,
   storageKey,
   type QueryTab,
 } from "../sqlitePlaygroundTabs";
 import { themeFor } from "../cmExtensions";
-// Replace the entire editor document — the v6 idiom for what v5 called
-// `editor.setValue(s)`. Centralised so the call sites that swap tab
-// contents all read the same.
-function replaceDoc(view: EditorView, value: string): void {
-  view.dispatch({
-    changes: { from: 0, to: view.state.doc.length, insert: value },
-  });
-}
-
 
 const PLAYGROUND_ID = sqliteAdapter.playgroundId;
 
@@ -230,9 +191,6 @@ const SQLITE_DB_ACTIONS: readonly DatabaseSelectorAction[] = [
   },
 ];
 
-const DROP_KIND_LABELS: Record<"table" | "view" | "index" | "trigger", string> =
-  { table: "Table", view: "View", index: "Index", trigger: "Trigger" };
-
 const RUNTIME_INFO: RuntimeInfo = {
   language: "SQLite",
   version: "3.53",
@@ -247,56 +205,6 @@ const RUNTIME_INFO: RuntimeInfo = {
 // Modify Structure drawer
 // ────────────────────────────────────────────────────────────────────────
 
-/** SQLite type-affinity options exposed by the Modify Structure drawer.
- *  These cover the five storage classes plus a few common aliases. The
- *  selected value is passed through to the engine's `rebuildTable`,
- *  which validates it against an identifier-shaped allowlist before
- *  inlining. */
-const COLUMN_TYPES = [
-  "INTEGER",
-  "REAL",
-  "TEXT",
-  "BLOB",
-  "NUMERIC",
-  "BOOLEAN",
-  "DATETIME",
-] as const;
-
-/** Allowed ON DELETE / ON UPDATE actions for foreign-key columns. */
-const FK_ACTIONS = [
-  "NO ACTION",
-  "RESTRICT",
-  "CASCADE",
-  "SET NULL",
-  "SET DEFAULT",
-] as const;
-
-/** Editable representation of one column inside the Modify Structure
- *  drawer. We keep `originalName` separately so the engine knows which
- *  column to copy from when applying a rename. `id` is a stable, local
- *  identifier so React's reconciliation matches rows correctly even
- *  while the user renames or reorders them. */
-interface ModifyColumnDraft {
-  id: string;
-  originalName: string | null;
-  name: string;
-  type: string;
-  notNull: boolean;
-  primaryKey: boolean;
-  autoIncrement: boolean;
-  unique: boolean;
-  defaultValue: string;
-  fkTable: string;
-  fkColumn: string;
-  fkOnDelete: string;
-  fkOnUpdate: string;
-  generated: { expression: string; storageType: "VIRTUAL" | "STORED" } | null;
-}
-
-function newDraftId(): string {
-  return `c_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`;
-}
-
 /** Hints used by the result-view header to render PK / FK icons next
  *  to columns sourced from a known table. Computed by the parent
  *  whenever the current tab's result was produced by a sidebar
@@ -305,256 +213,6 @@ interface ColumnKeyHints {
   pk: Set<string>;
   fk: Map<string, ForeignKeyInfo>;
 }
-
-interface ResultTableRow {
-  absoluteRow: number;
-  values: QueryExecResult["values"][number];
-}
-
-// ────────────────────────────────────────────────────────────────────────
-// Result formatting
-// ────────────────────────────────────────────────────────────────────────
-
-/** Infer a SQLite-style type label from the runtime JavaScript value.
- *  Scans the column's values to find the first non-null entry so that
- *  all-null columns fall back to "NULL" rather than silently showing
- *  nothing. Returns "INTEGER", "REAL", "TEXT", "BLOB", or "NULL". */
-function inferColumnType(
-  rows: QueryExecResult["values"],
-  colIdx: number,
-): string {
-  for (const row of rows) {
-    const v = row[colIdx];
-    if (v === null) continue;
-    if (v instanceof Uint8Array) return "BLOB";
-    if (typeof v === "number") return Number.isInteger(v) ? "INTEGER" : "REAL";
-    if (typeof v === "string") return "TEXT";
-  }
-  return "NULL";
-}
-
-interface QueryRunResult {
-  /** The result sets returned by sqlite-wasm (one per SELECT-like statement). */
-  sets: QueryExecResult[];
-  /** Time the run took in milliseconds. */
-  elapsedMs: number;
-  /** Optional error message if the run failed mid-way. */
-  error?: string;
-  /** Optional source label shown above the result panel — either the
-   *  active tab's title or, for sidebar previews, the table name. */
-  source: string;
-  /** When the result came from a sidebar preview, the underlying
-   *  table name. The result view uses this to look up PK / FK
-   *  metadata so it can render key icons next to those headers. We
-   *  intentionally only set this for previews — arbitrary user SQL has
-   *  no single "source table" so we don't try to guess. */
-  sourceTable?: string;
-  /** When lazy SQL pagination is active: the original trimmed SQL that
-   *  produced this result. Stored so page-navigation can re-run it
-   *  with a different LIMIT/OFFSET without requiring the caller to pass
-   *  it again. Undefined when the result was produced with all rows
-   *  loaded into memory (non-lazy mode). */
-  lazySql?: string;
-  /** When lazy SQL pagination is active: the original SQL before any
-   *  ORDER BY clauses were appended for UI sorting. Preserved so that
-   *  clearing a column sort reverts to the base query. */
-  lazyBaseSql?: string;
-  /** When lazy SQL pagination is active: total row count across all
-   *  pages, from a COUNT(*) wrapper executed at query time. Used by
-   *  the pagination footer to display accurate totals without loading
-   *  all rows into memory. */
-  lazyTotalCount?: number;
-  /** When lazy SQL pagination is active: 0-based index of the page
-   *  whose rows are stored in `sets`. */
-  lazyPage?: number;
-  /** When lazy SQL pagination is active: the page size (rows per page)
-   *  that was used to fetch this result. Stored separately from the
-   *  global setting so that delete/edit row-index calculations remain
-   *  correct even if the user changes the page size between the query
-   *  run and the action. */
-  lazyPageSize?: number;
-}
-
-type ResultSetExportScope = "page" | "all";
-
-interface ResultSetExportSnapshot {
-  setIndex: number;
-  columns: string[];
-  allRows: QueryExecResult["values"];
-  rows: QueryExecResult["values"];
-  totalRows: number;
-  pageSize: number;
-  currentPage: number;
-}
-
-type SelectedRowsByResult = Record<number, Set<number>>;
-type PendingEditsByResult = Record<number, Map<string, unknown>>;
-
-/** Quote a SQLite identifier with double-quotes, escaping embedded
- *  double-quotes per the SQL standard. Used for column and table names
- *  wherever SQL is generated by string concatenation. */
-function quoteIdentSql(name: string): string {
-  return `"${name.replace(/"/g, '""')}"`;
-}
-
-/** Parse a React Table column id of the form `col-${ci}-${name}` back
- *  into its column index and original column name. */
-function parseColumnId(id: string): { ci: number; name: string } | null {
-  const match = id.match(/^col-(\d+)-(.+)$/);
-  if (!match) return null;
-  return { ci: Number(match[1]), name: match[2] };
-}
-
-/** Compare two SQLite cell values for client-side sorting. NULL sorts
- *  before all other values; numbers compare numerically; everything
- *  else is coerced to string. */
-function compareCellValues(a: unknown, b: unknown): number {
-  if (a === null && b === null) return 0;
-  if (a === null) return -1;
-  if (b === null) return 1;
-  if (typeof a === "number" && typeof b === "number") return a - b;
-  const sa = String(a);
-  const sb = String(b);
-  return sa < sb ? -1 : sa > sb ? 1 : 0;
-}
-
-function formatCellValue(v: unknown): string {
-  if (v === null || v === undefined) return "NULL";
-  if (typeof v === "string") return v;
-  if (typeof v === "number") return Number.isFinite(v) ? String(v) : "NaN";
-  if (v instanceof Uint8Array) return `BLOB (${v.length} bytes)`;
-  return String(v);
-}
-
-/** Format a cell value as a SQL literal suitable for INSERT / SELECT. */
-function formatCellAsSql(v: unknown): string {
-  if (v === null || v === undefined) return "NULL";
-  if (typeof v === "number") return Number.isFinite(v) ? String(v) : "NULL";
-  if (typeof v === "string") return `'${v.replace(/'/g, "''")}'`;
-  if (v instanceof Uint8Array) {
-    const hex = Array.from(v)
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
-    return `x'${hex}'`;
-  }
-  return `'${String(v).replace(/'/g, "''")}'`;
-}
-
-function parseCellEditValue(raw: string, isNumeric: boolean): unknown {
-  // Mirrors utils/cellUtils.parseCellEditValue: an empty field clears to NULL,
-  // but the literal text "NULL" is stored verbatim (explicit "Set to NULL"
-  // exists for SQL NULL — see UX-20).
-  if (raw === "") return null;
-  if (!isNumeric) return raw;
-  const n = Number(raw);
-  // Keep as string if it doesn't parse cleanly so the user can see what
-  // they typed rather than silently coercing to NaN or 0.
-  return Number.isFinite(n) ? n : raw;
-}
-
-function cloneSelections(src: SelectedRowsByResult): SelectedRowsByResult {
-  return Object.fromEntries(
-    Object.entries(src).map(([idx, rows]) => [idx, new Set(rows)]),
-  ) as SelectedRowsByResult;
-}
-
-function clonePendingEdits(src: PendingEditsByResult): PendingEditsByResult {
-  return Object.fromEntries(
-    Object.entries(src).map(([idx, edits]) => [idx, new Map(edits)]),
-  ) as PendingEditsByResult;
-}
-
-/** Parse a pending-edit key of the form `${absoluteRow}:${columnIndex}`. */
-function parseCellKey(cellKey: string): { row: number; col: string } | null {
-  const [rowStr, col] = cellKey.split(":");
-  const row = Number(rowStr);
-  return Number.isInteger(row) ? { row, col } : null;
-}
-
-// ────────────────────────────────────────────────────────────────────────
-// SQL analysis helpers used for lazy (server-side) pagination decisions.
-// ────────────────────────────────────────────────────────────────────────
-
-/** Strip block (`/* … *\/`) and line (`-- …`) comments from a SQL string. */
-function stripSqlComments(sql: string): string {
-  return sql.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/--[^\r\n]*/g, "");
-}
-
-/** Returns true when `sql` appears to be a single SELECT or CTE statement
- *  (no multi-statement semicolons, starts with SELECT or WITH). Used to
- *  decide whether lazy LIMIT/OFFSET pagination is applicable.
- *  Pass `noComments` (the result of `stripSqlComments(sql)`) when you have
- *  already stripped comments to avoid redundant work. */
-function isSingleSelectSql(sql: string, noComments?: string): boolean {
-  const stripped = (noComments ?? stripSqlComments(sql))
-    .trim()
-    .replace(/;+\s*$/, "");
-  if (stripped.includes(";")) return false;
-  return /^(select|with)\s/i.test(stripped);
-}
-
-/** Returns true when `sql` already contains a LIMIT keyword (after
- *  stripping comments and single-quoted string literals). When true, lazy
- *  pagination is skipped: appending another LIMIT would produce invalid SQL.
- *  Single-quoted strings are stripped first so a value like `'No limit'`
- *  does not trigger a false positive.
- *  Pass `noComments` (the result of `stripSqlComments(sql)`) when you have
- *  already stripped comments to avoid redundant work. */
-function hasLimitClause(sqlOrNoComments: string): boolean {
-  const noStrings = sqlOrNoComments.replace(/'(?:''|[^'])*'/g, "''");
-  return /\blimit\b/i.test(noStrings);
-}
-
-/** Count deleted rows before a row index to calculate its post-delete shift. */
-function countSortedValuesLessThan(values: number[], target: number): number {
-  let lo = 0;
-  let hi = values.length;
-  while (lo < hi) {
-    const mid = Math.floor((lo + hi) / 2);
-    if (values[mid] < target) lo = mid + 1;
-    else hi = mid;
-  }
-  return lo;
-}
-
-/** Shift pending edit row indices after deletions and remove edits on deleted rows. */
-function pendingEditsAfterDeletedRows(
-  src: PendingEditsByResult,
-  setIdx: number,
-  deletedRows: Set<number>,
-): PendingEditsByResult {
-  const next = clonePendingEdits(src);
-  const edits = next[setIdx];
-  if (!edits) return next;
-  const sortedDeleted = [...deletedRows].sort((a, b) => a - b);
-  const shifted = new Map<string, unknown>();
-  for (const [cellKey, value] of edits) {
-    const parsed = parseCellKey(cellKey);
-    if (!parsed || deletedRows.has(parsed.row)) continue;
-    const { row, col } = parsed;
-    const shift = countSortedValuesLessThan(sortedDeleted, row);
-    shifted.set(`${row - shift}:${col}`, value);
-  }
-  if (shifted.size > 0) next[setIdx] = shifted;
-  else delete next[setIdx];
-  return next;
-}
-
-// ────────────────────────────────────────────────────────────────────────
-// Pagination defaults — shared globally across all result sets, tabs
-// and databases. The "All" option (value = 0) renders every row at
-// once and hides the page navigator. The chosen size is persisted to
-// localStorage so the user's preference survives reloads.
-// ────────────────────────────────────────────────────────────────────────
-
-const PAGE_SIZE_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
-  { value: 25, label: "25" },
-  { value: 50, label: "50" },
-  { value: 100, label: "100" },
-  { value: 250, label: "250" },
-  { value: 500, label: "500" },
-  { value: 0, label: "All" },
-];
 
 // ─── Pragma settings ─────────────────────────────────────────────────────
 
@@ -618,82 +276,6 @@ async function applyPragmasToEngine(
   }
 }
 
-/** Delay before treating a sidebar-row click as a single click. The
- *  schema rows distinguish single-click (toggle expand) from
- *  double-click (preview) by deferring the toggle for slightly less
- *  than the OS-typical double-click threshold (≤ 250ms). The 220ms
- *  window ensures click2 of a double-click always arrives before the
- *  timer fires, so dblclick can reliably cancel the pending toggle. */
-const SINGLE_CLICK_DELAY_MS = 220;
-
-// ── Import column-comparison helper ─────────────────────────────────────
-// Compares the file headers that will be inserted against the column list
-// of an existing target table, returning a row-per-column summary used by
-// the import dialogs to flag matched / extra / missing columns.
-// Sanitizes a raw header/column name to the SQL identifier that the import
-// handlers use when building INSERT statements (same regex as the callers).
-// Case is preserved so the created column names match the original file.
-function sanitizeImportColName(header: string): string {
-  return header.trim().replace(/[^a-zA-Z0-9_]/g, "_") || "col";
-}
-
-// Case-insensitive variant used only for column-matching comparisons.
-// SQLite column lookups are case-insensitive, so we normalise both sides
-// before comparing.
-function normalizeImportColName(header: string): string {
-  return sanitizeImportColName(header).toLowerCase();
-}
-
-function computeImportColComparison(
-  fileHeaders: string[],
-  tableCols: TableColumnInfo[],
-): Array<{
-  status: "matched" | "extra" | "optional" | "required";
-  fileCol: string | null;
-  tableCol: string | null;
-}> {
-  const tableMap = new Map(tableCols.map((c) => [c.name.toLowerCase(), c]));
-  const matched = new Set<string>();
-  const rows: ReturnType<typeof computeImportColComparison> = [];
-
-  for (const h of fileHeaders) {
-    const key = normalizeImportColName(h);
-    const col = tableMap.get(key);
-    if (col) {
-      rows.push({ status: "matched", fileCol: h, tableCol: col.name });
-      matched.add(key);
-    } else {
-      rows.push({ status: "extra", fileCol: h, tableCol: null });
-    }
-  }
-
-  for (const col of tableCols) {
-    if (!matched.has(col.name.toLowerCase())) {
-      // A column can safely be omitted from the import file when it
-      // allows NULL, carries a DEFAULT, or is (part of) the primary key
-      // (INTEGER PRIMARY KEY columns auto-assign the rowid).
-      const isOptional =
-        !col.notNull || col.defaultValue !== null || col.pk > 0;
-      rows.push({
-        status: isOptional ? "optional" : "required",
-        fileCol: null,
-        tableCol: col.name,
-      });
-    }
-  }
-
-  return rows;
-}
-
-// Labels shown in the status column of the column-comparison table inside
-// the import dialogs.
-const IMPORT_COL_STATUS_LABEL = {
-  matched: "✓ Matched",
-  extra: "⚠ Not in table",
-  optional: "○ Optional",
-  required: "✗ Required",
-} as const;
-
 // ────────────────────────────────────────────────────────────────────────
 // Component
 // ────────────────────────────────────────────────────────────────────────
@@ -748,57 +330,6 @@ function PragmaInfoButton({ pragma }: { pragma: keyof PragmaSettings }) {
         >
           <Popover.Popup className="bui-popup pragma-info-popup">
             <p className="pragma-info-text">{PRAGMA_DESCRIPTIONS[pragma]}</p>
-          </Popover.Popup>
-        </Popover.Positioner>
-      </Popover.Portal>
-    </Popover.Root>
-  );
-}
-
-// ─── Column header popovers in the modify-table drawer ───────────────────────
-
-const COLUMN_HEADER_DESCRIPTIONS: Record<string, string> = {
-  type: "The SQLite data type for this column, such as INTEGER, TEXT, REAL, or BLOB.",
-  notNull:
-    "When checked, every row must have a value in this column. NULL values are not allowed.",
-  primary:
-    "When checked, this column is the primary key used to uniquely identify each row.",
-  unique: "When checked, no two rows can have the same value in this column.",
-  autoIncrement:
-    "When checked, SQLite automatically assigns an incrementing integer value for each new row.",
-  defaultValue:
-    "The value automatically used for this column when no value is provided during insertion.",
-  fkTable: "The table that this column references as a foreign key.",
-  fkColumn:
-    "The column in the referenced table that this foreign key column maps to.",
-  onDelete:
-    "The action to perform when the referenced row in the foreign table is deleted.",
-  onUpdate:
-    "The action to perform when the referenced value in the foreign table is updated.",
-};
-
-function ColumnHeaderPopover({ pragma }: { pragma: string }) {
-  return (
-    <Popover.Root>
-      <Popover.Trigger
-        className="sql-col-header-info"
-        aria-label="More info"
-        openOnHover
-        delay={80}
-        closeDelay={120}
-      >
-        <CircleHelp size={11} aria-hidden="true" />
-      </Popover.Trigger>
-      <Popover.Portal>
-        <Popover.Positioner
-          className="sql-col-header-positioner"
-          sideOffset={6}
-          align="center"
-        >
-          <Popover.Popup className="bui-popup sql-col-header-popup">
-            <p className="sql-col-header-text">
-              {COLUMN_HEADER_DESCRIPTIONS[pragma]}
-            </p>
           </Popover.Popup>
         </Popover.Positioner>
       </Popover.Portal>
@@ -1059,9 +590,6 @@ function SqlPlaygroundInner() {
     (s) => s.setForeignKeysByEntity,
   );
   const constraintsByEntity = useEngineStore((s) => s.constraintsByEntity);
-  const setConstraintsByEntity = useEngineStore(
-    (s) => s.setConstraintsByEntity,
-  );
   const expandedEntities = useEngineStore((s) => s.expandedEntities);
   const setExpandedEntities = useEngineStore((s) => s.setExpandedEntities);
   const tablesSectionExpanded = useEngineStore((s) => s.tablesSectionExpanded);
@@ -1086,7 +614,6 @@ function SqlPlaygroundInner() {
   const setActiveTabId = useTabStore((s) => s.setActiveTabId);
   const resultsByTab = useTabStore((s) => s.resultsByTab);
   const setResultsByTab = useTabStore((s) => s.setResultsByTab);
-  const resultSetExportSnapshot = useTabStore((s) => s.resultSetExportSnapshot);
   const setResultSetExportSnapshot = useTabStore(
     (s) => s.setResultSetExportSnapshot,
   );
@@ -1124,9 +651,6 @@ function SqlPlaygroundInner() {
   const setModifyStructureTab = useDialogStore((s) => s.setModifyStructureTab);
   const modifyStructureRefreshKey = useDialogStore(
     (s) => s.modifyStructureRefreshKey,
-  );
-  const setModifyStructureRefreshKey = useDialogStore(
-    (s) => s.setModifyStructureRefreshKey,
   );
   const addRowDialog = useDialogStore((s) => s.addRowDialog);
   const setAddRowDialog = useDialogStore((s) => s.setAddRowDialog);
@@ -1289,10 +813,8 @@ function SqlPlaygroundInner() {
     addHistoryEntry,
   };
   const {
-    runSqlForTab,
     handleLoadPage,
     handleLoadMorePage,
-    handleFetchAllRows,
     runActiveTab,
     runSelection,
     runCurrentSelection,
@@ -1303,7 +825,6 @@ function SqlPlaygroundInner() {
     updateRowsInTable,
     duplicateRowInTable,
     showToast,
-    quoteIdent,
   } = useQueryRunner(queryRunnerRefs);
 
   const {
@@ -1353,7 +874,6 @@ function SqlPlaygroundInner() {
   );
 
   const {
-    applyDbLoad,
     performDbSwitch,
     performImportSqlite,
     performImportSqlDump,
@@ -1521,7 +1041,6 @@ function SqlPlaygroundInner() {
   // When tabs are closed (or replaced wholesale), drop any result
   // entries whose owning tab no longer exists.
   useEffect(() => {
-    /* eslint-disable-next-line react-hooks/set-state-in-effect */
     setResultsByTab((prev) => {
       const ids = new Set(tabs.map((t) => t.id));
       let changed = false;
@@ -1579,7 +1098,6 @@ function SqlPlaygroundInner() {
         localStorage.getItem(storageKey("pragma_casesensitivelike")) === "true",
     };
 
-    /* eslint-disable react-hooks/set-state-in-effect */
     setFontSizeState(savedSize);
     setOutputFontSizeEnabledState(false);
     setOutputFontSizeState(D.outputFontSize);
@@ -1593,7 +1111,6 @@ function SqlPlaygroundInner() {
     const initialTabs = loadTabs(initialSample.id, initialSample.defaultTabs);
     setTabs(initialTabs);
     setActiveTabId(loadActiveTabId(initialSample.id, initialTabs));
-    /* eslint-enable react-hooks/set-state-in-effect */
 
     applyMode(savedTheme);
     applyThemePalette(savedTheme);
@@ -1905,7 +1422,6 @@ function SqlPlaygroundInner() {
   // Hydrate sidebar collapse state for the active database.
   useEffect(() => {
     if (typeof window === "undefined") return;
-    /* eslint-disable react-hooks/set-state-in-effect */
     try {
       const rawSections = localStorage.getItem(
         dbScopedKey(activeDbId, "sections_expanded"),
@@ -1942,7 +1458,6 @@ function SqlPlaygroundInner() {
     // Cached metadata is per-database, so wipe it when the DB changes.
     setColumnsByEntity({});
     setForeignKeysByEntity({});
-    /* eslint-enable react-hooks/set-state-in-effect */
   }, [
     activeDbId,
     setTablesSectionExpanded,

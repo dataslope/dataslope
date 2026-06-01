@@ -21,7 +21,7 @@ Pick any approximation parameter $h$ that controls the
 spacing of a grid. Then the total error of a method usually has
 two contributions:
 
-$$ E(h) \\;=\\; \\underbrace\{C \\, h^p\}_\{\\text\{truncation\}\} \\;+\\; \\underbrace\{D / h^q\}_\{\\text\{round-off\}\} $$
+$$ E(h) \;=\; \underbrace{C \, h^p}_{\text{truncation}} \;+\; \underbrace{D / h^q}_{\text{round-off}} $$
 
 - **Truncation error** dominates when $h$ is *large*. Use a smaller
   $h$ to fix it.
@@ -74,8 +74,8 @@ Theoretical analysis says the sweet spots are roughly:
 
 | Method | Truncation order | Optimal $h$ | Optimal error |
 | --- | --- | --- | --- |
-| Forward difference $\\frac\{f(x+h)-f(x)\}\{h\}$ | $O(h)$ | $\\sqrt\{\\epsilon\}$ | $\\sqrt\{\\epsilon\} \\approx 10^\{-8\}$ |
-| Centered difference $\\frac\{f(x+h)-f(x-h)\}\{2h\}$ | $O(h^2)$ | $\\sqrt[3]\{\\epsilon\}$ | $\\epsilon^\{2/3\} \\approx 10^\{-11\}$ |
+| Forward difference $\frac{f(x+h)-f(x)}{h}$ | $O(h)$ | $\sqrt{\epsilon}$ | $\sqrt{\epsilon} \approx 10^{-8}$ |
+| Centered difference $\frac{f(x+h)-f(x-h)}{2h}$ | $O(h^2)$ | $\sqrt[3]{\epsilon}$ | $\epsilon^{2/3} \approx 10^{-11}$ |
 | Richardson extrapolation | $O(h^4)$ and higher | larger | even smaller |
 
 A higher-order method gives you more accuracy *and* lets you use a
@@ -92,7 +92,7 @@ halves an order-4 method's error by a factor of $16$.
 We can *empirically measure* convergence order. Compute the error at
 two step sizes $h_1$ and $h_2 = h_1 / 2$:
 
-$$ p \\approx \\log_2 \\frac\{E(h_1)\}\{E(h_2)\} $$
+$$ p \approx \log_2 \frac{E(h_1)}{E(h_2)} $$
 
 <CodeBlock
   adapter="python"
@@ -143,7 +143,7 @@ Runge–Kutta pair) rather than to plain Euler.
 Some series converge mathematically but agonizingly slowly. The
 Leibniz formula
 
-$$ \\frac\{\\pi\}\{4\} \\;=\\; 1 - \\frac\{1\}\{3\} + \\frac\{1\}\{5\} - \\frac\{1\}\{7\} + \\cdots $$
+$$ \frac{\pi}{4} \;=\; 1 - \frac{1}{3} + \frac{1}{5} - \frac{1}{7} + \cdots $$
 
 needs $10^6$ terms to get $6$ digits right. That is wasteful when
 **series acceleration** techniques can squeeze the same digits out

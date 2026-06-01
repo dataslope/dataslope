@@ -8,7 +8,6 @@ import {
   useSensor,
   useSensors,
   type DragEndEvent,
-  type DragStartEvent,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -26,7 +25,6 @@ import {
   makeSqlEditorCompartments,
   makeSqlLangExtension,
 } from "../sql/shared/editorSetup";
-import { AlertDialog } from "@base-ui-components/react/alert-dialog";
 import { Combobox } from "@base-ui-components/react/combobox";
 import { Dialog } from "@base-ui-components/react/dialog";
 import { Menu } from "@base-ui-components/react/menu";
@@ -47,7 +45,6 @@ import {
   Layers,
   Network,
   Pencil,
-  Play,
   Plus,
   Table,
   Trash2,
@@ -114,7 +111,6 @@ import { postgresAdapter } from "./postgresAdapter";
 import {
   ensureActiveWorkspace,
   setActiveWorkspaceId,
-  switchActiveWorkspace,
 } from "../opfs/activeWorkspace";
 import { acquireWorkspaceLock, createWorkspace } from "../opfs/workspace";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
@@ -1023,7 +1019,6 @@ function PostgresPlaygroundInner() {
     selectedSchema,
     setSelectedSchema,
     schemas,
-    setSchemas,
     schemaLoading,
     selectedSchemaRef,
     refreshSchemas: refreshSchemasFromHook,

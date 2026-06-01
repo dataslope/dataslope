@@ -59,11 +59,9 @@ import styles from "./ChallengeCard.module.css";
 import {
   createEngineForDialect,
   DialectGlyph,
-  RunOverlay,
   sqlFormatterLanguage,
   TableViewer,
   useSqlTableViewer,
-  VirtualizedResultTable,
   type ResultTabData,
   type SqlDialect,
   type SqlEngineLike,

@@ -69,7 +69,6 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
   );
 
   const activeDbId = useEngineStore((s) => s.activeDbId);
-  const customDb = useEngineStore((s) => s.customDb);
   const customFilenames = useEngineStore((s) => s.customFilenames);
   const tables = useEngineStore((s) => s.tables);
   const setTables = useEngineStore((s) => s.setTables);
@@ -90,13 +89,10 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
   const setImportSqlDumpOpen = useDialogStore((s) => s.setImportSqlDumpOpen);
   const setImportCsvOpen = useDialogStore((s) => s.setImportCsvOpen);
   const setImportCsvState = useDialogStore((s) => s.setImportCsvState);
-  const importCsvState = useDialogStore((s) => s.importCsvState);
   const setImportJsonOpen = useDialogStore((s) => s.setImportJsonOpen);
   const setImportJsonState = useDialogStore((s) => s.setImportJsonState);
-  const importJsonState = useDialogStore((s) => s.importJsonState);
   const setImportParquetOpen = useDialogStore((s) => s.setImportParquetOpen);
   const setImportParquetState = useDialogStore((s) => s.setImportParquetState);
-  const importParquetState = useDialogStore((s) => s.importParquetState);
   const setPendingDbId = useDialogStore((s) => s.setPendingDbId);
 
   const quoteIdent = useCallback(
@@ -194,22 +190,6 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
     },
     [applyDbLoad, showToast, engineRef, setCustomFilenames],
   );
-
-  const performBlankLoad = useCallback(() => {
-    const engine = engineRef.current;
-    if (!engine) return;
-    void (async () => {
-      const sample = await engine.loadBlankDatabase();
-      setCustomFilenames((prev) => {
-        if (!(sample.id in prev)) return prev;
-        const next = { ...prev };
-        delete next[sample.id];
-        return next;
-      });
-      await applyDbLoad(sample);
-      showToast("Created blank database.");
-    })();
-  }, [applyDbLoad, showToast, engineRef, setCustomFilenames]);
 
   const performImportSqlite = useCallback(
     (bytes: Uint8Array, filename: string) => {

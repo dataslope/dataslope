@@ -1574,9 +1574,7 @@ function ResultViewImpl({
                 preserveStateForReload();
                 onLoadPage(effectiveLazySql, p);
               };
-              // eslint-disable-next-line react-hooks/refs
               handlePageSizeChange = (s: number) => {
-                // eslint-disable-next-line react-hooks/refs
                 preserveStateForReload();
                 onSetGlobalPageSize(s);
                 onLoadPage(effectiveLazySql, 0, s);
@@ -2994,7 +2992,6 @@ export function ResultTableBody({
 export function ResultPager({
   totalRows,
   loadedRows,
-  index,
   pageSize,
   page,
   onPageChange,
