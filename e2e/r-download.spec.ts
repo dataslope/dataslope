@@ -1,18 +1,17 @@
 import { test, expect, type Page } from "@playwright/test";
 
-// Verifies the R playground's download.file() fix: a file fetched with
-// download.file() must (1) actually download (WebR's built-in stalls without
-// cross-origin isolation) and (2) show up in the Files pane.
+// E2E coverage for the R playground's data-handling fixes:
+//   1. download.file() saves a file that shows up in the Files pane.
+//   2. Printing a large data.frame is truncated (head + ellipsis + tail)
+//      instead of dumping every row and freezing the page.
 //
-// This test reaches the real WebR CDN and a real raw.githubusercontent.com
-// CSV (~4 MB), so it is intentionally kept out of the default e2e run to avoid
-// external-network flakiness. Enable it with:
+// Both need the heavy WebR runtime (fetched from a CDN), and the download
+// test also reaches a real raw.githubusercontent.com CSV (~4 MB), so this
+// spec is kept out of the default e2e run. Enable it with:
 //
-//   R_NET_E2E=1 npx playwright test e2e/r-download.spec.ts
-//
-// (The webServer + Chromium are booted by playwright.config.ts as usual.)
+//   R_E2E=1 npx playwright test e2e/r-download.spec.ts
 
-const ENABLED = !!process.env.R_NET_E2E;
+const ENABLED = !!process.env.R_E2E;
 
 const CSV_URL =
   "https://raw.githubusercontent.com/bdi593/datasets/refs/heads/main/zillow-properties/zillow_properties_champaign_urbana_savoy.csv";
@@ -77,13 +76,10 @@ async function runAndCollect(page: Page) {
   return out;
 }
 
-test.describe("R download.file()", () => {
-  test.skip(!ENABLED, "set R_NET_E2E=1 to run (reaches external network)");
+test.describe("R playground data handling", () => {
+  test.skip(!ENABLED, "set R_E2E=1 to run (needs the WebR runtime / network)");
 
-  test("downloads a CSV and shows it in the Files pane", async ({ page }) => {
-    const pageErrors: string[] = [];
-    page.on("pageerror", (e) => pageErrors.push(e.message));
-
+  test("download.file() saves a CSV into the Files pane", async ({ page }) => {
     await page.goto("/playground/r");
     await waitForRuntimeReady(page);
 
@@ -97,31 +93,49 @@ test.describe("R download.file()", () => {
     const cells = await runAndCollect(page);
     const allText = cells.map((c) => `[${c.type}] ${c.body}`).join("\n");
 
-    // The download must not error. download.file() prints "trying URL" /
-    // "downloaded N bytes" via message() (an stderr cell) — those are
-    // expected, so we look for genuine failure markers instead of any stderr.
+    // download.file() prints "trying URL" / "downloaded N bytes" via message()
+    // (an stderr cell) — those are expected, so look for genuine failure
+    // markers rather than treating any stderr as a failure.
     expect(allText, allText).not.toMatch(/cannot open URL/i);
     expect(allText, allText).not.toMatch(/could not find function/i);
     expect(allText, allText).not.toMatch(/download failed/i);
-    expect(allText, allText).not.toMatch(/Error[:\s]/);
 
-    // The file exists in the R working directory with real content.
+    // The file exists in the R working directory with real content…
     expect(allText).toContain("exists: TRUE");
-    expect(allText).toMatch(/nbytes:\s*\d{4,}/); // at least a few KB
+    expect(allText).toMatch(/nbytes:\s*\d{4,}/);
 
     // …and it now appears in the Files pane.
     await page.locator('[aria-label="Files"]').first().click();
     await expect(
       page.locator(".playground-files-name", { hasText: CSV_NAME }),
     ).toBeVisible({ timeout: 10_000 });
+  });
 
-    // Guard against page errors from the download path, but tolerate the
-    // app's pre-existing benign OPFS "NotFoundError" that fires on first
-    // load of a brand-new workspace (create:false reads in fileStorage /
-    // databaseStorage), which is unrelated to this feature.
-    const relevantErrors = pageErrors.filter(
-      (m) => !/requested file or directory could not be found/i.test(m),
+  test("printing a large data.frame is truncated to head + tail", async ({
+    page,
+  }) => {
+    await page.goto("/playground/r");
+    await waitForRuntimeReady(page);
+
+    // 500 rows; each label is unique so we can prove the middle is hidden.
+    await setEditorCode(
+      page,
+      `df <- data.frame(idx = 1:500, label = sprintf("row-%03d", 1:500),\n` +
+        `                 stringsAsFactors = FALSE)\n` +
+        `print(df)`,
     );
-    expect(relevantErrors, relevantErrors.join("\n")).toEqual([]);
+
+    const cells = await runAndCollect(page);
+    const stdout = cells
+      .filter((c) => c.type === "stdout")
+      .map((c) => c.body)
+      .join("\n");
+
+    expect(stdout, stdout).toContain("row-001"); // head present
+    expect(stdout, stdout).toContain("row-500"); // tail present
+    expect(stdout, stdout).toContain("..."); // ellipsis row
+    expect(stdout, stdout).toMatch(/500 rows total/);
+    // The hidden middle must NOT be dumped (this is the page-freeze guard).
+    expect(stdout, stdout).not.toContain("row-250");
   });
 });

@@ -688,114 +688,88 @@ function rowsFromDataFrame(value: unknown): Record<string, unknown>[] | null {
 // Working directory inside the WebR Emscripten FS (matches `getwd()` output).
 const WEB_USER_HOME = "/home/web_user";
 
-// Newline-separated list of absolute paths written by our download.file()
-// override during a run. Read back by collectCreatedFiles() so downloads show
-// up in the Files pane, then cleared.
+// Newline-separated list of absolute paths created during a run (currently
+// download.file() destinations). Read back by collectCreatedFiles() so
+// downloads appear in the Files pane, then cleared.
 const CREATED_FILES_PATH = "/tmp/.pg_created_files";
 
-// One-time R setup that installs a working download.file().
+// One-time R setup, run once after the runtime initialises and kept on the
+// search path so it survives the per-run wipe of the global environment (and
+// never shows up in the user's ls()).
 //
-// WebR's built-in download.file() performs a synchronous network request
-// through its main↔worker channel, which only succeeds when the page is
-// cross-origin isolated (SharedArrayBuffer available). The playground is not
-// cross-origin isolated, so the built-in stalls after printing "trying URL"
-// and never writes the file. We replace it with a synchronous XMLHttpRequest
-// run directly inside the WebR worker via webr::eval_js — fully self-contained,
-// so it works regardless of the communication channel. Cross-origin hosts
-// still need permissive CORS headers (or the CORS proxy), exactly like
-// pandas.read_csv in the Python runtime.
+// 1. download.file(): WebR's built-in download.file() already works in the
+//    playground (it performs the request synchronously inside the worker). We
+//    only wrap it so the destination file is mirrored into the Files pane — the
+//    actual fetch is delegated unchanged to utils::download.file(), so
+//    cross-origin hosts still need permissive CORS headers (or the CORS proxy),
+//    exactly like pandas.read_csv in the Python runtime.
 //
-// The override is attached to the search path (not .GlobalEnv) so it survives
-// the per-run wipe of the global environment in run() and never appears in the
-// user's ls(). Each successful download appends its destination path to
-// CREATED_FILES_PATH so the playground can mirror it into the Files pane.
-const R_NET_SETUP = String.raw`
+// 2. print(): base R prints every row of a plain data.frame, which can freeze
+//    the page for large frames. We override the print generic (an ordinary
+//    search-path lookup, unlike an S3 method which UseMethod won't pick up from
+//    an attached env) to show the first 10 and last 5 rows with an ellipsis —
+//    the same Jupyter-style truncation already used for auto-printed frames
+//    (see dataFrameToHtml). Only plain data.frames are affected; tibbles,
+//    data.tables, etc. keep their own already-truncating print methods.
+const R_SESSION_SETUP = String.raw`
 suppressWarnings(dir.create("/tmp", showWarnings = FALSE))
 
-.pg_download_file <- function(url, destfile, quiet = FALSE, mode = "wb", ...) {
-  if (missing(destfile) || is.null(destfile) || !nzchar(destfile)) {
-    stop("'destfile' must be a non-empty file path")
+local({
+  download_file <- function(url, destfile, ...) {
+    status <- utils::download.file(url, destfile, ...)
+    if (!missing(destfile) && is.character(destfile) && length(destfile) == 1L &&
+        nzchar(destfile) && file.exists(destfile)) {
+      abs <- if (startsWith(destfile, "/")) destfile else file.path(getwd(), destfile)
+      try(cat(abs, "\n", sep = "", file = "/tmp/.pg_created_files", append = TRUE),
+          silent = TRUE)
+    }
+    invisible(status)
   }
-  if (length(url) != 1L) stop("'url' must be a single string")
-  if (!quiet) message(sprintf("trying URL '%s'", url))
 
-  url_path    <- "/tmp/.pg_dl_url"
-  data_path   <- "/tmp/.pg_dl_data"
-  status_path <- "/tmp/.pg_dl_status"
-  unlink(c(data_path, status_path))
-  writeBin(charToRaw(enc2utf8(url)), url_path)
-
-  js <- r"---(
-(function () {
-  try {
-    var fs = Module.FS;
-    var raw = fs.readFile('/tmp/.pg_dl_url');
-    var url = '';
-    for (var i = 0; i < raw.length; i++) url += String.fromCharCode(raw[i]);
-    url = url.trim();
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', url, false);
-    xhr.overrideMimeType('text/plain; charset=x-user-defined');
-    try { xhr.responseType = 'arraybuffer'; } catch (e) {}
-    xhr.send(null);
-    var status = xhr.status || 0;
-    fs.writeFile('/tmp/.pg_dl_status', new TextEncoder().encode(String(status)));
-    if (status >= 200 && status < 300) {
-      var bytes;
-      if (xhr.response && typeof xhr.response.byteLength === 'number') {
-        bytes = new Uint8Array(xhr.response);
-      } else {
-        var text = xhr.responseText || '';
-        bytes = new Uint8Array(text.length);
-        for (var j = 0; j < text.length; j++) bytes[j] = text.charCodeAt(j) & 255;
+  print_override <- function(x, ...) {
+    # Only plain data.frames (e.g. from read.csv / data.frame). tibbles,
+    # data.tables, etc. keep their own already-truncating print methods.
+    if (identical(class(x), "data.frame")) {
+      n <- nrow(x)
+      if (is.finite(n) && n > 20L && ncol(x) >= 1L) {
+        done <- tryCatch({
+          head_n <- 10L; tail_n <- 5L
+          top <- format(utils::head(x, head_n))
+          bot <- format(utils::tail(x, tail_n))
+          sep <- top[1, , drop = FALSE]; sep[] <- "..."; rownames(sep) <- "..."
+          block <- as.matrix(rbind(top, sep, bot))
+          base::print(block, quote = FALSE, right = TRUE)
+          cat(sprintf("# %s rows total; showing first %d and last %d\n",
+                      format(n, big.mark = ","), head_n, tail_n))
+          TRUE
+        }, error = function(e) FALSE)
+        if (isTRUE(done)) return(invisible(x))
       }
-      fs.writeFile('/tmp/.pg_dl_data', bytes);
     }
-    return status;
-  } catch (err) {
-    try {
-      Module.FS.writeFile('/tmp/.pg_dl_status', new TextEncoder().encode('-1'));
-    } catch (e2) {}
-    return -1;
-  }
-})()
-)---"
-
-  invisible(webr::eval_js(js))
-
-  status <- tryCatch(
-    as.integer(readLines(status_path, warn = FALSE))[1],
-    error = function(e) NA_integer_
-  )
-  if (length(status) == 0L || is.na(status)) status <- -1L
-
-  if (status >= 200 && status < 300 && file.exists(data_path)) {
-    dest_dir <- dirname(destfile)
-    if (nzchar(dest_dir) && dest_dir != "." && !dir.exists(dest_dir)) {
-      dir.create(dest_dir, recursive = TRUE, showWarnings = FALSE)
-    }
-    ok <- file.copy(data_path, destfile, overwrite = TRUE)
-    unlink(data_path)
-    if (!isTRUE(ok)) stop(sprintf("cannot write downloaded data to '%s'", destfile))
-    size <- file.info(destfile)$size
-    if (!quiet) message(sprintf("downloaded %d bytes", as.integer(size)))
-    abs_path <- if (startsWith(destfile, "/")) destfile else file.path(getwd(), destfile)
-    cat(abs_path, "\n", sep = "", file = "/tmp/.pg_created_files", append = TRUE)
-    return(invisible(0L))
+    base::print(x, ...)
   }
 
-  stop(sprintf(
-    "cannot open URL '%s'%s",
-    url,
-    if (status > 0) sprintf(": HTTP status was %d", status) else ": download failed"
-  ))
-}
-
-while ("webr:playground-net" %in% search()) detach("webr:playground-net")
-attach(list(download.file = .pg_download_file),
-       name = "webr:playground-net", warn.conflicts = FALSE)
-rm(.pg_download_file)
+  while ("webr:playground" %in% search()) detach("webr:playground")
+  attach(list(download.file = download_file, print = print_override),
+         name = "webr:playground", warn.conflicts = FALSE)
+})
 `;
+
+// Backstop against a single run flooding the UI with megabytes of text (e.g.
+// printing a huge vector or matrix), which can freeze the browser. Keep the
+// head and tail so the output stays useful. Large data frames are truncated
+// more nicely by the print.data.frame override above; this catches everything
+// else.
+const MAX_CELL_TEXT_CHARS = 250_000;
+function capCellText(text: string): string {
+  if (text.length <= MAX_CELL_TEXT_CHARS) return text;
+  const headLen = Math.floor(MAX_CELL_TEXT_CHARS * 0.75);
+  const tailLen = MAX_CELL_TEXT_CHARS - headLen;
+  const head = text.slice(0, headLen);
+  const tail = text.slice(text.length - tailLen);
+  const hidden = text.length - head.length - tail.length;
+  return `${head}\n\n… ${hidden.toLocaleString()} characters of output hidden …\n\n${tail}`;
+}
 
 class WebRRuntime implements LanguageRuntime {
   private installedPackages = new Set<string>();
@@ -878,7 +852,7 @@ class WebRRuntime implements LanguageRuntime {
 
     await this.webR.evalRVoid(
       `rm(list = ls(envir = .GlobalEnv, all.names = TRUE), envir = .GlobalEnv)
-unlink(c("${CREATED_FILES_PATH}", "/tmp/.pg_dl_url", "/tmp/.pg_dl_data", "/tmp/.pg_dl_status"))`,
+unlink("${CREATED_FILES_PATH}")`,
     );
 
     const shelter: ShelterInstance = await new this.webR.Shelter();
@@ -908,9 +882,9 @@ unlink(c("${CREATED_FILES_PATH}", "/tmp/.pg_dl_url", "/tmp/.pg_dl_data", "/tmp/.
         else if (o.type === "stderr") stderrBuf += String(o.data) + "\n";
       }
       if (stdoutBuf.trim())
-        emit({ type: "stdout", content: stdoutBuf.trim() });
+        emit({ type: "stdout", content: capCellText(stdoutBuf.trim()) });
       if (stderrBuf.trim())
-        emit({ type: "stderr", content: stderrBuf.trim() });
+        emit({ type: "stderr", content: capCellText(stderrBuf.trim()) });
 
       for (const bmp of result.images) {
         const b64 = await imageBitmapToPngBase64(bmp);
@@ -970,9 +944,9 @@ unlink(c("${CREATED_FILES_PATH}", "/tmp/.pg_dl_url", "/tmp/.pg_dl_data", "/tmp/.
               else if (o.type === "stderr") printStderr += String(o.data) + "\n";
             }
             if (printStdout.trim())
-              emit({ type: "stdout", content: printStdout.trim() });
+              emit({ type: "stdout", content: capCellText(printStdout.trim()) });
             if (printStderr.trim())
-              emit({ type: "stderr", content: printStderr.trim() });
+              emit({ type: "stderr", content: capCellText(printStderr.trim()) });
             for (const bmp of printCapture.images) {
               const b64 = await imageBitmapToPngBase64(bmp);
               emit({ type: "image", content: b64 });
@@ -1097,13 +1071,13 @@ export const rAdapter: LanguageAdapter = {
       `options(device = function() webr::canvas(width = 720, height = 432, capture = TRUE))`,
     );
 
-    // Install a browser-native download.file() that works without
-    // cross-origin isolation (see R_NET_SETUP). Best-effort: a failure here
-    // shouldn't block the runtime from starting.
+    // Install the Files-pane download hook and large-data.frame print
+    // truncation (see R_SESSION_SETUP). Best-effort: a failure here shouldn't
+    // block the runtime from starting.
     try {
-      await webR.evalRVoid(R_NET_SETUP);
+      await webR.evalRVoid(R_SESSION_SETUP);
     } catch (err) {
-      console.error("[webr] failed to install download.file override", err);
+      console.error("[webr] failed to install playground session setup", err);
     }
 
     return new WebRRuntime(webR);
