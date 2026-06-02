@@ -638,9 +638,6 @@ function ResultViewImpl({
     sortingByIndex: Record<number, SortingState>;
     filterByIndex?: Record<number, string>;
     serverFilterByIndex?: Record<number, number>;
-    /** Active result-set tab, kept across an edit/sort/filter reload so a
-     *  commit on "Set 2" doesn't bounce the view back to "Set 1". */
-    activeSetIdx?: number;
   } | null>(null);
   // Keep a ref to the latest sortingByIndex so the result-change effect can
   // read it without adding sortingByIndex as a dependency (which would loop).
@@ -689,7 +686,12 @@ function ResultViewImpl({
     const cachedSorting = result ? sortingCacheRef.current.get(result) : undefined;
     setSortingByIndex(preserved?.sortingByIndex ?? cachedSorting ?? {});
     setActiveEditCellByIndex({});
-    setActiveSetIdx(preserved?.activeSetIdx ?? 0);
+    // Keep the active result-set tab across reloads — clamped to the new set
+    // count. (Clamping rather than restoring from a single "preserved" slot is
+    // robust when an edit triggers more than one queued re-fetch, e.g. quickly
+    // editing Set 1 then Set 2: each re-fetch would otherwise reset to Set 1.)
+    const nextSetCount = result?.sets.length ?? 1;
+    setActiveSetIdx((prev) => Math.max(0, Math.min(prev, nextSetCount - 1)));
     // A fresh result (or a filter/sort/edit reload) settles any pending filter
     // overlay — the rows shown now already reflect the applied filter.
     setFilterPending(false);
@@ -751,7 +753,6 @@ function ResultViewImpl({
         filterByIndex: overrides?.filterByIndex ?? { ...filterByIndex },
         serverFilterByIndex:
           overrides?.serverFilterByIndex ?? { ...serverFilterByIndex },
-        activeSetIdx,
       };
     },
     [
@@ -760,7 +761,6 @@ function ResultViewImpl({
       sortingByIndex,
       filterByIndex,
       serverFilterByIndex,
-      activeSetIdx,
     ],
   );
 
