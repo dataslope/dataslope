@@ -2577,6 +2577,33 @@
   cursor: default;
 }
 
+/* Per-cell "discard this edit" affordance — a small ✕ that reverts just this
+   cell's pending edit (revealed on hover/focus of the edited cell). */
+.sql-cell-discard {
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0 2px;
+  margin-left: 4px;
+  border-radius: 3px;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+  vertical-align: baseline;
+}
+
+.sql-result-table tbody td:hover .sql-cell-discard,
+.sql-cell-discard:focus-visible {
+  opacity: 1;
+}
+
+.sql-cell-discard:hover {
+  color: var(--red);
+  background: color-mix(in srgb, var(--red) 14%, transparent);
+}
+
 /* Inline boolean-column toggle in the result grid. */
 .sql-cell-bool {
   cursor: pointer;
@@ -2706,6 +2733,103 @@
 /* Rename-column dialog — slightly narrower than the edit-cell modal. */
 .sql-rename-col-popup {
   width: min(400px, calc(100vw - 48px));
+}
+
+/* ─── Column statistics dialog ─── */
+.sql-col-stats-popup {
+  width: min(460px, calc(100vw - 48px));
+}
+
+.sql-col-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 8px 0 4px;
+}
+
+.sql-col-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.sql-col-stats-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 11px;
+  background: var(--bg);
+}
+
+.sql-col-stats-label {
+  color: var(--text-dim);
+  font-size: 12px;
+  font-family: var(--font-ui);
+}
+
+.sql-col-stats-value {
+  color: var(--text);
+  font-weight: 600;
+  font-size: 13px;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sql-col-stats-top-title {
+  color: var(--text-dim);
+  font-size: 12px;
+  font-family: var(--font-ui);
+  margin-bottom: 6px;
+}
+
+.sql-col-stats-top-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.sql-col-stats-top-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--text) 4%, transparent);
+  font-size: 13px;
+}
+
+.sql-col-stats-top-val {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+  font-family: var(--font-mono);
+}
+
+.sql-col-stats-top-count {
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+  flex: 0 0 auto;
+}
+
+.sql-col-stats-foot {
+  color: var(--text-dim);
+  font-size: 12px;
+  font-family: var(--font-ui);
+  line-height: 1.5;
 }
 
 /* Disabled-looking context-menu pseudo-item (used for the Duplicate row
@@ -3885,6 +4009,94 @@
   border-color: var(--accent1);
 }
 
+/* ─── Saved queries (starred history entries) ─── */
+.sql-history-save-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    color 120ms ease,
+    background 120ms ease;
+}
+
+.sql-history-save-btn:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.sql-history-save-btn.is-saved {
+  color: var(--accent1);
+}
+
+.sql-saved-section {
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.sql-saved-section-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+}
+
+.sql-saved-section-title svg {
+  color: var(--accent1);
+}
+
+.sql-saved-list {
+  padding: 10px 0;
+}
+
+.sql-saved-entry {
+  margin-bottom: 14px;
+}
+
+.sql-history-entry-spacer {
+  margin-left: auto;
+}
+
+.sql-saved-entry-star {
+  color: var(--accent1);
+  flex-shrink: 0;
+}
+
+.sql-saved-remove-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    color 120ms ease,
+    background 120ms ease;
+}
+
+.sql-saved-remove-btn:hover {
+  background: var(--bg);
+  color: var(--red);
+}
+
 /* ─── History datetime popover ─── */
 .sql-history-datetime-popover-positioner {
   z-index: 600;
@@ -4113,6 +4325,21 @@
 /* Bottom tab bar — rendered always, shown only on mobile (below). */
 .sql-mobile-tabs {
   display: none;
+}
+
+/* UX-18: the loading hero stamps the title at up to 180px (`playground.css`),
+   which towers over the status caption + progress bar on a desktop monitor.
+   Right-size it on desktop so the rolling title stays bold but no longer
+   swamps the viewport, and give the caption a touch more prominence. Scoped
+   to the SQL playgrounds (this stylesheet only loads on their routes), like
+   the mobile hero override below. */
+@media (min-width: 769px) {
+  .pyodide-loading .loading-hero-text {
+    font-size: clamp(48px, 8vw, 104px);
+  }
+  .pyodide-loading .loading-quip {
+    font-size: 14px;
+  }
 }
 
 @media (max-width: 768px) {

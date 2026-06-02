@@ -79,6 +79,12 @@ import {
   buildResultFilterWhere,
   dialectFromEngineLabel,
 } from "../utils/resultFilter";
+import {
+  computeColumnStats,
+  formatStatNumber,
+  formatPercent,
+  type ColumnStats,
+} from "../utils/columnStats";
 
 // ────────────────────────────────────────────────────────────────────────
 // Local helpers
@@ -1049,6 +1055,36 @@ function ResultViewImpl({
     ],
   );
 
+  // Commit the pending edits when exactly one result set has them — used by the
+  // Ctrl/⌘+Enter shortcut. (Restricting to a single set avoids a stale-closure
+  // double-commit; the multi-set case is rare and still has per-set footer
+  // buttons.)
+  const commitSinglePendingSet = useCallback(() => {
+    const indices = Object.keys(pendingEditsByIndex).filter(
+      (k) => (pendingEditsByIndex[Number(k)]?.size ?? 0) > 0,
+    );
+    if (indices.length !== 1) return;
+    const idx = Number(indices[0]);
+    const set = result?.sets[idx];
+    if (set) commitEdits(idx, set);
+  }, [pendingEditsByIndex, result, commitEdits]);
+
+  // Ctrl/⌘+Enter commits pending cell edits. Scoped to when focus is NOT in the
+  // CodeMirror editor, whose own keymap owns Ctrl/⌘+Enter for "run query" — so
+  // the two never collide (the editor binding only fires while it's focused).
+  useEffect(() => {
+    if (Object.keys(pendingEditsByIndex).length === 0) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Enter" || !(e.metaKey || e.ctrlKey)) return;
+      const el = document.activeElement;
+      if (el instanceof HTMLElement && el.closest(".cm-editor")) return;
+      e.preventDefault();
+      commitSinglePendingSet();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [pendingEditsByIndex, commitSinglePendingSet]);
+
   const requestDelete = useCallback((setIdx: number) => {
     setPendingDelete(setIdx);
   }, []);
@@ -1788,6 +1824,102 @@ function ResultViewImpl({
   );
 }
 
+/** Human label for the detected column kind, shown as a caption. */
+const COLUMN_STATS_KIND_LABEL: Record<ColumnStats["kind"], string> = {
+  numeric: "Numeric",
+  text: "Text",
+  boolean: "Boolean",
+  blob: "Binary",
+  mixed: "Mixed",
+  empty: "Empty",
+};
+
+/** One label/value row in the stats grid. */
+function StatRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="sql-col-stats-row">
+      <span className="sql-col-stats-label">{label}</span>
+      <span className="sql-col-stats-value">{value}</span>
+    </div>
+  );
+}
+
+/** Presentational column-statistics body for the inspector dialog. */
+function ColumnStatsView({
+  name,
+  rowCount,
+  stats,
+}: {
+  name: string;
+  rowCount: number;
+  stats: ColumnStats;
+}) {
+  const { numeric, text, top } = stats;
+  return (
+    <div className="sql-col-stats">
+      <div className="sql-col-stats-grid">
+        <StatRow label="Rows" value={formatStatNumber(rowCount)} />
+        <StatRow label="Non-null" value={formatStatNumber(stats.nonNull)} />
+        <StatRow
+          label="Null"
+          value={`${formatStatNumber(stats.nulls)} (${formatPercent(
+            stats.nullFraction,
+          )})`}
+        />
+        <StatRow label="Distinct" value={formatStatNumber(stats.distinct)} />
+        {numeric && (
+          <>
+            <StatRow label="Min" value={formatStatNumber(numeric.min)} />
+            <StatRow label="Max" value={formatStatNumber(numeric.max)} />
+            <StatRow label="Mean" value={formatStatNumber(numeric.mean)} />
+            <StatRow label="Median" value={formatStatNumber(numeric.median)} />
+            <StatRow label="Sum" value={formatStatNumber(numeric.sum)} />
+          </>
+        )}
+        {text && (
+          <>
+            <StatRow
+              label="Min length"
+              value={formatStatNumber(text.minLength)}
+            />
+            <StatRow
+              label="Max length"
+              value={formatStatNumber(text.maxLength)}
+            />
+            <StatRow
+              label="Avg length"
+              value={formatStatNumber(text.avgLength)}
+            />
+          </>
+        )}
+      </div>
+      {top.length > 0 && (
+        <div className="sql-col-stats-top">
+          <div className="sql-col-stats-top-title">Most frequent values</div>
+          <ul className="sql-col-stats-top-list">
+            {top.map((t, i) => (
+              <li key={i} className="sql-col-stats-top-item">
+                <span className="sql-col-stats-top-val" title={t.label}>
+                  {t.label === "" ? "(empty string)" : t.label}
+                </span>
+                <span className="sql-col-stats-top-count">
+                  {formatStatNumber(t.count)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <div className="sql-col-stats-foot">
+        {`${COLUMN_STATS_KIND_LABEL[stats.kind]} column · based on ${formatStatNumber(
+          rowCount,
+        )} loaded row${rowCount === 1 ? "" : "s"} of `}
+        <strong>{name}</strong>
+      </div>
+    </div>
+  );
+}
+
 export function ResultTableBody({
   set,
   visible,
@@ -1871,6 +2003,15 @@ export function ResultTableBody({
     originalName: string;
   } | null>(null);
   const [renameInput, setRenameInput] = useState("");
+
+  // ── Column statistics dialog ───────────────────────────────────────────
+  // Computed once, from the loaded rows, when the dialog opens (a snapshot —
+  // no reactive recompute while the modal is up).
+  const [statsDialog, setStatsDialog] = useState<{
+    name: string;
+    rowCount: number;
+    stats: ColumnStats;
+  } | null>(null);
 
   // Keep mutable refs so that click handlers inside the columns useMemo
   // always access the latest values without needing them in the dep array.
@@ -2257,6 +2398,21 @@ export function ResultTableBody({
                         <ContextMenu.Item
                           className="example-item"
                           onClick={() => {
+                            const colValues = visibleRef.current.map(
+                              (row) => row[ci] ?? null,
+                            );
+                            setStatsDialog({
+                              name: displayName,
+                              rowCount: colValues.length,
+                              stats: computeColumnStats(colValues),
+                            });
+                          }}
+                        >
+                          <div className="ex-title">Column statistics</div>
+                        </ContextMenu.Item>
+                        <ContextMenu.Item
+                          className="example-item"
+                          onClick={() => {
                             const values = visibleRef.current.map(
                               (row) => row[ci] ?? null,
                             );
@@ -2266,6 +2422,19 @@ export function ResultTableBody({
                           }}
                         >
                           <div className="ex-title">Copy as JSON</div>
+                        </ContextMenu.Item>
+                        <ContextMenu.Item
+                          className="example-item"
+                          onClick={() => {
+                            const text = visibleRef.current
+                              .map((row) => formatCellValue(row[ci] ?? null))
+                              .join("\n");
+                            navigator.clipboard
+                              .writeText(text)
+                              .catch(() => undefined);
+                          }}
+                        >
+                          <div className="ex-title">Copy column values</div>
                         </ContextMenu.Item>
                       </ContextMenu.Popup>
                     </ContextMenu.Positioner>
@@ -2461,6 +2630,21 @@ export function ResultTableBody({
                   {hasPendingEdit
                     ? formatCellValue(pendingValue)
                     : formatCellValue(rawValue)}
+                  {hasPendingEdit && (
+                    <button
+                      type="button"
+                      className="sql-cell-discard"
+                      title="Discard this edit"
+                      aria-label={`Discard pending edit to ${c}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onClearPendingEdit(cellKey);
+                      }}
+                      onDoubleClick={(e) => e.stopPropagation()}
+                    >
+                      ×
+                    </button>
+                  )}
                 </span>
               );
             },
@@ -3042,6 +3226,34 @@ export function ResultTableBody({
           </Dialog.Popup>
         </Dialog.Portal>
       </Dialog.Root>
+      {/* Column statistics dialog */}
+      <Dialog.Root
+        open={statsDialog !== null}
+        onOpenChange={(open) => {
+          if (!open) setStatsDialog(null);
+        }}
+      >
+        <Dialog.Portal>
+          <Dialog.Backdrop className="confirm-backdrop" />
+          <Dialog.Popup className="confirm-popup sql-col-stats-popup">
+            <Dialog.Title className="confirm-title">
+              Column statistics
+            </Dialog.Title>
+            {statsDialog && (
+              <ColumnStatsView
+                name={statsDialog.name}
+                rowCount={statsDialog.rowCount}
+                stats={statsDialog.stats}
+              />
+            )}
+            <div className="confirm-actions">
+              <Dialog.Close className="confirm-btn confirm-btn-primary">
+                Close
+              </Dialog.Close>
+            </div>
+          </Dialog.Popup>
+        </Dialog.Portal>
+      </Dialog.Root>
     </div>
   );
 }
@@ -3319,6 +3531,7 @@ export function ResultPager({
             type="button"
             className="sql-edit-commit-btn"
             onClick={onCommitEdits}
+            title="Commit pending edits (Ctrl/⌘+Enter)"
           >
             Update {editCount} cell{editCount === 1 ? "" : "s"}…
           </button>

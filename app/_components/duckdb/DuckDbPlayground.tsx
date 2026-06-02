@@ -5163,6 +5163,7 @@ function DuckDbPlaygroundInner() {
                   isPostgres={true}
                   onClear={clearHistory}
                   onOpenQueryTab={openTabAndRun}
+                  savedStorageKey={storageKey("saved_queries")}
                 />
               </div>
             )}

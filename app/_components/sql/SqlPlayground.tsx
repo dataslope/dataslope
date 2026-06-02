@@ -3692,6 +3692,7 @@ function SqlPlaygroundInner() {
                   isPostgres={false}
                   onClear={clearHistory}
                   onOpenQueryTab={(title, sql) => openTabAndRun(title, sql)}
+                  savedStorageKey={storageKey("saved_queries")}
                 />
               </div>
             )}
