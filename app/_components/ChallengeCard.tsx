@@ -396,6 +396,10 @@ export default function ChallengeCard({
   // responsibility — each `run()` wipes user globals before evaluating
   // the next snippet.
   const runtimeRef = useRef<LanguageRuntime | null>(null);
+  // Outer card element + one-shot guard so the shared runtime can be warmed
+  // when the card first scrolls into view (see the warm-up effect below).
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const warmedRef = useRef(false);
   const runSeqRef = useRef(0);
   // Latest run handler — keeps the CodeMirror keymap closure
   // (registered once at mount) wired to the current function.
@@ -1060,6 +1064,34 @@ export default function ChallengeCard({
     runRef.current = run;
   }, [run]);
 
+  // Warm the shared runtime when the card first scrolls into view, so the
+  // learner's first Run/Submit reuses an already-initialised runtime instead
+  // of triggering a cold download on click. Best-effort and deduped across all
+  // cards/blocks of the same language by the registry; failures are swallowed
+  // so an actual Run can retry and surface the real error.
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!card || warmedRef.current) return;
+    if (typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (warmedRef.current || !entries.some((e) => e.isIntersecting)) return;
+        warmedRef.current = true;
+        io.disconnect();
+        void getSharedRuntime(RuntimeScope.Fumadocs, adapter)
+          .then((rt) => {
+            if (!runtimeRef.current) runtimeRef.current = rt;
+          })
+          .catch(() => {
+            warmedRef.current = false;
+          });
+      },
+      { rootMargin: "200px" },
+    );
+    io.observe(card);
+    return () => io.disconnect();
+  }, [adapter]);
+
   // Keep the test driver's submit hook pointing at the latest `check`.
   useEffect(() => {
     checkRef.current = check;
@@ -1287,6 +1319,7 @@ export default function ChallengeCard({
 
   return (
     <div
+      ref={cardRef}
       className={styles.card}
       aria-label={`${adapter.runtimeInfo.language} coding challenge: ${title}`}
       data-testid="challenge-card"

@@ -162,8 +162,8 @@ Code execution works and the output UI is clean (`30/31-js-codeblock-*.png`, `40
 
 - ✅ JavaScript (native) ran in ~**280 ms**; output rendered correctly.
 - ✅ Python (Pyodide, CDN) cold-boot + first run completed in ~**10.7 s** and printed `Hello, World!`. Subsequent runs reuse the shared worker.
-- 🟠 **#9 — Weak first-run affordance for slow runtimes.** A learner's *first* Run on a Python page is a ~10 s wait (heavier runtimes — WebR, CheerpJ/Java, .NET/C#, browsercc/C/C++ — are typically longer). The Run button shows "Running…", but there's no progress, no size/time expectation, and nothing communicating "this first run downloads the runtime; later runs are instant." For a learner this can read as "broken." Recommend: a determinate/àindeterminate boot indicator with copy like *"Downloading the Python runtime (first run only)…"*, and consider warming the shared runtime when the first code block scrolls into view.
-- 🟡 The `<CodeBlock>` Run button has no stable `data-testid`/`aria-label` (it's a class-hashed button whose accessible name is "RunCtrl+↵"). Minor, but it complicates automated testing and screen-reader labeling vs. the challenge card's `data-testid="challenge-submit"`.
+- 🟠 **#9 — Weak first-run affordance for slow runtimes.** A learner's *first* Run on a Python page is a ~10 s wait (heavier runtimes — WebR, CheerpJ/Java, .NET/C#, browsercc/C/C++ — are typically longer). The Run button shows "Running…", but there's no progress, no size/time expectation, and nothing communicating "this first run downloads the runtime; later runs are instant." For a learner this can read as "broken." Recommend: a determinate/àindeterminate boot indicator with copy like *"Downloading the Python runtime (first run only)…"*, and consider warming the shared runtime when the first code block scrolls into view. **Resolved:** `<CodeBlock>` now renders a labeled boot notice while the runtime loads — the live progress message (e.g. "Loading Pyodide…") plus, on a cold start, *"Downloading the Python runtime — this happens once; later runs are instant"* — and the Run button reads "Loading…" vs "Running…". Both `<CodeBlock>` and `<ChallengeCard>` also warm the shared runtime via an IntersectionObserver as they scroll into view, so the first Run reuses an already-initialised runtime.
+- 🟡 The `<CodeBlock>` Run button has no stable `data-testid`/`aria-label` (it's a class-hashed button whose accessible name is "RunCtrl+↵"). Minor, but it complicates automated testing and screen-reader labeling vs. the challenge card's `data-testid="challenge-submit"`. **Resolved:** the Run button now has `data-testid="codeblock-run"` and `aria-label="Run code"` (the card carries `data-testid="code-block"`, the boot notice `data-testid="codeblock-boot"`).
 
 ---
 
@@ -306,15 +306,15 @@ Each phase is self-contained and can be handed to a coding agent independently, 
 
 ---
 
-### Phase 5 — Runtime & loading UX for code execution 🟡
+### Phase 5 — Runtime & loading UX for code execution 🟡 — ✅ implemented
 
 **Goal:** the first Run on a heavy runtime feels intentional, not broken.
 
-1. **First-run boot affordance** in `<CodeBlock>`/`<ChallengeCard>`: a progress/boot state with copy like *"Downloading the Python runtime — first run only; later runs are instant"*, plus the existing status messages surfaced more prominently. Differentiate "loading runtime" from "running your code."
-2. **Optional warm-up:** start fetching/initializing the shared per-language runtime when the first relevant block scrolls into view (IntersectionObserver), so the learner's click isn't the trigger for a cold download.
-3. Add a stable `data-testid`/`aria-label` to the code-block Run button (parity with the challenge card) for testability and screen readers.
+1. **First-run boot affordance — done.** `<CodeBlock>` renders a labeled boot notice while `status === "loading"`: the live progress message (e.g. "Loading Pyodide…") and, on a cold start, *"Downloading the Python runtime — this happens once; later runs are instant."* The Run button now differentiates **"Loading…"** (runtime) from **"Running…"** (your code).
+2. **Warm-up — done.** Both `<CodeBlock>` and `<ChallengeCard>` warm the shared runtime via an `IntersectionObserver` (200 px rootMargin) when they scroll into view, so the learner's first click reuses an already-initialised runtime instead of triggering a cold download. The registry dedupes warm-ups per language, tracks a `ready` flag (for accurate cold-vs-warm copy), and swallows warm-up failures so a real Run can still retry and report errors.
+3. **Run button testability/a11y — done.** Added `data-testid="codeblock-run"` + `aria-label="Run code"` (plus `data-testid="code-block"` on the card and `data-testid="codeblock-boot"` on the boot notice).
 
-**Acceptance:** on a cold load, clicking Run on a Python lesson shows a clear, labeled boot indicator within 500 ms and a sensible completion; screen reader announces button purpose.
+**Acceptance (met):** verified via Playwright on a Python lesson — the labeled boot indicator appears on a cold Run with the "first run only" copy, the run completes (status → ready), a warm second run shows no cold hint, and the scroll-into-view warm-up pre-loads the runtime so a delayed first Run is already warm.
 
 ---
 

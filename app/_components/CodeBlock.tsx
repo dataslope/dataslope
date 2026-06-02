@@ -42,7 +42,7 @@ import type {
   OutputCell,
   PlotlyFigure,
 } from "./types";
-import { getSharedRuntime, RuntimeScope } from "./runtimeRegistry";
+import { getSharedRuntime, isRuntimeReady, RuntimeScope } from "./runtimeRegistry";
 import {
   clearPersistedCode,
   loadPersistedCode,
@@ -332,6 +332,11 @@ function CodeBlockInner({
   const initEditorRef = useRef<EditorView | null>(null);
   const initThemeCompRef = useRef<Compartment | null>(null);
   const runtimeRef = useRef<LanguageRuntime | null>(null);
+  // Outer card element — observed so the shared runtime can be warmed when
+  // the block first scrolls into view (so the learner's first Run isn't a
+  // cold download). `warmedRef` guards against re-warming on re-intersect.
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const warmedRef = useRef(false);
   // Sequence number lets us drop output from a previous run if the
   // user clicks Run again while one is in flight.
   const runSeqRef = useRef(0);
@@ -343,6 +348,10 @@ function CodeBlockInner({
 
   const [status, setStatus] = useState<Status>("idle");
   const [statusMessage, setStatusMessage] = useState<string>("");
+  // True while a *cold* runtime download is in flight (vs a warm runtime
+  // already initialised), so the boot notice only promises "first run only"
+  // when it really is the first run.
+  const [bootCold, setBootCold] = useState(false);
   const [outputs, setOutputs] = useState<OutputCell[]>([]);
   const [initExpanded, setInitExpanded] = useState(false);
   const [isFormatting, setIsFormatting] = useState(false);
@@ -661,6 +670,7 @@ function CodeBlockInner({
     const mySeq = ++runSeqRef.current;
 
     setOutputs([]);
+    setBootCold(!isRuntimeReady(RuntimeScope.Fumadocs, adapter.id));
     setStatus("loading");
     setStatusMessage("Initialising runtime…");
 
@@ -790,6 +800,35 @@ function CodeBlockInner({
     runRef.current = run;
   }, [run]);
 
+  // Warm the shared runtime when the block first scrolls into view, so the
+  // learner's first Run reuses an already-initialised runtime instead of
+  // triggering a cold (~10 s for Pyodide) download on click. Best-effort:
+  // the registry dedupes warm-ups across blocks of the same language, and
+  // any failure here is swallowed so an actual Run can retry and report it.
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!card || warmedRef.current) return;
+    if (typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (warmedRef.current || !entries.some((e) => e.isIntersecting)) return;
+        warmedRef.current = true;
+        io.disconnect();
+        void getSharedRuntime(RuntimeScope.Fumadocs, adapter)
+          .then((rt) => {
+            if (!runtimeRef.current) runtimeRef.current = rt;
+          })
+          .catch(() => {
+            // Warm-up is best-effort; let a later Run retry and surface errors.
+            warmedRef.current = false;
+          });
+      },
+      { rootMargin: "200px" },
+    );
+    io.observe(card);
+    return () => io.disconnect();
+  }, [adapter]);
+
   const reset = useCallback(() => {
     runSeqRef.current++;
     // Restore every file's buffer to its starter and wipe persisted
@@ -906,8 +945,10 @@ function CodeBlockInner({
   // ─── Render ────────────────────────────────────────────────────────────
   return (
     <div
+      ref={cardRef}
       className={`${challengeStyles.card} ${styles.outputScope}`}
       aria-label={`${adapter.runtimeInfo.language} executable code block`}
+      data-testid="code-block"
     >
       <div className={challengeStyles.header}>
         <div className={challengeStyles.headerRow}>
@@ -1063,6 +1104,8 @@ function CodeBlockInner({
             className={challengeStyles.runBtn}
             onClick={() => run()}
             disabled={isBusy}
+            data-testid="codeblock-run"
+            aria-label="Run code"
           >
             {isBusy ? (
               <svg
@@ -1085,7 +1128,11 @@ function CodeBlockInner({
               <PlayIcon />
             )}
             <span className={challengeStyles.runBtnLabel}>
-              {isBusy ? "Running…" : "Run"}
+              {status === "loading"
+                ? "Loading…"
+                : status === "running"
+                  ? "Running…"
+                  : "Run"}
             </span>
             {!isBusy && (
               <span
@@ -1175,6 +1222,34 @@ function CodeBlockInner({
           className={`${styles.output}${isBusy ? ` ${styles.outputRunning}` : ""}`}
           aria-live="polite"
         >
+          {status === "loading" && (
+            <div className={styles.bootNotice} data-testid="codeblock-boot">
+
+              <svg
+                viewBox="0 0 24 24"
+                className={styles.bootSpinner}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                aria-hidden
+              >
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
+              <span className={styles.bootNoticeText}>
+                <span className={styles.bootNoticeTitle}>
+                  {statusMessage ||
+                    `Setting up the ${adapter.runtimeInfo.language} runtime…`}
+                </span>
+                {bootCold && (
+                  <span className={styles.bootNoticeHint}>
+                    Downloading the {adapter.runtimeInfo.language} runtime — this
+                    happens once; later runs are instant.
+                  </span>
+                )}
+              </span>
+            </div>
+          )}
           {outputs.map((cell) => (
             <OutputCellView
               key={cell.id}

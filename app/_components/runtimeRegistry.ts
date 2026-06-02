@@ -47,9 +47,19 @@ export const RuntimeScope = {
 export type RuntimeScope = (typeof RuntimeScope)[keyof typeof RuntimeScope];
 
 const cache = new Map<string, Promise<LanguageRuntime>>();
+// Keys whose init promise has resolved — lets callers tell a cold start
+// (runtime still downloading) from a warm one (already initialised) so the
+// UI can show "first run only" boot copy without lying on later runs.
+const ready = new Set<string>();
 
 function cacheKey(scope: RuntimeScope, adapterId: string): string {
   return `${scope}:${adapterId}`;
+}
+
+/** Whether the `(scope, adapter)` runtime has finished initialising and is
+ *  ready to run code with no download/instantiation wait. */
+export function isRuntimeReady(scope: RuntimeScope, adapterId: string): boolean {
+  return ready.has(cacheKey(scope, adapterId));
 }
 
 /** Returns a promise for the runtime associated with `(scope, adapter)`,
@@ -69,11 +79,17 @@ export function getSharedRuntime(
   const key = cacheKey(scope, adapter.id);
   const existing = cache.get(key);
   if (existing) return existing;
-  const promise = adapter.init(setLoadingMessage).catch((err) => {
-    // Don't cache failures — let the next caller retry.
-    cache.delete(key);
-    throw err;
-  });
+  const promise = adapter.init(setLoadingMessage).then(
+    (runtime) => {
+      ready.add(key);
+      return runtime;
+    },
+    (err) => {
+      // Don't cache failures — let the next caller retry.
+      cache.delete(key);
+      throw err;
+    },
+  );
   cache.set(key, promise);
   return promise;
 }
