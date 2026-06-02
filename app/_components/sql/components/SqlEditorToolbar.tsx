@@ -44,8 +44,8 @@ export function SqlEditorToolbar({
           className="kbd-group"
           title={
             isMac
-              ? "Cmd + Enter — run selection or all"
-              : "Ctrl + Enter — run selection or all"
+              ? "Cmd + Enter — run selection, the statement at the cursor, or all"
+              : "Ctrl + Enter — run selection, the statement at the cursor, or all"
           }
         >
           <kbd className="kbd">{isMac ? "⌘" : "Ctrl"}</kbd>

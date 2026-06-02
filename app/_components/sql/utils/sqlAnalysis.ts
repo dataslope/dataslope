@@ -45,6 +45,108 @@ export function bareTableSelectSource(
     : table;
 }
 
+/** A single top-level SQL statement with its offsets in the source string. */
+export interface SqlStatementRange {
+  /** Trimmed statement text (no surrounding whitespace, no trailing `;`). */
+  text: string;
+  /** Offset of the statement's first non-whitespace character. */
+  from: number;
+  /** Offset just past the statement's last non-whitespace character. */
+  to: number;
+}
+
+/** Split SQL into top-level statements with their source offsets, respecting
+ *  string literals (`'…'` with `''` escapes), double-quoted identifiers
+ *  (`"…"`), line (`-- …`) and block (`/* … *\/`) comments, and Postgres
+ *  dollar-quoted bodies (`$tag$ … $tag$`). Semicolons inside any of those are
+ *  ignored; empty / whitespace-only segments are skipped. Used to run just the
+ *  statement under the editor cursor. */
+export function splitSqlStatements(sql: string): SqlStatementRange[] {
+  const out: SqlStatementRange[] = [];
+  const len = sql.length;
+  let i = 0;
+  let segStart = 0;
+
+  const pushSegment = (rawStart: number, rawEnd: number) => {
+    let s = rawStart;
+    let e = rawEnd;
+    while (s < e && /\s/.test(sql[s])) s++;
+    while (e > s && /\s/.test(sql[e - 1])) e--;
+    if (e > s) out.push({ text: sql.slice(s, e), from: s, to: e });
+  };
+
+  while (i < len) {
+    const ch = sql[i];
+    const next = i + 1 < len ? sql[i + 1] : "";
+    if (ch === "-" && next === "-") {
+      const eol = sql.indexOf("\n", i);
+      i = eol === -1 ? len : eol;
+      continue;
+    }
+    if (ch === "/" && next === "*") {
+      const end = sql.indexOf("*/", i + 2);
+      i = end === -1 ? len : end + 2;
+      continue;
+    }
+    if (ch === "'" || ch === '"') {
+      const quote = ch;
+      i += 1;
+      while (i < len) {
+        if (sql[i] === quote) {
+          if (sql[i + 1] === quote) {
+            i += 2;
+            continue;
+          }
+          i += 1;
+          break;
+        }
+        i += 1;
+      }
+      continue;
+    }
+    if (ch === "$") {
+      // Dollar-quote tags are empty or a valid identifier (never digit-led),
+      // so `$1` positional params don't open a quote.
+      const m = /^\$(?:[A-Za-z_][A-Za-z0-9_]*)?\$/.exec(sql.slice(i));
+      if (m) {
+        const tag = m[0];
+        const close = sql.indexOf(tag, i + tag.length);
+        i = close === -1 ? len : close + tag.length;
+        continue;
+      }
+    }
+    if (ch === ";") {
+      pushSegment(segStart, i);
+      i += 1;
+      segStart = i;
+      continue;
+    }
+    i += 1;
+  }
+  pushSegment(segStart, len);
+  return out;
+}
+
+/** Return the statement containing `cursorPos` (endpoints inclusive). For a
+ *  cursor in the whitespace/`;` between statements, returns the last statement
+ *  starting at or before it; returns null when there is no statement. */
+export function statementAtCursor(
+  sql: string,
+  cursorPos: number,
+): SqlStatementRange | null {
+  const stmts = splitSqlStatements(sql);
+  if (stmts.length === 0) return null;
+  for (const st of stmts) {
+    if (cursorPos >= st.from && cursorPos <= st.to) return st;
+  }
+  let chosen = stmts[0];
+  for (const st of stmts) {
+    if (st.from <= cursorPos) chosen = st;
+    else break;
+  }
+  return chosen;
+}
+
 /** Returns true when `sql` already contains a LIMIT keyword (after
  *  stripping comments and single-quoted string literals). When true, lazy
  *  pagination is skipped: appending another LIMIT would produce invalid SQL.
