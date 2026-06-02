@@ -318,17 +318,17 @@ Each phase is self-contained and can be handed to a coding agent independently, 
 
 ---
 
-### Phase 6 — Curriculum consistency & engagement features 🔵
+### Phase 6 — Curriculum consistency & engagement features 🔵 — partially implemented
 
 **Goal:** close cross-course gaps and add retention features.
 
-1. **Add challenges to SQL/viz courses** that currently have ~0 (`intro-sql-postgres`, `database-design-postgresql`, `sql-analytics-duckdb`, `sqlite-for-beginners` for SQL via `<SqlChallengeCard>`; evaluate feasible auto-grading for `intro-data-viz-plotly`/`mastering-ggplot2`).
-2. **Progress tracking:** per-chapter completion + per-course progress bar + "resume," persisted in `localStorage` (zustand store), surfaced in the catalog and course sidebar.
-3. **Per-course syllabus landing:** chapter count, estimated time, prerequisites, "start" CTA.
-4. **Early engagement hook** for the 7 history-first courses: a small runnable snippet or single check question within the narrative opener.
-5. *(Polish)* Fix `code-blocks-c.mdx:2` title (`Code Blocks - C` → `Code Blocks — C`) and audit demo-page titles for em-dash consistency; add Mermaid `alt`/caption support for accessibility.
+1. **Add challenges to SQL/viz courses** that currently have ~0 (`intro-sql-postgres`, `database-design-postgresql`, `sql-analytics-duckdb`, `sqlite-for-beginners` for SQL via `<SqlChallengeCard>`; evaluate feasible auto-grading for `intro-data-viz-plotly`/`mastering-ggplot2`). *(Remaining — dedicated content authoring + per-challenge solution verification.)*
+2. **Progress tracking — ✅ implemented (core).** Per-lesson completion (`<LessonComplete>` toggle at the bottom of every lesson), a per-course progress bar + "X / Y complete", and a "Continue →" resume link to the next incomplete chapter, persisted to `localStorage` via a zustand store (`useLearnProgress`) and surfaced in the course sidebar. Chapters are read from each course's `meta.json` (courses are `root: true`, so they're outside the root tree). All progress UI is mounted-gated to stay hydration-safe. *(Surfacing progress/resume on the `/` catalog remains.)*
+3. **Per-course syllabus landing:** chapter count, estimated time, prerequisites, "start" CTA. *(Remaining.)*
+4. **Early engagement hook** for the 7 history-first courses: a small runnable snippet or single check question within the narrative opener. *(Remaining — content authoring.)*
+5. **Polish — title consistency ✅ done.** Fixed `code-blocks-c.mdx` (`Code Blocks - C` → `Code Blocks — C`) and added `__tests__/contentTitles.test.ts` enforcing the em-dash convention under `npm test`. *(Mermaid `alt`/caption support remains; diagrams are authored as fenced blocks, so it needs an authoring path as well as the component prop.)*
 
-**Acceptance:** every course has at least one challenge in its first half (where gradable); a returning learner sees progress and a resume affordance; consistency lint for titles passes.
+**Acceptance:** progress + resume affordance for a returning learner — **met** (course sidebar); title-consistency lint — **met**. Cross-course SQL/viz challenges (a challenge in every course's first half) — remaining.
 
 ---
 
