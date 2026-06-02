@@ -28,74 +28,40 @@ const sourceSerif4 = Source_Serif_4({
   display: "swap",
 });
 
-// Build per-course data from each course's meta.json: the display title and
-// the ordered list of chapters (url + title). Courses set `root: true`, so
-// they live outside the root sidebar tree — we read their meta.json directly.
-// Chapter order follows meta.json; titles come from page data; entries that
-// don't resolve to a real page (separators, globs, external links) are
-// dropped. Read once on the server at render time.
-async function getCourseData(): Promise<{
-  titles: Record<string, string>;
-  chapters: Record<string, { url: string; title: string }[]>;
-}> {
+// Build a courseSlug → title map from each course's meta.json so the sidebar
+// can label the active course. Read once on the server at render time.
+async function getCourseTitles(): Promise<Record<string, string>> {
   const learnDir = path.join(process.cwd(), "content", "learn");
-  const titleByUrl: Record<string, string> = {};
-  const existing = new Set<string>();
-  for (const page of source.getPages()) {
-    titleByUrl[page.url] = page.data.title;
-    existing.add(page.url);
-  }
-
   const titles: Record<string, string> = {};
-  const chapters: Record<string, { url: string; title: string }[]> = {};
   const entries = await readdir(learnDir, { withFileTypes: true });
   await Promise.all(
     entries
       .filter((entry) => entry.isDirectory())
       .map(async (entry) => {
-        const slug = entry.name;
         try {
           const raw = await readFile(
-            path.join(learnDir, slug, "meta.json"),
+            path.join(learnDir, entry.name, "meta.json"),
             "utf-8",
           );
-          const meta = JSON.parse(raw) as { title?: string; pages?: unknown[] };
-          if (meta.title) titles[slug] = meta.title;
-          const list: { url: string; title: string }[] = [];
-          for (const item of meta.pages ?? []) {
-            if (typeof item !== "string") continue;
-            if (item.startsWith("---") || item === "...") continue; // separator / glob
-            const name = item.replace(/^\[[^\]]*\]/, "").trim(); // strip "[Icon]" prefix
-            const url = name === "index" ? `/learn/${slug}` : `/learn/${slug}/${name}`;
-            if (existing.has(url)) list.push({ url, title: titleByUrl[url] ?? "" });
-          }
-          if (list.length > 0) chapters[slug] = list;
+          const meta = JSON.parse(raw) as { title?: string };
+          if (meta.title) titles[entry.name] = meta.title;
         } catch {
           // Missing or malformed meta.json — skip this folder.
         }
       }),
   );
-  return { titles, chapters };
+  return titles;
 }
 
 export default async function LearnLayout({ children }: { children: ReactNode }) {
-  const { titles: courseTitles, chapters: courseChapters } =
-    await getCourseData();
+  const courseTitles = await getCourseTitles();
 
   return (
     <RootProvider>
       <DocsLayout
         tree={source.pageTree}
         tabs={false}
-        sidebar={{
-          banner: (
-            <SidebarCourseTitle
-              key="course-sidebar-banner"
-              titles={courseTitles}
-              chapters={courseChapters}
-            />
-          ),
-        }}
+        sidebar={{ banner: <SidebarCourseTitle key="course-sidebar-banner" titles={courseTitles} /> }}
         nav={{
           title: (
             <span style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: "bold" }}>
