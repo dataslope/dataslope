@@ -28,6 +28,11 @@ export interface QueryRunResult {
    *  table name. The result view uses this to look up PK / FK
    *  metadata so it can render key icons next to those headers. */
   sourceTable?: string;
+  /** Per-result-set editable source table, aligned with `sets` (one entry per
+   *  executed statement; null when that statement isn't an editable
+   *  `SELECT * FROM <table>`). Lets each tab of a multi-statement run be edited
+   *  against its own table. */
+  sourceTables?: (string | null)[];
   /** When lazy SQL pagination is active: the original trimmed SQL that
    *  produced this result. */
   lazySql?: string;

@@ -197,6 +197,31 @@ export function formatBytesHex(bytes: Uint8Array): string {
   return rows.join("\n");
 }
 
+/** Decide whether a previously-stored cell value can be safely written back
+ *  verbatim for a one-step *undo* of a committed edit (UX-10).
+ *
+ *  Undo re-applies the value the engine itself returned, so for scalars it is
+ *  exactly as safe as the original write. Only values that round-trip cleanly
+ *  through the same update path are reversible:
+ *    • `null`, string, number, boolean, bigint → passed through unchanged;
+ *    • `Date` → normalized to an ISO string (every engine parses it back, and
+ *      it avoids DuckDB's `String(date)` literal, which isn't valid SQL);
+ *  A complex original (JS array/object from a LIST/STRUCT/JSON column, or raw
+ *  `Uint8Array` bytes) returns `{ ok: false }` so the caller suppresses undo
+ *  rather than risk a lossy reverse-write. */
+export function reversibleCellValue(value: unknown): {
+  ok: boolean;
+  value: unknown;
+} {
+  if (value === null || value === undefined) return { ok: true, value: null };
+  const t = typeof value;
+  if (t === "string" || t === "number" || t === "boolean" || t === "bigint") {
+    return { ok: true, value };
+  }
+  if (value instanceof Date) return { ok: true, value: value.toISOString() };
+  return { ok: false, value: undefined };
+}
+
 /** Base64-encode bytes. Works in both the browser and Node (≥16) via the
  *  global `btoa`; falls back to a manual table when `btoa` is unavailable. */
 export function bytesToBase64(bytes: Uint8Array): string {

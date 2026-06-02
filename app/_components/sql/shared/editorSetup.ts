@@ -39,6 +39,7 @@ import {
   type SqlCompletionSchema,
   type SqlDialect,
 } from "../sqlCompletion";
+import { splitSqlStatements, statementAtCursor } from "../utils/sqlAnalysis";
 
 // 75 ms keeps local schema suggestions feeling immediate while still
 // coalescing rapid typing before recomputing completions. CodeMirror's
@@ -203,7 +204,10 @@ export function createSqlEditorExtensions(
     }),
     keymap.of([
       {
-        // Run selection if text is selected, otherwise run all.
+        // Primary run action (matches the toolbar's primary button): run the
+        // selection if there is one, otherwise run every statement. Use
+        // Mod-Shift-Enter for the secondary action (run just the statement under
+        // the cursor in a multi-statement document).
         key: "Mod-Enter",
         run: (view) => {
           const sel = view.state.selection.main;
@@ -216,9 +220,20 @@ export function createSqlEditorExtensions(
         },
       },
       {
-        // Always run all queries (ignores any selection).
+        // Secondary run action (the toolbar dropdown's "other" option): in a
+        // multi-statement document with no selection, run just the statement
+        // under the cursor (the standard IDE behavior); otherwise run all.
         key: "Mod-Shift-Enter",
-        run: () => {
+        run: (view) => {
+          const sel = view.state.selection.main;
+          if (sel.empty) {
+            const doc = view.state.doc.toString();
+            const stmt = statementAtCursor(doc, sel.head);
+            if (stmt && splitSqlStatements(doc).length > 1) {
+              onRunSelection(stmt.text);
+              return true;
+            }
+          }
           onRunAll();
           return true;
         },

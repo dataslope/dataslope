@@ -41,6 +41,7 @@ import {
   ToggleLeft,
   Trash2,
   Type,
+  Undo2,
   X,
 } from "lucide-react";
 import { MdOutlineKey } from "react-icons/md";
@@ -71,6 +72,7 @@ import {
   resolveTemporalEditorKind,
   formatBytesHex,
   bytesToBase64,
+  reversibleCellValue,
   type TemporalEditorKind,
 } from "../utils/cellEditing";
 import {
@@ -85,6 +87,7 @@ import {
   formatPercent,
   type ColumnStats,
 } from "../utils/columnStats";
+import { orderEditedStatementByPk } from "../utils/sqlAnalysis";
 
 // ────────────────────────────────────────────────────────────────────────
 // Local helpers
@@ -468,6 +471,9 @@ export const ResultView = memo(ResultViewImpl);
  *  overlay reads as a smooth, deliberate state rather than a glitch. */
 const FILTER_OVERLAY_MIN_MS = 400;
 
+// How long the post-commit "Undo" bar stays offered before auto-dismissing.
+const COMMIT_UNDO_TIMEOUT_MS = 15000;
+
 /** Mirror `active`, but once it becomes true keep it true for at least `minMs`
  *  so a brief activation stays visible long enough to read and to let a CSS
  *  fade-out play. Re-activating while waiting cancels the pending hide. */
@@ -511,9 +517,10 @@ function ResultViewImpl({
   result,
   loading,
   engineLabel = "SQLite",
-  keyHints,
-  sourceTable,
-  constraintInfo,
+  keyHints: propKeyHints,
+  sourceTable: propSourceTable,
+  constraintInfo: propConstraintInfo,
+  tableMetaFor,
   onDeleteRows,
   onUpdateRows,
   onDuplicateRow,
@@ -533,6 +540,13 @@ function ResultViewImpl({
   keyHints?: ColumnKeyHints;
   sourceTable?: string;
   constraintInfo?: ColumnConstraintInfo[];
+  /** Resolves a table's editing metadata by name. Used to pick up the PK / FK /
+   *  constraint hints for whichever result set is active, so every tab of a
+   *  multi-statement run is editable against its own table. */
+  tableMetaFor?: (table: string) => {
+    keyHints?: ColumnKeyHints;
+    constraintInfo?: ColumnConstraintInfo[];
+  } | undefined;
   onDeleteRows?: (
     tableName: string,
     pkColumns: string[],
@@ -586,6 +600,25 @@ function ResultViewImpl({
   const [activeEditCellByIndex, setActiveEditCellByIndex] = useState<
     Record<number, string | null>
   >({});
+  // One-step undo of the most recent committed cell edit(s) (UX-10). Set
+  // synchronously when `commitEdits` runs and survives the post-commit refetch
+  // (it's component state the result-change effect deliberately leaves alone),
+  // so the bar appears once the reloaded grid shows the new values. Auto-
+  // dismisses after a short window; clicking it re-applies the *previous*
+  // values (PK-addressed, so still correct after the row moved under MVCC).
+  const [commitUndo, setCommitUndo] = useState<{
+    tableName: string;
+    reverseUpdates: ReadonlyArray<{
+      rowIndex: number;
+      column: string;
+      value: unknown;
+      pk?: ReadonlyArray<{ column: string; value: unknown }>;
+    }>;
+    refetchSql?: string;
+    refetchBaseSql?: string;
+    cellCount: number;
+  } | null>(null);
+  const commitUndoTimerRef = useRef<number | null>(null);
   const [pendingDelete, setPendingDelete] = useState<number | null>(null);
   const [pendingDeleteSingleRow, setPendingDeleteSingleRow] = useState<{
     setIdx: number;
@@ -653,7 +686,12 @@ function ResultViewImpl({
     const cachedSorting = result ? sortingCacheRef.current.get(result) : undefined;
     setSortingByIndex(preserved?.sortingByIndex ?? cachedSorting ?? {});
     setActiveEditCellByIndex({});
-    setActiveSetIdx(0);
+    // Keep the active result-set tab across reloads — clamped to the new set
+    // count. (Clamping rather than restoring from a single "preserved" slot is
+    // robust when an edit triggers more than one queued re-fetch, e.g. quickly
+    // editing Set 1 then Set 2: each re-fetch would otherwise reset to Set 1.)
+    const nextSetCount = result?.sets.length ?? 1;
+    setActiveSetIdx((prev) => Math.max(0, Math.min(prev, nextSetCount - 1)));
     // A fresh result (or a filter/sort/edit reload) settles any pending filter
     // overlay — the rows shown now already reflect the applied filter.
     setFilterPending(false);
@@ -848,6 +886,32 @@ function ResultViewImpl({
     setPageStates((prev) => ({ ...prev, [idx]: { page: 0 } }));
   }, []);
 
+  // Editable identity is per active result set, not per query: a multi-statement
+  // run can show several `SELECT * FROM <table>` tabs, each editable against its
+  // own table. `result.sourceTables` carries the table per set (positionally
+  // aligned with `sets`); fall back to the whole-query `sourceTable` for a
+  // single set. The PK / FK / constraint hints below all follow that table, so
+  // every reference to `sourceTable` / `keyHints` / `constraintInfo` downstream
+  // resolves against whichever set the user is looking at.
+  const activeSetClamped = result
+    ? Math.max(0, Math.min(activeSetIdx, result.sets.length - 1))
+    : 0;
+  const sourceTable = useMemo<string | undefined>(() => {
+    if (!result) return undefined;
+    const perSet = result.sourceTables?.[activeSetClamped];
+    if (perSet != null) return perSet;
+    // Older results (and the single-set case) only carry the query-wide table.
+    return result.sets.length <= 1 ? propSourceTable : undefined;
+  }, [result, activeSetClamped, propSourceTable]);
+  const activeMeta = useMemo(
+    () => (sourceTable && tableMetaFor ? tableMetaFor(sourceTable) : undefined),
+    [sourceTable, tableMetaFor],
+  );
+  const singleSet = !result || result.sets.length <= 1;
+  const keyHints = activeMeta?.keyHints ?? (singleSet ? propKeyHints : undefined);
+  const constraintInfo =
+    activeMeta?.constraintInfo ?? (singleSet ? propConstraintInfo : undefined);
+
   const pkColumnsForSet = useCallback(
     (set: QueryExecResult): string[] | null => {
       if (!sourceTable || !onDeleteRows) return null;
@@ -977,26 +1041,48 @@ function ResultViewImpl({
         result?.lazySql !== undefined && result?.lazyPage !== undefined
           ? result.lazyPage * (result.lazyPageSize ?? globalPageSize)
           : 0;
-      const updates: Array<{
+      type CellUpdate = {
         rowIndex: number;
         column: string;
         value: unknown;
         pk?: ReadonlyArray<{ column: string; value: unknown }>;
-      }> = [];
+      };
+      const updates: CellUpdate[] = [];
+      // Reverse updates (prior values) power the one-step post-commit undo. We
+      // only offer undo when *every* edited cell's prior value round-trips
+      // cleanly (see `reversibleCellValue`); otherwise `undoable` is cleared.
+      const reverseUpdates: CellUpdate[] = [];
+      let undoable = true;
       for (const [cellKey, value] of edits) {
         const [rowStr, colStr] = cellKey.split(":");
         const absoluteRow = Number(rowStr);
         const colIdx = Number(colStr);
         const colName = set.columns[colIdx];
         if (!colName) continue;
+        const originalRow = set.values[absoluteRow - lazyOffset];
         let pk: Array<{ column: string; value: unknown }> | undefined;
         if (pkCols && pkColIndexes && pkColIndexes.every((i) => i >= 0)) {
-          const row = set.values[absoluteRow - lazyOffset];
-          if (row) {
-            pk = pkCols.map((c, i) => ({ column: c, value: row[pkColIndexes[i]] }));
+          if (originalRow) {
+            pk = pkCols.map((c, i) => ({
+              column: c,
+              value: originalRow[pkColIndexes[i]],
+            }));
           }
         }
         updates.push({ rowIndex: absoluteRow, column: colName, value, pk });
+        const rev = originalRow
+          ? reversibleCellValue(originalRow[colIdx])
+          : { ok: false, value: undefined };
+        if (rev.ok) {
+          reverseUpdates.push({
+            rowIndex: absoluteRow,
+            column: colName,
+            value: rev.value,
+            pk,
+          });
+        } else {
+          undoable = false;
+        }
       }
       if (updates.length === 0) return;
       const nextPendingEdits = clonePendingEdits(pendingEditsByIndex);
@@ -1031,14 +1117,43 @@ function ResultViewImpl({
         }
         refetchSql = refetchSql ?? baseSql;
       } else if (result?.querySql) {
-        // Materialized result (no lazy paging) — e.g. a query with its own
-        // `LIMIT`. Re-run the *exact* original query so the result keeps its
-        // shape/LIMIT, instead of letting the engine fall back to
-        // `SELECT * FROM <table>` (which drops the LIMIT and shows every row).
-        // Sorting for a materialized result is applied client-side and is
-        // preserved across the reload by `preserveStateForReload`.
-        refetchSql = result.querySql;
+        // Materialized result (no lazy paging) — e.g. a multi-statement run, or
+        // a query with its own `LIMIT`. Re-run the original query so the result
+        // keeps its shape, but order the *edited* statement by its primary key
+        // so the edited row keeps its place instead of jumping to the bottom
+        // (Postgres/DuckDB move an updated row to the end of the heap under
+        // MVCC). Other statements are left verbatim, so each set stays detected
+        // as editable on the re-fetch. Client-side sort is preserved across the
+        // reload by `preserveStateForReload`.
+        const pkCols = pkColumnsForSet(set);
+        refetchSql =
+          pkCols && pkCols.length > 0
+            ? orderEditedStatementByPk(result.querySql, setIdx, pkCols)
+            : result.querySql;
         refetchBaseSql = result.querySql;
+      }
+      // Offer a one-step undo of this commit. Set synchronously (before the
+      // refetch that `onUpdateRows` kicks off) and left untouched by the
+      // result-change effect, so the bar shows once the reloaded grid renders.
+      if (commitUndoTimerRef.current !== null) {
+        window.clearTimeout(commitUndoTimerRef.current);
+        commitUndoTimerRef.current = null;
+      }
+      if (undoable && reverseUpdates.length === updates.length) {
+        setCommitUndo({
+          tableName: sourceTable,
+          reverseUpdates,
+          refetchSql,
+          refetchBaseSql,
+          cellCount: updates.length,
+        });
+        commitUndoTimerRef.current = window.setTimeout(() => {
+          commitUndoTimerRef.current = null;
+          setCommitUndo(null);
+        }, COMMIT_UNDO_TIMEOUT_MS);
+      } else {
+        // A non-reversible commit clears any stale undo offer.
+        setCommitUndo(null);
       }
       onUpdateRows(sourceTable, updates, refetchSql, refetchBaseSql);
     },
@@ -1053,6 +1168,44 @@ function ResultViewImpl({
       preserveStateForReload,
       pkColumnsForSet,
     ],
+  );
+
+  /** Re-apply the previous values captured by the last commit (UX-10 undo). */
+  const handleUndoCommit = useCallback(() => {
+    if (!commitUndo || !onUpdateRows) return;
+    if (commitUndoTimerRef.current !== null) {
+      window.clearTimeout(commitUndoTimerRef.current);
+      commitUndoTimerRef.current = null;
+    }
+    const snap = commitUndo;
+    setCommitUndo(null);
+    onUpdateRows(
+      snap.tableName,
+      snap.reverseUpdates,
+      snap.refetchSql,
+      snap.refetchBaseSql,
+    );
+  }, [commitUndo, onUpdateRows]);
+
+  /** Dismiss the undo offer without reverting. */
+  const dismissCommitUndo = useCallback(() => {
+    if (commitUndoTimerRef.current !== null) {
+      window.clearTimeout(commitUndoTimerRef.current);
+      commitUndoTimerRef.current = null;
+    }
+    setCommitUndo(null);
+  }, []);
+
+  // Clear the auto-dismiss timer on unmount. (The undo bar is hidden for a
+  // different table by the render guard `commitUndo.tableName === sourceTable`,
+  // so no per-table reset effect is needed.)
+  useEffect(
+    () => () => {
+      if (commitUndoTimerRef.current !== null) {
+        window.clearTimeout(commitUndoTimerRef.current);
+      }
+    },
+    [],
   );
 
   // Commit the pending edits when exactly one result set has them — used by the
@@ -1755,6 +1908,33 @@ function ResultViewImpl({
             );
           })()}
       </div>
+      {commitUndo &&
+        commitUndo.tableName === sourceTable &&
+        Object.keys(pendingEditsByIndex).length === 0 && (
+          <div className="sql-edit-undo-bar" role="status">
+            <span className="sql-edit-undo-text">
+              Updated {commitUndo.cellCount} cell
+              {commitUndo.cellCount === 1 ? "" : "s"} in{" "}
+              <strong>{commitUndo.tableName}</strong>.
+            </span>
+            <button
+              type="button"
+              className="sql-edit-undo-btn"
+              onClick={handleUndoCommit}
+            >
+              <Undo2 size={12} aria-hidden="true" />
+              Undo
+            </button>
+            <button
+              type="button"
+              className="sql-edit-undo-dismiss"
+              aria-label="Dismiss"
+              onClick={dismissCommitUndo}
+            >
+              <X size={12} aria-hidden="true" />
+            </button>
+          </div>
+        )}
       <AlertDialog.Root
         open={pendingDelete !== null}
         onOpenChange={(next) => {

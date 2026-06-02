@@ -164,6 +164,9 @@ import {
   hasLimitClause,
   stripSqlComments,
   bareTableSelectSource,
+  bareTableSelectSources,
+  splitSqlStatements,
+  statementAtCursor,
 } from "../sql/utils/sqlAnalysis";
 import { computeImportColComparison } from "../sql/utils/importUtils";
 import {
@@ -1239,9 +1242,38 @@ function DuckDbPlaygroundInner() {
   );
   const runActiveTabRef = useRef<() => void>(() => undefined);
   const runSelectionRef = useRef<(sql: string) => void>(() => undefined);
+  // DuckDB runs one statement batch at a time. Rather than drop a run that
+  // arrives while the engine is busy (which would silently lose, e.g., the
+  // re-fetch after a second edit), we coalesce the latest such request here and
+  // run it the moment the in-flight one settles — see `drainPendingRun`, called
+  // from every engine-busy path's `finally`.
+  const runSqlForTabRef = useRef<
+    | ((
+        tabId: string,
+        sql: string,
+        source: string,
+        sourceTable?: string,
+        page?: number,
+        baseSql?: string,
+        explicitPageSize?: number,
+      ) => void)
+    | null
+  >(null);
+  const pendingRunRef = useRef<(() => void) | null>(null);
+  const drainPendingRun = useCallback(() => {
+    const pending = pendingRunRef.current;
+    if (pending) {
+      pendingRunRef.current = null;
+      pending();
+    }
+  }, []);
 
   const activeTab =
     tabs.find((tab) => tab.id === activeTabId) ?? tabs[0] ?? null;
+  const hasMultipleStatements = useMemo(
+    () => splitSqlStatements(activeTab?.code ?? "").length > 1,
+    [activeTab?.code],
+  );
   const isSettingsTabActive = activeTabId === SETTINGS_TAB_ID;
   const openSettingsTab = useCallback(() => {
     if (activeTabIdRef.current === SETTINGS_TAB_ID) {
@@ -1405,7 +1437,22 @@ function DuckDbPlaygroundInner() {
       explicitPageSize?: number,
     ) => {
       const engine = engineRef.current;
-      if (!engine || runningRef.current) return;
+      if (!engine) return;
+      if (runningRef.current) {
+        // Engine busy — queue the latest request (coalescing a burst) instead
+        // of dropping it; it runs when the in-flight one settles.
+        pendingRunRef.current = () =>
+          runSqlForTabRef.current?.(
+            tabId,
+            sql,
+            source,
+            sourceTable,
+            page,
+            baseSql,
+            explicitPageSize,
+          );
+        return;
+      }
       const trimmed = sql.trim();
       if (!trimmed) {
         showToast("Nothing to run — the query is empty.", "warn");
@@ -1421,9 +1468,10 @@ function DuckDbPlaygroundInner() {
       // Make a hand-typed full-table preview (`SELECT * FROM <table>`)
       // editable, just like opening the table from the sidebar — but only
       // for an actual table (not a view), so edits never fail on commit.
+      const isTable = (name: string) => tablesRef.current.includes(name);
       if (!sourceTable) {
         const detected = bareTableSelectSource(trimmed, noComments);
-        if (detected && tablesRef.current.includes(detected)) {
+        if (detected && isTable(detected)) {
           sourceTable = detected;
         }
       }
@@ -1455,6 +1503,10 @@ function DuckDbPlaygroundInner() {
         } else {
           sets = await engine.exec(trimmed);
         }
+        const sourceTables =
+          sets.length > 1
+            ? bareTableSelectSources(trimmed, isTable)
+            : [sourceTable ?? null];
         const elapsedMs = performance.now() - t0;
         setResultsByTab((prev) => ({
           ...prev,
@@ -1463,6 +1515,7 @@ function DuckDbPlaygroundInner() {
             elapsedMs,
             source,
             sourceTable,
+            sourceTables,
             lazySql,
             lazyBaseSql,
             lazyTotalCount,
@@ -1513,9 +1566,17 @@ function DuckDbPlaygroundInner() {
         window.setTimeout(() => setStatusState("ready"), 3000);
       } finally {
         runningRef.current = false;
+        drainPendingRun();
       }
     },
-    [clearBeforeRun, globalPageSize, refreshSchema, showToast, addHistoryEntry],
+    [
+      clearBeforeRun,
+      globalPageSize,
+      refreshSchema,
+      showToast,
+      addHistoryEntry,
+      drainPendingRun,
+    ],
   );
 
   const runActiveTab = useCallback(() => {
@@ -1546,6 +1607,19 @@ function DuckDbPlaygroundInner() {
     void runSqlForTab(tab.id, selected, tab.title);
   }, [runSqlForTab]);
 
+  // Run just the statement under the editor cursor (the toolbar "Run statement"
+  // affordance — mirrors the Ctrl/⌘+Enter keymap).
+  const runStatementAtCursor = useCallback(() => {
+    const view = editorRef.current;
+    const tab = tabsRef.current.find(
+      (candidate) => candidate.id === activeTabIdRef.current,
+    );
+    if (!view || !tab) return;
+    const doc = view.state.doc.toString();
+    const stmt = statementAtCursor(doc, view.state.selection.main.head);
+    void runSqlForTab(tab.id, stmt ? stmt.text : doc, tab.title);
+  }, [runSqlForTab]);
+
   // Keep runActiveTabRef / runSelectionRef in sync with latest callbacks.
   useEffect(() => {
     runActiveTabRef.current = runActiveTab;
@@ -1556,6 +1630,7 @@ function DuckDbPlaygroundInner() {
       if (!tab) return;
       void runSqlForTab(tab.id, sql, tab.title);
     };
+    runSqlForTabRef.current = runSqlForTab;
   }, [runActiveTab, runSqlForTab]);
 
   // Focus the newly added column's name input in the View/Edit Structure drawer.
@@ -2560,6 +2635,25 @@ function DuckDbPlaygroundInner() {
   }, [showToast]);
 
   // ─── Result/sidebar helpers ──────────────────────────────────────────
+  // Resolve PK / FK hints for any table by name, so each result set of a
+  // multi-statement run is editable against its own table.
+  const tableMetaFor = useCallback(
+    (tableName: string) => {
+      const cols = columnsByEntity[tableName] ?? [];
+      const fks = foreignKeysByEntity[tableName] ?? [];
+      return {
+        keyHints: {
+          pk: new Set(cols.filter((col) => col.pk > 0).map((col) => col.name)),
+          fk: new Map(fks.map((fk) => [fk.from, fk])),
+          readOnly: new Set(
+            cols.filter((col) => col.generated).map((col) => col.name),
+          ),
+        },
+      };
+    },
+    [columnsByEntity, foreignKeysByEntity],
+  );
+
   const resultKeyHints = useMemo<ColumnKeyHints | undefined>(() => {
     const tableName = result?.sourceTable;
     if (!tableName) return undefined;
@@ -2670,9 +2764,11 @@ function DuckDbPlaygroundInner() {
         // Keep the already-loaded rows visible if the next chunk fails.
       } finally {
         runningRef.current = false;
+        // A run queued while this page was loading must not be stranded.
+        drainPendingRun();
       }
     },
-    [resultsByTab],
+    [resultsByTab, drainPendingRun],
   );
 
   const deleteRowsFromTable = useCallback(
@@ -5124,8 +5220,10 @@ function DuckDbPlaygroundInner() {
                 loaded={loaded}
                 running={statusState === "running"}
                 hasEditorSelection={hasEditorSelection}
+                hasMultipleStatements={hasMultipleStatements}
                 isMac={isMac}
                 onRunSelection={runCurrentSelection}
+                onRunStatement={runStatementAtCursor}
                 onRunAll={runActiveTab}
               />
             </div>
@@ -5252,6 +5350,7 @@ function DuckDbPlaygroundInner() {
                 engineLabel="DuckDB"
                 keyHints={resultKeyHints}
                 sourceTable={result?.sourceTable}
+                tableMetaFor={tableMetaFor}
                 onDeleteRows={deleteRowsFromTable}
                 onUpdateRows={updateRowsInTable}
                 onDuplicateRow={duplicateRowInTable}
