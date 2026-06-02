@@ -4,7 +4,7 @@
 **Purpose:** A curated, license-verified catalogue of small "evergreen" datasets that DataSlope can **re-host in a public GitHub repo** and use across its courses (Pandas, data visualization, scientific computing, statistics, machine learning, NLP, time series, R, and SQL).
 **Special focus:** multi-table relational datasets for the SQL courses.
 
-**Methodology:** Five parallel research agents fanned out across the web; every license claim was checked against a primary source (the actual `LICENSE` file, dataset page, or terms-of-use page), not from memory. The nine most load-bearing claims (Chinook, Sakila, Northwind, UCI, Palmer Penguins, FiveThirtyEight, seaborn-data, diamonds→Zenodo, SILSO) were then independently re-verified by hand. **A second pass (§14–§15)** added ~50 more *standalone* datasets — from Kaggle, a broader UCI sweep, the Hugging Face Hub, government/institutional portals, and data hubs — under the same discipline (MovieLens's non-commercial terms, `banking77`'s CC BY 4.0, and Natural Earth's public-domain status were hand-checked). Source URLs are cited inline and collected at the end.
+**Methodology:** Five parallel research agents fanned out across the web; every license claim was checked against a primary source (the actual `LICENSE` file, dataset page, or terms-of-use page), not from memory. The nine most load-bearing claims (Chinook, Sakila, Northwind, UCI, Palmer Penguins, FiveThirtyEight, seaborn-data, diamonds→Zenodo, SILSO) were then independently re-verified by hand. **A second pass (§14–§15)** added ~50 more *standalone* datasets — from Kaggle, a broader UCI sweep, the Hugging Face Hub, government/institutional portals, and data hubs — under the same discipline (MovieLens's non-commercial terms, `banking77`'s CC BY 4.0, and Natural Earth's public-domain status were hand-checked). A third pass (§16) catalogues **scraped / legally gray-area** datasets — *for awareness only* — each with its specific risk and a clean substitute. Source URLs are cited inline and collected at the end.
 
 ---
 
@@ -459,7 +459,117 @@ USDA FoodData Central (PD) · Natural Earth (PD) · OurAirports (CC0) · `united
 
 ---
 
-## 16. Sources (primary, hand-verified in **bold**)
+## 16. Scraped / gray-area datasets — for awareness only (NOT recommended for re-hosting)
+
+> ⚠️ **Disclaimer — read first.** Everything in this section is **legally gray** and is listed for **awareness**, not as a recommendation. These datasets were **scraped from platforms whose Terms of Service typically forbid it**, and/or they contain **third-party-copyrighted content** (and sometimes **personal data**). A **CC0 / CC BY tag added by a Kaggle or Hugging Face uploader is legally void** against the real rights holder — *you cannot license what you do not own*. None of these should be re-hosted in DataSlope's public repo without legal review; **most should not be re-hosted at all**. This is not legal advice. Where a clean substitute exists, it is in the last column — **use that instead**.
+
+**Four things that decide the risk:**
+1. **Uploader licenses are void.** A CC0/CC-BY tag only covers the uploader's *own* contribution, never the underlying scraped content. (Exceptions: data the **rights holder** uploaded themselves, e.g. Olist; or genuinely open sources like Wikipedia.)
+2. **"Academic / research use" is a norm, not a license.** It offers no protection to a *commercial* platform that sells courses.
+3. **ToS ≠ copyright ≠ privacy.** Recent rulings (*Meta / X Corp v. Bright Data*, 2024) limited *CFAA* liability for scraping public pages — but they **do not** touch the **copyright** in the content or **privacy law** (GDPR/CCPA) over personal data. Those are separate, live risks.
+4. **Stale, too.** Most scraped sets are frozen snapshots that also fail the evergreen test.
+
+Treat every entry below as 🔴 (or the 🔴🔴 privacy tier in §16.8).
+
+### 16.1 Movies / TV & music
+
+| Dataset | Scraped from | The specific issue | Cleaner alternative |
+| --- | --- | --- | --- |
+| IMDB 5000 / Box Office Mojo | IMDb (Amazon) | No-scraping ToS; the IMDB 5000 set was **DMCA'd off Kaggle** | IMDb's **official non-commercial TSVs** (their terms); TMDB API; Wikidata box office (CC0) |
+| TMDB 5000 / The Movies Dataset | TMDB API (+ MovieLens) | API ToS bars "archived/cached datasets" & commercial use; MovieLens part is **non-commercial** | TMDB API with attribution; MovieLens direct (research only) |
+| Netflix titles | Netflix (no public API) | No-scraping ToS; catalog is Netflix's DB | TMDB "watch providers" endpoint |
+| Rotten Tomatoes reviews | Fandango / RT | No-scraping ToS; reviewer copyright | Cornell movie-review / SST (research); **UCI Sentiment Sentences** (CC BY) |
+| Spotify audio-feature sets (114k–600k tracks) | Spotify Web API | Policy bans standalone metadata, DBs, and ML training; **the `audio-features` endpoint was deprecated Nov 2024** | **MusicBrainz** (CC0) metadata; **FMA *metadata*** (CC BY 4.0; audio is per-track); compute features with **Essentia** |
+| Million Song Dataset | Echo Nest → Spotify | Inherits Spotify terms; Taste Profile subset = user data (privacy) | **FMA** dataset; MusicBrainz |
+| Genius / AZLyrics lyrics | Music publishers (via Genius/AZ) | **Highest copyright certainty** — lyrics are publisher-owned; no scraper holds a license (cf. *Genius v. Google*, preempted by copyright) | None at scale; license via Musixmatch/LyricFind; for NLP use Gutenberg poetry or **OpenSubtitles** |
+
+### 16.2 Sports
+
+| Dataset | Scraped from | The specific issue | Cleaner alternative |
+| --- | --- | --- | --- |
+| sports-reference family (NBA/NFL/MLB/NHL) | sports-reference.com (paid 3rd-party data) | Explicit "no scraping / no competing database"; rate-limited & IP-blocked | **Retrosheet** (commercial use OK + attribution ✓), **Lahman** (CC BY-SA) for baseball; **nflverse**, **StatsBomb Open Data**, `nba_api` |
+| 120 Years of Olympic History | sports-reference (now Olympedia) | Scraped → CC0 tag invalid; IOC marks | **Olympedia** (check terms); IOC Olympic Data Feed |
+| FIFA / EA FC players (SoFIFA) | EA Sports IP via SoFIFA | EA owns the in-game ratings; player attributes are group-licensed | **StatsBomb Open Data**; real match stats from openly-licensed providers |
+
+### 16.3 Product reviews & e-commerce
+
+| Dataset | Scraped from | The specific issue | Cleaner alternative |
+| --- | --- | --- | --- |
+| Amazon reviews (SNAP / McAuley / Amazon Reviews 2023) | Amazon | No-scraping ToS; no license; review pages behind login since Nov 2024 | **UCI Sentiment Sentences** (CC BY); MovieLens (research) |
+| Yelp Open Dataset | Yelp (self-distributed) | **Explicitly non-commercial + no redistribution** (each user must accept Yelp's agreement) | Yelp Fusion API; UCI Sentiment Sentences |
+| TripAdvisor (scraped) | TripAdvisor | No-scraping ToS; reviewer PII | None equivalent |
+| Google Play / Apple App Store apps | Google / Apple | No-scraping ToS; developer copyrights | Official developer APIs |
+| Olist Brazilian E-Commerce | **Olist (self-published)** | ✅ valid license — but **CC BY-NC-SA** (NC blocks commercial use) | This *is* the clean option; honor NC-SA, so still not for commercial re-host |
+
+### 16.4 Social media
+
+| Dataset | Scraped from | The specific issue | Cleaner alternative |
+| --- | --- | --- | --- |
+| Sentiment140, Twitter US Airline Sentiment | Twitter / X | Redistributing full tweet **text** violates X's ID-only policy; CC tag covers only the *annotations*; usernames = PII | **UCI SMS Spam** / Sentiment Sentences; **SST-2** (research) |
+| Reddit / Pushshift | Reddit | Reddit **sanctioned Pushshift** (2023); bulk redistribution barred; posts contain PII | Reddit Academic API; ConvoKit (same upstream caveat) |
+
+### 16.5 News
+
+| Dataset | Scraped from | The specific issue | Cleaner alternative |
+| --- | --- | --- | --- |
+| News Category (HuffPost), All the News, A Million News Headlines (ABC) | News publishers | **A CC license on the *paper* ≠ a license on the headline/article text**; publisher copyright (full-article sets like *All the News* are the riskiest) | **GDELT** (open); Reuters / RCV1 (research license); **20 Newsgroups** (public-domain Usenet) |
+| AG News | 2,000+ outlets via an academic engine | Source terms are **non-commercial**; HF license listed "unknown" | 20 Newsgroups; GDELT |
+
+### 16.6 Web-scale text corpora (LLM pretraining)
+
+> These power most "train an LLM" lessons but are the **highest commercial-risk** text data.
+
+| Dataset | Scraped from | The specific issue | Cleaner alternative |
+| --- | --- | --- | --- |
+| Common Crawl | The open web | ToU **shifts AI-use indemnity onto you**; ~45% of derived C4 is ToS-restricted; copyrighted content; active publisher lawsuits | **Common Corpus** (2025), **Wikipedia**, **Gutenberg** |
+| C4 | Common Crawl (2019) | ODC-BY covers Google's *curation*, not the underlying content | FineWeb (same base caveat); Common Corpus |
+| OpenWebText | Reddit-linked web pages | CC0 covers *packaging only*; card states "we don't own the text" | Common Corpus; Gutenberg; Wikipedia |
+| BookCorpus | Smashwords | **Documented copyright violations** — includes paid and "do not redistribute" books | **Project Gutenberg**, **Standard Ebooks** (public domain) |
+| The Pile (**Books3**) | Bibliotik (pirate library) | **Books3 = pirated books**; active lawsuits + DMCA takedown | **Common Pile v0.1**, **Dolma** (clean rebuilds) |
+
+### 16.7 Other commonly-scraped
+
+| Dataset | Scraped from | The specific issue | Cleaner alternative |
+| --- | --- | --- | --- |
+| Goodreads books / reviews | Goodreads (Amazon) | No-scraping ToS; public API shut down 2022 | **Open Library** (CC0); Book-Crossing (research) |
+| Zillow listings | Zillow | No-scraping ToS; cease-&-desist history; MLS rights; Zestimate IP | **Redfin Data Center** (free housing CSVs — confirm terms); **HUD** / **Census ACS** (public domain); **Ames Housing** (§3) |
+
+### 16.8 🔴🔴 Privacy / PII tier — avoid entirely (GDPR/CCPA territory, not just licensing)
+
+When a scraped set contains **identifiable people** — names, profiles, faces, health — the risk jumps from a licensing gamble to **privacy-law liability** (GDPR fines up to 4% of global revenue; CCPA; BIPA). Do **not** use these in any course, commercial or not.
+
+- **MS-Celeb-1M** — 10M scraped faces of ~100k people; **withdrawn by Microsoft (2019)**; biometric special-category data.
+- **Labeled Faces in the Wild (LFW)** — scraped *named* faces; fine to *discuss* as a historical benchmark, not to *use* the images.
+- **Scraped LinkedIn / Indeed *profiles*** — names, employers, work history = PII; *hiQ v. LinkedIn* ended in a **judgment against the scraper**. → For jobs/skills use **O*NET** / **BLS OES** (public domain) or **ESCO** (CC BY); for salaries use the **Stack Overflow Developer Survey** (ODbL).
+- **Health/location-linked posts** (mental-health subreddits, fitness exports) — GDPR Article 9 special-category data.
+
+### 16.9 ✅ Not gray-area — use these freely instead
+
+The obvious "big web" sources are **openly licensed**, not illegally scraped:
+
+- **Wikipedia / Wikimedia dumps** — CC BY-SA (bulk download is the *intended* access); **Wikidata** — CC0.
+- **Project Gutenberg / Standard Ebooks** — public domain (strip the PG header).
+- **GDELT** (global news events) — open · **O*NET / BLS / US Census** — US-gov public domain · **Stack Overflow Developer Survey** — ODbL · **Redfin Data Center** — free housing CSVs.
+
+### Clean-substitute cheat sheet
+
+| If you reached for (scraped)… | Use instead |
+| --- | --- |
+| Movie metadata / recommender | TMDB API (attrib) · MovieLens (research) |
+| Movie-review sentiment | UCI Sentiment Sentences (CC BY) · Cornell/SST (research) |
+| Music metadata / features | MusicBrainz (CC0) · FMA metadata (CC BY 4.0) · Essentia |
+| Baseball / sports stats | **Retrosheet** (commercial OK) · Lahman (CC BY-SA) · StatsBomb · nflverse |
+| Product-review NLP | UCI Sentiment Sentences (CC BY) |
+| Tweets / social sentiment | UCI SMS Spam · SST-2 (research) |
+| News classification | GDELT (open) · 20 Newsgroups (public domain) |
+| LLM text corpus | Common Corpus / Common Pile (clean) · Wikipedia · Gutenberg |
+| Books (full text) | Project Gutenberg · Standard Ebooks · Open Library (CC0) |
+| Housing prices | Redfin Data Center · Census ACS / HUD (PD) · Ames Housing (§3) |
+| Jobs / salaries | O*NET · BLS OES (PD) · ESCO (CC BY) · SO Developer Survey (ODbL) |
+
+---
+
+## 17. Sources (primary, hand-verified in **bold**)
 
 **SQL / multi-table**
 - **Chinook — MIT:** <https://github.com/lerocha/chinook-database/blob/master/LICENSE.md>
@@ -492,6 +602,16 @@ USDA FoodData Central (PD) · Natural Earth (PD) · OurAirports (CC0) · `united
 - Multi-table / hubs: US Congress legislators (CC0): <https://github.com/unitedstates/congress-legislators> · DataHub core (PDDL / CC BY): <https://datahub.io/core> · MusicBrainz data license: <https://musicbrainz.org/doc/About/Data_License>
 - Kaggle "avoid" provenance: Gallup terms <https://news.gallup.com/poll/105949/world-poll-terms-use.aspx> · Hass Avocado Board <https://hassavocadoboard.com/terms-of-use/> · Sports-Reference data use <https://www.sports-reference.com/data_use.html> · GTD non-commercial <https://www.start.umd.edu/gtd-terms>
 - Discovery / repositories: Dryad (all CC0): <https://datadryad.org> · Google Dataset Search: <https://datasetsearch.research.google.com> · Data Is Plural: <https://www.data-is-plural.com>
+
+**Third pass — scraped / gray-area datasets (§16) & their clean substitutes**
+- **Retrosheet — commercial use OK with attribution:** <https://www.retrosheet.org/notice.txt>
+- **FMA — code MIT / metadata CC BY 4.0 / audio per-track:** <https://github.com/mdeff/fma>
+- Spotify Developer Policy: <https://developer.spotify.com/policy> · `audio-features` deprecation (Nov 2024): <https://developer.spotify.com/blog/2024-11-27-changes-to-the-web-api>
+- IMDb Conditions of Use (no scraping): <https://www.imdb.com/conditions> · Sports-Reference data use: <https://www.sports-reference.com/data_use.html>
+- Yelp dataset terms: <https://www.yelp.com/dataset> · Common Crawl ToU: <https://commoncrawl.org/terms-of-use> · BookCorpus datasheet (Bandy & Vincent): <https://arxiv.org/abs/2105.05241>
+- Wikimedia dumps (CC BY-SA / Wikidata CC0): <https://dumps.wikimedia.org/legal.html> · Goodreads ToS: <https://www.goodreads.com/about/terms> · Zillow ToU: <https://www.zillow.com/z/corp/terms/>
+- Clean substitutes: Redfin Data Center <https://www.redfin.com/news/data-center/> · Stack Overflow Developer Survey (ODbL) <https://survey.stackoverflow.co/> · O*NET (public domain) <https://www.onetcenter.org/license_db.html> · GDELT <https://www.gdeltproject.org/> · Common Pile / Common Corpus, Standard Ebooks <https://standardebooks.org/>
+- Privacy tier: MS-Celeb-1M withdrawal (NYT/FT reporting) · *hiQ Labs v. LinkedIn* settlement (2022) · *Meta / X Corp v. Bright Data* (2024, CFAA ≠ copyright)
 
 ---
 
