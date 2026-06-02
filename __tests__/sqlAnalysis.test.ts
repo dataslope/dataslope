@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  bareTableSelectSource,
   bareTableSelectSources,
+  orderEditedStatementByPk,
   splitSqlStatements,
   statementAtCursor,
 } from "../app/_components/sql/utils/sqlAnalysis";
@@ -114,5 +116,71 @@ describe("bareTableSelectSources", () => {
       "cards",
     ]);
     expect(bareTableSelectSources("SELECT 1", isTable)).toEqual([null]);
+  });
+});
+
+describe("bareTableSelectSource with ORDER BY", () => {
+  it("still detects an editable table when a full-table select is ordered", () => {
+    expect(bareTableSelectSource("SELECT * FROM cards ORDER BY card_id")).toBe(
+      "cards",
+    );
+    expect(
+      bareTableSelectSource('SELECT * FROM "users" ORDER BY "user_id" LIMIT 10'),
+    ).toBe("users");
+    expect(
+      bareTableSelectSource("SELECT * FROM cards ORDER BY card_id DESC, card_type"),
+    ).toBe("cards");
+  });
+
+  it("still rejects non-full-table selects", () => {
+    expect(bareTableSelectSource("SELECT * FROM users WHERE id = 1")).toBeNull();
+    expect(bareTableSelectSource("SELECT * FROM a JOIN b ON a.id = b.id")).toBeNull();
+  });
+});
+
+describe("orderEditedStatementByPk", () => {
+  it("orders just the edited statement of a multi-statement query by its PK", () => {
+    expect(
+      orderEditedStatementByPk(
+        "SELECT * FROM users LIMIT 10;\nSELECT * FROM cards",
+        1,
+        ["card_id"],
+      ),
+    ).toBe(
+      'SELECT * FROM users LIMIT 10;\nSELECT * FROM cards ORDER BY "card_id"',
+    );
+  });
+
+  it("supports composite primary keys", () => {
+    expect(
+      orderEditedStatementByPk("SELECT * FROM order_items", 0, [
+        "order_id",
+        "product_id",
+      ]),
+    ).toBe('SELECT * FROM order_items ORDER BY "order_id", "product_id"');
+  });
+
+  it("leaves a LIMIT/OFFSET statement untouched (its row window is arbitrary)", () => {
+    // Ordering would change *which* rows the LIMIT shows, so it's left as-is.
+    const sql = "SELECT * FROM users LIMIT 10;\nSELECT * FROM cards";
+    expect(orderEditedStatementByPk(sql, 0, ["user_id"])).toBe(sql);
+    const off = "SELECT * FROM cards OFFSET 5";
+    expect(orderEditedStatementByPk(off, 0, ["card_id"])).toBe(off);
+  });
+
+  it("is a no-op when the statement already has an ORDER BY (no double-order)", () => {
+    const sql = "SELECT * FROM cards ORDER BY card_id";
+    expect(orderEditedStatementByPk(sql, 0, ["card_id"])).toBe(sql);
+  });
+
+  it("is a no-op for non-bare statements or a missing PK", () => {
+    const join = "SELECT * FROM a JOIN b ON a.id = b.id";
+    expect(orderEditedStatementByPk(join, 0, ["id"])).toBe(join);
+    expect(orderEditedStatementByPk("SELECT * FROM cards", 0, [])).toBe(
+      "SELECT * FROM cards",
+    );
+    expect(orderEditedStatementByPk("SELECT * FROM cards", 5, ["card_id"])).toBe(
+      "SELECT * FROM cards",
+    );
   });
 });

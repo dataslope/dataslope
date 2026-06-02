@@ -87,6 +87,7 @@ import {
   formatPercent,
   type ColumnStats,
 } from "../utils/columnStats";
+import { orderEditedStatementByPk } from "../utils/sqlAnalysis";
 
 // ────────────────────────────────────────────────────────────────────────
 // Local helpers
@@ -1116,13 +1117,19 @@ function ResultViewImpl({
         }
         refetchSql = refetchSql ?? baseSql;
       } else if (result?.querySql) {
-        // Materialized result (no lazy paging) — e.g. a query with its own
-        // `LIMIT`. Re-run the *exact* original query so the result keeps its
-        // shape/LIMIT, instead of letting the engine fall back to
-        // `SELECT * FROM <table>` (which drops the LIMIT and shows every row).
-        // Sorting for a materialized result is applied client-side and is
-        // preserved across the reload by `preserveStateForReload`.
-        refetchSql = result.querySql;
+        // Materialized result (no lazy paging) — e.g. a multi-statement run, or
+        // a query with its own `LIMIT`. Re-run the original query so the result
+        // keeps its shape, but order the *edited* statement by its primary key
+        // so the edited row keeps its place instead of jumping to the bottom
+        // (Postgres/DuckDB move an updated row to the end of the heap under
+        // MVCC). Other statements are left verbatim, so each set stays detected
+        // as editable on the re-fetch. Client-side sort is preserved across the
+        // reload by `preserveStateForReload`.
+        const pkCols = pkColumnsForSet(set);
+        refetchSql =
+          pkCols && pkCols.length > 0
+            ? orderEditedStatementByPk(result.querySql, setIdx, pkCols)
+            : result.querySql;
         refetchBaseSql = result.querySql;
       }
       // Offer a one-step undo of this commit. Set synchronously (before the

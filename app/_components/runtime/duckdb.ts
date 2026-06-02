@@ -1136,12 +1136,24 @@ export async function createDuckDbEngine(
       );
       const pkCols: string[] = (() => {
         const v = pkRows[0]?.[0];
-        if (Array.isArray(v)) return v.map((x) => String(x));
-        if (typeof v === "string") {
-          // Sometimes returned as a stringified Arrow list "[a, b]".
-          return v.replace(/^\[|\]$/g, "").split(/,\s*/).filter(Boolean);
-        }
-        return [];
+        // `constraint_column_names` is a VARCHAR[]. Depending on the WASM
+        // bridge it arrives as a JS array, an Arrow `Vector` (object, iterable
+        // — NOT `Array.isArray`), or a stringified list `["product_id"]` whose
+        // elements keep their quotes. Normalise all three, stripping brackets
+        // and per-element quotes, so names match the column list.
+        let raw: unknown[] = [];
+        if (Array.isArray(v)) raw = v;
+        else if (typeof v === "string")
+          raw = v.replace(/^\[|\]$/g, "").split(/,\s*/);
+        else if (
+          v != null &&
+          typeof (v as { [Symbol.iterator]?: unknown })[Symbol.iterator] ===
+            "function"
+        )
+          raw = Array.from(v as Iterable<unknown>);
+        return raw
+          .map((x) => String(x).trim().replace(/^["']|["']$/g, ""))
+          .filter(Boolean);
       })();
       return rows.map((row) => {
         const colName = String(row[1]);

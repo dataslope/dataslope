@@ -36,7 +36,7 @@ export function bareTableSelectSource(
     .trim();
   if (!s || s.includes(";")) return null;
   const m = s.match(
-    /^select\s+\*\s+from\s+("[^"]+"|[A-Za-z_][A-Za-z0-9_$]*)\s*(?:limit\s+\d+\s*)?(?:offset\s+\d+\s*)?(?:limit\s+\d+\s*)?$/i,
+    /^select\s+\*\s+from\s+("[^"]+"|[A-Za-z_][A-Za-z0-9_$]*)\s*(?:order\s+by\s+[\w\s",.]+?\s*)?(?:limit\s+\d+\s*)?(?:offset\s+\d+\s*)?(?:limit\s+\d+\s*)?$/i,
   );
   if (!m) return null;
   const table = m[1];
@@ -60,6 +60,37 @@ export function bareTableSelectSources(
     const table = bareTableSelectSource(stmt.text);
     return table && isTable(table) ? table : null;
   });
+}
+
+/** Rebuild a (possibly multi-statement) query so the statement at `stmtIndex`
+ *  is ordered by its primary key, leaving the other statements verbatim. Used
+ *  after an inline cell edit so the edited row keeps its place instead of
+ *  jumping to the bottom — Postgres and DuckDB move an updated row to the end of
+ *  the heap under MVCC, so an unordered re-fetch surfaces it last.
+ *
+ *  Only a bare `SELECT * FROM <table>` with no existing ORDER BY *and no
+ *  LIMIT/OFFSET* is rewritten: appending `ORDER BY <pk>` then returns the same
+ *  rows in a stable order. A LIMIT/OFFSET query is left untouched — ordering it
+ *  would change *which* rows the window shows (the chosen rows are arbitrary
+ *  without an ORDER BY), so that's left as the engine returns it. The rewrite
+ *  stays a bare select (ORDER BY included), so the set is still detected as
+ *  editable on re-fetch. */
+export function orderEditedStatementByPk(
+  querySql: string,
+  stmtIndex: number,
+  pkCols: string[],
+): string {
+  const stmts = splitSqlStatements(querySql);
+  if (stmtIndex < 0 || stmtIndex >= stmts.length || pkCols.length === 0) {
+    return querySql;
+  }
+  const statement = stmts[stmtIndex].text;
+  if (!bareTableSelectSource(statement)) return querySql;
+  const noComments = stripSqlComments(statement);
+  if (/\b(?:order\s+by|limit|offset)\b/i.test(noComments)) return querySql;
+  const orderBy = pkCols.map((c) => `"${c.replace(/"/g, '""')}"`).join(", ");
+  const ordered = `${statement.trim()} ORDER BY ${orderBy}`;
+  return stmts.map((s, i) => (i === stmtIndex ? ordered : s.text)).join(";\n");
 }
 
 /** A single top-level SQL statement with its offsets in the source string. */

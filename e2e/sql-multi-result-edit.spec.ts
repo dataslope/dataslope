@@ -79,29 +79,41 @@ for (const { id, route, t1, t2 } of ENGINES) {
     const row1 = () => grid.locator("tbody tr").first();
     const undoBar = page.locator(".sql-edit-undo-bar");
 
-    // Set 1 (the reported case): double-click now opens the editor; commit and
-    // confirm via the post-commit undo bar — which reports the table the edit
-    // was applied to ("Updated 1 cell in <t1>"). (We assert the bar rather than
-    // the grid because a materialized multi-statement re-fetch isn't PK-ordered,
-    // so under PG/DuckDB MVCC the edited row may move within the result.)
-    await expect(row1().locator("td:nth-child(3)")).toBeVisible({
-      timeout: 40_000,
-    });
-    await commitCell(page, row1().locator("td:nth-child(3)"), S1);
-    await expect(undoBar).toContainText("Updated 1 cell", { timeout: 40_000 });
-    await expect(undoBar).toContainText(t1);
-
-    // Set 2 edits ITS table — proving editability is per-set, and the write
-    // targets t2 (not the query-wide t1). The view also stays on Set 2 across
-    // the commit's re-fetch (it used to bounce back to Set 1).
+    // Set 2 (t2, an unbounded `SELECT *`): this is the reported case — editing a
+    // cell used to shove the row to the bottom under PG/DuckDB MVCC. After the
+    // fix the re-fetch is PK-ordered, so the edit persists AND the grid is
+    // stably ordered (row 1 is the smallest PK, "1"), not heap order with the
+    // edited row dumped last. Also proves per-set targeting (undo bar → t2) and
+    // that the view stays on Set 2 across the commit's re-fetch. (Doing Set 2
+    // first lets its assertions settle the re-fetch before we touch Set 1.)
     await setTabs.getByRole("tab", { name: "Set 2" }).click();
-    await expect(row1().locator("td:nth-child(4)")).toBeVisible();
+    // Wait for PK metadata to load: the row-select column only appears once the
+    // table's primary key is known — which is also what enables PK-ordering on
+    // the edit re-fetch and fixes the column offsets (a leading select column).
+    await grid
+      .locator(".sql-result-row-checkbox")
+      .first()
+      .waitFor({ state: "visible", timeout: 40_000 });
     await commitCell(page, row1().locator("td:nth-child(4)"), S2);
     await expect(undoBar).toContainText("Updated 1 cell", { timeout: 40_000 });
     await expect(undoBar).toContainText(t2);
+    await expect(grid.getByText(S2)).toBeVisible({ timeout: 40_000 });
+    await expect(row1().locator("td:nth-child(2)")).toHaveText("1");
     await expect(setTabs.getByRole("tab", { name: "Set 2" })).toHaveAttribute(
       "aria-selected",
       "true",
     );
+
+    // Set 1 (t1, a `… LIMIT 10`): also editable, against its own table. A LIMIT
+    // window's rows are arbitrary without an ORDER BY, so we confirm the commit
+    // via the undo bar (which reports the table) rather than pinning positions.
+    await setTabs.getByRole("tab", { name: "Set 1" }).click();
+    await grid
+      .locator(".sql-result-row-checkbox")
+      .first()
+      .waitFor({ state: "visible", timeout: 40_000 });
+    await commitCell(page, row1().locator("td:nth-child(3)"), S1);
+    await expect(undoBar).toContainText("Updated 1 cell", { timeout: 40_000 });
+    await expect(undoBar).toContainText(t1);
   });
 }
