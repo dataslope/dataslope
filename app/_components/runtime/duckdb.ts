@@ -63,8 +63,14 @@ interface DuckDbArrowTable {
   getChildAt(index: number): DuckDbArrowVector | null;
 }
 
+interface DuckDbPreparedStatement {
+  query(...params: unknown[]): Promise<DuckDbArrowTable>;
+  close(): Promise<void>;
+}
+
 interface DuckDbConnection {
   query(sql: string): Promise<DuckDbArrowTable>;
+  prepare(sql: string): Promise<DuckDbPreparedStatement>;
   close(): Promise<void>;
 }
 
@@ -208,6 +214,25 @@ function toSqlValue(value: unknown): SqlValue {
   } catch {
     return String(value);
   }
+}
+
+/** Normalize a JS value for binding as a DuckDB prepared-statement parameter
+ *  (UX-17). Replaces the old quote-escaped string-concatenation path used by
+ *  the row-mutation methods, so values flow to DuckDB as typed parameters that
+ *  it casts to the target column — instead of as VARCHAR literals that could
+ *  mis-cast (e.g. a numeric column silently receiving text) or, for values
+ *  with quotes, require fragile manual escaping.
+ *
+ *  Cell-edit values are string/number/boolean/null; primary-key values read
+ *  back from a result set may also be `bigint` (DuckDB BIGINT) or `Date`. The
+ *  binder accepts the scalars and bigint directly; `Date` is sent as an ISO
+ *  string DuckDB casts back to a timestamp, and any other object/array (e.g. a
+ *  STRUCT/LIST display value) falls back to its string form. */
+export function toBindParam(value: unknown): unknown {
+  if (value === undefined) return null;
+  if (value instanceof Date) return value.toISOString();
+  if (value !== null && typeof value === "object") return String(value);
+  return value;
 }
 
 function arrowToQueryExecResult(
@@ -857,6 +882,26 @@ export async function createDuckDbEngine(
     return result;
   }
 
+  // Run a statement through a DuckDB prepared statement, binding values as
+  // positional `?` parameters (UX-17). Used by the row-mutation methods so
+  // user/result-set values reach DuckDB as typed params it casts to the target
+  // column, never as hand-built SQL literals. Always closes the statement.
+  async function runParams(
+    sql: string,
+    params: unknown[],
+  ): Promise<DuckDbArrowTable> {
+    const stmt = await conn.prepare(sql);
+    try {
+      return await stmt.query(...params.map(toBindParam));
+    } finally {
+      try {
+        await stmt.close();
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
   const engine: DuckDbEngine = {
     async loadSampleDatabase(id) {
       const target = findDuckDbSampleDatabase(id);
@@ -1373,24 +1418,23 @@ export async function createDuckDbEngine(
       const qualifiedTable = `${quoteIdent(schema)}.${quoteIdent(tableName)}`;
       let deleted = 0;
       for (const row of pkRows) {
+        const params: unknown[] = [];
         const where = pkColumns
           .map((col, i) => {
             const v = row[i];
             if (v === null || v === undefined) {
               return `${quoteIdent(col)} IS NULL`;
             }
-            const literal =
-              typeof v === "number" || typeof v === "bigint"
-                ? String(v)
-                : `'${String(v).replace(/'/g, "''")}'`;
-            return `${quoteIdent(col)} = ${literal}`;
+            params.push(v);
+            return `${quoteIdent(col)} = ?`;
           })
           .join(" AND ");
-        const before = await rowsFor(
+        const before = await runParams(
           `SELECT COUNT(*) FROM ${qualifiedTable} WHERE ${where}`,
+          params,
         );
-        const matched = Number(before[0]?.[0] ?? 0);
-        await conn.query(`DELETE FROM ${qualifiedTable} WHERE ${where}`);
+        const matched = Number(before.getChildAt(0)?.get(0) ?? 0);
+        await runParams(`DELETE FROM ${qualifiedTable} WHERE ${where}`, params);
         deleted += matched;
       }
       return deleted;
@@ -1401,35 +1445,38 @@ export async function createDuckDbEngine(
       // the playground's PK-aware update path is preferred. As a
       // fallback for PKless tables we use a CTID-style emulation via
       // ROW_NUMBER() OVER () over a stable ordering of the table.
+      //
+      // Values are bound as prepared-statement parameters (UX-17) rather than
+      // concatenated as SQL literals: DuckDB casts each param to the target
+      // column type (so a numeric column edited via a text input no longer
+      // receives a VARCHAR), and strings with quotes need no manual escaping.
       const qualifiedTable = `${quoteIdent(schema)}.${quoteIdent(tableName)}`;
-      const toLiteral = (v: unknown): string => {
-        if (v === null || v === undefined) return "NULL";
-        if (typeof v === "number" || typeof v === "bigint") return String(v);
-        if (typeof v === "boolean") return v ? "TRUE" : "FALSE";
-        return `'${String(v).replace(/'/g, "''")}'`;
-      };
       let count = 0;
       for (const update of updates) {
-        const literal = toLiteral(update.value);
         if (update.pk && update.pk.length > 0) {
           // Primary-key identification: stable regardless of display order.
           const where = update.pk
-            .map((p) => `${quoteIdent(p.column)} = ${toLiteral(p.value)}`)
+            .map((p) => `${quoteIdent(p.column)} = ?`)
             .join(" AND ");
-          await conn.query(
+          await runParams(
             `UPDATE ${qualifiedTable}
-             SET ${quoteIdent(update.column)} = ${literal}
+             SET ${quoteIdent(update.column)} = ?
              WHERE ${where}`,
+            [update.value, ...update.pk.map((p) => p.value)],
           );
         } else {
-          await conn.query(
+          // `rowIndex` is a trusted integer we computed, so it stays inlined
+          // (DuckDB doesn't accept a bound parameter in OFFSET).
+          const offset = Math.trunc(Number(update.rowIndex)) || 0;
+          await runParams(
             `UPDATE ${qualifiedTable}
-             SET ${quoteIdent(update.column)} = ${literal}
+             SET ${quoteIdent(update.column)} = ?
              WHERE rowid = (
                SELECT rowid FROM ${qualifiedTable}
                ORDER BY rowid
-               LIMIT 1 OFFSET ${update.rowIndex}
+               LIMIT 1 OFFSET ${offset}
              )`,
+            [update.value],
           );
         }
         count += 1;
@@ -1444,16 +1491,12 @@ export async function createDuckDbEngine(
         return;
       }
       const cols = columnNames.map(quoteIdent).join(", ");
-      const literals = values
-        .map((v) => {
-          if (v === null || v === undefined) return "NULL";
-          if (typeof v === "number" || typeof v === "bigint") return String(v);
-          if (typeof v === "boolean") return v ? "TRUE" : "FALSE";
-          return `'${String(v).replace(/'/g, "''")}'`;
-        })
-        .join(", ");
-      await conn.query(
-        `INSERT INTO ${qualified} (${cols}) VALUES (${literals})`,
+      // Bind values as parameters (UX-17) so DuckDB casts each to its column
+      // type and quoted strings need no manual escaping.
+      const placeholders = values.map(() => "?").join(", ");
+      await runParams(
+        `INSERT INTO ${qualified} (${cols}) VALUES (${placeholders})`,
+        values,
       );
     },
 

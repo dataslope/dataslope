@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { splitDuckDbStatements } from "../app/_components/runtime/duckdb";
+import {
+  splitDuckDbStatements,
+  toBindParam,
+} from "../app/_components/runtime/duckdb";
 
 describe("splitDuckDbStatements", () => {
   it("splits simple statements on `;`", () => {
@@ -54,5 +57,30 @@ describe("splitDuckDbStatements", () => {
       "SELECT $tag$one; two$tag$ AS s",
       "SELECT 2",
     ]);
+  });
+});
+
+describe("toBindParam (UX-17 prepared-statement binding)", () => {
+  it("passes scalars and bigint through unchanged", () => {
+    expect(toBindParam("O'Brien")).toBe("O'Brien"); // no manual escaping needed
+    expect(toBindParam(42)).toBe(42);
+    expect(toBindParam(0)).toBe(0);
+    expect(toBindParam(true)).toBe(true);
+    expect(toBindParam(123n)).toBe(123n);
+  });
+
+  it("maps null/undefined to null", () => {
+    expect(toBindParam(null)).toBeNull();
+    expect(toBindParam(undefined)).toBeNull();
+  });
+
+  it("sends Date as an ISO string", () => {
+    expect(toBindParam(new Date("2024-03-15T14:30:00.000Z"))).toBe(
+      "2024-03-15T14:30:00.000Z",
+    );
+  });
+
+  it("falls back to a string form for other objects/arrays", () => {
+    expect(toBindParam([1, 2, 3])).toBe("1,2,3");
   });
 });
