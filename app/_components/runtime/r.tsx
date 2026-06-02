@@ -1047,6 +1047,137 @@ unlink("${CREATED_FILES_PATH}")`,
   }
 }
 
+// ─── styler-based code formatter ─────────────────────────────────────────
+//
+// The playground's "Format code" button calls rAdapter.formatCode(), which
+// pretty-prints the buffer with the {styler} package *inside WebR* — so, like
+// everything else here, formatting runs entirely client-side in WebAssembly
+// with no server round-trip. styler and its dependency closure are served as
+// pre-built Wasm binaries from the same WebR CRAN-like repo used for ggplot2,
+// dplyr, etc., and installed on first use.
+//
+// Formatting is a pure text→text transform: it only reads/writes scratch
+// files under /tmp and never touches the user's globals or staged files. That
+// lets it safely reuse whichever WebR session the page already started instead
+// of paying for a second R runtime. init() records that session below; if
+// Format is somehow clicked before any runtime has initialised (an embedded
+// code block that hasn't been Run yet) we lazily start a dedicated session.
+
+let activeWebR: WebRInstance | null = null;
+let dedicatedFormatterWebR: Promise<WebRInstance> | null = null;
+
+// Sessions that already have {styler} installed and configured, so we install
+// it at most once each. Keyed weakly so sessions can still be garbage-collected.
+const stylerReady = new WeakMap<WebRInstance, Promise<void>>();
+
+// Scratch paths under /tmp (created by R_SESSION_SETUP and never surfaced in
+// the Files pane), so formatting leaves the working directory untouched.
+const FMT_IN = "/tmp/.pg_fmt_in.R";
+const FMT_OUT = "/tmp/.pg_fmt_out.R";
+const FMT_ERR = "/tmp/.pg_fmt_err";
+
+async function getFormatterWebR(): Promise<WebRInstance> {
+  if (activeWebR) return activeWebR;
+  if (!dedicatedFormatterWebR) {
+    dedicatedFormatterWebR = (async () => {
+      // @ts-expect-error -- webr ships without bundled type declarations
+      const { WebR } = (await import("webr")) as { WebR: new () => WebRInstance };
+      const webR = new WebR();
+      await webR.init();
+      activeWebR = webR;
+      return webR;
+    })().catch((err) => {
+      dedicatedFormatterWebR = null; // allow a later retry
+      throw err;
+    });
+  }
+  return dedicatedFormatterWebR;
+}
+
+function ensureStyler(webR: WebRInstance): Promise<void> {
+  let ready = stylerReady.get(webR);
+  if (!ready) {
+    ready = (async () => {
+      // installPackages pulls styler's full dependency closure (cli, rlang,
+      // purrr, R.cache, vctrs, withr, …) from the WebR repo automatically.
+      await webR.installPackages(["styler"]);
+      // Ensure /tmp exists (R_SESSION_SETUP makes it for the runtime, but a
+      // dedicated formatter session skips that) and disable styler's on-disk
+      // cache — snippets are small, so it buys little and only litters the FS.
+      await webR.evalRVoid(
+        `suppressWarnings(dir.create("/tmp", showWarnings = FALSE))
+suppressMessages(try(styler::cache_deactivate(verbose = FALSE), silent = TRUE))`,
+      );
+    })().catch((err) => {
+      stylerReady.delete(webR); // allow a retry on the next Format click
+      throw err;
+    });
+    stylerReady.set(webR, ready);
+  }
+  return ready;
+}
+
+async function safeUnlink(webR: WebRInstance, paths: string[]): Promise<void> {
+  for (const p of paths) {
+    try {
+      await webR.FS.unlink(p);
+    } catch {
+      /* file may not exist — ignore */
+    }
+  }
+}
+
+async function formatRWithStyler(code: string): Promise<string> {
+  // Blank buffers: nothing to style. Return unchanged so the UI reports
+  // "Already formatted" rather than round-tripping through R.
+  if (!code.trim()) return code;
+
+  const webR = await getFormatterWebR();
+  await ensureStyler(webR);
+
+  // Pass user code in via a file so it never has to be escaped into the R
+  // string we evaluate (the only interpolated values below are our own
+  // constant /tmp paths).
+  await webR.FS.writeFile(FMT_IN, new TextEncoder().encode(code));
+
+  // Style the input file and write either the result (FMT_OUT) or the error
+  // message (FMT_ERR). Wrapped in local() so it never leaks bindings into
+  // .GlobalEnv, and tryCatch so invalid R surfaces as a clean message instead
+  // of an unhandled R error. UTF-8 connections preserve non-ASCII source.
+  await webR.evalRVoid(`suppressWarnings(local({
+  unlink(c("${FMT_OUT}", "${FMT_ERR}"))
+  tryCatch({
+    con_in <- file("${FMT_IN}", encoding = "UTF-8")
+    on.exit(close(con_in), add = TRUE)
+    styled <- as.character(styler::style_text(readLines(con_in, warn = FALSE)))
+    con_out <- file("${FMT_OUT}", encoding = "UTF-8")
+    writeLines(styled, con_out)
+    close(con_out)
+  }, error = function(e) {
+    writeLines(conditionMessage(e), "${FMT_ERR}")
+  })
+}))`);
+
+  // Parse error path: styler couldn't parse the buffer. Surface the R message
+  // through the Format button's "Formatting failed: …" toast.
+  let errBytes: Uint8Array | null = null;
+  try {
+    errBytes = await webR.FS.readFile(FMT_ERR);
+  } catch {
+    errBytes = null; // no error file written — formatting succeeded
+  }
+  if (errBytes && errBytes.byteLength > 0) {
+    const msg = new TextDecoder().decode(errBytes).trim();
+    await safeUnlink(webR, [FMT_IN, FMT_OUT, FMT_ERR]);
+    throw new Error(msg || "could not parse R code");
+  }
+
+  const outBytes = await webR.FS.readFile(FMT_OUT);
+  const formatted = new TextDecoder().decode(outBytes);
+  await safeUnlink(webR, [FMT_IN, FMT_OUT, FMT_ERR]);
+  return formatted;
+}
+
 export const rAdapter: LanguageAdapter = {
   id: "r",
   displayName: "R Playground",
@@ -1090,6 +1221,9 @@ export const rAdapter: LanguageAdapter = {
     );
     return re.test(code);
   },
+  formatCode(code: string): Promise<string> {
+    return formatRWithStyler(code);
+  },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Loading WebR…");
     // @ts-expect-error -- webr ships without bundled type declarations
@@ -1098,6 +1232,9 @@ export const rAdapter: LanguageAdapter = {
     setLoadingMessage("Initialising R runtime…");
     const webR = new WebR();
     await webR.init();
+    // Expose this session to the styler-based formatter (see formatRWithStyler)
+    // so the "Format code" button reuses it instead of starting a second R.
+    activeWebR = webR;
 
     setLoadingMessage("Configuring graphics device…");
     await webR.evalRVoid(
