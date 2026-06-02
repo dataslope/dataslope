@@ -275,8 +275,6 @@ Each phase is self-contained and can be handed to a coding agent independently, 
 
 **Goal:** a learner never lands in a bare 404, and can always get back to the course catalog at `/`.
 
-> **Intentional, not addressed here:** the course catalog living at the site root `/` (rather than in the `/learn` sidebar) and the component-showcase pages (`code-blocks-*`, `challenge-cards-*`, `multiple-choice`, `mermaid-test`) appearing in the `/learn` sidebar are deliberate choices during active development.
-
 1. **Add cross-course navigation.** A persistent "← All courses" link / breadcrumb in the course sidebar banner (the `SidebarCourseTitle` slot is a natural home) linking back to the catalog at `/`.
 2. **Custom 404.** Add `app/not-found.tsx` (or a learn-scoped `not-found`) with the Dataslope header and links to the catalog + `/learn`, so a mistyped or stale `/learn/*` URL has a recovery path.
 3. **Link `/learn` → catalog.** The `/learn` landing is a developer explainer; add a prominent link from it to the catalog at `/` so a learner who lands there can reach the courses.
