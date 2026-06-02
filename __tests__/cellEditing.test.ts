@@ -8,6 +8,7 @@ import {
   bytesToHex,
   formatBytesHex,
   bytesToBase64,
+  reversibleCellValue,
 } from "../app/_components/sql/utils/cellEditing";
 import {
   formatCellValue,
@@ -234,6 +235,35 @@ describe("byte encoders", () => {
     expect(enc("fo")).toBe("Zm8=");
     expect(enc("foo")).toBe("Zm9v");
     expect(enc("foobar")).toBe("Zm9vYmFy");
+  });
+});
+
+describe("reversibleCellValue (post-commit undo, UX-10)", () => {
+  it("passes scalars through verbatim", () => {
+    expect(reversibleCellValue("Ada")).toEqual({ ok: true, value: "Ada" });
+    expect(reversibleCellValue(42)).toEqual({ ok: true, value: 42 });
+    expect(reversibleCellValue(0)).toEqual({ ok: true, value: 0 });
+    expect(reversibleCellValue(false)).toEqual({ ok: true, value: false });
+    expect(reversibleCellValue(10n)).toEqual({ ok: true, value: 10n });
+  });
+
+  it("treats null/undefined as a reversible NULL", () => {
+    expect(reversibleCellValue(null)).toEqual({ ok: true, value: null });
+    expect(reversibleCellValue(undefined)).toEqual({ ok: true, value: null });
+  });
+
+  it("normalizes Date to an ISO string (parses back on every engine)", () => {
+    const d = new Date("2024-03-15T14:30:00.000Z");
+    expect(reversibleCellValue(d)).toEqual({
+      ok: true,
+      value: "2024-03-15T14:30:00.000Z",
+    });
+  });
+
+  it("refuses complex originals so undo never does a lossy reverse-write", () => {
+    expect(reversibleCellValue([1, 2, 3]).ok).toBe(false);
+    expect(reversibleCellValue({ a: 1 }).ok).toBe(false);
+    expect(reversibleCellValue(new Uint8Array([1, 2, 3])).ok).toBe(false);
   });
 });
 
