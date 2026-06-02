@@ -58,7 +58,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/dataslope-logo-blue.svg" type="image/svg+xml" />
         <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />

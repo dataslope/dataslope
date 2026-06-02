@@ -161,7 +161,7 @@ to add more encodings — it's to *remove rows*. Filter first.
 - Filtering makes the chart render faster.
 - Filtering is required by Plotly.
 - [o] A chart of the right subset is almost always more readable and more relevant than the same chart drawn on the entire dataset.
-  > Yes. "Show less" is one of the most consistently effective moves in visualization. Picking the right rows to show is half the design decision, and it's usually a one-line pandas operation before the chart call.
+  > "Show less" is one of the most consistently effective moves in visualization. Picking the right rows to show is half the design decision, and it's usually a one-line pandas operation before the chart call.
 - Filtering converts the DataFrame to a chart.
 
 The best charts often start with the question: *what am I going to filter out?*`}
@@ -173,7 +173,7 @@ The best charts often start with the question: *what am I going to filter out?*`
 - **df[df["continent"] == ["Europe", "Asia"]]**
 - **df[df["continent"] in ["Europe", "Asia"]]**
 - [o] **df[df["continent"].isin(["Europe", "Asia"])]**
-  > Yes. **.isin([...])** is the canonical "value matches any of these" filter. It also works with **~df["continent"].isin([...])** for *NOT in*. The other two syntaxes either don't do what they look like or raise an error.
+  > **.isin([...])** is the canonical "value matches any of these" filter. It also works with **~df["continent"].isin([...])** for *NOT in*. The other two syntaxes either don't do what they look like or raise an error.
 - **df.filter(continent=["Europe", "Asia"])**
 
 **.isin()** is one of the most-used pandas methods. Worth memorizing.`}
@@ -185,7 +185,7 @@ The best charts often start with the question: *what am I going to filter out?*`
 - Add more colors.
 - Make the chart taller.
 - [o] Filter to a meaningful subset — top N, recent dates, a specific segment — before plotting.
-  > Right. Charts have a finite visual budget. Trying to cram every observation into one picture leads to overlap, noise, and visual mush. A well-chosen filter does more for readability than any styling tweak.
+  > Charts have a finite visual budget. Trying to cram every observation into one picture leads to overlap, noise, and visual mush. A well-chosen filter does more for readability than any styling tweak.
 - Switch to a 3-D chart.
 
 Sometimes the answer is also "show many small charts" via faceting — which is itself a form of filtering applied per panel.`}

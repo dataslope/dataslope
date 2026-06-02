@@ -224,7 +224,7 @@ print(df.isna().sum())
 - NaN
 - 14.0
 - [o] 23.33 (= (10+20+40) / 3)
-  > Right. Pandas' aggregations skip NaN by default. Pass \`skipna=False\` to make NaN propagate.
+  > Pandas' aggregations skip NaN by default. Pass \`skipna=False\` to make NaN propagate.
 - 70.0
 
 This default is almost always what you want — but it can hide that some values are missing.`}
@@ -236,7 +236,7 @@ This default is almost always what you want — but it can hide that some values
 - The mean
 - The sum
 - [o] The median
-  > Yes. Medians are computed by position, not magnitude — they barely move when an extreme value is added.
+  > Medians are computed by position, not magnitude — they barely move when an extreme value is added.
 - The max
 
 Pair-report mean and median whenever distributions might be skewed.`}

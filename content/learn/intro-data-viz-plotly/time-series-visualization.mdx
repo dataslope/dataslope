@@ -205,7 +205,7 @@ group's *shape* clearly, and shared axes ensure honest comparison.
 - Sorting the data alphabetically.
 - Filling missing values.
 - [o] Aggregating the data to **daily** frequency, computing the mean of all rows that fall in each day.
-  > Yes. **.resample('D')** groups rows by calendar day. **.resample('W')** would be weekly, **.resample('M')** monthly. Combined with an aggregation like **.mean()**, **.sum()**, or **.last()**, this is the standard way to change the granularity of a time series.
+  > **.resample('D')** groups rows by calendar day. **.resample('W')** would be weekly, **.resample('M')** monthly. Combined with an aggregation like **.mean()**, **.sum()**, or **.last()**, this is the standard way to change the granularity of a time series.
 - Duplicating each row.
 
 Resampling is the time-series equivalent of **groupby**. Master it and time charts become much easier to compose.`}
@@ -217,7 +217,7 @@ Resampling is the time-series equivalent of **groupby**. Master it and time char
 - It increases the data resolution.
 - It is required by Plotly.
 - [o] It smooths short-term noise so the underlying weekly or monthly trend becomes visible.
-  > Right. Real-world series (web traffic, sales, sensor readings) are noisy day-to-day but often have meaningful longer-term trends. A 7-day or 30-day moving average filters out the noise. Show the raw and the smoothed series together so readers can see both layers.
+  > Real-world series (web traffic, sales, sensor readings) are noisy day-to-day but often have meaningful longer-term trends. A 7-day or 30-day moving average filters out the noise. Show the raw and the smoothed series together so readers can see both layers.
 - It removes outliers.
 
 Smoothing is *averaging*, not deleting. Outliers still affect a moving average; they're just averaged with their neighbors.`}
@@ -229,7 +229,7 @@ Smoothing is *averaging*, not deleting. Outliers still affect a moving average; 
 - The DataFrame contains negative values.
 - The dates are in the wrong time zone.
 - [o] The DataFrame is not sorted by date — Plotly draws lines in DataFrame row order, not date order.
-  > Yes. Plotly Express connects points in the *order they appear in the DataFrame*. If your rows aren't sorted by the x-column, the line walks through time in whatever order the rows arrived. The fix is one line: **df = df.sort_values("date")**.
+  > Plotly Express connects points in the *order they appear in the DataFrame*. If your rows aren't sorted by the x-column, the line walks through time in whatever order the rows arrived. The fix is one line: **df = df.sort_values("date")**.
 - The y-axis is on a log scale.
 
 This is one of those bugs that confuses everyone exactly once. After that, you sort first as a reflex.`}
@@ -241,7 +241,7 @@ This is one of those bugs that confuses everyone exactly once. After that, you s
 - Filtering the DataFrame to weekdays only.
 - **fig.update_layout(weekends=False)**.
 - [o] **fig.update_xaxes(rangebreaks=[dict(bounds=["sat", "mon"])])**.
-  > Right. **rangebreaks** tells Plotly to *compress* certain ranges out of the x-axis. The **bounds** form hides the weekend gap; there are also **pattern** and **values** variants for holidays. Without this, weekend gaps appear as flat plateaus that misrepresent the data.
+  > **rangebreaks** tells Plotly to *compress* certain ranges out of the x-axis. The **bounds** form hides the weekend gap; there are also **pattern** and **values** variants for holidays. Without this, weekend gaps appear as flat plateaus that misrepresent the data.
 - This isn't possible in Plotly.
 
 Time-series charts have many small configuration options like this. Bookmark Plotly's time-series documentation.`}

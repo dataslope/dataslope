@@ -229,7 +229,7 @@ assert int(row["temp"].iloc[0]) == 6`,
 - It is not
 - Years are integers
 - [o] The years are sitting in column *names*, not in a column of *values* — to do anything year-aware you must first lift them out
-  > Right. That column-names-are-values smell is the classic signal that you should melt.
+  > That column-names-are-values smell is the classic signal that you should melt.
 - The data is corrupted
 
 Recognizing this pattern is most of the battle.`}
@@ -241,7 +241,7 @@ Recognizing this pattern is most of the battle.`}
 - pivot
 - merge
 - [o] melt
-  > Yes. Think "melt the wide table down into a tall one".
+  > Think "melt the wide table down into a tall one".
 - concat
 
 melt unpivots; pivot pivots.`}

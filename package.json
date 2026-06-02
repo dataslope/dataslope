@@ -9,6 +9,7 @@
     "postinstall": "fumadocs-mdx && node scripts/patch-almostnode.mjs && node scripts/build-almostnode-workers.mjs",
     "start": "next start",
     "lint": "eslint .",
+    "check:mcq": "node scripts/check-mcq.mjs",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",

@@ -278,7 +278,7 @@ page on, the story stops and the *practice* begins.
 
 - Floating-point arithmetic is slower
 - [o] Floating-point operations are individually correctly rounded, but compound operations are not associative and can suffer catastrophic cancellation, so algebraically equivalent expressions can produce different numerical answers
-  > Exactly. Each single op is as accurate as it can be in 53 bits of mantissa, but $(a+b)+c \\neq a+(b+c)$ in general. Two mathematically identical algorithms can produce wildly different numerical results.
+  > Each single op is as accurate as it can be in 53 bits of mantissa, but $(a+b)+c \\neq a+(b+c)$ in general. Two mathematically identical algorithms can produce wildly different numerical results.
 - Floating-point can only represent integers
 - Floating-point uses base 10 internally
 
@@ -290,7 +290,7 @@ This is *the* foundational fact of numerical computing.`}
 
 - It measures how fast a solver will run
 - [o] It measures how much a relative input error gets amplified into a relative output error: a problem with $\\kappa = 10^k$ can lose up to $k$ digits of precision regardless of algorithm
-  > Right. The condition number is a property of the *problem*, not of the *algorithm*. It puts a fundamental ceiling on accuracy — no clever code can beat it.
+  > The condition number is a property of the *problem*, not of the *algorithm*. It puts a fundamental ceiling on accuracy — no clever code can beat it.
 - It measures memory usage
 - It measures the symmetry of $A$
 

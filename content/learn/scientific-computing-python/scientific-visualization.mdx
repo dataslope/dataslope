@@ -300,7 +300,7 @@ restyle every figure in a paper from a single place.
 
 - A sequential map like \`viridis\`
 - [o] A diverging map like \`coolwarm\` or \`RdBu_r\`, centered at zero
-  > Yes. Diverging data has a meaningful midpoint (here, "no anomaly"). A diverging colormap encodes sign with color (e.g. blue for cool, red for warm) and magnitude with intensity, so the viewer can read positive vs negative at a glance. Always set \`vmin = -vmax\` so zero maps to the middle color.
+  > Diverging data has a meaningful midpoint (here, "no anomaly"). A diverging colormap encodes sign with color (e.g. blue for cool, red for warm) and magnitude with intensity, so the viewer can read positive vs negative at a glance. Always set \`vmin = -vmax\` so zero maps to the middle color.
 - The default \`jet\`
 - A grayscale ramp
 
@@ -312,7 +312,7 @@ Match the colormap to the *structure* of the data — sequential for one-sided, 
 
 - One big plot with 12 overlapping lines and a legend
 - [o] A 3 × 4 grid of small multiples with shared axes
-  > Right. Small multiples ("trellis" plots) let the viewer compare like with like at a glance. Shared axes make differences between panels reflect differences in the data, not the scale. Twelve lines on a single plot become spaghetti that nobody can read.
+  > Small multiples ("trellis" plots) let the viewer compare like with like at a glance. Shared axes make differences between panels reflect differences in the data, not the scale. Twelve lines on a single plot become spaghetti that nobody can read.
 - A 3-D plot with patient ID on the z-axis
 - A pie chart per patient
 

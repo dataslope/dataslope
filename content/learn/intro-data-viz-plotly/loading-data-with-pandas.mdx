@@ -343,7 +343,7 @@ when your data is wide and Plotly Express is complaining.
 - It removes the first row of the DataFrame.
 - It deletes the column headers.
 - [o] It returns the first 5 rows of the DataFrame (or **n** rows if you pass **df.head(n)**).
-  > Yes. **df.head()** is the canonical "let me peek at this dataset" command. Combined with **df.shape** (dimensions) and **df.describe()** (numeric summary), it's most analysts' first 30 seconds with any new DataFrame.
+  > **df.head()** is the canonical "let me peek at this dataset" command. Combined with **df.shape** (dimensions) and **df.describe()** (numeric summary), it's most analysts' first 30 seconds with any new DataFrame.
 - It downloads the DataFrame.
 
 Build the habit: load a DataFrame → **df.head()** → **df.shape** → **df.describe()**. Always.`}
@@ -355,7 +355,7 @@ Build the habit: load a DataFrame → **df.head()** → **df.shape** → **df.de
 - **df.filter(year == 2007)**
 - **df.where(year == 2007)**
 - [o] **df[df["year"] == 2007]** (or **df.query("year == 2007")**)
-  > Right. Boolean indexing (**df[boolean_series]**) is the most common filtering idiom in pandas. The **.query("...")** method does the same thing with a slightly more readable string syntax. Both produce a new DataFrame containing only the matching rows.
+  > Boolean indexing (**df[boolean_series]**) is the most common filtering idiom in pandas. The **.query("...")** method does the same thing with a slightly more readable string syntax. Both produce a new DataFrame containing only the matching rows.
 - **df.select("year == 2007")**
 
 You will type one of these two patterns dozens of times in any real analysis. Pick whichever reads better to you.`}
@@ -367,7 +367,7 @@ You will type one of these two patterns dozens of times in any real analysis. Pi
 - The data has been spell-checked.
 - All numbers are integers.
 - [o] Each variable is one column, each observation is one row, each cell holds a single value — making it easy to map columns to chart encodings.
-  > Yes. Tidy data is the "preferred shape" for Plotly Express (and ggplot2, Seaborn, and most modern viz tools). When a column maps cleanly to an encoding (**x="year"**, **color="country"**), the chart almost writes itself. Wide data — with years spread across columns — usually needs to be reshaped first.
+  > Tidy data is the "preferred shape" for Plotly Express (and ggplot2, Seaborn, and most modern viz tools). When a column maps cleanly to an encoding (**x="year"**, **color="country"**), the chart almost writes itself. Wide data — with years spread across columns — usually needs to be reshaped first.
 - The data has fewer than 100 rows.
 
 If you find yourself fighting Plotly Express, ask yourself: *is my data tidy?* If not, use **.melt()** to reshape it.`}
@@ -379,7 +379,7 @@ If you find yourself fighting Plotly Express, ask yourself: *is my data tidy?* I
 - Sorting is required by the matplotlib library.
 - Sorted data is faster to plot.
 - [o] The eye reads a ranked / sorted bar chart almost instantly — alphabetical order obscures the actual ranking of values.
-  > Right. A bar chart's *point* is usually to compare values. Sorting by value lets the reader see "biggest, then next biggest, then..." in zero conscious time. Alphabetical order is essentially random for the reader and adds an extra cognitive step.
+  > A bar chart's *point* is usually to compare values. Sorting by value lets the reader see "biggest, then next biggest, then..." in zero conscious time. Alphabetical order is essentially random for the reader and adds an extra cognitive step.
 
 Always sort categorical bar charts by value, unless the order itself carries meaning (e.g., months of the year).`}
 />

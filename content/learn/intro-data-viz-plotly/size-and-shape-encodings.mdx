@@ -147,7 +147,7 @@ best way to make sure the chart matches your intention.
 - Color.
 - Size (area).
 - [o] Position along an axis.
-  > Yes. Position is the most accurate visual encoding (Cleveland-McGill ranking). Reserve x and y for the variables you want the reader to compare carefully. Use color and size for variables where "roughly bigger / smaller" is enough.
+  > Position is the most accurate visual encoding (Cleveland-McGill ranking). Reserve x and y for the variables you want the reader to compare carefully. Use color and size for variables where "roughly bigger / smaller" is enough.
 - Shape.
 
 Always start your design by asking *which variable matters most*, and give it position.`}
@@ -159,7 +159,7 @@ Always start your design by asking *which variable matters most*, and give it po
 - Never; it's always wasteful.
 - Always; redundancy is good.
 - [o] When you need the chart to remain readable in **grayscale** or for **colorblind viewers** — the shape carries the categorical info even if color fails.
-  > Right. Redundant encoding sounds wasteful in a vacuum but is a deliberate accessibility move when the chart will be printed in B&W or viewed by users with color vision deficiency. Otherwise it can be a wasted channel you could have given to a different variable.
+  > Redundant encoding sounds wasteful in a vacuum but is a deliberate accessibility move when the chart will be printed in B&W or viewed by users with color vision deficiency. Otherwise it can be a wasted channel you could have given to a different variable.
 - Only when you have exactly two categories.
 
 Use redundancy as a tool, not a habit.`}
@@ -171,7 +171,7 @@ Use redundancy as a tool, not a habit.`}
 - 20+
 - 12-15
 - [o] About 6 or fewer.
-  > Yes. Past about 6 shapes, viewers start confusing similar ones (●  ●  ■  ▲ ▼ ◆ ★ ✦). For more than a handful of categories, shape becomes ineffective. Use facets or filter the data instead.
+  > Past about 6 shapes, viewers start confusing similar ones (●  ●  ■  ▲ ▼ ◆ ★ ✦). For more than a handful of categories, shape becomes ineffective. Use facets or filter the data instead.
 - 2 only.
 
 Shape is a *weak* perceptual channel — keep it small or skip it.`}

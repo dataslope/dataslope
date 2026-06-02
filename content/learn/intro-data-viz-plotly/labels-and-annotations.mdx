@@ -199,7 +199,7 @@ work, they won't bother to do.
 - Descriptive titles are shorter than narrative titles.
 - They are the same thing.
 - [o] A descriptive title states what the chart shows ("Sales by month"); a narrative title summarizes the *takeaway* the chart is intended to convey ("Sales grew 23% in Q4").
-  > Yes. Both are legitimate. Descriptive titles are appropriate for exploratory or reference charts. Narrative titles are better when the chart is making a *point* in a report, dashboard, or article. Choose deliberately.
+  > Both are legitimate. Descriptive titles are appropriate for exploratory or reference charts. Narrative titles are better when the chart is making a *point* in a report, dashboard, or article. Choose deliberately.
 - Narrative titles are required by Plotly.
 
 A common upgrade for a beginner: rewriting "Tip vs total bill" as "Tips scale roughly linearly with bill size, regardless of smoker status."`}
@@ -211,7 +211,7 @@ A common upgrade for a beginner: rewriting "Tip vs total bill" as "Tips scale ro
 - **fig.add_text(...)**
 - **px.hline(...)**
 - [o] **fig.add_hline(y=..., annotation_text=...)**
-  > Right. **fig.add_hline()** and **fig.add_vline()** add reference lines with optional text. They're invaluable for marking thresholds: a target value, a regulatory limit, "average," "today," and so on.
+  > **fig.add_hline()** and **fig.add_vline()** add reference lines with optional text. They're invaluable for marking thresholds: a target value, a regulatory limit, "average," "today," and so on.
 - **fig.draw_line(...)**
 
 Reference lines split a chart into meaningful regions, often dramatically improving readability.`}
@@ -223,7 +223,7 @@ Reference lines split a chart into meaningful regions, often dramatically improv
 - It is required by GDPR.
 - It triples the chart's resolution.
 - [o] It lets future readers (including your future self) trust, verify, and reproduce the chart — and it makes the chart safer to share outside its original context.
-  > Yes. Charts get screenshotted, pasted into decks, and forwarded by email — quickly losing the surrounding context. A caption with source and method travels with the image. Future readers can verify the data; future you doesn't have to re-derive it.
+  > Charts get screenshotted, pasted into decks, and forwarded by email — quickly losing the surrounding context. A caption with source and method travels with the image. Future readers can verify the data; future you doesn't have to re-derive it.
 - It makes the chart load faster.
 
 A 12-word caption can save hours of "wait, where did this number come from?" later.`}

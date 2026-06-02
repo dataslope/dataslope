@@ -219,7 +219,7 @@ than a baffling alignment bug forty cells later.
 - Always drop the second copy
 - Always sum the spend
 - [o] Decide based on the business rules (keep first? keep latest? aggregate?) and document the choice; do not blindly drop or sum
-  > Right. Duplicate resolution is a business judgement. Whatever you pick, make it visible in your code so future readers know.
+  > Duplicate resolution is a business judgement. Whatever you pick, make it visible in your code so future readers know.
 - Ignore them
 
 Casual de-duplication is a frequent source of quiet data loss.`}
@@ -231,7 +231,7 @@ Casual de-duplication is a frequent source of quiet data loss.`}
 - Drop the column, recreate, paste back
 - One-hot encode everything
 - [o] Strip whitespace → normalize case → replace known variants with a canonical form
-  > Yes. That three-step recipe covers the great majority of category-label cleanup.
+  > That three-step recipe covers the great majority of category-label cleanup.
 - Convert to numeric
 
 The order matters: stripping and case-normalizing before replacement gives the replacement a clean target to match.`}

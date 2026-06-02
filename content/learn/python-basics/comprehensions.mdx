@@ -374,8 +374,8 @@ For example, \`cartesian([1, 2], ["a", "b"])\` returns \`[(1, "a"), (1, "b"), (2
 [x + y for x in [1, 2] for y in [10, 20]]
 \`\`\`
 
-- \`[11, 21, 12, 22]\`
-  > That is the correct order.
+- \`[11, 22]\`
+  > That would pair the lists element-wise (like \`zip\`), not form every combination.
 - [o] \`[11, 21, 12, 22]\`
   > The outer loop is \`x\`, the inner loop is \`y\`.
 - \`[11, 12, 21, 22]\`

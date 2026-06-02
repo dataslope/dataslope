@@ -327,7 +327,7 @@ def mc_area(predicate, bounds, n_samples, seed=0):
 
 - Deterministic quadrature always wins because it is higher order
 - [o] Monte Carlo usually wins because deterministic quadrature costs $n^\{12\}$ evaluations — only $n = 2$ fits in any reasonable budget — while MC's $1/\\sqrt\{N\}$ error is independent of dimension
-  > Exactly. In high dimensions deterministic quadrature suffers from the curse of dimensionality: doubling accuracy multiplies cost by $2^d$. Monte Carlo's dimension-free error scaling is what makes it the standard tool for integrals beyond ~5 dimensions.
+  > In high dimensions deterministic quadrature suffers from the curse of dimensionality: doubling accuracy multiplies cost by $2^d$. Monte Carlo's dimension-free error scaling is what makes it the standard tool for integrals beyond ~5 dimensions.
 - They are always equivalent
 - Neither converges
 
@@ -339,7 +339,7 @@ Use deterministic quadrature for $d \\le 4$; use Monte Carlo (or quasi-Monte Car
 
 - About $10^5$
 - [o] About $10^6$
-  > Right. Monte Carlo error scales as $1/\\sqrt N$, so reducing the error by 10× requires 100× more samples. From $10^4$ that is $10^6$. This brutal scaling is exactly why variance-reduction techniques (importance sampling, control variates, antithetic variates) matter.
+  > Monte Carlo error scales as $1/\\sqrt N$, so reducing the error by 10× requires 100× more samples. From $10^4$ that is $10^6$. This brutal scaling is exactly why variance-reduction techniques (importance sampling, control variates, antithetic variates) matter.
 - About $2 \\times 10^4$
 - About $10^7$
 

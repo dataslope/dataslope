@@ -289,7 +289,7 @@ assert students["gpa"].between(0, 4).all(), "gpa out of [0,4]"`,
 - The store address
 - A pie chart of the orders
 - [o] The quantity of items in that order line
-  > Yes. Columns are *attributes of each row*. Quantity is a property of a single order line. Store address could also be a column, but only if it varies by row.
+  > Columns are *attributes of each row*. Quantity is a property of a single order line. Store address could also be a column, but only if it varies by row.
 - A spreadsheet formula
 
 A column is an attribute that applies to every row of the dataset.`}
@@ -313,7 +313,7 @@ Always state the grain of a dataset before joining or aggregating it.`}
 - Wide
 - They are equivalent
 - [o] Long
-  > Right. In long form, each row is a single observation, which makes group-by, filter, and plot operations straightforward. Wide form is often nicer for *humans* to read, but harder to manipulate programmatically.
+  > In long form, each row is a single observation, which makes group-by, filter, and plot operations straightforward. Wide form is often nicer for *humans* to read, but harder to manipulate programmatically.
 - Neither
 
 The standard workflow is "keep it long while working, pivot to wide for display."`}

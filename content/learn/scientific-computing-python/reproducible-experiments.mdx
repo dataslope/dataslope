@@ -298,7 +298,7 @@ machine that does not yet exist.
 
 - Set \`np.random.seed(...)\` once at the top of the script
 - [o] Refactor the script to create a single \`rng = np.random.default_rng(seed)\` at the top and pass it to every function that needs randomness
-  > Right. The modern, recommended approach is the local \`Generator\` returned by \`default_rng\`. It avoids hidden global state, makes the data flow explicit (any function that takes randomness must accept \`rng\` as an argument), and prevents interference with libraries that also touch \`np.random.*\`. \`np.random.seed\` still works but is global and discouraged.
+  > The modern, recommended approach is the local \`Generator\` returned by \`default_rng\`. It avoids hidden global state, makes the data flow explicit (any function that takes randomness must accept \`rng\` as an argument), and prevents interference with libraries that also touch \`np.random.*\`. \`np.random.seed\` still works but is global and discouraged.
 - Run the script in a fresh Python interpreter each time
 - Catch the difference and average it away
 
@@ -310,7 +310,7 @@ machine that does not yet exist.
 
 - Email the notebook and ask the referee to figure it out
 - [o] Maintain the figure's computation in a versioned \`.py\` module with a single entry function, parametrized by the variation; re-run with the new parameter, regenerate the figure, and tag the commit
-  > Yes. The library-plus-thin-notebook discipline pays off precisely in this scenario. The notebook documents *what you saw*, the module encapsulates *how it was produced*, and git captures *which version*. Variations become a parameter change rather than a 47-cell archaeology dig.
+  > The library-plus-thin-notebook discipline pays off precisely in this scenario. The notebook documents *what you saw*, the module encapsulates *how it was produced*, and git captures *which version*. Variations become a parameter change rather than a 47-cell archaeology dig.
 - Re-run all 47 cells and hope they still work
 - Ask the referee to install your old laptop
 

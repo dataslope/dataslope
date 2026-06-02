@@ -370,7 +370,7 @@ Einsum's strength is that the shape of the result is exactly what the index nota
 - \`A.T\`
 - \`A.reshape(-1)\` on a C-contiguous array
 - [o] \`A[A > 0]\` (boolean indexing)
-  > Right. Boolean masks always return a copy, because the result has a new, irregular layout that cannot be described by strides into the original buffer. Slicing and transposes are views.
+  > Boolean masks always return a copy, because the result has a new, irregular layout that cannot be described by strides into the original buffer. Slicing and transposes are views.
 
 Knowing when you get a view versus a copy is critical for in-place algorithms and for understanding memory usage.`}
 />

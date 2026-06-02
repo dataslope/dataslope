@@ -178,3 +178,47 @@ A \`SELECT\` produces a fresh result and never alters the underlying table.`}
 
 \`DISTINCT\` returns each unique value once, which is ideal for listing the possible values in a column.`}
 />
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Select titles and authors"
+  instructions={`The \`books\` table has \`id\`, \`title\`, \`author\`, and \`year\` columns. Return just the \`title\` and \`author\` of every book.`}
+  initSql={`CREATE TABLE books (
+  id     SERIAL PRIMARY KEY,
+  title  TEXT NOT NULL,
+  author TEXT NOT NULL,
+  year   INTEGER
+);
+INSERT INTO books (title, author, year) VALUES
+  ('The Pragmatic Programmer', 'Hunt & Thomas', 1999),
+  ('Clean Code', 'Robert C. Martin', 2008),
+  ('Refactoring', 'Martin Fowler', 2018),
+  ('SQL for Smarties', 'Joe Celko', 1995);`}
+  starterCode={`-- Return only the title and author columns:
+SELECT
+FROM books;
+`}
+  solutionSql={`SELECT title, author FROM books ORDER BY id;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns title and author",
+      description: "Those two columns, in that order.",
+      expectedColumns: ["title", "author"],
+    },
+    {
+      id: "row_count",
+      name: "Returns all four books",
+      description: "One row per book.",
+      expectedRowCount: 4,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "The same titles and authors.",
+      matchesSolution: true,
+    },
+  ]}
+/>

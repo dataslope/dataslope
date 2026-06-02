@@ -148,7 +148,7 @@ indexes first or use `merge` with an explicit key.
 
 - merge
 - [o] concat with \`axis=0\` (stack rows) and \`ignore_index=True\`
-  > Right. Same shape, no key — stacking is the right operation.
+  > Same shape, no key — stacking is the right operation.
 - pivot
 - join
 
@@ -161,7 +161,7 @@ This is the canonical concat use case.`}
 - concat axis=0
 - concat axis=1
 - [o] \`orders.merge(customers, on="customer_id")\`
-  > Yes. Merge matches rows by the shared key — exactly what's needed for lookups.
+  > Merge matches rows by the shared key — exactly what's needed for lookups.
 - groupby
 
 Whenever a *key* relates the two tables, merge.`}

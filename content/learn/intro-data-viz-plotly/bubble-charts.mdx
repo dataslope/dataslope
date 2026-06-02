@@ -156,7 +156,7 @@ In those cases, prefer color or a different encoding.
 - A pie chart with multiple values per slice.
 - A 3-D scatter plot.
 - [o] A scatter plot where marker size encodes a third quantitative variable.
-  > Yes. By adding **size="..."** to a Plotly Express scatter call, you turn a 2-variable chart into a 3-variable bubble chart. Add **color="..."** for a 4th variable.
+  > By adding **size="..."** to a Plotly Express scatter call, you turn a 2-variable chart into a 3-variable bubble chart. Add **color="..."** for a 4th variable.
 - A type of histogram.
 
 The Gapminder chart by Hans Rosling is the canonical example of a bubble chart.`}
@@ -168,7 +168,7 @@ The Gapminder chart by Hans Rosling is the canonical example of a bubble chart.`
 - Size is calculated last by the rendering engine.
 - Size cannot be larger than 50 pixels.
 - [o] Area is a relatively weak encoding — the eye perceives "bigger / smaller" categorically but not precise multiples. Reserve size for variables where rough comparison is good enough.
-  > Right. According to the Cleveland-McGill ranking, area is much less accurate than position for quantitative comparison. Use size to *flag* which observations are big and which are small; use position (x and y) for the variables where the reader needs precise comparison.
+  > According to the Cleveland-McGill ranking, area is much less accurate than position for quantitative comparison. Use size to *flag* which observations are big and which are small; use position (x and y) for the variables where the reader needs precise comparison.
 - Size is hidden from screen readers.
 
 Always put your most important quantitative variables on x and y.`}
@@ -180,7 +180,7 @@ Always put your most important quantitative variables on x and y.`}
 - **animation=True**
 - **play=True**
 - [o] **animation_frame="..."** (and usually **animation_group="..."**)
-  > Yes. **animation_frame="year"** (for example) creates one frame per unique value of that column. **animation_group="country"** keeps each country's dot connected across frames so it moves smoothly instead of jumping. Plotly Express adds a play button and slider automatically.
+  > **animation_frame="year"** (for example) creates one frame per unique value of that column. **animation_group="country"** keeps each country's dot connected across frames so it moves smoothly instead of jumping. Plotly Express adds a play button and slider automatically.
 - **time=True**
 
 Animation is fun and instantly impressive — but use it only when *time* is meaningfully the third dimension. Animation for animation's sake makes charts harder to study.`}

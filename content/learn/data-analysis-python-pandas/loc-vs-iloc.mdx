@@ -184,7 +184,7 @@ print(df.iloc[0])
 - \`df.iloc[0:5]\`
 - \`mylist[0:5]\` in plain Python
 - [o] \`df.loc["a":"e"]\`
-  > Yes. Label-based slicing in Pandas is inclusive of both ends — different from \`iloc\` and from regular Python slicing.
+  > Label-based slicing in Pandas is inclusive of both ends — different from \`iloc\` and from regular Python slicing.
 - \`range(0, 5)\`
 
 This asymmetry surprises everyone the first time. Lock it in.`}
@@ -207,7 +207,7 @@ Train your fingers to write \`df.loc[mask, "col"] = ...\` and you will save your
 
 - An error
 - [o] The row whose **label** is 10 — i.e., the first row
-  > Right. When the index contains integers, the distinction between label and position becomes very visible: \`df.iloc[10]\` would be out of bounds here.
+  > When the index contains integers, the distinction between label and position becomes very visible: \`df.iloc[10]\` would be out of bounds here.
 - The row at position 10
 - The integer 10
 

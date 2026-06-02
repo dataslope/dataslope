@@ -271,7 +271,7 @@ template for almost every signal-processing experiment.
 
 - The FFT shows a peak at 700 Hz
 - [o] The 700 Hz tone is *aliased* to $|700 - 1000| = 300$ Hz because it lies above the Nyquist limit $f_s/2 = 500$ Hz
-  > Yes. The Nyquist–Shannon theorem says you can only faithfully represent frequencies below $f_s/2$. A 700 Hz sinusoid sampled at 1000 Hz is indistinguishable from a 300 Hz sinusoid — they alias. To detect 700 Hz, raise the sample rate above 1400 Hz.
+  > The Nyquist–Shannon theorem says you can only faithfully represent frequencies below $f_s/2$. A 700 Hz sinusoid sampled at 1000 Hz is indistinguishable from a 300 Hz sinusoid — they alias. To detect 700 Hz, raise the sample rate above 1400 Hz.
 - The FFT shows two peaks: one at 700 Hz and one at 300 Hz
 - The FFT returns NaN
 
@@ -283,7 +283,7 @@ Aliasing is irreversible once you've sampled. Anti-alias filter *before* the ADC
 
 - It runs on the GPU
 - [o] It performs a forward-then-backward pass for zero phase distortion *and* uses the numerically stable second-order-sections form for higher-order filters
-  > Right. \`lfilter\` is causal and introduces a frequency-dependent delay that smears features; \`filtfilt\` cancels that delay. The \`sos\` form avoids the catastrophic ill-conditioning of high-order transfer functions. Combined, \`sosfiltfilt\` is the safe default for offline analysis.
+  > \`lfilter\` is causal and introduces a frequency-dependent delay that smears features; \`filtfilt\` cancels that delay. The \`sos\` form avoids the catastrophic ill-conditioning of high-order transfer functions. Combined, \`sosfiltfilt\` is the safe default for offline analysis.
 - It always returns integer results
 - It uses less memory
 

@@ -219,7 +219,7 @@ The three walls — volume, precision, and dimensionality — map directly onto 
 - Python's \`math.cos\` is buggy for small arguments
 - The CPU is rounding $x^2$ to zero
 - [o] $1 - \\cos(x)$ subtracts two nearly equal numbers and loses almost all of its significant digits — a phenomenon called *catastrophic cancellation*
-  > Exactly. For tiny $x$, $\\cos(x) \\approx 1$, so $1 - \\cos(x)$ is the difference of two floating-point numbers that agree in almost every digit. Subtracting them keeps only the few digits where they *disagree*, which is mostly round-off noise. The rewritten form $2\\sin^2(x/2)$ avoids the subtraction entirely.
+  > For tiny $x$, $\\cos(x) \\approx 1$, so $1 - \\cos(x)$ is the difference of two floating-point numbers that agree in almost every digit. Subtracting them keeps only the few digits where they *disagree*, which is mostly round-off noise. The rewritten form $2\\sin^2(x/2)$ avoids the subtraction entirely.
 - The cubic spline interpolation introduced rounding error
 
 This is one of the most important lessons in numerical computing: **two algebraically identical expressions can produce wildly different numerical answers**. We will return to this idea many times.`}

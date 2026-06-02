@@ -204,3 +204,48 @@ to carry for now.
 
 Requiring both conditions calls for \`AND\`.`}
 />
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Books published before 2000"
+  instructions={`The \`books\` table has a \`year\` column. Return the \`title\` and \`year\` of every book published before the year 2000.`}
+  initSql={`CREATE TABLE books (
+  id     SERIAL PRIMARY KEY,
+  title  TEXT NOT NULL,
+  author TEXT NOT NULL,
+  year   INTEGER
+);
+INSERT INTO books (title, author, year) VALUES
+  ('The Pragmatic Programmer', 'Hunt & Thomas', 1999),
+  ('Clean Code', 'Robert C. Martin', 2008),
+  ('Refactoring', 'Martin Fowler', 2018),
+  ('SQL for Smarties', 'Joe Celko', 1995);`}
+  starterCode={`-- Keep only the books from before 2000:
+SELECT title, year
+FROM books
+WHERE ;
+`}
+  solutionSql={`SELECT title, year FROM books WHERE year < 2000 ORDER BY id;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns title and year",
+      description: "Those two columns.",
+      expectedColumns: ["title", "year"],
+    },
+    {
+      id: "row_count",
+      name: "Returns two books",
+      description: "Only the titles from before 2000.",
+      expectedRowCount: 2,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "The Pragmatic Programmer and SQL for Smarties.",
+      matchesSolution: true,
+    },
+  ]}
+/>

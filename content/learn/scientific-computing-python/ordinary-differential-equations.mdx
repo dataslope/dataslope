@@ -366,7 +366,7 @@ This is also why high-order methods can deliver far more accuracy *per function 
 
 - Lower the absolute tolerance
 - [o] Switch to an implicit stiff solver such as \`BDF\` or \`LSODA\`
-  > Right. Wildly separated timescales are the textbook definition of stiffness. Explicit RK methods are forced to use tiny steps for *stability* — not accuracy. Implicit BDF/LSODA solvers handle stiff systems in dozens of steps where RK45 needs millions.
+  > Wildly separated timescales are the textbook definition of stiffness. Explicit RK methods are forced to use tiny steps for *stability* — not accuracy. Implicit BDF/LSODA solvers handle stiff systems in dozens of steps where RK45 needs millions.
 - Switch to \`DOP853\` for higher order
 - Add a perturbation to break the symmetry
 

@@ -355,7 +355,7 @@ assert np.allclose(got, expected, atol=1e-9), "thomas disagrees with numpy"`,
 - Cramer's rule
 - Direct matrix inversion
 - [o] LU factorization with partial pivoting, then forward and back substitution
-  > Right. NumPy's \`solve\` dispatches to LAPACK's \`dgesv\`, which factors $A = PLU$ with partial pivoting and then solves the two triangular systems. This is the standard backward-stable algorithm for general dense linear systems.
+  > NumPy's \`solve\` dispatches to LAPACK's \`dgesv\`, which factors $A = PLU$ with partial pivoting and then solves the two triangular systems. This is the standard backward-stable algorithm for general dense linear systems.
 - A neural-network-based estimator
 
 Knowing what your library is actually doing lets you predict its runtime and stability.`}

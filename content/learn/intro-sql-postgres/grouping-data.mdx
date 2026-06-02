@@ -200,3 +200,50 @@ Grouping by multiple columns produces one summary row per distinct combination o
 
 \`WHERE\` filters rows before grouping; to filter the groups themselves you use \`HAVING\`.`}
 />
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Big-spending customers"
+  instructions={`The \`orders\` table has \`customer\` and \`amount\` columns. For each customer who has spent **more than 100** in total, return their \`customer\` name and total spend as \`total\`, sorted from the highest total to the lowest.`}
+  initSql={`CREATE TABLE orders (
+  id       SERIAL PRIMARY KEY,
+  customer TEXT NOT NULL,
+  amount   NUMERIC(8, 2) NOT NULL
+);
+INSERT INTO orders (customer, amount) VALUES
+  ('Ada', 120.00), ('Linus', 80.00), ('Ada', 30.00),
+  ('Grace', 200.00), ('Linus', 15.00), ('Ada', 25.00);`}
+  starterCode={`-- Total per customer, then keep only the big spenders:
+SELECT customer, SUM(amount) AS total
+FROM orders
+;
+`}
+  solutionSql={`SELECT customer, SUM(amount) AS total
+FROM orders
+GROUP BY customer
+HAVING SUM(amount) > 100
+ORDER BY total DESC;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns customer and total",
+      description: "The group key and its summed amount.",
+      expectedColumns: ["customer", "total"],
+    },
+    {
+      id: "row_count",
+      name: "Returns two customers",
+      description: "Only Ada and Grace clear the 100 threshold.",
+      expectedRowCount: 2,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Grace (200.00) then Ada (175.00).",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
+/>

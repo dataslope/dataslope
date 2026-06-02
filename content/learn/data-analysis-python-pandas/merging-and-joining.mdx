@@ -295,7 +295,7 @@ assert isinstance(orphans, pd.DataFrame)`,
 - A bug in pandas
 - A network issue
 - [o] The join key is duplicated in the right-hand table — each left row matches multiple right rows
-  > Right. Always check key uniqueness with \`.duplicated()\` or \`validate="one_to_many"\` before joining.
+  > Always check key uniqueness with \`.duplicated()\` or \`validate="one_to_many"\` before joining.
 - The dtypes are different
 
 Cardinality blow-ups are by far the most common merge bug.`}
@@ -306,7 +306,7 @@ Cardinality blow-ups are by far the most common merge bug.`}
 
 - inner
 - [o] left (employees on the left)
-  > Yes. Left join keeps all employees and adds dept info where it matches.
+  > Left join keeps all employees and adds dept info where it matches.
 - outer
 - right
 
@@ -331,7 +331,7 @@ Left joins are the workhorse of enrichment workflows.`}
 - Manually count rows after the merge
 - Hope for the best
 - [o] Pass \`validate="one_to_one"\` to \`merge\` — Pandas raises an error if the data violates that assumption
-  > Right. Encoding your assumptions in the code catches problems immediately, instead of letting silent bugs propagate.
+  > Encoding your assumptions in the code catches problems immediately, instead of letting silent bugs propagate.
 - Use a SQL database instead
 
 The \`validate=\` parameter turns implicit assumptions into explicit, testable contracts.`}

@@ -253,7 +253,7 @@ print("At-risk fraction:", df["AtRisk"].mean().round(3))
 - Nothing
 - The first is faster
 - [o] Direct assignment modifies \`df\` in place; \`.assign\` returns a *new* DataFrame and leaves the original untouched
-  > Right. \`.assign\` is the immutable alternative and chains nicely in pipelines.
+  > \`.assign\` is the immutable alternative and chains nicely in pipelines.
 - \`.assign\` is a method on Series
 
 Choose based on whether you want to preserve the original DataFrame.`}
@@ -265,7 +265,7 @@ Choose based on whether you want to preserve the original DataFrame.`}
 - When you want to filter
 - When you want to drop columns
 - [o] When you need to assign one of *more than two* values depending on multiple conditions
-  > Yes. \`np.where\` is binary (if/else). \`np.select\` extends to many branches without nesting.
+  > \`np.where\` is binary (if/else). \`np.select\` extends to many branches without nesting.
 - When you want to sort
 
 For grade letters, salary bands, customer tiers, etc., \`np.select\` keeps the logic readable.`}

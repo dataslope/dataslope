@@ -219,7 +219,7 @@ Express the right beginner tool.
 - They are two unrelated libraries that happen to share a name.
 - Plotly Express is a different programming language.
 - [o] Plotly Express is a high-level Python API on top of plotly.py, which is a Python wrapper around the Plotly.js JavaScript library.
-  > Yes. When you call **px.bar(...)** in Python, Plotly Express builds a configuration object, plotly.py serializes it, and Plotly.js renders the interactive chart in the browser. You write Python, the browser executes JavaScript — invisible to you.
+  > When you call **px.bar(...)** in Python, Plotly Express builds a configuration object, plotly.py serializes it, and Plotly.js renders the interactive chart in the browser. You write Python, the browser executes JavaScript — invisible to you.
 - Plotly.js is a fork of Plotly Express.
 
 This three-layer stack (Plotly Express → plotly.py → Plotly.js) is invisible most of the time. You'll only notice it when something breaks.`}
@@ -243,7 +243,7 @@ Both are free and open source. When you outgrow Plotly Express, you can always d
 - HTML
 - CSS
 - [o] plotly.graph_objects — the lower-level Plotly API for full chart customization.
-  > Yes. Plotly Express handles 90% of the charts you'll ever want to make, but when you need precise control — custom subplot layouts, multi-axis charts, animated transitions — you drop down to **plotly.graph_objects**. The two APIs work together seamlessly.
+  > Plotly Express handles 90% of the charts you'll ever want to make, but when you need precise control — custom subplot layouts, multi-axis charts, animated transitions — you drop down to **plotly.graph_objects**. The two APIs work together seamlessly.
 - JavaScript
 
 You will rarely *have* to leave Plotly Express. When you do, **graph_objects** is the natural next step.`}

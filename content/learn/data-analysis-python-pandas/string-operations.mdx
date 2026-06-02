@@ -315,7 +315,7 @@ assert pd.isna(clean.iloc[5])`,
 - Pandas requires it
 - It is faster than Python loops
 - [o] It provides vectorized string operations on whole columns of text — clean syntax and far faster than writing a Python for-loop over each value
-  > Right. \`.str.upper()\` on a million-row column is one call, not a million.
+  > \`.str.upper()\` on a million-row column is one call, not a million.
 - It works only on integers
 
 The \`.str\` accessor is one of Pandas's most quietly powerful features.`}
@@ -327,7 +327,7 @@ The \`.str\` accessor is one of Pandas's most quietly powerful features.`}
 - Return True everywhere
 - Return False everywhere
 - [o] Propagate the NaN — the result has NaN at that position by default
-  > Yes. Use \`na=False\` (or \`na=True\`) to coerce the NaN to a definite boolean — required if you want to use the result as a filter mask.
+  > Use \`na=False\` (or \`na=True\`) to coerce the NaN to a definite boolean — required if you want to use the result as a filter mask.
 - Throw an error
 
 Forgetting \`na=False\` is a classic gotcha when filtering string columns that contain nulls.`}

@@ -200,7 +200,7 @@ comparison is the main point, use grouped bars instead.
 - For showing a continuous trend over time.
 - For showing the distribution of a single variable.
 - [o] For comparing a quantitative value across a small-to-medium number of discrete categories.
-  > Yes. Bar charts use length-on-a-common-scale to encode quantity, which is one of the most accurate visual encodings. They're ideal when "how do these categories compare?" is the question.
+  > Bar charts use length-on-a-common-scale to encode quantity, which is one of the most accurate visual encodings. They're ideal when "how do these categories compare?" is the question.
 - For comparing two quantitative variables.
 
 For time use a line chart; for distributions use a histogram; for two-variable relationships use a scatter plot.`}
@@ -212,7 +212,7 @@ For time use a line chart; for distributions use a histogram; for two-variable r
 - It is required by Plotly.
 - It makes the chart render faster.
 - [o] The eye reads a ranked bar chart almost instantly, while alphabetical order forces the reader to do the ranking mentally.
-  > Right. The whole point of a bar chart is comparison. Sorting does the comparison work for the reader. Alphabetical order is essentially random in terms of the values, so it adds work without adding clarity.
+  > The whole point of a bar chart is comparison. Sorting does the comparison work for the reader. Alphabetical order is essentially random in terms of the values, so it adds work without adding clarity.
 - It uses less memory.
 
 Two exceptions: categories with a natural order (months, sizes) and time-based categories should keep their natural order.`}
@@ -224,7 +224,7 @@ Two exceptions: categories with a natural order (months, sizes) and time-based c
 - A great way to save vertical space.
 - Required for log-scale data.
 - [o] Misleading — bar length encodes magnitude *relative to zero*, so truncating exaggerates small differences and can mislead readers.
-  > Yes. This is one of the classic ways charts lie. A bar starting at 90 and reaching 100 looks "very different" from a bar reaching 95, even though the real difference is 5%. The visual cue (length) no longer matches the data magnitude. For trend visualization where small differences matter, a line chart with a truncated axis is sometimes acceptable — for bar charts, almost never.
+  > This is one of the classic ways charts lie. A bar starting at 90 and reaching 100 looks "very different" from a bar reaching 95, even though the real difference is 5%. The visual cue (length) no longer matches the data magnitude. For trend visualization where small differences matter, a line chart with a truncated axis is sometimes acceptable — for bar charts, almost never.
 - The default behavior in Plotly Express.
 
 If you want to emphasize a small difference, use a line chart or a dot plot — not a truncated bar chart.`}
@@ -236,7 +236,7 @@ If you want to emphasize a small difference, use a line chart or a dot plot — 
 - When you have fewer than 5 categories.
 - When you have more than 100 categories.
 - [o] When category labels are long, or when you have many categories that would otherwise crowd the x-axis.
-  > Yes. Horizontal bars let the labels sit comfortably to the left of each bar, no rotation needed. They also let you stack a lot of categories vertically without crowding.
+  > Horizontal bars let the labels sit comfortably to the left of each bar, no rotation needed. They also let you stack a lot of categories vertically without crowding.
 - Whenever the data is sorted.
 
 A horizontal layout is often the small change that turns a cluttered chart into a readable one.`}

@@ -255,8 +255,8 @@ print("a", "b", "c", sep="-", end="!")
 
 - \`print("Hello", newline=False)\`
   > The parameter is named \`end\`, not \`newline\`.
-- \`print("Hello", end="")\`
-  > This works! But there is another correct answer too.
+- \`print("Hello", end="\\n")\`
+  > \`end="\\n"\` is already the default, so this still prints a trailing newline.
 - [o] \`print("Hello", end="")\`
   > Setting \`end=""\` removes the newline.
 - \`print("Hello", sep="")\`

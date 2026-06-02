@@ -1530,6 +1530,8 @@ export default function SqlChallengeCard({
     <div
       className={styles.card}
       data-flavor="sql"
+      data-testid="sql-challenge-card"
+      data-challenge-title={title}
       aria-label={`SQL coding challenge: ${title}`}
     >
       {/* ── Header ── */}

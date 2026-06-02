@@ -294,7 +294,7 @@ def estimate_pi():
 
 - The CPU clock skew accumulates
 - [o] Subtracting $f(x_0+h)$ and $f(x_0)$ loses significant digits when the values are nearly equal, so round-off error dominates for tiny $h$
-  > Exactly. Truncation error scales as $O(h)$, but round-off in the numerator scales as $\\epsilon/h$. Their sum is minimized near $h\\approx\\sqrt\{\\epsilon\}\\approx 10^\{-8\}$.
+  > Truncation error scales as $O(h)$, but round-off in the numerator scales as $\\epsilon/h$. Their sum is minimized near $h\\approx\\sqrt\{\\epsilon\}\\approx 10^\{-8\}$.
 - The compiler reorders operations
 - Python's float type uses arbitrary precision so the rounding only happens at the end
 
@@ -306,7 +306,7 @@ This V-shaped error curve is the single most important plot to remember about nu
 
 - It needs the error to log it
 - [o] It uses an adaptive algorithm that already computes two different approximations on every sub-interval and uses their difference as a built-in error estimator
-  > Right. Adaptive quadrature compares two rules of different orders on the same interval; their difference both drives subdivision and serves as a free, reliable error estimate. Returning it lets you decide whether the answer is trustworthy.
+  > Adaptive quadrature compares two rules of different orders on the same interval; their difference both drives subdivision and serves as a free, reliable error estimate. Returning it lets you decide whether the answer is trustworthy.
 - Returning the error is required by the IEEE standard
 - The error is the variance of the integrand
 

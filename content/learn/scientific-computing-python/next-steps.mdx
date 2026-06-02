@@ -256,7 +256,7 @@ and now you are one of them.
 
 - Rewrite the entire project in Julia
 - [o] Add a \`@numba.njit\` decorator to the inner-loop function
-  > Right. Numba is purpose-built for the case "tight numeric Python loop that NumPy can't easily vectorize". A decorator and zero structural change typically buy you 100–500× speedup. Reaching for a different language or a GPU is overkill when the bottleneck is a single function.
+  > Numba is purpose-built for the case "tight numeric Python loop that NumPy can't easily vectorize". A decorator and zero structural change typically buy you 100–500× speedup. Reaching for a different language or a GPU is overkill when the bottleneck is a single function.
 - Buy a more expensive CPU
 - Increase the size of arrays
 
@@ -268,7 +268,7 @@ Profile first, then apply the cheapest tool that fixes the actual bottleneck.`}
 
 - Pure NumPy with finite-difference gradients
 - [o] JAX, which provides automatic differentiation, JIT compilation, and a NumPy-compatible API — so gradients of arbitrary simulations come "for free"
-  > Yes. The whole point of JAX (and frameworks like PyTorch) is to remove the need to derive gradients manually or approximate them with finite differences. You write the forward simulator in \`jax.numpy\`, wrap with \`grad\`, and you have exact, fast derivatives suitable for high-dimensional optimization or inference.
+  > The whole point of JAX (and frameworks like PyTorch) is to remove the need to derive gradients manually or approximate them with finite differences. You write the forward simulator in \`jax.numpy\`, wrap with \`grad\`, and you have exact, fast derivatives suitable for high-dimensional optimization or inference.
 - SymPy, which symbolically integrates the ODE
 - Dask, which parallelizes the loop
 
