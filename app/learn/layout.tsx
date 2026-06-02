@@ -61,7 +61,7 @@ export default async function LearnLayout({ children }: { children: ReactNode })
       <DocsLayout
         tree={source.pageTree}
         tabs={false}
-        sidebar={{ banner: <SidebarCourseTitle titles={courseTitles} /> }}
+        sidebar={{ banner: <SidebarCourseTitle key="course-sidebar-banner" titles={courseTitles} /> }}
         nav={{
           title: (
             <span style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: "bold" }}>

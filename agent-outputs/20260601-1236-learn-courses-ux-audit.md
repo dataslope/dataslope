@@ -102,12 +102,12 @@ Both errors below fired on **every one of the 24 pages** walked (full text captu
 - 🟠 **#4 — Duplicate React `key` warning.**
   > `Each child in a list should have a unique "key" prop. … Check the render method of `Sidebar`. It was passed a child from `LearnLayout`.`
 
-  `app/learn/layout.tsx` passes `tree={source.pageTree}` and `sidebar={{ banner: … }}` into Fumadocs's `DocsLayout`. The most likely trigger is the **repeated `"---"` separator nodes** in the top-level `meta.json` (5 of them) producing sidebar children that share a non-unique key. Worth confirming against the Fumadocs version (`fumadocs-ui@^16.8.5`).
+  `app/learn/layout.tsx` passes `tree={source.pageTree}` and `sidebar={{ banner: … }}` into Fumadocs's `DocsLayout`. The `"---"` separators were the initial suspect, but in `fumadocs-ui@16.9.0` the page-tree renderer keys every node by index — the real cause is the **`sidebar.banner` element**, which Fumadocs renders in *both* the desktop sidebar and the mobile drawer, so the shared keyless node collides. **Resolved** by giving the banner a stable `key` in `app/learn/layout.tsx`.
 
 - 🟠 **#5 — Hydration mismatch.**
   > `A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up.`
 
-  Server-rendered markup diverges from the client on first paint (candidates: theme class via `next-themes`/`RootProvider`, or sidebar active/expanded state). On its own it's a correctness smell; combined with #5 it means the learn route never has a clean console, which masks real regressions.
+  Confirmed cause: `next-themes` (via `RootProvider`) and the `/playground` theme-bootstrap script both set `<html>`'s `class`/`style`/`data-theme` before hydration, so the server-rendered `<html>` can't match the client. **Resolved** by adding `suppressHydrationWarning` to `<html>` in `app/layout.tsx` — the documented next-themes fix, scoped to the one element whose attributes are intentionally set client-side.
 
 These are dev-mode warnings but indicate real issues (a duplicate key can drop/duplicate sidebar items; a hydration mismatch discards server HTML for the affected subtree).
 
@@ -283,14 +283,14 @@ Each phase is self-contained and can be handed to a coding agent independently, 
 
 ---
 
-### Phase 3 — Rendering hygiene (clean console on every page) 🟠
+### Phase 3 — Rendering hygiene (clean console on every page) 🟠 — ✅ implemented
 
 **Goal:** `/learn` pages render with no React warnings.
 
-1. **Eliminate the duplicate-`key` warning** from the Fumadocs `Sidebar`. Investigate the repeated `"---"` separators in top-level `content/learn/meta.json` and any other `meta.json` with multiple separators; ensure separator/tree nodes get unique keys (may require a Fumadocs upgrade or a small `pageTree` transform in `app/learn/layout.tsx`).
-2. **Resolve the hydration mismatch.** Bisect the server/client divergence (theme class via `RootProvider`/`next-themes`, or sidebar active/expanded state); apply `suppressHydrationWarning` only where semantically correct, or fix the diverging attribute.
+1. **Duplicate-`key` warning — fixed.** Not the `"---"` separators (the `fumadocs-ui@16.9.0` page-tree keys every node by index); the cause was the `sidebar.banner`, which Fumadocs renders in both the desktop sidebar and the mobile drawer. Gave the banner element a stable `key` in `app/learn/layout.tsx`.
+2. **Hydration mismatch — fixed.** `next-themes` (via `RootProvider`) and the `/playground` theme-bootstrap script both set `<html>`'s `class`/`style`/`data-theme` on the client; added `suppressHydrationWarning` to `<html>` in `app/layout.tsx`.
 
-**Acceptance:** load 10 representative learn pages (incl. a course chapter, a demo page, the index) → zero console errors/warnings (excluding the sandbox-only CDN cert noise).
+**Acceptance (met):** 10 representative learn pages (the index, demo/showcase pages, and course chapters across several courses) load with zero console errors/warnings — excluding the sandbox-only CDN cert noise — verified via Playwright.
 
 ---
 
