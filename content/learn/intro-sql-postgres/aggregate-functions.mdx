@@ -174,3 +174,41 @@ Aggregate functions reduce many rows to a single summarizing value.`}
 
 \`AVG\` (like \`SUM\`, \`MIN\`, \`MAX\`) ignores NULLs and summarizes only the present values.`}
 />
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Count, total, and average"
+  instructions={`The \`payments\` table has an \`amount\` column. Return a single row with the number of payments as \`n\`, their total as \`total\`, and their average as \`avg\`.`}
+  initSql={`CREATE TABLE payments (
+  id     SERIAL PRIMARY KEY,
+  amount NUMERIC(8, 2) NOT NULL
+);
+INSERT INTO payments (amount) VALUES (50.00), (20.00), (30.00), (100.00);`}
+  starterCode={`-- One row with three aggregate columns:
+SELECT
+FROM payments;
+`}
+  solutionSql={`SELECT COUNT(*) AS n, SUM(amount) AS total, AVG(amount) AS avg FROM payments;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns n, total, avg",
+      description: "Three aggregate columns, named with aliases.",
+      expectedColumns: ["n", "total", "avg"],
+    },
+    {
+      id: "row_count",
+      name: "Returns a single summary row",
+      description: "Aggregates over the whole table collapse to one row.",
+      expectedRowCount: 1,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "n = 4, total = 200.00, avg = 50.00.",
+      matchesSolution: true,
+    },
+  ]}
+/>

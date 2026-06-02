@@ -191,3 +191,49 @@ Without an \`ORDER BY\`, \`LIMIT\` returns an arbitrary subset, not a meaningful
 
 Earlier columns in \`ORDER BY\` take priority; later ones break ties.`}
 />
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="The two newest books"
+  instructions={`Return the \`title\` and \`year\` of the two most recently published books, newest first.`}
+  initSql={`CREATE TABLE books (
+  id     SERIAL PRIMARY KEY,
+  title  TEXT NOT NULL,
+  author TEXT NOT NULL,
+  year   INTEGER
+);
+INSERT INTO books (title, author, year) VALUES
+  ('The Pragmatic Programmer', 'Hunt & Thomas', 1999),
+  ('Clean Code', 'Robert C. Martin', 2008),
+  ('Refactoring', 'Martin Fowler', 2018),
+  ('SQL for Smarties', 'Joe Celko', 1995);`}
+  starterCode={`-- Newest first, then keep only the top two:
+SELECT title, year
+FROM books
+;
+`}
+  solutionSql={`SELECT title, year FROM books ORDER BY year DESC LIMIT 2;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns title and year",
+      description: "Those two columns.",
+      expectedColumns: ["title", "year"],
+    },
+    {
+      id: "row_count",
+      name: "Returns exactly two rows",
+      description: "Limited to the two newest.",
+      expectedRowCount: 2,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Refactoring (2018) then Clean Code (2008).",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
+/>

@@ -169,3 +169,55 @@ With no matching order, an inner join leaves an order-less customer out of the r
 
 "Products that have been sold" calls for an inner join keeping only matched products.`}
 />
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Orders with customer details"
+  instructions={`Join \`orders\` to \`customers\`. Return one row per order with the customer's \`name\`, their \`city\`, and the order \`amount\`, sorted from the largest amount to the smallest.`}
+  initSql={`CREATE TABLE customers (
+  id   SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  city TEXT NOT NULL
+);
+CREATE TABLE orders (
+  id          SERIAL PRIMARY KEY,
+  customer_id INTEGER REFERENCES customers(id),
+  amount      NUMERIC(8, 2) NOT NULL
+);
+INSERT INTO customers (name, city) VALUES
+  ('Ada', 'London'), ('Linus', 'Helsinki'), ('Grace', 'New York');
+INSERT INTO orders (customer_id, amount) VALUES
+  (1, 120.00), (2, 80.00), (1, 30.00), (3, 200.00);`}
+  starterCode={`SELECT c.name, c.city, o.amount
+FROM orders o
+-- add your JOIN and ORDER BY
+;
+`}
+  solutionSql={`SELECT c.name, c.city, o.amount
+FROM orders o
+JOIN customers c ON c.id = o.customer_id
+ORDER BY o.amount DESC;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns name, city, amount",
+      description: "Customer columns joined onto each order.",
+      expectedColumns: ["name", "city", "amount"],
+    },
+    {
+      id: "row_count",
+      name: "Returns one row per order",
+      description: "Four orders, four rows.",
+      expectedRowCount: 4,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Grace's 200.00 first, down to Ada's 30.00.",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
+/>
