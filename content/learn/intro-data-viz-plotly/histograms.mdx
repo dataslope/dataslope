@@ -174,7 +174,7 @@ ever see.
 - The relationship between two variables.
 - A comparison across distinct categories.
 - [o] The distribution (shape, spread, center, skew) of a single numeric variable.
-  > Yes. A histogram divides the range of one variable into bins and counts how many values fall in each. The resulting shape reveals the distribution — where values cluster, how spread out they are, whether the distribution is skewed, and whether there are multiple peaks.
+  > A histogram divides the range of one variable into bins and counts how many values fall in each. The resulting shape reveals the distribution — where values cluster, how spread out they are, whether the distribution is skewed, and whether there are multiple peaks.
 - A trend over time.
 
 For trends over time, use a line chart; for relationships between two variables, use a scatter plot.`}
@@ -186,7 +186,7 @@ For trends over time, use a line chart; for relationships between two variables,
 - The chart looks noisy.
 - The chart fails to render.
 - [o] Structure in the distribution (e.g., bimodality, fine clustering) gets averaged away — you only see a coarse outline.
-  > Right. Too few bins is the visual equivalent of zooming out — you lose detail. Too many bins is the opposite: noise overwhelms signal. The sweet spot reveals *real* structure without amplifying random fluctuations. A common starting heuristic is √n bins, where n is the row count.
+  > Too few bins is the visual equivalent of zooming out — you lose detail. Too many bins is the opposite: noise overwhelms signal. The sweet spot reveals *real* structure without amplifying random fluctuations. A common starting heuristic is √n bins, where n is the row count.
 
 Always sweep through 2-3 bin counts when first exploring a histogram.`}
 />
@@ -197,7 +197,7 @@ Always sweep through 2-3 bin counts when first exploring a histogram.`}
 - Raw counts are illegal.
 - Raw counts force a log scale.
 - [o] The larger group will always have taller bars, even if the *shape* of the distributions is similar — counts confound group size with distribution shape.
-  > Yes. To compare *shapes* fairly, normalize: use **histnorm="probability density"** or **"percent"**. That way each group's distribution integrates to the same total, and you can compare apples to apples.
+  > To compare *shapes* fairly, normalize: use **histnorm="probability density"** or **"percent"**. That way each group's distribution integrates to the same total, and you can compare apples to apples.
 - Raw counts are always wrong.
 
 When comparing distributions across groups, the question "is this group different?" is almost always best answered with normalized histograms.`}
@@ -209,7 +209,7 @@ When comparing distributions across groups, the question "is this group differen
 - A single tall peak in the middle.
 - A long tail on the right side.
 - [o] Two distinct peaks separated by a valley.
-  > Right. Two peaks usually means your data contains two underlying populations mixed together (e.g., "two species of fish in one tank measurement"). Bimodality is a strong analytical clue — almost always worth investigating.
+  > Two peaks usually means your data contains two underlying populations mixed together (e.g., "two species of fish in one tank measurement"). Bimodality is a strong analytical clue — almost always worth investigating.
 - All bars at the same height.
 
 Catching bimodality early can completely change your analysis. A summary statistic like the mean would fall *between* the two modes, making it misleading.`}

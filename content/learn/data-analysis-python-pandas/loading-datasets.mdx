@@ -318,7 +318,7 @@ assert isinstance(df["Attrition"].dtype, pd.CategoricalDtype)`,
 - They are identical
 - The first is faster
 - [o] The first returns the GitHub HTML page that *displays* the file; the second returns the file's raw bytes
-  > Right. Always use the raw URL for \`pd.read_csv\` so you get the data and not the HTML.
+  > Always use the raw URL for \`pd.read_csv\` so you get the data and not the HTML.
 - The second requires authentication
 
 You will hit this distinction the very first time you try to load data from a GitHub link.`}
@@ -329,7 +329,7 @@ You will hit this distinction the very first time you try to load data from a Gi
 
 - It looks prettier
 - [o] Repeated string values are stored once with integer codes, which saves memory and speeds up grouping
-  > Yes. \`category\` is essentially an interned-string column, ideal for low-cardinality repeated values.
+  > \`category\` is essentially an interned-string column, ideal for low-cardinality repeated values.
 - It allows the column to hold any type
 - It is required by Pandas
 
@@ -354,7 +354,7 @@ Specifying \`dtype\` at read time is much safer than trying to recover later.`}
 - Load the whole thing and wait
 - Open it in Excel
 - [o] Use \`pd.read_csv(path, nrows=1000)\` to load a preview, then plan the real load (dtypes, usecols) based on what you see
-  > Yes. A small preview is the cheapest way to design a defensible full load.
+  > A small preview is the cheapest way to design a defensible full load.
 - Convert it to JSON first
 
 Cheap previews save expensive loads.`}

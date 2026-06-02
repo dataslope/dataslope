@@ -262,7 +262,7 @@ assert first_ten.shape == (10, 35)`,
 - \`df.age\` (attribute access — works but discouraged)
 - \`df[["age"]]\` (returns a DataFrame)
 - [o] \`df["age"]\` (returns a Series)
-  > Right. Single bracket → single column → Series.
+  > Single bracket → single column → Series.
 - \`df.loc[:, "age":"age"]\` (a label slice)
 
 The first option *works* but breaks for columns with spaces, dots, or names matching methods — prefer brackets.`}
@@ -274,7 +274,7 @@ The first option *works* but breaks for columns with spaces, dots, or names matc
 - \`loc\` is faster
 - They are identical
 - [o] \`loc\` slicing is *inclusive* of both endpoints, while \`iloc\` (like normal Python) is *exclusive* of the end
-  > Yes. This often-surprising difference is one of the most common bugs in label-based slicing.
+  > This often-surprising difference is one of the most common bugs in label-based slicing.
 - \`iloc\` accepts strings
 
 Memorize: label-slice is inclusive; position-slice is exclusive.`}

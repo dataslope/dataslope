@@ -315,7 +315,7 @@ assert isinstance(young_low_pay, pd.DataFrame)`,
 - \`and\` does not exist in Python
 - It is shorter
 - [o] \`and\` operates on single boolean values and tries to coerce a whole Series into one — which is ambiguous — while \`&\` is element-wise on Series
-  > Right. \`a and b\` requires \`a\` to be a single True/False, but a Series of length > 1 cannot be reduced to one. Pandas raises the "ambiguous truth value" error.
+  > \`a and b\` requires \`a\` to be a single True/False, but a Series of length > 1 cannot be reduced to one. Pandas raises the "ambiguous truth value" error.
 - \`&\` is faster
 - Pandas hates English
 
@@ -328,7 +328,7 @@ Train your fingers: \`&\`, \`|\`, \`~\`, and parentheses around each condition.`
 - \`df[df["dept"] == "Eng" or df["dept"] == "Sales" or df["dept"] == "Ops"]\`
 - \`df[df["dept"] == ["Eng", "Sales", "Ops"]]\`
 - [o] \`df[df["dept"].isin(["Eng", "Sales", "Ops"])]\`
-  > Yes. \`isin\` is the idiomatic Pandas way to express set membership across many values.
+  > \`isin\` is the idiomatic Pandas way to express set membership across many values.
 - \`df.dept = "Eng" | "Sales" | "Ops"\`
 
 \`isin\` scales cleanly to long lists and is faster than chaining ORs.`}

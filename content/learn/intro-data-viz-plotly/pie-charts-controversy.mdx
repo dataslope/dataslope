@@ -166,7 +166,7 @@ use them outside it.
 - Pie charts cannot be interactive.
 - Pie charts are mathematically incorrect.
 - [o] Pie charts encode quantity using **angles and areas**, which the human visual system judges much less accurately than **position and length** used by bar charts.
-  > Yes. The Cleveland-McGill ranking places angle and area near the *bottom* of accuracy for quantitative comparison. For 5+ slices of similar size, viewers cannot reliably rank them. A sorted bar chart makes the same comparison trivially easy.
+  > The Cleveland-McGill ranking places angle and area near the *bottom* of accuracy for quantitative comparison. For 5+ slices of similar size, viewers cannot reliably rank them. A sorted bar chart makes the same comparison trivially easy.
 - Pie charts are too colorful.
 
 The criticism is empirical, not aesthetic. Bars consistently outperform pies on accuracy in controlled experiments.`}
@@ -178,7 +178,7 @@ The criticism is empirical, not aesthetic. Bars consistently outperform pies on 
 - Comparing the populations of 30 countries.
 - Showing a trend over time.
 - [o] Showing a part-of-a-whole composition with 2-4 slices where one slice clearly dominates.
-  > Right. Pie charts shine when "this is a share of a total" is the *headline* story, the categories are few, and one dominant slice makes the ranking obvious. Outside that narrow zone, a sorted bar chart almost always communicates the same thing more clearly.
+  > Pie charts shine when "this is a share of a total" is the *headline* story, the categories are few, and one dominant slice makes the ranking obvious. Outside that narrow zone, a sorted bar chart almost always communicates the same thing more clearly.
 - Showing the distribution of customer ages.
 
 For distributions use a histogram; for trends use a line chart; for many-category comparisons use bars.`}
@@ -190,7 +190,7 @@ For distributions use a histogram; for trends use a line chart; for many-categor
 - Pies are forbidden in modern reports.
 - The colors might clash.
 - [o] Comparing the same slice across two different pies requires comparing two *angles*, which the eye is poor at — and any subtle change in slice composition makes the comparison harder still.
-  > Yes. This is one of the most famously hopeless visualization tasks. A paired or grouped bar chart, or a slope chart, makes the comparison much easier. If anyone gives you "two pies side by side" as analysis, you can almost always do better.
+  > This is one of the most famously hopeless visualization tasks. A paired or grouped bar chart, or a slope chart, makes the comparison much easier. If anyone gives you "two pies side by side" as analysis, you can almost always do better.
 - Two pies cannot fit on one page.
 
 Whenever you see paired pies, mentally translate them to paired bars — you'll see how much information is being thrown away.`}
@@ -202,7 +202,7 @@ Whenever you see paired pies, mentally translate them to paired bars — you'll 
 - A 3-D pie chart.
 - A scatter plot.
 - [o] A sorted bar chart, or a single stacked bar.
-  > Yes. A sorted bar chart makes ranking trivial; a single horizontal stacked bar visually communicates "shares of a total" without forcing angle comparison. Both replace the pie's weaknesses with stronger encodings.
+  > A sorted bar chart makes ranking trivial; a single horizontal stacked bar visually communicates "shares of a total" without forcing angle comparison. Both replace the pie's weaknesses with stronger encodings.
 - A histogram.
 
 Treemaps work for nested hierarchies. Donut charts are just pies with a hole and inherit the same problems.`}

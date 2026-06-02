@@ -331,7 +331,7 @@ The bias of 1023 means an "unbiased" exponent of 0, so the value is just $1 + m$
 
 - The \`==\` operator is slow
 - [o] Arithmetic that should produce equal values often differs by a few ULPs (units in the last place), so two values that are "morally" equal compare false
-  > Yes. Operations are rounded, and algebraically equivalent expressions can land on *adjacent* floats. Tolerant comparisons (\`math.isclose\`, \`np.isclose\`) are almost always what you want.
+  > Operations are rounded, and algebraically equivalent expressions can land on *adjacent* floats. Tolerant comparisons (\`math.isclose\`, \`np.isclose\`) are almost always what you want.
 - \`==\` raises an exception on \`nan\`
 - Python compares floats by string representation
 

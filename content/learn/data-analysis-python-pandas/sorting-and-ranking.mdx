@@ -218,7 +218,7 @@ compose into something powerful.
 - Sorts by salary first
 - Sorts only by department
 - [o] Sorts by department ascending; within each department, sorts by salary descending
-  > Right. The two lists are positional — the *n*-th element of \`ascending\` controls the *n*-th sort key.
+  > The two lists are positional — the *n*-th element of \`ascending\` controls the *n*-th sort key.
 - Throws an error
 
 Multi-column sorts give you fine-grained control of tie-breaking.`}
@@ -230,7 +230,7 @@ Multi-column sorts give you fine-grained control of tie-breaking.`}
 - They give different rows
 - One returns a Series, one a DataFrame
 - [o] They give the same rows, but \`nlargest\` is slightly faster and reads more directly
-  > Yes. For a top-N query, prefer \`nlargest\`/\`nsmallest\` — the intent is clearer than sort-then-head.
+  > For a top-N query, prefer \`nlargest\`/\`nsmallest\` — the intent is clearer than sort-then-head.
 - \`nlargest\` requires the data to be pre-sorted
 
 Either works; \`nlargest\` is the idiomatic choice.`}

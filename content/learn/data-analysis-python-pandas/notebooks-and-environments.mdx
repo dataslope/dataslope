@@ -246,7 +246,7 @@ Once you have been bitten by a version conflict, you become a virtual environmen
 - It contains the data for an analysis
 - It lists the columns of a DataFrame
 - [o] It records the package versions a project depends on, so a collaborator can install the same versions and reproduce the environment
-  > Yes. It is the simplest form of dependency pinning. Anyone with the repo can run \`pip install -r requirements.txt\` and get a matching environment.
+  > It is the simplest form of dependency pinning. Anyone with the repo can run \`pip install -r requirements.txt\` and get a matching environment.
 - It is a Pandas configuration file
 
 Lockfiles take this one step further by pinning transitive dependencies too.`}
@@ -258,7 +258,7 @@ Lockfiles take this one step further by pinning transitive dependencies too.`}
 - A type of cell
 - A plot
 - [o] The long-running Python process that holds your variables in memory and executes the cells you run
-  > Right. Every cell run mutates the kernel's state. Many notebook bugs come from running cells out of order or forgetting to re-run a dependent cell.
+  > Every cell run mutates the kernel's state. Many notebook bugs come from running cells out of order or forgetting to re-run a dependent cell.
 - A configuration file
 
 Restart-and-run-all is a wonderful habit; if your notebook does not run cleanly top to bottom, something is silently broken.`}
@@ -270,7 +270,7 @@ Restart-and-run-all is a wonderful habit; if your notebook does not run cleanly 
 - The DataFrame's column names
 - The kernel's memory dump
 - [o] Code in git + data with a stable reference + a pinned environment (\`requirements.txt\` or lockfile)
-  > Exactly. Code, data, and environment together let someone else reproduce your work months or years later.
+  > Code, data, and environment together let someone else reproduce your work months or years later.
 - A screenshot of the notebook
 
 Forgetting any of the three usually breaks reproducibility in subtle ways.`}

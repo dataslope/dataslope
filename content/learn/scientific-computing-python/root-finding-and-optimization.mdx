@@ -343,7 +343,7 @@ Test cases use $f(x) = x^2 - 2$ and $f(x) = \\cos x - x$, both with known good i
 
 - \`scipy.optimize.newton\` because it converges quadratically
 - [o] \`scipy.optimize.brentq\` because the sign change guarantees a bracketed root and Brent's method is unconditionally convergent
-  > Yes. With a guaranteed sign change you should always prefer a bracketing solver. Brent's method never leaves the bracket, doesn't need a derivative, and converges super-linearly. Newton needs a derivative and can wander off.
+  > With a guaranteed sign change you should always prefer a bracketing solver. Brent's method never leaves the bracket, doesn't need a derivative, and converges super-linearly. Newton needs a derivative and can wander off.
 - \`scipy.optimize.differential_evolution\`
 - \`scipy.optimize.minimize\` on $f^2$
 
@@ -355,7 +355,7 @@ When a bracket exists, bracketing methods are virtually always the right choice.
 
 - It uses less memory
 - [o] It exploits the sum-of-squares structure (Jacobian of residuals via the Levenberg–Marquardt algorithm) for faster, more reliable convergence, and returns parameter covariances for free
-  > Right. The residual Jacobian is far more informative than the gradient of the squared loss; LM combines Gauss–Newton with trust-region damping to get robust quadratic-ish convergence. Plus \`curve_fit\` returns the covariance matrix you need for uncertainty bars — which generic \`minimize\` would not give you.
+  > The residual Jacobian is far more informative than the gradient of the squared loss; LM combines Gauss–Newton with trust-region damping to get robust quadratic-ish convergence. Plus \`curve_fit\` returns the covariance matrix you need for uncertainty bars — which generic \`minimize\` would not give you.
 - It always finds the global minimum
 - It only works for linear models
 

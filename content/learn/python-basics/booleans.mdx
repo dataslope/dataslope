@@ -422,7 +422,7 @@ assert all_truthy(["a", "", "c"]) is False`,
   markdown={`What is the idiomatic way to check if a list is non-empty?
 
 - \`if len(items) > 0:\`
-  > This works, but it's verbose. Pythonic code uses truthiness.
+  > This is functionally correct but verbose; Pythonic code uses truthiness.
 - [o] \`if items:\`
   > This is the idiomatic Pythonic way—concise and readable.
 - \`if items is not None:\`

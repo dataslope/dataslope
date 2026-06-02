@@ -277,7 +277,7 @@ df["age"] = df["age"].replace([-1, 999], np.nan)
 - Take the mean
 - Drop the column
 - [o] Replace the sentinels with NaN (\`df["age"].replace([-1, 999], np.nan)\`) so downstream operations treat them as missing
-  > Right. Convert sentinels to NaN as early as possible so the rest of your code does not have to remember the sentinel codes.
+  > Convert sentinels to NaN as early as possible so the rest of your code does not have to remember the sentinel codes.
 - Round them to zero
 
 Documenting the conversion is just as important as performing it.`}
@@ -314,7 +314,7 @@ almost always a missed column or a sentinel you forgot about.
 - When the dataset is small
 - Always
 - [o] When missingness is high or correlated with something interesting (e.g., income is missing more often for certain groups), because dropping changes the effective population
-  > Yes. Dropping is fine for rare, random missingness. It is dangerous when the missing rows differ systematically from the kept ones.
+  > Dropping is fine for rare, random missingness. It is dangerous when the missing rows differ systematically from the kept ones.
 - Never
 
 Understanding *why* values are missing is essential before deciding how to handle them.`}
@@ -338,7 +338,7 @@ For numeric columns where missingness is moderate and random, median imputation 
 - Fill with 0
 - Fill with the column's mean
 - [o] Fill with the mode (most common value) or with a literal label like \`"unknown"\`
-  > Yes. Categorical data has no mean; fill either with the most common value or with an explicit "unknown" label so downstream code can still group on it.
+  > Categorical data has no mean; fill either with the most common value or with an explicit "unknown" label so downstream code can still group on it.
 - Fill with NaN
 
 Pick the option that matches what you want downstream code to *do* with these rows.`}
@@ -350,7 +350,7 @@ Pick the option that matches what you want downstream code to *do* with these ro
 - It looks fancy
 - Pandas requires it
 - [o] Because the *fact* that a value was missing can itself be informative — sometimes more informative than any imputed value
-  > Right. In churn analysis, "users who did not answer this question" can behave very differently from users who answered. The flag preserves that information.
+  > In churn analysis, "users who did not answer this question" can behave very differently from users who answered. The flag preserves that information.
 - It saves memory
 
 Preserving the signal of missingness alongside the cleaned value is a quietly powerful pattern.`}

@@ -155,7 +155,7 @@ sophisticated information graphic in major newspapers uses them.
 - Apply a fancy filter to the data.
 - Make the chart 3-D.
 - [o] Split the chart into multiple small panels, one per value of a categorical column, usually with shared axes.
-  > Yes. Faceting is the implementation of *small multiples*: replace one busy chart with many small, comparable ones. Each panel shows the same encoding for a different slice of the data, and shared axes let the reader compare them directly.
+  > Faceting is the implementation of *small multiples*: replace one busy chart with many small, comparable ones. Each panel shows the same encoding for a different slice of the data, and shared axes let the reader compare them directly.
 - Add a third color to the legend.
 
 **facet_col=...** and **facet_row=...** are the two arguments that turn one chart into a grid.`}
@@ -167,7 +167,7 @@ sophisticated information graphic in major newspapers uses them.
 - They use less ink.
 - They render faster.
 - [o] Any difference between panels reflects a real difference in the **data**, not a difference in scale — making comparison fast and honest.
-  > Right. Shared axes are the secret to small multiples. With a shared y range, a taller bar in one panel really means a bigger value than a shorter bar in another panel. With independent axes, the same visual height could mean different things.
+  > Shared axes are the secret to small multiples. With a shared y range, a taller bar in one panel really means a bigger value than a shorter bar in another panel. With independent axes, the same visual height could mean different things.
 - They never need labels.
 
 Default to shared axes. Use independent axes only when you have a specific reason — and label them clearly.`}
@@ -179,7 +179,7 @@ Default to shared axes. Use independent axes only when you have a specific reaso
 - Make the chart bigger.
 - Use brighter colors.
 - [o] Facet into small multiples — one mini-chart per series — with shared axes.
-  > Yes. The "spaghetti chart" is a structural problem, and small multiples are the structural fix. 30 lines tangled together become 30 small charts arranged in a grid, comparable at a glance.
+  > The "spaghetti chart" is a structural problem, and small multiples are the structural fix. 30 lines tangled together become 30 small charts arranged in a grid, comparable at a glance.
 - Reduce the number of decimal places.
 
 Stylistic fixes can't rescue a chart that's structurally overloaded.`}

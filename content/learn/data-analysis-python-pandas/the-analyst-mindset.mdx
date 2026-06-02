@@ -246,7 +246,7 @@ just a tool-using activity.
 - The mean function in Pandas is broken
 - There were too few rows
 - [o] All the low scores came in through one channel; aggregating across channels hid the variation that mattered
-  > Yes — this is a small Simpson's-paradox-flavored example. Always look at meaningful sub-groups before trusting an aggregate.
+  > This is a small Simpson's-paradox-flavored example. Always look at meaningful sub-groups before trusting an aggregate.
 - The scores were on a wrong scale
 
 This is why the analyst's first instinct after computing an aggregate should be "now break it down."`}
@@ -258,7 +258,7 @@ This is why the analyst's first instinct after computing an aggregate should be 
 - The number of pandas dataframes you create doubles every six months
 - A function that returns different answers each time
 - [o] A pattern that holds in every sub-group can reverse direction when the sub-groups are combined
-  > Right. The Berkeley admissions case is the classic example. Whenever you compute an aggregate, ask whether a known sub-grouping would change the conclusion.
+  > The Berkeley admissions case is the classic example. Whenever you compute an aggregate, ask whether a known sub-grouping would change the conclusion.
 - A statistical test that always rejects the null
 
 Awareness of Simpson's paradox is one of the few things that consistently separates intermediate from beginner analysts.`}
@@ -270,7 +270,7 @@ Awareness of Simpson's paradox is one of the few things that consistently separa
 - Memorizing every Pandas function
 - Charting everything
 - [o] Treating every analysis as if it will be audited — i.e., making it reproducible, traceable, and explainable
-  > Exactly. When (not if) someone asks "how did you arrive at this number?", being able to re-run a script and walk through it is what protects you and your team.
+  > When (not if) someone asks "how did you arrive at this number?", being able to re-run a script and walk through it is what protects you and your team.
 - Drinking lots of coffee
 
 Reproducibility is not academic; it is the everyday professional baseline.`}
@@ -282,7 +282,7 @@ Reproducibility is not academic; it is the everyday professional baseline.`}
 - Publish it immediately
 - Assume the data is correct and report it
 - [o] Suspect a data or code bug, and investigate before trusting it
-  > Yes. The base rate of "shocking findings" being bugs is very high. Build the reflex now.
+  > The base rate of "shocking findings" being bugs is very high. Build the reflex now.
 - Ignore it
 
 Most "anomalies" in data turn out to be join mistakes, type bugs, or filter errors.`}

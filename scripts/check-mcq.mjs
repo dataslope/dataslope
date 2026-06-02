@@ -1,77 +1,181 @@
-// Audits <MultipleChoice> blocks in the given MDX files for two hard rules:
-//   1. Single-answer only — exactly one `- [o]` correct option per question.
-//   2. No choice explanation (`> ...`) may start with an affirmative word,
-//      because explanations are shown to ALL learners regardless of choice.
-// Heuristic but reliable for this course's authored format. Exits non-zero
-// if any violation is found.
-import { readFileSync } from "node:fs";
+// Lints <MultipleChoice> blocks in content/learn for the rules that keep
+// every question answerable, non-contradictory, and neutrally worded:
+//
+//   1. no-correct          — every question must mark at least one `- [o]`
+//                            answer (multi-answer "select all" is allowed).
+//   2. too-few-choices     — a question needs at least 2 choices.
+//   3. duplicate-choice    — no two choices may be verbatim identical.
+//   4. affirmative-opener  — a choice explanation may not start with an
+//                            affirmation ("Yes.", "Right!", "Exactly,",
+//                            "This works"…). Explanations render for ALL
+//                            choices after submit, so a learner who picked a
+//                            wrong answer would still see false praise under
+//                            the correct one (see AGENTS.md). True/False
+//                            openers are allowed in "which is false/NOT
+//                            true" questions, where they label each
+//                            statement's truth value.
+//
+// Used both as a CLI (`node scripts/check-mcq.mjs [files...]`, defaults to
+// all of content/learn) and as a library by __tests__/mcqContent.test.ts.
+import { readFileSync, readdirSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
-const BANNED = [
-  "correct", "right", "yes", "yep", "yeah", "exactly", "perfect", "great",
-  "well done", "indeed", "absolutely", "nailed", "spot on", "bingo",
-  "that's right", "thats right", "good job", "you got it", "true!",
-];
+// --- extraction -----------------------------------------------------------
 
-const files = process.argv.slice(2);
-if (files.length === 0) {
-  console.error("usage: node scripts/check-mcq.mjs <file.mdx> ...");
-  process.exit(2);
-}
-
-// Pull out each <MultipleChoice ... /> element's inner text.
-function extractMcqBlocks(src) {
+// Pull the contents of each `markdown={` ... `}` template literal, honoring
+// escaped backticks (`\``) so code spans inside a choice don't end it early.
+export function extractMcqBlocks(src) {
   const blocks = [];
-  const re = /<MultipleChoice\b/g;
-  let m;
-  while ((m = re.exec(src)) !== null) {
-    // Find the matching markdown={` ... `} template literal.
-    const start = src.indexOf("markdown={`", m.index);
-    if (start === -1) continue;
-    const contentStart = start + "markdown={`".length;
-    // Find the closing backtick that is not escaped.
-    let i = contentStart;
-    while (i < src.length) {
-      if (src[i] === "`" && src[i - 1] !== "\\") break;
-      i++;
+  const marker = "markdown={`";
+  let i = 0;
+  for (;;) {
+    const start = src.indexOf(marker, i);
+    if (start === -1) break;
+    let j = start + marker.length;
+    let out = "";
+    while (j < src.length) {
+      const ch = src[j];
+      if (ch === "\\") { out += src[j + 1]; j += 2; continue; } // unescape: `\`` -> `, `\\n` -> \n
+      if (ch === "`") break;
+      out += ch; j++;
     }
-    blocks.push(src.slice(contentStart, i));
+    blocks.push(out);
+    i = j + 1;
   }
   return blocks;
 }
 
-let violations = 0;
-let questionCount = 0;
-
-for (const file of files) {
-  const src = readFileSync(file, "utf8");
-  const blocks = extractMcqBlocks(src);
-  for (const block of blocks) {
-    questionCount++;
-    const lines = block.split("\n");
-    const correct = lines.filter((l) => /^-\s+\[[oOxX]\]\s+/.test(l.trim()));
-    if (correct.length !== 1) {
-      violations++;
-      console.error(
-        `\n✗ ${file}: a MultipleChoice has ${correct.length} correct options (must be exactly 1, single-answer only).`,
-      );
-      console.error(`   stem: ${lines.find((l) => l.trim())?.slice(0, 80) ?? ""}`);
+// Parse one block into { body, choices:[{ correct, text, explanation }] }.
+// Mirrors parseQuestion.ts closely enough for linting purposes.
+export function parseChoices(md) {
+  const lines = md.replace(/\r\n?/g, "\n").split("\n");
+  const choices = [];
+  const bodyLines = [];
+  let inFence = false;
+  let seenChoice = false;
+  for (const line of lines) {
+    const choiceMatch = line.match(/^-\s+(?:\[(o|O| |x|X)\]\s+)?(.*)$/);
+    const isFence = /^(`{3,}|~{3,})/.test(line.trim());
+    if (choiceMatch && !inFence) {
+      seenChoice = true;
+      const marker = (choiceMatch[1] || "").toLowerCase();
+      choices.push({ correct: marker === "o" || marker === "x", text: choiceMatch[2].trim(), explanation: "" });
+      if (/^(`{3,}|~{3,})/.test(choiceMatch[2].trim())) inFence = true;
+      continue;
     }
-    for (const line of lines) {
-      const q = line.match(/^\s*>\s?(.*)$/);
-      if (!q) continue;
-      const text = q[1].trim().toLowerCase();
-      if (!text) continue;
-      if (BANNED.some((w) => text === w || text.startsWith(w + " ") || text.startsWith(w + ",") || text.startsWith(w + ".") || text.startsWith(w + "!") || text.startsWith(w + "—") || text.startsWith(w + " —"))) {
-        violations++;
-        console.error(`\n✗ ${file}: choice explanation starts with an affirmative word:`);
-        console.error(`   "> ${q[1].trim().slice(0, 90)}"`);
-      }
+    if (isFence) { inFence = !inFence; if (!seenChoice) bodyLines.push(line); continue; }
+    const bq = line.match(/^\s*>\s?(.*)$/);
+    if (bq && choices.length && !inFence) {
+      const c = choices[choices.length - 1];
+      c.explanation += (c.explanation ? "\n" : "") + bq[1];
+    } else if (!seenChoice) {
+      bodyLines.push(line);
     }
   }
+  return { body: bodyLines.join("\n"), choices };
 }
 
-if (violations > 0) {
-  console.error(`\n${violations} MCQ violation(s) across ${questionCount} question(s).`);
-  process.exit(1);
+// --- affirmation rule -----------------------------------------------------
+
+const AFFIRM_WORD =
+  "(?:yes|yep|yeah|right|correct|exactly|perfect|great|nice|indeed|absolutely|bingo|spot on|well done|good job|nailed it|you got it|that'?s right|this works|true|false)";
+// Praise = the word immediately followed by sentence punctuation, a spaced
+// dash, or end-of-string. This deliberately does NOT match adjective uses
+// like "Right child…", "Correct implementations…", "True is-a…", "Exactly 3…".
+export const AFFIRM = new RegExp(`^(${AFFIRM_WORD})([.!,:;?]|\\s+[—–]|\\s*$)`, "i");
+
+// A "select the statement that is false/incorrect/NOT true" question, where a
+// "True." / "False." opener legitimately labels each statement's truth value.
+export function isSelectFalse(body) {
+  // Strip markdown emphasis/code markers so "**not** true" reads as "not true".
+  const t = body.replace(/[*_`]/g, " ").replace(/\s+/g, " ");
+  return (
+    /\bfalse\b|\bincorrect\b|\buntrue\b|\bnot\s+true\b|\bnot\s+correct\b/i.test(t) ||
+    /\bNOT\b|\bEXCEPT\b|\bFALSE\b/.test(t)
+  );
 }
-console.log(`✓ all ${questionCount} MCQ block(s) pass (single-answer + neutral explanations)`);
+
+// Rewrite an affirmative opener to a neutral statement, or return null if the
+// explanation needs no change (or can't be mechanically fixed — e.g. it is
+// ONLY the affirmation, or a True/False label in a select-the-false question).
+export function rewriteOpener(content, { selectFalse = false } = {}) {
+  const m = content.match(AFFIRM);
+  if (!m) return null;
+  const word = m[1].toLowerCase();
+  if (word === "true" || word === "false") return null; // leave truth-value labels alone
+  let rest = content.slice(m[0].length).replace(/^\s+/, "");
+  if (!rest) return null; // explanation was only the affirmation — needs a human
+  rest = rest.replace(/^([a-z])/, (c) => c.toUpperCase());
+  return rest;
+}
+
+// --- linting --------------------------------------------------------------
+
+export function lintSource(src, file) {
+  const violations = [];
+  for (const md of extractMcqBlocks(src)) {
+    const { body, choices } = parseChoices(md);
+    const stem = (body.split("\n").find((l) => l.trim()) || "").trim().slice(0, 70);
+    const add = (rule, detail) => violations.push({ file, rule, detail });
+
+    if (choices.length < 2) add("too-few-choices", `${choices.length} choice(s) — ${stem}`);
+    if (choices.filter((c) => c.correct).length === 0) add("no-correct", stem);
+
+    const seen = new Set();
+    for (const c of choices) {
+      const key = c.text.replace(/\s+/g, " ").trim();
+      if (!key || /^(`{3,}|~{3,})/.test(key)) continue;
+      if (seen.has(key)) add("duplicate-choice", `"${c.text.slice(0, 48)}" — ${stem}`);
+      seen.add(key);
+    }
+
+    const selectFalse = isSelectFalse(body);
+    for (const c of choices) {
+      const ex = c.explanation.trim();
+      const m = ex.match(AFFIRM);
+      if (!m) continue;
+      const word = m[1].toLowerCase();
+      if ((word === "true" || word === "false") && selectFalse) continue; // allowlisted
+      add("affirmative-opener", `"${ex.slice(0, 56)}" — ${stem}`);
+    }
+  }
+  return violations;
+}
+
+// Recursively collect .mdx files under `dir` that contain a <MultipleChoice>.
+export function findMcqFiles(dir) {
+  const out = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) out.push(...findMcqFiles(full));
+    else if (entry.name.endsWith(".mdx") && readFileSync(full, "utf8").includes("<MultipleChoice")) out.push(full);
+  }
+  return out;
+}
+
+export function lintFiles(files) {
+  return files.flatMap((f) => lintSource(readFileSync(f, "utf8"), f));
+}
+
+// --- CLI ------------------------------------------------------------------
+
+const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+if (isMain) {
+  const args = process.argv.slice(2);
+  const root = path.join(process.cwd(), "content", "learn");
+  const files = args.length ? args : findMcqFiles(root);
+  const violations = lintFiles(files);
+  if (violations.length) {
+    const byRule = {};
+    for (const v of violations) (byRule[v.rule] ??= []).push(v);
+    for (const [rule, list] of Object.entries(byRule)) {
+      console.error(`\n✗ ${rule} (${list.length}):`);
+      for (const v of list.slice(0, 50)) console.error(`   ${fileURLToPath(pathToFileURL(v.file))}: ${v.detail}`);
+      if (list.length > 50) console.error(`   …and ${list.length - 50} more`);
+    }
+    console.error(`\n${violations.length} MCQ violation(s) across ${files.length} file(s).`);
+    process.exit(1);
+  }
+  console.log(`✓ all MCQ blocks in ${files.length} file(s) pass (correct answer, ≥2 distinct choices, neutral explanations)`);
+}

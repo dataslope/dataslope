@@ -218,7 +218,7 @@ You can replace the default later with anything meaningful.`}
 - It looks pretty
 - It is required by Pandas
 - [o] It enables date-range slicing, rolling windows, resampling, and label-based time lookups — operations that are awkward with plain integer indexes
-  > Yes. A DatetimeIndex is the gateway to most of Pandas's time-series features.
+  > A DatetimeIndex is the gateway to most of Pandas's time-series features.
 - It makes the data sorted automatically
 
 Time-series indexing is a great example of the value of *labeled* axes.`}
@@ -230,7 +230,7 @@ Time-series indexing is a great example of the value of *labeled* axes.`}
 - Sorts the index
 - Removes all rows
 - [o] Promotes the current index back to one or more regular columns and replaces the index with a default RangeIndex
-  > Right. It is the inverse of \`set_index\`. You will use it constantly after groupby.
+  > It is the inverse of \`set_index\`. You will use it constantly after groupby.
 - Renames the columns
 
 Knowing both directions — promote and demote — keeps you in control of where your labels live.`}

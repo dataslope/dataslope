@@ -360,7 +360,7 @@ Format specifiers like this make report-ready output trivial.`}
 
 - It is a Python bug
 - [o] By convention; \`names[1:3]\` returns items at index 1 and 2, so that \`len(names[1:3]) == 3 - 1 == 2\` — the slice length equals the difference of the indices
-  > Yes. The exclusive end-index makes slice arithmetic clean: \`a[i:j]\` has length \`j - i\`. Pandas' \`iloc\` uses the same convention.
+  > The exclusive end-index makes slice arithmetic clean: \`a[i:j]\` has length \`j - i\`. Pandas' \`iloc\` uses the same convention.
 - It is a NumPy convention only
 - Slices always exclude the first item
 
@@ -374,7 +374,7 @@ Same rule as Pandas' \`iloc\` — useful to remember.`}
 - Functions
 - Lists and dictionaries
 - [o] Decorators and \`async\`/\`await\`
-  > Right. Pandas needs very little of Python's "advanced" surface area. Start with the basics; pick up the rest only if a specific problem forces you to.
+  > Pandas needs very little of Python's "advanced" surface area. Start with the basics; pick up the rest only if a specific problem forces you to.
 
 Don't drown in Python before getting to the data work.`}
 />

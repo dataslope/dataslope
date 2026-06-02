@@ -250,7 +250,7 @@ fig.show()
 - Pick a color palette.
 - Pick a chart type.
 - [o] Decide what *question* the chart will answer.
-  > Yes. Without a clear question, every later choice becomes arbitrary. The question shapes the data filtering, the chart type, and the encoding decisions. "Pretty" charts that don't answer a question are decoration, not analysis.
+  > Without a clear question, every later choice becomes arbitrary. The question shapes the data filtering, the chart type, and the encoding decisions. "Pretty" charts that don't answer a question are decoration, not analysis.
 - Pick a template.
 
 Build the muscle: *question first, chart second*. Every time.`}
@@ -262,7 +262,7 @@ Build the muscle: *question first, chart second*. Every time.`}
 - Pie chart.
 - Bar chart.
 - [o] Scatter plot (**px.scatter**).
-  > Right. Scatter plots use the two most accurate encodings (x and y position) for the two quantitative variables. They reveal correlation, clusters, and outliers at a glance.
+  > Scatter plots use the two most accurate encodings (x and y position) for the two quantitative variables. They reveal correlation, clusters, and outliers at a glance.
 - Heatmap.
 
 A line chart would be wrong here unless the data has a meaningful *order* (like time). Otherwise, lines connecting unrelated points are misleading.`}
@@ -274,7 +274,7 @@ A line chart would be wrong here unless the data has a meaningful *order* (like 
 - It makes the chart load faster.
 - It changes the data values.
 - [o] It overrides the raw column names with human-readable labels (e.g., "Total bill (USD)" instead of "total_bill") for axes, legend, and hover.
-  > Yes. Real-world column names are often abbreviated or snake_cased. **labels={}** lets you keep the code referencing the column name but display readable strings to the reader. A small habit that hugely improves chart clarity.
+  > Real-world column names are often abbreviated or snake_cased. **labels={}** lets you keep the code referencing the column name but display readable strings to the reader. A small habit that hugely improves chart clarity.
 - It hides the legend.
 
 A chart with raw column names like **gdpPercap** and **lifeExp** reads as unfinished. Take the extra 20 seconds to label.`}

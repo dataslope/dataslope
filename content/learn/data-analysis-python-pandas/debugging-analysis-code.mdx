@@ -227,7 +227,7 @@ flowchart TB
 - A floating-point bug
 - The data is corrupt
 - [o] The column is a string, and \`.sum()\` concatenated the values instead of adding them — check \`df.dtypes\`
-  > Right. String-vs-number is the most common silent bug in Pandas.
+  > String-vs-number is the most common silent bug in Pandas.
 - Pandas needs an upgrade
 
 Always check dtypes after loading.`}
@@ -239,7 +239,7 @@ Always check dtypes after loading.`}
 - Add more print statements throughout
 - Re-run with a different package version
 - [o] Check whether the join key is duplicated on the right-hand table (\`df.duplicated(subset=...).sum()\`), and/or re-run the merge with \`validate="one_to_many"\` or similar
-  > Right. Cardinality blow-ups have a clear root cause that the \`validate\` flag would have caught.
+  > Cardinality blow-ups have a clear root cause that the \`validate\` flag would have caught.
 - Drop duplicates blindly
 
 Encode assumptions; let Pandas tell you when reality breaks them.`}
@@ -251,7 +251,7 @@ Encode assumptions; let Pandas tell you when reality breaks them.`}
 - Re-read every step
 - Rewrite the pipeline
 - [o] Bisect — check the intermediate output halfway through; whichever half is wrong, bisect again
-  > Right. Logarithmic search through your pipeline beats linear search.
+  > Logarithmic search through your pipeline beats linear search.
 - Add more comments
 
 Bisection is one of the most powerful debugging habits, period.`}
@@ -263,7 +263,7 @@ Bisection is one of the most powerful debugging habits, period.`}
 - It is faster than running on big data
 - It avoids print spam
 - [o] Both of those, AND a mini-example forces you to truly understand the bug — and is the perfect format to ask someone for help
-  > Right. "Can you reproduce it minimally?" is a question that often answers itself in the act of trying.
+  > "Can you reproduce it minimally?" is a question that often answers itself in the act of trying.
 - It uses less memory
 
 Minimal reproductions are universal currency in software debugging.`}

@@ -222,7 +222,7 @@ chapter, you will be able to answer it in one line.
 - Pandas was released and people had to fill it with data
 - Excel was upgraded
 - [o] A combination of cheaper storage, ubiquitous sensors (especially smartphones), and effortless web-based collection (clickstreams, APIs)
-  > Yes — the chapter highlights cheap storage, cheap sensors, and cheap collection as the three forces behind the data explosion. Each one independently lowered the cost of *keeping* an extra row of data.
+  > The chapter highlights cheap storage, cheap sensors, and cheap collection as the three forces behind the data explosion. Each one independently lowered the cost of *keeping* an extra row of data.
 - Hard drives became more reliable
 
 Pandas appeared *because* of this explosion, not the other way around.`}
@@ -233,7 +233,7 @@ Pandas appeared *because* of this explosion, not the other way around.`}
 
 - It writes the data back to the source automatically
 - [o] Downstream code can manipulate the DataFrame in the same way regardless of where it originally came from
-  > Right. The "many readers, one DataFrame" pattern means your analysis code is decoupled from the data source. You can swap a CSV for a SQL query without changing the rest of your notebook.
+  > The "many readers, one DataFrame" pattern means your analysis code is decoupled from the data source. You can swap a CSV for a SQL query without changing the rest of your notebook.
 - It compresses the data
 - It encrypts the data
 
@@ -245,7 +245,7 @@ Decoupling the *source* of data from the *operations* you perform on it is one o
 
 - They are correct
 - [o] 40,000 rows fits comfortably in memory on any laptop; Pandas will handle it instantly, and "big data" is normally reserved for datasets that no longer fit in memory or on one machine
-  > Exactly. Vocabulary matters. Calling small tabular data "big" causes teams to over-engineer with Spark, BigQuery, or distributed systems when Pandas alone would do the job in seconds.
+  > Vocabulary matters. Calling small tabular data "big" causes teams to over-engineer with Spark, BigQuery, or distributed systems when Pandas alone would do the job in seconds.
 - They are correct, but only on Tuesdays
 
 Resist the temptation to use big-data tooling on small-data problems — it adds cost, latency, and operational pain without adding insight.`}

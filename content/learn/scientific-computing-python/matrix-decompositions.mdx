@@ -357,7 +357,7 @@ eigenvectors.**
 
 - Call \`np.linalg.solve(A, b_k)\` 200 times
 - [o] Call \`scipy.linalg.lu_factor(A)\` **once** and then \`lu_solve\` 200 times
-  > Right. \`lu_factor\` does the $O(n^3)$ work *once*; each \`lu_solve\` is then $O(n^2)$. With 200 right-hand sides this is roughly 100× faster than re-factoring each time.
+  > \`lu_factor\` does the $O(n^3)$ work *once*; each \`lu_solve\` is then $O(n^2)$. With 200 right-hand sides this is roughly 100× faster than re-factoring each time.
 - Compute \`np.linalg.inv(A)\` once and multiply
 - Use the SVD because it generalizes
 
@@ -369,7 +369,7 @@ eigenvectors.**
 
 - It runs faster than Gaussian elimination
 - [o] The singular values reveal exactly how much "signal" exists in each direction; you can set a tolerance (e.g. $\\sigma_k < \\epsilon \\, \\sigma_1$) and count the singular values above it
-  > Yes. Algebraic rank from row reduction is binary and unstable. The SVD turns rank into a continuous measurement — singular values — which you can threshold sensibly to get a robust numerical rank.
+  > Algebraic rank from row reduction is binary and unstable. The SVD turns rank into a continuous measurement — singular values — which you can threshold sensibly to get a robust numerical rank.
 - The SVD always returns integer singular values
 - The QR decomposition gives the same answer faster
 

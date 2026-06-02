@@ -196,7 +196,7 @@ check is whether the data is sorted by x.
 - For comparing values across a handful of unrelated categories.
 - For showing the distribution of one variable.
 - [o] For showing how a value changes over an ordered axis — most commonly time.
-  > Yes. Lines visually encode *connection* between successive points, which only makes sense when the x-axis has a meaningful order. Time series is the most common case.
+  > Lines visually encode *connection* between successive points, which only makes sense when the x-axis has a meaningful order. Time series is the most common case.
 - For showing a part-of-a-whole breakdown.
 
 For unrelated categories use a bar chart; for distributions use a histogram or box plot.`}
@@ -208,7 +208,7 @@ For unrelated categories use a bar chart; for distributions use a histogram or b
 - Plotly will refuse to render it.
 - It uses too much memory.
 - [o] The line implies a meaningful order/connection between successive x-values; with unordered categories, the line is misleading.
-  > Right. The very shape of a line — going up between two points — *suggests* a transition or trend. If the x-axis is just "Apple, Banana, Cherry," then a line between Apple and Banana is meaningless. The reader's eye will still try to read meaning into it. Use a bar chart instead.
+  > The very shape of a line — going up between two points — *suggests* a transition or trend. If the x-axis is just "Apple, Banana, Cherry," then a line between Apple and Banana is meaningless. The reader's eye will still try to read meaning into it. Use a bar chart instead.
 - Lines can only show one series at a time.
 
 A common test: if reordering the x-axis would make the chart "say something different," then the x-axis is ordered and a line is fine. If it would mean the same, the x-axis is unordered and you want bars.`}
@@ -232,7 +232,7 @@ A good rule: ~7 lines is the practical max for a single chart. Past that, you ne
 - When values are all between 0 and 1.
 - When the chart only has one line.
 - [o] When values span many orders of magnitude (e.g., 100 vs 1,000,000) and you want to compare *rates of growth* across series.
-  > Yes. A log scale converts multiplicative differences into additive distances, so a 10× change looks the same as another 10× change anywhere on the axis. This is invaluable for comparing relative growth rates of values that differ wildly in absolute size. Always label the axis as "log" so readers don't misread it.
+  > A log scale converts multiplicative differences into additive distances, so a 10× change looks the same as another 10× change anywhere on the axis. This is invaluable for comparing relative growth rates of values that differ wildly in absolute size. Always label the axis as "log" so readers don't misread it.
 - When the data has fewer than 10 points.
 
 Log scales are very honest *when labeled* and very misleading *when not labeled*. Always label.`}

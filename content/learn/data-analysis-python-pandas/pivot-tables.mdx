@@ -269,7 +269,7 @@ assert isinstance(report, pd.DataFrame)`,
 
 - It is newer
 - [o] It accepts an aggregation function, so it works even when \`(index, columns)\` combinations have duplicate rows
-  > Right. \`pivot\` errors on duplicates; \`pivot_table\` aggregates them.
+  > \`pivot\` errors on duplicates; \`pivot_table\` aggregates them.
 - It is faster
 - It supports CSV
 
@@ -282,7 +282,7 @@ That's why \`pivot_table\` is the workhorse in practice.`}
 - Padding around the result
 - Borders
 - [o] A "Total" row and column that contain the aggregation applied to the entire row/column slice (typically grand totals)
-  > Yes. Just like the totals row in an Excel pivot.
+  > Just like the totals row in an Excel pivot.
 - Markdown formatting
 
 Margins are a small but valuable feature when producing reports.`}

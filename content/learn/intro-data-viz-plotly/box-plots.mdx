@@ -164,7 +164,7 @@ complexity, but they're often worth it.
 - The range of all values.
 - The mean ± one standard deviation.
 - [o] The interquartile range — from Q1 (25th percentile) to Q3 (75th percentile), with the median line inside.
-  > Yes. The box covers the middle 50% of the data; the line inside is the median. The whiskers extend to the most extreme non-outlier values (typically within 1.5×IQR), and individual dots beyond the whiskers represent outliers.
+  > The box covers the middle 50% of the data; the line inside is the median. The whiskers extend to the most extreme non-outlier values (typically within 1.5×IQR), and individual dots beyond the whiskers represent outliers.
 - The standard error of the mean.
 
 Box plots are pure descriptive statistics — they don't make assumptions about the distribution.`}
@@ -176,7 +176,7 @@ Box plots are pure descriptive statistics — they don't make assumptions about 
 - Box plots show more detail about distribution shape.
 - Box plots always look prettier.
 - [o] Box plots are compact enough to compare *many* distributions side by side without visual overload.
-  > Right. A histogram for each of 10 groups takes 10 panels. Ten box plots fit easily on one chart, letting you compare medians, spreads, and outliers across groups instantly. The tradeoff is that box plots *hide the shape* of each distribution.
+  > A histogram for each of 10 groups takes 10 panels. Ten box plots fit easily on one chart, letting you compare medians, spreads, and outliers across groups instantly. The tradeoff is that box plots *hide the shape* of each distribution.
 - Box plots are always more accurate.
 
 Compactness + side-by-side comparison is the box plot's superpower. Just remember it summarizes — it doesn't show every detail.`}
@@ -188,7 +188,7 @@ Compactness + side-by-side comparison is the box plot's superpower. Just remembe
 - Identical on both.
 - A clear bimodal shape on the box; flat on the violin.
 - [o] Featureless on the box plot (the box can't show two peaks), but clearly bimodal on the violin plot.
-  > Yes. This is exactly why violin plots exist. Box plots reduce a distribution to 5 summary numbers, so two very different shapes (bimodal vs unimodal with the same median and IQR) look identical as boxes. Violin plots add the density curve, revealing the shape.
+  > This is exactly why violin plots exist. Box plots reduce a distribution to 5 summary numbers, so two very different shapes (bimodal vs unimodal with the same median and IQR) look identical as boxes. Violin plots add the density curve, revealing the shape.
 - The box would have two medians.
 
 If you ever feel "this box is suspicious," reach for a violin or a histogram.`}
@@ -200,7 +200,7 @@ If you ever feel "this box is suspicious," reach for a violin or a histogram.`}
 - Yes, always.
 - Yes, unless the chart says otherwise.
 - [o] No — a dot beyond the whiskers is simply a value more than ~1.5×IQR from the box. It may be a real, legitimate observation.
-  > Right. "Outlier" is a *statistical* term meaning "far from the bulk of the distribution," not a value judgment. The dot might be a typo, or it might be a real Mt. Everest in a chart of mountain heights. Always investigate outliers — don't reflexively delete them.
+  > "Outlier" is a *statistical* term meaning "far from the bulk of the distribution," not a value judgment. The dot might be a typo, or it might be a real Mt. Everest in a chart of mountain heights. Always investigate outliers — don't reflexively delete them.
 - No, only if the chart is wrong.
 
 Box-plot outliers are an *invitation to investigate*, not a verdict.`}

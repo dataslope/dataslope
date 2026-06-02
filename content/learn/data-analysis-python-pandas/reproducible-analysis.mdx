@@ -185,7 +185,7 @@ Without reproducibility, automation is impossible.
 - Using emoji in chart titles
 - Writing many comments
 - [o] Treating the raw data as immutable and capturing every transformation in code that can be re-run from scratch
-  > Right. If raw data is untouched and all steps are in code, the analysis can always be regenerated.
+  > If raw data is untouched and all steps are in code, the analysis can always be regenerated.
 - Saving to xlsx instead of csv
 
 Immutability of inputs is the bedrock.`}
@@ -197,7 +197,7 @@ Immutability of inputs is the bedrock.`}
 - It saves memory
 - It triggers garbage collection
 - [o] It guarantees the notebook actually produces its results from a clean state — otherwise hidden side effects from out-of-order cells can give false confidence
-  > Right. The only test that matters is whether the notebook works from scratch.
+  > The only test that matters is whether the notebook works from scratch.
 - It speeds up Pandas
 
 Restart-and-run-all is the cheapest reproducibility test you can run.`}
@@ -209,7 +209,7 @@ Restart-and-run-all is the cheapest reproducibility test you can run.`}
 - Increase the sample size
 - Decrease the sample size
 - [o] Set a random seed (e.g. \`np.random.RandomState(42)\`) so the "random" choices are deterministic across runs
-  > Right. Set a seed and the same input always gives the same output — even when randomness is involved.
+  > Set a seed and the same input always gives the same output — even when randomness is involved.
 - Disable random sampling
 
 Seeded randomness is one of the simplest reproducibility wins.`}
@@ -221,7 +221,7 @@ Seeded randomness is one of the simplest reproducibility wins.`}
 - Smaller install
 - Required by Python
 - [o] Pandas (and other libraries) evolve — methods get renamed or removed. Pinning protects your notebook from breaking when versions change.
-  > Right. Pinning trades fresh-features for *stability*. For analyses, stability usually wins.
+  > Pinning trades fresh-features for *stability*. For analyses, stability usually wins.
 - Faster execution
 
 Pinning is the difference between "works today" and "works in two years".`}

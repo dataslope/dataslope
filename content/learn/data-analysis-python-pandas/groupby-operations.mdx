@@ -347,7 +347,7 @@ assert all(vals[i] >= vals[i+1] for i in range(len(vals)-1))`,
 - A coding style for indentation
 - A way to import data
 - [o] The three steps of a groupby: partition rows into groups, compute something per group, stitch the results together
-  > Right. Once you see groupby through this lens, it stops feeling magical.
+  > Once you see groupby through this lens, it stops feeling magical.
 - A method of sorting
 
 The phrase was popularized by Hadley Wickham in 2011 and applies in every tabular-data tool.`}
@@ -359,7 +359,7 @@ The phrase was popularized by Hadley Wickham in 2011 and applies in every tabula
 - It is faster
 - It supports more functions
 - [o] It produces flat, well-named output columns instead of a MultiIndex of columns — far easier to use downstream
-  > Yes. Named aggregations are the modern recommended style. The output looks like a normal table.
+  > Named aggregations are the modern recommended style. The output looks like a normal table.
 - It works on Series only
 
 If you have ever been confused by MultiIndex columns coming out of groupby, switch to named aggregations.`}
@@ -371,7 +371,7 @@ If you have ever been confused by MultiIndex columns coming out of groupby, swit
 - When you want fewer rows
 - They are equivalent
 - [o] When you want a column added back to every original row containing its group's statistic — the result has the same shape as the input
-  > Right. \`agg\` collapses to one row per group; \`transform\` broadcasts the group result back to every row in that group.
+  > \`agg\` collapses to one row per group; \`transform\` broadcasts the group result back to every row in that group.
 - When sorting
 
 \`transform\` is the right hammer for "show me each value alongside its group average."`}

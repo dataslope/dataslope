@@ -334,7 +334,7 @@ When you sit down to translate a formula into NumPy, ask:
 - A scalar
 - An array of shape \`(1, n)\`
 - [o] An array of shape \`(n, 1)\` — a "column vector" view of \`x\`
-  > Right. \`None\` (a synonym for \`np.newaxis\`) inserts a length-1 axis at that position. Combined with \`y[None, :]\`, this is the standard idiom for outer-product-style broadcasting.
+  > \`None\` (a synonym for \`np.newaxis\`) inserts a length-1 axis at that position. Combined with \`y[None, :]\`, this is the standard idiom for outer-product-style broadcasting.
 - A copy of \`x\` with no change in shape
 
 This idiom is one of the most common ways to set up a broadcast.`}
@@ -345,7 +345,7 @@ This idiom is one of the most common ways to set up a broadcast.`}
 
 - They are correct — \`np.vectorize\` is a compiled inner loop
 - [o] They are mistaken — \`np.vectorize\` is a cosmetic wrapper around a Python loop and runs at Python speed. It looks like NumPy but is not vectorized in the compiled sense
-  > Yes. \`np.vectorize\` exists to give a "ufunc-shaped" API to a Python function, not to speed it up. The docs explicitly warn it is "provided primarily for convenience, not for performance."
+  > \`np.vectorize\` exists to give a "ufunc-shaped" API to a Python function, not to speed it up. The docs explicitly warn it is "provided primarily for convenience, not for performance."
 - They are benchmarking the wrong array
 - \`np.vectorize\` JIT-compiles to C on first call
 

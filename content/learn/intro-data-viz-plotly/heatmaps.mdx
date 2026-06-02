@@ -155,7 +155,7 @@ flowchart TB
 - A single numeric variable's distribution.
 - A trend over time.
 - [o] A 2-D table of numeric values — rows × columns — where you want to spot patterns or hotspots.
-  > Yes. Each cell's color encodes the numeric value at that row/column intersection. The eye perceives the dense, hot, or cold regions instantly, which makes heatmaps excellent for correlation matrices, calendar data, and any cross-tabulation.
+  > Each cell's color encodes the numeric value at that row/column intersection. The eye perceives the dense, hot, or cold regions instantly, which makes heatmaps excellent for correlation matrices, calendar data, and any cross-tabulation.
 - A part-of-a-whole composition.
 
 For distributions use a histogram; for trends use a line chart; for compositions use a sorted bar chart.`}
@@ -167,7 +167,7 @@ For distributions use a histogram; for trends use a line chart; for compositions
 - A sequential palette like **Viridis**.
 - A categorical palette like **Plotly**.
 - [o] A **diverging** palette like **RdBu** or **RdBu_r**, centered at zero.
-  > Yes. Correlations have a meaningful midpoint (0 = no correlation). A diverging palette uses two distinct hues for positive vs negative and intensity for magnitude, so viewers can read sign and strength simultaneously. Always center the palette midpoint at zero (**color_continuous_midpoint=0**).
+  > Correlations have a meaningful midpoint (0 = no correlation). A diverging palette uses two distinct hues for positive vs negative and intensity for magnitude, so viewers can read sign and strength simultaneously. Always center the palette midpoint at zero (**color_continuous_midpoint=0**).
 - A grayscale ramp.
 
 Diverging data deserves a diverging palette. Mixing it up is a common mistake.`}
@@ -179,7 +179,7 @@ Diverging data deserves a diverging palette. Mixing it up is a common mistake.`}
 - It is copyrighted.
 - It is only available on Windows.
 - [o] It is **perceptually non-uniform** — bright cyan and yellow bands appear as visual "ridges" even where data is flat, leading viewers to see structure that isn't there.
-  > Right. Jet was popular in the 1990s but is now known to introduce false features. Modern perceptually uniform palettes (Viridis, Cividis, Magma) increase smoothly in luminance and reveal the actual structure of the data without visual artifacts.
+  > Jet was popular in the 1990s but is now known to introduce false features. Modern perceptually uniform palettes (Viridis, Cividis, Magma) increase smoothly in luminance and reveal the actual structure of the data without visual artifacts.
 - It uses too many colors.
 
 This is one of the genuinely settled debates in modern visualization. Just don't use rainbow palettes for quantitative data.`}

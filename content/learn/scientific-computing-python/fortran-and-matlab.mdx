@@ -210,7 +210,7 @@ chapter.
 - Because NumPy was written by the FORTRAN community
 - Because Python compiles to FORTRAN at runtime
 - [o] Because NumPy's heaviest routines (matrix multiply, linear solves, eigenvalues, FFTs) dispatch to BLAS, LAPACK, and related libraries, most of which are FORTRAN code that has been hand-tuned for decades
-  > Right. NumPy is Python at the interface and FORTRAN/C at the core. Calling \`A @ B\` invokes a BLAS routine like DGEMM written in FORTRAN. This is why scientific Python is so fast despite Python itself being interpreted.
+  > NumPy is Python at the interface and FORTRAN/C at the core. Calling \`A @ B\` invokes a BLAS routine like DGEMM written in FORTRAN. This is why scientific Python is so fast despite Python itself being interpreted.
 - Because FORTRAN syntax is hidden inside Python source files
 
 This layering — interpreted glue on top of compiled numerical kernels — is the secret to scientific Python's performance.`}

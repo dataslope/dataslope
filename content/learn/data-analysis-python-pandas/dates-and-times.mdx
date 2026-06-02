@@ -313,7 +313,7 @@ assert dates == sorted(dates)`,
 - Drop the whole column
 - Convert to integer
 - [o] Use \`pd.to_datetime(s, errors="coerce")\` so bad values become NaT and the column still has datetime dtype
-  > Right. \`errors="coerce"\` is the cleanest way to keep your column typed correctly while tolerating bad rows.
+  > \`errors="coerce"\` is the cleanest way to keep your column typed correctly while tolerating bad rows.
 - Use \`errors="ignore"\`
 
 The \`coerce\` flag is to dates what \`pd.to_numeric(..., errors="coerce")\` is to numbers.`}
@@ -325,7 +325,7 @@ The \`coerce\` flag is to dates what \`pd.to_numeric(..., errors="coerce")\` is 
 - It looks prettier
 - It auto-removes weekends
 - [o] It unlocks string-based date slicing (\`df.loc["2024-02"]\`), resampling (\`df.resample("W").sum()\`), and rolling windows — none of which work on a plain RangeIndex
-  > Yes. A DatetimeIndex is the gateway to most of Pandas's time-series features.
+  > A DatetimeIndex is the gateway to most of Pandas's time-series features.
 - It speeds up CSV parsing
 
 When you have time-series data, almost always promote the timestamp to the index.`}

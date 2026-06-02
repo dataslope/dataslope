@@ -185,7 +185,7 @@ Print it. Tape it to your wall. Use it on every new dataset.
 - Immediately compute and reply
 - Refuse — too vague
 - [o] Run an EDA pass — check shape, types, missing values, distinct regions — *then* compute the answer with confidence
-  > Right. Skipping EDA means you might compute the "average" while ignoring duplicates, missing rows, or merged customer records.
+  > Skipping EDA means you might compute the "average" while ignoring duplicates, missing rows, or merged customer records.
 - Switch to SQL
 
 EDA is what separates a credible analyst from a calculator.`}
@@ -197,7 +197,7 @@ EDA is what separates a credible analyst from a calculator.`}
 - It is faster
 - It uses less memory
 - [o] head shows only the top rows — random sampling reveals issues that may only occur in middle or end of the file
-  > Yes. Time-series files in particular often have format drift over time.
+  > Time-series files in particular often have format drift over time.
 - It returns sorted rows
 
 A random peek at the data is a small habit with outsized payoff.`}
@@ -209,7 +209,7 @@ A random peek at the data is a small habit with outsized payoff.`}
 - They cause each other
 - They are independent
 - [o] They are measuring something very similar — worth investigating whether one is derived from the other, or whether keeping both adds any information
-  > Right. High correlation is a flag, not a conclusion. Investigate before either dropping or using both as separate inputs.
+  > High correlation is a flag, not a conclusion. Investigate before either dropping or using both as separate inputs.
 - It is a bug
 
 Correlation is a signpost, not an answer.`}
@@ -221,7 +221,7 @@ Correlation is a signpost, not an answer.`}
 - It is required by Pandas
 - It is for your manager
 - [o] The next person to read your notebook (often future-you, six weeks later) will not remember the dataset's quirks — written notes preserve hard-won knowledge
-  > Yes. Undocumented EDA insights vanish the moment you close the notebook.
+  > Undocumented EDA insights vanish the moment you close the notebook.
 - It speeds up the kernel
 
 EDA notes are part of the deliverable, not throwaway scratch.`}

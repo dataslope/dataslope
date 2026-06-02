@@ -276,7 +276,7 @@ assert list(back.columns) == list(clean.columns)`,
 - It is faster
 - It hides PII
 - [o] Otherwise the DataFrame's index becomes a mystery first column ("Unnamed: 0") when someone reads the file back
-  > Right. \`index=False\` is the right default unless the index is meaningful (e.g., dates).
+  > \`index=False\` is the right default unless the index is meaningful (e.g., dates).
 - It is required
 
 A small habit that saves a lot of confusion downstream.`}
@@ -288,7 +288,7 @@ A small habit that saves a lot of confusion downstream.`}
 - CSV
 - Excel
 - [o] Parquet — preserves dtypes (datetimes, categories), is smaller, and reads faster
-  > Right. Parquet is the modern default for analyst-to-analyst handoffs.
+  > Parquet is the modern default for analyst-to-analyst handoffs.
 - JSON
 
 Parquet has become the standard for analytical data exchange.`}
@@ -300,7 +300,7 @@ Parquet has become the standard for analytical data exchange.`}
 - Parquet
 - Pickle
 - [o] Excel (.xlsx) or CSV — formats they can open without code
-  > Right. Match the format to the consumer.
+  > Match the format to the consumer.
 - HDF5
 
 Always match the export format to who's going to consume it.`}

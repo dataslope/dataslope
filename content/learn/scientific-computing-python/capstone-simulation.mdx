@@ -294,7 +294,7 @@ together by reproducible code.
 
 - To slow down the simulation for visualization
 - [o] An adaptive solver may take huge steps over slow dynamics and *miss* short-lived events; capping the step size forces the solver to evaluate the event function frequently enough to detect a fast extinction transient
-  > Right. The event detector only checks for a sign change *between* solver steps. If the predator crashes inside a single 5-second step, the event might be missed entirely. \`max_step\` bounds how aggressively the solver can grow its step, trading some performance for guaranteed event resolution.
+  > The event detector only checks for a sign change *between* solver steps. If the predator crashes inside a single 5-second step, the event might be missed entirely. \`max_step\` bounds how aggressively the solver can grow its step, trading some performance for guaranteed event resolution.
 - It changes the order of the integrator
 - It enables GPU acceleration
 
@@ -306,7 +306,7 @@ together by reproducible code.
 
 - For aesthetic reasons
 - [o] A single trajectory hides stochastic variability. Aggregated quantities (means *and* probabilities) over many seeds report a property of the *parameter setting*, not of one lucky draw — and they come with quantifiable uncertainty
-  > Yes. Reporting per-replicate aggregates is the difference between an anecdote and an experimental result. The probability of extinction over 20 seeds is a real quantity you can attach uncertainty bars to; one trajectory is a single sample from a distribution.
+  > Reporting per-replicate aggregates is the difference between an anecdote and an experimental result. The probability of extinction over 20 seeds is a real quantity you can attach uncertainty bars to; one trajectory is a single sample from a distribution.
 - It is required by the language
 - The CPU is faster that way
 
