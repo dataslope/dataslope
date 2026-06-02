@@ -204,21 +204,15 @@ export function createSqlEditorExtensions(
     }),
     keymap.of([
       {
-        // Run the selection if any; otherwise, in a multi-statement document,
-        // run just the statement under the cursor (the standard IDE behavior);
-        // a single-statement document still runs everything (unchanged). Use
-        // Mod-Shift-Enter to force "run all" regardless.
+        // Primary run action (matches the toolbar's primary button): run the
+        // selection if there is one, otherwise run every statement. Use
+        // Mod-Shift-Enter for the secondary action (run just the statement under
+        // the cursor in a multi-statement document).
         key: "Mod-Enter",
         run: (view) => {
           const sel = view.state.selection.main;
           if (!sel.empty) {
             onRunSelection(view.state.sliceDoc(sel.from, sel.to));
-            return true;
-          }
-          const doc = view.state.doc.toString();
-          const stmt = statementAtCursor(doc, sel.head);
-          if (stmt && splitSqlStatements(doc).length > 1) {
-            onRunSelection(stmt.text);
           } else {
             onRunAll();
           }
@@ -226,9 +220,20 @@ export function createSqlEditorExtensions(
         },
       },
       {
-        // Always run all queries (ignores any selection).
+        // Secondary run action (the toolbar dropdown's "other" option): in a
+        // multi-statement document with no selection, run just the statement
+        // under the cursor (the standard IDE behavior); otherwise run all.
         key: "Mod-Shift-Enter",
-        run: () => {
+        run: (view) => {
+          const sel = view.state.selection.main;
+          if (sel.empty) {
+            const doc = view.state.doc.toString();
+            const stmt = statementAtCursor(doc, sel.head);
+            if (stmt && splitSqlStatements(doc).length > 1) {
+              onRunSelection(stmt.text);
+              return true;
+            }
+          }
           onRunAll();
           return true;
         },

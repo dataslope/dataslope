@@ -107,8 +107,9 @@ export function SqlEditorToolbar({
   onRunAll,
 }: SqlEditorToolbarProps) {
   const disabled = !loaded || running;
-  const runKbd = isMac ? "⌘Enter" : "Ctrl+Enter";
-  const runAllKbd = isMac ? "⌘⇧Enter" : "Ctrl+Shift+Enter";
+  // ⌘/Ctrl+Enter triggers the *primary* button (shown by the kbd hint to the
+  // left); the dropdown's secondary action is always ⌘/Ctrl+Shift+Enter.
+  const secondaryKbd = isMac ? "⌘⇧Enter" : "Ctrl+Shift+Enter";
 
   return (
     <div className="sql-toolbar">
@@ -117,8 +118,8 @@ export function SqlEditorToolbar({
           className="kbd-group"
           title={
             isMac
-              ? "Cmd + Enter — run selection, the statement at the cursor, or all"
-              : "Ctrl + Enter — run selection, the statement at the cursor, or all"
+              ? "Cmd + Enter — run the selection, or all statements"
+              : "Ctrl + Enter — run the selection, or all statements"
           }
         >
           <kbd className="kbd">{isMac ? "⌘" : "Ctrl"}</kbd>
@@ -135,7 +136,7 @@ export function SqlEditorToolbar({
             disabled={disabled}
             mainLabel="Run Selection"
             onMain={onRunSelection}
-            items={[{ label: "Run All", kbd: runAllKbd, onClick: onRunAll }]}
+            items={[{ label: "Run All", kbd: secondaryKbd, onClick: onRunAll }]}
           />
         ) : hasMultipleStatements ? (
           <RunSplit
@@ -146,7 +147,7 @@ export function SqlEditorToolbar({
             items={[
               {
                 label: "Run statement at cursor",
-                kbd: runKbd,
+                kbd: secondaryKbd,
                 onClick: onRunStatement,
               },
             ]}

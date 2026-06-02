@@ -3,18 +3,20 @@ import { test, expect } from "@playwright/test";
 // ─────────────────────────────────────────────────────────────────────
 // Run controls for multi-statement tabs (Phase 4 / §9 IDE feature).
 //
-// Split-button rules — the dropdown never duplicates the primary action:
-//   • Multi-statement, no selection → primary "Run All";   dropdown: "Run
-//     statement at cursor" (Ctrl/⌘+Enter still runs just that statement).
-//   • Selection active             → primary "Run Selection"; dropdown: "Run
-//     All" (no duplicate "Run Selection").
+// ⌘/Ctrl+Enter triggers the PRIMARY action (the toolbar's primary button);
+// ⌘/Ctrl+Shift+Enter triggers the dropdown's SECONDARY action. Split-button
+// rules — the dropdown never duplicates the primary action:
+//   • Multi-statement, no selection → primary "Run All" (⌘/Ctrl+Enter);
+//     dropdown "Run statement at cursor" (⌘/Ctrl+Shift+Enter).
+//   • Selection active             → primary "Run Selection" (⌘/Ctrl+Enter);
+//     dropdown "Run All" (⌘/Ctrl+Shift+Enter).
 //   • Single statement             → plain "Run" button (runs everything).
 // Engine-agnostic (shared editor + toolbar) → tested on SQLite.
 // ─────────────────────────────────────────────────────────────────────
 
 const THREE = "SELECT 1 AS one;\nSELECT 2 AS two;\nSELECT 3 AS three;";
 
-test("run controls — Run All default, run-at-cursor in dropdown, no duplicate actions", async ({
+test("run controls — Cmd/Ctrl+Enter runs all, Shift+Enter runs the statement at cursor", async ({
   page,
 }) => {
   test.setTimeout(180_000);
@@ -43,24 +45,35 @@ test("run controls — Run All default, run-at-cursor in dropdown, no duplicate 
   await typeIntoEditor(THREE);
   await expect(splitMain).toHaveText(/Run All/);
 
-  // …and the dropdown offers ONLY "Run statement at cursor" (no duplicate).
+  // …and the dropdown offers ONLY "Run statement at cursor" — on Shift+Enter.
   await chevron.click();
   await expect(dropdown.getByRole("menuitem")).toHaveCount(1);
   await expect(
     dropdown.getByRole("menuitem", { name: "Run statement at cursor" }),
   ).toBeVisible();
+  await expect(dropdown.locator(".run-split-item-kbd")).toHaveText(
+    /Shift\+Enter|⇧Enter/,
+  );
   await page.keyboard.press("Escape");
 
-  // (1) Keyboard Ctrl/⌘+Enter with the cursor in the middle statement → only it.
+  // (1) ⌘/Ctrl+Enter runs the PRIMARY action — all statements (a result-set tab
+  //     bar) — regardless of where the cursor sits.
   await page.locator(".cm-line").nth(1).click();
   await page.keyboard.press("ControlOrMeta+Enter");
+  await expect(setTabs).toBeVisible({ timeout: 40_000 });
+  await expect(setTabs.locator("[role=tab], button")).toHaveCount(3);
+
+  // (2) ⌘/Ctrl+Shift+Enter runs just the statement under the cursor (middle →
+  //     only "two").
+  await page.locator(".cm-line").nth(1).click();
+  await page.keyboard.press("ControlOrMeta+Shift+Enter");
   await expect(grid.getByText("two", { exact: true })).toBeVisible({
     timeout: 40_000,
   });
   await expect(setTabs).toHaveCount(0);
   await expect(grid.getByText("one", { exact: true })).toHaveCount(0);
 
-  // (2) Dropdown "Run statement at cursor" with the cursor in the third → only it.
+  // (3) Dropdown "Run statement at cursor" with the cursor in the third → only it.
   await page.locator(".cm-line").nth(2).click();
   await chevron.click();
   await dropdown.getByRole("menuitem", { name: "Run statement at cursor" }).click();
@@ -70,12 +83,12 @@ test("run controls — Run All default, run-at-cursor in dropdown, no duplicate 
   await expect(setTabs).toHaveCount(0);
   await expect(grid.getByText("two", { exact: true })).toHaveCount(0);
 
-  // (3) The primary "Run All" button runs every statement (a result-set tab bar).
+  // (4) The primary "Run All" button runs every statement (a result-set tab bar).
   await splitMain.click();
   await expect(setTabs).toBeVisible({ timeout: 40_000 });
   await expect(setTabs.locator("[role=tab], button")).toHaveCount(3);
 
-  // (4) With a selection, the primary becomes "Run Selection" and the dropdown
+  // (5) With a selection, the primary becomes "Run Selection" and the dropdown
   //     offers ONLY "Run All" — no duplicate "Run Selection".
   await editor.click();
   await page.keyboard.press("ControlOrMeta+a");
@@ -88,7 +101,7 @@ test("run controls — Run All default, run-at-cursor in dropdown, no duplicate 
   ).toHaveCount(0);
   await page.keyboard.press("Escape");
 
-  // (5) A single-statement tab falls back to the plain "Run" button.
+  // (6) A single-statement tab falls back to the plain "Run" button.
   await typeIntoEditor("SELECT 42 AS answer;");
   await expect(page.locator(".run-btn")).toHaveText(/^Run$/);
   await expect(splitMain).toHaveCount(0);
