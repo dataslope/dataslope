@@ -15,6 +15,7 @@ import {
 } from "fumadocs-ui/page";
 import { source } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
+import { LessonComplete } from "@/app/_components/learn/LessonComplete";
 
 interface LearnPageProps {
   params: Promise<{ slug?: string[] }>;
@@ -35,6 +36,7 @@ export default async function LearnPage(props: LearnPageProps) {
       ) : null}
       <DocsBody>
         <MDX components={getMDXComponents()} />
+        <LessonComplete />
       </DocsBody>
     </DocsPage>
   );

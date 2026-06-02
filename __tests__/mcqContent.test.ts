@@ -18,7 +18,10 @@ describe("content/learn <MultipleChoice> corpus", () => {
   it("has no structural or wording violations", () => {
     const violations = lintFiles(files);
     const report = violations
-      .map((v) => `  [${v.rule}] ${path.relative(process.cwd(), v.file)}: ${v.detail}`)
+      .map(
+        (v: { rule: string; file: string; detail: string }) =>
+          `  [${v.rule}] ${path.relative(process.cwd(), v.file)}: ${v.detail}`,
+      )
       .join("\n");
     expect(violations, `MCQ lint violations:\n${report}`).toEqual([]);
   });
