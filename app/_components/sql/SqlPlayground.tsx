@@ -93,6 +93,7 @@ import { findSampleDatabase } from "../runtime/sqliteSamples";
 import { sqliteAdapter } from "./sqliteAdapter";
 import { DROP_KIND_LABELS, IMPORT_COL_STATUS_LABEL } from "./constants";
 import { computeImportColComparison } from "./utils/importUtils";
+import { splitSqlStatements, statementAtCursor } from "./utils/sqlAnalysis";
 import { ensureActiveWorkspace, switchActiveWorkspace } from "../opfs/activeWorkspace";
 import { acquireWorkspaceLock, createWorkspace } from "../opfs/workspace";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
@@ -729,6 +730,10 @@ function SqlPlaygroundInner() {
   // ─── Derived values ──────────────────────────────────────────────────
   const isSettingsTabActive = activeTabId === SETTINGS_TAB_ID;
   const activeTab = tabs.find((t) => t.id === activeTabId) ?? null;
+  const hasMultipleStatements = useMemo(
+    () => splitSqlStatements(activeTab?.code ?? "").length > 1,
+    [activeTab?.code],
+  );
   const result = activeTabId ? (resultsByTab[activeTabId] ?? null) : null;
   const loadingFading = loaded && showLoadingOverlay;
 
@@ -826,6 +831,20 @@ function SqlPlaygroundInner() {
     duplicateRowInTable,
     showToast,
   } = useQueryRunner(queryRunnerRefs);
+
+  // Run just the statement under the editor cursor (the toolbar "Run statement"
+  // affordance — mirrors the Ctrl/⌘+Enter keymap). Falls back to running the
+  // whole tab when the cursor isn't inside a statement.
+  const runStatementAtCursor = useCallback(() => {
+    const view = editorRef.current;
+    if (!view) return runActiveTab();
+    const stmt = statementAtCursor(
+      view.state.doc.toString(),
+      view.state.selection.main.head,
+    );
+    if (stmt) runSelection(stmt.text);
+    else runActiveTab();
+  }, [runActiveTab, runSelection]);
 
   const {
     refreshEntityMetadata,
@@ -3600,8 +3619,10 @@ function SqlPlaygroundInner() {
                 loaded={loaded}
                 running={statusState === "running"}
                 hasEditorSelection={hasEditorSelection}
+                hasMultipleStatements={hasMultipleStatements}
                 isMac={isMac}
                 onRunSelection={runCurrentSelection}
+                onRunStatement={runStatementAtCursor}
                 onRunAll={runActiveTab}
               />
             </div>

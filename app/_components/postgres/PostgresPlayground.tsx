@@ -159,6 +159,8 @@ import {
   hasLimitClause,
   stripSqlComments,
   bareTableSelectSource,
+  splitSqlStatements,
+  statementAtCursor,
 } from "../sql/utils/sqlAnalysis";
 import { computeImportColComparison } from "../sql/utils/importUtils";
 import {
@@ -1199,6 +1201,10 @@ function PostgresPlaygroundInner() {
 
   const activeTab =
     tabs.find((tab) => tab.id === activeTabId) ?? tabs[0] ?? null;
+  const hasMultipleStatements = useMemo(
+    () => splitSqlStatements(activeTab?.code ?? "").length > 1,
+    [activeTab?.code],
+  );
   const isSettingsTabActive = activeTabId === SETTINGS_TAB_ID;
   const openSettingsTab = useCallback(() => {
     if (activeTabIdRef.current === SETTINGS_TAB_ID) {
@@ -1486,6 +1492,19 @@ function PostgresPlaygroundInner() {
     );
     if (!tab) return;
     void runSqlForTab(tab.id, selected, tab.title);
+  }, [runSqlForTab]);
+
+  // Run just the statement under the editor cursor (the toolbar "Run statement"
+  // affordance — mirrors the Ctrl/⌘+Enter keymap).
+  const runStatementAtCursor = useCallback(() => {
+    const view = editorRef.current;
+    const tab = tabsRef.current.find(
+      (candidate) => candidate.id === activeTabIdRef.current,
+    );
+    if (!view || !tab) return;
+    const doc = view.state.doc.toString();
+    const stmt = statementAtCursor(doc, view.state.selection.main.head);
+    void runSqlForTab(tab.id, stmt ? stmt.text : doc, tab.title);
   }, [runSqlForTab]);
 
   // Keep runActiveTabRef / runSelectionRef in sync with latest callbacks.
@@ -4717,8 +4736,10 @@ function PostgresPlaygroundInner() {
                 loaded={loaded}
                 running={statusState === "running"}
                 hasEditorSelection={hasEditorSelection}
+                hasMultipleStatements={hasMultipleStatements}
                 isMac={isMac}
                 onRunSelection={runCurrentSelection}
+                onRunStatement={runStatementAtCursor}
                 onRunAll={runActiveTab}
               />
             </div>
