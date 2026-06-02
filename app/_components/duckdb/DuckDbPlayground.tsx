@@ -164,6 +164,7 @@ import {
   hasLimitClause,
   stripSqlComments,
   bareTableSelectSource,
+  bareTableSelectSources,
   splitSqlStatements,
   statementAtCursor,
 } from "../sql/utils/sqlAnalysis";
@@ -1427,9 +1428,10 @@ function DuckDbPlaygroundInner() {
       // Make a hand-typed full-table preview (`SELECT * FROM <table>`)
       // editable, just like opening the table from the sidebar — but only
       // for an actual table (not a view), so edits never fail on commit.
+      const isTable = (name: string) => tablesRef.current.includes(name);
       if (!sourceTable) {
         const detected = bareTableSelectSource(trimmed, noComments);
-        if (detected && tablesRef.current.includes(detected)) {
+        if (detected && isTable(detected)) {
           sourceTable = detected;
         }
       }
@@ -1461,6 +1463,10 @@ function DuckDbPlaygroundInner() {
         } else {
           sets = await engine.exec(trimmed);
         }
+        const sourceTables =
+          sets.length > 1
+            ? bareTableSelectSources(trimmed, isTable)
+            : [sourceTable ?? null];
         const elapsedMs = performance.now() - t0;
         setResultsByTab((prev) => ({
           ...prev,
@@ -1469,6 +1475,7 @@ function DuckDbPlaygroundInner() {
             elapsedMs,
             source,
             sourceTable,
+            sourceTables,
             lazySql,
             lazyBaseSql,
             lazyTotalCount,
@@ -2579,6 +2586,25 @@ function DuckDbPlaygroundInner() {
   }, [showToast]);
 
   // ─── Result/sidebar helpers ──────────────────────────────────────────
+  // Resolve PK / FK hints for any table by name, so each result set of a
+  // multi-statement run is editable against its own table.
+  const tableMetaFor = useCallback(
+    (tableName: string) => {
+      const cols = columnsByEntity[tableName] ?? [];
+      const fks = foreignKeysByEntity[tableName] ?? [];
+      return {
+        keyHints: {
+          pk: new Set(cols.filter((col) => col.pk > 0).map((col) => col.name)),
+          fk: new Map(fks.map((fk) => [fk.from, fk])),
+          readOnly: new Set(
+            cols.filter((col) => col.generated).map((col) => col.name),
+          ),
+        },
+      };
+    },
+    [columnsByEntity, foreignKeysByEntity],
+  );
+
   const resultKeyHints = useMemo<ColumnKeyHints | undefined>(() => {
     const tableName = result?.sourceTable;
     if (!tableName) return undefined;
@@ -5273,6 +5299,7 @@ function DuckDbPlaygroundInner() {
                 engineLabel="DuckDB"
                 keyHints={resultKeyHints}
                 sourceTable={result?.sourceTable}
+                tableMetaFor={tableMetaFor}
                 onDeleteRows={deleteRowsFromTable}
                 onUpdateRows={updateRowsInTable}
                 onDuplicateRow={duplicateRowInTable}

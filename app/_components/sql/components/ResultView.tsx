@@ -516,9 +516,10 @@ function ResultViewImpl({
   result,
   loading,
   engineLabel = "SQLite",
-  keyHints,
-  sourceTable,
-  constraintInfo,
+  keyHints: propKeyHints,
+  sourceTable: propSourceTable,
+  constraintInfo: propConstraintInfo,
+  tableMetaFor,
   onDeleteRows,
   onUpdateRows,
   onDuplicateRow,
@@ -538,6 +539,13 @@ function ResultViewImpl({
   keyHints?: ColumnKeyHints;
   sourceTable?: string;
   constraintInfo?: ColumnConstraintInfo[];
+  /** Resolves a table's editing metadata by name. Used to pick up the PK / FK /
+   *  constraint hints for whichever result set is active, so every tab of a
+   *  multi-statement run is editable against its own table. */
+  tableMetaFor?: (table: string) => {
+    keyHints?: ColumnKeyHints;
+    constraintInfo?: ColumnConstraintInfo[];
+  } | undefined;
   onDeleteRows?: (
     tableName: string,
     pkColumns: string[],
@@ -629,6 +637,9 @@ function ResultViewImpl({
     sortingByIndex: Record<number, SortingState>;
     filterByIndex?: Record<number, string>;
     serverFilterByIndex?: Record<number, number>;
+    /** Active result-set tab, kept across an edit/sort/filter reload so a
+     *  commit on "Set 2" doesn't bounce the view back to "Set 1". */
+    activeSetIdx?: number;
   } | null>(null);
   // Keep a ref to the latest sortingByIndex so the result-change effect can
   // read it without adding sortingByIndex as a dependency (which would loop).
@@ -677,7 +688,7 @@ function ResultViewImpl({
     const cachedSorting = result ? sortingCacheRef.current.get(result) : undefined;
     setSortingByIndex(preserved?.sortingByIndex ?? cachedSorting ?? {});
     setActiveEditCellByIndex({});
-    setActiveSetIdx(0);
+    setActiveSetIdx(preserved?.activeSetIdx ?? 0);
     // A fresh result (or a filter/sort/edit reload) settles any pending filter
     // overlay — the rows shown now already reflect the applied filter.
     setFilterPending(false);
@@ -739,6 +750,7 @@ function ResultViewImpl({
         filterByIndex: overrides?.filterByIndex ?? { ...filterByIndex },
         serverFilterByIndex:
           overrides?.serverFilterByIndex ?? { ...serverFilterByIndex },
+        activeSetIdx,
       };
     },
     [
@@ -747,6 +759,7 @@ function ResultViewImpl({
       sortingByIndex,
       filterByIndex,
       serverFilterByIndex,
+      activeSetIdx,
     ],
   );
 
@@ -871,6 +884,32 @@ function ResultViewImpl({
     });
     setPageStates((prev) => ({ ...prev, [idx]: { page: 0 } }));
   }, []);
+
+  // Editable identity is per active result set, not per query: a multi-statement
+  // run can show several `SELECT * FROM <table>` tabs, each editable against its
+  // own table. `result.sourceTables` carries the table per set (positionally
+  // aligned with `sets`); fall back to the whole-query `sourceTable` for a
+  // single set. The PK / FK / constraint hints below all follow that table, so
+  // every reference to `sourceTable` / `keyHints` / `constraintInfo` downstream
+  // resolves against whichever set the user is looking at.
+  const activeSetClamped = result
+    ? Math.max(0, Math.min(activeSetIdx, result.sets.length - 1))
+    : 0;
+  const sourceTable = useMemo<string | undefined>(() => {
+    if (!result) return undefined;
+    const perSet = result.sourceTables?.[activeSetClamped];
+    if (perSet != null) return perSet;
+    // Older results (and the single-set case) only carry the query-wide table.
+    return result.sets.length <= 1 ? propSourceTable : undefined;
+  }, [result, activeSetClamped, propSourceTable]);
+  const activeMeta = useMemo(
+    () => (sourceTable && tableMetaFor ? tableMetaFor(sourceTable) : undefined),
+    [sourceTable, tableMetaFor],
+  );
+  const singleSet = !result || result.sets.length <= 1;
+  const keyHints = activeMeta?.keyHints ?? (singleSet ? propKeyHints : undefined);
+  const constraintInfo =
+    activeMeta?.constraintInfo ?? (singleSet ? propConstraintInfo : undefined);
 
   const pkColumnsForSet = useCallback(
     (set: QueryExecResult): string[] | null => {

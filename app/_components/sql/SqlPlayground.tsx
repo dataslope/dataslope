@@ -1502,14 +1502,20 @@ function SqlPlaygroundInner() {
     }
   }, [activeDbId, tablesSectionExpanded, viewsSectionExpanded]);
 
-  // PK / FK lookups for the current result's source table.
+  // PK / FK lookups for every editable source table in the current result —
+  // the query-wide table plus each per-set table of a multi-statement run.
   useEffect(() => {
-    if (!result?.sourceTable) return;
-    if (
-      columnsByEntity[result.sourceTable] === undefined ||
-      foreignKeysByEntity[result.sourceTable] === undefined
-    ) {
-      refreshEntityMetadata(result.sourceTable);
+    if (!result) return;
+    const tables = new Set<string>();
+    if (result.sourceTable) tables.add(result.sourceTable);
+    for (const t of result.sourceTables ?? []) if (t) tables.add(t);
+    for (const t of tables) {
+      if (
+        columnsByEntity[t] === undefined ||
+        foreignKeysByEntity[t] === undefined
+      ) {
+        refreshEntityMetadata(t);
+      }
     }
   }, [result, columnsByEntity, foreignKeysByEntity, refreshEntityMetadata]);
 
@@ -1701,6 +1707,26 @@ function SqlPlaygroundInner() {
   // Drag-and-drop tab reordering is handled by the generic TabBar
   // internally; SqlPlayground no longer needs its own DnD sensors or
   // dragging-tab state for the tab strip.
+
+  // Resolve PK / FK / constraint hints for any table by name, so each result
+  // set of a multi-statement run is editable against its own table.
+  const tableMetaFor = useCallback(
+    (tableName: string) => {
+      const cols = columnsByEntity[tableName];
+      const fks = foreignKeysByEntity[tableName];
+      const pk = new Set<string>();
+      const readOnly = new Set<string>();
+      for (const c of cols ?? []) {
+        if (c.pk > 0) pk.add(c.name);
+        if (c.generated) readOnly.add(c.name);
+      }
+      const fkByName = new Map<string, ForeignKeyInfo>();
+      for (const fk of fks ?? []) fkByName.set(fk.from, fk);
+      const keyHints = cols || fks ? { pk, fk: fkByName, readOnly } : undefined;
+      return { keyHints, constraintInfo: constraintsByEntity[tableName] };
+    },
+    [columnsByEntity, foreignKeysByEntity, constraintsByEntity],
+  );
 
   const resultKeyHints = useMemo<ColumnKeyHints | undefined>(() => {
     const tableName = result?.sourceTable;
@@ -3662,6 +3688,7 @@ function SqlPlaygroundInner() {
                   keyHints={resultKeyHints}
                   sourceTable={result?.sourceTable}
                   constraintInfo={resultConstraintInfo}
+                  tableMetaFor={tableMetaFor}
                   onDeleteRows={deleteRowsFromTable}
                   onUpdateRows={updateRowsInTable}
                   onDuplicateRow={duplicateRowInTable}

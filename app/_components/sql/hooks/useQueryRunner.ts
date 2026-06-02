@@ -17,6 +17,7 @@ import {
   isSingleSelectSql,
   hasLimitClause,
   bareTableSelectSource,
+  bareTableSelectSources,
 } from "../utils/sqlAnalysis";
 import {
   exportResultToCsv,
@@ -112,9 +113,11 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
       // Make a hand-typed full-table preview (`SELECT * FROM <table>`)
       // editable, just like opening the table from the sidebar — but only
       // for an actual table (not a view), so edits never fail on commit.
+      const isTable = (name: string) =>
+        useEngineStore.getState().tables.includes(name);
       if (!sourceTable) {
         const detected = bareTableSelectSource(trimmed, noComments);
-        if (detected && useEngineStore.getState().tables.includes(detected)) {
+        if (detected && isTable(detected)) {
           sourceTable = detected;
         }
       }
@@ -145,12 +148,17 @@ export function useQueryRunner(refs: SqlPlaygroundRefs) {
         } else {
           sets = await engine.execAll(trimmed);
         }
+        const sourceTables =
+          sets.length > 1
+            ? bareTableSelectSources(trimmed, isTable)
+            : [sourceTable ?? null];
         const elapsedMs = performance.now() - t0;
         setResultForTab(tabId, {
           sets,
           elapsedMs,
           source,
           sourceTable,
+          sourceTables,
           lazySql,
           lazyBaseSql,
           lazyTotalCount,

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  bareTableSelectSources,
   splitSqlStatements,
   statementAtCursor,
 } from "../app/_components/sql/utils/sqlAnalysis";
@@ -72,5 +73,46 @@ describe("statementAtCursor", () => {
   it("returns null for whitespace-only or empty SQL", () => {
     expect(statementAtCursor("   \n  ", 2)).toBeNull();
     expect(statementAtCursor("", 0)).toBeNull();
+  });
+});
+
+describe("bareTableSelectSources", () => {
+  const isTable = (name: string) =>
+    ["users", "cards", "orders"].includes(name);
+
+  it("detects an editable table per statement, aligned with sets", () => {
+    expect(
+      bareTableSelectSources(
+        "SELECT * FROM users LIMIT 10;\nSELECT * FROM cards;",
+        isTable,
+      ),
+    ).toEqual(["users", "cards"]);
+  });
+
+  it("yields null for non-bare or non-table statements (positional alignment)", () => {
+    // count(*) and an INSERT are not editable `SELECT *`s, but they keep their
+    // slot so the array still lines up with the engine's per-statement sets.
+    expect(
+      bareTableSelectSources(
+        "SELECT * FROM users;\nSELECT count(*) FROM cards;\nINSERT INTO orders DEFAULT VALUES;\nSELECT * FROM orders;",
+        isTable,
+      ),
+    ).toEqual(["users", null, null, "orders"]);
+  });
+
+  it("ignores leading comments and views / unknown tables", () => {
+    expect(
+      bareTableSelectSources(
+        "-- preview\nSELECT * FROM users;\nSELECT * FROM some_view;",
+        isTable,
+      ),
+    ).toEqual(["users", null]);
+  });
+
+  it("handles a single statement", () => {
+    expect(bareTableSelectSources("SELECT * FROM cards", isTable)).toEqual([
+      "cards",
+    ]);
+    expect(bareTableSelectSources("SELECT 1", isTable)).toEqual([null]);
   });
 });

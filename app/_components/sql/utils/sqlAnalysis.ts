@@ -45,6 +45,23 @@ export function bareTableSelectSource(
     : table;
 }
 
+/** Per-statement source table for a (possibly multi-statement) query, one
+ *  entry per statement in execution order — so it lines up positionally with
+ *  the `sets` array a multi-statement run produces (each engine yields one set,
+ *  possibly null, per statement). An entry is the bare-selected table name when
+ *  that statement is an editable `SELECT * FROM <table>` against a real table
+ *  (per `isTable`), otherwise null. Lets each result-set tab be edited against
+ *  its own table. */
+export function bareTableSelectSources(
+  sql: string,
+  isTable: (name: string) => boolean,
+): (string | null)[] {
+  return splitSqlStatements(sql).map((stmt) => {
+    const table = bareTableSelectSource(stmt.text);
+    return table && isTable(table) ? table : null;
+  });
+}
+
 /** A single top-level SQL statement with its offsets in the source string. */
 export interface SqlStatementRange {
   /** Trimmed statement text (no surrounding whitespace, no trailing `;`). */
