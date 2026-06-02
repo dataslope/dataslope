@@ -35,11 +35,11 @@ The course **content components are excellent**. Code blocks, challenge cards, m
 
 The problems are concentrated in **two areas that sit *around* the good content**:
 
-1. **Top-level navigation & discoverability is broken.** The `/learn` landing page — the destination of the homepage's primary "Browse Learn" CTA — contains **9 dead links** (`/learn/python`, `/learn/r`, … all 404) and its sidebar does **not list a single one of the 27 courses**. The only working course catalog lives at the site root `/`. A learner who follows the obvious path lands on broken links with no way to reach any course.
+1. **The `/learn` landing page contains dead links.** The `/learn` landing page — the destination of the homepage's primary "Browse Learn" CTA — contains **9 dead links** (`/learn/python`, `/learn/r`, … all 404). A learner who follows the obvious path and clicks one lands on a bare 404. (The course catalog lives at the site root `/`, which correctly lists all 27 courses, each linking to `/learn/<slug>`.)
 
 2. **A class of multiple-choice content bugs makes some questions unwinnable or misleading.** One Java question can never be answered correctly (no option is marked correct). Four questions contain two *verbatim-identical* options where only one is marked correct, so a learner who picks the identical-but-unmarked option is told they are wrong. ~270 explanations open with an affirmation ("Yes.", "Right.", "Exactly.") in violation of the project's own `AGENTS.md` rule — confusing when shown to a learner who answered incorrectly.
 
-Additionally, **every page emits two console errors** (a React `key` warning from the sidebar and a hydration mismatch), and author-facing component-showcase pages (`code-blocks-*`, `challenge-cards-*`, …) occupy the learner sidebar in place of the courses.
+Additionally, **every page emits two console errors** (a React `key` warning from the sidebar and a hydration mismatch).
 
 None of these require touching the content components themselves — they are navigation wiring, a finite set of content fixes, and rendering hygiene. The phased plan in §6 is ordered so a coding agent can resolve "learner gets stranded / misled" first, then discoverability, then polish.
 
@@ -63,19 +63,17 @@ None of these require touching the content components themselves — they are na
 | # | Severity | Area | Finding | Evidence |
 |---|---|---|---|---|
 | 1 | 🔴 P0 | Nav | All 9 "Languages" links on `/learn` landing 404 (`/learn/python`, `/learn/r`, …) | `06-broken-link-404.png` |
-| 2 | 🔴 P0 | Nav | 0 of 27 courses appear in the `/learn` sidebar / page tree | `03-sidebar-full.png`, `01-learn-index.png` |
-| 3 | 🔴 P0 | MCQ | Java "role of `main`" question has **no** correct option marked — unwinnable | `your-first-java-program.mdx:121` |
-| 4 | 🔴 P0 | MCQ | 4 questions have two **identical** options, only one marked correct | `13-mcq-submitted-explanations.png` |
-| 5 | 🟠 P1 | Rendering | React duplicate-`key` warning in `Sidebar` on **every** page | `interact-log.txt` |
-| 6 | 🟠 P1 | Rendering | Hydration mismatch on **every** page | `interact-log.txt` |
-| 7 | 🟠 P1 | Nav | Bare 404 (no header/nav/links) — no recovery path | `06-broken-link-404.png` |
-| 8 | 🟡 P2 | MCQ | ~270 explanations open with an affirmation (violates `AGENTS.md`) | `mcq-lint.mjs` output |
-| 9 | 🟡 P2 | Nav | Author-facing showcase pages (`code-blocks-*`, etc.) live in the learner sidebar | `03-sidebar-full.png` |
-| 10 | 🟡 P2 | Consistency | `code-blocks-c.mdx` title uses a hyphen vs. em-dash on all 8 siblings | `code-blocks-c.mdx:2` |
-| 11 | 🟠 P1 | Loading | First-run cold boot (~10.7 s for Python) has weak progress affordance | `40-python-codeblock-after.png` |
-| 12 | 🔵 P3 | Curriculum | SQL/viz courses have ~0 challenge cards (vs. 60+ in others) | per-course table, §4.8 |
-| 13 | 🔵 P3 | Curriculum | 7/27 courses open with a non-interactive (history/prose) chapter | §4.9 |
-| 14 | 🔵 P3 | Feature | No progress tracking / chapter completion / resume | §4.9 |
+| 2 | 🔴 P0 | MCQ | Java "role of `main`" question has **no** correct option marked — unwinnable | `your-first-java-program.mdx:121` |
+| 3 | 🔴 P0 | MCQ | 4 questions have two **identical** options, only one marked correct | `13-mcq-submitted-explanations.png` |
+| 4 | 🟠 P1 | Rendering | React duplicate-`key` warning in `Sidebar` on **every** page | `interact-log.txt` |
+| 5 | 🟠 P1 | Rendering | Hydration mismatch on **every** page | `interact-log.txt` |
+| 6 | 🟠 P1 | Nav | Bare 404 (no header/nav/links) — no recovery path | `06-broken-link-404.png` |
+| 7 | 🟡 P2 | MCQ | ~270 explanations open with an affirmation (violates `AGENTS.md`) | `mcq-lint.mjs` output |
+| 8 | 🟡 P2 | Consistency | `code-blocks-c.mdx` title uses a hyphen vs. em-dash on all 8 siblings | `code-blocks-c.mdx:2` |
+| 9 | 🟠 P1 | Loading | First-run cold boot (~10.7 s for Python) has weak progress affordance | `40-python-codeblock-after.png` |
+| 10 | 🔵 P3 | Curriculum | SQL/viz courses have ~0 challenge cards (vs. 60+ in others) | per-course table, §4.8 |
+| 11 | 🔵 P3 | Curriculum | 7/27 courses open with a non-interactive (history/prose) chapter | §4.9 |
+| 12 | 🔵 P3 | Feature | No progress tracking / chapter completion / resume | §4.9 |
 
 ---
 
@@ -83,19 +81,17 @@ None of these require touching the content components themselves — they are na
 
 ### 4.1 Navigation & information architecture
 
-This is the highest-impact cluster. There are effectively **two competing front doors** that don't agree with each other.
+This is the highest-impact cluster: the `/learn` landing page ships dead links.
 
 **The site root `/` is a real catalog (good).** It lists all 27 courses alphabetically, each linking correctly to `/learn/<slug>` (e.g. `/learn/python-basics`). See `05-home-catalog.png`. Source: `app/page.tsx` reads each course's `meta.json` and includes those with `root: true` (all 27 qualify).
 
-**The `/learn` landing page is a developer explainer, not a catalog — and it is broken.**
+**The `/learn` landing page is a developer explainer, and its "Languages" list is broken.**
 
 - 🔴 **#1 — Nine dead links.** `content/learn/index.mdx` has a "Languages" list linking to `/learn/python`, `/learn/r`, `/learn/javascript`, `/learn/typescript`, `/learn/php`, `/learn/c`, `/learn/cpp`, `/learn/java`, `/learn/csharp`. **All nine return HTTP 404** (verified via direct requests). None of those slugs exist — the demo pages are `code-blocks-<lang>` and the courses are e.g. `python-basics`. A learner clicking "Python" on the landing page hits a dead end.
-- 🔴 **#2 — Courses are absent from the `/learn` nav.** The top-level `content/learn/meta.json` `pages` array lists **only** the demo/showcase pages (`code-blocks-*`, `sql-code-blocks-*`, `challenge-cards-*`, `sql-challenge-cards-*`, `multiple-choice`, `mermaid-test`) and contains a `"---"` separator 5 times. **None of the 27 course folders are listed**, and the rendered sidebar confirms it: 36 sidebar links, 0 of which point to a real course (`03-sidebar-full.png`). The courses are reachable *only* by typing a direct URL or arriving from the `/` catalog.
-- 🟠 **#7 — No recovery from 404.** The dead links land on a bare Next.js `404 — This page could not be found.` with no header, no nav, no link back to `/learn` or the catalog (`06-broken-link-404.png`). The browser back button is the only escape.
-- 🟡 **#9 — Showcase pages in the learner sidebar.** The component-demo pages (`code-blocks-python`, `challenge-cards-java`, `mermaid-test`, `multiple-choice`, …) are author/QA references but are the *only* thing in the `/learn` sidebar, so learners see "Code Blocks — Python", "Challenge Cards — R", etc. instead of courses.
+- 🟠 **#6 — No recovery from 404.** The dead links land on a bare Next.js `404 — This page could not be found.` with no header, no nav, no link back to `/learn` or the catalog (`06-broken-link-404.png`). The browser back button is the only escape.
 - 🟡 **No cross-course navigation.** On a course page the sidebar correctly shows that course's chapters (`04-course-sidebar.png`), but there is no "back to all courses", breadcrumb, or link to any other course. Once inside a course, the catalog is unreachable without editing the URL.
 
-**Net learner experience:** Homepage → "Browse Learn" → `/learn` → broken links + no course list. The good catalog at `/` is easy to miss, and the `/learn` page actively misleads.
+**Net learner experience:** Homepage → "Browse Learn" → `/learn`, where the "Languages" links are dead ends. The working catalog at `/` lists every course and is the intended front door.
 
 ---
 
@@ -103,12 +99,12 @@ This is the highest-impact cluster. There are effectively **two competing front 
 
 Both errors below fired on **every one of the 24 pages** walked (full text captured in `interact-log.txt`).
 
-- 🟠 **#5 — Duplicate React `key` warning.**
+- 🟠 **#4 — Duplicate React `key` warning.**
   > `Each child in a list should have a unique "key" prop. … Check the render method of `Sidebar`. It was passed a child from `LearnLayout`.`
 
   `app/learn/layout.tsx` passes `tree={source.pageTree}` and `sidebar={{ banner: … }}` into Fumadocs's `DocsLayout`. The most likely trigger is the **repeated `"---"` separator nodes** in the top-level `meta.json` (5 of them) producing sidebar children that share a non-unique key. Worth confirming against the Fumadocs version (`fumadocs-ui@^16.8.5`).
 
-- 🟠 **#6 — Hydration mismatch.**
+- 🟠 **#5 — Hydration mismatch.**
   > `A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up.`
 
   Server-rendered markup diverges from the client on first paint (candidates: theme class via `next-themes`/`RootProvider`, or sidebar active/expanded state). On its own it's a correctness smell; combined with #5 it means the learn route never has a clean console, which masks real regressions.
@@ -121,10 +117,10 @@ These are dev-mode warnings but indicate real issues (a duplicate key can drop/d
 
 Static analysis parsed **2,354** `<MultipleChoice>` blocks. The following are unambiguous bugs.
 
-- 🔴 **#3 — Unwinnable question (no correct answer).**
+- 🔴 **#2 — Unwinnable question (no correct answer).**
   `content/learn/java-programming-for-beginners/your-first-java-program.mdx:121` — *"What is the role of the `main` method in a Java program?"*. The intended answer ("It is the method called automatically by the JVM when the program starts") is **missing its `[o]` marker** (its explanation even reads "`main` is the agreed-upon entry point"). No option is flagged correct, so the card returns "Not quite — try again" for every selection. The learner can never pass it.
 
-- 🔴 **#4 — Two identical options, only one marked correct (4 questions).** In each, two choices are *verbatim* identical but only the second carries `[o]`. A learner who selects the first (identical) option is marked **wrong for choosing the correct answer**. `13-mcq-submitted-explanations.png` shows the effect: two identical `print("Hello", end="")` rows, one green-correct and one not.
+- 🔴 **#3 — Two identical options, only one marked correct (4 questions).** In each, two choices are *verbatim* identical but only the second carries `[o]`. A learner who selects the first (identical) option is marked **wrong for choosing the correct answer**. `13-mcq-submitted-explanations.png` shows the effect: two identical `print("Hello", end="")` rows, one green-correct and one not.
 
   | File:line | Duplicated option |
   |---|---|
@@ -143,7 +139,7 @@ Static analysis parsed **2,354** `<MultipleChoice>` blocks. The following are un
 
 ### 4.4 Multiple-choice content polish
 
-- 🟡 **#8 — Affirmative-opening explanations (~270 instances, 112 files).** `AGENTS.md` explicitly forbids starting a choice explanation with an affirmation because explanations render for **all** choices after submit — so a learner who answered *wrong* still sees "Yes." / "Right." / "Exactly." under the correct option, which reads as false praise. The linter found:
+- 🟡 **#7 — Affirmative-opening explanations (~270 instances, 112 files).** `AGENTS.md` explicitly forbids starting a choice explanation with an affirmation because explanations render for **all** choices after submit — so a learner who answered *wrong* still sees "Yes." / "Right." / "Exactly." under the correct option, which reads as false praise. The linter found:
 
   | Opening word | Count |
   |---|---|
@@ -166,7 +162,7 @@ Code execution works and the output UI is clean (`30/31-js-codeblock-*.png`, `40
 
 - ✅ JavaScript (native) ran in ~**280 ms**; output rendered correctly.
 - ✅ Python (Pyodide, CDN) cold-boot + first run completed in ~**10.7 s** and printed `Hello, World!`. Subsequent runs reuse the shared worker.
-- 🟠 **#11 — Weak first-run affordance for slow runtimes.** A learner's *first* Run on a Python page is a ~10 s wait (heavier runtimes — WebR, CheerpJ/Java, .NET/C#, browsercc/C/C++ — are typically longer). The Run button shows "Running…", but there's no progress, no size/time expectation, and nothing communicating "this first run downloads the runtime; later runs are instant." For a learner this can read as "broken." Recommend: a determinate/àindeterminate boot indicator with copy like *"Downloading the Python runtime (first run only)…"*, and consider warming the shared runtime when the first code block scrolls into view.
+- 🟠 **#9 — Weak first-run affordance for slow runtimes.** A learner's *first* Run on a Python page is a ~10 s wait (heavier runtimes — WebR, CheerpJ/Java, .NET/C#, browsercc/C/C++ — are typically longer). The Run button shows "Running…", but there's no progress, no size/time expectation, and nothing communicating "this first run downloads the runtime; later runs are instant." For a learner this can read as "broken." Recommend: a determinate/àindeterminate boot indicator with copy like *"Downloading the Python runtime (first run only)…"*, and consider warming the shared runtime when the first code block scrolls into view.
 - 🟡 The `<CodeBlock>` Run button has no stable `data-testid`/`aria-label` (it's a class-hashed button whose accessible name is "RunCtrl+↵"). Minor, but it complicates automated testing and screen-reader labeling vs. the challenge card's `data-testid="challenge-submit"`.
 
 ---
@@ -197,7 +193,7 @@ Among the strongest parts of the platform. Verified end-to-end by driving the ca
 ### 4.8 SQL components & challenge-coverage gap
 
 - ✅ SQLite code blocks execute and return real, paginated result grids with row counts and timing (`51-sql-after-run.png`), including a 10,000-row infinite-scroll example.
-- 🔵 **#12 — SQL & visualization courses barely use challenge cards.** Despite a working `<SqlChallengeCard>` component, the actual SQL/viz *courses* are almost entirely code-blocks + MCQs with no graded practice:
+- 🔵 **#10 — SQL & visualization courses barely use challenge cards.** Despite a working `<SqlChallengeCard>` component, the actual SQL/viz *courses* are almost entirely code-blocks + MCQs with no graded practice:
 
   | Course | Code blocks | Challenges | MCQs |
   |---|--:|--:|--:|
@@ -214,8 +210,8 @@ Among the strongest parts of the platform. Verified end-to-end by driving the ca
 
 ### 4.9 Curriculum & pedagogy
 
-- 🔵 **#13 — History-first openings (7/27 courses).** Seven courses open with a chapter that has **zero** executable components (e.g. `beginners-javascript/story-of-programming`, `data-analysis-python-pandas/history-of-data`, `from-zero-to-cpp/a-brief-history`, `practical-r-for-beginners/the-age-of-data`). Narrative framing is valuable, but a learner who came to *write code* doesn't touch any for one or more chapters. Consider an early "try it" hook even inside narrative chapters (a tiny runnable snippet or a 1-question check).
-- 🔵 **#14 — No progress/completion tracking.** There's no per-chapter "done" state, no course progress bar, no "resume where you left off." Editor buffers persist per-block (good), but a learner navigating 28+ chapters has no sense of progress. (`zustand` + `localStorage` are already in the stack.)
+- 🔵 **#11 — History-first openings (7/27 courses).** Seven courses open with a chapter that has **zero** executable components (e.g. `beginners-javascript/story-of-programming`, `data-analysis-python-pandas/history-of-data`, `from-zero-to-cpp/a-brief-history`, `practical-r-for-beginners/the-age-of-data`). Narrative framing is valuable, but a learner who came to *write code* doesn't touch any for one or more chapters. Consider an early "try it" hook even inside narrative chapters (a tiny runnable snippet or a 1-question check).
+- 🔵 **#12 — No progress/completion tracking.** There's no per-chapter "done" state, no course progress bar, no "resume where you left off." Editor buffers persist per-block (good), but a learner navigating 28+ chapters has no sense of progress. (`zustand` + `localStorage` are already in the stack.)
 - 🔵 Course landing pages (`/learn/<course>`) are thin indexes; a syllabus with chapter count, estimated time, and prerequisites would orient learners.
 - 🟡 Component density varies enormously (e.g. `python-basics` ≈ 13 code blocks/page vs. narrative SQL/viz chapters with mostly prose+Mermaid+MCQ). Not wrong, but worth a consistency pass on "every chapter ends with a check / a challenge."
 
@@ -250,7 +246,7 @@ So the rewrite phases don't accidentally regress strengths:
 - **Challenge grading** — pass/fail banners, expected-vs-got diffs, and the solution modal are excellent (`41/42/43`).
 - **Real in-browser execution** — JS/TS native, Pyodide/WebR/SQLite/etc. from CDN; shared worker reuse across a page.
 - **Within-course navigation** — sidebar chapter tree + on-page TOC are clean.
-- **The `/` catalog** — a good, complete list of all 27 courses (it just isn't wired to `/learn`).
+- **The `/` catalog** — a good, complete list of all 27 courses, each linking to `/learn/<slug>`.
 - **Mobile** — the heavy interactive components degrade gracefully.
 
 ---
@@ -263,7 +259,7 @@ Each phase is self-contained and can be handed to a coding agent independently, 
 
 **Goal:** no dead links from the learn entry point; every MCQ is winnable and has no contradictory options.
 
-1. **Fix the 9 broken landing links.** In `content/learn/index.mdx`, repoint the "Languages" list from `/learn/<lang>` to the correct destinations — either the language *courses* (e.g. `/learn/python-basics`, `/learn/practical-r-for-beginners`, `/learn/beginners-javascript`, …) or the demo pages (`/learn/code-blocks-<lang>`), per intent. Verify every link returns 200.
+1. **Remove the 9 broken landing links.** In `content/learn/index.mdx`, drop the broken `/learn/<lang>` links from the "Languages" list (the catalog at `/` is the front door, so the list now reads as a plain inventory of supported runtimes). Two further dead language links elsewhere are repointed to real targets: `code-blocks-typescript.mdx` → `/learn/code-blocks-javascript`, and `beginners-javascript/next-steps.mdx` → `/learn/typescript-from-scratch`. Verify every link returns 200.
 2. **Fix the unwinnable Java MCQ.** `your-first-java-program.mdx:125` — add the `[o]` marker to *"It is the method called automatically by the JVM when the program starts."*
 3. **Fix the 4 duplicate-option MCQs** (replace the unmarked duplicate with a real distractor):
    - `python-basics/hello-world.mdx:258` (also remove the misleading *"This works! But there is another correct answer too."* and reword the now-unique distractor)
@@ -275,19 +271,17 @@ Each phase is self-contained and can be handed to a coding agent independently, 
 
 ---
 
-### Phase 2 — Information architecture & discoverability 🟠
+### Phase 2 — Navigation recovery & cross-linking 🟠
 
-**Goal:** a learner arriving at `/learn` can see and reach all 27 courses, and never lands in a bare 404.
+**Goal:** a learner never lands in a bare 404, and can always get back to the course catalog at `/`.
 
-1. **Surface the courses in `/learn`.** Pick one (recommend a + b):
-   a. Replace the `/learn` landing body with a **course catalog** (reuse the `app/page.tsx` catalog logic / `meta.json root:true`), grouped by topic or language.
-   b. Add the course folders to the learn **sidebar/page tree** (extend top-level `meta.json` `pages`, or configure the `source` loader to include course roots) so the sidebar lists courses, not just demo pages.
-2. **Add cross-course navigation.** A persistent "← All courses" / breadcrumb in the course sidebar banner (the `SidebarCourseTitle` slot is a natural home) linking back to the catalog.
-3. **Custom 404.** Add `app/not-found.tsx` (or a learn-scoped `not-found`) with the Dataslope header and links to the catalog + `/learn`.
-4. **Decide on showcase-page visibility.** The component-showcase pages (`code-blocks-*`, `challenge-cards-*`, `multiple-choice`, `mermaid-test`) currently occupy the learner sidebar in place of the courses — if they're author docs, move them to an unlisted/`/dev` area or gate them so courses lead.
-5. **Make `/learn` self-sufficient.** Ensure `/learn` either *is* the course catalog or links to it prominently, so a learner who lands on `/learn` can reach any course without leaving the route.
+> **Intentional, not addressed here:** the course catalog living at the site root `/` (rather than in the `/learn` sidebar) and the component-showcase pages (`code-blocks-*`, `challenge-cards-*`, `multiple-choice`, `mermaid-test`) appearing in the `/learn` sidebar are deliberate choices during active development.
 
-**Acceptance:** from `/learn`, all 27 courses are reachable in ≤1 click; every course page has a one-click path back to the catalog; hitting a nonexistent `/learn/*` URL shows a branded page with recovery links.
+1. **Add cross-course navigation.** A persistent "← All courses" link / breadcrumb in the course sidebar banner (the `SidebarCourseTitle` slot is a natural home) linking back to the catalog at `/`.
+2. **Custom 404.** Add `app/not-found.tsx` (or a learn-scoped `not-found`) with the Dataslope header and links to the catalog + `/learn`, so a mistyped or stale `/learn/*` URL has a recovery path.
+3. **Link `/learn` → catalog.** The `/learn` landing is a developer explainer; add a prominent link from it to the catalog at `/` so a learner who lands there can reach the courses.
+
+**Acceptance:** every course page has a one-click path back to the catalog; hitting a nonexistent `/learn/*` URL shows a branded page with recovery links.
 
 ---
 
@@ -357,7 +351,7 @@ Each phase is self-contained and can be handed to a coding agent independently, 
 
 | File | Shows |
 |---|---|
-| `01-learn-index.png`, `03-sidebar-full.png` | `/learn` landing + sidebar (no courses listed) |
+| `01-learn-index.png`, `03-sidebar-full.png` | `/learn` landing + sidebar |
 | `04-course-sidebar.png` | Within-course chapter sidebar (works) |
 | `05-home-catalog.png` | The course catalog at `/` (lists all 27 courses) |
 | `06-broken-link-404.png` | Bare 404 from a dead `/learn/python` link |

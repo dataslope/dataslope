@@ -345,8 +345,8 @@ interface Pet {
 
 Which statement is **true** in TypeScript's structural type system?
 
-- \`Dog\` is assignable to \`Pet\` because it has all required properties (and more).
-  > A \`Dog\` has everything a \`Pet\` needs (\`name\`), plus extra (\`breed\`). Structural typing allows extra properties.
+- Both \`Dog\` and \`Pet\` are assignable to each other because they share the \`name\` property.
+  > Sharing one property isn't enough for mutual assignability — \`Pet\` has no \`breed\`, so it can't be used where a \`Dog\` is required.
 - [o] \`Dog\` is assignable to \`Pet\` because it has all required properties (and more).
   > A \`Dog\` has everything a \`Pet\` needs (\`name\`), plus extra (\`breed\`). Structural typing allows extra properties.
 - \`Pet\` is assignable to \`Dog\` because \`Dog\` is more specific.
