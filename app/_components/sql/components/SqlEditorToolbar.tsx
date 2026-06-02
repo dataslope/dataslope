@@ -135,24 +135,20 @@ export function SqlEditorToolbar({
             disabled={disabled}
             mainLabel="Run Selection"
             onMain={onRunSelection}
-            items={[
-              { label: "Run Selection", kbd: runKbd, onClick: onRunSelection },
-              { label: "Run All", kbd: runAllKbd, onClick: onRunAll },
-            ]}
+            items={[{ label: "Run All", kbd: runAllKbd, onClick: onRunAll }]}
           />
         ) : hasMultipleStatements ? (
           <RunSplit
             running={running}
             disabled={disabled}
-            mainLabel="Run statement"
-            onMain={onRunStatement}
+            mainLabel="Run All"
+            onMain={onRunAll}
             items={[
               {
                 label: "Run statement at cursor",
                 kbd: runKbd,
                 onClick: onRunStatement,
               },
-              { label: "Run All", kbd: runAllKbd, onClick: onRunAll },
             ]}
           />
         ) : (
