@@ -70,6 +70,9 @@ export interface ColumnKeyHints {
    *  result grid marks them read-only so an edit can't be started that would
    *  only fail at commit time. */
   readOnly?: Set<string>;
+  /** Enum-typed columns → their allowed labels (in declaration order). The
+   *  result grid renders an inline dropdown instead of a free-text editor. */
+  enums?: Map<string, string[]>;
 }
 
 export type ResultSetExportScope = "page" | "all";

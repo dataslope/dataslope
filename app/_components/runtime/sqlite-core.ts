@@ -59,6 +59,11 @@ export interface TableColumnInfo {
   /** For generated (computed) columns: the generation expression and
    *  storage type. `null` for ordinary columns. */
   generated: { expression: string; storageType: "VIRTUAL" | "STORED" } | null;
+  /** Allowed labels for an enum-typed column (Postgres `enum`, DuckDB
+   *  `ENUM(...)`), in declaration order. `null`/absent for non-enum
+   *  columns and for SQLite (which has no native enum type). Drives the
+   *  result grid's inline enum dropdown. */
+  enumValues?: string[] | null;
 }
 
 /** Unique / primary-key constraint info for a single column, used to

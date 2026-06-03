@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   splitDuckDbStatements,
   toBindParam,
+  parseDuckDbEnumValues,
 } from "../app/_components/runtime/duckdb";
 
 describe("splitDuckDbStatements", () => {
@@ -82,5 +83,47 @@ describe("toBindParam (UX-17 prepared-statement binding)", () => {
 
   it("falls back to a string form for other objects/arrays", () => {
     expect(toBindParam([1, 2, 3])).toBe("1,2,3");
+  });
+});
+
+describe("parseDuckDbEnumValues", () => {
+  it("parses a multi-label enum definition", () => {
+    expect(parseDuckDbEnumValues("ENUM('sad', 'ok', 'happy')")).toEqual([
+      "sad",
+      "ok",
+      "happy",
+    ]);
+  });
+
+  it("parses a single-label enum", () => {
+    expect(parseDuckDbEnumValues("ENUM('only')")).toEqual(["only"]);
+  });
+
+  it("is case-insensitive on the ENUM keyword", () => {
+    expect(parseDuckDbEnumValues("enum('a','b')")).toEqual(["a", "b"]);
+  });
+
+  it("tolerates irregular whitespace", () => {
+    expect(parseDuckDbEnumValues("ENUM(  'a' ,  'b'  )")).toEqual(["a", "b"]);
+  });
+
+  it("unescapes doubled single quotes in a label", () => {
+    expect(parseDuckDbEnumValues("ENUM('O''Brien', 'b')")).toEqual([
+      "O'Brien",
+      "b",
+    ]);
+  });
+
+  it("returns null for non-enum type strings", () => {
+    expect(parseDuckDbEnumValues("INTEGER")).toBeNull();
+    expect(parseDuckDbEnumValues("VARCHAR")).toBeNull();
+    expect(parseDuckDbEnumValues("STRUCT(a INT)")).toBeNull();
+  });
+
+  it("returns null for empty / missing input", () => {
+    expect(parseDuckDbEnumValues("")).toBeNull();
+    expect(parseDuckDbEnumValues(null)).toBeNull();
+    expect(parseDuckDbEnumValues(undefined)).toBeNull();
+    expect(parseDuckDbEnumValues("ENUM()")).toBeNull();
   });
 });

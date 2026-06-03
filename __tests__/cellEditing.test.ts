@@ -9,7 +9,9 @@ import {
   formatBytesHex,
   bytesToBase64,
   reversibleCellValue,
+  enumHintsFromColumns,
 } from "../app/_components/sql/utils/cellEditing";
+import type { TableColumnInfo } from "../app/_components/runtime/sqlite";
 import {
   formatCellValue,
   parseCellEditValue,
@@ -306,5 +308,47 @@ describe("formatCellValue array & date display", () => {
   it("still reports BLOB size and NULL", () => {
     expect(formatCellValue(new Uint8Array([1, 2, 3]))).toBe("BLOB (3 bytes)");
     expect(formatCellValue(null)).toBe("NULL");
+  });
+});
+
+describe("enumHintsFromColumns", () => {
+  const col = (
+    name: string,
+    enumValues?: string[] | null,
+  ): TableColumnInfo => ({
+    cid: 0,
+    name,
+    type: enumValues ? "mood" : "text",
+    notNull: false,
+    defaultValue: null,
+    pk: 0,
+    generated: null,
+    enumValues,
+  });
+
+  it("maps only the columns that carry enum labels", () => {
+    const map = enumHintsFromColumns([
+      col("id"),
+      col("status", ["open", "closed"]),
+      col("note"),
+      col("mood", ["sad", "ok", "happy"]),
+    ]);
+    expect(map.size).toBe(2);
+    expect(map.get("status")).toEqual(["open", "closed"]);
+    expect(map.get("mood")).toEqual(["sad", "ok", "happy"]);
+    expect(map.has("id")).toBe(false);
+  });
+
+  it("skips null / undefined / empty enum lists", () => {
+    const map = enumHintsFromColumns([
+      col("a", null),
+      col("b", undefined),
+      col("c", []),
+    ]);
+    expect(map.size).toBe(0);
+  });
+
+  it("returns an empty map for no columns", () => {
+    expect(enumHintsFromColumns([]).size).toBe(0);
   });
 });

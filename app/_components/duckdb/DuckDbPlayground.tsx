@@ -176,6 +176,7 @@ import {
   persistAsync,
 } from "../sql/utils/persistedStorage";
 import { pushTabHistory } from "../sql/utils/tabUtils";
+import { enumHintsFromColumns } from "../sql/utils/cellEditing";
 import { useSqlTabManagement } from "../sql/hooks/useSqlTabManagement";
 import { useSchemaTree } from "../sql/hooks/useSchemaTree";
 import type {
@@ -2690,6 +2691,7 @@ function DuckDbPlaygroundInner() {
           readOnly: new Set(
             cols.filter((col) => col.generated).map((col) => col.name),
           ),
+          enums: enumHintsFromColumns(cols),
         },
       };
     },
@@ -2707,6 +2709,7 @@ function DuckDbPlaygroundInner() {
       readOnly: new Set(
         cols.filter((col) => col.generated).map((col) => col.name),
       ),
+      enums: enumHintsFromColumns(cols),
     };
   }, [result, columnsByEntity, foreignKeysByEntity]);
 

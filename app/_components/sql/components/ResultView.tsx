@@ -2689,7 +2689,58 @@ export function ResultTableBody({
               }
               const isNumeric =
                 rawValue !== null && typeof rawValue === "number";
+              const enumValues = keyHints?.enums?.get(c);
               if (isActiveEdit) {
+                // Enum columns get a dropdown of their declared labels instead
+                // of a free-text editor. The committed value is the chosen
+                // label (a plain string) — the same value the text editor would
+                // produce — so the engine casts it to the enum type on write.
+                if (enumValues && enumValues.length > 0) {
+                  const cur = hasPendingEdit ? pendingValue : rawValue;
+                  const curStr =
+                    cur === null || cur === undefined ? "" : String(cur);
+                  const known = enumValues.includes(curStr);
+                  return (
+                    <select
+                      className="sql-cell-input sql-cell-select"
+                      value={curStr}
+                      autoFocus
+                      aria-label={`Edit ${c}`}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        const next = v === "" ? null : v;
+                        if (next !== rawValue) {
+                          onSetPendingEdit(cellKey, next);
+                        } else if (hasPendingEdit) {
+                          onClearPendingEdit(cellKey);
+                        }
+                      }}
+                      onBlur={() => onSetActiveEditCell(null)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Escape") {
+                          e.stopPropagation();
+                          onClearPendingEdit(cellKey);
+                          onSetActiveEditCell(null);
+                        }
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      onDoubleClick={(e) => e.stopPropagation()}
+                    >
+                      {!known && (
+                        <option value="">
+                          {cur === null || cur === undefined
+                            ? "(NULL)"
+                            : curStr}
+                        </option>
+                      )}
+                      {enumValues.map((v) => (
+                        <option key={v} value={v}>
+                          {v}
+                        </option>
+                      ))}
+                    </select>
+                  );
+                }
                 // Date/time columns get a native picker when the stored value
                 // is a recognizable date string. The committed value preserves
                 // the original's exact format (separator, fractional seconds,

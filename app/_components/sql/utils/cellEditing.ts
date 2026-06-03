@@ -15,6 +15,23 @@
  *  timezone arithmetic is performed, which is the usual source of off-by-an-
  *  hour bugs. */
 
+import type { TableColumnInfo } from "../../runtime/sqlite";
+
+/** Build the enum-column → allowed-labels map for `ColumnKeyHints` from a
+ *  table's introspected columns. Columns without enum metadata (every SQLite
+ *  column, and any non-enum Postgres/DuckDB column) are skipped. */
+export function enumHintsFromColumns(
+  cols: readonly TableColumnInfo[],
+): Map<string, string[]> {
+  const m = new Map<string, string[]>();
+  for (const col of cols) {
+    if (col.enumValues && col.enumValues.length > 0) {
+      m.set(col.name, col.enumValues);
+    }
+  }
+  return m;
+}
+
 /** The kind of inline editor a column should use, derived from its SQL type. */
 export type CellEditorKind =
   | "boolean"

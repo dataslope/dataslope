@@ -235,6 +235,44 @@ export function toBindParam(value: unknown): unknown {
   return value;
 }
 
+/** Parse the allowed labels out of a DuckDB enum `data_type` string.
+ *  `duckdb_columns()` reports an enum column's type as the full inline
+ *  definition, e.g. `ENUM('sad', 'ok', 'happy')`. Labels are single-quoted
+ *  with `''` escaping an embedded quote. Returns the labels in order, or
+ *  `null` when the string isn't an enum definition (the common case). */
+export function parseDuckDbEnumValues(
+  dataType: string | null | undefined,
+): string[] | null {
+  if (!dataType) return null;
+  const m = /^enum\s*\((.*)\)\s*$/is.exec(dataType.trim());
+  if (!m) return null;
+  const body = m[1];
+  const values: string[] = [];
+  let i = 0;
+  while (i < body.length) {
+    while (i < body.length && /[\s,]/.test(body[i])) i++; // skip separators
+    if (i >= body.length) break;
+    if (body[i] !== "'") return null; // malformed — bail rather than guess
+    i++; // opening quote
+    let label = "";
+    while (i < body.length) {
+      if (body[i] === "'") {
+        if (body[i + 1] === "'") {
+          label += "'";
+          i += 2;
+          continue;
+        }
+        i++; // closing quote
+        break;
+      }
+      label += body[i];
+      i++;
+    }
+    values.push(label);
+  }
+  return values.length > 0 ? values : null;
+}
+
 function arrowToQueryExecResult(
   table: DuckDbArrowTable,
 ): (QueryExecResult & { columnTypes?: string[] }) | null {
@@ -1161,16 +1199,18 @@ export async function createDuckDbEngine(
         const def = row[4];
         const defStr = def == null ? null : String(def);
         const isGenerated = false; // duckdb_columns() does not surface generation_expression in all builds
+        const dataType = String(row[2] ?? "");
         return {
           cid: Number(row[0]),
           name: colName,
-          type: String(row[2] ?? ""),
+          type: dataType,
           notNull: String(row[3]).toLowerCase() === "false",
           defaultValue: defStr,
           pk: pkIndex >= 0 ? pkIndex + 1 : 0,
           generated: isGenerated
             ? { expression: "", storageType: "STORED" as const }
             : null,
+          enumValues: parseDuckDbEnumValues(dataType),
         };
       });
     },
