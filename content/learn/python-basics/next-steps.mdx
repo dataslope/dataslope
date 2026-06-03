@@ -115,9 +115,8 @@ Python dominates backend web development. The big three:
 - **[Flask](https://flask.palletsprojects.com/)** — Tiny, minimal, flexible. Great for small services and learning.
 - **[Django](https://www.djangoproject.com/)** — Full-stack framework with batteries included: ORM, admin panel, auth, forms, migrations. Powers Instagram, Spotify, and countless others.
 
-<CodeBlock
-  adapter="python"
-  starterCode={`# FastAPI example (install with: pip install fastapi uvicorn)
+```python
+# FastAPI example (install with: pip install fastapi uvicorn)
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -134,8 +133,7 @@ def read_item(item_id: int, q: str = None):
 
 
 # Run with: uvicorn main:app --reload
-`}
-/>
+```
 
 ### Data science and machine learning
 
@@ -178,17 +176,15 @@ Python excels at gluing systems together:
 - **[Click](https://click.palletsprojects.com/)** / **[Typer](https://typer.tiangolo.com/)** — Building CLI tools.
 - **[schedule](https://schedule.readthedocs.io/)** / **[APScheduler](https://apscheduler.readthedocs.io/)** — Task scheduling.
 
-<CodeBlock
-  adapter="python"
-  starterCode={`# Example: fetch JSON from an API
+```python
+# Example: fetch JSON from an API
 import requests
 
 response = requests.get("https://api.github.com/users/github")
 data = response.json()
 print(f"GitHub user: {data['login']}")
 print(f"Public repos: {data['public_repos']}")
-`}
-/>
+```
 
 ### Packaging and distribution
 
