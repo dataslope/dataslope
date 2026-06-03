@@ -4,7 +4,7 @@
 **Purpose:** A curated, license-verified catalogue of small "evergreen" datasets that DataSlope can **re-host in a public GitHub repo** and use across its courses (Pandas, data visualization, scientific computing, statistics, machine learning, NLP, time series, R, and SQL).
 **Special focus:** multi-table relational datasets for the SQL courses.
 
-**Methodology:** Five parallel research agents fanned out across the web; every license claim was checked against a primary source (the actual `LICENSE` file, dataset page, or terms-of-use page), not from memory. The nine most load-bearing claims (Chinook, Sakila, Northwind, UCI, Palmer Penguins, FiveThirtyEight, seaborn-data, diamonds→Zenodo, SILSO) were then independently re-verified by hand. **A second pass (§14–§15)** added ~50 more *standalone* datasets — from Kaggle, a broader UCI sweep, the Hugging Face Hub, government/institutional portals, and data hubs — under the same discipline (MovieLens's non-commercial terms, `banking77`'s CC BY 4.0, and Natural Earth's public-domain status were hand-checked). A third pass (§16) catalogues **scraped / legally gray-area** datasets — *for awareness only* — each with its specific risk and a clean substitute. A fourth pass (§17) adds ~90 more real-world datasets browsed from GitHub, museums/libraries, sports & science sites, and civic/transit portals. A fifth pass (§18) adds ~70 more **English-language** datasets across US-federal, finance, health, text/legal, and computer-vision sources. A sixth pass (§19) adds ~70 more English datasets — reference/lookup tables, US state & city portals, English-speaking-country government data, survey/elections data, and environment/agriculture. Source URLs are cited inline and collected at the end.
+**Methodology:** Five parallel research agents fanned out across the web; every license claim was checked against a primary source (the actual `LICENSE` file, dataset page, or terms-of-use page), not from memory. The nine most load-bearing claims (Chinook, Sakila, Northwind, UCI, Palmer Penguins, FiveThirtyEight, seaborn-data, diamonds→Zenodo, SILSO) were then independently re-verified by hand. **A second pass (§14–§15)** added ~50 more *standalone* datasets — from Kaggle, a broader UCI sweep, the Hugging Face Hub, government/institutional portals, and data hubs — under the same discipline (MovieLens's non-commercial terms, `banking77`'s CC BY 4.0, and Natural Earth's public-domain status were hand-checked). A third pass (§16) catalogues **scraped / legally gray-area** datasets — *for awareness only* — each with its specific risk and a clean substitute. A fourth pass (§17) adds ~90 more real-world datasets browsed from GitHub, museums/libraries, sports & science sites, and civic/transit portals. A fifth pass (§18) adds ~70 more **English-language** datasets across US-federal, finance, health, text/legal, and computer-vision sources. A sixth pass (§19) adds ~70 more English datasets — reference/lookup tables, US state & city portals, English-speaking-country government data, survey/elections data, and environment/agriculture. A seventh pass (§20) adds ~70 more — astronomy/space, bioinformatics & chemistry, BLS and more US-federal agencies, NLP/linguistics, and sports/music/history. Source URLs are cited inline and collected at the end.
 
 ---
 
@@ -798,7 +798,68 @@ Always check the portal/dataset license — "open data" ≠ automatically re-hos
 
 ---
 
-## 20. Sources (primary, hand-verified in **bold**)
+## 20. Yet more English datasets (seventh pass — astronomy · bio/chemistry · BLS+federal · NLP · sports/music/history)
+
+~70 more. Hand-verified this pass: NASA mission data (CC0), MovieLens (non-commercial — correction), openfootball (CC0), Moby Project (PD).
+
+### 20.1 Astronomy & space catalogs (engaging — HR diagrams, exoplanet ML)
+
+| Dataset | License | Tier | Notes |
+| --- | --- | --- | --- |
+| **NASA Exoplanet Archive** ⭐ | CC0 (NASA) | 🟢A | ~6,300 planets — classification/regression |
+| **NASA Kepler KOI table** | CC0 | 🟢A | ~9,564 rows — planet vs. false-positive |
+| **JPL Small-Body Database** | US-gov PD | 🟢A | Asteroids; ~2,300-row near-Earth subset is ideal |
+| **HYG Star Database** | CC BY-SA 4.0 | 🟡C | 119K stars — the classic HR-diagram set |
+| **OpenNGC** | CC BY-SA 4.0 | 🟡C | ~13K deep-sky objects (classification) |
+| Open Exoplanet Catalogue | MIT | 🟢B | ~4,000 planets (XML parsing) |
+| IAU Star Names (WGSN) | CC BY | 🟢B | ~570 named stars — tiny join table |
+
+🔴 **AVOID:** **Gaia DR3** (CC BY-NC — non-commercial), **Minor Planet Center** (no explicit license — use JPL instead), **SDSS** (contradictory policy — verify before use).
+
+### 20.2 Bioinformatics & chemistry — small ML-ready CSVs ⭐
+
+| Dataset | License | Tier | Notes |
+| --- | --- | --- | --- |
+| **ESOL / Delaney solubility** ⭐ | MIT | 🟢B | 1,128 rows — regression from SMILES |
+| **FreeSolv** | CC BY 4.0 | 🟢B | 642 rows — hydration free energy |
+| **BBBP** | MIT | 🟢B | 2,050 rows — binary classification |
+| **Tox21** | MIT / US-gov | 🟢A/B | 7,831 × 12 — multi-label toxicity |
+| RCSB PDB | CC0 | 🟢A | Protein structures (curate 50–200) |
+| PubChem · GenBank/RefSeq | US-gov PD | 🟢A | Compounds / sequences (large → subset) |
+| UniProt · Gene Ontology · Materials Project · Human Protein Atlas | CC BY 4.0 | 🟢B | Proteins / ontology / materials / expression |
+| ChEMBL (+ Lipophilicity) | CC BY-SA 3.0 | 🟡C | Bioactivity (copyleft) |
+
+🔴 **AVOID:** **KEGG** (commercial license), **COSMIC** (academic-only), **DrugBank** full (CC BY-NC; Vocabulary/Structures subset is CC0), **TCGA/dbGaP** (controlled access), **1000 Genomes** (data-use agreement since 2024).
+
+### 20.3 BLS + more US-federal (public domain)
+
+| Dataset | License | Tier | Notes |
+| --- | --- | --- | --- |
+| **fueleconomy.gov vehicles.csv** ⭐ | US-gov PD (EPA) | 🟢A | ~47K vehicles, MPG/CO₂ — engaging Pandas intro |
+| **BLS** — CPI, OEWS wages, JOLTS | US-gov PD | 🟢A | Inflation / wages-by-occupation / labor (time-series) |
+| **FEMA** disaster declarations | PD / CC0 | 🟢A | ~68K declared disasters since 1953 |
+| **CPSC** product recalls | US-gov PD | 🟢A | ~20K recalls (text + EDA) |
+| **NCES / IPEDS** colleges | US-gov PD | 🟢A | Institutional characteristics / completions |
+| **Census County Business Patterns** | US-gov PD | 🟢A | Establishments by county × NAICS |
+| **BJS** (direct CSV tables) · USAspending (CC0) | PD / CC0 | 🟢A | Justice stats / federal spending (subset) |
+| PatentsView (USPTO) | CC BY 4.0 | 🟡C | Patents — **attribution required** (not PD) |
+
+🔴 **AVOID:** **FCC broadband map / BDC fabric** (CostQuest private-vendor license — no commercial redistribution), **BJS NCVS microdata via ICPSR** (ICPSR bars redistribution even of PD data — use BJS.gov tables). Note: fueleconomy.gov *web-page* content carries an ORNL non-commercial disclaimer, but the EPA-produced CSV files are PD; agency website *photos* are separately licensed.
+
+### 20.4 NLP / linguistics
+
+🟢 **Clean:** **Moby Project** (Grady Ward — **public domain**: thesaurus, pronunciations, POS, hyphenation, ~640K word lists), **dwyl/english-words** (Unlicense, ~479K), **ENABLE** word list (PD), **SCOWL** spell-check lists & **VADER** sentiment lexicon (MIT), **Brysbaert concreteness** + **Kuperman age-of-acquisition** norms (CC BY 4.0), **MASC** annotated sub-corpus (CC BY 3.0).
+🟡 **Copyleft (usable, share-alike):** ConceptNet, SentiWordNet, UD English-EWT (CC BY-SA 4.0); AFINN (ODbL); GCIDE dictionary (GPL).
+🔴 **AVOID:** **NRC Emotion/VAD lexicons** (redistribution prohibited), **Brown Corpus** via NLTK (non-commercial), **Bing Liu opinion lexicon** (no license), **Loughran-McDonald** (academic-only), **UD English-GUM** (CC BY-NC-SA, unlike EWT), Scrabble word lists (Hasbro).
+
+### 20.5 Sports / music / history
+
+🟢 **Clean:** **openfootball** (CC0 — football fixtures/results → SQL), **Discogs** monthly dumps (CC0 — music DB, subset), **Maddison Project** (CC BY 4.0 — 2,000 years of GDP, ideal time-series), **Pleiades** ancient places (CC BY 3.0 — geo/digital-humanities), **FMA metadata** (CC BY 4.0 — music; metadata only, not audio).
+🔴 **AVOID:** **MovieLens** — *non-commercial* (UMN license); it's the canonical recommender-systems dataset but **cannot be re-hosted commercially** — use FMA metadata instead. Also **Correlates of War** (no redistribution), **StatsBomb**, **Sackmann tennis**, **Ergast F1**, **MAESTRO**, **Million Song** (all non-commercial), **GTZAN** (unlicensed scraped audio).
+
+---
+
+## 21. Sources (primary, hand-verified in **bold**)
 
 **SQL / multi-table**
 - **Chinook — MIT:** <https://github.com/lerocha/chinook-database/blob/master/LICENSE.md>
@@ -864,6 +925,14 @@ Always check the portal/dataset license — "open data" ≠ automatically re-hos
 - World-English gov: NZGOAL/NZ (CC BY 4.0) <https://www.data.govt.nz/toolkit/policies/nzgoal> · Ireland (CC BY 4.0) <https://data.gov.ie/pages/opendatalicence> · GODL-India <https://www.data.gov.in/Godl> · Singapore ODL <https://data.gov.sg/open-data-licence> · FAOSTAT terms (CC BY + no-promo) <https://www.fao.org/contact-us/terms/db-terms-of-use/en/> · UNHCR <https://www.unhcr.org/terms-and-conditions-data.html>
 - Surveys/elections: CES (CC0, Harvard Dataverse) <https://dataverse.harvard.edu/dataverse/cces> · OpenElections (MIT) <https://github.com/openelections/openelections-data-ca/blob/master/LICENSE.md> · QOG (no redistribution) <https://www.gu.se/en/quality-government/qog-data/data-downloads/standard-dataset> · Pew (no redistribution) <https://www.pewresearch.org/about/terms-and-conditions/>
 - Environment: EPA data license (PD) <https://edg.epa.gov/epa_data_license.html> · EPA AQS PD statement <https://www.epa.gov/outdoor-air-quality-data/do-i-need-request-permission-use-monitoring-data-and-graphics-airdata> · Global Carbon Budget (CC BY 4.0) <https://zenodo.org/records/13981696> · Smithsonian Volcanism (non-commercial) <https://volcano.si.edu/gvp_termsofuse.cfm>
+
+**Seventh pass — astronomy / bio-chemistry / BLS+federal / NLP / sports-music-history**
+- **NASA mission data CC0:** <https://science.data.nasa.gov/about/license> · **MovieLens non-commercial:** <https://files.grouplens.org/datasets/movielens/ml-latest-small-README.html> · **openfootball CC0:** <https://github.com/openfootball/football.json> · **Moby Project PD:** <https://en.wikipedia.org/wiki/Moby_Project>
+- Astronomy: NASA Exoplanet Archive <https://exoplanetarchive.ipac.caltech.edu/> · HYG (CC BY-SA) <https://codeberg.org/astronexus/hyg> · OpenNGC (CC BY-SA) <https://github.com/mattiaverga/OpenNGC> · Open Exoplanet Catalogue (MIT) <https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue> · Gaia (CC BY-NC) <https://www.cosmos.esa.int/web/gaia-users/license>
+- Bio/chemistry: RCSB PDB (CC0) <https://www.rcsb.org/pages/usage-policy> · UniProt (CC BY) <https://www.uniprot.org/help/license> · Gene Ontology (CC BY) <https://geneontology.org/docs/go-citation-policy/> · Materials Project (CC BY) <https://next-gen.materialsproject.org/about/terms> · ChEMBL (CC BY-SA) <http://chembl.github.io/chembl-licensing/> · FreeSolv (CC BY) <https://github.com/MobleyLab/FreeSolv> · KEGG (restricted) <https://www.kegg.jp/kegg/legal.html> · DrugBank (CC BY-NC) <https://trust.drugbank.com/drugbank-trust-center/terms-of-use>
+- US-federal: BLS PD <https://www.bls.gov/opub/copyright-information.htm> · fueleconomy.gov (EPA PD) <https://catalog.data.gov/dataset/www-fueleconomy-gov> · FEMA OpenFEMA <https://www.fema.gov/about/openfema/terms-conditions> · CPSC recalls <https://catalog.data.gov/dataset/recalls-api> · USAspending (CC0) <https://github.com/fedspendingtransparency/usaspending-api/blob/master/LICENSE> · NCES/IPEDS (ED PD) <https://www.ed.gov/about/ed-overview/required-notices/website-policies/copyright-status-notice> · PatentsView (CC BY) <https://patentsview.org/> · FCC BDC (CostQuest restricted) <https://help.bdc.fcc.gov/hc/en-us/articles/7682769466395-Broadband-Data-Collection-BDC-FAQs>
+- NLP: dwyl/english-words (Unlicense) <https://github.com/dwyl/english-words> · SCOWL <https://wordlist.aspell.net/> · VADER (MIT) <https://github.com/cjhutto/vaderSentiment/blob/master/LICENSE.txt> · ConceptNet (CC BY-SA) <https://github.com/commonsense/conceptnet5/wiki/Copying-and-sharing-ConceptNet> · UD English-EWT (CC BY-SA) <https://universaldependencies.org/treebanks/en_ewt/index.html> · NRC lexicons (no redistribution) <https://saifmohammad.com/WebPages/NRC-Emotion-Lexicon.htm>
+- Sports/music/history: Discogs (CC0) <https://data.discogs.com/> · Maddison Project (CC BY) <https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2023> · Pleiades (CC BY) <https://pleiades.stoa.org/downloads> · FMA (CC BY metadata) <https://github.com/mdeff/fma> · Correlates of War (no redistribution) <https://correlatesofwar.org/data-sets/> · Sackmann tennis (CC BY-NC-SA) <https://github.com/JeffSackmann/tennis_atp>
 
 ---
 
