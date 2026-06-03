@@ -144,6 +144,9 @@ import { SchemaLeafItem } from "./components/SchemaLeafItem";
 import { SchemaSection } from "./components/SchemaSection";
 import { CreateIndexDialog } from "./components/CreateIndexDialog";
 import { CreateViewDialog } from "./components/CreateViewDialog";
+import { ExplainPlanDialog } from "./components/ExplainPlanDialog";
+import { buildExplainSql, formatExplainResult } from "./utils/explain";
+import { activeSqlForEditor } from "./utils/editorUtils";
 import {
   DatabaseSelector,
   type DatabaseSelectorAction,
@@ -888,6 +891,40 @@ function SqlPlaygroundInner() {
     setCreateViewBody(editorRef.current?.state.doc.toString() ?? "");
     setCreateViewOpen(true);
   }, []);
+
+  const [explainPlan, setExplainPlan] = useState<{
+    querySql: string;
+    plan: string;
+  } | null>(null);
+  // Run EXPLAIN for the selection / statement at the cursor / whole query and
+  // show the plan in a read-only modal (no result-tab / history pollution).
+  const handleExplain = useCallback(() => {
+    const view = editorRef.current;
+    const engine = engineRef.current;
+    if (!view || !engine) return;
+    const sql = activeSqlForEditor(view).trim();
+    if (!sql) {
+      showToast("Nothing to explain — the query is empty.", "warn");
+      return;
+    }
+    void (async () => {
+      try {
+        const sets = await engine.exec(buildExplainSql("sqlite", sql));
+        const set = sets.find((s) => s != null) ?? sets[0];
+        setExplainPlan({
+          querySql: sql,
+          plan: set
+            ? formatExplainResult(set.columns, set.values)
+            : "(no plan returned)",
+        });
+      } catch (err) {
+        showToast(
+          `Explain failed: ${err instanceof Error ? err.message : String(err)}`,
+          "warn",
+        );
+      }
+    })();
+  }, [showToast]);
 
   const {
     addTab,
@@ -3287,6 +3324,16 @@ function SqlPlaygroundInner() {
           defaultBody={createViewBody}
           onSubmit={createSchemaObject}
         />
+        <ExplainPlanDialog
+          open={explainPlan !== null}
+          onOpenChange={(next) => {
+            if (!next) setExplainPlan(null);
+          }}
+          querySql={explainPlan?.querySql ?? ""}
+          plan={explainPlan?.plan ?? ""}
+          onCopied={() => showToast("Plan copied.")}
+          onCopyFailed={() => showToast("Couldn't copy to clipboard.", "warn")}
+        />
 
         <div className="sql-shell" ref={shellRef}>
           <aside className="sql-sidebar" aria-label="Database explorer">
@@ -3681,6 +3728,7 @@ function SqlPlaygroundInner() {
                 onRunSelection={runCurrentSelection}
                 onRunStatement={runStatementAtCursor}
                 onRunAll={runActiveTab}
+                onExplain={handleExplain}
               />
             </div>
 

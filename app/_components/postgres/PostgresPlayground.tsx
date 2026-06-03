@@ -135,6 +135,9 @@ import { SchemaLeafItem } from "../sql/components/SchemaLeafItem";
 import { SchemaSection } from "../sql/components/SchemaSection";
 import { CreateIndexDialog } from "../sql/components/CreateIndexDialog";
 import { CreateViewDialog } from "../sql/components/CreateViewDialog";
+import { ExplainPlanDialog } from "../sql/components/ExplainPlanDialog";
+import { buildExplainSql, formatExplainResult } from "../sql/utils/explain";
+import { activeSqlForEditor } from "../sql/utils/editorUtils";
 import {
   DatabaseSelector,
   type DatabaseSelectorAction,
@@ -1338,6 +1341,40 @@ function PostgresPlaygroundInner() {
     setCreateViewBody(editorRef.current?.state.doc.toString() ?? "");
     setCreateViewOpen(true);
   }, []);
+
+  const [explainPlan, setExplainPlan] = useState<{
+    querySql: string;
+    plan: string;
+  } | null>(null);
+  // Run EXPLAIN for the selection / statement at the cursor / whole query and
+  // show the plan in a read-only modal.
+  const handleExplain = useCallback(() => {
+    const view = editorRef.current;
+    const engine = engineRef.current;
+    if (!view || !engine) return;
+    const sql = activeSqlForEditor(view).trim();
+    if (!sql) {
+      showToast("Nothing to explain — the query is empty.", "warn");
+      return;
+    }
+    void (async () => {
+      try {
+        const sets = await engine.exec(buildExplainSql("postgres", sql));
+        const set = sets.find((s) => s != null) ?? sets[0];
+        setExplainPlan({
+          querySql: sql,
+          plan: set
+            ? formatExplainResult(set.columns, set.values)
+            : "(no plan returned)",
+        });
+      } catch (err) {
+        showToast(
+          `Explain failed: ${err instanceof Error ? err.message : String(err)}`,
+          "warn",
+        );
+      }
+    })();
+  }, [showToast]);
 
   // Run a DDL statement from the schema tree's Create Index / Create View
   // dialogs, then refresh the sidebar. Resolves true on success.
@@ -4021,6 +4058,16 @@ function PostgresPlaygroundInner() {
           defaultBody={createViewBody}
           onSubmit={createSchemaObject}
         />
+        <ExplainPlanDialog
+          open={explainPlan !== null}
+          onOpenChange={(next) => {
+            if (!next) setExplainPlan(null);
+          }}
+          querySql={explainPlan?.querySql ?? ""}
+          plan={explainPlan?.plan ?? ""}
+          onCopied={() => showToast("Plan copied.")}
+          onCopyFailed={() => showToast("Couldn't copy to clipboard.", "warn")}
+        />
 
         {/* ── Add Table drawer ── */}
         <Dialog.Root
@@ -4880,6 +4927,7 @@ function PostgresPlaygroundInner() {
                 onRunSelection={runCurrentSelection}
                 onRunStatement={runStatementAtCursor}
                 onRunAll={runActiveTab}
+                onExplain={handleExplain}
               />
             </div>
             {tabs.some((t) => t.kind === "er-diagram") && (

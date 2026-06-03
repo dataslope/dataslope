@@ -1427,6 +1427,43 @@
   border-radius: 6px;
 }
 
+/* Secondary "Explain" toolbar button (ghost), sits to the right of Run. */
+.sql-explain-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 6px;
+  height: 28px;
+  padding: 0 11px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    border-color 0.12s,
+    color 0.12s;
+}
+
+.sql-explain-btn:hover:not(:disabled) {
+  background: var(--bg3);
+  border-color: var(--text-dim);
+}
+
+.sql-explain-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.sql-explain-btn svg {
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
 .sql-toolbar .kbd {
   font-weight: normal;
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
@@ -4744,4 +4781,48 @@
   margin-top: 0;
   padding: 12px 18px 16px;
   border-top: 1px solid var(--border);
+}
+
+/* ─── Explain / query-plan modal ───
+   Read-only plan viewer (reuses the global `.confirm-popup` shell + the
+   create-dialog header). Shared by all three SQL playgrounds. */
+.sql-explain-popup {
+  width: min(760px, calc(100vw - 32px));
+  max-height: min(80vh, 640px);
+  gap: 0;
+  padding: 0;
+}
+
+.sql-explain-subtitle {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  margin: 0;
+  padding: 0 18px 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sql-explain-plan {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 18px;
+  margin: 0;
+  overflow: auto;
+  white-space: pre;
+  flex: 1;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.sql-explain-popup .confirm-actions {
+  margin: 0;
+  padding: 12px 18px 16px;
 }

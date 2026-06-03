@@ -1,7 +1,7 @@
 "use client";
 
 import { Menu } from "@base-ui-components/react/menu";
-import { ChevronDown, Play } from "lucide-react";
+import { ChevronDown, ListTree, Play } from "lucide-react";
 
 export interface SqlEditorToolbarProps {
   loaded: boolean;
@@ -15,6 +15,9 @@ export interface SqlEditorToolbarProps {
   onRunSelection: () => void;
   onRunStatement: () => void;
   onRunAll: () => void;
+  /** Show the execution plan (EXPLAIN) for the selection / statement at the
+   *  cursor / whole query. */
+  onExplain: () => void;
 }
 
 const SPINNER = (
@@ -105,6 +108,7 @@ export function SqlEditorToolbar({
   onRunSelection,
   onRunStatement,
   onRunAll,
+  onExplain,
 }: SqlEditorToolbarProps) {
   const disabled = !loaded || running;
   // ⌘/Ctrl+Enter triggers the *primary* button (shown by the kbd hint to the
@@ -163,6 +167,16 @@ export function SqlEditorToolbar({
             {running ? "Running…" : "Run"}
           </button>
         )}
+        <button
+          type="button"
+          className="sql-explain-btn"
+          disabled={disabled}
+          onClick={onExplain}
+          title="Show the execution plan (EXPLAIN) for the current statement"
+        >
+          <ListTree size={12} aria-hidden="true" />
+          Explain
+        </button>
       </div>
     </div>
   );
