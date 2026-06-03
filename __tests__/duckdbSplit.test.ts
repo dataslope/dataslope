@@ -3,6 +3,7 @@ import {
   splitDuckDbStatements,
   toBindParam,
   parseDuckDbEnumValues,
+  toDuckDbListLiteral,
 } from "../app/_components/runtime/duckdb";
 
 describe("splitDuckDbStatements", () => {
@@ -83,6 +84,36 @@ describe("toBindParam (UX-17 prepared-statement binding)", () => {
 
   it("falls back to a string form for other objects/arrays", () => {
     expect(toBindParam([1, 2, 3])).toBe("1,2,3");
+  });
+});
+
+describe("toDuckDbListLiteral", () => {
+  it("serializes a numeric list", () => {
+    expect(toDuckDbListLiteral([10, 20, 30])).toBe("[10, 20, 30]");
+  });
+
+  it("single-quotes and escapes string elements", () => {
+    expect(toDuckDbListLiteral(["a", "b"])).toBe("['a', 'b']");
+    expect(toDuckDbListLiteral(["O'Brien"])).toBe("['O''Brien']");
+  });
+
+  it("inlines booleans, bigints and NULL bare", () => {
+    expect(toDuckDbListLiteral([true, false])).toBe("[TRUE, FALSE]");
+    expect(toDuckDbListLiteral([1n, 2n])).toBe("[1, 2]");
+    expect(toDuckDbListLiteral([1, null, 3])).toBe("[1, NULL, 3]");
+  });
+
+  it("recurses into nested arrays", () => {
+    expect(
+      toDuckDbListLiteral([
+        [1, 2],
+        [3, 4],
+      ]),
+    ).toBe("[[1, 2], [3, 4]]");
+  });
+
+  it("produces an empty list literal", () => {
+    expect(toDuckDbListLiteral([])).toBe("[]");
   });
 });
 

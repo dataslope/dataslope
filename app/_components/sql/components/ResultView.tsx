@@ -70,6 +70,8 @@ import {
   toDateEditorValue,
   fromDateEditorValue,
   resolveTemporalEditorKind,
+  arrayEditorText,
+  parseArrayEditValue,
   formatBytesHex,
   bytesToBase64,
   reversibleCellValue,
@@ -2739,6 +2741,55 @@ export function ResultTableBody({
                         </option>
                       ))}
                     </select>
+                  );
+                }
+                // Array / LIST columns are edited as a JSON array; on commit
+                // the parsed JS array is written back and each engine binds it
+                // as a real array (Postgres via pglite, DuckDB via a bound
+                // parameter). Invalid/partial JSON is kept as raw text so the
+                // user can keep typing — it surfaces a clear engine error on
+                // commit rather than silently writing garbage.
+                if (editorKind === "array") {
+                  const source = hasPendingEdit ? pendingValue : rawValue;
+                  return (
+                    <input
+                      className="sql-cell-input"
+                      defaultValue={arrayEditorText(source)}
+                      autoFocus
+                      type="text"
+                      size={1}
+                      aria-label={`Edit ${c} (JSON array)`}
+                      onFocus={(e) => e.currentTarget.select()}
+                      onChange={(e) => {
+                        const text = e.target.value;
+                        const parsed = parseArrayEditValue(text);
+                        if (parsed.ok) {
+                          // Unchanged vs the original JSON string → no edit.
+                          if (
+                            typeof rawValue === "string" &&
+                            JSON.stringify(parsed.value) === rawValue
+                          ) {
+                            if (hasPendingEdit) onClearPendingEdit(cellKey);
+                          } else {
+                            onSetPendingEdit(cellKey, parsed.value);
+                          }
+                        } else {
+                          onSetPendingEdit(cellKey, text);
+                        }
+                      }}
+                      onBlur={() => onSetActiveEditCell(null)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          (e.currentTarget as HTMLInputElement).blur();
+                        } else if (e.key === "Escape") {
+                          e.stopPropagation();
+                          onClearPendingEdit(cellKey);
+                          onSetActiveEditCell(null);
+                        }
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      onDoubleClick={(e) => e.stopPropagation()}
+                    />
                   );
                 }
                 // Date/time columns get a native picker when the stored value
