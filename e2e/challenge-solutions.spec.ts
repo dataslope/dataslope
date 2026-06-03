@@ -187,7 +187,7 @@ test.describe("Challenge solutions", () => {
       const pageErrors: string[] = [];
       page.on("pageerror", (err) => pageErrors.push(err.message));
 
-      await page.goto(`/learn/challenge-cards/${slug}`);
+      await page.goto(`/learn/challenge-cards-${slug}`);
       // Cards register on `window.__dsChallenges` from a `useEffect`
       // that fires once the React tree commits — wait until at least
       // one card has registered before reading the manifest, so we
