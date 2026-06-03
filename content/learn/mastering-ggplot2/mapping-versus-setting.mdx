@@ -105,10 +105,12 @@ The fix for the bug is simply to move the constant *out* of `aes()`:
   starterCode={`library(ggplot2)
 
 # Wrong (mapping a constant): reddish points + bogus legend.
-p_bug   <- ggplot(mpg, aes(displ, hwy, color = "blue")) + geom_point()
+p_bug <- ggplot(mpg, aes(displ, hwy, color = "blue")) +
+  geom_point()
 
 # Right (setting a constant): actually blue, no legend.
-p_fixed <- ggplot(mpg, aes(displ, hwy)) + geom_point(color = "blue")
+p_fixed <- ggplot(mpg, aes(displ, hwy)) +
+  geom_point(color = "blue")
 
 print(p_bug)
 print(p_fixed)
@@ -127,8 +129,8 @@ The same rule governs `size`, `shape`, `alpha`, `fill` — everything:
   starterCode={`library(ggplot2)
 
 # size MAPPED to a column (varies + legend) vs size SET to a constant.
-ggplot(mpg, aes(displ, hwy, size = cty)) +   # mapping
-  geom_point(alpha = 0.5)                     # alpha set as a constant
+ggplot(mpg, aes(displ, hwy, size = cty)) + # mapping
+  geom_point(alpha = 0.5) # alpha set as a constant
 `}
 />
 

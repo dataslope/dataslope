@@ -23,7 +23,7 @@ There are four ways to write a string literal. They're all equivalent at the val
 
 <CodeBlock
   adapter="python"
-  starterCode={`a = 'single quotes'
+  starterCode={`a = "single quotes"
 b = "double quotes"
 print(a)
 print(b)
@@ -41,7 +41,7 @@ print(c)
 
 <CodeBlock
   adapter="python"
-  starterCode={`d = '''also triple-quoted'''
+  starterCode={`d = """also triple-quoted"""
 print(d)
 `}
 />
@@ -61,7 +61,7 @@ print(d)
   adapter="python"
   starterCode={`print("Hello\\nWorld")
 print("Column1\\tColumn2")
-print("She said, \\"Hello!\\"")
+print('She said, "Hello!"')
 `}
 />
 
@@ -71,14 +71,15 @@ Prefix a literal with `r` to disable escape processing. Useful for regex pattern
 
 <CodeBlock
   adapter="python"
-  starterCode={`print("C:\\nope")     # \\n is a newline
-print(r"C:\\nope")    # raw, the backslash is literal
+  starterCode={`print("C:\\nope")  # \\n is a newline
+print(r"C:\\nope")  # raw, the backslash is literal
 `}
 />
 
 <CodeBlock
   adapter="python"
   starterCode={`import re
+
 # Regex for a digit: without raw string, you'd need \\\\d
 pattern = r"\\d+"
 print(re.findall(pattern, "Order 123 ships in 5 days"))
@@ -92,17 +93,17 @@ Strings are sequences, so they support indexing (`s[i]`) and slicing (`s[start:s
 <CodeBlock
   adapter="python"
   starterCode={`s = "Python"
-print(s[0])     # 'P'
-print(s[-1])    # 'n'
+print(s[0])  # 'P'
+print(s[-1])  # 'n'
 `}
 />
 
 <CodeBlock
   adapter="python"
   starterCode={`s = "Python"
-print(s[1:4])   # 'yth'
-print(s[:2])    # 'Py'
-print(s[2:])    # 'thon'
+print(s[1:4])  # 'yth'
+print(s[:2])  # 'Py'
+print(s[2:])  # 'thon'
 `}
 />
 
@@ -110,7 +111,7 @@ print(s[2:])    # 'thon'
   adapter="python"
   starterCode={`s = "Python"
 print(s[::-1])  # 'nohtyP' (reverse)
-print(s[::2])   # 'Pto' (every other character)
+print(s[::2])  # 'Pto' (every other character)
 `}
 />
 
@@ -152,14 +153,14 @@ except TypeError as e:
   adapter="python"
   starterCode={`s = "hello"
 print(s.upper())  # returns "HELLO"
-print(s)          # unchanged
+print(s)  # unchanged
 `}
 />
 
 <CodeBlock
   adapter="python"
   starterCode={`s = "hello"
-s = s.upper()     # rebinding is how you "change" a string
+s = s.upper()  # rebinding is how you "change" a string
 print(s)
 `}
 />
@@ -192,7 +193,7 @@ A selection of methods you'll use constantly:
 <CodeBlock
   adapter="python"
   starterCode={`s = "  Hello, World!  "
-print(s.strip())   # remove leading/trailing whitespace
+print(s.strip())  # remove leading/trailing whitespace
 print(s.lower())
 print(s.upper())
 `}
@@ -216,8 +217,8 @@ print("hello".endswith("lo"))
 
 <CodeBlock
   adapter="python"
-  starterCode={`print("hello".find("l"))    # 2 (first index) or -1 if not found
-print("hello".count("l"))   # 2
+  starterCode={`print("hello".find("l"))  # 2 (first index) or -1 if not found
+print("hello".count("l"))  # 2
 print("42".isdigit())
 print("Hello".isalpha())
 `}
@@ -251,7 +252,7 @@ print(f"{name} scored {score:.1f}")  # one decimal place
 score = 87.4321
 
 print(f"{name:>10} | {score:>6.2f}")  # right-aligned, widths
-print(f"{score:,.2f}")                # thousands separator
+print(f"{score:,.2f}")  # thousands separator
 `}
 />
 
@@ -351,10 +352,12 @@ response = b"Hello"  # from a network request
     # Your code here
     return ""
 
+
 print(format_name("  ada", "LOVELACE "))
 `}
   solutionCode={`def format_name(first, last):
     return f"{last.strip().title()}, {first.strip().title()}"
+
 
 print(format_name("  ada", "LOVELACE "))
 `}
@@ -385,11 +388,13 @@ print(format_name("  ada", "LOVELACE "))
     # Your code here
     return False
 
+
 print(is_palindrome("A man, a plan, a canal: Panama"))
 `}
   solutionCode={`def is_palindrome(s):
     clean = "".join(c.lower() for c in s if c.isalnum())
     return clean == clean[::-1]
+
 
 print(is_palindrome("A man, a plan, a canal: Panama"))
 `}
@@ -425,12 +430,14 @@ print(is_palindrome("A man, a plan, a canal: Panama"))
     # Your code here
     return ""
 
+
 print(slugify("Hello World!"))
 print(slugify("Python 3.12 Released"))
 `}
   solutionCode={`def slugify(text):
     clean = "".join(c.lower() if c.isalnum() or c == " " else "" for c in text)
     return "-".join(clean.split())
+
 
 print(slugify("Hello World!"))
 print(slugify("Python 3.12 Released"))

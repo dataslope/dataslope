@@ -145,7 +145,7 @@ plot_tree(
     tree,
     feature_names=data.feature_names,
     class_names=data.target_names,
-    filled=True,        # color boxes by majority class
+    filled=True,  # color boxes by majority class
     rounded=True,
     fontsize=10,
     ax=ax,
@@ -190,9 +190,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
 
 X, y = load_diabetes(return_X_y=True)
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=0
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
 tree = DecisionTreeRegressor(max_depth=3, random_state=0)
 tree.fit(X_train, y_train)
@@ -333,7 +331,7 @@ for seed in [0, 1, 2]:
     )
     tree = DecisionTreeClassifier(max_depth=3, random_state=0)
     tree.fit(X_train, y_train)
-    root_feature = tree.tree_.feature[0]   # index of the root's feature
+    root_feature = tree.tree_.feature[0]  # index of the root's feature
     print(f"seed {seed}: root splits on '{feature_names[root_feature]}'")
 `}
 />

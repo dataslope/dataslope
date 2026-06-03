@@ -307,11 +307,13 @@ air = pd.Series(_passengers, index=idx, name="passengers")`}
   starterCode={`# A laughably simple forecaster: "next month = this month" (a naive forecast).
 # How good is it when order is intact vs destroyed?
 
+
 def naive_mae(series):
     s = series.reset_index(drop=True)
-    pred = s.shift(1)            # predict each value with the previous one
+    pred = s.shift(1)  # predict each value with the previous one
     err = (s - pred).dropna()
     return float(np.mean(np.abs(err)))
+
 
 ordered_mae = naive_mae(air)
 shuffled_mae = naive_mae(air.sample(frac=1.0, random_state=3))
@@ -469,6 +471,7 @@ air = pd.Series(_passengers, index=idx, name="passengers")`}
     # TODO: correlate the series with itself shifted by 1 step.
     return None
 
+
 result = {
     "ordered": None,
     "shuffled": None,
@@ -478,6 +481,7 @@ print(result)
   solutionCode={`def lag1_autocorr(series):
     s = series.reset_index(drop=True)
     return float(s.corr(s.shift(1)))
+
 
 result = {
     "ordered": lag1_autocorr(air),
@@ -550,8 +554,17 @@ print("test :", None if test is None else test.shape)
   solutionCode={`h = 24
 train = air.iloc[:-h]
 test = air.iloc[-h:]
-print("train:", train.shape, "->", train.index.min().date(), "to", train.index.max().date())
-print("test :", test.shape, "->", test.index.min().date(), "to", test.index.max().date())
+print(
+    "train:",
+    train.shape,
+    "->",
+    train.index.min().date(),
+    "to",
+    train.index.max().date(),
+)
+print(
+    "test :", test.shape, "->", test.index.min().date(), "to", test.index.max().date()
+)
 `}
   tests={[
     {

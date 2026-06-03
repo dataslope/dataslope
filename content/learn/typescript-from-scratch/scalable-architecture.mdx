@@ -61,7 +61,11 @@ export function validateEmail(email: string): boolean {
   return email.includes("@");
 }
 
-export function createUser(id: string, name: string, email: string): User | null {
+export function createUser(
+  id: string,
+  name: string,
+  email: string,
+): User | null {
   if (!validateEmail(email)) {
     return null;
   }

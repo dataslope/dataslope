@@ -34,9 +34,12 @@ INSERT INTO trips VALUES
   (7, 'Seattle',  'Bo',     6,  5.00),
   (8, 'Portland', 'Cy',    22, 16.25);`}
   starterCode={`-- Always start by *looking*. LIMIT keeps it cheap.
-SELECT *
-FROM trips
-LIMIT 5;`}
+SELECT
+  *
+FROM
+  trips
+LIMIT
+  5;`}
 />
 
 That single `SELECT *` answers "what columns exist and what do typical
@@ -60,11 +63,17 @@ INSERT INTO trips VALUES
   (3,'Portland','Cy',8,6.25),(4,'Seattle','Ada',31,22.75),
   (5,'Portland','Di',14,11.00),(6,'Boise','Eli',19,13.50),
   (7,'Seattle','Bo',6,5.00),(8,'Portland','Cy',22,16.25);`}
-  starterCode={`SELECT rider, minutes, fare
-FROM trips
-WHERE city = 'Seattle'
+  starterCode={`SELECT
+  rider,
+  minutes,
+  fare
+FROM
+  trips
+WHERE
+  city = 'Seattle'
   AND minutes >= 20
-ORDER BY minutes DESC;`}
+ORDER BY
+  minutes DESC;`}
 />
 
 The mental phrasing is *"narrow the data to the part I care about, then
@@ -98,10 +107,16 @@ INSERT INTO trips VALUES
   (3,'Portland','Cy',8,6.25),(4,'Seattle','Ada',31,22.75),
   (5,'Portland','Di',14,11.00),(6,'Boise','Eli',19,13.50),
   (7,'Seattle','Bo',6,5.00),(8,'Portland','Cy',22,16.25);`}
-  starterCode={`SELECT city, rider, fare
-FROM trips
-ORDER BY fare DESC
-LIMIT 3;`}
+  starterCode={`SELECT
+  city,
+  rider,
+  fare
+FROM
+  trips
+ORDER BY
+  fare DESC
+LIMIT
+  3;`}
 />
 
 ## Computed columns: asking a new question of each row
@@ -126,8 +141,10 @@ INSERT INTO trips VALUES
   minutes,
   fare,
   ROUND(fare / minutes, 2) AS fare_per_min
-FROM trips
-ORDER BY fare_per_min DESC;`}
+FROM
+  trips
+ORDER BY
+  fare_per_min DESC;`}
 />
 
 The column `fare_per_min` exists only inside this query — it is a

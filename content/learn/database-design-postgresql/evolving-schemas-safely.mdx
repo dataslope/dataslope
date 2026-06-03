@@ -110,22 +110,31 @@ INSERT INTO tasks (title, status) VALUES
     ('Draft design', 'open'),
     ('Review keys', 'done');
 `}
-  starterCode={`ALTER TABLE tasks ADD COLUMN priority TEXT;
+  starterCode={`ALTER TABLE tasks
+ADD COLUMN priority TEXT;
 
 UPDATE tasks
-SET priority = 'normal'
-WHERE priority IS NULL;
+SET
+  priority = 'normal'
+WHERE
+  priority IS NULL;
 
 ALTER TABLE tasks
-ALTER COLUMN priority SET NOT NULL;
+ALTER COLUMN priority
+SET NOT NULL;
 
 ALTER TABLE tasks
-ADD CONSTRAINT tasks_priority_check
-CHECK (priority IN ('low', 'normal', 'high'));
+ADD CONSTRAINT tasks_priority_check CHECK (priority IN ('low', 'normal', 'high'));
 
-SELECT id, title, status, priority
-FROM tasks
-ORDER BY id;`}
+SELECT
+  id,
+  title,
+  status,
+  priority
+FROM
+  tasks
+ORDER BY
+  id;`}
 />
 
 The end state has a required, constrained column. The path avoids

@@ -14,7 +14,8 @@ scripts without a wrapping class.
   starterCode={`using System;
 
 Console.WriteLine("Hello, C#!");
-for (int i = 1; i <= 3; i++) {
+for (int i = 1; i <= 3; i++)
+{
     Console.WriteLine($"  i = {i}");
 }
 `}
@@ -133,7 +134,8 @@ using System.Text;`}
   starterCode={`// The using directives come from the initialization code above.
 var names = new List<string> { "Ada", "Linus", "Grace" };
 var sb = new StringBuilder();
-foreach (var n in names.OrderBy(x => x)) sb.Append(n).Append(" ");
+foreach (var n in names.OrderBy(x => x))
+    sb.Append(n).Append(" ");
 Console.WriteLine(sb.ToString().Trim());
 `}
 />

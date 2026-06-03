@@ -43,11 +43,17 @@ _passengers = [
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
   starterCode={`# Differencing by hand is just "value minus its lag":
-manual  = air - air.shift(1)
-builtin = air.diff()           # the convenient version
+manual = air - air.shift(1)
+builtin = air.diff()  # the convenient version
 
-frame = pd.DataFrame({"passengers": air, "shift(1)": air.shift(1),
-                      "manual diff": manual, ".diff()": builtin}).head(6)
+frame = pd.DataFrame(
+    {
+        "passengers": air,
+        "shift(1)": air.shift(1),
+        "manual diff": manual,
+        ".diff()": builtin,
+    }
+).head(6)
 print(frame)
 print()
 print("They match exactly:", manual.dropna().equals(builtin.dropna()))
@@ -125,7 +131,8 @@ fig, (a1, a2) = plt.subplots(2, 1, figsize=(10, 6))
 air.plot(ax=a1, title="Raw passengers: strong upward TREND (non-stationary)")
 diff1.plot(ax=a2, title="First difference: trend gone, now hovers around a level")
 a2.axhline(0, color="grey", lw=0.8)
-plt.tight_layout(); plt.show()
+plt.tight_layout()
+plt.show()
 
 print(f"Raw ADF p-value          : {adfuller(air)[1]:.4f}  (non-stationary)")
 print(f"First-difference ADF p   : {adfuller(diff1)[1]:.4f}  (much lower!)")
@@ -186,9 +193,9 @@ from statsmodels.tsa.stattools import adfuller
 #   3) diff(12)-> remove the yearly seasonality
 log_air = np.log(air)
 stage = {
-    "1) log(air)":               log_air,
-    "2) + first difference":     log_air.diff(),
-    "3) + seasonal difference":  log_air.diff().diff(12),
+    "1) log(air)": log_air,
+    "2) + first difference": log_air.diff(),
+    "3) + seasonal difference": log_air.diff().diff(12),
 }
 for name, s in stage.items():
     print(f"{name:28s} ADF p = {adfuller(s.dropna())[1]:.4f}")
@@ -197,7 +204,8 @@ final = log_air.diff().diff(12).dropna()
 fig, ax = plt.subplots(figsize=(10, 3.5))
 final.plot(ax=ax, title="log -> diff(1) -> diff(12): looks stationary at last")
 ax.axhline(0, color="grey", lw=0.8)
-plt.tight_layout(); plt.show()
+plt.tight_layout()
+plt.show()
 
 print()
 print("Each transform drives the p-value down. The final series has no trend,")
@@ -228,14 +236,16 @@ that went *up* instead of down.
 import numpy as np
 
 rng = np.random.default_rng(0)
-noise = pd.Series(rng.normal(0, 1, 500))     # ALREADY stationary white noise
-over  = noise.diff().dropna()                # difference it anyway (a mistake)
+noise = pd.Series(rng.normal(0, 1, 500))  # ALREADY stationary white noise
+over = noise.diff().dropna()  # difference it anyway (a mistake)
 
 print(f"Variance before differencing : {noise.var():.3f}")
 print(f"Variance after  differencing : {over.var():.3f}   (went UP ~2x -- bad)")
 print()
 print(f"Lag-1 autocorrelation before : {noise.autocorr(1):+.3f}  (~0, as expected)")
-print(f"Lag-1 autocorrelation after  : {over.autocorr(1):+.3f}  (~ -0.5 -- the over-diff signature)")
+print(
+    f"Lag-1 autocorrelation after  : {over.autocorr(1):+.3f}  (~ -0.5 -- the over-diff signature)"
+)
 print()
 print("Differencing stationary data manufactured a strong negative correlation")
 print("and doubled the variance. Use the SMALLEST d that achieves stationarity.")
@@ -285,14 +295,16 @@ idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
   starterCode={`import numpy as np
 
-changes = air.diff().dropna()           # the differenced series
-start   = air.iloc[0]                    # the one anchor we must remember
+changes = air.diff().dropna()  # the differenced series
+start = air.iloc[0]  # the one anchor we must remember
 
 # Integrate: cumulative-sum the changes and add back the starting level.
-reconstructed = pd.concat([
-    pd.Series([start], index=[air.index[0]]),
-    start + changes.cumsum(),
-])
+reconstructed = pd.concat(
+    [
+        pd.Series([start], index=[air.index[0]]),
+        start + changes.cumsum(),
+    ]
+)
 
 print("Original vs reconstructed (first 6):")
 print(pd.DataFrame({"original": air, "reconstructed": reconstructed}).head(6))
@@ -345,8 +357,8 @@ _passengers = [
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`manual_sdiff = None   # air(t) - air(t-12), using shift
-matches = None        # True if it equals air.diff(12)
+  starterCode={`manual_sdiff = None  # air(t) - air(t-12), using shift
+matches = None  # True if it equals air.diff(12)
 print(manual_sdiff.dropna().head() if manual_sdiff is not None else None)
 print("matches:", matches)
 `}
@@ -392,7 +404,7 @@ from statsmodels.tsa.stattools import adfuller
 rng = np.random.default_rng(7)
 # Random walk with drift -> stationary after ONE difference.
 s = pd.Series(np.cumsum(rng.normal(0.3, 1.0, 300)), name="s")`}
-  starterCode={`best_d = None        # smallest d with ADF p < 0.05
+  starterCode={`best_d = None  # smallest d with ADF p < 0.05
 over_diff_ac = None  # lag-1 autocorrelation at d = 2
 print("best_d:", best_d, " over-diff lag-1 ac:", over_diff_ac)
 `}

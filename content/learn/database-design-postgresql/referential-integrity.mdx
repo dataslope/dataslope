@@ -180,12 +180,24 @@ INSERT INTO draft_comments VALUES (10, 1, 'Needs revision');
 INSERT INTO accounts VALUES (1, 'Ada Co');
 INSERT INTO invoices VALUES (100, 1, 250.00);`}
   starterCode={`-- CASCADE: deleting the draft also deletes its comments.
-DELETE FROM drafts WHERE draft_id = 1;
-SELECT * FROM draft_comments;
+DELETE FROM drafts
+WHERE
+  draft_id = 1;
+
+SELECT
+  *
+FROM
+  draft_comments;
 
 -- RESTRICT: deleting this account would orphan an invoice, so it fails.
-DELETE FROM accounts WHERE account_id = 1;
-SELECT * FROM invoices;`}
+DELETE FROM accounts
+WHERE
+  account_id = 1;
+
+SELECT
+  *
+FROM
+  invoices;`}
 />
 
 The first delete removes dependent comments. The second delete is

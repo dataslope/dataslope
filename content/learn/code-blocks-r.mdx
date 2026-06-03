@@ -45,8 +45,10 @@ Base R graphics and ggplot output are captured into PNG cells.
 <CodeBlock
   adapter="r"
   starterCode={`x <- rnorm(1000)
-hist(x, breaks = 30, col = "steelblue", border = "white",
-     main = "1000 draws from N(0, 1)")
+hist(x,
+  breaks = 30, col = "steelblue", border = "white",
+  main = "1000 draws from N(0, 1)"
+)
 `}
 />
 

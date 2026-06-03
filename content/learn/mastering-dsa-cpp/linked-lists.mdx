@@ -14,17 +14,17 @@ A minimal node stores data and a pointer to the next node.
   starterCode={`#include <iostream>
 
 struct Node {
-    int data;
-    Node* next;
+  int data;
+  Node *next;
 };
 
 int main() {
-    Node a{10, nullptr};
-    Node b{20, nullptr};
-    a.next = &b;
+  Node a{10, nullptr};
+  Node b{20, nullptr};
+  a.next = &b;
 
-    std::cout << a.data << " -> " << a.next->data << "\\n";
-    return 0;
+  std::cout << a.data << " -> " << a.next->data << "\\n";
+  return 0;
 }
 `}
 />
@@ -46,22 +46,22 @@ Traversal starts at `head` and follows `next` until `nullptr`.
   starterCode={`#include <iostream>
 
 struct Node {
-    int data;
-    Node* next;
+  int data;
+  Node *next;
 };
 
-void printList(Node* head) {
-    for (Node* cur = head; cur != nullptr; cur = cur->next) {
-        std::cout << cur->data << "\\n";
-    }
+void printList(Node *head) {
+  for (Node *cur = head; cur != nullptr; cur = cur->next) {
+    std::cout << cur->data << "\\n";
+  }
 }
 
 int main() {
-    Node n3{30, nullptr};
-    Node n2{20, &n3};
-    Node n1{10, &n2};
-    printList(&n1);
-    return 0;
+  Node n3{30, nullptr};
+  Node n2{20, &n3};
+  Node n1{10, &n2};
+  printList(&n1);
+  return 0;
 }
 `}
 />
@@ -77,32 +77,30 @@ Prepending creates a new node, points it at the old head, then updates the head 
   starterCode={`#include <iostream>
 
 struct Node {
-    int data;
-    Node* next;
+  int data;
+  Node *next;
 };
 
-void pushFront(Node*& head, int value) {
-    head = new Node{value, head};
-}
+void pushFront(Node *&head, int value) { head = new Node{value, head}; }
 
-void destroy(Node* head) {
-    while (head != nullptr) {
-        Node* next = head->next;
-        delete head;
-        head = next;
-    }
+void destroy(Node *head) {
+  while (head != nullptr) {
+    Node *next = head->next;
+    delete head;
+    head = next;
+  }
 }
 
 int main() {
-    Node* head = nullptr;
-    pushFront(head, 30);
-    pushFront(head, 20);
-    pushFront(head, 10);
-    for (Node* cur = head; cur != nullptr; cur = cur->next) {
-        std::cout << cur->data << "\\n";
-    }
-    destroy(head);
-    return 0;
+  Node *head = nullptr;
+  pushFront(head, 30);
+  pushFront(head, 20);
+  pushFront(head, 10);
+  for (Node *cur = head; cur != nullptr; cur = cur->next) {
+    std::cout << cur->data << "\\n";
+  }
+  destroy(head);
+  return 0;
 }
 `}
 />
@@ -116,58 +114,61 @@ Appending without a tail pointer requires walking to the end. Deleting a value r
   starterCode={`#include <iostream>
 
 struct Node {
-    int data;
-    Node* next;
+  int data;
+  Node *next;
 };
 
-void pushBack(Node*& head, int value) {
-    Node* node = new Node{value, nullptr};
-    if (head == nullptr) {
-        head = node;
-        return;
-    }
-    Node* cur = head;
-    while (cur->next != nullptr) cur = cur->next;
-    cur->next = node;
+void pushBack(Node *&head, int value) {
+  Node *node = new Node{value, nullptr};
+  if (head == nullptr) {
+    head = node;
+    return;
+  }
+  Node *cur = head;
+  while (cur->next != nullptr)
+    cur = cur->next;
+  cur->next = node;
 }
 
-bool contains(Node* head, int value) {
-    for (Node* cur = head; cur != nullptr; cur = cur->next) {
-        if (cur->data == value) return true;
-    }
-    return false;
+bool contains(Node *head, int value) {
+  for (Node *cur = head; cur != nullptr; cur = cur->next) {
+    if (cur->data == value)
+      return true;
+  }
+  return false;
 }
 
-bool deleteValue(Node*& head, int value) {
-    Node** link = &head;
-    while (*link != nullptr) {
-        if ((*link)->data == value) {
-            Node* victim = *link;
-            *link = victim->next;
-            delete victim;
-            return true;
-        }
-        link = &((*link)->next);
+bool deleteValue(Node *&head, int value) {
+  Node **link = &head;
+  while (*link != nullptr) {
+    if ((*link)->data == value) {
+      Node *victim = *link;
+      *link = victim->next;
+      delete victim;
+      return true;
     }
-    return false;
+    link = &((*link)->next);
+  }
+  return false;
 }
 
-void destroy(Node* head) {
-    while (head != nullptr) {
-        Node* next = head->next;
-        delete head;
-        head = next;
-    }
+void destroy(Node *head) {
+  while (head != nullptr) {
+    Node *next = head->next;
+    delete head;
+    head = next;
+  }
 }
 
 int main() {
-    Node* head = nullptr;
-    for (int x : {10, 20, 30}) pushBack(head, x);
-    std::cout << contains(head, 20) << "\\n";
-    deleteValue(head, 20);
-    std::cout << contains(head, 20) << "\\n";
-    destroy(head);
-    return 0;
+  Node *head = nullptr;
+  for (int x : {10, 20, 30})
+    pushBack(head, x);
+  std::cout << contains(head, 20) << "\\n";
+  deleteValue(head, 20);
+  std::cout << contains(head, 20) << "\\n";
+  destroy(head);
+  return 0;
 }
 `}
 />
@@ -193,27 +194,27 @@ Manual `new` and `delete` are useful for learning pointers, but production C++ s
 #include <memory>
 
 struct Node {
-    int data;
-    std::unique_ptr<Node> next;
+  int data;
+  std::unique_ptr<Node> next;
 };
 
-void pushFront(std::unique_ptr<Node>& head, int value) {
-    auto node = std::make_unique<Node>();
-    node->data = value;
-    node->next = std::move(head);
-    head = std::move(node);
+void pushFront(std::unique_ptr<Node> &head, int value) {
+  auto node = std::make_unique<Node>();
+  node->data = value;
+  node->next = std::move(head);
+  head = std::move(node);
 }
 
 int main() {
-    std::unique_ptr<Node> head;
-    pushFront(head, 3);
-    pushFront(head, 2);
-    pushFront(head, 1);
+  std::unique_ptr<Node> head;
+  pushFront(head, 3);
+  pushFront(head, 2);
+  pushFront(head, 1);
 
-    for (Node* cur = head.get(); cur != nullptr; cur = cur->next.get()) {
-        std::cout << cur->data << "\\n";
-    }
-    return 0;
+  for (Node *cur = head.get(); cur != nullptr; cur = cur->next.get()) {
+    std::cout << cur->data << "\\n";
+  }
+  return 0;
 }
 `}
 />
@@ -231,67 +232,67 @@ When you reverse or delete nodes, you are rewiring addresses. Draw the links bef
   starterCode={`#include <iostream>
 
 struct Node {
-    int data;
-    Node* next;
+  int data;
+  Node *next;
 };
 
-Node* reverse(Node* head) {
-    // your code here
+Node *reverse(Node *head) {
+  // your code here
 }
 
-void destroy(Node* head) {
-    while (head != nullptr) {
-        Node* next = head->next;
-        delete head;
-        head = next;
-    }
+void destroy(Node *head) {
+  while (head != nullptr) {
+    Node *next = head->next;
+    delete head;
+    head = next;
+  }
 }
 
 int main() {
-    Node* head = new Node{1, new Node{2, new Node{3, new Node{4, nullptr}}}};
-    head = reverse(head);
-    for (Node* cur = head; cur != nullptr; cur = cur->next) {
-        std::cout << cur->data << "\\n";
-    }
-    destroy(head);
-    return 0;
+  Node *head = new Node{1, new Node{2, new Node{3, new Node{4, nullptr}}}};
+  head = reverse(head);
+  for (Node *cur = head; cur != nullptr; cur = cur->next) {
+    std::cout << cur->data << "\\n";
+  }
+  destroy(head);
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 
 struct Node {
-    int data;
-    Node* next;
+  int data;
+  Node *next;
 };
 
-Node* reverse(Node* head) {
-    Node* previous = nullptr;
-    Node* current = head;
-    while (current != nullptr) {
-        Node* next = current->next;
-        current->next = previous;
-        previous = current;
-        current = next;
-    }
-    return previous;
+Node *reverse(Node *head) {
+  Node *previous = nullptr;
+  Node *current = head;
+  while (current != nullptr) {
+    Node *next = current->next;
+    current->next = previous;
+    previous = current;
+    current = next;
+  }
+  return previous;
 }
 
-void destroy(Node* head) {
-    while (head != nullptr) {
-        Node* next = head->next;
-        delete head;
-        head = next;
-    }
+void destroy(Node *head) {
+  while (head != nullptr) {
+    Node *next = head->next;
+    delete head;
+    head = next;
+  }
 }
 
 int main() {
-    Node* head = new Node{1, new Node{2, new Node{3, new Node{4, nullptr}}}};
-    head = reverse(head);
-    for (Node* cur = head; cur != nullptr; cur = cur->next) {
-        std::cout << cur->data << "\\n";
-    }
-    destroy(head);
-    return 0;
+  Node *head = new Node{1, new Node{2, new Node{3, new Node{4, nullptr}}}};
+  head = reverse(head);
+  for (Node *cur = head; cur != nullptr; cur = cur->next) {
+    std::cout << cur->data << "\\n";
+  }
+  destroy(head);
+  return 0;
 }
 `}
   tests={[{ id: "reverse_list", name: "Reverses links", expect: { stdoutLines: ["4", "3", "2", "1"], stdoutLinesExact: true } }]}
@@ -306,45 +307,45 @@ int main() {
   starterCode={`#include <iostream>
 
 struct Node {
-    int data;
-    Node* next;
+  int data;
+  Node *next;
 };
 
-int length(Node* head) {
-    // your code here
+int length(Node *head) {
+  // your code here
 }
 
 int main() {
-    Node n4{4, nullptr};
-    Node n3{3, &n4};
-    Node n2{2, &n3};
-    Node n1{1, &n2};
-    std::cout << length(&n1) << "\\n";
-    return 0;
+  Node n4{4, nullptr};
+  Node n3{3, &n4};
+  Node n2{2, &n3};
+  Node n1{1, &n2};
+  std::cout << length(&n1) << "\\n";
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 
 struct Node {
-    int data;
-    Node* next;
+  int data;
+  Node *next;
 };
 
-int length(Node* head) {
-    int count = 0;
-    for (Node* cur = head; cur != nullptr; cur = cur->next) {
-        ++count;
-    }
-    return count;
+int length(Node *head) {
+  int count = 0;
+  for (Node *cur = head; cur != nullptr; cur = cur->next) {
+    ++count;
+  }
+  return count;
 }
 
 int main() {
-    Node n4{4, nullptr};
-    Node n3{3, &n4};
-    Node n2{2, &n3};
-    Node n1{1, &n2};
-    std::cout << length(&n1) << "\\n";
-    return 0;
+  Node n4{4, nullptr};
+  Node n3{3, &n4};
+  Node n2{2, &n3};
+  Node n1{1, &n2};
+  std::cout << length(&n1) << "\\n";
+  return 0;
 }
 `}
   tests={[{ id: "length", name: "Counts nodes", expect: { stdoutEquals: "4" } }]}

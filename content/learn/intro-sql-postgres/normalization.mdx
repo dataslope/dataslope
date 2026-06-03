@@ -103,11 +103,18 @@ INSERT INTO products (id, title, price) VALUES
 INSERT INTO orders (id, customer_id, product_id) VALUES
   (1,1,10), (2,1,11), (3,2,10);`}
   starterCode={`-- The duplicated, readable view is rebuilt on demand with a join:
-SELECT o.id AS order_id, c.name, c.email, p.title, p.price
-FROM orders o
-JOIN customers c ON c.id = o.customer_id
-JOIN products  p ON p.id = o.product_id
-ORDER BY o.id;`}
+SELECT
+  o.id AS order_id,
+  c.name,
+  c.email,
+  p.title,
+  p.price
+FROM
+  orders o
+  JOIN customers c ON c.id = o.customer_id
+  JOIN products p ON p.id = o.product_id
+ORDER BY
+  o.id;`}
 />
 
 The "flat" view people liked is not lost — a join reproduces it any

@@ -57,9 +57,9 @@ data(mtcars)
 
 p <- ggplot(mtcars, aes(x = wt, y = mpg))
 
-p + geom_point()        # scatter
-p + geom_smooth()       # smoothed trend
-p + geom_point() + geom_smooth(method = "lm")  # both!
+p + geom_point() # scatter
+p + geom_smooth() # smoothed trend
+p + geom_point() + geom_smooth(method = "lm") # both!
 `}
 />
 
@@ -125,7 +125,7 @@ data(iris)
 
 ggplot(iris, aes(x = Sepal.Length, y = Petal.Length)) +
   geom_point(color = "steelblue") +
-  facet_wrap(~ Species) +
+  facet_wrap(~Species) +
   labs(title = "Sepal length vs. petal length, by species")
 `}
 />
@@ -199,9 +199,11 @@ data(airquality)
 ggplot(airquality, aes(x = Day, y = Temp)) +
   geom_line(color = "steelblue") +
   geom_point(color = "steelblue") +
-  facet_wrap(~ Month, ncol = 5) +
-  labs(title = "Daily temperatures by month, NY 1973",
-       x = "Day of month", y = "Temp (°F)")
+  facet_wrap(~Month, ncol = 5) +
+  labs(
+    title = "Daily temperatures by month, NY 1973",
+    x = "Day of month", y = "Temp (°F)"
+  )
 `}
 />
 
@@ -219,7 +221,7 @@ also ships with several full themes:
 data(mtcars)
 
 p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
-       geom_point(color = "steelblue", size = 3)
+  geom_point(color = "steelblue", size = 3)
 
 p + theme_minimal()
 p + theme_bw()
@@ -290,23 +292,25 @@ Then print(p) to render it.`}
   starterCode={`library(ggplot2)
 data(iris)
 
-p <- NULL   # build the plot
+p <- NULL # build the plot
 
 print(p)
 `}
   solutionCode={`library(ggplot2)
 data(iris)
 
-p <- ggplot(iris, aes(x = Sepal.Length, y = Petal.Length,
-                      color = Species)) +
-       geom_point(size = 2, alpha = 0.7) +
-       geom_smooth(method = "lm", se = FALSE) +
-       facet_wrap(~ Species) +
-       labs(
-         title = "Sepal length vs. petal length, by species",
-         x = "Sepal length (cm)",
-         y = "Petal length (cm)"
-       )
+p <- ggplot(iris, aes(
+  x = Sepal.Length, y = Petal.Length,
+  color = Species
+)) +
+  geom_point(size = 2, alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~Species) +
+  labs(
+    title = "Sepal length vs. petal length, by species",
+    x = "Sepal length (cm)",
+    y = "Petal length (cm)"
+  )
 print(p)
 `}
   tests={[

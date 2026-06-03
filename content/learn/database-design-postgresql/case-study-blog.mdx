@@ -209,15 +209,26 @@ INSERT INTO post_tags (post_id, tag_id) VALUES
     (1, 2),
     (1, 3);
 `}
-  starterCode={`SELECT p.title,
-       u.display_name AS author,
-       string_agg(t.name, ', ' ORDER BY t.name) AS tags
-FROM posts AS p
-JOIN users AS u ON u.id = p.author_id
-JOIN post_tags AS pt ON pt.post_id = p.id
-JOIN tags AS t ON t.id = pt.tag_id
-WHERE p.status = 'published'
-GROUP BY p.id, p.title, u.display_name;`}
+  starterCode={`SELECT
+  p.title,
+  u.display_name AS author,
+  string_agg(
+    t.name,
+    ', '
+    ORDER BY
+      t.name
+  ) AS tags
+FROM
+  posts AS p
+  JOIN users AS u ON u.id = p.author_id
+  JOIN post_tags AS pt ON pt.post_id = p.id
+  JOIN tags AS t ON t.id = pt.tag_id
+WHERE
+  p.status = 'published'
+GROUP BY
+  p.id,
+  p.title,
+  u.display_name;`}
 />
 
 The query joins across the design: post to author, post to junction
@@ -268,8 +279,10 @@ INSERT INTO posts (title) VALUES ('Designing Tables');
 INSERT INTO tags (name) VALUES ('postgres');
 INSERT INTO post_tags (post_id, tag_id) VALUES (1, 1);
 `}
-  starterCode={`INSERT INTO post_tags (post_id, tag_id)
-VALUES (1, 1);`}
+  starterCode={`INSERT INTO
+  post_tags (post_id, tag_id)
+VALUES
+  (1, 1);`}
 />
 
 ## Check your understanding

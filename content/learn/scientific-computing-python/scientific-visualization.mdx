@@ -44,14 +44,19 @@ breaking a sweat.
   starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 
-x = np.linspace(0, 2*np.pi, 200)
+x = np.linspace(0, 2 * np.pi, 200)
 
 fig, axes = plt.subplots(2, 2, figsize=(9, 6), constrained_layout=True)
 
-axes[0, 0].plot(x, np.sin(x)); axes[0, 0].set_title("sin")
-axes[0, 1].plot(x, np.cos(x)); axes[0, 1].set_title("cos")
-axes[1, 0].plot(x, np.tan(x)); axes[1, 0].set_ylim(-5, 5); axes[1, 0].set_title("tan")
-axes[1, 1].plot(x, np.sin(x)*np.cos(x)); axes[1, 1].set_title("sin·cos")
+axes[0, 0].plot(x, np.sin(x))
+axes[0, 0].set_title("sin")
+axes[0, 1].plot(x, np.cos(x))
+axes[0, 1].set_title("cos")
+axes[1, 0].plot(x, np.tan(x))
+axes[1, 0].set_ylim(-5, 5)
+axes[1, 0].set_title("tan")
+axes[1, 1].plot(x, np.sin(x) * np.cos(x))
+axes[1, 1].set_title("sin·cos")
 
 for ax in axes.flat:
     ax.axhline(0, color="k", lw=0.5)
@@ -82,17 +87,19 @@ import matplotlib.pyplot as plt
 x = np.linspace(-3, 3, 200)
 y = np.linspace(-3, 3, 200)
 X, Y = np.meshgrid(x, y)
-Z = np.exp(-(X**2 + Y**2)) * np.cos(2*X) * np.sin(3*Y)
+Z = np.exp(-(X**2 + Y**2)) * np.cos(2 * X) * np.sin(3 * Y)
 
 fig, axes = plt.subplots(1, 2, figsize=(10, 4), constrained_layout=True)
 
 im = axes[0].pcolormesh(X, Y, Z, cmap="viridis", shading="auto")
-axes[0].set_title("pcolormesh"); axes[0].set_aspect("equal")
+axes[0].set_title("pcolormesh")
+axes[0].set_aspect("equal")
 fig.colorbar(im, ax=axes[0])
 
 cf = axes[1].contourf(X, Y, Z, levels=20, cmap="viridis")
 axes[1].contour(X, Y, Z, levels=10, colors="k", linewidths=0.4)
-axes[1].set_title("contourf + contour"); axes[1].set_aspect("equal")
+axes[1].set_title("contourf + contour")
+axes[1].set_aspect("equal")
 fig.colorbar(cf, ax=axes[1])
 plt.show()
 `}
@@ -125,11 +132,11 @@ ramp = np.linspace(0, 1, 256).reshape(1, -1)
 ramp = np.tile(ramp, (40, 1))
 
 cmaps = ["jet", "viridis", "cividis"]
-fig, axes = plt.subplots(len(cmaps), 1, figsize=(8, 3),
-                         constrained_layout=True)
+fig, axes = plt.subplots(len(cmaps), 1, figsize=(8, 3), constrained_layout=True)
 for ax, cm in zip(axes, cmaps):
     ax.imshow(ramp, cmap=cm, aspect="auto")
-    ax.set_yticks([]); ax.set_title(cm)
+    ax.set_yticks([])
+    ax.set_title(cm)
 plt.show()
 `}
 />
@@ -151,17 +158,19 @@ import matplotlib.pyplot as plt
 x = np.linspace(-2, 2, 25)
 y = np.linspace(-2, 2, 25)
 X, Y = np.meshgrid(x, y)
-U =  Y                       # rotational vector field
+U = Y  # rotational vector field
 V = -X
 M = np.hypot(U, V)
 
 fig, axes = plt.subplots(1, 2, figsize=(10, 4), constrained_layout=True)
 
 axes[0].quiver(X, Y, U, V, M, cmap="viridis", scale=40)
-axes[0].set_aspect("equal"); axes[0].set_title("quiver: vortex flow")
+axes[0].set_aspect("equal")
+axes[0].set_title("quiver: vortex flow")
 
 axes[1].streamplot(X, Y, U, V, color=M, cmap="viridis")
-axes[1].set_aspect("equal"); axes[1].set_title("streamplot")
+axes[1].set_aspect("equal")
+axes[1].set_title("streamplot")
 plt.show()
 `}
 />
@@ -179,7 +188,9 @@ Z = np.sin(np.sqrt(X**2 + Y**2))
 fig = plt.figure(figsize=(7, 5))
 ax = fig.add_subplot(111, projection="3d")
 ax.plot_surface(X, Y, Z, cmap="viridis", rstride=2, cstride=2, alpha=0.85)
-ax.set_xlabel("x"); ax.set_ylabel("y"); ax.set_zlabel("f(x,y)")
+ax.set_xlabel("x")
+ax.set_ylabel("y")
+ax.set_zlabel("f(x,y)")
 ax.set_title("3-D surface")
 plt.show()
 `}
@@ -205,12 +216,12 @@ rng = np.random.default_rng(0)
 t = np.linspace(0, 4, 200)
 
 # 9 noisy realizations of decaying oscillation with varying frequency
-fig, axes = plt.subplots(3, 3, figsize=(9, 7),
-                         sharex=True, sharey=True,
-                         constrained_layout=True)
+fig, axes = plt.subplots(
+    3, 3, figsize=(9, 7), sharex=True, sharey=True, constrained_layout=True
+)
 for i, ax in enumerate(axes.flat):
     omega = 1 + 0.4 * i
-    y = np.exp(-0.5*t) * np.cos(omega*t) + 0.05*rng.standard_normal(t.size)
+    y = np.exp(-0.5 * t) * np.cos(omega * t) + 0.05 * rng.standard_normal(t.size)
     ax.plot(t, y)
     ax.set_title(f"ω = {omega:.1f}", fontsize=10)
 plt.show()

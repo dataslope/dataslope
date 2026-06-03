@@ -201,26 +201,22 @@ implementations.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Greeter g = new Plain();
-        System.out.println(g.greet("Ada"));
-        System.out.println(g.greetLoudly("Ada"));
-    }
+  public static void main(String[] args) {
+    Greeter g = new Plain();
+    System.out.println(g.greet("Ada"));
+    System.out.println(g.greetLoudly("Ada"));
+  }
 }
 
 interface Greeter {
-    String greet(String name);
+  String greet(String name);
 
-    // default method — implementers get this for free
-    default String greetLoudly(String name) {
-        return greet(name).toUpperCase();
-    }
+  // default method — implementers get this for free
+  default String greetLoudly(String name) { return greet(name).toUpperCase(); }
 }
 
 class Plain implements Greeter {
-    public String greet(String name) {
-        return "hello, " + name;
-    }
+  public String greet(String name) { return "hello, " + name; }
 }
 `}
 />

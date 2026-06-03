@@ -110,10 +110,15 @@ INSERT INTO products (name, price) VALUES
   ('Mouse', 25),
   ('Desk', 220),
   ('Lamp', 45);`}
-  starterCode={`SELECT name, price
-FROM products
-WHERE price > 100
-ORDER BY price DESC;`}
+  starterCode={`SELECT
+  name,
+  price
+FROM
+  products
+WHERE
+  price > 100
+ORDER BY
+  price DESC;`}
 />
 
 You never told PostgreSQL *how* to scan the rows, compare prices,

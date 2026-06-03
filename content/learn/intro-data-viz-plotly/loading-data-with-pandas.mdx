@@ -30,11 +30,13 @@ named column headers."
   starterCode={`import pandas as pd
 
 # Build a tiny DataFrame from a Python dictionary:
-df = pd.DataFrame({
-    "name":   ["Ana", "Ben", "Cal", "Dee"],
-    "age":    [27, 41, 18, 33],
-    "income": [52000, 78000, 0, 64000],
-})
+df = pd.DataFrame(
+    {
+        "name": ["Ana", "Ben", "Cal", "Dee"],
+        "age": [27, 41, 18, 33],
+        "income": [52000, 78000, 0, 64000],
+    }
+)
 
 print(df)
 print()
@@ -251,14 +253,16 @@ df = px.data.gapminder().query("year == 2007")
 
 avg = (
     df.groupby("continent", as_index=False)["lifeExp"]
-      .mean()
-      .sort_values("lifeExp", ascending=False)
+    .mean()
+    .sort_values("lifeExp", ascending=False)
 )
 
 print(avg)
 
 fig = px.bar(
-    avg, x="continent", y="lifeExp",
+    avg,
+    x="continent",
+    y="lifeExp",
     template="simple_white",
     title="Average life expectancy by continent (2007)",
     labels={"lifeExp": "Mean life expectancy (years)", "continent": "Continent"},
@@ -304,12 +308,14 @@ The tool to do that is `df.melt(...)`:
   starterCode={`import pandas as pd
 import plotly.express as px
 
-wide = pd.DataFrame({
-    "city": ["Boston", "Tokyo"],
-    "2020": [100, 200],
-    "2021": [120, 220],
-    "2022": [150, 240],
-})
+wide = pd.DataFrame(
+    {
+        "city": ["Boston", "Tokyo"],
+        "2020": [100, 200],
+        "2021": [120, 220],
+        "2022": [150, 240],
+    }
+)
 
 print("WIDE:")
 print(wide)
@@ -321,7 +327,11 @@ print("\\nLONG:")
 print(long)
 
 fig = px.line(
-    long, x="year", y="visitors", color="city", markers=True,
+    long,
+    x="year",
+    y="visitors",
+    color="city",
+    markers=True,
     template="simple_white",
     title="Visitors by city (long format)",
     labels={"visitors": "Visitors", "year": "Year"},

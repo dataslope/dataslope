@@ -130,13 +130,15 @@ Pandas:
   adapter="python"
   starterCode={`import pandas as pd
 
-orders = pd.DataFrame({
-    "user_id":   [1,2,3,4,5,6,7,8],
-    "is_test":   [False,True,False,False,True,False,False,False],
-    "day":       ["Mon","Sat","Tue","Wed","Sun","Thu","Fri","Sat"],
-    "amount":    [100, 50, 80, 120, 60, 90, 110, 70],
-    "currency":  ["USD","EUR","USD","USD","GBP","USD","EUR","USD"],
-})
+orders = pd.DataFrame(
+    {
+        "user_id": [1, 2, 3, 4, 5, 6, 7, 8],
+        "is_test": [False, True, False, False, True, False, False, False],
+        "day": ["Mon", "Sat", "Tue", "Wed", "Sun", "Thu", "Fri", "Sat"],
+        "amount": [100, 50, 80, 120, 60, 90, 110, 70],
+        "currency": ["USD", "EUR", "USD", "USD", "GBP", "USD", "EUR", "USD"],
+    }
+)
 
 # 1. Drop test users
 clean = orders[~orders["is_test"]]
@@ -194,11 +196,13 @@ Data* chapter.)
 import io
 
 # Tiny demo dataset
-df = pd.DataFrame({
-    "product": ["Latte","Cappuccino","Espresso","Mocha"],
-    "units":   [120, 95, 60, 75],
-    "revenue": [600, 475, 240, 412.50],
-})
+df = pd.DataFrame(
+    {
+        "product": ["Latte", "Cappuccino", "Espresso", "Mocha"],
+        "units": [120, 95, 60, 75],
+        "revenue": [600, 475, 240, 412.50],
+    }
+)
 
 # Compute a quick summary
 summary = df.assign(price_each=df["revenue"] / df["units"]).round(2)

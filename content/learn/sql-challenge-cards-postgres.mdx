@@ -30,17 +30,19 @@ INSERT INTO orders (customer_id, amount) VALUES
   o.id AS order_id,
   c.name AS customer_name,
   o.amount
-FROM orders o
--- your JOIN and ORDER BY here
-;
-`}
+FROM
+  orders o
+  -- your JOIN and ORDER BY here
+;`}
   solutionSql={`SELECT
   o.id AS order_id,
   c.name AS customer_name,
   o.amount
-FROM orders o
-JOIN customers c ON c.id = o.customer_id
-ORDER BY o.id ASC;`}
+FROM
+  orders o
+  JOIN customers c ON c.id = o.customer_id
+ORDER BY
+  o.id ASC;`}
   tests={[
     {
       id: "row_count",
@@ -87,17 +89,19 @@ INSERT INTO orders (customer_id, amount) VALUES
   o.id AS order_id,
   c.name AS customer_name,
   o.amount
-FROM orders o
--- your JOIN and ORDER BY here
-;
-`}
+FROM
+  orders o
+  -- your JOIN and ORDER BY here
+;`}
   solutionSql={`SELECT
   o.id AS order_id,
   c.name AS customer_name,
   o.amount
-FROM orders o
-JOIN customers c ON c.id = o.customer_id
-ORDER BY o.id ASC;`}
+FROM
+  orders o
+  JOIN customers c ON c.id = o.customer_id
+ORDER BY
+  o.id ASC;`}
   tests={[
     {
       id: "row_count",
@@ -143,20 +147,33 @@ INSERT INTO orders (customer_id, amount) VALUES
   (1,  30.00), (3, 200.00),
   (2,  50.00);`}
   starterCode={`-- Your query here:
-SELECT c.name AS customer_name, 0 AS total_spent
-FROM customers c
-LIMIT 1;
-`}
-  solutionSql={`WITH spend AS (
-  SELECT customer_id, SUM(amount) AS total_spent
-  FROM orders
-  GROUP BY customer_id
-)
-SELECT c.name AS customer_name, s.total_spent
-FROM spend s
-JOIN customers c ON c.id = s.customer_id
-ORDER BY s.total_spent DESC
-LIMIT 1;`}
+SELECT
+  c.name AS customer_name,
+  0 AS total_spent
+FROM
+  customers c
+LIMIT
+  1;`}
+  solutionSql={`WITH
+  spend AS (
+    SELECT
+      customer_id,
+      SUM(amount) AS total_spent
+    FROM
+      orders
+    GROUP BY
+      customer_id
+  )
+SELECT
+  c.name AS customer_name,
+  s.total_spent
+FROM
+  spend s
+  JOIN customers c ON c.id = s.customer_id
+ORDER BY
+  s.total_spent DESC
+LIMIT
+  1;`}
   tests={[
     {
       id: "one_row",
@@ -193,20 +210,33 @@ INSERT INTO orders (customer_id, amount) VALUES
   (1,  30.00), (3, 200.00),
   (2,  50.00);`}
   starterCode={`-- Your query here:
-SELECT c.name AS customer_name, 0 AS total_spent
-FROM customers c
-LIMIT 1;
-`}
-  solutionSql={`WITH spend AS (
-  SELECT customer_id, SUM(amount) AS total_spent
-  FROM orders
-  GROUP BY customer_id
-)
-SELECT c.name AS customer_name, s.total_spent
-FROM spend s
-JOIN customers c ON c.id = s.customer_id
-ORDER BY s.total_spent DESC
-LIMIT 1;`}
+SELECT
+  c.name AS customer_name,
+  0 AS total_spent
+FROM
+  customers c
+LIMIT
+  1;`}
+  solutionSql={`WITH
+  spend AS (
+    SELECT
+      customer_id,
+      SUM(amount) AS total_spent
+    FROM
+      orders
+    GROUP BY
+      customer_id
+  )
+SELECT
+  c.name AS customer_name,
+  s.total_spent
+FROM
+  spend s
+  JOIN customers c ON c.id = s.customer_id
+ORDER BY
+  s.total_spent DESC
+LIMIT
+  1;`}
   tests={[
     {
       id: "one_row",
@@ -235,8 +265,7 @@ LIMIT 1;`}
   amount NUMERIC(10, 2)
 );
 INSERT INTO orders (amount) VALUES (120.00), (80.00), (200.00), (50.00), (150.00);`}
-  starterCode={`-- UPDATE the rows where amount > 100
-`}
+  starterCode={`-- UPDATE the rows where amount > 100`}
   tests={[
     {
       id: "count_large",
@@ -267,8 +296,7 @@ INSERT INTO orders (amount) VALUES (120.00), (80.00), (200.00), (50.00), (150.00
   amount NUMERIC(10, 2)
 );
 INSERT INTO orders (amount) VALUES (120.00), (80.00), (200.00), (50.00), (150.00);`}
-  starterCode={`-- UPDATE the rows where amount > 100
-`}
+  starterCode={`-- UPDATE the rows where amount > 100`}
   tests={[
     {
       id: "count_large",
@@ -310,11 +338,21 @@ SELECT
   (s.i * 37 % 100) AS score
 FROM generate_series(1, 10000) AS s(i);
 `}
-  starterCode={`SELECT * FROM big LIMIT 5;`}
-  solutionSql={`SELECT (score / 10) * 10 AS bucket, COUNT(*)::int AS n
-FROM big
-GROUP BY bucket
-ORDER BY bucket;`}
+  starterCode={`SELECT
+  *
+FROM
+  big
+LIMIT
+  5;`}
+  solutionSql={`SELECT
+  (score / 10) * 10 AS bucket,
+  COUNT(*)::int AS n
+FROM
+  big
+GROUP BY
+  bucket
+ORDER BY
+  bucket;`}
   tests={[
     {
       id: "row_count",
@@ -342,9 +380,21 @@ ORDER BY bucket;`}
 SELECT s.i AS id, ('user_' || s.i) AS name, (s.i * 37 % 100) AS score
 FROM generate_series(1, 10000) AS s(i);
 `}
-  starterCode={`SELECT * FROM big LIMIT 5;`}
-  solutionSql={`SELECT (score / 10) * 10 AS bucket, COUNT(*)::int AS n
-FROM big GROUP BY bucket ORDER BY bucket;`}
+  starterCode={`SELECT
+  *
+FROM
+  big
+LIMIT
+  5;`}
+  solutionSql={`SELECT
+  (score / 10) * 10 AS bucket,
+  COUNT(*)::int AS n
+FROM
+  big
+GROUP BY
+  bucket
+ORDER BY
+  bucket;`}
   tests={[
     { id: "row_count", name: "10 buckets", expectedRowCount: 10 },
     { id: "matches", matchesSolution: true, ordered: true },

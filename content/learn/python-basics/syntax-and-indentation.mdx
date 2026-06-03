@@ -39,6 +39,7 @@ in `{ ... }`. In Python it is wrapped in **a deeper indentation level**:
         return message.upper() + "!"
     return ""
 
+
 print(shout("hello"))
 print(shout(""))
 `}
@@ -66,6 +67,7 @@ silently broken program (in older Python 2 codebases).
 # then run again to see the IndentationError.
 def square(x):
     return x * x
+
 
 print(square(5))
 `}
@@ -170,8 +172,7 @@ ways to span multiple lines:
 <CodeBlock
   adapter="python"
   starterCode={`# Preferred: implicit continuation inside parentheses.
-total = (1 + 2 + 3
-         + 4 + 5 + 6)
+total = 1 + 2 + 3 + 4 + 5 + 6
 
 print("Total:", total)
 `}
@@ -180,8 +181,7 @@ print("Total:", total)
 <CodeBlock
   adapter="python"
   starterCode={`# Works but ugly: explicit backslash continuation.
-total2 = 1 + 2 + 3 \\
-       + 4 + 5 + 6
+total2 = 1 + 2 + 3 + 4 + 5 + 6
 
 print("Total2:", total2)
 `}
@@ -200,7 +200,9 @@ polite language; the real sentiment is "never do this".
 <CodeBlock
   adapter="python"
   starterCode={`# Legal Python, but PEP 8 says no.
-a = 1; b = 2; print(a + b)
+a = 1
+b = 2
+print(a + b)
 `}
 />
 
@@ -256,6 +258,7 @@ print(average([1, 2, 3, 4]))
     total = sum(numbers)
     return total / len(numbers)
 
+
 print(average([1, 2, 3, 4]))
 `}
   tests={[
@@ -284,16 +287,16 @@ print(average([1, 2, 3, 4]))
 
 Do not change the function's behavior, just improve its style.`}
   starterCode={`def long_sum(a, b, c, d, e):
-    result = a + b + c \\
-           + d + e
+    result = a + b + c + d + e
     return result
+
 
 print(long_sum(1, 2, 3, 4, 5))
 `}
   solutionCode={`def long_sum(a, b, c, d, e):
-    result = (a + b + c
-              + d + e)
+    result = a + b + c + d + e
     return result
+
 
 print(long_sum(1, 2, 3, 4, 5))
 `}

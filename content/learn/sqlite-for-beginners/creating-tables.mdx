@@ -14,14 +14,12 @@ To create a table, give SQLite a table name and a list of columns. Each column h
 <SqlCodeBlock
   dialect="sqlite"
   title="Create an empty books table"
-  starterCode={`CREATE TABLE books (
-  id INTEGER,
-  title TEXT,
-  author TEXT,
-  year INTEGER
-);
+  starterCode={`CREATE TABLE books (id INTEGER, title TEXT, author TEXT, year INTEGER);
 
-SELECT * FROM books;`}
+SELECT
+  *
+FROM
+  books;`}
 />
 
 The `SELECT` returns no rows because the table is empty. That is still useful: it proves the table exists and shows the column names.
@@ -79,7 +77,10 @@ SQLite will try to store values in a sensible way based on the column's declared
   tax_rate NUMERIC
 );
 
-SELECT * FROM products;`}
+SELECT
+  *
+FROM
+  products;`}
 />
 
 <MultipleChoice
@@ -110,18 +111,20 @@ That column becomes a unique row id. If you omit it during an insert, SQLite can
 <SqlCodeBlock
   dialect="sqlite"
   title="Let SQLite assign ids"
-  starterCode={`CREATE TABLE books (
-  id INTEGER PRIMARY KEY,
-  title TEXT,
-  author TEXT
-);
+  starterCode={`CREATE TABLE books (id INTEGER PRIMARY KEY, title TEXT, author TEXT);
 
-INSERT INTO books (title, author) VALUES
+INSERT INTO
+  books (title, author)
+VALUES
   ('A Wrinkle in Time', 'Madeleine L''Engle'),
   ('The Hobbit', 'J. R. R. Tolkien');
 
-SELECT * FROM books
-ORDER BY id;`}
+SELECT
+  *
+FROM
+  books
+ORDER BY
+  id;`}
 />
 
 Notice that the `INSERT` statement did not provide `id` values. SQLite filled them in because `id` is an `INTEGER PRIMARY KEY`.
@@ -148,12 +151,18 @@ A table can include rules called **constraints**. Two beginner-friendly constrai
   times_done INTEGER DEFAULT 0
 );
 
-INSERT INTO habits (name) VALUES
+INSERT INTO
+  habits (name)
+VALUES
   ('Drink water'),
   ('Stretch');
 
-SELECT * FROM habits
-ORDER BY id;`}
+SELECT
+  *
+FROM
+  habits
+ORDER BY
+  id;`}
 />
 
 The rows have `times_done` set to `0` even though the insert did not mention that column. The `DEFAULT 0` rule filled it in.
@@ -168,14 +177,22 @@ The rows have `times_done` set to `0` even though the insert did not mention tha
   rating REAL DEFAULT 0.0
 );
 
-INSERT INTO movies (title, release_year, rating) VALUES
+INSERT INTO
+  movies (title, release_year, rating)
+VALUES
   ('Spirited Away', 2001, 8.6);
 
-INSERT INTO movies (title, release_year) VALUES
+INSERT INTO
+  movies (title, release_year)
+VALUES
   ('The Iron Giant', 1999);
 
-SELECT * FROM movies
-ORDER BY id;`}
+SELECT
+  *
+FROM
+  movies
+ORDER BY
+  id;`}
 />
 
 ```mermaid
@@ -215,17 +232,17 @@ A default is a fallback value for missing input.`}
 Then select all columns from \`notes\`.`}
   initSql={``}
   starterCode={`-- Create the table here:
-
-
--- Then read it:
-`}
+-- Then read it:`}
   solutionSql={`CREATE TABLE notes (
   id INTEGER PRIMARY KEY,
   body TEXT NOT NULL,
   pinned INTEGER DEFAULT 0
 );
 
-SELECT * FROM notes;`}
+SELECT
+  *
+FROM
+  notes;`}
   tests={[
     { id: "columns", name: "Has the right columns", description: "The result should show id, body, and pinned columns.", expectedColumns: ["id", "body", "pinned"] },
     { id: "row_count", name: "Returns no rows", description: "A newly created table should be empty.", expectedRowCount: 0 },

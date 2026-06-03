@@ -72,14 +72,24 @@ INSERT INTO orders_flat VALUES
   (3, 'Grace', 'grace@test.test', 'Notebook', 8.00);`}
   starterCode={`-- A rushed update changes only one of Ada's rows.
 UPDATE orders_flat
-SET customer_email = 'ada@new.test'
-WHERE order_id = 1;
+SET
+  customer_email = 'ada@new.test'
+WHERE
+  order_id = 1;
 
 -- The same customer now appears with two different emails.
-SELECT customer_name, customer_email, COUNT(*) AS rows_with_that_email
-FROM orders_flat
-GROUP BY customer_name, customer_email
-ORDER BY customer_name, customer_email;`}
+SELECT
+  customer_name,
+  customer_email,
+  COUNT(*) AS rows_with_that_email
+FROM
+  orders_flat
+GROUP BY
+  customer_name,
+  customer_email
+ORDER BY
+  customer_name,
+  customer_email;`}
 />
 
 The update statement is legal SQL. The problem is not syntax; the

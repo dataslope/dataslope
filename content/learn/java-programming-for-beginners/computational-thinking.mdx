@@ -115,18 +115,18 @@ mechanically:
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        int[] nums = {3, 8, 1, 9, 4, 7, 2};
+  public static void main(String[] args) {
+    int[] nums = {3, 8, 1, 9, 4, 7, 2};
 
-        int biggest = nums[0];
-        for (int i = 1; i < nums.length; i++) {
-            if (nums[i] > biggest) {
-                biggest = nums[i];
-            }
-        }
-
-        System.out.println("biggest = " + biggest);
+    int biggest = nums[0];
+    for (int i = 1; i < nums.length; i++) {
+      if (nums[i] > biggest) {
+        biggest = nums[i];
+      }
     }
+
+    System.out.println("biggest = " + biggest);
+  }
 }
 `}
 />

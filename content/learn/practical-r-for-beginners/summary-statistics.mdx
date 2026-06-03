@@ -36,8 +36,8 @@ flowchart TB
   adapter="r"
   starterCode={`incomes <- c(32, 38, 42, 45, 48, 51, 55, 58, 62, 250)
 
-mean(incomes)     # average — pulled up by the 250
-median(incomes)   # middle value — robust to outliers
+mean(incomes) # average — pulled up by the 250
+median(incomes) # middle value — robust to outliers
 `}
 />
 
@@ -61,14 +61,19 @@ both).
 
 <CodeBlock
   adapter="r"
-  starterCode={`a <- c(48, 49, 50, 51, 52)        # tight
-b <- c(10, 30, 50, 70, 90)        # spread
+  starterCode={`a <- c(48, 49, 50, 51, 52) # tight
+b <- c(10, 30, 50, 70, 90) # spread
 
-mean(a); mean(b)     # same mean!
-sd(a);   sd(b)       # very different spread
-var(a);  var(b)      # variance = sd^2
-range(a); range(b)
-IQR(a);  IQR(b)      # interquartile range: Q3 - Q1
+mean(a)
+mean(b) # same mean!
+sd(a)
+sd(b) # very different spread
+var(a)
+var(b) # variance = sd^2
+range(a)
+range(b)
+IQR(a)
+IQR(b) # interquartile range: Q3 - Q1
 `}
 />
 
@@ -102,7 +107,7 @@ quantile(scores)
 quantile(scores, probs = seq(0, 1, by = 0.1))
 
 # A single quantile
-quantile(scores, probs = 0.9)   # 90th percentile
+quantile(scores, probs = 0.9) # 90th percentile
 `}
 />
 
@@ -180,10 +185,12 @@ summary statistics can describe wildly different datasets:
 
 # Compute means and sds of all four (x, y) pairs
 sapply(1:4, function(i) {
-  c(mean_x = mean(anscombe[[paste0("x", i)]]),
+  c(
+    mean_x = mean(anscombe[[paste0("x", i)]]),
     mean_y = mean(anscombe[[paste0("y", i)]]),
-    sd_x   = sd(anscombe[[paste0("x", i)]]),
-    sd_y   = sd(anscombe[[paste0("y", i)]]))
+    sd_x = sd(anscombe[[paste0("x", i)]]),
+    sd_y = sd(anscombe[[paste0("y", i)]])
+  )
 })
 `}
 />

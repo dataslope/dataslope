@@ -195,8 +195,8 @@ mtcars |>
   filter(wt > 2.5) |>
   group_by(cyl) |>
   summarise(
-    n_cars        = n(),
-    avg_mpg       = round(mean(mpg), 2),
+    n_cars = n(),
+    avg_mpg = round(mean(mpg), 2),
     avg_horsepower = round(mean(hp), 1)
   )
 `}

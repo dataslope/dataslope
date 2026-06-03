@@ -67,9 +67,10 @@ X, y = load_iris(return_X_y=True)
 print("Whole dataset:", X.shape, "->", len(y), "labels")
 
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y,
-    test_size=0.25,     # put 25% of rows in the test set
-    random_state=0,     # fixed seed so the split is reproducible
+    X,
+    y,
+    test_size=0.25,  # put 25% of rows in the test set
+    random_state=0,  # fixed seed so the split is reproducible
 )
 
 print("Training set:", X_train.shape)
@@ -100,9 +101,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
 X, y = load_breast_cancer(return_X_y=True)
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=0
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
 # A tree with no depth limit will grow until it fits the training data
 # almost perfectly.

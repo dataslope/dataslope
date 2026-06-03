@@ -80,34 +80,35 @@ will dispatch to the actual concrete class's version:
 
 class Animal {
 public:
-    Animal(std::string name) : name_(std::move(name)) {}
-    const std::string& name() const { return name_; }
-    virtual std::string sound() const { return "(none)"; }
-    virtual ~Animal() = default;
+  Animal(std::string name) : name_(std::move(name)) {}
+  const std::string &name() const { return name_; }
+  virtual std::string sound() const { return "(none)"; }
+  virtual ~Animal() = default;
+
 protected:
-    std::string name_;
+  std::string name_;
 };
 
 class Dog : public Animal {
 public:
-    Dog(std::string n) : Animal(std::move(n)) {}
-    std::string sound() const override { return "woof"; }
+  Dog(std::string n) : Animal(std::move(n)) {}
+  std::string sound() const override { return "woof"; }
 };
 class Cat : public Animal {
 public:
-    Cat(std::string n) : Animal(std::move(n)) {}
-    std::string sound() const override { return "meow"; }
+  Cat(std::string n) : Animal(std::move(n)) {}
+  std::string sound() const override { return "meow"; }
 };
 
 int main() {
-    std::vector<std::unique_ptr<Animal>> zoo;
-    zoo.push_back(std::make_unique<Dog>("Rex"));
-    zoo.push_back(std::make_unique<Cat>("Mochi"));
+  std::vector<std::unique_ptr<Animal>> zoo;
+  zoo.push_back(std::make_unique<Dog>("Rex"));
+  zoo.push_back(std::make_unique<Cat>("Mochi"));
 
-    for (auto& a : zoo) {
-        std::cout << a->name() << " says " << a->sound() << "\\n";
-    }
-    return 0;
+  for (auto &a : zoo) {
+    std::cout << a->name() << " says " << a->sound() << "\\n";
+  }
+  return 0;
 }
 `}
 />
@@ -206,35 +207,38 @@ that derived classes must implement.
 
 class Shape {
 public:
-    virtual double area() const = 0;
-    virtual ~Shape() = default;
+  virtual double area() const = 0;
+  virtual ~Shape() = default;
 };
 
 class Circle : public Shape {
 public:
-    Circle(double r) : r_(r) {}
-    double area() const override { return 3.14159265 * r_ * r_; }
+  Circle(double r) : r_(r) {}
+  double area() const override { return 3.14159265 * r_ * r_; }
+
 private:
-    double r_;
+  double r_;
 };
 
 class Square : public Shape {
 public:
-    Square(double s) : s_(s) {}
-    double area() const override { return s_ * s_; }
+  Square(double s) : s_(s) {}
+  double area() const override { return s_ * s_; }
+
 private:
-    double s_;
+  double s_;
 };
 
 int main() {
-    std::vector<std::unique_ptr<Shape>> shapes;
-    shapes.push_back(std::make_unique<Circle>(1.0));
-    shapes.push_back(std::make_unique<Square>(2.0));
+  std::vector<std::unique_ptr<Shape>> shapes;
+  shapes.push_back(std::make_unique<Circle>(1.0));
+  shapes.push_back(std::make_unique<Square>(2.0));
 
-    double total = 0;
-    for (auto& s : shapes) total += s->area();
-    std::cout << "total area = " << total << "\\n";
-    return 0;
+  double total = 0;
+  for (auto &s : shapes)
+    total += s->area();
+  std::cout << "total area = " << total << "\\n";
+  return 0;
 }
 `}
 />
@@ -250,16 +254,16 @@ int main() {
 
 class Shape {
 public:
-    virtual double area() const = 0;
-    virtual ~Shape() = default;
+  virtual double area() const = 0;
+  virtual ~Shape() = default;
 };
 
 // add Rectangle here
 
 int main() {
-    std::unique_ptr<Shape> s = /* construct a Rectangle(3.0, 4.0) */ nullptr;
-    std::cout << s->area();
-    return 0;
+  std::unique_ptr<Shape> s = /* construct a Rectangle(3.0, 4.0) */ nullptr;
+  std::cout << s->area();
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
@@ -267,22 +271,23 @@ int main() {
 
 class Shape {
 public:
-    virtual double area() const = 0;
-    virtual ~Shape() = default;
+  virtual double area() const = 0;
+  virtual ~Shape() = default;
 };
 
 class Rectangle : public Shape {
 public:
-    Rectangle(double w, double h) : w_(w), h_(h) {}
-    double area() const override { return w_ * h_; }
+  Rectangle(double w, double h) : w_(w), h_(h) {}
+  double area() const override { return w_ * h_; }
+
 private:
-    double w_, h_;
+  double w_, h_;
 };
 
 int main() {
-    std::unique_ptr<Shape> s = std::make_unique<Rectangle>(3.0, 4.0);
-    std::cout << s->area();
-    return 0;
+  std::unique_ptr<Shape> s = std::make_unique<Rectangle>(3.0, 4.0);
+  std::cout << s->area();
+  return 0;
 }
 `}
   tests={[

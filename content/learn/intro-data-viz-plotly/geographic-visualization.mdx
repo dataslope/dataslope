@@ -31,7 +31,7 @@ df = px.data.gapminder().query("year == 2007")
 
 fig = px.choropleth(
     df,
-    locations="iso_alpha",            # ISO-3 country codes
+    locations="iso_alpha",  # ISO-3 country codes
     color="lifeExp",
     hover_name="country",
     color_continuous_scale="Viridis",
@@ -167,7 +167,12 @@ df = px.data.gapminder()
 e2007 = df.query("year == 2007").set_index("iso_alpha")["lifeExp"]
 e1952 = df.query("year == 1952").set_index("iso_alpha")["lifeExp"]
 change = ((e2007 - e1952) / e1952 * 100).rename("pct_change").reset_index()
-change["country"] = df.drop_duplicates("iso_alpha").set_index("iso_alpha")["country"].reindex(change["iso_alpha"]).values
+change["country"] = (
+    df.drop_duplicates("iso_alpha")
+    .set_index("iso_alpha")["country"]
+    .reindex(change["iso_alpha"])
+    .values
+)
 
 fig = px.choropleth(
     change,

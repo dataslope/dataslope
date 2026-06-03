@@ -90,31 +90,31 @@ code touch its fields. That is the seed of every idea in this course.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Lamp desk = new Lamp("desk");
-        System.out.println(desk.describe());
-        desk.turnOn();
-        System.out.println(desk.describe());
-        desk.turnOff();
-        System.out.println(desk.describe());
-    }
+  public static void main(String[] args) {
+    Lamp desk = new Lamp("desk");
+    System.out.println(desk.describe());
+    desk.turnOn();
+    System.out.println(desk.describe());
+    desk.turnOff();
+    System.out.println(desk.describe());
+  }
 }
 
 class Lamp {
-    private final String name;
-    private boolean isOn;
+  private final String name;
+  private boolean isOn;
 
-    public Lamp(String name) {
-        this.name = name;
-        this.isOn = false;
-    }
+  public Lamp(String name) {
+    this.name = name;
+    this.isOn = false;
+  }
 
-    public void turnOn()  { this.isOn = true; }
-    public void turnOff() { this.isOn = false; }
+  public void turnOn() { this.isOn = true; }
+  public void turnOff() { this.isOn = false; }
 
-    public String describe() {
-        return name + " lamp is " + (isOn ? "ON" : "off");
-    }
+  public String describe() {
+    return name + " lamp is " + (isOn ? "ON" : "off");
+  }
 }
 `}
 />

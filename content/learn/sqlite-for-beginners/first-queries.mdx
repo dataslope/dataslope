@@ -14,7 +14,8 @@ The keyword `SELECT` means: *compute something and show me the result.* You can 
 <SqlCodeBlock
   dialect="sqlite"
   title="Select one literal value"
-  starterCode={`SELECT 'Hello, SQLite!' AS message;`}
+  starterCode={`SELECT
+  'Hello, SQLite!' AS message;`}
 />
 
 The result is a tiny table: one row and one column. The value is text, so it is wrapped in single quotes.
@@ -91,17 +92,19 @@ This block creates a small table, inserts two rows, and reads the rows back.
 <SqlCodeBlock
   dialect="sqlite"
   title="Create, insert, and select"
-  starterCode={`CREATE TABLE pets (
-  name TEXT,
-  species TEXT
-);
+  starterCode={`CREATE TABLE pets (name TEXT, species TEXT);
 
-INSERT INTO pets (name, species) VALUES
+INSERT INTO
+  pets (name, species)
+VALUES
   ('Mochi', 'cat'),
   ('Biscuit', 'dog');
 
-SELECT name, species
-FROM pets;`}
+SELECT
+  name,
+  species
+FROM
+  pets;`}
 />
 
 Read the final query like a sentence: *select the `name` and `species` columns from the `pets` table.*
@@ -128,8 +131,11 @@ INSERT INTO snacks (name, kind, calories) VALUES
   ('Apple', 'fruit', 95),
   ('Pretzels', 'snack', 110),
   ('Yogurt', 'dairy', 150);`}
-  starterCode={`SELECT name, calories
-FROM snacks;`}
+  starterCode={`SELECT
+  name,
+  calories
+FROM
+  snacks;`}
 />
 
 Try replacing `name, calories` with `*`. In SQL, `*` means "all columns."
@@ -146,8 +152,10 @@ INSERT INTO snacks (name, kind, calories) VALUES
   ('Apple', 'fruit', 95),
   ('Pretzels', 'snack', 110),
   ('Yogurt', 'dairy', 150);`}
-  starterCode={`SELECT *
-FROM snacks;`}
+  starterCode={`SELECT
+  *
+FROM
+  snacks;`}
 />
 
 <MultipleChoice

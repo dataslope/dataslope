@@ -89,8 +89,10 @@ best <- subset(mpg, hwy >= 40)
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(color = "grey70") +
   geom_point(data = best, color = "red", size = 3) +
-  geom_text(data = best, aes(label = model),
-            vjust = -1, size = 3)
+  geom_text(
+    data = best, aes(label = model),
+    vjust = -1, size = 3
+  )
 `}
 />
 

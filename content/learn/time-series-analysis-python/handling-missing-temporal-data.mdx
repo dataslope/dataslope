@@ -85,15 +85,20 @@ different answers. Let's compute exactly that:
   starterCode={`import pandas as pd
 import numpy as np
 
-s = pd.Series([10, np.nan, np.nan, 40],
-              index=pd.date_range("2014-01-01", periods=4, freq="D"), name="y")
+s = pd.Series(
+    [10, np.nan, np.nan, 40],
+    index=pd.date_range("2014-01-01", periods=4, freq="D"),
+    name="y",
+)
 
-table = pd.DataFrame({
-    "raw":     s,
-    "ffill":   s.ffill(),                       # last known value carried forward
-    "bfill":   s.bfill(),                       # next known value pulled back
-    "linear":  s.interpolate(method="linear"),  # straight line between knowns
-})
+table = pd.DataFrame(
+    {
+        "raw": s,
+        "ffill": s.ffill(),  # last known value carried forward
+        "bfill": s.bfill(),  # next known value pulled back
+        "linear": s.interpolate(method="linear"),  # straight line between knowns
+    }
+)
 print(table)
 print()
 print("ffill  -> 10, 10  (assumes the value HELD until it next changed)")
@@ -125,15 +130,26 @@ import matplotlib.pyplot as plt
 
 # A smooth-ish daily temperature with three dropout days.
 idx = pd.date_range("2014-05-01", periods=15, freq="D")
-temp = pd.Series([18,19,21,np.nan,np.nan,np.nan,24,23,22,24,25,np.nan,26,27,28.0],
-                 index=idx, name="temp_c")
+temp = pd.Series(
+    [18, 19, 21, np.nan, np.nan, np.nan, 24, 23, 22, 24, 25, np.nan, 26, 27, 28.0],
+    index=idx,
+    name="temp_c",
+)
 
 fig, ax = plt.subplots(figsize=(10, 4))
 temp.interpolate(method="linear").plot(ax=ax, marker="o", label="linear interpolation")
 temp.ffill().plot(ax=ax, marker="s", alpha=0.6, label="forward-fill (flat steps)")
-ax.scatter(temp.dropna().index, temp.dropna().values, color="black", zorder=5, label="actually measured")
-ax.legend(); ax.set_title("For a smooth physical quantity, interpolation looks natural")
-plt.tight_layout(); plt.show()
+ax.scatter(
+    temp.dropna().index,
+    temp.dropna().values,
+    color="black",
+    zorder=5,
+    label="actually measured",
+)
+ax.legend()
+ax.set_title("For a smooth physical quantity, interpolation looks natural")
+plt.tight_layout()
+plt.show()
 
 print("Interpolation traces a believable glide for temperature.")
 print("Forward-fill makes ugly flat steps here -- wrong assumption for a")
@@ -200,14 +216,14 @@ import numpy as np
 
 # A shop's daily sales. It is CLOSED on Sundays, so those days have no sales
 # rows -- but that's not "unknown sales," it's "zero sales."
-idx = pd.date_range("2014-03-03", periods=7, freq="D")   # Mon .. Sun
+idx = pd.date_range("2014-03-03", periods=7, freq="D")  # Mon .. Sun
 sales = pd.Series([200, 180, 210, 190, 260, 300, np.nan], index=idx, name="sales")
 print("Sunday is missing because the shop was CLOSED:")
 print(sales)
 print()
 
-wrong = sales.interpolate(method="linear")   # invents ~330 phantom Sunday sales
-right = sales.fillna(0)                       # closed means zero
+wrong = sales.interpolate(method="linear")  # invents ~330 phantom Sunday sales
+right = sales.fillna(0)  # closed means zero
 
 print(f"Interpolation invents Sunday sales of ~{wrong.iloc[-1]:.0f} (PHANTOM revenue).")
 print(f"The correct fill is 0 -- the shop genuinely sold nothing.")
@@ -313,7 +329,7 @@ import numpy as np
 idx = pd.date_range("2014-05-01", periods=7, freq="D")
 temp = pd.Series([18.0, 19.0, 20.0, np.nan, 24.0, 25.0, 26.0], index=idx, name="temp")`}
   starterCode={`smooth = None  # linear interpolation of the interior gap
-may4 = None     # the value on 2014-05-04
+may4 = None  # the value on 2014-05-04
 print(smooth)
 print("May 4:", may4)
 `}

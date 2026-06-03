@@ -33,7 +33,8 @@ INSERT INTO sales (product, price, qty) VALUES
   price,
   qty,
   price * qty AS line_total
-FROM sales;`}
+FROM
+  sales;`}
 />
 
 `price * qty` is not stored anywhere — it is computed fresh for each
@@ -79,10 +80,11 @@ INSERT INTO people (first, last) VALUES
   ('Ada', 'Lovelace'),
   ('Alan', 'Turing');`}
   starterCode={`SELECT
-  first || ' ' || last        AS full_name,
-  UPPER(last)                 AS last_upper,
-  LENGTH(first)               AS first_length
-FROM people;`}
+  first || ' ' || last AS full_name,
+  UPPER(last) AS last_upper,
+  LENGTH(first) AS first_length
+FROM
+  people;`}
 />
 
 `first || ' ' || last` glues the first name, a space, and the last
@@ -112,7 +114,8 @@ INSERT INTO sales (product, price, qty) VALUES
   starterCode={`SELECT
   product,
   ROUND(price * qty * 1.08, 2) AS total_with_tax
-FROM sales;`}
+FROM
+  sales;`}
 />
 
 Here one expression multiplies price by quantity, adds 8% tax, and
@@ -132,10 +135,15 @@ them as well:
 );
 INSERT INTO sales (product, price, qty) VALUES
   ('Latte',4.50,3),('Mocha',5.00,2),('Tea',3.00,5),('Water',1.00,1);`}
-  starterCode={`SELECT product, price * qty AS line_total
-FROM sales
-WHERE price * qty > 10
-ORDER BY price * qty DESC;`}
+  starterCode={`SELECT
+  product,
+  price * qty AS line_total
+FROM
+  sales
+WHERE
+  price * qty > 10
+ORDER BY
+  price * qty DESC;`}
 />
 
 The database computes `price * qty` to decide which rows pass the

@@ -24,12 +24,18 @@ behavior that owns it into a single unit.
 
 double balance = 0;
 
-void Deposit(double amount) { balance += amount; }
-void Withdraw(double amount) { balance -= amount; }
+void Deposit(double amount)
+{
+    balance += amount;
+}
+void Withdraw(double amount)
+{
+    balance -= amount;
+}
 
 Deposit(100);
 Withdraw(40);
-Console.WriteLine(balance);   // 60
+Console.WriteLine(balance); // 60
 `}
 />
 
@@ -67,8 +73,14 @@ public class BankAccount
     public string Owner;
     public double Balance;
 
-    public void Deposit(double amount) { Balance += amount; }
-    public void Withdraw(double amount) { Balance -= amount; }
+    public void Deposit(double amount)
+    {
+        Balance += amount;
+    }
+    public void Withdraw(double amount)
+    {
+        Balance -= amount;
+    }
 }
 
 var alice = new BankAccount();
@@ -131,8 +143,14 @@ public class BankAccount
         Balance = openingBalance;
     }
 
-    public void Deposit(double amount) { Balance += amount; }
-    public void Withdraw(double amount) { Balance -= amount; }
+    public void Deposit(double amount)
+    {
+        Balance += amount;
+    }
+    public void Withdraw(double amount)
+    {
+        Balance -= amount;
+    }
 }
 
 var alice = new BankAccount("Alice", 100);
@@ -175,7 +193,7 @@ public class Point
 }
 
 var p = new Point(3, 4);
-Console.WriteLine(p.DistanceFromOrigin());   // 5
+Console.WriteLine(p.DistanceFromOrigin()); // 5
 `}
 />
 

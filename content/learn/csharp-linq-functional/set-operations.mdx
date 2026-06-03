@@ -20,7 +20,7 @@ using System.Linq;
 
 var xs = new[] { 3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5 };
 
-Console.WriteLine(string.Join(",", xs.Distinct()));   // 3,1,4,5,9,2,6
+Console.WriteLine(string.Join(",", xs.Distinct())); // 3,1,4,5,9,2,6
 `}
 />
 
@@ -37,11 +37,10 @@ using System.Linq;
 
 record Person(string Name, int Age);
 
-var people = new[]
-{
+var people = new[] {
     new Person("Ada", 36),
     new Person("Bilal", 41),
-    new Person("Ada", 99),     // same name, different age
+    new Person("Ada", 99), // same name, different age
     new Person("Chiara", 29),
 };
 
@@ -97,7 +96,7 @@ using System.Linq;
 var a = new[] { 1, 2, 3 };
 var b = new[] { 3, 4, 5 };
 
-Console.WriteLine(string.Join(",", a.Concat(b)));   // 1,2,3,3,4,5
+Console.WriteLine(string.Join(",", a.Concat(b))); // 1,2,3,3,4,5
 `}
 />
 
@@ -115,11 +114,12 @@ function.
 using System.Linq;
 
 var names = new[] { "Ada", "Bilal", "Chiara", "Dmitri" };
-var ages  = new[] { 36, 41, 29 };
+var ages = new[] { 36, 41, 29 };
 
 var pairs = names.Zip(ages, (name, age) => $"{name}({age})");
 
-foreach (var p in pairs) Console.WriteLine(p);
+foreach (var p in pairs)
+    Console.WriteLine(p);
 `}
 />
 
@@ -133,7 +133,7 @@ tuples:
 using System.Linq;
 
 var names = new[] { "Ada", "Bilal", "Chiara" };
-var ages  = new[] { 36, 41, 29 };
+var ages = new[] { 36, 41, 29 };
 
 foreach (var (n, a) in names.Zip(ages))
     Console.WriteLine($"{n} is {a}");
@@ -163,28 +163,24 @@ using System.Linq;
 record Customer(int Id, string Name);
 record Order(int CustomerId, string Product);
 
-var customers = new[]
-{
+var customers = new[] {
     new Customer(1, "Ada"),
     new Customer(2, "Bilal"),
     new Customer(3, "Chiara"),
 };
 
-var orders = new[]
-{
+var orders = new[] {
     new Order(1, "Widget"),
     new Order(1, "Gadget"),
     new Order(2, "Gizmo"),
     // No order for customer 3.
-    new Order(99, "Mystery"),  // No matching customer.
+    new Order(99, "Mystery"), // No matching customer.
 };
 
-var joined = customers.Join(
-    orders,
-    c => c.Id,             // outer key
-    o => o.CustomerId,     // inner key
-    (c, o) => new { c.Name, o.Product }
-);
+var joined = customers.Join(orders,
+                            c => c.Id,         // outer key
+                            o => o.CustomerId, // inner key
+                            (c, o) => new { c.Name, o.Product });
 
 foreach (var row in joined)
     Console.WriteLine($"{row.Name} bought {row.Product}");
@@ -209,24 +205,21 @@ using System.Linq;
 record Customer(int Id, string Name);
 record Order(int CustomerId, string Product);
 
-var customers = new[]
-{
+var customers = new[] {
     new Customer(1, "Ada"),
     new Customer(2, "Bilal"),
-    new Customer(3, "Chiara"),  // no orders
+    new Customer(3, "Chiara"), // no orders
 };
 
-var orders = new[]
-{
+var orders = new[] {
     new Order(1, "Widget"),
     new Order(1, "Gadget"),
     new Order(2, "Gizmo"),
 };
 
-var leftJoined = customers
-    .GroupJoin(orders, c => c.Id, o => o.CustomerId, (c, os) => new { c, os })
-    .SelectMany(x => x.os.DefaultIfEmpty(),
-                (x, o) => new { x.c.Name, Product = o?.Product ?? "(none)" });
+var leftJoined =
+    customers.GroupJoin(orders, c => c.Id, o => o.CustomerId, (c, os) => new { c, os })
+        .SelectMany(x => x.os.DefaultIfEmpty(), (x, o) => new { x.c.Name, Product = o?.Product ?? "(none)" });
 
 foreach (var row in leftJoined)
     Console.WriteLine($"{row.Name,-7} → {row.Product}");
@@ -251,10 +244,7 @@ var classB = new[] { "Chiara", "Dmitri", "Esther" };
 var dropped = new[] { "Bilal" };
 
 // Students in either class, excluding the dropped, deduped, sorted.
-var active = classA
-    .Union(classB)
-    .Except(dropped)
-    .OrderBy(name => name);
+var active = classA.Union(classB).Except(dropped).OrderBy(name => name);
 
 Console.WriteLine(string.Join(", ", active));
 `}

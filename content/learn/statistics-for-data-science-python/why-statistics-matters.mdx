@@ -100,8 +100,10 @@ rng = np.random.default_rng(0)
 for trial in range(5):
     a = rng.normal(50, 10, size=40)
     b = rng.normal(50, 10, size=40)
-    print(f"Trial {trial+1}: A={a.mean():5.2f}  B={b.mean():5.2f}  "
-          f"gap={a.mean() - b.mean():+5.2f}")
+    print(
+        f"Trial {trial + 1}: A={a.mean():5.2f}  B={b.mean():5.2f}  "
+        f"gap={a.mean() - b.mean():+5.2f}"
+    )
 
 print("\\nSame underlying truth every time — the gap is just noise.")
 `}

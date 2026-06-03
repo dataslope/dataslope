@@ -83,7 +83,7 @@ n_flips = 100
 sims = rng.binomial(n=n_flips, p=0.5, size=100_000)
 
 # How far is observed from the null center (50)?
-distance = abs(observed_heads - 50)   # = 12
+distance = abs(observed_heads - 50)  # = 12
 
 # Two-sided p-value: as extreme as 62 means <=38 or >=62.
 as_or_more_extreme = np.abs(sims - 50) >= distance
@@ -135,8 +135,7 @@ sims = rng.binomial(n_flips, 0.5, size=200_000)
 p_sim = (np.abs(sims - 50) >= abs(observed_heads - 50)).mean()
 
 # scipy's exact binomial test, two-sided.
-p_exact = stats.binomtest(observed_heads, n_flips, 0.5,
-                          alternative="two-sided").pvalue
+p_exact = stats.binomtest(observed_heads, n_flips, 0.5, alternative="two-sided").pvalue
 
 print(f"Simulated p-value : {p_sim:.4f}")
 print(f"scipy exact p     : {p_exact:.4f}")
@@ -168,20 +167,24 @@ n_per_group = 50
 null_diffs = np.empty(20_000)
 for i in range(null_diffs.size):
     a = rng.normal(0, 1, n_per_group)
-    b = rng.normal(0, 1, n_per_group)   # identical truth
+    b = rng.normal(0, 1, n_per_group)  # identical truth
     null_diffs[i] = a.mean() - b.mean()
 
-observed_diff = 0.45   # a gap we supposedly saw in a real experiment
+observed_diff = 0.45  # a gap we supposedly saw in a real experiment
 
 # Two-sided p-value = fraction of null diffs at least this far from 0.
 p_value = (np.abs(null_diffs) >= abs(observed_diff)).mean()
 
-fig = px.histogram(null_diffs, nbins=60,
-                   title="Null distribution of the difference in means")
+fig = px.histogram(
+    null_diffs, nbins=60, title="Null distribution of the difference in means"
+)
 fig.add_vline(x=observed_diff, line_color="red", line_width=2)
 fig.add_vline(x=-observed_diff, line_color="red", line_width=2, line_dash="dash")
-fig.update_layout(xaxis_title="difference in group means under H0",
-                  yaxis_title="count", showlegend=False)
+fig.update_layout(
+    xaxis_title="difference in group means under H0",
+    yaxis_title="count",
+    showlegend=False,
+)
 fig.show()
 
 print(f"Observed difference : {observed_diff}")
@@ -253,18 +256,18 @@ rare. Flipping the condition changes the answer entirely.
   starterCode={`# A rare disease: 1% of people have it.
 # Test: if you have it, it flags positive 99% of the time (p-value-like:
 # P(positive | healthy) = 5%, a "5% false-positive rate").
-prevalence       = 0.01
-true_positive    = 0.99   # P(positive | disease)
-false_positive   = 0.05   # P(positive | healthy)   <- the "p-value" analog
+prevalence = 0.01
+true_positive = 0.99  # P(positive | disease)
+false_positive = 0.05  # P(positive | healthy)   <- the "p-value" analog
 
 # Imagine 100,000 people.
 N = 100_000
 have_disease = N * prevalence
-healthy      = N - have_disease
+healthy = N - have_disease
 
-pos_and_sick    = have_disease * true_positive
+pos_and_sick = have_disease * true_positive
 pos_and_healthy = healthy * false_positive
-total_positive  = pos_and_sick + pos_and_healthy
+total_positive = pos_and_sick + pos_and_healthy
 
 p_disease_given_positive = pos_and_sick / total_positive
 
@@ -272,7 +275,10 @@ print(f"P(positive | healthy)   = {false_positive:.2f}   <- small, like a p-valu
 print(f"P(disease | positive)   = {p_disease_given_positive:.2f}")
 print()
 print("A small 'p-value' (5%) does NOT mean a 5% chance of being healthy.")
-print("Here a positive test still leaves a", f"{(1-p_disease_given_positive)*100:.0f}% chance you are healthy.")
+print(
+    "Here a positive test still leaves a",
+    f"{(1 - p_disease_given_positive) * 100:.0f}% chance you are healthy.",
+)
 print("P(data | H0) is NOT P(H0 | data).")
 `}
 />
@@ -403,7 +409,7 @@ alpha = 0.05
 p_values = []
 for _ in range(n_tests):
     a = rng.normal(0, 1, 50)
-    b = rng.normal(0, 1, 50)   # no difference, every time
+    b = rng.normal(0, 1, 50)  # no difference, every time
     p_values.append(stats.ttest_ind(a, b).pvalue)
 
 p_values = np.array(p_values)

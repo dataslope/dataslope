@@ -44,7 +44,7 @@ page is what happens when you start combining Bernoulli trials.
 
 # A visitor converts with probability p = 0.3.
 p = 0.3
-b = stats.bernoulli(p)          # a "frozen" distribution
+b = stats.bernoulli(p)  # a "frozen" distribution
 
 print("P(convert)   = P(X=1) =", b.pmf(1))
 print("P(no convert)= P(X=0) =", b.pmf(0))
@@ -141,7 +141,8 @@ k = np.arange(0, 21)
 pmf = d.pmf(k)
 
 fig = px.bar(
-    x=k, y=pmf,
+    x=k,
+    y=pmf,
     labels={"x": "number of conversions", "y": "P(X = k)"},
     title="Binomial(n=200, p=0.03): how many of 200 visitors convert?",
 )
@@ -198,7 +199,7 @@ print("P(X >= 25):", p_at_least_25)
 `}
   solutionCode={`d = stats.binom(n, p)
 expected = float(d.mean())
-p_at_least_25 = float(d.sf(24))   # P(X > 24) = P(X >= 25)
+p_at_least_25 = float(d.sf(24))  # P(X > 24) = P(X >= 25)
 
 print("expected:", expected)
 print("P(X >= 25):", p_at_least_25)
@@ -278,7 +279,7 @@ more** — a spike worth staffing for?
 
 # Average rate: 3 tickets per hour.
 lam = 3
-d = stats.poisson(mu=lam)        # scipy calls the rate parameter 'mu'
+d = stats.poisson(mu=lam)  # scipy calls the rate parameter 'mu'
 
 print(f"Expected tickets/hour (lambda) = {d.mean()}")
 print(f"Variance (= lambda)            = {d.var()}")
@@ -287,7 +288,7 @@ print(f"P(0 tickets this hour)         = {d.pmf(0):.4f}")
 
 # P(8 or more) = P(X >= 8) = P(X > 7) = sf(7).
 p_spike = d.sf(7)
-print(f"\\nP(8 or more tickets) = {p_spike:.4f}  (~{p_spike*100:.1f}% of hours)")
+print(f"\\nP(8 or more tickets) = {p_spike:.4f}  (~{p_spike * 100:.1f}% of hours)")
 print("So a spike that big happens in roughly 1 hour out of 84.")
 `}
 />
@@ -342,7 +343,7 @@ print("P(X > 9):", p_more_than_9)
 `}
   solutionCode={`d = stats.poisson(mu=rate)
 mean_errors = float(d.mean())
-p_more_than_9 = float(d.sf(9))    # P(X > 9)
+p_more_than_9 = float(d.sf(9))  # P(X > 9)
 
 print("mean errors/min:", mean_errors)
 print("P(X > 9):", p_more_than_9)
@@ -392,7 +393,9 @@ succeeds, days until the first failure.
 
 # Each call closes a sale with probability 0.2.
 p = 0.2
-d = stats.geom(p)        # scipy's geom counts trials 1, 2, 3, ... (the trial of the first success)
+d = stats.geom(
+    p
+)  # scipy's geom counts trials 1, 2, 3, ... (the trial of the first success)
 
 print(f"Expected calls until first sale (1/p) = {d.mean()}")
 print(f"P(first sale on the 1st call)         = {d.pmf(1):.4f}")

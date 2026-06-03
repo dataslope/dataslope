@@ -122,19 +122,27 @@ from scipy.integrate import solve_ivp
 # Damped pendulum:  θ'' + (b/m) θ' + (g/L) sin θ = 0
 g, L, b, m = 9.81, 1.0, 0.5, 1.0
 
+
 def pendulum(t, y):
     theta, omega = y
-    return [omega, -(b/m)*omega - (g/L)*np.sin(theta)]
+    return [omega, -(b / m) * omega - (g / L) * np.sin(theta)]
 
-sol = solve_ivp(pendulum, (0, 20), [np.pi/2, 0],
-                t_eval=np.linspace(0, 20, 2000), rtol=1e-8)
+
+sol = solve_ivp(
+    pendulum, (0, 20), [np.pi / 2, 0], t_eval=np.linspace(0, 20, 2000), rtol=1e-8
+)
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
-ax1.plot(sol.t, sol.y[0]); ax1.set_xlabel("t"); ax1.set_ylabel("θ(t)")
+ax1.plot(sol.t, sol.y[0])
+ax1.set_xlabel("t")
+ax1.set_ylabel("θ(t)")
 ax1.set_title("Angle vs time")
-ax2.plot(sol.y[0], sol.y[1]); ax2.set_xlabel("θ"); ax2.set_ylabel("ω")
+ax2.plot(sol.y[0], sol.y[1])
+ax2.set_xlabel("θ")
+ax2.set_ylabel("ω")
 ax2.set_title("Phase portrait")
-plt.tight_layout(); plt.show()
+plt.tight_layout()
+plt.show()
 `}
 />
 

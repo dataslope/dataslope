@@ -33,14 +33,14 @@ guaranteed. To find the exact size on your system, use `sizeof`:
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    printf("sizeof(char)      = %zu\\n", sizeof(char));
-    printf("sizeof(short)     = %zu\\n", sizeof(short));
-    printf("sizeof(int)       = %zu\\n", sizeof(int));
-    printf("sizeof(long)      = %zu\\n", sizeof(long));
-    printf("sizeof(long long) = %zu\\n", sizeof(long long));
-    printf("sizeof(float)     = %zu\\n", sizeof(float));
-    printf("sizeof(double)    = %zu\\n", sizeof(double));
-    return 0;
+  printf("sizeof(char)      = %zu\\n", sizeof(char));
+  printf("sizeof(short)     = %zu\\n", sizeof(short));
+  printf("sizeof(int)       = %zu\\n", sizeof(int));
+  printf("sizeof(long)      = %zu\\n", sizeof(long));
+  printf("sizeof(long long) = %zu\\n", sizeof(long long));
+  printf("sizeof(float)     = %zu\\n", sizeof(float));
+  printf("sizeof(double)    = %zu\\n", sizeof(double));
+  return 0;
 }
 `}
 />
@@ -89,12 +89,12 @@ small integer — the ASCII code for `A`, which is `65`.
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    char letter = 'A';
-    printf("As a character: %c\\n", letter);
-    printf("As an integer:  %d\\n", letter);
+  char letter = 'A';
+  printf("As a character: %c\\n", letter);
+  printf("As an integer:  %d\\n", letter);
 
-    printf("'A' + 1 = %c (=%d)\\n", letter + 1, letter + 1);
-    return 0;
+  printf("'A' + 1 = %c (=%d)\\n", letter + 1, letter + 1);
+  return 0;
 }
 `}
 />
@@ -116,12 +116,12 @@ is tight.
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    double pi = 3.14159265358979;
-    double radius = 5.0;
-    double area = pi * radius * radius;
+  double pi = 3.14159265358979;
+  double radius = 5.0;
+  double area = pi * radius * radius;
 
-    printf("area of a circle with r = %.1f is %.5f\\n", radius, area);
-    return 0;
+  printf("area of a circle with r = %.1f is %.5f\\n", radius, area);
+  return 0;
 }
 `}
 />
@@ -142,9 +142,9 @@ every programming language.
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    double sum = 0.1 + 0.2;
-    printf("0.1 + 0.2 = %.20f\\n", sum);
-    return 0;
+  double sum = 0.1 + 0.2;
+  printf("0.1 + 0.2 = %.20f\\n", sum);
+  return 0;
 }
 `}
 />
@@ -163,16 +163,16 @@ fractional parts are thrown away.
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int a = 7, b = 2;
-    int quotient = a / b;          // 3, not 3.5
-    int remainder = a % b;         // 1
+  int a = 7, b = 2;
+  int quotient = a / b;  // 3, not 3.5
+  int remainder = a % b; // 1
 
-    double real_quotient = (double)a / b;  // cast a to double first
+  double real_quotient = (double)a / b; // cast a to double first
 
-    printf("7 / 2  = %d (integer)\\n", quotient);
-    printf("7 %% 2 = %d (remainder)\\n", remainder);
-    printf("(double)7 / 2 = %f\\n", real_quotient);
-    return 0;
+  printf("7 / 2  = %d (integer)\\n", quotient);
+  printf("7 %% 2 = %d (remainder)\\n", remainder);
+  printf("(double)7 / 2 = %f\\n", real_quotient);
+  return 0;
 }
 `}
 />
@@ -211,17 +211,17 @@ type via the header `<stdbool.h>`:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
-#include <stdbool.h>
+  starterCode={`#include <stdbool.h>
+#include <stdio.h>
 
 int main(void) {
-    bool is_ready = true;
-    bool is_done  = false;
+  bool is_ready = true;
+  bool is_done = false;
 
-    if (is_ready && !is_done) {
-        printf("Let's go!\\n");
-    }
-    return 0;
+  if (is_ready && !is_done) {
+    printf("Let's go!\\n");
+  }
+  return 0;
 }
 `}
 />
@@ -261,20 +261,20 @@ Use \`%.2f\` to format the result with two digits after the decimal point.`}
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int a = 10, b = 20, c = 33;
-    double avg = 0.0;
-    // compute avg here
-    printf("average = %.2f\\n", avg);
-    return 0;
+  int a = 10, b = 20, c = 33;
+  double avg = 0.0;
+  // compute avg here
+  printf("average = %.2f\\n", avg);
+  return 0;
 }
 `}
   solutionCode={`#include <stdio.h>
 
 int main(void) {
-    int a = 10, b = 20, c = 33;
-    double avg = (a + b + c) / 3.0;
-    printf("average = %.2f\\n", avg);
-    return 0;
+  int a = 10, b = 20, c = 33;
+  double avg = (a + b + c) / 3.0;
+  printf("average = %.2f\\n", avg);
+  return 0;
 }
 `}
   tests={[

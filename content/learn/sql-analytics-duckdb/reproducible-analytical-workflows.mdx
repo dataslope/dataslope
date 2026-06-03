@@ -48,10 +48,17 @@ rows tie on the sort key, SQL may return them in either order — so a
 );
 INSERT INTO products VALUES
   (1,'A',100),(2,'B',100),(3,'C',100),(4,'D',90),(5,'E',80);`}
-  starterCode={`SELECT id, name, sales
-FROM products
-ORDER BY sales DESC, id ASC   -- id breaks ties → reproducible order
-LIMIT 3;`}
+  starterCode={`SELECT
+  id,
+  name,
+  sales
+FROM
+  products
+ORDER BY
+  sales DESC,
+  id ASC -- id breaks ties → reproducible order
+LIMIT
+  3;`}
 />
 
 Without `, id ASC`, the three products tied at 100 could appear in any
@@ -70,16 +77,25 @@ without "already exists" errors.
   title="CREATE OR REPLACE makes rebuilds safe"
   starterCode={`-- Run this block twice — it never errors, and the result is identical.
 CREATE OR REPLACE TABLE clean_orders AS
-SELECT * FROM (VALUES
-  (1, 'paid',     120),
-  (2, 'refunded',  45),
-  (3, 'paid',     200)
-) AS t(id, status, amount);
+SELECT
+  *
+FROM
+  (
+    VALUES
+      (1, 'paid', 120),
+      (2, 'refunded', 45),
+      (3, 'paid', 200)
+  ) AS t (id, status, amount);
 
-SELECT status, SUM(amount) AS total
-FROM clean_orders
-GROUP BY status
-ORDER BY status;`}
+SELECT
+  status,
+  SUM(amount) AS total
+FROM
+  clean_orders
+GROUP BY
+  status
+ORDER BY
+  status;`}
 />
 
 Because the table is *replaced*, re-running the analysis from scratch
@@ -102,14 +118,23 @@ INSERT INTO orders VALUES
   (1,'West','paid',120),(2,'West','refunded',45),(3,'East','paid',200),
   (4,'East','paid',50),(5,'North','paid',60),(6,'West','paid',95);`}
   starterCode={`CREATE OR REPLACE VIEW paid_revenue_by_region AS
-SELECT region, SUM(amount) AS revenue
-FROM orders
-WHERE status = 'paid'
-GROUP BY region;
+SELECT
+  region,
+  SUM(amount) AS revenue
+FROM
+  orders
+WHERE
+  status = 'paid'
+GROUP BY
+  region;
 
 -- Everyone queries the view, so everyone uses the same definition.
-SELECT * FROM paid_revenue_by_region
-ORDER BY revenue DESC;`}
+SELECT
+  *
+FROM
+  paid_revenue_by_region
+ORDER BY
+  revenue DESC;`}
 />
 
 The definition of "paid revenue by region" now lives in *one* place. If

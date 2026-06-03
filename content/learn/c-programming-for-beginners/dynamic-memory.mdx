@@ -61,24 +61,26 @@ The shape `malloc(N * sizeof(T))` is the canonical form. Read it as
 #include <stdlib.h>
 
 int main(void) {
-    int n;
-    printf("How many numbers? ");
-    if (scanf("%d", &n) != 1 || n <= 0) {
-        return 1;
-    }
+  int n;
+  printf("How many numbers? ");
+  if (scanf("%d", &n) != 1 || n <= 0) {
+    return 1;
+  }
 
-    int *nums = malloc(n * sizeof(int));
-    if (nums == NULL) {
-        fprintf(stderr, "out of memory\\n");
-        return 1;
-    }
+  int *nums = malloc(n * sizeof(int));
+  if (nums == NULL) {
+    fprintf(stderr, "out of memory\\n");
+    return 1;
+  }
 
-    for (int i = 0; i < n; i++) nums[i] = i * i;
-    for (int i = 0; i < n; i++) printf("%d ", nums[i]);
-    printf("\\n");
+  for (int i = 0; i < n; i++)
+    nums[i] = i * i;
+  for (int i = 0; i < n; i++)
+    printf("%d ", nums[i]);
+  printf("\\n");
 
-    free(nums);
-    return 0;
+  free(nums);
+  return 0;
 }
 `}
 />
@@ -186,22 +188,26 @@ pointer to heap memory.
 #include <stdlib.h>
 
 int *make_squares(int n) {
-    int *out = malloc(n * sizeof(int));
-    if (out == NULL) return NULL;
-    for (int i = 0; i < n; i++) out[i] = i * i;
-    return out;
+  int *out = malloc(n * sizeof(int));
+  if (out == NULL)
+    return NULL;
+  for (int i = 0; i < n; i++)
+    out[i] = i * i;
+  return out;
 }
 
 int main(void) {
-    int n = 6;
-    int *sq = make_squares(n);
-    if (sq == NULL) return 1;
+  int n = 6;
+  int *sq = make_squares(n);
+  if (sq == NULL)
+    return 1;
 
-    for (int i = 0; i < n; i++) printf("%d ", sq[i]);
-    printf("\\n");
+  for (int i = 0; i < n; i++)
+    printf("%d ", sq[i]);
+  printf("\\n");
 
-    free(sq);             // caller is responsible
-    return 0;
+  free(sq); // caller is responsible
+  return 0;
 }
 `}
 />

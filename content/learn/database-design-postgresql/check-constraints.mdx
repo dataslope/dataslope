@@ -69,14 +69,24 @@ status must be one of a small set of allowed values.
 INSERT INTO products (name, price, status)
 VALUES ('Notebook', 4.50, 'active');`}
   starterCode={`-- Negative prices are not valid products.
-INSERT INTO products (name, price, status)
-VALUES ('Impossible discount', -2.00, 'active');
+INSERT INTO
+  products (name, price, status)
+VALUES
+  ('Impossible discount', -2.00, 'active');
 
 -- Try commenting the insert above, then run this bad status instead.
-INSERT INTO products (name, price, status)
-VALUES ('Mystery item', 5.00, 'banana');
+INSERT INTO
+  products (name, price, status)
+VALUES
+  ('Mystery item', 5.00, 'banana');
 
-SELECT id, name, price, status FROM products;`}
+SELECT
+  id,
+  name,
+  price,
+  status
+FROM
+  products;`}
 />
 
 The error is the lesson: the schema refuses to contain rows that break
@@ -106,10 +116,19 @@ flowchart LR
   CHECK (end_date > start_date)
 );`}
   starterCode={`-- The end date is before the start date, so the row is rejected.
-INSERT INTO events (name, start_date, end_date)
-VALUES ('Backwards conference', '2026-06-10', '2026-06-08');
+INSERT INTO
+  events (name, start_date, end_date)
+VALUES
+  (
+    'Backwards conference',
+    '2026-06-10',
+    '2026-06-08'
+  );
 
-SELECT * FROM events;`}
+SELECT
+  *
+FROM
+  events;`}
 />
 
 This is still one-row logic. CHECK is excellent for rules that can be

@@ -24,12 +24,12 @@ They are two angles on the same idea: *separating "what" from "how."*
 
 public class BankAccount
 {
-    public double Balance;   // anyone can write this
+    public double Balance; // anyone can write this
 }
 
 var a = new BankAccount();
 a.Balance = 100;
-a.Balance = -9999;          // oops
+a.Balance = -9999; // oops
 Console.WriteLine(a.Balance);
 `}
 />
@@ -63,7 +63,7 @@ For now, focus on **`private` for state, `public` for behavior**.
 public class BankAccount
 {
     public string Owner { get; }
-    public double Balance { get; private set; }   // outsiders read; only this class writes
+    public double Balance { get; private set; } // outsiders read; only this class writes
 
     public BankAccount(string owner, double openingBalance)
     {
@@ -75,14 +75,17 @@ public class BankAccount
 
     public void Deposit(double amount)
     {
-        if (amount <= 0) throw new ArgumentException("must be positive");
+        if (amount <= 0)
+            throw new ArgumentException("must be positive");
         Balance += amount;
     }
 
     public void Withdraw(double amount)
     {
-        if (amount <= 0) throw new ArgumentException("must be positive");
-        if (amount > Balance) throw new InvalidOperationException("insufficient funds");
+        if (amount <= 0)
+            throw new ArgumentException("must be positive");
+        if (amount > Balance)
+            throw new InvalidOperationException("insufficient funds");
         Balance -= amount;
     }
 }

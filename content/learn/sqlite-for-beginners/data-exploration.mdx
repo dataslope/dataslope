@@ -42,10 +42,14 @@ INSERT INTO customers (name, city) VALUES
 INSERT INTO orders (customer_id, amount, placed_on) VALUES
   (1,42.00,'2024-01-03'),(1,18.50,'2024-02-10'),
   (2,99.00,'2024-01-29'),(3,30.00,'2024-03-05'),(3,NULL,'2024-03-06');`}
-  starterCode={`SELECT name
-FROM sqlite_master
-WHERE type = 'table'
-ORDER BY name;`}
+  starterCode={`SELECT
+  name
+FROM
+  sqlite_master
+WHERE
+  type = 'table'
+ORDER BY
+  name;`}
 />
 
 <Callout type="info" title="The Tables viewer">
@@ -66,7 +70,7 @@ column.
   title="Inspect a table's columns"
   initSql={`CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount NUMERIC, placed_on TEXT);
 INSERT INTO orders (customer_id, amount, placed_on) VALUES (1,42.0,'2024-01-03');`}
-  starterCode={`PRAGMA table_info(orders);`}
+  starterCode={`PRAGMA table_info (orders);`}
 />
 
 Each row tells you the column's name, its declared type, whether it
@@ -84,9 +88,12 @@ Numbers and types only tell you so much. Always look at real rows.
   initSql={`CREATE TABLE customers (id INTEGER PRIMARY KEY, name TEXT, city TEXT);
 INSERT INTO customers (name, city) VALUES
   ('Ada','Lagos'),('Grace','Oslo'),('Linus','Lagos'),('Mary',NULL);`}
-  starterCode={`SELECT *
-FROM customers
-LIMIT 5;`}
+  starterCode={`SELECT
+  *
+FROM
+  customers
+LIMIT
+  5;`}
 />
 
 A five-row peek instantly answers questions a schema cannot: Are
@@ -110,12 +117,13 @@ INSERT INTO orders (customer_id, amount, placed_on) VALUES
   (1,42.00,'2024-01-03'),(1,18.50,'2024-02-10'),
   (2,99.00,'2024-01-29'),(3,30.00,'2024-03-05'),(3,55.00,'2024-03-06');`}
   starterCode={`SELECT
-  COUNT(*)        AS row_count,
-  MIN(amount)     AS smallest,
-  MAX(amount)     AS largest,
-  MIN(placed_on)  AS first_date,
-  MAX(placed_on)  AS last_date
-FROM orders;`}
+  COUNT(*) AS row_count,
+  MIN(amount) AS smallest,
+  MAX(amount) AS largest,
+  MIN(placed_on) AS first_date,
+  MAX(placed_on) AS last_date
+FROM
+  orders;`}
 />
 
 To see how a column's values are distributed, group by it and count —
@@ -129,10 +137,15 @@ categories, or skew:
 INSERT INTO customers (name, city) VALUES
   ('Ada','Lagos'),('Grace','Oslo'),('Linus','Lagos'),
   ('Mary','Oslo'),('Femi','Lagos'),('Nils',NULL);`}
-  starterCode={`SELECT city, COUNT(*) AS how_many
-FROM customers
-GROUP BY city
-ORDER BY how_many DESC;`}
+  starterCode={`SELECT
+  city,
+  COUNT(*) AS how_many
+FROM
+  customers
+GROUP BY
+  city
+ORDER BY
+  how_many DESC;`}
 />
 
 ## Step 5 — Hunt for gaps and surprises
@@ -147,10 +160,11 @@ missing values. A single query can count the holes:
 INSERT INTO customers (name, city) VALUES
   ('Ada','Lagos'),('Grace','Oslo'),('Linus','Lagos'),('Mary',NULL),('Nils',NULL);`}
   starterCode={`SELECT
-  COUNT(*)                              AS total_rows,
-  COUNT(city)                           AS city_present,
-  COUNT(*) - COUNT(city)                AS city_missing
-FROM customers;`}
+  COUNT(*) AS total_rows,
+  COUNT(city) AS city_present,
+  COUNT(*) - COUNT(city) AS city_missing
+FROM
+  customers;`}
 />
 
 Remember from **Working with NULL** that `COUNT(city)` skips `NULL`s,

@@ -15,15 +15,15 @@ standard) and run as WASI binaries in your browser.
   starterCode={`#include <iostream>
 
 int main() {
-    // your code here
-    return 0;
+  // your code here
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 
 int main() {
-    std::cout << "Hello, C++!\\n";
-    return 0;
+  std::cout << "Hello, C++!\\n";
+  return 0;
 }
 `}
   tests={[
@@ -44,15 +44,15 @@ int main() {
   starterCode={`#include <iostream>
 
 int main() {
-    // your code here
-    return 0;
+  // your code here
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 
 int main() {
-    std::cout << "Hello, C++!\\n";
-    return 0;
+  std::cout << "Hello, C++!\\n";
+  return 0;
 }
 `}
   tests={[
@@ -72,25 +72,26 @@ int main() {
   adapter="cpp"
   title="Sort and print"
   instructions={`Given the integer vector below, sort it in ascending order and print each element on its own line.`}
-  starterCode={`#include <iostream>
+  starterCode={`#include <algorithm>
+#include <iostream>
 #include <vector>
-#include <algorithm>
 
 int main() {
-    std::vector<int> xs = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3};
-    // your code here
-    return 0;
+  std::vector<int> xs = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3};
+  // your code here
+  return 0;
 }
 `}
-  solutionCode={`#include <iostream>
+  solutionCode={`#include <algorithm>
+#include <iostream>
 #include <vector>
-#include <algorithm>
 
 int main() {
-    std::vector<int> xs = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3};
-    std::sort(xs.begin(), xs.end());
-    for (int x : xs) std::cout << x << "\\n";
-    return 0;
+  std::vector<int> xs = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3};
+  std::sort(xs.begin(), xs.end());
+  for (int x : xs)
+    std::cout << x << "\\n";
+  return 0;
 }
 `}
   tests={[
@@ -111,25 +112,26 @@ int main() {
   adapter="cpp"
   title="Sort and print"
   instructions={`Given the integer vector below, sort it in ascending order and print each element on its own line.`}
-  starterCode={`#include <iostream>
+  starterCode={`#include <algorithm>
+#include <iostream>
 #include <vector>
-#include <algorithm>
 
 int main() {
-    std::vector<int> xs = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3};
-    // your code here
-    return 0;
+  std::vector<int> xs = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3};
+  // your code here
+  return 0;
 }
 `}
-  solutionCode={`#include <iostream>
+  solutionCode={`#include <algorithm>
+#include <iostream>
 #include <vector>
-#include <algorithm>
 
 int main() {
-    std::vector<int> xs = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3};
-    std::sort(xs.begin(), xs.end());
-    for (int x : xs) std::cout << x << "\\n";
-    return 0;
+  std::vector<int> xs = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3};
+  std::sort(xs.begin(), xs.end());
+  for (int x : xs)
+    std::cout << x << "\\n";
+  return 0;
 }
 `}
   tests={[
@@ -156,34 +158,35 @@ int main() {
 
 class Counter {
 public:
-    // your code here
+  // your code here
 };
 
 int main() {
-    Counter c;
-    for (int i = 0; i < 3; i++) {
-        c.tick();
-        std::cout << c.value() << "\\n";
-    }
-    return 0;
+  Counter c;
+  for (int i = 0; i < 3; i++) {
+    c.tick();
+    std::cout << c.value() << "\\n";
+  }
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 
 class Counter {
-    int n = 0;
+  int n = 0;
+
 public:
-    void tick() { ++n; }
-    int value() const { return n; }
+  void tick() { ++n; }
+  int value() const { return n; }
 };
 
 int main() {
-    Counter c;
-    for (int i = 0; i < 3; i++) {
-        c.tick();
-        std::cout << c.value() << "\\n";
-    }
-    return 0;
+  Counter c;
+  for (int i = 0; i < 3; i++) {
+    c.tick();
+    std::cout << c.value() << "\\n";
+  }
+  return 0;
 }
 `}
   tests={[
@@ -208,34 +211,35 @@ int main() {
 
 class Counter {
 public:
-    // your code here
+  // your code here
 };
 
 int main() {
-    Counter c;
-    for (int i = 0; i < 3; i++) {
-        c.tick();
-        std::cout << c.value() << "\\n";
-    }
-    return 0;
+  Counter c;
+  for (int i = 0; i < 3; i++) {
+    c.tick();
+    std::cout << c.value() << "\\n";
+  }
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 
 class Counter {
-    int n = 0;
+  int n = 0;
+
 public:
-    void tick() { ++n; }
-    int value() const { return n; }
+  void tick() { ++n; }
+  int value() const { return n; }
 };
 
 int main() {
-    Counter c;
-    for (int i = 0; i < 3; i++) {
-        c.tick();
-        std::cout << c.value() << "\\n";
-    }
-    return 0;
+  Counter c;
+  for (int i = 0; i < 3; i++) {
+    c.tick();
+    std::cout << c.value() << "\\n";
+  }
+  return 0;
 }
 `}
   tests={[

@@ -117,7 +117,7 @@ ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
   geom_point(alpha = 0.7) +
   geom_smooth(method = "lm", se = FALSE) +
   scale_color_brewer(palette = "Set1") +
-  facet_wrap(~ class) +
+  facet_wrap(~class) +
   labs(
     title = "Engine size vs. highway efficiency",
     subtitle = "Split by vehicle class, colored by drivetrain",

@@ -26,21 +26,31 @@ supply matching values:
   dialect="postgres"
   title="Insert one row and several rows"
   starterCode={`CREATE TABLE tasks (
-  id    SERIAL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   title TEXT NOT NULL,
-  done  BOOLEAN DEFAULT false
+  done BOOLEAN DEFAULT false
 );
 
 -- One row:
-INSERT INTO tasks (title) VALUES ('Buy milk');
+INSERT INTO
+  tasks (title)
+VALUES
+  ('Buy milk');
 
 -- Several rows at once, separated by commas:
-INSERT INTO tasks (title, done) VALUES
+INSERT INTO
+  tasks (title, done)
+VALUES
   ('Walk the dog', true),
   ('Write report', false),
   ('Call dentist', false);
 
-SELECT * FROM tasks ORDER BY id;`}
+SELECT
+  *
+FROM
+  tasks
+ORDER BY
+  id;`}
 />
 
 A few things to absorb:
@@ -71,10 +81,17 @@ INSERT INTO tasks (title, done) VALUES
   ('Walk the dog', false),
   ('Write report', false);`}
   starterCode={`UPDATE tasks
-SET done = true
-WHERE title = 'Buy milk';
+SET
+  done = true
+WHERE
+  title = 'Buy milk';
 
-SELECT * FROM tasks ORDER BY id;`}
+SELECT
+  *
+FROM
+  tasks
+ORDER BY
+  id;`}
 />
 
 Only the "Buy milk" row changed, because `WHERE title = 'Buy milk'`
@@ -97,9 +114,15 @@ INSERT INTO tasks (title, done) VALUES
   ('Walk the dog', false),
   ('Write report', true);`}
   starterCode={`DELETE FROM tasks
-WHERE done = true;
+WHERE
+  done = true;
 
-SELECT * FROM tasks ORDER BY id;`}
+SELECT
+  *
+FROM
+  tasks
+ORDER BY
+  id;`}
 />
 
 The two finished tasks are gone; the unfinished one remains.
@@ -142,7 +165,12 @@ INSERT INTO tasks (title, done) VALUES
   ('Walk the dog', false),
   ('Write report', false);`}
   starterCode={`-- Step 1: SELECT to preview which rows match.
-SELECT * FROM tasks WHERE title LIKE 'W%';
+SELECT
+  *
+FROM
+  tasks
+WHERE
+  title LIKE 'W%';
 
 -- Step 2 (once you're sure), the matching change would be:
 -- UPDATE tasks SET done = true WHERE title LIKE 'W%';`}

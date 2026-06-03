@@ -54,13 +54,16 @@ flip when we disaggregate.
 # Two departments. "Easy" admits ~60%, "Hard" admits ~25% — for EVERYONE.
 # Within each department, women are admitted at a HIGHER rate than men.
 # But women mostly apply to the Hard department; men to the Easy one.
-data = pd.DataFrame([
-    # dept,   gender,   applicants, admitted
-    ["Easy",  "Men",    600, 360],   # 60% admit
-    ["Easy",  "Women",  100,  65],   # 65% admit  (higher!)
-    ["Hard",  "Men",    100,  25],   # 25% admit
-    ["Hard",  "Women",  600, 165],   # 27.5% admit (higher!)
-], columns=["dept", "gender", "applicants", "admitted"])
+data = pd.DataFrame(
+    [
+        # dept,   gender,   applicants, admitted
+        ["Easy", "Men", 600, 360],  # 60% admit
+        ["Easy", "Women", 100, 65],  # 65% admit  (higher!)
+        ["Hard", "Men", 100, 25],  # 25% admit
+        ["Hard", "Women", 600, 165],  # 27.5% admit (higher!)
+    ],
+    columns=["dept", "gender", "applicants", "admitted"],
+)
 
 # Within-department admit rates: women win in BOTH.
 within = data.assign(rate=lambda d: d.admitted / d.applicants)
@@ -187,7 +190,7 @@ outcome = rng.normal(0, 1, size=n)
 # Test 20 unrelated random "features" against it.
 hits = []
 for i in range(20):
-    feature = rng.normal(0, 1, size=n)   # pure noise, unrelated to outcome
+    feature = rng.normal(0, 1, size=n)  # pure noise, unrelated to outcome
     r, p = stats.pearsonr(feature, outcome)
     if p < 0.05:
         hits.append((i, round(r, 3), round(p, 4)))
@@ -237,16 +240,16 @@ about **9%**. Run the numbers on 100,000 people:
 <CodeBlock
   adapter="python"
   starterCode={`# Disease prevalence and test accuracy.
-prevalence       = 1 / 1000     # 0.1% of people have it
-false_pos_rate   = 0.01         # 1% of healthy people test positive
-sensitivity      = 1.00         # catches every true case
+prevalence = 1 / 1000  # 0.1% of people have it
+false_pos_rate = 0.01  # 1% of healthy people test positive
+sensitivity = 1.00  # catches every true case
 
 population = 100_000
-sick    = population * prevalence
+sick = population * prevalence
 healthy = population - sick
 
-true_positives  = sick * sensitivity          # sick AND test positive
-false_positives = healthy * false_pos_rate    # healthy BUT test positive
+true_positives = sick * sensitivity  # sick AND test positive
+false_positives = healthy * false_pos_rate  # healthy BUT test positive
 
 prob_sick_given_positive = true_positives / (true_positives + false_positives)
 
@@ -340,7 +343,7 @@ rng = np.random.default_rng(3)
 # Each salesperson has a true skill, plus monthly luck. Measured = skill + luck.
 n = 500
 skill = rng.normal(100, 10, size=n)
-month1 = skill + rng.normal(0, 15, size=n)   # luck differs each month
+month1 = skill + rng.normal(0, 15, size=n)  # luck differs each month
 month2 = skill + rng.normal(0, 15, size=n)
 
 # Take the TOP 10% of month 1 ("our best reps!") and see how they do next month.

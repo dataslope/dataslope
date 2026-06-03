@@ -215,18 +215,19 @@ constructor.
 import java.util.Map;
 
 public class Main {
-    record CustomerId(String value) {}
-    record OrderId(String value)    {}
-    record Order(OrderId id, CustomerId customer, int cents) {}
+  record CustomerId(String value) {}
+  record OrderId(String value) {}
+  record Order(OrderId id, CustomerId customer, int cents) {}
 
-    public static void main(String[] args) {
-        Map<OrderId, Order> orders = new HashMap<>();
-        orders.put(new OrderId("o-1"), new Order(new OrderId("o-1"), new CustomerId("c-1"), 999));
+  public static void main(String[] args) {
+    Map<OrderId, Order> orders = new HashMap<>();
+    orders.put(new OrderId("o-1"),
+               new Order(new OrderId("o-1"), new CustomerId("c-1"), 999));
 
-        // This would not even compile:
-        // orders.get(new CustomerId("c-1"));
-        System.out.println(orders.get(new OrderId("o-1")));
-    }
+    // This would not even compile:
+    // orders.get(new CustomerId("c-1"));
+    System.out.println(orders.get(new OrderId("o-1")));
+  }
 }
 `}
 />

@@ -74,7 +74,7 @@ slice of the world and grows a slightly different structure.
   starterCode={`import numpy as np
 
 rng = np.random.RandomState(0)
-data = np.arange(10)            # pretend these are 10 training rows
+data = np.arange(10)  # pretend these are 10 training rows
 
 # Each "tree" gets its own bootstrap sample: draw 10 rows WITH replacement.
 for i in range(3):
@@ -141,10 +141,18 @@ tree.fit(X_train, y_train)
 forest = RandomForestClassifier(n_estimators=200, random_state=0)
 forest.fit(X_train, y_train)
 
-print("Single tree   -> train:", round(tree.score(X_train, y_train), 3),
-      " test:", round(tree.score(X_test, y_test), 3))
-print("Random forest -> train:", round(forest.score(X_train, y_train), 3),
-      " test:", round(forest.score(X_test, y_test), 3))
+print(
+    "Single tree   -> train:",
+    round(tree.score(X_train, y_train), 3),
+    " test:",
+    round(tree.score(X_test, y_test), 3),
+)
+print(
+    "Random forest -> train:",
+    round(forest.score(X_train, y_train), 3),
+    " test:",
+    round(forest.score(X_test, y_test), 3),
+)
 `}
 />
 
@@ -178,9 +186,7 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 
 X, y = load_diabetes(return_X_y=True)
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=0
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
 tree = DecisionTreeRegressor(random_state=0).fit(X_train, y_train)
 forest = RandomForestRegressor(n_estimators=200, random_state=0).fit(X_train, y_train)

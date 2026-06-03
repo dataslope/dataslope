@@ -42,8 +42,12 @@ INSERT INTO contacts (name, phone, reward_points) VALUES
   ('Grace', NULL, 0),
   ('Linus', '', NULL),
   ('Mae', '555-0104', 25);`}
-  starterCode={`SELECT name, phone, reward_points
-FROM contacts;`}
+  starterCode={`SELECT
+  name,
+  phone,
+  reward_points
+FROM
+  contacts;`}
 />
 
 The blank-looking cells may not all mean the same thing. A `NULL` value
@@ -81,9 +85,13 @@ INSERT INTO contacts (name, phone, reward_points) VALUES
   ('Grace', NULL, 0),
   ('Linus', '', NULL),
   ('Mae', '555-0104', 25);`}
-  starterCode={`SELECT name, phone
-FROM contacts
-WHERE phone IS NULL;`}
+  starterCode={`SELECT
+  name,
+  phone
+FROM
+  contacts
+WHERE
+  phone IS NULL;`}
 />
 
 <SqlCodeBlock
@@ -100,9 +108,13 @@ INSERT INTO contacts (name, phone, reward_points) VALUES
   ('Grace', NULL, 0),
   ('Linus', '', NULL),
   ('Mae', '555-0104', 25);`}
-  starterCode={`SELECT name, phone
-FROM contacts
-WHERE phone IS NOT NULL;`}
+  starterCode={`SELECT
+  name,
+  phone
+FROM
+  contacts
+WHERE
+  phone IS NOT NULL;`}
 />
 
 Notice that `IS NOT NULL` includes Linus, whose phone is an empty string.
@@ -195,7 +207,8 @@ INSERT INTO contacts (name, phone, reward_points) VALUES
   name,
   reward_points,
   reward_points + 5 AS points_after_bonus
-FROM contacts;`}
+FROM
+  contacts;`}
 />
 
 Linus has `NULL` reward points, so adding 5 still gives `NULL`.
@@ -223,7 +236,8 @@ INSERT INTO contacts (name, phone, reward_points) VALUES
   starterCode={`SELECT
   name,
   COALESCE(phone, 'No phone on file') AS phone_display
-FROM contacts;`}
+FROM
+  contacts;`}
 />
 
 `COALESCE(phone, 'No phone on file')` means: use `phone` if it is known;
@@ -247,7 +261,8 @@ INSERT INTO contacts (name, phone, reward_points) VALUES
   name,
   reward_points,
   COALESCE(reward_points, 0) + 5 AS points_after_bonus
-FROM contacts;`}
+FROM
+  contacts;`}
 />
 
 This query treats missing reward points as 0 for the purpose of the
@@ -277,7 +292,8 @@ INSERT INTO contacts (name, phone, reward_points) VALUES
   starterCode={`SELECT
   name,
   IFNULL(phone, 'No phone on file') AS phone_display
-FROM contacts;`}
+FROM
+  contacts;`}
 />
 
 For beginners, `COALESCE` is a great default because it is standard SQL

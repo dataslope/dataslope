@@ -69,8 +69,8 @@ for t in range(1, n):
 ma1 = pd.Series(ma[100:])`}
   starterCode={`from statsmodels.tsa.arima.model import ARIMA
 
-ar_fit = ARIMA(ar1, order=(1, 0, 0)).fit()   # one AR term, no differencing, no MA
-ma_fit = ARIMA(ma1, order=(0, 0, 1)).fit()   # no AR, no differencing, one MA term
+ar_fit = ARIMA(ar1, order=(1, 0, 0)).fit()  # one AR term, no differencing, no MA
+ma_fit = ARIMA(ma1, order=(0, 0, 1)).fit()  # no AR, no differencing, one MA term
 
 print("AR(1) model -- we built it with phi = 0.7:")
 print(f"   estimated ar.L1 = {ar_fit.params['ar.L1']:.3f}")
@@ -165,10 +165,18 @@ fig, ax = plt.subplots(figsize=(10, 4.5))
 train.plot(ax=ax, label="train")
 test.plot(ax=ax, label="actual (held out)", color="black")
 mean.plot(ax=ax, label="forecast", color="crimson")
-ax.fill_between(ci.index, ci.iloc[:, 0], ci.iloc[:, 1], color="crimson", alpha=0.15,
-                label="95% interval")
-ax.legend(); ax.set_title("ARIMA(1,1,1): fit on train, forecast the held-out future")
-plt.tight_layout(); plt.show()
+ax.fill_between(
+    ci.index,
+    ci.iloc[:, 0],
+    ci.iloc[:, 1],
+    color="crimson",
+    alpha=0.15,
+    label="95% interval",
+)
+ax.legend()
+ax.set_title("ARIMA(1,1,1): fit on train, forecast the held-out future")
+plt.tight_layout()
+plt.show()
 
 print("The forecast tracks the trend, and the red band WIDENS as it reaches")
 print("further out -- uncertainty compounds the further ahead you predict.")
@@ -216,7 +224,7 @@ train = series.iloc[:-24]`}
 
 print(f"{'order':>10} | {'AIC':>9}")
 print("-" * 24)
-for order in [(0,1,1), (1,1,0), (1,1,1), (2,1,1), (2,1,2)]:
+for order in [(0, 1, 1), (1, 1, 0), (1, 1, 1), (2, 1, 1), (2, 1, 2)]:
     aic = ARIMA(train, order=order).fit().aic
     print(f"{str(order):>10} | {aic:9.2f}")
 
@@ -274,7 +282,8 @@ import matplotlib.pyplot as plt
 # Plain ARIMA on log(air): it can take the trend, but NOT the yearly season.
 res = ARIMA(np.log(air), order=(2, 1, 2)).fit()
 res.plot_diagnostics(figsize=(10, 7))
-plt.tight_layout(); plt.show()
+plt.tight_layout()
+plt.show()
 
 print("Look at the bottom-left CORRELOGRAM (residual ACF): a spike still pokes")
 print("out around lag 12. That leftover SEASONAL structure means plain ARIMA")
@@ -412,12 +421,12 @@ train = pd.Series(10 + np.cumsum(ma) * 0.0 + ma, index=idx, name="y")`}
 }
 print(pick)
 `}
-  solutionCode={`a111 = float(ARIMA(train, order=(1,1,1)).fit().aic)
-a011 = float(ARIMA(train, order=(0,1,1)).fit().aic)
+  solutionCode={`a111 = float(ARIMA(train, order=(1, 1, 1)).fit().aic)
+a011 = float(ARIMA(train, order=(0, 1, 1)).fit().aic)
 pick = {
     "aic_111": a111,
     "aic_011": a011,
-    "best_order": (1,1,1) if a111 < a011 else (0,1,1),
+    "best_order": (1, 1, 1) if a111 < a011 else (0, 1, 1),
 }
 print(pick)
 `}

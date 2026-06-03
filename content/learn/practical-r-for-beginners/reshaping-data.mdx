@@ -93,11 +93,11 @@ wide <- data.frame(
 
 long <- wide |>
   pivot_longer(
-    cols          = starts_with("y"),
-    names_to      = "year",
-    names_prefix  = "y",
+    cols = starts_with("y"),
+    names_to = "year",
+    names_prefix = "y",
     names_transform = list(year = as.integer),
-    values_to     = "value"
+    values_to = "value"
   )
 
 print(long)
@@ -279,7 +279,7 @@ it into a tidy long-form data frame `sales_long` with columns
   starterCode={`library(tidyr)
 
 # sales_wide is already defined
-sales_long <- NULL   # pivot it longer
+sales_long <- NULL # pivot it longer
 
 print(sales_long)
 `}

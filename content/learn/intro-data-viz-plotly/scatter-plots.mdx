@@ -30,11 +30,12 @@ If you forget every other chart, remember the scatter plot.
 df = px.data.iris()
 
 fig = px.scatter(
-    df, x="sepal_width", y="sepal_length",
+    df,
+    x="sepal_width",
+    y="sepal_length",
     template="simple_white",
     title="Iris: sepal width vs length",
-    labels={"sepal_width": "Sepal width (cm)",
-            "sepal_length": "Sepal length (cm)"},
+    labels={"sepal_width": "Sepal width (cm)", "sepal_length": "Sepal length (cm)"},
 )
 fig.show()
 `}
@@ -55,11 +56,13 @@ richer once we color by species:
 df = px.data.iris()
 
 fig = px.scatter(
-    df, x="sepal_width", y="sepal_length", color="species",
+    df,
+    x="sepal_width",
+    y="sepal_length",
+    color="species",
     template="simple_white",
     title="Iris by species",
-    labels={"sepal_width": "Sepal width (cm)",
-            "sepal_length": "Sepal length (cm)"},
+    labels={"sepal_width": "Sepal width (cm)", "sepal_length": "Sepal length (cm)"},
 )
 fig.show()
 `}
@@ -82,12 +85,14 @@ whole page to it later):
 df = px.data.iris()
 
 fig = px.scatter(
-    df, x="sepal_width", y="sepal_length",
-    color="species", size="petal_length",
+    df,
+    x="sepal_width",
+    y="sepal_length",
+    color="species",
+    size="petal_length",
     template="simple_white",
     title="Iris with size encoding petal length",
-    labels={"sepal_width": "Sepal width (cm)",
-            "sepal_length": "Sepal length (cm)"},
+    labels={"sepal_width": "Sepal width (cm)", "sepal_length": "Sepal length (cm)"},
 )
 fig.show()
 `}
@@ -108,7 +113,10 @@ regression):
 df = px.data.tips()
 
 fig = px.scatter(
-    df, x="total_bill", y="tip", color="sex",
+    df,
+    x="total_bill",
+    y="tip",
+    color="sex",
     trendline="ols",
     template="simple_white",
     title="Tip vs total bill with linear trendlines per group",
@@ -137,7 +145,9 @@ look equally black. Two fixes:
 df = px.data.gapminder()
 
 fig = px.scatter(
-    df, x="gdpPercap", y="lifeExp",
+    df,
+    x="gdpPercap",
+    y="lifeExp",
     log_x=True,
     opacity=0.3,
     template="simple_white",

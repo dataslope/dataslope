@@ -34,16 +34,16 @@ flowchart TD
 #include <queue>
 
 int main() {
-    std::queue<int> line;
-    line.push(101);
-    line.push(102);
-    line.push(103);
+  std::queue<int> line;
+  line.push(101);
+  line.push(102);
+  line.push(103);
 
-    while (!line.empty()) {
-        std::cout << "serving " << line.front() << "\\n";
-        line.pop();
-    }
-    return 0;
+  while (!line.empty()) {
+    std::cout << "serving " << line.front() << "\\n";
+    line.pop();
+  }
+  return 0;
 }
 `}
 />
@@ -59,17 +59,17 @@ One part of a program can produce work while another consumes it in the same ord
 #include <string>
 
 int main() {
-    std::queue<std::string> jobs;
-    for (std::string job : {"parse", "validate", "save"}) {
-        jobs.push(job);
-        std::cout << "queued " << job << "\\n";
-    }
+  std::queue<std::string> jobs;
+  for (std::string job : {"parse", "validate", "save"}) {
+    jobs.push(job);
+    std::cout << "queued " << job << "\\n";
+  }
 
-    while (!jobs.empty()) {
-        std::cout << "running " << jobs.front() << "\\n";
-        jobs.pop();
-    }
-    return 0;
+  while (!jobs.empty()) {
+    std::cout << "running " << jobs.front() << "\\n";
+    jobs.pop();
+  }
+  return 0;
 }
 `}
 />
@@ -84,16 +84,16 @@ A deque is a double-ended queue. It supports O(1) push and pop at both the front
 #include <iostream>
 
 int main() {
-    std::deque<int> dq;
-    dq.push_back(20);
-    dq.push_front(10);
-    dq.push_back(30);
+  std::deque<int> dq;
+  dq.push_back(20);
+  dq.push_front(10);
+  dq.push_back(30);
 
-    std::cout << dq.front() << " " << dq.back() << "\\n";
-    dq.pop_front();
-    dq.pop_back();
-    std::cout << dq.front() << "\\n";
-    return 0;
+  std::cout << dq.front() << " " << dq.back() << "\\n";
+  dq.pop_front();
+  dq.pop_back();
+  std::cout << dq.front() << "\\n";
+  return 0;
 }
 `}
 />
@@ -115,15 +115,15 @@ This example shows the operation shape: vector erases from the front by shifting
 #include <vector>
 
 int main() {
-    std::vector<int> v = {1, 2, 3, 4};
-    v.erase(v.begin());
+  std::vector<int> v = {1, 2, 3, 4};
+  v.erase(v.begin());
 
-    std::deque<int> d = {1, 2, 3, 4};
-    d.pop_front();
+  std::deque<int> d = {1, 2, 3, 4};
+  d.pop_front();
 
-    std::cout << "vector front now " << v.front() << "\\n";
-    std::cout << "deque front now " << d.front() << "\\n";
-    return 0;
+  std::cout << "vector front now " << v.front() << "\\n";
+  std::cout << "deque front now " << d.front() << "\\n";
+  return 0;
 }
 `}
 />
@@ -138,10 +138,11 @@ int main() {
 #include <queue>
 
 int main() {
-    std::priority_queue<int> scores;
-    for (int x : {30, 99, 12}) scores.push(x);
-    std::cout << scores.top() << "\\n";
-    return 0;
+  std::priority_queue<int> scores;
+  for (int x : {30, 99, 12})
+    scores.push(x);
+  std::cout << scores.top() << "\\n";
+  return 0;
 }
 `}
 />
@@ -157,17 +158,18 @@ Queues also power breadth-first search: visit a node, enqueue its neighbors, the
 #include <vector>
 
 int main() {
-    std::vector<std::vector<int>> graph = {{1, 2}, {3}, {}, {}};
-    std::queue<int> q;
-    q.push(0);
+  std::vector<std::vector<int>> graph = {{1, 2}, {3}, {}, {}};
+  std::queue<int> q;
+  q.push(0);
 
-    while (!q.empty()) {
-        int node = q.front();
-        q.pop();
-        std::cout << node << "\\n";
-        for (int next : graph[node]) q.push(next);
-    }
-    return 0;
+  while (!q.empty()) {
+    int node = q.front();
+    q.pop();
+    std::cout << node << "\\n";
+    for (int next : graph[node])
+      q.push(next);
+  }
+  return 0;
 }
 `}
 />
@@ -187,14 +189,14 @@ A linked list can push and pop at ends, but a deque usually has better locality 
 #include <queue>
 #include <string>
 
-void printFirstNonRepeating(const std::string& stream) {
-    // your code here
+void printFirstNonRepeating(const std::string &stream) {
+  // your code here
 }
 
 int main() {
-    std::string stream = "aabc";
-    printFirstNonRepeating(stream);
-    return 0;
+  std::string stream = "aabc";
+  printFirstNonRepeating(stream);
+  return 0;
 }
 `}
   solutionCode={`#include <array>
@@ -202,25 +204,27 @@ int main() {
 #include <queue>
 #include <string>
 
-void printFirstNonRepeating(const std::string& stream) {
-    std::array<int, 26> freq{};
-    std::queue<char> candidates;
+void printFirstNonRepeating(const std::string &stream) {
+  std::array<int, 26> freq{};
+  std::queue<char> candidates;
 
-    for (char c : stream) {
-        ++freq[c - 'a'];
-        candidates.push(c);
-        while (!candidates.empty() && freq[candidates.front() - 'a'] > 1) {
-            candidates.pop();
-        }
-        if (candidates.empty()) std::cout << "#\\n";
-        else std::cout << candidates.front() << "\\n";
+  for (char c : stream) {
+    ++freq[c - 'a'];
+    candidates.push(c);
+    while (!candidates.empty() && freq[candidates.front() - 'a'] > 1) {
+      candidates.pop();
     }
+    if (candidates.empty())
+      std::cout << "#\\n";
+    else
+      std::cout << candidates.front() << "\\n";
+  }
 }
 
 int main() {
-    std::string stream = "aabc";
-    printFirstNonRepeating(stream);
-    return 0;
+  std::string stream = "aabc";
+  printFirstNonRepeating(stream);
+  return 0;
 }
 `}
   tests={[{ id: "first_unique", name: "Prints first non-repeating after each step", expect: { stdoutLines: ["a", "#", "b", "b"], stdoutLinesExact: true } }]}
@@ -236,51 +240,53 @@ int main() {
 #include <queue>
 #include <stack>
 
-void reverseFirstK(std::queue<int>& q, int k) {
-    // your code here
+void reverseFirstK(std::queue<int> &q, int k) {
+  // your code here
 }
 
 int main() {
-    std::queue<int> q;
-    for (int x : {1, 2, 3, 4, 5}) q.push(x);
-    reverseFirstK(q, 3);
-    while (!q.empty()) {
-        std::cout << q.front() << "\\n";
-        q.pop();
-    }
-    return 0;
+  std::queue<int> q;
+  for (int x : {1, 2, 3, 4, 5})
+    q.push(x);
+  reverseFirstK(q, 3);
+  while (!q.empty()) {
+    std::cout << q.front() << "\\n";
+    q.pop();
+  }
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 #include <queue>
 #include <stack>
 
-void reverseFirstK(std::queue<int>& q, int k) {
-    std::stack<int> st;
-    for (int i = 0; i < k; ++i) {
-        st.push(q.front());
-        q.pop();
-    }
-    while (!st.empty()) {
-        q.push(st.top());
-        st.pop();
-    }
-    int rest = static_cast<int>(q.size()) - k;
-    for (int i = 0; i < rest; ++i) {
-        q.push(q.front());
-        q.pop();
-    }
+void reverseFirstK(std::queue<int> &q, int k) {
+  std::stack<int> st;
+  for (int i = 0; i < k; ++i) {
+    st.push(q.front());
+    q.pop();
+  }
+  while (!st.empty()) {
+    q.push(st.top());
+    st.pop();
+  }
+  int rest = static_cast<int>(q.size()) - k;
+  for (int i = 0; i < rest; ++i) {
+    q.push(q.front());
+    q.pop();
+  }
 }
 
 int main() {
-    std::queue<int> q;
-    for (int x : {1, 2, 3, 4, 5}) q.push(x);
-    reverseFirstK(q, 3);
-    while (!q.empty()) {
-        std::cout << q.front() << "\\n";
-        q.pop();
-    }
-    return 0;
+  std::queue<int> q;
+  for (int x : {1, 2, 3, 4, 5})
+    q.push(x);
+  reverseFirstK(q, 3);
+  while (!q.empty()) {
+    std::cout << q.front() << "\\n";
+    q.pop();
+  }
+  return 0;
 }
 `}
   tests={[{ id: "reverse_k", name: "Reverses first three", expect: { stdoutLines: ["3", "2", "1", "4", "5"], stdoutLinesExact: true } }]}

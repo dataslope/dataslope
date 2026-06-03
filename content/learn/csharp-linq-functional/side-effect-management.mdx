@@ -59,7 +59,7 @@ List<decimal> ReadAndSumPositiveSales()
     {
         if (decimal.TryParse(line, out var n) && n > 0)
         {
-            Console.WriteLine($"keeping {n}");   // logging
+            Console.WriteLine($"keeping {n}"); // logging
             positives.Add(n);
         }
         else
@@ -92,8 +92,7 @@ using System.Linq;
 public static class SalesParser
 {
     public static IEnumerable<decimal> Parse(IEnumerable<string> lines) =>
-        lines
-            .Select(line => decimal.TryParse(line, out var n) ? (decimal?)n : null)
+        lines.Select(line => decimal.TryParse(line, out var n) ? (decimal?)n : null)
             .Where(n => n is > 0)
             .Select(n => n!.Value);
 }
@@ -101,7 +100,8 @@ public static class SalesParser
 // --- imperative shell: reads input, prints output ---
 var lines = new[] { "10.50", "-3.00", "abc", "7.25", "", "12.00" }; // pretend File.ReadAllLines
 var positives = SalesParser.Parse(lines).ToList();
-foreach (var p in positives) Console.WriteLine($"keeping {p}");
+foreach (var p in positives)
+    Console.WriteLine($"keeping {p}");
 Console.WriteLine($"Sum: {positives.Sum()}");
 `}
 />
@@ -135,12 +135,12 @@ public static class Subs
         subs.Where(s => s.ExpiresOn <= DateTime.UtcNow.AddDays(7));
 
     // GOOD: pass "now" in. Same code, infinitely more testable.
-    public static IEnumerable<Subscription> ExpiringSoon(IEnumerable<Subscription> subs, DateTime now) =>
-        subs.Where(s => s.ExpiresOn <= now.AddDays(7));
+    public static IEnumerable<Subscription> ExpiringSoon(IEnumerable<Subscription> subs,
+                                                         DateTime now) => subs.Where(s => s.ExpiresOn <=
+                                                                                          now.AddDays(7));
 }
 
-var subs = new[]
-{
+var subs = new[] {
     new Subscription("A", new DateTime(2026, 6, 1)),
     new Subscription("B", new DateTime(2026, 5, 27)),
     new Subscription("C", new DateTime(2026, 7, 1)),

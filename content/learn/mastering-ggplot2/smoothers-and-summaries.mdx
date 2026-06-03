@@ -75,8 +75,10 @@ without you pre-aggregating the data:
 # Mean highway MPG per class, computed at plot time, drawn as points.
 ggplot(mpg, aes(class, hwy)) +
   geom_jitter(width = 0.15, alpha = 0.3) +
-  stat_summary(fun = mean, geom = "point",
-               color = "red", size = 4)
+  stat_summary(
+    fun = mean, geom = "point",
+    color = "red", size = 4
+  )
 `}
 />
 
@@ -93,9 +95,11 @@ You can add a range too:
 
 # Mean with a min-max range bar per class.
 ggplot(mpg, aes(class, hwy)) +
-  stat_summary(fun = mean,
-               fun.min = min, fun.max = max,
-               geom = "pointrange", color = "steelblue")
+  stat_summary(
+    fun = mean,
+    fun.min = min, fun.max = max,
+    geom = "pointrange", color = "steelblue"
+  )
 `}
 />
 
@@ -109,8 +113,8 @@ and the summary, so the reader sees the evidence *and* the claim:
   starterCode={`library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy)) +
-  geom_point(alpha = 0.4) +                       # the evidence
-  geom_smooth(method = "lm", se = TRUE) +         # the claim + uncertainty
+  geom_point(alpha = 0.4) + # the evidence
+  geom_smooth(method = "lm", se = TRUE) + # the claim + uncertainty
   labs(title = "Bigger engines tend to use more fuel")
 `}
 />

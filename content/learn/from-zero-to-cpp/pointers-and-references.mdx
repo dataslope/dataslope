@@ -42,14 +42,14 @@ You read what a pointer points to with the **dereference** operator
   starterCode={`#include <iostream>
 
 int main() {
-    int n = 42;
-    int* p = &n;
+  int n = 42;
+  int *p = &n;
 
-    std::cout << "n  = " << n  << "\\n";
-    std::cout << "*p = " << *p << "\\n";   // reads through the pointer
-    *p = 100;                              // writes through the pointer
-    std::cout << "n  = " << n  << "  (after *p = 100)\\n";
-    return 0;
+  std::cout << "n  = " << n << "\\n";
+  std::cout << "*p = " << *p << "\\n"; // reads through the pointer
+  *p = 100;                           // writes through the pointer
+  std::cout << "n  = " << n << "  (after *p = 100)\\n";
+  return 0;
 }
 `}
 />
@@ -70,19 +70,19 @@ and check before dereferencing.
   adapter="cpp"
   starterCode={`#include <iostream>
 
-void describe(int* p) {
-    if (p == nullptr) {
-        std::cout << "(no value)\\n";
-    } else {
-        std::cout << "value = " << *p << "\\n";
-    }
+void describe(int *p) {
+  if (p == nullptr) {
+    std::cout << "(no value)\\n";
+  } else {
+    std::cout << "value = " << *p << "\\n";
+  }
 }
 
 int main() {
-    int n = 7;
-    describe(&n);
-    describe(nullptr);
-    return 0;
+  int n = 7;
+  describe(&n);
+  describe(nullptr);
+  return 0;
 }
 `}
 />
@@ -128,16 +128,16 @@ want the caller to be able to modify a member of an object.
   adapter="cpp"
   starterCode={`#include <iostream>
 
-void increment(int& x) {     // by reference: modifies caller's variable
-    x += 1;
+void increment(int &x) { // by reference: modifies caller's variable
+  x += 1;
 }
 
 int main() {
-    int n = 10;
-    increment(n);
-    increment(n);
-    std::cout << "n = " << n << "\\n";   // 12
-    return 0;
+  int n = 10;
+  increment(n);
+  increment(n);
+  std::cout << "n = " << n << "\\n"; // 12
+  return 0;
 }
 `}
 />
@@ -177,14 +177,14 @@ flowchart LR
   starterCode={`#include <iostream>
 
 int main() {
-    int a[5] = {10, 20, 30, 40, 50};
-    int* p = a;          // an array "decays" to a pointer to its first element
+  int a[5] = {10, 20, 30, 40, 50};
+  int *p = a; // an array "decays" to a pointer to its first element
 
-    std::cout << *p       << "\\n";   // 10
-    std::cout << *(p + 1) << "\\n";   // 20
-    std::cout << p[2]     << "\\n";   // 30 — same as *(p + 2)
-    std::cout << p[4]     << "\\n";   // 50
-    return 0;
+  std::cout << *p << "\\n";       // 10
+  std::cout << *(p + 1) << "\\n"; // 20
+  std::cout << p[2] << "\\n";     // 30 — same as *(p + 2)
+  std::cout << p[4] << "\\n";     // 50
+  return 0;
 }
 `}
 />
@@ -256,28 +256,29 @@ references and with pointers, so you can compare.
   adapter="cpp"
   starterCode={`#include <iostream>
 
-void swap_ref(int& a, int& b) {
-    int tmp = a;
-    a = b;
-    b = tmp;
+void swap_ref(int &a, int &b) {
+  int tmp = a;
+  a = b;
+  b = tmp;
 }
 
-void swap_ptr(int* a, int* b) {
-    if (!a || !b) return;     // pointer version must guard against null
-    int tmp = *a;
-    *a = *b;
-    *b = tmp;
+void swap_ptr(int *a, int *b) {
+  if (!a || !b)
+    return; // pointer version must guard against null
+  int tmp = *a;
+  *a = *b;
+  *b = tmp;
 }
 
 int main() {
-    int x = 1, y = 2;
-    swap_ref(x, y);
-    std::cout << "after swap_ref: " << x << " " << y << "\\n";
+  int x = 1, y = 2;
+  swap_ref(x, y);
+  std::cout << "after swap_ref: " << x << " " << y << "\\n";
 
-    int p = 10, q = 20;
-    swap_ptr(&p, &q);
-    std::cout << "after swap_ptr: " << p << " " << q << "\\n";
-    return 0;
+  int p = 10, q = 20;
+  swap_ptr(&p, &q);
+  std::cout << "after swap_ptr: " << p << " " << q << "\\n";
+  return 0;
 }
 `}
 />
@@ -294,30 +295,31 @@ references unless you really need to express "this might be absent."
   instructions={`Implement \`void add_one(int* p)\`. If \`p\` is not null, increment the int it points to by 1. If \`p\` is null, do nothing. The provided \`main\` calls it on a real address and prints the resulting value; you should see exactly \`8\`.`}
   starterCode={`#include <iostream>
 
-void add_one(int* p) {
-    // your code here
+void add_one(int *p) {
+  // your code here
 }
 
 int main() {
-    int n = 7;
-    add_one(&n);
-    add_one(nullptr);   // must not crash
-    std::cout << n;
-    return 0;
+  int n = 7;
+  add_one(&n);
+  add_one(nullptr); // must not crash
+  std::cout << n;
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 
-void add_one(int* p) {
-    if (p) *p += 1;
+void add_one(int *p) {
+  if (p)
+    *p += 1;
 }
 
 int main() {
-    int n = 7;
-    add_one(&n);
-    add_one(nullptr);
-    std::cout << n;
-    return 0;
+  int n = 7;
+  add_one(&n);
+  add_one(nullptr);
+  std::cout << n;
+  return 0;
 }
 `}
   tests={[
@@ -336,29 +338,30 @@ int main() {
   instructions={`Implement \`int sum(const int* data, int n)\` that returns the sum of the first \`n\` ints starting at \`data\`. Use pointer arithmetic (or indexing — they're equivalent). \`main\` runs the function on \`{1, 2, 3, 4, 5}\` and should print \`15\`.`}
   starterCode={`#include <iostream>
 
-int sum(const int* data, int n) {
-    // your code here
-    return 0;
+int sum(const int *data, int n) {
+  // your code here
+  return 0;
 }
 
 int main() {
-    int a[5] = {1, 2, 3, 4, 5};
-    std::cout << sum(a, 5);
-    return 0;
+  int a[5] = {1, 2, 3, 4, 5};
+  std::cout << sum(a, 5);
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 
-int sum(const int* data, int n) {
-    int total = 0;
-    for (int i = 0; i < n; ++i) total += data[i];
-    return total;
+int sum(const int *data, int n) {
+  int total = 0;
+  for (int i = 0; i < n; ++i)
+    total += data[i];
+  return total;
 }
 
 int main() {
-    int a[5] = {1, 2, 3, 4, 5};
-    std::cout << sum(a, 5);
-    return 0;
+  int a[5] = {1, 2, 3, 4, 5};
+  std::cout << sum(a, 5);
+  return 0;
 }
 `}
   tests={[

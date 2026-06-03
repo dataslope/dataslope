@@ -19,9 +19,9 @@ know one of the inputs, you don't know the answer either.
 
 <CodeBlock
   adapter="r"
-  starterCode={`5 + NA            # unknown plus 5 = unknown
-NA > 3            # unknown vs. 3 = unknown
-NA == NA          # unknown vs. unknown = unknown (!)
+  starterCode={`5 + NA # unknown plus 5 = unknown
+NA > 3 # unknown vs. 3 = unknown
+NA == NA # unknown vs. unknown = unknown (!)
 mean(c(1, 2, NA))
 sum(c(1, 2, NA))
 `}
@@ -38,10 +38,10 @@ missing?":
   adapter="r"
   starterCode={`x <- c(1, 2, NA, 4, NA, 6)
 
-is.na(x)            # logical vector: which positions are NA
-sum(is.na(x))       # count of missings
-mean(is.na(x))      # proportion missing
-which(is.na(x))     # positions of NAs
+is.na(x) # logical vector: which positions are NA
+sum(is.na(x)) # count of missings
+mean(is.na(x)) # proportion missing
+which(is.na(x)) # positions of NAs
 `}
 />
 
@@ -58,7 +58,7 @@ quietly removes `NA`s before computing.
   adapter="r"
   starterCode={`temps <- c(68, 70, NA, 72, 75, NA, 69)
 
-mean(temps)               # NA — there are missings
+mean(temps) # NA — there are missings
 mean(temps, na.rm = TRUE) # works: average of the non-NA values
 sum(temps, na.rm = TRUE)
 max(temps, na.rm = TRUE)
@@ -158,16 +158,16 @@ confuse with `NA`:
 
 <CodeBlock
   adapter="r"
-  starterCode={`0 / 0     # NaN
-1 / 0     # Inf
--1 / 0    # -Inf
+  starterCode={`0 / 0 # NaN
+1 / 0 # Inf
+-1 / 0 # -Inf
 
-is.na(NaN)      # TRUE — NaN counts as missing
-is.nan(NA)      # FALSE
-is.null(NA)     # FALSE — NA is not NULL
+is.na(NaN) # TRUE — NaN counts as missing
+is.nan(NA) # FALSE
+is.null(NA) # FALSE — NA is not NULL
 
-length(NULL)    # 0
-length(NA)      # 1
+length(NULL) # 0
+length(NA) # 1
 `}
 />
 
@@ -225,14 +225,14 @@ failed, leaving `NA`. Compute:
 `}
   starterCode={`# week is already defined: 7 daily temps with NAs
 
-n_missing <- NULL   # replace with the count of NAs
-avg_temp  <- NULL   # replace with the mean ignoring NAs
+n_missing <- NULL # replace with the count of NAs
+avg_temp <- NULL # replace with the mean ignoring NAs
 
 cat("Missing readings:", n_missing, "\\n")
 cat("Average temp:", avg_temp, "\\n")
 `}
   solutionCode={`n_missing <- sum(is.na(week))
-avg_temp  <- mean(week, na.rm = TRUE)
+avg_temp <- mean(week, na.rm = TRUE)
 cat("Missing readings:", n_missing, "\\n")
 cat("Average temp:", avg_temp, "\\n")
 `}

@@ -108,19 +108,26 @@ from scipy import stats
 # How many users per arm to detect a lift from 10% -> 12% conversion,
 # with 80% power at alpha = 0.05 (two-sided)? A standard formula for
 # comparing two proportions.
-p1, p2 = 0.10, 0.12           # baseline and target conversion rates
+p1, p2 = 0.10, 0.12  # baseline and target conversion rates
 alpha, power = 0.05, 0.80
 
-z_alpha = stats.norm.ppf(1 - alpha / 2)   # two-sided
-z_beta  = stats.norm.ppf(power)
+z_alpha = stats.norm.ppf(1 - alpha / 2)  # two-sided
+z_beta = stats.norm.ppf(power)
 p_bar = (p1 + p2) / 2
 
-n_per_arm = ((z_alpha * np.sqrt(2 * p_bar * (1 - p_bar))
-              + z_beta * np.sqrt(p1*(1-p1) + p2*(1-p2)))**2) / (p2 - p1)**2
+n_per_arm = (
+    (
+        z_alpha * np.sqrt(2 * p_bar * (1 - p_bar))
+        + z_beta * np.sqrt(p1 * (1 - p1) + p2 * (1 - p2))
+    )
+    ** 2
+) / (p2 - p1) ** 2
 
 print(f"Detecting {p1:.0%} -> {p2:.0%} at {power:.0%} power, alpha={alpha}:")
-print(f"  Need ~{np.ceil(n_per_arm):,.0f} users PER ARM "
-      f"(~{2*np.ceil(n_per_arm):,.0f} total).")
+print(
+    f"  Need ~{np.ceil(n_per_arm):,.0f} users PER ARM "
+    f"(~{2 * np.ceil(n_per_arm):,.0f} total)."
+)
 print()
 print("Smaller lifts need far more users. Decide this BEFORE you run,")
 print("so you don't stop early or chase an effect too small to see.")
@@ -156,13 +163,13 @@ rng = np.random.default_rng(42)
 
 # --- Simulate an experiment with a KNOWN true effect ---
 n_a = n_b = 6000
-true_p_a, true_p_b = 0.100, 0.118     # true 1.8pp lift (B is better)
+true_p_a, true_p_b = 0.100, 0.118  # true 1.8pp lift (B is better)
 
-conv_a = rng.binomial(1, true_p_a, n_a)   # 0/1 outcomes per user
+conv_a = rng.binomial(1, true_p_a, n_a)  # 0/1 outcomes per user
 conv_b = rng.binomial(1, true_p_b, n_b)
 
-x_a, x_b = conv_a.sum(), conv_b.sum()     # conversions observed
-p_a, p_b = x_a / n_a, x_b / n_b           # observed rates
+x_a, x_b = conv_a.sum(), conv_b.sum()  # conversions observed
+p_a, p_b = x_a / n_a, x_b / n_b  # observed rates
 
 # --- Lift: absolute and relative ---
 abs_lift = p_b - p_a
@@ -170,25 +177,25 @@ rel_lift = abs_lift / p_a
 
 # --- Two-proportion z-test (pooled SE under H0) ---
 p_pool = (x_a + x_b) / (n_a + n_b)
-se_pool = np.sqrt(p_pool * (1 - p_pool) * (1/n_a + 1/n_b))
+se_pool = np.sqrt(p_pool * (1 - p_pool) * (1 / n_a + 1 / n_b))
 z = abs_lift / se_pool
-p_value = 2 * (1 - stats.norm.cdf(abs(z)))   # two-sided
+p_value = 2 * (1 - stats.norm.cdf(abs(z)))  # two-sided
 
 # --- Cross-check with chi-square on the 2x2 table ---
 table = np.array([[x_a, n_a - x_a], [x_b, n_b - x_b]])
 chi2, p_chi2, _, _ = stats.chi2_contingency(table, correction=False)
 
 # --- 95% CI for the difference (unpooled SE) ---
-se_diff = np.sqrt(p_a*(1-p_a)/n_a + p_b*(1-p_b)/n_b)
+se_diff = np.sqrt(p_a * (1 - p_a) / n_a + p_b * (1 - p_b) / n_b)
 zc = stats.norm.ppf(0.975)
-ci_low, ci_high = abs_lift - zc*se_diff, abs_lift + zc*se_diff
+ci_low, ci_high = abs_lift - zc * se_diff, abs_lift + zc * se_diff
 
 # --- Effect size for proportions: Cohen's h ---
-h = 2*np.arcsin(np.sqrt(p_b)) - 2*np.arcsin(np.sqrt(p_a))
+h = 2 * np.arcsin(np.sqrt(p_b)) - 2 * np.arcsin(np.sqrt(p_a))
 
 print(f"Control (A):  {x_a}/{n_a} = {p_a:.4f}")
 print(f"Treatment (B):{x_b}/{n_b} = {p_b:.4f}")
-print(f"Absolute lift: {abs_lift:+.4f}  ({abs_lift*100:+.2f} pp)")
+print(f"Absolute lift: {abs_lift:+.4f}  ({abs_lift * 100:+.2f} pp)")
 print(f"Relative lift: {rel_lift:+.1%}")
 print(f"z-test:        z = {z:.2f},  p = {p_value:.4f}")
 print(f"chi-square:    chi2 = {chi2:.2f}, p = {p_chi2:.4f}  (agrees with z)")
@@ -218,18 +225,26 @@ conv_a = rng.binomial(1, 0.100, n_a)
 conv_b = rng.binomial(1, 0.118, n_b)
 p_a, p_b = conv_a.mean(), conv_b.mean()
 
+
 # 95% CI half-width per arm (normal approximation for a proportion).
 def ci_halfwidth(p, n):
     return stats.norm.ppf(0.975) * np.sqrt(p * (1 - p) / n)
 
-df = pd.DataFrame({
-    "group": ["A (control)", "B (treatment)"],
-    "rate":  [p_a, p_b],
-    "err":   [ci_halfwidth(p_a, n_a), ci_halfwidth(p_b, n_b)],
-})
+
+df = pd.DataFrame(
+    {
+        "group": ["A (control)", "B (treatment)"],
+        "rate": [p_a, p_b],
+        "err": [ci_halfwidth(p_a, n_a), ci_halfwidth(p_b, n_b)],
+    }
+)
 
 fig = px.bar(
-    df, x="group", y="rate", error_y="err", color="group",
+    df,
+    x="group",
+    y="rate",
+    error_y="err",
+    color="group",
     title="Conversion rate by arm (bars = 95% confidence interval)",
     labels={"rate": "conversion rate"},
 )
@@ -359,7 +374,7 @@ p_b = conv_b / n_b
 rel_lift = float((p_b - p_a) / p_a)
 
 p_pool = (conv_a + conv_b) / (n_a + n_b)
-se = np.sqrt(p_pool * (1 - p_pool) * (1/n_a + 1/n_b))
+se = np.sqrt(p_pool * (1 - p_pool) * (1 / n_a + 1 / n_b))
 z = (p_b - p_a) / se
 p_value = float(2 * (1 - stats.norm.cdf(abs(z))))
 
@@ -427,9 +442,9 @@ from scipy import stats
 p_a = conv_a / n_a
 p_b = conv_b / n_b
 diff = p_b - p_a
-se = np.sqrt(p_a*(1-p_a)/n_a + p_b*(1-p_b)/n_b)
+se = np.sqrt(p_a * (1 - p_a) / n_a + p_b * (1 - p_b) / n_b)
 zc = stats.norm.ppf(0.975)
-low, high = diff - zc*se, diff + zc*se
+low, high = diff - zc * se, diff + zc * se
 ci = (float(low), float(high))
 excludes_zero = bool(low > 0)
 

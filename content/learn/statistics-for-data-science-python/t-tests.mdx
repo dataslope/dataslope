@@ -192,8 +192,8 @@ from scipy import stats
 rng = np.random.default_rng(0)
 
 # Revenue per user ($). The two groups have DIFFERENT spreads on purpose.
-control   = rng.normal(loc=50.0, scale=12.0, size=180)   # old page
-treatment = rng.normal(loc=53.5, scale=20.0, size=160)   # new page
+control = rng.normal(loc=50.0, scale=12.0, size=180)  # old page
+treatment = rng.normal(loc=53.5, scale=20.0, size=160)  # new page
 alpha = 0.05
 
 # Welch's t-test: does NOT assume equal variances. This is the default.
@@ -232,7 +232,7 @@ effect size to learn *how much*.
 from scipy import stats
 
 rng = np.random.default_rng(0)
-control   = rng.normal(loc=50.0, scale=12.0, size=180)
+control = rng.normal(loc=50.0, scale=12.0, size=180)
 treatment = rng.normal(loc=53.5, scale=20.0, size=160)
 
 res = stats.ttest_ind(control, treatment, equal_var=False)
@@ -242,7 +242,7 @@ diff = control.mean() - treatment.mean()
 # A rough standardized effect size (Cohen's d, pooled sd). More in *Effect Sizes*.
 n1, n2 = len(control), len(treatment)
 s1, s2 = control.std(ddof=1), treatment.std(ddof=1)
-pooled_sd = np.sqrt(((n1 - 1)*s1**2 + (n2 - 1)*s2**2) / (n1 + n2 - 2))
+pooled_sd = np.sqrt(((n1 - 1) * s1**2 + (n2 - 1) * s2**2) / (n1 + n2 - 2))
 cohens_d = (control.mean() - treatment.mean()) / pooled_sd
 
 print(f"Difference (control - treatment): {diff:+.2f} dollars")
@@ -330,7 +330,9 @@ print(f"1-sample on diffs : t = {one_samp.statistic:.3f}, p = {one_samp.pvalue:.
 print()
 print("The two are identical -> a paired test IS a one-sample test on diffs.")
 decision = "REJECT H0" if paired.pvalue <= alpha else "FAIL TO REJECT H0"
-print(decision, "- the program changed blood pressure." if paired.pvalue <= alpha else "")
+print(
+    decision, "- the program changed blood pressure." if paired.pvalue <= alpha else ""
+)
 `}
 />
 
@@ -347,8 +349,8 @@ n = 25
 before = rng.normal(loc=150, scale=18, size=n)
 after = before - rng.normal(loc=6, scale=5, size=n)
 
-paired   = stats.ttest_rel(before, after)                       # correct
-unpaired = stats.ttest_ind(before, after, equal_var=False)      # WRONG here
+paired = stats.ttest_rel(before, after)  # correct
+unpaired = stats.ttest_ind(before, after, equal_var=False)  # WRONG here
 
 print(f"Paired   (correct): t = {paired.statistic:6.3f}, p = {paired.pvalue:.5f}")
 print(f"Unpaired (wrong)  : t = {unpaired.statistic:6.3f}, p = {unpaired.pvalue:.5f}")
@@ -398,7 +400,7 @@ rng = np.random.default_rng(3)
 
 # Strongly right-skewed RAW data (exponential) -- nothing like a bell curve.
 n = 200
-sample = rng.exponential(scale=10.0, size=n)   # true mean = 10
+sample = rng.exponential(scale=10.0, size=n)  # true mean = 10
 print(f"Raw-data skewness: {stats.skew(sample):.2f}  (0 = symmetric; this is skewed)")
 
 # A one-sample t-test against the true mean still behaves well,

@@ -344,9 +344,21 @@ function processPayment(method: PaymentMethod, amount: number): string {
   }
 }
 
-console.log(processPayment({ type: "credit-card", cardNumber: "4111111111111111", cvv: "123" }, 99.99));
-console.log(processPayment({ type: "bank-account", accountNumber: "123456", routingNumber: "987654" }, 50.00));
-console.log(processPayment({ type: "paypal", email: "alice@example.com" }, 25.00));
+console.log(
+  processPayment(
+    { type: "credit-card", cardNumber: "4111111111111111", cvv: "123" },
+    99.99,
+  ),
+);
+console.log(
+  processPayment(
+    { type: "bank-account", accountNumber: "123456", routingNumber: "987654" },
+    50.0,
+  ),
+);
+console.log(
+  processPayment({ type: "paypal", email: "alice@example.com" }, 25.0),
+);
 `}
 />
 

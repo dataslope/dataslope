@@ -106,7 +106,8 @@ sns.relplot(
     hue="species",
     style="sex",
     size="body_mass_g",
-    height=5, aspect=1.2,
+    height=5,
+    aspect=1.2,
 )
 `}
 />
@@ -140,9 +141,12 @@ sns.set_theme(style="whitegrid")
 diamonds = sns.load_dataset("diamonds").sample(n=2000, random_state=0)
 
 sns.relplot(
-    data=diamonds, x="carat", y="price",
-    alpha=0.3,            # let dense regions stack up visually
-    height=4, aspect=1.3,
+    data=diamonds,
+    x="carat",
+    y="price",
+    alpha=0.3,  # let dense regions stack up visually
+    height=4,
+    aspect=1.3,
 )
 `}
 />

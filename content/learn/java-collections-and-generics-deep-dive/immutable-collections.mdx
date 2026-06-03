@@ -45,21 +45,21 @@ import java.util.Map;
 import java.util.Set;
 
 public class Main {
-    public static void main(String[] args) {
-        List<Integer> xs = List.of(1, 2, 3);
-        Set<String>   ys = Set.of("a", "b", "c");
-        Map<String,Integer> zs = Map.of("one", 1, "two", 2);
+  public static void main(String[] args) {
+    List<Integer> xs = List.of(1, 2, 3);
+    Set<String> ys = Set.of("a", "b", "c");
+    Map<String, Integer> zs = Map.of("one", 1, "two", 2);
 
-        System.out.println(xs);
-        System.out.println(ys);
-        System.out.println(zs);
+    System.out.println(xs);
+    System.out.println(ys);
+    System.out.println(zs);
 
-        try {
-            xs.add(4);
-        } catch (UnsupportedOperationException e) {
-            System.out.println("xs.add threw: " + e.getClass().getSimpleName());
-        }
+    try {
+      xs.add(4);
+    } catch (UnsupportedOperationException e) {
+      System.out.println("xs.add threw: " + e.getClass().getSimpleName());
     }
+  }
 }
 `}
 />
@@ -82,19 +82,16 @@ just a wrapper. Mutator methods throw `UnsupportedOperationException`.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.Map;
-import static java.util.Map.entry;
+  starterCode={`import static java.util.Map.entry;
+
+import java.util.Map;
 
 public class Main {
-    public static void main(String[] args) {
-        Map<String, Integer> m = Map.ofEntries(
-            entry("a", 1),
-            entry("b", 2),
-            entry("c", 3),
-            entry("d", 4)
-        );
-        System.out.println(m);
-    }
+  public static void main(String[] args) {
+    Map<String, Integer> m = Map.ofEntries(entry("a", 1), entry("b", 2),
+                                           entry("c", 3), entry("d", 4));
+    System.out.println(m);
+  }
 }
 `}
 />
@@ -110,20 +107,20 @@ still useful — but it is a **view**, not a copy:
   starterCode={`import java.util.*;
 
 public class Main {
-    public static void main(String[] args) {
-        List<String> backing = new ArrayList<>(List.of("a", "b"));
-        List<String> view    = Collections.unmodifiableList(backing);
+  public static void main(String[] args) {
+    List<String> backing = new ArrayList<>(List.of("a", "b"));
+    List<String> view = Collections.unmodifiableList(backing);
 
-        System.out.println(view);
-        backing.add("c");          // mutating the backing list...
-        System.out.println(view);   // ...is visible through the view!
+    System.out.println(view);
+    backing.add("c");         // mutating the backing list...
+    System.out.println(view); // ...is visible through the view!
 
-        try {
-            view.add("d");
-        } catch (UnsupportedOperationException e) {
-            System.out.println("view.add threw " + e.getClass().getSimpleName());
-        }
+    try {
+      view.add("d");
+    } catch (UnsupportedOperationException e) {
+      System.out.println("view.add threw " + e.getClass().getSimpleName());
     }
+  }
 }
 `}
 />
@@ -159,31 +156,31 @@ Defensive copying is a discipline:
   starterCode={`import java.util.*;
 
 public class Main {
-    static final class Schedule {
-        private final List<String> tasks;
+  static final class Schedule {
+    private final List<String> tasks;
 
-        // copy on the way in
-        Schedule(List<String> tasks) {
-            this.tasks = List.copyOf(tasks);  // snapshot + immutable
-        }
-
-        // return a safe view on the way out
-        List<String> tasks() { return tasks; } // already immutable
+    // copy on the way in
+    Schedule(List<String> tasks) {
+      this.tasks = List.copyOf(tasks); // snapshot + immutable
     }
 
-    public static void main(String[] args) {
-        List<String> mutable = new ArrayList<>(List.of("write", "review", "ship"));
-        Schedule s = new Schedule(mutable);
+    // return a safe view on the way out
+    List<String> tasks() { return tasks; } // already immutable
+  }
 
-        mutable.add("oops");                // caller's mutation does NOT affect Schedule
-        System.out.println(s.tasks());
+  public static void main(String[] args) {
+    List<String> mutable = new ArrayList<>(List.of("write", "review", "ship"));
+    Schedule s = new Schedule(mutable);
 
-        try {
-            s.tasks().add("hack");
-        } catch (UnsupportedOperationException e) {
-            System.out.println("tasks() returns an unmodifiable list");
-        }
+    mutable.add("oops"); // caller's mutation does NOT affect Schedule
+    System.out.println(s.tasks());
+
+    try {
+      s.tasks().add("hack");
+    } catch (UnsupportedOperationException e) {
+      System.out.println("tasks() returns an unmodifiable list");
     }
+  }
 }
 `}
 />

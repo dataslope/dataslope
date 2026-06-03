@@ -25,12 +25,12 @@ Examples:
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int age = 30;
-    int year_of_birth = 2025 - age;
+  int age = 30;
+  int year_of_birth = 2025 - age;
 
-    printf("age = %d\\n", age);
-    printf("year of birth = %d\\n", year_of_birth);
-    return 0;
+  printf("age = %d\\n", age);
+  printf("year of birth = %d\\n", year_of_birth);
+  return 0;
 }
 `}
 />
@@ -69,15 +69,15 @@ Once a variable has been declared, you can change its value with the
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int score = 0;          // declare and initialize
-    printf("score = %d\\n", score);
+  int score = 0; // declare and initialize
+  printf("score = %d\\n", score);
 
-    score = 10;             // assignment
-    printf("score = %d\\n", score);
+  score = 10; // assignment
+  printf("score = %d\\n", score);
 
-    score = score + 5;      // read old value, add 5, write back
-    printf("score = %d\\n", score);
-    return 0;
+  score = score + 5; // read old value, add 5, write back
+  printf("score = %d\\n", score);
+  return 0;
 }
 `}
 />
@@ -150,9 +150,9 @@ between runs and compilers):
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int x;       // not initialized
-    printf("x = %d (unpredictable!)\\n", x);
-    return 0;
+  int x; // not initialized
+  printf("x = %d (unpredictable!)\\n", x);
+  return 0;
 }
 `}
 />
@@ -191,15 +191,15 @@ run it to check:
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int a = 1;
-    int b = 2;
+  int a = 1;
+  int b = 2;
 
-    int tmp = a;   // tmp is now 1
-    a = b;         // a is now 2
-    b = tmp;       // b is now 1
+  int tmp = a; // tmp is now 1
+  a = b;       // a is now 2
+  b = tmp;     // b is now 1
 
-    printf("a = %d, b = %d\\n", a, b);
-    return 0;
+  printf("a = %d, b = %d\\n", a, b);
+  return 0;
 }
 `}
 />
@@ -227,14 +227,14 @@ overflow**.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
-#include <limits.h>
+  starterCode={`#include <limits.h>
+#include <stdio.h>
 
 int main(void) {
-    int big = INT_MAX;
-    printf("INT_MAX     = %d\\n", big);
-    printf("INT_MAX + 1 = %d  (oops!)\\n", big + 1);
-    return 0;
+  int big = INT_MAX;
+  printf("INT_MAX     = %d\\n", big);
+  printf("INT_MAX + 1 = %d  (oops!)\\n", big + 1);
+  return 0;
 }
 `}
 />
@@ -256,20 +256,20 @@ We'll meet more types in the next chapter.
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int celsius = 25;
-    int fahrenheit = 0;
-    // compute fahrenheit here
-    printf("%d C = %d F\\n", celsius, fahrenheit);
-    return 0;
+  int celsius = 25;
+  int fahrenheit = 0;
+  // compute fahrenheit here
+  printf("%d C = %d F\\n", celsius, fahrenheit);
+  return 0;
 }
 `}
   solutionCode={`#include <stdio.h>
 
 int main(void) {
-    int celsius = 25;
-    int fahrenheit = celsius * 9 / 5 + 32;
-    printf("%d C = %d F\\n", celsius, fahrenheit);
-    return 0;
+  int celsius = 25;
+  int fahrenheit = celsius * 9 / 5 + 32;
+  printf("%d C = %d F\\n", celsius, fahrenheit);
+  return 0;
 }
 `}
   tests={[

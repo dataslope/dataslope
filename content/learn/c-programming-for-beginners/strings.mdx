@@ -76,21 +76,21 @@ buf[0] = 'H';   // fine: buf is your own copy
 #include <string.h>
 
 int main(void) {
-    char first[16] = "Hello";
-    const char *second = "World";
+  char first[16] = "Hello";
+  const char *second = "World";
 
-    printf("len(first) = %zu\\n", strlen(first));
+  printf("len(first) = %zu\\n", strlen(first));
 
-    // append " " + second onto first
-    strcat(first, " ");
-    strcat(first, second);
+  // append " " + second onto first
+  strcat(first, " ");
+  strcat(first, second);
 
-    printf("first = '%s'\\n", first);
+  printf("first = '%s'\\n", first);
 
-    if (strcmp(first, "Hello World") == 0) {
-        printf("they match\\n");
-    }
-    return 0;
+  if (strcmp(first, "Hello World") == 0) {
+    printf("they match\\n");
+  }
+  return 0;
 }
 `}
 />
@@ -172,20 +172,20 @@ loop:
 #include <string.h>
 
 int main(void) {
-    const char *s = "C is fun!";
-    size_t n = strlen(s);
+  const char *s = "C is fun!";
+  size_t n = strlen(s);
 
-    int vowels = 0;
-    for (size_t i = 0; i < n; i++) {
-        char c = s[i];
-        if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' ||
-            c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U') {
-            vowels++;
-        }
+  int vowels = 0;
+  for (size_t i = 0; i < n; i++) {
+    char c = s[i];
+    if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'A' ||
+        c == 'E' || c == 'I' || c == 'O' || c == 'U') {
+      vowels++;
     }
+  }
 
-    printf("\\"%s\\" has %d vowels\\n", s, vowels);
-    return 0;
+  printf("\\"%s\\" has %d vowels\\n", s, vowels);
+  return 0;
 }
 `}
 />
@@ -235,25 +235,27 @@ A "letter" here means any character that is not a space.`}
 #include <string.h>
 
 int main(void) {
-    const char *s = "The quick brown fox";
-    int letters = 0, spaces = 0;
-    // count here
-    printf("letters = %d\\nspaces = %d\\n", letters, spaces);
-    return 0;
+  const char *s = "The quick brown fox";
+  int letters = 0, spaces = 0;
+  // count here
+  printf("letters = %d\\nspaces = %d\\n", letters, spaces);
+  return 0;
 }
 `}
   solutionCode={`#include <stdio.h>
 #include <string.h>
 
 int main(void) {
-    const char *s = "The quick brown fox";
-    int letters = 0, spaces = 0;
-    for (size_t i = 0; s[i] != '\\0'; i++) {
-        if (s[i] == ' ') spaces++;
-        else             letters++;
-    }
-    printf("letters = %d\\nspaces = %d\\n", letters, spaces);
-    return 0;
+  const char *s = "The quick brown fox";
+  int letters = 0, spaces = 0;
+  for (size_t i = 0; s[i] != '\\0'; i++) {
+    if (s[i] == ' ')
+      spaces++;
+    else
+      letters++;
+  }
+  printf("letters = %d\\nspaces = %d\\n", letters, spaces);
+  return 0;
 }
 `}
   tests={[

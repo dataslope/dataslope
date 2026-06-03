@@ -39,9 +39,9 @@ not know someone's age, you also do not know "their age plus one."
   dialect="postgres"
   title="Arithmetic with NULL yields NULL"
   starterCode={`SELECT
-  5 + NULL      AS five_plus_null,
+  5 + NULL AS five_plus_null,
   'Hi ' || NULL AS greeting,
-  NULL = NULL   AS is_null_equal_null;`}
+  NULL = NULL AS is_null_equal_null;`}
 />
 
 Look closely at the third column. Even `NULL = NULL` is **not true**
@@ -70,9 +70,12 @@ INSERT INTO customers (name, phone) VALUES
   ('Linus', '555-0102'),
   ('Mae', NULL);`}
   starterCode={`-- Customers we cannot phone:
-SELECT name
-FROM customers
-WHERE phone IS NULL;`}
+SELECT
+  name
+FROM
+  customers
+WHERE
+  phone IS NULL;`}
 />
 
 <Callout type="warn" title="WHERE phone = NULL returns nothing">
@@ -98,8 +101,10 @@ INSERT INTO customers (name, phone) VALUES
   starterCode={`SELECT
   name,
   COALESCE(phone, 'No phone on file') AS phone_display
-FROM customers
-ORDER BY name;`}
+FROM
+  customers
+ORDER BY
+  name;`}
 />
 
 `COALESCE` reads as "use the phone, or if that is `NULL`, use this

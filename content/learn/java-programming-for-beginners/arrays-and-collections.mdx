@@ -16,25 +16,25 @@ size is fixed at creation time and cannot change later.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        int[] scores = new int[5];      // length 5, all zeros
-        scores[0] = 80;
-        scores[1] = 90;
-        scores[2] = 100;
-        scores[3] = 70;
-        scores[4] = 85;
+  public static void main(String[] args) {
+    int[] scores = new int[5]; // length 5, all zeros
+    scores[0] = 80;
+    scores[1] = 90;
+    scores[2] = 100;
+    scores[3] = 70;
+    scores[4] = 85;
 
-        // literal form is often nicer
-        String[] names = { "Ada", "Grace", "Linus" };
+    // literal form is often nicer
+    String[] names = {"Ada", "Grace", "Linus"};
 
-        for (int i = 0; i < scores.length; i++) {
-            System.out.println("scores[" + i + "] = " + scores[i]);
-        }
-
-        for (String n : names) {
-            System.out.println("name: " + n);
-        }
+    for (int i = 0; i < scores.length; i++) {
+      System.out.println("scores[" + i + "] = " + scores[i]);
     }
+
+    for (String n : names) {
+      System.out.println("name: " + n);
+    }
+  }
 }
 `}
 />
@@ -78,21 +78,21 @@ operations, and is part of Java's broader **Collections Framework**.
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<String> todo = new ArrayList<>();
-        todo.add("learn Java");
-        todo.add("write tests");
-        todo.add("read this chapter");
+  public static void main(String[] args) {
+    List<String> todo = new ArrayList<>();
+    todo.add("learn Java");
+    todo.add("write tests");
+    todo.add("read this chapter");
 
-        System.out.println("size = " + todo.size());
-        System.out.println("first = " + todo.get(0));
+    System.out.println("size = " + todo.size());
+    System.out.println("first = " + todo.get(0));
 
-        todo.remove("write tests");
+    todo.remove("write tests");
 
-        for (String task : todo) {
-            System.out.println("- " + task);
-        }
+    for (String task : todo) {
+      System.out.println("- " + task);
     }
+  }
 }
 `}
 />

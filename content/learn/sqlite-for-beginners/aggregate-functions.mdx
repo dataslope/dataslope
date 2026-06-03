@@ -51,8 +51,10 @@ INSERT INTO orders (customer, amount) VALUES
   ('Grace', 18.00),
   ('Linus', 42.75),
   ('Maya', 16.25);`}
-  starterCode={`SELECT COUNT(*) AS order_count
-FROM orders;`}
+  starterCode={`SELECT
+  COUNT(*) AS order_count
+FROM
+  orders;`}
 />
 
 The table has four order rows, so the answer is one row containing the number `4`.
@@ -80,8 +82,10 @@ INSERT INTO orders (customer, amount) VALUES
   ('Grace', 18.00),
   ('Linus', 42.75),
   ('Maya', 16.25);`}
-  starterCode={`SELECT SUM(amount) AS total_sales
-FROM orders;`}
+  starterCode={`SELECT
+  SUM(amount) AS total_sales
+FROM
+  orders;`}
 />
 
 SQLite reads the `amount` values and adds them into one total.
@@ -103,8 +107,10 @@ INSERT INTO orders (customer, amount) VALUES
   ('Grace', 18.00),
   ('Linus', 42.75),
   ('Maya', 16.25);`}
-  starterCode={`SELECT ROUND(AVG(amount), 2) AS average_order
-FROM orders;`}
+  starterCode={`SELECT
+  ROUND(AVG(amount), 2) AS average_order
+FROM
+  orders;`}
 />
 
 The `2` in `ROUND(..., 2)` means "show two digits after the decimal point."
@@ -144,7 +150,8 @@ INSERT INTO orders (customer, amount) VALUES
   starterCode={`SELECT
   MIN(amount) AS smallest_order,
   MAX(amount) AS largest_order
-FROM orders;`}
+FROM
+  orders;`}
 />
 
 These functions are useful for "best," "worst," "earliest," "latest," "cheapest," and "most expensive" questions.
@@ -172,7 +179,8 @@ INSERT INTO orders (customer, amount) VALUES
   ROUND(AVG(amount), 2) AS average_order,
   MIN(amount) AS smallest_order,
   MAX(amount) AS largest_order
-FROM orders;`}
+FROM
+  orders;`}
 />
 
 One query gives you a compact report: count, total, average, smallest, and largest.
@@ -206,9 +214,12 @@ INSERT INTO orders (customer, amount) VALUES
   ('Grace', 18.00),
   ('Ada', 42.75),
   ('Maya', 16.25);`}
-  starterCode={`SELECT SUM(amount) AS ada_total
-FROM orders
-WHERE customer = 'Ada';`}
+  starterCode={`SELECT
+  SUM(amount) AS ada_total
+FROM
+  orders
+WHERE
+  customer = 'Ada';`}
 />
 
 Read this as: "Keep only Ada's rows, then add their amounts."
@@ -248,7 +259,8 @@ INSERT INTO customers (name, phone) VALUES
   starterCode={`SELECT
   COUNT(*) AS total_customers,
   COUNT(phone) AS customers_with_phone
-FROM customers;`}
+FROM
+  customers;`}
 />
 
 There are four customers, but only two have phone numbers. `COUNT(*)` returns `4`; `COUNT(phone)` returns `2`.
@@ -274,7 +286,8 @@ INSERT INTO reviews (product, rating) VALUES
   COUNT(*) AS total_reviews,
   COUNT(rating) AS reviews_with_rating,
   AVG(rating) AS average_rating
-FROM reviews;`}
+FROM
+  reviews;`}
 />
 
 The average is based on the three known ratings: `5`, `4`, and `3`. The missing rating is not counted as zero.

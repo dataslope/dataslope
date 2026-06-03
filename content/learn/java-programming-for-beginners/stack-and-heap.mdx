@@ -74,17 +74,17 @@ single most important thing to picture about heap memory.
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<String> a = new ArrayList<>();
-        a.add("first");
+  public static void main(String[] args) {
+    List<String> a = new ArrayList<>();
+    a.add("first");
 
-        List<String> b = a;            // b and a are the SAME list
-        b.add("second");
+    List<String> b = a; // b and a are the SAME list
+    b.add("second");
 
-        System.out.println("a = " + a);   // prints both
-        System.out.println("b = " + b);   // prints both
-        System.out.println("same? " + (a == b));
-    }
+    System.out.println("a = " + a); // prints both
+    System.out.println("b = " + b); // prints both
+    System.out.println("same? " + (a == b));
+  }
 }
 `}
 />
@@ -114,16 +114,17 @@ pops it. Watch what happens here:
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        int n = 4;
-        long result = factorial(n);
-        System.out.println(n + "! = " + result);
-    }
+  public static void main(String[] args) {
+    int n = 4;
+    long result = factorial(n);
+    System.out.println(n + "! = " + result);
+  }
 
-    static long factorial(int n) {
-        if (n <= 1) return 1;
-        return n * factorial(n - 1);
-    }
+  static long factorial(int n) {
+    if (n <= 1)
+      return 1;
+    return n * factorial(n - 1);
+  }
 }
 `}
 />

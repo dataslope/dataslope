@@ -52,15 +52,18 @@ f, fp_true = np.sin, np.cos(1.0)
 x0 = 1.0
 
 hs = 10.0 ** np.arange(0, -17, -1)
-errs_fwd  = np.abs((f(x0 + hs) - f(x0))            / hs        - fp_true)
-errs_ctr  = np.abs((f(x0 + hs) - f(x0 - hs))       / (2*hs)    - fp_true)
+errs_fwd = np.abs((f(x0 + hs) - f(x0)) / hs - fp_true)
+errs_ctr = np.abs((f(x0 + hs) - f(x0 - hs)) / (2 * hs) - fp_true)
 
 plt.loglog(hs, errs_fwd, "o-", label="forward diff, O(h)")
 plt.loglog(hs, errs_ctr, "s-", label="centered diff, O(h²)")
 plt.gca().invert_xaxis()
-plt.xlabel("step size h"); plt.ylabel("|error|")
+plt.xlabel("step size h")
+plt.ylabel("|error|")
 plt.title("Truncation + round-off tradeoff")
-plt.legend(); plt.grid(True, which="both"); plt.show()
+plt.legend()
+plt.grid(True, which="both")
+plt.show()
 `}
 />
 
@@ -98,12 +101,16 @@ $$ p \approx \log_2 \frac{E(h_1)}{E(h_2)} $$
   adapter="python"
   starterCode={`import numpy as np
 
+
 # Simpson's rule for ∫_0^1 e^x dx = e - 1
 def simpson(f, a, b, n):
-    n = (n // 2) * 2 + 2      # ensure even
-    x = np.linspace(a, b, n+1)
+    n = (n // 2) * 2 + 2  # ensure even
+    x = np.linspace(a, b, n + 1)
     y = f(x)
-    return (b-a)/(3*n) * (y[0] + y[-1] + 4*y[1:-1:2].sum() + 2*y[2:-1:2].sum())
+    return (
+        (b - a) / (3 * n) * (y[0] + y[-1] + 4 * y[1:-1:2].sum() + 2 * y[2:-1:2].sum())
+    )
+
 
 f = np.exp
 true = np.e - 1
@@ -111,7 +118,7 @@ print(f"{'n':>6}  {'error':>12}  {'order':>7}")
 prev = None
 for n in [8, 16, 32, 64, 128, 256, 512]:
     err = abs(simpson(f, 0, 1, n) - true)
-    order = "" if prev is None else f"{np.log2(prev/err):.2f}"
+    order = "" if prev is None else f"{np.log2(prev / err):.2f}"
     print(f"{n:6d}  {err:12.3e}  {order:>7}")
     prev = err
 `}
@@ -155,11 +162,11 @@ of a handful of terms.
 
 # Partial sums of the Leibniz series for π/4
 N = 30
-terms = np.array([(-1)**k / (2*k + 1) for k in range(N)])
+terms = np.array([(-1) ** k / (2 * k + 1) for k in range(N)])
 partial = np.cumsum(terms)
 print("Plain partial sum (last 5):")
 for s in partial[-5:]:
-    print(f"  4*S = {4*s:.10f}  error = {abs(4*s - np.pi):.2e}")
+    print(f"  4*S = {4 * s:.10f}  error = {abs(4 * s - np.pi):.2e}")
 
 # Euler's transformation: average consecutive partial sums
 # (Repeated averaging accelerates alternating series convergence)
@@ -167,7 +174,7 @@ acc = partial.copy()
 for _ in range(20):
     acc = 0.5 * (acc[:-1] + acc[1:])
 print("\\nAfter 20 averaging passes:")
-print(f"  4*S = {4*acc[-1]:.10f}  error = {abs(4*acc[-1] - np.pi):.2e}")
+print(f"  4*S = {4 * acc[-1]:.10f}  error = {abs(4 * acc[-1] - np.pi):.2e}")
 `}
 />
 
@@ -191,9 +198,11 @@ Try integrating something with a sharp spike.
   starterCode={`import numpy as np
 from scipy.integrate import quad, simpson
 
+
 # A function with a sharp Lorentzian peak at x = 0
 def f(x):
     return 1.0 / (1.0 + 1000 * x**2)
+
 
 # Adaptive quadrature
 value, err_est = quad(f, -1, 1)
@@ -224,15 +233,18 @@ $p \\approx \\log_2(E_1 / E_2)$. Return the **mean** of those
 estimates across consecutive pairs.`}
   starterCode={`import math
 
+
 def estimate_order(errors):
     # TODO: average log2(E_i / E_{i+1}) across consecutive pairs
     return 0.0
 
+
 # Quick check: O(h²) data
 errs = [1e-2, 2.5e-3, 6.25e-4, 1.5625e-4]
-print("Estimated order:", estimate_order(errs))   # ~2
+print("Estimated order:", estimate_order(errs))  # ~2
 `}
   solutionCode={`import math
+
 
 def estimate_order(errors):
     ratios = []

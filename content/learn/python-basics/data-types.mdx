@@ -95,9 +95,9 @@ for v in values:
 
 <CodeBlock
   adapter="python"
-  starterCode={`print(isinstance(True, bool))   # True
-print(isinstance(True, int))    # True (bool is a subclass of int)
-print(isinstance(1, bool))      # False (int is not a subclass of bool)
+  starterCode={`print(isinstance(True, bool))  # True
+print(isinstance(True, int))  # True (bool is a subclass of int)
+print(isinstance(1, bool))  # False (int is not a subclass of bool)
 `}
 />
 
@@ -145,7 +145,7 @@ print(int(-3.9))
   starterCode={`# list / tuple / set are interchangeable in many cases
 items = [1, 2, 2, 3]
 print(tuple(items))
-print(set(items))   # duplicates removed
+print(set(items))  # duplicates removed
 print(list("abc"))
 `}
 />
@@ -160,7 +160,7 @@ Two patterns to remember:
 <CodeBlock
   adapter="python"
   starterCode={`s = "hello"
-s.upper()       # returns "HELLO" but does not change s
+s.upper()  # returns "HELLO" but does not change s
 print("s is still", s)
 `}
 />
@@ -168,7 +168,7 @@ print("s is still", s)
 <CodeBlock
   adapter="python"
   starterCode={`s = "hello"
-s = s.upper()   # rebinding is how you "change" an immutable
+s = s.upper()  # rebinding is how you "change" an immutable
 print("now s is", s)
 `}
 />
@@ -198,6 +198,7 @@ if result is None:
   starterCode={`# A function with no return statement returns None.
 def shout(msg):
     print(msg.upper())
+
 
 ret = shout("hello")
 print("shout returned:", ret)
@@ -263,6 +264,7 @@ assert type(parsed[3]) is bool`,
     # Your code here
     return default
 
+
 print(safe_int("123"))
 print(safe_int("abc"))
 print(safe_int("", -1))
@@ -272,6 +274,7 @@ print(safe_int("", -1))
         return int(s)
     except ValueError:
         return default
+
 
 print(safe_int("123"))
 print(safe_int("abc"))

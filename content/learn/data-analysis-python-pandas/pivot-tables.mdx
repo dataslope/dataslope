@@ -24,11 +24,13 @@ third one."
   adapter="python"
   starterCode={`import pandas as pd
 
-sales = pd.DataFrame({
-    "region":  ["N","N","S","S","E","W","W","N"],
-    "product": ["A","B","A","B","A","A","B","B"],
-    "amount":  [10, 20, 30, 25, 15, 18, 22, 40],
-})
+sales = pd.DataFrame(
+    {
+        "region": ["N", "N", "S", "S", "E", "W", "W", "N"],
+        "product": ["A", "B", "A", "B", "A", "A", "B", "B"],
+        "amount": [10, 20, 30, 25, 15, 18, 22, 40],
+    }
+)
 
 p = sales.pivot_table(
     index="region",
@@ -62,17 +64,19 @@ because it gracefully handles duplicates.
   adapter="python"
   starterCode={`import pandas as pd
 
-sales = pd.DataFrame({
-    "region":  ["N","N","S","S","E","W","W","N"],
-    "product": ["A","B","A","B","A","A","B","B"],
-    "amount":  [10, 20, 30, 25, 15, 18, 22, 40],
-})
+sales = pd.DataFrame(
+    {
+        "region": ["N", "N", "S", "S", "E", "W", "W", "N"],
+        "product": ["A", "B", "A", "B", "A", "A", "B", "B"],
+        "amount": [10, 20, 30, 25, 15, 18, 22, 40],
+    }
+)
 
 p = sales.pivot_table(
     index="region",
     columns="product",
     values="amount",
-    aggfunc=["sum","mean","count"],
+    aggfunc=["sum", "mean", "count"],
 )
 print(p)
 `}
@@ -88,11 +92,13 @@ want to flatten).
   adapter="python"
   starterCode={`import pandas as pd
 
-sales = pd.DataFrame({
-    "region":  ["N","N","S","S","E","W","W","N"],
-    "product": ["A","B","A","B","A","A","B","B"],
-    "amount":  [10, 20, 30, 25, 15, 18, 22, 40],
-})
+sales = pd.DataFrame(
+    {
+        "region": ["N", "N", "S", "S", "E", "W", "W", "N"],
+        "product": ["A", "B", "A", "B", "A", "A", "B", "B"],
+        "amount": [10, 20, 30, 25, 15, 18, 22, 40],
+    }
+)
 
 p = sales.pivot_table(
     index="region",
@@ -116,15 +122,17 @@ overall sums — exactly like an Excel pivot's grand totals.
   adapter="python"
   starterCode={`import pandas as pd
 
-orders = pd.DataFrame({
-    "year":    [2023,2023,2024,2024,2023,2024],
-    "region":  ["N","S","N","S","N","S"],
-    "product": ["A","B","A","A","B","B"],
-    "amount":  [100,200,150,180,90,210],
-})
+orders = pd.DataFrame(
+    {
+        "year": [2023, 2023, 2024, 2024, 2023, 2024],
+        "region": ["N", "S", "N", "S", "N", "S"],
+        "product": ["A", "B", "A", "A", "B", "B"],
+        "amount": [100, 200, 150, 180, 90, 210],
+    }
+)
 
 p = orders.pivot_table(
-    index=["year","region"],
+    index=["year", "region"],
     columns="product",
     values="amount",
     aggfunc="sum",
@@ -146,11 +154,13 @@ When you need a "flat" DataFrame for export:
   adapter="python"
   starterCode={`import pandas as pd
 
-sales = pd.DataFrame({
-    "region":  ["N","N","S","S"],
-    "product": ["A","B","A","B"],
-    "amount":  [10, 20, 30, 25],
-})
+sales = pd.DataFrame(
+    {
+        "region": ["N", "N", "S", "S"],
+        "product": ["A", "B", "A", "B"],
+        "amount": [10, 20, 30, 25],
+    }
+)
 
 p = sales.pivot_table(index="region", columns="product", values="amount", aggfunc="sum")
 print("Pivoted:")
@@ -158,7 +168,7 @@ print(p)
 print()
 
 flat = p.reset_index()
-flat.columns.name = None   # remove the column-axis name
+flat.columns.name = None  # remove the column-axis name
 print("Flat:")
 print(flat)
 `}
@@ -208,7 +218,7 @@ sales = pd.DataFrame({
     "product": ["A","B","A","B","A","A","B","B"],
     "amount":  [10, 20, 30, 25, 15, 18, 22, 40],
 })`}
-  starterCode={`report = None   # TODO
+  starterCode={`report = None  # TODO
 
 print(report)
 `}

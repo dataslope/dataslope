@@ -119,7 +119,7 @@ double Divide(int a, int b)
 try
 {
     Console.WriteLine(Divide(10, 2));
-    Console.WriteLine(Divide(10, 0));   // throws
+    Console.WriteLine(Divide(10, 0)); // throws
 }
 catch (ArgumentException ex)
 {
@@ -151,8 +151,14 @@ This is a really common beginner trap:
 // BAD — using exceptions as if they were "if not a number"
 int ParseOrZero(string s)
 {
-    try { return int.Parse(s); }
-    catch { return 0; }
+    try
+    {
+        return int.Parse(s);
+    }
+    catch
+    {
+        return 0;
+    }
 }
 
 Console.WriteLine(ParseOrZero("42"));
@@ -169,8 +175,7 @@ of `TryParse` is to *not* throw for the perfectly ordinary case
   starterCode={`using System;
 
 // GOOD — use TryParse for an expected failure
-int ParseOrZero(string s) =>
-    int.TryParse(s, out var n) ? n : 0;
+int ParseOrZero(string s) => int.TryParse(s, out var n) ? n : 0;
 
 Console.WriteLine(ParseOrZero("42"));
 Console.WriteLine(ParseOrZero("oops"));
@@ -193,12 +198,21 @@ specific exceptions you actually know how to handle.
   starterCode={`using System;
 
 // BAD — hides everything, including bugs
-try { /* important work */ }
-catch { /* nothing */ }
+try
+{ /* important work */
+}
+catch
+{ /* nothing */
+}
 
 // BETTER — handle what you know; let the rest bubble up
-try { /* important work */ }
-catch (FormatException ex) { Console.WriteLine($"bad input: {ex.Message}"); }
+try
+{ /* important work */
+}
+catch (FormatException ex)
+{
+    Console.WriteLine($"bad input: {ex.Message}");
+}
 `}
 />
 
@@ -223,13 +237,19 @@ void Risky()
     catch (Exception ex)
     {
         Console.WriteLine($"logging: {ex.Message}");
-        throw;          // re-throws preserving the original stack trace
+        throw; // re-throws preserving the original stack trace
         // throw ex;    // BAD — resets the stack trace
     }
 }
 
-try { Risky(); }
-catch (Exception ex) { Console.WriteLine($"top level got: {ex.Message}"); }
+try
+{
+    Risky();
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"top level got: {ex.Message}");
+}
 `}
 />
 

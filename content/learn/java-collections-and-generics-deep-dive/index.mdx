@@ -111,20 +111,20 @@ what stops you from accidentally putting an `Integer` next to a name.
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<String> names = new ArrayList<>();
-        names.add("Ada");
-        names.add("Linus");
-        names.add("Grace");
+  public static void main(String[] args) {
+    List<String> names = new ArrayList<>();
+    names.add("Ada");
+    names.add("Linus");
+    names.add("Grace");
 
-        // names.add(42);   // compile error — the list is List<String>
+    // names.add(42);   // compile error — the list is List<String>
 
-        for (String name : names) {
-            System.out.println("Hello, " + name);
-        }
-
-        System.out.println("There are " + names.size() + " names.");
+    for (String name : names) {
+      System.out.println("Hello, " + name);
     }
+
+    System.out.println("There are " + names.size() + " names.");
+  }
 }
 `}
 />

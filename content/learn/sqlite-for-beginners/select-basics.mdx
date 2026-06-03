@@ -38,8 +38,11 @@ INSERT INTO books (title, author, genre, price) VALUES
   ('Data Garden', 'Owen Lee', 'Technology', 29.50),
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00),
   ('SQL Street', 'Mina Park', 'Technology', 24.00);`}
-  starterCode={`SELECT title, author
-FROM books;`}
+  starterCode={`SELECT
+  title,
+  author
+FROM
+  books;`}
 />
 
 You asked for `title` and `author`, so the result has exactly those two
@@ -65,8 +68,10 @@ INSERT INTO books (title, author, genre, price) VALUES
   ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99),
   ('Data Garden', 'Owen Lee', 'Technology', 29.50),
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00);`}
-  starterCode={`SELECT *
-FROM books;`}
+  starterCode={`SELECT
+  *
+FROM
+  books;`}
 />
 
 `SELECT *` is great for a quick peek. In real work, naming only the
@@ -104,8 +109,12 @@ INSERT INTO books (title, author, genre, price) VALUES
   ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99),
   ('Data Garden', 'Owen Lee', 'Technology', 29.50),
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00);`}
-  starterCode={`SELECT price, title, genre
-FROM books;`}
+  starterCode={`SELECT
+  price,
+  title,
+  genre
+FROM
+  books;`}
 />
 
 This query does not reorder the stored table. It only changes the shape
@@ -136,8 +145,10 @@ INSERT INTO books (title, author, genre, price) VALUES
   ('Data Garden', 'Owen Lee', 'Technology', 29.50),
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00),
   ('SQL Street', 'Mina Park', 'Technology', 24.00);`}
-  starterCode={`SELECT title
-FROM books;`}
+  starterCode={`SELECT
+  title
+FROM
+  books;`}
 />
 
 ## Remove duplicates with DISTINCT
@@ -162,8 +173,10 @@ INSERT INTO books (title, author, genre, price) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00),
   ('SQL Street', 'Mina Park', 'Technology', 24.00),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25);`}
-  starterCode={`SELECT DISTINCT genre
-FROM books;`}
+  starterCode={`SELECT DISTINCT
+  genre
+FROM
+  books;`}
 />
 
 There are five books, but only three genres. `DISTINCT` is perfect for
@@ -187,8 +200,11 @@ INSERT INTO books (title, author, genre, price) VALUES
   ('Data Garden', 'Owen Lee', 'Technology', 29.50),
   ('SQL Street', 'Mina Park', 'Technology', 24.00),
   ('Cloud Recipes', 'Mina Park', 'Fiction', 18.25);`}
-  starterCode={`SELECT DISTINCT author, genre
-FROM books;`}
+  starterCode={`SELECT DISTINCT
+  author,
+  genre
+FROM
+  books;`}
 />
 
 ## Check your understanding

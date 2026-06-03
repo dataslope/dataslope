@@ -117,14 +117,17 @@ data(anscombe)
 long <- anscombe |>
   mutate(obs = row_number()) |>
   pivot_longer(-obs,
-               names_to  = c(".value", "set"),
-               names_pattern = "(.)(.)")
+    names_to = c(".value", "set"),
+    names_pattern = "(.)(.)"
+  )
 
 ggplot(long, aes(x = x, y = y)) +
   geom_point(color = "steelblue", size = 2) +
-  geom_smooth(method = "lm", se = FALSE,
-              color = "red", formula = y ~ x) +
-  facet_wrap(~ set) +
+  geom_smooth(
+    method = "lm", se = FALSE,
+    color = "red", formula = y ~ x
+  ) +
+  facet_wrap(~set) +
   labs(title = "Anscombe's quartet: 4 datasets, 4 stories")
 `}
 />
@@ -142,8 +145,10 @@ data(airquality)
 
 ggplot(airquality, aes(x = Temp, y = Ozone)) +
   geom_point(color = "steelblue", alpha = 0.7) +
-  geom_smooth(method = "loess", se = FALSE,
-              color = "red", formula = y ~ x) +
+  geom_smooth(
+    method = "loess", se = FALSE,
+    color = "red", formula = y ~ x
+  ) +
   labs(
     title = "Ozone vs. temperature (NYC, May–Sep 1973)",
     x     = "Temperature (°F)",
@@ -235,7 +240,7 @@ bad <- ggplot(mtcars, aes(x = wt, y = mpg)) +
   geom_point(aes(color = "blue"), size = 4)
 print(bad)
 
-fixed <- NULL  # build a clean version
+fixed <- NULL # build a clean version
 
 print(fixed)
 `}
@@ -243,13 +248,13 @@ print(fixed)
 data(mtcars)
 
 fixed <- ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
-           geom_point(size = 3, alpha = 0.85) +
-           labs(
-             title = "Fuel economy by weight, colored by cylinders",
-             x     = "Weight (1000s of lbs)",
-             y     = "Miles per gallon",
-             color = "Cylinders"
-           )
+  geom_point(size = 3, alpha = 0.85) +
+  labs(
+    title = "Fuel economy by weight, colored by cylinders",
+    x     = "Weight (1000s of lbs)",
+    y     = "Miles per gallon",
+    color = "Cylinders"
+  )
 print(fixed)
 `}
   tests={[

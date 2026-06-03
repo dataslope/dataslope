@@ -84,12 +84,14 @@ the old column *names*, one holding the *values*.
   starterCode={`import pandas as pd
 
 # A WIDE table: one column per city.
-wide = pd.DataFrame({
-    "month": ["Jan", "Feb", "Mar"],
-    "London": [5, 6, 9],
-    "Tokyo": [8, 9, 12],
-    "Cairo": [14, 16, 20],
-})
+wide = pd.DataFrame(
+    {
+        "month": ["Jan", "Feb", "Mar"],
+        "London": [5, 6, 9],
+        "Tokyo": [8, 9, 12],
+        "Cairo": [14, 16, 20],
+    }
+)
 
 display(wide)
 `}
@@ -102,12 +104,14 @@ Now melt it. Keep `month` as an identifier; stack `London`, `Tokyo`, and
   adapter="python"
   starterCode={`import pandas as pd
 
-wide = pd.DataFrame({
-    "month": ["Jan", "Feb", "Mar"],
-    "London": [5, 6, 9],
-    "Tokyo": [8, 9, 12],
-    "Cairo": [14, 16, 20],
-})
+wide = pd.DataFrame(
+    {
+        "month": ["Jan", "Feb", "Mar"],
+        "London": [5, 6, 9],
+        "Tokyo": [8, 9, 12],
+        "Cairo": [14, 16, 20],
+    }
+)
 
 long = wide.melt(id_vars="month", var_name="city", value_name="temp")
 display(long)
@@ -152,18 +156,26 @@ import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 
-wide = pd.DataFrame({
-    "month": ["Jan", "Feb", "Mar"],
-    "London": [5, 6, 9],
-    "Tokyo": [8, 9, 12],
-    "Cairo": [14, 16, 20],
-})
+wide = pd.DataFrame(
+    {
+        "month": ["Jan", "Feb", "Mar"],
+        "London": [5, 6, 9],
+        "Tokyo": [8, 9, 12],
+        "Cairo": [14, 16, 20],
+    }
+)
 long = wide.melt(id_vars="month", var_name="city", value_name="temp")
 
 # One line, because the data is tidy: x, y, and a color group.
 sns.relplot(
-    data=long, x="month", y="temp", hue="city",
-    kind="line", marker="o", height=4, aspect=1.4,
+    data=long,
+    x="month",
+    y="temp",
+    hue="city",
+    kind="line",
+    marker="o",
+    height=4,
+    aspect=1.4,
 )
 `}
 />
@@ -220,22 +232,26 @@ three columns, in this order: \`student\`, \`subject\`, \`score\`. Keep
 \`student\` as the identifier and stack the subject columns.`}
   starterCode={`import pandas as pd
 
-scores = pd.DataFrame({
-    "student": ["Ana", "Ben", "Cara"],
-    "math": [88, 72, 95],
-    "reading": [90, 85, 80],
-})
+scores = pd.DataFrame(
+    {
+        "student": ["Ana", "Ben", "Cara"],
+        "math": [88, 72, 95],
+        "reading": [90, 85, 80],
+    }
+)
 
 # Create the tidy/long DataFrame:
 tidy = None
 `}
   solutionCode={`import pandas as pd
 
-scores = pd.DataFrame({
-    "student": ["Ana", "Ben", "Cara"],
-    "math": [88, 72, 95],
-    "reading": [90, 85, 80],
-})
+scores = pd.DataFrame(
+    {
+        "student": ["Ana", "Ben", "Cara"],
+        "math": [88, 72, 95],
+        "reading": [90, 85, 80],
+    }
+)
 
 tidy = scores.melt(id_vars="student", var_name="subject", value_name="score")
 `}

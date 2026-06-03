@@ -375,6 +375,7 @@ For true independence, use `copy.deepcopy`.
 <CodeBlock
   adapter="python"
   starterCode={`import copy
+
 a = [1, [2, 3]]
 b = copy.deepcopy(a)
 b[1].append(4)
@@ -408,6 +409,7 @@ For **queues** (FIFO), prefer `collections.deque`, which supports O(1) operation
 <CodeBlock
   adapter="python"
   starterCode={`from collections import deque
+
 q = deque(["a", "b", "c"])
 q.append("d")
 print(q.popleft())

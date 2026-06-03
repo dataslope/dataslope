@@ -71,12 +71,16 @@ hood:
   adapter="r"
   starterCode={`library(ggplot2)
 
-sales <- data.frame(product = c("A", "B", "C"),
-                    revenue = c(120, 85, 47))
+sales <- data.frame(
+  product = c("A", "B", "C"),
+  revenue = c(120, 85, 47)
+)
 
 # These two are equivalent: geom_col() IS geom_bar(stat = "identity").
-ggplot(sales, aes(product, revenue)) + geom_bar(stat = "identity")
-ggplot(sales, aes(product, revenue)) + geom_col()
+ggplot(sales, aes(product, revenue)) +
+  geom_bar(stat = "identity")
+ggplot(sales, aes(product, revenue)) +
+  geom_col()
 `}
 />
 
@@ -95,7 +99,8 @@ the y-axis:
 # after_stat(density) maps the stat's computed 'density' to y.
 ggplot(mpg, aes(x = hwy)) +
   geom_histogram(aes(y = after_stat(density)),
-                 bins = 15, fill = "steelblue", color = "white")
+    bins = 15, fill = "steelblue", color = "white"
+  )
 `}
 />
 

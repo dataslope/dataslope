@@ -50,10 +50,14 @@ INSERT INTO orders VALUES
   starterCode={`SELECT
   region,
   SUM(amount) AS revenue
-FROM orders
-GROUP BY region
-HAVING SUM(amount) > 150     -- filter on the group total
-ORDER BY revenue DESC;`}
+FROM
+  orders
+GROUP BY
+  region
+HAVING
+  SUM(amount) > 150 -- filter on the group total
+ORDER BY
+  revenue DESC;`}
 />
 
 North (60) and any other small region are dropped *after* their totals
@@ -78,13 +82,18 @@ INSERT INTO orders VALUES
   (7,'East','refunded',300),(8,'North','paid',100);`}
   starterCode={`SELECT
   region,
-  COUNT(*)    AS paid_orders,
+  COUNT(*) AS paid_orders,
   SUM(amount) AS paid_revenue
-FROM orders
-WHERE status = 'paid'           -- 1) keep only paid rows
-GROUP BY region
-HAVING SUM(amount) > 150        -- 2) keep only big-revenue regions
-ORDER BY paid_revenue DESC;`}
+FROM
+  orders
+WHERE
+  status = 'paid' -- 1) keep only paid rows
+GROUP BY
+  region
+HAVING
+  SUM(amount) > 150 -- 2) keep only big-revenue regions
+ORDER BY
+  paid_revenue DESC;`}
 />
 
 Read it as a pipeline: *"Of the **paid** orders, group by region, and show

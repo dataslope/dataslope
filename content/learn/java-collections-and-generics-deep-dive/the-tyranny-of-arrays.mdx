@@ -51,19 +51,19 @@ slots forever.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        int[] scores = new int[5];   // five slots, all default 0
-        scores[0] = 90;
-        scores[1] = 72;
-        scores[2] = 88;
+  public static void main(String[] args) {
+    int[] scores = new int[5]; // five slots, all default 0
+    scores[0] = 90;
+    scores[1] = 72;
+    scores[2] = 88;
 
-        // Indexing is O(1) and feels great:
-        System.out.println("scores[1] = " + scores[1]);
-        System.out.println("length    = " + scores.length);
+    // Indexing is O(1) and feels great:
+    System.out.println("scores[1] = " + scores[1]);
+    System.out.println("length    = " + scores.length);
 
-        // ...but the array literally cannot grow.
-        // scores[5] = 100;          // ArrayIndexOutOfBoundsException
-    }
+    // ...but the array literally cannot grow.
+    // scores[5] = 100;          // ArrayIndexOutOfBoundsException
+  }
 }
 `}
 />
@@ -84,25 +84,31 @@ yourself by allocating a bigger array and copying.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    // Hand-rolled "growing array of Strings".
-    static String[] data = new String[2];
-    static int      size = 0;
+  // Hand-rolled "growing array of Strings".
+  static String[] data = new String[2];
+  static int size = 0;
 
-    static void add(String s) {
-        if (size == data.length) {
-            // Grow: allocate a bigger array, copy, replace.
-            String[] bigger = new String[data.length * 2];
-            for (int i = 0; i < size; i++) bigger[i] = data[i];
-            data = bigger;
-        }
-        data[size++] = s;
+  static void add(String s) {
+    if (size == data.length) {
+      // Grow: allocate a bigger array, copy, replace.
+      String[] bigger = new String[data.length * 2];
+      for (int i = 0; i < size; i++)
+        bigger[i] = data[i];
+      data = bigger;
     }
+    data[size++] = s;
+  }
 
-    public static void main(String[] args) {
-        add("Ada"); add("Linus"); add("Grace"); add("Edsger"); add("Barbara");
-        for (int i = 0; i < size; i++) System.out.println(data[i]);
-        System.out.println("capacity = " + data.length + ", size = " + size);
-    }
+  public static void main(String[] args) {
+    add("Ada");
+    add("Linus");
+    add("Grace");
+    add("Edsger");
+    add("Barbara");
+    for (int i = 0; i < size; i++)
+      System.out.println(data[i]);
+    System.out.println("capacity = " + data.length + ", size = " + size);
+  }
 }
 `}
 />
@@ -191,17 +197,18 @@ Compare the hand-rolled growing array above with the same thing using
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<String> data = new ArrayList<>();
-        data.add("Ada");
-        data.add("Linus");
-        data.add("Grace");
-        data.add("Edsger");
-        data.add("Barbara");
+  public static void main(String[] args) {
+    List<String> data = new ArrayList<>();
+    data.add("Ada");
+    data.add("Linus");
+    data.add("Grace");
+    data.add("Edsger");
+    data.add("Barbara");
 
-        for (String s : data) System.out.println(s);
-        System.out.println("size = " + data.size());
-    }
+    for (String s : data)
+      System.out.println(s);
+    System.out.println("size = " + data.size());
+  }
 }
 `}
 />

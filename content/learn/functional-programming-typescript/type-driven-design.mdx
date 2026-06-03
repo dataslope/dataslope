@@ -27,14 +27,14 @@ Consider a "remote data" wrapper used to model an API request:
   starterCode={`// ✗ WEAK MODEL — many illegal combinations
 type ProfileWeak = {
   loading: boolean;
-  data:    { name: string } | null;
-  error:   string | null;
+  data: { name: string } | null;
+  error: string | null;
 };
 
 // All of these are legally constructible — and all are bugs:
-const a: ProfileWeak = { loading: true,  data: { name: "x" }, error: null };
-const b: ProfileWeak = { loading: false, data: null,           error: null };
-const c: ProfileWeak = { loading: true,  data: null,           error: "x"  };
+const a: ProfileWeak = { loading: true, data: { name: "x" }, error: null };
+const b: ProfileWeak = { loading: false, data: null, error: null };
+const c: ProfileWeak = { loading: true, data: null, error: "x" };
 
 console.log(a, b, c);
 `}
@@ -50,8 +50,8 @@ representable:
 type Profile<A> =
   | { kind: "idle" }
   | { kind: "loading" }
-  | { kind: "loaded";  data: A }
-  | { kind: "failed";  error: string };
+  | { kind: "loaded"; data: A }
+  | { kind: "failed"; error: string };
 
 const r1: Profile<{ name: string }> = { kind: "idle" };
 const r2: Profile<{ name: string }> = { kind: "loading" };
@@ -64,10 +64,14 @@ const r4: Profile<{ name: string }> = { kind: "failed", error: "404" };
 
 const render = <A,>(p: Profile<A>, show: (a: A) => string): string => {
   switch (p.kind) {
-    case "idle":    return "—";
-    case "loading": return "loading...";
-    case "loaded":  return show(p.data);
-    case "failed":  return \`error: \${p.error}\`;
+    case "idle":
+      return "—";
+    case "loading":
+      return "loading...";
+    case "loaded":
+      return show(p.data);
+    case "failed":
+      return \`error: \${p.error}\`;
   }
 };
 
@@ -160,20 +164,24 @@ plain string.
 <CodeBlock
   adapter="typescript"
   starterCode={`type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
-const ok  = <E, A>(value: A): Result<E, A> => ({ kind: "ok",  value });
+const ok = <E, A>(value: A): Result<E, A> => ({ kind: "ok", value });
 const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
 
 // --- Branded subtypes ---
-type Email     = string & { readonly __brand: "Email" };
-type Age       = number & { readonly __brand: "Age" };
-type AdultAge  = Age    & { readonly __adult: true };
+type Email = string & { readonly __brand: "Email" };
+type Age = number & { readonly __brand: "Age" };
+type AdultAge = Age & { readonly __adult: true };
 
 // --- Parsers ---
 const parseEmail = (s: string): Result<string, Email> =>
-  /^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(s) ? ok(s as Email) : err(\`bad email: \${s}\`);
+  /^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(s)
+    ? ok(s as Email)
+    : err(\`bad email: \${s}\`);
 
 const parseAge = (n: number): Result<string, Age> =>
-  Number.isInteger(n) && n >= 0 && n <= 130 ? ok(n as Age) : err(\`bad age: \${n}\`);
+  Number.isInteger(n) && n >= 0 && n <= 130
+    ? ok(n as Age)
+    : err(\`bad age: \${n}\`);
 
 const parseAdult = (a: Age): Result<string, AdultAge> =>
   a >= 18 ? ok(a as AdultAge) : err(\`must be 18+\`);

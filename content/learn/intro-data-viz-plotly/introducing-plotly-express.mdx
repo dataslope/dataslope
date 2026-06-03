@@ -65,10 +65,12 @@ Try it:
   starterCode={`import pandas as pd
 import plotly.express as px
 
-df = pd.DataFrame({
-    "fruit": ["Apple", "Banana", "Cherry", "Date", "Elderberry"],
-    "kg":    [12, 8, 5, 3, 2],
-})
+df = pd.DataFrame(
+    {
+        "fruit": ["Apple", "Banana", "Cherry", "Date", "Elderberry"],
+        "kg": [12, 8, 5, 3, 2],
+    }
+)
 
 fig = px.bar(
     df,
@@ -152,8 +154,7 @@ The `fig` variable returned by every Plotly Express call is a
 
 df = px.data.iris()
 
-fig = px.scatter(df, x="sepal_width", y="sepal_length",
-                 template="simple_white")
+fig = px.scatter(df, x="sepal_width", y="sepal_length", template="simple_white")
 
 print("Type:", type(fig).__name__)
 print("Data traces:", len(fig.data))

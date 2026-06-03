@@ -101,7 +101,7 @@ With those, you can lift any n-argument function.
 const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 const none = <A,>(): Option<A> => ({ kind: "none" });
 
-const ofO  = <A,>(a: A): Option<A> => some(a);
+const ofO = <A,>(a: A): Option<A> => some(a);
 const mapO = <A, B>(fa: Option<A>, f: (a: A) => B): Option<B> =>
   fa.kind === "none" ? none() : some(f(fa.value));
 
@@ -122,9 +122,9 @@ function liftA2<A, B, C>(
 
 const add = (x: number) => (y: number) => x + y;
 
-console.log(liftA2(add, some(2), some(3)));   // some(5)
-console.log(liftA2(add, none(), some(3)));    // none
-console.log(liftA2(add, some(2), none()));    // none
+console.log(liftA2(add, some(2), some(3))); // some(5)
+console.log(liftA2(add, none(), some(3))); // none
+console.log(liftA2(add, some(2), none())); // none
 `}
 />
 
@@ -141,8 +141,10 @@ A famous use of applicative: validate several fields and gather
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; errors: ReadonlyArray<E> };
-const ok  = <E, A>(value: A): Result<E, A> => ({ kind: "ok",  value });
+  starterCode={`type Result<E, A> =
+  | { kind: "ok"; value: A }
+  | { kind: "err"; errors: ReadonlyArray<E> };
+const ok = <E, A>(value: A): Result<E, A> => ({ kind: "ok", value });
 const err = <E, A>(...es: E[]): Result<E, A> => ({ kind: "err", errors: es });
 
 // "Validation-flavoured" Result: ap collects errors from both sides
@@ -151,13 +153,14 @@ function map2<E, A, B, C>(
   ra: Result<E, A>,
   rb: Result<E, B>,
 ): Result<E, C> {
-  if (ra.kind === "ok"  && rb.kind === "ok")  return ok(f(ra.value, rb.value));
-  if (ra.kind === "err" && rb.kind === "err") return err(...ra.errors, ...rb.errors);
+  if (ra.kind === "ok" && rb.kind === "ok") return ok(f(ra.value, rb.value));
+  if (ra.kind === "err" && rb.kind === "err")
+    return err(...ra.errors, ...rb.errors);
   return ra.kind === "err" ? ra : (rb as Result<E, C>);
 }
 
 const nameR = err<string, string>("name required");
-const ageR  = err<string, number>("age must be a number");
+const ageR = err<string, number>("age must be a number");
 
 const profile = map2<string, string, number, { name: string; age: number }>(
   (n, a) => ({ name: n, age: a }),
@@ -213,9 +216,11 @@ const flatMapP = <A, B>(fa: Promise<A>, f: (a: A) => Promise<B>): Promise<B> =>
   fa.then(f);
 
 (async () => {
-  console.log(flatMapO(some(2), (n) => n > 0 ? some(n + 1) : none()));
+  console.log(flatMapO(some(2), (n) => (n > 0 ? some(n + 1) : none())));
   console.log(flatMapA([1, 2, 3], (n) => [n, n * 10]));
-  console.log(await flatMapP(Promise.resolve(2), (n) => Promise.resolve(n + 1)));
+  console.log(
+    await flatMapP(Promise.resolve(2), (n) => Promise.resolve(n + 1)),
+  );
 })();
 `}
 />

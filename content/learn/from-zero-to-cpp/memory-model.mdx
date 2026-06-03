@@ -47,21 +47,21 @@ Variables declared outside any function, and variables declared
   adapter="cpp"
   starterCode={`#include <iostream>
 
-int global_counter = 0;          // data segment, alive for whole program
+int global_counter = 0; // data segment, alive for whole program
 
 void called_many_times() {
-    static int call_count = 0;   // also data segment; survives between calls!
-    ++call_count;
-    ++global_counter;
-    std::cout << "I have been called " << call_count
-              << " times; global = " << global_counter << "\\n";
+  static int call_count = 0; // also data segment; survives between calls!
+  ++call_count;
+  ++global_counter;
+  std::cout << "I have been called " << call_count
+            << " times; global = " << global_counter << "\\n";
 }
 
 int main() {
-    called_many_times();
-    called_many_times();
-    called_many_times();
-    return 0;
+  called_many_times();
+  called_many_times();
+  called_many_times();
+  return 0;
 }
 `}
 />
@@ -221,16 +221,15 @@ action.
 #include <vector>
 
 int main() {
-    std::vector<int> v;
-    std::cout << "before: size=" << v.size()
+  std::vector<int> v;
+  std::cout << "before: size=" << v.size() << " capacity=" << v.capacity()
+            << "\\n";
+  for (int i = 0; i < 10; ++i) {
+    v.push_back(i);
+    std::cout << "push " << i << " -> size=" << v.size()
               << " capacity=" << v.capacity() << "\\n";
-    for (int i = 0; i < 10; ++i) {
-        v.push_back(i);
-        std::cout << "push " << i
-                  << " -> size=" << v.size()
-                  << " capacity=" << v.capacity() << "\\n";
-    }
-    return 0;
+  }
+  return 0;
 }
 `}
 />
@@ -251,22 +250,20 @@ Trace this program in your head before running it:
 int globals_live_here = 1;
 
 int main() {
-    int on_the_stack = 2;
-    std::vector<int> handle_on_stack;
-    handle_on_stack.push_back(3);  // the '3' lives on the heap
-    handle_on_stack.push_back(4);
+  int on_the_stack = 2;
+  std::vector<int> handle_on_stack;
+  handle_on_stack.push_back(3); // the '3' lives on the heap
+  handle_on_stack.push_back(4);
 
-    int* heap_int = new int(5);
+  int *heap_int = new int(5);
 
-    std::cout << globals_live_here << " "
-              << on_the_stack << " "
-              << handle_on_stack[0] << " "
-              << handle_on_stack[1] << " "
-              << *heap_int << "\\n";
+  std::cout << globals_live_here << " " << on_the_stack << " "
+            << handle_on_stack[0] << " " << handle_on_stack[1] << " "
+            << *heap_int << "\\n";
 
-    delete heap_int;               // free the raw heap allocation
-    return 0;
-}                                  // handle_on_stack auto-frees its heap data
+  delete heap_int; // free the raw heap allocation
+  return 0;
+} // handle_on_stack auto-frees its heap data
 `}
 />
 

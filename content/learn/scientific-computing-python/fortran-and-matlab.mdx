@@ -62,10 +62,10 @@ A = np.random.default_rng(0).standard_normal((n, n))
 B = np.random.default_rng(1).standard_normal((n, n))
 
 t0 = time.perf_counter()
-C = A @ B                        # dispatches to BLAS DGEMM
+C = A @ B  # dispatches to BLAS DGEMM
 t1 = time.perf_counter()
 
-flops = 2 * n**3                 # multiply-add count for n x n matmul
+flops = 2 * n**3  # multiply-add count for n x n matmul
 gflops = flops / (t1 - t0) / 1e9
 print(f"{n}x{n} matmul: {t1 - t0:.3f}s -> {gflops:.1f} GFLOPS")
 print(f"Result Frobenius norm: {np.linalg.norm(C):.2f}")
@@ -148,13 +148,14 @@ possible.
 import numpy as np
 import matplotlib.pyplot as plt
 
-t = np.linspace(0, 2*np.pi, 200)   # MATLAB: t = linspace(0, 2*pi, 200);
-y = np.sin(t) + 0.3*np.sin(5*t)    # MATLAB: y = sin(t) + 0.3*sin(5*t);
+t = np.linspace(0, 2 * np.pi, 200)  # MATLAB: t = linspace(0, 2*pi, 200);
+y = np.sin(t) + 0.3 * np.sin(5 * t)  # MATLAB: y = sin(t) + 0.3*sin(5*t);
 
-plt.figure(figsize=(8, 3))         # MATLAB: figure;
-plt.plot(t, y)                     # MATLAB: plot(t, y);
+plt.figure(figsize=(8, 3))  # MATLAB: figure;
+plt.plot(t, y)  # MATLAB: plot(t, y);
 plt.title("MATLAB-style plotting")
-plt.xlabel("t"); plt.ylabel("y")
+plt.xlabel("t")
+plt.ylabel("y")
 plt.grid(True)
 plt.show()
 `}

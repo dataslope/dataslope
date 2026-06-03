@@ -37,24 +37,22 @@ sequenceDiagram
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Person p = new Person("Ada", 30);
-        System.out.println(p.describe());
-    }
+  public static void main(String[] args) {
+    Person p = new Person("Ada", 30);
+    System.out.println(p.describe());
+  }
 }
 
 class Person {
-    private final String name;
-    private final int    age;
+  private final String name;
+  private final int age;
 
-    public Person(String name, int age) {
-        this.name = name;
-        this.age  = age;
-    }
+  public Person(String name, int age) {
+    this.name = name;
+    this.age = age;
+  }
 
-    public String describe() {
-        return name + " (" + age + ")";
-    }
+  public String describe() { return name + " (" + age + ")"; }
 }
 `}
 />
@@ -68,18 +66,18 @@ declare *any* constructor, that freebie disappears.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Empty e = new Empty();          // works: default no-arg constructor
-        System.out.println("e built: " + (e != null));
+  public static void main(String[] args) {
+    Empty e = new Empty(); // works: default no-arg constructor
+    System.out.println("e built: " + (e != null));
 
-        // Uncommenting this will fail to compile, because Person no longer
-        // has a no-arg constructor (you defined a Person(String,int) above):
-        // Person p = new Person();
-    }
+    // Uncommenting this will fail to compile, because Person no longer
+    // has a no-arg constructor (you defined a Person(String,int) above):
+    // Person p = new Person();
+  }
 }
 
 class Empty {
-    // no constructor declared — Java inserts a default Empty()
+  // no constructor declared — Java inserts a default Empty()
 }
 `}
 />
@@ -94,28 +92,28 @@ refusing to be constructed in violation of it.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        try {
-            Person p = new Person("", -1);    // both bad
-            System.out.println(p);
-        } catch (IllegalArgumentException e) {
-            System.out.println("rejected: " + e.getMessage());
-        }
+  public static void main(String[] args) {
+    try {
+      Person p = new Person("", -1); // both bad
+      System.out.println(p);
+    } catch (IllegalArgumentException e) {
+      System.out.println("rejected: " + e.getMessage());
     }
+  }
 }
 
 class Person {
-    private final String name;
-    private final int    age;
+  private final String name;
+  private final int age;
 
-    public Person(String name, int age) {
-        if (name == null || name.isBlank())
-            throw new IllegalArgumentException("name must not be blank");
-        if (age < 0)
-            throw new IllegalArgumentException("age must be >= 0");
-        this.name = name;
-        this.age  = age;
-    }
+  public Person(String name, int age) {
+    if (name == null || name.isBlank())
+      throw new IllegalArgumentException("name must not be blank");
+    if (age < 0)
+      throw new IllegalArgumentException("age must be >= 0");
+    this.name = name;
+    this.age = age;
+  }
 }
 `}
 />
@@ -143,24 +141,24 @@ flowchart LR
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        System.out.println(new Point());
-        System.out.println(new Point(5));
-        System.out.println(new Point(3, 4));
-    }
+  public static void main(String[] args) {
+    System.out.println(new Point());
+    System.out.println(new Point(5));
+    System.out.println(new Point(3, 4));
+  }
 }
 
 class Point {
-    private final int x, y;
+  private final int x, y;
 
-    public Point()                  { this(0, 0); }      // origin
-    public Point(int both)          { this(both, both); } // square
-    public Point(int x, int y) {                          // the "real" one
-        this.x = x;
-        this.y = y;
-    }
+  public Point() { this(0, 0); }               // origin
+  public Point(int both) { this(both, both); } // square
+  public Point(int x, int y) {                 // the "real" one
+    this.x = x;
+    this.y = y;
+  }
 
-    public String toString() { return "(" + x + ", " + y + ")"; }
+  public String toString() { return "(" + x + ", " + y + ")"; }
 }
 `}
 />
@@ -185,34 +183,35 @@ accidental mutation.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Money price = new Money(1999, "USD");        // $19.99
-        Money taxed = price.add(new Money(160, "USD"));
-        System.out.println("price: " + price);
-        System.out.println("taxed: " + taxed);
-    }
+  public static void main(String[] args) {
+    Money price = new Money(1999, "USD"); // $19.99
+    Money taxed = price.add(new Money(160, "USD"));
+    System.out.println("price: " + price);
+    System.out.println("taxed: " + taxed);
+  }
 }
 
 class Money {
-    private final long   cents;
-    private final String currency;
+  private final long cents;
+  private final String currency;
 
-    public Money(long cents, String currency) {
-        if (currency == null) throw new IllegalArgumentException("currency required");
-        this.cents = cents;
-        this.currency = currency;
-    }
+  public Money(long cents, String currency) {
+    if (currency == null)
+      throw new IllegalArgumentException("currency required");
+    this.cents = cents;
+    this.currency = currency;
+  }
 
-    public Money add(Money other) {
-        if (!this.currency.equals(other.currency))
-            throw new IllegalArgumentException("currency mismatch");
-        // Note: we do NOT mutate this. We return a brand new Money.
-        return new Money(this.cents + other.cents, this.currency);
-    }
+  public Money add(Money other) {
+    if (!this.currency.equals(other.currency))
+      throw new IllegalArgumentException("currency mismatch");
+    // Note: we do NOT mutate this. We return a brand new Money.
+    return new Money(this.cents + other.cents, this.currency);
+  }
 
-    public String toString() {
-        return String.format("%.2f %s", cents / 100.0, currency);
-    }
+  public String toString() {
+    return String.format("%.2f %s", cents / 100.0, currency);
+  }
 }
 `}
 />

@@ -46,8 +46,14 @@ console.log(identity(42));
 console.log(apply((n: number) => n + 1, 41));
 
 // We can even encode booleans as functions — pure lambda calculus
-const T = <A,>(a: A) => (_b: A): A => a;        // "true"  picks first
-const F = <A,>(_a: A) => (b: A): A => b;        // "false" picks second
+const T =
+  <A,>(a: A) =>
+  (_b: A): A =>
+    a; // "true"  picks first
+const F =
+  <A,>(_a: A) =>
+  (b: A): A =>
+    b; // "false" picks second
 const cond = <A,>(p: (a: A) => (b: A) => A, a: A, b: A) => p(a)(b);
 
 console.log(cond(T, "yes", "no")); // "yes"
@@ -111,8 +117,10 @@ const none = <A,>(): Maybe<A> => ({ kind: "none" });
 
 function unwrapOr<A>(m: Maybe<A>, fallback: A): A {
   switch (m.kind) {
-    case "some": return m.value;
-    case "none": return fallback;
+    case "some":
+      return m.value;
+    case "none":
+      return fallback;
   }
 }
 

@@ -209,7 +209,11 @@ log({ message: "Server started" });
 const error = { message: "Database connection failed", code: 500 };
 log(error);
 
-const event = { message: "User logged in", timestamp: Date.now(), userId: "123" };
+const event = {
+  message: "User logged in",
+  timestamp: Date.now(),
+  userId: "123",
+};
 log(event);
 `}
 />

@@ -54,7 +54,9 @@ const nowMs = (): number => Date.now();
 const greet = (name: string): void => console.log(\`Hello, \${name}\`);
 
 // IMPURE: mutates its argument — a hidden side effect.
-const appendOne = (xs: number[]): void => { xs.push(1); };
+const appendOne = (xs: number[]): void => {
+  xs.push(1);
+};
 
 console.log(add(2, 3));
 console.log(doubled([1, 2, 3]));
@@ -87,9 +89,9 @@ no mocks, no teardown.
 const check = (label: string, cond: boolean) =>
   console.log(\`\${cond ? "OK  " : "FAIL"} \${label}\`);
 
-check("0+0=0",       add(0, 0) === 0);
-check("2+3=5",       add(2, 3) === 5);
-check("-1+1=0",      add(-1, 1) === 0);
+check("0+0=0", add(0, 0) === 0);
+check("2+3=5", add(2, 3) === 5);
+check("-1+1=0", add(-1, 1) === 0);
 check("commutative", add(3, 4) === add(4, 3));
 `}
 />
@@ -123,12 +125,15 @@ remember it. This is called **memoization**.
 }
 
 let calls = 0;
-const slow = (x: number): number => { calls++; return x * x; };
+const slow = (x: number): number => {
+  calls++;
+  return x * x;
+};
 
 const fast = memoize(slow);
-console.log(fast(5));     // 25, calls=1
-console.log(fast(5));     // 25, calls=1 (cache hit)
-console.log(fast(6));     // 36, calls=2
+console.log(fast(5)); // 25, calls=1
+console.log(fast(5)); // 25, calls=1 (cache hit)
+console.log(fast(6)); // 36, calls=2
 console.log("calls:", calls);
 `}
 />
@@ -202,7 +207,7 @@ function recordPurchase(userId: string, amount: number): void {
 }
 
 recordPurchase("u-1", 19.99);
-recordPurchase("u-2", 49.00);
+recordPurchase("u-2", 49.0);
 `}
 />
 
@@ -232,7 +237,7 @@ function describe(p: Purchase): string {
 
 // Impure shell: gathers time and randomness, calls pure functions, logs result
 const p1 = makePurchase("u-1", 19.99, 1_700_000_000_000, "abc");
-const p2 = makePurchase("u-2", 49.00, 1_700_000_000_001, "def");
+const p2 = makePurchase("u-2", 49.0, 1_700_000_000_001, "def");
 
 console.log(describe(p1));
 console.log(describe(p2));

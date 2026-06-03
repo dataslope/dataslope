@@ -144,13 +144,16 @@ extreme values.
 tips = px.data.tips()
 
 fig = px.histogram(
-    tips, x="total_bill", nbins=30,
+    tips,
+    x="total_bill",
+    nbins=30,
     title="Distribution of total bill (note the right skew)",
 )
 fig.show()
 
 fig2 = px.box(
-    tips, x="total_bill",
+    tips,
+    x="total_bill",
     title="Total bill: center, spread, and high outliers",
 )
 fig2.show()
@@ -191,7 +194,9 @@ print(missing[missing > 0])
 print("\\nPercent missing:")
 print(missing_pct[missing_pct > 0])
 
-print(f"\\nRows lost if you naively dropna(): {tips.isna().any(axis=1).sum()} of {len(tips)}")
+print(
+    f"\\nRows lost if you naively dropna(): {tips.isna().any(axis=1).sum()} of {len(tips)}"
+)
 `}
 />
 
@@ -220,7 +225,7 @@ tips = px.data.tips()
 q1 = tips["total_bill"].quantile(0.25)
 q3 = tips["total_bill"].quantile(0.75)
 iqr = q3 - q1
-low_fence  = q1 - 1.5 * iqr
+low_fence = q1 - 1.5 * iqr
 high_fence = q3 + 1.5 * iqr
 
 outliers = tips[(tips["total_bill"] < low_fence) | (tips["total_bill"] > high_fence)]
@@ -228,7 +233,11 @@ outliers = tips[(tips["total_bill"] < low_fence) | (tips["total_bill"] > high_fe
 print(f"IQR fences for total_bill: [{low_fence:.2f}, {high_fence:.2f}]")
 print(f"Flagged points: {len(outliers)} of {len(tips)}")
 print("\\nThe flagged bills:")
-print(outliers[["total_bill", "tip", "size", "day"]].sort_values("total_bill").to_string(index=False))
+print(
+    outliers[["total_bill", "tip", "size", "day"]]
+    .sort_values("total_bill")
+    .to_string(index=False)
+)
 print("\\nThese look like genuine big-party bills, not errors -- KEEP them,")
 print("but be aware they'll pull the mean around.")
 `}
@@ -285,7 +294,11 @@ print("Correlation matrix:")
 print(corr)
 
 fig = px.imshow(
-    corr, text_auto=True, color_continuous_scale="RdBu", zmin=-1, zmax=1,
+    corr,
+    text_auto=True,
+    color_continuous_scale="RdBu",
+    zmin=-1,
+    zmax=1,
     title="Correlation matrix of numeric columns",
 )
 fig.show()
@@ -419,8 +432,8 @@ tips = px.data.tips()`}
 import numpy as np
 
 # TODO: find the most-correlated distinct numeric pair
-best_pair = None   # (col_a, col_b)
-best_r = None      # float
+best_pair = None  # (col_a, col_b)
+best_r = None  # float
 `}
   solutionCode={`import plotly.express as px
 import numpy as np

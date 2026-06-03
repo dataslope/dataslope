@@ -110,12 +110,22 @@ CREATE TABLE products (
 );
 INSERT INTO customers VALUES (1, 'Ada'), (2, 'Grace');
 INSERT INTO products VALUES (10, 'Notebook', 8.50), (11, 'Pen', 1.25);`}
-  starterCode={`SELECT 'customer' AS kind, id, name
-FROM customers
+  starterCode={`SELECT
+  'customer' AS kind,
+  id,
+  name
+FROM
+  customers
 UNION ALL
-SELECT 'product' AS kind, id, name
-FROM products
-ORDER BY kind, id;`}
+SELECT
+  'product' AS kind,
+  id,
+  name
+FROM
+  products
+ORDER BY
+  kind,
+  id;`}
 />
 
 The tables stay separate because they represent different entity

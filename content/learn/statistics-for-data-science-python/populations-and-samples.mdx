@@ -144,13 +144,13 @@ rng = np.random.default_rng(42)
 
 # We DEFINE the population, so we know the true parameters exactly.
 # (In real life these are hidden — that's the whole problem.)
-MU_TRUE = 100.0     # population mean       (parameter)
-SIGMA_TRUE = 15.0   # population sd         (parameter)
+MU_TRUE = 100.0  # population mean       (parameter)
+SIGMA_TRUE = 15.0  # population sd         (parameter)
 
 # Draw ONE sample of 50 and compute statistics.
 sample = rng.normal(MU_TRUE, SIGMA_TRUE, size=50)
-x_bar = sample.mean()      # statistic estimating MU_TRUE
-s = sample.std(ddof=1)     # statistic estimating SIGMA_TRUE (ddof=1 = sample sd)
+x_bar = sample.mean()  # statistic estimating MU_TRUE
+s = sample.std(ddof=1)  # statistic estimating SIGMA_TRUE (ddof=1 = sample sd)
 
 print(f"Parameter  mu    = {MU_TRUE:.2f}   (truth, normally unseen)")
 print(f"Statistic  x-bar = {x_bar:.2f}   (your estimate from n=50)")
@@ -194,14 +194,17 @@ rng = np.random.default_rng(7)
 MU_TRUE, SIGMA_TRUE = 100.0, 15.0
 
 # Draw 1000 separate samples of n=50, recording each sample's mean.
-sample_means = np.array([rng.normal(MU_TRUE, SIGMA_TRUE, 50).mean()
-                         for _ in range(1000)])
+sample_means = np.array(
+    [rng.normal(MU_TRUE, SIGMA_TRUE, 50).mean() for _ in range(1000)]
+)
 
-fig = px.histogram(sample_means, nbins=40,
-                   labels={"value": "Sample mean (x-bar)"},
-                   title="x-bar is a random variable: 1000 samples, 1000 means")
-fig.add_vline(x=MU_TRUE, line_dash="dash",
-              annotation_text="true mu = 100")
+fig = px.histogram(
+    sample_means,
+    nbins=40,
+    labels={"value": "Sample mean (x-bar)"},
+    title="x-bar is a random variable: 1000 samples, 1000 means",
+)
+fig.add_vline(x=MU_TRUE, line_dash="dash", annotation_text="true mu = 100")
 fig.show()
 
 print(f"The sample means scatter around the true mu = {MU_TRUE}.")
@@ -256,10 +259,14 @@ for n in sizes:
     x_bar = rng.normal(MU_TRUE, SIGMA_TRUE, size=n).mean()
     errors.append(abs(x_bar - MU_TRUE))
 
-fig = px.line(x=sizes, y=errors, markers=True, log_x=True,
-              labels={"x": "Sample size n (log scale)",
-                      "y": "|x-bar - mu| (estimation error)"},
-              title="Bigger samples sharpen the estimate")
+fig = px.line(
+    x=sizes,
+    y=errors,
+    markers=True,
+    log_x=True,
+    labels={"x": "Sample size n (log scale)", "y": "|x-bar - mu| (estimation error)"},
+    title="Bigger samples sharpen the estimate",
+)
 fig.show()
 
 for n, e in zip(sizes, errors):

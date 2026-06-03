@@ -59,9 +59,9 @@ import numpy as np
 
 s = pd.Series([10, 20, np.nan, 40, np.nan])
 
-print(f"mean:           {s.mean()}")        # 23.33 — only the 3 non-null values
-print(f"count:          {s.count()}")        # 3 (NaNs not counted)
-print(f"sum:            {s.sum()}")          # 70
+print(f"mean:           {s.mean()}")  # 23.33 — only the 3 non-null values
+print(f"count:          {s.count()}")  # 3 (NaNs not counted)
+print(f"sum:            {s.sum()}")  # 70
 print(f"mean(skipna=False): {s.mean(skipna=False)}")  # NaN
 `}
 />
@@ -126,10 +126,12 @@ back a Series or DataFrame of results.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "salary": [120, 95, 140, 80, 128, 110, 92],
-    "tenure": [3, 6, 7, 2, 4, 5, 6],
-})
+df = pd.DataFrame(
+    {
+        "salary": [120, 95, 140, 80, 128, 110, 92],
+        "tenure": [3, 6, 7, 2, 4, 5, 6],
+    }
+)
 
 # A list of agg names → one row per agg
 print(df.agg(["mean", "median", "std", "min", "max"]).round(1))
@@ -146,10 +148,12 @@ df = pd.DataFrame({
     "salary": [120, 95, 140, 80, 128, 110, 92],
     "tenure": [3, 6, 7, 2, 4, 5, 6],
 })`}
-  starterCode={`result = df.agg({
-    "salary": ["mean", "median"],
-    "tenure": ["min", "max"],
-})
+  starterCode={`result = df.agg(
+    {
+        "salary": ["mean", "median"],
+        "tenure": ["min", "max"],
+    }
+)
 print(result)
 `}
 />
@@ -163,11 +167,13 @@ like *"average salary of engineers."*
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
-    "dept":   ["Eng","Sales","Eng","Ops","Eng"],
-    "salary": [120, 95, 140, 80, 128],
-})
+df = pd.DataFrame(
+    {
+        "name": ["Aiko", "Bilal", "Chen", "Diego", "Eve"],
+        "dept": ["Eng", "Sales", "Eng", "Ops", "Eng"],
+        "salary": [120, 95, 140, 80, 128],
+    }
+)
 
 eng_mean = df.loc[df["dept"] == "Eng", "salary"].mean()
 print("Average engineer salary:", eng_mean.round(1))

@@ -42,9 +42,9 @@ A real example:
   return n * 2;
 }
 
-console.log(double(3));     // 6
-console.log(double(10));    // 20
-console.log(double(-7));    // -14
+console.log(double(3)); // 6
+console.log(double(10)); // 20
+console.log(double(-7)); // -14
 
 // 'double' is the function. We can use it as many times as we like.
 `}
@@ -164,8 +164,12 @@ Arrow functions have a few useful shorthand rules:
 <CodeBlock
   adapter="javascript"
   starterCode={`// Three equivalent ways to define the same function:
-function squareA(n) { return n * n; }
-const squareB = function (n) { return n * n; };
+function squareA(n) {
+  return n * n;
+}
+const squareB = function (n) {
+  return n * n;
+};
 const squareC = (n) => n * n;
 
 console.log(squareA(5));
@@ -204,8 +208,8 @@ console.log(greet("Ada"));
 function applyTwice(f, x) {
   return f(f(x));
 }
-console.log(applyTwice((n) => n + 1, 5));    // 7
-console.log(applyTwice((s) => s + "!", "go"));// "go!!"
+console.log(applyTwice((n) => n + 1, 5)); // 7
+console.log(applyTwice((s) => s + "!", "go")); // "go!!"
 
 // A function returned from a function.
 function makeAdder(amount) {
@@ -213,15 +217,11 @@ function makeAdder(amount) {
 }
 const add10 = makeAdder(10);
 const add100 = makeAdder(100);
-console.log(add10(5));   // 15
-console.log(add100(5));  // 105
+console.log(add10(5)); // 15
+console.log(add100(5)); // 105
 
 // Functions stored in an array.
-const operations = [
-  (n) => n + 1,
-  (n) => n * 2,
-  (n) => n - 3,
-];
+const operations = [(n) => n + 1, (n) => n * 2, (n) => n - 3];
 
 let v = 10;
 for (const op of operations) {
@@ -261,15 +261,15 @@ function add(a, b) {
 // Impure: reads from / writes to the outside world.
 let total = 0;
 function addToTotal(n) {
-  total += n;        // side effect — modifies an outside variable
+  total += n; // side effect — modifies an outside variable
   console.log(total); // side effect — produces output
 }
 
-console.log(add(2, 3));   // 5
-console.log(add(2, 3));   // 5  — same every time
+console.log(add(2, 3)); // 5
+console.log(add(2, 3)); // 5  — same every time
 
 addToTotal(2);
-addToTotal(3);            // result depends on previous calls!
+addToTotal(3); // result depends on previous calls!
 addToTotal(2);
 `}
 />
@@ -406,8 +406,8 @@ console.log(bmi(70, 1.75), bmiCategory(bmi(70, 1.75)));
 
 function bmiCategory(value) {
   if (value < 18.5) return "underweight";
-  if (value < 25)   return "normal";
-  if (value < 30)   return "overweight";
+  if (value < 25) return "normal";
+  if (value < 30) return "overweight";
   return "obese";
 }
 

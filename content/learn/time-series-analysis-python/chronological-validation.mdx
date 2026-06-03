@@ -60,8 +60,9 @@ vals = y.values
 positions = np.arange(n)
 
 # --- RANDOM hold-out: test points scattered through time ---
-test_pos = rng.choice(np.arange(3, n-3), size=24, replace=False)
-train_mask = np.ones(n, bool); train_mask[test_pos] = False
+test_pos = rng.choice(np.arange(3, n - 3), size=24, replace=False)
+train_mask = np.ones(n, bool)
+train_mask[test_pos] = False
 # "Predict" each test point by interpolating between its TRAIN neighbours.
 # Because the split is random, those neighbours sit on BOTH sides in time.
 pred_random = np.interp(test_pos, positions[train_mask], vals[train_mask])
@@ -74,8 +75,12 @@ split = n - 24
 pred_chrono = np.full(24, vals[:split][-1])
 mae_chrono = np.mean(np.abs(vals[split:] - pred_chrono))
 
-print(f"MAE with RANDOM hold-out (interpolating between past+future): {mae_random:6.2f}")
-print(f"MAE with CHRONOLOGICAL hold-out (honest extrapolation):       {mae_chrono:6.2f}")
+print(
+    f"MAE with RANDOM hold-out (interpolating between past+future): {mae_random:6.2f}"
+)
+print(
+    f"MAE with CHRONOLOGICAL hold-out (honest extrapolation):       {mae_chrono:6.2f}"
+)
 print()
 print("The random split looks far more accurate -- but only because it let the")
 print("'forecast' peek at future neighbours that will NOT exist in production.")
@@ -114,27 +119,33 @@ them by hand once and you'll never misread them again.
   adapter="python"
   starterCode={`import numpy as np
 
+
 def mae(y_true, y_pred):
     # Mean Absolute Error: average size of the miss, in the data's own units.
     return np.mean(np.abs(y_true - y_pred))
+
 
 def rmse(y_true, y_pred):
     # Root Mean Squared Error: like MAE but SQUARES errors first, so big
     # misses are punished much harder. Same units as the data.
     return np.sqrt(np.mean((y_true - y_pred) ** 2))
 
+
 def mape(y_true, y_pred):
     # Mean Absolute Percentage Error: scale-free, reported as a percent.
     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
 
+
 # Two forecasts of the same truth: one with small even misses, one that is
 # usually perfect but has a single huge blunder.
-y_true   = np.array([100, 100, 100, 100, 100], dtype=float)
-even     = np.array([105,  95, 104,  96, 100], dtype=float)  # small, spread out
+y_true = np.array([100, 100, 100, 100, 100], dtype=float)
+even = np.array([105, 95, 104, 96, 100], dtype=float)  # small, spread out
 oneblump = np.array([100, 100, 100, 100, 140], dtype=float)  # one big miss
 
 for name, pred in [("even misses", even), ("one big blunder", oneblump)]:
-    print(f"{name:16s}  MAE={mae(y_true,pred):5.1f}  RMSE={rmse(y_true,pred):5.1f}  MAPE={mape(y_true,pred):4.1f}%")
+    print(
+        f"{name:16s}  MAE={mae(y_true, pred):5.1f}  RMSE={rmse(y_true, pred):5.1f}  MAPE={mape(y_true, pred):4.1f}%"
+    )
 
 print()
 print("Same MAE-ish scale, but RMSE PUNISHES the single big blunder far more.")
@@ -214,6 +225,7 @@ def mae(yt, yp):
     return float(np.mean(np.abs(np.asarray(yt) - np.asarray(yp))))`}
   starterCode={`import numpy as np
 
+
 # Expanding-window backtest of a SEASONAL-NAIVE forecaster (predict each month
 # with the value 12 months earlier). Fast, leakage-free, and a strong baseline.
 def seasonal_naive_forecast(train, horizon, m=12):
@@ -221,19 +233,22 @@ def seasonal_naive_forecast(train, horizon, m=12):
     reps = int(np.ceil(horizon / m))
     return np.tile(last_season, reps)[:horizon]
 
+
 initial, horizon, step = 60, 12, 12
 fold_maes = []
 for cut in range(initial, len(air) - horizon + 1, step):
-    train = air.iloc[:cut]            # the PAST only
-    test  = air.iloc[cut:cut+horizon] # the next 12 months (the FUTURE)
-    pred  = seasonal_naive_forecast(train, horizon)
+    train = air.iloc[:cut]  # the PAST only
+    test = air.iloc[cut : cut + horizon]  # the next 12 months (the FUTURE)
+    pred = seasonal_naive_forecast(train, horizon)
     e = mae(test.values, pred)
     fold_maes.append(e)
     print(f"train up to {train.index[-1].date()}  ->  test MAE = {e:6.1f}")
 
 print()
-print(f"Backtest MAE across {len(fold_maes)} folds: mean = {np.mean(fold_maes):.1f}, "
-      f"std = {np.std(fold_maes):.1f}")
+print(
+    f"Backtest MAE across {len(fold_maes)} folds: mean = {np.mean(fold_maes):.1f}, "
+    f"std = {np.std(fold_maes):.1f}"
+)
 print("One holdout would have given just ONE of these numbers -- and you'd never")
 print("know how lucky or unlucky that single tail was. Many folds = a stable estimate.")
 `}
@@ -284,7 +299,9 @@ it won't have at prediction time:
   starterCode={`import numpy as np
 
 rng = np.random.default_rng(1)
-series = np.concatenate([rng.normal(10, 1, 80), rng.normal(40, 5, 20)])  # level jumps late
+series = np.concatenate(
+    [rng.normal(10, 1, 80), rng.normal(40, 5, 20)]
+)  # level jumps late
 split = 80
 train, test = series[:split], series[split:]
 
@@ -296,7 +313,9 @@ wrong_train = (train - g_mean) / g_std
 t_mean, t_std = train.mean(), train.std()
 right_train = (train - t_mean) / t_std
 
-print(f"Global mean used on train (LEAKY): {g_mean:5.2f}  <- pulled up by the test-era jump")
+print(
+    f"Global mean used on train (LEAKY): {g_mean:5.2f}  <- pulled up by the test-era jump"
+)
 print(f"Train-only mean (correct)        : {t_mean:5.2f}")
 print()
 print("The leaky version centers training data using a mean inflated by data")
@@ -329,28 +348,36 @@ y_true = np.array([200.0, 210.0, 190.0, 220.0, 205.0])
 y_pred = np.array([198.0, 215.0, 185.0, 219.0, 210.0])`}
   starterCode={`import numpy as np
 
+
 def mae(y_true, y_pred):
     return None
+
 
 def rmse(y_true, y_pred):
     return None
 
+
 def mape(y_true, y_pred):
     return None
+
 
 scores = {"mae": None, "rmse": None, "mape": None}
 print(scores)
 `}
   solutionCode={`import numpy as np
 
+
 def mae(y_true, y_pred):
     return float(np.mean(np.abs(y_true - y_pred)))
+
 
 def rmse(y_true, y_pred):
     return float(np.sqrt(np.mean((y_true - y_pred) ** 2)))
 
+
 def mape(y_true, y_pred):
     return float(np.mean(np.abs((y_true - y_pred) / y_true)) * 100)
+
 
 scores = {
     "mae": mae(y_true, y_pred),
@@ -406,6 +433,7 @@ Return the list of folds as \`folds\` (a list of \`(train_idx, test_idx)\` tuple
     # TODO: build (train_idx, test_idx) tuples
     return folds
 
+
 folds = expanding_folds(n, initial, horizon, step)
 for tr, te in folds:
     print(f"train 0..{tr[-1]}  test {te[0]}..{te[-1]}")
@@ -419,6 +447,7 @@ for tr, te in folds:
         folds.append((train_idx, test_idx))
         cut += step
     return folds
+
 
 folds = expanding_folds(n, initial, horizon, step)
 for tr, te in folds:
@@ -491,21 +520,36 @@ _passengers = [
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
   starterCode={`import numpy as np
+
 mae_snaive = None
 mae_mean = None
 baseline_wins = None
-print("seasonal-naive MAE:", mae_snaive, " flat-mean MAE:", mae_mean, " snaive wins:", baseline_wins)
+print(
+    "seasonal-naive MAE:",
+    mae_snaive,
+    " flat-mean MAE:",
+    mae_mean,
+    " snaive wins:",
+    baseline_wins,
+)
 `}
   solutionCode={`import numpy as np
+
 h = 24
 train, test = air.iloc[:-h], air.iloc[-h:]
-snaive_pred = np.tile(train.values[-12:], 2)    # seasonal naive: last 12 months, repeated
+snaive_pred = np.tile(train.values[-12:], 2)  # seasonal naive: last 12 months, repeated
 mean_pred = np.full(h, train.mean())
 mae_snaive = float(np.mean(np.abs(test.values - snaive_pred)))
 mae_mean = float(np.mean(np.abs(test.values - mean_pred)))
 baseline_wins = mae_snaive < mae_mean
-print("seasonal-naive MAE:", round(mae_snaive,1), " flat-mean MAE:", round(mae_mean,1),
-      " snaive wins:", baseline_wins)
+print(
+    "seasonal-naive MAE:",
+    round(mae_snaive, 1),
+    " flat-mean MAE:",
+    round(mae_mean, 1),
+    " snaive wins:",
+    baseline_wins,
+)
 `}
   tests={[
     {

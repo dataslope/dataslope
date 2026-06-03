@@ -98,25 +98,29 @@ rng = np.random.default_rng(42)
 MU, SIGMA = 50.0, 18.0
 population = rng.normal(MU, SIGMA, size=1_000_000)
 
-n = 40            # size of EACH sample
+n = 40  # size of EACH sample
 n_samples = 5000  # how many samples we draw
 
 # Draw n_samples samples of size n, recording the MEAN of each one.
-means = np.array([
-    rng.choice(population, size=n, replace=False).mean()
-    for _ in range(n_samples)
-])
+means = np.array(
+    [rng.choice(population, size=n, replace=False).mean() for _ in range(n_samples)]
+)
 
-fig = px.histogram(means, nbins=50,
-                   title=f"Sampling distribution of x-bar  (n={n}, {n_samples} samples)",
-                   labels={"value": "Sample mean (x-bar)"})
+fig = px.histogram(
+    means,
+    nbins=50,
+    title=f"Sampling distribution of x-bar  (n={n}, {n_samples} samples)",
+    labels={"value": "Sample mean (x-bar)"},
+)
 fig.add_vline(x=MU, line_dash="dash", annotation_text="true mu = 50")
 fig.show()
 
 print(f"Population mean mu               = {MU:.2f}")
 print(f"Mean of the {n_samples} sample means    = {means.mean():.2f}   (centers on mu)")
 print(f"Population sd sigma              = {SIGMA:.2f}")
-print(f"SD of the sample means          = {means.std():.2f}   (MUCH smaller than sigma)")
+print(
+    f"SD of the sample means          = {means.std():.2f}   (MUCH smaller than sigma)"
+)
 `}
 />
 
@@ -159,24 +163,33 @@ pop_vals = rng.choice(population, size=5000, replace=False)
 one_sample = rng.choice(population, size=n, replace=False)
 
 # (c) the sampling distribution of x-bar: many samples, each summarized by its mean
-many_means = np.array([
-    rng.choice(population, size=n, replace=False).mean()
-    for _ in range(5000)
-])
+many_means = np.array(
+    [rng.choice(population, size=n, replace=False).mean() for _ in range(5000)]
+)
 
-df = pd.concat([
-    pd.DataFrame({"value": pop_vals,    "what": "(a) population: raw values"}),
-    pd.DataFrame({"value": one_sample,  "what": "(b) one sample: raw values"}),
-    pd.DataFrame({"value": many_means,  "what": "(c) sampling dist: x-bar"}),
-])
+df = pd.concat(
+    [
+        pd.DataFrame({"value": pop_vals, "what": "(a) population: raw values"}),
+        pd.DataFrame({"value": one_sample, "what": "(b) one sample: raw values"}),
+        pd.DataFrame({"value": many_means, "what": "(c) sampling dist: x-bar"}),
+    ]
+)
 
-fig = px.histogram(df, x="value", facet_row="what", nbins=50, height=650,
-                   title="Three different distributions on the same axis")
+fig = px.histogram(
+    df,
+    x="value",
+    facet_row="what",
+    nbins=50,
+    height=650,
+    title="Three different distributions on the same axis",
+)
 fig.add_vline(x=MU, line_dash="dash")
 fig.show()
 
 print(f"(a) population raw values   -> sd = {pop_vals.std():5.2f}")
-print(f"(b) one sample raw values   -> sd = {one_sample.std():5.2f}  (~ matches population)")
+print(
+    f"(b) one sample raw values   -> sd = {one_sample.std():5.2f}  (~ matches population)"
+)
 print(f"(c) sampling dist of x-bar  -> sd = {many_means.std():5.2f}  (FAR narrower)")
 `}
 />
@@ -224,18 +237,24 @@ population = rng.normal(MU, SIGMA, size=1_000_000)
 
 rows = []
 for n in [5, 20, 80, 320]:
-    means = np.array([
-        rng.choice(population, size=n, replace=False).mean()
-        for _ in range(4000)
-    ])
+    means = np.array(
+        [rng.choice(population, size=n, replace=False).mean() for _ in range(4000)]
+    )
     for m in means:
         rows.append({"x_bar": m, "n": f"n = {n}"})
     print(f"n = {n:4d}  ->  SD of x-bar = {means.std():.2f}")
 
 df = pd.DataFrame(rows)
-fig = px.histogram(df, x="x_bar", color="n", barmode="overlay", nbins=70,
-                   opacity=0.6, title="Bigger n -> narrower sampling distribution (same center)",
-                   labels={"x_bar": "Sample mean (x-bar)"})
+fig = px.histogram(
+    df,
+    x="x_bar",
+    color="n",
+    barmode="overlay",
+    nbins=70,
+    opacity=0.6,
+    title="Bigger n -> narrower sampling distribution (same center)",
+    labels={"x_bar": "Sample mean (x-bar)"},
+)
 fig.add_vline(x=MU, line_dash="dash", annotation_text="mu = 50")
 fig.show()
 
@@ -285,12 +304,13 @@ rng = np.random.default_rng(1)
 MU, SIGMA = 50.0, 18.0
 population = rng.normal(MU, SIGMA, size=1_000_000)
 
+
 def sd_of_means(n, n_samples):
-    means = np.array([
-        rng.choice(population, size=n, replace=False).mean()
-        for _ in range(n_samples)
-    ])
+    means = np.array(
+        [rng.choice(population, size=n, replace=False).mean() for _ in range(n_samples)]
+    )
     return means.std()
+
 
 print("Lever 1: MORE SAMPLES (fix n=40, grow the number of samples)")
 for k in [500, 2000, 8000, 32000]:
@@ -349,18 +369,23 @@ n = 60
 
 rows = []
 for stat_name, fn in [("mean", np.mean), ("median", np.median), ("max", np.max)]:
-    vals = np.array([
-        fn(rng.choice(population, size=n, replace=False))
-        for _ in range(4000)
-    ])
+    vals = np.array(
+        [fn(rng.choice(population, size=n, replace=False)) for _ in range(4000)]
+    )
     for v in vals:
         rows.append({"value": v, "statistic": stat_name})
     print(f"{stat_name:>6}: center={vals.mean():7.2f}  spread(sd)={vals.std():6.2f}")
 
 df = pd.DataFrame(rows)
-fig = px.histogram(df, x="value", facet_col="statistic", nbins=50,
-                   facet_col_wrap=3, height=400,
-                   title=f"Each statistic has its OWN sampling distribution (n={n})")
+fig = px.histogram(
+    df,
+    x="value",
+    facet_col="statistic",
+    nbins=50,
+    facet_col_wrap=3,
+    height=400,
+    title=f"Each statistic has its OWN sampling distribution (n={n})",
+)
 fig.update_xaxes(matches=None)
 fig.show()
 
@@ -419,10 +444,9 @@ summary = {
     "spread": None,
 }
 `}
-  solutionCode={`means = np.array([
-    rng.choice(population, size=n, replace=False).mean()
-    for _ in range(n_samples)
-])
+  solutionCode={`means = np.array(
+    [rng.choice(population, size=n, replace=False).mean() for _ in range(n_samples)]
+)
 
 summary = {
     "center": float(means.mean()),
@@ -492,11 +516,11 @@ result = {
 }
 `}
   solutionCode={`def sd_of_means(n):
-    means = np.array([
-        rng.choice(population, size=n, replace=False).mean()
-        for _ in range(n_samples)
-    ])
+    means = np.array(
+        [rng.choice(population, size=n, replace=False).mean() for _ in range(n_samples)]
+    )
     return float(means.std())
+
 
 sd_small = sd_of_means(n_small)
 sd_big = sd_of_means(n_big)

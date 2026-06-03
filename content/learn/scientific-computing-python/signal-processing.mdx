@@ -46,26 +46,32 @@ into a routine operation.
   starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 
-fs = 1000           # sample rate, Hz
-T  = 2.0            # duration, seconds
-t  = np.arange(0, T, 1/fs)
+fs = 1000  # sample rate, Hz
+T = 2.0  # duration, seconds
+t = np.arange(0, T, 1 / fs)
 
 # Signal: 50 Hz + 120 Hz + noise
 rng = np.random.default_rng(0)
-x = (0.6 * np.sin(2*np.pi*50*t)
-   + 0.4 * np.sin(2*np.pi*120*t)
-   + 0.3 * rng.standard_normal(t.size))
+x = (
+    0.6 * np.sin(2 * np.pi * 50 * t)
+    + 0.4 * np.sin(2 * np.pi * 120 * t)
+    + 0.3 * rng.standard_normal(t.size)
+)
 
-X = np.fft.rfft(x)                   # real-input FFT (only positive freqs)
-f = np.fft.rfftfreq(t.size, 1/fs)
-mag = np.abs(X) / t.size * 2         # convert to physical amplitude
+X = np.fft.rfft(x)  # real-input FFT (only positive freqs)
+f = np.fft.rfftfreq(t.size, 1 / fs)
+mag = np.abs(X) / t.size * 2  # convert to physical amplitude
 
 fig, ax = plt.subplots(1, 2, figsize=(10, 3))
-ax[0].plot(t[:200], x[:200]); ax[0].set_xlabel("time (s)")
+ax[0].plot(t[:200], x[:200])
+ax[0].set_xlabel("time (s)")
 ax[0].set_title("first 200 ms of noisy signal")
-ax[1].plot(f, mag); ax[1].set_xlim(0, 200); ax[1].set_xlabel("frequency (Hz)")
+ax[1].plot(f, mag)
+ax[1].set_xlim(0, 200)
+ax[1].set_xlabel("frequency (Hz)")
 ax[1].set_title("FFT magnitude spectrum")
-plt.tight_layout(); plt.show()
+plt.tight_layout()
+plt.show()
 `}
 />
 
@@ -92,16 +98,18 @@ import matplotlib.pyplot as plt
 from scipy.signal import get_window
 
 fs, T = 1000, 1.0
-t = np.arange(0, T, 1/fs)
-x = np.sin(2*np.pi*50.5*t)         # NOT a whole number of cycles
+t = np.arange(0, T, 1 / fs)
+x = np.sin(2 * np.pi * 50.5 * t)  # NOT a whole number of cycles
 
 X_rect = np.abs(np.fft.rfft(x))
 X_hann = np.abs(np.fft.rfft(x * get_window("hann", t.size)))
-f = np.fft.rfftfreq(t.size, 1/fs)
+f = np.fft.rfftfreq(t.size, 1 / fs)
 
 plt.semilogy(f, X_rect, label="rectangular window")
 plt.semilogy(f, X_hann, label="Hann window")
-plt.xlim(0, 200); plt.xlabel("Hz"); plt.legend()
+plt.xlim(0, 200)
+plt.xlabel("Hz")
+plt.legend()
 plt.title("Windowing tames spectral leakage")
 plt.show()
 `}
@@ -124,10 +132,10 @@ import matplotlib.pyplot as plt
 from scipy.signal import butter, sosfiltfilt
 
 fs = 1000
-t  = np.arange(0, 2, 1/fs)
+t = np.arange(0, 2, 1 / fs)
 rng = np.random.default_rng(0)
-clean = np.sin(2*np.pi*5*t)                          # the signal we want
-noise = 0.5*np.sin(2*np.pi*120*t) + 0.3*rng.standard_normal(t.size)
+clean = np.sin(2 * np.pi * 5 * t)  # the signal we want
+noise = 0.5 * np.sin(2 * np.pi * 120 * t) + 0.3 * rng.standard_normal(t.size)
 x = clean + noise
 
 # 4th-order low-pass at 20 Hz, expressed in second-order sections
@@ -135,9 +143,13 @@ sos = butter(N=4, Wn=20, btype="low", fs=fs, output="sos")
 y = sosfiltfilt(sos, x)
 
 fig, ax = plt.subplots(2, 1, figsize=(9, 4), sharex=True)
-ax[0].plot(t, x);     ax[0].set_title("noisy")
-ax[1].plot(t, y);     ax[1].set_title("after Butterworth low-pass")
-plt.xlabel("time (s)"); plt.tight_layout(); plt.show()
+ax[0].plot(t, x)
+ax[0].set_title("noisy")
+ax[1].plot(t, y)
+ax[1].set_title("after Butterworth low-pass")
+plt.xlabel("time (s)")
+plt.tight_layout()
+plt.show()
 `}
 />
 
@@ -162,15 +174,17 @@ import matplotlib.pyplot as plt
 from scipy.signal import spectrogram
 
 fs = 4000
-t = np.arange(0, 4, 1/fs)
+t = np.arange(0, 4, 1 / fs)
 # A linear chirp from 100 Hz to 800 Hz
-x = np.sin(2*np.pi * (100*t + (700/2/4)*t**2))
+x = np.sin(2 * np.pi * (100 * t + (700 / 2 / 4) * t**2))
 
 f, tt, Sxx = spectrogram(x, fs=fs, nperseg=512, noverlap=384)
-plt.pcolormesh(tt, f, 10*np.log10(Sxx + 1e-12), shading="auto")
+plt.pcolormesh(tt, f, 10 * np.log10(Sxx + 1e-12), shading="auto")
 plt.ylim(0, 1000)
-plt.xlabel("time (s)"); plt.ylabel("frequency (Hz)")
-plt.title("chirp spectrogram"); plt.colorbar(label="dB")
+plt.xlabel("time (s)")
+plt.ylabel("frequency (Hz)")
+plt.title("chirp spectrogram")
+plt.colorbar(label="dB")
 plt.show()
 `}
 />
@@ -195,17 +209,18 @@ import matplotlib.pyplot as plt
 from scipy.signal import convolve
 
 # Smooth a noisy signal by convolving with a moving-average kernel
-t = np.linspace(0, 2*np.pi, 400)
+t = np.linspace(0, 2 * np.pi, 400)
 rng = np.random.default_rng(0)
-x = np.sin(t) + 0.4*rng.standard_normal(t.size)
+x = np.sin(t) + 0.4 * rng.standard_normal(t.size)
 
 K = 20
-kernel = np.ones(K) / K          # moving-average filter
+kernel = np.ones(K) / K  # moving-average filter
 y = convolve(x, kernel, mode="same")
 
 plt.plot(t, x, alpha=0.5, label="raw")
 plt.plot(t, y, lw=2, label=f"{K}-pt moving average")
-plt.legend(); plt.show()
+plt.legend()
+plt.show()
 `}
 />
 

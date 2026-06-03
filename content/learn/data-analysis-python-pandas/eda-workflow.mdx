@@ -33,7 +33,7 @@ column was actually full of garbage.
   adapter="python"
   initCode={`import pandas as pd
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`print("Shape:", df.shape)            # rows, columns
+  starterCode={`print("Shape:", df.shape)  # rows, columns
 print()
 print("Dtypes:")
 print(df.dtypes)
@@ -58,7 +58,7 @@ Questions to answer:
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
   starterCode={`print(df.head())
 print()
-print(df.sample(5, random_state=0))   # random rows often reveal weirdness
+print(df.sample(5, random_state=0))  # random rows often reveal weirdness
 `}
 />
 

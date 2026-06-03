@@ -71,8 +71,7 @@ place.
 
 df = px.data.tips()
 
-fig = px.scatter(df, x="total_bill", y="tip",
-                 template="simple_white")
+fig = px.scatter(df, x="total_bill", y="tip", template="simple_white")
 fig.show()
 `}
 />
@@ -90,8 +89,7 @@ groups.
 
 df = px.data.tips()
 
-fig = px.scatter(df, x="total_bill", y="tip", color="smoker",
-                 template="simple_white")
+fig = px.scatter(df, x="total_bill", y="tip", color="smoker", template="simple_white")
 fig.show()
 `}
 />
@@ -108,9 +106,14 @@ dramatic.
 
 df = px.data.tips()
 
-fig = px.scatter(df, x="total_bill", y="tip", color="smoker",
-                 trendline="ols",
-                 template="simple_white")
+fig = px.scatter(
+    df,
+    x="total_bill",
+    y="tip",
+    color="smoker",
+    trendline="ols",
+    template="simple_white",
+)
 fig.show()
 `}
 />
@@ -132,7 +135,10 @@ A chart without labels is rude to its readers.
 df = px.data.tips()
 
 fig = px.scatter(
-    df, x="total_bill", y="tip", color="smoker",
+    df,
+    x="total_bill",
+    y="tip",
+    color="smoker",
     trendline="ols",
     template="simple_white",
     title="Tip vs total bill, split by smoker status",
@@ -167,7 +173,10 @@ whole story of a row.
 df = px.data.tips()
 
 fig = px.scatter(
-    df, x="total_bill", y="tip", color="smoker",
+    df,
+    x="total_bill",
+    y="tip",
+    color="smoker",
     trendline="ols",
     template="simple_white",
     title="Tip vs total bill, split by smoker status",
@@ -233,7 +242,10 @@ Modify the chart below to:
 df = px.data.tips()
 
 fig = px.scatter(
-    df, x="total_bill", y="tip", color="smoker",
+    df,
+    x="total_bill",
+    y="tip",
+    color="smoker",
     template="simple_white",
     title="Tip vs total bill, split by smoker status",
     labels={"total_bill": "Total bill (USD)", "tip": "Tip (USD)"},

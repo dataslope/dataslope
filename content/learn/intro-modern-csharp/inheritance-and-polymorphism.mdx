@@ -24,21 +24,26 @@ class** adds to or overrides what the base provides.
 public class Animal
 {
     public string Name { get; }
-    public Animal(string name) { Name = name; }
+    public Animal(string name)
+    {
+        Name = name;
+    }
 
     public void Eat() => Console.WriteLine($"{Name} is eating.");
 }
 
-public class Dog : Animal   // "Dog : Animal" reads "Dog inherits from Animal"
+public class Dog : Animal // "Dog : Animal" reads "Dog inherits from Animal"
 {
-    public Dog(string name) : base(name) { }   // forward to the base constructor
+    public Dog(string name) : base(name)
+    {
+    } // forward to the base constructor
 
     public void Bark() => Console.WriteLine($"{Name} says woof!");
 }
 
 var d = new Dog("Rex");
-d.Eat();    // inherited from Animal
-d.Bark();   // defined on Dog
+d.Eat();  // inherited from Animal
+d.Bark(); // defined on Dog
 `}
 />
 
@@ -71,28 +76,35 @@ works, not just add new methods. The base marks the method
 public class Animal
 {
     public string Name { get; }
-    public Animal(string name) { Name = name; }
+    public Animal(string name)
+    {
+        Name = name;
+    }
 
     public virtual void Speak() => Console.WriteLine($"{Name} makes a sound.");
 }
 
 public class Dog : Animal
 {
-    public Dog(string name) : base(name) { }
+    public Dog(string name) : base(name)
+    {
+    }
     public override void Speak() => Console.WriteLine($"{Name} barks!");
 }
 
 public class Cat : Animal
 {
-    public Cat(string name) : base(name) { }
+    public Cat(string name) : base(name)
+    {
+    }
     public override void Speak() => Console.WriteLine($"{Name} meows.");
 }
 
 Animal a = new Dog("Rex");
-a.Speak();    // "Rex barks!" — even though a's declared type is Animal
+a.Speak(); // "Rex barks!" — even though a's declared type is Animal
 
 a = new Cat("Whiskers");
-a.Speak();    // "Whiskers meows."
+a.Speak(); // "Whiskers meows."
 `}
 />
 
@@ -131,7 +143,7 @@ method** on an **abstract class**.
 
 public abstract class Shape
 {
-    public abstract double Area();       // no body — derived classes MUST override
+    public abstract double Area(); // no body — derived classes MUST override
 
     public void Describe() => Console.WriteLine($"area = {Area():F2}");
 }
@@ -139,19 +151,26 @@ public abstract class Shape
 public class Circle : Shape
 {
     public double Radius { get; }
-    public Circle(double r) { Radius = r; }
+    public Circle(double r)
+    {
+        Radius = r;
+    }
     public override double Area() => Math.PI * Radius * Radius;
 }
 
 public class Square : Shape
 {
     public double Side { get; }
-    public Square(double s) { Side = s; }
+    public Square(double s)
+    {
+        Side = s;
+    }
     public override double Area() => Side * Side;
 }
 
 Shape[] shapes = { new Circle(3), new Square(4) };
-foreach (var s in shapes) s.Describe();
+foreach (var s in shapes)
+    s.Describe();
 `}
 />
 
@@ -186,10 +205,11 @@ public class Japanese : IGreeter
 
 void GreetEveryone(IGreeter g, string[] names)
 {
-    foreach (var n in names) Console.WriteLine(g.Greet(n));
+    foreach (var n in names)
+        Console.WriteLine(g.Greet(n));
 }
 
-GreetEveryone(new English(),  new[] { "Ada", "Bob" });
+GreetEveryone(new English(), new[] { "Ada", "Bob" });
 GreetEveryone(new Japanese(), new[] { "アダ", "ボブ" });
 `}
 />

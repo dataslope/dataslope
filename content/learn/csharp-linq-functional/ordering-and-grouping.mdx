@@ -20,20 +20,17 @@ using System.Linq;
 
 record Person(string Name, int Age, string City);
 
-var people = new[]
-{
-    new Person("Ada",    36, "London"),
-    new Person("Bilal",  41, "Berlin"),
-    new Person("Chiara", 29, "Berlin"),
-    new Person("Dmitri", 52, "Paris"),
-    new Person("Esther", 33, "London"),
+var people = new[] {
+    new Person("Ada", 36, "London"),   new Person("Bilal", 41, "Berlin"),  new Person("Chiara", 29, "Berlin"),
+    new Person("Dmitri", 52, "Paris"), new Person("Esther", 33, "London"),
 };
 
 Console.WriteLine("by age ascending:");
 foreach (var p in people.OrderBy(p => p.Age))
     Console.WriteLine($"  {p.Name,-7} {p.Age}");
 
-Console.WriteLine("\nby name descending:");
+Console.WriteLine("
+by name descending:");
 foreach (var p in people.OrderByDescending(p => p.Name))
     Console.WriteLine($"  {p.Name,-7} {p.Age}");
 `}
@@ -61,21 +58,14 @@ using System.Linq;
 
 record Person(string Name, int Age, string City);
 
-var people = new[]
-{
-    new Person("Ada",    36, "London"),
-    new Person("Bilal",  41, "Berlin"),
-    new Person("Chiara", 29, "Berlin"),
-    new Person("Dmitri", 52, "Paris"),
-    new Person("Esther", 33, "London"),
-    new Person("Farah",  41, "Berlin"),   // same age as Bilal
+var people = new[] {
+    new Person("Ada", 36, "London"),    new Person("Bilal", 41, "Berlin"),
+    new Person("Chiara", 29, "Berlin"), new Person("Dmitri", 52, "Paris"),
+    new Person("Esther", 33, "London"), new Person("Farah", 41, "Berlin"), // same age as Bilal
 };
 
 // City ascending, then age descending, then name ascending.
-var sorted = people
-    .OrderBy(p => p.City)
-    .ThenByDescending(p => p.Age)
-    .ThenBy(p => p.Name);
+var sorted = people.OrderBy(p => p.City).ThenByDescending(p => p.Age).ThenBy(p => p.Name);
 
 foreach (var p in sorted)
     Console.WriteLine($"{p.City,-7} {p.Age,3} {p.Name}");
@@ -105,13 +95,9 @@ using System.Linq;
 
 record Person(string Name, int Age, string City);
 
-var people = new[]
-{
-    new Person("Ada",    36, "London"),
-    new Person("Bilal",  41, "Berlin"),
-    new Person("Chiara", 29, "Berlin"),
-    new Person("Dmitri", 52, "Paris"),
-    new Person("Esther", 33, "London"),
+var people = new[] {
+    new Person("Ada", 36, "London"),   new Person("Bilal", 41, "Berlin"),  new Person("Chiara", 29, "Berlin"),
+    new Person("Dmitri", 52, "Paris"), new Person("Esther", 33, "London"),
 };
 
 var byCity = people.GroupBy(p => p.City);
@@ -150,20 +136,14 @@ using System.Linq;
 
 record Sale(string Region, decimal Amount);
 
-var sales = new[]
-{
-    new Sale("EU",   10m),
-    new Sale("APAC", 15m),
-    new Sale("EU",   30m),
-    new Sale("US",   25m),
-    new Sale("EU",    5m),
-    new Sale("APAC", 20m),
+var sales = new[] {
+    new Sale("EU", 10m), new Sale("APAC", 15m), new Sale("EU", 30m),
+    new Sale("US", 25m), new Sale("EU", 5m),    new Sale("APAC", 20m),
 };
 
-var totals = sales
-    .GroupBy(s => s.Region)
-    .Select(g => new { Region = g.Key, Total = g.Sum(s => s.Amount), Count = g.Count() })
-    .OrderByDescending(r => r.Total);
+var totals = sales.GroupBy(s => s.Region)
+                 .Select(g => new { Region = g.Key, Total = g.Sum(s => s.Amount), Count = g.Count() })
+                 .OrderByDescending(r => r.Total);
 
 foreach (var r in totals)
     Console.WriteLine($"{r.Region,-5}  total={r.Total,6:C}  ({r.Count} sales)");
@@ -184,20 +164,15 @@ using System.Linq;
 
 record Sale(string Region, string Product, decimal Amount);
 
-var sales = new[]
-{
-    new Sale("EU",   "Widget", 10m),
-    new Sale("EU",   "Widget", 20m),
-    new Sale("EU",   "Gadget", 30m),
-    new Sale("APAC", "Widget", 40m),
-    new Sale("APAC", "Gadget", 50m),
-    new Sale("APAC", "Gadget", 60m),
+var sales = new[] {
+    new Sale("EU", "Widget", 10m),   new Sale("EU", "Widget", 20m),   new Sale("EU", "Gadget", 30m),
+    new Sale("APAC", "Widget", 40m), new Sale("APAC", "Gadget", 50m), new Sale("APAC", "Gadget", 60m),
 };
 
-var totals = sales
-    .GroupBy(s => new { s.Region, s.Product })
-    .Select(g => new { g.Key.Region, g.Key.Product, Total = g.Sum(s => s.Amount) })
-    .OrderBy(r => r.Region).ThenBy(r => r.Product);
+var totals = sales.GroupBy(s => new { s.Region, s.Product })
+                 .Select(g => new { g.Key.Region, g.Key.Product, Total = g.Sum(s => s.Amount) })
+                 .OrderBy(r => r.Region)
+                 .ThenBy(r => r.Product);
 
 foreach (var r in totals)
     Console.WriteLine($"{r.Region,-5} {r.Product,-7} {r.Total,6:C}");
@@ -220,10 +195,9 @@ using System.Linq;
 
 record Sale(string Region, decimal Amount);
 
-var sales = new[]
-{
-    new Sale("EU",   10m), new Sale("APAC", 15m), new Sale("EU", 30m),
-    new Sale("US",   25m), new Sale("EU",   5m),  new Sale("APAC", 20m),
+var sales = new[] {
+    new Sale("EU", 10m), new Sale("APAC", 15m), new Sale("EU", 30m),
+    new Sale("US", 25m), new Sale("EU", 5m),    new Sale("APAC", 20m),
 };
 
 var lookup = sales.ToLookup(s => s.Region);

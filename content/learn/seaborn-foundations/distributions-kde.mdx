@@ -71,7 +71,9 @@ sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 # A histogram with the KDE curve drawn on top.
-sns.displot(data=penguins, x="flipper_length_mm", kde=True, bins=20, height=4, aspect=1.3)
+sns.displot(
+    data=penguins, x="flipper_length_mm", kde=True, bins=20, height=4, aspect=1.3
+)
 `}
 />
 
@@ -95,9 +97,12 @@ penguins = sns.load_dataset("penguins")
 
 # Three bandwidths on the same data. Watch the two modes appear and vanish.
 sns.displot(
-    data=penguins, x="flipper_length_mm", kind="kde",
-    bw_adjust=0.3,   # try 0.3 (wiggly), 1.0 (default), 2.0 (oversmoothed)
-    height=4, aspect=1.3,
+    data=penguins,
+    x="flipper_length_mm",
+    kind="kde",
+    bw_adjust=0.3,  # try 0.3 (wiggly), 1.0 (default), 2.0 (oversmoothed)
+    height=4,
+    aspect=1.3,
 )
 `}
 />
@@ -137,9 +142,13 @@ sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 sns.displot(
-    data=penguins, x="flipper_length_mm", hue="species",
-    kind="kde", fill=True,   # fill=True shades under each curve
-    height=4, aspect=1.4,
+    data=penguins,
+    x="flipper_length_mm",
+    hue="species",
+    kind="kde",
+    fill=True,  # fill=True shades under each curve
+    height=4,
+    aspect=1.4,
 )
 `}
 />
@@ -163,9 +172,13 @@ sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 sns.displot(
-    data=penguins, x="bill_length_mm", y="bill_depth_mm",
-    hue="species", kind="kde",
-    height=4.5, aspect=1.2,
+    data=penguins,
+    x="bill_length_mm",
+    y="bill_depth_mm",
+    hue="species",
+    kind="kde",
+    height=4.5,
+    aspect=1.2,
 )
 `}
 />
@@ -247,9 +260,13 @@ sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 g = sns.displot(
-    data=penguins, x="body_mass_g", hue="species",
-    kind="kde", fill=True,
-    height=4, aspect=1.4,
+    data=penguins,
+    x="body_mass_g",
+    hue="species",
+    kind="kde",
+    fill=True,
+    height=4,
+    aspect=1.4,
 )
 `}
   tests={[

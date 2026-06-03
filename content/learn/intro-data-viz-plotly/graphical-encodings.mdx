@@ -48,17 +48,19 @@ df = px.data.gapminder().query("year == 2007")
 
 fig = px.scatter(
     df,
-    x="gdpPercap",      # position-x  -> GDP per capita
-    y="lifeExp",        # position-y  -> life expectancy
+    x="gdpPercap",  # position-x  -> GDP per capita
+    y="lifeExp",  # position-y  -> life expectancy
     color="continent",  # color hue   -> continent (categorical)
-    size="pop",         # size        -> population
+    size="pop",  # size        -> population
     hover_name="country",
     log_x=True,
     size_max=55,
     template="simple_white",
     title="Gapminder 2007: four encodings in one chart",
-    labels={"gdpPercap": "GDP per capita (USD, log)",
-            "lifeExp": "Life expectancy (years)"},
+    labels={
+        "gdpPercap": "GDP per capita (USD, log)",
+        "lifeExp": "Life expectancy (years)",
+    },
 )
 fig.show()
 `}
@@ -155,8 +157,7 @@ fig = px.scatter(
     size="petal_length",
     template="simple_white",
     title="Iris: four encodings",
-    labels={"sepal_width": "Sepal width (cm)",
-            "sepal_length": "Sepal length (cm)"},
+    labels={"sepal_width": "Sepal width (cm)", "sepal_length": "Sepal length (cm)"},
 )
 fig.show()
 `}

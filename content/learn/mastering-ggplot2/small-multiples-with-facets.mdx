@@ -35,7 +35,7 @@ Now give each class its **own panel** instead:
 ggplot(mpg, aes(displ, hwy)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
-  facet_wrap(~ class)
+  facet_wrap(~class)
 `}
 />
 
@@ -71,7 +71,7 @@ like text. Control the shape with `nrow` or `ncol`:
 
 ggplot(mpg, aes(displ, hwy)) +
   geom_point() +
-  facet_wrap(~ class, nrow = 2)
+  facet_wrap(~class, nrow = 2)
 `}
 />
 
@@ -114,7 +114,7 @@ each panel scale independently:
 
 ggplot(mpg, aes(displ, hwy)) +
   geom_point() +
-  facet_wrap(~ drv, scales = "free_y")
+  facet_wrap(~drv, scales = "free_y")
 `}
 />
 

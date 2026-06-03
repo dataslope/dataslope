@@ -118,9 +118,12 @@ console.log(area({ kind: "rect", width: 3, height: 5 }));
 `}
   solutionCode={`function area(shape: Shape): number {
   switch (shape.kind) {
-    case "circle": return Math.PI * shape.radius * shape.radius;
-    case "square": return shape.side * shape.side;
-    case "rect":   return shape.width * shape.height;
+    case "circle":
+      return Math.PI * shape.radius * shape.radius;
+    case "square":
+      return shape.side * shape.side;
+    case "rect":
+      return shape.width * shape.height;
   }
 }
 
@@ -175,9 +178,12 @@ console.log(area({ kind: "rect", width: 3, height: 5 }));
 `}
   solutionCode={`function area(shape: Shape): number {
   switch (shape.kind) {
-    case "circle": return Math.PI * shape.radius * shape.radius;
-    case "square": return shape.side * shape.side;
-    case "rect":   return shape.width * shape.height;
+    case "circle":
+      return Math.PI * shape.radius * shape.radius;
+    case "square":
+      return shape.side * shape.side;
+    case "rect":
+      return shape.width * shape.height;
   }
 }
 

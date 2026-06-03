@@ -34,16 +34,20 @@ import plotly.express as px
 df = pd.DataFrame({"product": ["A", "B"], "score": [98, 100]})
 
 # Honest: starts at 0
-fig1 = px.bar(df, x="product", y="score",
-              template="simple_white",
-              title="Honest baseline at 0")
+fig1 = px.bar(
+    df, x="product", y="score", template="simple_white", title="Honest baseline at 0"
+)
 fig1.show()
 
 # Misleading: truncated y-axis
-fig2 = px.bar(df, x="product", y="score",
-              template="simple_white",
-              title="Misleading: y truncated to make 2% look like 100%",
-              range_y=[97, 101])
+fig2 = px.bar(
+    df,
+    x="product",
+    y="score",
+    template="simple_white",
+    title="Misleading: y truncated to make 2% look like 100%",
+    range_y=[97, 101],
+)
 fig2.show()
 `}
 />

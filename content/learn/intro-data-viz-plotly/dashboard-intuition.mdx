@@ -105,12 +105,15 @@ import plotly.express as px
 
 # Fabricated sales data
 import numpy as np
+
 np.random.seed(42)
-df = pd.DataFrame({
-    "date": pd.date_range("2024-01-01", periods=180),
-    "region": np.random.choice(["North", "South", "East", "West"], 180),
-    "sales": np.random.gamma(shape=2, scale=1000, size=180),
-})
+df = pd.DataFrame(
+    {
+        "date": pd.date_range("2024-01-01", periods=180),
+        "region": np.random.choice(["North", "South", "East", "West"], 180),
+        "sales": np.random.gamma(shape=2, scale=1000, size=180),
+    }
+)
 
 # Headline: total sales (year-to-date)
 total = df["sales"].sum()
@@ -120,18 +123,30 @@ print()
 
 # Time series of daily sales
 ts = df.groupby("date", as_index=False)["sales"].sum()
-fig1 = px.line(ts, x="date", y="sales",
-               template="simple_white",
-               title="Daily total sales",
-               labels={"date": "Date", "sales": "Sales (USD)"})
+fig1 = px.line(
+    ts,
+    x="date",
+    y="sales",
+    template="simple_white",
+    title="Daily total sales",
+    labels={"date": "Date", "sales": "Sales (USD)"},
+)
 fig1.show()
 
 # Breakdown by region
-by_region = df.groupby("region", as_index=False)["sales"].sum().sort_values("sales", ascending=False)
-fig2 = px.bar(by_region, x="region", y="sales",
-              template="simple_white",
-              title="Total sales by region",
-              labels={"region": "Region", "sales": "Sales (USD)"})
+by_region = (
+    df.groupby("region", as_index=False)["sales"]
+    .sum()
+    .sort_values("sales", ascending=False)
+)
+fig2 = px.bar(
+    by_region,
+    x="region",
+    y="sales",
+    template="simple_white",
+    title="Total sales by region",
+    labels={"region": "Region", "sales": "Sales (USD)"},
+)
 fig2.show()
 `}
 />

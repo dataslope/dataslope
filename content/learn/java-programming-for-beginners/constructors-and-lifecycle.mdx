@@ -23,28 +23,26 @@ A constructor:
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Point p = new Point(3, 4);
-        System.out.println("p = (" + p.x() + ", " + p.y() + ")");
-        System.out.println("distance from origin = " + p.distanceFromOrigin());
-    }
+  public static void main(String[] args) {
+    Point p = new Point(3, 4);
+    System.out.println("p = (" + p.x() + ", " + p.y() + ")");
+    System.out.println("distance from origin = " + p.distanceFromOrigin());
+  }
 }
 
 class Point {
-    private final double x;
-    private final double y;
+  private final double x;
+  private final double y;
 
-    public Point(double x, double y) {     // constructor
-        this.x = x;
-        this.y = y;
-    }
+  public Point(double x, double y) { // constructor
+    this.x = x;
+    this.y = y;
+  }
 
-    public double x() { return x; }
-    public double y() { return y; }
+  public double x() { return x; }
+  public double y() { return y; }
 
-    public double distanceFromOrigin() {
-        return Math.sqrt(x * x + y * y);
-    }
+  public double distanceFromOrigin() { return Math.sqrt(x * x + y * y); }
 }
 `}
 />
@@ -80,29 +78,29 @@ constructor *and* a custom one, you have to declare both yourself.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Box b1 = new Box();          // default, sets size to 1
-        Box b2 = new Box(5);         // explicit size
-        System.out.println("b1.size = " + b1.size());
-        System.out.println("b2.size = " + b2.size());
-    }
+  public static void main(String[] args) {
+    Box b1 = new Box();  // default, sets size to 1
+    Box b2 = new Box(5); // explicit size
+    System.out.println("b1.size = " + b1.size());
+    System.out.println("b2.size = " + b2.size());
+  }
 }
 
 class Box {
-    private int size;
+  private int size;
 
-    public Box() {                   // no-arg constructor
-        this(1);                     // delegate to the int constructor
+  public Box() { // no-arg constructor
+    this(1);     // delegate to the int constructor
+  }
+
+  public Box(int size) {
+    if (size <= 0) {
+      throw new IllegalArgumentException("size must be positive");
     }
+    this.size = size;
+  }
 
-    public Box(int size) {
-        if (size <= 0) {
-            throw new IllegalArgumentException("size must be positive");
-        }
-        this.size = size;
-    }
-
-    public int size() { return size; }
+  public int size() { return size; }
 }
 `}
 />
@@ -121,29 +119,29 @@ object.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        try {
-            Person p = new Person("Ada", -5);
-        } catch (IllegalArgumentException e) {
-            System.out.println("rejected: " + e.getMessage());
-        }
+  public static void main(String[] args) {
+    try {
+      Person p = new Person("Ada", -5);
+    } catch (IllegalArgumentException e) {
+      System.out.println("rejected: " + e.getMessage());
     }
+  }
 }
 
 class Person {
-    private final String name;
-    private final int    age;
+  private final String name;
+  private final int age;
 
-    public Person(String name, int age) {
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("name is required");
-        }
-        if (age < 0 || age > 150) {
-            throw new IllegalArgumentException("age must be 0..150, got " + age);
-        }
-        this.name = name;
-        this.age  = age;
+  public Person(String name, int age) {
+    if (name == null || name.isEmpty()) {
+      throw new IllegalArgumentException("name is required");
     }
+    if (age < 0 || age > 150) {
+      throw new IllegalArgumentException("age must be 0..150, got " + age);
+    }
+    this.name = name;
+    this.age = age;
+  }
 }
 `}
 />

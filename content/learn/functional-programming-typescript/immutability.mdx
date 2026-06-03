@@ -43,7 +43,11 @@ The immutable version is unambiguous:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type User = { readonly id: string; readonly name: string; readonly age: number };
+  starterCode={`type User = {
+  readonly id: string;
+  readonly name: string;
+  readonly age: number;
+};
 
 function birthday(u: User): User {
   return { ...u, age: u.age + 1 };
@@ -52,7 +56,7 @@ function birthday(u: User): User {
 const alice: User = { id: "u1", name: "Alice", age: 29 };
 const olderAlice = birthday(alice);
 
-console.log("alice:     ", alice);     // unchanged
+console.log("alice:     ", alice); // unchanged
 console.log("olderAlice:", olderAlice); // new value
 `}
 />
@@ -108,7 +112,11 @@ Once you commit to immutability, you stop *changing* values and start
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type User = { readonly id: string; readonly name: string; readonly age: number };
+  starterCode={`type User = {
+  readonly id: string;
+  readonly name: string;
+  readonly age: number;
+};
 
 const alice: User = { id: "u1", name: "Alice", age: 29 };
 
@@ -162,12 +170,16 @@ altogether.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Todo = { readonly id: number; readonly text: string; readonly done: boolean };
+  starterCode={`type Todo = {
+  readonly id: number;
+  readonly text: string;
+  readonly done: boolean;
+};
 
 const todos: readonly Todo[] = [
-  { id: 1, text: "Buy milk",  done: false },
-  { id: 2, text: "Write FP",  done: false },
-  { id: 3, text: "Sleep",     done: false },
+  { id: 1, text: "Buy milk", done: false },
+  { id: 2, text: "Write FP", done: false },
+  { id: 3, text: "Sleep", done: false },
 ];
 
 // Mark id=2 as done — returns a NEW array
@@ -179,10 +191,13 @@ const updated: readonly Todo[] = todos.map((t) =>
 const remaining: readonly Todo[] = updated.filter((t) => t.id !== 1);
 
 // Add a new one — returns a NEW array
-const withNew: readonly Todo[] = [...remaining, { id: 4, text: "Refactor", done: false }];
+const withNew: readonly Todo[] = [
+  ...remaining,
+  { id: 4, text: "Refactor", done: false },
+];
 
-console.log(todos);     // unchanged
-console.log(withNew);   // new value
+console.log(todos); // unchanged
+console.log(withNew); // new value
 `}
 />
 
@@ -241,9 +256,11 @@ Consider an "undo" feature.
   starterCode={`type State = { readonly counter: number; readonly note: string };
 
 // Pure transformations
-const inc       = (s: State): State => ({ ...s, counter: s.counter + 1 });
-const dec       = (s: State): State => ({ ...s, counter: s.counter - 1 });
-const setNote   = (note: string) => (s: State): State => ({ ...s, note });
+const inc = (s: State): State => ({ ...s, counter: s.counter + 1 });
+const dec = (s: State): State => ({ ...s, counter: s.counter - 1 });
+const setNote =
+  (note: string) =>
+  (s: State): State => ({ ...s, note });
 
 // History is just an array of past states
 const initial: State = { counter: 0, note: "" };
@@ -287,13 +304,13 @@ A few sneaky ways mutation gets in even when you're "trying":
   starterCode={`// 1. Methods that mutate AND return a value (lying about purity)
 const xs = [3, 1, 2];
 const sorted = xs.sort(); // sort() mutates xs AND returns it
-console.log("xs:    ", xs);     // [1, 2, 3]  (mutated!)
+console.log("xs:    ", xs); // [1, 2, 3]  (mutated!)
 console.log("sorted:", sorted); // [1, 2, 3]
 
 // Fix: copy first
 const xs2 = [3, 1, 2];
 const sorted2 = [...xs2].sort();
-console.log("xs2:    ", xs2);    // unchanged
+console.log("xs2:    ", xs2); // unchanged
 console.log("sorted2:", sorted2);
 `}
 />
@@ -304,7 +321,7 @@ console.log("sorted2:", sorted2);
 const d = new Date(2024, 0, 1);
 const tomorrow = d;
 tomorrow.setDate(tomorrow.getDate() + 1);
-console.log("d:        ", d.toISOString());        // changed!
+console.log("d:        ", d.toISOString()); // changed!
 console.log("tomorrow: ", tomorrow.toISOString()); // same reference
 
 // Treat Date as a value: create a new one

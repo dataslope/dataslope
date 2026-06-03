@@ -148,23 +148,23 @@ return type, prefer the interface type over a specific class.
   starterCode={`import java.util.*;
 
 public class Main {
-    public static void main(String[] args) {
-        // BAD: locks the caller to ArrayList
-        ArrayList<String> bad = new ArrayList<>();
-        bad.add("one");
+  public static void main(String[] args) {
+    // BAD: locks the caller to ArrayList
+    ArrayList<String> bad = new ArrayList<>();
+    bad.add("one");
 
-        // GOOD: the variable is a List; the implementation could be swapped freely
-        List<String> good = new ArrayList<>();
-        good.add("two");
+    // GOOD: the variable is a List; the implementation could be swapped freely
+    List<String> good = new ArrayList<>();
+    good.add("two");
 
-        // The same method works for any List implementation:
-        report(good);
-        report(new LinkedList<>(Arrays.asList("three", "four")));
-    }
+    // The same method works for any List implementation:
+    report(good);
+    report(new LinkedList<>(Arrays.asList("three", "four")));
+  }
 
-    static void report(List<String> items) {
-        System.out.println(items.size() + " items: " + items);
-    }
+  static void report(List<String> items) {
+    System.out.println(items.size() + " items: " + items);
+  }
 }
 `}
 />

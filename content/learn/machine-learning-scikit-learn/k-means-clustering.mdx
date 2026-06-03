@@ -158,8 +158,15 @@ plt.figure(figsize=(6, 5))
 # Color every point by which cluster it was assigned to.
 plt.scatter(X[:, 0], X[:, 1], c=labels, cmap="viridis", s=25, alpha=0.7)
 # Mark the learned centers.
-plt.scatter(centers[:, 0], centers[:, 1],
-            c="red", s=250, marker="*", edgecolor="black", label="centers")
+plt.scatter(
+    centers[:, 0],
+    centers[:, 1],
+    c="red",
+    s=250,
+    marker="*",
+    edgecolor="black",
+    label="centers",
+)
 plt.title("K-means found 4 clusters")
 plt.xlabel("feature 1")
 plt.ylabel("feature 2")
@@ -201,11 +208,14 @@ X, _ = make_blobs(n_samples=300, centers=4, cluster_std=0.70, random_state=0)
 # n_init=10 keeps the best of 10 starts.
 # We try several seeds and watch how much the final inertia varies.
 for n in [1, 10]:
-    inertias = [KMeans(n_clusters=4, n_init=n, random_state=s).fit(X).inertia_
-                for s in range(5)]
-    print(f"n_init={n:2d}  inertia across 5 seeds: "
-          f"min={min(inertias):.1f}  max={max(inertias):.1f}  "
-          f"spread={max(inertias) - min(inertias):.1f}")
+    inertias = [
+        KMeans(n_clusters=4, n_init=n, random_state=s).fit(X).inertia_ for s in range(5)
+    ]
+    print(
+        f"n_init={n:2d}  inertia across 5 seeds: "
+        f"min={min(inertias):.1f}  max={max(inertias):.1f}  "
+        f"spread={max(inertias) - min(inertias):.1f}"
+    )
 `}
 />
 
@@ -324,8 +334,16 @@ from sklearn.preprocessing import StandardScaler
 # Two features on wildly different scales:
 # age in years, income in dollars. Three obvious groups by BOTH features.
 rng = np.random.default_rng(0)
-age = np.concatenate([rng.normal(25, 3, 50), rng.normal(45, 3, 50), rng.normal(65, 3, 50)])
-income = np.concatenate([rng.normal(30000, 4000, 50), rng.normal(80000, 4000, 50), rng.normal(50000, 4000, 50)])
+age = np.concatenate(
+    [rng.normal(25, 3, 50), rng.normal(45, 3, 50), rng.normal(65, 3, 50)]
+)
+income = np.concatenate(
+    [
+        rng.normal(30000, 4000, 50),
+        rng.normal(80000, 4000, 50),
+        rng.normal(50000, 4000, 50),
+    ]
+)
 X = np.column_stack([age, income])
 
 # Cluster on the RAW features: income (huge numbers) dominates distance.
@@ -335,13 +353,19 @@ raw_labels = KMeans(n_clusters=3, n_init=10, random_state=0).fit_predict(X)
 X_scaled = StandardScaler().fit_transform(X)
 scaled_labels = KMeans(n_clusters=3, n_init=10, random_state=0).fit_predict(X_scaled)
 
+
 # How much does each clustering depend on age vs income? Look at how
 # spread-out the age values are within each found cluster.
 def mean_age_spread(labels):
     return np.mean([age[labels == c].std() for c in np.unique(labels)])
 
-print(f"Avg age spread within clusters, RAW features:    {mean_age_spread(raw_labels):.1f} years")
-print(f"Avg age spread within clusters, SCALED features: {mean_age_spread(scaled_labels):.1f} years")
+
+print(
+    f"Avg age spread within clusters, RAW features:    {mean_age_spread(raw_labels):.1f} years"
+)
+print(
+    f"Avg age spread within clusters, SCALED features: {mean_age_spread(scaled_labels):.1f} years"
+)
 print("Smaller age spread = age actually influenced the clustering.")
 `}
 />

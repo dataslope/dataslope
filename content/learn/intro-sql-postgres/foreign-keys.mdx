@@ -73,12 +73,21 @@ CREATE TABLE orders (
 );
 INSERT INTO customers (name) VALUES ('Ada'), ('Grace');`}
   starterCode={`-- Customer 1 (Ada) exists, so this is fine:
-INSERT INTO orders (customer_id, amount) VALUES (1, 42);
+INSERT INTO
+  orders (customer_id, amount)
+VALUES
+  (1, 42);
 
 -- Customer 99 does NOT exist; the foreign key blocks this:
-INSERT INTO orders (customer_id, amount) VALUES (99, 17);
+INSERT INTO
+  orders (customer_id, amount)
+VALUES
+  (99, 17);
 
-SELECT * FROM orders;`}
+SELECT
+  *
+FROM
+  orders;`}
 />
 
 The phrase `REFERENCES customers(id)` is what declares the foreign

@@ -13,12 +13,20 @@ engine compiled to WebAssembly, served from jsDelivr at first use.
   title="Find numbers divisible by 7"
   instructions={`Using DuckDB's \`range\` function, return every integer from 1 to 100 that is divisible by 7. The single column should be named \`n\`, sorted ascending.`}
   starterCode={`-- DuckDB's range(start, stop) is exclusive of stop.
-SELECT i AS n
-FROM range(1, 101) t(i)
--- your filter and ordering here
-;
-`}
-  solutionSql={`SELECT i AS n FROM range(1, 101) t(i) WHERE i % 7 = 0 ORDER BY i ASC;`}
+SELECT
+  i AS n
+FROM
+  range(1, 101) t (i)
+  -- your filter and ordering here
+;`}
+  solutionSql={`SELECT
+  i AS n
+FROM
+  range(1, 101) t (i)
+WHERE
+  i % 7 = 0
+ORDER BY
+  i ASC;`}
   tests={[
     {
       id: "count",
@@ -42,12 +50,20 @@ FROM range(1, 101) t(i)
   title="Find numbers divisible by 7"
   instructions={`Using DuckDB's \`range\` function, return every integer from 1 to 100 that is divisible by 7. The single column should be named \`n\`, sorted ascending.`}
   starterCode={`-- DuckDB's range(start, stop) is exclusive of stop.
-SELECT i AS n
-FROM range(1, 101) t(i)
--- your filter and ordering here
-;
-`}
-  solutionSql={`SELECT i AS n FROM range(1, 101) t(i) WHERE i % 7 = 0 ORDER BY i ASC;`}
+SELECT
+  i AS n
+FROM
+  range(1, 101) t (i)
+  -- your filter and ordering here
+;`}
+  solutionSql={`SELECT
+  i AS n
+FROM
+  range(1, 101) t (i)
+WHERE
+  i % 7 = 0
+ORDER BY
+  i ASC;`}
   tests={[
     {
       id: "count",
@@ -84,16 +100,26 @@ FROM range(1, 9) t(d);`}
   revenue,
   -- your window expression here
   0 AS running_total
-FROM sales
-ORDER BY region, sale_date;
-`}
+FROM
+  sales
+ORDER BY
+  region,
+  sale_date;`}
   solutionSql={`SELECT
   sale_date,
   region,
   revenue,
-  SUM(revenue) OVER (PARTITION BY region ORDER BY sale_date) AS running_total
-FROM sales
-ORDER BY region, sale_date;`}
+  SUM(revenue) OVER (
+    PARTITION BY
+      region
+    ORDER BY
+      sale_date
+  ) AS running_total
+FROM
+  sales
+ORDER BY
+  region,
+  sale_date;`}
   tests={[
     {
       id: "row_count",
@@ -134,16 +160,26 @@ FROM range(1, 9) t(d);`}
   revenue,
   -- your window expression here
   0 AS running_total
-FROM sales
-ORDER BY region, sale_date;
-`}
+FROM
+  sales
+ORDER BY
+  region,
+  sale_date;`}
   solutionSql={`SELECT
   sale_date,
   region,
   revenue,
-  SUM(revenue) OVER (PARTITION BY region ORDER BY sale_date) AS running_total
-FROM sales
-ORDER BY region, sale_date;`}
+  SUM(revenue) OVER (
+    PARTITION BY
+      region
+    ORDER BY
+      sale_date
+  ) AS running_total
+FROM
+  sales
+ORDER BY
+  region,
+  sale_date;`}
   tests={[
     {
       id: "row_count",
@@ -186,16 +222,23 @@ INSERT INTO movies VALUES
   (5, 'E', 2, 7.9),
   (6, 'F', 3, 6.5),
   (7, 'G', 3, 7.2);`}
-  starterCode={`SELECT g.name AS genre, ROUND(AVG(m.rating), 1) AS avg_rating
-FROM movies m
--- your JOIN, GROUP BY, ORDER BY here
-;
-`}
-  solutionSql={`SELECT g.name AS genre, ROUND(AVG(m.rating), 1) AS avg_rating
-FROM movies m
-JOIN genres g ON g.id = m.genre_id
-GROUP BY g.name
-ORDER BY avg_rating DESC;`}
+  starterCode={`SELECT
+  g.name AS genre,
+  ROUND(AVG(m.rating), 1) AS avg_rating
+FROM
+  movies m
+  -- your JOIN, GROUP BY, ORDER BY here
+;`}
+  solutionSql={`SELECT
+  g.name AS genre,
+  ROUND(AVG(m.rating), 1) AS avg_rating
+FROM
+  movies m
+  JOIN genres g ON g.id = m.genre_id
+GROUP BY
+  g.name
+ORDER BY
+  avg_rating DESC;`}
   tests={[
     {
       id: "three_genres",
@@ -230,16 +273,23 @@ INSERT INTO movies VALUES
   (5, 'E', 2, 7.9),
   (6, 'F', 3, 6.5),
   (7, 'G', 3, 7.2);`}
-  starterCode={`SELECT g.name AS genre, ROUND(AVG(m.rating), 1) AS avg_rating
-FROM movies m
--- your JOIN, GROUP BY, ORDER BY here
-;
-`}
-  solutionSql={`SELECT g.name AS genre, ROUND(AVG(m.rating), 1) AS avg_rating
-FROM movies m
-JOIN genres g ON g.id = m.genre_id
-GROUP BY g.name
-ORDER BY avg_rating DESC;`}
+  starterCode={`SELECT
+  g.name AS genre,
+  ROUND(AVG(m.rating), 1) AS avg_rating
+FROM
+  movies m
+  -- your JOIN, GROUP BY, ORDER BY here
+;`}
+  solutionSql={`SELECT
+  g.name AS genre,
+  ROUND(AVG(m.rating), 1) AS avg_rating
+FROM
+  movies m
+  JOIN genres g ON g.id = m.genre_id
+GROUP BY
+  g.name
+ORDER BY
+  avg_rating DESC;`}
   tests={[
     {
       id: "three_genres",
@@ -277,11 +327,21 @@ SELECT
   (i * 37 % 100) AS score
 FROM range(1, 10001) t(i);
 `}
-  starterCode={`SELECT * FROM big LIMIT 5;`}
-  solutionSql={`SELECT (score / 10) * 10 AS bucket, COUNT(*) AS n
-FROM big
-GROUP BY bucket
-ORDER BY bucket;`}
+  starterCode={`SELECT
+  *
+FROM
+  big
+LIMIT
+  5;`}
+  solutionSql={`SELECT
+  (score / 10) * 10 AS bucket,
+  COUNT(*) AS n
+FROM
+  big
+GROUP BY
+  bucket
+ORDER BY
+  bucket;`}
   tests={[
     {
       id: "row_count",
@@ -309,9 +369,21 @@ ORDER BY bucket;`}
 SELECT i AS id, ('user_' || i) AS name, (i * 37 % 100) AS score
 FROM range(1, 10001) t(i);
 `}
-  starterCode={`SELECT * FROM big LIMIT 5;`}
-  solutionSql={`SELECT (score / 10) * 10 AS bucket, COUNT(*) AS n
-FROM big GROUP BY bucket ORDER BY bucket;`}
+  starterCode={`SELECT
+  *
+FROM
+  big
+LIMIT
+  5;`}
+  solutionSql={`SELECT
+  (score / 10) * 10 AS bucket,
+  COUNT(*) AS n
+FROM
+  big
+GROUP BY
+  bucket
+ORDER BY
+  bucket;`}
   tests={[
     { id: "row_count", name: "10 buckets", expectedRowCount: 10 },
     { id: "matches", matchesSolution: true, ordered: true },

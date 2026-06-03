@@ -65,7 +65,7 @@ across calls, without exposing it to the outside world.
 <CodeBlock
   adapter="javascript"
   starterCode={`function makeCounter() {
-  let count = 0;            // private — no one else can see it directly
+  let count = 0; // private — no one else can see it directly
   return function () {
     count = count + 1;
     return count;
@@ -73,13 +73,13 @@ across calls, without exposing it to the outside world.
 }
 
 const tick = makeCounter();
-console.log(tick());   // 1
-console.log(tick());   // 2
-console.log(tick());   // 3
+console.log(tick()); // 1
+console.log(tick()); // 2
+console.log(tick()); // 3
 
 const tock = makeCounter();
-console.log(tock());   // 1 — independent counter
-console.log(tick());   // 4 — tick keeps going
+console.log(tock()); // 1 — independent counter
+console.log(tick()); // 4 — tick keeps going
 `}
 />
 
@@ -114,11 +114,11 @@ for (let i = 0; i < 5; i++) {
   });
 }
 
-console.log(fs[0]());   // 0
-console.log(fs[1]());   // 1
-console.log(fs[2]());   // 2
-console.log(fs[3]());   // 3
-console.log(fs[4]());   // 4
+console.log(fs[0]()); // 0
+console.log(fs[1]()); // 1
+console.log(fs[2]()); // 2
+console.log(fs[3]()); // 3
+console.log(fs[4]()); // 4
 `}
 />
 
@@ -139,11 +139,11 @@ for (var i = 0; i < 5; i++) {
   });
 }
 
-console.log(fs[0]());   // 5  (!)
-console.log(fs[1]());   // 5
-console.log(fs[2]());   // 5
-console.log(fs[3]());   // 5
-console.log(fs[4]());   // 5
+console.log(fs[0]()); // 5  (!)
+console.log(fs[1]()); // 5
+console.log(fs[2]()); // 5
+console.log(fs[3]()); // 5
+console.log(fs[4]()); // 5
 `}
 />
 
@@ -170,12 +170,12 @@ Closures are how JavaScript expresses many practical patterns.
   };
 }
 
-const addUKTax = makeTaxCalculator(0.20);
+const addUKTax = makeTaxCalculator(0.2);
 const addUSCal = makeTaxCalculator(0.0725);
 
-console.log(addUKTax(100));      // 120
-console.log(addUSCal(100));      // 107.25
-console.log(addUKTax(50));       // 60
+console.log(addUKTax(100)); // 120
+console.log(addUSCal(100)); // 107.25
+console.log(addUKTax(50)); // 60
 `}
 />
 
@@ -207,11 +207,11 @@ function slowSquare(n) {
 
 const fastSquare = memoize(slowSquare);
 
-console.log(fastSquare(4));   // computes
-console.log(fastSquare(4));   // cache hit
-console.log(fastSquare(5));   // computes
-console.log(fastSquare(5));   // cache hit
-console.log(fastSquare(4));   // cache hit
+console.log(fastSquare(4)); // computes
+console.log(fastSquare(4)); // cache hit
+console.log(fastSquare(5)); // computes
+console.log(fastSquare(5)); // cache hit
+console.log(fastSquare(4)); // cache hit
 `}
 />
 
@@ -228,19 +228,25 @@ pre-2015 JavaScript used closures explicitly:
 <CodeBlock
   adapter="javascript"
   starterCode={`const counterModule = (function () {
-  let count = 0;            // private state
-  function increment() { count += 1; }
-  function value() { return count; }
-  function reset() { count = 0; }
+  let count = 0; // private state
+  function increment() {
+    count += 1;
+  }
+  function value() {
+    return count;
+  }
+  function reset() {
+    count = 0;
+  }
   return { increment, value, reset };
 })();
 
 counterModule.increment();
 counterModule.increment();
 counterModule.increment();
-console.log(counterModule.value());   // 3
+console.log(counterModule.value()); // 3
 counterModule.reset();
-console.log(counterModule.value());   // 0
+console.log(counterModule.value()); // 0
 // counterModule.count       // undefined — count is private!
 `}
 />
@@ -329,25 +335,39 @@ The starting value of the counter is the \`start\` argument (default \`0\`). Eac
   starterCode={`function makeCounter(start = 0) {
   // your code here — keep \`count\` private via closure.
   return {
-    increment() { return 0; },
-    decrement() { return 0; },
-    value()     { return 0; },
+    increment() {
+      return 0;
+    },
+    decrement() {
+      return 0;
+    },
+    value() {
+      return 0;
+    },
   };
 }
 
 const c = makeCounter(10);
-console.log(c.value());      // 10
-console.log(c.increment());  // 11
-console.log(c.increment());  // 12
-console.log(c.decrement());  // 11
-console.log(c.value());      // 11
+console.log(c.value()); // 10
+console.log(c.increment()); // 11
+console.log(c.increment()); // 12
+console.log(c.decrement()); // 11
+console.log(c.value()); // 11
 `}
   solutionCode={`function makeCounter(start = 0) {
   let count = start;
   return {
-    increment() { count += 1; return count; },
-    decrement() { count -= 1; return count; },
-    value()     { return count; },
+    increment() {
+      count += 1;
+      return count;
+    },
+    decrement() {
+      count -= 1;
+      return count;
+    },
+    value() {
+      return count;
+    },
   };
 }
 

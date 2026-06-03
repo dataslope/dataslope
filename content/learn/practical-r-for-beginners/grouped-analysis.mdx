@@ -87,7 +87,7 @@ Group by more than one column to get all combinations:
 data(mtcars)
 
 mtcars |>
-  group_by(cyl, am) |>      # am = transmission (0 = auto, 1 = manual)
+  group_by(cyl, am) |> # am = transmission (0 = auto, 1 = manual)
   summarise(
     n       = n(),
     avg_mpg = mean(mpg),

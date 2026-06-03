@@ -51,13 +51,11 @@ crash. Read it from **top to bottom**.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        printLength(null);
-    }
+  public static void main(String[] args) { printLength(null); }
 
-    static void printLength(String s) {
-        System.out.println("length is " + s.length());
-    }
+  static void printLength(String s) {
+    System.out.println("length is " + s.length());
+  }
 }
 `}
 />
@@ -91,22 +89,22 @@ most-used debugging technique in the world is **printing values**.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        int[] xs = { 4, 9, 1, 7, 2 };
-        int max = findMax(xs);
-        System.out.println("max = " + max);
-    }
+  public static void main(String[] args) {
+    int[] xs = {4, 9, 1, 7, 2};
+    int max = findMax(xs);
+    System.out.println("max = " + max);
+  }
 
-    static int findMax(int[] xs) {
-        int max = xs[0];
-        for (int i = 0; i < xs.length; i++) {
-            System.out.println("DBG i=" + i + " xs[i]=" + xs[i] + " max=" + max);
-            if (xs[i] > max) {
-                max = xs[i];
-            }
-        }
-        return max;
+  static int findMax(int[] xs) {
+    int max = xs[0];
+    for (int i = 0; i < xs.length; i++) {
+      System.out.println("DBG i=" + i + " xs[i]=" + xs[i] + " max=" + max);
+      if (xs[i] > max) {
+        max = xs[i];
+      }
     }
+    return max;
+  }
 }
 `}
 />
@@ -202,22 +200,22 @@ see what really happens.
   starterCode={`import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<Integer> data = List.of(1, 2, 3, 4, 5, 6);
-        int s = sumEvens(data);
-        System.out.println("sum = " + s);
-    }
+  public static void main(String[] args) {
+    List<Integer> data = List.of(1, 2, 3, 4, 5, 6);
+    int s = sumEvens(data);
+    System.out.println("sum = " + s);
+  }
 
-    static int sumEvens(List<Integer> xs) {
-        int total = 0;
-        for (int x : xs) {
-            System.out.println("DBG x=" + x + " x%2=" + (x % 2));
-            if (x % 2 == 1) {           // ← BUG: this is odd, not even
-                total += x;
-            }
-        }
-        return total;
+  static int sumEvens(List<Integer> xs) {
+    int total = 0;
+    for (int x : xs) {
+      System.out.println("DBG x=" + x + " x%2=" + (x % 2));
+      if (x % 2 == 1) { // ← BUG: this is odd, not even
+        total += x;
+      }
     }
+    return total;
+  }
 }
 `}
 />

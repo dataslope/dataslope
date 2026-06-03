@@ -121,7 +121,7 @@ random_sample = rng.choice(population, size=500, replace=False)
 # --- A CONVENIENCE SAMPLE of 500 ---
 # Suppose the people easiest to reach are happier customers: we
 # preferentially draw from the high-satisfaction end of the population.
-weights = (population > 75).astype(float) + 0.1   # happy folks ~10x likelier
+weights = (population > 75).astype(float) + 0.1  # happy folks ~10x likelier
 weights /= weights.sum()
 convenience_sample = rng.choice(population, size=500, replace=False, p=weights)
 
@@ -171,11 +171,19 @@ for n in sizes:
     rows.append({"n": n, "estimate": conv, "method": "convenience"})
 
 import pandas as pd
+
 df = pd.DataFrame(rows)
 
-fig = px.line(df, x="n", y="estimate", color="method", markers=True, log_x=True,
-              title="More data fixes noise, not bias",
-              labels={"n": "Sample size n (log scale)", "estimate": "Estimated mean"})
+fig = px.line(
+    df,
+    x="n",
+    y="estimate",
+    color="method",
+    markers=True,
+    log_x=True,
+    title="More data fixes noise, not bias",
+    labels={"n": "Sample size n (log scale)", "estimate": "Estimated mean"},
+)
 fig.add_hline(y=true_mean, line_dash="dash", annotation_text="true mean")
 fig.show()
 
@@ -246,6 +254,7 @@ true_mean = population.mean()
 weights = (population > 75).astype(float) + 0.1
 weights /= weights.sum()
 
+
 # Repeat each sampling method MANY times to see its CENTER and SPREAD.
 def repeat(method, n, reps=400):
     out = []
@@ -256,14 +265,19 @@ def repeat(method, n, reps=400):
             out.append(rng.choice(population, size=n, replace=False, p=weights).mean())
     return np.array(out)
 
+
 for n in [200, 5000]:
     r = repeat("random", n)
     c = repeat("convenience", n)
     print(f"n = {n}")
-    print(f"  random:      center={r.mean():.2f}  spread={r.std():.2f}  "
-          f"bias={r.mean()-true_mean:+.2f}")
-    print(f"  convenience: center={c.mean():.2f}  spread={c.std():.2f}  "
-          f"bias={c.mean()-true_mean:+.2f}")
+    print(
+        f"  random:      center={r.mean():.2f}  spread={r.std():.2f}  "
+        f"bias={r.mean() - true_mean:+.2f}"
+    )
+    print(
+        f"  convenience: center={c.mean():.2f}  spread={c.std():.2f}  "
+        f"bias={c.mean() - true_mean:+.2f}"
+    )
     print()
 
 print(f"true mean = {true_mean:.2f}")
@@ -368,7 +382,7 @@ interviewed. Any time your dataset is "the ones still here," ask what the
 rng = np.random.default_rng(3)
 
 # 5000 mutual funds. True average annual return across ALL of them:
-returns = rng.normal(loc=6.0, scale=8.0, size=5000)   # percent
+returns = rng.normal(loc=6.0, scale=8.0, size=5000)  # percent
 true_avg = returns.mean()
 
 # Reality: funds with poor returns get shut down and vanish from the database.
@@ -378,7 +392,9 @@ survivor_avg = survivors.mean()
 
 print(f"True average across ALL 5000 funds:        {true_avg:5.2f}%")
 print(f"Average across SURVIVING funds only:        {survivor_avg:5.2f}%")
-print(f"Survivorship inflation:                     {survivor_avg - true_avg:+.2f} points")
+print(
+    f"Survivorship inflation:                     {survivor_avg - true_avg:+.2f} points"
+)
 print()
 print(f"Funds that 'disappeared' from the data: {5000 - len(survivors)}")
 print("The database looks better than reality because the losers are gone.")
@@ -448,14 +464,15 @@ result = {
   solutionCode={`n = 800
 reps = 300
 
-random_means = np.array([
-    rng.choice(population, size=n, replace=False).mean()
-    for _ in range(reps)
-])
-conv_means = np.array([
-    rng.choice(population, size=n, replace=False, p=conv_weights).mean()
-    for _ in range(reps)
-])
+random_means = np.array(
+    [rng.choice(population, size=n, replace=False).mean() for _ in range(reps)]
+)
+conv_means = np.array(
+    [
+        rng.choice(population, size=n, replace=False, p=conv_weights).mean()
+        for _ in range(reps)
+    ]
+)
 
 result = {
     "random_bias": float(random_means.mean() - true_mean),
@@ -550,8 +567,10 @@ for name, grp in pop.groupby("region"):
 
 strat_estimate = float(np.mean(sampled_spend))
 abs_error = float(abs(strat_estimate - true_mean))
-print(f"stratified estimate = {strat_estimate:.2f}, true = {true_mean:.2f}, "
-      f"abs error = {abs_error:.2f}")
+print(
+    f"stratified estimate = {strat_estimate:.2f}, true = {true_mean:.2f}, "
+    f"abs error = {abs_error:.2f}"
+)
 `}
   tests={[
     {

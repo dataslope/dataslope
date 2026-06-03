@@ -20,26 +20,19 @@ The same query, three ways.
   starterCode={`using System;
 using System.Linq;
 
-var people = new[]
-{
-    new { Name = "Ada",   Age = 36, City = "London" },
+var people = new[] {
+    new { Name = "Ada", Age = 36, City = "London" },
     new { Name = "Linus", Age = 54, City = "Helsinki" },
     new { Name = "Grace", Age = 85, City = "New York" },
     new { Name = "Guido", Age = 67, City = "Amsterdam" },
 };
 
 // 1. Method syntax (fluent)
-var a = people
-    .Where(p => p.Age > 40)
-    .OrderBy(p => p.Name)
-    .Select(p => p.Name);
+var a = people.Where(p => p.Age > 40).OrderBy(p => p.Name).Select(p => p.Name);
 
 // 2. Query syntax (SQL-like)
-var b =
-    from p in people
-    where p.Age > 40
-    orderby p.Name
-    select p.Name;
+var b = from p in people
+    where p.Age> 40 orderby p.Name select p.Name;
 
 // 3. Mixed
 var c = (from p in people where p.Age > 40 select p)
@@ -116,14 +109,11 @@ using System.Linq;
 
 var words = new[] { "functional", "linq", "imperative", "lazy" };
 
-var withLengths =
-    from w in words
-    let len = w.Length
-    where len > 4
-    orderby len descending, w
-    select $"{w} ({len})";
+var withLengths = from w in words let len = w.Length
+    where len> 4 orderby len descending, w select $"{w} ({len})";
 
-foreach (var line in withLengths) Console.WriteLine(line);
+foreach (var line in withLengths)
+    Console.WriteLine(line);
 `}
 />
 

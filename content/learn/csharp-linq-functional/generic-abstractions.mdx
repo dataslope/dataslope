@@ -57,7 +57,8 @@ public static class MyOps
         bool keep = true;
         foreach (var x in source)
         {
-            if (keep) yield return x;
+            if (keep)
+                yield return x;
             keep = !keep;
         }
     }
@@ -87,16 +88,17 @@ public static class Mini
 {
     public static IEnumerable<T> MyWhere<T>(this IEnumerable<T> source, Func<T, bool> predicate)
     {
-        if (source is null) throw new ArgumentNullException(nameof(source));
-        if (predicate is null) throw new ArgumentNullException(nameof(predicate));
+        if (source is null)
+            throw new ArgumentNullException(nameof(source));
+        if (predicate is null)
+            throw new ArgumentNullException(nameof(predicate));
 
         foreach (var x in source)
             if (predicate(x))
                 yield return x;
     }
 
-    public static IEnumerable<TResult> MySelect<T, TResult>(
-        this IEnumerable<T> source, Func<T, TResult> selector)
+    public static IEnumerable<TResult> MySelect<T, TResult>(this IEnumerable<T> source, Func<T, TResult> selector)
     {
         foreach (var x in source)
             yield return selector(x);
@@ -105,7 +107,7 @@ public static class Mini
 
 var nums = Enumerable.Range(1, 8);
 var result = nums.MyWhere(n => n % 2 == 0).MySelect(n => n * n);
-Console.WriteLine(string.Join(",", result));   // 4,16,36,64
+Console.WriteLine(string.Join(",", result)); // 4,16,36,64
 `}
 />
 
@@ -144,15 +146,19 @@ public static class Stats
         T best = fallback;
         foreach (var x in source)
         {
-            if (!seen || x.CompareTo(best) > 0) { best = x; seen = true; }
+            if (!seen || x.CompareTo(best) > 0)
+            {
+                best = x;
+                seen = true;
+            }
         }
         return best;
     }
 }
 
-Console.WriteLine(new[] { 3, 1, 4, 1, 5, 9, 2 }.MaxOrDefault(-1));         // 9
+Console.WriteLine(new[] { 3, 1, 4, 1, 5, 9, 2 }.MaxOrDefault(-1));        // 9
 Console.WriteLine(new[] { "pear", "apple", "kiwi" }.MaxOrDefault("zzz")); // pear
-Console.WriteLine(System.Linq.Enumerable.Empty<int>().MaxOrDefault(-1));   // -1
+Console.WriteLine(System.Linq.Enumerable.Empty<int>().MaxOrDefault(-1));  // -1
 `}
 />
 

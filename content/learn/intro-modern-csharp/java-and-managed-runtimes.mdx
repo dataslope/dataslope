@@ -160,7 +160,8 @@ using System.Collections.Generic;
 void MakeAndForget()
 {
     var big = new List<int>();
-    for (int i = 0; i < 1_000_000; i++) big.Add(i);
+    for (int i = 0; i < 1_000_000; i++)
+        big.Add(i);
     Console.WriteLine($"created a list with {big.Count} ints");
     // We return without doing anything — no cleanup.
     // The .NET runtime will reclaim 'big' later, automatically.

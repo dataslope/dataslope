@@ -24,10 +24,16 @@ SELECT
   ['West','East','North'][(i % 3) + 1] AS region,
   (i * 37) % 500 + 10            AS amount
 FROM range(1, 201) t(i);`}
-  starterCode={`SELECT id, region, amount
-FROM orders
-ORDER BY amount DESC
-LIMIT 5;`}
+  starterCode={`SELECT
+  id,
+  region,
+  amount
+FROM
+  orders
+ORDER BY
+  amount DESC
+LIMIT
+  5;`}
 />
 
 Flip `DESC` to `ASC` (or drop it — ascending is the default) to find the
@@ -49,9 +55,15 @@ SELECT
   ['West','East','North'][(i % 3) + 1] AS region,
   (i * 37) % 500 + 10            AS amount
 FROM range(1, 31) t(i);`}
-  starterCode={`SELECT region, id, amount
-FROM orders
-ORDER BY region ASC, amount DESC;`}
+  starterCode={`SELECT
+  region,
+  id,
+  amount
+FROM
+  orders
+ORDER BY
+  region ASC,
+  amount DESC;`}
 />
 
 Read it as "group the eye by region, and within each, descend by amount."
@@ -76,8 +88,12 @@ INSERT INTO snacks VALUES
   starterCode={`SELECT
   name,
   ROUND(price / grams, 4) AS price_per_gram
-FROM snacks
-ORDER BY price_per_gram ASC;   -- cheapest per gram first`}
+FROM
+  snacks
+ORDER BY
+  price_per_gram ASC;
+
+-- cheapest per gram first`}
 />
 
 ## Be careful: `NULL`s and ties
@@ -117,13 +133,22 @@ SELECT
   ['West','East','North'][(i % 3) + 1] AS region,
   (i * 37) % 500 + 10            AS amount
 FROM range(1, 31) t(i);`}
-  starterCode={`SELECT region, id, amount
-FROM orders
-QUALIFY ROW_NUMBER() OVER (
-          PARTITION BY region
-          ORDER BY amount DESC
-        ) <= 2
-ORDER BY region, amount DESC;`}
+  starterCode={`SELECT
+  region,
+  id,
+  amount
+FROM
+  orders
+QUALIFY
+  ROW_NUMBER() OVER (
+    PARTITION BY
+      region
+    ORDER BY
+      amount DESC
+  ) <= 2
+ORDER BY
+  region,
+  amount DESC;`}
 />
 
 Do not worry about the `OVER (...)` mechanics yet — the Window Functions

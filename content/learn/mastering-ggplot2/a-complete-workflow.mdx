@@ -62,7 +62,7 @@ grammar offers **facets** as the next move.
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(alpha = 0.5) +
   geom_smooth(method = "lm", se = FALSE) +
-  facet_wrap(~ drv)
+  facet_wrap(~drv)
 `}
 />
 
@@ -95,7 +95,7 @@ labels, a deliberate color scale, and a clean theme:
 ggplot(mpg, aes(displ, hwy, color = drv)) +
   geom_point(alpha = 0.5) +
   geom_smooth(method = "lm", se = FALSE) +
-  facet_wrap(~ drv) +
+  facet_wrap(~drv) +
   scale_color_brewer(palette = "Dark2") +
   labs(
     title    = "Front-wheel-drive cars are the most fuel-efficient",

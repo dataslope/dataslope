@@ -23,16 +23,16 @@ Once you have these two in your toolbox, a huge fraction of
 import java.util.Set;
 
 public class Main {
-    public static void main(String[] args) {
-        Set<String> seen = new HashSet<>();
-        seen.add("Ada");
-        seen.add("Grace");
-        seen.add("Ada");                  // duplicate — ignored
+  public static void main(String[] args) {
+    Set<String> seen = new HashSet<>();
+    seen.add("Ada");
+    seen.add("Grace");
+    seen.add("Ada"); // duplicate — ignored
 
-        System.out.println("size = " + seen.size());
-        System.out.println("contains Ada? " + seen.contains("Ada"));
-        System.out.println("contains Linus? " + seen.contains("Linus"));
-    }
+    System.out.println("size = " + seen.size());
+    System.out.println("contains Ada? " + seen.contains("Ada"));
+    System.out.println("contains Linus? " + seen.contains("Linus"));
+  }
 }
 `}
 />
@@ -56,27 +56,27 @@ Use a `Set` when you need to ask "have I seen this before?" or
 import java.util.Map;
 
 public class Main {
-    public static void main(String[] args) {
-        Map<String, Integer> agesByName = new HashMap<>();
-        agesByName.put("Ada", 36);
-        agesByName.put("Grace", 85);
-        agesByName.put("Linus", 54);
+  public static void main(String[] args) {
+    Map<String, Integer> agesByName = new HashMap<>();
+    agesByName.put("Ada", 36);
+    agesByName.put("Grace", 85);
+    agesByName.put("Linus", 54);
 
-        System.out.println("Ada is " + agesByName.get("Ada"));
+    System.out.println("Ada is " + agesByName.get("Ada"));
 
-        // .get returns null for unknown keys
-        Integer maybe = agesByName.get("Unknown");
-        System.out.println("Unknown -> " + maybe);
+    // .get returns null for unknown keys
+    Integer maybe = agesByName.get("Unknown");
+    System.out.println("Unknown -> " + maybe);
 
-        // safer alternative: a default
-        int age = agesByName.getOrDefault("Unknown", -1);
-        System.out.println("with default -> " + age);
+    // safer alternative: a default
+    int age = agesByName.getOrDefault("Unknown", -1);
+    System.out.println("with default -> " + age);
 
-        // iterate
-        for (Map.Entry<String, Integer> entry : agesByName.entrySet()) {
-            System.out.println(entry.getKey() + " = " + entry.getValue());
-        }
+    // iterate
+    for (Map.Entry<String, Integer> entry : agesByName.entrySet()) {
+      System.out.println(entry.getKey() + " = " + entry.getValue());
     }
+  }
 }
 `}
 />

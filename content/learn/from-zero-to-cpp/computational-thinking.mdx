@@ -70,18 +70,24 @@ Here is a pre-pattern-recognition version of a simple program:
   starterCode={`#include <iostream>
 
 int main() {
-    int a = 5, b = 10, c = 3;
+  int a = 5, b = 10, c = 3;
 
-    // distance from average for each value (clunky version)
-    double avg = (a + b + c) / 3.0;
-    double da = a - avg; if (da < 0) da = -da;
-    double db = b - avg; if (db < 0) db = -db;
-    double dc = c - avg; if (dc < 0) dc = -dc;
+  // distance from average for each value (clunky version)
+  double avg = (a + b + c) / 3.0;
+  double da = a - avg;
+  if (da < 0)
+    da = -da;
+  double db = b - avg;
+  if (db < 0)
+    db = -db;
+  double dc = c - avg;
+  if (dc < 0)
+    dc = -dc;
 
-    std::cout << "a deviation: " << da << "\\n";
-    std::cout << "b deviation: " << db << "\\n";
-    std::cout << "c deviation: " << dc << "\\n";
-    return 0;
+  std::cout << "a deviation: " << da << "\\n";
+  std::cout << "b deviation: " << db << "\\n";
+  std::cout << "c deviation: " << dc << "\\n";
+  return 0;
 }
 `}
 />
@@ -92,20 +98,18 @@ function.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
-#include <cmath>   // std::abs
+  starterCode={`#include <cmath> // std::abs
+#include <iostream>
 
-double deviation(double v, double avg) {
-    return std::abs(v - avg);
-}
+double deviation(double v, double avg) { return std::abs(v - avg); }
 
 int main() {
-    int a = 5, b = 10, c = 3;
-    double avg = (a + b + c) / 3.0;
-    std::cout << "a deviation: " << deviation(a, avg) << "\\n";
-    std::cout << "b deviation: " << deviation(b, avg) << "\\n";
-    std::cout << "c deviation: " << deviation(c, avg) << "\\n";
-    return 0;
+  int a = 5, b = 10, c = 3;
+  double avg = (a + b + c) / 3.0;
+  std::cout << "a deviation: " << deviation(a, avg) << "\\n";
+  std::cout << "b deviation: " << deviation(b, avg) << "\\n";
+  std::cout << "c deviation: " << deviation(c, avg) << "\\n";
+  return 0;
 }
 `}
 />
@@ -127,15 +131,15 @@ algorithms that work on *anything that behaves like a sequence*.
 <CodeBlock
   adapter="cpp"
   starterCode={`#include <iostream>
-#include <numeric>   // std::accumulate
+#include <numeric> // std::accumulate
 #include <vector>
 
 int main() {
-    std::vector<int> grades = {91, 82, 73, 88, 95};
-    int total = std::accumulate(grades.begin(), grades.end(), 0);
-    double avg = static_cast<double>(total) / grades.size();
-    std::cout << "average = " << avg << "\\n";
-    return 0;
+  std::vector<int> grades = {91, 82, 73, 88, 95};
+  int total = std::accumulate(grades.begin(), grades.end(), 0);
+  double avg = static_cast<double>(total) / grades.size();
+  std::cout << "average = " << avg << "\\n";
+  return 0;
 }
 `}
 />
@@ -166,26 +170,26 @@ Now the translation into C++ is almost mechanical:
 <CodeBlock
   adapter="cpp"
   starterCode={`#include <iostream>
-#include <vector>
 #include <stdexcept>
+#include <vector>
 
-int max_element(const std::vector<int>& xs) {
-    if (xs.empty()) {
-        throw std::runtime_error("cannot take max of empty vector");
+int max_element(const std::vector<int> &xs) {
+  if (xs.empty()) {
+    throw std::runtime_error("cannot take max of empty vector");
+  }
+  int best = xs[0];
+  for (std::size_t i = 1; i < xs.size(); ++i) {
+    if (xs[i] > best) {
+      best = xs[i];
     }
-    int best = xs[0];
-    for (std::size_t i = 1; i < xs.size(); ++i) {
-        if (xs[i] > best) {
-            best = xs[i];
-        }
-    }
-    return best;
+  }
+  return best;
 }
 
 int main() {
-    std::vector<int> v = {3, 1, 4, 1, 5, 9, 2, 6};
-    std::cout << "max = " << max_element(v) << "\\n";
-    return 0;
+  std::vector<int> v = {3, 1, 4, 1, 5, 9, 2, 6};
+  std::cout << "max = " << max_element(v) << "\\n";
+  return 0;
 }
 `}
 />
@@ -235,14 +239,18 @@ Now the C++ practically writes itself:
   starterCode={`#include <iostream>
 
 int main() {
-    for (int i = 1; i <= 15; ++i) {       // shortened to 15 for brevity
-        if (i % 15 == 0)      std::cout << "FizzBuzz";
-        else if (i % 3 == 0)  std::cout << "Fizz";
-        else if (i % 5 == 0)  std::cout << "Buzz";
-        else                  std::cout << i;
-        std::cout << "\\n";
-    }
-    return 0;
+  for (int i = 1; i <= 15; ++i) { // shortened to 15 for brevity
+    if (i % 15 == 0)
+      std::cout << "FizzBuzz";
+    else if (i % 3 == 0)
+      std::cout << "Fizz";
+    else if (i % 5 == 0)
+      std::cout << "Buzz";
+    else
+      std::cout << i;
+    std::cout << "\\n";
+  }
+  return 0;
 }
 `}
 />
@@ -277,37 +285,45 @@ yourself to enumerate them *before* you finish the code.
   starterCode={`#include <iostream>
 #include <string>
 
-int count_vowels(const std::string& s) {
-    // your code here
-    return 0;
+int count_vowels(const std::string &s) {
+  // your code here
+  return 0;
 }
 
 int main() {
-    std::cout << count_vowels("Hello, World!") << "\\n";
-    return 0;
+  std::cout << count_vowels("Hello, World!") << "\\n";
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 #include <string>
 
-int count_vowels(const std::string& s) {
-    int n = 0;
-    for (char c : s) {
-        switch (c) {
-            case 'a': case 'e': case 'i': case 'o': case 'u':
-            case 'A': case 'E': case 'I': case 'O': case 'U':
-                ++n;
-                break;
-            default:
-                break;
-        }
+int count_vowels(const std::string &s) {
+  int n = 0;
+  for (char c : s) {
+    switch (c) {
+    case 'a':
+    case 'e':
+    case 'i':
+    case 'o':
+    case 'u':
+    case 'A':
+    case 'E':
+    case 'I':
+    case 'O':
+    case 'U':
+      ++n;
+      break;
+    default:
+      break;
     }
-    return n;
+  }
+  return n;
 }
 
 int main() {
-    std::cout << count_vowels("Hello, World!") << "\\n";
-    return 0;
+  std::cout << count_vowels("Hello, World!") << "\\n";
+  return 0;
 }
 `}
   tests={[

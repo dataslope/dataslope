@@ -29,11 +29,11 @@ expressions**.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log(5 === 5);     // true
-console.log(5 === "5");   // false (different types)
-console.log(3 < 4);       // true
+  starterCode={`console.log(5 === 5); // true
+console.log(5 === "5"); // false (different types)
+console.log(3 < 4); // true
 console.log("apple" < "banana"); // true — strings compare lexicographically
-console.log("a" < "B");   // false — uppercase letters come before lowercase in Unicode
+console.log("a" < "B"); // false — uppercase letters come before lowercase in Unicode
 `}
 />
 
@@ -60,14 +60,14 @@ operators:
   starterCode={`const isAdmin = true;
 const isActive = false;
 
-console.log(isAdmin && isActive);   // false — needs both
-console.log(isAdmin || isActive);   // true  — needs at least one
-console.log(!isAdmin);              // false — flip
-console.log(!isActive);             // true
+console.log(isAdmin && isActive); // false — needs both
+console.log(isAdmin || isActive); // true  — needs at least one
+console.log(!isAdmin); // false — flip
+console.log(!isActive); // true
 
 // Combine them — parentheses make precedence obvious:
 const canEdit = isAdmin && (isActive || !isActive);
-console.log(canEdit);   // true
+console.log(canEdit); // true
 `}
 />
 
@@ -120,11 +120,11 @@ might never run.
 }
 
 console.log("--- AND ---");
-const a = false && expensive();   // expensive() is NOT called
+const a = false && expensive(); // expensive() is NOT called
 console.log(a);
 
 console.log("--- OR ---");
-const b = true || expensive();    // expensive() is NOT called
+const b = true || expensive(); // expensive() is NOT called
 console.log(b);
 `}
 />
@@ -146,18 +146,18 @@ triggers on `null`/`undefined` (not `0` or `""`):
   return value ?? "default";
 }
 
-console.log(withDefault("hi"));       // "hi"
-console.log(withDefault(""));         // ""  (empty string is kept!)
-console.log(withDefault(0));          // 0   (zero is kept!)
-console.log(withDefault(null));       // "default"
-console.log(withDefault(undefined));  // "default"
+console.log(withDefault("hi")); // "hi"
+console.log(withDefault("")); // ""  (empty string is kept!)
+console.log(withDefault(0)); // 0   (zero is kept!)
+console.log(withDefault(null)); // "default"
+console.log(withDefault(undefined)); // "default"
 
 // Compare with ||, which would replace ALL falsy values:
 function withDefaultOr(value) {
   return value || "default";
 }
-console.log(withDefaultOr(""));   // "default" — empty string got replaced!
-console.log(withDefaultOr(0));    // "default" — zero got replaced!
+console.log(withDefaultOr("")); // "default" — empty string got replaced!
+console.log(withDefaultOr(0)); // "default" — zero got replaced!
 `}
 />
 
@@ -193,7 +193,7 @@ greet("Ada");
 greet("");
 greet();
 greet(null);
-greet(0);   // careful — 0 is falsy! we treat it like "no name"
+greet(0); // careful — 0 is falsy! we treat it like "no name"
 `}
 />
 
@@ -224,8 +224,8 @@ negations into cleaner conditions.
 const isAdmin = true;
 const isActive = false;
 
-console.log(!(isAdmin && isActive));      // true
-console.log(!isAdmin || !isActive);       // true — same result
+console.log(!(isAdmin && isActive)); // true
+console.log(!isAdmin || !isActive); // true — same result
 
 // Original:
 //   if (!(name || email)) ...
@@ -235,8 +235,8 @@ console.log(!isAdmin || !isActive);       // true — same result
 const name = "";
 const email = "";
 
-console.log(!(name || email));    // true
-console.log(!name && !email);     // true — same result
+console.log(!(name || email)); // true
+console.log(!name && !email); // true — same result
 `}
 />
 
@@ -282,7 +282,7 @@ line.
   starterCode={`function canComment(user, article) {
   const isAuthor = user && user.id === article.authorId;
   const isMember = user && user.role === "member";
-  const isAdmin  = user && user.role === "admin";
+  const isAdmin = user && user.role === "admin";
   const articleOpen = !article.closedToComments;
 
   return (isMember || isAdmin) && (articleOpen || isAuthor || isAdmin);
@@ -290,13 +290,22 @@ line.
 
 const article = { id: 1, authorId: 42, closedToComments: false };
 
-console.log(canComment(null,                                  article)); // false
-console.log(canComment({ id: 7,  role: "guest"  },            article)); // false
-console.log(canComment({ id: 7,  role: "member" },            article)); // true
-console.log(canComment({ id: 42, role: "member" },            article)); // true
-console.log(canComment({ id: 7,  role: "member" }, { ...article, closedToComments: true })); // false
-console.log(canComment({ id: 42, role: "member" }, { ...article, closedToComments: true })); // true (author can comment even when closed)
-console.log(canComment({ id: 7,  role: "admin"  }, { ...article, closedToComments: true })); // true
+console.log(canComment(null, article)); // false
+console.log(canComment({ id: 7, role: "guest" }, article)); // false
+console.log(canComment({ id: 7, role: "member" }, article)); // true
+console.log(canComment({ id: 42, role: "member" }, article)); // true
+console.log(
+  canComment({ id: 7, role: "member" }, { ...article, closedToComments: true }),
+); // false
+console.log(
+  canComment(
+    { id: 42, role: "member" },
+    { ...article, closedToComments: true },
+  ),
+); // true (author can comment even when closed)
+console.log(
+  canComment({ id: 7, role: "admin" }, { ...article, closedToComments: true }),
+); // true
 `}
 />
 
@@ -331,7 +340,7 @@ console.log(isLeapYear(2023)); // false
   solutionCode={`function isLeapYear(year) {
   if (year % 400 === 0) return true;
   if (year % 100 === 0) return false;
-  if (year % 4 === 0)   return true;
+  if (year % 4 === 0) return true;
   return false;
   // Equivalent one-liner:
   // return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;

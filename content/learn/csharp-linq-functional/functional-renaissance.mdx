@@ -61,12 +61,12 @@ static int Pure(int x, int y) => x + y;
 
 static int Impure(int x)
 {
-    Console.Write("");                       // I/O
-    return x + DateTime.Now.Millisecond;     // hidden input
+    Console.Write("");                   // I/O
+    return x + DateTime.Now.Millisecond; // hidden input
 }
 
-Console.WriteLine(Pure(2, 3));   // always 5
-Console.WriteLine(Impure(2));    // depends on the clock
+Console.WriteLine(Pure(2, 3)); // always 5
+Console.WriteLine(Impure(2));  // depends on the clock
 `}
 />
 
@@ -125,7 +125,7 @@ Each one is reusable. The whole pipeline reads top to bottom.
 using System.Linq;
 
 static bool IsEven(int n) => n % 2 == 0;
-static int  Square(int n) => n * n;
+static int Square(int n) => n * n;
 
 var nums = Enumerable.Range(1, 10);
 

@@ -30,25 +30,24 @@ public record User(int Id, string Name, string? Email);
 
 public static class Users
 {
-    private static readonly User[] All =
-    {
-        new(1, "Ada",  "ada@example.com"),
-        new(2, "Bob",  null),
+    private static readonly User[] All = {
+        new(1, "Ada", "ada@example.com"),
+        new(2, "Bob", null),
         new(3, "Cara", "cara@example.com"),
     };
 
     public static User? Find(int id) => All.FirstOrDefault(u => u.Id == id);
 }
 
-string Greet(int id) =>
-    Users.Find(id)            // User?
-        ?.Email               // string?
-        ?.ToUpperInvariant()  // string?
-        ?? "(no email)";       // string
+string Greet(int id) => Users
+                            .Find(id)            // User?
+                            ?.Email              // string?
+                            ?.ToUpperInvariant() // string?
+                        ?? "(no email)";         // string
 
-Console.WriteLine(Greet(1));   // ADA@EXAMPLE.COM
-Console.WriteLine(Greet(2));   // (no email)
-Console.WriteLine(Greet(99));  // (no email)
+Console.WriteLine(Greet(1));  // ADA@EXAMPLE.COM
+Console.WriteLine(Greet(2));  // (no email)
+Console.WriteLine(Greet(99)); // (no email)
 `}
 />
 
@@ -72,41 +71,28 @@ public abstract record Result<T, E>
     public sealed record Ok(T Value) : Result<T, E>;
     public sealed record Err(E Error) : Result<T, E>;
 
-    public Result<U, E> Map<U>(Func<T, U> f) => this switch
-    {
-        Ok ok    => new Result<U, E>.Ok(f(ok.Value)),
-        Err err  => new Result<U, E>.Err(err.Error),
-        _ => throw new InvalidOperationException()
-    };
+    public Result<U, E> Map<U>(Func<T, U> f) =>
+        this switch { Ok ok => new Result<U, E>.Ok(f(ok.Value)), Err err => new Result<U, E>.Err(err.Error),
+                      _ => throw new InvalidOperationException() };
 
-    public Result<U, E> Bind<U>(Func<T, Result<U, E>> f) => this switch
-    {
-        Ok ok    => f(ok.Value),
-        Err err  => new Result<U, E>.Err(err.Error),
-        _ => throw new InvalidOperationException()
-    };
+    public Result<U, E> Bind<U>(Func<T, Result<U, E>> f) =>
+        this switch { Ok ok => f(ok.Value), Err err => new Result<U, E>.Err(err.Error),
+                      _ => throw new InvalidOperationException() };
 }
 
-Result<int, string> Parse(string s) =>
-    int.TryParse(s, out var n)
-        ? new Result<int, string>.Ok(n)
-        : new Result<int, string>.Err($"not a number: '{s}'");
+Result<int, string> Parse(string s) => int.TryParse(s, out var n) ? new Result<int, string>.Ok(n)
+                                                                  : new Result<int, string>.Err($"not a number: '{s}'");
 
-Result<int, string> Half(int n) =>
-    n % 2 == 0
-        ? new Result<int, string>.Ok(n / 2)
-        : new Result<int, string>.Err($"odd: {n}");
+Result<int, string> Half(int n) => n % 2 == 0 ? new Result<int, string>.Ok(n / 2)
+                                              : new Result<int, string>.Err($"odd: {n}");
 
-void Show(Result<int, string> r) => Console.WriteLine(r switch
-{
-    Result<int, string>.Ok o  => $"ok: {o.Value}",
-    Result<int, string>.Err e => $"err: {e.Error}",
-    _ => "?"
-});
+void Show(Result<int, string> r) => Console.WriteLine(r switch { Result<int, string>.Ok o => $"ok: {o.Value}",
+                                                                 Result<int, string>.Err e => $"err: {e.Error}",
+                                                                 _ => "?" });
 
-Show(Parse("10").Bind(Half));    // ok: 5
-Show(Parse("7").Bind(Half));     // err: odd: 7
-Show(Parse("abc").Bind(Half));   // err: not a number: 'abc'
+Show(Parse("10").Bind(Half));  // ok: 5
+Show(Parse("7").Bind(Half));   // err: odd: 7
+Show(Parse("abc").Bind(Half)); // err: not a number: 'abc'
 `}
 />
 
@@ -155,14 +141,13 @@ rest.
 using System.Linq;
 
 // curried: (string sep) => (IEnumerable<string> xs) => string
-Func<string, Func<System.Collections.Generic.IEnumerable<string>, string>>
-    join = sep => xs => string.Join(sep, xs);
+Func<string, Func<System.Collections.Generic.IEnumerable<string>, string>> join = sep => xs => string.Join(sep, xs);
 
-var joinCsv  = join(", ");
+var joinCsv = join(", ");
 var joinPath = join("/");
 
-Console.WriteLine(joinCsv(new[]  { "a", "b", "c" }));   // a, b, c
-Console.WriteLine(joinPath(new[] { "usr", "bin", "x" }));  // usr/bin/x
+Console.WriteLine(joinCsv(new[] { "a", "b", "c" }));      // a, b, c
+Console.WriteLine(joinPath(new[] { "usr", "bin", "x" })); // usr/bin/x
 `}
 />
 
@@ -187,13 +172,10 @@ public abstract record Payment
     public sealed record Voucher(string Code) : Payment;
 }
 
-string Describe(Payment p) => p switch
-{
-    Payment.Cash c             => $"cash {c.Amount:C}",
-    Payment.Card c             => $"card ****{c.Last4} {c.Amount:C}",
-    Payment.Voucher v          => $"voucher #{v.Code}",
-    _                          => "unknown"
-};
+string Describe(Payment p) => p switch { Payment.Cash c => $"cash {c.Amount:C}",
+                                         Payment.Card c => $"card ****{c.Last4} {c.Amount:C}",
+                                         Payment.Voucher v => $"voucher #{v.Code}",
+                                         _ => "unknown" };
 
 Console.WriteLine(Describe(new Payment.Cash(20m)));
 Console.WriteLine(Describe(new Payment.Card(150m, "0042")));

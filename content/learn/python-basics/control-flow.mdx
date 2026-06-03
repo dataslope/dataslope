@@ -118,6 +118,7 @@ There can be any number of `elif` branches; `else` is optional. Each branch need
     else:
         return "F"
 
+
 for s in [95, 82, 73, 60, 50]:
     print(s, "->", classify(s))
 `}
@@ -229,6 +230,7 @@ if a < b < c:
         case _:
             return "not a point"
 
+
 for p in [(0, 0), (0, 5), (3, 0), (4, 4), (2, 7), "nope"]:
     print(p, "->", describe(p))
 `}
@@ -248,6 +250,7 @@ Patterns can also match class instances, dict shapes, and sequences of varying l
             return "Server Error"
         case _:
             return "Unknown"
+
 
 for c in [200, 404, 500, 999]:
     print(c, "->", http_status(c))
@@ -271,6 +274,7 @@ For simple value-to-value mappings, a dict is often clearer than `if`/`elif` or 
         404: "Not Found",
         500: "Server Error",
     }.get(code, "Unknown")
+
 
 print(http_label(200))
 print(http_label(404))

@@ -38,11 +38,17 @@ SELECT
   DATE '2024-01-01' + (i % 120)  AS order_date,
   (i * 13) % 300 + 10            AS amount
 FROM range(1, 401) t(i);`}
-  starterCode={`SELECT id, order_date, amount
-FROM orders
-WHERE amount BETWEEN 100 AND 200
-  AND order_date BETWEEN DATE '2024-02-01' AND DATE '2024-02-29'
-ORDER BY amount DESC;`}
+  starterCode={`SELECT
+  id,
+  order_date,
+  amount
+FROM
+  orders
+WHERE
+  amount BETWEEN 100 AND 200
+  AND order_date BETWEEN DATE '2024-02-01' AND DATE  '2024-02-29'
+ORDER BY
+  amount DESC;`}
 />
 
 <Callout type="info" title="BETWEEN includes both endpoints">
@@ -66,10 +72,16 @@ INSERT INTO products VALUES
   (1,'Pen','Office',1.50),(2,'Laptop','Electronics',999.00),
   (3,'Notebook','Office',3.25),(4,'Phone','Electronics',699.00),
   (5,'Mug','Kitchen',8.00),(6,'Desk','Furniture',150.00);`}
-  starterCode={`SELECT name, category, price
-FROM products
-WHERE category IN ('Office', 'Electronics')
-ORDER BY price DESC;`}
+  starterCode={`SELECT
+  name,
+  category,
+  price
+FROM
+  products
+WHERE
+  category IN ('Office', 'Electronics')
+ORDER BY
+  price DESC;`}
 />
 
 `category IN ('Office', 'Electronics')` is exactly `category = 'Office' OR
@@ -93,10 +105,16 @@ INSERT INTO people VALUES
   (2,'Alan Turing','alan@compute.io'),
   (3,'Grace Hopper','grace@navy.mil'),
   (4,'Annie Easley','annie@nasa.gov');`}
-  starterCode={`SELECT name, email
-FROM people
-WHERE name ILIKE 'a%'          -- name starts with A or a
-  AND email LIKE '%.gov';      -- email ends in .gov`}
+  starterCode={`SELECT
+  name,
+  email
+FROM
+  people
+WHERE
+  name ILIKE 'a%' -- name starts with A or a
+  AND email LIKE '%.gov';
+
+-- email ends in .gov`}
 />
 
 ## Combining conditions — and the danger of `AND`/`OR`
@@ -115,11 +133,20 @@ INSERT INTO orders VALUES
   (1,'West',250),(2,'East',50),(3,'West',30),
   (4,'East',300),(5,'North',120),(6,'West',400);`}
   starterCode={`-- "Big orders, but only from West or East."
-SELECT id, region, amount
-FROM orders
-WHERE amount > 100
-  AND (region = 'West' OR region = 'East')
-ORDER BY amount DESC;`}
+SELECT
+  id,
+  region,
+  amount
+FROM
+  orders
+WHERE
+  amount > 100
+  AND (
+    region = 'West'
+    OR region = 'East'
+  )
+ORDER BY
+  amount DESC;`}
 />
 
 Without the parentheses, `amount > 100 AND region = 'West' OR region =

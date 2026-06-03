@@ -128,6 +128,7 @@ baseline.fit(X_train, y_train)
 
 # We check the baseline with cross-validation, just like a real model.
 from sklearn.model_selection import cross_val_score
+
 cv = cross_val_score(baseline, X_train, y_train, cv=5)
 print(f"Baseline (always majority class): {cv.mean():.3f} CV accuracy")
 print("Any real model must beat this to earn its keep.")
@@ -162,10 +163,12 @@ from sklearn.linear_model import LogisticRegression
 
 # One object that scales, then classifies. Cross-validation and tuning will
 # refit the scaler correctly on each fold's training data only.
-pipe = Pipeline([
-    ("scaler", StandardScaler()),
-    ("model", LogisticRegression(max_iter=5000)),
-])
+pipe = Pipeline(
+    [
+        ("scaler", StandardScaler()),
+        ("model", LogisticRegression(max_iter=5000)),
+    ]
+)
 
 print(pipe)
 print("\\nThe pipeline is a single estimator: fit it, score it, tune it as one unit.")
@@ -195,10 +198,12 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0, stratify=y
 )
 
-pipe = Pipeline([
-    ("scaler", StandardScaler()),
-    ("model", LogisticRegression(max_iter=5000)),
-])
+pipe = Pipeline(
+    [
+        ("scaler", StandardScaler()),
+        ("model", LogisticRegression(max_iter=5000)),
+    ]
+)
 
 scores = cross_val_score(pipe, X_train, y_train, cv=5)
 print("Per-fold accuracy:", [round(s, 3) for s in scores])
@@ -232,10 +237,12 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0, stratify=y
 )
 
-pipe = Pipeline([
-    ("scaler", StandardScaler()),
-    ("model", LogisticRegression(max_iter=5000)),
-])
+pipe = Pipeline(
+    [
+        ("scaler", StandardScaler()),
+        ("model", LogisticRegression(max_iter=5000)),
+    ]
+)
 
 # A tiny grid over the regularization strength only.
 search = GridSearchCV(pipe, {"model__C": [0.1, 1.0, 10.0]}, cv=5)
@@ -277,10 +284,12 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0, stratify=y
 )
 
-pipe = Pipeline([
-    ("scaler", StandardScaler()),
-    ("model", LogisticRegression(max_iter=5000)),
-])
+pipe = Pipeline(
+    [
+        ("scaler", StandardScaler()),
+        ("model", LogisticRegression(max_iter=5000)),
+    ]
+)
 search = GridSearchCV(pipe, {"model__C": [0.1, 1.0, 10.0]}, cv=5)
 search.fit(X_train, y_train)
 
@@ -357,10 +366,12 @@ base_cv = cross_val_score(baseline, X_train, y_train, cv=5).mean()
 print(f"\\nBaseline CV accuracy: {base_cv:.3f}")
 
 # Step 5: pipeline (scale + model)
-pipe = Pipeline([
-    ("scaler", StandardScaler()),
-    ("model", LogisticRegression(max_iter=5000)),
-])
+pipe = Pipeline(
+    [
+        ("scaler", StandardScaler()),
+        ("model", LogisticRegression(max_iter=5000)),
+    ]
+)
 
 # Step 6: cross-validate the real model on training data
 model_cv = cross_val_score(pipe, X_train, y_train, cv=5)
@@ -472,10 +483,12 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # 2. Build the pipeline: steps named "scaler" and "model"
-pipe = Pipeline([
-    ("scaler", StandardScaler()),
-    ("model", LogisticRegression(max_iter=5000)),
-])
+pipe = Pipeline(
+    [
+        ("scaler", StandardScaler()),
+        ("model", LogisticRegression(max_iter=5000)),
+    ]
+)
 
 # 3. Cross-validate on the TRAINING data (cv=5), store the mean
 cv_mean = cross_val_score(pipe, X_train, y_train, cv=5).mean()

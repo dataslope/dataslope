@@ -181,10 +181,10 @@ df["left"] = (df["Attrition"] == "Yes").astype(int)
 
 attrition_by_dept = (
     df.groupby("Department")["left"]
-      .mean()
-      .mul(100)
-      .round(1)
-      .sort_values(ascending=False)
+    .mean()
+    .mul(100)
+    .round(1)
+    .sort_values(ascending=False)
 )
 
 # 4. Communicate

@@ -92,7 +92,8 @@ import matplotlib.pyplot as plt
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 3.6))
 plot_acf(ar1, lags=20, ax=a1, title="AR(1) ACF: TAILS OFF (geometric decay)")
 plot_pacf(ar1, lags=20, ax=a2, method="ywm", title="AR(1) PACF: CUTS OFF after lag 1")
-plt.tight_layout(); plt.show()
+plt.tight_layout()
+plt.show()
 
 print("ACF: a smooth decaying staircase (each value echoes through the chain).")
 print("PACF: one big spike at lag 1, then nothing -> the DIRECT dependence is")
@@ -128,7 +129,8 @@ import matplotlib.pyplot as plt
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 3.6))
 plot_acf(ar2, lags=20, ax=a1, title="AR(2) ACF: tails off")
 plot_pacf(ar2, lags=20, ax=a2, method="ywm", title="AR(2) PACF: CUTS OFF after lag 2")
-plt.tight_layout(); plt.show()
+plt.tight_layout()
+plt.show()
 
 print("Now the PACF has TWO significant spikes (lags 1 and 2), then nothing.")
 print("Two PACF spikes => AR order p = 2. The ACF still just tails off.")
@@ -159,7 +161,8 @@ import matplotlib.pyplot as plt
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 3.6))
 plot_acf(ma1, lags=20, ax=a1, title="MA(1) ACF: CUTS OFF after lag 1")
 plot_pacf(ma1, lags=20, ax=a2, method="ywm", title="MA(1) PACF: tails off")
-plt.tight_layout(); plt.show()
+plt.tight_layout()
+plt.show()
 
 print("The roles SWAP for an MA process: the ACF has one spike then cuts off,")
 print("and the PACF is the one that tails off. One ACF spike => MA order q = 1.")
@@ -236,9 +239,14 @@ import numpy as np
 
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 3.6))
 plot_acf(air, lags=36, ax=a1, title="RAW airline ACF: decays painfully slowly")
-plot_acf(np.log(air).diff().diff(12).dropna(), lags=36, ax=a2,
-         title="After log + diff + seasonal diff: interpretable")
-plt.tight_layout(); plt.show()
+plot_acf(
+    np.log(air).diff().diff(12).dropna(),
+    lags=36,
+    ax=a2,
+    title="After log + diff + seasonal diff: interpretable",
+)
+plt.tight_layout()
+plt.show()
 
 print("Left: nearly every lag is 'significant' and the decay is glacial -- the")
 print("classic look of a NON-stationary series, NOT a high-order AR model.")
@@ -290,7 +298,8 @@ y = y[20:]`}
     # TODO: mean-centered autocorrelation at the given lag
     return None
 
-my_acf = None   # list of acf_at(0..5)
+
+my_acf = None  # list of acf_at(0..5)
 matches = None  # True if it matches statsmodels acf(y, nlags=5)
 print(my_acf)
 print("matches statsmodels:", matches)
@@ -301,11 +310,13 @@ from statsmodels.tsa.stattools import acf
 ybar = y.mean()
 denom = np.sum((y - ybar) ** 2)
 
+
 def acf_at(lag):
     if lag == 0:
         return 1.0
     num = np.sum((y[lag:] - ybar) * (y[:-lag] - ybar))
     return float(num / denom)
+
 
 my_acf = [acf_at(k) for k in range(6)]
 ref = acf(y, nlags=5)
@@ -360,7 +371,7 @@ for t in range(2, n):
     y[t] = 0.6 * y[t-1] - 0.3 * y[t-2] + e[t]   # AR(2)
 s = y[50:]`}
   starterCode={`sig_lags = None  # significant lags in 1..8
-p_hat = None     # AR order from the leading significant spikes
+p_hat = None  # AR order from the leading significant spikes
 print("significant lags:", sig_lags, " estimated AR order:", p_hat)
 `}
   solutionCode={`import numpy as np

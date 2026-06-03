@@ -65,25 +65,32 @@ rng = np.random.default_rng(42)
 
 # A heavily right-skewed population (e.g. wait times). VERY non-normal.
 population = rng.exponential(scale=10.0, size=1_000_000)
-MU = population.mean()       # ~10
-SIGMA = population.std()     # ~10
+MU = population.mean()  # ~10
+SIGMA = population.std()  # ~10
 
 rows = []
 for n in [1, 5, 30, 100]:
-    means = np.array([
-        rng.choice(population, size=n, replace=False).mean()
-        for _ in range(5000)
-    ])
+    means = np.array(
+        [rng.choice(population, size=n, replace=False).mean() for _ in range(5000)]
+    )
     skew = stats.skew(means)
     for m in means:
         rows.append({"x_bar": m, "panel": f"n = {n}  (skew={skew:.2f})"})
-    print(f"n = {n:3d}:  mean of x-bars = {means.mean():5.2f}  "
-          f"sd = {means.std():5.2f}  skewness = {skew:+.2f}")
+    print(
+        f"n = {n:3d}:  mean of x-bars = {means.mean():5.2f}  "
+        f"sd = {means.std():5.2f}  skewness = {skew:+.2f}"
+    )
 
 df = pd.DataFrame(rows)
-fig = px.histogram(df, x="x_bar", facet_col="panel", facet_col_wrap=2,
-                   nbins=50, height=620,
-                   title="Exponential population: sampling distribution of x-bar normalizes as n grows")
+fig = px.histogram(
+    df,
+    x="x_bar",
+    facet_col="panel",
+    facet_col_wrap=2,
+    nbins=50,
+    height=620,
+    title="Exponential population: sampling distribution of x-bar normalizes as n grows",
+)
 fig.update_xaxes(matches=None)
 fig.show()
 
@@ -129,32 +136,39 @@ N = 1_000_000
 
 populations = {
     "right-skewed (exponential)": rng.exponential(8.0, N),
-    "uniform (flat)":             rng.uniform(0.0, 20.0, N),
-    "bimodal (two humps)":        np.concatenate([
-                                      rng.normal(5, 1.5, N // 2),
-                                      rng.normal(15, 1.5, N // 2)]),
+    "uniform (flat)": rng.uniform(0.0, 20.0, N),
+    "bimodal (two humps)": np.concatenate(
+        [rng.normal(5, 1.5, N // 2), rng.normal(15, 1.5, N // 2)]
+    ),
 }
 
 n = 50  # a single, moderately large sample size
 fig = go.Figure()
 for name, pop in populations.items():
-    means = np.array([
-        rng.choice(pop, size=n, replace=False).mean()
-        for _ in range(4000)
-    ])
+    means = np.array(
+        [rng.choice(pop, size=n, replace=False).mean() for _ in range(4000)]
+    )
     # standardize so all three overlay on the same axis
     z = (means - means.mean()) / means.std()
-    fig.add_histogram(x=z, nbinsx=60, opacity=0.55, name=name,
-                      histnorm="probability density")
+    fig.add_histogram(
+        x=z, nbinsx=60, opacity=0.55, name=name, histnorm="probability density"
+    )
     print(f"{name:30s} -> skewness of x-bar = {stats.skew(means):+.2f}")
 
 # overlay the standard normal curve
 xs = np.linspace(-4, 4, 200)
-fig.add_scatter(x=xs, y=stats.norm.pdf(xs), mode="lines",
-                name="standard normal", line=dict(color="black", width=3))
-fig.update_layout(barmode="overlay",
-                  title=f"Three very different populations -> same normal mean (n={n})",
-                  xaxis_title="standardized x-bar")
+fig.add_scatter(
+    x=xs,
+    y=stats.norm.pdf(xs),
+    mode="lines",
+    name="standard normal",
+    line=dict(color="black", width=3),
+)
+fig.update_layout(
+    barmode="overlay",
+    title=f"Three very different populations -> same normal mean (n={n})",
+    xaxis_title="standardized x-bar",
+)
 fig.show()
 
 print("\\nAll three sampling distributions hug the same black normal curve.")
@@ -221,10 +235,9 @@ print(f"Population skewness: {stats.skew(population[:200000]):.2f}  (very large!
 print(f"{'n':>5} | {'skewness of x-bar':>18}")
 print("-" * 28)
 for n in [2, 10, 30, 100, 300, 1000]:
-    means = np.array([
-        rng.choice(population, size=n, replace=False).mean()
-        for _ in range(4000)
-    ])
+    means = np.array(
+        [rng.choice(population, size=n, replace=False).mean() for _ in range(4000)]
+    )
     print(f"{n:>5} | {stats.skew(means):>18.2f}")
 
 print()
@@ -267,23 +280,31 @@ rng = np.random.default_rng(11)
 
 # Use a skewed population to stress-test the formula.
 population = rng.exponential(scale=10.0, size=1_000_000)
-SIGMA = population.std()   # population sd
+SIGMA = population.std()  # population sd
 
 ns = [4, 9, 16, 36, 64, 100, 225, 400]
 empirical, theory = [], []
 for n in ns:
-    means = np.array([
-        rng.choice(population, size=n, replace=False).mean()
-        for _ in range(4000)
-    ])
-    empirical.append(means.std())          # measured spread of x-bar
-    theory.append(SIGMA / np.sqrt(n))       # CLT prediction sigma/sqrt(n)
+    means = np.array(
+        [rng.choice(population, size=n, replace=False).mean() for _ in range(4000)]
+    )
+    empirical.append(means.std())  # measured spread of x-bar
+    theory.append(SIGMA / np.sqrt(n))  # CLT prediction sigma/sqrt(n)
 
-fig = px.line(x=ns, y=theory, markers=True,
-              labels={"x": "sample size n", "y": "SD of x-bar"},
-              title="SD of x-bar follows sigma / sqrt(n)")
-fig.add_scatter(x=ns, y=empirical, mode="markers", name="simulated",
-                marker=dict(size=11, symbol="x"))
+fig = px.line(
+    x=ns,
+    y=theory,
+    markers=True,
+    labels={"x": "sample size n", "y": "SD of x-bar"},
+    title="SD of x-bar follows sigma / sqrt(n)",
+)
+fig.add_scatter(
+    x=ns,
+    y=empirical,
+    mode="markers",
+    name="simulated",
+    marker=dict(size=11, symbol="x"),
+)
 fig.data[0].name = "sigma / sqrt(n) (theory)"
 fig.show()
 
@@ -323,10 +344,9 @@ skews = {}
 `}
   solutionCode={`skews = {}
 for n in ns:
-    means = np.array([
-        rng.choice(population, size=n, replace=False).mean()
-        for _ in range(n_samples)
-    ])
+    means = np.array(
+        [rng.choice(population, size=n, replace=False).mean() for _ in range(n_samples)]
+    )
     skews[n] = float(stats.skew(means))
 print(skews)
 `}
@@ -391,10 +411,9 @@ check = {
     "rel_diff": None,
 }
 `}
-  solutionCode={`means = np.array([
-    rng.choice(population, size=n, replace=False).mean()
-    for _ in range(n_samples)
-])
+  solutionCode={`means = np.array(
+    [rng.choice(population, size=n, replace=False).mean() for _ in range(n_samples)]
+)
 empirical_sd = float(means.std())
 theory_sd = float(SIGMA / np.sqrt(n))
 check = {

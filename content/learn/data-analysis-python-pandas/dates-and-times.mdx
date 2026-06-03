@@ -79,11 +79,15 @@ date-component extraction:
   adapter="python"
   starterCode={`import pandas as pd
 
-s = pd.to_datetime(pd.Series([
-    "2024-01-15 10:30:00",
-    "2024-02-29 14:45:00",
-    "2024-12-25 23:59:59",
-]))
+s = pd.to_datetime(
+    pd.Series(
+        [
+            "2024-01-15 10:30:00",
+            "2024-02-29 14:45:00",
+            "2024-12-25 23:59:59",
+        ]
+    )
+)
 
 print("year:    ", s.dt.year.tolist())
 print("month:   ", s.dt.month.tolist())
@@ -110,10 +114,12 @@ Subtracting two datetimes gives a **Timedelta**:
   adapter="python"
   starterCode={`import pandas as pd
 
-orders = pd.DataFrame({
-    "order_date": pd.to_datetime(["2024-01-15","2024-02-01","2024-03-10"]),
-    "ship_date":  pd.to_datetime(["2024-01-18","2024-02-04","2024-03-15"]),
-})
+orders = pd.DataFrame(
+    {
+        "order_date": pd.to_datetime(["2024-01-15", "2024-02-01", "2024-03-10"]),
+        "ship_date": pd.to_datetime(["2024-01-18", "2024-02-04", "2024-03-15"]),
+    }
+)
 
 orders["fulfilment_days"] = (orders["ship_date"] - orders["order_date"]).dt.days
 print(orders)
@@ -251,7 +257,7 @@ raw = pd.DataFrame({
     ],
     "visits":  [1, 1, 1, 1, 1, 1, 1, 1, 1],
 })`}
-  starterCode={`daily = None   # TODO
+  starterCode={`daily = None  # TODO
 
 print(daily)
 `}
@@ -261,9 +267,9 @@ ts = pd.to_datetime(raw["timestamp"])
 
 daily = (
     raw.assign(date=ts.dt.date)
-       .groupby("date", as_index=False)["visits"]
-       .sum()
-       .sort_values("date")
+    .groupby("date", as_index=False)["visits"]
+    .sum()
+    .sort_values("date")
 )
 
 print(daily)

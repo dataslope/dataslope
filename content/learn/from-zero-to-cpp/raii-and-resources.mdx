@@ -63,33 +63,35 @@ which *is* a RAII wrapper around the OS file handle.)
 
 class File {
 public:
-    File(const char* path, const char* mode) {
-        fp_ = std::fopen(path, mode);
-        if (!fp_) throw std::runtime_error("could not open file");
-    }
-    ~File() {
-        if (fp_) std::fclose(fp_);
-    }
-    // (For now we forbid copying. We'll explain why in the next chapters.)
-    File(const File&) = delete;
-    File& operator=(const File&) = delete;
+  File(const char *path, const char *mode) {
+    fp_ = std::fopen(path, mode);
+    if (!fp_)
+      throw std::runtime_error("could not open file");
+  }
+  ~File() {
+    if (fp_)
+      std::fclose(fp_);
+  }
+  // (For now we forbid copying. We'll explain why in the next chapters.)
+  File(const File &) = delete;
+  File &operator=(const File &) = delete;
 
-    void writeln(const char* s) { std::fprintf(fp_, "%s\\n", s); }
+  void writeln(const char *s) { std::fprintf(fp_, "%s\\n", s); }
 
 private:
-    std::FILE* fp_;
+  std::FILE *fp_;
 };
 
 int main() {
-    try {
-        File f("/tmp/raii_demo.txt", "w");
-        f.writeln("hello from RAII");
-        // no close needed: ~File runs here, no matter what.
-    } catch (const std::exception& e) {
-        std::cerr << "error: " << e.what() << "\\n";
-    }
-    std::cout << "done\\n";
-    return 0;
+  try {
+    File f("/tmp/raii_demo.txt", "w");
+    f.writeln("hello from RAII");
+    // no close needed: ~File runs here, no matter what.
+  } catch (const std::exception &e) {
+    std::cerr << "error: " << e.what() << "\\n";
+  }
+  std::cout << "done\\n";
+  return 0;
 }
 `}
 />

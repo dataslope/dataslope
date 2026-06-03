@@ -43,13 +43,13 @@ pass to LINQ.
   adapter="csharp"
   starterCode={`using System;
 
-Func<int, int>      square      = x => x * x;
-Func<int, int, int> add         = (a, b) => a + b;
-Func<int, bool>     isPositive  = x => x > 0;
+Func<int, int> square = x => x * x;
+Func<int, int, int> add = (a, b) => a + b;
+Func<int, bool> isPositive = x => x > 0;
 
-Console.WriteLine(square(7));            // 49
-Console.WriteLine(add(3, 4));            // 7
-Console.WriteLine(isPositive(-2));       // False
+Console.WriteLine(square(7));      // 49
+Console.WriteLine(add(3, 4));      // 7
+Console.WriteLine(isPositive(-2)); // False
 `}
 />
 
@@ -63,10 +63,10 @@ a **closure**.
 int factor = 10;
 Func<int, int> times = x => x * factor;
 
-Console.WriteLine(times(3));   // 30
+Console.WriteLine(times(3)); // 30
 
 factor = 100;
-Console.WriteLine(times(3));   // 300 — the lambda *captured* factor, not its value
+Console.WriteLine(times(3)); // 300 — the lambda *captured* factor, not its value
 `}
 />
 
@@ -136,15 +136,13 @@ is the closest thing C# has to Haskell-style pattern matching.
   adapter="csharp"
   starterCode={`using System;
 
-static string Describe(object o) => o switch
-{
-    null            => "nothing",
-    int n when n < 0 => $"negative int {n}",
-    int n           => $"int {n}",
-    string s        => $"string of length {s.Length}",
-    int[] arr       => $"int[] with {arr.Length} elements",
-    _               => $"something else ({o.GetType().Name})"
-};
+static string Describe(object o) => o switch { null => "nothing",
+                                               int n when n <
+                                                   0 => $"negative int {n}",
+                                               int n => $"int {n}",
+                                               string s => $"string of length {s.Length}",
+                                               int[] arr => $"int[] with {arr.Length} elements",
+                                               _ => $"something else ({o.GetType().Name})" };
 
 Console.WriteLine(Describe(42));
 Console.WriteLine(Describe(-1));
@@ -174,10 +172,10 @@ var a = new Person("Ada", 36);
 var b = new Person("Ada", 36);
 var older = a with { Age = 37 };
 
-Console.WriteLine(a == b);       // True — equality by value, not by reference
-Console.WriteLine(a);            // Person { Name = Ada, Age = 36 }
-Console.WriteLine(older);        // Person { Name = Ada, Age = 37 }
-Console.WriteLine(a == older);   // False
+Console.WriteLine(a == b);     // True — equality by value, not by reference
+Console.WriteLine(a);          // Person { Name = Ada, Age = 36 }
+Console.WriteLine(older);      // Person { Name = Ada, Age = 37 }
+Console.WriteLine(a == older); // False
 `}
 />
 
@@ -198,7 +196,7 @@ using System.Linq;
 int[] nums = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
 static bool IsEven(int n) => n % 2 == 0;
-static int  Squared(int n) => n * n;
+static int Squared(int n) => n * n;
 
 var answer = nums.Where(IsEven).Select(Squared).Sum();
 Console.WriteLine(answer);
@@ -218,8 +216,7 @@ multiple values without inventing a class.
   starterCode={`using System;
 using System.Linq;
 
-static (int min, int max, double avg) Stats(int[] xs) =>
-    (xs.Min(), xs.Max(), xs.Average());
+static (int min, int max, double avg) Stats(int[] xs) => (xs.Min(), xs.Max(), xs.Average());
 
 var (lo, hi, mean) = Stats(new[] { 4, 1, 9, 2, 7 });
 Console.WriteLine($"lo={lo}, hi={hi}, mean={mean:F2}");
@@ -236,11 +233,11 @@ the compiler picks the right type.
   starterCode={`using System;
 using System.Collections.Generic;
 
-int[]      a = [1, 2, 3];
-List<int>  b = [4, 5, 6];
-int[]      c = [..a, ..b, 7, 8];
+int[] a = [1, 2, 3];
+List<int> b = [4, 5, 6];
+int[] c = [..a, ..b, 7, 8];
 
-Console.WriteLine(string.Join(", ", c));   // 1, 2, 3, 4, 5, 6, 7, 8
+Console.WriteLine(string.Join(", ", c)); // 1, 2, 3, 4, 5, 6, 7, 8
 `}
 />
 
@@ -256,27 +253,18 @@ using System.Collections.Generic;
 
 record Sale(string Region, string Product, decimal Amount);
 
-var sales = new List<Sale>
-{
-    new("EU",   "Widget",  12.50m),
-    new("EU",   "Gadget",  44.00m),
-    new("EU",   "Widget",   9.99m),
-    new("APAC", "Widget",  31.00m),
-    new("APAC", "Gadget",  21.50m),
-    new("US",   "Gizmo",   77.00m),
+var sales = new List<Sale> {
+    new("EU", "Widget", 12.50m),   new("EU", "Gadget", 44.00m),   new("EU", "Widget", 9.99m),
+    new("APAC", "Widget", 31.00m), new("APAC", "Gadget", 21.50m), new("US", "Gizmo", 77.00m),
 };
 
-var report = sales
-    .GroupBy(s => s.Region)
-    .Select(g => new
-    {
-        Region   = g.Key,
-        Products = g.GroupBy(s => s.Product)
-                    .Select(p => $"{p.Key}={p.Sum(s => s.Amount):C}")
-                    .ToArray(),
-        Total    = g.Sum(s => s.Amount),
-    })
-    .OrderByDescending(r => r.Total);
+var report = sales.GroupBy(s => s.Region)
+                 .Select(g => new {
+                     Region = g.Key,
+                     Products = g.GroupBy(s => s.Product).Select(p => $"{p.Key}={p.Sum(s => s.Amount):C}").ToArray(),
+                     Total = g.Sum(s => s.Amount),
+                 })
+                 .OrderByDescending(r => r.Total);
 
 foreach (var r in report)
     Console.WriteLine($"{r.Region,-5} total={r.Total,8:C}   {string.Join(", ", r.Products)}");

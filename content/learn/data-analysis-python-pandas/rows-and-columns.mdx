@@ -106,12 +106,14 @@ geometry.
   adapter="python"
   starterCode={`import pandas as pd
 
-employees = pd.DataFrame({
-    "name":       ["Aiko","Bilal","Chen","Diego","Eve"],
-    "department": ["Eng","Sales","Eng","Ops","Eng"],
-    "salary":     [120, 95, 140, 80, 128],
-    "tenure_yrs": [3, 6, 7, 2, 4],
-})
+employees = pd.DataFrame(
+    {
+        "name": ["Aiko", "Bilal", "Chen", "Diego", "Eve"],
+        "department": ["Eng", "Sales", "Eng", "Ops", "Eng"],
+        "salary": [120, 95, 140, 80, 128],
+        "tenure_yrs": [3, 6, 7, 2, 4],
+    }
+)
 
 print("Shape:", employees.shape, "<-- (rows, columns)")
 print()
@@ -231,12 +233,14 @@ print(students)
 `}
   solutionCode={`import pandas as pd
 
-students = pd.DataFrame({
-    "name":        ["Ana", "Ben", "Cara", "Dan", "Eli"],
-    "grade":       [9, 10, 11, 12, 9],
-    "gpa":         [3.8, 3.4, 2.9, 3.6, 3.1],
-    "passed_math": [True, True, False, True, True],
-})
+students = pd.DataFrame(
+    {
+        "name": ["Ana", "Ben", "Cara", "Dan", "Eli"],
+        "grade": [9, 10, 11, 12, 9],
+        "gpa": [3.8, 3.4, 2.9, 3.6, 3.1],
+        "passed_math": [True, True, False, True, True],
+    }
+)
 
 print(students)
 `}

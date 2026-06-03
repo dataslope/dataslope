@@ -160,16 +160,23 @@ INSERT INTO order_spreadsheet VALUES
   (102, 'Ada Lovelace', 'ada@old.example', 'Pen', 5),
   (103, 'Grace Hopper', 'grace@example.com', 'Notebook', 1);`}
   starterCode={`UPDATE order_spreadsheet
-SET customer_email = 'ada@new.example'
-WHERE customer_name = 'Ada Lovelace';
+SET
+  customer_email = 'ada@new.example'
+WHERE
+  customer_name = 'Ada Lovelace';
 
 SELECT
   customer_name,
   customer_email,
   COUNT(*) AS rows_with_that_email
-FROM order_spreadsheet
-GROUP BY customer_name, customer_email
-ORDER BY customer_name, customer_email;`}
+FROM
+  order_spreadsheet
+GROUP BY
+  customer_name,
+  customer_email
+ORDER BY
+  customer_name,
+  customer_email;`}
 />
 
 This is only a teaser. Later, normalization will show how to store Ada

@@ -210,9 +210,12 @@ INSERT INTO orders (customer_id, total) VALUES
   customers.name,
   orders.id AS order_id,
   orders.total
-FROM orders
-JOIN customers ON orders.customer_id = customers.id
-ORDER BY customers.name, orders.id;`}
+FROM
+  orders
+  JOIN customers ON orders.customer_id = customers.id
+ORDER BY
+  customers.name,
+  orders.id;`}
 />
 
 Ada appears twice in the result because she has two orders. But Ada's customer row is stored only once.

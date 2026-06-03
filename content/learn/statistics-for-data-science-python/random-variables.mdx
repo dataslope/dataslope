@@ -136,8 +136,8 @@ hand and then confirm it by simulation.
 
 # A weighted die: value -> probability (a pmf).
 values = np.array([1, 2, 3, 4, 5, 6])
-probs  = np.array([0.10, 0.10, 0.10, 0.10, 0.10, 0.50])  # heavily favors 6
-print("Probabilities sum to:", probs.sum())   # must be 1.0
+probs = np.array([0.10, 0.10, 0.10, 0.10, 0.10, 0.50])  # heavily favors 6
+print("Probabilities sum to:", probs.sum())  # must be 1.0
 
 # E[X] = sum of value * probability.
 expected = np.sum(values * probs)
@@ -185,10 +185,10 @@ original units and reads as a typical distance from the mean.
   starterCode={`import numpy as np
 
 values = np.array([1, 2, 3, 4, 5, 6])
-probs  = np.array([0.10, 0.10, 0.10, 0.10, 0.10, 0.50])
+probs = np.array([0.10, 0.10, 0.10, 0.10, 0.10, 0.50])
 
-mu = np.sum(values * probs)                    # E[X]
-var = np.sum((values - mu) ** 2 * probs)       # E[(X - mu)^2]
+mu = np.sum(values * probs)  # E[X]
+var = np.sum((values - mu) ** 2 * probs)  # E[(X - mu)^2]
 sd = np.sqrt(var)
 
 print(f"E[X]        = {mu:.3f}")
@@ -226,12 +226,12 @@ import numpy as np
 
 # A binomial RV: number of successes in 10 trials, each with p = 0.3.
 # (We'll study the binomial properly in Discrete Distributions.)
-X = stats.binom(n=10, p=0.3)   # "frozen": parameters fixed once
+X = stats.binom(n=10, p=0.3)  # "frozen": parameters fixed once
 
-print(f"E[X]   = {X.mean():.3f}")     # theoretical expectation
+print(f"E[X]   = {X.mean():.3f}")  # theoretical expectation
 print(f"Var(X) = {X.var():.3f}")
 print(f"SD(X)  = {X.std():.3f}")
-print(f"P(X = 3) = {X.pmf(3):.3f}")   # pmf: probability of exactly 3
+print(f"P(X = 3) = {X.pmf(3):.3f}")  # pmf: probability of exactly 3
 
 # Draw 100,000 samples and check the empirical mean matches E[X].
 rng = np.random.default_rng(42)
@@ -267,7 +267,7 @@ rng = np.random.default_rng(7)
 
 # Each of 1,000 customers: expected spend $40, but spends vary a lot.
 n = 1_000
-spend = rng.gamma(shape=2.0, scale=20.0, size=n)   # mean = 2 * 20 = $40
+spend = rng.gamma(shape=2.0, scale=20.0, size=n)  # mean = 2 * 20 = $40
 
 # Linearity: E[total] = sum of individual E[spend] = 1000 * 40.
 print(f"Per-customer mean spend (theory): $40.00")
@@ -312,9 +312,9 @@ offer it? Compute the expected payout and compare to the price.
   adapter="python"
   starterCode={`import numpy as np
 
-price = 80          # what the customer pays
-payout = 300        # what the seller pays IF the device fails
-p_fail = 0.15       # probability of failure
+price = 80  # what the customer pays
+payout = 300  # what the seller pays IF the device fails
+p_fail = 0.15  # probability of failure
 
 # Expected payout the seller faces per warranty sold.
 e_payout = payout * p_fail + 0 * (1 - p_fail)

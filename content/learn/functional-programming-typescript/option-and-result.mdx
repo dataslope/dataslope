@@ -20,9 +20,7 @@ single most useful pair of patterns in this entire course.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Option<A> =
-  | { kind: "none" }
-  | { kind: "some"; value: A };
+  starterCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
 
 const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 const none = <A,>(): Option<A> => ({ kind: "none" });
@@ -74,7 +72,7 @@ function getOrElse<A>(o: Option<A>, fallback: A): A {
 }
 
 const ageStr = some("36");
-const age    = flatMap(ageStr, (s) => {
+const age = flatMap(ageStr, (s) => {
   const n = Number(s);
   return Number.isNaN(n) ? none() : some(n);
 });
@@ -102,26 +100,31 @@ const flatMap = <A, B>(o: Option<A>, f: (a: A) => Option<B>): Option<B> =>
   o.kind === "none" ? none() : f(o.value);
 const map = <A, B>(o: Option<A>, f: (a: A) => B): Option<B> =>
   o.kind === "none" ? none() : some(f(o.value));
-const getOrElse = <A,>(o: Option<A>, fb: A): A => o.kind === "none" ? fb : o.value;
+const getOrElse = <A,>(o: Option<A>, fb: A): A =>
+  o.kind === "none" ? fb : o.value;
 
-const users: Record<string, { id: string; managerId?: string; name: string }> = {
-  u1: { id: "u1", name: "Ada" },
-  u2: { id: "u2", name: "Linus", managerId: "u1" },
-  u3: { id: "u3", name: "Grace", managerId: "u2" },
-};
+const users: Record<string, { id: string; managerId?: string; name: string }> =
+  {
+    u1: { id: "u1", name: "Ada" },
+    u2: { id: "u2", name: "Linus", managerId: "u1" },
+    u3: { id: "u3", name: "Grace", managerId: "u2" },
+  };
 
-const findUser = (id: string): Option<{ id: string; managerId?: string; name: string }> =>
+const findUser = (
+  id: string,
+): Option<{ id: string; managerId?: string; name: string }> =>
   id in users ? some(users[id]) : none();
 
 const managerOf = (id: string): Option<string> => {
   const u = findUser(id);
-  return u.kind === "some" && u.value.managerId !== undefined ? some(u.value.managerId) : none();
+  return u.kind === "some" && u.value.managerId !== undefined
+    ? some(u.value.managerId)
+    : none();
 };
 
 // "What is the name of u3's manager's manager?"
-const result = flatMap(
-  flatMap(managerOf("u3"), managerOf),
-  (id) => map(findUser(id), (u) => u.name),
+const result = flatMap(flatMap(managerOf("u3"), managerOf), (id) =>
+  map(findUser(id), (u) => u.name),
 );
 
 console.log(getOrElse(result, "no such chain"));
@@ -140,22 +143,20 @@ not just its absence.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Result<E, A> =
-  | { kind: "ok";  value: A }
-  | { kind: "err"; error: E };
+  starterCode={`type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
 
-const ok  = <E, A>(value: A): Result<E, A> => ({ kind: "ok",  value });
+const ok = <E, A>(value: A): Result<E, A> => ({ kind: "ok", value });
 const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
 
 function parseAge(s: string): Result<string, number> {
   const n = Number(s);
-  if (Number.isNaN(n))    return err("not a number");
-  if (n < 0)              return err("negative age");
+  if (Number.isNaN(n)) return err("not a number");
+  if (n < 0) return err("negative age");
   if (!Number.isInteger(n)) return err("not an integer");
   return ok(n);
 }
 
-[ "36", "x", "-1", "1.5" ].forEach((s) => {
+["36", "x", "-1", "1.5"].forEach((s) => {
   const r = parseAge(s);
   console.log(s.padEnd(4), r);
 });
@@ -175,7 +176,7 @@ Same three operators, with error-handling versions:
 <CodeBlock
   adapter="typescript"
   starterCode={`type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
-const ok  = <E, A>(value: A): Result<E, A> => ({ kind: "ok",  value });
+const ok = <E, A>(value: A): Result<E, A> => ({ kind: "ok", value });
 const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
 
 // Transform the value if ok; pass errors through unchanged
@@ -184,7 +185,10 @@ function map<E, A, B>(r: Result<E, A>, f: (a: A) => B): Result<E, B> {
 }
 
 // Chain a fallible step
-function flatMap<E, A, B>(r: Result<E, A>, f: (a: A) => Result<E, B>): Result<E, B> {
+function flatMap<E, A, B>(
+  r: Result<E, A>,
+  f: (a: A) => Result<E, B>,
+): Result<E, B> {
   return r.kind === "ok" ? f(r.value) : r;
 }
 
@@ -259,7 +263,7 @@ const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 const none = <A,>(): Option<A> => ({ kind: "none" });
 
 type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
-const ok  = <E, A>(value: A): Result<E, A> => ({ kind: "ok",  value });
+const ok = <E, A>(value: A): Result<E, A> => ({ kind: "ok", value });
 const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
 
 // nullable -> Option
@@ -268,8 +272,11 @@ const fromNullable = <A,>(a: A | null | undefined): Option<A> =>
 
 // throwing -> Result
 function tryRun<A>(work: () => A): Result<unknown, A> {
-  try   { return ok(work()); }
-  catch (e) { return err(e); }
+  try {
+    return ok(work());
+  } catch (e) {
+    return err(e);
+  }
 }
 
 const maybeName = fromNullable(process?.env?.NAME ?? null);

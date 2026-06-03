@@ -141,7 +141,7 @@ n_experiments = 5000
 
 rejections = 0
 for _ in range(n_experiments):
-    control   = rng.normal(0.0, 1.0, n_per_group)
+    control = rng.normal(0.0, 1.0, n_per_group)
     treatment = rng.normal(true_effect, 1.0, n_per_group)
     p = stats.ttest_ind(control, treatment).pvalue
     if p <= alpha:
@@ -151,8 +151,8 @@ power = rejections / n_experiments
 print(f"Effect = {true_effect}, n per group = {n_per_group}, alpha = {alpha}")
 print(f"Estimated power = {power:.3f}")
 print()
-print(f"This test catches the real effect about {power*100:.0f}% of the time.")
-print(f"It MISSES it (Type II error) about {(1-power)*100:.0f}% of the time.")
+print(f"This test catches the real effect about {power * 100:.0f}% of the time.")
+print(f"It MISSES it (Type II error) about {(1 - power) * 100:.0f}% of the time.")
 `}
 />
 
@@ -186,6 +186,7 @@ from scipy import stats
 rng = np.random.default_rng(1)
 alpha = 0.05
 
+
 def estimate_power(effect, n, reps=2000):
     rej = 0
     for _ in range(reps):
@@ -195,16 +196,21 @@ def estimate_power(effect, n, reps=2000):
             rej += 1
     return rej / reps
 
+
 # Power vs sample size, for a fixed real effect of 0.5.
 sizes = [10, 20, 40, 80, 160, 320]
 power_by_n = [estimate_power(0.5, n) for n in sizes]
 
-fig = px.line(x=sizes, y=power_by_n, markers=True,
-              title="Power rises with sample size (true effect = 0.5)")
+fig = px.line(
+    x=sizes,
+    y=power_by_n,
+    markers=True,
+    title="Power rises with sample size (true effect = 0.5)",
+)
 fig.add_hline(y=0.8, line_dash="dash", line_color="green")
-fig.update_layout(xaxis_title="n per group",
-                  yaxis_title="estimated power",
-                  yaxis_range=[0, 1])
+fig.update_layout(
+    xaxis_title="n per group", yaxis_title="estimated power", yaxis_range=[0, 1]
+)
 fig.show()
 
 for n, p in zip(sizes, power_by_n):
@@ -229,6 +235,7 @@ rng = np.random.default_rng(2)
 alpha = 0.05
 n_per_group = 40
 
+
 def estimate_power(effect, n, reps=2000):
     rej = 0
     for _ in range(reps):
@@ -238,16 +245,23 @@ def estimate_power(effect, n, reps=2000):
             rej += 1
     return rej / reps
 
+
 # Power vs effect size, for a fixed n = 40 per group.
 effects = [0.0, 0.1, 0.2, 0.4, 0.6, 0.8, 1.0]
 power_by_effect = [estimate_power(e, n_per_group) for e in effects]
 
-fig = px.line(x=effects, y=power_by_effect, markers=True,
-              title="Power rises with effect size (n = 40 per group)")
+fig = px.line(
+    x=effects,
+    y=power_by_effect,
+    markers=True,
+    title="Power rises with effect size (n = 40 per group)",
+)
 fig.add_hline(y=0.8, line_dash="dash", line_color="green")
-fig.update_layout(xaxis_title="true effect size (difference in means)",
-                  yaxis_title="estimated power",
-                  yaxis_range=[0, 1])
+fig.update_layout(
+    xaxis_title="true effect size (difference in means)",
+    yaxis_title="estimated power",
+    yaxis_range=[0, 1],
+)
 fig.show()
 
 for e, p in zip(effects, power_by_effect):
@@ -286,7 +300,7 @@ n_experiments = 20_000
 false_positives = 0
 for _ in range(n_experiments):
     a = rng.normal(0.0, 1.0, n_per_group)
-    b = rng.normal(0.0, 1.0, n_per_group)   # identical truth
+    b = rng.normal(0.0, 1.0, n_per_group)  # identical truth
     if stats.ttest_ind(a, b).pvalue <= alpha:
         false_positives += 1
 
@@ -295,7 +309,7 @@ print(f"Significance level alpha   : {alpha}")
 print(f"Observed Type I error rate : {type_I_rate:.4f}")
 print()
 print("Even though there is NO real effect, the test wrongly rejects")
-print(f"about {type_I_rate*100:.1f}% of the time — by design. That IS alpha.")
+print(f"about {type_I_rate * 100:.1f}% of the time — by design. That IS alpha.")
 print("This is the price you agree to pay every time you set alpha.")
 `}
 />
@@ -371,8 +385,10 @@ significant_estimates = np.array(significant_estimates)
 
 print(f"True effect                         : {true_effect}")
 print(f"Average of ALL estimates            : {all_estimates.mean():.3f}  (unbiased)")
-print(f"Average of only SIGNIFICANT estimates: {significant_estimates.mean():.3f}  (inflated!)")
-print(f"Power (fraction significant)        : {len(significant_estimates)/reps:.2f}")
+print(
+    f"Average of only SIGNIFICANT estimates: {significant_estimates.mean():.3f}  (inflated!)"
+)
+print(f"Power (fraction significant)        : {len(significant_estimates) / reps:.2f}")
 print()
 print("If you only publish/believe the significant runs, the effect looks")
 print("much bigger than 0.3. Low power exaggerates the effects it 'finds'.")

@@ -51,21 +51,21 @@ object itself. Both variables now point at the *same* heap object.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Dog a = new Dog("Rex");
-        Dog b = a;             // b is another label pointing at the SAME Dog
+  public static void main(String[] args) {
+    Dog a = new Dog("Rex");
+    Dog b = a; // b is another label pointing at the SAME Dog
 
-        b.rename("Max");        // mutate through b ...
-        System.out.println("a.name = " + a.name); // ... a sees it too
-        System.out.println("b.name = " + b.name);
-        System.out.println("a == b ? " + (a == b));    // reference equality
-    }
+    b.rename("Max");                          // mutate through b ...
+    System.out.println("a.name = " + a.name); // ... a sees it too
+    System.out.println("b.name = " + b.name);
+    System.out.println("a == b ? " + (a == b)); // reference equality
+  }
 }
 
 class Dog {
-    String name;
-    Dog(String name) { this.name = name; }
-    void rename(String newName) { this.name = newName; }
+  String name;
+  Dog(String name) { this.name = name; }
+  void rename(String newName) { this.name = newName; }
 }
 `}
 />
@@ -93,18 +93,18 @@ whether the contents are equal. (For content equality you call
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Dog a = new Dog("Rex");
-        Dog c = new Dog("Rex");   // brand new object, same name
+  public static void main(String[] args) {
+    Dog a = new Dog("Rex");
+    Dog c = new Dog("Rex"); // brand new object, same name
 
-        System.out.println("a == c ? " + (a == c));
-        System.out.println("Same name? " + a.name.equals(c.name));
-    }
+    System.out.println("a == c ? " + (a == c));
+    System.out.println("Same name? " + a.name.equals(c.name));
+  }
 }
 
 class Dog {
-    String name;
-    Dog(String name) { this.name = name; }
+  String name;
+  Dog(String name) { this.name = name; }
 }
 `}
 />
@@ -150,22 +150,24 @@ to do something."
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Dog d = null;
-        System.out.println("Before: d = " + d);
+  public static void main(String[] args) {
+    Dog d = null;
+    System.out.println("Before: d = " + d);
 
-        // Uncommenting this line would crash with NullPointerException:
-        // System.out.println(d.bark());
+    // Uncommenting this line would crash with NullPointerException:
+    // System.out.println(d.bark());
 
-        d = new Dog();
-        System.out.println("After:  d = " + d);
-        System.out.println(d.bark());
-    }
+    d = new Dog();
+    System.out.println("After:  d = " + d);
+    System.out.println(d.bark());
+  }
 }
 
 class Dog {
-    public String bark() { return "Woof!"; }
-    public String toString() { return "Dog@" + Integer.toHexString(System.identityHashCode(this)); }
+  public String bark() { return "Woof!"; }
+  public String toString() {
+    return "Dog@" + Integer.toHexString(System.identityHashCode(this));
+  }
 }
 `}
 />
@@ -188,20 +190,20 @@ caller.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    static void rename(Dog dog, String newName) {
-        dog.name = newName;       // mutates the shared heap object
-    }
+  static void rename(Dog dog, String newName) {
+    dog.name = newName; // mutates the shared heap object
+  }
 
-    public static void main(String[] args) {
-        Dog mine = new Dog("Rex");
-        rename(mine, "Buddy");
-        System.out.println(mine.name);
-    }
+  public static void main(String[] args) {
+    Dog mine = new Dog("Rex");
+    rename(mine, "Buddy");
+    System.out.println(mine.name);
+  }
 }
 
 class Dog {
-    String name;
-    Dog(String name) { this.name = name; }
+  String name;
+  Dog(String name) { this.name = name; }
 }
 `}
 />
@@ -226,20 +228,20 @@ the caller, because the parameter is its own local variable.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    static void replace(Dog dog) {
-        dog = new Dog("Other");   // only the local var changes
-    }
+  static void replace(Dog dog) {
+    dog = new Dog("Other"); // only the local var changes
+  }
 
-    public static void main(String[] args) {
-        Dog mine = new Dog("Rex");
-        replace(mine);
-        System.out.println(mine.name); // still "Rex"
-    }
+  public static void main(String[] args) {
+    Dog mine = new Dog("Rex");
+    replace(mine);
+    System.out.println(mine.name); // still "Rex"
+  }
 }
 
 class Dog {
-    String name;
-    Dog(String name) { this.name = name; }
+  String name;
+  Dog(String name) { this.name = name; }
 }
 `}
 />

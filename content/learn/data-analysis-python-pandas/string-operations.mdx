@@ -54,9 +54,16 @@ print(normalized)
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "title": ["Senior Data Engineer", "Marketing Lead", "Data Scientist", "Sales Rep"],
-})
+df = pd.DataFrame(
+    {
+        "title": [
+            "Senior Data Engineer",
+            "Marketing Lead",
+            "Data Scientist",
+            "Sales Rep",
+        ],
+    }
+)
 
 # Anyone with "Data" in their title (case-insensitive)
 print(df[df["title"].str.contains("Data", case=False)])
@@ -94,7 +101,7 @@ print(parts)
 print()
 
 # Or slice characters by position
-print(emails.str[:5])   # first 5 chars
+print(emails.str[:5])  # first 5 chars
 `}
 />
 
@@ -110,13 +117,17 @@ named groups.
   adapter="python"
   starterCode={`import pandas as pd
 
-logs = pd.Series([
-    "2024-03-18 14:23:01 INFO  User logged in",
-    "2024-03-18 14:24:55 ERROR Database timeout",
-    "2024-03-18 14:25:10 WARN  Slow query: 1.4s",
-])
+logs = pd.Series(
+    [
+        "2024-03-18 14:23:01 INFO  User logged in",
+        "2024-03-18 14:24:55 ERROR Database timeout",
+        "2024-03-18 14:25:10 WARN  Slow query: 1.4s",
+    ]
+)
 
-parsed = logs.str.extract(r"(?P<date>\d{4}-\d{2}-\d{2}) (?P<time>\d{2}:\d{2}:\d{2}) (?P<level>\w+)\s+(?P<msg>.*)")
+parsed = logs.str.extract(
+    r"(?P<date>d{4}-d{2}-d{2}) (?P<time>d{2}:d{2}:d{2}) (?P<level>w+)s+(?P<msg>.*)"
+)
 print(parsed)
 `}
 />
@@ -147,12 +158,12 @@ A grab bag of useful methods:
   starterCode={`import pandas as pd
 
 s = pd.Series(["5", "42", "123"])
-print(s.str.zfill(4))           # pad with leading zeros to length 4
+print(s.str.zfill(4))  # pad with leading zeros to length 4
 print()
 
 names = pd.Series(["aiko", "BiLaL"])
-print(names.str.capitalize())   # First char upper, rest lower
-print(names.str.swapcase())     # Invert case
+print(names.str.capitalize())  # First char upper, rest lower
+print(names.str.swapcase())  # Invert case
 `}
 />
 
@@ -162,11 +173,13 @@ print(names.str.swapcase())     # Invert case
   adapter="python"
   starterCode={`import pandas as pd
 
-comments = pd.Series([
-    "Loved it!",
-    "Could be better.",
-    "Five stars five stars five stars",
-])
+comments = pd.Series(
+    [
+        "Loved it!",
+        "Could be better.",
+        "Five stars five stars five stars",
+    ]
+)
 
 print("Length:")
 print(comments.str.len())
@@ -187,21 +200,22 @@ Bringing several pieces together — normalizing employee names:
   adapter="python"
   starterCode={`import pandas as pd
 
-raw = pd.Series([
-    " aiko TANAKA ",
-    "Bilal  Khan",        # double space
-    "chen ZHANG",
-    "DIEGO  ramirez",
-    "",
-    None,
-])
+raw = pd.Series(
+    [
+        " aiko TANAKA ",
+        "Bilal  Khan",  # double space
+        "chen ZHANG",
+        "DIEGO  ramirez",
+        "",
+        None,
+    ]
+)
 
 clean = (
-    raw
-      .str.strip()                              # outer spaces
-      .str.replace(r"\s+", " ", regex=True)    # collapse internal whitespace
-      .str.title()                              # nice casing
-      .replace("", pd.NA)                       # empties → missing
+    raw.str.strip()  # outer spaces
+    .str.replace(r"s+", " ", regex=True)  # collapse internal whitespace
+    .str.title()  # nice casing
+    .replace("", pd.NA)  # empties → missing
 )
 print(clean)
 `}
@@ -221,7 +235,7 @@ s = pd.Series(["Engineer", None, "Sales", "Lead Engineer"])
 
 print(s.str.contains("Engineer"))
 print()
-print(s.str.contains("Engineer", na=False))   # NaN → False
+print(s.str.contains("Engineer", na=False))  # NaN → False
 `}
 />
 
@@ -254,19 +268,18 @@ titles = pd.Series([
     "",
     None,
 ])`}
-  starterCode={`clean = None   # TODO
+  starterCode={`clean = None  # TODO
 
 print(clean)
 `}
   solutionCode={`import pandas as pd
 
 clean = (
-    titles
-      .str.strip()
-      .str.replace(r"\s+", " ", regex=True)
-      .str.title()
-      .replace({"Data Scientists": "Data Scientist"})
-      .replace("", pd.NA)
+    titles.str.strip()
+    .str.replace(r"s+", " ", regex=True)
+    .str.title()
+    .replace({"Data Scientists": "Data Scientist"})
+    .replace("", pd.NA)
 )
 
 print(clean)

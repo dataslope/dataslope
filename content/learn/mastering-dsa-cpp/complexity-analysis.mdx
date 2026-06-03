@@ -14,11 +14,11 @@ On ten items, almost any correct solution feels instant. On ten million items, a
   starterCode={`#include <iostream>
 
 int main() {
-    for (int n : {10, 100, 1000, 10000}) {
-        std::cout << "n=" << n << " linear=" << n
-                  << " quadratic=" << 1LL * n * n << "\\n";
-    }
-    return 0;
+  for (int n : {10, 100, 1000, 10000}) {
+    std::cout << "n=" << n << " linear=" << n << " quadratic=" << 1LL * n * n
+              << "\\n";
+  }
+  return 0;
 }
 `}
 />
@@ -44,16 +44,17 @@ Formally, `f(n) = O(g(n))` if there exist constants `c` and `n0` such that `f(n)
   starterCode={`#include <iostream>
 #include <vector>
 
-int sum(const std::vector<int>& xs) {
-    int total = 0;
-    for (int x : xs) total += x;
-    return total;
+int sum(const std::vector<int> &xs) {
+  int total = 0;
+  for (int x : xs)
+    total += x;
+  return total;
 }
 
 int main() {
-    std::vector<int> xs = {1, 2, 3, 4, 5};
-    std::cout << sum(xs) << "\\n";
-    return 0;
+  std::vector<int> xs = {1, 2, 3, 4, 5};
+  std::cout << sum(xs) << "\\n";
+  return 0;
 }
 `}
 />
@@ -90,15 +91,18 @@ flowchart TD
 #include <iostream>
 
 int main() {
-    volatile long long sink = 0;
-    for (int n : {10000, 100000, 1000000}) {
-        auto start = std::chrono::high_resolution_clock::now();
-        for (int i = 0; i < n; ++i) sink += i;
-        auto stop = std::chrono::high_resolution_clock::now();
-        auto micros = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count();
-        std::cout << "n=" << n << " took about " << micros << " microseconds\\n";
-    }
-    return 0;
+  volatile long long sink = 0;
+  for (int n : {10000, 100000, 1000000}) {
+    auto start = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < n; ++i)
+      sink += i;
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto micros =
+        std::chrono::duration_cast<std::chrono::microseconds>(stop - start)
+            .count();
+    std::cout << "n=" << n << " took about " << micros << " microseconds\\n";
+  }
+  return 0;
 }
 `}
 />
@@ -131,16 +135,16 @@ flowchart TD
 #include <vector>
 
 int main() {
-    std::vector<int> v;
-    std::size_t last = v.capacity();
-    for (int i = 0; i < 20; ++i) {
-        v.push_back(i);
-        if (v.capacity() != last) {
-            last = v.capacity();
-            std::cout << "size " << v.size() << " capacity " << v.capacity() << "\\n";
-        }
+  std::vector<int> v;
+  std::size_t last = v.capacity();
+  for (int i = 0; i < 20; ++i) {
+    v.push_back(i);
+    if (v.capacity() != last) {
+      last = v.capacity();
+      std::cout << "size " << v.size() << " capacity " << v.capacity() << "\\n";
     }
-    return 0;
+  }
+  return 0;
 }
 `}
 />
@@ -168,33 +172,34 @@ Use the straightforward O(n^2) nested-loop version for this challenge. Later, yo
   starterCode={`#include <iostream>
 #include <vector>
 
-int countPairs(const std::vector<int>& v, int target) {
-    // your code here
+int countPairs(const std::vector<int> &v, int target) {
+  // your code here
 }
 
 int main() {
-    std::vector<int> v = {1, 5, 7, -1, 5};
-    std::cout << countPairs(v, 6) << "\\n";
-    return 0;
+  std::vector<int> v = {1, 5, 7, -1, 5};
+  std::cout << countPairs(v, 6) << "\\n";
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 #include <vector>
 
-int countPairs(const std::vector<int>& v, int target) {
-    int count = 0;
-    for (std::size_t i = 0; i < v.size(); ++i) {
-        for (std::size_t j = i + 1; j < v.size(); ++j) {
-            if (v[i] + v[j] == target) ++count;
-        }
+int countPairs(const std::vector<int> &v, int target) {
+  int count = 0;
+  for (std::size_t i = 0; i < v.size(); ++i) {
+    for (std::size_t j = i + 1; j < v.size(); ++j) {
+      if (v[i] + v[j] == target)
+        ++count;
     }
-    return count;
+  }
+  return count;
 }
 
 int main() {
-    std::vector<int> v = {1, 5, 7, -1, 5};
-    std::cout << countPairs(v, 6) << "\\n";
-    return 0;
+  std::vector<int> v = {1, 5, 7, -1, 5};
+  std::cout << countPairs(v, 6) << "\\n";
+  return 0;
 }
 `}
   tests={[{ id: "count_pairs", name: "Counts all matching pairs", expect: { stdoutEquals: "3" } }]}
@@ -209,36 +214,37 @@ A naive O(n^2) solution is accepted here. If you already know \`std::unordered_s
   starterCode={`#include <iostream>
 #include <vector>
 
-bool hasDuplicate(const std::vector<int>& v) {
-    // your code here
+bool hasDuplicate(const std::vector<int> &v) {
+  // your code here
 }
 
 int main() {
-    std::vector<int> a = {4, 2, 9, 4};
-    std::vector<int> b = {1, 2, 3, 5};
-    std::cout << hasDuplicate(a) << "\\n";
-    std::cout << hasDuplicate(b) << "\\n";
-    return 0;
+  std::vector<int> a = {4, 2, 9, 4};
+  std::vector<int> b = {1, 2, 3, 5};
+  std::cout << hasDuplicate(a) << "\\n";
+  std::cout << hasDuplicate(b) << "\\n";
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 #include <vector>
 
-bool hasDuplicate(const std::vector<int>& v) {
-    for (std::size_t i = 0; i < v.size(); ++i) {
-        for (std::size_t j = i + 1; j < v.size(); ++j) {
-            if (v[i] == v[j]) return true;
-        }
+bool hasDuplicate(const std::vector<int> &v) {
+  for (std::size_t i = 0; i < v.size(); ++i) {
+    for (std::size_t j = i + 1; j < v.size(); ++j) {
+      if (v[i] == v[j])
+        return true;
     }
-    return false;
+  }
+  return false;
 }
 
 int main() {
-    std::vector<int> a = {4, 2, 9, 4};
-    std::vector<int> b = {1, 2, 3, 5};
-    std::cout << hasDuplicate(a) << "\\n";
-    std::cout << hasDuplicate(b) << "\\n";
-    return 0;
+  std::vector<int> a = {4, 2, 9, 4};
+  std::vector<int> b = {1, 2, 3, 5};
+  std::cout << hasDuplicate(a) << "\\n";
+  std::cout << hasDuplicate(b) << "\\n";
+  return 0;
 }
 `}
   tests={[{ id: "duplicate_outputs", name: "Detects duplicate and non-duplicate vectors", expect: { stdoutLines: ["1", "0"], stdoutLinesExact: true } }]}

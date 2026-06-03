@@ -106,7 +106,11 @@ print("Temperature is a LEVEL -> MEAN:")
 print("  June average temp:", temp_c.resample("ME").mean().round(2).iloc[0], "C")
 print()
 print("Summing temperatures would be meaningless:")
-print("  WRONG 'June temp' as a sum:", temp_c.resample("ME").sum().round(1).iloc[0], "C  <- nonsense")
+print(
+    "  WRONG 'June temp' as a sum:",
+    temp_c.resample("ME").sum().round(1).iloc[0],
+    "C  <- nonsense",
+)
 `}
 />
 
@@ -319,8 +323,8 @@ import numpy as np
 rng = np.random.default_rng(7)
 days = pd.date_range("2014-01-01", periods=90, freq="D")
 visits = pd.Series(rng.integers(80, 200, 90), index=days, name="visits")`}
-  starterCode={`weekly_total = None   # total visits per week (sum)
-busiest_week = None   # week-ending Timestamp with the max total
+  starterCode={`weekly_total = None  # total visits per week (sum)
+busiest_week = None  # week-ending Timestamp with the max total
 print(weekly_total.head() if weekly_total is not None else None)
 print("busiest:", busiest_week)
 `}
@@ -375,8 +379,8 @@ rainfall_mm  = pd.Series(rng.gamma(1.2, 3.0, 30).round(1), index=days, name="rai
 humidity_pct = pd.Series((60 + rng.normal(0, 8, 30)).clip(20, 100).round(1),
                          index=days, name="humidity")`}
   starterCode={`june = {
-    "total_rain": None,     # rainfall is a FLOW
-    "avg_humidity": None,   # humidity is a LEVEL
+    "total_rain": None,  # rainfall is a FLOW
+    "avg_humidity": None,  # humidity is a LEVEL
 }
 print(june)
 `}

@@ -28,16 +28,17 @@ int>` is the type of functions from `int` to `int`.
 Func<int, int> square = x => x * x;
 Func<int, int> negate = x => -x;
 
-Console.WriteLine(square(5));    // 25
-Console.WriteLine(negate(5));    // -5
+Console.WriteLine(square(5)); // 25
+Console.WriteLine(negate(5)); // -5
 
 // You can reassign.
 square = x => x * x * x;
-Console.WriteLine(square(5));    // 125
+Console.WriteLine(square(5)); // 125
 
 // You can store delegates in collections like any other value.
 var ops = new Func<int, int>[] { square, negate, x => x + 1 };
-foreach (var f in ops) Console.WriteLine(f(10));
+foreach (var f in ops)
+    Console.WriteLine(f(10));
 `}
 />
 
@@ -66,13 +67,14 @@ A **lambda** is an inline literal of a delegate type. It is written
   adapter="csharp"
   starterCode={`using System;
 
-Func<int, int>      a = x => x * 2;            // single param, no parens
-Func<int, int, int> b = (x, y) => x + y;       // multiple params
-Func<int, int>      c = (int x) => x * 2;      // explicit type (optional)
-Func<int, int>      d = x => { return x * 2; }; // statement body
+Func<int, int> a = x => x * 2;           // single param, no parens
+Func<int, int, int> b = (x, y) => x + y; // multiple params
+Func<int, int> c = (int x) => x * 2;     // explicit type (optional)
+Func<int, int> d = x =>
+{ return x * 2; }; // statement body
 
-Action              e = () => Console.WriteLine("hi");
-Action<string>      f = s => Console.WriteLine($"Hi, {s}");
+Action e = () => Console.WriteLine("hi");
+Action<string> f = s => Console.WriteLine($"Hi, {s}");
 
 Console.WriteLine(a(5));
 Console.WriteLine(b(2, 3));
@@ -159,7 +161,8 @@ for (int i = 0; i < 5; i++)
     actions.Add(() => Console.WriteLine(i));
 }
 
-foreach (var a in actions) a();
+foreach (var a in actions)
+    a();
 `}
 />
 
@@ -185,7 +188,7 @@ using System.Linq.Expressions;
 
 // Compiled to executable code — you can call it.
 Func<int, int> doubleFunc = x => x * 2;
-Console.WriteLine(doubleFunc(7));   // 14
+Console.WriteLine(doubleFunc(7)); // 14
 
 // Compiled to a data structure — you can inspect it.
 Expression<Func<int, int>> doubleExpr = x => x * 2;
@@ -197,7 +200,7 @@ Console.WriteLine($"Body kind:   {doubleExpr.Body.NodeType}");
 
 // You can still compile and call it if you want.
 var compiled = doubleExpr.Compile();
-Console.WriteLine(compiled(7));     // 14
+Console.WriteLine(compiled(7)); // 14
 `}
 />
 
@@ -232,15 +235,13 @@ using System.Linq;
 
 record Person(string Name, int Age, string City);
 
-var rules = new (string Name, Func<Person, bool> Pred)[]
-{
-    ("adult",       p => p.Age >= 18),
-    ("from-Paris",  p => p.City == "Paris"),
-    ("under-40",    p => p.Age < 40),
+var rules = new(string Name, Func<Person, bool> Pred)[] {
+    ("adult", p => p.Age >= 18),
+    ("from-Paris", p => p.City == "Paris"),
+    ("under-40", p => p.Age < 40),
 };
 
-var people = new[]
-{
+var people = new[] {
     new Person("Ada", 36, "London"),
     new Person("Bilal", 17, "Paris"),
     new Person("Chiara", 44, "Paris"),

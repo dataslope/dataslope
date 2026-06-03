@@ -26,7 +26,7 @@ The classic syntax — **object literal** notation:
 };
 
 console.log(user);
-console.log(typeof user);   // "object"
+console.log(typeof user); // "object"
 `}
 />
 
@@ -49,14 +49,14 @@ There are two ways to read a property:
   adapter="javascript"
   starterCode={`const user = { name: "Ada", age: 28, "favourite color": "blue" };
 
-console.log(user.name);                  // "Ada"
-console.log(user["name"]);               // "Ada"
-console.log(user["favourite color"]);    // bracket required: key has a space
+console.log(user.name); // "Ada"
+console.log(user["name"]); // "Ada"
+console.log(user["favourite color"]); // bracket required: key has a space
 
 const key = "age";
-console.log(user[key]);                  // 28 — bracket required for dynamic keys
+console.log(user[key]); // 28 — bracket required for dynamic keys
 
-console.log(user.email);                 // undefined — missing property
+console.log(user.email); // undefined — missing property
 `}
 />
 
@@ -72,9 +72,9 @@ You can set (or change, or add) a property with assignment:
   adapter="javascript"
   starterCode={`const user = { name: "Ada" };
 
-user.age = 28;            // add a new property
+user.age = 28; // add a new property
 user.name = "Ada Lovelace"; // change an existing one
-user["role"] = "admin";   // bracket-set also works
+user["role"] = "admin"; // bracket-set also works
 
 console.log(user);
 
@@ -156,13 +156,13 @@ Three common ways to walk an object's contents.
   starterCode={`const scores = { math: 90, science: 87, history: 73 };
 
 // Keys
-console.log(Object.keys(scores));            // ["math","science","history"]
+console.log(Object.keys(scores)); // ["math","science","history"]
 
 // Values
-console.log(Object.values(scores));          // [90, 87, 73]
+console.log(Object.values(scores)); // [90, 87, 73]
 
 // Both at once — array of [key, value] pairs
-console.log(Object.entries(scores));         // [["math",90],...]
+console.log(Object.entries(scores)); // [["math",90],...]
 
 // Loop with for...of + entries() and destructuring
 for (const [subject, score] of Object.entries(scores)) {
@@ -205,7 +205,9 @@ const order = {
   id: 7,
   customer: { name: "Linus", email: "linus@example.com" },
 };
-const { customer: { name: customerName, email } } = order;
+const {
+  customer: { name: customerName, email },
+} = order;
 console.log(customerName, email);
 `}
 />
@@ -239,7 +241,7 @@ The `...` syntax works for objects too.
 <CodeBlock
   adapter="javascript"
   starterCode={`const base = { color: "red", size: "M" };
-const extra = { material: "cotton", size: "L" };   // overrides 'size'
+const extra = { material: "cotton", size: "L" }; // overrides 'size'
 
 const merged = { ...base, ...extra };
 console.log(merged);
@@ -249,13 +251,13 @@ console.log(merged);
 // A shallow copy:
 const copy = { ...base };
 copy.color = "blue";
-console.log("base:", base);   // unchanged
+console.log("base:", base); // unchanged
 console.log("copy:", copy);
 
 // Rest in destructuring — "everything else":
 const { color, ...rest } = merged;
-console.log("color:", color);   // "red"
-console.log("rest: ", rest);    // { size: "L", material: "cotton" }
+console.log("color:", color); // "red"
+console.log("rest: ", rest); // { size: "L", material: "cotton" }
 `}
 />
 
@@ -274,12 +276,12 @@ objects.
   starterCode={`const a = { count: 0 };
 const b = a;
 b.count = 99;
-console.log("a:", a);    // { count: 99 } — surprising if you weren't expecting it
-console.log(a === b);    // true
+console.log("a:", a); // { count: 99 } — surprising if you weren't expecting it
+console.log(a === b); // true
 
-const c = { ...a };      // copy
+const c = { ...a }; // copy
 c.count = "different";
-console.log("a:", a);    // unchanged
+console.log("a:", a); // unchanged
 console.log("c:", c);
 `}
 />
@@ -296,13 +298,13 @@ considered equal unless they are *literally the same object*.
 const b = { x: 1 };
 const c = a;
 
-console.log(a === b);   // false — different objects, same contents
-console.log(a === c);   // true  — same reference
+console.log(a === b); // false — different objects, same contents
+console.log(a === c); // true  — same reference
 
 // To compare contents, you need a deep-equality check, which JavaScript
 // doesn't have built in. A common trick (for simple data) is to compare
 // JSON strings:
-console.log(JSON.stringify(a) === JSON.stringify(b));  // true
+console.log(JSON.stringify(a) === JSON.stringify(b)); // true
 `}
 />
 
@@ -406,7 +408,9 @@ Examples:
 }
 
 console.log(mergeUser({ name: "Ada", age: 28 }, { age: 29 }));
-console.log(mergeUser({ name: "Ada", age: 28 }, { age: undefined, role: "admin" }));
+console.log(
+  mergeUser({ name: "Ada", age: 28 }, { age: undefined, role: "admin" }),
+);
 `}
   solutionCode={`function mergeUser(base, updates) {
   const out = { ...base };
@@ -417,7 +421,9 @@ console.log(mergeUser({ name: "Ada", age: 28 }, { age: undefined, role: "admin" 
 }
 
 console.log(mergeUser({ name: "Ada", age: 28 }, { age: 29 }));
-console.log(mergeUser({ name: "Ada", age: 28 }, { age: undefined, role: "admin" }));
+console.log(
+  mergeUser({ name: "Ada", age: 28 }, { age: undefined, role: "admin" }),
+);
 `}
   tests={[
     {

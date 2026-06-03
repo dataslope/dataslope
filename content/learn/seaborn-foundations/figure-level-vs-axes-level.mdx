@@ -89,7 +89,7 @@ sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 ax = sns.scatterplot(data=tips, x="total_bill", y="tip")
-print(type(ax))   # a matplotlib Axes
+print(type(ax))  # a matplotlib Axes
 `}
 />
 
@@ -103,7 +103,7 @@ sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 g = sns.relplot(data=tips, x="total_bill", y="tip")
-print(type(g))    # a seaborn FacetGrid
+print(type(g))  # a seaborn FacetGrid
 `}
 />
 
@@ -153,7 +153,9 @@ tips = sns.load_dataset("tips")
 
 # One panel per time of day — try changing col to "day".
 sns.relplot(
-    data=tips, x="total_bill", y="tip",
+    data=tips,
+    x="total_bill",
+    y="tip",
     col="time",
     height=4,
 )
@@ -236,7 +238,9 @@ sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 g = sns.relplot(
-    data=tips, x="total_bill", y="tip",
+    data=tips,
+    x="total_bill",
+    y="tip",
     col="time",
     height=4,
 )

@@ -18,30 +18,30 @@ typed versions.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        // Without generics — Object, cast everywhere
-        UntypedBox a = new UntypedBox();
-        a.put("hello");
-        String s = (String) a.get();    // cast required
-        System.out.println(s.toUpperCase());
+  public static void main(String[] args) {
+    // Without generics — Object, cast everywhere
+    UntypedBox a = new UntypedBox();
+    a.put("hello");
+    String s = (String)a.get(); // cast required
+    System.out.println(s.toUpperCase());
 
-        // With generics — no cast, type checked
-        Box<String> b = new Box<>();
-        b.put("world");
-        System.out.println(b.get().toUpperCase());   // no cast
-    }
+    // With generics — no cast, type checked
+    Box<String> b = new Box<>();
+    b.put("world");
+    System.out.println(b.get().toUpperCase()); // no cast
+  }
 }
 
 class UntypedBox {
-    private Object value;
-    public void   put(Object v) { value = v; }
-    public Object get()         { return value; }
+  private Object value;
+  public void put(Object v) { value = v; }
+  public Object get() { return value; }
 }
 
 class Box<T> {
-    private T value;
-    public void put(T v) { value = v; }
-    public T    get()    { return value; }
+  private T value;
+  public void put(T v) { value = v; }
+  public T get() { return value; }
 }
 `}
 />
@@ -81,25 +81,25 @@ example is `Pair<A, B>`:
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Pair<String, Integer> nameAge = new Pair<>("Ada", 36);
-        System.out.println(nameAge.first() + " is " + nameAge.second());
+  public static void main(String[] args) {
+    Pair<String, Integer> nameAge = new Pair<>("Ada", 36);
+    System.out.println(nameAge.first() + " is " + nameAge.second());
 
-        // The two parameters are independent — they can be the same type:
-        Pair<String, String> fullName = new Pair<>("Ada", "Lovelace");
-        System.out.println(fullName.first() + " " + fullName.second());
-    }
+    // The two parameters are independent — they can be the same type:
+    Pair<String, String> fullName = new Pair<>("Ada", "Lovelace");
+    System.out.println(fullName.first() + " " + fullName.second());
+  }
 }
 
 class Pair<A, B> {
-    private final A first;
-    private final B second;
-    public Pair(A first, B second) {
-        this.first  = first;
-        this.second = second;
-    }
-    public A first()  { return first;  }
-    public B second() { return second; }
+  private final A first;
+  private final B second;
+  public Pair(A first, B second) {
+    this.first = first;
+    this.second = second;
+  }
+  public A first() { return first; }
+  public B second() { return second; }
 }
 `}
 />
@@ -124,29 +124,31 @@ public static <T> T identity(T x) { return x; }
 import java.util.List;
 
 public class Main {
-    // Generic method — works on any element type T
-    public static <T> T firstOf(List<T> list) {
-        return list.isEmpty() ? null : list.get(0);
-    }
+  // Generic method — works on any element type T
+  public static <T> T firstOf(List<T> list) {
+    return list.isEmpty() ? null : list.get(0);
+  }
 
-    // Another generic method — uses two parameters
-    public static <K, V> boolean keyMatchesValue(K k, V v) {
-        return k.toString().equals(v.toString());
-    }
+  // Another generic method — uses two parameters
+  public static <K, V> boolean keyMatchesValue(K k, V v) {
+    return k.toString().equals(v.toString());
+  }
 
-    public static void main(String[] args) {
-        List<String>  words = new ArrayList<>();
-        words.add("alpha"); words.add("beta");
-        List<Integer> nums  = new ArrayList<>();
-        nums.add(10); nums.add(20);
+  public static void main(String[] args) {
+    List<String> words = new ArrayList<>();
+    words.add("alpha");
+    words.add("beta");
+    List<Integer> nums = new ArrayList<>();
+    nums.add(10);
+    nums.add(20);
 
-        // Type parameter is inferred from the argument:
-        String s = firstOf(words);
-        Integer n = firstOf(nums);
-        System.out.println(s + ", " + n);
+    // Type parameter is inferred from the argument:
+    String s = firstOf(words);
+    Integer n = firstOf(nums);
+    System.out.println(s + ", " + n);
 
-        System.out.println(keyMatchesValue("42", 42));   // true
-    }
+    System.out.println(keyMatchesValue("42", 42)); // true
+  }
 }
 `}
 />
@@ -234,25 +236,30 @@ is what **bounded type parameters** are for, in their simplest form:
 import java.util.List;
 
 public class Main {
-    // T must extend Number — we may call doubleValue() on it.
-    public static <T extends Number> double average(List<T> xs) {
-        double total = 0;
-        for (T x : xs) total += x.doubleValue();
-        return total / xs.size();
-    }
+  // T must extend Number — we may call doubleValue() on it.
+  public static <T extends Number> double average(List<T> xs) {
+    double total = 0;
+    for (T x : xs)
+      total += x.doubleValue();
+    return total / xs.size();
+  }
 
-    public static void main(String[] args) {
-        List<Integer> ints = new ArrayList<>();
-        ints.add(1); ints.add(2); ints.add(3); ints.add(4);
+  public static void main(String[] args) {
+    List<Integer> ints = new ArrayList<>();
+    ints.add(1);
+    ints.add(2);
+    ints.add(3);
+    ints.add(4);
 
-        List<Double> dbls = new ArrayList<>();
-        dbls.add(1.5); dbls.add(2.5);
+    List<Double> dbls = new ArrayList<>();
+    dbls.add(1.5);
+    dbls.add(2.5);
 
-        System.out.println("avg ints = " + average(ints));
-        System.out.println("avg dbls = " + average(dbls));
+    System.out.println("avg ints = " + average(ints));
+    System.out.println("avg dbls = " + average(dbls));
 
-        // List<String> would not compile — String is not a Number.
-    }
+    // List<String> would not compile — String is not a Number.
+  }
 }
 `}
 />
@@ -272,23 +279,29 @@ type to be `Comparable`:
 import java.util.List;
 
 public class Main {
-    public static <T extends Comparable<T>> T maxOf(List<T> xs) {
-        T best = xs.get(0);
-        for (T x : xs) {
-            if (x.compareTo(best) > 0) best = x;
-        }
-        return best;
+  public static <T extends Comparable<T>> T maxOf(List<T> xs) {
+    T best = xs.get(0);
+    for (T x : xs) {
+      if (x.compareTo(best) > 0)
+        best = x;
     }
+    return best;
+  }
 
-    public static void main(String[] args) {
-        List<Integer> ns = new ArrayList<>();
-        ns.add(3); ns.add(1); ns.add(9); ns.add(2);
-        System.out.println("max int = " + maxOf(ns));
+  public static void main(String[] args) {
+    List<Integer> ns = new ArrayList<>();
+    ns.add(3);
+    ns.add(1);
+    ns.add(9);
+    ns.add(2);
+    System.out.println("max int = " + maxOf(ns));
 
-        List<String> ws = new ArrayList<>();
-        ws.add("alpha"); ws.add("zeta"); ws.add("kappa");
-        System.out.println("max str = " + maxOf(ws));   // "zeta" — lex order
-    }
+    List<String> ws = new ArrayList<>();
+    ws.add("alpha");
+    ws.add("zeta");
+    ws.add("kappa");
+    System.out.println("max str = " + maxOf(ws)); // "zeta" — lex order
+  }
 }
 `}
 />

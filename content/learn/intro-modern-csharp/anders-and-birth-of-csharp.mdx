@@ -135,23 +135,19 @@ using System.Collections.Generic;
 using System.Linq;
 
 // Top-level statements: no class wrapping required.
-var people = new List<Person>
-{
+var people = new List<Person> {
     new Person("Alice", 30),
-    new Person("Bob",   17),
-    new Person("Cara",  45),
-    new Person("Dan",   12),
+    new Person("Bob", 17),
+    new Person("Cara", 45),
+    new Person("Dan", 12),
 };
 
 // LINQ: a query-style transformation of the list.
-var adults = people
-    .Where(p => p.Age >= 18)
-    .OrderBy(p => p.Name)
-    .Select(p => $"{p.Name} ({p.Age})")
-    .ToList();
+var adults = people.Where(p => p.Age >= 18).OrderBy(p => p.Name).Select(p => $"{p.Name} ({p.Age})").ToList();
 
 Console.WriteLine("Adults:");
-foreach (var line in adults) Console.WriteLine($"  {line}");
+foreach (var line in adults)
+    Console.WriteLine($"  {line}");
 
 // 'record' makes a small immutable value type in one line.
 record Person(string Name, int Age);

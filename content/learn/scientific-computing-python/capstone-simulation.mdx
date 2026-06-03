@@ -196,27 +196,29 @@ oscillations; runaway escape means extinction.
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
+
 def rhs(t, z, r=1.0, K=200.0, a=0.015, e=0.1, m=0.4):
     x, y = z
-    return [r*x*(1 - x/K) - a*x*y,
-            e*a*x*y - m*y]
+    return [r * x * (1 - x / K) - a * x * y, e * a * x * y - m * y]
+
 
 # Several initial conditions
 fig, ax = plt.subplots(figsize=(6, 5))
 for x0 in [20, 60, 120, 180]:
-    sol = solve_ivp(rhs, [0, 300], [x0, 5], dense_output=True,
-                    rtol=1e-8, atol=1e-10)
+    sol = solve_ivp(rhs, [0, 300], [x0, 5], dense_output=True, rtol=1e-8, atol=1e-10)
     t = np.linspace(0, 300, 4000)
     x, y = sol.sol(t)
     ax.plot(x, y, lw=0.7, label=f"x₀ = {x0}")
 
 # Equilibrium point
 x_eq = 0.4 / (0.1 * 0.015)
-y_eq = 1.0 * (1 - x_eq/200) / 0.015
+y_eq = 1.0 * (1 - x_eq / 200) / 0.015
 ax.plot(x_eq, y_eq, "k*", ms=14, label="equilibrium")
 
-ax.set_xlabel("prey x"); ax.set_ylabel("predator y")
-ax.set_title("Lotka–Volterra phase portrait"); ax.legend()
+ax.set_xlabel("prey x")
+ax.set_ylabel("predator y")
+ax.set_title("Lotka–Volterra phase portrait")
+ax.legend()
 plt.show()
 `}
 />
@@ -237,26 +239,32 @@ us an answer with confidence bars.
   starterCode={`import numpy as np
 from scipy.integrate import solve_ivp
 
+
 def survives(a, seed):
     rng = np.random.default_rng(seed)
+
     def rhs(t, z, r=1.0, K=200.0, e=0.1, m=0.4, sigma=0.05):
         x, y = z
         noise = sigma * rng.standard_normal()
-        return [r*x*(1 - x/K) - a*x*y + noise*x,
-                e*a*x*y - m*y]
+        return [r * x * (1 - x / K) - a * x * y + noise * x, e * a * x * y - m * y]
 
-    def extinct(t, z): return z[1] - 0.5
-    extinct.terminal = True; extinct.direction = -1
+    def extinct(t, z):
+        return z[1] - 0.5
 
-    sol = solve_ivp(rhs, [0, 200], [40, 9],
-                    rtol=1e-6, atol=1e-9, events=extinct, max_step=0.5)
+    extinct.terminal = True
+    extinct.direction = -1
+
+    sol = solve_ivp(
+        rhs, [0, 200], [40, 9], rtol=1e-6, atol=1e-9, events=extinct, max_step=0.5
+    )
     return 0 if sol.t_events[0].size else 1
+
 
 # 20 replicates per a; estimate survival probability and 1-sigma error
 for a in [0.005, 0.010, 0.015, 0.020, 0.030]:
     outcomes = np.array([survives(a, seed) for seed in range(20)])
     p = outcomes.mean()
-    se = np.sqrt(p*(1-p)/len(outcomes))
+    se = np.sqrt(p * (1 - p) / len(outcomes))
     print(f"a = {a:.3f}   survival = {p:.2f} ± {se:.2f}")
 `}
 />

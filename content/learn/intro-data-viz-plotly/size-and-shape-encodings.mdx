@@ -25,14 +25,15 @@ We met `size=` in the chapter on bubble charts. The summary:
 df = px.data.iris()
 
 fig = px.scatter(
-    df, x="sepal_width", y="sepal_length",
+    df,
+    x="sepal_width",
+    y="sepal_length",
     color="species",
     size="petal_length",  # the extra variable
     size_max=22,
     template="simple_white",
     title="Iris: size encodes petal length",
-    labels={"sepal_width": "Sepal width (cm)",
-            "sepal_length": "Sepal length (cm)"},
+    labels={"sepal_width": "Sepal width (cm)", "sepal_length": "Sepal length (cm)"},
 )
 fig.show()
 `}
@@ -62,13 +63,14 @@ marker shape: circle, square, triangle, diamond, cross, etc.
 df = px.data.iris()
 
 fig = px.scatter(
-    df, x="sepal_width", y="sepal_length",
+    df,
+    x="sepal_width",
+    y="sepal_length",
     color="species",
     symbol="species",
     template="simple_white",
     title="Iris: redundant color and shape (helpful for B&W or colorblind)",
-    labels={"sepal_width": "Sepal width (cm)",
-            "sepal_length": "Sepal length (cm)"},
+    labels={"sepal_width": "Sepal width (cm)", "sepal_length": "Sepal length (cm)"},
 )
 fig.show()
 `}
@@ -123,13 +125,12 @@ fig = px.scatter(
     y="lifeExp",
     color="continent",
     size="pop",
-    symbol="continent",   # redundant with color
+    symbol="continent",  # redundant with color
     log_x=True,
     size_max=55,
     template="simple_white",
     title="Gapminder 2007 — 4 encodings (color & symbol redundant)",
-    labels={"gdpPercap": "GDP per capita (USD, log)",
-            "lifeExp": "Life expectancy"},
+    labels={"gdpPercap": "GDP per capita (USD, log)", "lifeExp": "Life expectancy"},
 )
 fig.show()
 `}

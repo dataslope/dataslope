@@ -113,9 +113,11 @@ d = stats.norm(loc=30, scale=6)
 print("frozen:", round(float(d.cdf(36)), 4), round(float(d.ppf(0.9)), 2))
 
 # Unfrozen (equivalent, but you repeat parameters every call — error-prone).
-print("unfrozen:",
-      round(float(stats.norm.cdf(36, loc=30, scale=6)), 4),
-      round(float(stats.norm.ppf(0.9, loc=30, scale=6)), 2))
+print(
+    "unfrozen:",
+    round(float(stats.norm.cdf(36, loc=30, scale=6)), 4),
+    round(float(stats.norm.ppf(0.9, loc=30, scale=6)), 2),
+)
 
 # Same numbers — the frozen form is just tidier and safer.
 `}
@@ -193,12 +195,15 @@ fitted = stats.norm(loc=loc, scale=scale)
 x = np.linspace(sample.min(), sample.max(), 300)
 
 fig = go.Figure()
-fig.add_trace(go.Histogram(x=sample, histnorm="probability density",
-                           nbinsx=40, name="data"))
-fig.add_trace(go.Scatter(x=x, y=fitted.pdf(x), mode="lines",
-                         name="fitted normal"))
-fig.update_layout(title="Histogram with fitted normal overlay — shapes match well",
-                  xaxis_title="score", yaxis_title="density")
+fig.add_trace(
+    go.Histogram(x=sample, histnorm="probability density", nbinsx=40, name="data")
+)
+fig.add_trace(go.Scatter(x=x, y=fitted.pdf(x), mode="lines", name="fitted normal"))
+fig.update_layout(
+    title="Histogram with fitted normal overlay — shapes match well",
+    xaxis_title="score",
+    yaxis_title="density",
+)
 fig.show()
 `}
 />
@@ -237,29 +242,34 @@ rng = np.random.default_rng(7)
 normal_data = rng.normal(loc=50, scale=8, size=400)
 skewed_data = rng.lognormal(mean=3.5, sigma=0.5, size=400)
 
+
 def qq_points(data):
     n = len(data)
-    probs = (np.arange(1, n + 1) - 0.5) / n          # plotting positions
-    loc, scale = stats.norm.fit(data)                 # fit a normal
+    probs = (np.arange(1, n + 1) - 0.5) / n  # plotting positions
+    loc, scale = stats.norm.fit(data)  # fit a normal
     theoretical = stats.norm(loc=loc, scale=scale).ppf(probs)
     sample = np.sort(data)
     return theoretical, sample
 
-for label, data in [("normal data (good fit)", normal_data),
-                    ("skewed data (bad fit)", skewed_data)]:
+
+for label, data in [
+    ("normal data (good fit)", normal_data),
+    ("skewed data (bad fit)", skewed_data),
+]:
     theo, samp = qq_points(data)
     corr = np.corrcoef(theo, samp)[0, 1]
     print(f"{label:>24}: Q-Q correlation = {corr:.4f}")
 
 # Plot the skewed case to SEE the bend at the tails.
 theo, samp = qq_points(skewed_data)
-fig = px.scatter(x=theo, y=samp,
-                 labels={"x": "theoretical quantiles (fitted normal)",
-                         "y": "sample quantiles"},
-                 title="Q-Q plot: skewed data vs a fitted normal — note the curve")
+fig = px.scatter(
+    x=theo,
+    y=samp,
+    labels={"x": "theoretical quantiles (fitted normal)", "y": "sample quantiles"},
+    title="Q-Q plot: skewed data vs a fitted normal — note the curve",
+)
 lo, hi = min(theo.min(), samp.min()), max(theo.max(), samp.max())
-fig.add_shape(type="line", x0=lo, y0=lo, x1=hi, y1=hi,
-              line=dict(dash="dash"))
+fig.add_shape(type="line", x0=lo, y0=lo, x1=hi, y1=hi, line=dict(dash="dash"))
 fig.show()
 `}
 />

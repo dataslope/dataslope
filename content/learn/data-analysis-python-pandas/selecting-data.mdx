@@ -26,12 +26,14 @@ Let us see each in action on the same little DataFrame.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "name":       ["Aiko","Bilal","Chen","Diego","Eve"],
-    "department": ["Eng","Sales","Eng","Ops","Eng"],
-    "salary":     [120, 95, 140, 80, 128],
-    "tenure_yrs": [3, 6, 7, 2, 4],
-}).set_index("name")
+df = pd.DataFrame(
+    {
+        "name": ["Aiko", "Bilal", "Chen", "Diego", "Eve"],
+        "department": ["Eng", "Sales", "Eng", "Ops", "Eng"],
+        "salary": [120, 95, 140, 80, 128],
+        "tenure_yrs": [3, 6, 7, 2, 4],
+    }
+).set_index("name")
 
 print(df)
 `}
@@ -88,7 +90,7 @@ print(df.loc["Bilal"])
 print()
 
 # A subset of rows × columns
-print(df.loc[["Aiko","Chen","Eve"], ["salary", "department"]])
+print(df.loc[["Aiko", "Chen", "Eve"], ["salary", "department"]])
 print()
 
 # A label-based slice (INCLUSIVE on both ends)

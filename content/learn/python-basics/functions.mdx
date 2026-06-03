@@ -60,6 +60,7 @@ A function is **defined once** with `def`, then **called many times**. Each call
     """Return a friendly greeting."""
     return f"Hello, {name}!"
 
+
 print(greet("Ada"))
 `}
 />
@@ -70,6 +71,7 @@ A function that does not explicitly `return` returns `None`.
   adapter="python"
   starterCode={`def say_hello():
     print("Hello!")
+
 
 result = say_hello()
 print("returned:", result)
@@ -88,6 +90,7 @@ Python distinguishes between **positional** and **keyword** arguments.
   adapter="python"
   starterCode={`def deposit(account, amount, currency="USD"):
     return f"Deposited {amount} {currency} into {account}"
+
 
 # positional
 print(deposit("acct-1", 100))
@@ -115,9 +118,10 @@ def add_item_bad(item, items=[]):
     items.append(item)
     return items
 
+
 print(add_item_bad("a"))
-print(add_item_bad("b"))   # surprise: ["a", "b"]
-print(add_item_bad("c"))   # surprise: ["a", "b", "c"]
+print(add_item_bad("b"))  # surprise: ["a", "b"]
+print(add_item_bad("c"))  # surprise: ["a", "b", "c"]
 `}
 />
 
@@ -134,9 +138,10 @@ def add_item(item, items=None):
     items.append(item)
     return items
 
+
 print(add_item("a"))
-print(add_item("b"))   # ["b"]
-print(add_item("c"))   # ["c"]
+print(add_item("b"))  # ["b"]
+print(add_item("c"))  # ["c"]
 `}
 />
 
@@ -148,8 +153,9 @@ print(add_item("c"))   # ["c"]
   adapter="python"
   starterCode={`def log_event(name, *tags, **metadata):
     print("event:", name)
-    print("tags:", tags)           # tuple
-    print("metadata:", metadata)   # dict
+    print("tags:", tags)  # tuple
+    print("metadata:", metadata)  # dict
+
 
 log_event("login", "web", "production", user_id=42, latency_ms=120)
 `}
@@ -162,8 +168,9 @@ When **calling** a function, `*` and `**` **unpack** iterables/dicts back into a
   starterCode={`def add3(a, b, c):
     return a + b + c
 
+
 nums = [1, 2, 3]
-print(add3(*nums))   # unpacks list into a=1, b=2, c=3
+print(add3(*nums))  # unpacks list into a=1, b=2, c=3
 
 opts = {"a": 10, "b": 20, "c": 30}
 print(add3(**opts))  # unpacks dict into keyword arguments
@@ -195,11 +202,12 @@ def func(pos_only, /, pos_or_kw, *, kw_only):
     result = a / b
     return round(result) if rounded else result
 
+
 print(divide(7, 2))
 print(divide(7, 2, rounded=True))
 
 try:
-    print(divide(a=7, b=2))   # TypeError: a and b are positional-only
+    print(divide(a=7, b=2))  # TypeError: a and b are positional-only
 except TypeError as e:
     print("TypeError:", e)
 `}
@@ -220,6 +228,7 @@ A `return` statement exits the function immediately and sends a value back to th
         return -x
     return x
 
+
 print(absolute(-5))
 print(absolute(3))
 `}
@@ -233,6 +242,7 @@ You can return **multiple values** by separating them with commas. Python packs 
     quotient = a // b
     remainder = a % b
     return quotient, remainder
+
 
 q, r = divmod_custom(17, 5)
 print(f"17 = 5 * {q} + {r}")
@@ -251,6 +261,7 @@ Use **early return** to avoid deep nesting:
     # main logic here
     return f"processed {value}"
 
+
 print(process(None))
 print(process(-5))
 print(process(10))
@@ -264,7 +275,7 @@ A `lambda` is an **anonymous, single-expression function**. They are useful as `
 <CodeBlock
   adapter="python"
   starterCode={`words = ["banana", "apple", "cherry"]
-print(sorted(words, key=lambda w: w[-1]))   # sort by last letter
+print(sorted(words, key=lambda w: w[-1]))  # sort by last letter
 
 doubler = lambda x: x * 2
 print(doubler(7))
@@ -284,6 +295,7 @@ Type hints (PEP 484+) are **optional annotations**. Python itself does not enfor
   starterCode={`def total(prices: list[float], tax_rate: float = 0.07) -> float:
     """Compute total price including tax."""
     return sum(prices) * (1 + tax_rate)
+
 
 print(total([10.0, 20.0, 30.0]))
 `}
@@ -310,10 +322,12 @@ In Python, functions are **first-class objects**: you can pass them as arguments
   starterCode={`def apply_twice(func, x):
     return func(func(x))
 
+
 def add_one(n):
     return n + 1
 
-print(apply_twice(add_one, 3))   # 5
+
+print(apply_twice(add_one, 3))  # 5
 
 # store functions in a dict (dispatch table)
 ops = {

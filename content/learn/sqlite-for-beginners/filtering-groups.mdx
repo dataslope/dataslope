@@ -51,11 +51,17 @@ INSERT INTO employees (name, dept) VALUES
   ('Dave', 'Sales'),
   ('Eve', 'Sales'),
   ('Finn', 'Marketing');`}
-  starterCode={`SELECT dept, COUNT(*) AS headcount
-FROM employees
-GROUP BY dept
-HAVING COUNT(*) > 2
-ORDER BY headcount DESC;`}
+  starterCode={`SELECT
+  dept,
+  COUNT(*) AS headcount
+FROM
+  employees
+GROUP BY
+  dept
+HAVING
+  COUNT(*) > 2
+ORDER BY
+  headcount DESC;`}
 />
 
 Only Engineering survives because it has 3 employees. Sales has 2 and Marketing has 1, so those groups are filtered out.
@@ -113,12 +119,19 @@ INSERT INTO employees (name, dept, salary, is_intern) VALUES
   ('Dave', 'Sales', 75000, 0),
   ('Eve', 'Sales', 72000, 0),
   ('Finn', 'Marketing', 68000, 0);`}
-  starterCode={`SELECT dept, ROUND(AVG(salary), 0) AS average_salary
-FROM employees
-WHERE is_intern = 0
-GROUP BY dept
-HAVING AVG(salary) > 80000
-ORDER BY average_salary DESC;`}
+  starterCode={`SELECT
+  dept,
+  ROUND(AVG(salary), 0) AS average_salary
+FROM
+  employees
+WHERE
+  is_intern = 0
+GROUP BY
+  dept
+HAVING
+  AVG(salary) > 80000
+ORDER BY
+  average_salary DESC;`}
 />
 
 Read it in stages:
@@ -156,11 +169,17 @@ INSERT INTO sales (product, amount) VALUES
   ('Backpack', 45.00),
   ('Pencil', 2.50),
   ('Notebook', 9.00);`}
-  starterCode={`SELECT product, SUM(amount) AS total_sales
-FROM sales
-GROUP BY product
-HAVING SUM(amount) >= 30
-ORDER BY total_sales DESC;`}
+  starterCode={`SELECT
+  product,
+  SUM(amount) AS total_sales
+FROM
+  sales
+GROUP BY
+  product
+HAVING
+  SUM(amount) >= 30
+ORDER BY
+  total_sales DESC;`}
 />
 
 The `SUM(amount)` value is created per product group, so the condition belongs in `HAVING`.
@@ -185,12 +204,19 @@ INSERT INTO sales (product, amount, channel) VALUES
   ('Backpack', 45.00, 'Store'),
   ('Backpack', 20.00, 'Online'),
   ('Pencil', 3.00, 'Online');`}
-  starterCode={`SELECT product, SUM(amount) AS online_sales
-FROM sales
-WHERE channel = 'Online'
-GROUP BY product
-HAVING SUM(amount) >= 20
-ORDER BY online_sales DESC;`}
+  starterCode={`SELECT
+  product,
+  SUM(amount) AS online_sales
+FROM
+  sales
+WHERE
+  channel = 'Online'
+GROUP BY
+  product
+HAVING
+  SUM(amount) >= 20
+ORDER BY
+  online_sales DESC;`}
 />
 
 This query first keeps only online sales rows. Then it groups and totals those online rows. Finally, `HAVING` keeps products with at least `20` in online sales.
@@ -247,11 +273,16 @@ INSERT INTO orders (customer, amount) VALUES
   ('Linus', 12.00),
   ('Linus', 9.00),
   ('Linus', 6.00);`}
-  starterCode={`SELECT customer
-FROM orders
-GROUP BY customer
-HAVING COUNT(*) >= 2
-ORDER BY customer;`}
+  starterCode={`SELECT
+  customer
+FROM
+  orders
+GROUP BY
+  customer
+HAVING
+  COUNT(*) >= 2
+ORDER BY
+  customer;`}
 />
 
 This returns customers who have at least two orders, even though the count is not displayed.

@@ -117,11 +117,16 @@ class Lamp
         this.isOn = false;
     }
 
-    public void TurnOn()  { isOn = true; }
-    public void TurnOff() { isOn = false; }
+    public void TurnOn()
+    {
+        isOn = true;
+    }
+    public void TurnOff()
+    {
+        isOn = false;
+    }
 
-    public string Describe()
-        => $"{name} lamp is {(isOn ? "ON" : "off")}";
+    public string Describe() => $"{name} lamp is {(isOn ? "ON" : "off")}";
 }
 
 class Program

@@ -40,18 +40,18 @@ flowchart LR
 #include <stdlib.h>
 
 int main(void) {
-    int *p = malloc(sizeof(int));
-    if (p == NULL) {
-        fprintf(stderr, "out of memory\\n");
-        return 1;
-    }
+  int *p = malloc(sizeof(int));
+  if (p == NULL) {
+    fprintf(stderr, "out of memory\\n");
+    return 1;
+  }
 
-    *p = 42;
-    printf("*p = %d at %p\\n", *p, (void *)p);
+  *p = 42;
+  printf("*p = %d at %p\\n", *p, (void *)p);
 
-    free(p);
-    // Do not use p again — it now points at memory we no longer own.
-    return 0;
+  free(p);
+  // Do not use p again — it now points at memory we no longer own.
+  return 0;
 }
 `}
 />
@@ -76,15 +76,18 @@ runtime.
 #include <stdlib.h>
 
 int main(void) {
-    int n = 6;
-    int *arr = malloc((size_t)n * sizeof *arr);  // sizeof *arr == sizeof(int)
-    if (!arr) return 1;
+  int n = 6;
+  int *arr = malloc((size_t)n * sizeof *arr); // sizeof *arr == sizeof(int)
+  if (!arr)
+    return 1;
 
-    for (int i = 0; i < n; i++) arr[i] = i * i;
-    for (int i = 0; i < n; i++) printf("arr[%d] = %d\\n", i, arr[i]);
+  for (int i = 0; i < n; i++)
+    arr[i] = i * i;
+  for (int i = 0; i < n; i++)
+    printf("arr[%d] = %d\\n", i, arr[i]);
 
-    free(arr);
-    return 0;
+  free(arr);
+  return 0;
 }
 `}
 />
@@ -109,14 +112,16 @@ It is a small habit that prevents large bugs.
 #include <stdlib.h>
 
 int main(void) {
-    int *zeros = calloc(8, sizeof *zeros);
-    if (!zeros) return 1;
+  int *zeros = calloc(8, sizeof *zeros);
+  if (!zeros)
+    return 1;
 
-    for (int i = 0; i < 8; i++) printf("%d ", zeros[i]);
-    printf("\\n");
+  for (int i = 0; i < 8; i++)
+    printf("%d ", zeros[i]);
+  printf("\\n");
 
-    free(zeros);
-    return 0;
+  free(zeros);
+  return 0;
 }
 `}
 />
@@ -143,26 +148,30 @@ safe pattern is to use a temporary.
 #include <stdlib.h>
 
 int main(void) {
-    size_t cap = 4;
-    int *arr = malloc(cap * sizeof *arr);
-    if (!arr) return 1;
-    for (size_t i = 0; i < cap; i++) arr[i] = (int)i;
+  size_t cap = 4;
+  int *arr = malloc(cap * sizeof *arr);
+  if (!arr)
+    return 1;
+  for (size_t i = 0; i < cap; i++)
+    arr[i] = (int)i;
 
-    // Need more space — double the capacity.
-    size_t new_cap = cap * 2;
-    int *tmp = realloc(arr, new_cap * sizeof *arr);
-    if (!tmp) {
-        free(arr);              // realloc failed; original block still valid
-        return 1;
-    }
-    arr = tmp;
-    for (size_t i = cap; i < new_cap; i++) arr[i] = (int)i;
+  // Need more space — double the capacity.
+  size_t new_cap = cap * 2;
+  int *tmp = realloc(arr, new_cap * sizeof *arr);
+  if (!tmp) {
+    free(arr); // realloc failed; original block still valid
+    return 1;
+  }
+  arr = tmp;
+  for (size_t i = cap; i < new_cap; i++)
+    arr[i] = (int)i;
 
-    for (size_t i = 0; i < new_cap; i++) printf("%d ", arr[i]);
-    printf("\\n");
+  for (size_t i = 0; i < new_cap; i++)
+    printf("%d ", arr[i]);
+  printf("\\n");
 
-    free(arr);
-    return 0;
+  free(arr);
+  return 0;
 }
 `}
 />
@@ -177,48 +186,50 @@ A small, complete `vec` type to show how growable arrays really work.
 #include <stdlib.h>
 
 typedef struct {
-    int   *data;
-    size_t len;
-    size_t cap;
+  int *data;
+  size_t len;
+  size_t cap;
 } Vec;
 
 static int vec_init(Vec *v) {
-    v->data = NULL;
-    v->len = 0;
-    v->cap = 0;
-    return 0;
+  v->data = NULL;
+  v->len = 0;
+  v->cap = 0;
+  return 0;
 }
 
 static int vec_push(Vec *v, int x) {
-    if (v->len == v->cap) {
-        size_t new_cap = v->cap == 0 ? 4 : v->cap * 2;
-        int *tmp = realloc(v->data, new_cap * sizeof *v->data);
-        if (!tmp) return -1;
-        v->data = tmp;
-        v->cap  = new_cap;
-    }
-    v->data[v->len++] = x;
-    return 0;
+  if (v->len == v->cap) {
+    size_t new_cap = v->cap == 0 ? 4 : v->cap * 2;
+    int *tmp = realloc(v->data, new_cap * sizeof *v->data);
+    if (!tmp)
+      return -1;
+    v->data = tmp;
+    v->cap = new_cap;
+  }
+  v->data[v->len++] = x;
+  return 0;
 }
 
 static void vec_free(Vec *v) {
-    free(v->data);
-    v->data = NULL;
-    v->len = v->cap = 0;
+  free(v->data);
+  v->data = NULL;
+  v->len = v->cap = 0;
 }
 
 int main(void) {
-    Vec v;
-    vec_init(&v);
-    for (int i = 0; i < 10; i++) vec_push(&v, i * i);
+  Vec v;
+  vec_init(&v);
+  for (int i = 0; i < 10; i++)
+    vec_push(&v, i * i);
 
-    for (size_t i = 0; i < v.len; i++) {
-        printf("%d ", v.data[i]);
-    }
-    printf("\\n(len=%zu cap=%zu)\\n", v.len, v.cap);
+  for (size_t i = 0; i < v.len; i++) {
+    printf("%d ", v.data[i]);
+  }
+  printf("\\n(len=%zu cap=%zu)\\n", v.len, v.cap);
 
-    vec_free(&v);
-    return 0;
+  vec_free(&v);
+  return 0;
 }
 `}
 />
@@ -249,19 +260,21 @@ make **ownership** explicit:
 
 // Allocate and return a heap copy of \`s\`. Caller is responsible for free().
 char *xstrdup(const char *s) {
-    size_t n = strlen(s) + 1;
-    char *out = malloc(n);
-    if (!out) return NULL;
-    memcpy(out, s, n);
-    return out;
+  size_t n = strlen(s) + 1;
+  char *out = malloc(n);
+  if (!out)
+    return NULL;
+  memcpy(out, s, n);
+  return out;
 }
 
 int main(void) {
-    char *greeting = xstrdup("Hello, owner!");
-    if (!greeting) return 1;
-    printf("%s\\n", greeting);
-    free(greeting);            // caller owns it; caller frees it
-    return 0;
+  char *greeting = xstrdup("Hello, owner!");
+  if (!greeting)
+    return 1;
+  printf("%s\\n", greeting);
+  free(greeting); // caller owns it; caller frees it
+  return 0;
 }
 `}
 />
@@ -277,19 +290,22 @@ pointer with the new address. That's a pointer-to-pointer parameter.
 #include <stdlib.h>
 
 int make_zeros(size_t n, int **out) {
-    int *p = calloc(n, sizeof *p);
-    if (!p) return -1;
-    *out = p;                   // store the new address through the out param
-    return 0;
+  int *p = calloc(n, sizeof *p);
+  if (!p)
+    return -1;
+  *out = p; // store the new address through the out param
+  return 0;
 }
 
 int main(void) {
-    int *arr = NULL;
-    if (make_zeros(5, &arr) != 0) return 1;
-    for (int i = 0; i < 5; i++) printf("%d ", arr[i]);
-    printf("\\n");
-    free(arr);
-    return 0;
+  int *arr = NULL;
+  if (make_zeros(5, &arr) != 0)
+    return 1;
+  for (int i = 0; i < 5; i++)
+    printf("%d ", arr[i]);
+  printf("\\n");
+  free(arr);
+  return 0;
 }
 `}
 />
@@ -307,17 +323,19 @@ eventually exhaust memory and crash.
 #include <stdlib.h>
 
 void leak(void) {
-    int *p = malloc(sizeof(int) * 1000);   // allocated...
-    if (!p) return;
-    // ...used briefly...
-    p[0] = 1;
-    // ...and forgotten. No free, and the only pointer p dies with this frame.
+  int *p = malloc(sizeof(int) * 1000); // allocated...
+  if (!p)
+    return;
+  // ...used briefly...
+  p[0] = 1;
+  // ...and forgotten. No free, and the only pointer p dies with this frame.
 }
 
 int main(void) {
-    for (int i = 0; i < 5; i++) leak();
-    printf("leaked 5 blocks; in a real program this would accumulate\\n");
-    return 0;
+  for (int i = 0; i < 5; i++)
+    leak();
+  printf("leaked 5 blocks; in a real program this would accumulate\\n");
+  return 0;
 }
 `}
 />
@@ -335,27 +353,28 @@ use-after-frees — in the *Memory Bugs* chapter.
 #include <stdlib.h>
 
 int main(void) {
-    int N = 5;
-    // your code here
-    return 0;
+  int N = 5;
+  // your code here
+  return 0;
 }
 `}
   solutionCode={`#include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
-    int N = 5;
-    int *a = malloc((size_t)N * sizeof *a);
-    if (!a) return 1;
-    int values[] = {10, 20, 30, 40, 50};
-    long sum = 0;
-    for (int i = 0; i < N; i++) {
-        a[i] = values[i];
-        sum += a[i];
-    }
-    printf("%ld\\n", sum / N);
-    free(a);
-    return 0;
+  int N = 5;
+  int *a = malloc((size_t)N * sizeof *a);
+  if (!a)
+    return 1;
+  int values[] = {10, 20, 30, 40, 50};
+  long sum = 0;
+  for (int i = 0; i < N; i++) {
+    a[i] = values[i];
+    sum += a[i];
+  }
+  printf("%ld\\n", sum / N);
+  free(a);
+  return 0;
 }
 `}
   tests={[
@@ -378,16 +397,17 @@ int main(void) {
 #include <string.h>
 
 char *my_strdup(const char *s) {
-    // your code here
-    return NULL;
+  // your code here
+  return NULL;
 }
 
 int main(void) {
-    char *copy = my_strdup("heap copy");
-    if (!copy) return 1;
-    printf("%s\\n", copy);
-    free(copy);
-    return 0;
+  char *copy = my_strdup("heap copy");
+  if (!copy)
+    return 1;
+  printf("%s\\n", copy);
+  free(copy);
+  return 0;
 }
 `}
   solutionCode={`#include <stdio.h>
@@ -395,20 +415,23 @@ int main(void) {
 #include <string.h>
 
 char *my_strdup(const char *s) {
-    if (!s) return NULL;
-    size_t n = strlen(s) + 1;
-    char *out = malloc(n);
-    if (!out) return NULL;
-    memcpy(out, s, n);
-    return out;
+  if (!s)
+    return NULL;
+  size_t n = strlen(s) + 1;
+  char *out = malloc(n);
+  if (!out)
+    return NULL;
+  memcpy(out, s, n);
+  return out;
 }
 
 int main(void) {
-    char *copy = my_strdup("heap copy");
-    if (!copy) return 1;
-    printf("%s\\n", copy);
-    free(copy);
-    return 0;
+  char *copy = my_strdup("heap copy");
+  if (!copy)
+    return 1;
+  printf("%s\\n", copy);
+  free(copy);
+  return 0;
 }
 `}
   tests={[

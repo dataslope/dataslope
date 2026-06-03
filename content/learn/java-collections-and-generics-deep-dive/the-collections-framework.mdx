@@ -159,24 +159,27 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Main {
-    // The method talks about List<String> — it does NOT care
-    // whether the underlying storage is an array or a linked list.
-    static int totalLength(List<String> words) {
-        int total = 0;
-        for (String w : words) total += w.length();
-        return total;
-    }
+  // The method talks about List<String> — it does NOT care
+  // whether the underlying storage is an array or a linked list.
+  static int totalLength(List<String> words) {
+    int total = 0;
+    for (String w : words)
+      total += w.length();
+    return total;
+  }
 
-    public static void main(String[] args) {
-        List<String> a = new ArrayList<>();
-        a.add("alpha"); a.add("beta");
+  public static void main(String[] args) {
+    List<String> a = new ArrayList<>();
+    a.add("alpha");
+    a.add("beta");
 
-        List<String> b = new LinkedList<>();
-        b.add("alpha"); b.add("beta");
+    List<String> b = new LinkedList<>();
+    b.add("alpha");
+    b.add("beta");
 
-        System.out.println("array-backed:  " + totalLength(a));
-        System.out.println("linked-backed: " + totalLength(b));
-    }
+    System.out.println("array-backed:  " + totalLength(a));
+    System.out.println("linked-backed: " + totalLength(b));
+  }
 }
 `}
 />
@@ -201,20 +204,25 @@ import java.util.Collections;
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<Integer> nums = new ArrayList<>();
-        nums.add(3); nums.add(1); nums.add(4); nums.add(1); nums.add(5); nums.add(9);
+  public static void main(String[] args) {
+    List<Integer> nums = new ArrayList<>();
+    nums.add(3);
+    nums.add(1);
+    nums.add(4);
+    nums.add(1);
+    nums.add(5);
+    nums.add(9);
 
-        Collections.sort(nums);
-        System.out.println("sorted:    " + nums);
+    Collections.sort(nums);
+    System.out.println("sorted:    " + nums);
 
-        Collections.reverse(nums);
-        System.out.println("reversed:  " + nums);
+    Collections.reverse(nums);
+    System.out.println("reversed:  " + nums);
 
-        System.out.println("frequency of 1: " + Collections.frequency(nums, 1));
-        System.out.println("min:            " + Collections.min(nums));
-        System.out.println("max:            " + Collections.max(nums));
-    }
+    System.out.println("frequency of 1: " + Collections.frequency(nums, 1));
+    System.out.println("min:            " + Collections.min(nums));
+    System.out.println("max:            " + Collections.max(nums));
+  }
 }
 `}
 />
@@ -237,20 +245,25 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<String> words = new ArrayList<>();
-        words.add("alpha"); words.add(""); words.add("beta"); words.add("");
+  public static void main(String[] args) {
+    List<String> words = new ArrayList<>();
+    words.add("alpha");
+    words.add("");
+    words.add("beta");
+    words.add("");
 
-        // Remove empty strings safely during iteration.
-        Iterator<String> it = words.iterator();
-        while (it.hasNext()) {
-            if (it.next().isEmpty()) it.remove();
-        }
-        System.out.println(words);
-
-        // Same walk, but read-only, with for-each:
-        for (String w : words) System.out.println("- " + w);
+    // Remove empty strings safely during iteration.
+    Iterator<String> it = words.iterator();
+    while (it.hasNext()) {
+      if (it.next().isEmpty())
+        it.remove();
     }
+    System.out.println(words);
+
+    // Same walk, but read-only, with for-each:
+    for (String w : words)
+      System.out.println("- " + w);
+  }
 }
 `}
 />

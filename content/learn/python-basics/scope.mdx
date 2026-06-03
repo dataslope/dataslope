@@ -43,9 +43,11 @@ flowchart TD
   adapter="python"
   starterCode={`x = "global x"
 
+
 def show():
     x = "local x"
     print("inside:", x)
+
 
 show()
 print("outside:", x)
@@ -66,8 +68,10 @@ This is the key gotcha: **reading** a name searches LEGB, but **assigning** a na
   adapter="python"
   starterCode={`counter = 0
 
+
 def bump_bad():
-    counter += 1     # UnboundLocalError: assigning makes it local
+    counter += 1  # UnboundLocalError: assigning makes it local
+
 
 try:
     bump_bad()
@@ -84,11 +88,15 @@ To rebind the **global** from inside a function, use the `global` keyword:
   adapter="python"
   starterCode={`counter = 0
 
+
 def bump():
     global counter
     counter += 1
 
-bump(); bump(); bump()
+
+bump()
+bump()
+bump()
 print("counter:", counter)
 `}
 />
@@ -105,11 +113,14 @@ When you nest functions, the inner one can **read** names from the outer one (cl
   adapter="python"
   starterCode={`def make_counter():
     count = 0
+
     def step():
         nonlocal count
         count += 1
         return count
+
     return step
+
 
 c = make_counter()
 print(c(), c(), c())
@@ -129,6 +140,7 @@ The built-in scope contains everything in the [`builtins` module](https://docs.p
 <CodeBlock
   adapter="python"
   starterCode={`import builtins
+
 print(len(dir(builtins)))
 print([n for n in dir(builtins) if n.islower()][:10])
 `}
@@ -138,14 +150,14 @@ You **can** shadow a built-in by accident:
 
 <CodeBlock
   adapter="python"
-  starterCode={`list = [1, 2, 3]   # bad: list() no longer works in this scope
+  starterCode={`list = [1, 2, 3]  # bad: list() no longer works in this scope
 print(list)
 try:
     print(list((4, 5, 6)))
 except TypeError as e:
     print("TypeError:", e)
 
-del list             # restore access to the built-in
+del list  # restore access to the built-in
 print(list((4, 5, 6)))
 `}
 />
@@ -164,8 +176,10 @@ A **closure** is a function that remembers variables from its enclosing scope, e
   adapter="python"
   starterCode={`def multiplier(factor):
     def inner(x):
-        return x * factor   # 'factor' comes from the enclosing scope
+        return x * factor  # 'factor' comes from the enclosing scope
+
     return inner
+
 
 double = multiplier(2)
 triple = multiplier(3)
@@ -216,8 +230,9 @@ This is a classic interview question:
         adders.append(lambda x: x + i)
     return adders
 
+
 a, b, c = make_adders()
-print(a(10), b(10), c(10))   # all print 12, not 10/11/12!
+print(a(10), b(10), c(10))  # all print 12, not 10/11/12!
 `}
 />
 
@@ -237,8 +252,9 @@ Closures capture variables by **reference**, not by **value**. If the variable c
         adders.append(lambda x, i=i: x + i)  # default argument captures value
     return adders
 
+
 a, b, c = make_adders()
-print(a(10), b(10), c(10))   # 10, 11, 12
+print(a(10), b(10), c(10))  # 10, 11, 12
 `}
 />
 
@@ -287,15 +303,18 @@ Use a closure with \`nonlocal\`; do not use globals.`}
     # your code here
     def next_value():
         return 0
+
     return next_value
 `}
   solutionCode={`def make_counter(start=0, step=1):
     current = start
+
     def next_value():
         nonlocal current
         value = current
         current += step
         return value
+
     return next_value
 `}
   tests={[
@@ -360,17 +379,22 @@ Return them as a tuple: \`(increment, get)\`.`}
     # your code here
     def increment():
         pass
+
     def get():
         return 0
+
     return increment, get
 `}
   solutionCode={`def counter():
     count = 0
+
     def increment():
         nonlocal count
         count += 1
+
     def get():
         return count
+
     return increment, get
 `}
   tests={[

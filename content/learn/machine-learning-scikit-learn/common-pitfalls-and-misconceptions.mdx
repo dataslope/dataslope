@@ -57,16 +57,16 @@ X, y = load_breast_cancer(return_X_y=True)
 # LEAKY: scale using the WHOLE dataset, then cross-validate.
 # Every fold's scaler has already seen statistics from its validation rows.
 X_leaked = StandardScaler().fit_transform(X)
-leaky_cv = cross_val_score(
-    LogisticRegression(max_iter=5000), X_leaked, y, cv=5
-).mean()
+leaky_cv = cross_val_score(LogisticRegression(max_iter=5000), X_leaked, y, cv=5).mean()
 
 # CORRECT: put the scaler INSIDE a pipeline, so each fold scales using only
 # its own training portion.
-correct = Pipeline([
-    ("scaler", StandardScaler()),
-    ("model", LogisticRegression(max_iter=5000)),
-])
+correct = Pipeline(
+    [
+        ("scaler", StandardScaler()),
+        ("model", LogisticRegression(max_iter=5000)),
+    ]
+)
 correct_cv = cross_val_score(correct, X, y, cv=5).mean()
 
 print(f"Leaky CV accuracy:   {leaky_cv:.4f}")
@@ -121,7 +121,9 @@ X_train, X_test, y_train, y_test = train_test_split(
 # An unrestricted tree memorizes the training set.
 tree = DecisionTreeClassifier(random_state=0).fit(X_train, y_train)
 
-print(f"Training accuracy: {tree.score(X_train, y_train):.3f}  <- meaningless as a performance estimate")
+print(
+    f"Training accuracy: {tree.score(X_train, y_train):.3f}  <- meaningless as a performance estimate"
+)
 print(f"Test accuracy:     {tree.score(X_test, y_test):.3f}  <- the honest number")
 `}
 />
@@ -157,7 +159,9 @@ model = DummyClassifier(strategy="most_frequent").fit(X, y)
 pred = model.predict(X)
 
 print(f"Accuracy: {accuracy_score(y, pred):.3f}   <- looks fantastic!")
-print(f"Recall on the rare class: {recall_score(y, pred, pos_label=1):.3f}   <- it caught ZERO of them")
+print(
+    f"Recall on the rare class: {recall_score(y, pred, pos_label=1):.3f}   <- it caught ZERO of them"
+)
 print("Confusion matrix:")
 print(confusion_matrix(y, pred))
 `}
@@ -287,7 +291,7 @@ from sklearn.ensemble import RandomForestRegressor
 # Train on x in [0, 10], target y = 2x.
 rng = np.random.default_rng(0)
 X_train = np.linspace(0, 10, 50).reshape(-1, 1)
-y_train = (2 * X_train.ravel())
+y_train = 2 * X_train.ravel()
 
 lin = LinearRegression().fit(X_train, y_train)
 forest = RandomForestRegressor(n_estimators=100, random_state=0).fit(X_train, y_train)
@@ -295,8 +299,12 @@ forest = RandomForestRegressor(n_estimators=100, random_state=0).fit(X_train, y_
 # Predict FAR outside the training range, at x = 100 (true answer: 200).
 far = np.array([[100.0]])
 print(f"True value at x=100: 200")
-print(f"Linear model predicts:        {lin.predict(far)[0]:.1f}  (extrapolates the line)")
-print(f"Random forest predicts:       {forest.predict(far)[0]:.1f}  (flat -- cannot exceed training range)")
+print(
+    f"Linear model predicts:        {lin.predict(far)[0]:.1f}  (extrapolates the line)"
+)
+print(
+    f"Random forest predicts:       {forest.predict(far)[0]:.1f}  (flat -- cannot exceed training range)"
+)
 `}
 />
 
@@ -362,8 +370,12 @@ rng = np.random.default_rng(0)
 noise = rng.normal(size=(X.shape[0], 200))
 X_noisy = np.hstack([X, noise])
 
-score_clean = cross_val_score(make_pipeline(StandardScaler(), KNeighborsClassifier()), X, y, cv=5).mean()
-score_noisy = cross_val_score(make_pipeline(StandardScaler(), KNeighborsClassifier()), X_noisy, y, cv=5).mean()
+score_clean = cross_val_score(
+    make_pipeline(StandardScaler(), KNeighborsClassifier()), X, y, cv=5
+).mean()
+score_noisy = cross_val_score(
+    make_pipeline(StandardScaler(), KNeighborsClassifier()), X_noisy, y, cv=5
+).mean()
 
 print(f"CV accuracy with 13 real features:        {score_clean:.3f}")
 print(f"CV accuracy after adding 200 noise cols:  {score_noisy:.3f}")
@@ -439,10 +451,12 @@ correct_cv = None
 print("correct CV accuracy:", correct_cv)
 `}
   solutionCode={`# YOUR FIX: scale INSIDE a pipeline so each fold scales only its training rows.
-pipe = Pipeline([
-    ("scaler", StandardScaler()),
-    ("model", LogisticRegression(max_iter=5000)),
-])
+pipe = Pipeline(
+    [
+        ("scaler", StandardScaler()),
+        ("model", LogisticRegression(max_iter=5000)),
+    ]
+)
 
 correct_cv = cross_val_score(pipe, X, y, cv=5).mean()
 

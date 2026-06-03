@@ -75,8 +75,8 @@ sample = rng.normal(loc=48, scale=14, size=50)
 
 n = sample.size
 x_bar = sample.mean()
-s = sample.std(ddof=1)            # sample sd (n-1)
-se = s / np.sqrt(n)               # standard error of the mean
+s = sample.std(ddof=1)  # sample sd (n-1)
+se = s / np.sqrt(n)  # standard error of the mean
 
 # 95% CI for the mean using the t-distribution (df = n - 1).
 low, high = stats.t.interval(0.95, df=n - 1, loc=x_bar, scale=se)
@@ -169,34 +169,44 @@ from scipy import stats
 
 rng = np.random.default_rng(7)
 
-MU_TRUE = 100.0      # the truth — normally hidden, here we know it
+MU_TRUE = 100.0  # the truth — normally hidden, here we know it
 SIGMA = 15.0
-n = 40               # each sample's size
-n_intervals = 100    # how many samples/intervals to draw
+n = 40  # each sample's size
+n_intervals = 100  # how many samples/intervals to draw
 
 lows, highs, centers, covers = [], [], [], []
 for _ in range(n_intervals):
     s = rng.normal(MU_TRUE, SIGMA, size=n)
     se = s.std(ddof=1) / np.sqrt(n)
     lo, hi = stats.t.interval(0.95, df=n - 1, loc=s.mean(), scale=se)
-    lows.append(lo); highs.append(hi); centers.append(s.mean())
-    covers.append(lo <= MU_TRUE <= hi)   # did THIS interval catch mu?
+    lows.append(lo)
+    highs.append(hi)
+    centers.append(s.mean())
+    covers.append(lo <= MU_TRUE <= hi)  # did THIS interval catch mu?
 
 covers = np.array(covers)
 n_miss = int((~covers).sum())
 
 fig = go.Figure()
 for i in range(n_intervals):
-    color = "#2ca02c" if covers[i] else "#d62728"   # green hit, red miss
-    fig.add_trace(go.Scatter(
-        x=[lows[i], highs[i]], y=[i, i],
-        mode="lines", line=dict(color=color, width=2),
-        showlegend=False))
-fig.add_vline(x=MU_TRUE, line_dash="dash", line_color="black",
-              annotation_text="true mu = 100")
+    color = "#2ca02c" if covers[i] else "#d62728"  # green hit, red miss
+    fig.add_trace(
+        go.Scatter(
+            x=[lows[i], highs[i]],
+            y=[i, i],
+            mode="lines",
+            line=dict(color=color, width=2),
+            showlegend=False,
+        )
+    )
+fig.add_vline(
+    x=MU_TRUE, line_dash="dash", line_color="black", annotation_text="true mu = 100"
+)
 fig.update_layout(
     title=f"100 separate 95% CIs — {n_miss} missed the true mu (red)",
-    xaxis_title="value", yaxis_title="interval number")
+    xaxis_title="value",
+    yaxis_title="interval number",
+)
 fig.show()
 
 print(f"{n_intervals - n_miss} of {n_intervals} intervals covered mu.")
@@ -312,7 +322,7 @@ df = sample.size - 1
 print("Same sample, different confidence levels (higher = WIDER):")
 for conf in (0.80, 0.90, 0.95, 0.99):
     lo, hi = stats.t.interval(conf, df=df, loc=x_bar, scale=se)
-    print(f"  {int(conf*100)}% CI: ({lo:.2f}, {hi:.2f})   width = {hi-lo:.2f}")
+    print(f"  {int(conf * 100)}% CI: ({lo:.2f}, {hi:.2f})   width = {hi - lo:.2f}")
 
 print()
 print("Fixed 95% confidence, growing n (bigger n = NARROWER):")
@@ -320,7 +330,7 @@ for n in (25, 100, 400, 1600):
     s = rng.normal(50, 12, size=n)
     se_n = s.std(ddof=1) / np.sqrt(n)
     lo, hi = stats.t.interval(0.95, df=n - 1, loc=s.mean(), scale=se_n)
-    print(f"  n={n:5d}: ({lo:.2f}, {hi:.2f})   width = {hi-lo:.2f}")
+    print(f"  n={n:5d}: ({lo:.2f}, {hi:.2f})   width = {hi - lo:.2f}")
 
 print()
 print("Notice: each 4x increase in n roughly HALVES the width.")
@@ -367,15 +377,15 @@ n = 3000
 p_hat = successes / n
 
 # Normal-approximation (Wald) 95% CI for a proportion.
-z = stats.norm.ppf(0.975)                  # ~1.96 for 95%
+z = stats.norm.ppf(0.975)  # ~1.96 for 95%
 se = np.sqrt(p_hat * (1 - p_hat) / n)
 low = p_hat - z * se
 high = p_hat + z * se
 
-print(f"p-hat   = {p_hat:.4f}  ({100*p_hat:.1f}% conversion)")
+print(f"p-hat   = {p_hat:.4f}  ({100 * p_hat:.1f}% conversion)")
 print(f"std err = {se:.4f}")
 print(f"95% CI  = ({low:.4f}, {high:.4f})")
-print(f"        = ({100*low:.1f}%, {100*high:.1f}%)")
+print(f"        = ({100 * low:.1f}%, {100 * high:.1f}%)")
 `}
 />
 

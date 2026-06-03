@@ -49,9 +49,9 @@ INSERT INTO orders (id, customer_id, amount) VALUES
   orders.id AS order_id,
   customers.name AS customer,
   orders.amount
-FROM orders
-JOIN customers
-  ON orders.customer_id = customers.id;`}
+FROM
+  orders
+  JOIN customers ON orders.customer_id = customers.id;`}
 />
 
 Read the `ON` line as: "match an order to a customer when the order's `customer_id` equals the customer's `id`."
@@ -86,9 +86,12 @@ INSERT INTO orders (id, customer_id, amount) VALUES (101, 1, 42), (102, 2, 99);`
   o.customer_id,
   c.id AS customer_id,
   c.name
-FROM orders o
-CROSS JOIN customers c
-ORDER BY o.id, c.id;`}
+FROM
+  orders o
+  CROSS JOIN customers c
+ORDER BY
+  o.id,
+  c.id;`}
 />
 
 That result shows every possible pairing. A normal join keeps only the rows where the ids line up.
@@ -104,9 +107,11 @@ INSERT INTO orders (id, customer_id, amount) VALUES (101, 1, 42), (102, 2, 99);`
   o.id AS order_id,
   c.name,
   o.amount
-FROM orders o
-JOIN customers c ON o.customer_id = c.id
-ORDER BY o.id;`}
+FROM
+  orders o
+  JOIN customers c ON o.customer_id = c.id
+ORDER BY
+  o.id;`}
 />
 
 ```mermaid
@@ -143,10 +148,15 @@ Aliases are short names you give tables inside one query. They make joined queri
 CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount NUMERIC);
 INSERT INTO customers (id, name) VALUES (1, 'Ada'), (2, 'Grace');
 INSERT INTO orders (id, customer_id, amount) VALUES (101, 1, 42), (102, 2, 99);`}
-  starterCode={`SELECT o.id AS order_id, c.name AS customer, o.amount
-FROM orders o
-JOIN customers c ON o.customer_id = c.id
-ORDER BY o.id;`}
+  starterCode={`SELECT
+  o.id AS order_id,
+  c.name AS customer,
+  o.amount
+FROM
+  orders o
+  JOIN customers c ON o.customer_id = c.id
+ORDER BY
+  o.id;`}
 />
 
 `orders o` means "use `o` as a short name for `orders` in this query." Prefixes also solve ambiguity: both tables may have a column named `id`, so `o.id` and `c.id` say exactly which one you mean.
@@ -171,11 +181,17 @@ flowchart TB
 CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount NUMERIC);
 INSERT INTO customers (id, name) VALUES (1, 'Ada'), (2, 'Grace');
 INSERT INTO orders (id, customer_id, amount) VALUES (101, 1, 42), (102, 2, 99), (103, 1, 18);`}
-  starterCode={`SELECT c.name, COUNT(o.id) AS order_count
-FROM customers c
-JOIN orders o ON o.customer_id = c.id
-GROUP BY c.id, c.name
-ORDER BY c.name;`}
+  starterCode={`SELECT
+  c.name,
+  COUNT(o.id) AS order_count
+FROM
+  customers c
+  JOIN orders o ON o.customer_id = c.id
+GROUP BY
+  c.id,
+  c.name
+ORDER BY
+  c.name;`}
 />
 
 ## What if a row has no match?

@@ -34,16 +34,16 @@ real:
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int a[5] = {10, 20, 30, 40, 50};
-    int *p = a;
+  int a[5] = {10, 20, 30, 40, 50};
+  int *p = a;
 
-    printf("a       = %p\\n", (void*)a);
-    printf("&a[0]   = %p\\n", (void*)&a[0]);
-    printf("p       = %p\\n", (void*)p);
-    printf("a[2]    = %d\\n", a[2]);
-    printf("p[2]    = %d\\n", p[2]);
-    printf("*(p+2)  = %d\\n", *(p + 2));
-    return 0;
+  printf("a       = %p\\n", (void *)a);
+  printf("&a[0]   = %p\\n", (void *)&a[0]);
+  printf("p       = %p\\n", (void *)p);
+  printf("a[2]    = %d\\n", a[2]);
+  printf("p[2]    = %d\\n", p[2]);
+  printf("*(p+2)  = %d\\n", *(p + 2));
+  return 0;
 }
 `}
 />
@@ -75,21 +75,21 @@ array with a pointer is just incrementing the pointer.
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int a[5] = {10, 20, 30, 40, 50};
+  int a[5] = {10, 20, 30, 40, 50};
 
-    // walk with an index
-    for (int i = 0; i < 5; i++) {
-        printf("%d ", a[i]);
-    }
-    printf("\\n");
+  // walk with an index
+  for (int i = 0; i < 5; i++) {
+    printf("%d ", a[i]);
+  }
+  printf("\\n");
 
-    // walk with a pointer
-    for (int *p = a; p < a + 5; p++) {
-        printf("%d ", *p);
-    }
-    printf("\\n");
+  // walk with a pointer
+  for (int *p = a; p < a + 5; p++) {
+    printf("%d ", *p);
+  }
+  printf("\\n");
 
-    return 0;
+  return 0;
 }
 `}
 />
@@ -109,16 +109,16 @@ pointer-arithmetic loop in C:
   starterCode={`#include <stdio.h>
 
 void my_puts(const char *s) {
-    while (*s != '\\0') {
-        putchar(*s);
-        s++;
-    }
-    putchar('\\n');
+  while (*s != '\\0') {
+    putchar(*s);
+    s++;
+  }
+  putchar('\\n');
 }
 
 int main(void) {
-    my_puts("Hello, pointers!");
-    return 0;
+  my_puts("Hello, pointers!");
+  return 0;
 }
 `}
 />
@@ -168,13 +168,13 @@ between them, in elements:
 #include <string.h>
 
 int main(void) {
-    const char *s = "Hello, world!";
-    const char *comma = strchr(s, ',');
+  const char *s = "Hello, world!";
+  const char *comma = strchr(s, ',');
 
-    if (comma != NULL) {
-        printf("comma is at offset %ld\\n", comma - s);
-    }
-    return 0;
+  if (comma != NULL) {
+    printf("comma is at offset %ld\\n", comma - s);
+  }
+  return 0;
 }
 `}
 />
@@ -194,20 +194,20 @@ elements with a single pointer:
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int grid[3][4] = {
-        { 1,  2,  3,  4},
-        { 5,  6,  7,  8},
-        { 9, 10, 11, 12},
-    };
+  int grid[3][4] = {
+      {1, 2, 3, 4},
+      {5, 6, 7, 8},
+      {9, 10, 11, 12},
+  };
 
-    int *p = &grid[0][0];
-    int total = 3 * 4;
-    int sum = 0;
-    for (int i = 0; i < total; i++) {
-        sum += p[i];
-    }
-    printf("sum = %d\\n", sum);
-    return 0;
+  int *p = &grid[0][0];
+  int total = 3 * 4;
+  int sum = 0;
+  for (int i = 0; i < total; i++) {
+    sum += p[i];
+  }
+  printf("sum = %d\\n", sum);
+  return 0;
 }
 `}
 />
@@ -271,32 +271,32 @@ The program must print exactly \`15\`.`}
   starterCode={`#include <stdio.h>
 
 int sum(const int *begin, const int *end) {
-    // walk from begin up to (but not including) end
-    return 0;
+  // walk from begin up to (but not including) end
+  return 0;
 }
 
 int main(void) {
-    int a[] = {1, 2, 3, 4, 5};
-    int total = sum(a, a + 5);
-    printf("%d\\n", total);
-    return 0;
+  int a[] = {1, 2, 3, 4, 5};
+  int total = sum(a, a + 5);
+  printf("%d\\n", total);
+  return 0;
 }
 `}
   solutionCode={`#include <stdio.h>
 
 int sum(const int *begin, const int *end) {
-    int total = 0;
-    for (const int *p = begin; p < end; p++) {
-        total += *p;
-    }
-    return total;
+  int total = 0;
+  for (const int *p = begin; p < end; p++) {
+    total += *p;
+  }
+  return total;
 }
 
 int main(void) {
-    int a[] = {1, 2, 3, 4, 5};
-    int total = sum(a, a + 5);
-    printf("%d\\n", total);
-    return 0;
+  int a[] = {1, 2, 3, 4, 5};
+  int total = sum(a, a + 5);
+  printf("%d\\n", total);
+  return 0;
 }
 `}
   tests={[

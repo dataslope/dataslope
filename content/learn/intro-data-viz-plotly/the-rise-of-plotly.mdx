@@ -110,13 +110,17 @@ That's *one* line of meaningful code. Try it:
   starterCode={`import pandas as pd
 import plotly.express as px
 
-df = pd.DataFrame({
-    "category": ["A", "B", "C", "D", "E"],
-    "count": [10, 7, 14, 4, 11],
-})
+df = pd.DataFrame(
+    {
+        "category": ["A", "B", "C", "D", "E"],
+        "count": [10, 7, 14, 4, 11],
+    }
+)
 
 fig = px.bar(
-    df, x="category", y="count",
+    df,
+    x="category",
+    y="count",
     title="Counts by category",
     template="simple_white",
 )

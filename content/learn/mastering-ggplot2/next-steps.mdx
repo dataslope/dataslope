@@ -77,8 +77,10 @@ mpg |>
   ggplot(aes(x = reorder(class, mean_hwy), y = mean_hwy)) +
   geom_col(fill = "steelblue") +
   coord_flip() +
-  labs(x = NULL, y = "Mean highway MPG",
-       title = "Average highway efficiency by class")
+  labs(
+    x = NULL, y = "Mean highway MPG",
+    title = "Average highway efficiency by class"
+  )
 `}
 />
 

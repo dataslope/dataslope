@@ -24,11 +24,13 @@ histograms, scatter plots, and lines.
   starterCode={`import pandas as pd
 import plotly.express as px
 
-df = pd.DataFrame({
-    "department": ["Eng","Sales","HR","Eng","Sales","HR","Eng","Sales"],
-    "headcount":  [25, 18, 6, 30, 22, 8, 28, 20],
-    "year":       [2022,2022,2022,2023,2023,2023,2024,2024],
-})
+df = pd.DataFrame(
+    {
+        "department": ["Eng", "Sales", "HR", "Eng", "Sales", "HR", "Eng", "Sales"],
+        "headcount": [25, 18, 6, 30, 22, 8, 28, 20],
+        "year": [2022, 2022, 2022, 2023, 2023, 2023, 2024, 2024],
+    }
+)
 
 fig = px.bar(df, x="department", y="headcount", color="year", barmode="group")
 fig.show()
@@ -49,8 +51,9 @@ A single function call:
   initCode={`import pandas as pd
 import plotly.express as px
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`fig = px.histogram(df, x="satisfaction_level", nbins=30,
-                   title="Distribution of employee satisfaction")
+  starterCode={`fig = px.histogram(
+    df, x="satisfaction_level", nbins=30, title="Distribution of employee satisfaction"
+)
 fig.show()
 `}
 />
@@ -70,8 +73,9 @@ for:
   initCode={`import pandas as pd
 import plotly.express as px
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`fig = px.box(df, x="salary", y="satisfaction_level",
-             title="Satisfaction by salary bracket")
+  starterCode={`fig = px.box(
+    df, x="salary", y="satisfaction_level", title="Satisfaction by salary bracket"
+)
 fig.show()
 `}
 />
@@ -86,9 +90,14 @@ glance. Use it to compare a numeric column across categories.
   initCode={`import pandas as pd
 import plotly.express as px
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`fig = px.scatter(df, x="average_montly_hours", y="satisfaction_level",
-                 color="salary", opacity=0.5,
-                 title="Hours worked vs satisfaction, by salary")
+  starterCode={`fig = px.scatter(
+    df,
+    x="average_montly_hours",
+    y="satisfaction_level",
+    color="salary",
+    opacity=0.5,
+    title="Hours worked vs satisfaction, by salary",
+)
 fig.show()
 `}
 />
@@ -103,14 +112,17 @@ Opacity is your friend when many points overlap.
 import plotly.express as px
 
 dates = pd.date_range("2024-01-01", periods=60, freq="D")
-df = pd.DataFrame({
-    "date":   list(dates) * 2,
-    "value":  [80 + i*0.5 for i in range(60)] + [60 + i*0.7 for i in range(60)],
-    "metric": ["visits"] * 60 + ["sign_ups"] * 60,
-})
+df = pd.DataFrame(
+    {
+        "date": list(dates) * 2,
+        "value": [80 + i * 0.5 for i in range(60)] + [60 + i * 0.7 for i in range(60)],
+        "metric": ["visits"] * 60 + ["sign_ups"] * 60,
+    }
+)
 
-fig = px.line(df, x="date", y="value", color="metric",
-              title="Daily visits and sign-ups")
+fig = px.line(
+    df, x="date", y="value", color="metric", title="Daily visits and sign-ups"
+)
 fig.show()
 `}
 />
@@ -129,8 +141,13 @@ A few line-chart rules:
   initCode={`import pandas as pd
 import plotly.express as px
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`fig = px.histogram(df, x="satisfaction_level", facet_col="salary",
-                   nbins=30, title="Satisfaction by salary bracket")
+  starterCode={`fig = px.histogram(
+    df,
+    x="satisfaction_level",
+    facet_col="salary",
+    nbins=30,
+    title="Satisfaction by salary bracket",
+)
 fig.show()
 `}
 />
@@ -204,14 +221,13 @@ sales = pd.DataFrame({
 })`}
   starterCode={`import plotly.express as px
 
-fig = None   # TODO
+fig = None  # TODO
 
 fig
 `}
   solutionCode={`import plotly.express as px
 
-fig = px.histogram(sales, x="amount", nbins=20,
-                   title="Sales amount distribution")
+fig = px.histogram(sales, x="amount", nbins=20, title="Sales amount distribution")
 fig
 `}
   tests={[

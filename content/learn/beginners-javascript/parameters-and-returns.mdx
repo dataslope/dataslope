@@ -34,8 +34,8 @@ parameter in the same position — first to first, second to second.
   return numerator / denominator;
 }
 
-console.log(divide(10, 2));    // 5
-console.log(divide(2, 10));    // 0.2  — order matters!
+console.log(divide(10, 2)); // 5
+console.log(divide(2, 10)); // 0.2  — order matters!
 `}
 />
 
@@ -62,7 +62,7 @@ arguments. Both are legal.
 
 describe("Ada", 28, "London");
 console.log("---");
-describe("Linus");                      // age and city are undefined
+describe("Linus"); // age and city are undefined
 console.log("---");
 describe("Grace", 80, "NYC", "extra"); // the "extra" is silently dropped
 `}
@@ -84,10 +84,10 @@ not pass anything for it (or passes `undefined`).
   return greeting + ", " + name + "!";
 }
 
-console.log(greet("Ada"));               // "Hello, Ada!"
-console.log(greet("Ada", "Welcome"));   // "Welcome, Ada!"
-console.log(greet("Ada", undefined));   // "Hello, Ada!" — undefined triggers the default
-console.log(greet("Ada", null));         // "null, Ada!"  — null does NOT trigger the default
+console.log(greet("Ada")); // "Hello, Ada!"
+console.log(greet("Ada", "Welcome")); // "Welcome, Ada!"
+console.log(greet("Ada", undefined)); // "Hello, Ada!" — undefined triggers the default
+console.log(greet("Ada", null)); // "null, Ada!"  — null does NOT trigger the default
 `}
 />
 
@@ -107,9 +107,9 @@ with, gather them with a **rest parameter** (`...name`):
   return total;
 }
 
-console.log(sum());              // 0
-console.log(sum(1));             // 1
-console.log(sum(1, 2, 3));       // 6
+console.log(sum()); // 0
+console.log(sum(1)); // 1
+console.log(sum(1, 2, 3)); // 6
 console.log(sum(10, 20, 30, 40)); // 100
 `}
 />
@@ -143,7 +143,7 @@ const triple = [10, 20, 30];
 console.log(add(triple[0], triple[1], triple[2])); // 60
 
 // With spread:
-console.log(add(...triple));                       // 60
+console.log(add(...triple)); // 60
 `}
 />
 
@@ -166,13 +166,13 @@ things to know:
   adapter="javascript"
   starterCode={`function findFirstNegative(numbers) {
   for (const n of numbers) {
-    if (n < 0) return n;     // exit the function the moment we find one
+    if (n < 0) return n; // exit the function the moment we find one
   }
-  return null;                // ran out of numbers — return null
+  return null; // ran out of numbers — return null
 }
 
-console.log(findFirstNegative([1, 2, -3, 4]));  // -3
-console.log(findFirstNegative([1, 2, 3, 4]));   // null
+console.log(findFirstNegative([1, 2, -3, 4])); // -3
+console.log(findFirstNegative([1, 2, 3, 4])); // null
 `}
 />
 
@@ -188,7 +188,9 @@ return several related results.
 <CodeBlock
   adapter="javascript"
   starterCode={`function summarize(numbers) {
-  let min = numbers[0], max = numbers[0], total = 0;
+  let min = numbers[0],
+    max = numbers[0],
+    total = 0;
   for (const n of numbers) {
     if (n < min) min = n;
     if (n > max) max = n;
@@ -228,13 +230,18 @@ function format1(text, upper, trim, prefix, suffix) {
 console.log(format1("  hello  ", true, true, "<", ">"));
 
 // Easier to read: each option is named at the call site.
-function format2(text, { upper = false, trim = false, prefix = "", suffix = "" } = {}) {
+function format2(
+  text,
+  { upper = false, trim = false, prefix = "", suffix = "" } = {},
+) {
   let s = text;
   if (trim) s = s.trim();
   if (upper) s = s.toUpperCase();
   return prefix + s + suffix;
 }
-console.log(format2("  hello  ", { trim: true, upper: true, prefix: "<", suffix: ">" }));
+console.log(
+  format2("  hello  ", { trim: true, upper: true, prefix: "<", suffix: ">" }),
+);
 `}
 />
 
@@ -260,15 +267,15 @@ behaviours:
   adapter="javascript"
   starterCode={`function f() {}
 f.label = "my function";
-console.log(f.label);            // "my function"
-console.log(typeof f);           // "function"
-console.log(typeof f === "function");  // true
+console.log(f.label); // "my function"
+console.log(typeof f); // "function"
+console.log(typeof f === "function"); // true
 
 // Functions compare by reference:
 const g = () => 1;
 const h = () => 1;
-console.log(g === h);            // false — two different function values, even with same body
-console.log(g === g);            // true
+console.log(g === h); // false — two different function values, even with same body
+console.log(g === g); // true
 `}
 />
 
@@ -286,11 +293,11 @@ to add a **JSDoc** comment block above it:
  * @returns {number} The temperature in degrees Fahrenheit.
  */
 function toFahrenheit(celsius) {
-  return celsius * 9 / 5 + 32;
+  return (celsius * 9) / 5 + 32;
 }
 
-console.log(toFahrenheit(100));  // 212
-console.log(toFahrenheit(0));    // 32
+console.log(toFahrenheit(100)); // 212
+console.log(toFahrenheit(0)); // 32
 `}
 />
 

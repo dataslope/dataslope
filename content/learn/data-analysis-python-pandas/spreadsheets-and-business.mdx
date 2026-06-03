@@ -173,12 +173,36 @@ In Pandas:
   adapter="python"
   starterCode={`import pandas as pd
 
-employees = pd.DataFrame({
-    "name":       ["Aiko","Bilal","Chen","Diego","Eve","Farah","Gabe","Hana","Ivan","Jin"],
-    "department": ["Eng","Eng","Sales","Sales","Eng","Ops","Ops","Sales","Eng","Ops"],
-    "salary":     [120, 135, 95, 110, 128, 80, 85, 105, 140, 90],
-    "tenure_yrs": [3, 6, 2, 8, 4, 1, 5, 3, 7, 2],
-})
+employees = pd.DataFrame(
+    {
+        "name": [
+            "Aiko",
+            "Bilal",
+            "Chen",
+            "Diego",
+            "Eve",
+            "Farah",
+            "Gabe",
+            "Hana",
+            "Ivan",
+            "Jin",
+        ],
+        "department": [
+            "Eng",
+            "Eng",
+            "Sales",
+            "Sales",
+            "Eng",
+            "Ops",
+            "Ops",
+            "Sales",
+            "Eng",
+            "Ops",
+        ],
+        "salary": [120, 135, 95, 110, 128, 80, 85, 105, 140, 90],
+        "tenure_yrs": [3, 6, 2, 8, 4, 1, 5, 3, 7, 2],
+    }
+)
 
 print("Average salary by department:")
 print(employees.groupby("department")["salary"].mean().round(1))

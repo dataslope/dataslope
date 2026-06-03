@@ -44,10 +44,12 @@ The basics:
   starterCode={`import pandas as pd
 import numpy as np
 
-df = pd.DataFrame({
-    "x": [1, 2, np.nan, 4, np.nan],
-    "y": ["a", None, "c", "d", "e"],
-})
+df = pd.DataFrame(
+    {
+        "x": [1, 2, np.nan, 4, np.nan],
+        "y": ["a", None, "c", "d", "e"],
+    }
+)
 
 print("isna (boolean DataFrame):")
 print(df.isna())
@@ -94,10 +96,12 @@ The remediation differs for each.
   starterCode={`import pandas as pd
 import numpy as np
 
-df = pd.DataFrame({
-    "a": [1, 2, np.nan, 4],
-    "b": [10, np.nan, 30, 40],
-})
+df = pd.DataFrame(
+    {
+        "a": [1, 2, np.nan, 4],
+        "b": [10, np.nan, 30, 40],
+    }
+)
 
 print("Drop any-NaN rows:")
 print(df.dropna())
@@ -129,11 +133,13 @@ analysis and may be noise.
   starterCode={`import pandas as pd
 import numpy as np
 
-df = pd.DataFrame({
-    "a": [1, 2, 3, 4, 5],
-    "b": [np.nan, np.nan, np.nan, np.nan, 10],
-    "c": [1, np.nan, 3, np.nan, 5],
-})
+df = pd.DataFrame(
+    {
+        "a": [1, 2, 3, 4, 5],
+        "b": [np.nan, np.nan, np.nan, np.nan, 10],
+        "c": [1, np.nan, 3, np.nan, 5],
+    }
+)
 
 # Drop columns more than 50% missing
 threshold = 0.5
@@ -201,10 +207,12 @@ downstream code to handle them.
   starterCode={`import pandas as pd
 import numpy as np
 
-df = pd.DataFrame({
-    "user": ["a","b","c","d"],
-    "score": [10, 20, np.nan, 40],
-})
+df = pd.DataFrame(
+    {
+        "user": ["a", "b", "c", "d"],
+        "score": [10, 20, np.nan, 40],
+    }
+)
 
 # Pandas aggregations skip NaN, so this just averages the 3 non-null values:
 print("Mean:", df["score"].mean())
@@ -224,13 +232,15 @@ A real-world cleaning step often mixes:
   starterCode={`import pandas as pd
 import numpy as np
 
-df = pd.DataFrame({
-    "customer_id": [1, 2, 3, 4, 5],
-    "age":         [25, np.nan, 35, np.nan, 45],
-    "city":        ["NY", "LA", None, "SF", "NY"],
-    "score":       [88, np.nan, 75, 92, np.nan],
-    "notes":       [np.nan]*5,  # entirely empty column
-})
+df = pd.DataFrame(
+    {
+        "customer_id": [1, 2, 3, 4, 5],
+        "age": [25, np.nan, 35, np.nan, 45],
+        "city": ["NY", "LA", None, "SF", "NY"],
+        "score": [88, np.nan, 75, 92, np.nan],
+        "notes": [np.nan] * 5,  # entirely empty column
+    }
+)
 
 clean = (
     df

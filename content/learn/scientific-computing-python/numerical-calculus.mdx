@@ -50,20 +50,28 @@ $h \approx \sqrt{\epsilon_\text{mach}} \approx 10^{-8}$.
   starterCode={`import numpy as np
 import matplotlib.pyplot as plt
 
-def f(x): return np.sin(x)
-true = np.cos(1.0)            # exact derivative of sin at x = 1
+
+def f(x):
+    return np.sin(x)
+
+
+true = np.cos(1.0)  # exact derivative of sin at x = 1
 
 hs = np.logspace(-16, 0, 200)
-err_fwd  = [abs((f(1+h)        - f(1)) / h        - true) for h in hs]
-err_cent = [abs((f(1+h) - f(1-h)) / (2*h)          - true) for h in hs]
+err_fwd = [abs((f(1 + h) - f(1)) / h - true) for h in hs]
+err_cent = [abs((f(1 + h) - f(1 - h)) / (2 * h) - true) for h in hs]
 
-plt.loglog(hs, err_fwd,  label="forward  O(h)")
+plt.loglog(hs, err_fwd, label="forward  O(h)")
 plt.loglog(hs, err_cent, label="centered O(h²)")
-plt.axvline(np.sqrt(np.finfo(float).eps), color="r", ls="--",
-            label="√ε  (best h for forward)")
-plt.xlabel("step size h"); plt.ylabel("|error|")
+plt.axvline(
+    np.sqrt(np.finfo(float).eps), color="r", ls="--", label="√ε  (best h for forward)"
+)
+plt.xlabel("step size h")
+plt.ylabel("|error|")
 plt.title("V-shape: truncation vs round-off")
-plt.legend(); plt.grid(True, which="both", alpha=0.3); plt.show()
+plt.legend()
+plt.grid(True, which="both", alpha=0.3)
+plt.show()
 `}
 />
 
@@ -82,9 +90,9 @@ For most production work, use `scipy.differentiate.derivative`
   starterCode={`import numpy as np
 
 # Numerical gradient on sampled data
-x = np.linspace(0, 2*np.pi, 200)
+x = np.linspace(0, 2 * np.pi, 200)
 y = np.sin(x)
-dy = np.gradient(y, x)             # centered differences, 2nd-order accurate
+dy = np.gradient(y, x)  # centered differences, 2nd-order accurate
 print("Max error vs true cos(x):", np.max(np.abs(dy - np.cos(x))))
 `}
 />
@@ -111,7 +119,10 @@ and weights $w_i$, multiply, add. The art is in choosing them.
   starterCode={`import numpy as np
 from scipy import integrate
 
-def f(x): return np.exp(-x**2) * np.cos(3*x)
+
+def f(x):
+    return np.exp(-(x**2)) * np.cos(3 * x)
+
 
 # Sampled-data rules
 x = np.linspace(0, 4, 1001)
@@ -141,13 +152,21 @@ estimated error is below the requested tolerance.
   starterCode={`import numpy as np
 from scipy import integrate
 
+
 # Integrable singularity at x = 0
-def g(x): return np.log(x) / np.sqrt(x)
+def g(x):
+    return np.log(x) / np.sqrt(x)
+
+
 val, err = integrate.quad(g, 0, 1)
 print(f"∫₀¹ ln(x)/√x dx ≈ {val:.8f}   (analytic = -4)   err≤{err:.1e}")
 
+
 # Highly oscillatory integrand: tell quad about the frequency
-def h(x): return np.sin(50 * x) / (1 + x**2)
+def h(x):
+    return np.sin(50 * x) / (1 + x**2)
+
+
 val2, err2 = integrate.quad(h, 0, 100, limit=200)
 print(f"oscillatory : {val2:.6f}   err≤{err2:.1e}")
 `}
@@ -170,8 +189,10 @@ from scipy import integrate
 # Volume under f(x,y) = exp(-(x²+y²)) over the unit square
 val, err = integrate.dblquad(
     lambda y, x: np.exp(-(x**2 + y**2)),
-    0, 1,                       # x bounds
-    lambda x: 0, lambda x: 1,   # y bounds depend on x
+    0,
+    1,  # x bounds
+    lambda x: 0,
+    lambda x: 1,  # y bounds depend on x
 )
 print(f"dblquad: {val:.8f}   err≤{err:.1e}")
 `}
@@ -262,12 +283,14 @@ Your answer should agree with \`math.pi\` to at least 10 decimal places.`}
   starterCode={`import numpy as np
 from scipy import integrate
 
+
 def estimate_pi():
     # TODO: integrate sqrt(1 - x**2) from -1 to 1 and return 2 * value
     return 0.0
 `}
   solutionCode={`import numpy as np
 from scipy import integrate
+
 
 def estimate_pi():
     val, _ = integrate.quad(lambda x: np.sqrt(1 - x**2), -1.0, 1.0)

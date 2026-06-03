@@ -63,14 +63,16 @@ from scipy import stats
 
 rng = np.random.default_rng(0)
 
-symmetric = rng.normal(50, 10, size=5000)          # bell-shaped
-right      = rng.lognormal(mean=3, sigma=0.6, size=5000)  # long right tail
-left       = 100 - rng.exponential(scale=10, size=5000)   # long left tail
+symmetric = rng.normal(50, 10, size=5000)  # bell-shaped
+right = rng.lognormal(mean=3, sigma=0.6, size=5000)  # long right tail
+left = 100 - rng.exponential(scale=10, size=5000)  # long left tail
 
 for name, x in [("symmetric", symmetric), ("right-skew", right), ("left-skew", left)]:
-    print(f"{name:>11}: skew={stats.skew(x):+.2f}  "
-          f"mean={x.mean():6.1f}  median={np.median(x):6.1f}  "
-          f"(mean - median = {x.mean() - np.median(x):+.1f})")
+    print(
+        f"{name:>11}: skew={stats.skew(x):+.2f}  "
+        f"mean={x.mean():6.1f}  median={np.median(x):6.1f}  "
+        f"(mean - median = {x.mean() - np.median(x):+.1f})"
+    )
 
 print("\\nPositive skew -> mean above median. Negative -> mean below.")
 `}
@@ -100,13 +102,16 @@ import plotly.express as px
 rng = np.random.default_rng(1)
 
 # A column that secretly contains two groups.
-group_a = rng.normal(165, 6, size=1500)   # one subpopulation
-group_b = rng.normal(185, 6, size=1500)   # another subpopulation
-mixed   = np.concatenate([group_a, group_b])
+group_a = rng.normal(165, 6, size=1500)  # one subpopulation
+group_b = rng.normal(185, 6, size=1500)  # another subpopulation
+mixed = np.concatenate([group_a, group_b])
 
-fig = px.histogram(mixed, nbins=50,
-                   title="One column, two hidden groups (bimodal)",
-                   labels={"value": "height (cm)"})
+fig = px.histogram(
+    mixed,
+    nbins=50,
+    title="One column, two hidden groups (bimodal)",
+    labels={"value": "height (cm)"},
+)
 fig.update_layout(showlegend=False)
 fig.show()
 
@@ -143,12 +148,14 @@ from scipy import stats
 rng = np.random.default_rng(3)
 
 normal_data = rng.normal(0, 1, size=20000)
-heavy_tail  = rng.standard_t(df=3, size=20000)   # Student's t, fat tails
+heavy_tail = rng.standard_t(df=3, size=20000)  # Student's t, fat tails
 
 for name, x in [("normal", normal_data), ("heavy-tailed", heavy_tail)]:
     far_out = np.mean(np.abs(x - x.mean()) > 4 * x.std())
-    print(f"{name:>13}: excess kurtosis={stats.kurtosis(x):+.2f}  "
-          f"share beyond 4 SD = {far_out:.4%}")
+    print(
+        f"{name:>13}: excess kurtosis={stats.kurtosis(x):+.2f}  "
+        f"share beyond 4 SD = {far_out:.4%}"
+    )
 
 print("\\nHeavier tails -> many more 'far out' values than normal predicts.")
 `}
@@ -224,10 +231,14 @@ from scipy import stats
 rng = np.random.default_rng(7)
 
 # Right-skewed data (incomes) plus a couple of genuine extremes.
-data = pd.Series(np.concatenate([
-    rng.lognormal(mean=3.0, sigma=0.5, size=200),
-    [120, 200],   # two real high earners
-]))
+data = pd.Series(
+    np.concatenate(
+        [
+            rng.lognormal(mean=3.0, sigma=0.5, size=200),
+            [120, 200],  # two real high earners
+        ]
+    )
+)
 
 # --- IQR fences (robust) ---
 q1, q3 = data.quantile(0.25), data.quantile(0.75)
@@ -259,15 +270,23 @@ import pandas as pd
 import plotly.express as px
 
 rng = np.random.default_rng(7)
-data = pd.DataFrame({
-    "income": np.concatenate([
-        rng.lognormal(mean=3.0, sigma=0.5, size=200),
-        [120, 200],
-    ])
-})
+data = pd.DataFrame(
+    {
+        "income": np.concatenate(
+            [
+                rng.lognormal(mean=3.0, sigma=0.5, size=200),
+                [120, 200],
+            ]
+        )
+    }
+)
 
-fig = px.box(data, y="income", points="outliers",
-             title="Box plot: whiskers = 1.5xIQR fences, dots = flagged outliers")
+fig = px.box(
+    data,
+    y="income",
+    points="outliers",
+    title="Box plot: whiskers = 1.5xIQR fences, dots = flagged outliers",
+)
 fig.show()
 
 print("The dots above the upper whisker are the 1.5xIQR-flagged points.")
@@ -325,6 +344,7 @@ and how many.
   starterCode={`import numpy as np
 import pandas as pd
 
+
 def flag_outliers_iqr(series, k=1.5):
     q1, q3 = series.quantile(0.25), series.quantile(0.75)
     iqr = q3 - q1
@@ -336,6 +356,7 @@ def flag_outliers_iqr(series, k=1.5):
         "n_outliers": int(mask.sum()),
         "outliers": series[mask].tolist(),
     }
+
 
 rng = np.random.default_rng(0)
 s = pd.Series(np.concatenate([rng.normal(50, 5, 100), [5, 95, 110]]))
@@ -375,8 +396,8 @@ q3 = None
 iqr = None
 lower_fence = None
 upper_fence = None
-outliers = None      # list of values outside the fences
-n_outliers = None    # int count
+outliers = None  # list of values outside the fences
+n_outliers = None  # int count
 `}
   solutionCode={`q1 = readings.quantile(0.25)
 q3 = readings.quantile(0.75)

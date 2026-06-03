@@ -38,24 +38,25 @@ someone else's bytes, sometimes it crashes.
 #include <string.h>
 
 int main(void) {
-    char *s = malloc(16);
-    if (!s) return 1;
-    strcpy(s, "hello");
+  char *s = malloc(16);
+  if (!s)
+    return 1;
+  strcpy(s, "hello");
 
-    free(s);
+  free(s);
 
-    // ↓ Undefined behavior: s no longer points to memory we own.
-    printf("%s\\n", s);
+  // ↓ Undefined behavior: s no longer points to memory we own.
+  printf("%s\\n", s);
 
-    // Probably "fresh" allocation may reuse s's old block.
-    char *t = malloc(16);
-    strcpy(t, "WORLD");
+  // Probably "fresh" allocation may reuse s's old block.
+  char *t = malloc(16);
+  strcpy(t, "WORLD");
 
-    // Reading through s again might now print "WORLD" or anything.
-    printf("after second malloc: %s\\n", s);
+  // Reading through s again might now print "WORLD" or anything.
+  printf("after second malloc: %s\\n", s);
 
-    free(t);
-    return 0;
+  free(t);
+  return 0;
 }
 `}
 />
@@ -82,17 +83,18 @@ allocators it can silently corrupt the heap.
 #include <stdlib.h>
 
 int main(void) {
-    int *p = malloc(sizeof *p);
-    if (!p) return 1;
-    *p = 7;
+  int *p = malloc(sizeof *p);
+  if (!p)
+    return 1;
+  *p = 7;
 
-    free(p);
-    printf("freed once\\n");
+  free(p);
+  printf("freed once\\n");
 
-    // ↓ Undefined behavior. Some allocators detect and abort here.
-    free(p);
-    printf("freed twice — if you see this, the allocator silently accepted it\\n");
-    return 0;
+  // ↓ Undefined behavior. Some allocators detect and abort here.
+  free(p);
+  printf("freed twice — if you see this, the allocator silently accepted it\\n");
+  return 0;
 }
 `}
 />
@@ -113,19 +115,20 @@ unreachable, until the process exits.
 #include <stdlib.h>
 
 void leaky(int times) {
-    for (int i = 0; i < times; i++) {
-        int *p = malloc(1024 * sizeof *p);   // 4 KB each
-        if (!p) return;
-        p[0] = i;
-        // ...use p briefly...
-        // (we forgot to free(p))
-    }
+  for (int i = 0; i < times; i++) {
+    int *p = malloc(1024 * sizeof *p); // 4 KB each
+    if (!p)
+      return;
+    p[0] = i;
+    // ...use p briefly...
+    // (we forgot to free(p))
+  }
 }
 
 int main(void) {
-    leaky(1000);
-    printf("leaked ~4 MB; in a server this would grow forever\\n");
-    return 0;
+  leaky(1000);
+  printf("leaked ~4 MB; in a server this would grow forever\\n");
+  return 0;
 }
 `}
 />
@@ -149,17 +152,17 @@ function's return address, leading to remote code execution.
 #include <string.h>
 
 int main(void) {
-    char name[8];
-    int  age = 30;
+  char name[8];
+  int age = 30;
 
-    printf("Before: age = %d\\n", age);
+  printf("Before: age = %d\\n", age);
 
-    // strcpy writes 13 bytes ("Christopher" + '\\0') into an 8-byte buffer.
-    strcpy(name, "Christopher");
+  // strcpy writes 13 bytes ("Christopher" + '\\0') into an 8-byte buffer.
+  strcpy(name, "Christopher");
 
-    printf("name = %s\\n", name);
-    printf("After:  age = %d   (may be corrupted!)\\n", age);
-    return 0;
+  printf("name = %s\\n", name);
+  printf("After:  age = %d   (may be corrupted!)\\n", age);
+  return 0;
 }
 `}
 />
@@ -188,15 +191,15 @@ you meant `<`).
 #include <string.h>
 
 int main(void) {
-    const char *src = "abcde";   // 5 visible chars + '\\0'
-    char dst[5];                  // forgot one byte for '\\0'
+  const char *src = "abcde"; // 5 visible chars + '\\0'
+  char dst[5];               // forgot one byte for '\\0'
 
-    // Copies 5 chars but leaves dst un-terminated.
-    memcpy(dst, src, 5);
+  // Copies 5 chars but leaves dst un-terminated.
+  memcpy(dst, src, 5);
 
-    // printf walks until it finds '\\0' — wherever that happens to be.
-    printf("dst = %s   (probably garbage at the end)\\n", dst);
-    return 0;
+  // printf walks until it finds '\\0' — wherever that happens to be.
+  printf("dst = %s   (probably garbage at the end)\\n", dst);
+  return 0;
 }
 `}
 />
@@ -217,15 +220,15 @@ previous user's data.
 #include <stdlib.h>
 
 int main(void) {
-    int local;             // uninitialized stack int
-    int *heap = malloc(sizeof *heap);   // uninitialized heap int
+  int local;                        // uninitialized stack int
+  int *heap = malloc(sizeof *heap); // uninitialized heap int
 
-    // Reading either is undefined behavior.
-    printf("local = %d\\n", local);
-    printf("*heap = %d\\n", *heap);
+  // Reading either is undefined behavior.
+  printf("local = %d\\n", local);
+  printf("*heap = %d\\n", *heap);
 
-    free(heap);
-    return 0;
+  free(heap);
+  return 0;
 }
 `}
 />
@@ -248,21 +251,22 @@ another mention here because the failure mode is so quiet.
   starterCode={`#include <stdio.h>
 
 int *make(void) {
-    int x = 42;
-    return &x;          // x dies here
+  int x = 42;
+  return &x; // x dies here
 }
 
 void noise(void) {
-    int filler[64];
-    for (int i = 0; i < 64; i++) filler[i] = -1;   // overwrite the stack region
-    (void)filler;
+  int filler[64];
+  for (int i = 0; i < 64; i++)
+    filler[i] = -1; // overwrite the stack region
+  (void)filler;
 }
 
 int main(void) {
-    int *p = make();
-    noise();             // overwrite the area where x used to live
-    printf("*p = %d  (probably -1 now, definitely UB)\\n", *p);
-    return 0;
+  int *p = make();
+  noise(); // overwrite the area where x used to live
+  printf("*p = %d  (probably -1 now, definitely UB)\\n", *p);
+  return 0;
 }
 `}
 />
@@ -284,13 +288,13 @@ type. The compiler trusts you to know what you are doing.
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    long x = 0x4142434445464748L;     // 'ABCDEFGH' as bytes on a little-endian box
-    char *p = (char *)&x;              // re-interpret as bytes
+  long x = 0x4142434445464748L; // 'ABCDEFGH' as bytes on a little-endian box
+  char *p = (char *)&x;         // re-interpret as bytes
 
-    for (int i = 0; i < 8; i++) {
-        printf("byte %d = '%c' (0x%02X)\\n", i, p[i], (unsigned char)p[i]);
-    }
-    return 0;
+  for (int i = 0; i < 8; i++) {
+    printf("byte %d = '%c' (0x%02X)\\n", i, p[i], (unsigned char)p[i]);
+  }
+  return 0;
 }
 `}
 />
@@ -334,16 +338,17 @@ the language:
 #include <string.h>
 
 char *make_greeting(const char *name) {
-    // your code here
-    return NULL;
+  // your code here
+  return NULL;
 }
 
 int main(void) {
-    char *g = make_greeting("Ada");
-    if (!g) return 1;
-    printf("%s\\n", g);
-    free(g);
-    return 0;
+  char *g = make_greeting("Ada");
+  if (!g)
+    return 1;
+  printf("%s\\n", g);
+  free(g);
+  return 0;
 }
 `}
   solutionCode={`#include <stdio.h>
@@ -351,20 +356,23 @@ int main(void) {
 #include <string.h>
 
 char *make_greeting(const char *name) {
-    if (!name) return NULL;
-    size_t need = strlen("Hello, ") + strlen(name) + strlen("!") + 1;
-    char *out = malloc(need);
-    if (!out) return NULL;
-    snprintf(out, need, "Hello, %s!", name);
-    return out;
+  if (!name)
+    return NULL;
+  size_t need = strlen("Hello, ") + strlen(name) + strlen("!") + 1;
+  char *out = malloc(need);
+  if (!out)
+    return NULL;
+  snprintf(out, need, "Hello, %s!", name);
+  return out;
 }
 
 int main(void) {
-    char *g = make_greeting("Ada");
-    if (!g) return 1;
-    printf("%s\\n", g);
-    free(g);
-    return 0;
+  char *g = make_greeting("Ada");
+  if (!g)
+    return 1;
+  printf("%s\\n", g);
+  free(g);
+  return 0;
 }
 `}
   tests={[
@@ -387,16 +395,17 @@ int main(void) {
 #include <string.h>
 
 char *repeat(const char *s, int times) {
-    // your code here
-    return NULL;
+  // your code here
+  return NULL;
 }
 
 int main(void) {
-    char *r = repeat("ab", 3);
-    if (!r) return 1;
-    printf("%s\\n", r);
-    free(r);
-    return 0;
+  char *r = repeat("ab", 3);
+  if (!r)
+    return 1;
+  printf("%s\\n", r);
+  free(r);
+  return 0;
 }
 `}
   solutionCode={`#include <stdio.h>
@@ -404,24 +413,27 @@ int main(void) {
 #include <string.h>
 
 char *repeat(const char *s, int times) {
-    if (!s || times < 0) return NULL;
-    size_t one = strlen(s);
-    size_t total = one * (size_t)times;
-    char *out = malloc(total + 1);
-    if (!out) return NULL;
-    for (int i = 0; i < times; i++) {
-        memcpy(out + (size_t)i * one, s, one);
-    }
-    out[total] = '\\0';
-    return out;
+  if (!s || times < 0)
+    return NULL;
+  size_t one = strlen(s);
+  size_t total = one * (size_t)times;
+  char *out = malloc(total + 1);
+  if (!out)
+    return NULL;
+  for (int i = 0; i < times; i++) {
+    memcpy(out + (size_t)i * one, s, one);
+  }
+  out[total] = '\\0';
+  return out;
 }
 
 int main(void) {
-    char *r = repeat("ab", 3);
-    if (!r) return 1;
-    printf("%s\\n", r);
-    free(r);
-    return 0;
+  char *r = repeat("ab", 3);
+  if (!r)
+    return 1;
+  printf("%s\\n", r);
+  free(r);
+  return 0;
 }
 `}
   tests={[

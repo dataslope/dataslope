@@ -320,7 +320,7 @@ rng = np.random.RandomState(0)
 print("dims | nearest dist | farthest dist | ratio")
 print("-----|--------------|---------------|------")
 for d in [2, 10, 100, 1000]:
-    pts = rng.rand(500, d)               # 500 random points in d dimensions
+    pts = rng.rand(500, d)  # 500 random points in d dimensions
     query = rng.rand(1, d)
     dists = np.sqrt(((pts - query) ** 2).sum(axis=1))
     near, far = dists.min(), dists.max()

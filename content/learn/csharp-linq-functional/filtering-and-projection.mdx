@@ -41,9 +41,9 @@ using System.Linq;
 
 var nums = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
-var evens     = nums.Where(n => n % 2 == 0);
-var bigOdds   = nums.Where(n => n % 2 == 1 && n > 5);
-var negatives = nums.Where(n => n < 0);   // empty, not null
+var evens = nums.Where(n => n % 2 == 0);
+var bigOdds = nums.Where(n => n % 2 == 1 && n > 5);
+var negatives = nums.Where(n => n < 0); // empty, not null
 
 Console.WriteLine(string.Join(",", evens));
 Console.WriteLine(string.Join(",", bigOdds));
@@ -86,9 +86,9 @@ sometimes called `map` in other languages.
   starterCode={`using System;
 using System.Linq;
 
-var nums   = new[] { 1, 2, 3, 4, 5 };
+var nums = new[] { 1, 2, 3, 4, 5 };
 var doubled = nums.Select(n => n * 2);
-var labels  = nums.Select(n => $"#{n}");
+var labels = nums.Select(n => $"#{n}");
 
 Console.WriteLine(string.Join(",", doubled));
 Console.WriteLine(string.Join(",", labels));
@@ -113,8 +113,7 @@ using System.Linq;
 
 record Person(string Name, int Age, string City);
 
-var people = new[]
-{
+var people = new[] {
     new Person("Ada", 36, "London"),
     new Person("Bilal", 41, "Berlin"),
     new Person("Chiara", 29, "Berlin"),
@@ -122,7 +121,8 @@ var people = new[]
 
 // Anonymous type — handy for the next stage only.
 var summary1 = people.Select(p => new { p.Name, IsAdult = p.Age >= 18 });
-foreach (var s in summary1) Console.WriteLine($"{s.Name} adult? {s.IsAdult}");
+foreach (var s in summary1)
+    Console.WriteLine($"{s.Name} adult? {s.IsAdult}");
 
 Console.WriteLine();
 
@@ -149,20 +149,15 @@ using System.Linq;
 
 record Order(string Product, decimal Price, int Quantity);
 
-var orders = new[]
-{
-    new Order("Widget",  9.99m, 3),
-    new Order("Gadget", 14.50m, 1),
-    new Order("Widget", 12.00m, 2),
-    new Order("Gizmo",  19.99m, 0),
-    new Order("Widget",  8.50m, 4),
+var orders = new[] {
+    new Order("Widget", 9.99m, 3), new Order("Gadget", 14.50m, 1), new Order("Widget", 12.00m, 2),
+    new Order("Gizmo", 19.99m, 0), new Order("Widget", 8.50m, 4),
 };
 
 // All widget orders with at least one unit, projected to (price, total).
-var widgetTotals = orders
-    .Where(o => o.Product == "Widget")
-    .Where(o => o.Quantity > 0)
-    .Select(o => new { o.Price, Total = o.Price * o.Quantity });
+var widgetTotals = orders.Where(o => o.Product == "Widget")
+                       .Where(o => o.Quantity > 0)
+                       .Select(o => new { o.Price, Total = o.Price * o.Quantity });
 
 foreach (var x in widgetTotals)
     Console.WriteLine($"price={x.Price,6:C}  total={x.Total,6:C}");

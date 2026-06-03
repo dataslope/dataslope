@@ -26,8 +26,11 @@ tips = sns.load_dataset("tips")
 
 # One column per time, one row per sex -> a 2 x 2 grid of scatter plots.
 sns.relplot(
-    data=tips, x="total_bill", y="tip",
-    col="time", row="sex",
+    data=tips,
+    x="total_bill",
+    y="tip",
+    col="time",
+    row="sex",
     height=3.2,
 )
 `}
@@ -61,8 +64,10 @@ mpg = sns.load_dataset("mpg")
 # Six model years, wrapped 3-per-row into a 2 x 3 block.
 sns.relplot(
     data=mpg[mpg["model_year"].isin([70, 73, 76, 78, 80, 82])],
-    x="weight", y="mpg",
-    col="model_year", col_wrap=3,
+    x="weight",
+    y="mpg",
+    col="model_year",
+    col_wrap=3,
     height=2.8,
 )
 `}
@@ -190,8 +195,11 @@ sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 g = sns.relplot(
-    data=tips, x="total_bill", y="tip",
-    col="time", row="sex",
+    data=tips,
+    x="total_bill",
+    y="tip",
+    col="time",
+    row="sex",
     height=3.2,
 )
 `}

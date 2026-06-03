@@ -25,7 +25,7 @@ int Square(int x)
 
 Console.WriteLine(Square(5));
 Console.WriteLine(Square(12));
-Console.WriteLine(Square(Square(3)));   // 9, then 81
+Console.WriteLine(Square(Square(3))); // 9, then 81
 `}
 />
 
@@ -56,8 +56,8 @@ double Average(int a, int b)
     return (a + b) / 2.0;
 }
 
-Console.WriteLine(Average(10, 20));    // 15
-Console.WriteLine(Average(7, 8));      // 7.5
+Console.WriteLine(Average(10, 20)); // 15
+Console.WriteLine(Average(7, 8));   // 7.5
 `}
 />
 
@@ -117,7 +117,7 @@ written more compactly with `=>`:
   starterCode={`using System;
 
 int Square(int x) => x * x;
-int Cube(int x)   => x * x * x;
+int Cube(int x) => x * x * x;
 bool IsEven(int x) => x % 2 == 0;
 
 Console.WriteLine(Square(4));
@@ -227,13 +227,18 @@ using System.Collections.Generic;
 void DescribeNumbers(int[] nums)
 {
     int sum = 0;
-    foreach (var n in nums) sum += n;
+    foreach (var n in nums)
+        sum += n;
 
     int min = nums[0];
-    foreach (var n in nums) if (n < min) min = n;
+    foreach (var n in nums)
+        if (n < min)
+            min = n;
 
     int max = nums[0];
-    foreach (var n in nums) if (n > max) max = n;
+    foreach (var n in nums)
+        if (n > max)
+            max = n;
 
     double avg = (double)sum / nums.Length;
 
@@ -251,9 +256,29 @@ DescribeNumbers(new[] { 3, 1, 4, 1, 5, 9, 2, 6 });
   starterCode={`using System;
 using System.Collections.Generic;
 
-int Sum(int[] xs)  { int s = 0; foreach (var n in xs) s += n; return s; }
-int Min(int[] xs)  { int m = xs[0]; foreach (var n in xs) if (n < m) m = n; return m; }
-int Max(int[] xs)  { int m = xs[0]; foreach (var n in xs) if (n > m) m = n; return m; }
+int Sum(int[] xs)
+{
+    int s = 0;
+    foreach (var n in xs)
+        s += n;
+    return s;
+}
+int Min(int[] xs)
+{
+    int m = xs[0];
+    foreach (var n in xs)
+        if (n < m)
+            m = n;
+    return m;
+}
+int Max(int[] xs)
+{
+    int m = xs[0];
+    foreach (var n in xs)
+        if (n > m)
+            m = n;
+    return m;
+}
 double Avg(int[] xs) => (double)Sum(xs) / xs.Length;
 
 void Describe(int[] xs)

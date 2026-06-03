@@ -14,11 +14,11 @@ downloads the first time you click Run.
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    printf("Hello, C!\\n");
-    for (int i = 1; i <= 5; i++) {
-        printf("  i = %d\\n", i);
-    }
-    return 0;
+  printf("Hello, C!\\n");
+  for (int i = 1; i <= 5; i++) {
+    printf("  i = %d\\n", i);
+  }
+  return 0;
 }
 `}
 />
@@ -30,12 +30,13 @@ int main(void) {
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int xs[] = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3};
-    int n = sizeof(xs) / sizeof(xs[0]);
-    long sum = 0;
-    for (int i = 0; i < n; i++) sum += xs[i];
-    printf("n = %d, sum = %ld, mean = %.2f\\n", n, sum, (double)sum / n);
-    return 0;
+  int xs[] = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3};
+  int n = sizeof(xs) / sizeof(xs[0]);
+  long sum = 0;
+  for (int i = 0; i < n; i++)
+    sum += xs[i];
+  printf("n = %d, sum = %ld, mean = %.2f\\n", n, sum, (double)sum / n);
+  return 0;
 }
 `}
 />
@@ -142,8 +143,8 @@ A short init (3 lines or fewer):
 #define GREETING "Hello from C!"`}
   starterCode={`/* GREETING and <stdio.h> come from the initialization code above. */
 int main(void) {
-    puts(GREETING);
-    return 0;
+  puts(GREETING);
+  return 0;
 }
 `}
 />
@@ -159,8 +160,8 @@ static int square(int x) {
 }`}
   starterCode={`/* square() and <stdio.h> come from the initialization code above. */
 int main(void) {
-    printf("square(7) = %d", square(7));
-    return 0;
+  printf("square(7) = %d", square(7));
+  return 0;
 }
 `}
 />

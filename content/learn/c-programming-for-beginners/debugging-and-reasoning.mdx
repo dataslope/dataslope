@@ -220,31 +220,31 @@ The program must print exactly \`120\`.`}
   starterCode={`#include <stdio.h>
 
 int fact(int n) {
-    int r = 0;
-    for (int i = 1; i < n; i++) {
-        r *= i;
-    }
-    return r;
+  int r = 0;
+  for (int i = 1; i < n; i++) {
+    r *= i;
+  }
+  return r;
 }
 
 int main(void) {
-    printf("%d\\n", fact(5));
-    return 0;
+  printf("%d\\n", fact(5));
+  return 0;
 }
 `}
   solutionCode={`#include <stdio.h>
 
 int fact(int n) {
-    int r = 1;
-    for (int i = 1; i <= n; i++) {
-        r *= i;
-    }
-    return r;
+  int r = 1;
+  for (int i = 1; i <= n; i++) {
+    r *= i;
+  }
+  return r;
 }
 
 int main(void) {
-    printf("%d\\n", fact(5));
-    return 0;
+  printf("%d\\n", fact(5));
+  return 0;
 }
 `}
   tests={[

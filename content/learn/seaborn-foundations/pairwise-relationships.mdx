@@ -209,7 +209,7 @@ penguins = sns.load_dataset("penguins")
 
 # Build the empty grid, then decide what each region draws.
 g = sns.PairGrid(penguins)
-g.map_diag(sns.histplot)        # diagonal: univariate
+g.map_diag(sns.histplot)  # diagonal: univariate
 g.map_offdiag(sns.scatterplot)  # off-diagonal: bivariate
 `}
 />

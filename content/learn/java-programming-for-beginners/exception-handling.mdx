@@ -33,20 +33,20 @@ flowchart TB
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        int[] xs = { 10, 20, 30 };
+  public static void main(String[] args) {
+    int[] xs = {10, 20, 30};
 
-        try {
-            System.out.println(xs[5]);       // out of bounds!
-            System.out.println("this never runs");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            System.out.println("caught: " + e.getMessage());
-        } finally {
-            System.out.println("always runs");
-        }
-
-        System.out.println("program continues normally");
+    try {
+      System.out.println(xs[5]); // out of bounds!
+      System.out.println("this never runs");
+    } catch (ArrayIndexOutOfBoundsException e) {
+      System.out.println("caught: " + e.getMessage());
+    } finally {
+      System.out.println("always runs");
     }
+
+    System.out.println("program continues normally");
+  }
 }
 `}
 />
@@ -122,31 +122,30 @@ catch, the method must declare it:
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        try {
-            int age = parseAge("not a number");
-            System.out.println(age);
-        } catch (BadInputException e) {
-            System.out.println("rejected: " + e.getMessage());
-        }
+  public static void main(String[] args) {
+    try {
+      int age = parseAge("not a number");
+      System.out.println(age);
+    } catch (BadInputException e) {
+      System.out.println("rejected: " + e.getMessage());
     }
+  }
 
-    static int parseAge(String s) throws BadInputException {
-        try {
-            int n = Integer.parseInt(s);
-            if (n < 0) throw new BadInputException("age cannot be negative");
-            return n;
-        } catch (NumberFormatException e) {
-            // wrap a lower-level exception in our own
-            throw new BadInputException("not a number: " + s);
-        }
+  static int parseAge(String s) throws BadInputException {
+    try {
+      int n = Integer.parseInt(s);
+      if (n < 0)
+        throw new BadInputException("age cannot be negative");
+      return n;
+    } catch (NumberFormatException e) {
+      // wrap a lower-level exception in our own
+      throw new BadInputException("not a number: " + s);
     }
+  }
 }
 
 class BadInputException extends Exception {
-    public BadInputException(String message) {
-        super(message);
-    }
+  public BadInputException(String message) { super(message); }
 }
 `}
 />

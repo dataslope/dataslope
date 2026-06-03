@@ -32,13 +32,16 @@ Every Django model inherits from \`django.db.models.Model\`. That base class pro
     def speak(self):
         return f"{self.name} makes a sound"
 
+
 class Dog(Animal):
     def speak(self):
         return f"{self.name} says woof!"
 
+
 class Cat(Animal):
     def speak(self):
         return f"{self.name} says meow!"
+
 
 for animal in [Dog("Rex"), Cat("Luna"), Animal("Thing")]:
     print(animal.speak())
@@ -67,9 +70,11 @@ When a subclass defines a method with the same name as a parent method, the subc
     def speak(self):
         return "some sound"
 
+
 class Dog(Animal):
     def speak(self):
         return "woof!"
+
 
 d = Dog()
 print(d.speak())  # calls Dog.speak, not Animal.speak
@@ -90,13 +95,15 @@ Override a method when you need **different behavior** for the subclass. If you 
     def __init__(self, name):
         self.name = name
 
+
 class Dog(Animal):
     def __init__(self, name, breed):
-        super().__init__(name)   # call Animal.__init__
-        self.breed = breed       # then add Dog-specific logic
+        super().__init__(name)  # call Animal.__init__
+        self.breed = breed  # then add Dog-specific logic
 
     def describe(self):
         return f"{self.name} is a {self.breed}"
+
 
 print(Dog("Rex", "Labrador").describe())
 `}
@@ -128,13 +135,16 @@ In single inheritance, \`super()\` just calls the parent. In multiple inheritanc
     def speak(self):
         return "woof!"
 
+
 class Cat:
     def speak(self):
         return "meow!"
 
+
 class Duck:
     def speak(self):
         return "quack!"
+
 
 animals = [Dog(), Cat(), Duck()]
 for animal in animals:
@@ -154,13 +164,18 @@ Use these instead of `type(x) is SomeClass` when you want to allow subclasses.
 
 <CodeBlock
   adapter="python"
-  starterCode={`class Animal: pass
-class Dog(Animal): pass
+  starterCode={`class Animal:
+    pass
+
+
+class Dog(Animal):
+    pass
+
 
 d = Dog()
-print(isinstance(d, Dog))       # True
-print(isinstance(d, Animal))    # True (d is also an Animal)
-print(type(d) is Animal)        # False (d's type is Dog, not Animal)
+print(isinstance(d, Dog))  # True
+print(isinstance(d, Animal))  # True (d is also an Animal)
+print(type(d) is Animal)  # False (d's type is Dog, not Animal)
 print(issubclass(Dog, Animal))  # True
 `}
 />
@@ -181,17 +196,21 @@ Python allows a class to inherit from **multiple** parents. Method lookup uses t
     def hello(self):
         return "A"
 
+
 class B(A):
     def hello(self):
         return "B -> " + super().hello()
+
 
 class C(A):
     def hello(self):
         return "C -> " + super().hello()
 
+
 class D(B, C):
     def hello(self):
         return "D -> " + super().hello()
+
 
 print(D().hello())
 print([cls.__name__ for cls in D.__mro__])
@@ -225,17 +244,19 @@ An **abstract base class (ABC)** is a class that cannot be instantiated directly
   adapter="python"
   starterCode={`from abc import ABC, abstractmethod
 
+
 class Shape(ABC):
     @abstractmethod
-    def area(self):
-        ...
+    def area(self): ...
+
 
 class Square(Shape):
     def __init__(self, side):
         self.side = side
 
     def area(self):
-        return self.side ** 2
+        return self.side**2
+
 
 print(Square(3).area())
 
@@ -579,12 +600,14 @@ assert m.base_salary == 60000`,
   starterCode={`class Vehicle:
     pass
 
+
 class Car(Vehicle):
     pass
 `}
   solutionCode={`class Vehicle:
     def start(self):
         return "Vehicle starting"
+
 
 class Car(Vehicle):
     def start(self):

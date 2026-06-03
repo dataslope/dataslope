@@ -30,11 +30,11 @@ will assume you think in arrays.
 import time
 
 N = 1_000_000
-xs = np.linspace(0, 2*np.pi, N)
+xs = np.linspace(0, 2 * np.pi, N)
 
 # Python loop
 t0 = time.perf_counter()
-out_loop = [0.0]*N
+out_loop = [0.0] * N
 for i in range(N):
     out_loop[i] = np.sin(xs[i]) ** 2
 t1 = time.perf_counter()
@@ -109,8 +109,8 @@ The classic example: an outer product written as broadcasting.
   adapter="python"
   starterCode={`import numpy as np
 
-x = np.arange(1, 6)          # shape (5,)
-y = np.arange(1, 4)          # shape (3,)
+x = np.arange(1, 6)  # shape (5,)
+y = np.arange(1, 4)  # shape (3,)
 
 # Reshape so the trailing dims line up:
 #   x[:, None] has shape (5, 1)
@@ -139,13 +139,13 @@ lines.
   starterCode={`import numpy as np
 
 rng = np.random.default_rng(0)
-pts = rng.uniform(0, 10, size=(8, 2))      # 8 points in 2-D
+pts = rng.uniform(0, 10, size=(8, 2))  # 8 points in 2-D
 
 # pts[:, None, :] has shape (8, 1, 2)  — column of point pairs
 # pts[None, :, :] has shape (1, 8, 2)  — row of point pairs
 # Their difference broadcasts to shape (8, 8, 2)
 diff = pts[:, None, :] - pts[None, :, :]
-D = np.sqrt((diff ** 2).sum(axis=-1))      # collapse the coord axis
+D = np.sqrt((diff**2).sum(axis=-1))  # collapse the coord axis
 
 print(D.round(2))
 print("symmetric?", np.allclose(D, D.T))
@@ -166,19 +166,21 @@ operation.
   starterCode={`import numpy as np
 
 # A small dataset: 6 patients × 4 measurements
-X = np.array([
-    [120, 80, 70,  98],   # systolic, diastolic, heart rate, oxygen
-    [135, 85, 75,  97],
-    [110, 70, 65,  99],
-    [150, 95, 80,  96],
-    [125, 82, 72,  98],
-    [140, 90, 78,  97],
-])
+X = np.array(
+    [
+        [120, 80, 70, 98],  # systolic, diastolic, heart rate, oxygen
+        [135, 85, 75, 97],
+        [110, 70, 65, 99],
+        [150, 95, 80, 96],
+        [125, 82, 72, 98],
+        [140, 90, 78, 97],
+    ]
+)
 
 print("X.shape =", X.shape)
-print("mean per measurement (axis=0):", X.mean(axis=0))   # one value per column
-print("mean per patient    (axis=1):", X.mean(axis=1))   # one value per row
-print("grand mean          (no axis):", X.mean())         # one number
+print("mean per measurement (axis=0):", X.mean(axis=0))  # one value per column
+print("mean per patient    (axis=1):", X.mean(axis=1))  # one value per row
+print("grand mean          (no axis):", X.mean())  # one number
 `}
 />
 
@@ -255,8 +257,8 @@ import matplotlib.pyplot as plt
 
 # Bifurcation diagram of the logistic map
 n_r, n_iter, n_keep = 1000, 1000, 200
-r = np.linspace(2.5, 4.0, n_r)        # shape (n_r,)
-x = 0.5 * np.ones_like(r)              # shape (n_r,)
+r = np.linspace(2.5, 4.0, n_r)  # shape (n_r,)
+x = 0.5 * np.ones_like(r)  # shape (n_r,)
 xs = np.empty((n_keep, n_r))
 
 for t in range(n_iter):
@@ -265,9 +267,9 @@ for t in range(n_iter):
         xs[t - (n_iter - n_keep)] = x
 
 plt.figure(figsize=(8, 4))
-plt.plot(np.broadcast_to(r, xs.shape).ravel(),
-         xs.ravel(), ",k", alpha=0.25)
-plt.xlabel("r"); plt.ylabel("x*")
+plt.plot(np.broadcast_to(r, xs.shape).ravel(), xs.ravel(), ",k", alpha=0.25)
+plt.xlabel("r")
+plt.ylabel("x*")
 plt.title("Logistic-map bifurcation diagram (vectorized over r)")
 plt.show()
 `}
@@ -295,11 +297,11 @@ n = 10_000
 A = np.random.default_rng(0).standard_normal((n, n))
 
 t0 = time.perf_counter()
-sum_rows = A.sum(axis=1)       # walks each row contiguously
+sum_rows = A.sum(axis=1)  # walks each row contiguously
 t1 = time.perf_counter()
 
 t2 = time.perf_counter()
-sum_cols = A.sum(axis=0)       # walks each column with stride n
+sum_cols = A.sum(axis=0)  # walks each column with stride n
 t3 = time.perf_counter()
 
 print(f"sum(axis=1) [contiguous] : {t1 - t0:.3f} s")

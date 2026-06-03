@@ -108,7 +108,7 @@ from scipy import stats
 rng = np.random.default_rng(7)
 
 # Two groups drawn from the EXACT same process — no real difference.
-control   = rng.normal(loc=100, scale=15, size=50)
+control = rng.normal(loc=100, scale=15, size=50)
 treatment = rng.normal(loc=100, scale=15, size=50)
 
 diff = treatment.mean() - control.mean()

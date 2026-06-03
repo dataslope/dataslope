@@ -60,7 +60,8 @@ int[] xs = { 3, 1, 4, 1, 5, 9, 2, 6, 5, 3 };
 int sumImp = 0;
 foreach (var x in xs)
 {
-    if (x % 2 == 0) sumImp += x;
+    if (x % 2 == 0)
+        sumImp += x;
 }
 Console.WriteLine($"imperative sum of evens: {sumImp}");
 
@@ -75,7 +76,10 @@ Console.WriteLine($"OO sum of evens:           {stats.SumOfEvens()}");
 class Stats
 {
     private readonly int[] data;
-    public Stats(int[] data) { this.data = data; }
+    public Stats(int[] data)
+    {
+        this.data = data;
+    }
     public int SumOfEvens() => data.Where(x => x % 2 == 0).Sum();
 }
 `}
@@ -214,8 +218,7 @@ class Library
 
     public void Add(Book b) => books.Add(b);
 
-    public IEnumerable<Book> ByAuthor(string author) =>
-        books.Where(b => b.Author == author);
+    public IEnumerable<Book> ByAuthor(string author) => books.Where(b => b.Author == author);
 
     public int Count => books.Count;
 }
@@ -225,9 +228,9 @@ class Program
     static void Main()
     {
         var lib = new Library();
-        lib.Add(new Book("The Pragmatic Programmer", "Hunt",     1999));
-        lib.Add(new Book("Code Complete",             "McConnell", 2004));
-        lib.Add(new Book("Refactoring",               "Fowler",   1999));
+        lib.Add(new Book("The Pragmatic Programmer", "Hunt", 1999));
+        lib.Add(new Book("Code Complete", "McConnell", 2004));
+        lib.Add(new Book("Refactoring", "Fowler", 1999));
 
         Console.WriteLine($"library has {lib.Count} books");
 

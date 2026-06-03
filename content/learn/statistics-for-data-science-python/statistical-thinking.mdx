@@ -70,8 +70,10 @@ rng = np.random.default_rng(11)
 # We "run the week" five times. Nothing about the system changes.
 for week in range(5):
     times = rng.normal(loc=200, scale=25, size=300)
-    print(f"Week {week+1}: mean = {times.mean():6.2f} ms   "
-          f"(min {times.min():5.1f}, max {times.max():5.1f})")
+    print(
+        f"Week {week + 1}: mean = {times.mean():6.2f} ms   "
+        f"(min {times.min():5.1f}, max {times.max():5.1f})"
+    )
 
 print("\\nSame system every week. The mean still wanders by several ms.")
 print("If you reported just one week's mean as THE number, you'd be")
@@ -115,17 +117,22 @@ rng = np.random.default_rng(3)
 months = np.arange(1, 25)
 metric = 100 + rng.normal(0, 8, size=24)
 
-fig = px.line(x=months, y=metric, markers=True,
-              labels={"x": "Month", "y": "Metric"},
-              title="A 'trend' that is 100% noise")
-fig.add_hline(y=100, line_dash="dash",
-              annotation_text="the actual truth (flat)")
+fig = px.line(
+    x=months,
+    y=metric,
+    markers=True,
+    labels={"x": "Month", "y": "Metric"},
+    title="A 'trend' that is 100% noise",
+)
+fig.add_hline(y=100, line_dash="dash", annotation_text="the actual truth (flat)")
 fig.show()
 
 # It is trivially easy to find a "rising stretch" or "decline" in here.
 last_six = metric[-6:]
-print(f"'Last six months' slope looks like: "
-      f"{(last_six[-1] - last_six[0]):+.1f} units of 'movement'")
+print(
+    f"'Last six months' slope looks like: "
+    f"{(last_six[-1] - last_six[0]):+.1f} units of 'movement'"
+)
 print("...but the generating process was flat the entire time.")
 `}
 />
@@ -147,6 +154,7 @@ range, it's plausibly just noise.
 
 rng = np.random.default_rng(0)
 
+
 # Build a "no-effect world": split one identical population in half,
 # many times, and record the gap between the two halves' means.
 def gap_under_no_effect():
@@ -155,16 +163,18 @@ def gap_under_no_effect():
     a, b = everyone[:100], everyone[100:]
     return a.mean() - b.mean()
 
+
 null_gaps = np.array([gap_under_no_effect() for _ in range(5000)])
 
 print(f"With NO real effect, the gap between two groups typically")
-print(f"falls within about +/- {2*null_gaps.std():.2f}.")
+print(f"falls within about +/- {2 * null_gaps.std():.2f}.")
 print(f"(std of the no-effect gaps = {null_gaps.std():.2f})")
 
-observed_gap = 1.4   # something you measured in real life
+observed_gap = 1.4  # something you measured in real life
 plausibly_noise = abs(observed_gap) < 2 * null_gaps.std()
-print(f"\\nObserved gap of {observed_gap:+.2f} -> "
-      f"plausibly just noise? {plausibly_noise}")
+print(
+    f"\\nObserved gap of {observed_gap:+.2f} -> plausibly just noise? {plausibly_noise}"
+)
 `}
 />
 
@@ -267,20 +277,25 @@ point_estimate = sample.mean()
 # The "distribution" answer: if we could resample the process many
 # times, where would the mean land? (Here we cheat by resampling the
 # real process; later, the bootstrap does this from a single sample.)
-many_means = np.array([rng.normal(200, 25, size=300).mean()
-                       for _ in range(2000)])
+many_means = np.array([rng.normal(200, 25, size=300).mean() for _ in range(2000)])
 
-fig = px.histogram(many_means, nbins=40,
-                   labels={"value": "Sample mean (ms)"},
-                   title="The mean is not a point — it's a distribution")
-fig.add_vline(x=point_estimate, line_dash="dash",
-              annotation_text="your one sample's mean")
+fig = px.histogram(
+    many_means,
+    nbins=40,
+    labels={"value": "Sample mean (ms)"},
+    title="The mean is not a point — it's a distribution",
+)
+fig.add_vline(
+    x=point_estimate, line_dash="dash", annotation_text="your one sample's mean"
+)
 fig.show()
 
 print(f"Point answer:        {point_estimate:.2f} ms")
-print(f"Distribution answer: most plausible means fall in "
-      f"[{np.percentile(many_means,2.5):.1f}, "
-      f"{np.percentile(many_means,97.5):.1f}] ms")
+print(
+    f"Distribution answer: most plausible means fall in "
+    f"[{np.percentile(many_means, 2.5):.1f}, "
+    f"{np.percentile(many_means, 97.5):.1f}] ms"
+)
 `}
 />
 

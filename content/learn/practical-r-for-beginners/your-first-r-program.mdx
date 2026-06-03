@@ -10,7 +10,8 @@ fully functional R session, running in your browser. Click **Run**.
 
 <CodeBlock
   adapter="r"
-  starterCode={`print("Hello, R!")`}
+  starterCode={`print("Hello, R!")
+`}
 />
 
 When you ran that, several things happened invisibly:
@@ -115,8 +116,8 @@ print(c(1, 2, 3))
 cat("The answer is", 42, "\\n")
 
 # Mix variables into a sentence
-city  <- "Auckland"
-temp  <- 17.5
+city <- "Auckland"
+temp <- 17.5
 cat("In", city, "today it is", temp, "degrees.\\n")
 `}
 />
@@ -137,7 +138,7 @@ Comments are notes you leave for the next human to read your code
 <CodeBlock
   adapter="r"
   starterCode={`# This whole line is a comment
-x <- 10  # this part of the line is a comment, too
+x <- 10 # this part of the line is a comment, too
 
 # Comments are how you explain *why*, not just *what*
 # Bad: "set x to 10"
@@ -218,9 +219,9 @@ will compute a heart-health summary for a small group of people.
   adapter="r"
   starterCode={`# Tiny health checkup program
 
-names    <- c("Alice", "Bob", "Carmen", "Dario")
-heights  <- c(165, 178, 170, 182)   # cm
-weights  <- c(60,  85,  72,  95)    # kg
+names <- c("Alice", "Bob", "Carmen", "Dario")
+heights <- c(165, 178, 170, 182) # cm
+weights <- c(60, 85, 72, 95) # kg
 
 # Body Mass Index = weight (kg) / height (m)^2
 bmi <- weights / (heights / 100)^2
@@ -230,10 +231,15 @@ bmi <- round(bmi, 1)
 
 # Show a summary line for each person
 for (i in seq_along(names)) {
-  status <- if (bmi[i] < 18.5) "underweight"
-            else if (bmi[i] < 25) "healthy"
-            else if (bmi[i] < 30) "overweight"
-            else "obese"
+  status <- if (bmi[i] < 18.5) {
+    "underweight"
+  } else if (bmi[i] < 25) {
+    "healthy"
+  } else if (bmi[i] < 30) {
+    "overweight"
+  } else {
+    "obese"
+  }
   cat(names[i], "-- BMI:", bmi[i], "(", status, ")\\n")
 }
 `}
@@ -310,9 +316,8 @@ decimal. Use the formula `F = C * 9/5 + 32`.
   initCode={`cities         <- c("Auckland", "Tokyo", "Reykjavik", "Cairo")
 temperatures_c <- c(17.5, 24.0, 3.1, 35.6)`}
   starterCode={`# Your code here
-
 `}
-  solutionCode={`temperatures_f <- round(temperatures_c * 9/5 + 32, 1)
+  solutionCode={`temperatures_f <- round(temperatures_c * 9 / 5 + 32, 1)
 for (i in seq_along(cities)) {
   cat(cities[i], ": ", temperatures_c[i], " C / ", temperatures_f[i], " F\\n", sep = "")
 }

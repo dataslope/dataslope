@@ -128,6 +128,7 @@ from nltk.tokenize import word_tokenize`}
         return 0.0
     return len(set(tokens)) / len(tokens)
 
+
 repetitive = word_tokenize("very very very good good good good")
 varied = word_tokenize("an unusually eclectic vocabulary brimming with novelty")
 
@@ -322,9 +323,11 @@ from nltk.probability import FreqDist`}
     # distinct / total, or 0.0 if empty
     return 0.0
 
+
 def top_words(tokens, n):
     # use FreqDist(...).most_common(n)
     return []
+
 
 sample = ["a", "b", "a", "c", "a", "b"]
 print("diversity:", lexical_diversity(sample))
@@ -335,8 +338,10 @@ print("top 2:    ", top_words(sample, 2))
         return 0.0
     return len(set(tokens)) / len(tokens)
 
+
 def top_words(tokens, n):
     return FreqDist(tokens).most_common(n)
+
 
 sample = ["a", "b", "a", "c", "a", "b"]
 print("diversity:", lexical_diversity(sample))

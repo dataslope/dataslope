@@ -56,37 +56,35 @@ miniature version of what that felt like.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    // Imagine these as "global" data — every procedure can read and write them.
-    static String customerName;
-    static double  customerBalance;
-    static boolean customerIsPremium;
+  // Imagine these as "global" data — every procedure can read and write them.
+  static String customerName;
+  static double customerBalance;
+  static boolean customerIsPremium;
 
-    static void deposit(double amount) {
-        customerBalance += amount;
+  static void deposit(double amount) { customerBalance += amount; }
+
+  static void withdraw(double amount) {
+    // Whoops: nothing stops us from going negative.
+    customerBalance -= amount;
+  }
+
+  static void applyMonthlyFee() {
+    if (!customerIsPremium) {
+      customerBalance -= 5.0;
     }
+  }
 
-    static void withdraw(double amount) {
-        // Whoops: nothing stops us from going negative.
-        customerBalance -= amount;
-    }
+  public static void main(String[] args) {
+    customerName = "Ada";
+    customerBalance = 100.0;
+    customerIsPremium = false;
 
-    static void applyMonthlyFee() {
-        if (!customerIsPremium) {
-            customerBalance -= 5.0;
-        }
-    }
+    deposit(50);
+    withdraw(200); // overdraws — no protection
+    applyMonthlyFee();
 
-    public static void main(String[] args) {
-        customerName      = "Ada";
-        customerBalance   = 100.0;
-        customerIsPremium = false;
-
-        deposit(50);
-        withdraw(200);          // overdraws — no protection
-        applyMonthlyFee();
-
-        System.out.println(customerName + " balance: " + customerBalance);
-    }
+    System.out.println(customerName + " balance: " + customerBalance);
+  }
 }
 `}
 />

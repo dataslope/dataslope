@@ -230,7 +230,7 @@ Z = linkage(X_scaled, method="ward")
 # Now cut it at several different k values — no refitting needed.
 for k in [2, 3, 4, 5]:
     labels = fcluster(Z, t=k, criterion="maxclust")
-    sizes = np.bincount(labels)[1:]   # fcluster labels start at 1
+    sizes = np.bincount(labels)[1:]  # fcluster labels start at 1
     print(f"Cut into k={k}:  cluster sizes = {sorted(sizes, reverse=True)}")
 `}
 />
@@ -319,6 +319,7 @@ from sklearn.cluster import AgglomerativeClustering
 from sklearn.preprocessing import StandardScaler
 from scipy.cluster.hierarchy import dendrogram
 
+
 def plot_dendrogram_from_model(model, **kwargs):
     # Count how many original points sit under each merged node.
     counts = np.zeros(model.children_.shape[0])
@@ -331,6 +332,7 @@ def plot_dendrogram_from_model(model, **kwargs):
     # SciPy's linkage matrix: [child1, child2, distance, sample_count].
     Z = np.column_stack([model.children_, model.distances_, counts]).astype(float)
     dendrogram(Z, **kwargs)
+
 
 X, _ = make_blobs(n_samples=18, centers=3, cluster_std=0.60, random_state=0)
 X_scaled = StandardScaler().fit_transform(X)

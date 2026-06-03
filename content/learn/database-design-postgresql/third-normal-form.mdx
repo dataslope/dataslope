@@ -66,13 +66,25 @@ INSERT INTO orders_bad VALUES
   (102, 2, 'Grace', 'Baltimore');`}
   starterCode={`-- A partial update makes one customer appear to live in two cities.
 UPDATE orders_bad
-SET customer_city = 'Oxford'
-WHERE order_id = 100;
+SET
+  customer_city = 'Oxford'
+WHERE
+  order_id = 100;
 
-SELECT customer_id, customer_name, customer_city, COUNT(*) AS rows
-FROM orders_bad
-GROUP BY customer_id, customer_name, customer_city
-ORDER BY customer_id, customer_city;`}
+SELECT
+  customer_id,
+  customer_name,
+  customer_city,
+  COUNT(*) AS rows
+FROM
+  orders_bad
+GROUP BY
+  customer_id,
+  customer_name,
+  customer_city
+ORDER BY
+  customer_id,
+  customer_city;`}
 />
 
 ## Quick check
@@ -162,13 +174,21 @@ INSERT INTO orders VALUES
   (102, 2, DATE '2026-01-12');`}
   starterCode={`-- Ada moves once, in the one row that stores Ada's city.
 UPDATE customers
-SET city = 'Oxford'
-WHERE id = 1;
+SET
+  city = 'Oxford'
+WHERE
+  id = 1;
 
-SELECT o.id AS order_id, c.name, c.city, o.order_date
-FROM orders o
-JOIN customers c ON c.id = o.customer_id
-ORDER BY o.id;`}
+SELECT
+  o.id AS order_id,
+  c.name,
+  c.city,
+  o.order_date
+FROM
+  orders o
+  JOIN customers c ON c.id = o.customer_id
+ORDER BY
+  o.id;`}
 />
 
 ## A step-by-step 3NF test

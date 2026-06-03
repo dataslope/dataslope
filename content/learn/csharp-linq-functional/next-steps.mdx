@@ -51,15 +51,14 @@ using System.Linq;
 
 var nums = Enumerable.Range(1, 20);
 
-var squares = nums
-    .AsParallel()
-    .Select(n =>
-    {
-        // pretend this is expensive
-        return n * n;
-    })
-    .OrderBy(n => n)
-    .ToList();
+var squares = nums.AsParallel()
+                  .Select(n =>
+                          {
+                              // pretend this is expensive
+                              return n * n;
+                          })
+                  .OrderBy(n => n)
+                  .ToList();
 
 Console.WriteLine(string.Join(",", squares));
 `}

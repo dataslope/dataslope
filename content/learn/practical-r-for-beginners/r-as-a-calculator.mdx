@@ -28,13 +28,13 @@ give you both halves of a division.
   adapter="r"
   starterCode={`# Each line produces an answer
 
-2 + 3            # addition
-10 - 4           # subtraction
-3 * 7            # multiplication
-10 / 4           # real division
-2 ^ 10           # exponentiation: 2 to the 10th power
-17 %% 5          # modulo: remainder of 17 / 5
-17 %/% 5         # integer division: how many times 5 fits into 17
+2 + 3 # addition
+10 - 4 # subtraction
+3 * 7 # multiplication
+10 / 4 # real division
+2^10 # exponentiation: 2 to the 10th power
+17 %% 5 # modulo: remainder of 17 / 5
+17 %/% 5 # integer division: how many times 5 fits into 17
 `}
 />
 
@@ -50,12 +50,12 @@ subtraction**, with **parentheses overriding** everything.
 <CodeBlock
   adapter="r"
   starterCode={`# These two expressions are NOT the same
-print(2 + 3 * 4)       # 2 + 12 = 14
-print((2 + 3) * 4)     # 5 * 4  = 20
+print(2 + 3 * 4) # 2 + 12 = 14
+print((2 + 3) * 4) # 5 * 4  = 20
 
 # Exponentiation is higher than multiplication
-print(2 * 3 ^ 2)       # 2 * 9 = 18
-print((2 * 3) ^ 2)     # 6^2  = 36
+print(2 * 3^2) # 2 * 9 = 18
+print((2 * 3)^2) # 6^2  = 36
 
 # When in doubt, parenthesize
 print(((1 + 2) * (3 + 4)) / 5)
@@ -75,8 +75,8 @@ R has two kinds of numbers you will routinely encounter:
 
 <CodeBlock
   adapter="r"
-  starterCode={`x <- 42       # double (the default in R!)
-y <- 42L      # integer (the L stands for "long integer")
+  starterCode={`x <- 42 # double (the default in R!)
+y <- 42L # integer (the L stands for "long integer")
 
 cat("type of x:", typeof(x), "\\n")
 cat("type of y:", typeof(y), "\\n")
@@ -101,13 +101,13 @@ R has a few special "numbers" that pop up in real data analysis:
 
 <CodeBlock
   adapter="r"
-  starterCode={`print(1 / 0)        # Inf
-print(-1 / 0)       # -Inf
-print(0 / 0)        # NaN — "not a number"
-print(NA + 5)       # NA — anything plus a missing value is missing
-print(is.na(NA))    # TRUE
-print(is.nan(0/0))  # TRUE
-print(is.infinite(1/0))  # TRUE
+  starterCode={`print(1 / 0) # Inf
+print(-1 / 0) # -Inf
+print(0 / 0) # NaN — "not a number"
+print(NA + 5) # NA — anything plus a missing value is missing
+print(is.na(NA)) # TRUE
+print(is.nan(0 / 0)) # TRUE
+print(is.infinite(1 / 0)) # TRUE
 `}
 />
 
@@ -133,14 +133,14 @@ Each comparison returns a **logical** value: `TRUE` or `FALSE`.
 
 <CodeBlock
   adapter="r"
-  starterCode={`5 == 5          # TRUE
-5 != 5          # FALSE
-5 < 10          # TRUE
-5 > 10          # FALSE
-5 <= 5          # TRUE — note the difference vs. <
+  starterCode={`5 == 5 # TRUE
+5 != 5 # FALSE
+5 < 10 # TRUE
+5 > 10 # FALSE
+5 <= 5 # TRUE — note the difference vs. <
 
 # Mix with arithmetic
-(2 + 3) > (1 * 4)   # 5 > 4 is TRUE
+(2 + 3) > (1 * 4) # 5 > 4 is TRUE
 
 # Watch out: floating point equality is tricky!
 (0.1 + 0.2) == 0.3
@@ -177,8 +177,8 @@ Once you have logical values, you can combine them.
 
 <CodeBlock
   adapter="r"
-  starterCode={`age      <- 30
-income   <- 55000
+  starterCode={`age <- 30
+income <- 55000
 
 # Eligible if age between 25 and 60 AND income at least 40000
 eligible <- (age >= 25) & (age <= 60) & (income >= 40000)
@@ -207,12 +207,12 @@ program:
 
 <CodeBlock
   adapter="r"
-  starterCode={`width  <- 8
+  starterCode={`width <- 8
 height <- 5
 
-area      <- width * height
+area <- width * height
 perimeter <- 2 * (width + height)
-is_wide   <- width > height
+is_wide <- width > height
 
 cat("Width:    ", width, "\\n")
 cat("Height:   ", height, "\\n")
@@ -257,8 +257,8 @@ cat("log10(1000)    =", log10(1000), "\\n")
 cat("round(3.14159, 2) =", round(3.14159, 2), "\\n")
 cat("floor(2.9)     =", floor(2.9), "\\n")
 cat("ceiling(2.1)   =", ceiling(2.1), "\\n")
-cat("sum(1:10)      =", sum(1:10), "\\n")    # 1+2+...+10
-cat("mean(1:10)     =", mean(1:10), "\\n")   # 5.5
+cat("sum(1:10)      =", sum(1:10), "\\n") # 1+2+...+10
+cat("mean(1:10)     =", mean(1:10), "\\n") # 5.5
 `}
 />
 
@@ -334,14 +334,14 @@ Both should be plain numeric scalars.
 - \`total\`: \`bill + tip\`, rounded to 2 decimals.`}
   initCode={`bill    <- 42.75
 tip_pct <- 18`}
-  starterCode={`tip   <- NA
+  starterCode={`tip <- NA
 total <- NA
 
 cat("Bill:  $", bill, "\\n", sep = "")
 cat("Tip:   $", tip, "\\n", sep = "")
 cat("Total: $", total, "\\n", sep = "")
 `}
-  solutionCode={`tip   <- round(bill * tip_pct / 100, 2)
+  solutionCode={`tip <- round(bill * tip_pct / 100, 2)
 total <- round(bill + tip, 2)
 
 cat("Bill:  $", bill, "\\n", sep = "")

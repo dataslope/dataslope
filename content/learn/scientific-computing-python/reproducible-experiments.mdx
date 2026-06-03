@@ -94,12 +94,14 @@ the top of the experiment, thread it through everywhere.
   adapter="python"
   starterCode={`import numpy as np
 
+
 def run_experiment(seed):
     rng = np.random.default_rng(seed)
     # Pass rng everywhere instead of using np.random.* globally
     samples = rng.normal(size=10_000)
     perturbations = rng.uniform(-0.1, 0.1, size=10_000)
     return (samples + perturbations).mean()
+
 
 a = run_experiment(seed=42)
 b = run_experiment(seed=42)
@@ -150,12 +152,14 @@ came out. Hash large inputs so you'd notice if they changed.
   starterCode={`import hashlib, json, platform, sys, time
 from pathlib import Path
 
+
 def hash_file(path, algo="sha256"):
     h = hashlib.new(algo)
     with open(path, "rb") as f:
         for chunk in iter(lambda: f.read(65536), b""):
             h.update(chunk)
     return h.hexdigest()
+
 
 # Create a fake input file
 inp = Path("/tmp/input.csv")

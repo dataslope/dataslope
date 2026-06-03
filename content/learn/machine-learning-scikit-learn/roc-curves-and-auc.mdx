@@ -177,14 +177,22 @@ strong = LogisticRegression(max_iter=5000).fit(X_train, y_train)
 weak = DecisionTreeClassifier(max_depth=1, random_state=0).fit(X_train, y_train)
 
 plt.figure(figsize=(6.5, 6))
-for model, name, color in [(strong, "LogisticRegression", "#4f8ef7"),
-                           (weak, "depth-1 stump", "#f59e0b")]:
+for model, name, color in [
+    (strong, "LogisticRegression", "#4f8ef7"),
+    (weak, "depth-1 stump", "#f59e0b"),
+]:
     p = model.predict_proba(X_test)[:, 1]
     fpr, tpr, _ = roc_curve(y_test, p)
-    plt.plot(fpr, tpr, color=color, linewidth=2.5,
-             label=f"{name} (AUC = {roc_auc_score(y_test, p):.3f})")
+    plt.plot(
+        fpr,
+        tpr,
+        color=color,
+        linewidth=2.5,
+        label=f"{name} (AUC = {roc_auc_score(y_test, p):.3f})",
+    )
 plt.plot([0, 1], [0, 1], "--", color="#94a3b8")
-plt.xlabel("False Positive Rate"); plt.ylabel("True Positive Rate")
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
 plt.title("Higher and more top-left = better")
 plt.legend(loc="lower right")
 plt.show()

@@ -39,10 +39,22 @@ INSERT INTO orders VALUES
   starterCode={`SELECT
   id,
   amount,
-  (SELECT ROUND(AVG(amount), 1) FROM orders) AS overall_avg,
-  amount - (SELECT AVG(amount) FROM orders)  AS diff_from_avg
-FROM orders
-ORDER BY diff_from_avg DESC;`}
+  (
+    SELECT
+      ROUND(AVG(amount), 1)
+    FROM
+      orders
+  ) AS overall_avg,
+  amount - (
+    SELECT
+      AVG(amount)
+    FROM
+      orders
+  ) AS diff_from_avg
+FROM
+  orders
+ORDER BY
+  diff_from_avg DESC;`}
 />
 
 The inner `(SELECT AVG(amount) FROM orders)` computes one number, reused
@@ -68,12 +80,23 @@ CREATE TABLE customers (
 );
 INSERT INTO customers VALUES
   (10,'gold'),(11,'silver'),(12,'gold'),(13,'bronze');`}
-  starterCode={`SELECT id, customer_id, amount
-FROM orders
-WHERE customer_id IN (
-  SELECT id FROM customers WHERE tier = 'gold'
-)
-ORDER BY amount DESC;`}
+  starterCode={`SELECT
+  id,
+  customer_id,
+  amount
+FROM
+  orders
+WHERE
+  customer_id IN (
+    SELECT
+      id
+    FROM
+      customers
+    WHERE
+      tier = 'gold'
+  )
+ORDER BY
+  amount DESC;`}
 />
 
 The subquery produces the gold customers' ids; the outer query keeps only
@@ -99,11 +122,19 @@ INSERT INTO orders VALUES
   o.id,
   o.region,
   o.amount,
-  (SELECT ROUND(AVG(x.amount), 1)
-   FROM orders x
-   WHERE x.region = o.region) AS region_avg   -- correlated on o.region
-FROM orders o
-ORDER BY o.region, o.amount DESC;`}
+  (
+    SELECT
+      ROUND(AVG(x.amount), 1)
+    FROM
+      orders x
+    WHERE
+      x.region = o.region
+  ) AS region_avg -- correlated on o.region
+FROM
+  orders o
+ORDER BY
+  o.region,
+  o.amount DESC;`}
 />
 
 Notice `WHERE x.region = o.region` — the inner query depends on the outer
@@ -124,12 +155,21 @@ placed *any* order" without caring how many.
 INSERT INTO customers VALUES (1,'Ada'),(2,'Bo'),(3,'Cy');
 CREATE TABLE orders (id INTEGER, customer_id INTEGER);
 INSERT INTO orders VALUES (101,1),(102,1),(103,3);`}
-  starterCode={`SELECT name
-FROM customers c
-WHERE EXISTS (
-  SELECT 1 FROM orders o WHERE o.customer_id = c.id
-)
-ORDER BY name;`}
+  starterCode={`SELECT
+  name
+FROM
+  customers c
+WHERE
+  EXISTS (
+    SELECT
+      1
+    FROM
+      orders o
+    WHERE
+      o.customer_id = c.id
+  )
+ORDER BY
+  name;`}
 />
 
 Bo has no orders, so Bo is excluded. `EXISTS` stops at the first match,

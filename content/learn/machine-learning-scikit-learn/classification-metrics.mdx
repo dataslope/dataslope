@@ -100,8 +100,8 @@ y_pred = model.predict(X_test)
 cm = confusion_matrix(y_test, y_pred)
 print("Confusion matrix (rows = actual, cols = predicted):")
 print("                 pred 0   pred 1")
-print(f"  actual 0 (neg)   {cm[0,0]:4d}     {cm[0,1]:4d}")
-print(f"  actual 1 (pos)   {cm[1,0]:4d}     {cm[1,1]:4d}")
+print(f"  actual 0 (neg)   {cm[0, 0]:4d}     {cm[0, 1]:4d}")
+print(f"  actual 1 (pos)   {cm[1, 0]:4d}     {cm[1, 1]:4d}")
 print()
 tn, fp, fn, tp = cm.ravel()
 print(f"TN={tn}  FP={fp}  FN={fn}  TP={tp}")
@@ -182,7 +182,7 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=1, stratify=y
 )
 model = LogisticRegression(max_iter=1000).fit(X_train, y_train)
-probs = model.predict_proba(X_test)[:, 1]   # probability of class 1
+probs = model.predict_proba(X_test)[:, 1]  # probability of class 1
 
 print("threshold |  precision |  recall")
 for t in [0.2, 0.35, 0.5, 0.65, 0.8]:

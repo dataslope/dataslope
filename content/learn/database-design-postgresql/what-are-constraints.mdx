@@ -99,10 +99,18 @@ SQL and read the error: PostgreSQL refuses the bad row.
 
 INSERT INTO products (name, price) VALUES ('Notebook', 4.50);`}
   starterCode={`-- A negative price violates the CHECK constraint.
-INSERT INTO products (name, price) VALUES ('Broken price', -3.00);
+INSERT INTO
+  products (name, price)
+VALUES
+  ('Broken price', -3.00);
 
 -- The bad product is not stored.
-SELECT id, name, price FROM products;`}
+SELECT
+  id,
+  name,
+  price
+FROM
+  products;`}
 />
 
 The schema now knows something about the business: a product's price

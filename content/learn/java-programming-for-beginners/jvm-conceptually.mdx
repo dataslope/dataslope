@@ -185,23 +185,23 @@ become unreachable. The JVM quietly reclaims them.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        // Make a million temporary objects
-        long total = 0;
-        for (int i = 0; i < 1_000_000; i++) {
-            Box b = new Box(i);     // allocate on heap
-            total += b.value();
-            // 'b' goes out of scope at the end of this iteration
-            // → that Box becomes unreachable → eventually GC'd
-        }
-        System.out.println("sum = " + total);
+  public static void main(String[] args) {
+    // Make a million temporary objects
+    long total = 0;
+    for (int i = 0; i < 1_000_000; i++) {
+      Box b = new Box(i); // allocate on heap
+      total += b.value();
+      // 'b' goes out of scope at the end of this iteration
+      // → that Box becomes unreachable → eventually GC'd
     }
+    System.out.println("sum = " + total);
+  }
 }
 
 class Box {
-    private final int value;
-    public Box(int value) { this.value = value; }
-    public int value()    { return value; }
+  private final int value;
+  public Box(int value) { this.value = value; }
+  public int value() { return value; }
 }
 `}
 />

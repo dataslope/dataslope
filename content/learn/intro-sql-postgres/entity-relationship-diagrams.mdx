@@ -112,10 +112,16 @@ INSERT INTO orders (id, customer_id, order_date, total) VALUES
   (101, 1, DATE '2026-05-01', 42),
   (102, 1, DATE '2026-05-09', 18),
   (103, 2, DATE '2026-05-10', 99);`}
-  starterCode={`SELECT c.name, o.order_date, o.total
-FROM customers c
-JOIN orders o ON o.customer_id = c.id
-ORDER BY c.name, o.order_date;`}
+  starterCode={`SELECT
+  c.name,
+  o.order_date,
+  o.total
+FROM
+  customers c
+  JOIN orders o ON o.customer_id = c.id
+ORDER BY
+  c.name,
+  o.order_date;`}
 />
 
 The `PK` markers became `PRIMARY KEY`; the `FK` became `REFERENCES`;

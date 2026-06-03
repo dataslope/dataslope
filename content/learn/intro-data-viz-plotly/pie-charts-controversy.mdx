@@ -20,13 +20,17 @@ by one category.
   starterCode={`import pandas as pd
 import plotly.express as px
 
-df = pd.DataFrame({
-    "channel": ["Organic", "Paid", "Email", "Referral", "Direct"],
-    "share":   [45, 22, 15, 10, 8],
-})
+df = pd.DataFrame(
+    {
+        "channel": ["Organic", "Paid", "Email", "Referral", "Direct"],
+        "share": [45, 22, 15, 10, 8],
+    }
+)
 
 fig = px.pie(
-    df, names="channel", values="share",
+    df,
+    names="channel",
+    values="share",
     template="simple_white",
     title="Traffic by channel (pie)",
 )
@@ -58,20 +62,29 @@ criticism: the eye is bad at comparing angles. Try the next chart:
 import plotly.express as px
 
 # Five close-to-equal categories
-df = pd.DataFrame({
-    "team":  ["A", "B", "C", "D", "E"],
-    "share": [21, 22, 19, 18, 20],
-})
+df = pd.DataFrame(
+    {
+        "team": ["A", "B", "C", "D", "E"],
+        "share": [21, 22, 19, 18, 20],
+    }
+)
 
-fig1 = px.pie(df, names="team", values="share",
-              template="simple_white",
-              title="Pie — can you rank these by size?")
+fig1 = px.pie(
+    df,
+    names="team",
+    values="share",
+    template="simple_white",
+    title="Pie — can you rank these by size?",
+)
 fig1.show()
 
-fig2 = px.bar(df.sort_values("share", ascending=False),
-              x="team", y="share",
-              template="simple_white",
-              title="Same data as a bar — much easier to rank")
+fig2 = px.bar(
+    df.sort_values("share", ascending=False),
+    x="team",
+    y="share",
+    template="simple_white",
+    title="Same data as a bar — much easier to rank",
+)
 fig2.show()
 `}
 />
@@ -116,15 +129,20 @@ When a pie isn't a good fit, the alternatives are almost always:
   starterCode={`import pandas as pd
 import plotly.express as px
 
-df = pd.DataFrame({
-    "channel": ["Organic", "Paid", "Email", "Referral", "Direct"],
-    "share":   [45, 22, 15, 10, 8],
-})
+df = pd.DataFrame(
+    {
+        "channel": ["Organic", "Paid", "Email", "Referral", "Direct"],
+        "share": [45, 22, 15, 10, 8],
+    }
+)
 
 # A horizontal stacked bar — communicates "parts of a whole" without angles.
 df["total"] = "Traffic"
 fig = px.bar(
-    df, y="total", x="share", color="channel",
+    df,
+    y="total",
+    x="share",
+    color="channel",
     orientation="h",
     template="simple_white",
     title="Traffic by channel (stacked bar — pie alternative)",

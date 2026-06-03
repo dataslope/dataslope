@@ -58,14 +58,14 @@ the program easier to reason about.
 // PI = 3.14;  // TypeError: Assignment to constant variable.
 
 let counter = 0;
-counter = counter + 1;  // OK with let
+counter = counter + 1; // OK with let
 counter = counter + 1;
 console.log("counter:", counter);
 
 // 'const' protects the binding, NOT the value:
 const list = [1, 2, 3];
 // list = [4, 5];   // Would be an error — reassignment.
-list.push(4);          // Fine — we are mutating the array itself.
+list.push(4); // Fine — we are mutating the array itself.
 console.log("list:", list);
 `}
 />
@@ -87,15 +87,15 @@ Three words that beginners often mix up:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`let x;             // declaration only — x is undefined
-console.log(x);    // undefined
+  starterCode={`let x; // declaration only — x is undefined
+console.log(x); // undefined
 
-x = 5;             // assignment
-console.log(x);    // 5
+x = 5; // assignment
+console.log(x); // 5
 
-let y = 10;        // declaration + initialisation in one line
-y = y + 1;         // assignment
-console.log(y);    // 11
+let y = 10; // declaration + initialisation in one line
+y = y + 1; // assignment
+console.log(y); // 11
 `}
 />
 
@@ -198,7 +198,7 @@ those braces. This is called **block scope**.
 if (true) {
   const inside = "I only exist inside the if-block";
   console.log(inside);
-  console.log(outside);  // still visible
+  console.log(outside); // still visible
 }
 
 console.log(outside);
@@ -320,10 +320,14 @@ console.log({ balance, deposits, withdrawals });
 let deposits = 0;
 let withdrawals = 0;
 
-balance += 50; deposits += 50;
-balance += 30; deposits += 30;
-balance -= 40; withdrawals += 40;
-balance -= 10; withdrawals += 10;
+balance += 50;
+deposits += 50;
+balance += 30;
+deposits += 30;
+balance -= 40;
+withdrawals += 40;
+balance -= 10;
+withdrawals += 10;
 
 console.log({ balance, deposits, withdrawals });
 `}

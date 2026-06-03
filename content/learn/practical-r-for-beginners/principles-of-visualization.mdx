@@ -165,9 +165,10 @@ mtcars$car <- rownames(mtcars)
 top <- mtcars[order(-mtcars$mpg), ][1:5, ]
 
 barplot(top$mpg,
-        names.arg = top$car,
-        col       = rainbow(5),
-        main      = "")
+  names.arg = top$car,
+  col       = rainbow(5),
+  main      = ""
+)
 `}
 />
 
@@ -178,14 +179,15 @@ data(mtcars)
 mtcars$car <- rownames(mtcars)
 top <- mtcars[order(-mtcars$mpg), ][1:5, ]
 
-par(mar = c(5, 8, 4, 2))   # extra left margin for names
+par(mar = c(5, 8, 4, 2)) # extra left margin for names
 barplot(rev(top$mpg),
-        names.arg = rev(top$car),
-        horiz     = TRUE,
-        col       = "steelblue",
-        las       = 1,
-        xlab      = "Miles per gallon",
-        main      = "Top 5 most fuel-efficient cars (mtcars)")
+  names.arg = rev(top$car),
+  horiz     = TRUE,
+  col       = "steelblue",
+  las       = 1,
+  xlab      = "Miles per gallon",
+  main      = "Top 5 most fuel-efficient cars (mtcars)"
+)
 `}
 />
 

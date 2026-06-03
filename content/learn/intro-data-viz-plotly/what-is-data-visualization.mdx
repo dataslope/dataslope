@@ -108,27 +108,41 @@ answers slightly different questions.
   starterCode={`import pandas as pd
 import plotly.express as px
 
-df = pd.DataFrame({
-    "fruit":  ["Apple", "Banana", "Cherry", "Date", "Elderberry"],
-    "sales":  [120, 85, 60, 30, 18],
-})
+df = pd.DataFrame(
+    {
+        "fruit": ["Apple", "Banana", "Cherry", "Date", "Elderberry"],
+        "sales": [120, 85, 60, 30, 18],
+    }
+)
 
 # Bar chart: easy to compare exact heights.
-fig1 = px.bar(df, x="fruit", y="sales",
-              template="simple_white",
-              title="Bar — compare exact values")
+fig1 = px.bar(
+    df,
+    x="fruit",
+    y="sales",
+    template="simple_white",
+    title="Bar — compare exact values",
+)
 fig1.show()
 
 # Pie chart: shows parts-of-a-whole, harder to compare slices.
-fig2 = px.pie(df, names="fruit", values="sales",
-              template="simple_white",
-              title="Pie — show parts of total")
+fig2 = px.pie(
+    df,
+    names="fruit",
+    values="sales",
+    template="simple_white",
+    title="Pie — show parts of total",
+)
 fig2.show()
 
 # Lollipop-style scatter: minimal ink, also good for comparison.
-fig3 = px.scatter(df, x="fruit", y="sales",
-                  template="simple_white",
-                  title="Dot — minimalist comparison")
+fig3 = px.scatter(
+    df,
+    x="fruit",
+    y="sales",
+    template="simple_white",
+    title="Dot — minimalist comparison",
+)
 fig3.update_traces(marker_size=15)
 fig3.show()
 `}

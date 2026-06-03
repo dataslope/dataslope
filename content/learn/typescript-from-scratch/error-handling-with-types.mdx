@@ -48,9 +48,7 @@ Functions return `Result` instead of throwing. Callers must check `.ok` to acces
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Result<T, E> =
-  | { ok: true; value: T }
-  | { ok: false; error: E };
+  starterCode={`type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
 
 function parseNumber(input: string): Result<number, string> {
   const n = Number(input);
@@ -90,9 +88,7 @@ Transforms the success value if present, otherwise propagates the error:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Result<T, E> =
-  | { ok: true; value: T }
-  | { ok: false; error: E };
+  starterCode={`type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
 
 function map<T, E, U>(result: Result<T, E>, fn: (value: T) => U): Result<U, E> {
   if (result.ok) {
@@ -130,13 +126,11 @@ Chains operations that also return `Result`:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Result<T, E> =
-  | { ok: true; value: T }
-  | { ok: false; error: E };
+  starterCode={`type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
 
 function andThen<T, E, U>(
   result: Result<T, E>,
-  fn: (value: T) => Result<U, E>
+  fn: (value: T) => Result<U, E>,
 ): Result<U, E> {
   if (result.ok) {
     return fn(result.value);
@@ -180,9 +174,7 @@ Extracts the value or returns a default:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Result<T, E> =
-  | { ok: true; value: T }
-  | { ok: false; error: E };
+  starterCode={`type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
 
 function unwrapOr<T, E>(result: Result<T, E>, defaultValue: T): T {
   if (result.ok) {
@@ -215,9 +207,7 @@ Let's build a pipeline that parses input, validates it, and computes a result:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Result<T, E> =
-  | { ok: true; value: T }
-  | { ok: false; error: E };
+  starterCode={`type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
 
 function map<T, E, U>(result: Result<T, E>, fn: (value: T) => U): Result<U, E> {
   return result.ok ? { ok: true, value: fn(result.value) } : result;
@@ -225,7 +215,7 @@ function map<T, E, U>(result: Result<T, E>, fn: (value: T) => U): Result<U, E> {
 
 function andThen<T, E, U>(
   result: Result<T, E>,
-  fn: (value: T) => Result<U, E>
+  fn: (value: T) => Result<U, E>,
 ): Result<U, E> {
   return result.ok ? fn(result.value) : result;
 }

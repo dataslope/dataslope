@@ -163,11 +163,13 @@ it in a moment.
 from sklearn.preprocessing import OneHotEncoder
 
 # A tiny, realistic table with three categorical columns.
-df = pd.DataFrame({
-    "color": ["red", "green", "blue", "red", "blue"],
-    "size":  ["M", "L", "S", "S", "M"],
-    "city":  ["Tokyo", "Paris", "Tokyo", "Berlin", "Paris"],
-})
+df = pd.DataFrame(
+    {
+        "color": ["red", "green", "blue", "red", "blue"],
+        "size": ["M", "L", "S", "S", "M"],
+        "city": ["Tokyo", "Paris", "Tokyo", "Berlin", "Paris"],
+    }
+)
 print("Original:")
 print(df)
 
@@ -241,11 +243,17 @@ Xte_int = df_test["city"].map(label_map).to_numpy().reshape(-1, 1)
 clf_int = LogisticRegression(max_iter=1000).fit(Xtr_int, y_train)
 
 # RIGHT: one-hot encoding, no false order.
-enc = OneHotEncoder(handle_unknown="ignore", sparse_output=False).fit(df_train[["city"]])
-clf_oh = LogisticRegression(max_iter=1000).fit(enc.transform(df_train[["city"]]), y_train)
+enc = OneHotEncoder(handle_unknown="ignore", sparse_output=False).fit(
+    df_train[["city"]]
+)
+clf_oh = LogisticRegression(max_iter=1000).fit(
+    enc.transform(df_train[["city"]]), y_train
+)
 
 print(f"Integer-label accuracy: {clf_int.score(Xte_int, y_test):.3f}")
-print(f"One-hot accuracy:       {clf_oh.score(enc.transform(df_test[['city']]), y_test):.3f}")
+print(
+    f"One-hot accuracy:       {clf_oh.score(enc.transform(df_test[['city']]), y_test):.3f}"
+)
 `}
 />
 
@@ -293,12 +301,12 @@ encoder.fit(train)
 print("Known categories:", encoder.categories_[0])
 
 # At predict time, a NEW, unseen city appears.
-new = pd.DataFrame({"city": ["Paris", "London"]})   # London was never seen
+new = pd.DataFrame({"city": ["Paris", "London"]})  # London was never seen
 out = encoder.transform(new)
 
 print("\\nColumns:", encoder.get_feature_names_out())
-print("Paris  ->", out[0])   # a normal one-hot row
-print("London ->", out[1])   # all zeros: 'none of the known cities'
+print("Paris  ->", out[0])  # a normal one-hot row
+print("London ->", out[1])  # all zeros: 'none of the known cities'
 `}
 />
 

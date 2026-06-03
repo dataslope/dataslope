@@ -46,26 +46,27 @@ its address.
   starterCode={`#include <stdio.h>
 #include <stdlib.h>
 
-int g_init = 42;        // .data    (initialized global)
-int g_zero;             // .bss     (zero-initialized global)
-static const char *g_literal = "hello"; // pointer in .data, "hello" in .rodata/.text
+int g_init = 42; // .data    (initialized global)
+int g_zero;      // .bss     (zero-initialized global)
+static const char *g_literal =
+    "hello"; // pointer in .data, "hello" in .rodata/.text
 
-void show(void) {}      // .text    (code)
+void show(void) {} // .text    (code)
 
 int main(void) {
-    int local = 7;                          // stack
-    int *heap = malloc(sizeof(int));        // heap
-    *heap = 99;
+  int local = 7;                   // stack
+  int *heap = malloc(sizeof(int)); // heap
+  *heap = 99;
 
-    printf("Code (function show):  %p\\n", (void *)&show);
-    printf("Literal \\"hello\\":      %p\\n", (void *)g_literal);
-    printf("Initialized global:    %p\\n", (void *)&g_init);
-    printf("Zero global:           %p\\n", (void *)&g_zero);
-    printf("Heap allocation:       %p\\n", (void *)heap);
-    printf("Stack local:           %p\\n", (void *)&local);
+  printf("Code (function show):  %p\\n", (void *)&show);
+  printf("Literal \\"hello\\":      %p\\n", (void *)g_literal);
+  printf("Initialized global:    %p\\n", (void *)&g_init);
+  printf("Zero global:           %p\\n", (void *)&g_zero);
+  printf("Heap allocation:       %p\\n", (void *)heap);
+  printf("Stack local:           %p\\n", (void *)&local);
 
-    free(heap);
-    return 0;
+  free(heap);
+  return 0;
 }
 `}
 />
@@ -101,14 +102,14 @@ C splits globals into two pieces purely as a file-size optimization:
   adapter="c"
   starterCode={`#include <stdio.h>
 
-int counter = 0;        // BSS (zero init takes no file bytes)
-int answer  = 42;       // DATA (must store the 42 in the binary)
-int big[10000];         // BSS — does NOT bloat the binary by 40 KB
+int counter = 0; // BSS (zero init takes no file bytes)
+int answer = 42; // DATA (must store the 42 in the binary)
+int big[10000];  // BSS — does NOT bloat the binary by 40 KB
 
 int main(void) {
-    counter++;
-    printf("counter=%d answer=%d big[0]=%d\\n", counter, answer, big[0]);
-    return 0;
+  counter++;
+  printf("counter=%d answer=%d big[0]=%d\\n", counter, answer, big[0]);
+  return 0;
 }
 `}
 />
@@ -138,15 +139,15 @@ private "memory across calls":
   starterCode={`#include <stdio.h>
 
 int next_id(void) {
-    static int counter = 0;   // initialized once, lives in BSS/.data
-    return ++counter;
+  static int counter = 0; // initialized once, lives in BSS/.data
+  return ++counter;
 }
 
 int main(void) {
-    for (int i = 0; i < 5; i++) {
-        printf("id = %d\\n", next_id());
-    }
-    return 0;
+  for (int i = 0; i < 5; i++) {
+    printf("id = %d\\n", next_id());
+  }
+  return 0;
 }
 `}
 />
@@ -188,15 +189,15 @@ function call uses — almost always *not* what you wanted.
   starterCode={`#include <stdio.h>
 
 int *bad(void) {
-    int x = 42;     // lives on the stack
-    return &x;      // returning the address of a soon-to-die local — UB!
+  int x = 42; // lives on the stack
+  return &x;  // returning the address of a soon-to-die local — UB!
 }
 
 int main(void) {
-    int *p = bad();
-    // Reading *p here is undefined. It may print 42 or anything else.
-    printf("*p = %d  (undefined; may be garbage)\\n", *p);
-    return 0;
+  int *p = bad();
+  // Reading *p here is undefined. It may print 42 or anything else.
+  printf("*p = %d  (undefined; may be garbage)\\n", *p);
+  return 0;
 }
 `}
 />
@@ -213,30 +214,30 @@ caller `free` it, or (b) have the caller pass in a buffer.
   starterCode={`#include <stdio.h>
 
 int next_id(void) {
-    // your code here — make the counter persist across calls
-    int counter = 0;
-    return ++counter;
+  // your code here — make the counter persist across calls
+  int counter = 0;
+  return ++counter;
 }
 
 int main(void) {
-    for (int i = 0; i < 5; i++) {
-        printf("%d\\n", next_id());
-    }
-    return 0;
+  for (int i = 0; i < 5; i++) {
+    printf("%d\\n", next_id());
+  }
+  return 0;
 }
 `}
   solutionCode={`#include <stdio.h>
 
 int next_id(void) {
-    static int counter = 0;
-    return ++counter;
+  static int counter = 0;
+  return ++counter;
 }
 
 int main(void) {
-    for (int i = 0; i < 5; i++) {
-        printf("%d\\n", next_id());
-    }
-    return 0;
+  for (int i = 0; i < 5; i++) {
+    printf("%d\\n", next_id());
+  }
+  return 0;
 }
 `}
   tests={[

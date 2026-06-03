@@ -37,23 +37,26 @@ using System.Linq;
 
 static IEnumerable<int> Source()
 {
-    Console.WriteLine("  Source: 1");  yield return 1;
-    Console.WriteLine("  Source: 2");  yield return 2;
-    Console.WriteLine("  Source: 3");  yield return 3;
+    Console.WriteLine("  Source: 1");
+    yield return 1;
+    Console.WriteLine("  Source: 2");
+    yield return 2;
+    Console.WriteLine("  Source: 3");
+    yield return 3;
 }
 
 Console.WriteLine("Building pipeline (no source output expected yet):");
 var pipeline = Source()
-    .Where(n =>
-    {
-        Console.WriteLine($"  Where checking {n}");
-        return n % 2 == 1;
-    })
-    .Select(n =>
-    {
-        Console.WriteLine($"  Select mapping {n}");
-        return n * 10;
-    });
+                   .Where(n =>
+                          {
+                              Console.WriteLine($"  Where checking {n}");
+                              return n % 2 == 1;
+                          })
+                   .Select(n =>
+                           {
+                               Console.WriteLine($"  Select mapping {n}");
+                               return n * 10;
+                           });
 
 Console.WriteLine("Pipeline built. Now iterating:");
 foreach (var n in pipeline)
@@ -123,7 +126,7 @@ using System.Collections.Generic;
 
 static IEnumerable<int> Counting()
 {
-    for (int i = 1; ; i++)
+    for (int i = 1;; i++)
     {
         Console.WriteLine($"  yielding {i}");
         yield return i;
@@ -175,7 +178,7 @@ var nums = new[] { 1, 2, 3, 4, 5 };
 int threshold = 3;
 var pipeline = nums.Where(n => n > threshold);
 
-threshold = 4;   // change AFTER building the pipeline
+threshold = 4; // change AFTER building the pipeline
 Console.WriteLine($"With threshold=4: {string.Join(",", pipeline)}");
 
 threshold = 1;

@@ -49,21 +49,21 @@ You can see the call chain by printing addresses of local variables.
   starterCode={`#include <stdio.h>
 
 void inner(void) {
-    int x = 0;
-    printf("inner  : &x = %p\\n", (void *)&x);
+  int x = 0;
+  printf("inner  : &x = %p\\n", (void *)&x);
 }
 
 void middle(void) {
-    int x = 0;
-    printf("middle : &x = %p\\n", (void *)&x);
-    inner();
+  int x = 0;
+  printf("middle : &x = %p\\n", (void *)&x);
+  inner();
 }
 
 int main(void) {
-    int x = 0;
-    printf("main   : &x = %p\\n", (void *)&x);
-    middle();
-    return 0;
+  int x = 0;
+  printf("main   : &x = %p\\n", (void *)&x);
+  middle();
+  return 0;
 }
 `}
 />
@@ -84,15 +84,16 @@ a *stack size* limit.
   starterCode={`#include <stdio.h>
 
 long fib(int n) {
-    if (n < 2) return n;
-    return fib(n - 1) + fib(n - 2);
+  if (n < 2)
+    return n;
+  return fib(n - 1) + fib(n - 2);
 }
 
 int main(void) {
-    for (int i = 0; i < 10; i++) {
-        printf("fib(%d) = %ld\\n", i, fib(i));
-    }
-    return 0;
+  for (int i = 0; i < 10; i++) {
+    printf("fib(%d) = %ld\\n", i, fib(i));
+  }
+  return 0;
 }
 `}
 />
@@ -121,17 +122,17 @@ this will crash before `main` runs a single line. Use the heap
 // Run this and watch how deep the recursion gets before stack overflow.
 // We print a count once per 1000 levels so output stays readable.
 int recurse(int depth) {
-    if (depth % 1000 == 0) {
-        printf("at depth %d\\n", depth);
-    }
-    return recurse(depth + 1) + 1;
+  if (depth % 1000 == 0) {
+    printf("at depth %d\\n", depth);
+  }
+  return recurse(depth + 1) + 1;
 }
 
 int main(void) {
-    // Beware: this will eventually crash with a stack overflow.
-    // Comment the next line out if you'd rather not see the crash.
-    recurse(0);
-    return 0;
+  // Beware: this will eventually crash with a stack overflow.
+  // Comment the next line out if you'd rather not see the crash.
+  recurse(0);
+  return 0;
 }
 `}
 />
@@ -147,21 +148,23 @@ stack instead of O(n). Compare:
 
 // Recursive — uses n stack frames.
 long fact_rec(int n) {
-    if (n <= 1) return 1;
-    return n * fact_rec(n - 1);
+  if (n <= 1)
+    return 1;
+  return n * fact_rec(n - 1);
 }
 
 // Iterative — uses one stack frame regardless of n.
 long fact_iter(int n) {
-    long product = 1;
-    for (int i = 2; i <= n; i++) product *= i;
-    return product;
+  long product = 1;
+  for (int i = 2; i <= n; i++)
+    product *= i;
+  return product;
 }
 
 int main(void) {
-    printf("fact_rec(10)  = %ld\\n", fact_rec(10));
-    printf("fact_iter(10) = %ld\\n", fact_iter(10));
-    return 0;
+  printf("fact_rec(10)  = %ld\\n", fact_rec(10));
+  printf("fact_iter(10) = %ld\\n", fact_iter(10));
+  return 0;
 }
 `}
 />
@@ -203,25 +206,25 @@ The single most important stack rule:
   starterCode={`#include <stdio.h>
 
 int *bad(void) {
-    int x = 42;
-    return &x;          // x dies as this function returns!
+  int x = 42;
+  return &x; // x dies as this function returns!
 }
 
 int *bad_inner_scope(void) {
-    int *p = NULL;
-    {
-        int x = 7;
-        p = &x;          // x dies at the closing }, even though we are still in the function
-    }
-    return p;           // p is dangling
+  int *p = NULL;
+  {
+    int x = 7;
+    p = &x; // x dies at the closing }, even though we are still in the function
+  }
+  return p; // p is dangling
 }
 
 int main(void) {
-    int *p1 = bad();
-    int *p2 = bad_inner_scope();
-    printf("*p1 = %d (UB!)\\n", *p1);
-    printf("*p2 = %d (UB!)\\n", *p2);
-    return 0;
+  int *p1 = bad();
+  int *p2 = bad_inner_scope();
+  printf("*p1 = %d (UB!)\\n", *p1);
+  printf("*p2 = %d (UB!)\\n", *p2);
+  return 0;
 }
 `}
 />
@@ -230,24 +233,24 @@ The pattern that *is* safe: write into a buffer the caller owns.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
-#include <stddef.h>
+  starterCode={`#include <stddef.h>
+#include <stdio.h>
 
 // Fill the caller's buffer; never returns a pointer to our own locals.
 void fill_squares(int *out, size_t n) {
-    for (size_t i = 0; i < n; i++) {
-        out[i] = (int)(i * i);
-    }
+  for (size_t i = 0; i < n; i++) {
+    out[i] = (int)(i * i);
+  }
 }
 
 int main(void) {
-    int buf[6];
-    fill_squares(buf, 6);
-    for (int i = 0; i < 6; i++) {
-        printf("%d ", buf[i]);
-    }
-    printf("\\n");
-    return 0;
+  int buf[6];
+  fill_squares(buf, 6);
+  for (int i = 0; i < 6; i++) {
+    printf("%d ", buf[i]);
+  }
+  printf("\\n");
+  return 0;
 }
 `}
 />
@@ -264,32 +267,32 @@ This *caller owns the buffer* idiom is everywhere in C APIs: think
   starterCode={`#include <stdio.h>
 
 long my_pow(int base, int exp) {
-    // your code here
-    return 0;
+  // your code here
+  return 0;
 }
 
 int main(void) {
-    printf("%ld\\n", my_pow(2, 0));
-    printf("%ld\\n", my_pow(2, 10));
-    printf("%ld\\n", my_pow(3, 5));
-    return 0;
+  printf("%ld\\n", my_pow(2, 0));
+  printf("%ld\\n", my_pow(2, 10));
+  printf("%ld\\n", my_pow(3, 5));
+  return 0;
 }
 `}
   solutionCode={`#include <stdio.h>
 
 long my_pow(int base, int exp) {
-    long result = 1;
-    for (int i = 0; i < exp; i++) {
-        result *= base;
-    }
-    return result;
+  long result = 1;
+  for (int i = 0; i < exp; i++) {
+    result *= base;
+  }
+  return result;
 }
 
 int main(void) {
-    printf("%ld\\n", my_pow(2, 0));
-    printf("%ld\\n", my_pow(2, 10));
-    printf("%ld\\n", my_pow(3, 5));
-    return 0;
+  printf("%ld\\n", my_pow(2, 0));
+  printf("%ld\\n", my_pow(2, 10));
+  printf("%ld\\n", my_pow(3, 5));
+  return 0;
 }
 `}
   tests={[
@@ -310,35 +313,37 @@ int main(void) {
   starterCode={`#include <stdio.h>
 
 int gcd(int a, int b) {
-    // your code here
-    return 0;
+  // your code here
+  return 0;
 }
 
 int main(void) {
-    printf("%d\\n", gcd(48, 18));
-    printf("%d\\n", gcd(101, 103));
-    printf("%d\\n", gcd(1000000, 250000));
-    return 0;
+  printf("%d\\n", gcd(48, 18));
+  printf("%d\\n", gcd(101, 103));
+  printf("%d\\n", gcd(1000000, 250000));
+  return 0;
 }
 `}
   solutionCode={`#include <stdio.h>
 
 int gcd(int a, int b) {
-    if (a < 0) a = -a;
-    if (b < 0) b = -b;
-    while (b != 0) {
-        int t = a % b;
-        a = b;
-        b = t;
-    }
-    return a;
+  if (a < 0)
+    a = -a;
+  if (b < 0)
+    b = -b;
+  while (b != 0) {
+    int t = a % b;
+    a = b;
+    b = t;
+  }
+  return a;
 }
 
 int main(void) {
-    printf("%d\\n", gcd(48, 18));
-    printf("%d\\n", gcd(101, 103));
-    printf("%d\\n", gcd(1000000, 250000));
-    return 0;
+  printf("%d\\n", gcd(48, 18));
+  printf("%d\\n", gcd(101, 103));
+  printf("%d\\n", gcd(1000000, 250000));
+  return 0;
 }
 `}
   tests={[

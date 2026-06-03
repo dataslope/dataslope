@@ -44,16 +44,29 @@ Now look at the same data as a chart:
   starterCode={`import pandas as pd
 import plotly.express as px
 
-df = pd.DataFrame({
-    "country": ["Afghanistan", "Brazil", "China", "Germany",
-                "Japan", "Norway", "Senegal"] * 2,
-    "year": [1952]*7 + [2007]*7,
-    "lifeExp": [30, 51, 44, 67, 63, 72, 37,
-                44, 73, 73, 80, 83, 81, 55],
-})
+df = pd.DataFrame(
+    {
+        "country": [
+            "Afghanistan",
+            "Brazil",
+            "China",
+            "Germany",
+            "Japan",
+            "Norway",
+            "Senegal",
+        ]
+        * 2,
+        "year": [1952] * 7 + [2007] * 7,
+        "lifeExp": [30, 51, 44, 67, 63, 72, 37, 44, 73, 73, 80, 83, 81, 55],
+    }
+)
 
 fig = px.line(
-    df, x="year", y="lifeExp", color="country", markers=True,
+    df,
+    x="year",
+    y="lifeExp",
+    color="country",
+    markers=True,
     template="simple_white",
     title="Life expectancy, 1952 vs 2007",
     labels={"lifeExp": "Life expectancy (years)", "year": "Year"},

@@ -50,7 +50,8 @@ static int Add(int x, int y) => x + y;
 static List<int> Doubled(IEnumerable<int> xs)
 {
     var result = new List<int>();
-    foreach (var x in xs) result.Add(x * 2);
+    foreach (var x in xs)
+        result.Add(x * 2);
     return result;
 }
 
@@ -94,12 +95,11 @@ f(input))`. There's no setup, no mocking, no teardown.
 static int Add(int x, int y) => x + y;
 
 // "Tests"
-void Check(string label, bool cond) =>
-    Console.WriteLine($"{(cond ? "OK  " : "FAIL")} {label}");
+void Check(string label, bool cond) => Console.WriteLine($"{(cond ? "OK  " : "FAIL")} {label}");
 
-Check("0+0=0",       Add(0, 0) == 0);
-Check("2+3=5",       Add(2, 3) == 5);
-Check("-1+1=0",      Add(-1, 1) == 0);
+Check("0+0=0", Add(0, 0) == 0);
+Check("2+3=5", Add(2, 3) == 5);
+Check("-1+1=0", Add(-1, 1) == 0);
 Check("commutative", Add(3, 4) == Add(4, 3));
 `}
 />
@@ -124,20 +124,25 @@ remember it. This is called **memoization**.
   starterCode={`using System;
 using System.Collections.Generic;
 
-static Func<TArg, TRes> Memoize<TArg, TRes>(Func<TArg, TRes> f) where TArg : notnull
+static Func<TArg, TRes> Memoize<TArg, TRes>(Func<TArg, TRes> f)
+    where TArg : notnull
 {
     var cache = new Dictionary<TArg, TRes>();
     return arg => cache.TryGetValue(arg, out var v) ? v : (cache[arg] = f(arg));
 }
 
 int callCount = 0;
-int Slow(int x) { callCount++; return x * x; }
+int Slow(int x)
+{
+    callCount++;
+    return x * x;
+}
 
 var fast = Memoize<int, int>(Slow);
 
-Console.WriteLine(fast(5));     // 25, callCount=1
-Console.WriteLine(fast(5));     // 25, callCount=1 (cache hit)
-Console.WriteLine(fast(6));     // 36, callCount=2
+Console.WriteLine(fast(5)); // 25, callCount=1
+Console.WriteLine(fast(5)); // 25, callCount=1 (cache hit)
+Console.WriteLine(fast(6)); // 36, callCount=2
 Console.WriteLine($"calls: {callCount}");
 `}
 />

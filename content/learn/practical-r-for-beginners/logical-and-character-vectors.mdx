@@ -116,7 +116,7 @@ another vector. R keeps only the positions where the logical is
 <CodeBlock
   adapter="r"
   starterCode={`scores <- c(82, 91, 76, 100, 65, 88, 79, 93, 71, 85)
-names  <- c("alice","bob","carol","dan","eve","frank","grace","heidi","ivan","judy")
+names <- c("alice", "bob", "carol", "dan", "eve", "frank", "grace", "heidi", "ivan", "judy")
 
 # Just the high scores
 scores[scores >= 90]
@@ -155,7 +155,7 @@ string enclosed in double or single quotes:
   starterCode={`fruits <- c("apple", "banana", "cherry", "date")
 print(fruits)
 length(fruits)
-nchar(fruits)        # number of characters in each string
+nchar(fruits) # number of characters in each string
 toupper(fruits)
 substr(fruits, 1, 3) # first three characters of each
 `}
@@ -173,7 +173,7 @@ coercion) into one:
 <CodeBlock
   adapter="r"
   starterCode={`first <- c("Alice", "Bob", "Carol")
-last  <- c("Smith", "Jones", "Lee")
+last <- c("Smith", "Jones", "Lee")
 
 # paste() puts a space between by default
 paste(first, last)
@@ -288,7 +288,7 @@ higher.
 scores   <- c(82, 64, 91, 70, 58)
 `}
   starterCode={`# students and scores are already defined
-passed <- NULL  # replace with the filtered names
+passed <- NULL # replace with the filtered names
 
 print(passed)
 `}

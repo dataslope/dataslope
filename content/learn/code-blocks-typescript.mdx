@@ -11,7 +11,10 @@ the [JavaScript](/learn/code-blocks-javascript) blocks are.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface Point { x: number; y: number }
+  starterCode={`interface Point {
+  x: number;
+  y: number;
+}
 const p: Point = { x: 3, y: 4 };
 const dist = Math.hypot(p.x, p.y);
 console.log(\`distance = \${dist}\`);

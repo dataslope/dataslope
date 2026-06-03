@@ -27,11 +27,14 @@ SELECT
 FROM range(0, 40) t(i);`}
   starterCode={`SELECT
   date_trunc('month', order_date) AS month,
-  COUNT(*)                        AS orders,
-  SUM(amount)                     AS revenue
-FROM orders
-GROUP BY month
-ORDER BY month;`}
+  COUNT(*) AS orders,
+  SUM(amount) AS revenue
+FROM
+  orders
+GROUP BY
+  month
+ORDER BY
+  month;`}
 />
 
 ```mermaid
@@ -61,12 +64,20 @@ busiest?" by grouping across all weeks.
 SELECT DATE '2024-01-01' + i AS order_date
 FROM range(0, 60) t(i);`}
   starterCode={`SELECT
-  EXTRACT(dow FROM order_date) AS weekday,   -- 0 = Sunday
-  dayname(order_date)          AS name,
-  COUNT(*)                     AS orders
-FROM orders
-GROUP BY weekday, name
-ORDER BY weekday;`}
+  EXTRACT (
+    dow
+    FROM
+      order_date
+  ) AS weekday, -- 0 = Sunday
+  dayname(order_date) AS name,
+  COUNT(*) AS orders
+FROM
+  orders
+GROUP BY
+  weekday,
+  name
+ORDER BY
+  weekday;`}
 />
 
 <Callout type="info" title="Truncate vs. extract">
@@ -96,10 +107,12 @@ INSERT INTO users VALUES
   starterCode={`SELECT
   id,
   signup_date,
-  DATE '2024-05-30' - signup_date           AS days_ago,
+  DATE '2024-05-30' - signup_date AS days_ago,
   signup_date >= DATE '2024-05-30' - INTERVAL 30 DAY AS in_last_30_days
-FROM users
-ORDER BY signup_date;`}
+FROM
+  users
+ORDER BY
+  signup_date;`}
 />
 
 ## Filling gaps: a complete time series
@@ -123,16 +136,19 @@ INSERT INTO orders VALUES
   (DATE '2024-03-05', 120);`}
   starterCode={`-- Build a continuous spine of dates, then attach revenue.
 SELECT
-  d::DATE                       AS day,
-  COALESCE(SUM(o.amount), 0)    AS revenue
-FROM generate_series(
-       DATE '2024-03-01',
-       DATE '2024-03-05',
-       INTERVAL 1 DAY
-     ) AS s(d)
-LEFT JOIN orders o ON o.order_date = d::DATE
-GROUP BY day
-ORDER BY day;`}
+  d::DATE AS day,
+  COALESCE(SUM(o.amount), 0) AS revenue
+FROM
+  generate_series(
+    DATE '2024-03-01',
+    DATE '2024-03-05',
+    INTERVAL 1 DAY
+  ) AS s (d)
+  LEFT JOIN orders o ON o.order_date = d::DATE
+GROUP BY
+  day
+ORDER BY
+  day;`}
 />
 
 March 2 and 4 had no orders, yet they appear with `revenue = 0` — a

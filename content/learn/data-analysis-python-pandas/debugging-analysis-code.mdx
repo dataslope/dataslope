@@ -31,10 +31,12 @@ After any non-trivial line, print and check.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "id":    [1, 2, 3, 4, 5],
-    "value": [10, 20, 30, 40, 50],
-})
+df = pd.DataFrame(
+    {
+        "id": [1, 2, 3, 4, 5],
+        "value": [10, 20, 30, 40, 50],
+    }
+)
 
 # After every step, inspect shape and a few rows
 print("Before filter:", df.shape)
@@ -53,7 +55,7 @@ is the cheapest bug-detector in Pandas.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({"price": ["10", "20", "30"]})   # strings!
+df = pd.DataFrame({"price": ["10", "20", "30"]})  # strings!
 
 # Looks like it works...
 print(df["price"].sum())
@@ -112,9 +114,11 @@ guessing.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "age": [25, 30, 28, 200, 35, -5, 40],
-})
+df = pd.DataFrame(
+    {
+        "age": [25, 30, 28, 200, 35, -5, 40],
+    }
+)
 
 print(df[df["age"] > 100])
 print(df[df["age"] < 0])
@@ -150,10 +154,12 @@ When stuck, recreate the problem with a tiny DataFrame.
 
 # Real data has 1M rows — too big to inspect.
 # Construct a 4-row mini that triggers the same bug:
-mini = pd.DataFrame({
-    "k": [1, 1, 2, 2],
-    "x": [10, 20, 30, 40],
-})
+mini = pd.DataFrame(
+    {
+        "k": [1, 1, 2, 2],
+        "x": [10, 20, 30, 40],
+    }
+)
 
 # Now you can step through the buggy operation by hand.
 print(mini.groupby("k")["x"].sum())
@@ -176,7 +182,7 @@ df = pd.DataFrame({"x": [1, 2, 3], "y": [10, 20, 30]})
 
 # This MIGHT modify a copy, not df. Don't do this.
 sub = df[df["x"] > 1]
-sub["y"] = 0   # Risky — may warn or fail silently
+sub["y"] = 0  # Risky — may warn or fail silently
 
 # Safer:
 df.loc[df["x"] > 1, "y"] = 0

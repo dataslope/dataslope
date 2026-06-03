@@ -193,7 +193,9 @@ _, p = stats.ttest_ind(control, treatment)
 p_value = float(p)
 
 na, nb = len(control), len(treatment)
-sp = np.sqrt(((na-1)*control.var(ddof=1) + (nb-1)*treatment.var(ddof=1)) / (na+nb-2))
+sp = np.sqrt(
+    ((na - 1) * control.var(ddof=1) + (nb - 1) * treatment.var(ddof=1)) / (na + nb - 2)
+)
 d = float((treatment.mean() - control.mean()) / sp)
 
 print(f"diff = {diff:+.2f}, p = {p_value:.4f}, d = {d:.3f}")

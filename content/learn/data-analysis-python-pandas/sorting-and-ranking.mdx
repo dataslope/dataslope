@@ -14,12 +14,14 @@ Sort by a single column:
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
-    "dept":   ["Eng","Sales","Eng","Ops","Eng"],
-    "salary": [120, 95, 140, 80, 128],
-    "tenure": [3, 6, 7, 2, 4],
-})
+df = pd.DataFrame(
+    {
+        "name": ["Aiko", "Bilal", "Chen", "Diego", "Eve"],
+        "dept": ["Eng", "Sales", "Eng", "Ops", "Eng"],
+        "salary": [120, 95, 140, 80, 128],
+        "tenure": [3, 6, 7, 2, 4],
+    }
+)
 
 print("By salary, descending:")
 print(df.sort_values("salary", ascending=False))
@@ -57,7 +59,7 @@ Sort by the index instead of a column:
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({"salary": [120, 95, 140]}, index=["Chen","Aiko","Bilal"])
+df = pd.DataFrame({"salary": [120, 95, 140]}, index=["Chen", "Aiko", "Bilal"])
 print(df.sort_index())
 `}
 />
@@ -75,10 +77,12 @@ to "sort by A, breaking ties by B":
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "team": ["A","A","B","B"],
-    "score": [10, 20, 10, 20],
-})
+df = pd.DataFrame(
+    {
+        "team": ["A", "A", "B", "B"],
+        "score": [10, 20, 10, 20],
+    }
+)
 
 # Two stable sorts in reverse priority order = ties broken predictably
 result = df.sort_values("score").sort_values("team")
@@ -86,7 +90,7 @@ print(result)
 print()
 
 # Or do it in one call:
-print(df.sort_values(["team","score"]))
+print(df.sort_values(["team", "score"]))
 `}
 />
 
@@ -108,11 +112,15 @@ df = pd.read_csv(
 )
 
 # Top 5 by monthly income
-print(df.nlargest(5, "MonthlyIncome")[["Age","JobRole","Department","MonthlyIncome"]])
+print(
+    df.nlargest(5, "MonthlyIncome")[["Age", "JobRole", "Department", "MonthlyIncome"]]
+)
 print()
 
 # Bottom 5 by income
-print(df.nsmallest(5, "MonthlyIncome")[["Age","JobRole","Department","MonthlyIncome"]])
+print(
+    df.nsmallest(5, "MonthlyIncome")[["Age", "JobRole", "Department", "MonthlyIncome"]]
+)
 `}
 />
 
@@ -145,10 +153,12 @@ representing its position in the sort, leaving row order alone.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
-    "salary": [120, 95, 140, 80, 128],
-})
+df = pd.DataFrame(
+    {
+        "name": ["Aiko", "Bilal", "Chen", "Diego", "Eve"],
+        "salary": [120, 95, 140, 80, 128],
+    }
+)
 
 df["rank"] = df["salary"].rank(ascending=False)
 print(df)
@@ -190,9 +200,8 @@ df = pd.read_csv(
 
 top3 = (
     df.sort_values("MonthlyIncome", ascending=False)
-      .groupby("Department")
-      .head(3)
-      [["Department","JobRole","MonthlyIncome"]]
+    .groupby("Department")
+    .head(3)[["Department", "JobRole", "MonthlyIncome"]]
 )
 print(top3.sort_values("Department"))
 `}

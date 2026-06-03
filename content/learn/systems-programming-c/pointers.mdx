@@ -21,14 +21,14 @@ specifier prints it in hex (after a cast to `void *`).
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int x = 42;
-    double y = 3.14;
-    char c = 'Q';
+  int x = 42;
+  double y = 3.14;
+  char c = 'Q';
 
-    printf("x = %d  at address %p\\n", x, (void *)&x);
-    printf("y = %g  at address %p\\n", y, (void *)&y);
-    printf("c = %c  at address %p\\n", c, (void *)&c);
-    return 0;
+  printf("x = %d  at address %p\\n", x, (void *)&x);
+  printf("y = %g  at address %p\\n", y, (void *)&y);
+  printf("c = %c  at address %p\\n", c, (void *)&c);
+  return 0;
 }
 `}
 />
@@ -65,15 +65,15 @@ flowchart LR
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int x = 10;
-    int *p = &x;        // p now holds the address of x
+  int x = 10;
+  int *p = &x; // p now holds the address of x
 
-    printf("x is %d\\n", x);
-    printf("*p is %d\\n", *p);
+  printf("x is %d\\n", x);
+  printf("*p is %d\\n", *p);
 
-    *p = 99;            // write through the pointer
-    printf("After *p = 99, x is %d\\n", x);
-    return 0;
+  *p = 99; // write through the pointer
+  printf("After *p = 99, x is %d\\n", x);
+  return 0;
 }
 `}
 />
@@ -86,22 +86,22 @@ A pointer that does not point anywhere meaningful should be `NULL`
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
-#include <stddef.h>
+  starterCode={`#include <stddef.h>
+#include <stdio.h>
 
 void print_if_some(int *p) {
-    if (p == NULL) {
-        printf("(nothing)\\n");
-    } else {
-        printf("value: %d\\n", *p);
-    }
+  if (p == NULL) {
+    printf("(nothing)\\n");
+  } else {
+    printf("value: %d\\n", *p);
+  }
 }
 
 int main(void) {
-    int x = 7;
-    print_if_some(&x);
-    print_if_some(NULL);
-    return 0;
+  int x = 7;
+  print_if_some(&x);
+  print_if_some(NULL);
+  return 0;
 }
 `}
 />
@@ -122,17 +122,17 @@ gets a copy. Modifying that copy does nothing to the caller.
   starterCode={`#include <stdio.h>
 
 void try_to_swap(int a, int b) {
-    int t = a;
-    a = b;
-    b = t;
-    printf("inside: a=%d b=%d\\n", a, b);
+  int t = a;
+  a = b;
+  b = t;
+  printf("inside: a=%d b=%d\\n", a, b);
 }
 
 int main(void) {
-    int x = 1, y = 2;
-    try_to_swap(x, y);
-    printf("outside: x=%d y=%d\\n", x, y);
-    return 0;
+  int x = 1, y = 2;
+  try_to_swap(x, y);
+  printf("outside: x=%d y=%d\\n", x, y);
+  return 0;
 }
 `}
 />
@@ -146,16 +146,16 @@ variables, pass their addresses:
   starterCode={`#include <stdio.h>
 
 void swap(int *a, int *b) {
-    int t = *a;
-    *a = *b;
-    *b = t;
+  int t = *a;
+  *a = *b;
+  *b = t;
 }
 
 int main(void) {
-    int x = 1, y = 2;
-    swap(&x, &y);
-    printf("x=%d y=%d\\n", x, y);
-    return 0;
+  int x = 1, y = 2;
+  swap(&x, &y);
+  printf("x=%d y=%d\\n", x, y);
+  return 0;
 }
 `}
 />
@@ -170,20 +170,20 @@ output pointers.
 // Returns 0 on success and fills *quot and *rem.
 // Returns -1 if denom is zero.
 int divmod(int num, int denom, int *quot, int *rem) {
-    if (denom == 0) {
-        return -1;
-    }
-    *quot = num / denom;
-    *rem  = num % denom;
-    return 0;
+  if (denom == 0) {
+    return -1;
+  }
+  *quot = num / denom;
+  *rem = num % denom;
+  return 0;
 }
 
 int main(void) {
-    int q, r;
-    if (divmod(17, 5, &q, &r) == 0) {
-        printf("17 / 5 = %d remainder %d\\n", q, r);
-    }
-    return 0;
+  int q, r;
+  if (divmod(17, 5, &q, &r) == 0) {
+    printf("17 / 5 = %d remainder %d\\n", q, r);
+  }
+  return 0;
 }
 `}
 />
@@ -222,13 +222,13 @@ does not know how many bytes to read or how to interpret them.
 #include <string.h>
 
 int main(void) {
-    int a = 0xDEADBEEF;
-    int b = 0;
+  int a = 0xDEADBEEF;
+  int b = 0;
 
-    // memcpy takes void * — works with any types.
-    memcpy(&b, &a, sizeof(int));
-    printf("b = 0x%X\\n", b);
-    return 0;
+  // memcpy takes void * — works with any types.
+  memcpy(&b, &a, sizeof(int));
+  printf("b = 0x%X\\n", b);
+  return 0;
 }
 `}
 />
@@ -245,17 +245,17 @@ variables.
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int x = 7;
-    int *p = &x;       // p points to x
-    int **pp = &p;     // pp points to p
+  int x = 7;
+  int *p = &x;   // p points to x
+  int **pp = &p; // pp points to p
 
-    printf("x  = %d\\n", x);
-    printf("*p = %d\\n", *p);
-    printf("**pp = %d\\n", **pp);
+  printf("x  = %d\\n", x);
+  printf("*p = %d\\n", *p);
+  printf("**pp = %d\\n", **pp);
 
-    **pp = 99;
-    printf("after **pp = 99, x = %d\\n", x);
-    return 0;
+  **pp = 99;
+  printf("after **pp = 99, x = %d\\n", x);
+  return 0;
 }
 `}
 />
@@ -272,29 +272,29 @@ needs to *replace* the caller's pointer with a new allocation.
   starterCode={`#include <stdio.h>
 
 void swap(int *a, int *b) {
-    // your code here
+  // your code here
 }
 
 int main(void) {
-    int x = 11, y = 22;
-    swap(&x, &y);
-    printf("%d %d\\n", x, y);
-    return 0;
+  int x = 11, y = 22;
+  swap(&x, &y);
+  printf("%d %d\\n", x, y);
+  return 0;
 }
 `}
   solutionCode={`#include <stdio.h>
 
 void swap(int *a, int *b) {
-    int t = *a;
-    *a = *b;
-    *b = t;
+  int t = *a;
+  *a = *b;
+  *b = t;
 }
 
 int main(void) {
-    int x = 11, y = 22;
-    swap(&x, &y);
-    printf("%d %d\\n", x, y);
-    return 0;
+  int x = 11, y = 22;
+  swap(&x, &y);
+  printf("%d %d\\n", x, y);
+  return 0;
 }
 `}
   tests={[
@@ -315,34 +315,38 @@ int main(void) {
   starterCode={`#include <stdio.h>
 
 void min_max(int a, int b, int c, int *out_min, int *out_max) {
-    // your code here
+  // your code here
 }
 
 int main(void) {
-    int lo = 0, hi = 0;
-    min_max(7, 2, 9, &lo, &hi);
-    printf("min=%d max=%d\\n", lo, hi);
-    return 0;
+  int lo = 0, hi = 0;
+  min_max(7, 2, 9, &lo, &hi);
+  printf("min=%d max=%d\\n", lo, hi);
+  return 0;
 }
 `}
   solutionCode={`#include <stdio.h>
 
 void min_max(int a, int b, int c, int *out_min, int *out_max) {
-    int lo = a;
-    if (b < lo) lo = b;
-    if (c < lo) lo = c;
-    int hi = a;
-    if (b > hi) hi = b;
-    if (c > hi) hi = c;
-    *out_min = lo;
-    *out_max = hi;
+  int lo = a;
+  if (b < lo)
+    lo = b;
+  if (c < lo)
+    lo = c;
+  int hi = a;
+  if (b > hi)
+    hi = b;
+  if (c > hi)
+    hi = c;
+  *out_min = lo;
+  *out_max = hi;
 }
 
 int main(void) {
-    int lo = 0, hi = 0;
-    min_max(7, 2, 9, &lo, &hi);
-    printf("min=%d max=%d\\n", lo, hi);
-    return 0;
+  int lo = 0, hi = 0;
+  min_max(7, 2, 9, &lo, &hi);
+  printf("min=%d max=%d\\n", lo, hi);
+  return 0;
 }
 `}
   tests={[

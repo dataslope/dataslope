@@ -146,7 +146,7 @@ with open("output.txt") as f:
   starterCode={`# Use print(..., file=f) for auto-newline behavior
 with open("numbers.txt", "w") as f:
     for n in range(5):
-        print(n, n ** 2, file=f, sep=" -> ")
+        print(n, n**2, file=f, sep=" -> ")
 
 with open("numbers.txt") as f:
     print(f.read())

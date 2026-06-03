@@ -27,13 +27,15 @@ system that nonetheless makes you manage every detail by hand:
 # Notice how much is manual bookkeeping.
 colors <- c("4" = "tomato", "6" = "steelblue", "8" = "darkgreen")
 plot(mtcars$wt, mtcars$mpg,
-     col = colors[as.character(mtcars$cyl)],
-     pch = 19,
-     xlab = "Weight", ylab = "MPG",
-     main = "MPG vs Weight")
+  col = colors[as.character(mtcars$cyl)],
+  pch = 19,
+  xlab = "Weight", ylab = "MPG",
+  main = "MPG vs Weight"
+)
 legend("topright",
-       legend = names(colors),
-       col = colors, pch = 19, title = "Cylinders")
+  legend = names(colors),
+  col = colors, pch = 19, title = "Cylinders"
+)
 `}
 />
 

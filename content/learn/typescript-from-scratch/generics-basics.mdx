@@ -158,9 +158,7 @@ console.log(\`Number box: \${numberBox.value}\`);
 console.log(\`String box: \${stringBox.value}\`);
 
 // Generic type alias
-type Result<T, E> =
-  | { success: true; value: T }
-  | { success: false; error: E };
+type Result<T, E> = { success: true; value: T } | { success: false; error: E };
 
 function divide(a: number, b: number): Result<number, string> {
   if (b === 0) {
@@ -251,14 +249,14 @@ Let's build a generic `map` function (like `Array.prototype.map`). It takes an a
 }
 
 const numbers = [1, 2, 3, 4, 5];
-const doubled = map(numbers, n => n * 2); // type: number[]
-const strings = map(numbers, n => \`Number \${n}\`); // type: string[]
+const doubled = map(numbers, (n) => n * 2); // type: number[]
+const strings = map(numbers, (n) => \`Number \${n}\`); // type: string[]
 
 console.log(doubled); // [2, 4, 6, 8, 10]
 console.log(strings); // ["Number 1", "Number 2", ...]
 
 // The compiler infers T = number and U = string from the callback
-const lengths = map(["hello", "world"], s => s.length); // type: number[]
+const lengths = map(["hello", "world"], (s) => s.length); // type: number[]
 console.log(lengths); // [5, 5]
 `}
 />

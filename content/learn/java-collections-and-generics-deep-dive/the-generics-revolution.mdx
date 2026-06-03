@@ -23,18 +23,18 @@ shipped:
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        // Before generics, every List was a List of Object.
-        List names = new ArrayList();
-        names.add("Ada");
-        names.add("Linus");
-        names.add(42);              // legal — there is no element type
+  public static void main(String[] args) {
+    // Before generics, every List was a List of Object.
+    List names = new ArrayList();
+    names.add("Ada");
+    names.add("Linus");
+    names.add(42); // legal — there is no element type
 
-        for (int i = 0; i < names.size(); i++) {
-            String s = (String) names.get(i);     // cast every time
-            System.out.println(s.toUpperCase());
-        }
+    for (int i = 0; i < names.size(); i++) {
+      String s = (String)names.get(i); // cast every time
+      System.out.println(s.toUpperCase());
     }
+  }
 }
 `}
 />
@@ -82,16 +82,16 @@ the compiler can prove that the cast cannot fail.
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<String> names = new ArrayList<>();
-        names.add("Ada");
-        names.add("Linus");
-        // names.add(42);            // compile error — won't even start
+  public static void main(String[] args) {
+    List<String> names = new ArrayList<>();
+    names.add("Ada");
+    names.add("Linus");
+    // names.add(42);            // compile error — won't even start
 
-        for (String s : names) {     // no cast — the compiler knows
-            System.out.println(s.toUpperCase());
-        }
+    for (String s : names) { // no cast — the compiler knows
+      System.out.println(s.toUpperCase());
     }
+  }
 }
 `}
 />
@@ -132,22 +132,23 @@ fact cleans up enormous amounts of code.
 import java.util.Map;
 
 public class Main {
-    public static void main(String[] args) {
-        Map<String, Integer> wordCount = new HashMap<>();
-        wordCount.put("alpha", 3);
-        wordCount.put("beta",  1);
-        wordCount.put("gamma", 7);
+  public static void main(String[] args) {
+    Map<String, Integer> wordCount = new HashMap<>();
+    wordCount.put("alpha", 3);
+    wordCount.put("beta", 1);
+    wordCount.put("gamma", 7);
 
-        // Look — Integer comes out of get(), and we can do arithmetic.
-        int total = 0;
-        for (Integer n : wordCount.values()) total += n;
-        System.out.println("total = " + total);
+    // Look — Integer comes out of get(), and we can do arithmetic.
+    int total = 0;
+    for (Integer n : wordCount.values())
+      total += n;
+    System.out.println("total = " + total);
 
-        // The compiler knows the key type too:
-        for (Map.Entry<String, Integer> e : wordCount.entrySet()) {
-            System.out.println(e.getKey() + " -> " + e.getValue());
-        }
+    // The compiler knows the key type too:
+    for (Map.Entry<String, Integer> e : wordCount.entrySet()) {
+      System.out.println(e.getKey() + " -> " + e.getValue());
     }
+  }
 }
 `}
 />
@@ -290,15 +291,16 @@ warning*, and you lose all the type safety we just gained.
 import java.util.List;
 
 public class Main {
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    public static void main(String[] args) {
-        List raw = new ArrayList();         // raw type — bad
-        raw.add("Ada");
-        raw.add(42);                        // legal at compile time
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  public static void main(String[] args) {
+    List raw = new ArrayList(); // raw type — bad
+    raw.add("Ada");
+    raw.add(42); // legal at compile time
 
-        // Compiler can't help. We get to find out at runtime.
-        for (Object o : raw) System.out.println(o.getClass().getSimpleName());
-    }
+    // Compiler can't help. We get to find out at runtime.
+    for (Object o : raw)
+      System.out.println(o.getClass().getSimpleName());
+  }
 }
 `}
 />

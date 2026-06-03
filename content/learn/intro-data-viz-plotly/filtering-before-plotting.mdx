@@ -103,7 +103,9 @@ print(top[["country", 1952, 2007, "gain"]])
 # Step 5: chart
 fig = px.bar(
     top.sort_values("gain"),
-    x="gain", y="country", orientation="h",
+    x="gain",
+    y="country",
+    orientation="h",
     template="simple_white",
     title="Top 10 European gains in life expectancy, 1952 → 2007",
     labels={"gain": "Gain in life expectancy (years)", "country": "Country"},

@@ -48,28 +48,30 @@ flowchart LR
 
 class Date {
 public:
-    Date(int y, int m, int d) {
-        if (m < 1 || m > 12) m = 1;
-        if (d < 1 || d > 31) d = 1;
-        year_  = y;
-        month_ = m;
-        day_   = d;
-    }
+  Date(int y, int m, int d) {
+    if (m < 1 || m > 12)
+      m = 1;
+    if (d < 1 || d > 31)
+      d = 1;
+    year_ = y;
+    month_ = m;
+    day_ = d;
+  }
 
-    int year()  const { return year_;  }
-    int month() const { return month_; }
-    int day()   const { return day_;   }
+  int year() const { return year_; }
+  int month() const { return month_; }
+  int day() const { return day_; }
 
 private:
-    int year_, month_, day_;
+  int year_, month_, day_;
 };
 
 int main() {
-    Date d1(2025, 11, 7);
-    Date d2(2025, 99, 99);   // invalid -> snapped to 1/1
-    std::cout << d1.year() << "-" << d1.month() << "-" << d1.day() << "\\n";
-    std::cout << d2.year() << "-" << d2.month() << "-" << d2.day() << "\\n";
-    return 0;
+  Date d1(2025, 11, 7);
+  Date d2(2025, 99, 99); // invalid -> snapped to 1/1
+  std::cout << d1.year() << "-" << d1.month() << "-" << d1.day() << "\\n";
+  std::cout << d2.year() << "-" << d2.month() << "-" << d2.day() << "\\n";
+  return 0;
 }
 `}
 />

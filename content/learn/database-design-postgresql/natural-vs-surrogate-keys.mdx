@@ -114,13 +114,19 @@ is `GENERATED ALWAYS AS IDENTITY`.
   email       TEXT NOT NULL UNIQUE,
   full_name   TEXT NOT NULL
 );`}
-  starterCode={`INSERT INTO customers (email, full_name)
+  starterCode={`INSERT INTO
+  customers (email, full_name)
 VALUES
   ('ada@example.com', 'Ada Lovelace'),
   ('grace@example.com', 'Grace Hopper');
 
 -- PostgreSQL generated the customer_id values.
-SELECT * FROM customers ORDER BY customer_id;`}
+SELECT
+  *
+FROM
+  customers
+ORDER BY
+  customer_id;`}
 />
 
 Notice the design: `customer_id` is the primary key, while `email` still

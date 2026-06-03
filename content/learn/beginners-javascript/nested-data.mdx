@@ -27,9 +27,9 @@ Take a moment to read this object slowly:
     },
   },
   items: [
-    { sku: "BK-001", title: "Notebook",  qty: 2, price: 4.50 },
-    { sku: "PN-014", title: "Fountain pen", qty: 1, price: 35.00 },
-    { sku: "IK-002", title: "Black ink",   qty: 3, price: 8.00 },
+    { sku: "BK-001", title: "Notebook", qty: 2, price: 4.5 },
+    { sku: "PN-014", title: "Fountain pen", qty: 1, price: 35.0 },
+    { sku: "IK-002", title: "Black ink", qty: 3, price: 8.0 },
   ],
   status: "paid",
 };
@@ -87,17 +87,17 @@ expression returns `undefined` instead of throwing.
   starterCode={`const noisy = { user: { profile: { name: "Ada" } } };
 const sparse = { user: null };
 
-console.log(noisy.user?.profile?.name);    // "Ada"
-console.log(sparse.user?.profile?.name);   // undefined — no crash!
+console.log(noisy.user?.profile?.name); // "Ada"
+console.log(sparse.user?.profile?.name); // undefined — no crash!
 console.log(sparse.user?.profile?.name ?? "anonymous"); // "anonymous"
 
 // Works for arrays too:
 const orders = [];
-console.log(orders[0]?.items);             // undefined, no crash
+console.log(orders[0]?.items); // undefined, no crash
 
 // And for method calls:
 const maybeFn = null;
-maybeFn?.();   // does nothing, returns undefined
+maybeFn?.(); // does nothing, returns undefined
 `}
 />
 
@@ -116,9 +116,9 @@ recursion). Let's add up the total cost of the order above:
   starterCode={`const order = {
   id: 101,
   items: [
-    { sku: "BK-001", qty: 2, price: 4.50 },
-    { sku: "PN-014", qty: 1, price: 35.00 },
-    { sku: "IK-002", qty: 3, price: 8.00 },
+    { sku: "BK-001", qty: 2, price: 4.5 },
+    { sku: "PN-014", qty: 1, price: 35.0 },
+    { sku: "IK-002", qty: 3, price: 8.0 },
   ],
 };
 
@@ -140,7 +140,7 @@ of nesting. The same pattern scales to any depth.
 <CodeBlock
   adapter="javascript"
   starterCode={`const class1 = [
-  { name: "Ada",  grades: [82, 95, 78] },
+  { name: "Ada", grades: [82, 95, 78] },
   { name: "Linus", grades: [60, 70, 65] },
   { name: "Grace", grades: [91, 88, 100] },
 ];
@@ -215,7 +215,7 @@ Updating one element of an array, immutably, is a common task. Use
 
 // Increase the quantity of the "PN-014" line by 1.
 const updated = items.map((item) =>
-  item.sku === "PN-014" ? { ...item, qty: item.qty + 1 } : item
+  item.sku === "PN-014" ? { ...item, qty: item.qty + 1 } : item,
 );
 
 console.log("original:", items);
@@ -253,7 +253,7 @@ console.log(text);
 // JSON text -> object
 const back = JSON.parse(text);
 console.log(back.customer.name);
-console.log(back === order);   // false — it's a brand-new object
+console.log(back === order); // false — it's a brand-new object
 console.log(JSON.stringify(back) === text); // true — equivalent contents
 
 // Pretty-printed JSON:

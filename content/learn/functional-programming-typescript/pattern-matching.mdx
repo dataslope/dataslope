@@ -19,20 +19,23 @@ A discriminated union is a sum type where every variant has a
 <CodeBlock
   adapter="typescript"
   starterCode={`type Shape =
-  | { kind: "circle";    radius: number }
-  | { kind: "square";    side: number   }
+  | { kind: "circle"; radius: number }
+  | { kind: "square"; side: number }
   | { kind: "rectangle"; w: number; h: number };
 
-const s1: Shape = { kind: "circle",    radius: 3 };
+const s1: Shape = { kind: "circle", radius: 3 };
 const s2: Shape = { kind: "rectangle", w: 4, h: 5 };
 
 // Without checking 'kind', the only properties available are the
 // common ones (none here). The compiler protects you.
 function show(s: Shape): string {
   switch (s.kind) {
-    case "circle":    return \`circle r=\${s.radius}\`;
-    case "square":    return \`square s=\${s.side}\`;
-    case "rectangle": return \`rect \${s.w}x\${s.h}\`;
+    case "circle":
+      return \`circle r=\${s.radius}\`;
+    case "square":
+      return \`square s=\${s.side}\`;
+    case "rectangle":
+      return \`rect \${s.w}x\${s.h}\`;
   }
 }
 
@@ -56,15 +59,18 @@ catches it.
 <CodeBlock
   adapter="typescript"
   starterCode={`type Shape =
-  | { kind: "circle";    radius: number }
-  | { kind: "square";    side: number   }
+  | { kind: "circle"; radius: number }
+  | { kind: "square"; side: number }
   | { kind: "rectangle"; w: number; h: number };
 
 function area(s: Shape): number {
   switch (s.kind) {
-    case "circle":    return Math.PI * s.radius * s.radius;
-    case "square":    return s.side * s.side;
-    case "rectangle": return s.w * s.h;
+    case "circle":
+      return Math.PI * s.radius * s.radius;
+    case "square":
+      return s.side * s.side;
+    case "rectangle":
+      return s.w * s.h;
     default: {
       const _exhaustive: never = s;
       throw new Error(\`unhandled: \${JSON.stringify(_exhaustive)}\`);
@@ -97,8 +103,8 @@ calling syntax:
 <CodeBlock
   adapter="typescript"
   starterCode={`type Shape =
-  | { kind: "circle";    radius: number }
-  | { kind: "square";    side: number   }
+  | { kind: "circle"; radius: number }
+  | { kind: "square"; side: number }
   | { kind: "rectangle"; w: number; h: number };
 
 // A "match" that requires a handler for every kind.
@@ -106,19 +112,24 @@ type Handlers<T extends { kind: string }, R> = {
   [K in T["kind"]]: (v: Extract<T, { kind: K }>) => R;
 };
 
-function match<T extends { kind: string }, R>(value: T, handlers: Handlers<T, R>): R {
-  return handlers[value.kind as T["kind"]](value as Extract<T, { kind: T["kind"] }>);
+function match<T extends { kind: string }, R>(
+  value: T,
+  handlers: Handlers<T, R>,
+): R {
+  return handlers[value.kind as T["kind"]](
+    value as Extract<T, { kind: T["kind"] }>,
+  );
 }
 
 const describe = (s: Shape) =>
   match(s, {
-    circle:    (c) => \`○ r=\${c.radius}\`,
-    square:    (sq) => \`□ s=\${sq.side}\`,
+    circle: (c) => \`○ r=\${c.radius}\`,
+    square: (sq) => \`□ s=\${sq.side}\`,
     rectangle: (r) => \`▭ \${r.w}x\${r.h}\`,
   });
 
-console.log(describe({ kind: "circle",    radius: 2 }));
-console.log(describe({ kind: "square",    side: 5 }));
+console.log(describe({ kind: "circle", radius: 2 }));
+console.log(describe({ kind: "square", side: 5 }));
 console.log(describe({ kind: "rectangle", w: 3, h: 4 }));
 `}
 />
@@ -141,22 +152,26 @@ inside a case.
   adapter="typescript"
   starterCode={`type Json =
   | { kind: "null" }
-  | { kind: "bool";   value: boolean }
-  | { kind: "num";    value: number  }
-  | { kind: "str";    value: string  }
-  | { kind: "arr";    items: Json[]  }
-  | { kind: "obj";    entries: ReadonlyArray<readonly [string, Json]> };
+  | { kind: "bool"; value: boolean }
+  | { kind: "num"; value: number }
+  | { kind: "str"; value: string }
+  | { kind: "arr"; items: Json[] }
+  | { kind: "obj"; entries: ReadonlyArray<readonly [string, Json]> };
 
 function size(j: Json): number {
   switch (j.kind) {
     case "null":
     case "bool":
     case "num":
-    case "str": return 1;
-    case "arr": return 1 + j.items.reduce((acc, x) => acc + size(x), 0);
-    case "obj": return 1 + j.entries.reduce((acc, [, v]) => acc + size(v), 0);
+    case "str":
+      return 1;
+    case "arr":
+      return 1 + j.items.reduce((acc, x) => acc + size(x), 0);
+    case "obj":
+      return 1 + j.entries.reduce((acc, [, v]) => acc + size(v), 0);
     default: {
-      const _e: never = j; return _e;
+      const _e: never = j;
+      return _e;
     }
   }
 }
@@ -165,10 +180,10 @@ const example: Json = {
   kind: "obj",
   entries: [
     ["a", { kind: "num", value: 1 }],
-    ["b", { kind: "arr", items: [
-      { kind: "bool", value: true },
-      { kind: "null" },
-    ]}],
+    [
+      "b",
+      { kind: "arr", items: [{ kind: "bool", value: true }, { kind: "null" }] },
+    ],
   ],
 };
 
@@ -193,9 +208,12 @@ values:
 function next(current: Light, emergency: boolean): Light {
   if (emergency) return "red";
   switch (current) {
-    case "red":    return "green";
-    case "green":  return "yellow";
-    case "yellow": return "red";
+    case "red":
+      return "green";
+    case "green":
+      return "yellow";
+    case "yellow":
+      return "red";
   }
 }
 

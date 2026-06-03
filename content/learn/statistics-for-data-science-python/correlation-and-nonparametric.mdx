@@ -199,15 +199,21 @@ score = 50 + 4.5 * hours + rng.normal(0, 6, size=60)
 fit = stats.linregress(hours, score)
 print(f"slope     : {fit.slope:.2f} points per hour studied")
 print(f"intercept : {fit.intercept:.2f}")
-print(f"R-squared : {fit.rvalue**2:.3f}  ({fit.rvalue**2:.0%} of score variance explained)")
+print(
+    f"R-squared : {fit.rvalue**2:.3f}  ({fit.rvalue**2:.0%} of score variance explained)"
+)
 print(f"p-value   : {fit.pvalue:.2e}  (H0: slope = 0, i.e. no relationship)")
 
 # Plot the points with the fitted line.
 xline = np.linspace(hours.min(), hours.max(), 100)
 yline = fit.intercept + fit.slope * xline
 
-fig = px.scatter(x=hours, y=score, labels={"x": "hours studied", "y": "exam score"},
-                 title="Exam score vs hours studied (with least-squares fit)")
+fig = px.scatter(
+    x=hours,
+    y=score,
+    labels={"x": "hours studied", "y": "exam score"},
+    title="Exam score vs hours studied (with least-squares fit)",
+)
 fig.add_scatter(x=xline, y=yline, mode="lines", name="fit line")
 fig.show()
 `}
@@ -286,7 +292,7 @@ rng = np.random.default_rng(6)
 # slower, but BOTH have a few extreme outliers (some tickets drag on for hours).
 a = rng.normal(30, 8, size=40)
 b = rng.normal(36, 8, size=40)
-a[:3] = [300, 280, 350]   # a few monster outliers
+a[:3] = [300, 280, 350]  # a few monster outliers
 b[:3] = [330, 410, 290]
 alpha = 0.05
 
@@ -333,7 +339,9 @@ alpha = 0.05
 w_res = stats.wilcoxon(before, after)
 
 print(f"Median before: {np.median(before):.1f}   median after: {np.median(after):.1f}")
-print(f"Wilcoxon signed-rank: statistic = {w_res.statistic:.1f}, p = {w_res.pvalue:.4f}")
+print(
+    f"Wilcoxon signed-rank: statistic = {w_res.statistic:.1f}, p = {w_res.pvalue:.4f}"
+)
 print()
 if w_res.pvalue <= alpha:
     print("REJECT H0: satisfaction shifted after the redesign.")

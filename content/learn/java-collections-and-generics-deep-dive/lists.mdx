@@ -41,23 +41,23 @@ all about *position*: `get(i)`, `add(i, x)`, `remove(i)`,
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<String> xs = new ArrayList<>();
-        xs.add("alpha");           // append
-        xs.add("beta");
-        xs.add("gamma");
-        xs.add(1, "between");      // insert at index 1
+  public static void main(String[] args) {
+    List<String> xs = new ArrayList<>();
+    xs.add("alpha"); // append
+    xs.add("beta");
+    xs.add("gamma");
+    xs.add(1, "between"); // insert at index 1
 
-        System.out.println(xs);                  // [alpha, between, beta, gamma]
-        System.out.println("xs[2] = " + xs.get(2));
-        System.out.println("indexOf beta = " + xs.indexOf("beta"));
+    System.out.println(xs); // [alpha, between, beta, gamma]
+    System.out.println("xs[2] = " + xs.get(2));
+    System.out.println("indexOf beta = " + xs.indexOf("beta"));
 
-        xs.set(0, "ALPHA");
-        xs.remove("gamma");                      // by value
-        xs.remove(0);                            // by index
+    xs.set(0, "ALPHA");
+    xs.remove("gamma"); // by value
+    xs.remove(0);       // by index
 
-        System.out.println(xs);                  // [between, beta]
-    }
+    System.out.println(xs); // [between, beta]
+  }
 }
 `}
 />
@@ -139,19 +139,22 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Main {
-    static long appendMany(List<Integer> list, int n) {
-        long start = System.nanoTime();
-        for (int i = 0; i < n; i++) list.add(i);
-        return System.nanoTime() - start;
-    }
+  static long appendMany(List<Integer> list, int n) {
+    long start = System.nanoTime();
+    for (int i = 0; i < n; i++)
+      list.add(i);
+    return System.nanoTime() - start;
+  }
 
-    public static void main(String[] args) {
-        int n = 200_000;
-        long a = appendMany(new ArrayList<>(),  n);
-        long l = appendMany(new LinkedList<>(), n);
-        System.out.println("ArrayList  append " + n + " : " + (a / 1_000_000) + " ms");
-        System.out.println("LinkedList append " + n + " : " + (l / 1_000_000) + " ms");
-    }
+  public static void main(String[] args) {
+    int n = 200_000;
+    long a = appendMany(new ArrayList<>(), n);
+    long l = appendMany(new LinkedList<>(), n);
+    System.out.println("ArrayList  append " + n + " : " + (a / 1_000_000) +
+                       " ms");
+    System.out.println("LinkedList append " + n + " : " + (l / 1_000_000) +
+                       " ms");
+  }
 }
 `}
 />
@@ -172,13 +175,14 @@ to the constructor. Otherwise you pay for repeated `grow()` and
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        // Default initial capacity is 10. If you know you'll add 10,000,
-        // size up front to avoid log(10000/10) reallocations.
-        List<Integer> xs = new ArrayList<>(10_000);
-        for (int i = 0; i < 10_000; i++) xs.add(i);
-        System.out.println("size = " + xs.size());
-    }
+  public static void main(String[] args) {
+    // Default initial capacity is 10. If you know you'll add 10,000,
+    // size up front to avoid log(10000/10) reallocations.
+    List<Integer> xs = new ArrayList<>(10_000);
+    for (int i = 0; i < 10_000; i++)
+      xs.add(i);
+    System.out.println("size = " + xs.size());
+  }
 }
 `}
 />
@@ -195,19 +199,20 @@ to the original *invalidate* the sublist.
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<Integer> xs = new ArrayList<>();
-        for (int i = 1; i <= 5; i++) xs.add(i);
+  public static void main(String[] args) {
+    List<Integer> xs = new ArrayList<>();
+    for (int i = 1; i <= 5; i++)
+      xs.add(i);
 
-        List<Integer> middle = xs.subList(1, 4);   // view of indices 1..3
-        System.out.println("middle = " + middle);
+    List<Integer> middle = xs.subList(1, 4); // view of indices 1..3
+    System.out.println("middle = " + middle);
 
-        middle.set(0, 99);                          // mutates the original
-        System.out.println("xs = " + xs);
+    middle.set(0, 99); // mutates the original
+    System.out.println("xs = " + xs);
 
-        middle.clear();                             // removes those elements from xs
-        System.out.println("xs = " + xs);
-    }
+    middle.clear(); // removes those elements from xs
+    System.out.println("xs = " + xs);
+  }
 }
 `}
 />
@@ -226,16 +231,16 @@ want for small fixed collections (especially as constants).
   starterCode={`import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<String> primary = List.of("red", "green", "blue");
-        System.out.println(primary);
+  public static void main(String[] args) {
+    List<String> primary = List.of("red", "green", "blue");
+    System.out.println(primary);
 
-        try {
-            primary.add("yellow");        // throws — immutable
-        } catch (UnsupportedOperationException e) {
-            System.out.println("threw: " + e.getClass().getSimpleName());
-        }
+    try {
+      primary.add("yellow"); // throws — immutable
+    } catch (UnsupportedOperationException e) {
+      System.out.println("threw: " + e.getClass().getSimpleName());
     }
+  }
 }
 `}
 />
@@ -256,14 +261,15 @@ iterator's `remove()`, or use `removeIf` (Java 8+):
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<Integer> xs = new ArrayList<>();
-        for (int i = 1; i <= 10; i++) xs.add(i);
+  public static void main(String[] args) {
+    List<Integer> xs = new ArrayList<>();
+    for (int i = 1; i <= 10; i++)
+      xs.add(i);
 
-        // The modern, declarative way:
-        xs.removeIf(n -> n % 2 == 0);
-        System.out.println(xs);
-    }
+    // The modern, declarative way:
+    xs.removeIf(n -> n % 2 == 0);
+    System.out.println(xs);
+  }
 }
 `}
 />

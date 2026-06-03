@@ -44,10 +44,17 @@ second account reuses the same email, so PostgreSQL rejects it.
 INSERT INTO accounts (email, username)
 VALUES ('ada@example.com', 'ada');`}
   starterCode={`-- This email is already used by Ada.
-INSERT INTO accounts (email, username)
-VALUES ('ada@example.com', 'ada_2');
+INSERT INTO
+  accounts (email, username)
+VALUES
+  ('ada@example.com', 'ada_2');
 
-SELECT id, email, username FROM accounts;`}
+SELECT
+  id,
+  email,
+  username
+FROM
+  accounts;`}
 />
 
 The database is not merely warning you. It refuses to store the second
@@ -124,9 +131,17 @@ from repeating.
 
 INSERT INTO enrollments (student_id, course_id) VALUES (1, 10);`}
   starterCode={`-- Same student, same course: duplicate pair.
-INSERT INTO enrollments (student_id, course_id) VALUES (1, 10);
+INSERT INTO
+  enrollments (student_id, course_id)
+VALUES
+  (1, 10);
 
-SELECT student_id, course_id, enrolled_on FROM enrollments;`}
+SELECT
+  student_id,
+  course_id,
+  enrolled_on
+FROM
+  enrollments;`}
 />
 
 ## Quick check

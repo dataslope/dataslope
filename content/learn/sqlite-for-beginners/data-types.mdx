@@ -97,9 +97,14 @@ INSERT INTO examples (label, value) VALUES
   ('decimal text', '3.14'),
   ('word text', 'banana'),
   ('missing value', NULL);`}
-  starterCode={`SELECT label, value, typeof(value) AS storage_class
-FROM examples
-ORDER BY id;`}
+  starterCode={`SELECT
+  label,
+  value,
+  typeof(value) AS storage_class
+FROM
+  examples
+ORDER BY
+  id;`}
 />
 
 A `NUMERIC` affinity column tries to store numeric-looking text as numbers. So `'42'` may become an integer, and `'3.14'` may become real. But `'banana'` cannot sensibly become a number, so SQLite stores it as text.
@@ -221,14 +226,20 @@ INSERT INTO type_demo (as_integer, as_text, as_real, as_numeric, is_active, crea
   ('not a number', 99, '8', 'banana', 0, NULL);`}
   starterCode={`SELECT
   id,
-  as_integer, typeof(as_integer) AS integer_type,
-  as_text, typeof(as_text) AS text_type,
-  as_real, typeof(as_real) AS real_type,
-  as_numeric, typeof(as_numeric) AS numeric_type,
+  as_integer,
+  typeof(as_integer) AS integer_type,
+  as_text,
+  typeof(as_text) AS text_type,
+  as_real,
+  typeof(as_real) AS real_type,
+  as_numeric,
+  typeof(as_numeric) AS numeric_type,
   is_active,
   created_on
-FROM type_demo
-ORDER BY id;`}
+FROM
+  type_demo
+ORDER BY
+  id;`}
 />
 
 Look closely at the output. SQLite converts some values based on affinity, but not every value. That is the key idea.

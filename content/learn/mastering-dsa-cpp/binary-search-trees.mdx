@@ -29,22 +29,33 @@ At each node, compare the target with the current value and choose one branch.
   adapter="cpp"
   starterCode={`#include <iostream>
 
-struct TreeNode { int val; TreeNode* left; TreeNode* right; };
+struct TreeNode {
+  int val;
+  TreeNode *left;
+  TreeNode *right;
+};
 
-bool contains(TreeNode* root, int target) {
-    while (root) {
-        if (target == root->val) return true;
-        if (target < root->val) root = root->left;
-        else root = root->right;
-    }
-    return false;
+bool contains(TreeNode *root, int target) {
+  while (root) {
+    if (target == root->val)
+      return true;
+    if (target < root->val)
+      root = root->left;
+    else
+      root = root->right;
+  }
+  return false;
 }
 
 int main() {
-    TreeNode n1{1, nullptr, nullptr}, n7{7, nullptr, nullptr}, n4{4, nullptr, nullptr};
-    TreeNode n6{6, &n4, &n7}, n3{3, &n1, &n6}, n10{10, nullptr, nullptr}, n8{8, &n3, &n10};
-    std::cout << std::boolalpha << contains(&n8, 7) << "\n";
-    return 0;
+  TreeNode n1{1, nullptr, nullptr}, n7{7, nullptr, nullptr},
+      n4{4, nullptr, nullptr};
+  TreeNode n6{6, &n4, &n7}, n3{3, &n1, &n6}, n10{10, nullptr, nullptr},
+      n8{8, &n3, &n10};
+  std::cout << std::boolalpha << contains(&n8, 7)
+            << "
+               ";
+      return 0;
 }
 `}
 />
@@ -67,27 +78,38 @@ flowchart LR
   adapter="cpp"
   starterCode={`#include <iostream>
 
-struct TreeNode { int val; TreeNode* left; TreeNode* right; };
+struct TreeNode {
+  int val;
+  TreeNode *left;
+  TreeNode *right;
+};
 
-TreeNode* insert(TreeNode* root, int value) {
-    if (!root) return new TreeNode{value, nullptr, nullptr};
-    if (value < root->val) root->left = insert(root->left, value);
-    else if (value > root->val) root->right = insert(root->right, value);
-    return root;
+TreeNode *insert(TreeNode *root, int value) {
+  if (!root)
+    return new TreeNode{value, nullptr, nullptr};
+  if (value < root->val)
+    root->left = insert(root->left, value);
+  else if (value > root->val)
+    root->right = insert(root->right, value);
+  return root;
 }
 
-void inorder(TreeNode* root) {
-    if (!root) return;
-    inorder(root->left);
-    std::cout << root->val << "\n";
-    inorder(root->right);
+void inorder(TreeNode *root) {
+  if (!root)
+    return;
+  inorder(root->left);
+  std::cout << root->val
+            << "
+               ";
+      inorder(root->right);
 }
 
 int main() {
-    TreeNode* root = nullptr;
-    for (int x : {8, 3, 10, 1, 6, 14}) root = insert(root, x);
-    inorder(root);
-    return 0;
+  TreeNode *root = nullptr;
+  for (int x : {8, 3, 10, 1, 6, 14})
+    root = insert(root, x);
+  inorder(root);
+  return 0;
 }
 `}
 />
@@ -100,24 +122,36 @@ The minimum is found by walking left until no left child remains. The maximum wa
   adapter="cpp"
   starterCode={`#include <iostream>
 
-struct TreeNode { int val; TreeNode* left; TreeNode* right; };
+struct TreeNode {
+  int val;
+  TreeNode *left;
+  TreeNode *right;
+};
 
-TreeNode* minimum(TreeNode* root) {
-    while (root && root->left) root = root->left;
-    return root;
+TreeNode *minimum(TreeNode *root) {
+  while (root && root->left)
+    root = root->left;
+  return root;
 }
 
-TreeNode* maximum(TreeNode* root) {
-    while (root && root->right) root = root->right;
-    return root;
+TreeNode *maximum(TreeNode *root) {
+  while (root && root->right)
+    root = root->right;
+  return root;
 }
 
 int main() {
-    TreeNode n1{1, nullptr, nullptr}, n6{6, nullptr, nullptr}, n10{10, nullptr, nullptr}, n8{8, &n1, &n10};
-    n1.right = &n6;
-    std::cout << minimum(&n8)->val << "\n";
-    std::cout << maximum(&n8)->val << "\n";
-    return 0;
+  TreeNode n1{1, nullptr, nullptr}, n6{6, nullptr, nullptr},
+      n10{10, nullptr, nullptr}, n8{8, &n1, &n10};
+  n1.right = &n6;
+  std::cout << minimum(&n8)->val
+            << "
+               ";
+      std::cout
+            << maximum(&n8)->val
+            << "
+               ";
+      return 0;
 }
 `}
 />
@@ -140,42 +174,53 @@ flowchart TD
   adapter="cpp"
   starterCode={`#include <iostream>
 
-struct TreeNode { int val; TreeNode* left; TreeNode* right; };
+struct TreeNode {
+  int val;
+  TreeNode *left;
+  TreeNode *right;
+};
 
-TreeNode* minNode(TreeNode* root) {
-    while (root->left) root = root->left;
-    return root;
+TreeNode *minNode(TreeNode *root) {
+  while (root->left)
+    root = root->left;
+  return root;
 }
 
-TreeNode* erase(TreeNode* root, int value) {
-    if (!root) return nullptr;
-    if (value < root->val) root->left = erase(root->left, value);
-    else if (value > root->val) root->right = erase(root->right, value);
-    else {
-        if (!root->left) {
-            TreeNode* right = root->right;
-            delete root;
-            return right;
-        }
-        if (!root->right) {
-            TreeNode* left = root->left;
-            delete root;
-            return left;
-        }
-        TreeNode* succ = minNode(root->right);
-        root->val = succ->val;
-        root->right = erase(root->right, succ->val);
+TreeNode *erase(TreeNode *root, int value) {
+  if (!root)
+    return nullptr;
+  if (value < root->val)
+    root->left = erase(root->left, value);
+  else if (value > root->val)
+    root->right = erase(root->right, value);
+  else {
+    if (!root->left) {
+      TreeNode *right = root->right;
+      delete root;
+      return right;
     }
-    return root;
+    if (!root->right) {
+      TreeNode *left = root->left;
+      delete root;
+      return left;
+    }
+    TreeNode *succ = minNode(root->right);
+    root->val = succ->val;
+    root->right = erase(root->right, succ->val);
+  }
+  return root;
 }
 
 int main() {
-    TreeNode* root = new TreeNode{5, new TreeNode{3, nullptr, nullptr}, new TreeNode{7, nullptr, nullptr}};
-    root = erase(root, 3);
-    std::cout << root->val << " " << (root->left == nullptr) << "\n";
-    delete root->right;
-    delete root;
-    return 0;
+  TreeNode *root = new TreeNode{5, new TreeNode{3, nullptr, nullptr},
+                                new TreeNode{7, nullptr, nullptr}};
+  root = erase(root, 3);
+  std::cout << root->val << " " << (root->left == nullptr)
+            << "
+               ";
+               delete root->right;
+  delete root;
+  return 0;
 }
 `}
 />
@@ -204,14 +249,21 @@ AVL and Red-Black trees rotate nodes to stay balanced. `std::set` and `std::map`
 #include <set>
 
 int main() {
-    std::set<int> values = {5, 1, 9, 3};
-    for (int x : values) std::cout << x << "\n";
+  std::set<int> values = {5, 1, 9, 3};
+  for (int x : values)
+    std::cout << x
+              << "
+                 ";
 
-    std::map<int, const char*> names;
-    names[2] = "two";
-    names[1] = "one";
-    for (const auto& [k, v] : names) std::cout << k << ":" << v << "\n";
-    return 0;
+        std::map<int, const char *>
+            names;
+  names[2] = "two";
+  names[1] = "one";
+  for (const auto &[k, v] : names)
+    std::cout << k << ":" << v
+              << "
+                 ";
+        return 0;
 }
 `}
 />
@@ -225,22 +277,31 @@ Because all left values come first, then the root, then all right values, in-ord
   starterCode={`#include <iostream>
 #include <vector>
 
-struct TreeNode { int val; TreeNode* left; TreeNode* right; };
+struct TreeNode {
+  int val;
+  TreeNode *left;
+  TreeNode *right;
+};
 
-void inorder(TreeNode* root, std::vector<int>& out) {
-    if (!root) return;
-    inorder(root->left, out);
-    out.push_back(root->val);
-    inorder(root->right, out);
+void inorder(TreeNode *root, std::vector<int> &out) {
+  if (!root)
+    return;
+  inorder(root->left, out);
+  out.push_back(root->val);
+  inorder(root->right, out);
 }
 
 int main() {
-    TreeNode n1{1, nullptr, nullptr}, n4{4, nullptr, nullptr}, n7{7, nullptr, nullptr};
-    TreeNode n6{6, &n4, &n7}, n3{3, &n1, &n6}, n8{8, &n3, nullptr};
-    std::vector<int> sorted;
-    inorder(&n8, sorted);
-    for (int x : sorted) std::cout << x << "\n";
-    return 0;
+  TreeNode n1{1, nullptr, nullptr}, n4{4, nullptr, nullptr},
+      n7{7, nullptr, nullptr};
+  TreeNode n6{6, &n4, &n7}, n3{3, &n1, &n6}, n8{8, &n3, nullptr};
+  std::vector<int> sorted;
+  inorder(&n8, sorted);
+  for (int x : sorted)
+    std::cout << x
+              << "
+                 ";
+        return 0;
 }
 `}
 />
@@ -254,28 +315,43 @@ Checking only immediate children is wrong because a deeper node can violate an a
   starterCode={`#include <climits>
 #include <iostream>
 
-struct TreeNode { int val; TreeNode* left; TreeNode* right; };
+struct TreeNode {
+  int val;
+  TreeNode *left;
+  TreeNode *right;
+};
 
-bool wrongValidate(TreeNode* root) {
-    if (!root) return true;
-    if (root->left && root->left->val >= root->val) return false;
-    if (root->right && root->right->val <= root->val) return false;
-    return wrongValidate(root->left) && wrongValidate(root->right);
+bool wrongValidate(TreeNode *root) {
+  if (!root)
+    return true;
+  if (root->left && root->left->val >= root->val)
+    return false;
+  if (root->right && root->right->val <= root->val)
+    return false;
+  return wrongValidate(root->left) && wrongValidate(root->right);
 }
 
-bool validRange(TreeNode* root, long long low, long long high) {
-    if (!root) return true;
-    if (root->val <= low || root->val >= high) return false;
-    return validRange(root->left, low, root->val) && validRange(root->right, root->val, high);
+bool validRange(TreeNode *root, long long low, long long high) {
+  if (!root)
+    return true;
+  if (root->val <= low || root->val >= high)
+    return false;
+  return validRange(root->left, low, root->val) &&
+         validRange(root->right, root->val, high);
 }
 
 int main() {
-    TreeNode badLeft{6, nullptr, nullptr};
-    TreeNode left{3, nullptr, &badLeft};
-    TreeNode root{5, &left, nullptr};
-    std::cout << std::boolalpha << wrongValidate(&root) << "\n";
-    std::cout << validRange(&root, LLONG_MIN, LLONG_MAX) << "\n";
-    return 0;
+  TreeNode badLeft{6, nullptr, nullptr};
+  TreeNode left{3, nullptr, &badLeft};
+  TreeNode root{5, &left, nullptr};
+  std::cout << std::boolalpha << wrongValidate(&root)
+            << "
+               ";
+      std::cout
+            << validRange(&root, LLONG_MIN, LLONG_MAX)
+            << "
+               ";
+      return 0;
 }
 `}
 />
@@ -288,50 +364,69 @@ int main() {
   instructions={`Implement \`TreeNode* insert(TreeNode* root, int val)\`. The driver inserts values and prints in-order traversal.`}
   starterCode={`#include <iostream>
 
-struct TreeNode { int val; TreeNode* left; TreeNode* right; };
+struct TreeNode {
+  int val;
+  TreeNode *left;
+  TreeNode *right;
+};
 
-TreeNode* insert(TreeNode* root, int val) {
-    // your code here
-    return root;
+TreeNode *insert(TreeNode *root, int val) {
+  // your code here
+  return root;
 }
 
-void inorder(TreeNode* root) {
-    if (!root) return;
-    inorder(root->left);
-    std::cout << root->val << "\n";
-    inorder(root->right);
+void inorder(TreeNode *root) {
+  if (!root)
+    return;
+  inorder(root->left);
+  std::cout << root->val
+            << "
+               ";
+      inorder(root->right);
 }
 
 int main() {
-    TreeNode* root = nullptr;
-    for (int x : {5, 3, 7, 2, 4, 6, 8}) root = insert(root, x);
-    inorder(root);
-    return 0;
+  TreeNode *root = nullptr;
+  for (int x : {5, 3, 7, 2, 4, 6, 8})
+    root = insert(root, x);
+  inorder(root);
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 
-struct TreeNode { int val; TreeNode* left; TreeNode* right; };
+struct TreeNode {
+  int val;
+  TreeNode *left;
+  TreeNode *right;
+};
 
-TreeNode* insert(TreeNode* root, int val) {
-    if (!root) return new TreeNode{val, nullptr, nullptr};
-    if (val < root->val) root->left = insert(root->left, val);
-    else if (val > root->val) root->right = insert(root->right, val);
-    return root;
+TreeNode *insert(TreeNode *root, int val) {
+  if (!root)
+    return new TreeNode{val, nullptr, nullptr};
+  if (val < root->val)
+    root->left = insert(root->left, val);
+  else if (val > root->val)
+    root->right = insert(root->right, val);
+  return root;
 }
 
-void inorder(TreeNode* root) {
-    if (!root) return;
-    inorder(root->left);
-    std::cout << root->val << "\n";
-    inorder(root->right);
+void inorder(TreeNode *root) {
+  if (!root)
+    return;
+  inorder(root->left);
+  std::cout << root->val
+            << "
+               ";
+      inorder(root->right);
 }
 
 int main() {
-    TreeNode* root = nullptr;
-    for (int x : {5, 3, 7, 2, 4, 6, 8}) root = insert(root, x);
-    inorder(root);
-    return 0;
+  TreeNode *root = nullptr;
+  for (int x : {5, 3, 7, 2, 4, 6, 8})
+    root = insert(root, x);
+  inorder(root);
+  return 0;
 }
 `}
   tests={[{ id: "sorted", name: "In-order is sorted", expect: { stdoutLines: ["2", "3", "4", "5", "6", "7", "8"], stdoutLinesExact: true } }]}
@@ -345,41 +440,68 @@ int main() {
   instructions={`Implement \`bool contains(TreeNode* root, int val)\` using the BST ordering.`}
   starterCode={`#include <iostream>
 
-struct TreeNode { int val; TreeNode* left; TreeNode* right; };
+struct TreeNode {
+  int val;
+  TreeNode *left;
+  TreeNode *right;
+};
 
-bool contains(TreeNode* root, int val) {
-    // your code here
-    return false;
+bool contains(TreeNode *root, int val) {
+  // your code here
+  return false;
 }
 
 int main() {
-    TreeNode n2{2, nullptr, nullptr}, n4{4, nullptr, nullptr}, n6{6, nullptr, nullptr}, n8{8, nullptr, nullptr};
-    TreeNode n3{3, &n2, &n4}, n7{7, &n6, &n8}, n5{5, &n3, &n7};
-    std::cout << std::boolalpha << contains(&n5, 4) << "\n";
-    std::cout << contains(&n5, 10) << "\n";
-    std::cout << contains(&n5, 8) << "\n";
-    return 0;
+  TreeNode n2{2, nullptr, nullptr}, n4{4, nullptr, nullptr},
+      n6{6, nullptr, nullptr}, n8{8, nullptr, nullptr};
+  TreeNode n3{3, &n2, &n4}, n7{7, &n6, &n8}, n5{5, &n3, &n7};
+  std::cout << std::boolalpha << contains(&n5, 4)
+            << "
+               ";
+      std::cout
+            << contains(&n5, 10)
+            << "
+               ";
+      std::cout
+            << contains(&n5, 8)
+            << "
+               ";
+      return 0;
 }
 `}
   solutionCode={`#include <iostream>
 
-struct TreeNode { int val; TreeNode* left; TreeNode* right; };
+struct TreeNode {
+  int val;
+  TreeNode *left;
+  TreeNode *right;
+};
 
-bool contains(TreeNode* root, int val) {
-    while (root) {
-        if (root->val == val) return true;
-        root = val < root->val ? root->left : root->right;
-    }
-    return false;
+bool contains(TreeNode *root, int val) {
+  while (root) {
+    if (root->val == val)
+      return true;
+    root = val < root->val ? root->left : root->right;
+  }
+  return false;
 }
 
 int main() {
-    TreeNode n2{2, nullptr, nullptr}, n4{4, nullptr, nullptr}, n6{6, nullptr, nullptr}, n8{8, nullptr, nullptr};
-    TreeNode n3{3, &n2, &n4}, n7{7, &n6, &n8}, n5{5, &n3, &n7};
-    std::cout << std::boolalpha << contains(&n5, 4) << "\n";
-    std::cout << contains(&n5, 10) << "\n";
-    std::cout << contains(&n5, 8) << "\n";
-    return 0;
+  TreeNode n2{2, nullptr, nullptr}, n4{4, nullptr, nullptr},
+      n6{6, nullptr, nullptr}, n8{8, nullptr, nullptr};
+  TreeNode n3{3, &n2, &n4}, n7{7, &n6, &n8}, n5{5, &n3, &n7};
+  std::cout << std::boolalpha << contains(&n5, 4)
+            << "
+               ";
+      std::cout
+            << contains(&n5, 10)
+            << "
+               ";
+      std::cout
+            << contains(&n5, 8)
+            << "
+               ";
+      return 0;
 }
 `}
   tests={[{ id: "contains", name: "Checks present and missing keys", expect: { stdoutLines: ["true", "false", "true"], stdoutLinesExact: true } }]}
@@ -393,42 +515,71 @@ int main() {
   instructions={`Implement \`TreeNode* lca(TreeNode* root, int a, int b)\`. Use the BST property to walk toward the split point.`}
   starterCode={`#include <iostream>
 
-struct TreeNode { int val; TreeNode* left; TreeNode* right; };
+struct TreeNode {
+  int val;
+  TreeNode *left;
+  TreeNode *right;
+};
 
-TreeNode* lca(TreeNode* root, int a, int b) {
-    // your code here
-    return nullptr;
+TreeNode *lca(TreeNode *root, int a, int b) {
+  // your code here
+  return nullptr;
 }
 
 int main() {
-    TreeNode n2{2, nullptr, nullptr}, n4{4, nullptr, nullptr}, n6{6, nullptr, nullptr}, n8{8, nullptr, nullptr};
-    TreeNode n3{3, &n2, &n4}, n7{7, &n6, &n8}, n5{5, &n3, &n7};
-    std::cout << lca(&n5, 2, 4)->val << "\n";
-    std::cout << lca(&n5, 2, 8)->val << "\n";
-    std::cout << lca(&n5, 6, 8)->val << "\n";
-    return 0;
+  TreeNode n2{2, nullptr, nullptr}, n4{4, nullptr, nullptr},
+      n6{6, nullptr, nullptr}, n8{8, nullptr, nullptr};
+  TreeNode n3{3, &n2, &n4}, n7{7, &n6, &n8}, n5{5, &n3, &n7};
+  std::cout << lca(&n5, 2, 4)->val
+            << "
+               ";
+      std::cout
+            << lca(&n5, 2, 8)->val
+            << "
+               ";
+      std::cout
+            << lca(&n5, 6, 8)->val
+            << "
+               ";
+      return 0;
 }
 `}
   solutionCode={`#include <iostream>
 
-struct TreeNode { int val; TreeNode* left; TreeNode* right; };
+struct TreeNode {
+  int val;
+  TreeNode *left;
+  TreeNode *right;
+};
 
-TreeNode* lca(TreeNode* root, int a, int b) {
-    while (root) {
-        if (a < root->val && b < root->val) root = root->left;
-        else if (a > root->val && b > root->val) root = root->right;
-        else return root;
-    }
-    return nullptr;
+TreeNode *lca(TreeNode *root, int a, int b) {
+  while (root) {
+    if (a < root->val && b < root->val)
+      root = root->left;
+    else if (a > root->val && b > root->val)
+      root = root->right;
+    else
+      return root;
+  }
+  return nullptr;
 }
 
 int main() {
-    TreeNode n2{2, nullptr, nullptr}, n4{4, nullptr, nullptr}, n6{6, nullptr, nullptr}, n8{8, nullptr, nullptr};
-    TreeNode n3{3, &n2, &n4}, n7{7, &n6, &n8}, n5{5, &n3, &n7};
-    std::cout << lca(&n5, 2, 4)->val << "\n";
-    std::cout << lca(&n5, 2, 8)->val << "\n";
-    std::cout << lca(&n5, 6, 8)->val << "\n";
-    return 0;
+  TreeNode n2{2, nullptr, nullptr}, n4{4, nullptr, nullptr},
+      n6{6, nullptr, nullptr}, n8{8, nullptr, nullptr};
+  TreeNode n3{3, &n2, &n4}, n7{7, &n6, &n8}, n5{5, &n3, &n7};
+  std::cout << lca(&n5, 2, 4)->val
+            << "
+               ";
+      std::cout
+            << lca(&n5, 2, 8)->val
+            << "
+               ";
+      std::cout
+            << lca(&n5, 6, 8)->val
+            << "
+               ";
+      return 0;
 }
 `}
   tests={[{ id: "lca", name: "Finds split nodes", expect: { stdoutLines: ["3", "5", "7"], stdoutLinesExact: true } }]}

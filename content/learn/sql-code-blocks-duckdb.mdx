@@ -27,9 +27,14 @@ INSERT INTO books VALUES
   (3, 'Snow Crash', 'Neal Stephenson', 1992),
   (4, 'Foundation', 'Isaac Asimov', 1951),
   (5, 'The Left Hand of Darkness', 'Ursula K. Le Guin', 1969);`}
-  starterCode={`SELECT title, author, year
-FROM books
-ORDER BY year;`}
+  starterCode={`SELECT
+  title,
+  author,
+  year
+FROM
+  books
+ORDER BY
+  year;`}
 />
 
 ```jsx
@@ -48,9 +53,14 @@ INSERT INTO books VALUES
   (3, 'Snow Crash', 'Neal Stephenson', 1992),
   (4, 'Foundation', 'Isaac Asimov', 1951),
   (5, 'The Left Hand of Darkness', 'Ursula K. Le Guin', 1969);`}
-  starterCode={`SELECT title, author, year
-FROM books
-ORDER BY year;`}
+  starterCode={`SELECT
+  title,
+  author,
+  year
+FROM
+  books
+ORDER BY
+  year;`}
 />
 ```
 
@@ -65,10 +75,12 @@ non-aggregated column) make ad-hoc aggregation terse.
   starterCode={`SELECT
   i % 3 AS bucket,
   COUNT(*) AS n,
-  SUM(i)  AS total
-FROM range(1, 31) AS t(i)
+  SUM(i) AS total
+FROM
+  range(1, 31) AS t (i)
 GROUP BY ALL
-ORDER BY bucket;`}
+ORDER BY
+  bucket;`}
 />
 
 ```jsx
@@ -78,10 +90,12 @@ ORDER BY bucket;`}
   starterCode={`SELECT
   i % 3 AS bucket,
   COUNT(*) AS n,
-  SUM(i)  AS total
-FROM range(1, 31) AS t(i)
+  SUM(i) AS total
+FROM
+  range(1, 31) AS t (i)
 GROUP BY ALL
-ORDER BY bucket;`}
+ORDER BY
+  bucket;`}
 />
 ```
 
@@ -94,9 +108,9 @@ DuckDB has first-class `LIST` columns plus lambda helpers like
   dialect="duckdb"
   title="Transform a list with a lambda"
   starterCode={`SELECT
-  [1, 2, 3, 4]                              AS nums,
+  [1, 2, 3, 4] AS nums,
   list_transform([1, 2, 3, 4], x -> x * x) AS squares,
-  list_aggregate([1, 2, 3, 4], 'sum')      AS total;`}
+  list_aggregate([1, 2, 3, 4], 'sum') AS total;`}
 />
 
 ```jsx
@@ -104,9 +118,9 @@ DuckDB has first-class `LIST` columns plus lambda helpers like
   dialect="duckdb"
   title="Transform a list with a lambda"
   starterCode={`SELECT
-  [1, 2, 3, 4]                              AS nums,
+  [1, 2, 3, 4] AS nums,
   list_transform([1, 2, 3, 4], x -> x * x) AS squares,
-  list_aggregate([1, 2, 3, 4], 'sum')      AS total;`}
+  list_aggregate([1, 2, 3, 4], 'sum') AS total;`}
 />
 ```
 
@@ -138,11 +152,16 @@ INSERT INTO orders VALUES
   (3, 2, 200.00),
   (4, 3,  50.00),
   (5, 3,  75.25);`}
-  starterCode={`SELECT c.name, c.city, SUM(o.amount) AS total_spent
-FROM orders o
-JOIN customers c ON c.id = o.customer_id
+  starterCode={`SELECT
+  c.name,
+  c.city,
+  SUM(o.amount) AS total_spent
+FROM
+  orders o
+  JOIN customers c ON c.id = o.customer_id
 GROUP BY ALL
-ORDER BY total_spent DESC;`}
+ORDER BY
+  total_spent DESC;`}
 />
 
 ```jsx
@@ -169,11 +188,16 @@ INSERT INTO orders VALUES
   (3, 2, 200.00),
   (4, 3,  50.00),
   (5, 3,  75.25);`}
-  starterCode={`SELECT c.name, c.city, SUM(o.amount) AS total_spent
-FROM orders o
-JOIN customers c ON c.id = o.customer_id
+  starterCode={`SELECT
+  c.name,
+  c.city,
+  SUM(o.amount) AS total_spent
+FROM
+  orders o
+  JOIN customers c ON c.id = o.customer_id
 GROUP BY ALL
-ORDER BY total_spent DESC;`}
+ORDER BY
+  total_spent DESC;`}
 />
 ```
 
@@ -192,9 +216,14 @@ SELECT
   'row-' || i    AS label,
   ROUND(i * 1.5, 2) AS value
 FROM range(1, 10001) AS t(i);`}
-  starterCode={`SELECT id, label, value
-FROM metrics
-ORDER BY id;`}
+  starterCode={`SELECT
+  id,
+  label,
+  value
+FROM
+  metrics
+ORDER BY
+  id;`}
 />
 
 ```jsx
@@ -207,8 +236,13 @@ SELECT
   'row-' || i    AS label,
   ROUND(i * 1.5, 2) AS value
 FROM range(1, 10001) AS t(i);`}
-  starterCode={`SELECT id, label, value
-FROM metrics
-ORDER BY id;`}
+  starterCode={`SELECT
+  id,
+  label,
+  value
+FROM
+  metrics
+ORDER BY
+  id;`}
 />
 ```

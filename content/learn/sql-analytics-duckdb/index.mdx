@@ -155,12 +155,15 @@ INSERT INTO sales VALUES
   ('East',  'Widget',  90.00);`}
   starterCode={`SELECT
   region,
-  COUNT(*)        AS orders,
-  SUM(amount)     AS revenue,
+  COUNT(*) AS orders,
+  SUM(amount) AS revenue,
   ROUND(AVG(amount), 2) AS avg_order
-FROM sales
-GROUP BY region
-ORDER BY revenue DESC;`}
+FROM
+  sales
+GROUP BY
+  region
+ORDER BY
+  revenue DESC;`}
 />
 
 That query says, in almost plain English: *"For each region, how many

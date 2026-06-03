@@ -54,7 +54,7 @@ Let us simulate, in Python, exactly how fast the work piles up.
 years = 100
 steps_per_year = 24 * 365
 ops_per_step = 200
-ops_per_second_human = 1            # one operation per second is generous
+ops_per_second_human = 1  # one operation per second is generous
 
 total_ops = years * steps_per_year * ops_per_step
 seconds = total_ops / ops_per_second_human
@@ -176,8 +176,8 @@ the expression differs.
 
 for k in range(1, 12):
     x = 10 ** (-k)
-    naive    = (1 - math.cos(x)) / x**2
-    rewritten = 2 * math.sin(x/2)**2 / x**2     # algebraically identical
+    naive = (1 - math.cos(x)) / x**2
+    rewritten = 2 * math.sin(x / 2) ** 2 / x**2  # algebraically identical
     print(f"x=1e-{k:>2}  naive={naive:.10f}  rewritten={rewritten:.10f}")
 `}
 />

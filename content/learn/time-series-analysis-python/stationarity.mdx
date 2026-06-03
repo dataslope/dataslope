@@ -59,15 +59,18 @@ moving_var    = pd.Series(rng.normal(0, 1, n) * np.linspace(0.3, 5, n), index=id
 for ax, s, title in zip(
     axes,
     [stationary, moving_mean, moving_var],
-    ["STATIONARY: constant mean and variance",
-     "NON-stationary: the MEAN drifts upward (a trend)",
-     "NON-stationary: the VARIANCE grows (a widening funnel)"],
+    [
+        "STATIONARY: constant mean and variance",
+        "NON-stationary: the MEAN drifts upward (a trend)",
+        "NON-stationary: the VARIANCE grows (a widening funnel)",
+    ],
 ):
     s.plot(ax=ax, color="steelblue", lw=0.9)
-    s.rolling(20).mean().plot(ax=ax, color="crimson", lw=2)   # rolling mean
+    s.rolling(20).mean().plot(ax=ax, color="crimson", lw=2)  # rolling mean
     ax.set_title(title)
 
-plt.tight_layout(); plt.show()
+plt.tight_layout()
+plt.show()
 
 print("Top: the red rolling mean stays flat and the band keeps a fixed width.")
 print("Middle: the rolling mean climbs -> the mean is time-dependent.")

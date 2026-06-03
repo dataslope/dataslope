@@ -125,11 +125,17 @@ INSERT INTO books (id, title) VALUES (10,'SQL Basics'),(11,'Databases 101');
 INSERT INTO loans (id, member_id, book_id, borrowed_on, due_on) VALUES
   (100, 1, 10, DATE '2026-05-01', DATE '2026-05-15'),
   (101, 2, 11, DATE '2026-05-03', DATE '2026-05-17');`}
-  starterCode={`SELECT m.name, b.title, l.borrowed_on, l.due_on
-FROM loans l
-JOIN members m ON m.id = l.member_id
-JOIN books   b ON b.id = l.book_id
-ORDER BY l.borrowed_on;`}
+  starterCode={`SELECT
+  m.name,
+  b.title,
+  l.borrowed_on,
+  l.due_on
+FROM
+  loans l
+  JOIN members m ON m.id = l.member_id
+  JOIN books b ON b.id = l.book_id
+ORDER BY
+  l.borrowed_on;`}
 />
 
 Every noun became a table, every fact-about-one-thing became a

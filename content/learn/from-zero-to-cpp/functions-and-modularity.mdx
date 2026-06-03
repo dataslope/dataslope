@@ -46,14 +46,12 @@ A function must have one **definition** (the body) and may have many
 int square(int n);
 
 int main() {
-    std::cout << square(7) << "\\n";
-    return 0;
+  std::cout << square(7) << "\\n";
+  return 0;
 }
 
 // Definition — the actual body.
-int square(int n) {
-    return n * n;
-}
+int square(int n) { return n * n; }
 `}
 />
 
@@ -110,23 +108,21 @@ classes) into functions when you only need to read them.
   starterCode={`#include <iostream>
 #include <string>
 
-void by_value(int x)        { x = 100; }
-void by_reference(int& x)   { x = 100; }
-void print(const std::string& s) {
-    std::cout << "received: " << s << "\\n";
-}
+void by_value(int x) { x = 100; }
+void by_reference(int &x) { x = 100; }
+void print(const std::string &s) { std::cout << "received: " << s << "\\n"; }
 
 int main() {
-    int n = 1;
-    by_value(n);
-    std::cout << "after by_value:     n = " << n << "\\n";  // still 1
+  int n = 1;
+  by_value(n);
+  std::cout << "after by_value:     n = " << n << "\\n"; // still 1
 
-    by_reference(n);
-    std::cout << "after by_reference: n = " << n << "\\n";  // 100
+  by_reference(n);
+  std::cout << "after by_reference: n = " << n << "\\n"; // 100
 
-    std::string greeting = "Hello!";
-    print(greeting);   // no copy made; we just borrow it.
-    return 0;
+  std::string greeting = "Hello!";
+  print(greeting); // no copy made; we just borrow it.
+  return 0;
 }
 `}
 />
@@ -154,16 +150,18 @@ a `std::string` or `std::vector` is essentially free.
 #include <vector>
 
 std::vector<int> first_n_squares(int n) {
-    std::vector<int> out;
-    for (int i = 1; i <= n; ++i) out.push_back(i * i);
-    return out;          // no expensive copy; the compiler "moves" the vector.
+  std::vector<int> out;
+  for (int i = 1; i <= n; ++i)
+    out.push_back(i * i);
+  return out; // no expensive copy; the compiler "moves" the vector.
 }
 
 int main() {
-    auto v = first_n_squares(5);
-    for (int x : v) std::cout << x << " ";
-    std::cout << "\\n";
-    return 0;
+  auto v = first_n_squares(5);
+  for (int x : v)
+    std::cout << x << " ";
+  std::cout << "\\n";
+  return 0;
 }
 `}
 />
@@ -181,14 +179,14 @@ arguments at the end of the list.
   starterCode={`#include <iostream>
 #include <string>
 
-void greet(const std::string& name, const std::string& punctuation = "!") {
-    std::cout << "Hello, " << name << punctuation << "\\n";
+void greet(const std::string &name, const std::string &punctuation = "!") {
+  std::cout << "Hello, " << name << punctuation << "\\n";
 }
 
 int main() {
-    greet("Ada");
-    greet("Linus", ".");
-    return 0;
+  greet("Ada");
+  greet("Linus", ".");
+  return 0;
 }
 `}
 />
@@ -207,15 +205,15 @@ site based on the arguments.
   starterCode={`#include <iostream>
 #include <string>
 
-void show(int n)               { std::cout << "int: " << n << "\\n"; }
-void show(double d)            { std::cout << "double: " << d << "\\n"; }
-void show(const std::string& s){ std::cout << "string: " << s << "\\n"; }
+void show(int n) { std::cout << "int: " << n << "\\n"; }
+void show(double d) { std::cout << "double: " << d << "\\n"; }
+void show(const std::string &s) { std::cout << "string: " << s << "\\n"; }
 
 int main() {
-    show(42);
-    show(3.14);
-    show(std::string{"hi"});
-    return 0;
+  show(42);
+  show(3.14);
+  show(std::string{"hi"});
+  return 0;
 }
 `}
 />
@@ -257,15 +255,16 @@ naturally recursive structure (trees, lists, mathematical sequences).
   starterCode={`#include <iostream>
 
 int factorial(int n) {
-    if (n <= 1) return 1;        // base case
-    return n * factorial(n - 1); // recursive case
+  if (n <= 1)
+    return 1;                  // base case
+  return n * factorial(n - 1); // recursive case
 }
 
 int main() {
-    for (int i = 0; i <= 6; ++i) {
-        std::cout << i << "! = " << factorial(i) << "\\n";
-    }
-    return 0;
+  for (int i = 0; i <= 6; ++i) {
+    std::cout << i << "! = " << factorial(i) << "\\n";
+  }
+  return 0;
 }
 `}
 />
@@ -345,25 +344,23 @@ header/implementation pairs grouped into folders.
   starterCode={`#include <iostream>
 
 int min3(int a, int b, int c) {
-    // your code here
-    return 0;
+  // your code here
+  return 0;
 }
 
 int main() {
-    std::cout << min3(7, 2, 5);
-    return 0;
+  std::cout << min3(7, 2, 5);
+  return 0;
 }
 `}
-  solutionCode={`#include <iostream>
-#include <algorithm>
+  solutionCode={`#include <algorithm>
+#include <iostream>
 
-int min3(int a, int b, int c) {
-    return std::min({a, b, c});
-}
+int min3(int a, int b, int c) { return std::min({a, b, c}); }
 
 int main() {
-    std::cout << min3(7, 2, 5);
-    return 0;
+  std::cout << min3(7, 2, 5);
+  return 0;
 }
 `}
   tests={[
@@ -382,30 +379,30 @@ int main() {
   instructions={`Implement \`void swap_ints(int& a, int& b)\` that swaps the values of its two arguments **in place**. \`main\` will print the values after the swap and expects to see \`9 1\`.`}
   starterCode={`#include <iostream>
 
-void swap_ints(int& a, int& b) {
-    // your code here
+void swap_ints(int &a, int &b) {
+  // your code here
 }
 
 int main() {
-    int x = 1, y = 9;
-    swap_ints(x, y);
-    std::cout << x << " " << y;
-    return 0;
+  int x = 1, y = 9;
+  swap_ints(x, y);
+  std::cout << x << " " << y;
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 
-void swap_ints(int& a, int& b) {
-    int tmp = a;
-    a = b;
-    b = tmp;
+void swap_ints(int &a, int &b) {
+  int tmp = a;
+  a = b;
+  b = tmp;
 }
 
 int main() {
-    int x = 1, y = 9;
-    swap_ints(x, y);
-    std::cout << x << " " << y;
-    return 0;
+  int x = 1, y = 9;
+  swap_ints(x, y);
+  std::cout << x << " " << y;
+  return 0;
 }
 `}
   tests={[

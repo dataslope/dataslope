@@ -25,12 +25,12 @@ non-zero value** as true.
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int age = 20;
+  int age = 20;
 
-    if (age >= 18) {
-        printf("You can vote.\\n");
-    }
-    return 0;
+  if (age >= 18) {
+    printf("You can vote.\\n");
+  }
+  return 0;
 }
 `}
 />
@@ -47,14 +47,14 @@ To do *one or the other*:
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int age = 15;
+  int age = 15;
 
-    if (age >= 18) {
-        printf("You can vote.\\n");
-    } else {
-        printf("Not quite yet — wait %d more years.\\n", 18 - age);
-    }
-    return 0;
+  if (age >= 18) {
+    printf("You can vote.\\n");
+  } else {
+    printf("Not quite yet — wait %d more years.\\n", 18 - age);
+  }
+  return 0;
 }
 `}
 />
@@ -68,20 +68,20 @@ For more than two branches, chain them:
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int score = 78;
+  int score = 78;
 
-    if (score >= 90) {
-        printf("Grade: A\\n");
-    } else if (score >= 80) {
-        printf("Grade: B\\n");
-    } else if (score >= 70) {
-        printf("Grade: C\\n");
-    } else if (score >= 60) {
-        printf("Grade: D\\n");
-    } else {
-        printf("Grade: F\\n");
-    }
-    return 0;
+  if (score >= 90) {
+    printf("Grade: A\\n");
+  } else if (score >= 80) {
+    printf("Grade: B\\n");
+  } else if (score >= 70) {
+    printf("Grade: C\\n");
+  } else if (score >= 60) {
+    printf("Grade: D\\n");
+  } else {
+    printf("Grade: F\\n");
+  }
+  return 0;
 }
 `}
 />
@@ -129,15 +129,15 @@ Combine conditions with logical operators:
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int age = 25;
-    int has_license = 1;   // 1 means true
+  int age = 25;
+  int has_license = 1; // 1 means true
 
-    if (age >= 18 && has_license) {
-        printf("You may drive.\\n");
-    } else {
-        printf("Not allowed to drive.\\n");
-    }
-    return 0;
+  if (age >= 18 && has_license) {
+    printf("You may drive.\\n");
+  } else {
+    printf("Not allowed to drive.\\n");
+  }
+  return 0;
 }
 `}
 />
@@ -177,20 +177,20 @@ You can put `if` inside `if`:
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int x = 7;
+  int x = 7;
 
-    if (x > 0) {
-        if (x % 2 == 0) {
-            printf("positive even\\n");
-        } else {
-            printf("positive odd\\n");
-        }
-    } else if (x < 0) {
-        printf("negative\\n");
+  if (x > 0) {
+    if (x % 2 == 0) {
+      printf("positive even\\n");
     } else {
-        printf("zero\\n");
+      printf("positive odd\\n");
     }
-    return 0;
+  } else if (x < 0) {
+    printf("negative\\n");
+  } else {
+    printf("zero\\n");
+  }
+  return 0;
 }
 `}
 />
@@ -235,23 +235,33 @@ sometimes clearer than a long `if/else if` chain.
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int day = 3;
+  int day = 3;
 
-    switch (day) {
-        case 1: printf("Monday\\n");    break;
-        case 2: printf("Tuesday\\n");   break;
-        case 3: printf("Wednesday\\n"); break;
-        case 4: printf("Thursday\\n");  break;
-        case 5: printf("Friday\\n");    break;
-        case 6:
-        case 7:
-            printf("Weekend\\n");
-            break;
-        default:
-            printf("Not a day\\n");
-            break;
-    }
-    return 0;
+  switch (day) {
+  case 1:
+    printf("Monday\\n");
+    break;
+  case 2:
+    printf("Tuesday\\n");
+    break;
+  case 3:
+    printf("Wednesday\\n");
+    break;
+  case 4:
+    printf("Thursday\\n");
+    break;
+  case 5:
+    printf("Friday\\n");
+    break;
+  case 6:
+  case 7:
+    printf("Weekend\\n");
+    break;
+  default:
+    printf("Not a day\\n");
+    break;
+  }
+  return 0;
 }
 `}
 />
@@ -305,18 +315,18 @@ Test cases the grader uses internally (you don't need to handle multiple inputs 
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int year = 2000;
-    // print "leap" or "not leap"
-    return 0;
+  int year = 2000;
+  // print "leap" or "not leap"
+  return 0;
 }
 `}
   solutionCode={`#include <stdio.h>
 
 int main(void) {
-    int year = 2000;
-    int is_leap = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
-    printf("%s\\n", is_leap ? "leap" : "not leap");
-    return 0;
+  int year = 2000;
+  int is_leap = (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+  printf("%s\\n", is_leap ? "leap" : "not leap");
+  return 0;
 }
 `}
   tests={[

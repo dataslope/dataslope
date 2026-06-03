@@ -118,7 +118,7 @@ print("1. isalpha filter: ", approach1)
 # Approach 2 — strip punctuation characters from each token with str.translate.
 table = str.maketrans("", "", string.punctuation)
 approach2 = [w.translate(table) for w in text.lower().split()]
-approach2 = [w for w in approach2 if w]   # drop any now-empty strings
+approach2 = [w for w in approach2 if w]  # drop any now-empty strings
 print("2. translate:      ", approach2)
 
 # Approach 3 — pull out runs of letters with a regular expression.
@@ -207,6 +207,7 @@ stripping — you do not need to fix it here, just be aware of it.)`}
     # 3. split and drop empties
     return []
 
+
 print(normalize("Hello, World!"))
 print(normalize("Wow!!!  Amazing??"))
 `}
@@ -215,6 +216,7 @@ print(normalize("Wow!!!  Amazing??"))
     table = str.maketrans("", "", string.punctuation)
     text = text.translate(table)
     return [w for w in text.split() if w]
+
 
 print(normalize("Hello, World!"))
 print(normalize("Wow!!!  Amazing??"))

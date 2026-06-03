@@ -41,12 +41,13 @@ relationships into straight lines and tames skewed data:
 # but we'll use a synthetic skewed example for clarity.
 set.seed(1)
 df <- data.frame(
-  size  = 10^runif(200, 0, 5),     # values from 1 to 100,000
+  size  = 10^runif(200, 0, 5), # values from 1 to 100,000
   score = runif(200, 0, 100)
 )
 
 # Linear scale: most points squashed against the left edge.
-ggplot(df, aes(size, score)) + geom_point(alpha = 0.5)
+ggplot(df, aes(size, score)) +
+  geom_point(alpha = 0.5)
 `}
 />
 

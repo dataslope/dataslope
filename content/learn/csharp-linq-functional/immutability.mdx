@@ -25,8 +25,9 @@ using System.Collections.Generic;
 static decimal Total(List<decimal> cart)
 {
     decimal sum = 0;
-    foreach (var item in cart) sum += item;
-    cart.Add(99m);                // "Tax line" — but we mutate the caller's cart!
+    foreach (var item in cart)
+        sum += item;
+    cart.Add(99m); // "Tax line" — but we mutate the caller's cart!
     return sum;
 }
 
@@ -71,7 +72,7 @@ record Money(decimal Amount, string Currency);
 
 var a = new Money(10m, "USD");
 var b = new Money(10m, "USD");
-var c = a with { Amount = 25m };   // new instance, original untouched
+var c = a with { Amount = 25m }; // new instance, original untouched
 
 Console.WriteLine($"a={a}");
 Console.WriteLine($"b={b}");
@@ -96,7 +97,7 @@ set once during construction:
 class Config
 {
     public string Host { get; init; } = "localhost";
-    public int    Port { get; init; } = 8080;
+    public int Port { get; init; } = 8080;
 }
 
 var c = new Config { Host = "example.com", Port = 443 };
@@ -122,9 +123,9 @@ var a = ImmutableList.Create(1, 2, 3);
 var b = a.Add(4);
 var c = b.SetItem(0, 99);
 
-Console.WriteLine(string.Join(", ", a));   // 1, 2, 3
-Console.WriteLine(string.Join(", ", b));   // 1, 2, 3, 4
-Console.WriteLine(string.Join(", ", c));   // 99, 2, 3, 4
+Console.WriteLine(string.Join(", ", a)); // 1, 2, 3
+Console.WriteLine(string.Join(", ", b)); // 1, 2, 3, 4
+Console.WriteLine(string.Join(", ", c)); // 99, 2, 3, 4
 `}
 />
 
@@ -145,7 +146,7 @@ record Player(string Name, int Score, int Level);
 var p = new Player("Ada", 0, 1);
 
 var afterPoint = p with { Score = p.Score + 10 };
-var leveledUp  = afterPoint with { Level = afterPoint.Level + 1, Score = 0 };
+var leveledUp = afterPoint with { Level = afterPoint.Level + 1, Score = 0 };
 
 Console.WriteLine(p);
 Console.WriteLine(afterPoint);

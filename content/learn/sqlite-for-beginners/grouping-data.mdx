@@ -52,9 +52,12 @@ INSERT INTO employees (name, dept, salary) VALUES
   dept,
   COUNT(*) AS headcount,
   ROUND(AVG(salary), 0) AS average_salary
-FROM employees
-GROUP BY dept
-ORDER BY dept;`}
+FROM
+  employees
+GROUP BY
+  dept
+ORDER BY
+  dept;`}
 />
 
 Read the query out loud like this:
@@ -88,10 +91,15 @@ INSERT INTO tickets (priority) VALUES
   ('Medium'),
   ('Low'),
   ('Low');`}
-  starterCode={`SELECT priority, COUNT(*) AS ticket_count
-FROM tickets
-GROUP BY priority
-ORDER BY ticket_count DESC;`}
+  starterCode={`SELECT
+  priority,
+  COUNT(*) AS ticket_count
+FROM
+  tickets
+GROUP BY
+  priority
+ORDER BY
+  ticket_count DESC;`}
 />
 
 There are six ticket rows, but only three priority groups: `High`, `Medium`, and `Low`.
@@ -150,10 +158,15 @@ INSERT INTO sales (product, amount) VALUES
   ('Notebook', 18.00),
   ('Backpack', 45.00),
   ('Pencil', 2.50);`}
-  starterCode={`SELECT product, SUM(amount) AS total_sales
-FROM sales
-GROUP BY product
-ORDER BY total_sales DESC;`}
+  starterCode={`SELECT
+  product,
+  SUM(amount) AS total_sales
+FROM
+  sales
+GROUP BY
+  product
+ORDER BY
+  total_sales DESC;`}
 />
 
 This is the pattern behind many reports: category on the left, summary number on the right.
@@ -182,10 +195,18 @@ INSERT INTO sales (region, year, amount) VALUES
   ('East', 2025, 80.00),
   ('East', 2026, 120.00),
   ('East', 2026, 60.00);`}
-  starterCode={`SELECT region, year, SUM(amount) AS total_sales
-FROM sales
-GROUP BY region, year
-ORDER BY region, year;`}
+  starterCode={`SELECT
+  region,
+  year,
+  SUM(amount) AS total_sales
+FROM
+  sales
+GROUP BY
+  region,
+  year
+ORDER BY
+  region,
+  year;`}
 />
 
 Each result row is one distinct `(region, year)` combination.
@@ -240,11 +261,17 @@ INSERT INTO employees (name, dept, salary, is_intern) VALUES
   ('Cara', 'Engineering', 30000, 1),
   ('Dave', 'Sales', 80000, 0),
   ('Eve', 'Sales', 72000, 0);`}
-  starterCode={`SELECT dept, ROUND(AVG(salary), 0) AS average_salary
-FROM employees
-WHERE is_intern = 0
-GROUP BY dept
-ORDER BY dept;`}
+  starterCode={`SELECT
+  dept,
+  ROUND(AVG(salary), 0) AS average_salary
+FROM
+  employees
+WHERE
+  is_intern = 0
+GROUP BY
+  dept
+ORDER BY
+  dept;`}
 />
 
 The intern row is removed first. Then SQLite groups the remaining rows by department.
@@ -279,10 +306,15 @@ INSERT INTO pets (name, species) VALUES
   ('Nori', 'Cat'),
   ('Pip', 'Bird'),
   ('Rex', 'Dog');`}
-  starterCode={`SELECT species, COUNT(*) AS pet_count
-FROM pets
-GROUP BY species
-ORDER BY species;`}
+  starterCode={`SELECT
+  species,
+  COUNT(*) AS pet_count
+FROM
+  pets
+GROUP BY
+  species
+ORDER BY
+  species;`}
 />
 
 The result does not show Luna, Milo, or Nori as separate rows. It shows one row per species.

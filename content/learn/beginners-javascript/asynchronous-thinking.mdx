@@ -342,7 +342,7 @@ const tasks = [
 
 runSequentially(tasks, (err, results) => {
   if (err) console.error(err);
-  else console.log(results);  // ["a","b","c"]
+  else console.log(results); // ["a","b","c"]
 });
 `}
   solutionCode={`function runSequentially(tasks, done) {

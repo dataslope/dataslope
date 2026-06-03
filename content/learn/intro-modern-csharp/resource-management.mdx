@@ -94,7 +94,7 @@ using (var c = new Connection("A"))
 {
     c.Send("hello");
     c.Send("world");
-}   // c.Dispose() runs here, even if an exception was thrown inside the block
+} // c.Dispose() runs here, even if an exception was thrown inside the block
 
 Console.WriteLine("done");
 `}
@@ -116,7 +116,11 @@ of the enclosing scope.
 public class Connection : IDisposable
 {
     public string Name { get; }
-    public Connection(string name) { Name = name; Console.WriteLine($"opened {name}"); }
+    public Connection(string name)
+    {
+        Name = name;
+        Console.WriteLine($"opened {name}");
+    }
     public void Send(string msg) => Console.WriteLine($"{Name}: {msg}");
     public void Dispose() => Console.WriteLine($"closed {Name}");
 }
@@ -126,7 +130,7 @@ void DoWork()
     using var c = new Connection("B");
     c.Send("ping");
     c.Send("pong");
-}   // c.Dispose() runs here
+} // c.Dispose() runs here
 
 DoWork();
 Console.WriteLine("done");
@@ -144,7 +148,11 @@ You *could* call `Dispose()` manually:
 public class Connection : IDisposable
 {
     public string Name { get; }
-    public Connection(string name) { Name = name; Console.WriteLine($"opened {name}"); }
+    public Connection(string name)
+    {
+        Name = name;
+        Console.WriteLine($"opened {name}");
+    }
     public void Dispose() => Console.WriteLine($"closed {Name}");
 }
 
@@ -156,7 +164,7 @@ try
 }
 finally
 {
-    c.Dispose();   // we have to remember
+    c.Dispose(); // we have to remember
 }
 `}
 />
@@ -203,7 +211,11 @@ public class Logger : IDisposable
     public string Name { get; }
     private List<string> _entries = new();
 
-    public Logger(string name) { Name = name; Console.WriteLine($"open {name}"); }
+    public Logger(string name)
+    {
+        Name = name;
+        Console.WriteLine($"open {name}");
+    }
     public void Write(string s) => _entries.Add(s);
     public void Dispose()
     {
@@ -218,7 +230,7 @@ void Job()
     log.Write("start");
     log.Write("doing work");
     log.Write("end");
-}   // Logger flushed and closed here
+} // Logger flushed and closed here
 
 Job();
 Console.WriteLine("program continues");

@@ -43,17 +43,19 @@ For lowercase English letters, `std::array<TrieNode*, 26>` is compact and fast. 
 #include <iostream>
 
 struct TrieNode {
-    std::array<TrieNode*, 26> child{};
-    bool isWord = false;
+  std::array<TrieNode *, 26> child{};
+  bool isWord = false;
 };
 
 int main() {
-    TrieNode root;
-    root.child[0] = new TrieNode();
-    root.child[0]->isWord = true;
-    std::cout << root.child[0]->isWord << "\n";
-    delete root.child[0];
-    return 0;
+  TrieNode root;
+  root.child[0] = new TrieNode();
+  root.child[0]->isWord = true;
+  std::cout << root.child[0]->isWord
+            << "
+               ";
+               delete root.child[0];
+  return 0;
 }
 `}
 />
@@ -69,51 +71,62 @@ This version is easy to read and works for any character.
 #include <unordered_map>
 
 struct TrieNode {
-    std::unordered_map<char, TrieNode*> child;
-    bool isWord = false;
+  std::unordered_map<char, TrieNode *> child;
+  bool isWord = false;
 };
 
 class Trie {
-    TrieNode* root = new TrieNode();
+  TrieNode *root = new TrieNode();
+
 public:
-    void insert(const std::string& word) {
-        TrieNode* cur = root;
-        for (char ch : word) {
-            if (!cur->child.count(ch)) cur->child[ch] = new TrieNode();
-            cur = cur->child[ch];
-        }
-        cur->isWord = true;
+  void insert(const std::string &word) {
+    TrieNode *cur = root;
+    for (char ch : word) {
+      if (!cur->child.count(ch))
+        cur->child[ch] = new TrieNode();
+      cur = cur->child[ch];
     }
+    cur->isWord = true;
+  }
 
-    bool search(const std::string& word) const {
-        TrieNode* node = walk(word);
-        return node && node->isWord;
-    }
+  bool search(const std::string &word) const {
+    TrieNode *node = walk(word);
+    return node && node->isWord;
+  }
 
-    bool startsWith(const std::string& prefix) const {
-        return walk(prefix) != nullptr;
-    }
+  bool startsWith(const std::string &prefix) const {
+    return walk(prefix) != nullptr;
+  }
 
 private:
-    TrieNode* walk(const std::string& s) const {
-        TrieNode* cur = root;
-        for (char ch : s) {
-            auto it = cur->child.find(ch);
-            if (it == cur->child.end()) return nullptr;
-            cur = it->second;
-        }
-        return cur;
+  TrieNode *walk(const std::string &s) const {
+    TrieNode *cur = root;
+    for (char ch : s) {
+      auto it = cur->child.find(ch);
+      if (it == cur->child.end())
+        return nullptr;
+      cur = it->second;
     }
+    return cur;
+  }
 };
 
 int main() {
-    Trie trie;
-    trie.insert("cat");
-    trie.insert("car");
-    std::cout << std::boolalpha << trie.search("cat") << "\n";
-    std::cout << trie.search("ca") << "\n";
-    std::cout << trie.startsWith("ca") << "\n";
-    return 0;
+  Trie trie;
+  trie.insert("cat");
+  trie.insert("car");
+  std::cout << std::boolalpha << trie.search("cat")
+            << "
+               ";
+      std::cout
+            << trie.search("ca")
+            << "
+               ";
+      std::cout
+            << trie.startsWith("ca")
+            << "
+               ";
+      return 0;
 }
 `}
 />
@@ -133,22 +146,28 @@ flowchart LR
 #include <string>
 #include <unordered_map>
 
-struct Node { std::unordered_map<char, Node*> next; bool word = false; };
+struct Node {
+  std::unordered_map<char, Node *> next;
+  bool word = false;
+};
 
-void insert(Node* root, const std::string& s) {
-    Node* cur = root;
-    for (char ch : s) {
-        if (!cur->next.count(ch)) cur->next[ch] = new Node();
-        cur = cur->next[ch];
-    }
-    cur->word = true;
+void insert(Node *root, const std::string &s) {
+  Node *cur = root;
+  for (char ch : s) {
+    if (!cur->next.count(ch))
+      cur->next[ch] = new Node();
+    cur = cur->next[ch];
+  }
+  cur->word = true;
 }
 
 int main() {
-    Node root;
-    insert(&root, "hi");
-    std::cout << root.next['h']->next['i']->word << "\n";
-    return 0;
+  Node root;
+  insert(&root, "hi");
+  std::cout << root.next['h']->next['i']->word
+            << "
+               ";
+      return 0;
 }
 `}
 />
@@ -163,27 +182,36 @@ Exact search requires the final node to have `isWord = true`. Prefix search only
 #include <string>
 #include <unordered_map>
 
-struct Node { std::unordered_map<char, Node*> next; bool word = false; };
+struct Node {
+  std::unordered_map<char, Node *> next;
+  bool word = false;
+};
 
-Node* walk(Node* root, const std::string& s) {
-    Node* cur = root;
-    for (char ch : s) {
-        auto it = cur->next.find(ch);
-        if (it == cur->next.end()) return nullptr;
-        cur = it->second;
-    }
-    return cur;
+Node *walk(Node *root, const std::string &s) {
+  Node *cur = root;
+  for (char ch : s) {
+    auto it = cur->next.find(ch);
+    if (it == cur->next.end())
+      return nullptr;
+    cur = it->second;
+  }
+  return cur;
 }
 
 int main() {
-    Node root;
-    root.next['c'] = new Node();
-    root.next['c']->next['a'] = new Node();
-    root.next['c']->next['a']->next['t'] = new Node();
-    root.next['c']->next['a']->next['t']->word = true;
-    std::cout << std::boolalpha << (walk(&root, "ca") != nullptr) << "\n";
-    std::cout << (walk(&root, "ca") && walk(&root, "ca")->word) << "\n";
-    return 0;
+  Node root;
+  root.next['c'] = new Node();
+  root.next['c']->next['a'] = new Node();
+  root.next['c']->next['a']->next['t'] = new Node();
+  root.next['c']->next['a']->next['t']->word = true;
+  std::cout << std::boolalpha << (walk(&root, "ca") != nullptr)
+            << "
+               ";
+      std::cout
+            << (walk(&root, "ca") && walk(&root, "ca")->word)
+            << "
+               ";
+      return 0;
 }
 `}
 />
@@ -199,28 +227,35 @@ Once you walk to a prefix node, collect all words below that node.
 #include <unordered_map>
 #include <vector>
 
-struct Node { std::unordered_map<char, Node*> next; bool word = false; };
+struct Node {
+  std::unordered_map<char, Node *> next;
+  bool word = false;
+};
 
-void dfs(Node* node, std::string& path, std::vector<std::string>& out) {
-    if (node->word) out.push_back(path);
-    for (auto& [ch, child] : node->next) {
-        path.push_back(ch);
-        dfs(child, path, out);
-        path.pop_back();
-    }
+void dfs(Node *node, std::string &path, std::vector<std::string> &out) {
+  if (node->word)
+    out.push_back(path);
+  for (auto &[ch, child] : node->next) {
+    path.push_back(ch);
+    dfs(child, path, out);
+    path.pop_back();
+  }
 }
 
 int main() {
-    Node root;
-    root.next['a'] = new Node();
-    root.next['a']->word = true;
-    root.next['a']->next['t'] = new Node();
-    root.next['a']->next['t']->word = true;
-    std::string path;
-    std::vector<std::string> words;
-    dfs(&root, path, words);
-    for (const std::string& w : words) std::cout << w << "\n";
-    return 0;
+  Node root;
+  root.next['a'] = new Node();
+  root.next['a']->word = true;
+  root.next['a']->next['t'] = new Node();
+  root.next['a']->next['t']->word = true;
+  std::string path;
+  std::vector<std::string> words;
+  dfs(&root, path, words);
+  for (const std::string &w : words)
+    std::cout << w
+              << "
+                 ";
+        return 0;
 }
 `}
 />
@@ -236,9 +271,13 @@ Tries are useful for autocomplete, spellcheck, IP routing, longest-prefix matchi
 #include <vector>
 
 int main() {
-    std::vector<std::string> useCases = {"autocomplete", "spellcheck", "routing", "board search"};
-    for (const std::string& item : useCases) std::cout << item << "\n";
-    return 0;
+  std::vector<std::string> useCases = {"autocomplete", "spellcheck", "routing",
+                                       "board search"};
+  for (const std::string &item : useCases)
+    std::cout << item
+              << "
+                 ";
+        return 0;
 }
 `}
 />
@@ -254,39 +293,51 @@ int main() {
 #include <unordered_map>
 
 struct TrieNode {
-    std::unordered_map<char, TrieNode*> child;
-    bool isWord = false;
+  std::unordered_map<char, TrieNode *> child;
+  bool isWord = false;
 };
 
 class Trie {
-    TrieNode* root = new TrieNode();
+  TrieNode *root = new TrieNode();
+
 public:
-    void insert(const std::string& w) {
-        // your code here
-    }
+  void insert(const std::string &w) {
+    // your code here
+  }
 
-    bool search(const std::string& w) {
-        // your code here
-        return false;
-    }
+  bool search(const std::string &w) {
+    // your code here
+    return false;
+  }
 
-    bool startsWith(const std::string& p) {
-        // your code here
-        return false;
-    }
+  bool startsWith(const std::string &p) {
+    // your code here
+    return false;
+  }
 };
 
 int main() {
-    Trie trie;
-    trie.insert("cat");
-    trie.insert("car");
-    trie.insert("dog");
-    std::cout << std::boolalpha;
-    std::cout << trie.search("cat") << "\n";
-    std::cout << trie.search("ca") << "\n";
-    std::cout << trie.startsWith("ca") << "\n";
-    std::cout << trie.startsWith("do") << "\n";
-    return 0;
+  Trie trie;
+  trie.insert("cat");
+  trie.insert("car");
+  trie.insert("dog");
+  std::cout << std::boolalpha;
+  std::cout << trie.search("cat")
+            << "
+               ";
+      std::cout
+            << trie.search("ca")
+            << "
+               ";
+      std::cout
+            << trie.startsWith("ca")
+            << "
+               ";
+      std::cout
+            << trie.startsWith("do")
+            << "
+               ";
+      return 0;
 }
 `}
   solutionCode={`#include <iostream>
@@ -294,53 +345,65 @@ int main() {
 #include <unordered_map>
 
 struct TrieNode {
-    std::unordered_map<char, TrieNode*> child;
-    bool isWord = false;
+  std::unordered_map<char, TrieNode *> child;
+  bool isWord = false;
 };
 
 class Trie {
-    TrieNode* root = new TrieNode();
+  TrieNode *root = new TrieNode();
 
-    TrieNode* walk(const std::string& s) {
-        TrieNode* cur = root;
-        for (char ch : s) {
-            auto it = cur->child.find(ch);
-            if (it == cur->child.end()) return nullptr;
-            cur = it->second;
-        }
-        return cur;
+  TrieNode *walk(const std::string &s) {
+    TrieNode *cur = root;
+    for (char ch : s) {
+      auto it = cur->child.find(ch);
+      if (it == cur->child.end())
+        return nullptr;
+      cur = it->second;
     }
+    return cur;
+  }
+
 public:
-    void insert(const std::string& w) {
-        TrieNode* cur = root;
-        for (char ch : w) {
-            if (!cur->child.count(ch)) cur->child[ch] = new TrieNode();
-            cur = cur->child[ch];
-        }
-        cur->isWord = true;
+  void insert(const std::string &w) {
+    TrieNode *cur = root;
+    for (char ch : w) {
+      if (!cur->child.count(ch))
+        cur->child[ch] = new TrieNode();
+      cur = cur->child[ch];
     }
+    cur->isWord = true;
+  }
 
-    bool search(const std::string& w) {
-        TrieNode* node = walk(w);
-        return node && node->isWord;
-    }
+  bool search(const std::string &w) {
+    TrieNode *node = walk(w);
+    return node && node->isWord;
+  }
 
-    bool startsWith(const std::string& p) {
-        return walk(p) != nullptr;
-    }
+  bool startsWith(const std::string &p) { return walk(p) != nullptr; }
 };
 
 int main() {
-    Trie trie;
-    trie.insert("cat");
-    trie.insert("car");
-    trie.insert("dog");
-    std::cout << std::boolalpha;
-    std::cout << trie.search("cat") << "\n";
-    std::cout << trie.search("ca") << "\n";
-    std::cout << trie.startsWith("ca") << "\n";
-    std::cout << trie.startsWith("do") << "\n";
-    return 0;
+  Trie trie;
+  trie.insert("cat");
+  trie.insert("car");
+  trie.insert("dog");
+  std::cout << std::boolalpha;
+  std::cout << trie.search("cat")
+            << "
+               ";
+      std::cout
+            << trie.search("ca")
+            << "
+               ";
+      std::cout
+            << trie.startsWith("ca")
+            << "
+               ";
+      std::cout
+            << trie.startsWith("do")
+            << "
+               ";
+      return 0;
 }
 `}
   tests={[{ id: "trie", name: "Searches words and prefixes", expect: { stdoutLines: ["true", "false", "true", "true"], stdoutLinesExact: true } }]}
@@ -357,17 +420,26 @@ int main() {
 #include <unordered_map>
 #include <vector>
 
-int countWithPrefix(const std::vector<std::string>& words, const std::string& prefix) {
-    // your code here
-    return 0;
+int countWithPrefix(const std::vector<std::string> &words,
+                    const std::string &prefix) {
+  // your code here
+  return 0;
 }
 
 int main() {
-    std::vector<std::string> words = {"cat", "car", "cart", "dog", "door"};
-    std::cout << countWithPrefix(words, "ca") << "\n";
-    std::cout << countWithPrefix(words, "car") << "\n";
-    std::cout << countWithPrefix(words, "z") << "\n";
-    return 0;
+  std::vector<std::string> words = {"cat", "car", "cart", "dog", "door"};
+  std::cout << countWithPrefix(words, "ca")
+            << "
+               ";
+      std::cout
+            << countWithPrefix(words, "car")
+            << "
+               ";
+      std::cout
+            << countWithPrefix(words, "z")
+            << "
+               ";
+      return 0;
 }
 `}
   solutionCode={`#include <iostream>
@@ -376,35 +448,46 @@ int main() {
 #include <vector>
 
 struct Node {
-    std::unordered_map<char, Node*> child;
-    int pass = 0;
+  std::unordered_map<char, Node *> child;
+  int pass = 0;
 };
 
-int countWithPrefix(const std::vector<std::string>& words, const std::string& prefix) {
-    Node root;
-    for (const std::string& word : words) {
-        Node* cur = &root;
-        for (char ch : word) {
-            if (!cur->child.count(ch)) cur->child[ch] = new Node();
-            cur = cur->child[ch];
-            cur->pass++;
-        }
+int countWithPrefix(const std::vector<std::string> &words,
+                    const std::string &prefix) {
+  Node root;
+  for (const std::string &word : words) {
+    Node *cur = &root;
+    for (char ch : word) {
+      if (!cur->child.count(ch))
+        cur->child[ch] = new Node();
+      cur = cur->child[ch];
+      cur->pass++;
     }
-    Node* cur = &root;
-    for (char ch : prefix) {
-        auto it = cur->child.find(ch);
-        if (it == cur->child.end()) return 0;
-        cur = it->second;
-    }
-    return cur->pass;
+  }
+  Node *cur = &root;
+  for (char ch : prefix) {
+    auto it = cur->child.find(ch);
+    if (it == cur->child.end())
+      return 0;
+    cur = it->second;
+  }
+  return cur->pass;
 }
 
 int main() {
-    std::vector<std::string> words = {"cat", "car", "cart", "dog", "door"};
-    std::cout << countWithPrefix(words, "ca") << "\n";
-    std::cout << countWithPrefix(words, "car") << "\n";
-    std::cout << countWithPrefix(words, "z") << "\n";
-    return 0;
+  std::vector<std::string> words = {"cat", "car", "cart", "dog", "door"};
+  std::cout << countWithPrefix(words, "ca")
+            << "
+               ";
+      std::cout
+            << countWithPrefix(words, "car")
+            << "
+               ";
+      std::cout
+            << countWithPrefix(words, "z")
+            << "
+               ";
+      return 0;
 }
 `}
   tests={[{ id: "prefix-count", name: "Counts prefix matches", expect: { stdoutLines: ["3", "2", "0"], stdoutLinesExact: true } }]}
@@ -421,14 +504,16 @@ int main() {
 #include <unordered_map>
 #include <vector>
 
-std::string longestCommonPrefix(const std::vector<std::string>& words) {
-    // your code here
-    return "";
+std::string longestCommonPrefix(const std::vector<std::string> &words) {
+  // your code here
+  return "";
 }
 
 int main() {
-    std::cout << longestCommonPrefix({"flower", "flow", "flight"}) << "\n";
-    return 0;
+  std::cout << longestCommonPrefix({"flower", "flow", "flight"})
+            << "
+               ";
+      return 0;
 }
 `}
   solutionCode={`#include <iostream>
@@ -437,34 +522,38 @@ int main() {
 #include <vector>
 
 struct Node {
-    std::unordered_map<char, Node*> child;
-    bool word = false;
+  std::unordered_map<char, Node *> child;
+  bool word = false;
 };
 
-std::string longestCommonPrefix(const std::vector<std::string>& words) {
-    if (words.empty()) return "";
-    Node root;
-    for (const std::string& s : words) {
-        Node* cur = &root;
-        for (char ch : s) {
-            if (!cur->child.count(ch)) cur->child[ch] = new Node();
-            cur = cur->child[ch];
-        }
-        cur->word = true;
+std::string longestCommonPrefix(const std::vector<std::string> &words) {
+  if (words.empty())
+    return "";
+  Node root;
+  for (const std::string &s : words) {
+    Node *cur = &root;
+    for (char ch : s) {
+      if (!cur->child.count(ch))
+        cur->child[ch] = new Node();
+      cur = cur->child[ch];
     }
-    std::string ans;
-    Node* cur = &root;
-    while (!cur->word && cur->child.size() == 1) {
-        auto it = cur->child.begin();
-        ans.push_back(it->first);
-        cur = it->second;
-    }
-    return ans;
+    cur->word = true;
+  }
+  std::string ans;
+  Node *cur = &root;
+  while (!cur->word && cur->child.size() == 1) {
+    auto it = cur->child.begin();
+    ans.push_back(it->first);
+    cur = it->second;
+  }
+  return ans;
 }
 
 int main() {
-    std::cout << longestCommonPrefix({"flower", "flow", "flight"}) << "\n";
-    return 0;
+  std::cout << longestCommonPrefix({"flower", "flow", "flight"})
+            << "
+               ";
+      return 0;
 }
 `}
   tests={[{ id: "lcp", name: "Finds fl", expect: { stdoutEquals: "fl" } }]}

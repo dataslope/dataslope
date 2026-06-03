@@ -104,7 +104,7 @@ batching. Beloved in scientific ML and probabilistic programming.
 <CodeBlock
   adapter="python"
   starterCode={`# JAX example (display only; JAX is not in the in-browser environment).
-EXAMPLE = '''
+EXAMPLE = """
 import jax.numpy as jnp
 from jax import grad, jit, vmap
 
@@ -117,7 +117,7 @@ grad_loss = jit(grad(loss))     # auto-differentiate AND compile
 # vmap turns a scalar function into a vectorized one
 predict = lambda p, x: p[0]*x*x + p[1]*x + p[2]
 batch_predict = vmap(predict, in_axes=(None, 0))
-'''
+"""
 print(EXAMPLE)
 `}
 />
@@ -173,19 +173,19 @@ system.
   starterCode={`import sympy as sp
 
 x = sp.symbols("x")
-expr = sp.sin(x) * sp.exp(-x**2)
+expr = sp.sin(x) * sp.exp(-(x**2))
 print("expression :", expr)
 print("derivative :", sp.diff(expr, x))
 print("series at 0:", sp.series(expr, x, 0, 6))
 
 # Solve an equation symbolically
 y = sp.symbols("y")
-print("solutions to x² + y² = 1, y > 0:",
-      sp.solve([x**2 + y**2 - 1, y > 0], y))
+print("solutions to x² + y² = 1, y > 0:", sp.solve([x**2 + y**2 - 1, y > 0], y))
 
 # Convert a symbolic expression to a fast NumPy function
 f_num = sp.lambdify(x, sp.diff(expr, x), modules="numpy")
 import numpy as np
+
 print("derivative at x=1:", f_num(1.0))
 `}
 />

@@ -21,10 +21,12 @@ index is the list of column names.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "salary":  [120, 95, 140],
-    "tenure":  [3, 6, 7],
-})
+df = pd.DataFrame(
+    {
+        "salary": [120, 95, 140],
+        "tenure": [3, 6, 7],
+    }
+)
 print(df)
 print()
 print("Row index:   ", df.index)
@@ -39,17 +41,22 @@ typically a real identifier:
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "salary":  [120, 95, 140],
-    "tenure":  [3, 6, 7],
-}, index=["Aiko","Bilal","Chen"])
+df = pd.DataFrame(
+    {
+        "salary": [120, 95, 140],
+        "tenure": [3, 6, 7],
+    },
+    index=["Aiko", "Bilal", "Chen"],
+)
 
 # Or, equivalently, set it from a column:
-df2 = pd.DataFrame({
-    "name":    ["Aiko","Bilal","Chen"],
-    "salary":  [120, 95, 140],
-    "tenure":  [3, 6, 7],
-}).set_index("name")
+df2 = pd.DataFrame(
+    {
+        "name": ["Aiko", "Bilal", "Chen"],
+        "salary": [120, 95, 140],
+        "tenure": [3, 6, 7],
+    }
+).set_index("name")
 
 print(df)
 print()
@@ -78,14 +85,18 @@ You can fetch a row by its label directly:
 <CodeBlock
   adapter="python"
   starterCode={`import pandas as pd
-df = pd.DataFrame({
-    "salary": [120, 95, 140],
-    "tenure": [3, 6, 7],
-}, index=["Aiko","Bilal","Chen"])
 
-print(df.loc["Bilal"])     # one row, by label
+df = pd.DataFrame(
+    {
+        "salary": [120, 95, 140],
+        "tenure": [3, 6, 7],
+    },
+    index=["Aiko", "Bilal", "Chen"],
+)
+
+print(df.loc["Bilal"])  # one row, by label
 print()
-print(df.loc[["Aiko","Chen"], "salary"])   # subset of rows × columns
+print(df.loc[["Aiko", "Chen"], "salary"])  # subset of rows × columns
 `}
 />
 
@@ -135,9 +146,13 @@ Sometimes you want to demote the index back to a regular column.
 <CodeBlock
   adapter="python"
   starterCode={`import pandas as pd
-df = pd.DataFrame({
-    "salary": [120, 95, 140],
-}, index=["Aiko","Bilal","Chen"])
+
+df = pd.DataFrame(
+    {
+        "salary": [120, 95, 140],
+    },
+    index=["Aiko", "Bilal", "Chen"],
+)
 
 print("Before:")
 print(df)
@@ -165,20 +180,22 @@ column.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "dept":   ["Eng","Eng","Sales","Sales","Eng","Sales"],
-    "level":  ["jr","sr","jr","sr","jr","jr"],
-    "salary": [110, 160, 80, 120, 95, 75],
-})
+df = pd.DataFrame(
+    {
+        "dept": ["Eng", "Eng", "Sales", "Sales", "Eng", "Sales"],
+        "level": ["jr", "sr", "jr", "sr", "jr", "jr"],
+        "salary": [110, 160, 80, 120, 95, 75],
+    }
+)
 
-grouped = df.groupby(["dept","level"])["salary"].mean()
+grouped = df.groupby(["dept", "level"])["salary"].mean()
 print(grouped)
 print()
 print("Type of index:", type(grouped.index).__name__)
 print("Levels:       ", grouped.index.names)
 print()
 print("Pull one slice with a tuple:")
-print(grouped.loc[("Eng","sr")])
+print(grouped.loc[("Eng", "sr")])
 `}
 />
 

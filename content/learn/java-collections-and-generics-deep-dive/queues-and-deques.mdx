@@ -70,20 +70,20 @@ ends are `O(1)`.
 import java.util.Deque;
 
 public class Main {
-    public static void main(String[] args) {
-        Deque<String> dq = new ArrayDeque<>();
-        dq.offerLast("first");
-        dq.offerLast("second");
-        dq.offerFirst("zeroth");
+  public static void main(String[] args) {
+    Deque<String> dq = new ArrayDeque<>();
+    dq.offerLast("first");
+    dq.offerLast("second");
+    dq.offerFirst("zeroth");
 
-        System.out.println(dq);                // [zeroth, first, second]
-        System.out.println("peek front: " + dq.peekFirst());
-        System.out.println("peek back:  " + dq.peekLast());
+    System.out.println(dq); // [zeroth, first, second]
+    System.out.println("peek front: " + dq.peekFirst());
+    System.out.println("peek back:  " + dq.peekLast());
 
-        System.out.println("pop front:  " + dq.pollFirst());
-        System.out.println("pop back:   " + dq.pollLast());
-        System.out.println("left over:  " + dq);
-    }
+    System.out.println("pop front:  " + dq.pollFirst());
+    System.out.println("pop back:   " + dq.pollLast());
+    System.out.println("left over:  " + dq);
+  }
 }
 `}
 />
@@ -99,16 +99,16 @@ When you need a plain queue (line-at-the-coffee-shop semantics),
 import java.util.Queue;
 
 public class Main {
-    public static void main(String[] args) {
-        Queue<String> q = new ArrayDeque<>();
-        q.offer("first");
-        q.offer("second");
-        q.offer("third");
+  public static void main(String[] args) {
+    Queue<String> q = new ArrayDeque<>();
+    q.offer("first");
+    q.offer("second");
+    q.offer("third");
 
-        while (!q.isEmpty()) {
-            System.out.println("serving: " + q.poll());
-        }
+    while (!q.isEmpty()) {
+      System.out.println("serving: " + q.poll());
     }
+  }
 }
 `}
 />
@@ -124,14 +124,16 @@ legacy `java.util.Stack`:
 import java.util.Deque;
 
 public class Main {
-    public static void main(String[] args) {
-        Deque<Integer> stack = new ArrayDeque<>();
-        stack.push(1); stack.push(2); stack.push(3);   // push = addFirst
+  public static void main(String[] args) {
+    Deque<Integer> stack = new ArrayDeque<>();
+    stack.push(1);
+    stack.push(2);
+    stack.push(3); // push = addFirst
 
-        while (!stack.isEmpty()) {
-            System.out.println("pop: " + stack.pop());  // pop = removeFirst
-        }
+    while (!stack.isEmpty()) {
+      System.out.println("pop: " + stack.pop()); // pop = removeFirst
     }
+  }
 }
 `}
 />
@@ -150,30 +152,28 @@ node is *visited* in the order it was discovered — exactly FIFO.
   starterCode={`import java.util.*;
 
 public class Main {
-    public static void main(String[] args) {
-        // Tiny graph: 1 -> {2, 3}; 2 -> {4}; 3 -> {4, 5}; 4 -> {}; 5 -> {}
-        Map<Integer, List<Integer>> g = Map.of(
-            1, List.of(2, 3),
-            2, List.of(4),
-            3, List.of(4, 5),
-            4, List.of(),
-            5, List.of()
-        );
+  public static void main(String[] args) {
+    // Tiny graph: 1 -> {2, 3}; 2 -> {4}; 3 -> {4, 5}; 4 -> {}; 5 -> {}
+    Map<Integer, List<Integer>> g =
+        Map.of(1, List.of(2, 3), 2, List.of(4), 3, List.of(4, 5), 4, List.of(),
+               5, List.of());
 
-        Set<Integer>      seen = new HashSet<>();
-        Queue<Integer>    q    = new ArrayDeque<>();
-        List<Integer>     order = new ArrayList<>();
+    Set<Integer> seen = new HashSet<>();
+    Queue<Integer> q = new ArrayDeque<>();
+    List<Integer> order = new ArrayList<>();
 
-        q.offer(1); seen.add(1);
-        while (!q.isEmpty()) {
-            int node = q.poll();
-            order.add(node);
-            for (int nb : g.get(node)) {
-                if (seen.add(nb)) q.offer(nb);   // add returns true on first sight
-            }
-        }
-        System.out.println("BFS order = " + order);
+    q.offer(1);
+    seen.add(1);
+    while (!q.isEmpty()) {
+      int node = q.poll();
+      order.add(node);
+      for (int nb : g.get(node)) {
+        if (seen.add(nb))
+          q.offer(nb); // add returns true on first sight
+      }
     }
+    System.out.println("BFS order = " + order);
+  }
 }
 `}
 />
@@ -193,17 +193,25 @@ you provide). It is backed by a *binary heap*, so `offer` and
 import java.util.PriorityQueue;
 
 public class Main {
-    public static void main(String[] args) {
-        PriorityQueue<Integer> pq = new PriorityQueue<>();
-        pq.offer(5); pq.offer(1); pq.offer(9); pq.offer(3);
+  public static void main(String[] args) {
+    PriorityQueue<Integer> pq = new PriorityQueue<>();
+    pq.offer(5);
+    pq.offer(1);
+    pq.offer(9);
+    pq.offer(3);
 
-        while (!pq.isEmpty()) System.out.println(pq.poll());
+    while (!pq.isEmpty())
+      System.out.println(pq.poll());
 
-        System.out.println("--- reverse order ---");
-        PriorityQueue<Integer> rev = new PriorityQueue<>(Comparator.reverseOrder());
-        rev.offer(5); rev.offer(1); rev.offer(9); rev.offer(3);
-        while (!rev.isEmpty()) System.out.println(rev.poll());
-    }
+    System.out.println("--- reverse order ---");
+    PriorityQueue<Integer> rev = new PriorityQueue<>(Comparator.reverseOrder());
+    rev.offer(5);
+    rev.offer(1);
+    rev.offer(9);
+    rev.offer(3);
+    while (!rev.isEmpty())
+      System.out.println(rev.poll());
+  }
 }
 `}
 />

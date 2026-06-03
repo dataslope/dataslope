@@ -66,23 +66,23 @@ owners). It *can* be moved, transferring ownership:
 #include <utility>
 
 struct Toy {
-    int id;
-    Toy(int i) : id(i) { std::cout << "Toy " << id << " born\\n"; }
-    ~Toy()              { std::cout << "Toy " << id << " gone\\n"; }
+  int id;
+  Toy(int i) : id(i) { std::cout << "Toy " << id << " born\\n"; }
+  ~Toy() { std::cout << "Toy " << id << " gone\\n"; }
 };
 
 std::unique_ptr<Toy> create() {
-    return std::make_unique<Toy>(7);   // returns by value -> moved out
+  return std::make_unique<Toy>(7); // returns by value -> moved out
 }
 
 int main() {
-    std::unique_ptr<Toy> a = create();
-    std::cout << "a holds Toy " << a->id << "\\n";
+  std::unique_ptr<Toy> a = create();
+  std::cout << "a holds Toy " << a->id << "\\n";
 
-    std::unique_ptr<Toy> b = std::move(a);
-    std::cout << "after move, a is " << (a ? "non-null" : "null") << "\\n";
-    std::cout << "b holds Toy " << b->id << "\\n";
-    return 0;
+  std::unique_ptr<Toy> b = std::move(a);
+  std::cout << "after move, a is " << (a ? "non-null" : "null") << "\\n";
+  std::cout << "b holds Toy " << b->id << "\\n";
+  return 0;
 }
 `}
 />

@@ -133,10 +133,14 @@ INSERT INTO orders VALUES
   starterCode={`SELECT
   customers.name,
   COUNT(orders.id) AS order_count
-FROM customers
-LEFT JOIN orders ON orders.customer_id = customers.id
-GROUP BY customers.id, customers.name
-ORDER BY customers.name;`}
+FROM
+  customers
+  LEFT JOIN orders ON orders.customer_id = customers.id
+GROUP BY
+  customers.id,
+  customers.name
+ORDER BY
+  customers.name;`}
 />
 
 The query is short because the design did earlier work. The customer

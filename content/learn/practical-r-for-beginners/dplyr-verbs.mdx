@@ -126,19 +126,29 @@ want.
 data(mtcars)
 
 # By name
-mtcars |> select(mpg, cyl, hp) |> head()
+mtcars |>
+  select(mpg, cyl, hp) |>
+  head()
 
 # Drop columns with -
-mtcars |> select(-disp, -drat) |> head()
+mtcars |>
+  select(-disp, -drat) |>
+  head()
 
 # Reorder by listing first
-mtcars |> select(cyl, mpg, everything()) |> head()
+mtcars |>
+  select(cyl, mpg, everything()) |>
+  head()
 
 # By position
-mtcars |> select(1:3) |> head()
+mtcars |>
+  select(1:3) |>
+  head()
 
 # By pattern
-mtcars |> select(starts_with("d")) |> head()
+mtcars |>
+  select(starts_with("d")) |>
+  head()
 `}
 />
 
@@ -156,9 +166,9 @@ data(mtcars)
 
 mtcars |>
   mutate(
-    kpl       = mpg * 0.425144,        # km per liter
-    power_wt  = hp / wt,                # horsepower per ton-ish
-    is_heavy  = wt > 3.5                # logical
+    kpl       = mpg * 0.425144, # km per liter
+    power_wt  = hp / wt, # horsepower per ton-ish
+    is_heavy  = wt > 3.5 # logical
   ) |>
   select(mpg, kpl, power_wt, is_heavy) |>
   head()
@@ -191,13 +201,19 @@ mtcars |>
 data(mtcars)
 
 # Ascending
-mtcars |> arrange(mpg) |> head()
+mtcars |>
+  arrange(mpg) |>
+  head()
 
 # Descending
-mtcars |> arrange(desc(mpg)) |> head()
+mtcars |>
+  arrange(desc(mpg)) |>
+  head()
 
 # Multiple keys
-mtcars |> arrange(cyl, desc(mpg)) |> head()
+mtcars |>
+  arrange(cyl, desc(mpg)) |>
+  head()
 `}
 />
 
@@ -298,7 +314,7 @@ Using `dplyr` and the pipe, from `mtcars`:
   starterCode={`library(dplyr)
 data(mtcars)
 
-top_eff <- NULL   # build a pipeline that produces a data.frame
+top_eff <- NULL # build a pipeline that produces a data.frame
 
 print(top_eff)
 `}

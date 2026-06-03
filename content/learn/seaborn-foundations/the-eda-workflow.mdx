@@ -118,8 +118,9 @@ sns.displot(
     data=penguins,
     x="body_mass_g",
     bins=25,
-    kde=True,          # overlay a smooth density estimate
-    height=4, aspect=1.3,
+    kde=True,  # overlay a smooth density estimate
+    height=4,
+    aspect=1.3,
 )
 `}
 />
@@ -150,7 +151,8 @@ sns.relplot(
     x="flipper_length_mm",
     y="body_mass_g",
     hue="species",
-    height=4, aspect=1.3,
+    height=4,
+    aspect=1.3,
 )
 `}
 />

@@ -83,21 +83,31 @@ compare values more easily?
   starterCode={`import pandas as pd
 import plotly.express as px
 
-df = pd.DataFrame({
-    "category": ["A", "B", "C", "D", "E"],
-    "value":    [27, 24, 22, 19, 16],
-})
+df = pd.DataFrame(
+    {
+        "category": ["A", "B", "C", "D", "E"],
+        "value": [27, 24, 22, 19, 16],
+    }
+)
 
 # Pie chart — judging slice angles is hard.
-fig1 = px.pie(df, names="category", values="value",
-              template="simple_white",
-              title="Pie chart — guess each category's value")
+fig1 = px.pie(
+    df,
+    names="category",
+    values="value",
+    template="simple_white",
+    title="Pie chart — guess each category's value",
+)
 fig1.show()
 
 # Bar chart — judging bar lengths is easy.
-fig2 = px.bar(df, x="category", y="value",
-              template="simple_white",
-              title="Bar chart — same data, clearer comparison")
+fig2 = px.bar(
+    df,
+    x="category",
+    y="value",
+    template="simple_white",
+    title="Bar chart — same data, clearer comparison",
+)
 fig2.show()
 `}
 />

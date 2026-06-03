@@ -37,22 +37,22 @@ element is the result of `fn` applied to the original element.
 
 // "For each n, give me n * n."
 const squared = nums.map((n) => n * n);
-console.log(squared);    // [1, 4, 9, 16, 25]
+console.log(squared); // [1, 4, 9, 16, 25]
 
 // "For each user, give me their name."
 const users = [
-  { name: "Ada",   age: 28 },
+  { name: "Ada", age: 28 },
   { name: "Linus", age: 35 },
   { name: "Grace", age: 80 },
 ];
 
 const names = users.map((u) => u.name);
-console.log(names);      // ["Ada","Linus","Grace"]
+console.log(names); // ["Ada","Linus","Grace"]
 
 // "For each grade, format it as a percentage string."
 const grades = [0.92, 0.78, 0.65];
 const formatted = grades.map((g) => (g * 100).toFixed(1) + "%");
-console.log(formatted);  // ["92.0%","78.0%","65.0%"]
+console.log(formatted); // ["92.0%","78.0%","65.0%"]
 `}
 />
 
@@ -76,12 +76,12 @@ elements for which `fn` returns a truthy value.
   starterCode={`const nums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 const evens = nums.filter((n) => n % 2 === 0);
-console.log(evens);     // [2, 4, 6, 8, 10]
+console.log(evens); // [2, 4, 6, 8, 10]
 
 const users = [
-  { name: "Ada",   active: true,  age: 28 },
+  { name: "Ada", active: true, age: 28 },
   { name: "Linus", active: false, age: 35 },
-  { name: "Grace", active: true,  age: 80 },
+  { name: "Grace", active: true, age: 80 },
 ];
 
 const active = users.filter((u) => u.active);
@@ -92,8 +92,8 @@ console.log(seniors);
 
 // Remove falsy values from a mixed list:
 const messy = [0, "hello", "", null, "world", undefined, 7];
-const cleaned = messy.filter(Boolean);  // Boolean is a function — neat trick!
-console.log(cleaned);   // ["hello", "world", 7]
+const cleaned = messy.filter(Boolean); // Boolean is a function — neat trick!
+console.log(cleaned); // ["hello", "world", 7]
 `}
 />
 
@@ -119,19 +119,19 @@ arr.reduce(
 
 // Sum
 const total = nums.reduce((acc, n) => acc + n, 0);
-console.log(total);      // 15
+console.log(total); // 15
 
 // Product
 const product = nums.reduce((acc, n) => acc * n, 1);
-console.log(product);    // 120
+console.log(product); // 120
 
 // Maximum
 const max = nums.reduce((acc, n) => (n > acc ? n : acc), -Infinity);
-console.log(max);        // 5
+console.log(max); // 5
 
 // Count of evens (reduce can return any type)
 const evenCount = nums.reduce((acc, n) => (n % 2 === 0 ? acc + 1 : acc), 0);
-console.log(evenCount);  // 2
+console.log(evenCount); // 2
 
 // Build an object: grades by name.
 const grades = [
@@ -144,7 +144,7 @@ const byName = grades.reduce((acc, g) => {
   acc[g.name] = g.score;
   return acc;
 }, {});
-console.log(byName);     // { Ada: 90, Linus: 75, Grace: 100 }
+console.log(byName); // { Ada: 90, Linus: 75, Grace: 100 }
 `}
 />
 
@@ -166,11 +166,11 @@ a new array, so you can apply the next one immediately.
 <CodeBlock
   adapter="javascript"
   starterCode={`const orders = [
-  { id: 1, customer: "Ada",   amount: 120, status: "paid" },
-  { id: 2, customer: "Linus", amount: 80,  status: "cancelled" },
-  { id: 3, customer: "Ada",   amount: 60,  status: "paid" },
+  { id: 1, customer: "Ada", amount: 120, status: "paid" },
+  { id: 2, customer: "Linus", amount: 80, status: "cancelled" },
+  { id: 3, customer: "Ada", amount: 60, status: "paid" },
   { id: 4, customer: "Grace", amount: 200, status: "paid" },
-  { id: 5, customer: "Linus", amount: 50,  status: "paid" },
+  { id: 5, customer: "Linus", amount: 50, status: "paid" },
 ];
 
 // Total revenue from paid orders.
@@ -191,9 +191,11 @@ const totalsByCustomer = orders
 
 console.log("By customer:", totalsByCustomer);
 
-const top = Object.entries(totalsByCustomer)
-  .reduce((best, [customer, total]) => (total > best.total ? { customer, total } : best),
-          { customer: null, total: -Infinity });
+const top = Object.entries(totalsByCustomer).reduce(
+  (best, [customer, total]) =>
+    total > best.total ? { customer, total } : best,
+  { customer: null, total: -Infinity },
+);
 
 console.log("Top:", top);
 `}
@@ -213,23 +215,23 @@ A few more that follow the same functional spirit:
   starterCode={`const nums = [3, 1, 4, 1, 5, 9, 2, 6];
 
 // find: first element matching a predicate
-console.log(nums.find((n) => n > 4));        // 5
+console.log(nums.find((n) => n > 4)); // 5
 
 // findIndex: position of the first match (or -1)
-console.log(nums.findIndex((n) => n > 4));   // 4
+console.log(nums.findIndex((n) => n > 4)); // 4
 
 // some: does at least one element match?
-console.log(nums.some((n) => n > 8));        // true
-console.log(nums.some((n) => n > 100));      // false
+console.log(nums.some((n) => n > 8)); // true
+console.log(nums.some((n) => n > 100)); // false
 
 // every: do ALL elements match?
-console.log(nums.every((n) => n > 0));       // true
-console.log(nums.every((n) => n > 1));       // false
+console.log(nums.every((n) => n > 0)); // true
+console.log(nums.every((n) => n > 1)); // false
 
 // flatMap: map + flatten one level (great for "expand each element")
 const words = ["hello world", "fancy chairs"];
 const allTokens = words.flatMap((w) => w.split(" "));
-console.log(allTokens);   // ["hello","world","fancy","chairs"]
+console.log(allTokens); // ["hello","world","fancy","chairs"]
 `}
 />
 
@@ -329,11 +331,11 @@ Examples:
 }
 
 const products = [
-  { name: "Pen",       price: 2,  inStock: true  },
-  { name: "Notebook",  price: 5,  inStock: true  },
-  { name: "Laptop",    price: 999, inStock: true },
-  { name: "Eraser",    price: 1,  inStock: false },
-  { name: "Ink",       price: 8,  inStock: true  },
+  { name: "Pen", price: 2, inStock: true },
+  { name: "Notebook", price: 5, inStock: true },
+  { name: "Laptop", price: 999, inStock: true },
+  { name: "Eraser", price: 1, inStock: false },
+  { name: "Ink", price: 8, inStock: true },
 ];
 
 console.log(affordableInStock(products, 10));
@@ -346,11 +348,11 @@ console.log(affordableInStock(products, 10));
 }
 
 const products = [
-  { name: "Pen",       price: 2,  inStock: true  },
-  { name: "Notebook",  price: 5,  inStock: true  },
-  { name: "Laptop",    price: 999, inStock: true },
-  { name: "Eraser",    price: 1,  inStock: false },
-  { name: "Ink",       price: 8,  inStock: true  },
+  { name: "Pen", price: 2, inStock: true },
+  { name: "Notebook", price: 5, inStock: true },
+  { name: "Laptop", price: 999, inStock: true },
+  { name: "Eraser", price: 1, inStock: false },
+  { name: "Ink", price: 8, inStock: true },
 ];
 
 console.log(affordableInStock(products, 10));
