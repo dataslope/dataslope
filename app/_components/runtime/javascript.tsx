@@ -6,7 +6,7 @@ import type {
   PackageInfo,
   RunOptions,
 } from "../types";
-import { getWebFmt } from "./webFmt";
+import { getWebFmt, WEB_FMT_2SPACE } from "./webFmt";
 
 // JavaScript runs in a dedicated Web Worker backed by almostnode — a
 // browser-native Node.js runtime. The worker stages every open file
@@ -320,6 +320,8 @@ export const javascriptAdapter: LanguageAdapter = {
       "Runs in a Web Worker on top of almostnode — multi-file projects, require(), and 40+ shimmed Node.js modules (fs, path, http, crypto, …) work in the browser.",
   },
   codeMirrorMode: "javascript",
+  // web_fmt configured for 2-space indentation (see formatCode) — keep in sync.
+  indentWidth: 2,
   examples: EXAMPLES,
   packages: PACKAGES,
   exportFormats: [
@@ -354,7 +356,7 @@ export const javascriptAdapter: LanguageAdapter = {
   },
   async formatCode(code: string): Promise<string> {
     const { format } = await getWebFmt();
-    return format(code, "script.js");
+    return format(code, "script.js", WEB_FMT_2SPACE);
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Starting almostnode runtime…");

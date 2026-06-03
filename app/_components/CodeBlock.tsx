@@ -487,8 +487,11 @@ function CodeBlockInner({
         }),
         highlightActiveLineGutter(),
         highlightActiveLine(),
-        EditorState.tabSize.of(4),
-        indentUnit.of("    "),
+        // Indent width tracks the adapter's formatter (see
+        // LanguageAdapter.indentWidth) so Tab inserts what the
+        // "Format code" button would produce.
+        EditorState.tabSize.of(adapter.indentWidth),
+        indentUnit.of(" ".repeat(adapter.indentWidth)),
         EditorView.lineWrapping,
         keymap.of([
           {
@@ -586,8 +589,8 @@ function CodeBlockInner({
         EditorView.editable.of(false),
         drawSelection(),
         lineNumbersExt(),
-        EditorState.tabSize.of(4),
-        indentUnit.of("    "),
+        EditorState.tabSize.of(adapter.indentWidth),
+        indentUnit.of(" ".repeat(adapter.indentWidth)),
         EditorView.lineWrapping,
         languageComp.of([]),
         themeComp.of(themeFor(cmThemeNameFor(detectIsDark()))),

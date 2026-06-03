@@ -1302,8 +1302,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           highlightSelectionMatches(),
           rectangularSelection(),
           crosshairCursor(),
-          EditorState.tabSize.of(2),
-          indentUnit.of("  "),
+          // Indent width tracks the adapter's formatter (see
+          // LanguageAdapter.indentWidth) so Tab matches the Format button.
+          EditorState.tabSize.of(adapter.indentWidth),
+          indentUnit.of(" ".repeat(adapter.indentWidth)),
           autocompletion({
             override: [completionSource],
             activateOnTyping: false,

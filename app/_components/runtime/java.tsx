@@ -671,6 +671,8 @@ export const javaAdapter: LanguageAdapter = {
   // CodeMirror's clike mode handles Java syntax. `text/x-java` is the
   // standard MIME alias for Java inside that mode.
   codeMirrorMode: "text/x-java",
+  // clang-format LLVM style (see formatCode) — keep in sync.
+  indentWidth: 2,
   examples: EXAMPLES,
   packages: PACKAGES,
   exportFormats: [

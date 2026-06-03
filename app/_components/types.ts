@@ -150,6 +150,13 @@ export interface LanguageAdapter {
   runtimeInfo: RuntimeInfo;
   /** CodeMirror language mode (e.g. "python", "r"). */
   codeMirrorMode: string;
+  /** Number of spaces used for one indentation level. This MUST match
+   *  the indent width produced by the adapter's `formatCode` formatter
+   *  so the editor's Tab key inserts exactly what the formatter emits
+   *  (e.g. Python/ruff = 4, JS/TS/web_fmt = 2, C/C++/Java/clang LLVM = 2,
+   *  C#/clang Microsoft = 4, PHP/mago = 4, R/styler = 2). The editor's
+   *  `tabSize` and `indentUnit` are both derived from this value. */
+  indentWidth: number;
   examples: ExampleSnippet[];
   packages: PackageInfo[];
   /** Output channels that this runtime can emit beyond plain text.

@@ -539,6 +539,8 @@ export const cAdapter: LanguageAdapter = {
   // CodeMirror's clike mode handles C syntax. `text/x-csrc` is the
   // standard MIME alias for C inside that mode.
   codeMirrorMode: "text/x-csrc",
+  // clang-format LLVM style (see formatCode) — keep in sync.
+  indentWidth: 2,
   examples: EXAMPLES,
   packages: PACKAGES,
   exportFormats: [

@@ -1192,6 +1192,8 @@ export const rAdapter: LanguageAdapter = {
     notes: "Runs entirely in the browser via WebAssembly — no server roundtrip.",
   },
   codeMirrorMode: "r",
+  // styler's tidyverse style (see formatCode) — keep in sync.
+  indentWidth: 2,
   examples: EXAMPLES,
   packages: PACKAGES,
   outputCapabilities: { dataframes: true, figures: true },

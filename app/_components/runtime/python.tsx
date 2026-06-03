@@ -777,6 +777,8 @@ export const pythonAdapter: LanguageAdapter = {
     notes: "Runs in a Web Worker so the UI stays responsive while your code executes.",
   },
   codeMirrorMode: "python",
+  // ruff_fmt (PEP 8) (see formatCode) — keep in sync.
+  indentWidth: 4,
   examples: EXAMPLES,
   packages: PACKAGES,
   outputCapabilities: { dataframes: true, charts: true, figures: true },
