@@ -4,7 +4,7 @@
 **Purpose:** A curated, license-verified catalogue of small "evergreen" datasets that DataSlope can **re-host in a public GitHub repo** and use across its courses (Pandas, data visualization, scientific computing, statistics, machine learning, NLP, time series, R, and SQL).
 **Special focus:** multi-table relational datasets for the SQL courses.
 
-**Methodology:** Five parallel research agents fanned out across the web; every license claim was checked against a primary source (the actual `LICENSE` file, dataset page, or terms-of-use page), not from memory. The nine most load-bearing claims (Chinook, Sakila, Northwind, UCI, Palmer Penguins, FiveThirtyEight, seaborn-data, diamonds→Zenodo, SILSO) were then independently re-verified by hand. **A second pass (§14–§15)** added ~50 more *standalone* datasets — from Kaggle, a broader UCI sweep, the Hugging Face Hub, government/institutional portals, and data hubs — under the same discipline (MovieLens's non-commercial terms, `banking77`'s CC BY 4.0, and Natural Earth's public-domain status were hand-checked). A third pass (§16) catalogues **scraped / legally gray-area** datasets — *for awareness only* — each with its specific risk and a clean substitute. A fourth pass (§17) adds ~90 more real-world datasets browsed from GitHub, museums/libraries, sports & science sites, and civic/transit portals. Source URLs are cited inline and collected at the end.
+**Methodology:** Five parallel research agents fanned out across the web; every license claim was checked against a primary source (the actual `LICENSE` file, dataset page, or terms-of-use page), not from memory. The nine most load-bearing claims (Chinook, Sakila, Northwind, UCI, Palmer Penguins, FiveThirtyEight, seaborn-data, diamonds→Zenodo, SILSO) were then independently re-verified by hand. **A second pass (§14–§15)** added ~50 more *standalone* datasets — from Kaggle, a broader UCI sweep, the Hugging Face Hub, government/institutional portals, and data hubs — under the same discipline (MovieLens's non-commercial terms, `banking77`'s CC BY 4.0, and Natural Earth's public-domain status were hand-checked). A third pass (§16) catalogues **scraped / legally gray-area** datasets — *for awareness only* — each with its specific risk and a clean substitute. A fourth pass (§17) adds ~90 more real-world datasets browsed from GitHub, museums/libraries, sports & science sites, and civic/transit portals. A fifth pass (§18) adds ~70 more **English-language** datasets across US-federal, finance, health, text/legal, and computer-vision sources. Source URLs are cited inline and collected at the end.
 
 ---
 
@@ -512,7 +512,7 @@ Treat every entry below as 🔴 (or the 🔴🔴 privacy tier in §16.8).
 
 | Dataset | Scraped from | The specific issue | Cleaner alternative |
 | --- | --- | --- | --- |
-| News Category (HuffPost), All the News, A Million News Headlines (ABC) | News publishers | **A CC license on the *paper* ≠ a license on the headline/article text**; publisher copyright (full-article sets like *All the News* are the riskiest) | **GDELT** (open); Reuters / RCV1 (research license); **20 Newsgroups** (public-domain Usenet) |
+| News Category (HuffPost), All the News, A Million News Headlines (ABC) | News publishers | **A CC license on the *paper* ≠ a license on the headline/article text**; publisher copyright (full-article sets like *All the News* are the riskiest) | **GDELT** (open); Reuters / RCV1 (research license); **20 Newsgroups** (widely used but no clear license — see §18.2) |
 | AG News | 2,000+ outlets via an academic engine | Source terms are **non-commercial**; HF license listed "unknown" | 20 Newsgroups; GDELT |
 
 ### 16.6 Web-scale text corpora (LLM pretraining)
@@ -561,7 +561,7 @@ The obvious "big web" sources are **openly licensed**, not illegally scraped:
 | Baseball / sports stats | **Retrosheet** (commercial OK) · Lahman (CC BY-SA) · nflverse (CC BY 4.0) · OpenPowerlifting (PD) |
 | Product-review NLP | UCI Sentiment Sentences (CC BY) |
 | Tweets / social sentiment | UCI SMS Spam · SST-2 (research) |
-| News classification | GDELT (open) · 20 Newsgroups (public domain) |
+| News classification | GDELT (open) · arXiv abstracts (CC0) · 20 Newsgroups (unlicensed — verify) |
 | LLM text corpus | Common Corpus / Common Pile (clean) · Wikipedia · Gutenberg |
 | Books (full text) | Project Gutenberg · Standard Ebooks · Open Library (CC0) |
 | Housing prices | Redfin Data Center · Census ACS / HUD (PD) · Ames Housing (§3) |
@@ -666,7 +666,77 @@ Evergreen (historical art/artifacts), mostly **CC0**, and many ship as multiple 
 
 ---
 
-## 18. Sources (primary, hand-verified in **bold**)
+## 18. English-language real-world datasets (fifth pass — US-federal · finance · health · text/legal · CV)
+
+English-scoped per request (English-language text corpora; English-documented tabular data). ~70 more datasets. Hand-verified this pass: Caselaw Access Project (CC0), Open Brewery DB (MIT), Google QuickDraw (CC BY 4.0), US Treasury yield curve (CC0), Natural Earth (earlier) — plus the **20 Newsgroups** correction to §16 (it's widely used but carries no clear license grant).
+
+### 18.1 US federal public-domain data (mostly 17 U.S.C. §105)
+
+A deep, clean vein — US federal works carry no copyright. Best small picks:
+
+| Dataset | License | Size | Course |
+| --- | --- | --- | --- |
+| **NPS Park Visitation** ⭐ | CC0 | ~2,900 rows | Beginner EDA / time series |
+| **FDIC failed-bank list** | US-gov PD | ~600 rows | Pandas/SQL |
+| **EIA Henry Hub gas price** | US-gov PD | ~7K rows | Time series, regression |
+| **US Treasury yield curve** ⭐ | **CC0** | ~8K rows (daily, 1990–) | Time series, finance |
+| Treasury "Debt to the Penny" · BEA GDP/NIPA | US-gov PD | small | Time series |
+| USGS Mineral Commodity Summaries | CC0 | tiny | Stats/viz |
+| IRS SOI ZIP-code tax data | US-gov PD | ~166K/yr | Geographic income, SQL |
+| **NOAA Storm Events** | CC0 (subset 1996–) | ~1M (subset) | Time series, multi-table |
+| **NHTSA FARS** fatal crashes | US-gov PD | ~40K/yr, **25 tables** | SQL joins |
+| FAA aircraft registry · NHTSA ODI complaints | US-gov PD | 350K / 2M (subset) | Pandas, NLP (complaint text) |
+
+⚠️ **Caution:** **College Scorecard** is **CC BY** (attribution, *not* PD); **NHTSA VPIC** carries an "unknown license" tag on data.gov (verify); **USAspending** is ~1.5 TB (subset hard); CMS files can embed **AHA-copyrighted UB-04** codes (the Hospital General Info file is clean).
+
+### 18.2 English text / NLP / legal corpora
+
+| Dataset | License | Tier | Notes |
+| --- | --- | --- | --- |
+| **Caselaw Access Project** ⭐ | **CC0** (restrictions lifted Mar 2024) | 🟢A | 6.6M US court decisions (subset by state/era) |
+| **arXiv metadata** | CC0 | 🟢A | ~1.7M STEM abstracts → topic classification |
+| **Gutenberg Poetry Corpus** | CC0 | 🟢A | 3M lines English poetry |
+| US legal/gov text (US Code · Federal Register · bills · SCOTUS) | US-gov PD | 🟢A | Legal NLP |
+| **Google Books Ngrams** (standard) | CC BY 3.0 | 🟢B | Word-frequency history *(NOT the syntactic ngrams — those are CC BY-NC-SA)* |
+| **CMU Pronouncing Dictionary** | BSD-2 | 🟢B | 134K words → phonetics |
+| SCOWL · dwyl/english-words | permissive / Unlicense | 🟢B | Word lists |
+| UD English Web Treebank · UK Hansard · CourtListener | CC BY-SA / Open Parliament / CC BY-ND | 🟡C | Parsing / legislative / case law |
+
+🔴 **AVOID:** **20 Newsgroups** (no license grant — author copyright; common but unverified), **google-10000-english** (LDC-restricted), **CNN/DailyMail** (news copyright), **Reuters-21578 / Brown Corpus** (research-only), **AG News** (non-commercial), Google Ngrams **syntactic** variant (CC BY-NC-SA).
+
+### 18.3 Finance / economics
+
+> **The stock-price problem:** recent market prices are almost never redistributable — exchanges + S&P/Dow Jones index copyright + ToS stack up. **FRED rule:** series tagged *"Public Domain: Citation Requested"* (Treasury/BLS/BEA — DGS10, UNRATE, GDPC1) are fine; *"Copyright"*-tagged series (SP500, DJIA, Case-Shiller) are **not**.
+
+🟢 **Clean:** US Treasury yield curve (CC0) & debt (PD), BEA GDP (PD), **EIA energy prices** (PD), **FDIC** bank/failed-bank lists (PD), FRED public-domain series, **Open Brewery DB** (MIT — nice SQL set), **OECD** indicators (CC BY 4.0, post-2024). 🟡 **DataHub packages** (PDDL): 10-yr bond yields, gold, exchange rates, and the **Shiller S&P 500 monthly back to 1871** — *truncate at 2023-06* (later rows are tainted by the copyrighted FRED SP500 series).
+🔴 **AVOID:** Yahoo Finance & Bloomberg (no redistribution), **IMF** (non-commercial), Nasdaq Data Link / Quandl, DataHub **nasdaq-listings** (NASDAQ © despite the PDDL tag), DataHub **S&P 500 constituents** (Wikipedia CC BY-SA + goes stale).
+
+### 18.4 Aggregate health data (US-gov public domain)
+
+Use the *aggregate* CDC/CMS tables (clean PD); avoid individual-level/credentialed files.
+
+| Dataset | License | Notes |
+| --- | --- | --- |
+| **NCHS Leading Causes of Death** ⭐ | US-gov PD | ~10K rows — excellent beginner set |
+| **CMS Medicare Part D drug spending** | US-gov PD | ~4K rows — drug-pricing analysis |
+| **CMS Hospital Care Compare** (general info) | US-gov PD | ~5K hospitals — joins/groupby |
+| CDC **PLACES** · **Chronic Disease Indicators** | US-gov PD | County/tract health estimates → stats/ML/choropleths |
+| NCHS Drug Poisoning · CDC SchoolVaxView | US-gov PD | Time series, demographics |
+| **Project Tycho** | ODbL 🟡C | 125 yrs of US disease surveillance (1888–2013) |
+
+🔴 **AVOID / restricted:** **NHANES** (raw-microdata DUA bars commercial use → use the CDC Socrata tables instead), **SEER / HCUP / MIMIC** (credentialed DUAs), **IHME / Global Burden of Disease** (CC BY-NC-ND), CDC **WONDER** raw query outputs (statutory ambiguity → use the pre-aggregated Socrata datasets).
+
+### 18.5 "Fun" tabular + clean computer-vision
+
+**Fun tabular:** **Bob Ross paintings** (CC BY 4.0 — 403 episodes' visual elements), **Open Brewery DB** (MIT), **Stanford Open Policing** (ODC-BY — use a single-state slice; full corpus is huge).
+
+**Computer vision (clean):** **Google QuickDraw** (CC BY 4.0 — 50M sketches, subset), **Caltech-101** (CC BY 4.0), **USGS Landsat** (US-gov PD) & **Copernicus Sentinel** (open licence) satellite imagery, **COCO *annotations*** (CC BY 4.0). 🟡 **Oxford-IIIT Pet** (CC BY-SA, copyleft).
+
+🔴 **AVOID:** **ImageNet · SVHN · Places365 · Stanford Dogs/Cars** (non-commercial / research-only), **CelebA · LFW · MS-Celeb** (non-commercial + face PII), **COCO images** (Flickr terms — annotations are fine, images aren't), **Oxford Flowers-102** (no stated license); and scraped "fun" sets: **TheCocktailDB/TheMealDB** (ToS), **Coffee Quality DB** (scraped CQI), **80 Cereals** (Consumer Reports ©), **NUFORC UFO** (scraped), **BoardGameGeek** (commercial license required), **AKC dog breeds** (scraped).
+
+---
+
+## 19. Sources (primary, hand-verified in **bold**)
 
 **SQL / multi-table**
 - **Chinook — MIT:** <https://github.com/lerocha/chinook-database/blob/master/LICENSE.md>
@@ -717,6 +787,14 @@ Evergreen (historical art/artifacts), mostly **CC0**, and many ship as multiple 
 - Science / ML: OpenFDA (CC0) <https://open.fda.gov/license/> · SEC EDGAR financials (US PD) <https://www.sec.gov/data-research/sec-markets-data/financial-statement-data-sets> · NASA Meteorite Landings <https://data.nasa.gov/dataset/meteorite-landings> · Fashion-MNIST (MIT) <https://github.com/zalandoresearch/fashion-mnist> · LibriSpeech (CC BY 4.0) <https://www.openslr.org/12/> · WHO GHO (CC BY-NC-SA) <https://www.who.int/about/policies/publishing/copyright> · ESC-50 (CC BY-NC) <https://github.com/karolpiczak/ESC-50>
 - Civic / transit / geo: SF DataSF (PDDL) <https://www.sf.gov/reports/april-2017/datasf-terms-use> · NYC Open Data <https://opendata.cityofnewyork.us/faq/> · IANA tz DB (PD) <https://data.iana.org/time-zones/tzdb/LICENSE> · US NTD GTFS public-domain rule <https://catalog.data.gov/dataset/2023-ntd-annual-data-general-transit-feed-specification-gtfs-weblinks> · OSM (ODbL) <https://www.openstreetmap.org/copyright>
 - GitHub / aggregators: the-pudding/data (MIT) <https://github.com/the-pudding/data> · BuzzFeedNews NICS (MIT) <https://github.com/BuzzFeedNews/nics-firearm-background-checks> · JHU COVID (CC BY 4.0) <https://github.com/CSSEGISandData/COVID-19> · Tatoeba (CC BY 2.0) <https://tatoeba.org/en/downloads> · WaPo police-shootings (CC BY-NC-SA) <https://github.com/washingtonpost/data-police-shootings>
+
+**Fifth pass — English: US-federal / finance / health / text-legal / CV**
+- **Caselaw Access Project — CC0:** <https://huggingface.co/datasets/free-law/Caselaw_Access_Project> (Mar-2024 restriction lift: <https://lil.law.harvard.edu/blog/2024/03/26/transitions-for-the-caselaw-access-project/>) · **Open Brewery DB — MIT:** <https://github.com/openbrewerydb/openbrewerydb> · **Google QuickDraw — CC BY 4.0:** <https://github.com/googlecreativelab/quickdraw-dataset/blob/master/LICENSE>
+- US federal (public domain): EIA reuse policy <https://www.eia.gov/about/copyrights_reuse.php> · BEA <https://www.bea.gov/help/faq/147> · USGS <https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits> · Treasury yield curve (CC0) <https://catalog.data.gov/dataset/interest-rate-statistics-daily-treasury-yield-curve-rates> · NPS visitation (CC0) <https://catalog.data.gov/dataset/nps-visitor-use-statistics-data-package-2024> · FDIC <https://catalog.data.gov/dataset/fdic-bankfind-suite-api> · NHTSA FARS <https://catalog.data.gov/dataset/fatality-analysis-reporting-system-fars> · College Scorecard (CC BY) <https://data.ed.gov/dataset/college-scorecard-all-data-files>
+- Text/legal: arXiv (CC0) <https://info.arxiv.org/help/license/index.html> · Gutenberg Poetry (CC0) <https://github.com/aparrish/gutenberg-poetry-corpus> · Google Books Ngrams (CC BY 3.0) <https://storage.googleapis.com/books/ngrams/books/datasetsv3.html> · CMUdict <https://github.com/cmusphinx/cmudict> · CourtListener/Free Law <https://free.law/datasets/> · UK Hansard / Open Parliament Licence <https://www.parliament.uk/site-information/copyright-parliament/open-parliament-licence/>
+- Finance: FRED legal (per-series ©) <https://fred.stlouisfed.org/legal/> · DataHub S&P 500 (Shiller) <https://github.com/datasets/s-and-p-500> · IMF (non-commercial) <https://www.imf.org/en/about/copyright-and-terms> · OECD (CC BY 4.0) <https://www.oecd.org/en/about/terms-conditions.html>
+- Health: NCHS Leading Causes (US-gov works) <https://catalog.data.gov/dataset/nchs-leading-causes-of-death-united-states> · CMS provider data <https://data.cms.gov/provider-data/topics/hospitals> · Project Tycho (ODbL) <https://catalog.data.gov/dataset/project-tycho-level-1-data> · IHME (CC BY-NC) <https://www.healthdata.org/data-tools-practices/data-practices/terms-and-conditions> · NCHS data-user agreement <https://www.cdc.gov/nchs/policy/data-user-agreement.html>
+- CV: USGS Landsat (PD) <https://www.usgs.gov/faqs/are-there-any-restrictions-use-or-redistribution-landsat-data> · Caltech-101 (CC BY 4.0) <https://data.caltech.edu/records/mzrjq-6wc02> · ImageNet (non-commercial) <https://image-net.org/accessagreement> · COCO (annotations CC BY; images Flickr) <https://cocodataset.org/> · Bob Ross (CC BY 4.0) <https://github.com/fivethirtyeight/data/tree/master/bob-ross>
 
 ---
 
