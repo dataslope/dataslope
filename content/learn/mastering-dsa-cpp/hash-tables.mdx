@@ -22,11 +22,11 @@ flowchart TD
 #include <string>
 
 int main() {
-    std::string key = "apple";
-    std::size_t capacity = 8;
-    std::size_t h = std::hash<std::string>{}(key);
-    std::cout << "bucket = " << (h % capacity) << "\n";
-    return 0;
+  std::string key = "apple";
+  std::size_t capacity = 8;
+  std::size_t h = std::hash<std::string>{}(key);
+  std::cout << "bucket = " << (h % capacity) << "\\n";
+  return 0;
 }
 `}
 />
@@ -58,17 +58,18 @@ flowchart LR
 #include <vector>
 
 int main() {
-    std::vector<std::list<std::pair<std::string, int>>> buckets(4);
-    buckets[1].push_back({"cat", 2});
-    buckets[1].push_back({"act", 5});
-    buckets[2].push_back({"dog", 7});
+  std::vector<std::list<std::pair<std::string, int>>> buckets(4);
+  buckets[1].push_back({"cat", 2});
+  buckets[1].push_back({"act", 5});
+  buckets[2].push_back({"dog", 7});
 
-    for (std::size_t i = 0; i < buckets.size(); i++) {
-        std::cout << "bucket " << i << ":";
-        for (const auto& [key, value] : buckets[i]) std::cout << " " << key << "=" << value;
-        std::cout << "\n";
-    }
-    return 0;
+  for (std::size_t i = 0; i < buckets.size(); i++) {
+    std::cout << "bucket " << i << ":";
+    for (const auto &[key, value] : buckets[i])
+      std::cout << " " << key << "=" << value;
+    std::cout << "\\n";
+  }
+  return 0;
 }
 `}
 />
@@ -92,21 +93,22 @@ flowchart TD
 #include <vector>
 
 int main() {
-    std::vector<std::optional<std::string>> table(7);
-    auto insert = [&](const std::string& key, std::size_t h) {
-        for (std::size_t step = 0; step < table.size(); step++) {
-            std::size_t i = (h + step) % table.size();
-            if (!table[i]) {
-                table[i] = key;
-                return;
-            }
-        }
-    };
-    insert("ant", 2);
-    insert("bat", 2);
-    insert("cat", 2);
-    for (std::size_t i = 0; i < table.size(); i++) std::cout << i << ":" << (table[i] ? *table[i] : "empty") << "\n";
-    return 0;
+  std::vector<std::optional<std::string>> table(7);
+  auto insert = [&](const std::string &key, std::size_t h) {
+    for (std::size_t step = 0; step < table.size(); step++) {
+      std::size_t i = (h + step) % table.size();
+      if (!table[i]) {
+        table[i] = key;
+        return;
+      }
+    }
+  };
+  insert("ant", 2);
+  insert("bat", 2);
+  insert("cat", 2);
+  for (std::size_t i = 0; i < table.size(); i++)
+    std::cout << i << ":" << (table[i] ? *table[i] : "empty") << "\\n";
+  return 0;
 }
 `}
 />
@@ -131,16 +133,16 @@ flowchart TD
 #include <unordered_map>
 
 int main() {
-    std::unordered_map<std::string, int> score;
-    score.max_load_factor(0.7f);
-    score.reserve(10);
-    score["alice"] = 90;
-    score["bob"] = 85;
-    score["cara"] = 92;
-    std::cout << "size = " << score.size() << "\n";
-    std::cout << "buckets = " << score.bucket_count() << "\n";
-    std::cout << "load = " << score.load_factor() << "\n";
-    return 0;
+  std::unordered_map<std::string, int> score;
+  score.max_load_factor(0.7f);
+  score.reserve(10);
+  score["alice"] = 90;
+  score["bob"] = 85;
+  score["cara"] = 92;
+  std::cout << "size = " << score.size() << "\\n";
+  std::cout << "buckets = " << score.bucket_count() << "\\n";
+  std::cout << "load = " << score.load_factor() << "\\n";
+  return 0;
 }
 `}
 />
@@ -157,19 +159,21 @@ int main() {
 #include <unordered_set>
 
 int main() {
-    std::unordered_map<std::string, int> ages;
-    ages["Ada"] = 36;
-    ages.insert({"Grace", 85});
-    ages["Ada"]++;
-    if (ages.find("Grace") != ages.end()) std::cout << "Grace found\n";
-    std::cout << "Ada count? " << ages.count("Ada") << "\n";
-    for (const auto& [name, age] : ages) std::cout << name << " " << age << "\n";
-    ages.erase("Grace");
+  std::unordered_map<std::string, int> ages;
+  ages["Ada"] = 36;
+  ages.insert({"Grace", 85});
+  ages["Ada"]++;
+  if (ages.find("Grace") != ages.end())
+    std::cout << "Grace found\\n";
+  std::cout << "Ada count? " << ages.count("Ada") << "\\n";
+  for (const auto &[name, age] : ages)
+    std::cout << name << " " << age << "\\n";
+  ages.erase("Grace");
 
-    std::unordered_set<int> seen;
-    seen.insert(10);
-    std::cout << seen.count(10) << "\n";
-    return 0;
+  std::unordered_set<int> seen;
+  seen.insert(10);
+  std::cout << seen.count(10) << "\\n";
+  return 0;
 }
 `}
 />
@@ -186,13 +190,16 @@ int main() {
 #include <unordered_map>
 
 int main() {
-    std::map<std::string, int> ordered = {{"pear", 2}, {"apple", 5}, {"kiwi", 3}};
-    std::unordered_map<std::string, int> hashed = {{"pear", 2}, {"apple", 5}, {"kiwi", 3}};
-    std::cout << "map order:\n";
-    for (const auto& [k, v] : ordered) std::cout << k << "=" << v << "\n";
-    std::cout << "unordered_map order:\n";
-    for (const auto& [k, v] : hashed) std::cout << k << "=" << v << "\n";
-    return 0;
+  std::map<std::string, int> ordered = {{"pear", 2}, {"apple", 5}, {"kiwi", 3}};
+  std::unordered_map<std::string, int> hashed = {
+      {"pear", 2}, {"apple", 5}, {"kiwi", 3}};
+  std::cout << "map order:\\n";
+  for (const auto &[k, v] : ordered)
+    std::cout << k << "=" << v << "\\n";
+  std::cout << "unordered_map order:\\n";
+  for (const auto &[k, v] : hashed)
+    std::cout << k << "=" << v << "\\n";
+  return 0;
 }
 `}
 />
@@ -211,22 +218,25 @@ int main() {
 #include <unordered_set>
 
 struct Point {
-    int x;
-    int y;
-    bool operator==(const Point& other) const { return x == other.x && y == other.y; }
+  int x;
+  int y;
+  bool operator==(const Point &other) const {
+    return x == other.x && y == other.y;
+  }
 };
 
 struct PointHash {
-    std::size_t operator()(const Point& p) const {
-        return static_cast<std::size_t>(p.x) * 1'000'003u ^ static_cast<std::size_t>(p.y);
-    }
+  std::size_t operator()(const Point &p) const {
+    return static_cast<std::size_t>(p.x) * 1'000'003u ^
+           static_cast<std::size_t>(p.y);
+  }
 };
 
 int main() {
-    std::unordered_set<Point, PointHash> points;
-    points.insert({2, 3});
-    std::cout << points.count({2, 3}) << "\n";
-    return 0;
+  std::unordered_set<Point, PointHash> points;
+  points.insert({2, 3});
+  std::cout << points.count({2, 3}) << "\\n";
+  return 0;
 }
 `}
 />
@@ -243,13 +253,15 @@ Frequency counting maps each value to a count.
 #include <unordered_map>
 
 int main() {
-    std::string sentence = "to be or not to be";
-    std::istringstream in(sentence);
-    std::unordered_map<std::string, int> freq;
-    std::string word;
-    while (in >> word) freq[word]++;
-    for (const auto& [w, count] : freq) std::cout << w << ":" << count << "\n";
-    return 0;
+  std::string sentence = "to be or not to be";
+  std::istringstream in(sentence);
+  std::unordered_map<std::string, int> freq;
+  std::string word;
+  while (in >> word)
+    freq[word]++;
+  for (const auto &[w, count] : freq)
+    std::cout << w << ":" << count << "\\n";
+  return 0;
 }
 `}
 />
@@ -263,18 +275,18 @@ Two Sum stores values already seen, then asks whether the complement exists.
 #include <vector>
 
 int main() {
-    std::vector<int> nums = {2, 7, 11, 15};
-    int target = 9;
-    std::unordered_map<int, int> indexOf;
-    for (int i = 0; i < static_cast<int>(nums.size()); i++) {
-        int need = target - nums[i];
-        if (indexOf.count(need)) {
-            std::cout << indexOf[need] << " " << i << "\n";
-            break;
-        }
-        indexOf[nums[i]] = i;
+  std::vector<int> nums = {2, 7, 11, 15};
+  int target = 9;
+  std::unordered_map<int, int> indexOf;
+  for (int i = 0; i < static_cast<int>(nums.size()); i++) {
+    int need = target - nums[i];
+    if (indexOf.count(need)) {
+      std::cout << indexOf[need] << " " << i << "\\n";
+      break;
     }
-    return 0;
+    indexOf[nums[i]] = i;
+  }
+  return 0;
 }
 `}
 />
@@ -290,19 +302,20 @@ Group anagrams by sorting each word to form a canonical key.
 #include <vector>
 
 int main() {
-    std::vector<std::string> words = {"eat", "tea", "tan", "ate", "nat", "bat"};
-    std::unordered_map<std::string, std::vector<std::string>> groups;
-    for (const std::string& word : words) {
-        std::string key = word;
-        std::sort(key.begin(), key.end());
-        groups[key].push_back(word);
-    }
-    for (const auto& [key, group] : groups) {
-        std::cout << key << ":";
-        for (const std::string& word : group) std::cout << " " << word;
-        std::cout << "\n";
-    }
-    return 0;
+  std::vector<std::string> words = {"eat", "tea", "tan", "ate", "nat", "bat"};
+  std::unordered_map<std::string, std::vector<std::string>> groups;
+  for (const std::string &word : words) {
+    std::string key = word;
+    std::sort(key.begin(), key.end());
+    groups[key].push_back(word);
+  }
+  for (const auto &[key, group] : groups) {
+    std::cout << key << ":";
+    for (const std::string &word : group)
+      std::cout << " " << word;
+    std::cout << "\\n";
+  }
+  return 0;
 }
 `}
 />
@@ -318,16 +331,16 @@ int main() {
 #include <utility>
 #include <vector>
 
-std::pair<int, int> twoSum(const std::vector<int>& nums, int target) {
-    // your code here
-    return {-1, -1};
+std::pair<int, int> twoSum(const std::vector<int> &nums, int target) {
+  // your code here
+  return {-1, -1};
 }
 
 int main() {
-    std::vector<int> nums = {2, 7, 11, 15};
-    auto ans = twoSum(nums, 9);
-    std::cout << ans.first << " " << ans.second << "\n";
-    return 0;
+  std::vector<int> nums = {2, 7, 11, 15};
+  auto ans = twoSum(nums, 9);
+  std::cout << ans.first << " " << ans.second << "\\n";
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
@@ -335,21 +348,22 @@ int main() {
 #include <utility>
 #include <vector>
 
-std::pair<int, int> twoSum(const std::vector<int>& nums, int target) {
-    std::unordered_map<int, int> index;
-    for (int i = 0; i < static_cast<int>(nums.size()); i++) {
-        int need = target - nums[i];
-        if (index.count(need)) return {index[need], i};
-        index[nums[i]] = i;
-    }
-    return {-1, -1};
+std::pair<int, int> twoSum(const std::vector<int> &nums, int target) {
+  std::unordered_map<int, int> index;
+  for (int i = 0; i < static_cast<int>(nums.size()); i++) {
+    int need = target - nums[i];
+    if (index.count(need))
+      return {index[need], i};
+    index[nums[i]] = i;
+  }
+  return {-1, -1};
 }
 
 int main() {
-    std::vector<int> nums = {2, 7, 11, 15};
-    auto ans = twoSum(nums, 9);
-    std::cout << ans.first << " " << ans.second << "\n";
-    return 0;
+  std::vector<int> nums = {2, 7, 11, 15};
+  auto ans = twoSum(nums, 9);
+  std::cout << ans.first << " " << ans.second << "\\n";
+  return 0;
 }
 `}
   tests={[{ id: "two-sum", name: "Finds indices", expect: { stdoutEquals: "0 1" } }]}
@@ -366,15 +380,15 @@ int main() {
 #include <unordered_map>
 #include <vector>
 
-std::string mostFrequentWord(const std::vector<std::string>& words) {
-    // your code here
-    return "";
+std::string mostFrequentWord(const std::vector<std::string> &words) {
+  // your code here
+  return "";
 }
 
 int main() {
-    std::vector<std::string> words = {"pear", "apple", "pear", "banana", "apple"};
-    std::cout << mostFrequentWord(words) << "\n";
-    return 0;
+  std::vector<std::string> words = {"pear", "apple", "pear", "banana", "apple"};
+  std::cout << mostFrequentWord(words) << "\\n";
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
@@ -382,24 +396,25 @@ int main() {
 #include <unordered_map>
 #include <vector>
 
-std::string mostFrequentWord(const std::vector<std::string>& words) {
-    std::unordered_map<std::string, int> freq;
-    for (const std::string& word : words) freq[word]++;
-    std::string best;
-    int bestCount = -1;
-    for (const auto& [word, count] : freq) {
-        if (count > bestCount || (count == bestCount && word < best)) {
-            best = word;
-            bestCount = count;
-        }
+std::string mostFrequentWord(const std::vector<std::string> &words) {
+  std::unordered_map<std::string, int> freq;
+  for (const std::string &word : words)
+    freq[word]++;
+  std::string best;
+  int bestCount = -1;
+  for (const auto &[word, count] : freq) {
+    if (count > bestCount || (count == bestCount && word < best)) {
+      best = word;
+      bestCount = count;
     }
-    return best;
+  }
+  return best;
 }
 
 int main() {
-    std::vector<std::string> words = {"pear", "apple", "pear", "banana", "apple"};
-    std::cout << mostFrequentWord(words) << "\n";
-    return 0;
+  std::vector<std::string> words = {"pear", "apple", "pear", "banana", "apple"};
+  std::cout << mostFrequentWord(words) << "\\n";
+  return 0;
 }
 `}
   tests={[{ id: "tie", name: "Breaks ties lexicographically", expect: { stdoutEquals: "apple" } }]}
@@ -415,38 +430,39 @@ int main() {
 #include <unordered_map>
 #include <vector>
 
-bool containsNearbyDuplicate(const std::vector<int>& v, int k) {
-    // your code here
-    return false;
+bool containsNearbyDuplicate(const std::vector<int> &v, int k) {
+  // your code here
+  return false;
 }
 
 int main() {
-    std::cout << std::boolalpha;
-    std::cout << containsNearbyDuplicate({1, 2, 3, 1}, 3) << "\n";
-    std::cout << containsNearbyDuplicate({1, 0, 1, 1}, 1) << "\n";
-    std::cout << containsNearbyDuplicate({1, 2, 3, 1, 2, 3}, 2) << "\n";
-    return 0;
+  std::cout << std::boolalpha;
+  std::cout << containsNearbyDuplicate({1, 2, 3, 1}, 3) << "\\n";
+  std::cout << containsNearbyDuplicate({1, 0, 1, 1}, 1) << "\\n";
+  std::cout << containsNearbyDuplicate({1, 2, 3, 1, 2, 3}, 2) << "\\n";
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 #include <unordered_map>
 #include <vector>
 
-bool containsNearbyDuplicate(const std::vector<int>& v, int k) {
-    std::unordered_map<int, int> last;
-    for (int i = 0; i < static_cast<int>(v.size()); i++) {
-        if (last.count(v[i]) && i - last[v[i]] <= k) return true;
-        last[v[i]] = i;
-    }
-    return false;
+bool containsNearbyDuplicate(const std::vector<int> &v, int k) {
+  std::unordered_map<int, int> last;
+  for (int i = 0; i < static_cast<int>(v.size()); i++) {
+    if (last.count(v[i]) && i - last[v[i]] <= k)
+      return true;
+    last[v[i]] = i;
+  }
+  return false;
 }
 
 int main() {
-    std::cout << std::boolalpha;
-    std::cout << containsNearbyDuplicate({1, 2, 3, 1}, 3) << "\n";
-    std::cout << containsNearbyDuplicate({1, 0, 1, 1}, 1) << "\n";
-    std::cout << containsNearbyDuplicate({1, 2, 3, 1, 2, 3}, 2) << "\n";
-    return 0;
+  std::cout << std::boolalpha;
+  std::cout << containsNearbyDuplicate({1, 2, 3, 1}, 3) << "\\n";
+  std::cout << containsNearbyDuplicate({1, 0, 1, 1}, 1) << "\\n";
+  std::cout << containsNearbyDuplicate({1, 2, 3, 1, 2, 3}, 2) << "\\n";
+  return 0;
 }
 `}
   tests={[{ id: "nearby", name: "Checks several cases", expect: { stdoutLines: ["true", "true", "false"], stdoutLinesExact: true } }]}
