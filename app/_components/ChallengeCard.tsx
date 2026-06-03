@@ -826,9 +826,15 @@ export default function ChallengeCard({
       // Multi-file workspaces: stage every file into the runtime VFS so
       // imports resolve. The entry file's bytes mirror what we pass to
       // `run()` below, including any init prelude / harness suffix the
-      // caller bolted on. Adapters that don't support multi-file omit
-      // `prepareFileSystem` entirely — the call is a no-op there.
-      if (runtime.prepareFileSystem) {
+      // caller bolted on.
+      //
+      // Single-file cards pass their source straight to `run()` and must
+      // NOT pre-stage it: some runtimes (CheerpJ/Java, .NET/C#) compile the
+      // staged file set when the VFS is populated, and with no
+      // `entryFilename` (single-file) they then can't locate `main`, so the
+      // program produces no output. This mirrors <CodeBlock>, which only
+      // stages for multi-file workspaces.
+      if (isMultiFile && runtime.prepareFileSystem) {
         const fileMap = new Map<string, Uint8Array>();
         const encoder = new TextEncoder();
         for (const [name, content] of filesSnapshot) {
