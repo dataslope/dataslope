@@ -179,6 +179,16 @@ function findCloseBacktick(src, openBacktick) {
   return -1;
 }
 
+// KNOWN LIMITATION: a snippet whose template literal uses *single*-backslash
+// escapes inside a string literal (e.g. `"\n"` instead of `"\\n"`) is already
+// buggy at runtime — the JS template literal evaluates `\n` to a real newline,
+// so the language receives a string with an embedded newline (illegal in C/
+// C++/C#/Java/JS single-line literals). evalTemplate() faithfully reproduces
+// that newline, after which the formatter mangles the source. Such content
+// must be corrected to double-backslash escapes BEFORE formatting; running
+// this script over it will corrupt the layout. (The mastering-dsa-cpp course
+// and one csharp page tripped this and were left un-formatted.)
+
 // raw template body → runtime string
 function evalTemplate(body) {
   // Safe: our scanner guarantees no unescaped backtick; interpolations are

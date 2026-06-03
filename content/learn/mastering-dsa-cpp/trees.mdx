@@ -27,20 +27,17 @@ flowchart TD
   starterCode={`#include <iostream>
 
 struct TreeNode {
-  int val;
-  TreeNode *left;
-  TreeNode *right;
+    int val;
+    TreeNode* left;
+    TreeNode* right;
 };
 
 int main() {
-  TreeNode left{5, nullptr, nullptr};
-  TreeNode right{20, nullptr, nullptr};
-  TreeNode root{10, &left, &right};
-  std::cout << root.val << " has children " << root.left->val << " and "
-            << root.right->val
-            << "
-               ";
-      return 0;
+    TreeNode left{5, nullptr, nullptr};
+    TreeNode right{20, nullptr, nullptr};
+    TreeNode root{10, &left, &right};
+    std::cout << root.val << " has children " << root.left->val << " and " << root.right->val << "\n";
+    return 0;
 }
 `}
 />
@@ -64,19 +61,17 @@ flowchart LR
 #include <vector>
 
 struct GeneralNode {
-  int val;
-  std::vector<GeneralNode *> children;
+    int val;
+    std::vector<GeneralNode*> children;
 };
 
 int main() {
-  GeneralNode a{1, {}};
-  GeneralNode b{2, {}};
-  GeneralNode c{3, {}};
-  a.children = {&b, &c};
-  std::cout << a.children.size()
-            << " children
-               ";
-      return 0;
+    GeneralNode a{1, {}};
+    GeneralNode b{2, {}};
+    GeneralNode c{3, {}};
+    a.children = {&b, &c};
+    std::cout << a.children.size() << " children\n";
+    return 0;
 }
 `}
 />
@@ -90,19 +85,17 @@ A linked representation is flexible and works well for sparse trees.
   starterCode={`#include <iostream>
 
 struct TreeNode {
-  int val;
-  TreeNode *left;
-  TreeNode *right;
+    int val;
+    TreeNode* left;
+    TreeNode* right;
 };
 
 int main() {
-  TreeNode n3{3, nullptr, nullptr};
-  TreeNode n2{2, nullptr, nullptr};
-  TreeNode n1{1, &n2, &n3};
-  std::cout << n1.left->val << " " << n1.right->val
-            << "
-               ";
-      return 0;
+    TreeNode n3{3, nullptr, nullptr};
+    TreeNode n2{2, nullptr, nullptr};
+    TreeNode n1{1, &n2, &n3};
+    std::cout << n1.left->val << " " << n1.right->val << "\n";
+    return 0;
 }
 `}
 />
@@ -125,19 +118,16 @@ flowchart TD
 #include <vector>
 
 int main() {
-  std::vector<int> tree = {10, 5, 20, 3, 7, 15};
-  for (int i = 0; i < static_cast<int>(tree.size()); i++) {
-    int left = 2 * i + 1;
-    int right = 2 * i + 2;
-    std::cout << tree[i] << ":";
-    if (left < static_cast<int>(tree.size()))
-      std::cout << " L=" << tree[left];
-    if (right < static_cast<int>(tree.size()))
-      std::cout << " R=" << tree[right];
-    std::cout << "
-                 ";
-  }
-  return 0;
+    std::vector<int> tree = {10, 5, 20, 3, 7, 15};
+    for (int i = 0; i < static_cast<int>(tree.size()); i++) {
+        int left = 2 * i + 1;
+        int right = 2 * i + 2;
+        std::cout << tree[i] << ":";
+        if (left < static_cast<int>(tree.size())) std::cout << " L=" << tree[left];
+        if (right < static_cast<int>(tree.size())) std::cout << " R=" << tree[right];
+        std::cout << "\n";
+    }
+    return 0;
 }
 `}
 />
@@ -168,51 +158,37 @@ For this tree:
   adapter="cpp"
   starterCode={`#include <iostream>
 
-struct TreeNode {
-  int val;
-  TreeNode *left;
-  TreeNode *right;
-};
+struct TreeNode { int val; TreeNode* left; TreeNode* right; };
 
-void preorder(TreeNode *root) {
-  if (!root)
-    return;
-  std::cout << root->val << " ";
-  preorder(root->left);
-  preorder(root->right);
+void preorder(TreeNode* root) {
+    if (!root) return;
+    std::cout << root->val << " ";
+    preorder(root->left);
+    preorder(root->right);
 }
 
-void inorder(TreeNode *root) {
-  if (!root)
-    return;
-  inorder(root->left);
-  std::cout << root->val << " ";
-  inorder(root->right);
+void inorder(TreeNode* root) {
+    if (!root) return;
+    inorder(root->left);
+    std::cout << root->val << " ";
+    inorder(root->right);
 }
 
-void postorder(TreeNode *root) {
-  if (!root)
-    return;
-  postorder(root->left);
-  postorder(root->right);
-  std::cout << root->val << " ";
+void postorder(TreeNode* root) {
+    if (!root) return;
+    postorder(root->left);
+    postorder(root->right);
+    std::cout << root->val << " ";
 }
 
 int main() {
-  TreeNode n4{4, nullptr, nullptr}, n5{5, nullptr, nullptr},
-      n3{3, nullptr, nullptr};
-  TreeNode n2{2, &n4, &n5};
-  TreeNode n1{1, &n2, &n3};
-  preorder(&n1);
-  std::cout << "
-               ";
-      inorder(&n1);
-  std::cout << "
-               ";
-      postorder(&n1);
-  std::cout << "
-               ";
-      return 0;
+    TreeNode n4{4, nullptr, nullptr}, n5{5, nullptr, nullptr}, n3{3, nullptr, nullptr};
+    TreeNode n2{2, &n4, &n5};
+    TreeNode n1{1, &n2, &n3};
+    preorder(&n1); std::cout << "\n";
+    inorder(&n1); std::cout << "\n";
+    postorder(&n1); std::cout << "\n";
+    return 0;
 }
 `}
 />
@@ -233,33 +209,25 @@ Level-order is breadth-first search. A queue processes nodes one level at a time
   starterCode={`#include <iostream>
 #include <queue>
 
-struct TreeNode {
-  int val;
-  TreeNode *left;
-  TreeNode *right;
-};
+struct TreeNode { int val; TreeNode* left; TreeNode* right; };
 
-void levelOrder(TreeNode *root) {
-  if (!root)
-    return;
-  std::queue<TreeNode *> q;
-  q.push(root);
-  while (!q.empty()) {
-    TreeNode *node = q.front();
-    q.pop();
-    std::cout << node->val
-              << "
-                 ";
-                 if (node->left) q.push(node->left);
-    if (node->right)
-      q.push(node->right);
-  }
+void levelOrder(TreeNode* root) {
+    if (!root) return;
+    std::queue<TreeNode*> q;
+    q.push(root);
+    while (!q.empty()) {
+        TreeNode* node = q.front();
+        q.pop();
+        std::cout << node->val << "\n";
+        if (node->left) q.push(node->left);
+        if (node->right) q.push(node->right);
+    }
 }
 
 int main() {
-  TreeNode n2{2, nullptr, nullptr}, n3{3, nullptr, nullptr}, n1{1, &n2, &n3};
-  levelOrder(&n1);
-  return 0;
+    TreeNode n2{2, nullptr, nullptr}, n3{3, nullptr, nullptr}, n1{1, &n2, &n3};
+    levelOrder(&n1);
+    return 0;
 }
 `}
 />
@@ -273,33 +241,27 @@ The recursion stack can be simulated with `std::stack`.
   starterCode={`#include <iostream>
 #include <stack>
 
-struct TreeNode {
-  int val;
-  TreeNode *left;
-  TreeNode *right;
-};
+struct TreeNode { int val; TreeNode* left; TreeNode* right; };
 
-void iterativeInorder(TreeNode *root) {
-  std::stack<TreeNode *> st;
-  TreeNode *cur = root;
-  while (cur || !st.empty()) {
-    while (cur) {
-      st.push(cur);
-      cur = cur->left;
-    }
-    cur = st.top();
-    st.pop();
-    std::cout << cur->val
-              << "
-                 ";
+void iterativeInorder(TreeNode* root) {
+    std::stack<TreeNode*> st;
+    TreeNode* cur = root;
+    while (cur || !st.empty()) {
+        while (cur) {
+            st.push(cur);
+            cur = cur->left;
+        }
+        cur = st.top();
+        st.pop();
+        std::cout << cur->val << "\n";
         cur = cur->right;
-  }
+    }
 }
 
 int main() {
-  TreeNode n1{1, nullptr, nullptr}, n3{3, nullptr, nullptr}, n2{2, &n1, &n3};
-  iterativeInorder(&n2);
-  return 0;
+    TreeNode n1{1, nullptr, nullptr}, n3{3, nullptr, nullptr}, n2{2, &n1, &n3};
+    iterativeInorder(&n2);
+    return 0;
 }
 `}
 />
@@ -315,61 +277,42 @@ Most tree properties are naturally recursive: solve the left subtree, solve the 
 #include <cstdlib>
 #include <iostream>
 
-struct TreeNode {
-  int val;
-  TreeNode *left;
-  TreeNode *right;
-};
+struct TreeNode { int val; TreeNode* left; TreeNode* right; };
 
-int height(TreeNode *root) {
-  if (!root)
-    return 0;
-  return 1 + std::max(height(root->left), height(root->right));
+int height(TreeNode* root) {
+    if (!root) return 0;
+    return 1 + std::max(height(root->left), height(root->right));
 }
 
-int countNodes(TreeNode *root) {
-  if (!root)
-    return 0;
-  return 1 + countNodes(root->left) + countNodes(root->right);
+int countNodes(TreeNode* root) {
+    if (!root) return 0;
+    return 1 + countNodes(root->left) + countNodes(root->right);
 }
 
-int maxValue(TreeNode *root) {
-  if (!root)
-    return INT_MIN;
-  return std::max({root->val, maxValue(root->left), maxValue(root->right)});
+int maxValue(TreeNode* root) {
+    if (!root) return INT_MIN;
+    return std::max({root->val, maxValue(root->left), maxValue(root->right)});
 }
 
-int checkHeight(TreeNode *root) {
-  if (!root)
-    return 0;
-  int left = checkHeight(root->left);
-  int right = checkHeight(root->right);
-  if (left == -1 || right == -1 || std::abs(left - right) > 1)
-    return -1;
-  return 1 + std::max(left, right);
+int checkHeight(TreeNode* root) {
+    if (!root) return 0;
+    int left = checkHeight(root->left);
+    int right = checkHeight(root->right);
+    if (left == -1 || right == -1 || std::abs(left - right) > 1) return -1;
+    return 1 + std::max(left, right);
 }
 
-bool isBalanced(TreeNode *root) { return checkHeight(root) != -1; }
+bool isBalanced(TreeNode* root) {
+    return checkHeight(root) != -1;
+}
 
 int main() {
-  TreeNode n4{4, nullptr, nullptr}, n5{5, nullptr, nullptr}, n2{2, &n4, &n5},
-      n3{3, nullptr, nullptr}, n1{1, &n2, &n3};
-  std::cout << height(&n1)
-            << "
-               ";
-      std::cout
-            << countNodes(&n1)
-            << "
-               ";
-      std::cout
-            << maxValue(&n1)
-            << "
-               ";
-      std::cout
-            << std::boolalpha << isBalanced(&n1)
-            << "
-               ";
-      return 0;
+    TreeNode n4{4, nullptr, nullptr}, n5{5, nullptr, nullptr}, n2{2, &n4, &n5}, n3{3, nullptr, nullptr}, n1{1, &n2, &n3};
+    std::cout << height(&n1) << "\n";
+    std::cout << countNodes(&n1) << "\n";
+    std::cout << maxValue(&n1) << "\n";
+    std::cout << std::boolalpha << isBalanced(&n1) << "\n";
+    return 0;
 }
 `}
 />
@@ -383,46 +326,41 @@ int main() {
   starterCode={`#include <iostream>
 
 struct TreeNode {
-  int val;
-  TreeNode *left;
-  TreeNode *right;
+    int val;
+    TreeNode* left;
+    TreeNode* right;
 };
 
-int sumTree(TreeNode *root) {
-  // your code here
-  return 0;
+int sumTree(TreeNode* root) {
+    // your code here
+    return 0;
 }
 
 int main() {
-  TreeNode n4{4, nullptr, nullptr}, n5{5, nullptr, nullptr};
-  TreeNode n2{2, &n4, &n5}, n3{3, nullptr, nullptr}, n1{1, &n2, &n3};
-  std::cout << sumTree(&n1)
-            << "
-               ";
-      return 0;
+    TreeNode n4{4, nullptr, nullptr}, n5{5, nullptr, nullptr};
+    TreeNode n2{2, &n4, &n5}, n3{3, nullptr, nullptr}, n1{1, &n2, &n3};
+    std::cout << sumTree(&n1) << "\n";
+    return 0;
 }
 `}
   solutionCode={`#include <iostream>
 
 struct TreeNode {
-  int val;
-  TreeNode *left;
-  TreeNode *right;
+    int val;
+    TreeNode* left;
+    TreeNode* right;
 };
 
-int sumTree(TreeNode *root) {
-  if (!root)
-    return 0;
-  return root->val + sumTree(root->left) + sumTree(root->right);
+int sumTree(TreeNode* root) {
+    if (!root) return 0;
+    return root->val + sumTree(root->left) + sumTree(root->right);
 }
 
 int main() {
-  TreeNode n4{4, nullptr, nullptr}, n5{5, nullptr, nullptr};
-  TreeNode n2{2, &n4, &n5}, n3{3, nullptr, nullptr}, n1{1, &n2, &n3};
-  std::cout << sumTree(&n1)
-            << "
-               ";
-      return 0;
+    TreeNode n4{4, nullptr, nullptr}, n5{5, nullptr, nullptr};
+    TreeNode n2{2, &n4, &n5}, n3{3, nullptr, nullptr}, n1{1, &n2, &n3};
+    std::cout << sumTree(&n1) << "\n";
+    return 0;
 }
 `}
   tests={[{ id: "sum", name: "Computes tree sum", expect: { stdoutEquals: "15" } }]}
@@ -437,48 +375,35 @@ int main() {
   starterCode={`#include <algorithm>
 #include <iostream>
 
-struct TreeNode {
-  int val;
-  TreeNode *left;
-  TreeNode *right;
-};
+struct TreeNode { int val; TreeNode* left; TreeNode* right; };
 
-int maxDepth(TreeNode *root) {
-  // your code here
-  return 0;
+int maxDepth(TreeNode* root) {
+    // your code here
+    return 0;
 }
 
 int main() {
-  TreeNode n7{7, nullptr, nullptr}, n4{4, &n7, nullptr};
-  TreeNode n2{2, &n4, nullptr}, n3{3, nullptr, nullptr}, n1{1, &n2, &n3};
-  std::cout << maxDepth(&n1)
-            << "
-               ";
-      return 0;
+    TreeNode n7{7, nullptr, nullptr}, n4{4, &n7, nullptr};
+    TreeNode n2{2, &n4, nullptr}, n3{3, nullptr, nullptr}, n1{1, &n2, &n3};
+    std::cout << maxDepth(&n1) << "\n";
+    return 0;
 }
 `}
   solutionCode={`#include <algorithm>
 #include <iostream>
 
-struct TreeNode {
-  int val;
-  TreeNode *left;
-  TreeNode *right;
-};
+struct TreeNode { int val; TreeNode* left; TreeNode* right; };
 
-int maxDepth(TreeNode *root) {
-  if (!root)
-    return 0;
-  return 1 + std::max(maxDepth(root->left), maxDepth(root->right));
+int maxDepth(TreeNode* root) {
+    if (!root) return 0;
+    return 1 + std::max(maxDepth(root->left), maxDepth(root->right));
 }
 
 int main() {
-  TreeNode n7{7, nullptr, nullptr}, n4{4, &n7, nullptr};
-  TreeNode n2{2, &n4, nullptr}, n3{3, nullptr, nullptr}, n1{1, &n2, &n3};
-  std::cout << maxDepth(&n1)
-            << "
-               ";
-      return 0;
+    TreeNode n7{7, nullptr, nullptr}, n4{4, &n7, nullptr};
+    TreeNode n2{2, &n4, nullptr}, n3{3, nullptr, nullptr}, n1{1, &n2, &n3};
+    std::cout << maxDepth(&n1) << "\n";
+    return 0;
 }
 `}
   tests={[{ id: "depth", name: "Finds max depth", expect: { stdoutEquals: "4" } }]}
@@ -494,74 +419,57 @@ int main() {
 #include <queue>
 #include <vector>
 
-struct TreeNode {
-  int val;
-  TreeNode *left;
-  TreeNode *right;
-};
+struct TreeNode { int val; TreeNode* left; TreeNode* right; };
 
-std::vector<std::vector<int>> levelOrder(TreeNode *root) {
-  // your code here
-  return {};
+std::vector<std::vector<int>> levelOrder(TreeNode* root) {
+    // your code here
+    return {};
 }
 
 int main() {
-  TreeNode n4{4, nullptr, nullptr}, n5{5, nullptr, nullptr},
-      n6{6, nullptr, nullptr};
-  TreeNode n2{2, &n4, &n5}, n3{3, nullptr, &n6}, n1{1, &n2, &n3};
-  for (const auto &level : levelOrder(&n1)) {
-    for (int x : level)
-      std::cout << x << " ";
-    std::cout << "
-                 ";
-  }
-  return 0;
+    TreeNode n4{4, nullptr, nullptr}, n5{5, nullptr, nullptr}, n6{6, nullptr, nullptr};
+    TreeNode n2{2, &n4, &n5}, n3{3, nullptr, &n6}, n1{1, &n2, &n3};
+    for (const auto& level : levelOrder(&n1)) {
+        for (int x : level) std::cout << x << " ";
+        std::cout << "\n";
+    }
+    return 0;
 }
 `}
   solutionCode={`#include <iostream>
 #include <queue>
 #include <vector>
 
-struct TreeNode {
-  int val;
-  TreeNode *left;
-  TreeNode *right;
-};
+struct TreeNode { int val; TreeNode* left; TreeNode* right; };
 
-std::vector<std::vector<int>> levelOrder(TreeNode *root) {
-  std::vector<std::vector<int>> ans;
-  if (!root)
-    return ans;
-  std::queue<TreeNode *> q;
-  q.push(root);
-  while (!q.empty()) {
-    int n = static_cast<int>(q.size());
-    std::vector<int> level;
-    for (int i = 0; i < n; i++) {
-      TreeNode *node = q.front();
-      q.pop();
-      level.push_back(node->val);
-      if (node->left)
-        q.push(node->left);
-      if (node->right)
-        q.push(node->right);
+std::vector<std::vector<int>> levelOrder(TreeNode* root) {
+    std::vector<std::vector<int>> ans;
+    if (!root) return ans;
+    std::queue<TreeNode*> q;
+    q.push(root);
+    while (!q.empty()) {
+        int n = static_cast<int>(q.size());
+        std::vector<int> level;
+        for (int i = 0; i < n; i++) {
+            TreeNode* node = q.front();
+            q.pop();
+            level.push_back(node->val);
+            if (node->left) q.push(node->left);
+            if (node->right) q.push(node->right);
+        }
+        ans.push_back(level);
     }
-    ans.push_back(level);
-  }
-  return ans;
+    return ans;
 }
 
 int main() {
-  TreeNode n4{4, nullptr, nullptr}, n5{5, nullptr, nullptr},
-      n6{6, nullptr, nullptr};
-  TreeNode n2{2, &n4, &n5}, n3{3, nullptr, &n6}, n1{1, &n2, &n3};
-  for (const auto &level : levelOrder(&n1)) {
-    for (int x : level)
-      std::cout << x << " ";
-    std::cout << "
-                 ";
-  }
-  return 0;
+    TreeNode n4{4, nullptr, nullptr}, n5{5, nullptr, nullptr}, n6{6, nullptr, nullptr};
+    TreeNode n2{2, &n4, &n5}, n3{3, nullptr, &n6}, n1{1, &n2, &n3};
+    for (const auto& level : levelOrder(&n1)) {
+        for (int x : level) std::cout << x << " ";
+        std::cout << "\n";
+    }
+    return 0;
 }
 `}
   tests={[{ id: "levels", name: "Prints levels", expect: { stdoutLines: ["1 ", "2 3 ", "4 5 6 "], stdoutLinesExact: true } }]}

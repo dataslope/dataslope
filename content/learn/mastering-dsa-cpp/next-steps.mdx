@@ -74,25 +74,20 @@ LeetCode, Codeforces, AtCoder, HackerRank, and USACO all give different styles o
 #include <vector>
 
 int main() {
-  std::vector<std::string> words = {"tree", "graph", "tree",
-                                    "dp",   "graph", "tree"};
-  std::map<std::string, int> freq;
-  for (const auto &word : words)
-    freq[word]++;
+    std::vector<std::string> words = {"tree", "graph", "tree", "dp", "graph", "tree"};
+    std::map<std::string, int> freq;
+    for (const auto& word : words) freq[word]++;
 
-  std::vector<std::pair<std::string, int>> items(freq.begin(), freq.end());
-  std::sort(items.begin(), items.end(), [](const auto &a, const auto &b) {
-    if (a.second != b.second)
-      return a.second > b.second;
-    return a.first < b.first;
-  });
+    std::vector<std::pair<std::string, int>> items(freq.begin(), freq.end());
+    std::sort(items.begin(), items.end(), [](const auto& a, const auto& b) {
+        if (a.second != b.second) return a.second > b.second;
+        return a.first < b.first;
+    });
 
-  for (const auto &[word, count] : items) {
-    std::cout << word << ": " << count
-              << "
-                 ";
-  }
-  return 0;
+    for (const auto& [word, count] : items) {
+        std::cout << word << ": " << count << "\n";
+    }
+    return 0;
 }
 `} />
 
