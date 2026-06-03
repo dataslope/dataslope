@@ -137,6 +137,11 @@ import { ResultView } from "../sql/components/ResultView";
 import { SchemaItem } from "../sql/components/SchemaItem";
 import { SchemaLeafItem } from "../sql/components/SchemaLeafItem";
 import { SchemaSection } from "../sql/components/SchemaSection";
+import { CreateIndexDialog } from "../sql/components/CreateIndexDialog";
+import { CreateViewDialog } from "../sql/components/CreateViewDialog";
+import { ExplainPlanDialog } from "../sql/components/ExplainPlanDialog";
+import { buildExplainSql, formatExplainResult } from "../sql/utils/explain";
+import { activeSqlForEditor } from "../sql/utils/editorUtils";
 import {
   DatabaseSelector,
   type DatabaseSelectorAction,
@@ -174,6 +179,7 @@ import {
   persistAsync,
 } from "../sql/utils/persistedStorage";
 import { pushTabHistory } from "../sql/utils/tabUtils";
+import { enumHintsFromColumns } from "../sql/utils/cellEditing";
 import { useSqlTabManagement } from "../sql/hooks/useSqlTabManagement";
 import { useSchemaTree } from "../sql/hooks/useSchemaTree";
 import type {
@@ -1426,6 +1432,80 @@ function DuckDbPlaygroundInner() {
     [refreshSchemasFromHook, refreshSchema],
   );
 
+  const [createIndexOpen, setCreateIndexOpen] = useState(false);
+  const [createViewOpen, setCreateViewOpen] = useState(false);
+  const [createViewBody, setCreateViewBody] = useState("");
+  // Capture the editor text in this event handler (reading a ref during
+  // render is disallowed) so the Create View body can be seeded from it.
+  const openCreateView = useCallback(() => {
+    setCreateViewBody(editorRef.current?.state.doc.toString() ?? "");
+    setCreateViewOpen(true);
+  }, []);
+
+  const [explainPlan, setExplainPlan] = useState<{
+    querySql: string;
+    plan: string;
+  } | null>(null);
+  // Run EXPLAIN for the selection / statement at the cursor / whole query and
+  // show the plan in a read-only modal.
+  const handleExplain = useCallback(() => {
+    const view = editorRef.current;
+    const engine = engineRef.current;
+    if (!view || !engine) return;
+    const sql = activeSqlForEditor(view).trim();
+    if (!sql) {
+      showToast("Nothing to explain — the query is empty.", "warn");
+      return;
+    }
+    void (async () => {
+      try {
+        const sets = await engine.exec(buildExplainSql("duckdb", sql));
+        const set = sets.find((s) => s != null) ?? sets[0];
+        setExplainPlan({
+          querySql: sql,
+          plan: set
+            ? formatExplainResult(set.columns, set.values)
+            : "(no plan returned)",
+        });
+      } catch (err) {
+        showToast(
+          `Explain failed: ${err instanceof Error ? err.message : String(err)}`,
+          "warn",
+        );
+      }
+    })();
+  }, [showToast]);
+
+  // Run a DDL statement from the schema tree's Create Index / Create View
+  // dialogs, then refresh the sidebar. Resolves true on success.
+  const createSchemaObject = useCallback(
+    async (sql: string, successMessage: string): Promise<boolean> => {
+      const engine = engineRef.current;
+      if (!engine) return false;
+      try {
+        await engine.exec(sql);
+        await refreshSchema();
+        showToast(successMessage);
+        return true;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Create failed: ${msg}`, "warn");
+        return false;
+      }
+    },
+    [refreshSchema, showToast],
+  );
+
+  const getCreateIndexColumns = useCallback(
+    async (table: string): Promise<string[]> => {
+      const engine = engineRef.current;
+      if (!engine) return [];
+      const cols = await engine.listColumns(table, selectedSchemaRef.current);
+      return cols.map((c) => c.name);
+    },
+    [selectedSchemaRef],
+  );
+
   const runSqlForTab = useCallback(
     async (
       tabId: string,
@@ -2648,6 +2728,7 @@ function DuckDbPlaygroundInner() {
           readOnly: new Set(
             cols.filter((col) => col.generated).map((col) => col.name),
           ),
+          enums: enumHintsFromColumns(cols),
         },
       };
     },
@@ -2665,6 +2746,7 @@ function DuckDbPlaygroundInner() {
       readOnly: new Set(
         cols.filter((col) => col.generated).map((col) => col.name),
       ),
+      enums: enumHintsFromColumns(cols),
     };
   }, [result, columnsByEntity, foreignKeysByEntity]);
 
@@ -4452,6 +4534,31 @@ function DuckDbPlaygroundInner() {
           onSubmit={() => void submitAddRow()}
         />
 
+        <CreateIndexDialog
+          open={createIndexOpen}
+          onOpenChange={setCreateIndexOpen}
+          tables={tables}
+          getColumns={getCreateIndexColumns}
+          onSubmit={createSchemaObject}
+        />
+        <CreateViewDialog
+          open={createViewOpen}
+          onOpenChange={setCreateViewOpen}
+          dialect="duckdb"
+          defaultBody={createViewBody}
+          onSubmit={createSchemaObject}
+        />
+        <ExplainPlanDialog
+          open={explainPlan !== null}
+          onOpenChange={(next) => {
+            if (!next) setExplainPlan(null);
+          }}
+          querySql={explainPlan?.querySql ?? ""}
+          plan={explainPlan?.plan ?? ""}
+          onCopied={() => showToast("Plan copied.")}
+          onCopyFailed={() => showToast("Couldn't copy to clipboard.", "warn")}
+        />
+
         {/* ── Add Table drawer ── */}
         <Dialog.Root
           open={addTableDialog !== null}
@@ -4945,6 +5052,7 @@ function DuckDbPlaygroundInner() {
                     expanded={viewsExpanded}
                     onToggle={() => setViewsExpanded((v) => !v)}
                     emptyMessage="No views."
+                    onAdd={openCreateView}
                     allExpanded={
                       views.length > 0 &&
                       views.every((name) => expandedEntities.has(name))
@@ -4997,6 +5105,7 @@ function DuckDbPlaygroundInner() {
                     expanded={indexesExpanded}
                     onToggle={() => setIndexesExpanded((v) => !v)}
                     emptyMessage="No indexes."
+                    onAdd={() => setCreateIndexOpen(true)}
                   >
                     {indexes.map((name) => (
                       <SchemaLeafItem
@@ -5225,6 +5334,7 @@ function DuckDbPlaygroundInner() {
                 onRunSelection={runCurrentSelection}
                 onRunStatement={runStatementAtCursor}
                 onRunAll={runActiveTab}
+                onExplain={handleExplain}
               />
             </div>
             {tabs.some((t) => t.kind === "er-diagram") && (

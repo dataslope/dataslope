@@ -527,6 +527,7 @@ export async function createPostgresEngine(
         column_default: string | null;
         is_generated: string;
         generation_expression: string | null;
+        udt_name: string;
         pk_position: number | null;
       }>(
         `
@@ -539,6 +540,7 @@ export async function createPostgresEngine(
           c.column_default,
           c.is_generated,
           c.generation_expression,
+          c.udt_name,
           kcu.ordinal_position AS pk_position
         FROM information_schema.columns c
         JOIN pg_catalog.pg_namespace n
@@ -564,6 +566,31 @@ export async function createPostgresEngine(
         `,
         [name, schema],
       );
+      // For any enum-typed (USER-DEFINED) column, fetch its allowed labels so
+      // the result grid can offer an inline dropdown. One query for the whole
+      // schema, only when an enum column is actually present.
+      const enumByType = new Map<string, string[]>();
+      if (rows.some((r) => r.data_type === "USER-DEFINED")) {
+        const enumRows = await queryRows<{
+          typname: string;
+          enumlabel: string;
+        }>(
+          `
+          SELECT t.typname, e.enumlabel
+          FROM pg_catalog.pg_type t
+          JOIN pg_catalog.pg_enum e ON e.enumtypid = t.oid
+          JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
+          WHERE n.nspname = $1
+          ORDER BY t.typname, e.enumsortorder
+          `,
+          [schema],
+        );
+        for (const r of enumRows) {
+          const list = enumByType.get(r.typname);
+          if (list) list.push(r.enumlabel);
+          else enumByType.set(r.typname, [r.enumlabel]);
+        }
+      }
       return rows.map((row) => ({
         cid: Number(row.ordinal_position) - 1,
         name: row.column_name,
@@ -578,6 +605,10 @@ export async function createPostgresEngine(
                 // PostgreSQL only supports STORED generated columns.
                 storageType: "STORED" as const,
               }
+            : null,
+        enumValues:
+          row.data_type === "USER-DEFINED"
+            ? (enumByType.get(row.udt_name) ?? null)
             : null,
       }));
     },

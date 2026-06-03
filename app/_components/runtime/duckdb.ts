@@ -235,6 +235,62 @@ export function toBindParam(value: unknown): unknown {
   return value;
 }
 
+/** Serialize a JS array as a DuckDB list literal (`[1, 2, 'a']`). The array
+ *  cell editor uses this for write-back because DuckDB-Wasm can't bind a JS
+ *  array as a LIST parameter — so the validated, JSON-parsed array is inlined
+ *  as a literal instead, with strings single-quote-escaped. Numbers, booleans
+ *  and bigints inline bare; `null` becomes `NULL`; nested arrays recurse;
+ *  anything else is quoted as text. */
+export function toDuckDbListLiteral(arr: readonly unknown[]): string {
+  const elem = (v: unknown): string => {
+    if (v === null || v === undefined) return "NULL";
+    if (typeof v === "number") return Number.isFinite(v) ? String(v) : "NULL";
+    if (typeof v === "boolean") return v ? "TRUE" : "FALSE";
+    if (typeof v === "bigint") return v.toString();
+    if (Array.isArray(v)) return toDuckDbListLiteral(v);
+    return `'${String(v).replace(/'/g, "''")}'`;
+  };
+  return `[${arr.map(elem).join(", ")}]`;
+}
+
+/** Parse the allowed labels out of a DuckDB enum `data_type` string.
+ *  `duckdb_columns()` reports an enum column's type as the full inline
+ *  definition, e.g. `ENUM('sad', 'ok', 'happy')`. Labels are single-quoted
+ *  with `''` escaping an embedded quote. Returns the labels in order, or
+ *  `null` when the string isn't an enum definition (the common case). */
+export function parseDuckDbEnumValues(
+  dataType: string | null | undefined,
+): string[] | null {
+  if (!dataType) return null;
+  const m = /^enum\s*\((.*)\)\s*$/is.exec(dataType.trim());
+  if (!m) return null;
+  const body = m[1];
+  const values: string[] = [];
+  let i = 0;
+  while (i < body.length) {
+    while (i < body.length && /[\s,]/.test(body[i])) i++; // skip separators
+    if (i >= body.length) break;
+    if (body[i] !== "'") return null; // malformed — bail rather than guess
+    i++; // opening quote
+    let label = "";
+    while (i < body.length) {
+      if (body[i] === "'") {
+        if (body[i + 1] === "'") {
+          label += "'";
+          i += 2;
+          continue;
+        }
+        i++; // closing quote
+        break;
+      }
+      label += body[i];
+      i++;
+    }
+    values.push(label);
+  }
+  return values.length > 0 ? values : null;
+}
+
 function arrowToQueryExecResult(
   table: DuckDbArrowTable,
 ): (QueryExecResult & { columnTypes?: string[] }) | null {
@@ -1161,16 +1217,18 @@ export async function createDuckDbEngine(
         const def = row[4];
         const defStr = def == null ? null : String(def);
         const isGenerated = false; // duckdb_columns() does not surface generation_expression in all builds
+        const dataType = String(row[2] ?? "");
         return {
           cid: Number(row[0]),
           name: colName,
-          type: String(row[2] ?? ""),
+          type: dataType,
           notNull: String(row[3]).toLowerCase() === "false",
           defaultValue: defStr,
           pk: pkIndex >= 0 ? pkIndex + 1 : 0,
           generated: isGenerated
             ? { expression: "", storageType: "STORED" as const }
             : null,
+          enumValues: parseDuckDbEnumValues(dataType),
         };
       });
     },
@@ -1465,6 +1523,15 @@ export async function createDuckDbEngine(
       const qualifiedTable = `${quoteIdent(schema)}.${quoteIdent(tableName)}`;
       let count = 0;
       for (const update of updates) {
+        // An edited LIST/array value can't be bound as a parameter in
+        // DuckDB-Wasm, so it's inlined as a list literal; every other value
+        // stays a bound parameter (UX-17). `setExpr` is the right-hand side
+        // and `setParams` the params it consumes (empty for the literal path).
+        const isArr = Array.isArray(update.value);
+        const setExpr = isArr
+          ? `${quoteIdent(update.column)} = ${toDuckDbListLiteral(update.value as unknown[])}`
+          : `${quoteIdent(update.column)} = ?`;
+        const setParams = isArr ? [] : [update.value];
         if (update.pk && update.pk.length > 0) {
           // Primary-key identification: stable regardless of display order.
           const where = update.pk
@@ -1472,9 +1539,9 @@ export async function createDuckDbEngine(
             .join(" AND ");
           await runParams(
             `UPDATE ${qualifiedTable}
-             SET ${quoteIdent(update.column)} = ?
+             SET ${setExpr}
              WHERE ${where}`,
-            [update.value, ...update.pk.map((p) => p.value)],
+            [...setParams, ...update.pk.map((p) => p.value)],
           );
         } else {
           // `rowIndex` is a trusted integer we computed, so it stays inlined
@@ -1482,13 +1549,13 @@ export async function createDuckDbEngine(
           const offset = Math.trunc(Number(update.rowIndex)) || 0;
           await runParams(
             `UPDATE ${qualifiedTable}
-             SET ${quoteIdent(update.column)} = ?
+             SET ${setExpr}
              WHERE rowid = (
                SELECT rowid FROM ${qualifiedTable}
                ORDER BY rowid
                LIMIT 1 OFFSET ${offset}
              )`,
-            [update.value],
+            setParams,
           );
         }
         count += 1;

@@ -70,6 +70,8 @@ import {
   toDateEditorValue,
   fromDateEditorValue,
   resolveTemporalEditorKind,
+  arrayEditorText,
+  parseArrayEditValue,
   formatBytesHex,
   bytesToBase64,
   reversibleCellValue,
@@ -2689,7 +2691,107 @@ export function ResultTableBody({
               }
               const isNumeric =
                 rawValue !== null && typeof rawValue === "number";
+              const enumValues = keyHints?.enums?.get(c);
               if (isActiveEdit) {
+                // Enum columns get a dropdown of their declared labels instead
+                // of a free-text editor. The committed value is the chosen
+                // label (a plain string) — the same value the text editor would
+                // produce — so the engine casts it to the enum type on write.
+                if (enumValues && enumValues.length > 0) {
+                  const cur = hasPendingEdit ? pendingValue : rawValue;
+                  const curStr =
+                    cur === null || cur === undefined ? "" : String(cur);
+                  const known = enumValues.includes(curStr);
+                  return (
+                    <select
+                      className="sql-cell-input sql-cell-select"
+                      value={curStr}
+                      autoFocus
+                      aria-label={`Edit ${c}`}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        const next = v === "" ? null : v;
+                        if (next !== rawValue) {
+                          onSetPendingEdit(cellKey, next);
+                        } else if (hasPendingEdit) {
+                          onClearPendingEdit(cellKey);
+                        }
+                      }}
+                      onBlur={() => onSetActiveEditCell(null)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Escape") {
+                          e.stopPropagation();
+                          onClearPendingEdit(cellKey);
+                          onSetActiveEditCell(null);
+                        }
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      onDoubleClick={(e) => e.stopPropagation()}
+                    >
+                      {!known && (
+                        <option value="">
+                          {cur === null || cur === undefined
+                            ? "(NULL)"
+                            : curStr}
+                        </option>
+                      )}
+                      {enumValues.map((v) => (
+                        <option key={v} value={v}>
+                          {v}
+                        </option>
+                      ))}
+                    </select>
+                  );
+                }
+                // Array / LIST columns are edited as a JSON array; on commit
+                // the parsed JS array is written back and each engine binds it
+                // as a real array (Postgres via pglite, DuckDB via a bound
+                // parameter). Invalid/partial JSON is kept as raw text so the
+                // user can keep typing — it surfaces a clear engine error on
+                // commit rather than silently writing garbage.
+                if (editorKind === "array") {
+                  const source = hasPendingEdit ? pendingValue : rawValue;
+                  return (
+                    <input
+                      className="sql-cell-input"
+                      defaultValue={arrayEditorText(source)}
+                      autoFocus
+                      type="text"
+                      size={1}
+                      aria-label={`Edit ${c} (JSON array)`}
+                      onFocus={(e) => e.currentTarget.select()}
+                      onChange={(e) => {
+                        const text = e.target.value;
+                        const parsed = parseArrayEditValue(text);
+                        if (parsed.ok) {
+                          // Unchanged vs the original JSON string → no edit.
+                          if (
+                            typeof rawValue === "string" &&
+                            JSON.stringify(parsed.value) === rawValue
+                          ) {
+                            if (hasPendingEdit) onClearPendingEdit(cellKey);
+                          } else {
+                            onSetPendingEdit(cellKey, parsed.value);
+                          }
+                        } else {
+                          onSetPendingEdit(cellKey, text);
+                        }
+                      }}
+                      onBlur={() => onSetActiveEditCell(null)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          (e.currentTarget as HTMLInputElement).blur();
+                        } else if (e.key === "Escape") {
+                          e.stopPropagation();
+                          onClearPendingEdit(cellKey);
+                          onSetActiveEditCell(null);
+                        }
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      onDoubleClick={(e) => e.stopPropagation()}
+                    />
+                  );
+                }
                 // Date/time columns get a native picker when the stored value
                 // is a recognizable date string. The committed value preserves
                 // the original's exact format (separator, fractional seconds,

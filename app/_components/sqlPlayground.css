@@ -1427,6 +1427,43 @@
   border-radius: 6px;
 }
 
+/* Secondary "Explain" toolbar button (ghost), sits to the right of Run. */
+.sql-explain-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 6px;
+  height: 28px;
+  padding: 0 11px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    border-color 0.12s,
+    color 0.12s;
+}
+
+.sql-explain-btn:hover:not(:disabled) {
+  background: var(--bg3);
+  border-color: var(--text-dim);
+}
+
+.sql-explain-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.sql-explain-btn svg {
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
 .sql-toolbar .kbd {
   font-weight: normal;
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
@@ -2565,6 +2602,20 @@
   box-shadow:
     0 0 0 1.5px var(--primary, #f0b400),
     0 0 0 3px var(--primary-glow, rgba(240, 180, 0, 0.25));
+}
+
+/* Enum dropdown inline editor — inherits .sql-cell-input's edit ring; keeps
+   the native select appearance so the arrow shows, re-themed to the cell. */
+.sql-cell-select {
+  cursor: pointer;
+  padding: 0 2px;
+  appearance: auto;
+  background: var(--bg2);
+  color: var(--text);
+}
+.sql-cell-select option {
+  background: var(--bg2);
+  color: var(--text);
 }
 
 /* Pending-edit cell display span */
@@ -4536,4 +4587,242 @@
   .pyodide-loading .loading-hero-text {
     font-size: clamp(32px, 12vw, 64px);
   }
+}
+
+/* ─── Create Index / Create View dialogs ───
+   Compact centered modals (reuse the global `.confirm-popup` shell) that
+   the schema tree's INDEXES / VIEWS "+" affordances open. Shared by all
+   three SQL playgrounds. */
+.sql-create-popup {
+  width: min(560px, calc(100vw - 32px));
+  max-height: min(86vh, 760px);
+  gap: 0;
+  padding: 0;
+}
+
+.sql-create-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px 12px;
+}
+
+.sql-create-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 18px 4px;
+  overflow: auto;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.sql-create-empty {
+  padding: 0 18px 8px;
+}
+
+.sql-create-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.sql-create-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.sql-create-label-hint {
+  font-weight: 400;
+  color: var(--text-dim);
+}
+
+.sql-create-input,
+.sql-create-select,
+.sql-create-textarea {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 9px;
+  outline: none;
+  width: 100%;
+}
+
+.sql-create-textarea {
+  resize: vertical;
+  line-height: 1.5;
+  min-height: 92px;
+}
+
+.sql-create-input:focus,
+.sql-create-select:focus,
+.sql-create-textarea:focus {
+  border-color: var(--primary);
+}
+
+.sql-create-cols {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  max-height: 168px;
+  overflow: auto;
+  background: var(--bg);
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.sql-create-col {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 9px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+}
+
+.sql-create-col:last-child {
+  border-bottom: 0;
+}
+
+.sql-create-col:hover {
+  background: var(--bg3);
+}
+
+.sql-create-col-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sql-create-col-order {
+  flex-shrink: 0;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  background: var(--primary);
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+}
+
+.sql-create-cols-status,
+.sql-create-error {
+  font-size: 12px;
+  color: var(--text-dim);
+  padding: 8px 2px;
+}
+
+.sql-create-error {
+  color: var(--red, #e5534b);
+}
+
+.sql-create-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.sql-create-check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.sql-create-hint {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin: -4px 0 0;
+}
+
+.sql-create-hint code,
+.sql-create-preview {
+  font-family: var(--font-mono);
+}
+
+.sql-create-preview {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 9px 10px;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 140px;
+  overflow: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.sql-create-popup .confirm-actions {
+  margin-top: 0;
+  padding: 12px 18px 16px;
+  border-top: 1px solid var(--border);
+}
+
+/* ─── Explain / query-plan modal ───
+   Read-only plan viewer (reuses the global `.confirm-popup` shell + the
+   create-dialog header). Shared by all three SQL playgrounds. */
+.sql-explain-popup {
+  width: min(760px, calc(100vw - 32px));
+  max-height: min(80vh, 640px);
+  gap: 0;
+  padding: 0;
+}
+
+.sql-explain-subtitle {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  margin: 0;
+  padding: 0 18px 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sql-explain-plan {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 18px;
+  margin: 0;
+  overflow: auto;
+  white-space: pre;
+  flex: 1;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+
+.sql-explain-popup .confirm-actions {
+  margin: 0;
+  padding: 12px 18px 16px;
 }

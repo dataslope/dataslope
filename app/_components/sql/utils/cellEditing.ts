@@ -15,6 +15,23 @@
  *  timezone arithmetic is performed, which is the usual source of off-by-an-
  *  hour bugs. */
 
+import type { TableColumnInfo } from "../../runtime/sqlite";
+
+/** Build the enum-column → allowed-labels map for `ColumnKeyHints` from a
+ *  table's introspected columns. Columns without enum metadata (every SQLite
+ *  column, and any non-enum Postgres/DuckDB column) are skipped. */
+export function enumHintsFromColumns(
+  cols: readonly TableColumnInfo[],
+): Map<string, string[]> {
+  const m = new Map<string, string[]>();
+  for (const col of cols) {
+    if (col.enumValues && col.enumValues.length > 0) {
+      m.set(col.name, col.enumValues);
+    }
+  }
+  return m;
+}
+
 /** The kind of inline editor a column should use, derived from its SQL type. */
 export type CellEditorKind =
   | "boolean"
@@ -22,6 +39,7 @@ export type CellEditorKind =
   | "datetime"
   | "time"
   | "json"
+  | "array"
   | "blob"
   | "text";
 
@@ -33,9 +51,13 @@ export function classifyCellEditor(sqlType: string | undefined): CellEditorKind 
   const t = (sqlType ?? "").trim().toLowerCase();
   if (!t) return "text";
   if (/^bool(ean)?$/.test(t)) return "boolean";
-  // Arrays keep the plain text / modal editor — no bespoke array editor yet,
-  // and an array of timestamps must not be mistaken for a single timestamp.
-  if (t.endsWith("[]")) return "text";
+  // Arrays / lists get a dedicated JSON-array editor (checked before the
+  // scalar temporal/json rules so an array of timestamps isn't mistaken for a
+  // single timestamp). Postgres reports `integer[]` / `text[]`; DuckDB result
+  // metadata uses Arrow notation, `list<int32>` / `list<utf8>`.
+  if (t.endsWith("[]") || t.startsWith("list<") || t.startsWith("list(")) {
+    return "array";
+  }
   if (t === "json" || t === "jsonb") return "json";
   if (
     t.includes("blob") ||
@@ -50,6 +72,39 @@ export function classifyCellEditor(sqlType: string | undefined): CellEditorKind 
   if (t.includes("date")) return "date";
   if (t.includes("time")) return "time";
   return "text";
+}
+
+/** Normalize an array cell's stored value to JSON text for editing. Array
+ *  values reach the grid as JSON strings (both adapters JSON-stringify them),
+ *  but a value may also be a live JS array — handle both. */
+export function arrayEditorText(value: unknown): string {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "string") return value;
+  if (Array.isArray(value)) {
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return String(value);
+    }
+  }
+  return String(value);
+}
+
+/** Parse an edited array cell. Returns the parsed JS array when the text is a
+ *  valid JSON array (the value written back, which each engine binds as a real
+ *  array / LIST); otherwise `{ ok: false }` so the caller keeps the raw text
+ *  rather than committing garbage. */
+export function parseArrayEditValue(text: string): {
+  ok: boolean;
+  value: unknown[];
+} {
+  try {
+    const parsed: unknown = JSON.parse(text);
+    if (Array.isArray(parsed)) return { ok: true, value: parsed };
+  } catch {
+    // not valid JSON — fall through
+  }
+  return { ok: false, value: [] };
 }
 
 /** Editor kinds that use a native date/time `<input>`. */

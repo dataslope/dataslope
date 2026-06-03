@@ -9,7 +9,11 @@ import {
   formatBytesHex,
   bytesToBase64,
   reversibleCellValue,
+  enumHintsFromColumns,
+  arrayEditorText,
+  parseArrayEditValue,
 } from "../app/_components/sql/utils/cellEditing";
+import type { TableColumnInfo } from "../app/_components/runtime/sqlite";
 import {
   formatCellValue,
   parseCellEditValue,
@@ -46,11 +50,15 @@ describe("classifyCellEditor", () => {
     expect(classifyCellEditor("datetime")).toBe("datetime");
   });
 
-  it("does not treat array types as scalar temporal/json types", () => {
-    expect(classifyCellEditor("timestamptz[]")).toBe("text");
-    expect(classifyCellEditor("integer[]")).toBe("text");
-    expect(classifyCellEditor("text[]")).toBe("text");
-    expect(classifyCellEditor("jsonb[]")).toBe("text");
+  it("routes array / list types to the array editor (not a scalar editor)", () => {
+    // Postgres reports `<type>[]`; DuckDB result metadata uses Arrow notation.
+    expect(classifyCellEditor("integer[]")).toBe("array");
+    expect(classifyCellEditor("text[]")).toBe("array");
+    expect(classifyCellEditor("timestamptz[]")).toBe("array");
+    expect(classifyCellEditor("jsonb[]")).toBe("array");
+    expect(classifyCellEditor("list<int32>")).toBe("array");
+    expect(classifyCellEditor("list<utf8>")).toBe("array");
+    expect(classifyCellEditor("LIST<TIMESTAMP>")).toBe("array");
   });
 
   it("falls back to text for unknown / empty types", () => {
@@ -306,5 +314,94 @@ describe("formatCellValue array & date display", () => {
   it("still reports BLOB size and NULL", () => {
     expect(formatCellValue(new Uint8Array([1, 2, 3]))).toBe("BLOB (3 bytes)");
     expect(formatCellValue(null)).toBe("NULL");
+  });
+});
+
+describe("enumHintsFromColumns", () => {
+  const col = (
+    name: string,
+    enumValues?: string[] | null,
+  ): TableColumnInfo => ({
+    cid: 0,
+    name,
+    type: enumValues ? "mood" : "text",
+    notNull: false,
+    defaultValue: null,
+    pk: 0,
+    generated: null,
+    enumValues,
+  });
+
+  it("maps only the columns that carry enum labels", () => {
+    const map = enumHintsFromColumns([
+      col("id"),
+      col("status", ["open", "closed"]),
+      col("note"),
+      col("mood", ["sad", "ok", "happy"]),
+    ]);
+    expect(map.size).toBe(2);
+    expect(map.get("status")).toEqual(["open", "closed"]);
+    expect(map.get("mood")).toEqual(["sad", "ok", "happy"]);
+    expect(map.has("id")).toBe(false);
+  });
+
+  it("skips null / undefined / empty enum lists", () => {
+    const map = enumHintsFromColumns([
+      col("a", null),
+      col("b", undefined),
+      col("c", []),
+    ]);
+    expect(map.size).toBe(0);
+  });
+
+  it("returns an empty map for no columns", () => {
+    expect(enumHintsFromColumns([]).size).toBe(0);
+  });
+});
+
+describe("arrayEditorText", () => {
+  it("passes a stored JSON string through unchanged", () => {
+    expect(arrayEditorText("[10,20,30]")).toBe("[10,20,30]");
+    expect(arrayEditorText('["a","b"]')).toBe('["a","b"]');
+  });
+
+  it("serializes a live JS array to JSON", () => {
+    expect(arrayEditorText([10, 20, 30])).toBe("[10,20,30]");
+    expect(arrayEditorText(["a", "b"])).toBe('["a","b"]');
+  });
+
+  it("renders null / undefined as empty", () => {
+    expect(arrayEditorText(null)).toBe("");
+    expect(arrayEditorText(undefined)).toBe("");
+  });
+});
+
+describe("parseArrayEditValue", () => {
+  it("parses a JSON array of numbers", () => {
+    expect(parseArrayEditValue("[10, 20, 30]")).toEqual({
+      ok: true,
+      value: [10, 20, 30],
+    });
+  });
+
+  it("parses a JSON array of strings (incl. empty array)", () => {
+    expect(parseArrayEditValue('["a","b"]')).toEqual({
+      ok: true,
+      value: ["a", "b"],
+    });
+    expect(parseArrayEditValue("[]")).toEqual({ ok: true, value: [] });
+  });
+
+  it("rejects non-array JSON and invalid JSON", () => {
+    expect(parseArrayEditValue("42").ok).toBe(false);
+    expect(parseArrayEditValue('{"a":1}').ok).toBe(false);
+    expect(parseArrayEditValue('"just a string"').ok).toBe(false);
+    expect(parseArrayEditValue("[10, 20").ok).toBe(false); // truncated
+    expect(parseArrayEditValue("").ok).toBe(false);
+  });
+
+  it("round-trips through arrayEditorText", () => {
+    const parsed = parseArrayEditValue(arrayEditorText([1, 2, 3]));
+    expect(parsed).toEqual({ ok: true, value: [1, 2, 3] });
   });
 });

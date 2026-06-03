@@ -682,7 +682,51 @@ export function useSidebarActions(
     });
   }, [setExpandedEntities]);
 
+  // Run a DDL statement (e.g. CREATE INDEX / CREATE VIEW from the schema
+  // tree's "+" dialogs) and refresh the sidebar lists. Mirrors
+  // submitAddTable's run/refresh/toast pattern. Resolves true on success.
+  const createSchemaObject = useCallback(
+    async (sql: string, successMessage: string): Promise<boolean> => {
+      const engine = engineRef.current;
+      if (!engine) return false;
+      try {
+        await engine.exec(sql);
+        const [nextTables, nextViews, nextIndexes, nextTriggers] =
+          await Promise.all([
+            engine.listTables(),
+            engine.listViews(),
+            engine.listIndexes(),
+            engine.listTriggers(),
+          ]);
+        setTables(nextTables);
+        setViews(nextViews);
+        setIndexes(nextIndexes);
+        setTriggers(nextTriggers);
+        showToast(successMessage);
+        return true;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Create failed: ${msg}`, "warn");
+        return false;
+      }
+    },
+    [engineRef, setTables, setViews, setIndexes, setTriggers, showToast],
+  );
+
+  // Column names for a table, for the Create Index column picker.
+  const listTableColumnNames = useCallback(
+    async (table: string): Promise<string[]> => {
+      const engine = engineRef.current;
+      if (!engine) return [];
+      const cols = await engine.listColumns(table);
+      return cols.map((c) => c.name);
+    },
+    [engineRef],
+  );
+
   return {
+    createSchemaObject,
+    listTableColumnNames,
     refreshEntityMetadata,
     refreshTableMetadata,
     describeEntity,
