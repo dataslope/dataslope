@@ -116,33 +116,44 @@ async function loadDuckDbModule(): Promise<DuckDbModule> {
   return _duckdbModulePromise;
 }
 
-let _dbPromise: Promise<{ db: AsyncDuckDB; bundle: DuckDbBundle }> | null =
-  null;
-
-async function getDuckDbInstance(): Promise<{
+async function instantiateDuckDb(): Promise<{
   db: AsyncDuckDB;
   bundle: DuckDbBundle;
 }> {
-  if (!_dbPromise) {
-    _dbPromise = (async () => {
-      const duckdb = await loadDuckDbModule();
-      const bundles = duckdb.getJsDelivrBundles();
-      const bundle = await duckdb.selectBundle(bundles);
-      // Bundlers can't always resolve the worker URL, so we wrap the
-      // worker script in a Blob — the standard duckdb-wasm pattern.
-      const workerUrl = URL.createObjectURL(
-        new Blob([`importScripts("${bundle.mainWorker}");`], {
-          type: "text/javascript",
-        }),
-      );
-      const worker = new Worker(workerUrl);
-      const logger = new duckdb.VoidLogger();
-      const db = new duckdb.AsyncDuckDB(logger, worker);
-      await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
-      URL.revokeObjectURL(workerUrl);
-      return { db, bundle };
-    })();
-  }
+  const duckdb = await loadDuckDbModule();
+  const bundles = duckdb.getJsDelivrBundles();
+  const bundle = await duckdb.selectBundle(bundles);
+  // Bundlers can't always resolve the worker URL, so we wrap the
+  // worker script in a Blob — the standard duckdb-wasm pattern.
+  const workerUrl = URL.createObjectURL(
+    new Blob([`importScripts("${bundle.mainWorker}");`], {
+      type: "text/javascript",
+    }),
+  );
+  const worker = new Worker(workerUrl);
+  const logger = new duckdb.VoidLogger();
+  const db = new duckdb.AsyncDuckDB(logger, worker);
+  await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+  URL.revokeObjectURL(workerUrl);
+  return { db, bundle };
+}
+
+let _dbPromise: Promise<{ db: AsyncDuckDB; bundle: DuckDbBundle }> | null =
+  null;
+
+// DuckDB-Wasm shares one in-memory catalog across every connection to the
+// same instance. The page-shared singleton is fine for the SQL Playground
+// (one engine per page) but NOT for the /learn route, where several
+// <SqlCodeBlock>/<SqlChallengeCard> each seed their own tables: a second
+// block's bootstrap runs cleanDuckDbSchema() and wipes the first block's
+// tables. Passing `isolated` returns a *fresh* instance (its own worker +
+// catalog) so learn blocks can't clobber one another; the caller is
+// responsible for terminating it (see createDuckDbEngine's destroy()).
+function getDuckDbInstance(
+  isolated = false,
+): Promise<{ db: AsyncDuckDB; bundle: DuckDbBundle }> {
+  if (isolated) return instantiateDuckDb();
+  if (!_dbPromise) _dbPromise = instantiateDuckDb();
   return _dbPromise;
 }
 
@@ -727,9 +738,9 @@ let _bootstrapChain: Promise<unknown> = Promise.resolve();
 
 async function bootstrapDatabase(
   sample: DuckDbSampleDatabase,
+  db: AsyncDuckDB,
 ): Promise<DuckDbConnection> {
   const run = async (): Promise<DuckDbConnection> => {
-    const { db } = await getDuckDbInstance();
     const conn = await db.connect();
     // Force consistent timestamp formatting for reproducible output.
     await conn.query("SET TimeZone='UTC'");
@@ -757,7 +768,12 @@ export async function createDuckDbEngine(
   workspaceId?: string | null,
 ): Promise<DuckDbEngine> {
   let sample = findDuckDbSampleDatabase(initialSampleId);
-  let conn = await bootstrapDatabase(sample);
+  // Learn blocks (no workspaceId) get an isolated DuckDB instance so they
+  // can't clobber each other's catalog; the Playground (workspaceId, OPFS
+  // persistence) keeps the page-shared singleton.
+  const isolated = !workspaceId;
+  const { db } = await getDuckDbInstance(isolated);
+  let conn = await bootstrapDatabase(sample, db);
   let destroyed = false;
 
   // ─── OPFS persistence (Phase 4) ─────────────────────────────────────
@@ -811,7 +827,6 @@ export async function createDuckDbEngine(
    *  copies the whole catalog via `COPY FROM DATABASE`, and reads the
    *  bytes back out for OPFS persistence. */
   async function exportAsBinaryInternal(): Promise<Uint8Array> {
-    const { db } = await getDuckDbInstance();
     if (!db.copyFileToBuffer) {
       throw new Error("This DuckDB-Wasm build does not support binary file export.");
     }
@@ -847,7 +862,6 @@ export async function createDuckDbEngine(
       const { readDatabase } = await import("../opfs/databaseStorage");
       const bytes = await readDatabase(workspaceId, DUCKDB_FILE);
       if (!bytes || bytes.byteLength === 0) return false;
-      const { db } = await getDuckDbInstance();
       const importFile = "_playground_restore_tmp.duckdb";
       const alias = "_playground_restore_alias";
       await db.registerFileBuffer(importFile, bytes);
@@ -961,7 +975,7 @@ export async function createDuckDbEngine(
   const engine: DuckDbEngine = {
     async loadSampleDatabase(id) {
       const target = findDuckDbSampleDatabase(id);
-      const next = await bootstrapDatabase(target);
+      const next = await bootstrapDatabase(target, db);
       if (destroyed) {
         // The component unmounted while this switch was in flight. Don't
         // adopt the new connection — close it so the orphaned bootstrap
@@ -984,7 +998,7 @@ export async function createDuckDbEngine(
     },
 
     async loadBlankDatabase() {
-      const next = await bootstrapDatabase(DUCKDB_BLANK_DATABASE);
+      const next = await bootstrapDatabase(DUCKDB_BLANK_DATABASE, db);
       if (destroyed) {
         try {
           await next.close();
@@ -1009,7 +1023,7 @@ export async function createDuckDbEngine(
       // the import; the best we can do is bootstrap a blank schema, try
       // the SQL there, and restore the previous sample if it fails.
       const previousSample = sample;
-      const next = await bootstrapDatabase(DUCKDB_BLANK_DATABASE);
+      const next = await bootstrapDatabase(DUCKDB_BLANK_DATABASE, db);
       try {
         const stmts = splitDuckDbStatements(sql);
         for (const stmt of stmts) {
@@ -1021,7 +1035,7 @@ export async function createDuckDbEngine(
         } catch {
           /* ignore */
         }
-        const restored = await bootstrapDatabase(previousSample);
+        const restored = await bootstrapDatabase(previousSample, db);
         try {
           await conn.close();
         } catch {
@@ -1580,12 +1594,10 @@ export async function createDuckDbEngine(
     },
 
     async registerFileBuffer(name, buffer) {
-      const { db } = await getDuckDbInstance();
       await db.registerFileBuffer(name, buffer);
     },
 
     async readFileBuffer(name) {
-      const { db } = await getDuckDbInstance();
       if (!db.copyFileToBuffer) return null;
       try {
         return await db.copyFileToBuffer(name);
@@ -1595,7 +1607,6 @@ export async function createDuckDbEngine(
     },
 
     async dropFile(name) {
-      const { db } = await getDuckDbInstance();
       try {
         await db.dropFile?.(name);
       } catch {
@@ -1673,6 +1684,15 @@ export async function createDuckDbEngine(
         await conn.close();
       } catch {
         /* ignore */
+      }
+      // Isolated learn instances own their worker — terminate it so a page
+      // full of SQL blocks doesn't leak a worker + WASM heap per block.
+      if (isolated) {
+        try {
+          await db.terminate();
+        } catch {
+          /* ignore */
+        }
       }
     },
   };
