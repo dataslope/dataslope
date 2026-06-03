@@ -142,6 +142,8 @@ import { ResultView } from "./components/ResultView";
 import { SchemaItem } from "./components/SchemaItem";
 import { SchemaLeafItem } from "./components/SchemaLeafItem";
 import { SchemaSection } from "./components/SchemaSection";
+import { CreateIndexDialog } from "./components/CreateIndexDialog";
+import { CreateViewDialog } from "./components/CreateViewDialog";
 import {
   DatabaseSelector,
   type DatabaseSelectorAction,
@@ -847,6 +849,8 @@ function SqlPlaygroundInner() {
   }, [runActiveTab, runSelection]);
 
   const {
+    createSchemaObject,
+    listTableColumnNames,
     refreshEntityMetadata,
     refreshTableMetadata,
     describeEntity,
@@ -874,6 +878,16 @@ function SqlPlaygroundInner() {
     { engineRef, activeTabIdRef, activeDbIdRef },
     openTabAndRun,
   );
+
+  const [createIndexOpen, setCreateIndexOpen] = useState(false);
+  const [createViewOpen, setCreateViewOpen] = useState(false);
+  const [createViewBody, setCreateViewBody] = useState("");
+  // Capture the editor text in this event handler (reading a ref during
+  // render is disallowed) so the Create View body can be seeded from it.
+  const openCreateView = useCallback(() => {
+    setCreateViewBody(editorRef.current?.state.doc.toString() ?? "");
+    setCreateViewOpen(true);
+  }, []);
 
   const {
     addTab,
@@ -3259,6 +3273,21 @@ function SqlPlaygroundInner() {
           </Dialog.Portal>
         </Dialog.Root>
 
+        <CreateIndexDialog
+          open={createIndexOpen}
+          onOpenChange={setCreateIndexOpen}
+          tables={tables}
+          getColumns={listTableColumnNames}
+          onSubmit={createSchemaObject}
+        />
+        <CreateViewDialog
+          open={createViewOpen}
+          onOpenChange={setCreateViewOpen}
+          dialect="sqlite"
+          defaultBody={createViewBody}
+          onSubmit={createSchemaObject}
+        />
+
         <div className="sql-shell" ref={shellRef}>
           <aside className="sql-sidebar" aria-label="Database explorer">
             <div className="sql-db-selector-wrap">
@@ -3387,6 +3416,7 @@ function SqlPlaygroundInner() {
                 expanded={viewsSectionExpanded}
                 onToggle={() => setViewsSectionExpanded((v) => !v)}
                 emptyMessage="No views."
+                onAdd={openCreateView}
                 allExpanded={
                   views.length > 0 &&
                   views.every((n) => expandedEntities.has(n))
@@ -3426,6 +3456,7 @@ function SqlPlaygroundInner() {
                 expanded={indexesSectionExpanded}
                 onToggle={() => setIndexesSectionExpanded((v) => !v)}
                 emptyMessage="No indexes."
+                onAdd={() => setCreateIndexOpen(true)}
               >
                 {indexes.map((name) => (
                   <SchemaLeafItem

@@ -133,6 +133,8 @@ import { ResultView } from "../sql/components/ResultView";
 import { SchemaItem } from "../sql/components/SchemaItem";
 import { SchemaLeafItem } from "../sql/components/SchemaLeafItem";
 import { SchemaSection } from "../sql/components/SchemaSection";
+import { CreateIndexDialog } from "../sql/components/CreateIndexDialog";
+import { CreateViewDialog } from "../sql/components/CreateViewDialog";
 import {
   DatabaseSelector,
   type DatabaseSelectorAction,
@@ -1324,6 +1326,46 @@ function PostgresPlaygroundInner() {
   const handleSchemaChange = useCallback(
     (schema: string) => handleSchemaChangeFromHook(schema, refreshSchema),
     [handleSchemaChangeFromHook, refreshSchema],
+  );
+
+  const [createIndexOpen, setCreateIndexOpen] = useState(false);
+  const [createViewOpen, setCreateViewOpen] = useState(false);
+  const [createViewBody, setCreateViewBody] = useState("");
+  // Capture the editor text in this event handler (reading a ref during
+  // render is disallowed) so the Create View body can be seeded from it.
+  const openCreateView = useCallback(() => {
+    setCreateViewBody(editorRef.current?.state.doc.toString() ?? "");
+    setCreateViewOpen(true);
+  }, []);
+
+  // Run a DDL statement from the schema tree's Create Index / Create View
+  // dialogs, then refresh the sidebar. Resolves true on success.
+  const createSchemaObject = useCallback(
+    async (sql: string, successMessage: string): Promise<boolean> => {
+      const engine = engineRef.current;
+      if (!engine) return false;
+      try {
+        await engine.exec(sql);
+        await refreshSchema();
+        showToast(successMessage);
+        return true;
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        showToast(`Create failed: ${msg}`, "warn");
+        return false;
+      }
+    },
+    [refreshSchema, showToast],
+  );
+
+  const getCreateIndexColumns = useCallback(
+    async (table: string): Promise<string[]> => {
+      const engine = engineRef.current;
+      if (!engine) return [];
+      const cols = await engine.listColumns(table, selectedSchemaRef.current);
+      return cols.map((c) => c.name);
+    },
+    [selectedSchemaRef],
   );
 
   function validateSchemaName(name: string, existingSchemas: string[]): string[] {
@@ -3962,6 +4004,21 @@ function PostgresPlaygroundInner() {
           onSubmit={() => void submitAddRow()}
         />
 
+        <CreateIndexDialog
+          open={createIndexOpen}
+          onOpenChange={setCreateIndexOpen}
+          tables={tables}
+          getColumns={getCreateIndexColumns}
+          onSubmit={createSchemaObject}
+        />
+        <CreateViewDialog
+          open={createViewOpen}
+          onOpenChange={setCreateViewOpen}
+          dialect="postgres"
+          defaultBody={createViewBody}
+          onSubmit={createSchemaObject}
+        />
+
         {/* ── Add Table drawer ── */}
         <Dialog.Root
           open={addTableDialog !== null}
@@ -4529,6 +4586,7 @@ function PostgresPlaygroundInner() {
                 expanded={viewsExpanded}
                 onToggle={() => setViewsExpanded((v) => !v)}
                 emptyMessage="No views."
+                onAdd={openCreateView}
                 allExpanded={
                   views.length > 0 &&
                   views.every((name) => expandedEntities.has(name))
@@ -4581,6 +4639,7 @@ function PostgresPlaygroundInner() {
                 expanded={indexesExpanded}
                 onToggle={() => setIndexesExpanded((v) => !v)}
                 emptyMessage="No indexes."
+                onAdd={() => setCreateIndexOpen(true)}
               >
                 {indexes.map((name) => (
                   <SchemaLeafItem

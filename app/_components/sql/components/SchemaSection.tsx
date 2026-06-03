@@ -30,6 +30,15 @@ export interface SchemaSectionProps {
 
 export const SchemaSection = memo(SchemaSectionImpl);
 
+/** Singular, lower-cased form of a section label ("Indexes" → "index",
+ *  "Views" → "view"). A plain trailing-"s" strip mangles "Indexes" into
+ *  "indexe", so that case is handled explicitly. */
+function singularLabel(label: string): string {
+  const lower = label.toLowerCase();
+  if (lower.endsWith("indexes")) return lower.replace(/indexes$/, "index");
+  return lower.replace(/s$/, "");
+}
+
 function SchemaSectionImpl({
   label,
   count,
@@ -49,7 +58,9 @@ function SchemaSectionImpl({
   const expandCollapseHint = allExpanded
     ? `Collapse all ${label.toLowerCase()}`
     : `Expand all ${label.toLowerCase()}`;
-  const addHint = `Add ${label.toLowerCase().replace(/s$/, "")}`;
+  const labelSingular = singularLabel(label);
+  const addArticle = /^[aeiou]/i.test(labelSingular) ? "an" : "a";
+  const addHint = `Add ${labelSingular}`;
   const hasContextMenu = !!(onAdd || onExpandAll || onCollapseAll);
   const labelLower = label.toLowerCase();
 
@@ -207,7 +218,9 @@ function SchemaSectionImpl({
                 onClick={onAdd}
               >
                 <Table size={12} aria-hidden="true" />
-                <span>Create a {label.toLowerCase().replace(/s$/, "")}</span>
+                <span>
+                  Create {addArticle} {labelSingular}
+                </span>
               </button>
             ) : (
               <div className="sql-tree-empty">{emptyMessage}</div>
