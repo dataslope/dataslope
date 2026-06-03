@@ -86,6 +86,7 @@ import {
   type ChallengeTest,
   type ParsedTestResult,
 } from "./challengeHarness";
+import { mergeInitAndEntry } from "./runtime/mergeInit";
 import styles from "./ChallengeCard.module.css";
 
 type Status = "idle" | "loading" | "ready" | "running" | "error";
@@ -944,7 +945,9 @@ export default function ChallengeCard({
     setActiveAction("submit");
     const snapshot = snapshotAllFiles();
     const entryCode = snapshot.get(resolvedEntryFilename) ?? "";
-    const userPart = hasInit ? `${trimmedInit}\n${entryCode}` : entryCode;
+    const userPart = hasInit
+      ? mergeInitAndEntry(adapter.id, trimmedInit, entryCode)
+      : entryCode;
     // Build a native harness for the subset of tests that have a `code`
     // field. Stdout-based tests are evaluated separately after the run.
     const harness = buildHarness(adapter.id, tests);

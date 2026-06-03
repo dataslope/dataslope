@@ -43,6 +43,7 @@ import type {
   PlotlyFigure,
 } from "./types";
 import { getSharedRuntime, isRuntimeReady, RuntimeScope } from "./runtimeRegistry";
+import { mergeInitAndEntry } from "./runtime/mergeInit";
 import {
   clearPersistedCode,
   loadPersistedCode,
@@ -669,7 +670,9 @@ function CodeBlockInner({
     // scope as the user code. Authors are responsible for providing
     // syntactically-compatible init (e.g. top-level `using`/`#include`
     // for compiled languages).
-    const code = hasInit ? `${trimmedInit}\n${entrySource}` : entrySource;
+    const code = hasInit
+      ? mergeInitAndEntry(adapter.id, trimmedInit, entrySource)
+      : entrySource;
     const mySeq = ++runSeqRef.current;
 
     setOutputs([]);
@@ -1336,7 +1339,7 @@ function OutputCellView({
     cell.type === "stdout" || cell.type === "stderr" || cell.type === "html";
 
   return (
-    <div className={wrapperClass}>
+    <div className={wrapperClass} data-cell-type={cell.type}>
       <div className={styles.outCellHeader}>
         <span className={styles.outCellType}>{headerLabel}</span>
         {cell.elapsed && (
