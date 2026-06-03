@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { discoverPages } from "./_discoverPages";
 
 // Drives every <ChallengeCard> on every /learn/challenge-cards/<lang>
 // page, loads its reference solution into the editor buffers, clicks
@@ -47,7 +48,10 @@ declare global {
   }
 }
 
-const CHALLENGE_PAGES: { path: string; label: string }[] = [
+// Default: the per-language/dialect demo pages. Set COURSEWARE=1 to sweep
+// every /learn page that embeds a <ChallengeCard> or <SqlChallengeCard>
+// across all courses — a long, opt-in CI run.
+const DEMO_PAGES: { path: string; label: string }[] = [
   { path: "challenge-cards-javascript", label: "JavaScript" },
   { path: "challenge-cards-typescript", label: "TypeScript" },
   { path: "challenge-cards-python", label: "Python" },
@@ -63,6 +67,14 @@ const CHALLENGE_PAGES: { path: string; label: string }[] = [
   { path: "sql-challenge-cards-duckdb", label: "DuckDB" },
   { path: "sql-challenge-cards-postgres", label: "PostgreSQL" },
 ];
+
+const CHALLENGE_PAGES: { path: string; label: string }[] = process.env
+  .COURSEWARE
+  ? discoverPages(["<ChallengeCard", "<SqlChallengeCard"]).map((p) => ({
+      path: p.route.replace(/^\/learn\//, ""),
+      label: p.route,
+    }))
+  : DEMO_PAGES;
 
 async function readCardsOnPage(page: Page): Promise<
   {

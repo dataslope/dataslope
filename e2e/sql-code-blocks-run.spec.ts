@@ -1,4 +1,5 @@
 import { test, expect, type Locator } from "@playwright/test";
+import { discoverPages } from "./_discoverPages";
 
 // Runs every <SqlCodeBlock> on each /learn/sql-code-blocks-<dialect> demo
 // page and asserts the query executes without the block entering its
@@ -10,11 +11,20 @@ import { test, expect, type Locator } from "@playwright/test";
 //             ("idle"|"loading"|"running"|"ready"|"error")
 //   - run:    [data-testid="sql-codeblock-run"] (disabled while busy)
 
-const SQL_PAGES: { path: string; label: string }[] = [
+// Default: the per-dialect demo pages. COURSEWARE=1 sweeps every /learn page
+// that embeds a <SqlCodeBlock> across all courses (long, opt-in CI run).
+const DEMO_PAGES: { path: string; label: string }[] = [
   { path: "sql-code-blocks-sqlite", label: "SQLite" },
   { path: "sql-code-blocks-duckdb", label: "DuckDB" },
   { path: "sql-code-blocks-postgres", label: "PostgreSQL" },
 ];
+
+const SQL_PAGES: { path: string; label: string }[] = process.env.COURSEWARE
+  ? discoverPages(["<SqlCodeBlock"]).map((p) => ({
+      path: p.route.replace(/^\/learn\//, ""),
+      label: p.route,
+    }))
+  : DEMO_PAGES;
 
 async function runBlock(
   block: Locator,
