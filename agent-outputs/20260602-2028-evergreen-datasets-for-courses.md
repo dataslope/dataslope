@@ -4,7 +4,7 @@
 **Purpose:** A curated, license-verified catalogue of small "evergreen" datasets that DataSlope can **re-host in a public GitHub repo** and use across its courses (Pandas, data visualization, scientific computing, statistics, machine learning, NLP, time series, R, and SQL).
 **Special focus:** multi-table relational datasets for the SQL courses.
 
-**Methodology:** Five parallel research agents fanned out across the web; every license claim was checked against a primary source (the actual `LICENSE` file, dataset page, or terms-of-use page), not from memory. The nine most load-bearing claims (Chinook, Sakila, Northwind, UCI, Palmer Penguins, FiveThirtyEight, seaborn-data, diamonds→Zenodo, SILSO) were then independently re-verified by hand. **A second pass (§14–§15)** added ~50 more *standalone* datasets — from Kaggle, a broader UCI sweep, the Hugging Face Hub, government/institutional portals, and data hubs — under the same discipline (MovieLens's non-commercial terms, `banking77`'s CC BY 4.0, and Natural Earth's public-domain status were hand-checked). A third pass (§16) catalogues **scraped / legally gray-area** datasets — *for awareness only* — each with its specific risk and a clean substitute. A fourth pass (§17) adds ~90 more real-world datasets browsed from GitHub, museums/libraries, sports & science sites, and civic/transit portals. A fifth pass (§18) adds ~70 more **English-language** datasets across US-federal, finance, health, text/legal, and computer-vision sources. Source URLs are cited inline and collected at the end.
+**Methodology:** Five parallel research agents fanned out across the web; every license claim was checked against a primary source (the actual `LICENSE` file, dataset page, or terms-of-use page), not from memory. The nine most load-bearing claims (Chinook, Sakila, Northwind, UCI, Palmer Penguins, FiveThirtyEight, seaborn-data, diamonds→Zenodo, SILSO) were then independently re-verified by hand. **A second pass (§14–§15)** added ~50 more *standalone* datasets — from Kaggle, a broader UCI sweep, the Hugging Face Hub, government/institutional portals, and data hubs — under the same discipline (MovieLens's non-commercial terms, `banking77`'s CC BY 4.0, and Natural Earth's public-domain status were hand-checked). A third pass (§16) catalogues **scraped / legally gray-area** datasets — *for awareness only* — each with its specific risk and a clean substitute. A fourth pass (§17) adds ~90 more real-world datasets browsed from GitHub, museums/libraries, sports & science sites, and civic/transit portals. A fifth pass (§18) adds ~70 more **English-language** datasets across US-federal, finance, health, text/legal, and computer-vision sources. A sixth pass (§19) adds ~70 more English datasets — reference/lookup tables, US state & city portals, English-speaking-country government data, survey/elections data, and environment/agriculture. Source URLs are cited inline and collected at the end.
 
 ---
 
@@ -736,7 +736,69 @@ Use the *aggregate* CDC/CMS tables (clean PD); avoid individual-level/credential
 
 ---
 
-## 19. Sources (primary, hand-verified in **bold**)
+## 19. Still more English datasets (sixth pass — reference tables · state/city portals · world-English gov · surveys · environment)
+
+~70 more. Hand-verified this pass: PubChem periodic table (PD), USDA NASS (CC0), Capital Bikeshare (prohibits standalone redistribution), CES (CC0), geoBoundaries (earlier).
+
+### 19.1 Reference / lookup tables for SQL joins (small, clean)
+
+Perfect small dimension tables to JOIN against larger sets.
+
+| Dataset | License | Tier | Notes |
+| --- | --- | --- | --- |
+| **PubChem Periodic Table** ⭐ | US-gov PD | 🟢A | 118 elements × 17 cols — clean SQL/merge anchor |
+| **US Census FIPS + ZCTA→county crosswalks** ⭐ | US-gov PD | 🟢A | The canonical join-teaching tables |
+| **annexare/Countries** | MIT | 🟢B | 250 countries: capital, currency, languages, calling codes |
+| **meodai/color-names** | MIT | 🟢B | ~30K color names + hex |
+| Unicode Character Database + emoji | Unicode License (permissive) | 🟢B | NLP/string processing |
+| Nager.Date public holidays | MIT | 🟢B | Calendar joins, business-day logic |
+| **Wikipedia Clickstream / Pageviews** ⭐ | CC0 | 🟢A | ~25M rows/month — engaging analytics (subset) |
+| dr5hn countries-states-cities | ODbL | 🟡C | 153K cities → multi-table SQL (copyleft) |
+| Bowserinator Periodic-Table-JSON | CC BY-SA 3.0 | 🟡C | Richer element data, but copyleft (not CC0) |
+
+🔴 **AVOID:** **SUBTLEX-US** word frequencies (non-commercial), **SimpleMaps** free US ZIP (prohibits redistribution), **google-10000-english** (LDC-restricted).
+
+### 19.2 US state & city open-data portals — licensing varies a LOT
+
+Always check the portal/dataset license — "open data" ≠ automatically re-hostable. Typical datasets: food/restaurant inspections, employee earnings, building permits, business licenses.
+
+| Portal | License | Tier |
+| --- | --- | --- |
+| **Analyze Boston** (data.boston.gov) ⭐ | **PDDL** (public domain) | 🟢A |
+| **Nashville** (data.nashville.gov) | **CC0** | 🟢A |
+| **Seattle** · **Cook County** | Public domain (per dataset) | 🟢A |
+| **WPRDC Pittsburgh** (data.wprdc.org) | CC0 / CC BY (per dataset) | 🟢A/B |
+| **Pennsylvania** (data.pa.gov) | "without restriction" | 🟢B |
+| **Denver** | CC BY 3.0 | 🟢B |
+| **Washington State** (data.wa.gov) | per-dataset (many CC0/CC BY) | 🟢B |
+
+🔴 **AVOID / caution:** **Maryland** (most datasets show *no* license), **King County WA** (license is **revocable**), **Texas / Connecticut / Austin** (no explicit license — public-record basis only), **Colorado** (custom; disclaimer must travel with the data), **LA County** (per-dataset custom). Best picks: Boston food inspections (PDDL), Nashville employee earnings (CC0), WPRDC Allegheny restaurant inspections (CC0), Seattle building permits (PD).
+
+### 19.3 English-speaking-country & world-English government data
+
+| Source | License | Tier | Example datasets |
+| --- | --- | --- | --- |
+| **New Zealand** data.govt.nz | CC BY 4.0 | 🟢B | Population, births/deaths (Stats NZ) |
+| **Ireland** data.gov.ie | CC BY 4.0 | 🟢B | CSO vital statistics |
+| **Scotland / Wales** | OGL v3 | 🟢B | **Scottish Index of Multiple Deprivation** (6,976 rows), life expectancy |
+| **India** data.gov.in | GODL-India | 🟢B | Crop production, rainfall (good cleaning practice) |
+| **UNHCR** refugee statistics | CC BY 4.0 | 🟢B | Displacement time series (1951–) |
+
+🟡 **Caution:** **Singapore** data.gov.sg (Open Data Licence — a **sub-licensing clause** makes raw-file re-hosting gray; the popular HDB resale-price set lives here → link, don't re-host raw), **FAOSTAT** (CC BY 4.0 **+ "no commercial promotion"** clause — fine in curriculum, not in marketing). 🔴 WHO GHO (covered — CC BY-NC-SA).
+
+### 19.4 Survey & elections data
+
+🟢 **Clean:** **Cooperative Election Study (CES/CCES)** — **CC0** (Harvard Dataverse, ~642K US political-survey rows — the clean GSS replacement); **OpenElections** — MIT (US precinct results → great SQL); **V-Dem** — CC BY-SA (democracy indices, country-year).
+🔴 **AVOID:** **GSS (General Social Survey)** — ubiquitous in courses but **no open license grant** (use CES instead); **QOG** (explicitly bans redistribution + commercial use); **Freedom House** (non-commercial); **Pew Research** & **ANES** (registration + no-redistribution); IPUMS / World Values Survey (registration).
+
+### 19.5 Environment / agriculture + quirky
+
+🟢 **Clean:** **EPA** TRI / AQS / ECHO / ENERGY STAR (US-gov PD — pollution, air quality), **USDA NASS QuickStats** (CC0 — agriculture), **FHFA House Price Index** + **HUD Fair Market Rents** (PD — housing), **Global Carbon Budget** (CC BY 4.0 — emissions), **Wikipedia Clickstream** (CC0), **Austin Animal Center** intakes/outcomes (city open data — engaging "shelter" narrative; verify portal terms).
+🔴 **AVOID:** **Bike-share** data (Capital Bikeshare, Divvy, Bay Wheels, Bluebikes) — the Motivate/Lyft license **forbids redistributing it as a standalone dataset** (analyze it in a pipeline, don't re-host the files); **SWAPI / Star Wars** (Lucasfilm IP); **Smithsonian Global Volcanism** (non-commercial); **Scrabble** word lists (Hasbro/Mattel); **Hacker News** / **GH Archive** (user-content / no clear data license); scraped fun sets (**Coffee Quality**, **NUFORC UFO**, **80 Cereals**).
+
+---
+
+## 20. Sources (primary, hand-verified in **bold**)
 
 **SQL / multi-table**
 - **Chinook — MIT:** <https://github.com/lerocha/chinook-database/blob/master/LICENSE.md>
@@ -795,6 +857,13 @@ Use the *aggregate* CDC/CMS tables (clean PD); avoid individual-level/credential
 - Finance: FRED legal (per-series ©) <https://fred.stlouisfed.org/legal/> · DataHub S&P 500 (Shiller) <https://github.com/datasets/s-and-p-500> · IMF (non-commercial) <https://www.imf.org/en/about/copyright-and-terms> · OECD (CC BY 4.0) <https://www.oecd.org/en/about/terms-conditions.html>
 - Health: NCHS Leading Causes (US-gov works) <https://catalog.data.gov/dataset/nchs-leading-causes-of-death-united-states> · CMS provider data <https://data.cms.gov/provider-data/topics/hospitals> · Project Tycho (ODbL) <https://catalog.data.gov/dataset/project-tycho-level-1-data> · IHME (CC BY-NC) <https://www.healthdata.org/data-tools-practices/data-practices/terms-and-conditions> · NCHS data-user agreement <https://www.cdc.gov/nchs/policy/data-user-agreement.html>
 - CV: USGS Landsat (PD) <https://www.usgs.gov/faqs/are-there-any-restrictions-use-or-redistribution-landsat-data> · Caltech-101 (CC BY 4.0) <https://data.caltech.edu/records/mzrjq-6wc02> · ImageNet (non-commercial) <https://image-net.org/accessagreement> · COCO (annotations CC BY; images Flickr) <https://cocodataset.org/> · Bob Ross (CC BY 4.0) <https://github.com/fivethirtyeight/data/tree/master/bob-ross>
+
+**Sixth pass — reference tables / state-city portals / world-English gov / surveys / environment**
+- **USDA NASS QuickStats — CC0:** <https://catalog.data.gov/dataset/quick-stats-agricultural-database> · **Capital Bikeshare — prohibits standalone redistribution:** <https://capitalbikeshare.com/data-license-agreement> · PubChem periodic table (PD) <https://pubchem.ncbi.nlm.nih.gov/rest/pug/periodictable/CSV> · Wikimedia dumps (CC0) <https://dumps.wikimedia.org/legal.html> · annexare/Countries (MIT) <https://github.com/annexare/Countries> · Unicode License <https://www.unicode.org/license.txt>
+- State/city portals: Boston PDDL <https://opendatacommons.org/licenses/pddl/1-0/> · Nashville CC0 policy <https://mymadison.io/documents/metro-nashville-government-open-data-policy> · WPRDC licenses <https://www.wprdc.org/en/data-licenses> · Pennsylvania <https://data.pa.gov/data-policy> · King County (revocable) <https://kingcounty.gov/en/legacy/about/website/datatermsofuse>
+- World-English gov: NZGOAL/NZ (CC BY 4.0) <https://www.data.govt.nz/toolkit/policies/nzgoal> · Ireland (CC BY 4.0) <https://data.gov.ie/pages/opendatalicence> · GODL-India <https://www.data.gov.in/Godl> · Singapore ODL <https://data.gov.sg/open-data-licence> · FAOSTAT terms (CC BY + no-promo) <https://www.fao.org/contact-us/terms/db-terms-of-use/en/> · UNHCR <https://www.unhcr.org/terms-and-conditions-data.html>
+- Surveys/elections: CES (CC0, Harvard Dataverse) <https://dataverse.harvard.edu/dataverse/cces> · OpenElections (MIT) <https://github.com/openelections/openelections-data-ca/blob/master/LICENSE.md> · QOG (no redistribution) <https://www.gu.se/en/quality-government/qog-data/data-downloads/standard-dataset> · Pew (no redistribution) <https://www.pewresearch.org/about/terms-and-conditions/>
+- Environment: EPA data license (PD) <https://edg.epa.gov/epa_data_license.html> · EPA AQS PD statement <https://www.epa.gov/outdoor-air-quality-data/do-i-need-request-permission-use-monitoring-data-and-graphics-airdata> · Global Carbon Budget (CC BY 4.0) <https://zenodo.org/records/13981696> · Smithsonian Volcanism (non-commercial) <https://volcano.si.edu/gvp_termsofuse.cfm>
 
 ---
 
