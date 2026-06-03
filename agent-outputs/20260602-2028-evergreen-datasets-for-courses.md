@@ -4,7 +4,7 @@
 **Purpose:** A curated, license-verified catalogue of small "evergreen" datasets that DataSlope can **re-host in a public GitHub repo** and use across its courses (Pandas, data visualization, scientific computing, statistics, machine learning, NLP, time series, R, and SQL).
 **Special focus:** multi-table relational datasets for the SQL courses.
 
-**Methodology:** Five parallel research agents fanned out across the web; every license claim was checked against a primary source (the actual `LICENSE` file, dataset page, or terms-of-use page), not from memory. The nine most load-bearing claims (Chinook, Sakila, Northwind, UCI, Palmer Penguins, FiveThirtyEight, seaborn-data, diamonds→Zenodo, SILSO) were then independently re-verified by hand. **A second pass (§14–§15)** added ~50 more *standalone* datasets — from Kaggle, a broader UCI sweep, the Hugging Face Hub, government/institutional portals, and data hubs — under the same discipline (MovieLens's non-commercial terms, `banking77`'s CC BY 4.0, and Natural Earth's public-domain status were hand-checked). A third pass (§16) catalogues **scraped / legally gray-area** datasets — *for awareness only* — each with its specific risk and a clean substitute. Source URLs are cited inline and collected at the end.
+**Methodology:** Five parallel research agents fanned out across the web; every license claim was checked against a primary source (the actual `LICENSE` file, dataset page, or terms-of-use page), not from memory. The nine most load-bearing claims (Chinook, Sakila, Northwind, UCI, Palmer Penguins, FiveThirtyEight, seaborn-data, diamonds→Zenodo, SILSO) were then independently re-verified by hand. **A second pass (§14–§15)** added ~50 more *standalone* datasets — from Kaggle, a broader UCI sweep, the Hugging Face Hub, government/institutional portals, and data hubs — under the same discipline (MovieLens's non-commercial terms, `banking77`'s CC BY 4.0, and Natural Earth's public-domain status were hand-checked). A third pass (§16) catalogues **scraped / legally gray-area** datasets — *for awareness only* — each with its specific risk and a clean substitute. A fourth pass (§17) adds ~90 more real-world datasets browsed from GitHub, museums/libraries, sports & science sites, and civic/transit portals. Source URLs are cited inline and collected at the end.
 
 ---
 
@@ -487,9 +487,9 @@ Treat every entry below as 🔴 (or the 🔴🔴 privacy tier in §16.8).
 
 | Dataset | Scraped from | The specific issue | Cleaner alternative |
 | --- | --- | --- | --- |
-| sports-reference family (NBA/NFL/MLB/NHL) | sports-reference.com (paid 3rd-party data) | Explicit "no scraping / no competing database"; rate-limited & IP-blocked | **Retrosheet** (commercial use OK + attribution ✓), **Lahman** (CC BY-SA) for baseball; **nflverse**, **StatsBomb Open Data**, `nba_api` |
+| sports-reference family (NBA/NFL/MLB/NHL) | sports-reference.com (paid 3rd-party data) | Explicit "no scraping / no competing database"; rate-limited & IP-blocked | **Retrosheet** (commercial use OK + attribution ✓), **Lahman** (CC BY-SA) for baseball; **nflverse** (CC BY 4.0), **OpenPowerlifting** (public domain), `nba_api` |
 | 120 Years of Olympic History | sports-reference (now Olympedia) | Scraped → CC0 tag invalid; IOC marks | **Olympedia** (check terms); IOC Olympic Data Feed |
-| FIFA / EA FC players (SoFIFA) | EA Sports IP via SoFIFA | EA owns the in-game ratings; player attributes are group-licensed | **StatsBomb Open Data**; real match stats from openly-licensed providers |
+| FIFA / EA FC players (SoFIFA) | EA Sports IP via SoFIFA | EA owns the in-game ratings; player attributes are group-licensed | no clean commercial event-data swap — **StatsBomb** is research-licensed (verify its `LICENSE.pdf`); see §17.2 |
 
 ### 16.3 Product reviews & e-commerce
 
@@ -558,7 +558,7 @@ The obvious "big web" sources are **openly licensed**, not illegally scraped:
 | Movie metadata / recommender | TMDB API (attrib) · MovieLens (research) |
 | Movie-review sentiment | UCI Sentiment Sentences (CC BY) · Cornell/SST (research) |
 | Music metadata / features | MusicBrainz (CC0) · FMA metadata (CC BY 4.0) · Essentia |
-| Baseball / sports stats | **Retrosheet** (commercial OK) · Lahman (CC BY-SA) · StatsBomb · nflverse |
+| Baseball / sports stats | **Retrosheet** (commercial OK) · Lahman (CC BY-SA) · nflverse (CC BY 4.0) · OpenPowerlifting (PD) |
 | Product-review NLP | UCI Sentiment Sentences (CC BY) |
 | Tweets / social sentiment | UCI SMS Spam · SST-2 (research) |
 | News classification | GDELT (open) · 20 Newsgroups (public domain) |
@@ -569,7 +569,104 @@ The obvious "big web" sources are **openly licensed**, not illegally scraped:
 
 ---
 
-## 17. Sources (primary, hand-verified in **bold**)
+## 17. Even more real-world datasets (fourth pass — museums · sports · science · civic · GitHub)
+
+This pass browsed GitHub, specialized sites, and open-data portals directly (per request) and adds ~90 more datasets/sources. Same tiers; 🔴 = don't re-host. Hand-verified this pass: OpenPowerlifting (PD), geoBoundaries (CC BY 4.0), National Gallery of Art (CC0), StatsBomb (correction below).
+
+> **Correction to §16:** I'd listed **StatsBomb Open Data** as a clean substitute for scraped soccer data. Its README restricts use to *"research projects and genuine interest in football analytics"* under a custom `LICENSE.pdf` and does **not** clearly permit commercial use → treat as 🟡 **research-licensed, verify before use**, not a clean swap.
+
+### 17.1 Museum & cultural open data — a CC0 goldmine (and great multi-table SQL)
+
+Evergreen (historical art/artifacts), mostly **CC0**, and many ship as multiple related CSVs.
+
+| Dataset | License | Size | Notes / course |
+| --- | --- | --- | --- |
+| **National Gallery of Art** ⭐ | **CC0** | 130K artworks, **15 relational CSVs** | Best museum **SQL** schema (objects/constituents/locations…) |
+| **MoMA** (collection + exhibitions) ⭐ | **CC0** | 126K + 15K + 1.8K rows | Multi-table, famous → Pandas/SQL |
+| The Met | CC0 | 470K rows / 303 MB (subset) | Pandas/viz; filter by department |
+| Cooper Hewitt · Cleveland · Carnegie · Whitney · Walters · Williams College | CC0 | 10K–215K | Right-sized museum collections |
+| **Tate** | **CC0** (not the assumed BY-NC-ND) | 70K + 3.5K | Pandas/SQL (artworks + artists) |
+| NYPL public-domain · Smithsonian · DPLA · Europeana | CC0 (metadata) | large → subset | Big aggregations; per-item rights vary |
+| Rijksmuseum | CC0 + CC BY 4.0 | 800K (filter `usageRights`) | API teaching |
+| Penn Museum · Open Context | CC BY 4.0 | 100s–430K | Archaeology / anthropology |
+
+🔴 **AVOID:** **Harvard Art Museums API** & **Auckland Museum API** (non-commercial). ⚠️ For Smithsonian/DPLA/Europeana/Rijksmuseum the *metadata* is CC0 but underlying object/image rights vary — filter before re-hosting any media.
+
+### 17.2 Sports & games
+
+| Dataset | License | Tier | Notes |
+| --- | --- | --- | --- |
+| **OpenPowerlifting** ⭐ | Public domain | 🟢A | ~4M rows (subset); superb for stats/ML |
+| **Cricsheet** | ODC-BY 1.0 | 🟢B | Ball-by-ball cricket, ~22K matches |
+| **nflverse** | CC BY 4.0 (FTN subset BY-SA) | 🟢B | NFL play-by-play (processed derivative) |
+| **Retrosheet** | custom, commercial-OK ✓ | 🟢B | MLB play-by-play to 1871 |
+| **Open Trivia DB** | CC BY-SA 4.0 | 🟡C | Trivia Q&A; copyleft |
+| Lichess | CC0 | 🟢A | Chess games/puzzles (also in §14.5) |
+
+🔴 **AVOID / flag:** **Jeff Sackmann tennis** (atp/wta/MCP — **CC BY-NC-SA**), **Ergast F1** (CC BY-NC-SA + shut down), **StatsBomb** (research-licensed — verify), **Scryfall / MTGJSON** (Wizards of the Coast Fan Content Policy), **Pokémon** (Nintendo IP), **Baseball Savant / Statcast** (MLB proprietary), **football-data.co.uk** (no stated license).
+
+### 17.3 Science · health · finance · bio
+
+| Dataset | License | Notes / course |
+| --- | --- | --- |
+| **OpenFDA** | CC0 | Drug/device/food events (subset); JSON wrangling |
+| **ClinicalTrials.gov / AACT** | US-gov PD | Multi-table relational → SQL, biomedical NLP |
+| **SEC EDGAR Financial Statement Data Sets** | ODC-PDDL / US PD | 4 tables/quarter → finance SQL, XBRL |
+| **NASA Meteorite Landings** ⭐ | CC0 (US-gov) | 34K rows / **3 MB** — clean small geospatial set |
+| Materials Project | CC BY 4.0 | Materials ML / regression |
+| GBIF · iNaturalist · Movebank | per-record CC0/CC BY (**filter!**) | Ecology/biodiversity; exclude CC BY-NC records |
+
+🔴 **AVOID:** **WHO GHO** (CC BY-NC-SA), **eBird** (non-commercial). ⚠️ **PubChem** (depositor-asserted IP — caution).
+
+### 17.4 Clean ML image / audio datasets
+
+| Dataset | License | Tier | Notes |
+| --- | --- | --- | --- |
+| **Fashion-MNIST** ⭐ | MIT | 🟢B | 70K clothing images; clean MNIST swap |
+| **EMNIST** | CC0 (NIST PD) | 🟢A | Letters + digits |
+| **Speech Commands · LibriSpeech · NSynth** | CC BY 4.0 | 🟢B | Audio ML (host a subset — LibriSpeech `dev-clean` ~337 MB) |
+| Open Images (annotations) | CC BY 4.0 | 🟢B | Object detection (annotations; images by URL) |
+| MNIST | CC BY-SA 3.0 | 🟡C | Copyleft, but commercial OK |
+| KMNIST · Free Spoken Digit | CC BY-SA 4.0 | 🟡C | Copyleft |
+
+🔴 **AVOID:** **ESC-50**, **UrbanSound8K** (CC BY-NC). ⚠️ **CIFAR-10/100** — no stated license + derived from the **withdrawn** 80 Million Tiny Images dataset; legally/ethically murky → don't re-host.
+
+### 17.5 Civic · transit · geospatial
+
+**GTFS** is natively multi-table (`stops`/`routes`/`trips`/`stop_times`/`calendar`) → excellent SQL JOIN practice. Prefer **US NTD-submitted feeds** (public domain under the FTA 2023 rule) or **LA Metro** (permissive) / **VIA Rail Canada** (OGL). 🔴 **CTA (Chicago)** and **WMATA (DC)** developer feeds are restricted — don't re-host.
+
+| Dataset | License | Notes |
+| --- | --- | --- |
+| **SF DataSF** (Muni stops, 311, districts) ⭐ | **PDDL (public domain)** | Cleanest US city portal |
+| **NYC Open Data** (tree census, boundaries) | no-restrictions by law | Effectively public domain |
+| Chicago (libraries, speed cameras) | CC BY 4.0 | Small clean tables |
+| US **Census TIGER/Line + ACS** | US-gov PD | Boundaries + income/pop → choropleths, joins |
+| **geoBoundaries** ⭐ | **CC BY 4.0** | World admin boundaries — the clean **GADM replacement** |
+| **IANA time-zone DB** ⭐ | Public domain | Tiny; nice many-to-many SQL (zones ↔ countries) |
+| OpenStreetMap (Geofabrik) · Overture Base/Buildings | ODbL 🟡C | Copyleft; commercial OK with share-alike |
+| Overture **Places** · Who's On First | CDLA-Permissive / CC BY | POIs, gazetteer |
+| UK **NaPTAN/NSPL** (OGL) · **StatCan** (OGL-Canada) · **ABS** Australia (CC BY 4.0) | 🟢B | National gov data, commercial OK w/ attribution |
+
+🔴 **AVOID:** **GADM** (non-commercial — use geoBoundaries), some **Eurostat GISCO** boundary layers (NC), **CTA/WMATA** GTFS. ⚠️ OpenAddresses & the LA portal — per-source / unstated, verify first.
+
+### 17.6 Curated GitHub repos & discovery channels
+
+| Source | License | Notes |
+| --- | --- | --- |
+| **the-pudding/data** | MIT | 50+ tiny, clean story CSVs (culture / journalism) |
+| **BuzzFeedNews** (e.g. NICS firearm checks) | MIT (code) + CC BY 4.0 (data) | Investigative data; verify per repo |
+| **JHU COVID-19** (CSSE) | CC BY 4.0 | Archived → evergreen time series |
+| **DataHub core** (airport / currency / country codes) | PDDL | Clean reference/lookup tables for joins |
+| **Tatoeba** | CC BY 2.0 (+ CC0 subset) | Multilingual sentences → NLP |
+| **WordNet** | Princeton permissive (OSI-approved) | Lexical database → NLP |
+| **ConceptNet · Open Trivia DB** | CC BY-SA 4.0 | Copyleft |
+
+🔴 **AVOID:** **WaPo police-shootings / school-shootings** (CC BY-NC-SA — a course staple, but non-commercial), **NYT COVID** (custom NC), **Tableau "Sample Superstore"** (EULA forbids redistribution — widely re-shared in violation), **jbrownlee/Datasets** & **selva86/datasets** (no license → trace to UCI / the primary source), Academic Torrents (unvetted).
+**Discovery (vet per-dataset):** `r/datasets`, **Data Is Plural**, Awesome Public Datasets, HDX (filter to CC BY / CC0), data.world.
+
+---
+
+## 18. Sources (primary, hand-verified in **bold**)
 
 **SQL / multi-table**
 - **Chinook — MIT:** <https://github.com/lerocha/chinook-database/blob/master/LICENSE.md>
@@ -612,6 +709,14 @@ The obvious "big web" sources are **openly licensed**, not illegally scraped:
 - Wikimedia dumps (CC BY-SA / Wikidata CC0): <https://dumps.wikimedia.org/legal.html> · Goodreads ToS: <https://www.goodreads.com/about/terms> · Zillow ToU: <https://www.zillow.com/z/corp/terms/>
 - Clean substitutes: Redfin Data Center <https://www.redfin.com/news/data-center/> · Stack Overflow Developer Survey (ODbL) <https://survey.stackoverflow.co/> · O*NET (public domain) <https://www.onetcenter.org/license_db.html> · GDELT <https://www.gdeltproject.org/> · Common Pile / Common Corpus, Standard Ebooks <https://standardebooks.org/>
 - Privacy tier: MS-Celeb-1M withdrawal (NYT/FT reporting) · *hiQ Labs v. LinkedIn* settlement (2022) · *Meta / X Corp v. Bright Data* (2024, CFAA ≠ copyright)
+
+**Fourth pass — museums / sports / science / civic / GitHub**
+- **OpenPowerlifting — public domain:** <https://openpowerlifting.gitlab.io/opl-csv/> · **geoBoundaries — CC BY 4.0:** <https://www.geoboundaries.org/> · **GADM — non-commercial (avoid):** <https://gadm.org/license.html>
+- **National Gallery of Art — CC0:** <https://github.com/NationalGalleryOfArt/opendata> · The Met (CC0) <https://github.com/metmuseum/openaccess> · MoMA (CC0) <https://github.com/MuseumofModernArt/collection> · Tate (CC0) <https://github.com/tategallery/collection> · Harvard Art Museums (non-commercial) <https://github.com/harvardartmuseums/api-docs>
+- Sports: Cricsheet (ODC-BY) <https://cricsheet.org/register/> · nflverse (CC BY 4.0) <https://github.com/nflverse/nflverse-data> · Retrosheet <https://www.retrosheet.org/notice.txt> · Sackmann tennis (CC BY-NC-SA) <https://github.com/JeffSackmann/tennis_atp> · StatsBomb (research-licensed) <https://github.com/statsbomb/open-data>
+- Science / ML: OpenFDA (CC0) <https://open.fda.gov/license/> · SEC EDGAR financials (US PD) <https://www.sec.gov/data-research/sec-markets-data/financial-statement-data-sets> · NASA Meteorite Landings <https://data.nasa.gov/dataset/meteorite-landings> · Fashion-MNIST (MIT) <https://github.com/zalandoresearch/fashion-mnist> · LibriSpeech (CC BY 4.0) <https://www.openslr.org/12/> · WHO GHO (CC BY-NC-SA) <https://www.who.int/about/policies/publishing/copyright> · ESC-50 (CC BY-NC) <https://github.com/karolpiczak/ESC-50>
+- Civic / transit / geo: SF DataSF (PDDL) <https://www.sf.gov/reports/april-2017/datasf-terms-use> · NYC Open Data <https://opendata.cityofnewyork.us/faq/> · IANA tz DB (PD) <https://data.iana.org/time-zones/tzdb/LICENSE> · US NTD GTFS public-domain rule <https://catalog.data.gov/dataset/2023-ntd-annual-data-general-transit-feed-specification-gtfs-weblinks> · OSM (ODbL) <https://www.openstreetmap.org/copyright>
+- GitHub / aggregators: the-pudding/data (MIT) <https://github.com/the-pudding/data> · BuzzFeedNews NICS (MIT) <https://github.com/BuzzFeedNews/nics-firearm-background-checks> · JHU COVID (CC BY 4.0) <https://github.com/CSSEGISandData/COVID-19> · Tatoeba (CC BY 2.0) <https://tatoeba.org/en/downloads> · WaPo police-shootings (CC BY-NC-SA) <https://github.com/washingtonpost/data-police-shootings>
 
 ---
 
