@@ -334,7 +334,7 @@ FROM
 LIMIT
   5;`}
   solutionSql={`SELECT
-  (score / 10) * 10 AS bucket,
+  (score // 10) * 10 AS bucket,
   COUNT(*) AS n
 FROM
   big
@@ -376,7 +376,7 @@ FROM
 LIMIT
   5;`}
   solutionSql={`SELECT
-  (score / 10) * 10 AS bucket,
+  (score // 10) * 10 AS bucket,
   COUNT(*) AS n
 FROM
   big
