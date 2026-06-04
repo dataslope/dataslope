@@ -18,21 +18,24 @@ cheap even on a huge table — you peek, you do not pull everything.
   dialect="duckdb"
   title="Peek at the shape of the data"
   initSql={`CREATE TABLE trips (
-  id        INTEGER,
-  city      TEXT,
-  rider     TEXT,
-  minutes   INTEGER,
-  fare      DECIMAL(6, 2)
+  id INTEGER,
+  city TEXT,
+  rider TEXT,
+  minutes INTEGER,
+  fare DECIMAL(6, 2)
 );
-INSERT INTO trips VALUES
-  (1, 'Seattle',  'Ada',   12,  9.50),
-  (2, 'Seattle',  'Bo',    25, 18.00),
-  (3, 'Portland', 'Cy',     8,  6.25),
-  (4, 'Seattle',  'Ada',   31, 22.75),
-  (5, 'Portland', 'Di',    14, 11.00),
-  (6, 'Boise',    'Eli',   19, 13.50),
-  (7, 'Seattle',  'Bo',     6,  5.00),
-  (8, 'Portland', 'Cy',    22, 16.25);`}
+
+INSERT INTO
+  trips
+VALUES
+  (1, 'Seattle', 'Ada', 12, 9.50),
+  (2, 'Seattle', 'Bo', 25, 18.00),
+  (3, 'Portland', 'Cy', 8, 6.25),
+  (4, 'Seattle', 'Ada', 31, 22.75),
+  (5, 'Portland', 'Di', 14, 11.00),
+  (6, 'Boise', 'Eli', 19, 13.50),
+  (7, 'Seattle', 'Bo', 6, 5.00),
+  (8, 'Portland', 'Cy', 22, 16.25);`}
   starterCode={`-- Always start by *looking*. LIMIT keeps it cheap.
 SELECT
   *
@@ -56,13 +59,24 @@ you are choosing a subset to summarize.
   dialect="duckdb"
   title="Slice: only the long Seattle trips"
   initSql={`CREATE TABLE trips (
-  id        INTEGER, city TEXT, rider TEXT, minutes INTEGER, fare DECIMAL(6,2)
+  id INTEGER,
+  city TEXT,
+  rider TEXT,
+  minutes INTEGER,
+  fare DECIMAL(6, 2)
 );
-INSERT INTO trips VALUES
-  (1,'Seattle','Ada',12,9.50),(2,'Seattle','Bo',25,18.00),
-  (3,'Portland','Cy',8,6.25),(4,'Seattle','Ada',31,22.75),
-  (5,'Portland','Di',14,11.00),(6,'Boise','Eli',19,13.50),
-  (7,'Seattle','Bo',6,5.00),(8,'Portland','Cy',22,16.25);`}
+
+INSERT INTO
+  trips
+VALUES
+  (1, 'Seattle', 'Ada', 12, 9.50),
+  (2, 'Seattle', 'Bo', 25, 18.00),
+  (3, 'Portland', 'Cy', 8, 6.25),
+  (4, 'Seattle', 'Ada', 31, 22.75),
+  (5, 'Portland', 'Di', 14, 11.00),
+  (6, 'Boise', 'Eli', 19, 13.50),
+  (7, 'Seattle', 'Bo', 6, 5.00),
+  (8, 'Portland', 'Cy', 22, 16.25);`}
   starterCode={`SELECT
   rider,
   minutes,
@@ -100,13 +114,24 @@ commit to heavier summarizing.
   dialect="duckdb"
   title="Slice, sort, peek: the three biggest fares overall"
   initSql={`CREATE TABLE trips (
-  id        INTEGER, city TEXT, rider TEXT, minutes INTEGER, fare DECIMAL(6,2)
+  id INTEGER,
+  city TEXT,
+  rider TEXT,
+  minutes INTEGER,
+  fare DECIMAL(6, 2)
 );
-INSERT INTO trips VALUES
-  (1,'Seattle','Ada',12,9.50),(2,'Seattle','Bo',25,18.00),
-  (3,'Portland','Cy',8,6.25),(4,'Seattle','Ada',31,22.75),
-  (5,'Portland','Di',14,11.00),(6,'Boise','Eli',19,13.50),
-  (7,'Seattle','Bo',6,5.00),(8,'Portland','Cy',22,16.25);`}
+
+INSERT INTO
+  trips
+VALUES
+  (1, 'Seattle', 'Ada', 12, 9.50),
+  (2, 'Seattle', 'Bo', 25, 18.00),
+  (3, 'Portland', 'Cy', 8, 6.25),
+  (4, 'Seattle', 'Ada', 31, 22.75),
+  (5, 'Portland', 'Di', 14, 11.00),
+  (6, 'Boise', 'Eli', 19, 13.50),
+  (7, 'Seattle', 'Bo', 6, 5.00),
+  (8, 'Portland', 'Cy', 22, 16.25);`}
   starterCode={`SELECT
   city,
   rider,
@@ -129,13 +154,24 @@ fly. This is where `SELECT` stops *retrieving* and starts *deriving*.
   dialect="duckdb"
   title="Derive a new measure: fare per minute"
   initSql={`CREATE TABLE trips (
-  id        INTEGER, city TEXT, rider TEXT, minutes INTEGER, fare DECIMAL(6,2)
+  id INTEGER,
+  city TEXT,
+  rider TEXT,
+  minutes INTEGER,
+  fare DECIMAL(6, 2)
 );
-INSERT INTO trips VALUES
-  (1,'Seattle','Ada',12,9.50),(2,'Seattle','Bo',25,18.00),
-  (3,'Portland','Cy',8,6.25),(4,'Seattle','Ada',31,22.75),
-  (5,'Portland','Di',14,11.00),(6,'Boise','Eli',19,13.50),
-  (7,'Seattle','Bo',6,5.00),(8,'Portland','Cy',22,16.25);`}
+
+INSERT INTO
+  trips
+VALUES
+  (1, 'Seattle', 'Ada', 12, 9.50),
+  (2, 'Seattle', 'Bo', 25, 18.00),
+  (3, 'Portland', 'Cy', 8, 6.25),
+  (4, 'Seattle', 'Ada', 31, 22.75),
+  (5, 'Portland', 'Di', 14, 11.00),
+  (6, 'Boise', 'Eli', 19, 13.50),
+  (7, 'Seattle', 'Bo', 6, 5.00),
+  (8, 'Portland', 'Cy', 22, 16.25);`}
   starterCode={`SELECT
   rider,
   minutes,

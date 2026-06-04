@@ -22,9 +22,10 @@ tool is `date_trunc('month', d)`.
   title="Revenue per month with date_trunc"
   initSql={`CREATE TABLE orders AS
 SELECT
-  DATE '2024-01-01' + (i * 5)  AS order_date,
-  (i * 17) % 200 + 20          AS amount
-FROM range(0, 40) t(i);`}
+  DATE '2024-01-01' + (i * 5) AS order_date,
+  (i * 17) % 200 + 20 AS amount
+FROM
+  range(0, 40) t (i);`}
   starterCode={`SELECT
   date_trunc('month', order_date) AS month,
   COUNT(*) AS orders,
@@ -61,8 +62,10 @@ busiest?" by grouping across all weeks.
   dialect="duckdb"
   title="Which day of week sees the most orders?"
   initSql={`CREATE TABLE orders AS
-SELECT DATE '2024-01-01' + i AS order_date
-FROM range(0, 60) t(i);`}
+SELECT
+  DATE '2024-01-01' + i AS order_date
+FROM
+  range(0, 60) t (i);`}
   starterCode={`SELECT
   EXTRACT (
     dow
@@ -96,10 +99,11 @@ calculations.
 <SqlCodeBlock
   dialect="duckdb"
   title="Days since each signup, and a 30-day cutoff"
-  initSql={`CREATE TABLE users (
-  id INTEGER, signup_date DATE
-);
-INSERT INTO users VALUES
+  initSql={`CREATE TABLE users (id INTEGER, signup_date DATE);
+
+INSERT INTO
+  users
+VALUES
   (1, DATE '2024-05-01'),
   (2, DATE '2024-05-20'),
   (3, DATE '2024-04-10'),
@@ -126,10 +130,11 @@ periods show up as zero.
 <SqlCodeBlock
   dialect="duckdb"
   title="Every day present, even the empty ones"
-  initSql={`CREATE TABLE orders (
-  order_date DATE, amount INTEGER
-);
-INSERT INTO orders VALUES
+  initSql={`CREATE TABLE orders (order_date DATE, amount INTEGER);
+
+INSERT INTO
+  orders
+VALUES
   (DATE '2024-03-01', 100),
   (DATE '2024-03-01', 50),
   (DATE '2024-03-03', 80),

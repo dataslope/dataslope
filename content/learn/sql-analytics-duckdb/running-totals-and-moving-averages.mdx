@@ -20,13 +20,14 @@ constant total.
 <SqlCodeBlock
   dialect="duckdb"
   title="Cumulative revenue by day"
-  initSql={`CREATE TABLE daily (
-  day DATE, revenue INTEGER
-);
-INSERT INTO daily VALUES
+  initSql={`CREATE TABLE daily (day DATE, revenue INTEGER);
+
+INSERT INTO
+  daily
+VALUES
   (DATE '2024-01-01', 100),
   (DATE '2024-01-02', 140),
-  (DATE '2024-01-03',  90),
+  (DATE '2024-01-03', 90),
   (DATE '2024-01-04', 200),
   (DATE '2024-01-05', 120);`}
   starterCode={`SELECT
@@ -65,15 +66,16 @@ Combine `PARTITION BY` with the ordered window to get a running total that
 <SqlCodeBlock
   dialect="duckdb"
   title="Cumulative revenue within each region"
-  initSql={`CREATE TABLE sales (
-  region TEXT, day DATE, revenue INTEGER
-);
-INSERT INTO sales VALUES
+  initSql={`CREATE TABLE sales (region TEXT, day DATE, revenue INTEGER);
+
+INSERT INTO
+  sales
+VALUES
   ('West', DATE '2024-01-01', 100),
   ('West', DATE '2024-01-02', 140),
-  ('West', DATE '2024-01-03',  90),
+  ('West', DATE '2024-01-03', 90),
   ('East', DATE '2024-01-01', 200),
-  ('East', DATE '2024-01-02',  60),
+  ('East', DATE '2024-01-02', 60),
   ('East', DATE '2024-01-03', 120);`}
   starterCode={`SELECT
   region,
@@ -105,13 +107,14 @@ trivial.
 <SqlCodeBlock
   dialect="duckdb"
   title="Day-over-day change with LAG"
-  initSql={`CREATE TABLE daily (
-  day DATE, revenue INTEGER
-);
-INSERT INTO daily VALUES
+  initSql={`CREATE TABLE daily (day DATE, revenue INTEGER);
+
+INSERT INTO
+  daily
+VALUES
   (DATE '2024-01-01', 100),
   (DATE '2024-01-02', 140),
-  (DATE '2024-01-03',  90),
+  (DATE '2024-01-03', 90),
   (DATE '2024-01-04', 200);`}
   starterCode={`SELECT
   day,
@@ -145,13 +148,14 @@ out noise.
 <SqlCodeBlock
   dialect="duckdb"
   title="3-day moving average"
-  initSql={`CREATE TABLE daily (
-  day DATE, revenue INTEGER
-);
-INSERT INTO daily VALUES
+  initSql={`CREATE TABLE daily (day DATE, revenue INTEGER);
+
+INSERT INTO
+  daily
+VALUES
   (DATE '2024-01-01', 100),
   (DATE '2024-01-02', 140),
-  (DATE '2024-01-03',  90),
+  (DATE '2024-01-03', 90),
   (DATE '2024-01-04', 200),
   (DATE '2024-01-05', 120),
   (DATE '2024-01-06', 160);`}

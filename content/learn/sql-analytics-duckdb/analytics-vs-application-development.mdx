@@ -83,19 +83,18 @@ single order is the answer; the *pattern across orders* is.
 <SqlCodeBlock
   dialect="duckdb"
   title="A net, not a needle"
-  initSql={`CREATE TABLE orders (
-  id        INTEGER,
-  category  TEXT,
-  amount    DECIMAL(10, 2)
-);
-INSERT INTO orders VALUES
-  (1, 'Books',       12.00),
+  initSql={`CREATE TABLE orders (id INTEGER, category TEXT, amount DECIMAL(10, 2));
+
+INSERT INTO
+  orders
+VALUES
+  (1, 'Books', 12.00),
   (2, 'Electronics', 240.00),
-  (3, 'Books',        9.50),
+  (3, 'Books', 9.50),
   (4, 'Electronics', 180.00),
-  (5, 'Home',         45.00),
-  (6, 'Books',       22.00),
-  (7, 'Home',        30.00);`}
+  (5, 'Home', 45.00),
+  (6, 'Books', 22.00),
+  (7, 'Home', 30.00);`}
   starterCode={`SELECT
   category,
   COUNT(*) AS num_orders,

@@ -25,12 +25,21 @@ inside an aggregate.* You write the dimensions once.
   dialect="duckdb"
   title="GROUP BY ALL infers the grouping columns"
   initSql={`CREATE TABLE sales (
-  region TEXT, product TEXT, channel TEXT, amount DECIMAL(8,2)
+  region TEXT,
+  product TEXT,
+  channel TEXT,
+  amount DECIMAL(8, 2)
 );
-INSERT INTO sales VALUES
-  ('West','Widget','online',120),('West','Gadget','store',80),
-  ('East','Widget','online',200),('East','Gadget','online',50),
-  ('North','Widget','store',75),('West','Widget','online',60);`}
+
+INSERT INTO
+  sales
+VALUES
+  ('West', 'Widget', 'online', 120),
+  ('West', 'Gadget', 'store', 80),
+  ('East', 'Widget', 'online', 200),
+  ('East', 'Gadget', 'online', 50),
+  ('North', 'Widget', 'store', 75),
+  ('West', 'Widget', 'online', 60);`}
   starterCode={`SELECT
   region,
   product,
@@ -84,13 +93,16 @@ each level rolls up into the one above (product → region → everything).
 <SqlCodeBlock
   dialect="duckdb"
   title="Subtotals per region and a grand total with ROLLUP"
-  initSql={`CREATE TABLE sales (
-  region TEXT, product TEXT, amount DECIMAL(8,2)
-);
-INSERT INTO sales VALUES
-  ('West','Widget',120),('West','Gadget',80),
-  ('East','Widget',200),('East','Gadget',50),
-  ('North','Widget',75);`}
+  initSql={`CREATE TABLE sales (region TEXT, product TEXT, amount DECIMAL(8, 2));
+
+INSERT INTO
+  sales
+VALUES
+  ('West', 'Widget', 120),
+  ('West', 'Gadget', 80),
+  ('East', 'Widget', 200),
+  ('East', 'Gadget', 50),
+  ('North', 'Widget', 75);`}
   starterCode={`SELECT
   region,
   product,
@@ -119,12 +131,15 @@ the marginal totals.
 <SqlCodeBlock
   dialect="duckdb"
   title="All marginal subtotals with CUBE"
-  initSql={`CREATE TABLE sales (
-  region TEXT, product TEXT, amount DECIMAL(8,2)
-);
-INSERT INTO sales VALUES
-  ('West','Widget',120),('West','Gadget',80),
-  ('East','Widget',200),('East','Gadget',50);`}
+  initSql={`CREATE TABLE sales (region TEXT, product TEXT, amount DECIMAL(8, 2));
+
+INSERT INTO
+  sales
+VALUES
+  ('West', 'Widget', 120),
+  ('West', 'Gadget', 80),
+  ('East', 'Widget', 200),
+  ('East', 'Gadget', 50);`}
   starterCode={`SELECT
   region,
   product,
@@ -151,11 +166,15 @@ rows unambiguously.
 <SqlCodeBlock
   dialect="duckdb"
   title="Label subtotal rows with GROUPING()"
-  initSql={`CREATE TABLE sales (
-  region TEXT, amount DECIMAL(8,2)
-);
-INSERT INTO sales VALUES
-  ('West',120),('West',80),('East',200),('East',50);`}
+  initSql={`CREATE TABLE sales (region TEXT, amount DECIMAL(8, 2));
+
+INSERT INTO
+  sales
+VALUES
+  ('West', 120),
+  ('West', 80),
+  ('East', 200),
+  ('East', 50);`}
   starterCode={`SELECT
   CASE
     WHEN GROUPING (region) = 1 THEN 'ALL REGIONS'

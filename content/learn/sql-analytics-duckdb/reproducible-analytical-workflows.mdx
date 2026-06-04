@@ -43,11 +43,16 @@ rows tie on the sort key, SQL may return them in either order — so a
 <SqlCodeBlock
   dialect="duckdb"
   title="A stable top-N with a tiebreaker"
-  initSql={`CREATE TABLE products (
-  id INTEGER, name TEXT, sales INTEGER
-);
-INSERT INTO products VALUES
-  (1,'A',100),(2,'B',100),(3,'C',100),(4,'D',90),(5,'E',80);`}
+  initSql={`CREATE TABLE products (id INTEGER, name TEXT, sales INTEGER);
+
+INSERT INTO
+  products
+VALUES
+  (1, 'A', 100),
+  (2, 'B', 100),
+  (3, 'C', 100),
+  (4, 'D', 90),
+  (5, 'E', 80);`}
   starterCode={`SELECT
   id,
   name,
@@ -112,11 +117,21 @@ metric's meaning consistent.
   dialect="duckdb"
   title="A view encodes one canonical definition"
   initSql={`CREATE TABLE orders (
-  id INTEGER, region TEXT, status TEXT, amount DECIMAL(8,2)
+  id INTEGER,
+  region TEXT,
+  status TEXT,
+  amount DECIMAL(8, 2)
 );
-INSERT INTO orders VALUES
-  (1,'West','paid',120),(2,'West','refunded',45),(3,'East','paid',200),
-  (4,'East','paid',50),(5,'North','paid',60),(6,'West','paid',95);`}
+
+INSERT INTO
+  orders
+VALUES
+  (1, 'West', 'paid', 120),
+  (2, 'West', 'refunded', 45),
+  (3, 'East', 'paid', 200),
+  (4, 'East', 'paid', 50),
+  (5, 'North', 'paid', 60),
+  (6, 'West', 'paid', 95);`}
   starterCode={`CREATE OR REPLACE VIEW paid_revenue_by_region AS
 SELECT
   region,

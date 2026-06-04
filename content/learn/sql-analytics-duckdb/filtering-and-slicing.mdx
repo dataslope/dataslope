@@ -34,10 +34,11 @@ ends.
   title="Orders in a price band and a date window"
   initSql={`CREATE TABLE orders AS
 SELECT
-  i                              AS id,
-  DATE '2024-01-01' + (i % 120)  AS order_date,
-  (i * 13) % 300 + 10            AS amount
-FROM range(1, 401) t(i);`}
+  i AS id,
+  DATE '2024-01-01' + (i % 120) AS order_date,
+  (i * 13) % 300 + 10 AS amount
+FROM
+  range(1, 401) t (i);`}
   starterCode={`SELECT
   id,
   order_date,
@@ -66,12 +67,21 @@ chain of `OR`s.
   dialect="duckdb"
   title="Just the categories we care about"
   initSql={`CREATE TABLE products (
-  id INTEGER, name TEXT, category TEXT, price DECIMAL(7,2)
+  id INTEGER,
+  name TEXT,
+  category TEXT,
+  price DECIMAL(7, 2)
 );
-INSERT INTO products VALUES
-  (1,'Pen','Office',1.50),(2,'Laptop','Electronics',999.00),
-  (3,'Notebook','Office',3.25),(4,'Phone','Electronics',699.00),
-  (5,'Mug','Kitchen',8.00),(6,'Desk','Furniture',150.00);`}
+
+INSERT INTO
+  products
+VALUES
+  (1, 'Pen', 'Office', 1.50),
+  (2, 'Laptop', 'Electronics', 999.00),
+  (3, 'Notebook', 'Office', 3.25),
+  (4, 'Phone', 'Electronics', 699.00),
+  (5, 'Mug', 'Kitchen', 8.00),
+  (6, 'Desk', 'Furniture', 150.00);`}
   starterCode={`SELECT
   name,
   category,
@@ -97,14 +107,15 @@ starting with "A", emails at a domain, codes containing a substring.
 <SqlCodeBlock
   dialect="duckdb"
   title="Pattern matching on text"
-  initSql={`CREATE TABLE people (
-  id INTEGER, name TEXT, email TEXT
-);
-INSERT INTO people VALUES
-  (1,'Ada Lovelace','ada@math.org'),
-  (2,'Alan Turing','alan@compute.io'),
-  (3,'Grace Hopper','grace@navy.mil'),
-  (4,'Annie Easley','annie@nasa.gov');`}
+  initSql={`CREATE TABLE people (id INTEGER, name TEXT, email TEXT);
+
+INSERT INTO
+  people
+VALUES
+  (1, 'Ada Lovelace', 'ada@math.org'),
+  (2, 'Alan Turing', 'alan@compute.io'),
+  (3, 'Grace Hopper', 'grace@navy.mil'),
+  (4, 'Annie Easley', 'annie@nasa.gov');`}
   starterCode={`SELECT
   name,
   email
@@ -126,12 +137,17 @@ what you intended. Make your grouping explicit.
 <SqlCodeBlock
   dialect="duckdb"
   title="Parentheses make the intent unambiguous"
-  initSql={`CREATE TABLE orders (
-  id INTEGER, region TEXT, amount DECIMAL(7,2)
-);
-INSERT INTO orders VALUES
-  (1,'West',250),(2,'East',50),(3,'West',30),
-  (4,'East',300),(5,'North',120),(6,'West',400);`}
+  initSql={`CREATE TABLE orders (id INTEGER, region TEXT, amount DECIMAL(7, 2));
+
+INSERT INTO
+  orders
+VALUES
+  (1, 'West', 250),
+  (2, 'East', 50),
+  (3, 'West', 30),
+  (4, 'East', 300),
+  (5, 'North', 120),
+  (6, 'West', 400);`}
   starterCode={`-- "Big orders, but only from West or East."
 SELECT
   id,

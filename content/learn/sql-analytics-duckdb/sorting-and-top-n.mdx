@@ -20,10 +20,11 @@ top; `LIMIT` lets you read just those.
   title="The five biggest orders"
   initSql={`CREATE TABLE orders AS
 SELECT
-  i                              AS id,
-  ['West','East','North'][(i % 3) + 1] AS region,
-  (i * 37) % 500 + 10            AS amount
-FROM range(1, 201) t(i);`}
+  i AS id,
+  ['West', 'East', 'North'] [(i % 3) + 1] AS region,
+  (i * 37) % 500 + 10 AS amount
+FROM
+  range(1, 201) t (i);`}
   starterCode={`SELECT
   id,
   region,
@@ -51,10 +52,11 @@ region.
   title="Within each region, biggest orders first"
   initSql={`CREATE TABLE orders AS
 SELECT
-  i                              AS id,
-  ['West','East','North'][(i % 3) + 1] AS region,
-  (i * 37) % 500 + 10            AS amount
-FROM range(1, 31) t(i);`}
+  i AS id,
+  ['West', 'East', 'North'] [(i % 3) + 1] AS region,
+  (i * 37) % 500 + 10 AS amount
+FROM
+  range(1, 31) t (i);`}
   starterCode={`SELECT
   region,
   id,
@@ -78,12 +80,15 @@ measure. "Most efficient", "best value", "highest rate" are all
 <SqlCodeBlock
   dialect="duckdb"
   title="Best value: lowest price per gram"
-  initSql={`CREATE TABLE snacks (
-  name TEXT, price DECIMAL(6,2), grams INTEGER
-);
-INSERT INTO snacks VALUES
-  ('Almonds', 6.00, 200), ('Chips', 3.50, 150),
-  ('Trail Mix', 8.00, 400), ('Pretzels', 2.00, 100),
+  initSql={`CREATE TABLE snacks (name TEXT, price DECIMAL(6, 2), grams INTEGER);
+
+INSERT INTO
+  snacks
+VALUES
+  ('Almonds', 6.00, 200),
+  ('Chips', 3.50, 150),
+  ('Trail Mix', 8.00, 400),
+  ('Pretzels', 2.00, 100),
   ('Jerky', 9.00, 90);`}
   starterCode={`SELECT
   name,
@@ -129,10 +134,11 @@ pairs a window function (which you will meet properly soon) with
   title="Top 2 orders within each region"
   initSql={`CREATE TABLE orders AS
 SELECT
-  i                              AS id,
-  ['West','East','North'][(i % 3) + 1] AS region,
-  (i * 37) % 500 + 10            AS amount
-FROM range(1, 31) t(i);`}
+  i AS id,
+  ['West', 'East', 'North'] [(i % 3) + 1] AS region,
+  (i * 37) % 500 + 10 AS amount
+FROM
+  range(1, 31) t (i);`}
   starterCode={`SELECT
   region,
   id,

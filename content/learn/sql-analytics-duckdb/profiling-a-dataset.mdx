@@ -47,10 +47,11 @@ column span*. `COUNT(*)`, `MIN`, and `MAX` answer both at once.
   title="Size and span in one query"
   initSql={`CREATE TABLE signups AS
 SELECT
-  i                              AS id,
-  DATE '2024-01-01' + (i % 200)  AS signup_date,
-  (i * 11) % 5                    AS plan_id
-FROM range(1, 1201) t(i);`}
+  i AS id,
+  DATE '2024-01-01' + (i % 200) AS signup_date,
+  (i * 11) % 5 AS plan_id
+FROM
+  range(1, 1201) t (i);`}
   starterCode={`SELECT
   COUNT(*) AS rows,
   MIN(signup_date) AS earliest,
@@ -74,10 +75,11 @@ also reveals **duplicates**.
   title="Distinct counts expose categories and duplicates"
   initSql={`CREATE TABLE signups AS
 SELECT
-  i                              AS id,
-  DATE '2024-01-01' + (i % 200)  AS signup_date,
-  (i * 11) % 5                    AS plan_id
-FROM range(1, 1201) t(i);`}
+  i AS id,
+  DATE '2024-01-01' + (i % 200) AS signup_date,
+  (i * 11) % 5 AS plan_id
+FROM
+  range(1, 1201) t (i);`}
   starterCode={`SELECT
   COUNT(*) AS rows,
   COUNT(DISTINCT id) AS distinct_ids,
@@ -99,12 +101,17 @@ check.
 <SqlCodeBlock
   dialect="duckdb"
   title="Find the missing emails"
-  initSql={`CREATE TABLE users (
-  id INTEGER, email TEXT, country TEXT
-);
-INSERT INTO users VALUES
-  (1, 'a@x.com', 'US'), (2, NULL, 'US'), (3, 'c@x.com', NULL),
-  (4, NULL, 'CA'), (5, 'e@x.com', 'US'), (6, 'f@x.com', NULL);`}
+  initSql={`CREATE TABLE users (id INTEGER, email TEXT, country TEXT);
+
+INSERT INTO
+  users
+VALUES
+  (1, 'a@x.com', 'US'),
+  (2, NULL, 'US'),
+  (3, 'c@x.com', NULL),
+  (4, NULL, 'CA'),
+  (5, 'e@x.com', 'US'),
+  (6, 'f@x.com', NULL);`}
   starterCode={`SELECT
   COUNT(*) AS rows,
   COUNT(email) AS has_email,
@@ -129,11 +136,12 @@ average, and approximate quantiles.
   title="Profile every column at once with SUMMARIZE"
   initSql={`CREATE TABLE orders AS
 SELECT
-  i                                            AS id,
-  DATE '2024-01-01' + (i % 90)                 AS order_date,
-  ['Books','Electronics','Home'][(i % 3) + 1]  AS category,
-  (i * 13) % 300 + 20                          AS amount
-FROM range(1, 501) t(i);`}
+  i AS id,
+  DATE '2024-01-01' + (i % 90) AS order_date,
+  ['Books', 'Electronics', 'Home'] [(i % 3) + 1] AS category,
+  (i * 13) % 300 + 20 AS amount
+FROM
+  range(1, 501) t (i);`}
   starterCode={`SUMMARIZE orders;`}
 />
 

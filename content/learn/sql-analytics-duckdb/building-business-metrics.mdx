@@ -36,15 +36,21 @@ against zero. `COUNT(DISTINCT ...)` ensures you count *people*, not events.
 <SqlCodeBlock
   dialect="duckdb"
   title="Visit-to-purchase conversion per channel"
-  initSql={`CREATE TABLE events (
-  user_id INTEGER, channel TEXT, action TEXT
-);
-INSERT INTO events VALUES
-  (1,'ads','visit'),(1,'ads','purchase'),
-  (2,'ads','visit'),
-  (3,'organic','visit'),(3,'organic','purchase'),
-  (4,'organic','visit'),(5,'organic','visit'),(5,'organic','purchase'),
-  (6,'ads','visit'),(6,'ads','purchase');`}
+  initSql={`CREATE TABLE events (user_id INTEGER, channel TEXT, action TEXT);
+
+INSERT INTO
+  events
+VALUES
+  (1, 'ads', 'visit'),
+  (1, 'ads', 'purchase'),
+  (2, 'ads', 'visit'),
+  (3, 'organic', 'visit'),
+  (3, 'organic', 'purchase'),
+  (4, 'organic', 'visit'),
+  (5, 'organic', 'visit'),
+  (5, 'organic', 'purchase'),
+  (6, 'ads', 'visit'),
+  (6, 'ads', 'purchase');`}
   starterCode={`SELECT
   channel,
   COUNT(DISTINCT user_id) FILTER(
@@ -92,10 +98,26 @@ whole job.
   dialect="duckdb"
   title="ARPU vs. ARPPU — two honest, different numbers"
   initSql={`CREATE TABLE users (id INTEGER);
-INSERT INTO users SELECT i FROM range(1, 11) t(i);   -- 10 users
-CREATE TABLE payments (user_id INTEGER, amount DECIMAL(8,2));
-INSERT INTO payments VALUES
-  (1, 50), (1, 20), (3, 100), (7, 30);               -- only 3 users paid`}
+
+INSERT INTO
+  users
+SELECT
+  i
+FROM
+  range(1, 11) t (i);
+
+-- 10 users
+CREATE TABLE payments (user_id INTEGER, amount DECIMAL(8, 2));
+
+INSERT INTO
+  payments
+VALUES
+  (1, 50),
+  (1, 20),
+  (3, 100),
+  (7, 30);
+
+-- only 3 users paid`}
   starterCode={`SELECT
   (
     SELECT
@@ -136,8 +158,9 @@ series — a direct application of the window-function lessons.
   initSql={`CREATE TABLE orders AS
 SELECT
   DATE '2024-01-01' + (i * 9) AS order_date,
-  (i * 23) % 150 + 50         AS amount
-FROM range(0, 30) t(i);`}
+  (i * 23) % 150 + 50 AS amount
+FROM
+  range(0, 30) t (i);`}
   starterCode={`WITH
   monthly AS (
     SELECT

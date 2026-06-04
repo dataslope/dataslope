@@ -140,19 +140,18 @@ per-region summary — the essence of analytical SQL.
 <SqlCodeBlock
   dialect="duckdb"
   title="From raw sales to a ranked summary"
-  initSql={`CREATE TABLE sales (
-  region   TEXT,
-  product  TEXT,
-  amount   DECIMAL(10, 2)
-);
-INSERT INTO sales VALUES
-  ('West',  'Widget', 120.00),
-  ('West',  'Gadget',  80.50),
-  ('East',  'Widget', 200.00),
-  ('East',  'Gadget',  50.00),
-  ('North', 'Widget',  75.25),
-  ('West',  'Widget',  60.00),
-  ('East',  'Widget',  90.00);`}
+  initSql={`CREATE TABLE sales (region TEXT, product TEXT, amount DECIMAL(10, 2));
+
+INSERT INTO
+  sales
+VALUES
+  ('West', 'Widget', 120.00),
+  ('West', 'Gadget', 80.50),
+  ('East', 'Widget', 200.00),
+  ('East', 'Gadget', 50.00),
+  ('North', 'Widget', 75.25),
+  ('West', 'Widget', 60.00),
+  ('East', 'Widget', 90.00);`}
   starterCode={`SELECT
   region,
   COUNT(*) AS orders,

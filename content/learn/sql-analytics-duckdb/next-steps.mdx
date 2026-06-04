@@ -62,10 +62,14 @@ before running it.
   title="Monthly paid revenue, share of total, and growth"
   initSql={`CREATE TABLE orders AS
 SELECT
-  DATE '2024-01-01' + (i * 6)              AS order_date,
-  CASE WHEN i % 5 = 0 THEN 'refunded' ELSE 'paid' END AS status,
-  (i * 19) % 200 + 40                      AS amount
-FROM range(0, 60) t(i);`}
+  DATE '2024-01-01' + (i * 6) AS order_date,
+  CASE
+    WHEN i % 5 = 0 THEN 'refunded'
+    ELSE 'paid'
+  END AS status,
+  (i * 19) % 200 + 40 AS amount
+FROM
+  range(0, 60) t (i);`}
   starterCode={`WITH
   monthly AS (
     SELECT
@@ -119,10 +123,11 @@ groups, and keep the top of each.
   instructions={`A table \`sales\` is pre-loaded with columns \`category\`, \`product\`, and \`amount\`. Return one row per category containing the \`category\`, the \`product\` with the highest total revenue in that category, and that \`revenue\`. Columns: \`category\`, \`product\`, \`revenue\`. Sort by \`revenue\` descending.`}
   initSql={`CREATE TABLE sales AS
 SELECT
-  ['Books','Electronics','Home'][(i % 3) + 1]                 AS category,
-  ['A','B','C','D'][(i % 4) + 1]                              AS product,
-  (i * 17) % 100 + 10                                         AS amount
-FROM range(1, 61) t(i);`}
+  ['Books', 'Electronics', 'Home'] [(i % 3) + 1] AS category,
+  ['A', 'B', 'C', 'D'] [(i % 4) + 1] AS product,
+  (i * 17) % 100 + 10 AS amount
+FROM
+  range(1, 61) t (i);`}
   starterCode={`-- Hint: total revenue per (category, product), then keep the
 -- top product within each category.
 SELECT

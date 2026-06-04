@@ -20,12 +20,17 @@ once you have decided the order.
 <SqlCodeBlock
   dialect="duckdb"
   title="Number orders from biggest to smallest"
-  initSql={`CREATE TABLE orders (
-  id INTEGER, region TEXT, amount DECIMAL(8,2)
-);
-INSERT INTO orders VALUES
-  (1,'West',120),(2,'East',80),(3,'West',45),
-  (4,'East',200),(5,'North',60),(6,'West',95);`}
+  initSql={`CREATE TABLE orders (id INTEGER, region TEXT, amount DECIMAL(8, 2));
+
+INSERT INTO
+  orders
+VALUES
+  (1, 'West', 120),
+  (2, 'East', 80),
+  (3, 'West', 45),
+  (4, 'East', 200),
+  (5, 'North', 60),
+  (6, 'West', 95);`}
   starterCode={`SELECT
   id,
   amount,
@@ -51,12 +56,17 @@ how you ask "rank within each region" — every region gets its own 1, 2,
 <SqlCodeBlock
   dialect="duckdb"
   title="Rank orders within each region"
-  initSql={`CREATE TABLE orders (
-  id INTEGER, region TEXT, amount DECIMAL(8,2)
-);
-INSERT INTO orders VALUES
-  (1,'West',120),(2,'East',80),(3,'West',45),
-  (4,'East',200),(5,'North',60),(6,'West',95);`}
+  initSql={`CREATE TABLE orders (id INTEGER, region TEXT, amount DECIMAL(8, 2));
+
+INSERT INTO
+  orders
+VALUES
+  (1, 'West', 120),
+  (2, 'East', 80),
+  (3, 'West', 45),
+  (4, 'East', 200),
+  (5, 'North', 60),
+  (6, 'West', 95);`}
   starterCode={`SELECT
   region,
   id,
@@ -92,12 +102,18 @@ run.
 <SqlCodeBlock
   dialect="duckdb"
   title="Top 2 orders per region with QUALIFY"
-  initSql={`CREATE TABLE orders (
-  id INTEGER, region TEXT, amount DECIMAL(8,2)
-);
-INSERT INTO orders VALUES
-  (1,'West',120),(2,'East',80),(3,'West',45),
-  (4,'East',200),(5,'North',60),(6,'West',95),(7,'East',150);`}
+  initSql={`CREATE TABLE orders (id INTEGER, region TEXT, amount DECIMAL(8, 2));
+
+INSERT INTO
+  orders
+VALUES
+  (1, 'West', 120),
+  (2, 'East', 80),
+  (3, 'West', 45),
+  (4, 'East', 200),
+  (5, 'North', 60),
+  (6, 'West', 95),
+  (7, 'East', 150);`}
   starterCode={`SELECT
   region,
   id,
@@ -136,11 +152,16 @@ source of confusion.
 <SqlCodeBlock
   dialect="duckdb"
   title="See how the three handle ties"
-  initSql={`CREATE TABLE scores (
-  player TEXT, points INTEGER
-);
-INSERT INTO scores VALUES
-  ('Ada',100),('Bo',100),('Cy',90),('Di',80),('Eli',80);`}
+  initSql={`CREATE TABLE scores (player TEXT, points INTEGER);
+
+INSERT INTO
+  scores
+VALUES
+  ('Ada', 100),
+  ('Bo', 100),
+  ('Cy', 90),
+  ('Di', 80),
+  ('Eli', 80);`}
   starterCode={`SELECT
   player,
   points,

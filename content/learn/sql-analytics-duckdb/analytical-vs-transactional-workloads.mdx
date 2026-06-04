@@ -96,11 +96,12 @@ any special syntax.
   title="A column-shaped question"
   initSql={`CREATE TABLE orders AS
 SELECT
-  i                                   AS id,
-  DATE '2024-01-01' + (i % 90)        AS order_date,
-  (i * 37) % 500 + 10                 AS amount,
-  ['West','East','North','South'][(i % 4) + 1] AS region
-FROM range(1, 5001) t(i);`}
+  i AS id,
+  DATE '2024-01-01' + (i % 90) AS order_date,
+  (i * 37) % 500 + 10 AS amount,
+  ['West', 'East', 'North', 'South'] [(i % 4) + 1] AS region
+FROM
+  range(1, 5001) t (i);`}
   starterCode={`-- Reads only the columns it needs (region, amount)
 -- across 5,000 rows, and returns just 4 summary rows.
 SELECT
