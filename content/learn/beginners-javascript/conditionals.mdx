@@ -24,17 +24,19 @@ if (condition) {
 The `condition` is any expression. If its value is truthy, the
 block runs; otherwise it is skipped entirely.
 
-<CodeBlock
-  adapter="javascript"
-  starterCode={`const age = 17;
+<CodeBlock adapter="javascript">
+
+```
+const age = 17;
 
 if (age >= 18) {
   console.log("You can vote.");
 }
 
 console.log("Done.");
-`}
-/>
+```
+
+</CodeBlock>
 
 Run the program. Then change `age` to `19` and run again. The
 `console.log("You can vote.")` line is skipped or executed
