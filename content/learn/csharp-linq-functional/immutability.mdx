@@ -68,8 +68,6 @@ positional properties are read-only and equality is by value.
   adapter="csharp"
   starterCode={`using System;
 
-record Money(decimal Amount, string Currency);
-
 var a = new Money(10m, "USD");
 var b = new Money(10m, "USD");
 var c = a with { Amount = 25m }; // new instance, original untouched
@@ -79,6 +77,8 @@ Console.WriteLine($"b={b}");
 Console.WriteLine($"c={c}");
 Console.WriteLine($"a==b: {a == b}");
 Console.WriteLine($"a==c: {a == c}");
+
+record Money(decimal Amount, string Currency);
 `}
 />
 
@@ -94,16 +94,16 @@ set once during construction:
   adapter="csharp"
   starterCode={`using System;
 
+var c = new Config { Host = "example.com", Port = 443 };
+// c.Host = "x";   // compile error: init-only property
+
+Console.WriteLine($"{c.Host}:{c.Port}");
+
 class Config
 {
     public string Host { get; init; } = "localhost";
     public int Port { get; init; } = 8080;
 }
-
-var c = new Config { Host = "example.com", Port = 443 };
-// c.Host = "x";   // compile error: init-only property
-
-Console.WriteLine($"{c.Host}:{c.Port}");
 `}
 />
 
@@ -141,8 +141,6 @@ update**. The `with` expression is its idiomatic form for records.
   adapter="csharp"
   starterCode={`using System;
 
-record Player(string Name, int Score, int Level);
-
 var p = new Player("Ada", 0, 1);
 
 var afterPoint = p with { Score = p.Score + 10 };
@@ -151,6 +149,8 @@ var leveledUp = afterPoint with { Level = afterPoint.Level + 1, Score = 0 };
 Console.WriteLine(p);
 Console.WriteLine(afterPoint);
 Console.WriteLine(leveledUp);
+
+record Player(string Name, int Score, int Level);
 `}
 />
 

@@ -80,12 +80,13 @@ An **immutable** value cannot change after it is constructed. To
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`record Point(double X, double Y);
-
+  starterCode={`
 var p = new Point(1, 2);
 var moved = p with { X = 10 };
 
 System.Console.WriteLine($"p={p}, moved={moved}");
+
+record Point(double X, double Y);
 `}
 />
 

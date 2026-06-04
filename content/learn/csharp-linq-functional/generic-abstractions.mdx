@@ -50,6 +50,10 @@ Watch how much one type parameter buys you.
 using System.Collections.Generic;
 using System.Linq;
 
+Console.WriteLine(string.Join(",", new[] { 1, 2, 3, 4, 5, 6 }.EveryOther()));
+Console.WriteLine(string.Join(",", new[] { "a", "b", "c", "d", "e" }.EveryOther()));
+Console.WriteLine(string.Join(",", "abcdef".EveryOther()));
+
 public static class MyOps
 {
     public static IEnumerable<T> EveryOther<T>(this IEnumerable<T> source)
@@ -63,10 +67,6 @@ public static class MyOps
         }
     }
 }
-
-Console.WriteLine(string.Join(",", new[] { 1, 2, 3, 4, 5, 6 }.EveryOther()));
-Console.WriteLine(string.Join(",", new[] { "a", "b", "c", "d", "e" }.EveryOther()));
-Console.WriteLine(string.Join(",", "abcdef".EveryOther()));
 `}
 />
 
@@ -83,6 +83,10 @@ To really see how built-in LINQ works, let's reimplement `Where`.
   starterCode={`using System;
 using System.Collections.Generic;
 using System.Linq;
+
+var nums = Enumerable.Range(1, 8);
+var result = nums.MyWhere(n => n % 2 == 0).MySelect(n => n * n);
+Console.WriteLine(string.Join(",", result)); // 4,16,36,64
 
 public static class Mini
 {
@@ -104,10 +108,6 @@ public static class Mini
             yield return selector(x);
     }
 }
-
-var nums = Enumerable.Range(1, 8);
-var result = nums.MyWhere(n => n % 2 == 0).MySelect(n => n * n);
-Console.WriteLine(string.Join(",", result)); // 4,16,36,64
 `}
 />
 
@@ -137,6 +137,10 @@ Sometimes you need to know *something* about `T`. C# generic
 using System.Collections.Generic;
 using System.Linq;
 
+Console.WriteLine(new[] { 3, 1, 4, 1, 5, 9, 2 }.MaxOrDefault(-1));        // 9
+Console.WriteLine(new[] { "pear", "apple", "kiwi" }.MaxOrDefault("zzz")); // pear
+Console.WriteLine(System.Linq.Enumerable.Empty<int>().MaxOrDefault(-1));  // -1
+
 public static class Stats
 {
     public static T MaxOrDefault<T>(this IEnumerable<T> source, T fallback)
@@ -155,10 +159,6 @@ public static class Stats
         return best;
     }
 }
-
-Console.WriteLine(new[] { 3, 1, 4, 1, 5, 9, 2 }.MaxOrDefault(-1));        // 9
-Console.WriteLine(new[] { "pear", "apple", "kiwi" }.MaxOrDefault("zzz")); // pear
-Console.WriteLine(System.Linq.Enumerable.Empty<int>().MaxOrDefault(-1));  // -1
 `}
 />
 

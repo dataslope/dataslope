@@ -89,13 +89,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 // --- pure core: takes raw lines, returns processed values ---
-public static class SalesParser
-{
-    public static IEnumerable<decimal> Parse(IEnumerable<string> lines) =>
-        lines.Select(line => decimal.TryParse(line, out var n) ? (decimal?)n : null)
-            .Where(n => n is > 0)
-            .Select(n => n!.Value);
-}
 
 // --- imperative shell: reads input, prints output ---
 var lines = new[] { "10.50", "-3.00", "abc", "7.25", "", "12.00" }; // pretend File.ReadAllLines
@@ -103,6 +96,14 @@ var positives = SalesParser.Parse(lines).ToList();
 foreach (var p in positives)
     Console.WriteLine($"keeping {p}");
 Console.WriteLine($"Sum: {positives.Sum()}");
+
+public static class SalesParser
+{
+    public static IEnumerable<decimal> Parse(IEnumerable<string> lines) =>
+        lines.Select(line => decimal.TryParse(line, out var n) ? (decimal?)n : null)
+            .Where(n => n is > 0)
+            .Select(n => n!.Value);
+}
 `}
 />
 
@@ -126,8 +127,17 @@ pure).
 using System.Collections.Generic;
 using System.Linq;
 
-public record Subscription(string User, DateTime ExpiresOn);
+var subs = new[] {
+    new Subscription("A", new DateTime(2026, 6, 1)),
+    new Subscription("B", new DateTime(2026, 5, 27)),
+    new Subscription("C", new DateTime(2026, 7, 1)),
+};
+var fixedNow = new DateTime(2026, 5, 26);
 
+foreach (var s in Subs.ExpiringSoon(subs, fixedNow))
+    Console.WriteLine($"{s.User} expires {s.ExpiresOn:yyyy-MM-dd}");
+
+public record Subscription(string User, DateTime ExpiresOn);
 public static class Subs
 {
     // BAD: hidden dependency on DateTime.UtcNow makes this hard to test.
@@ -139,16 +149,6 @@ public static class Subs
                                                          DateTime now) => subs.Where(s => s.ExpiresOn <=
                                                                                           now.AddDays(7));
 }
-
-var subs = new[] {
-    new Subscription("A", new DateTime(2026, 6, 1)),
-    new Subscription("B", new DateTime(2026, 5, 27)),
-    new Subscription("C", new DateTime(2026, 7, 1)),
-};
-var fixedNow = new DateTime(2026, 5, 26);
-
-foreach (var s in Subs.ExpiringSoon(subs, fixedNow))
-    Console.WriteLine($"{s.User} expires {s.ExpiresOn:yyyy-MM-dd}");
 `}
 />
 

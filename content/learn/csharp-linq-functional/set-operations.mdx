@@ -35,8 +35,6 @@ records are equal.
   starterCode={`using System;
 using System.Linq;
 
-record Person(string Name, int Age);
-
 var people = new[] {
     new Person("Ada", 36),
     new Person("Bilal", 41),
@@ -46,6 +44,8 @@ var people = new[] {
 
 foreach (var p in people.DistinctBy(p => p.Name))
     Console.WriteLine(p);
+
+record Person(string Name, int Age);
 `}
 />
 
@@ -160,9 +160,6 @@ equivalent of a SQL `INNER JOIN`.
   starterCode={`using System;
 using System.Linq;
 
-record Customer(int Id, string Name);
-record Order(int CustomerId, string Product);
-
 var customers = new[] {
     new Customer(1, "Ada"),
     new Customer(2, "Bilal"),
@@ -184,6 +181,9 @@ var joined = customers.Join(orders,
 
 foreach (var row in joined)
     Console.WriteLine($"{row.Name} bought {row.Product}");
+
+record Customer(int Id, string Name);
+record Order(int CustomerId, string Product);
 `}
 />
 
@@ -201,9 +201,6 @@ outer join is `GroupJoin` followed by `SelectMany` with
   adapter="csharp"
   starterCode={`using System;
 using System.Linq;
-
-record Customer(int Id, string Name);
-record Order(int CustomerId, string Product);
 
 var customers = new[] {
     new Customer(1, "Ada"),
@@ -223,6 +220,9 @@ var leftJoined =
 
 foreach (var row in leftJoined)
     Console.WriteLine($"{row.Name,-7} → {row.Product}");
+
+record Customer(int Id, string Name);
+record Order(int CustomerId, string Product);
 `}
 />
 

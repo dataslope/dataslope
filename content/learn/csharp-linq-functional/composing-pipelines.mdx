@@ -46,19 +46,6 @@ Extensions let your custom pipelines chain like built-in LINQ.
 using System.Collections.Generic;
 using System.Linq;
 
-public record Order(string Status, DateTime PlacedAt, decimal Total);
-
-public static class OrderQueries
-{
-    public static IEnumerable<Order> Active(this IEnumerable<Order> source) => source.Where(o => o.Status == "active");
-
-    public static IEnumerable<Order> Recent(this IEnumerable<Order> source,
-                                            DateTime since) => source.Where(o => o.PlacedAt >= since);
-
-    public static IEnumerable<Order> HighValue(this IEnumerable<Order> source,
-                                               decimal min = 1000m) => source.Where(o => o.Total > min);
-}
-
 var orders = new[] {
     new Order("active", DateTime.UtcNow.AddDays(-10), 1500m),
     new Order("active", DateTime.UtcNow.AddDays(-40), 500m),
@@ -69,6 +56,18 @@ var orders = new[] {
 var report = orders.Active().Recent(DateTime.UtcNow.AddDays(-30)).HighValue().Sum(o => o.Total);
 
 Console.WriteLine($"Recent active high-value revenue: {report}");
+
+public record Order(string Status, DateTime PlacedAt, decimal Total);
+public static class OrderQueries
+{
+    public static IEnumerable<Order> Active(this IEnumerable<Order> source) => source.Where(o => o.Status == "active");
+
+    public static IEnumerable<Order> Recent(this IEnumerable<Order> source,
+                                            DateTime since) => source.Where(o => o.PlacedAt >= since);
+
+    public static IEnumerable<Order> HighValue(this IEnumerable<Order> source,
+                                               decimal min = 1000m) => source.Where(o => o.Total > min);
+}
 `}
 />
 
@@ -95,6 +94,13 @@ previous one.
 using System.Collections.Generic;
 using System.Linq;
 
+var prices = new[] { 100.0, 102.5, 101.0, 105.0, 110.0 };
+
+var changes = prices.Pairwise().Select(p => p.curr - p.prev);
+
+foreach (var d in changes)
+    Console.WriteLine($"change: {d:+0.0;-0.0}");
+
 public static class Operators
 {
     public static IEnumerable<(T prev, T curr)> Pairwise<T>(this IEnumerable<T> source)
@@ -110,13 +116,6 @@ public static class Operators
         }
     }
 }
-
-var prices = new[] { 100.0, 102.5, 101.0, 105.0, 110.0 };
-
-var changes = prices.Pairwise().Select(p => p.curr - p.prev);
-
-foreach (var d in changes)
-    Console.WriteLine($"change: {d:+0.0;-0.0}");
 `}
 />
 

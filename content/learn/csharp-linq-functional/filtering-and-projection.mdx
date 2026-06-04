@@ -111,8 +111,6 @@ A common pattern: project into a small ad-hoc shape mid-pipeline.
   starterCode={`using System;
 using System.Linq;
 
-record Person(string Name, int Age, string City);
-
 var people = new[] {
     new Person("Ada", 36, "London"),
     new Person("Bilal", 41, "Berlin"),
@@ -130,6 +128,8 @@ Console.WriteLine();
 var summary2 = people.Select(p => (p.Name, Decade: p.Age / 10 * 10));
 foreach (var (name, decade) in summary2)
     Console.WriteLine($"{name} → {decade}s");
+
+record Person(string Name, int Age, string City);
 `}
 />
 
@@ -147,8 +147,6 @@ write is some combination of *filter, then transform*.
   starterCode={`using System;
 using System.Linq;
 
-record Order(string Product, decimal Price, int Quantity);
-
 var orders = new[] {
     new Order("Widget", 9.99m, 3), new Order("Gadget", 14.50m, 1), new Order("Widget", 12.00m, 2),
     new Order("Gizmo", 19.99m, 0), new Order("Widget", 8.50m, 4),
@@ -161,6 +159,8 @@ var widgetTotals = orders.Where(o => o.Product == "Widget")
 
 foreach (var x in widgetTotals)
     Console.WriteLine($"price={x.Price,6:C}  total={x.Total,6:C}");
+
+record Order(string Product, decimal Price, int Quantity);
 `}
 />
 

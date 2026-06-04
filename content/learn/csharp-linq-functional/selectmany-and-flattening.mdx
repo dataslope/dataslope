@@ -26,9 +26,6 @@ want one flat list of all employees in the company.
 using System.Collections.Generic;
 using System.Linq;
 
-record Employee(string Name);
-record Department(string Name, List<Employee> Employees);
-
 var company = new[] {
     new Department("Eng", new List<Employee> { new("Ada"), new("Bilal") }),
     new Department("Sales", new List<Employee> { new("Chiara"), new("Dmitri"), new("Esther") }),
@@ -42,6 +39,9 @@ Console.WriteLine($"nested has {nested.Count()} elements (not 6!)");
 
 foreach (var group in nested)
     Console.WriteLine($"  group of {group.Count}");
+
+record Employee(string Name);
+record Department(string Name, List<Employee> Employees);
 `}
 />
 
@@ -56,9 +56,6 @@ need to flatten.
 using System.Collections.Generic;
 using System.Linq;
 
-record Employee(string Name);
-record Department(string Name, List<Employee> Employees);
-
 var company = new[] {
     new Department("Eng", new List<Employee> { new("Ada"), new("Bilal") }),
     new Department("Sales", new List<Employee> { new("Chiara"), new("Dmitri"), new("Esther") }),
@@ -70,6 +67,9 @@ var allEmployees = company.SelectMany(d => d.Employees);
 
 foreach (var e in allEmployees)
     Console.WriteLine(e.Name);
+
+record Employee(string Name);
+record Department(string Name, List<Employee> Employees);
 `}
 />
 
@@ -102,9 +102,6 @@ overload for exactly this.
 using System.Collections.Generic;
 using System.Linq;
 
-record Employee(string Name);
-record Department(string Name, List<Employee> Employees);
-
 var company = new[] {
     new Department("Eng", new List<Employee> { new("Ada"), new("Bilal") }),
     new Department("Sales", new List<Employee> { new("Chiara"), new("Dmitri") }),
@@ -117,6 +114,9 @@ var pairs = company.SelectMany(d => d.Employees, // for each department, take it
 
 foreach (var p in pairs)
     Console.WriteLine($"{p.Emp,-7} ({p.Dept})");
+
+record Employee(string Name);
+record Department(string Name, List<Employee> Employees);
 `}
 />
 
@@ -167,9 +167,6 @@ For deeply nested structures, you chain `SelectMany` calls.
 using System.Collections.Generic;
 using System.Linq;
 
-record Order(int Id, List<string> Tags);
-record Customer(string Name, List<Order> Orders);
-
 var customers = new[] {
     new Customer("Ada",
                  new List<Order> {
@@ -186,6 +183,9 @@ var customers = new[] {
 var allTags = customers.SelectMany(c => c.Orders).SelectMany(o => o.Tags).Distinct().OrderBy(t => t);
 
 Console.WriteLine(string.Join(", ", allTags));
+
+record Order(int Id, List<string> Tags);
+record Customer(string Name, List<Order> Orders);
 `}
 />
 

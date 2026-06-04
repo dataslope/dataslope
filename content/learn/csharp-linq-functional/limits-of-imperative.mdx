@@ -27,8 +27,6 @@ live in Berlin."*
   starterCode={`using System;
 using System.Collections.Generic;
 
-record Person(string Name, string City, int Age);
-
 var people = new List<Person> {
     new("Ada", "London", 36),   new("Bilal", "Berlin", 41),  new("Chiara", "Berlin", 29),
     new("Dmitri", "Paris", 52), new("Esther", "Berlin", 33),
@@ -47,6 +45,8 @@ foreach (var p in people)
 
 double avg = count == 0 ? 0.0 : (double)total / count;
 Console.WriteLine($"Average Berlin age: {avg:F1}");
+
+record Person(string Name, string City, int Age);
 `}
 />
 
@@ -114,8 +114,6 @@ sorted by average age descending."*
   starterCode={`using System;
 using System.Collections.Generic;
 
-record Person(string Name, string City, int Age);
-
 var people = new List<Person> {
     new("Ada", "London", 36),    new("Bilal", "Berlin", 41), new("Chiara", "Berlin", 29), new("Dmitri", "Paris", 52),
     new("Esther", "Berlin", 33), new("Farah", "London", 27), new("Gus", "Paris", 60),
@@ -151,6 +149,8 @@ filtered.Sort((a, b) => b.Avg.CompareTo(a.Avg));
 
 foreach (var row in filtered)
     Console.WriteLine($"{row.City,-8} avg={row.Avg:F1} (n={row.Count})");
+
+record Person(string Name, string City, int Age);
 `}
 />
 

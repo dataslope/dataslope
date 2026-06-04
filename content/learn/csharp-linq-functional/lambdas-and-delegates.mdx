@@ -181,9 +181,8 @@ structure* describing itself.
 That data structure is called an **expression tree**, and its type
 is `Expression<Func<...>>`.
 
-<CodeBlock
-  adapter="csharp"
-  starterCode={`using System;
+```csharp
+using System;
 using System.Linq.Expressions;
 
 // Compiled to executable code — you can call it.
@@ -201,8 +200,7 @@ Console.WriteLine($"Body kind:   {doubleExpr.Body.NodeType}");
 // You can still compile and call it if you want.
 var compiled = doubleExpr.Compile();
 Console.WriteLine(compiled(7)); // 14
-`}
-/>
+```
 
 Why does this matter? Because LINQ providers — EF Core, MongoDB
 LINQ, etc. — accept `Expression<Func<T,bool>>`. They don't *call*
@@ -233,8 +231,6 @@ entirely as data.
 using System.Collections.Generic;
 using System.Linq;
 
-record Person(string Name, int Age, string City);
-
 var rules = new(string Name, Func<Person, bool> Pred)[] {
     ("adult", p => p.Age >= 18),
     ("from-Paris", p => p.City == "Paris"),
@@ -253,6 +249,8 @@ foreach (var p in people)
     var labels = rules.Where(r => r.Pred(p)).Select(r => r.Name);
     Console.WriteLine($"{p.Name,-7}: {string.Join(", ", labels)}");
 }
+
+record Person(string Name, int Age, string City);
 `}
 />
 

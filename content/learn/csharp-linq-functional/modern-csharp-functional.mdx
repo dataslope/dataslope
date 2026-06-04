@@ -113,14 +113,14 @@ and `return`.
   adapter="csharp"
   starterCode={`using System;
 
+var c = new Circle(2);
+Console.WriteLine($"area={c.Area:F2}, circ={c.Circumference():F2}");
+
 record Circle(double Radius)
 {
     public double Area => Math.PI * Radius * Radius;
     public double Circumference() => 2 * Math.PI * Radius;
 }
-
-var c = new Circle(2);
-Console.WriteLine($"area={c.Area:F2}, circ={c.Circumference():F2}");
 `}
 />
 
@@ -166,8 +166,6 @@ Records are the workhorse of immutable data in modern C#.
   adapter="csharp"
   starterCode={`using System;
 
-record Person(string Name, int Age);
-
 var a = new Person("Ada", 36);
 var b = new Person("Ada", 36);
 var older = a with { Age = 37 };
@@ -176,6 +174,8 @@ Console.WriteLine(a == b);     // True — equality by value, not by reference
 Console.WriteLine(a);          // Person { Name = Ada, Age = 36 }
 Console.WriteLine(older);      // Person { Name = Ada, Age = 37 }
 Console.WriteLine(a == older); // False
+
+record Person(string Name, int Age);
 `}
 />
 
@@ -251,8 +251,6 @@ By 2024-era C#, "functional" idioms look like this:
 using System.Linq;
 using System.Collections.Generic;
 
-record Sale(string Region, string Product, decimal Amount);
-
 var sales = new List<Sale> {
     new("EU", "Widget", 12.50m),   new("EU", "Gadget", 44.00m),   new("EU", "Widget", 9.99m),
     new("APAC", "Widget", 31.00m), new("APAC", "Gadget", 21.50m), new("US", "Gizmo", 77.00m),
@@ -268,6 +266,8 @@ var report = sales.GroupBy(s => s.Region)
 
 foreach (var r in report)
     Console.WriteLine($"{r.Region,-5} total={r.Total,8:C}   {string.Join(", ", r.Products)}");
+
+record Sale(string Region, string Product, decimal Amount);
 `}
 />
 

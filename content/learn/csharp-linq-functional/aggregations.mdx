@@ -29,8 +29,6 @@ all of them: `Aggregate`.
   starterCode={`using System;
 using System.Linq;
 
-record Product(string Name, decimal Price, int Stock);
-
 var products = new[] {
     new Product("Widget", 9.99m, 100),
     new Product("Gadget", 14.50m, 25),
@@ -49,6 +47,8 @@ var cheapest = products.MinBy(p => p.Price);
 var pricey = products.MaxBy(p => p.Price);
 Console.WriteLine($"cheapest:    {cheapest?.Name}");
 Console.WriteLine($"priciest:    {pricey?.Name}");
+
+record Product(string Name, decimal Price, int Stock);
 `}
 />
 
