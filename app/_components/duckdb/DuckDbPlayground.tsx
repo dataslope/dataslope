@@ -2699,7 +2699,11 @@ function DuckDbPlaygroundInner() {
     setIsFormatting(true);
     try {
       const { format: sqlFormat } = await import("sql-formatter");
-      const formatted = sqlFormat(code, { language: "sql" });
+      // Use the native DuckDB dialect — the same one SqlCodeBlock /
+      // SqlChallengeCard format duckdb snippets with (via
+      // `sqlFormatterLanguage`) — so the identical query formats the same
+      // way here as it does in lesson code blocks.
+      const formatted = sqlFormat(code, { language: "duckdb" });
       if (formatted === code) {
         showToast("Already formatted — nothing to change.");
         return;

@@ -585,8 +585,9 @@ export function DialectGlyph({ dialect }: { dialect: SqlDialect }) {
 }
 
 /** Map dialect → sql-formatter language identifier. PGlite is Postgres-
- *  compatible; DuckDB's grammar is largely Postgres-derived too, so
- *  reusing the postgres rules produces good results for both. */
+ *  compatible, so postgres formats with the `postgresql` rules; SQLite and
+ *  DuckDB use sql-formatter's matching native dialects. Keep this the single
+ *  source of truth so every surface formats a given dialect identically. */
 export function sqlFormatterLanguage(d: SqlDialect): "sqlite" | "postgresql" | "duckdb" {
   if (d === "sqlite") return "sqlite";
   if (d === "duckdb") return "duckdb";
