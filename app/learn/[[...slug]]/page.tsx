@@ -25,10 +25,14 @@ export default async function LearnPage(props: LearnPageProps) {
   const page = source.getPage(params.slug);
   if (!page) notFound();
 
-  const MDX = page.data.body;
+  // The docs collection uses `dynamic` mode (see `source.config.ts`), so the
+  // compiled MDX body and TOC are fetched on demand here rather than being
+  // bundled with the route. Frontmatter fields (title, description, full)
+  // remain available directly on `page.data`.
+  const { body: MDX, toc } = await page.data.load();
 
   return (
-    <DocsPage toc={page.data.toc} full={page.data.full}>
+    <DocsPage toc={toc} full={page.data.full}>
       <DocsTitle>{page.data.title}</DocsTitle>
       {page.data.description ? (
         <DocsDescription>{page.data.description}</DocsDescription>

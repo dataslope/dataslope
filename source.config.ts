@@ -33,6 +33,19 @@ import rehypeKatex from "rehype-katex";
 
 export const docs = defineDocs({
   dir: "content/learn",
+  docs: {
+    // Compile each lesson's MDX body on demand at request time instead of
+    // bundling all ~800 files into the route graph. By default the generated
+    // `.source/server.ts` statically imports every lesson, so the first
+    // request to any `/learn` page makes Turbopack compile all ~800 bodies
+    // (each through the remark/rehype/Shiki pipeline) before the page can
+    // render. `dynamic` keeps the bodies out of the bundler entirely:
+    // Fumadocs reads + compiles the requested file with its own MDX compiler
+    // at request time, so only the visited page is built. The body and TOC
+    // are then loaded via `await page.data.load()` (see `page.tsx`), and the
+    // collection is consumed from `.source/dynamic` (see `lib/source.ts`).
+    dynamic: true,
+  },
 });
 
 export default defineConfig({

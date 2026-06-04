@@ -8,7 +8,10 @@
  */
 import { loader } from "fumadocs-core/source";
 import { lucideIconsPlugin } from "fumadocs-core/source/plugins/lucide-icons";
-import { docs } from "@/.source/server";
+// `dynamic` mode (see `source.config.ts`) emits the `docs` collection from
+// `.source/dynamic`, where each lesson body is compiled on demand from disk
+// at request time instead of being bundled into the route graph.
+import { docs } from "@/.source/dynamic";
 
 export const source = loader({
   baseUrl: "/learn",
