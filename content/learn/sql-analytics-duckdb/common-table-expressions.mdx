@@ -42,12 +42,23 @@ readable pipeline:
   dialect="duckdb"
   title="The same analysis as a readable pipeline"
   initSql={`CREATE TABLE orders (
-  id INTEGER, region TEXT, status TEXT, amount DECIMAL(8,2)
+  id INTEGER,
+  region TEXT,
+  status TEXT,
+  amount DECIMAL(8, 2)
 );
-INSERT INTO orders VALUES
-  (1,'West','paid',120),(2,'West','refunded',45),(3,'East','paid',200),
-  (4,'East','paid',50),(5,'North','paid',60),(6,'West','paid',95),
-  (7,'East','paid',150),(8,'North','refunded',30);`}
+
+INSERT INTO
+  orders
+VALUES
+  (1, 'West', 'paid', 120),
+  (2, 'West', 'refunded', 45),
+  (3, 'East', 'paid', 200),
+  (4, 'East', 'paid', 50),
+  (5, 'North', 'paid', 60),
+  (6, 'West', 'paid', 95),
+  (7, 'East', 'paid', 150),
+  (8, 'North', 'refunded', 30);`}
   starterCode={`WITH
   paid AS (
     SELECT
@@ -111,12 +122,19 @@ it. Here, each region's revenue is compared to the company-wide average.
 <SqlCodeBlock
   dialect="duckdb"
   title="Compare each region to the overall average"
-  initSql={`CREATE TABLE orders (
-  id INTEGER, region TEXT, amount DECIMAL(8,2)
-);
-INSERT INTO orders VALUES
-  (1,'West',120),(2,'East',80),(3,'West',45),(4,'East',200),
-  (5,'North',60),(6,'West',95),(7,'East',150),(8,'North',100);`}
+  initSql={`CREATE TABLE orders (id INTEGER, region TEXT, amount DECIMAL(8, 2));
+
+INSERT INTO
+  orders
+VALUES
+  (1, 'West', 120),
+  (2, 'East', 80),
+  (3, 'West', 45),
+  (4, 'East', 200),
+  (5, 'North', 60),
+  (6, 'West', 95),
+  (7, 'East', 150),
+  (8, 'North', 100);`}
   starterCode={`WITH
   region_rev AS (
     SELECT

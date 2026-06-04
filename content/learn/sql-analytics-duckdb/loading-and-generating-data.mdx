@@ -109,10 +109,11 @@ so later queries can build on it.
   title="Generate once, then query the saved table"
   initSql={`CREATE TABLE daily_sales AS
 SELECT
-  DATE '2024-01-01' + (i % 90)                 AS day,
-  ['West','East','North','South'][(i % 4) + 1] AS region,
-  (i * 17) % 400 + 10                          AS amount
-FROM range(1, 901) t(i);`}
+  DATE '2024-01-01' + (i % 90) AS day,
+  ['West', 'East', 'North', 'South'] [(i % 4) + 1] AS region,
+  (i * 17) % 400 + 10 AS amount
+FROM
+  range(1, 901) t (i);`}
   starterCode={`-- daily_sales was built by the init step above.
 SELECT
   region,

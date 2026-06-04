@@ -53,12 +53,16 @@ total beside it.
 <SqlCodeBlock
   dialect="duckdb"
   title="The grand total, on every row"
-  initSql={`CREATE TABLE orders (
-  id INTEGER, region TEXT, amount DECIMAL(8,2)
-);
-INSERT INTO orders VALUES
-  (1,'West',120),(2,'East',80),(3,'West',45),
-  (4,'East',200),(5,'North',60);`}
+  initSql={`CREATE TABLE orders (id INTEGER, region TEXT, amount DECIMAL(8, 2));
+
+INSERT INTO
+  orders
+VALUES
+  (1, 'West', 120),
+  (2, 'East', 80),
+  (3, 'West', 45),
+  (4, 'East', 200),
+  (5, 'North', 60);`}
   starterCode={`SELECT
   id,
   region,
@@ -84,12 +88,16 @@ rows stay.
 <SqlCodeBlock
   dialect="duckdb"
   title="Each order tagged with its region total"
-  initSql={`CREATE TABLE orders (
-  id INTEGER, region TEXT, amount DECIMAL(8,2)
-);
-INSERT INTO orders VALUES
-  (1,'West',120),(2,'East',80),(3,'West',45),
-  (4,'East',200),(5,'North',60);`}
+  initSql={`CREATE TABLE orders (id INTEGER, region TEXT, amount DECIMAL(8, 2));
+
+INSERT INTO
+  orders
+VALUES
+  (1, 'West', 120),
+  (2, 'East', 80),
+  (3, 'West', 45),
+  (4, 'East', 200),
+  (5, 'North', 60);`}
   starterCode={`SELECT
   id,
   region,
@@ -122,12 +130,16 @@ Now the original request is one step away — divide each `amount` by its
 <SqlCodeBlock
   dialect="duckdb"
   title="Each order's share of its region"
-  initSql={`CREATE TABLE orders (
-  id INTEGER, region TEXT, amount DECIMAL(8,2)
-);
-INSERT INTO orders VALUES
-  (1,'West',120),(2,'East',80),(3,'West',45),
-  (4,'East',200),(5,'North',60);`}
+  initSql={`CREATE TABLE orders (id INTEGER, region TEXT, amount DECIMAL(8, 2));
+
+INSERT INTO
+  orders
+VALUES
+  (1, 'West', 120),
+  (2, 'East', 80),
+  (3, 'West', 45),
+  (4, 'East', 200),
+  (5, 'North', 60);`}
   starterCode={`SELECT
   id,
   region,

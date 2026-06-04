@@ -42,12 +42,18 @@ produces its own number.
 <SqlCodeBlock
   dialect="duckdb"
   title="A one-line revenue report"
-  initSql={`CREATE TABLE orders (
-  id INTEGER, customer TEXT, amount DECIMAL(8,2)
-);
-INSERT INTO orders VALUES
-  (1,'Ada',120),(2,'Bo',80),(3,'Ada',45),
-  (4,'Cy',200),(5,'Bo',60),(6,'Cy',95),(7,'Ada',30);`}
+  initSql={`CREATE TABLE orders (id INTEGER, customer TEXT, amount DECIMAL(8, 2));
+
+INSERT INTO
+  orders
+VALUES
+  (1, 'Ada', 120),
+  (2, 'Bo', 80),
+  (3, 'Ada', 45),
+  (4, 'Cy', 200),
+  (5, 'Bo', 60),
+  (6, 'Cy', 95),
+  (7, 'Ada', 30);`}
   starterCode={`SELECT
   COUNT(*) AS num_orders,
   SUM(amount) AS revenue,
@@ -74,12 +80,17 @@ analysis:
 <SqlCodeBlock
   dialect="duckdb"
   title="Three kinds of counting"
-  initSql={`CREATE TABLE visits (
-  id INTEGER, user_id INTEGER, referrer TEXT
-);
-INSERT INTO visits VALUES
-  (1, 10, 'google'), (2, 10, NULL), (3, 11, 'google'),
-  (4, 12, 'twitter'), (5, 11, NULL), (6, 10, 'twitter');`}
+  initSql={`CREATE TABLE visits (id INTEGER, user_id INTEGER, referrer TEXT);
+
+INSERT INTO
+  visits
+VALUES
+  (1, 10, 'google'),
+  (2, 10, NULL),
+  (3, 11, 'google'),
+  (4, 12, 'twitter'),
+  (5, 11, NULL),
+  (6, 10, 'twitter');`}
   starterCode={`SELECT
   COUNT(*) AS total_visits,
   COUNT(referrer) AS visits_with_referrer,
@@ -101,11 +112,16 @@ zero and drag an average down.
 <SqlCodeBlock
   dialect="duckdb"
   title="AVG skips the unknowns"
-  initSql={`CREATE TABLE ratings (
-  product TEXT, score INTEGER
-);
-INSERT INTO ratings VALUES
-  ('A', 5), ('A', 3), ('A', NULL), ('B', 4), ('B', NULL);`}
+  initSql={`CREATE TABLE ratings (product TEXT, score INTEGER);
+
+INSERT INTO
+  ratings
+VALUES
+  ('A', 5),
+  ('A', 3),
+  ('A', NULL),
+  ('B', 4),
+  ('B', NULL);`}
   starterCode={`SELECT
   product,
   COUNT(*) AS rows,
@@ -133,11 +149,17 @@ average with a filter.
 <SqlCodeBlock
   dialect="duckdb"
   title="Summarize only the big orders"
-  initSql={`CREATE TABLE orders (
-  id INTEGER, amount DECIMAL(8,2)
-);
-INSERT INTO orders VALUES
-  (1,120),(2,30),(3,200),(4,45),(5,95),(6,15);`}
+  initSql={`CREATE TABLE orders (id INTEGER, amount DECIMAL(8, 2));
+
+INSERT INTO
+  orders
+VALUES
+  (1, 120),
+  (2, 30),
+  (3, 200),
+  (4, 45),
+  (5, 95),
+  (6, 15);`}
   starterCode={`SELECT
   COUNT(*) AS big_orders,
   ROUND(AVG(amount), 2) AS avg_big_order

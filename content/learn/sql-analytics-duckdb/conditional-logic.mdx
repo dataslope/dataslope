@@ -20,11 +20,18 @@ continuous or messy column into clean, analysis-ready categories.
 <SqlCodeBlock
   dialect="duckdb"
   title="Bucket amounts into size labels"
-  initSql={`CREATE TABLE orders (
-  id INTEGER, amount DECIMAL(8,2)
-);
-INSERT INTO orders VALUES
-  (1,15),(2,120),(3,45),(4,250),(5,8),(6,95),(7,500);`}
+  initSql={`CREATE TABLE orders (id INTEGER, amount DECIMAL(8, 2));
+
+INSERT INTO
+  orders
+VALUES
+  (1, 15),
+  (2, 120),
+  (3, 45),
+  (4, 250),
+  (5, 8),
+  (6, 95),
+  (7, 500);`}
   starterCode={`SELECT
   id,
   amount,
@@ -53,11 +60,19 @@ your toolkit for good.
 <SqlCodeBlock
   dialect="duckdb"
   title="How many orders in each size bucket?"
-  initSql={`CREATE TABLE orders (
-  id INTEGER, amount DECIMAL(8,2)
-);
-INSERT INTO orders VALUES
-  (1,15),(2,120),(3,45),(4,250),(5,8),(6,95),(7,500),(8,60);`}
+  initSql={`CREATE TABLE orders (id INTEGER, amount DECIMAL(8, 2));
+
+INSERT INTO
+  orders
+VALUES
+  (1, 15),
+  (2, 120),
+  (3, 45),
+  (4, 250),
+  (5, 8),
+  (6, 95),
+  (7, 500),
+  (8, 60);`}
   starterCode={`SELECT
   CASE
     WHEN amount < 50 THEN 'small'
@@ -85,12 +100,23 @@ mobile vs. desktop — all side by side.
   dialect="duckdb"
   title="Paid and refunded totals, side by side"
   initSql={`CREATE TABLE orders (
-  id INTEGER, region TEXT, status TEXT, amount DECIMAL(8,2)
+  id INTEGER,
+  region TEXT,
+  status TEXT,
+  amount DECIMAL(8, 2)
 );
-INSERT INTO orders VALUES
-  (1,'West','paid',120),(2,'West','refunded',45),(3,'East','paid',200),
-  (4,'East','paid',50),(5,'North','refunded',60),(6,'West','paid',95),
-  (7,'East','refunded',30),(8,'North','paid',100);`}
+
+INSERT INTO
+  orders
+VALUES
+  (1, 'West', 'paid', 120),
+  (2, 'West', 'refunded', 45),
+  (3, 'East', 'paid', 200),
+  (4, 'East', 'paid', 50),
+  (5, 'North', 'refunded', 60),
+  (6, 'West', 'paid', 95),
+  (7, 'East', 'refunded', 30),
+  (8, 'North', 'paid', 100);`}
   starterCode={`SELECT
   region,
   SUM(
@@ -141,11 +167,21 @@ which expresses conditional aggregation more clearly than `CASE` inside
   dialect="duckdb"
   title="The same idea, written with FILTER"
   initSql={`CREATE TABLE orders (
-  id INTEGER, region TEXT, status TEXT, amount DECIMAL(8,2)
+  id INTEGER,
+  region TEXT,
+  status TEXT,
+  amount DECIMAL(8, 2)
 );
-INSERT INTO orders VALUES
-  (1,'West','paid',120),(2,'West','refunded',45),(3,'East','paid',200),
-  (4,'East','paid',50),(5,'North','refunded',60),(6,'West','paid',95);`}
+
+INSERT INTO
+  orders
+VALUES
+  (1, 'West', 'paid', 120),
+  (2, 'West', 'refunded', 45),
+  (3, 'East', 'paid', 200),
+  (4, 'East', 'paid', 50),
+  (5, 'North', 'refunded', 60),
+  (6, 'West', 'paid', 95);`}
   starterCode={`SELECT
   region,
   SUM(amount) FILTER(
@@ -185,10 +221,18 @@ Two small but constant companions of conditional logic:
   dialect="duckdb"
   title="Safe defaults and safe division"
   initSql={`CREATE TABLE line_items (
-  id INTEGER, amount DECIMAL(8,2), quantity INTEGER, discount DECIMAL(8,2)
+  id INTEGER,
+  amount DECIMAL(8, 2),
+  quantity INTEGER,
+  discount DECIMAL(8, 2)
 );
-INSERT INTO line_items VALUES
-  (1, 100, 4, NULL), (2, 60, 0, 5), (3, 80, 2, NULL);`}
+
+INSERT INTO
+  line_items
+VALUES
+  (1, 100, 4, NULL),
+  (2, 60, 0, 5),
+  (3, 80, 2, NULL);`}
   starterCode={`SELECT
   id,
   COALESCE(discount, 0) AS discount_filled,

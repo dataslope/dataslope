@@ -90,10 +90,14 @@ ORDER BY
   instructions={`Return one row per \`sale_date\` per \`region\` with columns \`sale_date\`, \`region\`, \`revenue\`, and a fourth column \`running_total\` containing the cumulative sum of \`revenue\` within each region, ordered by \`sale_date\`.`}
   initSql={`CREATE TABLE sales AS
 SELECT
-  d                                  AS sale_date,
-  CASE WHEN d % 2 = 0 THEN 'North' ELSE 'South' END AS region,
-  (d * 13) % 100 + 10                AS revenue
-FROM range(1, 9) t(d);`}
+  d AS sale_date,
+  CASE
+    WHEN d % 2 = 0 THEN 'North'
+    ELSE 'South'
+  END AS region,
+  (d * 13) % 100 + 10 AS revenue
+FROM
+  range(1, 9) t (d);`}
   starterCode={`SELECT
   sale_date,
   region,
@@ -150,10 +154,14 @@ ORDER BY
   instructions={`Return one row per \`sale_date\` per \`region\` with columns \`sale_date\`, \`region\`, \`revenue\`, and a fourth column \`running_total\` containing the cumulative sum of \`revenue\` within each region, ordered by \`sale_date\`.`}
   initSql={`CREATE TABLE sales AS
 SELECT
-  d                                  AS sale_date,
-  CASE WHEN d % 2 = 0 THEN 'North' ELSE 'South' END AS region,
-  (d * 13) % 100 + 10                AS revenue
-FROM range(1, 9) t(d);`}
+  d AS sale_date,
+  CASE
+    WHEN d % 2 = 0 THEN 'North'
+    ELSE 'South'
+  END AS region,
+  (d * 13) % 100 + 10 AS revenue
+FROM
+  range(1, 9) t (d);`}
   starterCode={`SELECT
   sale_date,
   region,
@@ -211,10 +219,24 @@ ORDER BY
   title="Average rating per genre"
   instructions={`Two tables are pre-loaded: \`movies\` (with \`id\`, \`title\`, \`genre_id\`, \`rating\`) and \`genres\` (with \`id\`, \`name\`). Return one row per genre with columns \`genre\` and \`avg_rating\` (rounded to one decimal place), sorted by \`avg_rating\` descending.`}
   initSql={`CREATE TABLE genres (id INTEGER, name VARCHAR);
-INSERT INTO genres VALUES (1, 'Drama'), (2, 'Sci-Fi'), (3, 'Comedy');
 
-CREATE TABLE movies (id INTEGER, title VARCHAR, genre_id INTEGER, rating DECIMAL(3,1));
-INSERT INTO movies VALUES
+INSERT INTO
+  genres
+VALUES
+  (1, 'Drama'),
+  (2, 'Sci-Fi'),
+  (3, 'Comedy');
+
+CREATE TABLE movies (
+  id INTEGER,
+  title VARCHAR,
+  genre_id INTEGER,
+  rating DECIMAL(3, 1)
+);
+
+INSERT INTO
+  movies
+VALUES
   (1, 'A', 1, 8.4),
   (2, 'B', 1, 7.6),
   (3, 'C', 2, 9.1),
@@ -262,10 +284,24 @@ ORDER BY
   title="Average rating per genre"
   instructions={`Two tables are pre-loaded: \`movies\` (with \`id\`, \`title\`, \`genre_id\`, \`rating\`) and \`genres\` (with \`id\`, \`name\`). Return one row per genre with columns \`genre\` and \`avg_rating\` (rounded to one decimal place), sorted by \`avg_rating\` descending.`}
   initSql={`CREATE TABLE genres (id INTEGER, name VARCHAR);
-INSERT INTO genres VALUES (1, 'Drama'), (2, 'Sci-Fi'), (3, 'Comedy');
 
-CREATE TABLE movies (id INTEGER, title VARCHAR, genre_id INTEGER, rating DECIMAL(3,1));
-INSERT INTO movies VALUES
+INSERT INTO
+  genres
+VALUES
+  (1, 'Drama'),
+  (2, 'Sci-Fi'),
+  (3, 'Comedy');
+
+CREATE TABLE movies (
+  id INTEGER,
+  title VARCHAR,
+  genre_id INTEGER,
+  rating DECIMAL(3, 1)
+);
+
+INSERT INTO
+  movies
+VALUES
   (1, 'A', 1, 8.4),
   (2, 'B', 1, 7.6),
   (3, 'C', 2, 9.1),
@@ -325,8 +361,8 @@ SELECT
   i AS id,
   ('user_' || i) AS name,
   (i * 37 % 100) AS score
-FROM range(1, 10001) t(i);
-`}
+FROM
+  range(1, 10001) t (i);`}
   starterCode={`SELECT
   *
 FROM
@@ -366,9 +402,12 @@ ORDER BY
   instructions={`A 10,000-row table big is preloaded ...`}
 
   initSql={`CREATE TABLE big AS
-SELECT i AS id, ('user_' || i) AS name, (i * 37 % 100) AS score
-FROM range(1, 10001) t(i);
-`}
+SELECT
+  i AS id,
+  ('user_' || i) AS name,
+  (i * 37 % 100) AS score
+FROM
+  range(1, 10001) t (i);`}
   starterCode={`SELECT
   *
 FROM

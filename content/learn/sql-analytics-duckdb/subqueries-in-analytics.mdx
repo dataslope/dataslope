@@ -31,11 +31,17 @@ average?"
 <SqlCodeBlock
   dialect="duckdb"
   title="Each order vs. the overall average"
-  initSql={`CREATE TABLE orders (
-  id INTEGER, amount DECIMAL(8,2)
-);
-INSERT INTO orders VALUES
-  (1,120),(2,80),(3,45),(4,200),(5,60),(6,95);`}
+  initSql={`CREATE TABLE orders (id INTEGER, amount DECIMAL(8, 2));
+
+INSERT INTO
+  orders
+VALUES
+  (1, 120),
+  (2, 80),
+  (3, 45),
+  (4, 200),
+  (5, 60),
+  (6, 95);`}
   starterCode={`SELECT
   id,
   amount,
@@ -71,15 +77,30 @@ from customers in the loyalty program."
   dialect="duckdb"
   title="Orders from high-value customers only"
   initSql={`CREATE TABLE orders (
-  id INTEGER, customer_id INTEGER, amount DECIMAL(8,2)
+  id INTEGER,
+  customer_id INTEGER,
+  amount DECIMAL(8, 2)
 );
-INSERT INTO orders VALUES
-  (1,10,120),(2,11,80),(3,10,45),(4,12,200),(5,11,60),(6,13,95);
-CREATE TABLE customers (
-  id INTEGER, tier TEXT
-);
-INSERT INTO customers VALUES
-  (10,'gold'),(11,'silver'),(12,'gold'),(13,'bronze');`}
+
+INSERT INTO
+  orders
+VALUES
+  (1, 10, 120),
+  (2, 11, 80),
+  (3, 10, 45),
+  (4, 12, 200),
+  (5, 11, 60),
+  (6, 13, 95);
+
+CREATE TABLE customers (id INTEGER, tier TEXT);
+
+INSERT INTO
+  customers
+VALUES
+  (10, 'gold'),
+  (11, 'silver'),
+  (12, 'gold'),
+  (13, 'bronze');`}
   starterCode={`SELECT
   id,
   customer_id,
@@ -112,12 +133,17 @@ function or join is often clearer.
 <SqlCodeBlock
   dialect="duckdb"
   title="Each order vs. its own region's average"
-  initSql={`CREATE TABLE orders (
-  id INTEGER, region TEXT, amount DECIMAL(8,2)
-);
-INSERT INTO orders VALUES
-  (1,'West',120),(2,'East',80),(3,'West',45),
-  (4,'East',200),(5,'North',60),(6,'West',95);`}
+  initSql={`CREATE TABLE orders (id INTEGER, region TEXT, amount DECIMAL(8, 2));
+
+INSERT INTO
+  orders
+VALUES
+  (1, 'West', 120),
+  (2, 'East', 80),
+  (3, 'West', 45),
+  (4, 'East', 200),
+  (5, 'North', 60),
+  (6, 'West', 95);`}
   starterCode={`SELECT
   o.id,
   o.region,
@@ -152,9 +178,22 @@ placed *any* order" without caring how many.
   dialect="duckdb"
   title="Customers who have ordered at least once"
   initSql={`CREATE TABLE customers (id INTEGER, name TEXT);
-INSERT INTO customers VALUES (1,'Ada'),(2,'Bo'),(3,'Cy');
+
+INSERT INTO
+  customers
+VALUES
+  (1, 'Ada'),
+  (2, 'Bo'),
+  (3, 'Cy');
+
 CREATE TABLE orders (id INTEGER, customer_id INTEGER);
-INSERT INTO orders VALUES (101,1),(102,1),(103,3);`}
+
+INSERT INTO
+  orders
+VALUES
+  (101, 1),
+  (102, 1),
+  (103, 3);`}
   starterCode={`SELECT
   name
 FROM

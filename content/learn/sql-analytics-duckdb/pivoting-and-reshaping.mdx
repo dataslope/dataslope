@@ -54,12 +54,17 @@ makes the mechanics visible.
 <SqlCodeBlock
   dialect="duckdb"
   title="Manual pivot: quarters into columns"
-  initSql={`CREATE TABLE sales (
-  region TEXT, quarter TEXT, amount INTEGER
-);
-INSERT INTO sales VALUES
-  ('West','Q1',100),('West','Q2',140),('West','Q1',20),
-  ('East','Q1',200),('East','Q2',90),('North','Q2',75);`}
+  initSql={`CREATE TABLE sales (region TEXT, quarter TEXT, amount INTEGER);
+
+INSERT INTO
+  sales
+VALUES
+  ('West', 'Q1', 100),
+  ('West', 'Q2', 140),
+  ('West', 'Q1', 20),
+  ('East', 'Q1', 200),
+  ('East', 'Q2', 90),
+  ('North', 'Q2', 75);`}
   starterCode={`SELECT
   region,
   SUM(amount) FILTER(
@@ -91,12 +96,17 @@ the aggregate, and DuckDB discovers the distinct values for you.
 <SqlCodeBlock
   dialect="duckdb"
   title="The same pivot with PIVOT syntax"
-  initSql={`CREATE TABLE sales (
-  region TEXT, quarter TEXT, amount INTEGER
-);
-INSERT INTO sales VALUES
-  ('West','Q1',100),('West','Q2',140),('West','Q1',20),
-  ('East','Q1',200),('East','Q2',90),('North','Q2',75);`}
+  initSql={`CREATE TABLE sales (region TEXT, quarter TEXT, amount INTEGER);
+
+INSERT INTO
+  sales
+VALUES
+  ('West', 'Q1', 100),
+  ('West', 'Q2', 140),
+  ('West', 'Q1', 20),
+  ('East', 'Q1', 200),
+  ('East', 'Q2', 90),
+  ('North', 'Q2', 75);`}
   starterCode={`PIVOT sales ON quarter -- values of this column become columns
 USING SUM(amount) -- aggregate that fills each cell
 GROUP BY
@@ -120,11 +130,17 @@ into rows.
   dialect="duckdb"
   title="UNPIVOT: month columns back into rows"
   initSql={`CREATE TABLE wide_sales (
-  region TEXT, jan INTEGER, feb INTEGER, mar INTEGER
+  region TEXT,
+  jan INTEGER,
+  feb INTEGER,
+  mar INTEGER
 );
-INSERT INTO wide_sales VALUES
+
+INSERT INTO
+  wide_sales
+VALUES
   ('West', 100, 140, 90),
-  ('East', 200,  60, 120);`}
+  ('East', 200, 60, 120);`}
   starterCode={`UNPIVOT wide_sales ON jan,
 feb,
 mar -- these columns become rows

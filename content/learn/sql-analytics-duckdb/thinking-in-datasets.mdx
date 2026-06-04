@@ -79,11 +79,12 @@ dataset you never scrolled through:
   title="Building a mental picture in three questions"
   initSql={`CREATE TABLE events AS
 SELECT
-  i                                AS id,
-  DATE '2024-01-01' + (i % 120)    AS day,
-  ['signup','login','purchase','refund'][(i % 4) + 1] AS kind,
-  (i * 17) % 200                   AS value
-FROM range(1, 4001) t(i);`}
+  i AS id,
+  DATE '2024-01-01' + (i % 120) AS day,
+  ['signup', 'login', 'purchase', 'refund'] [(i % 4) + 1] AS kind,
+  (i * 17) % 200 AS value
+FROM
+  range(1, 4001) t (i);`}
   starterCode={`-- Question 1: how big, and what does it span?
 SELECT
   COUNT(*) AS rows,
@@ -101,11 +102,12 @@ Now sharpen the question — *what kinds of events, and how common is each?*
   title="Drill down: the mix of event kinds"
   initSql={`CREATE TABLE events AS
 SELECT
-  i                                AS id,
-  DATE '2024-01-01' + (i % 120)    AS day,
-  ['signup','login','purchase','refund'][(i % 4) + 1] AS kind,
-  (i * 17) % 200                   AS value
-FROM range(1, 4001) t(i);`}
+  i AS id,
+  DATE '2024-01-01' + (i % 120) AS day,
+  ['signup', 'login', 'purchase', 'refund'] [(i % 4) + 1] AS kind,
+  (i * 17) % 200 AS value
+FROM
+  range(1, 4001) t (i);`}
   starterCode={`SELECT
   kind,
   COUNT(*) AS n,
