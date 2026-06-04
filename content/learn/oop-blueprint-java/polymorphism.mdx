@@ -48,23 +48,29 @@ flowchart LR
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Animal a = new Dog();         // compile-time type Animal, runtime type Dog
-        System.out.println(a.speak()); // -> "Woof!" (Dog's override)
+  public static void main(String[] args) {
+    Animal a = new Dog();          // compile-time type Animal, runtime type Dog
+    System.out.println(a.speak()); // -> "Woof!" (Dog's override)
 
-        Animal a2 = new Cat();        // compile-time type Animal, runtime type Cat
-        System.out.println(a2.speak());
-    }
+    Animal a2 = new Cat(); // compile-time type Animal, runtime type Cat
+    System.out.println(a2.speak());
+  }
 }
 
 class Animal {
-    public String speak() { return "(generic)"; }
+  public String speak() { return "(generic)"; }
 }
 class Dog extends Animal {
-    @Override public String speak() { return "Woof!"; }
+  @Override
+  public String speak() {
+    return "Woof!";
+  }
 }
 class Cat extends Animal {
-    @Override public String speak() { return "Meow!"; }
+  @Override
+  public String speak() {
+    return "Meow!";
+  }
 }
 `}
 />
@@ -209,31 +215,39 @@ expression and may fail at runtime if you're wrong.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Animal a1 = new Dog();
-        Animal a2 = new Cat();
+  public static void main(String[] args) {
+    Animal a1 = new Dog();
+    Animal a2 = new Cat();
 
-        // Safe pattern: check before you cast.
-        if (a1 instanceof Dog) {
-            Dog asDog = (Dog) a1;
-            System.out.println("upgraded: " + asDog.fetch());
-        }
-
-        // Modern alternative (pattern matching instanceof, Java 16+):
-        if (a2 instanceof Cat c) {
-            System.out.println("upgraded: " + c.purr());
-        }
+    // Safe pattern: check before you cast.
+    if (a1 instanceof Dog) {
+      Dog asDog = (Dog)a1;
+      System.out.println("upgraded: " + asDog.fetch());
     }
+
+    // Modern alternative (pattern matching instanceof, Java 16+):
+    if (a2 instanceof Cat c) {
+      System.out.println("upgraded: " + c.purr());
+    }
+  }
 }
 
-class Animal { public String speak() { return "(generic)"; } }
+class Animal {
+  public String speak() { return "(generic)"; }
+}
 class Dog extends Animal {
-    @Override public String speak() { return "Woof!"; }
-    public String fetch() { return "fetched the ball"; }
+  @Override
+  public String speak() {
+    return "Woof!";
+  }
+  public String fetch() { return "fetched the ball"; }
 }
 class Cat extends Animal {
-    @Override public String speak() { return "Meow!"; }
-    public String purr() { return "purrrr"; }
+  @Override
+  public String speak() {
+    return "Meow!";
+  }
+  public String purr() { return "purrrr"; }
 }
 `}
 />

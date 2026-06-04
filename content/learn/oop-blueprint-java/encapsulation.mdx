@@ -51,17 +51,17 @@ Look at this *anti-example* and notice every way it can go wrong.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        OpenAccount a = new OpenAccount();
-        a.balance = 100;
-        a.balance = -1_000_000;   // Nobody stopped us.
-        a.balance += 50;           // Outsiders are doing the math.
-        System.out.println(a.balance);
-    }
+  public static void main(String[] args) {
+    OpenAccount a = new OpenAccount();
+    a.balance = 100;
+    a.balance = -1_000_000; // Nobody stopped us.
+    a.balance += 50;        // Outsiders are doing the math.
+    System.out.println(a.balance);
+  }
 }
 
 class OpenAccount {
-    public double balance;        // public field — total exposure
+  public double balance; // public field — total exposure
 }
 `}
 />
@@ -80,32 +80,35 @@ Encapsulation fixes both at once.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        BankAccount a = new BankAccount();
-        a.deposit(100);
-        a.deposit(50);
-        boolean ok = a.withdraw(1_000_000);
-        System.out.println("withdraw allowed? " + ok);
-        System.out.println("balance: " + a.balance());
-    }
+  public static void main(String[] args) {
+    BankAccount a = new BankAccount();
+    a.deposit(100);
+    a.deposit(50);
+    boolean ok = a.withdraw(1_000_000);
+    System.out.println("withdraw allowed? " + ok);
+    System.out.println("balance: " + a.balance());
+  }
 }
 
 class BankAccount {
-    private double balance;       // hidden — outsiders cannot touch it
+  private double balance; // hidden — outsiders cannot touch it
 
-    public void deposit(double amount) {
-        if (amount <= 0) throw new IllegalArgumentException("deposit must be positive");
-        balance += amount;
-    }
+  public void deposit(double amount) {
+    if (amount <= 0)
+      throw new IllegalArgumentException("deposit must be positive");
+    balance += amount;
+  }
 
-    public boolean withdraw(double amount) {
-        if (amount <= 0)        throw new IllegalArgumentException("withdraw must be positive");
-        if (amount > balance)   return false;        // refuse rather than go negative
-        balance -= amount;
-        return true;
-    }
+  public boolean withdraw(double amount) {
+    if (amount <= 0)
+      throw new IllegalArgumentException("withdraw must be positive");
+    if (amount > balance)
+      return false; // refuse rather than go negative
+    balance -= amount;
+    return true;
+  }
 
-    public double balance() { return balance; }
+  public double balance() { return balance; }
 }
 `}
 />

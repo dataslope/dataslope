@@ -38,9 +38,11 @@ fig = px.scatter(
     size_max=55,
     template="simple_white",
     title="Gapminder 2007 — the classic bubble chart",
-    labels={"gdpPercap": "GDP per capita (USD, log)",
-            "lifeExp": "Life expectancy (years)",
-            "pop": "Population"},
+    labels={
+        "gdpPercap": "GDP per capita (USD, log)",
+        "lifeExp": "Life expectancy (years)",
+        "pop": "Population",
+    },
 )
 fig.show()
 `}
@@ -106,8 +108,10 @@ fig = px.scatter(
     range_y=[25, 90],
     template="simple_white",
     title="Gapminder — animated through time",
-    labels={"gdpPercap": "GDP per capita (USD, log)",
-            "lifeExp": "Life expectancy (years)"},
+    labels={
+        "gdpPercap": "GDP per capita (USD, log)",
+        "lifeExp": "Life expectancy (years)",
+    },
 )
 fig.show()
 `}

@@ -90,6 +90,7 @@ If you need complex state, write your own iterator with `__iter__` and `__next__
         self.current -= 1
         return self.current + 1
 
+
 for n in Countdown(5):
     print(n)
 `}
@@ -107,6 +108,7 @@ Writing `__iter__` and `__next__` by hand is tedious. A function that uses `yiel
     while n > 0:
         yield n
         n -= 1
+
 
 for x in countdown(5):
     print(x)
@@ -131,6 +133,7 @@ Here's proof that local variables survive across `yield` calls:
         count += 1
         yield f"call {count}"
 
+
 gen = stateful()
 print(next(gen))
 print(next(gen))
@@ -152,7 +155,9 @@ Generators can run forever. You take as much as you need and stop:
         yield n
         n += 1
 
+
 from itertools import islice
+
 print(list(islice(naturals(), 10)))
 `}
 />
@@ -181,8 +186,8 @@ When a generator expression is the sole argument to a function, the inner parens
 <CodeBlock
   adapter="python"
   starterCode={`# These are equivalent:
-total1 = sum((x*x for x in range(10)))
-total2 = sum(x*x for x in range(10))
+total1 = sum((x * x for x in range(10)))
+total2 = sum(x * x for x in range(10))
 print(total1, total2)
 `}
 />
@@ -198,15 +203,18 @@ Generators chain naturally. Each stage processes one item at a time:
     for line in ["alpha", "  beta  ", "", "gamma", "  ", "delta", "zeta"]:
         yield line
 
+
 def clean(stream):
     for line in stream:
         cleaned = line.strip()
         if cleaned:
             yield cleaned
 
+
 def uppercase(stream):
     for line in stream:
         yield line.upper()
+
 
 # Compose the pipeline
 pipeline = uppercase(clean(read_lines()))
@@ -232,6 +240,7 @@ In production, you might chain generators to process log files too large for RAM
     for it in iterables:
         yield from it
 
+
 for x in chain([1, 2], (3, 4), "ab"):
     print(x)
 `}
@@ -253,31 +262,38 @@ The `itertools` module is a treasure chest of lazy functions. A small sample:
 <CodeBlock
   adapter="python"
   starterCode={`from itertools import (
-    count, cycle, repeat, chain, islice,
-    takewhile, accumulate, combinations, product
+    count,
+    cycle,
+    repeat,
+    chain,
+    islice,
+    takewhile,
+    accumulate,
+    combinations,
+    product,
 )
 
 # Infinite counters
-print(list(islice(count(10), 5)))         # [10, 11, 12, 13, 14]
+print(list(islice(count(10), 5)))  # [10, 11, 12, 13, 14]
 
 # Cycle through a sequence forever
-print(list(islice(cycle("abc"), 7)))      # ['a','b','c','a','b','c','a']
+print(list(islice(cycle("abc"), 7)))  # ['a','b','c','a','b','c','a']
 
 # Repeat a value
-print(list(repeat("hi", 3)))              # ['hi', 'hi', 'hi']
+print(list(repeat("hi", 3)))  # ['hi', 'hi', 'hi']
 
 # Chain multiple iterables
-print(list(chain([1, 2], [3, 4])))        # [1, 2, 3, 4]
+print(list(chain([1, 2], [3, 4])))  # [1, 2, 3, 4]
 
 # Take while condition is true
 print(list(takewhile(lambda x: x < 5, count())))  # [0, 1, 2, 3, 4]
 
 # Running totals
-print(list(accumulate([1, 2, 3, 4])))     # [1, 3, 6, 10]
+print(list(accumulate([1, 2, 3, 4])))  # [1, 3, 6, 10]
 
 # Combinatorics
-print(list(combinations("abcd", 2)))      # [('a','b'), ('a','c'), ...]
-print(list(product("ab", "12")))          # [('a','1'), ('a','2'), ...]
+print(list(combinations("abcd", 2)))  # [('a','b'), ('a','c'), ...]
+print(list(product("ab", "12")))  # [('a','1'), ('a','2'), ...]
 `}
 />
 
@@ -294,6 +310,7 @@ Once exhausted, a generator cannot be restarted:
   starterCode={`def gen():
     yield 1
     yield 2
+
 
 g = gen()
 print(list(g))  # [1, 2]
@@ -447,6 +464,7 @@ Example: \`list(batched([1, 2, 3, 4, 5], 2))\` returns \`[(1, 2), (3, 4), (5,)]\
         if not batch:
             break
         yield batch
+
 
 from itertools import islice
 `}

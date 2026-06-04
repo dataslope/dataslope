@@ -108,11 +108,16 @@ tries to reuse the same primary key, so PostgreSQL rejects it.
 INSERT INTO customers (customer_id, name)
 VALUES (1, 'Ada');`}
   starterCode={`-- This tries to create a second row with the same identity.
-INSERT INTO customers (customer_id, name)
-VALUES (1, 'Grace');
+INSERT INTO
+  customers (customer_id, name)
+VALUES
+  (1, 'Grace');
 
 -- The failed insert protects the table from ambiguous identity.
-SELECT * FROM customers;`}
+SELECT
+  *
+FROM
+  customers;`}
 />
 
 The error is useful. It is the database refusing a design state where

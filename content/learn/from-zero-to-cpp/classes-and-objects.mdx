@@ -33,31 +33,32 @@ code may only ask it to deposit or withdraw."
 
 class BankAccount {
 public:
-    BankAccount(double opening) : balance_(opening) {}
+  BankAccount(double opening) : balance_(opening) {}
 
-    void deposit(double amount) {
-        if (amount > 0) balance_ += amount;
+  void deposit(double amount) {
+    if (amount > 0)
+      balance_ += amount;
+  }
+  bool withdraw(double amount) {
+    if (amount > 0 && amount <= balance_) {
+      balance_ -= amount;
+      return true;
     }
-    bool withdraw(double amount) {
-        if (amount > 0 && amount <= balance_) {
-            balance_ -= amount;
-            return true;
-        }
-        return false;
-    }
-    double balance() const { return balance_; }
+    return false;
+  }
+  double balance() const { return balance_; }
 
 private:
-    double balance_;
+  double balance_;
 };
 
 int main() {
-    BankAccount a(100.0);
-    a.deposit(50.0);
-    bool ok = a.withdraw(200.0);          // refused
-    std::cout << "ok = " << ok << "\\n";
-    std::cout << "bal = " << a.balance() << "\\n";
-    return 0;
+  BankAccount a(100.0);
+  a.deposit(50.0);
+  bool ok = a.withdraw(200.0); // refused
+  std::cout << "ok = " << ok << "\\n";
+  std::cout << "bal = " << a.balance() << "\\n";
+  return 0;
 }
 `}
 />
@@ -152,25 +153,25 @@ of the most useful disciplines in C++.
 
 class Counter {
 public:
-    Counter(std::string name) : name_(std::move(name)), count_(0) {}
+  Counter(std::string name) : name_(std::move(name)), count_(0) {}
 
-    void tick() { ++count_; }
-    int  count() const { return count_; }
-    const std::string& name() const { return name_; }
+  void tick() { ++count_; }
+  int count() const { return count_; }
+  const std::string &name() const { return name_; }
 
 private:
-    std::string name_;
-    int         count_;
+  std::string name_;
+  int count_;
 };
 
 int main() {
-    Counter clicks("clicks");
-    clicks.tick();
-    clicks.tick();
-    clicks.tick();
+  Counter clicks("clicks");
+  clicks.tick();
+  clicks.tick();
+  clicks.tick();
 
-    std::cout << clicks.name() << ": " << clicks.count() << "\\n";
-    return 0;
+  std::cout << clicks.name() << ": " << clicks.count() << "\\n";
+  return 0;
 }
 `}
 />
@@ -188,39 +189,40 @@ keeps an obvious invariant ("count_ only ever goes up by one").
 
 class Counter {
 public:
-    // your members and methods here
+  // your members and methods here
 };
 
 int main() {
-    Counter c;
-    c.tick();
-    c.tick();
-    std::cout << c.value();
-    c.reset();
-    std::cout << ' ' << c.value();
-    return 0;
+  Counter c;
+  c.tick();
+  c.tick();
+  std::cout << c.value();
+  c.reset();
+  std::cout << ' ' << c.value();
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 
 class Counter {
 public:
-    Counter() : n_(0) {}
-    void tick() { ++n_; }
-    void reset() { n_ = 0; }
-    int  value() const { return n_; }
+  Counter() : n_(0) {}
+  void tick() { ++n_; }
+  void reset() { n_ = 0; }
+  int value() const { return n_; }
+
 private:
-    int n_;
+  int n_;
 };
 
 int main() {
-    Counter c;
-    c.tick();
-    c.tick();
-    std::cout << c.value();
-    c.reset();
-    std::cout << ' ' << c.value();
-    return 0;
+  Counter c;
+  c.tick();
+  c.tick();
+  std::cout << c.value();
+  c.reset();
+  std::cout << ' ' << c.value();
+  return 0;
 }
 `}
   tests={[

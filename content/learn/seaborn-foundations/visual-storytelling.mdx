@@ -84,8 +84,11 @@ sns.set_theme(style="ticks")
 penguins = sns.load_dataset("penguins")
 
 g = sns.relplot(
-    data=penguins, x="flipper_length_mm", y="body_mass_g",
-    height=4, aspect=1.2,
+    data=penguins,
+    x="flipper_length_mm",
+    y="body_mass_g",
+    height=4,
+    aspect=1.2,
 )
 g.set_axis_labels("Flipper length (mm)", "Body mass (g)")
 sns.despine()
@@ -114,14 +117,21 @@ tips = sns.load_dataset("tips")
 day_colors = {
     "Thur": "lightgray",
     "Fri": "lightgray",
-    "Sat": "#d1495b",   # the one we want the eye to land on
+    "Sat": "#d1495b",  # the one we want the eye to land on
     "Sun": "lightgray",
 }
 
 g = sns.catplot(
-    data=tips, x="day", y="total_bill", kind="bar",
-    hue="day", palette=day_colors, legend=False,
-    height=4, aspect=1.3, errorbar=None,
+    data=tips,
+    x="day",
+    y="total_bill",
+    kind="bar",
+    hue="day",
+    palette=day_colors,
+    legend=False,
+    height=4,
+    aspect=1.3,
+    errorbar=None,
 )
 g.set_axis_labels("Day", "Mean total bill (USD)")
 g.figure.suptitle("Saturday brings the biggest bills")
@@ -241,7 +251,8 @@ g = sns.relplot(
     data=penguins,
     x="body_mass_g",
     y="flipper_length_mm",
-    height=4, aspect=1.3,
+    height=4,
+    aspect=1.3,
 )
 
 # Units on the axes, a message in the title, a light frame.

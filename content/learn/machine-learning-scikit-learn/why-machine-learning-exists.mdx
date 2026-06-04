@@ -145,7 +145,7 @@ petal_length = X[:, 2]
 
 # A hand-written rule: "short petals -> setosa".
 rule_says_setosa = petal_length < 2.5
-actually_setosa = (y == 0)
+actually_setosa = y == 0
 
 correct = (rule_says_setosa == actually_setosa).sum()
 print(f"A one-line rule separates setosa perfectly: {correct}/{len(y)} correct.")
@@ -174,7 +174,7 @@ X2, y2 = X[mask], y[mask]
 
 # Try a hand-written threshold on petal length for these two.
 petal_length = X2[:, 2]
-threshold = 4.9   # a reasonable hand-picked guess
+threshold = 4.9  # a reasonable hand-picked guess
 rule_pred = np.where(petal_length < threshold, 1, 2)
 rule_acc = (rule_pred == y2).mean()
 
@@ -260,8 +260,8 @@ rng = np.random.default_rng(0)
 x_old = rng.uniform(0, 10, size=200).reshape(-1, 1)
 y_old = 2.0 * x_old.ravel() + rng.normal(0, 1, size=200)
 
-rule_slope = 2.0                                  # a hand-tuned rule: y ~ 2*x
-model = LinearRegression().fit(x_old, y_old)      # a learned model
+rule_slope = 2.0  # a hand-tuned rule: y ~ 2*x
+model = LinearRegression().fit(x_old, y_old)  # a learned model
 
 # NEW WORLD: the relationship shifts to about 5 * x.
 x_new = rng.uniform(0, 10, size=200).reshape(-1, 1)
@@ -443,7 +443,7 @@ string \`"rule"\` or the string \`"model"\`:
 The hidden tests check each individual answer.`}
   initCode={``}
   starterCode={`choices = {
-    "flag_orders_over_10000": None,        # "rule" or "model"
+    "flag_orders_over_10000": None,  # "rule" or "model"
     "detect_fraud": None,
     "recognize_handwritten_digits": None,
     "compute_sales_tax": None,

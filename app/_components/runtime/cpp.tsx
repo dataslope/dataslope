@@ -597,6 +597,8 @@ export const cppAdapter: LanguageAdapter = {
   // CodeMirror's clike mode handles C++ syntax. `text/x-c++src` is the
   // standard MIME alias for C++ inside that mode.
   codeMirrorMode: "text/x-c++src",
+  // clang-format LLVM style (see formatCode) — keep in sync.
+  indentWidth: 2,
   examples: EXAMPLES,
   packages: PACKAGES,
   exportFormats: [

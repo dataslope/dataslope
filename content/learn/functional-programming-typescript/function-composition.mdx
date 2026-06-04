@@ -40,7 +40,7 @@ binary composer:
   return (a) => g(f(a));
 }
 
-const inc    = (n: number) => n + 1;
+const inc = (n: number) => n + 1;
 const double = (n: number) => n * 2;
 
 const incThenDouble = compose2(double, inc);
@@ -69,14 +69,19 @@ what `pipe` does:
   starterCode={`function pipe<A>(a: A): A;
 function pipe<A, B>(a: A, f1: (a: A) => B): B;
 function pipe<A, B, C>(a: A, f1: (a: A) => B, f2: (b: B) => C): C;
-function pipe<A, B, C, D>(a: A, f1: (a: A) => B, f2: (b: B) => C, f3: (c: C) => D): D;
+function pipe<A, B, C, D>(
+  a: A,
+  f1: (a: A) => B,
+  f2: (b: B) => C,
+  f3: (c: C) => D,
+): D;
 function pipe(value: unknown, ...fns: ((x: unknown) => unknown)[]): unknown {
   return fns.reduce((acc, fn) => fn(acc), value);
 }
 
-const inc    = (n: number) => n + 1;
+const inc = (n: number) => n + 1;
 const double = (n: number) => n * 2;
-const toStr  = (n: number) => \`#\${n}\`;
+const toStr = (n: number) => \`#\${n}\`;
 
 const result = pipe(3, inc, double, toStr);
 console.log(result); // "#8"
@@ -97,7 +102,11 @@ counterpart:
   starterCode={`function compose<A>(): (a: A) => A;
 function compose<A, B>(f1: (a: A) => B): (a: A) => B;
 function compose<A, B, C>(f2: (b: B) => C, f1: (a: A) => B): (a: A) => C;
-function compose<A, B, C, D>(f3: (c: C) => D, f2: (b: B) => C, f1: (a: A) => B): (a: A) => D;
+function compose<A, B, C, D>(
+  f3: (c: C) => D,
+  f2: (b: B) => C,
+  f1: (a: A) => B,
+): (a: A) => D;
 function compose(...fns: ((x: unknown) => unknown)[]): (x: unknown) => unknown {
   return (x) => fns.reduceRight((acc, fn) => fn(acc), x);
 }
@@ -122,10 +131,10 @@ when you want to *name* a composed function for reuse:
 }
 
 // "name" a transformation pipeline
-const trim       = (s: string) => s.trim();
-const lower      = (s: string) => s.toLowerCase();
-const noSpaces   = (s: string) => s.replace(/\\s+/g, "-");
-const normalize  = (s: string) => pipe(s, trim, lower, noSpaces);
+const trim = (s: string) => s.trim();
+const lower = (s: string) => s.toLowerCase();
+const noSpaces = (s: string) => s.replace(/\\s+/g, "-");
+const normalize = (s: string) => pipe(s, trim, lower, noSpaces);
 
 console.log(normalize("  Hello World  "));
 console.log(normalize("  Functional Programming  "));
@@ -157,11 +166,11 @@ With named composed steps:
   return fns.reduce((acc, f) => f(acc), x);
 }
 
-const trim     = (s: string) => s.trim();
-const lower    = (s: string) => s.toLowerCase();
-const slugify  = (s: string) => s.replace(/\\s+/g, "-");
-const hash     = (s: string) => \`#\${s}\`;
-const tag      = (s: string) => pipe(s, trim, lower, slugify, hash);
+const trim = (s: string) => s.trim();
+const lower = (s: string) => s.toLowerCase();
+const slugify = (s: string) => s.replace(/\\s+/g, "-");
+const hash = (s: string) => \`#\${s}\`;
+const tag = (s: string) => pipe(s, trim, lower, slugify, hash);
 
 const xs = ["  Hello  ", "  Functional  ", "  Programming  "];
 console.log(xs.map(tag));
@@ -182,10 +191,13 @@ arguments into a *chain* of one-argument functions.
 const add = (a: number, b: number): number => a + b;
 
 // Curried
-const addC = (a: number) => (b: number): number => a + b;
+const addC =
+  (a: number) =>
+  (b: number): number =>
+    a + b;
 
-console.log(add(2, 3));     // 5
-console.log(addC(2)(3));    // 5
+console.log(add(2, 3)); // 5
+console.log(addC(2)(3)); // 5
 
 // Why? Because addC(2) is now a useful value: a function "add 2 to its input"
 const addTwo = addC(2);
@@ -212,10 +224,11 @@ function partial<A, B, C>(f: (a: A, b: B) => C, a: A): (b: B) => C {
   return (b) => f(a, b);
 }
 
-const greet = (greeting: string, name: string): string => \`\${greeting}, \${name}!\`;
+const greet = (greeting: string, name: string): string =>
+  \`\${greeting}, \${name}!\`;
 
 const hello = partial(greet, "Hello");
-const hola  = partial(greet, "Hola");
+const hola = partial(greet, "Hola");
 
 console.log(hello("Ada"));
 console.log(hola("Linus"));
@@ -241,7 +254,10 @@ function.
 }
 
 // "data-last" curried versions of map/filter
-const map    = <A, B>(f: (a: A) => B) => (xs: readonly A[]): readonly B[] => xs.map(f);
+const map =
+  <A, B>(f: (a: A) => B) =>
+  (xs: readonly A[]): readonly B[] =>
+    xs.map(f);
 const filter = <A>(p: (a: A) => boolean) => (xs: readonly A[]): readonly A[] => xs.filter(p);
 
 const isEven = (n: number) => n % 2 === 0;
@@ -268,22 +284,32 @@ Same problem we used in [Declarative Thinking](./declarative-thinking):
   return fns.reduce((acc, f) => f(acc), x);
 }
 
-type Order = { readonly id: string; readonly status: "paid" | "draft" | "cancelled"; readonly total: number; readonly customer: string };
+type Order = {
+  readonly id: string;
+  readonly status: "paid" | "draft" | "cancelled";
+  readonly total: number;
+  readonly customer: string;
+};
 
 const orders: readonly Order[] = [
-  { id: "1", status: "paid",  total: 80,  customer: "Ada"   },
+  { id: "1", status: "paid", total: 80, customer: "Ada" },
   { id: "2", status: "draft", total: 200, customer: "Linus" },
-  { id: "3", status: "paid",  total: 30,  customer: "Grace" },
-  { id: "4", status: "paid",  total: 90,  customer: "Ada"   },
-  { id: "5", status: "paid",  total: 120, customer: "Linus" },
+  { id: "3", status: "paid", total: 30, customer: "Grace" },
+  { id: "4", status: "paid", total: 90, customer: "Ada" },
+  { id: "5", status: "paid", total: 120, customer: "Linus" },
 ];
 
 // Reusable building blocks (data-last, curried)
-const onlyPaid    = <T extends { status: string }>(xs: readonly T[]) => xs.filter((x) => x.status === "paid");
-const overAmount  = (n: number) => <T extends { total: number }>(xs: readonly T[]) => xs.filter((x) => x.total > n);
-const customers   = <T extends { customer: string }>(xs: readonly T[]) => xs.map((x) => x.customer);
-const distinct    = <A,>(xs: readonly A[]) => [...new Set(xs)];
-const sortAsc     = (xs: readonly string[]) => [...xs].sort();
+const onlyPaid = <T extends { status: string }>(xs: readonly T[]) =>
+  xs.filter((x) => x.status === "paid");
+const overAmount =
+  (n: number) =>
+  <T extends { total: number }>(xs: readonly T[]) =>
+    xs.filter((x) => x.total > n);
+const customers = <T extends { customer: string }>(xs: readonly T[]) =>
+  xs.map((x) => x.customer);
+const distinct = <A,>(xs: readonly A[]) => [...new Set(xs)];
+const sortAsc = (xs: readonly string[]) => [...xs].sort();
 
 // The composed pipeline
 const names = pipe(

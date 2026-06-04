@@ -137,13 +137,15 @@ flowchart TD
   starterCode={`import pandas as pd
 
 # A small mixed-type dataset: each column is a different data type.
-df = pd.DataFrame({
-    "user_id":      [101, 102, 103, 104, 105, 106],     # nominal (label!)
-    "country":      ["US", "UK", "US", "CA", "UK", "US"],# nominal
-    "plan":         ["S", "L", "M", "M", "L", "S"],      # ordinal (S<M<L)
-    "logins":       [3, 0, 7, 2, 5, 1],                  # discrete numeric
-    "monthly_spend":[48.2, 0.0, 91.5, 33.1, 75.9, 12.0], # continuous numeric
-})
+df = pd.DataFrame(
+    {
+        "user_id": [101, 102, 103, 104, 105, 106],  # nominal (label!)
+        "country": ["US", "UK", "US", "CA", "UK", "US"],  # nominal
+        "plan": ["S", "L", "M", "M", "L", "S"],  # ordinal (S<M<L)
+        "logins": [3, 0, 7, 2, 5, 1],  # discrete numeric
+        "monthly_spend": [48.2, 0.0, 91.5, 33.1, 75.9, 12.0],  # continuous numeric
+    }
+)
 
 print("dtypes (pandas' guess — not the same as statistical type!):")
 print(df.dtypes)
@@ -176,19 +178,26 @@ you a number. The dtype is `int64`; the meaning is gibberish.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "zip_code":   [10001, 60614, 94105, 30301],  # nominal, stored as int
-    "rating_1to5":[5, 3, 4, 2],                   # ordinal, stored as int
-    "price_usd":  [19.99, 5.00, 42.50, 8.25],     # ratio, genuinely numeric
-})
+df = pd.DataFrame(
+    {
+        "zip_code": [10001, 60614, 94105, 30301],  # nominal, stored as int
+        "rating_1to5": [5, 3, 4, 2],  # ordinal, stored as int
+        "price_usd": [19.99, 5.00, 42.50, 8.25],  # ratio, genuinely numeric
+    }
+)
 
 # pandas computes a "mean" for all three — only ONE of them means anything.
-print("Mean of zip_code:    ", df["zip_code"].mean(),
-      "  <- NONSENSE (zips are labels)")
-print("Mean of rating_1to5: ", df["rating_1to5"].mean(),
-      "      <- shaky (ordinal: gaps not equal)")
-print("Mean of price_usd:   ", round(df["price_usd"].mean(), 2),
-      "  <- valid (ratio scale)")
+print("Mean of zip_code:    ", df["zip_code"].mean(), "  <- NONSENSE (zips are labels)")
+print(
+    "Mean of rating_1to5: ",
+    df["rating_1to5"].mean(),
+    "      <- shaky (ordinal: gaps not equal)",
+)
+print(
+    "Mean of price_usd:   ",
+    round(df["price_usd"].mean(), 2),
+    "  <- valid (ratio scale)",
+)
 print()
 print("Correct summaries instead:")
 print("  zip_code     -> count distinct / mode:", df["zip_code"].mode().tolist())
@@ -251,10 +260,12 @@ Two practical moves. First, convert genuine categoricals to the
   starterCode={`import pandas as pd
 from pandas.api.types import CategoricalDtype
 
-df = pd.DataFrame({
-    "plan": ["S", "L", "M", "M", "L", "S", "M"],     # ordinal
-    "region_code": [12, 7, 12, 3, 7, 3, 12],          # nominal, looks numeric
-})
+df = pd.DataFrame(
+    {
+        "plan": ["S", "L", "M", "M", "L", "S", "M"],  # ordinal
+        "region_code": [12, 7, 12, 3, 7, 3, 12],  # nominal, looks numeric
+    }
+)
 
 # 1) Nominal: make it an (unordered) category so no one averages the code.
 df["region_code"] = df["region_code"].astype("category")
@@ -268,8 +279,11 @@ print("S < M is", df["plan"].iloc[0] < df["plan"].iloc[1])  # S < L -> True
 print()
 print("Median plan (valid because ordinal+ordered):", df["plan"].median())
 print()
-print("region_code dtype is now:", df["region_code"].dtype,
-      "-> averaging it is off the table")
+print(
+    "region_code dtype is now:",
+    df["region_code"].dtype,
+    "-> averaging it is off the table",
+)
 print(df["region_code"].value_counts())
 `}
 />
@@ -311,18 +325,18 @@ df = pd.DataFrame({
 })`}
   starterCode={`# TODO: classify each column by its STATISTICAL type (not its dtype)
 types = {
-    "customer_id":     None,
-    "country":         None,
-    "satisfaction":    None,
-    "num_purchases":   None,
+    "customer_id": None,
+    "country": None,
+    "satisfaction": None,
+    "num_purchases": None,
     "account_balance": None,
 }
 `}
   solutionCode={`types = {
-    "customer_id":     "nominal",     # an ID that looks numeric
-    "country":         "nominal",     # unordered label
-    "satisfaction":    "ordinal",     # ordered 1-5 rating, uneven gaps
-    "num_purchases":   "discrete",    # a count
+    "customer_id": "nominal",  # an ID that looks numeric
+    "country": "nominal",  # unordered label
+    "satisfaction": "ordinal",  # ordered 1-5 rating, uneven gaps
+    "num_purchases": "discrete",  # a count
     "account_balance": "continuous",  # a measured dollar amount
 }
 print(types)
@@ -383,15 +397,15 @@ df = pd.DataFrame({
 })`}
   starterCode={`# TODO: pick the summary that MATCHES each column's type
 summary = {
-    "country_mode":  None,
+    "country_mode": None,
     "rating_median": None,
-    "price_mean":    None,
+    "price_mean": None,
 }
 `}
   solutionCode={`summary = {
-    "country_mode":  str(df["country"].mode()[0]),
+    "country_mode": str(df["country"].mode()[0]),
     "rating_median": float(df["rating"].median()),
-    "price_mean":    float(df["price"].mean()),
+    "price_mean": float(df["price"].mean()),
 }
 print(summary)
 `}

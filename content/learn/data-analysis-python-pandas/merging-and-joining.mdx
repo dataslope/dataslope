@@ -31,16 +31,20 @@ flowchart TB
   adapter="python"
   starterCode={`import pandas as pd
 
-employees = pd.DataFrame({
-    "emp_id":  [1, 2, 3, 4, 5],
-    "name":    ["Aiko","Bilal","Chen","Diego","Esra"],
-    "dept_id": [10, 20, 10, 30, 99],   # 99 has no matching department
-})
+employees = pd.DataFrame(
+    {
+        "emp_id": [1, 2, 3, 4, 5],
+        "name": ["Aiko", "Bilal", "Chen", "Diego", "Esra"],
+        "dept_id": [10, 20, 10, 30, 99],  # 99 has no matching department
+    }
+)
 
-departments = pd.DataFrame({
-    "dept_id":   [10, 20, 30, 40],     # 40 has no employees
-    "dept_name": ["Engineering","Sales","Marketing","HR"],
-})
+departments = pd.DataFrame(
+    {
+        "dept_id": [10, 20, 30, 40],  # 40 has no employees
+        "dept_name": ["Engineering", "Sales", "Marketing", "HR"],
+    }
+)
 
 print(employees)
 print()
@@ -132,8 +136,12 @@ When the join key is named differently in each table:
   adapter="python"
   starterCode={`import pandas as pd
 
-orders = pd.DataFrame({"order_id":[1,2,3], "cust":[10,11,12], "amount":[50,80,30]})
-customers = pd.DataFrame({"customer_id":[10,11,12], "name":["Aiko","Bilal","Chen"]})
+orders = pd.DataFrame(
+    {"order_id": [1, 2, 3], "cust": [10, 11, 12], "amount": [50, 80, 30]}
+)
+customers = pd.DataFrame(
+    {"customer_id": [10, 11, 12], "name": ["Aiko", "Bilal", "Chen"]}
+)
 
 joined = orders.merge(customers, left_on="cust", right_on="customer_id")
 print(joined)
@@ -150,8 +158,8 @@ product per key value — often a disaster.
   adapter="python"
   starterCode={`import pandas as pd
 
-a = pd.DataFrame({"k":[1,1,2], "x":["a1","a2","a3"]})
-b = pd.DataFrame({"k":[1,1,3], "y":["b1","b2","b3"]})
+a = pd.DataFrame({"k": [1, 1, 2], "x": ["a1", "a2", "a3"]})
+b = pd.DataFrame({"k": [1, 1, 3], "y": ["b1", "b2", "b3"]})
 
 # Each key=1 row in a matches both key=1 rows in b → 2 × 2 = 4 rows
 print(a.merge(b, on="k", how="inner"))
@@ -164,8 +172,8 @@ Pandas can warn you about unexpected cardinalities:
   adapter="python"
   starterCode={`import pandas as pd
 
-a = pd.DataFrame({"k":[1,2,3], "x":["a","b","c"]})
-b = pd.DataFrame({"k":[1,2,3], "y":["X","Y","Z"]})
+a = pd.DataFrame({"k": [1, 2, 3], "x": ["a", "b", "c"]})
+b = pd.DataFrame({"k": [1, 2, 3], "y": ["X", "Y", "Z"]})
 
 # Assert that the join is one-to-one
 result = a.merge(b, on="k", validate="one_to_one")
@@ -183,12 +191,12 @@ data doesn't match.
   adapter="python"
   starterCode={`import pandas as pd
 
-a = pd.DataFrame({"id":[1,2], "value":[10,20]})
-b = pd.DataFrame({"id":[1,2], "value":[100,200]})
+a = pd.DataFrame({"id": [1, 2], "value": [10, 20]})
+b = pd.DataFrame({"id": [1, 2], "value": [100, 200]})
 
-print(a.merge(b, on="id"))                          # default suffixes _x / _y
+print(a.merge(b, on="id"))  # default suffixes _x / _y
 print()
-print(a.merge(b, on="id", suffixes=("_yr1","_yr2")))
+print(a.merge(b, on="id", suffixes=("_yr1", "_yr2")))
 `}
 />
 
@@ -247,7 +255,7 @@ customers = pd.DataFrame({
     "customer_id": [10,11,12,13],
     "name":        ["Aiko","Bilal","Chen","Diego"],
 })`}
-  starterCode={`orphans = None   # TODO
+  starterCode={`orphans = None  # TODO
 
 print(orphans)
 `}

@@ -62,11 +62,20 @@ INSERT INTO sales VALUES
   ('East','Q1',200),('East','Q2',90),('North','Q2',75);`}
   starterCode={`SELECT
   region,
-  SUM(amount) FILTER (WHERE quarter = 'Q1') AS q1,
-  SUM(amount) FILTER (WHERE quarter = 'Q2') AS q2
-FROM sales
-GROUP BY region
-ORDER BY region;`}
+  SUM(amount) FILTER(
+    WHERE
+      quarter = 'Q1'
+  ) AS q1,
+  SUM(amount) FILTER(
+    WHERE
+      quarter = 'Q2'
+  ) AS q2
+FROM
+  sales
+GROUP BY
+  region
+ORDER BY
+  region;`}
 />
 
 One row per region, one column per quarter — a wide cross-tab built from
@@ -88,11 +97,12 @@ the aggregate, and DuckDB discovers the distinct values for you.
 INSERT INTO sales VALUES
   ('West','Q1',100),('West','Q2',140),('West','Q1',20),
   ('East','Q1',200),('East','Q2',90),('North','Q2',75);`}
-  starterCode={`PIVOT sales
-ON quarter                 -- values of this column become columns
-USING SUM(amount)          -- aggregate that fills each cell
-GROUP BY region            -- one row per region
-ORDER BY region;`}
+  starterCode={`PIVOT sales ON quarter -- values of this column become columns
+USING SUM(amount) -- aggregate that fills each cell
+GROUP BY
+  region -- one row per region
+ORDER BY
+  region;`}
 />
 
 `ON quarter` spreads each distinct quarter into its own column; `USING
@@ -115,12 +125,14 @@ into rows.
 INSERT INTO wide_sales VALUES
   ('West', 100, 140, 90),
   ('East', 200,  60, 120);`}
-  starterCode={`UNPIVOT wide_sales
-ON jan, feb, mar           -- these columns become rows
-INTO
-  NAME month               -- new column holding 'jan'/'feb'/'mar'
-  VALUE sales              -- new column holding the number
-ORDER BY region, month;`}
+  starterCode={`UNPIVOT wide_sales ON jan,
+feb,
+mar -- these columns become rows
+INTO NAME month -- new column holding 'jan'/'feb'/'mar'
+VALUE sales -- new column holding the number
+ORDER BY
+  region,
+  month;`}
 />
 
 Now each region-month is a row again — ready to `GROUP BY`, aggregate, or

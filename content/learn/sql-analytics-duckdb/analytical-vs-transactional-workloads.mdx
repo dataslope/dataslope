@@ -105,12 +105,15 @@ FROM range(1, 5001) t(i);`}
 -- across 5,000 rows, and returns just 4 summary rows.
 SELECT
   region,
-  COUNT(*)             AS orders,
-  SUM(amount)          AS revenue,
+  COUNT(*) AS orders,
+  SUM(amount) AS revenue,
   ROUND(AVG(amount), 1) AS avg_amount
-FROM orders
-GROUP BY region
-ORDER BY revenue DESC;`}
+FROM
+  orders
+GROUP BY
+  region
+ORDER BY
+  revenue DESC;`}
 />
 
 Five thousand rows in, four rows out. The query never needed `id` or

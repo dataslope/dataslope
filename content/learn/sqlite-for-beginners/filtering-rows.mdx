@@ -39,9 +39,14 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  starterCode={`SELECT title, genre, price
-FROM books
-WHERE genre = 'Technology';`}
+  starterCode={`SELECT
+  title,
+  genre,
+  price
+FROM
+  books
+WHERE
+  genre = 'Technology';`}
 />
 
 The equals sign, `=`, means "is equal to." Text values go in single
@@ -78,9 +83,13 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  starterCode={`SELECT title, price
-FROM books
-WHERE price < 20;`}
+  starterCode={`SELECT
+  title,
+  price
+FROM
+  books
+WHERE
+  price < 20;`}
 />
 
 <SqlCodeBlock
@@ -100,9 +109,13 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  starterCode={`SELECT title, pages
-FROM books
-WHERE pages BETWEEN 200 AND 320;`}
+  starterCode={`SELECT
+  title,
+  pages
+FROM
+  books
+WHERE
+  pages BETWEEN 200 AND 320;`}
 />
 
 `BETWEEN` includes both ends of the range. In the example, 200 and 320
@@ -153,9 +166,15 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  starterCode={`SELECT title, genre, price
-FROM books
-WHERE genre = 'Technology' AND price < 30;`}
+  starterCode={`SELECT
+  title,
+  genre,
+  price
+FROM
+  books
+WHERE
+  genre = 'Technology'
+  AND price < 30;`}
 />
 
 <SqlCodeBlock
@@ -175,9 +194,14 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  starterCode={`SELECT title, genre
-FROM books
-WHERE genre = 'Fiction' OR genre = 'Travel';`}
+  starterCode={`SELECT
+  title,
+  genre
+FROM
+  books
+WHERE
+  genre = 'Fiction'
+  OR genre = 'Travel';`}
 />
 
 When you mix `AND` and `OR`, use parentheses so your meaning is clear.
@@ -199,9 +223,18 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  starterCode={`SELECT title, genre, price
-FROM books
-WHERE price < 20 AND (genre = 'Fiction' OR genre = 'Travel');`}
+  starterCode={`SELECT
+  title,
+  genre,
+  price
+FROM
+  books
+WHERE
+  price < 20
+  AND (
+    genre = 'Fiction'
+    OR genre = 'Travel'
+  );`}
 />
 
 ## IN is a shorter OR list
@@ -226,9 +259,13 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  starterCode={`SELECT title, genre
-FROM books
-WHERE genre IN ('Fiction', 'Travel');`}
+  starterCode={`SELECT
+  title,
+  genre
+FROM
+  books
+WHERE
+  genre IN ('Fiction', 'Travel');`}
 />
 
 ## LIKE finds text patterns
@@ -258,9 +295,12 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  starterCode={`SELECT title
-FROM books
-WHERE title LIKE 'sql%';`}
+  starterCode={`SELECT
+  title
+FROM
+  books
+WHERE
+  title LIKE 'sql%';`}
 />
 
 <SqlCodeBlock
@@ -280,9 +320,12 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  starterCode={`SELECT title
-FROM books
-WHERE title LIKE '%ar%';`}
+  starterCode={`SELECT
+  title
+FROM
+  books
+WHERE
+  title LIKE '%ar%';`}
 />
 
 ## Check your understanding

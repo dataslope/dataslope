@@ -22,10 +22,10 @@ Impure functions don't.
 const square = (x: number): number => x * x;
 
 const a = square(3) + square(3);
-const b = 9 + 9;            // replaced square(3) with 9
-const c = square(3) * 2;    // factored out the common subexpression
+const b = 9 + 9; // replaced square(3) with 9
+const c = square(3) * 2; // factored out the common subexpression
 
-console.log(a, b, c);  // all 18
+console.log(a, b, c); // all 18
 `}
 />
 
@@ -43,15 +43,15 @@ function nextId(): number {
   return counter;
 }
 
-const a = nextId() + nextId();  // 1 + 2 = 3
+const a = nextId() + nextId(); // 1 + 2 = 3
 console.log("a:", a);
 
 counter = 0;
-const b = nextId() * 2;          // 1 * 2 = 2
+const b = nextId() * 2; // 1 * 2 = 2
 console.log("b:", b);
 
 counter = 0;
-const c = 2 * nextId();          // 2 * 1 = 2
+const c = 2 * nextId(); // 2 * 1 = 2
 console.log("c:", c);
 `}
 />
@@ -98,7 +98,7 @@ at each step.
 <CodeBlock
   adapter="typescript"
   starterCode={`const double = (x: number): number => x * 2;
-const inc    = (x: number): number => x + 1;
+const inc = (x: number): number => x + 1;
 
 const result = double(inc(3));
 //             = double(3 + 1)
@@ -144,7 +144,9 @@ function fib(n: number): number {
   return n < 2 ? n : fib(n - 1) + fib(n - 2);
 }
 
-const fastFib = memoize<number, number>((n) => n < 2 ? n : fastFib(n - 1) + fastFib(n - 2));
+const fastFib = memoize<number, number>((n) =>
+  n < 2 ? n : fastFib(n - 1) + fastFib(n - 2),
+);
 
 console.time("slow fib(30)");
 console.log(fib(30));
@@ -167,12 +169,18 @@ expression twice in one block, you can compute it once and reuse it.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function distance(a: { x: number; y: number }, b: { x: number; y: number }): number {
+  starterCode={`function distance(
+  a: { x: number; y: number },
+  b: { x: number; y: number },
+): number {
   // dx and dy are computed twice in the naive version
   return Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
 }
 
-function distanceCSE(a: { x: number; y: number }, b: { x: number; y: number }): number {
+function distanceCSE(
+  a: { x: number; y: number },
+  b: { x: number; y: number },
+): number {
   const dx = a.x - b.x;
   const dy = a.y - b.y;
   return Math.sqrt(dx * dx + dy * dy);
@@ -231,8 +239,8 @@ function greetWith(name: string): string {
 
 // These two are NOT equivalent
 const a = greetWith("Ada") + " " + greetWith("Ada"); // logs twice
-const ga = greetWith("Ada");                          // logs once
-const b = ga + " " + ga;                              // no extra log
+const ga = greetWith("Ada"); // logs once
+const b = ga + " " + ga; // no extra log
 
 console.log("a:", a);
 console.log("b:", b);
@@ -272,9 +280,9 @@ function pickWinner(candidates: readonly string[], roll01: number): string {
 }
 
 // Same inputs → same output. Always.
-console.log(pickWinner(["A", "B", "C"], 0.10));  // "A"
-console.log(pickWinner(["A", "B", "C"], 0.50));  // "B"
-console.log(pickWinner(["A", "B", "C"], 0.99));  // "C"
+console.log(pickWinner(["A", "B", "C"], 0.1)); // "A"
+console.log(pickWinner(["A", "B", "C"], 0.5)); // "B"
+console.log(pickWinner(["A", "B", "C"], 0.99)); // "C"
 
 // The impure shell that actually rolls
 const winner = pickWinner(["A", "B", "C"], Math.random());

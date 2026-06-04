@@ -131,8 +131,7 @@ tips = sns.load_dataset("tips")
 #   ("ci", 95)  -> 95% confidence interval (the default)
 #   "sd"        -> one standard deviation (spread of the data itself)
 #   None        -> no error bar at all
-sns.catplot(data=tips, x="day", y="total_bill", kind="bar",
-            errorbar="sd", height=4)
+sns.catplot(data=tips, x="day", y="total_bill", kind="bar", errorbar="sd", height=4)
 `}
 />
 
@@ -163,8 +162,9 @@ sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 # estimator="median" is more robust when a group has extreme outliers.
-sns.catplot(data=tips, x="day", y="total_bill", kind="bar",
-            estimator="median", height=4)
+sns.catplot(
+    data=tips, x="day", y="total_bill", kind="bar", estimator="median", height=4
+)
 `}
 />
 
@@ -187,8 +187,7 @@ sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 # Each day splits into two bars: mean bill for each sex.
-sns.catplot(data=tips, x="day", y="total_bill", hue="sex",
-            kind="bar", height=4)
+sns.catplot(data=tips, x="day", y="total_bill", hue="sex", kind="bar", height=4)
 `}
 />
 
@@ -218,9 +217,13 @@ mpg = sns.load_dataset("mpg")
 
 # Many origins/regions with multi-word context? Go horizontal and order them.
 sns.catplot(
-    data=mpg, y="origin", x="horsepower", kind="bar",
-    order=["usa", "japan", "europe"],   # explicit, meaningful order
-    errorbar=None, height=4,
+    data=mpg,
+    y="origin",
+    x="horsepower",
+    kind="bar",
+    order=["usa", "japan", "europe"],  # explicit, meaningful order
+    errorbar=None,
+    height=4,
 )
 `}
 />

@@ -51,17 +51,17 @@ To **read or write through the pointer**, use `*` (the
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int n = 42;
-    int *p = &n;
+  int n = 42;
+  int *p = &n;
 
-    printf("n          = %d\\n", n);
-    printf("&n         = %p\\n", (void*)&n);
-    printf("p          = %p\\n", (void*)p);
-    printf("*p         = %d\\n", *p);
+  printf("n          = %d\\n", n);
+  printf("&n         = %p\\n", (void *)&n);
+  printf("p          = %p\\n", (void *)p);
+  printf("*p         = %d\\n", *p);
 
-    *p = 100;          // changing n through the pointer
-    printf("after *p = 100, n = %d\\n", n);
-    return 0;
+  *p = 100; // changing n through the pointer
+  printf("after *p = 100, n = %d\\n", n);
+  return 0;
 }
 `}
 />
@@ -139,15 +139,13 @@ variable, you pass a **pointer** to it.
   adapter="c"
   starterCode={`#include <stdio.h>
 
-void increment(int *x) {
-    (*x)++;
-}
+void increment(int *x) { (*x)++; }
 
 int main(void) {
-    int n = 10;
-    increment(&n);
-    printf("n = %d\\n", n);   // now 11
-    return 0;
+  int n = 10;
+  increment(&n);
+  printf("n = %d\\n", n); // now 11
+  return 0;
 }
 `}
 />
@@ -170,15 +168,15 @@ several output parameters via pointers:
   starterCode={`#include <stdio.h>
 
 void divmod(int a, int b, int *q, int *r) {
-    *q = a / b;
-    *r = a % b;
+  *q = a / b;
+  *r = a % b;
 }
 
 int main(void) {
-    int q = 0, r = 0;
-    divmod(23, 5, &q, &r);
-    printf("23 / 5 = %d remainder %d\\n", q, r);
-    return 0;
+  int q = 0, r = 0;
+  divmod(23, 5, &q, &r);
+  printf("23 / 5 = %d remainder %d\\n", q, r);
+  return 0;
 }
 `}
 />
@@ -245,17 +243,17 @@ variables:
   starterCode={`#include <stdio.h>
 
 void swap(int *a, int *b) {
-    int tmp = *a;
-    *a = *b;
-    *b = tmp;
+  int tmp = *a;
+  *a = *b;
+  *b = tmp;
 }
 
 int main(void) {
-    int x = 1, y = 2;
-    printf("before: x = %d, y = %d\\n", x, y);
-    swap(&x, &y);
-    printf("after:  x = %d, y = %d\\n", x, y);
-    return 0;
+  int x = 1, y = 2;
+  printf("before: x = %d, y = %d\\n", x, y);
+  swap(&x, &y);
+  printf("after:  x = %d, y = %d\\n", x, y);
+  return 0;
 }
 `}
 />
@@ -283,27 +281,25 @@ The program must print exactly \`17\` and nothing else.`}
   starterCode={`#include <stdio.h>
 
 void add_to(int *value, int delta) {
-    // your code here
+  // your code here
 }
 
 int main(void) {
-    int x = 10;
-    add_to(&x, 7);
-    printf("%d\\n", x);
-    return 0;
+  int x = 10;
+  add_to(&x, 7);
+  printf("%d\\n", x);
+  return 0;
 }
 `}
   solutionCode={`#include <stdio.h>
 
-void add_to(int *value, int delta) {
-    *value = *value + delta;
-}
+void add_to(int *value, int delta) { *value = *value + delta; }
 
 int main(void) {
-    int x = 10;
-    add_to(&x, 7);
-    printf("%d\\n", x);
-    return 0;
+  int x = 10;
+  add_to(&x, 7);
+  printf("%d\\n", x);
+  return 0;
 }
 `}
   tests={[

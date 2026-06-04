@@ -98,18 +98,18 @@ We'll re-derive every bit of it in later chapters.
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    int scores[] = {72, 88, 65, 91, 77, 83};
-    int n = 6;
+  int scores[] = {72, 88, 65, 91, 77, 83};
+  int n = 6;
 
-    int best = scores[0];
-    for (int i = 1; i < n; i++) {
-        if (scores[i] > best) {
-            best = scores[i];
-        }
+  int best = scores[0];
+  for (int i = 1; i < n; i++) {
+    if (scores[i] > best) {
+      best = scores[i];
     }
+  }
 
-    printf("The highest score is %d\\n", best);
-    return 0;
+  printf("The highest score is %d\\n", best);
+  return 0;
 }
 `}
 />

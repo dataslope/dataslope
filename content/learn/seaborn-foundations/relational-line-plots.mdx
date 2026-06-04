@@ -48,7 +48,8 @@ sns.relplot(
     x="year",
     y="passengers",
     kind="line",
-    height=4, aspect=1.4,
+    height=4,
+    aspect=1.4,
 )
 `}
 />
@@ -82,7 +83,8 @@ sns.relplot(
     y="signal",
     kind="line",
     hue="event",
-    height=4, aspect=1.5,
+    height=4,
+    aspect=1.5,
 )
 `}
 />
@@ -125,8 +127,9 @@ sns.relplot(
     x="timepoint",
     y="signal",
     kind="line",
-    errorbar="sd",   # spread of the data, not uncertainty of the mean
-    height=4, aspect=1.5,
+    errorbar="sd",  # spread of the data, not uncertainty of the mean
+    height=4,
+    aspect=1.5,
 )
 `}
 />
@@ -146,8 +149,9 @@ sns.relplot(
     x="timepoint",
     y="signal",
     kind="line",
-    errorbar=None,   # just the mean line
-    height=4, aspect=1.5,
+    errorbar=None,  # just the mean line
+    height=4,
+    aspect=1.5,
 )
 `}
 />
@@ -180,7 +184,8 @@ sns.relplot(
     kind="line",
     hue="region",
     style="event",
-    height=4, aspect=1.5,
+    height=4,
+    aspect=1.5,
 )
 `}
 />
@@ -263,7 +268,8 @@ g = sns.relplot(
     y="signal",
     kind="line",
     hue="region",
-    height=4, aspect=1.5,
+    height=4,
+    aspect=1.5,
 )
 `}
   tests={[

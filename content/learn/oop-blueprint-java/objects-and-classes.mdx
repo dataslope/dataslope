@@ -31,34 +31,32 @@ of that type can respond to.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Dog rex  = new Dog("Rex",  4);
-        Dog luna = new Dog("Luna", 2);
+  public static void main(String[] args) {
+    Dog rex = new Dog("Rex", 4);
+    Dog luna = new Dog("Luna", 2);
 
-        System.out.println(rex.describe());
-        System.out.println(luna.describe());
+    System.out.println(rex.describe());
+    System.out.println(luna.describe());
 
-        rex.haveBirthday();
-        System.out.println(rex.describe());
-    }
+    rex.haveBirthday();
+    System.out.println(rex.describe());
+  }
 }
 
 class Dog {
-    String name;   // field: each Dog has its own
-    int    age;    // field: each Dog has its own
+  String name; // field: each Dog has its own
+  int age;     // field: each Dog has its own
 
-    Dog(String name, int age) {  // constructor: how to build one
-        this.name = name;
-        this.age = age;
-    }
+  Dog(String name, int age) { // constructor: how to build one
+    this.name = name;
+    this.age = age;
+  }
 
-    String describe() {           // method: behavior every Dog supports
-        return name + " is " + age + " years old";
-    }
+  String describe() { // method: behavior every Dog supports
+    return name + " is " + age + " years old";
+  }
 
-    void haveBirthday() {
-        age = age + 1;
-    }
+  void haveBirthday() { age = age + 1; }
 }
 `}
 />
@@ -184,23 +182,23 @@ same name as a field, which is why constructors often look like
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Counter c = new Counter();
-        c.bump();
-        c.bump();
-        c.bump();
-        System.out.println("count = " + c.value());
+  public static void main(String[] args) {
+    Counter c = new Counter();
+    c.bump();
+    c.bump();
+    c.bump();
+    System.out.println("count = " + c.value());
 
-        Counter d = new Counter();        // a separate Counter
-        d.bump();
-        System.out.println("c = " + c.value() + ", d = " + d.value());
-    }
+    Counter d = new Counter(); // a separate Counter
+    d.bump();
+    System.out.println("c = " + c.value() + ", d = " + d.value());
+  }
 }
 
 class Counter {
-    private int count;          // each Counter has its own
-    public  void bump()   { this.count = this.count + 1; }
-    public  int  value()  { return this.count; }
+  private int count; // each Counter has its own
+  public void bump() { this.count = this.count + 1; }
+  public int value() { return this.count; }
 }
 `}
 />

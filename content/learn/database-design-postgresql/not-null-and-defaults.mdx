@@ -100,12 +100,23 @@ rejected because the required email is missing.
   status TEXT NOT NULL DEFAULT 'active'
 );`}
   starterCode={`-- status is omitted, so the DEFAULT fills in 'active'.
-INSERT INTO accounts (email) VALUES ('ada@example.com');
+INSERT INTO
+  accounts (email)
+VALUES
+  ('ada@example.com');
 
 -- email is required, so this insert is rejected.
-INSERT INTO accounts (status) VALUES ('active');
+INSERT INTO
+  accounts (status)
+VALUES
+  ('active');
 
-SELECT id, email, status FROM accounts;`}
+SELECT
+  id,
+  email,
+  status
+FROM
+  accounts;`}
 />
 
 The schema is doing two jobs: it refuses a row without its required
@@ -146,9 +157,13 @@ INSERT INTO contacts (name, nickname) VALUES
   ('Grace', NULL),
   ('Linus', NULL);`}
   starterCode={`-- This is the correct way to find missing nicknames.
-SELECT name, nickname
-FROM contacts
-WHERE nickname IS NULL;`}
+SELECT
+  name,
+  nickname
+FROM
+  contacts
+WHERE
+  nickname IS NULL;`}
 />
 
 ## Required data is part of meaning

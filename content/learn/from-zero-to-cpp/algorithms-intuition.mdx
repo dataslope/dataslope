@@ -42,21 +42,24 @@ logarithmic.
 #include <vector>
 
 int main() {
-    std::vector<int> v(8);
-    for (size_t i = 0; i < v.size(); ++i) v[i] = (int)i;
+  std::vector<int> v(8);
+  for (size_t i = 0; i < v.size(); ++i)
+    v[i] = (int)i;
 
-    // O(n): one pass
-    int sum = 0;
-    for (int x : v) sum += x;
+  // O(n): one pass
+  int sum = 0;
+  for (int x : v)
+    sum += x;
 
-    // O(n^2): nested over the same range
-    int pairs = 0;
-    for (size_t i = 0; i < v.size(); ++i)
-        for (size_t j = i + 1; j < v.size(); ++j)
-            if (v[i] + v[j] == 7) ++pairs;
+  // O(n^2): nested over the same range
+  int pairs = 0;
+  for (size_t i = 0; i < v.size(); ++i)
+    for (size_t j = i + 1; j < v.size(); ++j)
+      if (v[i] + v[j] == 7)
+        ++pairs;
 
-    std::cout << "sum = " << sum << ", pairs summing to 7 = " << pairs << "\\n";
-    return 0;
+  std::cout << "sum = " << sum << ", pairs summing to 7 = " << pairs << "\\n";
+  return 0;
 }
 `}
 />
@@ -78,22 +81,23 @@ writing a loop.
 #include <vector>
 
 int main() {
-    std::vector<int> v = {5, 2, 9, 1, 7, 3};
+  std::vector<int> v = {5, 2, 9, 1, 7, 3};
 
-    std::sort(v.begin(), v.end());                        // O(n log n)
-    int total   = std::accumulate(v.begin(), v.end(), 0); // O(n)
-    auto it     = std::find(v.begin(), v.end(), 7);       // O(n)
-    auto pos    = std::lower_bound(v.begin(), v.end(), 5);// O(log n) — sorted!
-    int  count  = (int)std::count_if(v.begin(), v.end(),
-                       [](int x){ return x % 2 == 0; });  // O(n)
+  std::sort(v.begin(), v.end());                      // O(n log n)
+  int total = std::accumulate(v.begin(), v.end(), 0); // O(n)
+  auto it = std::find(v.begin(), v.end(), 7);         // O(n)
+  auto pos = std::lower_bound(v.begin(), v.end(), 5); // O(log n) — sorted!
+  int count = (int)std::count_if(v.begin(), v.end(),
+                                 [](int x) { return x % 2 == 0; }); // O(n)
 
-    for (int x : v) std::cout << x << ' ';
-    std::cout << "\\n";
-    std::cout << "total = " << total << "\\n";
-    std::cout << "found 7 at index = " << (it - v.begin()) << "\\n";
-    std::cout << "5 belongs at index = " << (pos - v.begin()) << "\\n";
-    std::cout << "even count = " << count << "\\n";
-    return 0;
+  for (int x : v)
+    std::cout << x << ' ';
+  std::cout << "\\n";
+  std::cout << "total = " << total << "\\n";
+  std::cout << "found 7 at index = " << (it - v.begin()) << "\\n";
+  std::cout << "5 belongs at index = " << (pos - v.begin()) << "\\n";
+  std::cout << "even count = " << count << "\\n";
+  return 0;
 }
 `}
 />
@@ -156,9 +160,9 @@ The right discipline:
 #include <vector>
 
 int main() {
-    std::vector<int> v = {8, 1, 6, 4, 2, 9, 3};
-    // your code
-    return 0;
+  std::vector<int> v = {8, 1, 6, 4, 2, 9, 3};
+  // your code
+  return 0;
 }
 `}
   solutionCode={`#include <algorithm>
@@ -166,10 +170,10 @@ int main() {
 #include <vector>
 
 int main() {
-    std::vector<int> v = {8, 1, 6, 4, 2, 9, 3};
-    std::sort(v.begin(), v.end());
-    std::cout << v[v.size() / 2];
-    return 0;
+  std::vector<int> v = {8, 1, 6, 4, 2, 9, 3};
+  std::sort(v.begin(), v.end());
+  std::cout << v[v.size() / 2];
+  return 0;
 }
 `}
   tests={[

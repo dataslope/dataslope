@@ -41,16 +41,16 @@ at one*.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        int x = 5;
-        System.out.println("x is " + x);
+  public static void main(String[] args) {
+    int x = 5;
+    System.out.println("x is " + x);
 
-        x = 7;
-        System.out.println("x is now " + x);
+    x = 7;
+    System.out.println("x is now " + x);
 
-        int y = x + 3;
-        System.out.println("y is " + y);
-    }
+    int y = x + 3;
+    System.out.println("y is " + y);
+  }
 }
 `}
 />
@@ -148,13 +148,13 @@ first assignment. It is a *commitment*.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        final int LIMIT = 100;
-        System.out.println("LIMIT = " + LIMIT);
+  public static void main(String[] args) {
+    final int LIMIT = 100;
+    System.out.println("LIMIT = " + LIMIT);
 
-        // Uncomment to see the compiler refuse:
-        // LIMIT = 200;
-    }
+    // Uncomment to see the compiler refuse:
+    // LIMIT = 200;
+  }
 }
 `}
 />
@@ -170,20 +170,20 @@ in. Outside that block, the name is unknown.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        int outer = 10;
+  public static void main(String[] args) {
+    int outer = 10;
 
-        if (outer > 5) {
-            int inner = 20;
-            System.out.println("inner = " + inner);
-            System.out.println("outer = " + outer);
-        }
-
-        // 'inner' does not exist here — uncommenting the next line breaks the build:
-        // System.out.println("inner outside = " + inner);
-
-        System.out.println("outer = " + outer);
+    if (outer > 5) {
+      int inner = 20;
+      System.out.println("inner = " + inner);
+      System.out.println("outer = " + outer);
     }
+
+    // 'inner' does not exist here — uncommenting the next line breaks the
+    // build: System.out.println("inner outside = " + inner);
+
+    System.out.println("outer = " + outer);
+  }
 }
 `}
 />

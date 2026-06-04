@@ -44,7 +44,7 @@ print(isinstance(True, int))
 <CodeBlock
   adapter="python"
   starterCode={`print(True + True + True)  # 3
-print(False * 100)          # 0
+print(False * 100)  # 0
 `}
 />
 
@@ -99,15 +99,15 @@ print(True is True)
   adapter="python"
   starterCode={`a = [1, 2, 3]
 b = [1, 2, 3]
-print(a == b)   # True, same contents
-print(a is b)   # False, different list objects
+print(a == b)  # True, same contents
+print(a is b)  # False, different list objects
 `}
 />
 
 <CodeBlock
   adapter="python"
   starterCode={`x = None
-print(x is None)   # the idiomatic check
+print(x is None)  # the idiomatic check
 `}
 />
 
@@ -185,6 +185,7 @@ print(not True)
     print("expensive() called")
     return True
 
+
 print(False and expensive())  # expensive() is never called
 `}
 />
@@ -194,6 +195,7 @@ print(False and expensive())  # expensive() is never called
   starterCode={`def expensive():
     print("expensive() called")
     return True
+
 
 print(True or expensive())  # expensive() is never called
 `}
@@ -208,15 +210,15 @@ print(True or expensive())  # expensive() is never called
 
 <CodeBlock
   adapter="python"
-  starterCode={`print(True and "hello")   # 'hello'
-print(False or "default") # 'default'
+  starterCode={`print(True and "hello")  # 'hello'
+print(False or "default")  # 'default'
 `}
 />
 
 <CodeBlock
   adapter="python"
   starterCode={`print(None or 0 or "first truthy")  # 'first truthy'
-print("a" and "b" and "c")           # 'c'
+print("a" and "b" and "c")  # 'c'
 `}
 />
 
@@ -295,12 +297,14 @@ print(abs_x)
     # Your code here
     return False
 
+
 print(xor(True, False))
 print(xor(True, True))
 print(xor(False, False))
 `}
   solutionCode={`def xor(a, b):
     return (a or b) and not (a and b)
+
 
 print(xor(True, False))
 print(xor(True, True))
@@ -338,6 +342,7 @@ print(xor(False, False))
     # Your code here
     return False
 
+
 print(all_truthy([1, 2, 3]))
 print(all_truthy([1, 0, 3]))
 print(all_truthy([]))
@@ -347,6 +352,7 @@ print(all_truthy([]))
         if not item:
             return False
     return True
+
 
 print(all_truthy([1, 2, 3]))
 print(all_truthy([1, 0, 3]))

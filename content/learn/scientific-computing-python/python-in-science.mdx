@@ -177,20 +177,27 @@ noisy = clean + 0.5 * np.sin(2 * np.pi * 20 * t) + 0.4 * rng.standard_normal(t.s
 sos = signal.butter(N=4, Wn=5, btype="low", fs=400, output="sos")
 filtered = signal.sosfiltfilt(sos, noisy)
 
+
 # pandas to compare signal-to-noise ratios
 def snr(x, ref):
     return 10 * np.log10(np.var(ref) / np.var(x - ref))
 
-print(pd.Series({
-    "noisy_SNR_dB":    snr(noisy,    clean),
-    "filtered_SNR_dB": snr(filtered, clean),
-}).round(2))
+
+print(
+    pd.Series(
+        {
+            "noisy_SNR_dB": snr(noisy, clean),
+            "filtered_SNR_dB": snr(filtered, clean),
+        }
+    ).round(2)
+)
 
 fig, ax = plt.subplots(figsize=(9, 3))
 ax.plot(t, noisy, alpha=0.4, label="noisy")
 ax.plot(t, filtered, label="filtered")
 ax.plot(t, clean, "--", label="clean")
-ax.set_xlabel("time (s)"); ax.legend()
+ax.set_xlabel("time (s)")
+ax.legend()
 plt.show()
 `}
 />

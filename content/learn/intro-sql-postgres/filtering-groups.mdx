@@ -42,11 +42,17 @@ INSERT INTO employees (name, dept) VALUES
   ('Alice','Engineering'),('Bob','Engineering'),('Cara','Engineering'),
   ('Dave','Sales'),('Eve','Sales'),
   ('Finn','Marketing');`}
-  starterCode={`SELECT dept, COUNT(*) AS headcount
-FROM employees
-GROUP BY dept
-HAVING COUNT(*) > 2
-ORDER BY headcount DESC;`}
+  starterCode={`SELECT
+  dept,
+  COUNT(*) AS headcount
+FROM
+  employees
+GROUP BY
+  dept
+HAVING
+  COUNT(*) > 2
+ORDER BY
+  headcount DESC;`}
 />
 
 Only Engineering (3 people) survives. Sales (2) and Marketing (1)
@@ -73,12 +79,19 @@ INSERT INTO employees (name, dept, salary, is_intern) VALUES
   ('Cara','Engineering',30000,true),
   ('Dave','Sales',75000,false),('Eve','Sales',72000,false),
   ('Finn','Marketing',68000,false);`}
-  starterCode={`SELECT dept, ROUND(AVG(salary)) AS avg_salary
-FROM employees
-WHERE is_intern = false            -- step 1: drop interns (rows)
-GROUP BY dept                      -- step 2: form department groups
-HAVING AVG(salary) > 80000         -- step 3: keep high-paying groups
-ORDER BY avg_salary DESC;`}
+  starterCode={`SELECT
+  dept,
+  ROUND(AVG(salary)) AS avg_salary
+FROM
+  employees
+WHERE
+  is_intern = false -- step 1: drop interns (rows)
+GROUP BY
+  dept -- step 2: form department groups
+HAVING
+  AVG(salary) > 80000 -- step 3: keep high-paying groups
+ORDER BY
+  avg_salary DESC;`}
 />
 
 Read the three commented steps top to bottom — they are the actual

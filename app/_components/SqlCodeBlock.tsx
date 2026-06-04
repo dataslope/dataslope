@@ -520,6 +520,8 @@ export default function SqlCodeBlock({
     <div
       className={styles.card}
       data-flavor="sql"
+      data-testid="sql-code-block"
+      data-run-status={status}
       aria-label={title ? `SQL code block: ${title}` : "SQL code block"}
     >
       {/* ── Header ── */}
@@ -571,6 +573,7 @@ export default function SqlCodeBlock({
             className={styles.runBtn}
             onClick={() => void run()}
             disabled={isBusy}
+            data-testid="sql-codeblock-run"
           >
             {isBusy ? (
               <svg viewBox="0 0 12 12" className={styles.runBtnSpinner} aria-hidden>

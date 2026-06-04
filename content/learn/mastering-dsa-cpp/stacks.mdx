@@ -35,16 +35,16 @@ flowchart TD
 #include <stack>
 
 int main() {
-    std::stack<int> tasks;
-    tasks.push(10);
-    tasks.push(20);
-    tasks.push(30);
+  std::stack<int> tasks;
+  tasks.push(10);
+  tasks.push(20);
+  tasks.push(30);
 
-    while (!tasks.empty()) {
-        std::cout << tasks.top() << "\\n";
-        tasks.pop();
-    }
-    return 0;
+  while (!tasks.empty()) {
+    std::cout << tasks.top() << "\\n";
+    tasks.pop();
+  }
+  return 0;
 }
 `}
 />
@@ -61,34 +61,26 @@ A vector already has the right back operations: `push_back`, `back`, and `pop_ba
 #include <vector>
 
 class IntStack {
-    std::vector<int> data;
+  std::vector<int> data;
 
 public:
-    void push(int value) {
-        data.push_back(value);
-    }
+  void push(int value) { data.push_back(value); }
 
-    void pop() {
-        data.pop_back();
-    }
+  void pop() { data.pop_back(); }
 
-    int top() const {
-        return data.back();
-    }
+  int top() const { return data.back(); }
 
-    bool empty() const {
-        return data.empty();
-    }
+  bool empty() const { return data.empty(); }
 };
 
 int main() {
-    IntStack st;
-    st.push(5);
-    st.push(8);
-    std::cout << st.top() << "\\n";
-    st.pop();
-    std::cout << st.top() << "\\n";
-    return 0;
+  IntStack st;
+  st.push(5);
+  st.push(8);
+  std::cout << st.top() << "\\n";
+  st.pop();
+  std::cout << st.top() << "\\n";
+  return 0;
 }
 `}
 />
@@ -116,27 +108,27 @@ flowchart TD
 #include <string>
 
 bool matches(char open, char close) {
-    return (open == '(' && close == ')') ||
-           (open == '[' && close == ']') ||
-           (open == '{' && close == '}');
+  return (open == '(' && close == ')') || (open == '[' && close == ']') ||
+         (open == '{' && close == '}');
 }
 
 int main() {
-    std::string s = "{[()]}";
-    std::stack<char> opens;
-    bool ok = true;
-    for (char c : s) {
-        if (c == '(' || c == '[' || c == '{') opens.push(c);
-        else if (c == ')' || c == ']' || c == '}') {
-            if (opens.empty() || !matches(opens.top(), c)) {
-                ok = false;
-                break;
-            }
-            opens.pop();
-        }
+  std::string s = "{[()]}";
+  std::stack<char> opens;
+  bool ok = true;
+  for (char c : s) {
+    if (c == '(' || c == '[' || c == '{')
+      opens.push(c);
+    else if (c == ')' || c == ']' || c == '}') {
+      if (opens.empty() || !matches(opens.top(), c)) {
+        ok = false;
+        break;
+      }
+      opens.pop();
     }
-    std::cout << (ok && opens.empty() ? "balanced" : "not balanced") << "\\n";
-    return 0;
+  }
+  std::cout << (ok && opens.empty() ? "balanced" : "not balanced") << "\\n";
+  return 0;
 }
 `}
 />
@@ -152,17 +144,18 @@ Pushing items and popping them reverses their order.
 #include <string>
 
 int main() {
-    std::string input = "desserts";
-    std::stack<char> chars;
-    for (char c : input) chars.push(c);
+  std::string input = "desserts";
+  std::stack<char> chars;
+  for (char c : input)
+    chars.push(c);
 
-    std::string reversed;
-    while (!chars.empty()) {
-        reversed += chars.top();
-        chars.pop();
-    }
-    std::cout << reversed << "\\n";
-    return 0;
+  std::string reversed;
+  while (!chars.empty()) {
+    reversed += chars.top();
+    chars.pop();
+  }
+  std::cout << reversed << "\\n";
+  return 0;
 }
 `}
 />
@@ -190,13 +183,14 @@ sequenceDiagram
   starterCode={`#include <iostream>
 
 int factorial(int n) {
-    if (n <= 1) return 1;
-    return n * factorial(n - 1);
+  if (n <= 1)
+    return 1;
+  return n * factorial(n - 1);
 }
 
 int main() {
-    std::cout << factorial(5) << "\\n";
-    return 0;
+  std::cout << factorial(5) << "\\n";
+  return 0;
 }
 `}
 />
@@ -212,18 +206,21 @@ Many parsers use stacks for operators and operands. You will see this idea again
 #include <string>
 
 int main() {
-    std::string postfix = "23+4*";
-    std::stack<int> values;
-    for (char c : postfix) {
-        if (c >= '0' && c <= '9') values.push(c - '0');
-        else {
-            int b = values.top(); values.pop();
-            int a = values.top(); values.pop();
-            values.push(c == '+' ? a + b : a * b);
-        }
+  std::string postfix = "23+4*";
+  std::stack<int> values;
+  for (char c : postfix) {
+    if (c >= '0' && c <= '9')
+      values.push(c - '0');
+    else {
+      int b = values.top();
+      values.pop();
+      int a = values.top();
+      values.pop();
+      values.push(c == '+' ? a + b : a * b);
     }
-    std::cout << values.top() << "\\n";
-    return 0;
+  }
+  std::cout << values.top() << "\\n";
+  return 0;
 }
 `}
 />
@@ -242,14 +239,14 @@ int main() {
 #include <stack>
 #include <string>
 
-bool isBalanced(const std::string& s) {
-    // your code here
+bool isBalanced(const std::string &s) {
+  // your code here
 }
 
 int main() {
-    std::string test = "{[()()]()}";
-    std::cout << (isBalanced(test) ? "true" : "false") << "\\n";
-    return 0;
+  std::string test = "{[()()]()}";
+  std::cout << (isBalanced(test) ? "true" : "false") << "\\n";
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
@@ -257,28 +254,28 @@ int main() {
 #include <string>
 
 bool matches(char open, char close) {
-    return (open == '(' && close == ')') ||
-           (open == '[' && close == ']') ||
-           (open == '{' && close == '}');
+  return (open == '(' && close == ')') || (open == '[' && close == ']') ||
+         (open == '{' && close == '}');
 }
 
-bool isBalanced(const std::string& s) {
-    std::stack<char> opens;
-    for (char c : s) {
-        if (c == '(' || c == '[' || c == '{') {
-            opens.push(c);
-        } else if (c == ')' || c == ']' || c == '}') {
-            if (opens.empty() || !matches(opens.top(), c)) return false;
-            opens.pop();
-        }
+bool isBalanced(const std::string &s) {
+  std::stack<char> opens;
+  for (char c : s) {
+    if (c == '(' || c == '[' || c == '{') {
+      opens.push(c);
+    } else if (c == ')' || c == ']' || c == '}') {
+      if (opens.empty() || !matches(opens.top(), c))
+        return false;
+      opens.pop();
     }
-    return opens.empty();
+  }
+  return opens.empty();
 }
 
 int main() {
-    std::string test = "{[()()]()}";
-    std::cout << (isBalanced(test) ? "true" : "false") << "\\n";
-    return 0;
+  std::string test = "{[()()]()}";
+  std::cout << (isBalanced(test) ? "true" : "false") << "\\n";
+  return 0;
 }
 `}
   tests={[{ id: "balanced", name: "Recognizes balanced brackets", expect: { stdoutEquals: "true" } }]}
@@ -294,35 +291,36 @@ int main() {
 #include <stack>
 #include <string>
 
-std::string reverseWithStack(const std::string& s) {
-    // your code here
+std::string reverseWithStack(const std::string &s) {
+  // your code here
 }
 
 int main() {
-    std::string text = "stressed";
-    std::cout << reverseWithStack(text) << "\\n";
-    return 0;
+  std::string text = "stressed";
+  std::cout << reverseWithStack(text) << "\\n";
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 #include <stack>
 #include <string>
 
-std::string reverseWithStack(const std::string& s) {
-    std::stack<char> chars;
-    for (char c : s) chars.push(c);
-    std::string out;
-    while (!chars.empty()) {
-        out += chars.top();
-        chars.pop();
-    }
-    return out;
+std::string reverseWithStack(const std::string &s) {
+  std::stack<char> chars;
+  for (char c : s)
+    chars.push(c);
+  std::string out;
+  while (!chars.empty()) {
+    out += chars.top();
+    chars.pop();
+  }
+  return out;
 }
 
 int main() {
-    std::string text = "stressed";
-    std::cout << reverseWithStack(text) << "\\n";
-    return 0;
+  std::string text = "stressed";
+  std::cout << reverseWithStack(text) << "\\n";
+  return 0;
 }
 `}
   tests={[{ id: "reverse_stack", name: "Reverses string", expect: { stdoutEquals: "desserts" } }]}

@@ -67,8 +67,7 @@ async def _load_nltk(category, package):
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import word_tokenize
 from nltk.util import ngrams`}
-  starterCode={`tokens = [t.lower() for t in word_tokenize("The quick brown fox jumps")
-          if t.isalpha()]
+  starterCode={`tokens = [t.lower() for t in word_tokenize("The quick brown fox jumps") if t.isalpha()]
 print("tokens:", tokens)
 print()
 
@@ -247,8 +246,10 @@ for n in [1, 2, 3, 4]:
     fd = FreqDist(grams)
     distinct = len(fd)
     repeated = sum(1 for g, c in fd.items() if c > 1)
-    print(f"n={n}: {len(grams):2} {n}-grams, {distinct:2} distinct, "
-          f"{repeated:2} that repeat")
+    print(
+        f"n={n}: {len(grams):2} {n}-grams, {distinct:2} distinct, "
+        f"{repeated:2} that repeat"
+    )
 `}
 />
 
@@ -304,11 +305,13 @@ from nltk.util import ngrams`}
     # return a list of n-gram tuples
     return []
 
+
 print(get_ngrams(["a", "b", "c", "d"], 2))
 print(get_ngrams(["a", "b", "c", "d"], 3))
 `}
   solutionCode={`def get_ngrams(tokens, n):
     return list(ngrams(tokens, n))
+
 
 print(get_ngrams(["a", "b", "c", "d"], 2))
 print(get_ngrams(["a", "b", "c", "d"], 3))

@@ -30,11 +30,13 @@ import pandas as pd
 
 # Two delivery services, both averaging 30 minutes.
 consistent = pd.Series([28, 29, 30, 30, 31, 32, 30, 29, 31, 30])
-erratic    = pd.Series([ 5, 55, 12, 48, 30, 30,  8, 52, 31, 29])
+erratic = pd.Series([5, 55, 12, 48, 30, 30, 8, 52, 31, 29])
 
 for name, s in [("consistent", consistent), ("erratic", erratic)]:
-    print(f"{name:>11}: mean={s.mean():.1f}  "
-          f"min={s.min():2d}  max={s.max():2d}  std={s.std():.1f}")
+    print(
+        f"{name:>11}: mean={s.mean():.1f}  "
+        f"min={s.min():2d}  max={s.max():2d}  std={s.std():.1f}"
+    )
 
 print("\\nIdentical means. The spread is the whole story.")
 `}
@@ -120,8 +122,8 @@ deviations = data - mean
 print("Deviations from the mean:", deviations)
 print("They sum to (about):", round(deviations.sum(), 10), "-> cancellation")
 
-variance = (deviations ** 2).mean()      # average squared deviation
-std      = np.sqrt(variance)
+variance = (deviations**2).mean()  # average squared deviation
+std = np.sqrt(variance)
 print(f"\\nVariance (squared units): {variance:.3f}")
 print(f"Std dev  (original units): {std:.3f}")
 print(f"NumPy std agrees:          {data.std():.3f}")
@@ -289,11 +291,11 @@ from scipy import stats
 
 # Two metrics on completely different scales.
 house_prices = np.array([310, 305, 322, 298, 315, 308, 330, 295])  # thousands $
-daily_visits = np.array([ 12,  48,   9,  52,  30,   7,  55,  11])  # website hits
+daily_visits = np.array([12, 48, 9, 52, 30, 7, 55, 11])  # website hits
 
 for name, x in [("house prices", house_prices), ("daily visits", daily_visits)]:
     sd = x.std(ddof=1)
-    cv = stats.variation(x, ddof=1)   # CV = std / mean
+    cv = stats.variation(x, ddof=1)  # CV = std / mean
     print(f"{name:>12}: mean={x.mean():7.1f}  std={sd:6.1f}  CV={cv:.3f}")
 
 print("\\nHouse prices have a far LARGER std, but a much SMALLER CV.")
@@ -344,12 +346,12 @@ rng = np.random.default_rng(7)
 times = pd.Series(np.round(rng.lognormal(mean=4.0, sigma=0.5, size=500), 1))
 
 summary = {
-    "n":      int(times.size),
-    "range":  round(float(times.max() - times.min()), 1),
-    "std":    round(float(times.std()), 1),          # ddof=1 by default
-    "iqr":    round(float(stats.iqr(times)), 1),
-    "mad":    round(float(stats.median_abs_deviation(times)), 1),
-    "cv":     round(float(stats.variation(times, ddof=1)), 3),
+    "n": int(times.size),
+    "range": round(float(times.max() - times.min()), 1),
+    "std": round(float(times.std()), 1),  # ddof=1 by default
+    "iqr": round(float(stats.iqr(times)), 1),
+    "mad": round(float(stats.median_abs_deviation(times)), 1),
+    "cv": round(float(stats.variation(times, ddof=1)), 3),
 }
 
 for k, v in summary.items():

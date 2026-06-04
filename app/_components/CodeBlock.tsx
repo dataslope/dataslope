@@ -43,6 +43,7 @@ import type {
   PlotlyFigure,
 } from "./types";
 import { getSharedRuntime, isRuntimeReady, RuntimeScope } from "./runtimeRegistry";
+import { mergeInitAndEntry } from "./runtime/mergeInit";
 import {
   clearPersistedCode,
   loadPersistedCode,
@@ -487,8 +488,11 @@ function CodeBlockInner({
         }),
         highlightActiveLineGutter(),
         highlightActiveLine(),
-        EditorState.tabSize.of(4),
-        indentUnit.of("    "),
+        // Indent width tracks the adapter's formatter (see
+        // LanguageAdapter.indentWidth) so Tab inserts what the
+        // "Format code" button would produce.
+        EditorState.tabSize.of(adapter.indentWidth),
+        indentUnit.of(" ".repeat(adapter.indentWidth)),
         EditorView.lineWrapping,
         keymap.of([
           {
@@ -586,8 +590,8 @@ function CodeBlockInner({
         EditorView.editable.of(false),
         drawSelection(),
         lineNumbersExt(),
-        EditorState.tabSize.of(4),
-        indentUnit.of("    "),
+        EditorState.tabSize.of(adapter.indentWidth),
+        indentUnit.of(" ".repeat(adapter.indentWidth)),
         EditorView.lineWrapping,
         languageComp.of([]),
         themeComp.of(themeFor(cmThemeNameFor(detectIsDark()))),
@@ -666,7 +670,9 @@ function CodeBlockInner({
     // scope as the user code. Authors are responsible for providing
     // syntactically-compatible init (e.g. top-level `using`/`#include`
     // for compiled languages).
-    const code = hasInit ? `${trimmedInit}\n${entrySource}` : entrySource;
+    const code = hasInit
+      ? mergeInitAndEntry(adapter.id, trimmedInit, entrySource)
+      : entrySource;
     const mySeq = ++runSeqRef.current;
 
     setOutputs([]);
@@ -1333,7 +1339,7 @@ function OutputCellView({
     cell.type === "stdout" || cell.type === "stderr" || cell.type === "html";
 
   return (
-    <div className={wrapperClass}>
+    <div className={wrapperClass} data-cell-type={cell.type}>
       <div className={styles.outCellHeader}>
         <span className={styles.outCellType}>{headerLabel}</span>
         {cell.elapsed && (

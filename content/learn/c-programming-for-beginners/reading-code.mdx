@@ -218,24 +218,24 @@ of "spelling mistakes you can't help noticing".
 #include <string.h>
 
 int main(int argc, char **argv) {
-    if (argc < 2) {
-        fprintf(stderr, "usage: %s WORD\\n", argv[0]);
-        return 1;
+  if (argc < 2) {
+    fprintf(stderr, "usage: %s WORD\\n", argv[0]);
+    return 1;
+  }
+
+  const char *needle = argv[1];
+  char line[1024];
+  int matches = 0;
+
+  while (fgets(line, sizeof line, stdin) != NULL) {
+    if (strstr(line, needle) != NULL) {
+      fputs(line, stdout);
+      matches++;
     }
+  }
 
-    const char *needle = argv[1];
-    char line[1024];
-    int  matches = 0;
-
-    while (fgets(line, sizeof line, stdin) != NULL) {
-        if (strstr(line, needle) != NULL) {
-            fputs(line, stdout);
-            matches++;
-        }
-    }
-
-    fprintf(stderr, "%d match(es)\\n", matches);
-    return matches > 0 ? 0 : 2;
+  fprintf(stderr, "%d match(es)\\n", matches);
+  return matches > 0 ? 0 : 2;
 }
 `}
 />

@@ -1411,6 +1411,70 @@ export default function SqlChallengeCard({
     submitRef.current = canCheck ? () => void check() : () => void run();
   }, [canCheck, check, run]);
 
+  // ─── Test hook ─────────────────────────────────────────────────────
+  // Mirror <ChallengeCard>: expose an imperative driver on the shared
+  // `window.__dsChallenges` registry so the Playwright solution sweep
+  // (e2e/challenge-solutions.spec.ts) can load a card's reference SQL into
+  // the editor and run its tests without round-tripping through the DOM.
+  // The single editor surface is modelled as one virtual file, "query.sql".
+  const checkRef = useRef<() => Promise<void>>(() => Promise.resolve());
+  const bannerStateRef = useRef(bannerState);
+  const testResultsRef = useRef(testResults);
+  useEffect(() => {
+    checkRef.current = () => check();
+  }, [check]);
+  useEffect(() => {
+    bannerStateRef.current = bannerState;
+  }, [bannerState]);
+  useEffect(() => {
+    testResultsRef.current = testResults;
+  }, [testResults]);
+  useEffect(() => {
+    if (typeof window === "undefined" || !solutionSql) return;
+    const w = window as unknown as {
+      __dsChallenges?: Record<string, unknown>;
+    };
+    const key = `${dialect}::${title}`;
+    const handle = {
+      adapterId: dialect,
+      title,
+      entryFilename: "query.sql",
+      filenames: ["query.sql"],
+      setFileContent(_filename: string, content: string) {
+        const view = editorRef.current;
+        if (!view) return false;
+        view.dispatch({
+          changes: { from: 0, to: view.state.doc.length, insert: content },
+        });
+        return true;
+      },
+      submit() {
+        return checkRef.current();
+      },
+      getBannerState() {
+        return bannerStateRef.current;
+      },
+      getTestResults() {
+        return testResultsRef.current.map((t) => ({
+          id: t.id,
+          name: t.name,
+          state: t.state,
+          detail: t.detail,
+        }));
+      },
+    };
+    const registry = w.__dsChallenges ?? {};
+    w.__dsChallenges = { ...registry, [key]: handle };
+    return () => {
+      const current = w.__dsChallenges;
+      if (current && current[key] === handle) {
+        const next = { ...current };
+        delete next[key];
+        w.__dsChallenges = next;
+      }
+    };
+  }, [dialect, title, solutionSql]);
+
   // ─── Reset ──────────────────────────────────────────────────────────
   // Reset restores the starter code AND re-seeds the database so
   // INSERT/UPDATE/DELETE exercises can be retried from a clean slate.
@@ -1531,7 +1595,13 @@ export default function SqlChallengeCard({
       className={styles.card}
       data-flavor="sql"
       data-testid="sql-challenge-card"
+      data-adapter-id={dialect}
       data-challenge-title={title}
+      data-solution-files={
+        solutionSql
+          ? JSON.stringify([{ filename: "query.sql", source: solutionSql }])
+          : undefined
+      }
       aria-label={`SQL coding challenge: ${title}`}
     >
       {/* ── Header ── */}

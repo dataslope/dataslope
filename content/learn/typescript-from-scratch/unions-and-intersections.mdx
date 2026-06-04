@@ -81,9 +81,9 @@ narrowing in detail in [Type Narrowing](./type-narrowing)):
   adapter="typescript"
   starterCode={`function printLength(value: string | number): void {
   if (typeof value === "string") {
-    console.log("Length:", value.length);  // ✅ value is narrowed to string
+    console.log("Length:", value.length); // ✅ value is narrowed to string
   } else {
-    console.log("Number:", value);  // ✅ value is narrowed to number
+    console.log("Number:", value); // ✅ value is narrowed to number
   }
 }
 
@@ -346,8 +346,13 @@ This is equivalent to declaring an interface that extends both:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface PositionedI { x: number; y: number }
-interface ColoredI { color: string }
+  starterCode={`interface PositionedI {
+  x: number;
+  y: number;
+}
+interface ColoredI {
+  color: string;
+}
 interface SpriteI extends PositionedI, ColoredI {}
 
 const enemy: SpriteI = { x: 100, y: 200, color: "blue" };

@@ -46,18 +46,19 @@ value.
 import java.util.Set;
 
 public class Main {
-    public static void main(String[] args) {
-        Set<String> seen = new HashSet<>();
-        boolean firstAlpha = seen.add("alpha");
-        boolean againAlpha = seen.add("alpha");
-        seen.add("beta"); seen.add("gamma");
+  public static void main(String[] args) {
+    Set<String> seen = new HashSet<>();
+    boolean firstAlpha = seen.add("alpha");
+    boolean againAlpha = seen.add("alpha");
+    seen.add("beta");
+    seen.add("gamma");
 
-        System.out.println("first add alpha? " + firstAlpha);
-        System.out.println("again add alpha? " + againAlpha);
-        System.out.println("size = " + seen.size());
-        System.out.println("contains gamma? " + seen.contains("gamma"));
-        System.out.println(seen);   // iteration order is unspecified
-    }
+    System.out.println("first add alpha? " + firstAlpha);
+    System.out.println("again add alpha? " + againAlpha);
+    System.out.println("size = " + seen.size());
+    System.out.println("contains gamma? " + seen.contains("gamma"));
+    System.out.println(seen); // iteration order is unspecified
+  }
 }
 `}
 />
@@ -96,16 +97,17 @@ both matter (e.g. "the unique URLs visited, in visit order").
 import java.util.Set;
 
 public class Main {
-    public static void main(String[] args) {
-        Set<String> visited = new LinkedHashSet<>();
-        visited.add("/home");
-        visited.add("/about");
-        visited.add("/home");        // duplicate — ignored
-        visited.add("/contact");
-        visited.add("/about");       // duplicate — ignored
+  public static void main(String[] args) {
+    Set<String> visited = new LinkedHashSet<>();
+    visited.add("/home");
+    visited.add("/about");
+    visited.add("/home"); // duplicate — ignored
+    visited.add("/contact");
+    visited.add("/about"); // duplicate — ignored
 
-        for (String url : visited) System.out.println(url);
-    }
+    for (String url : visited)
+      System.out.println(url);
+  }
 }
 `}
 />
@@ -125,19 +127,25 @@ Backed by a red-black tree, every operation is `O(log n)`.
 import java.util.TreeSet;
 
 public class Main {
-    public static void main(String[] args) {
-        Set<Integer> sorted = new TreeSet<>();
-        sorted.add(3); sorted.add(1); sorted.add(4); sorted.add(1); sorted.add(5);
+  public static void main(String[] args) {
+    Set<Integer> sorted = new TreeSet<>();
+    sorted.add(3);
+    sorted.add(1);
+    sorted.add(4);
+    sorted.add(1);
+    sorted.add(5);
 
-        System.out.println(sorted);            // [1, 3, 4, 5] — sorted, no dupes
+    System.out.println(sorted); // [1, 3, 4, 5] — sorted, no dupes
 
-        TreeSet<String> words = new TreeSet<>();
-        words.add("zeta"); words.add("alpha"); words.add("mu");
+    TreeSet<String> words = new TreeSet<>();
+    words.add("zeta");
+    words.add("alpha");
+    words.add("mu");
 
-        System.out.println("first = " + words.first());
-        System.out.println("last  = " + words.last());
-        System.out.println("after kappa = " + words.higher("kappa"));
-    }
+    System.out.println("first = " + words.first());
+    System.out.println("last  = " + words.last());
+    System.out.println("after kappa = " + words.higher("kappa"));
+  }
 }
 `}
 />
@@ -160,22 +168,23 @@ people once and then never again.
 import java.util.Set;
 
 public class Main {
-    public static void main(String[] args) {
-        Set<Integer> a = new HashSet<>(Set.of(1, 2, 3, 4));
-        Set<Integer> b = new HashSet<>(Set.of(3, 4, 5, 6));
+  public static void main(String[] args) {
+    Set<Integer> a = new HashSet<>(Set.of(1, 2, 3, 4));
+    Set<Integer> b = new HashSet<>(Set.of(3, 4, 5, 6));
 
-        Set<Integer> union = new HashSet<>(a);
-        union.addAll(b);
-        System.out.println("union        = " + new java.util.TreeSet<>(union));
+    Set<Integer> union = new HashSet<>(a);
+    union.addAll(b);
+    System.out.println("union        = " + new java.util.TreeSet<>(union));
 
-        Set<Integer> intersection = new HashSet<>(a);
-        intersection.retainAll(b);
-        System.out.println("intersection = " + new java.util.TreeSet<>(intersection));
+    Set<Integer> intersection = new HashSet<>(a);
+    intersection.retainAll(b);
+    System.out.println("intersection = " +
+                       new java.util.TreeSet<>(intersection));
 
-        Set<Integer> difference = new HashSet<>(a);
-        difference.removeAll(b);
-        System.out.println("difference   = " + new java.util.TreeSet<>(difference));
-    }
+    Set<Integer> difference = new HashSet<>(a);
+    difference.removeAll(b);
+    System.out.println("difference   = " + new java.util.TreeSet<>(difference));
+  }
 }
 `}
 />

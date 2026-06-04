@@ -126,7 +126,11 @@ sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 g = sns.displot(
-    penguins, x="flipper_length_mm", hue="species", kind="hist", height=4,
+    penguins,
+    x="flipper_length_mm",
+    hue="species",
+    kind="hist",
+    height=4,
 )
 `}
   tests={[
@@ -170,7 +174,11 @@ penguins = sns.load_dataset("penguins")
 
 # Category on x, number on y: compare each species' weight distribution.
 sns.catplot(
-    data=penguins, x="species", y="body_mass_g", kind="box", height=4,
+    data=penguins,
+    x="species",
+    y="body_mass_g",
+    kind="box",
+    height=4,
 )
 `}
 />
@@ -210,7 +218,11 @@ sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 g = sns.catplot(
-    data=penguins, x="island", y="body_mass_g", kind="box", height=4,
+    data=penguins,
+    x="island",
+    y="body_mass_g",
+    kind="box",
+    height=4,
 )
 `}
   tests={[

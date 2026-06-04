@@ -42,11 +42,14 @@ INSERT INTO employees (name, dept, salary) VALUES
   ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
   starterCode={`SELECT
   dept,
-  COUNT(*)           AS headcount,
+  COUNT(*) AS headcount,
   ROUND(AVG(salary)) AS avg_salary
-FROM employees
-GROUP BY dept
-ORDER BY dept;`}
+FROM
+  employees
+GROUP BY
+  dept
+ORDER BY
+  dept;`}
 />
 
 One row per department, each with its own count and average. Read it
@@ -99,10 +102,18 @@ by both region and year:
 INSERT INTO sales (region, year, amount) VALUES
   ('West', 2025, 100), ('West', 2025, 50), ('West', 2026, 200),
   ('East', 2025, 80),  ('East', 2026, 120), ('East', 2026, 60);`}
-  starterCode={`SELECT region, year, SUM(amount) AS total
-FROM sales
-GROUP BY region, year
-ORDER BY region, year;`}
+  starterCode={`SELECT
+  region,
+  year,
+  SUM(amount) AS total
+FROM
+  sales
+GROUP BY
+  region,
+  year
+ORDER BY
+  region,
+  year;`}
 />
 
 Each row is now one (region, year) pair. Grouping by multiple
@@ -122,11 +133,17 @@ restrict which rows enter the groups:
 INSERT INTO employees (name, dept, salary, is_intern) VALUES
   ('Alice','Engineering',120000,false),('Bob','Engineering',95000,false),
   ('Carol','Sales',80000,false),('Dave','Sales',40000,true),('Eve','Sales',72000,false);`}
-  starterCode={`SELECT dept, ROUND(AVG(salary)) AS avg_salary
-FROM employees
-WHERE is_intern = false
-GROUP BY dept
-ORDER BY dept;`}
+  starterCode={`SELECT
+  dept,
+  ROUND(AVG(salary)) AS avg_salary
+FROM
+  employees
+WHERE
+  is_intern = false
+GROUP BY
+  dept
+ORDER BY
+  dept;`}
 />
 
 ```mermaid
@@ -216,15 +233,22 @@ INSERT INTO orders (customer, amount) VALUES
   ('Ada', 120.00), ('Linus', 80.00), ('Ada', 30.00),
   ('Grace', 200.00), ('Linus', 15.00), ('Ada', 25.00);`}
   starterCode={`-- Total per customer, then keep only the big spenders:
-SELECT customer, SUM(amount) AS total
-FROM orders
-;
-`}
-  solutionSql={`SELECT customer, SUM(amount) AS total
-FROM orders
-GROUP BY customer
-HAVING SUM(amount) > 100
-ORDER BY total DESC;`}
+SELECT
+  customer,
+  SUM(amount) AS total
+FROM
+  orders;`}
+  solutionSql={`SELECT
+  customer,
+  SUM(amount) AS total
+FROM
+  orders
+GROUP BY
+  customer
+HAVING
+  SUM(amount) > 100
+ORDER BY
+  total DESC;`}
   tests={[
     {
       id: "columns",

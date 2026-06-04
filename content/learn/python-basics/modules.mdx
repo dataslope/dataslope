@@ -23,15 +23,18 @@ When you do `import pandas as pd`, you're pulling in hundreds of modules, all or
 <CodeBlock
   adapter="python"
   starterCode={`import math
+
 print(math.pi)
 print(math.sqrt(2))
 
 # Import a specific name.
 from math import pi, sqrt
+
 print(pi, sqrt(2))
 
 # Rename on import.
 import math as m
+
 print(m.cos(0))
 `}
 />
@@ -82,7 +85,8 @@ When you write `import foo`:
 <CodeBlock
   adapter="python"
   starterCode={`import sys
-for p in sys.path[:5]:   # show first 5
+
+for p in sys.path[:5]:  # show first 5
     print(p)
 `}
 />
@@ -113,6 +117,7 @@ It pulls every public name into the current namespace, which makes it impossible
 
 # Good: clear and explicit
 import math
+
 print(math.sqrt(2))
 `}
 />

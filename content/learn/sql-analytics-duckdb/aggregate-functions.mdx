@@ -49,12 +49,13 @@ INSERT INTO orders VALUES
   (1,'Ada',120),(2,'Bo',80),(3,'Ada',45),
   (4,'Cy',200),(5,'Bo',60),(6,'Cy',95),(7,'Ada',30);`}
   starterCode={`SELECT
-  COUNT(*)              AS num_orders,
-  SUM(amount)           AS revenue,
+  COUNT(*) AS num_orders,
+  SUM(amount) AS revenue,
   ROUND(AVG(amount), 2) AS avg_order,
-  MIN(amount)           AS smallest,
-  MAX(amount)           AS largest
-FROM orders;`}
+  MIN(amount) AS smallest,
+  MAX(amount) AS largest
+FROM
+  orders;`}
 />
 
 Seven rows became one line of five numbers — a complete summary that would
@@ -80,10 +81,11 @@ INSERT INTO visits VALUES
   (1, 10, 'google'), (2, 10, NULL), (3, 11, 'google'),
   (4, 12, 'twitter'), (5, 11, NULL), (6, 10, 'twitter');`}
   starterCode={`SELECT
-  COUNT(*)                  AS total_visits,
-  COUNT(referrer)           AS visits_with_referrer,
-  COUNT(DISTINCT user_id)   AS unique_visitors
-FROM visits;`}
+  COUNT(*) AS total_visits,
+  COUNT(referrer) AS visits_with_referrer,
+  COUNT(DISTINCT user_id) AS unique_visitors
+FROM
+  visits;`}
 />
 
 "How many visits?" "How many had a known referrer?" "How many *different*
@@ -106,12 +108,15 @@ INSERT INTO ratings VALUES
   ('A', 5), ('A', 3), ('A', NULL), ('B', 4), ('B', NULL);`}
   starterCode={`SELECT
   product,
-  COUNT(*)            AS rows,
-  COUNT(score)        AS scored,
-  ROUND(AVG(score),2) AS avg_score   -- averages only the non-NULL scores
-FROM ratings
-GROUP BY product
-ORDER BY product;`}
+  COUNT(*) AS rows,
+  COUNT(score) AS scored,
+  ROUND(AVG(score), 2) AS avg_score -- averages only the non-NULL scores
+FROM
+  ratings
+GROUP BY
+  product
+ORDER BY
+  product;`}
 />
 
 Product A averages over its two real scores (5 and 3 → 4.0), ignoring the
@@ -134,10 +139,12 @@ average with a filter.
 INSERT INTO orders VALUES
   (1,120),(2,30),(3,200),(4,45),(5,95),(6,15);`}
   starterCode={`SELECT
-  COUNT(*)              AS big_orders,
+  COUNT(*) AS big_orders,
   ROUND(AVG(amount), 2) AS avg_big_order
-FROM orders
-WHERE amount > 50;`}
+FROM
+  orders
+WHERE
+  amount > 50;`}
 />
 
 ```mermaid

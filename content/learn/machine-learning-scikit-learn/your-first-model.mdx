@@ -141,10 +141,11 @@ from sklearn.model_selection import train_test_split
 X, y = load_iris(return_X_y=True)
 
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y,
-    test_size=0.25,    # 25% of flowers held out for the final grade
-    random_state=42,   # reproducible split
-    stratify=y,        # keep all 3 species balanced in both halves
+    X,
+    y,
+    test_size=0.25,  # 25% of flowers held out for the final grade
+    random_state=42,  # reproducible split
+    stratify=y,  # keep all 3 species balanced in both halves
 )
 
 print("Training flowers:", X_train.shape[0])
@@ -403,7 +404,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # TRAIN ---------------------------------------------------------------
-model = KNeighborsClassifier(n_neighbors=5)   # <- swap this line for any estimator
+model = KNeighborsClassifier(n_neighbors=5)  # <- swap this line for any estimator
 model.fit(X_train, y_train)
 
 # EVALUATE ------------------------------------------------------------
@@ -412,7 +413,9 @@ print(f"Test accuracy: {accuracy:.1%}")
 
 # USE -----------------------------------------------------------------
 new_flower = [[6.5, 3.0, 5.5, 2.0]]
-print("New flower predicted as:", load_iris().target_names[model.predict(new_flower)[0]])
+print(
+    "New flower predicted as:", load_iris().target_names[model.predict(new_flower)[0]]
+)
 `}
 />
 

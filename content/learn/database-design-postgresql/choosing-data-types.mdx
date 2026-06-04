@@ -41,9 +41,17 @@ that cannot be converted into an integer.
 
 INSERT INTO order_items (sku, quantity) VALUES ('PEN-1', 3);`}
   starterCode={`-- The type INTEGER rejects text that is not a number.
-INSERT INTO order_items (sku, quantity) VALUES ('BOOK-1', 'many');
+INSERT INTO
+  order_items (sku, quantity)
+VALUES
+  ('BOOK-1', 'many');
 
-SELECT id, sku, quantity FROM order_items;`}
+SELECT
+  id,
+  sku,
+  quantity
+FROM
+  order_items;`}
 />
 
 The `CHECK` adds the rule that quantity must be positive, but the data
@@ -128,7 +136,8 @@ VALUES (0.1 + 0.2, 0.1::double precision + 0.2::double precision);`}
   approximate_amount,
   exact_amount = 0.3 AS numeric_is_exact,
   approximate_amount = 0.3::double precision AS float_equals_point_three
-FROM money_demo;`}
+FROM
+  money_demo;`}
 />
 
 The exact result is what you want for prices, invoices, balances, and

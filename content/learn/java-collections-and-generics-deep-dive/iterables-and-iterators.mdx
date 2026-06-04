@@ -51,20 +51,23 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<String> xs = new ArrayList<>();
-        xs.add("a"); xs.add("b"); xs.add("c");
+  public static void main(String[] args) {
+    List<String> xs = new ArrayList<>();
+    xs.add("a");
+    xs.add("b");
+    xs.add("c");
 
-        // Sugar:
-        for (String s : xs) System.out.println("- " + s);
+    // Sugar:
+    for (String s : xs)
+      System.out.println("- " + s);
 
-        // What the compiler turns it into:
-        Iterator<String> it = xs.iterator();
-        while (it.hasNext()) {
-            String s = it.next();
-            System.out.println("* " + s);
-        }
+    // What the compiler turns it into:
+    Iterator<String> it = xs.iterator();
+    while (it.hasNext()) {
+      String s = it.next();
+      System.out.println("* " + s);
     }
+  }
 }
 `}
 />
@@ -149,18 +152,20 @@ could not iterate it from two places at once.
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<String> xs = new ArrayList<>();
-        xs.add("a"); xs.add("b"); xs.add("c");
+  public static void main(String[] args) {
+    List<String> xs = new ArrayList<>();
+    xs.add("a");
+    xs.add("b");
+    xs.add("c");
 
-        // Two simultaneous walks — each has its own iterator,
-        // so each has its own cursor.
-        for (String outer : xs) {
-            for (String inner : xs) {
-                System.out.println("(" + outer + "," + inner + ")");
-            }
-        }
+    // Two simultaneous walks — each has its own iterator,
+    // so each has its own cursor.
+    for (String outer : xs) {
+      for (String inner : xs) {
+        System.out.println("(" + outer + "," + inner + ")");
+      }
     }
+  }
 }
 `}
 />
@@ -188,18 +193,20 @@ import java.util.Iterator;
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<Integer> xs = new ArrayList<>();
-        for (int i = 1; i <= 10; i++) xs.add(i);
+  public static void main(String[] args) {
+    List<Integer> xs = new ArrayList<>();
+    for (int i = 1; i <= 10; i++)
+      xs.add(i);
 
-        // Remove every even number safely during iteration.
-        Iterator<Integer> it = xs.iterator();
-        while (it.hasNext()) {
-            int n = it.next();
-            if (n % 2 == 0) it.remove();
-        }
-        System.out.println(xs);
+    // Remove every even number safely during iteration.
+    Iterator<Integer> it = xs.iterator();
+    while (it.hasNext()) {
+      int n = it.next();
+      if (n % 2 == 0)
+        it.remove();
     }
+    System.out.println(xs);
+  }
 }
 `}
 />
@@ -220,18 +227,21 @@ the next call to `next()` throws.
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<String> xs = new ArrayList<>();
-        xs.add("a"); xs.add("b"); xs.add("c");
+  public static void main(String[] args) {
+    List<String> xs = new ArrayList<>();
+    xs.add("a");
+    xs.add("b");
+    xs.add("c");
 
-        try {
-            for (String s : xs) {
-                if (s.equals("b")) xs.remove(s);   // structural change!
-            }
-        } catch (RuntimeException e) {
-            System.out.println("threw: " + e.getClass().getSimpleName());
-        }
+    try {
+      for (String s : xs) {
+        if (s.equals("b"))
+          xs.remove(s); // structural change!
+      }
+    } catch (RuntimeException e) {
+      System.out.println("threw: " + e.getClass().getSimpleName());
     }
+  }
 }
 `}
 />
@@ -252,21 +262,25 @@ iterable:
 import java.util.Map;
 
 public class Main {
-    public static void main(String[] args) {
-        Map<String, Integer> m = new HashMap<>();
-        m.put("alpha", 1); m.put("beta", 2); m.put("gamma", 3);
+  public static void main(String[] args) {
+    Map<String, Integer> m = new HashMap<>();
+    m.put("alpha", 1);
+    m.put("beta", 2);
+    m.put("gamma", 3);
 
-        // keys
-        for (String k : m.keySet()) System.out.println("key:   " + k);
+    // keys
+    for (String k : m.keySet())
+      System.out.println("key:   " + k);
 
-        // values
-        for (Integer v : m.values()) System.out.println("value: " + v);
+    // values
+    for (Integer v : m.values())
+      System.out.println("value: " + v);
 
-        // entries (preferred — one walk over both)
-        for (Map.Entry<String, Integer> e : m.entrySet()) {
-            System.out.println(e.getKey() + " -> " + e.getValue());
-        }
+    // entries (preferred — one walk over both)
+    for (Map.Entry<String, Integer> e : m.entrySet()) {
+      System.out.println(e.getKey() + " -> " + e.getValue());
     }
+  }
 }
 `}
 />

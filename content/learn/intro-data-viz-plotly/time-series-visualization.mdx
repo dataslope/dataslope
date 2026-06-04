@@ -27,7 +27,10 @@ df = px.data.stocks()
 long = df.melt(id_vars="date", var_name="ticker", value_name="price")
 
 fig = px.line(
-    long, x="date", y="price", color="ticker",
+    long,
+    x="date",
+    y="price",
+    color="ticker",
     template="simple_white",
     title="Tech stocks (normalized to 1.0)",
     labels={"date": "Date", "price": "Normalized price"},
@@ -47,7 +50,10 @@ df = px.data.stocks()
 long = df.melt(id_vars="date", var_name="ticker", value_name="price")
 
 fig = px.line(
-    long, x="date", y="price", color="ticker",
+    long,
+    x="date",
+    y="price",
+    color="ticker",
     template="simple_white",
     title="Tech stocks with range slider",
     labels={"date": "Date", "price": "Normalized price"},
@@ -72,16 +78,20 @@ import numpy as np
 import plotly.express as px
 
 # Fabricate hourly data over 30 days
-hours = pd.date_range("2024-01-01", periods=30*24, freq="H")
+hours = pd.date_range("2024-01-01", periods=30 * 24, freq="H")
 np.random.seed(0)
-val = 50 + np.sin(np.arange(len(hours)) * 0.05) * 10 + np.random.normal(0, 3, len(hours))
+val = (
+    50 + np.sin(np.arange(len(hours)) * 0.05) * 10 + np.random.normal(0, 3, len(hours))
+)
 df = pd.DataFrame({"timestamp": hours, "value": val})
 
 # Aggregate to daily means:
 daily = df.set_index("timestamp").resample("D").mean().reset_index()
 
 fig = px.line(
-    daily, x="timestamp", y="value",
+    daily,
+    x="timestamp",
+    y="value",
     template="simple_white",
     title="Hourly noise smoothed to daily means via .resample('D')",
     labels={"timestamp": "Date", "value": "Mean value"},
@@ -117,7 +127,10 @@ df["rolling_30"] = df["value"].rolling(30, center=True).mean()
 long = df.melt(id_vars="date", var_name="series", value_name="v").dropna()
 
 fig = px.line(
-    long, x="date", y="v", color="series",
+    long,
+    x="date",
+    y="v",
+    color="series",
     template="simple_white",
     title="Daily value with 7-day and 30-day moving averages",
     labels={"date": "Date", "v": "Value"},
@@ -156,7 +169,9 @@ the noise. All three layered gives the whole story.
 df = px.data.stocks()
 
 fig = px.line(
-    df, x="date", y="GOOG",
+    df,
+    x="date",
+    y="GOOG",
     template="simple_white",
     title="GOOG with weekends skipped (no flat spots over Sat-Sun)",
     labels={"date": "Date", "GOOG": "Normalized price"},
@@ -184,7 +199,10 @@ import plotly.express as px
 df = px.data.gapminder().query("country in ['China', 'India', 'United States']")
 
 fig = px.line(
-    df, x="year", y="lifeExp", color="country",
+    df,
+    x="year",
+    y="lifeExp",
+    color="country",
     facet_col="country",
     template="simple_white",
     title="Life expectancy, faceted per country",

@@ -27,9 +27,14 @@ INSERT INTO books (title, author, year) VALUES
   ('Snow Crash', 'Neal Stephenson', 1992),
   ('Foundation', 'Isaac Asimov', 1951),
   ('The Left Hand of Darkness', 'Ursula K. Le Guin', 1969);`}
-  starterCode={`SELECT title, author, year
-FROM books
-ORDER BY year;`}
+  starterCode={`SELECT
+  title,
+  author,
+  year
+FROM
+  books
+ORDER BY
+  year;`}
 />
 
 ```jsx
@@ -48,9 +53,14 @@ INSERT INTO books (title, author, year) VALUES
   ('Snow Crash', 'Neal Stephenson', 1992),
   ('Foundation', 'Isaac Asimov', 1951),
   ('The Left Hand of Darkness', 'Ursula K. Le Guin', 1969);`}
-  starterCode={`SELECT title, author, year
-FROM books
-ORDER BY year;`}
+  starterCode={`SELECT
+  title,
+  author,
+  year
+FROM
+  books
+ORDER BY
+  year;`}
 />
 ```
 
@@ -74,10 +84,15 @@ INSERT INTO sales (category, product, revenue) VALUES
   ('Food',        'Coffee',        8.5),
   ('Food',        'Tea',           5.0),
   ('Food',        'Bread',         3.0);`}
-  starterCode={`SELECT category, SUM(revenue) AS total_revenue
-FROM sales
-GROUP BY category
-ORDER BY total_revenue DESC;`}
+  starterCode={`SELECT
+  category,
+  SUM(revenue) AS total_revenue
+FROM
+  sales
+GROUP BY
+  category
+ORDER BY
+  total_revenue DESC;`}
 />
 
 ```jsx
@@ -99,10 +114,15 @@ INSERT INTO sales (category, product, revenue) VALUES
   ('Food',        'Coffee',        8.5),
   ('Food',        'Tea',           5.0),
   ('Food',        'Bread',         3.0);`}
-  starterCode={`SELECT category, SUM(revenue) AS total_revenue
-FROM sales
-GROUP BY category
-ORDER BY total_revenue DESC;`}
+  starterCode={`SELECT
+  category,
+  SUM(revenue) AS total_revenue
+FROM
+  sales
+GROUP BY
+  category
+ORDER BY
+  total_revenue DESC;`}
 />
 ```
 
@@ -114,26 +134,46 @@ expression demos like generating a number series.
 <SqlCodeBlock
   dialect="sqlite"
   title="Generate a number series"
-  starterCode={`WITH RECURSIVE seq(n) AS (
-  SELECT 1
-  UNION ALL
-  SELECT n + 1 FROM seq WHERE n < 10
-)
-SELECT n, n * n AS squared
-FROM seq;`}
+  starterCode={`WITH RECURSIVE
+  seq (n) AS (
+    SELECT
+      1
+    UNION ALL
+    SELECT
+      n + 1
+    FROM
+      seq
+    WHERE
+      n < 10
+  )
+SELECT
+  n,
+  n * n AS squared
+FROM
+  seq;`}
 />
 
 ```jsx
 <SqlCodeBlock
   dialect="sqlite"
   title="Generate a number series"
-  starterCode={`WITH RECURSIVE seq(n) AS (
-  SELECT 1
-  UNION ALL
-  SELECT n + 1 FROM seq WHERE n < 10
-)
-SELECT n, n * n AS squared
-FROM seq;`}
+  starterCode={`WITH RECURSIVE
+  seq (n) AS (
+    SELECT
+      1
+    UNION ALL
+    SELECT
+      n + 1
+    FROM
+      seq
+    WHERE
+      n < 10
+  )
+SELECT
+  n,
+  n * n AS squared
+FROM
+  seq;`}
 />
 ```
 
@@ -165,10 +205,16 @@ INSERT INTO books (id, author_id, title, year) VALUES
   (3, 2, 'Neuromancer', 1984),
   (4, 3, 'The Left Hand of Darkness', 1969),
   (5, 3, 'The Dispossessed', 1974);`}
-  starterCode={`SELECT a.name AS author, b.title, b.year
-FROM books b
-JOIN authors a ON a.id = b.author_id
-ORDER BY a.name, b.year;`}
+  starterCode={`SELECT
+  a.name AS author,
+  b.title,
+  b.year
+FROM
+  books b
+  JOIN authors a ON a.id = b.author_id
+ORDER BY
+  a.name,
+  b.year;`}
 />
 
 ```jsx
@@ -195,10 +241,16 @@ INSERT INTO books (id, author_id, title, year) VALUES
   (3, 2, 'Neuromancer', 1984),
   (4, 3, 'The Left Hand of Darkness', 1969),
   (5, 3, 'The Dispossessed', 1974);`}
-  starterCode={`SELECT a.name AS author, b.title, b.year
-FROM books b
-JOIN authors a ON a.id = b.author_id
-ORDER BY a.name, b.year;`}
+  starterCode={`SELECT
+  a.name AS author,
+  b.title,
+  b.year
+FROM
+  books b
+  JOIN authors a ON a.id = b.author_id
+ORDER BY
+  a.name,
+  b.year;`}
 />
 ```
 
@@ -223,9 +275,14 @@ WITH RECURSIVE seq(n) AS (
 )
 INSERT INTO metrics (id, label, value)
 SELECT n, 'row-' || n, ROUND(n * 1.5, 2) FROM seq;`}
-  starterCode={`SELECT id, label, value
-FROM metrics
-ORDER BY id;`}
+  starterCode={`SELECT
+  id,
+  label,
+  value
+FROM
+  metrics
+ORDER BY
+  id;`}
 />
 
 ```jsx
@@ -244,8 +301,13 @@ WITH RECURSIVE seq(n) AS (
 )
 INSERT INTO metrics (id, label, value)
 SELECT n, 'row-' || n, ROUND(n * 1.5, 2) FROM seq;`}
-  starterCode={`SELECT id, label, value
-FROM metrics
-ORDER BY id;`}
+  starterCode={`SELECT
+  id,
+  label,
+  value
+FROM
+  metrics
+ORDER BY
+  id;`}
 />
 ```

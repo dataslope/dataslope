@@ -233,8 +233,10 @@ INSERT INTO events (title, starts_at) VALUES
 INSERT INTO registrations (attendee_id, event_id, status, registered_at)
 VALUES (1, 1, 'reserved', '2025-04-01 09:00');
 `}
-  starterCode={`INSERT INTO registrations (attendee_id, event_id, status, registered_at)
-VALUES (1, 2, 'waiting', '2025-04-02 10:00');`}
+  starterCode={`INSERT INTO
+  registrations (attendee_id, event_id, status, registered_at)
+VALUES
+  (1, 2, 'waiting', '2025-04-02 10:00');`}
 />
 
 The example rejects `waiting` because the design only allows

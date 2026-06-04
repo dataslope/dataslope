@@ -54,12 +54,12 @@ CREATE TABLE orders (
 INSERT INTO customers (name) VALUES ('Ada'), ('Grace');
 INSERT INTO orders (customer_id, amount) VALUES (1, 42), (2, 99);`}
   starterCode={`SELECT
-  orders.id        AS order_id,
-  customers.name   AS customer,
+  orders.id AS order_id,
+  customers.name AS customer,
   orders.amount
-FROM orders
-JOIN customers
-  ON orders.customer_id = customers.id;`}
+FROM
+  orders
+  JOIN customers ON orders.customer_id = customers.id;`}
 />
 
 Read it: *"From orders, joined to customers wherever the order's
@@ -84,9 +84,13 @@ CREATE TABLE orders (
 );
 INSERT INTO customers (name) VALUES ('Ada'), ('Grace');
 INSERT INTO orders (customer_id, amount) VALUES (1, 42), (2, 99);`}
-  starterCode={`SELECT o.id AS order_id, c.name AS customer, o.amount
-FROM orders o
-JOIN customers c ON o.customer_id = c.id;`}
+  starterCode={`SELECT
+  o.id AS order_id,
+  c.name AS customer,
+  o.amount
+FROM
+  orders o
+  JOIN customers c ON o.customer_id = c.id;`}
 />
 
 `orders o` means "call orders `o` here." This is the style you will

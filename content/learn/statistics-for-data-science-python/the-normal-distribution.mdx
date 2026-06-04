@@ -59,20 +59,31 @@ from scipy import stats
 x = np.linspace(-6, 14, 500)
 
 # Same shape, different center and spread.
-curves = pd.DataFrame({
-    "x": np.tile(x, 3),
-    "density": np.concatenate([
-        stats.norm(loc=0, scale=1).pdf(x),
-        stats.norm(loc=4, scale=1).pdf(x),
-        stats.norm(loc=4, scale=2.5).pdf(x),
-    ]),
-    "distribution": (["mu=0, sigma=1"] * len(x)
-                     + ["mu=4, sigma=1"] * len(x)
-                     + ["mu=4, sigma=2.5"] * len(x)),
-})
+curves = pd.DataFrame(
+    {
+        "x": np.tile(x, 3),
+        "density": np.concatenate(
+            [
+                stats.norm(loc=0, scale=1).pdf(x),
+                stats.norm(loc=4, scale=1).pdf(x),
+                stats.norm(loc=4, scale=2.5).pdf(x),
+            ]
+        ),
+        "distribution": (
+            ["mu=0, sigma=1"] * len(x)
+            + ["mu=4, sigma=1"] * len(x)
+            + ["mu=4, sigma=2.5"] * len(x)
+        ),
+    }
+)
 
-fig = px.line(curves, x="x", y="density", color="distribution",
-              title="The normal: mu moves the center, sigma sets the width")
+fig = px.line(
+    curves,
+    x="x",
+    y="density",
+    color="distribution",
+    title="The normal: mu moves the center, sigma sets the width",
+)
 fig.show()
 `}
 />
@@ -104,12 +115,12 @@ flowchart TD
   adapter="python"
   starterCode={`from scipy import stats
 
-d = stats.norm(loc=0, scale=1)   # standard normal
+d = stats.norm(loc=0, scale=1)  # standard normal
 
 # The empirical rule, computed from the CDF (area within ±k sigma).
 for k in (1, 2, 3):
     inside = d.cdf(k) - d.cdf(-k)
-    print(f"Within {k} sigma: {inside*100:5.2f}% of values")
+    print(f"Within {k} sigma: {inside * 100:5.2f}% of values")
 
 print("\\n68-95-99.7 are the rounded versions of these exact numbers.")
 `}
@@ -128,22 +139,31 @@ from scipy import stats
 
 mu, sigma = 100, 15
 d = stats.norm(loc=mu, scale=sigma)
-x = np.linspace(mu - 4*sigma, mu + 4*sigma, 500)
+x = np.linspace(mu - 4 * sigma, mu + 4 * sigma, 500)
 
 fig = go.Figure()
 fig.add_trace(go.Scatter(x=x, y=d.pdf(x), mode="lines", name="PDF"))
 
 # Shade the central 95% band (mu ± 2 sigma).
-band = (x >= mu - 2*sigma) & (x <= mu + 2*sigma)
-fig.add_trace(go.Scatter(
-    x=x[band], y=d.pdf(x[band]), fill="tozeroy",
-    mode="none", name="mu ± 2 sigma (~95%)"))
+band = (x >= mu - 2 * sigma) & (x <= mu + 2 * sigma)
+fig.add_trace(
+    go.Scatter(
+        x=x[band],
+        y=d.pdf(x[band]),
+        fill="tozeroy",
+        mode="none",
+        name="mu ± 2 sigma (~95%)",
+    )
+)
 
-fig.update_layout(title="Normal(100, 15): the central ~95% band",
-                  xaxis_title="score", yaxis_title="density")
+fig.update_layout(
+    title="Normal(100, 15): the central ~95% band",
+    xaxis_title="score",
+    yaxis_title="density",
+)
 fig.show()
 
-print(f"~95% of scores fall between {mu-2*sigma} and {mu+2*sigma}.")
+print(f"~95% of scores fall between {mu - 2 * sigma} and {mu + 2 * sigma}.")
 `}
 />
 
@@ -194,10 +214,10 @@ print(f"z-score of {x}: {z:.2f}  (it's {z:.0f} SDs above the mean)")
 # The percentile: what fraction of people score BELOW 130?
 # Two equivalent routes — standardize then use the standard normal,
 # or just use the original distribution's cdf directly.
-pct_via_z   = stats.norm().cdf(z)
-pct_direct  = stats.norm(loc=mu, scale=sigma).cdf(x)
-print(f"Percentile via z-score:    {pct_via_z*100:.1f}%")
-print(f"Percentile via norm.cdf(x):{pct_direct*100:.1f}%")
+pct_via_z = stats.norm().cdf(z)
+pct_direct = stats.norm(loc=mu, scale=sigma).cdf(x)
+print(f"Percentile via z-score:    {pct_via_z * 100:.1f}%")
+print(f"Percentile via norm.cdf(x):{pct_direct * 100:.1f}%")
 print("\\nSame answer: standardizing and using norm.cdf are equivalent.")
 `}
 />
@@ -228,7 +248,7 @@ interchangeable. Pick the right tool for the direction you need:
 
 mu, sigma = 100, 15
 d = stats.norm(loc=mu, scale=sigma)
-z_dist = stats.norm()   # standard normal
+z_dist = stats.norm()  # standard normal
 
 # "What score marks the 90th percentile?" (percentile -> value)
 score_90 = d.ppf(0.90)
@@ -396,16 +416,23 @@ fitted = stats.norm(loc=mu, scale=sigma)
 
 x = np.linspace(income.min(), income.max(), 400)
 fig = go.Figure()
-fig.add_trace(go.Histogram(x=income, histnorm="probability density",
-                           nbinsx=60, name="actual income"))
-fig.add_trace(go.Scatter(x=x, y=fitted.pdf(x), mode="lines",
-                         name="fitted normal"))
-fig.update_layout(title="A normal forced onto skewed income data — it doesn't fit",
-                  xaxis_title="income", yaxis_title="density")
+fig.add_trace(
+    go.Histogram(
+        x=income, histnorm="probability density", nbinsx=60, name="actual income"
+    )
+)
+fig.add_trace(go.Scatter(x=x, y=fitted.pdf(x), mode="lines", name="fitted normal"))
+fig.update_layout(
+    title="A normal forced onto skewed income data — it doesn't fit",
+    xaxis_title="income",
+    yaxis_title="density",
+)
 fig.show()
 
 # The tell: the normal puts real probability BELOW zero, which is impossible.
-print(f"\\nFitted normal says P(income < 0) = {fitted.cdf(0):.3f} — impossible for income!")
+print(
+    f"\\nFitted normal says P(income < 0) = {fitted.cdf(0):.3f} — impossible for income!"
+)
 `}
 />
 

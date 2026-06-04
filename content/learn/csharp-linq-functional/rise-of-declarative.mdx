@@ -86,7 +86,8 @@ for (int i = 0; i < nums.Length; i++)
 {
     if (nums[i] % 2 == 0)
     {
-        if (sb.Length > 0) sb.Append(", ");
+        if (sb.Length > 0)
+            sb.Append(", ");
         sb.Append(nums[i] * 2);
     }
 }
@@ -95,7 +96,8 @@ Console.WriteLine("v1: " + sb.ToString());
 // 2. foreach — a slight step up.
 var parts = new List<string>();
 foreach (var n in nums)
-    if (n % 2 == 0) parts.Add((n * 2).ToString());
+    if (n % 2 == 0)
+        parts.Add((n * 2).ToString());
 Console.WriteLine("v2: " + string.Join(", ", parts));
 
 // 3. LINQ method syntax — declarative pipeline.
@@ -146,8 +148,7 @@ using System.Linq;
 var nums = new[] { 1, 2, 3, 4, 5, 6 };
 
 // Just add .Skip(1) between Where and Select. Done.
-var result = string.Join(", ",
-    nums.Where(n => n % 2 == 0).Skip(1).Select(n => n * 2));
+var result = string.Join(", ", nums.Where(n => n % 2 == 0).Skip(1).Select(n => n * 2));
 
 Console.WriteLine(result); // 8, 12
 `}

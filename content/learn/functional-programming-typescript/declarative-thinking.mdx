@@ -30,12 +30,12 @@ $50, take their customer names, deduplicate, and sort alphabetically.
 };
 
 const orders: readonly Order[] = [
-  { id: "1", status: "paid",      total: 80,  customer: "Ada"   },
-  { id: "2", status: "draft",     total: 200, customer: "Linus" },
-  { id: "3", status: "paid",      total: 30,  customer: "Grace" },
-  { id: "4", status: "paid",      total: 90,  customer: "Ada"   },
-  { id: "5", status: "cancelled", total: 60,  customer: "Edsger"},
-  { id: "6", status: "paid",      total: 120, customer: "Linus" },
+  { id: "1", status: "paid", total: 80, customer: "Ada" },
+  { id: "2", status: "draft", total: 200, customer: "Linus" },
+  { id: "3", status: "paid", total: 30, customer: "Grace" },
+  { id: "4", status: "paid", total: 90, customer: "Ada" },
+  { id: "5", status: "cancelled", total: 60, customer: "Edsger" },
+  { id: "6", status: "paid", total: 120, customer: "Linus" },
 ];
 
 const seen = new Set<string>();
@@ -73,19 +73,21 @@ step by step.
 };
 
 const orders: readonly Order[] = [
-  { id: "1", status: "paid",      total: 80,  customer: "Ada"   },
-  { id: "2", status: "draft",     total: 200, customer: "Linus" },
-  { id: "3", status: "paid",      total: 30,  customer: "Grace" },
-  { id: "4", status: "paid",      total: 90,  customer: "Ada"   },
-  { id: "5", status: "cancelled", total: 60,  customer: "Edsger"},
-  { id: "6", status: "paid",      total: 120, customer: "Linus" },
+  { id: "1", status: "paid", total: 80, customer: "Ada" },
+  { id: "2", status: "draft", total: 200, customer: "Linus" },
+  { id: "3", status: "paid", total: 30, customer: "Grace" },
+  { id: "4", status: "paid", total: 90, customer: "Ada" },
+  { id: "5", status: "cancelled", total: 60, customer: "Edsger" },
+  { id: "6", status: "paid", total: 120, customer: "Linus" },
 ];
 
-const names = [...new Set(
-  orders
-    .filter((o) => o.status === "paid" && o.total > 50)
-    .map((o) => o.customer),
-)].sort();
+const names = [
+  ...new Set(
+    orders
+      .filter((o) => o.status === "paid" && o.total > 50)
+      .map((o) => o.customer),
+  ),
+].sort();
 
 console.log(names);
 `}
@@ -173,11 +175,11 @@ realistic example — computing per-customer paid totals.
 };
 
 const orders: readonly Order[] = [
-  { id: "1", status: "paid",  total: 80,  customer: "Ada"   },
-  { id: "2", status: "paid",  total: 30,  customer: "Linus" },
-  { id: "3", status: "draft", total: 200, customer: "Ada"   },
-  { id: "4", status: "paid",  total: 90,  customer: "Ada"   },
-  { id: "5", status: "paid",  total: 60,  customer: "Linus" },
+  { id: "1", status: "paid", total: 80, customer: "Ada" },
+  { id: "2", status: "paid", total: 30, customer: "Linus" },
+  { id: "3", status: "draft", total: 200, customer: "Ada" },
+  { id: "4", status: "paid", total: 90, customer: "Ada" },
+  { id: "5", status: "paid", total: 60, customer: "Linus" },
 ];
 
 // 1. Keep only paid
@@ -190,8 +192,7 @@ const byCustomer = paid.reduce<Record<string, number>>((acc, o) => {
 }, {});
 
 // 3. Turn into entries, sort by total desc
-const ranked = Object.entries(byCustomer)
-  .sort(([, a], [, b]) => b - a);
+const ranked = Object.entries(byCustomer).sort(([, a], [, b]) => b - a);
 
 console.log(ranked);
 `}
@@ -218,13 +219,17 @@ The mental shift applies far beyond list processing.
 };
 
 const fields: Record<string, Validator> = {
-  email:    { required: true, regex: /@/ },
+  email: { required: true, regex: /@/ },
   password: { required: true, minLen: 8 },
-  bio:      { maxLen: 200 },
+  bio: { maxLen: 200 },
 };
 
 // A SINGLE generic engine that interprets the data
-function validate(field: string, value: string | undefined, rule: Validator): string | null {
+function validate(
+  field: string,
+  value: string | undefined,
+  rule: Validator,
+): string | null {
   if (rule.required && !value) return \`\${field} is required\`;
   if (value === undefined) return null;
   if (rule.minLen && value.length < rule.minLen) return \`\${field} too short\`;
@@ -234,7 +239,18 @@ function validate(field: string, value: string | undefined, rule: Validator): st
 }
 
 const errors = Object.entries(fields)
-  .map(([name, rule]) => validate(name, ({ email: "x", password: "short", bio: undefined } as Record<string, string>)[name], rule))
+  .map(([name, rule]) =>
+    validate(
+      name,
+      (
+        { email: "x", password: "short", bio: undefined } as Record<
+          string,
+          string
+        >
+      )[name],
+      rule,
+    ),
+  )
   .filter((e): e is string => e !== null);
 
 console.log(errors);

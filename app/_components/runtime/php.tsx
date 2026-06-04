@@ -262,6 +262,8 @@ export const phpAdapter: LanguageAdapter = {
       "PHP compiled to WebAssembly — runs entirely in the browser, no server roundtrip.",
   },
   codeMirrorMode: "php",
+  // mago_fmt (PSR-12) (see formatCode) — keep in sync.
+  indentWidth: 4,
   examples: EXAMPLES,
   packages: PACKAGES,
   exportFormats: [

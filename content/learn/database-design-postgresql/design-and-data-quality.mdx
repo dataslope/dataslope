@@ -66,8 +66,10 @@ CREATE TABLE customers (
 INSERT INTO customers (email, full_name) VALUES
     ('ana@example.com', 'Ana Rivera');
 `}
-  starterCode={`INSERT INTO customers (email, full_name)
-VALUES ('ana@example.com', 'Ana R.');`}
+  starterCode={`INSERT INTO
+  customers (email, full_name)
+VALUES
+  ('ana@example.com', 'Ana R.');`}
 />
 
 The database rejects the duplicate email because the design says email

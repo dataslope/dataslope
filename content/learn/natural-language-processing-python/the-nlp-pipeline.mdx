@@ -212,7 +212,7 @@ await _load_nltk("corpora", "stopwords")
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords`}
   starterCode={`text = "The The THE end is near"
-stop = set(stopwords.words("english"))   # all lowercase, includes 'the'
+stop = set(stopwords.words("english"))  # all lowercase, includes 'the'
 tokens = word_tokenize(text)
 
 # Order A: lowercase FIRST, then remove stopwords  (correct)
@@ -300,6 +300,7 @@ stop = set(stopwords.words("english"))`}
     # ... lowercase, keep alphabetic, drop stopwords ...
     return tokens
 
+
 print(preprocess("The quick brown foxes are jumping!"))
 print(preprocess("It is NOT a good day."))
 `}
@@ -309,6 +310,7 @@ print(preprocess("It is NOT a good day."))
     tokens = [t for t in tokens if t.isalpha()]
     tokens = [t for t in tokens if t not in stop]
     return tokens
+
 
 print(preprocess("The quick brown foxes are jumping!"))
 print(preprocess("It is NOT a good day."))

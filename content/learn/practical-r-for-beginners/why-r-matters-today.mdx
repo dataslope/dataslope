@@ -219,8 +219,8 @@ mtcars |>
   mutate(weight_class = ifelse(wt < 3, "light", "heavy")) |>
   group_by(weight_class) |>
   summarise(
-    n           = n(),
-    avg_mpg     = mean(mpg),
+    n = n(),
+    avg_mpg = mean(mpg),
     avg_horsepower = mean(hp)
   )
 `}

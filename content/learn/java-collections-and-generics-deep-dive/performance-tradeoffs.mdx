@@ -70,17 +70,19 @@ If you know roughly how many elements you'll add, **pre-size**:
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        // Without a hint: many resize-and-copy events
-        List<Integer> a = new ArrayList<>();
-        for (int i = 0; i < 1_000_000; i++) a.add(i);
-        System.out.println(a.size());
+  public static void main(String[] args) {
+    // Without a hint: many resize-and-copy events
+    List<Integer> a = new ArrayList<>();
+    for (int i = 0; i < 1_000_000; i++)
+      a.add(i);
+    System.out.println(a.size());
 
-        // With a hint: one allocation, zero resizes
-        List<Integer> b = new ArrayList<>(1_000_000);
-        for (int i = 0; i < 1_000_000; i++) b.add(i);
-        System.out.println(b.size());
-    }
+    // With a hint: one allocation, zero resizes
+    List<Integer> b = new ArrayList<>(1_000_000);
+    for (int i = 0; i < 1_000_000; i++)
+      b.add(i);
+    System.out.println(b.size());
+  }
 }
 `}
 />
@@ -112,12 +114,13 @@ initialCapacity = ceil(n / loadFactor) = ceil(n / 0.75)
 import java.util.Map;
 
 public class Main {
-    public static void main(String[] args) {
-        int n = 10_000;
-        Map<Integer, String> m = new HashMap<>((int) Math.ceil(n / 0.75));
-        for (int i = 0; i < n; i++) m.put(i, "v" + i);
-        System.out.println(m.size());
-    }
+  public static void main(String[] args) {
+    int n = 10_000;
+    Map<Integer, String> m = new HashMap<>((int)Math.ceil(n / 0.75));
+    for (int i = 0; i < n; i++)
+      m.put(i, "v" + i);
+    System.out.println(m.size());
+  }
 }
 `}
 />

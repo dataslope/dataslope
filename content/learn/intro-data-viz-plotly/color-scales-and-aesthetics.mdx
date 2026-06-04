@@ -38,14 +38,15 @@ Good qualitative palettes: `"Plotly"`, `"D3"`, `"G10"`,
 df = px.data.gapminder().query("year == 2007")
 
 fig = px.scatter(
-    df, x="gdpPercap", y="lifeExp",
+    df,
+    x="gdpPercap",
+    y="lifeExp",
     color="continent",
     log_x=True,
     color_discrete_sequence=px.colors.qualitative.Vivid,
     template="simple_white",
     title="Qualitative palette: Vivid",
-    labels={"gdpPercap": "GDP per capita (USD, log)",
-            "lifeExp": "Life expectancy"},
+    labels={"gdpPercap": "GDP per capita (USD, log)", "lifeExp": "Life expectancy"},
 )
 fig.show()
 `}
@@ -70,14 +71,15 @@ Good sequential palettes: `"Viridis"`, `"Plasma"`, `"Magma"`,
 df = px.data.gapminder().query("year == 2007")
 
 fig = px.scatter(
-    df, x="gdpPercap", y="lifeExp",
+    df,
+    x="gdpPercap",
+    y="lifeExp",
     color="lifeExp",  # numeric -> continuous color
     log_x=True,
     color_continuous_scale="Viridis",
     template="simple_white",
     title="Sequential palette: Viridis",
-    labels={"gdpPercap": "GDP per capita (USD, log)",
-            "lifeExp": "Life expectancy"},
+    labels={"gdpPercap": "GDP per capita (USD, log)", "lifeExp": "Life expectancy"},
 )
 fig.show()
 `}
@@ -99,14 +101,18 @@ Good diverging palettes: `"RdBu"`, `"RdBu_r"` (reversed),
 import pandas as pd
 
 # Simulated year-over-year change for several products
-df = pd.DataFrame({
-    "product": ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta"],
-    "yoy_pct": [-18, -3, 7, 22, -5, 12],
-})
+df = pd.DataFrame(
+    {
+        "product": ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta"],
+        "yoy_pct": [-18, -3, 7, 22, -5, 12],
+    }
+)
 
 fig = px.bar(
     df.sort_values("yoy_pct"),
-    x="yoy_pct", y="product", orientation="h",
+    x="yoy_pct",
+    y="product",
+    orientation="h",
     color="yoy_pct",
     color_continuous_scale="RdBu",
     color_continuous_midpoint=0,
@@ -162,7 +168,9 @@ df = px.data.gapminder().query("continent == 'Europe'")
 df["highlight"] = df["country"].where(df["country"] == "Germany", "Other")
 
 fig = px.line(
-    df, x="year", y="lifeExp",
+    df,
+    x="year",
+    y="lifeExp",
     color="highlight",
     line_group="country",
     color_discrete_map={"Germany": "#d62728", "Other": "lightgray"},

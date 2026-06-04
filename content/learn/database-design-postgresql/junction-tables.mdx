@@ -147,11 +147,18 @@ INSERT INTO enrollments (student_id, course_id, enrolled_on, grade) VALUES
   (1, 10, DATE '2025-01-15', 'A'),
   (1, 11, DATE '2025-01-16', 'B'),
   (2, 10, DATE '2025-01-18', 'A');`}
-  starterCode={`SELECT s.name, c.title, e.enrolled_on, e.grade
-FROM enrollments e
-JOIN students s ON s.id = e.student_id
-JOIN courses c ON c.id = e.course_id
-ORDER BY s.name, c.title;`}
+  starterCode={`SELECT
+  s.name,
+  c.title,
+  e.enrolled_on,
+  e.grade
+FROM
+  enrollments e
+  JOIN students s ON s.id = e.student_id
+  JOIN courses c ON c.id = e.course_id
+ORDER BY
+  s.name,
+  c.title;`}
 />
 
 The result reads naturally because the design matches the real-world

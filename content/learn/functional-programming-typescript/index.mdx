@@ -132,14 +132,18 @@ composition.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Order = { id: string; status: "draft" | "paid" | "cancelled"; total: number };
+  starterCode={`type Order = {
+  id: string;
+  status: "draft" | "paid" | "cancelled";
+  total: number;
+};
 
 const orders: Order[] = [
-  { id: "a", status: "paid",      total: 30 },
-  { id: "b", status: "draft",     total: 10 },
-  { id: "c", status: "paid",      total: 50 },
+  { id: "a", status: "paid", total: 30 },
+  { id: "b", status: "draft", total: 10 },
+  { id: "c", status: "paid", total: 50 },
   { id: "d", status: "cancelled", total: 99 },
-  { id: "e", status: "paid",      total: 20 },
+  { id: "e", status: "paid", total: 20 },
 ];
 
 let total = 0;
@@ -154,14 +158,18 @@ console.log("Imperative total:", total);
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Order = { id: string; status: "draft" | "paid" | "cancelled"; total: number };
+  starterCode={`type Order = {
+  id: string;
+  status: "draft" | "paid" | "cancelled";
+  total: number;
+};
 
 const orders: Order[] = [
-  { id: "a", status: "paid",      total: 30 },
-  { id: "b", status: "draft",     total: 10 },
-  { id: "c", status: "paid",      total: 50 },
+  { id: "a", status: "paid", total: 30 },
+  { id: "b", status: "draft", total: 10 },
+  { id: "c", status: "paid", total: 50 },
   { id: "d", status: "cancelled", total: 99 },
-  { id: "e", status: "paid",      total: 20 },
+  { id: "e", status: "paid", total: 20 },
 ];
 
 const total = orders

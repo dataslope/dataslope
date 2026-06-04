@@ -29,13 +29,13 @@ once and for all.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        String a = "hello";
-        String b = new String("hello");   // different object, same value
+  public static void main(String[] args) {
+    String a = "hello";
+    String b = new String("hello"); // different object, same value
 
-        System.out.println("a == b      : " + (a == b));        // false
-        System.out.println("a.equals(b) : " + a.equals(b));     // true
-    }
+    System.out.println("a == b      : " + (a == b));    // false
+    System.out.println("a.equals(b) : " + a.equals(b)); // true
+  }
 }
 `}
 />
@@ -203,16 +203,16 @@ Java 16+ has **records**, which generate a correct `equals`,
 import java.util.Set;
 
 public class Main {
-    record Point(int x, int y) {}        // equals/hashCode auto-generated
+  record Point(int x, int y) {} // equals/hashCode auto-generated
 
-    public static void main(String[] args) {
-        Set<Point> seen = new HashSet<>();
-        seen.add(new Point(1, 2));
-        seen.add(new Point(1, 2));
-        seen.add(new Point(3, 4));
-        System.out.println("size = " + seen.size());
-        System.out.println("contains (1,2)? " + seen.contains(new Point(1, 2)));
-    }
+  public static void main(String[] args) {
+    Set<Point> seen = new HashSet<>();
+    seen.add(new Point(1, 2));
+    seen.add(new Point(1, 2));
+    seen.add(new Point(3, 4));
+    System.out.println("size = " + seen.size());
+    System.out.println("contains (1,2)? " + seen.contains(new Point(1, 2)));
+  }
 }
 `}
 />
@@ -230,28 +230,32 @@ there, but the collection looks for it in the wrong bucket.
 <CodeBlock
   adapter="java"
   starterCode={`import java.util.HashSet;
-import java.util.Set;
 import java.util.Objects;
+import java.util.Set;
 
 public class Main {
-    static class Name {
-        String first;
-        Name(String f) { first = f; }
-        @Override public boolean equals(Object o) {
-            return o instanceof Name n && n.first.equals(first);
-        }
-        @Override public int hashCode() { return Objects.hash(first); }
+  static class Name {
+    String first;
+    Name(String f) { first = f; }
+    @Override
+    public boolean equals(Object o) {
+      return o instanceof Name n && n.first.equals(first);
     }
-
-    public static void main(String[] args) {
-        Set<Name> set = new HashSet<>();
-        Name n = new Name("Ada");
-        set.add(n);
-
-        System.out.println("contains? " + set.contains(n));   // true
-        n.first = "Linus";                                    // mutated key!
-        System.out.println("contains? " + set.contains(n));   // false — lost
+    @Override
+    public int hashCode() {
+      return Objects.hash(first);
     }
+  }
+
+  public static void main(String[] args) {
+    Set<Name> set = new HashSet<>();
+    Name n = new Name("Ada");
+    set.add(n);
+
+    System.out.println("contains? " + set.contains(n)); // true
+    n.first = "Linus";                                  // mutated key!
+    System.out.println("contains? " + set.contains(n)); // false — lost
+  }
 }
 `}
 />

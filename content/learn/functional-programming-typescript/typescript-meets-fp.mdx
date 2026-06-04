@@ -59,7 +59,7 @@ function twice<T>(f: (x: T) => T, x: T): T {
   return f(f(x));
 }
 
-console.log(twice(double, 3));  // 12
+console.log(twice(double, 3)); // 12
 
 // Functions can be returned from functions.
 function adder(amount: number): (n: number) => number {
@@ -67,7 +67,7 @@ function adder(amount: number): (n: number) => number {
 }
 
 const addTen = adder(10);
-console.log(addTen(5));   // 15
+console.log(addTen(5)); // 15
 console.log(addTen(100)); // 110
 `}
 />
@@ -128,10 +128,14 @@ type LoadState<A> =
 
 function describe<A>(s: LoadState<A>): string {
   switch (s.kind) {
-    case "idle":    return "not started";
-    case "loading": return "in progress";
-    case "ready":   return \`ready with: \${JSON.stringify(s.data)}\`;
-    case "error":   return \`failed: \${s.message}\`;
+    case "idle":
+      return "not started";
+    case "loading":
+      return "in progress";
+    case "ready":
+      return \`ready with: \${JSON.stringify(s.data)}\`;
+    case "error":
+      return \`failed: \${s.message}\`;
   }
 }
 
@@ -157,9 +161,12 @@ been narrowed to "impossible".
 
 function describe(c: Color): string {
   switch (c) {
-    case "red":   return "stop";
-    case "green": return "go";
-    case "blue":  return "ocean";
+    case "red":
+      return "stop";
+    case "green":
+      return "go";
+    case "blue":
+      return "ocean";
     default: {
       const _exhaustive: never = c; // ❌ if you add a Color and forget a case
       return _exhaustive;
@@ -195,8 +202,8 @@ function swap<A, B>(p: Pair<A, B>): Pair<B, A> {
   return { first: p.second, second: p.first };
 }
 
-const x = pair("age", 30);              // Pair<string, number>
-const y = swap(x);                       // Pair<number, string>
+const x = pair("age", 30); // Pair<string, number>
+const y = swap(x); // Pair<number, string>
 console.log(x);
 console.log(y);
 `}
@@ -221,25 +228,37 @@ const none = <A,>(): Option<A> => ({ kind: "none" });
 
 function map<A, B>(o: Option<A>, f: (a: A) => B): Option<B> {
   switch (o.kind) {
-    case "none": return none<B>();
-    case "some": return some(f(o.value));
+    case "none":
+      return none<B>();
+    case "some":
+      return some(f(o.value));
   }
 }
 
 function getOrElse<A>(o: Option<A>, fallback: A): A {
   switch (o.kind) {
-    case "none": return fallback;
-    case "some": return o.value;
+    case "none":
+      return fallback;
+    case "some":
+      return o.value;
   }
 }
 
 // Find a user, double their age if present, default to 0
-const lookup: Option<{ name: string; age: number }> = some({ name: "Ada", age: 36 });
+const lookup: Option<{ name: string; age: number }> = some({
+  name: "Ada",
+  age: 36,
+});
 const doubled = map(lookup, (u) => u.age * 2);
 console.log(getOrElse(doubled, 0));
 
 const missing: Option<{ name: string; age: number }> = none();
-console.log(getOrElse(map(missing, (u) => u.age * 2), 0));
+console.log(
+  getOrElse(
+    map(missing, (u) => u.age * 2),
+    0,
+  ),
+);
 `}
 />
 

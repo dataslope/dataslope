@@ -61,19 +61,21 @@ reverse.
   adapter="python"
   starterCode={`import pandas as pd
 
-wide = pd.DataFrame({
-    "person": ["Aiko","Bilal","Chen"],
-    "2022":   [7, 6, 9],
-    "2023":   [8, 7, 8],
-    "2024":   [8, 9, 7],
-})
+wide = pd.DataFrame(
+    {
+        "person": ["Aiko", "Bilal", "Chen"],
+        "2022": [7, 6, 9],
+        "2023": [8, 7, 8],
+        "2024": [8, 9, 7],
+    }
+)
 print("Wide:")
 print(wide)
 print()
 
 long = wide.melt(
-    id_vars="person",                    # columns to keep as-is
-    value_vars=["2022","2023","2024"],   # columns to unpivot
+    id_vars="person",  # columns to keep as-is
+    value_vars=["2022", "2023", "2024"],  # columns to unpivot
     var_name="year",
     value_name="happiness",
 )
@@ -88,11 +90,13 @@ print(long)
   adapter="python"
   starterCode={`import pandas as pd
 
-long = pd.DataFrame({
-    "person":    ["Aiko","Aiko","Aiko","Bilal","Bilal","Bilal"],
-    "year":      [2022,2023,2024,2022,2023,2024],
-    "happiness": [7,8,8,6,7,9],
-})
+long = pd.DataFrame(
+    {
+        "person": ["Aiko", "Aiko", "Aiko", "Bilal", "Bilal", "Bilal"],
+        "year": [2022, 2023, 2024, 2022, 2023, 2024],
+        "happiness": [7, 8, 8, 6, 7, 9],
+    }
+)
 
 wide = long.pivot(index="person", columns="year", values="happiness")
 print(wide)
@@ -139,12 +143,14 @@ A common rhythm:
   adapter="python"
   starterCode={`import pandas as pd
 
-sales = pd.DataFrame({
-    "store":    ["A","B","C"],
-    "jan_2024": [100, 150,  90],
-    "feb_2024": [120, 130, 110],
-    "mar_2024": [140, 145, 120],
-})
+sales = pd.DataFrame(
+    {
+        "store": ["A", "B", "C"],
+        "jan_2024": [100, 150, 90],
+        "feb_2024": [120, 130, 110],
+        "mar_2024": [140, 145, 120],
+    }
+)
 
 # Melt month columns into rows
 long = sales.melt(id_vars="store", var_name="month", value_name="sales")
@@ -154,7 +160,7 @@ print()
 # Now month is a string. Pull it apart:
 parsed = long["month"].str.split("_", expand=True)
 long["month_name"] = parsed[0]
-long["year"]       = parsed[1].astype(int)
+long["year"] = parsed[1].astype(int)
 print(long)
 `}
 />
@@ -182,7 +188,7 @@ temps = pd.DataFrame({
     "feb":  [6, 21, 0],
     "mar":  [10, 26, 7],
 })`}
-  starterCode={`long = None   # TODO
+  starterCode={`long = None  # TODO
 
 print(long)
 `}

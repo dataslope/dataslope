@@ -24,8 +24,10 @@ class Program
 `}
   solutionCode={`using System;
 
-class Program {
-    static void Main() {
+class Program
+{
+    static void Main()
+    {
         Console.WriteLine("Hello, C#!");
     }
 }
@@ -57,8 +59,10 @@ class Program
 `}
   solutionCode={`using System;
 
-class Program {
-    static void Main() {
+class Program
+{
+    static void Main()
+    {
         Console.WriteLine("Hello, C#!");
     }
 }
@@ -94,10 +98,14 @@ class Program
 `}
   solutionCode={`using System;
 
-class Program {
-    static void Main() {
+class Program
+{
+    static void Main()
+    {
+        int[] nums = { 1, 2, 3, 4, 5 };
         int sum = 0;
-        for (int i = 1; i <= 10; i++) sum += i * i;
+        foreach (int n in nums)
+            sum += n * n;
         Console.WriteLine(sum);
     }
 }
@@ -131,10 +139,14 @@ class Program
 `}
   solutionCode={`using System;
 
-class Program {
-    static void Main() {
+class Program
+{
+    static void Main()
+    {
+        int[] nums = { 1, 2, 3, 4, 5 };
         int sum = 0;
-        for (int i = 1; i <= 10; i++) sum += i * i;
+        foreach (int n in nums)
+            sum += n * n;
         Console.WriteLine(sum);
     }
 }
@@ -184,17 +196,25 @@ class Program
 `}
   solutionCode={`using System;
 
-class Point {
+class Point
+{
     public double X, Y;
-    public Point(double x, double y) { X = x; Y = y; }
-    public double DistanceTo(Point other) {
+    public Point(double x, double y)
+    {
+        X = x;
+        Y = y;
+    }
+    public double DistanceTo(Point other)
+    {
         double dx = X - other.X, dy = Y - other.Y;
         return Math.Sqrt(dx * dx + dy * dy);
     }
 }
 
-class Program {
-    static void Main() {
+class Program
+{
+    static void Main()
+    {
         var a = new Point(0, 0);
         var b = new Point(3, 4);
         Console.WriteLine(a.DistanceTo(b));
@@ -244,17 +264,25 @@ class Program
 `}
   solutionCode={`using System;
 
-class Point {
+class Point
+{
     public double X, Y;
-    public Point(double x, double y) { X = x; Y = y; }
-    public double DistanceTo(Point other) {
+    public Point(double x, double y)
+    {
+        X = x;
+        Y = y;
+    }
+    public double DistanceTo(Point other)
+    {
         double dx = X - other.X, dy = Y - other.Y;
         return Math.Sqrt(dx * dx + dy * dy);
     }
 }
 
-class Program {
-    static void Main() {
+class Program
+{
+    static void Main()
+    {
         var a = new Point(0, 0);
         var b = new Point(3, 4);
         Console.WriteLine(a.DistanceTo(b));

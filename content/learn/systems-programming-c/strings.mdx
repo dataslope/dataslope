@@ -24,14 +24,14 @@ The character `'\0'` is the byte `0`, *not* the digit `'0'` (which is
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    char s[6] = {'H', 'e', 'l', 'l', 'o', '\\0'};
-    printf("%s\\n", s);
+  char s[6] = {'H', 'e', 'l', 'l', 'o', '\\0'};
+  printf("%s\\n", s);
 
-    // Show the bytes including the terminator.
-    for (int i = 0; i < 6; i++) {
-        printf("  s[%d] = %d ('%c')\\n", i, s[i], s[i] ? s[i] : ' ');
-    }
-    return 0;
+  // Show the bytes including the terminator.
+  for (int i = 0; i < 6; i++) {
+    printf("  s[%d] = %d ('%c')\\n", i, s[i], s[i] ? s[i] : ' ');
+  }
+  return 0;
 }
 `}
 />
@@ -64,15 +64,15 @@ when you need to modify the contents.
   starterCode={`#include <stdio.h>
 
 int main(void) {
-    char mutable_copy[] = "hi";      // copy of "hi" plus '\\0'
-    const char *literal = "hi";       // pointer to read-only literal
+  char mutable_copy[] = "hi"; // copy of "hi" plus '\\0'
+  const char *literal = "hi"; // pointer to read-only literal
 
-    mutable_copy[0] = 'H';             // ok
-    printf("%s\\n", mutable_copy);
+  mutable_copy[0] = 'H'; // ok
+  printf("%s\\n", mutable_copy);
 
-    // literal[0] = 'H';               // would be undefined behavior
-    printf("%s\\n", literal);
-    return 0;
+  // literal[0] = 'H';               // would be undefined behavior
+  printf("%s\\n", literal);
+  return 0;
 }
 `}
 />
@@ -102,21 +102,21 @@ how big `dst` is. You are responsible for that.
 #include <string.h>
 
 int main(void) {
-    char hello[16] = "Hello";
-    printf("len = %zu\\n", strlen(hello));
+  char hello[16] = "Hello";
+  printf("len = %zu\\n", strlen(hello));
 
-    strcat(hello, ", world!");
-    printf("%s\\n", hello);
+  strcat(hello, ", world!");
+  printf("%s\\n", hello);
 
-    if (strstr(hello, "world") != NULL) {
-        printf("found 'world'\\n");
-    }
+  if (strstr(hello, "world") != NULL) {
+    printf("found 'world'\\n");
+  }
 
-    char copy[16];
-    strcpy(copy, hello);
-    printf("copy: %s\\n", copy);
+  char copy[16];
+  strcpy(copy, hello);
+  printf("copy: %s\\n", copy);
 
-    return 0;
+  return 0;
 }
 `}
 />
@@ -140,19 +140,19 @@ That second case is the bug factory. Many codebases now use
 #include <string.h>
 
 int main(void) {
-    char buf[5];
+  char buf[5];
 
-    // Pretend buf has trash so we can see if strncpy terminates.
-    memset(buf, 'X', sizeof buf);
-    strncpy(buf, "hello!", 5);   // 6 chars + '\\0' would not fit
-    // buf now contains 'h','e','l','l','o' — no '\\0'!
+  // Pretend buf has trash so we can see if strncpy terminates.
+  memset(buf, 'X', sizeof buf);
+  strncpy(buf, "hello!", 5); // 6 chars + '\\0' would not fit
+  // buf now contains 'h','e','l','l','o' — no '\\0'!
 
-    // The safer pattern: force termination.
-    char safe[5];
-    memset(safe, 'X', sizeof safe);
-    snprintf(safe, sizeof safe, "%s", "hello!");
-    printf("safe = %s (len %zu)\\n", safe, strlen(safe));
-    return 0;
+  // The safer pattern: force termination.
+  char safe[5];
+  memset(safe, 'X', sizeof safe);
+  snprintf(safe, sizeof safe, "%s", "hello!");
+  printf("safe = %s (len %zu)\\n", safe, strlen(safe));
+  return 0;
 }
 `}
 />
@@ -164,21 +164,21 @@ null-termination.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
-#include <stddef.h>
+  starterCode={`#include <stddef.h>
+#include <stdio.h>
 
 size_t my_strlen(const char *s) {
-    size_t n = 0;
-    while (s[n] != '\\0') {
-        n++;
-    }
-    return n;
+  size_t n = 0;
+  while (s[n] != '\\0') {
+    n++;
+  }
+  return n;
 }
 
 int main(void) {
-    printf("%zu\\n", my_strlen("Hello, systems!"));
-    printf("%zu\\n", my_strlen(""));
-    return 0;
+  printf("%zu\\n", my_strlen("Hello, systems!"));
+  printf("%zu\\n", my_strlen(""));
+  return 0;
 }
 `}
 />
@@ -187,18 +187,19 @@ The idiomatic version uses a moving pointer:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
-#include <stddef.h>
+  starterCode={`#include <stddef.h>
+#include <stdio.h>
 
 size_t my_strlen(const char *s) {
-    const char *p = s;
-    while (*p) p++;
-    return (size_t)(p - s);
+  const char *p = s;
+  while (*p)
+    p++;
+  return (size_t)(p - s);
 }
 
 int main(void) {
-    printf("%zu\\n", my_strlen("Hello, systems!"));
-    return 0;
+  printf("%zu\\n", my_strlen("Hello, systems!"));
+  return 0;
 }
 `}
 />
@@ -212,27 +213,29 @@ buffer size.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  starterCode={`#include <ctype.h>
 #include <stddef.h>
-#include <ctype.h>
+#include <stdio.h>
 
 // Uppercases up to dst_cap-1 chars of src into dst, always null-terminates.
-// Returns the number of bytes written (excluding the terminator), or 0 on bad inputs.
+// Returns the number of bytes written (excluding the terminator), or 0 on bad
+// inputs.
 size_t to_upper_safe(char *dst, size_t dst_cap, const char *src) {
-    if (dst == NULL || dst_cap == 0 || src == NULL) return 0;
-    size_t i = 0;
-    for (; src[i] != '\\0' && i + 1 < dst_cap; i++) {
-        dst[i] = (char)toupper((unsigned char)src[i]);
-    }
-    dst[i] = '\\0';
-    return i;
+  if (dst == NULL || dst_cap == 0 || src == NULL)
+    return 0;
+  size_t i = 0;
+  for (; src[i] != '\\0' && i + 1 < dst_cap; i++) {
+    dst[i] = (char)toupper((unsigned char)src[i]);
+  }
+  dst[i] = '\\0';
+  return i;
 }
 
 int main(void) {
-    char out[32];
-    size_t n = to_upper_safe(out, sizeof out, "Hello, world!");
-    printf("(%zu) %s\\n", n, out);
-    return 0;
+  char out[32];
+  size_t n = to_upper_safe(out, sizeof out, "Hello, world!");
+  printf("(%zu) %s\\n", n, out);
+  return 0;
 }
 `}
 />
@@ -250,41 +253,48 @@ plain `char` is signed on some platforms.
   starterCode={`#include <stdio.h>
 
 int my_strcmp(const char *a, const char *b) {
-    // your code here
-    return 0;
+  // your code here
+  return 0;
 }
 
 static const char *sign(int x) {
-    if (x < 0) return "<";
-    if (x > 0) return ">";
-    return "=";
+  if (x < 0)
+    return "<";
+  if (x > 0)
+    return ">";
+  return "=";
 }
 
 int main(void) {
-    printf("%s\\n", sign(my_strcmp("apple", "banana")));
-    printf("%s\\n", sign(my_strcmp("hello", "hello")));
-    printf("%s\\n", sign(my_strcmp("zebra", "apple")));
-    return 0;
+  printf("%s\\n", sign(my_strcmp("apple", "banana")));
+  printf("%s\\n", sign(my_strcmp("hello", "hello")));
+  printf("%s\\n", sign(my_strcmp("zebra", "apple")));
+  return 0;
 }
 `}
   solutionCode={`#include <stdio.h>
 
 int my_strcmp(const char *a, const char *b) {
-    while (*a && *a == *b) { a++; b++; }
-    return (unsigned char)*a - (unsigned char)*b;
+  while (*a && *a == *b) {
+    a++;
+    b++;
+  }
+  return (unsigned char)*a - (unsigned char)*b;
 }
 
 static const char *sign(int x) {
-    if (x < 0) return "<";
-    if (x > 0) return ">";
-    return "=";
+  if (x < 0)
+    return "<";
+  if (x > 0)
+    return ">";
+  return "=";
 }
 
 int main(void) {
-    printf("%s\\n", sign(my_strcmp("apple", "banana")));
-    printf("%s\\n", sign(my_strcmp("hello", "hello")));
-    printf("%s\\n", sign(my_strcmp("zebra", "apple")));
-    return 0;
+  printf("%s\\n", sign(my_strcmp("apple", "banana")));
+  printf("%s\\n", sign(my_strcmp("hello", "hello")));
+  printf("%s\\n", sign(my_strcmp("zebra", "apple")));
+  return 0;
 }
 `}
   tests={[
@@ -306,35 +316,40 @@ int main(void) {
 #include <string.h>
 
 void reverse_str(char *s) {
-    // your code here
+  // your code here
 }
 
 int main(void) {
-    char s[] = "systems";
-    reverse_str(s);
-    printf("%s\\n", s);
-    return 0;
+  char s[] = "systems";
+  reverse_str(s);
+  printf("%s\\n", s);
+  return 0;
 }
 `}
   solutionCode={`#include <stdio.h>
 #include <string.h>
 
 void reverse_str(char *s) {
-    if (s == NULL) return;
-    size_t n = strlen(s);
-    if (n < 2) return;
-    size_t lo = 0, hi = n - 1;
-    while (lo < hi) {
-        char t = s[lo]; s[lo] = s[hi]; s[hi] = t;
-        lo++; hi--;
-    }
+  if (s == NULL)
+    return;
+  size_t n = strlen(s);
+  if (n < 2)
+    return;
+  size_t lo = 0, hi = n - 1;
+  while (lo < hi) {
+    char t = s[lo];
+    s[lo] = s[hi];
+    s[hi] = t;
+    lo++;
+    hi--;
+  }
 }
 
 int main(void) {
-    char s[] = "systems";
-    reverse_str(s);
-    printf("%s\\n", s);
-    return 0;
+  char s[] = "systems";
+  reverse_str(s);
+  printf("%s\\n", s);
+  return 0;
 }
 `}
   tests={[

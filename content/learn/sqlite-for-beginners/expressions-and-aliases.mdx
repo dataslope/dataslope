@@ -41,7 +41,8 @@ INSERT INTO sales (item, category, price, quantity) VALUES
   price,
   quantity,
   price * quantity AS line_total
-FROM sales;`}
+FROM
+  sales;`}
 />
 
 `line_total` is not stored in the table. SQLite calculates it for the
@@ -77,7 +78,8 @@ INSERT INTO sales (item, category, price, quantity) VALUES
   item,
   price,
   ROUND(price * 1.08, 2) AS price_with_tax
-FROM sales;`}
+FROM
+  sales;`}
 />
 
 `ROUND(value, 2)` rounds to two decimal places. It is handy for money
@@ -119,7 +121,8 @@ INSERT INTO sales (item, category, price, quantity) VALUES
   item,
   price * quantity,
   price * quantity AS line_total
-FROM sales;`}
+FROM
+  sales;`}
 />
 
 The two computed values are the same. The aliased one is easier to read.
@@ -154,7 +157,8 @@ INSERT INTO sales (item, category, price, quantity) VALUES
   starterCode={`SELECT
   item,
   category || ': ' || item AS shelf_label
-FROM sales;`}
+FROM
+  sales;`}
 />
 
 The expression joins the category, a colon and space, and the item name.
@@ -192,7 +196,8 @@ INSERT INTO sales (item, category, price, quantity) VALUES
   UPPER(item) AS item_upper,
   LOWER(category) AS category_lower,
   LENGTH(item) AS character_count
-FROM sales;`}
+FROM
+  sales;`}
 />
 
 <SqlCodeBlock
@@ -213,7 +218,8 @@ INSERT INTO sales (item, category, price, quantity) VALUES
   starterCode={`SELECT
   item,
   substr(item, 1, 4) AS first_four_characters
-FROM sales;`}
+FROM
+  sales;`}
 />
 
 SQLite's `substr` starts counting at 1. So `substr(item, 1, 4)` returns
@@ -241,9 +247,12 @@ INSERT INTO sales (item, category, price, quantity) VALUES
   starterCode={`SELECT
   item,
   price * quantity AS line_total
-FROM sales
-WHERE price * quantity > 15
-ORDER BY price * quantity DESC;`}
+FROM
+  sales
+WHERE
+  price * quantity > 15
+ORDER BY
+  price * quantity DESC;`}
 />
 
 The expression `price * quantity` is calculated for each row. SQLite can

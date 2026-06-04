@@ -18,12 +18,14 @@ mask is `True`.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
-    "dept":   ["Eng","Sales","Eng","Ops","Eng"],
-    "salary": [120, 95, 140, 80, 128],
-    "tenure": [3, 6, 7, 2, 4],
-})
+df = pd.DataFrame(
+    {
+        "name": ["Aiko", "Bilal", "Chen", "Diego", "Eve"],
+        "dept": ["Eng", "Sales", "Eng", "Ops", "Eng"],
+        "salary": [120, 95, 140, 80, 128],
+        "tenure": [3, 6, 7, 2, 4],
+    }
+)
 
 mask = df["salary"] > 100
 print("Mask:")
@@ -114,7 +116,7 @@ df = pd.DataFrame({
     "salary": [120, 95, 140, 80, 128],
 })`}
   starterCode={`# Cleaner than chaining many "or" clauses
-print(df[df["dept"].isin(["Eng","Sales"])])
+print(df[df["dept"].isin(["Eng", "Sales"])])
 `}
 />
 
@@ -196,14 +198,14 @@ df = pd.read_csv(
 
 # Recent hires (less than 3 years) in Sales who have left
 mask = (
-    (df["YearsAtCompany"] < 3) &
-    (df["Department"] == "Sales") &
-    (df["Attrition"] == "Yes")
+    (df["YearsAtCompany"] < 3)
+    & (df["Department"] == "Sales")
+    & (df["Attrition"] == "Yes")
 )
 
 leavers = df[mask]
 print(f"{len(leavers)} early-tenure Sales leavers")
-print(leavers[["Age","YearsAtCompany","MonthlyIncome","JobRole"]].head())
+print(leavers[["Age", "YearsAtCompany", "MonthlyIncome", "JobRole"]].head())
 `}
 />
 
@@ -220,11 +222,13 @@ column on just that subset. Use `.loc` for the assignment:
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
-    "dept":   ["Eng","Sales","Eng","Ops","Eng"],
-    "salary": [120, 95, 140, 80, 128],
-})
+df = pd.DataFrame(
+    {
+        "name": ["Aiko", "Bilal", "Chen", "Diego", "Eve"],
+        "dept": ["Eng", "Sales", "Eng", "Ops", "Eng"],
+        "salary": [120, 95, 140, 80, 128],
+    }
+)
 
 # Flag high-earning engineers
 df["flag"] = ""
@@ -255,7 +259,7 @@ Keep all columns.`}
 URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
 df = pd.read_csv(URL)
 
-young_low_pay = None    # TODO
+young_low_pay = None  # TODO
 
 print(len(young_low_pay) if young_low_pay is not None else "still None")
 `}
@@ -265,9 +269,7 @@ URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv
 df = pd.read_csv(URL)
 
 young_low_pay = df[
-    (df["Age"] < 30) &
-    (df["MonthlyIncome"] < 3000) &
-    (df["Attrition"] == "No")
+    (df["Age"] < 30) & (df["MonthlyIncome"] < 3000) & (df["Attrition"] == "No")
 ]
 
 print(len(young_low_pay))

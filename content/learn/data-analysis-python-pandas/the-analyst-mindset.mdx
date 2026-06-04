@@ -64,10 +64,12 @@ would have made the eventual conclusion wrong.
   starterCode={`import pandas as pd
 
 # A small "orders" table — a few suspicious values hidden in there
-orders = pd.DataFrame({
-    "order_id": range(1, 11),
-    "amount":   [100, 250, 80, -50, 9999999, 120, 0, 60, 80, 110],
-})
+orders = pd.DataFrame(
+    {
+        "order_id": range(1, 11),
+        "amount": [100, 250, 80, -50, 9999999, 120, 0, 60, 80, 110],
+    }
+)
 
 # Naive answer:
 print("Naive total revenue:", orders["amount"].sum())
@@ -186,11 +188,13 @@ just take the mean. Look first.
   adapter="python"
   starterCode={`import pandas as pd
 
-satisfaction = pd.DataFrame({
-    "customer_id": range(1, 16),
-    "score":       [5, 4, 5, 5, 1, 5, 4, 5, 5, 1, 5, 5, 4, 5, 1],
-    "submitted_via": ["email"]*12 + ["phone"]*3,
-})
+satisfaction = pd.DataFrame(
+    {
+        "customer_id": range(1, 16),
+        "score": [5, 4, 5, 5, 1, 5, 4, 5, 5, 1, 5, 5, 4, 5, 1],
+        "submitted_via": ["email"] * 12 + ["phone"] * 3,
+    }
+)
 
 print("Naive mean score:", satisfaction["score"].mean().round(2))
 print()

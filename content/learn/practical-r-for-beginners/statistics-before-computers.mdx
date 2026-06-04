@@ -260,15 +260,15 @@ the true mean is `40`.
 
 You can use base R only — no packages needed.`}
   initCode={`yield <- c(42, 39, 45, 41, 44, 40, 43, 38, 46, 42)`}
-  starterCode={`m      <- NA
-s      <- NA
+  starterCode={`m <- NA
+s <- NA
 t_stat <- NA
 
 cat("mean:", m, " sd:", s, " t:", t_stat, "\\n")
 `}
-  solutionCode={`n      <- length(yield)
-m      <- mean(yield)
-s      <- sd(yield)
+  solutionCode={`n <- length(yield)
+m <- mean(yield)
+s <- sd(yield)
 t_stat <- (m - 40) / (s / sqrt(n))
 
 cat("mean:", m, " sd:", s, " t:", t_stat, "\\n")

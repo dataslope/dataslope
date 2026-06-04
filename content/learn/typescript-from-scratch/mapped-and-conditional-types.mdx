@@ -264,7 +264,9 @@ You can use `infer` in multiple positions:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type FirstArg<T> = T extends (first: infer F, ...rest: any[]) => any ? F : never;
+  starterCode={`type FirstArg<T> = T extends (first: infer F, ...rest: any[]) => any
+  ? F
+  : never;
 
 function add(a: number, b: number): number {
   return a + b;

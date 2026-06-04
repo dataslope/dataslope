@@ -27,7 +27,9 @@ The word "class" comes from **classification** — the practice of grouping thin
   adapter="python"
   starterCode={`class Dog:
     """A very simple dog."""
+
     pass
+
 
 d = Dog()
 print(d)
@@ -48,6 +50,7 @@ print(isinstance(d, Dog))
     def __init__(self, name, age):
         self.name = name
         self.age = age
+
 
 d = Dog("Rex", 4)
 print(d.name)
@@ -83,17 +86,18 @@ An **instance attribute** belongs to a single object. A **class attribute** is s
 <CodeBlock
   adapter="python"
   starterCode={`class Dog:
-    species = "Canis familiaris"   # class attribute
+    species = "Canis familiaris"  # class attribute
 
     def __init__(self, name):
-        self.name = name           # instance attribute
+        self.name = name  # instance attribute
+
 
 a = Dog("Rex")
 b = Dog("Luna")
-print(a.species, b.species)        # both see the same class attribute
+print(a.species, b.species)  # both see the same class attribute
 
 Dog.species = "Canis lupus familiaris"
-print(a.species, b.species)        # change is reflected in all instances
+print(a.species, b.species)  # change is reflected in all instances
 `}
 />
 
@@ -138,6 +142,7 @@ A **method** is a function defined inside a class. The first parameter is always
     def bark(self):
         return f"{self.name} says woof!"
 
+
 d = Dog("Rex")
 print(d.bark())
 `}
@@ -154,6 +159,7 @@ When you write `d.bark()`, Python translates it to `Dog.bark(d)` — the instanc
     def increment(self, step=1):
         self.value += step
         return self.value
+
 
 c = Counter()
 c.increment()
@@ -183,6 +189,7 @@ Sometimes you want a method that operates on the **class** itself, or a utility 
         """Utility function."""
         return celsius <= 0
 
+
 t = Temperature.from_fahrenheit(32)
 print(t.celsius)
 print(Temperature.is_freezing(-1))
@@ -208,14 +215,15 @@ Use `@property` to define a method that looks like an attribute.
 
     @property
     def area(self):
-        return 3.14159 * self.radius ** 2
+        return 3.14159 * self.radius**2
 
     @property
     def diameter(self):
         return self.radius * 2
 
+
 c = Circle(5)
-print(c.area)       # looks like an attribute, runs a method
+print(c.area)  # looks like an attribute, runs a method
 print(c.diameter)
 `}
 />
@@ -251,19 +259,22 @@ Methods with double underscores ("dunder") define how instances interact with Py
         return f"{self.amount:.2f} {self.currency}"
 
     def __eq__(self, other):
-        return (isinstance(other, Money)
-                and self.amount == other.amount
-                and self.currency == other.currency)
+        return (
+            isinstance(other, Money)
+            and self.amount == other.amount
+            and self.currency == other.currency
+        )
 
     def __add__(self, other):
         if self.currency != other.currency:
             raise ValueError("currency mismatch")
         return Money(self.amount + other.amount, self.currency)
 
+
 a = Money(10)
 b = Money(2.5)
-print(a)            # uses __str__
-print(repr(a))      # uses __repr__
+print(a)  # uses __str__
+print(repr(a))  # uses __repr__
 print(a == Money(10))
 print(a + b)
 `}
@@ -288,15 +299,17 @@ Writing `__init__`, `__repr__`, and `__eq__` for every data-holding class is ted
   adapter="python"
   starterCode={`from dataclasses import dataclass
 
+
 @dataclass
 class Point:
     x: float
     y: float
 
+
 p = Point(3, 4)
 q = Point(3, 4)
-print(p)                # auto __repr__
-print(p == q)           # auto __eq__
+print(p)  # auto __repr__
+print(p == q)  # auto __eq__
 print(p.x, p.y)
 `}
 />
@@ -311,10 +324,12 @@ print(p.x, p.y)
   adapter="python"
   starterCode={`from dataclasses import dataclass
 
+
 @dataclass(frozen=True)
 class Point:
     x: float
     y: float
+
 
 p = Point(3, 4)
 # p.x = 5  # would raise FrozenInstanceError

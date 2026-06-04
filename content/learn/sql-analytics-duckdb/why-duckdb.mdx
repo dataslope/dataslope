@@ -111,12 +111,15 @@ FROM range(1, 1001) t(i);`}
 SELECT
   region,
   product,
-  COUNT(*)            AS orders,
-  SUM(amount)         AS revenue
-FROM sales
+  COUNT(*) AS orders,
+  SUM(amount) AS revenue
+FROM
+  sales
 GROUP BY ALL
-ORDER BY revenue DESC
-LIMIT 5;`}
+ORDER BY
+  revenue DESC
+LIMIT
+  5;`}
 />
 
 Notice `GROUP BY ALL` — you did not have to restate `region, product`. In

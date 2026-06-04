@@ -158,13 +158,13 @@ the helper:
   starterCode={`data(mtcars)
 
 # Sort by mpg ascending
-head(mtcars[order(mtcars$mpg), c("mpg","cyl","wt")])
+head(mtcars[order(mtcars$mpg), c("mpg", "cyl", "wt")])
 
 # Descending — wrap in -
-head(mtcars[order(-mtcars$mpg), c("mpg","cyl","wt")])
+head(mtcars[order(-mtcars$mpg), c("mpg", "cyl", "wt")])
 
 # By two columns: first cyl ascending, then mpg descending within each
-head(mtcars[order(mtcars$cyl, -mtcars$mpg), c("mpg","cyl","wt")])
+head(mtcars[order(mtcars$cyl, -mtcars$mpg), c("mpg", "cyl", "wt")])
 `}
 />
 
@@ -215,15 +215,17 @@ only the rows where `wt > 4` and `mpg < 18`, and only the columns
   instructions={`Use base R subsetting to filter \`mtcars\` to cars with \`wt > 4\` and \`mpg < 18\`, keeping only the \`mpg\`, \`cyl\`, and \`wt\` columns. Assign the result to \`heavy_inefficient\`.`}
   starterCode={`data(mtcars)
 
-heavy_inefficient <- NULL  # replace with a subset of mtcars
+heavy_inefficient <- NULL # replace with a subset of mtcars
 
 print(heavy_inefficient)
 cat("Number of cars:", nrow(heavy_inefficient), "\\n")
 `}
   solutionCode={`data(mtcars)
 
-heavy_inefficient <- mtcars[mtcars$wt > 4 & mtcars$mpg < 18,
-                            c("mpg", "cyl", "wt")]
+heavy_inefficient <- mtcars[
+  mtcars$wt > 4 & mtcars$mpg < 18,
+  c("mpg", "cyl", "wt")
+]
 print(heavy_inefficient)
 cat("Number of cars:", nrow(heavy_inefficient), "\\n")
 `}

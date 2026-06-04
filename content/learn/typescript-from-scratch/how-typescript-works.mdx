@@ -22,13 +22,13 @@ let x = 10;
 x = "hello"; // JavaScript allows this
 console.log(x);
 
-// TypeScript will accept the above (x has inferred type 'number', 
+// TypeScript will accept the above (x has inferred type 'number',
 // but we reassign to string, which would be an error in strict mode)
 // Let's demonstrate explicit types:
 
 let y: number = 10;
 // y = "hello";  // Uncommenting this line causes a compile error:
-                 // Type 'string' is not assignable to type 'number'.
+// Type 'string' is not assignable to type 'number'.
 
 console.log("y is", y);
 
@@ -212,7 +212,7 @@ One of TypeScript's most powerful features is **control flow analysis** — the 
     // TypeScript narrows the type to 'number' here
     console.log("Number squared:", value * value);
   }
-  
+
   // Outside the if/else, value is back to 'string | number'
 }
 

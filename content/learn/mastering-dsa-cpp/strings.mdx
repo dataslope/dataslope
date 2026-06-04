@@ -15,12 +15,12 @@ A string owns its characters and tracks its length. Like `std::vector`, indexing
 #include <string>
 
 int main() {
-    std::string language = "C++";
-    std::string topic("strings");
-    std::cout << language << " " << topic << "\\n";
-    std::cout << "length: " << topic.length() << "\\n";
-    std::cout << "first char: " << topic[0] << "\\n";
-    return 0;
+  std::string language = "C++";
+  std::string topic("strings");
+  std::cout << language << " " << topic << "\\n";
+  std::cout << "length: " << topic.length() << "\\n";
+  std::cout << "first char: " << topic[0] << "\\n";
+  return 0;
 }
 `}
 />
@@ -37,19 +37,19 @@ Characters are values of type `char`. You can iterate by index when you need pos
 #include <string>
 
 int main() {
-    std::string word = "algorithm";
-    for (std::size_t i = 0; i < word.size(); ++i) {
-        std::cout << i << ":" << word[i] << "\\n";
-    }
+  std::string word = "algorithm";
+  for (std::size_t i = 0; i < word.size(); ++i) {
+    std::cout << i << ":" << word[i] << "\\n";
+  }
 
-    int vowels = 0;
-    for (char c : word) {
-        if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u') {
-            ++vowels;
-        }
+  int vowels = 0;
+  for (char c : word) {
+    if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u') {
+      ++vowels;
     }
-    std::cout << "vowels: " << vowels << "\\n";
-    return 0;
+  }
+  std::cout << "vowels: " << vowels << "\\n";
+  return 0;
 }
 `}
 />
@@ -64,20 +64,20 @@ int main() {
 #include <string>
 
 int main() {
-    std::string text = "data structures and algorithms";
-    std::size_t pos = text.find("structures");
-    if (pos != std::string::npos) {
-        std::cout << "found at " << pos << "\\n";
-    }
+  std::string text = "data structures and algorithms";
+  std::size_t pos = text.find("structures");
+  if (pos != std::string::npos) {
+    std::cout << "found at " << pos << "\\n";
+  }
 
-    std::string first = text.substr(0, 4);
-    std::string changed = text;
-    changed.replace(5, 10, "types");
+  std::string first = text.substr(0, 4);
+  std::string changed = text;
+  changed.replace(5, 10, "types");
 
-    std::cout << first << "\\n";
-    std::cout << changed << "\\n";
-    std::cout << text.compare(changed) << "\\n";
-    return 0;
+  std::cout << first << "\\n";
+  std::cout << changed << "\\n";
+  std::cout << text.compare(changed) << "\\n";
+  return 0;
 }
 `}
 />
@@ -93,14 +93,15 @@ int main() {
 #include <vector>
 
 int main() {
-    std::vector<std::string> parts = {"binary", "search", "tree"};
-    std::string label;
-    for (const std::string& part : parts) {
-        if (!label.empty()) label += "-";
-        label += part;
-    }
-    std::cout << label << "\\n";
-    return 0;
+  std::vector<std::string> parts = {"binary", "search", "tree"};
+  std::string label;
+  for (const std::string &part : parts) {
+    if (!label.empty())
+      label += "-";
+    label += part;
+  }
+  std::cout << label << "\\n";
+  return 0;
 }
 `}
 />
@@ -116,13 +117,13 @@ A C-string is a null-terminated character array usually represented as `const ch
 #include <string>
 
 int main() {
-    const char* raw = "hello";
-    std::string owned = raw;
-    const char* back_to_c = owned.c_str();
+  const char *raw = "hello";
+  std::string owned = raw;
+  const char *back_to_c = owned.c_str();
 
-    std::cout << owned << "\\n";
-    std::cout << std::strlen(back_to_c) << "\\n";
-    return 0;
+  std::cout << owned << "\\n";
+  std::cout << std::strlen(back_to_c) << "\\n";
+  return 0;
 }
 `}
 />
@@ -142,14 +143,15 @@ A pointer returned by `.c_str()` is only valid while the string object is alive 
 #include <string_view>
 
 bool starts_with(std::string_view text, std::string_view prefix) {
-    return text.size() >= prefix.size() && text.substr(0, prefix.size()) == prefix;
+  return text.size() >= prefix.size() &&
+         text.substr(0, prefix.size()) == prefix;
 }
 
 int main() {
-    std::string name = "queue";
-    std::cout << starts_with(name, "qu") << "\\n";
-    std::cout << starts_with("stack", "qu") << "\\n";
-    return 0;
+  std::string name = "queue";
+  std::cout << starts_with(name, "qu") << "\\n";
+  std::cout << starts_with("stack", "qu") << "\\n";
+  return 0;
 }
 `}
 />
@@ -171,26 +173,26 @@ A simple split helper repeatedly calls `find` and `substr`. This is a useful pat
 #include <string>
 #include <vector>
 
-std::vector<std::string> split(const std::string& text, char delimiter) {
-    std::vector<std::string> parts;
-    std::size_t start = 0;
-    while (true) {
-        std::size_t pos = text.find(delimiter, start);
-        if (pos == std::string::npos) {
-            parts.push_back(text.substr(start));
-            break;
-        }
-        parts.push_back(text.substr(start, pos - start));
-        start = pos + 1;
+std::vector<std::string> split(const std::string &text, char delimiter) {
+  std::vector<std::string> parts;
+  std::size_t start = 0;
+  while (true) {
+    std::size_t pos = text.find(delimiter, start);
+    if (pos == std::string::npos) {
+      parts.push_back(text.substr(start));
+      break;
     }
-    return parts;
+    parts.push_back(text.substr(start, pos - start));
+    start = pos + 1;
+  }
+  return parts;
 }
 
 int main() {
-    for (const std::string& part : split("red,green,blue", ',')) {
-        std::cout << part << "\\n";
-    }
-    return 0;
+  for (const std::string &part : split("red,green,blue", ',')) {
+    std::cout << part << "\\n";
+  }
+  return 0;
 }
 `}
 />
@@ -204,21 +206,22 @@ A two-pointer scan can compare the first and last characters, then move inward.
   starterCode={`#include <iostream>
 #include <string>
 
-bool isPalindrome(const std::string& s) {
-    std::size_t left = 0;
-    std::size_t right = s.empty() ? 0 : s.size() - 1;
-    while (left < right) {
-        if (s[left] != s[right]) return false;
-        ++left;
-        --right;
-    }
-    return true;
+bool isPalindrome(const std::string &s) {
+  std::size_t left = 0;
+  std::size_t right = s.empty() ? 0 : s.size() - 1;
+  while (left < right) {
+    if (s[left] != s[right])
+      return false;
+    ++left;
+    --right;
+  }
+  return true;
 }
 
 int main() {
-    std::string word = "level";
-    std::cout << isPalindrome(word) << "\\n";
-    return 0;
+  std::string word = "level";
+  std::cout << isPalindrome(word) << "\\n";
+  return 0;
 }
 `}
 />
@@ -236,34 +239,35 @@ Like `std::vector<char>`, `std::string` can reallocate when it grows. Prefer app
   starterCode={`#include <iostream>
 #include <string>
 
-bool isPalindrome(const std::string& s) {
-    // your code here
+bool isPalindrome(const std::string &s) {
+  // your code here
 }
 
 int main() {
-    std::string test = "racecar";
-    std::cout << (isPalindrome(test) ? "true" : "false") << "\\n";
-    return 0;
+  std::string test = "racecar";
+  std::cout << (isPalindrome(test) ? "true" : "false") << "\\n";
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 #include <string>
 
-bool isPalindrome(const std::string& s) {
-    std::size_t left = 0;
-    std::size_t right = s.empty() ? 0 : s.size() - 1;
-    while (left < right) {
-        if (s[left] != s[right]) return false;
-        ++left;
-        --right;
-    }
-    return true;
+bool isPalindrome(const std::string &s) {
+  std::size_t left = 0;
+  std::size_t right = s.empty() ? 0 : s.size() - 1;
+  while (left < right) {
+    if (s[left] != s[right])
+      return false;
+    ++left;
+    --right;
+  }
+  return true;
 }
 
 int main() {
-    std::string test = "racecar";
-    std::cout << (isPalindrome(test) ? "true" : "false") << "\\n";
-    return 0;
+  std::string test = "racecar";
+  std::cout << (isPalindrome(test) ? "true" : "false") << "\\n";
+  return 0;
 }
 `}
   tests={[{ id: "palindrome", name: "Detects a palindrome", expect: { stdoutEquals: "true" } }]}
@@ -278,33 +282,33 @@ int main() {
   starterCode={`#include <iostream>
 #include <string>
 
-int countVowels(const std::string& s) {
-    // your code here
+int countVowels(const std::string &s) {
+  // your code here
 }
 
 int main() {
-    std::string text = "data structures";
-    std::cout << countVowels(text) << "\\n";
-    return 0;
+  std::string text = "data structures";
+  std::cout << countVowels(text) << "\\n";
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 #include <string>
 
-int countVowels(const std::string& s) {
-    int count = 0;
-    for (char c : s) {
-        if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u') {
-            ++count;
-        }
+int countVowels(const std::string &s) {
+  int count = 0;
+  for (char c : s) {
+    if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u') {
+      ++count;
     }
-    return count;
+  }
+  return count;
 }
 
 int main() {
-    std::string text = "data structures";
-    std::cout << countVowels(text) << "\\n";
-    return 0;
+  std::string text = "data structures";
+  std::cout << countVowels(text) << "\\n";
+  return 0;
 }
 `}
   tests={[{ id: "vowels", name: "Counts lowercase vowels", expect: { stdoutEquals: "5" } }]}

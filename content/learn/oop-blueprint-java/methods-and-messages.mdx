@@ -46,37 +46,37 @@ implement the message in its own way.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Lamp desk = new Lamp();
-        desk.turnOn();
-        desk.setBrightness(0.8);
-        System.out.println(desk.describe());
+  public static void main(String[] args) {
+    Lamp desk = new Lamp();
+    desk.turnOn();
+    desk.setBrightness(0.8);
+    System.out.println(desk.describe());
 
-        desk.setBrightness(2.0);     // out of range — lamp clamps
-        System.out.println(desk.describe());
-    }
+    desk.setBrightness(2.0); // out of range — lamp clamps
+    System.out.println(desk.describe());
+  }
 }
 
 class Lamp {
-    private boolean on;
-    private double  brightness;     // 0.0 .. 1.0
+  private boolean on;
+  private double brightness; // 0.0 .. 1.0
 
-    public void turnOn()  { on = true;  }
-    public void turnOff() { on = false; }
+  public void turnOn() { on = true; }
+  public void turnOff() { on = false; }
 
-    public void setBrightness(double b) {
-        if (b < 0) b = 0;
-        if (b > 1) b = 1;
-        brightness = b;
-    }
+  public void setBrightness(double b) {
+    if (b < 0)
+      b = 0;
+    if (b > 1)
+      b = 1;
+    brightness = b;
+  }
 
-    public double brightness() { return brightness; }
+  public double brightness() { return brightness; }
 
-    public String describe() {
-        return on
-            ? "Lamp on at " + (int)(brightness * 100) + "%"
-            : "Lamp off";
-    }
+  public String describe() {
+    return on ? "Lamp on at " + (int)(brightness * 100) + "%" : "Lamp off";
+  }
 }
 `}
 />
@@ -105,18 +105,20 @@ overloading**.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Printer p = new Printer();
-        p.print("hello");           // matches print(String)
-        p.print(42);                 // matches print(int)
-        p.print("page", 3);          // matches print(String,int)
-    }
+  public static void main(String[] args) {
+    Printer p = new Printer();
+    p.print("hello");   // matches print(String)
+    p.print(42);        // matches print(int)
+    p.print("page", 3); // matches print(String,int)
+  }
 }
 
 class Printer {
-    public void print(String s)         { System.out.println("S: " + s); }
-    public void print(int n)            { System.out.println("N: " + n); }
-    public void print(String s, int n)  { System.out.println("P: " + s + " x " + n); }
+  public void print(String s) { System.out.println("S: " + s); }
+  public void print(int n) { System.out.println("N: " + n); }
+  public void print(String s, int n) {
+    System.out.println("P: " + s + " x " + n);
+  }
 }
 `}
 />
@@ -156,31 +158,38 @@ build complex behavior out of small, well-named parts.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Stopwatch s = new Stopwatch();
-        s.start();
-        for (long i = 0; i < 1_000_000; i++) { /* burn a little time */ }
-        s.stop();
-        System.out.println(s.summary());
+  public static void main(String[] args) {
+    Stopwatch s = new Stopwatch();
+    s.start();
+    for (long i = 0; i < 1_000_000; i++) { /* burn a little time */
     }
+    s.stop();
+    System.out.println(s.summary());
+  }
 }
 
 class Stopwatch {
-    private long startNs;
-    private long stopNs;
-    private boolean running;
+  private long startNs;
+  private long stopNs;
+  private boolean running;
 
-    public void start() { this.running = true;  this.startNs = System.nanoTime(); }
-    public void stop()  { this.stopNs  = System.nanoTime(); this.running = false; }
+  public void start() {
+    this.running = true;
+    this.startNs = System.nanoTime();
+  }
+  public void stop() {
+    this.stopNs = System.nanoTime();
+    this.running = false;
+  }
 
-    public long elapsedNs() {
-        // a private helper, but works just as well from this method
-        return stopNs - startNs;
-    }
+  public long elapsedNs() {
+    // a private helper, but works just as well from this method
+    return stopNs - startNs;
+  }
 
-    public String summary() {
-        return "Elapsed: " + this.elapsedNs() + " ns (running=" + running + ")";
-    }
+  public String summary() {
+    return "Elapsed: " + this.elapsedNs() + " ns (running=" + running + ")";
+  }
 }
 `}
 />

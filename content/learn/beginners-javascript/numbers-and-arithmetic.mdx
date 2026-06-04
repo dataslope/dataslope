@@ -23,10 +23,10 @@ same type, stored the same way. There is no distinction between
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log(typeof 7);     // "number"
-console.log(typeof 7.0);   // "number"
+  starterCode={`console.log(typeof 7); // "number"
+console.log(typeof 7.0); // "number"
 console.log(typeof -3.14); // "number"
-console.log(7 === 7.0);    // true — they are the same value.
+console.log(7 === 7.0); // true — they are the same value.
 `}
 />
 
@@ -54,12 +54,12 @@ Unary operators:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log(7 / 2);       // 3.5  — NOT 3, because there is no integer division.
-console.log(7 % 2);       // 1
-console.log(2 ** 10);     // 1024
-console.log(-5 + 8);      // 3
-console.log(+"42");       // 42  — string coerced to number
-console.log(+"hello");    // NaN — cannot be coerced
+  starterCode={`console.log(7 / 2); // 3.5  — NOT 3, because there is no integer division.
+console.log(7 % 2); // 1
+console.log(2 ** 10); // 1024
+console.log(-5 + 8); // 3
+console.log(+"42"); // 42  — string coerced to number
+console.log(+"hello"); // NaN — cannot be coerced
 `}
 />
 
@@ -71,9 +71,9 @@ intent obvious.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log(2 + 3 * 4);     // 14, not 20
-console.log((2 + 3) * 4);   // 20
-console.log(2 ** 3 ** 2);   // 512  (exponent is right-associative: 2 ** (3 ** 2))
+  starterCode={`console.log(2 + 3 * 4); // 14, not 20
+console.log((2 + 3) * 4); // 20
+console.log(2 ** (3 ** 2)); // 512  (exponent is right-associative: 2 ** (3 ** 2))
 console.log((2 ** 3) ** 2); // 64
 `}
 />
@@ -101,15 +101,22 @@ is `x = x - 1`. These are common in loops; we will see them often.
 <CodeBlock
   adapter="javascript"
   starterCode={`let n = 10;
-n += 5;   console.log(n); // 15
-n *= 2;   console.log(n); // 30
-n -= 100; console.log(n); // -70
-n /= 7;   console.log(n); // -10
+n += 5;
+console.log(n); // 15
+n *= 2;
+console.log(n); // 30
+n -= 100;
+console.log(n); // -70
+n /= 7;
+console.log(n); // -10
 
 let i = 0;
-i++; console.log(i); // 1
-i++; console.log(i); // 2
-i++; console.log(i); // 3
+i++;
+console.log(i); // 1
+i++;
+console.log(i); // 2
+i++;
+console.log(i); // 3
 `}
 />
 
@@ -127,14 +134,14 @@ encounter:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log(1 / 0);          // Infinity
-console.log(-1 / 0);         // -Infinity
-console.log(0 / 0);          // NaN
-console.log(Math.sqrt(-1));  // NaN
-console.log(Number("hello"));// NaN
+  starterCode={`console.log(1 / 0); // Infinity
+console.log(-1 / 0); // -Infinity
+console.log(0 / 0); // NaN
+console.log(Math.sqrt(-1)); // NaN
+console.log(Number("hello")); // NaN
 
 // NaN is famously NOT equal to itself:
-console.log(NaN === NaN);    // false  (!)
+console.log(NaN === NaN); // false  (!)
 console.log(Number.isNaN(NaN)); // true — the right way to test for NaN
 `}
 />
@@ -151,9 +158,9 @@ errors. The classic example:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log(0.1 + 0.2);                   // 0.30000000000000004
-console.log(0.1 + 0.2 === 0.3);           // false  (!)
-console.log(Math.abs((0.1 + 0.2) - 0.3) < 1e-9); // true  — the safe way to compare
+  starterCode={`console.log(0.1 + 0.2); // 0.30000000000000004
+console.log(0.1 + 0.2 === 0.3); // false  (!)
+console.log(Math.abs(0.1 + 0.2 - 0.3) < 1e-9); // true  — the safe way to compare
 `}
 />
 
@@ -180,25 +187,25 @@ A few built-ins you will use constantly:
 <CodeBlock
   adapter="javascript"
   starterCode={`// Rounding
-console.log(Math.round(2.4));    // 2
-console.log(Math.round(2.5));    // 3
-console.log(Math.floor(2.9));    // 2  (round down)
-console.log(Math.ceil(2.1));     // 3  (round up)
-console.log(Math.trunc(2.9));    // 2  (chop off the decimal)
-console.log(Math.trunc(-2.9));   // -2
+console.log(Math.round(2.4)); // 2
+console.log(Math.round(2.5)); // 3
+console.log(Math.floor(2.9)); // 2  (round down)
+console.log(Math.ceil(2.1)); // 3  (round up)
+console.log(Math.trunc(2.9)); // 2  (chop off the decimal)
+console.log(Math.trunc(-2.9)); // -2
 
 // Min, max, absolute value
-console.log(Math.max(3, 7, 1, 9, 4));  // 9
-console.log(Math.min(3, 7, 1, 9, 4));  // 1
-console.log(Math.abs(-42));            // 42
+console.log(Math.max(3, 7, 1, 9, 4)); // 9
+console.log(Math.min(3, 7, 1, 9, 4)); // 1
+console.log(Math.abs(-42)); // 42
 
 // Powers, roots, logs
-console.log(Math.sqrt(16));      // 4
-console.log(Math.pow(2, 10));    // 1024 — same as 2 ** 10
-console.log(Math.log2(1024));    // 10
+console.log(Math.sqrt(16)); // 4
+console.log(Math.pow(2, 10)); // 1024 — same as 2 ** 10
+console.log(Math.log2(1024)); // 10
 
 // Random in [0, 1)
-console.log(Math.random());      // e.g. 0.7283193847...
+console.log(Math.random()); // e.g. 0.7283193847...
 // Random integer in [min, max] inclusive:
 function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -206,17 +213,17 @@ function randInt(min, max) {
 console.log("d6 roll:", randInt(1, 6));
 
 // Parsing strings
-console.log(parseInt("42"));       // 42
+console.log(parseInt("42")); // 42
 console.log(parseInt("42 things")); // 42  — stops at the first non-digit
-console.log(parseFloat("3.14"));   // 3.14
-console.log(Number("3.14"));       // 3.14 — stricter than parseFloat
-console.log(Number("3.14 things"));// NaN  — strict, the whole string must parse
+console.log(parseFloat("3.14")); // 3.14
+console.log(Number("3.14")); // 3.14 — stricter than parseFloat
+console.log(Number("3.14 things")); // NaN  — strict, the whole string must parse
 
 // Formatting
 const x = 1234.5678;
-console.log(x.toFixed(2));         // "1234.57"  — note: returns a string!
-console.log(x.toString());         // "1234.5678"
-console.log(x.toLocaleString());   // e.g. "1,234.568"  (locale-dependent)
+console.log(x.toFixed(2)); // "1234.57"  — note: returns a string!
+console.log(x.toString()); // "1234.5678"
+console.log(x.toLocaleString()); // e.g. "1,234.568"  (locale-dependent)
 `}
 />
 
@@ -235,13 +242,13 @@ that, you lose precision.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log(Number.MAX_SAFE_INTEGER);          // 9007199254740991
-console.log(Number.MAX_SAFE_INTEGER + 1);      // 9007199254740992  (fine)
-console.log(Number.MAX_SAFE_INTEGER + 2);      // 9007199254740992  (!! same as +1)
+  starterCode={`console.log(Number.MAX_SAFE_INTEGER); // 9007199254740991
+console.log(Number.MAX_SAFE_INTEGER + 1); // 9007199254740992  (fine)
+console.log(Number.MAX_SAFE_INTEGER + 2); // 9007199254740992  (!! same as +1)
 
 // Beyond MAX_SAFE_INTEGER, neighbouring numbers may collide.
 // For huge integers (cryptography, very large IDs), use BigInt:
-console.log(9007199254740993n + 1n);           // 9007199254740994n
+console.log(9007199254740993n + 1n); // 9007199254740994n
 `}
 />
 
@@ -258,7 +265,10 @@ learned. Try changing the inputs and see what happens.
   adapter="javascript"
   starterCode={`function format(amount) {
   // 2 decimals + thousands separators, locale-dependent.
-  return amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return amount.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 
 function compoundInterest(principal, annualRate, years) {
@@ -267,11 +277,11 @@ function compoundInterest(principal, annualRate, years) {
 }
 
 const principal = 1000;
-const rate = 0.05;     // 5% per year
+const rate = 0.05; // 5% per year
 const years = 30;
 
 const final = compoundInterest(principal, rate, years);
-const gain  = final - principal;
+const gain = final - principal;
 
 console.log("Starting:", format(principal));
 console.log("After " + years + " years at " + (rate * 100).toFixed(1) + "%:");
@@ -301,17 +311,17 @@ function toFahrenheit(c) {
   return 0;
 }
 
-console.log(toCelsius(32));    // 0
-console.log(toCelsius(212));   // 100
-console.log(toFahrenheit(0));  // 32
-console.log(toFahrenheit(100));// 212
+console.log(toCelsius(32)); // 0
+console.log(toCelsius(212)); // 100
+console.log(toFahrenheit(0)); // 32
+console.log(toFahrenheit(100)); // 212
 `}
   solutionCode={`function toCelsius(f) {
-  return (f - 32) * 5 / 9;
+  return ((f - 32) * 5) / 9;
 }
 
 function toFahrenheit(c) {
-  return c * 9 / 5 + 32;
+  return (c * 9) / 5 + 32;
 }
 
 console.log(toCelsius(32));

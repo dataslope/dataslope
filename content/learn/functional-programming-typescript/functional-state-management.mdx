@@ -34,12 +34,17 @@ const initial: State = { count: 0 };
 // Pure: same input -> same output, no mutation
 function reducer(state: State, action: Action): State {
   switch (action.kind) {
-    case "inc":   return { count: state.count + 1 };
-    case "dec":   return { count: state.count - 1 };
-    case "add":   return { count: state.count + action.by };
-    case "reset": return initial;
+    case "inc":
+      return { count: state.count + 1 };
+    case "dec":
+      return { count: state.count - 1 };
+    case "add":
+      return { count: state.count + action.by };
+    case "reset":
+      return initial;
     default: {
-      const _e: never = action; return _e;
+      const _e: never = action;
+      return _e;
     }
   }
 }
@@ -73,15 +78,21 @@ type Action = { kind: "inc" } | { kind: "add"; by: number } | { kind: "reset" };
 const initial: State = { count: 0 };
 const reducer = (s: State, a: Action): State => {
   switch (a.kind) {
-    case "inc":   return { count: s.count + 1 };
-    case "add":   return { count: s.count + a.by };
-    case "reset": return initial;
+    case "inc":
+      return { count: s.count + 1 };
+    case "add":
+      return { count: s.count + a.by };
+    case "reset":
+      return initial;
   }
 };
 
 const history: Action[] = [
-  { kind: "inc" }, { kind: "inc" }, { kind: "add", by: 10 },
-  { kind: "reset" }, { kind: "inc" },
+  { kind: "inc" },
+  { kind: "inc" },
+  { kind: "add", by: 10 },
+  { kind: "reset" },
+  { kind: "inc" },
 ];
 
 // All intermediate states
@@ -111,9 +122,9 @@ data structure:
   starterCode={`type Doc = { readonly text: string };
 
 type Editor = {
-  readonly past:    ReadonlyArray<Doc>;
+  readonly past: ReadonlyArray<Doc>;
   readonly present: Doc;
-  readonly future:  ReadonlyArray<Doc>;
+  readonly future: ReadonlyArray<Doc>;
 };
 
 type Action =
@@ -131,31 +142,34 @@ function step(e: Editor, a: Action): Editor {
   switch (a.kind) {
     case "type":
       return {
-        past:    [...e.past, e.present],
+        past: [...e.past, e.present],
         present: { text: e.present.text + a.ch },
-        future:  [],
+        future: [],
       };
     case "undo":
       if (e.past.length === 0) return e;
       return {
-        past:    e.past.slice(0, -1),
+        past: e.past.slice(0, -1),
         present: e.past[e.past.length - 1],
-        future:  [e.present, ...e.future],
+        future: [e.present, ...e.future],
       };
     case "redo":
       if (e.future.length === 0) return e;
       return {
-        past:    [...e.past, e.present],
+        past: [...e.past, e.present],
         present: e.future[0],
-        future:  e.future.slice(1),
+        future: e.future.slice(1),
       };
   }
 }
 
 const actions: Action[] = [
-  { kind: "type", ch: "h" }, { kind: "type", ch: "i" },
-  { kind: "undo" }, { kind: "undo" },
-  { kind: "redo" }, { kind: "type", ch: "!" },
+  { kind: "type", ch: "h" },
+  { kind: "type", ch: "i" },
+  { kind: "undo" },
+  { kind: "undo" },
+  { kind: "redo" },
+  { kind: "type", ch: "!" },
 ];
 
 let state = initial;
@@ -186,25 +200,40 @@ produce a value and the next state".
   starterCode={`// State<S, A> = a function from state to [value, newState]
 type State<S, A> = (s: S) => readonly [A, S];
 
-const of  = <S, A>(a: A): State<S, A> => (s) => [a, s];
+const of =
+  <S, A>(a: A): State<S, A> =>
+  (s) => [a, s];
 
-const map = <S, A, B>(sa: State<S, A>, f: (a: A) => B): State<S, B> =>
-  (s) => { const [a, s2] = sa(s); return [f(a), s2]; };
+const map =
+  <S, A, B>(sa: State<S, A>, f: (a: A) => B): State<S, B> =>
+  (s) => {
+    const [a, s2] = sa(s);
+    return [f(a), s2];
+  };
 
-const chain = <S, A, B>(sa: State<S, A>, f: (a: A) => State<S, B>): State<S, B> =>
-  (s) => { const [a, s2] = sa(s); return f(a)(s2); };
+const chain =
+  <S, A, B>(sa: State<S, A>, f: (a: A) => State<S, B>): State<S, B> =>
+  (s) => {
+    const [a, s2] = sa(s);
+    return f(a)(s2);
+  };
 
-const get  = <S,>(): State<S, S>      => (s) => [s, s];
-const put  = <S,>(s: S): State<S, void> => () => [undefined, s];
+const get =
+  <S,>(): State<S, S> =>
+  (s) => [s, s];
+const put =
+  <S,>(s: S): State<S, void> =>
+  () => [undefined, s];
 
 // --- Example: stateful counter that produces unique ids ---
 const fresh: State<number, string> = chain(get<number>(), (n) =>
-  chain(put(n + 1), () => of(\`id-\${n}\`)));
+  chain(put(n + 1), () => of(\`id-\${n}\`)),
+);
 
 // Build a small program: three IDs in a row
 const program = chain(fresh, (a) =>
-  chain(fresh, (b) =>
-    map(fresh, (c) => [a, b, c])));
+  chain(fresh, (b) => map(fresh, (c) => [a, b, c])),
+);
 
 const [ids, finalCounter] = program(0);
 console.log(ids);

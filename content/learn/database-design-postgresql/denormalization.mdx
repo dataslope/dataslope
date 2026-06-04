@@ -153,17 +153,24 @@ CREATE TABLE daily_sales_summary (
   total_amount NUMERIC NOT NULL
 );`}
   starterCode={`-- A reporting table stores a derived read shape.
-INSERT INTO daily_sales_summary (sales_date, order_count, total_amount)
-SELECT o.order_date,
-       COUNT(DISTINCT o.id) AS order_count,
-       SUM(oi.amount) AS total_amount
-FROM orders o
-JOIN order_items oi ON oi.order_id = o.id
-GROUP BY o.order_date;
+INSERT INTO
+  daily_sales_summary (sales_date, order_count, total_amount)
+SELECT
+  o.order_date,
+  COUNT(DISTINCT o.id) AS order_count,
+  SUM(oi.amount) AS total_amount
+FROM
+  orders o
+  JOIN order_items oi ON oi.order_id = o.id
+GROUP BY
+  o.order_date;
 
-SELECT *
-FROM daily_sales_summary
-ORDER BY sales_date;`}
+SELECT
+  *
+FROM
+  daily_sales_summary
+ORDER BY
+  sales_date;`}
 />
 
 The summary table is not the source of truth. The orders and order items

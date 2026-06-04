@@ -21,20 +21,19 @@ once, automatically, when an object is created.
 
 class Greeter {
 public:
-    Greeter(std::string who) : who_(std::move(who)) {
-        std::cout << "constructed " << who_ << "\\n";
-    }
-    void greet() const {
-        std::cout << "hello, " << who_ << "\\n";
-    }
+  Greeter(std::string who) : who_(std::move(who)) {
+    std::cout << "constructed " << who_ << "\\n";
+  }
+  void greet() const { std::cout << "hello, " << who_ << "\\n"; }
+
 private:
-    std::string who_;
+  std::string who_;
 };
 
 int main() {
-    Greeter g("world");
-    g.greet();
-    return 0;
+  Greeter g("world");
+  g.greet();
+  return 0;
 }
 `}
 />
@@ -55,21 +54,22 @@ A class can have several constructors with different signatures:
 
 class Rect {
 public:
-    Rect() : w_(0), h_(0) {}                       // default
-    Rect(int side) : w_(side), h_(side) {}         // square
-    Rect(int w, int h) : w_(w), h_(h) {}           // rectangle
+  Rect() : w_(0), h_(0) {}               // default
+  Rect(int side) : w_(side), h_(side) {} // square
+  Rect(int w, int h) : w_(w), h_(h) {}   // rectangle
 
-    int area() const { return w_ * h_; }
+  int area() const { return w_ * h_; }
+
 private:
-    int w_, h_;
+  int w_, h_;
 };
 
 int main() {
-    Rect a;
-    Rect b(5);
-    Rect c(3, 4);
-    std::cout << a.area() << ' ' << b.area() << ' ' << c.area() << "\\n";
-    return 0;
+  Rect a;
+  Rect b(5);
+  Rect c(3, 4);
+  std::cout << a.area() << ' ' << b.area() << ' ' << c.area() << "\\n";
+  return 0;
 }
 `}
 />
@@ -92,24 +92,21 @@ heap object, when the program ends for a global.
 
 class Loud {
 public:
-    Loud(int id) : id_(id) {
-        std::cout << "[ctor " << id_ << "]\\n";
-    }
-    ~Loud() {
-        std::cout << "[dtor " << id_ << "]\\n";
-    }
+  Loud(int id) : id_(id) { std::cout << "[ctor " << id_ << "]\\n"; }
+  ~Loud() { std::cout << "[dtor " << id_ << "]\\n"; }
+
 private:
-    int id_;
+  int id_;
 };
 
 int main() {
-    Loud a(1);
-    {
-        Loud b(2);
-        Loud c(3);
-    }   // <- c and b destroyed here, in reverse order
-    Loud d(4);
-    return 0;   // <- d then a destroyed here
+  Loud a(1);
+  {
+    Loud b(2);
+    Loud c(3);
+  } // <- c and b destroyed here, in reverse order
+  Loud d(4);
+  return 0; // <- d then a destroyed here
 }
 `}
 />
@@ -173,34 +170,35 @@ to write any of these by hand.
 
 class Stopwatch {
 public:
-    // your members here
+  // your members here
 };
 
 int main() {
-    Stopwatch s(10);
-    s.tick();
-    s.tick();
-    std::cout << s.read();
-    return 0;
+  Stopwatch s(10);
+  s.tick();
+  s.tick();
+  std::cout << s.read();
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 
 class Stopwatch {
 public:
-    Stopwatch(int start = 0) : n_(start) {}
-    void tick() { ++n_; }
-    int  read() const { return n_; }
+  Stopwatch(int start = 0) : n_(start) {}
+  void tick() { ++n_; }
+  int read() const { return n_; }
+
 private:
-    int n_;
+  int n_;
 };
 
 int main() {
-    Stopwatch s(10);
-    s.tick();
-    s.tick();
-    std::cout << s.read();
-    return 0;
+  Stopwatch s(10);
+  s.tick();
+  s.tick();
+  std::cout << s.read();
+  return 0;
 }
 `}
   tests={[

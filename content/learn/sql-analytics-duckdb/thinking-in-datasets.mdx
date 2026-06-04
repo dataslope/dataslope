@@ -86,11 +86,12 @@ SELECT
 FROM range(1, 4001) t(i);`}
   starterCode={`-- Question 1: how big, and what does it span?
 SELECT
-  COUNT(*)            AS rows,
-  MIN(day)            AS first_day,
-  MAX(day)            AS last_day,
+  COUNT(*) AS rows,
+  MIN(day) AS first_day,
+  MAX(day) AS last_day,
   COUNT(DISTINCT kind) AS kinds
-FROM events;`}
+FROM
+  events;`}
 />
 
 Now sharpen the question — *what kinds of events, and how common is each?*
@@ -107,11 +108,14 @@ SELECT
 FROM range(1, 4001) t(i);`}
   starterCode={`SELECT
   kind,
-  COUNT(*)                         AS n,
+  COUNT(*) AS n,
   ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 1) AS pct
-FROM events
-GROUP BY kind
-ORDER BY n DESC;`}
+FROM
+  events
+GROUP BY
+  kind
+ORDER BY
+  n DESC;`}
 />
 
 You just turned 4,000 invisible rows into a four-line story — without

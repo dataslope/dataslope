@@ -105,8 +105,10 @@ anscombe = sns.load_dataset("anscombe")
 # One panel per dataset; a regression line in each.
 sns.lmplot(
     data=anscombe,
-    x="x", y="y",
-    col="dataset", col_wrap=2,
+    x="x",
+    y="y",
+    col="dataset",
+    col_wrap=2,
     height=3,
     facet_kws={"sharex": True, "sharey": True},
     line_kws={"color": "crimson"},

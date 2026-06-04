@@ -152,7 +152,7 @@ function shippingCost1(weight, distance, isPriority) {
 
 // Guard-clause style — flat and easy to follow.
 function shippingCost2(weight, distance, isPriority) {
-  if (weight <= 0)   return 0;
+  if (weight <= 0) return 0;
   if (distance <= 0) return 0;
   let cost = weight * 0.5 + distance * 0.1;
   if (isPriority) cost *= 1.5;
@@ -240,9 +240,9 @@ any of the above. Build a small table, look up the answer.
 <CodeBlock
   adapter="javascript"
   starterCode={`const ROLES_TO_GREETING = {
-  admin:  "Welcome, administrator.",
+  admin: "Welcome, administrator.",
   member: "Welcome back!",
-  guest:  "Hello, guest.",
+  guest: "Hello, guest.",
 };
 
 function greetRole(role) {
@@ -252,7 +252,7 @@ function greetRole(role) {
 console.log(greetRole("admin"));
 console.log(greetRole("member"));
 console.log(greetRole("guest"));
-console.log(greetRole("alien"));   // falls through to the default
+console.log(greetRole("alien")); // falls through to the default
 `}
 />
 
@@ -273,10 +273,10 @@ where the logical operators from the previous chapter come in.
   return "Approved.";
 }
 
-console.log(canRent(30, true,  true));
-console.log(canRent(22, true,  true));
+console.log(canRent(30, true, true));
+console.log(canRent(22, true, true));
 console.log(canRent(30, false, true));
-console.log(canRent(30, true,  false));
+console.log(canRent(30, true, false));
 `}
 />
 
@@ -342,9 +342,9 @@ console.log(action("green"));
 console.log(action("purple"));
 `}
   solutionCode={`function action(color) {
-  if (color === "red")    return "stop";
+  if (color === "red") return "stop";
   if (color === "yellow") return "slow down";
-  if (color === "green")  return "go";
+  if (color === "green") return "go";
   return "unknown signal";
 }
 

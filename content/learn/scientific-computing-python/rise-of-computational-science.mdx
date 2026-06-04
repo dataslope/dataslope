@@ -108,27 +108,29 @@ import matplotlib.pyplot as plt
 # Discretize on a grid of N cells, step forward in time with FTCS.
 
 N = 100
-L = 1.0                  # rod length
-alpha = 0.01             # thermal diffusivity
+L = 1.0  # rod length
+alpha = 0.01  # thermal diffusivity
 dx = L / N
-dt = 0.4 * dx**2 / alpha # stability requires dt <= dx²/(2α)
+dt = 0.4 * dx**2 / alpha  # stability requires dt <= dx²/(2α)
 steps = 2000
 
 u = np.zeros(N)
-u[N//2 - 5 : N//2 + 5] = 1.0   # initial heat pulse in the middle
+u[N // 2 - 5 : N // 2 + 5] = 1.0  # initial heat pulse in the middle
 
 snapshots = [u.copy()]
 for step in range(steps):
     u_new = u.copy()
-    u_new[1:-1] = u[1:-1] + alpha * dt / dx**2 * (u[2:] - 2*u[1:-1] + u[:-2])
+    u_new[1:-1] = u[1:-1] + alpha * dt / dx**2 * (u[2:] - 2 * u[1:-1] + u[:-2])
     u = u_new
     if step % 400 == 0:
         snapshots.append(u.copy())
 
 x = np.linspace(0, L, N)
 for i, snap in enumerate(snapshots):
-    plt.plot(x, snap, label=f"step {i*400}")
-plt.xlabel("position"); plt.ylabel("temperature"); plt.legend()
+    plt.plot(x, snap, label=f"step {i * 400}")
+plt.xlabel("position")
+plt.ylabel("temperature")
+plt.legend()
 plt.title("Heat diffusion along a 1-D rod")
 plt.show()
 `}

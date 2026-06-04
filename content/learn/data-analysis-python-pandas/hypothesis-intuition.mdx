@@ -108,7 +108,7 @@ from scipy import stats
 rng = np.random.RandomState(42)
 
 # Two groups truly different
-control   = rng.normal(100, 10, size=40)
+control = rng.normal(100, 10, size=40)
 treatment = rng.normal(105, 10, size=40)
 
 t_stat, p = stats.ttest_ind(control, treatment)
@@ -132,7 +132,7 @@ rng = np.random.RandomState(0)
 
 for n in [10, 50, 500, 5000]:
     a = rng.normal(100, 10, n)
-    b = rng.normal(100.5, 10, n)   # tiny true difference
+    b = rng.normal(100.5, 10, n)  # tiny true difference
     p = stats.ttest_ind(a, b).pvalue
     print(f"n={n:>5}: p = {p:.4f}")
 `}

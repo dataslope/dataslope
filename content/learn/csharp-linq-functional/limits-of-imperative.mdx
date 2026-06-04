@@ -27,15 +27,9 @@ live in Berlin."*
   starterCode={`using System;
 using System.Collections.Generic;
 
-record Person(string Name, string City, int Age);
-
-var people = new List<Person>
-{
-    new("Ada", "London",  36),
-    new("Bilal", "Berlin", 41),
-    new("Chiara", "Berlin", 29),
-    new("Dmitri", "Paris", 52),
-    new("Esther", "Berlin", 33),
+var people = new List<Person> {
+    new("Ada", "London", 36),   new("Bilal", "Berlin", 41),  new("Chiara", "Berlin", 29),
+    new("Dmitri", "Paris", 52), new("Esther", "Berlin", 33),
 };
 
 int total = 0;
@@ -51,6 +45,8 @@ foreach (var p in people)
 
 double avg = count == 0 ? 0.0 : (double)total / count;
 Console.WriteLine($"Average Berlin age: {avg:F1}");
+
+record Person(string Name, string City, int Age);
 `}
 />
 
@@ -118,14 +114,9 @@ sorted by average age descending."*
   starterCode={`using System;
 using System.Collections.Generic;
 
-record Person(string Name, string City, int Age);
-
-var people = new List<Person>
-{
-    new("Ada", "London",  36),  new("Bilal", "Berlin", 41),
-    new("Chiara", "Berlin", 29), new("Dmitri", "Paris", 52),
-    new("Esther", "Berlin", 33), new("Farah",  "London", 27),
-    new("Gus", "Paris", 60),
+var people = new List<Person> {
+    new("Ada", "London", 36),    new("Bilal", "Berlin", 41), new("Chiara", "Berlin", 29), new("Dmitri", "Paris", 52),
+    new("Esther", "Berlin", 33), new("Farah", "London", 27), new("Gus", "Paris", 60),
 };
 
 // Step 1: group by city manually.
@@ -142,20 +133,24 @@ var averages = new List<(string City, double Avg, int Count)>();
 foreach (var kv in byCity)
 {
     int sum = 0;
-    foreach (var p in kv.Value) sum += p.Age;
+    foreach (var p in kv.Value)
+        sum += p.Age;
     averages.Add((kv.Key, (double)sum / kv.Value.Count, kv.Value.Count));
 }
 
 // Step 3: filter to cities with >= 2 residents.
 var filtered = new List<(string City, double Avg, int Count)>();
 foreach (var row in averages)
-    if (row.Count >= 2) filtered.Add(row);
+    if (row.Count >= 2)
+        filtered.Add(row);
 
 // Step 4: sort descending by average.
 filtered.Sort((a, b) => b.Avg.CompareTo(a.Avg));
 
 foreach (var row in filtered)
     Console.WriteLine($"{row.City,-8} avg={row.Avg:F1} (n={row.Count})");
+
+record Person(string Name, string City, int Age);
 `}
 />
 

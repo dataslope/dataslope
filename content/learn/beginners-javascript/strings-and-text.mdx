@@ -23,7 +23,7 @@ multi-line strings (more on that in a moment).
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const a = 'single quotes';
+  starterCode={`const a = "single quotes";
 const b = "double quotes";
 const c = \`backticks\`;
 console.log(a, b, c);
@@ -48,8 +48,8 @@ newline or a tab, you escape it with a backslash:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log("She said \\"hi\\".");
-console.log('It\\'s fine.');
+  starterCode={`console.log('She said "hi".');
+console.log("It's fine.");
 console.log("first line\\nsecond line");
 console.log("col1\\tcol2\\tcol3");
 `}
@@ -100,12 +100,12 @@ leaves the original alone.
   adapter="javascript"
   starterCode={`let s = "hello";
 const louder = s.toUpperCase();
-console.log(s);       // "hello"  — unchanged
-console.log(louder);  // "HELLO"  — a new string
+console.log(s); // "hello"  — unchanged
+console.log(louder); // "HELLO"  — a new string
 
 // You can reassign the variable to point at a new string:
 s = s + " world";
-console.log(s);       // "hello world"
+console.log(s); // "hello world"
 `}
 />
 
@@ -123,11 +123,11 @@ it. You can read an individual character with bracket notation:
   adapter="javascript"
   starterCode={`const word = "javascript";
 
-console.log(word.length);  // 10
-console.log(word[0]);      // "j"   (the first character)
-console.log(word[1]);      // "a"
+console.log(word.length); // 10
+console.log(word[0]); // "j"   (the first character)
+console.log(word[1]); // "a"
 console.log(word[word.length - 1]); // "t"   (the last)
-console.log(word[100]);    // undefined  (out of range)
+console.log(word[100]); // undefined  (out of range)
 `}
 />
 
@@ -151,19 +151,19 @@ console.log(s.toUpperCase());
 console.log(s.toLowerCase());
 
 // Whitespace
-console.log("[" + s.trim() + "]");        // strip leading/trailing whitespace
+console.log("[" + s.trim() + "]"); // strip leading/trailing whitespace
 console.log("[" + s.trimStart() + "]");
 console.log("[" + s.trimEnd() + "]");
 
 // Inspect content
-console.log(s.includes("Java"));    // true
+console.log(s.includes("Java")); // true
 console.log(s.startsWith("  Hello")); // true
-console.log(s.endsWith("!  "));     // true
-console.log(s.indexOf("World"));    // position of first match, or -1
+console.log(s.endsWith("!  ")); // true
+console.log(s.indexOf("World")); // position of first match, or -1
 
 // Slicing — like cutting out a part
-console.log(s.slice(2, 7));         // "Hello"
-console.log(s.slice(-3));           // "!  "   (last 3 chars)
+console.log(s.slice(2, 7)); // "Hello"
+console.log(s.slice(-3)); // "!  "   (last 3 chars)
 
 // Replacing
 console.log(s.replace("JavaScript", "JS"));
@@ -172,13 +172,13 @@ console.log(s.replaceAll("l", "L"));
 // Splitting and joining
 const csv = "apple,banana,cherry";
 const parts = csv.split(",");
-console.log(parts);            // ["apple","banana","cherry"]
-console.log(parts.join(" | "));// "apple | banana | cherry"
+console.log(parts); // ["apple","banana","cherry"]
+console.log(parts.join(" | ")); // "apple | banana | cherry"
 
 // Repeating and padding
 console.log("-".repeat(20));
-console.log("7".padStart(4, "0"));  // "0007"
-console.log("7".padEnd(4, "."));    // "7..."
+console.log("7".padStart(4, "0")); // "0007"
+console.log("7".padEnd(4, ".")); // "7..."
 `}
 />
 
@@ -194,19 +194,19 @@ display, parsing a piece of text into a value to compute with.
 <CodeBlock
   adapter="javascript"
   starterCode={`// String -> Number
-console.log(Number("42"));        // 42
-console.log(Number("3.14"));      // 3.14
-console.log(Number(""));          // 0    (!)
-console.log(Number("hello"));     // NaN
-console.log(parseInt("42 apples"));   // 42  (lenient)
+console.log(Number("42")); // 42
+console.log(Number("3.14")); // 3.14
+console.log(Number("")); // 0    (!)
+console.log(Number("hello")); // NaN
+console.log(parseInt("42 apples")); // 42  (lenient)
 console.log(parseFloat("3.14 pies")); // 3.14
 
 // Number -> String
 const n = 42;
-console.log(String(n));           // "42"
-console.log(n.toString());        // "42"
-console.log(\`Value: \${n}\`);       // "Value: 42"  — implicit, via template
-console.log("Value: " + n);       // "Value: 42"  — implicit, via concatenation
+console.log(String(n)); // "42"
+console.log(n.toString()); // "42"
+console.log(\`Value: \${n}\`); // "Value: 42"  — implicit, via template
+console.log("Value: " + n); // "Value: 42"  — implicit, via concatenation
 `}
 />
 
@@ -234,9 +234,9 @@ human-character counts in the presence of emoji, use
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log("abc".length);          // 3 — easy
-console.log("café".length);         // 4 — easy (if é is precomposed)
-console.log("😀".length);            // 2 — surprising!
+  starterCode={`console.log("abc".length); // 3 — easy
+console.log("café".length); // 4 — easy (if é is precomposed)
+console.log("😀".length); // 2 — surprising!
 console.log(Array.from("😀").length); // 1 — better
 `}
 />
@@ -311,7 +311,9 @@ console.log(titleCase(""));
   solutionCode={`function titleCase(text) {
   return text
     .split(" ")
-    .map((w) => w.length === 0 ? w : w[0].toUpperCase() + w.slice(1).toLowerCase())
+    .map((w) =>
+      w.length === 0 ? w : w[0].toUpperCase() + w.slice(1).toLowerCase(),
+    )
     .join(" ");
 }
 

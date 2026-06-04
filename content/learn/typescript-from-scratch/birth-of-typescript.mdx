@@ -77,10 +77,10 @@ On October 1, 2012, Microsoft unveiled **TypeScript 0.8** at the BUILD developer
   starterCode={`// Plain JavaScript — valid TypeScript with no changes
 const user = {
   name: "Alice",
-  age: 30
+  age: 30,
 };
 
-console.log(user.name);  // Works fine
+console.log(user.name); // Works fine
 console.log(user.emial); // Typo! But JS doesn't care — undefined
 
 // Now let's add a type annotation
@@ -91,7 +91,7 @@ interface User {
 
 const typedUser: User = {
   name: "Bob",
-  age: 25
+  age: 25,
 };
 
 console.log(typedUser.name); // Still works

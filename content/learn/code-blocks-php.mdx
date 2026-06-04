@@ -12,9 +12,10 @@ and class definitions don't carry over.
 <CodeBlock
   adapter="php"
   starterCode={`<?php
-echo "Hello from PHP " . PHP_VERSION . "!\\n";
 
-$names = ["Ada", "Linus", "Grace"];
+echo 'Hello from PHP ' . PHP_VERSION . "!\\n";
+
+$names = ['Ada', 'Linus', 'Grace'];
 foreach ($names as $i => $name) {
     echo ($i + 1) . ". $name\\n";
 }
@@ -26,12 +27,13 @@ foreach ($names as $i => $name) {
 <CodeBlock
   adapter="php"
   starterCode={`<?php
+
 $people = [
-    ["name" => "Ada",   "score" => 92],
-    ["name" => "Linus", "score" => 88],
-    ["name" => "Grace", "score" => 95],
+    ['name' => 'Ada', 'score' => 92],
+    ['name' => 'Linus', 'score' => 88],
+    ['name' => 'Grace', 'score' => 95],
 ];
-usort($people, fn($a, $b) => $b["score"] - $a["score"]);
+usort($people, fn($a, $b) => $b['score'] - $a['score']);
 echo json_encode($people, JSON_PRETTY_PRINT);
 `}
 />

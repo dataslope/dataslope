@@ -104,10 +104,12 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # One object: scale, then classify.
-pipe = Pipeline([
-    ("scaler", StandardScaler()),
-    ("model",  LogisticRegression(max_iter=1000)),
-])
+pipe = Pipeline(
+    [
+        ("scaler", StandardScaler()),
+        ("model", LogisticRegression(max_iter=1000)),
+    ]
+)
 
 # One fit. The scaler is fit on X_train only, then the model on the scaled X_train.
 pipe.fit(X_train, y_train)
@@ -264,16 +266,24 @@ X = df[numeric_cols + categorical_cols]
 y = df["upgraded"]
 
 # Route each column group to its own transformer.
-preprocess = ColumnTransformer([
-    ("num", StandardScaler(), numeric_cols),
-    ("cat", OneHotEncoder(handle_unknown="ignore", sparse_output=False), categorical_cols),
-])
+preprocess = ColumnTransformer(
+    [
+        ("num", StandardScaler(), numeric_cols),
+        (
+            "cat",
+            OneHotEncoder(handle_unknown="ignore", sparse_output=False),
+            categorical_cols,
+        ),
+    ]
+)
 
 # Stack preprocessing + model into ONE pipeline.
-pipe = Pipeline([
-    ("prep", preprocess),
-    ("clf",  LogisticRegression(max_iter=1000)),
-])
+pipe = Pipeline(
+    [
+        ("prep", preprocess),
+        ("clf", LogisticRegression(max_iter=1000)),
+    ]
+)
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
@@ -313,10 +323,16 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 numeric_cols = ["age", "income"]
 categorical_cols = ["city", "plan"]
 
-preprocess = ColumnTransformer([
-    ("num", StandardScaler(), numeric_cols),
-    ("cat", OneHotEncoder(handle_unknown="ignore", sparse_output=False), categorical_cols),
-])
+preprocess = ColumnTransformer(
+    [
+        ("num", StandardScaler(), numeric_cols),
+        (
+            "cat",
+            OneHotEncoder(handle_unknown="ignore", sparse_output=False),
+            categorical_cols,
+        ),
+    ]
+)
 
 transformed = preprocess.fit_transform(df[numeric_cols + categorical_cols])
 
@@ -380,22 +396,35 @@ categorical_cols = ["city", "plan"]
 X = df[numeric_cols + categorical_cols]
 y = df["upgraded"]
 
-pipe = Pipeline([
-    ("prep", ColumnTransformer([
-        ("num", StandardScaler(), numeric_cols),
-        ("cat", OneHotEncoder(handle_unknown="ignore", sparse_output=False), categorical_cols),
-    ])),
-    ("clf", LogisticRegression(max_iter=1000)),
-])
+pipe = Pipeline(
+    [
+        (
+            "prep",
+            ColumnTransformer(
+                [
+                    ("num", StandardScaler(), numeric_cols),
+                    (
+                        "cat",
+                        OneHotEncoder(handle_unknown="ignore", sparse_output=False),
+                        categorical_cols,
+                    ),
+                ]
+            ),
+        ),
+        ("clf", LogisticRegression(max_iter=1000)),
+    ]
+)
 pipe.fit(X, y)
 
 # Brand-new raw records: the pipeline scales and encodes them automatically.
-new_customers = pd.DataFrame({
-    "age":    [25, 55],
-    "income": [80000, 30000],
-    "city":   ["NY", "Tokyo"],     # 'Tokyo' was never seen -> handled by handle_unknown
-    "plan":   ["free", "pro"],
-})
+new_customers = pd.DataFrame(
+    {
+        "age": [25, 55],
+        "income": [80000, 30000],
+        "city": ["NY", "Tokyo"],  # 'Tokyo' was never seen -> handled by handle_unknown
+        "plan": ["free", "pro"],
+    }
+)
 print("Predictions for new customers:", pipe.predict(new_customers))
 `}
 />
@@ -518,15 +547,23 @@ test_acc = None
 
 print("test accuracy:", test_acc)
 `}
-  solutionCode={`preprocess = ColumnTransformer([
-    ("num", StandardScaler(), numeric_cols),
-    ("cat", OneHotEncoder(handle_unknown="ignore", sparse_output=False), categorical_cols),
-])
+  solutionCode={`preprocess = ColumnTransformer(
+    [
+        ("num", StandardScaler(), numeric_cols),
+        (
+            "cat",
+            OneHotEncoder(handle_unknown="ignore", sparse_output=False),
+            categorical_cols,
+        ),
+    ]
+)
 
-pipe = Pipeline([
-    ("prep", preprocess),
-    ("clf", LogisticRegression(max_iter=1000)),
-])
+pipe = Pipeline(
+    [
+        ("prep", preprocess),
+        ("clf", LogisticRegression(max_iter=1000)),
+    ]
+)
 
 pipe.fit(X_train, y_train)
 

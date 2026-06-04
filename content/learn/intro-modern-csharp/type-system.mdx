@@ -86,10 +86,10 @@ you with no syntax:
   starterCode={`using System;
 
 int small = 100;
-long big = small;        // implicit int -> long (always safe)
+long big = small; // implicit int -> long (always safe)
 
 float f = 3.5f;
-double d = f;            // implicit float -> double
+double d = f; // implicit float -> double
 
 Console.WriteLine($"big = {big}, d = {d}");
 `}
@@ -105,13 +105,13 @@ unless you cast explicitly with `(type)value`:
   starterCode={`using System;
 
 double price = 19.99;
-int rounded = (int)price;   // explicit cast — drops the .99
+int rounded = (int)price; // explicit cast — drops the .99
 
 Console.WriteLine($"price = {price}");
 Console.WriteLine($"rounded (truncated) = {rounded}");
 
 long bigNumber = 5_000_000_000L;
-int truncated = (int)bigNumber;   // overflow — produces a wrong answer
+int truncated = (int)bigNumber; // overflow — produces a wrong answer
 Console.WriteLine($"truncated = {truncated}");
 `}
 />
@@ -129,7 +129,7 @@ A very common operation: turn a string like `"42"` into an `int`.
 
 string text = "42";
 
-int n = int.Parse(text);            // throws if 'text' isn't a number
+int n = int.Parse(text); // throws if 'text' isn't a number
 Console.WriteLine($"parsed: {n}");
 
 bool ok = int.TryParse("not a number", out int result);
@@ -174,8 +174,8 @@ flowchart LR
   starterCode={`using System;
 
 int a = 5;
-int b = a;    // copies the value 5
-b = 99;       // changes only b
+int b = a; // copies the value 5
+b = 99;    // changes only b
 Console.WriteLine($"a = {a}, b = {b}");
 `}
 />
@@ -208,8 +208,8 @@ flowchart LR
 using System.Collections.Generic;
 
 var a = new List<int> { 1, 2, 3 };
-var b = a;            // copies the reference, not the list
-b.Add(99);            // modifies the same list
+var b = a; // copies the reference, not the list
+b.Add(99); // modifies the same list
 
 Console.WriteLine($"a has {a.Count} items: [{string.Join(", ", a)}]");
 Console.WriteLine($"b has {b.Count} items: [{string.Join(", ", b)}]");
@@ -228,7 +228,7 @@ If you wanted a real copy, you'd ask explicitly:
 using System.Collections.Generic;
 
 var a = new List<int> { 1, 2, 3 };
-var b = new List<int>(a);   // explicit copy
+var b = new List<int>(a); // explicit copy
 b.Add(99);
 
 Console.WriteLine($"a: [{string.Join(", ", a)}]");
@@ -247,8 +247,8 @@ cannot change the contents of a string once it's created. Every
   starterCode={`using System;
 
 string a = "hello";
-string b = a;          // copies the reference
-b = b + " world";      // does NOT mutate the original; creates a new string
+string b = a;       // copies the reference
+b = b + " world"; // does NOT mutate the original; creates a new string
 
 Console.WriteLine($"a = {a}");
 Console.WriteLine($"b = {b}");
@@ -270,12 +270,12 @@ using System.Collections.Generic;
 
 void AppendOne(List<int> list)
 {
-    list.Add(1);             // mutates the caller's list
+    list.Add(1); // mutates the caller's list
 }
 
 void Reassign(List<int> list)
 {
-    list = new List<int>();  // reassigns the local parameter; caller unaffected
+    list = new List<int>(); // reassigns the local parameter; caller unaffected
     list.Add(999);
 }
 
@@ -313,7 +313,7 @@ means "no object at all."
   adapter="csharp"
   starterCode={`using System;
 
-string? maybeName = null;        // 'string?' = "string or null"
+string? maybeName = null; // 'string?' = "string or null"
 
 if (maybeName is null)
 {

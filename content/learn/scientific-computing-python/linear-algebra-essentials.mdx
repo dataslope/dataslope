@@ -42,9 +42,7 @@ algorithm we mentioned in the stability chapter.
   adapter="python"
   starterCode={`import numpy as np
 
-A = np.array([[4.0, 1.0, 2.0],
-              [1.0, 3.0, 0.0],
-              [2.0, 0.0, 5.0]])
+A = np.array([[4.0, 1.0, 2.0], [1.0, 3.0, 0.0], [2.0, 0.0, 5.0]])
 b = np.array([7.0, 4.0, 9.0])
 
 x = np.linalg.solve(A, b)
@@ -80,12 +78,16 @@ import time
 # Build a 1500×1500 symmetric positive-definite matrix
 rng = np.random.default_rng(0)
 M = rng.standard_normal((1500, 1500))
-A = M @ M.T + 0.1 * np.eye(1500)        # SPD by construction
+A = M @ M.T + 0.1 * np.eye(1500)  # SPD by construction
 b = rng.standard_normal(1500)
 
-t0 = time.perf_counter(); x1 = solve(A, b); t1 = time.perf_counter()
-c, low = cho_factor(A);  t2 = time.perf_counter()
-x2 = cho_solve((c, low), b);              t3 = time.perf_counter()
+t0 = time.perf_counter()
+x1 = solve(A, b)
+t1 = time.perf_counter()
+c, low = cho_factor(A)
+t2 = time.perf_counter()
+x2 = cho_solve((c, low), b)
+t3 = time.perf_counter()
 
 print(f"General solve : {t1 - t0:.3f} s")
 print(f"Cholesky      : {(t3 - t2) + (t2 - t1):.3f} s   (factor + solve)")
@@ -117,8 +119,7 @@ transformation. They tell us:
   adapter="python"
   starterCode={`import numpy as np
 
-A = np.array([[2.0, 1.0],
-              [1.0, 3.0]])
+A = np.array([[2.0, 1.0], [1.0, 3.0]])
 
 # Symmetric -> use eigh, which is faster and returns real eigenvalues
 vals, vecs = np.linalg.eigh(A)
@@ -163,9 +164,17 @@ print("Variance explained ratio  :", vals / vals.sum())
 plt.figure(figsize=(5, 5))
 plt.scatter(X[:, 0], X[:, 1], s=8, alpha=0.5)
 for k in range(2):
-    plt.arrow(0, 0, 3*np.sqrt(vals[k])*vecs[0,k], 3*np.sqrt(vals[k])*vecs[1,k],
-              width=0.05, color="red")
-plt.axis("equal"); plt.title("Principal directions"); plt.show()
+    plt.arrow(
+        0,
+        0,
+        3 * np.sqrt(vals[k]) * vecs[0, k],
+        3 * np.sqrt(vals[k]) * vecs[1, k],
+        width=0.05,
+        color="red",
+    )
+plt.axis("equal")
+plt.title("Principal directions")
+plt.show()
 `}
 />
 
@@ -183,16 +192,14 @@ the ratio of largest to smallest singular value.
   starterCode={`import numpy as np
 
 v = np.array([3.0, 4.0])
-print("||v||_2 =", np.linalg.norm(v))            # 5
-print("||v||_1 =", np.linalg.norm(v, 1))         # 7
-print("||v||_∞ =", np.linalg.norm(v, np.inf))    # 4
+print("||v||_2 =", np.linalg.norm(v))  # 5
+print("||v||_1 =", np.linalg.norm(v, 1))  # 7
+print("||v||_∞ =", np.linalg.norm(v, np.inf))  # 4
 
-A = np.array([[1.0, 2.0, 3.0],
-              [4.0, 5.0, 6.0],
-              [7.0, 8.0, 9.0]])
-print("\\n||A||_F =", np.linalg.norm(A, "fro"))   # Frobenius
-print("rank(A) =", np.linalg.matrix_rank(A))     # 2  (rows are linearly dependent)
-print("κ(A)    =", np.linalg.cond(A))            # huge — A is nearly singular
+A = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]])
+print("\\n||A||_F =", np.linalg.norm(A, "fro"))  # Frobenius
+print("rank(A) =", np.linalg.matrix_rank(A))  # 2  (rows are linearly dependent)
+print("κ(A)    =", np.linalg.cond(A))  # huge — A is nearly singular
 `}
 />
 
@@ -215,7 +222,7 @@ import matplotlib.pyplot as plt
 rng = np.random.default_rng(0)
 n = 30
 x = np.linspace(0, 10, n)
-y = 2.3 * x - 1.0 + rng.standard_normal(n)        # y = m x + b + noise
+y = 2.3 * x - 1.0 + rng.standard_normal(n)  # y = m x + b + noise
 
 # Design matrix:  one column for slope, one column of 1s for intercept
 A = np.column_stack([x, np.ones_like(x)])
@@ -223,8 +230,9 @@ A = np.column_stack([x, np.ones_like(x)])
 print(f"Recovered model:  y = {m_hat:.3f} x + ({b_hat:+.3f})")
 
 plt.scatter(x, y, label="data")
-plt.plot(x, m_hat*x + b_hat, "r", label="fit")
-plt.legend(); plt.show()
+plt.plot(x, m_hat * x + b_hat, "r", label="fit")
+plt.legend()
+plt.show()
 `}
 />
 
@@ -258,7 +266,7 @@ f = np.exp(-((x - 0.5) ** 2) / 0.01)
 
 u = spsolve(A, f)
 print("Solved a 1000x1000 system in CSR format.")
-print(f"NNZ in A: {A.nnz}  (vs {n*n} for a dense matrix)")
+print(f"NNZ in A: {A.nnz}  (vs {n * n} for a dense matrix)")
 `}
 />
 
@@ -281,10 +289,12 @@ Return the solution \`x\` as a NumPy array of length $n$. Do not
 build the dense matrix.`}
   starterCode={`import numpy as np
 
+
 def thomas(a, b, c, d):
     # a, c have length n-1; b, d have length n
     # TODO: forward elimination, then back substitution
     return None
+
 
 # Quick check against numpy
 a = np.array([1.0, 1.0, 1.0])
@@ -299,20 +309,21 @@ print("thomas    :", thomas(a.copy(), b.copy(), c.copy(), d.copy()))
 `}
   solutionCode={`import numpy as np
 
+
 def thomas(a, b, c, d):
     n = len(b)
     cc, dd = c.copy().astype(float), d.copy().astype(float)
     bb = b.copy().astype(float)
     # Forward sweep
     for i in range(1, n):
-        m = a[i-1] / bb[i-1]
-        bb[i] -= m * cc[i-1]
-        dd[i] -= m * dd[i-1]
+        m = a[i - 1] / bb[i - 1]
+        bb[i] -= m * cc[i - 1]
+        dd[i] -= m * dd[i - 1]
     # Back substitution
     x = np.empty(n)
     x[-1] = dd[-1] / bb[-1]
-    for i in range(n-2, -1, -1):
-        x[i] = (dd[i] - cc[i] * x[i+1]) / bb[i]
+    for i in range(n - 2, -1, -1):
+        x[i] = (dd[i] - cc[i] * x[i + 1]) / bb[i]
     return x
 `}
   tests={[

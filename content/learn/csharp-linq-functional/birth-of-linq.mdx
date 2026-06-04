@@ -83,17 +83,13 @@ var xml = XElement.Parse(@"
     <p name='Chiara' age='29' />
   </people>");
 
-var youngNames = xml.Elements("p")
-    .Where(e => (int)e.Attribute("age") < 35)
-    .Select(e => (string)e.Attribute("name"));
+var youngNames = xml.Elements("p").Where(e => (int)e.Attribute("age") < 35).Select(e => (string)e.Attribute("name"));
 
 Console.WriteLine("XML:     " + string.Join(", ", youngNames));
 
 // 3. LINQ to Objects with grouping (a tiny taste of the rest of the course).
 var ages = new[] { 36, 41, 29, 52, 33, 27 };
-var bucketed = ages.GroupBy(a => a / 10 * 10)
-                   .OrderBy(g => g.Key)
-                   .Select(g => $"{g.Key}s: {g.Count()}");
+var bucketed = ages.GroupBy(a => a / 10 * 10).OrderBy(g => g.Key).Select(g => $"{g.Key}s: {g.Count()}");
 
 Console.WriteLine("Group:   " + string.Join(" | ", bucketed));
 `}

@@ -40,10 +40,10 @@ length 1:
 <CodeBlock
   adapter="r"
   starterCode={`x <- 42
-print(x)         # [1] 42
-length(x)        # [1] 1
-is.vector(x)     # [1] TRUE
-x[1]             # [1] 42 — yes, you can index it
+print(x) # [1] 42
+length(x) # [1] 1
+is.vector(x) # [1] TRUE
+x[1] # [1] 42 — yes, you can index it
 `}
 />
 
@@ -140,12 +140,12 @@ You access elements with `[ ]`. The first element is `[1]`, not
   adapter="r"
   starterCode={`days <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
-days[1]            # first element
-days[3]            # third
-days[c(1, 5, 7)]   # several at once — pass a vector of indices!
-days[-1]           # everything except the first (negative index = exclude)
-days[-c(1, 7)]     # everything except first and last
-days[2:4]          # a contiguous slice
+days[1] # first element
+days[3] # third
+days[c(1, 5, 7)] # several at once — pass a vector of indices!
+days[-1] # everything except the first (negative index = exclude)
+days[-c(1, 7)] # everything except first and last
+days[2:4] # a contiguous slice
 days[length(days)] # the last element
 `}
 />
@@ -261,7 +261,7 @@ Friday.
   initCode={`days <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 `}
   starterCode={`# days is already defined: c("Mon", ..., "Sun")
-weekdays <- NULL   # replace NULL with the right slice
+weekdays <- NULL # replace NULL with the right slice
 
 print(weekdays)
 `}

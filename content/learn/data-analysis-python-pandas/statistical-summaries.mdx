@@ -81,7 +81,7 @@ flowchart LR
 s = pd.Series([1, 2, 4, 5, 7, 9, 12, 15, 20, 35, 50])
 
 print("25%:", s.quantile(0.25))
-print("50%:", s.quantile(0.50))   # same as median
+print("50%:", s.quantile(0.50))  # same as median
 print("75%:", s.quantile(0.75))
 print("90%:", s.quantile(0.90))
 print("99%:", s.quantile(0.99))
@@ -97,9 +97,9 @@ finish in under X ms") or pay-band analyses.
   adapter="python"
   starterCode={`import pandas as pd
 
-a = pd.Series([50, 50, 50, 50, 50])           # no spread
-b = pd.Series([20, 30, 50, 70, 80])           # moderate
-c = pd.Series([0, 10, 50, 90, 100])           # large
+a = pd.Series([50, 50, 50, 50, 50])  # no spread
+b = pd.Series([20, 30, 50, 70, 80])  # moderate
+c = pd.Series([0, 10, 50, 90, 100])  # large
 
 for name, s in [("a", a), ("b", b), ("c", c)]:
     iqr = s.quantile(0.75) - s.quantile(0.25)
@@ -181,7 +181,7 @@ s = pd.Series([10, 12, 11, 13, 12, 11, 14, 13, 12, 95])
 
 q1, q3 = s.quantile([0.25, 0.75])
 iqr = q3 - q1
-lo, hi = q1 - 1.5*iqr, q3 + 1.5*iqr
+lo, hi = q1 - 1.5 * iqr, q3 + 1.5 * iqr
 
 print(f"Outlier bounds: [{lo:.1f}, {hi:.1f}]")
 print("Outliers:", s[(s < lo) | (s > hi)].tolist())
@@ -209,7 +209,7 @@ the most important customer on the list.
 import numpy as np
 
 values = pd.Series([5, 7, 6, 8, 7, 5, 9, 8, 6, 7, 6, 100, 5, 7, 8, np.nan, 6])`}
-  starterCode={`summary = {}   # TODO
+  starterCode={`summary = {}  # TODO
 
 print(summary)
 `}
@@ -219,14 +219,14 @@ import numpy as np
 s = values.dropna()
 q1, q3 = s.quantile([0.25, 0.75])
 iqr = q3 - q1
-lo, hi = q1 - 1.5*iqr, q3 + 1.5*iqr
+lo, hi = q1 - 1.5 * iqr, q3 + 1.5 * iqr
 
 summary = {
-    "count":      int(s.count()),
-    "mean":       float(s.mean()),
-    "median":     float(s.median()),
-    "p95":        float(s.quantile(0.95)),
-    "iqr":        float(iqr),
+    "count": int(s.count()),
+    "mean": float(s.mean()),
+    "median": float(s.median()),
+    "p95": float(s.quantile(0.95)),
+    "iqr": float(iqr),
     "n_outliers": int(((s < lo) | (s > hi)).sum()),
 }
 

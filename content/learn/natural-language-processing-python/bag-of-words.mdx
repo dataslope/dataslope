@@ -124,13 +124,16 @@ count.
 
 vocab = ["cheap", "free", "meeting", "report", "winner"]
 
+
 def count_vector(tokens, vocab):
     counts = Counter(tokens)
     return [counts[w] for w in vocab]
 
+
 def binary_vector(tokens, vocab):
     present = set(tokens)
     return [1 if w in present else 0 for w in vocab]
+
 
 spam = "free free free winner cheap".split()
 
@@ -218,11 +221,13 @@ Tip: \`collections.Counter\` makes this clean (it returns 0 for missing keys).`}
     # return a list of counts aligned to vocab
     return []
 
+
 print(bow_vector(["dog", "cat", "dog", "bird"], ["cat", "dog", "fish"]))
 `}
   solutionCode={`def bow_vector(tokens, vocab):
     counts = Counter(tokens)
     return [counts[w] for w in vocab]
+
 
 print(bow_vector(["dog", "cat", "dog", "bird"], ["cat", "dog", "fish"]))
 `}

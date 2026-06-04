@@ -22,24 +22,26 @@ With an early-exit flag, bubble sort is O(n) on already sorted input. Its averag
   starterCode={`#include <iostream>
 #include <utility>
 #include <vector>
-void bubbleSort(std::vector<int>& v) {
-    int n = static_cast<int>(v.size());
-    for (int pass = 0; pass < n - 1; pass++) {
-        bool swapped = false;
-        for (int i = 0; i < n - 1 - pass; i++) {
-            if (v[i] > v[i + 1]) {
-                std::swap(v[i], v[i + 1]);
-                swapped = true;
-            }
-        }
-        if (!swapped) break;
+void bubbleSort(std::vector<int> &v) {
+  int n = static_cast<int>(v.size());
+  for (int pass = 0; pass < n - 1; pass++) {
+    bool swapped = false;
+    for (int i = 0; i < n - 1 - pass; i++) {
+      if (v[i] > v[i + 1]) {
+        std::swap(v[i], v[i + 1]);
+        swapped = true;
+      }
     }
+    if (!swapped)
+      break;
+  }
 }
 int main() {
-    std::vector<int> v = {5, 1, 4, 2, 8};
-    bubbleSort(v);
-    for (int x : v) std::cout << x << "\\n";
-    return 0;
+  std::vector<int> v = {5, 1, 4, 2, 8};
+  bubbleSort(v);
+  for (int x : v)
+    std::cout << x << "\\n";
+  return 0;
 }
 `}
 />
@@ -53,21 +55,23 @@ Selection sort finds the smallest element in the unsorted suffix and swaps it in
   starterCode={`#include <iostream>
 #include <utility>
 #include <vector>
-void selectionSort(std::vector<int>& v) {
-    int n = static_cast<int>(v.size());
-    for (int i = 0; i < n; i++) {
-        int minIndex = i;
-        for (int j = i + 1; j < n; j++) {
-            if (v[j] < v[minIndex]) minIndex = j;
-        }
-        std::swap(v[i], v[minIndex]);
+void selectionSort(std::vector<int> &v) {
+  int n = static_cast<int>(v.size());
+  for (int i = 0; i < n; i++) {
+    int minIndex = i;
+    for (int j = i + 1; j < n; j++) {
+      if (v[j] < v[minIndex])
+        minIndex = j;
     }
+    std::swap(v[i], v[minIndex]);
+  }
 }
 int main() {
-    std::vector<int> v = {64, 25, 12, 22, 11};
-    selectionSort(v);
-    for (int x : v) std::cout << x << "\\n";
-    return 0;
+  std::vector<int> v = {64, 25, 12, 22, 11};
+  selectionSort(v);
+  for (int x : v)
+    std::cout << x << "\\n";
+  return 0;
 }
 `}
 />
@@ -82,22 +86,23 @@ Insertion sort builds a sorted prefix. For each new value, it shifts larger elem
   adapter="cpp"
   starterCode={`#include <iostream>
 #include <vector>
-void insertionSort(std::vector<int>& v) {
-    for (int i = 1; i < static_cast<int>(v.size()); i++) {
-        int key = v[i];
-        int j = i - 1;
-        while (j >= 0 && v[j] > key) {
-            v[j + 1] = v[j];
-            j--;
-        }
-        v[j + 1] = key;
+void insertionSort(std::vector<int> &v) {
+  for (int i = 1; i < static_cast<int>(v.size()); i++) {
+    int key = v[i];
+    int j = i - 1;
+    while (j >= 0 && v[j] > key) {
+      v[j + 1] = v[j];
+      j--;
     }
+    v[j + 1] = key;
+  }
 }
 int main() {
-    std::vector<int> v = {5, 2, 4, 6, 1, 3};
-    insertionSort(v);
-    for (int x : v) std::cout << x << "\\n";
-    return 0;
+  std::vector<int> v = {5, 2, 4, 6, 1, 3};
+  insertionSort(v);
+  for (int x : v)
+    std::cout << x << "\\n";
+  return 0;
 }
 `}
 />
@@ -122,17 +127,18 @@ A helper that prints vectors cleanly is useful while debugging sorts.
   adapter="cpp"
   starterCode={`#include <iostream>
 #include <vector>
-void printCommaSeparated(const std::vector<int>& v) {
-    for (int i = 0; i < static_cast<int>(v.size()); i++) {
-        if (i > 0) std::cout << ",";
-        std::cout << v[i];
-    }
-    std::cout << "\\n";
+void printCommaSeparated(const std::vector<int> &v) {
+  for (int i = 0; i < static_cast<int>(v.size()); i++) {
+    if (i > 0)
+      std::cout << ",";
+    std::cout << v[i];
+  }
+  std::cout << "\\n";
 }
 int main() {
-    std::vector<int> v = {1, 2, 3};
-    printCommaSeparated(v);
-    return 0;
+  std::vector<int> v = {1, 2, 3};
+  printCommaSeparated(v);
+  return 0;
 }
 `}
 />
@@ -148,51 +154,54 @@ Insertion sort's invariant is: before each outer-loop iteration, elements before
   starterCode={`#include <iostream>
 #include <utility>
 #include <vector>
-void bubbleSort(std::vector<int>& v) {
-    // your code here
+void bubbleSort(std::vector<int> &v) {
+  // your code here
 }
-void printVector(const std::vector<int>& v) {
-    for (int i = 0; i < static_cast<int>(v.size()); i++) {
-        if (i > 0) std::cout << ",";
-        std::cout << v[i];
-    }
-    std::cout << "\\n";
+void printVector(const std::vector<int> &v) {
+  for (int i = 0; i < static_cast<int>(v.size()); i++) {
+    if (i > 0)
+      std::cout << ",";
+    std::cout << v[i];
+  }
+  std::cout << "\\n";
 }
 int main() {
-    std::vector<int> v = {9, 1, 5, 3, 5, 2};
-    bubbleSort(v);
-    printVector(v);
-    return 0;
+  std::vector<int> v = {9, 1, 5, 3, 5, 2};
+  bubbleSort(v);
+  printVector(v);
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 #include <utility>
 #include <vector>
-void bubbleSort(std::vector<int>& v) {
-    int n = static_cast<int>(v.size());
-    for (int pass = 0; pass < n - 1; pass++) {
-        bool swapped = false;
-        for (int i = 0; i < n - 1 - pass; i++) {
-            if (v[i] > v[i + 1]) {
-                std::swap(v[i], v[i + 1]);
-                swapped = true;
-            }
-        }
-        if (!swapped) break;
+void bubbleSort(std::vector<int> &v) {
+  int n = static_cast<int>(v.size());
+  for (int pass = 0; pass < n - 1; pass++) {
+    bool swapped = false;
+    for (int i = 0; i < n - 1 - pass; i++) {
+      if (v[i] > v[i + 1]) {
+        std::swap(v[i], v[i + 1]);
+        swapped = true;
+      }
     }
+    if (!swapped)
+      break;
+  }
 }
-void printVector(const std::vector<int>& v) {
-    for (int i = 0; i < static_cast<int>(v.size()); i++) {
-        if (i > 0) std::cout << ",";
-        std::cout << v[i];
-    }
-    std::cout << "\\n";
+void printVector(const std::vector<int> &v) {
+  for (int i = 0; i < static_cast<int>(v.size()); i++) {
+    if (i > 0)
+      std::cout << ",";
+    std::cout << v[i];
+  }
+  std::cout << "\\n";
 }
 int main() {
-    std::vector<int> v = {9, 1, 5, 3, 5, 2};
-    bubbleSort(v);
-    printVector(v);
-    return 0;
+  std::vector<int> v = {9, 1, 5, 3, 5, 2};
+  bubbleSort(v);
+  printVector(v);
+  return 0;
 }
 `}
   tests={[{ id: "bubble_sorted", name: "Sorts values ascending", expect: { stdoutEquals: "1,2,3,5,5,9" } }]}
@@ -206,48 +215,50 @@ int main() {
   instructions={`Implement \`void insertionSort(std::vector<int>& v)\`. The driver prints the sorted result with comma separators.`}
   starterCode={`#include <iostream>
 #include <vector>
-void insertionSort(std::vector<int>& v) {
-    // your code here
+void insertionSort(std::vector<int> &v) {
+  // your code here
 }
-void printVector(const std::vector<int>& v) {
-    for (int i = 0; i < static_cast<int>(v.size()); i++) {
-        if (i > 0) std::cout << ",";
-        std::cout << v[i];
-    }
-    std::cout << "\\n";
+void printVector(const std::vector<int> &v) {
+  for (int i = 0; i < static_cast<int>(v.size()); i++) {
+    if (i > 0)
+      std::cout << ",";
+    std::cout << v[i];
+  }
+  std::cout << "\\n";
 }
 int main() {
-    std::vector<int> v = {8, 4, 2, 9, 5};
-    insertionSort(v);
-    printVector(v);
-    return 0;
+  std::vector<int> v = {8, 4, 2, 9, 5};
+  insertionSort(v);
+  printVector(v);
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 #include <vector>
-void insertionSort(std::vector<int>& v) {
-    for (int i = 1; i < static_cast<int>(v.size()); i++) {
-        int key = v[i];
-        int j = i - 1;
-        while (j >= 0 && v[j] > key) {
-            v[j + 1] = v[j];
-            j--;
-        }
-        v[j + 1] = key;
+void insertionSort(std::vector<int> &v) {
+  for (int i = 1; i < static_cast<int>(v.size()); i++) {
+    int key = v[i];
+    int j = i - 1;
+    while (j >= 0 && v[j] > key) {
+      v[j + 1] = v[j];
+      j--;
     }
+    v[j + 1] = key;
+  }
 }
-void printVector(const std::vector<int>& v) {
-    for (int i = 0; i < static_cast<int>(v.size()); i++) {
-        if (i > 0) std::cout << ",";
-        std::cout << v[i];
-    }
-    std::cout << "\\n";
+void printVector(const std::vector<int> &v) {
+  for (int i = 0; i < static_cast<int>(v.size()); i++) {
+    if (i > 0)
+      std::cout << ",";
+    std::cout << v[i];
+  }
+  std::cout << "\\n";
 }
 int main() {
-    std::vector<int> v = {8, 4, 2, 9, 5};
-    insertionSort(v);
-    printVector(v);
-    return 0;
+  std::vector<int> v = {8, 4, 2, 9, 5};
+  insertionSort(v);
+  printVector(v);
+  return 0;
 }
 `}
   tests={[{ id: "insertion_sorted", name: "Sorts values ascending", expect: { stdoutEquals: "2,4,5,8,9" } }]}

@@ -51,10 +51,15 @@ INSERT INTO customers (id, name) VALUES
 INSERT INTO orders (id, customer_id, amount) VALUES
   (101, 1, 42),
   (102, 2, 99);`}
-  starterCode={`SELECT c.name, o.id AS order_id, o.amount
-FROM customers c
-LEFT JOIN orders o ON o.customer_id = c.id
-ORDER BY c.name;`}
+  starterCode={`SELECT
+  c.name,
+  o.id AS order_id,
+  o.amount
+FROM
+  customers c
+  LEFT JOIN orders o ON o.customer_id = c.id
+ORDER BY
+  c.name;`}
 />
 
 Linus appears even though he has no order. His order columns are `NULL`, which means "no matching value exists here."
@@ -94,9 +99,11 @@ INSERT INTO orders (id, customer_id, amount) VALUES (101, 1, 42), (102, 2, 99);`
   c.name,
   COALESCE(CAST(o.id AS TEXT), 'no order') AS order_status,
   o.amount
-FROM customers c
-LEFT JOIN orders o ON o.customer_id = c.id
-ORDER BY c.name;`}
+FROM
+  customers c
+  LEFT JOIN orders o ON o.customer_id = c.id
+ORDER BY
+  c.name;`}
 />
 
 `COALESCE` is only for display here. The underlying missing value is still `NULL`.
@@ -126,11 +133,15 @@ INSERT INTO customers (id, name) VALUES
 INSERT INTO orders (id, customer_id, amount) VALUES
   (101, 1, 42),
   (102, 2, 99);`}
-  starterCode={`SELECT c.name
-FROM customers c
-LEFT JOIN orders o ON o.customer_id = c.id
-WHERE o.id IS NULL
-ORDER BY c.name;`}
+  starterCode={`SELECT
+  c.name
+FROM
+  customers c
+  LEFT JOIN orders o ON o.customer_id = c.id
+WHERE
+  o.id IS NULL
+ORDER BY
+  c.name;`}
 />
 
 Linus and Mae are returned because their joined order id is `NULL`.
@@ -149,11 +160,15 @@ INSERT INTO order_items (id, product_id, quantity) VALUES
   (101, 1, 2),
   (102, 2, 5),
   (103, 1, 1);`}
-  starterCode={`SELECT p.name
-FROM products p
-LEFT JOIN order_items oi ON oi.product_id = p.id
-WHERE oi.id IS NULL
-ORDER BY p.name;`}
+  starterCode={`SELECT
+  p.name
+FROM
+  products p
+  LEFT JOIN order_items oi ON oi.product_id = p.id
+WHERE
+  oi.id IS NULL
+ORDER BY
+  p.name;`}
 />
 
 This same pattern works whenever the question says "never," "missing," or "no related row."
@@ -169,11 +184,17 @@ This same pattern works whenever the question says "never," "missing," or "no re
 CREATE TABLE orders (id INTEGER PRIMARY KEY, customer_id INTEGER, amount NUMERIC);
 INSERT INTO customers (id, name) VALUES (1, 'Ada'), (2, 'Grace'), (3, 'Linus');
 INSERT INTO orders (id, customer_id, amount) VALUES (101, 1, 42), (102, 1, 18), (103, 2, 99);`}
-  starterCode={`SELECT c.name, COUNT(o.id) AS order_count
-FROM customers c
-LEFT JOIN orders o ON o.customer_id = c.id
-GROUP BY c.id, c.name
-ORDER BY c.name;`}
+  starterCode={`SELECT
+  c.name,
+  COUNT(o.id) AS order_count
+FROM
+  customers c
+  LEFT JOIN orders o ON o.customer_id = c.id
+GROUP BY
+  c.id,
+  c.name
+ORDER BY
+  c.name;`}
 />
 
 Linus gets `0` because there are no non-NULL order ids to count.

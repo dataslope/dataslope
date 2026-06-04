@@ -40,12 +40,15 @@ INSERT INTO orders VALUES
   (4,'East',200),(5,'North',60),(6,'West',95),(7,'East',30);`}
   starterCode={`SELECT
   region,
-  COUNT(*)       AS orders,
-  SUM(amount)    AS revenue,
+  COUNT(*) AS orders,
+  SUM(amount) AS revenue,
   ROUND(AVG(amount), 2) AS avg_order
-FROM orders
-GROUP BY region
-ORDER BY revenue DESC;`}
+FROM
+  orders
+GROUP BY
+  region
+ORDER BY
+  revenue DESC;`}
 />
 
 Read the result as a small report: each line is one region, summarized.
@@ -78,13 +81,18 @@ INSERT INTO sales VALUES
   ('West','Widget',120),('West','Gadget',80),('East','Widget',200),
   ('East','Gadget',50),('North','Widget',75),('West','Widget',60);`}
   starterCode={`SELECT
-  region,                 -- grouped
-  product,                -- grouped
-  COUNT(*)    AS n,       -- aggregated
-  SUM(amount) AS revenue  -- aggregated
-FROM sales
-GROUP BY region, product  -- group by BOTH dimensions
-ORDER BY region, revenue DESC;`}
+  region, -- grouped
+  product, -- grouped
+  COUNT(*) AS n, -- aggregated
+  SUM(amount) AS revenue -- aggregated
+FROM
+  sales
+GROUP BY
+  region,
+  product -- group by BOTH dimensions
+ORDER BY
+  region,
+  revenue DESC;`}
 />
 
 ## Grouping by multiple columns
@@ -110,15 +118,18 @@ INSERT INTO orders VALUES
   (1,15),(2,120),(3,45),(4,250),(5,8),(6,95),(7,500),(8,60);`}
   starterCode={`SELECT
   CASE
-    WHEN amount < 50  THEN 'small'
+    WHEN amount < 50 THEN 'small'
     WHEN amount < 200 THEN 'medium'
     ELSE 'large'
-  END               AS size_bucket,
-  COUNT(*)          AS orders,
-  SUM(amount)       AS revenue
-FROM orders
-GROUP BY size_bucket   -- group by the computed bucket
-ORDER BY revenue DESC;`}
+  END AS size_bucket,
+  COUNT(*) AS orders,
+  SUM(amount) AS revenue
+FROM
+  orders
+GROUP BY
+  size_bucket -- group by the computed bucket
+ORDER BY
+  revenue DESC;`}
 />
 
 You invented a *dimension* (`size_bucket`) that does not exist in the

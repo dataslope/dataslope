@@ -32,13 +32,13 @@ const ops = [(x: number) => x + 1, (x: number) => x * 2, (x: number) => x - 3];
 
 // Look them up by name
 const dispatch: Record<string, (x: number) => number> = {
-  inc:    (x) => x + 1,
+  inc: (x) => x + 1,
   double: (x) => x * 2,
   square: (x) => x * x,
 };
 
 console.log(double(10));
-console.log(ops.map((f) => f(5)));   // apply each op to 5
+console.log(ops.map((f) => f(5))); // apply each op to 5
 console.log(dispatch["square"](6));
 `}
 />
@@ -142,7 +142,9 @@ const n = timed("sum", () => {
 });
 
 console.log("n:", n);
-timed("noop", () => { for (let i = 0; i < 1_000_000; i++); });
+timed("noop", () => {
+  for (let i = 0; i < 1_000_000; i++);
+});
 `}
 />
 
@@ -159,30 +161,30 @@ function adder(amount: number): (n: number) => number {
   return (n) => n + amount;
 }
 
-const addTen     = adder(10);
+const addTen = adder(10);
 const addHundred = adder(100);
 
-console.log(addTen(5));        // 15
-console.log(addHundred(5));    // 105
+console.log(addTen(5)); // 15
+console.log(addHundred(5)); // 105
 
 // Another factory: validator generator
 type Validator<T> = (value: T) => string | null;
 
 function minLen(n: number): Validator<string> {
-  return (s) => s.length >= n ? null : \`must be at least \${n} characters\`;
+  return (s) => (s.length >= n ? null : \`must be at least \${n} characters\`);
 }
 
 function matches(re: RegExp, message: string): Validator<string> {
-  return (s) => re.test(s) ? null : message;
+  return (s) => (re.test(s) ? null : message);
 }
 
 const v1 = minLen(8);
 const v2 = matches(/@/, "must contain @");
 
-console.log(v1("abc"));            // "must be at least 8 characters"
-console.log(v1("abcdefghi"));      // null
-console.log(v2("nope"));           // "must contain @"
-console.log(v2("hi@there"));       // null
+console.log(v1("abc")); // "must be at least 8 characters"
+console.log(v1("abcdefghi")); // null
+console.log(v2("nope")); // "must contain @"
+console.log(v2("hi@there")); // null
 `}
 />
 
@@ -214,7 +216,7 @@ function withLogging<A extends readonly unknown[], R>(
   };
 }
 
-const add  = (x: number, y: number): number => x + y;
+const add = (x: number, y: number): number => x + y;
 const loggedAdd = withLogging("add", add);
 
 loggedAdd(2, 3);
@@ -237,16 +239,30 @@ These come up so often they're worth memorizing.
 const identity = <A,>(a: A): A => a;
 
 // constant: a function that ignores its argument and always returns x
-const constant = <A,>(a: A) => <B,>(_b: B): A => a;
+const constant =
+  <A,>(a: A) =>
+  <B,>(_b: B): A =>
+    a;
 
 // flip: swap the order of a binary function's arguments
-const flip = <A, B, C>(f: (a: A, b: B) => C) => (b: B, a: A): C => f(a, b);
+const flip =
+  <A, B, C>(f: (a: A, b: B) => C) =>
+  (b: B, a: A): C =>
+    f(a, b);
 
 // not: negate a predicate
-const not = <A,>(p: (a: A) => boolean) => (a: A): boolean => !p(a);
+const not =
+  <A,>(p: (a: A) => boolean) =>
+  (a: A): boolean =>
+    !p(a);
 
 // tap: run a side effect, return the value unchanged (great for debugging)
-const tap = <A,>(action: (a: A) => void) => (a: A): A => { action(a); return a; };
+const tap =
+  <A,>(action: (a: A) => void) =>
+  (a: A): A => {
+    action(a);
+    return a;
+  };
 
 console.log(identity(42));
 console.log(constant("X")<number>(123));
@@ -278,7 +294,7 @@ function twice<A>(f: (a: A) => A, a: A): A {
   return f(f(a));
 }
 
-console.log(twice((x: number) => x + 1, 0));   // 2
+console.log(twice((x: number) => x + 1, 0)); // 2
 console.log(twice((s: string) => s + "!", "hi")); // "hi!!"
 
 // A generic "until": keep applying f to a until pred is true
@@ -288,7 +304,13 @@ function until<A>(pred: (a: A) => boolean, f: (a: A) => A, a: A): A {
   return x;
 }
 
-console.log(until((n: number) => n >= 100, (n: number) => n * 2, 1));
+console.log(
+  until(
+    (n: number) => n >= 100,
+    (n: number) => n * 2,
+    1,
+  ),
+);
 `}
 />
 

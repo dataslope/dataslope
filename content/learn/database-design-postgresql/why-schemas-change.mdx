@@ -210,21 +210,30 @@ INSERT INTO tasks (title, status) VALUES
     ('Review constraints', 'done');
 `}
   starterCode={`CREATE TABLE projects (
-    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name TEXT NOT NULL UNIQUE
+  id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE
 );
 
-INSERT INTO projects (name) VALUES ('Database course');
+INSERT INTO
+  projects (name)
+VALUES
+  ('Database course');
 
-ALTER TABLE tasks ADD COLUMN project_id INT REFERENCES projects(id);
+ALTER TABLE tasks
+ADD COLUMN project_id INT REFERENCES projects (id);
 
 UPDATE tasks
-SET project_id = 1;
+SET
+  project_id = 1;
 
-SELECT t.title, p.name AS project
-FROM tasks AS t
-JOIN projects AS p ON p.id = t.project_id
-ORDER BY t.id;`}
+SELECT
+  t.title,
+  p.name AS project
+FROM
+  tasks AS t
+  JOIN projects AS p ON p.id = t.project_id
+ORDER BY
+  t.id;`}
 />
 
 This example adds structure without destroying the existing task rows.

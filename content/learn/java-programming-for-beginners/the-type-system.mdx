@@ -97,15 +97,15 @@ it got.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        int    x = 5;
-        String s = "hello";
+  public static void main(String[] args) {
+    int x = 5;
+    String s = "hello";
 
-        System.out.println(x + 1);      // 6
-        System.out.println(s + x);      // "hello5"
-        System.out.println(x > 0);      // true
-        System.out.println("x = " + x); // "x = 5"
-    }
+    System.out.println(x + 1);      // 6
+    System.out.println(s + x);      // "hello5"
+    System.out.println(x > 0);      // true
+    System.out.println("x = " + x); // "x = 5"
+  }
 }
 `}
 />
@@ -136,15 +136,15 @@ chopped off.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        int    a = 5;
-        double b = a;          // widening
-        System.out.println("b = " + b);
+  public static void main(String[] args) {
+    int a = 5;
+    double b = a; // widening
+    System.out.println("b = " + b);
 
-        double pi = 3.14;
-        int    n  = (int) pi;  // narrowing
-        System.out.println("n = " + n);
-    }
+    double pi = 3.14;
+    int n = (int)pi; // narrowing
+    System.out.println("n = " + n);
+  }
 }
 `}
 />
@@ -184,17 +184,17 @@ beginners often think of it as primitive. Worth knowing:
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        String a = "java";
-        String b = a.toUpperCase();
+  public static void main(String[] args) {
+    String a = "java";
+    String b = a.toUpperCase();
 
-        System.out.println("a = " + a);          // unchanged
-        System.out.println("b = " + b);
-        System.out.println("length(a) = " + a.length());
+    System.out.println("a = " + a); // unchanged
+    System.out.println("b = " + b);
+    System.out.println("length(a) = " + a.length());
 
-        String greet = "Hello, world!";
-        System.out.println(greet.substring(7, 12));  // "world"
-    }
+    String greet = "Hello, world!";
+    System.out.println(greet.substring(7, 12)); // "world"
+  }
 }
 `}
 />

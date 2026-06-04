@@ -147,10 +147,15 @@ INSERT INTO student_phones VALUES
   (102, 1, '555-2000'),
   (103, 2, '555-3000');`}
   starterCode={`-- Each phone number is now its own row.
-SELECT s.name, p.phone_number
-FROM students s
-JOIN student_phones p ON p.student_id = s.id
-ORDER BY s.name, p.phone_number;`}
+SELECT
+  s.name,
+  p.phone_number
+FROM
+  students s
+  JOIN student_phones p ON p.student_id = s.id
+ORDER BY
+  s.name,
+  p.phone_number;`}
 />
 
 The child table also lets the database protect facts. The foreign key

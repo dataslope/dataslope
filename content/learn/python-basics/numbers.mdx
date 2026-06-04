@@ -24,7 +24,7 @@ Understanding the quirks of Python's numeric types—especially the precision li
 
 <CodeBlock
   adapter="python"
-  starterCode={`big = 2 ** 200
+  starterCode={`big = 2**200
 print(big)
 print("digits:", len(str(big)))
 `}
@@ -38,9 +38,9 @@ Integer literals support several bases:
 
 <CodeBlock
   adapter="python"
-  starterCode={`print(0b1010)   # binary -> 10
-print(0o17)     # octal  -> 15
-print(0xff)     # hex    -> 255
+  starterCode={`print(0b1010)  # binary -> 10
+print(0o17)  # octal  -> 15
+print(0xFF)  # hex    -> 255
 `}
 />
 
@@ -168,7 +168,7 @@ A common surprise: `/` **always** returns a float in Python 3, even when both op
 
 <CodeBlock
   adapter="python"
-  starterCode={`print(7 / 2)   # 3.5 (float)
+  starterCode={`print(7 / 2)  # 3.5 (float)
 print(7 // 2)  # 3 (int)
 `}
 />
@@ -177,15 +177,15 @@ Floor division rounds toward negative infinity, which can surprise C programmers
 
 <CodeBlock
   adapter="python"
-  starterCode={`print(7 // 2)    # 3
-print(-7 // 2)   # -4, not -3
+  starterCode={`print(7 // 2)  # 3
+print(-7 // 2)  # -4, not -3
 `}
 />
 
 <CodeBlock
   adapter="python"
   starterCode={`print(7 % 2)
-print(2 ** 0.5)  # square root via exponentiation
+print(2**0.5)  # square root via exponentiation
 `}
 />
 
@@ -252,10 +252,11 @@ For non-cryptographic randomness, use `random`. For cryptography, use `secrets`.
 <CodeBlock
   adapter="python"
   starterCode={`import random
+
 random.seed(42)  # makes output reproducible
 
-print(random.random())            # float in [0.0, 1.0)
-print(random.randint(1, 6))       # inclusive on both ends
+print(random.random())  # float in [0.0, 1.0)
+print(random.randint(1, 6))  # inclusive on both ends
 print(random.choice(["a", "b", "c"]))
 `}
 />
@@ -263,6 +264,7 @@ print(random.choice(["a", "b", "c"]))
 <CodeBlock
   adapter="python"
   starterCode={`import random
+
 random.seed(42)
 
 print(random.sample(range(100), 5))  # 5 unique items
@@ -277,18 +279,22 @@ print(random.sample(range(100), 5))  # 5 unique items
   instructions={`Write a function \`round_to_cents(amount)\` that takes a string representing a dollar amount (e.g., \`"19.996"\`) and returns a \`Decimal\` rounded to two decimal places. Use \`Decimal\` and its \`.quantize()\` method with \`ROUND_HALF_UP\`.`}
   starterCode={`from decimal import Decimal, ROUND_HALF_UP
 
+
 def round_to_cents(amount):
     # Your code here
     return Decimal("0.00")
+
 
 print(round_to_cents("19.996"))
 print(round_to_cents("0.004"))
 `}
   solutionCode={`from decimal import Decimal, ROUND_HALF_UP
 
+
 def round_to_cents(amount):
     d = Decimal(amount)
     return d.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
 
 print(round_to_cents("19.996"))
 print(round_to_cents("0.004"))
@@ -320,6 +326,7 @@ print(round_to_cents("0.004"))
     # Your code here
     return 1
 
+
 print(gcd(48, 18))
 print(gcd(100, 25))
 `}
@@ -327,6 +334,7 @@ print(gcd(100, 25))
     while b:
         a, b = b, a % b
     return a
+
 
 print(gcd(48, 18))
 print(gcd(100, 25))
@@ -358,11 +366,13 @@ print(gcd(100, 25))
     # Your code here
     return 0.0
 
+
 print(compound_interest(1000, 0.05, 10))
 `}
   solutionCode={`def compound_interest(principal, rate, years):
     amount = principal * (1 + rate) ** years
     return round(amount, 2)
+
 
 print(compound_interest(1000, 0.05, 10))
 `}

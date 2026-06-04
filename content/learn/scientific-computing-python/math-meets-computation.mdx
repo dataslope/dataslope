@@ -64,13 +64,13 @@ print(f"Machine epsilon (float64): {eps:.3e}")
 
 # The classic surprise:
 a = 0.1 + 0.2
-print(f"0.1 + 0.2 = {a!r}")           # not exactly 0.3
+print(f"0.1 + 0.2 = {a!r}")  # not exactly 0.3
 print(f"Is it 0.3? {a == 0.3}")
 
 # A subtler surprise: associativity is *not* guaranteed
 x = 1e16
-print((x + 1) - x)                    # 0.0
-print(x + (1 - x))                    # 1.0
+print((x + 1) - x)  # 0.0
+print(x + (1 - x))  # 1.0
 `}
 />
 
@@ -117,10 +117,12 @@ at all. Multiplying a matrix by a vector might be well-conditioned;
   adapter="python"
   starterCode={`import numpy as np
 
+
 # A "Hilbert matrix" — famously ill-conditioned
 def hilbert(n):
     i, j = np.indices((n, n))
     return 1.0 / (i + j + 1)
+
 
 for n in [4, 8, 12, 16]:
     H = hilbert(n)
@@ -152,14 +154,16 @@ $\sin$ as you add more terms.
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 def taylor_sin(x, n_terms):
     s, term = 0.0, x
     for k in range(n_terms):
         s += term
-        term *= -x*x / ((2*k+2) * (2*k+3))
+        term *= -x * x / ((2 * k + 2) * (2 * k + 3))
     return s
 
-xs = np.linspace(-2*np.pi, 2*np.pi, 400)
+
+xs = np.linspace(-2 * np.pi, 2 * np.pi, 400)
 true = np.sin(xs)
 
 plt.figure(figsize=(9, 4))
@@ -167,7 +171,10 @@ plt.plot(xs, true, "k", lw=2, label="true sin(x)")
 for n in [2, 4, 6, 10]:
     approx = [taylor_sin(x, n) for x in xs]
     plt.plot(xs, approx, label=f"Taylor, {n} terms")
-plt.ylim(-2, 2); plt.legend(); plt.xlabel("x"); plt.ylabel("sin(x)")
+plt.ylim(-2, 2)
+plt.legend()
+plt.xlabel("x")
+plt.ylabel("sin(x)")
 plt.title("Approximating sin(x) with finite Taylor sums")
 plt.show()
 `}

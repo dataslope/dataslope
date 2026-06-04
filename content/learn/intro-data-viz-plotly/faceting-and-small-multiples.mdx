@@ -38,7 +38,9 @@ arranged horizontally.
 df = px.data.tips()
 
 fig = px.histogram(
-    df, x="total_bill", color="sex",
+    df,
+    x="total_bill",
+    color="sex",
     facet_col="time",
     template="simple_white",
     title="Bill distribution by sex, faceted by meal time",
@@ -62,8 +64,12 @@ Combine `facet_row` and `facet_col` for a full grid:
 df = px.data.tips()
 
 fig = px.scatter(
-    df, x="total_bill", y="tip", color="smoker",
-    facet_row="time", facet_col="day",
+    df,
+    x="total_bill",
+    y="tip",
+    color="smoker",
+    facet_row="time",
+    facet_col="day",
     category_orders={"day": ["Thur", "Fri", "Sat", "Sun"]},
     template="simple_white",
     title="Tip vs bill — full grid: time x day, color = smoker",
@@ -92,8 +98,11 @@ countries = ["Germany", "Italy", "France", "Japan", "China", "India"]
 df = df[df["country"].isin(countries)]
 
 fig = px.line(
-    df, x="year", y="lifeExp",
-    facet_col="country", facet_col_wrap=3,
+    df,
+    x="year",
+    y="lifeExp",
+    facet_col="country",
+    facet_col_wrap=3,
     template="simple_white",
     title="Life expectancy over time — small multiples",
     labels={"year": "Year", "lifeExp": "Life expectancy"},

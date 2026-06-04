@@ -41,8 +41,10 @@ with a single number — the whole table collapsed to a count:
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
   ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
-  starterCode={`SELECT COUNT(*) AS employee_count
-FROM employees;`}
+  starterCode={`SELECT
+  COUNT(*) AS employee_count
+FROM
+  employees;`}
 />
 
 ## Totals, averages, extremes
@@ -60,12 +62,13 @@ INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
   ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
   starterCode={`SELECT
-  COUNT(*)            AS headcount,
-  SUM(salary)         AS total_payroll,
-  ROUND(AVG(salary))  AS avg_salary,
-  MIN(salary)         AS lowest,
-  MAX(salary)         AS highest
-FROM employees;`}
+  COUNT(*) AS headcount,
+  SUM(salary) AS total_payroll,
+  ROUND(AVG(salary)) AS avg_salary,
+  MIN(salary) AS lowest,
+  MAX(salary) AS highest
+FROM
+  employees;`}
 />
 
 One row, five numbers — a complete summary of the whole table. This
@@ -87,9 +90,12 @@ Engineering*" is just an average with a filter:
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
   ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
-  starterCode={`SELECT ROUND(AVG(salary)) AS avg_eng_salary
-FROM employees
-WHERE dept = 'Engineering';`}
+  starterCode={`SELECT
+  ROUND(AVG(salary)) AS avg_eng_salary
+FROM
+  employees
+WHERE
+  dept = 'Engineering';`}
 />
 
 ```mermaid
@@ -120,9 +126,10 @@ between them tells you how many values are missing:
 INSERT INTO customers (name, phone) VALUES
   ('Ada','555-0101'),('Grace',NULL),('Linus','555-0102'),('Mae',NULL);`}
   starterCode={`SELECT
-  COUNT(*)     AS total_rows,
+  COUNT(*) AS total_rows,
   COUNT(phone) AS rows_with_phone
-FROM customers;`}
+FROM
+  customers;`}
 />
 
 Four rows, but only two phones on file — the difference reveals the
@@ -188,9 +195,14 @@ Aggregate functions reduce many rows to a single summarizing value.`}
 INSERT INTO payments (amount) VALUES (50.00), (20.00), (30.00), (100.00);`}
   starterCode={`-- One row with three aggregate columns:
 SELECT
-FROM payments;
-`}
-  solutionSql={`SELECT COUNT(*) AS n, SUM(amount) AS total, AVG(amount) AS avg FROM payments;`}
+FROM
+  payments;`}
+  solutionSql={`SELECT
+  COUNT(*) AS n,
+  SUM(amount) AS total,
+  AVG(amount) AS avg
+FROM
+  payments;`}
   tests={[
     {
       id: "columns",

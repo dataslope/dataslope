@@ -179,7 +179,7 @@ console.log("bit:", bit);
 
 type Yes = true;
 type No = false;
-type Answer = true | false;  // equivalent to boolean, but explicit
+type Answer = true | false; // equivalent to boolean, but explicit
 
 let answer: Answer = true;
 console.log("answer:", answer);
@@ -196,8 +196,8 @@ type, not the general primitive:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const message = "Hello";  // inferred as "Hello" (literal)
-let greeting = "Hi";       // inferred as string (general)
+  starterCode={`const message = "Hello"; // inferred as "Hello" (literal)
+let greeting = "Hi"; // inferred as string (general)
 
 console.log("message:", message);
 console.log("greeting:", greeting);
@@ -249,14 +249,14 @@ the values are fixed at compile time:
   SERVER_ERROR: 500,
 } as const;
 
-type StatusCode = typeof STATUS_CODES[keyof typeof STATUS_CODES];
+type StatusCode = (typeof STATUS_CODES)[keyof typeof STATUS_CODES];
 // StatusCode is 200 | 404 | 500
 
 function handleStatus(code: StatusCode): void {
   console.log("Handling status:", code);
 }
 
-handleStatus(STATUS_CODES.OK);        // ✅
+handleStatus(STATUS_CODES.OK); // ✅
 handleStatus(STATUS_CODES.NOT_FOUND); // ✅
 // handleStatus(999);                 // ❌ Argument of type '999' is not assignable
 `}

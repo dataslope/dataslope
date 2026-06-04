@@ -114,7 +114,8 @@ static IEnumerable<int> Naturals()
 // Infinite source — but we only consume 5.
 foreach (var n in Naturals())
 {
-    if (n > 5) break;
+    if (n > 5)
+        break;
     Console.WriteLine(n);
 }
 `}
@@ -174,18 +175,23 @@ using System.Collections.Generic;
 
 static IEnumerable<int> Source()
 {
-    Console.WriteLine("  Source: yielding 1");  yield return 1;
-    Console.WriteLine("  Source: yielding 2");  yield return 2;
-    Console.WriteLine("  Source: yielding 3");  yield return 3;
+    Console.WriteLine("  Source: yielding 1");
+    yield return 1;
+    Console.WriteLine("  Source: yielding 2");
+    yield return 2;
+    Console.WriteLine("  Source: yielding 3");
+    yield return 3;
 }
 
 var seq = Source();
 
 Console.WriteLine("First pass:");
-foreach (var n in seq) Console.WriteLine($"  got {n}");
+foreach (var n in seq)
+    Console.WriteLine($"  got {n}");
 
 Console.WriteLine("Second pass:");
-foreach (var n in seq) Console.WriteLine($"  got {n}");
+foreach (var n in seq)
+    Console.WriteLine($"  got {n}");
 `}
 />
 
@@ -204,18 +210,23 @@ using System.Linq;
 
 static IEnumerable<int> Source()
 {
-    Console.WriteLine("  Source: yielding 1");  yield return 1;
-    Console.WriteLine("  Source: yielding 2");  yield return 2;
-    Console.WriteLine("  Source: yielding 3");  yield return 3;
+    Console.WriteLine("  Source: yielding 1");
+    yield return 1;
+    Console.WriteLine("  Source: yielding 2");
+    yield return 2;
+    Console.WriteLine("  Source: yielding 3");
+    yield return 3;
 }
 
-var seq = Source().ToList();   // materialize once
+var seq = Source().ToList(); // materialize once
 
 Console.WriteLine("First pass:");
-foreach (var n in seq) Console.WriteLine($"  got {n}");
+foreach (var n in seq)
+    Console.WriteLine($"  got {n}");
 
 Console.WriteLine("Second pass:");
-foreach (var n in seq) Console.WriteLine($"  got {n}");
+foreach (var n in seq)
+    Console.WriteLine($"  got {n}");
 `}
 />
 
@@ -233,15 +244,16 @@ data sitting in memory".
   starterCode={`using System;
 using System.Linq;
 
-var nums = Enumerable.Range(1, 5);            // deferred
+var nums = Enumerable.Range(1, 5); // deferred
 
-int[]                arr = nums.ToArray();
+int[] arr = nums.ToArray();
 System.Collections.Generic.List<int> list = nums.ToList();
 var dict = nums.ToDictionary(n => n, n => n * n);
 
 Console.WriteLine($"arr = [{string.Join(", ", arr)}]");
 Console.WriteLine($"list count = {list.Count}");
-foreach (var kv in dict) Console.WriteLine($"  {kv.Key} → {kv.Value}");
+foreach (var kv in dict)
+    Console.WriteLine($"  {kv.Key} → {kv.Value}");
 `}
 />
 

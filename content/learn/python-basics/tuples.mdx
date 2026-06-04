@@ -44,7 +44,7 @@ print(type(also_two))
 <CodeBlock
   adapter="python"
   starterCode={`one = (1,)
-not_a_tuple = (1)
+not_a_tuple = 1
 print("one:", one, type(one))
 print("not_a_tuple:", not_a_tuple, type(not_a_tuple))
 `}
@@ -211,6 +211,7 @@ Functions "return multiple values" by returning a tuple, which the caller can un
   starterCode={`def minmax(values):
     return min(values), max(values)
 
+
 lo, hi = minmax([3, 1, 4, 1, 5, 9, 2, 6])
 print("min:", lo, "max:", hi)
 `}
@@ -220,6 +221,7 @@ print("min:", lo, "max:", hi)
   adapter="python"
   starterCode={`def divmod_manual(a, b):
     return (a // b, a % b)
+
 
 quotient, remainder = divmod_manual(17, 5)
 print("quotient:", quotient, "remainder:", remainder)
@@ -248,10 +250,12 @@ The newer `typing.NamedTuple` version lets you add type hints.
   adapter="python"
   starterCode={`from typing import NamedTuple
 
+
 class Color(NamedTuple):
     r: int
     g: int
     b: int
+
 
 c = Color(255, 128, 0)
 print(c)

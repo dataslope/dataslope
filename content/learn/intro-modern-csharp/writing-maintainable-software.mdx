@@ -46,8 +46,7 @@ Console.WriteLine(F(70, 1.75));
   adapter="csharp"
   starterCode={`using System;
 
-double Bmi(double weightKg, double heightMeters)
-    => weightKg / (heightMeters * heightMeters);
+double Bmi(double weightKg, double heightMeters) => weightKg / (heightMeters * heightMeters);
 
 Console.WriteLine(Bmi(70, 1.75));
 `}
@@ -89,9 +88,11 @@ void ProcessOrders(List<int> amounts)
     int big = 0;
     foreach (var a in amounts)
     {
-        if (a < 0) throw new ArgumentException("negative amount");
+        if (a < 0)
+            throw new ArgumentException("negative amount");
         total += a;
-        if (a > 100) big++;
+        if (a > 100)
+            big++;
     }
     Console.WriteLine($"total: {total}, big: {big}, average: {(double)total / amounts.Count:F2}");
 }
@@ -109,7 +110,8 @@ using System.Linq;
 void ValidateAmounts(IEnumerable<int> amounts)
 {
     foreach (var a in amounts)
-        if (a < 0) throw new ArgumentException("negative amount");
+        if (a < 0)
+            throw new ArgumentException("negative amount");
 }
 
 int CountBigOrders(IEnumerable<int> amounts) => amounts.Count(a => a > 100);
@@ -181,7 +183,7 @@ about. Where you can:
 public record Money(decimal Amount, string Currency);
 
 var a = new Money(10m, "USD");
-var b = a with { Amount = 25m };   // a is unchanged
+var b = a with { Amount = 25m }; // a is unchanged
 
 Console.WriteLine($"{a}, {b}");
 `}

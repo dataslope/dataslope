@@ -34,9 +34,13 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  starterCode={`SELECT title, price
-FROM books
-ORDER BY price ASC;`}
+  starterCode={`SELECT
+  title,
+  price
+FROM
+  books
+ORDER BY
+  price ASC;`}
 />
 
 <SqlCodeBlock
@@ -56,9 +60,13 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  starterCode={`SELECT title, price
-FROM books
-ORDER BY price DESC;`}
+  starterCode={`SELECT
+  title,
+  price
+FROM
+  books
+ORDER BY
+  price DESC;`}
 />
 
 ```mermaid
@@ -87,9 +95,13 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  starterCode={`SELECT title, author
-FROM books
-ORDER BY title;`}
+  starterCode={`SELECT
+  title,
+  author
+FROM
+  books
+ORDER BY
+  title;`}
 />
 
 ## Sort by more than one column
@@ -115,9 +127,15 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  starterCode={`SELECT genre, title, price
-FROM books
-ORDER BY genre ASC, price DESC;`}
+  starterCode={`SELECT
+  genre,
+  title,
+  price
+FROM
+  books
+ORDER BY
+  genre ASC,
+  price DESC;`}
 />
 
 ```mermaid
@@ -152,10 +170,15 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  starterCode={`SELECT title, price
-FROM books
-ORDER BY price ASC
-LIMIT 3;`}
+  starterCode={`SELECT
+  title,
+  price
+FROM
+  books
+ORDER BY
+  price ASC
+LIMIT
+  3;`}
 />
 
 <Callout type="warning" title="LIMIT needs order when meaning matters">
@@ -193,10 +216,17 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  starterCode={`SELECT title, price
-FROM books
-ORDER BY price ASC
-LIMIT 2 OFFSET 2;`}
+  starterCode={`SELECT
+  title,
+  price
+FROM
+  books
+ORDER BY
+  price ASC
+LIMIT
+  2
+OFFSET
+  2;`}
 />
 
 This orders all books by price, skips the two cheapest, then returns the
@@ -234,11 +264,18 @@ INSERT INTO books (title, author, genre, price, pages) VALUES
   ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
   ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
   ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
-  starterCode={`SELECT title, genre, price
-FROM books
-WHERE price < 25
-ORDER BY price DESC
-LIMIT 2;`}
+  starterCode={`SELECT
+  title,
+  genre,
+  price
+FROM
+  books
+WHERE
+  price < 25
+ORDER BY
+  price DESC
+LIMIT
+  2;`}
 />
 
 ## Check your understanding

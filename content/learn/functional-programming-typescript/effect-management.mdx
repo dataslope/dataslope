@@ -24,9 +24,9 @@ that, when called, produces a value:
   starterCode={`type IO<A> = () => A;
 
 // "describe" some effects (no execution yet)
-const sayHi:   IO<void>   = () => console.log("hi");
-const random:  IO<number> = () => Math.random();
-const now:     IO<number> = () => Date.now();
+const sayHi: IO<void> = () => console.log("hi");
+const random: IO<number> = () => Math.random();
+const now: IO<number> = () => Date.now();
 
 // Constructing them does NOTHING. They are just descriptions.
 console.log("nothing happened yet");
@@ -52,28 +52,41 @@ Once you have `IO<A>`, you can build the familiar trio:
   adapter="typescript"
   starterCode={`type IO<A> = () => A;
 
-const of  = <A,>(a: A): IO<A> => () => a;
+const of =
+  <A,>(a: A): IO<A> =>
+  () =>
+    a;
 
-const map = <A, B>(io: IO<A>, f: (a: A) => B): IO<B> =>
-  () => f(io());
+const map =
+  <A, B>(io: IO<A>, f: (a: A) => B): IO<B> =>
+  () =>
+    f(io());
 
-const chain = <A, B>(io: IO<A>, f: (a: A) => IO<B>): IO<B> =>
-  () => f(io())();
+const chain =
+  <A, B>(io: IO<A>, f: (a: A) => IO<B>): IO<B> =>
+  () =>
+    f(io())();
 
 // Build a recipe that:
 //  1. reads "now"
 //  2. doubles it
 //  3. prints it, returning void
 
-const printNumber = (n: number): IO<void> => () => console.log("n =", n);
+const printNumber =
+  (n: number): IO<void> =>
+  () =>
+    console.log("n =", n);
 
 const program: IO<void> = chain(
-  map(() => Date.now(), (t) => t * 2),
+  map(
+    () => Date.now(),
+    (t) => t * 2,
+  ),
   printNumber,
 );
 
 console.log("about to run...");
-program();    // <-- the one and only effectful call
+program(); // <-- the one and only effectful call
 `}
 />
 
@@ -109,9 +122,7 @@ against actual implementations.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Op =
-  | { kind: "log";   msg: string }
-  | { kind: "now" };
+  starterCode={`type Op = { kind: "log"; msg: string } | { kind: "now" };
 
 // A "program" is a list of ops + a continuation that consumes their results.
 // We keep it tiny: a fixed sequence with each op's result available to the next.
@@ -121,8 +132,16 @@ type Step<A> =
   | { kind: "do"; op: Op; next: (x: unknown) => Step<A> };
 
 const pure = <A,>(value: A): Step<A> => ({ kind: "pure", value });
-const log  = (msg: string): Step<void>   => ({ kind: "do", op: { kind: "log", msg }, next: () => pure(undefined) });
-const now  = (): Step<number>            => ({ kind: "do", op: { kind: "now" },      next: (x) => pure(x as number) });
+const log = (msg: string): Step<void> => ({
+  kind: "do",
+  op: { kind: "log", msg },
+  next: () => pure(undefined),
+});
+const now = (): Step<number> => ({
+  kind: "do",
+  op: { kind: "now" },
+  next: (x) => pure(x as number),
+});
 
 function chain<A, B>(s: Step<A>, f: (a: A) => Step<B>): Step<B> {
   if (s.kind === "pure") return f(s.value);
@@ -131,8 +150,8 @@ function chain<A, B>(s: Step<A>, f: (a: A) => Step<B>): Step<B> {
 
 // --- A program described as DATA ---
 const program: Step<void> = chain(now(), (t) =>
-  chain(log(\`time is \${t}\`), () =>
-    log(\`still describing — nothing has run\`)));
+  chain(log(\`time is \${t}\`), () => log(\`still describing — nothing has run\`)),
+);
 
 console.log("Built program: ", program.kind === "do" ? program.op : "empty");
 
@@ -141,8 +160,13 @@ function runReal<A>(s: Step<A>): A {
   if (s.kind === "pure") return s.value;
   let r: unknown;
   switch (s.op.kind) {
-    case "log": console.log("[real]", s.op.msg); r = undefined; break;
-    case "now": r = Date.now(); break;
+    case "log":
+      console.log("[real]", s.op.msg);
+      r = undefined;
+      break;
+    case "now":
+      r = Date.now();
+      break;
   }
   return runReal(s.next(r));
 }
@@ -152,8 +176,13 @@ function runTest<A>(s: Step<A>): A {
   if (s.kind === "pure") return s.value;
   let r: unknown;
   switch (s.op.kind) {
-    case "log": console.log("[test]", s.op.msg); r = undefined; break;
-    case "now": r = 1234567890; break;        // <-- deterministic time!
+    case "log":
+      console.log("[test]", s.op.msg);
+      r = undefined;
+      break;
+    case "now":
+      r = 1234567890;
+      break; // <-- deterministic time!
   }
   return runTest(s.next(r));
 }

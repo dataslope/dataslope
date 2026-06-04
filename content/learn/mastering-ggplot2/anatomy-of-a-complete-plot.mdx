@@ -17,7 +17,7 @@ ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
   geom_point(alpha = 0.7) +
   geom_smooth(method = "lm", se = FALSE) +
   scale_color_brewer(palette = "Set1") +
-  facet_wrap(~ class) +
+  facet_wrap(~class) +
   labs(
     title = "Engine size vs. highway efficiency",
     subtitle = "Split by vehicle class, colored by drivetrain",
@@ -74,7 +74,7 @@ would do — without running them. Test yourself, then run to confirm.
 ggplot(mpg, aes(x = displ, y = hwy)) +
   geom_point(aes(color = drv), alpha = 0.7) +
   geom_smooth(method = "lm", se = FALSE) +
-  facet_wrap(~ class) +
+  facet_wrap(~class) +
   theme_minimal()
 `}
 />
@@ -94,8 +94,9 @@ Experienced ggplot users do not type that whole block at once. They
   starterCode={`library(ggplot2)
 
 # Start minimal, then add components one at a time.
-p <- ggplot(mpg, aes(displ, hwy, color = drv)) + geom_point()
-p   # check: do the points and colors look right?
+p <- ggplot(mpg, aes(displ, hwy, color = drv)) +
+  geom_point()
+p # check: do the points and colors look right?
 `}
 />
 
@@ -103,9 +104,10 @@ p   # check: do the points and colors look right?
   adapter="r"
   starterCode={`library(ggplot2)
 
-p <- ggplot(mpg, aes(displ, hwy, color = drv)) + geom_point()
+p <- ggplot(mpg, aes(displ, hwy, color = drv)) +
+  geom_point()
 # Add the next component and re-check.
-p + facet_wrap(~ class)
+p + facet_wrap(~class)
 `}
 />
 

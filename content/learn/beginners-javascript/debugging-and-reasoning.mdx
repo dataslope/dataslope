@@ -65,7 +65,7 @@ final answer.
 }
 
 // Suspicious result:
-console.log(average([1, 2, 3, "4", 5]));   // not 3 — why?
+console.log(average([1, 2, 3, "4", 5])); // not 3 — why?
 `}
 />
 
@@ -103,8 +103,8 @@ A few small habits make logs much more useful:
 <CodeBlock
   adapter="javascript"
   starterCode={`const users = [
-  { name: "Ada",   age: 28, role: "admin" },
-  { name: "Linus", age: 35, role: "user"  },
+  { name: "Ada", age: 28, role: "admin" },
+  { name: "Linus", age: 35, role: "user" },
   { name: "Grace", age: 80, role: "admin" },
 ];
 
@@ -160,18 +160,32 @@ A small zoo of errors you'll meet often:
   adapter="javascript"
   starterCode={`// TypeError: Cannot read properties of undefined (reading 'name')
 const user = undefined;
-try { console.log(user.name); } catch (e) { console.log("1:", e.message); }
+try {
+  console.log(user.name);
+} catch (e) {
+  console.log("1:", e.message);
+}
 
 // ReferenceError: x is not defined
-try { console.log(notDeclared); } catch (e) { console.log("2:", e.message); }
+try {
+  console.log(notDeclared);
+} catch (e) {
+  console.log("2:", e.message);
+}
 
 // SyntaxError: parsed at load time, before any of your code runs.
 // (Can't demo here; uncomment to see "missing )" etc.)
 // const x = (
 
 // RangeError: Maximum call stack size exceeded
-function recurse() { recurse(); }
-try { recurse(); } catch (e) { console.log("3:", e.message); }
+function recurse() {
+  recurse();
+}
+try {
+  recurse();
+} catch (e) {
+  console.log("3:", e.message);
+}
 `}
 />
 
@@ -203,9 +217,17 @@ comments, assertions, or tests — gives you anchors.
 }
 
 const acct = { balance: 100 };
-console.log(withdraw(acct, 40));   // 60
-try { withdraw(acct, 999); } catch (e) { console.log(e.message); }
-try { withdraw(acct, -5);  } catch (e) { console.log(e.message); }
+console.log(withdraw(acct, 40)); // 60
+try {
+  withdraw(acct, 999);
+} catch (e) {
+  console.log(e.message);
+}
+try {
+  withdraw(acct, -5);
+} catch (e) {
+  console.log(e.message);
+}
 `}
 />
 
@@ -342,14 +364,15 @@ Your task:
   starterCode={`function average(nums) {
   // The current (buggy) implementation:
   let total = 0;
-  for (let i = 0; i <= nums.length; i++) {  // bug-ish?
-    total += nums[i];                       // bug-ish?
+  for (let i = 0; i <= nums.length; i++) {
+    // bug-ish?
+    total += nums[i]; // bug-ish?
   }
-  return total / nums.length;               // bug-ish?
+  return total / nums.length; // bug-ish?
 }
 
-console.log(average([1, 2, 3]));         // expect 2
-console.log(average([]));                // expect 0
+console.log(average([1, 2, 3])); // expect 2
+console.log(average([])); // expect 0
 console.log(average([1, "x", 3, null])); // expect 2
 `}
   solutionCode={`function average(nums) {

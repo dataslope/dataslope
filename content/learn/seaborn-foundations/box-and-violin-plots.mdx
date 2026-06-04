@@ -60,8 +60,13 @@ print(f"Q1={q1:.2f}  median={med:.2f}  Q3={q3:.2f}  IQR={iqr:.2f}")
 fig, ax = plt.subplots(figsize=(7, 3.6))
 sns.boxplot(x=x, ax=ax, color="#9ecae1")
 for val, label in [(q1, "Q1"), (med, "median"), (q3, "Q3")]:
-    ax.annotate(label, xy=(val, 0), xytext=(val, 0.34),
-                ha="center", arrowprops=dict(arrowstyle="->"))
+    ax.annotate(
+        label,
+        xy=(val, 0),
+        xytext=(val, 0.34),
+        ha="center",
+        arrowprops=dict(arrowstyle="->"),
+    )
 ax.set_ylim(-0.5, 0.6)
 ax.set_title("Anatomy of a box plot (total_bill)")
 `}
@@ -81,8 +86,12 @@ sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 sns.catplot(
-    data=tips, x="day", y="total_bill",
-    kind="box", height=4, aspect=1.3,
+    data=tips,
+    x="day",
+    y="total_bill",
+    kind="box",
+    height=4,
+    aspect=1.3,
 )
 `}
 />
@@ -111,10 +120,12 @@ rng = np.random.default_rng(0)
 # Group A: one central cluster. Group B: two separated clusters.
 a = rng.normal(50, 12, 400)
 b = np.concatenate([rng.normal(30, 4, 200), rng.normal(70, 4, 200)])
-df = pd.DataFrame({
-    "value": np.concatenate([a, b]),
-    "group": ["A (one peak)"] * 400 + ["B (two peaks)"] * 400,
-})
+df = pd.DataFrame(
+    {
+        "value": np.concatenate([a, b]),
+        "group": ["A (one peak)"] * 400 + ["B (two peaks)"] * 400,
+    }
+)
 
 sns.catplot(data=df, x="group", y="value", kind="box", height=4, aspect=1.1)
 `}
@@ -134,10 +145,12 @@ rng = np.random.default_rng(0)
 
 a = rng.normal(50, 12, 400)
 b = np.concatenate([rng.normal(30, 4, 200), rng.normal(70, 4, 200)])
-df = pd.DataFrame({
-    "value": np.concatenate([a, b]),
-    "group": ["A (one peak)"] * 400 + ["B (two peaks)"] * 400,
-})
+df = pd.DataFrame(
+    {
+        "value": np.concatenate([a, b]),
+        "group": ["A (one peak)"] * 400 + ["B (two peaks)"] * 400,
+    }
+)
 
 sns.catplot(data=df, x="group", y="value", kind="violin", height=4, aspect=1.1)
 `}
@@ -179,9 +192,13 @@ tips = sns.load_dataset("tips")
 
 # inner="quartile" draws the quartile lines inside each violin.
 sns.catplot(
-    data=tips, x="day", y="total_bill",
-    kind="violin", inner="quartile",
-    height=4, aspect=1.3,
+    data=tips,
+    x="day",
+    y="total_bill",
+    kind="violin",
+    inner="quartile",
+    height=4,
+    aspect=1.3,
 )
 `}
 />
@@ -213,8 +230,12 @@ sns.set_theme(style="whitegrid")
 diamonds = sns.load_dataset("diamonds").sample(n=3000, random_state=0)
 
 sns.catplot(
-    data=diamonds, x="cut", y="price",
-    kind="boxen", height=4, aspect=1.4,
+    data=diamonds,
+    x="cut",
+    y="price",
+    kind="boxen",
+    height=4,
+    aspect=1.4,
 )
 `}
 />
@@ -256,8 +277,12 @@ sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 g = sns.catplot(
-    data=penguins, x="species", y="body_mass_g",
-    kind="violin", height=4, aspect=1.2,
+    data=penguins,
+    x="species",
+    y="body_mass_g",
+    kind="violin",
+    height=4,
+    aspect=1.2,
 )
 `}
   tests={[

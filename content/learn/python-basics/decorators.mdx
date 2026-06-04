@@ -18,7 +18,9 @@ Before decorators, a quick reminder: a **closure** is a function that captures v
   starterCode={`def outer(x):
     def inner(y):
         return x + y
+
     return inner
+
 
 add_five = outer(5)
 print(add_five(10))  # 15
@@ -36,11 +38,14 @@ print(add_five(20))  # 25
     def wrapper(*args, **kwargs):
         result = fn(*args, **kwargs)
         return result.upper()
+
     return wrapper
+
 
 @shout
 def greet(name):
     return f"hello, {name}"
+
 
 print(greet("Ada"))
 `}
@@ -73,15 +78,18 @@ Without `wraps`, the wrapped function loses its name, docstring, and signature:
   starterCode={`def shout(fn):
     def wrapper(*args, **kwargs):
         return fn(*args, **kwargs).upper()
+
     return wrapper
+
 
 @shout
 def greet(name):
     """Return a greeting."""
     return f"hello, {name}"
 
-print(greet.__name__)   # 'wrapper' -- wrong!
-print(greet.__doc__)    # None -- lost!
+
+print(greet.__name__)  # 'wrapper' -- wrong!
+print(greet.__doc__)  # None -- lost!
 `}
 />
 
@@ -91,19 +99,23 @@ print(greet.__doc__)    # None -- lost!
   adapter="python"
   starterCode={`from functools import wraps
 
+
 def shout(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
         return fn(*args, **kwargs).upper()
+
     return wrapper
+
 
 @shout
 def greet(name):
     """Return a greeting."""
     return f"hello, {name}"
 
-print(greet.__name__)   # 'greet' -- correct!
-print(greet.__doc__)    # 'Return a greeting.' -- preserved!
+
+print(greet.__name__)  # 'greet' -- correct!
+print(greet.__doc__)  # 'Return a greeting.' -- preserved!
 `}
 />
 
@@ -118,6 +130,7 @@ Tools, debuggers, and stack traces rely on \`__name__\`, \`__doc__\`, and \`__mo
   starterCode={`import time
 from functools import wraps
 
+
 def timed(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
@@ -126,7 +139,9 @@ def timed(fn):
         elapsed_ms = (time.perf_counter() - start) * 1000
         print(f"{fn.__name__} took {elapsed_ms:.2f} ms")
         return result
+
     return wrapper
+
 
 @timed
 def slow_square(n):
@@ -134,6 +149,7 @@ def slow_square(n):
     for i in range(n):
         total += i * i
     return total
+
 
 print(slow_square(100_000))
 `}
@@ -149,6 +165,7 @@ If your decorator needs parameters, you need **three** levels of nesting. The ou
   adapter="python"
   starterCode={`from functools import wraps
 
+
 def repeat(times):
     def decorator(fn):
         @wraps(fn)
@@ -157,12 +174,16 @@ def repeat(times):
             for _ in range(times):
                 result = fn(*args, **kwargs)
             return result
+
         return wrapper
+
     return decorator
+
 
 @repeat(times=3)
 def hi():
     print("hi")
+
 
 hi()
 `}
@@ -202,22 +223,28 @@ You can apply multiple decorators. They nest bottom-up (the closest to the funct
   adapter="python"
   starterCode={`from functools import wraps
 
+
 def bracketed(fn):
     @wraps(fn)
     def wrapper(*a, **kw):
         return f"[{fn(*a, **kw)}]"
+
     return wrapper
+
 
 def excited(fn):
     @wraps(fn)
     def wrapper(*a, **kw):
         return f"{fn(*a, **kw)}!"
+
     return wrapper
+
 
 @bracketed
 @excited
 def greet(name):
     return f"hello {name}"
+
 
 print(greet("Ada"))
 `}
@@ -243,6 +270,7 @@ Sometimes you need state that survives across calls. A class with `__call__` can
   adapter="python"
   starterCode={`from functools import wraps
 
+
 class CountCalls:
     def __init__(self, fn):
         wraps(fn)(self)
@@ -254,9 +282,11 @@ class CountCalls:
         print(f"Call {self.count} to {self.fn.__name__}")
         return self.fn(*args, **kwargs)
 
+
 @CountCalls
 def greet(name):
     return f"hello, {name}"
+
 
 print(greet("Alice"))
 print(greet("Bob"))
@@ -274,17 +304,21 @@ When decorating class methods, remember that the first argument is `self`:
   adapter="python"
   starterCode={`from functools import wraps
 
+
 def logged(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
         print(f"Calling {fn.__name__}")
         return fn(*args, **kwargs)
+
     return wrapper
+
 
 class Calculator:
     @logged
     def add(self, a, b):
         return a + b
+
 
 calc = Calculator()
 print(calc.add(2, 3))
@@ -319,9 +353,11 @@ Applying \`@staticmethod\` first (closest to the function) can cause errors beca
   adapter="python"
   starterCode={`from functools import cache
 
+
 @cache
 def fib(n):
     return n if n < 2 else fib(n - 1) + fib(n - 2)
+
 
 print(fib(100))
 `}
@@ -340,12 +376,14 @@ Example output: \`add took 0.05 ms\``}
   starterCode={`import time
 from functools import wraps
 
+
 def timing(fn):
     # your code here
     return fn
 `}
   solutionCode={`import time
 from functools import wraps
+
 
 def timing(fn):
     @wraps(fn)
@@ -355,6 +393,7 @@ def timing(fn):
         elapsed = (time.perf_counter() - start) * 1000
         print(f"{fn.__name__} took {elapsed:.2f} ms")
         return result
+
     return wrapper
 `}
   tests={[
@@ -398,13 +437,16 @@ assert "fast took" in output and "ms" in output`,
 Example: \`@retry(3)\` tries the function up to 3 times.`}
   starterCode={`from functools import wraps
 
+
 def retry(n):
     # your code here
     def decorator(fn):
         return fn
+
     return decorator
 `}
   solutionCode={`from functools import wraps
+
 
 def retry(n):
     def decorator(fn):
@@ -416,7 +458,9 @@ def retry(n):
                 except Exception as e:
                     if attempt == n - 1:
                         raise
+
         return wrapper
+
     return decorator
 `}
   tests={[
@@ -471,19 +515,23 @@ assert my_func.__name__ == "my_func"`,
 Assume all arguments are hashable. The cache should persist across calls.`}
   starterCode={`from functools import wraps
 
+
 def memoize(fn):
     # your code here
     return fn
 `}
   solutionCode={`from functools import wraps
 
+
 def memoize(fn):
     cache = {}
+
     @wraps(fn)
     def wrapper(*args):
         if args not in cache:
             cache[args] = fn(*args)
         return cache[args]
+
     return wrapper
 `}
   tests={[
@@ -529,11 +577,13 @@ assert foo.__name__ == "foo"`,
 Example: \`@only_positive\` on \`add(a, b)\` should raise if \`a <= 0\` or \`b <= 0\`.`}
   starterCode={`from functools import wraps
 
+
 def only_positive(fn):
     # your code here
     return fn
 `}
   solutionCode={`from functools import wraps
+
 
 def only_positive(fn):
     @wraps(fn)
@@ -542,6 +592,7 @@ def only_positive(fn):
             if not isinstance(arg, (int, float)) or arg <= 0:
                 raise ValueError("All positional arguments must be positive numbers")
         return fn(*args, **kwargs)
+
     return wrapper
 `}
   tests={[

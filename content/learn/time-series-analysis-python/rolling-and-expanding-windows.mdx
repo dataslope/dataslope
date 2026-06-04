@@ -22,15 +22,19 @@ value from its own past (a **lag**). `shift(-k)` does the reverse (a
   adapter="python"
   starterCode={`import pandas as pd
 
-s = pd.Series([10, 12, 11, 15, 14],
-              index=pd.date_range("2014-01-01", periods=5, freq="D"),
-              name="y")
+s = pd.Series(
+    [10, 12, 11, 15, 14],
+    index=pd.date_range("2014-01-01", periods=5, freq="D"),
+    name="y",
+)
 
-frame = pd.DataFrame({
-    "y": s,
-    "lag1 (yesterday)": s.shift(1),    # pull the PAST up to today
-    "lead1 (tomorrow)": s.shift(-1),   # pull the FUTURE back to today
-})
+frame = pd.DataFrame(
+    {
+        "y": s,
+        "lag1 (yesterday)": s.shift(1),  # pull the PAST up to today
+        "lead1 (tomorrow)": s.shift(-1),  # pull the FUTURE back to today
+    }
+)
 print(frame)
 print()
 
@@ -99,7 +103,7 @@ idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
 air = pd.Series(_passengers, index=idx, name="passengers")`}
   starterCode={`import matplotlib.pyplot as plt
 
-window = 12   # <-- change me! try 3 (noisy), 12 (kills seasonality), 36 (very smooth)
+window = 12  # <-- change me! try 3 (noisy), 12 (kills seasonality), 36 (very smooth)
 
 ma = air.rolling(window=window).mean()
 
@@ -111,7 +115,7 @@ ax.set_title(f"Rolling mean smooths the noise (window = {window})")
 plt.tight_layout()
 plt.show()
 
-print(f"The first {window-1} values are NaN: a full {window}-wide window")
+print(f"The first {window - 1} values are NaN: a full {window}-wide window")
 print("isn't available until that many points have gone by.")
 `}
 />
@@ -178,14 +182,19 @@ flowchart LR
   adapter="python"
   starterCode={`import pandas as pd
 
-s = pd.Series([10, 20, 30, 40, 50],
-              index=pd.date_range("2014-01-01", periods=5, freq="D"), name="y")
+s = pd.Series(
+    [10, 20, 30, 40, 50],
+    index=pd.date_range("2014-01-01", periods=5, freq="D"),
+    name="y",
+)
 
-frame = pd.DataFrame({
-    "y": s,
-    "trailing": s.rolling(3).mean(),                 # ends AT t (past-facing)
-    "centered": s.rolling(3, center=True).mean(),    # straddles t (future-facing)
-})
+frame = pd.DataFrame(
+    {
+        "y": s,
+        "trailing": s.rolling(3).mean(),  # ends AT t (past-facing)
+        "centered": s.rolling(3, center=True).mean(),  # straddles t (future-facing)
+    }
+)
 print(frame)
 print()
 print("On 2014-01-02 the centered mean is (10+20+30)/3 = 20.0 -- it used")
@@ -249,10 +258,17 @@ ma.plot(ax=ax, linewidth=2.5, label="12-month moving average")
 # step a single month into 1961 on its own.
 last = air.index[-1]
 ax.axvline(last, color="crimson", linestyle="--")
-ax.text(last, air.min(), " data ends here\\n the MA cannot go further",
-        color="crimson", va="bottom")
-ax.legend(); ax.set_title("A moving average smooths the past; it does not forecast")
-plt.tight_layout(); plt.show()
+ax.text(
+    last,
+    air.min(),
+    " data ends here\\n the MA cannot go further",
+    color="crimson",
+    va="bottom",
+)
+ax.legend()
+ax.set_title("A moving average smooths the past; it does not forecast")
+plt.tight_layout()
+plt.show()
 
 print("The orange curve stops at the red line. To say anything about 1961")
 print("you need a MODEL (ARIMA, later) - not a backward-looking average.")
@@ -304,10 +320,15 @@ fig, ax = plt.subplots(figsize=(10, 3.5))
 roll_std.plot(ax=ax, color="purple")
 ax.set_title("12-month rolling standard deviation (volatility) is RISING")
 ax.set_ylabel("std of passengers")
-plt.tight_layout(); plt.show()
+plt.tight_layout()
+plt.show()
 
-print("Early years:", round(roll_std.dropna().iloc[0], 1),
-      " Late years:", round(roll_std.dropna().iloc[-1], 1))
+print(
+    "Early years:",
+    round(roll_std.dropna().iloc[0], 1),
+    " Late years:",
+    round(roll_std.dropna().iloc[-1], 1),
+)
 print("The spread roughly TRIPLES - the variance is not constant over time.")
 `}
 />
@@ -326,14 +347,17 @@ including now." It's the honest, leakage-free way to say "the typical value
 import numpy as np
 
 rng = np.random.default_rng(0)
-s = pd.Series(rng.normal(50, 10, 30),
-              index=pd.date_range("2014-01-01", periods=30, freq="D"))
+s = pd.Series(
+    rng.normal(50, 10, 30), index=pd.date_range("2014-01-01", periods=30, freq="D")
+)
 
-cmp = pd.DataFrame({
-    "value": s.round(1),
-    "rolling7_mean": s.rolling(7).mean().round(1),    # last 7 days
-    "expanding_mean": s.expanding().mean().round(1),  # all days so far
-})
+cmp = pd.DataFrame(
+    {
+        "value": s.round(1),
+        "rolling7_mean": s.rolling(7).mean().round(1),  # last 7 days
+        "expanding_mean": s.expanding().mean().round(1),  # all days so far
+    }
+)
 print(cmp.head(10))
 print()
 print("rolling7 forgets data older than 7 days; expanding never forgets.")
@@ -421,7 +445,14 @@ print(trailing_at_1, centered_at_1, uses_future)
   solutionCode={`trailing_at_1 = float(s.rolling(3, min_periods=1).mean().iloc[1])
 centered_at_1 = float(s.rolling(3, center=True).mean().iloc[1])
 uses_future = abs(centered_at_1 - (s.iloc[0] + s.iloc[1] + s.iloc[2]) / 3) < 1e-9
-print("trailing@1:", trailing_at_1, " centered@1:", centered_at_1, " uses_future:", uses_future)
+print(
+    "trailing@1:",
+    trailing_at_1,
+    " centered@1:",
+    centered_at_1,
+    " uses_future:",
+    uses_future,
+)
 `}
   tests={[
     {

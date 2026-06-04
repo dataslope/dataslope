@@ -52,7 +52,8 @@ const pair = <A, B>(a: A, b: B): readonly [A, B] => [a, b];
 
 const swap = <A, B>([a, b]: readonly [A, B]): readonly [B, A] => [b, a];
 
-const reverse = <A,>(xs: ReadonlyArray<A>): ReadonlyArray<A> => [...xs].reverse();
+const reverse = <A,>(xs: ReadonlyArray<A>): ReadonlyArray<A> =>
+  [...xs].reverse();
 
 console.log(head([1, 2, 3]));
 console.log(last(["a", "b", "c"]));
@@ -92,12 +93,15 @@ type Eq<A> = { equals: (x: A, y: A) => boolean };
 // Some instances
 const eqNumber: Eq<number> = { equals: (x, y) => x === y };
 const eqString: Eq<string> = { equals: (x, y) => x === y };
-const eqCI:     Eq<string> = { equals: (x, y) => x.toLowerCase() === y.toLowerCase() };
+const eqCI: Eq<string> = {
+  equals: (x, y) => x.toLowerCase() === y.toLowerCase(),
+};
 
 // Derive: an Eq for arrays, given an Eq for the element
 function eqArray<A>(e: Eq<A>): Eq<ReadonlyArray<A>> {
   return {
-    equals: (xs, ys) => xs.length === ys.length && xs.every((x, i) => e.equals(x, ys[i])),
+    equals: (xs, ys) =>
+      xs.length === ys.length && xs.every((x, i) => e.equals(x, ys[i])),
   };
 }
 
@@ -106,9 +110,9 @@ function contains<A>(eq: Eq<A>, xs: ReadonlyArray<A>, target: A): boolean {
   return xs.some((x) => eq.equals(x, target));
 }
 
-console.log(contains(eqString, ["Ada", "Linus"], "ada"));      // false
-console.log(contains(eqCI,     ["Ada", "Linus"], "ada"));      // true
-console.log(eqArray(eqNumber).equals([1, 2, 3], [1, 2, 3]));   // true
+console.log(contains(eqString, ["Ada", "Linus"], "ada")); // false
+console.log(contains(eqCI, ["Ada", "Linus"], "ada")); // true
+console.log(eqArray(eqNumber).equals([1, 2, 3], [1, 2, 3])); // true
 `}
 />
 
@@ -161,7 +165,10 @@ const ordPair = <A, B>(oa: Ord<A>, ob: Ord<B>): Ord<readonly [A, B]> => ({
 });
 
 const people: ReadonlyArray<readonly [string, number]> = [
-  ["Ada", 36], ["Linus", 36], ["Grace", 85], ["Ada", 30],
+  ["Ada", 36],
+  ["Linus", 36],
+  ["Grace", 85],
+  ["Ada", 30],
 ];
 
 const ord = ordPair(ordString, ordNumber);

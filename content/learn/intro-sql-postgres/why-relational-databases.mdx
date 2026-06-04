@@ -112,11 +112,17 @@ INSERT INTO orders (id, customer_id, item) VALUES
   (103, 2, 'Umbrella'),
   (104, 3, 'Hat');`}
   starterCode={`-- Customers from Ohio and what they ordered
-SELECT c.name, c.state, o.item
-FROM customers c
-JOIN orders o ON o.customer_id = c.id
-WHERE c.state = 'OH'
-ORDER BY c.name;`}
+SELECT
+  c.name,
+  c.state,
+  o.item
+FROM
+  customers c
+  JOIN orders o ON o.customer_id = c.id
+WHERE
+  c.state = 'OH'
+ORDER BY
+  c.name;`}
 />
 
 We will demystify every part of that query in the coming sections.

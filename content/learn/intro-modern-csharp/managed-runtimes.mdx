@@ -75,7 +75,8 @@ using System.Collections.Generic;
 void Burn()
 {
     var huge = new List<int>();
-    for (int i = 0; i < 500_000; i++) huge.Add(i);
+    for (int i = 0; i < 500_000; i++)
+        huge.Add(i);
     Console.WriteLine($"made {huge.Count} ints");
     // No 'free', no 'delete'. The runtime will clean up.
 }
@@ -105,7 +106,7 @@ int[] xs = { 10, 20, 30 };
 
 try
 {
-    int bad = xs[7];      // out of bounds
+    int bad = xs[7]; // out of bounds
     Console.WriteLine(bad);
 }
 catch (IndexOutOfRangeException ex)
@@ -116,7 +117,7 @@ catch (IndexOutOfRangeException ex)
 object o = "hello";
 try
 {
-    int n = (int)o;       // wrong cast
+    int n = (int)o; // wrong cast
     Console.WriteLine(n);
 }
 catch (InvalidCastException ex)

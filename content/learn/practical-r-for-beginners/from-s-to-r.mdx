@@ -267,12 +267,12 @@ linear model.
 3. Extract the slope coefficient (the "height" coefficient) into a numeric scalar \`slope\`.`}
   initCode={`data(women)`}
   starterCode={`avg_weight <- NA
-model      <- NULL
-slope      <- NA
+model <- NULL
+slope <- NA
 `}
   solutionCode={`avg_weight <- mean(women$weight)
-model      <- lm(weight ~ height, data = women)
-slope      <- unname(coef(model)["height"])
+model <- lm(weight ~ height, data = women)
+slope <- unname(coef(model)["height"])
 `}
   tests={[
     {

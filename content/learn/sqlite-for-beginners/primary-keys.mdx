@@ -142,9 +142,14 @@ INSERT INTO customers (name, city) VALUES
   ('Ada', 'London'),
   ('Grace', 'Arlington'),
   ('Lin', 'Taipei');`}
-  starterCode={`SELECT id, name, city
-FROM customers
-ORDER BY id;`}
+  starterCode={`SELECT
+  id,
+  name,
+  city
+FROM
+  customers
+ORDER BY
+  id;`}
 />
 
 You should see ids like `1`, `2`, and `3`. Those ids are stable row identities you can use in other tables later.

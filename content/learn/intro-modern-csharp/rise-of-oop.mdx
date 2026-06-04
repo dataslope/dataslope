@@ -82,9 +82,15 @@ class Counter
     private int count;
 
     // BEHAVIOR: operations the outside world is allowed to perform.
-    public void Increment() { count++; }
+    public void Increment()
+    {
+        count++;
+    }
 
-    public int Value() { return count; }
+    public int Value()
+    {
+        return count;
+    }
 }
 
 class Program
@@ -141,18 +147,21 @@ The object-oriented way:
 
 class BankAccount
 {
-    private decimal balance;   // hidden — nobody outside can touch it
+    private decimal balance; // hidden — nobody outside can touch it
 
     public void Deposit(decimal amount)
     {
-        if (amount <= 0) throw new ArgumentException("must be positive");
+        if (amount <= 0)
+            throw new ArgumentException("must be positive");
         balance += amount;
     }
 
     public bool Withdraw(decimal amount)
     {
-        if (amount <= 0) throw new ArgumentException("must be positive");
-        if (amount > balance) return false;   // refuse to go negative
+        if (amount <= 0)
+            throw new ArgumentException("must be positive");
+        if (amount > balance)
+            return false; // refuse to go negative
         balance -= amount;
         return true;
     }

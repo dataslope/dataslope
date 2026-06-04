@@ -20,9 +20,11 @@ If an exception is raised and **no** `try`/`except` catches it, Python does thre
   starterCode={`def divide(a, b):
     return a / b
 
+
 def main():
     result = divide(10, 0)
     print("result:", result)
+
 
 try:
     main()
@@ -113,6 +115,7 @@ Every exception is an object. You can inspect its type (`type(e)`), its message 
     except (TypeError, ZeroDivisionError) as e:
         return f"error: {type(e).__name__}: {e}"
 
+
 print(safe_div(10, 2))
 print(safe_div(10, 0))
 print(safe_div("10", 2))
@@ -155,6 +158,7 @@ finally:
         print("done with", repr(text))
     print()
 
+
 parse_int("42")
 parse_int("oops")
 `}
@@ -176,6 +180,7 @@ Use `raise` to signal an error from your own code. Use a specific built-in type 
     if amount > balance:
         raise ValueError(f"insufficient funds: balance={balance}, amount={amount}")
     return balance - amount
+
 
 print(withdraw(100, 30))
 try:
@@ -204,11 +209,13 @@ When you wrap a lower-level error in a higher-level one, use `from` to keep the 
   starterCode={`class ConfigError(Exception):
     pass
 
+
 def load_config(text):
     try:
         return int(text)
     except ValueError as e:
         raise ConfigError("bad config value") from e
+
 
 try:
     load_config("not a number")
@@ -235,16 +242,16 @@ Make your own exception types by subclassing `Exception` (or a more specific bui
   starterCode={`class InsufficientFundsError(Exception):
     """Raised when a withdrawal exceeds the available balance."""
 
+
 class Account:
     def __init__(self, balance):
         self.balance = balance
 
     def withdraw(self, amount):
         if amount > self.balance:
-            raise InsufficientFundsError(
-                f"requested {amount}, have {self.balance}"
-            )
+            raise InsufficientFundsError(f"requested {amount}, have {self.balance}")
         self.balance -= amount
+
 
 acct = Account(50)
 try:
@@ -385,12 +392,14 @@ Use **LBYL** when the check is cheap and the exception is expensive (rare). Use 
   starterCode={`class InsufficientFundsError(Exception):
     pass
 
+
 def withdraw(balance, amount):
     # your code here
     return balance
 `}
   solutionCode={`class InsufficientFundsError(Exception):
     pass
+
 
 def withdraw(balance, amount):
     if amount < 0:
@@ -472,16 +481,20 @@ For testing, assume a function that raises \`RateLimitError\` on the first \`n-1
   starterCode={`class RateLimitError(Exception):
     pass
 
+
 def retry_on_rate_limit(max_retries=3):
     def decorator(func):
         def wrapper(*args, **kwargs):
             # your code here
             return func(*args, **kwargs)
+
         return wrapper
+
     return decorator
 `}
   solutionCode={`class RateLimitError(Exception):
     pass
+
 
 def retry_on_rate_limit(max_retries=3):
     def decorator(func):
@@ -494,7 +507,9 @@ def retry_on_rate_limit(max_retries=3):
                         raise
             # unreachable, but for clarity
             return func(*args, **kwargs)
+
         return wrapper
+
     return decorator
 `}
   tests={[

@@ -67,7 +67,7 @@ One of the most useful constraints is `keyof`, which gives you the union of all 
 const person = { name: "Alice", age: 30, city: "New York" };
 
 const name = getProperty(person, "name"); // type: string
-const age = getProperty(person, "age");   // type: number
+const age = getProperty(person, "age"); // type: number
 
 console.log(\`Name: \${name}\`);
 console.log(\`Age: \${age}\`);
@@ -99,7 +99,7 @@ The syntax `T[K]` is an **indexed access type** (also called a **lookup type**).
 
 // Lookup types
 type NameType = Person["name"]; // string
-type AgeType = Person["age"];   // number
+type AgeType = Person["age"]; // number
 
 function getValue<T, K extends keyof T>(obj: T, key: K): T[K] {
   return obj[key];
@@ -107,7 +107,7 @@ function getValue<T, K extends keyof T>(obj: T, key: K): T[K] {
 
 const p: Person = { name: "Bob", age: 25, active: true };
 const nameValue = getValue(p, "name"); // type: string
-const ageValue = getValue(p, "age");   // type: number
+const ageValue = getValue(p, "age"); // type: number
 
 console.log(\`Name: \${nameValue}, Age: \${ageValue}\`);
 `}
@@ -196,7 +196,7 @@ Let's build a `pluck` function that extracts a property from an array of objects
 <CodeBlock
   adapter="typescript"
   starterCode={`function pluck<T, K extends keyof T>(array: T[], key: K): T[K][] {
-  return array.map(item => item[key]);
+  return array.map((item) => item[key]);
 }
 
 const users = [
@@ -206,7 +206,7 @@ const users = [
 ];
 
 const names = pluck(users, "name"); // type: string[]
-const ages = pluck(users, "age");   // type: number[]
+const ages = pluck(users, "age"); // type: number[]
 
 console.log(\`Names: \${names.join(", ")}\`);
 console.log(\`Ages: \${ages.join(", ")}\`);
@@ -281,7 +281,9 @@ acceptAnimalBox(dogBox);
 // Contravariant example: function parameters
 type Handler<T> = (input: T) => void;
 
-function registerHandler(handler: Handler<{ species: string; breed: string }>): void {
+function registerHandler(
+  handler: Handler<{ species: string; breed: string }>,
+): void {
   handler({ species: "Dog", breed: "Poodle" });
 }
 

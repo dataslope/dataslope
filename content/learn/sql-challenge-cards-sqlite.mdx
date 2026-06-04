@@ -25,9 +25,18 @@ INSERT INTO books (title, author, year) VALUES
   ('Foundation', 'Isaac Asimov', 1951),
   ('The Left Hand of Darkness', 'Ursula K. Le Guin', 1969);`}
   starterCode={`-- Your query here:
-SELECT * FROM books;
-`}
-  solutionSql={`SELECT title, author, year FROM books ORDER BY year ASC;`}
+SELECT
+  *
+FROM
+  books;`}
+  solutionSql={`SELECT
+  title,
+  author,
+  year
+FROM
+  books
+ORDER BY
+  year ASC;`}
   tests={[
     {
       id: "row_count",
@@ -78,9 +87,18 @@ INSERT INTO books (title, author, year) VALUES
   ('Foundation', 'Isaac Asimov', 1951),
   ('The Left Hand of Darkness', 'Ursula K. Le Guin', 1969);`}
   starterCode={`-- Your query here:
-SELECT * FROM books;
-`}
-  solutionSql={`SELECT title, author, year FROM books ORDER BY year ASC;`}
+SELECT
+  *
+FROM
+  books;`}
+  solutionSql={`SELECT
+  title,
+  author,
+  year
+FROM
+  books
+ORDER BY
+  year ASC;`}
   tests={[
     {
       id: "row_count",
@@ -135,15 +153,22 @@ INSERT INTO sales (category, product, revenue) VALUES
   ('Food',        'Coffee',         8.5),
   ('Food',        'Tea',            5.0),
   ('Food',        'Bread',          3.0);`}
-  starterCode={`SELECT category, SUM(revenue) AS total_revenue
-FROM sales
--- your code here
-;
-`}
-  solutionSql={`SELECT category, SUM(revenue) AS total_revenue
-FROM sales
-GROUP BY category
-ORDER BY total_revenue DESC;`}
+  starterCode={`SELECT
+  category,
+  SUM(revenue) AS total_revenue
+FROM
+  sales
+  -- your code here
+;`}
+  solutionSql={`SELECT
+  category,
+  SUM(revenue) AS total_revenue
+FROM
+  sales
+GROUP BY
+  category
+ORDER BY
+  total_revenue DESC;`}
   tests={[
     {
       id: "three_groups",
@@ -181,15 +206,22 @@ INSERT INTO sales (category, product, revenue) VALUES
   ('Food',        'Coffee',         8.5),
   ('Food',        'Tea',            5.0),
   ('Food',        'Bread',          3.0);`}
-  starterCode={`SELECT category, SUM(revenue) AS total_revenue
-FROM sales
--- your code here
-;
-`}
-  solutionSql={`SELECT category, SUM(revenue) AS total_revenue
-FROM sales
-GROUP BY category
-ORDER BY total_revenue DESC;`}
+  starterCode={`SELECT
+  category,
+  SUM(revenue) AS total_revenue
+FROM
+  sales
+  -- your code here
+;`}
+  solutionSql={`SELECT
+  category,
+  SUM(revenue) AS total_revenue
+FROM
+  sales
+GROUP BY
+  category
+ORDER BY
+  total_revenue DESC;`}
   tests={[
     {
       id: "three_groups",
@@ -222,8 +254,7 @@ ORDER BY total_revenue DESC;`}
 INSERT INTO users (name, email) VALUES
   ('Alice', 'alice@example.com'),
   ('Bob',   'bob@example.com');`}
-  starterCode={`-- INSERT a new row for Carol
-`}
+  starterCode={`-- INSERT a new row for Carol`}
   tests={[
     {
       id: "row_added",
@@ -256,8 +287,7 @@ INSERT INTO users (name, email) VALUES
 INSERT INTO users (name, email) VALUES
   ('Alice', 'alice@example.com'),
   ('Bob',   'bob@example.com');`}
-  starterCode={`-- INSERT a new row for Carol
-`}
+  starterCode={`-- INSERT a new row for Carol`}
   tests={[
     {
       id: "row_added",
@@ -298,11 +328,21 @@ WITH RECURSIVE n(i) AS (
 INSERT INTO big
 SELECT i, 'user_' || i, (i * 37 % 100) FROM n;
 `}
-  starterCode={`SELECT * FROM big LIMIT 5;`}
-  solutionSql={`SELECT (score / 10) * 10 AS bucket, COUNT(*) AS n
-FROM big
-GROUP BY bucket
-ORDER BY bucket;`}
+  starterCode={`SELECT
+  *
+FROM
+  big
+LIMIT
+  5;`}
+  solutionSql={`SELECT
+  (score / 10) * 10 AS bucket,
+  COUNT(*) AS n
+FROM
+  big
+GROUP BY
+  bucket
+ORDER BY
+  bucket;`}
   tests={[
     {
       id: "row_count",
@@ -333,9 +373,21 @@ WITH RECURSIVE n(i) AS (
 INSERT INTO big
 SELECT i, 'user_' || i, (i * 37 % 100) FROM n;
 `}
-  starterCode={`SELECT * FROM big LIMIT 5;`}
-  solutionSql={`SELECT (score / 10) * 10 AS bucket, COUNT(*) AS n
-FROM big GROUP BY bucket ORDER BY bucket;`}
+  starterCode={`SELECT
+  *
+FROM
+  big
+LIMIT
+  5;`}
+  solutionSql={`SELECT
+  (score / 10) * 10 AS bucket,
+  COUNT(*) AS n
+FROM
+  big
+GROUP BY
+  bucket
+ORDER BY
+  bucket;`}
   tests={[
     { id: "row_count", name: "10 buckets", expectedRowCount: 10 },
     { id: "matches", matchesSolution: true, ordered: true },

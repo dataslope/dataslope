@@ -52,10 +52,21 @@ import nltk`}
 
 stemmer = PorterStemmer()
 
-words = ["run", "runs", "running", "ran",
-         "study", "studies", "studying",
-         "happy", "happily", "happiness",
-         "organization", "organize", "organ"]
+words = [
+    "run",
+    "runs",
+    "running",
+    "ran",
+    "study",
+    "studies",
+    "studying",
+    "happy",
+    "happily",
+    "happiness",
+    "organization",
+    "organize",
+    "organ",
+]
 
 for w in words:
     print(f"  {w:14} -> {stemmer.stem(w)}")
@@ -302,11 +313,13 @@ lemmatizer = WordNetLemmatizer()`}
     # Lemmatize each word as a verb (pos="v") and return the list.
     return words
 
+
 print(verb_lemmas(["running", "ran", "studies"]))
 print(verb_lemmas(["was", "are", "been"]))
 `}
   solutionCode={`def verb_lemmas(words):
     return [lemmatizer.lemmatize(w, pos="v") for w in words]
+
 
 print(verb_lemmas(["running", "ran", "studies"]))
 print(verb_lemmas(["was", "are", "been"]))

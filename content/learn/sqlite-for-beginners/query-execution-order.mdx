@@ -50,12 +50,15 @@ yet when `WHERE` is evaluated:
 INSERT INTO orders (id, amount) VALUES (1,20),(2,80),(3,60);`}
   starterCode={`-- This FAILS: "doubled" does not exist yet when WHERE runs.
 -- SELECT amount * 2 AS doubled FROM orders WHERE doubled > 100;
-
 -- This works: repeat the expression, since WHERE runs before SELECT.
-SELECT amount * 2 AS doubled
-FROM orders
-WHERE amount * 2 > 100
-ORDER BY doubled;`}
+SELECT
+  amount * 2 AS doubled
+FROM
+  orders
+WHERE
+  amount * 2 > 100
+ORDER BY
+  doubled;`}
 />
 
 **But you *can* use the alias in `ORDER BY`,** because `ORDER BY`
@@ -84,13 +87,21 @@ result to the next:
 );
 INSERT INTO orders (id, customer_id, amount) VALUES
   (1,1,20),(2,1,80),(3,2,60),(4,2,15),(5,3,95),(6,3,40);`}
-  starterCode={`SELECT customer_id, SUM(amount) AS total
-FROM orders
-WHERE amount > 10
-GROUP BY customer_id
-HAVING SUM(amount) > 50
-ORDER BY total DESC
-LIMIT 2;`}
+  starterCode={`SELECT
+  customer_id,
+  SUM(amount) AS total
+FROM
+  orders
+WHERE
+  amount > 10
+GROUP BY
+  customer_id
+HAVING
+  SUM(amount) > 50
+ORDER BY
+  total DESC
+LIMIT
+  2;`}
 />
 
 Trace it in execution order:

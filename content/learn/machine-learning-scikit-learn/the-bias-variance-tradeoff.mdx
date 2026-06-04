@@ -69,8 +69,11 @@ for ax, (title, center, spread) in zip(axes.ravel(), settings):
         ax.add_patch(plt.Circle((0, 0), r, color=c, zorder=0))
     pts = rng.normal(center, spread, size=(20, 2))
     ax.scatter(pts[:, 0], pts[:, 1], color="#1e293b", s=25, zorder=2)
-    ax.set_xlim(-1.2, 1.2); ax.set_ylim(-1.2, 1.2)
-    ax.set_aspect("equal"); ax.set_xticks([]); ax.set_yticks([])
+    ax.set_xlim(-1.2, 1.2)
+    ax.set_ylim(-1.2, 1.2)
+    ax.set_aspect("equal")
+    ax.set_xticks([])
+    ax.set_yticks([])
     ax.set_title(title, fontsize=10)
 plt.tight_layout()
 plt.show()
@@ -108,13 +111,18 @@ from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline
 
 rng = np.random.default_rng(0)
+
+
 def true_function(x):
     return np.sin(1.5 * x)
+
 
 grid = np.linspace(0, 4, 200).reshape(-1, 1)
 
 fig, axes = plt.subplots(1, 2, figsize=(13, 5))
-for ax, degree, label in zip(axes, [1, 15], ["Degree 1 (high bias)", "Degree 15 (high variance)"]):
+for ax, degree, label in zip(
+    axes, [1, 15], ["Degree 1 (high bias)", "Degree 15 (high variance)"]
+):
     preds = []
     for _ in range(40):
         x = np.sort(rng.uniform(0, 4, 20))
@@ -124,8 +132,21 @@ for ax, degree, label in zip(axes, [1, 15], ["Degree 1 (high bias)", "Degree 15 
         p = model.predict(grid)
         preds.append(p)
         ax.plot(grid, p, color="#94a3b8", alpha=0.25, linewidth=1)
-    ax.plot(grid, np.mean(preds, axis=0), color="#f59e0b", linewidth=2.5, label="average model")
-    ax.plot(grid, true_function(grid.ravel()), "--", color="#34d399", linewidth=2, label="truth")
+    ax.plot(
+        grid,
+        np.mean(preds, axis=0),
+        color="#f59e0b",
+        linewidth=2.5,
+        label="average model",
+    )
+    ax.plot(
+        grid,
+        true_function(grid.ravel()),
+        "--",
+        color="#34d399",
+        linewidth=2,
+        label="truth",
+    )
     ax.set_title(label)
     ax.set_ylim(-2.5, 2.5)
     ax.legend(fontsize=9)
@@ -267,6 +288,7 @@ print("var_flexible:", var_flexible)
         model.fit(X, y)
         preds.append(model.predict(x_star)[0])
     return float(np.var(preds))
+
 
 var_simple = variance_at_point(simple)
 var_flexible = variance_at_point(flexible)

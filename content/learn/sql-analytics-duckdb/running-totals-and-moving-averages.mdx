@@ -32,9 +32,14 @@ INSERT INTO daily VALUES
   starterCode={`SELECT
   day,
   revenue,
-  SUM(revenue) OVER (ORDER BY day) AS running_total
-FROM daily
-ORDER BY day;`}
+  SUM(revenue) OVER (
+    ORDER BY
+      day
+  ) AS running_total
+FROM
+  daily
+ORDER BY
+  day;`}
 />
 
 Day 1 shows 100, day 2 shows 240, day 3 shows 330, ... each row carries
@@ -75,11 +80,16 @@ INSERT INTO sales VALUES
   day,
   revenue,
   SUM(revenue) OVER (
-    PARTITION BY region
-    ORDER BY day
+    PARTITION BY
+      region
+    ORDER BY
+      day
   ) AS running_total
-FROM sales
-ORDER BY region, day;`}
+FROM
+  sales
+ORDER BY
+  region,
+  day;`}
 />
 
 The total climbs within West, then **restarts** for East. `PARTITION BY`
@@ -106,10 +116,18 @@ INSERT INTO daily VALUES
   starterCode={`SELECT
   day,
   revenue,
-  LAG(revenue) OVER (ORDER BY day)              AS prev_day,
-  revenue - LAG(revenue) OVER (ORDER BY day)    AS change
-FROM daily
-ORDER BY day;`}
+  LAG (revenue) OVER (
+    ORDER BY
+      day
+  ) AS prev_day,
+  revenue - LAG (revenue) OVER (
+    ORDER BY
+      day
+  ) AS change
+FROM
+  daily
+ORDER BY
+  day;`}
 />
 
 The first row's `prev_day` is `NULL` — there is no earlier row to look
@@ -140,12 +158,18 @@ INSERT INTO daily VALUES
   starterCode={`SELECT
   day,
   revenue,
-  ROUND(AVG(revenue) OVER (
-    ORDER BY day
-    ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
-  ), 1) AS moving_avg_3d
-FROM daily
-ORDER BY day;`}
+  ROUND(
+    AVG(revenue) OVER (
+      ORDER BY
+        day ROWS BETWEEN 2 PRECEDING
+        AND CURRENT ROW
+    ),
+    1
+  ) AS moving_avg_3d
+FROM
+  daily
+ORDER BY
+  day;`}
 />
 
 The frame `ROWS BETWEEN 2 PRECEDING AND CURRENT ROW` means "average this

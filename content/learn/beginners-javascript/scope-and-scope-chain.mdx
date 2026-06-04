@@ -36,12 +36,12 @@ scope, which is one of the reasons we avoid `var`.
 
 function show() {
   const inside = "I am inside show";
-  console.log(outside);   // visible — global wraps around function
-  console.log(inside);    // visible — current scope
+  console.log(outside); // visible — global wraps around function
+  console.log(inside); // visible — current scope
 }
 
 show();
-console.log(outside);     // visible — global
+console.log(outside); // visible — global
 // console.log(inside);   // ReferenceError: inside is not defined
 `}
 />
@@ -57,10 +57,10 @@ one-way mirrors.
   starterCode={`function example() {
   const x = "function-scope x";
   if (true) {
-    const x = "block-scope x";   // a brand new x, only inside the if
-    console.log("inner:", x);    // "block-scope x"
+    const x = "block-scope x"; // a brand new x, only inside the if
+    console.log("inner:", x); // "block-scope x"
   }
-  console.log("outer:", x);      // "function-scope x"
+  console.log("outer:", x); // "function-scope x"
 }
 
 example();
@@ -119,7 +119,7 @@ into another.
 <CodeBlock
   adapter="javascript"
   starterCode={`function counter() {
-  let n = 0;        // a fresh n every time counter() is called
+  let n = 0; // a fresh n every time counter() is called
   n = n + 1;
   return n;
 }
@@ -146,13 +146,13 @@ outer is still there, just hidden inside the inner scope.
   starterCode={`let user = "outer";
 
 function modify() {
-  let user = "inner";   // shadows the outer 'user'
+  let user = "inner"; // shadows the outer 'user'
   user = "inner v2";
   console.log("inside:", user);
 }
 
 modify();
-console.log("outside:", user);    // unchanged — modify() never touched the outer 'user'
+console.log("outside:", user); // unchanged — modify() never touched the outer 'user'
 `}
 />
 
@@ -177,8 +177,8 @@ function describe() {
 }
 
 function caller() {
-  const country = "Looking-Glass-Land";   // local
-  describe();      // What does this print?
+  const country = "Looking-Glass-Land"; // local
+  describe(); // What does this print?
 }
 
 caller();
@@ -213,15 +213,23 @@ are used as possible.
   starterCode={`// Bad style: a global counter modified from anywhere
 let count = 0;
 
-function add() { count += 1; }
-function reset() { count = 0; }
+function add() {
+  count += 1;
+}
+function reset() {
+  count = 0;
+}
 
-add(); add(); add();
-console.log(count);   // 3 — but who set this? where? when?
+add();
+add();
+add();
+console.log(count); // 3 — but who set this? where? when?
 
 // Better style: each function operates on values it is given,
 // and returns new values. State is explicit and local.
-function increment(value) { return value + 1; }
+function increment(value) {
+  return value + 1;
+}
 
 let c = 0;
 c = increment(c);
@@ -250,7 +258,7 @@ with `function`), the important things to remember are:
 <CodeBlock
   adapter="javascript"
   starterCode={`// This works because of function hoisting:
-console.log(square(4));   // 16
+console.log(square(4)); // 16
 
 function square(n) {
   return n * n;
@@ -316,7 +324,7 @@ The function should return the sum of \`1 + 2 + 3\` which is \`6\`. As-is, it re
   starterCode={`function compute() {
   let total = 0;
   for (let i = 1; i <= 3; i++) {
-    let total = i;   // BUG: this declares a NEW total, shadowing the outer one
+    let total = i; // BUG: this declares a NEW total, shadowing the outer one
     // your fix here
   }
   return total;
@@ -327,7 +335,7 @@ console.log(compute());
   solutionCode={`function compute() {
   let total = 0;
   for (let i = 1; i <= 3; i++) {
-    total += i;       // assign to the OUTER total — no inner declaration
+    total += i; // assign to the OUTER total — no inner declaration
   }
   return total;
 }

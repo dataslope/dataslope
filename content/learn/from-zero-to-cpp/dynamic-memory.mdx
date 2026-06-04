@@ -51,15 +51,15 @@ returns the bytes to the allocator.
   starterCode={`#include <iostream>
 
 int main() {
-    int* p = new int(42);    // allocate one int on the heap, initialized to 42
-    std::cout << *p << "\\n"; // 42
+  int *p = new int(42);    // allocate one int on the heap, initialized to 42
+  std::cout << *p << "\\n"; // 42
 
-    *p = 100;
-    std::cout << *p << "\\n"; // 100
+  *p = 100;
+  std::cout << *p << "\\n"; // 100
 
-    delete p;                // give the memory back
-    p = nullptr;             // good habit: don't keep stale pointers around
-    return 0;
+  delete p;    // give the memory back
+  p = nullptr; // good habit: don't keep stale pointers around
+  return 0;
 }
 `}
 />
@@ -91,15 +91,15 @@ To allocate `n` objects in a row, use `new[]` and pair it with
   starterCode={`#include <iostream>
 
 int main() {
-    int n = 5;
-    int* arr = new int[n]{1, 2, 3, 4, 5};
+  int n = 5;
+  int *arr = new int[n]{1, 2, 3, 4, 5};
 
-    for (int i = 0; i < n; ++i) {
-        std::cout << arr[i] << (i + 1 == n ? '\\n' : ' ');
-    }
+  for (int i = 0; i < n; ++i) {
+    std::cout << arr[i] << (i + 1 == n ? '\\n' : ' ');
+  }
 
-    delete[] arr;     // [] is mandatory: must match new[]
-    return 0;
+  delete[] arr; // [] is mandatory: must match new[]
+  return 0;
 }
 `}
 />
@@ -191,10 +191,10 @@ A preview of the safer version of dynamic memory, using
 #include <memory>
 
 int main() {
-    auto p = std::make_unique<int>(42);   // allocates and owns
-    std::cout << *p << "\\n";
-    // no delete needed — the unique_ptr's destructor frees it on scope exit
-    return 0;
+  auto p = std::make_unique<int>(42); // allocates and owns
+  std::cout << *p << "\\n";
+  // no delete needed — the unique_ptr's destructor frees it on scope exit
+  return 0;
 }
 `}
 />
@@ -215,14 +215,14 @@ estimating memory usage.
   starterCode={`#include <iostream>
 
 int main() {
-    std::cout << "int:    " << sizeof(int)    << " bytes\\n";
-    std::cout << "double: " << sizeof(double) << " bytes\\n";
-    std::cout << "int*:   " << sizeof(int*)   << " bytes\\n";
+  std::cout << "int:    " << sizeof(int) << " bytes\\n";
+  std::cout << "double: " << sizeof(double) << " bytes\\n";
+  std::cout << "int*:   " << sizeof(int *) << " bytes\\n";
 
-    int* arr = new int[1000];
-    // ~4000 bytes were just requested from the OS.
-    delete[] arr;
-    return 0;
+  int *arr = new int[1000];
+  // ~4000 bytes were just requested from the OS.
+  delete[] arr;
+  return 0;
 }
 `}
 />
@@ -240,17 +240,17 @@ used by this course's runtime, `int*` is 4 bytes; on a typical
   starterCode={`#include <iostream>
 
 int main() {
-    // your code here
-    return 0;
+  // your code here
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 
 int main() {
-    int* p = new int(123);
-    std::cout << *p;
-    delete p;
-    return 0;
+  int *p = new int(123);
+  std::cout << *p;
+  delete p;
+  return 0;
 }
 `}
   tests={[
@@ -270,24 +270,25 @@ int main() {
   starterCode={`#include <iostream>
 
 int main() {
-    int n = 5;
-    int* arr = nullptr;
-    // your code: allocate, fill, print, free
-    return 0;
+  int n = 5;
+  int *arr = nullptr;
+  // your code: allocate, fill, print, free
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 
 int main() {
-    int n = 5;
-    int* arr = new int[n];
-    for (int i = 0; i < n; ++i) arr[i] = (i + 1) * (i + 1);
-    for (int i = 0; i < n; ++i) {
-        std::cout << arr[i];
-        std::cout << (i + 1 == n ? '\\n' : ' ');
-    }
-    delete[] arr;
-    return 0;
+  int n = 5;
+  int *arr = new int[n];
+  for (int i = 0; i < n; ++i)
+    arr[i] = (i + 1) * (i + 1);
+  for (int i = 0; i < n; ++i) {
+    std::cout << arr[i];
+    std::cout << (i + 1 == n ? '\\n' : ' ');
+  }
+  delete[] arr;
+  return 0;
 }
 `}
   tests={[

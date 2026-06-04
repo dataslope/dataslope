@@ -117,13 +117,13 @@ single summary value. You will use these constantly:
   adapter="r"
   starterCode={`scores <- c(82, 91, 76, 100, 65, 88, 79, 93, 71, 85)
 
-mean(scores)     # average
-median(scores)   # middle value
-sd(scores)       # standard deviation
-var(scores)      # variance
+mean(scores) # average
+median(scores) # middle value
+sd(scores) # standard deviation
+var(scores) # variance
 min(scores)
 max(scores)
-range(scores)    # min and max together
+range(scores) # min and max together
 sum(scores)
 length(scores)
 quantile(scores) # five-number summary
@@ -167,8 +167,8 @@ mean 0 and standard deviation 1.
 
 # Step by step
 mean_h <- mean(heights)
-sd_h   <- sd(heights)
-z      <- (heights - mean_h) / sd_h
+sd_h <- sd(heights)
+z <- (heights - mean_h) / sd_h
 
 print(round(z, 2))
 
@@ -249,11 +249,11 @@ temperatures in Fahrenheit using the formula `F = C * 9/5 + 32`.
   initCode={`celsius <- c(0, 10, 20, 30, 37, 100)
 `}
   starterCode={`# celsius is already defined
-fahrenheit <- NULL   # replace NULL with the vectorized formula
+fahrenheit <- NULL # replace NULL with the vectorized formula
 
 print(fahrenheit)
 `}
-  solutionCode={`fahrenheit <- celsius * 9/5 + 32
+  solutionCode={`fahrenheit <- celsius * 9 / 5 + 32
 print(fahrenheit)
 `}
   tests={[

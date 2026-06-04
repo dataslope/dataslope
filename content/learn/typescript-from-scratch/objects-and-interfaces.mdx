@@ -123,11 +123,11 @@ A property marked with `?` is **optional** — it may be present or absent:
   adapter="typescript"
   starterCode={`interface User {
   name: string;
-  age?: number;  // optional
+  age?: number; // optional
 }
 
 const alice: User = { name: "Alice", age: 30 };
-const bob: User = { name: "Bob" };  // no age, that's fine
+const bob: User = { name: "Bob" }; // no age, that's fine
 
 console.log("alice:", alice);
 console.log("bob:", bob);
@@ -210,8 +210,8 @@ an index signature with named properties:
 <CodeBlock
   adapter="typescript"
   starterCode={`interface MixedMap {
-  count: number;  // specific property
-  [key: string]: number;  // any other property is a number
+  count: number; // specific property
+  [key: string]: number; // any other property is a number
 }
 
 const data: MixedMap = {
@@ -399,7 +399,7 @@ interface Vector2D {
 }
 
 const point: Point2D = { x: 10, y: 20 };
-const vector: Vector2D = point;  // ✅ Allowed! Same shape.
+const vector: Vector2D = point; // ✅ Allowed! Same shape.
 
 console.log("point:", point);
 console.log("vector:", vector);
@@ -421,7 +421,7 @@ fewer properties (in most contexts):
 }
 
 const user = { name: "Alice", age: 30 };
-const named: Named = user;  // ✅ 'user' has at least 'name'
+const named: Named = user; // ✅ 'user' has at least 'name'
 
 console.log("named:", named);
 console.log("named.name:", named.name);

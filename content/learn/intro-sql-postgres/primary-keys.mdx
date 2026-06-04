@@ -112,10 +112,16 @@ defending the uniqueness rule.
 );
 INSERT INTO customers (id, name) VALUES (1, 'Ada');`}
   starterCode={`-- This tries to reuse id = 1, which already exists.
-INSERT INTO customers (id, name) VALUES (1, 'Grace');
+INSERT INTO
+  customers (id, name)
+VALUES
+  (1, 'Grace');
 
 -- The insert above fails; the table still has only Ada.
-SELECT * FROM customers;`}
+SELECT
+  *
+FROM
+  customers;`}
 />
 
 That rejection is a *good* thing. The database is stopping you from

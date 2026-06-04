@@ -62,11 +62,15 @@ text label or shape at coordinates you choose — *not* tied to the data:
 
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(alpha = 0.5) +
-  annotate("text", x = 6, y = 40,
-           label = "Big engines,\\nbut still efficient?",
-           color = "darkred", fontface = "bold") +
-  annotate("rect", xmin = 5, xmax = 7, ymin = 22, ymax = 30,
-           alpha = 0.1, fill = "red")
+  annotate("text",
+    x = 6, y = 40,
+    label = "Big engines,\\nbut still efficient?",
+    color = "darkred", fontface = "bold"
+  ) +
+  annotate("rect",
+    xmin = 5, xmax = 7, ymin = 22, ymax = 30,
+    alpha = 0.1, fill = "red"
+  )
 `}
 />
 
@@ -88,8 +92,10 @@ avg <- mean(mpg$hwy)
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(alpha = 0.5) +
   geom_hline(yintercept = avg, linetype = "dashed", color = "blue") +
-  annotate("text", x = 6.5, y = avg + 1.5,
-           label = "average", color = "blue", size = 3)
+  annotate("text",
+    x = 6.5, y = avg + 1.5,
+    label = "average", color = "blue", size = 3
+  )
 `}
 />
 

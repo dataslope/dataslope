@@ -37,10 +37,11 @@ many values fall in each. The result is a picture of where values
   adapter="r"
   starterCode={`data(mtcars)
 hist(mtcars$mpg,
-     main = "Fuel economy (mtcars)",
-     xlab = "Miles per gallon",
-     col  = "steelblue",
-     breaks = 10)
+  main = "Fuel economy (mtcars)",
+  xlab = "Miles per gallon",
+  col = "steelblue",
+  breaks = 10
+)
 `}
 />
 
@@ -68,10 +69,11 @@ easier to compare, especially across groups:
   starterCode={`data(mtcars)
 d <- density(mtcars$mpg)
 plot(d,
-     main = "Density of mpg",
-     xlab = "Miles per gallon",
-     col  = "darkred",
-     lwd  = 2)
+  main = "Density of mpg",
+  xlab = "Miles per gallon",
+  col  = "darkred",
+  lwd  = 2
+)
 polygon(d, col = adjustcolor("darkred", 0.3), border = NA)
 `}
 />
@@ -91,9 +93,10 @@ for marking outliers.
   adapter="r"
   starterCode={`data(mtcars)
 boxplot(mtcars$mpg,
-        main = "mpg distribution",
-        ylab = "Miles per gallon",
-        col  = "lightblue")
+  main = "mpg distribution",
+  ylab = "Miles per gallon",
+  col  = "lightblue"
+)
 `}
 />
 
@@ -110,11 +113,13 @@ distributions across groups**:
 <CodeBlock
   adapter="r"
   starterCode={`data(mtcars)
-boxplot(mpg ~ cyl, data = mtcars,
-        main = "mpg by cylinder count",
-        xlab = "Cylinders",
-        ylab = "mpg",
-        col  = c("lightblue", "lightgreen", "lightpink"))
+boxplot(mpg ~ cyl,
+  data = mtcars,
+  main = "mpg by cylinder count",
+  xlab = "Cylinders",
+  ylab = "mpg",
+  col = c("lightblue", "lightgreen", "lightpink")
+)
 `}
 />
 
@@ -162,11 +167,15 @@ at low-to-medium values with a long tail of high values.
 set.seed(42)
 incomes <- round(rlnorm(500, meanlog = 10.5, sdlog = 0.6))
 
-par(mfrow = c(1, 2))  # side by side
-hist(incomes, breaks = 30, main = "Right-skewed: incomes",
-     col = "coral", xlab = "income")
-boxplot(incomes, horizontal = TRUE, main = "Boxplot",
-        col = "coral", xlab = "income")
+par(mfrow = c(1, 2)) # side by side
+hist(incomes,
+  breaks = 30, main = "Right-skewed: incomes",
+  col = "coral", xlab = "income"
+)
+boxplot(incomes,
+  horizontal = TRUE, main = "Boxplot",
+  col = "coral", xlab = "income"
+)
 par(mfrow = c(1, 1))
 `}
 />
@@ -186,8 +195,8 @@ becomes easier to work with statistically.
 incomes <- round(rlnorm(500, meanlog = 10.5, sdlog = 0.6))
 
 par(mfrow = c(1, 2))
-hist(incomes,       main = "incomes",       col = "coral", breaks = 30)
-hist(log10(incomes),main = "log10(incomes)",col = "skyblue", breaks = 30)
+hist(incomes, main = "incomes", col = "coral", breaks = 30)
+hist(log10(incomes), main = "log10(incomes)", col = "skyblue", breaks = 30)
 par(mfrow = c(1, 1))
 `}
 />
@@ -236,7 +245,7 @@ just checks the plot was produced.
   title="Histogram + boxplot for Ozone"
   instructions={`Produce two side-by-side plots: (1) a histogram of \`airquality$Ozone\` (NAs ignored), (2) a boxplot of the same. Set the layout with \`par(mfrow = c(1, 2))\`.`}
   starterCode={`data(airquality)
-oz <- airquality$Ozone   # has NAs
+oz <- airquality$Ozone # has NAs
 
 par(mfrow = c(1, 2))
 # 1. histogram
@@ -249,8 +258,10 @@ cat("done\\n")
 oz <- airquality$Ozone
 
 par(mfrow = c(1, 2))
-hist(oz, breaks = 20, col = "coral",
-     main = "Ozone histogram", xlab = "Ozone")
+hist(oz,
+  breaks = 20, col = "coral",
+  main = "Ozone histogram", xlab = "Ozone"
+)
 boxplot(oz, col = "coral", main = "Ozone boxplot")
 par(mfrow = c(1, 1))
 

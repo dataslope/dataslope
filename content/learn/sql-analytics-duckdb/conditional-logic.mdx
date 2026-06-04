@@ -29,12 +29,14 @@ INSERT INTO orders VALUES
   id,
   amount,
   CASE
-    WHEN amount < 50  THEN 'small'
+    WHEN amount < 50 THEN 'small'
     WHEN amount < 200 THEN 'medium'
     ELSE 'large'
   END AS size_bucket
-FROM orders
-ORDER BY amount;`}
+FROM
+  orders
+ORDER BY
+  amount;`}
 />
 
 The conditions are tested **top to bottom**, and the first match wins —
@@ -58,15 +60,18 @@ INSERT INTO orders VALUES
   (1,15),(2,120),(3,45),(4,250),(5,8),(6,95),(7,500),(8,60);`}
   starterCode={`SELECT
   CASE
-    WHEN amount < 50  THEN 'small'
+    WHEN amount < 50 THEN 'small'
     WHEN amount < 200 THEN 'medium'
     ELSE 'large'
-  END         AS size_bucket,
-  COUNT(*)    AS orders,
+  END AS size_bucket,
+  COUNT(*) AS orders,
   SUM(amount) AS revenue
-FROM orders
-GROUP BY size_bucket
-ORDER BY revenue DESC;`}
+FROM
+  orders
+GROUP BY
+  size_bucket
+ORDER BY
+  revenue DESC;`}
 />
 
 ## Conditional aggregation: `SUM(CASE ...)`
@@ -88,12 +93,28 @@ INSERT INTO orders VALUES
   (7,'East','refunded',30),(8,'North','paid',100);`}
   starterCode={`SELECT
   region,
-  SUM(CASE WHEN status = 'paid'     THEN amount ELSE 0 END) AS paid_revenue,
-  SUM(CASE WHEN status = 'refunded' THEN amount ELSE 0 END) AS refunded_revenue,
-  COUNT(*) FILTER (WHERE status = 'paid')                   AS paid_orders
-FROM orders
-GROUP BY region
-ORDER BY region;`}
+  SUM(
+    CASE
+      WHEN status = 'paid' THEN amount
+      ELSE 0
+    END
+  ) AS paid_revenue,
+  SUM(
+    CASE
+      WHEN status = 'refunded' THEN amount
+      ELSE 0
+    END
+  ) AS refunded_revenue,
+  COUNT(*) FILTER(
+    WHERE
+      status = 'paid'
+  ) AS paid_orders
+FROM
+  orders
+GROUP BY
+  region
+ORDER BY
+  region;`}
 />
 
 How it works: for each row, the inner `CASE` contributes the `amount` only
@@ -127,12 +148,24 @@ INSERT INTO orders VALUES
   (4,'East','paid',50),(5,'North','refunded',60),(6,'West','paid',95);`}
   starterCode={`SELECT
   region,
-  SUM(amount) FILTER (WHERE status = 'paid')     AS paid_revenue,
-  SUM(amount) FILTER (WHERE status = 'refunded') AS refunded_revenue,
-  COUNT(*)    FILTER (WHERE status = 'paid')     AS paid_orders
-FROM orders
-GROUP BY region
-ORDER BY region;`}
+  SUM(amount) FILTER(
+    WHERE
+      status = 'paid'
+  ) AS paid_revenue,
+  SUM(amount) FILTER(
+    WHERE
+      status = 'refunded'
+  ) AS refunded_revenue,
+  COUNT(*) FILTER(
+    WHERE
+      status = 'paid'
+  ) AS paid_orders
+FROM
+  orders
+GROUP BY
+  region
+ORDER BY
+  region;`}
 />
 
 `SUM(amount) FILTER (WHERE status = 'paid')` reads almost like English:
@@ -158,10 +191,12 @@ INSERT INTO line_items VALUES
   (1, 100, 4, NULL), (2, 60, 0, 5), (3, 80, 2, NULL);`}
   starterCode={`SELECT
   id,
-  COALESCE(discount, 0)                  AS discount_filled,
-  ROUND(amount / NULLIF(quantity, 0), 2) AS price_each  -- NULL, not error, when qty=0
-FROM line_items
-ORDER BY id;`}
+  COALESCE(discount, 0) AS discount_filled,
+  ROUND(amount / NULLIF(quantity, 0), 2) AS price_each -- NULL, not error, when qty=0
+FROM
+  line_items
+ORDER BY
+  id;`}
 />
 
 ## Check your understanding

@@ -53,9 +53,12 @@ air = pd.Series(_passengers, index=idx, name="passengers")`}
 fig, ax = plt.subplots(figsize=(10, 4))
 air.plot(ax=ax, title="Monthly airline passengers, 1949-1960")
 ax.set_ylabel("passengers (thousands)")
-plt.tight_layout(); plt.show()
+plt.tight_layout()
+plt.show()
 
-print(f"Span      : {air.index.min().date()} to {air.index.max().date()}  ({len(air)} months)")
+print(
+    f"Span      : {air.index.min().date()} to {air.index.max().date()}  ({len(air)} months)"
+)
 print(f"Range     : {air.min()} to {air.max()}")
 print()
 print("Three features to plan around:")
@@ -97,13 +100,22 @@ air = pd.Series(_passengers, index=idx, name="passengers")`}
   starterCode={`import numpy as np
 from statsmodels.tsa.stattools import adfuller
 
-def p(series): return adfuller(series.dropna())[1]
+
+def p(series):
+    return adfuller(series.dropna())[1]
+
 
 print("ADF p-values (low = stationary):")
 print(f"  raw air                       : {p(air):.4f}  -> non-stationary")
-print(f"  log(air)                      : {p(np.log(air)):.4f}  -> still non-stationary (log fixes variance, not trend)")
-print(f"  log + first difference        : {p(np.log(air).diff()):.4f}  -> trend gone, season remains")
-print(f"  log + first + seasonal(12) diff: {p(np.log(air).diff().diff(12)):.4f}  -> STATIONARY")
+print(
+    f"  log(air)                      : {p(np.log(air)):.4f}  -> still non-stationary (log fixes variance, not trend)"
+)
+print(
+    f"  log + first difference        : {p(np.log(air).diff()):.4f}  -> trend gone, season remains"
+)
+print(
+    f"  log + first + seasonal(12) diff: {p(np.log(air).diff().diff(12)):.4f}  -> STATIONARY"
+)
 print()
 print("Verdict: we need a log, one regular difference (d=1), and one seasonal")
 print("difference at lag 12 (D=1). That's the recipe the data itself prescribed.")
@@ -140,12 +152,15 @@ air = pd.Series(_passengers, index=idx, name="passengers")`}
 import matplotlib.pyplot as plt
 
 dec = seasonal_decompose(air, model="multiplicative", period=12)
-fig = dec.plot(); fig.set_size_inches(9, 7)
-plt.tight_layout(); plt.show()
+fig = dec.plot()
+fig.set_size_inches(9, 7)
+plt.tight_layout()
+plt.show()
 
 # The seasonal factor tells us the shape of a typical year:
 season = dec.seasonal.iloc[:12]
-peak = season.idxmax(); trough = season.idxmin()
+peak = season.idxmax()
+trough = season.idxmin()
 print(f"Busiest month factor ~ {season.max():.2f} (around {peak.strftime('%B')})")
 print(f"Quietest month factor ~ {season.min():.2f} (around {trough.strftime('%B')})")
 print("Multiplicative: summer runs ~+25-30% above trend, winter dips below.")
@@ -188,8 +203,11 @@ stationary = np.log(air).diff().diff(12).dropna()
 
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 3.6))
 plot_acf(stationary, lags=24, ax=a1, title="ACF of the stationary series")
-plot_pacf(stationary, lags=24, ax=a2, method="ywm", title="PACF of the stationary series")
-plt.tight_layout(); plt.show()
+plot_pacf(
+    stationary, lags=24, ax=a2, method="ywm", title="PACF of the stationary series"
+)
+plt.tight_layout()
+plt.show()
 
 print("Small significant spikes at the short lags (1) suggest modest p and q.")
 print("A spike near lag 12 confirms a SEASONAL term is needed (period 12).")
@@ -247,16 +265,21 @@ from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
 H = 24
-train, test = air.iloc[:-H], air.iloc[-H:]   # past vs held-out future
+train, test = air.iloc[:-H], air.iloc[-H:]  # past vs held-out future
 log_train = np.log(train)
 
 # Seasonal ARIMA on the log series (forecast back via exp).
-sarima = SARIMAX(log_train, order=(1,1,1), seasonal_order=(1,1,1,12),
-                 enforce_stationarity=False, enforce_invertibility=False).fit(disp=False)
+sarima = SARIMAX(
+    log_train,
+    order=(1, 1, 1),
+    seasonal_order=(1, 1, 1, 12),
+    enforce_stationarity=False,
+    enforce_invertibility=False,
+).fit(disp=False)
 fc_sarima = np.exp(sarima.get_forecast(H).predicted_mean)
 
 # Plain ARIMA on the log series (no seasonal terms).
-plain = ARIMA(log_train, order=(2,1,2)).fit()
+plain = ARIMA(log_train, order=(2, 1, 2)).fit()
 fc_plain = np.exp(plain.forecast(H))
 
 # Baseline: seasonal-naive (each month = same month last year -> last 12, repeated).
@@ -265,10 +288,12 @@ fc_snaive = np.tile(train.values[-12:], H // 12)
 yt = test.values
 print(f"{'forecaster':30s}{'MAE':>8}{'RMSE':>8}{'MAPE':>8}")
 print("-" * 54)
-for name, pred in [("Seasonal-naive (BASELINE)", fc_snaive),
-                   ("Plain ARIMA(2,1,2)", fc_plain.values),
-                   ("Seasonal ARIMA (1,1,1)(1,1,1,12)", fc_sarima.values)]:
-    print(f"{name:30s}{mae(yt,pred):8.1f}{rmse(yt,pred):8.1f}{mape(yt,pred):7.1f}%")
+for name, pred in [
+    ("Seasonal-naive (BASELINE)", fc_snaive),
+    ("Plain ARIMA(2,1,2)", fc_plain.values),
+    ("Seasonal ARIMA (1,1,1)(1,1,1,12)", fc_sarima.values),
+]:
+    print(f"{name:30s}{mae(yt, pred):8.1f}{rmse(yt, pred):8.1f}{mape(yt, pred):7.1f}%")
 
 print()
 print("The SEASONAL model wins clearly -- it captures both the trend AND the")
@@ -316,8 +341,13 @@ from statsmodels.tsa.statespace.sarimax import SARIMAX
 
 H = 24
 train, test = air.iloc[:-H], air.iloc[-H:]
-res = SARIMAX(np.log(train), order=(1,1,1), seasonal_order=(1,1,1,12),
-              enforce_stationarity=False, enforce_invertibility=False).fit(disp=False)
+res = SARIMAX(
+    np.log(train),
+    order=(1, 1, 1),
+    seasonal_order=(1, 1, 1, 12),
+    enforce_stationarity=False,
+    enforce_invertibility=False,
+).fit(disp=False)
 
 fc = res.get_forecast(H)
 mean = np.exp(fc.predicted_mean)
@@ -327,10 +357,18 @@ fig, ax = plt.subplots(figsize=(10, 4.5))
 train.plot(ax=ax, label="train")
 test.plot(ax=ax, label="actual (held out)", color="black")
 mean.plot(ax=ax, label="seasonal forecast", color="crimson")
-ax.fill_between(ci.index, ci.iloc[:, 0], ci.iloc[:, 1], color="crimson", alpha=0.15,
-                label="95% interval")
-ax.legend(); ax.set_title("End-to-end forecast vs reality (last 24 months held out)")
-plt.tight_layout(); plt.show()
+ax.fill_between(
+    ci.index,
+    ci.iloc[:, 0],
+    ci.iloc[:, 1],
+    color="crimson",
+    alpha=0.15,
+    label="95% interval",
+)
+ax.legend()
+ax.set_title("End-to-end forecast vs reality (last 24 months held out)")
+plt.tight_layout()
+plt.show()
 
 print("The forecast reproduces the rising trend AND the summer peaks, and the")
 print("actual values land inside the uncertainty band. That is what an honest,")
@@ -411,7 +449,10 @@ print("final stationary:", is_stationary_final)
   solutionCode={`import numpy as np
 from statsmodels.tsa.stattools import adfuller
 
-def p(s): return float(adfuller(s.dropna())[1])
+
+def p(s):
+    return float(adfuller(s.dropna())[1])
+
 
 loga = np.log(air)
 report = {
@@ -487,8 +528,10 @@ air = pd.Series(_passengers, index=idx, name="passengers")`}
   starterCode={`import numpy as np
 
 evaluation = {
-    "snaive_mae": None, "snaive_rmse": None,
-    "mean_mae": None, "mean_rmse": None,
+    "snaive_mae": None,
+    "snaive_rmse": None,
+    "mean_mae": None,
+    "mean_rmse": None,
     "snaive_better": None,
 }
 print(evaluation)
@@ -502,8 +545,14 @@ yt = test.values
 snaive = train.values[-H:]
 flat = np.full(H, train.mean())
 
-def mae(a, b):  return float(np.mean(np.abs(a - b)))
-def rmse(a, b): return float(np.sqrt(np.mean((a - b) ** 2)))
+
+def mae(a, b):
+    return float(np.mean(np.abs(a - b)))
+
+
+def rmse(a, b):
+    return float(np.sqrt(np.mean((a - b) ** 2)))
+
 
 evaluation = {
     "snaive_mae": mae(yt, snaive),

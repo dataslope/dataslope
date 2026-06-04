@@ -59,7 +59,9 @@ df = px.data.iris()
 
 # Try changing the template name in the next line!
 fig = px.scatter(
-    df, x="sepal_width", y="sepal_length",
+    df,
+    x="sepal_width",
+    y="sepal_length",
     color="species",
     template="simple_white",
     title="Iris — change the template above to see other styles",
@@ -117,8 +119,13 @@ pio.templates.default = "simple_white"
 df = px.data.gapminder().query("year == 2007")
 
 fig = px.scatter(
-    df, x="gdpPercap", y="lifeExp", color="continent",
-    log_x=True, size="pop", size_max=40,
+    df,
+    x="gdpPercap",
+    y="lifeExp",
+    color="continent",
+    log_x=True,
+    size="pop",
+    size_max=40,
     title="Notice: no template= argument, but it still looks clean",
     labels={"gdpPercap": "GDP per capita (USD, log)", "lifeExp": "Life expectancy"},
 )

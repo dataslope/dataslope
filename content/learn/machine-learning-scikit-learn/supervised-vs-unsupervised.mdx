@@ -90,9 +90,7 @@ from sklearn.linear_model import LogisticRegression
 X, y = load_iris(return_X_y=True)
 print("We have labels. First few:", y[:8], "(species 0, 1, 2)")
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=0
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
 # Note: fit receives BOTH X and y -- the answers are the teacher.
 model = LogisticRegression(max_iter=1000)
@@ -179,7 +177,7 @@ from sklearn.cluster import KMeans
 # --- SUPERVISED: features AND labels ---
 Xs, ys = load_iris(return_X_y=True)
 sup = LogisticRegression(max_iter=1000)
-sup.fit(Xs, ys)              # <-- two arguments: X and y
+sup.fit(Xs, ys)  # <-- two arguments: X and y
 print("Supervised  : fit(X, y)  -- learns mapping to a KNOWN target")
 print("              can predict the labeled answer for new data")
 
@@ -188,7 +186,7 @@ print()
 # --- UNSUPERVISED: features ONLY ---
 Xu, _ = make_blobs(n_samples=60, centers=3, random_state=0)
 unsup = KMeans(n_clusters=3, n_init=10, random_state=0)
-unsup.fit(Xu)               # <-- one argument: X only
+unsup.fit(Xu)  # <-- one argument: X only
 print("Unsupervised: fit(X)     -- discovers STRUCTURE, no target given")
 print("              groups data; no ground-truth answer to score against")
 `}
@@ -252,7 +250,7 @@ from sklearn.metrics import silhouette_score
 # --- SUPERVISED: known answers -> we can compute ACCURACY ---
 Xs, ys = load_iris(return_X_y=True)
 clf = LogisticRegression(max_iter=1000).fit(Xs, ys)
-accuracy = clf.score(Xs, ys)            # compares predictions to KNOWN labels
+accuracy = clf.score(Xs, ys)  # compares predictions to KNOWN labels
 print("Supervised   -> accuracy is well-defined:", round(accuracy, 3))
 
 # --- UNSUPERVISED: no answers -> accuracy is IMPOSSIBLE ---
@@ -414,7 +412,7 @@ string \`"supervised"\` or the string \`"unsupervised"\`:
 The hidden tests check each individual answer.`}
   initCode={``}
   starterCode={`answers = {
-    "predict_house_price": None,           # "supervised" or "unsupervised"
+    "predict_house_price": None,  # "supervised" or "unsupervised"
     "segment_customers": None,
     "classify_email_spam": None,
     "group_news_articles": None,

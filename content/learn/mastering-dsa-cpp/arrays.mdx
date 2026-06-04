@@ -13,15 +13,13 @@ A C-style array such as `int a[5]` has a fixed size known at compile time. It is
   adapter="cpp"
   starterCode={`#include <iostream>
 
-void print_first(int* values) {
-    std::cout << values[0] << "\\n";
-}
+void print_first(int *values) { std::cout << values[0] << "\\n"; }
 
 int main() {
-    int scores[5] = {10, 20, 30, 40, 50};
-    print_first(scores);
-    std::cout << "sizeof array: " << sizeof(scores) << " bytes\\n";
-    return 0;
+  int scores[5] = {10, 20, 30, 40, 50};
+  print_first(scores);
+  std::cout << "sizeof array: " << sizeof(scores) << " bytes\\n";
+  return 0;
 }
 `}
 />
@@ -38,13 +36,13 @@ You almost never want raw arrays for DSA practice because `std::array` and `std:
 #include <iostream>
 
 int main() {
-    std::array<int, 4> levels = {3, 1, 4, 1};
-    std::cout << "size: " << levels.size() << "\\n";
-    for (int x : levels) {
-        std::cout << x << " ";
-    }
-    std::cout << "\\n";
-    return 0;
+  std::array<int, 4> levels = {3, 1, 4, 1};
+  std::cout << "size: " << levels.size() << "\\n";
+  for (int x : levels) {
+    std::cout << x << " ";
+  }
+  std::cout << "\\n";
+  return 0;
 }
 `}
 />
@@ -59,18 +57,18 @@ int main() {
 #include <vector>
 
 int main() {
-    std::vector<int> points = {10, 20, 30};
-    points.push_back(40);
-    points.pop_back();
-    points.push_back(99);
+  std::vector<int> points = {10, 20, 30};
+  points.push_back(40);
+  points.pop_back();
+  points.push_back(99);
 
-    std::cout << "size: " << points.size() << "\\n";
-    std::cout << "capacity: " << points.capacity() << "\\n";
-    std::cout << "first: " << points.front() << "\\n";
-    std::cout << "last: " << points.back() << "\\n";
-    std::cout << "index 1: " << points[1] << "\\n";
-    std::cout << "checked index 2: " << points.at(2) << "\\n";
-    return 0;
+  std::cout << "size: " << points.size() << "\\n";
+  std::cout << "capacity: " << points.capacity() << "\\n";
+  std::cout << "first: " << points.front() << "\\n";
+  std::cout << "last: " << points.back() << "\\n";
+  std::cout << "index 1: " << points[1] << "\\n";
+  std::cout << "checked index 2: " << points.at(2) << "\\n";
+  return 0;
 }
 `}
 />
@@ -97,11 +95,11 @@ flowchart LR
 #include <vector>
 
 int main() {
-    std::vector<int> xs = {10, 20, 30, 40};
-    std::cout << &xs[0] << "\\n";
-    std::cout << &xs[1] << "\\n";
-    std::cout << &xs[2] << "\\n";
-    return 0;
+  std::vector<int> xs = {10, 20, 30, 40};
+  std::cout << &xs[0] << "\\n";
+  std::cout << &xs[1] << "\\n";
+  std::cout << &xs[2] << "\\n";
+  return 0;
 }
 `}
 />
@@ -118,23 +116,23 @@ Index-based loops are useful when you need positions. Range-for loops are clean 
 #include <vector>
 
 int main() {
-    std::vector<int> xs = {4, 8, 15, 16, 23, 42};
+  std::vector<int> xs = {4, 8, 15, 16, 23, 42};
 
-    for (std::size_t i = 0; i < xs.size(); ++i) {
-        std::cout << i << ":" << xs[i] << " ";
-    }
-    std::cout << "\\n";
+  for (std::size_t i = 0; i < xs.size(); ++i) {
+    std::cout << i << ":" << xs[i] << " ";
+  }
+  std::cout << "\\n";
 
-    for (int x : xs) {
-        std::cout << x << " ";
-    }
-    std::cout << "\\n";
+  for (int x : xs) {
+    std::cout << x << " ";
+  }
+  std::cout << "\\n";
 
-    for (auto it = xs.begin(); it != xs.end(); ++it) {
-        std::cout << *it << " ";
-    }
-    std::cout << "\\n";
-    return 0;
+  for (auto it = xs.begin(); it != xs.end(); ++it) {
+    std::cout << *it << " ";
+  }
+  std::cout << "\\n";
+  return 0;
 }
 `}
 />
@@ -149,17 +147,17 @@ int main() {
 #include <vector>
 
 int main() {
-    std::vector<int> values;
-    std::size_t previous = values.capacity();
-    for (int i = 0; i < 20; ++i) {
-        values.push_back(i);
-        if (values.capacity() != previous) {
-            previous = values.capacity();
-            std::cout << "size=" << values.size()
-                      << " capacity=" << values.capacity() << "\\n";
-        }
+  std::vector<int> values;
+  std::size_t previous = values.capacity();
+  for (int i = 0; i < 20; ++i) {
+    values.push_back(i);
+    if (values.capacity() != previous) {
+      previous = values.capacity();
+      std::cout << "size=" << values.size() << " capacity=" << values.capacity()
+                << "\\n";
     }
-    return 0;
+  }
+  return 0;
 }
 `}
 />
@@ -177,15 +175,17 @@ Browser timing is noisy, but this shows how to measure a sequence of pushes with
 #include <vector>
 
 int main() {
-    std::vector<int> values;
-    auto start = std::chrono::high_resolution_clock::now();
-    for (int i = 0; i < 1000000; ++i) {
-        values.push_back(i);
-    }
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
-    std::cout << "pushed " << values.size() << " values in about " << ms << " ms\\n";
-    return 0;
+  std::vector<int> values;
+  auto start = std::chrono::high_resolution_clock::now();
+  for (int i = 0; i < 1000000; ++i) {
+    values.push_back(i);
+  }
+  auto stop = std::chrono::high_resolution_clock::now();
+  auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start)
+                .count();
+  std::cout << "pushed " << values.size() << " values in about " << ms
+            << " ms\\n";
+  return 0;
 }
 `}
 />
@@ -200,18 +200,14 @@ A matrix is often represented as `std::vector<std::vector<int>>`: a vector of ro
 #include <vector>
 
 int main() {
-    std::vector<std::vector<int>> grid = {
-        {1, 2, 3},
-        {4, 5, 6},
-        {7, 8, 9}
-    };
+  std::vector<std::vector<int>> grid = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
 
-    int diagonal = 0;
-    for (std::size_t r = 0; r < grid.size(); ++r) {
-        diagonal += grid[r][r];
-    }
-    std::cout << "diagonal sum: " << diagonal << "\\n";
-    return 0;
+  int diagonal = 0;
+  for (std::size_t r = 0; r < grid.size(); ++r) {
+    diagonal += grid[r][r];
+  }
+  std::cout << "diagonal sum: " << diagonal << "\\n";
+  return 0;
 }
 `}
 />
@@ -236,41 +232,41 @@ int main() {
   starterCode={`#include <iostream>
 #include <vector>
 
-void reverseInPlace(std::vector<int>& values) {
-    // your code here
+void reverseInPlace(std::vector<int> &values) {
+  // your code here
 }
 
 int main() {
-    std::vector<int> values = {1, 2, 3, 4, 5};
-    reverseInPlace(values);
-    for (int x : values) {
-        std::cout << x << "\\n";
-    }
-    return 0;
+  std::vector<int> values = {1, 2, 3, 4, 5};
+  reverseInPlace(values);
+  for (int x : values) {
+    std::cout << x << "\\n";
+  }
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 #include <vector>
 
-void reverseInPlace(std::vector<int>& values) {
-    std::size_t left = 0;
-    std::size_t right = values.empty() ? 0 : values.size() - 1;
-    while (left < right) {
-        int temp = values[left];
-        values[left] = values[right];
-        values[right] = temp;
-        ++left;
-        --right;
-    }
+void reverseInPlace(std::vector<int> &values) {
+  std::size_t left = 0;
+  std::size_t right = values.empty() ? 0 : values.size() - 1;
+  while (left < right) {
+    int temp = values[left];
+    values[left] = values[right];
+    values[right] = temp;
+    ++left;
+    --right;
+  }
 }
 
 int main() {
-    std::vector<int> values = {1, 2, 3, 4, 5};
-    reverseInPlace(values);
-    for (int x : values) {
-        std::cout << x << "\\n";
-    }
-    return 0;
+  std::vector<int> values = {1, 2, 3, 4, 5};
+  reverseInPlace(values);
+  for (int x : values) {
+    std::cout << x << "\\n";
+  }
+  return 0;
 }
 `}
   tests={[{ id: "reverse", name: "Reverses the vector", expect: { stdoutLines: ["5", "4", "3", "2", "1"], stdoutLinesExact: true } }]}
@@ -286,38 +282,38 @@ int main() {
 #include <limits>
 #include <vector>
 
-int secondLargest(const std::vector<int>& values) {
-    // your code here
+int secondLargest(const std::vector<int> &values) {
+  // your code here
 }
 
 int main() {
-    std::vector<int> values = {17, 42, 5, 42, 30, 99, 18};
-    std::cout << secondLargest(values) << "\\n";
-    return 0;
+  std::vector<int> values = {17, 42, 5, 42, 30, 99, 18};
+  std::cout << secondLargest(values) << "\\n";
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 #include <limits>
 #include <vector>
 
-int secondLargest(const std::vector<int>& values) {
-    int best = std::numeric_limits<int>::min();
-    int runner = std::numeric_limits<int>::min();
-    for (int x : values) {
-        if (x > best) {
-            runner = best;
-            best = x;
-        } else if (x < best && x > runner) {
-            runner = x;
-        }
+int secondLargest(const std::vector<int> &values) {
+  int best = std::numeric_limits<int>::min();
+  int runner = std::numeric_limits<int>::min();
+  for (int x : values) {
+    if (x > best) {
+      runner = best;
+      best = x;
+    } else if (x < best && x > runner) {
+      runner = x;
     }
-    return runner;
+  }
+  return runner;
 }
 
 int main() {
-    std::vector<int> values = {17, 42, 5, 42, 30, 99, 18};
-    std::cout << secondLargest(values) << "\\n";
-    return 0;
+  std::vector<int> values = {17, 42, 5, 42, 30, 99, 18};
+  std::cout << secondLargest(values) << "\\n";
+  return 0;
 }
 `}
   tests={[{ id: "second", name: "Finds runner-up", expect: { stdoutEquals: "42" } }]}

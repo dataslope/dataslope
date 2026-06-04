@@ -37,9 +37,10 @@ Compare the default grey theme with a few alternatives:
   adapter="r"
   starterCode={`library(ggplot2)
 
-p <- ggplot(mpg, aes(displ, hwy, color = drv)) + geom_point()
+p <- ggplot(mpg, aes(displ, hwy, color = drv)) +
+  geom_point()
 
-p + theme_gray()      # the default: grey panel, white gridlines
+p + theme_gray() # the default: grey panel, white gridlines
 `}
 />
 
@@ -47,9 +48,10 @@ p + theme_gray()      # the default: grey panel, white gridlines
   adapter="r"
   starterCode={`library(ggplot2)
 
-p <- ggplot(mpg, aes(displ, hwy, color = drv)) + geom_point()
+p <- ggplot(mpg, aes(displ, hwy, color = drv)) +
+  geom_point()
 
-p + theme_minimal()   # no panel background, light grid
+p + theme_minimal() # no panel background, light grid
 `}
 />
 
@@ -57,9 +59,10 @@ p + theme_minimal()   # no panel background, light grid
   adapter="r"
   starterCode={`library(ggplot2)
 
-p <- ggplot(mpg, aes(displ, hwy, color = drv)) + geom_point()
+p <- ggplot(mpg, aes(displ, hwy, color = drv)) +
+  geom_point()
 
-p + theme_classic()   # axis lines, no grid -> a traditional look
+p + theme_classic() # axis lines, no grid -> a traditional look
 `}
 />
 

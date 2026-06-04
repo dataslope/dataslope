@@ -23,9 +23,13 @@ ascending (the default) or `DESC` for descending:
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
   ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
-  starterCode={`SELECT name, salary
-FROM employees
-ORDER BY salary DESC;`}
+  starterCode={`SELECT
+  name,
+  salary
+FROM
+  employees
+ORDER BY
+  salary DESC;`}
 />
 
 Swap `DESC` for `ASC` (or remove it) to flip to lowest-first.
@@ -46,9 +50,15 @@ each grade:
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
   ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
-  starterCode={`SELECT dept, name, salary
-FROM employees
-ORDER BY dept ASC, salary DESC;`}
+  starterCode={`SELECT
+  dept,
+  name,
+  salary
+FROM
+  employees
+ORDER BY
+  dept ASC,
+  salary DESC;`}
 />
 
 The rows are grouped by department alphabetically, and *within* each
@@ -74,10 +84,15 @@ flowchart LR
 INSERT INTO employees (name, salary) VALUES
   ('Alice',120000),('Bob',95000),('Carol',80000),
   ('Dave',72000),('Eve',68000);`}
-  starterCode={`SELECT name, salary
-FROM employees
-ORDER BY salary DESC
-LIMIT 3;`}
+  starterCode={`SELECT
+  name,
+  salary
+FROM
+  employees
+ORDER BY
+  salary DESC
+LIMIT
+  3;`}
 />
 
 <Callout type="warn" title="LIMIT without ORDER BY is meaningless">
@@ -104,10 +119,17 @@ so on:
 INSERT INTO employees (name, salary) VALUES
   ('Alice',120000),('Bob',95000),('Carol',80000),
   ('Dave',72000),('Eve',68000);`}
-  starterCode={`SELECT name, salary
-FROM employees
-ORDER BY salary DESC
-LIMIT 2 OFFSET 2;`}
+  starterCode={`SELECT
+  name,
+  salary
+FROM
+  employees
+ORDER BY
+  salary DESC
+LIMIT
+  2
+OFFSET
+  2;`}
 />
 
 The query orders everyone, skips the top 2, and returns the next 2 —
@@ -210,11 +232,20 @@ INSERT INTO books (title, author, year) VALUES
   ('Refactoring', 'Martin Fowler', 2018),
   ('SQL for Smarties', 'Joe Celko', 1995);`}
   starterCode={`-- Newest first, then keep only the top two:
-SELECT title, year
-FROM books
-;
-`}
-  solutionSql={`SELECT title, year FROM books ORDER BY year DESC LIMIT 2;`}
+SELECT
+  title,
+  year
+FROM
+  books;`}
+  solutionSql={`SELECT
+  title,
+  year
+FROM
+  books
+ORDER BY
+  year DESC
+LIMIT
+  2;`}
   tests={[
     {
       id: "columns",

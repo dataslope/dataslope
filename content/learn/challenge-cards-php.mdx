@@ -14,20 +14,24 @@ they can see file-scope variables defined by the learner's code.
   title="Greeting function"
   instructions={`Define a function \`greet($name)\` that returns the string \`"Hello, NAME!"\` with \`NAME\` replaced by the argument.`}
   starterCode={`<?php
-function greet($name) {
+
+function greet($name)
+{
     // your code here
-    return "";
+    return '';
 }
 
-echo greet("World") . "\\n";
+echo greet('World') . "\\n";
 `}
   solutionCode={`<?php
-function greet(string $name): string {
+
+function greet(string $name): string
+{
     return "Hello, $name!";
 }
 
-echo greet("Ada") . "\\n";
-echo greet("Linus") . "\\n";
+echo greet('Ada') . "\\n";
+echo greet('Linus') . "\\n";
 `}
   tests={[
     {
@@ -51,20 +55,24 @@ echo greet("Linus") . "\\n";
   title="Greeting function"
   instructions={`Define a function \`greet($name)\` that returns the string \`"Hello, NAME!"\` with \`NAME\` replaced by the argument.`}
   starterCode={`<?php
-function greet($name) {
+
+function greet($name)
+{
     // your code here
-    return "";
+    return '';
 }
 
-echo greet("World") . "\\n";
+echo greet('World') . "\\n";
 `}
   solutionCode={`<?php
-function greet(string $name): string {
+
+function greet(string $name): string
+{
     return "Hello, $name!";
 }
 
-echo greet("Ada") . "\\n";
-echo greet("Linus") . "\\n";
+echo greet('Ada') . "\\n";
+echo greet('Linus') . "\\n";
 `}
   tests={[
     {
@@ -98,14 +106,17 @@ $items = [
 ];
 `}
   starterCode={`<?php
+
 $total = 0; // TODO
 
 echo $total;
 `}
   solutionCode={`<?php
+
 $total = 0.0;
 foreach ($items as $item) {
-    if ($item["in_stock"]) $total += $item["price"];
+    if ($item['in_stock'])
+        $total += $item['price'];
 }
 
 echo $total;
@@ -140,14 +151,17 @@ $items = [
 ];
 `}
   starterCode={`<?php
+
 $total = 0; // TODO
 
 echo $total;
 `}
   solutionCode={`<?php
+
 $total = 0.0;
 foreach ($items as $item) {
-    if ($item["in_stock"]) $total += $item["price"];
+    if ($item['in_stock'])
+        $total += $item['price'];
 }
 
 echo $total;
@@ -175,12 +189,14 @@ echo $total;
   adapter="php"
   title="Print the multiplication table for 7"
   starterCode={`<?php
+
 // Print 7 × 1 through 7 × 5, one per line.
 `}
   instructions={`Print five lines, where line *i* reads \`7 x i = (7*i)\`. Example first line: \`7 x 1 = 7\`.`}
   solutionCode={`<?php
-for ($i = 1; $i <= 10; $i++) {
-    echo "7 * $i = " . (7 * $i) . "\\n";
+
+for ($i = 1; $i <= 5; $i++) {
+    echo "7 x $i = " . (7 * $i) . "\\n";
 }
 `}
   tests={[
@@ -207,12 +223,14 @@ for ($i = 1; $i <= 10; $i++) {
   adapter="php"
   title="Print the multiplication table for 7"
   starterCode={`<?php
+
 // Print 7 × 1 through 7 × 5, one per line.
 `}
   instructions={`Print five lines, where line *i* reads \`7 x i = (7*i)\`. Example first line: \`7 x 1 = 7\`.`}
   solutionCode={`<?php
-for ($i = 1; $i <= 10; $i++) {
-    echo "7 * $i = " . (7 * $i) . "\\n";
+
+for ($i = 1; $i <= 5; $i++) {
+    echo "7 x $i = " . (7 * $i) . "\\n";
 }
 `}
   tests={[

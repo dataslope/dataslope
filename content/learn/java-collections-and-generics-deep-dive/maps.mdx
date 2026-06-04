@@ -49,16 +49,16 @@ iterate a map. Of those, `entrySet()` is almost always what you want.
 import java.util.Map;
 
 public class Main {
-    public static void main(String[] args) {
-        Map<String, Integer> wordCount = new HashMap<>();
-        for (String w : "the quick brown fox the lazy dog the".split(" ")) {
-            wordCount.merge(w, 1, Integer::sum);
-        }
-
-        for (Map.Entry<String, Integer> e : wordCount.entrySet()) {
-            System.out.println(e.getKey() + " -> " + e.getValue());
-        }
+  public static void main(String[] args) {
+    Map<String, Integer> wordCount = new HashMap<>();
+    for (String w : "the quick brown fox the lazy dog the".split(" ")) {
+      wordCount.merge(w, 1, Integer::sum);
     }
+
+    for (Map.Entry<String, Integer> e : wordCount.entrySet()) {
+      System.out.println(e.getKey() + " -> " + e.getValue());
+    }
+  }
 }
 `}
 />
@@ -113,18 +113,18 @@ order** (or, optionally, **access order**, for LRU caches).
 import java.util.Map;
 
 public class Main {
-    public static void main(String[] args) {
-        Map<String, Integer> m = new LinkedHashMap<>();
-        m.put("alpha", 1);
-        m.put("beta",  2);
-        m.put("gamma", 3);
-        m.put("delta", 4);
+  public static void main(String[] args) {
+    Map<String, Integer> m = new LinkedHashMap<>();
+    m.put("alpha", 1);
+    m.put("beta", 2);
+    m.put("gamma", 3);
+    m.put("delta", 4);
 
-        // Iteration order = insertion order
-        for (Map.Entry<String, Integer> e : m.entrySet()) {
-            System.out.println(e.getKey() + " -> " + e.getValue());
-        }
+    // Iteration order = insertion order
+    for (Map.Entry<String, Integer> e : m.entrySet()) {
+      System.out.println(e.getKey() + " -> " + e.getValue());
     }
+  }
 }
 `}
 />
@@ -144,21 +144,21 @@ everywhere, but in exchange you get range queries, `firstKey`,
 import java.util.TreeMap;
 
 public class Main {
-    public static void main(String[] args) {
-        TreeMap<Integer, String> grades = new TreeMap<>();
-        grades.put(60, "D");
-        grades.put(70, "C");
-        grades.put(80, "B");
-        grades.put(90, "A");
+  public static void main(String[] args) {
+    TreeMap<Integer, String> grades = new TreeMap<>();
+    grades.put(60, "D");
+    grades.put(70, "C");
+    grades.put(80, "B");
+    grades.put(90, "A");
 
-        // "What grade does a 75 earn?" — floor: largest key <= 75
-        int score = 75;
-        Map.Entry<Integer, String> band = grades.floorEntry(score);
-        System.out.println(score + " -> " + band.getValue());
+    // "What grade does a 75 earn?" — floor: largest key <= 75
+    int score = 75;
+    Map.Entry<Integer, String> band = grades.floorEntry(score);
+    System.out.println(score + " -> " + band.getValue());
 
-        // Range query
-        System.out.println("80-100: " + grades.subMap(80, 101));
-    }
+    // Range query
+    System.out.println("80-100: " + grades.subMap(80, 101));
+  }
 }
 `}
 />
@@ -178,18 +178,18 @@ ordinal. Use it whenever you have an enum-keyed lookup.
 import java.util.Map;
 
 public class Main {
-    enum Day { MON, TUE, WED, THU, FRI, SAT, SUN }
+  enum Day { MON, TUE, WED, THU, FRI, SAT, SUN }
 
-    public static void main(String[] args) {
-        Map<Day, String> hours = new EnumMap<>(Day.class);
-        hours.put(Day.MON, "9-5");
-        hours.put(Day.FRI, "9-3");
-        hours.put(Day.SAT, "closed");
+  public static void main(String[] args) {
+    Map<Day, String> hours = new EnumMap<>(Day.class);
+    hours.put(Day.MON, "9-5");
+    hours.put(Day.FRI, "9-3");
+    hours.put(Day.SAT, "closed");
 
-        for (Day d : Day.values()) {
-            System.out.println(d + ": " + hours.getOrDefault(d, "n/a"));
-        }
+    for (Day d : Day.values()) {
+      System.out.println(d + ": " + hours.getOrDefault(d, "n/a"));
     }
+  }
 }
 `}
 />
@@ -216,15 +216,17 @@ The most useful idiom of all is "map of lists":
   starterCode={`import java.util.*;
 
 public class Main {
-    public static void main(String[] args) {
-        Map<String, List<String>> byInitial = new HashMap<>();
-        for (String name : List.of("Ada", "Alan", "Barbara", "Bjarne", "Ada", "Cathy")) {
-            String key = name.substring(0, 1);
-            // create the list lazily the first time we see this key
-            byInitial.computeIfAbsent(key, k -> new ArrayList<>()).add(name);
-        }
-        new TreeMap<>(byInitial).forEach((k, v) -> System.out.println(k + " -> " + v));
+  public static void main(String[] args) {
+    Map<String, List<String>> byInitial = new HashMap<>();
+    for (String name :
+         List.of("Ada", "Alan", "Barbara", "Bjarne", "Ada", "Cathy")) {
+      String key = name.substring(0, 1);
+      // create the list lazily the first time we see this key
+      byInitial.computeIfAbsent(key, k -> new ArrayList<>()).add(name);
     }
+    new TreeMap<>(byInitial).forEach(
+        (k, v) -> System.out.println(k + " -> " + v));
+  }
 }
 `}
 />

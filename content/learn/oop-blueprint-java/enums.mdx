@@ -26,18 +26,22 @@ flowchart LR
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        respond("red");                 // What if you typo "Red"?
-        respond("amber");
-        respond("orange");               // not a real state — no warning!
-    }
+  public static void main(String[] args) {
+    respond("red"); // What if you typo "Red"?
+    respond("amber");
+    respond("orange"); // not a real state — no warning!
+  }
 
-    static void respond(String light) {
-        if (light.equals("red"))    System.out.println("STOP");
-        else if (light.equals("amber")) System.out.println("SLOW");
-        else if (light.equals("green")) System.out.println("GO");
-        else                            System.out.println("???");
-    }
+  static void respond(String light) {
+    if (light.equals("red"))
+      System.out.println("STOP");
+    else if (light.equals("amber"))
+      System.out.println("SLOW");
+    else if (light.equals("green"))
+      System.out.println("GO");
+    else
+      System.out.println("???");
+  }
 }
 `}
 />
@@ -48,20 +52,26 @@ compiler cannot help you. Let's see the same idea with an enum.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        respond(Light.RED);
-        respond(Light.AMBER);
-        respond(Light.GREEN);
-        // respond(Light.ORANGE);  // <- would not compile; no such value
-    }
+  public static void main(String[] args) {
+    respond(Light.RED);
+    respond(Light.AMBER);
+    respond(Light.GREEN);
+    // respond(Light.ORANGE);  // <- would not compile; no such value
+  }
 
-    static void respond(Light light) {
-        switch (light) {
-            case RED:   System.out.println("STOP"); break;
-            case AMBER: System.out.println("SLOW"); break;
-            case GREEN: System.out.println("GO");   break;
-        }
+  static void respond(Light light) {
+    switch (light) {
+    case RED:
+      System.out.println("STOP");
+      break;
+    case AMBER:
+      System.out.println("SLOW");
+      break;
+    case GREEN:
+      System.out.println("GO");
+      break;
     }
+  }
 }
 
 enum Light { RED, AMBER, GREEN }
@@ -102,31 +112,30 @@ classDiagram
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        for (Planet p : Planet.values()) {
-            System.out.printf("%-8s g = %.2f m/s^2%n", p, p.surfaceGravity());
-        }
+  public static void main(String[] args) {
+    for (Planet p : Planet.values()) {
+      System.out.printf("%-8s g = %.2f m/s^2%n", p, p.surfaceGravity());
     }
+  }
 }
 
 enum Planet {
-    MERCURY(3.303e+23, 2.4397e6),
-    VENUS  (4.869e+24, 6.0518e6),
-    EARTH  (5.976e+24, 6.37814e6),
-    MARS   (6.421e+23, 3.3972e6);
+  MERCURY(3.303e+23, 2.4397e6),
+  VENUS(4.869e+24, 6.0518e6),
+  EARTH(5.976e+24, 6.37814e6),
+  MARS(6.421e+23, 3.3972e6);
 
-    private static final double G = 6.67300E-11;
-    private final double massKg;
-    private final double radiusM;
+  private static final double G = 6.67300E-11;
+  private final double massKg;
+  private final double radiusM;
 
-    Planet(double massKg, double radiusM) {     // enum constructor: package-private by default
-        this.massKg  = massKg;
-        this.radiusM = radiusM;
-    }
+  Planet(double massKg,
+         double radiusM) { // enum constructor: package-private by default
+    this.massKg = massKg;
+    this.radiusM = radiusM;
+  }
 
-    public double surfaceGravity() {
-        return G * massKg / (radiusM * radiusM);
-    }
+  public double surfaceGravity() { return G * massKg / (radiusM * radiusM); }
 }
 `}
 />
@@ -150,32 +159,32 @@ interface implemented by a fixed list of objects."
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        for (Operation op : Operation.values()) {
-            System.out.println("10 " + op.symbol() + " 3 = " + op.apply(10, 3));
-        }
+  public static void main(String[] args) {
+    for (Operation op : Operation.values()) {
+      System.out.println("10 " + op.symbol() + " 3 = " + op.apply(10, 3));
     }
+  }
 }
 
 enum Operation {
-    PLUS("+") {
-        public int apply(int a, int b) { return a + b; }
-    },
-    MINUS("-") {
-        public int apply(int a, int b) { return a - b; }
-    },
-    TIMES("*") {
-        public int apply(int a, int b) { return a * b; }
-    },
-    DIVIDE("/") {
-        public int apply(int a, int b) { return a / b; }
-    };
+  PLUS("+") {
+    public int apply(int a, int b) { return a + b; }
+  },
+  MINUS("-") {
+    public int apply(int a, int b) { return a - b; }
+  },
+  TIMES("*") {
+    public int apply(int a, int b) { return a * b; }
+  },
+  DIVIDE("/") {
+    public int apply(int a, int b) { return a / b; }
+  };
 
-    private final String symbol;
-    Operation(String symbol) { this.symbol = symbol; }
+  private final String symbol;
+  Operation(String symbol) { this.symbol = symbol; }
 
-    public String symbol() { return symbol; }
-    public abstract int apply(int a, int b);    // each constant must implement
+  public String symbol() { return symbol; }
+  public abstract int apply(int a, int b); // each constant must implement
 }
 `}
 />

@@ -58,12 +58,13 @@ flowchart TD
   starterCode={`library(dplyr)
 
 aq <- airquality |>
-  filter(!is.na(Ozone)) |>           # drop rows missing the response
+  filter(!is.na(Ozone)) |> # drop rows missing the response
   mutate(
     Month_name = factor(Month,
-                        levels = 5:9,
-                        labels = c("May","Jun","Jul","Aug","Sep")),
-    Temp_C     = round((Temp - 32) * 5/9, 1)
+      levels = 5:9,
+      labels = c("May", "Jun", "Jul", "Aug", "Sep")
+    ),
+    Temp_C = round((Temp - 32) * 5 / 9, 1)
   )
 
 head(aq)
@@ -89,8 +90,8 @@ A few notes:
 aq <- airquality |>
   filter(!is.na(Ozone)) |>
   mutate(
-    Month_name = factor(Month, levels = 5:9, labels = c("May","Jun","Jul","Aug","Sep")),
-    Temp_C     = round((Temp - 32) * 5/9, 1)
+    Month_name = factor(Month, levels = 5:9, labels = c("May", "Jun", "Jul", "Aug", "Sep")),
+    Temp_C     = round((Temp - 32) * 5 / 9, 1)
   )
 
 # Overall
@@ -103,7 +104,7 @@ monthly <- aq |>
     n         = n(),
     median    = median(Ozone),
     mean      = round(mean(Ozone), 1),
-    sd        = round(sd(Ozone),   1),
+    sd        = round(sd(Ozone), 1),
     mean_temp = round(mean(Temp_C), 1),
     .groups   = "drop"
   )
@@ -127,8 +128,8 @@ library(ggplot2)
 aq <- airquality |>
   filter(!is.na(Ozone)) |>
   mutate(
-    Month_name = factor(Month, levels = 5:9, labels = c("May","Jun","Jul","Aug","Sep")),
-    Temp_C     = round((Temp - 32) * 5/9, 1)
+    Month_name = factor(Month, levels = 5:9, labels = c("May", "Jun", "Jul", "Aug", "Sep")),
+    Temp_C     = round((Temp - 32) * 5 / 9, 1)
   )
 
 ggplot(aq, aes(x = Temp_C, y = Ozone, color = Month_name)) +
@@ -158,8 +159,10 @@ library(ggplot2)
 
 aq <- airquality |>
   filter(!is.na(Ozone)) |>
-  mutate(Month_name = factor(Month, levels = 5:9,
-                             labels = c("May","Jun","Jul","Aug","Sep")))
+  mutate(Month_name = factor(Month,
+    levels = 5:9,
+    labels = c("May", "Jun", "Jul", "Aug", "Sep")
+  ))
 
 ggplot(aq, aes(x = Month_name, y = Ozone, fill = Month_name)) +
   geom_boxplot(alpha = 0.85, outlier.alpha = 0.6) +
@@ -187,7 +190,7 @@ strong is it? And is it surprising given the noise?
 
 aq <- airquality |>
   filter(!is.na(Ozone)) |>
-  mutate(Temp_C = (Temp - 32) * 5/9)
+  mutate(Temp_C = (Temp - 32) * 5 / 9)
 
 # Correlation
 cor(aq$Temp_C, aq$Ozone)

@@ -51,8 +51,11 @@ penguins = sns.load_dataset("penguins")
 
 # 'deep' is Seaborn's default qualitative palette: distinct, balanced hues.
 sns.relplot(
-    data=penguins, x="bill_length_mm", y="bill_depth_mm",
-    hue="species", palette="deep",
+    data=penguins,
+    x="bill_length_mm",
+    y="bill_depth_mm",
+    hue="species",
+    palette="deep",
     height=4,
 )
 `}
@@ -82,8 +85,11 @@ penguins = sns.load_dataset("penguins")
 
 # body_mass_g is an amount -> a sequential ramp + a colorbar.
 sns.relplot(
-    data=penguins, x="bill_length_mm", y="bill_depth_mm",
-    hue="body_mass_g", palette="viridis",
+    data=penguins,
+    x="bill_length_mm",
+    y="bill_depth_mm",
+    hue="body_mass_g",
+    palette="viridis",
     height=4,
 )
 `}
@@ -199,8 +205,12 @@ penguins = sns.load_dataset("penguins")
 # Colorblind-safe palette, with marker shape ALSO encoding species,
 # so color isn't the only thing carrying the group.
 sns.relplot(
-    data=penguins, x="bill_length_mm", y="bill_depth_mm",
-    hue="species", style="species", palette="colorblind",
+    data=penguins,
+    x="bill_length_mm",
+    y="bill_depth_mm",
+    hue="species",
+    style="species",
+    palette="colorblind",
     height=4,
 )
 `}
@@ -250,8 +260,11 @@ sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 g = sns.relplot(
-    data=penguins, x="bill_length_mm", y="bill_depth_mm",
-    hue="species", palette="colorblind",
+    data=penguins,
+    x="bill_length_mm",
+    y="bill_depth_mm",
+    hue="species",
+    palette="colorblind",
     height=4,
 )
 `}

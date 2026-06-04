@@ -23,10 +23,10 @@ BFS would see `0 -> 1` as one edge, but the cheaper path is `0 -> 2 -> 1` with c
   starterCode={`#include <iostream>
 
 int main() {
-    int direct = 100;
-    int viaTwo = 1 + 1;
-    std::cout << "direct=" << direct << " viaTwo=" << viaTwo << "\\n";
-    return 0;
+  int direct = 100;
+  int viaTwo = 1 + 1;
+  std::cout << "direct=" << direct << " viaTwo=" << viaTwo << "\\n";
+  return 0;
 }
 `}
 />
@@ -81,41 +81,45 @@ Use an adjacency list where each edge is `(neighbor, weight)`. The min-heap stor
 #include <utility>
 #include <vector>
 
-std::vector<int> dijkstra(int n, const std::vector<std::vector<std::pair<int, int>>>& adj, int src) {
-    std::vector<int> dist(n, INT_MAX);
-    using State = std::pair<int, int>;
-    std::priority_queue<State, std::vector<State>, std::greater<State>> pq;
+std::vector<int>
+dijkstra(int n, const std::vector<std::vector<std::pair<int, int>>> &adj,
+         int src) {
+  std::vector<int> dist(n, INT_MAX);
+  using State = std::pair<int, int>;
+  std::priority_queue<State, std::vector<State>, std::greater<State>> pq;
 
-    dist[src] = 0;
-    pq.push({0, src});
+  dist[src] = 0;
+  pq.push({0, src});
 
-    while (!pq.empty()) {
-        auto [d, u] = pq.top();
-        pq.pop();
-        if (d != dist[u]) continue;
+  while (!pq.empty()) {
+    auto [d, u] = pq.top();
+    pq.pop();
+    if (d != dist[u])
+      continue;
 
-        for (auto [v, w] : adj[u]) {
-            if (dist[u] != INT_MAX && dist[u] + w < dist[v]) {
-                dist[v] = dist[u] + w;
-                pq.push({dist[v], v});
-            }
-        }
+    for (auto [v, w] : adj[u]) {
+      if (dist[u] != INT_MAX && dist[u] + w < dist[v]) {
+        dist[v] = dist[u] + w;
+        pq.push({dist[v], v});
+      }
     }
-    return dist;
+  }
+  return dist;
 }
 
 int main() {
-    int n = 4;
-    std::vector<std::vector<std::pair<int, int>>> adj(n);
-    adj[0].push_back({1, 4});
-    adj[0].push_back({2, 1});
-    adj[2].push_back({1, 2});
-    adj[1].push_back({3, 1});
-    adj[2].push_back({3, 5});
+  int n = 4;
+  std::vector<std::vector<std::pair<int, int>>> adj(n);
+  adj[0].push_back({1, 4});
+  adj[0].push_back({2, 1});
+  adj[2].push_back({1, 2});
+  adj[1].push_back({3, 1});
+  adj[2].push_back({3, 5});
 
-    for (int d : dijkstra(n, adj, 0)) std::cout << d << " ";
-    std::cout << "\\n";
-    return 0;
+  for (int d : dijkstra(n, adj, 0))
+    std::cout << d << " ";
+  std::cout << "\\n";
+  return 0;
 }
 `}
 />
@@ -133,17 +137,17 @@ Relaxation means: if going through `u` improves `v`, update `dist[v]`.
 #include <vector>
 
 int main() {
-    std::vector<int> dist = {0, 10, INT_MAX};
-    int u = 0;
-    int v = 1;
-    int w = 4;
+  std::vector<int> dist = {0, 10, INT_MAX};
+  int u = 0;
+  int v = 1;
+  int w = 4;
 
-    if (dist[u] != INT_MAX && dist[u] + w < dist[v]) {
-        dist[v] = dist[u] + w;
-    }
+  if (dist[u] != INT_MAX && dist[u] + w < dist[v]) {
+    dist[v] = dist[u] + w;
+  }
 
-    std::cout << dist[v] << "\\n";
-    return 0;
+  std::cout << dist[v] << "\\n";
+  return 0;
 }
 `}
 />
@@ -163,39 +167,42 @@ Maintain a `parent` array whenever a relaxation improves a vertex. To reconstruc
 #include <vector>
 
 int main() {
-    int n = 4, src = 0, target = 3;
-    std::vector<std::vector<std::pair<int, int>>> adj(n);
-    adj[0] = {{1, 4}, {2, 1}};
-    adj[2] = {{1, 2}, {3, 5}};
-    adj[1] = {{3, 1}};
+  int n = 4, src = 0, target = 3;
+  std::vector<std::vector<std::pair<int, int>>> adj(n);
+  adj[0] = {{1, 4}, {2, 1}};
+  adj[2] = {{1, 2}, {3, 5}};
+  adj[1] = {{3, 1}};
 
-    std::vector<int> dist(n, INT_MAX), parent(n, -1);
-    using State = std::pair<int, int>;
-    std::priority_queue<State, std::vector<State>, std::greater<State>> pq;
-    dist[src] = 0;
-    pq.push({0, src});
+  std::vector<int> dist(n, INT_MAX), parent(n, -1);
+  using State = std::pair<int, int>;
+  std::priority_queue<State, std::vector<State>, std::greater<State>> pq;
+  dist[src] = 0;
+  pq.push({0, src});
 
-    while (!pq.empty()) {
-        auto [d, u] = pq.top();
-        pq.pop();
-        if (d != dist[u]) continue;
-        for (auto [v, w] : adj[u]) {
-            if (dist[u] + w < dist[v]) {
-                dist[v] = dist[u] + w;
-                parent[v] = u;
-                pq.push({dist[v], v});
-            }
-        }
+  while (!pq.empty()) {
+    auto [d, u] = pq.top();
+    pq.pop();
+    if (d != dist[u])
+      continue;
+    for (auto [v, w] : adj[u]) {
+      if (dist[u] + w < dist[v]) {
+        dist[v] = dist[u] + w;
+        parent[v] = u;
+        pq.push({dist[v], v});
+      }
     }
+  }
 
-    std::vector<int> path;
-    for (int cur = target; cur != -1; cur = parent[cur]) path.push_back(cur);
-    std::reverse(path.begin(), path.end());
+  std::vector<int> path;
+  for (int cur = target; cur != -1; cur = parent[cur])
+    path.push_back(cur);
+  std::reverse(path.begin(), path.end());
 
-    std::cout << "distance " << dist[target] << " path";
-    for (int x : path) std::cout << " " << x;
-    std::cout << "\\n";
-    return 0;
+  std::cout << "distance " << dist[target] << " path";
+  for (int x : path)
+    std::cout << " " << x;
+  std::cout << "\\n";
+  return 0;
 }
 `}
 />
@@ -226,9 +233,9 @@ BellmanFord(edges, n, src):
   starterCode={`#include <iostream>
 
 int main() {
-    std::cout << "Dijkstra: non-negative weights\\n";
-    std::cout << "Bellman-Ford: can handle negative edges\\n";
-    return 0;
+  std::cout << "Dijkstra: non-negative weights\\n";
+  std::cout << "Bellman-Ford: can handle negative edges\\n";
+  return 0;
 }
 `}
 />
@@ -258,26 +265,22 @@ graph TD
 #include <vector>
 
 int main() {
-    const int INF = 1'000'000;
-    std::vector<std::vector<int>> dist = {
-        {0, 3, INF},
-        {INF, 0, 2},
-        {5, INF, 0}
-    };
+  const int INF = 1'000'000;
+  std::vector<std::vector<int>> dist = {{0, 3, INF}, {INF, 0, 2}, {5, INF, 0}};
 
-    int n = static_cast<int>(dist.size());
-    for (int k = 0; k < n; k++) {
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (dist[i][k] < INF && dist[k][j] < INF) {
-                    dist[i][j] = std::min(dist[i][j], dist[i][k] + dist[k][j]);
-                }
-            }
+  int n = static_cast<int>(dist.size());
+  for (int k = 0; k < n; k++) {
+    for (int i = 0; i < n; i++) {
+      for (int j = 0; j < n; j++) {
+        if (dist[i][k] < INF && dist[k][j] < INF) {
+          dist[i][j] = std::min(dist[i][j], dist[i][k] + dist[k][j]);
         }
+      }
     }
+  }
 
-    std::cout << dist[0][2] << "\\n";
-    return 0;
+  std::cout << dist[0][2] << "\\n";
+  return 0;
 }
 `}
 />
@@ -295,26 +298,31 @@ int main() {
 #include <utility>
 #include <vector>
 
-std::vector<int> dijkstra(int n, const std::vector<std::vector<std::pair<int, int>>>& adj, int src) {
-    // your code here
-    return {};
+std::vector<int>
+dijkstra(int n, const std::vector<std::vector<std::pair<int, int>>> &adj,
+         int src) {
+  // your code here
+  return {};
 }
 
 int main() {
-    int n = 5;
-    std::vector<std::vector<std::pair<int, int>>> adj(n);
-    adj[0] = {{1, 2}, {2, 5}};
-    adj[1] = {{2, 1}, {3, 2}};
-    adj[2] = {{3, 1}};
+  int n = 5;
+  std::vector<std::vector<std::pair<int, int>>> adj(n);
+  adj[0] = {{1, 2}, {2, 5}};
+  adj[1] = {{2, 1}, {3, 2}};
+  adj[2] = {{3, 1}};
 
-    std::vector<int> dist = dijkstra(n, adj, 0);
-    for (int i = 0; i < n; i++) {
-        if (i) std::cout << " ";
-        if (dist[i] == INT_MAX) std::cout << "INF";
-        else std::cout << dist[i];
-    }
-    std::cout << "\\n";
-    return 0;
+  std::vector<int> dist = dijkstra(n, adj, 0);
+  for (int i = 0; i < n; i++) {
+    if (i)
+      std::cout << " ";
+    if (dist[i] == INT_MAX)
+      std::cout << "INF";
+    else
+      std::cout << dist[i];
+  }
+  std::cout << "\\n";
+  return 0;
 }
 `}
   solutionCode={`#include <climits>
@@ -324,42 +332,48 @@ int main() {
 #include <utility>
 #include <vector>
 
-std::vector<int> dijkstra(int n, const std::vector<std::vector<std::pair<int, int>>>& adj, int src) {
-    std::vector<int> dist(n, INT_MAX);
-    using State = std::pair<int, int>;
-    std::priority_queue<State, std::vector<State>, std::greater<State>> pq;
-    dist[src] = 0;
-    pq.push({0, src});
+std::vector<int>
+dijkstra(int n, const std::vector<std::vector<std::pair<int, int>>> &adj,
+         int src) {
+  std::vector<int> dist(n, INT_MAX);
+  using State = std::pair<int, int>;
+  std::priority_queue<State, std::vector<State>, std::greater<State>> pq;
+  dist[src] = 0;
+  pq.push({0, src});
 
-    while (!pq.empty()) {
-        auto [d, u] = pq.top();
-        pq.pop();
-        if (d != dist[u]) continue;
-        for (auto [v, w] : adj[u]) {
-            if (dist[u] != INT_MAX && dist[u] + w < dist[v]) {
-                dist[v] = dist[u] + w;
-                pq.push({dist[v], v});
-            }
-        }
+  while (!pq.empty()) {
+    auto [d, u] = pq.top();
+    pq.pop();
+    if (d != dist[u])
+      continue;
+    for (auto [v, w] : adj[u]) {
+      if (dist[u] != INT_MAX && dist[u] + w < dist[v]) {
+        dist[v] = dist[u] + w;
+        pq.push({dist[v], v});
+      }
     }
-    return dist;
+  }
+  return dist;
 }
 
 int main() {
-    int n = 5;
-    std::vector<std::vector<std::pair<int, int>>> adj(n);
-    adj[0] = {{1, 2}, {2, 5}};
-    adj[1] = {{2, 1}, {3, 2}};
-    adj[2] = {{3, 1}};
+  int n = 5;
+  std::vector<std::vector<std::pair<int, int>>> adj(n);
+  adj[0] = {{1, 2}, {2, 5}};
+  adj[1] = {{2, 1}, {3, 2}};
+  adj[2] = {{3, 1}};
 
-    std::vector<int> dist = dijkstra(n, adj, 0);
-    for (int i = 0; i < n; i++) {
-        if (i) std::cout << " ";
-        if (dist[i] == INT_MAX) std::cout << "INF";
-        else std::cout << dist[i];
-    }
-    std::cout << "\\n";
-    return 0;
+  std::vector<int> dist = dijkstra(n, adj, 0);
+  for (int i = 0; i < n; i++) {
+    if (i)
+      std::cout << " ";
+    if (dist[i] == INT_MAX)
+      std::cout << "INF";
+    else
+      std::cout << dist[i];
+  }
+  std::cout << "\\n";
+  return 0;
 }
 `}
   tests={[
@@ -386,17 +400,17 @@ int main() {
 #include <utility>
 #include <vector>
 
-int networkDelayTime(const std::vector<std::tuple<int, int, int>>& times, int n, int k) {
-    // your code here
-    return 0;
+int networkDelayTime(const std::vector<std::tuple<int, int, int>> &times, int n,
+                     int k) {
+  // your code here
+  return 0;
 }
 
 int main() {
-    std::vector<std::tuple<int, int, int>> times = {
-        {2, 1, 1}, {2, 3, 1}, {3, 4, 1}
-    };
-    std::cout << networkDelayTime(times, 4, 2) << "\\n";
-    return 0;
+  std::vector<std::tuple<int, int, int>> times = {
+      {2, 1, 1}, {2, 3, 1}, {3, 4, 1}};
+  std::cout << networkDelayTime(times, 4, 2) << "\\n";
+  return 0;
 }
 `}
   solutionCode={`#include <algorithm>
@@ -408,42 +422,45 @@ int main() {
 #include <utility>
 #include <vector>
 
-int networkDelayTime(const std::vector<std::tuple<int, int, int>>& times, int n, int k) {
-    std::vector<std::vector<std::pair<int, int>>> adj(n + 1);
-    for (auto [u, v, w] : times) adj[u].push_back({v, w});
+int networkDelayTime(const std::vector<std::tuple<int, int, int>> &times, int n,
+                     int k) {
+  std::vector<std::vector<std::pair<int, int>>> adj(n + 1);
+  for (auto [u, v, w] : times)
+    adj[u].push_back({v, w});
 
-    std::vector<int> dist(n + 1, INT_MAX);
-    using State = std::pair<int, int>;
-    std::priority_queue<State, std::vector<State>, std::greater<State>> pq;
-    dist[k] = 0;
-    pq.push({0, k});
+  std::vector<int> dist(n + 1, INT_MAX);
+  using State = std::pair<int, int>;
+  std::priority_queue<State, std::vector<State>, std::greater<State>> pq;
+  dist[k] = 0;
+  pq.push({0, k});
 
-    while (!pq.empty()) {
-        auto [d, u] = pq.top();
-        pq.pop();
-        if (d != dist[u]) continue;
-        for (auto [v, w] : adj[u]) {
-            if (dist[u] + w < dist[v]) {
-                dist[v] = dist[u] + w;
-                pq.push({dist[v], v});
-            }
-        }
+  while (!pq.empty()) {
+    auto [d, u] = pq.top();
+    pq.pop();
+    if (d != dist[u])
+      continue;
+    for (auto [v, w] : adj[u]) {
+      if (dist[u] + w < dist[v]) {
+        dist[v] = dist[u] + w;
+        pq.push({dist[v], v});
+      }
     }
+  }
 
-    int answer = 0;
-    for (int node = 1; node <= n; node++) {
-        if (dist[node] == INT_MAX) return -1;
-        answer = std::max(answer, dist[node]);
-    }
-    return answer;
+  int answer = 0;
+  for (int node = 1; node <= n; node++) {
+    if (dist[node] == INT_MAX)
+      return -1;
+    answer = std::max(answer, dist[node]);
+  }
+  return answer;
 }
 
 int main() {
-    std::vector<std::tuple<int, int, int>> times = {
-        {2, 1, 1}, {2, 3, 1}, {3, 4, 1}
-    };
-    std::cout << networkDelayTime(times, 4, 2) << "\\n";
-    return 0;
+  std::vector<std::tuple<int, int, int>> times = {
+      {2, 1, 1}, {2, 3, 1}, {3, 4, 1}};
+  std::cout << networkDelayTime(times, 4, 2) << "\\n";
+  return 0;
 }
 `}
   tests={[

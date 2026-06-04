@@ -205,8 +205,8 @@ are in good shape.
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
   starterCode={`summary = (
     df.groupby("Attrition")["MonthlyIncome"]
-      .describe()[["count", "25%", "50%", "75%"]]
-      .round(0)
+    .describe()[["count", "25%", "50%", "75%"]]
+    .round(0)
 )
 print(summary)
 `}

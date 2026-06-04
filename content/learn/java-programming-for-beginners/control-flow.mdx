@@ -24,19 +24,19 @@ when the condition is false. `else if` chains additional conditions.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        int score = 72;
+  public static void main(String[] args) {
+    int score = 72;
 
-        if (score >= 90) {
-            System.out.println("A");
-        } else if (score >= 80) {
-            System.out.println("B");
-        } else if (score >= 70) {
-            System.out.println("C");
-        } else {
-            System.out.println("F");
-        }
+    if (score >= 90) {
+      System.out.println("A");
+    } else if (score >= 80) {
+      System.out.println("B");
+    } else if (score >= 70) {
+      System.out.println("C");
+    } else {
+      System.out.println("F");
     }
+  }
 }
 `}
 />
@@ -57,23 +57,38 @@ a long `if/else` chain.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        int day = 3;
-        String name;
+  public static void main(String[] args) {
+    int day = 3;
+    String name;
 
-        switch (day) {
-            case 1: name = "Monday";    break;
-            case 2: name = "Tuesday";   break;
-            case 3: name = "Wednesday"; break;
-            case 4: name = "Thursday";  break;
-            case 5: name = "Friday";    break;
-            case 6: name = "Saturday";  break;
-            case 7: name = "Sunday";    break;
-            default: name = "?";
-        }
-
-        System.out.println("Day " + day + " is " + name);
+    switch (day) {
+    case 1:
+      name = "Monday";
+      break;
+    case 2:
+      name = "Tuesday";
+      break;
+    case 3:
+      name = "Wednesday";
+      break;
+    case 4:
+      name = "Thursday";
+      break;
+    case 5:
+      name = "Friday";
+      break;
+    case 6:
+      name = "Saturday";
+      break;
+    case 7:
+      name = "Sunday";
+      break;
+    default:
+      name = "?";
     }
+
+    System.out.println("Day " + day + " is " + name);
+  }
 }
 `}
 />
@@ -94,14 +109,14 @@ condition is checked **before** each pass.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        int n = 10;
-        while (n > 0) {
-            System.out.println(n);
-            n = n - 1;
-        }
-        System.out.println("Lift off!");
+  public static void main(String[] args) {
+    int n = 10;
+    while (n > 0) {
+      System.out.println(n);
+      n = n - 1;
     }
+    System.out.println("Lift off!");
+  }
 }
 `}
 />
@@ -134,11 +149,11 @@ flowchart TB
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        for (int i = 1; i <= 5; i++) {
-            System.out.println("i = " + i);
-        }
+  public static void main(String[] args) {
+    for (int i = 1; i <= 5; i++) {
+      System.out.println("i = " + i);
     }
+  }
 }
 `}
 />
@@ -154,17 +169,17 @@ has a cleaner form:
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        int[] primes = {2, 3, 5, 7, 11, 13};
-        int total = 0;
+  public static void main(String[] args) {
+    int[] primes = {2, 3, 5, 7, 11, 13};
+    int total = 0;
 
-        for (int p : primes) {
-            total += p;
-            System.out.println("saw " + p);
-        }
-
-        System.out.println("total = " + total);
+    for (int p : primes) {
+      total += p;
+      System.out.println("saw " + p);
     }
+
+    System.out.println("total = " + total);
+  }
 }
 `}
 />
@@ -179,13 +194,15 @@ Read `for (int p : primes)` as *"for each int p in primes."*
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        for (int i = 1; i <= 10; i++) {
-            if (i == 5) continue;   // skip 5
-            if (i == 8) break;      // stop entirely at 8
-            System.out.println(i);
-        }
+  public static void main(String[] args) {
+    for (int i = 1; i <= 10; i++) {
+      if (i == 5)
+        continue; // skip 5
+      if (i == 8)
+        break; // stop entirely at 8
+      System.out.println(i);
     }
+  }
 }
 `}
 />
@@ -201,16 +218,16 @@ run it and check.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        int sum = 0;
-        for (int i = 1; i <= 5; i++) {
-            for (int j = 1; j <= i; j++) {
-                sum += j;
-                System.out.println("i=" + i + " j=" + j + " sum=" + sum);
-            }
-        }
-        System.out.println("final sum = " + sum);
+  public static void main(String[] args) {
+    int sum = 0;
+    for (int i = 1; i <= 5; i++) {
+      for (int j = 1; j <= i; j++) {
+        sum += j;
+        System.out.println("i=" + i + " j=" + j + " sum=" + sum);
+      }
     }
+    System.out.println("final sum = " + sum);
+  }
 }
 `}
 />

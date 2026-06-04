@@ -63,9 +63,11 @@ INSERT INTO orders VALUES
   id,
   region,
   amount,
-  SUM(amount) OVER () AS grand_total   -- same total on every row
-FROM orders
-ORDER BY id;`}
+  SUM(amount) OVER () AS grand_total -- same total on every row
+FROM
+  orders
+ORDER BY
+  id;`}
 />
 
 Notice all five rows survived, each carrying the grand total `505`. A
@@ -92,9 +94,15 @@ INSERT INTO orders VALUES
   id,
   region,
   amount,
-  SUM(amount) OVER (PARTITION BY region) AS region_total
-FROM orders
-ORDER BY region, id;`}
+  SUM(amount) OVER (
+    PARTITION BY
+      region
+  ) AS region_total
+FROM
+  orders
+ORDER BY
+  region,
+  id;`}
 />
 
 ```mermaid
@@ -124,10 +132,18 @@ INSERT INTO orders VALUES
   id,
   region,
   amount,
-  ROUND(100.0 * amount
-        / SUM(amount) OVER (PARTITION BY region), 1) AS pct_of_region
-FROM orders
-ORDER BY region, pct_of_region DESC;`}
+  ROUND(
+    100.0 * amount / SUM(amount) OVER (
+      PARTITION BY
+        region
+    ),
+    1
+  ) AS pct_of_region
+FROM
+  orders
+ORDER BY
+  region,
+  pct_of_region DESC;`}
 />
 
 That `pct_of_region` is impossible with `GROUP BY` alone in a single

@@ -52,10 +52,11 @@ SELECT
   (i * 11) % 5                    AS plan_id
 FROM range(1, 1201) t(i);`}
   starterCode={`SELECT
-  COUNT(*)          AS rows,
-  MIN(signup_date)  AS earliest,
-  MAX(signup_date)  AS latest
-FROM signups;`}
+  COUNT(*) AS rows,
+  MIN(signup_date) AS earliest,
+  MAX(signup_date) AS latest
+FROM
+  signups;`}
 />
 
 In seconds you learn the table's size and the window of time it covers —
@@ -78,11 +79,12 @@ SELECT
   (i * 11) % 5                    AS plan_id
 FROM range(1, 1201) t(i);`}
   starterCode={`SELECT
-  COUNT(*)                  AS rows,
-  COUNT(DISTINCT id)        AS distinct_ids,
-  COUNT(DISTINCT plan_id)   AS distinct_plans,
+  COUNT(*) AS rows,
+  COUNT(DISTINCT id) AS distinct_ids,
+  COUNT(DISTINCT plan_id) AS distinct_plans,
   COUNT(DISTINCT signup_date) AS distinct_days
-FROM signups;`}
+FROM
+  signups;`}
 />
 
 If `distinct_ids` were less than `rows`, you would have duplicate ids — a
@@ -104,11 +106,12 @@ INSERT INTO users VALUES
   (1, 'a@x.com', 'US'), (2, NULL, 'US'), (3, 'c@x.com', NULL),
   (4, NULL, 'CA'), (5, 'e@x.com', 'US'), (6, 'f@x.com', NULL);`}
   starterCode={`SELECT
-  COUNT(*)                        AS rows,
-  COUNT(email)                    AS has_email,
-  COUNT(*) - COUNT(email)         AS missing_email,
-  COUNT(*) - COUNT(country)       AS missing_country
-FROM users;`}
+  COUNT(*) AS rows,
+  COUNT(email) AS has_email,
+  COUNT(*) - COUNT(email) AS missing_email,
+  COUNT(*) - COUNT(country) AS missing_country
+FROM
+  users;`}
 />
 
 Knowing *how many* values are missing tells you whether a column is

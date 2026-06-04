@@ -34,15 +34,19 @@ quick experiments.
 <SqlCodeBlock
   dialect="duckdb"
   title="A throwaway table from literal VALUES"
-  starterCode={`SELECT *
-FROM (VALUES
-  ('Mon', 120),
-  ('Tue', 150),
-  ('Wed',  90),
-  ('Thu', 200),
-  ('Fri', 175)
-) AS t(day, visitors)
-ORDER BY visitors DESC;`}
+  starterCode={`SELECT
+  *
+FROM
+  (
+    VALUES
+      ('Mon', 120),
+      ('Tue', 150),
+      ('Wed', 90),
+      ('Thu', 200),
+      ('Fri', 175)
+  ) AS t (day, visitors)
+ORDER BY
+  visitors DESC;`}
 />
 
 No `CREATE TABLE` needed — `VALUES` becomes a table inline. Analysts use
@@ -59,10 +63,12 @@ testing a query's behavior at scale.
   dialect="duckdb"
   title="Fabricate 12 months of fake revenue"
   starterCode={`SELECT
-  i                          AS month,
-  (i * 7) % 50 + 100         AS revenue
-FROM range(1, 13) AS t(i)
-ORDER BY month;`}
+  i AS month,
+  (i * 7) % 50 + 100 AS revenue
+FROM
+  range(1, 13) AS t (i)
+ORDER BY
+  month;`}
 />
 
 <Callout type="info" title="range() is exclusive of the end">
@@ -78,12 +84,14 @@ arithmetic and DuckDB's list-indexing trick `['a','b','c'][n]`:
   dialect="duckdb"
   title="A richer generated dataset"
   starterCode={`SELECT
-  i                                            AS id,
-  DATE '2024-01-01' + (i % 365)                AS day,
-  ['Books','Electronics','Home'][(i % 3) + 1]  AS category,
-  (i * 13) % 300 + 20                          AS amount
-FROM range(1, 11) AS t(i)
-ORDER BY id;`}
+  i AS id,
+  DATE '2024-01-01' + (i % 365) AS day,
+  ['Books', 'Electronics', 'Home'] [(i % 3) + 1] AS category,
+  (i * 13) % 300 + 20 AS amount
+FROM
+  range(1, 11) AS t (i)
+ORDER BY
+  id;`}
 />
 
 That same pattern, with `range(1, 1000001)`, would give you a million
@@ -108,11 +116,14 @@ FROM range(1, 901) t(i);`}
   starterCode={`-- daily_sales was built by the init step above.
 SELECT
   region,
-  COUNT(*)     AS rows,
-  SUM(amount)  AS revenue
-FROM daily_sales
-GROUP BY region
-ORDER BY revenue DESC;`}
+  COUNT(*) AS rows,
+  SUM(amount) AS revenue
+FROM
+  daily_sales
+GROUP BY
+  region
+ORDER BY
+  revenue DESC;`}
 />
 
 Here the `initSql` step used CTAS to build `daily_sales` once; the main

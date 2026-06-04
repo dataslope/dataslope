@@ -69,7 +69,8 @@ long <- reshape(wide,
   varying   = c("y2019", "y2020", "y2021"),
   v.names   = "sales",
   timevar   = "year",
-  times     = c(2019, 2020, 2021))
+  times     = c(2019, 2020, 2021)
+)
 long <- long[order(long$region, long$year), c("region", "year", "sales")]
 print(long, row.names = FALSE)
 `}

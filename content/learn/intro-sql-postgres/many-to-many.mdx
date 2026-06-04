@@ -86,11 +86,16 @@ INSERT INTO enrollments (student_id, course_id) VALUES
   (1,10), (1,11),   -- Ada: Math, History
   (2,10), (2,12),   -- Grace: Math, Art
   (3,11);           -- Linus: History`}
-  starterCode={`SELECT s.name, c.title
-FROM enrollments e
-JOIN students s ON s.id = e.student_id
-JOIN courses  c ON c.id = e.course_id
-ORDER BY s.name, c.title;`}
+  starterCode={`SELECT
+  s.name,
+  c.title
+FROM
+  enrollments e
+  JOIN students s ON s.id = e.student_id
+  JOIN courses c ON c.id = e.course_id
+ORDER BY
+  s.name,
+  c.title;`}
 />
 
 The query "walks" from `enrollments` out to both `students` and
@@ -124,11 +129,17 @@ INSERT INTO students (id, name) VALUES (1,'Ada'),(2,'Grace'),(3,'Linus');
 INSERT INTO courses (id, title) VALUES (10,'Math'),(11,'History'),(12,'Art');
 INSERT INTO enrollments (student_id, course_id) VALUES
   (1,10),(1,11),(2,10),(2,12),(3,11);`}
-  starterCode={`SELECT c.title, COUNT(*) AS student_count
-FROM courses c
-JOIN enrollments e ON e.course_id = c.id
-GROUP BY c.title
-ORDER BY student_count DESC, c.title;`}
+  starterCode={`SELECT
+  c.title,
+  COUNT(*) AS student_count
+FROM
+  courses c
+  JOIN enrollments e ON e.course_id = c.id
+GROUP BY
+  c.title
+ORDER BY
+  student_count DESC,
+  c.title;`}
 />
 
 Same three tables, different question — "students per course"

@@ -96,9 +96,9 @@ console.log("any bypasses all type checking");
   return x * 2;
 }
 
-console.log("double(5):", double(5));        // 10
-console.log("double('5'):", double("5"));    // NaN (no compile error!)
-console.log("double(true):", double(true));  // 2 (true coerces to 1)
+console.log("double(5):", double(5)); // 10
+console.log("double('5'):", double("5")); // NaN (no compile error!)
+console.log("double(true):", double(true)); // 2 (true coerces to 1)
 `}
 />
 
@@ -134,9 +134,9 @@ To use an `unknown` value, you must prove its type via narrowing:
   adapter="typescript"
   starterCode={`function process(value: unknown): void {
   if (typeof value === "string") {
-    console.log("String length:", value.length);  // ✅ value is narrowed to string
+    console.log("String length:", value.length); // ✅ value is narrowed to string
   } else if (typeof value === "number") {
-    console.log("Number squared:", value * value);  // ✅ value is narrowed to number
+    console.log("Number squared:", value * value); // ✅ value is narrowed to number
   } else {
     console.log("Unknown type:", value);
   }
@@ -163,7 +163,7 @@ Compare `any` vs `unknown` side by side:
 <CodeBlock
   adapter="typescript"
   starterCode={`function dangerousAny(x: any): number {
-  return x.length;  // No error, but crashes if x is a number
+  return x.length; // No error, but crashes if x is a number
 }
 
 function safeUnknown(x: unknown): number {
@@ -227,9 +227,9 @@ type Shape = { kind: "circle" } | { kind: "square" };
 function area(shape: Shape): number {
   switch (shape.kind) {
     case "circle":
-      return 0;  // Placeholder
+      return 0; // Placeholder
     case "square":
-      return 0;  // Placeholder
+      return 0; // Placeholder
     default:
       // If you add a new Shape variant, this line errors:
       return assertNever(shape);
@@ -276,7 +276,7 @@ functions that return `void` typically return `undefined` at runtime):
 }
 
 const result = logMessage("Hello, TypeScript!");
-console.log("result is:", result);  // undefined
+console.log("result is:", result); // undefined
 `}
 />
 
@@ -291,7 +291,7 @@ but the compiler won't let you use it in a meaningful way:
 }
 
 const x = doNothing();
-console.log("x:", x);  // undefined
+console.log("x:", x); // undefined
 
 // You can't do much with it:
 // console.log(x.length);  // ❌ Object is of type 'void'
@@ -317,8 +317,8 @@ function returnsUndefined(): undefined {
   return undefined;
 }
 
-const a = returnsVoid();        // type: void
-const b = returnsUndefined();   // type: undefined
+const a = returnsVoid(); // type: void
+const b = returnsUndefined(); // type: undefined
 
 console.log("a:", a);
 console.log("b:", b);
@@ -347,7 +347,7 @@ Here's how the four types relate in terms of assignability:
   adapter="typescript"
   starterCode={`let a: any = 42;
 let u: unknown = 42;
-let n: never;  // You can't construct a never value, so we leave it uninitialized
+let n: never; // You can't construct a never value, so we leave it uninitialized
 
 // any ↔ anything
 a = u;
@@ -387,7 +387,7 @@ function getString(value: unknown): string {
 const validJSON = parseJSON('"hello"');
 console.log("Parsed string:", getString(validJSON));
 
-const invalidJSON = parseJSON('42');
+const invalidJSON = parseJSON("42");
 try {
   console.log(getString(invalidJSON));
 } catch (e: any) {
@@ -408,7 +408,7 @@ function getString(value: unknown): string {
 const validJSON = parseJSON('"hello"');
 console.log("Parsed string:", getString(validJSON));
 
-const invalidJSON = parseJSON('42');
+const invalidJSON = parseJSON("42");
 try {
   console.log(getString(invalidJSON));
 } catch (e: any) {

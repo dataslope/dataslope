@@ -93,14 +93,56 @@ spot each issue before reading on.
   starterCode={`import pandas as pd
 import numpy as np
 
-messy = pd.DataFrame({
-    "customer_id": [1, 2, 3, 4, 5, 5, 6, 7, 8],
-    "name":        ["Aiko", "Bilal", "chen ", "DIEGO", "Eve", "Eve", "Farah", None, "Hana"],
-    "country":     ["USA", "U.S.A.", "United States", "USA", "UK", "UK", "uk", "USA", "U.S."],
-    "signup_date": ["2024-01-15","2024/02/03","2024-02-29","03/04/2024",None,None,"2024-03-30","2024-04-01","??"],
-    "spend":       ["100", "200", "300", "abc", "-50", "-50", "9999999", "150", ""],
-    "tier":        ["gold","silver","gold","bronze","silver","silver","gold","silver",None],
-})
+messy = pd.DataFrame(
+    {
+        "customer_id": [1, 2, 3, 4, 5, 5, 6, 7, 8],
+        "name": [
+            "Aiko",
+            "Bilal",
+            "chen ",
+            "DIEGO",
+            "Eve",
+            "Eve",
+            "Farah",
+            None,
+            "Hana",
+        ],
+        "country": [
+            "USA",
+            "U.S.A.",
+            "United States",
+            "USA",
+            "UK",
+            "UK",
+            "uk",
+            "USA",
+            "U.S.",
+        ],
+        "signup_date": [
+            "2024-01-15",
+            "2024/02/03",
+            "2024-02-29",
+            "03/04/2024",
+            None,
+            None,
+            "2024-03-30",
+            "2024-04-01",
+            "??",
+        ],
+        "spend": ["100", "200", "300", "abc", "-50", "-50", "9999999", "150", ""],
+        "tier": [
+            "gold",
+            "silver",
+            "gold",
+            "bronze",
+            "silver",
+            "silver",
+            "gold",
+            "silver",
+            None,
+        ],
+    }
+)
 
 print(messy)
 print()
@@ -152,10 +194,19 @@ messy = pd.DataFrame({
     # 2. Normalize name: strip whitespace, title-case
     .assign(name=lambda x: x["name"].str.strip().str.title())
     # 3. Normalize country: uppercase + map variants
-    .assign(country=lambda x: x["country"].str.upper().replace(
-        {"U.S.A.": "USA", "U.S.": "USA", "UNITED STATES": "USA"}))
+    .assign(
+        country=lambda x: (
+            x["country"]
+            .str.upper()
+            .replace({"U.S.A.": "USA", "U.S.": "USA", "UNITED STATES": "USA"})
+        )
+    )
     # 4. Parse dates — bad values become NaT
-    .assign(signup_date=lambda x: pd.to_datetime(x["signup_date"], errors="coerce", format="mixed"))
+    .assign(
+        signup_date=lambda x: pd.to_datetime(
+            x["signup_date"], errors="coerce", format="mixed"
+        )
+    )
     # 5. Coerce spend to numeric — bad values become NaN
     .assign(spend=lambda x: pd.to_numeric(x["spend"], errors="coerce"))
     # 6. Flag suspicious spend values

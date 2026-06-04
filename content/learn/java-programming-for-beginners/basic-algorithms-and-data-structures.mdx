@@ -17,18 +17,19 @@ what you want, or run out.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        int[] xs = { 4, 9, 1, 7, 2 };
-        System.out.println("index of 7  = " + indexOf(xs, 7));
-        System.out.println("index of 99 = " + indexOf(xs, 99));
-    }
+  public static void main(String[] args) {
+    int[] xs = {4, 9, 1, 7, 2};
+    System.out.println("index of 7  = " + indexOf(xs, 7));
+    System.out.println("index of 99 = " + indexOf(xs, 99));
+  }
 
-    static int indexOf(int[] xs, int target) {
-        for (int i = 0; i < xs.length; i++) {
-            if (xs[i] == target) return i;
-        }
-        return -1;
+  static int indexOf(int[] xs, int target) {
+    for (int i = 0; i < xs.length; i++) {
+      if (xs[i] == target)
+        return i;
     }
+    return -1;
+  }
 }
 `}
 />
@@ -67,22 +68,25 @@ A list of 1 million elements is fully searched in **20** comparisons
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        int[] sorted = { 2, 5, 8, 11, 17, 23, 31, 42 };
-        System.out.println("index of 17 = " + binarySearch(sorted, 17));
-        System.out.println("index of 4  = " + binarySearch(sorted, 4));
-    }
+  public static void main(String[] args) {
+    int[] sorted = {2, 5, 8, 11, 17, 23, 31, 42};
+    System.out.println("index of 17 = " + binarySearch(sorted, 17));
+    System.out.println("index of 4  = " + binarySearch(sorted, 4));
+  }
 
-    static int binarySearch(int[] xs, int target) {
-        int lo = 0, hi = xs.length - 1;
-        while (lo <= hi) {
-            int mid = lo + (hi - lo) / 2;        // avoids integer overflow
-            if (xs[mid] == target) return mid;
-            if (xs[mid] < target) lo = mid + 1;
-            else                  hi = mid - 1;
-        }
-        return -1;
+  static int binarySearch(int[] xs, int target) {
+    int lo = 0, hi = xs.length - 1;
+    while (lo <= hi) {
+      int mid = lo + (hi - lo) / 2; // avoids integer overflow
+      if (xs[mid] == target)
+        return mid;
+      if (xs[mid] < target)
+        lo = mid + 1;
+      else
+        hi = mid - 1;
     }
+    return -1;
+  }
 }
 `}
 />
@@ -102,24 +106,25 @@ smallest remaining element and put it in the next position.
   starterCode={`import java.util.Arrays;
 
 public class Main {
-    public static void main(String[] args) {
-        int[] xs = { 5, 3, 8, 1, 4 };
-        selectionSort(xs);
-        System.out.println(Arrays.toString(xs));
-    }
+  public static void main(String[] args) {
+    int[] xs = {5, 3, 8, 1, 4};
+    selectionSort(xs);
+    System.out.println(Arrays.toString(xs));
+  }
 
-    static void selectionSort(int[] xs) {
-        for (int i = 0; i < xs.length; i++) {
-            int minIdx = i;
-            for (int j = i + 1; j < xs.length; j++) {
-                if (xs[j] < xs[minIdx]) minIdx = j;
-            }
-            // swap xs[i] and xs[minIdx]
-            int tmp = xs[i];
-            xs[i] = xs[minIdx];
-            xs[minIdx] = tmp;
-        }
+  static void selectionSort(int[] xs) {
+    for (int i = 0; i < xs.length; i++) {
+      int minIdx = i;
+      for (int j = i + 1; j < xs.length; j++) {
+        if (xs[j] < xs[minIdx])
+          minIdx = j;
+      }
+      // swap xs[i] and xs[minIdx]
+      int tmp = xs[i];
+      xs[i] = xs[minIdx];
+      xs[minIdx] = tmp;
     }
+  }
 }
 `}
 />
@@ -183,23 +188,23 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class Main {
-    public static void main(String[] args) {
-        // stack: LIFO
-        Deque<Integer> stack = new ArrayDeque<>();
-        stack.push(1);
-        stack.push(2);
-        stack.push(3);
-        System.out.println("pop -> " + stack.pop());   // 3
-        System.out.println("pop -> " + stack.pop());   // 2
+  public static void main(String[] args) {
+    // stack: LIFO
+    Deque<Integer> stack = new ArrayDeque<>();
+    stack.push(1);
+    stack.push(2);
+    stack.push(3);
+    System.out.println("pop -> " + stack.pop()); // 3
+    System.out.println("pop -> " + stack.pop()); // 2
 
-        // queue: FIFO
-        Queue<String> q = new LinkedList<>();
-        q.add("a");
-        q.add("b");
-        q.add("c");
-        System.out.println("poll -> " + q.poll());     // a
-        System.out.println("poll -> " + q.poll());     // b
-    }
+    // queue: FIFO
+    Queue<String> q = new LinkedList<>();
+    q.add("a");
+    q.add("b");
+    q.add("c");
+    System.out.println("poll -> " + q.poll()); // a
+    System.out.println("poll -> " + q.poll()); // b
+  }
 }
 `}
 />

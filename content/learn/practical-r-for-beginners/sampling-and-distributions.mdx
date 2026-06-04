@@ -53,13 +53,13 @@ set.seed(1)
 population <- rnorm(100000, mean = 170, sd = 9)
 
 cat("Population mean:", mean(population), "\\n")
-cat("Population sd:  ", sd(population),   "\\n")
+cat("Population sd:  ", sd(population), "\\n")
 
 # Take a sample of 50
 sample50 <- sample(population, size = 50, replace = FALSE)
 
 cat("Sample mean:", mean(sample50), "\\n")
-cat("Sample sd:  ", sd(sample50),   "\\n")
+cat("Sample sd:  ", sd(sample50), "\\n")
 `}
 />
 
@@ -109,14 +109,15 @@ population <- rnorm(100000, mean = 170, sd = 9)
 many_means <- replicate(5000, mean(sample(population, 50)))
 
 hist(many_means,
-     breaks = 40,
-     col    = "steelblue",
-     main   = "Sampling distribution of the mean (n=50, 5000 reps)",
-     xlab   = "Sample mean (cm)")
+  breaks = 40,
+  col    = "steelblue",
+  main   = "Sampling distribution of the mean (n=50, 5000 reps)",
+  xlab   = "Sample mean (cm)"
+)
 
 cat("Mean of sample means:", mean(many_means), "\\n")
-cat("SD of sample means:  ", sd(many_means),   "\\n")
-cat("Theoretical SE = sd(pop)/sqrt(n) =", sd(population)/sqrt(50), "\\n")
+cat("SD of sample means:  ", sd(many_means), "\\n")
+cat("Theoretical SE = sd(pop)/sqrt(n) =", sd(population) / sqrt(50), "\\n")
 `}
 />
 
@@ -147,18 +148,22 @@ a long right tail):
   starterCode={`set.seed(1)
 
 # An extremely right-skewed population
-population <- rexp(100000, rate = 1)   # mean = 1, sd = 1
+population <- rexp(100000, rate = 1) # mean = 1, sd = 1
 
 par(mfrow = c(2, 2))
 
-hist(population, breaks = 60, col = "tomato",
-     main = "Population (exponential)", xlab = "x")
+hist(population,
+  breaks = 60, col = "tomato",
+  main = "Population (exponential)", xlab = "x"
+)
 
 for (n in c(2, 10, 50)) {
   means <- replicate(5000, mean(sample(population, n)))
-  hist(means, breaks = 40, col = "steelblue",
-       main = paste0("Sample means, n=", n),
-       xlab = "x̄")
+  hist(means,
+    breaks = 40, col = "steelblue",
+    main = paste0("Sample means, n=", n),
+    xlab = "x̄"
+  )
 }
 
 par(mfrow = c(1, 1))
@@ -210,12 +215,14 @@ cat("True population mean:", mean(population), "\\n\\n")
 # Take a single sample of 100
 sample100 <- sample(population, 100)
 xbar <- mean(sample100)
-se   <- sd(sample100) / sqrt(100)
+se <- sd(sample100) / sqrt(100)
 
 cat("Sample mean:", round(xbar, 3), "\\n")
 cat("Standard error:", round(se, 3), "\\n")
-cat(sprintf("Approx 95%% interval: [%.2f, %.2f]\\n",
-            xbar - 2*se, xbar + 2*se))
+cat(sprintf(
+  "Approx 95%% interval: [%.2f, %.2f]\\n",
+  xbar - 2 * se, xbar + 2 * se
+))
 `}
 />
 
@@ -271,19 +278,19 @@ the rule x̄ ± 2·SE.
 pop <- rnorm(100000, mean = 50, sd = 12)
 
 x_bar <- NULL
-se    <- NULL
-ci    <- NULL
+se <- NULL
+ci <- NULL
 
 cat("x_bar:", x_bar, "\\n")
-cat("se:   ", se,    "\\n")
-cat("ci:   ", ci,    "\\n")
+cat("se:   ", se, "\\n")
+cat("ci:   ", ci, "\\n")
 `}
   solutionCode={`set.seed(123)
-pop  <- rnorm(100000, mean = 50, sd = 12)
+pop <- rnorm(100000, mean = 50, sd = 12)
 samp <- sample(pop, 30)
 x_bar <- mean(samp)
-se    <- sd(samp) / sqrt(length(samp))
-ci    <- c(x_bar - 2*se, x_bar + 2*se)
+se <- sd(samp) / sqrt(length(samp))
+ci <- c(x_bar - 2 * se, x_bar + 2 * se)
 `}
   tests={[
     {

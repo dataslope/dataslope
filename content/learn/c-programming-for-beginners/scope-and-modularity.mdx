@@ -46,18 +46,18 @@ Three levels of scope appear above:
   adapter="c"
   starterCode={`#include <stdio.h>
 
-int counter = 0;   // file scope
+int counter = 0; // file scope
 
 void bump(void) {
-    counter++;     // any function can see file-scope names
+  counter++; // any function can see file-scope names
 }
 
 int main(void) {
-    bump();
-    bump();
-    bump();
-    printf("counter = %d\\n", counter);
-    return 0;
+  bump();
+  bump();
+  bump();
+  printf("counter = %d\\n", counter);
+  return 0;
 }
 `}
 />
@@ -75,13 +75,13 @@ ends.
 int x = 100;
 
 int main(void) {
-    printf("outer x = %d\\n", x);
-    {
-        int x = 5;        // shadows the file-scope x
-        printf("inner x = %d\\n", x);
-    }
-    printf("outer x again = %d\\n", x);
-    return 0;
+  printf("outer x = %d\\n", x);
+  {
+    int x = 5; // shadows the file-scope x
+    printf("inner x = %d\\n", x);
+  }
+  printf("outer x again = %d\\n", x);
+  return 0;
 }
 `}
 />
@@ -117,16 +117,16 @@ across calls — a counter, perhaps. Prefix it with `static`.
   starterCode={`#include <stdio.h>
 
 int next_id(void) {
-    static int id = 0;     // initialized once, persists across calls
-    id++;
-    return id;
+  static int id = 0; // initialized once, persists across calls
+  id++;
+  return id;
 }
 
 int main(void) {
-    printf("id = %d\\n", next_id());
-    printf("id = %d\\n", next_id());
-    printf("id = %d\\n", next_id());
-    return 0;
+  printf("id = %d\\n", next_id());
+  printf("id = %d\\n", next_id());
+  printf("id = %d\\n", next_id());
+  return 0;
 }
 `}
 />

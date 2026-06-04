@@ -114,7 +114,13 @@ INSERT INTO enrollments (student_id, course_id, enrolled_on) VALUES
   (2, 10, '2024-09-01'),
   (2, 12, '2024-09-03'),
   (3, 11, '2024-09-02');`}
-  starterCode={`SELECT * FROM enrollments ORDER BY student_id, course_id;`}
+  starterCode={`SELECT
+  *
+FROM
+  enrollments
+ORDER BY
+  student_id,
+  course_id;`}
 />
 
 The primary key is the pair `(student_id, course_id)`. That means the same student cannot be enrolled in the same course twice.
@@ -148,11 +154,17 @@ INSERT INTO enrollments (student_id, course_id, enrolled_on) VALUES
   (2, 10, '2024-09-01'),
   (2, 12, '2024-09-03'),
   (3, 11, '2024-09-02');`}
-  starterCode={`SELECT s.name, c.title, e.enrolled_on
-FROM enrollments e
-JOIN students s ON s.id = e.student_id
-JOIN courses c ON c.id = e.course_id
-ORDER BY s.name, c.title;`}
+  starterCode={`SELECT
+  s.name,
+  c.title,
+  e.enrolled_on
+FROM
+  enrollments e
+  JOIN students s ON s.id = e.student_id
+  JOIN courses c ON c.id = e.course_id
+ORDER BY
+  s.name,
+  c.title;`}
 />
 
 ```mermaid
@@ -177,11 +189,18 @@ INSERT INTO students (id, name) VALUES (1, 'Ada'), (2, 'Grace'), (3, 'Linus');
 INSERT INTO courses (id, title) VALUES (10, 'Math'), (11, 'History'), (12, 'Art');
 INSERT INTO enrollments (student_id, course_id) VALUES
   (1, 10), (1, 11), (2, 10), (2, 12), (3, 11);`}
-  starterCode={`SELECT c.title, COUNT(e.student_id) AS student_count
-FROM courses c
-JOIN enrollments e ON e.course_id = c.id
-GROUP BY c.id, c.title
-ORDER BY student_count DESC, c.title;`}
+  starterCode={`SELECT
+  c.title,
+  COUNT(e.student_id) AS student_count
+FROM
+  courses c
+  JOIN enrollments e ON e.course_id = c.id
+GROUP BY
+  c.id,
+  c.title
+ORDER BY
+  student_count DESC,
+  c.title;`}
 />
 
 <SqlCodeBlock
@@ -194,11 +213,18 @@ INSERT INTO students (id, name) VALUES (1, 'Ada'), (2, 'Grace'), (3, 'Linus');
 INSERT INTO courses (id, title) VALUES (10, 'Math'), (11, 'History'), (12, 'Art');
 INSERT INTO enrollments (student_id, course_id) VALUES
   (1, 10), (1, 11), (2, 10), (2, 12), (3, 11);`}
-  starterCode={`SELECT s.name, COUNT(e.course_id) AS course_count
-FROM students s
-JOIN enrollments e ON e.student_id = s.id
-GROUP BY s.id, s.name
-ORDER BY course_count DESC, s.name;`}
+  starterCode={`SELECT
+  s.name,
+  COUNT(e.course_id) AS course_count
+FROM
+  students s
+  JOIN enrollments e ON e.student_id = s.id
+GROUP BY
+  s.id,
+  s.name
+ORDER BY
+  course_count DESC,
+  s.name;`}
 />
 
 ## Junction tables can hold facts about the relationship
@@ -224,11 +250,17 @@ INSERT INTO enrollments (student_id, course_id, grade) VALUES
   (2, 10, 'A'),
   (2, 12, 'A'),
   (3, 11, 'B');`}
-  starterCode={`SELECT s.name, c.title, e.grade
-FROM enrollments e
-JOIN students s ON s.id = e.student_id
-JOIN courses c ON c.id = e.course_id
-ORDER BY s.name, c.title;`}
+  starterCode={`SELECT
+  s.name,
+  c.title,
+  e.grade
+FROM
+  enrollments e
+  JOIN students s ON s.id = e.student_id
+  JOIN courses c ON c.id = e.course_id
+ORDER BY
+  s.name,
+  c.title;`}
 />
 
 <Callout type="info" title="Naming junction tables">

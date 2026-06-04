@@ -46,7 +46,8 @@ In *one* compact glyph.
 df = px.data.tips()
 
 fig = px.box(
-    df, y="total_bill",
+    df,
+    y="total_bill",
     template="simple_white",
     title="Distribution of restaurant bills (box plot)",
     labels={"total_bill": "Total bill (USD)"},
@@ -70,7 +71,10 @@ The real power of box plots is *side-by-side comparison*. Add an
 df = px.data.tips()
 
 fig = px.box(
-    df, x="day", y="total_bill", color="sex",
+    df,
+    x="day",
+    y="total_bill",
+    color="sex",
     template="simple_white",
     category_orders={"day": ["Thur", "Fri", "Sat", "Sun"]},
     title="Bill distribution by day and sex",
@@ -96,7 +100,9 @@ the raw points back:
 df = px.data.tips()
 
 fig = px.box(
-    df, x="day", y="total_bill",
+    df,
+    x="day",
+    y="total_bill",
     points="all",  # 'outliers' (default), 'all', 'suspectedoutliers', or False
     template="simple_white",
     category_orders={"day": ["Thur", "Fri", "Sat", "Sun"]},
@@ -122,8 +128,12 @@ shows the same summary plus a smoothed density:
 df = px.data.tips()
 
 fig = px.violin(
-    df, x="day", y="total_bill", color="sex",
-    box=True, points="outliers",
+    df,
+    x="day",
+    y="total_bill",
+    color="sex",
+    box=True,
+    points="outliers",
     template="simple_white",
     category_orders={"day": ["Thur", "Fri", "Sat", "Sun"]},
     title="Bill distribution by day and sex (violin + box)",

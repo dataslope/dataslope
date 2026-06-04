@@ -35,7 +35,8 @@ flowchart TD
 df = px.data.tips()
 
 fig = px.histogram(
-    df, x="total_bill",
+    df,
+    x="total_bill",
     template="simple_white",
     title="Distribution of restaurant bills",
     labels={"total_bill": "Total bill (USD)"},
@@ -61,7 +62,9 @@ df = px.data.tips()
 
 # Try changing nbins to 5, 20, 50, 100
 fig = px.histogram(
-    df, x="total_bill", nbins=30,
+    df,
+    x="total_bill",
+    nbins=30,
     template="simple_white",
     title="Bill distribution with nbins=30 — try other values",
     labels={"total_bill": "Total bill (USD)"},
@@ -91,7 +94,9 @@ Add `color="..."` to split the histogram by a categorical variable:
 df = px.data.tips()
 
 fig = px.histogram(
-    df, x="total_bill", color="sex",
+    df,
+    x="total_bill",
+    color="sex",
     barmode="overlay",
     opacity=0.6,
     template="simple_white",
@@ -124,8 +129,11 @@ normalize:
 df = px.data.tips()
 
 fig = px.histogram(
-    df, x="total_bill", color="sex",
-    barmode="overlay", opacity=0.6,
+    df,
+    x="total_bill",
+    color="sex",
+    barmode="overlay",
+    opacity=0.6,
     histnorm="probability density",
     template="simple_white",
     title="Bill distribution by sex (normalized)",

@@ -37,33 +37,33 @@ flowchart TB
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Widget a = new Widget();
-        Widget b = new Widget();
-        Widget c = new Widget();
+  public static void main(String[] args) {
+    Widget a = new Widget();
+    Widget b = new Widget();
+    Widget c = new Widget();
 
-        System.out.println("a.id = " + a.id());
-        System.out.println("b.id = " + b.id());
-        System.out.println("c.id = " + c.id());
-        System.out.println("total created so far = " + Widget.totalCreated());
-    }
+    System.out.println("a.id = " + a.id());
+    System.out.println("b.id = " + b.id());
+    System.out.println("c.id = " + c.id());
+    System.out.println("total created so far = " + Widget.totalCreated());
+  }
 }
 
 class Widget {
-    // Belongs to the CLASS — shared by all instances:
-    private static int created = 0;
+  // Belongs to the CLASS — shared by all instances:
+  private static int created = 0;
 
-    // Belongs to each INSTANCE — each Widget has its own:
-    private final int id;
+  // Belongs to each INSTANCE — each Widget has its own:
+  private final int id;
 
-    public Widget() {
-        created++;        // bump the shared counter
-        this.id = created;
-    }
+  public Widget() {
+    created++; // bump the shared counter
+    this.id = created;
+  }
 
-    public int id() { return id; }
+  public int id() { return id; }
 
-    public static int totalCreated() { return created; }
+  public static int totalCreated() { return created; }
 }
 `}
 />
@@ -90,19 +90,17 @@ change. By convention, constants are written in `UPPER_SNAKE_CASE`.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        System.out.println("Circumference of unit circle: " + Geometry.TAU);
-        System.out.println("Circle area, r=3:           " + Geometry.circleArea(3));
-    }
+  public static void main(String[] args) {
+    System.out.println("Circumference of unit circle: " + Geometry.TAU);
+    System.out.println("Circle area, r=3:           " + Geometry.circleArea(3));
+  }
 }
 
 class Geometry {
-    public static final double PI  = 3.14159265358979;
-    public static final double TAU = 2 * PI;
+  public static final double PI = 3.14159265358979;
+  public static final double TAU = 2 * PI;
 
-    public static double circleArea(double r) {
-        return PI * r * r;
-    }
+  public static double circleArea(double r) { return PI * r * r; }
 }
 `}
 />
@@ -207,35 +205,41 @@ always allocating.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Color red    = Color.rgb(255, 0, 0);
-        Color black  = Color.named("black");
-        Color white  = Color.named("white");
+  public static void main(String[] args) {
+    Color red = Color.rgb(255, 0, 0);
+    Color black = Color.named("black");
+    Color white = Color.named("white");
 
-        System.out.println(red);
-        System.out.println(black);
-        System.out.println(white);
-    }
+    System.out.println(red);
+    System.out.println(black);
+    System.out.println(white);
+  }
 }
 
 class Color {
-    private final int r, g, b;
-    private Color(int r, int g, int b) { this.r=r; this.g=g; this.b=b; }
+  private final int r, g, b;
+  private Color(int r, int g, int b) {
+    this.r = r;
+    this.g = g;
+    this.b = b;
+  }
 
-    // Factory methods — the *named* construction paths
-    public static Color rgb(int r, int g, int b) {
-        return new Color(r, g, b);
+  // Factory methods — the *named* construction paths
+  public static Color rgb(int r, int g, int b) { return new Color(r, g, b); }
+  public static Color named(String name) {
+    switch (name) {
+    case "black":
+      return new Color(0, 0, 0);
+    case "white":
+      return new Color(255, 255, 255);
+    case "red":
+      return new Color(255, 0, 0);
+    default:
+      throw new IllegalArgumentException("unknown color: " + name);
     }
-    public static Color named(String name) {
-        switch (name) {
-            case "black": return new Color(0,0,0);
-            case "white": return new Color(255,255,255);
-            case "red":   return new Color(255,0,0);
-            default:      throw new IllegalArgumentException("unknown color: " + name);
-        }
-    }
+  }
 
-    public String toString() { return "Color(" + r + "," + g + "," + b + ")"; }
+  public String toString() { return "Color(" + r + "," + g + "," + b + ")"; }
 }
 `}
 />

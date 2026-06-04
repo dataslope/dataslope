@@ -81,11 +81,11 @@ vector and returns a small named list summarizing it.
   list(
     n      = length(x),
     n_na   = sum(is.na(x)),
-    mean   = mean(x,   na.rm = na.rm),
+    mean   = mean(x, na.rm = na.rm),
     median = median(x, na.rm = na.rm),
-    sd     = sd(x,     na.rm = na.rm),
-    min    = min(x,    na.rm = na.rm),
-    max    = max(x,    na.rm = na.rm)
+    sd     = sd(x, na.rm = na.rm),
+    min    = min(x, na.rm = na.rm),
+    max    = max(x, na.rm = na.rm)
   )
 }
 
@@ -211,7 +211,7 @@ report_snr <- function(x, label = "x") {
 }
 
 report_snr(mtcars$mpg, "mpg")
-report_snr(mtcars$hp,  "hp")
+report_snr(mtcars$hp, "hp")
 `}
 />
 
@@ -233,7 +233,7 @@ scoped <- function() {
 }
 
 cat(scoped(), "\\n")
-cat(temp_var_in_global, "\\n")  # unchanged
+cat(temp_var_in_global, "\\n") # unchanged
 `}
 />
 
@@ -295,7 +295,7 @@ summarize_group(c(1, 2, NA, 4, 5))
   list(
     n    = length(x),
     mean = mean(x, na.rm = TRUE),
-    sd   = sd(x,   na.rm = TRUE)
+    sd   = sd(x, na.rm = TRUE)
   )
 }
 

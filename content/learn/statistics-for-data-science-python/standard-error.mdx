@@ -81,11 +81,11 @@ rng = np.random.default_rng(42)
 sample = rng.normal(loc=41, scale=12, size=200)
 
 n = len(sample)
-sd = sample.std(ddof=1)            # spread of the DATA
-se = sd / np.sqrt(n)               # spread of the ESTIMATE (mean)
+sd = sample.std(ddof=1)  # spread of the DATA
+se = sd / np.sqrt(n)  # spread of the ESTIMATE (mean)
 
 # scipy computes the SE of the mean directly:
-se_scipy = stats.sem(sample)       # same as sd/sqrt(n)
+se_scipy = stats.sem(sample)  # same as sd/sqrt(n)
 
 print(f"sample size n          = {n}")
 print(f"sample mean x-bar      = {sample.mean():.2f}")
@@ -132,10 +132,9 @@ population = rng.normal(MU, SIGMA, size=1_000_000)
 n = 50
 
 # --- The thing we usually CAN'T do: draw many samples and measure x-bar's spread. ---
-many_means = np.array([
-    rng.choice(population, size=n, replace=False).mean()
-    for _ in range(10000)
-])
+many_means = np.array(
+    [rng.choice(population, size=n, replace=False).mean() for _ in range(10000)]
+)
 true_sampling_sd = many_means.std()
 
 # --- The thing we CAN do with ONE sample: estimate SE as s/sqrt(n). ---
@@ -197,9 +196,13 @@ SIGMA = 20.0
 ns = np.array([10, 25, 50, 100, 200, 400, 800, 1600, 3200, 6400, 12800])
 se = SIGMA / np.sqrt(ns)
 
-fig = px.line(x=ns, y=se, markers=True,
-              title="Standard error vs sample size: steep, then flat (diminishing returns)",
-              labels={"x": "sample size n", "y": "standard error (sigma/sqrt(n))"})
+fig = px.line(
+    x=ns,
+    y=se,
+    markers=True,
+    title="Standard error vs sample size: steep, then flat (diminishing returns)",
+    labels={"x": "sample size n", "y": "standard error (sigma/sqrt(n))"},
+)
 fig.show()
 
 print(f"{'n':>7} | {'SE':>7} | note")
@@ -275,7 +278,7 @@ sample = rng.normal(loc=8.0, scale=2.5, size=120)
 
 n = len(sample)
 x_bar = sample.mean()
-se = stats.sem(sample)             # s / sqrt(n)
+se = stats.sem(sample)  # s / sqrt(n)
 
 # A rough 95% confidence interval: x-bar +/- ~2 * SE
 lo, hi = x_bar - 1.96 * se, x_bar + 1.96 * se
@@ -323,6 +326,7 @@ out = {
 }
 `}
   solutionCode={`import numpy as np
+
 n = len(sample)
 sd = float(sample.std(ddof=1))
 se = float(sd / np.sqrt(n))
@@ -397,6 +401,7 @@ plan = {
 `}
   solutionCode={`import numpy as np
 import math
+
 se_current = sigma / np.sqrt(n_current)
 se_target = se_current / 2.0
 n_needed = math.ceil((sigma / se_target) ** 2)

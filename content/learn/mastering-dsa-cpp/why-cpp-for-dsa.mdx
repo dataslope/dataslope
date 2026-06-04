@@ -21,15 +21,15 @@ C++ is compiled ahead of time to machine code. There is no interpreter in the ho
 <CodeBlock
   adapter="cpp"
   starterCode={`#include <iostream>
-#include <vector>
 #include <numeric>
+#include <vector>
 
 int main() {
-    std::vector<int> values(1000, 1);
-    int total = std::accumulate(values.begin(), values.end(), 0);
+  std::vector<int> values(1000, 1);
+  int total = std::accumulate(values.begin(), values.end(), 0);
 
-    std::cout << "sum: " << total << "\\n";
-    return 0;
+  std::cout << "sum: " << total << "\\n";
+  return 0;
 }
 `}
 />
@@ -61,15 +61,15 @@ The **Standard Template Library (STL)** gives you production-quality containers 
 #include <vector>
 
 int main() {
-    std::priority_queue<int> urgent;
-    for (int score : std::vector<int>{17, 42, 5, 99, 23}) {
-        urgent.push(score);
-    }
+  std::priority_queue<int> urgent;
+  for (int score : std::vector<int>{17, 42, 5, 99, 23}) {
+    urgent.push(score);
+  }
 
-    std::cout << "highest: " << urgent.top() << "\\n";
-    urgent.pop();
-    std::cout << "next: " << urgent.top() << "\\n";
-    return 0;
+  std::cout << "highest: " << urgent.top() << "\\n";
+  urgent.pop();
+  std::cout << "next: " << urgent.top() << "\\n";
+  return 0;
 }
 `}
 />
@@ -94,17 +94,17 @@ That is why a vector can beat a list even when both have O(n) traversal: Big-O d
 #include <vector>
 
 int main() {
-    std::vector<int> xs = {10, 20, 30, 40};
+  std::vector<int> xs = {10, 20, 30, 40};
 
-    std::cout << "values: ";
-    for (int x : xs) {
-        std::cout << x << " ";
-    }
-    std::cout << "\\n";
+  std::cout << "values: ";
+  for (int x : xs) {
+    std::cout << x << " ";
+  }
+  std::cout << "\\n";
 
-    std::cout << "first address: " << &xs[0] << "\\n";
-    std::cout << "second address: " << &xs[1] << "\\n";
-    return 0;
+  std::cout << "first address: " << &xs[0] << "\\n";
+  std::cout << "second address: " << &xs[1] << "\\n";
+  return 0;
 }
 `}
 />
@@ -118,15 +118,12 @@ Templates let you write algorithms once and let the compiler generate type-speci
   starterCode={`#include <iostream>
 #include <string>
 
-template <typename T>
-T bigger(T a, T b) {
-    return a < b ? b : a;
-}
+template <typename T> T bigger(T a, T b) { return a < b ? b : a; }
 
 int main() {
-    std::cout << bigger(10, 42) << "\\n";
-    std::cout << bigger(std::string("heap"), std::string("graph")) << "\\n";
-    return 0;
+  std::cout << bigger(10, 42) << "\\n";
+  std::cout << bigger(std::string("heap"), std::string("graph")) << "\\n";
+  return 0;
 }
 `}
 />
@@ -143,21 +140,23 @@ Here is a tiny program that builds a vector, sorts it with `std::sort`, prints t
 #include <vector>
 
 int main() {
-    std::vector<int> scores = {41, 12, 99, 12, 73, 5, 88, 30};
+  std::vector<int> scores = {41, 12, 99, 12, 73, 5, 88, 30};
 
-    auto start = std::chrono::high_resolution_clock::now();
-    std::sort(scores.begin(), scores.end());
-    auto stop = std::chrono::high_resolution_clock::now();
+  auto start = std::chrono::high_resolution_clock::now();
+  std::sort(scores.begin(), scores.end());
+  auto stop = std::chrono::high_resolution_clock::now();
 
-    std::cout << "sorted:";
-    for (int x : scores) {
-        std::cout << " " << x;
-    }
-    std::cout << "\\n";
+  std::cout << "sorted:";
+  for (int x : scores) {
+    std::cout << " " << x;
+  }
+  std::cout << "\\n";
 
-    auto micros = std::chrono::duration_cast<std::chrono::microseconds>(stop - start).count();
-    std::cout << "sort took about " << micros << " microseconds\\n";
-    return 0;
+  auto micros =
+      std::chrono::duration_cast<std::chrono::microseconds>(stop - start)
+          .count();
+  std::cout << "sort took about " << micros << " microseconds\\n";
+  return 0;
 }
 `}
 />
@@ -202,9 +201,9 @@ Expected output:
 #include <vector>
 
 int main() {
-    std::vector<int> scores = {88, 55, 90, 61, 72};
-    // your code here
-    return 0;
+  std::vector<int> scores = {88, 55, 90, 61, 72};
+  // your code here
+  return 0;
 }
 `}
   solutionCode={`#include <algorithm>
@@ -212,14 +211,15 @@ int main() {
 #include <vector>
 
 int main() {
-    std::vector<int> scores = {88, 55, 90, 61, 72};
-    std::sort(scores.begin(), scores.end());
-    for (std::size_t i = 0; i < scores.size(); ++i) {
-        if (i) std::cout << " ";
-        std::cout << scores[i];
-    }
-    std::cout << "\\n";
-    return 0;
+  std::vector<int> scores = {88, 55, 90, 61, 72};
+  std::sort(scores.begin(), scores.end());
+  for (std::size_t i = 0; i < scores.size(); ++i) {
+    if (i)
+      std::cout << " ";
+    std::cout << scores[i];
+  }
+  std::cout << "\\n";
+  return 0;
 }
 `}
   tests={[
@@ -240,9 +240,9 @@ int main() {
 #include <vector>
 
 int main() {
-    std::vector<int> priorities = {3, 9, 4, 1, 7};
-    // your code here
-    return 0;
+  std::vector<int> priorities = {3, 9, 4, 1, 7};
+  // your code here
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
@@ -250,13 +250,13 @@ int main() {
 #include <vector>
 
 int main() {
-    std::vector<int> priorities = {3, 9, 4, 1, 7};
-    std::priority_queue<int> pq;
-    for (int p : priorities) {
-        pq.push(p);
-    }
-    std::cout << "top priority: " << pq.top() << "\\n";
-    return 0;
+  std::vector<int> priorities = {3, 9, 4, 1, 7};
+  std::priority_queue<int> pq;
+  for (int p : priorities) {
+    pq.push(p);
+  }
+  std::cout << "top priority: " << pq.top() << "\\n";
+  return 0;
 }
 `}
   tests={[

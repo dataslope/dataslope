@@ -224,14 +224,14 @@ forest = RandomForestClassifier(n_estimators=200, random_state=0)
 forest.fit(X_train, y_train)
 
 # Permute each feature on the HELD-OUT set and measure the score drop.
-result = permutation_importance(
-    forest, X_test, y_test, n_repeats=20, random_state=0
-)
+result = permutation_importance(forest, X_test, y_test, n_repeats=20, random_state=0)
 
 order = np.argsort(result.importances_mean)[::-1]
 print("Permutation importances (mean drop in accuracy on held-out data):")
 for i in order[:6]:
-    print(f"  {names[i]:<28} {result.importances_mean[i]:.3f}  +/- {result.importances_std[i]:.3f}")
+    print(
+        f"  {names[i]:<28} {result.importances_mean[i]:.3f}  +/- {result.importances_std[i]:.3f}"
+    )
 `}
 />
 
@@ -290,11 +290,10 @@ forest = RandomForestClassifier(n_estimators=200, random_state=0)
 forest.fit(data.data, data.target)
 
 importances = forest.feature_importances_
-order = np.argsort(importances)[::-1][:8]   # top 8
+order = np.argsort(importances)[::-1][:8]  # top 8
 
 fig, ax = plt.subplots(figsize=(7, 4))
-ax.barh([data.feature_names[i] for i in order][::-1],
-        importances[order][::-1])
+ax.barh([data.feature_names[i] for i in order][::-1], importances[order][::-1])
 ax.set_xlabel("Importance (impurity-based)")
 ax.set_title("Top features: wine random forest")
 fig.tight_layout()

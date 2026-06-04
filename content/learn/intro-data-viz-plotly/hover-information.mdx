@@ -21,7 +21,9 @@ that would otherwise require a separate table.
 df = px.data.gapminder().query("year == 2007")
 
 fig = px.scatter(
-    df, x="gdpPercap", y="lifeExp",
+    df,
+    x="gdpPercap",
+    y="lifeExp",
     log_x=True,
     template="simple_white",
     title="Default hover — just x and y",
@@ -45,7 +47,9 @@ the top of the tooltip.
 df = px.data.gapminder().query("year == 2007")
 
 fig = px.scatter(
-    df, x="gdpPercap", y="lifeExp",
+    df,
+    x="gdpPercap",
+    y="lifeExp",
     hover_name="country",
     log_x=True,
     template="simple_white",
@@ -70,13 +74,15 @@ pass a dictionary to control formatting and visibility per field.
 df = px.data.gapminder().query("year == 2007")
 
 fig = px.scatter(
-    df, x="gdpPercap", y="lifeExp",
+    df,
+    x="gdpPercap",
+    y="lifeExp",
     hover_name="country",
     hover_data={
         "continent": True,
-        "pop": ":,",        # comma-separated thousands
-        "gdpPercap": ":.0f", # no decimals
-        "lifeExp": ":.1f",   # one decimal
+        "pop": ":,",  # comma-separated thousands
+        "gdpPercap": ":.0f",  # no decimals
+        "lifeExp": ":.1f",  # one decimal
     },
     log_x=True,
     color="continent",
@@ -115,7 +121,9 @@ in the hover automatically.
 df = px.data.gapminder().query("year == 2007")
 
 fig = px.scatter(
-    df, x="gdpPercap", y="lifeExp",
+    df,
+    x="gdpPercap",
+    y="lifeExp",
     hover_name="country",
     hover_data={"pop": ":,"},
     color="continent",

@@ -29,14 +29,11 @@ all of them: `Aggregate`.
   starterCode={`using System;
 using System.Linq;
 
-record Product(string Name, decimal Price, int Stock);
-
-var products = new[]
-{
+var products = new[] {
     new Product("Widget", 9.99m, 100),
     new Product("Gadget", 14.50m, 25),
-    new Product("Gizmo",  19.99m, 0),
-    new Product("Doodad",  4.50m, 250),
+    new Product("Gizmo", 19.99m, 0),
+    new Product("Doodad", 4.50m, 250),
 };
 
 Console.WriteLine($"count:       {products.Count()}");
@@ -46,10 +43,12 @@ Console.WriteLine($"min price:   {products.Min(p => p.Price):C}");
 Console.WriteLine($"max price:   {products.Max(p => p.Price):C}");
 Console.WriteLine($"avg price:   {products.Average(p => p.Price):C}");
 
-var cheapest  = products.MinBy(p => p.Price);
-var pricey    = products.MaxBy(p => p.Price);
+var cheapest = products.MinBy(p => p.Price);
+var pricey = products.MaxBy(p => p.Price);
 Console.WriteLine($"cheapest:    {cheapest?.Name}");
 Console.WriteLine($"priciest:    {pricey?.Name}");
+
+record Product(string Name, decimal Price, int Stock);
 `}
 />
 
@@ -85,8 +84,14 @@ var empty = System.Array.Empty<int>();
 Console.WriteLine($"count: {empty.Count()}");
 Console.WriteLine($"sum:   {empty.Sum()}");
 
-try { Console.WriteLine($"min: {empty.Min()}"); }
-catch (Exception ex) { Console.WriteLine($"min threw: {ex.GetType().Name}"); }
+try
+{
+    Console.WriteLine($"min: {empty.Min()}");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"min threw: {ex.GetType().Name}");
+}
 
 // Safe alternatives:
 Console.WriteLine($"min-or-default: {empty.DefaultIfEmpty().Min()}");
@@ -116,16 +121,16 @@ using System.Linq;
 var nums = new[] { 3, 1, 4, 1, 5, 9, 2, 6, 5 };
 
 // Sum implemented with Aggregate.
-int sum     = nums.Aggregate(0, (acc, n) => acc + n);
+int sum = nums.Aggregate(0, (acc, n) => acc + n);
 
 // Product implemented with Aggregate.
 int product = nums.Aggregate(1, (acc, n) => acc * n);
 
 // Max implemented with Aggregate.
-int max     = nums.Aggregate(int.MinValue, (acc, n) => n > acc ? n : acc);
+int max = nums.Aggregate(int.MinValue, (acc, n) => n > acc ? n : acc);
 
 // Concatenate strings.
-string csv  = nums.Aggregate("", (acc, n) => acc == "" ? n.ToString() : $"{acc},{n}");
+string csv = nums.Aggregate("", (acc, n) => acc == "" ? n.ToString() : $"{acc},{n}");
 
 Console.WriteLine($"sum     = {sum}");
 Console.WriteLine($"product = {product}");
@@ -152,18 +157,12 @@ using System.Linq;
 var nums = new[] { 3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5 };
 
 // One pass that computes count, sum, sum-of-squares, min, max.
-var stats = nums.Aggregate(
-    seed: (Count: 0, Sum: 0L, Sq: 0L, Min: int.MaxValue, Max: int.MinValue),
-    func: (acc, n) => (
-        acc.Count + 1,
-        acc.Sum + n,
-        acc.Sq + (long)n * n,
-        n < acc.Min ? n : acc.Min,
-        n > acc.Max ? n : acc.Max
-    ));
+var stats = nums.Aggregate(seed: (Count: 0, Sum: 0L, Sq: 0L, Min: int.MaxValue, Max: int.MinValue),
+                           func: (acc, n) => (acc.Count + 1, acc.Sum + n, acc.Sq + (long)n * n,
+                                              n<acc.Min ? n : acc.Min, n> acc.Max ? n : acc.Max));
 
 double mean = (double)stats.Sum / stats.Count;
-double var  = (double)stats.Sq / stats.Count - mean * mean;
+double var = (double)stats.Sq / stats.Count - mean * mean;
 
 Console.WriteLine($"count={stats.Count} sum={stats.Sum} min={stats.Min} max={stats.Max}");
 Console.WriteLine($"mean={mean:F2}  variance={var:F2}");

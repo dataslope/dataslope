@@ -60,10 +60,12 @@ numerator and denominator each tell only half the story.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "rooms":  [3, 5, 2, 8, 4],
-    "people": [6, 5, 4, 8, 2],
-})
+df = pd.DataFrame(
+    {
+        "rooms": [3, 5, 2, 8, 4],
+        "people": [6, 5, 4, 8, 2],
+    }
+)
 
 # The concept "crowding" is a ratio, not either column alone.
 df["people_per_room"] = df["people"] / df["rooms"]
@@ -97,9 +99,7 @@ b = rng.uniform(-1, 1, n)
 y = ((a > 0) ^ (b > 0)).astype(int)
 X = np.column_stack([a, b])
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=0
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
 # Plain logistic regression: only sees a and b separately -> near chance.
 base = LogisticRegression(max_iter=1000).fit(X_train, y_train)
@@ -181,13 +181,17 @@ informative ones.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "date": pd.to_datetime(["2021-01-15", "2021-07-04", "2021-12-25", "2021-03-22"]),
-})
+df = pd.DataFrame(
+    {
+        "date": pd.to_datetime(
+            ["2021-01-15", "2021-07-04", "2021-12-25", "2021-03-22"]
+        ),
+    }
+)
 
 # Pull out the parts that actually carry signal.
-df["month"]      = df["date"].dt.month
-df["dayofweek"]  = df["date"].dt.dayofweek      # Monday=0 ... Sunday=6
+df["month"] = df["date"].dt.month
+df["dayofweek"] = df["date"].dt.dayofweek  # Monday=0 ... Sunday=6
 df["is_weekend"] = (df["date"].dt.dayofweek >= 5).astype(int)
 
 print(df)
@@ -234,12 +238,10 @@ from sklearn.metrics import r2_score
 # A genuinely curved relationship: y is roughly x squared.
 np.random.seed(0)
 x = np.linspace(-3, 3, 60)
-y = x ** 2 + np.random.normal(0, 0.5, size=x.shape)
+y = x**2 + np.random.normal(0, 0.5, size=x.shape)
 X = x.reshape(-1, 1)
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=0
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
 # Plain line: cannot bend, so it fits a curved relationship badly.
 line = LinearRegression().fit(X_train, y_train)

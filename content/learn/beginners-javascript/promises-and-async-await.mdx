@@ -163,7 +163,7 @@ async function main() {
     const u1 = await fetchUser(1);
     console.log("ok:", u1);
 
-    const u2 = await fetchUser(-1);   // rejects -> throws
+    const u2 = await fetchUser(-1); // rejects -> throws
     console.log("never printed:", u2);
   } catch (err) {
     console.error("caught:", err.message);
@@ -242,7 +242,9 @@ A quick tour of the other combinators:
 <CodeBlock
   adapter="javascript"
   starterCode={`const p = (v, ms, fail = false) =>
-  new Promise((res, rej) => setTimeout(() => (fail ? rej(new Error(v)) : res(v)), ms));
+  new Promise((res, rej) =>
+    setTimeout(() => (fail ? rej(new Error(v)) : res(v)), ms),
+  );
 
 (async () => {
   // all: rejects if ANY rejects
@@ -285,13 +287,13 @@ A short list of "gotchas" that catch beginners.
 }
 
 async function broken() {
-  const v = fetchValue();          // NO await
-  console.log(typeof v, v);        // "object" Promise { 42 }
+  const v = fetchValue(); // NO await
+  console.log(typeof v, v); // "object" Promise { 42 }
 }
 
 async function fixed() {
   const v = await fetchValue();
-  console.log(typeof v, v);        // "number" 42
+  console.log(typeof v, v); // "number" 42
 }
 
 broken().then(fixed);
@@ -308,22 +310,24 @@ your code doesn't wait.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+  starterCode={`function wait(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
 
 async function broken() {
-  ["a","b","c"].forEach(async (x) => {
+  ["a", "b", "c"].forEach(async (x) => {
     await wait(100);
     console.log("forEach:", x);
   });
-  console.log("forEach: finished?");   // logs BEFORE the loops
+  console.log("forEach: finished?"); // logs BEFORE the loops
 }
 
 async function fixed() {
-  for (const x of ["a","b","c"]) {
+  for (const x of ["a", "b", "c"]) {
     await wait(100);
     console.log("for-of:", x);
   }
-  console.log("for-of: finished.");    // logs AFTER the loops
+  console.log("for-of: finished."); // logs AFTER the loops
 }
 
 (async () => {

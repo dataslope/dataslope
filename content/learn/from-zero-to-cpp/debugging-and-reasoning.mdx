@@ -43,16 +43,17 @@ when you need to *trace what the program is actually doing*.
   starterCode={`#include <iostream>
 
 int factorial(int n) {
-    std::cerr << "[factorial called with n=" << n << "]\\n";
-    if (n <= 1) return 1;
-    int r = n * factorial(n - 1);
-    std::cerr << "[factorial n=" << n << " returning " << r << "]\\n";
-    return r;
+  std::cerr << "[factorial called with n=" << n << "]\\n";
+  if (n <= 1)
+    return 1;
+  int r = n * factorial(n - 1);
+  std::cerr << "[factorial n=" << n << " returning " << r << "]\\n";
+  return r;
 }
 
 int main() {
-    std::cout << factorial(5) << "\\n";
-    return 0;
+  std::cout << factorial(5) << "\\n";
+  return 0;
 }
 `}
 />

@@ -40,7 +40,7 @@ function totalSalesForCategory(items, category) {
 const items = [
   { category: "book", price: 12 },
   { category: "book", price: 8 },
-  { category: "pen",  price: 2 },
+  { category: "pen", price: 2 },
 ];
 
 console.log(totalSalesForCategory(items, "book"));
@@ -311,7 +311,11 @@ function isAdult(age) {
 }
 
 console.log(isAdult(parseAge("42")));
-try { isAdult(parseAge("oops")); } catch (e) { console.log(e.message); }
+try {
+  isAdult(parseAge("oops"));
+} catch (e) {
+  console.log(e.message);
+}
 `}
 />
 

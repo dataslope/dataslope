@@ -66,24 +66,42 @@ SELECT
   CASE WHEN i % 5 = 0 THEN 'refunded' ELSE 'paid' END AS status,
   (i * 19) % 200 + 40                      AS amount
 FROM range(0, 60) t(i);`}
-  starterCode={`WITH monthly AS (
-  SELECT
-    date_trunc('month', order_date)              AS month,
-    SUM(amount) FILTER (WHERE status = 'paid')   AS revenue
-  FROM orders
-  GROUP BY month
-)
+  starterCode={`WITH
+  monthly AS (
+    SELECT
+      date_trunc('month', order_date) AS month,
+      SUM(amount) FILTER(
+        WHERE
+          status = 'paid'
+      ) AS revenue
+    FROM
+      orders
+    GROUP BY
+      month
+  )
 SELECT
   month,
   revenue,
-  ROUND(100.0 * revenue / SUM(revenue) OVER (), 1)        AS pct_of_total,
+  ROUND(100.0 * revenue / SUM(revenue) OVER (), 1) AS pct_of_total,
   ROUND(
-    100.0 * (revenue - LAG(revenue) OVER (ORDER BY month))
-          / NULLIF(LAG(revenue) OVER (ORDER BY month), 0),
+    100.0 * (
+      revenue - LAG (revenue) OVER (
+        ORDER BY
+          month
+      )
+    ) / NULLIF(
+      LAG (revenue) OVER (
+        ORDER BY
+          month
+      ),
+      0
+    ),
     1
-  )                                                        AS mom_growth_pct
-FROM monthly
-ORDER BY month;`}
+  ) AS mom_growth_pct
+FROM
+  monthly
+ORDER BY
+  month;`}
 />
 
 If you can read that and explain each column — the filtered sum, the
@@ -107,21 +125,45 @@ SELECT
 FROM range(1, 61) t(i);`}
   starterCode={`-- Hint: total revenue per (category, product), then keep the
 -- top product within each category.
-SELECT category, product, SUM(amount) AS revenue
-FROM sales
-GROUP BY category, product
--- your ranking/filtering here
-ORDER BY revenue DESC;
-`}
-  solutionSql={`WITH totals AS (
-  SELECT category, product, SUM(amount) AS revenue
-  FROM sales
-  GROUP BY category, product
-)
-SELECT category, product, revenue
-FROM totals
-QUALIFY ROW_NUMBER() OVER (PARTITION BY category ORDER BY revenue DESC) = 1
-ORDER BY revenue DESC;`}
+SELECT
+  category,
+  product,
+  SUM(amount) AS revenue
+FROM
+  sales
+GROUP BY
+  category,
+  product
+  -- your ranking/filtering here
+ORDER BY
+  revenue DESC;`}
+  solutionSql={`WITH
+  totals AS (
+    SELECT
+      category,
+      product,
+      SUM(amount) AS revenue
+    FROM
+      sales
+    GROUP BY
+      category,
+      product
+  )
+SELECT
+  category,
+  product,
+  revenue
+FROM
+  totals
+QUALIFY
+  ROW_NUMBER() OVER (
+    PARTITION BY
+      category
+    ORDER BY
+      revenue DESC
+  ) = 1
+ORDER BY
+  revenue DESC;`}
   tests={[
     {
       id: "row_count",

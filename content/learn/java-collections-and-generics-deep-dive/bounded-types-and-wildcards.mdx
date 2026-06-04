@@ -52,12 +52,13 @@ when `X` and `Y` are.
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<Integer> ints = new ArrayList<>();
-        // List<Number> nums = ints;     // compile error — would let us add a Double
+  public static void main(String[] args) {
+    List<Integer> ints = new ArrayList<>();
+    // List<Number> nums = ints;     // compile error — would let us add a
+    // Double
 
-        System.out.println(ints);
-    }
+    System.out.println(ints);
+  }
 }
 `}
 />
@@ -79,21 +80,24 @@ can read from it as `Object`, and you cannot write into it (except
 import java.util.List;
 
 public class Main {
-    // Works for ANY list — prints elements.
-    static void printAll(List<?> xs) {
-        for (Object o : xs) System.out.println(o);
-        // xs.add("hi");   // compile error — we don't know the element type
-    }
+  // Works for ANY list — prints elements.
+  static void printAll(List<?> xs) {
+    for (Object o : xs)
+      System.out.println(o);
+    // xs.add("hi");   // compile error — we don't know the element type
+  }
 
-    public static void main(String[] args) {
-        List<Integer> a = new ArrayList<>();
-        a.add(1); a.add(2);
-        List<String>  b = new ArrayList<>();
-        b.add("alpha"); b.add("beta");
+  public static void main(String[] args) {
+    List<Integer> a = new ArrayList<>();
+    a.add(1);
+    a.add(2);
+    List<String> b = new ArrayList<>();
+    b.add("alpha");
+    b.add("beta");
 
-        printAll(a);
-        printAll(b);
-    }
+    printAll(a);
+    printAll(b);
+  }
 }
 `}
 />
@@ -112,24 +116,28 @@ strict about writes — but reads are guaranteed to be a `Number`:
 import java.util.List;
 
 public class Main {
-    // Can SUM any list whose elements are Number or a subtype.
-    static double sum(List<? extends Number> xs) {
-        double total = 0;
-        for (Number n : xs) total += n.doubleValue();   // read as Number
-        // xs.add(1);    // compile error — could be List<Double>, can't add Integer
-        return total;
-    }
+  // Can SUM any list whose elements are Number or a subtype.
+  static double sum(List<? extends Number> xs) {
+    double total = 0;
+    for (Number n : xs)
+      total += n.doubleValue(); // read as Number
+    // xs.add(1);    // compile error — could be List<Double>, can't add Integer
+    return total;
+  }
 
-    public static void main(String[] args) {
-        List<Integer> ints = new ArrayList<>();
-        ints.add(1); ints.add(2); ints.add(3);
+  public static void main(String[] args) {
+    List<Integer> ints = new ArrayList<>();
+    ints.add(1);
+    ints.add(2);
+    ints.add(3);
 
-        List<Double>  dbls = new ArrayList<>();
-        dbls.add(1.5); dbls.add(2.5);
+    List<Double> dbls = new ArrayList<>();
+    dbls.add(1.5);
+    dbls.add(2.5);
 
-        System.out.println("sum ints = " + sum(ints));
-        System.out.println("sum dbls = " + sum(dbls));
-    }
+    System.out.println("sum ints = " + sum(ints));
+    System.out.println("sum dbls = " + sum(dbls));
+  }
 }
 `}
 />
@@ -151,24 +159,24 @@ collection — it just reads elements.
 import java.util.List;
 
 public class Main {
-    // Can FILL any list that can hold Integer (or supertype).
-    static void fillIntegers(List<? super Integer> sink) {
-        sink.add(1);
-        sink.add(2);
-        sink.add(3);
-        // Integer i = sink.get(0);   // compile error — only know it's Object
-    }
+  // Can FILL any list that can hold Integer (or supertype).
+  static void fillIntegers(List<? super Integer> sink) {
+    sink.add(1);
+    sink.add(2);
+    sink.add(3);
+    // Integer i = sink.get(0);   // compile error — only know it's Object
+  }
 
-    public static void main(String[] args) {
-        List<Number> nums    = new ArrayList<>();
-        List<Object> objects = new ArrayList<>();
+  public static void main(String[] args) {
+    List<Number> nums = new ArrayList<>();
+    List<Object> objects = new ArrayList<>();
 
-        fillIntegers(nums);     // Number IS a supertype of Integer  ✓
-        fillIntegers(objects);  // Object IS a supertype of Integer  ✓
+    fillIntegers(nums);    // Number IS a supertype of Integer  ✓
+    fillIntegers(objects); // Object IS a supertype of Integer  ✓
 
-        System.out.println(nums);
-        System.out.println(objects);
-    }
+    System.out.println(nums);
+    System.out.println(objects);
+  }
 }
 `}
 />
@@ -239,13 +247,15 @@ import java.util.Collections;
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<Integer> ints = new ArrayList<>();
-        ints.add(3); ints.add(9); ints.add(1);
+  public static void main(String[] args) {
+    List<Integer> ints = new ArrayList<>();
+    ints.add(3);
+    ints.add(9);
+    ints.add(1);
 
-        // Collections.max accepts the wider signature, so this just works.
-        System.out.println("max = " + Collections.max(ints));
-    }
+    // Collections.max accepts the wider signature, so this just works.
+    System.out.println("max = " + Collections.max(ints));
+  }
 }
 `}
 />

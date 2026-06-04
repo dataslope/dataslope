@@ -68,28 +68,36 @@ on framing.
   starterCode={`import pandas as pd
 import plotly.express as px
 
-df = pd.DataFrame({
-    "year": list(range(2018, 2025)) * 2,
-    "channel": ["Desktop"]*7 + ["Mobile"]*7,
-    "sales": [100, 95, 92, 88, 80, 70, 55,
-              30, 45, 60, 75, 95, 110, 130],
-})
+df = pd.DataFrame(
+    {
+        "year": list(range(2018, 2025)) * 2,
+        "channel": ["Desktop"] * 7 + ["Mobile"] * 7,
+        "sales": [100, 95, 92, 88, 80, 70, 55, 30, 45, 60, 75, 95, 110, 130],
+    }
+)
 
 # Story 1: "Mobile is growing fast"
 fig1 = px.line(
-    df, x="year", y="sales", color="channel",
+    df,
+    x="year",
+    y="sales",
+    color="channel",
     markers=True,
     template="simple_white",
     title="Mobile sales tripled while desktop sales fell by half",
     labels={"sales": "Sales (units)", "year": "Year"},
 )
-fig1.add_annotation(x=2024, y=130, text="Mobile<br>+330% since 2018", showarrow=True, ax=-60, ay=-30)
+fig1.add_annotation(
+    x=2024, y=130, text="Mobile<br>+330% since 2018", showarrow=True, ax=-60, ay=-30
+)
 fig1.show()
 
 # Story 2: "Total sales are flat" — same data, summed
 total = df.groupby("year", as_index=False)["sales"].sum()
 fig2 = px.line(
-    total, x="year", y="sales",
+    total,
+    x="year",
+    y="sales",
     markers=True,
     template="simple_white",
     title="Total sales held roughly steady over six years",

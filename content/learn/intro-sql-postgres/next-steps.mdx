@@ -78,12 +78,19 @@ INSERT INTO orders (id, customer_id, amount) VALUES
   (101,1,42),(102,1,18),(103,2,99),(104,2,15),(105,2,30);`}
   starterCode={`-- A join, a group, an aggregate, a HAVING filter, and a sort —
 -- every major idea from the course in one readable query.
-SELECT c.name, COUNT(*) AS order_count, SUM(o.amount) AS total_spent
-FROM customers c
-JOIN orders o ON o.customer_id = c.id
-GROUP BY c.name
-HAVING SUM(o.amount) > 50
-ORDER BY total_spent DESC;`}
+SELECT
+  c.name,
+  COUNT(*) AS order_count,
+  SUM(o.amount) AS total_spent
+FROM
+  customers c
+  JOIN orders o ON o.customer_id = c.id
+GROUP BY
+  c.name
+HAVING
+  SUM(o.amount) > 50
+ORDER BY
+  total_spent DESC;`}
 />
 
 If you can read that query and predict its result before running it,

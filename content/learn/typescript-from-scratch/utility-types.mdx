@@ -139,7 +139,11 @@ Constructs a type by omitting a set of properties `K` from `T`.
 
 type PublicUser = Omit<User, "password">;
 
-const publicUser: PublicUser = { id: 1, name: "Alice", email: "alice@example.com" };
+const publicUser: PublicUser = {
+  id: 1,
+  name: "Alice",
+  email: "alice@example.com",
+};
 console.log(publicUser);
 `}
 />
@@ -332,7 +336,10 @@ Extracts the parameter types of a constructor function type.
 <CodeBlock
   adapter="typescript"
   starterCode={`class User {
-  constructor(public id: number, public name: string) {}
+  constructor(
+    public id: number,
+    public name: string,
+  ) {}
 }
 
 type UserCtorParams = ConstructorParameters<typeof User>;
@@ -359,7 +366,10 @@ Extracts the instance type of a constructor function type.
 <CodeBlock
   adapter="typescript"
   starterCode={`class User {
-  constructor(public id: number, public name: string) {}
+  constructor(
+    public id: number,
+    public name: string,
+  ) {}
 }
 
 type UserInstance = InstanceType<typeof User>;

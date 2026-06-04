@@ -26,8 +26,8 @@ ts = pd.to_datetime(raw)
 
 print(ts)
 print()
-print("type of the whole thing:", type(ts).__name__)   # DatetimeIndex
-print("type of one element:    ", type(ts[0]).__name__) # Timestamp
+print("type of the whole thing:", type(ts).__name__)  # DatetimeIndex
+print("type of one element:    ", type(ts[0]).__name__)  # Timestamp
 print()
 print("It understands the calendar:")
 print("  day names:", list(ts.day_name()))
@@ -81,10 +81,12 @@ The pivotal move: take a parsed date column and make it the index.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "date":  ["2014-01-05", "2014-01-06", "2014-01-07", "2014-01-08"],
-    "sales": [120, 135, 98, 110],
-})
+df = pd.DataFrame(
+    {
+        "date": ["2014-01-05", "2014-01-06", "2014-01-07", "2014-01-08"],
+        "sales": [120, 135, 98, 110],
+    }
+)
 
 # Step 1: parse the text into timestamps.
 df["date"] = pd.to_datetime(df["date"])
@@ -93,7 +95,7 @@ df = df.set_index("date")
 
 print(df)
 print()
-print("index type:", type(df.index).__name__)   # DatetimeIndex
+print("index type:", type(df.index).__name__)  # DatetimeIndex
 print("Now the timeline tools are available.")
 `}
 />
@@ -253,8 +255,8 @@ print("First five months:", air.index.month[:5].tolist())
 # As a DataFrame with derived calendar columns via .dt:
 df = air.reset_index()
 df.columns = ["date", "passengers"]
-df["year"]    = df["date"].dt.year
-df["month"]   = df["date"].dt.month_name().str[:3]
+df["year"] = df["date"].dt.year
+df["month"] = df["date"].dt.month_name().str[:3]
 df["quarter"] = df["date"].dt.quarter
 
 # Which month, on average, is busiest? (Seasonality, previewed.)
@@ -298,7 +300,7 @@ keeps you from nonsense like "the sales at exactly midnight on the 1st."
   starterCode={`import pandas as pd
 
 instant = pd.Timestamp("2014-03-15 14:32:05")
-month   = pd.Period("2014-03", freq="M")
+month = pd.Period("2014-03", freq="M")
 
 print("Timestamp:", instant, "-> just the minute:", instant.minute)
 print("Period:   ", month, "-> spans", month.start_time, "to", month.end_time)
@@ -308,8 +310,9 @@ print()
 print("This period:", month, " next period:", month + 1)
 
 # Is our instant inside that month?
-print("Is the instant within the period?",
-      month.start_time <= instant <= month.end_time)
+print(
+    "Is the instant within the period?", month.start_time <= instant <= month.end_time
+)
 `}
 />
 
@@ -347,10 +350,12 @@ flowchart LR
   adapter="python"
   starterCode={`import pandas as pd
 
-a = pd.Series([1, 2, 3],
-              index=pd.to_datetime(["2014-01-01", "2014-01-02", "2014-01-03"]))
-b = pd.Series([10, 20, 30],
-              index=pd.to_datetime(["2014-01-02", "2014-01-03", "2014-01-04"]))
+a = pd.Series(
+    [1, 2, 3], index=pd.to_datetime(["2014-01-01", "2014-01-02", "2014-01-03"])
+)
+b = pd.Series(
+    [10, 20, 30], index=pd.to_datetime(["2014-01-02", "2014-01-03", "2014-01-04"])
+)
 
 print("a + b aligns by DATE, not by position:")
 print(a + b)

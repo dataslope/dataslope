@@ -117,8 +117,8 @@ from sklearn.linear_model import LogisticRegression
 
 data = load_iris()
 # Use just two features so we can see it in 2-D.
-X = data.data[:, 2:4]      # petal length, petal width
-y = data.target            # species: 0, 1, 2
+X = data.data[:, 2:4]  # petal length, petal width
+y = data.target  # species: 0, 1, 2
 
 model = LogisticRegression(max_iter=1000)
 model.fit(X, y)
@@ -194,7 +194,7 @@ X, _ = make_blobs(n_samples=150, centers=3, cluster_std=1.0, random_state=0)
 # KMeans sees only X -- no answers. It invents the groups.
 model = KMeans(n_clusters=3, n_init=10, random_state=0)
 model.fit(X)
-labels = model.labels_          # group id assigned to each point
+labels = model.labels_  # group id assigned to each point
 centers = model.cluster_centers_
 
 print("The algorithm discovered groups. First 10 assignments:", labels[:10])
@@ -280,18 +280,16 @@ from sklearn.datasets import load_diabetes
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.cluster import KMeans
 
-X, y = load_diabetes(return_X_y=True)   # y: continuous disease-progression score
+X, y = load_diabetes(return_X_y=True)  # y: continuous disease-progression score
 
 # 1) REGRESSION: predict the continuous score directly.
 reg = LinearRegression().fit(X, y)
-print("Regression  -> predicts a number:",
-      round(float(reg.predict(X[:1])[0]), 1))
+print("Regression  -> predicts a number:", round(float(reg.predict(X[:1])[0]), 1))
 
 # 2) CLASSIFICATION: bucket the SAME target into high vs low, then predict the class.
-y_class = (y > np.median(y)).astype(int)    # 1 = above-median progression, else 0
+y_class = (y > np.median(y)).astype(int)  # 1 = above-median progression, else 0
 clf = LogisticRegression(max_iter=1000).fit(X, y_class)
-print("Classification -> predicts a category (0/1):",
-      int(clf.predict(X[:1])[0]))
+print("Classification -> predicts a category (0/1):", int(clf.predict(X[:1])[0]))
 
 # 3) CLUSTERING: ignore y entirely and discover groups of similar patients.
 km = KMeans(n_clusters=3, n_init=10, random_state=0).fit(X)
@@ -388,7 +386,7 @@ the strings \`"regression"\`, \`"classification"\`, or \`"clustering"\`:
 The hidden tests check each individual answer.`}
   initCode={``}
   starterCode={`tasks = {
-    "predict_tomorrows_temperature": None,   # "regression" / "classification" / "clustering"
+    "predict_tomorrows_temperature": None,  # "regression" / "classification" / "clustering"
     "is_email_spam": None,
     "segment_shoppers": None,
     "predict_house_price": None,

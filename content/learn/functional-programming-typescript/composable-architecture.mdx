@@ -89,7 +89,10 @@ type Invoice = {
 type Summary = {
   readonly totalDue: number;
   readonly overdueCount: number;
-  readonly invoices: ReadonlyArray<{ id: string; status: "paid" | "due" | "overdue" }>;
+  readonly invoices: ReadonlyArray<{
+    id: string;
+    status: "paid" | "due" | "overdue";
+  }>;
 };
 
 const isOverdue = (today: string, inv: Invoice): boolean =>
@@ -116,12 +119,14 @@ function summarize(today: string, invoices: ReadonlyArray<Invoice>): Summary {
 //   In a real app, the shell is the only part that knows about
 //   the HTTP framework, the database, the clock, etc.
 
-function todayUTC(): string { return new Date().toISOString().slice(0, 10); }
+function todayUTC(): string {
+  return new Date().toISOString().slice(0, 10);
+}
 
 function fakeFetchInvoices(): ReadonlyArray<Invoice> {
   return [
-    { id: "1", amount: 50,  paid: true,  dueDate: "2024-01-01" },
-    { id: "2", amount: 75,  paid: false, dueDate: "2020-01-01" },
+    { id: "1", amount: 50, paid: true, dueDate: "2024-01-01" },
+    { id: "2", amount: 75, paid: false, dueDate: "2020-01-01" },
     { id: "3", amount: 200, paid: false, dueDate: "2099-01-01" },
   ];
 }
@@ -129,7 +134,7 @@ function fakeFetchInvoices(): ReadonlyArray<Invoice> {
 function handler(): void {
   // Shell: gather inputs
   const invoices = fakeFetchInvoices();
-  const today    = "2025-06-01";  // deterministic for this demo
+  const today = "2025-06-01"; // deterministic for this demo
 
   // Core: pure decision
   const summary = summarize(today, invoices);

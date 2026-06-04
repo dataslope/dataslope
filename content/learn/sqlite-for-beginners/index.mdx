@@ -129,10 +129,16 @@ INSERT INTO pets (name, species, age) VALUES
   ('Pixel', 'dog', 5),
   ('Sunny', 'cat', 2),
   ('Rex',   'dog', 8);`}
-  starterCode={`SELECT name, species, age
-FROM pets
-WHERE species = 'cat'
-ORDER BY age DESC;`}
+  starterCode={`SELECT
+  name,
+  species,
+  age
+FROM
+  pets
+WHERE
+  species = 'cat'
+ORDER BY
+  age DESC;`}
 />
 
 That query says, in almost plain English: *"Show me the name,

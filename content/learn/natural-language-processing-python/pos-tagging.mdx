@@ -248,6 +248,7 @@ from nltk.stem import WordNetLemmatizer
 from nltk.corpus import wordnet`}
   starterCode={`lemmatizer = WordNetLemmatizer()
 
+
 def to_wordnet_pos(treebank_tag):
     # Map a Penn Treebank tag to the coarse POS WordNet expects.
     if treebank_tag.startswith("J"):
@@ -256,7 +257,8 @@ def to_wordnet_pos(treebank_tag):
         return wordnet.VERB
     if treebank_tag.startswith("R"):
         return wordnet.ADV
-    return wordnet.NOUN   # default, including N* tags
+    return wordnet.NOUN  # default, including N* tags
+
 
 sentence = "The runners were running and they had eaten well."
 tagged = pos_tag(word_tokenize(sentence))
@@ -354,12 +356,14 @@ from nltk.tokenize import word_tokenize`}
     # tokenize -> pos_tag -> keep words whose tag starts with "NN"
     return []
 
+
 print(get_nouns("The hungry cat chased a small mouse."))
 print(get_nouns("Alice traveled to Paris."))
 `}
   solutionCode={`def get_nouns(text):
     tagged = pos_tag(word_tokenize(text))
     return [w for w, t in tagged if t.startswith("NN")]
+
 
 print(get_nouns("The hungry cat chased a small mouse."))
 print(get_nouns("Alice traveled to Paris."))

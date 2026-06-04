@@ -103,8 +103,9 @@ combines both groups' spread.
 rng = np.random.default_rng(7)
 
 # Two groups: a control and a treatment with a genuine, moderate effect.
-control   = rng.normal(loc=100, scale=15, size=200)
+control = rng.normal(loc=100, scale=15, size=200)
 treatment = rng.normal(loc=107, scale=15, size=200)
+
 
 def cohens_d(a, b):
     na, nb = len(a), len(b)
@@ -113,6 +114,7 @@ def cohens_d(a, b):
     var_b = b.var(ddof=1)
     s_pooled = np.sqrt(((na - 1) * var_a + (nb - 1) * var_b) / (na + nb - 2))
     return (a.mean() - b.mean()) / s_pooled
+
 
 d = cohens_d(treatment, control)
 
@@ -225,10 +227,12 @@ from scipy import stats
 
 rng = np.random.default_rng(123)
 
+
 def cohens_d(a, b):
     na, nb = len(a), len(b)
-    sp = np.sqrt(((na-1)*a.var(ddof=1) + (nb-1)*b.var(ddof=1)) / (na+nb-2))
+    sp = np.sqrt(((na - 1) * a.var(ddof=1) + (nb - 1) * b.var(ddof=1)) / (na + nb - 2))
     return (b.mean() - a.mean()) / sp
+
 
 # True effect is fixed: means 100 vs 103, sd = 10  ->  true d = 0.30.
 print(f"{'n per group':>12} | {'p-value':>10} | {'estimated d':>11}")
@@ -284,7 +288,7 @@ print(f"Pearson r        : {r:.3f}   (the effect size)")
 print(f"r-squared        : {r**2:.3f}   (variance explained)")
 print(f"p-value          : {p:.2e}")
 print()
-print(f"The relationship explains about {100*r**2:.0f}% of the variation in scores.")
+print(f"The relationship explains about {100 * r**2:.0f}% of the variation in scores.")
 print("r itself tells you the STRENGTH; the p-value only tells you it's not zero.")
 `}
 />
@@ -313,22 +317,24 @@ different stories.
   starterCode={`import numpy as np
 
 # A/B test on a checkout button. Counts of conversions out of visitors.
-conv_control,   n_control   = 90,  3000   # control arm
-conv_treatment, n_treatment = 126, 3000   # new button
+conv_control, n_control = 90, 3000  # control arm
+conv_treatment, n_treatment = 126, 3000  # new button
 
-p_control   = conv_control / n_control
+p_control = conv_control / n_control
 p_treatment = conv_treatment / n_treatment
 
-risk_difference = p_treatment - p_control          # absolute
-relative_risk   = p_treatment / p_control          # ratio
+risk_difference = p_treatment - p_control  # absolute
+relative_risk = p_treatment / p_control  # ratio
 relative_uplift = (p_treatment - p_control) / p_control
 
-print(f"Control conversion   : {p_control:.4f}  ({p_control*100:.2f}%)")
-print(f"Treatment conversion : {p_treatment:.4f}  ({p_treatment*100:.2f}%)")
+print(f"Control conversion   : {p_control:.4f}  ({p_control * 100:.2f}%)")
+print(f"Treatment conversion : {p_treatment:.4f}  ({p_treatment * 100:.2f}%)")
 print()
-print(f"Risk difference      : {risk_difference:+.4f}  ({risk_difference*100:+.2f} pp)")
+print(
+    f"Risk difference      : {risk_difference:+.4f}  ({risk_difference * 100:+.2f} pp)"
+)
 print(f"Relative risk (ratio): {relative_risk:.3f}x")
-print(f"Relative uplift      : {relative_uplift*100:+.1f}%")
+print(f"Relative uplift      : {relative_uplift * 100:+.1f}%")
 `}
 />
 
@@ -363,13 +369,15 @@ from scipy import stats
 
 rng = np.random.default_rng(11)
 
-control   = rng.normal(100, 15, size=120)
+control = rng.normal(100, 15, size=120)
 treatment = rng.normal(106, 15, size=120)
+
 
 def cohens_d(a, b):
     na, nb = len(a), len(b)
-    sp = np.sqrt(((na-1)*a.var(ddof=1) + (nb-1)*b.var(ddof=1)) / (na+nb-2))
+    sp = np.sqrt(((na - 1) * a.var(ddof=1) + (nb - 1) * b.var(ddof=1)) / (na + nb - 2))
     return (b.mean() - a.mean()) / sp
+
 
 d = cohens_d(control, treatment)
 
@@ -426,7 +434,9 @@ d = None
   solutionCode={`import numpy as np
 
 na, nb = len(before), len(after)
-s_pooled = np.sqrt(((na - 1) * before.var(ddof=1) + (nb - 1) * after.var(ddof=1)) / (na + nb - 2))
+s_pooled = np.sqrt(
+    ((na - 1) * before.var(ddof=1) + (nb - 1) * after.var(ddof=1)) / (na + nb - 2)
+)
 d = float((after.mean() - before.mean()) / s_pooled)
 print(d)
 `}

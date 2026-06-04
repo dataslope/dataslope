@@ -199,7 +199,12 @@ print()
 
 # Department × JobRole — does each role belong to one department?
 print("Departments per JobRole:")
-print(df.groupby("JobRole", observed=True)["Department"].nunique().sort_values(ascending=False).head(10))
+print(
+    df.groupby("JobRole", observed=True)["Department"]
+    .nunique()
+    .sort_values(ascending=False)
+    .head(10)
+)
 `}
 />
 

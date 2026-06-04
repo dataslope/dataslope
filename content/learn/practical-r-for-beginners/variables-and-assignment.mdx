@@ -124,8 +124,8 @@ see the value.
 
 <CodeBlock
   adapter="r"
-  starterCode={`a <- 100        # no output — assignment is silent
-print(a)        # shows 100
+  starterCode={`a <- 100 # no output — assignment is silent
+print(a) # shows 100
 
 # Trick: parenthesize the assignment to both store and print
 (b <- 200)
@@ -146,7 +146,7 @@ you — it just replaces the old value.
   starterCode={`count <- 0
 print(count)
 
-count <- count + 1   # this is fine: read the right side, then store on the left
+count <- count + 1 # this is fine: read the right side, then store on the left
 print(count)
 
 count <- count * 10
@@ -201,11 +201,11 @@ an *independent* copy. Changing one does not change the other.
 <CodeBlock
   adapter="r"
   starterCode={`x <- c(1, 2, 3)
-y <- x         # y now refers to a copy of x's data
-y[1] <- 999    # change y's first element
+y <- x # y now refers to a copy of x's data
+y[1] <- 999 # change y's first element
 
-print(x)       # x is unchanged
-print(y)       # y has 999 in first position
+print(x) # x is unchanged
+print(y) # y has 999 in first position
 `}
 />
 

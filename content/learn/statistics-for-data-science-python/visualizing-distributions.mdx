@@ -35,9 +35,8 @@ rng = np.random.default_rng(0)
 # Three samples engineered to share (about) the same mean and std,
 # but with totally different shapes.
 n = 3000
-bell    = rng.normal(50, 15, size=n)
-bimodal = np.concatenate([rng.normal(30, 6, n // 2),
-                          rng.normal(70, 6, n // 2)])
+bell = rng.normal(50, 15, size=n)
+bimodal = np.concatenate([rng.normal(30, 6, n // 2), rng.normal(70, 6, n // 2)])
 uniform = rng.uniform(50 - 15 * np.sqrt(3), 50 + 15 * np.sqrt(3), size=n)
 
 for name, x in [("bell", bell), ("bimodal", bimodal), ("uniform", uniform)]:
@@ -82,8 +81,9 @@ tips = px.data.tips()
 
 # The SAME column, three bin counts — three different impressions.
 for nbins in [5, 20, 80]:
-    fig = px.histogram(tips, x="total_bill", nbins=nbins,
-                       title=f"total_bill with nbins={nbins}")
+    fig = px.histogram(
+        tips, x="total_bill", nbins=nbins, title=f"total_bill with nbins={nbins}"
+    )
     fig.show()
 
 print("Few bins: smooth but hides detail. Many bins: spiky and noisy.")
@@ -131,9 +131,14 @@ two-humped distribution looks just like a box plot of a one-humped one.
 tips = px.data.tips()
 
 # Compare the bill distribution across days, with outliers shown.
-fig = px.box(tips, x="day", y="total_bill", color="day",
-             points="outliers",
-             title="total_bill by day (box = IQR, line = median, dots = outliers)")
+fig = px.box(
+    tips,
+    x="day",
+    y="total_bill",
+    color="day",
+    points="outliers",
+    title="total_bill by day (box = IQR, line = median, dots = outliers)",
+)
 fig.update_layout(showlegend=False)
 fig.show()
 
@@ -164,10 +169,15 @@ and more reliable than they are.
 
 tips = px.data.tips()
 
-fig = px.violin(tips, x="day", y="total_bill", color="day",
-                box=True,        # draw the box plot inside the violin
-                points=False,
-                title="total_bill by day (violin shows the full shape)")
+fig = px.violin(
+    tips,
+    x="day",
+    y="total_bill",
+    color="day",
+    box=True,  # draw the box plot inside the violin
+    points=False,
+    title="total_bill by day (violin shows the full shape)",
+)
 fig.update_layout(showlegend=False)
 fig.show()
 
@@ -213,8 +223,12 @@ features without worrying you've smoothed them away.
 
 tips = px.data.tips()
 
-fig = px.ecdf(tips, x="total_bill", color="sex",
-              title="ECDF of total_bill: fraction of bills at or below each value")
+fig = px.ecdf(
+    tips,
+    x="total_bill",
+    color="sex",
+    title="ECDF of total_bill: fraction of bills at or below each value",
+)
 fig.show()
 
 print("Read it like this: find a dollar amount on the x-axis, go up to")

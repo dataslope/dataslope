@@ -117,11 +117,10 @@ When you have many possible values for one variable, a chain of
 
 string day = "Tue";
 
-string kind = day switch
-{
-    "Sat" or "Sun"      => "weekend",
+string kind = day switch {
+    "Sat" or "Sun" => "weekend",
     "Mon" or "Tue" or "Wed" or "Thu" or "Fri" => "weekday",
-    _                   => "unknown",
+    _ => "unknown",
 };
 
 Console.WriteLine($"{day} is a {kind}");
@@ -254,8 +253,10 @@ Two useful escape hatches:
 
 for (int i = 1; i <= 10; i++)
 {
-    if (i == 7) break;          // stop the loop completely
-    if (i % 2 == 0) continue;   // skip even numbers
+    if (i == 7)
+        break; // stop the loop completely
+    if (i % 2 == 0)
+        continue; // skip even numbers
     Console.WriteLine(i);
 }
 `}
@@ -275,10 +276,14 @@ multiples of both print "FizzBuzz".
 
 for (int i = 1; i <= 15; i++)
 {
-    if (i % 15 == 0)      Console.WriteLine("FizzBuzz");
-    else if (i % 3 == 0)  Console.WriteLine("Fizz");
-    else if (i % 5 == 0)  Console.WriteLine("Buzz");
-    else                  Console.WriteLine(i);
+    if (i % 15 == 0)
+        Console.WriteLine("FizzBuzz");
+    else if (i % 3 == 0)
+        Console.WriteLine("Fizz");
+    else if (i % 5 == 0)
+        Console.WriteLine("Buzz");
+    else
+        Console.WriteLine(i);
 }
 `}
 />
@@ -330,7 +335,8 @@ int count = 0;
 foreach (char c in text)
 {
     char lc = char.ToLower(c);
-    if (lc == 'a' || lc == 'e' || lc == 'i' || lc == 'o' || lc == 'u') count++;
+    if (lc == 'a' || lc == 'e' || lc == 'i' || lc == 'o' || lc == 'u')
+        count++;
 }
 Console.WriteLine($"vowels = {count}");
 `}

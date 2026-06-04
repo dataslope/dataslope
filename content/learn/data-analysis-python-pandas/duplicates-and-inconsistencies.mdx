@@ -24,11 +24,13 @@ uniquely identify a row?*
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "customer_id": [1, 2, 3, 2, 4, 1],
-    "name":        ["Aiko","Bilal","Chen","Bilal","Diego","Aiko"],
-    "spend":       [100, 200, 300, 200, 50, 100],
-})
+df = pd.DataFrame(
+    {
+        "customer_id": [1, 2, 3, 2, 4, 1],
+        "name": ["Aiko", "Bilal", "Chen", "Bilal", "Diego", "Aiko"],
+        "spend": [100, 200, 300, 200, 50, 100],
+    }
+)
 
 # True wherever a row is a duplicate of an earlier row
 print("Is duplicate?")
@@ -94,9 +96,11 @@ category can appear under many syntactic forms.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "country": ["USA", "U.S.A.", "United States", "usa", " USA ", "U.S."],
-})
+df = pd.DataFrame(
+    {
+        "country": ["USA", "U.S.A.", "United States", "usa", " USA ", "U.S."],
+    }
+)
 
 # Naive count — every variant is its own group
 print("Before cleanup:")
@@ -110,16 +114,18 @@ A canonical-mapping cleanup:
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "country": ["USA", "U.S.A.", "United States", "usa", " USA ", "U.S."],
-})
+df = pd.DataFrame(
+    {
+        "country": ["USA", "U.S.A.", "United States", "usa", " USA ", "U.S."],
+    }
+)
 
 # 1. Strip whitespace, 2. uppercase, 3. replace known variants
 df["country_clean"] = (
     df["country"]
-      .str.strip()
-      .str.upper()
-      .replace({"U.S.A.": "USA", "U.S.": "USA", "UNITED STATES": "USA"})
+    .str.strip()
+    .str.upper()
+    .replace({"U.S.A.": "USA", "U.S.": "USA", "UNITED STATES": "USA"})
 )
 print(df)
 print()
@@ -165,10 +171,13 @@ keep a column for the original currency if useful.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "price":    [10.00, 1500,    9.50, 1200],
-    "currency": ["USD", "cents", "EUR", "cents"],
-})
+df = pd.DataFrame(
+    {
+        "price": [10.00, 1500, 9.50, 1200],
+        "currency": ["USD", "cents", "EUR", "cents"],
+    }
+)
+
 
 def normalize(row):
     if row["currency"] == "cents":
@@ -176,6 +185,7 @@ def normalize(row):
     if row["currency"] == "EUR":
         return row["price"] * 1.08
     return row["price"]
+
 
 df["price_usd"] = df.apply(normalize, axis=1).round(2)
 print(df)

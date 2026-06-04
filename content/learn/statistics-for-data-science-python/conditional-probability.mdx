@@ -116,12 +116,16 @@ print(f"\\nTotal users: {table.values.sum()}")
 # P(churned | paid): zoom into the 'paid' row, take fraction that churned.
 paid_total = table.loc["paid"].sum()
 p_churn_given_paid = table.loc["paid", "churned"] / paid_total
-print(f"\\nP(churn | paid) = {table.loc['paid','churned']}/{paid_total} = {p_churn_given_paid:.3f}")
+print(
+    f"\\nP(churn | paid) = {table.loc['paid', 'churned']}/{paid_total} = {p_churn_given_paid:.3f}"
+)
 
 # P(churned | free): zoom into the 'free' row instead.
 free_total = table.loc["free"].sum()
 p_churn_given_free = table.loc["free", "churned"] / free_total
-print(f"P(churn | free) = {table.loc['free','churned']}/{free_total} = {p_churn_given_free:.3f}")
+print(
+    f"P(churn | free) = {table.loc['free', 'churned']}/{free_total} = {p_churn_given_free:.3f}"
+)
 
 # Compare to the UNCONDITIONAL churn rate (whole table).
 p_churn = table["churned"].sum() / table.values.sum()
@@ -212,18 +216,18 @@ verify both by direct calculation and by simulating a population.
 <CodeBlock
   adapter="python"
   starterCode={`# Bayes' rule by hand: P(disease | positive).
-base_rate   = 0.001   # P(disease)
-sensitivity = 0.99    # P(+ | disease)
-fpr         = 0.01    # P(+ | healthy)  = 1 - specificity
+base_rate = 0.001  # P(disease)
+sensitivity = 0.99  # P(+ | disease)
+fpr = 0.01  # P(+ | healthy)  = 1 - specificity
 
 # P(+) = P(+ | disease)P(disease) + P(+ | healthy)P(healthy)
 p_pos = sensitivity * base_rate + fpr * (1 - base_rate)
 
 # Bayes' rule.
-ppv = (sensitivity * base_rate) / p_pos   # PPV = P(disease | +)
+ppv = (sensitivity * base_rate) / p_pos  # PPV = P(disease | +)
 
 print(f"P(positive) overall        = {p_pos:.4f}")
-print(f"P(disease | positive)= PPV = {ppv:.4f}  (about {ppv*100:.0f}%)")
+print(f"P(disease | positive)= PPV = {ppv:.4f}  (about {ppv * 100:.0f}%)")
 print()
 print("A POSITIVE on a '99% accurate' test means only a ~9% chance of")
 print("disease here, because the disease is rare. The base rate dominates.")
@@ -310,7 +314,7 @@ p_spam = 0.20
 
 # A particular word ("winner") appears in 60% of spam, 2% of real mail.
 p_word_given_spam = 0.60
-p_word_given_ham  = 0.02
+p_word_given_ham = 0.02
 
 # Total probability of seeing the word at all (the two paths combined).
 p_word = p_word_given_spam * p_spam + p_word_given_ham * (1 - p_spam)

@@ -13,11 +13,13 @@ to *hand off* the result. Pandas can write to dozens of formats
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "id":   [1, 2, 3],
-    "name": ["Aiko","Bilal","Chen"],
-    "score": [85.5, 91.2, 77.8],
-})
+df = pd.DataFrame(
+    {
+        "id": [1, 2, 3],
+        "name": ["Aiko", "Bilal", "Chen"],
+        "score": [85.5, 91.2, 77.8],
+    }
+)
 
 df.to_csv("scores.csv", index=False)
 print("Written.")
@@ -46,10 +48,12 @@ get a mystery unnamed column when someone re-reads the file.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "department": ["Eng","Sales","HR"],
-    "headcount":  [120, 80, 25],
-})
+df = pd.DataFrame(
+    {
+        "department": ["Eng", "Sales", "HR"],
+        "headcount": [120, 80, 25],
+    }
+)
 
 df.to_excel("report.xlsx", index=False, sheet_name="Headcount")
 print("Written.")
@@ -62,12 +66,12 @@ Multiple sheets in one file:
   adapter="python"
   starterCode={`import pandas as pd
 
-summary = pd.DataFrame({"metric": ["sales","cost"], "value":[1200, 800]})
-detail  = pd.DataFrame({"order":[1,2,3], "amount":[300,500,400]})
+summary = pd.DataFrame({"metric": ["sales", "cost"], "value": [1200, 800]})
+detail = pd.DataFrame({"order": [1, 2, 3], "amount": [300, 500, 400]})
 
 with pd.ExcelWriter("report.xlsx") as writer:
     summary.to_excel(writer, sheet_name="Summary", index=False)
-    detail.to_excel(writer,  sheet_name="Detail",  index=False)
+    detail.to_excel(writer, sheet_name="Detail", index=False)
 
 print("Multi-sheet workbook written.")
 `}
@@ -82,12 +86,14 @@ and the format is messier under the hood.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "id":     [1, 2, 3],
-    "name":   ["Aiko","Bilal","Chen"],
-    "score":  [85.5, 91.2, 77.8],
-    "date":   pd.to_datetime(["2024-01-01","2024-02-15","2024-03-30"]),
-})
+df = pd.DataFrame(
+    {
+        "id": [1, 2, 3],
+        "name": ["Aiko", "Bilal", "Chen"],
+        "score": [85.5, 91.2, 77.8],
+        "date": pd.to_datetime(["2024-01-01", "2024-02-15", "2024-03-30"]),
+    }
+)
 
 df.to_parquet("scores.parquet")
 print("Written.")
@@ -145,7 +151,7 @@ A small habit with huge dividends:
   starterCode={`import pandas as pd
 from datetime import date
 
-df = pd.DataFrame({"value": [1,2,3]})
+df = pd.DataFrame({"value": [1, 2, 3]})
 
 today = date.today().isoformat()
 fname = f"sales_clean_{today}.csv"
@@ -165,7 +171,7 @@ Before declaring "done", read the file back and confirm:
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({"id":[1,2,3], "value":[10,20,30]})
+df = pd.DataFrame({"id": [1, 2, 3], "value": [10, 20, 30]})
 df.to_csv("/tmp/check.csv", index=False)
 
 back = pd.read_csv("/tmp/check.csv")
@@ -209,8 +215,8 @@ df = pd.DataFrame({
     "Last":  ["Tanaka","Khan","Zhang","Ramirez"],
     "Age":   [29, np.nan, 35, 41],
 })`}
-  starterCode={`clean = None   # TODO
-back = None    # TODO
+  starterCode={`clean = None  # TODO
+back = None  # TODO
 
 print(clean)
 print()
@@ -221,7 +227,7 @@ print(back)
 clean = df.copy()
 clean.columns = clean.columns.str.lower()
 clean["full_name"] = clean["first"] + " " + clean["last"]
-clean = clean.drop(columns=["first","last"])
+clean = clean.drop(columns=["first", "last"])
 clean = clean.dropna(subset=["age"]).reset_index(drop=True)
 
 clean.to_csv("/tmp/clean.csv", index=False)

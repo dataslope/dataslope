@@ -70,7 +70,7 @@ print("ones:\\n", np.ones((2, 3)))
 print("eye  :\\n", np.eye(3))
 print("arange:", np.arange(0, 10, 2))
 print("linspace:", np.linspace(0, 1, 6))
-print("logspace:", np.logspace(0, 3, 4))            # 10**0, 10**1, ..., 10**3
+print("logspace:", np.logspace(0, 3, 4))  # 10**0, 10**1, ..., 10**3
 print("full:\\n", np.full((2, 3), fill_value=np.pi))
 print("from list:", np.array([1, 2, 3]))
 print("empty (uninitialized — fast, but contents are random):")
@@ -131,15 +131,15 @@ A = np.arange(20).reshape(4, 5)
 # 2. Fancy indexing — copy
 rows = np.array([0, 2, 3])
 cols = np.array([1, 4, 0])
-F = A[rows, cols]                  # picks (0,1), (2,4), (3,0)
+F = A[rows, cols]  # picks (0,1), (2,4), (3,0)
 print("Fancy result :", F)
 F[:] = -1
 print("Original unchanged:\\n", A)
 
 # 3. Boolean — copy
-mask = (A % 3 == 0)
+mask = A % 3 == 0
 print("\\nBoolean mask picks multiples of 3:", A[mask])
-A[mask] = 0                         # boolean *assignment* writes in place
+A[mask] = 0  # boolean *assignment* writes in place
 print("\\nAfter zeroing multiples of 3:\\n", A)
 `}
 />
@@ -158,14 +158,12 @@ always copies.
   starterCode={`import numpy as np
 
 A = np.arange(12).reshape(3, 4)
-print("A.reshape(2, 6) shares memory with A?",
-      np.shares_memory(A, A.reshape(2, 6)))
+print("A.reshape(2, 6) shares memory with A?", np.shares_memory(A, A.reshape(2, 6)))
 
 # Reshaping a transposed (non-contiguous) array may force a copy
 T = A.T
 print("T.shape   =", T.shape, " contiguous?", T.flags["C_CONTIGUOUS"])
-print("T.reshape(12) shares memory?",
-      np.shares_memory(T, T.reshape(12)))
+print("T.reshape(12) shares memory?", np.shares_memory(T, T.reshape(12)))
 `}
 />
 
@@ -181,15 +179,15 @@ products use `@` (or `np.matmul` / `np.dot`).
 a = np.array([1, 2, 3])
 b = np.array([4, 5, 6])
 
-print("a + b      =", a + b)          # element-wise
-print("a * b      =", a * b)          # element-wise (not dot!)
-print("a @ b      =", a @ b)          # dot product (scalar)
-print("a[:, None] @ b[None, :] =\\n", a[:, None] @ b[None, :])   # outer
+print("a + b      =", a + b)  # element-wise
+print("a * b      =", a * b)  # element-wise (not dot!)
+print("a @ b      =", a @ b)  # dot product (scalar)
+print("a[:, None] @ b[None, :] =\\n", a[:, None] @ b[None, :])  # outer
 
 A = np.array([[1, 2], [3, 4]])
 B = np.array([[5, 6], [7, 8]])
-print("\\nA @ B =\\n", A @ B)           # matrix product
-print("\\nA * B =\\n", A * B)           # element-wise product (Hadamard)
+print("\\nA @ B =\\n", A @ B)  # matrix product
+print("\\nA * B =\\n", A * B)  # element-wise product (Hadamard)
 `}
 />
 
@@ -219,8 +217,8 @@ C = np.einsum("ik,kj->ij", A, B)
 print("A @ B via einsum:\\n", C)
 
 # Batched matmul:  one matmul per "batch" index
-T = np.random.default_rng(0).standard_normal((4, 3, 5))    # 4 matrices of 3x5
-S = np.random.default_rng(1).standard_normal((4, 5, 2))    # 4 matrices of 5x2
+T = np.random.default_rng(0).standard_normal((4, 3, 5))  # 4 matrices of 3x5
+S = np.random.default_rng(1).standard_normal((4, 5, 2))  # 4 matrices of 5x2
 out = np.einsum("bij,bjk->bik", T, S)
 print("\\nBatched matmul shape:", out.shape)
 
@@ -301,9 +299,11 @@ as a 1-D array of shape \`(d,)\`. Do it **without any explicit
 Python loops** — use broadcasting and a single reduction.`}
   starterCode={`import numpy as np
 
+
 def weighted_centroid(points, weights):
     # TODO: vectorized weighted average along axis 0
     return None
+
 
 # Quick check
 points = np.array([[0.0, 0.0], [2.0, 0.0], [0.0, 4.0]])
@@ -313,8 +313,9 @@ print("centroid =", weighted_centroid(points, weights))
 `}
   solutionCode={`import numpy as np
 
+
 def weighted_centroid(points, weights):
-    points  = np.asarray(points, dtype=float)
+    points = np.asarray(points, dtype=float)
     weights = np.asarray(weights, dtype=float)
     return (weights[:, None] * points).sum(axis=0) / weights.sum()
 `}

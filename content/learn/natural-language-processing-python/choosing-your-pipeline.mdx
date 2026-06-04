@@ -280,6 +280,7 @@ stop = set(stopwords.words("english"))`}
     # then conditionally remove stopwords
     return tokens
 
+
 print("topic    :", preprocess("This is NOT good", True))
 print("sentiment:", preprocess("This is NOT good", False))
 `}
@@ -288,6 +289,7 @@ print("sentiment:", preprocess("This is NOT good", False))
     if remove_stopwords:
         tokens = [t for t in tokens if t not in stop]
     return tokens
+
 
 print("topic    :", preprocess("This is NOT good", True))
 print("sentiment:", preprocess("This is NOT good", False))

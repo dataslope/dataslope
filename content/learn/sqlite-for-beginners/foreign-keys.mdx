@@ -58,7 +58,12 @@ INSERT INTO orders (id, customer_id, amount) VALUES
   (101, 1, 42),
   (102, 1, 18),
   (103, 2, 99);`}
-  starterCode={`SELECT * FROM orders ORDER BY id;`}
+  starterCode={`SELECT
+  *
+FROM
+  orders
+ORDER BY
+  id;`}
 />
 
 The phrase `REFERENCES customers(id)` declares the relationship: each `orders.customer_id` is meant to refer to a value in `customers.id`.
@@ -121,14 +126,21 @@ INSERT INTO customers (id, name) VALUES
   (1, 'Ada'),
   (2, 'Grace');`}
   starterCode={`-- This works because customer 1 exists.
-INSERT INTO orders (id, customer_id, amount)
-VALUES (101, 1, 42);
+INSERT INTO
+  orders (id, customer_id, amount)
+VALUES
+  (101, 1, 42);
 
 -- This fails because customer 99 does not exist.
-INSERT INTO orders (id, customer_id, amount)
-VALUES (102, 99, 17);
+INSERT INTO
+  orders (id, customer_id, amount)
+VALUES
+  (102, 99, 17);
 
-SELECT * FROM orders;`}
+SELECT
+  *
+FROM
+  orders;`}
 />
 
 The second insert is blocked. SQLite is protecting you from an **orphan row**: an order that claims to belong to a missing customer.
@@ -155,9 +167,11 @@ INSERT INTO orders (id, customer_id, amount) VALUES
   orders.id AS order_id,
   customers.name AS customer,
   orders.amount
-FROM orders
-JOIN customers ON orders.customer_id = customers.id
-ORDER BY orders.id;`}
+FROM
+  orders
+  JOIN customers ON orders.customer_id = customers.id
+ORDER BY
+  orders.id;`}
 />
 
 The join follows the foreign-key arrows and shows readable customer names next to order facts.

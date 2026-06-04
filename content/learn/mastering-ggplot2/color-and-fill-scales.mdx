@@ -120,9 +120,11 @@ When you need specific brand or semantic colors, map them by hand with
 
 ggplot(mpg, aes(class, fill = drv)) +
   geom_bar() +
-  scale_fill_manual(values = c("4" = "#1b9e77",
-                               "f" = "#d95f02",
-                               "r" = "#7570b3"))
+  scale_fill_manual(values = c(
+    "4" = "#1b9e77",
+    "f" = "#d95f02",
+    "r" = "#7570b3"
+  ))
 `}
 />
 

@@ -28,9 +28,9 @@ flowchart LR
   adapter="python"
   starterCode={`import pandas as pd
 
-jan = pd.DataFrame({"date": ["2024-01-15","2024-01-20"], "sales": [100, 150]})
-feb = pd.DataFrame({"date": ["2024-02-05","2024-02-18"], "sales": [200, 175]})
-mar = pd.DataFrame({"date": ["2024-03-02","2024-03-25"], "sales": [225, 300]})
+jan = pd.DataFrame({"date": ["2024-01-15", "2024-01-20"], "sales": [100, 150]})
+feb = pd.DataFrame({"date": ["2024-02-05", "2024-02-18"], "sales": [200, 175]})
+mar = pd.DataFrame({"date": ["2024-03-02", "2024-03-25"], "sales": [225, 300]})
 
 q1 = pd.concat([jan, feb, mar], ignore_index=True)
 print(q1)
@@ -46,8 +46,8 @@ You can also concat horizontally:
   adapter="python"
   starterCode={`import pandas as pd
 
-ids   = pd.DataFrame({"id": [1, 2, 3]})
-names = pd.DataFrame({"name": ["Aiko","Bilal","Chen"]})
+ids = pd.DataFrame({"id": [1, 2, 3]})
+names = pd.DataFrame({"name": ["Aiko", "Bilal", "Chen"]})
 
 side_by_side = pd.concat([ids, names], axis=1)
 print(side_by_side)
@@ -65,16 +65,20 @@ differently, you'd silently mis-pair people with names. Prefer
   adapter="python"
   starterCode={`import pandas as pd
 
-employees = pd.DataFrame({
-    "emp_id":  [1, 2, 3, 4],
-    "name":    ["Aiko","Bilal","Chen","Diego"],
-    "dept_id": [10, 20, 10, 30],
-})
+employees = pd.DataFrame(
+    {
+        "emp_id": [1, 2, 3, 4],
+        "name": ["Aiko", "Bilal", "Chen", "Diego"],
+        "dept_id": [10, 20, 10, 30],
+    }
+)
 
-departments = pd.DataFrame({
-    "dept_id":   [10, 20, 30],
-    "dept_name": ["Engineering","Sales","Marketing"],
-})
+departments = pd.DataFrame(
+    {
+        "dept_id": [10, 20, 30],
+        "dept_name": ["Engineering", "Sales", "Marketing"],
+    }
+)
 
 joined = employees.merge(departments, on="dept_id")
 print(joined)
@@ -91,8 +95,8 @@ from the other table by matching `dept_id`.
   starterCode={`import pandas as pd
 
 # Two months of orders — concat them
-m1 = pd.DataFrame({"order_id": [1,2], "customer_id": [10, 11], "amount": [50, 75]})
-m2 = pd.DataFrame({"order_id": [3,4], "customer_id": [10, 12], "amount": [40, 90]})
+m1 = pd.DataFrame({"order_id": [1, 2], "customer_id": [10, 11], "amount": [50, 75]})
+m2 = pd.DataFrame({"order_id": [3, 4], "customer_id": [10, 12], "amount": [40, 90]})
 
 all_orders = pd.concat([m1, m2], ignore_index=True)
 print("After concat:")
@@ -100,10 +104,12 @@ print(all_orders)
 print()
 
 # A customer lookup table — merge it in
-customers = pd.DataFrame({
-    "customer_id": [10, 11, 12],
-    "name":        ["Aiko","Bilal","Chen"],
-})
+customers = pd.DataFrame(
+    {
+        "customer_id": [10, 11, 12],
+        "name": ["Aiko", "Bilal", "Chen"],
+    }
+)
 
 enriched = all_orders.merge(customers, on="customer_id")
 print("After merge:")
@@ -130,8 +136,8 @@ data sources), then **merge** in lookup tables to enrich.
   adapter="python"
   starterCode={`import pandas as pd
 
-a = pd.DataFrame({"x": [1,2,3]}, index=[0,1,2])
-b = pd.DataFrame({"y": [10,20,30]}, index=[5,6,7])   # different index!
+a = pd.DataFrame({"x": [1, 2, 3]}, index=[0, 1, 2])
+b = pd.DataFrame({"y": [10, 20, 30]}, index=[5, 6, 7])  # different index!
 
 print("axis=1 concat (aligns by INDEX):")
 print(pd.concat([a, b], axis=1))

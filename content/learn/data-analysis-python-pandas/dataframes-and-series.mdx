@@ -34,7 +34,9 @@ flowchart LR
   starterCode={`import pandas as pd
 
 # A Series — a single labeled column
-s = pd.Series([120, 95, 140, 80], index=["Aiko","Bilal","Chen","Diego"], name="salary")
+s = pd.Series(
+    [120, 95, 140, 80], index=["Aiko", "Bilal", "Chen", "Diego"], name="salary"
+)
 print(s)
 print()
 print("Type:", type(s).__name__)
@@ -43,10 +45,13 @@ print("index:", list(s.index))
 print()
 
 # A DataFrame — a dict of Series with a shared index
-df = pd.DataFrame({
-    "salary":     [120, 95, 140, 80],
-    "department": ["Eng","Sales","Eng","Ops"],
-}, index=["Aiko","Bilal","Chen","Diego"])
+df = pd.DataFrame(
+    {
+        "salary": [120, 95, 140, 80],
+        "department": ["Eng", "Sales", "Eng", "Ops"],
+    },
+    index=["Aiko", "Bilal", "Chen", "Diego"],
+)
 print(df)
 print("Type:", type(df).__name__)
 `}
@@ -64,10 +69,13 @@ a Series.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "salary":     [120, 95, 140, 80],
-    "department": ["Eng","Sales","Eng","Ops"],
-}, index=["Aiko","Bilal","Chen","Diego"])
+df = pd.DataFrame(
+    {
+        "salary": [120, 95, 140, 80],
+        "department": ["Eng", "Sales", "Eng", "Ops"],
+    },
+    index=["Aiko", "Bilal", "Chen", "Diego"],
+)
 
 salaries = df["salary"]
 print(salaries)
@@ -101,7 +109,7 @@ the whole thing at once — no for-loop required.
   adapter="python"
   starterCode={`import pandas as pd
 
-salaries = pd.Series([120, 95, 140, 80], index=["Aiko","Bilal","Chen","Diego"])
+salaries = pd.Series([120, 95, 140, 80], index=["Aiko", "Bilal", "Chen", "Diego"])
 
 # Element-wise math
 raises = salaries * 0.05
@@ -136,8 +144,8 @@ together, Pandas **aligns them by index** before adding.
   adapter="python"
   starterCode={`import pandas as pd
 
-q1 = pd.Series([100, 120, 90],  index=["Aiko","Bilal","Chen"], name="q1")
-q2 = pd.Series([110, 95, 130],  index=["Chen","Aiko","Diego"], name="q2")
+q1 = pd.Series([100, 120, 90], index=["Aiko", "Bilal", "Chen"], name="q1")
+q2 = pd.Series([110, 95, 130], index=["Chen", "Aiko", "Diego"], name="q2")
 
 total = q1 + q2
 print(total)
@@ -164,10 +172,13 @@ You can confirm this by reaching in:
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "salary":     [120, 95, 140],
-    "department": ["Eng","Sales","Eng"],
-}, index=["Aiko","Bilal","Chen"])
+df = pd.DataFrame(
+    {
+        "salary": [120, 95, 140],
+        "department": ["Eng", "Sales", "Eng"],
+    },
+    index=["Aiko", "Bilal", "Chen"],
+)
 
 # The DataFrame's columns are just Series sharing the same index
 print(df["salary"].index.equals(df["department"].index))
@@ -184,11 +195,14 @@ column-wise. For example:
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "salary":  [120, 95, 140, 80],
-    "bonus":   [12, 8, 20, 5],
-    "tenure":  [3, 6, 7, 2],
-}, index=["Aiko","Bilal","Chen","Diego"])
+df = pd.DataFrame(
+    {
+        "salary": [120, 95, 140, 80],
+        "bonus": [12, 8, 20, 5],
+        "tenure": [3, 6, 7, 2],
+    },
+    index=["Aiko", "Bilal", "Chen", "Diego"],
+)
 
 # .mean() on a DataFrame returns a Series — one mean per column
 print(df.mean())

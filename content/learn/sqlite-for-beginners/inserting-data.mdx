@@ -30,11 +30,17 @@ Here is a complete example: create a table, insert one row, then read it back.
   done INTEGER DEFAULT 0
 );
 
-INSERT INTO tasks (title, done) VALUES
+INSERT INTO
+  tasks (title, done)
+VALUES
   ('Buy milk', 0);
 
-SELECT * FROM tasks
-ORDER BY id;`}
+SELECT
+  *
+FROM
+  tasks
+ORDER BY
+  id;`}
 />
 
 SQLite does not have a separate `BOOLEAN` type. In beginner examples, we often use `INTEGER` values `0` and `1` for yes/no data: `0` means false or no, and `1` means true or yes.
@@ -52,11 +58,17 @@ When a table has `id INTEGER PRIMARY KEY`, you usually leave `id` out of the ins
   done INTEGER DEFAULT 0
 );
 
-INSERT INTO tasks (title) VALUES
+INSERT INTO
+  tasks (title)
+VALUES
   ('Water plants');
 
-SELECT * FROM tasks
-ORDER BY id;`}
+SELECT
+  *
+FROM
+  tasks
+ORDER BY
+  id;`}
 />
 
 The insert only gave `title`. SQLite supplied `id`, and `DEFAULT 0` supplied `done`.
@@ -95,13 +107,19 @@ You can add multiple rows with one `INSERT` by separating value groups with comm
   done INTEGER DEFAULT 0
 );
 
-INSERT INTO tasks (title, done) VALUES
+INSERT INTO
+  tasks (title, done)
+VALUES
   ('Buy milk', 0),
   ('Walk the dog', 1),
   ('Call dentist', 0);
 
-SELECT * FROM tasks
-ORDER BY id;`}
+SELECT
+  *
+FROM
+  tasks
+ORDER BY
+  id;`}
 />
 
 Each parenthesized group becomes one new row.
@@ -130,13 +148,20 @@ The column list and values match by position. The first value goes into the firs
   age INTEGER
 );
 
-INSERT INTO contacts (name, email, age) VALUES
+INSERT INTO
+  contacts (name, email, age)
+VALUES
   ('Maya', 'maya@example.com', 31),
   ('Noah', 'noah@example.com', 28);
 
-SELECT name, email, age
-FROM contacts
-ORDER BY id;`}
+SELECT
+  name,
+  email,
+  age
+FROM
+  contacts
+ORDER BY
+  id;`}
 />
 
 ```mermaid
@@ -175,14 +200,22 @@ You do not have to fill every column every time. Name the columns you are provid
   pages INTEGER DEFAULT 0
 );
 
-INSERT INTO books (title, author) VALUES
+INSERT INTO
+  books (title, author)
+VALUES
   ('Kindred', 'Octavia E. Butler');
 
-INSERT INTO books (title, pages) VALUES
+INSERT INTO
+  books (title, pages)
+VALUES
   ('A Short Book', 120);
 
-SELECT * FROM books
-ORDER BY id;`}
+SELECT
+  *
+FROM
+  books
+ORDER BY
+  id;`}
 />
 
 The first row has no page count, so `pages` uses its default `0`. The second row has no author, so that value is empty in the result.
@@ -204,17 +237,20 @@ Then select \`name\` and \`quantity\` from \`pantry\` ordered by \`id\`.`}
   quantity INTEGER DEFAULT 0
 );`}
   starterCode={`-- Insert the two rows here:
-
-
--- Then read them:
-`}
-  solutionSql={`INSERT INTO pantry (name, quantity) VALUES
+-- Then read them:`}
+  solutionSql={`INSERT INTO
+  pantry (name, quantity)
+VALUES
   ('Rice', 3),
   ('Beans', 5);
 
-SELECT name, quantity
-FROM pantry
-ORDER BY id;`}
+SELECT
+  name,
+  quantity
+FROM
+  pantry
+ORDER BY
+  id;`}
   tests={[
     { id: "columns", name: "Returns the requested columns", description: "The result should include name and quantity.", expectedColumns: ["name", "quantity"] },
     { id: "rows", name: "Returns Rice and Beans", description: "The rows should be inserted in order.", expectedRows: { columns: ["name", "quantity"], ordered: true, values: [["Rice", 3], ["Beans", 5]] } },

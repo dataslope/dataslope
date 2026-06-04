@@ -187,13 +187,17 @@ Discriminated unions are perfect for modeling **domain events** — things that 
 function logEvent(event: AppEvent): void {
   switch (event.type) {
     case "user-logged-in":
-      console.log(\`[\${new Date(event.timestamp).toISOString()}] User \${event.userId} logged in\`);
+      console.log(
+        \`[\${new Date(event.timestamp).toISOString()}] User \${event.userId} logged in\`,
+      );
       break;
     case "user-logged-out":
       console.log(\`User \${event.userId} logged out\`);
       break;
     case "page-viewed":
-      console.log(\`Page viewed: \${event.path} (referrer: \${event.referrer || "none"})\`);
+      console.log(
+        \`Page viewed: \${event.path} (referrer: \${event.referrer || "none"})\`,
+      );
       break;
     case "error-occurred":
       console.log(\`Error: \${event.message}\`);
@@ -209,7 +213,11 @@ function logEvent(event: AppEvent): void {
 logEvent({ type: "user-logged-in", userId: "u123", timestamp: Date.now() });
 logEvent({ type: "page-viewed", path: "/dashboard", referrer: "/home" });
 logEvent({ type: "user-logged-out", userId: "u123" });
-logEvent({ type: "error-occurred", message: "DB connection lost", stack: "at ..." });
+logEvent({
+  type: "error-occurred",
+  message: "DB connection lost",
+  stack: "at ...",
+});
 `}
 />
 

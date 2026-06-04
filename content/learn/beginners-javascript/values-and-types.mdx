@@ -53,15 +53,15 @@ what type any value has with the `typeof` operator:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log(typeof 42);            // "number"
-console.log(typeof 3.14);          // "number"
-console.log(typeof "hello");       // "string"
-console.log(typeof true);          // "boolean"
-console.log(typeof undefined);     // "undefined"
-console.log(typeof null);          // "object" (a famous historical bug — see below)
-console.log(typeof [1, 2, 3]);     // "object"
-console.log(typeof { x: 1 });      // "object"
-console.log(typeof function(){});  // "function"
+  starterCode={`console.log(typeof 42); // "number"
+console.log(typeof 3.14); // "number"
+console.log(typeof "hello"); // "string"
+console.log(typeof true); // "boolean"
+console.log(typeof undefined); // "undefined"
+console.log(typeof null); // "object" (a famous historical bug — see below)
+console.log(typeof [1, 2, 3]); // "object"
+console.log(typeof { x: 1 }); // "object"
+console.log(typeof function () {}); // "function"
 `}
 />
 
@@ -162,16 +162,16 @@ parts of the language for beginners.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log("5" + 3);    // "53"  — number 3 was converted to the string "3", then strings were joined.
-console.log("5" - 3);    // 2     — string "5" was converted to the number 5, then subtracted.
-console.log(5 + null);   // 5     — null became 0.
+  starterCode={`console.log("5" + 3); // "53"  — number 3 was converted to the string "3", then strings were joined.
+console.log("5" - 3); // 2     — string "5" was converted to the number 5, then subtracted.
+console.log(5 + null); // 5     — null became 0.
 console.log(5 + undefined); // NaN — "Not a Number". undefined cannot meaningfully become a number.
-console.log("hello" * 2);   // NaN — string "hello" cannot become a number.
+console.log("hello" * 2); // NaN — string "hello" cannot become a number.
 
-console.log(Boolean(0));     // false  — 0 is "falsy"
-console.log(Boolean(""));    // false  — empty string is falsy
-console.log(Boolean(" "));   // true   — non-empty string is truthy
-console.log(Boolean("0"));   // true   — the *string* "0" is truthy!
+console.log(Boolean(0)); // false  — 0 is "falsy"
+console.log(Boolean("")); // false  — empty string is falsy
+console.log(Boolean(" ")); // true   — non-empty string is truthy
+console.log(Boolean("0")); // true   — the *string* "0" is truthy!
 `}
 />
 
@@ -205,16 +205,16 @@ equality is predictable.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log(5 === 5);       // true
-console.log(5 === "5");     // false  (different types — good!)
-console.log("a" === "a");   // true
-console.log(true === 1);    // false  (boolean vs number — good!)
+  starterCode={`console.log(5 === 5); // true
+console.log(5 === "5"); // false  (different types — good!)
+console.log("a" === "a"); // true
+console.log(true === 1); // false  (boolean vs number — good!)
 
 // Compare with the loose ==, which is full of footguns:
-console.log(5 == "5");      // true   (silent conversion — confusing)
+console.log(5 == "5"); // true   (silent conversion — confusing)
 console.log(null == undefined); // true
-console.log("" == 0);       // true
-console.log("0" == 0);      // true
+console.log("" == 0); // true
+console.log("0" == 0); // true
 
 // Stick with === and !==.
 `}
@@ -237,21 +237,21 @@ either is fine, as long as you are deliberate.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`let x;                         // declared but not assigned
-console.log(x);                // undefined
-console.log(typeof x);         // "undefined"
+  starterCode={`let x; // declared but not assigned
+console.log(x); // undefined
+console.log(typeof x); // "undefined"
 
 const user = { name: "Ada" };
-console.log(user.email);       // undefined — property doesn't exist
+console.log(user.email); // undefined — property doesn't exist
 
 function greet(name) {
   console.log("Hello,", name);
 }
-greet();                       // logs "Hello, undefined" — no argument given
+greet(); // logs "Hello, undefined" — no argument given
 
-const middleName = null;       // deliberately: this user has no middle name
-console.log(middleName);       // null
-console.log(typeof middleName);// "object"  (historic bug)
+const middleName = null; // deliberately: this user has no middle name
+console.log(middleName); // null
+console.log(typeof middleName); // "object"  (historic bug)
 `}
 />
 
@@ -297,9 +297,9 @@ describe(1);
 describe(-1);
 describe("hello");
 describe(" ");
-describe("0");      // truthy (non-empty string)
-describe([]);       // truthy (an object)
-describe({});       // truthy (an object)
+describe("0"); // truthy (non-empty string)
+describe([]); // truthy (an object)
+describe({}); // truthy (an object)
 `}
 />
 

@@ -51,8 +51,7 @@ sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 # Turn jitter off to see WHY it exists: points collapse onto one line.
-sns.catplot(data=tips, x="day", y="total_bill", kind="strip",
-            jitter=False, height=4)
+sns.catplot(data=tips, x="day", y="total_bill", kind="strip", jitter=False, height=4)
 `}
 />
 
@@ -136,8 +135,9 @@ sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 # Color by sex, and dodge so the two groups sit side by side per day.
-sns.catplot(data=tips, x="day", y="total_bill", hue="sex",
-            kind="strip", dodge=True, height=4)
+sns.catplot(
+    data=tips, x="day", y="total_bill", hue="sex", kind="strip", dodge=True, height=4
+)
 `}
 />
 
@@ -201,8 +201,7 @@ g = None
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
-g = sns.catplot(data=penguins, x="species", y="body_mass_g",
-                kind="swarm", height=4)
+g = sns.catplot(data=penguins, x="species", y="body_mass_g", kind="swarm", height=4)
 `}
   tests={[
     {

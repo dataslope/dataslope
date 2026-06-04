@@ -38,18 +38,18 @@ function double(nums) {
 // IMPURE: depends on a hidden variable.
 let tax = 0.2;
 function withTax(price) {
-  return price * (1 + tax);   // result depends on outer 'tax'
+  return price * (1 + tax); // result depends on outer 'tax'
 }
 
 // IMPURE: mutates its argument.
 function addItem(cart, item) {
-  cart.push(item);            // side effect on caller's array
+  cart.push(item); // side effect on caller's array
   return cart;
 }
 
 // IMPURE: does I/O.
 function shout(msg) {
-  console.log(msg.toUpperCase());  // side effect: writes to terminal
+  console.log(msg.toUpperCase()); // side effect: writes to terminal
 }
 
 console.log(add(2, 3));
@@ -98,19 +98,19 @@ treats them as if they weren't.
   adapter="javascript"
   starterCode={`// MUTATING style: change the array in place.
 const nums = [1, 2, 3];
-nums.push(4);                // nums is now [1,2,3,4] — the SAME array
+nums.push(4); // nums is now [1,2,3,4] — the SAME array
 console.log(nums);
 
 // IMMUTABLE style: produce a new array, leave the old one alone.
 const a = [1, 2, 3];
-const b = [...a, 4];         // a is still [1,2,3]; b is [1,2,3,4]
+const b = [...a, 4]; // a is still [1,2,3]; b is [1,2,3,4]
 console.log(a);
 console.log(b);
 
 // Same idea for objects:
 const user = { name: "Ada", age: 28 };
 const olderUser = { ...user, age: user.age + 1 };
-console.log(user);      // { name: 'Ada', age: 28 }   — unchanged
+console.log(user); // { name: 'Ada', age: 28 }   — unchanged
 console.log(olderUser); // { name: 'Ada', age: 29 }
 `}
 />
@@ -161,10 +161,10 @@ console.log(nums.map((n) => n * 10));
 
 // Store functions in an object: a tiny strategy table.
 const ops = {
-  add:    (a, b) => a + b,
-  sub:    (a, b) => a - b,
-  mul:    (a, b) => a * b,
-  div:    (a, b) => a / b,
+  add: (a, b) => a + b,
+  sub: (a, b) => a - b,
+  mul: (a, b) => a * b,
+  div: (a, b) => a / b,
 };
 
 console.log(ops.add(2, 3));
@@ -194,22 +194,25 @@ bigger one. You can compose at the function level too.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const trim       = (s) => s.trim();
-const lower      = (s) => s.toLowerCase();
-const dashify    = (s) => s.replace(/\\s+/g, "-");
+  starterCode={`const trim = (s) => s.trim();
+const lower = (s) => s.toLowerCase();
+const dashify = (s) => s.replace(/\\s+/g, "-");
 
 // Compose by hand:
 function slugify(text) {
   return dashify(lower(trim(text)));
 }
 
-console.log(slugify("  Hello World  "));   // "hello-world"
+console.log(slugify("  Hello World  ")); // "hello-world"
 
 // Or build a generic 'pipe' helper:
-const pipe = (...fns) => (input) => fns.reduce((v, fn) => fn(v), input);
+const pipe =
+  (...fns) =>
+  (input) =>
+    fns.reduce((v, fn) => fn(v), input);
 
 const slugify2 = pipe(trim, lower, dashify);
-console.log(slugify2("  Functional STYLE  "));  // "functional-style"
+console.log(slugify2("  Functional STYLE  ")); // "functional-style"
 `}
 />
 
@@ -241,8 +244,8 @@ functional. None of these versions is "wrong" — they're trade-offs.
   adapter="javascript"
   starterCode={`const orders = [
   { id: 1, amount: 120, status: "paid" },
-  { id: 2, amount: 80,  status: "cancelled" },
-  { id: 3, amount: 60,  status: "paid" },
+  { id: 2, amount: 80, status: "cancelled" },
+  { id: 3, amount: 60, status: "paid" },
   { id: 4, amount: 200, status: "paid" },
 ];
 
@@ -373,7 +376,7 @@ This is a classic immutable update.`}
 }
 
 const students = [
-  { name: "Ada",   score: 90 },
+  { name: "Ada", score: 90 },
   { name: "Linus", score: 75 },
   { name: "Grace", score: 100 },
 ];
@@ -384,12 +387,12 @@ console.log("Original unchanged:", students);
 `}
   solutionCode={`function incrementScores(students, name) {
   return students.map((s) =>
-    s.name === name ? { ...s, score: s.score + 1 } : s
+    s.name === name ? { ...s, score: s.score + 1 } : s,
   );
 }
 
 const students = [
-  { name: "Ada",   score: 90 },
+  { name: "Ada", score: 90 },
   { name: "Linus", score: 75 },
   { name: "Grace", score: 100 },
 ];

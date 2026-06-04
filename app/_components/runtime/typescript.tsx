@@ -6,7 +6,7 @@ import type {
   PackageInfo,
   RunOptions,
 } from "../types";
-import { getWebFmt } from "./webFmt";
+import { getWebFmt, WEB_FMT_2SPACE } from "./webFmt";
 
 // TypeScript runs in a dedicated Web Worker (typescript-worker.ts):
 //   1. Every .ts/.tsx file in the workspace is transpiled to JavaScript
@@ -362,6 +362,8 @@ export const typescriptAdapter: LanguageAdapter = {
   },
   // CodeMirror v5 exposes TypeScript via the `text/typescript` MIME alias.
   codeMirrorMode: "text/typescript",
+  // web_fmt configured for 2-space indentation (see formatCode) — keep in sync.
+  indentWidth: 2,
   examples: EXAMPLES,
   packages: PACKAGES,
   exportFormats: [
@@ -401,7 +403,7 @@ export const typescriptAdapter: LanguageAdapter = {
   },
   async formatCode(code: string): Promise<string> {
     const { format } = await getWebFmt();
-    return format(code, "script.ts");
+    return format(code, "script.ts", WEB_FMT_2SPACE);
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage("Starting TypeScript worker…");

@@ -58,13 +58,13 @@ print(summary)
 `}
   solutionCode={`summary = (
     df.groupby("category")
-      .agg(
-          units_sold=("units_sold", "sum"),
-          revenue=("revenue", "sum"),
-          avg_revenue=("revenue", "mean"),
-      )
-      .round(2)
-      .sort_values("revenue", ascending=False)
+    .agg(
+        units_sold=("units_sold", "sum"),
+        revenue=("revenue", "sum"),
+        avg_revenue=("revenue", "mean"),
+    )
+    .round(2)
+    .sort_values("revenue", ascending=False)
 )
 print(summary)
 `}
@@ -151,13 +151,13 @@ print(summary)
 `}
   solutionCode={`summary = (
     df.groupby("category")
-      .agg(
-          units_sold=("units_sold", "sum"),
-          revenue=("revenue", "sum"),
-          avg_revenue=("revenue", "mean"),
-      )
-      .round(2)
-      .sort_values("revenue", ascending=False)
+    .agg(
+        units_sold=("units_sold", "sum"),
+        revenue=("revenue", "sum"),
+        avg_revenue=("revenue", "mean"),
+    )
+    .round(2)
+    .sort_values("revenue", ascending=False)
 )
 print(summary)
 `}
@@ -387,10 +387,12 @@ Example: \`"hello world"\` → \`"world hello"\`.`}
     # your code here
     return s
 
+
 print(reverse_words(sample_sentence))
 `}
   solutionCode={`def reverse_words(s):
     return " ".join(reversed(s.split(" ")))
+
 
 print(reverse_words(sample_sentence))
 `}
@@ -435,10 +437,12 @@ Example: \`"hello world"\` → \`"world hello"\`.`}
     # your code here
     return s
 
+
 print(reverse_words(sample_sentence))
 `}
   solutionCode={`def reverse_words(s):
     return " ".join(reversed(s.split(" ")))
+
 
 print(reverse_words(sample_sentence))
 `}

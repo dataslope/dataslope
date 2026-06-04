@@ -35,13 +35,17 @@ single variable, prefer a **histogram**. Bar charts are for
   starterCode={`import pandas as pd
 import plotly.express as px
 
-df = pd.DataFrame({
-    "team":   ["Marketing", "Engineering", "Sales", "Support"],
-    "people": [12, 47, 28, 19],
-})
+df = pd.DataFrame(
+    {
+        "team": ["Marketing", "Engineering", "Sales", "Support"],
+        "people": [12, 47, 28, 19],
+    }
+)
 
 fig = px.bar(
-    df, x="team", y="people",
+    df,
+    x="team",
+    y="people",
     template="simple_white",
     title="Headcount by team",
     labels={"team": "Team", "people": "Headcount"},
@@ -68,13 +72,17 @@ time.
   starterCode={`import pandas as pd
 import plotly.express as px
 
-df = pd.DataFrame({
-    "team":   ["Marketing", "Engineering", "Sales", "Support"],
-    "people": [12, 47, 28, 19],
-}).sort_values("people", ascending=False)
+df = pd.DataFrame(
+    {
+        "team": ["Marketing", "Engineering", "Sales", "Support"],
+        "people": [12, 47, 28, 19],
+    }
+).sort_values("people", ascending=False)
 
 fig = px.bar(
-    df, x="team", y="people",
+    df,
+    x="team",
+    y="people",
     template="simple_white",
     title="Headcount by team (sorted)",
     labels={"team": "Team", "people": "Headcount"},
@@ -103,7 +111,9 @@ df = px.data.gapminder().query("year == 2007 and continent == 'Europe'")
 df = df.sort_values("lifeExp")
 
 fig = px.bar(
-    df, x="lifeExp", y="country",
+    df,
+    x="lifeExp",
+    y="country",
     orientation="h",
     template="simple_white",
     title="European life expectancy in 2007",
@@ -129,12 +139,13 @@ with `color="..."` and `barmode="group"`.
 
 df = px.data.tips()
 
-avg = (
-    df.groupby(["day", "sex"], as_index=False)["tip"].mean()
-)
+avg = df.groupby(["day", "sex"], as_index=False)["tip"].mean()
 
 fig = px.bar(
-    avg, x="day", y="tip", color="sex",
+    avg,
+    x="day",
+    y="tip",
+    color="sex",
     barmode="group",
     template="simple_white",
     title="Average tip by day and sex",
@@ -162,7 +173,10 @@ df = px.data.tips()
 avg = df.groupby(["day", "sex"], as_index=False)["tip"].sum()
 
 fig = px.bar(
-    avg, x="day", y="tip", color="sex",
+    avg,
+    x="day",
+    y="tip",
+    color="sex",
     barmode="stack",
     template="simple_white",
     title="Total tips by day, stacked by sex",

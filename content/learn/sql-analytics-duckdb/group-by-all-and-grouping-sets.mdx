@@ -35,11 +35,13 @@ INSERT INTO sales VALUES
   region,
   product,
   channel,
-  COUNT(*)    AS orders,
+  COUNT(*) AS orders,
   SUM(amount) AS revenue
-FROM sales
-GROUP BY ALL          -- = GROUP BY region, product, channel
-ORDER BY revenue DESC;`}
+FROM
+  sales
+GROUP BY ALL -- = GROUP BY region, product, channel
+ORDER BY
+  revenue DESC;`}
 />
 
 The result is identical to writing `GROUP BY region, product, channel`,
@@ -93,9 +95,13 @@ INSERT INTO sales VALUES
   region,
   product,
   SUM(amount) AS revenue
-FROM sales
-GROUP BY ROLLUP (region, product)
-ORDER BY region NULLS LAST, product NULLS LAST;`}
+FROM
+  sales
+GROUP BY
+  ROLLUP (region, product)
+ORDER BY
+  region NULLS LAST,
+  product NULLS LAST;`}
 />
 
 Notice the rows where `product` is `NULL`: those are the **region
@@ -123,9 +129,13 @@ INSERT INTO sales VALUES
   region,
   product,
   SUM(amount) AS revenue
-FROM sales
-GROUP BY CUBE (region, product)
-ORDER BY region NULLS LAST, product NULLS LAST;`}
+FROM
+  sales
+GROUP BY
+  CUBE (region, product)
+ORDER BY
+  region NULLS LAST,
+  product NULLS LAST;`}
 />
 
 You now have per-region subtotals, per-product subtotals, the detail, and
@@ -147,11 +157,18 @@ rows unambiguously.
 INSERT INTO sales VALUES
   ('West',120),('West',80),('East',200),('East',50);`}
   starterCode={`SELECT
-  CASE WHEN GROUPING(region) = 1 THEN 'ALL REGIONS' ELSE region END AS region,
+  CASE
+    WHEN GROUPING (region) = 1 THEN 'ALL REGIONS'
+    ELSE region
+  END AS region,
   SUM(amount) AS revenue
-FROM sales
-GROUP BY ROLLUP (region)
-ORDER BY GROUPING(region), region;`}
+FROM
+  sales
+GROUP BY
+  ROLLUP (region)
+ORDER BY
+  GROUPING (region),
+  region;`}
 />
 
 ## Check your understanding

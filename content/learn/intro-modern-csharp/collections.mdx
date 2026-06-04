@@ -30,12 +30,13 @@ Each one is good at something the others are bad at.
 
 int[] scores = { 91, 84, 77, 65 };
 
-Console.WriteLine(scores[0]);    // 91 — first element
-Console.WriteLine(scores[3]);    // 65 — last element
+Console.WriteLine(scores[0]); // 91 — first element
+Console.WriteLine(scores[3]); // 65 — last element
 Console.WriteLine(scores.Length);
 
 scores[2] = 80;
-foreach (var s in scores) Console.WriteLine(s);
+foreach (var s in scores)
+    Console.WriteLine(s);
 `}
 />
 
@@ -58,12 +59,13 @@ names.Add("Bob");
 names.Add("Cara");
 
 Console.WriteLine($"count = {names.Count}");
-Console.WriteLine(names[1]);   // "Bob"
+Console.WriteLine(names[1]); // "Bob"
 
 names.Remove("Bob");
 names.Insert(0, "Zoe");
 
-foreach (var n in names) Console.WriteLine(n);
+foreach (var n in names)
+    Console.WriteLine(n);
 `}
 />
 
@@ -81,16 +83,15 @@ even for a dictionary with millions of entries.
   starterCode={`using System;
 using System.Collections.Generic;
 
-var phoneBook = new Dictionary<string, string>
-{
+var phoneBook = new Dictionary<string, string> {
     ["Alice"] = "555-1234",
-    ["Bob"]   = "555-5678",
+    ["Bob"] = "555-5678",
 };
 
 Console.WriteLine(phoneBook["Alice"]);
 
-phoneBook["Cara"] = "555-9999";   // add
-phoneBook["Bob"]  = "555-0000";   // update
+phoneBook["Cara"] = "555-9999"; // add
+phoneBook["Bob"] = "555-0000";  // update
 
 if (phoneBook.TryGetValue("Dave", out var n))
     Console.WriteLine($"Dave: {n}");
@@ -119,7 +120,7 @@ using System.Collections.Generic;
 var visited = new HashSet<string>();
 visited.Add("home");
 visited.Add("about");
-visited.Add("home");   // ignored — already there
+visited.Add("home"); // ignored — already there
 
 Console.WriteLine(visited.Count);            // 2
 Console.WriteLine(visited.Contains("home")); // True
@@ -169,9 +170,12 @@ var nums = new List<int> { 10, 20, 30 };
 var counts = new Dictionary<string, int> { ["a"] = 1, ["b"] = 2 };
 var seen = new HashSet<string> { "x", "y" };
 
-foreach (var n in nums) Console.WriteLine(n);
-foreach (var (k, v) in counts) Console.WriteLine($"{k}={v}");
-foreach (var s in seen) Console.WriteLine(s);
+foreach (var n in nums)
+    Console.WriteLine(n);
+foreach (var (k, v) in counts)
+    Console.WriteLine($"{k}={v}");
+foreach (var s in seen)
+    Console.WriteLine(s);
 `}
 />
 
@@ -193,8 +197,10 @@ var counts = new Dictionary<string, int>();
 
 foreach (var word in text.Split(' '))
 {
-    if (counts.ContainsKey(word)) counts[word]++;
-    else counts[word] = 1;
+    if (counts.ContainsKey(word))
+        counts[word]++;
+    else
+        counts[word] = 1;
 }
 
 foreach (var (w, c) in counts)

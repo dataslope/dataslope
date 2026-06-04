@@ -81,20 +81,20 @@ from sklearn.cluster import KMeans
 # 1) REGRESSION -- predict a number
 Xr, yr = make_regression(n_samples=80, n_features=3, noise=10, random_state=0)
 reg = LinearRegression()
-reg.fit(Xr, yr)                       # <-- fit
+reg.fit(Xr, yr)  # <-- fit
 print("Regressor predicts:  ", round(float(reg.predict(Xr[:1])[0]), 1))  # <-- predict
 
 # 2) CLASSIFICATION -- predict a category
 Xc, yc = load_iris(return_X_y=True)
 clf = KNeighborsClassifier(n_neighbors=5)
-clf.fit(Xc, yc)                       # <-- fit  (same method!)
-print("Classifier predicts: ", clf.predict(Xc[:1])[0])                   # <-- predict
+clf.fit(Xc, yc)  # <-- fit  (same method!)
+print("Classifier predicts: ", clf.predict(Xc[:1])[0])  # <-- predict
 
 # 3) CLUSTERING -- discover a group
 Xk, _ = make_blobs(n_samples=80, centers=3, random_state=0)
 km = KMeans(n_clusters=3, n_init=10, random_state=0)
-km.fit(Xk)                            # <-- fit  (same method again!)
-print("Clusterer assigns:   ", km.predict(Xk[:1])[0])                    # <-- predict
+km.fit(Xk)  # <-- fit  (same method again!)
+print("Clusterer assigns:   ", km.predict(Xk[:1])[0])  # <-- predict
 `}
 />
 
@@ -155,7 +155,7 @@ X, y = load_iris(return_X_y=True)
 
 # A TRANSFORMER: learns column stats with fit, then RESHAPES data with transform.
 scaler = StandardScaler()
-scaler.fit(X)                 # learn each feature's mean and spread
+scaler.fit(X)  # learn each feature's mean and spread
 X_scaled = scaler.transform(X)
 print("Transformer output is reshaped DATA, shape:", X_scaled.shape)
 print("Each feature now has mean ~0:", X_scaled.mean(axis=0).round(2))
@@ -200,9 +200,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
 X, y = load_iris(return_X_y=True)
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=0
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
 model = LogisticRegression(max_iter=1000).fit(X_train, y_train)
 
@@ -279,16 +277,14 @@ from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
 X, y = load_wine(return_X_y=True)
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=0
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
 clf = KNeighborsClassifier(n_neighbors=5)
 
-clf.fit(X_train, y_train)                         # 1. train
-labels = clf.predict(X_test)                      # 2. hard predictions
-probs = clf.predict_proba(X_test)                 # 3. class probabilities
-acc = clf.score(X_test, y_test)                   # 4. quick quality number
+clf.fit(X_train, y_train)  # 1. train
+labels = clf.predict(X_test)  # 2. hard predictions
+probs = clf.predict_proba(X_test)  # 3. class probabilities
+acc = clf.score(X_test, y_test)  # 4. quick quality number
 
 print("First 5 predicted labels:", labels[:5])
 print("Probabilities for row 0: ", probs[0].round(2))

@@ -31,7 +31,9 @@ imply a relationship that isn't there.
 df = px.data.stocks()  # Date + several tech stocks normalized to 1.0
 
 fig = px.line(
-    df, x="date", y="GOOG",
+    df,
+    x="date",
+    y="GOOG",
     template="simple_white",
     title="Google stock price (normalized to 1.0)",
     labels={"date": "Date", "GOOG": "Normalized price"},
@@ -59,7 +61,10 @@ df = px.data.stocks()
 long = df.melt(id_vars="date", var_name="ticker", value_name="price")
 
 fig = px.line(
-    long, x="date", y="price", color="ticker",
+    long,
+    x="date",
+    y="price",
+    color="ticker",
     template="simple_white",
     title="Tech stocks, normalized",
     labels={"date": "Date", "price": "Normalized price", "ticker": "Ticker"},
@@ -84,7 +89,10 @@ Add `markers=True`:
 df = px.data.gapminder().query("country in ['Japan', 'Brazil', 'Nigeria']")
 
 fig = px.line(
-    df, x="year", y="lifeExp", color="country",
+    df,
+    x="year",
+    y="lifeExp",
+    color="country",
     markers=True,
     template="simple_white",
     title="Life expectancy in three countries over time",
@@ -115,7 +123,10 @@ overlapping lines that no one can read.
 df = px.data.gapminder().query("continent == 'Europe'")
 
 fig = px.line(
-    df, x="year", y="lifeExp", color="country",
+    df,
+    x="year",
+    y="lifeExp",
+    color="country",
     template="simple_white",
     title="Life expectancy in Europe — too many lines!",
     labels={"year": "Year", "lifeExp": "Life expectancy (years)"},
@@ -145,10 +156,15 @@ linear scale flattens out.
   adapter="python"
   starterCode={`import plotly.express as px
 
-df = px.data.gapminder().query("country in ['China', 'India', 'United States', 'Japan']")
+df = px.data.gapminder().query(
+    "country in ['China', 'India', 'United States', 'Japan']"
+)
 
 fig_linear = px.line(
-    df, x="year", y="gdpPercap", color="country",
+    df,
+    x="year",
+    y="gdpPercap",
+    color="country",
     template="simple_white",
     title="GDP per capita over time (linear y)",
     labels={"year": "Year", "gdpPercap": "GDP per capita (USD)"},
@@ -156,7 +172,10 @@ fig_linear = px.line(
 fig_linear.show()
 
 fig_log = px.line(
-    df, x="year", y="gdpPercap", color="country",
+    df,
+    x="year",
+    y="gdpPercap",
+    color="country",
     log_y=True,
     template="simple_white",
     title="GDP per capita over time (log y)",

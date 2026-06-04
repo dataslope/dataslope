@@ -47,16 +47,33 @@ INSERT INTO events VALUES
   (6,'ads','visit'),(6,'ads','purchase');`}
   starterCode={`SELECT
   channel,
-  COUNT(DISTINCT user_id) FILTER (WHERE action = 'visit')    AS visitors,
-  COUNT(DISTINCT user_id) FILTER (WHERE action = 'purchase') AS buyers,
+  COUNT(DISTINCT user_id) FILTER(
+    WHERE
+      action = 'visit'
+  ) AS visitors,
+  COUNT(DISTINCT user_id) FILTER(
+    WHERE
+      action = 'purchase'
+  ) AS buyers,
   ROUND(
-    100.0 * COUNT(DISTINCT user_id) FILTER (WHERE action = 'purchase')
-          / NULLIF(COUNT(DISTINCT user_id) FILTER (WHERE action = 'visit'), 0),
+    100.0 * COUNT(DISTINCT user_id) FILTER(
+      WHERE
+        action = 'purchase'
+    ) / NULLIF(
+      COUNT(DISTINCT user_id) FILTER(
+        WHERE
+          action = 'visit'
+      ),
+      0
+    ),
     1
   ) AS conversion_pct
-FROM events
-GROUP BY channel
-ORDER BY conversion_pct DESC;`}
+FROM
+  events
+GROUP BY
+  channel
+ORDER BY
+  conversion_pct DESC;`}
 />
 
 Every analytical tool from this course is here: conditional aggregation
@@ -80,12 +97,26 @@ CREATE TABLE payments (user_id INTEGER, amount DECIMAL(8,2));
 INSERT INTO payments VALUES
   (1, 50), (1, 20), (3, 100), (7, 30);               -- only 3 users paid`}
   starterCode={`SELECT
-  (SELECT COUNT(*) FROM users)                          AS all_users,
-  COUNT(DISTINCT user_id)                               AS paying_users,
-  SUM(amount)                                           AS revenue,
-  ROUND(SUM(amount) / (SELECT COUNT(*) FROM users), 2)  AS arpu,   -- per all users
-  ROUND(SUM(amount) / COUNT(DISTINCT user_id), 2)       AS arppu   -- per paying user
-FROM payments;`}
+  (
+    SELECT
+      COUNT(*)
+    FROM
+      users
+  ) AS all_users,
+  COUNT(DISTINCT user_id) AS paying_users,
+  SUM(amount) AS revenue,
+  ROUND(
+    SUM(amount) / (
+      SELECT
+        COUNT(*)
+      FROM
+        users
+    ),
+    2
+  ) AS arpu, -- per all users
+  ROUND(SUM(amount) / COUNT(DISTINCT user_id), 2) AS arppu -- per paying user
+FROM
+  payments;`}
 />
 
 `arpu` (\$20.00 over 10 users) and `arppu` (\$66.67 over 3 payers) are
@@ -107,24 +138,42 @@ SELECT
   DATE '2024-01-01' + (i * 9) AS order_date,
   (i * 23) % 150 + 50         AS amount
 FROM range(0, 30) t(i);`}
-  starterCode={`WITH monthly AS (
-  SELECT
-    date_trunc('month', order_date) AS month,
-    SUM(amount)                     AS revenue
-  FROM orders
-  GROUP BY month
-)
+  starterCode={`WITH
+  monthly AS (
+    SELECT
+      date_trunc('month', order_date) AS month,
+      SUM(amount) AS revenue
+    FROM
+      orders
+    GROUP BY
+      month
+  )
 SELECT
   month,
   revenue,
-  LAG(revenue) OVER (ORDER BY month) AS prev_revenue,
+  LAG (revenue) OVER (
+    ORDER BY
+      month
+  ) AS prev_revenue,
   ROUND(
-    100.0 * (revenue - LAG(revenue) OVER (ORDER BY month))
-          / NULLIF(LAG(revenue) OVER (ORDER BY month), 0),
+    100.0 * (
+      revenue - LAG (revenue) OVER (
+        ORDER BY
+          month
+      )
+    ) / NULLIF(
+      LAG (revenue) OVER (
+        ORDER BY
+          month
+      ),
+      0
+    ),
     1
   ) AS growth_pct
-FROM monthly
-ORDER BY month;`}
+FROM
+  monthly
+ORDER BY
+  month;`}
 />
 
 A CTE to build the monthly series, `LAG` to reach the previous month,

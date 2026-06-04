@@ -112,8 +112,8 @@ Pandas filtering is built entirely on boolean comparisons.
   adapter="python"
   starterCode={`x = 5
 
-print(x == 5)   # equal
-print(x != 5)   # not equal
+print(x == 5)  # equal
+print(x != 5)  # not equal
 print(x > 3)
 print(x >= 5)
 print(x < 10)
@@ -138,8 +138,8 @@ integers, starting at 0.
   adapter="python"
   starterCode={`names = ["Aiko", "Bilal", "Chen", "Diego"]
 
-print(names[0])    # first
-print(names[-1])   # last
+print(names[0])  # first
+print(names[-1])  # last
 print(names[1:3])  # slice: items at index 1 and 2 (exclusive end)
 print(len(names))
 
@@ -183,6 +183,7 @@ A function bundles up reusable logic. The classic shape:
     """Return how many years until retirement."""
     return retire_at - age
 
+
 print(years_until_retirement(29))
 print(years_until_retirement(60, retire_at=67))
 `}
@@ -220,9 +221,11 @@ column transformations.
   starterCode={`square = lambda x: x * x
 print(square(7))
 
+
 # Equivalent to:
 def square2(x):
     return x * x
+
 
 # Lambdas shine when passed to other functions:
 nums = [1, 2, 3, 4, 5]
@@ -296,12 +299,14 @@ Store the three take-home values in a list called \`results\` in that order.`}
     # TODO
     pass
 
-results = []   # TODO: fill with three numbers
+
+results = []  # TODO: fill with three numbers
 
 print(results)
 `}
   solutionCode={`def take_home(salary, tax_rate):
     return salary * (1 - tax_rate)
+
 
 results = [
     take_home(100000, 0.30),

@@ -46,24 +46,24 @@ array of `Object`, with `addElement`, `removeElement`,
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.Vector;
-import java.util.Enumeration;
+  starterCode={`import java.util.Enumeration;
+import java.util.Vector;
 
 public class Main {
-    public static void main(String[] args) {
-        // Vector was the original "growable array of anything".
-        Vector v = new Vector();
-        v.addElement("Ada");
-        v.addElement("Linus");
-        v.addElement(42);            // also legal — it's a Vector of Object
+  public static void main(String[] args) {
+    // Vector was the original "growable array of anything".
+    Vector v = new Vector();
+    v.addElement("Ada");
+    v.addElement("Linus");
+    v.addElement(42); // also legal — it's a Vector of Object
 
-        // Walk it the 1996 way, with Enumeration.
-        Enumeration e = v.elements();
-        while (e.hasMoreElements()) {
-            Object o = e.nextElement();
-            System.out.println(o + " (a " + o.getClass().getSimpleName() + ")");
-        }
+    // Walk it the 1996 way, with Enumeration.
+    Enumeration e = v.elements();
+    while (e.hasMoreElements()) {
+      Object o = e.nextElement();
+      System.out.println(o + " (a " + o.getClass().getSimpleName() + ")");
     }
+  }
 }
 `}
 />
@@ -77,14 +77,14 @@ comes out has to be downcast:
   starterCode={`import java.util.Vector;
 
 public class Main {
-    public static void main(String[] args) {
-        Vector v = new Vector();
-        v.addElement("hello");
+  public static void main(String[] args) {
+    Vector v = new Vector();
+    v.addElement("hello");
 
-        // Have to downcast on the way out. Try changing "String" to "Integer".
-        String s = (String) v.elementAt(0);
-        System.out.println(s.toUpperCase());
-    }
+    // Have to downcast on the way out. Try changing "String" to "Integer".
+    String s = (String)v.elementAt(0);
+    System.out.println(s.toUpperCase());
+  }
 }
 `}
 />
@@ -105,16 +105,16 @@ return to this — modern code prefers `ArrayDeque` for stack behavior).
   starterCode={`import java.util.Stack;
 
 public class Main {
-    public static void main(String[] args) {
-        Stack stack = new Stack();
-        stack.push("first");
-        stack.push("second");
-        stack.push("third");
+  public static void main(String[] args) {
+    Stack stack = new Stack();
+    stack.push("first");
+    stack.push("second");
+    stack.push("third");
 
-        while (!stack.empty()) {
-            System.out.println("pop: " + stack.pop());
-        }
+    while (!stack.empty()) {
+      System.out.println("pop: " + stack.pop());
     }
+  }
 }
 `}
 />
@@ -131,27 +131,27 @@ values using a hash function.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.Hashtable;
-import java.util.Enumeration;
+  starterCode={`import java.util.Enumeration;
+import java.util.Hashtable;
 
 public class Main {
-    public static void main(String[] args) {
-        Hashtable phone = new Hashtable();
-        phone.put("Ada",   "555-0101");
-        phone.put("Linus", "555-0102");
-        phone.put("Grace", "555-0103");
+  public static void main(String[] args) {
+    Hashtable phone = new Hashtable();
+    phone.put("Ada", "555-0101");
+    phone.put("Linus", "555-0102");
+    phone.put("Grace", "555-0103");
 
-        // Cast on the way out, again.
-        String n = (String) phone.get("Grace");
-        System.out.println("Grace -> " + n);
+    // Cast on the way out, again.
+    String n = (String)phone.get("Grace");
+    System.out.println("Grace -> " + n);
 
-        // Walk the keys with Enumeration.
-        Enumeration keys = phone.keys();
-        while (keys.hasMoreElements()) {
-            Object k = keys.nextElement();
-            System.out.println(k + " -> " + phone.get(k));
-        }
+    // Walk the keys with Enumeration.
+    Enumeration keys = phone.keys();
+    while (keys.hasMoreElements()) {
+      Object k = keys.nextElement();
+      System.out.println(k + " -> " + phone.get(k));
     }
+  }
 }
 `}
 />
@@ -168,20 +168,22 @@ exist yet; everyone wrote the `while` loop by hand.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.Vector;
-import java.util.Enumeration;
+  starterCode={`import java.util.Enumeration;
+import java.util.Vector;
 
 public class Main {
-    public static void main(String[] args) {
-        Vector v = new Vector();
-        v.addElement("a"); v.addElement("b"); v.addElement("c");
+  public static void main(String[] args) {
+    Vector v = new Vector();
+    v.addElement("a");
+    v.addElement("b");
+    v.addElement("c");
 
-        Enumeration e = v.elements();
-        while (e.hasMoreElements()) {
-            String s = (String) e.nextElement();
-            System.out.println(s);
-        }
+    Enumeration e = v.elements();
+    while (e.hasMoreElements()) {
+      String s = (String)e.nextElement();
+      System.out.println(s);
     }
+  }
 }
 `}
 />

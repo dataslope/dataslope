@@ -37,9 +37,14 @@ INSERT INTO employees (name, dept, salary) VALUES
   ('Carol', 'Sales',        80000),
   ('Dave',  'Sales',        72000),
   ('Eve',   'Marketing',    68000);`}
-  starterCode={`SELECT name, dept, salary
-FROM employees
-WHERE dept = 'Engineering';`}
+  starterCode={`SELECT
+  name,
+  dept,
+  salary
+FROM
+  employees
+WHERE
+  dept = 'Engineering';`}
 />
 
 Only the two engineers survive the filter. Note `=` tests equality
@@ -69,10 +74,15 @@ You can compare with more than just equality:
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
   ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
-  starterCode={`SELECT name, salary
-FROM employees
-WHERE salary >= 90000
-ORDER BY salary DESC;`}
+  starterCode={`SELECT
+  name,
+  salary
+FROM
+  employees
+WHERE
+  salary >= 90000
+ORDER BY
+  salary DESC;`}
 />
 
 ## Matching text patterns with LIKE
@@ -93,9 +103,13 @@ So `'A%'` means "starts with A," `'%son'` means "ends with son," and
 );
 INSERT INTO employees (name) VALUES
   ('Alice'),('Bob'),('Carol'),('Dave'),('Eve');`}
-  starterCode={`SELECT name
-FROM employees
-WHERE name LIKE 'A%' OR name LIKE 'E%';`}
+  starterCode={`SELECT
+  name
+FROM
+  employees
+WHERE
+  name LIKE 'A%'
+  OR name LIKE 'E%';`}
 />
 
 ## Combining conditions: AND, OR, NOT
@@ -113,9 +127,15 @@ Real questions often have several parts. Combine conditions with
 INSERT INTO employees (name, dept, salary) VALUES
   ('Alice','Engineering',120000),('Bob','Engineering',95000),
   ('Carol','Sales',80000),('Dave','Sales',72000),('Eve','Marketing',68000);`}
-  starterCode={`SELECT name, dept, salary
-FROM employees
-WHERE dept = 'Engineering' AND salary > 100000;`}
+  starterCode={`SELECT
+  name,
+  dept,
+  salary
+FROM
+  employees
+WHERE
+  dept = 'Engineering'
+  AND salary > 100000;`}
 />
 
 <Callout type="info" title="Mixing AND and OR? Use parentheses">
@@ -223,11 +243,21 @@ INSERT INTO books (title, author, year) VALUES
   ('Refactoring', 'Martin Fowler', 2018),
   ('SQL for Smarties', 'Joe Celko', 1995);`}
   starterCode={`-- Keep only the books from before 2000:
-SELECT title, year
-FROM books
-WHERE ;
-`}
-  solutionSql={`SELECT title, year FROM books WHERE year < 2000 ORDER BY id;`}
+SELECT
+  title,
+  year
+FROM
+  books
+WHERE;`}
+  solutionSql={`SELECT
+  title,
+  year
+FROM
+  books
+WHERE
+  year < 2000
+ORDER BY
+  id;`}
   tests={[
     {
       id: "columns",

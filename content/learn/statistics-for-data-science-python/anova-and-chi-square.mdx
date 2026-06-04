@@ -112,15 +112,17 @@ from scipy import stats
 rng = np.random.default_rng(11)
 
 # Fulfillment time (hours) at three warehouses.
-east  = rng.normal(24.0, 4.0, size=40)
-west  = rng.normal(24.5, 4.0, size=40)
-south = rng.normal(27.5, 4.0, size=40)   # this one is genuinely slower
+east = rng.normal(24.0, 4.0, size=40)
+west = rng.normal(24.5, 4.0, size=40)
+south = rng.normal(27.5, 4.0, size=40)  # this one is genuinely slower
 alpha = 0.05
 
 # One-way ANOVA: do ANY of the three group means differ?
 F_stat, p_value = stats.f_oneway(east, west, south)
 
-print(f"Means -> east {east.mean():.1f}, west {west.mean():.1f}, south {south.mean():.1f}")
+print(
+    f"Means -> east {east.mean():.1f}, west {west.mean():.1f}, south {south.mean():.1f}"
+)
 print(f"F-statistic : {F_stat:.3f}")
 print(f"p-value     : {p_value:.4f}")
 print()
@@ -226,7 +228,7 @@ n = 600
 device = rng.choice(["mobile", "desktop", "tablet"], size=n, p=[0.5, 0.4, 0.1])
 # Make churn depend a bit on device (mobile churns more) -> a real association.
 base = np.where(device == "mobile", 0.32, np.where(device == "desktop", 0.18, 0.22))
-churned = (rng.random(n) < base)
+churned = rng.random(n) < base
 
 df = pd.DataFrame({"device": device, "churned": churned})
 

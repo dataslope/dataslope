@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { discoverPages } from "./_discoverPages";
 
 // Drives every <ChallengeCard> on every /learn/challenge-cards/<lang>
 // page, loads its reference solution into the editor buffers, clicks
@@ -47,17 +48,33 @@ declare global {
   }
 }
 
-const CHALLENGE_PAGES: { slug: string; label: string }[] = [
-  { slug: "javascript", label: "JavaScript" },
-  { slug: "typescript", label: "TypeScript" },
-  { slug: "python", label: "Python" },
-  { slug: "r", label: "R" },
-  { slug: "java", label: "Java" },
-  { slug: "c", label: "C" },
-  { slug: "cpp", label: "C++" },
-  { slug: "csharp", label: "C#" },
-  { slug: "php", label: "PHP" },
+// Default: the per-language/dialect demo pages. Set COURSEWARE=1 to sweep
+// every /learn page that embeds a <ChallengeCard> or <SqlChallengeCard>
+// across all courses — a long, opt-in CI run.
+const DEMO_PAGES: { path: string; label: string }[] = [
+  { path: "challenge-cards-javascript", label: "JavaScript" },
+  { path: "challenge-cards-typescript", label: "TypeScript" },
+  { path: "challenge-cards-python", label: "Python" },
+  { path: "challenge-cards-r", label: "R" },
+  { path: "challenge-cards-java", label: "Java" },
+  { path: "challenge-cards-c", label: "C" },
+  { path: "challenge-cards-cpp", label: "C++" },
+  { path: "challenge-cards-csharp", label: "C#" },
+  { path: "challenge-cards-php", label: "PHP" },
+  // SQL challenge cards register on the same window.__dsChallenges registry
+  // and expose the same data-* attributes (see SqlChallengeCard).
+  { path: "sql-challenge-cards-sqlite", label: "SQLite" },
+  { path: "sql-challenge-cards-duckdb", label: "DuckDB" },
+  { path: "sql-challenge-cards-postgres", label: "PostgreSQL" },
 ];
+
+const CHALLENGE_PAGES: { path: string; label: string }[] = process.env
+  .COURSEWARE
+  ? discoverPages(["<ChallengeCard", "<SqlChallengeCard"]).map((p) => ({
+      path: p.route.replace(/^\/learn\//, ""),
+      label: p.route,
+    }))
+  : DEMO_PAGES;
 
 async function readCardsOnPage(page: Page): Promise<
   {
@@ -75,7 +92,7 @@ async function readCardsOnPage(page: Page): Promise<
       solutionFiles: SolutionFilePayload[];
     }[] = [];
     const nodes = document.querySelectorAll<HTMLElement>(
-      '[data-testid="challenge-card"]',
+      '[data-testid="challenge-card"], [data-testid="sql-challenge-card"]',
     );
     nodes.forEach((node) => {
       const adapterId = node.getAttribute("data-adapter-id") ?? "";
@@ -182,12 +199,12 @@ async function runOneCard(
 }
 
 test.describe("Challenge solutions", () => {
-  for (const { slug, label } of CHALLENGE_PAGES) {
+  for (const { path: pagePath, label } of CHALLENGE_PAGES) {
     test(`${label} — every challenge solution passes`, async ({ page }) => {
       const pageErrors: string[] = [];
       page.on("pageerror", (err) => pageErrors.push(err.message));
 
-      await page.goto(`/learn/challenge-cards/${slug}`);
+      await page.goto(`/learn/${pagePath}`);
       // Cards register on `window.__dsChallenges` from a `useEffect`
       // that fires once the React tree commits — wait until at least
       // one card has registered before reading the manifest, so we
@@ -215,7 +232,7 @@ test.describe("Challenge solutions", () => {
           .map((f) => `❌ ${f.key}\n${f.detail}`)
           .join("\n\n");
         throw new Error(
-          `${failures.length}/${cards.length} challenges failed on ${slug}:\n\n${summary}`,
+          `${failures.length}/${cards.length} challenges failed on ${pagePath}:\n\n${summary}`,
         );
       }
 

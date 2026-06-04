@@ -13,8 +13,8 @@ roughly a dozen distinct language features. Let's name them.
   starterCode={`#include <iostream>
 
 int main() {
-    std::cout << "Hello, World!\\n";
-    return 0;
+  std::cout << "Hello, World!\\n";
+  return 0;
 }
 `}
 />
@@ -99,8 +99,8 @@ programs communicate with each other.
   starterCode={`#include <iostream>
 
 int main() {
-    std::cout << "About to fail on purpose\\n";
-    return 42;   // non-zero means "I failed"; the number can mean anything.
+  std::cout << "About to fail on purpose\\n";
+  return 42; // non-zero means "I failed"; the number can mean anything.
 }
 `}
 />
@@ -119,24 +119,24 @@ pieces feel new; we'll spend whole chapters on each.
   starterCode={`#include <iostream>
 #include <string>
 
-std::string shout(const std::string& s) {
-    std::string out;
-    for (char c : s) {
-        if (c >= 'a' && c <= 'z') {
-            out += (char)(c - 'a' + 'A');
-        } else {
-            out += c;
-        }
+std::string shout(const std::string &s) {
+  std::string out;
+  for (char c : s) {
+    if (c >= 'a' && c <= 'z') {
+      out += (char)(c - 'a' + 'A');
+    } else {
+      out += c;
     }
-    return out;
+  }
+  return out;
 }
 
 int main() {
-    std::string greeting = "hello, world!";
-    for (int i = 0; i < 3; ++i) {
-        std::cout << shout(greeting) << "\\n";
-    }
-    return 0;
+  std::string greeting = "hello, world!";
+  for (int i = 0; i < 3; ++i) {
+    std::cout << shout(greeting) << "\\n";
+  }
+  return 0;
 }
 `}
 />
@@ -199,17 +199,17 @@ you really need to.
   starterCode={`#include <iostream>
 
 int main() {
-    // your code here
-    return 0;
+  // your code here
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 
 int main() {
-    std::cout << "Ready\\n";
-    std::cout << "Set\\n";
-    std::cout << "Go!\\n";
-    return 0;
+  std::cout << "Ready\\n";
+  std::cout << "Set\\n";
+  std::cout << "Go!\\n";
+  return 0;
 }
 `}
   tests={[
@@ -232,21 +232,21 @@ int main() {
   starterCode={`#include <iostream>
 
 int main() {
-    int total = 0;
-    // your code here
-    std::cout << total << "\\n";
-    return 0;
+  int total = 0;
+  // your code here
+  std::cout << total << "\\n";
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 
 int main() {
-    int total = 0;
-    for (int i = 1; i <= 100; ++i) {
-        total += i;
-    }
-    std::cout << total << "\\n";
-    return 0;
+  int total = 0;
+  for (int i = 1; i <= 100; ++i) {
+    total += i;
+  }
+  std::cout << total << "\\n";
+  return 0;
 }
 `}
   tests={[

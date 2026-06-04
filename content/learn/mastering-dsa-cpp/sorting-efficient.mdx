@@ -27,29 +27,36 @@ graph TD
   adapter="cpp"
   starterCode={`#include <iostream>
 #include <vector>
-void mergeRange(std::vector<int>& v, int left, int mid, int right) {
-    std::vector<int> temp;
-    int i = left, j = mid + 1;
-    while (i <= mid && j <= right) {
-        if (v[i] <= v[j]) temp.push_back(v[i++]);
-        else temp.push_back(v[j++]);
-    }
-    while (i <= mid) temp.push_back(v[i++]);
-    while (j <= right) temp.push_back(v[j++]);
-    for (int k = 0; k < static_cast<int>(temp.size()); k++) v[left + k] = temp[k];
+void mergeRange(std::vector<int> &v, int left, int mid, int right) {
+  std::vector<int> temp;
+  int i = left, j = mid + 1;
+  while (i <= mid && j <= right) {
+    if (v[i] <= v[j])
+      temp.push_back(v[i++]);
+    else
+      temp.push_back(v[j++]);
+  }
+  while (i <= mid)
+    temp.push_back(v[i++]);
+  while (j <= right)
+    temp.push_back(v[j++]);
+  for (int k = 0; k < static_cast<int>(temp.size()); k++)
+    v[left + k] = temp[k];
 }
-void mergeSortRange(std::vector<int>& v, int left, int right) {
-    if (left >= right) return;
-    int mid = left + (right - left) / 2;
-    mergeSortRange(v, left, mid);
-    mergeSortRange(v, mid + 1, right);
-    mergeRange(v, left, mid, right);
+void mergeSortRange(std::vector<int> &v, int left, int right) {
+  if (left >= right)
+    return;
+  int mid = left + (right - left) / 2;
+  mergeSortRange(v, left, mid);
+  mergeSortRange(v, mid + 1, right);
+  mergeRange(v, left, mid, right);
 }
 int main() {
-    std::vector<int> v = {5, 2, 8, 1, 9, 3, 7, 4};
-    mergeSortRange(v, 0, static_cast<int>(v.size()) - 1);
-    for (int x : v) std::cout << x << "\\n";
-    return 0;
+  std::vector<int> v = {5, 2, 8, 1, 9, 3, 7, 4};
+  mergeSortRange(v, 0, static_cast<int>(v.size()) - 1);
+  for (int x : v)
+    std::cout << x << "\\n";
+  return 0;
 }
 `}
 />
@@ -63,29 +70,31 @@ Quicksort chooses a pivot, partitions values around it, then recursively sorts b
   starterCode={`#include <iostream>
 #include <utility>
 #include <vector>
-int partition(std::vector<int>& v, int low, int high) {
-    int pivot = v[high];
-    int i = low;
-    for (int j = low; j < high; j++) {
-        if (v[j] <= pivot) {
-            std::swap(v[i], v[j]);
-            i++;
-        }
+int partition(std::vector<int> &v, int low, int high) {
+  int pivot = v[high];
+  int i = low;
+  for (int j = low; j < high; j++) {
+    if (v[j] <= pivot) {
+      std::swap(v[i], v[j]);
+      i++;
     }
-    std::swap(v[i], v[high]);
-    return i;
+  }
+  std::swap(v[i], v[high]);
+  return i;
 }
-void quickSort(std::vector<int>& v, int low, int high) {
-    if (low >= high) return;
-    int p = partition(v, low, high);
-    quickSort(v, low, p - 1);
-    quickSort(v, p + 1, high);
+void quickSort(std::vector<int> &v, int low, int high) {
+  if (low >= high)
+    return;
+  int p = partition(v, low, high);
+  quickSort(v, low, p - 1);
+  quickSort(v, p + 1, high);
 }
 int main() {
-    std::vector<int> v = {10, 7, 8, 9, 1, 5};
-    quickSort(v, 0, static_cast<int>(v.size()) - 1);
-    for (int x : v) std::cout << x << "\\n";
-    return 0;
+  std::vector<int> v = {10, 7, 8, 9, 1, 5};
+  quickSort(v, 0, static_cast<int>(v.size()) - 1);
+  for (int x : v)
+    std::cout << x << "\\n";
+  return 0;
 }
 `}
 />
@@ -115,10 +124,11 @@ flowchart TD
 #include <iostream>
 #include <vector>
 int main() {
-    std::vector<int> v = {4, 1, 7, 3, 9, 2};
-    std::sort(v.begin(), v.end());
-    for (int x : v) std::cout << x << "\\n";
-    return 0;
+  std::vector<int> v = {4, 1, 7, 3, 9, 2};
+  std::sort(v.begin(), v.end());
+  for (int x : v)
+    std::cout << x << "\\n";
+  return 0;
 }
 `}
 />
@@ -133,14 +143,18 @@ Use `std::stable_sort` when equal keys must keep their original relative order. 
 #include <iostream>
 #include <string>
 #include <vector>
-struct Record { std::string name; int group; };
+struct Record {
+  std::string name;
+  int group;
+};
 int main() {
-    std::vector<Record> rows = {{"alice", 2}, {"bob", 1}, {"cara", 2}};
-    std::stable_sort(rows.begin(), rows.end(), [](const Record& a, const Record& b) {
-        return a.group < b.group;
-    });
-    for (const Record& r : rows) std::cout << r.group << ":" << r.name << "\\n";
-    return 0;
+  std::vector<Record> rows = {{"alice", 2}, {"bob", 1}, {"cara", 2}};
+  std::stable_sort(
+      rows.begin(), rows.end(),
+      [](const Record &a, const Record &b) { return a.group < b.group; });
+  for (const Record &r : rows)
+    std::cout << r.group << ":" << r.name << "\\n";
+  return 0;
 }
 `}
 />
@@ -155,14 +169,13 @@ Sorting `std::pair` values by their second field is a common lambda example.
 #include <utility>
 #include <vector>
 int main() {
-    std::vector<std::pair<std::string, int>> scores = {
-        {"apple", 3}, {"banana", 1}, {"cherry", 2}, {"date", 5}
-    };
-    std::sort(scores.begin(), scores.end(), [](const auto& a, const auto& b) {
-        return a.second > b.second;
-    });
-    for (const auto& item : scores) std::cout << item.first << "=" << item.second << "\\n";
-    return 0;
+  std::vector<std::pair<std::string, int>> scores = {
+      {"apple", 3}, {"banana", 1}, {"cherry", 2}, {"date", 5}};
+  std::sort(scores.begin(), scores.end(),
+            [](const auto &a, const auto &b) { return a.second > b.second; });
+  for (const auto &item : scores)
+    std::cout << item.first << "=" << item.second << "\\n";
+  return 0;
 }
 `}
 />
@@ -175,45 +188,56 @@ int main() {
   instructions={`Implement \`void mergeSort(std::vector<int>& v)\`. The driver sorts \`{5,2,8,1,9,3,7,4}\` and prints each value on its own line.`}
   starterCode={`#include <iostream>
 #include <vector>
-void mergeSort(std::vector<int>& v) {
-    // your code here
+void mergeSort(std::vector<int> &v) {
+  // your code here
 }
 int main() {
-    std::vector<int> v = {5, 2, 8, 1, 9, 3, 7, 4};
-    mergeSort(v);
-    for (int x : v) std::cout << x << "\\n";
-    return 0;
+  std::vector<int> v = {5, 2, 8, 1, 9, 3, 7, 4};
+  mergeSort(v);
+  for (int x : v)
+    std::cout << x << "\\n";
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 #include <vector>
-void mergeRange(std::vector<int>& v, std::vector<int>& temp, int left, int mid, int right) {
-    int i = left, j = mid + 1, k = left;
-    while (i <= mid && j <= right) {
-        if (v[i] <= v[j]) temp[k++] = v[i++];
-        else temp[k++] = v[j++];
-    }
-    while (i <= mid) temp[k++] = v[i++];
-    while (j <= right) temp[k++] = v[j++];
-    for (int p = left; p <= right; p++) v[p] = temp[p];
+void mergeRange(std::vector<int> &v, std::vector<int> &temp, int left, int mid,
+                int right) {
+  int i = left, j = mid + 1, k = left;
+  while (i <= mid && j <= right) {
+    if (v[i] <= v[j])
+      temp[k++] = v[i++];
+    else
+      temp[k++] = v[j++];
+  }
+  while (i <= mid)
+    temp[k++] = v[i++];
+  while (j <= right)
+    temp[k++] = v[j++];
+  for (int p = left; p <= right; p++)
+    v[p] = temp[p];
 }
-void mergeSortRange(std::vector<int>& v, std::vector<int>& temp, int left, int right) {
-    if (left >= right) return;
-    int mid = left + (right - left) / 2;
-    mergeSortRange(v, temp, left, mid);
-    mergeSortRange(v, temp, mid + 1, right);
-    mergeRange(v, temp, left, mid, right);
+void mergeSortRange(std::vector<int> &v, std::vector<int> &temp, int left,
+                    int right) {
+  if (left >= right)
+    return;
+  int mid = left + (right - left) / 2;
+  mergeSortRange(v, temp, left, mid);
+  mergeSortRange(v, temp, mid + 1, right);
+  mergeRange(v, temp, left, mid, right);
 }
-void mergeSort(std::vector<int>& v) {
-    if (v.empty()) return;
-    std::vector<int> temp(v.size());
-    mergeSortRange(v, temp, 0, static_cast<int>(v.size()) - 1);
+void mergeSort(std::vector<int> &v) {
+  if (v.empty())
+    return;
+  std::vector<int> temp(v.size());
+  mergeSortRange(v, temp, 0, static_cast<int>(v.size()) - 1);
 }
 int main() {
-    std::vector<int> v = {5, 2, 8, 1, 9, 3, 7, 4};
-    mergeSort(v);
-    for (int x : v) std::cout << x << "\\n";
-    return 0;
+  std::vector<int> v = {5, 2, 8, 1, 9, 3, 7, 4};
+  mergeSort(v);
+  for (int x : v)
+    std::cout << x << "\\n";
+  return 0;
 }
 `}
   tests={[{ id: "merge_sorted", name: "Sorts values ascending", expect: { stdoutLines: ["1", "2", "3", "4", "5", "7", "8", "9"], stdoutLinesExact: true } }]}
@@ -231,11 +255,10 @@ int main() {
 #include <utility>
 #include <vector>
 int main() {
-    std::vector<std::pair<std::string, int>> items = {
-        {"apple", 3}, {"banana", 1}, {"cherry", 2}, {"date", 5}
-    };
-    // your code here
-    return 0;
+  std::vector<std::pair<std::string, int>> items = {
+      {"apple", 3}, {"banana", 1}, {"cherry", 2}, {"date", 5}};
+  // your code here
+  return 0;
 }
 `}
   solutionCode={`#include <algorithm>
@@ -244,14 +267,13 @@ int main() {
 #include <utility>
 #include <vector>
 int main() {
-    std::vector<std::pair<std::string, int>> items = {
-        {"apple", 3}, {"banana", 1}, {"cherry", 2}, {"date", 5}
-    };
-    std::sort(items.begin(), items.end(), [](const auto& a, const auto& b) {
-        return a.second > b.second;
-    });
-    for (const auto& item : items) std::cout << item.first << "=" << item.second << "\\n";
-    return 0;
+  std::vector<std::pair<std::string, int>> items = {
+      {"apple", 3}, {"banana", 1}, {"cherry", 2}, {"date", 5}};
+  std::sort(items.begin(), items.end(),
+            [](const auto &a, const auto &b) { return a.second > b.second; });
+  for (const auto &item : items)
+    std::cout << item.first << "=" << item.second << "\\n";
+  return 0;
 }
 `}
   tests={[{ id: "pairs_descending", name: "Sorts pairs by value descending", expect: { stdoutLines: ["date=5", "apple=3", "cherry=2", "banana=1"], stdoutLinesExact: true } }]}

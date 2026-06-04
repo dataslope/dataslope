@@ -161,12 +161,15 @@ INSERT INTO order_items VALUES
   starterCode={`SELECT DISTINCT
   customers.name,
   customers.email
-FROM customers
-JOIN orders ON orders.customer_id = customers.id
-JOIN order_items ON order_items.order_id = orders.id
-JOIN products ON products.id = order_items.product_id
-WHERE products.name = 'Notebook'
-ORDER BY customers.name;`}
+FROM
+  customers
+  JOIN orders ON orders.customer_id = customers.id
+  JOIN order_items ON order_items.order_id = orders.id
+  JOIN products ON products.id = order_items.product_id
+WHERE
+  products.name = 'Notebook'
+ORDER BY
+  customers.name;`}
 />
 
 The query is not magic. It is possible because the schema already knows

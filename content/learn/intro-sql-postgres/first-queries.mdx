@@ -16,7 +16,8 @@ On its own, it can do arithmetic and produce text. Run this:
 <SqlCodeBlock
   dialect="postgres"
   title="SELECT as a calculator"
-  starterCode={`SELECT 2 + 2;`}
+  starterCode={`SELECT
+  2 + 2;`}
 />
 
 PostgreSQL evaluated `2 + 2` and handed back a one-row, one-column
@@ -31,9 +32,9 @@ can name a result column yourself with `AS`:
   dialect="postgres"
   title="Give results friendly names"
   starterCode={`SELECT
-  2 + 2          AS sum,
-  10 * 3         AS product,
-  'PostgreSQL'   AS database_name;`}
+  2 + 2 AS sum,
+  10 * 3 AS product,
+  'PostgreSQL' AS database_name;`}
 />
 
 Notice three things that will recur all course long:
@@ -100,8 +101,11 @@ INSERT INTO cities (name, country, population) VALUES
   ('Tokyo',  'Japan',  37000000),
   ('Lagos',  'Nigeria', 15000000),
   ('Lima',   'Peru',    11000000);`}
-  starterCode={`SELECT name, population
-FROM cities;`}
+  starterCode={`SELECT
+  name,
+  population
+FROM
+  cities;`}
 />
 
 Try editing it: replace `name, population` with `*` to get every

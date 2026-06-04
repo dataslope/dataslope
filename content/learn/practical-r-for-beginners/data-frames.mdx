@@ -58,14 +58,14 @@ these at the start of *every* real analysis:
   starterCode={`# A built-in data frame
 data(mtcars)
 
-dim(mtcars)        # rows, columns
+dim(mtcars) # rows, columns
 nrow(mtcars)
 ncol(mtcars)
-names(mtcars)      # column names
-head(mtcars)       # first 6 rows
-tail(mtcars, 3)    # last 3 rows
-str(mtcars)        # compact summary of structure
-summary(mtcars)    # column-by-column statistics
+names(mtcars) # column names
+head(mtcars) # first 6 rows
+tail(mtcars, 3) # last 3 rows
+str(mtcars) # compact summary of structure
+summary(mtcars) # column-by-column statistics
 `}
 />
 
@@ -85,9 +85,9 @@ or with `[["..."]]`:
   salary = c(95000, 72000, 110000, 65000)
 )
 
-employees$salary           # by name with $
-employees[["salary"]]      # by name with [[
-mean(employees$salary)     # use it like any vector
+employees$salary # by name with $
+employees[["salary"]] # by name with [[
+mean(employees$salary) # use it like any vector
 `}
 />
 
@@ -104,10 +104,10 @@ to mean "all":
   adapter="r"
   starterCode={`data(mtcars)
 
-mtcars[1, ]              # first row, all columns
-mtcars[, 1]              # all rows, first column (returns a vector)
-mtcars[1:5, c("mpg","hp")]   # rows 1-5, just mpg and hp
-mtcars[mtcars$mpg > 25, ]    # rows where mpg > 25, all columns
+mtcars[1, ] # first row, all columns
+mtcars[, 1] # all rows, first column (returns a vector)
+mtcars[1:5, c("mpg", "hp")] # rows 1-5, just mpg and hp
+mtcars[mtcars$mpg > 25, ] # rows where mpg > 25, all columns
 `}
 />
 
@@ -209,8 +209,8 @@ Build a data frame `students` with columns `name` (character),
 - "Cleo", grade 10, score 85
 
 Then assign \`avg_score\` to the mean of the \`score\` column.`}
-  starterCode={`students  <- NULL  # build a data.frame with name, grade, score
-avg_score <- NULL  # mean of students$score
+  starterCode={`students <- NULL # build a data.frame with name, grade, score
+avg_score <- NULL # mean of students$score
 
 print(students)
 cat("Average:", avg_score, "\\n")

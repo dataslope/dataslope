@@ -26,8 +26,11 @@ INSERT INTO employees (name, dept, salary) VALUES
   ('Carol', 'Sales',        80000),
   ('Dave',  'Sales',        72000),
   ('Eve',   'Marketing',    68000);`}
-  starterCode={`SELECT name, salary
-FROM employees;`}
+  starterCode={`SELECT
+  name,
+  salary
+FROM
+  employees;`}
 />
 
 You asked for two columns, so you got two columns — for **every**
@@ -51,8 +54,10 @@ INSERT INTO employees (name, dept, salary) VALUES
   ('Alice', 'Engineering', 120000),
   ('Bob',   'Engineering',  95000),
   ('Carol', 'Sales',        80000);`}
-  starterCode={`SELECT *
-FROM employees;`}
+  starterCode={`SELECT
+  *
+FROM
+  employees;`}
 />
 
 `SELECT *` is handy for exploring a table quickly. In real queries,
@@ -101,8 +106,12 @@ INSERT INTO employees (name, dept, salary) VALUES
   ('Alice', 'Engineering', 120000),
   ('Bob',   'Sales',        72000);`}
   starterCode={`-- salary first, then dept, then name — any order you want
-SELECT salary, dept, name
-FROM employees;`}
+SELECT
+  salary,
+  dept,
+  name
+FROM
+  employees;`}
 />
 
 ## Removing duplicates with DISTINCT
@@ -124,9 +133,12 @@ INSERT INTO employees (name, dept) VALUES
   ('Carol', 'Sales'),
   ('Dave',  'Sales'),
   ('Eve',   'Marketing');`}
-  starterCode={`SELECT DISTINCT dept
-FROM employees
-ORDER BY dept;`}
+  starterCode={`SELECT DISTINCT
+  dept
+FROM
+  employees
+ORDER BY
+  dept;`}
 />
 
 Five employees, but only three distinct departments. `DISTINCT` is
@@ -198,9 +210,15 @@ INSERT INTO books (title, author, year) VALUES
   ('SQL for Smarties', 'Joe Celko', 1995);`}
   starterCode={`-- Return only the title and author columns:
 SELECT
-FROM books;
-`}
-  solutionSql={`SELECT title, author FROM books ORDER BY id;`}
+FROM
+  books;`}
+  solutionSql={`SELECT
+  title,
+  author
+FROM
+  books
+ORDER BY
+  id;`}
   tests={[
     {
       id: "columns",

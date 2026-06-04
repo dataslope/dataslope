@@ -63,14 +63,14 @@ collection?" Because the answer literally is not stored anywhere.
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<String>  ss = new ArrayList<>();
-        List<Integer> is = new ArrayList<>();
+  public static void main(String[] args) {
+    List<String> ss = new ArrayList<>();
+    List<Integer> is = new ArrayList<>();
 
-        // At runtime, both are the same class.
-        System.out.println(ss.getClass() == is.getClass());   // true
-        System.out.println(ss.getClass().getName());          // java.util.ArrayList
-    }
+    // At runtime, both are the same class.
+    System.out.println(ss.getClass() == is.getClass()); // true
+    System.out.println(ss.getClass().getName());        // java.util.ArrayList
+  }
 }
 `}
 />
@@ -89,17 +89,17 @@ the compiler cannot generate a meaningful element-type check for
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        // T[] arr = new T[10];     // not allowed
-        // Pair<String,Integer>[] ps = new Pair<String,Integer>[10];  // not allowed
+  public static void main(String[] args) {
+    // T[] arr = new T[10];     // not allowed
+    // Pair<String,Integer>[] ps = new Pair<String,Integer>[10];  // not allowed
 
-        // Workarounds:
-        Object[] raw = new Object[10];
-        @SuppressWarnings("unchecked")
-        String[] cast = (String[]) new String[10];   // OK — String is concrete
+    // Workarounds:
+    Object[] raw = new Object[10];
+    @SuppressWarnings("unchecked")
+    String[] cast = (String[]) new String[10]; // OK — String is concrete
 
-        System.out.println("ok: " + raw.length + ", " + cast.length);
-    }
+    System.out.println("ok: " + raw.length + ", " + cast.length);
+  }
 }
 `}
 />
@@ -131,17 +131,17 @@ parameterizations.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    static class Counter<T> {
-        static int instances = 0;       // ONE counter, shared
-        Counter() { instances++; }
-    }
+  static class Counter<T> {
+    static int instances = 0; // ONE counter, shared
+    Counter() { instances++; }
+  }
 
-    public static void main(String[] args) {
-        new Counter<String>();
-        new Counter<Integer>();
-        new Counter<Double>();
-        System.out.println("instances = " + Counter.instances);  // 3, not 1+1+1
-    }
+  public static void main(String[] args) {
+    new Counter<String>();
+    new Counter<Integer>();
+    new Counter<Double>();
+    System.out.println("instances = " + Counter.instances); // 3, not 1+1+1
+  }
 }
 `}
 />
@@ -167,17 +167,18 @@ you can suppress the warning with `@SafeVarargs`:
 import java.util.List;
 
 public class Main {
-    @SafeVarargs
-    static <T> List<T> listOf(T... items) {
-        List<T> out = new ArrayList<>();
-        for (T x : items) out.add(x);
-        return out;
-    }
+  @SafeVarargs
+  static <T> List<T> listOf(T... items) {
+    List<T> out = new ArrayList<>();
+    for (T x : items)
+      out.add(x);
+    return out;
+  }
 
-    public static void main(String[] args) {
-        List<String> xs = listOf("a", "b", "c");
-        System.out.println(xs);
-    }
+  public static void main(String[] args) {
+    List<String> xs = listOf("a", "b", "c");
+    System.out.println(xs);
+  }
 }
 `}
 />
@@ -224,22 +225,26 @@ constructing arrays, looking up in a registry — accept a
 import java.util.List;
 
 public class Main {
-    // Filter a heterogeneous list to elements of a given type.
-    static <T> List<T> only(Iterable<?> items, Class<T> type) {
-        List<T> out = new ArrayList<>();
-        for (Object o : items) {
-            if (type.isInstance(o)) out.add(type.cast(o));
-        }
-        return out;
+  // Filter a heterogeneous list to elements of a given type.
+  static <T> List<T> only(Iterable<?> items, Class<T> type) {
+    List<T> out = new ArrayList<>();
+    for (Object o : items) {
+      if (type.isInstance(o))
+        out.add(type.cast(o));
     }
+    return out;
+  }
 
-    public static void main(String[] args) {
-        List<Object> mixed = new ArrayList<>();
-        mixed.add("alpha"); mixed.add(42); mixed.add("beta"); mixed.add(3.14);
+  public static void main(String[] args) {
+    List<Object> mixed = new ArrayList<>();
+    mixed.add("alpha");
+    mixed.add(42);
+    mixed.add("beta");
+    mixed.add(3.14);
 
-        List<String> strings = only(mixed, String.class);
-        System.out.println(strings);
-    }
+    List<String> strings = only(mixed, String.class);
+    System.out.println(strings);
+  }
 }
 `}
 />

@@ -72,7 +72,8 @@ df = px.data.tips()
 
 for col in df.select_dtypes("number").columns:
     fig = px.histogram(
-        df, x=col,
+        df,
+        x=col,
         template="simple_white",
         title=f"Distribution of {col}",
     )
@@ -98,7 +99,9 @@ df = px.data.tips()
 df["pct"] = df["tip"] / df["total_bill"] * 100
 
 fig = px.box(
-    df, x="size", y="pct",
+    df,
+    x="size",
+    y="pct",
     template="simple_white",
     title="Tip percentage by party size",
     labels={"size": "Party size", "pct": "Tip percentage (%)"},

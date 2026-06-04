@@ -86,6 +86,7 @@ import {
   type ChallengeTest,
   type ParsedTestResult,
 } from "./challengeHarness";
+import { mergeInitAndEntry } from "./runtime/mergeInit";
 import styles from "./ChallengeCard.module.css";
 
 type Status = "idle" | "loading" | "ready" | "running" | "error";
@@ -522,8 +523,8 @@ export default function ChallengeCard({
         }),
         highlightActiveLineGutter(),
         highlightActiveLine(),
-        EditorState.tabSize.of(4),
-        indentUnit.of("    "),
+        EditorState.tabSize.of(adapter.indentWidth),
+        indentUnit.of(" ".repeat(adapter.indentWidth)),
         EditorView.lineWrapping,
         keymap.of([
           {
@@ -689,8 +690,8 @@ export default function ChallengeCard({
         EditorState.readOnly.of(true),
         drawSelection(),
         lineNumbersExt(),
-        EditorState.tabSize.of(4),
-        indentUnit.of("    "),
+        EditorState.tabSize.of(adapter.indentWidth),
+        indentUnit.of(" ".repeat(adapter.indentWidth)),
         EditorView.lineWrapping,
         keymap.of(defaultKeymap),
         languageComp.of([]),
@@ -733,8 +734,8 @@ export default function ChallengeCard({
         EditorView.editable.of(false),
         drawSelection(),
         lineNumbersExt(),
-        EditorState.tabSize.of(4),
-        indentUnit.of("    "),
+        EditorState.tabSize.of(adapter.indentWidth),
+        indentUnit.of(" ".repeat(adapter.indentWidth)),
         EditorView.lineWrapping,
         languageComp.of([]),
         themeComp.of(themeFor(cmThemeNameRef.current)),
@@ -825,9 +826,15 @@ export default function ChallengeCard({
       // Multi-file workspaces: stage every file into the runtime VFS so
       // imports resolve. The entry file's bytes mirror what we pass to
       // `run()` below, including any init prelude / harness suffix the
-      // caller bolted on. Adapters that don't support multi-file omit
-      // `prepareFileSystem` entirely — the call is a no-op there.
-      if (runtime.prepareFileSystem) {
+      // caller bolted on.
+      //
+      // Single-file cards pass their source straight to `run()` and must
+      // NOT pre-stage it: some runtimes (CheerpJ/Java, .NET/C#) compile the
+      // staged file set when the VFS is populated, and with no
+      // `entryFilename` (single-file) they then can't locate `main`, so the
+      // program produces no output. This mirrors <CodeBlock>, which only
+      // stages for multi-file workspaces.
+      if (isMultiFile && runtime.prepareFileSystem) {
         const fileMap = new Map<string, Uint8Array>();
         const encoder = new TextEncoder();
         for (const [name, content] of filesSnapshot) {
@@ -944,7 +951,9 @@ export default function ChallengeCard({
     setActiveAction("submit");
     const snapshot = snapshotAllFiles();
     const entryCode = snapshot.get(resolvedEntryFilename) ?? "";
-    const userPart = hasInit ? `${trimmedInit}\n${entryCode}` : entryCode;
+    const userPart = hasInit
+      ? mergeInitAndEntry(adapter.id, trimmedInit, entryCode)
+      : entryCode;
     // Build a native harness for the subset of tests that have a `code`
     // field. Stdout-based tests are evaluated separately after the run.
     const harness = buildHarness(adapter.id, tests);

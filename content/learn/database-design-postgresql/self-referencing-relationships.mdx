@@ -91,12 +91,15 @@ INSERT INTO employees (id, name, title, manager_id) VALUES
   (3, 'Linus', 'Operations Manager', 1),
   (4, 'Mina', 'Developer', 2),
   (5, 'Noor', 'Developer', 2);`}
-  starterCode={`SELECT e.name AS employee,
-       e.title,
-       m.name AS manager
-FROM employees e
-LEFT JOIN employees m ON m.id = e.manager_id
-ORDER BY e.id;`}
+  starterCode={`SELECT
+  e.name AS employee,
+  e.title,
+  m.name AS manager
+FROM
+  employees e
+  LEFT JOIN employees m ON m.id = e.manager_id
+ORDER BY
+  e.id;`}
 />
 
 The `LEFT JOIN` matters because Ada has no manager. An inner join would

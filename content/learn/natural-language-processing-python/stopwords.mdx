@@ -103,7 +103,7 @@ await _load_nltk("tokenizers", "punkt_tab")
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize`}
   starterCode={`text = "The quick brown fox jumps over the lazy dog in the park"
-stop = set(stopwords.words("english"))   # a set -> fast membership tests
+stop = set(stopwords.words("english"))  # a set -> fast membership tests
 
 tokens = [t.lower() for t in word_tokenize(text)]
 content = [t for t in tokens if t not in stop]
@@ -365,18 +365,22 @@ await _load_nltk("corpora", "stopwords")
 from nltk.corpus import stopwords`}
   starterCode={`KEEP = {"not", "no", "nor", "never", "but"}
 
+
 def clean_keep_negation(tokens):
     # Build a custom stop set, then filter.
     return tokens
+
 
 print(clean_keep_negation(["this", "is", "not", "good"]))
 print(clean_keep_negation(["the", "food", "was", "never", "fresh"]))
 `}
   solutionCode={`KEEP = {"not", "no", "nor", "never", "but"}
 
+
 def clean_keep_negation(tokens):
     custom = set(stopwords.words("english")) - KEEP
     return [t for t in tokens if t not in custom]
+
 
 print(clean_keep_negation(["this", "is", "not", "good"]))
 print(clean_keep_negation(["the", "food", "was", "never", "fresh"]))

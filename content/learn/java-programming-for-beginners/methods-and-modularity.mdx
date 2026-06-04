@@ -61,19 +61,17 @@ A few rules:
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        int a = square(5);
-        int b = square(7);
-        int c = square(a + b);
+  public static void main(String[] args) {
+    int a = square(5);
+    int b = square(7);
+    int c = square(a + b);
 
-        System.out.println("a = " + a);
-        System.out.println("b = " + b);
-        System.out.println("c = " + c);
-    }
+    System.out.println("a = " + a);
+    System.out.println("b = " + b);
+    System.out.println("c = " + c);
+  }
 
-    static int square(int x) {
-        return x * x;
-    }
+  static int square(int x) { return x * x; }
 }
 `}
 />
@@ -128,33 +126,33 @@ each in its own method.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        int[] scores = {72, 85, 90, 64, 91, 78};
+  public static void main(String[] args) {
+    int[] scores = {72, 85, 90, 64, 91, 78};
 
-        int avg = average(scores);
-        int max = maximum(scores);
+    int avg = average(scores);
+    int max = maximum(scores);
 
-        System.out.println("average = " + avg);
-        System.out.println("maximum = " + max);
+    System.out.println("average = " + avg);
+    System.out.println("maximum = " + max);
+  }
+
+  static int sum(int[] xs) {
+    int s = 0;
+    for (int x : xs)
+      s += x;
+    return s;
+  }
+
+  static int average(int[] xs) { return sum(xs) / xs.length; }
+
+  static int maximum(int[] xs) {
+    int m = xs[0];
+    for (int i = 1; i < xs.length; i++) {
+      if (xs[i] > m)
+        m = xs[i];
     }
-
-    static int sum(int[] xs) {
-        int s = 0;
-        for (int x : xs) s += x;
-        return s;
-    }
-
-    static int average(int[] xs) {
-        return sum(xs) / xs.length;
-    }
-
-    static int maximum(int[] xs) {
-        int m = xs[0];
-        for (int i = 1; i < xs.length; i++) {
-            if (xs[i] > m) m = xs[i];
-        }
-        return m;
-    }
+    return m;
+  }
 }
 `}
 />
@@ -181,27 +179,28 @@ mutate the object's contents.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        int x = 5;
-        bumpInt(x);
-        System.out.println("after bumpInt, x = " + x);    // still 5
+  public static void main(String[] args) {
+    int x = 5;
+    bumpInt(x);
+    System.out.println("after bumpInt, x = " + x); // still 5
 
-        int[] arr = {1, 2, 3};
-        bumpAll(arr);
-        System.out.print("after bumpAll, arr = ");
-        for (int v : arr) System.out.print(v + " ");
-        System.out.println();                              // 2 3 4
-    }
+    int[] arr = {1, 2, 3};
+    bumpAll(arr);
+    System.out.print("after bumpAll, arr = ");
+    for (int v : arr)
+      System.out.print(v + " ");
+    System.out.println(); // 2 3 4
+  }
 
-    static void bumpInt(int n) {
-        n = n + 1;        // changes local copy only
-    }
+  static void bumpInt(int n) {
+    n = n + 1; // changes local copy only
+  }
 
-    static void bumpAll(int[] xs) {
-        for (int i = 0; i < xs.length; i++) {
-            xs[i] = xs[i] + 1;   // changes the actual array
-        }
+  static void bumpAll(int[] xs) {
+    for (int i = 0; i < xs.length; i++) {
+      xs[i] = xs[i] + 1; // changes the actual array
     }
+  }
 }
 `}
 />
@@ -217,15 +216,15 @@ based on the argument types.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        System.out.println(area(5));          // square
-        System.out.println(area(3, 4));       // rectangle
-        System.out.println(area(3.14, 5));    // ellipse, sort of
-    }
+  public static void main(String[] args) {
+    System.out.println(area(5));       // square
+    System.out.println(area(3, 4));    // rectangle
+    System.out.println(area(3.14, 5)); // ellipse, sort of
+  }
 
-    static int area(int side)             { return side * side; }
-    static int area(int width, int height){ return width * height; }
-    static double area(double r1, double r2){ return Math.PI * r1 * r2; }
+  static int area(int side) { return side * side; }
+  static int area(int width, int height) { return width * height; }
+  static double area(double r1, double r2) { return Math.PI * r1 * r2; }
 }
 `}
 />

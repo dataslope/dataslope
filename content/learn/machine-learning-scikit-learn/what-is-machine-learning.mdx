@@ -183,9 +183,7 @@ X, y = load_iris(return_X_y=True)
 print("Each flower has", X.shape[1], "measurements; we have", X.shape[0], "flowers.")
 
 # 2. Hold some flowers back so we can test on ones the model never saw.
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=0
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
 # 3. TRAIN: let the model learn the pattern from the training flowers.
 model = KNeighborsClassifier(n_neighbors=5)
@@ -225,9 +223,7 @@ from sklearn.neighbors import KNeighborsClassifier
 X, y = load_iris(return_X_y=True)
 species = load_iris().target_names  # ['setosa' 'versicolor' 'virginica']
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=0
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 model = KNeighborsClassifier(n_neighbors=5).fit(X_train, y_train)
 
 # Take one held-out flower and look at its four measurements.

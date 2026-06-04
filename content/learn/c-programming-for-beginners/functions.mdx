@@ -30,16 +30,14 @@ A complete example:
   adapter="c"
   starterCode={`#include <stdio.h>
 
-int square(int n) {
-    return n * n;
-}
+int square(int n) { return n * n; }
 
 int main(void) {
-    int a = 7;
-    int b = square(a);
-    printf("%d squared = %d\\n", a, b);
-    printf("%d squared = %d\\n", 3, square(3));
-    return 0;
+  int a = 7;
+  int b = square(a);
+  printf("%d squared = %d\\n", a, b);
+  printf("%d squared = %d\\n", 3, square(3));
+  return 0;
 }
 `}
 />
@@ -66,15 +64,15 @@ caller's variables.
   starterCode={`#include <stdio.h>
 
 void try_to_increment(int x) {
-    x = x + 1;
-    printf("inside function: x = %d\\n", x);
+  x = x + 1;
+  printf("inside function: x = %d\\n", x);
 }
 
 int main(void) {
-    int n = 10;
-    try_to_increment(n);
-    printf("after call:      n = %d\\n", n);
-    return 0;
+  int n = 10;
+  try_to_increment(n);
+  printf("after call:      n = %d\\n", n);
+  return 0;
 }
 `}
 />
@@ -93,15 +91,13 @@ has nothing meaningful to return, use `void` as the return type.
   adapter="c"
   starterCode={`#include <stdio.h>
 
-void banner(void) {
-    printf("============================\\n");
-}
+void banner(void) { printf("============================\\n"); }
 
 int main(void) {
-    banner();
-    printf(" Welcome to the program!\\n");
-    banner();
-    return 0;
+  banner();
+  printf(" Welcome to the program!\\n");
+  banner();
+  return 0;
 }
 `}
 />
@@ -121,18 +117,18 @@ site.
   starterCode={`#include <stdio.h>
 
 int max(int a, int b) {
-    if (a > b) {
-        return a;
-    } else {
-        return b;
-    }
+  if (a > b) {
+    return a;
+  } else {
+    return b;
+  }
 }
 
 int main(void) {
-    printf("max(3, 7)   = %d\\n", max(3, 7));
-    printf("max(42, 10) = %d\\n", max(42, 10));
-    printf("max(5, 5)   = %d\\n", max(5, 5));
-    return 0;
+  printf("max(3, 7)   = %d\\n", max(3, 7));
+  printf("max(42, 10) = %d\\n", max(42, 10));
+  printf("max(5, 5)   = %d\\n", max(5, 5));
+  return 0;
 }
 `}
 />
@@ -220,20 +216,18 @@ file, you need to tell the compiler the signature first. That's a
   adapter="c"
   starterCode={`#include <stdio.h>
 
-int max(int a, int b);   // prototype: tell the compiler the signature
+int max(int a, int b); // prototype: tell the compiler the signature
 
 int largest_of_three(int a, int b, int c) {
-    return max(a, max(b, c));   // can call max even though it's defined below
+  return max(a, max(b, c)); // can call max even though it's defined below
 }
 
 int main(void) {
-    printf("largest = %d\\n", largest_of_three(3, 9, 7));
-    return 0;
+  printf("largest = %d\\n", largest_of_three(3, 9, 7));
+  return 0;
 }
 
-int max(int a, int b) {
-    return (a > b) ? a : b;
-}
+int max(int a, int b) { return (a > b) ? a : b; }
 `}
 />
 
@@ -251,17 +245,17 @@ example is factorial:
   starterCode={`#include <stdio.h>
 
 long factorial(int n) {
-    if (n <= 1) {
-        return 1;          // base case
-    }
-    return n * factorial(n - 1);   // recursive case
+  if (n <= 1) {
+    return 1; // base case
+  }
+  return n * factorial(n - 1); // recursive case
 }
 
 int main(void) {
-    for (int i = 0; i <= 6; i++) {
-        printf("%d! = %ld\\n", i, factorial(i));
-    }
-    return 0;
+  for (int i = 0; i <= 6; i++) {
+    printf("%d! = %ld\\n", i, factorial(i));
+  }
+  return 0;
 }
 `}
 />
@@ -294,36 +288,38 @@ naturally recursive (trees, divide-and-conquer, parsing).
   starterCode={`#include <stdio.h>
 
 int is_prime(int n) {
-    // your code here
-    return 0;
+  // your code here
+  return 0;
 }
 
 int main(void) {
-    for (int i = 2; i <= 10; i++) {
-        if (is_prime(i)) {
-            printf("%d\\n", i);
-        }
+  for (int i = 2; i <= 10; i++) {
+    if (is_prime(i)) {
+      printf("%d\\n", i);
     }
-    return 0;
+  }
+  return 0;
 }
 `}
   solutionCode={`#include <stdio.h>
 
 int is_prime(int n) {
-    if (n < 2) return 0;
-    for (int d = 2; d * d <= n; d++) {
-        if (n % d == 0) return 0;
-    }
-    return 1;
+  if (n < 2)
+    return 0;
+  for (int d = 2; d * d <= n; d++) {
+    if (n % d == 0)
+      return 0;
+  }
+  return 1;
 }
 
 int main(void) {
-    for (int i = 2; i <= 10; i++) {
-        if (is_prime(i)) {
-            printf("%d\\n", i);
-        }
+  for (int i = 2; i <= 10; i++) {
+    if (is_prime(i)) {
+      printf("%d\\n", i);
     }
-    return 0;
+  }
+  return 0;
 }
 `}
   tests={[

@@ -130,6 +130,7 @@ A valid Python identifier:
 <CodeBlock
   adapter="python"
   starterCode={`import keyword
+
 print("Reserved keywords:", keyword.kwlist)
 `}
 />
@@ -233,9 +234,11 @@ print("b =", b)
   instructions={`Write a function \`is_valid_identifier(name)\` that returns \`True\` if \`name\` is a valid Python identifier that is not a reserved keyword, and \`False\` otherwise. Use the \`str.isidentifier()\` method and the \`keyword\` module.`}
   starterCode={`import keyword
 
+
 def is_valid_identifier(name):
     # Your code here
     return False
+
 
 print(is_valid_identifier("user_count"))
 print(is_valid_identifier("2nd_place"))
@@ -243,8 +246,10 @@ print(is_valid_identifier("class"))
 `}
   solutionCode={`import keyword
 
+
 def is_valid_identifier(name):
     return name.isidentifier() and not keyword.iskeyword(name)
+
 
 print(is_valid_identifier("user_count"))
 print(is_valid_identifier("2nd_place"))

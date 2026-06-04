@@ -108,7 +108,7 @@ from scipy import stats
 rng = np.random.default_rng(42)
 
 # One observed sample of 60 customer wait times (minutes).
-data = rng.gamma(shape=2.0, scale=4.0, size=60)   # skewed, not normal
+data = rng.gamma(shape=2.0, scale=4.0, size=60)  # skewed, not normal
 
 B = 5000
 boot_means = np.empty(B)
@@ -122,8 +122,9 @@ boot_se = boot_means.std(ddof=1)
 
 # Compare to the textbook t-interval for the mean.
 se_formula = data.std(ddof=1) / np.sqrt(len(data))
-t_low, t_high = stats.t.interval(0.95, df=len(data) - 1,
-                                 loc=data.mean(), scale=se_formula)
+t_low, t_high = stats.t.interval(
+    0.95, df=len(data) - 1, loc=data.mean(), scale=se_formula
+)
 
 print(f"observed mean        = {data.mean():.3f}")
 print(f"bootstrap SE         = {boot_se:.3f}")
@@ -173,16 +174,18 @@ B = 5000
 boot_medians = np.empty(B)
 for i in range(B):
     resample = rng.choice(data, size=len(data), replace=True)
-    boot_medians[i] = np.median(resample)        # <-- only change vs. the mean
+    boot_medians[i] = np.median(resample)  # <-- only change vs. the mean
 
 ci_low, ci_high = np.percentile(boot_medians, [2.5, 97.5])
 boot_se = boot_medians.std(ddof=1)
 
-fig = px.histogram(boot_medians, nbins=50,
-                   labels={"value": "bootstrap median"},
-                   title="Bootstrap distribution of the median")
-fig.add_vline(x=np.median(data), line_dash="dash",
-              annotation_text="observed median")
+fig = px.histogram(
+    boot_medians,
+    nbins=50,
+    labels={"value": "bootstrap median"},
+    title="Bootstrap distribution of the median",
+)
+fig.add_vline(x=np.median(data), line_dash="dash", annotation_text="observed median")
 fig.add_vline(x=ci_low, line_color="red")
 fig.add_vline(x=ci_high, line_color="red")
 fig.show()

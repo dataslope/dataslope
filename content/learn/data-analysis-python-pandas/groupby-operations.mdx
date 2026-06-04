@@ -41,10 +41,12 @@ ever since.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
-    "salary": [120, 95, 140, 80, 128, 110, 92],
-})
+df = pd.DataFrame(
+    {
+        "dept": ["Eng", "Sales", "Eng", "Ops", "Eng", "Sales", "Ops"],
+        "salary": [120, 95, 140, 80, 128, 110, 92],
+    }
+)
 
 # Group by dept, take the mean of salary
 print(df.groupby("dept")["salary"].mean())
@@ -63,7 +65,7 @@ df = pd.DataFrame({
     "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
     "salary": [120, 95, 140, 80, 128, 110, 92],
 })`}
-  starterCode={`print(df.groupby("dept")["salary"].agg(["mean","median","min","max","count"]))
+  starterCode={`print(df.groupby("dept")["salary"].agg(["mean", "median", "min", "max", "count"]))
 `}
 />
 
@@ -73,16 +75,20 @@ Or apply different aggregations to different columns:
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
-    "salary": [120, 95, 140, 80, 128, 110, 92],
-    "tenure": [3, 6, 7, 2, 4, 5, 6],
-})
+df = pd.DataFrame(
+    {
+        "dept": ["Eng", "Sales", "Eng", "Ops", "Eng", "Sales", "Ops"],
+        "salary": [120, 95, 140, 80, 128, 110, 92],
+        "tenure": [3, 6, 7, 2, 4, 5, 6],
+    }
+)
 
-result = df.groupby("dept").agg({
-    "salary": ["mean", "max"],
-    "tenure": ["mean", "min"],
-})
+result = df.groupby("dept").agg(
+    {
+        "salary": ["mean", "max"],
+        "tenure": ["mean", "min"],
+    }
+)
 print(result)
 `}
 />
@@ -96,18 +102,24 @@ columns. This is the modern recommended style.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
-    "salary": [120, 95, 140, 80, 128, 110, 92],
-    "tenure": [3, 6, 7, 2, 4, 5, 6],
-})
+df = pd.DataFrame(
+    {
+        "dept": ["Eng", "Sales", "Eng", "Ops", "Eng", "Sales", "Ops"],
+        "salary": [120, 95, 140, 80, 128, 110, 92],
+        "tenure": [3, 6, 7, 2, 4, 5, 6],
+    }
+)
 
-result = df.groupby("dept").agg(
-    avg_salary=("salary", "mean"),
-    max_salary=("salary", "max"),
-    head_count=("salary", "count"),
-    avg_tenure=("tenure", "mean"),
-).round(1)
+result = (
+    df.groupby("dept")
+    .agg(
+        avg_salary=("salary", "mean"),
+        max_salary=("salary", "max"),
+        head_count=("salary", "count"),
+        avg_tenure=("tenure", "mean"),
+    )
+    .round(1)
+)
 
 print(result)
 `}
@@ -124,13 +136,15 @@ Pass a list of column names:
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "dept":   ["Eng","Eng","Sales","Sales","Eng","Sales"],
-    "level":  ["jr","sr","jr","sr","jr","jr"],
-    "salary": [110, 160, 80, 120, 95, 75],
-})
+df = pd.DataFrame(
+    {
+        "dept": ["Eng", "Eng", "Sales", "Sales", "Eng", "Sales"],
+        "level": ["jr", "sr", "jr", "sr", "jr", "jr"],
+        "salary": [110, 160, 80, 120, 95, 75],
+    }
+)
 
-print(df.groupby(["dept","level"])["salary"].mean())
+print(df.groupby(["dept", "level"])["salary"].mean())
 `}
 />
 
@@ -145,7 +159,7 @@ df = pd.DataFrame({
     "level":  ["jr","sr","jr","sr","jr","jr"],
     "salary": [110, 160, 80, 120, 95, 75],
 })`}
-  starterCode={`flat = df.groupby(["dept","level"])["salary"].mean().reset_index()
+  starterCode={`flat = df.groupby(["dept", "level"])["salary"].mean().reset_index()
 print(flat)
 `}
 />
@@ -159,10 +173,12 @@ add a column to the *original* rows containing a group statistic.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
-    "salary": [120, 95, 140, 80, 128, 110, 92],
-})
+df = pd.DataFrame(
+    {
+        "dept": ["Eng", "Sales", "Eng", "Ops", "Eng", "Sales", "Ops"],
+        "salary": [120, 95, 140, 80, 128, 110, 92],
+    }
+)
 
 df["dept_avg"] = df.groupby("dept")["salary"].transform("mean")
 df["vs_dept_avg"] = (df["salary"] - df["dept_avg"]).round(1)
@@ -183,10 +199,12 @@ satisfy a condition.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
-    "salary": [120, 95, 140, 80, 128, 110, 92],
-})
+df = pd.DataFrame(
+    {
+        "dept": ["Eng", "Sales", "Eng", "Ops", "Eng", "Sales", "Ops"],
+        "salary": [120, 95, 140, 80, 128, 110, 92],
+    }
+)
 
 # Keep only departments with average salary > 100
 big = df.groupby("dept").filter(lambda g: g["salary"].mean() > 100)
@@ -207,13 +225,17 @@ the named aggregations, but flexible.
   adapter="python"
   starterCode={`import pandas as pd
 
-df = pd.DataFrame({
-    "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
-    "salary": [120, 95, 140, 80, 128, 110, 92],
-})
+df = pd.DataFrame(
+    {
+        "dept": ["Eng", "Sales", "Eng", "Ops", "Eng", "Sales", "Ops"],
+        "salary": [120, 95, 140, 80, 128, 110, 92],
+    }
+)
+
 
 def top_two(g):
     return g.sort_values("salary", ascending=False).head(2)
+
 
 print(df.groupby("dept").apply(top_two, include_groups=False))
 `}
@@ -238,12 +260,16 @@ df = pd.read_csv(
 # Turn Attrition (Yes/No) into 1/0 so we can take its mean
 df["left"] = (df["Attrition"] == "Yes").astype(int)
 
-summary = df.groupby("Department").agg(
-    headcount     = ("EmployeeNumber", "count"),
-    avg_income    = ("MonthlyIncome", "mean"),
-    median_income = ("MonthlyIncome", "median"),
-    attrition_pct = ("left", "mean"),
-).round({"avg_income": 0, "median_income": 0, "attrition_pct": 3})
+summary = (
+    df.groupby("Department")
+    .agg(
+        headcount=("EmployeeNumber", "count"),
+        avg_income=("MonthlyIncome", "mean"),
+        median_income=("MonthlyIncome", "median"),
+        attrition_pct=("left", "mean"),
+    )
+    .round({"avg_income": 0, "median_income": 0, "attrition_pct": 3})
+)
 
 summary["attrition_pct"] = (summary["attrition_pct"] * 100).round(1)
 print(summary)
@@ -275,7 +301,7 @@ Sort the result by \`attrition_pct\` descending.`}
 URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
 df = pd.read_csv(URL)
 
-summary = None   # TODO
+summary = None  # TODO
 
 print(summary)
 `}
@@ -288,16 +314,16 @@ df["left"] = (df["Attrition"] == "Yes").astype(int)
 
 summary = (
     df.groupby("Department")
-      .agg(
-          headcount=("EmployeeNumber", "count"),
-          avg_income=("MonthlyIncome", "mean"),
-          attrition_pct=("left", "mean"),
-      )
-      .assign(
-          avg_income=lambda x: x["avg_income"].round(0),
-          attrition_pct=lambda x: (x["attrition_pct"] * 100).round(1),
-      )
-      .sort_values("attrition_pct", ascending=False)
+    .agg(
+        headcount=("EmployeeNumber", "count"),
+        avg_income=("MonthlyIncome", "mean"),
+        attrition_pct=("left", "mean"),
+    )
+    .assign(
+        avg_income=lambda x: x["avg_income"].round(0),
+        attrition_pct=lambda x: (x["attrition_pct"] * 100).round(1),
+    )
+    .sort_values("attrition_pct", ascending=False)
 )
 
 print(summary)

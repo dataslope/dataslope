@@ -96,18 +96,22 @@ class. TypeScript narrows based on `instanceof`:
 <CodeBlock
   adapter="typescript"
   starterCode={`class Dog {
-  bark() { console.log("Woof!"); }
+  bark() {
+    console.log("Woof!");
+  }
 }
 
 class Cat {
-  meow() { console.log("Meow!"); }
+  meow() {
+    console.log("Meow!");
+  }
 }
 
 function speak(animal: Dog | Cat): void {
   if (animal instanceof Dog) {
-    animal.bark();  // animal is narrowed to Dog
+    animal.bark(); // animal is narrowed to Dog
   } else {
-    animal.meow();  // animal is narrowed to Cat
+    animal.meow(); // animal is narrowed to Cat
   }
 }
 
@@ -235,7 +239,7 @@ The `switch` statement also triggers narrowing:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Result = 
+  starterCode={`type Result =
   | { status: "success"; data: string }
   | { status: "failure"; error: string }
   | { status: "pending" };
@@ -243,13 +247,13 @@ The `switch` statement also triggers narrowing:
 function handle(result: Result): void {
   switch (result.status) {
     case "success":
-      console.log("Data:", result.data);  // result is narrowed to success
+      console.log("Data:", result.data); // result is narrowed to success
       break;
     case "failure":
-      console.log("Error:", result.error);  // result is narrowed to failure
+      console.log("Error:", result.error); // result is narrowed to failure
       break;
     case "pending":
-      console.log("Still loading...");  // result is narrowed to pending
+      console.log("Still loading..."); // result is narrowed to pending
       break;
     default:
       // Exhaustiveness check: if you add a new variant, this line errors
@@ -424,11 +428,11 @@ predicates:
 
 // Filter to only strings
 const strings = mixed.filter((x): x is string => typeof x === "string");
-console.log("strings:", strings);  // strings is string[]
+console.log("strings:", strings); // strings is string[]
 
 // Filter to only numbers
 const numbers = mixed.filter((x): x is number => typeof x === "number");
-console.log("numbers:", numbers);  // numbers is number[]
+console.log("numbers:", numbers); // numbers is number[]
 `}
 />
 

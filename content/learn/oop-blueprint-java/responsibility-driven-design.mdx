@@ -265,27 +265,27 @@ behavior *envies* the data — it wants to live on `Invoice`.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Invoice inv = new Invoice(100.0, 50.0);
-        // Awkward: outsider doing the math
-        double tax = Util.tax(inv);
-        System.out.println("tax = " + tax);
-    }
+  public static void main(String[] args) {
+    Invoice inv = new Invoice(100.0, 50.0);
+    // Awkward: outsider doing the math
+    double tax = Util.tax(inv);
+    System.out.println("tax = " + tax);
+  }
 }
 
 class Invoice {
-    double subtotal;
-    double shipping;
-    Invoice(double subtotal, double shipping) {
-        this.subtotal = subtotal;
-        this.shipping = shipping;
-    }
+  double subtotal;
+  double shipping;
+  Invoice(double subtotal, double shipping) {
+    this.subtotal = subtotal;
+    this.shipping = shipping;
+  }
 }
 
 class Util {
-    static double tax(Invoice inv) {
-        return (inv.subtotal + inv.shipping) * 0.10;   // pokes Invoice's fields
-    }
+  static double tax(Invoice inv) {
+    return (inv.subtotal + inv.shipping) * 0.10; // pokes Invoice's fields
+  }
 }
 `}
 />
@@ -297,25 +297,25 @@ fields.
 <CodeBlock
   adapter="java"
   starterCode={`public class Main {
-    public static void main(String[] args) {
-        Invoice inv = new Invoice(100.0, 50.0);
-        System.out.println("tax = " + inv.tax());
-    }
+  public static void main(String[] args) {
+    Invoice inv = new Invoice(100.0, 50.0);
+    System.out.println("tax = " + inv.tax());
+  }
 }
 
 class Invoice {
-    private final double subtotal;
-    private final double shipping;
-    private static final double RATE = 0.10;
+  private final double subtotal;
+  private final double shipping;
+  private static final double RATE = 0.10;
 
-    public Invoice(double subtotal, double shipping) {
-        this.subtotal = subtotal;
-        this.shipping = shipping;
-    }
+  public Invoice(double subtotal, double shipping) {
+    this.subtotal = subtotal;
+    this.shipping = shipping;
+  }
 
-    public double tax() {
-        return (subtotal + shipping) * RATE;       // owns its own behavior
-    }
+  public double tax() {
+    return (subtotal + shipping) * RATE; // owns its own behavior
+  }
 }
 `}
 />

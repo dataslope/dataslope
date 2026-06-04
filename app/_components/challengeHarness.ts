@@ -333,14 +333,17 @@ const buildPythonHarness: HarnessBuilder = (tests) => {
 /**
  * JavaScript / TypeScript harness — used by both adapters since their
  * runtime surface for `console.log` and exception handling is the same.
- * Test bodies execute inside an IIFE so `return` is legal and lexical
- * bindings don't pollute the global scope.
+ * Test bodies execute inside an async function so `return`/`await` are
+ * legal and lexical bindings don't pollute the global scope. The runtime
+ * wraps user code (and this harness) in an async function with top-level
+ * `await` support, so each test is awaited in turn — this lets test code
+ * `await` Promises (e.g. asserting on a callback wrapped in a Promise).
  */
 const buildJsHarness: HarnessBuilder = (tests) => {
   const lines: string[] = [];
   lines.push(`console.log("${HARNESS_BEGIN}");`);
-  lines.push("function __dstestRun(tid, fn) {");
-  lines.push("  try { fn();");
+  lines.push("async function __dstestRun(tid, fn) {");
+  lines.push("  try { await fn();");
   lines.push(`    console.log("${HARNESS_RESULT_PREFIX}" + tid + ":PASS");`);
   lines.push("  } catch (e) {");
   lines.push(
@@ -355,7 +358,7 @@ const buildJsHarness: HarnessBuilder = (tests) => {
   tests.forEach((t) => {
     const body = t.code.trim() || "/* empty */";
     lines.push(
-      `__dstestRun(${JSON.stringify(t.id)}, function () {\n${body}\n});`,
+      `await __dstestRun(${JSON.stringify(t.id)}, async function () {\n${body}\n});`,
     );
     lines.push("");
   });

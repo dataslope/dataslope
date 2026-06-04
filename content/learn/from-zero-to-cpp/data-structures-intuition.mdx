@@ -105,28 +105,28 @@ flowchart LR
 #include <vector>
 
 int main() {
-    // Count occurrences of each word.
-    std::vector<std::string> words = {"the", "quick", "brown", "fox",
-                                      "the", "fox", "the"};
+  // Count occurrences of each word.
+  std::vector<std::string> words = {"the", "quick", "brown", "fox",
+                                    "the", "fox",   "the"};
 
-    std::map<std::string, int>           ordered_counts;
-    std::unordered_map<std::string, int> hash_counts;
+  std::map<std::string, int> ordered_counts;
+  std::unordered_map<std::string, int> hash_counts;
 
-    for (const auto& w : words) {
-        ++ordered_counts[w];   // map: lookup is O(log n)
-        ++hash_counts[w];      // unordered_map: O(1) average
-    }
+  for (const auto &w : words) {
+    ++ordered_counts[w]; // map: lookup is O(log n)
+    ++hash_counts[w];    // unordered_map: O(1) average
+  }
 
-    std::cout << "[ordered iteration]\\n";
-    for (const auto& [w, n] : ordered_counts) {
-        std::cout << "  " << w << " : " << n << "\\n";
-    }
+  std::cout << "[ordered iteration]\\n";
+  for (const auto &[w, n] : ordered_counts) {
+    std::cout << "  " << w << " : " << n << "\\n";
+  }
 
-    std::cout << "[hashed iteration order is unspecified]\\n";
-    for (const auto& [w, n] : hash_counts) {
-        std::cout << "  " << w << " : " << n << "\\n";
-    }
-    return 0;
+  std::cout << "[hashed iteration order is unspecified]\\n";
+  for (const auto &[w, n] : hash_counts) {
+    std::cout << "  " << w << " : " << n << "\\n";
+  }
+  return 0;
 }
 `}
 />

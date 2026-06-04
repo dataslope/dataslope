@@ -27,11 +27,11 @@ Many built-in types implement it: `Integer`, `Double`, `String`
   starterCode={`import java.util.Arrays;
 
 public class Main {
-    public static void main(String[] args) {
-        String[] names = { "Charlie", "Alice", "Bob" };
-        Arrays.sort(names);                         // uses String.compareTo
-        System.out.println(Arrays.toString(names)); // [Alice, Bob, Charlie]
-    }
+  public static void main(String[] args) {
+    String[] names = {"Charlie", "Alice", "Bob"};
+    Arrays.sort(names);                         // uses String.compareTo
+    System.out.println(Arrays.toString(names)); // [Alice, Bob, Charlie]
+  }
 }
 `}
 />
@@ -44,24 +44,28 @@ makes sense most of the time:
   starterCode={`import java.util.Arrays;
 
 public class Main {
-    record Version(int major, int minor, int patch) implements Comparable<Version> {
-        public int compareTo(Version o) {
-            if (this.major != o.major) return Integer.compare(this.major, o.major);
-            if (this.minor != o.minor) return Integer.compare(this.minor, o.minor);
-            return Integer.compare(this.patch, o.patch);
-        }
+  record Version(int major, int minor, int patch)
+      implements Comparable<Version> {
+    public int compareTo(Version o) {
+      if (this.major != o.major)
+        return Integer.compare(this.major, o.major);
+      if (this.minor != o.minor)
+        return Integer.compare(this.minor, o.minor);
+      return Integer.compare(this.patch, o.patch);
     }
+  }
 
-    public static void main(String[] args) {
-        Version[] vs = {
-            new Version(1, 10, 0),
-            new Version(1,  2, 5),
-            new Version(2,  0, 0),
-            new Version(1,  2, 4),
-        };
-        Arrays.sort(vs);
-        for (Version v : vs) System.out.println(v);
-    }
+  public static void main(String[] args) {
+    Version[] vs = {
+        new Version(1, 10, 0),
+        new Version(1, 2, 5),
+        new Version(2, 0, 0),
+        new Version(1, 2, 4),
+    };
+    Arrays.sort(vs);
+    for (Version v : vs)
+      System.out.println(v);
+  }
 }
 `}
 />
@@ -95,25 +99,22 @@ type:
   starterCode={`import java.util.*;
 
 public class Main {
-    record Person(String name, int age) {}
+  record Person(String name, int age) {}
 
-    public static void main(String[] args) {
-        List<Person> ps = new ArrayList<>(List.of(
-            new Person("Ada",   36),
-            new Person("Linus", 54),
-            new Person("Grace", 85),
-            new Person("Bjarne",73)
-        ));
+  public static void main(String[] args) {
+    List<Person> ps = new ArrayList<>(
+        List.of(new Person("Ada", 36), new Person("Linus", 54),
+                new Person("Grace", 85), new Person("Bjarne", 73)));
 
-        ps.sort(Comparator.comparing(Person::name));
-        System.out.println("by name:  " + ps);
+    ps.sort(Comparator.comparing(Person::name));
+    System.out.println("by name:  " + ps);
 
-        ps.sort(Comparator.comparingInt(Person::age));
-        System.out.println("by age:   " + ps);
+    ps.sort(Comparator.comparingInt(Person::age));
+    System.out.println("by age:   " + ps);
 
-        ps.sort(Comparator.comparingInt(Person::age).reversed());
-        System.out.println("by age v: " + ps);
-    }
+    ps.sort(Comparator.comparingInt(Person::age).reversed());
+    System.out.println("by age v: " + ps);
+  }
 }
 `}
 />
@@ -132,26 +133,23 @@ The real elegance of `Comparator` is composition. You can chain
   starterCode={`import java.util.*;
 
 public class Main {
-    record Employee(String dept, String name, int salary) {}
+  record Employee(String dept, String name, int salary) {}
 
-    public static void main(String[] args) {
-        List<Employee> es = new ArrayList<>(List.of(
-            new Employee("eng",  "Ada",   120),
-            new Employee("eng",  "Linus", 150),
-            new Employee("sales","Grace",  90),
-            new Employee("eng",  "Brian", 150),
-            new Employee("sales","Edsger", 90)
-        ));
+  public static void main(String[] args) {
+    List<Employee> es = new ArrayList<>(List.of(
+        new Employee("eng", "Ada", 120), new Employee("eng", "Linus", 150),
+        new Employee("sales", "Grace", 90), new Employee("eng", "Brian", 150),
+        new Employee("sales", "Edsger", 90)));
 
-        // department asc, salary desc, then name asc
-        Comparator<Employee> order = Comparator
-            .comparing(Employee::dept)
+    // department asc, salary desc, then name asc
+    Comparator<Employee> order =
+        Comparator.comparing(Employee::dept)
             .thenComparing(Comparator.comparingInt(Employee::salary).reversed())
             .thenComparing(Employee::name);
 
-        es.sort(order);
-        es.forEach(System.out::println);
-    }
+    es.sort(order);
+    es.forEach(System.out::println);
+  }
 }
 `}
 />
@@ -171,11 +169,11 @@ null-tolerant one:
   starterCode={`import java.util.*;
 
 public class Main {
-    public static void main(String[] args) {
-        List<String> xs = new ArrayList<>(Arrays.asList("b", null, "a", null, "c"));
-        xs.sort(Comparator.nullsLast(Comparator.naturalOrder()));
-        System.out.println(xs);
-    }
+  public static void main(String[] args) {
+    List<String> xs = new ArrayList<>(Arrays.asList("b", null, "a", null, "c"));
+    xs.sort(Comparator.nullsLast(Comparator.naturalOrder()));
+    System.out.println(xs);
+  }
 }
 `}
 />

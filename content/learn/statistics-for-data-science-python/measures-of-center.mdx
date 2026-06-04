@@ -37,9 +37,9 @@ from scipy import stats
 # Daily support tickets resolved by an agent over two weeks.
 tickets = pd.Series([8, 9, 7, 8, 10, 9, 8, 11, 7, 8, 9, 12, 8, 10])
 
-print("Mean   :", tickets.mean())          # arithmetic average
-print("Median :", tickets.median())        # middle value
-print("Mode   :", tickets.mode().tolist()) # most common value(s)
+print("Mean   :", tickets.mean())  # arithmetic average
+print("Median :", tickets.median())  # middle value
+print("Mode   :", tickets.mode().tolist())  # most common value(s)
 
 # scipy gives the mode plus how often it occurs
 m = stats.mode(tickets, keepdims=False)
@@ -208,8 +208,8 @@ from scipy import stats
 # Right-skewed incomes (in thousands), with a couple of high earners.
 income = np.array([38, 41, 44, 47, 49, 52, 55, 60, 120, 400])
 
-mean_      = np.mean(income)
-median_    = np.median(income)
+mean_ = np.mean(income)
+median_ = np.median(income)
 trimmed_10 = stats.trim_mean(income, 0.10)  # drop 10% from each end
 
 print(f"Mean         : {mean_:.1f}k   (pulled up by the 400k earner)")
@@ -222,7 +222,9 @@ factors = np.array([1.10, 0.95, 1.20, 1.08])
 g = stats.gmean(factors)
 print(f"\\nArithmetic mean of factors: {factors.mean():.4f}")
 print(f"Geometric mean of factors : {g:.4f}  <- true average growth/yr")
-print(f"Compounded over 4 yrs, gmean reproduces total: {g**4:.4f} = {np.prod(factors):.4f}")
+print(
+    f"Compounded over 4 yrs, gmean reproduces total: {g**4:.4f} = {np.prod(factors):.4f}"
+)
 `}
 />
 
@@ -259,10 +261,10 @@ rng = np.random.default_rng(7)
 orders = pd.Series(np.round(rng.lognormal(mean=3.2, sigma=0.6, size=500), 2))
 
 summary = {
-    "n":            int(orders.size),
-    "mean":         round(float(orders.mean()), 2),
-    "median":       round(float(orders.median()), 2),
-    "trimmed_10":   round(float(stats.trim_mean(orders, 0.10)), 2),
+    "n": int(orders.size),
+    "mean": round(float(orders.mean()), 2),
+    "median": round(float(orders.median()), 2),
+    "trimmed_10": round(float(stats.trim_mean(orders, 0.10)), 2),
     "mean_minus_median": round(float(orders.mean() - orders.median()), 2),
 }
 

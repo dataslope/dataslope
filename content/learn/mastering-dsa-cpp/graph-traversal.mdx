@@ -40,34 +40,35 @@ Because BFS visits by increasing number of edges, it finds shortest paths in **u
 #include <queue>
 #include <vector>
 
-std::vector<int> bfs(const std::vector<std::vector<int>>& adj, int src) {
-    std::vector<int> order;
-    std::vector<bool> visited(adj.size(), false);
-    std::queue<int> q;
+std::vector<int> bfs(const std::vector<std::vector<int>> &adj, int src) {
+  std::vector<int> order;
+  std::vector<bool> visited(adj.size(), false);
+  std::queue<int> q;
 
-    visited[src] = true;
-    q.push(src);
+  visited[src] = true;
+  q.push(src);
 
-    while (!q.empty()) {
-        int u = q.front();
-        q.pop();
-        order.push_back(u);
+  while (!q.empty()) {
+    int u = q.front();
+    q.pop();
+    order.push_back(u);
 
-        for (int v : adj[u]) {
-            if (!visited[v]) {
-                visited[v] = true;
-                q.push(v);
-            }
-        }
+    for (int v : adj[u]) {
+      if (!visited[v]) {
+        visited[v] = true;
+        q.push(v);
+      }
     }
-    return order;
+  }
+  return order;
 }
 
 int main() {
-    std::vector<std::vector<int>> adj = {{1, 2}, {3, 4}, {5}, {}, {}, {}};
-    for (int x : bfs(adj, 0)) std::cout << x << " ";
-    std::cout << "\\n";
-    return 0;
+  std::vector<std::vector<int>> adj = {{1, 2}, {3, 4}, {5}, {}, {}, {}};
+  for (int x : bfs(adj, 0))
+    std::cout << x << " ";
+  std::cout << "\\n";
+  return 0;
 }
 `}
 />
@@ -90,20 +91,22 @@ DFS(u):
   starterCode={`#include <iostream>
 #include <vector>
 
-void dfsRecursive(int u, const std::vector<std::vector<int>>& adj, std::vector<bool>& visited) {
-    visited[u] = true;
-    std::cout << u << " ";
-    for (int v : adj[u]) {
-        if (!visited[v]) dfsRecursive(v, adj, visited);
-    }
+void dfsRecursive(int u, const std::vector<std::vector<int>> &adj,
+                  std::vector<bool> &visited) {
+  visited[u] = true;
+  std::cout << u << " ";
+  for (int v : adj[u]) {
+    if (!visited[v])
+      dfsRecursive(v, adj, visited);
+  }
 }
 
 int main() {
-    std::vector<std::vector<int>> adj = {{1, 2}, {3, 4}, {5}, {}, {}, {}};
-    std::vector<bool> visited(adj.size(), false);
-    dfsRecursive(0, adj, visited);
-    std::cout << "\\n";
-    return 0;
+  std::vector<std::vector<int>> adj = {{1, 2}, {3, 4}, {5}, {}, {}, {}};
+  std::vector<bool> visited(adj.size(), false);
+  dfsRecursive(0, adj, visited);
+  std::cout << "\\n";
+  return 0;
 }
 `}
 />
@@ -116,32 +119,36 @@ The iterative version uses a stack. Push neighbors in reverse order if you want 
 #include <stack>
 #include <vector>
 
-std::vector<int> dfsIterative(const std::vector<std::vector<int>>& adj, int src) {
-    std::vector<int> order;
-    std::vector<bool> visited(adj.size(), false);
-    std::stack<int> st;
-    st.push(src);
+std::vector<int> dfsIterative(const std::vector<std::vector<int>> &adj,
+                              int src) {
+  std::vector<int> order;
+  std::vector<bool> visited(adj.size(), false);
+  std::stack<int> st;
+  st.push(src);
 
-    while (!st.empty()) {
-        int u = st.top();
-        st.pop();
-        if (visited[u]) continue;
-        visited[u] = true;
-        order.push_back(u);
+  while (!st.empty()) {
+    int u = st.top();
+    st.pop();
+    if (visited[u])
+      continue;
+    visited[u] = true;
+    order.push_back(u);
 
-        for (int i = static_cast<int>(adj[u].size()) - 1; i >= 0; i--) {
-            int v = adj[u][i];
-            if (!visited[v]) st.push(v);
-        }
+    for (int i = static_cast<int>(adj[u].size()) - 1; i >= 0; i--) {
+      int v = adj[u][i];
+      if (!visited[v])
+        st.push(v);
     }
-    return order;
+  }
+  return order;
 }
 
 int main() {
-    std::vector<std::vector<int>> adj = {{1, 2}, {3, 4}, {5}, {}, {}, {}};
-    for (int x : dfsIterative(adj, 0)) std::cout << x << " ";
-    std::cout << "\\n";
-    return 0;
+  std::vector<std::vector<int>> adj = {{1, 2}, {3, 4}, {5}, {}, {}, {}};
+  for (int x : dfsIterative(adj, 0))
+    std::cout << x << " ";
+  std::cout << "\\n";
+  return 0;
 }
 `}
 />
@@ -171,35 +178,36 @@ To count connected components in an undirected graph, start a BFS or DFS from ev
 #include <queue>
 #include <vector>
 
-int countComponents(const std::vector<std::vector<int>>& adj) {
-    int n = static_cast<int>(adj.size());
-    std::vector<bool> visited(n, false);
-    int components = 0;
+int countComponents(const std::vector<std::vector<int>> &adj) {
+  int n = static_cast<int>(adj.size());
+  std::vector<bool> visited(n, false);
+  int components = 0;
 
-    for (int start = 0; start < n; start++) {
-        if (visited[start]) continue;
-        components++;
-        std::queue<int> q;
-        visited[start] = true;
-        q.push(start);
-        while (!q.empty()) {
-            int u = q.front();
-            q.pop();
-            for (int v : adj[u]) {
-                if (!visited[v]) {
-                    visited[v] = true;
-                    q.push(v);
-                }
-            }
+  for (int start = 0; start < n; start++) {
+    if (visited[start])
+      continue;
+    components++;
+    std::queue<int> q;
+    visited[start] = true;
+    q.push(start);
+    while (!q.empty()) {
+      int u = q.front();
+      q.pop();
+      for (int v : adj[u]) {
+        if (!visited[v]) {
+          visited[v] = true;
+          q.push(v);
         }
+      }
     }
-    return components;
+  }
+  return components;
 }
 
 int main() {
-    std::vector<std::vector<int>> adj = {{1}, {0}, {3}, {2}, {}};
-    std::cout << countComponents(adj) << "\\n";
-    return 0;
+  std::vector<std::vector<int>> adj = {{1}, {0}, {3}, {2}, {}};
+  std::cout << countComponents(adj) << "\\n";
+  return 0;
 }
 `}
 />
@@ -213,23 +221,27 @@ For an undirected graph, DFS tracks the parent. Seeing a visited neighbor that i
   starterCode={`#include <iostream>
 #include <vector>
 
-bool dfsCycleUndirected(int u, int parent, const std::vector<std::vector<int>>& adj, std::vector<bool>& visited) {
-    visited[u] = true;
-    for (int v : adj[u]) {
-        if (!visited[v]) {
-            if (dfsCycleUndirected(v, u, adj, visited)) return true;
-        } else if (v != parent) {
-            return true;
-        }
+bool dfsCycleUndirected(int u, int parent,
+                        const std::vector<std::vector<int>> &adj,
+                        std::vector<bool> &visited) {
+  visited[u] = true;
+  for (int v : adj[u]) {
+    if (!visited[v]) {
+      if (dfsCycleUndirected(v, u, adj, visited))
+        return true;
+    } else if (v != parent) {
+      return true;
     }
-    return false;
+  }
+  return false;
 }
 
 int main() {
-    std::vector<std::vector<int>> adj = {{1, 2}, {0, 2}, {0, 1}};
-    std::vector<bool> visited(adj.size(), false);
-    std::cout << (dfsCycleUndirected(0, -1, adj, visited) ? "cycle" : "acyclic") << "\\n";
-    return 0;
+  std::vector<std::vector<int>> adj = {{1, 2}, {0, 2}, {0, 1}};
+  std::vector<bool> visited(adj.size(), false);
+  std::cout << (dfsCycleUndirected(0, -1, adj, visited) ? "cycle" : "acyclic")
+            << "\\n";
+  return 0;
 }
 `}
 />
@@ -241,21 +253,25 @@ For a directed graph, use colors: white = unvisited, gray = currently in recursi
   starterCode={`#include <iostream>
 #include <vector>
 
-bool hasDirectedCycleFrom(int u, const std::vector<std::vector<int>>& adj, std::vector<int>& color) {
-    color[u] = 1;
-    for (int v : adj[u]) {
-        if (color[v] == 1) return true;
-        if (color[v] == 0 && hasDirectedCycleFrom(v, adj, color)) return true;
-    }
-    color[u] = 2;
-    return false;
+bool hasDirectedCycleFrom(int u, const std::vector<std::vector<int>> &adj,
+                          std::vector<int> &color) {
+  color[u] = 1;
+  for (int v : adj[u]) {
+    if (color[v] == 1)
+      return true;
+    if (color[v] == 0 && hasDirectedCycleFrom(v, adj, color))
+      return true;
+  }
+  color[u] = 2;
+  return false;
 }
 
 int main() {
-    std::vector<std::vector<int>> adj = {{1}, {2}, {0}};
-    std::vector<int> color(adj.size(), 0);
-    std::cout << (hasDirectedCycleFrom(0, adj, color) ? "cycle" : "acyclic") << "\\n";
-    return 0;
+  std::vector<std::vector<int>> adj = {{1}, {2}, {0}};
+  std::vector<int> color(adj.size(), 0);
+  std::cout << (hasDirectedCycleFrom(0, adj, color) ? "cycle" : "acyclic")
+            << "\\n";
+  return 0;
 }
 `}
 />
@@ -270,23 +286,28 @@ A topological ordering places every directed edge `u -> v` with `u` before `v`. 
 #include <iostream>
 #include <vector>
 
-void dfsTopo(int u, const std::vector<std::vector<int>>& adj, std::vector<bool>& visited, std::vector<int>& order) {
-    visited[u] = true;
-    for (int v : adj[u]) if (!visited[v]) dfsTopo(v, adj, visited, order);
-    order.push_back(u);
+void dfsTopo(int u, const std::vector<std::vector<int>> &adj,
+             std::vector<bool> &visited, std::vector<int> &order) {
+  visited[u] = true;
+  for (int v : adj[u])
+    if (!visited[v])
+      dfsTopo(v, adj, visited, order);
+  order.push_back(u);
 }
 
 int main() {
-    std::vector<std::vector<int>> adj = {{1, 2}, {3}, {3}, {}};
-    std::vector<bool> visited(adj.size(), false);
-    std::vector<int> order;
-    for (int u = 0; u < static_cast<int>(adj.size()); u++) {
-        if (!visited[u]) dfsTopo(u, adj, visited, order);
-    }
-    std::reverse(order.begin(), order.end());
-    for (int x : order) std::cout << x << " ";
-    std::cout << "\\n";
-    return 0;
+  std::vector<std::vector<int>> adj = {{1, 2}, {3}, {3}, {}};
+  std::vector<bool> visited(adj.size(), false);
+  std::vector<int> order;
+  for (int u = 0; u < static_cast<int>(adj.size()); u++) {
+    if (!visited[u])
+      dfsTopo(u, adj, visited, order);
+  }
+  std::reverse(order.begin(), order.end());
+  for (int x : order)
+    std::cout << x << " ";
+  std::cout << "\\n";
+  return 0;
 }
 `}
 />
@@ -304,28 +325,29 @@ BFS can also record distance and parent arrays.
 #include <vector>
 
 int main() {
-    std::vector<std::vector<int>> adj = {{1, 2}, {3}, {3}, {4}, {}};
-    int src = 0;
-    std::vector<int> dist(adj.size(), -1), parent(adj.size(), -1);
-    std::queue<int> q;
-    dist[src] = 0;
-    q.push(src);
+  std::vector<std::vector<int>> adj = {{1, 2}, {3}, {3}, {4}, {}};
+  int src = 0;
+  std::vector<int> dist(adj.size(), -1), parent(adj.size(), -1);
+  std::queue<int> q;
+  dist[src] = 0;
+  q.push(src);
 
-    while (!q.empty()) {
-        int u = q.front();
-        q.pop();
-        for (int v : adj[u]) {
-            if (dist[v] == -1) {
-                dist[v] = dist[u] + 1;
-                parent[v] = u;
-                q.push(v);
-            }
-        }
+  while (!q.empty()) {
+    int u = q.front();
+    q.pop();
+    for (int v : adj[u]) {
+      if (dist[v] == -1) {
+        dist[v] = dist[u] + 1;
+        parent[v] = u;
+        q.push(v);
+      }
     }
+  }
 
-    for (int d : dist) std::cout << d << " ";
-    std::cout << "\\n";
-    return 0;
+  for (int d : dist)
+    std::cout << d << " ";
+  std::cout << "\\n";
+  return 0;
 }
 `}
 />
@@ -352,39 +374,39 @@ A number-of-islands solution starts BFS from every unvisited land cell and marks
 #include <vector>
 
 int main() {
-    std::vector<std::vector<char>> grid = {
-        {'1', '1', '0'},
-        {'0', '1', '0'},
-        {'1', '0', '1'}
-    };
-    int rows = static_cast<int>(grid.size());
-    int cols = static_cast<int>(grid[0].size());
-    int islands = 0;
-    std::vector<int> dr = {1, -1, 0, 0};
-    std::vector<int> dc = {0, 0, 1, -1};
+  std::vector<std::vector<char>> grid = {
+      {'1', '1', '0'}, {'0', '1', '0'}, {'1', '0', '1'}};
+  int rows = static_cast<int>(grid.size());
+  int cols = static_cast<int>(grid[0].size());
+  int islands = 0;
+  std::vector<int> dr = {1, -1, 0, 0};
+  std::vector<int> dc = {0, 0, 1, -1};
 
-    for (int r = 0; r < rows; r++) {
-        for (int c = 0; c < cols; c++) {
-            if (grid[r][c] != '1') continue;
-            islands++;
-            grid[r][c] = '0';
-            std::queue<std::pair<int, int>> q;
-            q.push({r, c});
-            while (!q.empty()) {
-                auto [cr, cc] = q.front();
-                q.pop();
-                for (int k = 0; k < 4; k++) {
-                    int nr = cr + dr[k], nc = cc + dc[k];
-                    if (nr < 0 || nr >= rows || nc < 0 || nc >= cols || grid[nr][nc] != '1') continue;
-                    grid[nr][nc] = '0';
-                    q.push({nr, nc});
-                }
-            }
+  for (int r = 0; r < rows; r++) {
+    for (int c = 0; c < cols; c++) {
+      if (grid[r][c] != '1')
+        continue;
+      islands++;
+      grid[r][c] = '0';
+      std::queue<std::pair<int, int>> q;
+      q.push({r, c});
+      while (!q.empty()) {
+        auto [cr, cc] = q.front();
+        q.pop();
+        for (int k = 0; k < 4; k++) {
+          int nr = cr + dr[k], nc = cc + dc[k];
+          if (nr < 0 || nr >= rows || nc < 0 || nc >= cols ||
+              grid[nr][nc] != '1')
+            continue;
+          grid[nr][nc] = '0';
+          q.push({nr, nc});
         }
+      }
     }
+  }
 
-    std::cout << islands << "\\n";
-    return 0;
+  std::cout << islands << "\\n";
+  return 0;
 }
 `}
 />
@@ -399,55 +421,57 @@ int main() {
 #include <queue>
 #include <vector>
 
-std::vector<int> bfsOrder(const std::vector<std::vector<int>>& adj, int src) {
-    // your code here
-    return {};
+std::vector<int> bfsOrder(const std::vector<std::vector<int>> &adj, int src) {
+  // your code here
+  return {};
 }
 
 int main() {
-    std::vector<std::vector<int>> adj = {{1, 2}, {3, 4}, {5}, {}, {}, {}};
-    std::vector<int> order = bfsOrder(adj, 0);
-    for (int i = 0; i < static_cast<int>(order.size()); i++) {
-        if (i) std::cout << " ";
-        std::cout << order[i];
-    }
-    std::cout << "\\n";
-    return 0;
+  std::vector<std::vector<int>> adj = {{1, 2}, {3, 4}, {5}, {}, {}, {}};
+  std::vector<int> order = bfsOrder(adj, 0);
+  for (int i = 0; i < static_cast<int>(order.size()); i++) {
+    if (i)
+      std::cout << " ";
+    std::cout << order[i];
+  }
+  std::cout << "\\n";
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 #include <queue>
 #include <vector>
 
-std::vector<int> bfsOrder(const std::vector<std::vector<int>>& adj, int src) {
-    std::vector<int> order;
-    std::vector<bool> visited(adj.size(), false);
-    std::queue<int> q;
-    visited[src] = true;
-    q.push(src);
-    while (!q.empty()) {
-        int u = q.front();
-        q.pop();
-        order.push_back(u);
-        for (int v : adj[u]) {
-            if (!visited[v]) {
-                visited[v] = true;
-                q.push(v);
-            }
-        }
+std::vector<int> bfsOrder(const std::vector<std::vector<int>> &adj, int src) {
+  std::vector<int> order;
+  std::vector<bool> visited(adj.size(), false);
+  std::queue<int> q;
+  visited[src] = true;
+  q.push(src);
+  while (!q.empty()) {
+    int u = q.front();
+    q.pop();
+    order.push_back(u);
+    for (int v : adj[u]) {
+      if (!visited[v]) {
+        visited[v] = true;
+        q.push(v);
+      }
     }
-    return order;
+  }
+  return order;
 }
 
 int main() {
-    std::vector<std::vector<int>> adj = {{1, 2}, {3, 4}, {5}, {}, {}, {}};
-    std::vector<int> order = bfsOrder(adj, 0);
-    for (int i = 0; i < static_cast<int>(order.size()); i++) {
-        if (i) std::cout << " ";
-        std::cout << order[i];
-    }
-    std::cout << "\\n";
-    return 0;
+  std::vector<std::vector<int>> adj = {{1, 2}, {3, 4}, {5}, {}, {}, {}};
+  std::vector<int> order = bfsOrder(adj, 0);
+  for (int i = 0; i < static_cast<int>(order.size()); i++) {
+    if (i)
+      std::cout << " ";
+    std::cout << order[i];
+  }
+  std::cout << "\\n";
+  return 0;
 }
 `}
   tests={[
@@ -469,54 +493,51 @@ int main() {
 #include <queue>
 #include <vector>
 
-int countComponents(int n, const std::vector<std::vector<int>>& adj) {
-    // your code here
-    return 0;
+int countComponents(int n, const std::vector<std::vector<int>> &adj) {
+  // your code here
+  return 0;
 }
 
 int main() {
-    int n = 6;
-    std::vector<std::vector<int>> adj = {
-        {1}, {0}, {3}, {2}, {}, {}
-    };
-    std::cout << countComponents(n, adj) << "\\n";
-    return 0;
+  int n = 6;
+  std::vector<std::vector<int>> adj = {{1}, {0}, {3}, {2}, {}, {}};
+  std::cout << countComponents(n, adj) << "\\n";
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
 #include <queue>
 #include <vector>
 
-int countComponents(int n, const std::vector<std::vector<int>>& adj) {
-    std::vector<bool> visited(n, false);
-    int components = 0;
-    for (int start = 0; start < n; start++) {
-        if (visited[start]) continue;
-        components++;
-        std::queue<int> q;
-        visited[start] = true;
-        q.push(start);
-        while (!q.empty()) {
-            int u = q.front();
-            q.pop();
-            for (int v : adj[u]) {
-                if (!visited[v]) {
-                    visited[v] = true;
-                    q.push(v);
-                }
-            }
+int countComponents(int n, const std::vector<std::vector<int>> &adj) {
+  std::vector<bool> visited(n, false);
+  int components = 0;
+  for (int start = 0; start < n; start++) {
+    if (visited[start])
+      continue;
+    components++;
+    std::queue<int> q;
+    visited[start] = true;
+    q.push(start);
+    while (!q.empty()) {
+      int u = q.front();
+      q.pop();
+      for (int v : adj[u]) {
+        if (!visited[v]) {
+          visited[v] = true;
+          q.push(v);
         }
+      }
     }
-    return components;
+  }
+  return components;
 }
 
 int main() {
-    int n = 6;
-    std::vector<std::vector<int>> adj = {
-        {1}, {0}, {3}, {2}, {}, {}
-    };
-    std::cout << countComponents(n, adj) << "\\n";
-    return 0;
+  int n = 6;
+  std::vector<std::vector<int>> adj = {{1}, {0}, {3}, {2}, {}, {}};
+  std::cout << countComponents(n, adj) << "\\n";
+  return 0;
 }
 `}
   tests={[
@@ -539,20 +560,18 @@ int main() {
 #include <utility>
 #include <vector>
 
-int numIslands(std::vector<std::vector<char>>& grid) {
-    // your code here
-    return 0;
+int numIslands(std::vector<std::vector<char>> &grid) {
+  // your code here
+  return 0;
 }
 
 int main() {
-    std::vector<std::vector<char>> grid = {
-        {'1', '1', '0', '0'},
-        {'0', '1', '0', '1'},
-        {'1', '0', '0', '1'},
-        {'0', '0', '1', '1'}
-    };
-    std::cout << numIslands(grid) << "\\n";
-    return 0;
+  std::vector<std::vector<char>> grid = {{'1', '1', '0', '0'},
+                                         {'0', '1', '0', '1'},
+                                         {'1', '0', '0', '1'},
+                                         {'0', '0', '1', '1'}};
+  std::cout << numIslands(grid) << "\\n";
+  return 0;
 }
 `}
   solutionCode={`#include <iostream>
@@ -560,45 +579,47 @@ int main() {
 #include <utility>
 #include <vector>
 
-int numIslands(std::vector<std::vector<char>>& grid) {
-    if (grid.empty()) return 0;
-    int rows = static_cast<int>(grid.size());
-    int cols = static_cast<int>(grid[0].size());
-    int islands = 0;
-    std::vector<int> dr = {1, -1, 0, 0};
-    std::vector<int> dc = {0, 0, 1, -1};
+int numIslands(std::vector<std::vector<char>> &grid) {
+  if (grid.empty())
+    return 0;
+  int rows = static_cast<int>(grid.size());
+  int cols = static_cast<int>(grid[0].size());
+  int islands = 0;
+  std::vector<int> dr = {1, -1, 0, 0};
+  std::vector<int> dc = {0, 0, 1, -1};
 
-    for (int r = 0; r < rows; r++) {
-        for (int c = 0; c < cols; c++) {
-            if (grid[r][c] != '1') continue;
-            islands++;
-            grid[r][c] = '0';
-            std::queue<std::pair<int, int>> q;
-            q.push({r, c});
-            while (!q.empty()) {
-                auto [cr, cc] = q.front();
-                q.pop();
-                for (int k = 0; k < 4; k++) {
-                    int nr = cr + dr[k], nc = cc + dc[k];
-                    if (nr < 0 || nr >= rows || nc < 0 || nc >= cols || grid[nr][nc] != '1') continue;
-                    grid[nr][nc] = '0';
-                    q.push({nr, nc});
-                }
-            }
+  for (int r = 0; r < rows; r++) {
+    for (int c = 0; c < cols; c++) {
+      if (grid[r][c] != '1')
+        continue;
+      islands++;
+      grid[r][c] = '0';
+      std::queue<std::pair<int, int>> q;
+      q.push({r, c});
+      while (!q.empty()) {
+        auto [cr, cc] = q.front();
+        q.pop();
+        for (int k = 0; k < 4; k++) {
+          int nr = cr + dr[k], nc = cc + dc[k];
+          if (nr < 0 || nr >= rows || nc < 0 || nc >= cols ||
+              grid[nr][nc] != '1')
+            continue;
+          grid[nr][nc] = '0';
+          q.push({nr, nc});
         }
+      }
     }
-    return islands;
+  }
+  return islands;
 }
 
 int main() {
-    std::vector<std::vector<char>> grid = {
-        {'1', '1', '0', '0'},
-        {'0', '1', '0', '1'},
-        {'1', '0', '0', '1'},
-        {'0', '0', '1', '1'}
-    };
-    std::cout << numIslands(grid) << "\\n";
-    return 0;
+  std::vector<std::vector<char>> grid = {{'1', '1', '0', '0'},
+                                         {'0', '1', '0', '1'},
+                                         {'1', '0', '0', '1'},
+                                         {'0', '0', '1', '1'}};
+  std::cout << numIslands(grid) << "\\n";
+  return 0;
 }
 `}
   tests={[

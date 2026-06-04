@@ -45,7 +45,7 @@ the `return` statements:
 <CodeBlock
   adapter="typescript"
   starterCode={`function multiply(a: number, b: number) {
-  return a * b;  // inferred return type: number
+  return a * b; // inferred return type: number
 }
 
 console.log("multiply(3, 4):", multiply(3, 4));
@@ -90,8 +90,8 @@ argument:
   return \`\${greeting}, \${name}!\`;
 }
 
-console.log(greet("Alice"));           // uses default "Hello"
-console.log(greet("Bob", "Hi"));       // overrides default
+console.log(greet("Alice")); // uses default "Hello"
+console.log(greet("Bob", "Hi")); // overrides default
 `}
 />
 
@@ -151,18 +151,15 @@ Here's a higher-order function that accepts a callback:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function applyTwice(
-  fn: (x: number) => number,
-  value: number
-): number {
+  starterCode={`function applyTwice(fn: (x: number) => number, value: number): number {
   return fn(fn(value));
 }
 
 const double = (x: number) => x * 2;
 const square = (x: number) => x * x;
 
-console.log("applyTwice(double, 5):", applyTwice(double, 5));  // 5 * 2 * 2 = 20
-console.log("applyTwice(square, 3):", applyTwice(square, 3));  // 3² = 9, 9² = 81
+console.log("applyTwice(double, 5):", applyTwice(double, 5)); // 5 * 2 * 2 = 20
+console.log("applyTwice(square, 3):", applyTwice(square, 3)); // 3² = 9, 9² = 81
 `}
 />
 
@@ -227,7 +224,7 @@ logMessage("Hello, TypeScript!");
 
 // The function doesn't return anything useful:
 const result = logMessage("Another message");
-console.log("result is:", result);  // undefined
+console.log("result is:", result); // undefined
 `}
 />
 
@@ -253,8 +250,8 @@ function returnUndefined(): undefined {
   return undefined;
 }
 
-const a = doNothing();         // type: void
-const b = returnUndefined();   // type: undefined
+const a = doNothing(); // type: void
+const b = returnUndefined(); // type: undefined
 
 console.log("a:", a);
 console.log("b:", b);

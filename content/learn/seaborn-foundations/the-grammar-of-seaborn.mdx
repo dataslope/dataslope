@@ -51,7 +51,7 @@ for species, color in zip(species_list, colors):
         subset["flipper_length_mm"],
         subset["body_mass_g"],
         color=color,
-        label=species,   # remember the label for the legend
+        label=species,  # remember the label for the legend
         alpha=0.8,
     )
 
@@ -91,7 +91,8 @@ sns.relplot(
     x="flipper_length_mm",
     y="body_mass_g",
     hue="species",
-    height=4, aspect=1.2,
+    height=4,
+    aspect=1.2,
 )
 `}
 />
@@ -232,7 +233,8 @@ g = sns.relplot(
     x="flipper_length_mm",
     y="body_mass_g",
     hue="species",
-    height=4, aspect=1.2,
+    height=4,
+    aspect=1.2,
 )
 
 # Seaborn picked sensible defaults; now we touch them up via the grid.
@@ -300,7 +302,8 @@ g = sns.relplot(
     x="total_bill",
     y="tip",
     hue="time",
-    height=4, aspect=1.2,
+    height=4,
+    aspect=1.2,
 )
 `}
   tests={[

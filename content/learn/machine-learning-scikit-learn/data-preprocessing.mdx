@@ -222,7 +222,7 @@ X, y = load_wine(return_X_y=True)
 
 # WRONG: scale the ENTIRE dataset first, using stats from all rows...
 scaler = StandardScaler()
-X_all_scaled = scaler.fit_transform(X)   # <-- mean/std include test rows!
+X_all_scaled = scaler.fit_transform(X)  # <-- mean/std include test rows!
 
 # ...and only THEN split. The damage is already done.
 X_train, X_test, y_train, y_test = train_test_split(
@@ -251,9 +251,7 @@ from sklearn.preprocessing import StandardScaler
 X, y = load_wine(return_X_y=True)
 
 # RIGHT: split FIRST, so the test set is untouched.
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.3, random_state=0
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
 # Learn mean/std from the TRAINING set only.
 scaler = StandardScaler()
@@ -322,12 +320,14 @@ range (max minus min).
 from sklearn.preprocessing import MinMaxScaler
 
 # Three features on very different scales.
-X = np.array([
-    [1.0,  100.0,  0.01],
-    [2.0,  300.0,  0.05],
-    [3.0,  500.0,  0.09],
-    [4.0,  900.0,  0.20],
-])
+X = np.array(
+    [
+        [1.0, 100.0, 0.01],
+        [2.0, 300.0, 0.05],
+        [3.0, 500.0, 0.09],
+        [4.0, 900.0, 0.20],
+    ]
+)
 
 scaler = MinMaxScaler()
 X01 = scaler.fit_transform(X)

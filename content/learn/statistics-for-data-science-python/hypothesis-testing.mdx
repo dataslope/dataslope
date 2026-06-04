@@ -235,7 +235,7 @@ alpha = 0.05
 print(f"{'trial':>5} {'mean A':>8} {'mean B':>8} {'p-value':>9}  decision")
 for trial in range(1, 9):
     a = rng.normal(100, 15, size=50)
-    b = rng.normal(100, 15, size=50)   # SAME truth as A
+    b = rng.normal(100, 15, size=50)  # SAME truth as A
     p = stats.ttest_ind(a, b).pvalue
     decision = "reject" if p <= alpha else "fail to reject"
     print(f"{trial:>5} {a.mean():>8.2f} {b.mean():>8.2f} {p:>9.3f}  {decision}")
@@ -293,7 +293,7 @@ rng = np.random.default_rng(20)
 # A sample whose mean sits a bit ABOVE the claimed value.
 sample = rng.normal(105, 15, size=30)
 
-two_sided  = stats.ttest_1samp(sample, 100).pvalue
+two_sided = stats.ttest_1samp(sample, 100).pvalue
 right_sided = stats.ttest_1samp(sample, 100, alternative="greater").pvalue
 
 print(f"Sample mean: {sample.mean():.2f}")

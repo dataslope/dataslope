@@ -244,8 +244,13 @@ penguins = sns.load_dataset("penguins")
 
 # Side-by-side bars make the per-bin counts directly comparable.
 sns.displot(
-    penguins, x="flipper_length_mm", hue="species",
-    kind="hist", multiple="dodge", height=4, aspect=1.3,
+    penguins,
+    x="flipper_length_mm",
+    hue="species",
+    kind="hist",
+    multiple="dodge",
+    height=4,
+    aspect=1.3,
 )
 `}
 />
@@ -263,8 +268,12 @@ penguins = sns.load_dataset("penguins")
 
 # Outlines instead of filled bars: groups overlap without occluding.
 sns.displot(
-    penguins, x="flipper_length_mm", hue="species",
-    kind="hist", element="step", height=4,
+    penguins,
+    x="flipper_length_mm",
+    hue="species",
+    kind="hist",
+    element="step",
+    height=4,
 )
 `}
 />
@@ -298,8 +307,13 @@ penguins = sns.load_dataset("penguins")
 
 # Density puts unequal-sized groups on a comparable footing.
 sns.displot(
-    penguins, x="flipper_length_mm", hue="species",
-    kind="hist", stat="density", multiple="layer", height=4,
+    penguins,
+    x="flipper_length_mm",
+    hue="species",
+    kind="hist",
+    stat="density",
+    multiple="layer",
+    height=4,
 )
 `}
 />

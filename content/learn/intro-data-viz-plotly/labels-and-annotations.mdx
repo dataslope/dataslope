@@ -32,7 +32,9 @@ df = px.data.gapminder().query("year == 2007 and continent == 'Europe'")
 
 fig = px.bar(
     df.sort_values("lifeExp"),
-    x="lifeExp", y="country", orientation="h",
+    x="lifeExp",
+    y="country",
+    orientation="h",
     template="simple_white",
     title="Life expectancy in Europe — 2007",
     labels={"lifeExp": "Life expectancy (years)", "country": "Country"},
@@ -68,7 +70,9 @@ outlier, the day something happened — use `fig.add_annotation(...)`.
 df = px.data.gapminder().query("country == 'Japan'")
 
 fig = px.line(
-    df, x="year", y="lifeExp",
+    df,
+    x="year",
+    y="lifeExp",
     markers=True,
     template="simple_white",
     title="Japan: life expectancy, 1952-2007",
@@ -77,11 +81,13 @@ fig = px.line(
 
 # Annotate the latest value
 fig.add_annotation(
-    x=2007, y=82.6,
+    x=2007,
+    y=82.6,
     text="82.6 years (2007)<br>highest in the dataset",
     showarrow=True,
     arrowhead=2,
-    ax=-60, ay=-30,
+    ax=-60,
+    ay=-30,
 )
 
 fig.show()
@@ -109,17 +115,32 @@ threshold. Use `fig.add_hline` or `fig.add_vline`:
 df = px.data.gapminder().query("year == 2007")
 
 fig = px.scatter(
-    df, x="gdpPercap", y="lifeExp",
-    color="continent", log_x=True, size="pop", size_max=40,
+    df,
+    x="gdpPercap",
+    y="lifeExp",
+    color="continent",
+    log_x=True,
+    size="pop",
+    size_max=40,
     template="simple_white",
     title="Gapminder 2007 with reference lines",
     labels={"gdpPercap": "GDP per capita (USD, log)", "lifeExp": "Life expectancy"},
 )
 
-fig.add_hline(y=70, line_dash="dash", line_color="gray",
-              annotation_text="70 years", annotation_position="top right")
-fig.add_vline(x=10000, line_dash="dash", line_color="gray",
-              annotation_text="$10k GDP", annotation_position="top")
+fig.add_hline(
+    y=70,
+    line_dash="dash",
+    line_color="gray",
+    annotation_text="70 years",
+    annotation_position="top right",
+)
+fig.add_vline(
+    x=10000,
+    line_dash="dash",
+    line_color="gray",
+    annotation_text="$10k GDP",
+    annotation_position="top",
+)
 
 fig.show()
 `}
@@ -141,17 +162,27 @@ can add one via a layout annotation at the bottom:
 df = px.data.gapminder().query("year == 2007")
 
 fig = px.scatter(
-    df, x="gdpPercap", y="lifeExp",
-    color="continent", log_x=True, size="pop", size_max=40,
+    df,
+    x="gdpPercap",
+    y="lifeExp",
+    color="continent",
+    log_x=True,
+    size="pop",
+    size_max=40,
     template="simple_white",
     title="Life expectancy vs GDP per capita (2007)",
     labels={"gdpPercap": "GDP per capita (USD, log)", "lifeExp": "Life expectancy"},
 )
 
 fig.add_annotation(
-    text=("Source: Gapminder dataset (built into Plotly Express). "
-          "Bubble size encodes population."),
-    xref="paper", yref="paper", x=0, y=-0.18,
+    text=(
+        "Source: Gapminder dataset (built into Plotly Express). "
+        "Bubble size encodes population."
+    ),
+    xref="paper",
+    yref="paper",
+    x=0,
+    y=-0.18,
     showarrow=False,
     align="left",
     font=dict(size=10, color="gray"),

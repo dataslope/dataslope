@@ -30,27 +30,37 @@ chapter — laziness for composability.
   adapter="typescript"
   starterCode={`type Task<A> = () => Promise<A>;
 
-const of  = <A,>(a: A): Task<A> => () => Promise.resolve(a);
+const of =
+  <A,>(a: A): Task<A> =>
+  () =>
+    Promise.resolve(a);
 
-const map = <A, B>(t: Task<A>, f: (a: A) => B): Task<B> =>
-  () => t().then(f);
+const map =
+  <A, B>(t: Task<A>, f: (a: A) => B): Task<B> =>
+  () =>
+    t().then(f);
 
-const chain = <A, B>(t: Task<A>, f: (a: A) => Task<B>): Task<B> =>
-  () => t().then((a) => f(a)());
+const chain =
+  <A, B>(t: Task<A>, f: (a: A) => Task<B>): Task<B> =>
+  () =>
+    t().then((a) => f(a)());
 
 // A tiny "sleep" effect, lazy
-const sleep = (ms: number): Task<void> =>
-  () => new Promise((res) => setTimeout(res, ms));
+const sleep =
+  (ms: number): Task<void> =>
+  () =>
+    new Promise((res) => setTimeout(res, ms));
 
 // Compose a sequence
 const program: Task<string> = chain(of(1), (n) =>
   chain(sleep(50), () =>
-    chain(of(n + 1), (n2) =>
-      map(of(n2 * 10), (n3) => \`final = \${n3}\`))));
+    chain(of(n + 1), (n2) => map(of(n2 * 10), (n3) => \`final = \${n3}\`)),
+  ),
+);
 
 (async () => {
   console.log("nothing has run yet");
-  console.log(await program());     // single, controlled execution
+  console.log(await program()); // single, controlled execution
 })();
 `}
 />
@@ -67,9 +77,14 @@ in parallel, combine their results.
   adapter="typescript"
   starterCode={`type Task<A> = () => Promise<A>;
 
-const of    = <A,>(a: A): Task<A> => () => Promise.resolve(a);
-const sleep = (ms: number, label: string): Task<string> =>
-  () => new Promise((res) => setTimeout(() => res(label), ms));
+const of =
+  <A,>(a: A): Task<A> =>
+  () =>
+    Promise.resolve(a);
+const sleep =
+  (ms: number, label: string): Task<string> =>
+  () =>
+    new Promise((res) => setTimeout(() => res(label), ms));
 
 // Sequential: total time = sum of all
 function sequence<A>(ts: ReadonlyArray<Task<A>>): Task<ReadonlyArray<A>> {
@@ -120,41 +135,48 @@ the underlying promise are *not* part of the success channel.
 <CodeBlock
   adapter="typescript"
   starterCode={`type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
-const ok  = <E, A>(value: A): Result<E, A> => ({ kind: "ok",  value });
+const ok = <E, A>(value: A): Result<E, A> => ({ kind: "ok", value });
 const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
 
 type TaskResult<E, A> = () => Promise<Result<E, A>>;
 
-const mapTR = <E, A, B>(t: TaskResult<E, A>, f: (a: A) => B): TaskResult<E, B> =>
+const mapTR =
+  <E, A, B>(t: TaskResult<E, A>, f: (a: A) => B): TaskResult<E, B> =>
   async () => {
     const r = await t();
     return r.kind === "ok" ? ok(f(r.value)) : r;
   };
 
-const chainTR = <E, A, B>(
-  t: TaskResult<E, A>,
-  f: (a: A) => TaskResult<E, B>,
-): TaskResult<E, B> =>
+const chainTR =
+  <E, A, B>(
+    t: TaskResult<E, A>,
+    f: (a: A) => TaskResult<E, B>,
+  ): TaskResult<E, B> =>
   async () => {
     const r = await t();
     return r.kind === "ok" ? f(r.value)() : r;
   };
 
 // --- A fake API ---
-const fetchUser = (id: string): TaskResult<string, { id: string; name: string }> =>
-  () => new Promise((res) =>
-    setTimeout(() =>
-      res(id === "ok" ? ok({ id, name: "Ada" }) : err("not found")), 20));
+const fetchUser =
+  (id: string): TaskResult<string, { id: string; name: string }> =>
+  () =>
+    new Promise((res) =>
+      setTimeout(
+        () => res(id === "ok" ? ok({ id, name: "Ada" }) : err("not found")),
+        20,
+      ),
+    );
 
 const greet = (u: { name: string }) => \`Hello, \${u.name}!\`;
 
 // --- Compose without any try/catch ---
-const program = mapTR(fetchUser("ok"),    greet);
+const program = mapTR(fetchUser("ok"), greet);
 const program2 = mapTR(fetchUser("missing"), greet);
 
 (async () => {
-  console.log(await program());     // { kind: 'ok', value: 'Hello, Ada!' }
-  console.log(await program2());    // { kind: 'err', error: 'not found' }
+  console.log(await program()); // { kind: 'ok', value: 'Hello, Ada!' }
+  console.log(await program2()); // { kind: 'err', error: 'not found' }
 })();
 `}
 />
