@@ -279,18 +279,22 @@ What is the value of \`x\`?
 - [o] \`5\`
   > When you wrote \`y <- x\`, R gave \`y\` its own independent copy. Modifying \`y\` leaves \`x\` alone.
 - \`NA\`
-- An error`}
+  > \`x\` was assigned a concrete value (5) and never changed, so it is not missing.
+- An error
+  > The code is valid R and runs without error.`}
 />
 
 <MultipleChoice
   markdown={`Which of these is **not** a valid R variable name?
 
 - \`my_var\`
+  > Letters, digits, underscores, and dots are allowed, and a name may start with a letter — this is valid.
 - \`avg.price\`
   > Dots are allowed inside R names — this is valid (though somewhat dated style).
 - [o] \`2nd_quarter\`
   > R variable names cannot start with a digit.
-- \`.hidden\``}
+- \`.hidden\`
+  > A leading dot is allowed; such names are simply hidden from \`ls()\` by default, but they are still valid.`}
 />
 
 <MultipleChoice

@@ -430,7 +430,7 @@ assert get2() == 1`,
 - Built-in, Enclosing, Local, Global
   > No, this is the reverse of the correct order.
 - [o] Local, Enclosing, Global, Built-in (LEGB)
-  > **Correct.** Local first, then any enclosing functions, then the module's globals, then the built-ins.
+  > Local first, then any enclosing functions, then the module's globals, then the built-ins.
 - Local, Global only
   > No, Python also checks Enclosing and Built-in scopes.`}
 />
@@ -454,7 +454,7 @@ print("module:", x)
 - \`outer: 2\\nmodule: 3\`
   > \`nonlocal\` binds to the **nearest enclosing** function scope, not the module scope.
 - [o] \`outer: 3\\nmodule: 1\`
-  > **Correct.** \`inner\` rebinds \`outer\`'s \`x\` to 3; the module-level \`x\` is untouched.
+  > \`inner\` rebinds \`outer\`'s \`x\` to 3; the module-level \`x\` is untouched.
 - \`outer: 3\\nmodule: 3\`
   > The module-level \`x\` is never modified. \`nonlocal\` only affects the nearest enclosing function scope.
 - A \`SyntaxError\`
@@ -474,7 +474,7 @@ increment()
 - Because \`count\` is a reserved keyword.
   > No, \`count\` is a valid variable name.
 - [o] Because \`count += 1\` creates a local variable, which is read before it's assigned.
-  > **Correct.** Python sees an assignment to \`count\` and makes it local. Then it tries to read \`count\` for the \`+=\`, but there's no local value yet.
+  > Python sees an assignment to \`count\` and makes it local. Then it tries to read \`count\` for the \`+=\`, but there's no local value yet.
 - Because global variables are read-only.
   > No, you can read global variables from inside functions without any keyword. The problem is the assignment.
 - Because \`+=\` is not allowed inside functions.
@@ -487,7 +487,7 @@ increment()
 - A function that is defined inside a class.
   > No, that is a method. A closure is about variable capture, not class membership.
 - [o] A function that captures variables from its enclosing scope.
-  > **Correct.** A closure remembers variables from the scope in which it was created, even after that scope exits.
+  > A closure remembers variables from the scope in which it was created, even after that scope exits.
 - A function that takes another function as an argument.
   > No, that is a higher-order function. Closures are about capturing enclosing variables.
 - A function that has no return value.
@@ -500,7 +500,7 @@ increment()
 - Use the \`global\` keyword.
   > \`global\` is for module-level variables, not enclosing function scopes.
 - [o] Use the \`nonlocal\` keyword.
-  > **Correct.** \`nonlocal\` tells Python to rebind a variable in the nearest enclosing function scope.
+  > \`nonlocal\` tells Python to rebind a variable in the nearest enclosing function scope.
 - Use the \`enclosing\` keyword.
   > No such keyword exists in Python.
 - You cannot; enclosing variables are read-only.

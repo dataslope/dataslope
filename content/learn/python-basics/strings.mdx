@@ -503,16 +503,16 @@ print(slugify("Python 3.12 Released"))
 />
 
 <MultipleChoice
-  markdown={`What is the best way to build a string from a list of 1000 items?
+  markdown={`Which approach builds a string from a list of 1000 items **without** the O(n²) cost of repeated concatenation?
 
 - \`result = ""; for x in items: result += str(x)\`
-  > This is O(n²) because strings are immutable—each \`+=\` creates a new string.
-- \`result = "".join(map(str, items))\`
-  > This works and is idiomatic. \`join\` is the best tool for this job.
+  > This is the O(n²) approach: strings are immutable, so each \`+=\` creates and copies a new string.
+- \`result = sum(str(x) for x in items)\`
+  > \`sum\` defaults to starting from the integer \`0\`, so adding strings raises a \`TypeError\`.
 - [o] \`result = "".join(str(x) for x in items)\`
-  > This is idiomatic and efficient—\`join\` does a single allocation.
-- \`result = ""  # and pray\`
-  > Prayer is not a valid optimization strategy.`}
+  > \`str.join\` builds the result in a single pass and one allocation, avoiding the repeated copying that \`+=\` causes.
+- \`result = "".add(str(x) for x in items)\`
+  > \`str\` has no \`.add\` method, so this raises an \`AttributeError\`.`}
 />
 
 Next: booleans, comparisons, and Python's short-circuiting logical operators.

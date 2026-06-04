@@ -184,15 +184,18 @@ Position along x and y are the two most powerful encodings — use them for what
 />
 
 <MultipleChoice
-  markdown={`You have a chart of houses where you want to show **price**, **square footage**, **neighborhood** (categorical), and **year built**. Which mapping uses the **strongest channels for the most important comparisons**?
+  markdown={`You want the reader to judge precisely **how price relates to square footage**. Which mapping puts *those two* variables on the **strongest** (most accurate) channels?
 
-- color = price, x = year built, y = square footage, size = neighborhood
-- size = price, color = year built, x = neighborhood, y = square footage
-- [o] x = square footage, y = price, color = neighborhood, size = year built (or similar)
-  > Position (x and y) is the most accurate channel — putting the two quantitative variables you most want to compare (**price** and **square footage**) on x and y gives the reader the clearest possible read of their relationship. Color carries the categorical neighborhood; size carries the secondary continuous variable.
-- color = neighborhood, size = price, x = year built, y = price
+- Put **square footage** on x and **price** on color.
+  > Price lands on color, a weak channel, so the price-vs-square-footage relationship can't be read from position. Only one of the two variables is on an axis.
+- [o] Put **square footage** on x and **price** on y.
+  > Position along x and y is the most accurate channel, so placing both variables of the relationship there gives the clearest read of how they relate.
+- Put **square footage** on size and **price** on color.
+  > Size and color are both weak channels for precise comparison, so neither variable in the relationship is on a strong channel.
 
-A general rule: the two most important *quantitative* variables go on x and y.`}
+A general rule: the two most important *quantitative* variables go on x and y.
+
+*Hint: position (x and y) is the most accurate channel, so reserve it for the two variables in the relationship you most want the reader to judge.*`}
 />
 
 <MultipleChoice

@@ -512,16 +512,18 @@ int gcd(int a, int b) {
 />
 
 <MultipleChoice
-  markdown={`Why does function overloading require the overloads to differ in parameter types?
+  markdown={`Why can two overloads differ in their *parameter types* but not in *return type alone*?
 
-- Because the linker can't sort by return type alone.
-  > Linkers actually can encode types in symbol names; the rule is about *call resolution*.
-- [o] Because the compiler picks the right overload from the arguments at the call site, and arguments don't carry the call's expected return type.
-  > The compiler can't know which overload you meant if only the return type differs.
-- For backwards compatibility with C.
-  > C does not support overloading at all.
-- Because the standard does not allow two functions with the same name.
-  > It does, as long as their signatures differ.`}
+*Hint: think about what information is available at the call site when the compiler decides which overload to use.*
+
+- [o] The compiler chooses the overload by looking at the arguments you pass, and the arguments don't tell it what return type you expected.
+  > Parameter types are visible at the call; the expected return type is not, so return type alone can't disambiguate.
+- Two functions with the same name are forbidden by the standard.
+  > They are allowed, as long as their parameter lists differ.
+- Overloading only works for functions that return \`void\`.
+  > Overloads can return any type; the return type simply isn't what selects them.
+- C++ inherited the rule unchanged from C.
+  > C does not support function overloading at all, so it can't be the source of this rule.`}
 />
 
 Next: where do function calls actually live in memory? Meet *the

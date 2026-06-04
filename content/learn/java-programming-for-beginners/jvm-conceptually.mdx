@@ -218,6 +218,7 @@ flat. You didn't write a single line of cleanup code.
 - It compiles everything to native code before running anything
   > That's "ahead-of-time" compilation, not the standard JVM model.
 - [o] It interprets bytecode at first, and uses a Just-In-Time compiler to translate frequently-used methods into native CPU instructions for speed
+  > The engine combines interpretation with JIT compilation of hot methods, getting both quick startup and native speed.
 - It runs Java code by translating it back to source first
   > It does not.`}
 />
@@ -228,6 +229,7 @@ flat. You didn't write a single line of cleanup code.
 - To make the JVM smaller
   > It actually makes the JVM larger and more complex.
 - [o] So programmers do not have to manually free memory; objects that become unreachable are reclaimed automatically
+  > Automatic reclamation removes the manual free/delete step and the bugs that come with it.
 - To prevent the program from creating any objects
   > It does not prevent allocation; it manages reclamation.
 - Because the JVM cannot create memory itself

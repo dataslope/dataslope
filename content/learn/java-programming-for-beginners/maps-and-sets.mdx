@@ -213,6 +213,7 @@ genuinely don't know in advance.
 - The second add throws an exception
   > It doesn't throw.
 - [o] The second add is silently ignored — the set still contains exactly one copy
+  > A \`Set\` stores each element at most once, so a duplicate \`add\` is a no-op.
 - The set now contains two copies
   > Sets enforce uniqueness.
 - The first copy is removed
@@ -227,6 +228,7 @@ genuinely don't know in advance.
 - It keeps the map sorted by key
   > It does not sort.
 - [o] It computes the key's hash code, picks a bucket directly, and looks only in that bucket
+  > Hashing jumps straight to where the value would be, instead of scanning entries.
 - It uses a binary search across the keys
   > That's a TreeMap (and it's O(log n), not O(1)).`}
 />
@@ -239,7 +241,7 @@ genuinely don't know in advance.
 - HashMap with the ID as the value
   > Keys go in maps, not values.
 - [o] HashSet of IDs
-  > Constant-time \`contains\`.
+  > A set answers "seen before?" in constant time on average, which is exactly the question.
 - A plain array
   > Same problem as ArrayList: linear search.`}
 />

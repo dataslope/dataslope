@@ -236,11 +236,16 @@ next page.)
 <MultipleChoice
   markdown={`The **standard error of the mean** with sample size n and population SD σ is approximately:
 
+*Hint: the standard error should get smaller as the sample size n grows.*
+
 - σ
+  > This is the spread of individual values, which does not depend on n at all — the standard error must shrink as n grows.
 - [o] σ / √n
   > Doubling sample size shrinks SE by √2, quadrupling shrinks it by 2, etc.
 - σ × n
-- σ² / n`}
+  > This grows with n, but the standard error should shrink as you collect more data.
+- σ² / n
+  > This uses the variance (σ²) and divides by n rather than √n, so the units and rate of shrinkage are both wrong.`}
 />
 
 <MultipleChoice

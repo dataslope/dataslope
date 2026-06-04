@@ -312,7 +312,7 @@ assert variance([3, 3, 3]) == 0`,
 - It prevents the file from being imported at all.
   > No, it is the opposite: it lets the file be safely imported **without** running the script code.
 - [o] It runs the indented block only when the file is executed directly, not when it is imported.
-  > **Correct.** When imported, \`__name__\` is the module name, not \`"__main__"\`.
+  > When imported, \`__name__\` is the module name, not \`"__main__"\`, so the block is skipped.
 - It is required syntax in every Python script.
   > No, it is a convention, not a requirement. But it is a **very strong** convention.
 - It is the entry point recognized by Python's package installer.
@@ -325,7 +325,7 @@ assert variance([3, 3, 3]) == 0`,
 - The module is re-executed from scratch.
   > No, modules are only executed once.
 - [o] Python returns the cached module from \`sys.modules\`.
-  > **Correct.** Modules are cached after the first import. Subsequent imports are nearly free.
+  > Modules are cached after the first import. Subsequent imports are nearly free.
 - A \`ImportError\` is raised (duplicate import).
   > No, importing the same module multiple times is perfectly fine.
 - The module is reloaded from disk with the latest changes.
@@ -340,7 +340,7 @@ assert variance([3, 3, 3]) == 0`,
 - \`from math import sqrt, cos, sin, tan, log, exp, pi, e\`
   > This can be okay, but if you're importing many names, \`import math\` is clearer.
 - [o] \`import math\` (then call \`math.sqrt(...)\`)
-  > **Correct.** This is the clearest: every call to \`math.sqrt\` tells the reader exactly where it comes from.
+  > This is the clearest: every call to \`math.sqrt\` tells the reader exactly where it comes from.
 - All three are equally good.
   > No, \`from math import *\` is widely considered an anti-pattern.`}
 />
@@ -351,7 +351,7 @@ assert variance([3, 3, 3]) == 0`,
 - Only the current directory.
   > No, Python searches all directories in \`sys.path\`, not just the current one.
 - [o] All directories in \`sys.path\`, which includes the current directory, \`PYTHONPATH\`, and \`site-packages\`.
-  > **Correct.** \`sys.path\` is a list of directories Python searches in order.
+  > \`sys.path\` is a list of directories Python searches in order.
 - Only the standard library.
   > No, \`sys.path\` includes third-party packages and the current directory.
 - Only installed packages from \`pip install\`.

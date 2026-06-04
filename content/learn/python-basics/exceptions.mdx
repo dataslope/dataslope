@@ -560,7 +560,7 @@ else:
 - \`except\`
   > No, \`except\` runs when an exception **is** raised.
 - [o] \`else\`
-  > **Correct.** \`else\` is for code that should run on success (no exception).
+  > \`else\` is for code that should run on success (no exception).
 - \`finally\`
   > No, \`finally\` **always** runs, whether there's an exception or not.
 - The block after the \`try\` statement entirely
@@ -573,7 +573,7 @@ else:
 - It is invalid syntax.
   > No, it is valid Python, but it is an anti-pattern.
 - [o] It catches \`KeyboardInterrupt\` and \`SystemExit\`, making the program hard to kill.
-  > **Correct.** Bare \`except:\` catches **everything**, including signals you want to let through.
+  > Bare \`except:\` catches **everything**, including signals you want to let through.
 - It only catches \`Exception\`, which is too broad.
   > No, it catches **BaseException**, which is even broader than \`Exception\`.
 - It requires an \`as e\` clause.
@@ -586,7 +586,7 @@ else:
 - When you want to suppress the original exception.
   > No, \`raise ... from None\` suppresses context, not \`raise ... from e\`.
 - [o] When wrapping a lower-level exception in a higher-level one, to preserve the cause.
-  > **Correct.** \`raise ConfigError(...) from e\` shows both the \`ConfigError\` and the underlying \`ValueError\`, with a causal link.
+  > \`raise ConfigError(...) from e\` shows both the \`ConfigError\` and the underlying \`ValueError\`, with a causal link.
 - When re-raising the same exception.
   > No, just write \`raise\` with no arguments to re-raise.
 - When you want to catch multiple exception types.
@@ -601,7 +601,7 @@ else:
 - Runs only if no exception is raised.
   > No, that is what \`else\` does.
 - [o] Runs no matter what: success, exception, return, or even sys.exit().
-  > **Correct.** \`finally\` is guaranteed cleanup. Use it for closing files, releasing locks, etc.
+  > \`finally\` is guaranteed cleanup. Use it for closing files, releasing locks, etc.
 - Suppresses the exception.
   > No, \`finally\` does not suppress exceptions; it just runs before the exception propagates.`}
 />
@@ -612,7 +612,7 @@ else:
 - Always check if a file exists before opening it.
   > No, that is LBYL (Look Before You Leap). EAFP is the opposite.
 - [o] Try the operation and catch the exception if it fails.
-  > **Correct.** EAFP stands for "Easier to Ask for Forgiveness than Permission." It is idiomatic Python.
+  > EAFP stands for "Easier to Ask for Forgiveness than Permission." It is idiomatic Python.
 - Never use exceptions; they are expensive.
   > No, exceptions are cheap in Python (when not raised), and EAFP is the Pythonic way.
 - Use assertions instead of exceptions.
@@ -625,7 +625,7 @@ else:
 - The exception is silently ignored.
   > No, unhandled exceptions are never ignored.
 - [o] Python prints a traceback and exits with a non-zero exit code.
-  > **Correct.** Unhandled exceptions terminate the program (or return 500 in a web context).
+  > Unhandled exceptions terminate the program (or return 500 in a web context).
 - The exception is logged but the program continues.
   > No, the program exits unless the exception is caught.
 - The exception is converted to a warning.

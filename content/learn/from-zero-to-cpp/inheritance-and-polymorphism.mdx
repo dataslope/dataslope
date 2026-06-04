@@ -323,6 +323,7 @@ int main() {
 - It makes destruction faster.
   > It is slightly slower.
 - [o] So that \`delete\` through a base-class pointer also calls the derived destructor and releases derived-class resources; otherwise you get a partial cleanup which is undefined behavior.
+  > The virtual destructor ensures the full chain of destructors runs.
 - It is purely stylistic.
   > It has real semantic consequences.`}
 />

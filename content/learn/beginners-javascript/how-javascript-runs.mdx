@@ -397,11 +397,16 @@ console.log("D");
 
 What does it print?
 
+*Hint: the two \`console.log\` calls are synchronous and run first; then ask which kind of callback the event loop drains first — a promise (microtask) or a \`setTimeout\` (task).*
+
 - A B C D
+  > This would be the order if callbacks ran the instant they were scheduled. They don't: \`setTimeout\` and the promise \`.then\` are both deferred until the synchronous code finishes, so \`B\` and \`C\` cannot appear before \`D\`.
 - A D B C
+  > The two synchronous logs \`A\` and \`D\` are in the right place, but this assumes the \`setTimeout\` callback (\`B\`) runs before the promise callback (\`C\`). It's the other way around — microtasks run before tasks.
 - [o] A D C B
   > \`A\` and \`D\` are synchronous and run first. When the stack empties, the event loop drains *microtasks* before tasks, so the promise callback \`C\` runs before the \`setTimeout\` callback \`B\`. Even though \`setTimeout\` is scheduled before the promise, microtasks always win against macrotasks.
 - A C D B
+  > This puts \`C\` before \`D\`, but \`D\` is synchronous and the promise callback \`C\` is a microtask — microtasks only run after all the synchronous code (including \`D\`) has finished.
 
 The crucial rule: microtasks (promises, \`queueMicrotask\`) run between every task. \`setTimeout(..., 0)\` is a *task*, so it has to wait its turn.`}
 />

@@ -498,6 +498,7 @@ from itertools import islice
   markdown={`What happens when a generator function is called?
 
 - The body runs immediately and returns the first value.
+  > Calling a generator function runs none of the body; it just builds the generator object.
 - [o] No code in the body runs; you get back a generator object, and the body runs lazily as you iterate.
   > \`yield\` makes the function lazy — nothing runs until you call \`next()\` or loop over it.
 - It raises \`StopIteration\` if the body is empty.

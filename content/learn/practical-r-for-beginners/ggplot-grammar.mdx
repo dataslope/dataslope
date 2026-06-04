@@ -244,11 +244,15 @@ flowchart TB
 <MultipleChoice
   markdown={`What's the difference between writing \`geom_point(color = "red")\` and \`geom_point(aes(color = "red"))\`?
 
+*Hint: think about what \`aes()\` is for — mapping data to a property versus setting a property to a fixed value.*
+
 - They are equivalent.
+  > The \`aes()\` wrapper changes the meaning: one sets a constant color, the other maps a value to the color scale.
 - The first errors; only the second works.
 - [o] The first **sets** every point to red. The second **maps** the literal string "red" to color as if it were a category, and ggplot picks the default color for that category — usually not red — and adds a useless legend.
   > Inside \`aes()\`, you map data to properties. Outside, you set properties to constant values.
-- The second is faster.`}
+- The second is faster.
+  > Speed is not the distinction here; the difference is setting a constant versus mapping to a scale.`}
 />
 
 <MultipleChoice

@@ -302,7 +302,7 @@ public static class WordCounter
   markdown={`What happens if you read \`dict[key]\` for a key that doesn't exist in a \`Dictionary\`?
 
 - It returns \`null\`
-  > Only for nullable value types; otherwise it throws.
+  > The indexer doesn't return \`null\` for a missing key — it throws instead.
 - It returns a default value silently
   > It doesn't — \`TryGetValue\` is the safe alternative.
 - [o] It throws a \`KeyNotFoundException\`

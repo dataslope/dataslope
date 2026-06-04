@@ -247,11 +247,16 @@ vectors will do.
 <MultipleChoice
   markdown={`Given \`x <- c(10, 20, 30, 40)\`, what does \`sum(x > 15)\` return?
 
+*Hint: \`x > 15\` is a logical vector, and \`sum()\` adds up \`TRUE\` (1) and \`FALSE\` (0) — it never sees the original numbers.*
+
 - \`90\` (the sum of values greater than 15)
+  > \`sum()\` is applied to \`x > 15\`, not to \`x\` itself, so it adds the \`TRUE\`/\`FALSE\` values rather than 20 + 30 + 40.
 - [o] \`3\`
   > \`x > 15\` is \`c(FALSE, TRUE, TRUE, TRUE)\`. \`sum()\` treats \`TRUE\` as 1, so the count is 3.
 - \`TRUE\`
-- \`0.75\``}
+  > \`sum()\` returns a number, not a single logical value.
+- \`0.75\`
+  > That would be \`mean(x > 15)\` — the *proportion* of \`TRUE\` values, not the count.`}
 />
 
 <MultipleChoice
@@ -268,10 +273,13 @@ vectors will do.
   markdown={`Given \`names <- c("Ana", "Bo", "Cara")\` and \`ages <- c(40, 25, 33)\`, what does \`names[ages > 30]\` return?
 
 - \`c(40, 33)\`
+  > Those are the *ages* over 30, but the expression indexes into \`names\`, so it returns names rather than ages.
 - \`c(TRUE, FALSE, TRUE)\`
+  > That is the value of \`ages > 30\` itself, before it is used to subset \`names\`.
 - [o] \`c("Ana", "Cara")\`
   > The logical \`ages > 30\` is \`c(TRUE, FALSE, TRUE)\`, used as an index into \`names\`, keeping positions 1 and 3.
-- An error`}
+- An error
+  > Logical indexing of a character vector is valid R, so no error occurs.`}
 />
 
 ## Mini challenge: who passed?

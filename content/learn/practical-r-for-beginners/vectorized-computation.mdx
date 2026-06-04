@@ -211,10 +211,13 @@ this?" 95% of the time, there is.
   markdown={`What does \`c(1, 2, 3) * 10\` return?
 
 - \`60\` (the product of all elements times 10)
+  > Multiplication here is element-wise, not a single product of everything; you get a vector back, not one number.
 - [o] \`10 20 30\`
   > The \`10\` is recycled to match the length of the vector, then multiplied element-wise.
 - An error — different lengths
-- \`c(10, 2, 3)\``}
+  > A length-1 value is recycled to match the vector, so this is valid rather than an error.
+- \`c(10, 2, 3)\`
+  > The \`10\` multiplies *every* element, not just the first one.`}
 />
 
 <MultipleChoice

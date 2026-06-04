@@ -314,6 +314,7 @@ Console.WriteLine($"b = {b}");
 - \`decimal\` uses less memory
   > It uses more.
 - [o] \`double\` has small rounding errors for decimal fractions (e.g., \`0.1 + 0.2 != 0.3\`); \`decimal\` is exact for the decimal numbers humans care about
+  > \`decimal\` stores base-10 fractions precisely, so money amounts add up correctly.
 - They're the same — pick either one
-  > They're meaningfully different.`}
+  > They behave differently for fractions, which is exactly why money needs \`decimal\`.`}
 />

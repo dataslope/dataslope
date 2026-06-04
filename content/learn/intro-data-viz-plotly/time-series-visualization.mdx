@@ -257,10 +257,15 @@ This is one of those bugs that confuses everyone exactly once. After that, you s
   markdown={`Which Plotly chart configuration **hides weekend gaps** in a stock-price line chart, so the x-axis only shows trading days?
 
 - Filtering the DataFrame to weekdays only.
+  > Dropping weekend rows removes the data, but the x-axis is still a continuous date axis, so Plotly leaves the empty Saturday-Sunday span and draws a straight line across it. The gap remains visible.
 - **fig.update_layout(weekends=False)**.
+  > There is no **weekends** option on **update_layout**. This looks plausible but isn't a real Plotly setting.
 - [o] **fig.update_xaxes(rangebreaks=[dict(bounds=["sat", "mon"])])**.
   > **rangebreaks** tells Plotly to *compress* certain ranges out of the x-axis. The **bounds** form hides the weekend gap; there are also **pattern** and **values** variants for holidays. Without this, weekend gaps appear as flat plateaus that misrepresent the data.
 - This isn't possible in Plotly.
+  > Plotly does support this directly through **rangebreaks**, so this option is incorrect.
 
-Time-series charts have many small configuration options like this. Bookmark Plotly's time-series documentation.`}
+Time-series charts have many small configuration options like this. Bookmark Plotly's time-series documentation.
+
+*Hint: this chapter showed the exact setting used to skip weekends — it operates on the x-axis, not on the data or the layout.*`}
 />
