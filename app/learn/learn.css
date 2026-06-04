@@ -18,7 +18,16 @@
    at-rule, including the inlined CSS pulled in by tailwindcss. */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
 
-@import "tailwindcss";
+/* `source(none)` disables Tailwind v4's automatic content detection,
+   which otherwise crawls the entire project on every CSS compile. In this
+   repo that sweep walks large non-source trees (public/, cdn-assets/,
+   agent-outputs/, the 800-file content/ tree) and added ~2 minutes to the
+   /learn dev compile on a cold cache. The app authors no Tailwind utility
+   classes of its own — only Fumadocs UI uses them — so the single explicit
+   `@source` below (Fumadocs's prebuilt JS) is the complete set of class
+   names Tailwind needs to scan. If app code ever starts using Tailwind
+   utilities directly, add an `@source` for those files here. */
+@import "tailwindcss" source(none);
 @source "../../node_modules/fumadocs-ui/dist/**/*.js";
 @import "fumadocs-ui/css/neutral.css";
 @import "fumadocs-ui/css/preset.css";
