@@ -306,9 +306,9 @@ toys: 14
 const sales: readonly Sale[] = [
   { category: "books", amount: 20 },
   { category: "books", amount: 30 },
-  { category: "food",  amount: 5  },
-  { category: "food",  amount: 12 },
-  { category: "toys",  amount: 14 },
+  { category: "food", amount: 5 },
+  { category: "food", amount: 12 },
+  { category: "toys", amount: 14 },
 ];
 
 const avg = avgPerCategory(sales);
@@ -324,7 +324,9 @@ for (const line of lines) console.log(line);
       initialContent: `export type Sale = { readonly category: string; readonly amount: number };
 
 // Reimplement this declaratively — no \`for\`, no \`let\`, no mutation.
-export function avgPerCategory(sales: readonly Sale[]): ReadonlyMap<string, number> {
+export function avgPerCategory(
+  sales: readonly Sale[],
+): ReadonlyMap<string, number> {
   const out = new Map<string, number>();
   const totals: Record<string, { sum: number; count: number }> = {};
   for (let i = 0; i < sales.length; i++) {
@@ -341,17 +343,18 @@ export function avgPerCategory(sales: readonly Sale[]): ReadonlyMap<string, numb
 `,
       solutionContent: `export type Sale = { readonly category: string; readonly amount: number };
 
-export function avgPerCategory(sales: readonly Sale[]): ReadonlyMap<string, number> {
-  const totals = sales.reduce<ReadonlyMap<string, { sum: number; count: number }>>(
-    (acc, s) => {
-      const prev = acc.get(s.category) ?? { sum: 0, count: 0 };
-      return new Map(acc).set(s.category, {
-        sum: prev.sum + s.amount,
-        count: prev.count + 1,
-      });
-    },
-    new Map(),
-  );
+export function avgPerCategory(
+  sales: readonly Sale[],
+): ReadonlyMap<string, number> {
+  const totals = sales.reduce<
+    ReadonlyMap<string, { sum: number; count: number }>
+  >((acc, s) => {
+    const prev = acc.get(s.category) ?? { sum: 0, count: 0 };
+    return new Map(acc).set(s.category, {
+      sum: prev.sum + s.amount,
+      count: prev.count + 1,
+    });
+  }, new Map());
 
   return new Map(
     [...totals.entries()].map(([k, { sum, count }]) => [k, sum / count]),

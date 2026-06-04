@@ -79,28 +79,33 @@ Hints:
       initialContent: `import java.util.*;
 
 public class Main {
-    public static void main(String[] args) {
-        MusicLibrary lib = new MusicLibrary();
-        lib.add(new Track("Clair de Lune",   "Debussy",  "Suite Bergamasque", List.of("classical","impressionist"), 5));
-        lib.add(new Track("Gymnopedie No.1", "Satie",    "Gymnopedies",       List.of("classical"),                 3));
-        lib.add(new Track("Reverie",         "Debussy",  "Reveries",          List.of("classical","impressionist"), 4));
-        lib.add(new Track("Liebestraum",     "Liszt",    "Liebestraume",      List.of("classical"),                 4));
-        lib.add(new Track("La Mer",          "Debussy",  "Sea Pieces",        List.of("classical","orchestral"),    5));
+  public static void main(String[] args) {
+    MusicLibrary lib = new MusicLibrary();
+    lib.add(new Track("Clair de Lune", "Debussy", "Suite Bergamasque",
+                      List.of("classical", "impressionist"), 5));
+    lib.add(new Track("Gymnopedie No.1", "Satie", "Gymnopedies",
+                      List.of("classical"), 3));
+    lib.add(new Track("Reverie", "Debussy", "Reveries",
+                      List.of("classical", "impressionist"), 4));
+    lib.add(new Track("Liebestraum", "Liszt", "Liebestraume",
+                      List.of("classical"), 4));
+    lib.add(new Track("La Mer", "Debussy", "Sea Pieces",
+                      List.of("classical", "orchestral"), 5));
 
-        System.out.println("Debussy tracks:");
-        for (Track t : lib.byArtist("Debussy")) {
-            System.out.println("  " + t.title());
-        }
-
-        System.out.println("Genres: " + lib.genres());
-
-        System.out.println("Top 3:");
-        for (Track t : lib.topRated(3)) {
-            System.out.println("  " + t.title() + " (" + t.rating() + ")");
-        }
-
-        System.out.println("Debussy albums: " + lib.albumsByArtist("Debussy"));
+    System.out.println("Debussy tracks:");
+    for (Track t : lib.byArtist("Debussy")) {
+      System.out.println("  " + t.title());
     }
+
+    System.out.println("Genres: " + lib.genres());
+
+    System.out.println("Top 3:");
+    for (Track t : lib.topRated(3)) {
+      System.out.println("  " + t.title() + " (" + t.rating() + ")");
+    }
+
+    System.out.println("Debussy albums: " + lib.albumsByArtist("Debussy"));
+  }
 }
 `,
     },
@@ -108,13 +113,8 @@ public class Main {
       filename: "Track.java",
       initialContent: `import java.util.List;
 
-public record Track(
-    String title,
-    String artist,
-    String album,
-    List<String> genres,
-    int rating
-) {}
+public record Track(String title, String artist, String album,
+                    List<String> genres, int rating) {}
 `,
     },
     {
@@ -122,72 +122,72 @@ public record Track(
       initialContent: `import java.util.*;
 
 public class MusicLibrary {
-    // TODO: choose the right shapes for each query
+  // TODO: choose the right shapes for each query
 
-    public void add(Track t) {
-        // TODO
-    }
+  public void add(Track t) {
+    // TODO
+  }
 
-    /** All tracks for the artist, in insertion order. */
-    public List<Track> byArtist(String artist) {
-        // TODO
-        return List.of();
-    }
+  /** All tracks for the artist, in insertion order. */
+  public List<Track> byArtist(String artist) {
+    // TODO
+    return List.of();
+  }
 
-    /** All genres across the library, in insertion order (deduped). */
-    public Set<String> genres() {
-        // TODO
-        return Set.of();
-    }
+  /** All genres across the library, in insertion order (deduped). */
+  public Set<String> genres() {
+    // TODO
+    return Set.of();
+  }
 
-    /** Top n by rating desc, ties broken by title asc. */
-    public List<Track> topRated(int n) {
-        // TODO
-        return List.of();
-    }
+  /** Top n by rating desc, ties broken by title asc. */
+  public List<Track> topRated(int n) {
+    // TODO
+    return List.of();
+  }
 
-    /** Unique albums for the artist, in insertion order. */
-    public Set<String> albumsByArtist(String artist) {
-        // TODO
-        return Set.of();
-    }
+  /** Unique albums for the artist, in insertion order. */
+  public Set<String> albumsByArtist(String artist) {
+    // TODO
+    return Set.of();
+  }
 }
 `,
       solutionContent: `import java.util.*;
 
 public class MusicLibrary {
-    private final List<Track>                tracks      = new ArrayList<>();
-    private final Map<String, List<Track>>   byArtist    = new HashMap<>();
-    private final Set<String>                allGenres   = new LinkedHashSet<>();
-    private final Map<String, Set<String>>   albumsOfArt = new HashMap<>();
+  private final List<Track> tracks = new ArrayList<>();
+  private final Map<String, List<Track>> byArtist = new HashMap<>();
+  private final Set<String> allGenres = new LinkedHashSet<>();
+  private final Map<String, Set<String>> albumsOfArt = new HashMap<>();
 
-    public void add(Track t) {
-        tracks.add(t);
-        byArtist.computeIfAbsent(t.artist(), k -> new ArrayList<>()).add(t);
-        allGenres.addAll(t.genres());
-        albumsOfArt.computeIfAbsent(t.artist(), k -> new LinkedHashSet<>()).add(t.album());
-    }
+  public void add(Track t) {
+    tracks.add(t);
+    byArtist.computeIfAbsent(t.artist(), k -> new ArrayList<>()).add(t);
+    allGenres.addAll(t.genres());
+    albumsOfArt.computeIfAbsent(t.artist(), k -> new LinkedHashSet<>())
+        .add(t.album());
+  }
 
-    public List<Track> byArtist(String artist) {
-        return Collections.unmodifiableList(byArtist.getOrDefault(artist, List.of()));
-    }
+  public List<Track> byArtist(String artist) {
+    return Collections.unmodifiableList(
+        byArtist.getOrDefault(artist, List.of()));
+  }
 
-    public Set<String> genres() {
-        return Collections.unmodifiableSet(allGenres);
-    }
+  public Set<String> genres() { return Collections.unmodifiableSet(allGenres); }
 
-    public List<Track> topRated(int n) {
-        List<Track> copy = new ArrayList<>(tracks);
-        copy.sort(Comparator
-            .comparingInt(Track::rating).reversed()
-            .thenComparing(Track::title));
-        return copy.subList(0, Math.min(n, copy.size()));
-    }
+  public List<Track> topRated(int n) {
+    List<Track> copy = new ArrayList<>(tracks);
+    copy.sort(Comparator.comparingInt(Track::rating)
+                  .reversed()
+                  .thenComparing(Track::title));
+    return copy.subList(0, Math.min(n, copy.size()));
+  }
 
-    public Set<String> albumsByArtist(String artist) {
-        return Collections.unmodifiableSet(
-            albumsOfArt.getOrDefault(artist, Set.of()));
-    }
+  public Set<String> albumsByArtist(String artist) {
+    return Collections.unmodifiableSet(
+        albumsOfArt.getOrDefault(artist, Set.of()));
+  }
 }
 `,
     },

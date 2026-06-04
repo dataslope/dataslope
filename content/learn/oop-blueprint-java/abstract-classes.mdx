@@ -45,52 +45,52 @@ abstract. Concrete subclasses must implement `area()`.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Shape[] shapes = { new Circle(1), new Square(4) };
-        for (Shape s : shapes) {
-            System.out.println(s.describe());
-        }
-        // Shape s = new Shape();  // would fail: Shape is abstract
+  public static void main(String[] args) {
+    Shape[] shapes = {new Circle(1), new Square(4)};
+    for (Shape s : shapes) {
+      System.out.println(s.describe());
     }
+    // Shape s = new Shape();  // would fail: Shape is abstract
+  }
 }
 `,
     },
     {
       filename: "Shape.java",
       initialContent: `public abstract class Shape {
-    // Concrete behavior shared by every shape:
-    public String describe() {
-        return getClass().getSimpleName() + " with area " + area();
-    }
+  // Concrete behavior shared by every shape:
+  public String describe() {
+    return getClass().getSimpleName() + " with area " + area();
+  }
 
-    // Abstract: every concrete shape must implement this.
-    public abstract double area();
+  // Abstract: every concrete shape must implement this.
+  public abstract double area();
 }
 `,
     },
     {
       filename: "Circle.java",
       initialContent: `public class Circle extends Shape {
-    private final double radius;
-    public Circle(double radius) { this.radius = radius; }
+  private final double radius;
+  public Circle(double radius) { this.radius = radius; }
 
-    @Override
-    public double area() {
-        return Math.PI * radius * radius;
-    }
+  @Override
+  public double area() {
+    return Math.PI * radius * radius;
+  }
 }
 `,
     },
     {
       filename: "Square.java",
       initialContent: `public class Square extends Shape {
-    private final double side;
-    public Square(double side) { this.side = side; }
+  private final double side;
+  public Square(double side) { this.side = side; }
 
-    @Override
-    public double area() {
-        return side * side;
-    }
+  @Override
+  public double area() {
+    return side * side;
+  }
 }
 `,
     },
@@ -136,76 +136,74 @@ sequenceDiagram
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        TaxReturn us = new USTaxReturn(120_000);
-        TaxReturn uk = new UKTaxReturn(120_000);
+  public static void main(String[] args) {
+    TaxReturn us = new USTaxReturn(120_000);
+    TaxReturn uk = new UKTaxReturn(120_000);
 
-        System.out.println(us.file());
-        System.out.println(uk.file());
-    }
+    System.out.println(us.file());
+    System.out.println(uk.file());
+  }
 }
 `,
     },
     {
       filename: "TaxReturn.java",
       initialContent: `public abstract class TaxReturn {
-    protected final double income;
+  protected final double income;
 
-    protected TaxReturn(double income) {
-        this.income = income;
-    }
+  protected TaxReturn(double income) { this.income = income; }
 
-    // The template method — defines the overall shape:
-    public final String file() {
-        gatherIncome();
-        double tax = computeTax();
-        return submit(tax);
-    }
+  // The template method — defines the overall shape:
+  public final String file() {
+    gatherIncome();
+    double tax = computeTax();
+    return submit(tax);
+  }
 
-    // Concrete shared step:
-    protected void gatherIncome() {
-        // pretend we look up forms
-    }
+  // Concrete shared step:
+  protected void gatherIncome() {
+    // pretend we look up forms
+  }
 
-    // Step that varies per country:
-    protected abstract double computeTax();
+  // Step that varies per country:
+  protected abstract double computeTax();
 
-    // Step that varies per country:
-    protected abstract String submit(double tax);
+  // Step that varies per country:
+  protected abstract String submit(double tax);
 }
 `,
     },
     {
       filename: "USTaxReturn.java",
       initialContent: `public class USTaxReturn extends TaxReturn {
-    public USTaxReturn(double income) { super(income); }
+  public USTaxReturn(double income) { super(income); }
 
-    @Override
-    protected double computeTax() {
-        return income * 0.24;
-    }
+  @Override
+  protected double computeTax() {
+    return income * 0.24;
+  }
 
-    @Override
-    protected String submit(double tax) {
-        return "IRS receipt: tax owed $" + tax;
-    }
+  @Override
+  protected String submit(double tax) {
+    return "IRS receipt: tax owed $" + tax;
+  }
 }
 `,
     },
     {
       filename: "UKTaxReturn.java",
       initialContent: `public class UKTaxReturn extends TaxReturn {
-    public UKTaxReturn(double income) { super(income); }
+  public UKTaxReturn(double income) { super(income); }
 
-    @Override
-    protected double computeTax() {
-        return income * 0.20;
-    }
+  @Override
+  protected double computeTax() {
+    return income * 0.20;
+  }
 
-    @Override
-    protected String submit(double tax) {
-        return "HMRC receipt: tax owed £" + tax;
-    }
+  @Override
+  protected String submit(double tax) {
+    return "HMRC receipt: tax owed £" + tax;
+  }
 }
 `,
     },
@@ -265,71 +263,67 @@ To +1-555-0100: Your code is 1234
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Notification a = new EmailNotification("ada@oop.dev", "Welcome!");
-        Notification b = new SmsNotification("+1-555-0100", "Your code is 1234");
-        System.out.println(a.send());
-        System.out.println(b.send());
-    }
+  public static void main(String[] args) {
+    Notification a = new EmailNotification("ada@oop.dev", "Welcome!");
+    Notification b = new SmsNotification("+1-555-0100", "Your code is 1234");
+    System.out.println(a.send());
+    System.out.println(b.send());
+  }
 }
 `,
     },
     {
       filename: "Notification.java",
       initialContent: `public abstract class Notification {
-    // TODO: recipient field, constructor, final send(), abstract body()
+  // TODO: recipient field, constructor, final send(), abstract body()
 }
 `,
       solutionContent: `public abstract class Notification {
-    private final String recipient;
+  private final String recipient;
 
-    protected Notification(String recipient) {
-        this.recipient = recipient;
-    }
+  protected Notification(String recipient) { this.recipient = recipient; }
 
-    public final String send() {
-        return "To " + recipient + ": " + body();
-    }
+  public final String send() { return "To " + recipient + ": " + body(); }
 
-    protected abstract String body();
+  protected abstract String body();
 }
 `,
     },
     {
       filename: "EmailNotification.java",
       initialContent: `public class EmailNotification extends Notification {
-    // TODO
+  // TODO
 }
 `,
       solutionContent: `public class EmailNotification extends Notification {
-    private final String subject;
-    public EmailNotification(String recipient, String subject) {
-        super(recipient);
-        this.subject = subject;
-    }
-    @Override
-    protected String body() {
-        return "Subject: " + subject;
-    }
+  private final String subject;
+  public EmailNotification(String recipient, String subject) {
+    super(recipient);
+    this.subject = subject;
+  }
+  @Override
+  protected String body() {
+    return "Subject: " + subject;
+  }
 }
 `,
     },
     {
       filename: "SmsNotification.java",
       initialContent: `public class SmsNotification extends Notification {
-    // TODO
+  // TODO
 }
 `,
       solutionContent: `public class SmsNotification extends Notification {
-    private final String text;
-    public SmsNotification(String recipient, String text) {
-        super(recipient);
-        this.text = text;
-    }
-    @Override
-    protected String body() {
-        return text;
-    }
+  private final String text;
+  public SmsNotification(String recipient, String text) {
+    super(recipient);
+    this.text = text;
+  }
+  @Override
+  protected String body() {
+    return text;
+  }
 }
 `,
     },

@@ -62,8 +62,21 @@ function reorder(body) {
   if (moved === 0) return { rebuilt: body, moved: 0 };
   const kept = [];
   const types = [];
+  // Partition lines into statements (kept) and relocated type declarations
+  // (types). When several type declarations move (e.g. an inheritance example
+  // with a base + derived classes), keep one blank line between consecutive
+  // declarations so they don't jam together — a single blank is clang-format
+  // stable, so the later reformat preserves it.
+  let inType = false;
   for (let i = 0; i < lines.length; i++) {
-    (typeLineFlags[i] ? types : kept).push(lines[i]);
+    if (typeLineFlags[i]) {
+      if (!inType && types.length > 0) types.push("");
+      types.push(lines[i]);
+      inType = true;
+    } else {
+      kept.push(lines[i]);
+      inType = false;
+    }
   }
   while (kept.length && kept[kept.length - 1].trim() === "") kept.pop();
   while (types.length && types[0].trim() === "") types.shift();

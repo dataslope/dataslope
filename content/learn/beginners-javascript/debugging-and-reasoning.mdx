@@ -302,12 +302,12 @@ the bug *before* looking at the fix below.
       initialContent: `const { applyDiscounts } = require("./pricing");
 
 const cart = [
-  { name: "Pen",      price: 2,  qty: 3 },
-  { name: "Notebook", price: 5,  qty: 2 },
-  { name: "Laptop",   price: 999, qty: 1 },
+  { name: "Pen", price: 2, qty: 3 },
+  { name: "Notebook", price: 5, qty: 2 },
+  { name: "Laptop", price: 999, qty: 1 },
 ];
 
-console.log("total:", applyDiscounts(cart, 0.10));
+console.log("total:", applyDiscounts(cart, 0.1));
 console.log("cart afterwards:", cart);
 `,
     },
@@ -317,7 +317,7 @@ console.log("cart afterwards:", cart);
 function applyDiscounts(cart, discount) {
   let total = 0;
   for (const item of cart) {
-    item.price = item.price * (1 - discount);   // bug: mutates caller's data!
+    item.price = item.price * (1 - discount); // bug: mutates caller's data!
     total += item.price * item.qty;
   }
   return total;

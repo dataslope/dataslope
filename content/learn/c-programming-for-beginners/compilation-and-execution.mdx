@@ -164,13 +164,13 @@ and click *Run* — both files are compiled and linked together.
   files={[
     {
       filename: "main.c",
-      initialContent: `#include <stdio.h>
-#include "greetings.h"
+      initialContent: `#include "greetings.h"
+#include <stdio.h>
 
 int main(void) {
-    say_hello("world");
-    say_hello("C");
-    return 0;
+  say_hello("world");
+  say_hello("C");
+  return 0;
 }
 `,
     },
@@ -186,12 +186,10 @@ void say_hello(const char *name);
     },
     {
       filename: "greetings.c",
-      initialContent: `#include <stdio.h>
-#include "greetings.h"
+      initialContent: `#include "greetings.h"
+#include <stdio.h>
 
-void say_hello(const char *name) {
-    printf("Hello, %s!\\n", name);
-}
+void say_hello(const char *name) { printf("Hello, %s!\\n", name); }
 `,
     },
   ]}
@@ -243,8 +241,8 @@ flowchart LR
       initialContent: `#include "farewell.h"
 
 int main(void) {
-    say_goodbye("Bell Labs");
-    return 0;
+  say_goodbye("Bell Labs");
+  return 0;
 }
 `,
     },
@@ -267,17 +265,15 @@ void say_goodbye(const char *name);
     },
     {
       filename: "farewell.c",
-      initialContent: `#include <stdio.h>
-#include "farewell.h"
+      initialContent: `#include "farewell.h"
+#include <stdio.h>
 
 // define say_goodbye here
 `,
-      solutionContent: `#include <stdio.h>
-#include "farewell.h"
+      solutionContent: `#include "farewell.h"
+#include <stdio.h>
 
-void say_goodbye(const char *name) {
-    printf("Goodbye, %s!\\n", name);
-}
+void say_goodbye(const char *name) { printf("Goodbye, %s!\\n", name); }
 `,
     },
   ]}

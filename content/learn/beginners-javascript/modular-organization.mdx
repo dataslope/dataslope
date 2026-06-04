@@ -118,11 +118,13 @@ surface, the freer you are to change the internals.
       filename: "index.js",
       initialContent: `const { format } = require("./currency");
 
-console.log(format(1234.5,  "USD"));
-console.log(format(99,      "EUR"));
+console.log(format(1234.5, "USD"));
+console.log(format(99, "EUR"));
 
 // We DON'T expose the helpers — and we can't even reach them.
-try { require("./currency").pad; } catch (e) {}
+try {
+  require("./currency").pad;
+} catch (e) {}
 console.log("pad exposed?", typeof require("./currency").pad === "function");
 `,
     },
@@ -255,9 +257,9 @@ re-exports.
 const { listActiveUsers, addUser } = require("./users");
 const { createOrder, totalRevenue } = require("./orders");
 
-addUser({ id: 1, name: "Ada",   active: true  });
+addUser({ id: 1, name: "Ada", active: true });
 addUser({ id: 2, name: "Linus", active: false });
-addUser({ id: 3, name: "Grace", active: true  });
+addUser({ id: 3, name: "Grace", active: true });
 
 createOrder({ userId: 1, amount: 50 });
 createOrder({ userId: 1, amount: 30 });
@@ -314,7 +316,7 @@ function add(name, value) {
 }
 
 function getAll(name) {
-  return [...(collections[name] || [])];   // copy to discourage mutation
+  return [...(collections[name] || [])]; // copy to discourage mutation
 }
 
 module.exports = { add, getAll };
@@ -393,8 +395,8 @@ The tests will require \`./budget\` and call the exported functions.`}
 
 budget.addIncome(1000);
 budget.addExpense(120, "food");
-budget.addExpense(80,  "food");
-budget.addExpense(60,  "books");
+budget.addExpense(80, "food");
+budget.addExpense(60, "books");
 
 console.log("balance:", budget.balance());
 console.log("by category:", budget.expensesByCategory());
@@ -403,8 +405,8 @@ console.log("by category:", budget.expensesByCategory());
 
 budget.addIncome(1000);
 budget.addExpense(120, "food");
-budget.addExpense(80,  "food");
-budget.addExpense(60,  "books");
+budget.addExpense(80, "food");
+budget.addExpense(60, "books");
 
 console.log("balance:", budget.balance());
 console.log("by category:", budget.expensesByCategory());

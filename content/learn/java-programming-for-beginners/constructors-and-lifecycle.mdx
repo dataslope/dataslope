@@ -270,46 +270,44 @@ rejected: low must be less than high
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Range r = new Range(0, 5);
-        System.out.println("length=" + r.length());
-        System.out.println("contains 3 = " + r.contains(3));
-        System.out.println("contains 5 = " + r.contains(5));
+  public static void main(String[] args) {
+    Range r = new Range(0, 5);
+    System.out.println("length=" + r.length());
+    System.out.println("contains 3 = " + r.contains(3));
+    System.out.println("contains 5 = " + r.contains(5));
 
-        try {
-            Range bad = new Range(5, 5);
-        } catch (IllegalArgumentException e) {
-            System.out.println("rejected: " + e.getMessage());
-        }
+    try {
+      Range bad = new Range(5, 5);
+    } catch (IllegalArgumentException e) {
+      System.out.println("rejected: " + e.getMessage());
     }
+  }
 }
 `,
     },
     {
       filename: "Range.java",
       initialContent: `public class Range {
-    // TODO: implement
+  // TODO: implement
 }
 `,
       solutionContent: `public class Range {
-    private final int low;
-    private final int high;
+  private final int low;
+  private final int high;
 
-    public Range(int low, int high) {
-        if (low >= high) {
-            throw new IllegalArgumentException("low must be less than high");
-        }
-        this.low = low;
-        this.high = high;
+  public Range(int low, int high) {
+    if (low >= high) {
+      throw new IllegalArgumentException("low must be less than high");
     }
+    this.low = low;
+    this.high = high;
+  }
 
-    public int low()    { return low; }
-    public int high()   { return high; }
-    public int length() { return high - low; }
+  public int low() { return low; }
+  public int high() { return high; }
+  public int length() { return high - low; }
 
-    public boolean contains(int n) {
-        return n >= low && n < high;
-    }
+  public boolean contains(int n) { return n >= low && n < high; }
 }
 `,
     },

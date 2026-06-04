@@ -253,20 +253,20 @@ The program must print exactly:
   files={[
     {
       filename: "main.c",
-      initialContent: `#include <stdio.h>
-#include "dynarr.h"
+      initialContent: `#include "dynarr.h"
+#include <stdio.h>
 
 int main(void) {
-    DynArr a;
-    da_init(&a);
-    for (int i = 1; i <= 5; i++) {
-        da_push(&a, i);
-    }
-    for (size_t i = 0; i < a.length; i++) {
-        printf("%d%s", a.data[i], i + 1 == a.length ? "\\n" : " ");
-    }
-    da_free(&a);
-    return 0;
+  DynArr a;
+  da_init(&a);
+  for (int i = 1; i <= 5; i++) {
+    da_push(&a, i);
+  }
+  for (size_t i = 0; i < a.length; i++) {
+    printf("%d%s", a.data[i], i + 1 == a.length ? "\\n" : " ");
+  }
+  da_free(&a);
+  return 0;
 }
 `,
     },
@@ -278,9 +278,9 @@ int main(void) {
 #include <stddef.h>
 
 typedef struct {
-    int   *data;
-    size_t length;
-    size_t capacity;
+  int *data;
+  size_t length;
+  size_t capacity;
 } DynArr;
 
 void da_init(DynArr *a);
@@ -292,46 +292,47 @@ void da_free(DynArr *a);
     },
     {
       filename: "dynarr.c",
-      initialContent: `#include <stdlib.h>
-#include "dynarr.h"
+      initialContent: `#include "dynarr.h"
+#include <stdlib.h>
 
 void da_init(DynArr *a) {
-    // your code here
+  // your code here
 }
 
 void da_push(DynArr *a, int value) {
-    // your code here
+  // your code here
 }
 
 void da_free(DynArr *a) {
-    // your code here
+  // your code here
 }
 `,
-      solutionContent: `#include <stdlib.h>
-#include "dynarr.h"
+      solutionContent: `#include "dynarr.h"
+#include <stdlib.h>
 
 void da_init(DynArr *a) {
-    a->data = NULL;
-    a->length = 0;
-    a->capacity = 0;
+  a->data = NULL;
+  a->length = 0;
+  a->capacity = 0;
 }
 
 void da_push(DynArr *a, int value) {
-    if (a->length == a->capacity) {
-        size_t new_cap = a->capacity == 0 ? 1 : a->capacity * 2;
-        int *new_data = realloc(a->data, new_cap * sizeof(int));
-        if (new_data == NULL) return;
-        a->data = new_data;
-        a->capacity = new_cap;
-    }
-    a->data[a->length++] = value;
+  if (a->length == a->capacity) {
+    size_t new_cap = a->capacity == 0 ? 1 : a->capacity * 2;
+    int *new_data = realloc(a->data, new_cap * sizeof(int));
+    if (new_data == NULL)
+      return;
+    a->data = new_data;
+    a->capacity = new_cap;
+  }
+  a->data[a->length++] = value;
 }
 
 void da_free(DynArr *a) {
-    free(a->data);
-    a->data = NULL;
-    a->length = 0;
-    a->capacity = 0;
+  free(a->data);
+  a->data = NULL;
+  a->length = 0;
+  a->capacity = 0;
 }
 `,
     },

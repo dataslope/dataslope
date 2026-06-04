@@ -265,7 +265,13 @@ filesystem before each run, so the entry translation unit can
   files={[
     {
       filename: "main.c",
-      initialContent: `#include "utils.h"\n\nint main(void) {\n    greet();\n    return 0;\n}\n`,
+      initialContent: `#include "utils.h"
+
+int main(void) {
+  greet();
+  return 0;
+}
+`,
     },
     {
       filename: "utils.h",
@@ -273,8 +279,18 @@ filesystem before each run, so the entry translation unit can
     },
     {
       filename: "utils.c",
-      initialContent: `#include <stdio.h>\n#include "utils.h"\n\nvoid greet(void) {\n    // your code here\n}\n`,
-      solutionContent: `#include <stdio.h>\n#include "utils.h"\n\nvoid greet(void) {\n    printf("Hello, World!\\n");\n}\n`,
+      initialContent: `#include "utils.h"
+#include <stdio.h>
+
+void greet(void) {
+  // your code here
+}
+`,
+      solutionContent: `#include "utils.h"
+#include <stdio.h>
+
+void greet(void) { printf("Hello, World!\\n"); }
+`,
     },
   ]}
   tests={[
@@ -296,7 +312,13 @@ filesystem before each run, so the entry translation unit can
   files={[
     {
       filename: "main.c",
-      initialContent: `#include "utils.h"\n\nint main(void) {\n    greet();\n    return 0;\n}\n`,
+      initialContent: `#include "utils.h"
+
+int main(void) {
+  greet();
+  return 0;
+}
+`,
     },
     {
       filename: "utils.h",
@@ -304,8 +326,16 @@ filesystem before each run, so the entry translation unit can
     },
     {
       filename: "utils.c",
-      initialContent: `#include <stdio.h>\n#include "utils.h"\n\nvoid greet(void) {\n}\n`,
-      solutionContent: `#include <stdio.h>\n#include "utils.h"\n\nvoid greet(void) {\n    printf("Hello, World!\\n");\n}\n`,
+      initialContent: `#include "utils.h"
+#include <stdio.h>
+
+void greet(void) {}
+`,
+      solutionContent: `#include "utils.h"
+#include <stdio.h>
+
+void greet(void) { printf("Hello, World!\\n"); }
+`,
     },
   ]}
   tests={[

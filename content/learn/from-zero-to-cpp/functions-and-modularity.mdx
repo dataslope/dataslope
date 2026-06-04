@@ -290,13 +290,13 @@ into their own file.
   files={[
     {
       filename: "main.cpp",
-      initialContent: `#include <iostream>
-#include "strutil.h"
+      initialContent: `#include "strutil.h"
+#include <iostream>
 
 int main() {
-    std::cout << to_upper("hello") << "\\n";
-    std::cout << repeat("ab", 3) << "\\n";
-    return 0;
+  std::cout << to_upper("hello") << "\\n";
+  std::cout << repeat("ab", 3) << "\\n";
+  return 0;
 }
 `,
     },
@@ -305,8 +305,8 @@ int main() {
       initialContent: `#pragma once
 #include <string>
 
-std::string to_upper(const std::string& s);
-std::string repeat(const std::string& s, int n);
+std::string to_upper(const std::string &s);
+std::string repeat(const std::string &s, int n);
 `,
     },
     {
@@ -314,18 +314,20 @@ std::string repeat(const std::string& s, int n);
       initialContent: `#include "strutil.h"
 #include <cctype>
 
-std::string to_upper(const std::string& s) {
-    std::string out;
-    out.reserve(s.size());
-    for (char c : s) out += static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
-    return out;
+std::string to_upper(const std::string &s) {
+  std::string out;
+  out.reserve(s.size());
+  for (char c : s)
+    out += static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
+  return out;
 }
 
-std::string repeat(const std::string& s, int n) {
-    std::string out;
-    out.reserve(s.size() * n);
-    for (int i = 0; i < n; ++i) out += s;
-    return out;
+std::string repeat(const std::string &s, int n) {
+  std::string out;
+  out.reserve(s.size() * n);
+  for (int i = 0; i < n; ++i)
+    out += s;
+  return out;
 }
 `,
     },
@@ -423,7 +425,14 @@ int main() {
   files={[
     {
       filename: "main.cpp",
-      initialContent: `#include <iostream>\n#include "arith.h"\n\nint main() {\n    std::cout << gcd(48, 18);\n    return 0;\n}\n`,
+      initialContent: `#include "arith.h"
+#include <iostream>
+
+int main() {
+  std::cout << gcd(48, 18);
+  return 0;
+}
+`,
     },
     {
       filename: "arith.h",
@@ -431,8 +440,24 @@ int main() {
     },
     {
       filename: "arith.cpp",
-      initialContent: `#include "arith.h"\n\nint gcd(int a, int b) {\n    // your code here\n    return 0;\n}\n`,
-      solutionContent: `#include "arith.h"\n\nint gcd(int a, int b) {\n    while (b != 0) {\n        int t = a % b;\n        a = b;\n        b = t;\n    }\n    return a;\n}\n`,
+      initialContent: `#include "arith.h"
+
+int gcd(int a, int b) {
+  // your code here
+  return 0;
+}
+`,
+      solutionContent: `#include "arith.h"
+
+int gcd(int a, int b) {
+  while (b != 0) {
+    int t = a % b;
+    a = b;
+    b = t;
+  }
+  return a;
+}
+`,
     },
   ]}
   tests={[

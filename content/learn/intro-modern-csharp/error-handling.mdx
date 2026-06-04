@@ -330,7 +330,8 @@ Console.WriteLine(SafeMath.SumNumbers(data));
         int total = 0;
         foreach (var s in inputs)
         {
-            if (int.TryParse(s, out var n)) total += n;
+            if (int.TryParse(s, out var n))
+                total += n;
         }
         return total;
     }

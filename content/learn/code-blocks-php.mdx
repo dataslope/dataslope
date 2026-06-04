@@ -49,20 +49,24 @@ echo json_encode($people, JSON_PRETTY_PRINT);
     {
       filename: "index.php",
       initialContent: `<?php
-require_once __DIR__ . "/greetings.php";
 
-echo hello("PHP Playground") . "\\n";
-echo bye("PHP Playground") . "\\n";
+require_once __DIR__ . '/greetings.php';
+
+echo hello('PHP Playground') . "\\n";
+echo bye('PHP Playground') . "\\n";
 `,
     },
     {
       filename: "greetings.php",
       initialContent: `<?php
-function hello(string $name): string {
+
+function hello(string $name): string
+{
     return "Hello, {$name}!";
 }
 
-function bye(string $name): string {
+function bye(string $name): string
+{
     return "Goodbye, {$name}!";
 }
 `,
@@ -80,20 +84,24 @@ The MDX source for the example above:
     {
       filename: "index.php",
       initialContent: `<?php
-require_once __DIR__ . "/greetings.php";
 
-echo hello("PHP Playground") . "\\n";
-echo bye("PHP Playground") . "\\n";
+require_once __DIR__ . '/greetings.php';
+
+echo hello('PHP Playground') . "\\n";
+echo bye('PHP Playground') . "\\n";
 `,
     },
     {
       filename: "greetings.php",
       initialContent: `<?php
-function hello(string $name): string {
+
+function hello(string $name): string
+{
     return "Hello, {$name}!";
 }
 
-function bye(string $name): string {
+function bye(string $name): string
+{
     return "Goodbye, {$name}!";
 }
 `,

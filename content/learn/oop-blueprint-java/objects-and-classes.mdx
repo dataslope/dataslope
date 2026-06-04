@@ -111,41 +111,40 @@ convention from now on. CheerpJ in your browser does the same.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Book hp = new Book("Harry Potter", "J. K. Rowling", 1997);
-        Book lr = new Book("The Lord of the Rings", "J. R. R. Tolkien", 1954);
+  public static void main(String[] args) {
+    Book hp = new Book("Harry Potter", "J. K. Rowling", 1997);
+    Book lr = new Book("The Lord of the Rings", "J. R. R. Tolkien", 1954);
 
-        System.out.println(hp.citation());
-        System.out.println(lr.citation());
-        System.out.println("Older book: " + (hp.olderThan(lr) ? hp.title() : lr.title()));
-    }
+    System.out.println(hp.citation());
+    System.out.println(lr.citation());
+    System.out.println("Older book: " +
+                       (hp.olderThan(lr) ? hp.title() : lr.title()));
+  }
 }
 `,
     },
     {
       filename: "Book.java",
       initialContent: `public class Book {
-    private final String title;
-    private final String author;
-    private final int    year;
+  private final String title;
+  private final String author;
+  private final int year;
 
-    public Book(String title, String author, int year) {
-        this.title  = title;
-        this.author = author;
-        this.year   = year;
-    }
+  public Book(String title, String author, int year) {
+    this.title = title;
+    this.author = author;
+    this.year = year;
+  }
 
-    public String title()  { return title; }
-    public String author() { return author; }
-    public int    year()   { return year; }
+  public String title() { return title; }
+  public String author() { return author; }
+  public int year() { return year; }
 
-    public String citation() {
-        return author + ", \\"" + title + "\\" (" + year + ")";
-    }
+  public String citation() {
+    return author + ", \\"" + title + "\\" (" + year + ")";
+  }
 
-    public boolean olderThan(Book other) {
-        return this.year < other.year;
-    }
+  public boolean olderThan(Book other) { return this.year < other.year; }
 }
 `,
     },
@@ -221,50 +220,46 @@ perimeter: 14.0
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Rectangle r = new Rectangle(4.0, 3.0);
-        System.out.println("area: " + r.area());
-        System.out.println("perimeter: " + r.perimeter());
-    }
+  public static void main(String[] args) {
+    Rectangle r = new Rectangle(4.0, 3.0);
+    System.out.println("area: " + r.area());
+    System.out.println("perimeter: " + r.perimeter());
+  }
 }
 `,
     },
     {
       filename: "Rectangle.java",
       initialContent: `public class Rectangle {
-    // TODO: declare private fields width and height (both double)
+  // TODO: declare private fields width and height (both double)
 
-    public Rectangle(double width, double height) {
-        // TODO: assign the parameters into the fields
-    }
+  public Rectangle(double width, double height) {
+    // TODO: assign the parameters into the fields
+  }
 
-    public double area() {
-        // TODO: return width * height
-        return 0;
-    }
+  public double area() {
+    // TODO: return width * height
+    return 0;
+  }
 
-    public double perimeter() {
-        // TODO: return 2 * (width + height)
-        return 0;
-    }
+  public double perimeter() {
+    // TODO: return 2 * (width + height)
+    return 0;
+  }
 }
 `,
       solutionContent: `public class Rectangle {
-    private final double width;
-    private final double height;
+  private final double width;
+  private final double height;
 
-    public Rectangle(double width, double height) {
-        this.width  = width;
-        this.height = height;
-    }
+  public Rectangle(double width, double height) {
+    this.width = width;
+    this.height = height;
+  }
 
-    public double area() {
-        return width * height;
-    }
+  public double area() { return width * height; }
 
-    public double perimeter() {
-        return 2.0 * (width + height);
-    }
+  public double perimeter() { return 2.0 * (width + height); }
 }
 `,
     },
@@ -301,26 +296,28 @@ a=3, b=1
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Counter a = new Counter();
-        Counter b = new Counter();
-        a.bump(); a.bump(); a.bump();
-        b.bump();
-        System.out.println("a=" + a.value() + ", b=" + b.value());
-    }
+  public static void main(String[] args) {
+    Counter a = new Counter();
+    Counter b = new Counter();
+    a.bump();
+    a.bump();
+    a.bump();
+    b.bump();
+    System.out.println("a=" + a.value() + ", b=" + b.value());
+  }
 }
 `,
     },
     {
       filename: "Counter.java",
       initialContent: `public class Counter {
-    // TODO: a private int field, a bump() method, a value() method
+  // TODO: a private int field, a bump() method, a value() method
 }
 `,
       solutionContent: `public class Counter {
-    private int count = 0;
-    public  void bump()  { count++; }
-    public  int  value() { return count; }
+  private int count = 0;
+  public void bump() { count++; }
+  public int value() { return count; }
 }
 `,
     },

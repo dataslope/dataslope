@@ -252,16 +252,16 @@ use `containsKey` to distinguish.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Cache<String, Integer> sq = new Cache<>(k -> {
-            System.out.println("computing " + k);
-            return Integer.parseInt(k) * Integer.parseInt(k);
-        });
+  public static void main(String[] args) {
+    Cache<String, Integer> sq = new Cache<>(k -> {
+      System.out.println("computing " + k);
+      return Integer.parseInt(k) * Integer.parseInt(k);
+    });
 
-        System.out.println(sq.get("3"));
-        System.out.println(sq.get("3"));   // no recomputation
-        System.out.println(sq.get("4"));
-    }
+    System.out.println(sq.get("3"));
+    System.out.println(sq.get("3")); // no recomputation
+    System.out.println(sq.get("4"));
+  }
 }
 `,
     },
@@ -272,14 +272,12 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class Cache<K, V> {
-    private final Map<K, V>       store = new HashMap<>();
-    private final Function<K, V>  loader;
+  private final Map<K, V> store = new HashMap<>();
+  private final Function<K, V> loader;
 
-    public Cache(Function<K, V> loader) { this.loader = loader; }
+  public Cache(Function<K, V> loader) { this.loader = loader; }
 
-    public V get(K key) {
-        return store.computeIfAbsent(key, loader);
-    }
+  public V get(K key) { return store.computeIfAbsent(key, loader); }
 }
 `,
     },
@@ -313,13 +311,12 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class Main {
-    public static void main(String[] args) {
-        List<String> ws = List.of(
-            "the", "quick", "brown", "fox", "jumps", "over", "lazy", "dog"
-        );
-        Map<Integer, List<String>> g = new TreeMap<>(Grouper.byLength(ws));
-        g.forEach((k, v) -> System.out.println(k + " -> " + v));
-    }
+  public static void main(String[] args) {
+    List<String> ws =
+        List.of("the", "quick", "brown", "fox", "jumps", "over", "lazy", "dog");
+    Map<Integer, List<String>> g = new TreeMap<>(Grouper.byLength(ws));
+    g.forEach((k, v) -> System.out.println(k + " -> " + v));
+  }
 }
 `,
     },
@@ -328,22 +325,22 @@ public class Main {
       initialContent: `import java.util.*;
 
 public class Grouper {
-    public static Map<Integer, List<String>> byLength(List<String> words) {
-        // TODO: use computeIfAbsent to build lists on demand
-        return new HashMap<>();
-    }
+  public static Map<Integer, List<String>> byLength(List<String> words) {
+    // TODO: use computeIfAbsent to build lists on demand
+    return new HashMap<>();
+  }
 }
 `,
       solutionContent: `import java.util.*;
 
 public class Grouper {
-    public static Map<Integer, List<String>> byLength(List<String> words) {
-        Map<Integer, List<String>> out = new HashMap<>();
-        for (String w : words) {
-            out.computeIfAbsent(w.length(), k -> new ArrayList<>()).add(w);
-        }
-        return out;
+  public static Map<Integer, List<String>> byLength(List<String> words) {
+    Map<Integer, List<String>> out = new HashMap<>();
+    for (String w : words) {
+      out.computeIfAbsent(w.length(), k -> new ArrayList<>()).add(w);
     }
+    return out;
+  }
 }
 `,
     },

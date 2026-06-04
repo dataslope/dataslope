@@ -216,17 +216,18 @@ incoming stream while preserving first-seen order.
       initialContent: `import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<String> raw = List.of(
-            "alice", "bob", "alice", "carol", "bob", "dave", "alice"
-        );
-        VisitorLog log = new VisitorLog();
-        for (String name : raw) log.record(name);
+  public static void main(String[] args) {
+    List<String> raw =
+        List.of("alice", "bob", "alice", "carol", "bob", "dave", "alice");
+    VisitorLog log = new VisitorLog();
+    for (String name : raw)
+      log.record(name);
 
-        System.out.println("unique visitors, in arrival order:");
-        for (String name : log.uniqueInOrder()) System.out.println("- " + name);
-        System.out.println("count = " + log.uniqueCount());
-    }
+    System.out.println("unique visitors, in arrival order:");
+    for (String name : log.uniqueInOrder())
+      System.out.println("- " + name);
+    System.out.println("count = " + log.uniqueCount());
+  }
 }
 `,
     },
@@ -236,14 +237,14 @@ public class Main {
 import java.util.Set;
 
 public class VisitorLog {
-    private final Set<String> seen = new LinkedHashSet<>();
+  private final Set<String> seen = new LinkedHashSet<>();
 
-    public boolean record(String name) {
-        return seen.add(name);   // returns true on first visit only
-    }
+  public boolean record(String name) {
+    return seen.add(name); // returns true on first visit only
+  }
 
-    public Set<String> uniqueInOrder() { return seen; }
-    public int        uniqueCount()    { return seen.size(); }
+  public Set<String> uniqueInOrder() { return seen; }
+  public int uniqueCount() { return seen.size(); }
 }
 `,
     },
@@ -274,10 +275,10 @@ Expected output:
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        String s = "the quick brown fox jumps over the lazy dog the fox";
-        System.out.println(Distinct.ofWords(s));
-    }
+  public static void main(String[] args) {
+    String s = "the quick brown fox jumps over the lazy dog the fox";
+    System.out.println(Distinct.ofWords(s));
+  }
 }
 `,
     },
@@ -287,10 +288,10 @@ Expected output:
 import java.util.List;
 
 public class Distinct {
-    public static List<String> ofWords(String text) {
-        // TODO: use a LinkedHashSet for "unique in insertion order"
-        return new ArrayList<>();
-    }
+  public static List<String> ofWords(String text) {
+    // TODO: use a LinkedHashSet for "unique in insertion order"
+    return new ArrayList<>();
+  }
 }
 `,
       solutionContent: `import java.util.ArrayList;
@@ -299,13 +300,14 @@ import java.util.List;
 import java.util.Set;
 
 public class Distinct {
-    public static List<String> ofWords(String text) {
-        Set<String> seen = new LinkedHashSet<>();
-        for (String w : text.split("\\\\s+")) {
-            if (!w.isEmpty()) seen.add(w);
-        }
-        return new ArrayList<>(seen);
+  public static List<String> ofWords(String text) {
+    Set<String> seen = new LinkedHashSet<>();
+    for (String w : text.split("\\\\s+")) {
+      if (!w.isEmpty())
+        seen.add(w);
     }
+    return new ArrayList<>(seen);
+  }
 }
 `,
     },

@@ -312,9 +312,12 @@ export const makeMessage = (g: Greeting): string => formatGreeting(g);
 
 export function formatGreeting(g: Greeting): string {
   switch (g.language) {
-    case "en": return \`Hello, \${g.name}!\`;
-    case "es": return \`¡Hola, \${g.name}!\`;
-    case "fr": return \`Bonjour, \${g.name}!\`;
+    case "en":
+      return \`Hello, \${g.name}!\`;
+    case "es":
+      return \`¡Hola, \${g.name}!\`;
+    case "fr":
+      return \`Bonjour, \${g.name}!\`;
   }
 }
 `,

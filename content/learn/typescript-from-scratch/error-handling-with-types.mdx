@@ -328,20 +328,18 @@ export function parseConfig(input: string): Result<Config, string> {
     },
     {
       filename: "result.ts",
-      initialContent: `export type Result<T, E> =
-  | { ok: true; value: T }
-  | { ok: false; error: E };
+      initialContent: `export type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
 
 export function map<T, E, U>(
   result: Result<T, E>,
-  fn: (value: T) => U
+  fn: (value: T) => U,
 ): Result<U, E> {
   return result.ok ? { ok: true, value: fn(result.value) } : result;
 }
 
 export function andThen<T, E, U>(
   result: Result<T, E>,
-  fn: (value: T) => Result<U, E>
+  fn: (value: T) => Result<U, E>,
 ): Result<U, E> {
   return result.ok ? fn(result.value) : result;
 }
@@ -398,25 +396,21 @@ export function parseNumber(input: string): Result<number, string> {
     },
     {
       filename: "result.ts",
-      initialContent: `export type Result<T, E> =
-  | { ok: true; value: T }
-  | { ok: false; error: E };
+      initialContent: `export type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
 
 export function map<T, E, U>(
   result: Result<T, E>,
-  fn: (value: T) => U
+  fn: (value: T) => U,
 ): Result<U, E> {
   // Implement
   return { ok: false, error: "Not implemented" as any };
 }
 `,
-      solutionContent: `export type Result<T, E> =
-  | { ok: true; value: T }
-  | { ok: false; error: E };
+      solutionContent: `export type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
 
 export function map<T, E, U>(
   result: Result<T, E>,
-  fn: (value: T) => U
+  fn: (value: T) => U,
 ): Result<U, E> {
   if (result.ok) {
     return { ok: true, value: fn(result.value) };

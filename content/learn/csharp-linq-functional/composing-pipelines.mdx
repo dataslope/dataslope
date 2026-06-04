@@ -178,21 +178,16 @@ to combine before they ever touch LINQ.
       initialContent: `using System;
 using System.Linq;
 
-var events = new[]
-{
-    new LogEvent("INFO",  "boot",        DateTime.UtcNow.AddMinutes(-50)),
-    new LogEvent("WARN",  "slow query",  DateTime.UtcNow.AddMinutes(-30)),
-    new LogEvent("ERROR", "timeout",     DateTime.UtcNow.AddMinutes(-20)),
-    new LogEvent("ERROR", "disk full",   DateTime.UtcNow.AddMinutes(-5)),
-    new LogEvent("INFO",  "request 200", DateTime.UtcNow.AddMinutes(-3)),
+var events = new[] {
+    new LogEvent("INFO", "boot", DateTime.UtcNow.AddMinutes(-50)),
+    new LogEvent("WARN", "slow query", DateTime.UtcNow.AddMinutes(-30)),
+    new LogEvent("ERROR", "timeout", DateTime.UtcNow.AddMinutes(-20)),
+    new LogEvent("ERROR", "disk full", DateTime.UtcNow.AddMinutes(-5)),
+    new LogEvent("INFO", "request 200", DateTime.UtcNow.AddMinutes(-3)),
 };
 
 // Compose: keep last-15-min ERROR events, take the messages, join them.
-var headline = events
-    .Recent(TimeSpan.FromMinutes(15))
-    .OfLevel("ERROR")
-    .Messages()
-    .Join(", ");
+var headline = events.Recent(TimeSpan.FromMinutes(15)).OfLevel("ERROR").Messages().Join(", ");
 
 Console.WriteLine($"Recent errors: {headline}");
 
@@ -201,20 +196,15 @@ public record LogEvent(string Level, string Message, DateTime At);
       solutionContent: `using System;
 using System.Linq;
 
-var events = new[]
-{
-    new LogEvent("INFO",  "boot",        DateTime.UtcNow.AddMinutes(-50)),
-    new LogEvent("WARN",  "slow query",  DateTime.UtcNow.AddMinutes(-30)),
-    new LogEvent("ERROR", "timeout",     DateTime.UtcNow.AddMinutes(-20)),
-    new LogEvent("ERROR", "disk full",   DateTime.UtcNow.AddMinutes(-5)),
-    new LogEvent("INFO",  "request 200", DateTime.UtcNow.AddMinutes(-3)),
+var events = new[] {
+    new LogEvent("INFO", "boot", DateTime.UtcNow.AddMinutes(-50)),
+    new LogEvent("WARN", "slow query", DateTime.UtcNow.AddMinutes(-30)),
+    new LogEvent("ERROR", "timeout", DateTime.UtcNow.AddMinutes(-20)),
+    new LogEvent("ERROR", "disk full", DateTime.UtcNow.AddMinutes(-5)),
+    new LogEvent("INFO", "request 200", DateTime.UtcNow.AddMinutes(-3)),
 };
 
-var headline = events
-    .Recent(TimeSpan.FromMinutes(15))
-    .OfLevel("ERROR")
-    .Messages()
-    .Join(", ");
+var headline = events.Recent(TimeSpan.FromMinutes(15)).OfLevel("ERROR").Messages().Join(", ");
 
 Console.WriteLine($"Recent errors: {headline}");
 
@@ -230,20 +220,18 @@ using System.Linq;
 public static class LogExtensions
 {
     // TODO: return events whose At is within the past 'window' from now.
-    public static IEnumerable<LogEvent> Recent(this IEnumerable<LogEvent> src, TimeSpan window)
-        => throw new NotImplementedException();
+    public static IEnumerable<LogEvent> Recent(this IEnumerable<LogEvent> src,
+                                               TimeSpan window) => throw new NotImplementedException();
 
     // TODO: return only events whose Level matches.
-    public static IEnumerable<LogEvent> OfLevel(this IEnumerable<LogEvent> src, string level)
-        => throw new NotImplementedException();
+    public static IEnumerable<LogEvent> OfLevel(this IEnumerable<LogEvent> src,
+                                                string level) => throw new NotImplementedException();
 
     // TODO: project to the Message strings.
-    public static IEnumerable<string> Messages(this IEnumerable<LogEvent> src)
-        => throw new NotImplementedException();
+    public static IEnumerable<string> Messages(this IEnumerable<LogEvent> src) => throw new NotImplementedException();
 
     // TODO: join strings with the given separator.
-    public static string Join(this IEnumerable<string> src, string sep)
-        => throw new NotImplementedException();
+    public static string Join(this IEnumerable<string> src, string sep) => throw new NotImplementedException();
 }
 `,
       solutionContent: `using System;
@@ -258,14 +246,12 @@ public static class LogExtensions
         return src.Where(e => e.At >= cutoff);
     }
 
-    public static IEnumerable<LogEvent> OfLevel(this IEnumerable<LogEvent> src, string level) =>
-        src.Where(e => e.Level == level);
+    public static IEnumerable<LogEvent> OfLevel(this IEnumerable<LogEvent> src,
+                                                string level) => src.Where(e => e.Level == level);
 
-    public static IEnumerable<string> Messages(this IEnumerable<LogEvent> src) =>
-        src.Select(e => e.Message);
+    public static IEnumerable<string> Messages(this IEnumerable<LogEvent> src) => src.Select(e => e.Message);
 
-    public static string Join(this IEnumerable<string> src, string sep) =>
-        string.Join(sep, src);
+    public static string Join(this IEnumerable<string> src, string sep) => string.Join(sep, src);
 }
 `,
     },

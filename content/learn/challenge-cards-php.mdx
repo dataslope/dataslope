@@ -268,12 +268,29 @@ sibling files.
   files={[
     {
       filename: "main.php",
-      initialContent: `<?php\nrequire_once "utils.php";\necho greet("World");\n`,
+      initialContent: `<?php
+
+require_once 'utils.php';
+echo greet('World');
+`,
     },
     {
       filename: "utils.php",
-      initialContent: `<?php\nfunction greet($name) {\n    // your code here\n    return "";\n}\n`,
-      solutionContent: `<?php\nfunction greet($name) {\n    return "Hello, {$name}!";\n}\n`,
+      initialContent: `<?php
+
+function greet($name)
+{
+    // your code here
+    return '';
+}
+`,
+      solutionContent: `<?php
+
+function greet($name)
+{
+    return "Hello, {$name}!";
+}
+`,
     },
   ]}
   tests={[
@@ -295,12 +312,28 @@ sibling files.
   files={[
     {
       filename: "main.php",
-      initialContent: `<?php\nrequire_once "utils.php";\necho greet("World");\n`,
+      initialContent: `<?php
+
+require_once 'utils.php';
+echo greet('World');
+`,
     },
     {
       filename: "utils.php",
-      initialContent: `<?php\nfunction greet($name) {\n    return "";\n}\n`,
-      solutionContent: `<?php\nfunction greet($name) {\n    return "Hello, {$name}!";\n}\n`,
+      initialContent: `<?php
+
+function greet($name)
+{
+    return '';
+}
+`,
+      solutionContent: `<?php
+
+function greet($name)
+{
+    return "Hello, {$name}!";
+}
+`,
     },
   ]}
   tests={[

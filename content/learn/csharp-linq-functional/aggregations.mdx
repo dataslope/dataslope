@@ -251,8 +251,7 @@ using System.Linq;
 
 public static class Checksum
 {
-    public static int Compute(IEnumerable<int> xs) =>
-        xs.Aggregate(0, (acc, x) => acc * 31 + x);
+    public static int Compute(IEnumerable<int> xs) => xs.Aggregate(0, (acc, x) => acc * 31 + x);
 }
 `,
     },

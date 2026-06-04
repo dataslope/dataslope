@@ -33,44 +33,42 @@ constructor, and (traditionally) no method bodies.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Greeter formal = new FormalGreeter();
-        Greeter casual = new CasualGreeter();
+  public static void main(String[] args) {
+    Greeter formal = new FormalGreeter();
+    Greeter casual = new CasualGreeter();
 
-        say(formal, "Ada");
-        say(casual, "Ada");
-    }
+    say(formal, "Ada");
+    say(casual, "Ada");
+  }
 
-    static void say(Greeter g, String name) {
-        System.out.println(g.greet(name));
-    }
+  static void say(Greeter g, String name) { System.out.println(g.greet(name)); }
 }
 `,
     },
     {
       filename: "Greeter.java",
       initialContent: `public interface Greeter {
-    String greet(String name);
+  String greet(String name);
 }
 `,
     },
     {
       filename: "FormalGreeter.java",
       initialContent: `public class FormalGreeter implements Greeter {
-    @Override
-    public String greet(String name) {
-        return "Good day, " + name + ".";
-    }
+  @Override
+  public String greet(String name) {
+    return "Good day, " + name + ".";
+  }
 }
 `,
     },
     {
       filename: "CasualGreeter.java",
       initialContent: `public class CasualGreeter implements Greeter {
-    @Override
-    public String greet(String name) {
-        return "hey " + name + "!";
-    }
+  @Override
+  public String greet(String name) {
+    return "hey " + name + "!";
+  }
 }
 `,
     },
@@ -146,42 +144,42 @@ your class is — it just trusts the contract.
       initialContent: `import java.util.Arrays;
 
 public class Main {
-    public static void main(String[] args) {
-        Book[] shelf = {
-            new Book("Java", 320),
-            new Book("Go",   180),
-            new Book("Rust", 450),
-        };
+  public static void main(String[] args) {
+    Book[] shelf = {
+        new Book("Java", 320),
+        new Book("Go", 180),
+        new Book("Rust", 450),
+    };
 
-        Arrays.sort(shelf);
+    Arrays.sort(shelf);
 
-        for (Book b : shelf) {
-            System.out.println(b);
-        }
+    for (Book b : shelf) {
+      System.out.println(b);
     }
+  }
 }
 `,
     },
     {
       filename: "Book.java",
       initialContent: `public class Book implements Comparable<Book> {
-    private final String title;
-    private final int    pages;
+  private final String title;
+  private final int pages;
 
-    public Book(String title, int pages) {
-        this.title = title;
-        this.pages = pages;
-    }
+  public Book(String title, int pages) {
+    this.title = title;
+    this.pages = pages;
+  }
 
-    @Override
-    public int compareTo(Book other) {
-        return Integer.compare(this.pages, other.pages);
-    }
+  @Override
+  public int compareTo(Book other) {
+    return Integer.compare(this.pages, other.pages);
+  }
 
-    @Override
-    public String toString() {
-        return title + " (" + pages + " pages)";
-    }
+  @Override
+  public String toString() {
+    return title + " (" + pages + " pages)";
+  }
 }
 `,
     },
@@ -292,68 +290,66 @@ Hi, Ada!
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Printable[] items = {
-            new Invoice(7, 1299),
-            new Greeting("Ada"),
-        };
-        for (Printable p : items) {
-            System.out.println(p.toReport());
-        }
+  public static void main(String[] args) {
+    Printable[] items = {
+        new Invoice(7, 1299),
+        new Greeting("Ada"),
+    };
+    for (Printable p : items) {
+      System.out.println(p.toReport());
     }
+  }
 }
 `,
     },
     {
       filename: "Printable.java",
       initialContent: `public interface Printable {
-    // TODO
+  // TODO
 }
 `,
       solutionContent: `public interface Printable {
-    String toReport();
+  String toReport();
 }
 `,
     },
     {
       filename: "Invoice.java",
       initialContent: `public class Invoice implements Printable {
-    // TODO
+  // TODO
 }
 `,
       solutionContent: `public class Invoice implements Printable {
-    private final int id;
-    private final int totalCents;
+  private final int id;
+  private final int totalCents;
 
-    public Invoice(int id, int totalCents) {
-        this.id = id;
-        this.totalCents = totalCents;
-    }
+  public Invoice(int id, int totalCents) {
+    this.id = id;
+    this.totalCents = totalCents;
+  }
 
-    @Override
-    public String toReport() {
-        return "Invoice #" + id + ": " + totalCents + "c";
-    }
+  @Override
+  public String toReport() {
+    return "Invoice #" + id + ": " + totalCents + "c";
+  }
 }
 `,
     },
     {
       filename: "Greeting.java",
       initialContent: `public class Greeting implements Printable {
-    // TODO
+  // TODO
 }
 `,
       solutionContent: `public class Greeting implements Printable {
-    private final String who;
+  private final String who;
 
-    public Greeting(String who) {
-        this.who = who;
-    }
+  public Greeting(String who) { this.who = who; }
 
-    @Override
-    public String toReport() {
-        return "Hi, " + who + "!";
-    }
+  @Override
+  public String toReport() {
+    return "Hi, " + who + "!";
+  }
 }
 `,
     },

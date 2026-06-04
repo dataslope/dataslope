@@ -359,7 +359,7 @@ export function addTen(x: number): number {
 
 export function compose(
   f: (x: number) => number,
-  g: (x: number) => number
+  g: (x: number) => number,
 ): (x: number) => number {
   // Your code here
   return (x) => 0;
@@ -372,7 +372,7 @@ console.log("compose(double, addTen)(5):", pipeline(5));
 
 export function compose(
   f: (x: number) => number,
-  g: (x: number) => number
+  g: (x: number) => number,
 ): (x: number) => number {
   return (x) => f(g(x));
 }

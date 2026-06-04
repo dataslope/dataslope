@@ -64,52 +64,47 @@ million-line software systems without going insane.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        BankAccount a = new BankAccount("Ada");
-        a.deposit(500);
-        boolean ok1 = a.withdraw(200);
-        boolean ok2 = a.withdraw(9999);
-        System.out.println("owner=" + a.owner());
-        System.out.println("ok1=" + ok1);
-        System.out.println("ok2=" + ok2);
-        System.out.println("balance=" + a.balance());
-    }
+  public static void main(String[] args) {
+    BankAccount a = new BankAccount("Ada");
+    a.deposit(500);
+    boolean ok1 = a.withdraw(200);
+    boolean ok2 = a.withdraw(9999);
+    System.out.println("owner=" + a.owner());
+    System.out.println("ok1=" + ok1);
+    System.out.println("ok2=" + ok2);
+    System.out.println("balance=" + a.balance());
+  }
 }
 `,
     },
     {
       filename: "BankAccount.java",
       initialContent: `public class BankAccount {
-    private final String owner;
-    private long balanceCents = 0;
+  private final String owner;
+  private long balanceCents = 0;
 
-    public BankAccount(String owner) {
-        this.owner = owner;
-    }
+  public BankAccount(String owner) { this.owner = owner; }
 
-    public String owner() {
-        return owner;
-    }
+  public String owner() { return owner; }
 
-    public long balance() {
-        return balanceCents;
-    }
+  public long balance() { return balanceCents; }
 
-    public void deposit(long cents) {
-        if (cents <= 0) {
-            throw new IllegalArgumentException("must be positive");
-        }
-        balanceCents += cents;
+  public void deposit(long cents) {
+    if (cents <= 0) {
+      throw new IllegalArgumentException("must be positive");
     }
+    balanceCents += cents;
+  }
 
-    public boolean withdraw(long cents) {
-        if (cents <= 0) {
-            throw new IllegalArgumentException("must be positive");
-        }
-        if (cents > balanceCents) return false;
-        balanceCents -= cents;
-        return true;
+  public boolean withdraw(long cents) {
+    if (cents <= 0) {
+      throw new IllegalArgumentException("must be positive");
     }
+    if (cents > balanceCents)
+      return false;
+    balanceCents -= cents;
+    return true;
+  }
 }
 `,
     },
@@ -251,47 +246,45 @@ after illegal change: 24
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Thermostat t = new Thermostat(20);
-        System.out.println("target=" + t.target());
+  public static void main(String[] args) {
+    Thermostat t = new Thermostat(20);
+    System.out.println("target=" + t.target());
 
-        t.setTarget(24);
-        System.out.println("after legal change: " + t.target());
+    t.setTarget(24);
+    System.out.println("after legal change: " + t.target());
 
-        t.setTarget(100);
-        System.out.println("after illegal change: " + t.target());
-    }
+    t.setTarget(100);
+    System.out.println("after illegal change: " + t.target());
+  }
 }
 `,
     },
     {
       filename: "Thermostat.java",
       initialContent: `public class Thermostat {
-    // TODO: implement
+  // TODO: implement
 }
 `,
       solutionContent: `public class Thermostat {
-    private int targetC;
+  private int targetC;
 
-    public Thermostat(int initialTarget) {
-        this.targetC = clamp(initialTarget);
-    }
+  public Thermostat(int initialTarget) { this.targetC = clamp(initialTarget); }
 
-    public int target() {
-        return targetC;
-    }
+  public int target() { return targetC; }
 
-    public void setTarget(int newTarget) {
-        if (newTarget >= 5 && newTarget <= 35) {
-            this.targetC = newTarget;
-        }
+  public void setTarget(int newTarget) {
+    if (newTarget >= 5 && newTarget <= 35) {
+      this.targetC = newTarget;
     }
+  }
 
-    private int clamp(int v) {
-        if (v < 5)  return 5;
-        if (v > 35) return 35;
-        return v;
-    }
+  private int clamp(int v) {
+    if (v < 5)
+      return 5;
+    if (v > 35)
+      return 35;
+    return v;
+  }
 }
 `,
     },

@@ -180,12 +180,12 @@ about. Where you can:
   adapter="csharp"
   starterCode={`using System;
 
-public record Money(decimal Amount, string Currency);
-
 var a = new Money(10m, "USD");
 var b = a with { Amount = 25m }; // a is unchanged
 
 Console.WriteLine($"{a}, {b}");
+
+public record Money(decimal Amount, string Currency);
 `}
 />
 

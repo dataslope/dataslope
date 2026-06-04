@@ -88,10 +88,11 @@ a tiny `IntRange` that produces the integers `[start, end)`:
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        IntRange r = new IntRange(3, 8);
-        for (int n : r) System.out.println(n);
-    }
+  public static void main(String[] args) {
+    IntRange r = new IntRange(3, 8);
+    for (int n : r)
+      System.out.println(n);
+  }
 }
 `,
     },
@@ -101,26 +102,31 @@ a tiny `IntRange` that produces the integers `[start, end)`:
 import java.util.NoSuchElementException;
 
 public class IntRange implements Iterable<Integer> {
-    private final int start;
-    private final int end;
+  private final int start;
+  private final int end;
 
-    public IntRange(int start, int end) {
-        this.start = start;
-        this.end   = end;
-    }
+  public IntRange(int start, int end) {
+    this.start = start;
+    this.end = end;
+  }
 
-    @Override
-    public Iterator<Integer> iterator() {
-        return new Iterator<>() {
-            private int cursor = start;
+  @Override
+  public Iterator<Integer> iterator() {
+    return new Iterator<>() {
+      private int cursor = start;
 
-            @Override public boolean hasNext() { return cursor < end; }
-            @Override public Integer next() {
-                if (!hasNext()) throw new NoSuchElementException();
-                return cursor++;
-            }
-        };
-    }
+      @Override
+      public boolean hasNext() {
+        return cursor < end;
+      }
+      @Override
+      public Integer next() {
+        if (!hasNext())
+          throw new NoSuchElementException();
+        return cursor++;
+      }
+    };
+  }
 }
 `,
     },
@@ -300,17 +306,19 @@ This is exactly how `Arrays.asList` and friends work conceptually.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        int[] arr = { 10, 20, 30, 40 };
-        IntArrayIterable it = new IntArrayIterable(arr);
+  public static void main(String[] args) {
+    int[] arr = {10, 20, 30, 40};
+    IntArrayIterable it = new IntArrayIterable(arr);
 
-        for (int n : it) System.out.println(n);
+    for (int n : it)
+      System.out.println(n);
 
-        // Walk it a second time — fresh iterator, starts over.
-        int total = 0;
-        for (int n : it) total += n;
-        System.out.println("sum = " + total);
-    }
+    // Walk it a second time — fresh iterator, starts over.
+    int total = 0;
+    for (int n : it)
+      total += n;
+    System.out.println("sum = " + total);
+  }
 }
 `,
     },
@@ -320,21 +328,26 @@ This is exactly how `Arrays.asList` and friends work conceptually.
 import java.util.NoSuchElementException;
 
 public class IntArrayIterable implements Iterable<Integer> {
-    private final int[] data;
+  private final int[] data;
 
-    public IntArrayIterable(int[] data) { this.data = data; }
+  public IntArrayIterable(int[] data) { this.data = data; }
 
-    @Override
-    public Iterator<Integer> iterator() {
-        return new Iterator<>() {
-            private int i = 0;
-            @Override public boolean hasNext() { return i < data.length; }
-            @Override public Integer next() {
-                if (!hasNext()) throw new NoSuchElementException();
-                return data[i++];
-            }
-        };
-    }
+  @Override
+  public Iterator<Integer> iterator() {
+    return new Iterator<>() {
+      private int i = 0;
+      @Override
+      public boolean hasNext() {
+        return i < data.length;
+      }
+      @Override
+      public Integer next() {
+        if (!hasNext())
+          throw new NoSuchElementException();
+        return data[i++];
+      }
+    };
+  }
 }
 `,
     },
@@ -369,12 +382,14 @@ Expected output:
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Countdown c = new Countdown(3);
-        for (int n : c) System.out.println(n);
-        System.out.println("---");
-        for (int n : c) System.out.println(n);
-    }
+  public static void main(String[] args) {
+    Countdown c = new Countdown(3);
+    for (int n : c)
+      System.out.println(n);
+    System.out.println("---");
+    for (int n : c)
+      System.out.println(n);
+  }
 }
 `,
     },
@@ -383,36 +398,41 @@ Expected output:
       initialContent: `import java.util.Iterator;
 
 public class Countdown implements Iterable<Integer> {
+  // TODO
+  public Countdown(int start) {
     // TODO
-    public Countdown(int start) {
-        // TODO
-    }
+  }
 
-    @Override
-    public Iterator<Integer> iterator() {
-        // TODO
-        return null;
-    }
+  @Override
+  public Iterator<Integer> iterator() {
+    // TODO
+    return null;
+  }
 }
 `,
       solutionContent: `import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class Countdown implements Iterable<Integer> {
-    private final int start;
-    public Countdown(int start) { this.start = start; }
+  private final int start;
+  public Countdown(int start) { this.start = start; }
 
-    @Override
-    public Iterator<Integer> iterator() {
-        return new Iterator<>() {
-            private int cursor = start;
-            @Override public boolean hasNext() { return cursor >= 1; }
-            @Override public Integer next() {
-                if (!hasNext()) throw new NoSuchElementException();
-                return cursor--;
-            }
-        };
-    }
+  @Override
+  public Iterator<Integer> iterator() {
+    return new Iterator<>() {
+      private int cursor = start;
+      @Override
+      public boolean hasNext() {
+        return cursor >= 1;
+      }
+      @Override
+      public Integer next() {
+        if (!hasNext())
+          throw new NoSuchElementException();
+        return cursor--;
+      }
+    };
+  }
 }
 `,
     },

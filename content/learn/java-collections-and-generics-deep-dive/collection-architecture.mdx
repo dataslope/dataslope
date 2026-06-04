@@ -133,26 +133,25 @@ but its API is safe to use everywhere:
       initialContent: `import java.util.*;
 
 public class Main {
-    public static void main(String[] args) {
-        BookRepo repo = new BookRepo(List.of(
-            new Book("978-1", "Clean Code",   "Martin"),
-            new Book("978-2", "Effective Java","Bloch"),
-            new Book("978-3", "TAOCP I",      "Knuth")
-        ));
+  public static void main(String[] args) {
+    BookRepo repo =
+        new BookRepo(List.of(new Book("978-1", "Clean Code", "Martin"),
+                             new Book("978-2", "Effective Java", "Bloch"),
+                             new Book("978-3", "TAOCP I", "Knuth")));
 
-        // Read flows: callers can't accidentally damage repo state
-        System.out.println("all: " + repo.allTitles());
+    // Read flows: callers can't accidentally damage repo state
+    System.out.println("all: " + repo.allTitles());
 
-        Optional<Book> hit = repo.findByIsbn("978-2");
-        hit.ifPresent(b -> System.out.println("found: " + b.title()));
+    Optional<Book> hit = repo.findByIsbn("978-2");
+    hit.ifPresent(b -> System.out.println("found: " + b.title()));
 
-        // Demonstrate that the returned view is read-only
-        try {
-            repo.allTitles().add("hack");
-        } catch (UnsupportedOperationException e) {
-            System.out.println("allTitles is read-only");
-        }
+    // Demonstrate that the returned view is read-only
+    try {
+      repo.allTitles().add("hack");
+    } catch (UnsupportedOperationException e) {
+      System.out.println("allTitles is read-only");
     }
+  }
 }
 `,
     },
@@ -166,24 +165,26 @@ public class Main {
       initialContent: `import java.util.*;
 
 public final class BookRepo {
-    private final Map<String, Book> byIsbn;     // private mutable state, owned here
+  private final Map<String, Book> byIsbn; // private mutable state, owned here
 
-    public BookRepo(Collection<Book> seed) {    // accept the widest sensible input
-        Map<String, Book> m = new LinkedHashMap<>();
-        for (Book b : seed) m.put(b.isbn(), b);
-        this.byIsbn = m;
-    }
+  public BookRepo(Collection<Book> seed) { // accept the widest sensible input
+    Map<String, Book> m = new LinkedHashMap<>();
+    for (Book b : seed)
+      m.put(b.isbn(), b);
+    this.byIsbn = m;
+  }
 
-    public Optional<Book> findByIsbn(String isbn) {
-        return Optional.ofNullable(byIsbn.get(isbn));
-    }
+  public Optional<Book> findByIsbn(String isbn) {
+    return Optional.ofNullable(byIsbn.get(isbn));
+  }
 
-    public List<String> allTitles() {
-        // narrow, ordered, unmodifiable
-        List<String> out = new ArrayList<>(byIsbn.size());
-        for (Book b : byIsbn.values()) out.add(b.title());
-        return Collections.unmodifiableList(out);
-    }
+  public List<String> allTitles() {
+    // narrow, ordered, unmodifiable
+    List<String> out = new ArrayList<>(byIsbn.size());
+    for (Book b : byIsbn.values())
+      out.add(b.title());
+    return Collections.unmodifiableList(out);
+  }
 }
 `,
     },
@@ -240,20 +241,24 @@ caller mutation was blocked
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<String> seed = new ArrayList<>(List.of("hello", "world"));
-        Inbox in = new Inbox(seed);
-        System.out.println(in.messages());
+  public static void main(String[] args) {
+    List<String> seed = new ArrayList<>(List.of("hello", "world"));
+    Inbox in = new Inbox(seed);
+    System.out.println(in.messages());
 
-        seed.add("steal-me");
-        if (!in.messages().contains("steal-me")) System.out.println("external did not leak");
+    seed.add("steal-me");
+    if (!in.messages().contains("steal-me"))
+      System.out.println("external did not leak");
 
-        try { in.messages().add("hack"); }
-        catch (UnsupportedOperationException e) { System.out.println("caller mutation was blocked"); }
-
-        in.add("!");
-        System.out.println(in.messages());
+    try {
+      in.messages().add("hack");
+    } catch (UnsupportedOperationException e) {
+      System.out.println("caller mutation was blocked");
     }
+
+    in.add("!");
+    System.out.println(in.messages());
+  }
 }
 `,
     },
@@ -263,19 +268,17 @@ public class Main {
 import java.util.List;
 
 public class Inbox {
-    private final List<String> msgs;
+  private final List<String> msgs;
 
-    public Inbox(List<String> msgs) {
-        this.msgs = msgs;             // TODO: defensive copy into a mutable list
-    }
+  public Inbox(List<String> msgs) {
+    this.msgs = msgs; // TODO: defensive copy into a mutable list
+  }
 
-    public void add(String m) {
-        msgs.add(m);
-    }
+  public void add(String m) { msgs.add(m); }
 
-    public List<String> messages() {
-        return msgs;                  // TODO: unmodifiable
-    }
+  public List<String> messages() {
+    return msgs; // TODO: unmodifiable
+  }
 }
 `,
       solutionContent: `import java.util.ArrayList;
@@ -283,19 +286,15 @@ import java.util.Collections;
 import java.util.List;
 
 public class Inbox {
-    private final List<String> msgs;
+  private final List<String> msgs;
 
-    public Inbox(List<String> msgs) {
-        this.msgs = new ArrayList<>(msgs);   // own a fresh mutable list
-    }
+  public Inbox(List<String> msgs) {
+    this.msgs = new ArrayList<>(msgs); // own a fresh mutable list
+  }
 
-    public void add(String m) {
-        msgs.add(m);
-    }
+  public void add(String m) { msgs.add(m); }
 
-    public List<String> messages() {
-        return Collections.unmodifiableList(msgs);
-    }
+  public List<String> messages() { return Collections.unmodifiableList(msgs); }
 }
 `,
     },

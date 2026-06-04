@@ -423,17 +423,16 @@ square:   16
       filename: "main.ts",
       initialContent: `import { area } from "./shape";
 
-console.log("circle:  ", area({ kind: "circle",    radius: 2 }));
-console.log("rectangle:", area({ kind: "rectangle", width: 3,  height: 4 }));
-console.log("triangle:", area({ kind: "triangle",  base: 5,   height: 6 }));
-console.log("square:  ", area({ kind: "square",    side: 4 }));
+console.log("circle:  ", area({ kind: "circle", radius: 2 }));
+console.log("rectangle:", area({ kind: "rectangle", width: 3, height: 4 }));
+console.log("triangle:", area({ kind: "triangle", base: 5, height: 6 }));
+console.log("square:  ", area({ kind: "square", side: 4 }));
 `,
     },
     {
       filename: "shape.ts",
-      initialContent: `export type Shape =
-  | { kind: "circle"; radius: number };
-  // TODO: add rectangle, triangle, square variants
+      initialContent: `export type Shape = { kind: "circle"; radius: number };
+// TODO: add rectangle, triangle, square variants
 
 export function area(s: Shape): number {
   // TODO: switch over s.kind, return the appropriate area.
@@ -442,17 +441,21 @@ export function area(s: Shape): number {
 }
 `,
       solutionContent: `export type Shape =
-  | { kind: "circle";    radius: number }
+  | { kind: "circle"; radius: number }
   | { kind: "rectangle"; width: number; height: number }
-  | { kind: "triangle";  base: number;  height: number }
-  | { kind: "square";    side: number };
+  | { kind: "triangle"; base: number; height: number }
+  | { kind: "square"; side: number };
 
 export function area(s: Shape): number {
   switch (s.kind) {
-    case "circle":    return Math.PI * s.radius * s.radius;
-    case "rectangle": return s.width * s.height;
-    case "triangle":  return 0.5 * s.base * s.height;
-    case "square":    return s.side * s.side;
+    case "circle":
+      return Math.PI * s.radius * s.radius;
+    case "rectangle":
+      return s.width * s.height;
+    case "triangle":
+      return 0.5 * s.base * s.height;
+    case "square":
+      return s.side * s.side;
     default: {
       const _e: never = s;
       return _e;

@@ -154,25 +154,21 @@ same greeting, split across two files:
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Greeter g = new Greeter("Java");
-        g.greet();
-    }
+  public static void main(String[] args) {
+    Greeter g = new Greeter("Java");
+    g.greet();
+  }
 }
 `,
     },
     {
       filename: "Greeter.java",
       initialContent: `public class Greeter {
-    private final String name;
+  private final String name;
 
-    public Greeter(String name) {
-        this.name = name;
-    }
+  public Greeter(String name) { this.name = name; }
 
-    public void greet() {
-        System.out.println("Hello, " + name + "!");
-    }
+  public void greet() { System.out.println("Hello, " + name + "!"); }
 }
 `,
     },
@@ -202,17 +198,17 @@ Role: First programmer
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        // TODO: print the three lines exactly
-    }
+  public static void main(String[] args) {
+    // TODO: print the three lines exactly
+  }
 }
 `,
       solutionContent: `public class Main {
-    public static void main(String[] args) {
-        System.out.println("Name: Ada Lovelace");
-        System.out.println("Year: 1815");
-        System.out.println("Role: First programmer");
-    }
+  public static void main(String[] args) {
+    System.out.println("Name: Ada Lovelace");
+    System.out.println("Year: 1815");
+    System.out.println("Role: First programmer");
+  }
 }
 `,
     },

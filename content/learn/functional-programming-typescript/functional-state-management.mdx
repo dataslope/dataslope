@@ -302,9 +302,9 @@ The reducer must be **pure** — return a new \`State\`; do not mutate
       initialContent: `import { reduce, initial, Action } from "./cart";
 
 const actions: Action[] = [
-  { kind: "add",    sku: "A", qty: 1 },
-  { kind: "add",    sku: "A", qty: 2 },
-  { kind: "add",    sku: "B", qty: 1 },
+  { kind: "add", sku: "A", qty: 1 },
+  { kind: "add", sku: "A", qty: 2 },
+  { kind: "add", sku: "B", qty: 1 },
   { kind: "remove", sku: "B" },
   { kind: "clear" },
 ];
@@ -321,7 +321,7 @@ for (const a of actions) {
       initialContent: `export type Item = { readonly sku: string; readonly qty: number };
 export type State = { readonly items: ReadonlyArray<Item> };
 export type Action =
-  | { kind: "add";    sku: string; qty: number }
+  | { kind: "add"; sku: string; qty: number }
   | { kind: "remove"; sku: string }
   | { kind: "clear" };
 
@@ -335,7 +335,7 @@ export function reduce(state: State, action: Action): State {
       solutionContent: `export type Item = { readonly sku: string; readonly qty: number };
 export type State = { readonly items: ReadonlyArray<Item> };
 export type Action =
-  | { kind: "add";    sku: string; qty: number }
+  | { kind: "add"; sku: string; qty: number }
   | { kind: "remove"; sku: string }
   | { kind: "clear" };
 
@@ -347,7 +347,8 @@ export function reduce(state: State, action: Action): State {
       const exists = state.items.find((i) => i.sku === action.sku);
       const items = exists
         ? state.items.map((i) =>
-            i.sku === action.sku ? { sku: i.sku, qty: i.qty + action.qty } : i)
+            i.sku === action.sku ? { sku: i.sku, qty: i.qty + action.qty } : i,
+          )
         : [...state.items, { sku: action.sku, qty: action.qty }];
       return { items };
     }
@@ -356,7 +357,8 @@ export function reduce(state: State, action: Action): State {
     case "clear":
       return initial;
     default: {
-      const _e: never = action; return _e;
+      const _e: never = action;
+      return _e;
     }
   }
 }

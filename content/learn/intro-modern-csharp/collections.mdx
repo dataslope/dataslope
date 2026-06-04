@@ -263,8 +263,10 @@ public static class WordCounter
         var d = new Dictionary<string, int>();
         foreach (var word in text.Split(' '))
         {
-            if (d.ContainsKey(word)) d[word]++;
-            else d[word] = 1;
+            if (d.ContainsKey(word))
+                d[word]++;
+            else
+                d[word] = 1;
         }
         return d;
     }

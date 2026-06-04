@@ -269,7 +269,10 @@ console.log(summarize(article));
 
 function sentenceCount(text) {
   // Very rough — split on punctuation that ends sentences.
-  return text.split(/[.!?]+/).map((s) => s.trim()).filter(Boolean).length;
+  return text
+    .split(/[.!?]+/)
+    .map((s) => s.trim())
+    .filter(Boolean).length;
 }
 
 function summarize(text) {

@@ -223,13 +223,9 @@ Use \`Where\` and \`Select\`. Do not use \`foreach\`.
   files={[
     {
       filename: "Program.cs",
-      initialContent: `var people = new[]
-{
-    new Person("Ada", 36),
-    new Person("Bilal", 12),
-    new Person("Chiara", 17),
-    new Person("Dmitri", 22),
-    new Person("Esther", 41),
+      initialContent: `var people = new[] {
+    new Person("Ada", 36),    new Person("Bilal", 12),  new Person("Chiara", 17),
+    new Person("Dmitri", 22), new Person("Esther", 41),
 };
 
 foreach (var name in PeopleFilter.AdultNamesUpper(people))
@@ -257,9 +253,7 @@ using System.Linq;
 public static class PeopleFilter
 {
     public static IEnumerable<string> AdultNamesUpper(IEnumerable<Person> people) =>
-        people
-            .Where(p => p.Age >= 18)
-            .Select(p => p.Name.ToUpperInvariant());
+        people.Where(p => p.Age >= 18).Select(p => p.Name.ToUpperInvariant());
 }
 `,
     },

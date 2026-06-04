@@ -98,30 +98,34 @@ inside hash-based collections.
 import java.util.Set;
 
 public class Main {
-    public static void main(String[] args) {
-        Set<Point> seen = new HashSet<>();
-        seen.add(new Point(1, 2));
+  public static void main(String[] args) {
+    Set<Point> seen = new HashSet<>();
+    seen.add(new Point(1, 2));
 
-        // Should be true — but the set will say "no."
-        System.out.println("contains (1,2)? " + seen.contains(new Point(1, 2)));
-    }
+    // Should be true — but the set will say "no."
+    System.out.println("contains (1,2)? " + seen.contains(new Point(1, 2)));
+  }
 }
 `,
     },
     {
       filename: "Point.java",
       initialContent: `public class Point {
-    private final int x;
-    private final int y;
-    public Point(int x, int y) { this.x = x; this.y = y; }
+  private final int x;
+  private final int y;
+  public Point(int x, int y) {
+    this.x = x;
+    this.y = y;
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Point)) return false;
-        Point p = (Point) o;
-        return p.x == this.x && p.y == this.y;
-    }
-    // NOTE: no hashCode() override!
+  @Override
+  public boolean equals(Object o) {
+    if (!(o instanceof Point))
+      return false;
+    Point p = (Point)o;
+    return p.x == this.x && p.y == this.y;
+  }
+  // NOTE: no hashCode() override!
 }
 `,
     },
@@ -148,16 +152,16 @@ set never even reaches the `.equals` step.
 import java.util.Set;
 
 public class Main {
-    public static void main(String[] args) {
-        Set<Point> seen = new HashSet<>();
-        seen.add(new Point(1, 2));
-        seen.add(new Point(1, 2));   // duplicate — should be ignored
-        seen.add(new Point(3, 4));
+  public static void main(String[] args) {
+    Set<Point> seen = new HashSet<>();
+    seen.add(new Point(1, 2));
+    seen.add(new Point(1, 2)); // duplicate — should be ignored
+    seen.add(new Point(3, 4));
 
-        System.out.println("size = " + seen.size());
-        System.out.println("contains (1,2)? " + seen.contains(new Point(1, 2)));
-        System.out.println("contains (5,6)? " + seen.contains(new Point(5, 6)));
-    }
+    System.out.println("size = " + seen.size());
+    System.out.println("contains (1,2)? " + seen.contains(new Point(1, 2)));
+    System.out.println("contains (5,6)? " + seen.contains(new Point(5, 6)));
+  }
 }
 `,
     },
@@ -166,22 +170,27 @@ public class Main {
       initialContent: `import java.util.Objects;
 
 public class Point {
-    private final int x;
-    private final int y;
-    public Point(int x, int y) { this.x = x; this.y = y; }
+  private final int x;
+  private final int y;
+  public Point(int x, int y) {
+    this.x = x;
+    this.y = y;
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Point)) return false;
-        Point p = (Point) o;
-        return p.x == this.x && p.y == this.y;
-    }
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (!(o instanceof Point))
+      return false;
+    Point p = (Point)o;
+    return p.x == this.x && p.y == this.y;
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(x, y);
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(x, y);
+  }
 }
 `,
     },
@@ -304,44 +313,50 @@ total unique = 2
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        UniquenessTracker t = new UniquenessTracker();
-        System.out.println("first  Ada@x.com? " + t.register(new Email("Ada@x.com")));
-        System.out.println("again  Ada@x.com? " + t.register(new Email("Ada@x.com")));
-        System.out.println("again  ada@x.com? " + t.register(new Email("ada@x.com")));
-        System.out.println("new    bob@x.com? " + t.register(new Email("bob@x.com")));
-        System.out.println("total unique = " + t.size());
-    }
+  public static void main(String[] args) {
+    UniquenessTracker t = new UniquenessTracker();
+    System.out.println("first  Ada@x.com? " +
+                       t.register(new Email("Ada@x.com")));
+    System.out.println("again  Ada@x.com? " +
+                       t.register(new Email("Ada@x.com")));
+    System.out.println("again  ada@x.com? " +
+                       t.register(new Email("ada@x.com")));
+    System.out.println("new    bob@x.com? " +
+                       t.register(new Email("bob@x.com")));
+    System.out.println("total unique = " + t.size());
+  }
 }
 `,
     },
     {
       filename: "Email.java",
       initialContent: `public class Email {
-    private final String address;
-    public Email(String address) { this.address = address; }
-    public String address() { return address; }
-    // TODO: equals / hashCode that ignore case
+  private final String address;
+  public Email(String address) { this.address = address; }
+  public String address() { return address; }
+  // TODO: equals / hashCode that ignore case
 }
 `,
-      solutionContent: `import java.util.Objects;
-import java.util.Locale;
+      solutionContent: `import java.util.Locale;
+import java.util.Objects;
 
 public class Email {
-    private final String address;
-    public Email(String address) { this.address = address; }
-    public String address() { return address; }
+  private final String address;
+  public Email(String address) { this.address = address; }
+  public String address() { return address; }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Email e)) return false;
-        return e.address.equalsIgnoreCase(this.address);
-    }
-    @Override
-    public int hashCode() {
-        return Objects.hash(address.toLowerCase(Locale.ROOT));
-    }
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (!(o instanceof Email e))
+      return false;
+    return e.address.equalsIgnoreCase(this.address);
+  }
+  @Override
+  public int hashCode() {
+    return Objects.hash(address.toLowerCase(Locale.ROOT));
+  }
 }
 `,
     },
@@ -351,23 +366,23 @@ public class Email {
 import java.util.Set;
 
 public class UniquenessTracker {
-    private final Set<Email> seen = new HashSet<>();
-    public boolean register(Email e) {
-        // TODO: return true if this is the first time we have seen e
-        return false;
-    }
-    public int size() { return seen.size(); }
+  private final Set<Email> seen = new HashSet<>();
+  public boolean register(Email e) {
+    // TODO: return true if this is the first time we have seen e
+    return false;
+  }
+  public int size() { return seen.size(); }
 }
 `,
       solutionContent: `import java.util.HashSet;
 import java.util.Set;
 
 public class UniquenessTracker {
-    private final Set<Email> seen = new HashSet<>();
-    public boolean register(Email e) {
-        return seen.add(e);   // Set.add returns true iff the element was new
-    }
-    public int size() { return seen.size(); }
+  private final Set<Email> seen = new HashSet<>();
+  public boolean register(Email e) {
+    return seen.add(e); // Set.add returns true iff the element was new
+  }
+  public int size() { return seen.size(); }
 }
 `,
     },

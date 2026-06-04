@@ -332,8 +332,10 @@ export const none = <A,>(): Option<A> => ({ kind: "none" });
 
 export const map = <A, B>(o: Option<A>, f: (a: A) => B): Option<B> =>
   o.kind === "none" ? none() : some(f(o.value));
-export const flatMap = <A, B>(o: Option<A>, f: (a: A) => Option<B>): Option<B> =>
-  o.kind === "none" ? none() : f(o.value);
+export const flatMap = <A, B>(
+  o: Option<A>,
+  f: (a: A) => Option<B>,
+): Option<B> => (o.kind === "none" ? none() : f(o.value));
 export const getOrElse = <A,>(o: Option<A>, fb: A): A =>
   o.kind === "none" ? fb : o.value;
 
@@ -345,13 +347,13 @@ const db: Record<string, User> = {
   u3: { id: "u3", managerId: "u2", email: "linus@example.com" },
 };
 
-export const findUser  = (id: string): Option<User> =>
+export const findUser = (id: string): Option<User> =>
   id in db ? some(db[id]) : none();
 
 export const managerOf = (u: User): Option<string> =>
   u.managerId !== undefined ? some(u.managerId) : none();
 
-export const emailOf   = (u: User): Option<string> =>
+export const emailOf = (u: User): Option<string> =>
   u.email !== undefined ? some(u.email) : none();
 
 export function emailOfManagerOf(id: string): Option<string> {
@@ -365,8 +367,10 @@ export const none = <A,>(): Option<A> => ({ kind: "none" });
 
 export const map = <A, B>(o: Option<A>, f: (a: A) => B): Option<B> =>
   o.kind === "none" ? none() : some(f(o.value));
-export const flatMap = <A, B>(o: Option<A>, f: (a: A) => Option<B>): Option<B> =>
-  o.kind === "none" ? none() : f(o.value);
+export const flatMap = <A, B>(
+  o: Option<A>,
+  f: (a: A) => Option<B>,
+): Option<B> => (o.kind === "none" ? none() : f(o.value));
 export const getOrElse = <A,>(o: Option<A>, fb: A): A =>
   o.kind === "none" ? fb : o.value;
 
@@ -378,23 +382,17 @@ const db: Record<string, User> = {
   u3: { id: "u3", managerId: "u2", email: "linus@example.com" },
 };
 
-export const findUser  = (id: string): Option<User> =>
+export const findUser = (id: string): Option<User> =>
   id in db ? some(db[id]) : none();
 
 export const managerOf = (u: User): Option<string> =>
   u.managerId !== undefined ? some(u.managerId) : none();
 
-export const emailOf   = (u: User): Option<string> =>
+export const emailOf = (u: User): Option<string> =>
   u.email !== undefined ? some(u.email) : none();
 
 export function emailOfManagerOf(id: string): Option<string> {
-  return flatMap(
-    flatMap(
-      flatMap(findUser(id), managerOf),
-      findUser,
-    ),
-    emailOf,
-  );
+  return flatMap(flatMap(flatMap(findUser(id), managerOf), findUser), emailOf);
 }
 `,
     },

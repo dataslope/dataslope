@@ -260,11 +260,15 @@ export type RemoteData<T> =
   | { status: "error"; error: string };
 
 // Type guards
-export function isLoading<T>(state: RemoteData<T>): state is { status: "loading" } {
+export function isLoading<T>(
+  state: RemoteData<T>,
+): state is { status: "loading" } {
   return state.status === "loading";
 }
 
-export function isSuccess<T>(state: RemoteData<T>): state is { status: "success"; data: T } {
+export function isSuccess<T>(
+  state: RemoteData<T>,
+): state is { status: "success"; data: T } {
   return state.status === "success";
 }
 
@@ -312,8 +316,16 @@ export function renderNotification(notif: Notification): string {
 
 // Test cases
 const info: Notification = { type: "info", message: "System updated" };
-const warning: Notification = { type: "warning", message: "Low disk space", severity: 3 };
-const error: Notification = { type: "error", message: "Crash", stack: "at line 42" };
+const warning: Notification = {
+  type: "warning",
+  message: "Low disk space",
+  severity: 3,
+};
+const error: Notification = {
+  type: "error",
+  message: "Crash",
+  stack: "at line 42",
+};
 
 console.log(renderNotification(info));
 console.log(renderNotification(warning));
@@ -336,8 +348,16 @@ export function renderNotification(notif: Notification): string {
 }
 
 const info: Notification = { type: "info", message: "System updated" };
-const warning: Notification = { type: "warning", message: "Low disk space", severity: 3 };
-const error: Notification = { type: "error", message: "Crash", stack: "at line 42" };
+const warning: Notification = {
+  type: "warning",
+  message: "Low disk space",
+  severity: 3,
+};
+const error: Notification = {
+  type: "error",
+  message: "Crash",
+  stack: "at line 42",
+};
 
 console.log(renderNotification(info));
 console.log(renderNotification(warning));

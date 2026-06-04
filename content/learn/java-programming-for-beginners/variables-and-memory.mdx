@@ -235,27 +235,27 @@ where \`P = 2 * (width + height)\` and \`A = width * height\`.`}
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        int width  = 7;
-        int height = 4;
+  public static void main(String[] args) {
+    int width = 7;
+    int height = 4;
 
-        // TODO: compute perimeter and area, and print exactly:
-        // perimeter = 22
-        // area = 28
-    }
+    // TODO: compute perimeter and area, and print exactly:
+    // perimeter = 22
+    // area = 28
+  }
 }
 `,
       solutionContent: `public class Main {
-    public static void main(String[] args) {
-        int width  = 7;
-        int height = 4;
+  public static void main(String[] args) {
+    int width = 7;
+    int height = 4;
 
-        int perimeter = 2 * (width + height);
-        int area      = width * height;
+    int perimeter = 2 * (width + height);
+    int area = width * height;
 
-        System.out.println("perimeter = " + perimeter);
-        System.out.println("area = " + area);
-    }
+    System.out.println("perimeter = " + perimeter);
+    System.out.println("area = " + area);
+  }
 }
 `,
     },

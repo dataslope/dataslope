@@ -62,14 +62,13 @@ await _load_nltk("tokenizers", "punkt_tab")
 await _load_nltk("taggers", "averaged_perceptron_tagger_eng")
 from nltk import pos_tag
 from nltk.tokenize import word_tokenize`}
-  starterCode={`for sentence in ["I caught a big fish.",
-                 "We fish on weekends."]:
+  starterCode={`for sentence in ["I caught a big fish.", "We fish on weekends."]:
     tokens = word_tokenize(sentence)
     tagged = pos_tag(tokens)
     # Show just the word 'fish' and the tag it received.
     for word, tag in tagged:
         if word.lower() == "fish":
-            print(f"{sentence!r}\n   -> 'fish' tagged as {tag}")
+            print(f"{sentence!r}\\n   -> 'fish' tagged as {tag}")
 `}
 />
 

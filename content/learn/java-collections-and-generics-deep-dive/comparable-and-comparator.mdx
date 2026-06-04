@@ -198,18 +198,15 @@ public class Main {
       initialContent: `import java.util.*;
 
 public class Main {
-    public static void main(String[] args) {
-        List<User> us = new ArrayList<>(List.of(
-            new User("ada",    36, false),
-            new User("linus",  54, true),
-            new User("grace",  85, true),
-            new User("bjarne", 73, false)
-        ));
+  public static void main(String[] args) {
+    List<User> us = new ArrayList<>(
+        List.of(new User("ada", 36, false), new User("linus", 54, true),
+                new User("grace", 85, true), new User("bjarne", 73, false)));
 
-        // active users first, then by age descending, then by name
-        us.sort(UserOrders.activeFirstThenOldestThenName());
-        us.forEach(System.out::println);
-    }
+    // active users first, then by age descending, then by name
+    us.sort(UserOrders.activeFirstThenOldestThenName());
+    us.forEach(System.out::println);
+  }
 }
 `,
     },
@@ -223,15 +220,14 @@ public class Main {
       initialContent: `import java.util.Comparator;
 
 public final class UserOrders {
-    private UserOrders() {}
+  private UserOrders() {}
 
-    public static Comparator<User> activeFirstThenOldestThenName() {
-        // Boolean.compare(false, true) is negative, so reversed() puts true first
-        return Comparator
-            .comparing(User::active, Comparator.reverseOrder())
-            .thenComparing(Comparator.comparingInt(User::age).reversed())
-            .thenComparing(User::name);
-    }
+  public static Comparator<User> activeFirstThenOldestThenName() {
+    // Boolean.compare(false, true) is negative, so reversed() puts true first
+    return Comparator.comparing(User::active, Comparator.reverseOrder())
+        .thenComparing(Comparator.comparingInt(User::age).reversed())
+        .thenComparing(User::name);
+  }
 }
 `,
     },
@@ -263,18 +259,14 @@ Grace 90
       initialContent: `import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<Player> ps = List.of(
-            new Player("Ada",    80),
-            new Player("Linus",  95),
-            new Player("Grace",  90),
-            new Player("Bjarne", 95),
-            new Player("Edsger", 85)
-        );
-        for (Player p : Leaderboard.top3(ps)) {
-            System.out.println(p.name() + " " + p.score());
-        }
+  public static void main(String[] args) {
+    List<Player> ps = List.of(new Player("Ada", 80), new Player("Linus", 95),
+                              new Player("Grace", 90), new Player("Bjarne", 95),
+                              new Player("Edsger", 85));
+    for (Player p : Leaderboard.top3(ps)) {
+      System.out.println(p.name() + " " + p.score());
     }
+  }
 }
 `,
     },
@@ -288,27 +280,26 @@ public class Main {
       initialContent: `import java.util.*;
 
 public final class Leaderboard {
-    private Leaderboard() {}
+  private Leaderboard() {}
 
-    public static List<Player> top3(List<Player> players) {
-        // TODO: sort by score desc, then name asc, return first 3
-        return List.of();
-    }
+  public static List<Player> top3(List<Player> players) {
+    // TODO: sort by score desc, then name asc, return first 3
+    return List.of();
+  }
 }
 `,
       solutionContent: `import java.util.*;
 
 public final class Leaderboard {
-    private Leaderboard() {}
+  private Leaderboard() {}
 
-    public static List<Player> top3(List<Player> players) {
-        List<Player> sorted = new ArrayList<>(players);
-        sorted.sort(
-            Comparator.comparingInt(Player::score).reversed()
-                      .thenComparing(Player::name)
-        );
-        return sorted.subList(0, Math.min(3, sorted.size()));
-    }
+  public static List<Player> top3(List<Player> players) {
+    List<Player> sorted = new ArrayList<>(players);
+    sorted.sort(Comparator.comparingInt(Player::score)
+                    .reversed()
+                    .thenComparing(Player::name));
+    return sorted.subList(0, Math.min(3, sorted.size()));
+  }
 }
 `,
     },

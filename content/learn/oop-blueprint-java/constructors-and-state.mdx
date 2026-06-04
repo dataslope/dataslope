@@ -259,48 +259,48 @@ bad: invalid email
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        try {
-            User u = new User("ada", "ada@oop.dev");
-            System.out.println("ok: " + u.username() + " @ " + u.email());
-        } catch (IllegalArgumentException e) {
-            System.out.println("bad: " + e.getMessage());
-        }
-        try {
-            new User("a", "ada@oop.dev");
-        } catch (IllegalArgumentException e) {
-            System.out.println("bad: " + e.getMessage());
-        }
-        try {
-            new User("ada", "no-at-sign");
-        } catch (IllegalArgumentException e) {
-            System.out.println("bad: " + e.getMessage());
-        }
+  public static void main(String[] args) {
+    try {
+      User u = new User("ada", "ada@oop.dev");
+      System.out.println("ok: " + u.username() + " @ " + u.email());
+    } catch (IllegalArgumentException e) {
+      System.out.println("bad: " + e.getMessage());
     }
+    try {
+      new User("a", "ada@oop.dev");
+    } catch (IllegalArgumentException e) {
+      System.out.println("bad: " + e.getMessage());
+    }
+    try {
+      new User("ada", "no-at-sign");
+    } catch (IllegalArgumentException e) {
+      System.out.println("bad: " + e.getMessage());
+    }
+  }
 }
 `,
     },
     {
       filename: "User.java",
       initialContent: `public class User {
-    // TODO: private final fields + a validating constructor + accessors
+  // TODO: private final fields + a validating constructor + accessors
 }
 `,
       solutionContent: `public class User {
-    private final String username;
-    private final String email;
+  private final String username;
+  private final String email;
 
-    public User(String username, String email) {
-        if (username == null || username.length() < 3)
-            throw new IllegalArgumentException("invalid username");
-        if (email == null || email.indexOf('@') < 0)
-            throw new IllegalArgumentException("invalid email");
-        this.username = username;
-        this.email    = email;
-    }
+  public User(String username, String email) {
+    if (username == null || username.length() < 3)
+      throw new IllegalArgumentException("invalid username");
+    if (email == null || email.indexOf('@') < 0)
+      throw new IllegalArgumentException("invalid email");
+    this.username = username;
+    this.email = email;
+  }
 
-    public String username() { return username; }
-    public String email()    { return email; }
+  public String username() { return username; }
+  public String email() { return email; }
 }
 `,
     },

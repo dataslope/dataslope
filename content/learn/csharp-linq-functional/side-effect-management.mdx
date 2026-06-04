@@ -205,14 +205,9 @@ using System.Collections.Generic;
 using System.Linq;
 
 // "Shell" — fixed inputs (pretending these came from a file / clock).
-var rawLines = new[]
-{
-    "2026-05-01,paid,120",
-    "2026-05-12,paid,300",
-    "2026-05-20,pending,75",
-    "garbage line",
-    "2026-05-25,paid,40",
-    "2026-05-26,refund,-50",
+var rawLines = new[] {
+    "2026-05-01,paid,120", "2026-05-12,paid,300", "2026-05-20,pending,75",
+    "garbage line",        "2026-05-25,paid,40",  "2026-05-26,refund,-50",
 };
 var today = new DateTime(2026, 5, 26);
 var windowDays = 10;
@@ -224,14 +219,9 @@ Console.WriteLine(report);
 using System.Collections.Generic;
 using System.Linq;
 
-var rawLines = new[]
-{
-    "2026-05-01,paid,120",
-    "2026-05-12,paid,300",
-    "2026-05-20,pending,75",
-    "garbage line",
-    "2026-05-25,paid,40",
-    "2026-05-26,refund,-50",
+var rawLines = new[] {
+    "2026-05-01,paid,120", "2026-05-12,paid,300", "2026-05-20,pending,75",
+    "garbage line",        "2026-05-25,paid,40",  "2026-05-26,refund,-50",
 };
 var today = new DateTime(2026, 5, 26);
 var windowDays = 10;
@@ -273,21 +263,22 @@ public static class Report
     public static string Build(IEnumerable<string> lines, DateTime today, int windowDays)
     {
         var cutoff = today.AddDays(-windowDays);
-        var total = lines
-            .Select(l => l.Split(','))
-            .Where(parts => parts.Length == 3)
-            .Select(parts =>
-            {
-                if (!DateTime.TryParse(parts[0], CultureInfo.InvariantCulture, DateTimeStyles.None, out var d))
-                    return ((DateTime?)null, parts[1], 0m);
-                if (!decimal.TryParse(parts[2], NumberStyles.Any, CultureInfo.InvariantCulture, out var n))
-                    return ((DateTime?)null, parts[1], 0m);
-                return ((DateTime?)d, parts[1], n);
-            })
-            .Where(r => r.Item1 is not null)
-            .Where(r => r.Item2 == "paid")
-            .Where(r => r.Item1!.Value >= cutoff)
-            .Sum(r => r.Item3);
+        var total =
+            lines.Select(l => l.Split(','))
+                .Where(parts => parts.Length == 3)
+                .Select(
+                    parts =>
+                    {
+                        if (!DateTime.TryParse(parts[0], CultureInfo.InvariantCulture, DateTimeStyles.None, out var d))
+                            return ((DateTime?)null, parts[1], 0m);
+                        if (!decimal.TryParse(parts[2], NumberStyles.Any, CultureInfo.InvariantCulture, out var n))
+                            return ((DateTime?)null, parts[1], 0m);
+                        return ((DateTime?)d, parts[1], n);
+                    })
+                .Where(r => r.Item1 is not null)
+                .Where(r => r.Item2 == "paid")
+                .Where(r => r.Item1!.Value >= cutoff)
+                .Sum(r => r.Item3);
 
         return $"PAID in last {windowDays} days: {total}";
     }

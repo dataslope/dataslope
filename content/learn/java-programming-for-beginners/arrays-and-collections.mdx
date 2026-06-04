@@ -190,12 +190,12 @@ Two safe fixes:
       initialContent: `import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<Integer> scores = List.of(80, 90, 100, 70, 85);
-        double avg = Stats.average(scores);
-        System.out.println("count = " + scores.size());
-        System.out.println("avg = " + avg);
-    }
+  public static void main(String[] args) {
+    List<Integer> scores = List.of(80, 90, 100, 70, 85);
+    double avg = Stats.average(scores);
+    System.out.println("count = " + scores.size());
+    System.out.println("avg = " + avg);
+  }
 }
 `,
     },
@@ -204,16 +204,16 @@ public class Main {
       initialContent: `import java.util.List;
 
 public class Stats {
-    public static double average(List<Integer> values) {
-        if (values.isEmpty()) {
-            throw new IllegalArgumentException("need at least one value");
-        }
-        long sum = 0;
-        for (int v : values) {
-            sum += v;
-        }
-        return (double) sum / values.size();
+  public static double average(List<Integer> values) {
+    if (values.isEmpty()) {
+      throw new IllegalArgumentException("need at least one value");
     }
+    long sum = 0;
+    for (int v : values) {
+      sum += v;
+    }
+    return (double)sum / values.size();
+  }
 }
 `,
     },
@@ -292,10 +292,10 @@ sumPositive=15
       initialContent: `import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<Integer> data = List.of(3, -1, 0, 7, -8, 5);
-        System.out.println("sumPositive=" + Numbers.sumPositive(data));
-    }
+  public static void main(String[] args) {
+    List<Integer> data = List.of(3, -1, 0, 7, -8, 5);
+    System.out.println("sumPositive=" + Numbers.sumPositive(data));
+  }
 }
 `,
     },
@@ -304,22 +304,23 @@ public class Main {
       initialContent: `import java.util.List;
 
 public class Numbers {
-    public static int sumPositive(List<Integer> values) {
-        // TODO
-        return 0;
-    }
+  public static int sumPositive(List<Integer> values) {
+    // TODO
+    return 0;
+  }
 }
 `,
       solutionContent: `import java.util.List;
 
 public class Numbers {
-    public static int sumPositive(List<Integer> values) {
-        int total = 0;
-        for (int v : values) {
-            if (v > 0) total += v;
-        }
-        return total;
+  public static int sumPositive(List<Integer> values) {
+    int total = 0;
+    for (int v : values) {
+      if (v > 0)
+        total += v;
     }
+    return total;
+  }
 }
 `,
     },

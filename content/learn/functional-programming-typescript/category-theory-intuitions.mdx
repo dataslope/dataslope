@@ -291,7 +291,11 @@ Then in \`main.ts\`, use it to compute \`pair(some(2), some(3))\`,
       initialContent: `import { map2, some, none } from "./combine";
 
 const pair = <A, B>(oa: { kind: string }, ob: { kind: string }) =>
-  map2<A, B, readonly [A, B]>((a, b) => [a, b] as const, oa as never, ob as never);
+  map2<A, B, readonly [A, B]>(
+    (a, b) => [a, b] as const,
+    oa as never,
+    ob as never,
+  );
 
 console.log(pair(some(2), some(3)));
 console.log(pair(none(), some(3)));
@@ -322,7 +326,8 @@ export function map2<A, B, C>(
   oa: Option<A>,
   ob: Option<B>,
 ): Option<C> {
-  if (oa.kind === "some" && ob.kind === "some") return some(f(oa.value, ob.value));
+  if (oa.kind === "some" && ob.kind === "some")
+    return some(f(oa.value, ob.value));
   return none();
 }
 `,

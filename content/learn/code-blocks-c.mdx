@@ -51,14 +51,14 @@ Pass a `files` array alongside an `entryFilename` to compile a multi-translation
   files={[
     {
       filename: "main.c",
-      initialContent: `#include <stdio.h>
-#include "mathx.h"
+      initialContent: `#include "mathx.h"
+#include <stdio.h>
 
 int main(void) {
-    int a = 6, b = 7;
-    printf("add(%d, %d) = %d\\n", a, b, add(a, b));
-    printf("mul(%d, %d) = %d\\n", a, b, mul(a, b));
-    return 0;
+  int a = 6, b = 7;
+  printf("add(%d, %d) = %d\\n", a, b, add(a, b));
+  printf("mul(%d, %d) = %d\\n", a, b, mul(a, b));
+  return 0;
 }
 `,
     },
@@ -93,14 +93,14 @@ The MDX source for the example above:
   files={[
     {
       filename: "main.c",
-      initialContent: `#include <stdio.h>
-#include "mathx.h"
+      initialContent: `#include "mathx.h"
+#include <stdio.h>
 
 int main(void) {
-    int a = 6, b = 7;
-    printf("add(%d, %d) = %d\\n", a, b, add(a, b));
-    printf("mul(%d, %d) = %d\\n", a, b, mul(a, b));
-    return 0;
+  int a = 6, b = 7;
+  printf("add(%d, %d) = %d\\n", a, b, add(a, b));
+  printf("mul(%d, %d) = %d\\n", a, b, mul(a, b));
+  return 0;
 }
 `,
     },

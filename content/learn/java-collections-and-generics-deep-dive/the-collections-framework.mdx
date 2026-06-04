@@ -289,33 +289,34 @@ import java.util.List;
 import java.util.Set;
 
 public class Main {
-    public static void main(String[] args) {
-        List<Book> books = new ArrayList<>();
-        books.add(new Book("The Mythical Man-Month", "Brooks"));
-        books.add(new Book("Design Patterns",        "Gang of Four"));
-        books.add(new Book("Effective Java",         "Bloch"));
+  public static void main(String[] args) {
+    List<Book> books = new ArrayList<>();
+    books.add(new Book("The Mythical Man-Month", "Brooks"));
+    books.add(new Book("Design Patterns", "Gang of Four"));
+    books.add(new Book("Effective Java", "Bloch"));
 
-        Set<String> banned = new HashSet<>();
-        banned.add("Brooks");                       // pretend we don't carry Brooks
+    Set<String> banned = new HashSet<>();
+    banned.add("Brooks"); // pretend we don't carry Brooks
 
-        Library lib = new Library(books, banned);
-        for (Book b : lib.available()) {
-            System.out.println(b.title() + " by " + b.author());
-        }
+    Library lib = new Library(books, banned);
+    for (Book b : lib.available()) {
+      System.out.println(b.title() + " by " + b.author());
     }
+  }
 }
 `,
     },
     {
       filename: "Book.java",
       initialContent: `public class Book {
-    private final String title;
-    private final String author;
-    public Book(String title, String author) {
-        this.title = title; this.author = author;
-    }
-    public String title()  { return title; }
-    public String author() { return author; }
+  private final String title;
+  private final String author;
+  public Book(String title, String author) {
+    this.title = title;
+    this.author = author;
+  }
+  public String title() { return title; }
+  public String author() { return author; }
 }
 `,
     },
@@ -326,21 +327,22 @@ import java.util.List;
 import java.util.Set;
 
 public class Library {
-    private final List<Book>   books;
-    private final Set<String>  bannedAuthors;
+  private final List<Book> books;
+  private final Set<String> bannedAuthors;
 
-    public Library(List<Book> books, Set<String> bannedAuthors) {
-        this.books         = books;
-        this.bannedAuthors = bannedAuthors;
-    }
+  public Library(List<Book> books, Set<String> bannedAuthors) {
+    this.books = books;
+    this.bannedAuthors = bannedAuthors;
+  }
 
-    public List<Book> available() {
-        List<Book> out = new ArrayList<>();
-        for (Book b : books) {
-            if (!bannedAuthors.contains(b.author())) out.add(b);
-        }
-        return out;
+  public List<Book> available() {
+    List<Book> out = new ArrayList<>();
+    for (Book b : books) {
+      if (!bannedAuthors.contains(b.author()))
+        out.add(b);
     }
+    return out;
+  }
 }
 `,
     },
@@ -380,17 +382,18 @@ Linus
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        Roster r = new Roster(new ArrayList<>());
-        r.addStudent("Ada");
-        r.addStudent("Grace");
-        r.addStudent("Linus");
+  public static void main(String[] args) {
+    Roster r = new Roster(new ArrayList<>());
+    r.addStudent("Ada");
+    r.addStudent("Grace");
+    r.addStudent("Linus");
 
-        System.out.println("size = " + r.size());
-        System.out.println("has Ada? " + r.has("Ada"));
-        System.out.println("has Bob? " + r.has("Bob"));
-        for (String n : r.all()) System.out.println(n);
-    }
+    System.out.println("size = " + r.size());
+    System.out.println("has Ada? " + r.has("Ada"));
+    System.out.println("has Bob? " + r.has("Bob"));
+    for (String n : r.all())
+      System.out.println(n);
+  }
 }
 `,
     },
@@ -399,18 +402,18 @@ public class Main {
       initialContent: `import java.util.List;
 
 public class Roster {
-    // TODO
+  // TODO
 }
 `,
       solutionContent: `import java.util.List;
 
 public class Roster {
-    private final List<String> names;
-    public Roster(List<String> names) { this.names = names; }
-    public void addStudent(String name) { names.add(name); }
-    public int size() { return names.size(); }
-    public boolean has(String name) { return names.contains(name); }
-    public List<String> all() { return names; }
+  private final List<String> names;
+  public Roster(List<String> names) { this.names = names; }
+  public void addStudent(String name) { names.add(name); }
+  public int size() { return names.size(); }
+  public boolean has(String name) { return names.contains(name); }
+  public List<String> all() { return names; }
 }
 `,
     },

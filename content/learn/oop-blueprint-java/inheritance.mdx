@@ -39,55 +39,50 @@ is-an Animal*. In Java, the keyword is `extends`.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Animal a = new Animal("Generic");
-        Dog    d = new Dog("Rex");
-        Cat    c = new Cat("Mochi");
+  public static void main(String[] args) {
+    Animal a = new Animal("Generic");
+    Dog d = new Dog("Rex");
+    Cat c = new Cat("Mochi");
 
-        System.out.println(a.name() + ": " + a.speak());
-        System.out.println(d.name() + ": " + d.speak());
-        System.out.println(c.name() + ": " + c.speak());
-    }
+    System.out.println(a.name() + ": " + a.speak());
+    System.out.println(d.name() + ": " + d.speak());
+    System.out.println(c.name() + ": " + c.speak());
+  }
 }
 `,
     },
     {
       filename: "Animal.java",
       initialContent: `public class Animal {
-    private final String name;
+  private final String name;
 
-    public Animal(String name) {
-        this.name = name;
-    }
+  public Animal(String name) { this.name = name; }
 
-    public String name()  { return name; }
-    public String speak() { return "(some sound)"; }
+  public String name() { return name; }
+  public String speak() { return "(some sound)"; }
 }
 `,
     },
     {
       filename: "Dog.java",
       initialContent: `public class Dog extends Animal {
-    public Dog(String name) {
-        super(name);                 // call Animal's constructor
-    }
-    @Override
-    public String speak() {           // override the inherited behavior
-        return "Woof!";
-    }
+  public Dog(String name) {
+    super(name); // call Animal's constructor
+  }
+  @Override public String speak() { // override the inherited behavior
+    return "Woof!";
+  }
 }
 `,
     },
     {
       filename: "Cat.java",
       initialContent: `public class Cat extends Animal {
-    public Cat(String name) {
-        super(name);
-    }
-    @Override
-    public String speak() {
-        return "Meow!";
-    }
+  public Cat(String name) { super(name); }
+  @Override
+  public String speak() {
+    return "Meow!";
+  }
 }
 `,
     },
@@ -160,48 +155,46 @@ explicitly with `super.methodName(...)`.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Employee e  = new Employee("Ada", 5_000);
-        Manager  m  = new Manager("Bob", 5_000, 2_000);
-        System.out.println("Ada earns " + e.monthlyPay());
-        System.out.println("Bob earns " + m.monthlyPay());
-    }
+  public static void main(String[] args) {
+    Employee e = new Employee("Ada", 5_000);
+    Manager m = new Manager("Bob", 5_000, 2_000);
+    System.out.println("Ada earns " + e.monthlyPay());
+    System.out.println("Bob earns " + m.monthlyPay());
+  }
 }
 `,
     },
     {
       filename: "Employee.java",
       initialContent: `public class Employee {
-    private final String name;
-    private final double baseSalary;
+  private final String name;
+  private final double baseSalary;
 
-    public Employee(String name, double baseSalary) {
-        this.name = name;
-        this.baseSalary = baseSalary;
-    }
+  public Employee(String name, double baseSalary) {
+    this.name = name;
+    this.baseSalary = baseSalary;
+  }
 
-    public String name() { return name; }
+  public String name() { return name; }
 
-    public double monthlyPay() {
-        return baseSalary;
-    }
+  public double monthlyPay() { return baseSalary; }
 }
 `,
     },
     {
       filename: "Manager.java",
       initialContent: `public class Manager extends Employee {
-    private final double bonus;
+  private final double bonus;
 
-    public Manager(String name, double baseSalary, double bonus) {
-        super(name, baseSalary);
-        this.bonus = bonus;
-    }
+  public Manager(String name, double baseSalary, double bonus) {
+    super(name, baseSalary);
+    this.bonus = bonus;
+  }
 
-    @Override
-    public double monthlyPay() {
-        return super.monthlyPay() + bonus;       // extends, doesn't replace
-    }
+  @Override
+  public double monthlyPay() {
+    return super.monthlyPay() + bonus; // extends, doesn't replace
+  }
 }
 `,
     },
@@ -282,64 +275,53 @@ Shape with area 16.0
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<Shape> shapes = Arrays.asList(
-            new Shape(),
-            new Circle(1.0),
-            new Square(4.0)
-        );
-        for (Shape s : shapes) {
-            System.out.println(s.describe());
-        }
+  public static void main(String[] args) {
+    List<Shape> shapes =
+        Arrays.asList(new Shape(), new Circle(1.0), new Square(4.0));
+    for (Shape s : shapes) {
+      System.out.println(s.describe());
     }
+  }
 }
 `,
     },
     {
       filename: "Shape.java",
       initialContent: `public class Shape {
-    public double area() {
-        return 0.0;
-    }
-    public String describe() {
-        return "Shape with area " + area();
-    }
+  public double area() { return 0.0; }
+  public String describe() { return "Shape with area " + area(); }
 }
 `,
     },
     {
       filename: "Circle.java",
       initialContent: `public class Circle extends Shape {
-    // TODO
+  // TODO
 }
 `,
       solutionContent: `public class Circle extends Shape {
-    private final double radius;
-    public Circle(double radius) {
-        this.radius = radius;
-    }
-    @Override
-    public double area() {
-        return Math.PI * radius * radius;
-    }
+  private final double radius;
+  public Circle(double radius) { this.radius = radius; }
+  @Override
+  public double area() {
+    return Math.PI * radius * radius;
+  }
 }
 `,
     },
     {
       filename: "Square.java",
       initialContent: `public class Square extends Shape {
-    // TODO
+  // TODO
 }
 `,
       solutionContent: `public class Square extends Shape {
-    private final double side;
-    public Square(double side) {
-        this.side = side;
-    }
-    @Override
-    public double area() {
-        return side * side;
-    }
+  private final double side;
+  public Square(double side) { this.side = side; }
+  @Override
+  public double area() {
+    return side * side;
+  }
 }
 `,
     },

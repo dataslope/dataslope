@@ -299,15 +299,17 @@ Expected output:
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        RecentHistory<String> h = new RecentHistory<>(3);
-        h.record("a"); h.record("b"); h.record("c");
-        System.out.println(h.items());
-        h.record("d");
-        System.out.println(h.items());
-        h.record("e");
-        System.out.println(h.items());
-    }
+  public static void main(String[] args) {
+    RecentHistory<String> h = new RecentHistory<>(3);
+    h.record("a");
+    h.record("b");
+    h.record("c");
+    System.out.println(h.items());
+    h.record("d");
+    System.out.println(h.items());
+    h.record("e");
+    System.out.println(h.items());
+  }
 }
 `,
     },
@@ -317,23 +319,24 @@ Expected output:
 import java.util.List;
 
 public class RecentHistory<E> {
-    // TODO
+  // TODO
 }
 `,
       solutionContent: `import java.util.ArrayList;
 import java.util.List;
 
 public class RecentHistory<E> {
-    private final int limit;
-    private final List<E> data = new ArrayList<>();
-    public RecentHistory(int limit) { this.limit = limit; }
+  private final int limit;
+  private final List<E> data = new ArrayList<>();
+  public RecentHistory(int limit) { this.limit = limit; }
 
-    public void record(E item) {
-        data.add(item);
-        while (data.size() > limit) data.remove(0);
-    }
+  public void record(E item) {
+    data.add(item);
+    while (data.size() > limit)
+      data.remove(0);
+  }
 
-    public List<E> items() { return data; }
+  public List<E> items() { return data; }
 }
 `,
     },

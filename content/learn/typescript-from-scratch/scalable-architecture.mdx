@@ -263,7 +263,7 @@ export interface OrderRepository {
 export function createOrder(
   repo: OrderRepository,
   orderId: string,
-  total: number
+  total: number,
 ): Order | null {
   const order = buildOrder(orderId, total);
   if (order) {
@@ -345,7 +345,11 @@ export function validateEmail(email: string): boolean {
       filename: "user/application.ts",
       initialContent: `import { User, validateEmail } from "./domain";
 
-export function createUser(id: string, name: string, email: string): User | null {
+export function createUser(
+  id: string,
+  name: string,
+  email: string,
+): User | null {
   if (!validateEmail(email)) {
     return null;
   }

@@ -327,10 +327,10 @@ The tests will verify that \`map\` transforms the value and returns a new contai
 const numContainer = new Container(42);
 console.log(\`Original: \${numContainer.get()}\`);
 
-const doubled = numContainer.map(n => n * 2);
+const doubled = numContainer.map((n) => n * 2);
 console.log(\`Doubled: \${doubled.get()}\`);
 
-const stringContainer = numContainer.map(n => \`Number: \${n}\`);
+const stringContainer = numContainer.map((n) => \`Number: \${n}\`);
 console.log(\`String: \${stringContainer.get()}\`);
 `,
       solutionContent: `import { Container } from "./container";
@@ -338,10 +338,10 @@ console.log(\`String: \${stringContainer.get()}\`);
 const numContainer = new Container(42);
 console.log(\`Original: \${numContainer.get()}\`);
 
-const doubled = numContainer.map(n => n * 2);
+const doubled = numContainer.map((n) => n * 2);
 console.log(\`Doubled: \${doubled.get()}\`);
 
-const stringContainer = numContainer.map(n => \`Number: \${n}\`);
+const stringContainer = numContainer.map((n) => \`Number: \${n}\`);
 console.log(\`String: \${stringContainer.get()}\`);
 `,
     },

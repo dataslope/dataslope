@@ -225,30 +225,29 @@ classDiagram
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<Item> cart = Arrays.asList(
-            new Item("Apple",  120),
-            new Item("Bread",  300),
-            new Item("Cheese", 550)
-        );
+  public static void main(String[] args) {
+    List<Item> cart =
+        Arrays.asList(new Item("Apple", 120), new Item("Bread", 300),
+                      new Item("Cheese", 550));
 
-        Cashier c = new Cashier();
-        Receipt r = c.ringUp(cart);
-        System.out.println(r.format());
-    }
+    Cashier c = new Cashier();
+    Receipt r = c.ringUp(cart);
+    System.out.println(r.format());
+  }
 }
 `,
     },
     {
       filename: "Item.java",
       initialContent: `public class Item {
-    private final String name;
-    private final int priceCents;
-    public Item(String name, int priceCents) {
-        this.name = name; this.priceCents = priceCents;
-    }
-    public String name()  { return name; }
-    public int    price() { return priceCents; }
+  private final String name;
+  private final int priceCents;
+  public Item(String name, int priceCents) {
+    this.name = name;
+    this.priceCents = priceCents;
+  }
+  public String name() { return name; }
+  public int price() { return priceCents; }
 }
 `,
     },
@@ -258,23 +257,24 @@ public class Main {
 import java.util.List;
 
 public class Receipt {
-    private final List<String> lines = new ArrayList<>();
-    private int total = 0;
+  private final List<String> lines = new ArrayList<>();
+  private int total = 0;
 
-    public void addLine(Item item) {
-        lines.add(String.format("  %-8s %4d", item.name(), item.price()));
-        total += item.price();
-    }
+  public void addLine(Item item) {
+    lines.add(String.format("  %-8s %4d", item.name(), item.price()));
+    total += item.price();
+  }
 
-    public int total() { return total; }
+  public int total() { return total; }
 
-    public String format() {
-        StringBuilder sb = new StringBuilder();
-        for (String l : lines) sb.append(l).append('\\n');
-        sb.append("  ----------\\n");
-        sb.append(String.format("  TOTAL    %4d", total));
-        return sb.toString();
-    }
+  public String format() {
+    StringBuilder sb = new StringBuilder();
+    for (String l : lines)
+      sb.append(l).append('\\n');
+    sb.append("  ----------\\n");
+    sb.append(String.format("  TOTAL    %4d", total));
+    return sb.toString();
+  }
 }
 `,
     },
@@ -283,13 +283,13 @@ public class Receipt {
       initialContent: `import java.util.List;
 
 public class Cashier {
-    public Receipt ringUp(List<Item> items) {
-        Receipt r = new Receipt();
-        for (Item it : items) {
-            r.addLine(it);            // sending addLine() to the Receipt
-        }
-        return r;
+  public Receipt ringUp(List<Item> items) {
+    Receipt r = new Receipt();
+    for (Item it : items) {
+      r.addLine(it); // sending addLine() to the Receipt
     }
+    return r;
+  }
 }
 `,
     },
@@ -335,36 +335,35 @@ Hello, Eve!
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Greeter g = new Greeter();
-        System.out.println(g.greet());
-        System.out.println(g.greet("Ada"));
-        System.out.println(g.greet("Bob", "es"));
-        System.out.println(g.greet("Kenji", "ja"));
-        System.out.println(g.greet("Eve", "fr"));      // fallback
-    }
+  public static void main(String[] args) {
+    Greeter g = new Greeter();
+    System.out.println(g.greet());
+    System.out.println(g.greet("Ada"));
+    System.out.println(g.greet("Bob", "es"));
+    System.out.println(g.greet("Kenji", "ja"));
+    System.out.println(g.greet("Eve", "fr")); // fallback
+  }
 }
 `,
     },
     {
       filename: "Greeter.java",
       initialContent: `public class Greeter {
-    // TODO: three overloaded greet methods
+  // TODO: three overloaded greet methods
 }
 `,
       solutionContent: `public class Greeter {
-    public String greet() {
-        return "Hello!";
-    }
-    public String greet(String name) {
-        return "Hello, " + name + "!";
-    }
-    public String greet(String name, String lang) {
-        if ("en".equals(lang)) return "Hello, " + name + "!";
-        if ("es".equals(lang)) return "Hola, "  + name + "!";
-        if ("ja".equals(lang)) return "こんにちは, " + name + "!";
-        return greet(name);                  // sending a message to this
-    }
+  public String greet() { return "Hello!"; }
+  public String greet(String name) { return "Hello, " + name + "!"; }
+  public String greet(String name, String lang) {
+    if ("en".equals(lang))
+      return "Hello, " + name + "!";
+    if ("es".equals(lang))
+      return "Hola, " + name + "!";
+    if ("ja".equals(lang))
+      return "こんにちは, " + name + "!";
+    return greet(name); // sending a message to this
+  }
 }
 `,
     },

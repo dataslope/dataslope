@@ -323,9 +323,9 @@ values, the other uses them.
       filename: "index.js",
       initialContent: `const { square, isEven, describe } = require("./numbers");
 
-console.log(square(7));            // 49
-console.log(isEven(4));            // true
-console.log(isEven(5));            // false
+console.log(square(7)); // 49
+console.log(isEven(4)); // true
+console.log(isEven(5)); // false
 
 console.log(describe(0));
 console.log(describe(-3));
@@ -347,7 +347,7 @@ function isEven(n) {
 
 function describe(n) {
   if (n === 0) return "zero";
-  if (n < 0)   return "negative";
+  if (n < 0) return "negative";
   return "positive";
 }
 

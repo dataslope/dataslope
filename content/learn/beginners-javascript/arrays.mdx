@@ -349,7 +349,10 @@ console.log("Passed:   ", passed);
   if (xs.length === 0) {
     return { count: 0, min: null, max: null, average: 0, passed: 0 };
   }
-  let min = xs[0], max = xs[0], total = 0, passed = 0;
+  let min = xs[0],
+    max = xs[0],
+    total = 0,
+    passed = 0;
   for (const n of xs) {
     if (n < min) min = n;
     if (n > max) max = n;

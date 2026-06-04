@@ -236,18 +236,17 @@ The fix is always one of:
       initialContent: `import java.util.*;
 
 public class Main {
-    public static void main(String[] args) {
-        List<Post> posts = List.of(
-            new Post("Ada",   "hello",          true),
-            new Post("Linus","kernel rant",     false),
-            new Post("Grace", "compiler talk",  true),
-            new Post("Edsger","goto considered",true)
-        );
+  public static void main(String[] args) {
+    List<Post> posts = List.of(new Post("Ada", "hello", true),
+                               new Post("Linus", "kernel rant", false),
+                               new Post("Grace", "compiler talk", true),
+                               new Post("Edsger", "goto considered", true));
 
-        System.out.println("imperative: " + FeedFilters.imperative(posts));
-        System.out.println("iterator:   " + FeedFilters.viaIterator(new ArrayList<>(posts)));
-        System.out.println("stream:     " + FeedFilters.viaStream(posts));
-    }
+    System.out.println("imperative: " + FeedFilters.imperative(posts));
+    System.out.println("iterator:   " +
+                       FeedFilters.viaIterator(new ArrayList<>(posts)));
+    System.out.println("stream:     " + FeedFilters.viaStream(posts));
+  }
 }
 `,
     },
@@ -261,31 +260,33 @@ public class Main {
       initialContent: `import java.util.*;
 
 public final class FeedFilters {
-    private FeedFilters() {}
+  private FeedFilters() {}
 
-    /** Loop + ArrayList accumulator. */
-    public static List<String> imperative(List<Post> posts) {
-        List<String> out = new ArrayList<>();
-        for (Post p : posts) if (p.published()) out.add(p.author());
-        return out;
-    }
+  /** Loop + ArrayList accumulator. */
+  public static List<String> imperative(List<Post> posts) {
+    List<String> out = new ArrayList<>();
+    for (Post p : posts)
+      if (p.published())
+        out.add(p.author());
+    return out;
+  }
 
-    /** Iterator.remove on a mutable copy. */
-    public static List<String> viaIterator(List<Post> mutable) {
-        Iterator<Post> it = mutable.iterator();
-        while (it.hasNext()) if (!it.next().published()) it.remove();
-        List<String> out = new ArrayList<>();
-        for (Post p : mutable) out.add(p.author());
-        return out;
-    }
+  /** Iterator.remove on a mutable copy. */
+  public static List<String> viaIterator(List<Post> mutable) {
+    Iterator<Post> it = mutable.iterator();
+    while (it.hasNext())
+      if (!it.next().published())
+        it.remove();
+    List<String> out = new ArrayList<>();
+    for (Post p : mutable)
+      out.add(p.author());
+    return out;
+  }
 
-    /** Declarative pipeline. */
-    public static List<String> viaStream(List<Post> posts) {
-        return posts.stream()
-                    .filter(Post::published)
-                    .map(Post::author)
-                    .toList();
-    }
+  /** Declarative pipeline. */
+  public static List<String> viaStream(List<Post> posts) {
+    return posts.stream().filter(Post::published).map(Post::author).toList();
+  }
 }
 `,
     },
@@ -315,11 +316,12 @@ Expected output:
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<String> ws = new ArrayList<>(List.of("hi", "alpha", "ok", "gamma", "delta"));
-        Pruner.removeShorterThan(ws, 4);
-        System.out.println(ws);
-    }
+  public static void main(String[] args) {
+    List<String> ws =
+        new ArrayList<>(List.of("hi", "alpha", "ok", "gamma", "delta"));
+    Pruner.removeShorterThan(ws, 4);
+    System.out.println(ws);
+  }
 }
 `,
     },
@@ -328,21 +330,21 @@ public class Main {
       initialContent: `import java.util.List;
 
 public final class Pruner {
-    private Pruner() {}
+  private Pruner() {}
 
-    public static void removeShorterThan(List<String> words, int minLen) {
-        // TODO
-    }
+  public static void removeShorterThan(List<String> words, int minLen) {
+    // TODO
+  }
 }
 `,
       solutionContent: `import java.util.List;
 
 public final class Pruner {
-    private Pruner() {}
+  private Pruner() {}
 
-    public static void removeShorterThan(List<String> words, int minLen) {
-        words.removeIf(w -> w.length() < minLen);
-    }
+  public static void removeShorterThan(List<String> words, int minLen) {
+    words.removeIf(w -> w.length() < minLen);
+  }
 }
 `,
     },

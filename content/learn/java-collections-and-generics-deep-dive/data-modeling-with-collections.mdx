@@ -89,25 +89,29 @@ If we let the **questions** drive the **shape**, we get:
       initialContent: `import java.util.*;
 
 public class Main {
-    public static void main(String[] args) {
-        Library lib = new Library();
-        lib.add(new Track("Clair de Lune",  "Debussy",   "Suite Bergamasque", List.of("classical", "impressionist"), 1200));
-        lib.add(new Track("Gymnopedie No.1","Satie",     "Gymnopedies",       List.of("classical"),                  900));
-        lib.add(new Track("Reverie",        "Debussy",   "Reveries",          List.of("classical"),                  450));
-        lib.add(new Track("Liebestraum",    "Liszt",     "Liebestraume",      List.of("classical", "romantic"),      700));
+  public static void main(String[] args) {
+    Library lib = new Library();
+    lib.add(new Track("Clair de Lune", "Debussy", "Suite Bergamasque",
+                      List.of("classical", "impressionist"), 1200));
+    lib.add(new Track("Gymnopedie No.1", "Satie", "Gymnopedies",
+                      List.of("classical"), 900));
+    lib.add(
+        new Track("Reverie", "Debussy", "Reveries", List.of("classical"), 450));
+    lib.add(new Track("Liebestraum", "Liszt", "Liebestraume",
+                      List.of("classical", "romantic"), 700));
 
-        System.out.println("Debussy tracks:");
-        for (Track t : lib.tracksByArtist("Debussy")) {
-            System.out.println("  " + t.title());
-        }
-
-        System.out.println("All genres: " + new TreeSet<>(lib.allGenres()));
-
-        System.out.println("Top 2:");
-        for (Track t : lib.topLiked(2)) {
-            System.out.println("  " + t.title() + " (" + t.likes() + ")");
-        }
+    System.out.println("Debussy tracks:");
+    for (Track t : lib.tracksByArtist("Debussy")) {
+      System.out.println("  " + t.title());
     }
+
+    System.out.println("All genres: " + new TreeSet<>(lib.allGenres()));
+
+    System.out.println("Top 2:");
+    for (Track t : lib.topLiked(2)) {
+      System.out.println("  " + t.title() + " (" + t.likes() + ")");
+    }
+  }
 }
 `,
     },
@@ -115,13 +119,8 @@ public class Main {
       filename: "Track.java",
       initialContent: `import java.util.List;
 
-public record Track(
-    String title,
-    String artist,
-    String album,
-    List<String> genres,
-    int likes
-) {}
+public record Track(String title, String artist, String album,
+                    List<String> genres, int likes) {}
 `,
     },
     {
@@ -129,34 +128,33 @@ public record Track(
       initialContent: `import java.util.*;
 
 public class Library {
-    // shape: ordered list of tracks
-    private final List<Track> tracks = new ArrayList<>();
+  // shape: ordered list of tracks
+  private final List<Track> tracks = new ArrayList<>();
 
-    // shape: lookup by artist -> list of tracks
-    private final Map<String, List<Track>> byArtist = new HashMap<>();
+  // shape: lookup by artist -> list of tracks
+  private final Map<String, List<Track>> byArtist = new HashMap<>();
 
-    // shape: set of all unique genres seen
-    private final Set<String> genres = new HashSet<>();
+  // shape: set of all unique genres seen
+  private final Set<String> genres = new HashSet<>();
 
-    public void add(Track t) {
-        tracks.add(t);
-        byArtist.computeIfAbsent(t.artist(), k -> new ArrayList<>()).add(t);
-        genres.addAll(t.genres());
-    }
+  public void add(Track t) {
+    tracks.add(t);
+    byArtist.computeIfAbsent(t.artist(), k -> new ArrayList<>()).add(t);
+    genres.addAll(t.genres());
+  }
 
-    public List<Track> tracksByArtist(String artist) {
-        return Collections.unmodifiableList(byArtist.getOrDefault(artist, List.of()));
-    }
+  public List<Track> tracksByArtist(String artist) {
+    return Collections.unmodifiableList(
+        byArtist.getOrDefault(artist, List.of()));
+  }
 
-    public Set<String> allGenres() {
-        return Collections.unmodifiableSet(genres);
-    }
+  public Set<String> allGenres() { return Collections.unmodifiableSet(genres); }
 
-    public List<Track> topLiked(int n) {
-        List<Track> copy = new ArrayList<>(tracks);
-        copy.sort(Comparator.comparingInt(Track::likes).reversed());
-        return copy.subList(0, Math.min(n, copy.size()));
-    }
+  public List<Track> topLiked(int n) {
+    List<Track> copy = new ArrayList<>(tracks);
+    copy.sort(Comparator.comparingInt(Track::likes).reversed());
+    return copy.subList(0, Math.min(n, copy.size()));
+  }
 }
 `,
     },
@@ -256,16 +254,13 @@ carol: [Order[id=4, total=200]]
       initialContent: `import java.util.*;
 
 public class Main {
-    public static void main(String[] args) {
-        List<Order> orders = List.of(
-            new Order(1, "alice", 100),
-            new Order(2, "bob",    40),
-            new Order(3, "alice",  70),
-            new Order(4, "carol", 200)
-        );
-        Map<String, List<Order>> idx = new TreeMap<>(OrderIndex.byCustomer(orders));
-        idx.forEach((k, v) -> System.out.println(k + ": " + v));
-    }
+  public static void main(String[] args) {
+    List<Order> orders =
+        List.of(new Order(1, "alice", 100), new Order(2, "bob", 40),
+                new Order(3, "alice", 70), new Order(4, "carol", 200));
+    Map<String, List<Order>> idx = new TreeMap<>(OrderIndex.byCustomer(orders));
+    idx.forEach((k, v) -> System.out.println(k + ": " + v));
+  }
 }
 `,
     },
@@ -279,26 +274,26 @@ public class Main {
       initialContent: `import java.util.*;
 
 public final class OrderIndex {
-    private OrderIndex() {}
+  private OrderIndex() {}
 
-    public static Map<String, List<Order>> byCustomer(List<Order> orders) {
-        // TODO: use computeIfAbsent + ArrayList
-        return new HashMap<>();
-    }
+  public static Map<String, List<Order>> byCustomer(List<Order> orders) {
+    // TODO: use computeIfAbsent + ArrayList
+    return new HashMap<>();
+  }
 }
 `,
       solutionContent: `import java.util.*;
 
 public final class OrderIndex {
-    private OrderIndex() {}
+  private OrderIndex() {}
 
-    public static Map<String, List<Order>> byCustomer(List<Order> orders) {
-        Map<String, List<Order>> out = new HashMap<>();
-        for (Order o : orders) {
-            out.computeIfAbsent(o.customerId(), k -> new ArrayList<>()).add(o);
-        }
-        return out;
+  public static Map<String, List<Order>> byCustomer(List<Order> orders) {
+    Map<String, List<Order>> out = new HashMap<>();
+    for (Order o : orders) {
+      out.computeIfAbsent(o.customerId(), k -> new ArrayList<>()).add(o);
     }
+    return out;
+  }
 }
 `,
     },

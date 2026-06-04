@@ -350,10 +350,10 @@ function doStuff(arr, x) {
 }
 
 const data = [
-  { t: "a", s: "ok",  p: 10, q: 2 },
+  { t: "a", s: "ok", p: 10, q: 2 },
   { t: "a", s: "bad", p: 99, q: 1 },
-  { t: "b", s: "ok",  p:  5, q: 3 },
-  { t: "a", s: "ok",  p:  3, q: 4 },
+  { t: "b", s: "ok", p: 5, q: 3 },
+  { t: "a", s: "ok", p: 3, q: 4 },
 ];
 
 console.log(doStuff(data, "a"));
@@ -373,10 +373,10 @@ After — same behaviour, far clearer:
       initialContent: `const { totalWithTaxForType } = require("./reporting");
 
 const orders = [
-  { type: "a", status: "ok",        price: 10, qty: 2 },
+  { type: "a", status: "ok", price: 10, qty: 2 },
   { type: "a", status: "cancelled", price: 99, qty: 1 },
-  { type: "b", status: "ok",        price:  5, qty: 3 },
-  { type: "a", status: "ok",        price:  3, qty: 4 },
+  { type: "b", status: "ok", price: 5, qty: 3 },
+  { type: "a", status: "ok", price: 3, qty: 4 },
 ];
 
 console.log(totalWithTaxForType(orders, "a"));
@@ -384,7 +384,7 @@ console.log(totalWithTaxForType(orders, "a"));
     },
     {
       filename: "reporting.js",
-      initialContent: `const TAX_RATE = 0.10;
+      initialContent: `const TAX_RATE = 0.1;
 
 function lineTotal(order) {
   return order.price * order.qty;

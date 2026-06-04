@@ -374,7 +374,10 @@ original unchanged: 3
       initialContent: `import { add, remove, setQty, totalQty } from "./cart";
 
 const empty: readonly { id: string; qty: number }[] = [];
-const cart1 = add(add(add(empty, { id: "a", qty: 1 }), { id: "b", qty: 1 }), { id: "c", qty: 1 });
+const cart1 = add(add(add(empty, { id: "a", qty: 1 }), { id: "b", qty: 1 }), {
+  id: "c",
+  qty: 1,
+});
 console.log(\`total items: \${totalQty(cart1)}\`);
 
 const cart2 = remove(cart1, "b");

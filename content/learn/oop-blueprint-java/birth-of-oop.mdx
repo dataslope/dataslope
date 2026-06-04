@@ -92,30 +92,30 @@ the sequence diagram in the actual code.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Cart cart = new Cart();
-        cart.add(new Item("Notebook", 9.99));
-        cart.add(new Item("Pen",      4.50));
+  public static void main(String[] args) {
+    Cart cart = new Cart();
+    cart.add(new Item("Notebook", 9.99));
+    cart.add(new Item("Pen", 4.50));
 
-        Order order = new Order(cart);
-        System.out.println("Order total: $" + order.totalString());
-    }
+    Order order = new Order(cart);
+    System.out.println("Order total: $" + order.totalString());
+  }
 }
 `,
     },
     {
       filename: "Item.java",
       initialContent: `public class Item {
-    private final String name;
-    private final double price;
+  private final String name;
+  private final double price;
 
-    public Item(String name, double price) {
-        this.name = name;
-        this.price = price;
-    }
+  public Item(String name, double price) {
+    this.name = name;
+    this.price = price;
+  }
 
-    public double price() { return price; }
-    public String name()  { return name; }
+  public double price() { return price; }
+  public String name() { return name; }
 }
 `,
     },
@@ -125,28 +125,29 @@ the sequence diagram in the actual code.
 import java.util.List;
 
 public class Cart {
-    private final List<Item> items = new ArrayList<>();
+  private final List<Item> items = new ArrayList<>();
 
-    public void add(Item it) { items.add(it); }
+  public void add(Item it) { items.add(it); }
 
-    public double total() {
-        double sum = 0;
-        for (Item it : items) sum += it.price();   // sending price() to each Item
-        return sum;
-    }
+  public double total() {
+    double sum = 0;
+    for (Item it : items)
+      sum += it.price(); // sending price() to each Item
+    return sum;
+  }
 }
 `,
     },
     {
       filename: "Order.java",
       initialContent: `public class Order {
-    private final Cart cart;
+  private final Cart cart;
 
-    public Order(Cart cart) { this.cart = cart; }
+  public Order(Cart cart) { this.cart = cart; }
 
-    public String totalString() {
-        return String.format("%.2f", cart.total()); // sending total() to the Cart
-    }
+  public String totalString() {
+    return String.format("%.2f", cart.total()); // sending total() to the Cart
+  }
 }
 `,
     },
@@ -221,33 +222,33 @@ internals. Every interaction is a *message*.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        VendingMachine vm = new VendingMachine();
-        vm.stock(new Product("Cola",  150));
-        vm.stock(new Product("Chips", 200));
+  public static void main(String[] args) {
+    VendingMachine vm = new VendingMachine();
+    vm.stock(new Product("Cola", 150));
+    vm.stock(new Product("Chips", 200));
 
-        vm.insertCoins(100);
-        vm.insertCoins(100);
-        Product got = vm.select("Chips");
-        System.out.println("You got: " + (got == null ? "nothing" : got.name()));
-        System.out.println("Change : " + vm.takeChange() + " cents");
-    }
+    vm.insertCoins(100);
+    vm.insertCoins(100);
+    Product got = vm.select("Chips");
+    System.out.println("You got: " + (got == null ? "nothing" : got.name()));
+    System.out.println("Change : " + vm.takeChange() + " cents");
+  }
 }
 `,
     },
     {
       filename: "Product.java",
       initialContent: `public class Product {
-    private final String name;
-    private final int    priceCents;
+  private final String name;
+  private final int priceCents;
 
-    public Product(String name, int priceCents) {
-        this.name = name;
-        this.priceCents = priceCents;
-    }
+  public Product(String name, int priceCents) {
+    this.name = name;
+    this.priceCents = priceCents;
+  }
 
-    public String name()       { return name; }
-    public int    priceCents() { return priceCents; }
+  public String name() { return name; }
+  public int priceCents() { return priceCents; }
 }
 `,
     },
@@ -257,29 +258,29 @@ internals. Every interaction is a *message*.
 import java.util.List;
 
 public class VendingMachine {
-    private final List<Product> inventory = new ArrayList<>();
-    private int credit = 0;
+  private final List<Product> inventory = new ArrayList<>();
+  private int credit = 0;
 
-    public void stock(Product p)          { inventory.add(p); }
-    public void insertCoins(int cents)    { credit += cents; }
+  public void stock(Product p) { inventory.add(p); }
+  public void insertCoins(int cents) { credit += cents; }
 
-    public Product select(String name) {
-        for (int i = 0; i < inventory.size(); i++) {
-            Product p = inventory.get(i);
-            if (p.name().equals(name) && credit >= p.priceCents()) {
-                credit -= p.priceCents();
-                inventory.remove(i);
-                return p;
-            }
-        }
-        return null;
+  public Product select(String name) {
+    for (int i = 0; i < inventory.size(); i++) {
+      Product p = inventory.get(i);
+      if (p.name().equals(name) && credit >= p.priceCents()) {
+        credit -= p.priceCents();
+        inventory.remove(i);
+        return p;
+      }
     }
+    return null;
+  }
 
-    public int takeChange() {
-        int c = credit;
-        credit = 0;
-        return c;
-    }
+  public int takeChange() {
+    int c = credit;
+    credit = 0;
+    return c;
+  }
 }
 `,
     },

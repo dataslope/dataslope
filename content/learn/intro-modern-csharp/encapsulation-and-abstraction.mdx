@@ -22,15 +22,15 @@ They are two angles on the same idea: *separating "what" from "how."*
   adapter="csharp"
   starterCode={`using System;
 
-public class BankAccount
-{
-    public double Balance; // anyone can write this
-}
-
 var a = new BankAccount();
 a.Balance = 100;
 a.Balance = -9999; // oops
 Console.WriteLine(a.Balance);
+
+public class BankAccount
+{
+    public double Balance; // anyone can write this
+}
 `}
 />
 
@@ -59,6 +59,13 @@ For now, focus on **`private` for state, `public` for behavior**.
 <CodeBlock
   adapter="csharp"
   starterCode={`using System;
+
+var a = new BankAccount("Alice", 100);
+a.Deposit(50);
+a.Withdraw(30);
+Console.WriteLine($"{a.Owner}: {a.Balance}");
+
+// a.Balance = -9999;   // won't compile — Balance has a private setter
 
 public class BankAccount
 {
@@ -89,13 +96,6 @@ public class BankAccount
         Balance -= amount;
     }
 }
-
-var a = new BankAccount("Alice", 100);
-a.Deposit(50);
-a.Withdraw(30);
-Console.WriteLine($"{a.Owner}: {a.Balance}");
-
-// a.Balance = -9999;   // won't compile — Balance has a private setter
 `}
 />
 
@@ -127,6 +127,10 @@ Consider a `TemperatureSensor`:
   adapter="csharp"
   starterCode={`using System;
 
+var s = new TemperatureSensor();
+Console.WriteLine($"C: {s.Celsius:F2}");
+Console.WriteLine($"F: {s.Fahrenheit:F2}");
+
 public class TemperatureSensor
 {
     private double _rawVoltage = 1.23;
@@ -135,10 +139,6 @@ public class TemperatureSensor
 
     public double Fahrenheit => Celsius * 9.0 / 5.0 + 32;
 }
-
-var s = new TemperatureSensor();
-Console.WriteLine($"C: {s.Celsius:F2}");
-Console.WriteLine($"F: {s.Fahrenheit:F2}");
 `}
 />
 
@@ -179,8 +179,14 @@ var w = new Wallet("Ada", 50);
 w.Add(100);
 w.Spend(30);
 Console.WriteLine($"{w.Owner} has {w.Cash}");
-try { w.Spend(9999); }
-catch (Exception ex) { Console.WriteLine($"refused: {ex.Message}"); }
+try
+{
+    w.Spend(9999);
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"refused: {ex.Message}");
+}
 `,
     },
     {
@@ -192,21 +198,25 @@ catch (Exception ex) { Console.WriteLine($"refused: {ex.Message}"); }
 
     public Wallet(string owner, decimal initialCash)
     {
-        if (initialCash < 0) throw new ArgumentException("initial cash can't be negative");
+        if (initialCash < 0)
+            throw new ArgumentException("initial cash can't be negative");
         Owner = owner;
         Cash = initialCash;
     }
 
     public void Add(decimal amount)
     {
-        if (amount <= 0) throw new ArgumentException("must be positive");
+        if (amount <= 0)
+            throw new ArgumentException("must be positive");
         Cash += amount;
     }
 
     public void Spend(decimal amount)
     {
-        if (amount <= 0) throw new ArgumentException("must be positive");
-        if (amount > Cash) throw new InvalidOperationException("not enough cash");
+        if (amount <= 0)
+            throw new ArgumentException("must be positive");
+        if (amount > Cash)
+            throw new InvalidOperationException("not enough cash");
         Cash -= amount;
     }
 }
@@ -287,7 +297,8 @@ catch (ArgumentException)
 
     public Counter(int start)
     {
-        if (start < 0) throw new ArgumentException("start cannot be negative");
+        if (start < 0)
+            throw new ArgumentException("start cannot be negative");
         Value = start;
     }
 

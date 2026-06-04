@@ -209,21 +209,21 @@ The further right you go, the safer your API.
       initialContent: `import java.util.*;
 
 public class Main {
-    public static void main(String[] args) {
-        List<String> initial = new ArrayList<>(List.of("apple", "bread", "cheese"));
-        Catalog c = new Catalog(initial);
+  public static void main(String[] args) {
+    List<String> initial = new ArrayList<>(List.of("apple", "bread", "cheese"));
+    Catalog c = new Catalog(initial);
 
-        // External mutation does not leak into the catalog
-        initial.add("steal-me");
-        System.out.println(c.items());
+    // External mutation does not leak into the catalog
+    initial.add("steal-me");
+    System.out.println(c.items());
 
-        // Caller cannot mutate what they got back
-        try {
-            c.items().add("hack");
-        } catch (UnsupportedOperationException e) {
-            System.out.println("safe: " + e.getClass().getSimpleName());
-        }
+    // Caller cannot mutate what they got back
+    try {
+      c.items().add("hack");
+    } catch (UnsupportedOperationException e) {
+      System.out.println("safe: " + e.getClass().getSimpleName());
     }
+  }
 }
 `,
     },
@@ -232,13 +232,13 @@ public class Main {
       initialContent: `import java.util.List;
 
 public final class Catalog {
-    private final List<String> items;
+  private final List<String> items;
 
-    public Catalog(List<String> items) {
-        this.items = List.copyOf(items);   // snapshot in
-    }
+  public Catalog(List<String> items) {
+    this.items = List.copyOf(items); // snapshot in
+  }
 
-    public List<String> items() { return items; }  // already immutable
+  public List<String> items() { return items; } // already immutable
 }
 `,
     },
@@ -267,20 +267,21 @@ caller mutation was blocked
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<String> names = new ArrayList<>(List.of("Ada", "Grace"));
-        Roster r = new Roster(names);
-        System.out.println(r.names());
+  public static void main(String[] args) {
+    List<String> names = new ArrayList<>(List.of("Ada", "Grace"));
+    Roster r = new Roster(names);
+    System.out.println(r.names());
 
-        names.add("Linus");
-        if (!r.names().contains("Linus")) System.out.println("external mutation didn't leak");
+    names.add("Linus");
+    if (!r.names().contains("Linus"))
+      System.out.println("external mutation didn't leak");
 
-        try {
-            r.names().add("Edsger");
-        } catch (UnsupportedOperationException e) {
-            System.out.println("caller mutation was blocked");
-        }
+    try {
+      r.names().add("Edsger");
+    } catch (UnsupportedOperationException e) {
+      System.out.println("caller mutation was blocked");
     }
+  }
 }
 `,
     },
@@ -289,29 +290,25 @@ public class Main {
       initialContent: `import java.util.List;
 
 public final class Roster {
-    private final List<String> names;
+  private final List<String> names;
 
-    public Roster(List<String> names) {
-        this.names = names;          // TODO: defensive copy
-    }
+  public Roster(List<String> names) {
+    this.names = names; // TODO: defensive copy
+  }
 
-    public List<String> names() {
-        return names;                // TODO: unmodifiable
-    }
+  public List<String> names() {
+    return names; // TODO: unmodifiable
+  }
 }
 `,
       solutionContent: `import java.util.List;
 
 public final class Roster {
-    private final List<String> names;
+  private final List<String> names;
 
-    public Roster(List<String> names) {
-        this.names = List.copyOf(names);
-    }
+  public Roster(List<String> names) { this.names = List.copyOf(names); }
 
-    public List<String> names() {
-        return names;
-    }
+  public List<String> names() { return names; }
 }
 `,
     },

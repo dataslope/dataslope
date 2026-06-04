@@ -371,11 +371,11 @@ console.log(slug("  Nice  to !! meet  you  "));
   return fns.reduce((acc, f) => f(acc), x);
 }
 
-export const trim           = (s: string): string => s; // TODO
-export const lower          = (s: string): string => s; // TODO
-export const stripPunct     = (s: string): string => s; // TODO
+export const trim = (s: string): string => s; // TODO
+export const lower = (s: string): string => s; // TODO
+export const stripPunct = (s: string): string => s; // TODO
 export const collapseSpaces = (s: string): string => s; // TODO
-export const hyphenate      = (s: string): string => s; // TODO
+export const hyphenate = (s: string): string => s; // TODO
 
 export const slug = (s: string): string => s; // TODO: pipe the above
 `,
@@ -383,11 +383,12 @@ export const slug = (s: string): string => s; // TODO: pipe the above
   return fns.reduce((acc, f) => f(acc), x);
 }
 
-export const trim           = (s: string): string => s.trim();
-export const lower          = (s: string): string => s.toLowerCase();
-export const stripPunct     = (s: string): string => s.replace(/[^\\p{L}\\p{N}\\s]/gu, "");
+export const trim = (s: string): string => s.trim();
+export const lower = (s: string): string => s.toLowerCase();
+export const stripPunct = (s: string): string =>
+  s.replace(/[^\\p{L}\\p{N}\\s]/gu, "");
 export const collapseSpaces = (s: string): string => s.replace(/\\s+/g, " ");
-export const hyphenate      = (s: string): string => s.replace(/ /g, "-");
+export const hyphenate = (s: string): string => s.replace(/ /g, "-");
 
 export const slug = (s: string): string =>
   pipe(s, trim, lower, stripPunct, collapseSpaces, hyphenate);

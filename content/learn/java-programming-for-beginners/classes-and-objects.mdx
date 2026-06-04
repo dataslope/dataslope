@@ -135,41 +135,40 @@ has more than one class, we will show each in its own file.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Book hp = new Book("Harry Potter", "J. K. Rowling", 1997);
-        Book lr = new Book("The Lord of the Rings", "J. R. R. Tolkien", 1954);
+  public static void main(String[] args) {
+    Book hp = new Book("Harry Potter", "J. K. Rowling", 1997);
+    Book lr = new Book("The Lord of the Rings", "J. R. R. Tolkien", 1954);
 
-        System.out.println(hp.citation());
-        System.out.println(lr.citation());
-        System.out.println("Older: " + (hp.olderThan(lr) ? hp.title() : lr.title()));
-    }
+    System.out.println(hp.citation());
+    System.out.println(lr.citation());
+    System.out.println("Older: " +
+                       (hp.olderThan(lr) ? hp.title() : lr.title()));
+  }
 }
 `,
     },
     {
       filename: "Book.java",
       initialContent: `public class Book {
-    private final String title;
-    private final String author;
-    private final int    year;
+  private final String title;
+  private final String author;
+  private final int year;
 
-    public Book(String title, String author, int year) {
-        this.title  = title;
-        this.author = author;
-        this.year   = year;
-    }
+  public Book(String title, String author, int year) {
+    this.title = title;
+    this.author = author;
+    this.year = year;
+  }
 
-    public String title()  { return title; }
-    public String author() { return author; }
-    public int    year()   { return year; }
+  public String title() { return title; }
+  public String author() { return author; }
+  public int year() { return year; }
 
-    public String citation() {
-        return author + ", \\"" + title + "\\" (" + year + ")";
-    }
+  public String citation() {
+    return author + ", \\"" + title + "\\" (" + year + ")";
+  }
 
-    public boolean olderThan(Book other) {
-        return this.year < other.year;
-    }
+  public boolean olderThan(Book other) { return this.year < other.year; }
 }
 `,
     },
@@ -274,33 +273,31 @@ d=1
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Counter c = new Counter();
-        c.bump(); c.bump(); c.bump();
-        Counter d = new Counter();
-        d.bump();
-        System.out.println("c=" + c.value());
-        System.out.println("d=" + d.value());
-    }
+  public static void main(String[] args) {
+    Counter c = new Counter();
+    c.bump();
+    c.bump();
+    c.bump();
+    Counter d = new Counter();
+    d.bump();
+    System.out.println("c=" + c.value());
+    System.out.println("d=" + d.value());
+  }
 }
 `,
     },
     {
       filename: "Counter.java",
       initialContent: `public class Counter {
-    // TODO: implement
+  // TODO: implement
 }
 `,
       solutionContent: `public class Counter {
-    private int value = 0;
+  private int value = 0;
 
-    public void bump() {
-        value++;
-    }
+  public void bump() { value++; }
 
-    public int value() {
-        return value;
-    }
+  public int value() { return value; }
 }
 `,
     },

@@ -212,40 +212,36 @@ using System.Linq;
 // authors whose books total > 1500 pages, ordered by author name,
 // printed as "Name: totalPages".
 
-var books = new[]
-{
-    new Book("Knuth",  "TAOCP V1", 650),
-    new Book("Knuth",  "TAOCP V2", 700),
-    new Book("Knuth",  "TAOCP V3", 800),
-    new Book("Skiena", "Algo Design Manual", 730),
-    new Book("Cormen", "CLRS", 1300),
-    new Book("Sedgewick", "Algorithms", 950),
+var books = new[] {
+    new Book("Knuth", "TAOCP V1", 650), new Book("Knuth", "TAOCP V2", 700),
+    new Book("Knuth", "TAOCP V3", 800), new Book("Skiena", "Algo Design Manual", 730),
+    new Book("Cormen", "CLRS", 1300),   new Book("Sedgewick", "Algorithms", 950),
 };
 
 Console.WriteLine("-- query --");
-foreach (var line in QueryStyle.Run(books))  Console.WriteLine(line);
+foreach (var line in QueryStyle.Run(books))
+    Console.WriteLine(line);
 Console.WriteLine("-- method --");
-foreach (var line in MethodStyle.Run(books)) Console.WriteLine(line);
+foreach (var line in MethodStyle.Run(books))
+    Console.WriteLine(line);
 
 public record Book(string Author, string Title, int Pages);
 `,
       solutionContent: `using System;
 using System.Linq;
 
-var books = new[]
-{
-    new Book("Knuth",  "TAOCP V1", 650),
-    new Book("Knuth",  "TAOCP V2", 700),
-    new Book("Knuth",  "TAOCP V3", 800),
-    new Book("Skiena", "Algo Design Manual", 730),
-    new Book("Cormen", "CLRS", 1300),
-    new Book("Sedgewick", "Algorithms", 950),
+var books = new[] {
+    new Book("Knuth", "TAOCP V1", 650), new Book("Knuth", "TAOCP V2", 700),
+    new Book("Knuth", "TAOCP V3", 800), new Book("Skiena", "Algo Design Manual", 730),
+    new Book("Cormen", "CLRS", 1300),   new Book("Sedgewick", "Algorithms", 950),
 };
 
 Console.WriteLine("-- query --");
-foreach (var line in QueryStyle.Run(books))  Console.WriteLine(line);
+foreach (var line in QueryStyle.Run(books))
+    Console.WriteLine(line);
 Console.WriteLine("-- method --");
-foreach (var line in MethodStyle.Run(books)) Console.WriteLine(line);
+foreach (var line in MethodStyle.Run(books))
+    Console.WriteLine(line);
 
 public record Book(string Author, string Title, int Pages);
 `,
@@ -270,12 +266,8 @@ using System.Linq;
 public static class QueryStyle
 {
     public static IEnumerable<string> Run(IEnumerable<Book> books) =>
-        from b in books
-        group b by b.Author into g
-        let total = g.Sum(x => x.Pages)
-        where total > 1500
-        orderby g.Key
-        select $"{g.Key}: {total}";
+        from b in books group b by b.Author into g let total = g.Sum(x => x.Pages)
+        where total> 1500 orderby g.Key select $"{g.Key}: {total}";
 }
 `,
     },
@@ -299,8 +291,7 @@ using System.Linq;
 public static class MethodStyle
 {
     public static IEnumerable<string> Run(IEnumerable<Book> books) =>
-        books
-            .GroupBy(b => b.Author)
+        books.GroupBy(b => b.Author)
             .Select(g => new { Author = g.Key, Total = g.Sum(x => x.Pages) })
             .Where(x => x.Total > 1500)
             .OrderBy(x => x.Author)

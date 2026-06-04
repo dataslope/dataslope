@@ -345,8 +345,10 @@ ok
       filename: "main.ts",
       initialContent: `import { every, when, mapInput, type Validator } from "./validators";
 
-const minLen = (n: number): Validator<number> =>
-  (x) => (x >= n ? null : "too short");
+const minLen =
+  (n: number): Validator<number> =>
+  (x) =>
+    x >= n ? null : "too short";
 const hasAt: Validator<string> = (s) => (s.includes("@") ? null : "missing @");
 
 const isEmail: Validator<string> = every(
@@ -373,7 +375,10 @@ export function every<A>(...vs: Validator<A>[]): Validator<A> {
   return () => null;
 }
 
-export function when<A>(pred: (a: A) => boolean, v: Validator<A>): Validator<A> {
+export function when<A>(
+  pred: (a: A) => boolean,
+  v: Validator<A>,
+): Validator<A> {
   // your code here
   return () => null;
 }
@@ -395,7 +400,10 @@ export function every<A>(...vs: Validator<A>[]): Validator<A> {
   };
 }
 
-export function when<A>(pred: (a: A) => boolean, v: Validator<A>): Validator<A> {
+export function when<A>(
+  pred: (a: A) => boolean,
+  v: Validator<A>,
+): Validator<A> {
   return (a) => (pred(a) ? v(a) : null);
 }
 

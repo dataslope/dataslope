@@ -187,52 +187,53 @@ allowed temperature range and a current setting. Outsiders can
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Thermostat t = new Thermostat(60, 80, 68);
-        System.out.println(t.describe());
+  public static void main(String[] args) {
+    Thermostat t = new Thermostat(60, 80, 68);
+    System.out.println(t.describe());
 
-        t.setTarget(75);
-        System.out.println(t.describe());
+    t.setTarget(75);
+    System.out.println(t.describe());
 
-        t.setTarget(120);                // out of range — clamped
-        System.out.println(t.describe());
+    t.setTarget(120); // out of range — clamped
+    System.out.println(t.describe());
 
-        t.setTarget(-10);                // out of range — clamped
-        System.out.println(t.describe());
-    }
+    t.setTarget(-10); // out of range — clamped
+    System.out.println(t.describe());
+  }
 }
 `,
     },
     {
       filename: "Thermostat.java",
       initialContent: `public class Thermostat {
-    private final int minF;
-    private final int maxF;
-    private int target;          // not final — changes over time
+  private final int minF;
+  private final int maxF;
+  private int target; // not final — changes over time
 
-    public Thermostat(int minF, int maxF, int initialTarget) {
-        if (minF >= maxF) throw new IllegalArgumentException("minF must be < maxF");
-        this.minF = minF;
-        this.maxF = maxF;
-        this.target = clamp(initialTarget);
-    }
+  public Thermostat(int minF, int maxF, int initialTarget) {
+    if (minF >= maxF)
+      throw new IllegalArgumentException("minF must be < maxF");
+    this.minF = minF;
+    this.maxF = maxF;
+    this.target = clamp(initialTarget);
+  }
 
-    public void setTarget(int desired) {
-        this.target = clamp(desired);
-    }
+  public void setTarget(int desired) { this.target = clamp(desired); }
 
-    public int target() { return target; }
+  public int target() { return target; }
 
-    public String describe() {
-        return "Thermostat[" + minF + ".." + maxF + "F, target=" + target + "F]";
-    }
+  public String describe() {
+    return "Thermostat[" + minF + ".." + maxF + "F, target=" + target + "F]";
+  }
 
-    // private helper: enforces the invariant in ONE place
-    private int clamp(int value) {
-        if (value < minF) return minF;
-        if (value > maxF) return maxF;
-        return value;
-    }
+  // private helper: enforces the invariant in ONE place
+  private int clamp(int value) {
+    if (value < minF)
+      return minF;
+    if (value > maxF)
+      return maxF;
+    return value;
+  }
 }
 `,
     },
@@ -278,40 +279,43 @@ balance=20
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Wallet w = new Wallet();
-        w.add(100);
-        boolean s1 = w.spend(80);
-        boolean s2 = w.spend(999);
-        System.out.println("spend1=" + s1);
-        System.out.println("spend2=" + s2);
-        System.out.println("balance=" + w.balance());
-    }
+  public static void main(String[] args) {
+    Wallet w = new Wallet();
+    w.add(100);
+    boolean s1 = w.spend(80);
+    boolean s2 = w.spend(999);
+    System.out.println("spend1=" + s1);
+    System.out.println("spend2=" + s2);
+    System.out.println("balance=" + w.balance());
+  }
 }
 `,
     },
     {
       filename: "Wallet.java",
       initialContent: `public class Wallet {
-    // TODO: implement the Wallet class
+  // TODO: implement the Wallet class
 }
 `,
       solutionContent: `public class Wallet {
-    private int cents = 0;
+  private int cents = 0;
 
-    public void add(int amount) {
-        if (amount <= 0) throw new IllegalArgumentException("must be positive");
-        cents += amount;
-    }
+  public void add(int amount) {
+    if (amount <= 0)
+      throw new IllegalArgumentException("must be positive");
+    cents += amount;
+  }
 
-    public boolean spend(int amount) {
-        if (amount <= 0) throw new IllegalArgumentException("must be positive");
-        if (amount > cents) return false;
-        cents -= amount;
-        return true;
-    }
+  public boolean spend(int amount) {
+    if (amount <= 0)
+      throw new IllegalArgumentException("must be positive");
+    if (amount > cents)
+      return false;
+    cents -= amount;
+    return true;
+  }
 
-    public int balance() { return cents; }
+  public int balance() { return cents; }
 }
 `,
     },
