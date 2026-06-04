@@ -190,12 +190,17 @@ Adding **hover_name** is often the single biggest improvement you can make to an
   markdown={`Which **hover_data** value would format a population of **1234567** as **"1,234,567"**?
 
 - **True**
+  > **True** just turns the field on with default formatting — it does not add thousands separators, so the number would still read as **1234567**.
 - **":.2f"**
+  > **":.2f"** formats with two decimal places (1234567.00) but adds no thousands separators. The comma in the spec is what inserts the separators.
 - [o] **":,"**
   > The **","** format spec inserts thousands separators. For more control, combine: **":,.0f"** gives 1,234,567 (no decimals) and **":,.2f"** gives 1,234,567.00 (two decimals). The syntax is the same as Python's f-strings.
 - **"%population%"**
+  > This isn't a valid Plotly format spec — hover formats follow the D3 / Python mini-format-language (a string like **":,"**), not **%name%** placeholders.
 
-Plotly's hover format strings mostly follow Python's mini-format-language, which is convenient if you already know f-strings.`}
+Plotly's hover format strings mostly follow Python's mini-format-language, which is convenient if you already know f-strings.
+
+*Hint: think of the same format mini-language Python f-strings use — the single character that inserts thousands separators is the one you want.*`}
 />
 
 <MultipleChoice

@@ -312,11 +312,16 @@ int main(void) {
 <MultipleChoice
   markdown={`If \`int a[5];\` and \`int *p = a;\`, which of the following is **not** equivalent to \`a[3]\`?
 
+*Hint: \`a[3]\` is a value. Which option gives you an address instead?*
+
 - \`p[3]\`
+  > Since \`p\` points at \`a\`'s first element, \`p[3]\` indexes the same element as \`a[3]\` and yields its value.
 - \`*(p + 3)\`
+  > \`p + 3\` is the address of the fourth element; the leading \`*\` dereferences it, giving the same value as \`a[3]\`.
 - \`*(a + 3)\`
+  > This is the definition the compiler uses for \`a[3]\` itself: add \`3\`, then dereference. Same value.
 - [o] \`a + 3\`
-  > \`a + 3\` is the **address** of the fourth element, not its value. To get the value you need \`*(a + 3)\` or \`a[3]\`.
+  > \`a + 3\` is the **address** of the fourth element, not its value. It has no dereference (\`*\`), so it is the one option that differs from \`a[3]\`.
 
 The relationship \`a[i]\` ≡ \`*(a + i)\` is built into the C standard. Notice this also implies the bizarre legal expression \`3[a]\`, which evaluates to \`*(3 + a)\`, which is the same as \`a[3]\`. Just because something is legal doesn't mean it's a good idea.`}
 />

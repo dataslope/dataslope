@@ -212,10 +212,13 @@ report("NAs per column", colSums(is.na(iris)))
   markdown={`Which function gives you a compact view of a data frame's structure: number of rows, number of columns, every column's type, and a sample of its values?
 
 - \`summary()\`
+  > \`summary()\` gives per-column statistics (min, mean, quartiles), not the column *types* and structure.
 - \`head()\`
+  > \`head()\` shows the first few rows, but not a one-line report of types and dimensions.
 - [o] \`str()\`
   > \`str()\` is the structural summary — types and a sample, in one screen.
-- \`dim()\``}
+- \`dim()\`
+  > \`dim()\` returns just the row and column counts, with no type or value information.`}
 />
 
 <MultipleChoice

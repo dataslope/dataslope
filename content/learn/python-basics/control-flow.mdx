@@ -462,16 +462,18 @@ else:
 />
 
 <MultipleChoice
-  markdown={`Which of the following is a valid Python 3.10+ \`match\` pattern?
+  markdown={`Which \`match\` case matches a 2-tuple **only when its two elements are equal** (e.g. \`(4, 4)\`)?
 
-- \`case x | y:\` at the start
-  > \`|\` works for alternatives inside a pattern (e.g. \`case 1 | 2:\`), but the syntax error here is that you need a concrete value or wildcard first.
+*Hint: a guard is an \`if\` condition written after the pattern.*
+
+- \`case (x, y):\`
+  > This matches **any** 2-tuple and binds \`x\` and \`y\`, but it has no condition, so it also matches \`(2, 7)\`.
 - [o] \`case (x, y) if x == y:\`
-  > This matches a 2-tuple and adds a guard clause.
-- \`case [x, y, z, *rest] if len(rest) > 0:\`
-  > Guards can only reference bound variables, not call functions like \`len\` on them. This would raise a name error.
+  > This matches a 2-tuple and the \`if x == y\` guard runs only when the two bound values are equal.
 - \`case x and y:\`
-  > \`and\` is not valid pattern syntax; use \`case (x, y):\` for a tuple.`}
+  > \`and\` is not valid pattern syntax; a tuple pattern is written \`case (x, y):\`.
+- \`case (x, x):\`
+  > A pattern cannot bind the same name twice; Python raises a \`SyntaxError\` for repeated capture names.`}
 />
 
 <MultipleChoice

@@ -211,10 +211,13 @@ a plot.
   markdown={`Which measure of center is **robust to outliers**?
 
 - mean
+  > The mean is a measure of center, but it uses every value's magnitude, so one outlier can pull it far from the typical value.
 - variance
+  > Variance measures *spread*, not center, and it is highly sensitive to outliers because it squares distances from the mean.
 - [o] median
   > The median only depends on the *position* of values, not their magnitude. A single extreme value can pull the mean a lot but barely move the median.
-- range`}
+- range
+  > Range measures *spread*, not center, and it is the most outlier-sensitive of all — it is defined entirely by the two most extreme values.`}
 />
 
 <MultipleChoice

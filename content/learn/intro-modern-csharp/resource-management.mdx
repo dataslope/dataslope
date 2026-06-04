@@ -257,6 +257,7 @@ production bugs.
 - Memory, file handles, and network sockets
   > Just memory.
 - [o] Memory only — other resources still need to be released explicitly, typically via \`IDisposable\` / \`using\`
+  > The GC reclaims managed heap memory; file handles, sockets, and locks are not its job.
 - Only unmanaged memory
   > It collects managed objects on the .NET heap.
 - Variables on the stack
@@ -271,6 +272,7 @@ production bugs.
 - It doesn't actually call \`Dispose()\`
   > It does — that's the whole point.
 - [o] It guarantees \`Dispose()\` runs at the end of the block, even if an exception is thrown — so you can't forget cleanup
+  > \`using\` expands to a try/finally that calls \`Dispose()\` for you, so cleanup can't be skipped.
 - It hides what's happening
   > It makes the intent *clearer*, not more hidden.`}
 />

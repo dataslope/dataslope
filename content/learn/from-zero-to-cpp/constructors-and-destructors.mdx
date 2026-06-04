@@ -234,6 +234,7 @@ int main() {
 - The body cannot reference members.
   > It can.
 - [o] The initializer list constructs each field directly with the right value, instead of default-constructing it first and then overwriting it. This is more efficient and required for \`const\` and reference members.
+  > One construction with the final value beats default-construct-then-assign.
 - It causes the constructor to run twice.
   > It does not.`}
 />

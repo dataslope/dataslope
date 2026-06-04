@@ -578,7 +578,7 @@ assert count_lines("cl1.txt") == 1`,
 - It makes the file read-only.
   > No, \`with\` works with any mode (\`"r"\`, \`"w"\`, etc.).
 - [o] It automatically closes the file when the block exits, even if an exception is raised.
-  > **Correct.** The context manager protocol guarantees cleanup.
+  > The context manager protocol guarantees cleanup.
 - It speeds up file I/O by buffering writes.
   > Buffering happens regardless of \`with\`. This is about resource cleanup.`}
 />
@@ -589,7 +589,7 @@ assert count_lines("cl1.txt") == 1`,
 - The string \`"logs/2024/jan.log"\`
   > Close, but it returns a \`Path\` object, not a plain string.
 - [o] A \`Path\` object representing \`logs/2024/jan.log\`
-  > **Correct.** \`Path\` overloads \`/\` for path joining.
+  > \`Path\` overloads \`/\` for path joining.
 - A \`TypeError\` because you cannot divide a path.
   > No, \`Path.__truediv__\` is defined to handle \`/\`.
 - A list of three path components.
@@ -600,7 +600,7 @@ assert count_lines("cl1.txt") == 1`,
   markdown={`When should you open a file in binary mode (\`"rb"\` or \`"wb"\`)?
 
 - [o] When working with non-text files like images, executables, or pickle files.
-  > **Correct.** Binary mode gives you raw bytes without text encoding.
+  > Binary mode gives you raw bytes without text encoding.
 - When you want to read a text file faster.
   > No, binary mode does not speed up text reading; it just skips encoding.
 - When the file is very large.
@@ -615,7 +615,7 @@ assert count_lines("cl1.txt") == 1`,
 - UTF-8 is faster than the default encoding.
   > No, performance is not the reason.
 - [o] The default encoding is platform-dependent, which can cause bugs on different systems.
-  > **Correct.** macOS/Linux default to UTF-8; Windows often defaults to CP1252. Explicit is better than implicit.
+  > macOS/Linux default to UTF-8; Windows often defaults to CP1252. Explicit is better than implicit.
 - Python 3 does not have a default encoding.
   > Python 3 has a default (from \`locale.getpreferredencoding()\`), but it varies by platform.
 - \`encoding="utf-8"\` is required for \`with\` blocks.
@@ -628,7 +628,7 @@ assert count_lines("cl1.txt") == 1`,
 - They are aliases; both do the same thing.
   > No, one writes to a file, the other returns a string.
 - [o] \`json.dumps\` returns a JSON string; \`json.dump\` writes directly to a file object.
-  > **Correct.** The \`s\` suffix conventionally means "string" in Python APIs.
+  > The \`s\` suffix conventionally means "string" in Python APIs.
 - \`json.dump\` is deprecated in Python 3.
   > No, both are current and widely used.
 - \`json.dumps\` is for serializing; \`json.dump\` is for deserializing.
@@ -641,7 +641,7 @@ assert count_lines("cl1.txt") == 1`,
 - It is required by the CSV spec.
   > Not by the spec, but by Python's CSV module on Windows.
 - [o] On Windows, the default text mode translates \`\\n\` to \`\\r\\n\`, doubling line endings. \`newline=""\` disables this.
-  > **Correct.** The CSV module handles line endings itself; you must disable the OS translation.
+  > The CSV module handles line endings itself; you must disable the OS translation.
 - It makes the CSV parser faster.
   > No, it is about correctness, not performance.
 - It prevents Unicode errors.

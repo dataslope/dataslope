@@ -199,16 +199,18 @@ A box is an entity (table); the lines connecting boxes are the relationships.`}
 />
 
 <MultipleChoice
-  markdown={`How does an ER diagram typically show a **many-to-many** relationship between two entities?
+  markdown={`When a many-to-many relationship is turned into actual tables, how is it usually represented in the diagram and schema?
 
-- With a single direct line and a "many" symbol on both ends only.
-  > While the cardinality is many-to-many, in a relational model it is realized through a third box.
+*Hint: a foreign key can express "many" on only one side, so the database needs an extra table in the middle.*
+
+- By merging the two entities into one combined box.
+  > Merging would collapse two distinct entities into one and lose their independent rows, so it is not how many-to-many is built.
 - [o] As two one-to-many relationships pointing into a junction (middle) entity.
-  > A junction entity resolves many-to-many into two one-to-many links, which is how the schema implements it.
-- By merging the two entities into one box.
-  > Merging would lose the separate entities and their independent rows.
+  > A junction entity resolves the many-to-many into two one-to-many links, which is how the schema actually implements it.
+- By drawing a single line with no key columns on either entity.
+  > A line alone cannot store the pairings; the connections need a junction table holding a foreign key to each side.
 - By removing the relationship line entirely.
-  > The relationship still exists; it is expressed through the junction entity.
+  > The relationship still exists and must be represented; it is expressed through the junction entity.
 
-Many-to-many is drawn (and built) as two one-to-many links through a junction entity.`}
+A many-to-many is realized as two one-to-many links through a junction entity holding a foreign key to each side.`}
 />

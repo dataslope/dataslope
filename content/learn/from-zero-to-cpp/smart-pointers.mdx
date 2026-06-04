@@ -235,6 +235,7 @@ int main() {
 - It allows multiple owners.
   > That is what \`shared_ptr\` does.
 - [o] It applies RAII: the destructor runs on scope exit and reliably deletes the owned object, eliminating leaks, double-deletes, and use-after-free bugs on the *owner* side.
+  > Ownership is tied to a scope, so cleanup happens automatically on every path.
 - It is the only legal way to use the heap in modern C++.
   > Raw \`new\` is still legal; just usually unwise.`}
 />
@@ -247,6 +248,7 @@ int main() {
 - For all polymorphic objects.
   > Polymorphism does not by itself require shared ownership.
 - [o] When the lifetime of the object is genuinely shared across multiple owners that may release it in any order — and \`unique_ptr\` cannot capture that.
+  > The reference count keeps the object alive until the last owner is gone.
 - For any object larger than 64 bytes.
   > Size is unrelated to ownership shape.`}
 />

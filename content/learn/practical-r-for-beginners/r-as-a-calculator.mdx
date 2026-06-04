@@ -298,6 +298,7 @@ calculator: numbers in, numbers / booleans out.
 - \`(0.1 + 0.2) == 0.3\`
   > This returns \`FALSE\` because of floating-point representation issues.
 - \`(0.1 + 0.2) ~ 0.3\`
+  > \`~\` builds a model formula; it does not test approximate equality.
 - [o] \`all.equal(0.1 + 0.2, 0.3)\`
   > \`all.equal()\` is R's idiom for "are these approximately equal within tolerance?"
 - \`(0.1 + 0.2) === 0.3\`
@@ -307,13 +308,16 @@ calculator: numbers in, numbers / booleans out.
 <MultipleChoice
   markdown={`What does \`2 + 3 * 4 ^ 2\` evaluate to in R?
 
+*Hint: precedence order is exponentiation (\`^\`), then multiplication (\`*\`), then addition (\`+\`).*
+
 - 80
   > That would require \`(2 + 3) * 4 ^ 2 = 5 * 16\`.
 - 196
   > That would require \`((2 + 3) * 4) ^ 2 = 400\` — not this either.
 - [o] 50
   > Apply exponentiation first: \`4 ^ 2 = 16\`. Then multiplication: \`3 * 16 = 48\`. Then addition: \`2 + 48 = 50\`.
-- 100`}
+- 100
+  > This treats the expression left to right (\`((2 + 3) * 4)... \`) instead of honoring precedence.`}
 />
 
 ## Challenge: tip calculator

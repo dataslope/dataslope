@@ -344,6 +344,7 @@ careful."
 - The runtime checks types as the program runs
   > That's dynamic typing.
 - [o] The compiler knows the type of every variable and refuses to compile code that uses values in a way that doesn't match their type
+  > Type mismatches are caught at compile time, before the program ever runs.
 - C# uses no types at all
   > C# is one of the most strongly typed mainstream languages.`}
 />
@@ -358,6 +359,8 @@ b.Add(3);
 \`\`\`
 
 What is in \`a\`?
+
+*Hint: \`List<T>\` is a reference type — think about whether \`b = a\` copies the list or just another name for it.*
 
 - \`[1, 2]\`
   > Both variables point to the same list — \`b.Add(3)\` affects what \`a\` sees.

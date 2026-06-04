@@ -247,6 +247,7 @@ month the marketing team says "make shipping free above $40" or
 - The compiler inlines them automatically
   > It may, but that's not the maintainability reason.
 - [o] Each method reads like a sentence, can be understood in isolation, and can be changed without affecting unrelated logic
+  > Small named methods lower the amount a reader must hold in their head at once.
 - The JIT runs faster on small methods
   > That's a tiny detail at best, not the point.`}
 />
@@ -272,6 +273,7 @@ month the marketing team says "make shipping free above $40" or
 - It needs more methods
   > It needs fewer responsibilities, not more methods.
 - [o] It is doing too many unrelated things — the word "and" in its description hints that it should be split into several focused classes
+  > Each responsibility (parse, validate, save, email) belongs in its own focused class.
 - It should be made \`abstract\`
   > Abstractness doesn't address the responsibility problem.`}
 />

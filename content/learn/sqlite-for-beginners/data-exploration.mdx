@@ -213,6 +213,8 @@ A small \`LIMIT\` gives a quick, cheap look at representative rows.`}
 <MultipleChoice
   markdown={`A column \`amount\` has \`COUNT(*) = 200\` but \`COUNT(amount) = 188\`. What does that tell you?
 
+*Hint: \`COUNT(*)\` counts all rows, while \`COUNT(amount)\` counts only rows where \`amount\` is present.*
+
 - The table has 388 rows.
   > These are two counts of the same 200 rows, not two separate tables to add together.
 - Nothing — the two counts should always match.

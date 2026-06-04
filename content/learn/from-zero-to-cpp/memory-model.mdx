@@ -311,6 +311,8 @@ container/pointer to do it for you.
 <MultipleChoice
   markdown={`Which of these allocations is cheapest *at runtime*?
 
+*Hint: anything involving \`new\` or a heap buffer pays allocator bookkeeping; a plain local does not.*
+
 - \`new std::vector<int>(1000)\`
   > That allocates the vector handle on the heap AND the 1000-int buffer on the heap.
 - [o] \`int x = 0;\` inside a function.

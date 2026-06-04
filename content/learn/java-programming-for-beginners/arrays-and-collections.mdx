@@ -255,6 +255,7 @@ more often than bare arrays.
 - It is faster
   > Arrays are slightly faster for primitives.
 - [o] It can grow and shrink, has a richer API, and integrates with the rest of the collections framework
+  > Flexibility and the collections API matter more than raw speed in most everyday code.
 - It uses less memory
   > It actually uses more (boxing overhead).
 - The compiler refuses to use \`int[]\`
@@ -269,6 +270,7 @@ more often than bare arrays.
 - Nothing — that's the recommended pattern
   > Not recommended; it throws.
 - [o] It throws \`ConcurrentModificationException\` because the iterator detects the structural change
+  > The iterator notices the list changed underneath it and fails fast instead of returning garbage.
 - It silently loses one element
   > It throws; it does not silently corrupt.`}
 />

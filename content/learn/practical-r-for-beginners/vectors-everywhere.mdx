@@ -241,11 +241,16 @@ really starts to shine.
 <MultipleChoice
   markdown={`Given \`x <- c(10, 20, 30, 40, 50)\`, what does \`x[-2]\` return?
 
+*Hint: in R a negative index does not count from the end (as in some languages) — it drops that position.*
+
 - \`20\`
+  > That is \`x[2]\`. A negative index does not select the second element; it removes it.
 - \`40\`
+  > A negative index in R does not mean "second from the end" the way it does in some other languages.
 - [o] \`10 30 40 50\`
   > Negative indices in R mean *exclude this position*. \`x[-2]\` returns everything except the second element.
-- \`50 40 30 10\` (reversed without the second)`}
+- \`50 40 30 10\` (reversed without the second)
+  > Negative indexing removes a position but does not reverse the remaining order.`}
 />
 
 ## Mini challenge: pick out the weekdays

@@ -539,11 +539,14 @@ retry(flaky, 5)
 <MultipleChoice
   markdown={`Which snippet runs the two fetches *concurrently* (overlapping in time)?
 
+*Hint: look for the version where both \`fetch\` calls are *started* before any \`await\` pauses execution.*
+
 - 
   \`\`\`javascript
   const a = await fetchA();
   const b = await fetchB();
   \`\`\`
+  > The \`await\` on the first line pauses until \`fetchA()\` fully settles, and only then does \`fetchB()\` even start. The two never overlap, so this is sequential.
 - [o] 
   \`\`\`javascript
   const pa = fetchA();
@@ -556,10 +559,12 @@ retry(flaky, 5)
   await fetchA();
   await fetchB();
   \`\`\`
+  > Same problem as the first snippet: the \`await\` in front of \`fetchA()\` blocks until it finishes before \`fetchB()\` starts. The results are discarded, but the timing is still one-after-the-other.
 - 
   \`\`\`javascript
   fetchA().then((a) => fetchB().then((b) => ...));
   \`\`\`
+  > Nesting \`fetchB()\` inside \`fetchA()\`'s \`.then\` means \`fetchB()\` is only started once \`fetchA()\` has resolved. The promises run in sequence, not concurrently.
 
 The trick to concurrent awaits: *start* all the promises first, *then* await them together. If you write \`await\` in front of each call, you've serialised them.`}
 />

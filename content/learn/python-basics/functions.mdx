@@ -540,7 +540,7 @@ print(f(2))
 - \`[1]\\n[2]\`
   > A new \`[]\` is **not** created on each call when the default is a literal. The default is evaluated once at function definition time.
 - [o] \`[1]\\n[1, 2]\`
-  > **Correct.** The default list is evaluated once at \`def\` time and shared across calls. This is the classic mutable-default footgun.
+  > The default list is evaluated once at \`def\` time and shared across calls. This is the classic mutable-default footgun.
 - \`[1, 2]\\n[1, 2]\`
   > The second call does not create a new list; it appends to the same one from the first call.
 - A \`TypeError\`
@@ -551,7 +551,7 @@ print(f(2))
   markdown={`Given \`def f(a, b, /, c, *, d): ...\`, which call is valid?
 
 - [o] \`f(1, 2, 3, d=4)\`
-  > **Correct.** \`a\` and \`b\` are positional-only, \`c\` can be positional or keyword, \`d\` must be keyword.
+  > \`a\` and \`b\` are positional-only, \`c\` can be positional or keyword, \`d\` must be keyword.
 - \`f(a=1, b=2, c=3, d=4)\`
   > \`a\` and \`b\` are positional-only (left of \`/\`), so they cannot be passed by name.
 - \`f(1, 2, 3, 4)\`
@@ -566,7 +566,7 @@ print(f(2))
 - \`0\`
   > No, the default return value is not zero.
 - [o] \`None\`
-  > **Correct.** A function without an explicit \`return\` returns \`None\`.
+  > A function without an explicit \`return\` returns \`None\`.
 - An empty string \`""\`
   > No, the default return value is not an empty string.
 - It raises a \`SyntaxError\`
@@ -579,7 +579,7 @@ print(f(2))
 - \`lambda\` functions can contain multiple statements.
   > No, a \`lambda\` is limited to a single expression.
 - [o] \`lambda\` functions are anonymous and show up as \`<lambda>\` in tracebacks.
-  > **Correct.** Unlike \`def\`, a \`lambda\` has no name and appears as \`<lambda>\` in error messages.
+  > Unlike \`def\`, a \`lambda\` has no name and appears as \`<lambda>\` in error messages.
 - \`lambda\` functions are faster than \`def\` functions.
   > No, there is no performance difference.
 - \`lambda\` functions cannot take arguments.
@@ -592,7 +592,7 @@ print(f(2))
 - It captures extra positional arguments into a tuple.
   > That is what \`*args\` does in the **function definition**. In a **function call**, \`*\` does the opposite.
 - [o] It expands an iterable into separate positional arguments.
-  > **Correct.** \`func(*[1, 2, 3])\` is equivalent to \`func(1, 2, 3)\`.
+  > \`func(*[1, 2, 3])\` is equivalent to \`func(1, 2, 3)\`.
 - It makes the argument keyword-only.
   > No, that is what \`*\` does in the function signature when placed before parameter names.
 - It creates a pointer to the iterable.
@@ -607,7 +607,7 @@ print(f(2))
 - They are enforced by the Python interpreter at runtime.
   > No, the Python interpreter ignores type hints at runtime.
 - [o] They help tools like \`mypy\` catch bugs and improve IDE autocompletion.
-  > **Correct.** Type hints are for static analysis tools and IDEs, not the runtime.
+  > Type hints are for static analysis tools and IDEs, not the runtime.
 - They are required for all functions in Python 3.10+.
   > No, type hints remain optional in all Python versions.`}
 />

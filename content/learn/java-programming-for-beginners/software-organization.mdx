@@ -200,6 +200,7 @@ That is the entire game.
 - The compiler refuses to allow it
   > It allows it; this is a design rule, not a compiler rule.
 - [o] It couples the core business rules to a specific technology choice, making the domain hard to test, hard to reuse, and hard to evolve as the infrastructure changes
+  > The domain should stay independent of databases and frameworks so it can be tested and reused freely.
 - It causes a stack overflow
   > It does not.`}
 />
@@ -212,6 +213,7 @@ That is the entire game.
 - "Many classes"
   > Not the summary.
 - [o] "High cohesion, low coupling"
+  > Keep related things together and minimize how much one module must know about another.
 - "Latest framework"
   > Not the summary.`}
 />

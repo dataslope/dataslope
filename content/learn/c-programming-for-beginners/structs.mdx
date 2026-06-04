@@ -331,10 +331,14 @@ y.a = 99;
 printf("%d %d\\n", x.a, y.a);
 \`\`\`
 
+*Hint: the \`printf\` prints \`x.a\` first, then \`y.a\`. Decide whether the assignment to \`y\` changes \`x\`.*
+
 - \`99 99\`
+  > This would require \`x\` and \`y\` to share storage. They don't: \`S y = x;\` copies, so changing \`y\` leaves \`x\` alone.
 - \`99 1\`
+  > This has the two values swapped. \`printf\` prints \`x.a\` (still \`1\`) before \`y.a\` (now \`99\`).
 - [o] \`1 99\`
-  > Struct assignment makes a full copy. Modifying \`y.a\` doesn't touch \`x\`.
+  > Struct assignment makes a full copy. \`x.a\` stays \`1\`, and the modified \`y.a\` is \`99\`, printed in that order.
 - The code is invalid; you can't assign one struct to another.
 
 If \`S\` had contained a pointer field, only the pointer value (the address) would have been copied, not the data the pointer points at — that's known as a "shallow copy" and is something to watch out for once your structs start owning heap memory.`}

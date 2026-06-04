@@ -209,6 +209,7 @@ int main() {
 - It does not; it works on any range.
   > It works, but produces nonsense on unsorted input.
 - [o] It uses binary search internally; binary search is correct only if the elements are arranged in order.
+  > Each comparison discards half the range, which only works when the data is sorted.
 - It uses hashing.
   > It does not.`}
 />

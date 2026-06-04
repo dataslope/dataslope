@@ -324,10 +324,13 @@ int *p = &n;
 What is the value of \`n\` afterwards?
 
 - 5
+  > \`5\` was \`n\`'s value before the assignment; \`*p = 10\` overwrites it through the pointer.
 - The address of \`n\`.
+  > \`p\` holds \`n\`'s address, but \`*p = 10\` writes through \`p\`, storing the *value* \`10\` into \`n\`.
 - [o] 10
   > \`*p = 10\` writes \`10\` into the memory location \`p\` points at, which is \`n\`'s memory.
 - Undefined, because \`p\` was reassigned.
+  > \`p\` was never reassigned — it still points at \`n\`. Only the value at \`n\` was changed, and that change is well-defined.
 
 \`p\` is just a sticky note with \`n\`'s address on it; \`*p = 10\` follows the sticky note to \`n\` and writes \`10\` there.`}
 />
@@ -336,8 +339,11 @@ What is the value of \`n\` afterwards?
   markdown={`What is the type of the expression \`&x\` if \`x\` is declared as \`double x;\`?
 
 - \`double\`
+  > \`x\` itself is a \`double\`, but \`&x\` is the *address* of \`x\`, which is a pointer type, not a plain \`double\`.
 - \`int *\`
+  > The target type follows the operand. \`x\` is a \`double\`, not an \`int\`, so \`&x\` is not an \`int *\`.
 - \`void *\`
+  > A \`double *\` can be *converted* to \`void *\`, but the type of the expression \`&x\` itself is the specific \`double *\`.
 - [o] \`double *\`
   > The address-of operator yields a pointer whose target type is the same as the operand's type — so \`&x\` where \`x\` is a \`double\` is a \`double *\`.
 

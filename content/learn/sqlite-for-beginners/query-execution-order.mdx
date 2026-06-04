@@ -170,6 +170,8 @@ Execution starts with \`FROM\`; \`SELECT\` and \`ORDER BY\` come much later.`}
 <MultipleChoice
   markdown={`Why can a column alias defined in \`SELECT\` be used in \`ORDER BY\` but **not** in \`WHERE\`?
 
+*Hint: compare where each clause sits in the execution order relative to \`SELECT\`.*
+
 - Because \`ORDER BY\` is optional and \`WHERE\` is required.
   > Being optional or not has nothing to do with alias visibility.
 - [o] Because \`WHERE\` runs before \`SELECT\` (so the alias does not exist yet), while \`ORDER BY\` runs after \`SELECT\`.
@@ -184,6 +186,8 @@ Execution starts with \`FROM\`; \`SELECT\` and \`ORDER BY\` come much later.`}
 
 <MultipleChoice
   markdown={`Why must you filter on \`SUM(amount) > 50\` using \`HAVING\` rather than \`WHERE\`?
+
+*Hint: think about when the group's \`SUM\` first exists in the execution order.*
 
 - Because \`WHERE\` cannot contain numbers.
   > \`WHERE\` handles numeric comparisons fine; the issue is when the sum is computed.

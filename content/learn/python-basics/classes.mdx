@@ -679,7 +679,7 @@ assert c.value == 0`,
 - It is a keyword that Python requires in method definitions.
   > No, \`self\` is just a convention; the name is not special.
 - [o] It is the conventional name for the first parameter, which receives the instance.
-  > **Correct.** Python passes the instance automatically; we name it \`self\` by convention.
+  > Python passes the instance automatically; we name it \`self\` by convention.
 - It refers to the class, not the instance.
   > No, \`self\` is the instance. The class is \`cls\` in \`@classmethod\`.
 - It is automatically defined; you do not need to include it in method signatures.
@@ -692,7 +692,7 @@ assert c.value == 0`,
 - Only \`__init__\`.
   > No, it also generates \`__repr__\` and \`__eq__\` by default.
 - [o] \`__init__\`, \`__repr__\`, and \`__eq__\` (and optionally \`__hash__\` if \`frozen=True\`).
-  > **Correct.** Dataclasses reduce boilerplate for data-holding classes.
+  > Dataclasses reduce boilerplate for data-holding classes by generating these methods from the annotated fields.
 - Runtime type validation for all fields.
   > No, type hints are not enforced at runtime by \`@dataclass\`. Use Pydantic for that.
 - Private attributes for all fields.
@@ -705,7 +705,7 @@ assert c.value == 0`,
 - They are synonyms; Python 3 renamed \`__str__\` to \`__repr__\`.
   > No, both exist and serve different purposes.
 - [o] \`__repr__\` is unambiguous for developers; \`__str__\` is user-friendly.
-  > **Correct.** \`__repr__\` should ideally let you reconstruct the object; \`__str__\` is what \`print()\` uses.
+  > \`__repr__\` should ideally let you reconstruct the object; \`__str__\` is what \`print()\` uses.
 - \`__repr__\` is for built-in types; \`__str__\` is for user classes.
   > No, both can be defined on any class.
 - \`__str__\` is automatically generated; \`__repr__\` must be written by hand.
@@ -718,7 +718,7 @@ assert c.value == 0`,
 - When the method does not need access to \`self\`.
   > That is \`@staticmethod\`. \`@classmethod\` receives \`cls\`.
 - [o] When the method needs to access the class itself, often for alternative constructors.
-  > **Correct.** \`@classmethod\` is commonly used for factory methods that return \`cls(...)\`.
+  > \`@classmethod\` is commonly used for factory methods that return \`cls(...)\`.
 - When the method modifies a class attribute.
   > You can do that with \`@classmethod\`, but it is not the primary reason to use it.
 - When the method is private.
@@ -731,7 +731,7 @@ assert c.value == 0`,
 - Python will raise a \`SyntaxError\`.
   > No, it is legal; Python just sets \`__hash__ = None\`.
 - [o] Instances become unhashable and cannot be used as dict keys or in sets.
-  > **Correct.** If \`__eq__\` is defined but \`__hash__\` is not, \`__hash__\` is set to \`None\`, making instances unhashable.
+  > If \`__eq__\` is defined but \`__hash__\` is not, \`__hash__\` is set to \`None\`, making instances unhashable.
 - \`__eq__\` comparisons will always return \`False\`.
   > No, \`__eq__\` works fine; the issue is hashing.
 - The class becomes abstract and cannot be instantiated.
@@ -744,7 +744,7 @@ assert c.value == 0`,
 - Each instance gets its own copy of the list.
   > No, class attributes are shared by all instances.
 - [o] The change is visible in all instances because they share the same list object.
-  > **Correct.** Mutable class attributes are a common gotcha. Always initialize mutable per-instance data in \`__init__\`.
+  > Mutable class attributes are a common gotcha. Always initialize mutable per-instance data in \`__init__\`.
 - Python raises a \`TypeError\`.
   > No, it is legal; just usually not what you want.
 - The class attribute becomes an instance attribute.

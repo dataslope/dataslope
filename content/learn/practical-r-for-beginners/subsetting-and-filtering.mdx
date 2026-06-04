@@ -187,10 +187,13 @@ then use those positions as row indices.
   markdown={`Which expression filters \`iris\` to rows where the species is either "setosa" or "versicolor"?
 
 - \`iris[iris$Species == "setosa" == "versicolor", ]\`
+  > Chaining \`==\` like this does not test membership; it compares the first result to \`"versicolor"\` and gives nonsense.
 - [o] \`iris[iris$Species %in% c("setosa", "versicolor"), ]\`
   > \`%in%\` is the idiomatic way to match against a set of values.
 - \`iris[iris$Species = "setosa" | "versicolor", ]\`
-- \`iris[in(iris$Species, "setosa", "versicolor"), ]\``}
+  > A single \`=\` is assignment, not comparison, and \`| "versicolor"\` is not a valid condition.
+- \`iris[in(iris$Species, "setosa", "versicolor"), ]\`
+  > There is no \`in()\` function in R; the membership operator is \`%in%\`.`}
 />
 
 <MultipleChoice
