@@ -68,6 +68,18 @@ actual accounts.
   adapter="csharp"
   starterCode={`using System;
 
+var alice = new BankAccount();
+alice.Owner = "Alice";
+alice.Deposit(100);
+alice.Withdraw(40);
+
+var bob = new BankAccount();
+bob.Owner = "Bob";
+bob.Deposit(500);
+
+Console.WriteLine($"{alice.Owner}: {alice.Balance}");
+Console.WriteLine($"{bob.Owner}: {bob.Balance}");
+
 public class BankAccount
 {
     public string Owner;
@@ -82,18 +94,6 @@ public class BankAccount
         Balance -= amount;
     }
 }
-
-var alice = new BankAccount();
-alice.Owner = "Alice";
-alice.Deposit(100);
-alice.Withdraw(40);
-
-var bob = new BankAccount();
-bob.Owner = "Bob";
-bob.Deposit(500);
-
-Console.WriteLine($"{alice.Owner}: {alice.Balance}");
-Console.WriteLine($"{bob.Owner}: {bob.Balance}");
 `}
 />
 
@@ -132,6 +132,11 @@ object is created, and is the natural place to put initialization.
   adapter="csharp"
   starterCode={`using System;
 
+var alice = new BankAccount("Alice", 100);
+alice.Withdraw(40);
+
+Console.WriteLine($"{alice.Owner}: {alice.Balance}");
+
 public class BankAccount
 {
     public string Owner;
@@ -152,11 +157,6 @@ public class BankAccount
         Balance -= amount;
     }
 }
-
-var alice = new BankAccount("Alice", 100);
-alice.Withdraw(40);
-
-Console.WriteLine($"{alice.Owner}: {alice.Balance}");
 `}
 />
 
@@ -173,6 +173,9 @@ parameter has the same name as a field.
 <CodeBlock
   adapter="csharp"
   starterCode={`using System;
+
+var p = new Point(3, 4);
+Console.WriteLine(p.DistanceFromOrigin()); // 5
 
 public class Point
 {
@@ -191,9 +194,6 @@ public class Point
         return Math.Sqrt(X * X + Y * Y);
     }
 }
-
-var p = new Point(3, 4);
-Console.WriteLine(p.DistanceFromOrigin()); // 5
 `}
 />
 
@@ -209,6 +209,9 @@ validation or computed logic without breaking callers.
   adapter="csharp"
   starterCode={`using System;
 
+var p = new Person { Name = "Ada", Age = 30 };
+Console.WriteLine($"{p.Name}, adult? {p.IsAdult}");
+
 public class Person
 {
     // auto-implemented property — the compiler creates a hidden field
@@ -218,9 +221,6 @@ public class Person
     // computed (read-only) property
     public bool IsAdult => Age >= 18;
 }
-
-var p = new Person { Name = "Ada", Age = 30 };
-Console.WriteLine($"{p.Name}, adult? {p.IsAdult}");
 `}
 />
 

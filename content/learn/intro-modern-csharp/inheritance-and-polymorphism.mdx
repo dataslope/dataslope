@@ -21,6 +21,10 @@ class** adds to or overrides what the base provides.
   adapter="csharp"
   starterCode={`using System;
 
+var d = new Dog("Rex");
+d.Eat();  // inherited from Animal
+d.Bark(); // defined on Dog
+
 public class Animal
 {
     public string Name { get; }
@@ -40,10 +44,6 @@ public class Dog : Animal // "Dog : Animal" reads "Dog inherits from Animal"
 
     public void Bark() => Console.WriteLine($"{Name} says woof!");
 }
-
-var d = new Dog("Rex");
-d.Eat();  // inherited from Animal
-d.Bark(); // defined on Dog
 `}
 />
 
@@ -73,6 +73,12 @@ works, not just add new methods. The base marks the method
   adapter="csharp"
   starterCode={`using System;
 
+Animal a = new Dog("Rex");
+a.Speak(); // "Rex barks!" — even though a's declared type is Animal
+
+a = new Cat("Whiskers");
+a.Speak(); // "Whiskers meows."
+
 public class Animal
 {
     public string Name { get; }
@@ -99,12 +105,6 @@ public class Cat : Animal
     }
     public override void Speak() => Console.WriteLine($"{Name} meows.");
 }
-
-Animal a = new Dog("Rex");
-a.Speak(); // "Rex barks!" — even though a's declared type is Animal
-
-a = new Cat("Whiskers");
-a.Speak(); // "Whiskers meows."
 `}
 />
 
@@ -141,6 +141,10 @@ method** on an **abstract class**.
   adapter="csharp"
   starterCode={`using System;
 
+Shape[] shapes = { new Circle(3), new Square(4) };
+foreach (var s in shapes)
+    s.Describe();
+
 public abstract class Shape
 {
     public abstract double Area(); // no body — derived classes MUST override
@@ -167,10 +171,6 @@ public class Square : Shape
     }
     public override double Area() => Side * Side;
 }
-
-Shape[] shapes = { new Circle(3), new Square(4) };
-foreach (var s in shapes)
-    s.Describe();
 `}
 />
 
@@ -188,6 +188,15 @@ promises to provide. It's pure shape — no fields, no behavior.
   adapter="csharp"
   starterCode={`using System;
 
+void GreetEveryone(IGreeter g, string[] names)
+{
+    foreach (var n in names)
+        Console.WriteLine(g.Greet(n));
+}
+
+GreetEveryone(new English(), new[] { "Ada", "Bob" });
+GreetEveryone(new Japanese(), new[] { "アダ", "ボブ" });
+
 public interface IGreeter
 {
     string Greet(string name);
@@ -202,15 +211,6 @@ public class Japanese : IGreeter
 {
     public string Greet(string name) => $"こんにちは、{name}さん!";
 }
-
-void GreetEveryone(IGreeter g, string[] names)
-{
-    foreach (var n in names)
-        Console.WriteLine(g.Greet(n));
-}
-
-GreetEveryone(new English(), new[] { "Ada", "Bob" });
-GreetEveryone(new Japanese(), new[] { "アダ", "ボブ" });
 `}
 />
 
