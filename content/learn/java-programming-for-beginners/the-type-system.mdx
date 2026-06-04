@@ -258,23 +258,23 @@ where F is the \`double\` value and R is the cast-to-int value.`}
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        double celsius = 36.6;
+  public static void main(String[] args) {
+    double celsius = 36.6;
 
-        // TODO: compute fahrenheit and rounded
-    }
+    // TODO: compute fahrenheit and rounded
+  }
 }
 `,
       solutionContent: `public class Main {
-    public static void main(String[] args) {
-        double celsius = 36.6;
+  public static void main(String[] args) {
+    double celsius = 36.6;
 
-        double fahrenheit = celsius * 9 / 5 + 32;
-        int    rounded    = (int) fahrenheit;
+    double fahrenheit = celsius * 9 / 5 + 32;
+    int rounded = (int)fahrenheit;
 
-        System.out.println("fahrenheit = " + fahrenheit);
-        System.out.println("rounded = " + rounded);
-    }
+    System.out.println("fahrenheit = " + fahrenheit);
+    System.out.println("rounded = " + rounded);
+  }
 }
 `,
     },

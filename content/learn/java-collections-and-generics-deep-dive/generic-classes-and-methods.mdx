@@ -170,23 +170,25 @@ typed LIFO container — `push`, `pop`, `peek`, `size`.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Stack<String> s = new Stack<>();
-        s.push("first");
-        s.push("second");
-        s.push("third");
+  public static void main(String[] args) {
+    Stack<String> s = new Stack<>();
+    s.push("first");
+    s.push("second");
+    s.push("third");
 
-        System.out.println("size = "    + s.size());
-        System.out.println("peek = "    + s.peek());
-        System.out.println("pop  = "    + s.pop());
-        System.out.println("pop  = "    + s.pop());
-        System.out.println("size = "    + s.size());
+    System.out.println("size = " + s.size());
+    System.out.println("peek = " + s.peek());
+    System.out.println("pop  = " + s.pop());
+    System.out.println("pop  = " + s.pop());
+    System.out.println("size = " + s.size());
 
-        // A different element type — entirely independent:
-        Stack<Integer> ns = new Stack<>();
-        ns.push(1); ns.push(2); ns.push(3);
-        System.out.println("ns pop = " + ns.pop());
-    }
+    // A different element type — entirely independent:
+    Stack<Integer> ns = new Stack<>();
+    ns.push(1);
+    ns.push(2);
+    ns.push(3);
+    System.out.println("ns pop = " + ns.pop());
+  }
 }
 `,
     },
@@ -197,22 +199,24 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 public class Stack<E> {
-    private final List<E> data = new ArrayList<>();
+  private final List<E> data = new ArrayList<>();
 
-    public void push(E e) { data.add(e); }
+  public void push(E e) { data.add(e); }
 
-    public E pop() {
-        if (data.isEmpty()) throw new NoSuchElementException();
-        return data.remove(data.size() - 1);
-    }
+  public E pop() {
+    if (data.isEmpty())
+      throw new NoSuchElementException();
+    return data.remove(data.size() - 1);
+  }
 
-    public E peek() {
-        if (data.isEmpty()) throw new NoSuchElementException();
-        return data.get(data.size() - 1);
-    }
+  public E peek() {
+    if (data.isEmpty())
+      throw new NoSuchElementException();
+    return data.get(data.size() - 1);
+  }
 
-    public int     size()    { return data.size();    }
-    public boolean isEmpty() { return data.isEmpty(); }
+  public int size() { return data.size(); }
+  public boolean isEmpty() { return data.isEmpty(); }
 }
 `,
     },
@@ -332,32 +336,31 @@ ada / 36
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Pair<String, Integer> p  = new Pair<>("ada", 36);
-        Pair<Integer, String> sp = p.swap();
-        System.out.println(p.first() + " / " + p.second());
-        System.out.println(sp.first() + " / " + sp.second());
-    }
+  public static void main(String[] args) {
+    Pair<String, Integer> p = new Pair<>("ada", 36);
+    Pair<Integer, String> sp = p.swap();
+    System.out.println(p.first() + " / " + p.second());
+    System.out.println(sp.first() + " / " + sp.second());
+  }
 }
 `,
     },
     {
       filename: "Pair.java",
       initialContent: `public class Pair<A, B> {
-    // TODO
+  // TODO
 }
 `,
       solutionContent: `public class Pair<A, B> {
-    private final A first;
-    private final B second;
-    public Pair(A first, B second) {
-        this.first = first; this.second = second;
-    }
-    public A first()  { return first;  }
-    public B second() { return second; }
-    public Pair<B, A> swap() {
-        return new Pair<>(second, first);
-    }
+  private final A first;
+  private final B second;
+  public Pair(A first, B second) {
+    this.first = first;
+    this.second = second;
+  }
+  public A first() { return first; }
+  public B second() { return second; }
+  public Pair<B, A> swap() { return new Pair<>(second, first); }
 }
 `,
     },

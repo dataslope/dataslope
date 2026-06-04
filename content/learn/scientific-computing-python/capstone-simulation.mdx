@@ -71,9 +71,11 @@ for a in sweep:
 
 summary = summarize(all_runs)
 for row in summary:
-    print(f"a = {row['a']:.4f}   "
-          f"P(extinction) = {row['p_extinction']:.2f}   "
-          f"⟨peak prey⟩ = {row['mean_peak_prey']:.1f}")
+    print(
+        f"a = {row['a']:.4f}   "
+        f"P(extinction) = {row['p_extinction']:.2f}   "
+        f"⟨peak prey⟩ = {row['mean_peak_prey']:.1f}"
+    )
 
 small_multiples(all_runs, sweep)
 plt.show()
@@ -84,35 +86,50 @@ plt.show()
       initialContent: `import numpy as np
 from scipy.integrate import solve_ivp
 
+
 def make_rhs(r, K, a, e, m, sigma, rng):
     """Returns f(t, y) with stochastic prey growth perturbation."""
+
     def f(t, z):
         x, y = z
         # Tiny random perturbation in prey growth to make seeds matter
         noise = sigma * rng.standard_normal()
-        return [r*x*(1 - x/K) - a*x*y + noise*x,
-                e*a*x*y - m*y]
+        return [r * x * (1 - x / K) - a * x * y + noise * x, e * a * x * y - m * y]
+
     return f
 
-def run_one(a, seed, r=1.0, K=200.0, e=0.1, m=0.4,
-            sigma=0.02, t_end=200.0):
+
+def run_one(a, seed, r=1.0, K=200.0, e=0.1, m=0.4, sigma=0.02, t_end=200.0):
     rng = np.random.default_rng(seed)
     rhs = make_rhs(r, K, a, e, m, sigma, rng)
 
     # Event: predators go extinct (y drops below 0.5)
-    def extinct(t, z): return z[1] - 0.5
+    def extinct(t, z):
+        return z[1] - 0.5
+
     extinct.terminal = True
     extinct.direction = -1
 
-    sol = solve_ivp(rhs, [0, t_end], y0=[40.0, 9.0],
-                    method="RK45", rtol=1e-7, atol=1e-9,
-                    events=extinct, dense_output=True, max_step=0.5)
+    sol = solve_ivp(
+        rhs,
+        [0, t_end],
+        y0=[40.0, 9.0],
+        method="RK45",
+        rtol=1e-7,
+        atol=1e-9,
+        events=extinct,
+        dense_output=True,
+        max_step=0.5,
+    )
 
     t = np.linspace(0, sol.t[-1], 400)
     x, y = sol.sol(t)
     return {
-        "a": a, "seed": seed,
-        "t": t, "x": x, "y": y,
+        "a": a,
+        "seed": seed,
+        "t": t,
+        "x": x,
+        "y": y,
         "extinct": bool(sol.t_events[0].size),
         "t_extinct": float(sol.t_events[0][0]) if sol.t_events[0].size else None,
     }
@@ -122,6 +139,7 @@ def run_one(a, seed, r=1.0, K=200.0, e=0.1, m=0.4,
       filename: "aggregate.py",
       initialContent: `import numpy as np
 from collections import defaultdict
+
 
 def summarize(runs):
     """Group runs by parameter 'a' and compute summary stats."""
@@ -133,12 +151,14 @@ def summarize(runs):
     for a, group in sorted(groups.items()):
         ext = [r["extinct"] for r in group]
         peaks = [float(np.max(r["x"])) for r in group]
-        out.append({
-            "a": a,
-            "n": len(group),
-            "p_extinction": np.mean(ext),
-            "mean_peak_prey": np.mean(peaks),
-        })
+        out.append(
+            {
+                "a": a,
+                "n": len(group),
+                "p_extinction": np.mean(ext),
+                "mean_peak_prey": np.mean(peaks),
+            }
+        )
     return out
 `,
     },
@@ -147,14 +167,21 @@ def summarize(runs):
       initialContent: `import numpy as np
 import matplotlib.pyplot as plt
 
+
 def small_multiples(runs, sweep):
     cols = len(sweep)
-    fig, axes = plt.subplots(1, cols, figsize=(2.5*cols, 3),
-                             sharex=True, sharey=True,
-                             constrained_layout=True)
+    fig, axes = plt.subplots(
+        1,
+        cols,
+        figsize=(2.5 * cols, 3),
+        sharex=True,
+        sharey=True,
+        constrained_layout=True,
+    )
     for ax, a in zip(axes, sweep):
         for r in runs:
-            if r["a"] != a: continue
+            if r["a"] != a:
+                continue
             color = "tab:red" if r["extinct"] else "tab:blue"
             ax.plot(r["t"], r["x"], color=color, lw=0.8, alpha=0.7)
         ax.set_title(f"a = {a:.3f}", fontsize=10)

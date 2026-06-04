@@ -91,109 +91,112 @@ The given \`Main.java\` drives the behavior. Don't change it.`}
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Library lib = new Library();
-        lib.addBook(new Book("Effective Java", 2));
-        lib.addBook(new Book("Refactoring", 1));
+  public static void main(String[] args) {
+    Library lib = new Library();
+    lib.addBook(new Book("Effective Java", 2));
+    lib.addBook(new Book("Refactoring", 1));
 
-        System.out.println("Catalog:");
-        for (Book b : lib.catalog()) {
-            System.out.println("- " + b.title() + " (" + b.availableCopies() + " copies)");
-        }
-
-        Member ada = new Member("ada");
-        Member grace = new Member("grace");
-
-        System.out.println("borrow ok? " + tryBorrow(lib, ada, "Effective Java"));
-        System.out.println("borrow ok? " + tryBorrow(lib, grace, "Effective Java"));
-        System.out.println("borrow ok? " + tryBorrow(lib, ada, "Effective Java")); // none left
-        System.out.println("borrow ok? " + tryBorrow(lib, ada, "Unknown Title"));
-
-        System.out.println("After borrows:");
-        for (Book b : lib.catalog()) {
-            System.out.println("- " + b.title() + " (" + b.availableCopies() + " copies)");
-        }
-
-        System.out.println(ada.name() + " has " + ada.loanCount() + " loan(s)");
-        System.out.println(grace.name() + " has " + grace.loanCount() + " loan(s)");
-
-        System.out.println("return ok? " + tryReturn(lib, ada, "Effective Java"));
-        System.out.println("After ada returns Effective Java:");
-        for (Book b : lib.catalog()) {
-            System.out.println("- " + b.title() + " (" + b.availableCopies() + " copies)");
-        }
-
-        System.out.println("return ok? " + tryReturn(lib, ada, "Refactoring")); // not on loan
+    System.out.println("Catalog:");
+    for (Book b : lib.catalog()) {
+      System.out.println("- " + b.title() + " (" + b.availableCopies() +
+                         " copies)");
     }
 
-    static boolean tryBorrow(Library lib, Member m, String title) {
-        try {
-            lib.borrow(m, title);
-            return true;
-        } catch (BorrowException e) {
-            System.out.println("borrow failed: " + e.getMessage());
-            return false;
-        }
+    Member ada = new Member("ada");
+    Member grace = new Member("grace");
+
+    System.out.println("borrow ok? " + tryBorrow(lib, ada, "Effective Java"));
+    System.out.println("borrow ok? " + tryBorrow(lib, grace, "Effective Java"));
+    System.out.println("borrow ok? " +
+                       tryBorrow(lib, ada, "Effective Java")); // none left
+    System.out.println("borrow ok? " + tryBorrow(lib, ada, "Unknown Title"));
+
+    System.out.println("After borrows:");
+    for (Book b : lib.catalog()) {
+      System.out.println("- " + b.title() + " (" + b.availableCopies() +
+                         " copies)");
     }
 
-    static boolean tryReturn(Library lib, Member m, String title) {
-        try {
-            lib.returnBook(m, title);
-            return true;
-        } catch (BorrowException e) {
-            System.out.println("return failed: " + e.getMessage());
-            return false;
-        }
+    System.out.println(ada.name() + " has " + ada.loanCount() + " loan(s)");
+    System.out.println(grace.name() + " has " + grace.loanCount() + " loan(s)");
+
+    System.out.println("return ok? " + tryReturn(lib, ada, "Effective Java"));
+    System.out.println("After ada returns Effective Java:");
+    for (Book b : lib.catalog()) {
+      System.out.println("- " + b.title() + " (" + b.availableCopies() +
+                         " copies)");
     }
+
+    System.out.println("return ok? " +
+                       tryReturn(lib, ada, "Refactoring")); // not on loan
+  }
+
+  static boolean tryBorrow(Library lib, Member m, String title) {
+    try {
+      lib.borrow(m, title);
+      return true;
+    } catch (BorrowException e) {
+      System.out.println("borrow failed: " + e.getMessage());
+      return false;
+    }
+  }
+
+  static boolean tryReturn(Library lib, Member m, String title) {
+    try {
+      lib.returnBook(m, title);
+      return true;
+    } catch (BorrowException e) {
+      System.out.println("return failed: " + e.getMessage());
+      return false;
+    }
+  }
 }
 `,
     },
     {
       filename: "BorrowException.java",
       initialContent: `public class BorrowException extends RuntimeException {
-    // TODO
+  // TODO
 }
 `,
       solutionContent: `public class BorrowException extends RuntimeException {
-    public BorrowException(String message) {
-        super(message);
-    }
+  public BorrowException(String message) { super(message); }
 }
 `,
     },
     {
       filename: "Book.java",
       initialContent: `public class Book {
-    // TODO: title, totalCopies, availableCopies + methods
+  // TODO: title, totalCopies, availableCopies + methods
 }
 `,
       solutionContent: `public class Book {
-    private final String title;
-    private final int totalCopies;
-    private int availableCopies;
+  private final String title;
+  private final int totalCopies;
+  private int availableCopies;
 
-    public Book(String title, int totalCopies) {
-        this.title = title;
-        this.totalCopies = totalCopies;
-        this.availableCopies = totalCopies;
+  public Book(String title, int totalCopies) {
+    this.title = title;
+    this.totalCopies = totalCopies;
+    this.availableCopies = totalCopies;
+  }
+
+  public String title() { return title; }
+  public int totalCopies() { return totalCopies; }
+  public int availableCopies() { return availableCopies; }
+
+  void borrowOne() {
+    if (availableCopies == 0) {
+      throw new BorrowException("no copies available: " + title);
     }
+    availableCopies--;
+  }
 
-    public String title()       { return title; }
-    public int totalCopies()    { return totalCopies; }
-    public int availableCopies(){ return availableCopies; }
-
-    void borrowOne() {
-        if (availableCopies == 0) {
-            throw new BorrowException("no copies available: " + title);
-        }
-        availableCopies--;
+  void returnOne() {
+    if (availableCopies < totalCopies) {
+      availableCopies++;
     }
-
-    void returnOne() {
-        if (availableCopies < totalCopies) {
-            availableCopies++;
-        }
-    }
+  }
 }
 `,
     },
@@ -203,30 +206,24 @@ The given \`Main.java\` drives the behavior. Don't change it.`}
 import java.util.List;
 
 public class Member {
-    // TODO
+  // TODO
 }
 `,
       solutionContent: `import java.util.ArrayList;
 import java.util.List;
 
 public class Member {
-    private final String name;
-    private final List<Book> loans = new ArrayList<>();
+  private final String name;
+  private final List<Book> loans = new ArrayList<>();
 
-    public Member(String name) {
-        this.name = name;
-    }
+  public Member(String name) { this.name = name; }
 
-    public String name()  { return name; }
-    public int loanCount(){ return loans.size(); }
+  public String name() { return name; }
+  public int loanCount() { return loans.size(); }
 
-    void addLoan(Book b) {
-        loans.add(b);
-    }
+  void addLoan(Book b) { loans.add(b); }
 
-    boolean removeLoan(Book b) {
-        return loans.remove(b);
-    }
+  boolean removeLoan(Book b) { return loans.remove(b); }
 }
 `,
     },
@@ -237,7 +234,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 public class Library {
-    // TODO
+  // TODO
 }
 `,
       solutionContent: `import java.util.ArrayList;
@@ -245,35 +242,31 @@ import java.util.List;
 import java.util.TreeMap;
 
 public class Library {
-    private final TreeMap<String, Book> catalog = new TreeMap<>();
+  private final TreeMap<String, Book> catalog = new TreeMap<>();
 
-    public void addBook(Book b) {
-        catalog.put(b.title(), b);
-    }
+  public void addBook(Book b) { catalog.put(b.title(), b); }
 
-    public List<Book> catalog() {
-        return new ArrayList<>(catalog.values());
-    }
+  public List<Book> catalog() { return new ArrayList<>(catalog.values()); }
 
-    public void borrow(Member m, String title) {
-        Book b = catalog.get(title);
-        if (b == null) {
-            throw new BorrowException("unknown book: " + title);
-        }
-        b.borrowOne();
-        m.addLoan(b);
+  public void borrow(Member m, String title) {
+    Book b = catalog.get(title);
+    if (b == null) {
+      throw new BorrowException("unknown book: " + title);
     }
+    b.borrowOne();
+    m.addLoan(b);
+  }
 
-    public void returnBook(Member m, String title) {
-        Book b = catalog.get(title);
-        if (b == null) {
-            throw new BorrowException("unknown book: " + title);
-        }
-        if (!m.removeLoan(b)) {
-            throw new BorrowException("not on loan to this member: " + title);
-        }
-        b.returnOne();
+  public void returnBook(Member m, String title) {
+    Book b = catalog.get(title);
+    if (b == null) {
+      throw new BorrowException("unknown book: " + title);
     }
+    if (!m.removeLoan(b)) {
+      throw new BorrowException("not on loan to this member: " + title);
+    }
+    b.returnOne();
+  }
 }
 `,
     },

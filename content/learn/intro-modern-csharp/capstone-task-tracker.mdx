@@ -157,7 +157,9 @@ public class TaskList
 {
     // TODO: implement
     public TaskItem Add(string title) => null!;
-    public void Complete(int id) { }
+    public void Complete(int id)
+    {
+    }
     public int Remaining() => 0;
     public IEnumerable<TaskItem> All() => System.Array.Empty<TaskItem>();
 }
@@ -192,7 +194,9 @@ public class TaskList
     public int Remaining()
     {
         int n = 0;
-        foreach (var t in _items) if (!t.Done) n++;
+        foreach (var t in _items)
+            if (!t.Done)
+                n++;
         return n;
     }
 

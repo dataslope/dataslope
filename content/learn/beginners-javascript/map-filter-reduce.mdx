@@ -279,10 +279,10 @@ one module owns the transformations, another assembles them.
 
 const orders = [
   { month: "Jan", amount: 120 },
-  { month: "Jan", amount: 80  },
+  { month: "Jan", amount: 80 },
   { month: "Feb", amount: 200 },
-  { month: "Mar", amount: 50  },
-  { month: "Mar", amount: 75  },
+  { month: "Mar", amount: 50 },
+  { month: "Mar", amount: 75 },
   { month: "Mar", amount: 100 },
 ];
 
@@ -302,8 +302,9 @@ console.log("Top month:", topMonth(orders));
 function topMonth(orders) {
   const totals = revenueByMonth(orders);
   return Object.entries(totals).reduce(
-    (best, [month, amount]) => (amount > best.amount ? { month, amount } : best),
-    { month: null, amount: -Infinity }
+    (best, [month, amount]) =>
+      amount > best.amount ? { month, amount } : best,
+    { month: null, amount: -Infinity },
   );
 }
 

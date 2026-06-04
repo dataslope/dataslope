@@ -245,9 +245,11 @@ import matplotlib.pyplot as plt
 from plotting import phase_portrait
 from scipy.integrate import solve_ivp
 
+
 def vdp(t, z, mu=1.5):
     x, y = z
-    return [y, mu*(1-x*x)*y - x]
+    return [y, mu * (1 - x * x) * y - x]
+
 
 # Integrate several initial conditions
 trajectories = []
@@ -257,10 +259,14 @@ for x0 in np.linspace(-3, 3, 7):
     trajectories.append(sol.sol(tt).T)
 
 fig, ax = plt.subplots(figsize=(6, 5), constrained_layout=True)
-phase_portrait(ax, trajectories,
-               vector_field=lambda x, y: (y, 1.5*(1-x*x)*y - x),
-               xlim=(-3.5, 3.5), ylim=(-5, 5),
-               title="Van der Pol oscillator")
+phase_portrait(
+    ax,
+    trajectories,
+    vector_field=lambda x, y: (y, 1.5 * (1 - x * x) * y - x),
+    xlim=(-3.5, 3.5),
+    ylim=(-5, 5),
+    title="Van der Pol oscillator",
+)
 plt.show()
 `,
     },
@@ -268,8 +274,10 @@ plt.show()
       filename: "plotting.py",
       initialContent: `import numpy as np
 
-def phase_portrait(ax, trajectories, vector_field,
-                   xlim=(-3, 3), ylim=(-3, 3), grid=25, title=""):
+
+def phase_portrait(
+    ax, trajectories, vector_field, xlim=(-3, 3), ylim=(-3, 3), grid=25, title=""
+):
     """Plot trajectories on top of a streamplot of the vector field."""
     x = np.linspace(*xlim, grid)
     y = np.linspace(*ylim, grid)
@@ -278,10 +286,13 @@ def phase_portrait(ax, trajectories, vector_field,
     ax.streamplot(X, Y, U, V, color="lightgray", density=1.1, linewidth=0.6)
     for traj in trajectories:
         ax.plot(traj[:, 0], traj[:, 1], lw=1.2)
-    ax.set_xlim(xlim); ax.set_ylim(ylim)
-    ax.set_xlabel("x"); ax.set_ylabel("ẋ")
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
+    ax.set_xlabel("x")
+    ax.set_ylabel("ẋ")
     ax.set_aspect("equal")
-    if title: ax.set_title(title)
+    if title:
+        ax.set_title(title)
 `,
     },
   ]}

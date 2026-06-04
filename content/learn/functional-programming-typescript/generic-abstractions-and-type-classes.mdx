@@ -261,32 +261,38 @@ undefined
       filename: "main.ts",
       initialContent: `import { combineAll, sumSG, prodSG, stringSG } from "./semigroup";
 
-console.log(combineAll(sumSG,    [1, 2, 3, 4]));
-console.log(combineAll(prodSG,   [1, 2, 3, 4]));
+console.log(combineAll(sumSG, [1, 2, 3, 4]));
+console.log(combineAll(prodSG, [1, 2, 3, 4]));
 console.log(combineAll(stringSG, ["a", "b", "c"]));
-console.log(combineAll(sumSG,    []));
+console.log(combineAll(sumSG, []));
 `,
     },
     {
       filename: "semigroup.ts",
       initialContent: `export type Semigroup<A> = { concat: (x: A, y: A) => A };
 
-export const sumSG:    Semigroup<number> = { concat: (x, y) => x + y };
-export const prodSG:   Semigroup<number> = { concat: (x, y) => x * y };
+export const sumSG: Semigroup<number> = { concat: (x, y) => x + y };
+export const prodSG: Semigroup<number> = { concat: (x, y) => x * y };
 export const stringSG: Semigroup<string> = { concat: (x, y) => x + y };
 
-export function combineAll<A>(s: Semigroup<A>, xs: ReadonlyArray<A>): A | undefined {
+export function combineAll<A>(
+  s: Semigroup<A>,
+  xs: ReadonlyArray<A>,
+): A | undefined {
   // TODO: fold the list using s.concat.
   return undefined;
 }
 `,
       solutionContent: `export type Semigroup<A> = { concat: (x: A, y: A) => A };
 
-export const sumSG:    Semigroup<number> = { concat: (x, y) => x + y };
-export const prodSG:   Semigroup<number> = { concat: (x, y) => x * y };
+export const sumSG: Semigroup<number> = { concat: (x, y) => x + y };
+export const prodSG: Semigroup<number> = { concat: (x, y) => x * y };
 export const stringSG: Semigroup<string> = { concat: (x, y) => x + y };
 
-export function combineAll<A>(s: Semigroup<A>, xs: ReadonlyArray<A>): A | undefined {
+export function combineAll<A>(
+  s: Semigroup<A>,
+  xs: ReadonlyArray<A>,
+): A | undefined {
   if (xs.length === 0) return undefined;
   return xs.slice(1).reduce((acc, x) => s.concat(acc, x), xs[0]);
 }

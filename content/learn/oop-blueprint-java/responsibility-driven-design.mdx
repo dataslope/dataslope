@@ -105,34 +105,35 @@ everything"*. The flow of messages is the conversation.
       initialContent: `import java.util.Arrays;
 
 public class Main {
-    public static void main(String[] args) {
-        Menu menu = new Menu();
-        menu.add(new Drink("Espresso",   250));
-        menu.add(new Drink("Latte",      400));
-        menu.add(new Drink("Croissant",  300));
+  public static void main(String[] args) {
+    Menu menu = new Menu();
+    menu.add(new Drink("Espresso", 250));
+    menu.add(new Drink("Latte", 400));
+    menu.add(new Drink("Croissant", 300));
 
-        Order o = new Order();
-        o.add(new LineItem(menu.find("Latte"),     2));
-        o.add(new LineItem(menu.find("Croissant"), 1));
+    Order o = new Order();
+    o.add(new LineItem(menu.find("Latte"), 2));
+    o.add(new LineItem(menu.find("Croissant"), 1));
 
-        Payment p = new Payment();
-        p.charge(o);
+    Payment p = new Payment();
+    p.charge(o);
 
-        System.out.println(new Receipt().format(o));
-    }
+    System.out.println(new Receipt().format(o));
+  }
 }
 `,
     },
     {
       filename: "Drink.java",
       initialContent: `public class Drink {
-    private final String name;
-    private final int priceCents;
-    public Drink(String name, int priceCents) {
-        this.name = name; this.priceCents = priceCents;
-    }
-    public String name()  { return name; }
-    public int    price() { return priceCents; }
+  private final String name;
+  private final int priceCents;
+  public Drink(String name, int priceCents) {
+    this.name = name;
+    this.priceCents = priceCents;
+  }
+  public String name() { return name; }
+  public int price() { return priceCents; }
 }
 `,
     },
@@ -142,34 +143,36 @@ public class Main {
 import java.util.List;
 
 public class Menu {
-    private final List<Drink> drinks = new ArrayList<>();
+  private final List<Drink> drinks = new ArrayList<>();
 
-    public void add(Drink d) { drinks.add(d); }
+  public void add(Drink d) { drinks.add(d); }
 
-    public Drink find(String name) {
-        for (Drink d : drinks) {
-            if (d.name().equals(name)) return d;
-        }
-        throw new IllegalArgumentException("no such drink: " + name);
+  public Drink find(String name) {
+    for (Drink d : drinks) {
+      if (d.name().equals(name))
+        return d;
     }
+    throw new IllegalArgumentException("no such drink: " + name);
+  }
 }
 `,
     },
     {
       filename: "LineItem.java",
       initialContent: `public class LineItem {
-    private final Drink drink;
-    private final int   quantity;
+  private final Drink drink;
+  private final int quantity;
 
-    public LineItem(Drink drink, int quantity) {
-        if (quantity <= 0) throw new IllegalArgumentException("quantity > 0");
-        this.drink = drink;
-        this.quantity = quantity;
-    }
+  public LineItem(Drink drink, int quantity) {
+    if (quantity <= 0)
+      throw new IllegalArgumentException("quantity > 0");
+    this.drink = drink;
+    this.quantity = quantity;
+  }
 
-    public Drink drink()    { return drink; }
-    public int   quantity() { return quantity; }
-    public int   subtotal() { return drink.price() * quantity; }
+  public Drink drink() { return drink; }
+  public int quantity() { return quantity; }
+  public int subtotal() { return drink.price() * quantity; }
 }
 `,
     },
@@ -179,51 +182,51 @@ public class Menu {
 import java.util.List;
 
 public class Order {
-    private final List<LineItem> items = new ArrayList<>();
-    private boolean paid = false;
+  private final List<LineItem> items = new ArrayList<>();
+  private boolean paid = false;
 
-    public void add(LineItem item) { items.add(item); }
+  public void add(LineItem item) { items.add(item); }
 
-    public int total() {
-        int sum = 0;
-        for (LineItem it : items) sum += it.subtotal();
-        return sum;
-    }
+  public int total() {
+    int sum = 0;
+    for (LineItem it : items)
+      sum += it.subtotal();
+    return sum;
+  }
 
-    public boolean isPaid() { return paid; }
-    public void markPaid()  { paid = true; }
+  public boolean isPaid() { return paid; }
+  public void markPaid() { paid = true; }
 
-    public List<LineItem> items() { return items; }
+  public List<LineItem> items() { return items; }
 }
 `,
     },
     {
       filename: "Payment.java",
       initialContent: `public class Payment {
-    public void charge(Order order) {
-        if (order.isPaid()) return;
-        // Pretend we hit a payment gateway here.
-        order.markPaid();
-    }
+  public void charge(Order order) {
+    if (order.isPaid())
+      return;
+    // Pretend we hit a payment gateway here.
+    order.markPaid();
+  }
 }
 `,
     },
     {
       filename: "Receipt.java",
       initialContent: `public class Receipt {
-    public String format(Order o) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("--- RECEIPT ---\\n");
-        for (LineItem it : o.items()) {
-            sb.append(String.format(
-                "%-10s x%-2d  %4d%n",
-                it.drink().name(), it.quantity(), it.subtotal()
-            ));
-        }
-        sb.append("TOTAL          ").append(o.total()).append('\\n');
-        sb.append(o.isPaid() ? "(paid)" : "(unpaid)");
-        return sb.toString();
+  public String format(Order o) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("--- RECEIPT ---\\n");
+    for (LineItem it : o.items()) {
+      sb.append(String.format("%-10s x%-2d  %4d%n", it.drink().name(),
+                              it.quantity(), it.subtotal()));
     }
+    sb.append("TOTAL          ").append(o.total()).append('\\n');
+    sb.append(o.isPaid() ? "(paid)" : "(unpaid)");
+    return sb.toString();
+  }
 }
 `,
     },
@@ -376,55 +379,55 @@ balance: 60
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Wallet w = new Wallet(100);
-        Buyer  b = new Buyer();
-        System.out.println("bought apple? " + b.shop(w, 40));
-        System.out.println("bought yacht? " + b.shop(w, 1_000_000));
-        System.out.println("balance: " + w.balance());
-    }
+  public static void main(String[] args) {
+    Wallet w = new Wallet(100);
+    Buyer b = new Buyer();
+    System.out.println("bought apple? " + b.shop(w, 40));
+    System.out.println("bought yacht? " + b.shop(w, 1_000_000));
+    System.out.println("balance: " + w.balance());
+  }
 }
 `,
     },
     {
       filename: "Wallet.java",
       initialContent: `public class Wallet {
-    public int cents;          // TODO: encapsulate this
-    public Wallet(int cents) { this.cents = cents; }
+  public int cents; // TODO: encapsulate this
+  public Wallet(int cents) { this.cents = cents; }
 }
 `,
       solutionContent: `public class Wallet {
-    private int cents;
-    public Wallet(int cents) { this.cents = cents; }
+  private int cents;
+  public Wallet(int cents) { this.cents = cents; }
 
-    public boolean buy(int priceCents) {
-        if (priceCents <= 0) throw new IllegalArgumentException("price > 0");
-        if (priceCents > cents) return false;
-        cents -= priceCents;
-        return true;
-    }
+  public boolean buy(int priceCents) {
+    if (priceCents <= 0)
+      throw new IllegalArgumentException("price > 0");
+    if (priceCents > cents)
+      return false;
+    cents -= priceCents;
+    return true;
+  }
 
-    public int balance() { return cents; }
+  public int balance() { return cents; }
 }
 `,
     },
     {
       filename: "Buyer.java",
       initialContent: `public class Buyer {
-    public boolean shop(Wallet w, int priceCents) {
-        // TODO: replace this feature-envy with a single \`tell\` call
-        if (w.cents >= priceCents) {
-            w.cents -= priceCents;
-            return true;
-        }
-        return false;
+  public boolean shop(Wallet w, int priceCents) {
+    // TODO: replace this feature-envy with a single \`tell\` call
+    if (w.cents >= priceCents) {
+      w.cents -= priceCents;
+      return true;
     }
+    return false;
+  }
 }
 `,
       solutionContent: `public class Buyer {
-    public boolean shop(Wallet w, int priceCents) {
-        return w.buy(priceCents);
-    }
+  public boolean shop(Wallet w, int priceCents) { return w.buy(priceCents); }
 }
 `,
     },

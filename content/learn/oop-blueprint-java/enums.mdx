@@ -223,37 +223,37 @@ an enum:
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        double subtotal = 200.00;
-        for (PaymentMethod m : PaymentMethod.values()) {
-            double charged = m.surchargedTotal(subtotal);
-            System.out.printf("%-12s -> %.2f%n", m.label(), charged);
-        }
+  public static void main(String[] args) {
+    double subtotal = 200.00;
+    for (PaymentMethod m : PaymentMethod.values()) {
+      double charged = m.surchargedTotal(subtotal);
+      System.out.printf("%-12s -> %.2f%n", m.label(), charged);
     }
+  }
 }
 `,
     },
     {
       filename: "PaymentMethod.java",
       initialContent: `public enum PaymentMethod {
-    CASH        ("Cash",          0.00),
-    DEBIT_CARD  ("Debit card",    0.01),
-    CREDIT_CARD ("Credit card",   0.025),
-    CRYPTO      ("Crypto wallet", 0.005);
+  CASH("Cash", 0.00),
+  DEBIT_CARD("Debit card", 0.01),
+  CREDIT_CARD("Credit card", 0.025),
+  CRYPTO("Crypto wallet", 0.005);
 
-    private final String label;
-    private final double feeRate;
+  private final String label;
+  private final double feeRate;
 
-    PaymentMethod(String label, double feeRate) {
-        this.label = label;
-        this.feeRate = feeRate;
-    }
+  PaymentMethod(String label, double feeRate) {
+    this.label = label;
+    this.feeRate = feeRate;
+  }
 
-    public String label() { return label; }
+  public String label() { return label; }
 
-    public double surchargedTotal(double subtotal) {
-        return subtotal * (1.0 + feeRate);
-    }
+  public double surchargedTotal(double subtotal) {
+    return subtotal * (1.0 + feeRate);
+  }
 }
 `,
     },
@@ -283,26 +283,30 @@ SUNDAY weekend? true
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        for (Day d : Day.values()) {
-            System.out.println(d + " weekend? " + d.isWeekend());
-        }
+  public static void main(String[] args) {
+    for (Day d : Day.values()) {
+      System.out.println(d + " weekend? " + d.isWeekend());
     }
+  }
 }
 `,
     },
     {
       filename: "Day.java",
       initialContent: `public enum Day {
-    // TODO: list the seven days, then define isWeekend()
+  // TODO: list the seven days, then define isWeekend()
 }
 `,
       solutionContent: `public enum Day {
-    MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY;
+  MONDAY,
+  TUESDAY,
+  WEDNESDAY,
+  THURSDAY,
+  FRIDAY,
+  SATURDAY,
+  SUNDAY;
 
-    public boolean isWeekend() {
-        return this == SATURDAY || this == SUNDAY;
-    }
+  public boolean isWeekend() { return this == SATURDAY || this == SUNDAY; }
 }
 `,
     },

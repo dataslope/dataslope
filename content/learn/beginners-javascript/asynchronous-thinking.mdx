@@ -292,7 +292,7 @@ console.log("main: subscriptions registered, waiting for events...");
     {
       filename: "bus.js",
       initialContent: `function createBus() {
-  const listeners = {};   // eventName -> array of callbacks
+  const listeners = {}; // eventName -> array of callbacks
 
   function on(event, cb) {
     (listeners[event] = listeners[event] || []).push(cb);

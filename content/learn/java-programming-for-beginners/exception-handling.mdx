@@ -229,37 +229,37 @@ a normal end of input, use a `boolean hasNext()` instead.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        printSafe("42");
-        printSafe("oops");
-        printSafe(null);
-        System.out.println("done");
-    }
+  public static void main(String[] args) {
+    printSafe("42");
+    printSafe("oops");
+    printSafe(null);
+    System.out.println("done");
+  }
 
-    static void printSafe(String s) {
-        try {
-            int n = SafeParser.parse(s);
-            System.out.println("parsed " + n);
-        } catch (IllegalArgumentException e) {
-            System.out.println("bad input: " + e.getMessage());
-        }
+  static void printSafe(String s) {
+    try {
+      int n = SafeParser.parse(s);
+      System.out.println("parsed " + n);
+    } catch (IllegalArgumentException e) {
+      System.out.println("bad input: " + e.getMessage());
     }
+  }
 }
 `,
     },
     {
       filename: "SafeParser.java",
       initialContent: `public class SafeParser {
-    public static int parse(String s) {
-        if (s == null) {
-            throw new IllegalArgumentException("input was null");
-        }
-        try {
-            return Integer.parseInt(s);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("not a number: " + s);
-        }
+  public static int parse(String s) {
+    if (s == null) {
+      throw new IllegalArgumentException("input was null");
     }
+    try {
+      return Integer.parseInt(s);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("not a number: " + s);
+    }
+  }
 }
 `,
     },
@@ -333,35 +333,35 @@ done
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        System.out.println("10/2 = " + SafeMath.divide(10, 2));
-        try {
-            int r = SafeMath.divide(10, 0);
-            System.out.println("10/0 = " + r);
-        } catch (IllegalArgumentException e) {
-            System.out.println("10/0 -> " + e.getMessage());
-        }
-        System.out.println("done");
+  public static void main(String[] args) {
+    System.out.println("10/2 = " + SafeMath.divide(10, 2));
+    try {
+      int r = SafeMath.divide(10, 0);
+      System.out.println("10/0 = " + r);
+    } catch (IllegalArgumentException e) {
+      System.out.println("10/0 -> " + e.getMessage());
     }
+    System.out.println("done");
+  }
 }
 `,
     },
     {
       filename: "SafeMath.java",
       initialContent: `public class SafeMath {
-    public static int divide(int a, int b) {
-        // TODO
-        return 0;
-    }
+  public static int divide(int a, int b) {
+    // TODO
+    return 0;
+  }
 }
 `,
       solutionContent: `public class SafeMath {
-    public static int divide(int a, int b) {
-        if (b == 0) {
-            throw new IllegalArgumentException("cannot divide by zero");
-        }
-        return a / b;
+  public static int divide(int a, int b) {
+    if (b == 0) {
+      throw new IllegalArgumentException("cannot divide by zero");
     }
+    return a / b;
+  }
 }
 `,
     },

@@ -75,18 +75,12 @@ record. *Data first, behavior second* — the functional move.
       initialContent: `using System;
 using System.Linq;
 
-var lines = new[]
-{
-    "2026-05-01,A,2,19.99,paid",
-    "2026-05-01,B,1,49.00,paid",
-    "2026-05-02,A,1,19.99,refund",
-    "2026-05-02,A,5,19.99,paid",
-    "2026-05-03,B,3,49.00,paid",
-    "garbage line should be skipped",
-    "2026-05-04,A,10,19.99,paid",
-    "2026-05-04,B,8,49.00,paid",
-    "2026-05-05,A,1,19.99,refund",
-    "",
+var lines = new[] {
+    "2026-05-01,A,2,19.99,paid",   "2026-05-01,B,1,49.00,paid",
+    "2026-05-02,A,1,19.99,refund", "2026-05-02,A,5,19.99,paid",
+    "2026-05-03,B,3,49.00,paid",   "garbage line should be skipped",
+    "2026-05-04,A,10,19.99,paid",  "2026-05-04,B,8,49.00,paid",
+    "2026-05-05,A,1,19.99,refund", "",
 };
 
 Console.Write(Pipeline.BuildReport(lines));
@@ -94,18 +88,12 @@ Console.Write(Pipeline.BuildReport(lines));
       solutionContent: `using System;
 using System.Linq;
 
-var lines = new[]
-{
-    "2026-05-01,A,2,19.99,paid",
-    "2026-05-01,B,1,49.00,paid",
-    "2026-05-02,A,1,19.99,refund",
-    "2026-05-02,A,5,19.99,paid",
-    "2026-05-03,B,3,49.00,paid",
-    "garbage line should be skipped",
-    "2026-05-04,A,10,19.99,paid",
-    "2026-05-04,B,8,49.00,paid",
-    "2026-05-05,A,1,19.99,refund",
-    "",
+var lines = new[] {
+    "2026-05-01,A,2,19.99,paid",   "2026-05-01,B,1,49.00,paid",
+    "2026-05-02,A,1,19.99,refund", "2026-05-02,A,5,19.99,paid",
+    "2026-05-03,B,3,49.00,paid",   "garbage line should be skipped",
+    "2026-05-04,A,10,19.99,paid",  "2026-05-04,B,8,49.00,paid",
+    "2026-05-05,A,1,19.99,refund", "",
 };
 
 Console.Write(Pipeline.BuildReport(lines));
@@ -158,14 +146,19 @@ public static class Parsing
 {
     public static Txn? ParseLine(string line)
     {
-        if (string.IsNullOrWhiteSpace(line)) return null;
+        if (string.IsNullOrWhiteSpace(line))
+            return null;
         var parts = line.Split(',');
-        if (parts.Length != 5) return null;
+        if (parts.Length != 5)
+            return null;
 
-        if (!DateTime.TryParse(parts[0], CultureInfo.InvariantCulture, DateTimeStyles.None, out var date)) return null;
+        if (!DateTime.TryParse(parts[0], CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
+            return null;
         var product = parts[1];
-        if (!int.TryParse(parts[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out var qty)) return null;
-        if (!decimal.TryParse(parts[3], NumberStyles.Any, CultureInfo.InvariantCulture, out var price)) return null;
+        if (!int.TryParse(parts[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out var qty))
+            return null;
+        if (!decimal.TryParse(parts[3], NumberStyles.Any, CultureInfo.InvariantCulture, out var price))
+            return null;
         var status = parts[4];
 
         return new Txn(date, product, qty, price, status);
@@ -202,18 +195,17 @@ using System.Linq;
 public static class Summarize
 {
     public static IEnumerable<ProductSummary> ByProduct(IEnumerable<Txn> txns) =>
-        txns
-            .GroupBy(t => t.Product)
+        txns.GroupBy(t => t.Product)
             .OrderBy(g => g.Key)
             .Select(g =>
-            {
-                var paid    = g.Where(t => t.Status == "paid");
-                var refund  = g.Where(t => t.Status == "refund");
-                var units   = paid.Sum(t => t.Quantity);
-                var gross   = paid.Sum(t => t.Quantity * t.UnitPrice);
-                var refunds = refund.Sum(t => t.Quantity * t.UnitPrice);
-                return new ProductSummary(g.Key, units, gross, gross - refunds);
-            });
+                    {
+                        var paid = g.Where(t => t.Status == "paid");
+                        var refund = g.Where(t => t.Status == "refund");
+                        var units = paid.Sum(t => t.Quantity);
+                        var gross = paid.Sum(t => t.Quantity * t.UnitPrice);
+                        var refunds = refund.Sum(t => t.Quantity * t.UnitPrice);
+                        return new ProductSummary(g.Key, units, gross, gross - refunds);
+                    });
 }
 `,
     },
@@ -265,7 +257,7 @@ public static class Pipeline
         }
         var totUnits = summaries.Sum(x => x.UnitsSold);
         var totGross = summaries.Sum(x => x.Gross);
-        var totNet   = summaries.Sum(x => x.Net);
+        var totNet = summaries.Sum(x => x.Net);
         sb.AppendLine("=== TOTAL ===");
         sb.AppendLine($"  units sold:   {totUnits}");
         sb.AppendLine($"  gross:        {totGross.ToString("0.00", CultureInfo.InvariantCulture)}");

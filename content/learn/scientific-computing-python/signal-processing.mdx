@@ -246,10 +246,15 @@ t, clean, noisy = generate_signal(fs=fs, T=2.0, seed=0)
 recovered = denoise(noisy, fs=fs, cutoff=30.0, order=6)
 
 fig, ax = plt.subplots(3, 1, figsize=(9, 5), sharex=True)
-ax[0].plot(t, clean);     ax[0].set_title("clean signal")
-ax[1].plot(t, noisy);     ax[1].set_title("noisy measurement")
-ax[2].plot(t, recovered); ax[2].set_title("low-pass recovered")
-plt.xlabel("time (s)"); plt.tight_layout(); plt.show()
+ax[0].plot(t, clean)
+ax[0].set_title("clean signal")
+ax[1].plot(t, noisy)
+ax[1].set_title("noisy measurement")
+ax[2].plot(t, recovered)
+ax[2].set_title("low-pass recovered")
+plt.xlabel("time (s)")
+plt.tight_layout()
+plt.show()
 
 rmse = np.sqrt(np.mean((recovered - clean) ** 2))
 print(f"RMSE after denoising: {rmse:.4f}")
@@ -260,12 +265,14 @@ print(f"RMSE after denoising: {rmse:.4f}")
       initialContent: `import numpy as np
 from scipy.signal import butter, sosfiltfilt
 
+
 def generate_signal(fs=2000, T=2.0, seed=0):
     rng = np.random.default_rng(seed)
-    t = np.arange(0, T, 1/fs)
-    clean = np.sin(2*np.pi*4*t) + 0.5*np.sin(2*np.pi*9*t)
-    noise = 0.6*np.sin(2*np.pi*180*t) + 0.4*rng.standard_normal(t.size)
+    t = np.arange(0, T, 1 / fs)
+    clean = np.sin(2 * np.pi * 4 * t) + 0.5 * np.sin(2 * np.pi * 9 * t)
+    noise = 0.6 * np.sin(2 * np.pi * 180 * t) + 0.4 * rng.standard_normal(t.size)
     return t, clean, clean + noise
+
 
 def denoise(x, fs, cutoff=30.0, order=6):
     """Zero-phase Butterworth low-pass."""

@@ -148,52 +148,56 @@ miniature.
       initialContent: `import java.util.Arrays;
 
 public class Main {
-    public static void main(String[] args) {
-        Library lib = new Library(new LimitPolicy(2));
+  public static void main(String[] args) {
+    Library lib = new Library(new LimitPolicy(2));
 
-        Book b1 = new Book("Design Patterns", "GoF",     "ISBN-1");
-        Book b2 = new Book("Refactoring",     "Fowler",  "ISBN-2");
-        Book b3 = new Book("OOSC",            "Meyer",   "ISBN-3");
-        for (Book b : Arrays.asList(b1, b2, b3)) lib.addBook(b);
+    Book b1 = new Book("Design Patterns", "GoF", "ISBN-1");
+    Book b2 = new Book("Refactoring", "Fowler", "ISBN-2");
+    Book b3 = new Book("OOSC", "Meyer", "ISBN-3");
+    for (Book b : Arrays.asList(b1, b2, b3))
+      lib.addBook(b);
 
-        Member ada = new Member("Ada", 1);
-        Member bob = new Member("Bob", 2);
-        lib.register(ada);
-        lib.register(bob);
+    Member ada = new Member("Ada", 1);
+    Member bob = new Member("Bob", 2);
+    lib.register(ada);
+    lib.register(bob);
 
-        Loan l1 = lib.borrow(ada, b1, /*today*/ 1, /*loanDays*/ 14);
-        Loan l2 = lib.borrow(ada, b2, /*today*/ 1, /*loanDays*/ 14);
-        Loan l3 = lib.borrow(ada, b3, /*today*/ 1, /*loanDays*/ 14);  // should be refused
+    Loan l1 = lib.borrow(ada, b1, /*today*/ 1, /*loanDays*/ 14);
+    Loan l2 = lib.borrow(ada, b2, /*today*/ 1, /*loanDays*/ 14);
+    Loan l3 =
+        lib.borrow(ada, b3, /*today*/ 1, /*loanDays*/ 14); // should be refused
 
-        System.out.println("l1 issued? " + (l1 != null));
-        System.out.println("l2 issued? " + (l2 != null));
-        System.out.println("l3 issued? " + (l3 != null));
+    System.out.println("l1 issued? " + (l1 != null));
+    System.out.println("l2 issued? " + (l2 != null));
+    System.out.println("l3 issued? " + (l3 != null));
 
-        System.out.println("active loans: " + lib.activeLoans().size());
-        System.out.println("l1 overdue on day 10? " + l1.isOverdue(10));
-        System.out.println("l1 overdue on day 20? " + l1.isOverdue(20));
+    System.out.println("active loans: " + lib.activeLoans().size());
+    System.out.println("l1 overdue on day 10? " + l1.isOverdue(10));
+    System.out.println("l1 overdue on day 20? " + l1.isOverdue(20));
 
-        lib.returnBook(l1);
-        System.out.println("after return, active: " + lib.activeLoans().size());
+    lib.returnBook(l1);
+    System.out.println("after return, active: " + lib.activeLoans().size());
 
-        Loan l4 = lib.borrow(ada, b3, /*today*/ 5, /*loanDays*/ 14);
-        System.out.println("l4 issued? " + (l4 != null));
-    }
+    Loan l4 = lib.borrow(ada, b3, /*today*/ 5, /*loanDays*/ 14);
+    System.out.println("l4 issued? " + (l4 != null));
+  }
 }
 `,
     },
     {
       filename: "Book.java",
       initialContent: `public class Book {
-    private final String title;
-    private final String author;
-    private final String isbn;
-    public Book(String title, String author, String isbn) {
-        this.title = title; this.author = author; this.isbn = isbn;
-    }
-    public String title()  { return title; }
-    public String author() { return author; }
-    public String isbn()   { return isbn; }
+  private final String title;
+  private final String author;
+  private final String isbn;
+  public Book(String title, String author, String isbn) {
+    this.title = title;
+    this.author = author;
+    this.isbn = isbn;
+  }
+  public String title() { return title; }
+  public String author() { return author; }
+  public String isbn() { return isbn; }
 }
 `,
     },
@@ -203,103 +207,104 @@ public class Main {
 import java.util.List;
 
 public class Member {
-    private final String name;
-    private final int id;
-    private final List<Loan> loans = new ArrayList<>();
+  private final String name;
+  private final int id;
+  private final List<Loan> loans = new ArrayList<>();
 
-    public Member(String name, int id) {
-        this.name = name; this.id = id;
-    }
+  public Member(String name, int id) {
+    this.name = name;
+    this.id = id;
+  }
 
-    public String name()  { return name; }
-    public int    id()    { return id; }
+  public String name() { return name; }
+  public int id() { return id; }
 
-    public int loanCount() { return loans.size(); }
-    public void addLoan(Loan loan)    { loans.add(loan); }
-    public void removeLoan(Loan loan) { loans.remove(loan); }
+  public int loanCount() { return loans.size(); }
+  public void addLoan(Loan loan) { loans.add(loan); }
+  public void removeLoan(Loan loan) { loans.remove(loan); }
 }
 `,
     },
     {
       filename: "Loan.java",
       initialContent: `public class Loan {
-    private final Book   book;
-    private final Member member;
-    private final int    dueDay;     // simplified day counter
+  private final Book book;
+  private final Member member;
+  private final int dueDay; // simplified day counter
 
-    public Loan(Book book, Member member, int dueDay) {
-        this.book   = book;
-        this.member = member;
-        this.dueDay = dueDay;
-    }
+  public Loan(Book book, Member member, int dueDay) {
+    this.book = book;
+    this.member = member;
+    this.dueDay = dueDay;
+  }
 
-    public Book   book()   { return book; }
-    public Member member() { return member; }
-    public int    dueDay() { return dueDay; }
+  public Book book() { return book; }
+  public Member member() { return member; }
+  public int dueDay() { return dueDay; }
 
-    public boolean isOverdue(int nowDay) {
-        // TODO: return true iff nowDay is strictly after dueDay.
-        return false;
-    }
+  public boolean isOverdue(int nowDay) {
+    // TODO: return true iff nowDay is strictly after dueDay.
+    return false;
+  }
 }
 `,
       solutionContent: `public class Loan {
-    private final Book   book;
-    private final Member member;
-    private final int    dueDay;
+  private final Book book;
+  private final Member member;
+  private final int dueDay;
 
-    public Loan(Book book, Member member, int dueDay) {
-        this.book   = book;
-        this.member = member;
-        this.dueDay = dueDay;
-    }
+  public Loan(Book book, Member member, int dueDay) {
+    this.book = book;
+    this.member = member;
+    this.dueDay = dueDay;
+  }
 
-    public Book   book()   { return book; }
-    public Member member() { return member; }
-    public int    dueDay() { return dueDay; }
+  public Book book() { return book; }
+  public Member member() { return member; }
+  public int dueDay() { return dueDay; }
 
-    public boolean isOverdue(int nowDay) {
-        return nowDay > dueDay;
-    }
+  public boolean isOverdue(int nowDay) { return nowDay > dueDay; }
 }
 `,
     },
     {
       filename: "BorrowingPolicy.java",
       initialContent: `public interface BorrowingPolicy {
-    boolean mayBorrow(Member member);
+  boolean mayBorrow(Member member);
 }
 `,
     },
     {
       filename: "LimitPolicy.java",
       initialContent: `public class LimitPolicy implements BorrowingPolicy {
-    private final int max;
-    public LimitPolicy(int max) { this.max = max; }
+  private final int max;
+  public LimitPolicy(int max) { this.max = max; }
 
-    @Override
-    public boolean mayBorrow(Member member) {
-        // TODO: return true iff member.loanCount() < max.
-        return true;
-    }
+  @Override
+  public boolean mayBorrow(Member member) {
+    // TODO: return true iff member.loanCount() < max.
+    return true;
+  }
 }
 `,
       solutionContent: `public class LimitPolicy implements BorrowingPolicy {
-    private final int max;
-    public LimitPolicy(int max) { this.max = max; }
+  private final int max;
+  public LimitPolicy(int max) { this.max = max; }
 
-    @Override
-    public boolean mayBorrow(Member member) {
-        return member.loanCount() < max;
-    }
+  @Override
+  public boolean mayBorrow(Member member) {
+    return member.loanCount() < max;
+  }
 }
 `,
     },
     {
       filename: "OpenPolicy.java",
       initialContent: `public class OpenPolicy implements BorrowingPolicy {
-    @Override
-    public boolean mayBorrow(Member member) { return true; }
+  @Override
+  public boolean mayBorrow(Member member) {
+    return true;
+  }
 }
 `,
     },
@@ -309,37 +314,36 @@ public class Member {
 import java.util.List;
 
 public class Library {
-    private final BorrowingPolicy policy;
-    private final List<Book>   books   = new ArrayList<>();
-    private final List<Member> members = new ArrayList<>();
-    private final List<Loan>   active  = new ArrayList<>();
+  private final BorrowingPolicy policy;
+  private final List<Book> books = new ArrayList<>();
+  private final List<Member> members = new ArrayList<>();
+  private final List<Loan> active = new ArrayList<>();
 
-    public Library(BorrowingPolicy policy) {
-        this.policy = policy;
-    }
+  public Library(BorrowingPolicy policy) { this.policy = policy; }
 
-    public void addBook(Book b)      { books.add(b); }
-    public void register(Member m)   { members.add(m); }
+  public void addBook(Book b) { books.add(b); }
+  public void register(Member m) { members.add(m); }
 
-    public Loan borrow(Member m, Book b, int today, int loanDays) {
-        if (!books.contains(b))     return null;
-        if (!policy.mayBorrow(m))   return null;
-        Loan loan = new Loan(b, m, today + loanDays);
-        active.add(loan);
-        m.addLoan(loan);
-        books.remove(b);            // book is off the shelf now
-        return loan;
-    }
+  public Loan borrow(Member m, Book b, int today, int loanDays) {
+    if (!books.contains(b))
+      return null;
+    if (!policy.mayBorrow(m))
+      return null;
+    Loan loan = new Loan(b, m, today + loanDays);
+    active.add(loan);
+    m.addLoan(loan);
+    books.remove(b); // book is off the shelf now
+    return loan;
+  }
 
-    public void returnBook(Loan loan) {
-        if (!active.remove(loan)) return;
-        loan.member().removeLoan(loan);
-        books.add(loan.book());
-    }
+  public void returnBook(Loan loan) {
+    if (!active.remove(loan))
+      return;
+    loan.member().removeLoan(loan);
+    books.add(loan.book());
+  }
 
-    public List<Loan> activeLoans() {
-        return active;
-    }
+  public List<Loan> activeLoans() { return active; }
 }
 `,
     },

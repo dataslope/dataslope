@@ -183,17 +183,17 @@ the right type*, with no cast.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Phonebook book = new Phonebook();
-        book.add("Ada",   "555-0101");
-        book.add("Grace", "555-0102");
-        book.add("Linus", "555-0103");
+  public static void main(String[] args) {
+    Phonebook book = new Phonebook();
+    book.add("Ada", "555-0101");
+    book.add("Grace", "555-0102");
+    book.add("Linus", "555-0103");
 
-        // No cast — generic types flow all the way through.
-        String n = book.lookup("Grace");
-        System.out.println("Grace -> " + n.toUpperCase());
-        System.out.println("Bob   -> " + book.lookup("Bob"));
-    }
+    // No cast — generic types flow all the way through.
+    String n = book.lookup("Grace");
+    System.out.println("Grace -> " + n.toUpperCase());
+    System.out.println("Bob   -> " + book.lookup("Bob"));
+  }
 }
 `,
     },
@@ -203,14 +203,12 @@ the right type*, with no cast.
 import java.util.Map;
 
 public class Phonebook {
-    private final Map<String, String> entries = new HashMap<>();
+  private final Map<String, String> entries = new HashMap<>();
 
-    public void add(String name, String number) {
-        entries.put(name, number);
-    }
-    public String lookup(String name) {
-        return entries.get(name);   // returns String, not Object
-    }
+  public void add(String name, String number) { entries.put(name, number); }
+  public String lookup(String name) {
+    return entries.get(name); // returns String, not Object
+  }
 }
 `,
     },
@@ -227,18 +225,18 @@ to *strings*? A general "key-to-record store" looks like this:
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Registry<String, Integer> ages = new Registry<>();
-        ages.add("Ada",   36);
-        ages.add("Linus", 54);
-        System.out.println("Ada is "   + ages.lookup("Ada")   + " years old");
-        System.out.println("Linus is " + ages.lookup("Linus") + " years old");
+  public static void main(String[] args) {
+    Registry<String, Integer> ages = new Registry<>();
+    ages.add("Ada", 36);
+    ages.add("Linus", 54);
+    System.out.println("Ada is " + ages.lookup("Ada") + " years old");
+    System.out.println("Linus is " + ages.lookup("Linus") + " years old");
 
-        Registry<Integer, String> roomByExt = new Registry<>();
-        roomByExt.add(101, "Lobby");
-        roomByExt.add(202, "Suite A");
-        System.out.println("ext 202 -> " + roomByExt.lookup(202));
-    }
+    Registry<Integer, String> roomByExt = new Registry<>();
+    roomByExt.add(101, "Lobby");
+    roomByExt.add(202, "Suite A");
+    System.out.println("ext 202 -> " + roomByExt.lookup(202));
+  }
 }
 `,
     },
@@ -248,10 +246,10 @@ to *strings*? A general "key-to-record store" looks like this:
 import java.util.Map;
 
 public class Registry<K, V> {
-    private final Map<K, V> entries = new HashMap<>();
+  private final Map<K, V> entries = new HashMap<>();
 
-    public void add(K key, V value) { entries.put(key, value); }
-    public V    lookup(K key)        { return entries.get(key);  }
+  public void add(K key, V value) { entries.put(key, value); }
+  public V lookup(K key) { return entries.get(key); }
 }
 `,
     },

@@ -41,43 +41,49 @@ opposed to `<|--` for "extends a class"). In Java, the keywords are
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Noisy[] things = { new Dog(), new Doorbell(), new MotionSensor() };
-        for (Noisy n : things) {
-            System.out.println(n.sound());
-        }
+  public static void main(String[] args) {
+    Noisy[] things = {new Dog(), new Doorbell(), new MotionSensor()};
+    for (Noisy n : things) {
+      System.out.println(n.sound());
     }
+  }
 }
 `,
     },
     {
       filename: "Noisy.java",
       initialContent: `public interface Noisy {
-    String sound();
+  String sound();
 }
 `,
     },
     {
       filename: "Dog.java",
       initialContent: `public class Dog implements Noisy {
-    @Override
-    public String sound() { return "Woof!"; }
+  @Override
+  public String sound() {
+    return "Woof!";
+  }
 }
 `,
     },
     {
       filename: "Doorbell.java",
       initialContent: `public class Doorbell implements Noisy {
-    @Override
-    public String sound() { return "Ding-dong"; }
+  @Override
+  public String sound() {
+    return "Ding-dong";
+  }
 }
 `,
     },
     {
       filename: "MotionSensor.java",
       initialContent: `public class MotionSensor implements Noisy {
-    @Override
-    public String sound() { return "BEEP! BEEP!"; }
+  @Override
+  public String sound() {
+    return "BEEP! BEEP!";
+  }
 }
 `,
     },
@@ -188,51 +194,49 @@ interface without breaking every existing implementer.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Greeter polite = new Polite();
-        Greeter casual = new Casual();
-        System.out.println(polite.greet("Ada"));
-        System.out.println(casual.greet("Ada"));
-        System.out.println(polite.farewell("Ada"));   // uses the default
-        System.out.println(casual.farewell("Ada"));   // overridden
-    }
+  public static void main(String[] args) {
+    Greeter polite = new Polite();
+    Greeter casual = new Casual();
+    System.out.println(polite.greet("Ada"));
+    System.out.println(casual.greet("Ada"));
+    System.out.println(polite.farewell("Ada")); // uses the default
+    System.out.println(casual.farewell("Ada")); // overridden
+  }
 }
 `,
     },
     {
       filename: "Greeter.java",
       initialContent: `public interface Greeter {
-    String greet(String name);
+  String greet(String name);
 
-    // Implementers get this for free, but may override:
-    default String farewell(String name) {
-        return "Goodbye, " + name + ".";
-    }
+  // Implementers get this for free, but may override:
+  default String farewell(String name) { return "Goodbye, " + name + "."; }
 }
 `,
     },
     {
       filename: "Polite.java",
       initialContent: `public class Polite implements Greeter {
-    @Override
-    public String greet(String name) {
-        return "Good day, " + name + ".";
-    }
-    // farewell() inherited from the interface
+  @Override
+  public String greet(String name) {
+    return "Good day, " + name + ".";
+  }
+  // farewell() inherited from the interface
 }
 `,
     },
     {
       filename: "Casual.java",
       initialContent: `public class Casual implements Greeter {
-    @Override
-    public String greet(String name) {
-        return "Hey " + name + "!";
-    }
-    @Override
-    public String farewell(String name) {
-        return "Cya, " + name + "!";
-    }
+  @Override
+  public String greet(String name) {
+    return "Hey " + name + "!";
+  }
+  @Override
+  public String farewell(String name) {
+    return "Cya, " + name + "!";
+  }
 }
 `,
     },
@@ -277,56 +281,54 @@ classDiagram
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Checkout c1 = new Checkout(new StripeProcessor());
-        Checkout c2 = new Checkout(new FakeProcessor());
+  public static void main(String[] args) {
+    Checkout c1 = new Checkout(new StripeProcessor());
+    Checkout c2 = new Checkout(new FakeProcessor());
 
-        c1.purchase(2599);
-        c2.purchase(199);
-    }
+    c1.purchase(2599);
+    c2.purchase(199);
+  }
 }
 `,
     },
     {
       filename: "PaymentProcessor.java",
       initialContent: `public interface PaymentProcessor {
-    boolean charge(int cents);
+  boolean charge(int cents);
 }
 `,
     },
     {
       filename: "StripeProcessor.java",
       initialContent: `public class StripeProcessor implements PaymentProcessor {
-    @Override
-    public boolean charge(int cents) {
-        System.out.println("[stripe] charged " + cents + " cents");
-        return true;
-    }
+  @Override
+  public boolean charge(int cents) {
+    System.out.println("[stripe] charged " + cents + " cents");
+    return true;
+  }
 }
 `,
     },
     {
       filename: "FakeProcessor.java",
       initialContent: `public class FakeProcessor implements PaymentProcessor {
-    @Override
-    public boolean charge(int cents) {
-        System.out.println("[fake] pretended to charge " + cents + " cents");
-        return true;
-    }
+  @Override
+  public boolean charge(int cents) {
+    System.out.println("[fake] pretended to charge " + cents + " cents");
+    return true;
+  }
 }
 `,
     },
     {
       filename: "Checkout.java",
       initialContent: `public class Checkout {
-    private final PaymentProcessor processor;
-    public Checkout(PaymentProcessor processor) {
-        this.processor = processor;
-    }
-    public void purchase(int cents) {
-        boolean ok = processor.charge(cents);
-        System.out.println("purchase ok? " + ok);
-    }
+  private final PaymentProcessor processor;
+  public Checkout(PaymentProcessor processor) { this.processor = processor; }
+  public void purchase(int cents) {
+    boolean ok = processor.charge(cents);
+    System.out.println("purchase ok? " + ok);
+  }
 }
 `,
     },
@@ -364,78 +366,78 @@ name: 1
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Length a = new Length(1.0);
-        Length b = new Length(2.0);
-        Length c = new Length(1.0);
-        Length d = new Length(0.5);
-        System.out.println("length: " + Integer.signum(a.compareWith(b)));
-        System.out.println("length: " + Integer.signum(a.compareWith(c)));
-        System.out.println("length: " + Integer.signum(a.compareWith(d)));
+  public static void main(String[] args) {
+    Length a = new Length(1.0);
+    Length b = new Length(2.0);
+    Length c = new Length(1.0);
+    Length d = new Length(0.5);
+    System.out.println("length: " + Integer.signum(a.compareWith(b)));
+    System.out.println("length: " + Integer.signum(a.compareWith(c)));
+    System.out.println("length: " + Integer.signum(a.compareWith(d)));
 
-        Name p = new Name("alpha");
-        Name q = new Name("beta");
-        Name r = new Name("alpha");
-        Name s = new Name("a");
-        System.out.println("name: " + Integer.signum(p.compareWith(q)));
-        System.out.println("name: " + Integer.signum(p.compareWith(r)));
-        System.out.println("name: " + Integer.signum(p.compareWith(s)));
-    }
+    Name p = new Name("alpha");
+    Name q = new Name("beta");
+    Name r = new Name("alpha");
+    Name s = new Name("a");
+    System.out.println("name: " + Integer.signum(p.compareWith(q)));
+    System.out.println("name: " + Integer.signum(p.compareWith(r)));
+    System.out.println("name: " + Integer.signum(p.compareWith(s)));
+  }
 }
 `,
     },
     {
       filename: "Comparable2.java",
       initialContent: `public interface Comparable2<T> {
-    int compareWith(T other);
+  int compareWith(T other);
 }
 `,
     },
     {
       filename: "Length.java",
       initialContent: `public class Length implements Comparable2<Length> {
-    private final double value;
-    public Length(double value) { this.value = value; }
+  private final double value;
+  public Length(double value) { this.value = value; }
 
-    // TODO: implement compareWith
-    @Override
-    public int compareWith(Length other) {
-        return 0;
-    }
+  // TODO: implement compareWith
+  @Override
+  public int compareWith(Length other) {
+    return 0;
+  }
 }
 `,
       solutionContent: `public class Length implements Comparable2<Length> {
-    private final double value;
-    public Length(double value) { this.value = value; }
+  private final double value;
+  public Length(double value) { this.value = value; }
 
-    @Override
-    public int compareWith(Length other) {
-        return Double.compare(this.value, other.value);
-    }
+  @Override
+  public int compareWith(Length other) {
+    return Double.compare(this.value, other.value);
+  }
 }
 `,
     },
     {
       filename: "Name.java",
       initialContent: `public class Name implements Comparable2<Name> {
-    private final String value;
-    public Name(String value) { this.value = value; }
+  private final String value;
+  public Name(String value) { this.value = value; }
 
-    // TODO: implement compareWith
-    @Override
-    public int compareWith(Name other) {
-        return 0;
-    }
+  // TODO: implement compareWith
+  @Override
+  public int compareWith(Name other) {
+    return 0;
+  }
 }
 `,
       solutionContent: `public class Name implements Comparable2<Name> {
-    private final String value;
-    public Name(String value) { this.value = value; }
+  private final String value;
+  public Name(String value) { this.value = value; }
 
-    @Override
-    public int compareWith(Name other) {
-        return this.value.compareTo(other.value);
-    }
+  @Override
+  public int compareWith(Name other) {
+    return this.value.compareTo(other.value);
+  }
 }
 `,
     },

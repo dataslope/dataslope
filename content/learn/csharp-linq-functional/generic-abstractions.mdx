@@ -242,8 +242,8 @@ public static class HistogramOp
     //   1) Use a generic constraint so TKey can be compared / used as a dictionary key.
     //   2) Count how many elements of 'source' produce each key (via keySelector).
     //   3) Return pairs ordered by key ascending.
-    public static IEnumerable<(TKey key, int count)> Histogram<T, TKey>(
-        this IEnumerable<T> source, Func<T, TKey> keySelector)
+    public static IEnumerable<(TKey key, int count)> Histogram<T, TKey>(this IEnumerable<T> source,
+                                                                        Func<T, TKey> keySelector)
         where TKey : notnull
     {
         throw new NotImplementedException();
@@ -256,14 +256,11 @@ using System.Linq;
 
 public static class HistogramOp
 {
-    public static IEnumerable<(TKey key, int count)> Histogram<T, TKey>(
-        this IEnumerable<T> source, Func<T, TKey> keySelector)
+    public static IEnumerable<(TKey key, int count)> Histogram<T, TKey>(this IEnumerable<T> source,
+                                                                        Func<T, TKey> keySelector)
         where TKey : notnull
     {
-        return source
-            .GroupBy(keySelector)
-            .OrderBy(g => g.Key)
-            .Select(g => (g.Key, g.Count()));
+        return source.GroupBy(keySelector).OrderBy(g => g.Key).Select(g => (g.Key, g.Count()));
     }
 }
 `,

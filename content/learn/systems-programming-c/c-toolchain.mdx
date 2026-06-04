@@ -158,14 +158,14 @@ header / implementation split you would use in a real project.
   files={[
     {
       filename: "main.c",
-      initialContent: `#include <stdio.h>
-#include "mathx.h"
+      initialContent: `#include "mathx.h"
+#include <stdio.h>
 
 int main(void) {
-    int a = 6, b = 7;
-    printf("add(%d, %d) = %d\\n", a, b, add(a, b));
-    printf("mul(%d, %d) = %d\\n", a, b, mul(a, b));
-    return 0;
+  int a = 6, b = 7;
+  printf("add(%d, %d) = %d\\n", a, b, add(a, b));
+  printf("mul(%d, %d) = %d\\n", a, b, mul(a, b));
+  return 0;
 }
 `,
     },
@@ -236,12 +236,12 @@ system. That is why a "hello world" binary is so small.
   files={[
     {
       filename: "main.c",
-      initialContent: `#include <stdio.h>
-#include "util.h"
+      initialContent: `#include "util.h"
+#include <stdio.h>
 
 int main(void) {
-    printf("%d\\n", square(7));
-    return 0;
+  printf("%d\\n", square(7));
+  return 0;
 }
 `,
     },
@@ -258,15 +258,13 @@ int square(int x);
       initialContent: `#include "util.h"
 
 int square(int x) {
-    // your code here
-    return 0;
+  // your code here
+  return 0;
 }
 `,
       solutionContent: `#include "util.h"
 
-int square(int x) {
-    return x * x;
-}
+int square(int x) { return x * x; }
 `,
     },
   ]}

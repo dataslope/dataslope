@@ -53,14 +53,14 @@ Split a class into a header and an implementation file. Every workspace file is 
   files={[
     {
       filename: "main.cpp",
-      initialContent: `#include <iostream>
-#include "greeter.hpp"
+      initialContent: `#include "greeter.hpp"
+#include <iostream>
 
 int main() {
-    Greeter g("C++ Playground");
-    std::cout << g.hello() << "\\n";
-    std::cout << g.bye() << "\\n";
-    return 0;
+  Greeter g("C++ Playground");
+  std::cout << g.hello() << "\\n";
+  std::cout << g.bye() << "\\n";
+  return 0;
 }
 `,
     },
@@ -73,12 +73,12 @@ int main() {
 
 class Greeter {
 public:
-    explicit Greeter(std::string name);
-    std::string hello() const;
-    std::string bye() const;
+  explicit Greeter(std::string name);
+  std::string hello() const;
+  std::string bye() const;
 
 private:
-    std::string name_;
+  std::string name_;
 };
 
 #endif
@@ -91,7 +91,7 @@ private:
 Greeter::Greeter(std::string name) : name_(std::move(name)) {}
 
 std::string Greeter::hello() const { return "Hello, " + name_ + "!"; }
-std::string Greeter::bye() const   { return "Goodbye, " + name_ + "!"; }
+std::string Greeter::bye() const { return "Goodbye, " + name_ + "!"; }
 `,
     },
   ]}
@@ -106,14 +106,14 @@ The MDX source for the example above:
   files={[
     {
       filename: "main.cpp",
-      initialContent: `#include <iostream>
-#include "greeter.hpp"
+      initialContent: `#include "greeter.hpp"
+#include <iostream>
 
 int main() {
-    Greeter g("C++ Playground");
-    std::cout << g.hello() << "\\n";
-    std::cout << g.bye() << "\\n";
-    return 0;
+  Greeter g("C++ Playground");
+  std::cout << g.hello() << "\\n";
+  std::cout << g.bye() << "\\n";
+  return 0;
 }
 `,
     },
@@ -126,12 +126,12 @@ int main() {
 
 class Greeter {
 public:
-    explicit Greeter(std::string name);
-    std::string hello() const;
-    std::string bye() const;
+  explicit Greeter(std::string name);
+  std::string hello() const;
+  std::string bye() const;
 
 private:
-    std::string name_;
+  std::string name_;
 };
 
 #endif
@@ -144,7 +144,7 @@ private:
 Greeter::Greeter(std::string name) : name_(std::move(name)) {}
 
 std::string Greeter::hello() const { return "Hello, " + name_ + "!"; }
-std::string Greeter::bye() const   { return "Goodbye, " + name_ + "!"; }
+std::string Greeter::bye() const { return "Goodbye, " + name_ + "!"; }
 `,
     },
   ]}

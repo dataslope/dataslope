@@ -272,11 +272,11 @@ state directly.
 
 const limiter = makeRateLimiter(3);
 
-console.log(limiter("first"));    // allow
-console.log(limiter("second"));   // allow
-console.log(limiter("third"));    // allow
-console.log(limiter("fourth"));   // deny
-console.log(limiter("fifth"));    // deny
+console.log(limiter("first")); // allow
+console.log(limiter("second")); // allow
+console.log(limiter("third")); // allow
+console.log(limiter("fourth")); // deny
+console.log(limiter("fifth")); // deny
 `,
     },
     {

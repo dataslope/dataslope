@@ -171,32 +171,32 @@ type:
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        int n = 5;
-        bumpPrimitive(n);
-        System.out.println("after bumpPrimitive: n = " + n);
+  public static void main(String[] args) {
+    int n = 5;
+    bumpPrimitive(n);
+    System.out.println("after bumpPrimitive: n = " + n);
 
-        List<String> items = new ArrayList<>();
-        items.add("a");
-        mutate(items);                  // changes the object
-        System.out.println("after mutate: items = " + items);
+    List<String> items = new ArrayList<>();
+    items.add("a");
+    mutate(items); // changes the object
+    System.out.println("after mutate: items = " + items);
 
-        replace(items);                 // does NOT replace caller's variable
-        System.out.println("after replace: items = " + items);
-    }
+    replace(items); // does NOT replace caller's variable
+    System.out.println("after replace: items = " + items);
+  }
 
-    static void bumpPrimitive(int x) {
-        x = x + 100;                    // local x changes; caller unaffected
-    }
+  static void bumpPrimitive(int x) {
+    x = x + 100; // local x changes; caller unaffected
+  }
 
-    static void mutate(List<String> list) {
-        list.add("b");                  // same object → caller sees change
-    }
+  static void mutate(List<String> list) {
+    list.add("b"); // same object → caller sees change
+  }
 
-    static void replace(List<String> list) {
-        list = new ArrayList<>();       // local reassign; caller unaffected
-        list.add("hidden");
-    }
+  static void replace(List<String> list) {
+    list = new ArrayList<>(); // local reassign; caller unaffected
+    list.add("hidden");
+  }
 }
 `,
     },

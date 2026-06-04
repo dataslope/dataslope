@@ -247,18 +247,19 @@ deadline. The "smallest deadline" task runs next.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Scheduler s = new Scheduler();
-        s.add(new Task("backup",    30));
-        s.add(new Task("email",     10));
-        s.add(new Task("reindex",   50));
-        s.add(new Task("heartbeat",  5));
+  public static void main(String[] args) {
+    Scheduler s = new Scheduler();
+    s.add(new Task("backup", 30));
+    s.add(new Task("email", 10));
+    s.add(new Task("reindex", 50));
+    s.add(new Task("heartbeat", 5));
 
-        while (s.hasWork()) {
-            Task t = s.next();
-            System.out.println("running " + t.name() + " (deadline=" + t.deadline() + ")");
-        }
+    while (s.hasWork()) {
+      Task t = s.next();
+      System.out.println("running " + t.name() + " (deadline=" + t.deadline() +
+                         ")");
     }
+  }
 }
 `,
     },
@@ -273,12 +274,12 @@ deadline. The "smallest deadline" task runs next.
 import java.util.PriorityQueue;
 
 public class Scheduler {
-    private final PriorityQueue<Task> q =
-        new PriorityQueue<>(Comparator.comparingInt(Task::deadline));
+  private final PriorityQueue<Task> q =
+      new PriorityQueue<>(Comparator.comparingInt(Task::deadline));
 
-    public void    add(Task t)  { q.offer(t); }
-    public boolean hasWork()    { return !q.isEmpty(); }
-    public Task    next()       { return q.poll();    }
+  public void add(Task t) { q.offer(t); }
+  public boolean hasWork() { return !q.isEmpty(); }
+  public Task next() { return q.poll(); }
 }
 `,
     },
@@ -312,15 +313,17 @@ Expected output:
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        SlidingWindow<Integer> w = new SlidingWindow<>(3);
-        w.add(1); w.add(2); w.add(3);
-        System.out.println(w.snapshot());
-        w.add(4);
-        System.out.println(w.snapshot());
-        w.add(5);
-        System.out.println(w.snapshot());
-    }
+  public static void main(String[] args) {
+    SlidingWindow<Integer> w = new SlidingWindow<>(3);
+    w.add(1);
+    w.add(2);
+    w.add(3);
+    System.out.println(w.snapshot());
+    w.add(4);
+    System.out.println(w.snapshot());
+    w.add(5);
+    System.out.println(w.snapshot());
+  }
 }
 `,
     },
@@ -332,7 +335,7 @@ import java.util.Deque;
 import java.util.List;
 
 public class SlidingWindow<E> {
-    // TODO
+  // TODO
 }
 `,
       solutionContent: `import java.util.ArrayDeque;
@@ -341,17 +344,18 @@ import java.util.Deque;
 import java.util.List;
 
 public class SlidingWindow<E> {
-    private final int capacity;
-    private final Deque<E> dq = new ArrayDeque<>();
+  private final int capacity;
+  private final Deque<E> dq = new ArrayDeque<>();
 
-    public SlidingWindow(int capacity) { this.capacity = capacity; }
+  public SlidingWindow(int capacity) { this.capacity = capacity; }
 
-    public void add(E item) {
-        dq.offerLast(item);
-        if (dq.size() > capacity) dq.pollFirst();
-    }
+  public void add(E item) {
+    dq.offerLast(item);
+    if (dq.size() > capacity)
+      dq.pollFirst();
+  }
 
-    public List<E> snapshot() { return new ArrayList<>(dq); }
+  public List<E> snapshot() { return new ArrayList<>(dq); }
 }
 `,
     },

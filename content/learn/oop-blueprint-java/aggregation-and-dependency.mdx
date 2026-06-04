@@ -58,28 +58,28 @@ classDiagram
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        // Members exist on their own:
-        Member ada = new Member("Ada");
-        Member ken = new Member("Ken");
+  public static void main(String[] args) {
+    // Members exist on their own:
+    Member ada = new Member("Ada");
+    Member ken = new Member("Ken");
 
-        // The library aggregates them — it holds references, but didn't make them:
-        Library lib = new Library();
-        lib.register(ada);
-        lib.register(ken);
+    // The library aggregates them — it holds references, but didn't make them:
+    Library lib = new Library();
+    lib.register(ada);
+    lib.register(ken);
 
-        System.out.println("members: " + lib.memberCount());
-        System.out.println("ada still exists: " + (ada != null));   // yes, of course
-    }
+    System.out.println("members: " + lib.memberCount());
+    System.out.println("ada still exists: " + (ada != null)); // yes, of course
+  }
 }
 `,
     },
     {
       filename: "Member.java",
       initialContent: `public class Member {
-    private final String name;
-    public Member(String name) { this.name = name; }
-    public String name() { return name; }
+  private final String name;
+  public Member(String name) { this.name = name; }
+  public String name() { return name; }
 }
 `,
     },
@@ -89,17 +89,13 @@ classDiagram
 import java.util.List;
 
 public class Library {
-    // The list is owned by the Library (composition), but the Members
-    // inside it are aggregated — they were created elsewhere.
-    private final List<Member> members = new ArrayList<>();
+  // The list is owned by the Library (composition), but the Members
+  // inside it are aggregated — they were created elsewhere.
+  private final List<Member> members = new ArrayList<>();
 
-    public void register(Member m) {
-        members.add(m);
-    }
+  public void register(Member m) { members.add(m); }
 
-    public int memberCount() {
-        return members.size();
-    }
+  public int memberCount() { return members.size(); }
 }
 `,
     },
@@ -162,44 +158,43 @@ classDiagram
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Order o = new Order("ORD-42", 19.95);
-        Printer console = new Printer();
+  public static void main(String[] args) {
+    Order o = new Order("ORD-42", 19.95);
+    Printer console = new Printer();
 
-        OrderPrinter op = new OrderPrinter();
-        op.print(o, console);   // OrderPrinter doesn't *own* either of these
-    }
+    OrderPrinter op = new OrderPrinter();
+    op.print(o, console); // OrderPrinter doesn't *own* either of these
+  }
 }
 `,
     },
     {
       filename: "Order.java",
       initialContent: `public class Order {
-    private final String id;
-    private final double total;
-    public Order(String id, double total) {
-        this.id = id; this.total = total;
-    }
-    public String id()    { return id;    }
-    public double total() { return total; }
+  private final String id;
+  private final double total;
+  public Order(String id, double total) {
+    this.id = id;
+    this.total = total;
+  }
+  public String id() { return id; }
+  public double total() { return total; }
 }
 `,
     },
     {
       filename: "Printer.java",
       initialContent: `public class Printer {
-    public void write(String line) {
-        System.out.println("[printer] " + line);
-    }
+  public void write(String line) { System.out.println("[printer] " + line); }
 }
 `,
     },
     {
       filename: "OrderPrinter.java",
       initialContent: `public class OrderPrinter {
-    public void print(Order o, Printer printer) {
-        printer.write("Order " + o.id() + " total = " + o.total());
-    }
+  public void print(Order o, Printer printer) {
+    printer.write("Order " + o.id() + " total = " + o.total());
+  }
 }
 `,
     },
@@ -242,35 +237,29 @@ but the simple version is just good Java.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Logger console = new Logger();
-        Greeter g = new Greeter(console);   // Greeter aggregates the logger
-        g.greet("world");
-    }
+  public static void main(String[] args) {
+    Logger console = new Logger();
+    Greeter g = new Greeter(console); // Greeter aggregates the logger
+    g.greet("world");
+  }
 }
 `,
     },
     {
       filename: "Logger.java",
       initialContent: `public class Logger {
-    public void log(String message) {
-        System.out.println("[LOG] " + message);
-    }
+  public void log(String message) { System.out.println("[LOG] " + message); }
 }
 `,
     },
     {
       filename: "Greeter.java",
       initialContent: `public class Greeter {
-    private final Logger logger;          // aggregated, not owned
+  private final Logger logger; // aggregated, not owned
 
-    public Greeter(Logger logger) {
-        this.logger = logger;
-    }
+  public Greeter(Logger logger) { this.logger = logger; }
 
-    public void greet(String name) {
-        logger.log("Hello, " + name + "!");
-    }
+  public void greet(String name) { logger.log("Hello, " + name + "!"); }
 }
 `,
     },
@@ -312,30 +301,30 @@ names=Ada, Bob, Cleo
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Classroom room = new Classroom();
-        System.out.println("size=" + room.size());
+  public static void main(String[] args) {
+    Classroom room = new Classroom();
+    System.out.println("size=" + room.size());
 
-        room.enroll(new Student("Ada"));
-        room.enroll(new Student("Bob"));
-        room.enroll(new Student("Cleo"));
+    room.enroll(new Student("Ada"));
+    room.enroll(new Student("Bob"));
+    room.enroll(new Student("Cleo"));
 
-        System.out.println("size=" + room.size());
-        System.out.println("names=" + room.names());
-    }
+    System.out.println("size=" + room.size());
+    System.out.println("names=" + room.names());
+  }
 }
 `,
     },
     {
       filename: "Student.java",
       initialContent: `public class Student {
-    // TODO
+  // TODO
 }
 `,
       solutionContent: `public class Student {
-    private final String name;
-    public Student(String name) { this.name = name; }
-    public String name() { return name; }
+  private final String name;
+  public Student(String name) { this.name = name; }
+  public String name() { return name; }
 }
 `,
     },
@@ -345,26 +334,27 @@ names=Ada, Bob, Cleo
 import java.util.List;
 
 public class Classroom {
-    // TODO
+  // TODO
 }
 `,
       solutionContent: `import java.util.ArrayList;
 import java.util.List;
 
 public class Classroom {
-    private final List<Student> students = new ArrayList<>();
+  private final List<Student> students = new ArrayList<>();
 
-    public void enroll(Student s) { students.add(s); }
-    public int  size()            { return students.size(); }
+  public void enroll(Student s) { students.add(s); }
+  public int size() { return students.size(); }
 
-    public String names() {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < students.size(); i++) {
-            if (i > 0) sb.append(", ");
-            sb.append(students.get(i).name());
-        }
-        return sb.toString();
+  public String names() {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < students.size(); i++) {
+      if (i > 0)
+        sb.append(", ");
+      sb.append(students.get(i).name());
     }
+    return sb.toString();
+  }
 }
 `,
     },

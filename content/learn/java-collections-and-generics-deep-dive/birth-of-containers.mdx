@@ -224,38 +224,39 @@ needing one for "list", "set", "map", "queue", "stack",
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Bag bag = new Bag();
-        bag.add("Ada");
-        bag.add("Linus");
-        bag.add("Grace");
+  public static void main(String[] args) {
+    Bag bag = new Bag();
+    bag.add("Ada");
+    bag.add("Linus");
+    bag.add("Grace");
 
-        for (int i = 0; i < bag.size(); i++) {
-            // Downcast required — the bag is untyped.
-            String s = (String) bag.get(i);
-            System.out.println(s);
-        }
+    for (int i = 0; i < bag.size(); i++) {
+      // Downcast required — the bag is untyped.
+      String s = (String)bag.get(i);
+      System.out.println(s);
     }
+  }
 }
 `,
     },
     {
       filename: "Bag.java",
       initialContent: `public class Bag {
-    private Object[] data = new Object[2];
-    private int      size = 0;
+  private Object[] data = new Object[2];
+  private int size = 0;
 
-    public void add(Object o) {
-        if (size == data.length) {
-            Object[] bigger = new Object[data.length * 2];
-            for (int i = 0; i < size; i++) bigger[i] = data[i];
-            data = bigger;
-        }
-        data[size++] = o;
+  public void add(Object o) {
+    if (size == data.length) {
+      Object[] bigger = new Object[data.length * 2];
+      for (int i = 0; i < size; i++)
+        bigger[i] = data[i];
+      data = bigger;
     }
+    data[size++] = o;
+  }
 
-    public Object get(int i) { return data[i]; }
-    public int    size()      { return size; }
+  public Object get(int i) { return data[i]; }
+  public int size() { return size; }
 }
 `,
     },

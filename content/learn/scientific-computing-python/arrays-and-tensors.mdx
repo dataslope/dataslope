@@ -249,19 +249,25 @@ driver.
 from linalg import project_onto_basis
 
 rng = np.random.default_rng(0)
-basis  = np.array([[1, 0, 0],          # an orthonormal basis for the xy-plane
-                   [0, 1, 0]], dtype=float)
+basis = np.array(
+    [
+        [1, 0, 0],  # an orthonormal basis for the xy-plane
+        [0, 1, 0],
+    ],
+    dtype=float,
+)
 points = rng.standard_normal((5, 3))
 
 proj = project_onto_basis(points, basis)
 print("original  z-components:", points[:, 2].round(2))
-print("projected z-components:", proj[:, 2].round(2))    # all zero
+print("projected z-components:", proj[:, 2].round(2))  # all zero
 print("\\nFrobenius difference :", np.linalg.norm(points - proj).round(4))
 `,
     },
     {
       filename: "linalg.py",
       initialContent: `import numpy as np
+
 
 def project_onto_basis(points: np.ndarray, basis: np.ndarray) -> np.ndarray:
     """Project rows of \`points\` onto the row-space of \`basis\`.

@@ -13,8 +13,10 @@
 //   sql         sql-formatter   (dialect-aware, 2-space)
 //
 // Props formatted: `starterCode` (all), `solutionCode` (language challenge
-// cards) and `solutionSql` (SQL challenge cards). `initCode`/`initSql`,
-// `tests` and `instructions` are left untouched.
+// cards) and `solutionSql` (SQL challenge cards), plus the per-file
+// `initialContent`/`solutionContent` of multi-file `files={[ … ]}` blocks.
+// `initCode`/`initSql` (read-only init), `tests` and `instructions` are left
+// untouched.
 //
 // Usage:
 //   node scripts/format-content.mjs            # format everything
@@ -205,6 +207,12 @@ function escapeTemplate(s) {
 }
 
 const PROP_RE = /\b(starterCode|solutionCode|solutionSql)\s*=\s*\{\s*`/g;
+// Multi-file blocks carry code as object properties inside files={[ … ]}:
+//   { filename: "Main.java", initialContent: `…`, solutionContent: `…` }
+// These use the `prop: ` + backtick object form (not the `prop={` + backtick
+// attribute form), so they need their own pattern. Same language as the
+// enclosing <CodeBlock>/<ChallengeCard>.
+const PROP_OBJ_RE = /\b(initialContent|solutionContent)\s*:\s*`/g;
 
 const stats = {
   files: 0,
@@ -223,21 +231,24 @@ async function processFile(file) {
   stats.files++;
   const openers = buildOpeners(src);
 
-  // Collect prop matches with their template spans.
+  // Collect prop matches with their template spans — both the attribute form
+  // (starterCode={`…`}) and the object-property form (initialContent: `…`).
   const edits = [];
-  let m;
-  PROP_RE.lastIndex = 0;
-  while ((m = PROP_RE.exec(src))) {
-    const prop = m[1];
-    const openBacktick = m.index + m[0].length - 1; // index of the `
-    const close = findCloseBacktick(src, openBacktick);
-    if (close === -1) {
-      stats.failed.push(`${file}: ${prop}: unterminated template literal`);
-      continue;
+  for (const re of [PROP_RE, PROP_OBJ_RE]) {
+    let m;
+    re.lastIndex = 0;
+    while ((m = re.exec(src))) {
+      const prop = m[1];
+      const openBacktick = m.index + m[0].length - 1; // index of the `
+      const close = findCloseBacktick(src, openBacktick);
+      if (close === -1) {
+        stats.failed.push(`${file}: ${prop}: unterminated template literal`);
+        continue;
+      }
+      const lang = langAt(openers, m.index);
+      edits.push({ prop, bodyStart: openBacktick + 1, bodyEnd: close, lang });
+      re.lastIndex = close + 1;
     }
-    const lang = langAt(openers, m.index);
-    edits.push({ prop, bodyStart: openBacktick + 1, bodyEnd: close, lang });
-    PROP_RE.lastIndex = close + 1;
   }
 
   // Format each (sequential — formatters are stateful singletons).

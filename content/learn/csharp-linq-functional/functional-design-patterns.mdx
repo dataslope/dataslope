@@ -201,35 +201,25 @@ combinator** library.
       initialContent: `using System;
 using System.Linq;
 
-var rule = Validator<string>.All(
-    Validator<string>.NonEmpty("name"),
-    Validator<string>.MaxLen("name", 10),
-    Validator<string>.NoDigits("name")
-);
+var rule = Validator<string>.All(Validator<string>.NonEmpty("name"), Validator<string>.MaxLen("name", 10),
+                                 Validator<string>.NoDigits("name"));
 
 foreach (var name in new[] { "Ada", "", "alongusername", "Ada1" })
 {
     var errs = rule(name).ToList();
-    Console.WriteLine(errs.Count == 0
-        ? $"OK: {name}"
-        : $"BAD '{name}': {string.Join("; ", errs)}");
+    Console.WriteLine(errs.Count == 0 ? $"OK: {name}" : $"BAD '{name}': {string.Join("; ", errs)}");
 }
 `,
       solutionContent: `using System;
 using System.Linq;
 
-var rule = Validator<string>.All(
-    Validator<string>.NonEmpty("name"),
-    Validator<string>.MaxLen("name", 10),
-    Validator<string>.NoDigits("name")
-);
+var rule = Validator<string>.All(Validator<string>.NonEmpty("name"), Validator<string>.MaxLen("name", 10),
+                                 Validator<string>.NoDigits("name"));
 
 foreach (var name in new[] { "Ada", "", "alongusername", "Ada1" })
 {
     var errs = rule(name).ToList();
-    Console.WriteLine(errs.Count == 0
-        ? $"OK: {name}"
-        : $"BAD '{name}': {string.Join("; ", errs)}");
+    Console.WriteLine(errs.Count == 0 ? $"OK: {name}" : $"BAD '{name}': {string.Join("; ", errs)}");
 }
 `,
     },
@@ -245,20 +235,16 @@ public static class Validator<T>
     public delegate IEnumerable<string> Rule(T value);
 
     // TODO: NonEmpty<string>: error "{field} is empty" iff value is null or empty string.
-    public static Rule NonEmpty(string field) =>
-        throw new NotImplementedException();
+    public static Rule NonEmpty(string field) => throw new NotImplementedException();
 
     // TODO: MaxLen<string>: error "{field} too long" iff value.Length > max.
-    public static Rule MaxLen(string field, int max) =>
-        throw new NotImplementedException();
+    public static Rule MaxLen(string field, int max) => throw new NotImplementedException();
 
     // TODO: NoDigits<string>: error "{field} contains digits" iff value has any digit char.
-    public static Rule NoDigits(string field) =>
-        throw new NotImplementedException();
+    public static Rule NoDigits(string field) => throw new NotImplementedException();
 
     // TODO: All: combine rules; concatenate all their errors in argument order.
-    public static Rule All(params Rule[] rules) =>
-        throw new NotImplementedException();
+    public static Rule All(params Rule[] rules) => throw new NotImplementedException();
 }
 `,
       solutionContent: `using System;
@@ -269,23 +255,17 @@ public static class Validator<T>
 {
     public delegate IEnumerable<string> Rule(T value);
 
-    public static Rule NonEmpty(string field) => v =>
-        string.IsNullOrEmpty(v as string)
-            ? new[] { $"{field} is empty" }
-            : Enumerable.Empty<string>();
+    public static Rule NonEmpty(string field) => v => string.IsNullOrEmpty(v as string) ? new[] { $"{field} is empty" }
+                                                                                        : Enumerable.Empty<string>();
 
-    public static Rule MaxLen(string field, int max) => v =>
-        (v as string)?.Length > max
-            ? new[] { $"{field} too long" }
-            : Enumerable.Empty<string>();
+    public static Rule MaxLen(string field, int max) => v => (v as string)?.Length > max? new[] { $"{field} too long" }
+        : Enumerable.Empty<string>();
 
-    public static Rule NoDigits(string field) => v =>
-        (v as string)?.Any(char.IsDigit) == true
-            ? new[] { $"{field} contains digits" }
-            : Enumerable.Empty<string>();
+    public static Rule NoDigits(string field) => v => (v as string)?.Any(char.IsDigit) == true
+                                                          ? new[] { $"{field} contains digits" }
+                                                          : Enumerable.Empty<string>();
 
-    public static Rule All(params Rule[] rules) => v =>
-        rules.SelectMany(r => r(v));
+    public static Rule All(params Rule[] rules) => v => rules.SelectMany(r => r(v));
 }
 `,
     },

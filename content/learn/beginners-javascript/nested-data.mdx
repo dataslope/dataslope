@@ -316,9 +316,16 @@ small.
       initialContent: `const { ordersByCustomer, lineTotal } = require("./orders");
 
 const orders = [
-  { id: 1, customer: "Ada",   items: [{ price: 10, qty: 2 }, { price: 5, qty: 1 }] },
+  {
+    id: 1,
+    customer: "Ada",
+    items: [
+      { price: 10, qty: 2 },
+      { price: 5, qty: 1 },
+    ],
+  },
   { id: 2, customer: "Linus", items: [{ price: 20, qty: 3 }] },
-  { id: 3, customer: "Ada",   items: [{ price: 8,  qty: 4 }] },
+  { id: 3, customer: "Ada", items: [{ price: 8, qty: 4 }] },
 ];
 
 const byCustomer = ordersByCustomer(orders);

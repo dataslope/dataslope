@@ -52,30 +52,24 @@ Reference a class declared in a sibling `.java` file. Each workspace file is com
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Greeter g = new Greeter("Java Playground");
-        System.out.println(g.hello());
-        System.out.println(g.bye());
-    }
+  public static void main(String[] args) {
+    Greeter g = new Greeter("Java Playground");
+    System.out.println(g.hello());
+    System.out.println(g.bye());
+  }
 }
 `,
     },
     {
       filename: "Greeter.java",
       initialContent: `public class Greeter {
-    private final String name;
+  private final String name;
 
-    public Greeter(String name) {
-        this.name = name;
-    }
+  public Greeter(String name) { this.name = name; }
 
-    public String hello() {
-        return "Hello, " + name + "!";
-    }
+  public String hello() { return "Hello, " + name + "!"; }
 
-    public String bye() {
-        return "Goodbye, " + name + "!";
-    }
+  public String bye() { return "Goodbye, " + name + "!"; }
 }
 `,
     },
@@ -92,30 +86,24 @@ The MDX source for the example above:
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Greeter g = new Greeter("Java Playground");
-        System.out.println(g.hello());
-        System.out.println(g.bye());
-    }
+  public static void main(String[] args) {
+    Greeter g = new Greeter("Java Playground");
+    System.out.println(g.hello());
+    System.out.println(g.bye());
+  }
 }
 `,
     },
     {
       filename: "Greeter.java",
       initialContent: `public class Greeter {
-    private final String name;
+  private final String name;
 
-    public Greeter(String name) {
-        this.name = name;
-    }
+  public Greeter(String name) { this.name = name; }
 
-    public String hello() {
-        return "Hello, " + name + "!";
-    }
+  public String hello() { return "Hello, " + name + "!"; }
 
-    public String bye() {
-        return "Goodbye, " + name + "!";
-    }
+  public String bye() { return "Goodbye, " + name + "!"; }
 }
 `,
     },

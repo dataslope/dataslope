@@ -71,26 +71,24 @@ console.log(report.bestDay.date, "=", report.bestDay.revenue.toFixed(2));
     },
     {
       filename: "types.ts",
-      initialContent: `export type Result<E, A> =
-  | { kind: "ok"; value: A }
-  | { kind: "err"; error: E };
+      initialContent: `export type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
 
-export const ok  = <E, A>(value: A): Result<E, A> => ({ kind: "ok",  value });
+export const ok = <E, A>(value: A): Result<E, A> => ({ kind: "ok", value });
 export const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
 
 export type Sale = {
-  readonly date:  string;     // YYYY-MM-DD
-  readonly sku:   string;
-  readonly qty:   number;
-  readonly price: number;     // unit price
+  readonly date: string; // YYYY-MM-DD
+  readonly sku: string;
+  readonly qty: number;
+  readonly price: number; // unit price
 };
 
 export type Rejected = { readonly raw: string; readonly error: string };
 
 export type Report = {
-  readonly rejected:   ReadonlyArray<Rejected>;
-  readonly byProduct:  ReadonlyMap<string, number>;     // sku -> revenue
-  readonly bestDay:    { readonly date: string; readonly revenue: number };
+  readonly rejected: ReadonlyArray<Rejected>;
+  readonly byProduct: ReadonlyMap<string, number>; // sku -> revenue
+  readonly bestDay: { readonly date: string; readonly revenue: number };
 };
 `,
     },
@@ -120,12 +118,14 @@ export function parseRow(raw: string): Result<string, Sale> {
 
 export type Priced = Sale & { readonly revenue: number };
 
-export const withRevenue = (s: Sale): Priced =>
-  ({ ...s, revenue: s.qty * s.price });
+export const withRevenue = (s: Sale): Priced => ({
+  ...s,
+  revenue: s.qty * s.price,
+});
 
 export const sumByKey = <A,>(
   xs: ReadonlyArray<A>,
-  key:   (a: A) => string,
+  key: (a: A) => string,
   value: (a: A) => number,
 ): ReadonlyMap<string, number> => {
   const out = new Map<string, number>();
@@ -142,7 +142,10 @@ export const maxByValue = (
   let bestK = "";
   let bestV = -Infinity;
   for (const [k, v] of m) {
-    if (v > bestV) { bestK = k; bestV = v; }
+    if (v > bestV) {
+      bestK = k;
+      bestV = v;
+    }
   }
   return { date: bestK, revenue: Number.isFinite(bestV) ? bestV : 0 };
 };
@@ -156,15 +159,15 @@ import { withRevenue, sumByKey, maxByValue } from "./transform";
 
 // Partition raw rows into accepted Sales and rejected reasons (pure)
 function partition(raws: ReadonlyArray<string>): {
-  sales:    ReadonlyArray<Sale>;
+  sales: ReadonlyArray<Sale>;
   rejected: ReadonlyArray<Rejected>;
 } {
-  const sales:    Sale[]     = [];
+  const sales: Sale[] = [];
   const rejected: Rejected[] = [];
   for (const raw of raws) {
     const r: Result<string, Sale> = parseRow(raw);
     if (r.kind === "ok") sales.push(r.value);
-    else                 rejected.push({ raw, error: r.error });
+    else rejected.push({ raw, error: r.error });
   }
   return { sales, rejected };
 }
@@ -174,9 +177,17 @@ export function runReport(raws: ReadonlyArray<string>): Report {
 
   const priced = sales.map(withRevenue);
 
-  const byProduct = sumByKey(priced, (p) => p.sku,  (p) => p.revenue);
-  const byDay     = sumByKey(priced, (p) => p.date, (p) => p.revenue);
-  const bestDay   = maxByValue(byDay);
+  const byProduct = sumByKey(
+    priced,
+    (p) => p.sku,
+    (p) => p.revenue,
+  );
+  const byDay = sumByKey(
+    priced,
+    (p) => p.date,
+    (p) => p.revenue,
+  );
+  const bestDay = maxByValue(byDay);
 
   return { rejected, byProduct, bestDay };
 }

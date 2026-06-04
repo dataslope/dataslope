@@ -226,14 +226,9 @@ Ties may be broken in any deterministic way (e.g. by region name).
   files={[
     {
       filename: "Program.cs",
-      initialContent: `var sales = new[]
-{
-    new Sale("EU",   10m),
-    new Sale("APAC", 15m),
-    new Sale("EU",   30m),
-    new Sale("US",   25m),
-    new Sale("EU",    5m),
-    new Sale("APAC", 20m),
+      initialContent: `var sales = new[] {
+    new Sale("EU", 10m), new Sale("APAC", 15m), new Sale("EU", 30m),
+    new Sale("US", 25m), new Sale("EU", 5m),    new Sale("APAC", 20m),
 };
 
 System.Console.WriteLine(SalesReport.TopRegion(sales));
@@ -259,14 +254,13 @@ using System.Linq;
 
 public static class SalesReport
 {
-    public static string TopRegion(IEnumerable<Sale> sales) =>
-        sales
-            .GroupBy(s => s.Region)
-            .Select(g => new { Region = g.Key, Total = g.Sum(s => s.Amount) })
-            .OrderByDescending(r => r.Total)
-            .ThenBy(r => r.Region)
-            .First()
-            .Region;
+    public static string TopRegion(IEnumerable<Sale> sales) => sales.GroupBy(s => s.Region)
+                                                                   .Select(g => new { Region = g.Key,
+                                                                                      Total = g.Sum(s => s.Amount) })
+                                                                   .OrderByDescending(r => r.Total)
+                                                                   .ThenBy(r => r.Region)
+                                                                   .First()
+                                                                   .Region;
 }
 `,
     },

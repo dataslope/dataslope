@@ -142,26 +142,24 @@ so `Main` can reference `Dog` directly without any imports.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Dog d = new Dog();
-        System.out.println(d.bark());
-    }
+  public static void main(String[] args) {
+    Dog d = new Dog();
+    System.out.println(d.bark());
+  }
 }
 `,
     },
     {
       filename: "Dog.java",
       initialContent: `public class Dog {
-    public String bark() {
-        // your code here
-        return "";
-    }
+  public String bark() {
+    // your code here
+    return "";
+  }
 }
 `,
       solutionContent: `public class Dog {
-    public String bark() {
-        return "Woof!";
-    }
+  public String bark() { return "Woof!"; }
 }
 `,
     },
@@ -186,25 +184,21 @@ so `Main` can reference `Dog` directly without any imports.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Dog d = new Dog();
-        System.out.println(d.bark());
-    }
+  public static void main(String[] args) {
+    Dog d = new Dog();
+    System.out.println(d.bark());
+  }
 }
 `,
     },
     {
       filename: "Dog.java",
       initialContent: `public class Dog {
-    public String bark() {
-        return "";
-    }
+  public String bark() { return ""; }
 }
 `,
       solutionContent: `public class Dog {
-    public String bark() {
-        return "Woof!";
-    }
+  public String bark() { return "Woof!"; }
 }
 `,
     },

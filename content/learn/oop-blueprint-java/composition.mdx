@@ -65,37 +65,37 @@ ownership. The `Engine` is part of the `Car`.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Car c = new Car();
-        System.out.println("Before start, running? " + c.running());
-        c.start();
-        System.out.println("After  start, running? " + c.running());
-        c.stop();
-        System.out.println("After  stop,  running? " + c.running());
-    }
+  public static void main(String[] args) {
+    Car c = new Car();
+    System.out.println("Before start, running? " + c.running());
+    c.start();
+    System.out.println("After  start, running? " + c.running());
+    c.stop();
+    System.out.println("After  stop,  running? " + c.running());
+  }
 }
 `,
     },
     {
       filename: "Engine.java",
       initialContent: `public class Engine {
-    private boolean running;
+  private boolean running;
 
-    public void ignite()   { running = true;  }
-    public void shutOff()  { running = false; }
-    public boolean running() { return running; }
+  public void ignite() { running = true; }
+  public void shutOff() { running = false; }
+  public boolean running() { return running; }
 }
 `,
     },
     {
       filename: "Car.java",
       initialContent: `public class Car {
-    // The engine is constructed and OWNED by the Car.
-    private final Engine engine = new Engine();
+  // The engine is constructed and OWNED by the Car.
+  private final Engine engine = new Engine();
 
-    public void start()  { engine.ignite();  }
-    public void stop()   { engine.shutOff(); }
-    public boolean running() { return engine.running(); }
+  public void start() { engine.ignite(); }
+  public void stop() { engine.shutOff(); }
+  public boolean running() { return engine.running(); }
 }
 `}
   ]}
@@ -142,47 +142,47 @@ for me." It is the everyday verb of composition.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Person p = new Person("Ada", new Address("13 Albemarle St", "London"));
-        System.out.println(p.describe());
-        System.out.println("City: " + p.city());      // Person delegates to Address
-    }
+  public static void main(String[] args) {
+    Person p = new Person("Ada", new Address("13 Albemarle St", "London"));
+    System.out.println(p.describe());
+    System.out.println("City: " + p.city()); // Person delegates to Address
+  }
 }
 `,
     },
     {
       filename: "Address.java",
       initialContent: `public class Address {
-    private final String street;
-    private final String city;
-    public Address(String street, String city) {
-        this.street = street;
-        this.city = city;
-    }
-    public String street() { return street; }
-    public String city()   { return city; }
-    public String oneLine() { return street + ", " + city; }
+  private final String street;
+  private final String city;
+  public Address(String street, String city) {
+    this.street = street;
+    this.city = city;
+  }
+  public String street() { return street; }
+  public String city() { return city; }
+  public String oneLine() { return street + ", " + city; }
 }
 `,
     },
     {
       filename: "Person.java",
       initialContent: `public class Person {
-    private final String  name;
-    private final Address address;
+  private final String name;
+  private final Address address;
 
-    public Person(String name, Address address) {
-        this.name    = name;
-        this.address = address;
-    }
+  public Person(String name, Address address) {
+    this.name = name;
+    this.address = address;
+  }
 
-    public String describe() {
-        return name + " — " + address.oneLine();          // delegation
-    }
+  public String describe() {
+    return name + " — " + address.oneLine(); // delegation
+  }
 
-    public String city() {
-        return address.city();                             // delegation
-    }
+  public String city() {
+    return address.city(); // delegation
+  }
 }
 `,
     },
@@ -234,66 +234,61 @@ classDiagram
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Computer c = new Computer(
-            new Cpu("M4", 10),
-            new Ram(16),
-            new Ssd(512)
-        );
-        System.out.println(c.specs());
-    }
+  public static void main(String[] args) {
+    Computer c = new Computer(new Cpu("M4", 10), new Ram(16), new Ssd(512));
+    System.out.println(c.specs());
+  }
 }
 `,
     },
     {
       filename: "Cpu.java",
       initialContent: `public class Cpu {
-    private final String model;
-    private final int cores;
-    public Cpu(String model, int cores) {
-        this.model = model;
-        this.cores = cores;
-    }
-    public String describe() { return model + " (" + cores + " cores)"; }
+  private final String model;
+  private final int cores;
+  public Cpu(String model, int cores) {
+    this.model = model;
+    this.cores = cores;
+  }
+  public String describe() { return model + " (" + cores + " cores)"; }
 }
 `,
     },
     {
       filename: "Ram.java",
       initialContent: `public class Ram {
-    private final int gb;
-    public Ram(int gb) { this.gb = gb; }
-    public String describe() { return gb + " GB RAM"; }
+  private final int gb;
+  public Ram(int gb) { this.gb = gb; }
+  public String describe() { return gb + " GB RAM"; }
 }
 `,
     },
     {
       filename: "Ssd.java",
       initialContent: `public class Ssd {
-    private final int gb;
-    public Ssd(int gb) { this.gb = gb; }
-    public String describe() { return gb + " GB SSD"; }
+  private final int gb;
+  public Ssd(int gb) { this.gb = gb; }
+  public String describe() { return gb + " GB SSD"; }
 }
 `,
     },
     {
       filename: "Computer.java",
       initialContent: `public class Computer {
-    private final Cpu cpu;
-    private final Ram ram;
-    private final Ssd ssd;
+  private final Cpu cpu;
+  private final Ram ram;
+  private final Ssd ssd;
 
-    public Computer(Cpu cpu, Ram ram, Ssd ssd) {
-        this.cpu = cpu;
-        this.ram = ram;
-        this.ssd = ssd;
-    }
+  public Computer(Cpu cpu, Ram ram, Ssd ssd) {
+    this.cpu = cpu;
+    this.ram = ram;
+    this.ssd = ssd;
+  }
 
-    public String specs() {
-        return "Computer: " + cpu.describe()
-             + ", "         + ram.describe()
-             + ", "         + ssd.describe();
-    }
+  public String specs() {
+    return "Computer: " + cpu.describe() + ", " + ram.describe() + ", " +
+        ssd.describe();
+  }
 }
 `,
     },
@@ -325,49 +320,45 @@ Pride and Prejudice by Jane Austen
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Author austen = new Author("Jane", "Austen");
-        Book   book   = new Book("Pride and Prejudice", austen);
-        System.out.println(book.citation());
-    }
+  public static void main(String[] args) {
+    Author austen = new Author("Jane", "Austen");
+    Book book = new Book("Pride and Prejudice", austen);
+    System.out.println(book.citation());
+  }
 }
 `,
     },
     {
       filename: "Author.java",
       initialContent: `public class Author {
-    // TODO
+  // TODO
 }
 `,
       solutionContent: `public class Author {
-    private final String firstName;
-    private final String lastName;
-    public Author(String firstName, String lastName) {
-        this.firstName = firstName;
-        this.lastName  = lastName;
-    }
-    public String fullName() {
-        return firstName + " " + lastName;
-    }
+  private final String firstName;
+  private final String lastName;
+  public Author(String firstName, String lastName) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+  }
+  public String fullName() { return firstName + " " + lastName; }
 }
 `,
     },
     {
       filename: "Book.java",
       initialContent: `public class Book {
-    // TODO — must compose an Author
+  // TODO — must compose an Author
 }
 `,
       solutionContent: `public class Book {
-    private final String title;
-    private final Author author;
-    public Book(String title, Author author) {
-        this.title  = title;
-        this.author = author;
-    }
-    public String citation() {
-        return title + " by " + author.fullName();
-    }
+  private final String title;
+  private final Author author;
+  public Book(String title, Author author) {
+    this.title = title;
+    this.author = author;
+  }
+  public String citation() { return title + " by " + author.fullName(); }
 }
 `,
     },

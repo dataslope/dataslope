@@ -383,14 +383,17 @@ Console.WriteLine($"max={Stats.Max(data)}");
     public static int Sum(int[] xs)
     {
         int s = 0;
-        foreach (var x in xs) s += x;
+        foreach (var x in xs)
+            s += x;
         return s;
     }
 
     public static int Max(int[] xs)
     {
         int m = xs[0];
-        foreach (var x in xs) if (x > m) m = x;
+        foreach (var x in xs)
+            if (x > m)
+                m = x;
         return m;
     }
 }

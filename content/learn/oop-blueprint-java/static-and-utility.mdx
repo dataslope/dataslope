@@ -138,36 +138,35 @@ nobody can mistakenly write `new StringTools()`.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        System.out.println(StringTools.reverse("OOP"));
-        System.out.println(StringTools.isPalindrome("level"));
-        System.out.println(StringTools.isPalindrome("Java"));
-        System.out.println(StringTools.wordCount("encapsulation is a discipline"));
-    }
+  public static void main(String[] args) {
+    System.out.println(StringTools.reverse("OOP"));
+    System.out.println(StringTools.isPalindrome("level"));
+    System.out.println(StringTools.isPalindrome("Java"));
+    System.out.println(StringTools.wordCount("encapsulation is a discipline"));
+  }
 }
 `,
     },
     {
       filename: "StringTools.java",
       initialContent: `public final class StringTools {
-    private StringTools() {
-        // Never instantiated. This constructor exists only to forbid
-        // \`new StringTools()\`.
-        throw new AssertionError("no instances");
-    }
+  private StringTools() {
+    // Never instantiated. This constructor exists only to forbid
+    // \`new StringTools()\`.
+    throw new AssertionError("no instances");
+  }
 
-    public static String reverse(String s) {
-        return new StringBuilder(s).reverse().toString();
-    }
+  public static String reverse(String s) {
+    return new StringBuilder(s).reverse().toString();
+  }
 
-    public static boolean isPalindrome(String s) {
-        return s.equals(reverse(s));
-    }
+  public static boolean isPalindrome(String s) { return s.equals(reverse(s)); }
 
-    public static int wordCount(String s) {
-        if (s == null || s.isBlank()) return 0;
-        return s.trim().split("\\\\s+").length;
-    }
+  public static int wordCount(String s) {
+    if (s == null || s.isBlank())
+      return 0;
+    return s.trim().split("\\\\s+").length;
+  }
 }
 `,
     },
@@ -275,40 +274,43 @@ sum=15
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        System.out.println("max="    + MyMath.max(7, 10));
-        System.out.println("clamp1=" + MyMath.clamp(5,  0, 10));
-        System.out.println("clamp2=" + MyMath.clamp(-3, 0, 10));
-        System.out.println("clamp3=" + MyMath.clamp(99, 0, 10));
-        System.out.println("sum="    + MyMath.sum(new int[]{1, 2, 3, 4, 5}));
-    }
+  public static void main(String[] args) {
+    System.out.println("max=" + MyMath.max(7, 10));
+    System.out.println("clamp1=" + MyMath.clamp(5, 0, 10));
+    System.out.println("clamp2=" + MyMath.clamp(-3, 0, 10));
+    System.out.println("clamp3=" + MyMath.clamp(99, 0, 10));
+    System.out.println("sum=" + MyMath.sum(new int[] {1, 2, 3, 4, 5}));
+  }
 }
 `,
     },
     {
       filename: "MyMath.java",
       initialContent: `public final class MyMath {
-    // TODO: private constructor + the three static methods
+  // TODO: private constructor + the three static methods
 }
 `,
       solutionContent: `public final class MyMath {
-    private MyMath() { throw new AssertionError("no instances"); }
+  private MyMath() { throw new AssertionError("no instances"); }
 
-    public static int max(int a, int b) {
-        return a >= b ? a : b;
-    }
-    public static int clamp(int x, int lo, int hi) {
-        if (lo > hi) throw new IllegalArgumentException("lo > hi");
-        if (x < lo) return lo;
-        if (x > hi) return hi;
-        return x;
-    }
-    public static int sum(int[] xs) {
-        if (xs == null) return 0;
-        int s = 0;
-        for (int v : xs) s += v;
-        return s;
-    }
+  public static int max(int a, int b) { return a >= b ? a : b; }
+  public static int clamp(int x, int lo, int hi) {
+    if (lo > hi)
+      throw new IllegalArgumentException("lo > hi");
+    if (x < lo)
+      return lo;
+    if (x > hi)
+      return hi;
+    return x;
+  }
+  public static int sum(int[] xs) {
+    if (xs == null)
+      return 0;
+    int s = 0;
+    for (int v : xs)
+      s += v;
+    return s;
+  }
 }
 `,
     },

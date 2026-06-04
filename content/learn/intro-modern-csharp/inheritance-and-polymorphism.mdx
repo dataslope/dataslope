@@ -282,7 +282,10 @@ foreach (var s in shapes)
       solutionContent: `public class Circle : Shape
 {
     public double Radius { get; }
-    public Circle(double r) { Radius = r; }
+    public Circle(double r)
+    {
+        Radius = r;
+    }
     public override double Area() => System.Math.PI * Radius * Radius;
 }
 `,
@@ -299,7 +302,11 @@ foreach (var s in shapes)
 {
     public double Width { get; }
     public double Height { get; }
-    public Rectangle(double w, double h) { Width = w; Height = h; }
+    public Rectangle(double w, double h)
+    {
+        Width = w;
+        Height = h;
+    }
     public override double Area() => Width * Height;
 }
 `,

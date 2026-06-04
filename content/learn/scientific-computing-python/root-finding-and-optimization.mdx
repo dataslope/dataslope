@@ -267,8 +267,8 @@ import matplotlib.pyplot as plt
 from fit import fit_gaussian, gaussian
 
 rng = np.random.default_rng(0)
-x  = np.linspace(-3, 6, 200)
-y  = gaussian(x, amp=3.0, mu=1.5, sigma=0.8) + 0.1*rng.standard_normal(x.size)
+x = np.linspace(-3, 6, 200)
+y = gaussian(x, amp=3.0, mu=1.5, sigma=0.8) + 0.1 * rng.standard_normal(x.size)
 
 params, errors = fit_gaussian(x, y)
 print("estimated parameters (amp, mu, sigma):", params.round(3))
@@ -276,7 +276,8 @@ print("1-σ uncertainties                    :", errors.round(3))
 
 plt.plot(x, y, "o", ms=3, label="data")
 plt.plot(x, gaussian(x, *params), "r-", lw=2, label="fit")
-plt.legend(); plt.show()
+plt.legend()
+plt.show()
 `,
     },
     {
@@ -284,15 +285,15 @@ plt.legend(); plt.show()
       initialContent: `import numpy as np
 from scipy.optimize import curve_fit
 
+
 def gaussian(x, amp, mu, sigma):
-    return amp * np.exp(-((x - mu) / sigma) ** 2 / 2)
+    return amp * np.exp(-(((x - mu) / sigma) ** 2) / 2)
+
 
 def fit_gaussian(x, y):
     """Fit a Gaussian peak; return (params, 1-sigma errors)."""
     # Sensible initial guesses from the data
-    p0 = [y.max() - y.min(),
-          x[np.argmax(y)],
-          (x.max() - x.min()) / 6]
+    p0 = [y.max() - y.min(), x[np.argmax(y)], (x.max() - x.min()) / 6]
     popt, pcov = curve_fit(gaussian, x, y, p0=p0)
     perr = np.sqrt(np.diag(pcov))
     return popt, perr

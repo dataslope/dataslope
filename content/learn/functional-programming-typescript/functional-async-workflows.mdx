@@ -248,18 +248,23 @@ errors**. Errors must propagate via the Result channel.
     {
       filename: "workflow.ts",
       initialContent: `export type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
-export const ok  = <E, A>(value: A): Result<E, A> => ({ kind: "ok",  value });
+export const ok = <E, A>(value: A): Result<E, A> => ({ kind: "ok", value });
 export const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
 
 export type TaskResult<E, A> = () => Promise<Result<E, A>>;
 
-export const mapTR = <E, A, B>(t: TaskResult<E, A>, f: (a: A) => B): TaskResult<E, B> =>
+export const mapTR =
+  <E, A, B>(t: TaskResult<E, A>, f: (a: A) => B): TaskResult<E, B> =>
   async () => {
     const r = await t();
     return r.kind === "ok" ? ok(f(r.value)) : r;
   };
 
-export const chainTR = <E, A, B>(t: TaskResult<E, A>, f: (a: A) => TaskResult<E, B>): TaskResult<E, B> =>
+export const chainTR =
+  <E, A, B>(
+    t: TaskResult<E, A>,
+    f: (a: A) => TaskResult<E, B>,
+  ): TaskResult<E, B> =>
   async () => {
     const r = await t();
     return r.kind === "ok" ? f(r.value)() : r;
@@ -268,17 +273,21 @@ export const chainTR = <E, A, B>(t: TaskResult<E, A>, f: (a: A) => TaskResult<E,
 // --- Fake APIs ---
 type User = { id: string; name: string };
 
-export const fetchUser = (id: string): TaskResult<string, User> =>
-  () => Promise.resolve(
-    id === "u1" ? ok({ id, name: "Ada" }) :
-    id === "u2" ? ok({ id, name: "Linus" }) :
-    err("no such user"),
-  );
+export const fetchUser =
+  (id: string): TaskResult<string, User> =>
+  () =>
+    Promise.resolve(
+      id === "u1"
+        ? ok({ id, name: "Ada" })
+        : id === "u2"
+          ? ok({ id, name: "Linus" })
+          : err("no such user"),
+    );
 
-export const fetchLang = (u: User): TaskResult<string, string> =>
-  () => Promise.resolve(
-    u.id === "u1" ? ok("TypeScript") : err("no language set"),
-  );
+export const fetchLang =
+  (u: User): TaskResult<string, string> =>
+  () =>
+    Promise.resolve(u.id === "u1" ? ok("TypeScript") : err("no language set"));
 
 // TODO: implement
 export function run(userId: string): TaskResult<string, string> {
@@ -286,18 +295,23 @@ export function run(userId: string): TaskResult<string, string> {
 }
 `,
       solutionContent: `export type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
-export const ok  = <E, A>(value: A): Result<E, A> => ({ kind: "ok",  value });
+export const ok = <E, A>(value: A): Result<E, A> => ({ kind: "ok", value });
 export const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
 
 export type TaskResult<E, A> = () => Promise<Result<E, A>>;
 
-export const mapTR = <E, A, B>(t: TaskResult<E, A>, f: (a: A) => B): TaskResult<E, B> =>
+export const mapTR =
+  <E, A, B>(t: TaskResult<E, A>, f: (a: A) => B): TaskResult<E, B> =>
   async () => {
     const r = await t();
     return r.kind === "ok" ? ok(f(r.value)) : r;
   };
 
-export const chainTR = <E, A, B>(t: TaskResult<E, A>, f: (a: A) => TaskResult<E, B>): TaskResult<E, B> =>
+export const chainTR =
+  <E, A, B>(
+    t: TaskResult<E, A>,
+    f: (a: A) => TaskResult<E, B>,
+  ): TaskResult<E, B> =>
   async () => {
     const r = await t();
     return r.kind === "ok" ? f(r.value)() : r;
@@ -305,22 +319,29 @@ export const chainTR = <E, A, B>(t: TaskResult<E, A>, f: (a: A) => TaskResult<E,
 
 type User = { id: string; name: string };
 
-export const fetchUser = (id: string): TaskResult<string, User> =>
-  () => Promise.resolve(
-    id === "u1" ? ok({ id, name: "Ada" }) :
-    id === "u2" ? ok({ id, name: "Linus" }) :
-    err("no such user"),
-  );
+export const fetchUser =
+  (id: string): TaskResult<string, User> =>
+  () =>
+    Promise.resolve(
+      id === "u1"
+        ? ok({ id, name: "Ada" })
+        : id === "u2"
+          ? ok({ id, name: "Linus" })
+          : err("no such user"),
+    );
 
-export const fetchLang = (u: User): TaskResult<string, string> =>
-  () => Promise.resolve(
-    u.id === "u1" ? ok("TypeScript") : err("no language set"),
-  );
+export const fetchLang =
+  (u: User): TaskResult<string, string> =>
+  () =>
+    Promise.resolve(u.id === "u1" ? ok("TypeScript") : err("no language set"));
 
 export function run(userId: string): TaskResult<string, string> {
   return chainTR(fetchUser(userId), (user) =>
-    mapTR(fetchLang(user), (lang) =>
-      \`Hello, \${user.name}! Preferred language: \${lang}.\`));
+    mapTR(
+      fetchLang(user),
+      (lang) => \`Hello, \${user.name}! Preferred language: \${lang}.\`,
+    ),
+  );
 }
 `,
     },

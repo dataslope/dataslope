@@ -276,15 +276,17 @@ differ in the safe direction.
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<Integer> ints = new ArrayList<>();
-        ints.add(1); ints.add(2); ints.add(3);
+  public static void main(String[] args) {
+    List<Integer> ints = new ArrayList<>();
+    ints.add(1);
+    ints.add(2);
+    ints.add(3);
 
-        List<Number> nums = new ArrayList<>();   // Number is a supertype of Integer
+    List<Number> nums = new ArrayList<>(); // Number is a supertype of Integer
 
-        Copier.copyAll(nums, ints);              // dest = Number, src = Integer
-        System.out.println(nums);
-    }
+    Copier.copyAll(nums, ints); // dest = Number, src = Integer
+    System.out.println(nums);
+  }
 }
 `,
     },
@@ -293,10 +295,11 @@ public class Main {
       initialContent: `import java.util.List;
 
 public class Copier {
-    // PECS: src produces (? extends T), dest consumes (? super T)
-    public static <T> void copyAll(List<? super T> dest, List<? extends T> src) {
-        for (T x : src) dest.add(x);
-    }
+  // PECS: src produces (? extends T), dest consumes (? super T)
+  public static <T> void copyAll(List<? super T> dest, List<? extends T> src) {
+    for (T x : src)
+      dest.add(x);
+  }
 }
 `,
     },
@@ -348,18 +351,19 @@ Expected output (when the provided \`Main\` runs):
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        Bag<Number> bag = new Bag<>();
-        bag.add(1);
-        bag.add(2);
-        bag.add(3);
+  public static void main(String[] args) {
+    Bag<Number> bag = new Bag<>();
+    bag.add(1);
+    bag.add(2);
+    bag.add(3);
 
-        List<Integer> moreInts = new ArrayList<>();
-        moreInts.add(10); moreInts.add(20);
+    List<Integer> moreInts = new ArrayList<>();
+    moreInts.add(10);
+    moreInts.add(20);
 
-        bag.addAll(moreInts);   // List<Integer> is "? extends Number"
-        System.out.println(bag.all());
-    }
+    bag.addAll(moreInts); // List<Integer> is "? extends Number"
+    System.out.println(bag.all());
+  }
 }
 `,
     },
@@ -369,28 +373,29 @@ public class Main {
 import java.util.List;
 
 public class Bag<T> {
-    private final List<T> data = new ArrayList<>();
+  private final List<T> data = new ArrayList<>();
 
-    public void add(T item) { data.add(item); }
+  public void add(T item) { data.add(item); }
 
-    // TODO: addAll must accept any Iterable<? extends T>
-    public void addAll(/* TODO */) {
-        // TODO
-    }
+  // TODO: addAll must accept any Iterable<? extends T>
+  public void addAll(/* TODO */) {
+    // TODO
+  }
 
-    public List<T> all() { return data; }
+  public List<T> all() { return data; }
 }
 `,
       solutionContent: `import java.util.ArrayList;
 import java.util.List;
 
 public class Bag<T> {
-    private final List<T> data = new ArrayList<>();
-    public void add(T item) { data.add(item); }
-    public void addAll(Iterable<? extends T> items) {
-        for (T x : items) data.add(x);
-    }
-    public List<T> all() { return data; }
+  private final List<T> data = new ArrayList<>();
+  public void add(T item) { data.add(item); }
+  public void addAll(Iterable<? extends T> items) {
+    for (T x : items)
+      data.add(x);
+  }
+  public List<T> all() { return data; }
 }
 `,
     },

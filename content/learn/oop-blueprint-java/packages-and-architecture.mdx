@@ -267,17 +267,17 @@ concern.
       filename: "Main.java",
       initialContent: `// presentation layer (would live in com.lib.cli)
 public class Main {
-    public static void main(String[] args) {
-        Catalog catalog = new Catalog();
-        catalog.add(new Book("Refactoring", "Fowler"));
-        catalog.add(new Book("OOSC",        "Meyer"));
+  public static void main(String[] args) {
+    Catalog catalog = new Catalog();
+    catalog.add(new Book("Refactoring", "Fowler"));
+    catalog.add(new Book("OOSC", "Meyer"));
 
-        LibraryService svc = new LibraryService(catalog);
-        for (String line : svc.allTitles()) {
-            System.out.println("- " + line);
-        }
-        System.out.println("Find 'OOSC': " + svc.findByTitle("OOSC"));
+    LibraryService svc = new LibraryService(catalog);
+    for (String line : svc.allTitles()) {
+      System.out.println("- " + line);
     }
+    System.out.println("Find 'OOSC': " + svc.findByTitle("OOSC"));
+  }
 }
 `,
     },
@@ -285,14 +285,18 @@ public class Main {
       filename: "Book.java",
       initialContent: `// domain layer (would live in com.lib.model)
 public class Book {
-    private final String title;
-    private final String author;
-    public Book(String title, String author) {
-        this.title = title; this.author = author;
-    }
-    public String title()  { return title; }
-    public String author() { return author; }
-    @Override public String toString() { return title + " — " + author; }
+  private final String title;
+  private final String author;
+  public Book(String title, String author) {
+    this.title = title;
+    this.author = author;
+  }
+  public String title() { return title; }
+  public String author() { return author; }
+  @Override
+  public String toString() {
+    return title + " — " + author;
+  }
 }
 `,
     },
@@ -303,13 +307,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Catalog {
-    private final List<Book> books = new ArrayList<>();
-    public void add(Book b)         { books.add(b); }
-    public List<Book> all()         { return books; }
-    public Book findByTitle(String t) {
-        for (Book b : books) if (b.title().equals(t)) return b;
-        return null;
-    }
+  private final List<Book> books = new ArrayList<>();
+  public void add(Book b) { books.add(b); }
+  public List<Book> all() { return books; }
+  public Book findByTitle(String t) {
+    for (Book b : books)
+      if (b.title().equals(t))
+        return b;
+    return null;
+  }
 }
 `,
     },
@@ -320,21 +326,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LibraryService {
-    private final Catalog catalog;
-    public LibraryService(Catalog catalog) {
-        this.catalog = catalog;
-    }
+  private final Catalog catalog;
+  public LibraryService(Catalog catalog) { this.catalog = catalog; }
 
-    public List<String> allTitles() {
-        List<String> out = new ArrayList<>();
-        for (Book b : catalog.all()) out.add(b.toString());
-        return out;
-    }
+  public List<String> allTitles() {
+    List<String> out = new ArrayList<>();
+    for (Book b : catalog.all())
+      out.add(b.toString());
+    return out;
+  }
 
-    public String findByTitle(String t) {
-        Book b = catalog.findByTitle(t);
-        return b == null ? "not found" : b.toString();
-    }
+  public String findByTitle(String t) {
+    Book b = catalog.findByTitle(t);
+    return b == null ? "not found" : b.toString();
+  }
 }
 `,
     },

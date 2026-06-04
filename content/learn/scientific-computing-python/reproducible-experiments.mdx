@@ -220,7 +220,7 @@ for damping, omega in itertools.product([0.1, 0.3, 0.5], [1.0, 2.0, 3.0]):
 
 results = []
 for i, cfg in enumerate(configs):
-    seed = SEED_BASE + i             # deterministic per-config seed
+    seed = SEED_BASE + i  # deterministic per-config seed
     final = simulate(**cfg, seed=seed)
     results.append({**cfg, "seed": seed, "final_energy": final})
 
@@ -233,6 +233,7 @@ for r in results:
       initialContent: `import numpy as np
 from scipy.integrate import solve_ivp
 
+
 def simulate(damping=0.1, omega=1.0, seed=0, t_end=20.0):
     """Damped oscillator with stochastic kick; returns final energy."""
     rng = np.random.default_rng(seed)
@@ -241,18 +242,18 @@ def simulate(damping=0.1, omega=1.0, seed=0, t_end=20.0):
 
     def rhs(t, y):
         x, v = y
-        return [v, -damping*v - omega*omega*x]
+        return [v, -damping * v - omega * omega * x]
 
     state = np.array([1.0, 0.0])
     t = 0.0
     for tk in kick_times:
         sol = solve_ivp(rhs, [t, tk], state, rtol=1e-9)
         state = sol.y[:, -1].copy()
-        state[1] += 0.5 * rng.standard_normal()    # random velocity kick
+        state[1] += 0.5 * rng.standard_normal()  # random velocity kick
         t = tk
     sol = solve_ivp(rhs, [t, t_end], state, rtol=1e-9)
     state = sol.y[:, -1]
-    return 0.5 * state[1]**2 + 0.5 * omega**2 * state[0]**2
+    return 0.5 * state[1] ** 2 + 0.5 * omega**2 * state[0] ** 2
 `,
     },
   ]}

@@ -271,16 +271,38 @@ filesystem before each run, so the entry translation unit can
   files={[
     {
       filename: "main.cpp",
-      initialContent: `#include "greeter.h"\n\nint main() {\n    Greeter g;\n    g.greet();\n    return 0;\n}\n`,
+      initialContent: `#include "greeter.h"
+
+int main() {
+  Greeter g;
+  g.greet();
+  return 0;
+}
+`,
     },
     {
       filename: "greeter.h",
-      initialContent: `#pragma once\nclass Greeter {\npublic:\n    void greet();\n};\n`,
+      initialContent: `#pragma once
+class Greeter {
+public:
+  void greet();
+};
+`,
     },
     {
       filename: "greeter.cpp",
-      initialContent: `#include <iostream>\n#include "greeter.h"\n\nvoid Greeter::greet() {\n    // your code here\n}\n`,
-      solutionContent: `#include <iostream>\n#include "greeter.h"\n\nvoid Greeter::greet() {\n    std::cout << "Hello, World!\\n";\n}\n`,
+      initialContent: `#include "greeter.h"
+#include <iostream>
+
+void Greeter::greet() {
+  // your code here
+}
+`,
+      solutionContent: `#include "greeter.h"
+#include <iostream>
+
+void Greeter::greet() { std::cout << "Hello, World!\\n"; }
+`,
     },
   ]}
   tests={[
@@ -302,16 +324,36 @@ filesystem before each run, so the entry translation unit can
   files={[
     {
       filename: "main.cpp",
-      initialContent: `#include "greeter.h"\n\nint main() {\n    Greeter g;\n    g.greet();\n    return 0;\n}\n`,
+      initialContent: `#include "greeter.h"
+
+int main() {
+  Greeter g;
+  g.greet();
+  return 0;
+}
+`,
     },
     {
       filename: "greeter.h",
-      initialContent: `#pragma once\nclass Greeter {\npublic:\n    void greet();\n};\n`,
+      initialContent: `#pragma once
+class Greeter {
+public:
+  void greet();
+};
+`,
     },
     {
       filename: "greeter.cpp",
-      initialContent: `#include <iostream>\n#include "greeter.h"\n\nvoid Greeter::greet() {\n}\n`,
-      solutionContent: `#include <iostream>\n#include "greeter.h"\n\nvoid Greeter::greet() {\n    std::cout << "Hello, World!\\n";\n}\n`,
+      initialContent: `#include "greeter.h"
+#include <iostream>
+
+void Greeter::greet() {}
+`,
+      solutionContent: `#include "greeter.h"
+#include <iostream>
+
+void Greeter::greet() { std::cout << "Hello, World!\\n"; }
+`,
     },
   ]}
   tests={[

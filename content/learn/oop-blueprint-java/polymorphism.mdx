@@ -110,49 +110,58 @@ brand new `Hexagon` tomorrow, and your function doesn't change.
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<Shape> shapes = Arrays.asList(new Circle(2), new Square(3), new Triangle(4, 5));
-        Renderer r = new Renderer();
-        r.drawAll(shapes);
-    }
+  public static void main(String[] args) {
+    List<Shape> shapes =
+        Arrays.asList(new Circle(2), new Square(3), new Triangle(4, 5));
+    Renderer r = new Renderer();
+    r.drawAll(shapes);
+  }
 }
 `,
     },
     {
       filename: "Shape.java",
       initialContent: `public interface Shape {
-    String draw();
+  String draw();
 }
 `,
     },
     {
       filename: "Circle.java",
       initialContent: `public class Circle implements Shape {
-    private final double r;
-    public Circle(double r) { this.r = r; }
-    @Override public String draw() { return "(O) circle r=" + r; }
+  private final double r;
+  public Circle(double r) { this.r = r; }
+  @Override
+  public String draw() {
+    return "(O) circle r=" + r;
+  }
 }
 `,
     },
     {
       filename: "Square.java",
       initialContent: `public class Square implements Shape {
-    private final double s;
-    public Square(double s) { this.s = s; }
-    @Override public String draw() { return "[ ] square s=" + s; }
+  private final double s;
+  public Square(double s) { this.s = s; }
+  @Override
+  public String draw() {
+    return "[ ] square s=" + s;
+  }
 }
 `,
     },
     {
       filename: "Triangle.java",
       initialContent: `public class Triangle implements Shape {
-    private final double base, height;
-    public Triangle(double base, double height) {
-        this.base = base; this.height = height;
-    }
-    @Override public String draw() {
-        return "/\\\\ triangle base=" + base + " height=" + height;
-    }
+  private final double base, height;
+  public Triangle(double base, double height) {
+    this.base = base;
+    this.height = height;
+  }
+  @Override
+  public String draw() {
+    return "/\\\\ triangle base=" + base + " height=" + height;
+  }
 }
 `,
     },
@@ -161,11 +170,11 @@ public class Main {
       initialContent: `import java.util.List;
 
 public class Renderer {
-    public void drawAll(List<Shape> shapes) {
-        for (Shape s : shapes) {
-            System.out.println(s.draw());     // polymorphic call
-        }
+  public void drawAll(List<Shape> shapes) {
+    for (Shape s : shapes) {
+      System.out.println(s.draw()); // polymorphic call
     }
+  }
 }
 `,
     },
@@ -301,58 +310,58 @@ total cents: 800000
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        List<Payable> people = Arrays.asList(
-            new SalariedEmployee(500_000),
-            new HourlyEmployee(2_000, 100),     // 2_000 * 100 = 200_000
-            new HourlyEmployee(1_000, 100)      // 1_000 * 100 = 100_000
+  public static void main(String[] args) {
+    List<Payable> people =
+        Arrays.asList(new SalariedEmployee(500_000),
+                      new HourlyEmployee(2_000, 100), // 2_000 * 100 = 200_000
+                      new HourlyEmployee(1_000, 100)  // 1_000 * 100 = 100_000
         );
-        Payroll p = new Payroll();
-        System.out.println("total cents: " + p.totalCents(people));
-    }
+    Payroll p = new Payroll();
+    System.out.println("total cents: " + p.totalCents(people));
+  }
 }
 `,
     },
     {
       filename: "Payable.java",
       initialContent: `public interface Payable {
-    int monthlyPayCents();
+  int monthlyPayCents();
 }
 `,
     },
     {
       filename: "SalariedEmployee.java",
       initialContent: `public class SalariedEmployee implements Payable {
-    // TODO
+  // TODO
 }
 `,
       solutionContent: `public class SalariedEmployee implements Payable {
-    private final int salaryCents;
-    public SalariedEmployee(int salaryCents) {
-        this.salaryCents = salaryCents;
-    }
-    @Override
-    public int monthlyPayCents() { return salaryCents; }
+  private final int salaryCents;
+  public SalariedEmployee(int salaryCents) { this.salaryCents = salaryCents; }
+  @Override
+  public int monthlyPayCents() {
+    return salaryCents;
+  }
 }
 `,
     },
     {
       filename: "HourlyEmployee.java",
       initialContent: `public class HourlyEmployee implements Payable {
-    // TODO
+  // TODO
 }
 `,
       solutionContent: `public class HourlyEmployee implements Payable {
-    private final int hourlyRateCents;
-    private final int hoursWorked;
-    public HourlyEmployee(int hourlyRateCents, int hoursWorked) {
-        this.hourlyRateCents = hourlyRateCents;
-        this.hoursWorked     = hoursWorked;
-    }
-    @Override
-    public int monthlyPayCents() {
-        return hourlyRateCents * hoursWorked;
-    }
+  private final int hourlyRateCents;
+  private final int hoursWorked;
+  public HourlyEmployee(int hourlyRateCents, int hoursWorked) {
+    this.hourlyRateCents = hourlyRateCents;
+    this.hoursWorked = hoursWorked;
+  }
+  @Override
+  public int monthlyPayCents() {
+    return hourlyRateCents * hoursWorked;
+  }
 }
 `,
     },
@@ -361,22 +370,22 @@ public class Main {
       initialContent: `import java.util.List;
 
 public class Payroll {
-    public int totalCents(List<Payable> payees) {
-        // TODO: sum all monthly pays using polymorphic dispatch
-        return 0;
-    }
+  public int totalCents(List<Payable> payees) {
+    // TODO: sum all monthly pays using polymorphic dispatch
+    return 0;
+  }
 }
 `,
       solutionContent: `import java.util.List;
 
 public class Payroll {
-    public int totalCents(List<Payable> payees) {
-        int total = 0;
-        for (Payable p : payees) {
-            total += p.monthlyPayCents();         // polymorphic call
-        }
-        return total;
+  public int totalCents(List<Payable> payees) {
+    int total = 0;
+    for (Payable p : payees) {
+      total += p.monthlyPayCents(); // polymorphic call
     }
+    return total;
+  }
 }
 `,
     },

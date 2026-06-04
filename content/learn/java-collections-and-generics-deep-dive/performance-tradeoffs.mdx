@@ -165,17 +165,17 @@ collections library (Eclipse Collections, fastutil, Koloboke).
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        int n = 200_000;
+  public static void main(String[] args) {
+    int n = 200_000;
 
-        long t1 = Bench.time(() -> Bench.appendArrayListNoHint(n));
-        long t2 = Bench.time(() -> Bench.appendArrayListWithHint(n));
-        long t3 = Bench.time(() -> Bench.appendLinkedList(n));
+    long t1 = Bench.time(() -> Bench.appendArrayListNoHint(n));
+    long t2 = Bench.time(() -> Bench.appendArrayListWithHint(n));
+    long t3 = Bench.time(() -> Bench.appendLinkedList(n));
 
-        System.out.println("ArrayList (no hint):   " + t1 + " ms");
-        System.out.println("ArrayList (with hint): " + t2 + " ms");
-        System.out.println("LinkedList:            " + t3 + " ms");
-    }
+    System.out.println("ArrayList (no hint):   " + t1 + " ms");
+    System.out.println("ArrayList (with hint): " + t2 + " ms");
+    System.out.println("LinkedList:            " + t3 + " ms");
+  }
 }
 `,
     },
@@ -186,28 +186,31 @@ import java.util.LinkedList;
 import java.util.List;
 
 public final class Bench {
-    private Bench() {}
+  private Bench() {}
 
-    public static long time(Runnable r) {
-        long t0 = System.currentTimeMillis();
-        r.run();
-        return System.currentTimeMillis() - t0;
-    }
+  public static long time(Runnable r) {
+    long t0 = System.currentTimeMillis();
+    r.run();
+    return System.currentTimeMillis() - t0;
+  }
 
-    public static void appendArrayListNoHint(int n) {
-        List<Integer> xs = new ArrayList<>();
-        for (int i = 0; i < n; i++) xs.add(i);
-    }
+  public static void appendArrayListNoHint(int n) {
+    List<Integer> xs = new ArrayList<>();
+    for (int i = 0; i < n; i++)
+      xs.add(i);
+  }
 
-    public static void appendArrayListWithHint(int n) {
-        List<Integer> xs = new ArrayList<>(n);
-        for (int i = 0; i < n; i++) xs.add(i);
-    }
+  public static void appendArrayListWithHint(int n) {
+    List<Integer> xs = new ArrayList<>(n);
+    for (int i = 0; i < n; i++)
+      xs.add(i);
+  }
 
-    public static void appendLinkedList(int n) {
-        List<Integer> xs = new LinkedList<>();
-        for (int i = 0; i < n; i++) xs.add(i);
-    }
+  public static void appendLinkedList(int n) {
+    List<Integer> xs = new LinkedList<>();
+    for (int i = 0; i < n; i++)
+      xs.add(i);
+  }
 }
 `,
     },

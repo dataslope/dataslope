@@ -280,9 +280,9 @@ But this table covers an *astonishing* fraction of day-to-day code.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        System.out.println(Reverser.reverse("hello!"));
-    }
+  public static void main(String[] args) {
+    System.out.println(Reverser.reverse("hello!"));
+  }
 }
 `,
     },
@@ -292,27 +292,27 @@ But this table covers an *astonishing* fraction of day-to-day code.
 import java.util.Deque;
 
 public class Reverser {
-    public static String reverse(String s) {
-        // TODO: use a Deque<Character> as a stack
-        return s;
-    }
+  public static String reverse(String s) {
+    // TODO: use a Deque<Character> as a stack
+    return s;
+  }
 }
 `,
       solutionContent: `import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class Reverser {
-    public static String reverse(String s) {
-        Deque<Character> stack = new ArrayDeque<>();
-        for (int i = 0; i < s.length(); i++) {
-            stack.push(s.charAt(i));
-        }
-        StringBuilder out = new StringBuilder(s.length());
-        while (!stack.isEmpty()) {
-            out.append(stack.pop());
-        }
-        return out.toString();
+  public static String reverse(String s) {
+    Deque<Character> stack = new ArrayDeque<>();
+    for (int i = 0; i < s.length(); i++) {
+      stack.push(s.charAt(i));
     }
+    StringBuilder out = new StringBuilder(s.length());
+    while (!stack.isEmpty()) {
+      out.append(stack.pop());
+    }
+    return out.toString();
+  }
 }
 `,
     },

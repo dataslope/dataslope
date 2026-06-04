@@ -354,22 +354,24 @@ for row in data:
     },
     {
       filename: "sales.csv",
-      initialContent: `product,amount
-Laptop,1200
-Mouse,25
-Keyboard,75
-Monitor,300
+      initialContent: `product, amount
+Laptop, 1200
+Mouse, 25
+Keyboard, 75
+Monitor, 300
 `,
     },
     {
       filename: "parser.py",
       initialContent: `import csv
 
+
 def parse_sales(filename):
     # your code here
     return []
 `,
       solutionContent: `import csv
+
 
 def parse_sales(filename):
     with open(filename) as f:
@@ -423,25 +425,20 @@ print(f"Port: {config['server']['port']}")
     },
     {
       filename: "config.json",
-      initialContent: `{
-  "app_name": "DataSlope",
-  "debug": true,
-  "server": {
-    "host": "localhost",
-    "port": 8000
-  }
-}
+      initialContent: `{"app_name": "DataSlope", "debug": true, "server": {"host": "localhost", "port": 8000}}
 `,
     },
     {
       filename: "config_loader.py",
       initialContent: `import json
 
+
 def load_config(filename):
     # your code here
     return {}
 `,
       solutionContent: `import json
+
 
 def load_config(filename):
     with open(filename) as f:

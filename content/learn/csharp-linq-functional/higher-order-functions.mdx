@@ -293,8 +293,8 @@ using System.Linq;
 
 public static class Filters
 {
-    public static Func<IEnumerable<int>, IEnumerable<int>> Build(Func<int, bool> predicate) =>
-        xs => xs.Where(predicate);
+    public static Func<IEnumerable<int>, IEnumerable<int>> Build(Func<int, bool> predicate) => xs =>
+        xs.Where(predicate);
 }
 `,
     },

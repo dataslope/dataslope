@@ -104,66 +104,60 @@ classDiagram
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        double subtotal = 100.0;
+  public static void main(String[] args) {
+    double subtotal = 100.0;
 
-        Checkout regular = new Checkout(new RegularPricing());
-        Checkout holiday = new Checkout(new HolidayPricing(0.20));
-        Checkout loyalty = new Checkout(new LoyaltyPricing(15));
+    Checkout regular = new Checkout(new RegularPricing());
+    Checkout holiday = new Checkout(new HolidayPricing(0.20));
+    Checkout loyalty = new Checkout(new LoyaltyPricing(15));
 
-        System.out.println("Regular: $" + regular.total(subtotal));
-        System.out.println("Holiday: $" + holiday.total(subtotal));
-        System.out.println("Loyalty: $" + loyalty.total(subtotal));
-    }
+    System.out.println("Regular: $" + regular.total(subtotal));
+    System.out.println("Holiday: $" + holiday.total(subtotal));
+    System.out.println("Loyalty: $" + loyalty.total(subtotal));
+  }
 }
 `,
     },
     {
       filename: "PricingStrategy.java",
       initialContent: `public interface PricingStrategy {
-    double price(double subtotal);
+  double price(double subtotal);
 }
 `,
     },
     {
       filename: "RegularPricing.java",
       initialContent: `public class RegularPricing implements PricingStrategy {
-    public double price(double subtotal) { return subtotal; }
+  public double price(double subtotal) { return subtotal; }
 }
 `,
     },
     {
       filename: "HolidayPricing.java",
       initialContent: `public class HolidayPricing implements PricingStrategy {
-    private final double discount; // e.g. 0.20 = 20% off
-    public HolidayPricing(double discount) { this.discount = discount; }
-    public double price(double subtotal) {
-        return subtotal * (1.0 - discount);
-    }
+  private final double discount; // e.g. 0.20 = 20% off
+  public HolidayPricing(double discount) { this.discount = discount; }
+  public double price(double subtotal) { return subtotal * (1.0 - discount); }
 }
 `,
     },
     {
       filename: "LoyaltyPricing.java",
       initialContent: `public class LoyaltyPricing implements PricingStrategy {
-    private final double flatOff;
-    public LoyaltyPricing(double flatOff) { this.flatOff = flatOff; }
-    public double price(double subtotal) {
-        return Math.max(0.0, subtotal - flatOff);
-    }
+  private final double flatOff;
+  public LoyaltyPricing(double flatOff) { this.flatOff = flatOff; }
+  public double price(double subtotal) {
+    return Math.max(0.0, subtotal - flatOff);
+  }
 }
 `,
     },
     {
       filename: "Checkout.java",
       initialContent: `public class Checkout {
-    private final PricingStrategy strategy;
-    public Checkout(PricingStrategy strategy) {
-        this.strategy = strategy;
-    }
-    public double total(double subtotal) {
-        return strategy.price(subtotal);
-    }
+  private final PricingStrategy strategy;
+  public Checkout(PricingStrategy strategy) { this.strategy = strategy; }
+  public double total(double subtotal) { return strategy.price(subtotal); }
 }
 `,
     },

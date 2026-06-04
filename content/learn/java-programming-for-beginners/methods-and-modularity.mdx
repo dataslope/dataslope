@@ -281,37 +281,39 @@ max = 91
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        int[] xs = {72, 85, 91, 2, 64, 78};
-        System.out.println("min = " + MathTools.min(xs));
-        System.out.println("max = " + MathTools.max(xs));
-    }
+  public static void main(String[] args) {
+    int[] xs = {72, 85, 91, 2, 64, 78};
+    System.out.println("min = " + MathTools.min(xs));
+    System.out.println("max = " + MathTools.max(xs));
+  }
 }
 `,
     },
     {
       filename: "MathTools.java",
       initialContent: `public class MathTools {
-    // TODO: implement static int min(int[] xs)
-    // TODO: implement static int max(int[] xs)
+  // TODO: implement static int min(int[] xs)
+  // TODO: implement static int max(int[] xs)
 }
 `,
       solutionContent: `public class MathTools {
-    public static int min(int[] xs) {
-        int m = xs[0];
-        for (int i = 1; i < xs.length; i++) {
-            if (xs[i] < m) m = xs[i];
-        }
-        return m;
+  public static int min(int[] xs) {
+    int m = xs[0];
+    for (int i = 1; i < xs.length; i++) {
+      if (xs[i] < m)
+        m = xs[i];
     }
+    return m;
+  }
 
-    public static int max(int[] xs) {
-        int m = xs[0];
-        for (int i = 1; i < xs.length; i++) {
-            if (xs[i] > m) m = xs[i];
-        }
-        return m;
+  public static int max(int[] xs) {
+    int m = xs[0];
+    for (int i = 1; i < xs.length; i++) {
+      if (xs[i] > m)
+        m = xs[i];
     }
+    return m;
+  }
 }
 `,
     },

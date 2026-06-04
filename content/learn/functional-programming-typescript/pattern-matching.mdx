@@ -282,9 +282,9 @@ Rules:
       initialContent: `import { apply, Event } from "./interpret";
 
 const events: Event[] = [
-  { kind: "deposit",  amount: 100 },
-  { kind: "withdraw", amount: 30  },
-  { kind: "interest", rate: 0.05  },
+  { kind: "deposit", amount: 100 },
+  { kind: "withdraw", amount: 30 },
+  { kind: "interest", rate: 0.05 },
   { kind: "reset" },
 ];
 
@@ -298,31 +298,37 @@ for (const e of events) {
     {
       filename: "interpret.ts",
       initialContent: `export type Event =
-  | { kind: "deposit";  amount: number }
+  | { kind: "deposit"; amount: number }
   | { kind: "withdraw"; amount: number }
-  | { kind: "interest"; rate:   number }
+  | { kind: "interest"; rate: number }
   | { kind: "reset" };
 
 export function apply(balance: number, e: Event): number {
   // Implement using a switch + exhaustiveness check
-  switch (e.kind) {
+  switch (
+    e.kind
     // TODO: handle every variant
+  ) {
   }
   return balance;
 }
 `,
       solutionContent: `export type Event =
-  | { kind: "deposit";  amount: number }
+  | { kind: "deposit"; amount: number }
   | { kind: "withdraw"; amount: number }
-  | { kind: "interest"; rate:   number }
+  | { kind: "interest"; rate: number }
   | { kind: "reset" };
 
 export function apply(balance: number, e: Event): number {
   switch (e.kind) {
-    case "deposit":  return balance + e.amount;
-    case "withdraw": return balance - e.amount;
-    case "interest": return Math.round((balance * (1 + e.rate)) * 100) / 100;
-    case "reset":    return 0;
+    case "deposit":
+      return balance + e.amount;
+    case "withdraw":
+      return balance - e.amount;
+    case "interest":
+      return Math.round(balance * (1 + e.rate) * 100) / 100;
+    case "reset":
+      return 0;
     default: {
       const _exhaustive: never = e;
       throw new Error(\`unhandled \${JSON.stringify(_exhaustive)}\`);

@@ -251,7 +251,12 @@ type OrderState =
   | { status: "draft" }
   | { status: "submitted"; shippingAddress: string }
   | { status: "paid"; paymentId: string; shippingAddress: string }
-  | { status: "shipped"; paymentId: string; shippingAddress: string; trackingNumber: string }
+  | {
+      status: "shipped";
+      paymentId: string;
+      shippingAddress: string;
+      trackingNumber: string;
+    }
   | { status: "cancelled"; reason: string };
 
 export type Order = {
@@ -442,7 +447,11 @@ const draft: Post = {
 const published: Post = {
   id: "p2",
   title: "Published Article",
-  state: { status: "published", slug: "published-article", publishedAt: Date.now() },
+  state: {
+    status: "published",
+    slug: "published-article",
+    publishedAt: Date.now(),
+  },
 };
 
 const archived: Post = {
@@ -480,7 +489,11 @@ const draft: Post = {
 const published: Post = {
   id: "p2",
   title: "Published Article",
-  state: { status: "published", slug: "published-article", publishedAt: Date.now() },
+  state: {
+    status: "published",
+    slug: "published-article",
+    publishedAt: Date.now(),
+  },
 };
 
 const archived: Post = {

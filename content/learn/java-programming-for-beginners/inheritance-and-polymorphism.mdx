@@ -50,62 +50,60 @@ The arrow with the open triangle means "extends." `Circle` and
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Shape[] shapes = {
-            new Circle(2.0),
-            new Rectangle(3.0, 4.0),
-            new Circle(1.0),
-        };
+  public static void main(String[] args) {
+    Shape[] shapes = {
+        new Circle(2.0),
+        new Rectangle(3.0, 4.0),
+        new Circle(1.0),
+    };
 
-        for (Shape s : shapes) {
-            System.out.println(s.describe());
-        }
+    for (Shape s : shapes) {
+      System.out.println(s.describe());
     }
+  }
 }
 `,
     },
     {
       filename: "Shape.java",
       initialContent: `public abstract class Shape {
-    public abstract double area();
+  public abstract double area();
 
-    public String describe() {
-        return getClass().getSimpleName() + " with area " + area();
-    }
+  public String describe() {
+    return getClass().getSimpleName() + " with area " + area();
+  }
 }
 `,
     },
     {
       filename: "Circle.java",
       initialContent: `public class Circle extends Shape {
-    private final double radius;
+  private final double radius;
 
-    public Circle(double radius) {
-        this.radius = radius;
-    }
+  public Circle(double radius) { this.radius = radius; }
 
-    @Override
-    public double area() {
-        return Math.PI * radius * radius;
-    }
+  @Override
+  public double area() {
+    return Math.PI * radius * radius;
+  }
 }
 `,
     },
     {
       filename: "Rectangle.java",
       initialContent: `public class Rectangle extends Shape {
-    private final double width;
-    private final double height;
+  private final double width;
+  private final double height;
 
-    public Rectangle(double width, double height) {
-        this.width = width;
-        this.height = height;
-    }
+  public Rectangle(double width, double height) {
+    this.width = width;
+    this.height = height;
+  }
 
-    @Override
-    public double area() {
-        return width * height;
-    }
+  @Override
+  public double area() {
+    return width * height;
+  }
 }
 `,
     },
@@ -174,46 +172,44 @@ and can call a superclass constructor via `super(...)` as the
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Employee e = new Employee("Ada", 50000);
-        Manager  m = new Manager("Grace", 80000, 10);
-        System.out.println(e.describe());
-        System.out.println(m.describe());
-    }
+  public static void main(String[] args) {
+    Employee e = new Employee("Ada", 50000);
+    Manager m = new Manager("Grace", 80000, 10);
+    System.out.println(e.describe());
+    System.out.println(m.describe());
+  }
 }
 `,
     },
     {
       filename: "Employee.java",
       initialContent: `public class Employee {
-    protected final String name;
-    protected final int    salary;
+  protected final String name;
+  protected final int salary;
 
-    public Employee(String name, int salary) {
-        this.name = name;
-        this.salary = salary;
-    }
+  public Employee(String name, int salary) {
+    this.name = name;
+    this.salary = salary;
+  }
 
-    public String describe() {
-        return name + " (salary " + salary + ")";
-    }
+  public String describe() { return name + " (salary " + salary + ")"; }
 }
 `,
     },
     {
       filename: "Manager.java",
       initialContent: `public class Manager extends Employee {
-    private final int reports;
+  private final int reports;
 
-    public Manager(String name, int salary, int reports) {
-        super(name, salary);            // must be the first line
-        this.reports = reports;
-    }
+  public Manager(String name, int salary, int reports) {
+    super(name, salary); // must be the first line
+    this.reports = reports;
+  }
 
-    @Override
-    public String describe() {
-        return super.describe() + " managing " + reports + " people";
-    }
+  @Override
+  public String describe() {
+    return super.describe() + " managing " + reports + " people";
+  }
 }
 `,
     },
@@ -310,56 +306,54 @@ Hello, I say Meow.
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        Animal[] zoo = { new Dog(), new Cat() };
-        for (Animal a : zoo) {
-            System.out.println(a.greet());
-        }
+  public static void main(String[] args) {
+    Animal[] zoo = {new Dog(), new Cat()};
+    for (Animal a : zoo) {
+      System.out.println(a.greet());
     }
+  }
 }
 `,
     },
     {
       filename: "Animal.java",
       initialContent: `public abstract class Animal {
-    // TODO: declare speak() abstract
-    // TODO: implement greet()
+  // TODO: declare speak() abstract
+  // TODO: implement greet()
 }
 `,
       solutionContent: `public abstract class Animal {
-    public abstract String speak();
+  public abstract String speak();
 
-    public String greet() {
-        return "Hello, I say " + speak();
-    }
+  public String greet() { return "Hello, I say " + speak(); }
 }
 `,
     },
     {
       filename: "Dog.java",
       initialContent: `public class Dog extends Animal {
-    // TODO
+  // TODO
 }
 `,
       solutionContent: `public class Dog extends Animal {
-    @Override
-    public String speak() {
-        return "Woof!";
-    }
+  @Override
+  public String speak() {
+    return "Woof!";
+  }
 }
 `,
     },
     {
       filename: "Cat.java",
       initialContent: `public class Cat extends Animal {
-    // TODO
+  // TODO
 }
 `,
       solutionContent: `public class Cat extends Animal {
-    @Override
-    public String speak() {
-        return "Meow.";
-    }
+  @Override
+  public String speak() {
+    return "Meow.";
+  }
 }
 `,
     },

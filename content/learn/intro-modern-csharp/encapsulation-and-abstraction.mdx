@@ -179,8 +179,14 @@ var w = new Wallet("Ada", 50);
 w.Add(100);
 w.Spend(30);
 Console.WriteLine($"{w.Owner} has {w.Cash}");
-try { w.Spend(9999); }
-catch (Exception ex) { Console.WriteLine($"refused: {ex.Message}"); }
+try
+{
+    w.Spend(9999);
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"refused: {ex.Message}");
+}
 `,
     },
     {
@@ -192,21 +198,25 @@ catch (Exception ex) { Console.WriteLine($"refused: {ex.Message}"); }
 
     public Wallet(string owner, decimal initialCash)
     {
-        if (initialCash < 0) throw new ArgumentException("initial cash can't be negative");
+        if (initialCash < 0)
+            throw new ArgumentException("initial cash can't be negative");
         Owner = owner;
         Cash = initialCash;
     }
 
     public void Add(decimal amount)
     {
-        if (amount <= 0) throw new ArgumentException("must be positive");
+        if (amount <= 0)
+            throw new ArgumentException("must be positive");
         Cash += amount;
     }
 
     public void Spend(decimal amount)
     {
-        if (amount <= 0) throw new ArgumentException("must be positive");
-        if (amount > Cash) throw new InvalidOperationException("not enough cash");
+        if (amount <= 0)
+            throw new ArgumentException("must be positive");
+        if (amount > Cash)
+            throw new InvalidOperationException("not enough cash");
         Cash -= amount;
     }
 }
@@ -287,7 +297,8 @@ catch (ArgumentException)
 
     public Counter(int start)
     {
-        if (start < 0) throw new ArgumentException("start cannot be negative");
+        if (start < 0)
+            throw new ArgumentException("start cannot be negative");
         Value = start;
     }
 

@@ -159,19 +159,17 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class Main {
-    public static void main(String[] args) {
-        List<String> words = List.of(
-            "to", "be", "or", "not", "to", "be"
-        );
+  public static void main(String[] args) {
+    List<String> words = List.of("to", "be", "or", "not", "to", "be");
 
-        Map<String, Integer> counts = WordCounter.count(words);
+    Map<String, Integer> counts = WordCounter.count(words);
 
-        // TreeMap gives us sorted keys for deterministic output
-        TreeMap<String, Integer> sorted = new TreeMap<>(counts);
-        for (Map.Entry<String, Integer> e : sorted.entrySet()) {
-            System.out.println(e.getKey() + " " + e.getValue());
-        }
+    // TreeMap gives us sorted keys for deterministic output
+    TreeMap<String, Integer> sorted = new TreeMap<>(counts);
+    for (Map.Entry<String, Integer> e : sorted.entrySet()) {
+      System.out.println(e.getKey() + " " + e.getValue());
     }
+  }
 }
 `,
     },
@@ -182,13 +180,13 @@ import java.util.List;
 import java.util.Map;
 
 public class WordCounter {
-    public static Map<String, Integer> count(List<String> words) {
-        Map<String, Integer> counts = new HashMap<>();
-        for (String w : words) {
-            counts.merge(w, 1, Integer::sum);
-        }
-        return counts;
+  public static Map<String, Integer> count(List<String> words) {
+    Map<String, Integer> counts = new HashMap<>();
+    for (String w : words) {
+      counts.merge(w, 1, Integer::sum);
     }
+    return counts;
+  }
 }
 `,
     },
@@ -265,10 +263,10 @@ unique=7
     {
       filename: "Main.java",
       initialContent: `public class Main {
-    public static void main(String[] args) {
-        int n = Letters.uniqueLetterCount("Hello, World! 1234");
-        System.out.println("unique=" + n);
-    }
+  public static void main(String[] args) {
+    int n = Letters.uniqueLetterCount("Hello, World! 1234");
+    System.out.println("unique=" + n);
+  }
 }
 `,
     },
@@ -278,26 +276,26 @@ unique=7
 import java.util.Set;
 
 public class Letters {
-    public static int uniqueLetterCount(String s) {
-        // TODO
-        return 0;
-    }
+  public static int uniqueLetterCount(String s) {
+    // TODO
+    return 0;
+  }
 }
 `,
       solutionContent: `import java.util.HashSet;
 import java.util.Set;
 
 public class Letters {
-    public static int uniqueLetterCount(String s) {
-        Set<Character> seen = new HashSet<>();
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            if (Character.isLetter(c)) {
-                seen.add(Character.toLowerCase(c));
-            }
-        }
-        return seen.size();
+  public static int uniqueLetterCount(String s) {
+    Set<Character> seen = new HashSet<>();
+    for (int i = 0; i < s.length(); i++) {
+      char c = s.charAt(i);
+      if (Character.isLetter(c)) {
+        seen.add(Character.toLowerCase(c));
+      }
     }
+    return seen.size();
+  }
 }
 `,
     },

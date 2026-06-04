@@ -268,7 +268,11 @@ console.log("state:", s.kind);
 s = next(s, { kind: "add-card", card: "4242" });
 console.log("state:", s.kind);
 s = next(s, { kind: "confirm" });
-console.log("state:", s.kind, "orderId=" + (s.kind === "confirmed" ? s.orderId : "?"));
+console.log(
+  "state:",
+  s.kind,
+  "orderId=" + (s.kind === "confirmed" ? s.orderId : "?"),
+);
 `,
     },
     {
@@ -276,14 +280,19 @@ console.log("state:", s.kind, "orderId=" + (s.kind === "confirmed" ? s.orderId :
       initialContent: `type Item = { sku: string; qty: number };
 
 export type Checkout =
-  | { kind: "cart";      items: ReadonlyArray<Item> }
-  | { kind: "shipping";  items: ReadonlyArray<Item>; address: string }
-  | { kind: "paying";    items: ReadonlyArray<Item>; address: string; card: string }
+  | { kind: "cart"; items: ReadonlyArray<Item> }
+  | { kind: "shipping"; items: ReadonlyArray<Item>; address: string }
+  | {
+      kind: "paying";
+      items: ReadonlyArray<Item>;
+      address: string;
+      card: string;
+    }
   | { kind: "confirmed"; orderId: string };
 
 export type Event =
   | { kind: "add-address"; address: string }
-  | { kind: "add-card";    card:    string }
+  | { kind: "add-card"; card: string }
   | { kind: "confirm" };
 
 export function next(state: Checkout, event: Event): Checkout {
@@ -295,14 +304,19 @@ export function next(state: Checkout, event: Event): Checkout {
       solutionContent: `type Item = { sku: string; qty: number };
 
 export type Checkout =
-  | { kind: "cart";      items: ReadonlyArray<Item> }
-  | { kind: "shipping";  items: ReadonlyArray<Item>; address: string }
-  | { kind: "paying";    items: ReadonlyArray<Item>; address: string; card: string }
+  | { kind: "cart"; items: ReadonlyArray<Item> }
+  | { kind: "shipping"; items: ReadonlyArray<Item>; address: string }
+  | {
+      kind: "paying";
+      items: ReadonlyArray<Item>;
+      address: string;
+      card: string;
+    }
   | { kind: "confirmed"; orderId: string };
 
 export type Event =
   | { kind: "add-address"; address: string }
-  | { kind: "add-card";    card:    string }
+  | { kind: "add-card"; card: string }
   | { kind: "confirm" };
 
 let counter = 0;
@@ -316,7 +330,12 @@ export function next(state: Checkout, event: Event): Checkout {
       break;
     case "shipping":
       if (event.kind === "add-card")
-        return { kind: "paying", items: state.items, address: state.address, card: event.card };
+        return {
+          kind: "paying",
+          items: state.items,
+          address: state.address,
+          card: event.card,
+        };
       break;
     case "paying":
       if (event.kind === "confirm")
