@@ -30,6 +30,7 @@ import { defineDocs, defineConfig } from "fumadocs-mdx/config";
 import { remarkMdxMermaid } from "fumadocs-core/mdx-plugins";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
+import { remarkPreserveCodeIndent } from "./lib/remarkPreserveCodeIndent";
 
 export const docs = defineDocs({
   dir: "content/learn",
@@ -37,7 +38,11 @@ export const docs = defineDocs({
 
 export default defineConfig({
   mdxOptions: {
-    remarkPlugins: [remarkMath, remarkMdxMermaid],
+    // `remarkPreserveCodeIndent` MUST run for code blocks/challenge cards to
+    // display formatted code: @mdx-js strips the authored indentation from
+    // multi-line `starterCode`/`solutionCode`/… template literals during
+    // tokenization, and this restores it from the original source offsets.
+    remarkPlugins: [remarkPreserveCodeIndent, remarkMath, remarkMdxMermaid],
     rehypePlugins: (plugins) => [
       [rehypeKatex, { throwOnError: false, errorColor: "#ef4444" }],
       ...plugins,
