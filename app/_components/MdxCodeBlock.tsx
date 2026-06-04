@@ -19,10 +19,8 @@
  * ```
  */
 
-import type { ReactNode } from "react";
 import CodeBlock, { type CodeBlockFile } from "./CodeBlock";
 import { getAdapterById, type AdapterId } from "./runtime/adapters";
-import { codeFromChildren } from "./mdxCodeChildren";
 
 interface MdxCodeBlockProps {
   adapter: AdapterId;
@@ -31,12 +29,6 @@ interface MdxCodeBlockProps {
   entryFilename?: string;
   initCode?: string;
   label?: string;
-  /**
-   * Preferred authoring style: the starter code as a fenced code block child
-   * (indentation-safe — see `mdxCodeChildren`). Falls back to the
-   * `starterCode` prop for content not yet migrated.
-   */
-  children?: ReactNode;
 }
 
 export default function MdxCodeBlock({
@@ -46,10 +38,7 @@ export default function MdxCodeBlock({
   entryFilename,
   initCode,
   label,
-  children,
 }: MdxCodeBlockProps) {
-  const childCode = codeFromChildren(children);
-  const resolvedStarter = childCode ?? starterCode;
   const resolved = getAdapterById(adapter);
   if (!resolved) {
     return (
@@ -61,7 +50,7 @@ export default function MdxCodeBlock({
   return (
     <CodeBlock
       adapter={resolved}
-      starterCode={resolvedStarter}
+      starterCode={starterCode}
       files={files}
       entryFilename={entryFilename}
       initCode={initCode}
