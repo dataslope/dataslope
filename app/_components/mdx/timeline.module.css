@@ -1,0 +1,121 @@
+.timeline {
+  /* Establish a container so the wide/narrow layout switch below responds to
+     the article column width, not the viewport. */
+  container-type: inline-size;
+  margin: 1.75rem 0;
+  font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+}
+
+.title {
+  margin: 0 0 1.5rem;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--color-fd-foreground, #e2e8f0);
+}
+
+.track {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The central rail. */
+.track::before {
+  content: "";
+  position: absolute;
+  top: 0.4rem;
+  bottom: 0.4rem;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: var(--color-fd-border, #2a3347);
+}
+
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 3rem;
+  padding: 0.6rem 0;
+}
+
+/* Small filled marker sitting on the rail, aligned to each card's top border. */
+.marker {
+  position: absolute;
+  left: 50%;
+  top: 0.6rem;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--color-fd-foreground, #e2e8f0);
+  z-index: 1;
+}
+
+/* Cards are borderless apart from a top rule, hugging the rail. */
+.card {
+  padding: 0.6rem 0 0;
+  border-top: 1px solid var(--color-fd-border, #2a3347);
+}
+
+/* Even rows sit on the left of the rail (text right-aligned, hugging the rail);
+   odd rows on the right (left-aligned). */
+.left .card {
+  grid-column: 1;
+  text-align: right;
+}
+
+.right .card {
+  grid-column: 2;
+  text-align: left;
+}
+
+.period {
+  margin: 0 0 0.3rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-fd-foreground, #e2e8f0);
+  font-variant-numeric: tabular-nums;
+}
+
+.event {
+  margin: 0.2rem 0;
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--color-fd-foreground, #e2e8f0);
+}
+
+.event:first-of-type {
+  margin-top: 0;
+}
+
+.event:last-child {
+  margin-bottom: 0;
+}
+
+/* Narrow columns: collapse to a single left-railed column so cards keep their
+   full width and stay legible. */
+@container (max-width: 33rem) {
+  .track::before {
+    left: 7px;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+  }
+
+  .left .card,
+  .right .card {
+    grid-column: 1;
+    justify-self: stretch;
+    text-align: left;
+    margin-left: 1.75rem;
+  }
+
+  .marker {
+    left: 7px;
+  }
+}
