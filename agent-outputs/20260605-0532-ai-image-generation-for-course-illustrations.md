@@ -15,6 +15,7 @@
 - **Recommended primary API: Google Imagen 4 (Fast/Standard)** for decorative art at **$0.02–$0.04/image**, with **Google Gemini "Nano Banana Pro" (Gemini 3 Pro Image, ~$0.134/image)** or **OpenAI GPT Image 1.5 (~$0.04/image)** reserved for the rare illustration that must contain **legible text/labels**. All three render text far better than the 2024-era models.
 - **Cost is not the constraint.** One illustration per chapter (781 images) costs **~$16–$31** at Imagen 4 Fast/Standard rates. Even a lavish budget of one hero + 3 section images per chapter (~3,100 images) lands around **$62–$420** depending on tier. The real costs are **art-direction, consistency, review, and accessibility**, not API spend.
 - **Build a one-off generation script + a JSON manifest + committed PNG/WebP assets.** Do **not** generate at request time or live build time (slow, nondeterministic, costs recur, breaks offline/preview builds). Generate offline, review, commit the images, and reference them through a new `<Illustration>` MDX component backed by `next/image`.
+- **Dark mode is a first-class constraint, not an afterthought.** The `/learn` site runs **next-themes** via Fumadocs `RootProvider`, toggling a `.dark` **class** on `<html>` (confirmed in `app/learn/layout.tsx` and `app/_components/mdx/mermaid.tsx`, which already re-renders per theme). A raster illustration baked onto a **white background will look broken in dark mode**. Solve it with: **(a) transparent-background art** that lets the page background show through, **(b) SVG art recolored via `currentColor`/CSS variables** so it themes automatically, or **(c) two committed variants** (light/dark) swapped by the `<Illustration>` component — the same `useTheme()` pattern Mermaid already uses. See §7.
 
 ---
 
@@ -66,6 +67,21 @@ Prices are **per generated 1024×1024 (1K) output image** unless noted. The mark
 - **The rare label-heavy "infographic" illustration:** **Nano Banana Pro** — but first ask whether Mermaid/SVG is the better tool (usually yes).
 - **Crisp scalable icons/spot-illustrations for the web:** evaluate **Recraft V3 vector** (SVG scales perfectly at any DPI and is tiny).
 - **Prototyping:** Google AI Studio free tier, then a multi-model aggregator for the A/B bake-off.
+
+### 3.4 Transparency & SVG support by model (matters for dark mode — see §7)
+
+| Model | Native transparent PNG (alpha) | Native SVG / vector | Practical note |
+|---|---|---|---|
+| **Recraft V4 / V3 Vector** | n/a (vector) | **Yes — true editable SVG** | Only major API that emits production SVG; best path for icons/spot art that must theme cleanly |
+| **OpenAI GPT Image 1.5** | **Yes** (`background: "transparent"`, request PNG/WebP) | No | Best raster route to a clean alpha cutout from a prompt |
+| **OpenAI GPT Image 2** | **No** (per OpenAI docs — common failure point) | No | Use 1.5 if you need transparency |
+| **Google Imagen 4** | No | No | Opaque output; needs background removal for transparency |
+| **Google Nano Banana / Pro** | Limited / inconsistent | No | Treat as opaque; post-process if you need alpha |
+| **Flux 2** | **No** | No | Cannot output transparency natively |
+| **Runware LayerDiffuse** | **Yes (built-in alpha at generation)** | No | Purpose-built for one-step transparent raster |
+| **Background-removal APIs** (e.g. remove.bg, Recraft vectorizer, Transparify) | Yes (post-process any image) | Some vectorize | The universal fallback: generate opaque, then strip the background |
+
+**Two reliable routes to transparency:** (1) pick a model that emits alpha directly (**GPT Image 1.5** or **LayerDiffuse**), or (2) generate opaque on any model and run a **background-removal pass**. For anything icon-like, **SVG from Recraft** sidesteps the whole problem because vectors carry no background and recolor via CSS.
 
 ---
 
@@ -193,6 +209,9 @@ export function Illustration({ id }: { id: string }) {
 {
   "practical-r/the-age-of-data/hero": {
     "src": "/illustrations/practical-r-for-beginners/the-age-of-data/hero.webp",
+    "srcDark": null,
+    "format": "raster",
+    "transparent": true,
     "width": 1600, "height": 900,
     "alt": "Abstract flat-vector scene of data streams converging into a glowing hub",
     "caption": null,
@@ -203,6 +222,8 @@ export function Illustration({ id }: { id: string }) {
   }
 }
 ```
+
+The `format`, `transparent`, and `srcDark` fields drive the light/dark-mode behavior described in **§7**: `format:"svg"` entries inline and recolor via CSS; transparent raster entries render on any theme; and a non-null `srcDark` tells `<Illustration>` to swap variants per theme via `useTheme()`.
 
 ### 6.4 Generation script
 
@@ -217,7 +238,62 @@ Add `scripts/generate-illustrations.mjs` (ESM, matching `scripts/check-mcq.mjs` 
 
 ---
 
-## 7. Quality, legal, and accessibility
+## 7. SVG, transparency, and light/dark mode
+
+This is the section that most affects whether illustrations *look intentional* on DataSlope, because the `/learn` site ships a real dark theme.
+
+### 7.1 The problem, concretely
+
+`app/learn/layout.tsx` wraps every lesson in Fumadocs's `RootProvider`, which uses **next-themes**. Theme switching adds/removes a **`.dark` class on `<html>`** (it is *not* purely a `prefers-color-scheme` media query — a user can manually toggle). `app/_components/mdx/mermaid.tsx` already imports `useTheme` from `next-themes` and re-renders diagrams when the theme flips.
+
+Consequences for raster art:
+
+- A PNG with a **solid white background** sits in a glaring white box on a dark page. A solid dark background does the inverse in light mode.
+- Because next-themes toggles a **class**, a pure CSS `<picture media="(prefers-color-scheme: dark)">` approach **will not track the manual toggle** — it only follows the OS setting. Theme-aware swapping must key off the `.dark` class (CSS) or `useTheme()` (JS), not the media query alone.
+
+### 7.2 Four strategies (use the right one per art type)
+
+**Strategy A — SVG that recolors itself (best for icons / line art / simple spot illustrations).**
+Generate vector art with **Recraft V4/V3 Vector**, then make it theme-aware by letting strokes/fills inherit `currentColor` or reference CSS custom properties. Inline the SVG (or load it so its `fill`/`stroke` can be CSS-driven) and it adapts to *any* theme automatically — one asset, infinitely scalable, ~a few KB, no white box ever. This is the cleanest dark-mode answer and also the most accessible (crisp at any zoom/DPI).
+- Caveat: complex/painterly SVGs with baked-in hex colors won't auto-recolor — you'd post-process to swap a known palette to CSS variables, or treat them like raster (Strategy C).
+
+**Strategy B — Transparent-background raster that works on both themes (best for hero/decorative art).**
+Generate a **transparent PNG/WebP** (GPT Image 1.5 `background:"transparent"`, LayerDiffuse, or generate-then-background-remove) using a **theme-agnostic palette**: avoid near-white and near-black; favor your brand accent + mid-tones; use soft shadows/glows that read on both light and dark. One asset, no theme logic. ~80% of decorative needs can be met this way and it's the lowest-maintenance option.
+- Watch-outs: subtle anti-aliasing halos around edges show on dark backgrounds (check at generation); fine dark linework can vanish on dark bg, so prefer shapes with their own fill over thin outlines.
+
+**Strategy C — Two committed variants, swapped by the component (best when an image genuinely needs different treatment per theme).**
+Generate/store a **light** and **dark** version, list both in the manifest (`src` + `srcDark`), and have `<Illustration>` pick using `useTheme()` — mirroring exactly what `mermaid.tsx` does today. Costs 2× the assets/generation and doubles review, so reserve it for high-value images (e.g. course hero banners) where a single asset can't satisfy both.
+- No-JS / SSR nicety: you can also render both and toggle with CSS `.dark` class utilities (`hidden dark:block` / `block dark:hidden`) so there's no theme flash before hydration.
+
+**Strategy D — CSS containment (fallback for legacy/opaque images).**
+If you're stuck with an opaque raster, wrap it in a `<figure>` with consistent padding and a **theme-neutral container** (e.g. a soft card surface using the theme's surface variable, rounded corners, subtle border) so the image reads as an intentional framed element rather than a clashing rectangle. Avoid `filter: invert()` hacks — they wreck colored art and only sometimes work for pure black/white line drawings.
+
+### 7.3 Decision guide
+
+```mermaid
+flowchart TD
+    A["New illustration"] --> B{"Icon / line art /<br/>simple shapes?"}
+    B -- Yes --> C["SVG via Recraft<br/>+ currentColor / CSS vars<br/>(Strategy A)"]
+    B -- No --> D{"Can one image read well<br/>on light AND dark?"}
+    D -- Yes --> E["Transparent raster,<br/>theme-agnostic palette<br/>(Strategy B)"]
+    D -- No --> F["Two variants + srcDark,<br/>swap via useTheme()<br/>(Strategy C)"]
+```
+
+### 7.4 What this means for the component and manifest (extends §6)
+
+- **Manifest** gains optional fields: `format` (`"svg" | "raster"`), `srcDark`, and `transparent: true`. SVG entries can be inlined; raster entries go through `next/image`.
+- **`<Illustration>`** reads the theme with `useTheme()` (already a project dependency) and chooses `srcDark` when present and `.dark` is active; otherwise renders the single theme-agnostic asset. For SVG, render inline so CSS can drive `fill`/`stroke`.
+- **Generation script** records which strategy each slot used and, for transparency, whether alpha was native or added via a background-removal pass (provenance for later re-runs).
+
+### 7.5 Recommended default
+
+- **Spot/icon art → Strategy A (Recraft SVG).** Themes for free, tiny, scalable, accessible.
+- **Hero/decorative art → Strategy B (transparent raster, theme-agnostic palette).** One asset, low maintenance; this should cover most chapters.
+- **Strategy C only for marquee images** where the extra asset is worth it. **Strategy D** is a stopgap, not a plan.
+
+---
+
+## 8. Quality, legal, and accessibility
 
 - **Accessibility (required).** Every illustration needs meaningful **`alt` text** (stored in the manifest, human-reviewed). Decorative-only images should be marked decorative (empty alt / `aria-hidden`) so screen readers skip them. This is the single most important non-cost consideration.
 - **Don't put load-bearing information only in an image.** If an illustration conveys a concept, the prose must convey it too (it already does). Images supplement, never replace, text — also protects you if an image is wrong or fails to load.
@@ -228,9 +304,9 @@ Add `scripts/generate-illustrations.mjs` (ESM, matching `scripts/check-mcq.mjs` 
 
 ---
 
-## 8. Recommended rollout
+## 9. Recommended rollout
 
-**Phase 0 — Style discovery (free, ~1 day).** Use Google AI Studio's free tier (and an aggregator for A/B) to nail a house style on **3–5 chapters across different courses**. Produce "golden" reference images. Decide medium, palette, aspect ratios.
+**Phase 0 — Style discovery (free, ~1 day).** Use Google AI Studio's free tier (and an aggregator for A/B) to nail a house style on **3–5 chapters across different courses**. Produce "golden" reference images. Decide medium, palette, aspect ratios — **and the default light/dark strategy (§7): transparent raster + theme-agnostic palette, or SVG.** Test every candidate on both the light and dark theme before locking the style.
 
 **Phase 1 — Pipeline + pilot (small).** Build `scripts/generate-illustrations.mjs`, the manifest, and the `<Illustration>` component. Generate **hero images for one full course** (e.g. `practical-r-for-beginners`, ~30 chapters) on **Imagen 4 Fast**. Review, commit, ship behind the existing render path. Cost: a few dollars.
 
@@ -238,17 +314,18 @@ Add `scripts/generate-illustrations.mjs` (ESM, matching `scripts/check-mcq.mjs` 
 
 **Phase 3 — Selective section art & conceptual explainers.** Add section/metaphor images only where they earn their place. Use GPT Image 1.5 / Nano Banana where a few legible words are genuinely needed. Keep precise diagrams on **Mermaid**.
 
-**Phase 4 — Optional hardening.** Consider Recraft SVG for icon-like spot art, a custom fine-tune/LoRA for tighter brand consistency, and/or CDN offload if repo size grows.
+**Phase 4 — Optional hardening.** Consider Recraft SVG for icon-like spot art (themes for free in dark mode), `srcDark` variants for marquee heroes that need them, a custom fine-tune/LoRA for tighter brand consistency, and/or CDN offload if repo size grows.
 
 ---
 
-## 9. Open questions for you
+## 10. Open questions for you
 
 1. **Style direction** — flat vector / isometric / line-art / painterly? (Drives model choice and the locked preamble.)
 2. **Density** — hero-only, or hero + section art? (Drives count and review burden.)
 3. **Brand palette** — should illustrations pull DataSlope's Tailwind theme colors for cohesion?
 4. **Provider preference / constraints** — any existing GCP or OpenAI account, data-residency, or licensing constraints that should pick the API for us?
 5. **Asset hosting** — commit to repo (simple) vs reuse the jsDelivr CDN pattern (keeps repo lean)?
+6. **Dark-mode default (§7)** — standardize on transparent raster + theme-agnostic palette (one asset, lowest maintenance), lean into SVG for spot art, or accept `srcDark` two-variant cost for hero images? This decision shapes both the model choice and the component/manifest design.
 
 ---
 
@@ -274,5 +351,12 @@ Add `scripts/generate-illustrations.mjs` (ESM, matching `scripts/check-mcq.mjs` 
 - [AI art style libraries & keywords 2026 (GensGPT)](https://www.gensgpt.com/blog/ai-art-style-libraries-popular-styles-keywords-2026-guide)
 - [Replicate pricing](https://replicate.com/pricing)
 - [fal.ai image generators](https://fal.ai/learn/tools/ai-image-generators)
+- [OpenAI image generation guide — background/transparency parameter](https://developers.openai.com/api/docs/guides/image-generation)
+- [GPT-Image-2 transparent background limitations (Apiyi)](https://help.apiyi.com/en/gpt-image-2-transparent-background-not-supported-en.html)
+- [Can AI generate transparent images? (ZSky AI)](https://zsky.ai/blog/can-ai-generate-transparent-images)
+- [LayerDiffuse — built-in transparency at generation (Runware)](https://runware.ai/blog/introducing-layerdiffuse-generate-images-with-built-in-transparency-in-one-step)
+- [Recraft V3 SVG — text-to-SVG API (Replicate)](https://replicate.com/recraft-ai/recraft-v3-svg)
+- [Recraft V4 models & SVG output (Recraft docs)](https://www.recraft.ai/docs/recraft-models/recraft-V4)
+- [Transparent PNGs from any AI generator (Transparify)](https://transparify.app/blog/ai-image-transparent-background)
 
 > **Pricing caveat:** Image-API prices change frequently and vary by region, resolution, and aggregator markup. Figures above reflect June 2026 estimates aggregated from the sources listed — re-confirm against live vendor pricing pages before committing budget.
