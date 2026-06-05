@@ -12,8 +12,20 @@ import {
 import { useTheme } from "next-themes";
 import { Maximize2, Minus, Plus, RotateCcw, X } from "lucide-react";
 import styles from "./mermaid.module.css";
+import { Timeline } from "./timeline";
 
 export function Mermaid({ chart }: { chart: string }) {
+  // Mermaid lays `timeline` diagrams out horizontally, so a chart with many
+  // year-columns grows far wider than the article column and gets scaled down
+  // until the text is unreadable. Render those with our vertical, responsive
+  // <Timeline> instead; everything else falls through to the Mermaid SVG.
+  if (/^\s*timeline\b/i.test(chart.replace(/\\n/g, "\n"))) {
+    return <Timeline chart={chart} />;
+  }
+  return <MermaidDiagram chart={chart} />;
+}
+
+function MermaidDiagram({ chart }: { chart: string }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
