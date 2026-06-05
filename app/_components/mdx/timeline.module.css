@@ -42,56 +42,48 @@
   padding: 0.6rem 0;
 }
 
-/* Circular marker sitting on the rail, aligned to the period line. */
+/* Small filled marker sitting on the rail, aligned to each card's top border. */
 .marker {
   position: absolute;
   left: 50%;
-  top: 1.15rem;
-  width: 14px;
-  height: 14px;
+  top: 0.6rem;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  background: var(--color-fd-primary, #4f8ef7);
-  /* Knock a gap in the rail and ring the dot so it reads as a node on the line. */
-  box-shadow:
-    0 0 0 4px var(--color-fd-background, #0f1117),
-    0 0 0 6px var(--color-fd-primary, #4f8ef7);
+  background: var(--color-fd-foreground, #e2e8f0);
   z-index: 1;
 }
 
+/* Cards are borderless apart from a top rule, hugging the rail. */
 .card {
-  max-width: 26rem;
-  padding: 0.65rem 0.95rem;
-  border: 1px solid var(--color-fd-border, #2a3347);
-  border-radius: 8px;
-  background: var(--color-fd-card, rgba(22, 27, 39, 0.6));
+  padding: 0.6rem 0 0;
+  border-top: 1px solid var(--color-fd-border, #2a3347);
 }
 
-/* Even rows sit on the left of the rail (text hugging the rail, right-aligned);
+/* Even rows sit on the left of the rail (text right-aligned, hugging the rail);
    odd rows on the right (left-aligned). */
 .left .card {
   grid-column: 1;
-  justify-self: end;
   text-align: right;
 }
 
 .right .card {
   grid-column: 2;
-  justify-self: start;
   text-align: left;
 }
 
 .period {
   margin: 0 0 0.3rem;
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: var(--color-fd-primary, #4f8ef7);
+  color: var(--color-fd-foreground, #e2e8f0);
   font-variant-numeric: tabular-nums;
 }
 
 .event {
   margin: 0.2rem 0;
-  font-size: 0.95rem;
+  font-size: 1rem;
   line-height: 1.45;
   color: var(--color-fd-foreground, #e2e8f0);
 }
