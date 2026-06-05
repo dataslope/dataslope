@@ -159,6 +159,8 @@ Mood: {curiosity / clarity / momentum}.
 16:9 hero banner, centered composition, safe margins.
 ```
 
+> **Ready-to-run versions** of this template — concrete, copy-paste prompts tied to real DataSlope chapters, with per-service tweaks for transparency/SVG — are in **Appendix A**.
+
 ---
 
 ## 6. Integration into the existing stack
@@ -364,7 +366,7 @@ This alone removes the most fragile Hobby limit. What remains is raw bandwidth �
 
 ## 10. Recommended rollout
 
-**Phase 0 — Style discovery (free, ~1 day).** Use Google AI Studio's free tier (and an aggregator for A/B) to nail a house style on **3–5 chapters across different courses**. Produce "golden" reference images. Decide medium, palette, aspect ratios — **and the default light/dark strategy (§7): transparent raster + theme-agnostic palette, or SVG.** Test every candidate on both the light and dark theme before locking the style.
+**Phase 0 — Style discovery (free, ~1 day).** Use Google AI Studio's free tier (and an aggregator for A/B) to nail a house style on **3–5 chapters across different courses** — start with the **ready-to-run prompts in Appendix A**. Produce "golden" reference images. Decide medium, palette, aspect ratios — **and the default light/dark strategy (§7): transparent raster + theme-agnostic palette, or SVG.** Test every candidate on both the light and dark theme before locking the style.
 
 **Phase 1 — Pipeline + pilot (small).** Build `scripts/generate-illustrations.mjs`, the manifest, and the `<Illustration>` component. Generate **hero images for one full course** (e.g. `practical-r-for-beginners`, ~30 chapters) on **Imagen 4 Fast**. Review, commit, ship behind the existing render path. Cost: a few dollars.
 
@@ -384,6 +386,106 @@ This alone removes the most fragile Hobby limit. What remains is raw bandwidth �
 4. **Provider preference / constraints** — any existing GCP or OpenAI account, data-residency, or licensing constraints that should pick the API for us?
 5. **Asset hosting (§8)** — on Vercel Hobby today: start with **pre-optimize + jsDelivr (free)**, then graduate to **Cloudflare R2 (free egress)** as traffic grows? Or do you want a managed transformer (Bunny / Cloudflare Images) from day one? Also: is DataSlope commercial (which would require Vercel Pro regardless)?
 6. **Dark-mode default (§7)** — standardize on transparent raster + theme-agnostic palette (one asset, lowest maintenance), lean into SVG for spot art, or accept `srcDark` two-variant cost for hero images? This decision shapes both the model choice and the component/manifest design.
+
+---
+
+## Appendix A — Ready-to-test sample prompts
+
+Copy-paste prompts for the **Phase 0 bake-off** (§10). They're built on real DataSlope chapters so you can judge results in context. **Method:** run the *same* prompt across services (Imagen 4, GPT Image 1.5, Ideogram 4.0, Recraft V4.1, Flux 2, Nano Banana) and compare style, coherence, text accuracy, and how each reads on **both light and dark backgrounds**.
+
+### A.0 Shared house-style preamble (prepend to every prompt)
+
+Replace the bracketed tokens with your real brand values once chosen (§11 Q1/Q3). Keeping this string **identical** across images is what creates a coherent set.
+
+```
+Flat vector editorial illustration. Clean geometric shapes, generous negative
+space, limited palette of [#3B82F6 primary], [#F59E0B accent], and warm neutral
+tones, soft long shadows, subtle paper grain. Friendly, modern, calm. Centered
+composition with safe margins. Transparent background.
+NEGATIVE: no text, no letters, no numbers, no labels, no watermark, no UI chrome,
+no photorealism, no harsh pure-white or pure-black fills, no busy backgrounds.
+```
+
+> **Per-service tweaks for the preamble**
+> - **Imagen 4 / Flux 2 / Nano Banana:** these don't emit alpha — drop "Transparent background," generate on a **mid-tone neutral** so the art reads on both themes, or run a background-removal pass after (§3.4).
+> - **GPT Image 1.5:** keep "Transparent background" *and* pass the API param `background:"transparent"`, `format:"png"`.
+> - **Ideogram 4.0:** enable its **background-removal / transparency** option; it also honors the negative-text rule well.
+> - **Recraft V4.1 Vector:** select the **Vector / SVG** output and a flat "digital illustration" style; vectors are inherently background-free and theme via CSS.
+> - Most APIs take a separate `negative_prompt` field — move the `NEGATIVE:` line there if so.
+
+### A.1 Decorative hero banner — *“The Age of Data”* (16:9)
+
+```
+[HOUSE STYLE]
+Subject: a sweeping conceptual hero image for a chapter about how the modern
+world became saturated with data. Scene: countless small luminous data points
+flowing like rivers across a stylized landscape and converging into a single
+calm glowing hub. A lone human silhouette stands looking toward the hub,
+conveying curiosity and scale. 16:9 banner, cinematic but minimal.
+```
+*Good first test of overall style and palette. Evaluate: does it feel editorial vs. generic-AI?*
+
+### A.2 Conceptual metaphor — *“Vectorized Computation”* (4:3)
+
+```
+[HOUSE STYLE]
+Subject: a visual metaphor for performing the same operation on many values at
+once. Scene: a row of identical gears mounted along a single conveyor belt, all
+turning in perfect unison, with small uniform parcels riding the belt and being
+stamped simultaneously. Sense of effortless parallelism and rhythm.
+```
+*Tests whether the model can render a clean, legible metaphor without clutter.*
+
+### A.3 Conceptual metaphor — *“Missing Values”* (4:3)
+
+```
+[HOUSE STYLE]
+Subject: a gentle metaphor for gaps in a dataset. Scene: a woven fabric or grid
+of soft tiles where a few tiles are missing, leaving clean empty silhouettes;
+one tile is being lifted away. Calm, non-alarming mood — gaps as a normal part
+of real data, not an error.
+```
+*Tests subtlety and negative space. Check it doesn't add scary "error" connotations.*
+
+### A.4 Transparent spot illustration — *“Tidy Data Principles”* (1:1)
+
+```
+[HOUSE STYLE]
+Subject: a small spot illustration contrasting messy vs. tidy data. Scene: on
+one side a tangled, jumbled pile of mismatched cards; an arrow; on the other
+side the same cards snapped into a neat aligned grid. No text on the cards.
+Square, transparent background, suitable as an inline figure.
+```
+*Best on GPT Image 1.5 (transparent), Ideogram 4 (transparent), or Recraft Vector. The cutout test — inspect edges on a dark background for halos.*
+
+### A.5 SVG icon set — section/topic icons (1:1, vector)
+
+```
+[HOUSE STYLE — but as: minimal line + flat-fill ICON, 2px uniform strokes,
+single foreground color so it can inherit currentColor]
+Subject: a cohesive set of simple topic icons for an R course: (1) a data frame
+as a small table grid, (2) a vector as three stacked arrows, (3) a distribution
+as a smooth bell curve, (4) a pipe operator as two linked chevrons. Each icon
+centered on its own square, consistent stroke weight and corner radius.
+```
+*Generate on **Recraft V4.1 Vector**. The payoff: true SVG that recolors via CSS for dark mode (§7 Strategy A) and stays crisp at any size. Evaluate stroke consistency across the set.*
+
+### A.6 Text-rendering stress test — labeled mini-diagram (4:3)
+
+```
+[HOUSE STYLE — allow text for THIS test only; remove the no-text negatives]
+Subject: a friendly labeled illustration of the data-analysis loop. Scene: four
+rounded nodes in a circle connected by arrows, each clearly labeled with exactly
+one word: "Import", "Tidy", "Model", "Communicate". Crisp, legible sans-serif
+lettering, correct spelling.
+```
+*Only for comparing **typography** models — **Ideogram 4.0**, **Nano Banana Pro**, **GPT Image 1.5**. Verdict usually: even the best models misspell at label density, which is exactly why §2 says keep precise labeled diagrams on **Mermaid**. This test is to confirm that for yourself.*
+
+### A.7 Per-course accent variant (consistency probe)
+
+Re-run **A.1** with only the accent color swapped (e.g. `[#10B981 accent]` for a Python course vs. `[#3B82F6]` for R). Everything else identical. *Confirms the house-style system yields "same family, different course" rather than random drift (§5.2).*
+
+> **What to record per run:** model, exact prompt, seed, aspect ratio, whether transparency was native or post-processed, and a screenshot on **both** light and dark backgrounds. Drop the winners into the manifest schema from §6.3 as your "golden" references.
 
 ---
 
