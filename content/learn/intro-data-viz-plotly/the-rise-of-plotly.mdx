@@ -145,15 +145,10 @@ chart libraries:
 3. **It produces interactive charts by default.** Every output is
    pannable, zoomable, hoverable. You don't have to opt in.
 
-```mermaid
-flowchart TD
-    DF[(DataFrame)] --> PX["px.bar / px.line / px.scatter / ..."]
-    PX --> Args["x= y= color= size= facet_col= ..."]
-    Args --> Fig[Interactive Plotly figure]
-    Fig --> H[Hover]
-    Fig --> Z[Zoom]
-    Fig --> D[Download]
-```
+The whole flow is one line: a **DataFrame** goes into a call like
+`px.bar` / `px.line` / `px.scatter`, encodings ride along as arguments
+(`x=`, `y=`, `color=`, `size=`, `facet_col=`, ...), and out comes an
+interactive Plotly figure you can hover, zoom, and download.
 
 ## Plotly Express's place in the ecosystem
 

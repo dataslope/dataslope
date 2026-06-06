@@ -25,11 +25,9 @@ Templates are *purely cosmetic*. They do not change which data is
 plotted, which encodings you use, or any analytical content. They
 only change how the chart *looks*.
 
-```mermaid
-flowchart LR
-    PX["px.bar(df, x=..., y=...,<br/>template='simple_white')"] --> S["Plotly resolves<br/>'simple_white' to a<br/>full styling spec"]
-    S --> R["Render with<br/>those defaults"]
-```
+Passing `template='simple_white'` to `px.bar(df, x=..., y=...)` tells
+Plotly to resolve that name to a full styling spec, then render the
+chart with those defaults.
 
 ## The built-in templates
 

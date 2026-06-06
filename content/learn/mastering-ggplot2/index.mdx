@@ -40,17 +40,7 @@ scatter plot to a publication figure with faceting, custom scales, and
 a hand-built theme, is assembled from the *same* small set of
 components:
 
-```mermaid
-flowchart LR
-    D["Data"] --> M["Aesthetic<br/>mappings"]
-    M --> G["Geometries"]
-    G --> S["Statistics"]
-    S --> SC["Scales"]
-    SC --> C["Coordinates"]
-    C --> F["Facets"]
-    F --> T["Theme"]
-    T --> P["Rendered<br/>plot"]
-```
+**Data → Aesthetic mappings → Geometries → Statistics → Scales → Coordinates → Facets → Theme → Rendered plot**
 
 Learn the components once, and every chart becomes a *combination* you
 can reason about — including charts you have never seen before.

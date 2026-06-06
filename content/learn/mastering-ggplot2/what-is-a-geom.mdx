@@ -15,13 +15,13 @@ variables relate to what visual channels*. The geom decides *how those
 relationships are drawn*. Swap the geom and you get a different chart
 **from the same description**.
 
-```mermaid
-flowchart TD
-    DM["Same data + mappings<br/>aes(x = displ, y = hwy)"] --> P["geom_point<br/>scatter"]
-    DM --> L["geom_line<br/>connected line"]
-    DM --> B["geom_bin2d<br/>2-D density"]
-    DM --> S["geom_smooth<br/>trend + band"]
-```
+From the *same* data and mappings — `aes(x = displ, y = hwy)` — each
+geom draws a different chart:
+
+- `geom_point` — a scatter plot.
+- `geom_line` — a connected line.
+- `geom_bin2d` — a 2-D density.
+- `geom_smooth` — a trend line + band.
 
 Watch the geom change while everything else stays fixed:
 

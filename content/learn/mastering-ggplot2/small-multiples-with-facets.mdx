@@ -39,11 +39,9 @@ ggplot(mpg, aes(displ, hwy)) +
 `}
 />
 
-```mermaid
-flowchart LR
-    M["One busy panel<br/>7 overlapping groups"] -->|"facet_wrap(~ class)"| G["7 small panels<br/>shared axes<br/>one group each"]
-    G --> C["Differences between panels<br/>= differences in the data"]
-```
+One busy panel with 7 overlapping groups becomes, via
+`facet_wrap(~ class)`, 7 small panels on shared axes — one group each.
+Differences *between* panels are then differences in the *data*.
 
 ## Why shared scales are the secret
 

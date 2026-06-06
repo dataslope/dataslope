@@ -44,12 +44,9 @@ ggplot(mpg, aes(displ, hwy)) +
 `}
 />
 
-```mermaid
-flowchart LR
-    D["Raw points<br/>(displ, hwy)"] --> SM["stat_smooth<br/>fit model (lm or loess)"]
-    SM --> CURVE["Fitted values<br/>+ confidence band"]
-    CURVE --> G["geom_smooth<br/>draw line + ribbon"]
-```
+**Raw points `(displ, hwy)` → `stat_smooth` fits a model (`lm` or
+`loess`) → fitted values + a confidence band → `geom_smooth` draws the
+line + ribbon.**
 
 Switching `method` swaps the *statistic's* model while the *geom*
 (line + ribbon) stays the same — yet another instance of separating

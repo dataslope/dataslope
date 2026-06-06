@@ -11,17 +11,14 @@ key summary statistics — and that compactness lets you compare
 
 ## Anatomy of a box plot
 
-```mermaid
-flowchart TB
-    Min["Min<br/>(or lower fence)"]
-    Q1["Q1<br/>(25th percentile)"]
-    Med["Median<br/>(50th percentile)"]
-    Q3["Q3<br/>(75th percentile)"]
-    Max["Max<br/>(or upper fence)"]
-    Out["Outliers<br/>(beyond fences)"]
-    Min --> Q1 --> Med --> Q3 --> Max
-    Q3 --> Out
-```
+A box plot is built from a handful of ordered summary statistics:
+
+- **Min** (or lower fence)
+- **Q1** — 25th percentile
+- **Median** — 50th percentile
+- **Q3** — 75th percentile
+- **Max** (or upper fence)
+- **Outliers** — points beyond the fences
 
 The box itself spans from **Q1** (25th percentile) to **Q3** (75th
 percentile). The line inside is the **median**. The "whiskers"

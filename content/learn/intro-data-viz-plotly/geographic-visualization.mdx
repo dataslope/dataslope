@@ -102,15 +102,6 @@ sphere onto a flat page. *Every* projection distorts *something*
   exaggerates the size of regions near the poles (Greenland looks
   the same size as Africa, but Africa is 14× bigger).
 
-```mermaid
-flowchart TB
-    G[3-D globe] --> P[Project to 2-D]
-    P --> A[Equirectangular<br/>simple, distorted poles]
-    P --> B[Mercator<br/>preserves angles, lies about size]
-    P --> C[Natural Earth<br/>compromise, nice default]
-    P --> D[Orthographic<br/>realistic, half a globe]
-```
-
 <Callout type="warn" title="Mercator distortion is a real visualization problem">
 The Mercator projection famously makes Greenland look as large as
 Africa, even though Africa is ~14× larger by area. If your map's

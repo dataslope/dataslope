@@ -31,13 +31,10 @@ them.*
 ## Inheritance: layers borrow from the base by default
 
 A key rule: **layers inherit the data and mappings declared in
-`ggplot()`** unless you override them. This diagram shows the flow:
-
-```mermaid
-flowchart TD
-    G["ggplot(data = mpg,<br/>aes(displ, hwy, color = drv))"] --> P["geom_point()<br/>inherits all three"]
-    G --> S["geom_smooth()<br/>inherits all three<br/>-> one line per drv"]
-```
+`ggplot()`** unless you override them. So from a base of
+`ggplot(data = mpg, aes(displ, hwy, color = drv))`, both `geom_point()`
+and `geom_smooth()` inherit all three — and `geom_smooth()` draws one
+line per `drv`.
 
 So a `color = drv` mapping in `ggplot()` reaches *every* layer:
 

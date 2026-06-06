@@ -36,13 +36,12 @@ ggplot(mpg, aes(class, fill = drv)) +
 The single biggest fork: is the mapped variable **categorical** or
 **continuous**? It determines the *kind* of color scale entirely.
 
-```mermaid
-flowchart TD
-    Q["What type is the variable<br/>mapped to color?"] --> D["Discrete / categorical"]
-    Q --> C["Continuous / numeric"]
-    D --> DP["Qualitative palette<br/>distinct hues<br/>scale_color_brewer"]
-    C --> CP["Gradient<br/>low-to-high lightness<br/>scale_color_viridis_c"]
-```
+The type of the variable mapped to color decides the kind of scale:
+
+| Variable mapped to color | Scale to use | Example |
+| --- | --- | --- |
+| Discrete / categorical | Qualitative palette (distinct hues) | `scale_color_brewer` |
+| Continuous / numeric | Gradient (low-to-high lightness) | `scale_color_viridis_c` |
 
 ### Discrete: distinct hues for distinct categories
 

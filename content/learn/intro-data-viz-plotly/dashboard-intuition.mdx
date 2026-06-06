@@ -45,16 +45,14 @@ The classic dashboard failure mode is the **wall of charts**: 30+
 small panels, each showing a different metric, with no apparent
 priority. The user opens it, freezes, and closes it.
 
-```mermaid
-flowchart TB
-    B[Bad dashboard]
-    B --> M[Too many charts]
-    B --> NP[No visual priority]
-    B --> NC[No clear question]
-    B --> SS[Stale data]
-    B --> NL[Unlabeled axes]
-    B --> NA[No annotations]
-```
+A bad dashboard usually has several of these traits at once:
+
+- Too many charts.
+- No visual priority.
+- No clear question.
+- Stale data.
+- Unlabeled axes.
+- No annotations.
 
 Why does this happen? Because dashboards are *cheap* to build and
 *expensive* to delete. Every stakeholder who ever wanted "their

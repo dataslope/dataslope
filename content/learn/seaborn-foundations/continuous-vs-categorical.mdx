@@ -51,18 +51,9 @@ do arithmetic on the labels.
 ## How Seaborn maps each kind
 
 This is the crux. The *type* of a variable decides how Seaborn turns it into
-something you can see:
-
-```mermaid
-flowchart TD
-    V["A column in your data"] --> Q{"A number measured<br/>on a scale?"}
-    Q -->|Yes| C["CONTINUOUS<br/>e.g. body_mass_g, total_bill"]
-    Q -->|No| K["CATEGORICAL<br/>e.g. species, day, sex"]
-    C --> CA["Mapped to: a continuous axis,<br/>a color gradient (hue),<br/>or marker size"]
-    K --> KA["Mapped to: discrete positions,<br/>distinct colors,<br/>or separate facets"]
-    CA --> CP["Natural charts: scatter, line,<br/>histogram, KDE, ECDF"]
-    KA --> KP["Natural charts: bar, count,<br/>box, violin, strip, swarm"]
-```
+something you can see. A continuous variable is a number measured on a scale
+(`body_mass_g`, `total_bill`); a categorical one is a label (`species`,
+`day`, `sex`):
 
 | If the variable is... | Seaborn gives it... | Reach for... |
 | --------------------- | ------------------- | ------------ |

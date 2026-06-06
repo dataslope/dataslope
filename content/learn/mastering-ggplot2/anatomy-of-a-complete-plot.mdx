@@ -34,18 +34,6 @@ ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
 Walk down the code and name the **component** each line belongs to.
 This is the skill the whole course has been building:
 
-```mermaid
-flowchart TD
-    A["ggplot(mpg, ...)"] --> A1["DATA: the mpg table"]
-    B["aes(displ, hwy, color = drv)"] --> B1["MAPPINGS: x, y, color channels"]
-    C["geom_point(alpha = 0.7)"] --> C1["GEOMETRY 1: raw points<br/>(alpha SET, not mapped)"]
-    D["geom_smooth(method = lm)"] --> D1["GEOMETRY 2 + STAT: a fitted line per drv"]
-    E["scale_color_brewer(...)"] --> E1["SCALE: the categorical palette"]
-    F["facet_wrap(~ class)"] --> F1["FACETS: one panel per class"]
-    G["labs(...)"] --> G1["LABELS: title, axes, legend"]
-    H["theme_minimal()"] --> H1["THEME: non-data styling"]
-```
-
 | Code | Component | What it contributes |
 | --- | --- | --- |
 | `ggplot(mpg, ...)` | **Data** | The table being shown |

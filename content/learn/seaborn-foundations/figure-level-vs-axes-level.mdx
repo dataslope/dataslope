@@ -28,41 +28,23 @@ Here's the key relationship: **each figure-level function is a wrapper
 around a family of axes-level functions**, and the `kind` argument picks
 which one to use.
 
-```mermaid
-flowchart TD
-    subgraph FL["FIGURE-LEVEL: manage a whole figure, can facet"]
-        REL["relplot"]
-        DIS["displot"]
-        CAT["catplot"]
-        LM["lmplot"]
-    end
-    subgraph AL["AXES-LEVEL: draw on one Axes, composable"]
-        SC["scatterplot"]
-        LN["lineplot"]
-        HI["histplot"]
-        KD["kdeplot"]
-        EC["ecdfplot"]
-        BX["boxplot"]
-        VI["violinplot"]
-        BR["barplot"]
-        CO["countplot"]
-        ST["stripplot"]
-        SW["swarmplot"]
-        RG["regplot"]
-    end
-    REL -->|"kind='scatter'"| SC
-    REL -->|"kind='line'"| LN
-    DIS -->|"kind='hist'"| HI
-    DIS -->|"kind='kde'"| KD
-    DIS -->|"kind='ecdf'"| EC
-    CAT -->|"kind='box'"| BX
-    CAT -->|"kind='violin'"| VI
-    CAT -->|"kind='bar'"| BR
-    CAT -->|"kind='count'"| CO
-    CAT -->|"kind='strip'"| ST
-    CAT -->|"kind='swarm'"| SW
-    LM --> RG
-```
+Each figure-level function (left) dispatches to a family of axes-level
+functions (right) according to its `kind` argument:
+
+| Figure-level function | `kind=` | Axes-level function it calls |
+| --- | --- | --- |
+| `relplot` | `"scatter"` (default) | `scatterplot` |
+| `relplot` | `"line"` | `lineplot` |
+| `displot` | `"hist"` (default) | `histplot` |
+| `displot` | `"kde"` | `kdeplot` |
+| `displot` | `"ecdf"` | `ecdfplot` |
+| `catplot` | `"strip"` (default) | `stripplot` |
+| `catplot` | `"swarm"` | `swarmplot` |
+| `catplot` | `"box"` | `boxplot` |
+| `catplot` | `"violin"` | `violinplot` |
+| `catplot` | `"bar"` | `barplot` |
+| `catplot` | `"count"` | `countplot` |
+| `lmplot` | — | `regplot` |
 
 So `sns.relplot(..., kind="scatter")` ends up calling `scatterplot` under
 the hood, and `sns.catplot(..., kind="box")` calls `boxplot`. The

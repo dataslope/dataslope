@@ -71,11 +71,8 @@ ggplot(df, aes(size, score)) +
 Same data, same mapping, same geom. Only the **scale's
 transformation** changed — and the chart went from unreadable to clear.
 
-```mermaid
-flowchart LR
-    DATA["Skewed data<br/>1 ... 100000"] --> T["scale_x_log10<br/>transform spacing"]
-    T --> EVEN["Evenly spread axis<br/>equal gaps = 10x steps"]
-```
+**Skewed data (1 ... 100000) → `scale_x_log10` transforms the spacing →
+an evenly spread axis where equal gaps mean 10x steps.**
 
 <Callout type="info" title="Transform the scale, not the data">
 You *could* create a new column `log10(size)` and plot that. But then

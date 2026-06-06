@@ -132,15 +132,6 @@ This is the single most important decision when making a heatmap.
   bright cyan and yellow bands look like ridges in the data even
   where there aren't any. `Viridis` is its modern replacement.
 
-```mermaid
-flowchart TB
-    D[Data]
-    D --> H1{One-sided<br/>e.g. counts}
-    H1 --> SEQ[Sequential palette<br/>Viridis, Blues, Plasma]
-    D --> H2{Diverging<br/>e.g. correlation}
-    H2 --> DIV[Diverging palette<br/>RdBu, PiYG, centered at 0]
-```
-
 ## Pitfalls of heatmaps
 
 - **Too many cells** (1000×1000) make individual cells invisible.

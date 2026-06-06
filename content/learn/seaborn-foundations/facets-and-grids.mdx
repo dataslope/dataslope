@@ -80,14 +80,13 @@ The figure-level functions do their faceting through a class called
 three-step workflow demystifies what `relplot` and friends are doing — and
 lets you build custom grids when you need them.
 
-```mermaid
-flowchart TD
-    DATA["Full tidy dataset"] --> SPLIT["Split by the facet variables<br/>col= and/or row="]
-    SPLIT --> GRID["An empty grid of axes:<br/>one cell per category combination"]
-    GRID --> MAP["map() a plotting function<br/>onto each data subset"]
-    MAP --> DRAW["Every cell draws the same plot<br/>for its slice of the data"]
-    DRAW --> LEG["add_legend() and final touches"]
-```
+Starting from the full tidy dataset, the workflow runs:
+
+1. **Split** by the facet variables (`col=` and/or `row=`).
+2. Lay out an **empty grid of axes** — one cell per category combination.
+3. **`map()`** a plotting function onto each data subset.
+4. Every cell **draws the same plot** for its slice of the data.
+5. **`add_legend()`** and final touches.
 
 In code, those steps look like this:
 
