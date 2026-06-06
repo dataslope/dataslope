@@ -8,6 +8,17 @@
 
 > **What's already good.** This is a genuinely strong playground. All nine languages boot and run correctly (live-verified, §8): a CodeMirror editor with autocomplete/format/find, a Run split-button with ⌘/Ctrl+Enter, a clean output pane with an empty state, a multi-file tab bar, an Examples menu with titled+described snippets, Export, a Packages drawer, per-language settings (font size, word wrap, themes), and OPFS-backed workspaces with export/import-ZIP, duplicate, and rename. The issues below are the gap between "very good" and "production-ready," not foundational problems.
 
+> **Implementation status (updated as fixes land).** Findings are marked **✅ Fixed** inline in §3/§4 once shipped; per-finding detail carries a "**Fixed:**" note. Live-re-verified with Playwright after each change (`after-*.png` in the assets folder).
+>
+> - **2026-06-06 — Phase 1 + Phase 2 (this PR).**
+>   - **NSQL-07 (🔴)** — root-caused and fixed the uncaught OPFS `NotFoundError`: `getDataDir` returned a non-awaited `getDirectoryHandle("data", …)` so its own `try/catch` couldn't catch the first-load NotFound; added `await` (+ a defensive `.catch()` at the `loadDataFiles` call site). Re-verified: **0 page errors / 0 unhandled rejections** on load.
+>   - **NSQL-01** — the "Editor" rail button is now a real toggle (closes Files + focuses the editor), lit only when Files is closed, so exactly one rail button is active at a time; `.active` is now accent-tinted (distinct from hover) with `aria-pressed`.
+>   - **NSQL-02** — Settings now also opens from a gear in the top-right header cluster (the bottom-left rail entry stays).
+>   - **NSQL-04** — theme preview cards now render the **playground's own language** (per-language snippets), not Python.
+>   - **NSQL-05** — workspace drawer: drag-handle no longer leaks onto desktop (descendant selector), cards align with the header (`padding-inline:16px`) and no longer touch the walls, and the top buttons fill the row evenly (dropped the compounding `margin-bottom`).
+>   - **NSQL-06** — plain-language, playground-type-aware workspace description (no "OPFS"/"database" for non-SQL); new workspaces get a friendly "Workspace N" name instead of a timestamp.
+>   - **Still open:** NSQL-03 (Settings overlay occludes the editor), NSQL-08 (Files unreachable on mobile), NSQL-09 (minor polish).
+
 ---
 
 ## Table of contents
@@ -56,23 +67,23 @@ Each finding carries an ID (`NSQL-NN`) for cross-reference from the plan in §9.
 
 ## 3. Top findings at a glance
 
-| ID | Finding | Sev | Your # | Primary code reference |
-|---|---|---|---|---|
-| **NSQL-01** | Activity-bar shows **two active buttons** when Files is open; the "Editor" button is hard-coded `active` and is **inert (no `onClick`)** | 🟡 ♿ | #1 | `Playground.tsx:3395` (hard-coded `active`), `:3420-3423` (Files toggle) |
-| **NSQL-02** | **Settings only reachable from the bottom-left gear** on desktop — opposite corner from every other control, the hardest pixel to reach | 🟡 | #2 | `Playground.tsx:3438-3467`; header has no Settings entry (`:3100-3223`) |
-| **NSQL-03** | Theme changes are **invisible until you leave Settings** — the Settings tab is an opaque overlay covering the editor; previews are static | 🟡 | #3 | `playground.css:4073-4083` (opaque overlay), `Playground.tsx:1390-1398` (live apply) |
-| **NSQL-04** | Theme preview cards render a **Python snippet for every language** except R/SQL (so JS/TS/PHP/C/C++/Java/C# previews are misleading) | 🟡 | #3 | `playgroundShared.tsx:206-269` (`ThemePreviewSnippet` only special-cases sql/r) |
-| **NSQL-05** | Workspace manager drawer **spacing**: desktop drag-handle leak + header/body left-edge misalignment (16px vs 0) + cards touch both walls + ragged button row | 🟡 | #4 | `WorkspaceBadge.tsx:403-404`, `playground.css:2102,2181-2185,3940-3956` |
-| **NSQL-06** | **"Workspace" is under-explained**: jargon ("OPFS-backed"), claims "database state" that non-SQL playgrounds don't have, timestamp default name, no first-run hint | 🟢 | #5 | `WorkspaceBadge.tsx:411-414` (desc), `:168-169,345-346` (timestamp name) |
-| **NSQL-07** | **Uncaught `NotFoundError` (OPFS) on every first load, in all nine languages** — trips the dev error overlay; would reach prod error monitoring | 🔴 | new | `opfs/fileStorage.ts:51-95` (fire-and-forget `flush()`); shared bootstrap |
-| **NSQL-08** | **Files panel is unreachable on mobile** — the icon rail is `display:none` < 768px and the mobile menu has no "Files" entry | 🟡 | new | `playground.css:774-781`, `Playground.tsx:3160-3217` (mobile menu actions) |
-| **NSQL-09** | Minor polish: icon-rail hover tooltip overlaps the Files panel toolbar; redundant Files close affordances; long workspace name truncates in the header badge | 🟢 | new | `FilesPanel.tsx:641-677`, `WorkspaceBadge.tsx:188-191` |
+| ID | Finding | Sev | Your # | Status | Primary code reference |
+|---|---|---|---|---|---|
+| **NSQL-01** | Activity-bar shows **two active buttons** when Files is open; the "Editor" button is hard-coded `active` and is **inert (no `onClick`)** | 🟡 ♿ | #1 | ✅ Fixed | `Playground.tsx:3395` (hard-coded `active`), `:3420-3423` (Files toggle) |
+| **NSQL-02** | **Settings only reachable from the bottom-left gear** on desktop — opposite corner from every other control, the hardest pixel to reach | 🟡 | #2 | ✅ Fixed | `Playground.tsx:3438-3467`; header had no Settings entry (`:3100-3223`) |
+| **NSQL-03** | Theme changes are **invisible until you leave Settings** — the Settings tab is an opaque overlay covering the editor; previews are static | 🟡 | #3 | ⏳ Open | `playground.css:4073-4083` (opaque overlay), `Playground.tsx:1390-1398` (live apply) |
+| **NSQL-04** | Theme preview cards render a **Python snippet for every language** except R/SQL (so JS/TS/PHP/C/C++/Java/C# previews are misleading) | 🟡 | #3 | ✅ Fixed | `playgroundShared.tsx:206-269` (`ThemePreviewSnippet` only special-cased sql/r) |
+| **NSQL-05** | Workspace manager drawer **spacing**: desktop drag-handle leak + header/body left-edge misalignment (16px vs 0) + cards touch both walls + ragged button row | 🟡 | #4 | ✅ Fixed | `WorkspaceBadge.tsx:403-404`, `playground.css:2102,2181-2185,3940-3956` |
+| **NSQL-06** | **"Workspace" is under-explained**: jargon ("OPFS-backed"), claims "database state" that non-SQL playgrounds don't have, timestamp default name, no first-run hint | 🟢 | #5 | ✅ Fixed | `WorkspaceBadge.tsx:411-414` (desc), `:168-169,345-346` (timestamp name) |
+| **NSQL-07** | **Uncaught `NotFoundError` (OPFS) on every first load, in all nine languages** — trips the dev error overlay; would reach prod error monitoring | 🔴 | new | ✅ Fixed | `files/opfsDataStorage.ts:32-45` (`getDataDir` non-awaited return); `Playground.tsx:1001` |
+| **NSQL-08** | **Files panel is unreachable on mobile** — the icon rail is `display:none` < 768px and the mobile menu has no "Files" entry | 🟡 | new | ⏳ Open | `playground.css:774-781`, `Playground.tsx:3160-3217` (mobile menu actions) |
+| **NSQL-09** | Minor polish: icon-rail hover tooltip overlaps the Files panel toolbar; redundant Files close affordances; long workspace name truncates in the header badge | 🟢 | new | ⏳ Open | `FilesPanel.tsx:641-677`, `WorkspaceBadge.tsx:188-191` |
 
 ---
 
 ## 4. Detailed findings
 
-### NSQL-01 — Activity bar: two "active" buttons, and an inert "Editor" button 🟡 ♿ (your #1)
+### NSQL-01 — Activity bar: two "active" buttons, and an inert "Editor" button 🟡 ♿ (your #1) — ✅ Fixed
 
 **What happens.** The left icon rail has three buttons: **Editor** (`</>`), **Files** (folder-tree), and **Settings** (gear, bottom). When the Files panel is open, **both** the Editor and Files buttons show the same active background (`var(--bg3)`), so it looks like two views are simultaneously selected. See `assets/02-icon-sidebar-both-active.png` (both top icons grey) and `assets/03-js-files-pane-open.png` (in full context).
 
@@ -103,15 +114,19 @@ Each finding carries an ID (`NSQL-NN`) for cross-reference from the plan in §9.
 - Differentiate `.active` from `:hover` (e.g. `active` gets an accent left-border or `--primary`-tinted background) so the selected state is legible.
 - Add `aria-pressed` consistently to whatever stays a toggle.
 
+> **Fixed (this PR).** The Editor button is now a real toggle: `onClick` closes the Files panel and focuses CodeMirror, it's lit (`active`) only when Files is **closed**, and carries `aria-pressed={!filesPaneOpen}` — so exactly one rail button is active at a time (verified live: files-closed → Editor active/Files not; files-open → Files active/Editor not; clicking Editor closes Files). `.playground-icon-sidebar-btn.active` now uses `color: var(--primary)` / `background: var(--primary-glow)`, visually distinct from the neutral `:hover`. See `after-01-rail-files-open.png`.
+
 ---
 
-### NSQL-02 — Settings is only reachable from the bottom-left gear on desktop 🟡 (your #2)
+### NSQL-02 — Settings is only reachable from the bottom-left gear on desktop 🟡 (your #2) — ✅ Fixed
 
 **What happens.** The Settings gear lives alone in `.playground-icon-sidebar-bottom`, pinned to the bottom of the 40px rail (`Playground.tsx:3438-3467`). On a 1000px-tall window it's the **bottom-left corner** — the furthest point from the workspace badge / Examples / Export / info cluster, which all live **top-right** (`assets/01-js-initial.png`). There is **no Settings entry in the desktop header at all**; the gear is the only way in. (On mobile it's the reverse — the gear rail is hidden and Settings moves into the header overflow menu, `assets/31-mobile-menu.png`.)
 
 **Why it's a problem.** Fitts's-law-wise, bottom-left is a long diagonal mouse trip from where the user's attention and the rest of the toolbar sit. It also splits the mental model: "most chrome is top-right, but settings is bottom-left."
 
 **Recommendation.** Add a Settings affordance to the **top-right header cluster** next to the info (`i`) button — the same `openSettingsTab()` call already exists. Keep or drop the bottom-left gear as you like, but the primary, discoverable entry should be co-located with the other global controls. (This also makes desktop and mobile consistent — both would reach Settings from the header.)
+
+> **Fixed (this PR).** Added a Settings gear (`<Settings>` icon, `aria-label="Settings"`) to the desktop `.header-actions` cluster next to the info button, wired to `openSettingsTab()`. The bottom-left rail gear stays for muscle-memory. See `after-02-initial-with-header-settings.png`.
 
 ---
 
@@ -136,7 +151,7 @@ So "Settings as a tab" replaces the panes rather than sitting beside them.
 
 ---
 
-### NSQL-04 — Theme preview cards show Python code in every non-Python language 🟡 (your #3, related)
+### NSQL-04 — Theme preview cards show Python code in every non-Python language 🟡 (your #3, related) — ✅ Fixed
 
 **What happens.** In the **JavaScript** playground (and TS/PHP/C/C++/Java/C#), every theme preview card shows `def greet(name): return f"Hello, {name}!"` — i.e. **Python**. See `assets/11-dracula-selected-editor-hidden.png` (all 12 cards show Python in the JS playground).
 
@@ -152,9 +167,11 @@ const fnName = SAMPLE_FN_NAME[language] ?? "greet";
 
 **Recommendation.** Add per-language snippets (a small map keyed by `adapter.id`), or — cleaner — derive the preview from the **first line or two of the active file / first example** so it's always the real language. If NSQL-03 is fixed by keeping the editor visible, these cards matter less, but they should still not show Python in a Java playground.
 
+> **Fixed (this PR).** `ThemePreviewSnippet` now dispatches per language with a concise, syntax-coloured `greet`-style snippet for each (JS/TS arrow fn + template literal, PHP `function`, C `printf`, C++ `std::cout`, Java `System.out.println`, C# `Console.WriteLine`, plus the existing Python/R/SQL). Verified the JS playground preview now reads `const greet = (name) => \`Hello, ${name}!\`;`. See `after-03-theme-previews-js.png`.
+
 ---
 
-### NSQL-05 — Workspace manager drawer: spacing & a leaked mobile handle 🟡 (your #4)
+### NSQL-05 — Workspace manager drawer: spacing & a leaked mobile handle 🟡 (your #4) — ✅ Fixed
 
 Reproduced at the exact 2-workspace state from your screenshot: `assets/41-workspace-drawer-2ws-crop.png`. Four distinct problems, all measured live:
 
@@ -187,9 +204,11 @@ Reproduced at the exact 2-workspace state from your screenshot: `assets/41-works
 
 > One more structural note: the manager is a **bottom-sheet `Drawer` (`swipeDirection="down"`)** reused as a right-anchored desktop side panel. The handle leak (above) is the visible symptom; consider whether the desktop presentation should be a centered modal/dialog rather than a side sheet, which would also fix the awkward top-right close-button-over-handle stack.
 
+> **Fixed (this PR).** (1) The handle hide rule is now `.pkg-drawer .mobile-menu-handle` (descendant), so it catches the nested handle — verified `display:none` on desktop. (2) `.workspace-manager-body` now has `padding-inline: 16px`, so buttons and cards align with the header (measured: header.left = card.left = 1237) and no longer touch the walls (card.right 1600 → 1584). (3) Dropped `margin-bottom`/`align-self` on `.workspace-manager-new` and gave it `flex: 1 1 auto` so the two top buttons fill the row evenly. The deeper "side-sheet vs modal" restructuring is left as a follow-up. See `after-04-workspace-drawer.png`.
+
 ---
 
-### NSQL-06 — "Workspace" is under-explained 🟢 (your #5)
+### NSQL-06 — "Workspace" is under-explained 🟢 (your #5) — ✅ Fixed
 
 **What's unclear.**
 - The drawer's one-line description is **`"Isolated, OPFS-backed copies of this playground's files and database state."`** (`WorkspaceBadge.tsx:411-414`). For a non-SQL playground this is doubly off: **"OPFS-backed" is internal jargon** a learner won't know, and **"database state" doesn't exist** here (there's no DB in the JS/Python/… playgrounds — that string is copied from the SQL playground).
@@ -201,9 +220,11 @@ Reproduced at the exact 2-workspace state from your screenshot: `assets/41-works
 - Default new workspaces to a friendly name — `"Untitled workspace"` or `"Workspace 2"` (next ordinal) — and let the timestamp be a subtitle, not the title.
 - Consider a one-time tooltip/callout on the badge ("This is your workspace — your files are saved here") on first visit.
 
+> **Fixed (this PR).** The drawer description is now plain-language and branches on playground type — non-SQL reads *"Each workspace is a separate, saved copy of this playground's files — switch between them to keep projects apart. Everything stays in your browser."* (no "OPFS"/"database state"); SQL keeps the "…files and database…" wording. New workspaces are named `Workspace N` (next ordinal via `defaultWorkspaceName`) instead of a `toLocaleString()` timestamp. The first-run badge callout is left as an optional follow-up.
+
 ---
 
-### NSQL-07 — Uncaught OPFS `NotFoundError` on every first load (all nine languages) 🔴 (new)
+### NSQL-07 — Uncaught OPFS `NotFoundError` on every first load (all nine languages) 🔴 (new) — ✅ Fixed
 
 **What happens.** On a fresh load of *any* non-SQL playground, exactly one uncaught promise rejection fires:
 ```
@@ -211,18 +232,20 @@ NotFoundError: A requested file or directory could not be found at the time an o
 ```
 Captured via `pageerror` and `unhandledrejection` on all nine languages (§8 — every row shows `pageErrs=1`). In dev it pops the Next.js error overlay ("1 Issue", visible bottom-left of `assets/01-js-initial.png` and `assets/03-js-files-pane-open.png`); **in production it would surface to whatever error monitoring you run** as a recurring uncaught exception. It does **not** break functionality — code still runs correctly — but a 🔴 "throws on every load" is not production-ready.
 
-**Diagnosis.** The DOMException has an empty `.stack` (typical for async OPFS handle ops), so it's a fire-and-forget OPFS call that isn't `.catch()`-ed. The app's own read/delete/list helpers in `opfs/fileStorage.ts` and `files/opfsDataStorage.ts` all swallow `NotFoundError` internally, and the bootstrap's awaited path is wrapped in try/catch (`Playground.tsx:886-973`). The remaining unguarded surfaces are the **fire-and-forget writers/flushers**, e.g.:
+**Diagnosis (root-caused by instrumenting the OPFS handle methods to capture the synchronous call-site stack).** The leak is **`getDataDir` in `files/opfsDataStorage.ts`**. It wraps its OPFS calls in a `try/catch` that's meant to return `null` on failure, but the last handle is **returned without `await`**:
 ```ts
-// opfs/fileStorage.ts:51-95 — flush() is invoked as `void flush()` (no .catch);
-// navigator.storage.getDirectory() on line 62 is OUTSIDE the per-write try/catch.
-function schedule(){ … requestIdleCallback(() => void flush() …) }  // unguarded rejection path
+// files/opfsDataStorage.ts (before)
+try {
+  …
+  return wDir.getDirectoryHandle("data", { create });  // ← not awaited
+} catch { return null; }                                 // ← can't catch a non-awaited return
 ```
-(The worker runtimes' own OPFS layer is another candidate, but the leak reproduces identically across all nine languages — pointing at the shared JS bootstrap, not a per-runtime worker.)
+On first load the `data/` directory doesn't exist, so `getDirectoryHandle("data", {create:false})` rejects with `NotFoundError`. Because it's `return <promise>` (not `return await <promise>`), the local `catch` never runs — the rejection propagates to `loadDataFiles` (no `try/catch`), then to `Playground.tsx:1001` `void loadDataFiles(...).then(...)` (no `.catch()`), where it becomes an unhandled rejection. (The other first-load NotFound, from `readFile`, *is* awaited and correctly caught — confirmed only one leak.)
 
-**Recommendation.**
-- Wrap the fire-and-forget schedulers: `requestIdleCallback(() => { flush().catch(() => {}); })` and move `navigator.storage.getDirectory()` inside `flush()`'s try (or wrap the whole body).
-- Audit the bootstrap for any non-awaited OPFS call (`opfsWriteFile` at `Playground.tsx:907,925`, `void loadDataFiles(...)` at `:1001`) and ensure each has a `.catch()`.
-- As a belt-and-suspenders net, install a single `window.addEventListener("unhandledrejection")` that silently drops OPFS `NotFoundError` (these are expected on empty storage).
+**Fix applied (this PR).**
+- **Root cause:** added `await` — `return await wDir.getDirectoryHandle("data", { create })` — so `getDataDir`'s own `catch` now returns `null` as intended.
+- **Defense in depth:** added a `.catch()` to the `void loadDataFiles(...)` call site.
+- **Re-verified:** **0 `pageerror`s and 0 `unhandledrejection`s** on JS playground load (was 1 each). Fix is in the shared bootstrap, so it covers all nine languages.
 
 ---
 
@@ -322,21 +345,23 @@ Each playground loaded in a fresh context; waited for the editor + an enabled Ru
 
 All changes are in shared files, so each fixes all nine playgrounds at once.
 
-**Phase 1 — Correctness (do first)**
-- **NSQL-07** Stop the uncaught OPFS `NotFoundError`: `.catch()` the fire-and-forget `flush()`/writers in `opfs/fileStorage.ts`, wrap `getDirectory()`, add a global `unhandledrejection` net for OPFS NotFound. *(🔴; small, isolated.)*
+**Phase 1 — Correctness (do first)** — ✅ **Done**
+- **NSQL-07** ✅ Stop the uncaught OPFS `NotFoundError`: `await` the returned handle in `getDataDir` so its `catch` works, + a `.catch()` at the `loadDataFiles` call site. Re-verified 0 errors. *(🔴; small, isolated.)*
 
-**Phase 2 — The five reported issues**
-- **NSQL-01** Remove the hard-coded `active` from the Editor button; either drop it or give it a real focus-editor action; make `.active` ≠ `:hover`. *(`Playground.tsx`, `playground.css`.)*
-- **NSQL-02** Add a Settings entry to the top-right header cluster (reuse `openSettingsTab()`). *(`Playground.tsx`.)*
-- **NSQL-03** Render Settings beside the editor (in the output half) instead of as an opaque overlay, so theme changes preview live. *(`playground.css`, small `Playground.tsx` layout tweak.)*
-- **NSQL-04** Per-language (or real-file-derived) theme preview snippets. *(`playgroundShared.tsx`.)*
-- **NSQL-05** Workspace drawer: fix the handle selector, add `padding-inline:16px` to the body so cards align with the header and don't touch the walls, drop the redundant button `margin-bottom`, equalize the two top buttons. *(`WorkspaceBadge.tsx`, `playground.css`.)*
-- **NSQL-06** Plain-language, playground-type-aware workspace description; friendly default names. *(`WorkspaceBadge.tsx`.)*
+**Phase 2 — The five reported issues** — ✅ **4/5 done** (NSQL-03 carried to Phase 2b)
+- **NSQL-01** ✅ Editor button is a real toggle (closes Files + focuses editor), lit only when Files is closed + `aria-pressed`; `.active` is accent-tinted (≠ hover). *(`Playground.tsx`, `playground.css`.)*
+- **NSQL-02** ✅ Settings entry added to the top-right header cluster (reuses `openSettingsTab()`). *(`Playground.tsx`.)*
+- **NSQL-04** ✅ Per-language theme preview snippets. *(`playgroundShared.tsx`.)*
+- **NSQL-05** ✅ Workspace drawer: handle selector fixed, `padding-inline:16px` body, button row fills evenly. *(`WorkspaceBadge.tsx`, `playground.css`.)*
+- **NSQL-06** ✅ Plain-language, playground-type-aware workspace description; friendly `Workspace N` default names. *(`WorkspaceBadge.tsx`.)*
 
-**Phase 3 — Mobile & polish**
-- **NSQL-08** Add a "Files" entry to the mobile menu (FilesPanel as a bottom-sheet drawer). *(`Playground.tsx`.)*
-- **NSQL-09** Tooltip-vs-panel overlap, redundant close affordance, badge truncation cleanup.
-- **A11y** `aria-pressed` consistency, non-color active cue (folds into NSQL-01).
+**Phase 2b — Settings live preview (next)**
+- **NSQL-03** ⏳ Render Settings beside the editor (in the output half) instead of as an opaque overlay, so theme changes preview live on the user's real code. *(`playground.css`, small `Playground.tsx` layout tweak.)*
+
+**Phase 3 — Mobile & polish (next)**
+- **NSQL-08** ⏳ Add a "Files" entry to the mobile menu (FilesPanel as a bottom-sheet drawer). *(`Playground.tsx`.)*
+- **NSQL-09** ⏳ Tooltip-vs-panel overlap, redundant close affordance, badge truncation cleanup.
+- **A11y** ✅ `aria-pressed` consistency + non-color active cue (landed with NSQL-01).
 
 ---
 
@@ -365,3 +390,7 @@ All changes are in shared files, so each fixes all nine playgrounds at once.
 | `43-export-menu.png` | Export menu |
 | `30-mobile-initial.png`, `31-mobile-menu.png` | Mobile (390px): no Files entry (NSQL-08) |
 | `50-python-run.png`, `50-typescript-run.png` | Cross-language run verification (§8) |
+| **`after-01-rail-files-open.png`** | **After NSQL-01:** Files open → only Files lit (accent), Editor neutral |
+| **`after-02-initial-with-header-settings.png`** | **After NSQL-02:** Settings gear in the top-right header |
+| **`after-03-theme-previews-js.png`** | **After NSQL-04:** theme previews show real JavaScript |
+| **`after-04-workspace-drawer.png`** | **After NSQL-05/06:** no handle, aligned cards, plain-language description |

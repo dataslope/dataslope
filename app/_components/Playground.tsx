@@ -998,9 +998,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   useEffect(() => {
     if (!workspaceReady || !workspaceId) return;
     let cancelled = false;
-    void loadDataFiles(workspaceId).then((loaded) => {
-      if (!cancelled) setVirtualFiles(loaded);
-    });
+    void loadDataFiles(workspaceId)
+      .then((loaded) => {
+        if (!cancelled) setVirtualFiles(loaded);
+      })
+      .catch(() => {
+        /* OPFS unavailable / empty — leave the data-file list empty. */
+      });
     return () => {
       cancelled = true;
     };
@@ -2998,6 +3002,19 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 </Popover.Positioner>
               </Popover.Portal>
             </Popover.Root>
+
+            {/* Settings entry co-located with the other global controls so
+                it's reachable from the top-right cluster (it's also still
+                pinned at the bottom of the left icon rail). */}
+            <button
+              type="button"
+              className="header-btn icon-only"
+              onClick={openSettingsTab}
+              title="Settings"
+              aria-label="Settings"
+            >
+              <Settings size={14} aria-hidden="true" />
+            </button>
           </div>
 
           {/* Mobile-only consolidated menu — replaces the header buttons
@@ -3392,8 +3409,17 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     <button
                       {...triggerProps}
                       type="button"
-                      className="playground-icon-sidebar-btn active"
+                      className={`playground-icon-sidebar-btn${filesPaneOpen ? "" : " active"}`}
                       aria-label="Editor"
+                      aria-pressed={!filesPaneOpen}
+                      onClick={() => {
+                        // The editor is the default surface; this button
+                        // returns to it (closing the Files panel) and
+                        // focuses CodeMirror, so it's a real toggle rather
+                        // than a permanently-lit decoration.
+                        setFilesPaneOpen(false);
+                        editorRef.current?.focus();
+                      }}
                     >
                       <Code2 size={16} aria-hidden="true" />
                     </button>

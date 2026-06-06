@@ -38,7 +38,12 @@ async function getDataDir(
     const root = await navigator.storage.getDirectory();
     const wsDir = await root.getDirectoryHandle("workspaces", { create });
     const wDir = await wsDir.getDirectoryHandle(workspaceId, { create });
-    return wDir.getDirectoryHandle("data", { create });
+    // `await` (not a bare `return`) so a NotFoundError from the missing
+    // `data/` dir — expected on first load before any data file is
+    // written — is caught here and returned as `null` instead of
+    // rejecting the caller's promise (which, fire-and-forget, would
+    // surface as an uncaught rejection).
+    return await wDir.getDirectoryHandle("data", { create });
   } catch {
     return null;
   }

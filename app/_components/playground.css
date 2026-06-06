@@ -495,9 +495,11 @@ body.playground-active {
   background: var(--bg3);
 }
 
+/* Active (selected) is accent-tinted so it reads as "this panel is
+   selected" rather than just "hovered" (hover uses the neutral --bg3). */
 .playground-icon-sidebar-btn.active {
-  color: var(--text);
-  background: var(--bg3);
+  color: var(--primary);
+  background: var(--primary-glow);
 }
 
 .playground-icon-sidebar-btn:focus-visible {
@@ -2098,12 +2100,15 @@ input[type="range"].fs-slider:disabled {
 }
 
 /* The drag handle is only meaningful for the bottom-sheet (mobile)
-   presentation; hide it for the right-anchored desktop side panel. */
-.pkg-drawer > .mobile-menu-handle {
+   presentation; hide it for the right-anchored desktop side panel.
+   Uses a descendant (not direct-child) selector so it still matches when
+   a drawer nests the handle inside `.pkg-drawer-content` (e.g. the
+   workspace manager), which previously leaked the handle onto desktop. */
+.pkg-drawer .mobile-menu-handle {
   display: none;
 }
 @media (max-width: 768px) {
-  .pkg-drawer > .mobile-menu-handle {
+  .pkg-drawer .mobile-menu-handle {
     display: block;
   }
 }
@@ -3935,11 +3940,16 @@ html[data-playground-theme="dark"] .welcome h3 {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  /* `.pkg-body` ships 0 horizontal padding; add it back here so the
+     buttons and workspace cards line up with the 16px-inset header
+     instead of sitting flush against (and touching) the panel walls. */
+  padding-inline: 16px;
 }
 
 .workspace-manager-new {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   padding: 10px 14px;
   background: color-mix(in srgb, var(--primary) 18%, transparent);
@@ -3951,8 +3961,10 @@ html[data-playground-theme="dark"] .welcome h3 {
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  margin-bottom: 8px;
-  align-self: flex-start;
+  /* Share the row evenly instead of content-sizing with a ragged right
+     edge. No `margin-bottom` — the parent's flex `gap` owns the spacing
+     (the stray margin compounded with the gap and the column gap). */
+  flex: 1 1 auto;
 }
 
 .workspace-manager-new:hover {

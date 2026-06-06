@@ -195,14 +195,10 @@ export function RuntimeInfoContent({ info }: { info: RuntimeInfo }) {
   );
 }
 
-const SAMPLE_FN_NAME: Record<string, string> = {
-  python: "greet",
-  r: "greet",
-};
-
 /** Build the language-specific syntax-highlighted snippet shown inside
- *  each editor-theme preview card. Shared so the SQL playground's
- *  Settings → Themes tab renders a SQL snippet instead of Python. */
+ *  each editor-theme preview card, so the preview is representative of
+ *  what *this* playground's editor will look like — not a generic Python
+ *  snippet for every language. */
 function ThemePreviewSnippet({
   palette,
   language,
@@ -210,63 +206,89 @@ function ThemePreviewSnippet({
   palette: ThemePalette;
   language: string;
 }) {
-  // Render a tiny SQL snippet in the theme preview cards for the
-  // SQLite playground so the preview is representative of what the
-  // editor will actually look like.
-  if (language === "sqlite" || language === "sql") {
-    return (
-      <>
-        <span style={{ color: palette.kw }}>SELECT</span>{" "}
-        <span style={{ color: palette.arg }}>name</span>
-        ,{" "}
-        <span style={{ color: palette.fn }}>COUNT</span>(
-        <span style={{ color: palette.kw }}>*</span>)
-        {"\n"}
-        <span style={{ color: palette.kw }}>FROM</span> users
-        {"\n"}
-        <span style={{ color: palette.kw }}>WHERE</span> city {" "}
-        <span style={{ color: palette.kw }}>=</span>{" "}
-        <span style={{ color: palette.str }}>{`'Seattle'`}</span>;
-      </>
-    );
+  const kw = (t: ReactNode) => <span style={{ color: palette.kw }}>{t}</span>;
+  const fn = (t: ReactNode) => <span style={{ color: palette.fn }}>{t}</span>;
+  const arg = (t: ReactNode) => <span style={{ color: palette.arg }}>{t}</span>;
+  const str = (t: ReactNode) => <span style={{ color: palette.str }}>{t}</span>;
+
+  switch (language) {
+    case "sqlite":
+    case "sql":
+      return (
+        <>
+          {kw("SELECT")} {arg("name")}, {fn("COUNT")}({kw("*")}){"\n"}
+          {kw("FROM")} users{"\n"}
+          {kw("WHERE")} city {kw("=")} {str("'Seattle'")};
+        </>
+      );
+    case "r":
+      return (
+        <>
+          {fn("greet")} {kw("<-")} {kw("function")}({arg("name")}) {"{"}
+          {"\n  "}
+          {fn("paste0")}({str('"Hello, "')}, name, {str('"!"')}){"\n}"}
+        </>
+      );
+    case "javascript":
+      return (
+        <>
+          {kw("const")} {fn("greet")} = ({arg("name")}) {kw("=>")}
+          {"\n  "}
+          {str("`Hello, ${name}!`")};
+        </>
+      );
+    case "typescript":
+      return (
+        <>
+          {kw("const")} {fn("greet")} = ({arg("name")}: {kw("string")}) {kw("=>")}
+          {"\n  "}
+          {str("`Hello, ${name}!`")};
+        </>
+      );
+    case "php":
+      return (
+        <>
+          {kw("function")} {fn("greet")}({arg("$name")}) {"{"}
+          {"\n  "}
+          {kw("return")} {str('"Hello, $name!"')};{"\n}"}
+        </>
+      );
+    case "c":
+      return (
+        <>
+          {fn("printf")}({str('"Hello, %s!\\n"')},{"\n  "}name);
+        </>
+      );
+    case "cpp":
+      return (
+        <>
+          {fn("std::cout")} {kw("<<")} {str('"Hello, "')}
+          {"\n  "}
+          {kw("<<")} name {kw("<<")} {str('"!\\n"')};
+        </>
+      );
+    case "java":
+      return (
+        <>
+          {fn("System.out")}.{fn("println")}({"\n  "}
+          {str('"Hello, "')} + name);
+        </>
+      );
+    case "csharp":
+      return (
+        <>
+          {fn("Console")}.{fn("WriteLine")}({"\n  "}
+          {str('$"Hello, {name}!"')});
+        </>
+      );
+    default:
+      return (
+        <>
+          {kw("def")} {fn("greet")}({arg("name")}):{"\n  "}
+          {kw("return")} {str('f"Hello, {name}!"')}
+        </>
+      );
   }
-  const fnName = SAMPLE_FN_NAME[language] ?? "greet";
-  return (
-    <>
-      <span style={{ color: palette.kw }}>
-        {language === "r" ? fnName : "def"}
-      </span>{" "}
-      {language === "r" ? (
-        <>
-          <span style={{ color: palette.kw }}>&lt;-</span>{" "}
-          <span style={{ color: palette.fn }}>function</span>(
-          <span style={{ color: palette.arg }}>name</span>) {"{"}
-        </>
-      ) : (
-        <>
-          <span style={{ color: palette.fn }}>{fnName}</span>(
-          <span style={{ color: palette.arg }}>name</span>):
-        </>
-      )}
-      {"\n  "}
-      {language === "r" ? (
-        <>
-          <span style={{ color: palette.fn }}>paste0</span>(
-          <span style={{ color: palette.str }}>{`"Hello, "`}</span>
-          , name,{" "}
-          <span style={{ color: palette.str }}>{`"!"`}</span>)
-          {"\n}"}
-        </>
-      ) : (
-        <>
-          <span style={{ color: palette.kw }}>return</span>{" "}
-          <span style={{ color: palette.str }}>
-            {`f"Hello, {name}!"`}
-          </span>
-        </>
-      )}
-    </>
-  );
 }
 
 export interface SettingsPanelProps {

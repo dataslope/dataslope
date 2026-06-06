@@ -76,6 +76,28 @@ function formatBytes(bytes: number): string {
   return `${n.toFixed(n >= 10 || i === 0 ? 0 : 1)} ${units[i]}`;
 }
 
+const SQL_PLAYGROUNDS = new Set(["sqlite", "postgres", "duckdb"]);
+
+/** SQL playgrounds persist a database alongside their files; the language
+ *  playgrounds (Python, JS, …) only have files. Used to keep the
+ *  workspace copy that mentions "database" out of the non-SQL playgrounds,
+ *  where it's both wrong and confusing. */
+function isSqlPlayground(id: string): boolean {
+  return SQL_PLAYGROUNDS.has(id);
+}
+
+/** A friendly default name for a newly-created workspace — e.g.
+ *  "Workspace 2" — instead of a raw `toLocaleString()` timestamp (which
+ *  was meaningless and truncated in the header badge). Reads naturally
+ *  next to the auto-created "Default <playground>". */
+function defaultWorkspaceName(
+  registry: WorkspaceEntry[],
+  playgroundId: string,
+): string {
+  const count = registry.filter((e) => e.playground === playgroundId).length;
+  return `Workspace ${count + 1}`;
+}
+
 function formatRelative(timestamp: number): string {
   const now = Date.now();
   const diff = Math.max(0, now - timestamp);
@@ -166,10 +188,12 @@ export function WorkspaceBadge({
   );
 
   const handleCreateNew = useCallback(async () => {
-    const defaultName = `Workspace ${new Date().toLocaleString()}`;
-    const created = await createWorkspace(defaultName, playgroundId);
+    const created = await createWorkspace(
+      defaultWorkspaceName(registry, playgroundId),
+      playgroundId,
+    );
     switchActiveWorkspace(playgroundId, created.id);
-  }, [playgroundId]);
+  }, [playgroundId, registry]);
 
   const openManager = useCallback(() => {
     refreshRegistry();
@@ -343,10 +367,12 @@ function WorkspaceManagerDrawer({
   }, [open, list]);
 
   const handleCreateNew = useCallback(async () => {
-    const defaultName = `Workspace ${new Date().toLocaleString()}`;
-    const created = await createWorkspace(defaultName, playgroundId);
+    const created = await createWorkspace(
+      defaultWorkspaceName(registry, playgroundId),
+      playgroundId,
+    );
     switchActiveWorkspace(playgroundId, created.id);
-  }, [playgroundId]);
+  }, [playgroundId, registry]);
 
   const handleExport = useCallback(
     async (ws: WorkspaceEntry) => {
@@ -409,8 +435,9 @@ function WorkspaceManagerDrawer({
                       <span className="pkg-count-badge">{list.length}</span>
                     </Drawer.Title>
                     <Drawer.Description className="pkg-drawer-hint">
-                      Isolated, OPFS-backed copies of this playground&apos;s
-                      files and database state.
+                      {isSqlPlayground(playgroundId)
+                        ? "Each workspace is a separate, saved copy of this playground’s files and database — switch between them to keep projects apart. Everything stays in your browser."
+                        : "Each workspace is a separate, saved copy of this playground’s files — switch between them to keep projects apart. Everything stays in your browser."}
                     </Drawer.Description>
                   </div>
                   <Drawer.Close
