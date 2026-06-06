@@ -573,6 +573,17 @@
 }
 
 .toastTitle {
+  /* `Toast.Title` renders an <h2>, and the toast is portaled to <body> —
+     outside the /learn docs container that maps `--font-serif` to Source
+     Serif. There the docs' `h1–h6 { font-family: var(--font-serif) }` rule
+     resolves to Tailwind's `ui-serif` default and wins over the Inter set on
+     `.toastRoot` (a directly-matched element rule beats an inherited value).
+     Pin Inter on the title itself so the toast text stays in the UI font. */
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    sans-serif;
   font-weight: 500;
   font-size: 12.5px;
   line-height: 1.35;

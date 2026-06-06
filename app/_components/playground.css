@@ -1267,6 +1267,11 @@ body.playground-active {
   height: 100%;
   gap: 6px;
   color: var(--text);
+  /* Pin the empty-state text to Inter. Without this the heading/body simply
+     inherit the document font, which is fine on the standalone playground but
+     lets a serif stack leak in wherever the playground is mounted inside a
+     serif-scoped context (the heading especially — see `.welcome h3`). */
+  font-family: var(--font-ui);
   text-align: center;
   padding: 32px;
 }
@@ -1275,6 +1280,11 @@ body.playground-active {
   font-size: 32px;
 }
 .welcome h3 {
+  /* "Run a query to see results" is an <h3>. A bare `h3` selector (e.g. the
+     /learn docs' `h1–h6 { font-family: var(--font-serif) }`) would otherwise
+     win over the inherited value above, so pin Inter directly here — the
+     `.welcome h3` selector outranks a lone element selector. */
+  font-family: var(--font-ui);
   font-size: 16px;
   font-weight: 500;
   margin: 0;
@@ -3363,6 +3373,10 @@ html[data-playground-theme="light"] .toast {
 }
 
 .toast-title {
+  /* `Toast.Title` renders an <h2>. Pin Inter directly (rather than relying on
+     the `.toast` parent's font-family) so a bare `h1–h6` rule from a
+     serif-scoped host context can't override the inherited value. */
+  font-family: var(--font-ui);
   font-weight: 600;
   font-size: 12.5px;
   line-height: 1.35;
@@ -3370,6 +3384,7 @@ html[data-playground-theme="light"] .toast {
   margin: 0;
 }
 .toast-desc {
+  font-family: var(--font-ui);
   font-size: 11.5px;
   color: var(--text);
   margin-top: 2px;
