@@ -17,6 +17,20 @@
 
 These already appear in your mockup (alien, astronaut, topic chips) and the playground tokens are *almost* this blue already (`--primary: oklch(68% 0.18 250)` ≈ `#148CFF`), so alignment is low-friction.
 
+### 1.1 Decorative / categorical hues (added for charts & illustrations)
+
+The four-color palette is intentionally small and **semantically loaded** — green/red/yellow are locked to success/error/warning (§5), which leaves **blue as the only meaning-free hue**. That's fine for UI, but **diagrams and illustrations need categorical variety**: a flowchart with several node groups, a Mermaid **mindmap** (which assigns a different color per branch), or an illustration with several distinct shapes. A content audit confirms the gap — across the `/learn` MDX, authors hand-color Mermaid nodes in **~480 places**, reaching for **seven-plus hue families** (purple `#e9d5ff`, pink `#fbcfe8`, orange `#fed7aa`, teal `#dee`, …), i.e. well beyond the four brand colors and off-brand.
+
+So we add **three decorative hues** — **teal, purple, orange** — generated with the *same* OKLCH method as the brand ramps (constant hue, interpolated L/C, gamut-mapped; 500 = base). They carry **no semantic meaning**; use them purely to tell series/branches apart. With blue they form a seven-step categorical wheel: **blue · teal · green · yellow · orange · red · purple**.
+
+| Decorative hue | 500 (base) | Ink (700 — AA body text on white) |
+|---|---|---|
+| **Teal** (hue ≈192) | `#00AEAA` | `#007B79` (5.1:1) |
+| **Purple** (hue ≈300) | `#AB77FA` | `#7A51B6` (5.7:1) |
+| **Orange** (hue ≈55) | `#E47600` | `#A35200` (5.6:1) |
+
+Full 50–900 ramps ship in `app/brand.css` as `--ds-{teal,purple,orange}-{step}` (plus `--ds-{hue}` and `--ds-{hue}-ink` aliases), mirroring the four brand ramps. Like the brand hues they are **dark-native**: the 500s clear AA body text on dark, the 700s clear AA on white.
+
 ---
 
 ## 2. The one thing that shapes everything: this palette is **dark-mode-native**
@@ -47,7 +61,7 @@ Define, for each brand hue, a **bright "signal" value** (the hex above — used 
 
 ### 2.2 The full 50–900 tonal ramps
 
-Generated in **OKLCH** (constant hue; lightness/chroma interpolated toward white for the light steps and toward near-black for the dark steps; every value gamut-mapped to valid sRGB). **500 = your exact brand color.** These are now shipped in `app/brand.css` as `--ds-{hue}-{step}` tokens; the "ink" roles in §2.1 are remapped onto ramp steps (`blue-700`, `green-800`, `red-700`, `yellow-800`) so everything references one ramp.
+Generated in **OKLCH** (constant hue; lightness/chroma interpolated toward white for the light steps and toward near-black for the dark steps; every value gamut-mapped to valid sRGB). **500 = your exact brand color.** These are now shipped in `app/brand.css` as `--ds-{hue}-{step}` tokens; the "ink" roles in §2.1 are remapped onto ramp steps (`blue-700`, `green-800`, `red-700`, `yellow-800`) so everything references one ramp. The three **decorative** hues from §1.1 ship as parallel `--ds-{teal,purple,orange}-*` ramps in the same file, built the same way.
 
 | Step | Blue | Green | Red | Yellow |
 |---|---|---|---|---|
@@ -165,9 +179,25 @@ Use `color-mix()` for tints (the playground already does this): `color-mix(in sr
 
 > **Leave the per-editor-theme palettes alone.** `THEME_PALETTES` / `applyThemePalette` deliberately recolor the chrome to match the *chosen code theme* (Dracula, Nord…). Those are user-selected editor aesthetics, not brand surfaces — keep them independent. Only the brand-signal tokens above should be unified.
 
-### 4.3 Result
+### 4.3 Fourth consumer — Mermaid diagrams (JS, not CSS)
 
-One file defines the palette; each route reads it through its native token system; the `.dark` class flips light↔dark everywhere at once. Adding a color or fixing a shade is a one-line change in `brand.css`.
+`/learn` renders Mermaid diagrams (flowcharts dominate, plus ER, sequence, class, state, gantt, mindmaps). Mermaid **can't read `var(--ds-*)`** — it runs color math (khroma) over its theme variables and needs concrete colors. So instead of the stock **`neutral`** (light) / **`dark`** themes, `app/_components/mdx/mermaid.tsx` builds Mermaid's customizable **`base`** theme from the brand palette: it resolves the `--ds-*` tokens to hex at render time (via `getComputedStyle`, keeping `brand.css` the source of truth, with literal fallbacks) and maps them onto Mermaid's `themeVariables`.
+
+**A light theme in light mode and a real dark theme in dark mode**, so each matches the surrounding page. Light: soft tints on white. Dark: layered slate (page < cluster < node) with light text — genuinely dark, *not* a white card on a dark page.
+
+**The legibility wrinkle (and how it's solved).** ~200 MDX diagrams hand-color nodes with `classDef` using **light pastel fills and no text color** (e.g. `classDef bad fill:#fee2e2,stroke:#b91c1c`). Mermaid exposes a *single* global node-text color, so a dark theme's light text would be light-on-light on those author fills. The fix is `adaptNodeLabels`: after render (the SVG must be in the DOM, since `classDef` fills come from injected CSS classes), it reads each flowchart node's **own fill luminance** and sets that node's label color — **dark text on light fills, light text on dark fills**. So default nodes go properly dark (light text) while author pastels keep dark text; the colored nodes read as intentional emphasis. It's idempotent and harmless in light mode.
+
+The mapping, tuned soft and low-border (per the report updates):
+- **Nodes** — light: soft `blue-100` fill, soft `blue-300` hairline border. Dark: `gray-700` node on a `gray-800` cluster on the `gray-900`/page, subtle `gray-600` border. Label color is then set per-node by `adaptNodeLabels`.
+- **Structure** — neutral `--ds-gray-*` connectors/arrowheads/lifelines; free-floating text (titles, sequence signals) follows the page foreground; edge-label backdrops blend into the page.
+- **Semantic hues keep their meaning** — yellow notes; red critical-path / "today" markers in gantt.
+- **Categorical wheel** — mindmaps cycle the **seven-hue** wheel (§1.1): soft `-200` fills + dark labels in light, deep `-800` fills + light labels in dark. (Mermaid re-applies overrides *after* its internal derivation, so these reach the SVG verbatim — its `cScale` darkening is bypassed; mindmap sections aren't `.node`, so `adaptNodeLabels` leaves them alone.)
+
+Spot-checked with **Playwright** across all diagram types in light and dark — including the author-`classDef` pages that exposed the original dark-mode legibility bug.
+
+### 4.4 Result
+
+One file defines the palette; each route reads it through its native token system (CSS tokens, Fumadocs `--color-fd-*`, the playground `--primary/...`, and now Mermaid's JS `themeVariables`); the `.dark` class flips light↔dark everywhere at once. Adding a color or fixing a shade is a one-line change in `brand.css`.
 
 ---
 
@@ -181,6 +211,8 @@ Consistency comes from **meaning**, not just shared hex. Lock these mappings:
 | **Green** | success / go | "Run", passing tests, correct answers, positive deltas | links or generic accents (reads as "success") |
 | **Red** | error / stop | failures, destructive actions, wrong answers, validation errors | decoration (alarms users) |
 | **Yellow** | attention | highlights, warnings, "new" badges, callout accents | body text on light; large fills behind dark text only with care |
+
+**Decorative hues (teal/purple/orange) are the exception to "meaning":** they are deliberately *non-semantic* — use them only for categorical distinction in charts, diagrams, and illustrations, never to imply success/error/warning and not as a second "primary." See §1.1.
 
 **Accessibility do/don'ts:**
 - ✅ Use the **ink variants** for any text/link/icon on **light** backgrounds; use the **bright** hues for text on **dark**.
@@ -227,6 +259,17 @@ Deliberately **left alone:** non-brand decoratives (violet/purple `--ch-violet-*
 
 Across Phases 5–6: **ChallengeCard 81 → 34** unique vars (−58%), **MCQ 57 → 15** (−74%). **0 dangling references**, build green, lint clean, 445 tests pass throughout.
 
+**Phase 7 — Mermaid chart theme — ✅ done.** `app/_components/mdx/mermaid.tsx` previously selected Mermaid's stock `neutral` (light) / `dark` themes. It now builds the customizable **`base`** theme from the brand palette (see §4.3), so diagrams match the rest of `/learn`. This is also what motivated the **three decorative hues** (§1.1): mindmaps and other categorical diagrams cycle the seven-hue brand wheel instead of Mermaid's off-brand defaults.
+
+Dark mode took a few review iterations to get right (recorded here because each step informed the final design):
+1. **First cut** — dark nodes + light text. Broke the ~200 author `classDef` light-pastel nodes (light fill + inherited light text → invisible).
+2. **Light figure card** — flipped to one light palette in both modes, rendered on a white "figure card" in dark mode. Legible, but (a) the card used `width: fit-content`, which collapsed the SVG (it's sized `width:100%; max-width:<W>px`, so a shrink-to-fit parent gives ~0 width), and (b) `blue-50` fills looked washed-out on white. Also reviewers (rightly) read a white card on a dark page as "still light mode."
+3. **Final — a real dark theme + `adaptNodeLabels`.** Dark mode now uses a genuine dark theme (layered slate, light text, no card); the card CSS is removed. The author-pastel constraint is solved by `adaptNodeLabels`, which sets each node's label color from its own fill luminance (§4.3) — so default nodes go dark while author pastels keep dark text. Node fills are `blue-100`/`blue-300` in light, `gray-700`/`gray-600` in dark.
+
+Alongside: **minimized borders** (default node border `blue-600` → soft hairline), a **softer, less "poppy" palette**, and **`/color-test`** now renders the teal / purple / orange ramps + ink anchors so the QA gate covers the decorative hues. Verified with Playwright across flowchart / ER / sequence / class / state / gantt / mindmap in both modes (incl. author-`classDef` pages); dark-mode SVG widths match light mode (no shrinking).
+
+Typecheck + lint clean, 450 unit tests pass; verified visually with Playwright across flowchart / ER / sequence / class / state / gantt / mindmap in light and dark (incl. author-`classDef` pages).
+
 ---
 
 ## 7. Feasibility for AI illustration generation (light **and** dark mode)
@@ -238,7 +281,7 @@ The same dark-native asymmetry from §2 applies to illustrations, but illustrati
 - **On dark mode:** the bright palette is ideal — saturated blue/green/red/yellow shapes pop against `#121212`. No adjustment needed.
 - **On light mode:** large saturated **shapes** read fine on white, but **yellow and light-green areas can look weak/washed** on a pure-white page. Mitigate by: (a) giving shapes a subtle darker outline or shadow, (b) composing on the brand's **off-white surface** rather than pure `#fff`, or (c) leaning on blue/red as the dominant hues with yellow/green as accents.
 - **The rule (ties to the illustration report §7):** generate art with a **transparent background** and a **theme-agnostic, mid-tone application** of the palette so a single asset reads on both themes — OR use **SVG** (Recraft) where fills can be brand tokens and even adapt via CSS. Avoid baking pure-white or pure-black backgrounds into raster art.
-- **Consistency:** feed these exact hex values into the house-style prompt preamble (already updated in the illustration report) and cap each illustration to **2–3 of the four** brand colors to avoid a circus look. Use the per-course accent trick (swap one hue per course) for variety within the system.
+- **Consistency:** feed these exact hex values into the house-style prompt preamble (already updated in the illustration report) and cap each illustration to **2–3 hues** to avoid a circus look — drawn from the four brand colors, or from the decorative hues (§1.1) when an image needs non-semantic categorical accents. Use the per-course accent trick (swap one hue per course) for variety within the system.
 
 **Verdict:** the palette is a strong fit for AI illustration in both modes. Dark mode is "free"; light mode needs the transparent-background + mid-tone discipline already recommended for illustrations generally. See `20260605-0532-ai-image-generation-for-course-illustrations.md` §7 and Appendix A for the prompt mechanics.
 
@@ -247,10 +290,11 @@ The same dark-native asymmetry from §2 applies to illustrations, but illustrati
 ## 8. Summary
 
 1. **Adopt two values per hue** — a bright "signal" (your four hex) and a darker "ink" for light-mode text. The palette is dark-native; light mode needs the ink variants.
-2. **One `app/brand.css` token layer** (✅ shipped) — brand hue ramps, ink anchors, semantic roles, **and a shared neutral ramp (`--ds-gray-*`, `--ds-white/black`)** — adapted into each of the three worlds (CSS modules → tokens, Fumadocs `--color-fd-*` remap, playground `--primary/...` remap). Dark overrides target both `.dark` (/learn) and `[data-theme="dark"]` (/playground); dark-only home uses the raw ramp. Components (challenge cards, quizzes, code blocks) keep only semantic aliases — all literal palette values now live in `brand.css`.
-3. **Lock semantic meaning** (blue=primary, green=success, red=error, yellow=attention) and the accessibility do/don'ts.
+2. **One `app/brand.css` token layer** (✅ shipped) — brand hue ramps, ink anchors, semantic roles, **a shared neutral ramp (`--ds-gray-*`, `--ds-white/black`)**, and **three non-semantic decorative hues (teal/purple/orange)** for categorical use in charts and illustrations (§1.1) — adapted into each world (CSS modules → tokens, Fumadocs `--color-fd-*` remap, playground `--primary/...` remap). Dark overrides target both `.dark` (/learn) and `[data-theme="dark"]` (/playground); dark-only home uses the raw ramp. Components (challenge cards, quizzes, code blocks) keep only semantic aliases — all literal palette values now live in `brand.css`.
+3. **Lock semantic meaning** (blue=primary, green=success, red=error, yellow=attention; decoratives carry none) and the accessibility do/don'ts.
 4. **Migrate playground → learn → home**, using `/color-test` as the QA gate; then de-dupe ad-hoc hex.
-5. **Illustrations:** feasible and well-suited in both modes — transparent backgrounds + mid-tone palette use (or SVG), bright hues for dark, slightly tempered for light.
+5. **Charts (Mermaid):** the `/learn` diagram theme is built from the brand palette (Mermaid `base` theme) instead of the stock neutral/dark themes — a light theme in light mode and a real dark theme in dark mode. Author `classDef` pastel fills (which carry no text color) stay legible via `adaptNodeLabels`, which sets each node's label color from its own fill luminance; mindmaps cycle the seven-hue categorical wheel (§4.3). Minimal hairline borders, soft palette. Playwright-verified in light and dark.
+6. **Illustrations:** feasible and well-suited in both modes — transparent backgrounds + mid-tone palette use (or SVG), bright hues for dark, slightly tempered for light.
 
 ---
 
@@ -268,5 +312,11 @@ WCAG AA: **4.5:1** body text · **3:1** large/bold text, icons, UI boundaries.
 | Red-ink `#D5323C` | 4.83 | — |
 | Green-ink `#178017` | 5.08 | — |
 | Amber-ink `#8A6D00` | 4.92 | — |
+| Teal `#00AEAA` | 2.75 | 6.81 |
+| Purple `#AB77FA` | 3.11 | 6.02 |
+| Orange `#E47600` | 3.05 | 6.15 |
+| Teal-ink `#007B79` | 5.11 | — |
+| Purple-ink `#7A51B6` | 5.71 | — |
+| Orange-ink `#A35200` | 5.58 | — |
 
 *Computed via the standard WCAG relative-luminance formula; re-verify any shipped value in a contrast checker.*

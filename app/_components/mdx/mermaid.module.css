@@ -11,11 +11,11 @@
    cap equal to the diagram's intrinsic width. Leaving that cap intact keeps
    the diagram at its default size on wide columns while still letting it
    scale down to fit narrower ones (the SVG carries a viewBox). */
-.wrap > div:first-child {
+.wrap > .diagram {
   width: 100%;
 }
 
-.wrap > div:first-child svg {
+.diagram svg {
   display: block;
   margin-inline: auto;
   height: auto;

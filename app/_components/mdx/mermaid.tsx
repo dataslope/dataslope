@@ -48,6 +48,236 @@ function cachePromise<T>(key: string, setPromise: () => Promise<T>): Promise<T> 
   return promise;
 }
 
+// ─── Brand-themed Mermaid palette ──────────────────────────────────────────
+//
+// Diagrams are themed from the brand color system (app/brand.css) via Mermaid's
+// customizable "base" theme — a LIGHT theme in light mode and a DARK theme in
+// dark mode, so each matches the surrounding page (no white card on a dark
+// page).
+//
+// The wrinkle: ~200 MDX diagrams hand-color nodes with `classDef` using light
+// pastel fills and *no* text color (e.g. `classDef bad fill:#fee2e2`). Mermaid
+// has one global node-text color, so in a dark theme (light text) those author
+// nodes would be light-on-light. We fix that after render with
+// `adaptNodeLabels`, which sets each node's label color from its *own* fill
+// luminance — dark text on light fills, light text on dark fills — so author
+// pastels stay legible while our default nodes go properly dark.
+//
+// Mermaid runs color math (khroma) over theme values and needs concrete colors,
+// so we resolve the brand tokens to hex at render time (brand.css stays the
+// source of truth) with literal fallbacks.
+const BRAND_FALLBACKS: Record<string, string> = {
+  "--ds-blue-50": "#E8F2FF",
+  "--ds-blue-100": "#D1E6FF",
+  "--ds-blue-200": "#AED3FF",
+  "--ds-blue-300": "#8ABFFF",
+  "--ds-blue-800": "#00519C",
+  "--ds-teal-200": "#AAE0DD",
+  "--ds-teal-800": "#006361",
+  "--ds-green-200": "#B4EAAF",
+  "--ds-green-800": "#006F01",
+  "--ds-red-200": "#FFC2BF",
+  "--ds-red-500": "#FF4F59",
+  "--ds-red-600": "#DC3F49",
+  "--ds-red-800": "#99212C",
+  "--ds-yellow-100": "#FDF5D9",
+  "--ds-yellow-200": "#FEF0C3",
+  "--ds-yellow-600": "#D4B651",
+  "--ds-yellow-800": "#836D1C",
+  "--ds-orange-200": "#F6CAAD",
+  "--ds-orange-800": "#844200",
+  "--ds-purple-200": "#DBCAFC",
+  "--ds-purple-800": "#634094",
+  "--ds-gray-50": "#F9FAFB",
+  "--ds-gray-200": "#E5E7EB",
+  "--ds-gray-300": "#D1D5DB",
+  "--ds-gray-400": "#9CA3AF",
+  "--ds-gray-500": "#6B7280",
+  "--ds-gray-600": "#4B5563",
+  "--ds-gray-700": "#374151",
+  "--ds-gray-800": "#1F2937",
+  "--ds-gray-900": "#111827",
+  "--ds-white": "#FFFFFF",
+};
+
+function readBrand(): (token: keyof typeof BRAND_FALLBACKS) => string {
+  let resolved: Record<string, string> = BRAND_FALLBACKS;
+  if (typeof window !== "undefined") {
+    const root = getComputedStyle(document.documentElement);
+    resolved = { ...BRAND_FALLBACKS };
+    for (const name of Object.keys(BRAND_FALLBACKS)) {
+      const value = root.getPropertyValue(name).trim();
+      if (value) resolved[name] = value;
+    }
+  }
+  return (token) => resolved[token] ?? BRAND_FALLBACKS[token];
+}
+
+function brandThemeVariables(isDark: boolean): Record<string, string | boolean> {
+  const c = readBrand();
+
+  // Surfaces & text, keyed by mode. Light: soft tints on white. Dark: layered
+  // slate (page < cluster < node) with light text. `nodeText` is the theme
+  // default; adaptNodeLabels overrides it per node from the node's own fill.
+  const nodeFill = isDark ? c("--ds-gray-700") : c("--ds-blue-100");
+  const nodeEdge = isDark ? c("--ds-gray-600") : c("--ds-blue-300");
+  const nodeText = isDark ? c("--ds-gray-50") : c("--ds-gray-900");
+  const clusterFill = isDark ? c("--ds-gray-800") : c("--ds-gray-50");
+  const clusterEdge = isDark ? c("--ds-gray-700") : c("--ds-gray-200");
+  const pageText = isDark ? c("--ds-gray-50") : c("--ds-gray-900"); // free-floating
+  const surface = isDark ? c("--ds-gray-900") : c("--ds-white");
+  const line = c("--ds-gray-400"); // connectors — visible on light and dark
+  const lifeline = isDark ? c("--ds-gray-500") : c("--ds-gray-300");
+  const edgeLabelBg = isDark ? c("--ds-gray-900") : c("--ds-white");
+  const accentFill = isDark ? c("--ds-gray-600") : c("--ds-blue-100");
+
+  // Notes — bright sticky in light; muted slate with a yellow edge in dark.
+  const noteFill = isDark ? c("--ds-gray-700") : c("--ds-yellow-100");
+  const noteEdge = isDark ? c("--ds-yellow-600") : c("--ds-yellow-200");
+
+  // Categorical wheel (mindmaps): light = soft -200 + dark labels; dark = deep
+  // -800 + light labels. (Mermaid re-applies overrides after derivation, so
+  // these reach the SVG verbatim; mindmap sections aren't `.node`, so
+  // adaptNodeLabels leaves them alone.)
+  const step = isDark ? "800" : "200";
+  const wheel = ["blue", "teal", "green", "yellow", "orange", "red", "purple"];
+  const cScale: Record<string, string> = {};
+  for (let i = 0; i < 12; i++) {
+    cScale[`cScale${i}`] = c(
+      `--ds-${wheel[i % wheel.length]}-${step}` as keyof typeof BRAND_FALLBACKS,
+    );
+  }
+
+  return {
+    darkMode: isDark,
+    background: surface,
+    fontFamily: '"Source Serif 4", Georgia, "Times New Roman", serif',
+    // Controls the font-size written into the SVG's inline <style> block.
+    // Without this, Mermaid inherits the container's computed size (16px from
+    // the 1rem wrapper) and writes that into the SVG, overriding the fontSize
+    // config which only governs text measurement.
+    fontSize: "15px",
+
+    // Nodes (flowchart / class / state / ER) + sequence actors
+    primaryColor: nodeFill,
+    primaryBorderColor: nodeEdge,
+    primaryTextColor: nodeText,
+    nodeTextColor: nodeText,
+
+    // Secondary / tertiary — clusters/subgraphs + gentle accents
+    secondaryColor: accentFill,
+    secondaryBorderColor: nodeEdge,
+    secondaryTextColor: nodeText,
+    tertiaryColor: clusterFill,
+    tertiaryBorderColor: clusterEdge,
+    tertiaryTextColor: nodeText,
+
+    // Connectors + free-floating text (titles / signals sit on the page)
+    lineColor: line,
+    arrowheadColor: line,
+    textColor: pageText,
+    titleColor: pageText,
+    edgeLabelBackground: edgeLabelBg,
+
+    // Notes
+    noteBkgColor: noteFill,
+    noteBorderColor: noteEdge,
+    noteTextColor: nodeText,
+
+    // Sequence diagrams
+    actorBkg: nodeFill,
+    actorBorder: nodeEdge,
+    actorTextColor: nodeText,
+    actorLineColor: lifeline,
+    signalColor: line,
+    signalTextColor: pageText,
+    labelBoxBkgColor: nodeFill,
+    labelBoxBorderColor: nodeEdge,
+    labelTextColor: nodeText,
+    loopTextColor: pageText,
+    activationBkgColor: accentFill,
+    activationBorderColor: nodeEdge,
+    sequenceNumberColor: isDark ? c("--ds-gray-900") : c("--ds-white"),
+
+    // Class diagrams
+    classText: nodeText,
+
+    // State diagrams (composite/alt backgrounds follow the cluster surface)
+    compositeBackground: clusterFill,
+    altBackground: clusterFill,
+    compositeTitleBackground: nodeFill,
+    compositeBorder: nodeEdge,
+
+    // ER diagrams — alternating attribute rows
+    attributeBackgroundColorOdd: clusterFill,
+    attributeBackgroundColorEven: surface,
+
+    // Gantt charts
+    sectionBkgColor: clusterFill,
+    altSectionBkgColor: surface,
+    sectionBkgColor2: isDark ? c("--ds-gray-700") : c("--ds-blue-50"),
+    taskBkgColor: nodeFill,
+    taskBorderColor: nodeEdge,
+    activeTaskBkgColor: isDark ? c("--ds-gray-600") : c("--ds-blue-200"),
+    activeTaskBorderColor: nodeEdge,
+    gridColor: clusterEdge,
+    doneTaskBkgColor: isDark ? c("--ds-gray-700") : c("--ds-gray-300"),
+    doneTaskBorderColor: c("--ds-gray-500"),
+    critBkgColor: isDark ? c("--ds-red-800") : c("--ds-red-200"),
+    critBorderColor: c("--ds-red-600"),
+    todayLineColor: c("--ds-red-500"),
+    taskTextColor: nodeText,
+    taskTextDarkColor: c("--ds-gray-900"),
+    taskTextLightColor: c("--ds-gray-50"),
+    taskTextOutsideColor: pageText,
+
+    // Categorical scale (mindmaps / pie) + mindmap root node
+    scaleLabelColor: nodeText,
+    git0: nodeFill,
+    gitBranchLabel0: nodeText,
+    ...cScale,
+  };
+}
+
+// Relative luminance (WCAG) of an "rgb(r, g, b)" string, or null if unparseable.
+function rgbLuminance(rgb: string): number | null {
+  const m = rgb.match(/[\d.]+/g);
+  if (!m || m.length < 3) return null;
+  const [r, g, b] = m.slice(0, 3).map((n) => {
+    const v = Number(n) / 255;
+    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+// Set each flowchart node's label color from its own fill luminance, so author
+// `classDef` pastel fills (which carry no text color) stay legible: dark text on
+// light fills, light text on dark fills. Runs after the SVG is in the DOM —
+// fills can come from injected CSS classes, so getComputedStyle is required.
+// Idempotent, and harmless in light mode (re-asserts dark-on-light).
+function adaptNodeLabels(root: Element | null): void {
+  if (!root) return;
+  const DARK = "#111827"; // --ds-gray-900
+  const LIGHT = "#F3F4F6"; // --ds-gray-100
+  root.querySelectorAll(".node").forEach((node) => {
+    const shape = node.querySelector("rect, polygon, circle, ellipse, path");
+    if (!shape) return;
+    const lum = rgbLuminance(getComputedStyle(shape).fill);
+    if (lum == null) return;
+    const color = lum > 0.4 ? DARK : LIGHT;
+    node
+      .querySelectorAll<HTMLElement>(
+        "foreignObject div, foreignObject span, foreignObject p",
+      )
+      .forEach((el) => {
+        el.style.color = color;
+      });
+    node.querySelectorAll<SVGElement>("text, tspan").forEach((el) => {
+      el.style.fill = color;
+    });
+  });
+}
+
 function MermaidContent({ chart }: { chart: string }) {
   const id = useId();
   const { resolvedTheme } = useTheme();
@@ -59,14 +289,12 @@ function MermaidContent({ chart }: { chart: string }) {
     fontFamily: '"Source Serif 4", Georgia, "Times New Roman", serif',
     fontSize: 15,
     themeCSS: "margin: 1.5rem auto 0;",
-    theme: resolvedTheme === "dark" ? "dark" : "neutral",
-    themeVariables: {
-      // Controls the font-size written into the SVG's inline <style> block.
-      // Without this, Mermaid inherits the container's computed size (16px
-      // from the 1rem wrapper) and writes that into the SVG, overriding the
-      // fontSize config above which only governs text measurement.
-      fontSize: "15px",
-    },
+    // Drive diagram colors from the DataSlope brand palette (app/brand.css) via
+    // the customizable "base" theme: a light theme in light mode and a dark
+    // theme in dark mode (adaptNodeLabels keeps author classDef pastels legible
+    // in the dark theme). Replaces Mermaid's stock neutral/dark themes.
+    theme: "base",
+    themeVariables: brandThemeVariables(resolvedTheme === "dark"),
   });
 
   const { svg, bindFunctions } = use(
@@ -89,8 +317,12 @@ function MermaidContent({ chart }: { chart: string }) {
   return (
     <div className={styles.wrap}>
       <div
+        className={styles.diagram}
         ref={(container) => {
-          if (container) bindFunctions?.(container);
+          if (container) {
+            bindFunctions?.(container);
+            adaptNodeLabels(container);
+          }
         }}
         dangerouslySetInnerHTML={{ __html: svg }}
       />
@@ -174,6 +406,9 @@ function MermaidFullscreen({
       if (!viewport || !stage) return;
       const svgEl = stage.querySelector("svg");
       if (!svgEl) return;
+      // Keep author classDef pastel nodes legible in the dark theme (matches
+      // the inline diagram).
+      adaptNodeLabels(stage);
       const bbox = svgEl.getBoundingClientRect();
       const naturalW = bbox.width;
       const naturalH = bbox.height;
@@ -365,7 +600,11 @@ function MermaidFullscreen({
               transform: `translate(${tx}px, ${ty}px)`,
             }}
           >
-            <div ref={stageRef} dangerouslySetInnerHTML={{ __html: svg }} />
+            <div
+              className={styles.diagram}
+              ref={stageRef}
+              dangerouslySetInnerHTML={{ __html: svg }}
+            />
           </div>
         </div>
       </div>
