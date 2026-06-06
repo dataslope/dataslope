@@ -80,6 +80,23 @@
   --ds-red-ink:   var(--ds-red-700);
   --ds-amber-ink: var(--ds-yellow-800);
 
+  /* ── Neutral foundation (Tailwind gray ramp) ──────────────────────────
+   * Shared by the card / quiz / codeblock components, which each used to
+   * duplicate this scale locally (--ch-gray-*, --mc-gray-*). (ChallengeCard
+   * also keeps a small local --ch-slate-* set for its cool-gray surfaces.) */
+  --ds-white: #ffffff;
+  --ds-black: #000000;
+  --ds-gray-50:  #f9fafb;
+  --ds-gray-100: #f3f4f6;
+  --ds-gray-200: #e5e7eb;
+  --ds-gray-300: #d1d5db;
+  --ds-gray-400: #9ca3af;
+  --ds-gray-500: #6b7280;
+  --ds-gray-600: #4b5563;
+  --ds-gray-700: #374151;
+  --ds-gray-800: #1f2937;
+  --ds-gray-900: #111827;
+
   /* ── Semantic roles — LIGHT MODE defaults ─────────────────────────── */
   --ds-primary:      var(--ds-blue);      /* fills, primary buttons, active   */
   --ds-link:         var(--ds-blue-ink);  /* text/links on a light surface    */

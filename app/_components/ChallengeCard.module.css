@@ -25,37 +25,25 @@
      module uses. */
 
   /* Local neutral palette (Tailwind) */
-  --ch-white: #ffffff;
-  --ch-black: #000000;
   --ch-slate-50: #f8fafc;
   --ch-slate-100: #f1f5f9;
   --ch-slate-200: #e2e8f0;
   --ch-slate-900: #0f172a;
-  --ch-gray-50: #f9fafb;
-  --ch-gray-100: #f3f4f6;
-  --ch-gray-200: #e5e7eb;
-  --ch-gray-300: #d1d5db;
-  --ch-gray-400: #9ca3af;
-  --ch-gray-500: #6b7280;
-  --ch-gray-700: #374151;
-  --ch-gray-800: #1f2937;
-  --ch-gray-900: #111827;
-  --ch-neutral-50: #fafafa;
   --ch-violet-50: #f5f3ff;
   --ch-violet-100: #ede9fe;
   --ch-violet-500: #8b5cf6;
   --ch-violet-600: #7c3aed;
 
   /* Semantic aliases */
-  --ch-bg: var(--ch-white);
-  --ch-bg-muted: var(--ch-neutral-50);
-  --ch-bg-subtle: var(--ch-gray-50);
-  --ch-bg-hover: var(--ch-gray-100);
-  --ch-border: var(--ch-gray-200);
-  --ch-border-light: var(--ch-gray-100);
-  --ch-text: var(--ch-gray-900);
-  --ch-text-secondary: var(--ch-gray-500);
-  --ch-text-muted: var(--ch-gray-400);
+  --ch-bg: var(--ds-white);
+  --ch-bg-muted: var(--ds-gray-50);
+  --ch-bg-subtle: var(--ds-gray-50);
+  --ch-bg-hover: var(--ds-gray-100);
+  --ch-border: var(--ds-gray-200);
+  --ch-border-light: var(--ds-gray-100);
+  --ch-text: var(--ds-gray-900);
+  --ch-text-secondary: var(--ds-gray-500);
+  --ch-text-muted: var(--ds-gray-400);
   --ch-accent: var(--ds-blue-600);
   --ch-accent-hover: var(--ds-blue-700);
   --ch-accent-disabled: var(--ds-blue-300);
@@ -65,8 +53,8 @@
   --ch-red: var(--ds-red-600);
   --ch-red-bg: var(--ds-red-50);
   --ch-badge-color: var(--ch-accent);
-  --ch-scrollbar-thumb: var(--ch-gray-300);
-  --ch-scrollbar-thumb-hover: var(--ch-gray-400);
+  --ch-scrollbar-thumb: var(--ds-gray-300);
+  --ch-scrollbar-thumb-hover: var(--ds-gray-400);
   /* Modal backdrop: slate-900 at 55% opacity. */
   --ch-overlay: color-mix(in srgb, var(--ch-slate-900) 55%, transparent);
 
@@ -75,8 +63,8 @@
     "JetBrains Mono", "Fira Code", ui-monospace, monospace;
   --ch-radius: 8px;
   --ch-shadow:
-    0 1px 3px color-mix(in srgb, var(--ch-black) 8%, transparent),
-    0 1px 2px color-mix(in srgb, var(--ch-black) 5%, transparent);
+    0 1px 3px color-mix(in srgb, var(--ds-black) 8%, transparent),
+    0 1px 2px color-mix(in srgb, var(--ds-black) 5%, transparent);
 
   background: var(--ch-bg);
   border: 1px solid var(--ch-border);
@@ -140,7 +128,7 @@
   width: 13px;
   height: 13px;
   flex-shrink: 0;
-  color: var(--ch-gray-900);
+  color: var(--ds-gray-900);
 }
 
 .badge {
@@ -379,10 +367,10 @@
 .instructionsBody code {
   font-family: var(--ch-font-mono);
   font-size: 12px;
-  background: var(--ch-gray-100);
+  background: var(--ds-gray-100);
   border-radius: 4px;
   padding: 1px 5px;
-  color: var(--ch-gray-900);
+  color: var(--ds-gray-900);
 }
 
 .instructionsBody ul,
@@ -621,7 +609,7 @@
   padding: 6px 14px;
   background: var(--ch-bg);
   border: none;
-  color: var(--ch-gray-700);
+  color: var(--ds-gray-700);
   font-family: var(--ch-font-ui);
   font-size: 12px;
   font-weight: 400;
@@ -630,7 +618,7 @@
 }
 
 .initToggle:hover {
-  color: var(--ch-gray-900);
+  color: var(--ds-gray-900);
   background: var(--ch-bg-hover);
 }
 
@@ -644,7 +632,7 @@
   width: 100%;
   padding: 6px 14px;
   background: var(--ch-bg);
-  color: var(--ch-gray-700);
+  color: var(--ds-gray-700);
   font-family: var(--ch-font-ui);
   font-size: 12px;
   font-weight: 400;
@@ -670,7 +658,7 @@
 .initLabel {
   flex: 1;
   letter-spacing: 0;
-  color: var(--ch-gray-700);
+  color: var(--ds-gray-700);
 }
 
 .initMeta {
@@ -831,13 +819,13 @@
   font-family: var(--ch-font-ui);
   font-size: 12px;
   font-weight: 500;
-  color: var(--ch-gray-700);
+  color: var(--ds-gray-700);
   cursor: pointer;
   transition: color 0.12s, background 0.12s;
 }
 
 .initCollapseBtn:hover {
-  color: var(--ch-gray-900);
+  color: var(--ds-gray-900);
   background: var(--ch-bg-hover);
 }
 
@@ -919,7 +907,7 @@
 /* Hairline divider between the main Submit/Run pill and the chevron
    that opens the dropdown — only when both halves are present. */
 .btnGroupPrimary .runBtn:not(:last-child) {
-  border-right: 1px solid color-mix(in srgb, var(--ch-white) 22%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--ds-white) 22%, transparent);
 }
 
 /* Chevron half of the split button — same accent fill as the main
@@ -927,7 +915,7 @@
    arrow. Anchored to the right of `.btnGroupPrimary`. */
 .runBtnChevron {
   background: var(--ch-accent);
-  color: var(--ch-white);
+  color: var(--ds-white);
   border: none;
   padding: 0 8px;
   cursor: pointer;
@@ -984,15 +972,13 @@
    Tailwind palette + semantic tokens the menu actually needs here so
    the popup renders with the same blue chrome as the Submit button. */
 .runMenuPopup {
-  --ch-white: #ffffff;
-  --ch-black: #000000;
 
   background: #1a1a1a;
   border: 1px solid #333333;
   border-radius: 8px;
   box-shadow:
-    0 1px 2px color-mix(in srgb, var(--ch-black) 12%, transparent),
-    0 8px 24px color-mix(in srgb, var(--ch-black) 22%, transparent);
+    0 1px 2px color-mix(in srgb, var(--ds-black) 12%, transparent),
+    0 8px 24px color-mix(in srgb, var(--ds-black) 22%, transparent);
   min-width: 240px;
   font-family: "Inter", system-ui, -apple-system, sans-serif;
   outline: none;
@@ -1007,7 +993,7 @@
   background: transparent;
   border: none;
   border-radius: 5px;
-  color: var(--ch-white);
+  color: var(--ds-white);
   font-size: 14px;
   cursor: pointer;
   text-align: left;
@@ -1040,9 +1026,9 @@
 /* Kbd chips inside the menu mirror the embedded kbd inside the Run
    button — semi-transparent white pill on the accent background. */
 .runMenuKbd .kbd {
-  background: color-mix(in srgb, var(--ch-white) 16%, transparent);
-  border: 1px solid color-mix(in srgb, var(--ch-white) 28%, transparent);
-  color: color-mix(in srgb, var(--ch-white) 88%, transparent);
+  background: color-mix(in srgb, var(--ds-white) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ds-white) 28%, transparent);
+  color: color-mix(in srgb, var(--ds-white) 88%, transparent);
   box-shadow: none;
   font-family: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
   font-size: 11.5px;
@@ -1053,13 +1039,13 @@
 }
 
 .runMenuKbd .kbdSep {
-  color: color-mix(in srgb, var(--ch-white) 50%, transparent);
+  color: color-mix(in srgb, var(--ds-white) 50%, transparent);
   font-size: 12px;
 }
 
 .runBtn {
   background: #1a1a1a;
-  color: var(--ch-white);
+  color: var(--ds-white);
   border: none;
   padding: 6px 12px;
   font-size: 14px;
@@ -1124,18 +1110,18 @@
 }
 
 .runBtn .btnKbd .kbd {
-  background: color-mix(in srgb, var(--ch-white) 16%, transparent);
-  border-color: color-mix(in srgb, var(--ch-white) 28%, transparent);
-  color: color-mix(in srgb, var(--ch-white) 88%, transparent);
+  background: color-mix(in srgb, var(--ds-white) 16%, transparent);
+  border-color: color-mix(in srgb, var(--ds-white) 28%, transparent);
+  color: color-mix(in srgb, var(--ds-white) 88%, transparent);
   box-shadow: none;
 }
 
 .runBtn .btnKbd .kbdSep {
-  color: color-mix(in srgb, var(--ch-white) 50%, transparent);
+  color: color-mix(in srgb, var(--ds-white) 50%, transparent);
 }
 
 .kbd {
-  background: var(--ch-white);
+  background: var(--ds-white);
   border: 1px solid var(--ch-border);
   border-radius: 4px;
   padding: 2px 5px;
@@ -1397,8 +1383,8 @@
   opacity: 0;
   transition: opacity 0.18s ease;
   z-index: 0;
-  -webkit-mask-image: linear-gradient(to top, var(--ch-black) 35%, transparent 100%);
-  mask-image: linear-gradient(to top, var(--ch-black) 35%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, var(--ds-black) 35%, transparent 100%);
+  mask-image: linear-gradient(to top, var(--ds-black) 35%, transparent 100%);
 }
 
 .runOverlay.runOverlayActive {
@@ -1561,9 +1547,9 @@
 }
 
 .testPill[data-state="pending"] {
-  background: var(--ch-gray-100);
+  background: var(--ds-gray-100);
   color: var(--ch-text-muted);
-  border: 1px solid var(--ch-gray-200);
+  border: 1px solid var(--ds-gray-200);
 }
 
 .testChevron {
@@ -1588,7 +1574,7 @@
   gap: 8px;
   padding: 8px 10px;
   border-radius: 6px;
-  background: var(--ch-white);
+  background: var(--ds-white);
   border: 1px solid var(--ch-border-light);
 }
 
@@ -1614,7 +1600,7 @@
 }
 
 .testIcon[data-state="pending"] {
-  background: var(--ch-gray-100);
+  background: var(--ds-gray-100);
   color: var(--ch-text-muted);
 }
 
@@ -1875,10 +1861,10 @@
   --ch-red-bg: color-mix(in srgb, var(--ds-red-500) 12%, transparent);
   /* Badge inherits the dark-mode accent (the var() declared above
      auto-tracks --ch-accent), but bg/border need explicit dark tints. */
-  --ch-overlay: color-mix(in srgb, var(--ch-black) 65%, transparent);
+  --ch-overlay: color-mix(in srgb, var(--ds-black) 65%, transparent);
   --ch-shadow:
-    0 1px 2px color-mix(in srgb, var(--ch-black) 50%, transparent),
-    0 1px 3px color-mix(in srgb, var(--ch-black) 40%, transparent);
+    0 1px 2px color-mix(in srgb, var(--ds-black) 50%, transparent),
+    0 1px 3px color-mix(in srgb, var(--ds-black) 40%, transparent);
 }
 
 /* Match CodeMirror editor background to page background in dark mode —
@@ -1903,7 +1889,7 @@
 
 :global(html.dark) .initToggle,
 :global(html.dark) .initHeaderStatic {
-  color: var(--ch-gray-300);
+  color: var(--ds-gray-300);
 }
 
 :global(html.dark) .initToggle:hover {
@@ -1912,11 +1898,11 @@
 }
 
 :global(html.dark) .initLabel {
-  color: var(--ch-gray-300);
+  color: var(--ds-gray-300);
 }
 
 :global(html.dark) .initCollapseBtn {
-  color: var(--ch-gray-300);
+  color: var(--ds-gray-300);
 }
 
 :global(html.dark) .initCollapseBtn:hover {
@@ -2275,10 +2261,10 @@
 }
 
 .tableViewerEmpty code {
-  background: var(--ch-gray-100);
+  background: var(--ds-gray-100);
   border-radius: 3px;
   padding: 1px 5px;
-  color: var(--ch-gray-900);
+  color: var(--ds-gray-900);
 }
 
 :global(html.dark) .tableViewerEmpty code {
@@ -2325,8 +2311,8 @@
   letter-spacing: -0.01em;
   border-radius: 6px;
   box-shadow:
-    0 10px 25px color-mix(in srgb, var(--ch-black) 15%, transparent),
-    0 4px 10px color-mix(in srgb, var(--ch-black) 10%, transparent);
+    0 10px 25px color-mix(in srgb, var(--ds-black) 15%, transparent),
+    0 4px 10px color-mix(in srgb, var(--ds-black) 10%, transparent);
   animation: ch-toast-in 0.16s ease-out;
   max-width: 320px;
 }
@@ -2341,7 +2327,7 @@
   justify-content: center;
   background: transparent;
   border: none;
-  color: color-mix(in srgb, var(--ch-gray-50) 70%, transparent);
+  color: color-mix(in srgb, var(--ds-gray-50) 70%, transparent);
   padding: 2px;
   border-radius: 3px;
   cursor: pointer;
@@ -2349,8 +2335,8 @@
 }
 
 .toast>button:hover {
-  color: var(--ch-white);
-  background: color-mix(in srgb, var(--ch-white) 12%, transparent);
+  color: var(--ds-white);
+  background: color-mix(in srgb, var(--ds-white) 12%, transparent);
 }
 
 @keyframes ch-toast-in {

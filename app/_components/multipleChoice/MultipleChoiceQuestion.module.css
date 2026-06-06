@@ -14,25 +14,16 @@
 .card {
   /* Local neutral palette (Tailwind) — kept in sync with ChallengeCard;
      brand accent colors are referenced from --ds-* below. */
-  --mc-white: #ffffff;
-  --mc-black: #000000;
-  --mc-gray-50: #f9fafb;
-  --mc-gray-100: #f3f4f6;
-  --mc-gray-200: #e5e7eb;
-  --mc-gray-300: #d1d5db;
-  --mc-gray-400: #9ca3af;
-  --mc-gray-700: #374151;
-  --mc-gray-900: #111827;
 
   /* Semantic aliases — these mirror ChallengeCard's --ch-* naming so a
      reader who knows one stylesheet can read the other. */
-  --mc-bg: var(--mc-white);
-  --mc-bg-subtle: var(--mc-gray-50);
-  --mc-bg-hover: var(--mc-gray-100);
-  --mc-border: var(--mc-gray-200);
-  --mc-border-light: var(--mc-gray-100);
-  --mc-text: var(--mc-gray-900);
-  --mc-text-muted: var(--mc-gray-400);
+  --mc-bg: var(--ds-white);
+  --mc-bg-subtle: var(--ds-gray-50);
+  --mc-bg-hover: var(--ds-gray-100);
+  --mc-border: var(--ds-gray-200);
+  --mc-border-light: var(--ds-gray-100);
+  --mc-text: var(--ds-gray-900);
+  --mc-text-muted: var(--ds-gray-400);
   --mc-accent: var(--ds-blue-600);
   --mc-accent-hover: var(--ds-blue-700);
   --mc-accent-disabled: var(--ds-blue-300);
@@ -43,8 +34,8 @@
     "JetBrains Mono", "Fira Code", ui-monospace, monospace;
   --mc-radius: 8px;
   --mc-shadow:
-    0 1px 3px color-mix(in srgb, var(--mc-black) 8%, transparent),
-    0 1px 2px color-mix(in srgb, var(--mc-black) 5%, transparent);
+    0 1px 3px color-mix(in srgb, var(--ds-black) 8%, transparent),
+    0 1px 2px color-mix(in srgb, var(--ds-black) 5%, transparent);
 
   background: var(--mc-bg);
   border: 1px solid var(--mc-border);
@@ -135,10 +126,10 @@
 .bodyMd code {
   font-family: var(--mc-font-mono);
   font-size: 13.5px;
-  background: var(--mc-gray-100);
+  background: var(--ds-gray-100);
   border-radius: 4px;
   padding: 1px 5px;
-  color: var(--mc-gray-900);
+  color: var(--ds-gray-900);
 }
 
 .bodyMd ul,
@@ -201,7 +192,7 @@
 }
 
 .choice:not([data-locked="true"]):hover {
-  background: var(--mc-gray-50);
+  background: var(--ds-gray-50);
 }
 
 .choice[data-selected="true"] {
@@ -236,7 +227,7 @@
   flex-shrink: 0;
   margin-top: 3px;
   cursor: inherit;
-  background: var(--mc-gray-100);
+  background: var(--ds-gray-100);
   box-shadow: none;
   transition: box-shadow 0.12s, background 0.12s;
 }
@@ -250,12 +241,12 @@
 }
 
 .choiceInput:checked {
-  background: var(--mc-gray-900);
-  box-shadow: 0 0 0 1.5px var(--mc-gray-400);
+  background: var(--ds-gray-900);
+  box-shadow: 0 0 0 1.5px var(--ds-gray-400);
 }
 
 .choiceInput[type="radio"]:checked {
-  background: radial-gradient(circle, #fff 30%, var(--mc-gray-900) 31%);
+  background: radial-gradient(circle, #fff 30%, var(--ds-gray-900) 31%);
   box-shadow: none;
 }
 
@@ -282,10 +273,10 @@
 .choiceLabel code {
   font-family: var(--mc-font-mono);
   font-size: 13.5px;
-  background: var(--mc-gray-100);
+  background: var(--ds-gray-100);
   border-radius: 4px;
   padding: 1px 5px;
-  color: var(--mc-gray-900);
+  color: var(--ds-gray-900);
 }
 
 /* Code blocks inside choice labels (multi-line code answers). */
@@ -343,7 +334,7 @@
   border-radius: 4px;
   font-size: 13.5px;
   line-height: 1.6;
-  color: var(--mc-gray-700);
+  color: var(--ds-gray-700);
 }
 
 .choiceExplanation p {
@@ -357,12 +348,12 @@
 .choice[data-verdict="correct-selected"] .choiceExplanation,
 .choice[data-verdict="correct-missed"] .choiceExplanation {
   border-left-color: var(--ds-green-500);
-  background: var(--mc-white);
+  background: var(--ds-white);
 }
 
 .choice[data-verdict="wrong-selected"] .choiceExplanation {
   border-left-color: var(--ds-red-600);
-  background: var(--mc-white);
+  background: var(--ds-white);
 }
 
 /* In light mode, `code` elements inside green/red choice rows need
@@ -417,7 +408,7 @@
   align-items: center;
   gap: 6px;
   background: var(--mc-accent);
-  color: var(--mc-white);
+  color: var(--ds-white);
   border: none;
   border-radius: 6px;
   padding: 7px 14px;
@@ -441,7 +432,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: var(--mc-white);
+  background: var(--ds-white);
   color: var(--mc-text);
   border: 1px solid var(--mc-border);
   border-radius: 6px;
@@ -455,7 +446,7 @@
 
 .retryBtn:hover {
   background: var(--mc-bg-hover);
-  border-color: var(--mc-gray-300);
+  border-color: var(--ds-gray-300);
   color: var(--mc-text);
 }
 
@@ -539,7 +530,7 @@
 .overallBody {
   font-size: 14px;
   line-height: 1.7;
-  color: var(--mc-gray-700);
+  color: var(--ds-gray-700);
 }
 
 .overallBody p {
@@ -553,10 +544,10 @@
 .overallBody code {
   font-family: var(--mc-font-mono);
   font-size: 13.5px;
-  background: var(--mc-gray-100);
+  background: var(--ds-gray-100);
   border-radius: 4px;
   padding: 1px 5px;
-  color: var(--mc-gray-900);
+  color: var(--ds-gray-900);
 }
 
 /* ─── Dark mode ───────────────────────────────────────────────────── */
@@ -706,7 +697,7 @@
    Use background-color (not the background shorthand) so it doesn't
    reset background-image, which would hide the checkbox checkmark. */
 :global(html.dark) .choiceInput:checked {
-  background-color: var(--mc-gray-900);
+  background-color: var(--ds-gray-900);
   box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.25);
 }
 

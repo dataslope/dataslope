@@ -221,7 +221,11 @@ Deliberately **left alone:** non-brand decoratives (violet/purple `--ch-violet-*
 - **CodeBlock:** repointed `--cb-yellow` off the removed `--ch-amber-500` to `--ds-yellow-500`; dropped the dead `--cb-white`/`--cb-font-ui`. (Note: CodeBlock consumes ChallengeCard's `--ch-*` cross-file — verified before any removal.)
 - **learn.css:** merged the duplicate `:root:not(.dark)` / `.dark` brand→Fumadocs blocks into one pair.
 
-Net **−90 lines**, **0 dangling references**, build green, 445 tests pass.
+**Phase 6 — Shared neutral foundation — ✅ done.** The last duplication was the **neutral gray scale**, defined identically in *both* ChallengeCard (`--ch-gray-*`) and MCQ (`--mc-gray-*`) and consumed cross-file by CodeBlock. Hoisted a single Tailwind gray ramp (`--ds-gray-50…900`) plus `--ds-white`/`--ds-black` into `app/brand.css`, and pointed all three components at it (gray/white/black usages → `--ds-*`, local scales deleted). Appearance-preserving (the `--ds-gray-NNN` values equal the Tailwind values the components already used) and slightly **more robust** — code blocks now resolve neutrals from `:root` instead of relying on a `.card` ancestor.
+- ChallengeCard local vars **46 → 34**; MCQ **24 → 15**; ~88 references now share the ramp.
+- ChallengeCard keeps a small local `--ch-slate-*` set (cool-gray surfaces — *not* duplicated elsewhere, so left in place).
+
+Across Phases 5–6: **ChallengeCard 81 → 34** unique vars (−58%), **MCQ 57 → 15** (−74%). **0 dangling references**, build green, lint clean, 445 tests pass throughout.
 
 ---
 
@@ -243,7 +247,7 @@ The same dark-native asymmetry from §2 applies to illustrations, but illustrati
 ## 8. Summary
 
 1. **Adopt two values per hue** — a bright "signal" (your four hex) and a darker "ink" for light-mode text. The palette is dark-native; light mode needs the ink variants.
-2. **One `app/brand.css` token layer** (✅ shipped), adapted into each of the three worlds (CSS modules → tokens, Fumadocs `--color-fd-*` remap, playground `--primary/...` remap). Dark overrides target both `.dark` (/learn) and `[data-theme="dark"]` (/playground); dark-only home uses the raw ramp.
+2. **One `app/brand.css` token layer** (✅ shipped) — brand hue ramps, ink anchors, semantic roles, **and a shared neutral ramp (`--ds-gray-*`, `--ds-white/black`)** — adapted into each of the three worlds (CSS modules → tokens, Fumadocs `--color-fd-*` remap, playground `--primary/...` remap). Dark overrides target both `.dark` (/learn) and `[data-theme="dark"]` (/playground); dark-only home uses the raw ramp. Components (challenge cards, quizzes, code blocks) keep only semantic aliases — all literal palette values now live in `brand.css`.
 3. **Lock semantic meaning** (blue=primary, green=success, red=error, yellow=attention) and the accessibility do/don'ts.
 4. **Migrate playground → learn → home**, using `/color-test` as the QA gate; then de-dupe ad-hoc hex.
 5. **Illustrations:** feasible and well-suited in both modes — transparent backgrounds + mid-tone palette use (or SVG), bright hues for dark, slightly tempered for light.
