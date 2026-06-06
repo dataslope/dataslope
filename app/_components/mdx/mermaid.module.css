@@ -21,22 +21,6 @@
   height: auto;
 }
 
-/* Dark mode: the Mermaid theme is light in both modes (so author classDef
-   pastel fills keep dark, legible text). Render it on a soft "figure card" so
-   the light diagram reads cleanly on the dark page. Only add the card surface
-   here — do NOT set `width`: the inline diagram keeps `width: 100%` from the
-   rule above, and the SVG (sized `width:100%; max-width:<W>px`) would COLLAPSE
-   to near-zero inside a shrink-to-fit parent. `box-sizing: border-box` keeps
-   the padding within the column. Applies to both the inline diagram and the
-   fullscreen modal stage (both carry .diagram). */
-:global(.dark) .diagram {
-  box-sizing: border-box;
-  background: var(--ds-white, #ffffff);
-  padding: 1rem 1.25rem;
-  border-radius: 12px;
-  border: 1px solid var(--ds-gray-200, #e5e7eb);
-}
-
 .expandBtn {
   position: absolute;
   top: 8px;

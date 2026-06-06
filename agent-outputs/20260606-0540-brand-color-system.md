@@ -183,15 +183,17 @@ Use `color-mix()` for tints (the playground already does this): `color-mix(in sr
 
 `/learn` renders Mermaid diagrams (flowcharts dominate, plus ER, sequence, class, state, gantt, mindmaps). Mermaid **can't read `var(--ds-*)`** — it runs color math (khroma) over its theme variables and needs concrete colors. So instead of the stock **`neutral`** (light) / **`dark`** themes, `app/_components/mdx/mermaid.tsx` builds Mermaid's customizable **`base`** theme from the brand palette: it resolves the `--ds-*` tokens to hex at render time (via `getComputedStyle`, keeping `brand.css` the source of truth, with literal fallbacks) and maps them onto Mermaid's `themeVariables`.
 
-**One light palette, in both modes — the legibility constraint that shapes everything.** ~200 MDX diagrams hand-color nodes with `classDef` using **light pastel fills and no text color** (e.g. `classDef bad fill:#fee2e2,stroke:#b91c1c`). Mermaid exposes a *single* global node-text color, so it must be **dark** to stay readable on those author fills — which means our own node fills must be light too. The diagram is therefore **light-based in both modes**, and dark mode is handled by rendering the whole figure on a soft **light "figure card"** (a `border-radius`'d white panel in `mermaid.module.css`, applied to both the inline diagram and the fullscreen modal). This keeps every label dark-on-light and author pastels legible, with no per-element light/dark juggling.
+**A light theme in light mode and a real dark theme in dark mode**, so each matches the surrounding page. Light: soft tints on white. Dark: layered slate (page < cluster < node) with light text — genuinely dark, *not* a white card on a dark page.
 
-The mapping, tuned to be soft and low-border (per the report updates):
-- **Nodes** — soft `blue-100` fill (light enough to stay calm, dark enough to read as "blue" on the white card; `blue-50` looked colorless), a **soft `blue-300` hairline** border (not the old bold accent border), `gray-900` text. Author `classDef` fills keep their colors; only the bold default borders were toned down.
-- **Structure** — neutral `--ds-gray-*` for edges, arrowheads, lifelines, and subgraph/cluster backgrounds; edge-label backdrops blend into the canvas/card.
-- **Semantic hues keep their meaning** — yellow "sticky-note" notes; red critical-path and "today" markers in gantt.
-- **Categorical wheel** — mindmaps cycle the **seven-hue** wheel (§1.1) as soft `-200` fills under dark labels, identical in both modes. (Mermaid re-applies overrides *after* its internal derivation, so these exact values reach the SVG — its built-in `cScale` darkening is bypassed.)
+**The legibility wrinkle (and how it's solved).** ~200 MDX diagrams hand-color nodes with `classDef` using **light pastel fills and no text color** (e.g. `classDef bad fill:#fee2e2,stroke:#b91c1c`). Mermaid exposes a *single* global node-text color, so a dark theme's light text would be light-on-light on those author fills. The fix is `adaptNodeLabels`: after render (the SVG must be in the DOM, since `classDef` fills come from injected CSS classes), it reads each flowchart node's **own fill luminance** and sets that node's label color — **dark text on light fills, light text on dark fills**. So default nodes go properly dark (light text) while author pastels keep dark text; the colored nodes read as intentional emphasis. It's idempotent and harmless in light mode.
 
-Every node/label pairing is dark-on-light (WCAG-AA), and the output was spot-checked with **Playwright** across all diagram types in light and dark — including the author-`classDef` pages that exposed the original dark-mode legibility bug.
+The mapping, tuned soft and low-border (per the report updates):
+- **Nodes** — light: soft `blue-100` fill, soft `blue-300` hairline border. Dark: `gray-700` node on a `gray-800` cluster on the `gray-900`/page, subtle `gray-600` border. Label color is then set per-node by `adaptNodeLabels`.
+- **Structure** — neutral `--ds-gray-*` connectors/arrowheads/lifelines; free-floating text (titles, sequence signals) follows the page foreground; edge-label backdrops blend into the page.
+- **Semantic hues keep their meaning** — yellow notes; red critical-path / "today" markers in gantt.
+- **Categorical wheel** — mindmaps cycle the **seven-hue** wheel (§1.1): soft `-200` fills + dark labels in light, deep `-800` fills + light labels in dark. (Mermaid re-applies overrides *after* its internal derivation, so these reach the SVG verbatim — its `cScale` darkening is bypassed; mindmap sections aren't `.node`, so `adaptNodeLabels` leaves them alone.)
+
+Spot-checked with **Playwright** across all diagram types in light and dark — including the author-`classDef` pages that exposed the original dark-mode legibility bug.
 
 ### 4.4 Result
 
@@ -259,15 +261,12 @@ Across Phases 5–6: **ChallengeCard 81 → 34** unique vars (−58%), **MCQ 57 
 
 **Phase 7 — Mermaid chart theme — ✅ done.** `app/_components/mdx/mermaid.tsx` previously selected Mermaid's stock `neutral` (light) / `dark` themes. It now builds the customizable **`base`** theme from the brand palette (see §4.3), so diagrams match the rest of `/learn`. This is also what motivated the **three decorative hues** (§1.1): mindmaps and other categorical diagrams cycle the seven-hue brand wheel instead of Mermaid's off-brand defaults.
 
-A follow-up pass refined the look after dark-mode review:
-- **Fixed a dark-mode legibility bug.** The first cut used dark nodes + light text in dark mode, which made the ~200 author `classDef` light-pastel nodes (light fill + inherited light text) unreadable. Switched to a single **light palette in both modes** with dark text, rendered on a soft **light figure card** in dark mode (§4.3) — author pastels and edge labels are now legible everywhere.
-- **Minimized borders.** Default node borders dropped from the bold `blue-600` to a soft `blue-300` hairline.
-- **Softer, less "poppy" palette.** Low-contrast fills, neutral-gray connectors, and the figure card give a calmer, more figure-like look.
-- **`/color-test`** now also renders the teal / purple / orange ramps + ink anchors, so the QA gate covers the decorative hues.
+Dark mode took a few review iterations to get right (recorded here because each step informed the final design):
+1. **First cut** — dark nodes + light text. Broke the ~200 author `classDef` light-pastel nodes (light fill + inherited light text → invisible).
+2. **Light figure card** — flipped to one light palette in both modes, rendered on a white "figure card" in dark mode. Legible, but (a) the card used `width: fit-content`, which collapsed the SVG (it's sized `width:100%; max-width:<W>px`, so a shrink-to-fit parent gives ~0 width), and (b) `blue-50` fills looked washed-out on white. Also reviewers (rightly) read a white card on a dark page as "still light mode."
+3. **Final — a real dark theme + `adaptNodeLabels`.** Dark mode now uses a genuine dark theme (layered slate, light text, no card); the card CSS is removed. The author-pastel constraint is solved by `adaptNodeLabels`, which sets each node's label color from its own fill luminance (§4.3) — so default nodes go dark while author pastels keep dark text. Node fills are `blue-100`/`blue-300` in light, `gray-700`/`gray-600` in dark.
 
-A second dark-mode review caught two more issues, now fixed:
-- **Shrinking.** The figure card used `width: fit-content`, but the SVG is sized `width: 100%; max-width: <W>px` — a shrink-to-fit parent gave it ~0 intrinsic width, collapsing the diagram. The card now keeps `width: 100%` (the SVG renders at its natural size, centered).
-- **Washed-out colors.** `blue-50` node fills were nearly indistinguishable from the white card. Bumped to `blue-100` (clearly blue, still soft) with a `blue-300` edge.
+Alongside: **minimized borders** (default node border `blue-600` → soft hairline), a **softer, less "poppy" palette**, and **`/color-test`** now renders the teal / purple / orange ramps + ink anchors so the QA gate covers the decorative hues. Verified with Playwright across flowchart / ER / sequence / class / state / gantt / mindmap in both modes (incl. author-`classDef` pages); dark-mode SVG widths match light mode (no shrinking).
 
 Typecheck + lint clean, 450 unit tests pass; verified visually with Playwright across flowchart / ER / sequence / class / state / gantt / mindmap in light and dark (incl. author-`classDef` pages).
 
@@ -294,7 +293,7 @@ The same dark-native asymmetry from §2 applies to illustrations, but illustrati
 2. **One `app/brand.css` token layer** (✅ shipped) — brand hue ramps, ink anchors, semantic roles, **a shared neutral ramp (`--ds-gray-*`, `--ds-white/black`)**, and **three non-semantic decorative hues (teal/purple/orange)** for categorical use in charts and illustrations (§1.1) — adapted into each world (CSS modules → tokens, Fumadocs `--color-fd-*` remap, playground `--primary/...` remap). Dark overrides target both `.dark` (/learn) and `[data-theme="dark"]` (/playground); dark-only home uses the raw ramp. Components (challenge cards, quizzes, code blocks) keep only semantic aliases — all literal palette values now live in `brand.css`.
 3. **Lock semantic meaning** (blue=primary, green=success, red=error, yellow=attention; decoratives carry none) and the accessibility do/don'ts.
 4. **Migrate playground → learn → home**, using `/color-test` as the QA gate; then de-dupe ad-hoc hex.
-5. **Charts (Mermaid):** the `/learn` diagram theme is built from the brand palette (Mermaid `base` theme) instead of the stock neutral/dark themes. It uses one **soft light palette with dark text in both modes** — required so author `classDef` pastel fills stay legible — rendered on a light **figure card** in dark mode, with minimal hairline borders; mindmaps cycle the seven-hue categorical wheel (§4.3). Playwright-verified in light and dark.
+5. **Charts (Mermaid):** the `/learn` diagram theme is built from the brand palette (Mermaid `base` theme) instead of the stock neutral/dark themes — a light theme in light mode and a real dark theme in dark mode. Author `classDef` pastel fills (which carry no text color) stay legible via `adaptNodeLabels`, which sets each node's label color from its own fill luminance; mindmaps cycle the seven-hue categorical wheel (§4.3). Minimal hairline borders, soft palette. Playwright-verified in light and dark.
 6. **Illustrations:** feasible and well-suited in both modes — transparent backgrounds + mid-tone palette use (or SVG), bright hues for dark, slightly tempered for light.
 
 ---
