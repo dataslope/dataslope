@@ -1,11 +1,13 @@
 // Lints <MultipleChoice> blocks in content/learn for the rules that keep
 // every question answerable, non-contradictory, and neutrally worded:
 //
-//   1. no-correct          — every question must mark at least one `- [o]`
-//                            answer (multi-answer "select all" is allowed).
-//   2. too-few-choices     — a question needs at least 2 choices.
-//   3. duplicate-choice    — no two choices may be verbatim identical.
-//   4. affirmative-opener  — a choice explanation may not start with an
+//   1. no-correct          — every question must mark exactly one `- [o]`
+//                            answer; a question with none is unwinnable.
+//   2. multiple-correct    — the component is single-answer, so a question
+//                            may not mark more than one `- [o]` choice.
+//   3. too-few-choices     — a question needs at least 2 choices.
+//   4. duplicate-choice    — no two choices may be verbatim identical.
+//   5. affirmative-opener  — a choice explanation may not start with an
 //                            affirmation ("Yes.", "Right!", "Exactly,",
 //                            "This works"…). Explanations render for ALL
 //                            choices after submit, so a learner who picked a
@@ -120,7 +122,9 @@ export function lintSource(src, file) {
     const add = (rule, detail) => violations.push({ file, rule, detail });
 
     if (choices.length < 2) add("too-few-choices", `${choices.length} choice(s) — ${stem}`);
-    if (choices.filter((c) => c.correct).length === 0) add("no-correct", stem);
+    const correctCount = choices.filter((c) => c.correct).length;
+    if (correctCount === 0) add("no-correct", stem);
+    else if (correctCount > 1) add("multiple-correct", `${correctCount} correct — ${stem}`);
 
     const seen = new Set();
     for (const c of choices) {
@@ -177,5 +181,5 @@ if (isMain) {
     console.error(`\n${violations.length} MCQ violation(s) across ${files.length} file(s).`);
     process.exit(1);
   }
-  console.log(`✓ all MCQ blocks in ${files.length} file(s) pass (correct answer, ≥2 distinct choices, neutral explanations)`);
+  console.log(`✓ all MCQ blocks in ${files.length} file(s) pass (exactly one correct answer, ≥2 distinct choices, neutral explanations)`);
 }

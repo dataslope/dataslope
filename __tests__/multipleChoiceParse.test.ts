@@ -29,27 +29,20 @@ and visual stories for decision-making.`;
     expect(q.choices[0].explanation).toMatch(/document creation/);
     expect(q.choices[1].explanation).toMatch(/Correct!/);
     expect(q.choices[2].explanation).toBe("");
-    expect(q.multiAnswer).toBe(false);
-    expect(q.correctIds).toEqual(["1"]);
+    expect(q.correctId).toBe("1");
     expect(q.explanation).toMatch(/decision-making\.$/);
   });
 
-  it("detects multi-answer mode when 2+ choices are marked correct", () => {
-    const src = `Which of the following are valid \`justify-content\` values?
+  it("returns a null correctId when no choice is marked correct", () => {
+    const src = `Pick one.
 
-- [o] flex-start
-- [o] center
-- column
-  > \`column\` is a \`flex-direction\` value, not \`justify-content\`.
-- [o] space-between
-- inline-flex
-  > \`inline-flex\` is a \`display\` value.`;
+- A
+- B
+- C`;
 
     const q = parseQuestion(src);
-    expect(q.multiAnswer).toBe(true);
-    expect(q.correctIds).toEqual(["0", "1", "3"]);
-    expect(q.explanation).toBe("");
-    expect(q.choices[2].explanation).toContain("flex-direction");
+    expect(q.correctId).toBeNull();
+    expect(q.choices.map((c) => c.correct)).toEqual([false, false, false]);
   });
 
   it("preserves math notation in question body and choices", () => {
@@ -110,7 +103,7 @@ The power rule states that $\\frac{d}{dx}[x^n] = nx^{n-1}$.`;
 
     const q = parseQuestion(src);
     expect(q.explanation).toBe("");
-    expect(q.correctIds).toEqual(["1"]);
+    expect(q.correctId).toBe("1");
   });
 
   it("handles CRLF line endings", () => {
@@ -153,8 +146,7 @@ The power rule states that $\\frac{d}{dx}[x^n] = nx^{n-1}$.`;
     expect(q.choices[1].text).toMatch(/```\s*$/);
     // Explanation is separate from the code block.
     expect(q.choices[1].explanation).toContain("Correct");
-    expect(q.multiAnswer).toBe(false);
-    expect(q.correctIds).toEqual(["1"]);
+    expect(q.correctId).toBe("1");
   });
 
   it("parses a fenced code block opened as a continuation line", () => {
@@ -174,7 +166,7 @@ The power rule states that $\\frac{d}{dx}[x^n] = nx^{n-1}$.`;
   });
 
   it("handles multiple fenced code-block choices followed by an explanation", () => {
-    const src = `Which of the following are valid ways to create a list in Python?
+    const src = `Which snippet creates a list in Python?
 
 - [o] \`\`\`python
   my_list = [1, 2, 3]
@@ -183,15 +175,15 @@ The power rule states that $\\frac{d}{dx}[x^n] = nx^{n-1}$.`;
   my_list = (1, 2, 3)
   \`\`\`
   > This creates a tuple, not a list.
-- [o] \`\`\`python
-  my_list = list(range(3))
+- \`\`\`python
+  my_list = {1, 2, 3}
   \`\`\`
+  > This creates a set, not a list.
 
 Lists are ordered, mutable sequences in Python.`;
 
     const q = parseQuestion(src);
-    expect(q.multiAnswer).toBe(true);
-    expect(q.correctIds).toEqual(["0", "2"]);
+    expect(q.correctId).toBe("0");
     expect(q.choices[0].text).toContain("[1, 2, 3]");
     expect(q.choices[1].explanation).toContain("tuple");
     expect(q.explanation).toContain("mutable sequences");

@@ -259,12 +259,25 @@ per-element behavior.
 ## Test your understanding
 
 <MultipleChoice
-  markdown={`Which of these lines will produce visible output when run by itself?
+  markdown={`Which of these lines shows output by **auto-printing** — i.e. without an explicit print call?
 
 - \`x <- 5\`
   > Assignment produces no automatic output — the result is stored, not printed.
 - [o] \`5 + 3\`
   > An unassigned expression auto-prints its result.
+- \`# print("hello")\`
+  > That is a comment — everything after \`#\` is ignored.
+- \`print(5)\`
+  > This does show output, but through an explicit \`print()\` call rather than auto-printing.`}
+/>
+
+<MultipleChoice
+  markdown={`Which of these lines shows output through an **explicit** print call?
+
+- \`x <- 5\`
+  > Assignment produces no automatic output — the result is stored, not printed.
+- \`5 + 3\`
+  > This does show output, but by auto-printing an unassigned expression — there is no explicit call.
 - \`# print("hello")\`
   > That is a comment — everything after \`#\` is ignored.
 - [o] \`print(5)\`

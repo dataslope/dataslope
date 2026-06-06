@@ -35,8 +35,8 @@
  *   - The first unindented, non-blank, non-choice line after the choices
  *     block opens the overall explanation; everything after it is
  *     captured verbatim.
- *   - Multi-answer mode is auto-detected — when 2+ choices are flagged
- *     `[o]`, the renderer presents checkboxes; otherwise a radio group.
+ *   - Exactly one choice should be flagged `[o]`; the renderer presents
+ *     the choices as a single-answer radio group.
  */
 
 export interface ParsedChoice {
@@ -58,10 +58,8 @@ export interface ParsedQuestion {
   choices: ParsedChoice[];
   /** Markdown source of everything after the choices block. */
   explanation: string;
-  /** True when 2+ choices are flagged correct — checkbox preview. */
-  multiAnswer: boolean;
-  /** Set of choice ids that are correct (convenience). */
-  correctIds: string[];
+  /** Id of the correct choice (`[o]`), or null when none is marked. */
+  correctId: string | null;
 }
 
 const CHOICE_RE = /^-\s+(?:\[(o|O| |x|X)\]\s+)?(.*)$/;
@@ -245,7 +243,7 @@ export function parseQuestion(source: string): ParsedQuestion {
     explanationLines.push(line);
   }
 
-  const correctIds = choices.filter((c) => c.correct).map((c) => c.id);
+  const correctChoice = choices.find((c) => c.correct);
   const trimBlock = (text: string) =>
     text.replace(/^\n+/, "").replace(/\n+$/, "");
 
@@ -255,7 +253,6 @@ export function parseQuestion(source: string): ParsedQuestion {
     // added during continuation-appending are stripped cleanly.
     choices: choices.map((c) => ({ ...c, text: trimBlock(c.text) })),
     explanation: trimBlock(explanationLines.join("\n")),
-    multiAnswer: correctIds.length > 1,
-    correctIds,
+    correctId: correctChoice ? correctChoice.id : null,
   };
 }
