@@ -1,0 +1,111 @@
+/* ============================================================================
+ * Illustration.module.css — theme-aware token layer for lesson SVG art
+ * ----------------------------------------------------------------------------
+ * Every illustration is a server-rendered inline <svg> that paints itself from
+ * the `--il-*` custom properties declared here. The properties are defined on
+ * the `.figure` wrapper and overridden under the `.dark` / `[data-theme=dark]`
+ * ancestors, so a single set of SVGs renders correctly in BOTH color schemes
+ * with no JavaScript and no theme-flash — the cascade does the work.
+ *
+ * Colors are sourced from the brand system (app/brand.css):
+ *   - Neutrals come from the --ds-gray ramp (ink / surfaces / hairlines).
+ *   - Accents come from the seven categorical brand hues. We use the 500 step
+ *     in light mode and the brighter 400 step in dark mode so each accent keeps
+ *     a comfortable contrast against the surface it sits on.
+ *   - Soft tints are mixed at call sites with
+ *     `color-mix(in srgb, var(--il-…) <pct>%, transparent)`, which yields a
+ *     light wash over a white page and a subtle hue-tinted shade over the dark
+ *     page from the SAME declaration (color-mix is already used across the app).
+ * ========================================================================== */
+
+.figure {
+  /* Respond to the article column width, not the viewport. */
+  container-type: inline-size;
+  display: block;
+  margin: 2rem auto;
+  max-width: var(--il-max-width, 30rem);
+
+  /* ── Neutrals — LIGHT ─────────────────────────────────────────────── */
+  --il-ink: var(--ds-gray-800); /* primary linework / labels            */
+  --il-ink-2: var(--ds-gray-600); /* secondary lines                     */
+  --il-muted: var(--ds-gray-400); /* faint glyphs / de-emphasised text   */
+  --il-hair: var(--ds-gray-300); /* hairline guides, connectors, grids   */
+  --il-paper: var(--ds-white); /* primary object fill ("paper")          */
+  --il-surface-2: var(--ds-gray-100); /* secondary panel fill            */
+  --il-surface-3: var(--ds-gray-200); /* tertiary / iso side faces       */
+
+  /* ── Accents — LIGHT (500 step) ───────────────────────────────────── */
+  --il-blue: var(--ds-blue-500);
+  --il-teal: var(--ds-teal-500);
+  --il-purple: var(--ds-purple-500);
+  --il-orange: var(--ds-orange-500);
+  --il-green: var(--ds-green-500);
+  --il-yellow: var(--ds-yellow-500);
+  --il-red: var(--ds-red-500);
+}
+
+/* ── Dark overrides ───────────────────────────────────────────────────
+ * Targets BOTH theme hooks used in the repo (.dark for /learn via
+ * next-themes, [data-theme=dark] for /playground), mirroring brand.css. */
+:global(.dark) .figure,
+:global([data-theme="dark"]) .figure {
+  /* Neutrals — DARK */
+  --il-ink: var(--ds-gray-200);
+  --il-ink-2: var(--ds-gray-300);
+  --il-muted: var(--ds-gray-500);
+  --il-hair: var(--ds-gray-700);
+  --il-paper: var(--ds-gray-800); /* lifted card on the ~#121212 page    */
+  --il-surface-2: var(--ds-gray-700);
+  --il-surface-3: var(--ds-gray-600);
+
+  /* Accents — DARK (brighter 400 step) */
+  --il-blue: var(--ds-blue-400);
+  --il-teal: var(--ds-teal-400);
+  --il-purple: var(--ds-purple-400);
+  --il-orange: var(--ds-orange-400);
+  --il-green: var(--ds-green-400);
+  --il-yellow: var(--ds-yellow-400);
+  --il-red: var(--ds-red-400);
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* Anchor `currentColor` (used for incidental strokes) to the ink token. */
+  color: var(--il-ink);
+  overflow: visible;
+}
+
+/* Inline labels baked into the art. The /learn prose rules deliberately skip
+   `svg *`, so SVG text keeps these values instead of the article serif. */
+.svg text {
+  font-family: var(--font-sans, system-ui, sans-serif);
+  fill: var(--il-ink);
+}
+
+.svg .mono {
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+/* Visible fallback for an unknown illustration name (authoring typo). */
+.missing {
+  padding: 1.25rem;
+  border: 2px dashed var(--il-red, #ef4444);
+  border-radius: 0.75rem;
+  text-align: center;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.85rem;
+  color: var(--il-red, #ef4444);
+}
+
+.caption {
+  margin: 0.85rem auto 0;
+  max-width: 34rem;
+  text-align: center;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  letter-spacing: -0.006em;
+  color: var(--color-fd-muted-foreground, var(--il-muted));
+}

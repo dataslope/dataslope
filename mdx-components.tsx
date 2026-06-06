@@ -18,6 +18,7 @@ import MdxSqlChallengeCard from "@/app/_components/MdxSqlChallengeCard";
 import MdxSqlCodeBlock from "@/app/_components/MdxSqlCodeBlock";
 import MdxMultipleChoiceQuestion from "@/app/_components/multipleChoice/MdxMultipleChoiceQuestion";
 import { Mermaid } from "@/app/_components/mdx/mermaid";
+import { Illustration } from "@/app/_components/mdx/illustrations";
 
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
@@ -28,6 +29,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     SqlCodeBlock: MdxSqlCodeBlock,
     MultipleChoice: MdxMultipleChoiceQuestion,
     Mermaid,
+    Illustration,
     ...components,
   };
 }

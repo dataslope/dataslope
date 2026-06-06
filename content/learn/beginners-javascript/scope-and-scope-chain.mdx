@@ -28,6 +28,11 @@ Variables declared with `let` and `const` respect *block* scope.
 Variables declared with the old `var` only respect *function*
 scope, which is one of the reasons we avoid `var`.
 
+<Illustration
+  name="scope-nesting"
+  caption="A name is resolved by searching outward — block, then function, then global — stopping at the first scope that defines it."
+/>
+
 ## A first example
 
 <CodeBlock
