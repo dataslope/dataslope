@@ -4,20 +4,18 @@
    The visual language intentionally mirrors `ChallengeCard.module.css`
    (paper card chrome, blue badge header, slate text, accent submit
    button, green/red status banner) so the two embeddable components
-   feel like one product. Tokens are duplicated locally rather than
-   imported because CSS modules can't share custom properties across
-   files reliably, and the playground bundle doesn't load Tailwind's
-   preflight that defines the `--color-…` vars. */
+   feel like one product. Neutral tokens are duplicated locally (the
+   playground bundle doesn't load Tailwind's preflight that defines the
+   `--color-…` vars); brand colors come from the global `--ds-*` ramp
+   (app/brand.css). */
 
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
 
 .card {
-  /* Tailwind palette tokens — kept in sync with ChallengeCard.module.css */
+  /* Local neutral palette (Tailwind) — kept in sync with ChallengeCard;
+     brand accent colors are referenced from --ds-* below. */
   --mc-white: #ffffff;
   --mc-black: #000000;
-  --mc-slate-100: #f1f5f9;
-  --mc-slate-200: #e2e8f0;
-  --mc-slate-900: #0f172a;
   --mc-gray-50: #f9fafb;
   --mc-gray-100: #f3f4f6;
   --mc-gray-200: #e5e7eb;
@@ -26,49 +24,21 @@
   --mc-gray-500: #6b7280;
   --mc-gray-700: #374151;
   --mc-gray-900: #111827;
-  --mc-zinc-100: #f4f4f5;
   --mc-neutral-50: #fafafa;
-  --mc-blue-50: var(--ds-blue-50);
-  --mc-blue-100: var(--ds-blue-100);
-  --mc-blue-200: var(--ds-blue-200);
-  --mc-blue-300: var(--ds-blue-300);
-  --mc-blue-500: var(--ds-blue-500);
-  --mc-blue-600: var(--ds-blue-600);
-  --mc-blue-700: var(--ds-blue-700);
-  --mc-blue-800: var(--ds-blue-800);
-  --mc-blue-900: var(--ds-blue-900);
-  --mc-green-50: var(--ds-green-50);
-  --mc-green-100: var(--ds-green-100);
-  --mc-green-200: var(--ds-green-200);
-  --mc-green-500: var(--ds-green-500);
-  --mc-green-600: var(--ds-green-600);
-  --mc-green-700: var(--ds-green-700);
-  --mc-red-50: var(--ds-red-50);
-  --mc-red-100: var(--ds-red-100);
-  --mc-red-200: var(--ds-red-200);
-  --mc-red-600: var(--ds-red-600);
-  --mc-red-700: var(--ds-red-700);
-  --mc-amber-50: var(--ds-yellow-50);
-  --mc-amber-200: var(--ds-yellow-200);
-  --mc-amber-700: var(--ds-yellow-700);
 
   /* Semantic aliases — these mirror ChallengeCard's --ch-* naming so a
      reader who knows one stylesheet can read the other. */
   --mc-bg: var(--mc-white);
-  --mc-bg-muted: var(--mc-neutral-50);
   --mc-bg-subtle: var(--mc-gray-50);
   --mc-bg-hover: var(--mc-gray-100);
   --mc-border: var(--mc-gray-200);
   --mc-border-light: var(--mc-gray-100);
   --mc-text: var(--mc-gray-900);
-  --mc-text-secondary: var(--mc-gray-500);
   --mc-text-muted: var(--mc-gray-400);
-  --mc-accent: var(--mc-blue-600);
-  --mc-accent-hover: var(--mc-blue-700);
-  --mc-accent-disabled: var(--mc-blue-300);
+  --mc-accent: var(--ds-blue-600);
+  --mc-accent-hover: var(--ds-blue-700);
+  --mc-accent-disabled: var(--ds-blue-300);
   --mc-badge-color: var(--mc-accent);
-  --mc-badge-bg: var(--mc-blue-50);
-  --mc-badge-border: var(--mc-blue-100);
 
   --mc-font-ui: "Inter", system-ui, -apple-system, sans-serif;
   --mc-font-mono:
@@ -108,7 +78,7 @@
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--mc-blue-500);
+  color: var(--ds-blue-500);
   flex-shrink: 0;
   white-space: nowrap;
 }
@@ -247,12 +217,12 @@
 /* Post-submit verdicts. */
 .choice[data-verdict="correct-selected"],
 .choice[data-verdict="correct-missed"] {
-  background: var(--mc-green-50);
+  background: var(--ds-green-50);
   box-shadow: none;
 }
 
 .choice[data-verdict="wrong-selected"] {
-  background: var(--mc-red-50);
+  background: var(--ds-red-50);
   box-shadow: none;
 }
 
@@ -358,13 +328,13 @@
 
 .choice[data-verdict="correct-selected"] .choiceMark,
 .choice[data-verdict="correct-missed"] .choiceMark {
-  background: var(--mc-green-100);
-  color: var(--mc-green-700);
+  background: var(--ds-green-100);
+  color: var(--ds-green-700);
 }
 
 .choice[data-verdict="wrong-selected"] .choiceMark {
-  background: var(--mc-red-100);
-  color: var(--mc-red-700);
+  background: var(--ds-red-100);
+  color: var(--ds-red-700);
 }
 
 .choiceExplanation {
@@ -388,12 +358,12 @@
 
 .choice[data-verdict="correct-selected"] .choiceExplanation,
 .choice[data-verdict="correct-missed"] .choiceExplanation {
-  border-left-color: var(--mc-green-500);
+  border-left-color: var(--ds-green-500);
   background: var(--mc-white);
 }
 
 .choice[data-verdict="wrong-selected"] .choiceExplanation {
-  border-left-color: var(--mc-red-600);
+  border-left-color: var(--ds-red-600);
   background: var(--mc-white);
 }
 
@@ -402,24 +372,24 @@
    surface. */
 .choice[data-verdict="correct-selected"] .choiceLabel code,
 .choice[data-verdict="correct-missed"] .choiceLabel code {
-  background: var(--mc-green-200);
-  color: var(--mc-green-700);
+  background: var(--ds-green-200);
+  color: var(--ds-green-700);
 }
 
 .choice[data-verdict="wrong-selected"] .choiceLabel code {
-  background: var(--mc-red-200);
-  color: var(--mc-red-700);
+  background: var(--ds-red-200);
+  color: var(--ds-red-700);
 }
 
 .choice[data-verdict="correct-selected"] .choiceExplanation code,
 .choice[data-verdict="correct-missed"] .choiceExplanation code {
-  background: var(--mc-green-100);
-  color: var(--mc-green-700);
+  background: var(--ds-green-100);
+  color: var(--ds-green-700);
 }
 
 .choice[data-verdict="wrong-selected"] .choiceExplanation code {
-  background: var(--mc-red-100);
-  color: var(--mc-red-700);
+  background: var(--ds-red-100);
+  color: var(--ds-red-700);
 }
 
 /* The explanation block hangs off to the right of the input + glyph.
@@ -509,18 +479,18 @@
 }
 
 .banner[data-state="pass"] {
-  background: var(--mc-green-50);
-  color: var(--mc-green-700);
+  background: var(--ds-green-50);
+  color: var(--ds-green-700);
 }
 
 .banner[data-state="fail"] {
-  background: var(--mc-red-50);
-  color: var(--mc-red-700);
+  background: var(--ds-red-50);
+  color: var(--ds-red-700);
 }
 
 .banner[data-state="partial"] {
-  background: var(--mc-amber-50);
-  color: var(--mc-amber-700);
+  background: var(--ds-yellow-50);
+  color: var(--ds-yellow-700);
 }
 
 .bannerIcon {
@@ -534,15 +504,15 @@
 }
 
 .banner[data-state="pass"] .bannerIcon {
-  background: var(--mc-green-100);
+  background: var(--ds-green-100);
 }
 
 .banner[data-state="fail"] .bannerIcon {
-  background: var(--mc-red-100);
+  background: var(--ds-red-100);
 }
 
 .banner[data-state="partial"] .bannerIcon {
-  background: var(--mc-amber-200);
+  background: var(--ds-yellow-200);
 }
 
 .bannerSub {
@@ -603,16 +573,12 @@
      All surface tokens use black-based colour-mix so they stay neutral
      — no blue-tinted slate values. */
   --mc-bg: var(--color-fd-background, #121212);
-  --mc-bg-muted: color-mix(in srgb, var(--color-fd-background, #121212) 70%, #000000);
   --mc-bg-subtle: color-mix(in srgb, var(--color-fd-background, #121212) 85%, #000000);
   --mc-bg-hover: #222222;
   --mc-border: #2e2e2e;
   --mc-border-light: #232323;
   --mc-text: #e0e0e0;
-  --mc-text-secondary: #b0b0b0;
   --mc-text-muted: #808080;
-  --mc-badge-bg: color-mix(in srgb, var(--mc-blue-500) 14%, transparent);
-  --mc-badge-border: color-mix(in srgb, var(--mc-blue-500) 32%, transparent);
   --mc-badge-color: var(--ds-blue-300);
 }
 

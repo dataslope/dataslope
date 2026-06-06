@@ -215,6 +215,14 @@ Deliberately **left alone:** non-brand decoratives (violet/purple `--ch-violet-*
 
 > Sequence rationale (as executed): playground → learn → home went from "tokens already exist" to "tokens partially exist (Fumadocs)" to "no tokens," i.e. easiest-to-hardest and lowest-to-highest visual risk.
 
+**Phase 5 — Variable cleanup — ✅ done.** Once the components pulled brand colors from `--ds-*`, their local Tailwind-style palette scales (`--ch-*`, `--mc-*`) became a redundant pass-through layer. Cleaned up:
+- **ChallengeCard:** 81 → **46** vars (−43%). The `--ch-{blue,green,red,amber}-NNN` numeric steps were collapsed — every usage now points at `--ds-*` directly (a provably appearance-preserving change, since each step already resolved to the identical `--ds-*` value), and the dead `--ch-purple*`, unused slates, and `--ch-badge-bg/border` were removed. Only the **neutral** Tailwind palette + the **semantic aliases** (`--ch-accent`, `--ch-bg`, `--ch-green`…) remain.
+- **MultipleChoiceQuestion:** 57 → **26** vars (−54%), same treatment.
+- **CodeBlock:** repointed `--cb-yellow` off the removed `--ch-amber-500` to `--ds-yellow-500`; dropped the dead `--cb-white`/`--cb-font-ui`. (Note: CodeBlock consumes ChallengeCard's `--ch-*` cross-file — verified before any removal.)
+- **learn.css:** merged the duplicate `:root:not(.dark)` / `.dark` brand→Fumadocs blocks into one pair.
+
+Net **−90 lines**, **0 dangling references**, build green, 445 tests pass.
+
 ---
 
 ## 7. Feasibility for AI illustration generation (light **and** dark mode)

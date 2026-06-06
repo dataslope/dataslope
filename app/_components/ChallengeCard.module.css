@@ -15,26 +15,22 @@
      CodeBlock — challenges are meant to feel like a worksheet, not a
      console.
 
-     Color tokens come straight from the Tailwind v4 palette
-     (https://tailwindcss.com/docs/colors). Palette tokens live in
-     the first block; the semantic aliases (--ch-bg, --ch-text…)
-     that the rest of the module references are derived from them.
-     We duplicate the palette locally rather than reading Tailwind's
-     own `--color-…` vars because Tailwind's preflight is only
-     imported on /learn; this module is also used by /playground. */
+     Neutral tokens (grays/slates) come from the Tailwind v4 palette
+     (https://tailwindcss.com/docs/colors) and live locally in the first
+     block, because Tailwind's preflight is only imported on /learn while
+     this module is also used by /playground. Brand colors — accent/success/
+     error — are NOT duplicated here: the semantic aliases below reference the
+     global brand ramp (`--ds-*` from app/brand.css) directly. The semantic
+     aliases (--ch-bg, --ch-text, --ch-accent…) are what the rest of the
+     module uses. */
 
-  /* Tailwind palette tokens */
+  /* Local neutral palette (Tailwind) */
   --ch-white: #ffffff;
   --ch-black: #000000;
   --ch-slate-50: #f8fafc;
   --ch-slate-100: #f1f5f9;
   --ch-slate-200: #e2e8f0;
-  --ch-slate-300: #cbd5e1;
-  --ch-slate-400: #94a3b8;
-  --ch-slate-700: #334155;
-  --ch-slate-800: #1e293b;
   --ch-slate-900: #0f172a;
-  --ch-slate-950: #020617;
   --ch-gray-50: #f9fafb;
   --ch-gray-100: #f3f4f6;
   --ch-gray-200: #e5e7eb;
@@ -44,33 +40,11 @@
   --ch-gray-700: #374151;
   --ch-gray-800: #1f2937;
   --ch-gray-900: #111827;
-  --ch-zinc-100: #f4f4f5;
   --ch-neutral-50: #fafafa;
-  --ch-blue-50: var(--ds-blue-50);
-  --ch-blue-100: var(--ds-blue-100);
-  --ch-blue-200: var(--ds-blue-200);
-  --ch-blue-300: var(--ds-blue-300);
-  --ch-blue-500: var(--ds-blue-500);
-  --ch-blue-600: var(--ds-blue-600);
-  --ch-blue-700: var(--ds-blue-700);
-  --ch-blue-800: var(--ds-blue-800);
-  --ch-blue-900: var(--ds-blue-900);
-  --ch-green-50: var(--ds-green-50);
-  --ch-green-100: var(--ds-green-100);
-  --ch-green-200: var(--ds-green-200);
-  --ch-green-500: var(--ds-green-500);
-  --ch-green-600: var(--ds-green-600);
-  --ch-red-50: var(--ds-red-50);
-  --ch-red-100: var(--ds-red-100);
-  --ch-red-200: var(--ds-red-200);
-  --ch-red-500: var(--ds-red-500);
-  --ch-red-600: var(--ds-red-600);
-  --ch-red-900: var(--ds-red-900);
   --ch-violet-50: #f5f3ff;
   --ch-violet-100: #ede9fe;
   --ch-violet-500: #8b5cf6;
   --ch-violet-600: #7c3aed;
-  --ch-amber-500: var(--ds-yellow-500);
 
   /* Semantic aliases */
   --ch-bg: var(--ch-white);
@@ -82,20 +56,15 @@
   --ch-text: var(--ch-gray-900);
   --ch-text-secondary: var(--ch-gray-500);
   --ch-text-muted: var(--ch-gray-400);
-  --ch-accent: var(--ch-blue-600);
-  --ch-accent-hover: var(--ch-blue-700);
-  --ch-accent-disabled: var(--ch-blue-300);
-  --ch-green: var(--ch-green-600);
-  --ch-green-dot: var(--ch-green-500);
-  --ch-green-bg: var(--ch-green-50);
-  --ch-red: var(--ch-red-600);
-  --ch-red-bg: var(--ch-red-50);
-  --ch-purple: var(--ch-violet-600);
-  --ch-purple-bg: var(--ch-violet-50);
-  --ch-purple-border: var(--ch-violet-100);
+  --ch-accent: var(--ds-blue-600);
+  --ch-accent-hover: var(--ds-blue-700);
+  --ch-accent-disabled: var(--ds-blue-300);
+  --ch-green: var(--ds-green-600);
+  --ch-green-dot: var(--ds-green-500);
+  --ch-green-bg: var(--ds-green-50);
+  --ch-red: var(--ds-red-600);
+  --ch-red-bg: var(--ds-red-50);
   --ch-badge-color: var(--ch-accent);
-  --ch-badge-bg: var(--ch-blue-50);
-  --ch-badge-border: var(--ch-blue-100);
   --ch-scrollbar-thumb: var(--ch-gray-300);
   --ch-scrollbar-thumb-hover: var(--ch-gray-400);
   /* Modal backdrop: slate-900 at 55% opacity. */
@@ -544,7 +513,7 @@
 
 .statusDot[data-status="loading"],
 .statusDot[data-status="running"] {
-  background: var(--ch-amber-500);
+  background: var(--ds-yellow-500);
   animation: ch-pulse 1s ease-in-out infinite;
 }
 
@@ -1017,10 +986,6 @@
 .runMenuPopup {
   --ch-white: #ffffff;
   --ch-black: #000000;
-  --ch-blue-500: var(--ds-blue-500);
-  --ch-blue-600: var(--ds-blue-600);
-  --ch-blue-700: var(--ds-blue-700);
-  --ch-blue-900: var(--ds-blue-900);
 
   background: #1a1a1a;
   border: 1px solid #333333;
@@ -1586,13 +1551,13 @@
 .testPill[data-state="pass"] {
   background: var(--ch-green-bg);
   color: var(--ch-green);
-  border: 1px solid var(--ch-green-200);
+  border: 1px solid var(--ds-green-200);
 }
 
 .testPill[data-state="fail"] {
   background: var(--ch-red-bg);
   color: var(--ch-red);
-  border: 1px solid var(--ch-red-200);
+  border: 1px solid var(--ds-red-200);
 }
 
 .testPill[data-state="pending"] {
@@ -1699,13 +1664,13 @@
 .banner[data-state="pass"] {
   background: var(--ch-green-bg);
   color: var(--ch-green);
-  border-top-color: var(--ch-green-200);
+  border-top-color: var(--ds-green-200);
 }
 
 .banner[data-state="fail"] {
   background: var(--ch-red-bg);
   color: var(--ch-red);
-  border-top-color: var(--ch-red-200);
+  border-top-color: var(--ds-red-200);
 }
 
 .bannerIcon {
@@ -1719,11 +1684,11 @@
 }
 
 .banner[data-state="pass"] .bannerIcon {
-  background: var(--ch-green-100);
+  background: var(--ds-green-100);
 }
 
 .banner[data-state="fail"] .bannerIcon {
-  background: var(--ch-red-100);
+  background: var(--ds-red-100);
 }
 
 .bannerSub {
@@ -1880,11 +1845,6 @@
      above are still available). All values come from the Tailwind
      palette so a future colour audit only has to look at these
      palette aliases. */
-  --ch-slate-950: #020617;
-  --ch-blue-400: var(--ds-blue-400);
-  --ch-green-400: var(--ds-green-400);
-  --ch-red-400: var(--ds-red-400);
-  --ch-red-500: var(--ds-red-500);
   --ch-violet-300: #c4b5fd;
   --ch-violet-500: #8b5cf6;
 
@@ -1905,21 +1865,16 @@
   --ch-text-muted: #808080;
   --ch-scrollbar-thumb: rgba(255, 255, 255, 0.15);
   --ch-scrollbar-thumb-hover: rgba(255, 255, 255, 0.25);
-  --ch-accent: var(--ch-blue-500);
-  --ch-accent-hover: var(--ch-blue-400);
-  --ch-accent-disabled: var(--ch-blue-700);
-  --ch-green: var(--ch-green-400);
-  --ch-green-dot: var(--ch-green-500);
-  --ch-green-bg: color-mix(in srgb, var(--ch-green-500) 12%, transparent);
-  --ch-red: var(--ch-red-400);
-  --ch-red-bg: color-mix(in srgb, var(--ch-red-500) 12%, transparent);
-  --ch-purple: var(--ch-violet-300);
-  --ch-purple-bg: color-mix(in srgb, var(--ch-violet-500) 14%, transparent);
-  --ch-purple-border: color-mix(in srgb, var(--ch-violet-500) 32%, transparent);
+  --ch-accent: var(--ds-blue-500);
+  --ch-accent-hover: var(--ds-blue-400);
+  --ch-accent-disabled: var(--ds-blue-700);
+  --ch-green: var(--ds-green-400);
+  --ch-green-dot: var(--ds-green-500);
+  --ch-green-bg: color-mix(in srgb, var(--ds-green-500) 12%, transparent);
+  --ch-red: var(--ds-red-400);
+  --ch-red-bg: color-mix(in srgb, var(--ds-red-500) 12%, transparent);
   /* Badge inherits the dark-mode accent (the var() declared above
      auto-tracks --ch-accent), but bg/border need explicit dark tints. */
-  --ch-badge-bg: color-mix(in srgb, var(--ch-blue-500) 14%, transparent);
-  --ch-badge-border: color-mix(in srgb, var(--ch-blue-500) 32%, transparent);
   --ch-overlay: color-mix(in srgb, var(--ch-black) 65%, transparent);
   --ch-shadow:
     0 1px 2px color-mix(in srgb, var(--ch-black) 50%, transparent),
@@ -2016,13 +1971,13 @@
 }
 
 :global(html.dark) .testPill[data-state="pass"] {
-  background: color-mix(in srgb, var(--ch-green-500) 12%, transparent);
-  border-color: color-mix(in srgb, var(--ch-green-500) 28%, transparent);
+  background: color-mix(in srgb, var(--ds-green-500) 12%, transparent);
+  border-color: color-mix(in srgb, var(--ds-green-500) 28%, transparent);
 }
 
 :global(html.dark) .testPill[data-state="fail"] {
-  background: color-mix(in srgb, var(--ch-red-500) 12%, transparent);
-  border-color: color-mix(in srgb, var(--ch-red-500) 28%, transparent);
+  background: color-mix(in srgb, var(--ds-red-500) 12%, transparent);
+  border-color: color-mix(in srgb, var(--ds-red-500) 28%, transparent);
 }
 
 :global(html.dark) .testPill[data-state="pending"] {
@@ -2031,19 +1986,19 @@
 }
 
 :global(html.dark) .banner[data-state="pass"] {
-  border-top-color: color-mix(in srgb, var(--ch-green-500) 28%, transparent);
+  border-top-color: color-mix(in srgb, var(--ds-green-500) 28%, transparent);
 }
 
 :global(html.dark) .banner[data-state="fail"] {
-  border-top-color: color-mix(in srgb, var(--ch-red-500) 28%, transparent);
+  border-top-color: color-mix(in srgb, var(--ds-red-500) 28%, transparent);
 }
 
 :global(html.dark) .banner[data-state="pass"] .bannerIcon {
-  background: color-mix(in srgb, var(--ch-green-500) 22%, transparent);
+  background: color-mix(in srgb, var(--ds-green-500) 22%, transparent);
 }
 
 :global(html.dark) .banner[data-state="fail"] .bannerIcon {
-  background: color-mix(in srgb, var(--ch-red-500) 22%, transparent);
+  background: color-mix(in srgb, var(--ds-red-500) 22%, transparent);
 }
 
 :global(html.dark) .outCellHtml :global(th) {
@@ -2377,7 +2332,7 @@
 }
 
 .toast[data-kind="warn"] {
-  background: var(--ch-red-900);
+  background: var(--ds-red-900);
 }
 
 .toast>button {
