@@ -21,22 +21,11 @@ until it's concrete.
 Here are the three. Read them slowly — the differences are the whole
 lesson.
 
-```mermaid
-flowchart TD
-    subgraph A["(a) Population distribution"]
-      A1["Spread of the RAW VALUES<br/>across the whole population"]
-      A2["Fixed. Has mean mu, sd sigma.<br/>Usually unknown."]
-    end
-    subgraph B["(b) Distribution of ONE sample"]
-      B1["Spread of the RAW VALUES<br/>in the n data points you collected"]
-      B2["A noisy snapshot of (a).<br/>Looks more like (a) as n grows."]
-    end
-    subgraph C["(c) Sampling distribution of a statistic"]
-      C1["Spread of a STATISTIC (e.g. x-bar)<br/>across MANY samples of size n"]
-      C2["Centered near mu, but MUCH narrower.<br/>This is what inference uses."]
-    end
-    A --> B --> C
-```
+| Distribution | What spreads | Key fact |
+| --- | --- | --- |
+| (a) Population | raw values across the whole population | Fixed, with mean μ and sd σ. Usually unknown. |
+| (b) One sample | raw values in the `n` points you collected | A noisy snapshot of (a); looks more like (a) as `n` grows. |
+| (c) Sampling distribution of a statistic | a statistic (e.g. x̄) across many samples of size `n` | Centered near μ but much narrower. This is what inference uses. |
 
 1. **The population distribution** is the spread of the raw values across
    the *entire population*: every customer's spend, every part's

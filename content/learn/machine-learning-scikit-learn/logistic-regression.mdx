@@ -49,18 +49,10 @@ output into the 0-to-1 range** so it reads as a genuine probability.
 
 ## The intuition: linear score, then a squash
 
-Logistic regression works in three steps. Hold this picture in your head and
-the whole algorithm follows.
+Logistic regression works in three steps. Hold this pipeline in your head and
+the whole algorithm follows:
 
-```mermaid
-flowchart LR
-    A["Features<br/>x1, x2, x3, ..."] --> B["Linear score<br/>z = b + w1*x1 + w2*x2 + ..."]
-    B --> C["Sigmoid squash<br/>p = 1 / (1 + e^-z)"]
-    C --> D["Probability p<br/>(between 0 and 1)"]
-    D --> E{"p >= 0.5 ?"}
-    E -. yes .-> F["Predict class 1"]
-    E -. no .-> G["Predict class 0"]
-```
+**Features → linear score `z` → sigmoid squash → probability `p` → threshold at 0.5 → class 1 or class 0**
 
 **Step 1 — a linear score.** Exactly like linear regression, the model
 computes a weighted sum of the features plus a constant:

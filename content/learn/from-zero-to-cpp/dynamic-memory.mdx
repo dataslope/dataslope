@@ -14,21 +14,11 @@ control: the **heap**.
 
 ## Stack vs. heap, one more time
 
-```mermaid
-flowchart LR
-    subgraph Stack
-        direction TB
-        S1[Automatic variables]
-        S2[Function frames]
-        S3[Tiny, fixed-size, super fast]
-    end
-    subgraph Heap
-        direction TB
-        H1[Manually requested storage]
-        H2[Lifetime decided by program]
-        H3[Large, flexible, slower]
-    end
-```
+| Stack | Heap |
+| --- | --- |
+| Automatic variables | Manually requested storage |
+| Function frames | Lifetime decided by the program |
+| Tiny, fixed-size, super fast | Large, flexible, slower |
 
 Asking for heap memory used to be done with raw `new` and `delete`.
 Modern C++ has *much* better tools (we'll meet them in the smart

@@ -89,12 +89,13 @@ A `HashMap<K, V>`:
   average.
 - Iteration order is **not** guaranteed.
 
-```mermaid
-flowchart LR
-    K1["key 'Ada'"] --> V1["value 36"]
-    K2["key 'Grace'"] --> V2["value 85"]
-    K3["key 'Linus'"] --> V3["value 54"]
-```
+Each key maps to exactly one value:
+
+| Key | Value |
+| --- | --- |
+| `"Ada"` | `36` |
+| `"Grace"` | `85` |
+| `"Linus"` | `54` |
 
 ## Choosing between List, Set, Map
 

@@ -12,16 +12,15 @@ errors come from confusing one stage with another.
 
 ## A four-step pipeline
 
-The traditional C++ toolchain has four steps:
+The traditional C++ toolchain takes your source code (`.cpp` + `.h`)
+and runs it through four steps to produce an executable (`a.out` /
+`.exe`):
 
-```mermaid
-flowchart TD
-    A[Source code<br/>.cpp + .h] --> P[1. Preprocess<br/>expand #include,<br/>#define, ifdef]
-    P --> C[2. Compile<br/>parse, type-check,<br/>generate assembly]
-    C --> AS[3. Assemble<br/>assembly to<br/>object code .o]
-    AS --> L[4. Link<br/>combine .o files +<br/>libraries into one<br/>executable]
-    L --> E[Executable<br/>a.out / .exe]
-```
+1. **Preprocess** — expand `#include`, `#define`, and `#ifdef`.
+2. **Compile** — parse, type-check, and generate assembly.
+3. **Assemble** — turn assembly into object code (`.o`).
+4. **Link** — combine the `.o` files and libraries into one
+   executable.
 
 Each step produces a real artifact you can sometimes inspect. Each
 step has its own kind of error message. Let's walk through them.
@@ -62,18 +61,18 @@ to `5`, not `9`. This is one big reason modern C++ prefers
 
 The actual **compiler** takes one translation unit and turns it into
 **assembly**, the human-readable form of machine code for your target
-CPU. Inside, the compiler runs many sub-passes:
+CPU. Inside, the compiler runs many sub-passes over the translation
+unit, in order:
 
-```mermaid
-flowchart TD
-    A[Translation unit] --> L[Lexer:<br/>text to tokens]
-    L --> Pa[Parser:<br/>tokens to syntax tree]
-    Pa --> Sm[Semantic analysis:<br/>type-check, lookup names]
-    Sm --> IR[Intermediate<br/>representation IR]
-    IR --> Op[Optimizer:<br/>fold constants,<br/>inline, vectorize]
-    Op --> Cg[Code generator:<br/>IR to assembly]
-    Cg --> Out[.s assembly file]
-```
+1. **Lexer** — text to tokens.
+2. **Parser** — tokens to a syntax tree.
+3. **Semantic analysis** — type-check and look up names.
+4. **Intermediate representation (IR)** — a lower-level form the
+   compiler can reason about.
+5. **Optimizer** — fold constants, inline, vectorize.
+6. **Code generator** — IR to assembly.
+
+The result is a `.s` assembly file.
 
 This is the stage where almost all of your *type errors* are caught.
 If you write

@@ -241,14 +241,11 @@ essentially settled. The lesson: pick `n_estimators` large enough to reach
 the plateau (often a few hundred) and spend your real tuning effort on
 `max_depth`, `max_features`, or `min_samples_leaf` instead.
 
-```mermaid
-flowchart LR
-    A["Few trees<br/>(1-10)"] -->|"big gains per tree"| B["Accuracy rising fast"]
-    B --> C["Many trees<br/>(50-200)"]
-    C -->|"benefit flattens"| D["Plateau:<br/>more trees barely help"]
-    D --> E["Very many trees<br/>(1000+)"]
-    E -->|"more compute, ~same score"| F["Diminishing returns"]
-```
+| Number of trees | What happens |
+| --- | --- |
+| Few (1-10) | Big gains per tree — accuracy rises fast |
+| Many (50-200) | Benefit flattens — more trees barely help |
+| Very many (1000+) | Diminishing returns — more compute, roughly the same score |
 
 <Callout type="warn" title="More trees is not more overfitting">
 A common confusion: people assume that since a deeper *single* tree

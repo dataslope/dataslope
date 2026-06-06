@@ -15,18 +15,19 @@ This page is a field guide to the classics. For each one: **what it is**,
 fancy math to understand. All of them have ended real projects, shipped
 real bad features, and made it into real headlines.
 
-```mermaid
-flowchart TD
-  A["A correct calculation"] --> B{"But is the<br/>reasoning sound?"}
-  B -->|"forgot a lurking group"| C["Simpson's paradox"]
-  B -->|"a third cause"| D["Confounding"]
-  B -->|"tested many things"| E["P-hacking /<br/>multiple comparisons"]
-  B -->|"ignored the prior"| F["Base-rate neglect"]
-  B -->|"only saw survivors"| G["Survivorship bias"]
-  B -->|"extreme bounces back"| H["Regression to the mean"]
-  B -->|"picked the nice data"| I["Cherry-picking"]
-  B -->|"drew the target after"| J["Texas sharpshooter"]
-```
+Even with a correct calculation, the reasoning can still spring one of
+these leaks:
+
+| The mistake | The fallacy |
+| --- | --- |
+| Forgot a lurking group | Simpson's paradox |
+| A third cause | Confounding |
+| Tested many things | P-hacking / multiple comparisons |
+| Ignored the prior | Base-rate neglect |
+| Only saw survivors | Survivorship bias |
+| Extreme bounces back | Regression to the mean |
+| Picked the nice data | Cherry-picking |
+| Drew the target after | Texas sharpshooter |
 
 ## Simpson's paradox: a trend that reverses when you split the data
 

@@ -14,23 +14,16 @@ each — without diving into their implementations.
 
 ## A map of the standard containers
 
-```mermaid
-flowchart TB
-    subgraph "Sequence containers"
-        V[std::vector<br/>contiguous, grow at end]
-        D[std::deque<br/>like vector, grow at both ends]
-        L[std::list<br/>doubly linked]
-        A[std::array<br/>fixed size]
-    end
-    subgraph "Associative ordered"
-        M[std::map<br/>sorted key->value]
-        S[std::set<br/>sorted unique keys]
-    end
-    subgraph "Associative hashed"
-        UM[std::unordered_map<br/>hash key->value]
-        US[std::unordered_set<br/>hash unique keys]
-    end
-```
+| Family | Container | What it is |
+| --- | --- | --- |
+| Sequence | `std::vector` | contiguous, grow at the end |
+| Sequence | `std::deque` | like vector, grow at both ends |
+| Sequence | `std::list` | doubly linked |
+| Sequence | `std::array` | fixed size |
+| Associative, ordered | `std::map` | sorted key → value |
+| Associative, ordered | `std::set` | sorted unique keys |
+| Associative, hashed | `std::unordered_map` | hash key → value |
+| Associative, hashed | `std::unordered_set` | hash unique keys |
 
 ## Sequence containers
 

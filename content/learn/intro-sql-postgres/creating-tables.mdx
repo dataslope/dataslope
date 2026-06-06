@@ -31,15 +31,6 @@ integer `id`, a text `title`, a text `author`, and an integer
 `year`."* The parentheses hold a comma-separated list of
 `column_name TYPE` pairs. That is the core of the whole statement.
 
-```mermaid
-flowchart TB
-    K["CREATE TABLE books ("] --> C1["id INTEGER,"]
-    C1 --> C2["title TEXT,"]
-    C2 --> C3["author TEXT,"]
-    C3 --> C4["year INTEGER"]
-    C4 --> E[")"]
-```
-
 ## Adding rules with constraints
 
 Beyond a name and type, each column can carry **constraints** —

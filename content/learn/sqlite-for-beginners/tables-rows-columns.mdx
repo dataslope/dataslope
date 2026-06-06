@@ -30,29 +30,11 @@ A **table** is a named grid. Each table has:
 
 Here is a small `pets` table:
 
-```mermaid
-flowchart TB
-    subgraph Pets["Table: pets"]
-        direction LR
-        H1["id"]:::hdr
-        H2["name"]:::hdr
-        H3["species"]:::hdr
-        H4["age"]:::hdr
-        A1["1"]
-        A2["Mochi"]
-        A3["cat"]
-        A4["3"]
-        B1["2"]
-        B2["Biscuit"]
-        B3["dog"]
-        B4["5"]
-        C1["3"]
-        C2["Sunny"]
-        C3["bird"]
-        C4["1"]
-    end
-    classDef hdr fill:#dbeafe,stroke:#1d4ed8
-```
+| id | name | species | age |
+| --- | --- | --- | --- |
+| 1 | Mochi | cat | 3 |
+| 2 | Biscuit | dog | 5 |
+| 3 | Sunny | bird | 1 |
 
 Read one row as a sentence:
 

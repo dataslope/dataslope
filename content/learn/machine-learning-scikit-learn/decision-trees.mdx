@@ -280,12 +280,11 @@ dip. Once the gap between the two columns yawns open, the extra depth is
 buying memorization, not understanding. The sweet spot is a depth where
 test accuracy is high *and* close to train accuracy.
 
-```mermaid
-flowchart LR
-    A["Shallow tree<br/>(depth 1-2)"] -->|"too simple"| B["Underfit<br/>high bias"]
-    C["Medium tree<br/>(depth 3-5)"] -->|"just right"| D["Generalizes well"]
-    E["Deep tree<br/>(no limit)"] -->|"too complex"| F["Overfit<br/>high variance"]
-```
+| Tree depth | Behavior | Result |
+| --- | --- | --- |
+| Shallow (depth 1-2) | Too simple to capture the pattern | Underfit — high bias |
+| Medium (depth 3-5) | Captures structure without chasing noise | Generalizes well |
+| Deep (no limit) | Carves out a region for nearly every row | Overfit — high variance |
 
 <Callout type="danger" title="An unlimited tree will memorize its training data">
 The default `DecisionTreeClassifier()` has **no depth limit**. On most

@@ -111,12 +111,11 @@ it directly controls the **bias-variance tradeoff** you met earlier.
   toward the overall majority class, ignoring local structure. This is
   **high bias, low variance**: the model **underfits**.
 
-```mermaid
-flowchart LR
-    A["k = 1<br/>jagged boundary"] -->|"too sensitive"| B["Overfit<br/>high variance"]
-    C["k = 5 to 15<br/>balanced"] -->|"local but smooth"| D["Generalizes well"]
-    E["k = very large<br/>over-smoothed"] -->|"ignores local detail"| F["Underfit<br/>high bias"]
-```
+| Value of `k` | Decision boundary | Result |
+| --- | --- | --- |
+| `k = 1` | Jagged, wraps tightly around individual points | Overfit — high variance |
+| `k = 5` to `15` | Local but smooth | Generalizes well |
+| `k` very large | Over-smoothed, ignores local detail | Underfit — high bias |
 
 Let us watch test accuracy respond to `k`.
 

@@ -33,17 +33,15 @@ When you `print` a data frame in WebR, you get a real rendered
 HTML table. Each column has its own type — `name` and `dept` are
 character, `salary` is numeric, `remote` is logical.
 
-```mermaid
-flowchart TB
-  subgraph DF["data frame: employees"]
-    direction LR
-    c1["name (chr): Ada, Ben, Cleo, Drew"]
-    c2["dept (chr): Eng, Sales, Eng, HR"]
-    c3["salary (num): 95000, 72000, 110000, 65000"]
-    c4["remote (lgl): T, F, T, T"]
-  end
-  style DF fill:#dcfce7
-```
+Each column is a vector, and the data frame stacks them
+side-by-side:
+
+| Column   | Type        | Values                       |
+| -------- | ----------- | ---------------------------- |
+| `name`   | chr         | Ada, Ben, Cleo, Drew         |
+| `dept`   | chr         | Eng, Sales, Eng, HR          |
+| `salary` | num         | 95000, 72000, 110000, 65000  |
+| `remote` | lgl         | T, F, T, T                   |
 
 The columns are vectors. The table just *displays* them
 side-by-side.

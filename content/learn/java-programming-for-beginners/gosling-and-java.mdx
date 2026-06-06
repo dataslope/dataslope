@@ -81,21 +81,14 @@ This conservatism is the reason Java looks "boring" to fans of
 exotic languages. It is also exactly why Java still runs banks,
 airlines, and stock exchanges thirty years later.
 
-```mermaid
-flowchart LR
-    subgraph in[Kept]
-        S1[C-style syntax]
-        S2[Classes / OOP]
-        S3[Strong typing]
-        S4[Threads]
-    end
-    subgraph out[Removed]
-        R1[Pointer arithmetic]
-        R2[Manual memory]
-        R3[Multiple inheritance]
-        R4[Operator overloading]
-    end
-```
+In short, what Gosling kept and what he threw away:
+
+| Kept | Removed |
+| --- | --- |
+| C-style syntax | Pointer arithmetic |
+| Classes / OOP | Manual memory management |
+| Strong typing | Multiple inheritance |
+| Threads | Operator overloading |
 
 <MultipleChoice
   markdown={`What was Java originally designed for?

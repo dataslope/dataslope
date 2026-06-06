@@ -29,23 +29,12 @@ flowchart TB
 A **primary key** is the table's answer to this problem. It is the
 column, or group of columns, whose job is to identify each row.
 
-```mermaid
-flowchart TB
-    subgraph customers["Table: customers"]
-        direction LR
-        H1["customer_id (PK)"]:::pk
-        H2["name"]:::hdr
-        H3["city"]:::hdr
-        A1["101"]:::pk
-        A2["Taylor Kim"]
-        A3["Portland"]
-        B1["102"]:::pk
-        B2["Taylor Kim"]
-        B3["Portland"]
-    end
-    classDef hdr fill:#dbeafe,stroke:#1d4ed8
-    classDef pk fill:#fde68a,stroke:#b45309
-```
+Table: `customers`
+
+| customer_id (PK) | name       | city     |
+| ---------------- | ---------- | -------- |
+| 101              | Taylor Kim | Portland |
+| 102              | Taylor Kim | Portland |
 
 Now there are not two vague Taylors. There is customer `101` and
 customer `102`. The values can look similar everywhere else, but the
@@ -177,11 +166,10 @@ The key is the combination: student `7` in course `42`. That design says
 A primary key should rarely, ideally never, change. If many other tables
 point to it, changing the key means changing every reference too.
 
-```mermaid
-flowchart LR
-    A["Stable key"] --> B["Safe references"] --> C["Reliable joins"]
-    X["Changing key"] --> Y["References must change"] --> Z["Broken links risk"]
-```
+| Key behavior | Consequence | Outcome |
+| --- | --- | --- |
+| Stable key | References stay valid | Reliable joins |
+| Changing key | Every reference must change too | Risk of broken links |
 
 That is why many designs use an artificial `id`: not because numbers are
 magical, but because a generated id can stay stable even when human data

@@ -38,7 +38,7 @@ We train on the rest (the **training set**), and only at the very end do we
 unlock the drawer and measure performance on those held-out rows.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Full dataset<br/>(all rows)"] --> B{"random split"}
     B --> C["Training set<br/>(about 70-80%)"]
     B --> D["Test set<br/>(about 20-30%)"]

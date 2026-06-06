@@ -99,18 +99,6 @@ We will rarely worry about exact sizes. The key idea is that the
 type tells Java **how big the box is and how to interpret its
 contents**.
 
-```mermaid
-flowchart LR
-    A["int x<br/>= 42"]:::ibox
-    B["double pi<br/>= 3.14"]:::dbox
-    C["boolean<br/>done = true"]:::bbox
-    D["char c<br/>= 'A'"]:::cbox
-    classDef ibox fill:#dee,stroke:#066
-    classDef dbox fill:#fed,stroke:#660
-    classDef bbox fill:#efe,stroke:#060
-    classDef cbox fill:#fee,stroke:#600
-```
-
 ## Reference types: the box holds a pointer
 
 Not everything fits in a tiny box. A `String` like

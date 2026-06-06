@@ -133,14 +133,13 @@ for sharing with humans.**
 
 Before you `df.to_csv(...)`:
 
-```mermaid
-flowchart TB
-  C1["Have you dropped truly internal columns?"] --> C2
-  C2["Are column names final / human-friendly?"] --> C3
-  C3["Did you set index=False (unless meaningful)?"] --> C4
-  C4["Did you choose a clear filename (with date)?"] --> C5
-  C5["Will this file overwrite something important?"] --> R["Now export"]
-```
+- Have you dropped truly internal columns?
+- Are the column names final and human-friendly?
+- Did you set `index=False` (unless the index is meaningful)?
+- Did you choose a clear filename (with a date)?
+- Will this file overwrite something important?
+
+*Then* export.
 
 ### Date-stamped filenames
 

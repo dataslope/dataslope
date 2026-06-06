@@ -85,12 +85,11 @@ must be unique.
 
 Every relationship line can become an English sentence.
 
-```mermaid
-flowchart TB
-    A["customers ||--o{ orders"] --> S1["One customer places zero or many orders"]
-    B["orders ||--|{ order_items"] --> S2["One order contains one or many order items"]
-    C["products ||--o{ order_items"] --> S3["One product appears in zero or many order items"]
-```
+| Relationship | In plain English |
+| --- | --- |
+| `customers \|\|--o{ orders` | One customer places zero or many orders. |
+| `orders \|\|--\|{ order_items` | One order contains one or many order items. |
+| `products \|\|--o{ order_items` | One product appears in zero or many order items. |
 
 The words are just as important as the symbols. If the sentence sounds
 wrong to the business, the diagram needs work.
@@ -120,14 +119,7 @@ The relationship lines are stored using foreign keys:
 - `order_items.order_id` points to `orders.id`.
 - `order_items.product_id` points to `products.id`.
 
-```mermaid
-flowchart LR
-    O["orders.customer_id<br/>FK"] --> C["customers.id<br/>PK"]
-    I1["order_items.order_id<br/>FK"] --> OID["orders.id<br/>PK"]
-    I2["order_items.product_id<br/>FK"] --> P["products.id<br/>PK"]
-```
-
-The diagram tells you where joins will happen, but it also tells you
+Those keys tell you where joins will happen, but they also tell you
 where integrity rules should exist.
 
 <SqlCodeBlock
@@ -199,14 +191,12 @@ only has meaning within its parent order.
 
 When you meet a new ER diagram, use this order:
 
-```mermaid
-flowchart TB
-    A["1. Find entity boxes"] --> B["2. Read attributes"]
-    B --> C["3. Mark PK, FK, UK"]
-    C --> D["4. Turn lines into sentences"]
-    D --> E["5. Check cardinality<br/>in both directions"]
-    E --> F["6. Imagine the joins"]
-```
+1. Find the entity boxes.
+2. Read the attributes.
+3. Mark `PK`, `FK`, and `UK`.
+4. Turn the lines into sentences.
+5. Check cardinality in both directions.
+6. Imagine the joins.
 
 This keeps you from staring at symbols randomly. You are translating a
 picture into plain English and then into schema rules.

@@ -111,10 +111,7 @@ grouping step.
 You have now met the core query clauses. Here is their fixed order —
 and, helpfully, roughly the order the database executes them:
 
-```mermaid
-flowchart LR
-    F["FROM"] --> W["WHERE"] --> G["GROUP BY"] --> H["HAVING"] --> S["SELECT"] --> O["ORDER BY"] --> L["LIMIT"]
-```
+**`FROM` → `WHERE` → `GROUP BY` → `HAVING` → `SELECT` → `ORDER BY` → `LIMIT`**
 
 We will revisit this execution order in detail in the **Composing
 Queries** section — for now, knowing where `HAVING` fits is the key

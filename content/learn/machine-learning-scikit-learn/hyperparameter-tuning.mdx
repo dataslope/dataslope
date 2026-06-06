@@ -203,19 +203,17 @@ one hyperparameter and 2 of another, that is 3 × 2 = 6 combinations, and
 with 5-fold cross-validation that is 6 × 5 = 30 model fits. Keep grids
 small — the work multiplies fast.
 
-```mermaid
-flowchart LR
-    subgraph Grid["Hyperparameter grid (C × max_depth)"]
-        direction TB
-        G1["C=0.1, depth=2"]
-        G2["C=0.1, depth=4"]
-        G3["C=1.0, depth=2"]
-        G4["C=1.0, depth=4"]
-    end
-    Grid --> CV["5-fold CV<br/>for each cell"]
-    CV --> Best["Pick highest<br/>mean CV score"]
-    Best --> Refit["best_estimator_<br/>(refit on all training data)"]
-```
+A grid over two hyperparameters — say `C` and `max_depth` — is every
+combination of their values:
+
+| | `max_depth=2` | `max_depth=4` |
+| --- | --- | --- |
+| `C=0.1` | `C=0.1, depth=2` | `C=0.1, depth=4` |
+| `C=1.0` | `C=1.0, depth=2` | `C=1.0, depth=4` |
+
+`GridSearchCV` runs 5-fold cross-validation for each cell, picks the
+combination with the highest mean CV score, and exposes it as
+`best_estimator_`, refit on all of the training data.
 
 Here is the smallest honest example: a tiny grid over a single
 hyperparameter, wrapped around a small model, judged by cross-validation.

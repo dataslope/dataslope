@@ -12,15 +12,13 @@ That conceptual foundation is the hard part, and you have it.
 
 The course moved deliberately from "why" to "how" to "how to think":
 
-```mermaid
-flowchart TB
-    A["Why databases exist<br/>(beyond spreadsheets)"] --> B["Relational foundations<br/>(tables, keys, types)"]
-    B --> C["Querying data<br/>(SELECT, WHERE, ORDER BY)"]
-    C --> D["Summarizing data<br/>(aggregates, GROUP BY, HAVING)"]
-    D --> E["Connecting tables<br/>(foreign keys, joins, many-to-many)"]
-    E --> F["Data modeling<br/>(entities, ER diagrams, normalization)"]
-    F --> G["Composing queries<br/>(subqueries, CTEs, execution order)"]
-```
+1. **Why databases exist** — beyond spreadsheets.
+2. **Relational foundations** — tables, keys, types.
+3. **Querying data** — `SELECT`, `WHERE`, `ORDER BY`.
+4. **Summarizing data** — aggregates, `GROUP BY`, `HAVING`.
+5. **Connecting tables** — foreign keys, joins, many-to-many.
+6. **Data modeling** — entities, ER diagrams, normalization.
+7. **Composing queries** — subqueries, CTEs, execution order.
 
 Each layer rested on the one before it. Joins only made sense once
 keys did; normalization only made sense once you felt the pain of

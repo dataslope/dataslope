@@ -181,15 +181,9 @@ relationships.
 Cardinality also includes the minimum number of related rows. This is
 sometimes called **participation**.
 
-- **Optional** means zero is allowed.
-- **Mandatory** means at least one is required.
-
-```mermaid
-flowchart LR
-    Optional["o<br/>zero allowed"] --> Meaning1["optional participation"]
-    Mandatory["|<br/>one required"] --> Meaning2["mandatory participation"]
-    Many["{<br/>many allowed"] --> Meaning3["maximum is many"]
-```
+- **Optional** means zero is allowed, shown by `o` on the line.
+- **Mandatory** means at least one is required, shown by `|` on the line.
+- **Many** is the crow's foot, `{`, marking the maximum as many.
 
 Crow's-foot symbols combine minimum and maximum. `o{` means zero or
 many. `||` means exactly one. `o|` means zero or one.

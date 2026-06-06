@@ -15,15 +15,16 @@ ways anyone (including future-you) can re-run.
 
 ## A minimal project layout
 
-```mermaid
-flowchart TB
-  root["my-analysis/"] --> data["data/raw — original files, never edited"]
-  root --> processed["data/processed — cleaned outputs"]
-  root --> R["R/ — your scripts"]
-  root --> out["output/ — plots, reports, summaries"]
-  root --> readme["README.md — what this project does"]
-  root --> renv["renv.lock or DESCRIPTION — package versions (optional)"]
-```
+A project folder collects a handful of well-defined parts:
+
+| Path | What it holds |
+| --- | --- |
+| `data/raw/` | Original files, never edited |
+| `data/processed/` | Cleaned outputs |
+| `R/` | Your scripts |
+| `output/` | Plots, reports, summaries |
+| `README.md` | What this project does |
+| `renv.lock` or `DESCRIPTION` | Package versions (optional) |
 
 A common starter layout:
 

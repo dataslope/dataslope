@@ -131,12 +131,11 @@ also unknown.
 
 Use `IS NULL` and `IS NOT NULL` when you want to test for missing data.
 
-```mermaid
-flowchart TB
-    A["email = NULL"] --> U["Unknown<br/>not true"]
-    B["email IS NULL"] --> T["True when<br/>missing"]
-    C["email IS NOT NULL"] --> F["True when<br/>present"]
-```
+| Comparison         | Result                  |
+| ------------------ | ----------------------- |
+| `email = NULL`     | Unknown, never true     |
+| `email IS NULL`    | True when the value is missing |
+| `email IS NOT NULL` | True when a value is present  |
 
 This is called **three-valued logic**: SQL conditions can be true,
 false, or unknown. You do not need the formal theory yet. Just remember

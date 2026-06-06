@@ -24,25 +24,11 @@ flowchart TB
 
 For example, a `students` table should have one row per student:
 
-```mermaid
-flowchart TB
-    subgraph Students["Table: students"]
-        direction LR
-        H1["id"]:::hdr
-        H2["name"]:::hdr
-        H3["grade_level"]:::hdr
-        A1["1"]
-        A2["Ana"]
-        A3["9"]
-        B1["2"]
-        B2["Ben"]
-        B3["10"]
-        C1["3"]
-        C2["Cara"]
-        C3["9"]
-    end
-    classDef hdr fill:#dbeafe,stroke:#1d4ed8
-```
+| id | name | grade_level |
+| --- | --- | --- |
+| 1 | Ana | 9 |
+| 2 | Ben | 10 |
+| 3 | Cara | 9 |
 
 Every row answers: **which student?**
 
@@ -86,25 +72,10 @@ If you cannot finish the sentence, the table may be trying to store too many kin
 
 Here is a focused `products` table. Every row is one product. Every column describes that product.
 
-```mermaid
-flowchart TB
-    subgraph Products["Good table: products"]
-        direction LR
-        P1["id"]:::hdr
-        P2["name"]:::hdr
-        P3["category"]:::hdr
-        P4["price"]:::hdr
-        A1["1"]
-        A2["Notebook"]
-        A3["school"]
-        A4["3.50"]
-        B1["2"]
-        B2["Mug"]
-        B3["kitchen"]
-        B4["8.00"]
-    end
-    classDef hdr fill:#dbeafe,stroke:#1d4ed8
-```
+| id | name | category | price |
+| --- | --- | --- | --- |
+| 1 | Notebook | school | 3.50 |
+| 2 | Mug | kitchen | 8.00 |
 
 This table is easy to understand because the columns all fit the same subject.
 
@@ -120,28 +91,10 @@ flowchart LR
 
 Now compare that with a table that mixes products, customers, and order facts into one place.
 
-```mermaid
-flowchart TB
-    subgraph Messy["Messy table: mixed_sales"]
-        direction LR
-        H1["product_name"]:::bad
-        H2["product_price"]:::bad
-        H3["customer_name"]:::bad
-        H4["customer_phone"]:::bad
-        H5["order_date"]:::bad
-        A1["Notebook"]
-        A2["3.50"]
-        A3["Ada"]
-        A4["555-0101"]
-        A5["2026-02-01"]
-        B1["Notebook"]
-        B2["3.50"]
-        B3["Ada"]
-        B4["555-0101"]
-        B5["2026-02-10"]
-    end
-    classDef bad fill:#fee2e2,stroke:#b91c1c
-```
+| product_name | product_price | customer_name | customer_phone | order_date |
+| --- | --- | --- | --- | --- |
+| Notebook | 3.50 | Ada | 555-0101 | 2026-02-01 |
+| Notebook | 3.50 | Ada | 555-0101 | 2026-02-10 |
 
 This table has problems:
 

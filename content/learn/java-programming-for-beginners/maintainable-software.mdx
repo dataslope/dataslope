@@ -102,24 +102,15 @@ sentence *without using the word "and"*? If you need "and," the
 class probably has more than one responsibility and wants to be
 two classes.
 
-```mermaid
-flowchart LR
-    subgraph Bad["OrderManager (does too much)"]
-        B1[parse orders]
-        B2[validate orders]
-        B3[save to DB]
-        B4[send email]
-        B5[render PDF]
-    end
-    subgraph Good["Separate, focused classes"]
-        G1[OrderParser]
-        G2[OrderValidator]
-        G3[OrderRepository]
-        G4[OrderEmailer]
-        G5[InvoicePdfRenderer]
-    end
-    Bad --> Good
-```
+One `OrderManager` that does too much splits into a focused class per job:
+
+| Responsibility | Focused class |
+| --- | --- |
+| Parse orders | `OrderParser` |
+| Validate orders | `OrderValidator` |
+| Save to DB | `OrderRepository` |
+| Send email | `OrderEmailer` |
+| Render PDF | `InvoicePdfRenderer` |
 
 You don't have to split early. But when you notice the "and" in
 your description, refactor toward focused classes.

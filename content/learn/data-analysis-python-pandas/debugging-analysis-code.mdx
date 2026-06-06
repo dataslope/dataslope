@@ -216,14 +216,15 @@ Most bugs come from skipping step 1.
 
 ## A debugging checklist
 
-```mermaid
-flowchart TB
-  C1["Did you check .shape before & after?"] --> C2
-  C2["Are dtypes what you expect?"] --> C3
-  C3["Did the row count change unexpectedly?"] --> C4
-  C4["Are there NaNs you didn't account for?"] --> C5
-  C5["Can you reproduce in 5 rows?"] --> R["Now fix it"]
-```
+Before you change any code, run through:
+
+- Did you check `.shape` before **and** after?
+- Are the dtypes what you expect?
+- Did the row count change unexpectedly?
+- Are there `NaN`s you didn't account for?
+- Can you reproduce it in 5 rows?
+
+*Then* fix it.
 
 ## Check your understanding
 

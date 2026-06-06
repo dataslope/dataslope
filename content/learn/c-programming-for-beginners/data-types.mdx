@@ -228,22 +228,15 @@ int main(void) {
 
 You may still see older code use `int` for boolean values. Both work.
 
-## A picture: types and the bits they reserve
+## Types and the bits they reserve
 
-```mermaid
-flowchart LR
-    subgraph char
-      C0[1 byte]
-    end
-    subgraph int
-      I0[4 bytes]
-    end
-    subgraph double
-      D0[8 bytes]
-    end
-```
+| Type     | Size     |
+| -------- | -------- |
+| `char`   | 1 byte   |
+| `int`    | 4 bytes  |
+| `double` | 8 bytes  |
 
-Same memory, different sized boxes, different bit interpretations.
+Same memory, different sized chunks, different bit interpretations.
 The CPU has separate instructions for integer arithmetic and
 floating-point arithmetic — the type tells the compiler which to
 emit.

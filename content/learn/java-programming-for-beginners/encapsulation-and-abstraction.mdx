@@ -136,18 +136,13 @@ That is the **abstraction**. The fact that the balance is stored as
 is the **implementation**. We can change the implementation without
 breaking any caller, as long as the abstraction stays the same.
 
-```mermaid
-flowchart TB
-    subgraph A[Abstraction <br/>what the world sees]
-        AB1[owner, balance, deposit, withdraw]
-    end
-    subgraph I[Implementation <br/>how it really works]
-        IB1[balanceCents: long]
-        IB2[validation rules]
-        IB3[possibly a transaction log, etc.]
-    end
-    A -. hides .-> I
-```
+The abstraction hides the implementation:
+
+| Abstraction (what the world sees) | Implementation (how it really works) |
+| --- | --- |
+| `owner`, `balance`, `deposit`, `withdraw` | `balanceCents: long` |
+| | validation rules |
+| | possibly a transaction log, etc. |
 
 A class is *well designed* to the extent that its abstraction is
 small, clean, and stable while its implementation can change freely.

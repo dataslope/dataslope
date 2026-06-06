@@ -33,23 +33,12 @@ A **primary key** is a column (or set of columns) whose value
 **uniquely identifies each row** in a table. No two rows may share
 the same primary key value, and it is never empty.
 
-```mermaid
-flowchart TB
-    subgraph customers["Table: customers"]
-        direction LR
-        H1["id (PK)"]:::pk
-        H2["name"]:::hdr
-        H3["city"]:::hdr
-        A1["1"]:::pk
-        A2["John Smith"]
-        A3["Springfield"]
-        B1["2"]:::pk
-        B2["John Smith"]
-        B3["Springfield"]
-    end
-    classDef hdr fill:#dbeafe,stroke:#1d4ed8
-    classDef pk fill:#fde68a,stroke:#b45309
-```
+Table: `customers`
+
+| id (PK) | name | city |
+| --- | --- | --- |
+| 1 | John Smith | Springfield |
+| 2 | John Smith | Springfield |
 
 Now the two John Smiths are clearly different: one is customer `1`,
 the other is customer `2`. The `id` column is the primary key, and

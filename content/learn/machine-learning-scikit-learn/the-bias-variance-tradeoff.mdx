@@ -184,12 +184,11 @@ This single idea reframes much of the course:
   while keeping their low bias. That is *why* a forest usually beats a
   single deep tree.
 
-```mermaid
-flowchart TD
-    A["Model too simple"] -->|"high bias, low variance"| U["Underfitting"]
-    B["Model too flexible"] -->|"low bias, high variance"| O["Overfitting"]
-    C["Average many flexible models"] -->|"keeps low bias, cuts variance"| E["Ensembles win"]
-```
+| Model | Bias / variance | Result |
+| --- | --- | --- |
+| Too simple | High bias, low variance | Underfitting |
+| Too flexible | Low bias, high variance | Overfitting |
+| Average many flexible models | Keeps low bias, cuts variance | Ensembles win |
 
 ## More data changes the picture
 

@@ -45,18 +45,14 @@ Plus one helper: `group_by()`, which makes `summarise()`,
 `mutate()`, and friends operate **per group**. We'll meet that
 properly on the next page.
 
-```mermaid
-flowchart TD
-  raw["data frame"] -->|filter| rows["fewer rows"]
-  rows -->|select| cols["fewer/different columns"]
-  cols -->|mutate| derived["new columns added"]
-  derived -->|arrange| sorted["rows reordered"]
-  sorted -->|summarise| out["summary row(s)"]
-  style out fill:#bfdbfe
-```
+Each verb reshapes the data frame a little:
+**`filter` (fewer rows) → `select` (fewer columns) → `mutate`
+(new columns) → `arrange` (rows reordered) → `summarise`
+(summary rows)**.
 
-You almost never use all five at once. But every dplyr pipeline
-is some composition of these.
+You almost never use all five at once, and they don't have to
+run in that order. But every dplyr pipeline is some composition
+of these.
 
 ## The pipe: `|>`
 

@@ -9,21 +9,12 @@ with the `how` parameter.
 
 ## The four join types
 
-```mermaid
-flowchart TB
-  subgraph Inner
-    I["Only rows whose key<br/>appears in BOTH tables"]
-  end
-  subgraph Left
-    L["All rows from LEFT table.<br/>Right columns filled with NaN<br/>where no match exists."]
-  end
-  subgraph Right
-    R["All rows from RIGHT table.<br/>Left columns filled with NaN<br/>where no match exists."]
-  end
-  subgraph Outer
-    O["Every row from EITHER table.<br/>NaN wherever the other side<br/>has no match."]
-  end
-```
+| `how=` | What you get |
+| --- | --- |
+| `inner` | Only rows whose key appears in **both** tables |
+| `left` | All rows from the **left** table; right columns are `NaN` where no match exists |
+| `right` | All rows from the **right** table; left columns are `NaN` where no match exists |
+| `outer` | Every row from **either** table; `NaN` wherever the other side has no match |
 
 ## Setting the stage
 

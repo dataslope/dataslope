@@ -25,28 +25,13 @@ Names can repeat. Addresses can repeat. Phone numbers can change. A table needs 
 
 A **primary key** is a column, or sometimes a combination of columns, that uniquely identifies each row in a table.
 
-For beginners, the most common pattern in SQLite is a column named `id`:
+For beginners, the most common pattern in SQLite is a column named `id`, as in this `customers` table:
 
-```mermaid
-flowchart TB
-    subgraph Customers["Table: customers"]
-        direction LR
-        H1["id<br/>primary key"]:::pk
-        H2["name"]:::hdr
-        H3["city"]:::hdr
-        A1["1"]:::pk
-        A2["John Smith"]
-        A3["Springfield"]
-        B1["2"]:::pk
-        B2["John Smith"]
-        B3["Springfield"]
-        C1["3"]:::pk
-        C2["Maya Chen"]
-        C3["Denver"]
-    end
-    classDef hdr fill:#dbeafe,stroke:#1d4ed8
-    classDef pk fill:#fde68a,stroke:#b45309
-```
+| id (primary key) | name | city |
+| --- | --- | --- |
+| 1 | John Smith | Springfield |
+| 2 | John Smith | Springfield |
+| 3 | Maya Chen | Denver |
 
 Now the two John Smith rows are not confused:
 

@@ -33,18 +33,11 @@ sits.
   pulled below the median**. Think exam scores with a ceiling, or age
   at death.
 
-```mermaid
-flowchart TD
-  subgraph L["Left-skewed (negative)"]
-    L1["long tail to the LEFT"] --> L2["mean &lt; median"]
-  end
-  subgraph S["Symmetric"]
-    S1["balanced tails"] --> S2["mean &asymp; median"]
-  end
-  subgraph R["Right-skewed (positive)"]
-    R1["long tail to the RIGHT"] --> R2["mean &gt; median"]
-  end
-```
+| Shape | Long tail | Mean vs median |
+| --- | --- | --- |
+| Left-skewed (negative) | to the left | mean &lt; median |
+| Symmetric | balanced tails | mean &asymp; median |
+| Right-skewed (positive) | to the right | mean &gt; median |
 
 <Callout type="warn" title="Misconception: 'right-skewed' means the peak is on the right">
 It's the opposite. Right-skewed means the *tail* points right, so the
@@ -211,13 +204,10 @@ deviations from the mean?" But it's built on the **mean and standard
 deviation**, which the outliers *themselves* inflate — so on skewed or
 contaminated data it can hide the very points it's meant to catch.
 
-```mermaid
-flowchart LR
-  A["1.5 x IQR rule"] --> A1["uses Q1, Q3, IQR<br/>robust to outliers"]
-  A1 --> A2["good on skewed data"]
-  B["z-score rule (|z| > 3)"] --> B1["uses mean and std<br/>outliers inflate both"]
-  B1 --> B2["assumes roughly normal<br/>can miss/over-flag on skew"]
-```
+| Rule | Built on | Behavior |
+| --- | --- | --- |
+| 1.5×IQR | `Q1`, `Q3`, `IQR` | Robust — outliers don't move the fences. Good on skewed data. |
+| z-score (`\|z\| > 3`) | mean and std | Outliers inflate both; assumes roughly normal, so it can miss or over-flag on skew. |
 
 The two rules **often disagree**, and seeing how is genuinely
 clarifying.

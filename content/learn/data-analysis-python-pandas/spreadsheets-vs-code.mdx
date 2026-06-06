@@ -53,20 +53,21 @@ df.groupby("region")["revenue"].sum().plot.bar()
 
 Save the file as `weekly_report.py`. **Next Monday: re-run.**
 
-```mermaid
-flowchart TD
-    subgraph "Spreadsheet workflow"
-        A1[Open CSV] --> A2[Manual import]
-        A2 --> A3[Eyeball + fix types]
-        A3 --> A4[Manual sort/filter/sum]
-        A4 --> A5[Manual chart]
-        A5 --> A6[Save with date<br/>in filename]
-        A6 --> A7[Repeat next week]
-    end
-    subgraph "Code workflow"
-        B1[python report.py] --> B2[Done]
-    end
-```
+The asymmetry is the whole point. **Every week**, the spreadsheet
+path is:
+
+1. Open the CSV
+2. Manual import
+3. Eyeball and fix column types
+4. Manual sort / filter / sum
+5. Build a chart by hand
+6. Save with the date in the filename
+7. …repeat it all next week
+
+…while the code path is:
+
+1. `python report.py`
+2. Done.
 
 ## What the comparison actually proves
 
@@ -223,20 +224,12 @@ the audience can read it.
 
 ## Conceptual comparison: manual vs reproducible
 
-```mermaid
-flowchart TB
-    subgraph "Manual (spreadsheet)"
-        M1[Steve opens file] --> M2[Steve clicks around]
-        M2 --> M3[Steve copies numbers]
-        M3 --> M4[Steve emails result]
-        M4 --> M5[Nobody can audit]
-    end
-    subgraph "Reproducible (code)"
-        C1[Run script] --> C2[Same inputs<br/>= same outputs]
-        C2 --> C3[Source in git]
-        C3 --> C4[Anyone can audit<br/>and rerun]
-    end
-```
+| Manual (spreadsheet) | Reproducible (code) |
+| --- | --- |
+| Steve opens the file and clicks around | Run one script |
+| Steve copies numbers by hand | Same inputs → same outputs |
+| Steve emails the result | Source lives in git |
+| Nobody can audit what he did | Anyone can audit and rerun |
 
 That right-hand pipeline — *same inputs, same outputs, audit
 trail* — is the whole game. Pandas is the most popular tool for

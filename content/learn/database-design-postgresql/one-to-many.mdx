@@ -68,13 +68,10 @@ one customer. The customer row does **not** need a list of order ids.
 That would break the table shape: a cell would have to hold many
 values, and every new order would require editing the parent row.
 
-```mermaid
-flowchart TB
-    Bad["Bad idea:<br/>customers.order_ids = 101, 102, 103"] --> Problem["One cell now stores a list"]
-    Problem --> Hard["Hard to validate, query, and update"]
-    Good["Good idea:<br/>orders.customer_id"] --> Simple["One child row stores one parent id"]
-    Simple --> Join["A join rebuilds the full picture"]
-```
+| Approach | Where the link lives | Result |
+| --- | --- | --- |
+| Bad idea | `customers.order_ids = 101, 102, 103` | One cell stores a list; hard to validate, query, and update. |
+| Good idea | `orders.customer_id` | One child row stores one parent id; a join rebuilds the full picture. |
 
 The many side can repeat the same parent id safely. That repetition is
 not a duplication problem; it is the relationship itself.

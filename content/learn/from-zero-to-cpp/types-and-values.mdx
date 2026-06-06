@@ -34,22 +34,18 @@ flowchart LR
 
 C++ types break down into a small family of categories:
 
-```mermaid
-flowchart TD
-    T[Types]
-    T --> Fund[Fundamental]
-    T --> Comp[Compound]
-    Fund --> Int[Integral<br/>int, char, bool, ...]
-    Fund --> Flt[Floating-point<br/>float, double, long double]
-    Fund --> Void[void<br/>'no value']
-    Fund --> Nptr[std::nullptr_t<br/>just for nullptr]
-    Comp --> Ptr[Pointer T*]
-    Comp --> Ref[Reference T&]
-    Comp --> Arr[Array T n]
-    Comp --> Fn[Function int int]
-    Comp --> Cls[Class / Struct]
-    Comp --> Enum[Enumeration]
-```
+- **Fundamental**
+  - Integral — `int`, `char`, `bool`, ...
+  - Floating-point — `float`, `double`, `long double`
+  - `void` — "no value"
+  - `std::nullptr_t` — just for `nullptr`
+- **Compound**
+  - Pointer — `T*`
+  - Reference — `T&`
+  - Array — `T[n]`
+  - Function — `int(int)`
+  - Class / struct
+  - Enumeration
 
 Most of your day will be spent with `int`, `double`, `bool`,
 `std::string`, `std::vector`, and your own classes — but it helps

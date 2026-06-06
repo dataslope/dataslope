@@ -15,15 +15,12 @@ pages. A Java **applet** was a small program (a `.class` file) that
 the browser downloaded and ran in a sandbox. Applets did simple
 animations, calculators, simple games, and proof-of-concept demos.
 
-```mermaid
-flowchart TD
-    Page[Web page HTML]
-    Page -->|<applet> tag| Browser
-    Browser -->|download| Server[Web server: .class]
-    Server --> Applet[Applet bytecode]
-    Applet --> JVM[Plug-in JVM inside browser]
-    JVM --> UI[Pixels in the page]
-```
+How an applet reached the screen:
+
+1. A web page's HTML contained an `<applet>` tag.
+2. The browser downloaded the `.class` file from the web server.
+3. A plug-in JVM inside the browser ran that applet bytecode.
+4. The applet drew pixels directly into the page.
 
 For a brief window in the late 1990s, applets looked like the future
 of interactive content on the web. They never quite lived up to that
@@ -115,14 +112,16 @@ Recent versions have added:
 We will not use most of these advanced features in this course, but
 it is worth knowing they exist. Java is not standing still.
 
-```mermaid
-flowchart TD
-    A[Java 1<br/>1996<br/>Applets] --> B[Java 5<br/>2004<br/>Generics, enums]
-    B --> C[Java 8<br/>2014<br/>Lambdas, streams]
-    C --> D[Java 11<br/>2018<br/>Modern LTS]
-    D --> E[Java 17<br/>2021<br/>Records, sealed]
-    E --> F[Java 21<br/>2023<br/>Virtual threads]
-```
+The major milestones at a glance:
+
+| Version | Year | Headline additions |
+| --- | --- | --- |
+| Java 1 | 1996 | Applets |
+| Java 5 | 2004 | Generics, enums |
+| Java 8 | 2014 | Lambdas, streams |
+| Java 11 | 2018 | Modern LTS |
+| Java 17 | 2021 | Records, sealed classes |
+| Java 21 | 2023 | Virtual threads |
 
 ## What got dropped
 

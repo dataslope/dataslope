@@ -45,12 +45,11 @@ The nouns — bookstore, book, customer, order — are candidate
 entities. Now ask of each: *what do we need to know about it?* Those
 become attributes (columns):
 
-```mermaid
-flowchart TB
-    Books["books"] --> BA["title<br/>author<br/>price"]
-    Customers["customers"] --> CA["name<br/>email"]
-    Orders["orders"] --> OA["order date<br/>total"]
-```
+| Entity | Attributes |
+| --- | --- |
+| `books` | title, author, price |
+| `customers` | name, email |
+| `orders` | order date, total |
 
 Notice attributes describe **one** instance of the entity: one book
 has one title and one price. If a "fact" really describes *many*

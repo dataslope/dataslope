@@ -207,16 +207,11 @@ possibly old data.
 Design first does not mean you must predict everything. It means you
 pause long enough to model the core facts that are already visible.
 
-```mermaid
-flowchart TB
-    A["Model core facts"] --> B["Create tables and constraints"]
-    B --> C["Write application code"]
-    C --> D["Add features on stable meaning"]
-
-    E["Skip modeling"] --> F["Code invents assumptions"]
-    F --> G["Data grows around shortcuts"]
-    G --> H["Expensive redesign"]
-```
+| Design first | Skip modeling |
+| --- | --- |
+| Model core facts | Code invents assumptions |
+| Create tables and constraints | Data grows around shortcuts |
+| Write application code on stable meaning | Expensive redesign later |
 
 The schema becomes a contract. It is much easier to make that contract
 clear before many callers depend on it.

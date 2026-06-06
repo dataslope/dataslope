@@ -14,16 +14,12 @@ questions:
    end of program, never)
 3. **Who is responsible for it?** (the compiler, you, or the OS)
 
-```mermaid
-flowchart TB
-    subgraph "Process address space"
-        T[Text segment<br/>compiled machine code<br/>read-only]
-        D[Data segment<br/>globals + statics + string literals<br/>lives for whole program]
-        H[Heap<br/>'new' allocates here<br/>YOU manage lifetime]
-        Gap[(...unused address space...)]
-        S[Stack<br/>function calls + locals<br/>auto-managed]
-    end
-```
+| Region | What lives there | Lifetime / owner |
+| --- | --- | --- |
+| Text segment | compiled machine code | whole program, read-only |
+| Data segment | globals, statics, string literals | whole program |
+| Heap | whatever `new` allocates | until you free it — **you** manage it |
+| Stack | function calls and locals | end of scope — auto-managed |
 
 ## The four regions, one by one
 

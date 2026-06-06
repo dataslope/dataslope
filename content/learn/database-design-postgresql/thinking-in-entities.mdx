@@ -58,39 +58,36 @@ entity, but `email` is probably a column on `customers`.
 ## Candidate entities are boxes
 
 Designers often sketch entities as boxes before deciding exact columns
-or SQL syntax. The box says, "this is a kind of thing we may need to
-store."
+or SQL syntax. Each box says, "this is a kind of thing we may need to
+store." An online shop might begin with:
 
-```mermaid
-flowchart LR
-    subgraph Shop["Online shop"]
-        Customer["Customer"]
-        Order["Order"]
-        Product["Product"]
-        Payment["Payment"]
-        Shipment["Shipment"]
-    end
-```
+- Customer
+- Order
+- Product
+- Payment
+- Shipment
 
-At this stage, the boxes are intentionally simple. You are building a
-map of the domain, not a finished schema.
+At this stage, the candidates are intentionally simple. You are building
+a map of the domain, not a finished schema.
 
 ## One entity type, one table
 
 Once an entity is real enough to track, it usually gets its own table.
 A table should hold rows that are all the same kind of thing.
 
-```mermaid
-flowchart TB
-    subgraph customers["Table: customers"]
-        C1["id = 1<br/>Ada"]
-        C2["id = 2<br/>Grace"]
-    end
-    subgraph products["Table: products"]
-        P1["id = 10<br/>Notebook"]
-        P2["id = 11<br/>Pen"]
-    end
-```
+Table: `customers`
+
+| id | name  |
+| -- | ----- |
+| 1  | Ada   |
+| 2  | Grace |
+
+Table: `products`
+
+| id | name     |
+| -- | -------- |
+| 10 | Notebook |
+| 11 | Pen      |
 
 Mixing different entity types into one table creates confusion. A
 customer row and a product row do not have the same meaning, the same

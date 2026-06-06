@@ -228,27 +228,14 @@ meaning.
 
 ## The three side by side
 
-Here is the whole page in one table-like view. Same library, three different
-shapes of problem and output.
+Here is the whole page in one view. Same library, three different shapes of
+problem and output.
 
-```mermaid
-flowchart LR
-    subgraph RG["Regression"]
-        direction TB
-        r1["Input: features"] --> r2["Output: a NUMBER"]
-        r3["e.g. predict price"]
-    end
-    subgraph CF["Classification"]
-        direction TB
-        c1["Input: features"] --> c2["Output: a CATEGORY"]
-        c3["e.g. spam or not"]
-    end
-    subgraph CL["Clustering"]
-        direction TB
-        l1["Input: features only"] --> l2["Output: DISCOVERED groups"]
-        l3["e.g. customer segments"]
-    end
-```
+| Task | Input | Output | Example |
+| --- | --- | --- | --- |
+| Regression | Features | a NUMBER | predict price |
+| Classification | Features | a CATEGORY | spam or not |
+| Clustering | Features only | DISCOVERED groups | customer segments |
 
 And the code signatures, distilled:
 
