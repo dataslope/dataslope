@@ -132,18 +132,17 @@ spreadsheet horror stories:
   of the largest trading losses in JPMorgan's history (the 2012
   "London Whale" affair).
 
-```mermaid
-flowchart TB
-    R[Raw data] --> S1[Excel sheet 1<br/>manual cleanup]
-    S1 --> S2[Excel sheet 2<br/>copy-pasted by Alice]
-    S2 --> S3[Excel sheet 3<br/>VLOOKUPs into a CSV<br/>Steve emailed last week]
-    S3 --> S4[Excel sheet 4<br/>charts for the<br/>board deck]
-    S4 --> D[Decision]
-    style S2 fill:#fee2e2,stroke:#dc2626
-    style S3 fill:#fee2e2,stroke:#dc2626
-```
+A typical "analysis" flows through a chain of hand-edited sheets
+before anyone makes a decision:
 
-The red boxes are the points where, in a real company, *nobody
+1. Raw data
+2. Excel sheet 1 — manual cleanup
+3. ⚠️ Excel sheet 2 — copy-pasted by Alice
+4. ⚠️ Excel sheet 3 — VLOOKUPs into a CSV Steve emailed last week
+5. Excel sheet 4 — charts for the board deck
+6. Decision
+
+The ⚠️ steps are the points where, in a real company, *nobody
 remembers what was done or how*. The chain is **not
 reproducible**. Six months later, when an auditor asks "show me
 exactly how this number was computed," the honest answer is "we

@@ -54,17 +54,11 @@ always an area, never a height.
 The contrast with the discrete world is worth pinning down, because the
 mental model is genuinely different.
 
-```mermaid
-flowchart LR
-  subgraph S1["Discrete (PMF)"]
-    A1["Bars at 0, 1, 2, ..."] --> A2["Height = P(X = k)<br/>directly a probability"]
-    A2 --> A3["P over a range =<br/>SUM of bar heights"]
-  end
-  subgraph S2["Continuous (PDF)"]
-    B1["Smooth curve"] --> B2["Height = density<br/>NOT a probability"]
-    B2 --> B3["P over a range =<br/>AREA under the curve"]
-  end
-```
+| | **Discrete (PMF)** | **Continuous (PDF)** |
+| --- | --- | --- |
+| Shape | Bars at 0, 1, 2, … | A smooth curve |
+| Height means | `P(X = k)` — directly a probability | A *density* — **not** a probability |
+| `P` over a range | **Sum** of bar heights | **Area** under the curve |
 
 <Callout type="info" title="Why P(X = x) = 0 isn't a paradox">
 "The probability of any exact value is zero" sounds like it means

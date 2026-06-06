@@ -30,22 +30,15 @@ and that is why "JavaScript in a browser" and "JavaScript on a
 server" feel like slightly different worlds, even though it is the
 same language.
 
-```mermaid
-flowchart TB
-    subgraph Lang["The JavaScript language (ECMAScript)"]
-        L1["Numbers, strings, booleans"]
-        L2["Variables, functions, loops"]
-        L3["Arrays, objects"]
-        L4["Promises, async/await"]
-    end
-    subgraph Runtimes["Runtimes layer different capabilities on top"]
-        R1["Browser<br/>DOM, fetch, localStorage"]
-        R2["Node.js<br/>fs, http, child processes"]
-        R3["Deno / Bun<br/>fs, http, native fetch"]
-        R4["Embedded engines<br/>game scripting, IoT"]
-    end
-    Lang --> Runtimes
-```
+The **language** (ECMAScript) is the same everywhere — numbers, strings,
+booleans, variables, functions, loops, arrays, objects, promises and
+`async`/`await`. Each **runtime** then layers its own capabilities on
+top:
+
+- **Browser**: DOM, `fetch`, `localStorage`.
+- **Node.js**: filesystem, HTTP, child processes.
+- **Deno / Bun**: filesystem, HTTP, native `fetch`.
+- **Embedded engines**: game scripting, IoT.
 
 The same `if`/`for`/`function` works everywhere. What changes is the
 *environment*: the set of built-in objects available, and what those

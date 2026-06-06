@@ -14,20 +14,20 @@ once, because the shape will repeat on nearly every page that follows.
 Here is the canonical flow. Almost every classic NLP project is some subset
 of these steps, in roughly this order.
 
-```mermaid
-flowchart TD
-    A["Raw text<br/>(a string)"] --> B["Sentence tokenization<br/>split into sentences (optional)"]
-    B --> C["Word tokenization<br/>split into words and punctuation"]
-    C --> D["Case folding<br/>lowercase the tokens"]
-    D --> E["Cleaning<br/>drop punctuation and non-words"]
-    E --> F["Stopword removal<br/>drop ultra-common words (optional)"]
-    F --> G["Stemming or lemmatization<br/>reduce words to a root (optional)"]
-    G --> H["Analysis<br/>counts, n-grams, POS tags, features"]
-```
+| # | Step | What it does |
+| - | ---- | ------------ |
+| 1 | Raw text | A single string comes in. |
+| 2 | Sentence tokenization | Split into sentences (optional). |
+| 3 | Word tokenization | Split into words and punctuation. |
+| 4 | Case folding | Lowercase the tokens. |
+| 5 | Cleaning | Drop punctuation and non-words. |
+| 6 | Stopword removal | Drop ultra-common words (optional). |
+| 7 | Stemming or lemmatization | Reduce words to a root (optional). |
+| 8 | Analysis | Counts, n-grams, POS tags, features. |
 
 Read it top to bottom. Raw text comes in; a clean, normalized list of units
 comes out, ready to be counted or fed into a model. Three things about this
-picture matter more than the picture itself.
+sequence matter more than the steps themselves.
 
 **First, it is a pipeline of transformations.** At each step you are holding
 a value — first a string, then a list of tokens — and you apply one
@@ -61,7 +61,7 @@ transformations to apply.
 Let us make "a pipeline is a sequence of list transformations" concrete. The
 block below runs the standard steps and prints the list after each one, so
 you can watch it shrink and change. Read each printed line against the
-diagram above.
+table above.
 
 <CodeBlock
   adapter="python"
@@ -122,7 +122,7 @@ print("5. lemmatized:", tokens)
 `}
 />
 
-Each `print` is one row of the pipeline diagram. The list started as nine
+Each `print` is one row of the pipeline table. The list started as nine
 tokens including punctuation and shrank to a handful of meaningful roots. Try
 commenting out step 4 (stopword removal) and re-running — notice how much
 longer the final list becomes, and ask yourself whether those extra words
@@ -140,21 +140,18 @@ The stopword list is all lowercase, so comparing un-lowercased tokens like
 
 It helps to mentally split the pipeline into two halves.
 
-```mermaid
-flowchart LR
-    subgraph PRE["Preprocessing (cleaning)"]
-        direction TB
-        p1["Tokenize"] --> p2["Normalize"] --> p3["Filter / reduce"]
-    end
-    subgraph ANA["Analysis (extracting value)"]
-        direction TB
-        a1["Count frequencies"]
-        a2["Tag parts of speech"]
-        a3["Build n-grams"]
-        a4["Make features"]
-    end
-    PRE --> ANA
-```
+**Preprocessing (cleaning)** — a fixed sequence:
+
+1. Tokenize
+2. Normalize
+3. Filter / reduce
+
+**Analysis (extracting value)** — pick what your goal needs:
+
+- Count frequencies
+- Tag parts of speech
+- Build n-grams
+- Make features
 
 The **preprocessing** half turns raw text into clean, comparable units. It is
 mostly mechanical and mostly the same from project to project. The

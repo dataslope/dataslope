@@ -65,17 +65,15 @@ series and computes a summary at each stop. The **moving average** —
 becomes the average of itself and its `N-1` predecessors, so random
 up-and-down jitter cancels out while the slow signal survives.
 
-```mermaid
-flowchart TB
-    subgraph ROLL["Rolling window = 3 (fixed size, slides forward)"]
-        direction LR
-        R1["mean of y1, y2, y3"] --> R2["mean of y2, y3, y4"] --> R3["mean of y3, y4, y5"]
-    end
-    subgraph EXP["Expanding window (grows from the start)"]
-        direction LR
-        E1["mean of y1"] --> E2["mean of y1, y2"] --> E3["mean of y1, y2, y3"]
-    end
-```
+A **rolling** window is a fixed size that slides forward; an **expanding**
+window is anchored at the start and grows. Watch what each averages as it
+advances:
+
+| Step | Rolling, window = 3 (fixed size, slides) | Expanding (grows from the start) |
+| --- | --- | --- |
+| 1 | mean of `y1, y2, y3` | mean of `y1` |
+| 2 | mean of `y2, y3, y4` | mean of `y1, y2` |
+| 3 | mean of `y3, y4, y5` | mean of `y1, y2, y3` |
 
 Watch a 12-month moving average dissolve the airline series' seasonal hump
 and lay its trend bare. **Change the `window` and re-run** to feel the

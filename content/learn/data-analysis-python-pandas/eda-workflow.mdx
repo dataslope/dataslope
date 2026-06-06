@@ -13,15 +13,15 @@ This page outlines a workflow you can apply to any new dataset.
 
 ## Why a workflow?
 
-```mermaid
-flowchart TD
-  A["New dataset"] --> B{"What questions<br/>can we ask?"}
-  B --> C["Discover<br/>shape & types"]
-  C --> D["Discover<br/>quality issues"]
-  D --> E["Discover<br/>distributions"]
-  E --> F["Discover<br/>relationships"]
-  F --> G["Now you can<br/>ask real questions"]
-```
+You discover a new dataset in layers, and each layer makes the
+next one trustworthy:
+
+1. **Shape & types** — what are we even looking at?
+2. **Quality issues** — what's missing, duplicated, or wrong?
+3. **Distributions** — how is each column shaped?
+4. **Relationships** — how do columns move together?
+
+Only *then* can you ask real questions with confidence.
 
 Without this scaffolding, beginners jump straight to `groupby`
 and chart-making, only to realize halfway through that one
@@ -164,16 +164,14 @@ it. Your notes should grow over the life of the project.
 
 ## An EDA checklist
 
-```mermaid
-flowchart TB
-  S1["1. Shape and dtypes"] --> S2
-  S2["2. head / sample"] --> S3
-  S3["3. Missing values"] --> S4
-  S4["4. Numeric describe"] --> S5
-  S5["5. Categorical value_counts"] --> S6
-  S6["6. Correlations / group summaries"] --> S7
-  S7["7. Write notes"] --> S8["8. Now ask your real questions"]
-```
+1. Shape and dtypes
+2. `head` / sample
+3. Missing values
+4. Numeric `describe`
+5. Categorical `value_counts`
+6. Correlations / group summaries
+7. Write notes
+8. Now ask your real questions
 
 Print it. Tape it to your wall. Use it on every new dataset.
 

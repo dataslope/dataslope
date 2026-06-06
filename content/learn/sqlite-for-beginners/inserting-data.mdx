@@ -164,12 +164,13 @@ ORDER BY
   id;`}
 />
 
-```mermaid
-flowchart LR
-    C1["name"] --> V1["'Maya'"]
-    C2["email"] --> V2["'maya@example.com'"]
-    C3["age"] --> V3["31"]
-```
+Each named column lines up with a value in the same position:
+
+| Column  | Value                |
+| ------- | -------------------- |
+| `name`  | `'Maya'`             |
+| `email` | `'maya@example.com'` |
+| `age`   | `31`                 |
 
 <MultipleChoice
   markdown={`In \`INSERT INTO contacts (name, email, age) VALUES ('Maya', 'maya@example.com', 31);\`, where does \`31\` go?

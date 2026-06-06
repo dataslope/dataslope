@@ -111,15 +111,13 @@ print(Dog("Rex", "Labrador").describe())
 
 Without `super().__init__(name)`, `self.name` would never be set. `super()` lets you **reuse** the parent's initialization logic.
 
-```mermaid
-flowchart TD
-    A["Dog('Rex', 'Labrador')"] --> B["Dog.__init__ runs"]
-    B --> C["super().__init__('Rex')"]
-    C --> D["Animal.__init__ sets self.name"]
-    D --> E["Dog.__init__ sets self.breed"]
-    E --> F["Return initialized Dog instance"]
-    style C fill:#e1f5ff
-```
+When you write `Dog("Rex", "Labrador")`, initialization runs in order:
+
+1. `Dog.__init__` runs.
+2. **`super().__init__("Rex")`** hands off to the parent.
+3. `Animal.__init__` sets `self.name`.
+4. Control returns to `Dog.__init__`, which sets `self.breed`.
+5. The fully initialized `Dog` instance is returned.
 
 <Callout type="info" title="super() in multiple inheritance">
 In single inheritance, \`super()\` just calls the parent. In multiple inheritance, \`super()\` follows the **Method Resolution Order (MRO)**, which is computed by the C3 linearization algorithm. This ensures every class is called exactly once in a consistent order. See the MRO section below.

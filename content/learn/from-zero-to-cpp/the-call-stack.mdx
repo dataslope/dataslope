@@ -208,16 +208,10 @@ rewrite it as a loop.
 We saw this in the "How Computers Run Programs" chapter. The stack
 is one of several regions:
 
-```mermaid
-flowchart TB
-    subgraph "Program memory"
-        T[Text / code]
-        D[Data: globals, statics, string literals]
-        H[Heap: grows upward as you 'new' things]
-        Gap[(unused address space)]
-        S[Stack: grows downward as you call functions]
-    end
-```
+- **Text / code** — the compiled instructions.
+- **Data** — globals, statics, string literals.
+- **Heap** — grows upward as you `new` things.
+- **Stack** — grows downward as you call functions.
 
 The stack grows toward the heap; the heap grows toward the stack.
 On 32-bit systems they could in principle meet. On modern 64-bit

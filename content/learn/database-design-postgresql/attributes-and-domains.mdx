@@ -25,21 +25,8 @@ flowchart TB
 ```
 
 In a table, each attribute usually becomes one column. Each row then
-stores the values for one real entity.
-
-```mermaid
-flowchart LR
-    subgraph customers["Table: customers"]
-        direction LR
-        A["id"]:::pk
-        B["name"]:::hdr
-        C["email"]:::hdr
-        D["joined_on"]:::hdr
-        E["status"]:::hdr
-    end
-    classDef hdr fill:#dbeafe,stroke:#1d4ed8
-    classDef pk fill:#fde68a,stroke:#b45309
-```
+stores the values for one real entity. A `customers` table might have
+the columns `id`, `name`, `email`, `joined_on`, and `status`.
 
 ## Domains say what values are allowed
 

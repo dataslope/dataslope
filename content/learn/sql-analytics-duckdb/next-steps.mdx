@@ -14,15 +14,13 @@ the part that outlasts any one tool.
 
 The course moved deliberately from *mindset* to *technique* to *insight*:
 
-```mermaid
-flowchart TB
-    A["Analytical mindset<br/>(OLAP, thinking in datasets)"] --> B["Exploration<br/>(profile, slice, sort)"]
-    B --> C["Summarization<br/>(aggregates, GROUP BY, HAVING)"]
-    C --> D["Window functions<br/>(rank, running totals)"]
-    D --> E["Transformation<br/>(CASE, dates, pivots)"]
-    E --> F["Composition<br/>(CTEs, subqueries)"]
-    F --> G["Insight<br/>(metrics, reproducibility)"]
-```
+1. **Analytical mindset** — OLAP, thinking in datasets.
+2. **Exploration** — profile, slice, sort.
+3. **Summarization** — aggregates, `GROUP BY`, `HAVING`.
+4. **Window functions** — rank, running totals.
+5. **Transformation** — `CASE`, dates, pivots.
+6. **Composition** — CTEs, subqueries.
+7. **Insight** — metrics, reproducibility.
 
 Each layer rested on the one before it. Window functions only made sense
 once aggregation did; metrics only made sense once you could compose

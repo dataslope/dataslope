@@ -17,21 +17,18 @@ This page is the ritual. Memorize it.
 
 ## The five-minute ritual
 
-```mermaid
-flowchart TB
-  s["Dataset arrives"]
-  s --> shape["1. Shape: dim(), nrow(), ncol()"]
-  shape --> peek["2. Peek: head(), tail()"]
-  peek --> types["3. Types & structure: str()"]
-  types --> stats["4. Summaries: summary()"]
-  stats --> missing["5. Missingness: colSums(is.na(...))"]
-  missing --> ready["Ready to start asking real questions"]
-  style ready fill:#dcfce7
-```
+The moment a dataset arrives, run these five steps before anything
+else:
 
-Each step takes seconds and gives you orientation. Skip any of
-them and you risk asking a meaningless question of a misunderstood
-dataset.
+1. **Shape** — `dim()`, `nrow()`, `ncol()`.
+2. **Peek** — `head()`, `tail()`.
+3. **Types and structure** — `str()`.
+4. **Summaries** — `summary()`.
+5. **Missingness** — `colSums(is.na(...))`.
+
+Only then are you ready to start asking real questions. Each step
+takes seconds and gives you orientation. Skip any of them and you
+risk asking a meaningless question of a misunderstood dataset.
 
 We'll use `airquality` — a built-in dataset of daily air quality
 measurements in New York, May–September 1973 — as our example.

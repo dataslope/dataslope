@@ -144,12 +144,11 @@ This does **not** mean types do not matter in SQLite. They still matter because 
 
 `NULL` means the value is missing, unknown, or not applicable. It is not the same as zero, an empty string, or the word `'NULL'`.
 
-```mermaid
-flowchart LR
-    Z["0"] --> ZERO["Known number: zero"]
-    E["''"] --> EMPTY["Known text: empty string"]
-    N["NULL"] --> MISS["Unknown or missing value"]
-```
+| Value | Meaning |
+| --- | --- |
+| `0` | A known number: zero |
+| `''` | A known text value: the empty string |
+| `NULL` | An unknown or missing value |
 
 For example, if you do not know a customer's phone number yet, `NULL` is better than making up a fake value.
 

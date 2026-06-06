@@ -92,18 +92,15 @@ the program finished successfully. Reach the closing `}` without an
 explicit `return` and (since C99) `main` returns `0` automatically,
 but explicit is better than implicit.
 
-## What just happened, in pictures
+## What just happened, step by step
 
-```mermaid
-flowchart TB
-    A[Your text file<br/>hello.c] --> B[Compiler]
-    B --> C[Machine code<br/>executable]
-    C --> D[Operating system<br/>loads it into memory]
-    D --> E[CPU jumps to<br/>address of main]
-    E --> F[Execute printf:<br/>write bytes to stdout]
-    F --> G[Operating system<br/>delivers bytes to terminal]
-    G --> H[You see<br/>Hello, world!]
-```
+1. Your text file `hello.c` goes into the **compiler**.
+2. The compiler produces a **machine-code executable**.
+3. The **operating system** loads that executable into memory.
+4. The **CPU** jumps to the address of `main`.
+5. `printf` executes: it **writes bytes to stdout**.
+6. The operating system **delivers those bytes to the terminal**.
+7. You see **`Hello, world!`**.
 
 In our browser sandbox, every step still happens — the compiler is
 just bundled into the same web page you are reading, and the

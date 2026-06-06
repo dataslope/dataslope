@@ -65,12 +65,11 @@ is \$52K — much more representative. **For skewed
 distributions, prefer median.** Income, prices, durations, and
 file sizes are almost always skewed.
 
-```mermaid
-flowchart LR
-  A["Symmetric distribution<br/>(e.g. exam scores)"] --> M["Mean ≈ Median"]
-  B["Right-skewed distribution<br/>(e.g. income)"] --> N["Mean >> Median<br/>Use median"]
-  C["Outliers present"] --> O["Mean misleading<br/>Use median"]
-```
+| Distribution | Mean vs. median | Prefer |
+| --- | --- | --- |
+| Symmetric (e.g. exam scores) | Mean ≈ median | Either |
+| Right-skewed (e.g. income) | Mean ≫ median | **Median** |
+| Outliers present | Mean is misleading | **Median** |
 
 ## Quantiles — beyond the median
 

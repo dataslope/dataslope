@@ -18,13 +18,12 @@ eigenvalue by hand.
 
 ## The four problem types
 
-```mermaid
-flowchart LR
-    Q1["Solve A x = b"] --> S1[Linear system]
-    Q2["Find min ||Ax - b||"] --> S2[Least squares]
-    Q3["Find A v = λ v"] --> S3[Eigenproblem]
-    Q4["Decompose A = U Σ Vᵀ"] --> S4[SVD]
-```
+| Problem | Name |
+| --- | --- |
+| Solve $A x = b$ | Linear system |
+| Find $\min \lVert A x - b \rVert$ | Least squares |
+| Find $A v = \lambda v$ | Eigenproblem |
+| Decompose $A = U \Sigma V^\mathsf{T}$ | SVD |
 
 Most of scientific computing falls into one of these four buckets.
 The next chapter will cover the factorizations behind each. This

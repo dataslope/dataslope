@@ -11,28 +11,10 @@ Instead of storing every fact in one giant table, you store each kind of thing i
 
 Imagine an orders table that repeats the customer's details on every order.
 
-```mermaid
-flowchart TB
-    subgraph Giant["One giant table"]
-        direction LR
-        H1["order_id"]:::bad
-        H2["order_date"]:::bad
-        H3["customer_name"]:::bad
-        H4["customer_phone"]:::bad
-        H5["total"]:::bad
-        A1["101"]
-        A2["2026-01-05"]
-        A3["Ada"]
-        A4["555-0101"]
-        A5["42.00"]
-        B1["102"]
-        B2["2026-01-12"]
-        B3["Ada"]
-        B4["555-0101"]
-        B5["18.00"]
-    end
-    classDef bad fill:#fee2e2,stroke:#b91c1c
-```
+| order_id | order_date | customer_name | customer_phone | total |
+| --- | --- | --- | --- | --- |
+| 101 | 2026-01-05 | Ada | 555-0101 | 42.00 |
+| 102 | 2026-01-12 | Ada | 555-0101 | 18.00 |
 
 Ada's phone number is copied in multiple rows. If it changes, you must find and update every copy. Miss one copy, and the database disagrees with itself.
 

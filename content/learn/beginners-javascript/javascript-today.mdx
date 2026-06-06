@@ -149,26 +149,9 @@ JavaScript" is sometimes used to mean three quite different things:
    ever-changing landscape of libraries built **on top of** the
    language.
 
-```mermaid
-flowchart TB
-    subgraph L1["1. The language (this course)"]
-        A["JavaScript syntax, types, control flow, functions, async/await"]
-    end
-    subgraph L2["2. The platform APIs (per-runtime)"]
-        B1["Browser:<br/>DOM, fetch, localStorage"]
-        B2["Node.js:<br/>fs, http, processes"]
-        B3["Mobile:<br/>native bridges"]
-    end
-    subgraph L3["3. Frameworks and tools"]
-        C1[React, Vue, Svelte]
-        C2[Express, Next.js]
-        C3[Bundlers, linters, test runners]
-    end
-    L1 --> L2
-    L2 --> L3
-```
-
-Layer 1 is the foundation. The things in layer 3 change every few
+Each layer builds on the one before it: the platform APIs assume the
+language, and the frameworks and tools assume both. Layer 1 is the
+foundation. The things in layer 3 change every few
 years. The things in layer 1 essentially never change. By focusing
 this course on layer 1, we are giving you a skill that will not
 expire.

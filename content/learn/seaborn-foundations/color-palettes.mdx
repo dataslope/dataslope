@@ -12,16 +12,7 @@ Seaborn gives you three families of palettes for three kinds of data.
 
 ## Three palette types for three kinds of data
 
-```mermaid
-flowchart TD
-    Q{"What does the color represent?"}
-    Q -->|"Unordered categories"| QUAL["QUALITATIVE palette<br/>distinct, equal-weight hues<br/>e.g. deep, colorblind, Set2"]
-    Q -->|"An amount, low to high"| SEQ["SEQUENTIAL palette<br/>one ramp, light to dark<br/>e.g. rocket, mako, viridis"]
-    Q -->|"A value around a midpoint"| DIV["DIVERGING palette<br/>two hues, neutral center<br/>e.g. vlag, coolwarm, RdBu"]
-    QUAL --> QU["For: species, day, region"]
-    SEQ --> SU["For: counts, magnitude, density"]
-    DIV --> DU["For: correlation, change vs. a baseline"]
-```
+Seaborn matches three palette families to three kinds of data:
 
 - **Qualitative** palettes use distinct hues of roughly equal visual weight.
   They're for **unordered categories** (species, day, region), where no color

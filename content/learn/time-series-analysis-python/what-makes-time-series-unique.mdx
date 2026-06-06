@@ -118,22 +118,12 @@ the same fixed distribution (same mean, same variance, forever).
 
 A time series violates **both** halves, on purpose:
 
-```mermaid
-flowchart TB
-    subgraph CS["Cross-sectional data (i.i.d.)"]
-        direction LR
-        C1["obs 1"]
-        C2["obs 2"]
-        C3["obs 3"]
-        C4["obs 4"]
-    end
-    subgraph TS["Time series (dependent, evolving)"]
-        direction LR
-        T1["y at t-1"] --> T2["y at t"] --> T3["y at t+1"] --> T4["y at t+2"]
-    end
-    CS -. "rows are islands<br/>shuffle freely" .-> NOTE1["order does not matter"]
-    TS -. "each value leans on the last<br/>mean and variance drift" .-> NOTE2["order is everything"]
-```
+| | Cross-sectional data (i.i.d.) | Time series (dependent, evolving) |
+| --- | --- | --- |
+| The rows | independent islands: `obs 1`, `obs 2`, `obs 3`, … | a chain: `y` at `t-1` → `y` at `t` → `y` at `t+1` → … |
+| Each value | stands alone | leans on the one before it |
+| Distribution | the same for every row | mean and variance drift over time |
+| Order | does not matter — shuffle freely | is everything — shuffling destroys it |
 
 - **Not independent:** `y_t` depends on `y_{t-1}`. That's temporal
   dependence — the thing we just plotted.
@@ -254,19 +244,17 @@ Your model effectively gets to peek at the future on both sides of every
 test point. It will look brilliant in evaluation and then fall on its face
 in production, where the future is genuinely unavailable.
 
-```mermaid
-flowchart LR
-    R1["Jan<br/>train"] --> R2["Feb<br/>test"] --> R3["Mar<br/>train"] --> R4["Apr<br/>test"] --> R5["May<br/>train"] --> R6["Jun<br/>test"]
-```
+| Jan | Feb | Mar | Apr | May | Jun |
+| --- | --- | --- | --- | --- | --- |
+| train | test | train | test | train | test |
 
 *Random split (WRONG):* train and test are interleaved in time. To
 "predict" February the model is allowed to learn from January **and**
 March — it has seen the future. This is **data leakage**.
 
-```mermaid
-flowchart LR
-    B1["Jan<br/>train"] --> B2["Feb<br/>train"] --> B3["Mar<br/>train"] --> B4["Apr<br/>test"] --> B5["May<br/>test"] --> B6["Jun<br/>test"]
-```
+| Jan | Feb | Mar | Apr | May | Jun |
+| --- | --- | --- | --- | --- | --- |
+| train | train | train | test | test | test |
 
 *Chronological split (RIGHT):* train is the earlier block, test is the
 later block. The model only ever learns from the past to predict the

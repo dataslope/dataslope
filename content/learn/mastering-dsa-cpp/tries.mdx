@@ -125,10 +125,11 @@ int main() {
 
 Insertion creates missing nodes along the word path, then marks the final node as a complete word.
 
-```mermaid
-flowchart LR
-    A["root"] --> B["read c"] --> C["create/find c"] --> D["read a"] --> E["create/find a"] --> F["mark last node isWord"]
-```
+Starting at the root, for each character:
+
+1. Read the next character.
+2. Create the child node for it if missing, otherwise follow the existing one.
+3. After the last character, mark that node with `isWord`.
 
 <CodeBlock
   adapter="cpp"

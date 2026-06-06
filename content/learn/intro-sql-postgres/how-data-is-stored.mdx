@@ -23,30 +23,17 @@ The relational database's big idea is to group facts into neat
   a price.
 - A **cell** (one row, one column) holds a single value.
 
-```mermaid
-flowchart TB
-    subgraph customers["Table: customers"]
-        direction LR
-        H1["id"]:::hdr
-        H2["name"]:::hdr
-        H3["city"]:::hdr
-        R1["1"]
-        R2["Ada"]
-        R3["Toronto"]
-        S1["2"]
-        S2["Linus"]
-        S3["Helsinki"]
-        T1["3"]
-        T2["Grace"]
-        T3["New York"]
-    end
-    classDef hdr fill:#dbeafe,stroke:#1d4ed8
-```
+Table: `customers`
 
-That picture — a labeled grid of rows and columns — is the single
-most important image in this entire course. Almost everything we do
-is either *reading* such a grid, *changing* it, or *combining* two
-of them.
+| id | name | city |
+| --- | --- | --- |
+| 1 | Ada | Toronto |
+| 2 | Linus | Helsinki |
+| 3 | Grace | New York |
+
+That labeled grid of rows and columns is the single most important
+image in this entire course. Almost everything we do is either
+*reading* such a grid, *changing* it, or *combining* two of them.
 
 ## Why a grid?
 

@@ -152,14 +152,7 @@ hours later when something downstream blows up.
 
 ## The lifecycle of an object
 
-```mermaid
-flowchart TD
-    A[1. allocated<br/>on heap] --> B[2. fields default-initialized<br/>0 / null / false]
-    B --> C[3. constructor runs]
-    C --> D[4. object is alive<br/>methods can be called]
-    D --> E[5. no references left]
-    E --> F[6. garbage-collected]
-```
+An object moves through six stages, from creation to reclamation:
 
 1. **Allocation.** `new Point(3, 4)` finds free memory on the heap.
 2. **Default initialization.** Java fills every field with its

@@ -17,18 +17,6 @@ A **box plot** (or box-and-whisker plot) compresses a distribution into a
 handful of robust summary numbers based on **quartiles** — the values that
 cut the sorted data into four equal parts.
 
-```mermaid
-flowchart LR
-    subgraph BOX["The box spans Q1 to Q3: the middle 50% of the data (IQR)"]
-        Q1["Q1<br/>25th percentile<br/>(near edge of box)"]
-        MED["Median<br/>50th percentile<br/>(line inside box)"]
-        Q3["Q3<br/>75th percentile<br/>(far edge of box)"]
-    end
-    LW["Lower whisker:<br/>reaches the furthest point<br/>within 1.5 IQR below Q1"] --> Q1
-    Q3 --> UW["Upper whisker:<br/>reaches the furthest point<br/>within 1.5 IQR above Q3"]
-    UW --> OUT["Outliers:<br/>points beyond the whiskers,<br/>drawn one by one"]
-```
-
 Reading the parts:
 
 - **The box** spans the first quartile (**Q1**, 25th percentile) to the

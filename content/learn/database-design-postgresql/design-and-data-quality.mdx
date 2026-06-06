@@ -80,13 +80,6 @@ must be unique.
 `NOT NULL` protects required facts. `CHECK` protects allowed values.
 Foreign keys protect relationships.
 
-```mermaid
-flowchart LR
-    Required["Required fact"] --> NotNull["NOT NULL"]
-    Allowed["Allowed values"] --> Check["CHECK"]
-    Relationship["Valid relationship"] --> ForeignKey["FOREIGN KEY"]
-```
-
 A task status should not be any random text. If the design knows the
 allowed states, the schema can enforce them.
 

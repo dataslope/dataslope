@@ -12,17 +12,15 @@ That's what the **heap** is for. The heap is a big pool of memory
 your program can grab chunks from and give back as it sees fit. The
 controls are `malloc` and `free`.
 
-## Stack vs heap, in one picture
+## Stack vs heap
 
-```mermaid
-flowchart TB
-    subgraph "Process memory"
-      CODE["Code (your compiled instructions)"]
-      DATA["Globals & constants"]
-      HEAP["Heap (grows downward in this picture)<br/>malloc lives here"]
-      STACK["Stack (grows upward in this picture)<br/>function locals live here"]
-    end
-```
+A running program's memory is split into a few regions:
+
+- **Code** — your compiled instructions.
+- **Globals & constants** — values that live for the whole program.
+- **Heap** — a large pool you grab from with `malloc` and return with
+  `free`.
+- **Stack** — where function locals live, one frame per call.
 
 | Stack                                | Heap                              |
 |--------------------------------------|-----------------------------------|

@@ -63,13 +63,10 @@ The `<T>` is a **type parameter** (also called a **type variable**). It's a plac
 By convention, single-letter names like `T`, `U`, `V` are used for generic type parameters. If the parameter has a more specific role, use a descriptive name like `TKey` or `TValue`. Avoid overly generic names like `Type` or `GenericType`.
 </Callout>
 
-```mermaid
-graph LR
-    A[identity call with 42] --> B[Compiler infers T = number]
-    B --> C[Return type: number]
-    D["identity call with 'hello'"] --> E[Compiler infers T = string]
-    E --> F[Return type: string]
-```
+| Call | Inferred `T` | Return type |
+| --- | --- | --- |
+| `identity(42)` | `number` | `number` |
+| `identity("hello")` | `string` | `string` |
 
 ## Generic functions
 
@@ -269,14 +266,7 @@ Notice how the compiler infers both `T` and `U`:
 
 For the second call, it infers `T = number` and `U = string` (from the callback returning a string), so the return type is `string[]`.
 
-```mermaid
-graph TD
-    A[map array, fn] --> B{Infer T from array}
-    B --> C[T = element type]
-    C --> D{Infer U from fn return}
-    D --> E[U = return type of fn]
-    E --> F[Return type: U array]
-```
+The inference flows in one direction: **`map(array, fn)` → infer `T` from the array's element type → infer `U` from the callback's return type → return type is `U[]`.**
 
 This is the power of generics: you write one function, and the compiler figures out the specific types for every call site.
 

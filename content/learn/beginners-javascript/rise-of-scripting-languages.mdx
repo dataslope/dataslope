@@ -52,17 +52,18 @@ A **scripting language** has, traditionally, a few common traits:
 - **Good at gluing things together.** Strings, files, processes,
   network requests — the bread and butter of automation.
 
-```mermaid
-flowchart TD
-    subgraph CL["Compiled language (e.g. C)"]
-        A1[Edit source] --> A2[Compile]
-        A2 --> A3[Link]
-        A3 --> A4[Run program]
-    end
-    subgraph SL["Scripting language (e.g. JS)"]
-        B1[Edit source] --> B2[Run interpreter on source]
-    end
-```
+The difference shows up in how many steps stand between editing and
+running. A **compiled language** (e.g. C) makes you:
+
+1. Edit source.
+2. Compile.
+3. Link.
+4. Run the program.
+
+A **scripting language** (e.g. JS) collapses that to:
+
+1. Edit source.
+2. Run the interpreter on the source.
 
 That last bullet — *gluing things together* — is why scripting
 languages exploded. A scripting language is rarely the *centre* of a

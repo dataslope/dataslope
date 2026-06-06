@@ -31,13 +31,8 @@ A visualization is a *mapping* from data to visual properties.
 Numbers become positions. Categories become colors. Time becomes a
 horizontal axis. The map is called an **encoding**.
 
-```mermaid
-flowchart TD
-    D["Data<br/>(rows + columns)"] --> E["Encoding<br/>(rules)"]
-    E --> P["Picture<br/>(positions, colors, sizes)"]
-    P --> H["Human eye"]
-    H --> I["Insight"]
-```
+The chain runs: **data (rows + columns) → encoding (the rules) → a
+picture (positions, colors, sizes) → the human eye → insight.**
 
 The encoding is the *design decision*. There is no "neutral" or
 "default" encoding. Every chart you make is the result of choices

@@ -47,16 +47,11 @@ Notebooks are great for:
 - Anything that produces interesting plots you want to keep next
   to the code that made them.
 
-```mermaid
-flowchart LR
-    subgraph "Script"
-        S1[my_script.py] --> S2[Run top to bottom] --> S3[Outputs go to console / files]
-    end
-    subgraph "Notebook"
-        N1[analysis.ipynb] --> N2[Run cells interactively]
-        N2 --> N3[Output stays beside code]
-    end
-```
+- A **script** (`my_script.py`) runs top to bottom; output goes to
+  the console or to files.
+- A **notebook** (`analysis.ipynb`) runs cell by cell,
+  interactively, and keeps each output right beside the code that
+  produced it.
 
 The dominant notebook tool today is **Jupyter** (formerly IPython
 Notebook). Variants include JupyterLab, VS Code's notebook view,

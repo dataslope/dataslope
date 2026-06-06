@@ -24,18 +24,6 @@ let you see**. Every group of numbers has a full shape — where it clusters,
 how spread out it is, where the outliers sit. A categorical plot makes a
 choice about how much of that shape to draw versus boil away.
 
-```mermaid
-flowchart TD
-    CAT["catplot<br/>categorical x, usually numeric y"] --> RAW["Show every point"]
-    CAT --> SUM["Summarize the distribution"]
-    CAT --> EST["Show one estimate"]
-    CAT --> CNT["Count occurrences"]
-    RAW --> R1["strip, swarm"]
-    SUM --> S1["box, violin, boxen"]
-    EST --> E1["bar, point"]
-    CNT --> C1["count"]
-```
-
 | `kind` | What it draws | How much it reveals | Needs |
 | ------ | ------------- | ------------------- | ----- |
 | `"strip"` | Every point, with jitter | **All** observations | category + numeric |

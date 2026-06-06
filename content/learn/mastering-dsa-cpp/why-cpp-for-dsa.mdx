@@ -78,13 +78,10 @@ int main() {
 
 Many data structure tradeoffs are really memory-layout tradeoffs. A `std::vector<int>` stores integers contiguously, so walking through it usually benefits from CPU cache locality. A `std::list<int>` stores nodes separately, so traversal follows pointers from one allocation to the next.
 
-```mermaid
-flowchart LR
-    V["std::vector<int>"] --> C["contiguous memory"]
-    C --> F["fast iteration and random access"]
-    L["std::list<int>"] --> N["separate heap nodes"]
-    N --> P["cheap splicing, slower traversal"]
-```
+| Container | Memory layout | Consequence |
+| --- | --- | --- |
+| `std::vector<int>` | Contiguous memory | Fast iteration and random access |
+| `std::list<int>` | Separate heap nodes | Cheap splicing, slower traversal |
 
 That is why a vector can beat a list even when both have O(n) traversal: Big-O describes growth, but cache locality changes the constant factor dramatically.
 

@@ -52,15 +52,11 @@ at the middle element. If it matches, done. If your target is
 smaller, search the left half. Otherwise the right half. Each step
 eliminates *half* of what is left.
 
-```mermaid
-flowchart TB
-    A["search 17 in 2 5 8 11 17 23 31 42"]
-    A --> B["mid is 11<br/>17 > 11 → search right half"]
-    B --> C["search 17 in 17 23 31 42"]
-    C --> D["mid is 23<br/>17 < 23 → search left half"]
-    D --> E["search 17 in 17"]
-    E --> F[found!]
-```
+Searching for `17` in `[2, 5, 8, 11, 17, 23, 31, 42]`:
+
+1. Middle of the whole list is `11`. `17 > 11`, so search the right half: `[17, 23, 31, 42]`.
+2. Middle is `23`. `17 < 23`, so search the left half: `[17]`.
+3. Middle is `17`. Match — found it.
 
 A list of 1 million elements is fully searched in **20** comparisons
 (2^20 ≈ 1M). A list of 1 billion: about **30** comparisons.

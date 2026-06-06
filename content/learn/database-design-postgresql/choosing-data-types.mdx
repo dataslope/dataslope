@@ -61,17 +61,7 @@ all.
 ## Choosing common types
 
 You do not need every PostgreSQL type on day one. Start with the common
-modeling choices.
-
-```mermaid
-flowchart TB
-    V["What kind of value?"] --> Text["Words or codes<br/>TEXT or VARCHAR"]
-    V --> Whole["Whole number<br/>INTEGER or BIGINT"]
-    V --> Money["Exact decimal<br/>NUMERIC"]
-    V --> Bool["True or false<br/>BOOLEAN"]
-    V --> Day["Calendar date<br/>DATE"]
-    V --> Moment["Moment in time<br/>TIMESTAMP or TIMESTAMPTZ"]
-```
+modeling choices, matched to the kind of value you are storing.
 
 - Use `TEXT` for ordinary strings. `VARCHAR(n)` is useful when the
   length limit is a real business rule, not just habit.

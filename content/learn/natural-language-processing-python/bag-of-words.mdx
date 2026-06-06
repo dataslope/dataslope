@@ -20,14 +20,12 @@ just a vector of numbers, which is exactly what an algorithm can work with.
 Bag-of-words turns a whole collection of documents into a table of numbers in
 a fixed sequence of steps.
 
-```mermaid
-flowchart TB
-    D["Documents<br/>doc1, doc2, doc3"] --> P["Tokenize + clean<br/>each document"]
-    P --> V["Build the vocabulary<br/>(all distinct words across the corpus)"]
-    V --> M["Count each vocabulary word<br/>in each document"]
-    M --> X["Document-term matrix<br/>rows = documents, columns = words, cells = counts"]
-    X --> C["Feed the matrix to a classifier"]
-```
+1. **Documents** come in (`doc1`, `doc2`, `doc3`).
+2. **Tokenize and clean** each document.
+3. **Build the vocabulary** — all distinct words across the corpus.
+4. **Count** each vocabulary word in each document.
+5. **Document-term matrix** — rows = documents, columns = words, cells = counts.
+6. **Feed the matrix** to a classifier.
 
 The output is a **document-term matrix**: one row per document, one column per
 vocabulary word, and each cell holding how many times that word appeared in

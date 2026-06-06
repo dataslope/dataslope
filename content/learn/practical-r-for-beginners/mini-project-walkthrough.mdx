@@ -40,16 +40,8 @@ What we learn:
 - `Month` is numeric (5 through 9) but conceptually categorical.
 - `Temp` is in degrees Fahrenheit.
 
-```mermaid
-flowchart TD
-  load["Load airquality"] --> insp["Inspect: dim, head, str, summary"]
-  insp --> tidy["Tidy: NAs, types, factor for Month"]
-  tidy --> trans["Transform: add °C, monthly summaries"]
-  trans --> viz["Visualize: scatter, box, line"]
-  viz --> interp["Interpret"]
-  style load fill:#dcfce7
-  style interp fill:#bfdbfe
-```
+The rest of the walkthrough follows the standard arc:
+**Load → Inspect → Tidy → Transform → Visualize → Interpret.**
 
 ## Step 2 — Tidy: handle NAs and fix types
 

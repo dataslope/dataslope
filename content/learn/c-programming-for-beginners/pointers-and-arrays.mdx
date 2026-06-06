@@ -58,14 +58,13 @@ it adds the size of one element of the pointed-to type. So `p + 1`
 on an `int *` advances `4` bytes (on a typical system), landing on
 the next `int`.
 
-```mermaid
-flowchart LR
-    P0[p ] --> A0["a[0] = 10"]
-    P1["p+1"] --> A1["a[1] = 20"]
-    P2["p+2"] --> A2["a[2] = 30"]
-    P3["p+3"] --> A3["a[3] = 40"]
-    P4["p+4"] --> A4["a[4] = 50"]
-```
+| Expression | Points to     |
+| ---------- | ------------- |
+| `p`        | `a[0] = 10`   |
+| `p + 1`    | `a[1] = 20`   |
+| `p + 2`    | `a[2] = 30`   |
+| `p + 3`    | `a[3] = 40`   |
+| `p + 4`    | `a[4] = 50`   |
 
 This is why arrays and pointers fit so neatly together. Walking an
 array with a pointer is just incrementing the pointer.

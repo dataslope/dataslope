@@ -31,18 +31,10 @@ dashboards. Burn the distinction in now:
   It's the standard deviation of the *sampling distribution*. It **shrinks
   as `n` grows**, because bigger samples give steadier estimates.
 
-```mermaid
-flowchart TD
-    subgraph DATA["Standard deviation (SD)"]
-      D1["Spread of the DATA<br/>(how individual values vary)"]
-      D2["Property of the population.<br/>Does NOT shrink with more data."]
-    end
-    subgraph EST["Standard error (SE)"]
-      E1["Spread of the ESTIMATE<br/>(how x-bar varies sample to sample)"]
-      E2["= SD of the sampling distribution.<br/>SHRINKS as n grows: s / sqrt(n)."]
-    end
-    DATA -->|"divide by sqrt(n)"| EST
-```
+|  | Standard deviation (SD) | Standard error (SE) |
+| --- | --- | --- |
+| Spread of… | the **data** (how individual values vary) | the **estimate** (how x̄ varies sample to sample) |
+| Behavior | a property of the population; does **not** shrink with more data | the SD of the sampling distribution; **shrinks** as `n` grows, since `SE = s / √n` |
 
 The formula linking them is short and worth memorizing: for the sample
 mean,
@@ -231,12 +223,11 @@ only improves precision by about √10 ≈ 3.2x, and going
 further buys even less. Knowing this saves real money and time when you
 plan how much data to collect.
 
-```mermaid
-flowchart LR
-    A["Want 2x the precision<br/>(halve the SE)"] --> B["Need 4x the data"]
-    C["Want 3x the precision"] --> D["Need 9x the data"]
-    E["Want 10x the precision"] --> F["Need 100x the data"]
-```
+| Precision you want | Data you need |
+| --- | --- |
+| 2× (halve the SE) | 4× the data |
+| 3× | 9× the data |
+| 10× | 100× the data |
 
 <MultipleChoice
   markdown={`Your estimate of a mean has a standard error of 2.0 from a sample of \`n = 500\`. Your manager wants the SE down to 1.0. Roughly how large must the new sample be?

@@ -16,14 +16,13 @@ The abstract operations are small:
 | `top()` | Read the top item |
 | `empty()` | Check whether the stack has no items |
 
-```mermaid
-flowchart TD
-    A["push 10"] --> B["top: 10"]
-    B --> C["push 20"]
-    C --> D["top: 20"]
-    D --> E["pop"]
-    E --> F["top: 10"]
-```
+A short trace, where each operation acts on the top:
+
+| Operation | Stack top after |
+| --- | --- |
+| `push(10)` | 10 |
+| `push(20)` | 20 |
+| `pop()` | 10 |
 
 ## `std::stack<T>`
 

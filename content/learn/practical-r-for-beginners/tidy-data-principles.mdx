@@ -80,16 +80,17 @@ is messy:
 
 Almost any real-world messiness fits one of these.
 
-```mermaid
-flowchart TD
-  raw["Raw / messy data"] -->|"pivot_longer / pivot_wider"| reshape["Reshape"]
-  reshape -->|"separate / unite"| split["Split combined columns"]
-  split -->|"join / split into multiple tables"| sep["Separate observational units"]
-  sep --> tidy["Tidy data"]
-  tidy -->|"ggplot, dplyr, models"| insight["Insight"]
-  style tidy fill:#dcfce7
-  style insight fill:#bfdbfe
-```
+Getting from raw data to tidy data is a sequence of small moves,
+each with its own tool:
+
+| Move | Tool |
+| --- | --- |
+| Reshape between wide and long | `pivot_longer` / `pivot_wider` |
+| Split combined columns | `separate` / `unite` |
+| Separate observational units | `join` / split into multiple tables |
+
+Once the data is tidy, it flows straight into analysis — `ggplot`,
+`dplyr`, and models — and from there into insight.
 
 We'll meet the actual reshaping tools (`pivot_longer`,
 `pivot_wider`) on the "Reshaping Data" page later. For now, the

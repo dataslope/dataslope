@@ -7,17 +7,15 @@ Changing a schema is easy when no one uses it yet. It is harder after
 real rows, real queries, and real application code depend on it.
 
 A safe schema change treats the migration as a sequence of deliberate
-steps, not one dramatic rewrite.
+steps, not one dramatic rewrite:
 
-```mermaid
-flowchart TD
-    Need["New requirement"] --> Plan["Plan migration"]
-    Plan --> Add["Add compatible structure"]
-    Add --> Backfill["Backfill existing rows"]
-    Backfill --> Verify["Verify data matches rule"]
-    Verify --> Tighten["Tighten constraint"]
-    Tighten --> Cleanup["Remove old structure later"]
-```
+1. Start from the new requirement.
+2. Plan the migration.
+3. Add compatible structure.
+4. Backfill existing rows.
+5. Verify the data matches the new rule.
+6. Tighten the constraint.
+7. Remove the old structure later.
 
 ## Migrations are ordered changes
 

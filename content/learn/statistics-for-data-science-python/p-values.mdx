@@ -219,22 +219,17 @@ The null distribution shows what "pure noise" looks like, and pure noise average
 This is the heart of the page. Every item below is a misreading you will
 hear from smart people. Burn the corrections in.
 
-```mermaid
-flowchart TD
-  P["p-value = P(data this extreme or more | H0 true)"]
-  P --> N1["NOT P(H0 is true)"]
-  P --> N2["NOT P(result was 'due to chance')"]
-  P --> N3["NOT the probability you are wrong"]
-  P --> N4["NOT 1 minus P(H1)"]
-  P --> N5["NOT the effect size or its importance"]
-  P --> N6["NOT the probability the result replicates"]
-  N1 --> R1["It ASSUMES H0; it cannot output a probability about H0"]
-  N2 --> R2["It already assumes chance-only; it can't also measure it"]
-  N3 --> R3["Being wrong depends on whether H0 is actually true, which p never uses"]
-  N4 --> R4["It says nothing about how likely the alternative is"]
-  N5 --> R5["A tiny effect + huge sample gives a tiny p"]
-  N6 --> R6["Replication depends on power and the true effect, not on p"]
-```
+A p-value is `P(data this extreme or more | H0 true)` — and nothing else.
+Each misreading below, with why it fails:
+
+| A p-value is NOT… | Why |
+| --- | --- |
+| `P(H0 is true)` | It *assumes* H₀; it cannot output a probability about H₀. |
+| `P(result was "due to chance")` | It already assumes chance-only; it can't also measure it. |
+| the probability you are wrong | Being wrong depends on whether H₀ is actually true, which `p` never uses. |
+| `1 − P(H1)` | It says nothing about how likely the alternative is. |
+| the effect size or its importance | A tiny effect plus a huge sample gives a tiny `p`. |
+| the probability the result replicates | Replication depends on power and the true effect, not on `p`. |
 
 Let's take the four most damaging ones in turn.
 

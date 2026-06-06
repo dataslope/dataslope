@@ -18,28 +18,14 @@ conceptual unlock for Pandas.
 - The **cell** at row $r$, column $c$ is *that thing's value of
   that attribute*.
 
-```mermaid
-flowchart TB
-    subgraph "DataFrame: 4 employees × 3 attributes"
-        direction LR
-        H1[name]:::hdr
-        H2[department]:::hdr
-        H3[salary]:::hdr
-        R1[Aiko]
-        R2[Eng]
-        R3[120]
-        S1[Bilal]
-        S2[Sales]
-        S3[95]
-        T1[Chen]
-        T2[Eng]
-        T3[140]
-        U1[Diego]
-        U2[Ops]
-        U3[80]
-    end
-    classDef hdr fill:#dbeafe,stroke:#1d4ed8
-```
+A DataFrame of 4 employees (rows) × 3 attributes (columns):
+
+| name  | department | salary |
+| ----- | ---------- | ------ |
+| Aiko  | Eng        | 120    |
+| Bilal | Sales      | 95     |
+| Chen  | Eng        | 140    |
+| Diego | Ops        | 80     |
 
 When you read a Pandas tutorial and see `df.shape == (1470, 35)`,
 that means "1,470 things, each with 35 attributes." When you see

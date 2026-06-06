@@ -41,17 +41,14 @@ the model must change too.
 
 ## Common kinds of change
 
-Schema changes usually fall into a few patterns.
+Schema changes usually fall into a few patterns:
 
-```mermaid
-flowchart TD
-    Change["Schema change"] --> Attribute["New attribute"]
-    Change --> Entity["New entity"]
-    Change --> Relationship["New relationship"]
-    Change --> Split["Split a table"]
-    Change --> Merge["Merge tables"]
-    Change --> Tighten["Tighten constraints"]
-```
+- a new attribute
+- a new entity
+- a new relationship
+- splitting a table
+- merging tables
+- tightening constraints
 
 ### New attributes
 

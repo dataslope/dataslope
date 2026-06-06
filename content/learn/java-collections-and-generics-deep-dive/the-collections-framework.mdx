@@ -16,15 +16,13 @@ makes the JCF feel coherent even today, almost three decades later.
 
 ## The two big ideas
 
-```mermaid
-flowchart LR
-    subgraph Goals["Goals of the JCF"]
-        G1[Program to<br/>interfaces, not<br/>implementations]
-        G2[A small,<br/>uniform vocabulary<br/>of container shapes]
-        G3[High-quality<br/>default implementations<br/>for each interface]
-        G4["Algorithms<br/>(sort, shuffle, search)<br/>that work on any<br/>matching container"]
-    end
-```
+The JCF was built around four goals:
+
+- Program to **interfaces**, not implementations.
+- A small, uniform **vocabulary** of container shapes.
+- High-quality **default implementations** for each interface.
+- **Algorithms** (sort, shuffle, search) that work on any matching
+  container.
 
 That is it. From those four goals everything else follows: the
 interface hierarchy, the `Collections` static-utility class, the

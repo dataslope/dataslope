@@ -18,13 +18,7 @@ Every plot is made of two kinds of "ink":
 - **Non-data ink** — axes, gridlines, background, labels, legend
   styling. Controlled by the **theme**.
 
-```mermaid
-flowchart TD
-    P["A ggplot"] --> D["Data ink<br/>points, bars, lines<br/>geoms + scales"]
-    P --> N["Non-data ink<br/>background, grid, fonts,<br/>legend position<br/>THEME"]
-```
-
-The theme owns the entire right branch. You can hand the same data plot
+The theme owns all of the non-data ink. You can hand the same data plot
 to ten different themes and get ten different looks with identical
 meaning.
 

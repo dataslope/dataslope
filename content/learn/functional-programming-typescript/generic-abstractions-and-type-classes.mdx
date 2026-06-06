@@ -185,15 +185,12 @@ orderings algebraically.
 
 ## Type-class hierarchies (briefly)
 
-Some classes extend others. The classical hierarchy from FP looks
-like:
+Some classes extend others. The classical hierarchy from FP forms a
+few independent lineages:
 
-```mermaid
-flowchart TD
-    Functor --> Applicative --> Monad
-    Semigroup --> Monoid
-    Eq --> Ord
-```
+- `Functor` → `Applicative` → `Monad`
+- `Semigroup` → `Monoid`
+- `Eq` → `Ord`
 
 The arrows mean "extends" — every `Ord` instance is also an `Eq`
 (it can decide equality from "neither less nor greater"). Every

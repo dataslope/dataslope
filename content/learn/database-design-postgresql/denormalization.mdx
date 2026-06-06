@@ -14,17 +14,13 @@ shortcut around design; it is a trade-off you make with your eyes open.
 ## Normalize first
 
 Start with the clean design. Give each fact one home. Use keys and
-relationships to connect the facts.
+relationships to connect the facts. The normal forms build on each other:
 
-```mermaid
-flowchart LR
-    UNF["UNF<br/>mixed and repeated facts"] --> NF1["1NF<br/>atomic values"]
-    NF1 --> NF2["2NF<br/>whole key"]
-    NF2 --> NF3["3NF<br/>nothing but the key"]
-    NF3 --> Decision{"Need a deliberate<br/>read model?"}
-    Decision -->|"no"| Keep["Keep normalized design"]
-    Decision -->|"yes"| Denorm["Add controlled<br/>denormalized data"]
-```
+**UNF (mixed and repeated facts) → 1NF (atomic values) → 2NF (whole key) → 3NF (nothing but the key)**
+
+Only once you reach a clean, normalized design do you ask whether you
+need a deliberate read model. If not, keep the normalized design. If you
+do, add controlled denormalized data on top of it.
 
 A normalized design is easier to trust because updates happen in one
 place. If Ada changes her city, the `customers` row changes once. Every

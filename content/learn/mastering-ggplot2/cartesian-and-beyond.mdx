@@ -42,13 +42,9 @@ space** — they change values. Coordinates operate on the **final
 space** — they reshape where already-computed marks land, *after* the
 stats and scales have run.
 
-```mermaid
-flowchart LR
-    DATA["Data"] --> STAT["Stat<br/>(data space)"]
-    STAT --> SCALE["Scale<br/>(data space)"]
-    SCALE --> COORD["Coordinate system<br/>(arranges final space)"]
-    COORD --> DRAW["Rendered marks"]
-```
+The pipeline runs in this order: **Data → Stat → Scale** (all in data
+space) **→ Coordinate system** (arranges the final space) **→ rendered
+marks**.
 
 This ordering is exactly why `coord_cartesian(xlim = ...)` *zooms*
 rather than *filters*: the coordinate step happens last, after the

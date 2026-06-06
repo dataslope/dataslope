@@ -12,17 +12,12 @@ vocabulary. The goal is not to memorize a list but to develop a reflex:
 A reliable way to pick a geom is to count and classify the variables
 you want to show:
 
-```mermaid
-flowchart TD
-    Q1["How many variables?<br/>What types?"] --> A["1 continuous"]
-    Q1 --> B["1 categorical"]
-    Q1 --> C["2 continuous"]
-    Q1 --> D["1 categorical + 1 continuous"]
-    A --> A1["geom_histogram<br/>geom_density"]
-    B --> B1["geom_bar"]
-    C --> C1["geom_point<br/>geom_line"]
-    D --> D1["geom_boxplot<br/>geom_col<br/>geom_violin"]
-```
+| Variables | Reach for |
+| --- | --- |
+| 1 continuous | `geom_histogram`, `geom_density` |
+| 1 categorical | `geom_bar` |
+| 2 continuous | `geom_point`, `geom_line` |
+| 1 categorical + 1 continuous | `geom_boxplot`, `geom_col`, `geom_violin` |
 
 This is a starting point, not a law — but it resolves most "which geom
 do I use?" questions.

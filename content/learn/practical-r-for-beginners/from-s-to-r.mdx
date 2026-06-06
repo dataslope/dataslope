@@ -89,19 +89,16 @@ statisticians, and adopted in the statistics curriculum at one
 university after another through the 2000s. New PhDs entered
 industry already fluent in R, and brought it with them.
 
-```mermaid
-flowchart LR
-  Core[R Core: the language] --> CRAN[CRAN: package archive]
-  CRAN --> A[ggplot2: plotting]
-  CRAN --> B[dplyr: data wrangling]
-  CRAN --> C[caret: machine learning]
-  CRAN --> D[shiny: web apps]
-  CRAN --> E[lme4: mixed models]
-  CRAN --> F[Bioconductor: genomics]
-  CRAN --> G[...thousands more]
-  style Core fill:#a7f3d0,stroke:#047857
-  style CRAN fill:#bfdbfe,stroke:#1d4ed8
-```
+On top of **R Core** (the language itself) sits **CRAN**, and on
+top of CRAN sits everything else:
+
+- `ggplot2` — plotting
+- `dplyr` — data wrangling
+- `caret` — machine learning
+- `shiny` — web apps
+- `lme4` — mixed models
+- `Bioconductor` — genomics
+- ...thousands more
 
 By 2010, CRAN had over 2,000 packages. By 2020, over 16,000. Today
 there are more than 20,000. Whatever obscure statistical method you

@@ -49,14 +49,13 @@ instead put the grand total `650` on every row. **Ordering an aggregate
 window turns it from a total into a running total** — that is the single
 most important idea on this page.
 
-```mermaid
-flowchart LR
-    D1["Day 1: 100"] --> R1["100"]
-    D2["Day 2: 140"] --> R2["240"]
-    D3["Day 3: 90"] --> R3["330"]
-    D4["Day 4: 200"] --> R4["530"]
-    D5["Day 5: 120"] --> R5["650"]
-```
+| Day | Revenue | Running total |
+| --- | --- | --- |
+| 1 | 100 | 100 |
+| 2 | 140 | 240 |
+| 3 | 90 | 330 |
+| 4 | 200 | 530 |
+| 5 | 120 | 650 |
 
 ## Running totals per group
 

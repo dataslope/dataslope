@@ -46,11 +46,10 @@ That is the whole trick. Generics give you compile-time guarantees;
 at runtime, they look like the old `Object`-based code, with the
 casts written for you.
 
-```mermaid
-flowchart LR
-    A[Source<br/>List String] --> B[javac<br/>type-checks] --> C[Bytecode<br/>List of Object]
-    A2[Source<br/>String s = list.get 0] --> B2[javac<br/>inserts cast] --> C2[Bytecode<br/>String s = String list.get 0]
-```
+| Source | What `javac` does | Bytecode |
+| --- | --- | --- |
+| `List<String>` | type-checks the element type | `List` (of `Object`) |
+| `String s = list.get(0)` | inserts the cast | `String s = (String) list.get(0)` |
 
 ## Consequence 1: you cannot ask for the type parameter at runtime
 

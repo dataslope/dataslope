@@ -131,14 +131,6 @@ When you call `fig.show()`, Plotly Express does the following:
 3. Plotly.js renders the chart as interactive SVG or WebGL,
    wrapped in HTML.
 
-```mermaid
-flowchart TD
-    Code["Python code<br/>px.bar(...)"] --> Fig["Figure object<br/>(JSON spec)"]
-    Fig --> Show["fig.show()"]
-    Show --> JS["Plotly.js<br/>in browser"]
-    JS --> Render["Interactive chart"]
-```
-
 You don't normally need to think about this pipeline. But it
 explains why Plotly charts are interactive *for free*: the chart
 *is* a small JavaScript application.

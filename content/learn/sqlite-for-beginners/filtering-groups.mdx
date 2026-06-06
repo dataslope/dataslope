@@ -141,15 +141,6 @@ Read it in stages:
 3. `AVG(salary)` calculates each group's average.
 4. `HAVING AVG(salary) > 80000` keeps only groups with a high average.
 
-```mermaid
-flowchart LR
-    A["All rows"] --> B["WHERE<br/>drop interns"]
-    B --> C["GROUP BY dept<br/>make groups"]
-    C --> D["AVG(salary)<br/>compute summaries"]
-    D --> E["HAVING<br/>keep avg over 80000"]
-    E --> F["Final result"]
-```
-
 ## Filtering by totals
 
 `HAVING` is also common with `SUM`. This query keeps only products whose total sales are at least `30`.
@@ -240,15 +231,7 @@ ORDER BY sort_columns;
 
 The logical flow is:
 
-```mermaid
-flowchart TB
-    F["FROM<br/>choose table"] --> W["WHERE<br/>filter rows"]
-    W --> G["GROUP BY<br/>build groups"]
-    G --> A["Aggregates<br/>COUNT, SUM, AVG"]
-    A --> H["HAVING<br/>filter groups"]
-    H --> S["SELECT<br/>choose output"]
-    S --> O["ORDER BY<br/>sort result"]
-```
+**`FROM` (choose table) → `WHERE` (filter rows) → `GROUP BY` (build groups) → aggregates like `COUNT`, `SUM`, `AVG` → `HAVING` (filter groups) → `SELECT` (choose output) → `ORDER BY` (sort result)**
 
 The most important part for this page is:
 

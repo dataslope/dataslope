@@ -21,19 +21,6 @@ Every test has an unknowable **truth** (H₀ is really true, or it's
 really false) and a **decision** you make (reject H₀, or fail to
 reject). Cross them and you get four outcomes — two right, two wrong.
 
-```mermaid
-flowchart TD
-  subgraph M["Truth (unknown) x Your decision"]
-    direction TB
-    A["H0 TRUE + you FAIL TO REJECT<br/>= correct (no false alarm)"]
-    B["H0 TRUE + you REJECT<br/>= TYPE I ERROR (false positive)<br/>rate = alpha"]
-    C["H0 FALSE + you FAIL TO REJECT<br/>= TYPE II ERROR (false negative)<br/>rate = beta"]
-    D["H0 FALSE + you REJECT<br/>= correct DETECTION<br/>rate = power = 1 - beta"]
-  end
-```
-
-Read it as a table:
-
 | | **You fail to reject H₀** | **You reject H₀** |
 | --- | --- | --- |
 | **H₀ is true** | Correct (specificity) | **Type I error** — false positive, rate α |

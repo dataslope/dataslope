@@ -155,14 +155,12 @@ memory:
 - **Big-endian** (older PowerPC, network byte order): the *most*
   significant byte first — `12 34 56 78`.
 
-```mermaid
-flowchart LR
-    subgraph LE["Little-endian (x86, WASI)"]
-        A0["addr 0<br/>0x78"] --> A1["addr 1<br/>0x56"] --> A2["addr 2<br/>0x34"] --> A3["addr 3<br/>0x12"]
-    end
-    subgraph BE["Big-endian"]
-        B0["addr 0<br/>0x12"] --> B1["addr 1<br/>0x34"] --> B2["addr 2<br/>0x56"] --> B3["addr 3<br/>0x78"]
-    end
+Laid out byte by byte at increasing addresses:
+
+```text
+                addr 0   addr 1   addr 2   addr 3
+Little-endian:   0x78     0x56     0x34     0x12     (x86, WASI)
+Big-endian:      0x12     0x34     0x56     0x78
 ```
 
 You can *see* the byte order at runtime by reading the bytes of an

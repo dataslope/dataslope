@@ -14,18 +14,14 @@ This is one of the most clarifying ideas in all of SQL.
 The order you type is for human readability. The order the database
 *reasons* about the query is different:
 
-```mermaid
-flowchart TB
-    F["1. FROM / JOIN<br/>gather and combine tables"]
-    W["2. WHERE<br/>filter individual rows"]
-    G["3. GROUP BY<br/>form groups"]
-    H["4. HAVING<br/>filter groups"]
-    S["5. SELECT<br/>choose columns, compute aliases"]
-    D["6. DISTINCT<br/>remove duplicates"]
-    O["7. ORDER BY<br/>sort"]
-    L["8. LIMIT<br/>keep the first N"]
-    F --> W --> G --> H --> S --> D --> O --> L
-```
+1. **`FROM` / `JOIN`** — gather and combine tables.
+2. **`WHERE`** — filter individual rows.
+3. **`GROUP BY`** — form groups.
+4. **`HAVING`** — filter groups.
+5. **`SELECT`** — choose columns, compute aliases.
+6. **`DISTINCT`** — remove duplicates.
+7. **`ORDER BY`** — sort.
+8. **`LIMIT`** — keep the first N.
 
 Read the numbers: `FROM` is first, `SELECT` is near the **end**, and
 `LIMIT` is last. The clause you *write* first (`SELECT`) is among the

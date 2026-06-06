@@ -29,13 +29,10 @@ Seaborn does the grouping, the aggregation, the color mapping, the legend,
 and sensible defaults — so the code you write looks like the *question you
 are asking*.
 
-```mermaid
-flowchart LR
-    A["Tidy DataFrame"] --> B["Describe the chart<br/>(x, y, hue, col, ...)"]
-    B --> C["Seaborn maps columns<br/>to visual properties"]
-    C --> D["Statistical summary<br/>(counts, means, density, CI)"]
-    D --> E["A figure that answers<br/>your question"]
-```
+The flow is always the same: **a tidy DataFrame → describe the chart (`x`,
+`y`, `hue`, `col`, ...) → Seaborn maps columns to visual properties →
+a statistical summary (counts, means, density, CI) → a figure that answers
+your question.**
 
 This is the mental shift the course is built around: **you describe
 *what* you want to see; Seaborn figures out *how* to draw it.**

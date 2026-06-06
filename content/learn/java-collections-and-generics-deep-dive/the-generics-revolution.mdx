@@ -59,16 +59,11 @@ a new *language* feature with two distinct ideas:
    `List<String>`, the *compile* fails — before the program even
    runs.
 
-```mermaid
-flowchart LR
-    A[List names<br/>= new ArrayList<br/><br/>Java 1.4]
-      --> B[List of Object<br/>compile-time:<br/>no type checks]
-    B --> C[Runtime cast<br/>+ ClassCastException]
-
-    D[List String names<br/>= new ArrayList String<br/><br/>Java 5+]
-      --> E[List of String<br/>compile-time:<br/>type checked]
-    E --> F[No cast in source<br/>compiler inserts<br/>and proves safe]
-```
+|  | Pre-generics (Java 1.4) | Generics (Java 5+) |
+| --- | --- | --- |
+| **Declaration** | `List names = new ArrayList()` | `List<String> names = new ArrayList<>()` |
+| **Compile time** | holds `Object`; no type checks | element type checked |
+| **Runtime** | manual cast, risking `ClassCastException` | no cast in source — the compiler inserts one and proves it safe |
 
 That is the entire story. The JCF you already know does not change
 shape — the *types* on every method now carry the element type, so

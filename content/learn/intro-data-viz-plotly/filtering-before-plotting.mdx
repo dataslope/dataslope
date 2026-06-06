@@ -22,13 +22,9 @@ Most analytic questions are about a **subset** of the data:
 If you skip the filter, the chart drowns in noise. Worse, the
 chart may *technically* be correct but answer the wrong question.
 
-```mermaid
-flowchart TD
-    R[Raw data<br/>2M rows] --> F[Filter to<br/>relevant slice]
-    F --> A[Aggregate if needed]
-    A --> P[Plot]
-    P --> RD[Read]
-```
+The pre-chart pipeline is almost always the same: **raw data (say, 2M
+rows) → filter to the relevant slice → aggregate if needed → plot →
+read.**
 
 ## The big four operations
 

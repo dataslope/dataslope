@@ -106,30 +106,17 @@ For a beginner, three regions are worth knowing:
 - **Method area / metaspace.** Holds loaded classes themselves —
   their fields, methods, bytecode, constants.
 
-```mermaid
-flowchart TB
-    subgraph Memory[JVM Memory]
-        subgraph S[Stack per thread]
-            F3["frame: add(a=2, b=3)"]
-            F2["frame: main(args)"]
-            F1[main thread bottom]
-            F1 --> F2 --> F3
-        end
-        subgraph H[Heap shared]
-            O1[Account #1<br/>balance=500]
-            O2[Account #2<br/>balance=250]
-            O3[String 'Ada']
-        end
-        subgraph M[Method Area]
-            C1[class Account]
-            C2[class String]
-            C3[class Main]
-        end
-    end
-```
+A snapshot of what each region holds while `main` is calling `add`:
+
+- **Stack** (per thread) — a pile of frames, newest on top:
+  `main thread bottom` → `frame: main(args)` → `frame: add(a=2, b=3)`.
+- **Heap** (shared) — the live objects: `Account #1 (balance=500)`,
+  `Account #2 (balance=250)`, `String 'Ada'`.
+- **Method area** — the loaded classes themselves: `class Account`,
+  `class String`, `class Main`.
 
 We dedicate the next page entirely to stack vs heap — for now, the
-shape is what matters.
+three regions are what matter.
 
 ## Garbage collection, intuitively
 

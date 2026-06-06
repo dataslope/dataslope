@@ -8,19 +8,9 @@ slowly. Everything after this is a deep dive into one of these
 components.
 
 The Grammar of Graphics says that **every** chart is assembled from a
-small set of components. ggplot2 organizes them like this:
+small set of components. ggplot2 stacks them in a fixed order:
 
-```mermaid
-flowchart TD
-    D["1 - Data<br/>the table of values"] --> M["2 - Mappings<br/>columns to aesthetics"]
-    M --> G["3 - Geometries<br/>the marks drawn"]
-    G --> S["4 - Statistics<br/>transform before drawing"]
-    S --> SC["5 - Scales<br/>data values to visual values"]
-    SC --> C["6 - Coordinates<br/>the space marks live in"]
-    C --> F["7 - Facets<br/>split into small panels"]
-    F --> T["Theme<br/>non-data styling"]
-    T --> OUT["Rendered plot"]
-```
+**Data → Mappings → Geometries → Statistics → Scales → Coordinates → Facets → Theme → Rendered plot**
 
 Let us meet each one with a single sentence and a concrete example
 using the built-in `mpg` data set (fuel-economy records for 234 cars).

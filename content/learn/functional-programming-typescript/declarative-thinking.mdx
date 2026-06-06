@@ -99,16 +99,14 @@ sort.* There's no index, no mutation, no `seen` set, no `for` loop.
 
 ## What "declarative" actually means
 
-```mermaid
-flowchart LR
-    subgraph Imperative
-      A1["loop variables"] --> A2["mutate accumulators"] --> A3["control flow"] --> A4["result"]
-    end
-    subgraph Declarative
-      B1["data"] --> B2["transformations"] --> B3["data"]
-    end
-    style B2 fill:#e6f7e6
-```
+The two styles build a result along very different paths:
+
+| Imperative | Declarative |
+| --- | --- |
+| loop variables | data |
+| mutate accumulators | transformations |
+| control flow | data |
+| result | |
 
 Declarative code:
 

@@ -11,20 +11,12 @@ understanding, and it is the part of NLP that does not go out of date.
 
 ## What you can now do
 
-Look back at the journey. Each stage is something you can now reason about, not
-just run.
+Look back at the journey — the whole pipeline in one line:
 
-```mermaid
-flowchart LR
-    A["Raw text"] --> B["Tokenize<br/>(words, sentences)"]
-    B --> C["Normalize<br/>(case, punctuation)"]
-    C --> D["Filter / reduce<br/>(stopwords, stem, lemmatize)"]
-    D --> E["Analyze<br/>(frequencies, POS, n-grams)"]
-    E --> F["Features<br/>(bag-of-words)"]
-    F --> G["Decision<br/>(classify)"]
-```
+**Raw text → Tokenize → Normalize → Filter / reduce → Analyze → Features → Decision**
 
-Concretely, you can now:
+Each stage is something you can now reason about, not just run. Concretely, you
+can now:
 
 - Explain **why** raw text is hard — ambiguity and missing structure — and what
   a pipeline is for.

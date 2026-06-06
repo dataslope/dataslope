@@ -56,12 +56,11 @@ what you can *do* with the values:
 - You can compare and subtract `DATE`s to get a number of days.
 - You can filter `BOOLEAN` columns directly (`WHERE is_active`).
 
-```mermaid
-flowchart TB
-    NUM["Numbers<br/>(INTEGER, NUMERIC)"] --> M1["add, subtract,<br/>average, sum"]
-    TXT["Text (TEXT)"] --> M2["join, search,<br/>change case"]
-    DT["Dates (DATE,<br/>TIMESTAMP)"] --> M3["compare, find<br/>differences in days"]
-```
+| Type | Natural operations |
+| --- | --- |
+| Numbers (`INTEGER`, `NUMERIC`) | add, subtract, average, sum |
+| Text (`TEXT`) | join, search, change case |
+| Dates (`DATE`, `TIMESTAMP`) | compare, find differences in days |
 
 Choosing the right type up front means the natural operations are
 available and the nonsensical ones (like multiplying two names) are

@@ -141,17 +141,6 @@ Within its address space, your program organises memory into a few
 distinct regions. You will hear about these for the rest of the
 course, so it helps to meet them now:
 
-```mermaid
-flowchart TB
-    subgraph "Program address space"
-        T["Text / code<br/>the compiled instructions"]
-        D["Data<br/>global and static variables"]
-        H["Heap<br/>grows upward as you<br/>allocate dynamically"]
-        Sp[ ]
-        S["Stack<br/>grows downward<br/>function call frames"]
-    end
-```
-
 - **Text / code** — the actual machine instructions of your program.
   Usually read-only.
 - **Data** — global variables, string literals, and other things that

@@ -123,18 +123,19 @@ mathematicians doing arithmetic in parallel. NASA's early space
 programs ran this way well into the 1960s, as immortalized in the
 book and film *Hidden Figures*.
 
-```mermaid
-flowchart TD
-  A[Question] --> B[Design experiment]
-  B --> C[Collect data on paper forms]
-  C --> D[Transcribe into worksheet]
-  D --> E[Hand-compute statistics]
-  E --> F[Look up p-values in printed tables]
-  F --> G[Write up results]
-```
+A typical study ran top to bottom through these stages:
+
+1. Pose the question.
+2. Design the experiment.
+3. Collect data on paper forms.
+4. Transcribe it into a worksheet.
+5. Hand-compute the statistics.
+6. Look up p-values in printed tables.
+7. Write up the results.
 
 That whole pipeline — every step — was manual. If you found a
-transcription error at step E, you might have to redo hours of work.
+transcription error partway through, you might have to redo hours
+of work.
 
 ## A taste of "manual statistics" in R
 

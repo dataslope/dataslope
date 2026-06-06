@@ -35,31 +35,19 @@ to the answer in the first slot of `y`. If that correspondence ever breaks,
 your model learns nonsense — so we always split `X` and `y` *together*, never
 separately.
 
-```mermaid
-flowchart LR
-    subgraph DATA["One labeled dataset"]
-        direction LR
-        subgraph XMAT["X  -  feature matrix"]
-            direction TB
-            X1["row 1: features of example 1"]
-            X2["row 2: features of example 2"]
-            X3["row 3: features of example 3"]
-        end
-        subgraph YVEC["y  -  target"]
-            direction TB
-            Y1["answer 1"]
-            Y2["answer 2"]
-            Y3["answer 3"]
-        end
-    end
-    X1 -. "same example" .-> Y1
-    X2 -. "same example" .-> Y2
-    X3 -. "same example" .-> Y3
-```
+In one labeled dataset, the rows of the feature matrix `X` line up one-for-one
+with the entries of the target `y`:
 
-Read the diagram across, not down: each row of `X` lines up with one entry of
-`y`. Columns of `X` are features; the single column `y` is what we predict.
-Hold this picture in mind and the abstract letters become concrete.
+| `X` — feature matrix (one row per example) | `y` — target |
+| --- | --- |
+| row 1: features of example 1 | answer 1 |
+| row 2: features of example 2 | answer 2 |
+| row 3: features of example 3 | answer 3 |
+
+Read the table across, not down: each row of `X` lines up with one entry of
+`y` — they describe the same example. Columns of `X` are features; the single
+column `y` is what we predict. Hold this picture in mind and the abstract
+letters become concrete.
 
 <Callout type="info" title="Why these exact letters?">
 The convention comes from the math: a model is a function `y = f(X)`, just

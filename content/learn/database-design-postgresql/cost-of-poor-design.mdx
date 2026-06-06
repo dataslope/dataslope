@@ -22,15 +22,15 @@ flat table. The first report works because there are only three rows.
 Then customers change emails, product names change, and new features
 need order history by product.
 
-```mermaid
-flowchart LR
-    A["Day 1:<br/>one flat table"] --> B["Feature works"]
-    B --> C["More rows arrive"]
-    C --> D["Repeated facts drift"]
-    D --> E["Bug fixes and cleanup"]
-    E --> F["Slower feature work"]
-    F --> G["Design debt compounds"]
-```
+The shortcut follows a predictable arc:
+
+1. Day 1: everything lives in one flat table.
+2. The first feature works.
+3. More rows arrive.
+4. Repeated facts start to drift apart.
+5. Bug fixes and cleanup scripts pile up.
+6. Feature work slows down.
+7. Design debt compounds.
 
 The schema did not suddenly become worse. The system simply grew large
 enough for the original shortcuts to matter.
@@ -211,15 +211,17 @@ They may need cleanup before the feature can even begin.
 A better design stores products once and order items point to them.
 Then the feature is mostly a query.
 
-```mermaid
-flowchart LR
-    A["New feature request"] --> B{"Schema has clear entities?"}
-    B -->|"yes"| C["Write focused query"]
-    B -->|"no"| D["Clean duplicates"]
-    D --> E["Patch application code"]
-    E --> F["Migrate old rows"]
-    F --> G["Then write query"]
-```
+The same request lands very differently depending on the schema. When
+the schema has clear entities:
+
+1. Write a focused query.
+
+When it does not:
+
+1. Clean up the duplicate values.
+2. Patch the application code that produced them.
+3. Migrate the old rows.
+4. Only then write the query.
 
 The difference is not developer talent. It is whether the schema has
 already answered the modeling questions the feature depends on.

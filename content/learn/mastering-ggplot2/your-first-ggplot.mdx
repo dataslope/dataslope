@@ -9,15 +9,7 @@ any basic ggplot as an English sentence.
 
 ## The skeleton
 
-Almost every ggplot follows the same shape:
-
-```mermaid
-flowchart LR
-    A["ggplot(data, aes(...))"] --> B["+ geom_something()"]
-    B --> C["+ optional<br/>scales / facets /<br/>theme"]
-```
-
-Three pieces:
+Almost every ggplot follows the same shape — three pieces:
 
 1. `ggplot(data, aes(...))` — name the **data** and the **mappings**.
 2. `+ geom_*()` — add at least one **geometry**.

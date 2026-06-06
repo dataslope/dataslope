@@ -189,17 +189,18 @@ misspellings, decide whether `notebook` and `notebooks` match, and hope
 old notes use the same pattern. The feature is no longer just a query.
 It is data cleanup, parsing logic, and risk.
 
-```mermaid
-flowchart LR
-    A["Clean schema"] --> B["New question"]
-    B --> C["Small join"]
+With a clean schema, a new question is short:
 
-    D["Messy schema"] --> E["New question"]
-    E --> F["Parse text"]
-    F --> G["Clean old values"]
-    G --> H["Patch edge cases"]
-    H --> I["Maybe answer"]
-```
+1. New question arrives.
+2. Write a small join.
+
+With a messy schema, the same question turns into a project:
+
+1. New question arrives.
+2. Parse the free text.
+3. Clean up old values.
+4. Patch the edge cases.
+5. Maybe get an answer.
 
 Good schema design does not remove all application work. It makes the
 work about the feature instead of about recovering meaning from messy

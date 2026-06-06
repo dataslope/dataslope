@@ -7,31 +7,20 @@ The right chart depends on *the question you're answering*.
 This page is a practical decision flow plus a tour of common
 charts and their failure modes.
 
-## The decision flow
+## The decision guide
 
-```mermaid
-flowchart TB
-  Q["What do I want<br/>to show?"]
-  Q --> D1{"Distribution<br/>of one variable?"}
-  D1 -- "Numeric" --> H["Histogram<br/>or box plot"]
-  D1 -- "Categorical" --> B1["Bar chart of counts"]
+Start from the question you want to answer, then read across:
 
-  Q --> D2{"Comparing categories<br/>by a numeric metric?"}
-  D2 --> B2["Bar chart<br/>(sorted)"]
-
-  Q --> D3{"Relationship between<br/>two numerics?"}
-  D3 --> S["Scatter plot"]
-  D3 -- "+ a third numeric" --> SS["Scatter + color or size"]
-
-  Q --> D4{"Change over time?"}
-  D4 --> L["Line chart"]
-
-  Q --> D5{"Composition<br/>(parts of whole)?"}
-  D5 --> ST["Stacked bar<br/>(avoid pies)"]
-
-  Q --> D6{"Many small charts<br/>by category?"}
-  D6 --> FA["Facet / small multiples"]
-```
+| What do you want to show? | Reach for |
+| --- | --- |
+| Distribution of one **numeric** variable | Histogram or box plot |
+| Distribution of one **categorical** variable | Bar chart of counts |
+| Comparing categories by a numeric metric | Sorted bar chart |
+| Relationship between two numerics | Scatter plot |
+| …plus a third numeric | Scatter + color or size |
+| Change over time | Line chart |
+| Composition (parts of a whole) | Stacked bar (avoid pies) |
+| Many small charts by category | Facets / small multiples |
 
 Print it. Reference it. Internalize it.
 
@@ -103,14 +92,13 @@ better.
 
 ## Bad choices and their consequences
 
-```mermaid
-flowchart LR
-  X1["Pie chart with 12 slices"] --> Y1["Eye cannot rank<br/>angles accurately"]
-  X2["3D bar chart"] --> Y2["Perspective distorts<br/>true heights"]
-  X3["Line on categorical axis"] --> Y3["Suggests false trend<br/>between unordered items"]
-  X4["Truncated y-axis"] --> Y4["Tiny changes<br/>look enormous"]
-  X5["Rainbow color scale"] --> Y5["Non-uniform perception<br/>creates false features"]
-```
+| Bad choice | Why it misleads |
+| --- | --- |
+| Pie chart with 12 slices | The eye can't rank angles accurately |
+| 3D bar chart | Perspective distorts true heights |
+| Line on a categorical axis | Suggests a false trend between unordered items |
+| Truncated y-axis | Tiny changes look enormous |
+| Rainbow color scale | Non-uniform perception creates false features |
 
 ## A practical anti-checklist
 

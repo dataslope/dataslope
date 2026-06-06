@@ -20,16 +20,15 @@ step does to your data and matching it to what your task needs.
 Picture the steps as a menu of optional transformations. Only tokenization is
 nearly mandatory; everything after it is a decision.
 
-```mermaid
-flowchart TD
-    T["Tokenize<br/>(almost always)"] --> C1{"Lowercase?"}
-    C1 --> C2{"Remove stopwords?"}
-    C2 --> C3{"Stem or lemmatize?"}
-    C3 --> C4{"Add n-grams?"}
-    C4 --> A["Analysis"]
-```
+You almost always **tokenize** first. After that, every step is a question
+with no default answer:
 
-Each diamond is a question with no default answer. To answer it, apply a
+- Lowercase?
+- Remove stopwords?
+- Stem or lemmatize?
+- Add n-grams?
+
+Answer all four and you arrive at **analysis**. To answer each one, apply a
 single guiding principle.
 
 <Callout type="info" title="The one question to ask at every step">

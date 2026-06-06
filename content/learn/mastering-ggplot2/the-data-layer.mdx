@@ -37,11 +37,9 @@ ggplot2 works best with **tidy** data, where:
 This matters because **mappings refer to columns**. If the variable
 you want to put on the x-axis is not a column, you cannot map it.
 
-```mermaid
-flowchart LR
-    W["Wide / messy<br/>year columns: 2019, 2020, 2021"] -->|reshape| T["Tidy / long<br/>columns: year, value"]
-    T --> P["Now 'year' is a column<br/>you can map to x"]
-```
+Reshaping wide, messy data (separate `2019`, `2020`, `2021` columns)
+into tidy, long data (a `year` column and a `value` column) makes `year`
+a column you can map to x.
 
 ### A concrete reshaping example
 

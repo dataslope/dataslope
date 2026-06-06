@@ -39,22 +39,6 @@ groups" means bar, box, or violin — depending on how much of the
 distribution you want to show. The point is to let the *question* pick the
 chart, not habit or whichever function you remember first.
 
-The same mapping reads naturally as a decision flow — start from the
-question, and the chart family falls out:
-
-```mermaid
-flowchart TD
-    START{"What is your question?"}
-    START -->|"How are two numbers related?"| REL["Scatter / line<br/>relplot"]
-    START -->|"What does one variable look like?"| DIST["Histogram / KDE / ECDF<br/>displot"]
-    START -->|"Compare a number across categories?"| CAT["Bar / box / violin<br/>catplot"]
-    START -->|"How many in each category?"| CNT["Count plot<br/>catplot kind=count"]
-    START -->|"All pairwise relationships?"| PAIR["Pair plot<br/>pairplot"]
-    START -->|"How do variables correlate?"| HEAT["Heatmap of a<br/>correlation matrix"]
-```
-
-The point is to let the *question* pick the chart, not the other way around.
-
 ## Cut the clutter
 
 Once the chart type is right, the most reliable way to improve an

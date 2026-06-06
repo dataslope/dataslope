@@ -114,13 +114,14 @@ ORDER BY
   o.id;`}
 />
 
-```mermaid
-flowchart LR
-    P1["101 with Ada<br/>1 = 1"] -->|"keep"| K1["Ada<br/>101<br/>42"]
-    P2["101 with Grace<br/>1 = 2"] -->|"discard"| X1["not a match"]
-    P3["102 with Ada<br/>2 = 1"] -->|"discard"| X2["not a match"]
-    P4["102 with Grace<br/>2 = 2"] -->|"keep"| K2["Grace<br/>102<br/>99"]
-```
+Each pairing is tested against `o.customer_id = c.id`, and only the matches survive:
+
+| Pairing          | Test    | Outcome | Result row          |
+| ---------------- | ------- | ------- | ------------------- |
+| order 101 + Ada  | `1 = 1` | keep    | Ada, 101, 42        |
+| order 101 + Grace | `1 = 2` | discard | —                   |
+| order 102 + Ada  | `2 = 1` | discard | —                   |
+| order 102 + Grace | `2 = 2` | keep    | Grace, 102, 99      |
 
 <MultipleChoice
   markdown={`What is the job of the \`ON\` clause in a join?

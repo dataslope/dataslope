@@ -122,16 +122,6 @@ same answer: no.
 PostgreSQL gives you several common kinds of constraints. Each protects
 a different part of the design.
 
-```mermaid
-flowchart TB
-    C["Constraint family"] --> NN["NOT NULL<br/>value required"]
-    C --> D["DEFAULT<br/>fill missing value"]
-    C --> U["UNIQUE<br/>no duplicates"]
-    C --> CH["CHECK<br/>domain rule"]
-    C --> PK["PRIMARY KEY<br/>row identity"]
-    C --> FK["FOREIGN KEY<br/>valid reference"]
-```
-
 - **NOT NULL** means a column must have a value.
 - **DEFAULT** supplies a value when the insert does not provide one.
 - **UNIQUE** prevents duplicate values such as repeated usernames.

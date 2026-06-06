@@ -176,14 +176,12 @@ profiler proves it matters.**
 
 ## A small map of "mutability levels"
 
-```mermaid
-flowchart TB
-    A[Most immutable] --> B["record / record struct (with init properties)"]
-    B --> C["class with all init/readonly + ImmutableList"]
-    C --> D["class with readonly fields, but holds mutable List"]
-    D --> E[Mutable class]
-    E --> F[Most mutable]
-```
+From most immutable to most mutable:
+
+1. `record` / `record struct` (with `init` properties)
+2. `class` with all `init`/`readonly` + `ImmutableList`
+3. `class` with `readonly` fields, but holds a mutable `List`
+4. Mutable `class`
 
 The closer to the top, the easier it is to reason about. A `record`
 that contains a mutable `List<int>` is *not really* immutable — you

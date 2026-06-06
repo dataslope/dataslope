@@ -24,10 +24,8 @@ algorithm's *time complexity*.
 | O(n²) | "n squared" | Doubling n quadruples the work. Fine for n=1000, painful for n=100,000. |
 | O(2ⁿ) | "exponential" | Adding one input element doubles the time. Only tractable for tiny n. |
 
-```mermaid
-flowchart LR
-    A[O 1 ] --> B[O log n ] --> C[O n ] --> D[O n log n ] --> E[O n squared ] --> F[O 2 to the n ]
-```
+The rows are ordered from cheapest to most expensive: each step down
+the table grows faster than the one above it.
 
 You don't need to be a theorist. Just learn to recognize the
 shape: nested loops over the same data are usually quadratic; a

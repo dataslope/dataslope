@@ -61,24 +61,17 @@ prerequisite for filling them honestly.
 Once gaps are explicit `NaN`s, you choose how to fill. The three workhorses
 encode three different beliefs about the unseen interval:
 
-```mermaid
-flowchart TB
-    subgraph FFILL["Forward-fill: carry the LAST known value forward"]
-        direction LR
-        F1["10"] --> F2["10 (copied)"] --> F3["10 (copied)"] --> F4["40"]
-    end
-    subgraph BFILL["Back-fill: pull the NEXT known value backward (uses the future!)"]
-        direction LR
-        B1["10"] --> B2["40 (copied)"] --> B3["40 (copied)"] --> B4["40"]
-    end
-    subgraph INTERP["Linear interpolation: glide in a straight line between knowns"]
-        direction LR
-        I1["10"] --> I2["20 (computed)"] --> I3["30 (computed)"] --> I4["40"]
-    end
-```
+Take the same gap — two missing points between a known `10` and a known
+`40` — and watch each method fill the two interior slots differently
+(filled values in **bold**):
 
-The same gap — two missing points between a 10 and a 40 — gets three
-different answers. Let's compute exactly that:
+| Method | known | gap | gap | known |
+| --- | --- | --- | --- | --- |
+| **Forward-fill** — carry the LAST known value forward | 10 | **10** | **10** | 40 |
+| **Back-fill** — pull the NEXT known value backward (uses the future!) | 10 | **40** | **40** | 40 |
+| **Linear interpolation** — glide in a straight line between knowns | 10 | **20** | **30** | 40 |
+
+The same gap gets three different answers. Let's compute exactly that:
 
 <CodeBlock
   adapter="python"

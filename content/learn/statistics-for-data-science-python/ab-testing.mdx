@@ -16,14 +16,9 @@ collect a single row, **analyze** it once it's done, and **decide**
 whether to ship — then catalog the **pitfalls** that quietly invalidate
 otherwise-fine tests.
 
-```mermaid
-flowchart LR
-  A["1. Hypothesis +<br/>primary metric"] --> B["2. Randomize<br/>users to A / B"]
-  B --> C["3. Pick sample size<br/>(power) IN ADVANCE"]
-  C --> D["4. Run to plan<br/>(no peeking)"]
-  D --> E["5. Analyze:<br/>lift, CI, effect size, p"]
-  E --> F["6. Decide: ship?<br/>(significance AND size)"]
-```
+The full arc, start to finish:
+
+**Hypothesis + primary metric → Randomize users to A/B → Pick sample size (power) in advance → Run to plan (no peeking) → Analyze (lift, CI, effect size, p) → Decide: ship? (significance *and* size)**
 
 ## Design comes first (and is where most tests are won or lost)
 

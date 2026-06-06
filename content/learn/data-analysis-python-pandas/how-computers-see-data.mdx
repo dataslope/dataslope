@@ -144,18 +144,20 @@ modern analytical systems — including Pandas — store data
   (`mean of salary`, `count of department`), not many columns
   of a few rows. Column storage makes those queries fast.
 
-```mermaid
-flowchart LR
-    subgraph "Row-store (think: a notebook)"
-        R1[Aiko 29 Tokyo]
-        R2[Bilal 42 Karachi]
-        R3[Chen 35 Shanghai]
-    end
-    subgraph "Column-store (Pandas, DuckDB, Parquet)"
-        C1[name: Aiko Bilal Chen]
-        C2[age: 29 42 35]
-        C3[city: Tokyo Karachi Shanghai]
-    end
+A **row-store** (think: a notebook) keeps each *record* together:
+
+```text
+Aiko,  29, Tokyo
+Bilal, 42, Karachi
+Chen,  35, Shanghai
+```
+
+A **column-store** (Pandas, DuckDB, Parquet) keeps each *column* together:
+
+```text
+name: Aiko, Bilal, Chen
+age:  29, 42, 35
+city: Tokyo, Karachi, Shanghai
 ```
 
 This is one of the reasons Pandas is fast on operations like

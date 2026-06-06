@@ -14,12 +14,8 @@ A histogram answers: *how is one continuous variable distributed?* The
 stat slices the range of x into equal **bins** and counts how many
 values land in each.
 
-```mermaid
-flowchart LR
-    X["Continuous hwy<br/>values 12 to 44"] --> BIN["stat_bin<br/>cut into equal bins"]
-    BIN --> CNT["count per bin"]
-    CNT --> BARS["geom_histogram<br/>one bar per bin"]
-```
+**Continuous `hwy` (values 12 to 44) → `stat_bin` cuts the range into
+equal bins → count per bin → `geom_histogram` draws one bar per bin.**
 
 The single most important knob is the **bin width** — it changes the
 story the histogram tells:
@@ -63,12 +59,14 @@ now we must decide *how* the sub-bars share space. That decision is the
 When bars (or their sub-pieces) would occupy the same place, a
 **position** controls the arrangement:
 
-```mermaid
-flowchart TD
-    R["fill = drv on each class bar"] --> S["position = stack<br/>sub-bars piled vertically<br/>(default)"]
-    R --> D["position = dodge<br/>sub-bars side by side"]
-    R --> F["position = fill<br/>stacked to 100 percent<br/>shows proportions"]
-```
+With `fill = drv` on each `class` bar, the position adjustment decides
+how the sub-bars share that space:
+
+| `position =` | Arrangement | Best for |
+| --- | --- | --- |
+| `stack` (default) | Sub-bars piled vertically | Totals, with parts visible |
+| `dodge` | Sub-bars side by side | Comparing groups within a category |
+| `fill` | Stacked to 100 percent | Proportions, ignoring totals |
 
 See all three on the same data:
 

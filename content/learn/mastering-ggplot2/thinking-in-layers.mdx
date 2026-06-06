@@ -15,12 +15,12 @@ statistic it uses**. When you write `+ geom_point()`, you add a layer.
 When you add `+ geom_smooth()`, you add another. They render in order,
 bottom to top:
 
-```mermaid
-flowchart TD
-    B["Base: ggplot(data, aes)<br/>coordinate space + scales"] --> L1["Layer 1: geom_point<br/>draw the raw points"]
-    L1 --> L2["Layer 2: geom_smooth<br/>draw a trend line on top"]
-    L2 --> R["Final composited plot"]
-```
+They render from the bottom up:
+
+1. **Base** — `ggplot(data, aes)` sets up the coordinate space + scales.
+2. **Layer 1** — `geom_point` draws the raw points.
+3. **Layer 2** — `geom_smooth` draws a trend line on top.
+4. The **final composited plot**.
 
 The base `ggplot()` call sets up the shared space; each `+ geom_*()`
 paints a transparent sheet over it.

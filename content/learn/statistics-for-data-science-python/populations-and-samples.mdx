@@ -102,23 +102,6 @@ Latin/hat = your best guess from data.** The statistic is the
 *estimator*; the parameter is the *estimand*. You use x̄ to
 estimate μ, p̂ to estimate `p`, and so on.
 
-```mermaid
-flowchart TD
-    subgraph POP["Population (unknown truth)"]
-      MU["mu — true mean"]
-      SIG["sigma — true sd"]
-      PP["p — true proportion"]
-    end
-    subgraph SAMP["Sample (what you compute)"]
-      XB["x-bar — sample mean"]
-      SS["s — sample sd"]
-      PH["p-hat — sample proportion"]
-    end
-    XB -. "estimates" .-> MU
-    SS -. "estimates" .-> SIG
-    PH -. "estimates" .-> PP
-```
-
 <Callout type="danger" title="The #1 confusion: reporting a statistic as a parameter">
 Writing "average revenue per user is \$48.20" — full stop — quietly
 claims you measured the *population*. You didn't. You measured

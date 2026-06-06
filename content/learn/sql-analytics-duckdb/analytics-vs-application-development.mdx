@@ -22,19 +22,11 @@ Think of a busy online store.
   first-time buyers spend less than returning ones?"* Each sweeps across
   *millions* of rows to produce a *small* summary.
 
-```mermaid
-flowchart LR
-    subgraph App["Application SQL"]
-        direction TB
-        A1["Tiny, targeted queries"] --> A2["Read/write a few rows"]
-        A2 --> A3["Runs constantly,<br/>must be instant"]
-    end
-    subgraph Ana["Analytical SQL"]
-        direction TB
-        B1["Broad, exploratory queries"] --> B2["Scan millions of rows"]
-        B2 --> B3["Produce a small summary"]
-    end
-```
+**Application SQL:** tiny, targeted queries that read or write a few rows
+and run constantly, so they must be instant.
+
+**Analytical SQL:** broad, exploratory queries that scan millions of rows
+to produce a small summary.
 
 Same keywords. Opposite shape. An application query is a **needle**: find
 this one row, fast. An analytical query is a **net**: drag it across the

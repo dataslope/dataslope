@@ -23,29 +23,16 @@ An **aesthetic mapping** is a *correspondence between a data column and
 one of these visual properties*. "Map `displ` to x." "Map `class` to
 color." You declare mappings inside `aes()`.
 
-```mermaid
-flowchart LR
-    subgraph Data columns
-      A["displ"]
-      B["hwy"]
-      C["class"]
-      D["cty"]
-    end
-    subgraph Aesthetics
-      X["x position"]
-      Y["y position"]
-      COL["color"]
-      SZ["size"]
-    end
-    A --> X
-    B --> Y
-    C --> COL
-    D --> SZ
-```
+| Data column | Aesthetic |
+| --- | --- |
+| `displ` | x position |
+| `hwy` | y position |
+| `class` | color |
+| `cty` | size |
 
-That diagram *is* a call to
-`aes(x = displ, y = hwy, color = class, size = cty)`. The arrows are
-the mappings.
+Those four rows *are* a call to
+`aes(x = displ, y = hwy, color = class, size = cty)`. Each row is one
+mapping.
 
 ## Aesthetics are information channels
 

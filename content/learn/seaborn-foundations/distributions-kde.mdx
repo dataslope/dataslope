@@ -24,12 +24,9 @@ places a small smooth **bump** — called a *kernel* (usually a tiny Gaussian)
 points cluster, the bumps pile up into a tall region; where points are
 sparse, the curve sags. The sum is one smooth **density** curve.
 
-```mermaid
-flowchart LR
-    D["Raw data points<br/>on the number line"] --> K["Place a smooth bump<br/>(a kernel) over each point"]
-    K --> S["Add all the bumps<br/>together"]
-    S --> C["One smooth curve:<br/>the KDE"]
-```
+In short: **raw data points on the number line → place a smooth bump (a
+kernel) over each point → add all the bumps together → one smooth curve, the
+KDE.**
 
 That's the whole idea: **a KDE is the sum of one little bump per data
 point**. A histogram is a *count* in bins; a KDE is a *smoothed* version of
