@@ -18,8 +18,10 @@
 >   - **NSQL-05** — workspace drawer: drag-handle no longer leaks onto desktop (descendant selector), cards align with the header (`padding-inline:16px`) and no longer touch the walls, and the top buttons fill the row evenly (dropped the compounding `margin-bottom`).
 >   - **NSQL-06** — plain-language, playground-type-aware workspace description (no "OPFS"/"database" for non-SQL); new workspaces get a friendly "Workspace N" name instead of a timestamp.
 >   - **NSQL-03** — Settings now renders in the **output column** on desktop (grid-column 2) instead of as a full-bleed overlay, so the editor stays visible and **re-themes live** as you click theme cards (verified: cm-editor flips to Dracula while Settings is open). Mobile keeps the full-screen overlay (the panes are tab-switched there).
+>   - **NSQL-08** — added a **Files** entry to the mobile header menu that opens the full FilesPanel (upload / new folder / tree / context actions) as a bottom-sheet, so file management is reachable on mobile (it was desktop-only).
+>   - **NSQL-09** — the badge-truncation part is resolved by NSQL-06's short `Workspace N` names; the tooltip-overlap and redundant-close items are deferred as very-low-priority.
 >   - **New finding NSQL-10 (pre-existing):** while verifying NSQL-03 on mobile I measured a **96px horizontal overflow** at 390px (the editor pane-bar's non-shrinking content forces a ~486px min-content). It reproduces with the original CSS too, so it's **not** caused by these changes — documented in §6/§4 for a follow-up (it needs a responsive pane-bar, not a one-liner). This also corrects the original §6 claim of "no overflow."
->   - **Still open:** NSQL-08 (Files unreachable on mobile), NSQL-09 (minor polish), NSQL-10 (mobile overflow).
+>   - **Still open:** NSQL-10 (mobile overflow), and the deferred low-priority slices of NSQL-09.
 
 ---
 
@@ -78,8 +80,8 @@ Each finding carries an ID (`NSQL-NN`) for cross-reference from the plan in §9.
 | **NSQL-05** | Workspace manager drawer **spacing**: desktop drag-handle leak + header/body left-edge misalignment (16px vs 0) + cards touch both walls + ragged button row | 🟡 | #4 | ✅ Fixed | `WorkspaceBadge.tsx:403-404`, `playground.css:2102,2181-2185,3940-3956` |
 | **NSQL-06** | **"Workspace" is under-explained**: jargon ("OPFS-backed"), claims "database state" that non-SQL playgrounds don't have, timestamp default name, no first-run hint | 🟢 | #5 | ✅ Fixed | `WorkspaceBadge.tsx:411-414` (desc), `:168-169,345-346` (timestamp name) |
 | **NSQL-07** | **Uncaught `NotFoundError` (OPFS) on every first load, in all nine languages** — trips the dev error overlay; would reach prod error monitoring | 🔴 | new | ✅ Fixed | `files/opfsDataStorage.ts:32-45` (`getDataDir` non-awaited return); `Playground.tsx:1001` |
-| **NSQL-08** | **Files panel is unreachable on mobile** — the icon rail is `display:none` < 768px and the mobile menu has no "Files" entry | 🟡 | new | ⏳ Open | `playground.css:774-781`, `Playground.tsx:3160-3217` (mobile menu actions) |
-| **NSQL-09** | Minor polish: icon-rail hover tooltip overlaps the Files panel toolbar; redundant Files close affordances; long workspace name truncates in the header badge | 🟢 | new | ⏳ Open | `FilesPanel.tsx:641-677`, `WorkspaceBadge.tsx:188-191` |
+| **NSQL-08** | **Files panel is unreachable on mobile** — the icon rail is `display:none` < 768px and the mobile menu has no "Files" entry | 🟡 | new | ✅ Fixed | `playground.css:774-781`, `Playground.tsx:3160-3217` (mobile menu actions) |
+| **NSQL-09** | Minor polish: icon-rail hover tooltip overlaps the Files panel toolbar; redundant Files close affordances; long workspace name truncates in the header badge | 🟢 | new | ✅ Partial | `FilesPanel.tsx:641-677`, `WorkspaceBadge.tsx:188-191` |
 | **NSQL-10** | **96px horizontal overflow at 390px** (pre-existing) — the editor pane-bar's non-shrinking content forces `.playground-body` to ~486px | 🟡 (mobile) | new | ⏳ Open | `.playground-body` `min-width:auto`; editor `.pane-bar` content |
 
 ---
@@ -254,7 +256,7 @@ On first load the `data/` directory doesn't exist, so `getDirectoryHandle("data"
 
 ---
 
-### NSQL-08 — The Files panel is completely unreachable on mobile 🟡 (new)
+### NSQL-08 — The Files panel is completely unreachable on mobile 🟡 (new) — ✅ Fixed
 
 **What happens.** Below 768px the entire icon rail (and thus the Files button) is hidden, and the mobile header menu offers only **Examples / Export / Information / Settings** — **no Files** (`assets/30-mobile-initial.png`, `assets/31-mobile-menu.png`). So on a phone you cannot open the file tree, upload data files, create folders, rename via the tree, or download files. (You *can* still add/switch file tabs via the tab-bar `+`, and switch workspaces via the badge — but the whole FilesPanel feature is desktop-only.)
 
@@ -272,9 +274,13 @@ On first load the `data/` directory doesn't exist, so `getDirectoryHandle("data"
 
 **Recommendation.** Add a **"Files"** entry to the mobile header menu that opens the FilesPanel as a bottom-sheet `Drawer` (the same pattern Packages/Workspaces already use), or surface a Files tab in the existing mobile Editor/Output tab bar. At minimum, if mobile file management is intentionally out of scope, say so (disabled item with a tooltip) rather than omitting it.
 
+> **Fixed (this PR).** Added a **Files** action (first item) to the mobile header menu that opens the **full FilesPanel** as a bottom-sheet `Drawer` — Upload, New folder, the file tree, and the per-file context actions (download / rename / delete / info). The desktop side panel and the mobile sheet share one `filesPanelProps` object, so they stay in lock-step. Verified live at 390px (`after-07-mobile-menu-with-files.png`, `after-08-mobile-files-drawer.png`). CSS: `.mobile-files-drawer-body` gives the panel a definite `60dvh` height so the tree is usable.
+
 ---
 
-### NSQL-09 — Minor polish 🟢 (new)
+### NSQL-09 — Minor polish 🟢 (new) — ✅ Partial
+
+> **Status (this PR).** The **badge-truncation** item is resolved by NSQL-06 (new workspaces are short `Workspace N` names that fit the badge). The **tooltip-overlap** and **redundant-close** items are deferred — both are low-value and the tooltip fix means fiddling with Base UI hover-popover positioning, which isn't worth the regression risk in this pass.
 
 - **Hover tooltip overlaps the Files panel toolbar.** With the Files panel open, the icon-rail "Files" hover tooltip renders on top of the panel's "Upload" button (`assets/03-js-files-pane-open.png`). The rail's tooltips open `side="right"`, directly over the adjacent panel. Consider suppressing the tooltip while the panel is open, or offsetting it.
 - **Redundant Files close affordances.** The panel can be closed by its own header `✕` (`Playground.tsx:3473-3480`) *and* by re-clicking the rail Files button — plus the rail button stays lit. Harmless but slightly redundant; pick one primary.
@@ -371,11 +377,11 @@ All changes are in shared files, so each fixes all nine playgrounds at once.
 - **NSQL-05** ✅ Workspace drawer: handle selector fixed, `padding-inline:16px` body, button row fills evenly. *(`WorkspaceBadge.tsx`, `playground.css`.)*
 - **NSQL-06** ✅ Plain-language, playground-type-aware workspace description; friendly `Workspace N` default names. *(`WorkspaceBadge.tsx`.)*
 
-**Phase 3 — Mobile & polish (next)**
-- **NSQL-08** ⏳ Add a "Files" entry to the mobile menu (FilesPanel as a bottom-sheet drawer). *(`Playground.tsx`.)*
-- **NSQL-10** ⏳ Responsive editor pane-bar at ≤768px + `min-width:0` to kill the 96px overflow (pairs with NSQL-08).
-- **NSQL-09** ⏳ Tooltip-vs-panel overlap, redundant close affordance, badge truncation cleanup.
+**Phase 3 — Mobile & polish**
+- **NSQL-08** ✅ Added a "Files" entry to the mobile menu (FilesPanel as a bottom-sheet drawer). *(`Playground.tsx`, `playground.css`.)*
+- **NSQL-09** ✅ Partial — badge truncation resolved via NSQL-06; tooltip/redundant-close deferred.
 - **A11y** ✅ `aria-pressed` consistency + non-color active cue (landed with NSQL-01).
+- **NSQL-10** ⏳ Responsive editor pane-bar at ≤768px + `min-width:0` to kill the 96px overflow — the one remaining substantive item (own follow-up; pre-existing).
 
 ---
 
@@ -410,3 +416,5 @@ All changes are in shared files, so each fixes all nine playgrounds at once.
 | **`after-04-workspace-drawer.png`** | **After NSQL-05/06:** no handle, aligned cards, plain-language description |
 | **`after-05-settings-split-live-theme.png`** | **After NSQL-03:** editor (left) shows real code live-themed Dracula while Settings (right) is open |
 | **`after-06-mobile-settings.png`** | **After NSQL-03 (mobile):** Settings keeps the full-screen overlay |
+| **`after-07-mobile-menu-with-files.png`** | **After NSQL-08:** "Files" entry now in the mobile menu |
+| **`after-08-mobile-files-drawer.png`** | **After NSQL-08:** full FilesPanel as a mobile bottom-sheet |

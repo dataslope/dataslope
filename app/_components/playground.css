@@ -2849,6 +2849,19 @@ input[type="range"].fs-slider:disabled {
   border-radius: 3px;
 }
 
+/* The Files bottom-sheet hosts the full FilesPanel (toolbar + tree),
+   which expects to fill its container — so give it a definite, usable
+   height and let the panel scroll internally instead of the menu body. */
+.mobile-files-drawer-body {
+  padding: 0;
+  height: 60vh;
+  height: 60dvh;
+  overflow: hidden;
+}
+.mobile-files-drawer-body .playground-files {
+  height: 100%;
+}
+
 .mobile-menu-action {
   display: flex;
   align-items: center;
