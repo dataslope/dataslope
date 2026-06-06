@@ -8,6 +8,16 @@
       "type": "stdio",
       "command": "npx",
       "args": ["-y", "next-devtools-mcp@latest"]
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    },
+    "duckdb": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["mcp-server-motherduck", "--db-path", ":memory:"]
     }
   }
 }
