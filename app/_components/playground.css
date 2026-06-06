@@ -35,6 +35,15 @@
   --green: var(--ds-green);
   --red: var(--ds-red);
   --yellow: var(--ds-yellow);
+  /* Semantic accents consumed by the SQL playground (sqlPlayground.css) via
+     `var(--danger, …)`, `var(--ok-accent, …)`, etc. Previously these were
+     undefined, so each call site fell back to a hardcoded Tailwind hex.
+     Defining them here once routes the SQL UI's success/error/focus colors
+     through the brand palette; the inline fallbacks remain as a safety net. */
+  --accent: var(--ds-blue);
+  --danger: var(--ds-red);
+  --ok-accent: var(--ds-green);
+  --err-accent: var(--ds-red);
   --font-mono:
     "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace;
   --font-ui: "Inter", system-ui, -apple-system, sans-serif;

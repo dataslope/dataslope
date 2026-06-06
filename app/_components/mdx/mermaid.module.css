@@ -47,8 +47,8 @@
 }
 
 .expandBtn:hover {
-  background: var(--color-fd-accent, rgba(79, 142, 247, 0.15));
-  border-color: var(--color-fd-primary, #4f8ef7);
+  background: var(--color-fd-accent, color-mix(in srgb, var(--ds-blue) 15%, transparent));
+  border-color: var(--color-fd-primary, var(--ds-blue-400));
 }
 
 .modalBackdrop {

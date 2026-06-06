@@ -46,31 +46,31 @@
   --ch-gray-900: #111827;
   --ch-zinc-100: #f4f4f5;
   --ch-neutral-50: #fafafa;
-  --ch-blue-50: #eff6ff;
-  --ch-blue-100: #dbeafe;
-  --ch-blue-200: #bfdbfe;
-  --ch-blue-300: #93c5fd;
-  --ch-blue-500: #3b82f6;
-  --ch-blue-600: #2563eb;
-  --ch-blue-700: #1d4ed8;
-  --ch-blue-800: #1e40af;
-  --ch-blue-900: #1e3a8a;
-  --ch-green-50: #f0fdf4;
-  --ch-green-100: #dcfce7;
-  --ch-green-200: #bbf7d0;
-  --ch-green-500: #22c55e;
-  --ch-green-600: #16a34a;
-  --ch-red-50: #fef2f2;
-  --ch-red-100: #fee2e2;
-  --ch-red-200: #fecaca;
-  --ch-red-500: #ef4444;
-  --ch-red-600: #dc2626;
-  --ch-red-900: #7f1d1d;
+  --ch-blue-50: var(--ds-blue-50);
+  --ch-blue-100: var(--ds-blue-100);
+  --ch-blue-200: var(--ds-blue-200);
+  --ch-blue-300: var(--ds-blue-300);
+  --ch-blue-500: var(--ds-blue-500);
+  --ch-blue-600: var(--ds-blue-600);
+  --ch-blue-700: var(--ds-blue-700);
+  --ch-blue-800: var(--ds-blue-800);
+  --ch-blue-900: var(--ds-blue-900);
+  --ch-green-50: var(--ds-green-50);
+  --ch-green-100: var(--ds-green-100);
+  --ch-green-200: var(--ds-green-200);
+  --ch-green-500: var(--ds-green-500);
+  --ch-green-600: var(--ds-green-600);
+  --ch-red-50: var(--ds-red-50);
+  --ch-red-100: var(--ds-red-100);
+  --ch-red-200: var(--ds-red-200);
+  --ch-red-500: var(--ds-red-500);
+  --ch-red-600: var(--ds-red-600);
+  --ch-red-900: var(--ds-red-900);
   --ch-violet-50: #f5f3ff;
   --ch-violet-100: #ede9fe;
   --ch-violet-500: #8b5cf6;
   --ch-violet-600: #7c3aed;
-  --ch-amber-500: #f59e0b;
+  --ch-amber-500: var(--ds-yellow-500);
 
   /* Semantic aliases */
   --ch-bg: var(--ch-white);
@@ -1017,10 +1017,10 @@
 .runMenuPopup {
   --ch-white: #ffffff;
   --ch-black: #000000;
-  --ch-blue-500: #3b82f6;
-  --ch-blue-600: #2563eb;
-  --ch-blue-700: #1d4ed8;
-  --ch-blue-900: #1e3a8a;
+  --ch-blue-500: var(--ds-blue-500);
+  --ch-blue-600: var(--ds-blue-600);
+  --ch-blue-700: var(--ds-blue-700);
+  --ch-blue-900: var(--ds-blue-900);
 
   background: #1a1a1a;
   border: 1px solid #333333;
@@ -1881,10 +1881,10 @@
      palette so a future colour audit only has to look at these
      palette aliases. */
   --ch-slate-950: #020617;
-  --ch-blue-400: #60a5fa;
-  --ch-green-400: #4ade80;
-  --ch-red-400: #f87171;
-  --ch-red-500: #ef4444;
+  --ch-blue-400: var(--ds-blue-400);
+  --ch-green-400: var(--ds-green-400);
+  --ch-red-400: var(--ds-red-400);
+  --ch-red-500: var(--ds-red-500);
   --ch-violet-300: #c4b5fd;
   --ch-violet-500: #8b5cf6;
 
@@ -1994,15 +1994,15 @@
    The base style uses #1a1a1a for light-mode contrast; dark mode reverts
    to the standard accent (blue) so the button reads as a primary action. */
 :global(html.dark) .runBtn {
-  background: #2563eb;
+  background: var(--ds-blue-600);
 }
 
 :global(html.dark) .runBtn:hover:not(:disabled) {
-  background: #1d4ed8;
+  background: var(--ds-blue-700);
 }
 
 :global(html.dark) .runBtn:disabled {
-  background: #93c5fd;
+  background: var(--ds-blue-300);
 }
 
 

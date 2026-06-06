@@ -76,6 +76,25 @@ samp {
   --color-fd-ring: var(--ds-blue);
 }
 
+/* Callout / admonition accents. Fumadocs's Callout sets
+   `--callout-color: var(--color-fd-<type>, var(--color-fd-muted))` and uses it
+   for the left bar (at 50% alpha) and the type icon. Define the four semantic
+   tokens so callouts read in the brand palette instead of falling back to
+   muted gray. The icon/bar sit on the light/dark card surface, so light mode
+   uses the AA "ink" steps and dark mode uses the brighter brand steps. */
+:root:not(.dark) {
+  --color-fd-info: var(--ds-blue-ink);
+  --color-fd-warning: var(--ds-amber-ink);
+  --color-fd-error: var(--ds-red-ink);
+  --color-fd-success: var(--ds-green-ink);
+}
+.dark {
+  --color-fd-info: var(--ds-blue-400);
+  --color-fd-warning: var(--ds-yellow-400);
+  --color-fd-error: var(--ds-red-400);
+  --color-fd-success: var(--ds-green-400);
+}
+
 /* Sidebar text + active/hover overrides.
    Non-layered rules beat Tailwind's @layer utilities, so these win
    without !important.

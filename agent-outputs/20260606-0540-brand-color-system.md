@@ -193,17 +193,25 @@ Consistency comes from **meaning**, not just shared hex. Lock these mappings:
 
 ## 6. Migration plan
 
-> **Status: Phases 0–3 are implemented in this branch** (build green, lint clean, 445 unit tests pass). Phase 4 (de-dupe) and a light-mode home redesign remain.
+> **Status: Phases 0–4 are implemented in this branch** (build green, lint clean, 445 unit tests pass). Only a light-mode home **redesign** remains (a deliberate design decision, not a mechanical task).
 
 **Phase 0 — Define & QA — ✅ done.** `app/brand.css` ships the full ramps + ink + semantic-role tokens, imported once in `app/layout.tsx`. The **`/color-test`** route now renders the four ink anchors and all 40 ramp swatches (each with copy-to-clipboard), so it doubles as the acceptance gate.
 
 **Phase 1 — Playground — ✅ done.** `playground.css` repoints `--primary/--blue/--green/--red/--yellow` (and `--primary-glow` via `color-mix`) at the brand tokens. The editor-theme palettes (`THEME_PALETTES`) are deliberately untouched.
 
-**Phase 2 — Learn — ✅ done (primary/ring).** `learn.css` maps `--color-fd-primary` → `--ds-blue-ink` (light) / `--ds-blue-400` (dark) and `--color-fd-ring` → brand blue. Remapping individual callout/admonition accents is a follow-up if you want them brand-tinted too.
+**Phase 2 — Learn — ✅ done (primary/ring + callouts).** `learn.css` maps `--color-fd-primary` → `--ds-blue-ink` (light) / `--ds-blue-400` (dark) and `--color-fd-ring` → brand blue. **Callouts/admonitions are now brand-tinted too:** Fumadocs derives each callout's bar + icon from `--callout-color: var(--color-fd-<type>, --color-fd-muted)`, so `learn.css` defines `--color-fd-info/warning/error/success` (AA "ink" steps in light mode, brighter brand steps in dark) — info=blue, warning=yellow, error=red, success=green. This also adds color where callouts previously fell back to muted gray.
 
 **Phase 3 — Home — ✅ tokenized (still dark-only).** `root.module.css` now pulls its blue/green accents and the title gradient from the ramp (`var(--ds-blue)`, `var(--ds-green)`, `var(--ds-blue-400)`). It remains dark-only by design — **adding a light mode to the home route is a separate design decision** (no theme switch exists there yet) and was intentionally *not* done unilaterally.
 
-**Phase 4 — De-dupe — ⬜ todo.** Sweep the ~10 ad-hoc blues / multiple greens/ambers still hardcoded in component CSS modules and replace with tokens. Add a lint rule or CI grep to flag new raw-hex brand colors so drift doesn't return.
+**Phase 4 — De-dupe — ✅ done (interactive components).** The big repeated offenders now source from the brand ramp:
+- **`ChallengeCard.module.css`** — its documented `--ch-{blue,green,red}-*` palette scale + the `--ch-amber-500` accent + the dark-mode `.runBtn` literals all repoint to `--ds-*` (one audit surface, as the file's own comments intended).
+- **`MultipleChoiceQuestion.module.css`** — same treatment for the mirrored `--mc-*` scale, plus the badge/code-text literals.
+- **`sqlPlayground.css`** — its semantic accents (`--danger/--ok-accent/--err-accent/--accent`) were *never defined*, so every call site fell back to a hardcoded Tailwind hex. They're now defined once in `playground.css` `:root` → brand. The ~23 inline `var(--token, #hex)` fallbacks remain only as an inert safety net (the codebase's defensive pattern).
+- **`mermaid.module.css`** + **`playground/home.module.css`** — stray blue literals → `--ds-blue-400`.
+
+Deliberately **left alone:** non-brand decoratives (violet/purple `--ch-violet-*`, the SQL editor-theme palettes), neutral grays/surfaces/backgrounds, and a few dark-mode `rgba()` wash tints (perceptually identical at 12–30% alpha; not worth the churn/risk).
+
+*Not yet done:* a lint rule / CI grep to flag **new** raw-hex brand colors so drift doesn't creep back — recommended as a small follow-up.
 
 > Sequence rationale (as executed): playground → learn → home went from "tokens already exist" to "tokens partially exist (Fumadocs)" to "no tokens," i.e. easiest-to-hardest and lowest-to-highest visual risk.
 

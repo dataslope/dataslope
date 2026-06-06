@@ -47,7 +47,7 @@
 }
 
 .card:hover {
-  border-color: #4f8ef7;
+  border-color: var(--ds-blue-400);
 }
 
 .logo {

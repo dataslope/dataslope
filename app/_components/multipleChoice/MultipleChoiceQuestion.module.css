@@ -28,29 +28,29 @@
   --mc-gray-900: #111827;
   --mc-zinc-100: #f4f4f5;
   --mc-neutral-50: #fafafa;
-  --mc-blue-50: #eff6ff;
-  --mc-blue-100: #dbeafe;
-  --mc-blue-200: #bfdbfe;
-  --mc-blue-300: #93c5fd;
-  --mc-blue-500: #3b82f6;
-  --mc-blue-600: #2563eb;
-  --mc-blue-700: #1d4ed8;
-  --mc-blue-800: #1e40af;
-  --mc-blue-900: #1e3a8a;
-  --mc-green-50: #f0fdf4;
-  --mc-green-100: #dcfce7;
-  --mc-green-200: #bbf7d0;
-  --mc-green-500: #22c55e;
-  --mc-green-600: #16a34a;
-  --mc-green-700: #15803d;
-  --mc-red-50: #fef2f2;
-  --mc-red-100: #fee2e2;
-  --mc-red-200: #fecaca;
-  --mc-red-600: #dc2626;
-  --mc-red-700: #b91c1c;
-  --mc-amber-50: #fffbeb;
-  --mc-amber-200: #fde68a;
-  --mc-amber-700: #b45309;
+  --mc-blue-50: var(--ds-blue-50);
+  --mc-blue-100: var(--ds-blue-100);
+  --mc-blue-200: var(--ds-blue-200);
+  --mc-blue-300: var(--ds-blue-300);
+  --mc-blue-500: var(--ds-blue-500);
+  --mc-blue-600: var(--ds-blue-600);
+  --mc-blue-700: var(--ds-blue-700);
+  --mc-blue-800: var(--ds-blue-800);
+  --mc-blue-900: var(--ds-blue-900);
+  --mc-green-50: var(--ds-green-50);
+  --mc-green-100: var(--ds-green-100);
+  --mc-green-200: var(--ds-green-200);
+  --mc-green-500: var(--ds-green-500);
+  --mc-green-600: var(--ds-green-600);
+  --mc-green-700: var(--ds-green-700);
+  --mc-red-50: var(--ds-red-50);
+  --mc-red-100: var(--ds-red-100);
+  --mc-red-200: var(--ds-red-200);
+  --mc-red-600: var(--ds-red-600);
+  --mc-red-700: var(--ds-red-700);
+  --mc-amber-50: var(--ds-yellow-50);
+  --mc-amber-200: var(--ds-yellow-200);
+  --mc-amber-700: var(--ds-yellow-700);
 
   /* Semantic aliases — these mirror ChallengeCard's --ch-* naming so a
      reader who knows one stylesheet can read the other. */
@@ -613,7 +613,7 @@
   --mc-text-muted: #808080;
   --mc-badge-bg: color-mix(in srgb, var(--mc-blue-500) 14%, transparent);
   --mc-badge-border: color-mix(in srgb, var(--mc-blue-500) 32%, transparent);
-  --mc-badge-color: #93c5fd;
+  --mc-badge-color: var(--ds-blue-300);
 }
 
 :global(html.dark) .choice[data-selected="true"] {
@@ -764,12 +764,12 @@
 :global(html.dark) .choice[data-verdict="correct-selected"] .choiceExplanation code,
 :global(html.dark) .choice[data-verdict="correct-missed"] .choiceExplanation code {
   background: rgba(22, 163, 74, 0.3);
-  color: #bbf7d0;
+  color: var(--ds-green-200);
 }
 
 :global(html.dark) .choice[data-verdict="wrong-selected"] .choiceExplanation code {
   background: rgba(220, 38, 38, 0.3);
-  color: #fecaca;
+  color: var(--ds-red-200);
 }
 
 /* Overall explanation paragraph text is white in dark mode. */
