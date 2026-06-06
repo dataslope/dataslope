@@ -17,7 +17,9 @@
 >   - **NSQL-04** — theme preview cards now render the **playground's own language** (per-language snippets), not Python.
 >   - **NSQL-05** — workspace drawer: drag-handle no longer leaks onto desktop (descendant selector), cards align with the header (`padding-inline:16px`) and no longer touch the walls, and the top buttons fill the row evenly (dropped the compounding `margin-bottom`).
 >   - **NSQL-06** — plain-language, playground-type-aware workspace description (no "OPFS"/"database" for non-SQL); new workspaces get a friendly "Workspace N" name instead of a timestamp.
->   - **Still open:** NSQL-03 (Settings overlay occludes the editor), NSQL-08 (Files unreachable on mobile), NSQL-09 (minor polish).
+>   - **NSQL-03** — Settings now renders in the **output column** on desktop (grid-column 2) instead of as a full-bleed overlay, so the editor stays visible and **re-themes live** as you click theme cards (verified: cm-editor flips to Dracula while Settings is open). Mobile keeps the full-screen overlay (the panes are tab-switched there).
+>   - **New finding NSQL-10 (pre-existing):** while verifying NSQL-03 on mobile I measured a **96px horizontal overflow** at 390px (the editor pane-bar's non-shrinking content forces a ~486px min-content). It reproduces with the original CSS too, so it's **not** caused by these changes — documented in §6/§4 for a follow-up (it needs a responsive pane-bar, not a one-liner). This also corrects the original §6 claim of "no overflow."
+>   - **Still open:** NSQL-08 (Files unreachable on mobile), NSQL-09 (minor polish), NSQL-10 (mobile overflow).
 
 ---
 
@@ -71,13 +73,14 @@ Each finding carries an ID (`NSQL-NN`) for cross-reference from the plan in §9.
 |---|---|---|---|---|---|
 | **NSQL-01** | Activity-bar shows **two active buttons** when Files is open; the "Editor" button is hard-coded `active` and is **inert (no `onClick`)** | 🟡 ♿ | #1 | ✅ Fixed | `Playground.tsx:3395` (hard-coded `active`), `:3420-3423` (Files toggle) |
 | **NSQL-02** | **Settings only reachable from the bottom-left gear** on desktop — opposite corner from every other control, the hardest pixel to reach | 🟡 | #2 | ✅ Fixed | `Playground.tsx:3438-3467`; header had no Settings entry (`:3100-3223`) |
-| **NSQL-03** | Theme changes are **invisible until you leave Settings** — the Settings tab is an opaque overlay covering the editor; previews are static | 🟡 | #3 | ⏳ Open | `playground.css:4073-4083` (opaque overlay), `Playground.tsx:1390-1398` (live apply) |
+| **NSQL-03** | Theme changes are **invisible until you leave Settings** — the Settings tab is an opaque overlay covering the editor; previews are static | 🟡 | #3 | ✅ Fixed | `playground.css:4073-4083` (was opaque overlay), `Playground.tsx:1390-1398` (live apply) |
 | **NSQL-04** | Theme preview cards render a **Python snippet for every language** except R/SQL (so JS/TS/PHP/C/C++/Java/C# previews are misleading) | 🟡 | #3 | ✅ Fixed | `playgroundShared.tsx:206-269` (`ThemePreviewSnippet` only special-cased sql/r) |
 | **NSQL-05** | Workspace manager drawer **spacing**: desktop drag-handle leak + header/body left-edge misalignment (16px vs 0) + cards touch both walls + ragged button row | 🟡 | #4 | ✅ Fixed | `WorkspaceBadge.tsx:403-404`, `playground.css:2102,2181-2185,3940-3956` |
 | **NSQL-06** | **"Workspace" is under-explained**: jargon ("OPFS-backed"), claims "database state" that non-SQL playgrounds don't have, timestamp default name, no first-run hint | 🟢 | #5 | ✅ Fixed | `WorkspaceBadge.tsx:411-414` (desc), `:168-169,345-346` (timestamp name) |
 | **NSQL-07** | **Uncaught `NotFoundError` (OPFS) on every first load, in all nine languages** — trips the dev error overlay; would reach prod error monitoring | 🔴 | new | ✅ Fixed | `files/opfsDataStorage.ts:32-45` (`getDataDir` non-awaited return); `Playground.tsx:1001` |
 | **NSQL-08** | **Files panel is unreachable on mobile** — the icon rail is `display:none` < 768px and the mobile menu has no "Files" entry | 🟡 | new | ⏳ Open | `playground.css:774-781`, `Playground.tsx:3160-3217` (mobile menu actions) |
 | **NSQL-09** | Minor polish: icon-rail hover tooltip overlaps the Files panel toolbar; redundant Files close affordances; long workspace name truncates in the header badge | 🟢 | new | ⏳ Open | `FilesPanel.tsx:641-677`, `WorkspaceBadge.tsx:188-191` |
+| **NSQL-10** | **96px horizontal overflow at 390px** (pre-existing) — the editor pane-bar's non-shrinking content forces `.playground-body` to ~486px | 🟡 (mobile) | new | ⏳ Open | `.playground-body` `min-width:auto`; editor `.pane-bar` content |
 
 ---
 
@@ -130,7 +133,7 @@ Each finding carries an ID (`NSQL-NN`) for cross-reference from the plan in §9.
 
 ---
 
-### NSQL-03 — Theme changes are invisible until you close Settings 🟡 (your #3)
+### NSQL-03 — Theme changes are invisible until you close Settings 🟡 (your #3) — ✅ Fixed
 
 **What happens.** Open Settings → Themes → pick "Dracula." The whole chrome re-themes live, but the **editor with your actual code is hidden behind the Settings overlay**, so you can't preview the result on real code until you switch back to your file tab. See `assets/11-dracula-selected-editor-hidden.png` (Settings covers everything) → `assets/12-editor-after-close-dracula-applied.png` (only now do you see Dracula on your code).
 
@@ -148,6 +151,8 @@ So "Settings as a tab" replaces the panes rather than sitting beside them.
 - **Don't occlude the editor.** Render Settings in the **output-pane half** (split view) instead of as a full-bleed overlay, so the editor with the user's code stays visible and re-themes live as they click theme cards. This turns the existing live-apply into a real-time preview for free.
 - Or add a small **"live preview" strip** inside the Themes tab that renders a few lines of the *current file* (not a canned snippet) in the focused palette.
 - Or apply theme **on hover** of each card (preview) and commit on click, with the editor visible.
+
+> **Fixed (this PR).** Took the first option. On desktop the Settings pane now occupies **grid column 2** (the output column) instead of `position:absolute; inset:0`, so the **editor stays visible in column 1 and re-themes live** — verified `cm-editor` background flips to Dracula *while Settings is open* (`after-05-settings-split-live-theme.png`), and the editor's pane bar is no longer hidden. It respects the editor/output resizer automatically (column 2 width follows the grid). On mobile the panes are a single tab-switched column, so the Settings pane keeps the full-screen overlay there (`after-06-mobile-settings.png`). Verified mobile-neutral: page overflow is identical with/without this change (see NSQL-10).
 
 ---
 
@@ -295,7 +300,17 @@ On first load the `data/` directory doesn't exist, so `getDirectoryHandle("data"
 - **Mobile (390×844)** collapses to an Editor/Output tab bar and a bottom-sheet header menu (`assets/30-mobile-initial.png`, `assets/31-mobile-menu.png`). This works for the core run loop, **but**:
   - **Files is unreachable** (NSQL-08, 🟡).
   - The **workspace manager drawer** becomes a proper bottom sheet on mobile (good) — the handle leak (NSQL-05) is a *desktop* regression of that same component, not a mobile one.
-- No horizontal overflow observed at 390px on the editor/output view.
+- **Correction to an earlier draft of this section:** there *is* a **96px horizontal overflow at 390px** (NSQL-10, below) — the document is ~486px wide. It's pre-existing (reproduces on the base commit) and was missed in the first eyeball pass; measured precisely while verifying NSQL-03.
+
+### NSQL-10 — 96px horizontal overflow at 390px (pre-existing) 🟡 (mobile, new) — ⏳ Open
+
+**What happens.** At a 390px viewport the document is **486px wide** (`document.documentElement.scrollWidth = 486`, `clientWidth = 390`) — a 96px horizontal overflow / scroll. `html` and `body` are correctly 390px, but **`.playground-body` is 486px** (`min-width: auto`), and everything below it (`.playground-body-content` → `.panes` → `.editor-pane` → CodeMirror) stretches to match.
+
+**Root cause.** `.playground-body` is a flex item with the default `min-width: auto`, so it can't shrink below its content's min-content width. The widest min-content contributor is the **editor `.pane-bar`** — its label, copy/format icons, the `Ctrl + Enter` kbd hints, and the Run split-button are all `white-space: nowrap` / non-shrinking, summing to ~486px. With `min-width: auto` that 486px propagates up and widens the whole layout.
+
+**Not caused by this PR.** Verified by stashing the NSQL-03 CSS and re-measuring: overflow is **486px with the original CSS too**, settings open or closed. NSQL-03 is mobile-neutral.
+
+**Recommendation (follow-up, not a one-liner).** A naive `min-width: 0` on the flex chain would let `.editor-pane` shrink but then `overflow:hidden` would *clip the Run button* off-screen — worse. The proper fix is a **responsive editor pane-bar** at ≤768px: drop/condense the `Ctrl + Enter` kbd hint, shrink the "Run `main`" label to just an icon, and/or let the pane-bar wrap — then add `min-width: 0` so the column can reach 390px. Worth a dedicated mobile-polish pass (pairs naturally with NSQL-08).
 
 ---
 
@@ -348,18 +363,17 @@ All changes are in shared files, so each fixes all nine playgrounds at once.
 **Phase 1 — Correctness (do first)** — ✅ **Done**
 - **NSQL-07** ✅ Stop the uncaught OPFS `NotFoundError`: `await` the returned handle in `getDataDir` so its `catch` works, + a `.catch()` at the `loadDataFiles` call site. Re-verified 0 errors. *(🔴; small, isolated.)*
 
-**Phase 2 — The five reported issues** — ✅ **4/5 done** (NSQL-03 carried to Phase 2b)
+**Phase 2 — The five reported issues** — ✅ **Done (5/5)**
 - **NSQL-01** ✅ Editor button is a real toggle (closes Files + focuses editor), lit only when Files is closed + `aria-pressed`; `.active` is accent-tinted (≠ hover). *(`Playground.tsx`, `playground.css`.)*
 - **NSQL-02** ✅ Settings entry added to the top-right header cluster (reuses `openSettingsTab()`). *(`Playground.tsx`.)*
+- **NSQL-03** ✅ Settings renders in the output column (grid-column 2) on desktop so the editor stays visible and re-themes live; mobile keeps the overlay. *(`playground.css`.)*
 - **NSQL-04** ✅ Per-language theme preview snippets. *(`playgroundShared.tsx`.)*
 - **NSQL-05** ✅ Workspace drawer: handle selector fixed, `padding-inline:16px` body, button row fills evenly. *(`WorkspaceBadge.tsx`, `playground.css`.)*
 - **NSQL-06** ✅ Plain-language, playground-type-aware workspace description; friendly `Workspace N` default names. *(`WorkspaceBadge.tsx`.)*
 
-**Phase 2b — Settings live preview (next)**
-- **NSQL-03** ⏳ Render Settings beside the editor (in the output half) instead of as an opaque overlay, so theme changes preview live on the user's real code. *(`playground.css`, small `Playground.tsx` layout tweak.)*
-
 **Phase 3 — Mobile & polish (next)**
 - **NSQL-08** ⏳ Add a "Files" entry to the mobile menu (FilesPanel as a bottom-sheet drawer). *(`Playground.tsx`.)*
+- **NSQL-10** ⏳ Responsive editor pane-bar at ≤768px + `min-width:0` to kill the 96px overflow (pairs with NSQL-08).
 - **NSQL-09** ⏳ Tooltip-vs-panel overlap, redundant close affordance, badge truncation cleanup.
 - **A11y** ✅ `aria-pressed` consistency + non-color active cue (landed with NSQL-01).
 
@@ -394,3 +408,5 @@ All changes are in shared files, so each fixes all nine playgrounds at once.
 | **`after-02-initial-with-header-settings.png`** | **After NSQL-02:** Settings gear in the top-right header |
 | **`after-03-theme-previews-js.png`** | **After NSQL-04:** theme previews show real JavaScript |
 | **`after-04-workspace-drawer.png`** | **After NSQL-05/06:** no handle, aligned cards, plain-language description |
+| **`after-05-settings-split-live-theme.png`** | **After NSQL-03:** editor (left) shows real code live-themed Dracula while Settings (right) is open |
+| **`after-06-mobile-settings.png`** | **After NSQL-03 (mobile):** Settings keeps the full-screen overlay |

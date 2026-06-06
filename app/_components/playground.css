@@ -792,10 +792,15 @@ body.playground-active {
   position: relative;
 }
 
-/* Hide editor/output pane bars when the settings tab is active, since
-   the settings overlay covers both panes. */
-.panes[data-settings-active] .pane-bar {
-  display: none;
+/* On desktop the settings tab sits in the output column only (so the
+   editor stays visible and re-themes live), so the editor keeps its
+   pane bar. The output pane bar is covered by the settings panel. On
+   mobile the settings panel covers the whole pane area, so hide the bar
+   underneath it there. */
+@media (max-width: 768px) {
+  .panes[data-settings-active] .pane-bar {
+    display: none;
+  }
 }
 
 /* ─── Editor pane ─── */
@@ -4083,15 +4088,30 @@ html[data-playground-theme="dark"] .welcome h3 {
    positioning anchored to the `.panes` container.
    ─────────────────────────────────────────────────────────────────────── */
 .playground-settings-tab-pane {
-  /* Overlay the full .panes container (which has position: relative) so
-     the settings content spans both the editor and output panes. */
-  position: absolute;
-  inset: 0;
+  /* Desktop: occupy the *output* column (grid column 2) only, stacked on
+     top of the output pane. This keeps the editor (column 1) visible so
+     theme changes preview live on the user's real code instead of being
+     hidden behind a full-bleed overlay. Respects the editor/output
+     resizer automatically since column 2 width follows the grid. */
+  grid-column: 2;
+  grid-row: 1;
   z-index: 10;
   display: flex;
   flex-direction: column;
   background: var(--bg);
   overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+}
+/* Mobile: the panes are a single tab-switched column, so cover the whole
+   pane area as before. */
+@media (max-width: 768px) {
+  .playground-settings-tab-pane {
+    position: absolute;
+    inset: 0;
+    grid-column: auto;
+    grid-row: auto;
+  }
 }
 .playground-settings-tab-pane .settings-tabs {
   flex: 1 1 auto;
