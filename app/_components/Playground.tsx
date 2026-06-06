@@ -998,9 +998,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   useEffect(() => {
     if (!workspaceReady || !workspaceId) return;
     let cancelled = false;
-    void loadDataFiles(workspaceId).then((loaded) => {
-      if (!cancelled) setVirtualFiles(loaded);
-    });
+    void loadDataFiles(workspaceId)
+      .then((loaded) => {
+        if (!cancelled) setVirtualFiles(loaded);
+      })
+      .catch(() => {
+        /* OPFS unavailable / empty — leave the data-file list empty. */
+      });
     return () => {
       cancelled = true;
     };
@@ -2772,6 +2776,23 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     [adapter.outputCapabilities],
   );
 
+  // Shared props for the virtual-filesystem panel, used by both the
+  // desktop side panel and the mobile bottom-sheet drawer so file
+  // management is reachable on every breakpoint (the icon rail that
+  // toggled the desktop panel is hidden below 768px).
+  const filesPanelProps = {
+    files: mergedVirtualFiles,
+    expandedFolders,
+    onToggleFolder: handleFilesToggleFolder,
+    onUpload: handleFilesUpload,
+    onDownload: mergedHandleFilesDownload,
+    onDelete: mergedHandleFilesDelete,
+    onRename: mergedHandleFilesRename,
+    onCreateFolder: handleFilesCreateFolder,
+    onCreateFile: handleFilesCreateFile,
+    onMove: mergedHandleFilesMove,
+  };
+
   return (
     <div className="playground-root">
       {showLoadingOverlay && (
@@ -2998,6 +3019,19 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 </Popover.Positioner>
               </Popover.Portal>
             </Popover.Root>
+
+            {/* Settings entry co-located with the other global controls so
+                it's reachable from the top-right cluster (it's also still
+                pinned at the bottom of the left icon rail). */}
+            <button
+              type="button"
+              className="header-btn icon-only"
+              onClick={openSettingsTab}
+              title="Settings"
+              aria-label="Settings"
+            >
+              <Settings size={14} aria-hidden="true" />
+            </button>
           </div>
 
           {/* Mobile-only consolidated menu — replaces the header buttons
@@ -3041,6 +3075,48 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                       </Drawer.Close>
                     </div>
                     <div className="mobile-menu-drawer-body">
+                      {/* Files — the desktop icon rail (which toggles the
+                          file panel) is hidden on mobile, so surface file
+                          management here as a bottom-sheet instead. */}
+                      <Drawer.Root swipeDirection="down">
+                        <Drawer.Trigger className="mobile-menu-action">
+                          <span>Files</span>
+                          <span className="mobile-menu-chev" aria-hidden="true">
+                            ›
+                          </span>
+                        </Drawer.Trigger>
+                        <Drawer.Portal>
+                          <Drawer.Backdrop
+                            className="pkg-overlay mobile-menu-backdrop"
+                            forceRender
+                          />
+                          <Drawer.Viewport className="mobile-drawer-viewport">
+                            <Drawer.Popup
+                              className="mobile-menu-drawer mobile-menu-nested-drawer"
+                              aria-label="Files"
+                            >
+                              <Drawer.Content>
+                                <div className="mobile-menu-handle" aria-hidden="true" />
+                                <div className="mobile-menu-drawer-header">
+                                  <Drawer.Title className="mobile-menu-drawer-title">
+                                    Files
+                                  </Drawer.Title>
+                                  <Drawer.Close
+                                    className="settings-close"
+                                    aria-label="Close files"
+                                  >
+                                    ✕
+                                  </Drawer.Close>
+                                </div>
+                                <div className="mobile-menu-drawer-body mobile-files-drawer-body">
+                                  <FilesPanel {...filesPanelProps} />
+                                </div>
+                              </Drawer.Content>
+                            </Drawer.Popup>
+                          </Drawer.Viewport>
+                        </Drawer.Portal>
+                      </Drawer.Root>
+
                       <Drawer.Root swipeDirection="down">
                         <Drawer.Trigger className="mobile-menu-action">
                           <span>Examples</span>
@@ -3392,8 +3468,17 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     <button
                       {...triggerProps}
                       type="button"
-                      className="playground-icon-sidebar-btn active"
+                      className={`playground-icon-sidebar-btn${filesPaneOpen ? "" : " active"}`}
                       aria-label="Editor"
+                      aria-pressed={!filesPaneOpen}
+                      onClick={() => {
+                        // The editor is the default surface; this button
+                        // returns to it (closing the Files panel) and
+                        // focuses CodeMirror, so it's a real toggle rather
+                        // than a permanently-lit decoration.
+                        setFilesPaneOpen(false);
+                        editorRef.current?.focus();
+                      }}
                     >
                       <Code2 size={16} aria-hidden="true" />
                     </button>
@@ -3479,18 +3564,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                   <X size={13} aria-hidden="true" />
                 </button>
               </div>
-              <FilesPanel
-                files={mergedVirtualFiles}
-                expandedFolders={expandedFolders}
-                onToggleFolder={handleFilesToggleFolder}
-                onUpload={handleFilesUpload}
-                onDownload={mergedHandleFilesDownload}
-                onDelete={mergedHandleFilesDelete}
-                onRename={mergedHandleFilesRename}
-                onCreateFolder={handleFilesCreateFolder}
-                onCreateFile={handleFilesCreateFile}
-                onMove={mergedHandleFilesMove}
-              />
+              <FilesPanel {...filesPanelProps} />
             </div>
           )}
           <div className="playground-body-content">

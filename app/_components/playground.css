@@ -133,6 +133,12 @@ body.playground-active {
 .playground-app {
   display: grid;
   grid-template-rows: 40px 1fr;
+  /* Cap the single column at the container width (min 0, not the
+     children's min-content). Without this the implicit `auto` column
+     grew to the header's min-content (~486px on a phone: wordmark +
+     language switcher + workspace badge + menu), forcing a horizontal
+     overflow. `minmax(0, 1fr)` lets the rows/header shrink to fit. */
+  grid-template-columns: minmax(0, 1fr);
   /* Use the dynamic viewport height on mobile browsers so that the
      bottom of the layout (e.g. the last output cell on the Output tab)
      remains reachable when the URL bar is visible. `100vh` falls back
@@ -508,9 +514,11 @@ body.playground-active {
   background: var(--bg3);
 }
 
+/* Active (selected) is accent-tinted so it reads as "this panel is
+   selected" rather than just "hovered" (hover uses the neutral --bg3). */
 .playground-icon-sidebar-btn.active {
-  color: var(--text);
-  background: var(--bg3);
+  color: var(--primary);
+  background: var(--primary-glow);
 }
 
 .playground-icon-sidebar-btn:focus-visible {
@@ -803,10 +811,15 @@ body.playground-active {
   position: relative;
 }
 
-/* Hide editor/output pane bars when the settings tab is active, since
-   the settings overlay covers both panes. */
-.panes[data-settings-active] .pane-bar {
-  display: none;
+/* On desktop the settings tab sits in the output column only (so the
+   editor stays visible and re-themes live), so the editor keeps its
+   pane bar. The output pane bar is covered by the settings panel. On
+   mobile the settings panel covers the whole pane area, so hide the bar
+   underneath it there. */
+@media (max-width: 768px) {
+  .panes[data-settings-active] .pane-bar {
+    display: none;
+  }
 }
 
 /* ─── Editor pane ─── */
@@ -2111,12 +2124,15 @@ input[type="range"].fs-slider:disabled {
 }
 
 /* The drag handle is only meaningful for the bottom-sheet (mobile)
-   presentation; hide it for the right-anchored desktop side panel. */
-.pkg-drawer > .mobile-menu-handle {
+   presentation; hide it for the right-anchored desktop side panel.
+   Uses a descendant (not direct-child) selector so it still matches when
+   a drawer nests the handle inside `.pkg-drawer-content` (e.g. the
+   workspace manager), which previously leaked the handle onto desktop. */
+.pkg-drawer .mobile-menu-handle {
   display: none;
 }
 @media (max-width: 768px) {
-  .pkg-drawer > .mobile-menu-handle {
+  .pkg-drawer .mobile-menu-handle {
     display: block;
   }
 }
@@ -2667,6 +2683,36 @@ input[type="range"].fs-slider:disabled {
     display: none;
   }
 
+  /* Let the editor/output column shrink to the viewport. The flex chain
+     defaults to min-width:auto, so it was held open at the editor pane
+     bar's min-content width — which forced a ~96px horizontal overflow
+     at 390px. Relax min-width down the chain and drop the keyboard-only
+     run hint (no Ctrl/Cmd+Enter on touch) so the pane bar fits; the Run
+     label already truncates with an ellipsis. */
+  .playground-body,
+  .playground-body-content,
+  .panes,
+  .editor-pane,
+  .output-pane {
+    min-width: 0;
+  }
+  .editor-pane .kbd-group {
+    display: none;
+  }
+
+  /* Let the header fit a phone: drop the "Dataslope" wordmark (the logo
+     icon stays) and let the logo group + workspace badge shrink/truncate
+     so the language switcher, badge, and menu button all stay on one row
+     without forcing the layout wider than the viewport. */
+  .playground-header,
+  .logo,
+  .workspace-badge {
+    min-width: 0;
+  }
+  .brand-name {
+    display: none;
+  }
+
   /* Hide the CodeMirror line-number gutter on mobile so the code takes
      the full width, and add a slight horizontal inset on each line so
      tapping near the edge to position the caret / start a selection is
@@ -2850,6 +2896,19 @@ input[type="range"].fs-slider:disabled {
 .mobile-menu-drawer-body::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 3px;
+}
+
+/* The Files bottom-sheet hosts the full FilesPanel (toolbar + tree),
+   which expects to fill its container — so give it a definite, usable
+   height and let the panel scroll internally instead of the menu body. */
+.mobile-files-drawer-body {
+  padding: 0;
+  height: 60vh;
+  height: 60dvh;
+  overflow: hidden;
+}
+.mobile-files-drawer-body .playground-files {
+  height: 100%;
 }
 
 .mobile-menu-action {
@@ -3948,11 +4007,16 @@ html[data-playground-theme="dark"] .welcome h3 {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  /* `.pkg-body` ships 0 horizontal padding; add it back here so the
+     buttons and workspace cards line up with the 16px-inset header
+     instead of sitting flush against (and touching) the panel walls. */
+  padding-inline: 16px;
 }
 
 .workspace-manager-new {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   padding: 10px 14px;
   background: color-mix(in srgb, var(--primary) 18%, transparent);
@@ -3964,8 +4028,10 @@ html[data-playground-theme="dark"] .welcome h3 {
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  margin-bottom: 8px;
-  align-self: flex-start;
+  /* Share the row evenly instead of content-sizing with a ragged right
+     edge. No `margin-bottom` — the parent's flex `gap` owns the spacing
+     (the stray margin compounded with the gap and the column gap). */
+  flex: 1 1 auto;
 }
 
 .workspace-manager-new:hover {
@@ -4084,15 +4150,30 @@ html[data-playground-theme="dark"] .welcome h3 {
    positioning anchored to the `.panes` container.
    ─────────────────────────────────────────────────────────────────────── */
 .playground-settings-tab-pane {
-  /* Overlay the full .panes container (which has position: relative) so
-     the settings content spans both the editor and output panes. */
-  position: absolute;
-  inset: 0;
+  /* Desktop: occupy the *output* column (grid column 2) only, stacked on
+     top of the output pane. This keeps the editor (column 1) visible so
+     theme changes preview live on the user's real code instead of being
+     hidden behind a full-bleed overlay. Respects the editor/output
+     resizer automatically since column 2 width follows the grid. */
+  grid-column: 2;
+  grid-row: 1;
   z-index: 10;
   display: flex;
   flex-direction: column;
   background: var(--bg);
   overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+}
+/* Mobile: the panes are a single tab-switched column, so cover the whole
+   pane area as before. */
+@media (max-width: 768px) {
+  .playground-settings-tab-pane {
+    position: absolute;
+    inset: 0;
+    grid-column: auto;
+    grid-row: auto;
+  }
 }
 .playground-settings-tab-pane .settings-tabs {
   flex: 1 1 auto;
