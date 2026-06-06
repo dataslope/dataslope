@@ -45,7 +45,24 @@ Define, for each brand hue, a **bright "signal" value** (the hex above — used 
 | Green | `#20C621` | **`#178017`** (5.08:1) |
 | Yellow | `#FFDD6C` | *(yellow can't be text on white — pair with* **`#8A6D00`** *amber-ink, 4.92:1, for warning text)* |
 
-> Generate a full 50–900 tint/shade ramp per hue with a tool (e.g. Leonardo, Radix Colors custom, or `oklch()` lightness steps) rather than hand-picking — but the four "ink" anchors above are the ones accessibility hinges on. **Re-verify any value you ship in a contrast checker.**
+### 2.2 The full 50–900 tonal ramps
+
+Generated in **OKLCH** (constant hue; lightness/chroma interpolated toward white for the light steps and toward near-black for the dark steps; every value gamut-mapped to valid sRGB). **500 = your exact brand color.** These are now shipped in `app/brand.css` as `--ds-{hue}-{step}` tokens; the "ink" roles in §2.1 are remapped onto ramp steps (`blue-700`, `green-800`, `red-700`, `yellow-800`) so everything references one ramp.
+
+| Step | Blue | Green | Red | Yellow |
+|---|---|---|---|---|
+| 50  | `#E8F2FF` | `#E8F9E6` | `#FFEDEC` | `#FDF8E8` |
+| 100 | `#D1E6FF` | `#D4F3D1` | `#FFDCDA` | `#FDF5D9` |
+| 200 | `#AED3FF` | `#B4EAAF` | `#FFC2BF` | `#FEF0C3` |
+| 300 | `#8ABFFF` | `#93E08E` | `#FFA6A3` | `#FEEBAC` |
+| 400 | `#5BA7FF` | `#66D361` | `#FF807F` | `#FFE48E` |
+| **500** | **`#148CFF`** | **`#20C621`** | **`#FF4F59`** | **`#FFDD6C`** |
+| 600 | `#0878DD` | `#0AA80F` | `#DC3F49` | `#D4B651` |
+| 700 | `#0064BD` | `#008B03` | `#BA303A` | `#AB9137` |
+| 800 | `#00519C` | `#006F01` | `#99212C` | `#836D1C` |
+| 900 | `#00407F` | `#005600` | `#7C141F` | `#624F00` |
+
+**Text-on-white safety (WCAG AA, ≥4.5:1 body):** Blue ≥ **700** (5.9:1), Green ≥ **800** (6.4:1; 700 is 4.5 borderline), Red ≥ **700** (5.9:1), Yellow ≥ **800** (5.0:1). On dark (`#121212`) the 500s and below all clear AA. Pick a 600/700 for hover/pressed states of a 500 fill. *Re-verify any shipped text value in a contrast checker.*
 
 ---
 
@@ -59,7 +76,13 @@ Define, for each brand hue, a **bright "signal" value** (the hex above — used 
 
 Plus: colors are duplicated as raw hex across components (~10 distinct blues, multiple greens/ambers/reds). There is **no shared brand-token layer** any of the three can reference. `#148CFF` appears nowhere yet.
 
-**Theme mechanism is consistent, though:** all routes ride **next-themes**, which toggles a **`.dark` class on `<html>`** (confirmed in `app/learn/layout.tsx`, `mermaid.tsx`). That class is the universal hook for light/dark token swaps.
+**Theme mechanisms differ per route** (verified in code — an earlier draft of this report over-simplified this):
+
+- **`/learn`** uses **next-themes** (via Fumadocs `RootProvider`), toggling a **`.dark` class** on `<html>`.
+- **`/playground`** uses a **`data-theme="light|dark"` attribute** on `<html>`, driven by the selected editor theme (`applyMode` in `playgroundTheme.ts`) — *not* next-themes.
+- **`/`** has **no theme switch at all** — it's hardcoded dark.
+
+So there is no single universal hook. The fix (below) keeps token **values** global and has each route's dark override target **both** `.dark` *and* `[data-theme="dark"]`, while the dark-only home consumes the raw bright ramp directly.
 
 ---
 
@@ -70,6 +93,8 @@ Introduce a single source of truth, then *adapt* it into each world rather than 
 ### 4.1 Layer 1 — global brand tokens (`app/brand.css`, imported once)
 
 A plain CSS file with **raw hues** and **semantic roles** that remap for dark mode. No Tailwind needed, so it works for the CSS-module routes and Fumadocs alike. Import it in the root `app/layout.tsx` (it's tiny and framework-agnostic).
+
+> The snippet below is an **abridged illustration**. The **authoritative version shipped in `app/brand.css`** also includes the full 50–900 ramps from §2.2 and targets both dark hooks (`.dark, [data-theme="dark"]`). Read that file for the exact tokens.
 
 ```css
 /* app/brand.css — single source of truth for brand color */
@@ -168,17 +193,19 @@ Consistency comes from **meaning**, not just shared hex. Lock these mappings:
 
 ## 6. Migration plan
 
-**Phase 0 — Define & QA (½ day).** Add `app/brand.css` with the tokens from §4.1. Extend the existing **`/color-test`** route (it's already a palette harness) to render brand swatches + the ink variants with live contrast readouts in both modes. This is your acceptance gate.
+> **Status: Phases 0–3 are implemented in this branch** (build green, lint clean, 445 unit tests pass). Phase 4 (de-dupe) and a light-mode home redesign remain.
 
-**Phase 1 — Playground.** Lowest-risk: it already has the token slots. Repoint `--primary/--blue/--green/--red/--yellow` to brand tokens; visually verify the Run button, error states, and selection tints across a couple of editor themes.
+**Phase 0 — Define & QA — ✅ done.** `app/brand.css` ships the full ramps + ink + semantic-role tokens, imported once in `app/layout.tsx`. The **`/color-test`** route now renders the four ink anchors and all 40 ramp swatches (each with copy-to-clipboard), so it doubles as the acceptance gate.
 
-**Phase 2 — Learn.** Remap `--color-fd-primary`/`--color-fd-ring` (and callout accents) to brand tokens in `learn.css`. Check links, active sidebar item, focus rings, and admonition colors in both modes.
+**Phase 1 — Playground — ✅ done.** `playground.css` repoints `--primary/--blue/--green/--red/--yellow` (and `--primary-glow` via `color-mix`) at the brand tokens. The editor-theme palettes (`THEME_PALETTES`) are deliberately untouched.
 
-**Phase 3 — Home.** Replace hardcoded hex in `root.module.css` with tokens **and add a light mode** (currently dark-only). Biggest visual delta — do it last, with design review.
+**Phase 2 — Learn — ✅ done (primary/ring).** `learn.css` maps `--color-fd-primary` → `--ds-blue-ink` (light) / `--ds-blue-400` (dark) and `--color-fd-ring` → brand blue. Remapping individual callout/admonition accents is a follow-up if you want them brand-tinted too.
 
-**Phase 4 — De-dupe.** Sweep the ~10 ad-hoc blues / multiple greens/ambers in component CSS modules and replace with tokens. Add a lint rule or CI grep to flag new raw-hex brand colors so drift doesn't return.
+**Phase 3 — Home — ✅ tokenized (still dark-only).** `root.module.css` now pulls its blue/green accents and the title gradient from the ramp (`var(--ds-blue)`, `var(--ds-green)`, `var(--ds-blue-400)`). It remains dark-only by design — **adding a light mode to the home route is a separate design decision** (no theme switch exists there yet) and was intentionally *not* done unilaterally.
 
-> Sequence rationale: playground → learn → home goes from "tokens already exist" to "tokens partially exist (Fumadocs)" to "no tokens + needs a new light mode," i.e. easiest-to-hardest and lowest-to-highest visual risk.
+**Phase 4 — De-dupe — ⬜ todo.** Sweep the ~10 ad-hoc blues / multiple greens/ambers still hardcoded in component CSS modules and replace with tokens. Add a lint rule or CI grep to flag new raw-hex brand colors so drift doesn't return.
+
+> Sequence rationale (as executed): playground → learn → home went from "tokens already exist" to "tokens partially exist (Fumadocs)" to "no tokens," i.e. easiest-to-hardest and lowest-to-highest visual risk.
 
 ---
 
@@ -200,7 +227,7 @@ The same dark-native asymmetry from §2 applies to illustrations, but illustrati
 ## 8. Summary
 
 1. **Adopt two values per hue** — a bright "signal" (your four hex) and a darker "ink" for light-mode text. The palette is dark-native; light mode needs the ink variants.
-2. **One `app/brand.css` token layer**, adapted into each of the three worlds (CSS modules → tokens, Fumadocs `--color-fd-*` remap, playground `--primary/...` remap). The `.dark` class flips everything.
+2. **One `app/brand.css` token layer** (✅ shipped), adapted into each of the three worlds (CSS modules → tokens, Fumadocs `--color-fd-*` remap, playground `--primary/...` remap). Dark overrides target both `.dark` (/learn) and `[data-theme="dark"]` (/playground); dark-only home uses the raw ramp.
 3. **Lock semantic meaning** (blue=primary, green=success, red=error, yellow=attention) and the accessibility do/don'ts.
 4. **Migrate playground → learn → home**, using `/color-test` as the QA gate; then de-dupe ad-hoc hex.
 5. **Illustrations:** feasible and well-suited in both modes — transparent backgrounds + mid-tone palette use (or SVG), bright hues for dark, slightly tempered for light.

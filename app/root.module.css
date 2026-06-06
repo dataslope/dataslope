@@ -19,7 +19,7 @@
 .title {
   font-size: 3rem;
   margin: 0 0 0.5rem;
-  background: linear-gradient(135deg, #4f8ef7, #34d399);
+  background: linear-gradient(135deg, var(--ds-blue), var(--ds-green));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -46,7 +46,7 @@
 }
 
 .cta:hover {
-  border-color: #4f8ef7;
+  border-color: var(--ds-blue-400);
   background: #1b2230;
 }
 
@@ -80,7 +80,7 @@
 }
 
 .ctaSecondary:hover {
-  border-color: #4f8ef7;
+  border-color: var(--ds-blue-400);
   color: #e2e8f0;
   background: #1b2230;
 }
@@ -97,7 +97,7 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #4f8ef7;
+  color: var(--ds-blue-400);
   margin: 0 0 0.75rem;
 }
 
@@ -121,7 +121,7 @@
 }
 
 .courseCard:hover {
-  border-color: #4f8ef7;
+  border-color: var(--ds-blue-400);
   background: #1b2230;
 }
 
@@ -131,7 +131,7 @@
 }
 
 .courseArrow {
-  color: #4f8ef7;
+  color: var(--ds-blue-400);
   transition: transform 0.15s;
 }
 
