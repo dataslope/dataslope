@@ -50,45 +50,39 @@ function cachePromise<T>(key: string, setPromise: () => Promise<T>): Promise<T> 
 
 // ─── Brand-themed Mermaid palette ──────────────────────────────────────────
 //
-// Mermaid runs color math (khroma) over its theme variables, so it needs
-// concrete colors rather than `var(--ds-*)` strings. We resolve the brand
-// tokens (app/brand.css) to hex at render time, keeping that file the single
-// source of truth, and fall back to the literal brand values — mirrored below,
-// kept in sync with app/brand.css — if a token is ever missing (e.g. before
-// the stylesheet applies). Only the steps the theme actually uses are listed.
+// Diagrams use one SOFT, LIGHT palette from the brand system (app/brand.css)
+// in *both* modes, via Mermaid's customizable "base" theme. It's light in both
+// modes for two reasons:
+//   1. Many MDX diagrams hand-color nodes with `classDef` light pastel fills
+//      and no text color (e.g. `fill:#fee2e2`). One global node-text color must
+//      be dark to stay legible on them — so every box is light with dark text.
+//   2. With all text dark, we render the whole figure on a soft light "card" in
+//      dark mode (see mermaid.module.css) so it reads cleanly on a dark page —
+//      no per-element light/dark juggling, and author pastels always work.
+// Borders are deliberately minimal (soft hairlines) and the palette is
+// low-contrast (updates from the brand report). Mermaid runs color math
+// (khroma) over these values and needs concrete colors, so we resolve the
+// brand tokens to hex at render time (brand.css stays the source of truth)
+// with literal fallbacks.
 const BRAND_FALLBACKS: Record<string, string> = {
   "--ds-blue-50": "#E8F2FF",
   "--ds-blue-100": "#D1E6FF",
   "--ds-blue-200": "#AED3FF",
-  "--ds-blue-400": "#5BA7FF",
-  "--ds-blue-600": "#0878DD",
-  "--ds-blue-800": "#00519C",
   "--ds-teal-200": "#AAE0DD",
-  "--ds-teal-600": "#009491",
-  "--ds-teal-800": "#006361",
   "--ds-green-200": "#B4EAAF",
-  "--ds-green-800": "#006F01",
   "--ds-red-200": "#FFC2BF",
   "--ds-red-500": "#FF4F59",
   "--ds-red-600": "#DC3F49",
-  "--ds-red-800": "#99212C",
   "--ds-yellow-100": "#FDF5D9",
   "--ds-yellow-200": "#FEF0C3",
-  "--ds-yellow-600": "#D4B651",
-  "--ds-yellow-800": "#836D1C",
   "--ds-orange-200": "#F6CAAD",
-  "--ds-orange-800": "#844200",
   "--ds-purple-200": "#DBCAFC",
-  "--ds-purple-800": "#634094",
-  "--ds-gray-50": "#f9fafb",
-  "--ds-gray-300": "#d1d5db",
-  "--ds-gray-400": "#9ca3af",
-  "--ds-gray-500": "#6b7280",
-  "--ds-gray-600": "#4b5563",
-  "--ds-gray-700": "#374151",
-  "--ds-gray-800": "#1f2937",
+  "--ds-gray-50": "#F9FAFB",
+  "--ds-gray-200": "#E5E7EB",
+  "--ds-gray-300": "#D1D5DB",
+  "--ds-gray-400": "#9CA3AF",
   "--ds-gray-900": "#111827",
-  "--ds-white": "#ffffff",
+  "--ds-white": "#FFFFFF",
 };
 
 function readBrand(): (token: keyof typeof BRAND_FALLBACKS) => string {
@@ -104,38 +98,32 @@ function readBrand(): (token: keyof typeof BRAND_FALLBACKS) => string {
   return (token) => resolved[token] ?? BRAND_FALLBACKS[token];
 }
 
-// Build Mermaid `themeVariables` for the brand "base" theme. Light mode places
-// dark text/soft-blue nodes on a white page; dark mode places light text on
-// dark cards with a bright-blue accent border. All node/line/text pairings are
-// WCAG-AA verified. Semantic brand hues (green/red/yellow) keep their meaning
-// (success/error/warning notes & critical tasks); the seven-hue categorical
-// wheel colors multi-branch diagrams (mindmaps) without semantic collisions.
-function brandThemeVariables(isDark: boolean): Record<string, string | boolean> {
+function brandThemeVariables(): Record<string, string | boolean> {
   const c = readBrand();
 
-  const text = isDark ? c("--ds-gray-50") : c("--ds-gray-900");
-  const surface = isDark ? c("--ds-gray-900") : c("--ds-white");
-  const nodeFill = isDark ? c("--ds-gray-800") : c("--ds-blue-50");
-  const nodeBorder = isDark ? c("--ds-blue-400") : c("--ds-blue-600");
-  const line = isDark ? c("--ds-gray-400") : c("--ds-gray-500");
-  const lifeline = isDark ? c("--ds-gray-500") : c("--ds-gray-400");
-  const signal = isDark ? c("--ds-gray-300") : c("--ds-gray-600");
-  const clusterFill = isDark ? c("--ds-gray-900") : c("--ds-gray-50");
-  const clusterBorder = isDark ? c("--ds-gray-700") : c("--ds-gray-300");
+  const ink = c("--ds-gray-900"); // all text — dark, sits on light fills/card
+  const canvas = c("--ds-white"); // diagram canvas + edge-label backdrop blend
+  const nodeFill = c("--ds-blue-50"); // soft node fill
+  const nodeEdge = c("--ds-blue-200"); // minimal hairline border
+  const softFill = c("--ds-gray-50"); // clusters / subgraphs / alt rows
+  const softEdge = c("--ds-gray-200");
+  const line = c("--ds-gray-400"); // connectors
 
-  // Categorical wheel (mindmaps): light = soft -200 fills under dark labels;
-  // dark = deep -800 fills under light labels. Mermaid re-applies overrides
-  // after its internal derivation, so these exact values reach the SVG.
-  const step = isDark ? "800" : "200";
+  // Categorical wheel (mindmaps): soft -200 fills under dark labels. Mermaid
+  // re-applies overrides after its internal derivation, so these reach the SVG
+  // verbatim (its cScale darkening is bypassed).
   const wheel = ["blue", "teal", "green", "yellow", "orange", "red", "purple"];
   const cScale: Record<string, string> = {};
   for (let i = 0; i < 12; i++) {
-    cScale[`cScale${i}`] = c(`--ds-${wheel[i % wheel.length]}-${step}` as keyof typeof BRAND_FALLBACKS);
+    cScale[`cScale${i}`] = c(
+      `--ds-${wheel[i % wheel.length]}-200` as keyof typeof BRAND_FALLBACKS,
+    );
   }
 
   return {
-    darkMode: isDark,
-    background: surface,
+    // Light-based in both modes; dark mode is handled by a CSS figure card.
+    darkMode: false,
+    background: canvas,
     fontFamily: '"Source Serif 4", Georgia, "Times New Roman", serif',
     // Controls the font-size written into the SVG's inline <style> block.
     // Without this, Mermaid inherits the container's computed size (16px from
@@ -143,77 +131,84 @@ function brandThemeVariables(isDark: boolean): Record<string, string | boolean> 
     // config which only governs text measurement.
     fontSize: "15px",
 
-    // Primary nodes (flowchart / class / state / ER) + sequence actors
+    // Nodes (flowchart / class / state / ER) + sequence actors
     primaryColor: nodeFill,
-    primaryBorderColor: nodeBorder,
-    primaryTextColor: text,
-    nodeTextColor: text,
+    primaryBorderColor: nodeEdge,
+    primaryTextColor: ink,
+    nodeTextColor: ink,
 
-    // Secondary / tertiary — clusters/subgraphs and accents
-    secondaryColor: isDark ? c("--ds-gray-700") : c("--ds-teal-200"),
-    secondaryBorderColor: isDark ? c("--ds-gray-600") : c("--ds-teal-600"),
-    secondaryTextColor: text,
-    tertiaryColor: clusterFill,
-    tertiaryBorderColor: clusterBorder,
-    tertiaryTextColor: text,
+    // Secondary / tertiary — clusters/subgraphs + gentle accents
+    secondaryColor: c("--ds-blue-100"),
+    secondaryBorderColor: nodeEdge,
+    secondaryTextColor: ink,
+    tertiaryColor: softFill,
+    tertiaryBorderColor: softEdge,
+    tertiaryTextColor: ink,
 
-    // Edges / arrows / labels
+    // Connectors + labels (edge-label backdrops blend into the canvas/card)
     lineColor: line,
     arrowheadColor: line,
-    textColor: text,
-    titleColor: text,
-    edgeLabelBackground: surface,
+    textColor: ink,
+    titleColor: ink,
+    edgeLabelBackground: canvas,
 
-    // Notes (sequence + flowchart) — bright "sticky note" in both modes
+    // Notes — soft yellow, dark text
     noteBkgColor: c("--ds-yellow-100"),
-    noteBorderColor: c("--ds-yellow-600"),
-    noteTextColor: c("--ds-gray-900"),
+    noteBorderColor: c("--ds-yellow-200"),
+    noteTextColor: ink,
 
     // Sequence diagrams
     actorBkg: nodeFill,
-    actorBorder: nodeBorder,
-    actorTextColor: text,
-    actorLineColor: lifeline,
-    signalColor: signal,
-    signalTextColor: text,
+    actorBorder: nodeEdge,
+    actorTextColor: ink,
+    actorLineColor: c("--ds-gray-300"),
+    signalColor: line,
+    signalTextColor: ink,
     labelBoxBkgColor: nodeFill,
-    labelBoxBorderColor: nodeBorder,
-    labelTextColor: text,
-    loopTextColor: text,
-    activationBkgColor: isDark ? c("--ds-gray-700") : c("--ds-blue-100"),
-    activationBorderColor: nodeBorder,
-    sequenceNumberColor: isDark ? c("--ds-gray-900") : c("--ds-white"),
+    labelBoxBorderColor: nodeEdge,
+    labelTextColor: ink,
+    loopTextColor: ink,
+    activationBkgColor: c("--ds-blue-100"),
+    activationBorderColor: nodeEdge,
+    sequenceNumberColor: ink,
 
     // Class diagrams
-    classText: text,
+    classText: ink,
+
+    // State diagrams — keep composite/alt backgrounds light (they default to
+    // `background`) so nested state text stays legible.
+    compositeBackground: softFill,
+    altBackground: softFill,
+    compositeTitleBackground: nodeFill,
+    compositeBorder: nodeEdge,
 
     // ER diagrams — alternating attribute rows
-    attributeBackgroundColorOdd: clusterFill,
-    attributeBackgroundColorEven: surface,
+    attributeBackgroundColorOdd: softFill,
+    attributeBackgroundColorEven: canvas,
 
     // Gantt charts
-    sectionBkgColor: isDark ? c("--ds-gray-800") : c("--ds-gray-50"),
-    altSectionBkgColor: surface,
-    sectionBkgColor2: isDark ? c("--ds-gray-700") : c("--ds-blue-50"),
-    taskBkgColor: nodeFill,
-    taskBorderColor: nodeBorder,
-    activeTaskBkgColor: isDark ? c("--ds-blue-800") : c("--ds-blue-200"),
-    activeTaskBorderColor: nodeBorder,
-    gridColor: clusterBorder,
-    doneTaskBkgColor: isDark ? c("--ds-gray-700") : c("--ds-gray-300"),
-    doneTaskBorderColor: c("--ds-gray-500"),
-    critBkgColor: isDark ? c("--ds-red-800") : c("--ds-red-200"),
+    sectionBkgColor: softFill,
+    altSectionBkgColor: canvas,
+    sectionBkgColor2: c("--ds-blue-50"),
+    taskBkgColor: c("--ds-blue-100"),
+    taskBorderColor: nodeEdge,
+    activeTaskBkgColor: c("--ds-blue-200"),
+    activeTaskBorderColor: nodeEdge,
+    gridColor: softEdge,
+    doneTaskBkgColor: c("--ds-gray-200"),
+    doneTaskBorderColor: c("--ds-gray-400"),
+    critBkgColor: c("--ds-red-200"),
     critBorderColor: c("--ds-red-600"),
     todayLineColor: c("--ds-red-500"),
-    taskTextColor: text,
-    taskTextDarkColor: c("--ds-gray-900"),
-    taskTextLightColor: c("--ds-white"),
-    taskTextOutsideColor: text,
+    taskTextColor: ink,
+    taskTextDarkColor: ink,
+    taskTextLightColor: ink,
+    taskTextOutsideColor: ink,
 
     // Categorical scale (mindmaps / pie) + mindmap root node
-    scaleLabelColor: text,
-    git0: isDark ? c("--ds-gray-800") : c("--ds-blue-100"),
-    gitBranchLabel0: text,
+    scaleLabelColor: ink,
+    git0: c("--ds-blue-100"),
+    gitBranchLabel0: ink,
     ...cScale,
   };
 }
@@ -230,10 +225,11 @@ function MermaidContent({ chart }: { chart: string }) {
     fontSize: 15,
     themeCSS: "margin: 1.5rem auto 0;",
     // Drive diagram colors from the DataSlope brand palette (app/brand.css) via
-    // the customizable "base" theme, instead of Mermaid's stock neutral (light)
-    // / dark themes, so charts match the rest of /learn in both modes.
+    // the customizable "base" theme, instead of Mermaid's stock neutral/dark
+    // themes. The theme is light-based in both modes; free-floating text blends
+    // with the page so it reads on light and dark (see brandThemeVariables).
     theme: "base",
-    themeVariables: brandThemeVariables(resolvedTheme === "dark"),
+    themeVariables: brandThemeVariables(),
   });
 
   const { svg, bindFunctions } = use(
@@ -256,6 +252,7 @@ function MermaidContent({ chart }: { chart: string }) {
   return (
     <div className={styles.wrap}>
       <div
+        className={styles.diagram}
         ref={(container) => {
           if (container) bindFunctions?.(container);
         }}
@@ -532,7 +529,11 @@ function MermaidFullscreen({
               transform: `translate(${tx}px, ${ty}px)`,
             }}
           >
-            <div ref={stageRef} dangerouslySetInnerHTML={{ __html: svg }} />
+            <div
+              className={styles.diagram}
+              ref={stageRef}
+              dangerouslySetInnerHTML={{ __html: svg }}
+            />
           </div>
         </div>
       </div>

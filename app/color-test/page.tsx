@@ -68,8 +68,20 @@ const SWATCH_DEFS: SwatchDef[] = [
   { name: "--ds-green-ink", label: "Green ink", isTextColor: true },
   { name: "--ds-red-ink", label: "Red ink", isTextColor: true },
   { name: "--ds-amber-ink", label: "Amber ink", isTextColor: true },
+  // Decorative-hue "ink" anchors (non-semantic; AA-on-white from brand.css).
+  { name: "--ds-teal-ink", label: "Teal ink", isTextColor: true },
+  { name: "--ds-purple-ink", label: "Purple ink", isTextColor: true },
+  { name: "--ds-orange-ink", label: "Orange ink", isTextColor: true },
   // Full 50–900 brand ramps (brand.css). 500 = the brand color.
   ...(["blue", "green", "red", "yellow"] as const).flatMap((hue) =>
+    [50, 100, 200, 300, 400, 500, 600, 700, 800, 900].map((step) => ({
+      name: `--ds-${hue}-${step}`,
+      label: `${hue} ${step}`,
+    })),
+  ),
+  // Decorative / categorical ramps (teal, purple, orange) — non-semantic,
+  // for charts (Mermaid mindmaps) and illustrations. 500 = the base hue.
+  ...(["teal", "purple", "orange"] as const).flatMap((hue) =>
     [50, 100, 200, 300, 400, 500, 600, 700, 800, 900].map((step) => ({
       name: `--ds-${hue}-${step}`,
       label: `${hue} ${step}`,

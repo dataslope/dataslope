@@ -11,14 +11,29 @@
    cap equal to the diagram's intrinsic width. Leaving that cap intact keeps
    the diagram at its default size on wide columns while still letting it
    scale down to fit narrower ones (the SVG carries a viewBox). */
-.wrap > div:first-child {
+.wrap > .diagram {
   width: 100%;
 }
 
-.wrap > div:first-child svg {
+.diagram svg {
   display: block;
   margin-inline: auto;
   height: auto;
+}
+
+/* Dark mode: the Mermaid theme is light in both modes (so author classDef
+   pastel fills keep dark, legible text). Render it on a soft "figure card" so
+   the light diagram reads cleanly on the dark page. The card hugs the diagram
+   (fit-content) rather than spanning the whole column. Applies to both the
+   inline diagram and the fullscreen modal stage (both carry .diagram). */
+:global(.dark) .diagram {
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  background: var(--ds-white, #ffffff);
+  padding: 0.85rem 1.1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .expandBtn {
