@@ -143,14 +143,14 @@ Three things to notice — they will reappear on almost every page:
 
 ## What you'll be able to do by the end
 
-```mermaid
-flowchart TD
-    A["A vague requirement<br/>track unique users<br/>by login order"] --> B["Recognize<br/>the right container<br/>LinkedHashSet"]
-    B --> C["Model it with<br/>a generic API"]
-    C --> D["Reason about<br/>Big-O and memory"]
-    D --> E["Layer behind<br/>an interface"]
-    E --> F["Compose into<br/>larger architecture"]
-```
+Take a vague requirement — *track unique users by login order* — and
+carry it all the way down:
+
+1. **Recognize** the right container (here, a `LinkedHashSet`).
+2. **Model** it with a generic API.
+3. **Reason** about its Big-O and memory.
+4. **Layer** it behind an interface.
+5. **Compose** it into a larger architecture.
 
 Let's start where every interesting story about software starts: with
 the problem that the tools we had weren't enough.

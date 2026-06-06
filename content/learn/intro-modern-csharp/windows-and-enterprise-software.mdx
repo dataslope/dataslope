@@ -70,22 +70,8 @@ later make.
 ## The Microsoft developer toolchain before .NET
 
 By the late 1990s, Microsoft offered three major tools for building
-software on Windows:
-
-```mermaid
-flowchart TB
-    subgraph Tools["Microsoft developer tools, ~1998"]
-        VC["Visual C++<br/>(power, but unsafe)"]
-        VB["Visual Basic<br/>(easy, but limited)"]
-        VJ["Visual J++<br/>(Microsoft's Java)"]
-    end
-    subgraph Goal["What enterprises wanted"]
-        G["A language that was<br/>both safe AND powerful,<br/>with great Windows tools"]
-    end
-    Tools -.does not exist yet.-> Goal
-```
-
-Each tool had real strengths and real weaknesses:
+software on Windows — Visual C++, Visual Basic, and Visual J++.
+Each had real strengths and real weaknesses:
 
 - **Visual C++** gave you raw, fast access to Windows. But C++ is
   notoriously unsafe: pointer bugs, memory leaks, and crashes were

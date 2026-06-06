@@ -26,17 +26,15 @@ training set* by February and April. The model gets to peek at both sides of
 every test point. It will score brilliantly in evaluation and collapse in
 production, where the future genuinely doesn't exist yet.
 
-```mermaid
-flowchart TB
-    subgraph BAD["WRONG: random / k-fold split (test points time-surrounded by train)"]
-        direction LR
-        b1["Jan<br/>train"] --> b2["Feb<br/>TEST"] --> b3["Mar<br/>train"] --> b4["Apr<br/>TEST"] --> b5["May<br/>train"]
-    end
-    subgraph GOOD["RIGHT: chronological split (train is the past, test is the future)"]
-        direction LR
-        g1["Jan<br/>train"] --> g2["Feb<br/>train"] --> g3["Mar<br/>train"] --> g4["Apr<br/>TEST"] --> g5["May<br/>TEST"]
-    end
-```
+Line the two schemes up month by month and the flaw is obvious — under the
+random split, every `TEST` month is hemmed in by `train` months on both
+sides; under the chronological split, all training is in the past and all
+testing is in the future:
+
+| Split | Jan | Feb | Mar | Apr | May |
+| --- | --- | --- | --- | --- | --- |
+| **Random / k-fold** (wrong) | train | `TEST` | train | `TEST` | train |
+| **Chronological** (right) | train | train | train | `TEST` | `TEST` |
 
 Let's *measure* the leakage. We'll take a smooth-ish series and "predict"
 held-out points two ways: a random hold-out (where each test point still has
@@ -178,23 +176,13 @@ estimate is noisy. Maybe that particular tail happened to be easy or hard.
 *many* successive cut-off points and averages the skill. The iron rule holds
 in every fold: **train is always strictly before test.**
 
-```mermaid
-flowchart TB
-    subgraph F1["Fold 1"]
-        direction LR
-        a1["train: months 1-60"] --> p1["test: 61-72"]
-    end
-    subgraph F2["Fold 2 (train grows)"]
-        direction LR
-        a2["train: months 1-72"] --> p2["test: 73-84"]
-    end
-    subgraph F3["Fold 3 (train grows)"]
-        direction LR
-        a3["train: months 1-84"] --> p3["test: 85-96"]
-    end
-```
+| Fold | Train (the past) | Test (the future) |
+| --- | --- | --- |
+| 1 | months 1–60 | months 61–72 |
+| 2 | months 1–72 | months 73–84 |
+| 3 | months 1–84 | months 85–96 |
 
-The picture above is the **expanding-window** (anchored) scheme: the training
+This is the **expanding-window** (anchored) scheme: the training
 set grows each fold while the test window marches forward. A **rolling-window**
 scheme instead keeps the training window a fixed *size* and slides it — useful
 when old history stops being relevant. Either way, you get several honest

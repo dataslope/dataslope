@@ -221,16 +221,14 @@ single, radical claim:
 The rest of this course is about how to actually do that, in
 TypeScript, for real applications.
 
-```mermaid
-flowchart LR
-    subgraph Imperative
-      A[Step 1: mutate x] --> B[Step 2: mutate y] --> C[Step 3: side effect]
-    end
-    subgraph Functional
-      D[value] --> E[pure transformation] --> F[new value] --> G[edge effect]
-    end
-    style E fill:#e6f7e6
-```
+The shape of a computation changes accordingly:
+
+| Imperative | Functional |
+| --- | --- |
+| mutate `x` | a value |
+| mutate `y` | a pure transformation |
+| side effect | a new value |
+| | the effect, at the edge |
 
 The next chapter looks at where these ideas *came from* — the
 mathematical and historical roots of functional programming, from

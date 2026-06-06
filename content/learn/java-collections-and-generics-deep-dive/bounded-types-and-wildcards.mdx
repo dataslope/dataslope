@@ -208,15 +208,16 @@ the *consumer* (we write into it): `? super T`.
 
 ## Picture: variance on a number line
 
-```mermaid
-flowchart TD
-    A[List of Object] --- B[List ? super Integer]
-    B --- C[List of Integer]
-    C --- D[List ? extends Number]
-    D --- E[List of Number]
-    E --- F[List ? extends Object]
-    F --- G[List ? unbounded]
-```
+Line the wildcard forms up from the widest supertype down to the most
+permissive bound:
+
+1. `List<Object>`
+2. `List<? super Integer>`
+3. `List<Integer>`
+4. `List<? extends Number>`
+5. `List<Number>`
+6. `List<? extends Object>`
+7. `List<?>` (unbounded)
 
 `? extends T` shrinks toward subtypes (read-only side). `? super T`
 shrinks toward supertypes (write-only side). Plain `T` is the fixed

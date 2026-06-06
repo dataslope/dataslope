@@ -19,24 +19,21 @@ be fast, and must be safe even if thousands happen at once.
 An **analysis** is the opposite in almost every dimension: it reads a
 huge slice of history and condenses it into understanding.
 
-```mermaid
-flowchart LR
-    subgraph OLTP["OLTP — transactional"]
-        direction TB
-        T1["Many small writes<br/>and point reads"]
-        T2["Touch a few rows"]
-        T3["Latency: milliseconds"]
-        T4["Keeps the business<br/>running"]
-    end
-    subgraph OLAP["OLAP — analytical"]
-        direction TB
-        O1["Few large reads"]
-        O2["Scan millions of rows,<br/>few columns"]
-        O3["Latency: seconds is fine"]
-        O4["Helps the business<br/>understand itself"]
-    end
-    OLTP -. "same data,<br/>different question" .-> OLAP
-```
+**OLTP — transactional:**
+
+- Many small writes and point reads
+- Touches a few rows
+- Latency measured in milliseconds
+- Keeps the business *running*
+
+**OLAP — analytical:**
+
+- Few large reads
+- Scans millions of rows, a few columns
+- Latency of seconds is fine
+- Helps the business *understand itself*
+
+It is the same data, asked a different question.
 
 A simple way to remember it: **OLTP records what happened; OLAP explains
 what it means.** Every order an OLTP system saves becomes a row that, much
@@ -54,23 +51,20 @@ feels fast for analysis. Databases can store a table in two ways.
   for OLAP: "average `amount` over 10 million orders" reads just the
   `amount` column and skips everything else.
 
-```mermaid
-flowchart TB
-    subgraph Row["Row store (good for OLTP)"]
-        direction LR
-        R1["order1: id, date, amount, region"]
-        R2["order2: id, date, amount, region"]
-        R3["order3: id, date, amount, region"]
-    end
-    subgraph Col["Column store (good for OLAP)"]
-        direction LR
-        C1["all ids"]
-        C2["all dates"]
-        C3["all amounts"]
-        C4["all regions"]
-    end
-    Row -- "analytics reads<br/>one column" --> Col
+Row store (good for OLTP) keeps each order's values together on disk:
+
+```text
+[id1 date1 amount1 region1] [id2 date2 amount2 region2] [id3 date3 amount3 region3]
 ```
+
+Column store (good for OLAP) keeps each column together instead:
+
+```text
+[id1 id2 id3] [date1 date2 date3] [amount1 amount2 amount3] [region1 region2 region3]
+```
+
+An analytical query for "average `amount`" reads only the third block and
+skips the rest.
 
 When an analytical query only needs `amount`, a **column store** reads
 *only* the amounts — not the ids, dates, or regions sitting beside them.

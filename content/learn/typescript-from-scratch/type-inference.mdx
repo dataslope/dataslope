@@ -51,13 +51,10 @@ Why the difference? A `const` binding can never be reassigned, so the compiler c
 
 This is called **widening**: the compiler expands a narrow literal type into a broader one when the variable is mutable. It's a practical trade-off between precision and flexibility.
 
-```mermaid
-graph TD
-    A["const x = 'hello'"] --> B["Type: 'hello' literal"]
-    C["let y = 'hello'"] --> D[Type: string widened]
-    B --> E[Cannot reassign]
-    D --> F[Can reassign to any string]
-```
+| Binding | Inferred type | Why |
+| --- | --- | --- |
+| `const x = "hello"` | `"hello"` (literal) | Can never be reassigned, so the exact value is locked in |
+| `let y = "hello"` | `string` (widened) | Can be reassigned to any string, so the type broadens |
 
 ## Contextual typing
 
@@ -219,14 +216,11 @@ console.log(\`First feature: \${firstFeature}\`);
 
 Here's the inference chain:
 
-```mermaid
-graph TD
-    A[getConfig return literal] --> B[Inferred object type]
-    B --> C[config: inferred type]
-    C --> D[config.features: string array]
-    D --> E[features zero-index: string]
-    E --> F[firstFeature: string]
-```
+1. `getConfig`'s `return` literal gives the function an inferred object type.
+2. `config` takes that inferred type.
+3. `config.features` is `string[]`.
+4. `config.features[0]` is `string`.
+5. `firstFeature` is therefore `string`.
 
 Each expression's type is deduced from the types of its subexpressions. The compiler starts at the leaves (literal values) and propagates types upward through property accesses, function calls, and assignments.
 

@@ -134,13 +134,12 @@ A first-order method needs $10^6$ steps to gain $6$ digits of
 accuracy. A fourth-order method needs only $30$. **Order beats
 constants** for any problem accurate enough to matter.
 
-```mermaid
-graph LR
-    O1[Order 1<br/>error halves per step] --> H1[~50 steps<br/>per 15 digits]
-    O2[Order 2<br/>error /4 per step] --> H2[~25 steps]
-    O4[Order 4<br/>error /16 per step] --> H4[~13 steps]
-    O8[Order 8<br/>error /256 per step] --> H8[~6 steps]
-```
+| Method order | Error per step | Steps for ~15 digits |
+| --- | --- | --- |
+| 1 | halves | ~50 |
+| 2 | $\div 4$ | ~25 |
+| 4 | $\div 16$ | ~13 |
+| 8 | $\div 256$ | ~6 |
 
 This is why SciPy's `solve_ivp` defaults to `RK45` (a 4th–5th order
 Runge–Kutta pair) rather than to plain Euler.

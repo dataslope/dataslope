@@ -19,19 +19,14 @@ page nails down.
 - **`HAVING`** runs **after** grouping. It filters whole *groups*, so it
   can see aggregates like `SUM(amount)`.
 
-```mermaid
-flowchart LR
-    R[("Rows")] --> W["WHERE<br/>(filter rows)"]
-    W --> G["GROUP BY<br/>(form groups)"]
-    G --> A["aggregate<br/>(per-group totals)"]
-    A --> H["HAVING<br/>(filter groups)"]
-    H --> O["ORDER BY"]
-```
+The clauses run in a fixed order:
 
-That single diagram is the whole mental model. `WHERE` is upstream of the
-groups; `HAVING` is downstream. A condition that mentions an aggregate
-*must* go in `HAVING`, because the aggregate does not exist yet when
-`WHERE` runs.
+**Rows → `WHERE` (filter rows) → `GROUP BY` (form groups) → aggregate
+(per-group totals) → `HAVING` (filter groups) → `ORDER BY`**
+
+That order is the whole mental model. `WHERE` is upstream of the groups;
+`HAVING` is downstream. A condition that mentions an aggregate *must* go in
+`HAVING`, because the aggregate does not exist yet when `WHERE` runs.
 
 ## `HAVING` in action
 

@@ -179,15 +179,11 @@ By constraining `T extends readonly unknown[]`, we accept both mutable and reado
 When you preserve precise input types (readonly, literals, exact shapes), the compiler can give you more accurate autocomplete and catch more bugs. This is especially important in library code, where you don't control the input types.
 </Callout>
 
-```mermaid
-graph TD
-    A[Input: readonly array of literals] --> B[T extends readonly unknown]
-    B --> C[T binds to precise type]
-    C --> D[Return T 0: preserves literal]
-    E[Input: mutable array of strings] --> F[T extends readonly unknown]
-    F --> G[T binds to string array]
-    G --> H[Return T 0: string]
-```
+| Stage | Readonly array of literals | Mutable array of strings |
+| --- | --- | --- |
+| Input | `readonly ["red", "green", "blue"]` | `string[]` |
+| `T extends readonly unknown[]` | `T` binds to the precise tuple | `T` binds to `string[]` |
+| Return `T[0]` | `"red"` (literal preserved) | `string` |
 
 ## A practical example: typed `pluck`
 

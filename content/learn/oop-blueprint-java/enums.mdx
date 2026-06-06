@@ -16,12 +16,11 @@ in Java to use.
 
 ## The problem enums solve
 
-```mermaid
-flowchart LR
-    A["Using a String<br/>'red' / 'amber' / 'green'<br/>(or 'Red' or 'RED' or 'gren'!)"] -->|risk| B["Typos<br/>Invalid values<br/>No autocomplete"]
-    C["Using an int<br/>0 / 1 / 2"] -->|risk| D["Magic numbers<br/>No meaning<br/>Out-of-range values"]
-    E["Using an enum<br/>RED, AMBER, GREEN"] -->|wins| F["Type-safe<br/>Self-documenting<br/>Exhaustive"]
-```
+| Representation | What you get |
+| --- | --- |
+| A `String` — `"red"` / `"amber"` / `"green"` (or `"Red"`, `"RED"`, `"gren"`!) | Typos, invalid values, no autocomplete |
+| An `int` — `0` / `1` / `2` | Magic numbers, no meaning, out-of-range values |
+| An `enum` — `RED`, `AMBER`, `GREEN` | Type-safe, self-documenting, exhaustive |
 
 <CodeBlock
   adapter="java"
@@ -203,13 +202,14 @@ alternative to a giant `switch` over a `String` operator.
 | `name()` | Returns the constant's name as a `String` |
 | `ordinal()` | Returns the constant's position (0-based) — useful, but use sparingly |
 
-```mermaid
-flowchart LR
-    A["Light.values()"] --> B[["[RED, AMBER, GREEN]"]]
-    C["Light.valueOf('AMBER')"] --> D["AMBER"]
-    E["Light.RED.name()"] --> F["'RED'"]
-    G["Light.GREEN.ordinal()"] --> H["2"]
-```
+Concretely, for the `Light` enum:
+
+| Call | Result |
+| --- | --- |
+| `Light.values()` | `[RED, AMBER, GREEN]` |
+| `Light.valueOf("AMBER")` | `AMBER` |
+| `Light.RED.name()` | `"RED"` |
+| `Light.GREEN.ordinal()` | `2` |
 
 ## A small modeling example: payment methods
 

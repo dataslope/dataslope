@@ -90,17 +90,14 @@ Imagine memory as a long strip of numbered cells. When you write
 `int age = 30;`, the compiler picks a cell (or a few cells), labels
 it `age`, and writes the number `30` into it.
 
-```mermaid
-flowchart LR
-    subgraph Memory
-        A["age<br/>30"]
-        B["price<br/>19.99"]
-        C["name<br/>'Ada'"]
-        D["isAdmin<br/>true"]
-    end
-```
+| Variable | Value |
+| --- | --- |
+| `age` | `30` |
+| `price` | `19.99` |
+| `name` | `'Ada'` |
+| `isAdmin` | `true` |
 
-That picture is slightly oversimplified — strings and lists
+That is slightly oversimplified — strings and lists
 actually live on the *heap*, with a small reference on the stack
 pointing to them — but for value types like `int` and `bool` it's
 exactly right.

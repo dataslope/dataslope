@@ -207,12 +207,13 @@ int main() {
 `}
 />
 
-```mermaid
-flowchart LR
-    P["pre-order"] --> PR["root"] --> PL["left"] --> PX["right"]
-    I["in-order"] --> IL["left"] --> IR["root"] --> IX["right"]
-    O["post-order"] --> OL["left"] --> OR["right"] --> OO["root"]
-```
+The three depth-first orders differ only in when the root is visited relative to its subtrees:
+
+| Traversal | Visit order |
+| --- | --- |
+| Pre-order | root → left → right |
+| In-order | left → root → right |
+| Post-order | left → right → root |
 
 ## Level-order traversal
 

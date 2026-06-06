@@ -47,14 +47,7 @@ The desired report:
 
 ## The architecture
 
-```mermaid
-flowchart TD
-    R[Raw CSV lines] --> P[Parse]
-    P --> V[Valid rows]
-    V --> G[Group by product]
-    G --> S[Summarize per product]
-    S --> RPT[Render report]
-```
+**Raw CSV lines → Parse → Valid rows → Group by product → Summarize per product → Render report**
 
 Each stage is a pure function from one shape of data to another.
 Each stage uses LINQ. Each stage is independently testable.
@@ -304,14 +297,7 @@ If you completed the challenge, look back over your code and notice:
 
 ## How this generalizes
 
-```mermaid
-flowchart LR
-    Raw[Raw input] --> Parse --> Validate --> Transform --> Summarize --> Render
-    style Parse     fill:#e0f2fe,stroke:#0284c7
-    style Validate  fill:#e0f2fe,stroke:#0284c7
-    style Transform fill:#e0f2fe,stroke:#0284c7
-    style Summarize fill:#e0f2fe,stroke:#0284c7
-```
+**Raw input → Parse → Validate → Transform → Summarize → Render**
 
 Almost every batch data program — analytics, ETL, report
 generation, log processing, billing, search indexing — fits this

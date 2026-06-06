@@ -234,18 +234,11 @@ behind modern assistants) infer their behavior from large quantities of
 example text instead of hand-written rules. They are powerful but opaque, and
 they assume you already understand the structure of text.
 
-```mermaid
-flowchart TD
-    subgraph RB["Rule-based / classic NLP (this course)"]
-        direction LR
-        r1["Human-written rules<br/>and word lists"] --> r2["Transparent result"]
-    end
-    subgraph LB["Learning-based NLP (later study)"]
-        direction LR
-        l1["Lots of example text"] --> l2["Trained model"]
-    end
-    RB -.-> LB
-```
+|                 | Rule-based / classic NLP (this course)   | Learning-based NLP (later study)        |
+| --------------- | ---------------------------------------- | --------------------------------------- |
+| **Built from**  | Human-written rules and word lists       | Lots of labeled example text            |
+| **Produces**    | A transparent, inspectable result        | A trained model                         |
+| **You get**     | Read exactly why it did what it did       | Power, at the cost of opacity           |
 
 We focus on classic, rule-based and count-based NLP because it is where the
 durable intuition lives. Once you understand *why* text needs tokenizing,

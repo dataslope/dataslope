@@ -8,17 +8,16 @@ things in spectacular ways. This page is a tour of the bug classes
 that every C programmer eventually meets, with runnable examples that
 *reproduce the bug* in the sandbox where possible.
 
-```mermaid
-flowchart TB
-    A[Common memory bugs] --> B[Use after free]
-    A --> C[Double free]
-    A --> D[Memory leak]
-    A --> E[Buffer overflow]
-    A --> F[Off-by-one]
-    A --> G[Uninitialized read]
-    A --> H[Dangling stack pointer]
-    A --> I[Type confusion / strict aliasing]
-```
+The bug classes we will cover:
+
+- Use-after-free
+- Double-free
+- Memory leak
+- Buffer overflow
+- Off-by-one
+- Uninitialized read
+- Dangling stack pointer
+- Type confusion / strict aliasing
 
 These are not "exotic" bugs — they are the source of an enormous
 share of real-world security vulnerabilities (CVEs). Recognizing the

@@ -63,16 +63,7 @@ The `sum` function is Θ(n): it must inspect every element, and it does constant
 
 ## Growth rates hierarchy
 
-```mermaid
-flowchart TD
-    A["O(1)"] --> B["O(log n)"]
-    B --> C["O(sqrt n)"]
-    C --> D["O(n)"]
-    D --> E["O(n log n)"]
-    E --> F["O(n^2)"]
-    F --> G["O(2^n)"]
-    G --> H["O(n!)"]
-```
+From slowest- to fastest-growing: **O(1) → O(log n) → O(sqrt n) → O(n) → O(n log n) → O(n^2) → O(2^n) → O(n!)**.
 
 | Complexity | Example |
 | --- | --- |

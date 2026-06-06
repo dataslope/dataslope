@@ -298,17 +298,12 @@ These patterns are *tools*, not laws. In real C# code:
 - Use discriminated unions when you have a *closed* set of states.
 - Use combinators when you're writing a small DSL.
 
-```mermaid
-flowchart TB
-    P[Need to model missing data?] --> Q{Reach for}
-    Q --> N1[Nullable types: string?, int?]
-    P2[Need to model failure?] --> Q2{Reach for}
-    Q2 --> N2[Result&lt;T, E&gt;]
-    P3[Need to model a closed set of states?] --> Q3{Reach for}
-    Q3 --> N3[Discriminated union: sealed records]
-    P4[Need to build complex things from simple ones?] --> Q4{Reach for}
-    Q4 --> N4[Combinators]
-```
+| Need to model… | Reach for |
+| --- | --- |
+| Missing data | Nullable types: `string?`, `int?` |
+| Failure | `Result<T, E>` |
+| A closed set of states | Discriminated union: sealed records |
+| Complex things built from simple ones | Combinators |
 
 When chosen carefully, these patterns make C# code dramatically more
 expressive *without* abandoning the strengths of the OO model.

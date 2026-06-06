@@ -14,17 +14,9 @@ CPU instructions, just build the mental model.
 
 ## The big picture
 
-```mermaid
-flowchart TD
-    A["Source code<br/>(.cs files)"] --> B["Compiler<br/>(Roslyn)"]
-    B --> C["Intermediate Language<br/>(CIL / IL)"]
-    C --> D["Runtime<br/>(.NET CLR or WebAssembly)"]
-    D --> E["JIT compiler<br/>(translates IL to CPU code<br/>on the fly)"]
-    E --> F["CPU<br/>+ memory"]
-    F --> G[Output to console / files / screen]
-```
+**Source code (`.cs` files) → Compiler (Roslyn) → Intermediate Language (CIL / IL) → Runtime (.NET CLR or WebAssembly) → JIT compiler → CPU + memory → Output to console / files / screen**
 
-There are five real "things" in that diagram, plus the CPU. Let's
+There are five real "things" in that pipeline, plus the CPU. Let's
 walk through them.
 
 ## 1. Source code
@@ -242,20 +234,15 @@ Console.WriteLine($"now a list of length {nums.Count}");
 
 ## 8. The full lifecycle, one more time
 
-Let's redraw the whole picture, now with the pieces named.
+Here is the whole picture, now with the pieces named.
 
-```mermaid
-flowchart TB
-    A["1. You write .cs source"]
-    B["2. Roslyn compiles to IL (.dll)"]
-    C["3. Runtime loads .dll, type-checks, sets up stack and heap"]
-    D["4. JIT compiles IL to CPU machine code on demand"]
-    E["5. CPU executes; stack holds calls, heap holds objects"]
-    F["6. GC reclaims unreferenced heap objects"]
-    G["7. Program exits, OS frees all memory"]
-
-    A --> B --> C --> D --> E --> F --> G
-```
+1. You write `.cs` source.
+2. Roslyn compiles it to IL (`.dll`).
+3. The runtime loads the `.dll`, type-checks it, and sets up the stack and heap.
+4. The JIT compiles IL to CPU machine code on demand.
+5. The CPU executes; the stack holds calls, the heap holds objects.
+6. The GC reclaims unreferenced heap objects.
+7. The program exits, and the OS frees all memory.
 
 That is the *entire* journey of one C# program. Every later
 chapter in this course is just a closer look at some piece of this

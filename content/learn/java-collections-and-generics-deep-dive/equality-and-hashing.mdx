@@ -50,14 +50,13 @@ Hashing turns an arbitrary object into an `int` "fingerprint." A
 the bucket where the element should live — instead of scanning all
 buckets.
 
-```mermaid
-flowchart TD
-    A["new Customer('ada@…')"] --> H["hashCode()<br/>= 8132917"]
-    H --> M["bucket = 8132917 mod N<br/>= 5"]
-    M --> B5["bucket 5<br/>1–2 candidates"]
-    B5 --> EQ["walk candidates,<br/>call equals(x)"]
-    EQ --> R["hit or miss<br/>in O(1) average"]
-```
+A lookup for `new Customer("ada@…")` flows through these stages:
+
+1. `hashCode()` returns the fingerprint, say `8132917`.
+2. `bucket = 8132917 mod N` picks the bucket, say `5`.
+3. Bucket `5` holds only 1–2 candidates.
+4. Walk those candidates, calling `equals(x)` on each.
+5. Hit or miss — in `O(1)` on average.
 
 So a hash collection's lookup is two steps:
 

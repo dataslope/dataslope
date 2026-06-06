@@ -107,23 +107,12 @@ The types divide into two large families:
 We will spend the next several pages on the primitives, then build
 up to objects later.
 
-```mermaid
-flowchart TB
-    V[Values]
-    V --> P[Primitives]
-    V --> O[Objects]
-    P --> N[number]
-    P --> S[string]
-    P --> B[boolean]
-    P --> NU[null]
-    P --> U[undefined]
-    P --> SY[symbol]
-    P --> BI[bigint]
-    O --> OB["plain {} objects"]
-    O --> AR["arrays []"]
-    O --> FN["functions"]
-    O --> DT["dates, regexes, Maps, Sets, ..."]
-```
+Every value falls into one of these two families:
+
+- **Primitives**: `number`, `string`, `boolean`, `null`, `undefined`,
+  `symbol`, `bigint`.
+- **Objects**: plain `{}` objects, `[]` arrays, functions, and the
+  rest (dates, regexes, `Map`s, `Set`s, ...).
 
 ## What "immutable" means for primitives
 

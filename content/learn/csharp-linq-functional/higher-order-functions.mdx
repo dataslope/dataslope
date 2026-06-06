@@ -194,18 +194,13 @@ ever writing a `for` loop.
 
 Every LINQ operator is a higher-order function:
 
-```mermaid
-flowchart LR
-    subgraph LINQ
-        W["Where(predicate)"]
-        S["Select(selector)"]
-        O["OrderBy(keySelector)"]
-        A["Aggregate(seed, accumulator)"]
-        G["GroupBy(keySelector)"]
-    end
-```
+- `Where(predicate)`
+- `Select(selector)`
+- `OrderBy(keySelector)`
+- `Aggregate(seed, accumulator)`
+- `GroupBy(keySelector)`
 
-Each box accepts a function and uses it to drive its behavior over a
+Each operator accepts a function and uses it to drive its behavior over a
 sequence. The sequence itself is just data; the *behavior* is
 parameterized.
 

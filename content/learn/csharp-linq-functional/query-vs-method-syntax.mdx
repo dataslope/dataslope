@@ -155,19 +155,11 @@ Method syntax also wins when you need operators that have no query
 keyword: `Take`, `Skip`, `Distinct`, `Count`, `First`, `Aggregate`,
 `Zip`, `Concat`, `Reverse`, `Chunk`, and many more.
 
-```mermaid
-flowchart TB
-    subgraph "Use Query Syntax When"
-      QS1[Multiple from / cross joins]
-      QS2[let bindings carry state forward]
-      QS3[Visually similar to SQL]
-    end
-    subgraph "Use Method Syntax When"
-      MS1[Mostly Where + Select pipelines]
-      MS2[You need operators query syntax lacks]
-      MS3[The query ends with an aggregation]
-    end
-```
+| Use query syntax when | Use method syntax when |
+| --- | --- |
+| Multiple `from` / cross joins | Mostly `Where` + `Select` pipelines |
+| `let` bindings carry state forward | You need operators query syntax lacks |
+| Visually similar to SQL | The query ends with an aggregation |
 
 ## What the compiler actually does
 

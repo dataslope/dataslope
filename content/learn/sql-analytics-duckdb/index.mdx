@@ -73,37 +73,15 @@ concurrency, ORMs, query-planner internals, or cloud infrastructure.
 Those matter for *running* a database in production, but they are not
 what an analyst reaches for when asking questions of data.
 
-```mermaid
-flowchart LR
-    subgraph Focus["This course focuses on"]
-        F1["Analytical SQL"]
-        F2["Exploratory analysis"]
-        F3["Aggregation"]
-        F4["Window functions"]
-        F5["Data to insight"]
-    end
-    subgraph Skip["This course skips"]
-        S1["Administration"]
-        S2["Transactions"]
-        S3["Replication, HA"]
-        S4["Deployment"]
-        S5["ORMs, backends"]
-    end
-```
+| This course focuses on | This course skips |
+| --- | --- |
+| Analytical SQL | Administration |
+| Exploratory analysis | Transactions |
+| Aggregation | Replication, HA |
+| Window functions | Deployment |
+| Data to insight | ORMs, backends |
 
 ## How the course is organized
-
-```mermaid
-flowchart TB
-    A["Why Analytical<br/>SQL"] --> B["Getting Started<br/>with DuckDB"]
-    B --> C["Exploratory<br/>Data Analysis"]
-    C --> D["Aggregation and<br/>Summarization"]
-    D --> E["Window<br/>Functions"]
-    E --> F["Transforming<br/>Data"]
-    F --> G["Composing<br/>Queries"]
-    G --> H["From Data<br/>to Insight"]
-    H --> I["Wrapping<br/>Up"]
-```
 
 We start with **mindset, not syntax**. The first section explains how
 analytical thinking differs from the application-development SQL you may
