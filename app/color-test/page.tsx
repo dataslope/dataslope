@@ -63,6 +63,18 @@ const SWATCH_DEFS: SwatchDef[] = [
   { name: "--green", label: "Green" },
   { name: "--red", label: "Red" },
   { name: "--yellow", label: "Yellow" },
+  // Brand "ink" anchors (AA-on-white text colors from brand.css).
+  { name: "--ds-blue-ink", label: "Blue ink", isTextColor: true },
+  { name: "--ds-green-ink", label: "Green ink", isTextColor: true },
+  { name: "--ds-red-ink", label: "Red ink", isTextColor: true },
+  { name: "--ds-amber-ink", label: "Amber ink", isTextColor: true },
+  // Full 50–900 brand ramps (brand.css). 500 = the brand color.
+  ...(["blue", "green", "red", "yellow"] as const).flatMap((hue) =>
+    [50, 100, 200, 300, 400, 500, 600, 700, 800, 900].map((step) => ({
+      name: `--ds-${hue}-${step}`,
+      label: `${hue} ${step}`,
+    })),
+  ),
 ];
 
 function resolveCssVarToHex(varName: string): string {

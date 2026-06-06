@@ -4,79 +4,38 @@
    The visual language intentionally mirrors `ChallengeCard.module.css`
    (paper card chrome, blue badge header, slate text, accent submit
    button, green/red status banner) so the two embeddable components
-   feel like one product. Tokens are duplicated locally rather than
-   imported because CSS modules can't share custom properties across
-   files reliably, and the playground bundle doesn't load Tailwind's
-   preflight that defines the `--color-…` vars. */
+   feel like one product. Neutral tokens are duplicated locally (the
+   playground bundle doesn't load Tailwind's preflight that defines the
+   `--color-…` vars); brand colors come from the global `--ds-*` ramp
+   (app/brand.css). */
 
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
 
 .card {
-  /* Tailwind palette tokens — kept in sync with ChallengeCard.module.css */
-  --mc-white: #ffffff;
-  --mc-black: #000000;
-  --mc-slate-100: #f1f5f9;
-  --mc-slate-200: #e2e8f0;
-  --mc-slate-900: #0f172a;
-  --mc-gray-50: #f9fafb;
-  --mc-gray-100: #f3f4f6;
-  --mc-gray-200: #e5e7eb;
-  --mc-gray-300: #d1d5db;
-  --mc-gray-400: #9ca3af;
-  --mc-gray-500: #6b7280;
-  --mc-gray-700: #374151;
-  --mc-gray-900: #111827;
-  --mc-zinc-100: #f4f4f5;
-  --mc-neutral-50: #fafafa;
-  --mc-blue-50: #eff6ff;
-  --mc-blue-100: #dbeafe;
-  --mc-blue-200: #bfdbfe;
-  --mc-blue-300: #93c5fd;
-  --mc-blue-500: #3b82f6;
-  --mc-blue-600: #2563eb;
-  --mc-blue-700: #1d4ed8;
-  --mc-blue-800: #1e40af;
-  --mc-blue-900: #1e3a8a;
-  --mc-green-50: #f0fdf4;
-  --mc-green-100: #dcfce7;
-  --mc-green-200: #bbf7d0;
-  --mc-green-500: #22c55e;
-  --mc-green-600: #16a34a;
-  --mc-green-700: #15803d;
-  --mc-red-50: #fef2f2;
-  --mc-red-100: #fee2e2;
-  --mc-red-200: #fecaca;
-  --mc-red-600: #dc2626;
-  --mc-red-700: #b91c1c;
-  --mc-amber-50: #fffbeb;
-  --mc-amber-200: #fde68a;
-  --mc-amber-700: #b45309;
+  /* Local neutral palette (Tailwind) — kept in sync with ChallengeCard;
+     brand accent colors are referenced from --ds-* below. */
 
   /* Semantic aliases — these mirror ChallengeCard's --ch-* naming so a
      reader who knows one stylesheet can read the other. */
-  --mc-bg: var(--mc-white);
-  --mc-bg-muted: var(--mc-neutral-50);
-  --mc-bg-subtle: var(--mc-gray-50);
-  --mc-bg-hover: var(--mc-gray-100);
-  --mc-border: var(--mc-gray-200);
-  --mc-border-light: var(--mc-gray-100);
-  --mc-text: var(--mc-gray-900);
-  --mc-text-secondary: var(--mc-gray-500);
-  --mc-text-muted: var(--mc-gray-400);
-  --mc-accent: var(--mc-blue-600);
-  --mc-accent-hover: var(--mc-blue-700);
-  --mc-accent-disabled: var(--mc-blue-300);
+  --mc-bg: var(--ds-white);
+  --mc-bg-subtle: var(--ds-gray-50);
+  --mc-bg-hover: var(--ds-gray-100);
+  --mc-border: var(--ds-gray-200);
+  --mc-border-light: var(--ds-gray-100);
+  --mc-text: var(--ds-gray-900);
+  --mc-text-muted: var(--ds-gray-400);
+  --mc-accent: var(--ds-blue-600);
+  --mc-accent-hover: var(--ds-blue-700);
+  --mc-accent-disabled: var(--ds-blue-300);
   --mc-badge-color: var(--mc-accent);
-  --mc-badge-bg: var(--mc-blue-50);
-  --mc-badge-border: var(--mc-blue-100);
 
   --mc-font-ui: "Inter", system-ui, -apple-system, sans-serif;
   --mc-font-mono:
     "JetBrains Mono", "Fira Code", ui-monospace, monospace;
   --mc-radius: 8px;
   --mc-shadow:
-    0 1px 3px color-mix(in srgb, var(--mc-black) 8%, transparent),
-    0 1px 2px color-mix(in srgb, var(--mc-black) 5%, transparent);
+    0 1px 3px color-mix(in srgb, var(--ds-black) 8%, transparent),
+    0 1px 2px color-mix(in srgb, var(--ds-black) 5%, transparent);
 
   background: var(--mc-bg);
   border: 1px solid var(--mc-border);
@@ -108,7 +67,7 @@
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--mc-blue-500);
+  color: var(--ds-blue-500);
   flex-shrink: 0;
   white-space: nowrap;
 }
@@ -167,10 +126,10 @@
 .bodyMd code {
   font-family: var(--mc-font-mono);
   font-size: 13.5px;
-  background: var(--mc-gray-100);
+  background: var(--ds-gray-100);
   border-radius: 4px;
   padding: 1px 5px;
-  color: var(--mc-gray-900);
+  color: var(--ds-gray-900);
 }
 
 .bodyMd ul,
@@ -233,7 +192,7 @@
 }
 
 .choice:not([data-locked="true"]):hover {
-  background: var(--mc-gray-50);
+  background: var(--ds-gray-50);
 }
 
 .choice[data-selected="true"] {
@@ -247,12 +206,12 @@
 /* Post-submit verdicts. */
 .choice[data-verdict="correct-selected"],
 .choice[data-verdict="correct-missed"] {
-  background: var(--mc-green-50);
+  background: var(--ds-green-50);
   box-shadow: none;
 }
 
 .choice[data-verdict="wrong-selected"] {
-  background: var(--mc-red-50);
+  background: var(--ds-red-50);
   box-shadow: none;
 }
 
@@ -268,7 +227,7 @@
   flex-shrink: 0;
   margin-top: 3px;
   cursor: inherit;
-  background: var(--mc-gray-100);
+  background: var(--ds-gray-100);
   box-shadow: none;
   transition: box-shadow 0.12s, background 0.12s;
 }
@@ -282,12 +241,12 @@
 }
 
 .choiceInput:checked {
-  background: var(--mc-gray-900);
-  box-shadow: 0 0 0 1.5px var(--mc-gray-400);
+  background: var(--ds-gray-900);
+  box-shadow: 0 0 0 1.5px var(--ds-gray-400);
 }
 
 .choiceInput[type="radio"]:checked {
-  background: radial-gradient(circle, #fff 30%, var(--mc-gray-900) 31%);
+  background: radial-gradient(circle, #fff 30%, var(--ds-gray-900) 31%);
   box-shadow: none;
 }
 
@@ -314,10 +273,10 @@
 .choiceLabel code {
   font-family: var(--mc-font-mono);
   font-size: 13.5px;
-  background: var(--mc-gray-100);
+  background: var(--ds-gray-100);
   border-radius: 4px;
   padding: 1px 5px;
-  color: var(--mc-gray-900);
+  color: var(--ds-gray-900);
 }
 
 /* Code blocks inside choice labels (multi-line code answers). */
@@ -358,13 +317,13 @@
 
 .choice[data-verdict="correct-selected"] .choiceMark,
 .choice[data-verdict="correct-missed"] .choiceMark {
-  background: var(--mc-green-100);
-  color: var(--mc-green-700);
+  background: var(--ds-green-100);
+  color: var(--ds-green-700);
 }
 
 .choice[data-verdict="wrong-selected"] .choiceMark {
-  background: var(--mc-red-100);
-  color: var(--mc-red-700);
+  background: var(--ds-red-100);
+  color: var(--ds-red-700);
 }
 
 .choiceExplanation {
@@ -375,7 +334,7 @@
   border-radius: 4px;
   font-size: 13.5px;
   line-height: 1.6;
-  color: var(--mc-gray-700);
+  color: var(--ds-gray-700);
 }
 
 .choiceExplanation p {
@@ -388,13 +347,13 @@
 
 .choice[data-verdict="correct-selected"] .choiceExplanation,
 .choice[data-verdict="correct-missed"] .choiceExplanation {
-  border-left-color: var(--mc-green-500);
-  background: var(--mc-white);
+  border-left-color: var(--ds-green-500);
+  background: var(--ds-white);
 }
 
 .choice[data-verdict="wrong-selected"] .choiceExplanation {
-  border-left-color: var(--mc-red-600);
-  background: var(--mc-white);
+  border-left-color: var(--ds-red-600);
+  background: var(--ds-white);
 }
 
 /* In light mode, `code` elements inside green/red choice rows need
@@ -402,24 +361,24 @@
    surface. */
 .choice[data-verdict="correct-selected"] .choiceLabel code,
 .choice[data-verdict="correct-missed"] .choiceLabel code {
-  background: var(--mc-green-200);
-  color: var(--mc-green-700);
+  background: var(--ds-green-200);
+  color: var(--ds-green-700);
 }
 
 .choice[data-verdict="wrong-selected"] .choiceLabel code {
-  background: var(--mc-red-200);
-  color: var(--mc-red-700);
+  background: var(--ds-red-200);
+  color: var(--ds-red-700);
 }
 
 .choice[data-verdict="correct-selected"] .choiceExplanation code,
 .choice[data-verdict="correct-missed"] .choiceExplanation code {
-  background: var(--mc-green-100);
-  color: var(--mc-green-700);
+  background: var(--ds-green-100);
+  color: var(--ds-green-700);
 }
 
 .choice[data-verdict="wrong-selected"] .choiceExplanation code {
-  background: var(--mc-red-100);
-  color: var(--mc-red-700);
+  background: var(--ds-red-100);
+  color: var(--ds-red-700);
 }
 
 /* The explanation block hangs off to the right of the input + glyph.
@@ -449,7 +408,7 @@
   align-items: center;
   gap: 6px;
   background: var(--mc-accent);
-  color: var(--mc-white);
+  color: var(--ds-white);
   border: none;
   border-radius: 6px;
   padding: 7px 14px;
@@ -473,7 +432,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: var(--mc-white);
+  background: var(--ds-white);
   color: var(--mc-text);
   border: 1px solid var(--mc-border);
   border-radius: 6px;
@@ -487,7 +446,7 @@
 
 .retryBtn:hover {
   background: var(--mc-bg-hover);
-  border-color: var(--mc-gray-300);
+  border-color: var(--ds-gray-300);
   color: var(--mc-text);
 }
 
@@ -509,18 +468,18 @@
 }
 
 .banner[data-state="pass"] {
-  background: var(--mc-green-50);
-  color: var(--mc-green-700);
+  background: var(--ds-green-50);
+  color: var(--ds-green-700);
 }
 
 .banner[data-state="fail"] {
-  background: var(--mc-red-50);
-  color: var(--mc-red-700);
+  background: var(--ds-red-50);
+  color: var(--ds-red-700);
 }
 
 .banner[data-state="partial"] {
-  background: var(--mc-amber-50);
-  color: var(--mc-amber-700);
+  background: var(--ds-yellow-50);
+  color: var(--ds-yellow-700);
 }
 
 .bannerIcon {
@@ -534,15 +493,15 @@
 }
 
 .banner[data-state="pass"] .bannerIcon {
-  background: var(--mc-green-100);
+  background: var(--ds-green-100);
 }
 
 .banner[data-state="fail"] .bannerIcon {
-  background: var(--mc-red-100);
+  background: var(--ds-red-100);
 }
 
 .banner[data-state="partial"] .bannerIcon {
-  background: var(--mc-amber-200);
+  background: var(--ds-yellow-200);
 }
 
 .bannerSub {
@@ -571,7 +530,7 @@
 .overallBody {
   font-size: 14px;
   line-height: 1.7;
-  color: var(--mc-gray-700);
+  color: var(--ds-gray-700);
 }
 
 .overallBody p {
@@ -585,10 +544,10 @@
 .overallBody code {
   font-family: var(--mc-font-mono);
   font-size: 13.5px;
-  background: var(--mc-gray-100);
+  background: var(--ds-gray-100);
   border-radius: 4px;
   padding: 1px 5px;
-  color: var(--mc-gray-900);
+  color: var(--ds-gray-900);
 }
 
 /* ─── Dark mode ───────────────────────────────────────────────────── */
@@ -603,17 +562,13 @@
      All surface tokens use black-based colour-mix so they stay neutral
      — no blue-tinted slate values. */
   --mc-bg: var(--color-fd-background, #121212);
-  --mc-bg-muted: color-mix(in srgb, var(--color-fd-background, #121212) 70%, #000000);
   --mc-bg-subtle: color-mix(in srgb, var(--color-fd-background, #121212) 85%, #000000);
   --mc-bg-hover: #222222;
   --mc-border: #2e2e2e;
   --mc-border-light: #232323;
   --mc-text: #e0e0e0;
-  --mc-text-secondary: #b0b0b0;
   --mc-text-muted: #808080;
-  --mc-badge-bg: color-mix(in srgb, var(--mc-blue-500) 14%, transparent);
-  --mc-badge-border: color-mix(in srgb, var(--mc-blue-500) 32%, transparent);
-  --mc-badge-color: #93c5fd;
+  --mc-badge-color: var(--ds-blue-300);
 }
 
 :global(html.dark) .choice[data-selected="true"] {
@@ -622,26 +577,26 @@
 
 :global(html.dark) .choice[data-verdict="correct-selected"],
 :global(html.dark) .choice[data-verdict="correct-missed"] {
-  background: rgba(22, 163, 74, 0.15);
+  background: color-mix(in srgb, var(--ds-green) 15%, transparent);
 }
 
 :global(html.dark) .choice[data-verdict="wrong-selected"] {
-  background: rgba(220, 38, 38, 0.15);
+  background: color-mix(in srgb, var(--ds-red) 15%, transparent);
 }
 
 :global(html.dark) .banner[data-state="pass"] {
-  background: rgba(22, 163, 74, 0.12);
-  color: #86efac;
+  background: color-mix(in srgb, var(--ds-green) 12%, transparent);
+  color: var(--ds-green-300);
 }
 
 :global(html.dark) .banner[data-state="fail"] {
-  background: rgba(220, 38, 38, 0.12);
-  color: #fca5a5;
+  background: color-mix(in srgb, var(--ds-red) 12%, transparent);
+  color: var(--ds-red-300);
 }
 
 :global(html.dark) .banner[data-state="partial"] {
-  background: rgba(217, 119, 6, 0.12);
-  color: #fcd34d;
+  background: color-mix(in srgb, var(--ds-yellow) 12%, transparent);
+  color: var(--ds-yellow-300);
 }
 
 :global(html.dark) .choiceLabel code,
@@ -673,36 +628,36 @@
    light mode — override to a translucent tinted dark surface. */
 :global(html.dark) .choice[data-verdict="correct-selected"] .choiceExplanation,
 :global(html.dark) .choice[data-verdict="correct-missed"] .choiceExplanation {
-  background: rgba(22, 163, 74, 0.08);
+  background: color-mix(in srgb, var(--ds-green) 8%, transparent);
 }
 
 :global(html.dark) .choice[data-verdict="wrong-selected"] .choiceExplanation {
-  background: rgba(220, 38, 38, 0.08);
+  background: color-mix(in srgb, var(--ds-red) 8%, transparent);
 }
 
 /* Choice mark icons — replace light green/red fill with translucent dark tints. */
 :global(html.dark) .choice[data-verdict="correct-selected"] .choiceMark,
 :global(html.dark) .choice[data-verdict="correct-missed"] .choiceMark {
-  background: rgba(22, 163, 74, 0.2);
-  color: #86efac;
+  background: color-mix(in srgb, var(--ds-green) 20%, transparent);
+  color: var(--ds-green-300);
 }
 
 :global(html.dark) .choice[data-verdict="wrong-selected"] .choiceMark {
-  background: rgba(220, 38, 38, 0.2);
-  color: #fca5a5;
+  background: color-mix(in srgb, var(--ds-red) 20%, transparent);
+  color: var(--ds-red-300);
 }
 
 /* Banner icon circles — light green/red fills need dark-mode tints. */
 :global(html.dark) .banner[data-state="pass"] .bannerIcon {
-  background: rgba(22, 163, 74, 0.2);
+  background: color-mix(in srgb, var(--ds-green) 20%, transparent);
 }
 
 :global(html.dark) .banner[data-state="fail"] .bannerIcon {
-  background: rgba(220, 38, 38, 0.2);
+  background: color-mix(in srgb, var(--ds-red) 20%, transparent);
 }
 
 :global(html.dark) .banner[data-state="partial"] .bannerIcon {
-  background: rgba(217, 119, 6, 0.2);
+  background: color-mix(in srgb, var(--ds-yellow) 20%, transparent);
 }
 
 /* Retry button uses an explicit white background in light mode. */
@@ -726,7 +681,7 @@
 /* Disabled submit button is too vivid (blue-300) in dark mode — tone it
    down to a dim translucent blue so it reads as inactive. */
 :global(html.dark) .submitBtn:disabled {
-  background: rgba(59, 130, 246, 0.5);
+  background: color-mix(in srgb, var(--ds-blue) 50%, transparent);
   color: rgba(255, 255, 255, 0.5);
   cursor: not-allowed;
 }
@@ -742,7 +697,7 @@
    Use background-color (not the background shorthand) so it doesn't
    reset background-image, which would hide the checkbox checkmark. */
 :global(html.dark) .choiceInput:checked {
-  background-color: var(--mc-gray-900);
+  background-color: var(--ds-gray-900);
   box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.25);
 }
 
@@ -763,13 +718,13 @@
    that blends with the dark green / dark red surface instead of gray. */
 :global(html.dark) .choice[data-verdict="correct-selected"] .choiceExplanation code,
 :global(html.dark) .choice[data-verdict="correct-missed"] .choiceExplanation code {
-  background: rgba(22, 163, 74, 0.3);
-  color: #bbf7d0;
+  background: color-mix(in srgb, var(--ds-green) 30%, transparent);
+  color: var(--ds-green-200);
 }
 
 :global(html.dark) .choice[data-verdict="wrong-selected"] .choiceExplanation code {
-  background: rgba(220, 38, 38, 0.3);
-  color: #fecaca;
+  background: color-mix(in srgb, var(--ds-red) 30%, transparent);
+  color: var(--ds-red-200);
 }
 
 /* Overall explanation paragraph text is white in dark mode. */

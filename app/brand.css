@@ -1,0 +1,121 @@
+/* ============================================================================
+ * brand.css — DataSlope brand color system (single source of truth)
+ * ----------------------------------------------------------------------------
+ * Imported once in app/layout.tsx so every route (/, /learn, /playground) can
+ * read these tokens. Defines:
+ *   1. Full 50–900 tonal ramps for the four brand hues (500 = the brand color).
+ *   2. Raw hue aliases (--ds-blue → --ds-blue-500, etc.).
+ *   3. Mode-agnostic "ink" anchors that clear WCAG AA body text on white.
+ *   4. Semantic role tokens, with light-mode defaults and dark-mode overrides.
+ *
+ * Theme mechanisms differ per route — the dark overrides below target BOTH:
+ *   - `.dark`              → /learn (next-themes / Fumadocs)
+ *   - `[data-theme=dark]`  → /playground (editor-theme driven)
+ * The home route (/) is currently dark-only and consumes the raw hue ramps
+ * directly (its accents are decorative, which read fine on dark).
+ *
+ * Ramps were generated in OKLCH (constant hue, lightness/chroma interpolated
+ * toward white/near-black, gamut-mapped). Re-verify any value used for text in
+ * a contrast checker before relying on it. WCAG AA: 4.5:1 body, 3:1 large/UI.
+ * ========================================================================== */
+
+:root {
+  /* ── Blue (primary) ───────────────────────────────────────────────── */
+  --ds-blue-50:  #E8F2FF;
+  --ds-blue-100: #D1E6FF;
+  --ds-blue-200: #AED3FF;
+  --ds-blue-300: #8ABFFF;
+  --ds-blue-400: #5BA7FF;
+  --ds-blue-500: #148CFF; /* brand */
+  --ds-blue-600: #0878DD;
+  --ds-blue-700: #0064BD; /* AA body text on white (5.9:1) */
+  --ds-blue-800: #00519C;
+  --ds-blue-900: #00407F;
+
+  /* ── Green (success) ──────────────────────────────────────────────── */
+  --ds-green-50:  #E8F9E6;
+  --ds-green-100: #D4F3D1;
+  --ds-green-200: #B4EAAF;
+  --ds-green-300: #93E08E;
+  --ds-green-400: #66D361;
+  --ds-green-500: #20C621; /* brand */
+  --ds-green-600: #0AA80F;
+  --ds-green-700: #008B03;
+  --ds-green-800: #006F01; /* AA body text on white (6.4:1) */
+  --ds-green-900: #005600;
+
+  /* ── Red (danger) ─────────────────────────────────────────────────── */
+  --ds-red-50:  #FFEDEC;
+  --ds-red-100: #FFDCDA;
+  --ds-red-200: #FFC2BF;
+  --ds-red-300: #FFA6A3;
+  --ds-red-400: #FF807F;
+  --ds-red-500: #FF4F59; /* brand */
+  --ds-red-600: #DC3F49;
+  --ds-red-700: #BA303A; /* AA body text on white (5.9:1) */
+  --ds-red-800: #99212C;
+  --ds-red-900: #7C141F;
+
+  /* ── Yellow (attention) ───────────────────────────────────────────── */
+  --ds-yellow-50:  #FDF8E8;
+  --ds-yellow-100: #FDF5D9;
+  --ds-yellow-200: #FEF0C3;
+  --ds-yellow-300: #FEEBAC;
+  --ds-yellow-400: #FFE48E;
+  --ds-yellow-500: #FFDD6C; /* brand */
+  --ds-yellow-600: #D4B651;
+  --ds-yellow-700: #AB9137;
+  --ds-yellow-800: #836D1C; /* AA body text on white (5.0:1) */
+  --ds-yellow-900: #624F00;
+
+  /* ── Raw hue aliases (= the 500 brand value) ──────────────────────── */
+  --ds-blue:   var(--ds-blue-500);
+  --ds-green:  var(--ds-green-500);
+  --ds-red:    var(--ds-red-500);
+  --ds-yellow: var(--ds-yellow-500);
+
+  /* ── "Ink" anchors: AA-on-white text/link/icon colors ─────────────── */
+  --ds-blue-ink:  var(--ds-blue-700);
+  --ds-green-ink: var(--ds-green-800);
+  --ds-red-ink:   var(--ds-red-700);
+  --ds-amber-ink: var(--ds-yellow-800);
+
+  /* ── Neutral foundation (Tailwind gray ramp) ──────────────────────────
+   * Shared by the card / quiz / codeblock components, which each used to
+   * duplicate this scale locally (--ch-gray-*, --mc-gray-*). (ChallengeCard
+   * also keeps a small local --ch-slate-* set for its cool-gray surfaces.) */
+  --ds-white: #ffffff;
+  --ds-black: #000000;
+  --ds-gray-50:  #f9fafb;
+  --ds-gray-100: #f3f4f6;
+  --ds-gray-200: #e5e7eb;
+  --ds-gray-300: #d1d5db;
+  --ds-gray-400: #9ca3af;
+  --ds-gray-500: #6b7280;
+  --ds-gray-600: #4b5563;
+  --ds-gray-700: #374151;
+  --ds-gray-800: #1f2937;
+  --ds-gray-900: #111827;
+
+  /* ── Semantic roles — LIGHT MODE defaults ─────────────────────────── */
+  --ds-primary:      var(--ds-blue);      /* fills, primary buttons, active   */
+  --ds-link:         var(--ds-blue-ink);  /* text/links on a light surface    */
+  --ds-focus:        var(--ds-blue);      /* focus ring (UI, 3:1 is enough)   */
+  --ds-success:      var(--ds-green-ink);
+  --ds-success-fill: var(--ds-green);
+  --ds-danger:       var(--ds-red-ink);
+  --ds-danger-fill:  var(--ds-red);
+  --ds-warning:      var(--ds-amber-ink);
+  --ds-warning-fill: var(--ds-yellow);
+}
+
+/* ── Semantic roles — DARK MODE ───────────────────────────────────────
+ * On dark surfaces the bright 500s already clear AA body text, so text
+ * roles point straight at them (no ink needed). Targets both dark hooks. */
+.dark,
+[data-theme="dark"] {
+  --ds-link:    var(--ds-blue-400);
+  --ds-success: var(--ds-green-400);
+  --ds-danger:  var(--ds-red-400);
+  --ds-warning: var(--ds-yellow-400);
+}

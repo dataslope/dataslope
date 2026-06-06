@@ -25,12 +25,25 @@
      `--text-complementary`. */
   --accent1: oklch(68% 0.18 250);
   --accent2: oklch(75% 0.2 85);
-  --primary: oklch(68% 0.18 250);
-  --primary-glow: oklch(68% 0.18 250 / 0.15);
-  --blue: oklch(68% 0.18 250);
-  --green: oklch(68% 0.18 145);
-  --red: oklch(62% 0.18 15);
-  --yellow: oklch(78% 0.16 85);
+  /* Brand-signal tokens — sourced from brand.css so the Run button, error
+     states, and selection tints match the rest of the site. The editor-theme
+     palettes (applyThemePalette / THEME_PALETTES) intentionally stay separate;
+     they recolor the chrome to the user's chosen code theme, not the brand. */
+  --primary: var(--ds-blue);
+  --primary-glow: color-mix(in srgb, var(--ds-blue) 15%, transparent);
+  --blue: var(--ds-blue);
+  --green: var(--ds-green);
+  --red: var(--ds-red);
+  --yellow: var(--ds-yellow);
+  /* Semantic accents consumed by the SQL playground (sqlPlayground.css) via
+     `var(--danger, …)`, `var(--ok-accent, …)`, etc. Previously these were
+     undefined, so each call site fell back to a hardcoded Tailwind hex.
+     Defining them here once routes the SQL UI's success/error/focus colors
+     through the brand palette; the inline fallbacks remain as a safety net. */
+  --accent: var(--ds-blue);
+  --danger: var(--ds-red);
+  --ok-accent: var(--ds-green);
+  --err-accent: var(--ds-red);
   --font-mono:
     "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace;
   --font-ui: "Inter", system-ui, -apple-system, sans-serif;

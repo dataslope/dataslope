@@ -18,15 +18,14 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
 
 .outputScope {
-  --cb-white: var(--ch-white);
-  --cb-black: var(--ch-black);
+  --cb-black: var(--ds-black);
   --cb-slate-200: var(--ch-slate-200);
-  --cb-slate-500: var(--ch-gray-500);
+  --cb-slate-500: var(--ds-gray-500);
   --cb-slate-700: var(--ch-border);
   --cb-slate-800: var(--ch-bg-subtle);
   --cb-slate-900: var(--ch-bg-muted);
-  --cb-gray-200: var(--ch-gray-200);
-  --cb-gray-800: var(--ch-gray-800);
+  --cb-gray-200: var(--ds-gray-200);
+  --cb-gray-800: var(--ds-gray-800);
   --cb-neutral-100: var(--ch-bg-subtle);
   --cb-neutral-300: var(--ch-border);
   --cb-bg: var(--ch-bg);
@@ -39,8 +38,7 @@
   --cb-accent: var(--ch-accent);
   --cb-green: var(--ch-green);
   --cb-red: var(--ch-red);
-  --cb-yellow: var(--ch-amber-500);
-  --cb-font-ui: var(--ch-font-ui);
+  --cb-yellow: var(--ds-yellow-500);
   --cb-font-mono: var(--ch-font-mono);
   --cb-radius: var(--ch-radius);
   position: relative;

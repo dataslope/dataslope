@@ -63,6 +63,29 @@ samp {
   --color-fd-card: hsl(0, 0%, 100%);
 }
 
+/* Brand accents → Fumadocs tokens. --color-fd-primary drives doc links, the
+   active sidebar item, and most UI accents; --color-fd-ring is the focus
+   outline. Callouts derive `--callout-color: var(--color-fd-<type>, …)` for
+   their bar + icon, so --color-fd-{info,warning,error,success} brand-tint
+   admonitions (otherwise they fall back to muted gray). Light mode uses the
+   AA-on-white "ink" steps; dark mode uses the brighter brand steps. */
+:root:not(.dark) {
+  --color-fd-primary: var(--ds-blue-ink);
+  --color-fd-ring: var(--ds-blue);
+  --color-fd-info: var(--ds-blue-ink);
+  --color-fd-warning: var(--ds-amber-ink);
+  --color-fd-error: var(--ds-red-ink);
+  --color-fd-success: var(--ds-green-ink);
+}
+.dark {
+  --color-fd-primary: var(--ds-blue-400);
+  --color-fd-ring: var(--ds-blue);
+  --color-fd-info: var(--ds-blue-400);
+  --color-fd-warning: var(--ds-yellow-400);
+  --color-fd-error: var(--ds-red-400);
+  --color-fd-success: var(--ds-green-400);
+}
+
 /* Sidebar text + active/hover overrides.
    Non-layered rules beat Tailwind's @layer utilities, so these win
    without !important.
