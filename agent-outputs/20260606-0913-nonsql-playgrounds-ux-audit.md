@@ -20,8 +20,8 @@
 >   - **NSQL-03** — Settings now renders in the **output column** on desktop (grid-column 2) instead of as a full-bleed overlay, so the editor stays visible and **re-themes live** as you click theme cards (verified: cm-editor flips to Dracula while Settings is open). Mobile keeps the full-screen overlay (the panes are tab-switched there).
 >   - **NSQL-08** — added a **Files** entry to the mobile header menu that opens the full FilesPanel (upload / new folder / tree / context actions) as a bottom-sheet, so file management is reachable on mobile (it was desktop-only).
 >   - **NSQL-09** — the badge-truncation part is resolved by NSQL-06's short `Workspace N` names; the tooltip-overlap and redundant-close items are deferred as very-low-priority.
->   - **New finding NSQL-10 (pre-existing):** while verifying NSQL-03 on mobile I measured a **96px horizontal overflow** at 390px (the editor pane-bar's non-shrinking content forces a ~486px min-content). It reproduces with the original CSS too, so it's **not** caused by these changes — documented in §6/§4 for a follow-up (it needs a responsive pane-bar, not a one-liner). This also corrects the original §6 claim of "no overflow."
->   - **Still open:** NSQL-10 (mobile overflow), and the deferred low-priority slices of NSQL-09.
+>   - **NSQL-10 (pre-existing, now fixed):** a **96px horizontal overflow** at 390px. Root cause turned out to be the **header**, not the editor pane-bar I first guessed: `.playground-app` is a grid with rows but no `grid-template-columns`, so its implicit `auto` column grew to the header's ~486px min-content (wordmark + language switcher + workspace badge + menu). Fixed by capping the column (`grid-template-columns: minmax(0,1fr)`) and letting the header shrink on mobile (hide the "Dataslope" wordmark — icon stays; `min-width:0` + truncation on the logo group/badge; hide the keyboard-only Run hint). Verified **0 overflow** at 390px with Run/menu/badge all on-screen; desktop unchanged (wordmark still shown); all 5 SQL mobile/desktop e2e tests still pass.
+>   - **Still open:** only the two deferred low-priority slices of NSQL-09 (tooltip overlap, redundant Files close).
 
 ---
 
@@ -82,7 +82,7 @@ Each finding carries an ID (`NSQL-NN`) for cross-reference from the plan in §9.
 | **NSQL-07** | **Uncaught `NotFoundError` (OPFS) on every first load, in all nine languages** — trips the dev error overlay; would reach prod error monitoring | 🔴 | new | ✅ Fixed | `files/opfsDataStorage.ts:32-45` (`getDataDir` non-awaited return); `Playground.tsx:1001` |
 | **NSQL-08** | **Files panel is unreachable on mobile** — the icon rail is `display:none` < 768px and the mobile menu has no "Files" entry | 🟡 | new | ✅ Fixed | `playground.css:774-781`, `Playground.tsx:3160-3217` (mobile menu actions) |
 | **NSQL-09** | Minor polish: icon-rail hover tooltip overlaps the Files panel toolbar; redundant Files close affordances; long workspace name truncates in the header badge | 🟢 | new | ✅ Partial | `FilesPanel.tsx:641-677`, `WorkspaceBadge.tsx:188-191` |
-| **NSQL-10** | **96px horizontal overflow at 390px** (pre-existing) — the editor pane-bar's non-shrinking content forces `.playground-body` to ~486px | 🟡 (mobile) | new | ⏳ Open | `.playground-body` `min-width:auto`; editor `.pane-bar` content |
+| **NSQL-10** | **96px horizontal overflow at 390px** (pre-existing) — `.playground-app`'s implicit grid column grows to the header's ~486px min-content | 🟡 (mobile) | new | ✅ Fixed | `playground.css` `.playground-app` (no `grid-template-columns`); header |
 
 ---
 
@@ -308,15 +308,18 @@ On first load the `data/` directory doesn't exist, so `getDirectoryHandle("data"
   - The **workspace manager drawer** becomes a proper bottom sheet on mobile (good) — the handle leak (NSQL-05) is a *desktop* regression of that same component, not a mobile one.
 - **Correction to an earlier draft of this section:** there *is* a **96px horizontal overflow at 390px** (NSQL-10, below) — the document is ~486px wide. It's pre-existing (reproduces on the base commit) and was missed in the first eyeball pass; measured precisely while verifying NSQL-03.
 
-### NSQL-10 — 96px horizontal overflow at 390px (pre-existing) 🟡 (mobile, new) — ⏳ Open
+### NSQL-10 — 96px horizontal overflow at 390px (pre-existing) 🟡 (mobile, new) — ✅ Fixed
 
-**What happens.** At a 390px viewport the document is **486px wide** (`document.documentElement.scrollWidth = 486`, `clientWidth = 390`) — a 96px horizontal overflow / scroll. `html` and `body` are correctly 390px, but **`.playground-body` is 486px** (`min-width: auto`), and everything below it (`.playground-body-content` → `.panes` → `.editor-pane` → CodeMirror) stretches to match.
+**What happened.** At a 390px viewport the document was **486px wide** (`scrollWidth = 486`, `clientWidth = 390`) — a 96px horizontal scroll. `html`/`body` were correctly 390px, but **`.playground-app`'s single grid column was 486px**, so everything inside (header, tab bar, panes, editor) stretched to 486.
 
-**Root cause.** `.playground-body` is a flex item with the default `min-width: auto`, so it can't shrink below its content's min-content width. The widest min-content contributor is the **editor `.pane-bar`** — its label, copy/format icons, the `Ctrl + Enter` kbd hints, and the Run split-button are all `white-space: nowrap` / non-shrinking, summing to ~486px. With `min-width: auto` that 486px propagates up and widens the whole layout.
+**Root cause (initially mis-diagnosed, then traced).** My first guess was the editor pane-bar; the probe disproved it. `.playground-app` is `display:grid` with `grid-template-rows: 40px 1fr` but **no `grid-template-columns`**, so the implicit single column is `auto` — it sizes to the **max-content of its widest row, which is the header**: `.logo` (244px — wordmark + language switcher) + workspace badge (156px) + menu button (38px) + gaps ≈ 486px. That 486px column overflowed the 390px viewport, and the editor/pane chain (all `min-width:auto`) faithfully filled it.
 
-**Not caused by this PR.** Verified by stashing the NSQL-03 CSS and re-measuring: overflow is **486px with the original CSS too**, settings open or closed. NSQL-03 is mobile-neutral.
+**Not caused by this PR.** Confirmed by stashing the NSQL-03 CSS and re-measuring — 486px with the original CSS too, settings open or closed.
 
-**Recommendation (follow-up, not a one-liner).** A naive `min-width: 0` on the flex chain would let `.editor-pane` shrink but then `overflow:hidden` would *clip the Run button* off-screen — worse. The proper fix is a **responsive editor pane-bar** at ≤768px: drop/condense the `Ctrl + Enter` kbd hint, shrink the "Run `main`" label to just an icon, and/or let the pane-bar wrap — then add `min-width: 0` so the column can reach 390px. Worth a dedicated mobile-polish pass (pairs naturally with NSQL-08).
+**Fix applied (this PR).**
+- `.playground-app { grid-template-columns: minmax(0, 1fr) }` — cap the column at the container width (min 0, not the children's min-content) instead of letting it grow.
+- On mobile (≤768px): hide the **"Dataslope" wordmark** (the logo icon stays), add `min-width: 0` to `.playground-header` / `.logo` / `.workspace-badge` so they shrink/truncate, add `min-width: 0` down the editor/output flex chain, and hide the keyboard-only `Ctrl+Enter` run hint.
+- **Verified:** 0 overflow at 390px (`after-09-mobile-no-overflow.png`); Run button, menu, and workspace badge all on-screen; **desktop unchanged** (wordmark still shown, `after-10-desktop-header-intact.png`); the 5 SQL mobile/desktop e2e tests (which share these classes) all pass.
 
 ---
 
@@ -377,11 +380,11 @@ All changes are in shared files, so each fixes all nine playgrounds at once.
 - **NSQL-05** ✅ Workspace drawer: handle selector fixed, `padding-inline:16px` body, button row fills evenly. *(`WorkspaceBadge.tsx`, `playground.css`.)*
 - **NSQL-06** ✅ Plain-language, playground-type-aware workspace description; friendly `Workspace N` default names. *(`WorkspaceBadge.tsx`.)*
 
-**Phase 3 — Mobile & polish**
+**Phase 3 — Mobile & polish** — ✅ **Done**
 - **NSQL-08** ✅ Added a "Files" entry to the mobile menu (FilesPanel as a bottom-sheet drawer). *(`Playground.tsx`, `playground.css`.)*
-- **NSQL-09** ✅ Partial — badge truncation resolved via NSQL-06; tooltip/redundant-close deferred.
+- **NSQL-10** ✅ Killed the 96px mobile overflow at the source — cap `.playground-app`'s grid column + shrink the header on mobile (hide wordmark, `min-width:0`/truncate). *(`playground.css`.)*
+- **NSQL-09** ✅ Partial — badge truncation resolved via NSQL-06; tooltip/redundant-close deferred as very low priority.
 - **A11y** ✅ `aria-pressed` consistency + non-color active cue (landed with NSQL-01).
-- **NSQL-10** ⏳ Responsive editor pane-bar at ≤768px + `min-width:0` to kill the 96px overflow — the one remaining substantive item (own follow-up; pre-existing).
 
 ---
 
@@ -418,3 +421,5 @@ All changes are in shared files, so each fixes all nine playgrounds at once.
 | **`after-06-mobile-settings.png`** | **After NSQL-03 (mobile):** Settings keeps the full-screen overlay |
 | **`after-07-mobile-menu-with-files.png`** | **After NSQL-08:** "Files" entry now in the mobile menu |
 | **`after-08-mobile-files-drawer.png`** | **After NSQL-08:** full FilesPanel as a mobile bottom-sheet |
+| **`after-09-mobile-no-overflow.png`** | **After NSQL-10:** mobile fits 390px — header + Run button on-screen, no horizontal scroll |
+| **`after-10-desktop-header-intact.png`** | **After NSQL-10:** desktop header unchanged (wordmark still shown) |

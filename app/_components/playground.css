@@ -120,6 +120,12 @@ body.playground-active {
 .playground-app {
   display: grid;
   grid-template-rows: 40px 1fr;
+  /* Cap the single column at the container width (min 0, not the
+     children's min-content). Without this the implicit `auto` column
+     grew to the header's min-content (~486px on a phone: wordmark +
+     language switcher + workspace badge + menu), forcing a horizontal
+     overflow. `minmax(0, 1fr)` lets the rows/header shrink to fit. */
+  grid-template-columns: minmax(0, 1fr);
   /* Use the dynamic viewport height on mobile browsers so that the
      bottom of the layout (e.g. the last output cell on the Output tab)
      remains reachable when the URL bar is visible. `100vh` falls back
@@ -2661,6 +2667,36 @@ input[type="range"].fs-slider:disabled {
 
   /* The drag-to-resize divider doesn't make sense in a tabbed layout. */
   .resizer {
+    display: none;
+  }
+
+  /* Let the editor/output column shrink to the viewport. The flex chain
+     defaults to min-width:auto, so it was held open at the editor pane
+     bar's min-content width — which forced a ~96px horizontal overflow
+     at 390px. Relax min-width down the chain and drop the keyboard-only
+     run hint (no Ctrl/Cmd+Enter on touch) so the pane bar fits; the Run
+     label already truncates with an ellipsis. */
+  .playground-body,
+  .playground-body-content,
+  .panes,
+  .editor-pane,
+  .output-pane {
+    min-width: 0;
+  }
+  .editor-pane .kbd-group {
+    display: none;
+  }
+
+  /* Let the header fit a phone: drop the "Dataslope" wordmark (the logo
+     icon stays) and let the logo group + workspace badge shrink/truncate
+     so the language switcher, badge, and menu button all stay on one row
+     without forcing the layout wider than the viewport. */
+  .playground-header,
+  .logo,
+  .workspace-badge {
+    min-width: 0;
+  }
+  .brand-name {
     display: none;
   }
 
