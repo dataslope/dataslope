@@ -2,9 +2,9 @@
    alongside `<ChallengeCard>` on Learn pages.
 
    The visual language intentionally mirrors `ChallengeCard.module.css`
-   (paper card chrome, blue badge header, slate text, accent submit
-   button, green/red status banner) so the two embeddable components
-   feel like one product. Neutral tokens are duplicated locally (the
+   (paper card chrome, blue badge header, slate text, green/red status
+   banner) so the two embeddable components feel like one product.
+   Neutral tokens are duplicated locally (the
    playground bundle doesn't load Tailwind's preflight that defines the
    `--color-…` vars); brand colors come from the global `--ds-*` ramp
    (app/brand.css). */
@@ -25,7 +25,6 @@
   --mc-text: var(--ds-gray-900);
   --mc-text-muted: var(--ds-gray-400);
   --mc-accent: var(--ds-blue-600);
-  --mc-badge-color: var(--mc-accent);
 
   --mc-font-ui: "Inter", system-ui, -apple-system, sans-serif;
   --mc-font-mono:
@@ -70,13 +69,6 @@
   white-space: nowrap;
 }
 
-.badgeDot {
-  width: 5px;
-  height: 5px;
-  background: var(--mc-badge-color);
-  border-radius: 50%;
-}
-
 .modeLabel {
   font-size: 12px;
   color: var(--mc-text-muted);
@@ -90,7 +82,6 @@
   width: 13px;
   height: 13px;
 }
-
 
 /* ─── Question body (markdown-rendered) ───────────────────────────── */
 
@@ -191,10 +182,6 @@
 
 .choice:not([data-locked="true"]):hover {
   background: var(--ds-gray-50);
-}
-
-.choice[data-selected="true"] {
-  /* no background highlight — selection is indicated by the input alone */
 }
 
 .choice[data-locked="true"] {
@@ -506,11 +493,6 @@
   --mc-border-light: #232323;
   --mc-text: #e0e0e0;
   --mc-text-muted: #808080;
-  --mc-badge-color: var(--ds-blue-300);
-}
-
-:global(html.dark) .choice[data-selected="true"] {
-  /* no background highlight in dark mode either */
 }
 
 :global(html.dark) .choice[data-verdict="correct-selected"],

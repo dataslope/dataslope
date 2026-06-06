@@ -158,7 +158,6 @@ export default function MultipleChoiceQuestion({
                   when the input itself is clicked. */}
               <div
                 className={styles.choice}
-                data-selected={isSelected ? "true" : "false"}
                 data-locked={submitted ? "true" : "false"}
                 data-verdict={verdict}
                 onClick={() => !submitted && select(choice.id)}
