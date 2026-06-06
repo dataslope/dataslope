@@ -48,6 +48,176 @@ function cachePromise<T>(key: string, setPromise: () => Promise<T>): Promise<T> 
   return promise;
 }
 
+// ─── Brand-themed Mermaid palette ──────────────────────────────────────────
+//
+// Mermaid runs color math (khroma) over its theme variables, so it needs
+// concrete colors rather than `var(--ds-*)` strings. We resolve the brand
+// tokens (app/brand.css) to hex at render time, keeping that file the single
+// source of truth, and fall back to the literal brand values — mirrored below,
+// kept in sync with app/brand.css — if a token is ever missing (e.g. before
+// the stylesheet applies). Only the steps the theme actually uses are listed.
+const BRAND_FALLBACKS: Record<string, string> = {
+  "--ds-blue-50": "#E8F2FF",
+  "--ds-blue-100": "#D1E6FF",
+  "--ds-blue-200": "#AED3FF",
+  "--ds-blue-400": "#5BA7FF",
+  "--ds-blue-600": "#0878DD",
+  "--ds-blue-800": "#00519C",
+  "--ds-teal-200": "#AAE0DD",
+  "--ds-teal-600": "#009491",
+  "--ds-teal-800": "#006361",
+  "--ds-green-200": "#B4EAAF",
+  "--ds-green-800": "#006F01",
+  "--ds-red-200": "#FFC2BF",
+  "--ds-red-500": "#FF4F59",
+  "--ds-red-600": "#DC3F49",
+  "--ds-red-800": "#99212C",
+  "--ds-yellow-100": "#FDF5D9",
+  "--ds-yellow-200": "#FEF0C3",
+  "--ds-yellow-600": "#D4B651",
+  "--ds-yellow-800": "#836D1C",
+  "--ds-orange-200": "#F6CAAD",
+  "--ds-orange-800": "#844200",
+  "--ds-purple-200": "#DBCAFC",
+  "--ds-purple-800": "#634094",
+  "--ds-gray-50": "#f9fafb",
+  "--ds-gray-300": "#d1d5db",
+  "--ds-gray-400": "#9ca3af",
+  "--ds-gray-500": "#6b7280",
+  "--ds-gray-600": "#4b5563",
+  "--ds-gray-700": "#374151",
+  "--ds-gray-800": "#1f2937",
+  "--ds-gray-900": "#111827",
+  "--ds-white": "#ffffff",
+};
+
+function readBrand(): (token: keyof typeof BRAND_FALLBACKS) => string {
+  let resolved: Record<string, string> = BRAND_FALLBACKS;
+  if (typeof window !== "undefined") {
+    const root = getComputedStyle(document.documentElement);
+    resolved = { ...BRAND_FALLBACKS };
+    for (const name of Object.keys(BRAND_FALLBACKS)) {
+      const value = root.getPropertyValue(name).trim();
+      if (value) resolved[name] = value;
+    }
+  }
+  return (token) => resolved[token] ?? BRAND_FALLBACKS[token];
+}
+
+// Build Mermaid `themeVariables` for the brand "base" theme. Light mode places
+// dark text/soft-blue nodes on a white page; dark mode places light text on
+// dark cards with a bright-blue accent border. All node/line/text pairings are
+// WCAG-AA verified. Semantic brand hues (green/red/yellow) keep their meaning
+// (success/error/warning notes & critical tasks); the seven-hue categorical
+// wheel colors multi-branch diagrams (mindmaps) without semantic collisions.
+function brandThemeVariables(isDark: boolean): Record<string, string | boolean> {
+  const c = readBrand();
+
+  const text = isDark ? c("--ds-gray-50") : c("--ds-gray-900");
+  const surface = isDark ? c("--ds-gray-900") : c("--ds-white");
+  const nodeFill = isDark ? c("--ds-gray-800") : c("--ds-blue-50");
+  const nodeBorder = isDark ? c("--ds-blue-400") : c("--ds-blue-600");
+  const line = isDark ? c("--ds-gray-400") : c("--ds-gray-500");
+  const lifeline = isDark ? c("--ds-gray-500") : c("--ds-gray-400");
+  const signal = isDark ? c("--ds-gray-300") : c("--ds-gray-600");
+  const clusterFill = isDark ? c("--ds-gray-900") : c("--ds-gray-50");
+  const clusterBorder = isDark ? c("--ds-gray-700") : c("--ds-gray-300");
+
+  // Categorical wheel (mindmaps): light = soft -200 fills under dark labels;
+  // dark = deep -800 fills under light labels. Mermaid re-applies overrides
+  // after its internal derivation, so these exact values reach the SVG.
+  const step = isDark ? "800" : "200";
+  const wheel = ["blue", "teal", "green", "yellow", "orange", "red", "purple"];
+  const cScale: Record<string, string> = {};
+  for (let i = 0; i < 12; i++) {
+    cScale[`cScale${i}`] = c(`--ds-${wheel[i % wheel.length]}-${step}` as keyof typeof BRAND_FALLBACKS);
+  }
+
+  return {
+    darkMode: isDark,
+    background: surface,
+    fontFamily: '"Source Serif 4", Georgia, "Times New Roman", serif',
+    // Controls the font-size written into the SVG's inline <style> block.
+    // Without this, Mermaid inherits the container's computed size (16px from
+    // the 1rem wrapper) and writes that into the SVG, overriding the fontSize
+    // config which only governs text measurement.
+    fontSize: "15px",
+
+    // Primary nodes (flowchart / class / state / ER) + sequence actors
+    primaryColor: nodeFill,
+    primaryBorderColor: nodeBorder,
+    primaryTextColor: text,
+    nodeTextColor: text,
+
+    // Secondary / tertiary — clusters/subgraphs and accents
+    secondaryColor: isDark ? c("--ds-gray-700") : c("--ds-teal-200"),
+    secondaryBorderColor: isDark ? c("--ds-gray-600") : c("--ds-teal-600"),
+    secondaryTextColor: text,
+    tertiaryColor: clusterFill,
+    tertiaryBorderColor: clusterBorder,
+    tertiaryTextColor: text,
+
+    // Edges / arrows / labels
+    lineColor: line,
+    arrowheadColor: line,
+    textColor: text,
+    titleColor: text,
+    edgeLabelBackground: surface,
+
+    // Notes (sequence + flowchart) — bright "sticky note" in both modes
+    noteBkgColor: c("--ds-yellow-100"),
+    noteBorderColor: c("--ds-yellow-600"),
+    noteTextColor: c("--ds-gray-900"),
+
+    // Sequence diagrams
+    actorBkg: nodeFill,
+    actorBorder: nodeBorder,
+    actorTextColor: text,
+    actorLineColor: lifeline,
+    signalColor: signal,
+    signalTextColor: text,
+    labelBoxBkgColor: nodeFill,
+    labelBoxBorderColor: nodeBorder,
+    labelTextColor: text,
+    loopTextColor: text,
+    activationBkgColor: isDark ? c("--ds-gray-700") : c("--ds-blue-100"),
+    activationBorderColor: nodeBorder,
+    sequenceNumberColor: isDark ? c("--ds-gray-900") : c("--ds-white"),
+
+    // Class diagrams
+    classText: text,
+
+    // ER diagrams — alternating attribute rows
+    attributeBackgroundColorOdd: clusterFill,
+    attributeBackgroundColorEven: surface,
+
+    // Gantt charts
+    sectionBkgColor: isDark ? c("--ds-gray-800") : c("--ds-gray-50"),
+    altSectionBkgColor: surface,
+    sectionBkgColor2: isDark ? c("--ds-gray-700") : c("--ds-blue-50"),
+    taskBkgColor: nodeFill,
+    taskBorderColor: nodeBorder,
+    activeTaskBkgColor: isDark ? c("--ds-blue-800") : c("--ds-blue-200"),
+    activeTaskBorderColor: nodeBorder,
+    gridColor: clusterBorder,
+    doneTaskBkgColor: isDark ? c("--ds-gray-700") : c("--ds-gray-300"),
+    doneTaskBorderColor: c("--ds-gray-500"),
+    critBkgColor: isDark ? c("--ds-red-800") : c("--ds-red-200"),
+    critBorderColor: c("--ds-red-600"),
+    todayLineColor: c("--ds-red-500"),
+    taskTextColor: text,
+    taskTextDarkColor: c("--ds-gray-900"),
+    taskTextLightColor: c("--ds-white"),
+    taskTextOutsideColor: text,
+
+    // Categorical scale (mindmaps / pie) + mindmap root node
+    scaleLabelColor: text,
+    git0: isDark ? c("--ds-gray-800") : c("--ds-blue-100"),
+    gitBranchLabel0: text,
+    ...cScale,
+  };
+}
+
 function MermaidContent({ chart }: { chart: string }) {
   const id = useId();
   const { resolvedTheme } = useTheme();
@@ -59,14 +229,11 @@ function MermaidContent({ chart }: { chart: string }) {
     fontFamily: '"Source Serif 4", Georgia, "Times New Roman", serif',
     fontSize: 15,
     themeCSS: "margin: 1.5rem auto 0;",
-    theme: resolvedTheme === "dark" ? "dark" : "neutral",
-    themeVariables: {
-      // Controls the font-size written into the SVG's inline <style> block.
-      // Without this, Mermaid inherits the container's computed size (16px
-      // from the 1rem wrapper) and writes that into the SVG, overriding the
-      // fontSize config above which only governs text measurement.
-      fontSize: "15px",
-    },
+    // Drive diagram colors from the DataSlope brand palette (app/brand.css) via
+    // the customizable "base" theme, instead of Mermaid's stock neutral (light)
+    // / dark themes, so charts match the rest of /learn in both modes.
+    theme: "base",
+    themeVariables: brandThemeVariables(resolvedTheme === "dark"),
   });
 
   const { svg, bindFunctions } = use(

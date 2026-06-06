@@ -3,7 +3,9 @@
  * ----------------------------------------------------------------------------
  * Imported once in app/layout.tsx so every route (/, /learn, /playground) can
  * read these tokens. Defines:
- *   1. Full 50–900 tonal ramps for the four brand hues (500 = the brand color).
+ *   1. Full 50–900 tonal ramps for the four brand hues (500 = the brand color),
+ *      plus three decorative "categorical" hues (teal/purple/orange) for charts
+ *      and illustrations that need more than four distinct, non-semantic colors.
  *   2. Raw hue aliases (--ds-blue → --ds-blue-500, etc.).
  *   3. Mode-agnostic "ink" anchors that clear WCAG AA body text on white.
  *   4. Semantic role tokens, with light-mode defaults and dark-mode overrides.
@@ -68,17 +70,69 @@
   --ds-yellow-800: #836D1C; /* AA body text on white (5.0:1) */
   --ds-yellow-900: #624F00;
 
+  /* ── Decorative / categorical hues (NON-SEMANTIC) ──────────────────────
+   * Extend the four brand hues to give charts, diagrams (Mermaid mindmaps,
+   * pie/quadrant) and illustrations categorical variety. Unlike green/red/
+   * yellow — which are LOCKED to success/error/warning (see brand report §5) —
+   * these carry no meaning; use them purely to tell series/branches apart.
+   * Same OKLCH method as the brand ramps (constant hue, interpolated L/C,
+   * gamut-mapped to sRGB; 500 = the base hue). Together with blue they form a
+   * seven-step categorical wheel: blue · teal · green · yellow · orange · red ·
+   * purple. The 700 steps clear WCAG AA body text on white (the "ink" role). */
+
+  /* ── Teal (hue ≈192) ──────────────────────────────────────────────── */
+  --ds-teal-50:  #E6F6F5;
+  --ds-teal-100: #CFEDEB;
+  --ds-teal-200: #AAE0DD;
+  --ds-teal-300: #80D3CF;
+  --ds-teal-400: #3BC4BF;
+  --ds-teal-500: #00AEAA; /* base */
+  --ds-teal-600: #009491;
+  --ds-teal-700: #007B79; /* AA body text on white (5.1:1) */
+  --ds-teal-800: #006361;
+  --ds-teal-900: #004E4C;
+
+  /* ── Purple (hue ≈300) ────────────────────────────────────────────── */
+  --ds-purple-50:  #F4EFFE;
+  --ds-purple-100: #EAE0FD;
+  --ds-purple-200: #DBCAFC;
+  --ds-purple-300: #CCB3FB;
+  --ds-purple-400: #BB96FA;
+  --ds-purple-500: #AB77FA; /* base */
+  --ds-purple-600: #9263D7;
+  --ds-purple-700: #7A51B6; /* AA body text on white (5.7:1) */
+  --ds-purple-800: #634094;
+  --ds-purple-900: #4E3177;
+
+  /* ── Orange (hue ≈55) ─────────────────────────────────────────────── */
+  --ds-orange-50:  #FDEFE6;
+  --ds-orange-100: #FAE0D0;
+  --ds-orange-200: #F6CAAD;
+  --ds-orange-300: #F1B288;
+  --ds-orange-400: #EB9558;
+  --ds-orange-500: #E47600; /* base */
+  --ds-orange-600: #C36400;
+  --ds-orange-700: #A35200; /* AA body text on white (5.6:1) */
+  --ds-orange-800: #844200;
+  --ds-orange-900: #693300;
+
   /* ── Raw hue aliases (= the 500 brand value) ──────────────────────── */
   --ds-blue:   var(--ds-blue-500);
   --ds-green:  var(--ds-green-500);
   --ds-red:    var(--ds-red-500);
   --ds-yellow: var(--ds-yellow-500);
+  --ds-teal:   var(--ds-teal-500);
+  --ds-purple: var(--ds-purple-500);
+  --ds-orange: var(--ds-orange-500);
 
   /* ── "Ink" anchors: AA-on-white text/link/icon colors ─────────────── */
   --ds-blue-ink:  var(--ds-blue-700);
   --ds-green-ink: var(--ds-green-800);
   --ds-red-ink:   var(--ds-red-700);
   --ds-amber-ink: var(--ds-yellow-800);
+  --ds-teal-ink:   var(--ds-teal-700);
+  --ds-purple-ink: var(--ds-purple-700);
+  --ds-orange-ink: var(--ds-orange-700);
 
   /* ── Neutral foundation (Tailwind gray ramp) ──────────────────────────
    * Shared by the card / quiz / codeblock components, which each used to
