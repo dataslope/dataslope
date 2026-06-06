@@ -7,14 +7,12 @@
  * chrome as `<ChallengeCard>`.
  *
  * Behaviour:
- *   - Single-answer questions render as a radio group; questions with
- *     2+ `[o]` choices render as checkboxes (auto-detected by the
- *     parser).
- *   - Submit reveals per-choice verdicts + the overall explanation.
- *     A "Try Again" button then resets the selection while leaving the
- *     attempt count visible, so learners can iterate as many times as
- *     they like (mirrors the "unlimited attempts" UX of the existing
- *     `<ChallengeCard>` Check-Answer flow).
+ *   - Choices render as a radio group: the learner picks exactly one
+ *     option. Selecting a choice immediately reveals per-choice verdicts
+ *     and the overall explanation.
+ *   - A "Try Again" button then resets the selection so learners can
+ *     iterate as many times as they like (mirrors the "unlimited
+ *     attempts" UX of the existing `<ChallengeCard>` Check-Answer flow).
  *   - All learner-visible Markdown — body, choice labels, per-choice
  *     explanations, overall explanation — is rendered through
  *     react-markdown with GFM + KaTeX + rehype-highlight so authors
@@ -28,16 +26,13 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import rehypeHighlight from "rehype-highlight";
-import { Check, X, RotateCcw, ListChecks, MousePointerClick, ScrollText } from "lucide-react";
-import {
-  parseQuestion,
-  type ParsedChoice,
-  type ParsedQuestion,
-} from "./parseQuestion";
+import { Check, X, RotateCcw, MousePointerClick, ScrollText } from "lucide-react";
+import { parseQuestion, type ParsedChoice } from "./parseQuestion";
 import styles from "./MultipleChoiceQuestion.module.css";
 
-/** Choice verdict assigned after Submit. Drives the per-choice colour
- *  ring + glyph and is read off `data-verdict` in the stylesheet. */
+/** Choice verdict assigned after the learner picks an answer. Drives the
+ *  per-choice colour ring + glyph and is read off `data-verdict` in the
+ *  stylesheet. */
 type Verdict =
   | "correct-selected"
   | "correct-missed"
@@ -83,30 +78,6 @@ function computeVerdict(
   return "neutral";
 }
 
-function summariseResult(
-  parsed: ParsedQuestion,
-  selectedIds: Set<string>,
-): "pass" | "fail" | "partial" {
-  // Treat the answer set as a set comparison: every correct choice
-  // must be selected, and no incorrect choice may be selected. In
-  // multi-answer questions, picking *some* of the correct choices
-  // without any wrong ones earns a "partial" banner — useful feedback
-  // even though the question isn't fully right.
-  const correct = new Set(parsed.correctIds);
-  let selectedCorrect = 0;
-  let selectedWrong = 0;
-  for (const id of selectedIds) {
-    if (correct.has(id)) selectedCorrect++;
-    else selectedWrong++;
-  }
-  const allCorrectPicked = selectedCorrect === correct.size;
-  if (allCorrectPicked && selectedWrong === 0) return "pass";
-  if (parsed.multiAnswer && selectedCorrect > 0 && selectedWrong === 0) {
-    return "partial";
-  }
-  return "fail";
-}
-
 export default function MultipleChoiceQuestion({
   markdown,
   badge = "Question",
@@ -116,48 +87,31 @@ export default function MultipleChoiceQuestion({
   // this component with the new source.
   const parsed = useMemo(() => parseQuestion(markdown), [markdown]);
 
-  const [selected, setSelected] = useState<Set<string>>(() => new Set());
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
-  const [, setAttempts] = useState(0);
 
-  const toggle = (id: string) => {
+  const select = (id: string) => {
+    // Picking a choice locks the card and reveals feedback immediately —
+    // a single-answer question has no separate Submit step.
     if (submitted) return;
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (parsed.multiAnswer) {
-        if (next.has(id)) next.delete(id);
-        else next.add(id);
-      } else {
-        next.clear();
-        next.add(id);
-      }
-      return next;
-    });
-    if (!parsed.multiAnswer) {
-      setSubmitted(true);
-      setAttempts((n) => n + 1);
-    }
-  };
-
-  const onSubmit = () => {
-    if (selected.size === 0) return;
+    setSelectedId(id);
     setSubmitted(true);
-    setAttempts((n) => n + 1);
   };
 
   const onRetry = () => {
-    // Reset selection but keep the attempt counter — the learner has
-    // earned that. The overall explanation hides again so the second
-    // attempt isn't trivially cued by the previous reveal.
-    setSelected(new Set());
+    // Reset the selection so the learner can try again. The overall
+    // explanation hides again so the next attempt isn't trivially cued
+    // by the previous reveal.
+    setSelectedId(null);
     setSubmitted(false);
   };
 
-  const result = submitted ? summariseResult(parsed, selected) : null;
-  const inputType = parsed.multiAnswer ? "checkbox" : "radio";
+  const result: "pass" | "fail" | null = submitted
+    ? selectedId !== null && selectedId === parsed.correctId
+      ? "pass"
+      : "fail"
+    : null;
   const groupName = useId();
-
-  const correctCount = parsed.correctIds.length;
 
   return (
     <section className={styles.card} aria-label="Multiple choice question">
@@ -167,17 +121,8 @@ export default function MultipleChoiceQuestion({
           {badge}
         </span>
         <span className={styles.modeLabel}>
-          {parsed.multiAnswer ? (
-            <>
-              <ListChecks aria-hidden />
-              Select all that apply ({correctCount})
-            </>
-          ) : (
-            <>
-              <MousePointerClick aria-hidden />
-              Select one
-            </>
-          )}
+          <MousePointerClick aria-hidden />
+          Select one
         </span>
       </header>
 
@@ -194,11 +139,11 @@ export default function MultipleChoiceQuestion({
           inside a choice label is valid HTML. */}
       <div
         className={styles.choiceList}
-        role={parsed.multiAnswer ? "group" : "radiogroup"}
+        role="radiogroup"
         aria-label="Answer choices"
       >
         {parsed.choices.map((choice) => {
-          const isSelected = selected.has(choice.id);
+          const isSelected = selectedId === choice.id;
           const verdict = computeVerdict(choice, isSelected, submitted);
           // Show explanations for all choices after submit so learners
           // can understand why each option is right or wrong.
@@ -216,16 +161,16 @@ export default function MultipleChoiceQuestion({
                 data-selected={isSelected ? "true" : "false"}
                 data-locked={submitted ? "true" : "false"}
                 data-verdict={verdict}
-                onClick={() => !submitted && toggle(choice.id)}
+                onClick={() => !submitted && select(choice.id)}
               >
                 <input
                   className={styles.choiceInput}
-                  type={inputType}
+                  type="radio"
                   name={groupName}
                   value={choice.id}
                   checked={isSelected}
                   disabled={submitted}
-                  onChange={() => toggle(choice.id)}
+                  onChange={() => select(choice.id)}
                   onClick={(e) => e.stopPropagation()}
                 />
                 <div className={styles.choiceContent}>
@@ -260,28 +205,12 @@ export default function MultipleChoiceQuestion({
         })}
       </div>
 
-      {((!submitted && parsed.multiAnswer) || submitted) ? (
+      {submitted ? (
         <div className={styles.actionBar}>
-          {!submitted ? (
-            <button
-              type="button"
-              className={styles.submitBtn}
-              onClick={onSubmit}
-              disabled={selected.size === 0}
-            >
-              Submit
-            </button>
-          ) : (
-            <button type="button" className={styles.retryBtn} onClick={onRetry}>
-              <RotateCcw size={13} aria-hidden />
-              Try again
-            </button>
-          )}
-          {!submitted && parsed.multiAnswer ? (
-            <span className={styles.actionHint}>
-              Pick every option that applies, then submit.
-            </span>
-          ) : null}
+          <button type="button" className={styles.retryBtn} onClick={onRetry}>
+            <RotateCcw size={13} aria-hidden />
+            Try again
+          </button>
         </div>
       ) : null}
 
@@ -290,26 +219,16 @@ export default function MultipleChoiceQuestion({
           <span className={styles.bannerIcon}>
             {result === "pass" ? (
               <Check size={14} strokeWidth={3} aria-hidden />
-            ) : result === "partial" ? (
-              <ListChecks size={14} strokeWidth={2.5} aria-hidden />
             ) : (
               <X size={14} strokeWidth={3} aria-hidden />
             )}
           </span>
           <span>
-            {result === "pass"
-              ? "Correct!"
-              : result === "partial"
-                ? "Partially correct"
-                : "Not quite — try again"}
+            {result === "pass" ? "Correct!" : "Not quite — try again"}
             <span className={styles.bannerSub}>
               {result === "pass"
-                ? parsed.multiAnswer
-                  ? "You selected every correct option."
-                  : "Great choice."
-                : result === "partial"
-                  ? `You picked ${selected.size} of ${correctCount} correct options.`
-                  : "Review the explanations and give it another go."}
+                ? "Great choice."
+                : "Review the explanations and give it another go."}
             </span>
           </span>
         </div>

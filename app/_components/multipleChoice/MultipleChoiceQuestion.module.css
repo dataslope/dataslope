@@ -25,8 +25,6 @@
   --mc-text: var(--ds-gray-900);
   --mc-text-muted: var(--ds-gray-400);
   --mc-accent: var(--ds-blue-600);
-  --mc-accent-hover: var(--ds-blue-700);
-  --mc-accent-disabled: var(--ds-blue-300);
   --mc-badge-color: var(--mc-accent);
 
   --mc-font-ui: "Inter", system-ui, -apple-system, sans-serif;
@@ -228,33 +226,13 @@
   margin-top: 3px;
   cursor: inherit;
   background: var(--ds-gray-100);
+  border-radius: 50%;
   box-shadow: none;
   transition: box-shadow 0.12s, background 0.12s;
 }
 
-.choiceInput[type="radio"] {
-  border-radius: 50%;
-}
-
-.choiceInput[type="checkbox"] {
-  border-radius: 3px;
-}
-
 .choiceInput:checked {
-  background: var(--ds-gray-900);
-  box-shadow: 0 0 0 1.5px var(--ds-gray-400);
-}
-
-.choiceInput[type="radio"]:checked {
   background: radial-gradient(circle, #fff 30%, var(--ds-gray-900) 31%);
-  box-shadow: none;
-}
-
-.choiceInput[type="checkbox"]:checked {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 5l2.5 2.5L8 3' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 9px;
   box-shadow: none;
 }
 
@@ -403,31 +381,6 @@
   background: var(--mc-bg-subtle);
 }
 
-.submitBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--mc-accent);
-  color: var(--ds-white);
-  border: none;
-  border-radius: 6px;
-  padding: 7px 14px;
-  font-family: var(--mc-font-ui);
-  font-size: 13.5px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.12s;
-}
-
-.submitBtn:hover:not(:disabled) {
-  background: var(--mc-accent-hover);
-}
-
-.submitBtn:disabled {
-  background: var(--mc-accent-disabled);
-  cursor: not-allowed;
-}
-
 .retryBtn {
   display: inline-flex;
   align-items: center;
@@ -448,12 +401,6 @@
   background: var(--mc-bg-hover);
   border-color: var(--ds-gray-300);
   color: var(--mc-text);
-}
-
-.actionHint {
-  margin-left: auto;
-  font-size: 12px;
-  color: var(--mc-text-muted);
 }
 
 /* ─── Status banner ───────────────────────────────────────────────── */
@@ -477,11 +424,6 @@
   color: var(--ds-red-700);
 }
 
-.banner[data-state="partial"] {
-  background: var(--ds-yellow-50);
-  color: var(--ds-yellow-700);
-}
-
 .bannerIcon {
   width: 22px;
   height: 22px;
@@ -498,10 +440,6 @@
 
 .banner[data-state="fail"] .bannerIcon {
   background: var(--ds-red-100);
-}
-
-.banner[data-state="partial"] .bannerIcon {
-  background: var(--ds-yellow-200);
 }
 
 .bannerSub {
@@ -594,11 +532,6 @@
   color: var(--ds-red-300);
 }
 
-:global(html.dark) .banner[data-state="partial"] {
-  background: color-mix(in srgb, var(--ds-yellow) 12%, transparent);
-  color: var(--ds-yellow-300);
-}
-
 :global(html.dark) .choiceLabel code,
 :global(html.dark) .bodyMd code,
 :global(html.dark) .overallBody code {
@@ -619,7 +552,7 @@
   background: transparent;
 }
 
-/* Unselected radio/checkbox: no ring, subtle fill close to the page bg. */
+/* Unselected radio: no ring, subtle fill close to the page bg. */
 :global(html.dark) .choiceInput:not(:checked) {
   background: rgba(255, 255, 255, 0.05);
 }
@@ -656,10 +589,6 @@
   background: color-mix(in srgb, var(--ds-red) 20%, transparent);
 }
 
-:global(html.dark) .banner[data-state="partial"] .bannerIcon {
-  background: color-mix(in srgb, var(--ds-yellow) 20%, transparent);
-}
-
 /* Retry button uses an explicit white background in light mode. */
 :global(html.dark) .retryBtn {
   background: var(--mc-bg-subtle);
@@ -678,14 +607,6 @@
   background: var(--mc-bg-hover);
 }
 
-/* Disabled submit button is too vivid (blue-300) in dark mode — tone it
-   down to a dim translucent blue so it reads as inactive. */
-:global(html.dark) .submitBtn:disabled {
-  background: color-mix(in srgb, var(--ds-blue) 50%, transparent);
-  color: rgba(255, 255, 255, 0.5);
-  cursor: not-allowed;
-}
-
 /* White explanation text on dark red/green verdict backgrounds. */
 :global(html.dark) .choice[data-verdict="correct-selected"] .choiceExplanation,
 :global(html.dark) .choice[data-verdict="correct-missed"] .choiceExplanation,
@@ -693,24 +614,9 @@
   color: #ffffff;
 }
 
-/* Neutral checked state for radio/checkbox inputs in dark mode.
-   Use background-color (not the background shorthand) so it doesn't
-   reset background-image, which would hide the checkbox checkmark. */
+/* Neutral checked state for the radio input in dark mode. */
 :global(html.dark) .choiceInput:checked {
-  background-color: var(--ds-gray-900);
-  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.25);
-}
-
-:global(html.dark) .choiceInput[type="radio"]:checked {
   background: radial-gradient(circle, white 30%, #fff6 31%);
-  box-shadow: none;
-}
-
-/* In dark mode, checked checkboxes flip to a white box with a dark
-   checkmark so they read as clearly "on" against any dark background. */
-:global(html.dark) .choiceInput[type="checkbox"]:checked {
-  background-color: #ffffff;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 5l2.5 2.5L8 3' stroke='%231a1a1a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   box-shadow: none;
 }
 
