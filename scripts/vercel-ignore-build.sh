@@ -2,9 +2,10 @@
 #
 # Vercel "Ignored Build Step" — skip deployments that only touch agent-outputs/.
 #
-# How to enable (one-time, in the Vercel dashboard):
-#   Project Settings → Git → Ignored Build Step → "Run my Bash script"
-#   Command:  bash scripts/vercel-ignore-build.sh
+# Wired up via the repo's vercel.json:
+#   { "ignoreCommand": "bash scripts/vercel-ignore-build.sh" }
+# (ignoreCommand overrides the dashboard "Ignored Build Step", so no UI step is
+# needed. The same command also works if pasted into that dashboard setting.)
 #
 # Exit-code contract defined by Vercel:
 #   exit 1 → continue the build / create a deployment
