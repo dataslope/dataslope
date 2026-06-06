@@ -103,8 +103,10 @@ function brandThemeVariables(): Record<string, string | boolean> {
 
   const ink = c("--ds-gray-900"); // all text — dark, sits on light fills/card
   const canvas = c("--ds-white"); // diagram canvas + edge-label backdrop blend
-  const nodeFill = c("--ds-blue-50"); // soft node fill
-  const nodeEdge = c("--ds-blue-200"); // minimal hairline border
+  // blue-100 reads clearly on white (blue-50 was nearly invisible); blue-300
+  // gives a soft-but-visible edge without the old bold border.
+  const nodeFill = c("--ds-blue-100");
+  const nodeEdge = c("--ds-blue-300");
   const softFill = c("--ds-gray-50"); // clusters / subgraphs / alt rows
   const softEdge = c("--ds-gray-200");
   const line = c("--ds-gray-400"); // connectors

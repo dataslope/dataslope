@@ -186,7 +186,7 @@ Use `color-mix()` for tints (the playground already does this): `color-mix(in sr
 **One light palette, in both modes — the legibility constraint that shapes everything.** ~200 MDX diagrams hand-color nodes with `classDef` using **light pastel fills and no text color** (e.g. `classDef bad fill:#fee2e2,stroke:#b91c1c`). Mermaid exposes a *single* global node-text color, so it must be **dark** to stay readable on those author fills — which means our own node fills must be light too. The diagram is therefore **light-based in both modes**, and dark mode is handled by rendering the whole figure on a soft **light "figure card"** (a `border-radius`'d white panel in `mermaid.module.css`, applied to both the inline diagram and the fullscreen modal). This keeps every label dark-on-light and author pastels legible, with no per-element light/dark juggling.
 
 The mapping, tuned to be soft and low-border (per the report updates):
-- **Nodes** — soft `blue-50` fill, **minimal `blue-200` hairline** border (not the old bold accent border), `gray-900` text. Author `classDef` fills keep their colors; only the bold default borders were toned down.
+- **Nodes** — soft `blue-100` fill (light enough to stay calm, dark enough to read as "blue" on the white card; `blue-50` looked colorless), a **soft `blue-300` hairline** border (not the old bold accent border), `gray-900` text. Author `classDef` fills keep their colors; only the bold default borders were toned down.
 - **Structure** — neutral `--ds-gray-*` for edges, arrowheads, lifelines, and subgraph/cluster backgrounds; edge-label backdrops blend into the canvas/card.
 - **Semantic hues keep their meaning** — yellow "sticky-note" notes; red critical-path and "today" markers in gantt.
 - **Categorical wheel** — mindmaps cycle the **seven-hue** wheel (§1.1) as soft `-200` fills under dark labels, identical in both modes. (Mermaid re-applies overrides *after* its internal derivation, so these exact values reach the SVG — its built-in `cScale` darkening is bypassed.)
@@ -261,9 +261,13 @@ Across Phases 5–6: **ChallengeCard 81 → 34** unique vars (−58%), **MCQ 57 
 
 A follow-up pass refined the look after dark-mode review:
 - **Fixed a dark-mode legibility bug.** The first cut used dark nodes + light text in dark mode, which made the ~200 author `classDef` light-pastel nodes (light fill + inherited light text) unreadable. Switched to a single **light palette in both modes** with dark text, rendered on a soft **light figure card** in dark mode (§4.3) — author pastels and edge labels are now legible everywhere.
-- **Minimized borders.** Default node borders dropped from the bold `blue-600` to a soft `blue-200` hairline.
-- **Softer, less "poppy" palette.** Low-contrast `-50/-200` fills, neutral-gray connectors, and the figure card give a calmer, more figure-like look.
+- **Minimized borders.** Default node borders dropped from the bold `blue-600` to a soft `blue-300` hairline.
+- **Softer, less "poppy" palette.** Low-contrast fills, neutral-gray connectors, and the figure card give a calmer, more figure-like look.
 - **`/color-test`** now also renders the teal / purple / orange ramps + ink anchors, so the QA gate covers the decorative hues.
+
+A second dark-mode review caught two more issues, now fixed:
+- **Shrinking.** The figure card used `width: fit-content`, but the SVG is sized `width: 100%; max-width: <W>px` — a shrink-to-fit parent gave it ~0 intrinsic width, collapsing the diagram. The card now keeps `width: 100%` (the SVG renders at its natural size, centered).
+- **Washed-out colors.** `blue-50` node fills were nearly indistinguishable from the white card. Bumped to `blue-100` (clearly blue, still soft) with a `blue-300` edge.
 
 Typecheck + lint clean, 450 unit tests pass; verified visually with Playwright across flowchart / ER / sequence / class / state / gantt / mindmap in light and dark (incl. author-`classDef` pages).
 
