@@ -299,6 +299,8 @@ flowchart TD
 - **Hero/decorative art → Strategy B (transparent raster, theme-agnostic palette).** One asset, low maintenance; this should cover most chapters.
 - **Strategy C only for marquee images** where the extra asset is worth it. **Strategy D** is a stopgap, not a plan.
 
+> **Brand palette × dark mode:** DataSlope's palette (blue `#148CFF`, green `#20C621`, red `#FF4F59`, yellow `#FFDD6C`) is **dark-mode-native** — all four read well on dark; on white, yellow/green areas can look washed out. That's exactly why Strategy B's *transparent background + mid-tone palette* (or SVG) is the right default here. Full analysis — including how the same palette themes the rest of the site — is in `20260606-0540-brand-color-system.md` §7.
+
 ---
 
 ## 8. Image hosting & delivery at scale
@@ -395,13 +397,16 @@ Copy-paste prompts for the **Phase 0 bake-off** (§10). They're built on real Da
 
 ### A.0 Shared house-style preamble (prepend to every prompt)
 
-Replace the bracketed tokens with your real brand values once chosen (§11 Q1/Q3). Keeping this string **identical** across images is what creates a coherent set.
+These use DataSlope's **brand palette** (blue `#148CFF`, green `#20C621`, red `#FF4F59`, yellow `#FFDD6C`). Keep this string **identical** across images for a coherent set, and **cap each illustration to 2–3 of the four hues** to avoid a circus look. See the brand color report (`20260606-0540-brand-color-system.md`) for how the same palette themes the rest of the site and why it's dark-mode-native.
 
 ```
 Flat vector editorial illustration. Clean geometric shapes, generous negative
-space, limited palette of [#3B82F6 primary], [#F59E0B accent], and warm neutral
-tones, soft long shadows, subtle paper grain. Friendly, modern, calm. Centered
-composition with safe margins. Transparent background.
+space. Brand palette: azure blue #148CFF (primary), bright green #20C621, coral
+red #FF4F59, warm yellow #FFDD6C — use only 2–3 of these per image plus warm
+neutral tones. Mid-tone application (avoid washed-out pastels and pure-white or
+pure-black areas) so the art reads on BOTH light and dark backgrounds. Soft long
+shadows, subtle paper grain. Friendly, modern, calm. Centered composition with
+safe margins. Transparent background.
 NEGATIVE: no text, no letters, no numbers, no labels, no watermark, no UI chrome,
 no photorealism, no harsh pure-white or pure-black fills, no busy backgrounds.
 ```
@@ -483,7 +488,7 @@ lettering, correct spelling.
 
 ### A.7 Per-course accent variant (consistency probe)
 
-Re-run **A.1** with only the accent color swapped (e.g. `[#10B981 accent]` for a Python course vs. `[#3B82F6]` for R). Everything else identical. *Confirms the house-style system yields "same family, different course" rather than random drift (§5.2).*
+Re-run **A.1** holding the brand blue `#148CFF` as the constant primary and swapping only the secondary accent per course (e.g. green `#20C621` for an R course vs. yellow `#FFDD6C` for a Python course). Everything else identical. *Confirms the house-style system yields "same family, different course" rather than random drift (§5.2).*
 
 > **What to record per run:** model, exact prompt, seed, aspect ratio, whether transparency was native or post-processed, and a screenshot on **both** light and dark backgrounds. Drop the winners into the manifest schema from §6.3 as your "golden" references.
 
