@@ -217,7 +217,7 @@ Deliberately **left alone:** non-brand decoratives (violet/purple `--ch-violet-*
 
 **Phase 5 — Variable cleanup — ✅ done.** Once the components pulled brand colors from `--ds-*`, their local Tailwind-style palette scales (`--ch-*`, `--mc-*`) became a redundant pass-through layer. Cleaned up:
 - **ChallengeCard:** 81 → **46** vars (−43%). The `--ch-{blue,green,red,amber}-NNN` numeric steps were collapsed — every usage now points at `--ds-*` directly (a provably appearance-preserving change, since each step already resolved to the identical `--ds-*` value), and the dead `--ch-purple*`, unused slates, and `--ch-badge-bg/border` were removed. Only the **neutral** Tailwind palette + the **semantic aliases** (`--ch-accent`, `--ch-bg`, `--ch-green`…) remain.
-- **MultipleChoiceQuestion:** 57 → **26** vars (−54%), same treatment.
+- **MultipleChoiceQuestion:** 57 → **24** vars (−58%), same treatment. A follow-up pass also migrated its **dark-mode block** — which still hardcoded Tailwind hues (`rgba(22,163,74,…)` green, `rgba(220,38,38,…)` red, `rgba(217,119,6,…)` amber, `rgba(59,130,246,…)` blue, and `#86efac`/`#fca5a5`/`#fcd34d` verdict text) — to brand tokens (washes via `color-mix(... var(--ds-*) …)`, text via the `--ds-*-300` ramp). MCQ now sources **every** brand color from the palette in both light and dark; only neutrals/surfaces remain as literals.
 - **CodeBlock:** repointed `--cb-yellow` off the removed `--ch-amber-500` to `--ds-yellow-500`; dropped the dead `--cb-white`/`--cb-font-ui`. (Note: CodeBlock consumes ChallengeCard's `--ch-*` cross-file — verified before any removal.)
 - **learn.css:** merged the duplicate `:root:not(.dark)` / `.dark` brand→Fumadocs blocks into one pair.
 

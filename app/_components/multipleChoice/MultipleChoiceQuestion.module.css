@@ -21,10 +21,8 @@
   --mc-gray-200: #e5e7eb;
   --mc-gray-300: #d1d5db;
   --mc-gray-400: #9ca3af;
-  --mc-gray-500: #6b7280;
   --mc-gray-700: #374151;
   --mc-gray-900: #111827;
-  --mc-neutral-50: #fafafa;
 
   /* Semantic aliases — these mirror ChallengeCard's --ch-* naming so a
      reader who knows one stylesheet can read the other. */
@@ -588,26 +586,26 @@
 
 :global(html.dark) .choice[data-verdict="correct-selected"],
 :global(html.dark) .choice[data-verdict="correct-missed"] {
-  background: rgba(22, 163, 74, 0.15);
+  background: color-mix(in srgb, var(--ds-green) 15%, transparent);
 }
 
 :global(html.dark) .choice[data-verdict="wrong-selected"] {
-  background: rgba(220, 38, 38, 0.15);
+  background: color-mix(in srgb, var(--ds-red) 15%, transparent);
 }
 
 :global(html.dark) .banner[data-state="pass"] {
-  background: rgba(22, 163, 74, 0.12);
-  color: #86efac;
+  background: color-mix(in srgb, var(--ds-green) 12%, transparent);
+  color: var(--ds-green-300);
 }
 
 :global(html.dark) .banner[data-state="fail"] {
-  background: rgba(220, 38, 38, 0.12);
-  color: #fca5a5;
+  background: color-mix(in srgb, var(--ds-red) 12%, transparent);
+  color: var(--ds-red-300);
 }
 
 :global(html.dark) .banner[data-state="partial"] {
-  background: rgba(217, 119, 6, 0.12);
-  color: #fcd34d;
+  background: color-mix(in srgb, var(--ds-yellow) 12%, transparent);
+  color: var(--ds-yellow-300);
 }
 
 :global(html.dark) .choiceLabel code,
@@ -639,36 +637,36 @@
    light mode — override to a translucent tinted dark surface. */
 :global(html.dark) .choice[data-verdict="correct-selected"] .choiceExplanation,
 :global(html.dark) .choice[data-verdict="correct-missed"] .choiceExplanation {
-  background: rgba(22, 163, 74, 0.08);
+  background: color-mix(in srgb, var(--ds-green) 8%, transparent);
 }
 
 :global(html.dark) .choice[data-verdict="wrong-selected"] .choiceExplanation {
-  background: rgba(220, 38, 38, 0.08);
+  background: color-mix(in srgb, var(--ds-red) 8%, transparent);
 }
 
 /* Choice mark icons — replace light green/red fill with translucent dark tints. */
 :global(html.dark) .choice[data-verdict="correct-selected"] .choiceMark,
 :global(html.dark) .choice[data-verdict="correct-missed"] .choiceMark {
-  background: rgba(22, 163, 74, 0.2);
-  color: #86efac;
+  background: color-mix(in srgb, var(--ds-green) 20%, transparent);
+  color: var(--ds-green-300);
 }
 
 :global(html.dark) .choice[data-verdict="wrong-selected"] .choiceMark {
-  background: rgba(220, 38, 38, 0.2);
-  color: #fca5a5;
+  background: color-mix(in srgb, var(--ds-red) 20%, transparent);
+  color: var(--ds-red-300);
 }
 
 /* Banner icon circles — light green/red fills need dark-mode tints. */
 :global(html.dark) .banner[data-state="pass"] .bannerIcon {
-  background: rgba(22, 163, 74, 0.2);
+  background: color-mix(in srgb, var(--ds-green) 20%, transparent);
 }
 
 :global(html.dark) .banner[data-state="fail"] .bannerIcon {
-  background: rgba(220, 38, 38, 0.2);
+  background: color-mix(in srgb, var(--ds-red) 20%, transparent);
 }
 
 :global(html.dark) .banner[data-state="partial"] .bannerIcon {
-  background: rgba(217, 119, 6, 0.2);
+  background: color-mix(in srgb, var(--ds-yellow) 20%, transparent);
 }
 
 /* Retry button uses an explicit white background in light mode. */
@@ -692,7 +690,7 @@
 /* Disabled submit button is too vivid (blue-300) in dark mode — tone it
    down to a dim translucent blue so it reads as inactive. */
 :global(html.dark) .submitBtn:disabled {
-  background: rgba(59, 130, 246, 0.5);
+  background: color-mix(in srgb, var(--ds-blue) 50%, transparent);
   color: rgba(255, 255, 255, 0.5);
   cursor: not-allowed;
 }
@@ -729,12 +727,12 @@
    that blends with the dark green / dark red surface instead of gray. */
 :global(html.dark) .choice[data-verdict="correct-selected"] .choiceExplanation code,
 :global(html.dark) .choice[data-verdict="correct-missed"] .choiceExplanation code {
-  background: rgba(22, 163, 74, 0.3);
+  background: color-mix(in srgb, var(--ds-green) 30%, transparent);
   color: var(--ds-green-200);
 }
 
 :global(html.dark) .choice[data-verdict="wrong-selected"] .choiceExplanation code {
-  background: rgba(220, 38, 38, 0.3);
+  background: color-mix(in srgb, var(--ds-red) 30%, transparent);
   color: var(--ds-red-200);
 }
 
