@@ -341,6 +341,7 @@ int main() {
 - Every subproblem is unique.
   > That gives little reuse.
 - [o] The problem has optimal substructure and overlapping subproblems.
+  > Overlapping subproblems make caching pay off, and optimal substructure lets sub-answers combine into the final one.
 - The input is always sorted.
   > Sorting is not required.
 - Only for graphs.
@@ -349,6 +350,7 @@ int main() {
 <MultipleChoice markdown={`What is top-down DP?
 
 - [o] Recursion plus a cache.
+  > It solves the problem with ordinary recursion but memoizes each subproblem the first time it is computed.
 - Iteration without storage.
   > Usually bottom-up uses iteration.
 - Sorting by value.
@@ -361,6 +363,7 @@ int main() {
 - O(n + m)
   > It checks pairs of prefixes.
 - [o] O(nm)
+  > The table has n × m cells and each one is filled in constant time.
 - O(log n)
   > No halving.
 - O(2^n)
@@ -373,5 +376,6 @@ int main() {
 - C++ memoizes automatically.
   > It does not.
 - [o] Each state needs only the previous two values.
+  > Keeping just the last two results lets each new value be computed in place, so no full array is needed.
 - It only works for n=10.
   > The dependency pattern is general.`} />

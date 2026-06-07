@@ -314,6 +314,7 @@ picture.
 - They are the same thing
   > They are distinct memory regions with different lifetime rules.
 - [o] The stack holds short-lived bookkeeping for method calls (parameters, locals, return addresses). The heap holds longer-lived objects created with \`new\` and managed by the garbage collector.
+  > Stack memory is reclaimed automatically the moment a method returns, while heap objects persist until the garbage collector frees them.
 - The heap is faster than the stack
   > It's usually the other way around — stack access is extremely fast.`}
 />
