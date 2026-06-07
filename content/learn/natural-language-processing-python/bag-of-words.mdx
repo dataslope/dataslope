@@ -189,10 +189,13 @@ bag-of-words discards tells you exactly when you need to shore it up.
 document-term matrix correspond to?
 
 - One document in the corpus
+  > Documents are represented by rows, not columns; each row holds the word counts for one document.
 - [o] One word in the shared vocabulary, with each cell counting that word's occurrences in a document
   > Rows are documents and columns are vocabulary words; a cell is the count (or presence) of that word in that document. The shared columns make all document vectors comparable.
 - One sentence in a document
+  > Sentences are not the unit of bag-of-words; the model does not track sentence boundaries — each column is a word from the shared vocabulary.
 - One character in the text
+  > Bag-of-words operates at the word level, not the character level; each column represents a vocabulary word, not an individual character.
 
 Columns are vocabulary words; rows are documents; cells are counts.`}
 />
@@ -268,10 +271,13 @@ assert out == [0, 0, 0], "Got: " + repr(out)`,
   markdown={`Why do we convert text to a bag-of-words vector at all?
 
 - Because vectors take less disk space than text
+  > Storage efficiency is not the motivation; in fact, a sparse vector of thousands of word counts can use more space than the original text. The purpose is to produce a numeric form algorithms can process.
 - [o] Because most algorithms operate on numbers, not words, so each document must be turned into a fixed-length numeric vector before it can be fed to them
   > Feature extraction bridges words and math. A bag-of-words vector gives every document the same numeric shape (one entry per vocabulary word), which is exactly what classifiers and clustering algorithms require.
 - Because it makes the text easier for humans to read
+  > A bag-of-words vector — a list of word counts — is harder for humans to read than the original sentence; readability for humans is not the goal.
 - Because it translates the document into another language
+  > Bag-of-words does not translate; it represents a document numerically within its original language by counting word occurrences against a shared vocabulary.
 
 The point is to produce numeric features an algorithm can consume.`}
 />
@@ -281,10 +287,13 @@ The point is to produce numeric features an algorithm can consume.`}
 What does this reveal, and how is it commonly addressed?
 
 - It is a bug in the counting code
+  > Both sentences use the same three words exactly once each, so identical count vectors are the correct, intended output of bag-of-words — there is no counting error.
 - [o] Bag-of-words discards word order, so different orderings of the same words collapse together; adding n-gram (e.g., bigram) features puts some local order back
   > The bag keeps counts but not order, so both sentences have identical word tallies. When order matters, bigram/trigram features ("bites man" vs "bites dog") restore enough of it to distinguish them.
 - It means the two sentences have different vocabularies
+  > The two sentences share the same three words — "dog", "bites", "man" — so they have identical vocabularies, which is exactly why their vectors are the same.
 - It proves bag-of-words cannot be used for any real task
+  > Despite this limitation, bag-of-words is widely used for topic detection, spam filtering, and search; order often matters less than word presence for those tasks.
 
 Order-loss is inherent to the bag; n-grams are the standard remedy.`}
 />
@@ -293,10 +302,13 @@ Order-loss is inherent to the bag; n-grams are the standard remedy.`}
   markdown={`How does **binary** bag-of-words differ from **count** bag-of-words?
 
 - Binary uses words; count uses numbers
+  > Both binary and count bag-of-words produce numeric vectors; the distinction is not words versus numbers but presence (1/0) versus frequency counts.
 - [o] Binary records only whether each word is present (1 or 0); count records how many times it appears
   > Both share the same vocabulary-aligned vector shape. Binary collapses any nonzero count to 1, which can be more robust to document length, while counts preserve frequency information that may itself be a useful signal.
 - Binary is always more accurate than count
+  > Neither variant is universally superior; binary is more robust to document length effects, but count preserves frequency information that can itself be a useful signal for some tasks.
 - They produce vectors of different lengths
+  > Both binary and count vectors are aligned to the same shared vocabulary, so they have identical lengths; only the cell values (0/1 vs. counts) differ.
 
 Presence (1/0) versus frequency (counts) is the only difference, and which is better depends on the task.`}
 />
@@ -307,10 +319,13 @@ connection between them. What limitation is this, and what technique is aimed
 at it?
 
 - A sparsity problem, fixed by stopword removal
+  > Sparsity refers to having mostly zero counts in a high-dimensional vector; giving "great" and "excellent" separate columns is a *semantic* limitation, not a sparsity issue, and stopword removal does not close the meaning gap.
 - [o] It captures no *meaning*/similarity between words; word embeddings (e.g., Word2Vec) address it by placing similar words close together in a numeric space
   > Bag-of-words treats every word as an independent dimension, so synonyms are unrelated. Embeddings encode semantic similarity numerically, so related words end up near each other — a more advanced topic, but the conceptual fix for this exact limitation.
 - A word-order problem, fixed by n-grams
+  > Losing word order is a separate bag-of-words limitation; here the problem is that "great" and "excellent" are treated as unrelated columns despite being synonyms, which n-grams do not address.
 - There is no limitation here
+  > Treating synonyms as entirely unrelated dimensions is a real limitation of bag-of-words; it means a classifier trained on documents with "great" learns nothing that helps it on documents with "excellent".
 
 Bag-of-words has no semantics; embeddings are the conceptual answer to that gap.`}
 />
