@@ -326,12 +326,11 @@ function snapToBrand(
 //      font just enough to fit the box (so wider mono glyphs aren't clipped).
 // Runs post-render because fills can come from injected CSS classes, so
 // getComputedStyle is required. Idempotent.
-function adaptNodes(root: Element | null): void {
+function adaptNodes(root: Element | null, isDark: boolean): void {
   if (!root) return;
   const c = readBrand();
   const DARK = c("--ds-gray-900");
   const LIGHT = c("--ds-white");
-  const isDark = document.documentElement.classList.contains("dark");
   const pageText = isDark ? c("--ds-gray-50") : c("--ds-gray-900");
   const pageBg = isDark ? c("--ds-gray-900") : c("--ds-white");
 
@@ -463,7 +462,7 @@ function MermaidContent({ chart }: { chart: string }) {
         ref={(container) => {
           if (container) {
             bindFunctions?.(container);
-            adaptNodes(container);
+            adaptNodes(container, resolvedTheme === "dark");
           }
         }}
         dangerouslySetInnerHTML={{ __html: svg }}
@@ -480,6 +479,7 @@ function MermaidContent({ chart }: { chart: string }) {
       {fullscreen && (
         <MermaidFullscreen
           svg={svg}
+          isDark={resolvedTheme === "dark"}
           onClose={() => setFullscreen(false)}
         />
       )}
@@ -499,9 +499,11 @@ function clamp(value: number, min: number, max: number): number {
 
 function MermaidFullscreen({
   svg,
+  isDark,
   onClose,
 }: {
   svg: string;
+  isDark: boolean;
   onClose: () => void;
 }) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
@@ -550,7 +552,7 @@ function MermaidFullscreen({
       if (!svgEl) return;
       // Apply the same brand snapping / borderless / label treatment as the
       // inline diagram.
-      adaptNodes(stage);
+      adaptNodes(stage, isDark);
       const bbox = svgEl.getBoundingClientRect();
       const naturalW = bbox.width;
       const naturalH = bbox.height;
@@ -569,7 +571,7 @@ function MermaidFullscreen({
       setTy((viewport.clientHeight - naturalH * next) / 2);
     });
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [isDark]);
 
   // Apply zoom by resizing the SVG's intrinsic dimensions rather than a
   // CSS `transform: scale()`. A scaled transform on a composited layer
