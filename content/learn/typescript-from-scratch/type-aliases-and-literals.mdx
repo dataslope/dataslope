@@ -412,10 +412,13 @@ types from existing ones, all at compile time.
   markdown={`What is the type of the variable \`x\` after this declaration: \`const x = "north";\`?
 
 - \`string\` (the general string type)
+  > \`let\` bindings infer the wider \`string\` type, but \`const\` bindings receive the narrower literal type because the variable can never be reassigned.
 - [o] \`"north"\` (the literal type)
   > \`const\` bindings infer the literal type because the value cannot change.
 - \`"north" | "south" | "east" | "west"\`
+  > TypeScript infers only the value that was actually assigned, not a union of all possible compass directions.
 - \`any\`
+  > TypeScript does not infer \`any\` for a \`const\` initialized with a string literal; it infers the precise literal type.
 
 TypeScript infers the narrowest possible type for \`const\` bindings.`}
 />

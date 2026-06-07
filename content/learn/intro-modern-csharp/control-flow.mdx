@@ -365,6 +365,7 @@ real test was watching the whole time.
 - All branches always run
   > Definitely not.
 - [o] Only the *first* matching branch runs; the rest are skipped
+  > Conditions are tested top-down and the chain stops at the first one that is true.
 - The compiler picks the branch with the shortest condition
   > It does not.`}
 />
@@ -390,6 +391,7 @@ real test was watching the whole time.
 - Restarts the entire loop from the beginning
   > It doesn't reset the loop variable; it just moves on to the next iteration.
 - [o] Skips the rest of the current iteration's body and goes on to the next iteration
+  > Execution jumps straight to the next pass of the loop, leaving the remaining statements in the body unrun.
 - Ends the program
   > It does not.`}
 />

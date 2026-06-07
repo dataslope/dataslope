@@ -233,10 +233,13 @@ see this dependency again and again.
 tokenization usually is not"?
 
 - Tokenization is the only step that is fast enough to run
+  > Speed is not what makes tokenization special; it is that every subsequent step — lowercasing, filtering, counting — operates on the list of tokens that tokenization produces, making it a prerequisite rather than a choice.
 - [o] Almost every later step operates on *tokens*, so you need tokens before you can lowercase, filter, count, or tag them — whereas lowercasing, stopword removal, and stemming are choices that depend on the task
   > Tokenization produces the list of units everything else transforms. Without it there is nothing to lowercase or count. The later steps add or remove information and are applied (or skipped) based on what you are trying to achieve.
 - Tokenization is the last thing you do, after counting
+  > Tokenization must come first, not last, because counting and every other step require a list of tokens to operate on; you cannot count words in a raw string directly.
 - Stopword removal must always happen before tokenization
+  > Stopword removal compares tokens against a list of words, so it requires tokens to already exist; it is impossible to remove stopwords from text that has not yet been tokenized.
 
 You cannot transform a list of tokens you have not produced yet.`}
 />
@@ -433,10 +436,13 @@ free; sometimes it throws away the very words that matter.
 produce different results?
 
 - It cannot — order never affects the outcome of preprocessing
+  > Order consistently affects outcomes, as the concrete code example in this page demonstrates: filtering stopwords before lowercasing leaves capitalized variants like "The" and "THE" in the output.
 - [o] Each step transforms the data the next step sees, so (for example) filtering before lowercasing compares differently-cased tokens against a lowercase stopword list and misses some
   > Steps are not independent; each one changes the input to the next. Lowercasing after filtering means the filter saw the original casing, so case-mismatched stopwords slip through. Order changes what each step actually operates on.
 - Reordering steps changes which version of Python runs
+  > The Python version is a runtime property of the environment and is completely unaffected by the order of preprocessing operations in your code.
 - Only the first step has any effect; the rest are ignored
+  > Every step in the pipeline transforms the token list it receives; later steps are not ignored — they each change the data that flows into the following step.
 
 Pipelines are sequential transformations, so the order of those transformations is part of the logic.`}
 />
@@ -446,10 +452,13 @@ Pipelines are sequential transformations, so the order of those transformations 
 the project — it's just good hygiene." What is the best response?
 
 - They are right; more preprocessing is always better
+  > More preprocessing means more information destroyed; for sentiment analysis, removing stopwords deletes negations like "not", silently flipping a negative review to look positive.
 - [o] Preprocessing steps are choices that should be driven by the downstream task; some steps that help one task (like topic counting) actively hurt another (like sentiment analysis)
   > There is no universally correct pipeline. Stopword removal helps when you want content words for topic analysis but can destroy sentiment or phrase meaning. The right steps depend on what you are trying to do — which is why "choosing the pipeline" gets its own page.
 - They are right, because stemming and stopword removal are required by NLTK
+  > NLTK provides these tools but does not require you to use them; they are optional steps in a pipeline that should be applied only when the task benefits from them.
 - They are wrong because preprocessing should never be done at all
+  > Preprocessing is essential for most NLP tasks; the issue is not whether to preprocess but which steps to apply, because each step is a deliberate choice rather than an automatic requirement.
 
 "It depends on the task" is the honest, correct answer — and the core skill this course builds.`}
 />
@@ -459,10 +468,13 @@ the project — it's just good hygiene." What is the best response?
 tokens" is useful mainly because:
 
 - It proves that NLP requires no programming
+  > NLP does require programming; the list-transformation model clarifies that the coding is straightforward list comprehensions, but choosing which transformations to apply still demands judgment.
 - [o] Once text is tokenized, each later step is just a filter or map over a list — a pattern you already know — so the difficulty shifts from *coding* the steps to *choosing* them
   > After tokenization you are holding a Python list of strings, and lowercasing, filtering stopwords, and stemming are ordinary list comprehensions. The mechanics are familiar; the judgment about which transformations to apply is the real work.
 - It means the order of operations is irrelevant
+  > Order still matters even when steps are list operations; the order determines what input each transformation receives, and applying them in the wrong sequence produces different — often incorrect — results.
 - It guarantees every pipeline gives the same output
+  > Different pipelines applying different transformations produce different outputs; the list model explains how pipelines work mechanically, not that all pipelines converge to the same result.
 
 The mental model reframes NLP preprocessing as list-wrangling plus good judgment.`}
 />

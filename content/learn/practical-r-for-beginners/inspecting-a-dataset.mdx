@@ -273,17 +273,22 @@ report("NAs per column", colSums(is.na(iris)))
 - [o] Because real datasets contain surprises (missing values, wrong types, implausible values) that can silently corrupt every downstream analysis.
   > Five minutes of inspection saves hours of debugging later.
 - Because \`summary()\` is the only way to compute means.
-- Because it's a tradition.`}
+  > \`mean()\` and other functions compute means directly; the ritual uses \`summary()\` as a broad overview tool, not because it is the only option.
+- Because it's a tradition.
+  > The inspection ritual has a practical purpose: catching data quality problems before they silently invalidate an analysis; following it only as tradition misses the point.`}
 />
 
 <MultipleChoice
   markdown={`If \`mean(airquality$Ozone)\` returns \`NA\`, the most likely reason is:
 
 - The \`mean\` function is broken.
+  > \`mean()\` is working correctly; returning \`NA\` when the input contains \`NA\` is its intended, documented behavior.
 - The dataset has fewer than 30 rows.
+  > \`airquality\` has 153 rows; row count does not affect whether \`mean()\` returns \`NA\`, but missing values do.
 - [o] The \`Ozone\` column contains \`NA\` values, and \`mean()\` returns \`NA\` unless told otherwise.
   > Fix it with \`mean(airquality$Ozone, na.rm = TRUE)\`.
-- R refuses to compute means on built-in datasets.`}
+- R refuses to compute means on built-in datasets.
+  > R treats built-in datasets like any other data frame; the \`NA\` propagation behavior applies to all numeric vectors, regardless of their source.`}
 />
 
 Inspecting tells us *what's there*. The next page is about

@@ -248,10 +248,13 @@ just a tool-using activity.
   markdown={`Why did the naive mean satisfaction score in the chapter's example mislead?
 
 - The mean function in Pandas is broken
+  > \`df["score"].mean()\` computed the correct arithmetic mean of the values in the column; the problem was with interpretation, not computation.
 - There were too few rows
+  > The dataset had 15 rows — enough to compute a meaningful mean; the issue was that grouping by channel revealed a pattern the overall mean concealed.
 - [o] All the low scores came in through one channel; aggregating across channels hid the variation that mattered
   > This is a small Simpson's-paradox-flavored example. Always look at meaningful sub-groups before trusting an aggregate.
 - The scores were on a wrong scale
+  > The scores were on a consistent 1–5 scale; the misleading result came from mixing channels with different underlying distributions, not from a scaling error.
 
 This is why the analyst's first instinct after computing an aggregate should be "now break it down."`}
 />
@@ -260,10 +263,13 @@ This is why the analyst's first instinct after computing an aggregate should be 
   markdown={`Which of these is **Simpson's paradox**?
 
 - The number of pandas dataframes you create doubles every six months
+  > This describes a humorous growth pattern, not a statistical phenomenon; Simpson's paradox is about aggregation reversals, not exponential growth.
 - A function that returns different answers each time
+  > A non-deterministic function is a reproducibility problem, not Simpson's paradox; the paradox is specifically about how combining sub-groups can reverse a trend.
 - [o] A pattern that holds in every sub-group can reverse direction when the sub-groups are combined
   > The Berkeley admissions case is the classic example. Whenever you compute an aggregate, ask whether a known sub-grouping would change the conclusion.
 - A statistical test that always rejects the null
+  > A test that always rejects the null would be a broken statistical procedure; Simpson's paradox is about how aggregate statistics can contradict sub-group statistics.
 
 Awareness of Simpson's paradox is one of the few things that consistently separates intermediate from beginner analysts.`}
 />
@@ -272,10 +278,13 @@ Awareness of Simpson's paradox is one of the few things that consistently separa
   markdown={`Which habit does the chapter call "professional self-defense"?
 
 - Memorizing every Pandas function
+  > Pandas has hundreds of methods; no analyst memorizes them all, and that is not what the chapter calls professional self-defense.
 - Charting everything
+  > Visualization is valuable, but the chapter's "professional self-defense" specifically refers to making analyses auditable and reproducible.
 - [o] Treating every analysis as if it will be audited — i.e., making it reproducible, traceable, and explainable
   > When (not if) someone asks "how did you arrive at this number?", being able to re-run a script and walk through it is what protects you and your team.
 - Drinking lots of coffee
+  > Caffeine is not among the chapter's analytical habits; this is a humorous distractor.
 
 Reproducibility is not academic; it is the everyday professional baseline.`}
 />
@@ -284,10 +293,13 @@ Reproducibility is not academic; it is the everyday professional baseline.`}
   markdown={`When a result is **surprising**, what is the chapter's recommended first instinct?
 
 - Publish it immediately
+  > Publishing a surprising result before verifying it risks distributing a number that turns out to be a data or code error, damaging credibility.
 - Assume the data is correct and report it
+  > The chapter explicitly argues that most surprising results in data are bugs, not breakthroughs; assuming correctness without checking is the opposite of the recommended instinct.
 - [o] Suspect a data or code bug, and investigate before trusting it
   > The base rate of "shocking findings" being bugs is very high. Build the reflex now.
 - Ignore it
+  > Ignoring a surprising result leaves either a real finding or a real bug unaddressed; both outcomes are bad for the analysis.
 
 Most "anomalies" in data turn out to be join mistakes, type bugs, or filter errors.`}
 />

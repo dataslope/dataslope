@@ -254,7 +254,9 @@ institutionalized.
   markdown={`What is the **primary** reason scripted (rather than spreadsheet) analyses are considered more reproducible?
 
 - Scripts are always faster.
+  > Execution speed depends on the algorithm and data size, not whether the analysis is scripted or in a spreadsheet; reproducibility is the primary advantage of scripted analysis.
 - Scripts can analyze more data.
+  > Memory and processing limits apply to both scripts and spreadsheets; the case for scripts is reproducibility, not raw data capacity.
 - [o] The script *itself* is a precise record of every step, which means anyone (including future-you) can re-run the exact analysis.
   > Reproducibility is fundamentally about leaving a trail. A script *is* the trail; a sequence of mouse clicks is not.
 - Spreadsheets cannot do statistics.
@@ -265,10 +267,13 @@ institutionalized.
   markdown={`What does R Markdown / Quarto enable that a plain R script does not?
 
 - It runs R faster.
+  > R Markdown and Quarto execute the same R code as a plain script; rendering adds overhead rather than reducing it.
 - It eliminates the need to know R.
+  > R Markdown and Quarto still require writing R (or Python, Julia, etc.) in the code chunks; the format adds prose-weaving capabilities, not a no-code interface.
 - [o] It interleaves prose, code, and computed output into a single document that is regenerated from the data every time it is rendered.
   > This means the narrative explanation and the actual numbers in your report are always in sync — there is no opportunity for a stale copy-pasted figure to disagree with the text.
-- It encrypts your data automatically.`}
+- It encrypts your data automatically.
+  > Neither R Markdown nor Quarto provides encryption; security of underlying data files is a separate concern managed at the file-system or infrastructure level.`}
 />
 
 <MultipleChoice
@@ -277,9 +282,11 @@ institutionalized.
 - A study that, when repeated with new participants, gives the same finding.
   > That is *replication*, a separate concept.
 - An analysis that produces only one possible answer no matter the data.
+  > Reproducibility is not about a unique answer — different data legitimately produce different results; the point is that given the same inputs, anyone can get the same outputs.
 - [o] An analysis where another person, given the same raw data and the same code, can rerun the pipeline and obtain the same final numbers, tables, and figures.
   > Reproducibility is about *given the same inputs, getting the same outputs*. Replication is a stricter and separate scientific practice.
-- An analysis whose findings have been confirmed by a peer-reviewed journal.`}
+- An analysis whose findings have been confirmed by a peer-reviewed journal.
+  > Peer review evaluates whether a finding is credible, but a paper can be peer-reviewed without providing the data or code needed for anyone to reproduce it.`}
 />
 
 ## Mini challenge: turn a click-process into a script

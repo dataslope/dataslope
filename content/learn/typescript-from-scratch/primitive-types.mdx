@@ -352,10 +352,13 @@ console.log("100°C =", celsiusToFahrenheit(100), "°F");
   markdown={`Which of the following is the correct way to annotate a variable that holds a number in TypeScript?
 
 - \`let x: Number = 10;\`
+  > \`Number\` (capitalized) refers to the JavaScript wrapper object, not the primitive type. TypeScript discourages using the wrapper types in annotations.
 - [o] \`let x: number = 10;\`
   > Always use the lowercase primitive type \`number\`.
 - \`let x: num = 10;\`
+  > \`num\` is not a valid TypeScript type; the correct primitive type name is lowercase \`number\`.
 - \`let x = Number(10);\`
+  > This is a valid JavaScript expression, but it omits the type annotation entirely; the inferred type would be \`number\` only because TypeScript can see the return type of \`Number()\`, and it does not demonstrate explicit annotation syntax.
 
 The capitalized \`Number\` refers to the object wrapper, which is almost never what you want. The lowercase \`number\` is the primitive type.`}
 />
@@ -364,10 +367,13 @@ The capitalized \`Number\` refers to the object wrapper, which is almost never w
   markdown={`What is the type of the variable \`x\` after this declaration: \`const x = 42;\`?
 
 - \`number\` (the general number type)
+  > \`let\` bindings get the wider \`number\` type, but \`const\` bindings receive the narrower literal type because the value can never be reassigned.
 - [o] \`42\` (the literal type)
   > When you use \`const\`, TypeScript infers the literal type because the value cannot change.
 - \`any\`
+  > TypeScript does not infer \`any\` for a \`const\` initialized with a numeric literal; it infers the precise literal type \`42\`.
 - \`unknown\`
+  > \`unknown\` is the safe top type that must be narrowed before use; TypeScript does not infer it for numeric literals.
 
 TypeScript's inference is precise: \`const\` bindings get literal types, while \`let\` bindings get the broader primitive type.`}
 />

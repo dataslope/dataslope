@@ -409,10 +409,13 @@ if (r.length !== 1 || typeof r[0] !== "string") throw new Error("must return an 
   markdown={`Which of these is the *cleanest* expression of "give me a new array where each user's name is uppercased"?
 
 - A \`for\` loop that pushes into a new array
+  > A \`for\` loop with \`push\` produces the right result but obscures the intent: the reader must understand the loop mechanics before seeing that the goal is "transform every element".
 - A \`for...of\` loop with manual indexing
+  > A \`for...of\` loop is already cleaner than an index-based \`for\`, but "with manual indexing" adds unnecessary bookkeeping; when the goal is to transform every element, \`map\` expresses that directly.
 - [o] \`users.map((u) => ({ ...u, name: u.name.toUpperCase() }))\`
   > \`map\` precisely expresses "transform every element". The transformation describes the result without spelling out the mechanics of the loop. Using object spread together with \`map\` is the standard idiom for "produce a new array of updated objects".
 - A \`while\` loop that builds a new array index-by-index
+  > A \`while\` loop requires the most manual bookkeeping of all the options — initialising the index, checking the condition, incrementing, and pushing — none of which communicates the intent of "transform every element".
 
 \`map\` makes the *intent* obvious. Hand-written loops do the same work but force the reader to figure out what you're trying to express.`}
 />

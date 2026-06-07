@@ -222,10 +222,13 @@ roles.
   markdown={`Which of these communities does the chapter argue **fused** to form modern data science?
 
 - Web designers, copywriters, and accountants
+  > None of those communities contributed the statistical methodology, engineering scale, or domain-question framing that define data science.
 - [o] Statisticians, computer scientists, and business analysts
   > The Drew Conway Venn diagram (math/stats, hacking skills, substantive expertise) captures the same three-way intersection.
 - Hardware engineers, mathematicians, and biologists
+  > The chapter names statisticians, computer scientists, and business analysts — not hardware engineers or biologists.
 - Sociologists, philosophers, and historians
+  > These disciplines were not the communities the chapter identifies as fusing to form modern data science.
 
 Each community contributed a piece — methodology, engineering, and domain understanding — that the others lacked alone.`}
 />
@@ -234,10 +237,13 @@ Each community contributed a piece — methodology, engineering, and domain unde
   markdown={`The chapter cites a famous estimate that data scientists spend roughly what fraction of their time on data cleaning?
 
 - 10%
+  > The 10% estimate dramatically understates what most industry surveys report; cleaning is the dominant time sink in analysis work.
 - 30%
+  > 30% is closer but still well below the 60–80% figure the chapter cites from multiple industry surveys.
 - [o] 60–80%
   > The exact number varies by team and project, but multiple industry surveys put cleaning above half of an analyst's time, often by a wide margin. This is why this course gives the topic an entire section.
 - 100%
+  > While analysts frequently joke that cleaning takes all their time, the actual cited estimate is 60–80%, leaving room for other activities.
 
 Time spent cleaning is not wasted — it is the substrate that every later conclusion rests on.`}
 />
@@ -246,10 +252,13 @@ Time spent cleaning is not wasted — it is the substrate that every later concl
   markdown={`Which open-source Python library, released in 2008, is the focus of this course?
 
 - NumPy
+  > NumPy was released in 2005, not 2008, and is a general-purpose array library rather than the pandas tabular data library this course covers.
 - scikit-learn
+  > scikit-learn was released in 2010 and is a machine-learning library, not the tabular data analysis library this course focuses on.
 - [o] pandas
   > Pandas was released by Wes McKinney in 2008 while he was at AQR Capital Management. Its history is the subject of the next chapter.
 - matplotlib
+  > Matplotlib was released in 2003 and is a visualization library, not the tabular data analysis library at the center of this course.
 
 NumPy and matplotlib are older; scikit-learn arrived in 2010. Pandas is the one we will build the course around.`}
 />
@@ -258,10 +267,13 @@ NumPy and matplotlib are older; scikit-learn arrived in 2010. Pandas is the one 
   markdown={`Why does the chapter draw the analysis loop as a *cycle* rather than a straight line from "question" to "answer"?
 
 - Because data scientists like circles
+  > The cycle shape reflects the iterative nature of real analysis, not a stylistic preference of practitioners.
 - Because Pandas requires you to repeat operations
+  > Pandas does not impose a circular workflow; the cycle reflects how questions and evidence evolve during an analysis.
 - [o] Because the answer to one analysis almost always raises new questions, exposes data gaps, or prompts follow-up work — analysis is iterative by nature
   > The cycle is a more honest depiction of how real analyses unfold. Treating analysis as one-shot tends to produce shallow results.
 - Because dashboards refresh on a schedule
+  > Dashboard refresh schedules are a deployment concern, not the reason the chapter draws the analysis loop as a cycle.
 
 Embracing iteration — and writing code that supports re-runs and modifications — is one of the recurring themes of this course.`}
 />

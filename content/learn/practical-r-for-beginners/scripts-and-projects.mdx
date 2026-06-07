@@ -239,30 +239,39 @@ can develop.
   markdown={`Why should you never edit files in \`data/raw/\`?
 
 - They're owned by the OS.
+  > File system ownership is unrelated to this convention; the reason is analytical, not technical.
 - [o] Raw data is the immutable ground truth — preserving it means anyone can re-derive every cleaned output by re-running scripts, and accidental edits can't silently corrupt your analysis.
   > Treat raw data as read-only.
 - R can't write to that folder.
-- It's a tradition with no real reason.`}
+  > R has no built-in restriction on writing to \`data/raw/\` — the convention is enforced by discipline, not by the file system.
+- It's a tradition with no real reason.
+  > The reason is reproducibility: if the raw file changes, you can no longer verify that your cleaned outputs match the original source.`}
 />
 
 <MultipleChoice
   markdown={`What's the main problem with a hard-coded path like \`"C:/Users/Ada/Documents/data/sales.csv"\` in a script?
 
 - It's longer to type.
+  > Path length is irrelevant; a short absolute path is just as broken on another machine as a long one.
 - [o] It won't work on anyone else's machine (or even yours, after you reorganize your files) — relative paths anchored to the project root are portable.
   > Portability matters even if "anyone else" is just future-you.
 - R can't read Windows paths.
-- It only works for CSV files.`}
+  > R can read Windows-style paths using forward slashes or \`\\\\\` — the portability problem is that the path references a specific user's directory, not a path format issue.
+- It only works for CSV files.
+  > The problem applies to every file type; a hard-coded path to a PNG or an RDS file is equally broken on another machine.`}
 />
 
 <MultipleChoice
   markdown={`What's the purpose of a tool like \`renv\` or \`packrat\`?
 
 - They speed up script execution.
+  > \`renv\` and \`packrat\` manage package versions and project-local libraries; they have no effect on script execution speed.
 - [o] They record the exact package versions a project uses, so the analysis can be reliably re-run later even after packages on CRAN have changed.
   > Reproducibility doesn't end at code — it includes the environment around it.
 - They replace base R.
-- They make scripts run in parallel.`}
+  > These tools sit on top of base R and manage the project library; they do not change or remove any base R functionality.
+- They make scripts run in parallel.
+  > Parallel execution requires packages like \`parallel\` or \`future\`; \`renv\` and \`packrat\` only manage package versioning.`}
 />
 
 ## Mini challenge: design a project layout

@@ -232,10 +232,13 @@ flowchart TB
   markdown={`A table has columns \`country\`, \`gdp_2020\`, \`gdp_2021\`, \`gdp_2022\`. To turn it into a tidy long form with columns \`country\`, \`year\`, \`gdp\`, you would use:
 
 - \`pivot_wider()\`
+  > \`pivot_wider()\` goes in the opposite direction — it spreads rows into new columns, making a table wider rather than longer.
 - \`group_by()\`
+  > \`group_by()\` marks groups for downstream aggregation; it does not reshape the table or change the number of columns.
 - [o] \`pivot_longer()\`
   > \`pivot_longer()\` folds multiple columns into a key column (year) and a value column (gdp).
-- \`select()\``}
+- \`select()\`
+  > \`select()\` chooses or drops columns but does not fold them into new rows; the shape of the table stays the same.`}
 />
 
 <MultipleChoice
@@ -244,18 +247,24 @@ flowchart TB
 - [o] \`pivot_wider(names_from = year, values_from = gdp)\`
   > Year's *values* become the new column *names*; gdp's values fill them.
 - \`pivot_longer(cols = year)\`
+  > \`pivot_longer()\` would make the table longer (more rows), not wider — the opposite of what is needed here.
 - \`summarise(gdp = mean(gdp))\`
-- \`mutate(year = as.character(year))\``}
+  > \`summarise()\` reduces rows to a single aggregate value; it does not spread a column's values into new columns.
+- \`mutate(year = as.character(year))\`
+  > Converting \`year\` to a character type changes the column's type but does not reshape the table in any way.`}
 />
 
 <MultipleChoice
   markdown={`When working with ggplot2, you typically want your data in:
 
 - Wide form, because plots need rectangles.
+  > ggplot reads data from a data frame, not a matrix; and having one column per measurement makes mapping aesthetics impossible when there are multiple metrics.
 - [o] Long form, because ggplot maps **columns** to visual properties (one column per variable).
   > Long form is what makes \`aes(color = metric)\`-style mappings work cleanly.
 - Either — ggplot doesn't care.
-- A matrix, not a data frame.`}
+  > ggplot does care: each aesthetic mapping names one column, so all values for a given variable must live in one column (long form), not spread across many columns (wide form).
+- A matrix, not a data frame.
+  > ggplot2 expects a data frame (or tibble) as input; while a matrix can be coerced, ggplot's grammar is designed around named columns in a data frame.`}
 />
 
 ## Mini challenge: tidy quarterly sales

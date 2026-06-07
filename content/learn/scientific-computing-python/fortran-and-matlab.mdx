@@ -209,10 +209,13 @@ chapter.
   markdown={`Why is it accurate to say "every fast NumPy operation is really a FORTRAN operation in disguise"?
 
 - Because NumPy was written by the FORTRAN community
+  > NumPy was written primarily in C and Python by researchers at various institutions; the FORTRAN connection is about the underlying numerical libraries it calls, not who authored NumPy itself.
 - Because Python compiles to FORTRAN at runtime
+  > Python is interpreted and never compiled to FORTRAN; the connection is that NumPy's numerical inner loops call pre-compiled FORTRAN library routines at the C level.
 - [o] Because NumPy's heaviest routines (matrix multiply, linear solves, eigenvalues, FFTs) dispatch to BLAS, LAPACK, and related libraries, most of which are FORTRAN code that has been hand-tuned for decades
   > NumPy is Python at the interface and FORTRAN/C at the core. Calling \`A @ B\` invokes a BLAS routine like DGEMM written in FORTRAN. This is why scientific Python is so fast despite Python itself being interpreted.
 - Because FORTRAN syntax is hidden inside Python source files
+  > Python source files contain only Python; there is no FORTRAN syntax inside them.
 
 This layering — interpreted glue on top of compiled numerical kernels — is the secret to scientific Python's performance.`}
 />
@@ -221,8 +224,11 @@ This layering — interpreted glue on top of compiled numerical kernels — is t
   markdown={`MATLAB shaped scientific Python in many visible ways. Which of the following is **not** a deliberate echo of MATLAB in the SciPy stack?
 
 - The naming of \`plot\`, \`subplot\`, \`title\`, \`xlabel\` in Matplotlib
+  > These function names were deliberately copied from MATLAB by Matplotlib's creator John Hunter so that engineers could switch with minimal friction — making this a direct MATLAB echo.
 - The functions \`linspace\`, \`zeros\`, \`ones\`, \`eye\` in NumPy
+  > These names are borrowed directly from MATLAB, where the same functions exist with identical semantics.
 - The use of the \`@\` operator for matrix multiplication
+  > The \`@\` operator was introduced in Python 3.5 (PEP 465) partly because MATLAB used \`*\` for matrix multiplication; the \`@\` choice is a deliberate design nod to that MATLAB convention.
 - [o] The Global Interpreter Lock
   > The GIL is a CPython implementation detail that has nothing to do with MATLAB. The other three items were all deliberate design choices to make MATLAB-trained engineers feel at home in Python.
 

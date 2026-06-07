@@ -236,10 +236,13 @@ growing in ways spreadsheets simply could not keep up with.
   markdown={`What was VisiCalc's most important contribution to computing history?
 
 - It was the first programming language for personal computers
+  > BASIC and assembler preceded VisiCalc on personal computers; VisiCalc was a spreadsheet application, not a programming language.
 - It introduced the relational database
+  > Relational databases were developed in the early 1970s by IBM and others; VisiCalc introduced the interactive electronic spreadsheet grid, a distinct concept.
 - [o] It gave businesspeople a compelling reason to buy a personal computer, by turning "what-if" financial modeling from days into minutes
   > VisiCalc was the original "killer app" — it justified the existence of the personal computer for offices. The Apple II's commercial success was driven largely by VisiCalc demand.
 - It invented the chart and graph
+  > Charts and graphs predate computing by centuries; VisiCalc's contribution was automatic recalculation of linked cells, not data visualization.
 
 The chapter argues that the *concept* of automatic recalculation across a grid was VisiCalc's lasting contribution — every modern spreadsheet inherits it.`}
 />
@@ -248,10 +251,13 @@ The chapter argues that the *concept* of automatic recalculation across a grid w
   markdown={`Which of the following is a **real, well-documented limitation of using spreadsheets for serious analysis**?
 
 - Spreadsheets cannot perform addition
+  > Addition is one of the most basic and well-supported spreadsheet operations; the chapter's critiques focus on reproducibility, scale, and version control — not arithmetic capability.
 - Spreadsheets cannot display dates
+  > Spreadsheets display dates, though they sometimes misformat them (e.g., Excel converting gene names like SEPT2 to dates); inability to display dates is not a documented limitation.
 - [o] Spreadsheet workflows are often non-reproducible — there is no record of which cells were edited, in what order, or why, making it impossible to re-run an analysis identically months later
   > The chapter highlights this as the central failure mode of spreadsheets in business contexts. Auditors, scientists, and analysts all need to be able to re-run a calculation and get the same number. Manual spreadsheet workflows make that very hard.
 - Spreadsheets cannot produce charts
+  > Charting in two clicks is listed in the chapter as one of the *reasons* Excel won the business world; chart production is a strength of spreadsheets, not a limitation.
 
 Reproducibility is the dominant reason organizations migrate analyses from Excel to code.`}
 />
@@ -260,10 +266,13 @@ Reproducibility is the dominant reason organizations migrate analyses from Excel
   markdown={`What is the "row limit" issue mentioned in this chapter, and why does it matter?
 
 - Modern Excel allows infinite rows
+  > Modern \`.xlsx\` files are capped at 1,048,576 rows (2^20); the chapter discusses this limit and notes that many real-world datasets exceed it.
 - [o] Even modern Excel caps a sheet at around one million rows, which is small by today's data standards — real-world tables routinely exceed that
   > Modern \`.xlsx\` files cap at 1,048,576 rows (the classic \`.xls\` capped at 65,536). Web analytics, IoT, transaction logs, and many scientific datasets blow past this limit easily.
 - The row limit is set by your operating system
+  > The row limit is a fixed property of the Excel file format, not the OS; a more powerful computer does not raise the limit.
 - The row limit only applies to text columns
+  > The row limit applies to the entire sheet regardless of column type; all data types count equally toward the maximum row count.
 
 This is one of many points where Pandas (which is limited only by your computer's RAM) is more comfortable than Excel.`}
 />

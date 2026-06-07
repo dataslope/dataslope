@@ -360,10 +360,13 @@ printf("%d\\n", *p);
 \`\`\`
 
 - It will fail to compile.
+  > The code is syntactically valid; the bug is a runtime memory error that no compiler is required to detect.
 - The \`malloc\` will fail because 4 bytes is too small.
+  > \`sizeof(int)\` is typically 4 bytes, which is exactly the right amount to store one \`int\`; size is not the problem here.
 - [o] \`*p\` is a use-after-free; the memory was returned to the heap and may now belong to something else.
   > Reading or writing through a pointer after \`free\` is undefined behavior. It might appear to work today and crash tomorrow.
 - The \`printf\` requires \`%p\`, not \`%d\`.
+  > \`%d\` is correct for printing the \`int\` value obtained by dereferencing \`p\` with \`*p\`; \`%p\` would be used to print the pointer's address itself.
 
 The cure is to either not access the memory after \`free\`, or to set \`p = NULL;\` after the \`free\` so the bug crashes loudly rather than silently corrupting other data.`}
 />
@@ -372,10 +375,13 @@ The cure is to either not access the memory after \`free\`, or to set \`p = NULL
   markdown={`Which of the following allocations leaves you with **zero-initialized** memory without a separate loop?
 
 - \`malloc(n * sizeof(int))\`
+  > \`malloc\` allocates raw bytes without initializing them; the contents are indeterminate until you write to each element.
 - [o] \`calloc(n, sizeof(int))\`
   > \`calloc\` zero-fills the memory it returns. \`malloc\` does not; it gives you whatever happened to be in those bytes.
 - \`realloc(NULL, n * sizeof(int))\`
+  > Passing \`NULL\` as the first argument to \`realloc\` is equivalent to \`malloc\`—it allocates but does not zero-initialize the new memory.
 - \`alloca(n * sizeof(int))\`
+  > \`alloca\` allocates on the stack rather than the heap, and it never zero-initializes the memory it returns.
 
 \`calloc\` is also the idiomatic choice when you need an array of structs where every field should start at zero.`}
 />

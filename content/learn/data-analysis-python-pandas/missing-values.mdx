@@ -285,10 +285,13 @@ df["age"] = df["age"].replace([-1, 999], np.nan)
   markdown={`A column \`age\` contains the values \`[25, -1, 30, 999, 35]\`. The values \`-1\` and \`999\` are sentinel codes from the original system meaning "refused to answer" and "data error." What is the cleanest first step?
 
 - Take the mean
+  > Taking the mean of values that include sentinel codes (-1, 999) would corrupt the result; the sentinels must be removed first.
 - Drop the column
+  > Dropping the whole column throws away the valid values (25, 30, 35) along with the bad ones.
 - [o] Replace the sentinels with NaN (\`df["age"].replace([-1, 999], np.nan)\`) so downstream operations treat them as missing
   > Convert sentinels to NaN as early as possible so the rest of your code does not have to remember the sentinel codes.
 - Round them to zero
+  > Rounding sentinel codes to zero turns a "refused to answer" into an age of zero, which is worse than missing — it is wrong.
 
 Documenting the conversion is just as important as performing it.`}
 />
@@ -322,10 +325,13 @@ almost always a missed column or a sentinel you forgot about.
   markdown={`When is **dropping rows with NaN** a poor strategy?
 
 - When the dataset is small
+  > Small datasets make the problem worse, not better — dropping rows from a small dataset reduces power significantly, but the strategy is still fine when missingness is rare and random.
 - Always
+  > Dropping is sometimes the right choice, such as when NaNs are rare, random, and not in key columns.
 - [o] When missingness is high or correlated with something interesting (e.g., income is missing more often for certain groups), because dropping changes the effective population
   > Dropping is fine for rare, random missingness. It is dangerous when the missing rows differ systematically from the kept ones.
 - Never
+  > Dropping rows is a legitimate strategy when the fraction of missing values is small and the missingness appears unrelated to the analysis.
 
 Understanding *why* values are missing is essential before deciding how to handle them.`}
 />
@@ -334,10 +340,13 @@ Understanding *why* values are missing is essential before deciding how to handl
   markdown={`What does \`s.fillna(s.median())\` do?
 
 - Replaces NaNs with 0
+  > \`fillna(0)\` fills with a literal zero; \`fillna(s.median())\` fills with the computed median of the non-null values.
 - Removes NaNs from \`s\`
+  > \`dropna()\` removes rows with NaN; \`fillna\` substitutes a value in their place — the Series retains the same length.
 - [o] Replaces NaNs with the median of the non-null values in \`s\`
   > Median imputation is a robust default — it does not get pulled by outliers like the mean does.
 - Computes the median while ignoring NaNs
+  > \`s.median()\` does compute the median, but the outer \`fillna(...)\` call uses that value to replace NaNs — the result is the filled Series, not just the median.
 
 For numeric columns where missingness is moderate and random, median imputation is a sensible default.`}
 />
@@ -346,10 +355,13 @@ For numeric columns where missingness is moderate and random, median imputation 
   markdown={`A categorical column \`payment_method\` has 8% missing values. You decide to fill them in. Which is **most appropriate**?
 
 - Fill with 0
+  > Zero is a numeric value with no meaning in a categorical column like \`payment_method\` — it would create a spurious category.
 - Fill with the column's mean
+  > A categorical column of payment method strings has no numeric mean; computing one would raise an error or produce nonsense.
 - [o] Fill with the mode (most common value) or with a literal label like \`"unknown"\`
   > Categorical data has no mean; fill either with the most common value or with an explicit "unknown" label so downstream code can still group on it.
 - Fill with NaN
+  > The column already has NaN in those positions; filling with NaN again leaves it unchanged and does not solve the missingness.
 
 Pick the option that matches what you want downstream code to *do* with these rows.`}
 />
@@ -358,10 +370,13 @@ Pick the option that matches what you want downstream code to *do* with these ro
   markdown={`Why might you add a column like \`score_missing\` instead of (or in addition to) filling \`score\`?
 
 - It looks fancy
+  > Aesthetic appeal is not the reason; the flag serves an analytical purpose — encoding the missingness as a feature.
 - Pandas requires it
+  > Pandas does not require a missingness indicator column; it is an optional design choice that captures information which imputation would erase.
 - [o] Because the *fact* that a value was missing can itself be informative — sometimes more informative than any imputed value
   > In churn analysis, "users who did not answer this question" can behave very differently from users who answered. The flag preserves that information.
 - It saves memory
+  > Adding a boolean column increases memory use slightly; the motivation is analytical, not technical efficiency.
 
 Preserving the signal of missingness alongside the cleaned value is a quietly powerful pattern.`}
 />

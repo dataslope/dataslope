@@ -199,10 +199,13 @@ revolution.
   markdown={`Why did the early web need a scripting language embedded in the browser?
 
 - Because HTML could not display images
+  > HTML's \`<img>\` tag has existed since the early days of the web; the inability to display images was not the motivation for adding a scripting language to browsers.
 - Because servers were unable to validate user input
+  > Servers can validate input just fine; the problem was that every validation attempt required a full network round-trip, which was slow — a scripting language let browsers catch basic errors locally and instantly.
 - [o] Because every interaction had to round-trip to the server, which was slow and clunky — the browser needed to run small programs locally to respond immediately
   > Without an in-browser language, every form check, every menu, every reactive behaviour required a full request/response cycle. A scripting language let the browser handle small interactions on its own, instantly.
 - Because Java applets were faster than native code
+  > Java applets were actually considered slow and heavyweight compared to native code; they were a competing technology, not the reason JavaScript was needed.
 
 Embedding a small scripting language in the browser meant interactions could happen in milliseconds, not seconds, without involving the server at all.`}
 />

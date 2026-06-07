@@ -161,10 +161,13 @@ distinct categories, not as quantities on a scale.
   markdown={`A model outputs a person's predicted annual income in dollars — any value on a continuous scale. What task type is this?
 
 - Classification, because income comes in brackets
+  > Income "brackets" are a way humans organize it, not what the model outputs. A continuous dollar amount as output means regression, not classification.
 - Clustering, because incomes form groups
+  > Clustering discovers groups in unlabeled data; it is not used when there is a labeled continuous target to predict.
 - [o] Regression, because the output is a continuous number that could land anywhere on a scale
   > A continuous quantity as output is the defining signature of regression. Income can reasonably take any in-between value, so predicting it is regression.
 - It cannot be determined from the output alone
+  > The output alone is exactly what settles the task type. A continuous number as output means regression, regardless of the inputs.
 
 Continuous number out means regression — the output type settles it.`}
 />
@@ -440,10 +443,13 @@ print(tasks)
   markdown={`What is the single most reliable way to tell regression, classification, and clustering apart?
 
 - By the size of the dataset
+  > Dataset size has nothing to do with task type. The same problem is still regression or classification regardless of how many rows you have.
 - By which scikit-learn module the algorithm lives in
+  > Module location is an organizational choice in scikit-learn, not the definition of the task. The task is determined by the output, not by where the class is imported from.
 - [o] By the output: a continuous number means regression, a category from a fixed set means classification, and discovered groups from unlabeled data means clustering
   > The task type is defined by what a single prediction looks like. Number, category, or discovered group — the output settles which of the three you have.
 - By the number of features in \`X\`
+  > The number of input features is irrelevant to the task type. A single-feature problem can be regression or classification depending on what is predicted.
 
 Look at what comes out of the model; the output type names the task.`}
 />
@@ -452,10 +458,13 @@ Look at what comes out of the model; the output type names the task.`}
   markdown={`The iris target is stored as the integers 0, 1, and 2 for the three species. Is predicting it regression or classification, and why?
 
 - Regression, because the target values are numbers
+  > The storage format of labels (integers) does not determine the task. These integers name three distinct species; there is no meaningful "species 1.5," so the task is classification.
 - Regression, because the model outputs values between 0 and 2
+  > Regression outputs a continuous quantity anywhere on a scale. Predicting one of three fixed codes (0, 1, 2) is predicting a category, not a continuous value.
 - [o] Classification, because those integers are just names for three distinct categories — there is no meaningful "species 1.5"
   > Integer labels are a convenient encoding of categories, not quantities. With no sensible in-between value, the task is classification regardless of how the labels are stored.
 - Clustering, because there are multiple species
+  > Clustering discovers groups in unlabeled data. Here the species labels are given and we are predicting one of them — that is supervised classification, not clustering.
 
 Numeric-looking labels can still be categories; with no meaningful in-between, it is classification.`}
 />
@@ -464,10 +473,13 @@ Numeric-looking labels can still be categories; with no meaningful in-between, i
   markdown={`Which task is **unsupervised**, requiring no labels?
 
 - Regression
+  > Regression is supervised: it requires a continuous labeled target \`y\` to train from.
 - Classification
+  > Classification is supervised: it requires a categorical labeled target \`y\` to train from.
 - [o] Clustering — it discovers groups from the features alone, with no target \`y\`
   > Clustering is the unsupervised task of the three. It finds structure in \`X\` without any answer key, whereas regression and classification both need a labeled target.
 - All three are unsupervised
+  > Regression and classification are supervised — both require a labeled target \`y\`. Only clustering operates with no labels.
 
 Clustering needs no labels; regression and classification both require a target.`}
 />
@@ -476,10 +488,13 @@ Clustering needs no labels; regression and classification both require a target.
   markdown={`A bank wants to predict, for each loan applicant, the probability-driven decision of "approve" or "deny." What task type is this?
 
 - Regression, because probabilities are numbers
+  > A probability estimate is an intermediate output, but the final deliverable is a categorical decision (approve or deny), which makes this classification.
 - Clustering, because applicants form groups
+  > Clustering discovers groups in unlabeled data. Here each applicant is given a labeled decision (approve/deny), which is supervised classification.
 - [o] Classification, because the output is a category (approve or deny) chosen from a fixed set
   > The deliverable is a class label — approve or deny — so this is classification. (Such models can also output a probability, but the task is still predicting a category.)
 - It is not a machine learning task
+  > Predicting one of two outcomes (approve/deny) from applicant features is a well-defined binary classification problem.
 
 The final output is a category from a fixed set, which makes it classification.`}
 />
@@ -488,10 +503,13 @@ The final output is a category from a fixed set, which makes it classification.`
   markdown={`Why can't you compute "accuracy" on a clustering result the way you do for a classifier?
 
 - Because clustering is always perfectly accurate
+  > Clustering is not "perfectly accurate" — it has no labels to be accurate against. Its quality is judged by tightness and separation, not by a correctness score.
 - Because accuracy is only defined for regression
+  > Accuracy is defined for classification (fraction of correct class labels), not for regression. Regression uses error metrics such as MAE and R². Neither applies to clustering.
 - [o] Because clustering has no ground-truth labels to compare against — the group ids are invented by the algorithm, so there is no "correct" answer to score
   > Accuracy needs known answers. Clustering produces groups with no answer key, so accuracy is undefined; clusters are judged by tightness, separation, and usefulness instead.
 - Because clusters change every run, so accuracy is meaningless by chance
+  > While cluster numbering can vary across runs, the real reason accuracy is undefined is the absence of any ground-truth labels — not just run-to-run instability.
 
 Without ground-truth labels there is nothing to compare predictions to, so accuracy does not apply.`}
 />
@@ -500,10 +518,13 @@ Without ground-truth labels there is nothing to compare predictions to, so accur
   markdown={`Which statement about choosing a task type is correct?
 
 - Each dataset supports exactly one task type, fixed by the data
+  > A single dataset can be framed as regression, classification, or clustering depending on the question asked. The data alone does not fix the task.
 - The inputs (features) determine whether it is regression or classification
+  > The same input features can feed a regression, a classification, or a clustering. The task is determined by the output you want, not by what goes in.
 - [o] A single dataset can support several tasks — the task is set by the question you ask (predict a number, predict a class, or find groups), not by the data alone
   > Customer data, for instance, could drive a regression (spend), a classification (churn), and a clustering (segments). What you ask determines the task; the inputs do not.
 - Clustering and regression are interchangeable for any dataset
+  > Clustering and regression serve different purposes. Regression predicts a labeled continuous target; clustering discovers structure in unlabeled data. They are not interchangeable.
 
 The question you pose chooses the task; one dataset can be framed several ways.`}
 />

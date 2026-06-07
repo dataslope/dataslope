@@ -212,10 +212,13 @@ comparison is the main point, use grouped bars instead.
   markdown={`When is a **bar chart** the right choice?
 
 - For showing a continuous trend over time.
+  > Continuous trends over time call for a line chart, which connects ordered time points with a continuous line. A bar chart treats the x-axis as discrete categories, losing the sense of continuous flow.
 - For showing the distribution of a single variable.
+  > Distributions of a single variable are best shown with a histogram, which groups values into bins and reveals shape, spread, and skew. A bar chart requires a discrete categorical axis, not a continuous numeric range.
 - [o] For comparing a quantitative value across a small-to-medium number of discrete categories.
   > Bar charts use length-on-a-common-scale to encode quantity, which is one of the most accurate visual encodings. They're ideal when "how do these categories compare?" is the question.
 - For comparing two quantitative variables.
+  > Comparing two quantitative variables — to see if they are related — calls for a scatter plot, which places both variables on position axes. A bar chart requires one categorical and one quantitative axis.
 
 For time use a line chart; for distributions use a histogram; for two-variable relationships use a scatter plot.`}
 />
@@ -224,10 +227,13 @@ For time use a line chart; for distributions use a histogram; for two-variable r
   markdown={`Why is **sorting bars by value** usually preferable to alphabetical order?
 
 - It is required by Plotly.
+  > Plotly Express does not require sorting; it displays bars in whatever order the DataFrame rows are in. Sorting is a best-practice design decision, not a technical requirement.
 - It makes the chart render faster.
+  > Rendering performance is not affected by whether bars are sorted. Sorting is a readability improvement, not a performance optimization.
 - [o] The eye reads a ranked bar chart almost instantly, while alphabetical order forces the reader to do the ranking mentally.
   > The whole point of a bar chart is comparison. Sorting does the comparison work for the reader. Alphabetical order is essentially random in terms of the values, so it adds work without adding clarity.
 - It uses less memory.
+  > Sorting does not affect memory usage. The same data is stored regardless of its order in the DataFrame.
 
 Two exceptions: categories with a natural order (months, sizes) and time-based categories should keep their natural order.`}
 />
@@ -236,10 +242,13 @@ Two exceptions: categories with a natural order (months, sizes) and time-based c
   markdown={`Truncating a bar chart's y-axis so it starts at, say, 90 instead of 0 is generally:
 
 - A great way to save vertical space.
+  > Saving space by cutting the y-axis is a poor trade-off: it breaks the visual contract that bar length represents the full magnitude from zero, causing readers to overestimate differences.
 - Required for log-scale data.
+  > Log scales change the spacing between values, but they do not require a non-zero baseline. Truncating a bar chart's y-axis is a separate design choice and is not needed for log-scale axes.
 - [o] Misleading — bar length encodes magnitude *relative to zero*, so truncating exaggerates small differences and can mislead readers.
   > This is one of the classic ways charts lie. A bar starting at 90 and reaching 100 looks "very different" from a bar reaching 95, even though the real difference is 5%. The visual cue (length) no longer matches the data magnitude. For trend visualization where small differences matter, a line chart with a truncated axis is sometimes acceptable — for bar charts, almost never.
 - The default behavior in Plotly Express.
+  > Plotly Express sets the y-axis to start at zero by default for bar charts. Truncating the axis is something a developer would have to configure explicitly, so this is the opposite of the default.
 
 If you want to emphasize a small difference, use a line chart or a dot plot — not a truncated bar chart.`}
 />
@@ -248,10 +257,13 @@ If you want to emphasize a small difference, use a line chart or a dot plot — 
   markdown={`When should you use **horizontal** bars (**orientation="h"**) instead of vertical?
 
 - When you have fewer than 5 categories.
+  > The number of categories is not a criterion for orientation — what matters is label length and readability. Short labels work fine vertically even with many categories; it is long labels that make horizontal orientation necessary.
 - When you have more than 100 categories.
+  > Even with many categories, 100 bars are hard to read regardless of orientation. Beyond a practical limit, filtering to a top-N is better advice. Orientation choice is driven by label length, not category count alone.
 - [o] When category labels are long, or when you have many categories that would otherwise crowd the x-axis.
   > Horizontal bars let the labels sit comfortably to the left of each bar, no rotation needed. They also let you stack a lot of categories vertically without crowding.
 - Whenever the data is sorted.
+  > Sorting bars by value is a best practice for both vertical and horizontal orientations. Sorting alone is not a reason to switch to horizontal — the choice is about label readability, not sort order.
 
 A horizontal layout is often the small change that turns a cluttered chart into a readable one.`}
 />

@@ -321,10 +321,13 @@ restyle every figure in a paper from a single place.
   markdown={`You are visualizing temperature anomalies (deviation from a baseline) which can be positive or negative. Which colormap should you choose?
 
 - A sequential map like \`viridis\`
+  > Sequential maps run from low to high with no natural midpoint; they cannot visually distinguish positive from negative anomalies, which is precisely the key information in this dataset.
 - [o] A diverging map like \`coolwarm\` or \`RdBu_r\`, centered at zero
   > Diverging data has a meaningful midpoint (here, "no anomaly"). A diverging colormap encodes sign with color (e.g. blue for cool, red for warm) and magnitude with intensity, so the viewer can read positive vs negative at a glance. Always set \`vmin = -vmax\` so zero maps to the middle color.
 - The default \`jet\`
+  > The page explicitly warns against \`jet\` because it is perceptually nonuniform and creates false visual boundaries; for diverging data it is doubly inappropriate because it has no meaningful midpoint.
 - A grayscale ramp
+  > A grayscale ramp is sequential with no midpoint, making it unable to distinguish positive from negative anomalies.
 
 Match the colormap to the *structure* of the data — sequential for one-sided, diverging for two-sided, cyclic for angular.`}
 />
@@ -333,10 +336,13 @@ Match the colormap to the *structure* of the data — sequential for one-sided, 
   markdown={`You need to compare model fits across 12 different patient datasets. What's the most effective layout?
 
 - One big plot with 12 overlapping lines and a legend
+  > Twelve overlapping lines create visual spaghetti; the page describes this as the main failure mode that small multiples solve.
 - [o] A 3 × 4 grid of small multiples with shared axes
   > Small multiples ("trellis" plots) let the viewer compare like with like at a glance. Shared axes make differences between panels reflect differences in the data, not the scale. Twelve lines on a single plot become spaghetti that nobody can read.
 - A 3-D plot with patient ID on the z-axis
+  > Encoding patient ID on a 3-D depth axis is one of the worst ways to make quantitative comparisons; humans cannot accurately read depth, and the page explicitly calls 3-D "almost always worse" for quantitative comparison.
 - A pie chart per patient
+  > Pie charts encode proportion of a whole, not model-fit curves; they cannot represent the type of data described here and are generally poor for scientific comparison tasks.
 
 Tufte's principle: when you have many similar things to compare, repeat the same small plot many times.`}
 />

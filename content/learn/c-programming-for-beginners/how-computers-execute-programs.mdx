@@ -179,10 +179,13 @@ exactly why it's such a great teacher.
   markdown={`In the fetch-decode-execute cycle, what is the role of the **program counter**?
 
 - It counts how many programs are currently running on the computer.
+  > That is an operating-system concept, not a CPU register. The program counter tracks the position within a single program's instructions.
 - [o] It holds the address of the next instruction the CPU will fetch.
   > The PC is just a special register that points into memory at the next instruction. Jumps, function calls, and \`if\` statements all work by changing the PC.
 - It records how many instructions a program has executed in total.
+  > Some CPUs have performance counters for profiling, but the program counter is not a cumulative instruction count — it is an address, reset when the PC jumps.
 - It stores the result of the most recent arithmetic operation.
+  > That is the role of an accumulator or general-purpose register, not the program counter.
 
 The CPU repeats: read the instruction at the address in PC, advance (or change) PC, then execute. That loop, with a few extras, is the entire job of the processor.`}
 />
@@ -191,10 +194,13 @@ The CPU repeats: read the instruction at the address in PC, advance (or change) 
   markdown={`When you write \`int x = 42;\` in C, which statement is most accurate about what happens at the machine level?
 
 - The CPU creates a brand-new memory chip labeled \`x\`.
+  > Memory chips are fixed hardware; no new hardware is created at runtime. The compiler arranges for existing RAM to hold the value.
 - The compiler stores \`x\` as the literal text \`"x"\` somewhere in memory.
+  > Variable names exist only in the source code and debug symbols; at runtime, the CPU works with numeric addresses, not strings like \`"x"\`.
 - [o] The compiler reserves a small region of memory (typically 4 bytes) to hold the value 42; the name \`x\` only exists in the source code.
   > Variable names are a human convenience. At runtime, the CPU sees only addresses. The compiler is the bridge between the two views.
 - The number 42 is sent to the CPU directly, not stored in memory.
+  > The value must be stored in a memory location (or register) so the CPU can retrieve it later; a bare immediate value sent once would have nowhere to live.
 
 The hardware doesn't know variable names. The compiler maps each name to a specific memory location (or sometimes a register), and from then on the CPU just shuffles bits between addresses.`}
 />

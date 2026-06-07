@@ -323,10 +323,13 @@ def estimate_pi():
   markdown={`You compute $f'(x_0)$ by forward differences and try ever-smaller step sizes $h$. The error first *decreases* but eventually starts *increasing* as $h \\to 0$. Why?
 
 - The CPU clock skew accumulates
+  > CPU clock variation affects timing measurements, not floating-point arithmetic; the degradation in finite-difference accuracy is caused by cancellation in the subtraction, not by hardware timing.
 - [o] Subtracting $f(x_0+h)$ and $f(x_0)$ loses significant digits when the values are nearly equal, so round-off error dominates for tiny $h$
   > Truncation error scales as $O(h)$, but round-off in the numerator scales as $\\epsilon/h$. Their sum is minimized near $h\\approx\\sqrt\{\\epsilon\}\\approx 10^\{-8\}$.
 - The compiler reorders operations
+  > Python does not compile the arithmetic in a way that would reorder the subtraction; the increasing error at small $h$ is the predictable result of subtracting nearly equal floats.
 - Python's float type uses arbitrary precision so the rounding only happens at the end
+  > Python's \`float\` is a standard 64-bit IEEE 754 double; it is not arbitrary precision. Libraries like \`mpmath\` provide arbitrary precision, but the built-in \`float\` rounds at every operation.
 
 This V-shaped error curve is the single most important plot to remember about numerical differentiation.`}
 />
@@ -335,10 +338,13 @@ This V-shaped error curve is the single most important plot to remember about nu
   markdown={`Why does \`scipy.integrate.quad\` return *both* a value and an estimated error bound?
 
 - It needs the error to log it
+  > The function returns the error estimate as a value for the caller to inspect, not for internal logging; the page explains that the adaptive algorithm produces it as a byproduct.
 - [o] It uses an adaptive algorithm that already computes two different approximations on every sub-interval and uses their difference as a built-in error estimator
   > Adaptive quadrature compares two rules of different orders on the same interval; their difference both drives subdivision and serves as a free, reliable error estimate. Returning it lets you decide whether the answer is trustworthy.
 - Returning the error is required by the IEEE standard
+  > The IEEE 754 standard covers floating-point arithmetic operations; it says nothing about the return type of integration routines.
 - The error is the variance of the integrand
+  > The variance of the integrand is related to Monte Carlo error, not quadrature error; the error bound returned by \`quad\` is an estimate of the absolute integration error, not a statistical variance.
 
 Always check the reported error — it costs nothing extra and tells you whether to tighten tolerances.`}
 />

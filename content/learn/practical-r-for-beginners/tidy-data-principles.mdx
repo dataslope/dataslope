@@ -206,28 +206,37 @@ further.
 - [o] Each variable is a column, each observation is a row, and each observational unit is its own table.
   > These are Hadley Wickham's three rules from the foundational "Tidy Data" paper.
 - Each value is rounded to two decimals.
+  > Rounding is a numeric formatting choice that has nothing to do with the structural rules for tidy data.
 - Missing values have been removed.
-- The data has been sorted.`}
+  > Tidy data can contain \`NA\` values; the tidy principles govern *structure* (rows, columns, tables), not whether data is complete.
+- The data has been sorted.
+  > Row order does not affect whether a dataset is tidy; tidy refers to structural organization, not sorting.`}
 />
 
 <MultipleChoice
   markdown={`A spreadsheet has columns: \`country\`, \`gdp_2020\`, \`gdp_2021\`, \`gdp_2022\`. Is it tidy?
 
 - Yes — every row is one country.
+  > While every row does represent one country, the column names \`gdp_2020\`, \`gdp_2021\`, \`gdp_2022\` encode the variable "year" as column headers rather than as values in a \`year\` column, which violates tidy rule 1.
 - [o] No — "year" is hidden in the column names, so year is not a variable in its own right.
   > The tidy form has columns \`country\`, \`year\`, \`gdp\` — one row per country-year combination.
 - Yes — every column has a name.
-- It depends on how many countries there are.`}
+  > Having named columns is a basic requirement, not a sufficient condition for tidiness; the structure of *what* those columns represent is what matters.
+- It depends on how many countries there are.
+  > The number of rows (countries) does not affect whether the format is tidy; the issue is the structure of the columns, not the number of rows.`}
 />
 
 <MultipleChoice
   markdown={`Why does tidy data make analysis easier?
 
 - It's mandatory in R.
+  > R will happily read and manipulate non-tidy data; tidy structure is a convention that makes analysis easier, not a language requirement.
 - It makes the file smaller.
+  > Tidy (long) format often uses *more* rows than wide format, so file size is not the motivation; the payoff is analytical convenience.
 - [o] Modern tools (\`dplyr\`, \`ggplot2\`, modeling functions) all assume one row per observation and one column per variable, so tidy data "just works" with them.
   > Once your data is tidy, the whole tidyverse and most statistical functions become straightforward.
-- It removes missing values.`}
+- It removes missing values.
+  > Tidying data reshapes its structure; it does not delete \`NA\` values or change the data's content.`}
 />
 
 ## Mini challenge: spot the tidy version

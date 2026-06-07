@@ -255,10 +255,13 @@ and now you are one of them.
   markdown={`Your simulation loops over $10^6$ time steps with a Python \`for\` loop containing data-dependent branching that resists vectorization. Profiling shows 95% of time is in that loop. What is the most appropriate first tool to reach for?
 
 - Rewrite the entire project in Julia
+  > Rewriting an entire project in a different language is a high-cost, high-risk option; the page recommends profiling first and applying the cheapest fix, not wholesale rewrites.
 - [o] Add a \`@numba.njit\` decorator to the inner-loop function
   > Numba is purpose-built for the case "tight numeric Python loop that NumPy can't easily vectorize". A decorator and zero structural change typically buy you 100–500× speedup. Reaching for a different language or a GPU is overkill when the bottleneck is a single function.
 - Buy a more expensive CPU
+  > Hardware upgrades give at most a small constant-factor improvement and do not address the root cause: the interpreter overhead of a pure-Python loop.
 - Increase the size of arrays
+  > Larger arrays would make the simulation take even longer, not faster; the bottleneck is the interpreter overhead per iteration, not array size.
 
 Profile first, then apply the cheapest tool that fixes the actual bottleneck.`}
 />
@@ -267,10 +270,13 @@ Profile first, then apply the cheapest tool that fixes the actual bottleneck.`}
   markdown={`You want to fit a physics simulator's parameters to experimental data by gradient descent. The simulator is written as a smooth NumPy function. Which ecosystem makes this most natural?
 
 - Pure NumPy with finite-difference gradients
+  > Finite-difference gradients require $O(n)$ extra simulator evaluations per gradient step and introduce truncation error; automatic differentiation gives exact gradients at a fraction of the cost.
 - [o] JAX, which provides automatic differentiation, JIT compilation, and a NumPy-compatible API — so gradients of arbitrary simulations come "for free"
   > The whole point of JAX (and frameworks like PyTorch) is to remove the need to derive gradients manually or approximate them with finite differences. You write the forward simulator in \`jax.numpy\`, wrap with \`grad\`, and you have exact, fast derivatives suitable for high-dimensional optimization or inference.
 - SymPy, which symbolically integrates the ODE
+  > SymPy can solve simple ODEs symbolically, but a physics simulator with complex dynamics generally has no closed-form solution; SymPy cannot differentiate through a numerical simulator.
 - Dask, which parallelizes the loop
+  > Dask parallelizes data operations across chunks or workers but does not provide automatic differentiation; parallelism helps throughput but not gradient computation.
 
 Autodiff frameworks (JAX, PyTorch, Autograd) have become the standard tool whenever you need gradients of a numerical program.`}
 />

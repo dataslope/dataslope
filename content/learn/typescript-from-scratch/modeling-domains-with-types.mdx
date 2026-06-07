@@ -579,8 +579,11 @@ export type Post = {
 <MultipleChoice
   markdown={`You're modeling a feature flag that can be:
 - Disabled
+  > This state means the feature is completely off; no percentage applies.
 - Enabled for everyone
+  > This state means the feature is on for all users; no percentage applies.
 - Enabled for a specific percentage of users
+  > This state requires a percentage value; the other two states do not.
 
 Which type definition makes illegal states **unrepresentable**?
 

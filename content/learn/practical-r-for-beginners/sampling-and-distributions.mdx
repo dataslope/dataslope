@@ -245,20 +245,26 @@ next page.)
   markdown={`The Central Limit Theorem says:
 
 - All data is normally distributed if you collect enough.
+  > The CLT says the *sampling distribution of the mean* becomes normal, not the raw data; individual observations in a skewed population remain skewed no matter how many you collect.
 - [o] The distribution of the **sample mean** becomes approximately normal as n grows, regardless of the population shape.
   > It's a statement about averages, not about individual data points.
 - Skewed data can be ignored.
-- p-values are always small.`}
+  > Skewed data affects which summary statistics are appropriate and how you interpret results; the CLT does not make skewness irrelevant for individual observations or for small samples.
+- p-values are always small.
+  > The CLT justifies using normal-based test statistics for large samples; it says nothing about whether effects are large or p-values are small.`}
 />
 
 <MultipleChoice
   markdown={`Why is "sampling 10 million biased people" still a problem?
 
 - It's never a problem if n is huge.
+  > A large biased sample converges very precisely to the wrong answer — large n reduces variability, but cannot remove a systematic offset in the sampling process.
 - [o] Bias is a systematic offset that big sample size does **not** fix — you'll just be very precisely wrong.
   > Sample size shrinks variance, but only sound sampling design eliminates bias.
 - p-values become unreliable.
-- The CLT stops applying.`}
+  > p-values and confidence intervals address variability, not bias; a biased sample will produce p-values that are too small or confidence intervals that miss the true parameter, regardless of n.
+- The CLT stops applying.
+  > The CLT still applies to biased samples — sample means still become approximately normal — but they converge to a biased value rather than the true population mean.`}
 />
 
 ## Mini challenge: estimate the mean with uncertainty

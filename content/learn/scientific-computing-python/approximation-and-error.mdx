@@ -283,10 +283,13 @@ assert 1.7 < est < 2.3, f"expected ~2, got {est}"`,
   markdown={`A finite-difference derivative shows error decreasing as $h$ shrinks until $h \\approx 10^\{-6\}$, after which the error starts to **grow**. What is happening?
 
 - The function is non-differentiable
+  > Non-differentiability would cause the error to plateau or behave irregularly, not to decrease and then grow in the characteristic V-shape seen here.
 - [o] Truncation error is shrinking but round-off error is growing; below the optimal $h$, round-off dominates because $f(x+h) - f(x)$ loses most of its significant digits to cancellation
   > This is the classic "V-shaped" total-error curve: truncation falls as $h \\to 0$, round-off grows as $h \\to 0$, and the minimum sits at the crossover.
 - The CPU is malfunctioning
+  > CPU hardware does not produce this smooth, predictable V-shaped pattern; hardware faults produce unpredictable, non-reproducible errors rather than a systematic increase as $h$ shrinks.
 - The numpy library is broken
+  > A library bug would not produce the smooth, reproducible V-shaped error curve; it would be observed regardless of $h$ and would not follow the theoretical $O(h)$ decrease on the truncation side.
 
 Recognizing this V-curve in a log–log plot is a key diagnostic skill for numerical work.`}
 />
@@ -295,10 +298,13 @@ Recognizing this V-curve in a log–log plot is a key diagnostic skill for numer
   markdown={`You have two numerical integrators. Method A has truncation error $O(h)$; method B has truncation error $O(h^4)$. To achieve the same accuracy that method B reaches with $32$ steps, roughly how many steps does method A need?
 
 - About 32
+  > $32$ steps would only be enough if method A had the same fourth-order accuracy as method B; a first-order method needs many more steps to match the same error level.
 - About 128
+  > $128$ is too small by many orders of magnitude; multiplying by 4 treats the order as a linear factor rather than an exponent.
 - [o] About $32^4 \\approx 10^6$
   > Method A's error is $O(h)$ and method B's is $O(h^4)$. Matching B's error of $\\sim (1/32)^4$ requires $h \\sim (1/32)^4$, i.e. about $32^4 \\approx 10^6$ steps for method A.
 - About $32 \\cdot 4 = 128$
+  > Multiplying by 4 treats the order as a simple multiplier on step count; the correct relationship is exponential because the error scales as $h^p$.
 
 Order of convergence dominates step count, which is why higher-order methods are almost always worth their extra per-step cost.`}
 />

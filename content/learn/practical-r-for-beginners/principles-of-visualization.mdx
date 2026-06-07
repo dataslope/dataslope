@@ -206,30 +206,39 @@ The data is the same. The reader's experience is not.
   markdown={`Which visual property is read with the **highest accuracy** by the human eye?
 
 - Color hue
+  > Color hue is useful for distinguishing categories, but humans can only discriminate about 7 hues and cannot reliably read quantitative differences from it.
 - [o] Position along a common scale
   > Position (and length to a common baseline) is the most accurate visual channel. Color and area are far coarser.
 - Area
-- Shape`}
+  > Area (as in bubble charts or pie slices) requires comparing two-dimensional quantities, which the eye does poorly compared to reading positions on a shared axis.
+- Shape
+  > Shape lets us tell categories apart but carries no quantitative information and is among the least accurate visual channels.`}
 />
 
 <MultipleChoice
   markdown={`Why are pie charts often a poor choice?
 
 - They take more pixels.
+  > Pixel count has nothing to do with whether a chart communicates accurately; the issue is how the human eye reads the encoded values.
 - They cannot show more than two categories.
+  > Pie charts can show many categories, but with more slices the angle differences become even harder to judge accurately.
 - [o] The eye reads angles and areas poorly — bar charts (which use position/length) are usually clearer and more accurate.
   > Almost any time you'd reach for a pie chart, a sorted bar chart is better.
-- R does not support them.`}
+- R does not support them.
+  > R supports pie charts via \`pie()\` in base R; the objection is perceptual accuracy, not software support.`}
 />
 
 <MultipleChoice
   markdown={`If you have a bar chart with five regions and no inherent order, you should:
 
 - Sort alphabetically.
+  > Alphabetical order encodes nothing about the underlying data, so the reader has to scan the entire chart to find the highest or lowest bar.
 - Sort by region ID.
+  > An arbitrary ID number carries no useful data signal; it conveys the same meaningless order as random placement.
 - [o] Sort by the value you're plotting, so the chart's order itself encodes a ranking.
   > Sorting by value lets the reader see the ranking instantly with no conscious effort.
-- Leave them in a random order.`}
+- Leave them in a random order.
+  > A random order makes every comparison harder because neither the sequence nor the data value drives placement.`}
 />
 
 The principles are language-agnostic. The next page is about

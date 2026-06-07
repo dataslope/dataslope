@@ -119,10 +119,13 @@ why scikit-learn became the standard for classical machine learning.
   markdown={`Why is it often a one-line change to swap a \`KNeighborsClassifier\` for a \`LogisticRegression\` in scikit-learn?
 
 - Because the two algorithms work the same way internally
+  > The two algorithms operate very differently internally — one finds nearest neighbors, the other fits a linear boundary. What makes the swap easy is the shared external interface, not shared internals.
 - Because scikit-learn automatically rewrites your code
+  > scikit-learn does not rewrite or generate user code. The ease of swapping comes from the consistent interface all estimators share.
 - [o] Because all estimators share the same interface (\`fit\`, \`predict\`, \`score\`), so the surrounding code does not need to change when you swap the model
   > The consistent API means models are interchangeable from the outside. You replace the constructor and the \`fit\`/\`predict\`/\`score\` calls keep working unchanged.
 - Because both models always give identical predictions
+  > Different classifiers learned on the same data will generally produce different predictions; the shared interface is what makes them swappable, not their outputs.
 
 The shared interface, not any internal similarity, is what makes models swappable.`}
 />
@@ -438,10 +441,13 @@ assert abs(accuracy - model.score(X_test, y_test)) < 1e-9, "accuracy should be m
   markdown={`What is scikit-learn's "consistent API" and why does it matter?
 
 - A rule that every model must achieve the same accuracy
+  > The consistent API is about shared method names and signatures, not about performance. Different models on the same data will typically achieve different accuracies.
 - A requirement that all data be in NumPy arrays
+  > scikit-learn accepts both NumPy arrays and pandas DataFrames as input. The consistent API refers to the shared method vocabulary, not a data format requirement.
 - [o] The fact that nearly every estimator shares the same methods (\`fit\`, \`predict\`, \`transform\`, \`score\`), so learning to use one model teaches you to use them all
   > A uniform interface across hundreds of algorithms means your knowledge transfers and models are interchangeable. You learn the contract once and reuse it everywhere.
 - A guarantee that models never make mistakes
+  > No API can guarantee correct predictions; models always carry some error. The consistent API is about a shared interface, not guaranteed accuracy.
 
 The shared method vocabulary is the consistent API, and it lets knowledge and code transfer across models.`}
 />
@@ -450,10 +456,13 @@ The shared method vocabulary is the consistent API, and it lets knowledge and co
   markdown={`What does \`.fit(X, y)\` do, and what does it return?
 
 - It returns the predictions for \`X\`
+  > Returning predictions is the job of \`predict\`, not \`fit\`. \`fit\` trains the estimator and returns the estimator itself so calls can be chained.
 - It returns the accuracy score on \`X\` and \`y\`
+  > Returning a score is the job of \`score\`, not \`fit\`. \`fit\` performs training and returns the fitted estimator, not an evaluation metric.
 - [o] It trains the estimator (learning from the data) and returns the estimator itself; predictions come later from a separate \`.predict()\` call
   > \`fit\` is the training step and returns the fitted estimator (enabling chaining). Getting answers is a distinct \`predict\` call afterward.
 - It splits the data into training and test sets
+  > Splitting data is the job of \`train_test_split\`, not \`fit\`. \`fit\` receives already-split training data and learns from it.
 
 Training happens in \`fit\`; predictions are produced separately by \`predict\`.`}
 />
@@ -462,10 +471,13 @@ Training happens in \`fit\`; predictions are produced separately by \`predict\`.
   markdown={`How do you tell a **transformer** (like \`StandardScaler\`) from a **predictor** (like \`LinearRegression\`) by their methods?
 
 - Transformers have \`fit\`; predictors do not
+  > Both transformers and predictors are estimators and both expose \`fit\`. The distinction is in what comes after \`fit\`: \`transform\` for transformers, \`predict\` for predictors.
 - Transformers run faster than predictors
+  > Speed depends on the specific algorithm, not on whether an estimator is a transformer or a predictor. The distinction is about what they produce, not how quickly they run.
 - [o] A predictor exposes \`.predict()\` and returns answers; a transformer exposes \`.transform()\` and returns reshaped data — though both are estimators that \`fit\` first
   > The exposed method tells you the kind: \`predict\` produces answers, \`transform\` produces transformed features. Both share \`fit\`; only their output role differs.
 - Predictors return data; transformers return predictions
+  > These roles are reversed: transformers return reshaped data via \`transform\`, while predictors return answers (numbers, class labels, or group ids) via \`predict\`.
 
 Predictors give answers via \`predict\`; transformers give reshaped data via \`transform\`.`}
 />
@@ -474,10 +486,13 @@ Predictors give answers via \`predict\`; transformers give reshaped data via \`t
   markdown={`A classifier's \`.predict()\` returns the label \`"spam"\`. What does \`.predict_proba()\` return for the same input, and what is it good for?
 
 - The same label \`"spam"\` again, just formatted differently
+  > \`predict_proba\` returns something fundamentally different from \`predict\`: a vector of probabilities, one per class, rather than a single hard label.
 - The accuracy of the model on that single row
+  > Accuracy is a metric computed by comparing predictions to true labels over many examples; \`predict_proba\` returns per-class probability estimates for the given input, not an evaluation score.
 - [o] A probability for each class (summing to 1), useful for ranking by confidence, setting custom decision thresholds, and drawing ROC curves
   > \`predict_proba\` gives the estimated confidence per class rather than a single hard label, which enables thresholding, ranking, and ROC analysis.
 - The training data the model memorized
+  > The model does not return its training data through any API method; \`predict_proba\` returns estimated class probabilities for the input row, which is derived from what was learned, not the raw training examples.
 
 \`predict_proba\` reports per-class probabilities, the raw material for thresholds and ROC curves.`}
 />
@@ -486,10 +501,13 @@ Predictors give answers via \`predict\`; transformers give reshaped data via \`t
   markdown={`You call \`model.score(X_train, y_train)\` and get a very high number. Why is this not a trustworthy measure of the model's quality?
 
 - \`score\` only works on test data and will raise an error here
+  > \`score\` accepts any data; it does not check whether the data was used during training or not. That is precisely the problem — a high training score can reflect memorization rather than skill.
 - A high score always means the model is excellent
+  > A high score on training data can simply mean the model memorized the training examples rather than learning a generalizable pattern. Only a high score on held-out data is a trustworthy signal of quality.
 - [o] \`score\` happily reports on whatever data you pass it, and scoring on the training data measures memorization, not the model's ability to generalize to new data
   > \`score\` does not distinguish training from test data. A flattering training score can reflect memorization; honest evaluation requires scoring on held-out data.
 - \`score\` returns R² for classifiers, which is meaningless
+  > For classifiers, \`score\` returns accuracy (fraction correct), not R². R² is the default for regressors. The issue here is scoring on training data, not the metric itself.
 
 Scoring on training data measures memory; trustworthy scores come from held-out data.`}
 />
@@ -498,10 +516,13 @@ Scoring on training data measures memory; trustworthy scores come from held-out 
   markdown={`Which statement about \`predict_proba\` is most accurate?
 
 - Every scikit-learn estimator, including regressors, provides it
+  > Regressors do not have \`predict_proba\` because their output is already a continuous number, not a class probability. Even among classifiers, not every one exposes this method.
 - The probabilities it returns are always perfectly calibrated truths
+  > \`predict_proba\` gives the model's estimated confidence, which can be systematically over- or under-confident. Calibration (ensuring the numbers match observed frequencies) is a separate, non-trivial step.
 - [o] It is available on many classifiers (not all, and not on regressors), and its numbers are the model's *estimated* confidence, which can be miscalibrated
   > \`predict_proba\` belongs to many classifiers but not to regressors or every classifier, and its outputs are estimates of confidence rather than guaranteed probabilities.
 - It returns the single most likely class label, like \`predict\`
+  > Returning a single class label is the job of \`predict\`. \`predict_proba\` returns an array of probabilities, one per class, which contains more information than a hard label.
 
 \`predict_proba\` is a classifier feature giving estimated (not guaranteed) per-class probabilities.`}
 />

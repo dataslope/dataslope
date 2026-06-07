@@ -202,10 +202,13 @@ provide *context* without competing for attention.
   markdown={`Which color palette family should you use for **unordered categorical** data with 5-7 categories?
 
 - A sequential palette like **Viridis**.
+  > Sequential palettes vary in luminance from light to dark, implying an ordering of magnitude — which is misleading for categories that have no inherent rank.
 - A diverging palette like **RdBu**.
+  > Diverging palettes are designed for data with a meaningful midpoint (such as correlation coefficients or year-over-year change), not for unordered categories.
 - [o] A **qualitative** palette like **Plotly** or **Vivid** — distinct hues with no implied ordering.
   > Qualitative palettes use different *hues* so the eye sees the categories as distinct, with no implied order or magnitude. For more than ~7 categories, even good qualitative palettes start running out of distinguishable hues and you should reach for facets instead.
 - A grayscale ramp.
+  > A grayscale ramp implies an ordering from light (less) to dark (more), just as a sequential palette does; it is inappropriate for unordered categories where no ranking exists.
 
 Color hue = categories. Color intensity = quantity. Don't mix them up.`}
 />
@@ -214,10 +217,13 @@ Color hue = categories. Color intensity = quantity. Don't mix them up.`}
   markdown={`Why should a **diverging** color palette like **RdBu** be **centered at the meaningful midpoint** (e.g., 0 for correlations or year-over-year change)?
 
 - Plotly requires it.
+  > Plotly places no such requirement; a diverging palette will render without centering, but the result will be visually misleading because "neutral" will drift to an arbitrary data value instead of the meaningful midpoint.
 - It makes the chart smaller.
+  > The midpoint setting controls the color anchor, not the chart's physical dimensions.
 - [o] Centering the white anchor at the meaningful zero makes the reader instantly see positive vs negative, and the chart's coloring directly mirrors the data's sign.
   > If the midpoint floats arbitrarily (say, at the mean of the data), then "white" no longer means "neutral" — it means "average," which is a different and often confusing message. **color_continuous_midpoint=0** (in Plotly Express) makes the encoding honest.
 - White is more accessible than other colors.
+  > Accessibility is about contrast and colorblind safety, not about centering on white; a diverging palette centered at white works for design reasons (white = neutral midpoint), not accessibility reasons.
 
 Diverging data deserves diverging palettes, centered at the meaningful midpoint.`}
 />
@@ -226,10 +232,13 @@ Diverging data deserves diverging palettes, centered at the meaningful midpoint.
   markdown={`A reasonable design move for a chart with **30 lines** where you want to spotlight just one is:
 
 - Use a different color for all 30 lines.
+  > Assigning 30 distinct colors creates a "Christmas tree" chart where every line competes for attention and none stands out — the opposite of highlighting.
 - Add a 3-D effect.
+  > A 3-D effect adds visual complexity and perspective distortion without conveying any additional data; it does not help the reader identify the important line.
 - [o] Color the one important line in a bright hue and color the other 29 light gray.
   > This "spotlight" technique cuts visual noise dramatically. The 29 gray lines provide *context* without competing for attention; the highlighted line reads immediately. Newspaper graphics teams use this constantly.
 - Drop 29 lines and only show the important one.
+  > Removing the 29 context lines would eliminate the reader's ability to judge whether the highlighted line is normal or unusual; graying them out preserves context while reducing visual noise.
 
 Sometimes the context lines are essential — dropping them would hide whether the highlighted line is normal or unusual. Graying them keeps the context but lowers its visual weight.`}
 />
@@ -238,10 +247,13 @@ Sometimes the context lines are essential — dropping them would hide whether t
   markdown={`Approximately what fraction of men have some form of **color vision deficiency**?
 
 - About 0.1%.
+  > This is far too low; color vision deficiency affects roughly 1 in 12 men, making it a common condition that warrants deliberate design choices.
 - About 1%.
+  > This underestimates the actual prevalence by roughly an order of magnitude; the correct figure is around 8% of men.
 - [o] About 8%.
   > Red-green color blindness is the most common form. That's roughly 1 in 12 men. A chart that conveys "good vs bad" only with red vs green excludes a large slice of the audience. Use a colorblind-safe palette and/or double-encode with shape or labels.
 - About 50%.
+  > Fifty percent would mean roughly half the male population is colorblind, which would make it normal rather than a minority condition warranting design accommodations; the actual figure is around 8%.
 
 Accessibility isn't a niche concern — it's a meaningful slice of every audience.`}
 />

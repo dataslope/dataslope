@@ -320,10 +320,13 @@ assert train_acc > test_acc, "Expected the unrestricted tree to overfit (train >
   markdown={`Why do we evaluate a model on a held-out test set instead of on the data it was trained on?
 
 - Because test sets are easier to compute metrics on
+  > Metrics are computed in the same way on both training and test data — there is no technical difference in difficulty. The reason to use a held-out test set is to get an honest estimate of generalization, not for computational convenience.
 - [o] Because a model can memorize its training data, so its training score reflects memory rather than its ability to generalize to new data
   > The training score can be inflated by memorization. Only data the model never saw during training gives an honest estimate of future performance.
 - Because scikit-learn requires it
+  > scikit-learn does not enforce a train/test split — you can call \`fit\` and \`score\` on the same data and it will work. The split is a best practice for honest evaluation, not a library requirement.
 - Because the training data is usually corrupted
+  > Training data is not assumed to be corrupted; the issue is that a model can memorize clean training data. Even with perfectly labeled data, evaluating on the training set gives an inflated score.
 
 The held-out test set stands in for "data the model will face in the future."`}
 />
@@ -332,10 +335,13 @@ The held-out test set stands in for "data the model will face in the future."`}
   markdown={`A decision tree scores 1.000 on the training data and 0.890 on the test data. What is the most reasonable interpretation?
 
 - The model is perfect and ready to ship
+  > A perfect training score alongside a noticeably lower test score is the signature of overfitting, not readiness to ship. The test score (0.890) is the honest estimate; the training score (1.000) reflects memorization.
 - Something is broken; scores should be equal
+  > A small train-test gap is normal — the model has a home-field advantage on data it trained on. A large gap, as seen here, signals overfitting. This is expected behavior that the train/test split is designed to expose.
 - [o] The model has overfit — it memorized the training data, and the test score (0.890) is the honest estimate of real-world performance
   > A large train-minus-test gap is the signature of overfitting. Trust the test score, and consider a simpler or more regularized model.
 - The test set must be too small to trust at all
+  > A small test set increases the *uncertainty* of the estimate, but it does not make the score untrustworthy in the direction of always being too low. There is no systematic reason a small test set would produce 0.890 if the true performance is really 1.000.
 
 A near-perfect training score next to a lower test score is the classic overfitting pattern.`}
 />
@@ -344,10 +350,13 @@ A near-perfect training score next to a lower test score is the classic overfitt
   markdown={`What does \`stratify=y\` do in \`train_test_split\`, and when does it matter most?
 
 - It sorts the rows by \`y\` before splitting
+  > Sorting rows by \`y\` before splitting would create a biased split where one half has all the low values and the other has all the high values. \`stratify=y\` does the opposite — it ensures each class appears proportionally in both halves.
 - It removes the rare class to balance the data
+  > \`stratify=y\` preserves the rare class in both halves proportionally — it never removes any rows. Removing classes to balance data is a different technique called undersampling.
 - [o] It preserves each class's proportion in both the train and test sets, which matters most when classes are imbalanced
   > Stratifying keeps the class ratio of the full dataset in both halves, so a rare class is not accidentally concentrated in one side.
 - It scales the features to have equal variance
+  > Feature scaling (standardization) is a separate preprocessing step unrelated to how rows are split. \`stratify=y\` controls how rows are assigned to the two sets, based on the target class, not the feature values.
 
 Stratification is about *representation*, not sorting or deleting data.`}
 />
@@ -356,10 +365,13 @@ Stratification is about *representation*, not sorting or deleting data.`}
   markdown={`You are predicting tomorrow's sales from historical daily data. Why is a plain random \`train_test_split\` a poor choice here?
 
 - Random splits are slower on time-series data
+  > Split speed does not depend on whether data has a time component; \`train_test_split\` runs at the same speed regardless. The problem with random splits on time series is correctness, not speed.
 - [o] The rows are ordered in time; a random split lets the model train on future days to predict past ones, which it can never do in reality
   > Time-series rows are not independent. Honest evaluation trains on the past and tests on later data, mirroring how the model will actually be used.
 - Time-series data cannot be used in scikit-learn
+  > scikit-learn supports time-series workflows, including \`TimeSeriesSplit\` for time-aware cross-validation. The constraint is that you must respect the temporal ordering when splitting, not that time-series data is unsupported.
 - You must always use the entire dataset for training with time series
+  > Holding out future data for testing is essential with time series, just as with any other data. Using the entire dataset for training would leave no way to evaluate how well the model predicts future values.
 
 When rows carry a time order, the split must respect that order.`}
 />
@@ -368,10 +380,13 @@ When rows carry a time order, the split must respect that order.`}
   markdown={`Why is fixing \`random_state\` to the same value useful when comparing two models?
 
 - It makes the models train faster
+  > \`random_state\` controls the shuffling of rows, not training speed. The same split with or without a fixed seed takes the same time to produce.
 - It guarantees both models reach 100% accuracy
+  > \`random_state\` fixes the split for reproducibility, but it says nothing about the accuracy a model will achieve. Accuracy depends on the model and the data, not on the seed used to divide them.
 - [o] It makes both models see exactly the same train/test rows, so any difference in scores reflects the models, not two different lucky splits
   > Holding the split constant removes split-luck as a confounder, so the comparison is apples-to-apples.
 - It changes the metric used to score the models
+  > \`random_state\` has no effect on which metric is used to score models. The metric is determined by the \`.score\` method or a separate metric function, not by the split seed.
 
 Reproducible splits are what let you attribute a score difference to the model itself.`}
 />

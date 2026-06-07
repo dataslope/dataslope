@@ -153,10 +153,13 @@ The next chapter dives into ethics in more detail.
   markdown={`What is the **first step** in data storytelling, before you ever open a chart library?
 
 - Pick a color palette.
+  > Color selection is a late-stage styling decision, not a starting point. Choosing colors before knowing what you're arguing produces decoration rather than communication — the palette should serve the claim, not precede it.
 - Choose between Plotly and Matplotlib.
+  > Tool selection is a technical decision that can wait until after the story is defined. The claim, the audience, and the encoding should drive the chart, regardless of which library ends up rendering it.
 - [o] State the **claim** you want to make in one clear sentence.
   > Without a claim, you cannot pick the right chart, the right data slice, or the right title. The claim is the spine of the entire story. "Sales are up" is too vague; "Mobile sales overtook desktop in Q2 2024" is a claim a chart can support.
 - Decide on the chart type.
+  > Chart type selection depends on the nature of the claim and the data. Without knowing what you're arguing, you have no principled basis for choosing between a line chart, a bar chart, or anything else.
 
 Claim first; chart second. This is the discipline that separates "displaying data" from "telling a story."`}
 />
@@ -165,10 +168,13 @@ Claim first; chart second. This is the discipline that separates "displaying dat
   markdown={`Which **title** is more **narrative** and likely more effective for a presentation chart?
 
 - "Sales by quarter."
+  > "Sales by quarter" is a descriptive label that tells the viewer what data is shown but makes no claim about what it means. A narrative title states the key finding so the reader can immediately grasp the takeaway.
 - "Quarterly metrics."
+  > "Quarterly metrics" is vague and gives the viewer no guidance about what to look for or why the chart matters. It describes the data domain, not the insight being communicated.
 - [o] "Q4 sales grew 23%, the steepest jump since 2019."
   > A descriptive title tells the reader *what the chart is*. A narrative title tells them *what it means*. For presentations and dashboards, narrative titles do much of the cognitive work for the reader and dramatically increase the chance the takeaway lands.
 - "Untitled."
+  > An untitled chart gives the viewer no context whatsoever — they must infer the topic, the time period, and the units entirely from the axes. Leaving a presentation chart untitled is a communication failure.
 
 Narrative titles are not "spin" — they're a respectful summary of what the data actually says.`}
 />
@@ -177,10 +183,13 @@ Narrative titles are not "spin" — they're a respectful summary of what the dat
   markdown={`What is the **difference between focusing and misleading**?
 
 - They are the same thing.
+  > Focusing and misleading are meaningfully distinct. Focusing directs attention to a genuine insight while the underlying data would confirm that insight if fully shown. Misleading hides or distorts data so the conclusion contradicts what the full data would show.
 - Misleading uses Plotly, focusing uses Matplotlib.
+  > The library used to render a chart has nothing to do with whether it is honest or misleading. Both focusing and misleading are communication choices that apply equally to charts made in any tool.
 - [o] Focusing chooses a slice / framing that matches an honest claim; misleading omits or distorts context so the reader concludes something that the full data wouldn't support.
   > The test is: *if a careful reader saw the underlying full data, would they reach a different reasonable conclusion?* Focusing helps the reader see what the data says; misleading prevents them from seeing what the data really says. The first is competent storytelling; the second is a form of dishonesty.
 - Focusing requires a license.
+  > Focusing is a design and communication choice available to anyone making a chart. There is no licensing or legal concept associated with choosing which subset of data to highlight in a visualization.
 
 Every chart leaves something out — that's not the problem. The problem is leaving out things that would change the conclusion.`}
 />

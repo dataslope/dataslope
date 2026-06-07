@@ -178,10 +178,13 @@ seconds.
   markdown={`What does **hover_name="country"** do in a Plotly Express call?
 
 - Renames the country column.
+  > \`hover_name\` controls only how the column appears in the tooltip header; it does not rename the column in the DataFrame or change how it is used in other encodings.
 - Hides the country column from the data.
+  > \`hover_name\` displays the column's values more prominently, not less; it adds the value as a bold title at the top of the hover box.
 - [o] Sets the value of that column as a bold headline at the top of the hover tooltip for each data point.
   > **hover_name** is for the "title" of the tooltip — usually a unique identifier like a name, ID, or label. Combined with **hover_data** for extra fields, you can turn each hover into a small information panel about a single data point.
 - Forces the chart to use country as the color.
+  > Color encoding is controlled by the \`color=\` parameter; \`hover_name\` only affects the tooltip's headline text and does not change any visual encoding in the chart.
 
 Adding **hover_name** is often the single biggest improvement you can make to an analytical scatter plot.`}
 />
@@ -207,10 +210,13 @@ Plotly's hover format strings mostly follow Python's mini-format-language, which
   markdown={`Why is a **well-crafted hover tooltip** valuable for analytical charts?
 
 - It makes the chart look more colorful.
+  > Hover tooltips are invisible until the user moves the cursor over a point; they do not add color or change the visual appearance of the chart itself.
 - It speeds up rendering.
+  > A richer tooltip adds slightly more configuration to the chart object but has no noticeable effect on rendering speed; the tooltip appears lazily on hover, not at render time.
 - [o] It provides "details on demand" — the reader can investigate any individual data point without leaving the chart or consulting a separate table.
   > The hover is the chart's *detail layer*. The default chart shows overall structure; the hover answers "what *is* this particular point?" Combined, they form a complete analytical experience inside a single interactive chart.
 - It is required for the chart to be interactive.
+  > Plotly charts are interactive (zoomable, pannable, legend-clickable) regardless of how the hover is configured; a default tooltip is added automatically and a custom tooltip is an enhancement, not a prerequisite.
 
 A great hover is the difference between a chart that's "pretty" and a chart that's a *tool*.`}
 />

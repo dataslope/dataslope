@@ -305,7 +305,9 @@ What is the value of \`x\`?
 - [o] To keep assignment visually distinct from comparison (\`==\`) and from named function arguments (\`mean(x = 1:10)\`).
   > The arrow leaves no doubt that what's happening is a write, not a read or a label.
 - Because \`=\` is reserved for SQL.
-- Because R does not understand the \`=\` symbol.`}
+  > R is an independent language with no special reservation of \`=\` for SQL; the preference for \`<-\` is about clarity within R itself.
+- Because R does not understand the \`=\` symbol.
+  > R uses \`=\` for named function arguments and supports it for assignment; the convention to prefer \`<-\` is stylistic, not a language limitation.`}
 />
 
 ## Mini challenge: a running budget

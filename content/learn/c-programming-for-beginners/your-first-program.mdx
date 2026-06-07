@@ -227,10 +227,13 @@ int main(void) {
   markdown={`What is the purpose of the line \`#include <stdio.h>\` at the top of a C program?
 
 - It runs first when the program starts.
+  > \`#include\` is a preprocessor directive processed before compilation; it does not affect which code executes first at runtime. Execution starts at \`main\`.
 - It tells the operating system to use the standard input format.
+  > The operating system is not involved in \`#include\`. The directive tells the C preprocessor to paste the contents of \`stdio.h\` into the translation unit.
 - [o] It instructs the preprocessor to insert the declarations from \`stdio.h\` so the compiler knows about functions like \`printf\`.
   > \`#include\` is a textual paste handled before compilation. Without it, the compiler doesn't know what \`printf\` looks like.
 - It compiles \`stdio.h\` into a separate executable.
+  > \`#include\` only inserts declarations (types and function signatures); the actual implementation of \`printf\` is in a pre-compiled library that the linker attaches later.
 
 The preprocessor literally copies the contents of \`stdio.h\` into your translation unit before the compiler ever looks at your code.`}
 />
@@ -239,10 +242,13 @@ The preprocessor literally copies the contents of \`stdio.h\` into your translat
   markdown={`Which character ends every C statement?
 
 - A period \`.\`
+  > A period is not a statement terminator in C. It is used as the struct field-access operator (e.g., \`p.x\`).
 - A newline character
+  > C ignores whitespace including newlines; a statement can span multiple lines without any special terminator until the semicolon is reached.
 - [o] A semicolon \`;\`
   > C is *not* a whitespace-sensitive language; you can spread a statement across multiple lines or put many statements on one line, as long as each statement ends with a semicolon.
 - The closing brace \`}\`
+  > A closing brace ends a block or function body, not a statement. Statements inside that block still each need their own semicolon.
 
 Forgetting semicolons is by far the most common syntax error for newcomers to C. Read your compiler's error messages carefully — they almost always point to the right line (or the line just after the missing semicolon).`}
 />

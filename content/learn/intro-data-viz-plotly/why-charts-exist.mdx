@@ -176,10 +176,13 @@ answers the question."
   markdown={`Why are charts often easier to read than tables of numbers?
 
 - Charts always show more data than tables.
+  > Charts often show *less* raw data than tables — they aggregate, bin, or summarize; the advantage is in the *speed* of pattern perception, not in data volume.
 - Charts use less memory than tables.
+  > Memory usage is a property of the rendering system, not a reason charts are easier to read; the cognitive benefit is about how the human visual system processes the information.
 - [o] Charts let the human visual system perceive patterns in parallel — comparisons of position, length, and slope happen almost instantly without conscious effort.
   > The visual cortex is optimized for exactly the kinds of comparisons charts make easy (which is taller? which is rising fastest?). The conscious arithmetic part of the brain is slow at these tasks; the visual system does them in milliseconds.
 - Charts are required by law.
+  > No law requires the use of charts; the preference for charts over tables in analytical and communication contexts is a matter of cognitive efficiency, not legal obligation.
 
 This is **cognitive offloading**: the chart does some of the comparison work for you, freeing your mind for higher-level interpretation.`}
 />
@@ -188,10 +191,13 @@ This is **cognitive offloading**: the chart does some of the comparison work for
   markdown={`Which of the following is a case where a **table** is probably better than a chart?
 
 - Comparing trends in revenue across 12 quarters.
+  > Comparing trends across time is exactly where charts excel; a line chart of 12 quarters would make rising or falling patterns immediately visible.
 - Showing the distribution of customer ages.
+  > Showing a distribution is a chart-friendly task; a histogram or box plot conveys shape, spread, and center far faster than a column of numbers.
 - [o] An invoice listing each line item with its exact price.
   > When the reader needs exact, individual values that they will *look up* (not compare), a table is the right tool. A chart of invoice line items would obscure the precise dollars and cents that matter to accounting.
 - Showing how two variables relate to each other.
+  > Showing the relationship between two variables is ideally suited to a scatter plot; a table of the same data would require the reader to mentally find pairs and compute correlation.
 
 Tables for look-up; charts for patterns. Many good reports use both.`}
 />
@@ -200,8 +206,11 @@ Tables for look-up; charts for patterns. Many good reports use both.`}
   markdown={`Which is **NOT** a legitimate failure mode of charts that tables don't share?
 
 - Rounding away small but important differences.
+  > Charts *do* round — a bar representing 99 and one representing 101 can look identical, making small but meaningful differences invisible; this is a real failure mode.
 - Inviting over-interpretation of short trends.
+  > Charts can visually suggest a "trend" in just two or three data points, leading readers to draw conclusions the data does not support; this is a genuine failure mode.
 - Imposing the author's framing through axes and colors.
+  > The author's choice of axis range, color, and scale shapes how the data reads; charts carry the framing far more strongly than a neutral table does; this is a real failure mode.
 - [o] Always being slower to read than tables.
   > This is the odd one out. Charts are typically *much faster* to read than tables for pattern-finding tasks. The other three are real failure modes: charts can hide small differences, suggest spurious trends, and reflect the author's framing more strongly than a raw table.
 
@@ -212,10 +221,13 @@ Being honest about the limits of each tool is what separates competent analysts 
   markdown={`What does "cognitive offloading" mean in the context of data visualization?
 
 - Using a computer to do calculations.
+  > Using a computer to calculate is a form of offloading arithmetic, but cognitive offloading in the visualization context refers specifically to using a visual representation to handle comparison and pattern-finding tasks.
 - Writing notes by hand.
+  > Writing notes is a form of memory offloading, but it relies on language and serial reading, not on the parallel pattern-recognition the visual system provides when reading a chart.
 - [o] Moving some of the work of thinking — remembering values, comparing them — out of the brain and into an external representation like a chart.
   > A chart "remembers" data values for you and *arranges* them so the visual system can compare them automatically. Your mind is left free for higher-level interpretation: *why* is this trend happening, *what* should we do about it.
 - Forgetting things on purpose.
+  > Cognitive offloading is about *transferring* memory or processing work to an external tool — retaining it there, not discarding it; the information is still available, just stored outside the brain.
 
 Cognitive offloading is one of the deep reasons charts have spread so widely as a cultural technology. It's the same reason we use shopping lists and to-do apps.`}
 />

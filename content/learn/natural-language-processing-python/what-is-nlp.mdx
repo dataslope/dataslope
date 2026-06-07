@@ -180,10 +180,13 @@ one-liner.**
   markdown={`Why does \`sentence.split()\` give a misleading word list for the sentence above?
 
 - It removes all the vowels from each word
+  > \`split()\` performs no such transformation; it returns substrings as-is, vowels intact.
 - [o] It only splits on whitespace, so punctuation stays attached to words and contractions are never separated
   > \`split()\` knows nothing about language. It cuts on spaces, leaving "butter," and "Jones!" with punctuation fused on and "can't" unsplit, which distorts both the word list and any counts based on it.
 - It splits every character into its own item
+  > \`split()\` cuts on whitespace and returns whole whitespace-delimited chunks, not individual characters; character-level splitting would require \`list(sentence)\`.
 - It automatically lowercases the text, changing the words
+  > \`split()\` does not alter case; every substring is returned exactly as it appears in the original string.
 
 The whole job of a tokenizer is to make linguistically sensible cuts that \`split()\` cannot.`}
 />
@@ -280,6 +283,7 @@ kind of ambiguity?
 - Referential ambiguity
   > Referential ambiguity is about what a word like "it" or "they" points to, not about a single word's dictionary meaning.
 - There is no ambiguity here
+  > "Bank" is a classic example of a word with multiple unrelated meanings; the ambiguity is real and is precisely why context-aware NLP is necessary.
 
 One word, multiple dictionary meanings — that is lexical ambiguity by definition.`}
 />
@@ -289,10 +293,13 @@ One word, multiple dictionary meanings — that is lexical ambiguity by definiti
 this course) actually do?
 
 - They make the computer genuinely understand the meaning of text the way a human does
+  > Classic NLP techniques count, match, and transform text mechanically; the course explicitly warns against conflating processing with comprehension.
 - [o] They mechanically transform, match, and count text to expose structure — without any real comprehension
   > Classic NLP is transformation and counting: splitting, normalizing, tagging, tallying. It is enormously useful precisely because so many tasks don't require true understanding.
 - They translate all text into mathematical equations that are always exactly correct
+  > NLP techniques produce approximations (counts, patterns, heuristics), not exact mathematical proofs; and NLP is applied to human language, not formal equations.
 - They only work on programming languages, not human languages
+  > Natural language — English, French, Mandarin — is exactly what NLP is designed for; "natural" in the name contrasts it from formal languages like Python.
 
 Useful does not require understanding — a spam filter scores words without knowing what any of them mean.`}
 />
@@ -308,6 +315,7 @@ him* or *I saw a man who had a telescope*. What kind of ambiguity is this?
 - Referential ambiguity
   > Referential ambiguity would be about an unclear pronoun like "it" or "they"; this sentence has none.
 - Morphological ambiguity
+  > Morphological ambiguity concerns a single word's form (e.g., "wound" as past tense of "wind" vs. an injury noun); here no word is individually ambiguous — the whole phrase parses two ways.
 
 Same words, same order, two valid parse trees — that is structural ambiguity.`}
 />
@@ -317,10 +325,13 @@ Same words, same order, two valid parse trees — that is structural ambiguity.`
 NLP's core problem?
 
 - Because text files are larger than other kinds of data
+  > File size has no bearing on whether text is structured or unstructured; the challenge is that meaning is implicit, not that the data is large.
 - [o] Because raw text is just a sequence of characters with all its meaning implied, and programs need that implied structure (words, sentences, tags) made explicit before they can compute with it
   > Structured data carries its meaning in labeled fields; text hides everything inside a flat string. NLP's foundational job is to recover and make explicit the words, boundaries, and grammar that a program can then use.
 - Because text always needs to be translated into another language first
+  > NLP can work on text in its original language; translation is a downstream task, not a prerequisite for processing.
 - Because computers cannot store text at all
+  > Computers store text perfectly well as character encodings; the problem is that stored text has no explicit labels for word boundaries, grammar, or meaning.
 
 The recurring theme of the whole course: add explicit structure to implicitly-structured text.`}
 />
@@ -330,10 +341,13 @@ The recurring theme of the whole course: add explicit structure to implicitly-st
 \`review.split()\` and tallying the results. What is the most important risk?
 
 - Splitting is far too slow to run on text
+  > \`str.split()\` is fast and imposes negligible overhead; the problem is correctness, not speed.
 - [o] Punctuation stays attached to words and contractions stay glued, so "great!", "great", and "great." are counted as three different words and counts are distorted
   > \`split()\` only cuts on whitespace. Without real tokenization, the same word with different trailing punctuation becomes multiple distinct entries, corrupting every count built on top.
 - \`split()\` deletes the reviews from memory
+  > \`split()\` returns a new list and leaves the original string untouched; it does not modify or delete anything.
 - \`split()\` only works on numbers
+  > \`str.split()\` is a string method that operates on text, not numbers; this is a factually incorrect claim about Python.
 
 This is precisely why tokenization, not whitespace splitting, is step one of a real pipeline.`}
 />

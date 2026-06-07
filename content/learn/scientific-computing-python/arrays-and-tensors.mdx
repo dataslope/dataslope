@@ -362,10 +362,13 @@ assert np.allclose(weighted_centroid(pts, ws), expected)`,
   markdown={`What is the shape of \`np.einsum("ijk,kl->ijl", A, B)\` if \`A\` has shape \`(2, 3, 4)\` and \`B\` has shape \`(4, 5)\`?
 
 - \`(2, 3, 4)\`
+  > This would be the shape of \`A\` alone; the contraction with \`B\` replaces the \`k\` axis (size 4) with \`l\` (size 5), so the \`k\` dimension does not survive.
 - [o] \`(2, 3, 5)\`
   > The shared index \`k\` is summed away, and the remaining free indices are \`i\` (size 2), \`j\` (size 3), and \`l\` (size 5).
 - \`(4, 5)\`
+  > This is the shape of \`B\` alone; the contraction must include the free indices from \`A\` (\`i\` and \`j\`), which appear in the output subscript \`ijl\`.
 - \`(2, 5)\`
+  > This shape would result if \`j\` were also summed away, but the output subscript is \`ijl\`, which explicitly retains \`j\`.
 
 Einsum's strength is that the shape of the result is exactly what the index notation says it is.`}
 />
@@ -374,8 +377,11 @@ Einsum's strength is that the shape of the result is exactly what the index nota
   markdown={`Which of the following array operations on a 2-D NumPy array returns a **copy** (rather than a view)?
 
 - \`A[1:5, ::2]\`
+  > Basic slicing (integer ranges and step strides) returns a view by adjusting the strides and offset in the array header without touching the underlying buffer.
 - \`A.T\`
+  > Transposing returns a view with reordered strides; the underlying byte buffer is unchanged and shared with the original array.
 - \`A.reshape(-1)\` on a C-contiguous array
+  > Reshaping a C-contiguous array into a 1-D array can always be expressed as a new set of strides on the same buffer, so NumPy returns a view rather than a copy.
 - [o] \`A[A > 0]\` (boolean indexing)
   > Boolean masks always return a copy, because the result has a new, irregular layout that cannot be described by strides into the original buffer. Slicing and transposes are views.
 

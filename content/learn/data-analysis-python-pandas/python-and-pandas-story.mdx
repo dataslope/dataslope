@@ -250,10 +250,13 @@ now used by millions every day.
   markdown={`Where does the name "pandas" come from?
 
 - The animal, because the logo is cute
+  > The panda animal branding is a coincidence, not the origin; the name comes from the econometrics term "panel data."
 - A clever acronym
+  > "Pandas" is not an acronym; it is a contraction of "panel data," the type of financial time-series data McKinney was working with.
 - [o] "Panel data" — an econometrics term for multi-dimensional structured datasets, which is what McKinney was working with at AQR
   > Pandas was originally designed for panel data in finance; the bear-themed branding came later as a happy coincidence.
 - "Python and dataframes"
+  > The chapter explicitly states the name derives from "panel data"; "Python and dataframes" is a plausible-sounding but incorrect backronym.
 
 Knowing the origin helps explain why pandas takes labeled multi-dimensional data so seriously.`}
 />
@@ -262,10 +265,13 @@ Knowing the origin helps explain why pandas takes labeled multi-dimensional data
   markdown={`What problem in McKinney's day-to-day work motivated him to start pandas?
 
 - He needed a new project for his MBA
+  > The chapter makes no mention of an MBA; McKinney built pandas out of day-to-day frustration at AQR Capital Management, not as an academic exercise.
 - He wanted to compete with Microsoft Excel
+  > Competing with Excel was not McKinney's stated motivation; he needed a tool that combined R-like data semantics with Python's speed and general-purpose programming.
 - [o] None of his available tools — Excel, MATLAB, R, plain Python + NumPy — combined fast tabular operations, label-aware alignment, and Python's general-purpose programming in one place
   > Each existing tool covered some of those needs, but no single tool covered all of them. Pandas was built to fill the intersection.
 - He wanted to learn a new programming language
+  > McKinney was already proficient in Python; his motivation was to solve a practical data analysis problem, not to acquire new language skills.
 
 The tool you reach for shapes the questions you can comfortably ask. McKinney wanted to remove that friction for himself and ended up doing it for everyone.`}
 />
@@ -274,10 +280,13 @@ The tool you reach for shapes the questions you can comfortably ask. McKinney wa
   markdown={`Which of these is **not** something pandas is designed to be?
 
 - A library for labeled tabular data
+  > Pandas is explicitly designed to be a library for labeled tabular data — this is one of its core purposes, not something it is not.
 - A bridge into the broader scientific Python ecosystem
+  > The chapter describes pandas as the glue that connects NumPy, scikit-learn, Matplotlib, and other libraries — being a bridge into the ecosystem is one of its stated strengths.
 - [o] A distributed system that scales transparently across many machines
   > Pandas runs in one process, on one machine, in memory. Scaling to many machines is what tools like Spark, Dask, and DuckDB are for.
 - A friendly home for the split-apply-combine pattern
+  > The chapter explicitly credits Hadley Wickham's split-apply-combine paper as an influence on pandas's groupby API — this is one of the things pandas is designed to support.
 
 Knowing pandas's *scope* — what it does and does not try to do — keeps you from misusing it.`}
 />

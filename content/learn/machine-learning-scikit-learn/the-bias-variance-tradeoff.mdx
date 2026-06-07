@@ -323,10 +323,13 @@ print("var_flexible:", var_flexible)
   markdown={`In bias–variance terms, what does **bias** measure?
 
 - How much predictions change when the training data changes
+  > That is the definition of variance, not bias. Bias measures systematic error from the model's assumptions; variance measures how much the model fluctuates across different training samples.
 - The amount of random noise in the labels
+  > Noise in the labels is irreducible error — the third component of the bias-variance decomposition. Bias is a property of the model's assumptions, not of the data's noise level.
 - [o] How far the model's predictions are from the truth *on average*, due to overly simple assumptions
   > Bias is systematic error from the model family being too rigid to represent the true pattern — it is wrong in the same direction regardless of the sample.
 - The number of features in the model
+  > The number of features is one factor that can influence bias (too few informative features may increase bias), but bias itself is the statistical concept of systematic error from overly simple assumptions — not a count of features.
 
 Bias is the "consistently off-target" part of error; variance is the "scattered" part.`}
 />
@@ -335,10 +338,13 @@ Bias is the "consistently off-target" part of error; variance is the "scattered"
   markdown={`A model whose predictions swing dramatically when you retrain it on a slightly different sample has:
 
 - High bias
+  > High bias means the model is systematically wrong in the same direction regardless of which training sample it sees — it is consistently off-target, not sensitive to the particular sample. The described behavior (swinging with sample changes) is the definition of high variance.
 - [o] High variance
-- Zero irreducible error
-- Perfect generalization
   > Sensitivity to the particular training sample is the definition of variance. Such a model is likely overfitting.
+- Zero irreducible error
+  > Irreducible error is the noise baked into the problem that no model can eliminate. It is unrelated to whether a model has high or low variance; the two are independent components of total error.
+- Perfect generalization
+  > A model whose predictions swing dramatically with different training samples is not generalizing well — it is overfitting to each particular sample. Perfect generalization would require stable predictions across samples.
 
 High variance is the statistical name for the instability behind overfitting.`}
 />
@@ -347,10 +353,13 @@ High variance is the statistical name for the instability behind overfitting.`}
   markdown={`Why is it usually impossible to drive both bias and variance to zero by adjusting model complexity?
 
 - Because scikit-learn limits model complexity
+  > scikit-learn imposes no such limit; you can build arbitrarily complex models. The tradeoff is a mathematical property of how bias and variance respond to model flexibility, not a software constraint.
 - [o] Because increasing complexity lowers bias but raises variance, and decreasing it does the reverse — they trade off
   > Moving the complexity dial pushes one component down while pushing the other up, so you optimize their sum rather than eliminating both.
 - Because variance is always larger than bias
+  > There is no general rule that variance is always larger than bias. Their relative sizes depend on the model and data. The tradeoff is about how adjusting complexity tends to move them in opposite directions, not about their absolute magnitudes.
 - Because more data removes bias
+  > More data reduces variance (a flexible model has less room to memorize noise with more examples) but does little for bias, which is determined by the model family's flexibility. Bias is not removed by collecting more data.
 
 The tradeoff means the target is minimum *total* error, not zero of either part.`}
 />
@@ -359,10 +368,13 @@ The tradeoff means the target is minimum *total* error, not zero of either part.
   markdown={`You are clearly overfitting (high variance) and can collect more labeled data. What should you expect?
 
 - More data will increase variance
+  > More training data reduces variance, not increases it. With more examples the noise averages out and a flexible model is pulled away from memorizing individual points toward the true underlying pattern.
 - [o] More data typically reduces variance, pulling a flexible model back toward the true pattern
   > Additional examples let the noise average out, so the flexible model stops chasing individual points and its predictions stabilize.
 - More data will fix bias but not variance
+  > More data addresses variance, not bias. Bias is a property of the model family's assumptions — a linear model fitting a curved relationship has high bias regardless of how much data is provided.
 - Nothing changes with more data
+  > More labeled data reliably reduces variance by making the model less sensitive to any particular training set. This is one of the most consistent and actionable insights from the bias-variance framework.
 
 More data is the classic remedy for variance; it does little for bias.`}
 />
@@ -371,10 +383,13 @@ More data is the classic remedy for variance; it does little for bias.`}
   markdown={`Why does a random forest usually outperform a single deep decision tree?
 
 - It has higher bias than a single tree
+  > A random forest has similar or lower bias than a single deep tree, since its individual trees are just as flexible. The forest's advantage is lower variance, not higher bias.
 - It uses fewer features
+  > A random forest considers a random subset of features at each split, but across all trees it uses all features. The total number of features available is the same; the restriction is per split, not overall.
 - [o] Averaging many high-variance trees cancels out their individual noise, cutting variance while keeping the low bias of deep trees
   > Bagging is fundamentally a variance-reduction technique: independent errors of many trees partially cancel when averaged.
 - It is guaranteed to reach zero error
+  > No model can guarantee zero error due to irreducible noise in the data. A random forest reduces variance but cannot eliminate the inherent unpredictability in the problem.
 
 Ensembles win mainly by reducing variance, which is why they tame the overfitting of individual deep trees.`}
 />

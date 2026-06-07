@@ -152,10 +152,13 @@ questions far faster than you would with a screenshot.
   markdown={`What does "overview first, zoom and filter, then details on demand" describe?
 
 - A SQL query optimization strategy.
+  > SQL query optimization is about reducing database execution time. Shneiderman's mantra describes a human-facing workflow for exploring data through an interactive interface, not a database performance technique.
 - A type of Plotly chart.
+  > Plotly chart types are specific visualization forms (scatter, bar, line, etc.). "Overview first, zoom and filter, then details on demand" is a design philosophy about how users should be able to interact with any chart, not a chart type itself.
 - [o] A foundational rhythm for interactive data exploration — first see the whole, then narrow down, then inspect specifics.
   > This phrase from Ben Shneiderman (1996) captures how an analyst uses an interactive chart in practice: get the gestalt of the data, then drill into the interesting subset, then look at exact values. Plotly Express supports every step of this loop out of the box.
 - A type of database index.
+  > Database indexes are structures that speed up data retrieval in a database engine. Shneiderman's mantra is a user-interface and visualization design principle, entirely unrelated to database internals.
 
 The Plotly mode bar (zoom, pan, lasso, reset) and the hover tooltip together implement this mantra mechanically.`}
 />
@@ -164,8 +167,11 @@ The Plotly mode bar (zoom, pan, lasso, reset) and the hover tooltip together imp
   markdown={`Which of the following is **NOT** a built-in interaction in a default Plotly Express chart?
 
 - Hovering over points to see values.
+  > Hover tooltips are built into every Plotly Express chart by default. Moving the cursor over any data point reveals its exact values, making this a standard built-in interaction.
 - Click-dragging to zoom into a region.
+  > Click-dragging a selection rectangle is one of the five default interactions in every Plotly Express chart. The mode bar in the top-right corner of each chart provides direct access to this zoom mode.
 - Clicking a legend item to hide a series.
+  > Clicking a legend item to show or hide a series is a built-in Plotly interaction. A single click toggles visibility; a double-click isolates that series by hiding all others.
 - [o] Editing the data values by clicking a bar and typing a new value.
   > This is the odd one out. Plotly charts are read-only by design. You can hover, zoom, pan, filter via legend, and download — but you cannot edit the underlying data through the chart. If you want editable charts you need a dashboard framework like Plotly Dash with form widgets.
 
@@ -176,10 +182,13 @@ Read-only interactivity is enough for 95% of analytical work. The other 5% is wh
   markdown={`When is a *static* chart usually a better choice than an interactive one?
 
 - When you are exploring data for the first time.
+  > Exploratory analysis is one of the strongest use cases for interactive charts — hovering, zooming, and filtering let you rapidly investigate hypotheses. Static charts are rarely the better choice for first-pass exploration.
 - When you have hundreds of overlapping points to investigate.
+  > Dense overlapping points are exactly where interactivity helps — you can zoom into crowded regions or hover to identify individual points. A static chart of overplotted data is harder to investigate, not easier.
 - [o] When the chart will be printed, slide-projected, or published in a context where the reader cannot interact with it.
   > Print, slides, PDFs, and many newsletter formats render only a static snapshot. For those contexts you want every important detail visible *in the image itself* — labels, annotations, callouts — because the reader cannot hover or zoom.
 - When you don't know what your data looks like yet.
+  > Not knowing what the data looks like is a reason to use interactive charts more, not less. Hovering, zooming, and filtering help you discover structure you couldn't anticipate from reading column names alone.
 
 Interactive charts are the default for *exploration* and *digital* presentation; static charts are the default for *print* and *broadcast*.`}
 />
@@ -188,10 +197,13 @@ Interactive charts are the default for *exploration* and *digital* presentation;
   markdown={`What is **linked brushing** in interactive visualization?
 
 - A keyboard shortcut for pan.
+  > Pan in Plotly is activated by clicking the pan icon in the mode bar or by shift-dragging. "Linked brushing" is a different concept about synchronized selection across multiple charts, not a keyboard shortcut.
 - A way to format chart text.
+  > Text formatting in charts involves fonts, labels, and annotations — these have nothing to do with brushing. "Linked brushing" specifically refers to the coordination of data selections across two or more linked chart panels.
 - [o] Selecting a subset of rows in one chart and seeing the same rows highlighted (or filtered) in another linked chart.
   > Linked brushing — when two or more charts share a selection — is enormously powerful because the same observation can be looked at through several lenses simultaneously. Plotly Dash and other dashboard frameworks make this easy; we'll touch on it briefly in the dashboard chapter.
 - A way to draw on top of a chart.
+  > Drawing on top of a chart is done through annotations and shapes in Plotly's layout API. Linked brushing is a selection-and-highlighting mechanism that connects separate chart panels to show the same rows simultaneously.
 
 You won't need linked brushing for most beginner analysis, but it's good to know the term — you'll meet it again in any serious dashboard course.`}
 />

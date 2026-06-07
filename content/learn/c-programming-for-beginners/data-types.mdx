@@ -295,9 +295,11 @@ int main(void) {
 - 3.5
   > C's \`/\` between two \`int\`s does **integer** division — the result is itself an \`int\`, so there is no \`.5\`.
 - 4
+  > Rounding to the nearest integer would give 4, but C integer division truncates toward zero, dropping the fractional part entirely.
 - [o] 3
   > Integer division truncates toward zero: \`7 / 2\` yields \`3\`.
 - A compile-time error.
+  > Dividing two \`int\`s is perfectly legal C; no error is produced at any stage.
 
 To get a fractional result, at least one of the operands must be a floating-point value: \`(double)a / b\` or \`a / 2.0\`.`}
 />

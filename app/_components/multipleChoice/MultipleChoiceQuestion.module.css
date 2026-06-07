@@ -310,6 +310,18 @@
   margin-bottom: 0;
 }
 
+/* Inline code inside a neutral (unselected/distractor) explanation. The
+   verdict variants below override the colours on green/red rows; this is
+   the base chip used on the plain subtle surface. */
+.choiceExplanation code {
+  font-family: var(--mc-font-mono);
+  font-size: 12.5px;
+  background: var(--ds-gray-100);
+  border-radius: 4px;
+  padding: 1px 5px;
+  color: var(--ds-gray-700);
+}
+
 .choice[data-verdict="correct-selected"] .choiceExplanation,
 .choice[data-verdict="correct-missed"] .choiceExplanation {
   border-left-color: var(--ds-green-500);
@@ -515,6 +527,7 @@
 }
 
 :global(html.dark) .choiceLabel code,
+:global(html.dark) .choiceExplanation code,
 :global(html.dark) .bodyMd code,
 :global(html.dark) .overallBody code {
   background: #252525;
@@ -589,10 +602,12 @@
   background: var(--mc-bg-hover);
 }
 
-/* White explanation text on dark red/green verdict backgrounds. */
-:global(html.dark) .choice[data-verdict="correct-selected"] .choiceExplanation,
-:global(html.dark) .choice[data-verdict="correct-missed"] .choiceExplanation,
-:global(html.dark) .choice[data-verdict="wrong-selected"] .choiceExplanation {
+/* Explanation prose is white in dark mode so it stays legible on every
+   surface — the neutral subtle background of the choices the learner did
+   not pick, as well as the tinted green/red verdict backgrounds. Without
+   the base (neutral) rule, those distractor explanations kept the
+   light-mode gray-700 text and were almost invisible on the dark card. */
+:global(html.dark) .choiceExplanation {
   color: #ffffff;
 }
 

@@ -272,10 +272,13 @@ Reach past trigrams only with a specific reason and a lot of data.
 single words could not?
 
 - Bigrams are faster to compute than single words
+  > Computational speed is not what distinguishes bigrams from unigrams; bigrams actually require more computation, and the reason to add them is to capture word-order information, not to gain speed.
 - [o] A lone "not" and a lone "good" do not capture that they were adjacent; the bigram preserves the local order so the model can learn that "not good" is negative
   > Single-word features discard order, so "not" and "good" look independent. The bigram is a concrete feature encoding their adjacency, letting the model associate the *phrase* with negative sentiment. Capturing local order is exactly what n-grams add.
 - Bigrams remove stopwords automatically
+  > N-gram generation has nothing to do with stopword removal; it simply pairs adjacent tokens, whether or not those tokens are stopwords.
 - Bigrams translate the text into another language
+  > Bigrams are tuples of adjacent tokens in the same language; they do not translate or transform the vocabulary in any way.
 
 N-grams reintroduce the local word order that a bag of single words throws away.`}
 />
@@ -354,10 +357,13 @@ assert len(out) == 9, "Expected 9 bigrams from 10 tokens; got " + str(len(out))`
   markdown={`A **trigram** is:
 
 - A word that appears exactly three times
+  > Frequency of occurrence has nothing to do with what a trigram is; a trigram is defined by its length (three tokens), not how many times it appears.
 - [o] A contiguous sequence of three adjacent tokens
   > An n-gram is \`n\` adjacent tokens; a trigram is the \`n = 3\` case — three words in a row, captured as a 3-tuple. It is about adjacency, not frequency.
 - The three most common words in a text
+  > Most-common words are found by frequency counting, which is a separate operation; a trigram is any consecutive run of three tokens, regardless of how common each word is.
 - A sentence with three words
+  > A trigram is a window of three adjacent tokens, not a complete sentence; a three-word sentence would produce exactly one trigram, but trigrams can come from anywhere inside a longer sentence.
 
 N-grams are defined by their length \`n\`, and a trigram has length three.`}
 />
@@ -366,10 +372,13 @@ N-grams are defined by their length \`n\`, and a trigram has length three.`}
   markdown={`A token list has 12 tokens. How many bigrams does it produce?
 
 - 12
+  > Bigrams do not equal the number of tokens; a sliding window of width 2 over 12 tokens produces \`12 - 2 + 1 = 11\` bigrams, because the last window can only start at the second-to-last token.
 - [o] 11
   > The number of n-grams is \`k - n + 1\`. For \`k = 12\` tokens and \`n = 2\`, that is \`12 - 2 + 1 = 11\`. Each window of width 2 slides one step, and the last window starts at the 11th token.
 - 6
+  > 6 is half the token count, not the bigram count; the correct formula is \`k - n + 1 = 12 - 2 + 1 = 11\`.
 - 24
+  > 24 is twice the token count and does not correspond to any standard n-gram formula; generating bigrams from 12 tokens produces 11, not 24.
 
 Sliding a width-2 window over 12 tokens lands in 11 positions.`}
 />
@@ -379,10 +388,13 @@ Sliding a width-2 window over 12 tokens lands in 11 positions.`}
 (say, 6-grams)?
 
 - Larger n-grams are illegal in NLTK
+  > NLTK's \`ngrams(tokens, n)\` accepts any positive integer for \`n\`; there is no legal limit on n-gram size within the library.
 - [o] As n grows, specific n-grams become increasingly rare (sparse) and the feature space explodes, so large n-grams carry little statistical signal while costing a lot of memory
   > Long n-grams almost always appear once, so counts stop being informative, and the number of possible n-grams grows enormously. Bigrams and trigrams balance useful context against sparsity — the practical sweet spot.
 - Larger n-grams are always slower to type
+  > The typing effort for a function call like \`ngrams(tokens, 6)\` is the same as \`ngrams(tokens, 2)\`; the real costs are computational and statistical, not typographical.
 - Bigrams capture the entire meaning of any document
+  > Bigrams capture only local two-word context; they cannot encode long-range dependencies or the full meaning of a document, which is part of why larger n-grams and other models exist.
 
 Sparsity and explosion are the twin reasons to keep n small.`}
 />
@@ -392,10 +404,13 @@ Sparsity and explosion are the twin reasons to keep n small.`}
 reusable list of tuples you can index and count?
 
 - Nothing; a generator already behaves like a list
+  > A generator is not a list: it can only be iterated once, cannot be indexed, and has no \`len()\`; you must materialize it with \`list()\` before counting or reusing the n-grams.
 - [o] Wrap it in \`list(...)\`, e.g. \`list(ngrams(tokens, n))\`, to materialize the n-grams into a list
   > Generators are consumed once and cannot be indexed. Wrapping in \`list()\` materializes the n-grams so you can index them, count them, or iterate more than once.
 - Convert it to a string with \`str(...)\`
+  > \`str(...)\` on a generator produces something like \`"<generator object ...>"\`, not the n-gram tuples; you need \`list()\` to get the actual content.
 - Call \`.sort()\` on the generator
+  > Generators do not have a \`.sort()\` method; calling it would raise an \`AttributeError\`, and even on a list, sorting changes order but does not materialize the n-grams.
 
 Materializing with \`list()\` is the standard step before reusing or counting n-grams.`}
 />

@@ -498,10 +498,13 @@ try {
   markdown={`What does the union type \`string | number\` represent?
 
 - A value that is both a string and a number
+  > A value that must satisfy both types simultaneously is an intersection (\`string & number\`), which is \`never\` for primitives because no value can be both.
 - A value that is neither a string nor a number
+  > A union type expands what is acceptable; it cannot exclude both members. A type that excludes certain types uses negation patterns or \`never\`, not a union.
 - [o] A value that is either a string or a number
   > Union types represent "this or that" — the value can be either member of the union.
 - A value that is only a string
+  > The union \`string | number\` accepts both strings and numbers, not just strings. A type of only \`string\` would be annotated as \`string\` alone.
 
 Union types widen the set of acceptable values.`}
 />
@@ -510,10 +513,13 @@ Union types widen the set of acceptable values.`}
   markdown={`What does the intersection type \`A & B\` represent for two object types A and B?
 
 - A value that is either A or B
+  > "Either A or B" describes a union (\`A | B\`), not an intersection. An intersection requires a value to satisfy both types at once.
 - [o] A value that has all properties from both A and B
   > Intersection types merge properties — the result must satisfy both constraints.
 - A value that has no properties
+  > An intersection of two object types combines their properties; it does not remove them. A type with no properties would be \`{}\` or \`Record<never, never>\`.
 - A value that is compatible with neither A nor B
+  > An intersection narrows the set of valid values by requiring both constraints, but any valid value of \`A & B\` is still assignable to both \`A\` and \`B\` individually.
 
 Intersections narrow the set of acceptable values by requiring both constraints to be met.`}
 />

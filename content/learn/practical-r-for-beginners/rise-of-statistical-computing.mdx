@@ -199,30 +199,39 @@ What happened next surprised everyone, including them.
   markdown={`What was the main innovation that distinguished S (and later R) from earlier statistical packages like SAS and SPSS?
 
 - It was faster than SAS at large-scale data crunching.
+  > SAS was actually known for efficiently processing large datasets on limited hardware; raw speed was not S's distinguishing feature.
 - It supported larger datasets than SAS.
+  > Handling large datasets was SAS's strength, not S's; S was designed for interactive exploration, not big-batch processing.
 - [o] It treated data analysis as an *interactive, programmable* activity rather than a batch job.
   > S was designed for interactive use at a terminal, with data as first-class objects and full programmability. This shaped the modern style of "exploratory data analysis as a conversation with the data."
-- It was the first statistical software to use the normal distribution.`}
+- It was the first statistical software to use the normal distribution.
+  > Statistical packages such as SPSS and SAS already used the normal distribution well before S was created in 1976.`}
 />
 
 <MultipleChoice
   markdown={`Where was the S language created?
 
 - Stanford University
+  > SPSS was created at Stanford, not S; S was developed at Bell Labs in New Jersey.
 - North Carolina State University
+  > SAS was created at North Carolina State University; S originated at Bell Labs.
 - [o] Bell Labs
   > S was created at Bell Labs in Murray Hill, New Jersey, by a team led by John Chambers starting around 1976.
-- IBM Research`}
+- IBM Research
+  > IBM Research produced many important computing innovations, but S was not among them; it was a Bell Labs project.`}
 />
 
 <MultipleChoice
   markdown={`Which is the most accurate description of how a SAS analyst in 1985 typically worked?
 
 - Sitting at a terminal, typing one expression at a time and seeing immediate output.
+  > That interactive style was the innovation of S, not the typical SAS workflow; SAS analysts in 1985 wrote and submitted complete batch jobs.
 - [o] Writing a batch script of \`DATA\` and \`PROC\` steps, submitting it, and reading the printed output later.
   > SAS was — and historically still is — primarily a batch language, in which an analyst writes a complete program of steps and submits it as a job.
 - Writing FORTRAN code that called SAS subroutines.
-- Editing data interactively in a spreadsheet-like grid.`}
+  > SAS provided its own high-level \`DATA\`/\`PROC\` language precisely to free analysts from writing FORTRAN; they did not call SAS from FORTRAN.
+- Editing data interactively in a spreadsheet-like grid.
+  > Spreadsheet-style interactive editing came much later with tools like Microsoft Excel; 1985 SAS work was text-based batch scripting.`}
 />
 
 ## A quick code exercise

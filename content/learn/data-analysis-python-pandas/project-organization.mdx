@@ -207,10 +207,13 @@ documentation that *used* to be true.
   markdown={`Why number your notebooks (\`01-load\`, \`02-clean\`, ...)?
 
 - It is required by Jupyter
+  > Jupyter imposes no naming requirements; numbered prefixes are a human convention for clarity.
 - It makes them faster
+  > The filename has no effect on notebook execution speed.
 - [o] It makes the reading and execution order obvious — important when a future reader (or you, in six months) needs to retrace the analysis
   > Folder listings are alphabetical; numbering forces a meaningful order.
 - It saves memory
+  > Notebook filename conventions have no impact on memory usage at runtime.
 
 A tiny convention with disproportionate payoff.`}
 />
@@ -219,10 +222,13 @@ A tiny convention with disproportionate payoff.`}
   markdown={`When should logic move out of a notebook and into a \`.py\` file in \`src/\`?
 
 - Never — notebooks are the deliverable
+  > Notebooks are the exploratory interface, not always the final artifact; reusable logic belongs in importable \`.py\` modules once it needs to be shared or tested.
 - Immediately, always
+  > Moving logic to \`src/\` before it is needed adds overhead without benefit; the promotion makes sense once code is being reused or becomes large.
 - [o] When the same logic is needed in multiple notebooks, or when a cell grows large enough to be its own well-named function
   > Notebooks are for narrative; reusable logic belongs in importable modules.
 - When the cell crashes
+  > A cell crash indicates a bug to fix in place, not a reason to move code to a separate file.
 
 The promotion-when-reused rule is a healthy default.`}
 />
@@ -231,10 +237,13 @@ The promotion-when-reused rule is a healthy default.`}
   markdown={`Why is committing raw data to git generally a bad idea?
 
 - Git cannot handle CSV
+  > Git can track CSV files; the reason to exclude them is size, privacy, and change-frequency concerns, not a technical limitation.
 - It is illegal
+  > Committing data to git is not illegal per se, but it is poor practice for size and confidentiality reasons.
 - [o] Data files are often large, change frequently, and may contain PII or confidential information — git is for code, data belongs in dedicated storage
   > \`.gitignore\` should exclude \`data/\` in most projects.
 - It slows down notebooks
+  > Notebook execution speed is unaffected by whether the raw data file is tracked in git or not.
 
 Code in git; data in storage. A clean separation pays off.`}
 />
@@ -243,10 +252,13 @@ Code in git; data in storage. A clean separation pays off.`}
   markdown={`Which name for a DataFrame is best?
 
 - \`df_FINAL_v3_real\`
+  > Version suffixes like \`FINAL\`, \`v3\`, and \`real\` encode history in a name — that belongs in git commits, not variable names.
 - \`df2\`
+  > Single-letter or numbered names convey no information about the data the variable holds.
 - [o] \`cleaned_orders\` — a descriptive name that says what is in it
   > Names describe *content*, not history. Use git for history.
 - \`final\`
+  > \`final\` is vague and almost always wrong within a week; it says nothing about the data's content or transformation stage.
 
 Good names eliminate whole categories of confusion.`}
 />

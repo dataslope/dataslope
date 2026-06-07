@@ -227,10 +227,13 @@ The skills transfer directly.
   markdown={`Why do experienced analysts use **virtual environments**?
 
 - To make Python run faster
+  > Virtual environments are isolated package directories; they do not affect interpreter speed or CPU performance.
 - To use more memory
+  > Each virtual environment contains its own copy of installed packages, which can use slightly more disk space, but memory usage is not the motivation.
 - [o] To isolate each project's package versions so that incompatible dependencies in different projects do not conflict
   > Without virtual environments, two projects that need different versions of the same package will collide. Environments give each project its own package directory.
 - To prevent code from being copied
+  > Virtual environments have no access-control or copy-protection features; they are purely an isolation mechanism for package versions.
 
 Once you have been bitten by a version conflict, you become a virtual environment evangelist for life.`}
 />
@@ -239,10 +242,13 @@ Once you have been bitten by a version conflict, you become a virtual environmen
   markdown={`What is the role of a \`requirements.txt\` file?
 
 - It contains the data for an analysis
+  > Data lives in files like CSV or Parquet; \`requirements.txt\` is a plain-text list of Python package names and version pins, not data.
 - It lists the columns of a DataFrame
+  > DataFrame columns are part of a dataset loaded at runtime; \`requirements.txt\` is a static project file listing installable packages.
 - [o] It records the package versions a project depends on, so a collaborator can install the same versions and reproduce the environment
   > It is the simplest form of dependency pinning. Anyone with the repo can run \`pip install -r requirements.txt\` and get a matching environment.
 - It is a Pandas configuration file
+  > Pandas configuration is done at runtime via \`pd.options\`; \`requirements.txt\` is a pip dependency file that exists outside of Python entirely.
 
 Lockfiles take this one step further by pinning transitive dependencies too.`}
 />
@@ -251,10 +257,13 @@ Lockfiles take this one step further by pinning transitive dependencies too.`}
   markdown={`What is the **kernel** in a Jupyter notebook?
 
 - A type of cell
+  > Cells are the individual code or Markdown blocks in a notebook; the kernel is the separate Python process that *executes* those code cells.
 - A plot
+  > Plots are outputs produced by cells; the kernel is the underlying Python process responsible for running the code that generates those outputs.
 - [o] The long-running Python process that holds your variables in memory and executes the cells you run
   > Every cell run mutates the kernel's state. Many notebook bugs come from running cells out of order or forgetting to re-run a dependent cell.
 - A configuration file
+  > Configuration files store settings on disk; the kernel is a live Python process in memory that keeps state across all the cells you run.
 
 Restart-and-run-all is a wonderful habit; if your notebook does not run cleanly top to bottom, something is silently broken.`}
 />
@@ -263,10 +272,13 @@ Restart-and-run-all is a wonderful habit; if your notebook does not run cleanly 
   markdown={`Which combination of artifacts gets you closest to a **reproducible** analysis?
 
 - The DataFrame's column names
+  > Column names are part of the data structure, not an artifact that lets someone reproduce an analysis from scratch on a new machine.
 - The kernel's memory dump
+  > A memory dump captures in-memory state but is not portable or reproducible — the next person cannot simply load a memory dump and re-run the analysis.
 - [o] Code in git + data with a stable reference + a pinned environment (\`requirements.txt\` or lockfile)
   > Code, data, and environment together let someone else reproduce your work months or years later.
 - A screenshot of the notebook
+  > A screenshot shows outputs but not the code that produced them, and it cannot be re-run — it is documentation, not a reproducibility artifact.
 
 Forgetting any of the three usually breaks reproducibility in subtle ways.`}
 />

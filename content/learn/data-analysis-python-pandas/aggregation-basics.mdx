@@ -228,10 +228,13 @@ print(df.isna().sum())
   markdown={`If a column has values \`[10, 20, NaN, 40, NaN]\`, what does \`.mean()\` return by default?
 
 - NaN
+  > NaN would only propagate if \`skipna=False\` is passed; the default behavior skips NaN values and computes the mean of the non-null entries.
 - 14.0
+  > 14.0 would result from dividing the sum (70) by the total length (5), but Pandas divides by the count of non-null values (3), giving 23.33.
 - [o] 23.33 (= (10+20+40) / 3)
   > Pandas' aggregations skip NaN by default. Pass \`skipna=False\` to make NaN propagate.
 - 70.0
+  > 70.0 is the sum, not the mean; \`.mean()\` divides by the count, not returns the total.
 
 This default is almost always what you want — but it can hide that some values are missing.`}
 />
@@ -240,10 +243,13 @@ This default is almost always what you want — but it can hide that some values
   markdown={`A salary column has values \`[50, 55, 60, 60, 65, 70, 75, 500]\`. Which statistic is **least** affected by the 500 outlier?
 
 - The mean
+  > The mean is pulled above 100 by the single outlier of 500, making it a poor representation of where most values cluster.
 - The sum
+  > The sum is directly inflated by the 500 outlier and changes significantly whenever an outlier is added or removed.
 - [o] The median
   > Medians are computed by position, not magnitude — they barely move when an extreme value is added.
 - The max
+  > The max is, by definition, the outlier itself (500), so it is maximally affected.
 
 Pair-report mean and median whenever distributions might be skewed.`}
 />
@@ -252,10 +258,13 @@ Pair-report mean and median whenever distributions might be skewed.`}
   markdown={`What does \`s.value_counts(normalize=True)\` produce?
 
 - The counts of unique values
+  > \`value_counts()\` without \`normalize=True\` returns raw counts; adding \`normalize=True\` replaces counts with proportions.
 - A list of unique values
+  > \`s.unique()\` returns a list of distinct values; \`value_counts(normalize=True)\` returns a Series of proportions indexed by those values.
 - [o] The *proportions* (fractions of total) of each unique value
   > \`normalize=True\` divides each count by the total, giving share-of-total — perfect for "what fraction of customers are in each tier" questions.
 - A sorted Series
+  > \`value_counts()\` does sort by frequency by default, but \`normalize=True\` specifically changes the *values* from counts to proportions — the sorting behavior is unchanged.
 
 A small flag that saves a division — well worth knowing.`}
 />

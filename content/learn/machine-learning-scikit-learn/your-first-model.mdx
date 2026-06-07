@@ -600,10 +600,13 @@ assert accuracy > 0.85, f"Expected accuracy above 0.85, got {accuracy}"`,
   markdown={`What are the four moves of the end-to-end workflow, in order?
 
 - Split, load, evaluate, train
+  > The order matters: loading comes first (you need data before you can split), and splitting must happen before training so the test set stays unseen. Evaluating before training is impossible.
 - [o] Load the data, split into train/test, train (fit) on the training set, evaluate (score) on the test set
   > Loading comes first, then the split, then fitting on the training portion, and finally scoring on the held-out portion. Using the model on new inputs comes after this honest evaluation.
 - Train, evaluate, load, split
+  > Training before loading is impossible — you need data first. Additionally, training before splitting means the model would see all the data during training, leaving no honest held-out set for evaluation.
 - Load, train, split, evaluate
+  > Splitting must happen before training. If the model is trained on the full dataset first and split happens afterward, the model has already seen the test data and the evaluation is dishonest.
 
 The split must happen before training so the test set stays unseen.`}
 />
@@ -612,10 +615,13 @@ The split must happen before training so the test set stays unseen.`}
   markdown={`To predict the species of a single new flower with measurements 5.1, 3.5, 1.4, 0.2, what do you pass to \`model.predict(...)\`?
 
 - A flat list: \`[5.1, 3.5, 1.4, 0.2]\`
+  > scikit-learn requires a 2D input shaped \`(n_samples, n_features)\`. A flat list is 1D and will raise a shape error; it must be wrapped in another list to form a 2D array with one row.
 - The four numbers as separate arguments
+  > scikit-learn's \`predict\` method takes a single array-like object, not four separate positional arguments. The four measurements must be packed into a 2D structure with one row.
 - [o] A 2D structure with one row: \`[[5.1, 3.5, 1.4, 0.2]]\`
   > scikit-learn always expects input shaped (n_samples, n_features). A single sample is still one row inside a list, so it must be doubly nested.
 - The training labels \`y_train\` as well
+  > \`predict\` takes only the feature matrix — no labels are needed or accepted. Labels are passed to \`fit\` during training and to \`score\` during evaluation, but never to \`predict\`.
 
 \`predict\` returns one prediction per row, so even one sample is wrapped as a row.`}
 />
@@ -626,8 +632,11 @@ The split must happen before training so the test set stays unseen.`}
 - [o] Accuracy — the fraction of test samples the model labeled correctly
   > For classifiers, \`.score()\` is accuracy: predict every test row, then take the fraction that match the true labels. It is identical to \`(model.predict(X_test) == y_test).mean()\`.
 - The number of training samples used
+  > The number of training samples is a property of the data split, not something \`score\` reports. For a classifier, \`score\` returns the fraction of test samples labeled correctly.
 - The model's internal loss value
+  > Internal loss is used during training optimization and is not what \`score\` exposes. For classifiers, \`score\` returns accuracy on the provided \`X\` and \`y\`.
 - The probability that the model is correct on average
+  > Accuracy (what \`score\` returns for classifiers) is the fraction of examples where the predicted label matches the true label — a ratio over the test set, not a probability estimate per prediction.
 
 For regressors the same method returns R² instead, which is a different quantity.`}
 />
@@ -636,10 +645,13 @@ For regressors the same method returns R² instead, which is a different quantit
   markdown={`You want to try \`KNeighborsClassifier\` instead of \`LogisticRegression\` in your workflow. How much of the load/split/train/evaluate code has to change?
 
 - All of it — each estimator needs a different workflow
+  > The workflow shape (load, split, fit, evaluate) does not change when you swap estimators. Only the constructor line changes; everything else — the split, the \`fit\` call, the \`score\` call — stays the same.
 - The split must be redone with a different \`random_state\`
+  > The same split can be reused with any estimator. The split is independent of the model choice; \`random_state\` only controls reproducibility, not compatibility with a specific algorithm.
 - [o] Essentially one line — the line that constructs the estimator; \`.fit()\`, \`.score()\`, and \`.predict()\` are called the same way
   > Every scikit-learn estimator shares the fit/predict/score interface, so swapping models changes only the constructor line. That uniformity is the point of memorizing the workflow shape.
 - The data must be reloaded in a different format
+  > Different classifiers in scikit-learn accept the same input formats (NumPy arrays or pandas DataFrames). No reloading is needed; the data prepared for one estimator works with any other.
 
 The shared interface is exactly why the workflow is worth internalizing once.`}
 />
@@ -648,10 +660,13 @@ The shared interface is exactly why the workflow is worth internalizing once.`}
   markdown={`A classmate calls \`model.predict(X_test)\` and is confused that they did not have to pass \`y_test\`. What is the right explanation?
 
 - \`predict\` always needs the labels; their code has a bug
+  > \`predict\` does not take labels — it is designed to work on new data where the true labels are unknown. Labels go to \`fit\` (for training) and \`score\` (for evaluation), never to \`predict\`.
 - \`predict\` uses \`y_test\` internally even though it is not written
+  > After training, \`predict\` uses only the model's learned parameters (weights, rules, or stored neighbors) — not the test labels. Passing \`y_test\` to \`predict\` would be circular and is not supported.
 - [o] \`predict\` takes only features and returns the model's guessed labels; you pass \`y\` to \`.fit()\` to learn and to \`.score()\` to grade, but never to \`.predict()\`
   > Prediction is the model applying what it already learned, so it needs only the inputs. The true labels are required to *learn* (fit) and to *grade* (score), not to predict.
 - \`predict\` and \`score\` are the same method
+  > \`predict\` and \`score\` are distinct methods with different signatures and purposes. \`predict(X)\` returns an array of guessed labels; \`score(X, y)\` compares predictions to true labels and returns a single metric.
 
 In production there is no answer key at all — predict must work from features alone.`}
 />

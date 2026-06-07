@@ -460,10 +460,13 @@ if (JSON.stringify(original) !== "[1,2,3,4,5]") throw new Error("original array 
   markdown={`Two variables point to the same array: \`const a = [1, 2, 3]; const b = a;\`. You then call \`b.push(99)\`. What is \`a\`?
 
 - \`[1, 2, 3]\` — \`a\` is independent of \`b\`
+  > \`b = a\` does not copy the array; both variables refer to the same array in memory, so any mutation through \`b\` is immediately visible through \`a\`.
 - [o] \`[1, 2, 3, 99]\` — \`a\` and \`b\` reference the *same* array, so changes through one are visible through the other
   > Arrays (and all objects) in JavaScript are passed by reference. Assigning \`b = a\` makes \`b\` refer to the same array, not a copy. To get a real copy, use \`[...a]\` or \`a.slice()\`.
 - \`undefined\` — pushing through \`b\` clears \`a\`
+  > \`push\` adds an element to the end of the shared array; it does not clear it or produce \`undefined\`.
 - A \`TypeError\` is thrown
+  > \`push\` is a perfectly legal operation on any array; it never throws a \`TypeError\` simply for being called through an alias.
 
 This sharing-by-reference behaviour is the source of many subtle bugs. When you need an independent copy, always make one explicitly.`}
 />

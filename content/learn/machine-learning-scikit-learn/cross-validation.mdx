@@ -304,10 +304,13 @@ assert abs(mean_score - cv_scores.mean()) < 1e-9`,
   markdown={`What is the main problem with evaluating a model on a single train/test split, especially on a small dataset?
 
 - It is slower than cross-validation
+  > A single train/test split is actually faster than cross-validation, which requires training the model k times. Speed is an advantage of single splits, not a problem.
 - It always overestimates accuracy
+  > A single split can go either way — it can be optimistic or pessimistic depending on which rows land in the test set. The problem is that you cannot know which, and there is no error bar to warn you.
 - [o] The score depends on which rows happened to land in the test set, so it is a noisy estimate with no error bar
   > A single split is one roll of the dice; reshuffle and the number moves. Cross-validation averages many splits to stabilize the estimate.
 - It cannot be used with classifiers
+  > A single train/test split works perfectly well with classifiers. The limitation is statistical — high variance due to depending on one particular split — not a compatibility issue.
 
 The weakness is variance in the estimate, not speed or a fixed direction of bias.`}
 />
@@ -316,10 +319,13 @@ The weakness is variance in the estimate, not speed or a fixed direction of bias
   markdown={`In 5-fold cross-validation, how many times is each row used for **testing**?
 
 - Five times
+  > Each row is used for *training* in four of the five rounds, not testing. Testing happens in exactly one round — the one where the row's fold is held out.
 - Zero times
+  > Every row is tested exactly once. The defining property of k-fold cross-validation is that every row participates in a test fold in exactly one of the k rounds.
 - [o] Exactly once — each row sits in the test fold in exactly one of the five rounds
   > Each fold serves as the test set once, so every row is tested a single time and used for training in the other four rounds.
 - It depends on the random seed
+  > The number of times each row is used for testing is always exactly one in k-fold cross-validation, regardless of how the folds were assigned. The seed can affect *which* fold a row lands in, but not *how many* times it is tested.
 
 This is what lets cross-validation use all the data for both training and testing.`}
 />
@@ -328,10 +334,13 @@ This is what lets cross-validation use all the data for both training and testin
   markdown={`Why should preprocessing like \`StandardScaler\` be placed *inside* a \`Pipeline\` that is cross-validated, rather than applied to the whole dataset first?
 
 - It runs faster inside a pipeline
+  > A pipeline does not make preprocessing faster; it adds a small overhead. The reason to use a pipeline is correctness — preventing data leakage — not speed.
 - Pipelines are required by \`cross_val_score\`
+  > \`cross_val_score\` works with any estimator, not just pipelines. Pipelines are recommended to prevent leakage, not because they are technically required.
 - [o] So the scaler is re-fit on each fold's training portion only, preventing information from the test fold leaking into training
   > Scaling on the full dataset lets every test fold influence the statistics, inflating the score. A pipeline re-fits preprocessing per fold, keeping each estimate honest.
 - It changes the number of folds
+  > Wrapping a scaler in a pipeline has no effect on the number of folds used in cross-validation; that is controlled by the \`cv\` parameter passed to \`cross_val_score\`.
 
 The point is leakage prevention: anything that learns from data must be re-fit within each fold.`}
 />
@@ -340,10 +349,13 @@ The point is leakage prevention: anything that learns from data must be re-fit w
   markdown={`After using cross-validation to choose your model and hyperparameters, why keep a separate untouched test set?
 
 - Because cross-validation cannot score classifiers
+  > Cross-validation works with classifiers by default — \`cross_val_score\` even uses stratified folds for them. The reason to keep a test set is to have a final unbiased estimate, not because CV cannot score classifiers.
 - [o] Because selecting the option with the best CV score makes that score slightly optimistic; a final untouched test set gives one clean, unbiased number
   > Picking the winner of a noisy contest favors lucky candidates, so the winning CV score is a bit inflated. The held-out test set reports performance after all choices are locked in.
 - Because the test set trains the final model
+  > The test set is never used for training — it is held out until final evaluation. The final model is trained on all the non-test data, typically after choices are locked in using cross-validation.
 - Because cross-validation uses the test set internally
+  > Cross-validation operates only on the non-test portion of the data. The test set is kept completely separate so it remains an unbiased final checkpoint.
 
 CV is for decision-making with a stable signal; the test set is for the final honest report.`}
 />
@@ -352,10 +364,13 @@ CV is for decision-making with a stable signal; the test set is for the final ho
   markdown={`You are predicting next month's revenue from monthly history. Why is plain k-fold cross-validation inappropriate?
 
 - k-fold cannot be used for regression
+  > k-fold cross-validation works fine with regression tasks, including revenue prediction. The problem here is the temporal ordering of rows, not the regression target.
 - [o] The data is ordered in time; plain k-fold would train on future months to predict past ones, which is impossible in reality — use \`TimeSeriesSplit\`
   > Shuffled folds let the model peek at the future. Time-aware splitting trains on the past and tests on later periods, matching real use.
 - k-fold requires at least 100 folds for time series
+  > There is no minimum fold requirement for time series, and \`TimeSeriesSplit\` typically uses far fewer folds (5 or 10) — the same range as regular k-fold. The issue is ordering, not fold count.
 - Revenue data cannot be cross-validated
+  > Revenue forecasting can absolutely be cross-validated; the key is using \`TimeSeriesSplit\` to respect the temporal order so the model never trains on future data to predict the past.
 
 Match the splitter to the data's structure; temporal data needs time-ordered folds.`}
 />

@@ -216,10 +216,13 @@ table. The bug usually exposes itself by row three.
   markdown={`Which of the following is the **best** description of *decomposition* in computational thinking?
 
 - Removing all comments from a program to make it run faster.
+  > Comments are stripped before compilation and have no effect on runtime speed; removing them is code tidying, not decomposition.
 - Renaming variables so the code is easier to read.
+  > Renaming is refactoring for readability, not breaking a problem into sub-problems.
 - [o] Breaking a large problem into smaller, more manageable sub-problems.
   > Decomposition is exactly this: chopping a big, fuzzy goal into small concrete steps that you can solve and combine.
 - Writing the same code in multiple languages to compare them.
+  > Translating between languages is a portability exercise, not a problem-solving technique.
 
 Decomposition is the first habit of computational thinking, because *you cannot tell a computer how to do something until you have first told yourself how to do it*.`}
 />
@@ -237,7 +240,9 @@ print total
 What does this algorithm compute?
 
 - The largest number in the list.
+  > Finding the maximum requires keeping track of the best value seen so far and updating it; this algorithm only adds every value to \`total\`.
 - The number of items in the list.
+  > Counting items requires incrementing a counter by 1 each iteration, not by \`n\`.
 - [o] The sum of all numbers in the list.
   > The variable \`total\` starts at zero and accumulates each value it sees.
 - The average of the numbers in the list.

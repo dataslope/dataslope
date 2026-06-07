@@ -207,30 +207,42 @@ par(mfrow = c(1, 1))
   markdown={`A histogram of a column shows a long tail extending to the right of the bulk of the data. This distribution is:
 
 - left-skewed
+  > A left-skewed distribution has its long tail pointing to the left (toward smaller values), not the right.
 - [o] right-skewed
   > "Right-skewed" means the tail extends to the right (toward larger values). It is the most common shape for natural data like income or transaction sizes.
 - bimodal
-- symmetric`}
+  > Bimodal means two peaks, not a single tail — this histogram has one dominant cluster with a tail, not two separate humps.
+- symmetric
+  > A symmetric distribution has roughly equal bulk on both sides of the center; a long right tail rules that out.
+`}
 />
 
 <MultipleChoice
   markdown={`In a boxplot, the "box" itself represents:
 
 - The mean ± one standard deviation.
+  > The mean ± one SD is a common summary but is not what a boxplot's box represents; the box is defined by quartiles, not the mean.
 - [o] The middle 50% of the data, from Q1 (25th percentile) to Q3 (75th percentile).
   > The line inside is the median; the box edges are the quartiles.
 - The full range of the data.
-- The confidence interval of the mean.`}
+  > The full range (minimum to maximum) is shown by the whiskers and outlier dots, not by the box itself.
+- The confidence interval of the mean.
+  > A confidence interval is an inferential construct requiring an assumption about the population; the boxplot's box is simply a descriptive display of quartiles.
+`}
 />
 
 <MultipleChoice
   markdown={`Why are boxplots especially useful when comparing several groups?
 
 - They have the fewest pixels.
+  > Pixel count is not a meaningful criterion for choosing a plot; compactness of statistical information is what matters.
 - [o] They compress each group's full distribution into a small, standardized picture that lines up nicely side-by-side.
   > That makes shifts in center, spread, and outliers easy to spot across many groups at once.
 - They show every individual data point.
-- They are the only plot that handles NAs.`}
+  > Showing every point is the job of a strip chart or jittered dot plot; a boxplot summarizes the distribution rather than displaying raw values.
+- They are the only plot that handles NAs.
+  > All standard R plots skip NAs by default; handling missing values is not unique to boxplots.
+`}
 />
 
 ## Mini challenge: visualize a skewed column

@@ -313,10 +313,13 @@ assert len(departments) == 3, f"Expected 3 departments, got {len(departments)}"`
   markdown={`Why does the chapter recommend running \`df.describe()\` before any "real" analysis?
 
 - To make the dataset look bigger
+  > \`df.describe()\` summarizes statistics; it does not change the number of rows in the dataset.
 - [o] Because it gives a quick read on ranges, central tendency, and spread — and surfaces obviously wrong values (negative ages, impossible maxes) early
   > A 30-second \`describe\` regularly catches data bugs that would otherwise hide for hours.
 - It is required by Pandas
+  > \`df.describe()\` is a recommended habit, not a mandatory Pandas step; code runs without it.
 - It removes missing values
+  > \`df.describe()\` skips NaN values when computing statistics but does not drop them from the DataFrame.
 
 Cheap eyeball checks at the front of an analysis prevent expensive corrections later.`}
 />
@@ -325,10 +328,13 @@ Cheap eyeball checks at the front of an analysis prevent expensive corrections l
   markdown={`In the missing-value step, why is the **pattern** of missingness as important as the count?
 
 - It is not
+  > The chapter explicitly argues the pattern is important; structural or concentrated missingness calls for different remedies than random missingness.
 - [o] Because random missingness can often be ignored or imputed, structural missingness reveals something about the dataset's grain, and concentrated missingness flags bad rows — each pattern suggests a different fix
   > Treating all NaNs the same way is a common rookie mistake. Look at *where* they cluster before deciding how to handle them.
 - It changes how Pandas computes means
+  > Pandas skips NaN values in aggregations regardless of whether they are random or structural; the pattern affects *your* analytical decisions, not Pandas's arithmetic.
 - Pandas requires you to look at the pattern
+  > Pandas does not enforce any particular NaN-pattern inspection; the recommendation comes from analytical best practice, not from the library.
 
 Same headline count of NaNs can mean very different things depending on distribution.`}
 />
@@ -337,10 +343,13 @@ Same headline count of NaNs can mean very different things depending on distribu
   markdown={`A column with 1,470 rows shows 1,470 unique values when you call \`.value_counts()\`. What is it most likely to be?
 
 - A categorical variable
+  > A categorical column has a small, repeating set of values, not a unique value for every row.
 - A boolean column
+  > A boolean column has at most two distinct values (\`True\`/\`False\`), not 1,470 unique ones.
 - [o] An identifier column (like an employee ID or name) — every row has a different value, so it is unique per row
   > Such columns are useful as keys (for joins) but not for grouping or counting.
 - A date column
+  > A date column can have many unique values, but 1,470 unique values in 1,470 rows more strongly signals an identifier column than a date series, which typically has fewer distinct values.
 
 Recognizing "this is an ID, not a category" early stops you from making meaningless \`groupby("name")\` calls.`}
 />
@@ -349,10 +358,13 @@ Recognizing "this is an ID, not a category" early stops you from making meaningl
   markdown={`Which of these is the chapter's recommended habit *after* completing the five-minute ritual?
 
 - Delete the dataset
+  > Deleting the dataset would destroy the raw input that all subsequent analysis depends on; the chapter advises keeping the raw data sacred.
 - Switch to Excel
+  > The chapter's recommended post-ritual habit is documentation, not a tool switch.
 - [o] Write a short Markdown note summarizing what you learned (rows, grain, missingness, surprises) so you and others can find it later
   > A few sentences of plain-English summary are the highest-leverage documentation you can produce.
 - Run all the visualizations
+  > Jumping straight to visualizations skips the documentation step the chapter recommends; a prose summary is more reusable and searchable than a batch of charts.
 
 Compact prose summaries pay massive dividends in real projects.`}
 />

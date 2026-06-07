@@ -146,6 +146,7 @@ when statistics was a craft practiced with paper and ink.
   markdown={`Which of the following best describes how the **bottleneck** in data analysis has shifted over the past 50 years?
 
 - The bottleneck has stayed the same: people still mostly run out of data.
+  > Data scarcity was the bottleneck for most of history, but the text describes how the world has shifted from data-scarce to data-abundant, making *understanding* the new limiting factor.
 - [o] The bottleneck has shifted from *collecting* data to *understanding* it.
   > For most of history, gathering data was the hard part. Today, data is generated in huge volumes automatically; the challenge is interpreting it, separating signal from noise, and making decisions that are not fooled by spurious patterns.
 - The bottleneck is now purely hardware — we need faster computers.
@@ -158,18 +159,24 @@ when statistics was a craft practiced with paper and ink.
   markdown={`Why does *spurious patterns* become a more dangerous problem as datasets grow larger?
 
 - Computers introduce rounding errors at scale.
+  > Floating-point rounding errors are a real concern in numerical computing but are not the primary reason large datasets produce spurious patterns; multiple-comparison inflation is.
 - Large datasets are always biased.
+  > Bias is a potential problem with large datasets, but it is a separate issue from spurious patterns; here the concern is false positives due to testing many hypotheses.
 - [o] When you test many hypotheses against a large dataset, some will look "statistically interesting" purely by chance.
   > This is sometimes called the *multiple comparisons problem* — and it is one of the main reasons data analysts need disciplined statistical tools, not just spreadsheets.
-- Larger datasets cannot be visualized.`}
+- Larger datasets cannot be visualized.
+  > Large datasets can absolutely be visualized (with sampling, aggregation, or appropriate tools); the spurious-patterns problem is a statistical phenomenon, not a visualization limitation.`}
 />
 
 <MultipleChoice
   markdown={`Which of these is **not** primarily a consequence of the explosion in data over the past few decades?
 
 - The need for reproducible, scripted analyses
+  > The explosion of data made reproducibility more critical, not less; large, complex workflows that cannot be rerun are a direct consequence of the data boom.
 - The risk of finding patterns that are not really there
+  > Spurious patterns are an established consequence of large-scale data exploration; testing many hypotheses on big datasets inflates false-discovery rates.
 - The shift from hand calculation to programmatic analysis
+  > Programmatic analysis emerged directly from the need to process data volumes too large for manual methods; it is a well-documented consequence of the data explosion.
 - [o] The disappearance of the need to understand basic arithmetic
   > Basic arithmetic is *more* important than ever, because you need to sanity-check what the computer is doing. Tools amplify both correct and incorrect reasoning.`}
 />

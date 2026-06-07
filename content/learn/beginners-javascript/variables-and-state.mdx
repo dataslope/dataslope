@@ -359,10 +359,13 @@ console.log({ balance, deposits, withdrawals });
   markdown={`Which of the following best describes the recommended way to declare variables in modern JavaScript?
 
 - Always use \`var\` for backwards compatibility
+  > \`var\` is function-scoped (not block-scoped) and is hoisted in a way that can cause surprising bugs; \`let\` and \`const\` were introduced precisely to replace it, and all modern code should use them instead.
 - Use \`let\` for everything to keep things flexible
+  > Using \`let\` everywhere hides intent: a reader can't tell which bindings are expected to change. \`const\` communicates "this won't be reassigned" and catches accidental reassignments at compile time.
 - [o] Use \`const\` by default; switch to \`let\` only when you actually need to reassign; avoid \`var\`
   > \`const\` documents that the binding won't change, which makes code easier to read and reason about. \`let\` is reserved for the cases where you really do reassign. \`var\` is kept only for legacy reasons.
 - Use \`const\` for primitives and \`let\` for objects
+  > The primitive-vs-object distinction is the wrong criterion; the right question is whether you intend to reassign the variable. \`const\` works perfectly for objects and arrays — it just prevents rebinding the variable to a different object, not mutating the object itself.
 
 The right rule has nothing to do with the value's type — it's about whether you intend to reassign the variable.`}
 />

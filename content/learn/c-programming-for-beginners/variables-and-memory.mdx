@@ -286,10 +286,13 @@ int main(void) {
   markdown={`Which statement best describes a variable in C?
 
 - A keyword reserved by the compiler.
+  > Keywords like \`int\`, \`if\`, and \`return\` are reserved words with special meaning; they are not variables. A variable is a programmer-defined name for a memory location.
 - An object that grows and shrinks automatically based on the value assigned to it.
+  > In C, a variable's size is fixed by its type at declaration time. A variable does not resize when you assign a larger or smaller value to it.
 - [o] A name bound to a fixed-size region of memory whose contents can be read or written.
   > In C, variable size is fixed at declaration based on its type. The variable is essentially a labelled box at a specific address.
 - A function that always returns the most recent value passed to it.
+  > A variable holds a stored value that can be read or written; it does not execute code or accept arguments the way a function does.
 
 C is a *statically typed* language: the size and layout of a variable are decided when you write \`int x;\`, not at runtime.`}
 />
@@ -304,10 +307,13 @@ printf("%d\\n", y);
 \`\`\`
 
 - Nothing — \`y\` will always be \`1\`.
+  > \`x\` is uninitialized, so its value is indeterminate; \`x + 1\` could produce any number, not reliably \`1\`.
 - The compiler will refuse to build it.
+  > Most compilers will issue a warning about an uninitialized read but will still compile the code; the resulting program has undefined behavior at runtime.
 - [o] \`x\` is uninitialized, so reading it is undefined behavior; \`y\` could be anything.
   > The compiler reserves memory for \`x\` but doesn't zero it out. Whatever bits happened to be there become its value.
 - \`y\` cannot be initialized from another variable.
+  > C allows initializing a variable from any expression, including another variable. The bug here is that \`x\` is uninitialized, not that \`y\` is initialized from \`x\`.
 
 Always initialize your variables. Modern compilers will often emit a warning for uninitialized reads — turn warnings on and pay attention to them.`}
 />

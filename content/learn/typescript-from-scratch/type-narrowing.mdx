@@ -531,10 +531,13 @@ if (result !== 25) throw new Error("Expected 25, got " + result);
   markdown={`Which of the following checks will narrow \`value: string | number\` to \`string\`?
 
 - \`if (value) { ... }\`
+  > A truthiness check eliminates falsy values such as \`0\`, \`""\`, \`null\`, and \`undefined\`, but it does not distinguish \`string\` from \`number\`; both types have truthy values.
 - [o] \`if (typeof value === "string") { ... }\`
   > The \`typeof\` guard narrows to \`string\` in the \`if\` branch.
 - \`if (value instanceof String) { ... }\`
+  > \`instanceof String\` checks for the String wrapper object, not the primitive \`string\` type; primitive strings are never instances of \`String\`.
 - \`if ("length" in value) { ... }\`
+  > Both \`string\` and \`number\` values do not support the \`in\` operator in this context, and even if they did, both strings and arrays have \`length\`, so this would not narrow to just \`string\`.
 
 \`typeof\` is the standard way to narrow primitive types. The \`instanceof\` check works for classes, and \`in\` works for object properties, but neither is appropriate here.`}
 />
@@ -543,10 +546,13 @@ if (result !== 25) throw new Error("Expected 25, got " + result);
   markdown={`What does a type predicate like \`function isString(x: unknown): x is string\` do?
 
 - It converts \`x\` to a string at runtime
+  > Type predicates are a compile-time construct only; they do not generate any runtime coercion code.
 - [o] It tells the compiler that \`x\` is a \`string\` if the function returns \`true\`
   > Type predicates enable custom narrowing logic.
 - It asserts that \`x\` is always a string
+  > A type predicate does not unconditionally assert the type; it narrows the type only in the branch where the function returned \`true\`.
 - It's a syntax error
+  > \`x is string\` is valid TypeScript syntax for a type predicate return type; it compiles without error.
 
 Type predicates let you encapsulate complex checks in reusable functions and still get narrowing.`}
 />

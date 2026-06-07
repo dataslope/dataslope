@@ -262,10 +262,13 @@ assert first_ten.shape == (10, 35)`,
   markdown={`Which of these selects the *single column* \`age\` from \`df\`?
 
 - \`df.age\` (attribute access — works but discouraged)
+  > Attribute access returns a Series but breaks for column names containing spaces, dots, or names that clash with DataFrame methods like \`count\` or \`sum\`.
 - \`df[["age"]]\` (returns a DataFrame)
+  > Double brackets select one or more columns and always return a DataFrame, not a Series — even when only one column name is given.
 - [o] \`df["age"]\` (returns a Series)
   > Single bracket → single column → Series.
 - \`df.loc[:, "age":"age"]\` (a label slice)
+  > A label-slice from \`"age"\` to \`"age"\` returns a one-column DataFrame (not a Series), and the syntax is more verbose than a simple single-bracket selection.
 
 The first option *works* but breaks for columns with spaces, dots, or names matching methods — prefer brackets.`}
 />
@@ -274,10 +277,13 @@ The first option *works* but breaks for columns with spaces, dots, or names matc
   markdown={`In Pandas, \`df.loc["Aiko":"Chen"]\` versus \`df.iloc[0:3]\` — what is the key difference?
 
 - \`loc\` is faster
+  > The performance difference between the two is negligible for typical analytical use; the meaningful distinction is inclusive vs exclusive endpoint behavior.
 - They are identical
+  > \`df.loc["Aiko":"Chen"]\` includes Chen (inclusive end), while \`df.iloc[0:3]\` excludes the row at position 3 (exclusive end) — the same rows only if the label order and positions happen to coincide.
 - [o] \`loc\` slicing is *inclusive* of both endpoints, while \`iloc\` (like normal Python) is *exclusive* of the end
   > This often-surprising difference is one of the most common bugs in label-based slicing.
 - \`iloc\` accepts strings
+  > \`iloc\` is position-based and requires integer selectors; passing a string to \`iloc\` raises a \`TypeError\`.
 
 Memorize: label-slice is inclusive; position-slice is exclusive.`}
 />
@@ -286,10 +292,13 @@ Memorize: label-slice is inclusive; position-slice is exclusive.`}
   markdown={`Reading \`df.loc[df["status"] == "active", ["id", "rev"]]\` out loud, what does it return?
 
 - An error
+  > This is valid Pandas syntax; passing a boolean mask as the row selector and a list of column names as the column selector is exactly how \`loc\` is designed to be used.
 - All rows of df
+  > The boolean mask \`df["status"] == "active"\` selects only rows where the condition is True — not all rows.
 - [o] The rows of df where status equals "active", keeping only the columns id and rev
   > This is the canonical "filter rows AND project columns" pattern.
 - The first row
+  > \`loc\` with a boolean mask returns all rows where the mask is True, not just the first match; use \`.iloc[0]\` if you want only the first result.
 
 This pattern shows up many times per day in real analyst code.`}
 />

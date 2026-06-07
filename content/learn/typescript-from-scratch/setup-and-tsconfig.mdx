@@ -465,10 +465,13 @@ In the next section, we'll dive into the **core type system**: primitives, objec
   markdown={`Which \`tsconfig.json\` option is most important for catching null and undefined errors?
 
 - \`noImplicitAny\`
+  > \`noImplicitAny\` prevents untyped variables but does not specifically address \`null\` or \`undefined\`; those require \`strictNullChecks\`.
 - \`esModuleInterop\`
+  > \`esModuleInterop\` improves CommonJS/ES module import syntax but has no effect on \`null\` or \`undefined\` handling.
 - [o] \`strictNullChecks\` (enabled by \`strict: true\`)
   > \`strictNullChecks\` makes \`null\` and \`undefined\` separate types, so you must explicitly handle them. This eliminates the most common source of runtime errors in JavaScript: \`Cannot read property 'x' of null/undefined\`. It's enabled by \`"strict": true\`.
 - \`skipLibCheck\`
+  > \`skipLibCheck\` skips type-checking of declaration files in \`node_modules\` to speed up compilation; it has no effect on how \`null\` and \`undefined\` are handled in your own code.
 
 While \`noImplicitAny\` prevents untyped variables and \`esModuleInterop\` improves module syntax, \`strictNullChecks\` directly prevents the "billion-dollar mistake" of null-pointer dereferences.`}
 />

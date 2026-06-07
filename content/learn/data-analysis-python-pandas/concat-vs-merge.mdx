@@ -153,10 +153,13 @@ indexes first or use `merge` with an explicit key.
   markdown={`You have twelve CSV files, one per month, each with the same columns. What's the right tool to combine them into one DataFrame?
 
 - merge
+  > Merge joins tables by matching a key column; stacking twelve files with identical columns needs \`concat\`, not a key-based join.
 - [o] concat with \`axis=0\` (stack rows) and \`ignore_index=True\`
   > Same shape, no key — stacking is the right operation.
 - pivot
+  > Pivot reshapes an existing table from long to wide form; it does not combine separate files.
 - join
+  > \`DataFrame.join\` is an index-based merge operation; it requires a matching index, not a simple stack of rows with the same shape.
 
 This is the canonical concat use case.`}
 />
@@ -165,10 +168,13 @@ This is the canonical concat use case.`}
   markdown={`You have an \`orders\` table with a \`customer_id\` column, and a separate \`customers\` table you want to look up the customer's name from. Which is correct?
 
 - concat axis=0
+  > \`concat\` axis=0 stacks rows from tables with the same columns; it cannot look up a name from a separate table by matching an ID column.
 - concat axis=1
+  > \`concat\` axis=1 joins by position, not by key — if the two tables are in different orders, rows would be silently mismatched.
 - [o] \`orders.merge(customers, on="customer_id")\`
   > Merge matches rows by the shared key — exactly what's needed for lookups.
 - groupby
+  > \`groupby\` aggregates rows within a single table; it cannot bring columns from a separate lookup table.
 
 Whenever a *key* relates the two tables, merge.`}
 />
@@ -177,10 +183,13 @@ Whenever a *key* relates the two tables, merge.`}
   markdown={`Why is horizontal \`pd.concat([a, b], axis=1)\` considered risky?
 
 - It is slow
+  > Horizontal \`concat\` is not meaningfully slower than merge for typical datasets; the concern is correctness, not performance.
 - It does not work with strings
+  > String columns are fully supported by \`concat\`; the risk is incorrect row pairing, not a type restriction.
 - [o] It pairs rows by index/position rather than by a key — easy to silently mis-align rows if the two frames are in different orders
   > Even if it works today, a future sort or reset on one frame breaks the pairing. Use merge when you have an ID.
 - It is deprecated
+  > Horizontal \`pd.concat\` is not deprecated; it is a supported operation with a well-understood (but potentially dangerous) alignment behavior.
 
 Position-based joins are dangerous in any data tool, not just Pandas.`}
 />

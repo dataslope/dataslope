@@ -501,8 +501,11 @@ assert abs(pred_at_1_5 - expected) < 1e-6, f"Expected {expected}, got {pred_at_1
 - [o] It minimizes the total **squared** vertical distance from the points to the line (least squares)
   > The fitted line is the one whose summed squared residuals are smallest. Squaring removes the sign and penalizes large misses heavily.
 - It connects the first and last data points
+  > Connecting the first and last points is an arbitrary geometric rule that minimizes nothing in particular. The least-squares line is determined by all data points together, minimizing the total squared residuals.
 - It passes through as many points as possible
+  > Maximizing the number of exact hits is a different criterion — it would produce a line that is heavily influenced by coincidences in the data. Least squares minimizes the total squared vertical distance for all points.
 - It maximizes the correlation between two features
+  > Linear regression predicts a target from features; it does not maximize correlation between two input features. Maximizing correlation is not the criterion; minimizing squared prediction error is.
 
 "Least squares" names exactly this: the smallest sum of squared residuals.`}
 />
@@ -511,10 +514,13 @@ assert abs(pred_at_1_5 - expected) < 1e-6, f"Expected {expected}, got {pred_at_1
   markdown={`A linear regression on house data has a coefficient of 80 on \`square_feet\` (target in dollars). What does that 80 mean?
 
 - The model is 80% accurate
+  > Coefficients do not represent accuracy percentages. A coefficient of 80 on \`square_feet\` means each additional square foot changes the predicted price by about $80, not that the model is 80% correct.
 - 80 houses were used to train the model
+  > The number of training samples is not encoded in any coefficient. Coefficients represent the per-unit effect of each feature on the prediction, not a count of training examples.
 - [o] Each additional square foot adds about $80 to the predicted price, holding the other features fixed
   > A coefficient is the change in the prediction per one-unit increase in that feature, with the other features held constant. It is the "price per unit" of the feature.
 - The intercept of the line is 80
+  > The intercept is stored in \`model.intercept_\`, not in the feature coefficients. A coefficient of 80 on \`square_feet\` is a slope: the predicted change in price per one-unit increase in that feature.
 
 The slope/coefficient is a per-unit effect, which is what makes the model interpretable.`}
 />
@@ -523,10 +529,13 @@ The slope/coefficient is a per-unit effect, which is what makes the model interp
   markdown={`You fit \`LinearRegression\` to data whose scatter plot is clearly U-shaped, and R² is very low. What is the most likely situation?
 
 - Your code has a bug; linear regression always fits well
+  > Linear regression can fit poorly when the relationship is not approximately linear. A low R² on genuinely curved data is the model correctly reporting that a straight line is a poor fit, not a sign of a coding error.
 - The test set is too small to compute R²
+  > R² can be computed on any size dataset. The issue here is not the size of the test set but the mismatch between the assumed linear relationship and the actual curved one.
 - [o] A straight line cannot capture a curved relationship, so the model is the wrong shape — you need transformed features or a more flexible model
   > Linear regression assumes a roughly straight, additive relationship. On genuinely curved data it is biased everywhere, and a low R² is the model honestly reporting that mismatch.
 - R² cannot be computed for nonlinear data
+  > R² can always be computed from any set of actual and predicted values; there is no restriction about the data's shape. A low or negative R² is the result, not an error in the calculation.
 
 The remedy is a better-matched model or engineered features, not more fiddling with the same fit.`}
 />
@@ -535,10 +544,13 @@ The remedy is a better-matched model or engineered features, not more fiddling w
   markdown={`With multiple features, how does linear regression form a single prediction?
 
 - It picks the one most important feature and ignores the rest
+  > Linear regression uses all provided features, weighting each one by its learned coefficient. Selecting only one feature would be a different, simpler model (univariate regression).
 - [o] It computes a weighted sum of the features plus the intercept: \`intercept + w1*x1 + w2*x2 + ...\`
   > "Linear" means the prediction is a straight, additive combination of the inputs. Each feature contributes its value times its coefficient, and the intercept is added on.
 - It averages the values of all the features
+  > Averaging features ignores their relative importance and does not use learned coefficients. Linear regression multiplies each feature by its fitted coefficient and sums the results, rather than taking a simple average.
 - It multiplies all the features together
+  > Multiplying features together would create interactions, which is not what standard linear regression does. The model adds weighted features; products of features would need to be added explicitly as engineered terms.
 
 The additive weighted-sum form is exactly what the word "linear" refers to.`}
 />
@@ -547,8 +559,11 @@ The additive weighted-sum form is exactly what the word "linear" refers to.`}
   markdown={`Why can squared error make linear regression sensitive to outliers?
 
 - Outliers are always removed before fitting
+  > Outlier removal is an optional preprocessing step, not something linear regression performs automatically. When outliers are not removed, the squared-error criterion gives them disproportionate influence on the fitted line.
 - Squaring makes all errors equal to one
+  > Squaring does not normalize errors to one — it amplifies them. A residual of 2 becomes 4, a residual of 10 becomes 100. Squaring makes large errors contribute proportionally more, not equally.
 - Linear regression ignores points that are far from the line
+  > Linear regression does the opposite: squared error gives far-away points extra influence. Robust regression methods exist precisely to reduce the impact of outliers, but standard least squares does not.
 - [o] Squaring a large residual produces a very large penalty, so a single far-off point can pull the whole line toward itself
   > Because the penalty grows with the square of the miss, one extreme point contributes disproportionately to the total error, dragging the fitted line in its direction.
 

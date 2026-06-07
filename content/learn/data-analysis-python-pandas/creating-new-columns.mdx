@@ -271,10 +271,13 @@ print("At-risk fraction:", df["AtRisk"].mean().round(3))
   markdown={`What is the difference between \`df["x"] = ...\` and \`df.assign(x=...)\`?
 
 - Nothing
+  > The two differ in whether the original DataFrame is mutated: direct assignment modifies \`df\` in place, while \`.assign\` returns a new DataFrame leaving the original unchanged.
 - The first is faster
+  > Performance is similar for small DataFrames; the meaningful difference is mutability, not speed.
 - [o] Direct assignment modifies \`df\` in place; \`.assign\` returns a *new* DataFrame and leaves the original untouched
   > \`.assign\` is the immutable alternative and chains nicely in pipelines.
 - \`.assign\` is a method on Series
+  > \`.assign\` is a DataFrame method; Series has no \`assign\` method.
 
 Choose based on whether you want to preserve the original DataFrame.`}
 />
@@ -283,10 +286,13 @@ Choose based on whether you want to preserve the original DataFrame.`}
   markdown={`When would you reach for \`np.select\` instead of \`np.where\`?
 
 - When you want to filter
+  > Filtering rows uses boolean masks and \`.loc\`; neither \`np.where\` nor \`np.select\` filters a DataFrame.
 - When you want to drop columns
+  > Dropping columns uses \`df.drop(columns=...)\`; this is unrelated to \`np.where\` or \`np.select\`.
 - [o] When you need to assign one of *more than two* values depending on multiple conditions
   > \`np.where\` is binary (if/else). \`np.select\` extends to many branches without nesting.
 - When you want to sort
+  > Sorting uses \`df.sort_values\`; the choice between \`np.where\` and \`np.select\` is about how many conditional branches you need.
 
 For grade letters, salary bands, customer tiers, etc., \`np.select\` keeps the logic readable.`}
 />
@@ -295,10 +301,13 @@ For grade letters, salary bands, customer tiers, etc., \`np.select\` keeps the l
   markdown={`\`df["currency"].map({"USD": 1.00, "EUR": 1.08})\` returns NaN for rows whose currency is "GBP". Why?
 
 - Pandas does not support strings in maps
+  > \`.map\` works perfectly with string keys in a dictionary; the issue is that "GBP" is simply absent from the dict, not that strings are unsupported.
 - The map is corrupted
+  > The dictionary is intact and correctly maps USD and EUR; NaN is returned specifically for values not found in the dict, which is the defined behavior.
 - [o] \`.map\` returns NaN for any value not found in the mapping dict; "GBP" is missing so the result is NaN
   > You can supply a default with \`.map(dict).fillna(...)\` or by using \`.replace\` instead.
 - The dict is read-only
+  > Python dictionaries passed to \`.map\` are used for lookup only and are never modified; read-only access is not the cause of NaN results.
 
 Always confirm your mapping is exhaustive (or explicitly handle the misses).`}
 />

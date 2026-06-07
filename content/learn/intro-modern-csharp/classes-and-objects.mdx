@@ -356,6 +356,7 @@ Console.WriteLine($"perimeter={r.Perimeter()}");
 - It destroys the object when it's no longer needed
   > That's the GC's job (and, conceptually, a finalizer).
 - [o] It runs once when the object is created, typically to initialize the object's data into a valid state
+  > It runs automatically as part of \`new\`, giving the object a chance to set up its fields before any other code uses it.
 - It runs every time a method on the object is called
   > It runs only at creation time.
 - It is required to return a value

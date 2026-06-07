@@ -494,10 +494,13 @@ if (!threw) throw new Error("must throw for negative amount");`,
   markdown={`What's the main reason to keep a module's public surface (its exports) as small as possible?
 
 - Smaller exports make the program run faster
+  > The size of a module's public API has no bearing on runtime performance; tree-shaking in bundlers can eliminate unused exports, but keeping exports small is a design concern, not a speed concern.
 - Files with fewer exports use less memory
+  > Memory usage is determined by the code and data that actually runs, not by how many names are exported; exports are essentially just references and have negligible memory cost.
 - [o] Anything you export becomes a commitment — callers can rely on it, so the more you expose, the less freedom you have to change the internals later
   > Module exports define a *contract*. Once other code starts using \`pad\` or \`SYMBOLS\`, renaming or removing them risks breaking callers. Keeping internals private leaves you free to refactor without breaking anyone, which is one of the biggest long-term wins of good modular design.
 - Smaller exports look nicer in editors
+  > Editor presentation is a minor aesthetic point; the real reason to minimise exports is the engineering principle of information hiding and the freedom it gives you to change internal implementation later.
 
 Modules are about *information hiding*. The less you expose, the easier the code is to evolve.`}
 />
