@@ -135,10 +135,13 @@ That solution was **TypeScript**. And its story begins at Microsoft, with a lang
   markdown={`Why did JavaScript's maintainability problems worsen as codebases grew larger?
 
 - JavaScript became slower over time
+  > JavaScript's runtime performance actually improved dramatically over this period as V8 and other engines advanced; the problem was correctness and tooling, not speed.
 - [o] The lack of static type checking made it hard to catch errors across many modules
   > In large codebases, typos, refactoring mistakes, and type mismatches that JavaScript can't catch at compile time lead to runtime bugs. The bigger the project, the harder it is to track these issues manually.
 - Browsers stopped supporting older JavaScript features
+  > Browsers continued to support legacy JavaScript features; the problem was JavaScript's inherent lack of type safety, not changing browser compatibility.
 - JavaScript doesn't support asynchronous programming
+  > JavaScript has supported asynchronous programming through callbacks, Promises, and async/await; asynchrony was not the source of the maintainability crisis described here.
 
 As projects scale from 1,000 to 100,000+ lines of code, the inability to verify types, function signatures, and property names *before* running the code becomes a major source of bugs and fragility.`}
 />
