@@ -23,7 +23,47 @@ and runs it through four steps to produce an executable (`a.out` /
    executable.
 
 Each step produces a real artifact you can sometimes inspect. Each
-step has its own kind of error message. Let's walk through them.
+step has its own kind of error message. Follow the artifact as it
+changes form at each stage:
+
+<Steps>
+<Step>
+
+**Preprocess** → `your.cpp.i`
+
+Expand every `#include`, `#define`, and `#ifdef` by pure text
+substitution. Out comes one self-contained *translation unit* — often
+tens of thousands of lines of C++.
+
+</Step>
+<Step>
+
+**Compile** → `your.s`
+
+Parse, type-check, optimize, and emit **assembly** for your target
+CPU. This is the stage where almost every *type error* is caught.
+
+</Step>
+<Step>
+
+**Assemble** → `your.o`
+
+Translate the assembly text into binary **machine code**, packaged as
+an *object file* of bytes plus symbol tables. Not runnable on its own.
+
+</Step>
+<Step>
+
+**Link** → `a.out` / `.exe`
+
+Glue the object files and libraries together, matching every symbol a
+file *needs* to one another file *defines*. The result is a single
+runnable executable.
+
+</Step>
+</Steps>
+
+Now let's walk through each stage in turn.
 
 ## Step 1: the preprocessor
 

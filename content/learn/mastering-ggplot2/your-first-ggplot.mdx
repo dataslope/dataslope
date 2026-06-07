@@ -161,6 +161,46 @@ Shared mappings go in \`ggplot()\`; layer-specific mappings go in that
 layer's \`aes()\`. This control is central to building multi-layer plots.`}
 />
 
+## How the plot grew
+
+Look back at what just happened: you built a complete, colored,
+multi-layer figure by adding one component at a time. Each step left
+the previous ones untouched and simply added the next.
+
+<Steps>
+<Step>
+
+**Start with data + mappings**
+
+`ggplot(mpg, aes(x = displ, y = hwy))` draws the axes and scales from the
+data — but no marks yet.
+
+</Step>
+<Step>
+
+**Add a geometry**
+
+`+ geom_point()` draws one point per row. Now it is a real scatter plot.
+
+</Step>
+<Step>
+
+**Map another variable**
+
+`color = drv` inside `aes()` colors the points by drivetrain and adds a
+legend for free.
+
+</Step>
+<Step>
+
+**Stack a second layer**
+
+`+ geom_smooth()` lays a trend line on top, sharing the same data and
+mappings declared once in `ggplot()`.
+
+</Step>
+</Steps>
+
 ## Key takeaways
 
 - The ggplot skeleton is `ggplot(data, aes(...)) + geom_*()`.

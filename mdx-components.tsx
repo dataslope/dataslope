@@ -11,6 +11,7 @@
  * ```
  */
 import defaultMdxComponents from "fumadocs-ui/mdx";
+import { Step, Steps } from "fumadocs-ui/components/steps";
 import type { MDXComponents } from "mdx/types";
 import MdxCodeBlock from "@/app/_components/MdxCodeBlock";
 import MdxChallengeCard from "@/app/_components/MdxChallengeCard";
@@ -28,6 +29,11 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     SqlCodeBlock: MdxSqlCodeBlock,
     MultipleChoice: MdxMultipleChoiceQuestion,
     Mermaid,
+    // Fumadocs Steps/Step — a numbered vertical walkthrough. Registered
+    // globally so lessons can drop `<Steps>…<Step>` in without an import,
+    // matching the convention used by the components above.
+    Steps,
+    Step,
     ...components,
   };
 }
