@@ -190,9 +190,11 @@ them in the next chapter.
 - It was too slow for the CPU to execute.
   > Machine code is literally what the CPU executes — speed of execution is not the issue. The issue is for humans, not the machine.
 - It used too much electricity.
+  > Power consumption is a hardware concern unrelated to the representation of programs. Early computers were power-hungry, but that had nothing to do with writing in machine code.
 - [o] It was extremely difficult for humans to read, write, and debug.
   > The machine doesn't care, but human beings can barely look at long sequences of 1s and 0s without making mistakes. This is why assembly language was invented.
 - It only worked on machines built after 1960.
+  > Machine code ran on the earliest computers, including those built in the 1940s; there was no such temporal restriction.
 
 Machine code is the native language of the CPU, so it always runs at full speed. The pain is on the human side: writing and maintaining anything non-trivial in raw bits is essentially impossible.`}
 />
@@ -207,6 +209,7 @@ Machine code is the native language of the CPU, so it always runs at full speed.
 - [o] Each line of assembly typically corresponds to a single machine instruction; an assembler translates between them.
   > Assembly is essentially a human-readable spelling of machine code, with mnemonics like \`MOV\` and \`ADD\` instead of raw bit patterns.
 - Assembly is a high-level language similar to FORTRAN.
+  > Assembly is a low-level language: each instruction maps one-to-one to a CPU operation, with no loops, functions, or types in the language itself. FORTRAN, by contrast, hides all of that behind expressions and control structures.
 
 Assembly languages give us names for opcodes and registers, but they do not abstract away the machine. A compiler for a high-level language, on the other hand, can generate machine code for many different CPU architectures from the same source.`}
 />

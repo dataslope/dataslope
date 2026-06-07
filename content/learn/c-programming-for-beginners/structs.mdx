@@ -312,10 +312,13 @@ int main(void) {
   markdown={`Given \`Point *p = &some_point;\`, which expression accesses the field \`x\`?
 
 - \`p.x\`
+  > The dot operator requires a struct value, not a pointer. Since \`p\` is a \`Point *\`, using \`p.x\` is a type error.
 - \`*p.x\`
+  > Because \`.\` binds tighter than \`*\`, this is parsed as \`*(p.x)\` — first access field \`x\` of the pointer \`p\` (invalid), then dereference. Use \`(*p).x\` or \`p->x\` instead.
 - [o] \`p->x\`
   > When you have a pointer to a struct, the arrow operator dereferences and accesses the field in one step. Equivalent to \`(*p).x\`.
 - \`&p.x\`
+  > \`&p.x\` would yield the address of a field, not the field's value. It is also malformed here because \`p\` is a pointer, not a struct value, so \`p.x\` itself is invalid.
 
 The arrow operator exists purely because \`(*p).x\` is so common — and because the parentheses are easy to forget. \`*p.x\` would be parsed as \`*(p.x)\`, which is almost never what you want.`}
 />
@@ -340,6 +343,7 @@ printf("%d %d\\n", x.a, y.a);
 - [o] \`1 99\`
   > Struct assignment makes a full copy. \`x.a\` stays \`1\`, and the modified \`y.a\` is \`99\`, printed in that order.
 - The code is invalid; you can't assign one struct to another.
+  > C allows struct assignment with \`=\` as long as both sides have the same type; it copies every field just like assigning a scalar would copy its value.
 
 If \`S\` had contained a pointer field, only the pointer value (the address) would have been copied, not the data the pointer points at — that's known as a "shallow copy" and is something to watch out for once your structs start owning heap memory.`}
 />

@@ -340,10 +340,13 @@ for (Node *cur = head; cur != NULL; cur = cur->next) {
 \`\`\`
 
 - It will leak memory.
+  > Every node is reached and freed; the problem is not that nodes are left unfreed but that the code reads freed memory to get to the next node.
 - It runs forever.
+  > The loop does terminate because it eventually reaches a node whose \`next\` was \`NULL\` before being freed, but it invokes undefined behavior on the way there.
 - [o] \`cur->next\` is read after \`cur\` has been freed — undefined behavior.
   > By the time the loop step \`cur = cur->next\` runs, the memory at \`cur\` has already been returned to the heap. The fix is to save \`cur->next\` into a local before \`free(cur)\`.
 - It frees one node too few.
+  > The loop condition \`cur != NULL\` ensures every node, including the last, is freed; the bug is about reading freed memory, not skipping a node.
 
 This bug often *appears* to work because the freed memory hasn't been overwritten yet. Such bugs are a nightmare to debug. Tools like AddressSanitizer flag them immediately.`}
 />
@@ -352,10 +355,13 @@ This bug often *appears* to work because the freed memory hasn't been overwritte
   markdown={`Compared to an \`int\` array of the same length, a singly linked list of \`int\`s:
 
 - uses less memory.
+  > Each node in a singly linked list stores the value plus a \`next\` pointer, so it uses more memory per element than a plain array, not less.
 - gives faster random access by index.
+  > Reaching the nth element requires traversing n nodes from the head, giving O(n) access, while an array reaches any element in O(1) via pointer arithmetic.
 - [o] gives O(1) insertion at the front, but O(n) access by index.
   > That's the classic trade-off. Lists win when you insert and remove a lot, especially at the front. Arrays win when you index a lot.
 - has cache-friendlier access patterns.
+  > Nodes are scattered across the heap, so sequential traversal causes many cache misses. A contiguous array is far more cache-friendly.
 
 In practice, modern hardware loves arrays — they're contiguous and the CPU cache prefetches the next elements. Linked lists are conceptually elegant but are slower than arrays for most real workloads. Use them when you specifically need their insertion characteristics or as a building block for more complex structures like trees and graphs.`}
 />

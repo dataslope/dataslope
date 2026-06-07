@@ -354,10 +354,13 @@ int main(void) {
 \`\`\`
 
 - 6
+  > This would be the result if \`increment\` modified \`n\` in \`main\`, but C passes by value, so the function only modifies its local copy.
 - 0
+  > \`n\` starts at \`5\` and is never changed from \`main\`'s perspective; there is no code that would set it to \`0\`.
 - [o] 5
   > Arguments in C are passed by value. \`increment\` receives a copy of \`n\`; modifying that copy does not affect \`n\` in \`main\`.
 - A compile-time error.
+  > The code is syntactically valid; passing \`n\` by value and ignoring the side effect inside the function is not an error.
 
 To modify a caller's variable, the function would need to receive a *pointer* to it — \`void increment(int *x) { (*x)++; }\` — and the caller would pass \`&n\`. We'll meet pointers soon.`}
 />
@@ -368,9 +371,11 @@ To modify a caller's variable, the function would need to receive a *pointer* to
 - It makes the program run faster.
   > Modern compilers can sometimes inline calls so there's no speed difference. The main benefit is for *humans*.
 - The C standard limits how many lines \`main\` may have.
+  > No such limit exists in the C standard; a function can be any length the compiler will accept.
 - [o] It lets a human reader understand the program one small piece at a time.
   > Functions are an *abstraction tool*. They let you reason about *what* a chunk of code does without having to read every line.
 - It is required by the compiler.
+  > The compiler does not enforce any rule about function length or decomposition; the benefit is entirely for human maintainability.
 
 Abstraction is the only sustainable defense against complexity. Every well-named function you extract is one less thing the next reader (often: future you) has to hold in their head.`}
 />

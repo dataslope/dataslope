@@ -336,6 +336,7 @@ void show(int arr[]) {
 \`\`\`
 
 - The compiler can't compute \`sizeof\` at runtime.
+  > \`sizeof\` is evaluated at compile time, not runtime. The real issue is that the compile-time type of \`arr\` inside the function is already a pointer, so \`sizeof\` returns the pointer's size, not the array's.
 - The function should declare \`arr\` as \`int *arr\` instead.
   > Actually \`int arr[]\` and \`int *arr\` mean exactly the same thing in a function parameter.
 - [o] Inside the function, \`arr\` is a pointer, not an array. \`sizeof(arr)\` is the size of a pointer (typically 8), not the array's total size.

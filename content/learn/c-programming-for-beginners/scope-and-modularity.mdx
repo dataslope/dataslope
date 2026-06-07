@@ -322,10 +322,13 @@ int multiply(int a, int b) { return a * b; }
   markdown={`What is the most accurate description of \`static\` when applied to a variable inside a function?
 
 - It makes the variable read-only.
+  > \`const\` makes a variable read-only, not \`static\`. A \`static\` local variable can be both read and written; it simply persists between calls.
 - It makes the variable visible to all functions in the file.
+  > \`static\` at file scope restricts visibility to the file, but \`static\` inside a function does not change the variable's scope — it remains accessible only within that function.
 - [o] It gives the variable a single, persistent storage location that retains its value across calls to the function.
   > \`static\` inside a function changes the variable's *lifetime* (whole program) and *initialization rules* (initialized once), but its *scope* is still that one function.
 - It causes the variable to be initialized every time the function is called.
+  > A \`static\` local is initialized only once — the first time the function is called — and retains its value thereafter. Ordinary (non-static) locals are initialized each call.
 
 Compare two ideas: \`static\` *inside* a function gives a long lifetime + local scope. \`static\` *outside* any function (at file scope) restricts the linkage to the current file.`}
 />
@@ -336,9 +339,11 @@ Compare two ideas: \`static\` *inside* a function gives a long lifetime + local 
 - The compiler will refuse to build the program.
   > Most compilers warn, but it's syntactically valid.
 - It would be slower than returning the value directly.
+  > Speed is not the concern; the problem is correctness. Returning a pointer to a local variable is a correctness bug, not a performance one.
 - [o] The local variable's memory is reclaimed when the function returns, so the pointer is left pointing at memory that may be overwritten at any time.
   > Local variables live on the stack. Once the function returns, that stack space is reused by the next call. Reading or writing through the returned pointer is undefined behavior.
 - C functions cannot return any kind of pointer.
+  > Functions can and regularly do return pointers — to heap memory, globals, or caller-supplied buffers. The restriction is only on returning pointers to the function's own local variables.
 
 Functions can absolutely return pointers — to globals, to data on the heap (\`malloc\`), to memory the caller supplied. They just can't safely return pointers to their own stack-allocated locals.`}
 />
