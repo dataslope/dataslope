@@ -263,10 +263,13 @@ vectors will do.
   markdown={`What does \`mean(c(TRUE, TRUE, FALSE, TRUE))\` evaluate to?
 
 - \`3\`
+  > \`sum()\` of this logical vector would return 3 (three \`TRUE\` values), but \`mean()\` divides by the count, giving 3/4 = 0.75.
 - [o] \`0.75\`
   > \`mean()\` treats \`TRUE\` as 1 and \`FALSE\` as 0, so the mean is \`(1+1+0+1)/4 = 0.75\` — the *proportion* of \`TRUE\` values.
 - \`TRUE\`
-- An error`}
+  > \`mean()\` returns a numeric value, not a logical one; the result 0.75 is not coerced back to \`TRUE\`.
+- An error
+  > \`mean()\` accepts logical vectors and silently coerces \`TRUE\`/\`FALSE\` to 1/0 before averaging — no error occurs.`}
 />
 
 <MultipleChoice

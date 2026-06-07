@@ -249,6 +249,7 @@ flowchart TB
 - They are equivalent.
   > The \`aes()\` wrapper changes the meaning: one sets a constant color, the other maps a value to the color scale.
 - The first errors; only the second works.
+  > Both forms are syntactically valid; the difference is in behavior, not whether they produce an error.
 - [o] The first **sets** every point to red. The second **maps** the literal string "red" to color as if it were a category, and ggplot picks the default color for that category — usually not red — and adds a useless legend.
   > Inside \`aes()\`, you map data to properties. Outside, you set properties to constant values.
 - The second is faster.
@@ -259,10 +260,13 @@ flowchart TB
   markdown={`Which is the right ggplot to make a scatterplot of \`hp\` (x) vs \`mpg\` (y) from \`mtcars\`?
 
 - \`ggplot(mtcars) + geom_point(hp, mpg)\`
+  > \`geom_point()\` does not accept bare column names as positional arguments; column-to-axis mappings must be declared inside \`aes()\`.
 - [o] \`ggplot(mtcars, aes(x = hp, y = mpg)) + geom_point()\`
   > Aesthetic mappings go in \`aes()\` inside \`ggplot()\` (or inside the geom).
 - \`plot(mtcars$hp, mtcars$mpg)\`
-- \`ggplot(mtcars, hp, mpg) + scatter()\``}
+  > \`plot()\` is base R's generic plot function, not a ggplot2 call; it produces a basic scatterplot but does not use the grammar-of-graphics layer system.
+- \`ggplot(mtcars, hp, mpg) + scatter()\`
+  > \`ggplot()\` takes a data frame and optionally an \`aes()\` call as arguments — bare column names are not valid in the second and third positions, and \`scatter()\` is not a ggplot2 function.`}
 />
 
 <MultipleChoice
@@ -271,8 +275,11 @@ flowchart TB
 - [o] \`facet_wrap(~ Species)\`
   > \`facet_wrap()\` creates one panel per unique value, laid out in a wrapping grid.
 - \`group_by(Species)\`
+  > \`group_by()\` is a dplyr verb for grouping rows before summarization; it has no effect inside a ggplot call.
 - \`color = Species\`
-- \`split(Species)\``}
+  > Setting \`color = Species\` inside \`aes()\` colors the points by species in a single panel — it does not split the chart into separate panels.
+- \`split(Species)\`
+  > \`split()\` is a base R function that partitions a vector or data frame into a list; it is not a ggplot2 layer and cannot be added to a plot with \`+\`.`}
 />
 
 ## Mini challenge: a publication-ready iris plot

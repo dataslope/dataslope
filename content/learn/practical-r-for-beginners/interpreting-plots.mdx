@@ -192,30 +192,42 @@ shows us *associations*; causation requires more.
   markdown={`When reading a chart, what's the very first thing you should look at?
 
 - The legend
+  > The legend identifies encodings for color, shape, or size, but it only makes sense after you know what the axes represent.
 - [o] The axes — their labels, units, scale, and starting values
   > Without knowing what the axes are showing, the picture itself is uninterpretable. A y-axis starting at 85 vs. 0 can completely change the story.
 - The colors
-- The chart's title`}
+  > Colors encode a variable, but their meaning depends on knowing what the axes already say.
+- The chart's title
+  > A title summarizes what the chart shows, but it can be misleading or vague; the axes give the ground truth about what is being measured.
+`}
 />
 
 <MultipleChoice
   markdown={`Anscombe's quartet shows that:
 
 - R sometimes plots data incorrectly.
+  > R's plotting functions are accurate; the lesson of Anscombe's quartet is about the inadequacy of summary statistics alone, not about software errors.
 - Correlation is always meaningless.
+  > Correlation is a useful measure of linear association; the quartet shows that identical correlations can hide very different structures, not that correlation has no value.
 - [o] Datasets with nearly identical summary statistics can have completely different shapes — so you must visualize, not just summarize.
   > It is the canonical demonstration of why "plot first" is non-negotiable in EDA.
-- Linear regression is always wrong.`}
+- Linear regression is always wrong.
+  > Linear regression is appropriate for some of the quartet's datasets; the point is that you cannot know which without looking at the data.
+`}
 />
 
 <MultipleChoice
   markdown={`You see a scatterplot showing a positive relationship between ice cream sales and drowning rates. What's the most responsible interpretation?
 
 - Ice cream causes drowning.
+  > A positive association between two variables does not establish that one causes the other; a third variable (summer weather) drives both.
 - Drowning causes ice cream sales.
+  > Reverse causation is logically implausible here, and neither direction of causation can be read from a scatterplot alone.
 - [o] The two are associated; a likely cause is a confounding variable like summer weather, but the chart alone cannot establish causation.
   > The chart describes an association. Causation requires either an experiment or careful reasoning about confounders.
-- The chart is wrong.`}
+- The chart is wrong.
+  > The data are real; the pattern reflects a genuine correlation driven by a shared seasonal cause, not an error in the chart.
+`}
 />
 
 ## Mini challenge: critique a chart

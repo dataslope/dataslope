@@ -224,20 +224,26 @@ this?" 95% of the time, there is.
   markdown={`What value does \`mean(c(2, 4, 6, 8))\` produce?
 
 - \`4\`
+  > 4 is the median of (2, 4, 6, 8), not the mean; the arithmetic mean is (2+4+6+8)/4 = 5.
 - [o] \`5\`
   > \`(2 + 4 + 6 + 8) / 4 = 20 / 4 = 5\`.
 - \`6\`
-- \`20\``}
+  > 6 is neither the mean nor the median of this vector; the sum is 20 and dividing by 4 gives 5.
+- \`20\`
+  > 20 is the *sum* of the vector elements, not the mean; \`mean()\` divides the sum by the number of elements.`}
 />
 
 <MultipleChoice
   markdown={`In R, you almost never need to write a \`for\` loop to apply an operation to every element of a vector. Why?
 
 - Because \`for\` loops are forbidden in R.
+  > \`for\` loops are valid R syntax; they are just rarely the most concise or efficient way to process a vector when a vectorized alternative exists.
 - [o] Because operations and most built-in functions are *vectorized* — they automatically apply to every element.
   > This is R's signature design choice and is the reason R code for data work is so compact.
 - Because R secretly rewrites loops as parallel code.
-- Because R cannot iterate over vectors.`}
+  > R does not automatically parallelize loops; vectorized operations are fast because they are implemented as optimized C routines, not because of hidden parallelism.
+- Because R cannot iterate over vectors.
+  > R can iterate over vectors with \`for\`, \`while\`, and \`lapply\`; the reason to prefer vectorization is clarity and performance, not an inability to iterate.`}
 />
 
 ## Mini challenge: convert Celsius to Fahrenheit

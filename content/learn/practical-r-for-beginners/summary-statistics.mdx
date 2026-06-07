@@ -224,20 +224,26 @@ a plot.
   markdown={`Two columns both have mean 50, but one has sd 2 and the other has sd 20. The one with sd 20:
 
 - has more values
+  > Standard deviation describes how spread out values are, not how many there are; the number of observations is captured by \`length()\` or \`n()\`, not by sd.
 - has higher values
+  > Both columns have the same mean (50), so neither has systematically higher values; the difference is in variability, not location.
 - [o] has values that are more spread out around 50
   > Standard deviation measures typical distance from the mean — bigger sd means values are scattered farther from the center.
-- has fewer NAs`}
+- has fewer NAs
+  > Missing values are tracked separately (e.g., with \`is.na()\`) and have no systematic relationship to the standard deviation.`}
 />
 
 <MultipleChoice
   markdown={`Anscombe's quartet is famous because it shows:
 
 - That R has poor numerical precision.
+  > Anscombe's quartet was constructed by hand in 1973, long before R existed, specifically to demonstrate the limits of summary statistics — not any computing platform's precision.
 - [o] Four very different datasets can share nearly identical summary statistics — proving you must visualize, not just summarize.
   > It's the canonical reminder that summaries compress; plots reveal.
 - That correlation always implies causation.
-- That outliers should be removed.`}
+  > The quartet demonstrates that identical statistics can mask completely different relationships — correlation vs. causation is a separate (though related) lesson.
+- That outliers should be removed.
+  > One of the four datasets does contain an influential point, but the quartet's lesson is about visualizing data, not a prescription to remove outliers.`}
 />
 
 ## Mini challenge: describe a column

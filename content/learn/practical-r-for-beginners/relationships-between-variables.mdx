@@ -236,30 +236,39 @@ the natural next step.
   markdown={`The correlation between two variables is computed as -0.92. What does that imply?
 
 - They are unrelated.
+  > A correlation of -0.92 is close to -1, indicating a strong relationship; it is the direction (negative) and not whether one exists that this choice gets wrong.
 - One causes the other.
+  > Correlation measures association, not causation; knowing the correlation tells you nothing about which variable (if either) drives the other.
 - [o] They have a strong negative linear relationship — when one tends to go up, the other tends to go down.
   > Correlation measures linear association strength and direction, on a scale from -1 to +1. It does *not* establish causation.
-- One of the variables has more NAs than the other.`}
+- One of the variables has more NAs than the other.
+  > The correlation coefficient says nothing about missingness; it only quantifies the linear association between the non-missing paired values.`}
 />
 
 <MultipleChoice
   markdown={`Two variables have correlation 0. Which conclusion is **always** justified?
 
 - They are completely independent.
+  > Independence means no relationship of any kind; a correlation of 0 only rules out a *linear* relationship, not all possible relationships.
 - They have no relationship of any kind.
+  > A perfect curve — like a U-shape — can have a Pearson correlation near zero, even though there is a very clear nonlinear pattern.
 - [o] They have no *linear* relationship. They might still have a curved or otherwise structured relationship — only a plot will tell you.
   > Pearson correlation only sees linear association.
-- The dataset is too small.`}
+- The dataset is too small.
+  > Dataset size affects the *precision* of the correlation estimate, not what a value of zero means; small samples can still be linearly related.`}
 />
 
 <MultipleChoice
   markdown={`Ice cream sales and drowning rates are strongly correlated. The most likely explanation is:
 
 - Ice cream causes drowning.
+  > There is no plausible mechanism by which consuming ice cream increases drowning risk; both variables are driven by a shared seasonal cause.
 - Drowning causes ice cream sales (e.g., grieving families binge).
+  > Reverse causation is logically implausible here; neither variable can causally produce the other.
 - [o] A third variable — summer/hot weather — causes both. This is a *confounding* variable.
   > This is the classic example of why correlation does not imply causation.
-- Pure coincidence.`}
+- Pure coincidence.
+  > The correlation is too consistent year after year and too strong to be random noise; a shared cause (hot weather) produces it systematically.`}
 />
 
 ## Mini challenge: build a correlation table

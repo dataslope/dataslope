@@ -177,10 +177,13 @@ then use those positions as row indices.
   markdown={`What is the convention for indexing a data frame with brackets?
 
 - \`df[cols, rows]\`
+  > The order is reversed here; R follows the row-first, column-second convention from matrix notation, so columns do not come first.
 - [o] \`df[rows, cols]\`
   > Rows first, columns second — same convention as matrices in mathematics.
 - \`df[rows][cols]\`
-- \`df.rows.cols\``}
+  > Chaining two separate bracket calls like this does not select rows and then columns; the second bracket would subset the result of the first, which is not a reliable way to filter rows and select columns simultaneously.
+- \`df.rows.cols\`
+  > R does not use dot notation for indexing data frames; that syntax belongs to languages like Python or JavaScript.`}
 />
 
 <MultipleChoice
@@ -200,10 +203,13 @@ then use those positions as row indices.
   markdown={`Why is \`airquality[airquality$Ozone > 100, ]\` potentially dangerous?
 
 - It's not — it works perfectly.
+  > The expression silently includes rows where \`Ozone\` is \`NA\` as rows of all-\`NA\` values rather than excluding them, which corrupts downstream analyses.
 - [o] \`Ozone\` contains NAs, and \`NA > 100\` evaluates to NA, which produces rows of all NAs in the result.
   > Always guard with \`!is.na(col) & ...\` (or use \`dplyr::filter()\`, which handles this for you).
 - It sorts the data instead of filtering it.
-- \`Ozone\` is character, so the comparison errors.`}
+  > Logical indexing selects rows, not sorts them; sorting requires \`order()\`.
+- \`Ozone\` is character, so the comparison errors.
+  > \`Ozone\` is numeric in \`airquality\`; the problem is not a type error but the propagation of \`NA\` through the comparison.`}
 />
 
 ## Mini challenge: heavy cars with poor fuel economy
