@@ -195,8 +195,8 @@ equivalent loop**, on top of being shorter and easier to read.
 
 ```mermaid
 flowchart TB
-  loop["for (i in 1:n) result[i] <- xs[i] + ys[i]"] -->|interpreted per element| slow["Slow"]
-  vec["result <- xs + ys"] -->|single C call| fast["Fast"]
+  loop["for (i in 1:n) result[i] <- xs[i] + ys[i]"]:::code -->|interpreted per element| slow["Slow"]
+  vec["result <- xs + ys"]:::code -->|single C call| fast["Fast"]
   style fast fill:#dcfce7
   style slow fill:#fee2e2
 ```
