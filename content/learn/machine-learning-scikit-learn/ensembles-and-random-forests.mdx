@@ -446,10 +446,13 @@ assert forest_acc >= tree_acc, f"Expected the forest to match or beat the tree: 
   markdown={`What is the core reason a random forest usually generalizes better than a single decision tree?
 
 - Each tree in the forest is individually far more accurate than a standalone tree
+  > The individual trees are typically comparable in accuracy to a standalone deep tree — they overfit similarly. The improvement comes from combining many diverse trees, not from each tree being individually superior.
 - The forest grows one enormous tree that is too big to overfit
+  > A random forest is not a single large tree. It is a collection of independently grown trees whose predictions are combined by voting or averaging. A very large single tree would overfit more, not less.
 - [o] Averaging the predictions of many diverse, individually-overfit trees cancels out their independent errors, reducing variance while keeping the signal they agree on
   > The members can each overfit, but because they are trained on different bootstrap samples and feature subsets, their mistakes are largely independent and cancel when combined. This variance reduction is the whole point of bagging.
 - The forest discards the training data and learns a smooth equation instead
+  > Decision trees (and random forests) retain the training data structure in their splits; they do not learn a smooth parametric equation. The forest predicts by routing inputs through trees, not evaluating a formula.
 
 The power comes from combining many decorrelated models, not from any single member being excellent.`}
 />
@@ -458,10 +461,13 @@ The power comes from combining many decorrelated models, not from any single mem
   markdown={`In a random forest, what does training each tree on a **bootstrap sample** accomplish?
 
 - It guarantees every tree sees the exact same data for consistency
+  > Bootstrap sampling does the opposite: each tree sees a different random resample of the data. Identical data for every tree would produce identical trees, and averaging identical trees does nothing.
 - It permanently removes 37% of the dataset to speed up training
+  > While each bootstrap sample omits about 37% of rows on average, those rows are not permanently removed — they simply are not in that particular tree's training sample. All rows can appear in other trees' samples.
 - [o] Each tree is trained on a different random resample (drawn with replacement) of the data, so the trees grow different structures — the diversity that makes averaging effective
   > Bootstrapping draws rows with replacement, so each tree sees a slightly different dataset (some rows repeated, some absent). Without this diversity, all trees would be identical and averaging them would do nothing.
 - It scales the features so distances are comparable
+  > Feature scaling is done by preprocessing steps like \`StandardScaler\`, not by bootstrap sampling. Decision trees and random forests are scale-invariant and do not require or benefit from feature scaling.
 
 Bootstrapping is what makes the trees disagree, and disagreement is what averaging exploits.`}
 />
@@ -470,10 +476,13 @@ Bootstrapping is what makes the trees disagree, and disagreement is what averagi
   markdown={`Besides bootstrapping the rows, a random forest also considers only a **random subset of features at each split**. Why?
 
 - To make training slower so the model is more thorough
+  > Restricting features at each split actually speeds training, since fewer candidates are evaluated per split. The purpose is to introduce diversity between trees, not to slow them down.
 - To ensure every tree uses all features equally
+  > The random subset approach means different trees use different features at each split, producing unequal feature usage across trees — which is intentional. The goal is to prevent all trees from relying on the same dominant feature.
 - [o] To decorrelate the trees — if one feature is very strong, restricting the candidates at each split prevents every tree from looking the same, so their errors are more independent
   > If all trees could always split on the single best feature, they would be highly similar and their errors would coincide. Random feature subsets force diversity, which makes the averaged prediction more reliable than plain bagging.
 - Because trees cannot handle more than a few features at once
+  > Decision trees can split on any number of features; there is no technical limit. The random subset at each split is a design choice to produce diverse trees, not a workaround for a tree limitation.
 
 Random feature selection is the extra ingredient that distinguishes a random forest from ordinary bagging.`}
 />
@@ -482,10 +491,13 @@ Random feature selection is the extra ingredient that distinguishes a random for
   markdown={`You increase \`n_estimators\` from 100 to 1000. What is the most accurate expectation?
 
 - Test accuracy will keep rising sharply, so more is always clearly worth it
+  > Accuracy gains diminish quickly as trees are added. After the first 50–200 trees, the averaged prediction has largely stabilized and additional trees buy negligible improvement at growing computational cost.
 - The forest will start to overfit because it now has too many trees
+  > Adding more trees to a random forest does not cause overfitting. More trees only refine the average; overfitting in a forest is controlled by tree depth and other per-tree parameters, not by the count.
 - [o] Accuracy will change very little (it has likely plateaued), while training and prediction take roughly ten times longer — diminishing returns, not added risk
   > More trees only refine the average; they do not cause overfitting. Most of the benefit arrives in the first 50-100 trees, so going much higher mainly costs compute for a negligible gain.
 - Accuracy will drop because extra trees add noise to the vote
+  > Additional trees do not add noise to the vote; they add more independent estimates whose average can only become more stable. Accuracy cannot decrease from adding trees, though gains become negligible past a certain point.
 
 Adding trees is safe but subject to diminishing returns; per-tree depth, not tree count, governs overfitting.`}
 />
@@ -494,10 +506,13 @@ Adding trees is safe but subject to diminishing returns; per-tree depth, not tre
   markdown={`When is a **single decision tree** preferable to a random forest?
 
 - When you need the highest possible test accuracy
+  > A random forest typically achieves higher test accuracy than a single tree. Choosing a single tree specifically for accuracy is usually the wrong call; accuracy generally favors the forest.
 - When the features are on very different scales and need handling
+  > Both single trees and random forests are scale-invariant and do not require feature scaling. This is not a criterion that distinguishes them.
 - [o] When you must be able to read and explain the exact decision logic — a shallow single tree is a literal flowchart, whereas a forest of hundreds of trees is far harder to interpret
   > The main thing you give up moving from one tree to a forest is interpretability. If a regulator, clinician, or stakeholder needs to follow the precise rules, a shallow single tree (or a linear model) is the better choice despite lower accuracy.
 - Single trees are always faster to train than any forest
+  > A single unconstrained tree can actually be slower than a forest of small trees, depending on depth. More importantly, training speed is rarely the reason to prefer a single tree; interpretability is.
 
 The single tree's advantage is transparency, which the ensemble trades away for accuracy and stability.`}
 />

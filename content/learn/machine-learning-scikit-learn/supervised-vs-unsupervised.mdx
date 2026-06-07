@@ -287,10 +287,13 @@ different mindset from chasing a test-set accuracy.
   markdown={`What single fact most fundamentally separates supervised from unsupervised learning?
 
 - Supervised learning uses scikit-learn; unsupervised learning does not
+  > scikit-learn supports both supervised and unsupervised algorithms — for example, \`LogisticRegression\` for supervised classification and \`KMeans\` for unsupervised clustering live in the same library.
 - Supervised learning is for numbers; unsupervised learning is for text
+  > Both approaches apply to numeric and non-numeric data. Supervised learning can handle text (e.g., spam classification) and unsupervised learning can work on numeric data (e.g., clustering customer records).
 - [o] Supervised learning has labeled answers (a target \`y\`) to learn from; unsupervised learning has only features \`X\` and must find structure without answers
   > The dividing line is the presence or absence of labels. With a known target you learn a mapping (supervised); with no target you discover structure (unsupervised).
 - Supervised learning is always more accurate
+  > Accuracy is not even defined for unsupervised learning, so comparing the two on that basis is not meaningful. Neither is universally "better" — they answer different questions.
 
 Labels in, supervised; no labels, unsupervised — that is the whole distinction.`}
 />
@@ -471,10 +474,13 @@ print(answers)
   markdown={`In scikit-learn, which call signature signals a **supervised** algorithm?
 
 - \`fit(X)\` — features only
+  > Passing only \`X\` is the signature of an unsupervised algorithm; it has no target to learn from. Supervised algorithms require both \`X\` and \`y\` so the model can learn the mapping from inputs to known answers.
 - \`fit()\` — no arguments at all
+  > Calling \`fit\` with no arguments is not valid for any scikit-learn estimator. Supervised learning requires at minimum both the feature matrix \`X\` and the target vector \`y\`.
 - [o] \`fit(X, y)\` — features and a target, because supervised learning needs the answers to learn the mapping
   > Supervised \`fit\` takes both the feature matrix and the target. Passing \`y\` is exactly what lets the model learn the input-to-output relationship.
 - \`fit(y)\` — the target only
+  > Passing only the target is not a valid scikit-learn call, and it would not make sense — the model needs the input features to learn a mapping, not just the answers.
 
 The two-argument \`fit(X, y)\` is the hallmark of supervised learning; \`fit(X)\` alone is unsupervised.`}
 />
@@ -483,10 +489,13 @@ The two-argument \`fit(X, y)\` is the hallmark of supervised learning; \`fit(X)\
   markdown={`You have a dataset of shoppers' purchase histories but **no** predefined customer segments, and you want to discover natural groups. What kind of learning is this?
 
 - Supervised regression, because purchases are numbers
+  > Supervised regression requires a known numeric target \`y\` for each example. With no predefined segments or labels of any kind, there is nothing to regress against — this is an unsupervised problem.
 - Supervised classification, because shoppers belong to types
+  > Supervised classification requires labeled examples where the category is already known for each one. Since no predefined customer segments exist, there are no class labels to learn from.
 - [o] Unsupervised learning (clustering), because there are no labels — you are discovering structure, not predicting a known answer
   > With no target labels and a goal of finding natural groups, this is unsupervised clustering. There is no answer key to predict against.
 - It is not a machine learning problem at all
+  > Finding natural groups in unlabeled data is a well-defined machine learning task — unsupervised clustering — applied across many industries for customer segmentation and more.
 
 No labels plus a goal of finding groups points squarely at unsupervised clustering.`}
 />
@@ -495,10 +504,13 @@ No labels plus a goal of finding groups points squarely at unsupervised clusteri
   markdown={`Why can't you compute ordinary "accuracy" for a pure clustering result?
 
 - Because clustering algorithms are too slow to evaluate
+  > Speed has nothing to do with why accuracy cannot be computed. The real reason is that clustering produces no ground-truth labels to compare predictions against — not a performance limitation.
 - Because accuracy only works for regression, not for groups
+  > Accuracy is actually a classification metric, not a regression one. The reason it cannot be applied to clustering is the absence of any ground-truth answer key, not a restriction about task types.
 - [o] Because there is no ground-truth answer key — the cluster numbers were invented by the algorithm, so there is nothing "correct" to compare them against
   > Accuracy compares predictions to known answers. In unsupervised learning there are no known answers, so accuracy is undefined; clusters are judged by other measures entirely.
 - Because clusters always achieve 100% accuracy by definition
+  > Clustering algorithms do not achieve perfect accuracy by definition — accuracy is simply undefined because there is no answer key to compare against, not because they are trivially correct.
 
 Without ground-truth labels there is nothing to score predictions against, so accuracy does not apply.`}
 />
@@ -507,10 +519,13 @@ Without ground-truth labels there is nothing to score predictions against, so ac
   markdown={`A team has a large set of customer records and wants to (a) first understand whether the data falls into natural groups, then (b) later predict churn once they have labels. Which sequence of approaches fits?
 
 - Supervised first to explore, then unsupervised to predict
+  > The sequence is reversed. Unsupervised methods are the right tool for initial exploration when labels are absent; supervised methods are appropriate once labels have been collected.
 - Unsupervised for both steps, since labels are never needed
+  > Predicting churn requires knowing which customers actually churned — those are labels. Once labels exist, supervised learning is the appropriate approach for building a predictive model.
 - [o] Unsupervised first to discover structure with no labels, then supervised to predict churn once labels are available
   > Exploration with no labels is unsupervised; predicting a known target (churn) once labels exist is supervised. Using them in this order is a common, sensible workflow.
 - Neither approach applies to customer data
+  > Both approaches apply directly to customer data. Unsupervised clustering is a standard tool for discovering customer segments, and supervised learning is widely used to predict outcomes like churn.
 
 Explore structure without labels (unsupervised), then predict a known target with labels (supervised).`}
 />
@@ -519,10 +534,13 @@ Explore structure without labels (unsupervised), then predict a known target wit
   markdown={`Which statement is **true** about the relationship between supervised and unsupervised learning?
 
 - Unsupervised learning is just supervised learning with the labels hidden, solving the same task
+  > The two approaches solve different problems. Supervised learning predicts a specific known answer; unsupervised learning discovers structure that was not defined in advance. Hiding the labels from a supervised model does not make it unsupervised.
 - Supervised learning is always the better choice when both are possible
+  > Neither is universally better. Even when both approaches are technically applicable, unsupervised methods may be preferred when you want to discover structure without imposing predefined categories, or when you have far more unlabeled data.
 - [o] They solve fundamentally different problems — predicting a known answer versus discovering unknown structure — and are evaluated in completely different ways
   > Supervised and unsupervised learning answer different questions and use different evaluation methods. Neither is universally "better"; the right one depends on whether you have labels and what you are asking.
 - Both always require a target column \`y\` to function
+  > Unsupervised learning explicitly does not use a target column. Clustering, for example, calls \`fit(X)\` with only the feature matrix and discovers groups without any \`y\`.
 
 They are different tasks with different goals and different evaluation, not two versions of the same thing.`}
 />
