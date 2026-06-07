@@ -87,9 +87,15 @@ const BRAND_FALLBACKS: Record<string, string> = {
   "--ds-blue-300": "#8ABFFF",
   "--ds-blue-400": "#5BA7FF",
   "--ds-blue-500": "#148CFF",
+  "--ds-blue-550": "#0E82EE",
   "--ds-blue-600": "#0878DD",
+  "--ds-blue-650": "#046ECD",
   "--ds-blue-700": "#0064BD",
+  "--ds-blue-750": "#005AAC",
   "--ds-blue-800": "#00519C",
+  "--ds-blue-850": "#00488D",
+  "--ds-blue-900": "#00407F",
+  "--ds-blue-950": "#003871",
   "--ds-teal-500": "#00AEAA",
   "--ds-teal-600": "#009491",
   "--ds-green-500": "#20C621",
@@ -131,16 +137,18 @@ const WHEEL: ReadonlyArray<{ name: string; dark: boolean }> = [
 
 // Mindmaps render all-blue (Request: one hue, varied shades). The root takes
 // brand blue; branches cycle a set of distinct blue shades so sibling sections
-// stay tellable apart. The two lightest shades take dark label text.
+// stay tellable apart. Every branch uses a *dark* shade (the 50-step ramp's
+// 650–850, which all clear WCAG AA body text against white) so the label can
+// always be white — no light fills with hard-to-read dark text. The shades
+// alternate light/dark around the wheel to keep neighbouring sections distinct.
 const MINDMAP_ROOT = "--ds-blue-500";
 const MINDMAP_BRANCHES = [
-  "--ds-blue-700",
-  "--ds-blue-400",
-  "--ds-blue-600",
-  "--ds-blue-300",
+  "--ds-blue-650",
   "--ds-blue-800",
+  "--ds-blue-700",
+  "--ds-blue-850",
+  "--ds-blue-750",
 ];
-const MINDMAP_DARK_TEXT = new Set(["--ds-blue-300", "--ds-blue-400"]);
 
 function readBrand(): (token: keyof typeof BRAND_FALLBACKS) => string {
   let resolved: Record<string, string> = BRAND_FALLBACKS;
@@ -394,13 +402,15 @@ function adaptNodes(root: Element | null, isDark: boolean): void {
     let fillHex: string | null = null;
     let hueName = "blue";
     let darkText = false;
-    if (node.classList.contains("mindmap-node")) {
+    const isMindmap = node.classList.contains("mindmap-node");
+    if (isMindmap) {
       const m = (node.getAttribute("class") ?? "").match(/\bsection-(\d+)\b/);
       const token = m
         ? MINDMAP_BRANCHES[Number(m[1]) % MINDMAP_BRANCHES.length]
         : MINDMAP_ROOT;
       fillHex = c(token as keyof typeof BRAND_FALLBACKS);
-      darkText = MINDMAP_DARK_TEXT.has(token);
+      // Every mindmap shade (root 500 + dark branches) carries white text.
+      darkText = false;
     } else {
       const snapped = snapToBrand(getComputedStyle(shapes[0]).fill, c);
       if (snapped) {
@@ -425,10 +435,18 @@ function adaptNodes(root: Element | null, isDark: boolean): void {
       }
     });
 
-    // Inner bars (e.g. subroutine side rules) → subtle 600 so they stay visible.
+    // Inner `<line>` bars vary by diagram. Mindmap's default node appends a
+    // full-width `node-line-` rule under the label — an underline that fights
+    // the clean filled-pill look — so hide it. Elsewhere (e.g. subroutine side
+    // rules) the line conveys structure, so keep it as a subtle 600 stroke.
     node.querySelectorAll<SVGElement>("line").forEach((ln) => {
-      ln.style.setProperty("stroke", stroke600, "important");
-      ln.style.setProperty("stroke-width", "1.5px", "important");
+      if (isMindmap) {
+        ln.style.setProperty("stroke", "none", "important");
+        ln.style.setProperty("stroke-width", "0", "important");
+      } else {
+        ln.style.setProperty("stroke", stroke600, "important");
+        ln.style.setProperty("stroke-width", "1.5px", "important");
+      }
     });
 
     const textColor = fillHex ? (darkText ? DARK : LIGHT) : null;
@@ -598,6 +616,27 @@ function MermaidFullscreen({
 }) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
+
+  // Callback ref for the SVG host. We inject the markup imperatively here
+  // (rather than via `dangerouslySetInnerHTML`) and adapt it in the same pass.
+  // Why not dangerouslySetInnerHTML: React owns that subtree, and under
+  // StrictMode's double commit it re-asserts the *raw* multi-hue SVG over our
+  // adapted nodes after this ref has run — without re-firing the ref — so the
+  // fullscreen copy reverts to Mermaid's default palette. Setting innerHTML
+  // ourselves keeps the subtree outside React's reconciler, so the brand
+  // snapping/borderless/white-label treatment sticks. `useCallback` keyed on
+  // [svg, isDark] re-runs it only when the diagram or theme actually changes,
+  // not on every pan/zoom frame.
+  const stageRefCallback = useCallback(
+    (node: HTMLDivElement | null) => {
+      stageRef.current = node;
+      if (!node) return;
+      node.innerHTML = svg;
+      adaptNodes(node, isDark);
+    },
+    [svg, isDark],
+  );
+
   const [scale, setScale] = useState(1);
   const [tx, setTx] = useState(0);
   const [ty, setTy] = useState(0);
@@ -640,9 +679,9 @@ function MermaidFullscreen({
       if (!viewport || !stage) return;
       const svgEl = stage.querySelector("svg");
       if (!svgEl) return;
-      // Apply the same brand snapping / borderless / label treatment as the
-      // inline diagram.
-      adaptNodes(stage, isDark);
+      // Brand snapping / borderless / label treatment is applied by the stage
+      // callback ref (`stageRef` below) when the SVG mounts, so by the time
+      // this fit runs the measured size already reflects the adapted nodes.
       const bbox = svgEl.getBoundingClientRect();
       const naturalW = bbox.width;
       const naturalH = bbox.height;
@@ -834,11 +873,9 @@ function MermaidFullscreen({
               transform: `translate(${tx}px, ${ty}px)`,
             }}
           >
-            <div
-              className={styles.diagram}
-              ref={stageRef}
-              dangerouslySetInnerHTML={{ __html: svg }}
-            />
+            {/* Markup is injected + adapted imperatively by stageRefCallback;
+                no dangerouslySetInnerHTML so React can't revert the styling. */}
+            <div className={styles.diagram} ref={stageRefCallback} />
           </div>
         </div>
       </div>
