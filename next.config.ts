@@ -30,6 +30,18 @@ const nextConfig: NextConfig = {
       permanent: false,
     },
   ],
+  // Expose every `/learn` lesson as raw Markdown at `${page.url}.md`, served
+  // by the route handler in `app/llms/learn/[[...slug]]/`. The page-action
+  // buttons (Copy Markdown / View as Markdown) point at these URLs. Using
+  // `beforeFiles` guarantees the `.md` suffix is intercepted before the
+  // `/learn/[[...slug]]` page route gets a chance to match it. The bare
+  // `/learn.md` entry covers the course index (content/learn/index.mdx).
+  rewrites: async () => ({
+    beforeFiles: [
+      { source: "/learn.md", destination: "/llms/learn" },
+      { source: "/learn/:path*.md", destination: "/llms/learn/:path*" },
+    ],
+  }),
 };
 
 const withMDX = createMDX();
