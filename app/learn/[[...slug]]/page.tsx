@@ -13,8 +13,17 @@ import {
   DocsPage,
   DocsTitle,
 } from "fumadocs-ui/page";
+import {
+  MarkdownCopyButton,
+  ViewOptionsPopover,
+} from "fumadocs-ui/layouts/docs/page";
 import { source } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
+
+// Lessons live at `content/learn/<page.path>` on the default branch, so the
+// "Open in GitHub" action links straight to the page source.
+const GITHUB_BLOB_BASE =
+  "https://github.com/dataslope/dataslope/blob/main/content/learn";
 
 interface LearnPageProps {
   params: Promise<{ slug?: string[] }>;
@@ -31,12 +40,37 @@ export default async function LearnPage(props: LearnPageProps) {
   // remain available directly on `page.data`.
   const { body: MDX, toc } = await page.data.load();
 
+  // `markdownUrl` is rewritten to the raw-Markdown route handler (see
+  // `next.config.ts` and `app/llms/learn/[[...slug]]/route.ts`). The
+  // `MarkdownCopyButton` fetches it for the clipboard; `ViewOptionsPopover`
+  // links to it ("View as Markdown") and builds the "Open in ChatGPT/Claude"
+  // shortcuts, alongside the GitHub source link.
+  const markdownUrl = `${page.url}.md`;
+  const githubUrl = `${GITHUB_BLOB_BASE}/${page.path}`;
+
   return (
     <DocsPage toc={toc} full={page.data.full}>
       <DocsTitle>{page.data.title}</DocsTitle>
       {page.data.description ? (
         <DocsDescription>{page.data.description}</DocsDescription>
       ) : null}
+      {/* Inline styles (not Tailwind utilities) on purpose: `learn.css` runs
+          Tailwind with `source(none)` and only scans Fumadocs's own dist, so
+          utility classes authored here would never be generated. The buttons
+          themselves are Fumadocs components and keep their compiled styles. */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          gap: "0.5rem",
+          paddingBottom: "1rem",
+          borderBottom: "1px solid var(--color-fd-border)",
+        }}
+      >
+        <MarkdownCopyButton markdownUrl={markdownUrl} />
+        <ViewOptionsPopover markdownUrl={markdownUrl} githubUrl={githubUrl} />
+      </div>
       <DocsBody>
         <MDX components={getMDXComponents()} />
       </DocsBody>

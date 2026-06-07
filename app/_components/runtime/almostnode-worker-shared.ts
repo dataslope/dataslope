@@ -150,3 +150,69 @@ export async function runEntry(
     runtime.clearCache();
   }
 }
+
+// ─── Per-run isolation ──────────────────────────────────────────────
+//
+// The JavaScript and TypeScript workers are long-lived: every
+// `<CodeBlock>` and `<ChallengeCard>` on a /learn page (and every run in
+// a `<Playground>`) shares ONE worker instance per language via the
+// runtime registry. That means the worker's VirtualFS would, if reused,
+// persist files — including the entry file — from one block's run into
+// the next. A single-file block that doesn't stage its own files would
+// then execute whatever entry the *previous* block left behind, so
+// running block B right after block A printed block A's output. (See the
+// regression test in __tests__/almostnodeRunner.test.ts.)
+//
+// `AlmostNodeRunner` closes that hole: each run executes against a
+// VirtualFS that contains ONLY that run's files. Multi-file callers call
+// `stage()` immediately before `run()` (recreating the FS from their
+// current workspace snapshot); single-file callers skip `stage()` and
+// get a brand-new empty FS. Either way the staged snapshot is consumed
+// by the run, so nothing leaks into a subsequent un-staged run.
+
+export class AlmostNodeRunner {
+  // Files staged by the most recent `stage()` call, awaiting their run.
+  // `null` once a run consumes them (or if `stage()` was never called),
+  // so a run that isn't preceded by its own staging starts from a clean,
+  // empty filesystem and can't observe the previous run's files or entry.
+  private stagedVfs: VirtualFS | null = null;
+
+  /** Stage a complete workspace snapshot into a freshly-created
+   *  VirtualFS for the NEXT run. Rebuilt from scratch each call so
+   *  deletions/renames in the UI propagate. `transformFile` lets the
+   *  TypeScript worker transpile `.ts` sources to `.js` as they're
+   *  staged (see `stageFiles`). */
+  stage(
+    files: Array<[string, Uint8Array]>,
+    transformFile?: (
+      path: string,
+      bytes: Uint8Array,
+    ) => Array<[string, Uint8Array]>,
+  ): void {
+    this.stagedVfs = stageFiles(files, transformFile);
+  }
+
+  /** Execute the entry file against a VirtualFS holding only this run's
+   *  files — the freshly-staged snapshot if `stage()` was called since
+   *  the last run, otherwise a brand-new empty FS.
+   *
+   *  `resolveEntrySource` is handed that VFS and returns the entry's
+   *  source text: the JavaScript worker returns its inline `code`
+   *  verbatim (always the authoritative entry source); the TypeScript
+   *  worker prefers the staged, already-transpiled copy and falls back to
+   *  transpiling inline code. The returned source is wrapped (so
+   *  top-level `await` works) and written at `entryVfsPath` before
+   *  execution. The staged snapshot is consumed up front so the next
+   *  un-staged run is fully isolated even if this one throws. */
+  async run(
+    entryVfsPath: string,
+    resolveEntrySource: (vfs: VirtualFS) => string,
+    sink: ConsoleSink,
+  ): Promise<void> {
+    const vfs = this.stagedVfs ?? new VirtualFS();
+    this.stagedVfs = null;
+    const entrySource = resolveEntrySource(vfs);
+    vfs.writeFileSync(entryVfsPath, wrapEntryAsAsyncIIFE(entrySource));
+    await runEntry(vfs, entryVfsPath, sink);
+  }
+}
