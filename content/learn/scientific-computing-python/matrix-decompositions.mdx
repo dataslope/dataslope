@@ -360,10 +360,13 @@ eigenvectors.**
   markdown={`You need to solve $A x = b$ for the same 5000×5000 matrix $A$ but with 200 different right-hand sides $b$. Which strategy is fastest?
 
 - Call \`np.linalg.solve(A, b_k)\` 200 times
+  > Each call to \`np.linalg.solve\` performs the full $O(n^3)$ LU factorization; repeating it 200 times throws away the factorization after each use, wasting the dominant cost.
 - [o] Call \`scipy.linalg.lu_factor(A)\` **once** and then \`lu_solve\` 200 times
   > \`lu_factor\` does the $O(n^3)$ work *once*; each \`lu_solve\` is then $O(n^2)$. With 200 right-hand sides this is roughly 100× faster than re-factoring each time.
 - Compute \`np.linalg.inv(A)\` once and multiply
+  > Computing the inverse costs the same $O(n^3)$ as LU factorization, is less numerically stable than the factorize-then-solve approach, and the resulting dense inverse matrix itself requires $O(n^2)$ storage per solve multiply.
 - Use the SVD because it generalizes
+  > SVD costs roughly $4n^3$ — about 6× more than LU — so reaching for it when a standard LU solve suffices wastes significant compute time.
 
 "Factor once, solve many times" is the most common performance win in numerical linear algebra.`}
 />
@@ -372,10 +375,13 @@ eigenvectors.**
   markdown={`Why is the SVD the right tool to compute the *numerical* rank of a matrix that is theoretically rank-deficient but has been perturbed by tiny floating-point noise?
 
 - It runs faster than Gaussian elimination
+  > The SVD costs roughly $4n^3$ — several times more than Gaussian elimination — so speed is not the motivation; stability and the ability to threshold small singular values is.
 - [o] The singular values reveal exactly how much "signal" exists in each direction; you can set a tolerance (e.g. $\\sigma_k < \\epsilon \\, \\sigma_1$) and count the singular values above it
   > Algebraic rank from row reduction is binary and unstable. The SVD turns rank into a continuous measurement — singular values — which you can threshold sensibly to get a robust numerical rank.
 - The SVD always returns integer singular values
+  > Singular values are real non-negative numbers; for a noisy or near-rank-deficient matrix they are almost never integers.
 - The QR decomposition gives the same answer faster
+  > QR can reveal rank through the diagonal of $R$, but those diagonal entries depend on column ordering and pivoting strategy and are far less reliable than the singular values for numerical rank determination.
 
 Numerical rank decisions almost always go through the SVD.`}
 />

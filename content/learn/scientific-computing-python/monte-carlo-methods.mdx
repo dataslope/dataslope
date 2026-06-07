@@ -338,10 +338,13 @@ def mc_area(predicate, bounds, n_samples, seed=0):
   markdown={`You are integrating a smooth 12-dimensional function. You compare deterministic Gauss quadrature with $n$ nodes per axis against a Monte Carlo estimator with $N$ total samples. Both are forced to use the *same* total budget of evaluations. Which usually wins, and why?
 
 - Deterministic quadrature always wins because it is higher order
+  > High order only helps in low dimensions; in 12 dimensions a fixed budget of evaluations forces $n = 2$ nodes per axis (a $2^{12}$ grid), which gives far less accuracy than Monte Carlo on the same budget.
 - [o] Monte Carlo usually wins because deterministic quadrature costs $n^\{12\}$ evaluations — only $n = 2$ fits in any reasonable budget — while MC's $1/\\sqrt\{N\}$ error is independent of dimension
   > In high dimensions deterministic quadrature suffers from the curse of dimensionality: doubling accuracy multiplies cost by $2^d$. Monte Carlo's dimension-free error scaling is what makes it the standard tool for integrals beyond ~5 dimensions.
 - They are always equivalent
+  > They are equivalent only in very low dimensions; the curse of dimensionality makes deterministic quadrature impractical beyond about 4–5 dimensions while Monte Carlo is unaffected.
 - Neither converges
+  > Both methods converge in principle; Monte Carlo converges at $1/\\sqrt{N}$ regardless of dimension, and deterministic quadrature converges in low dimensions.
 
 Use deterministic quadrature for $d \\le 4$; use Monte Carlo (or quasi-Monte Carlo) for higher dimensions.`}
 />
@@ -350,10 +353,13 @@ Use deterministic quadrature for $d \\le 4$; use Monte Carlo (or quasi-Monte Car
   markdown={`You ran a Monte Carlo estimator with $N = 10^4$ samples and obtained a standard error of $0.05$. About how many samples would you need to reduce the standard error to $0.005$ (one extra digit)?
 
 - About $10^5$
+  > A 10× increase in samples reduces the standard error by only $\\sqrt{10} \\approx 3.16$, not by 10; going from $0.05$ to $0.005$ requires a factor of 100 in samples.
 - [o] About $10^6$
   > Monte Carlo error scales as $1/\\sqrt N$, so reducing the error by 10× requires 100× more samples. From $10^4$ that is $10^6$. This brutal scaling is exactly why variance-reduction techniques (importance sampling, control variates, antithetic variates) matter.
 - About $2 \\times 10^4$
+  > Doubling the sample count reduces the standard error by only $\\sqrt{2} \\approx 1.41$; a 10× reduction in error requires 100× more samples.
 - About $10^7$
+  > $10^7$ samples would reduce the error by $\\sqrt{10^7/10^4} = \\sqrt{1000} \\approx 31.6$, which is far more than the factor of 10 needed; $10^6$ samples (a factor-of-100 increase) achieves exactly the factor-of-10 error reduction.
 
 The $1/\\sqrt N$ law is the single most important fact to remember about Monte Carlo.`}
 />

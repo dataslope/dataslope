@@ -200,8 +200,11 @@ That is the story of the next chapter.
   markdown={`Which of the following was **not** a category of "wall" that human computers ran into and that modern scientific computing was created to overcome?
 
 - Volume — sheer number of arithmetic operations required
+  > Volume is explicitly identified as the first wall: the page explains how planetary simulation alone requires billions of operations that a human computer could never complete.
 - Precision — accumulated round-off in long calculations
+  > Precision is explicitly the second wall: the page describes how carrying only seven decimal digits through thousands of operations leaves only noise in the later digits.
 - Dimensionality — problems with thousands of variables
+  > Dimensionality is explicitly the third wall: the page describes optimizing a function of two thousand variables as requiring an entirely different toolbox.
 - [o] Syntax — the absence of structured programming constructs
   > "Syntax" is a software engineering concern, not a fundamental obstacle to scientific calculation. Human computers worked with mathematical notation, not programming languages. Volume, precision, and dimensionality are the three classical walls.
 
@@ -212,10 +215,13 @@ The three walls — volume, precision, and dimensionality — map directly onto 
   markdown={`In the page's "1 − cos(x) / x²" example, both expressions are mathematically identical. Why does the naive version collapse to zero for tiny $x$?
 
 - Python's \`math.cos\` is buggy for small arguments
+  > \`math.cos\` is correctly implemented and accurate for small arguments; the problem is in the expression that subtracts \`cos(x)\` from \`1\`, not in \`cos\` itself.
 - The CPU is rounding $x^2$ to zero
+  > For tiny but non-zero $x$ (e.g. $10^{-6}$), $x^2 = 10^{-12}$ is well within the range of double precision and is not rounded to zero; the issue is cancellation in $1 - \\cos(x)$, not underflow of $x^2$.
 - [o] $1 - \\cos(x)$ subtracts two nearly equal numbers and loses almost all of its significant digits — a phenomenon called *catastrophic cancellation*
   > For tiny $x$, $\\cos(x) \\approx 1$, so $1 - \\cos(x)$ is the difference of two floating-point numbers that agree in almost every digit. Subtracting them keeps only the few digits where they *disagree*, which is mostly round-off noise. The rewritten form $2\\sin^2(x/2)$ avoids the subtraction entirely.
 - The cubic spline interpolation introduced rounding error
+  > Cubic spline interpolation is used in a separate example (the sine table lookup); the collapsing-to-zero in the \`(1 - cos(x)) / x²\` example has nothing to do with splines.
 
 This is one of the most important lessons in numerical computing: **two algebraically identical expressions can produce wildly different numerical answers**. We will return to this idea many times.`}
 />

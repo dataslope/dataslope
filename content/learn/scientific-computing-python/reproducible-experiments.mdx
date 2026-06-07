@@ -302,10 +302,13 @@ machine that does not yet exist.
   markdown={`Your colleague ships you a script that calls \`np.random.normal(...)\` directly. You run it twice in a row and get different results. What is the cleanest fix?
 
 - Set \`np.random.seed(...)\` once at the top of the script
+  > \`np.random.seed\` seeds a global legacy state that any imported library can accidentally disturb; the page explicitly calls it discouraged in favour of the local \`default_rng\` generator.
 - [o] Refactor the script to create a single \`rng = np.random.default_rng(seed)\` at the top and pass it to every function that needs randomness
   > The modern, recommended approach is the local \`Generator\` returned by \`default_rng\`. It avoids hidden global state, makes the data flow explicit (any function that takes randomness must accept \`rng\` as an argument), and prevents interference with libraries that also touch \`np.random.*\`. \`np.random.seed\` still works but is global and discouraged.
 - Run the script in a fresh Python interpreter each time
+  > A fresh interpreter without a seed still draws from a randomly initialised state, so results differ between runs; reproducibility requires an explicit seed, not just a fresh process.
 - Catch the difference and average it away
+  > Averaging over runs without a seed produces a noisier estimate, not a reproducible one; the output changes each time the averaging is done.
 
 \`default_rng\` is the modern, recommended approach and should be used in all new code.`}
 />
@@ -314,10 +317,13 @@ machine that does not yet exist.
   markdown={`You publish a paper whose key figure was produced by a notebook with 47 cells. Six months later a referee asks for a small variation. What is the most reproducibility-friendly response?
 
 - Email the notebook and ask the referee to figure it out
+  > Sending an unstructured 47-cell notebook transfers the archaeology burden to the referee and makes the variation almost impossible to reproduce reliably.
 - [o] Maintain the figure's computation in a versioned \`.py\` module with a single entry function, parametrized by the variation; re-run with the new parameter, regenerate the figure, and tag the commit
   > The library-plus-thin-notebook discipline pays off precisely in this scenario. The notebook documents *what you saw*, the module encapsulates *how it was produced*, and git captures *which version*. Variations become a parameter change rather than a 47-cell archaeology dig.
 - Re-run all 47 cells and hope they still work
+  > Running 47 cells in a notebook does not guarantee the environment or hidden state is equivalent to the original run; the page describes this as the "archaeology dig" problem.
 - Ask the referee to install your old laptop
+  > Hardware is not a reproducibility strategy; the correct approach is pinned software environments and version-controlled code.
 
 Reproducibility is about future-you, not just other people.`}
 />

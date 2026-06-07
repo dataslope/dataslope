@@ -284,10 +284,13 @@ page on, the story stops and the *practice* begins.
   markdown={`Which of these is the **most accurate** characterization of how floating-point arithmetic differs from ordinary real-number arithmetic?
 
 - Floating-point arithmetic is slower
+  > Floating-point arithmetic is in fact as fast as integer arithmetic on modern CPUs; the fundamental issue is precision and non-associativity, not speed.
 - [o] Floating-point operations are individually correctly rounded, but compound operations are not associative and can suffer catastrophic cancellation, so algebraically equivalent expressions can produce different numerical answers
   > Each single op is as accurate as it can be in 53 bits of mantissa, but $(a+b)+c \\neq a+(b+c)$ in general. Two mathematically identical algorithms can produce wildly different numerical results.
 - Floating-point can only represent integers
+  > IEEE 754 floating-point can represent non-integer fractions (as binary fractions in the mantissa); representing only integers is the definition of an integer type, not a float.
 - Floating-point uses base 10 internally
+  > IEEE 754 uses base 2 (binary) internally; base 10 is the decimal format and is a separate standard (IEEE 754-2008 decimal) that is almost never used in scientific computing.
 
 This is *the* foundational fact of numerical computing.`}
 />
@@ -296,10 +299,13 @@ This is *the* foundational fact of numerical computing.`}
   markdown={`The condition number $\\kappa(A)$ of a matrix tells you something fundamental about a problem. Which statement best captures what it tells you?
 
 - It measures how fast a solver will run
+  > Runtime depends on the algorithm, matrix size, and hardware; the condition number measures accuracy potential, not computational speed.
 - [o] It measures how much a relative input error gets amplified into a relative output error: a problem with $\\kappa = 10^k$ can lose up to $k$ digits of precision regardless of algorithm
   > The condition number is a property of the *problem*, not of the *algorithm*. It puts a fundamental ceiling on accuracy — no clever code can beat it.
 - It measures memory usage
+  > Memory usage for a dense $n \times n$ matrix is $O(n^2)$ regardless of the condition number; the two quantities are unrelated.
 - It measures the symmetry of $A$
+  > Symmetry is a structural property (whether $A = A^T$) that is unrelated to the condition number; a symmetric matrix can be well- or ill-conditioned.
 
 When you see $\\kappa(A) = 10^\{15\}$ and you have $\\epsilon \\approx 10^\{-16\}$ of precision, you should expect to keep at most 1 digit of your answer.`}
 />

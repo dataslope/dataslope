@@ -214,10 +214,13 @@ Pyodide kernel powering this page.
   markdown={`The first 24-hour numerical weather forecast in 1950 took 24 hours of compute time. What does the page identify as the *deepest* lesson from that experiment?
 
 - That computers were too slow to be useful for weather
+  > The page explicitly says the opposite: the forecast was qualitatively correct and kicked off the research program that underlies every modern weather app; it proved the method was viable, even if the hardware needed decades to catch up.
 - [o] That discretizing a continuous physical problem onto a grid and stepping it forward in time was a viable scientific method
   > Even though the forecast was useless operationally, it proved the *pattern* — discretize + step + iterate — that now underlies every weather, climate, ocean, and atmospheric model.
 - That the barotropic vorticity equation was not a useful approximation
+  > The forecast was qualitatively correct, showing the barotropic vorticity equation was a useful approximation; the lesson was about the viability of discretisation-and-stepping, not a failure of the physics model.
 - That FORTRAN was necessary for weather modeling
+  > The 1950 forecast ran on ENIAC before FORTRAN existed (the first FORTRAN compiler was released in 1957); FORTRAN was not part of this experiment.
 
 The pattern outlasted ENIAC and outlasted FORTRAN — it is still how a 2026 supercomputer thinks about the atmosphere.`}
 />
@@ -226,10 +229,13 @@ The pattern outlasted ENIAC and outlasted FORTRAN — it is still how a 2026 sup
   markdown={`In the 1-D heat equation example, why does the simulation explode when \`dt\` is set too large?
 
 - The grid spacing becomes too coarse
+  > Increasing \`dt\` does not change \`dx\` (the grid spacing); the explosion is a time-stepping stability issue, not a spatial resolution issue.
 - [o] The numerical scheme violates the CFL stability condition: each step amplifies, rather than damps, the high-frequency error modes
   > The forward-time, centered-space (FTCS) scheme is *conditionally stable*. When $\\alpha \\, dt / dx^2 > 1/2$, the discrete update is no longer a contraction and any small round-off error grows exponentially.
 - Python runs out of memory
+  > The simulation array size does not change when \`dt\` increases; no additional memory is allocated, so memory exhaustion is not the cause.
 - Matplotlib cannot plot the values
+  > Matplotlib can plot any finite floating-point value; the explosion produces values so large they overflow to \`inf\` or \`nan\`, which is a numerical stability failure, not a plotting limitation.
 
 Understanding *why* a scheme is stable or unstable is one of the most important parts of designing any time-marching simulation.`}
 />

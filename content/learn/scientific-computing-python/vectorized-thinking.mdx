@@ -335,10 +335,13 @@ When you sit down to translate a formula into NumPy, ask:
   markdown={`What does \`x[:, None]\` produce, given a 1-D array \`x\` of shape \`(n,)\`?
 
 - A scalar
+  > Indexing with \`None\` inserts a new axis rather than reducing dimensions; the result is still an array, not a scalar.
 - An array of shape \`(1, n)\`
+  > The \`None\` in \`x[:, None]\` goes at the second position (after the colon), inserting a length-1 axis there and yielding shape \`(n, 1)\`, not \`(1, n)\`. Placing \`None\` first as in \`x[None, :]\` gives shape \`(1, n)\`.
 - [o] An array of shape \`(n, 1)\` — a "column vector" view of \`x\`
   > \`None\` (a synonym for \`np.newaxis\`) inserts a length-1 axis at that position. Combined with \`y[None, :]\`, this is the standard idiom for outer-product-style broadcasting.
 - A copy of \`x\` with no change in shape
+  > \`x[:, None]\` creates a view with a new axis inserted; the shape changes from \`(n,)\` to \`(n, 1)\`, so it is neither a copy nor an unchanged shape.
 
 This idiom is one of the most common ways to set up a broadcast.`}
 />
@@ -347,10 +350,13 @@ This idiom is one of the most common ways to set up a broadcast.`}
   markdown={`A colleague's NumPy code uses \`np.vectorize\` to call a complicated Python function over an array of shape \`(10**6,)\`. They report it is "as fast as native NumPy." What is most likely going on?
 
 - They are correct — \`np.vectorize\` is a compiled inner loop
+  > \`np.vectorize\` is explicitly documented as a convenience wrapper that calls the Python function once per element; no compilation occurs and it runs at Python-loop speed.
 - [o] They are mistaken — \`np.vectorize\` is a cosmetic wrapper around a Python loop and runs at Python speed. It looks like NumPy but is not vectorized in the compiled sense
   > \`np.vectorize\` exists to give a "ufunc-shaped" API to a Python function, not to speed it up. The docs explicitly warn it is "provided primarily for convenience, not for performance."
 - They are benchmarking the wrong array
+  > Benchmarking the wrong array is a possible error, but the question asks what is *most likely* going on; the more fundamental issue is that \`np.vectorize\` is inherently slow regardless of the input.
 - \`np.vectorize\` JIT-compiles to C on first call
+  > \`np.vectorize\` does not perform JIT compilation; that capability belongs to Numba's \`@njit\` decorator. \`np.vectorize\` always calls the Python function, every call.
 
 When you really need a fast custom ufunc, use Numba, Cython, or rewrite the operation as a composition of existing NumPy primitives.`}
 />

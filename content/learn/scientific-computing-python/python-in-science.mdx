@@ -273,10 +273,13 @@ matters.
   markdown={`Which of the following is the *best* explanation of why Python — a slow, interpreted, dynamically typed language — became the platform of choice for fast scientific computation?
 
 - Python's interpreter is secretly very fast
+  > CPython is a slow interpreter compared to compiled languages; Python's success in scientific computing comes from calling fast C and FORTRAN code, not from a fast interpreter.
 - The Python community rewrote FORTRAN in pure Python
+  > FORTRAN was not rewritten in Python; the scientific Python stack wraps existing FORTRAN libraries (BLAS, LAPACK, ODEPACK) via C extensions.
 - [o] Python is an excellent *glue language*: heavy numerical work happens in compiled BLAS/LAPACK/C/FORTRAN code, while Python provides a friendly interactive interface, a general-purpose programming environment, and a massive ecosystem on top
   > Python's value to science is its ability to combine fast numerical kernels (written in C and FORTRAN), an interactive REPL/Jupyter workflow, and a general-purpose language that handles file I/O, scripting, plotting, and web APIs.
 - The Python language was redesigned in 2005 to add fast arrays
+  > The Python language itself was not redesigned; Travis Oliphant wrote NumPy in 2005 as a third-party library, unifying the competing Numeric and Numarray packages without changing the language core.
 
 The slowness of the interpreter is irrelevant when 99% of compute time is spent inside a BLAS call.`}
 />
@@ -285,10 +288,13 @@ The slowness of the interpreter is irrelevant when 99% of compute time is spent 
   markdown={`The SciPy ecosystem is layered. Which of these correctly describes the layering?
 
 - pandas → NumPy → Matplotlib → SciPy
+  > This ordering is incorrect; pandas depends on NumPy, and Matplotlib is a peer of SciPy rather than a layer beneath it.
 - SciPy → NumPy → BLAS/LAPACK
+  > The arrow direction is reversed: NumPy sits below SciPy, not above it. SciPy depends on NumPy, not the other way around.
 - [o] Almost every other scientific package is built on top of NumPy; SciPy adds higher-level algorithms (optimize, integrate, signal, stats) and itself depends on NumPy and on FORTRAN libraries like BLAS/LAPACK/MINPACK
   > NumPy is the foundation: it defines the array type and the broadcasting rules. SciPy sits on top of NumPy and provides algorithms; under the hood many of those algorithms are FORTRAN. pandas, scikit-learn, scikit-image, PyTorch, xarray, AstroPy all assume NumPy arrays.
 - All four packages are siblings with no dependency relationships
+  > The packages have clear dependency relationships: NumPy is the foundation, SciPy, pandas, and Matplotlib all depend on NumPy, and many higher-level packages depend on multiple layers.
 
 Understanding this layering helps you debug performance problems and pick the right library for a given task.`}
 />

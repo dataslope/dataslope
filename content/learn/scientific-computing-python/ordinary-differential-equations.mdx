@@ -393,8 +393,11 @@ def time_to_apex(v0):
   markdown={`You halve the step size $h$ in your explicit RK4 integrator. By roughly what factor does the global error shrink?
 
 - 2
+  > A factor of 2 reduction is what first-order Euler's method gives; RK4 is fourth-order, so halving $h$ shrinks the error by $2^4 = 16$, not $2^1 = 2$.
 - 4
+  > A factor of 4 corresponds to a second-order method; RK4's fourth-order accuracy means the error scales as $h^4$, giving a $2^4 = 16$ reduction when $h$ is halved.
 - 8
+  > A factor of 8 would correspond to a third-order method; RK4 is fourth-order, so the reduction is $2^4 = 16$.
 - [o] 16
   > RK4 is fourth-order accurate, so the error scales as $h^4$. Halving $h$ shrinks the error by $2^4 = 16$. This favorable scaling is exactly why RK4 dominated explicit ODE solving for decades.
 
@@ -405,10 +408,13 @@ This is also why high-order methods can deliver far more accuracy *per function 
   markdown={`Your reaction-network ODE has fast equilibria on timescales of $10^\{-6\}$ seconds and slow dynamics on timescales of $10^\{3\}$ seconds. \`solve_ivp\` with the default \`RK45\` method either crawls or returns "step size too small". What's the right next step?
 
 - Lower the absolute tolerance
+  > Lowering the absolute tolerance makes the solver demand higher accuracy, which forces even smaller steps — the opposite of what is needed when stiffness is already causing the step size to collapse.
 - [o] Switch to an implicit stiff solver such as \`BDF\` or \`LSODA\`
   > Wildly separated timescales are the textbook definition of stiffness. Explicit RK methods are forced to use tiny steps for *stability* — not accuracy. Implicit BDF/LSODA solvers handle stiff systems in dozens of steps where RK45 needs millions.
 - Switch to \`DOP853\` for higher order
+  > DOP853 is an explicit 8th-order method; using a higher-order explicit method does not solve stiffness, because explicit methods of any order are still constrained by the CFL-like stability condition.
 - Add a perturbation to break the symmetry
+  > Stiffness is a property of the ODE's eigenvalue spectrum, not of any symmetry; adding a perturbation does not change the timescale separation that causes stiffness.
 
 The symptom "any step size is too small" almost always means stiffness.`}
 />
