@@ -227,10 +227,13 @@ than a baffling alignment bug forty cells later.
   markdown={`In a table where each row should represent one customer, two rows have the same \`customer_id\` but slightly different \`name\` and \`spend\`. What is the most defensible response?
 
 - Always drop the second copy
+  > Dropping the second copy assumes it is less authoritative, which may not be true — it could be more recent or more accurate.
 - Always sum the spend
+  > Summing blindly could double-count a customer's spend if both rows represent the same purchase event.
 - [o] Decide based on the business rules (keep first? keep latest? aggregate?) and document the choice; do not blindly drop or sum
   > Duplicate resolution is a business judgement. Whatever you pick, make it visible in your code so future readers know.
 - Ignore them
+  > Ignoring duplicates means every groupby, aggregation, and join will silently count the customer twice, producing inflated results.
 
 Casual de-duplication is a frequent source of quiet data loss.`}
 />
@@ -239,10 +242,13 @@ Casual de-duplication is a frequent source of quiet data loss.`}
   markdown={`Which sequence is the chapter's recommended general approach to cleaning inconsistent categorical labels?
 
 - Drop the column, recreate, paste back
+  > Recreating the column from scratch does not fix the underlying inconsistencies unless the cleaning logic is also applied.
 - One-hot encode everything
+  > One-hot encoding an inconsistent column would create separate binary columns for each variant (e.g., \`"USA"\`, \`"U.S."\`, \`"U.S.A."\`), inflating dimensionality without solving the root problem.
 - [o] Strip whitespace → normalize case → replace known variants with a canonical form
   > That three-step recipe covers the great majority of category-label cleanup.
 - Convert to numeric
+  > Converting a categorical text column to numeric would destroy the label information; the goal is to unify the string variants, not change the column type.
 
 The order matters: stripping and case-normalizing before replacement gives the replacement a clean target to match.`}
 />
@@ -251,10 +257,13 @@ The order matters: stripping and case-normalizing before replacement gives the r
   markdown={`Why does a column with inconsistent units (\`"USD"\`, \`"cents"\`, \`"EUR"\` all in one \`price\` field) cause silent bugs?
 
 - It causes the file to fail to open
+  > Pandas reads the file without error because the column has a valid dtype (\`object\` or \`float64\`); the problem is semantic, not structural.
 - It is too small
+  > Data size is irrelevant here; a single mixed-unit column causes incorrect results regardless of how many rows the DataFrame has.
 - [o] Aggregations like \`mean\`, \`sum\`, comparisons, and rankings will mix incompatible numbers, producing meaningless results without any error
   > There is no syntactic clue that 1500 cents and 10 USD are the same amount; convert to one unit early.
 - It uses too much memory
+  > Memory usage depends on column count and row count, not whether the stored values are in consistent units.
 
 Unit-normalize before any numeric operation. Always.`}
 />

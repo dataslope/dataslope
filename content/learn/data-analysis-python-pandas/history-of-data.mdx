@@ -198,8 +198,11 @@ total something up — is unchanged.
   markdown={`Which of the following is **not** an example of a tabular dataset in the historical sense used in this chapter?
 
 - A Sumerian clay tablet listing daily grain rations
+  > A grain-ration ledger has repeated rows of transactions with aligned columns of item, quantity, and recipient — exactly the tabular shape the chapter describes.
 - A Roman census enumerating citizens by household
+  > A census has repeated rows (one per household) with columns of attributes (name, property, family members) — a canonical tabular dataset.
 - The 1890 US census tabulated on Hollerith punch cards
+  > The 1890 census is explicitly cited in the chapter as a milestone in tabular data; each punch card was one row (one person) with columns of attributes.
 - [o] A handwritten love poem on parchment
   > A poem is unstructured prose — it has no repeated rows of similar things with aligned columns of attributes. A tabular dataset is defined by its row-and-column structure, where each row represents one "thing" and each column one attribute of that thing.
 
@@ -210,10 +213,13 @@ Tabular structure — repeated rows of similar entities with aligned columns —
   markdown={`Why is the relational model (Codd, 1970) relevant to a course about Pandas?
 
 - Pandas is itself a relational database
+  > The chapter explicitly states that Pandas is an in-memory analytical library, not a database; it does not provide persistent storage or concurrent access.
 - Codd invented the CSV format
+  > Codd's 1970 paper proposed the relational model and relational algebra; the CSV format predates and postdates that work independently and was not part of his contribution.
 - [o] Pandas borrows the same conceptual vocabulary — tables, rows, columns, joins, group-bys — and the same mental model of operating on whole sets of rows at once
   > Pandas is an in-memory analytical library, not a database, but its operations are deeply inspired by relational algebra. Understanding "joins" and "group bys" in Pandas means understanding ideas that have been around for over fifty years.
 - Pandas requires you to use SQL syntax internally
+  > Pandas uses Python method calls, not SQL; the connection to Codd is conceptual (shared vocabulary and mental models), not syntactic.
 
 The historical continuity between databases and DataFrames is one reason the same vocabulary keeps appearing in this course.`}
 />

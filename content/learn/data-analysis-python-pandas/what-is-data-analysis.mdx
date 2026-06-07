@@ -313,10 +313,13 @@ coming back to it.
   markdown={`Which of the following best matches the chapter's working definition of data analysis?
 
 - Producing as many charts as possible
+  > Chart volume is not the goal; the definition emphasizes useful, defensible answers — charts are one communication tool among several.
 - Memorizing Pandas function names
+  > Knowing library syntax is a means to an end; the chapter's definition is tool-independent and centers on the analytical process.
 - [o] A disciplined process of turning raw recorded observations into useful, defensible answers to questions humans care about
   > Notice the three load-bearing words: *disciplined*, *useful*, *defensible*. None of them mentions a specific tool.
 - Building machine-learning models
+  > Machine-learning model building is part of the predictive layer; the chapter's definition of data analysis encompasses a broader process that includes but is not limited to modeling.
 
 A useful definition is tool-independent.`}
 />
@@ -325,8 +328,11 @@ A useful definition is tool-independent.`}
   markdown={`Which of these is a **descriptive** analytical question (as opposed to diagnostic, predictive, or prescriptive)?
 
 - Why did revenue drop last quarter?
+  > "Why did revenue drop" is a diagnostic question — it seeks a cause, not just a description of what happened.
 - What should we do to reduce churn?
+  > Recommending an action is prescriptive analysis, the highest level of analytical ambition in the chapter's framework.
 - What will revenue be next quarter?
+  > Forecasting a future value is predictive analysis, not descriptive.
 - [o] What was our revenue last quarter?
   > Descriptive analysis answers "what happened" — counts, sums, averages, breakdowns. It is the foundation everything else is built on.
 
@@ -337,10 +343,13 @@ Most analyst work falls in the descriptive and diagnostic layers, which is exact
   markdown={`Why does the chapter say "asking the right question" is an under-rated skill?
 
 - It saves keystrokes
+  > A well-framed question typically requires *more* careful wording, not fewer; keystroke count is irrelevant to analytical quality.
 - It avoids using Pandas
+  > Good question-framing is tool-independent; Pandas is still the right library once the question is precise.
 - [o] Vague questions ("how is the campaign doing?") have many plausible answers, while specific questions ("of users who saw banner X between dates A and B, what fraction purchased within 7 days?") have one computable answer
   > Precision in the question is what makes the answer defensible. Most arguments about analysis results trace back to ambiguity in the original question.
 - It impresses your manager
+  > The chapter's argument is about analytical quality and defensibility, not perception management.
 
 Spending time sharpening the question before writing code is almost always a good investment.`}
 />
@@ -349,10 +358,13 @@ Spending time sharpening the question before writing code is almost always a goo
   markdown={`In the income-vs-attrition example, the chapter cautioned that the observed gap is "a correlation, not a proven cause." What is the closest reason given?
 
 - The dataset is too small
+  > The chapter does not cite dataset size as the caution; 1,470 employees is a reasonable sample. The concern is confounding variables, not sample size.
 - Pandas cannot compute causes
+  > The caution is analytical — about the limits of observational data — not a Pandas limitation.
 - [o] The income gap could be explained by many other factors (age, department, role), so a simple comparison cannot prove that pay drives attrition
   > This is the classic "correlation is not causation" warning, applied carefully. Honest analysts state the limits of their evidence.
 - Attrition is a categorical variable
+  > Attrition's variable type (categorical Yes/No) is not the reason for the caution; many valid causal analyses involve categorical outcomes.
 
 Hedging language ("appears to be associated with") is the analyst's friend; overstated causal claims are a frequent source of bad decisions.`}
 />

@@ -292,10 +292,13 @@ assert isinstance(orphans, pd.DataFrame)`,
   markdown={`Your join produces 3× more rows than the left table. The most likely cause is:
 
 - A bug in pandas
+  > Row-count multiplication from duplicate keys is correct, documented merge behavior — not a Pandas defect.
 - A network issue
+  > Network issues affect data loading, not the row-matching logic of an in-memory merge.
 - [o] The join key is duplicated in the right-hand table — each left row matches multiple right rows
   > Always check key uniqueness with \`.duplicated()\` or \`validate="one_to_many"\` before joining.
 - The dtypes are different
+  > Mismatched dtypes on the key column prevent rows from matching and would produce *fewer* rows (or no matches), not 3× more.
 
 Cardinality blow-ups are by far the most common merge bug.`}
 />
@@ -304,10 +307,13 @@ Cardinality blow-ups are by far the most common merge bug.`}
   markdown={`Which join is best for "every employee row, with department info attached if available, but I don't want to lose any employees"?
 
 - inner
+  > An inner join drops employees who have no matching department, violating the requirement to keep every employee row.
 - [o] left (employees on the left)
   > Left join keeps all employees and adds dept info where it matches.
 - outer
+  > An outer join keeps every row from both tables, including departments that have no employees — more rows than needed.
 - right
+  > A right join keeps all department rows and only the employees that match, losing employees with no department record.
 
 Left joins are the workhorse of enrichment workflows.`}
 />
@@ -316,10 +322,13 @@ Left joins are the workhorse of enrichment workflows.`}
   markdown={`The most useful diagnostic flag for understanding a merge is:
 
 - copy=False
+  > \`copy=False\` is a memory-efficiency hint that has no effect on the diagnostic information returned by the merge.
 - sort=True
+  > \`sort=True\` reorders rows by the join key, which helps with display but does not reveal coverage issues.
 - [o] indicator=True — adds a \`_merge\` column showing which rows are left-only, right-only, or matched in both
   > Always reach for this when row counts surprise you.
 - on="*"
+  > \`on="*"\` is not valid Pandas syntax; the \`on\` parameter requires an explicit column name or list of column names.
 
 \`indicator=True\` should be in every data analyst's debugging toolbox.`}
 />
@@ -328,10 +337,13 @@ Left joins are the workhorse of enrichment workflows.`}
   markdown={`What's the safest way to **guarantee** your merge is one-to-one before producing results?
 
 - Manually count rows after the merge
+  > Comparing row counts after the merge can detect a problem but does not prevent it or tell you which key caused it; \`validate=\` raises immediately with details.
 - Hope for the best
+  > Relying on luck is not a safeguard; silent cardinality bugs are exactly what the \`validate=\` parameter was designed to catch.
 - [o] Pass \`validate="one_to_one"\` to \`merge\` — Pandas raises an error if the data violates that assumption
   > Encoding your assumptions in the code catches problems immediately, instead of letting silent bugs propagate.
 - Use a SQL database instead
+  > SQL can also validate cardinality, but switching tools is not necessary; \`pd.merge(..., validate=)\` provides the same protection inline.
 
 The \`validate=\` parameter turns implicit assumptions into explicit, testable contracts.`}
 />

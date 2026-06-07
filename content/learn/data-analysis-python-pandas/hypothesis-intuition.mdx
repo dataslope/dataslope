@@ -183,10 +183,13 @@ covariate; use stratified sampling).
   markdown={`Your A/B test shows a 1% improvement with p = 0.03 on 2,000 users. Your colleague claims "this proves the feature works." What's the best response?
 
 - Agree — p < 0.05
+  > p < 0.05 is a conventional threshold, not proof the effect is large or real enough to act on — a 1% improvement may be too small to matter, and confounders could explain it.
 - Disagree — p > 0.001
+  > p = 0.03 does cross the standard 0.05 threshold, so blanket disagreement based on it not reaching 0.001 would be incorrect.
 - [o] Push back gently — significance is real, but 1% is small, and there may be confounders (time of day, version drift, holiday traffic). Investigate effect size and replicability before shipping company-wide.
   > P-values are one input. Effect size, practical significance, replicability, and confounders matter at least as much.
 - Re-run with smaller sample
+  > A smaller sample would reduce statistical power, making it harder to detect the effect — not a useful diagnostic step here.
 
 Analysts protect their team from over-interpreting noisy results.`}
 />
@@ -195,10 +198,13 @@ Analysts protect their team from over-interpreting noisy results.`}
   markdown={`You see a strong correlation between ice cream sales and drowning incidents. What is the most likely explanation?
 
 - Ice cream causes drowning
+  > No plausible mechanism connects ice cream consumption to drowning risk directly; assuming causation from correlation is the classic error this example warns against.
 - Drowning causes ice cream sales
+  > Reverse causation is also unsupported — drowning incidents don't trigger ice cream purchases.
 - [o] A confounding variable — hot summer weather increases both
   > The textbook example of confounding.
 - The data is wrong
+  > Dismissing a consistent pattern as data error without evidence is not a useful analytical response.
 
 Always ask "what else could explain this?".`}
 />
@@ -207,10 +213,13 @@ Always ask "what else could explain this?".`}
   markdown={`A p-value of 0.03 means:
 
 - A 97% chance the result is real
+  > A p-value does not directly measure the probability that the alternative hypothesis is true; that is a common but incorrect interpretation.
 - A 3% chance the data is wrong
+  > A p-value says nothing about whether the data are wrong; it is a statement about how surprising the observed result would be if the null hypothesis were true.
 - [o] If the null hypothesis (no real effect) were true, the chance of seeing a result this extreme by luck is 3%
   > It's a statement about a hypothetical world, not directly about your actual hypothesis being "true".
 - A 30% chance of error
+  > No standard definition maps a p-value of 0.03 to a 30% error rate.
 
 Misinterpreting p-values is one of the most common errors in applied analytics.`}
 />
@@ -219,10 +228,13 @@ Misinterpreting p-values is one of the most common errors in applied analytics.`
   markdown={`A very large dataset shows a "statistically significant" difference of 0.001 between two groups. What should you conclude?
 
 - Definitely a real effect — ship it
+  > Statistical significance does not guarantee practical importance; with a very large dataset even a 0.001 difference can be statistically significant while being irrelevant to any real decision.
 - The data must be corrupt
+  > A tiny but statistically significant difference is consistent with clean data and a large sample — there is no reason to suspect corruption.
 - [o] The difference may be real but is so small it is probably not practically meaningful — large samples can detect trivially small effects
   > Big samples make tiny signals reach significance. Always ask: "Is this difference big enough to matter for my decision?"
 - It is just noise
+  > A statistically significant result — even a tiny one — is unlikely to be pure noise; the issue is that "significant" and "important" are different questions.
 
 Statistical significance and practical significance are different questions.`}
 />
@@ -231,10 +243,13 @@ Statistical significance and practical significance are different questions.`}
   markdown={`Which is the most useful safeguard against fooling yourself with data?
 
 - Always trusting the p-value
+  > Relying solely on the p-value ignores effect size, confounders, and replication — the very issues that lead analysts to fool themselves.
 - Computing more decimal places
+  > Extra precision in the p-value (e.g., 0.0312 vs 0.03) adds no meaningful information and does not guard against the underlying biases.
 - [o] Combining: a clear hypothesis stated in advance, a check for confounders, an effect-size threshold that matters in your domain, and replication
   > No single number protects you. Disciplined process does.
 - Using bigger fonts in charts
+  > Chart typography has no effect on the statistical rigor of an analysis.
 
 Hypothesis testing is one tool inside a much larger discipline of careful thinking.`}
 />

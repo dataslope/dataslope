@@ -280,10 +280,13 @@ limitation (your dataset must fit).
   markdown={`A CSV file on disk is, at the lowest level:
 
 - A spreadsheet
+  > A spreadsheet is a binary format maintained by application software; a CSV is plain text that any editor can open without special software.
 - A binary database table
+  > Database tables are stored in proprietary binary formats with type metadata; a CSV is plain text with no type information.
 - [o] A sequence of bytes (typically interpreted as text) with rows separated by newlines and values separated by commas
   > CSV is plain text. The "table-ness" is imposed by whatever reader (Excel, Pandas, etc.) interprets the bytes.
 - A proprietary Pandas format
+  > Pandas has no proprietary on-disk format for reading; \`pd.read_csv\` reads the universal plain-text CSV format, not something Pandas invented.
 
 This is why CSV files are portable across every OS, language, and tool.`}
 />
@@ -292,10 +295,13 @@ This is why CSV files are portable across every OS, language, and tool.`}
   markdown={`Why might Pandas read a ZIP code column like \`04210\` as the integer \`4210\`?
 
 - Pandas has a bug
+  > Type inference that converts digit-only strings to integers is documented and intentional behavior; leading-zero loss is the expected consequence of integer representation.
 - The CSV file is corrupted
+  > The CSV contains the text \`04210\`; the file is intact. The loss of the leading zero happens during type inference, not during file reading.
 - [o] Pandas inferred the column as \`int64\` (because all values look like integers) and integers cannot have leading zeros — the \`0\` is dropped silently
   > This is the canonical example of type inference biting you. Fix it by passing \`dtype={"zip": "string"}\` to \`pd.read_csv\`.
 - ZIP codes are not real data
+  > ZIP codes are valid data; the chapter uses them as an example precisely because they are real and frequently mishandled by automatic type inference.
 
 Always check \`df.dtypes\` after loading; it is the cheapest bug-prevention habit you can build.`}
 />
@@ -304,10 +310,13 @@ Always check \`df.dtypes\` after loading; it is the cheapest bug-prevention habi
   markdown={`Why does Pandas store data column-by-column rather than row-by-row?
 
 - It uses less disk space
+  > Column-oriented storage has disk-space benefits in some formats (e.g., Parquet), but the chapter's explanation focuses on memory efficiency and query speed, not general disk savings.
 - It is required by Python
+  > Python itself has no storage-layout requirement; Pandas chose columnar storage for performance reasons.
 - [o] All values in a column share a type, which allows tight packing and fast operations; analytical queries also tend to scan a few columns of many rows
   > Column-store layouts are the standard for analytical systems (Pandas, Parquet, DuckDB, ClickHouse, BigQuery). Row-stores are better for transactional databases that touch one row at a time.
 - Pandas was invented after rows existed
+  > The chronology of rows versus columns is irrelevant; Pandas chose column storage for the analytical performance advantage it provides.
 
 Understanding column orientation explains why \`df["age"].mean()\` is fast and why memory usage scales by column rather than by row.`}
 />
@@ -316,10 +325,13 @@ Understanding column orientation explains why \`df["age"].mean()\` is fast and w
   markdown={`A column containing the values \`"true"\`, \`"false"\`, \`"true"\` is loaded by Pandas. What dtype is it most likely to get by default?
 
 - \`bool\`
+  > Pandas does not reliably auto-detect lowercase string values \`"true"\`/\`"false"\` as booleans during CSV reading; they remain plain strings (\`object\` dtype).
 - \`int64\`
+  > The values are the strings \`"true"\` and \`"false"\`, not digits; there is nothing for integer inference to parse.
 - [o] \`object\` (Python strings)
   > Pandas does not auto-recognize lowercase \`"true"\` / \`"false"\` as booleans (it has done so in some versions for \`True\`/\`False\`, but not reliably). You need to convert explicitly with \`df["col"].map({"true": True, "false": False})\` or \`astype("bool")\` after cleaning.
 - \`category\`
+  > Pandas does not automatically infer \`category\` dtype; it requires an explicit \`dtype="category"\` argument or a subsequent \`astype("category")\` call.
 
 Booleans-as-strings are a common surprise; defensive type checking catches them.`}
 />
