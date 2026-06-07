@@ -548,25 +548,6 @@ function adaptNodes(root: Element | null, isDark: boolean): void {
     const token = MINDMAP_BRANCHES[Number(m[1]) % MINDMAP_BRANCHES.length];
     e.style.setProperty("stroke", c(token as keyof typeof BRAND_FALLBACKS), "important");
   });
-
-  // JetBrains Mono renders 700 ("bolder") heavy, so soften every bold label to
-  // 580 wherever the mono face is used: the all-mono class/ER diagrams and inline
-  // <code> spans. Inline style beats Mermaid's id-scoped `.classTitle` rule, and
-  // the variable font (loaded 400–700) makes 580 a real weight.
-  const soften = (el: SVGElement | HTMLElement) => {
-    const weight = getComputedStyle(el).fontWeight;
-    if (weight === "bold" || Number(weight) >= 600) el.style.fontWeight = "580";
-  };
-  const codeSvg = root.querySelector(
-    'svg[aria-roledescription="class"], svg[aria-roledescription="er"]',
-  );
-  codeSvg
-    ?.querySelectorAll<HTMLElement>(
-      "foreignObject p, foreignObject span, foreignObject div",
-    )
-    .forEach(soften);
-  codeSvg?.querySelectorAll<SVGElement>("text, tspan").forEach(soften);
-  root.querySelectorAll<HTMLElement>("foreignObject code").forEach(soften);
 }
 
 function MermaidContent({ chart }: { chart: string }) {
@@ -600,7 +581,7 @@ function MermaidContent({ chart }: { chart: string }) {
         document.fonts.load("700 15px Inter"),
         document.fonts.load('400 15px "JetBrains Mono"'),
         document.fonts.load('500 15px "JetBrains Mono"'),
-        document.fonts.load('580 15px "JetBrains Mono"'),
+        document.fonts.load('700 15px "JetBrains Mono"'),
       ]);
       const prefix = isCodeDiagram(chart) ? MONO_DIRECTIVE : "";
       return mermaid.render(id, prefix + chart.replaceAll("\\n", "\n"));
