@@ -25,6 +25,73 @@ flowchart TD
     Review -->|revise| Gather
 ```
 
+The flowchart shows the loop; here is what each step actually asks of you,
+as a checklist you can carry into any design:
+
+<Steps>
+<Step>
+
+**Gather requirements**
+
+Write plain sentences about what the system must remember. **Nouns** hint at
+entities; **verbs** hint at relationships.
+
+</Step>
+<Step>
+
+**Identify entities**
+
+Pick out the kinds of things worth their own table — each with its own
+identity and facts.
+
+</Step>
+<Step>
+
+**Identify attributes**
+
+Place each fact on the entity it actually describes, not on a neighbour.
+
+</Step>
+<Step>
+
+**Identify relationships**
+
+Ask "how many connect to how many?" in both directions to find the
+cardinality.
+
+</Step>
+<Step>
+
+**Choose keys**
+
+Give each row a stable primary key, and connect rows to others with foreign
+keys.
+
+</Step>
+<Step>
+
+**Add constraints**
+
+Turn design rules into `NOT NULL`, `UNIQUE`, `CHECK`, and `REFERENCES` so the
+database itself rejects bad data.
+
+</Step>
+<Step>
+
+**Normalize**
+
+Check that every fact lives in exactly one place, with no harmful repetition.
+
+</Step>
+<Step>
+
+**Review with examples**
+
+Walk real scenarios through the schema; when one breaks, loop back and revise.
+
+</Step>
+</Steps>
+
 ## Step 1: gather requirements
 
 Start with plain sentences about what the system must remember and

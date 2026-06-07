@@ -47,6 +47,73 @@ Lowercasing before part-of-speech tagging can confuse a tagger that uses
 capitalization as a clue. The same steps in a different order can give
 different — sometimes worse — results.
 
+The table above is the quick reference. Here is the same flow as a
+walkthrough, so you can watch the value in your hands change shape at each
+stage — a single string going in, a clean list of units coming out:
+
+<Steps>
+<Step>
+
+**Raw text in**
+
+You start with a single string — one document, message, or sentence.
+
+</Step>
+<Step>
+
+**Sentence tokenization** *(optional)*
+
+Split that string into a list of sentences, so later steps can respect
+sentence boundaries.
+
+</Step>
+<Step>
+
+**Word tokenization**
+
+Break the text into words and punctuation. You are now holding a *list of
+tokens* — and almost everything that follows is a transformation of that list.
+
+</Step>
+<Step>
+
+**Case folding**
+
+Lowercase the tokens so `The` and `the` count as the same word.
+
+</Step>
+<Step>
+
+**Cleaning**
+
+Drop punctuation and other non-word tokens you do not need.
+
+</Step>
+<Step>
+
+**Stopword removal** *(optional)*
+
+Remove ultra-common words like *the*, *is*, and *of* — when the task benefits
+from it.
+
+</Step>
+<Step>
+
+**Stemming or lemmatization** *(optional)*
+
+Reduce each remaining word to a root form so variants collapse together.
+
+</Step>
+<Step>
+
+**Analysis**
+
+Feed the clean list into whatever you are building: counts, n-grams, POS tags,
+or model features.
+
+</Step>
+</Steps>
+
 <Callout type="info" title="The pipeline is a sequence of transformations on a list">
 After tokenization, your text is just a Python list of strings, and every
 later step is a transformation of that list into another list: filter out

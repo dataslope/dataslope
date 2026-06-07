@@ -141,6 +141,53 @@ missing data. That will affect how you compute averages, how you
 plot, how you join with other data, *everything*. Knowing it
 upfront lets you choose your strategy.
 
+## The ritual at a glance
+
+That is the entire ritual. Before applying it to a fresh dataset below, here
+it is as a walkthrough — the question each step answers about the data in
+front of you:
+
+<Steps>
+<Step>
+
+**Shape — how big is it?**
+
+`dim()`, `nrow()`, `ncol()`. The size decides what analysis is even feasible.
+
+</Step>
+<Step>
+
+**Peek — does it look right?**
+
+`head()`, `tail()`. A ten-second glance catches mangled headers and parsing
+errors before they cost you an hour.
+
+</Step>
+<Step>
+
+**Structure — are the types right?**
+
+`str()`. Confirm numbers are numeric, dates are dates, and categories are not
+hiding as strings.
+
+</Step>
+<Step>
+
+**Summaries — are the values plausible?**
+
+`summary()`. Scan for impossible values, suspicious means, and telltale skew.
+
+</Step>
+<Step>
+
+**Missingness — what is missing, and how much?**
+
+`colSums(is.na(...))`. Knowing the gaps upfront shapes how you average, plot,
+and join.
+
+</Step>
+</Steps>
+
 ## A multi-file walkthrough: meet `iris`
 
 Let's apply the ritual to a fresh dataset, with the inspection

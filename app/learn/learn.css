@@ -151,6 +151,34 @@ samp {
   color: hsl(0, 0%, 80%);
 }
 
+/* Theme toggle hover affordance (desktop sidebar footer). The light/dark
+   toggle is a single button (data-theme-toggle) holding the sun + moon
+   icons; Fumadocs gives it no hover state, and the general sidebar-hover
+   rule above deliberately excludes it (:not([aria-label="Toggle Theme"])).
+   Re-add a subtle background + slightly stronger icon on hover so the
+   control reads as interactive, matching the hover tint used by the
+   sidebar's navigation items. The background is applied to the individual
+   icon under the pointer (svg:hover) — not the wrapper — so only the sun
+   or moon being hovered highlights, mirroring the active icon's own
+   rounded background.
+
+   #nd-sidebar is the desktop sidebar (its wrapper is `max-md:hidden`) and
+   the `.border.rounded-lg` footer bar only exists there, so this never
+   applies on mobile; the min-width query makes that desktop-only scope
+   explicit. */
+@media (min-width: 768px) {
+  :root:not(.dark) #nd-sidebar div.border.rounded-lg [data-theme-toggle] svg:hover {
+    background-color: hsl(0, 0%, 94%);
+    color: hsl(0, 0%, 38%);
+    border-radius: 0.375rem;
+  }
+  .dark #nd-sidebar div.border.rounded-lg [data-theme-toggle] svg:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+    color: hsl(0, 0%, 92%);
+    border-radius: 0.375rem;
+  }
+}
+
 /* Sidebar navigation links, folder-trigger buttons, and separator labels
    ("Dataslope" logo link included) → Source Serif. The opsz axis is set
    to 14 for text at ~13–15 px to get the optical balance right at small
@@ -440,6 +468,45 @@ code.hljs {
   line-height: 1.6;
 }
 
+/* ── Steps component (Fumadocs docs styling) ─────────────────────────────
+   Match the Fumadocs docs look for <Steps>/<Step>: compact Inter (sans)
+   with tight tracking instead of the large Source Serif that the `.prose`
+   paragraph rule applies. Each step is authored as a bold title paragraph
+   (`<p><strong>…</strong></p>`) followed by one description paragraph.
+   These selectors outrank the `.prose :where(p, …)` serif rule on
+   specificity, so they win without !important.
+   ─────────────────────────────────────────────────────────────────────── */
+.prose .fd-step > p {
+  font-family: var(--font-sans);
+  letter-spacing: -0.011em;
+  font-variation-settings: normal;
+}
+.prose .fd-step > p strong {
+  font-weight: 600;
+}
+/* Title — the first paragraph: 600-weight, sized down from the 1.125rem
+   prose default, with a 12px gap down to its description. */
+.prose .fd-step > p:first-child {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+/* Description — slightly smaller than the title, with the body line-height
+   (1.75). Its margins are zeroed so the only vertical gap between steps is
+   the explicit one set on `.fd-step` below. */
+.prose .fd-step > p:not(:first-child) {
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+/* ~32px between consecutive steps. */
+.prose .fd-steps .fd-step + .fd-step {
+  margin-top: 2rem;
+}
+
 /* ── TOC navigation ──────────────────────────────────────────────────────
    Each TOC item is an <a> inside #nd-toc (desktop) or inside the mobile
    popover ([data-toc-popover-content]). The panel title is an <h3>.
@@ -490,26 +557,6 @@ code.hljs {
   font-family: var(--font-serif), Georgia, "Times New Roman", serif;
   font-variation-settings: "opsz" 14;
   letter-spacing: 0;
-}
-
-/* ── Course label ────────────────────────────────────────────────────────
-   Rendered as the sidebar banner (below the search bar) on pages nested
-   inside a course, linking back to the course landing page. Styled as a
-   small, muted serif link so it reads as context, not a heading.
-   ─────────────────────────────────────────────────────────────────────── */
-[data-course-label] {
-  display: block;
-  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
-  font-size: 0.875rem;
-  font-variation-settings: "opsz" 12;
-  letter-spacing: 0;
-  color: var(--color-fd-muted-foreground);
-  text-decoration: none;
-  margin-bottom: 0.25rem;
-}
-
-[data-course-label]:hover {
-  text-decoration: underline;
 }
 
 /* Restore sans-serif on <td> and <th> inside challenge/quiz cards.

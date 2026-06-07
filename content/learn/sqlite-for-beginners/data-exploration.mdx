@@ -26,6 +26,49 @@ flowchart LR
     E --> A
 ```
 
+The loop above is the shape of exploration; here is one pass through it, with
+the question each step answers:
+
+<Steps>
+<Step>
+
+**What tables exist?**
+
+List the tables in the database so you know what you are working with.
+
+</Step>
+<Step>
+
+**What columns does each have?**
+
+Inspect a table's schema — the column names and types tell you what questions
+are even askable.
+
+</Step>
+<Step>
+
+**What do a few rows look like?**
+
+Peek at a small sample to see real values, formats, and obvious oddities.
+
+</Step>
+<Step>
+
+**How big, and what's in the columns?**
+
+Count rows and check ranges, distinct values, and min/max to gauge scale and
+spread.
+
+</Step>
+<Step>
+
+**Any gaps, NULLs, or surprises?**
+
+Hunt for missing values and anomalies — then loop back with sharper questions.
+
+</Step>
+</Steps>
+
 ## Step 1 — What tables exist?
 
 In SQLite, the database keeps a built-in catalog of itself in a

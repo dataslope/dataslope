@@ -81,6 +81,53 @@ flowchart TD
   F -. "iterate" .-> B
 ```
 
+Here is that checklist as a walkthrough — the question each stage answers:
+
+<Steps>
+<Step>
+
+**Understand the shape**
+
+Rows, columns, and dtypes — what *is* this table before you analyze it?
+
+</Step>
+<Step>
+
+**Each variable alone**
+
+Distributions and summaries, one column at a time — center, spread, and skew.
+
+</Step>
+<Step>
+
+**Missingness**
+
+How much is missing, where it sits, and (if you can tell) why.
+
+</Step>
+<Step>
+
+**Outliers**
+
+Separate data-entry errors from real, meaningful extremes.
+
+</Step>
+<Step>
+
+**Relationships**
+
+How variables move together — group-bys and correlations.
+
+</Step>
+<Step>
+
+**Form hypotheses**
+
+Turn what you saw into hunches to confirm *later*, on fresh data.
+
+</Step>
+</Steps>
+
 We'll walk this with a real dataset. The tips dataset records
 restaurant bills, tips, party size, day, and a few categorical traits —
 small enough to reason about, rich enough to be interesting.
