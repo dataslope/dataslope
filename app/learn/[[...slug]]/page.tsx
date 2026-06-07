@@ -49,7 +49,15 @@ export default async function LearnPage(props: LearnPageProps) {
   const githubUrl = `${GITHUB_BLOB_BASE}/${page.path}`;
 
   return (
-    <DocsPage toc={toc} full={page.data.full}>
+    // Each course folder's meta.json sets `root: true`, so Fumadocs scopes the
+    // sidebar and breadcrumb tree to that course (the root folder's title is the
+    // course name). `includeRoot: true` adds that root as the breadcrumb's
+    // leading crumb — linking to the course index — which surfaces the course
+    // name on every lesson page. Without it the breadcrumb excludes the root,
+    // and since the course is the only node in scope it would render nothing.
+    // Loose/demo pages under `content/learn` aren't inside a `root` folder, so
+    // they simply get no breadcrumb.
+    <DocsPage toc={toc} full={page.data.full} breadcrumb={{ includeRoot: true }}>
       <DocsTitle>{page.data.title}</DocsTitle>
       {page.data.description ? (
         <DocsDescription>{page.data.description}</DocsDescription>
