@@ -34,7 +34,7 @@ the `id` of some customer. Order 101 storing `customer_id = 1` means
 
 ```mermaid
 flowchart LR
-    O["orders.<code>customer_id</code> = 1"] -->|"refers to"| C["customers.id = 1<br/>(Ada)"]
+    O["orders.<code>customer_id</code> = 1"] -->|"refers to"| C["<code>customers.id = 1</code><br/>(Ada)"]
 ```
 
 ## Why store an id instead of the name?
@@ -110,8 +110,8 @@ appears:
 ```mermaid
 flowchart TB
     subgraph customers["customers"]
-        C1["id = 1 (PK)<br/>name = Ada"]
-        C2["id = 2 (PK)<br/>name = Grace"]
+        C1["<code>id = 1</code> (PK)<br/>name = Ada"]
+        C2["<code>id = 2</code> (PK)<br/>name = Grace"]
     end
     subgraph orders["orders"]
         O1["id = 101<br/><code>customer_id</code> = 1 (FK)"]

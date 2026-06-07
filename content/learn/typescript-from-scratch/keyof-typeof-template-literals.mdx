@@ -235,9 +235,9 @@ This pattern ensures that if you add a new event to `EventMap`, the correspondin
 
 ```mermaid
 graph TD
-    A["Value: EventMap<br/>{click: ..., keypress: ..., focus: ...}"] --> B["keyof EventMap<br/>'click' | 'keypress' | 'focus'"]
+    A["Value: EventMap<br/><code>{click: ..., keypress: ..., focus: ...}</code>"] --> B["keyof EventMap<br/>'click' | 'keypress' | 'focus'"]
     B --> C["Template Literal<br/>'onClick' | 'onKeypress' | 'onFocus'"]
-    C --> D["Mapped Type<br/>{onClick: ..., onKeypress: ..., onFocus: ...}"]
+    C --> D["Mapped Type<br/><code>{onClick: ..., onKeypress: ..., onFocus: ...}</code>"]
     style A fill:#e1f5ff
     style D fill:#d4edda
 ```

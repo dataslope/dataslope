@@ -25,17 +25,17 @@ isolation is the entire point.
 
 ```mermaid
 flowchart TD
-    subgraph users.js
+    subgraph users.js["<code>users.js</code>"]
         U1[users array]
         U2["<code>getUser</code>"]
         U3[private helper]
     end
-    subgraph orders.js
+    subgraph orders.js["<code>orders.js</code>"]
         O1[orders array]
         O2["<code>createOrder</code>"]
         O3[private helper]
     end
-    subgraph index.js
+    subgraph index.js["<code>index.js</code>"]
         I1[main]
     end
     I1 -->|imports| U2
@@ -226,7 +226,7 @@ on B, B may depend on C, but C must not depend on A.
 flowchart LR
     A["<code>index.js</code>"] --> B["<code>users.js</code>"]
     A --> C["<code>orders.js</code>"]
-    C --> D[shared/http.js]
+    C --> D["shared/<code>http.js</code>"]
     B --> D
     style D fill:#dff,stroke:#066
 ```

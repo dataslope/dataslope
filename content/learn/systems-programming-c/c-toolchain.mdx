@@ -13,14 +13,14 @@ to add `foo.c` to the link command.
 
 ```mermaid
 flowchart TD
-    A["hello.c<br/>(source)"] --> B[Preprocessor]
-    B --> C["hello.i<br/>(translation unit)"]
+    A["<code>hello.c</code><br/>(source)"] --> B[Preprocessor]
+    B --> C["<code>hello.i</code><br/>(translation unit)"]
     C --> D[Compiler]
-    D --> E["hello.s<br/>(assembly)"]
+    D --> E["<code>hello.s</code><br/>(assembly)"]
     E --> F[Assembler]
-    F --> G["hello.o<br/>(object file)"]
+    F --> G["<code>hello.o</code><br/>(object file)"]
     G --> H[Linker]
-    I["libc.a"] --> H
+    I["<code>libc.a</code>"] --> H
     J["other .o files"] --> H
     H --> K["a.out<br/>(executable)"]
 ```

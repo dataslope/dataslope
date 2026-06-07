@@ -226,7 +226,7 @@ Read this as: "Keep only Ada's rows, then add their amounts."
 
 ```mermaid
 flowchart LR
-    T[("orders table")] --> W["WHERE customer = 'Ada'"]
+    T[("orders table")] --> W["WHERE <code>customer = 'Ada'</code>"]
     W --> S["SUM(amount)"]
     S --> R["one total"]
 ```

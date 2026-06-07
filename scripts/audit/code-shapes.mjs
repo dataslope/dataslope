@@ -30,7 +30,7 @@ function walk(dir) {
   return out;
 }
 
-const SKIP_LINE = /^\s*(flowchart|graph|subgraph|end\b|classDef|class\s|click|style|linkStyle|direction|%%)/i;
+const SKIP_LINE = /^\s*(flowchart|graph|end\b|classDef|class\s|click|style|linkStyle|direction|%%)/i;
 
 // Shape openers (longest first) → their valid closing brackets.
 const SHAPES = [
@@ -144,7 +144,16 @@ const CODE_WORDS = new Set([
 const NOT_CODE = new Set([
   "javascript", "typescript", "mysql", "postgresql", "duckdb", "numpy", "scipy",
   "webgl", "macos", "ironpython", "ironruby", "plotly.js", "d3.js", "vb.net",
+  // Product/library names that look like a `name.js` file but are prose.
+  "node.js", "next.js", "vue.js", "react.js", "three.js", "express.js", "deno.js",
 ]);
+
+// A dotted span that's really prose, not code: a denylisted product name, or a
+// web domain (example.com, python.org) rather than a source file (hello.c).
+const WEB_TLD = /\.(?:com|org|net|edu|gov)$/i;
+function isProseName(s) {
+  return NOT_CODE.has(s.toLowerCase()) || WEB_TLD.test(s);
+}
 
 // A function name that reads as a code identifier rather than math notation.
 // Excludes single letters and short all-caps tokens — so `fib(5)`, `resample()`
@@ -163,31 +172,33 @@ function isWholeCode(rawLabel) {
   if (CODE_WORDS.has(s.toLowerCase())) return true;
 
   let removedIdent = false;
-  const ident = [
-    /[A-Za-z_]\w*(?:::[A-Za-z_~]\w*)+(?:<[^<>]*>)?(?:\([^)]*\))?/g, // a::b<T>(…)
-    /[A-Za-z_]\w*<[A-Za-z_][^<>]*>(?:\([^)]*\))?/g, // vector<int>
-    /[A-Za-z_]\w*\[[^\]]*\]/g, // arr[i]
-    /\b[A-Za-z]\w*_\w+\b/g, // snake_case (any case)
-    /[*&]+[A-Za-z_]\w*|[A-Za-z_]\w*[*&]+/g, // *ptr / T&
-  ];
-  for (const re of ident) {
+  const mark = (re) => {
     if (re.test(s)) {
       removedIdent = true;
       s = s.replace(re, " ");
     }
-  }
-  // Member paths (df.head()) and camelCase names (DataFrame) — but skip proper
-  // nouns (Plotly.js, JavaScript) so a label that is *only* a product name
-  // isn't treated as code.
+  };
+  mark(/function\s*\([^()]*\)/g); // function (args)
+  mark(/[A-Za-z_]\w*(?:::[A-Za-z_~]\w*)+(?:<[^<>]*>)?(?:\([^)]*\))?/g); // a::b<T>(…)
+  mark(/[A-Za-z_]\w*<[A-Za-z_][^<>]*>(?:\([^)]*\))?/g); // vector<int>
+  mark(/[A-Za-z_]\w*\[[^\]]*\]/g); // arr[i]
+  // Assignment to a *literal* or call (p = 0x100, n = 42, greeting = 'Howdy',
+  // x = f()). A bare-word RHS is excluded so prose equations ("Pipeline = recipe",
+  // "Residual = actual", "A = L") aren't treated as code.
+  mark(
+    /[A-Za-z_][\w.]*\s*=\s*(?:'[^']*'|"[^"]*"|0x[0-9a-fA-F_]+|-?\d[\w.]*|[A-Za-z_][\w.]*\([^()]*\))/g,
+  );
+  // Member paths (df.head()), dotted file/module names (hello.c, users.js), and
+  // camelCase names (DataFrame) — but skip proper nouns (Plotly.js, JavaScript)
+  // so a label that is *only* a product name isn't treated as code.
   const removeGuarded = (re) => {
     s = s.replace(re, (m) => {
-      if (NOT_CODE.has(m.toLowerCase())) return m;
+      if (isProseName(m)) return m;
       removedIdent = true;
       return " ";
     });
   };
-  removeGuarded(/[A-Za-z_]\w+(?:\.[A-Za-z_]\w+)+(?:\([^)]*\))?/g); // df.head()
-  removeGuarded(/\b\w*[a-z][A-Z]\w*\b/g); // camelCase / PascalCase-multiword
+  removeGuarded(/[A-Za-z_]\w+(?:\.[A-Za-z_]\w+)+\([^()]*\)/g); // df.head()
   // Plain calls only when the callee reads as code (not math like AR(p), y(t)),
   // and not a "word(s)" English pluralization.
   s = s.replace(/([A-Za-z_]\w*)\(([^()]*)\)/g, (m, name, args) => {
@@ -197,6 +208,13 @@ function isWholeCode(rawLabel) {
     }
     return m;
   });
+  removeGuarded(/[A-Za-z_][\w-]+(?:\.[A-Za-z][\w-]*)+/g); // hello.c / users.js
+  removeGuarded(/\b\w*[a-z][A-Z]\w*\b/g); // camelCase / PascalCase-multiword
+  mark(/\b[A-Za-z]\w*_\w+\b/g); // snake_case (any case)
+  mark(/[*&]+[A-Za-z_]\w*|[A-Za-z_]\w*[*&]+/g); // *ptr / T&
+  mark(/\{[^{}]*\}/g); // { ... } brace block
+  mark(/0x[0-9a-fA-F][0-9a-fA-F_]*/g); // hex literal
+  mark(/'[^']*'|"[^"]*"/g); // string literal
   s = s
     .replace(/->|=>|<-|<<|>>|&&|\|\||==|!=|<=|>=|\+\+|--|\+=|-=|%>%|\|>|:=/g, " ")
     .replace(/[-+]?\b\d[\w.]*\b/g, " ");
@@ -205,11 +223,16 @@ function isWholeCode(rawLabel) {
 
 // High-confidence code spans to wrap inside an otherwise-prose label.
 const SPAN = new RegExp(
-  "\\b[A-Za-z_]\\w*(?:::[A-Za-z_~]\\w*)+(?:<[A-Za-z_][^<>]*>)?(?:\\([^()]*\\))?" + // std::a<T>(…)
+  "\\bfunction\\s*\\([^()]*\\)(?:\\s*\\{[^{}]*\\})?" + // function (name) { ... }
+    "|\\b[A-Za-z_]\\w*(?:::[A-Za-z_~]\\w*)+(?:<[A-Za-z_][^<>]*>)?(?:\\([^()]*\\))?" + // std::a<T>(…)
+    "|\\b[A-Za-z_][\\w.]*\\s*=\\s*(?:'[^']*'|\"[^\"]*\"|0x[0-9a-fA-F_]+|-?\\d[\\w.]*|[A-Za-z_][\\w.]*\\([^()]*\\))" + // x = val
     "|\\b[A-Za-z_]\\w+(?:\\.[A-Za-z_]\\w+)+\\([^()]*\\)" + // df.head()
     "|\\b[A-Za-z_]\\w*<[A-Za-z_][^<>]*>(?:\\([^()]*\\))?" + // vector<int>
     "|\\b[A-Za-z_]\\w*\\([^()]*\\)" + // value_counts()
-    "|\\b[A-Za-z]\\w*_\\w+\\b", // snake_case
+    "|\\b[A-Za-z_][\\w-]+(?:\\.[A-Za-z][\\w-]*)+" + // hello.c / users.js
+    "|\\b[A-Za-z]\\w*_\\w+\\b" + // snake_case
+    "|0x[0-9a-fA-F][0-9a-fA-F_]*" + // hex literal
+    "|\\{[^{}]*\\}", // { ... }
   "g",
 );
 
@@ -256,6 +279,7 @@ function rewriteLabel(rawLabel) {
               const plain = s.match(/^([A-Za-z_]\w*)\(([^()]*)\)$/);
               if (plain && (!isCodeName(plain[1]) || plain[2].trim() === "s"))
                 return s; // math notation / "word(s)" pluralization
+              if (isProseName(s)) return s; // product name / domain
               any = true;
               tags.push(s);
               return `<code>${escHtml(s)}</code>`;
@@ -268,7 +292,18 @@ function rewriteLabel(rawLabel) {
 }
 
 function processLine(line, isFlow) {
-  if (!isFlow || SKIP_LINE.test(line)) return { line, tags: [] };
+  if (!isFlow) return { line, tags: [] };
+  // Bare subgraph title (`subgraph users.js`): wrap a code-like title, rewriting
+  // to the `subgraph <id>["…"]` form (the id keeps the original token). Bracketed
+  // titles (`subgraph id["…"]`) fall through to findNodes below.
+  const sg = line.match(/^(\s*subgraph\s+)([^\s"\[][^"\[\n]*?)(\s*)$/);
+  if (sg) {
+    const res = rewriteLabel(sg[2]);
+    if (res.tags.length && res.label !== sg[2])
+      return { line: `${sg[1]}${sg[2]}[${res.label}]${sg[3]}`, tags: res.tags };
+    return { line, tags: [] };
+  }
+  if (SKIP_LINE.test(line)) return { line, tags: [] };
   const nodes = findNodes(line);
   if (!nodes.length) return { line, tags: [] };
   const tags = [];

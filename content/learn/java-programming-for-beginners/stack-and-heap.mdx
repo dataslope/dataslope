@@ -21,7 +21,7 @@ flowchart LR
     end
     subgraph Heap[Heap — shared]
         direction TB
-        O1[int array<br/>length=3, values=80,90,100]
+        O1["int array<br/><code>length=3</code>, <code>values=80</code>,90,100"]
         O2[String 'Ada']
         O3[Student object]
     end
@@ -53,7 +53,7 @@ String s = "hello";
 ```mermaid
 flowchart LR
     subgraph S[stack frame]
-        X["x = 42"]
+        X["<code>x = 42</code>"]
         SREF["s = ●─"]
     end
     subgraph H[heap]
@@ -133,11 +133,11 @@ Calling `factorial(4)` builds up a stack of frames:
 
 ```mermaid
 flowchart TB
-    M["main: n=4, result=?"]
-    F4["factorial: n=4"]
-    F3["factorial: n=3"]
-    F2["factorial: n=2"]
-    F1["factorial: n=1 returns 1"]
+    M["main: <code>n=4</code>, result=?"]
+    F4["factorial: <code>n=4</code>"]
+    F3["factorial: <code>n=3</code>"]
+    F2["factorial: <code>n=2</code>"]
+    F1["factorial: <code>n=1</code> returns 1"]
     M --> F4 --> F3 --> F2 --> F1
 ```
 

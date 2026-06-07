@@ -48,8 +48,8 @@ order. That feels simple until the data changes.
 
 ```mermaid
 flowchart TB
-    A["orders table with copied customer data"] --> B["Order 1<br/>Mina, mina@old.example"]
-    A --> C["Order 2<br/>Mina, mina@old.example"]
+    A["orders table with copied customer data"] --> B["Order 1<br/>Mina, mina@<code>old.example</code>"]
+    A --> C["Order 2<br/>Mina, mina@<code>old.example</code>"]
     D["Email changes"] --> E{"Update every copy?"}
     B --> E
     C --> E

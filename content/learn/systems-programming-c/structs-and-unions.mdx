@@ -74,7 +74,7 @@ that arrays of the struct stay aligned.
 
 ```mermaid
 flowchart LR
-    subgraph bad["struct Bad { char c; int i; char d; }"]
+    subgraph bad["struct Bad <code>{ char c; int i; char d; }</code>"]
         b0["c<br/>1 B"] --> b1["pad<br/>3 B"] --> b2["i<br/>4 B"] --> b3["d<br/>1 B"] --> b4["pad<br/>3 B"]
     end
 ```

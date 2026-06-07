@@ -15,7 +15,7 @@ and each box has **contents** (the data).
 
 ```mermaid
 flowchart LR
-    M0[0x1000<br/>?] --- M1[0x1004<br/>?] --- M2[0x1008<br/>?] --- M3[0x100C<br/>?] --- M4[0x1010<br/>?]
+    M0["<code>0x1000</code><br/>?"] --- M1["<code>0x1004</code><br/>?"] --- M2["<code>0x1008</code><br/>?"] --- M3["<code>0x100C</code><br/>?"] --- M4["<code>0x1010</code><br/>?"]
 ```
 
 When you write `int x = 5;`, three things happen:
@@ -26,7 +26,7 @@ When you write `int x = 5;`, three things happen:
 
 ```mermaid
 flowchart LR
-    M0[0x1000<br/>?] --- M1["0x1004<br/>5<br/>(x)"] --- M2[0x1008<br/>?] --- M3[0x100C<br/>?] --- M4[0x1010<br/>?]
+    M0["<code>0x1000</code><br/>?"] --- M1["<code>0x1004</code><br/>5<br/>(x)"] --- M2["<code>0x1008</code><br/>?"] --- M3["<code>0x100C</code><br/>?"] --- M4["<code>0x1010</code><br/>?"]
     style M1 fill:#efe
 ```
 

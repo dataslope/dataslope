@@ -135,7 +135,7 @@ shorter one that fills in defaults by calling the real one with
 flowchart LR
     A["new Point()"] -->|delegates| C["new Point(0,0)"]
     B["new Point(5)"] -->|delegates| C
-    C --> S["sets this.x and this.y"]
+    C --> S["sets <code>this.x</code> and <code>this.y</code>"]
 ```
 
 <CodeBlock
@@ -224,8 +224,8 @@ work.
 
 ```mermaid
 flowchart LR
-    P["price : Money<br/>cents=1999<br/>currency='USD'"]
-    T["taxed : Money<br/>cents=2159<br/>currency='USD'"]
+    P["price : Money<br/><code>cents=1999</code><br/><code>currency='USD'</code>"]
+    T["taxed : Money<br/><code>cents=2159</code><br/><code>currency='USD'</code>"]
     O["new Money(160,'USD')"]
 
     P -. unchanged .-> P

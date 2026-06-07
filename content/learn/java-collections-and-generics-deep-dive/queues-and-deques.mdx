@@ -53,12 +53,12 @@ element, very fast.
 
 ```mermaid
 flowchart LR
-    subgraph Buffer["circular buffer (capacity = 8)"]
+    subgraph Buffer["circular buffer (<code>capacity = 8</code>)"]
       direction LR
       S0["[_]"] --- S1["[_]"] --- S2["[a]"] --- S3["[b]"] --- S4["[c]"] --- S5["[d]"] --- S6["[_]"] --- S7["[_]"]
     end
-    head[head=2] --> S2
-    tail[tail=6] --> S6
+    head["<code>head=2</code>"] --> S2
+    tail["<code>tail=6</code>"] --> S6
 ```
 
 Front and back are pointers into the array; they wrap around. Both

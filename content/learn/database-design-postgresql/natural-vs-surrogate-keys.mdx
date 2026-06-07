@@ -140,9 +140,9 @@ future update.
 
 ```mermaid
 flowchart TB
-    A["users.email is the PK<br/>ada@old.example"]:::bad --> B["orders.<code>user_email</code><br/>ada@old.example"]
+    A["<code>users.email</code> is the PK<br/>ada@<code>old.example</code>"]:::bad --> B["orders.<code>user_email</code><br/>ada@old.example"]
     A --> C["tickets.<code>user_email</code><br/>ada@old.example"]
-    D["Email changes to<br/>ada@new.example"] --> E{"What about old references?"}
+    D["Email changes to<br/>ada@<code>new.example</code>"] --> E{"What about old references?"}
     B --> E
     C --> E
     E --> F["Every referencing row must stay in sync"]:::bad
@@ -159,7 +159,7 @@ an identity.
 ```mermaid
 flowchart LR
     ID["users.<code>user_id</code> = 10"]:::pk --> R["references keep <code>user_id</code> = 10"]
-    E1["email = ada@old.example"] --> E2["email = ada@new.example"]
+    E1["email = ada@<code>old.example</code>"] --> E2["email = ada@<code>new.example</code>"]
     ID --> E2
     classDef pk fill:#fde68a,stroke:#b45309
 ```

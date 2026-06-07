@@ -199,10 +199,10 @@ Let's trace `nums.Aggregate(0, (acc, n) => acc + n)` for
 
 ```mermaid
 flowchart TD
-    A["acc=0"] --> B["+3 → acc=3"]
-    B --> C["+1 → acc=4"]
-    C --> D["+4 → acc=8"]
-    D --> E["result = 8"]
+    A["<code>acc=0</code>"] --> B["<code>+3 → acc=3</code>"]
+    B --> C["<code>+1 → acc=4</code>"]
+    C --> D["<code>+4 → acc=8</code>"]
+    D --> E["<code>result = 8</code>"]
 ```
 
 The accumulator threads through, one element at a time. The seed is

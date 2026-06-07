@@ -20,7 +20,7 @@ you are telling the compiler:
 ```mermaid
 flowchart LR
     subgraph "Stack frame for main()"
-        X["x : int<br/>4 bytes<br/>value = 42"]
+        X["x : int<br/>4 bytes<br/><code>value = 42</code>"]
     end
 ```
 
@@ -91,7 +91,7 @@ label; it tells the compiler:
 ```mermaid
 flowchart LR
     subgraph Memory
-        B["4 raw bytes<br/>0x2A 0x00 0x00 0x00"]
+        B["4 raw bytes<br/><code>0x2A</code> <code>0x00</code> <code>0x00</code> <code>0x00</code>"]
     end
     B -->|interpreted as int| I[42]
     B -->|interpreted as float| F[5.88e-44]
@@ -181,9 +181,9 @@ block.
 ```mermaid
 flowchart TB
     subgraph "main scope"
-        A["int a = 1;"]
+        A["int <code>a = 1</code>;"]
         subgraph "inner block"
-            B["int b = 2;"]
+            B["int <code>b = 2</code>;"]
         end
         C["a is visible here; b is NOT"]
     end

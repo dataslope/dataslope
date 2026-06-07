@@ -120,8 +120,8 @@ Both `service.ts` and `client.ts` import from `types.ts`. If you add a field to 
 
 ```mermaid
 graph LR
-    A[types.ts<br/>Shared Contract] --> B[service.ts<br/>Producer]
-    A --> C[client.ts<br/>Consumer]
+    A["<code>types.ts</code><br/>Shared Contract"] --> B["<code>service.ts</code><br/>Producer"]
+    A --> C["<code>client.ts</code><br/>Consumer"]
     B --> D[Runtime]
     C --> D
     style A fill:#fffacd

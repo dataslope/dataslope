@@ -41,14 +41,14 @@ over" the variable `greeting` from `makeGreeter`'s scope.
 
 ```mermaid
 flowchart LR
-    subgraph Call1["makeGreeter('Hello')"]
-        G1["greeting = 'Hello'"]
-        H["function (name) { ... }"]
+    subgraph Call1["<code>makeGreeter('Hello')</code>"]
+        G1["<code>greeting = 'Hello'</code>"]
+        H["<code>function (name) { ... }</code>"]
         H -- closes over --> G1
     end
-    subgraph Call2["makeGreeter('Howdy')"]
-        G2["greeting = 'Howdy'"]
-        K["function (name) { ... }"]
+    subgraph Call2["<code>makeGreeter('Howdy')</code>"]
+        G2["<code>greeting = 'Howdy'</code>"]
+        K["<code>function (name) { ... }</code>"]
         K -- closes over --> G2
     end
 ```
@@ -309,7 +309,7 @@ just from how closures work.
 
 ```mermaid
 flowchart TB
-    A["A function is defined inside another function (or in any block)"]
+    A["A function is defined inside another <code>function (or in any block)</code>"]
     B["The inner function refers to a variable from the outer scope"]
     C["The outer scope finishes (its call returns)"]
     D["The inner function continues to live somewhere<br/>(returned, stored, passed as a callback)"]

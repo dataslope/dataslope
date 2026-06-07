@@ -128,7 +128,7 @@ flowchart TB
   raw["Raw dataset with NAs"]
   inspect["Inspect missingness"]
   decide{"Is missingness informative?"}
-  drop["na.rm = TRUE / na.omit"]
+  drop["<code>na.rm</code> = TRUE / <code>na.omit</code>"]
   impute["Impute carefully"]
   flag["Record a '<code>was_missing</code>' column"]
   raw --> inspect --> decide

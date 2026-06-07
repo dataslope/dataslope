@@ -31,16 +31,16 @@ name*. The class `java.util.ArrayList` lives in the package
 
 ```mermaid
 flowchart TB
-    P1["package com.bank.account"]
+    P1["package <code>com.bank.account</code>"]
     P1 --> C1[Account]
     P1 --> C2[Transaction]
     P1 --> C3[Statement]
 
-    P2["package com.bank.customer"]
+    P2["package <code>com.bank.customer</code>"]
     P2 --> C4[Customer]
     P2 --> C5[Address]
 
-    P3["package com.bank.payments"]
+    P3["package <code>com.bank.payments</code>"]
     P3 --> C6[Payment]
     P3 --> C7[Gateway]
 ```
@@ -98,12 +98,12 @@ class is part of your package's *external API*.
 
 ```mermaid
 flowchart LR
-    subgraph com.bank.account
+    subgraph com.bank.account["<code>com.bank.account</code>"]
         A[Account]
         T[Transaction]
         L[(package-private<br/>helper class<br/>TxValidator)]
     end
-    subgraph com.bank.payments
+    subgraph com.bank.payments["<code>com.bank.payments</code>"]
         P[Payment]
     end
     P -. cannot see .-> L
@@ -158,20 +158,20 @@ growth. Each file's first line would be a `package` declaration.
 
 ```mermaid
 flowchart TB
-    subgraph cli["com.shop.cli"]
+    subgraph cli["<code>com.shop.cli</code>"]
         CLI["<code>CafeCli</code>"]
     end
-    subgraph service["com.shop.service"]
+    subgraph service["<code>com.shop.service</code>"]
         OS["<code>OrderService</code>"]
     end
-    subgraph model["com.shop.model"]
+    subgraph model["<code>com.shop.model</code>"]
         D[Drink]
         L["<code>LineItem</code>"]
         O[Order]
         R[Receipt]
         M[Menu]
     end
-    subgraph payments["com.shop.payments"]
+    subgraph payments["<code>com.shop.payments</code>"]
         P[Payment]
         I[["<code>PaymentGateway</code>"]]
         S["<code>StripeGateway</code>"]

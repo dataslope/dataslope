@@ -261,7 +261,7 @@ parsing and rewriting historical text.
 ```mermaid
 flowchart TB
     A["Add product SKU"] --> B{"Product has its own table?"}
-    B -->|"yes"| C["Add products.sku"]
+    B -->|"yes"| C["Add <code>products.sku</code>"]
     C --> D["Update product rows"]
     B -->|"no"| E["Find product text in many places"]
     E --> F["Clean inconsistent names"]

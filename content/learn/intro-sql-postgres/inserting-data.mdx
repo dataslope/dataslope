@@ -135,7 +135,7 @@ accidentally destroy data.
 
 ```mermaid
 flowchart TB
-    D1["DELETE FROM tasks<br/>WHERE id = 5;"] --> R1["Removes 1 row<br/>(good)"]
+    D1["DELETE FROM tasks<br/>WHERE <code>id = 5</code>;"] --> R1["Removes 1 row<br/>(good)"]
     D2["DELETE FROM tasks;"] --> R2["Removes EVERY row<br/>(usually a disaster)"]
 ```
 

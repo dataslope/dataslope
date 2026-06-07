@@ -81,9 +81,9 @@ sequence of nested scopes is called the **scope chain**.
 
 ```mermaid
 flowchart TB
-    G["Global scope<br/>const greeting = 'Hello'"]
-    F["Function scope (greet)<br/>let name = 'Ada'"]
-    B["Block scope (if true)<br/>let stamp = '<<>>'"]
+    G["Global scope<br/>const <code>greeting = 'Hello'</code>"]
+    F["Function scope (greet)<br/>let <code>name = 'Ada'</code>"]
+    B["Block scope (if true)<br/>let <code>stamp = '&lt;&lt;&gt;&gt;'</code>"]
     B -->|outer| F -->|outer| G
 ```
 

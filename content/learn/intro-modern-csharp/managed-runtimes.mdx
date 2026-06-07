@@ -155,7 +155,7 @@ flowchart TB
     C["C() throws<br/>InvalidOperationException"]
     C -.runtime unwinds.-> B
     B -.no catch here.-> A
-    A -.has catch.-> Handler["catch (InvalidOperationException)<br/>{ ... }"]
+    A -.has catch.-> Handler["catch (InvalidOperationException)<br/><code>{ ... }</code>"]
 ```
 
 You don't write the unwinding logic. The runtime does. All you
@@ -194,7 +194,7 @@ It can help to picture all the layers at once.
 ```mermaid
 flowchart TB
     Y["Your C# code"]
-    BCL["Base Class Library<br/>(System.*, System.Collections, etc.)"]
+    BCL["Base Class Library<br/>(System.*, <code>System.Collections</code>, etc.)"]
     R["Runtime (CLR)<br/>GC, JIT, type system, exceptions"]
     OS["Operating system<br/>(Windows / Linux / macOS / browser WASM)"]
     H["Hardware"]

@@ -93,8 +93,8 @@ They also imply the paths software will use to find related data.
 
 ```mermaid
 flowchart TD
-    Customer["customers.id primary key"] --> OrderFK["orders.<code>customer_id</code> foreign key"]
-    Email["customers.email unique"] --> AccountLookup["find account by email"]
+    Customer["<code>customers.id</code> primary key"] --> OrderFK["orders.<code>customer_id</code> foreign key"]
+    Email["<code>customers.email</code> unique"] --> AccountLookup["find account by email"]
     OrderFK --> OrderHistory["find customer orders"]
 ```
 

@@ -36,7 +36,7 @@ information about whether you should care.
 ```mermaid
 flowchart LR
   A["Effect exists?"] -->|"p-value answers this"| B["Yes / can't tell"]
-  C["How big is it?"] -->|"effect size answers this"| D["d = 0.05? r = 0.6?<br/>+8% revenue?"]
+  C["How big is it?"] -->|"effect size answers this"| D["<code>d = 0.05</code>? <code>r = 0.6</code>?<br/>+8% revenue?"]
   B --> E{"Ship decision<br/>needs BOTH"}
   D --> E
 ```
@@ -60,10 +60,10 @@ apart — only an effect size can.
 
 ```mermaid
 flowchart TD
-  P["Both studies report<br/>p = 0.03"] --> S1["Study A:<br/>tiny effect, huge n"]
+  P["Both studies report<br/><code>p = 0.03</code>"] --> S1["Study A:<br/>tiny effect, huge n"]
   P --> S2["Study B:<br/>large effect, small n"]
-  S1 --> O1["Effect size d = 0.04<br/>(ignore it)"]
-  S2 --> O2["Effect size d = 0.9<br/>(act on it)"]
+  S1 --> O1["Effect size <code>d = 0.04</code><br/>(ignore it)"]
+  S2 --> O2["Effect size <code>d = 0.9</code><br/>(act on it)"]
 ```
 
 The p-value is a function of *signal divided by noise divided by

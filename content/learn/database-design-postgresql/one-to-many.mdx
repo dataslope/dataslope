@@ -55,7 +55,7 @@ the **many** side.
 
 ```mermaid
 flowchart LR
-    C["customers.id = 1<br/>Ada"] --> O1["<code>orders.id = 101<br/>customer_id = 1</code>"]
+    C["<code>customers.id = 1</code><br/>Ada"] --> O1["<code>orders.id = 101<br/>customer_id = 1</code>"]
     C --> O2["<code>orders.id = 102<br/>customer_id = 1</code>"]
     C --> O3["<code>orders.id = 103<br/>customer_id = 1</code>"]
     O1 -->|"FK -> PK"| C
@@ -147,7 +147,7 @@ Designers often call the one side the **parent** and the many side the
 
 ```mermaid
 flowchart LR
-    Parent["Parent row<br/>customers.id = 1"] --> ChildA["Child row<br/>order 101"]
+    Parent["Parent row<br/><code>customers.id = 1</code>"] --> ChildA["Child row<br/>order 101"]
     Parent --> ChildB["Child row<br/>order 102"]
     Parent --> ChildC["Child row<br/>order 103"]
     ChildA -->|"stores customer_id"| Parent
