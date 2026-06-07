@@ -260,10 +260,13 @@ fig.show()
   markdown={`What should be the **first** step when starting a new chart?
 
 - Pick a color palette.
+  > Color palette selection is a late-stage styling decision. Without a clear question, there is no basis for choosing which variables to encode or which encodings to use — making a color palette choice at this point is premature.
 - Pick a chart type.
+  > Chart type follows from the question and the data types involved. Picking a chart type before knowing what you're asking leads to forcing data into an ill-fitting form rather than letting the question drive the choice.
 - [o] Decide what *question* the chart will answer.
   > Without a clear question, every later choice becomes arbitrary. The question shapes the data filtering, the chart type, and the encoding decisions. "Pretty" charts that don't answer a question are decoration, not analysis.
 - Pick a template.
+  > Templates control only visual styling and are independent of what the chart is trying to communicate. Template choice is the last thing to finalize, not the first — any template can be changed without affecting the chart's analytical content.
 
 Build the muscle: *question first, chart second*. Every time.`}
 />
@@ -272,10 +275,13 @@ Build the muscle: *question first, chart second*. Every time.`}
   markdown={`You have two **quantitative** variables and want to see if they're related. Which chart type is the natural starting point?
 
 - Pie chart.
+  > Pie charts show how a whole divides into named parts, using angle as the encoding. They require a discrete categorical dimension and a single quantity for each slice — they cannot show the relationship between two continuous quantitative variables.
 - Bar chart.
+  > Bar charts compare a quantitative value across discrete categories. They require one categorical axis and one quantitative axis. When both variables are quantitative and you want to see if they are related, a bar chart is not the right form.
 - [o] Scatter plot (**px.scatter**).
   > Scatter plots use the two most accurate encodings (x and y position) for the two quantitative variables. They reveal correlation, clusters, and outliers at a glance.
 - Heatmap.
+  > Heatmaps encode value as color intensity in a grid, which is useful for two-way categorical comparisons or density maps. For exploring the relationship between two continuous quantitative variables, position on both axes (a scatter plot) is far more accurate than color.
 
 A line chart would be wrong here unless the data has a meaningful *order* (like time). Otherwise, lines connecting unrelated points are misleading.`}
 />
@@ -284,10 +290,13 @@ A line chart would be wrong here unless the data has a meaningful *order* (like 
   markdown={`Why is **labels={...}** worth adding to a Plotly Express call?
 
 - It makes the chart load faster.
+  > Chart loading speed depends on the number of data points and figure complexity, not on label strings. **labels={}** is purely a display-string override with no performance effect.
 - It changes the data values.
+  > **labels={}** only changes the display text shown on axes, legends, and hover tooltips — it does not modify the underlying DataFrame values or column names in any way.
 - [o] It overrides the raw column names with human-readable labels (e.g., "Total bill (USD)" instead of "total_bill") for axes, legend, and hover.
   > Real-world column names are often abbreviated or snake_cased. **labels={}** lets you keep the code referencing the column name but display readable strings to the reader. A small habit that hugely improves chart clarity.
 - It hides the legend.
+  > Legend visibility is controlled by **fig.update_layout(showlegend=False)**. **labels={}** has no effect on whether the legend is shown — it only replaces the text strings used for labels.
 
 A chart with raw column names like **gdpPercap** and **lifeExp** reads as unfinished. Take the extra 20 seconds to label.`}
 />

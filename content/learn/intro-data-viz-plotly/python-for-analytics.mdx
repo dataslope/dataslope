@@ -181,10 +181,13 @@ every page from here on.
   markdown={`Which Python library introduced the **DataFrame** — a labeled, spreadsheet-like table that has become the central object of Python data analysis?
 
 - NumPy
+  > NumPy (2005) introduced efficient numerical arrays to Python, but its primary data structure is a homogeneous multidimensional array, not a labeled table with named columns. The DataFrame concept was added later by pandas.
 - Matplotlib
+  > Matplotlib (2003) is a plotting library built on top of NumPy. It did not introduce the DataFrame — its focus is rendering charts, not storing or manipulating tabular data with named columns.
 - [o] pandas
   > Pandas (2008, by Wes McKinney) brought the DataFrame to Python, building on top of NumPy's arrays. Plotly Express expects DataFrames as input, so pandas is the workhorse you'll use throughout this course.
 - Jupyter
+  > Jupyter is a notebook environment for writing code and prose side by side. It provides an interactive interface for Python but did not introduce the DataFrame data structure.
 
 Almost every page of this course starts with a **px.data.something()** call that returns a pandas DataFrame.`}
 />
@@ -193,10 +196,13 @@ Almost every page of this course starts with a **px.data.something()** call that
   markdown={`Which of the following is the **best** reason that Python "won" the analytics ecosystem?
 
 - Python is faster than C++ for numerical code.
+  > Python is generally slower than C++ for raw computation. The numerical performance of Python's scientific stack comes from libraries like NumPy and pandas that call optimized C and Fortran routines under the hood — but Python itself is not faster than C++.
 - Python charts are prettier than R charts.
+  > Chart aesthetics depend on the library, the theme, and the designer's choices, not the host language. R's ggplot2 and tidyverse graphics are widely considered beautiful. Chart appearance is not why Python won the analytics ecosystem.
 - [o] Python is "good enough" at everything from data pipelines to ML to web apps, so analysts rarely have to leave it.
   > Python is rarely the *best* language for any single task, but the cost of switching languages mid-project is high. By being adequate at everything, Python eliminated the friction of "which language do I write this next part in?"
 - Python is the only language with notebooks.
+  > R Markdown, Observable notebooks (for JavaScript), and Pluto.jl (for Julia) all offer notebook-style environments. Jupyter itself supports dozens of languages through kernels. Notebooks are not exclusive to Python.
 
 R, Julia, and even SQL have notebook-like environments — but the Python ecosystem became self-reinforcing first, and now leads by a wide margin.`}
 />
@@ -205,10 +211,13 @@ R, Julia, and even SQL have notebook-like environments — but the Python ecosys
   markdown={`What is a **Jupyter notebook**?
 
 - A spreadsheet application.
+  > Spreadsheet applications like Excel or Google Sheets use a grid-based cell model. Jupyter notebooks use a cell-based model too, but each cell contains code or Markdown prose rather than grid values, and outputs (charts, tables) appear inline below the cell.
 - A database management tool.
+  > Database management tools like pgAdmin or DBeaver are for querying and administering databases. Jupyter notebooks run Python (or other language) code and are not connected to any particular database by default.
 - [o] A web-based environment for writing code, prose, and seeing chart outputs inline — the default working environment for many data scientists.
   > Jupyter (originally IPython Notebook, 2010) lets you write Python and Markdown side by side, with chart and table outputs appearing directly under the code that produced them. It is to modern analytics what the spreadsheet was to 1990s business.
 - A type of Python web framework.
+  > Python web frameworks like Django or Flask are used to build server-side web applications. Jupyter is an interactive computational environment for running code and exploring data, not a framework for building production web apps.
 
 This course doesn't require you to install Jupyter — every code block here runs in your browser — but you'll likely use Jupyter outside this course.`}
 />

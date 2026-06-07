@@ -225,10 +225,13 @@ fig.show()
   markdown={`Your line chart looks like a **scribble** — lines crossing back and forth instead of going left-to-right. The most likely cause is:
 
 - A bug in Plotly.
+  > Plotly is faithfully connecting points in the order it receives them. The chart is working correctly; the problem lies in the unsorted data, not in the library.
 - The wrong template.
+  > Templates control only visual styling (colors, backgrounds, gridlines) and have no effect on the order in which data points are connected. Changing the template would not fix a scribbling line.
 - [o] The DataFrame is not sorted by the x-axis column. Lines connect points in DataFrame order, not in x-axis order.
   > Plotly connects points in the order they appear in the DataFrame. If your data is unsorted by x, the line will zigzag. Fix: **df.sort_values("x")** before plotting.
 - You need more colors.
+  > Adding more colors changes which series are visually distinguished, not how or in what order points are connected. A scribble pattern is caused by unsorted x values, which additional colors cannot fix.
 
 This is *the* most common line-chart bug. Always sort by x first.`}
 />
@@ -237,10 +240,13 @@ This is *the* most common line-chart bug. Always sort by x first.`}
   markdown={`Plotly Express generally expects data in:
 
 - Wide format (one column per category).
+  > Wide format has one column per category or time period, which does not align with Plotly Express's expectations. Wide data needs to be reshaped with **df.melt(...)** into long format before passing to Plotly Express.
 - [o] Long format (one row per observation, with separate columns for the category, the value, and any grouping variable).
   > Long ("tidy") format is the Plotly Express convention. If your data is wide, use **df.melt(...)** to reshape it before plotting.
 - A NumPy array.
+  > While Plotly can accept NumPy arrays in some lower-level calls, Plotly Express is designed around pandas DataFrames, which provide the column names that Plotly Express uses for its **x=**, **y=**, **color=** arguments.
 - A nested dictionary.
+  > Plotly Express is not designed to consume nested dictionaries directly. It expects a pandas DataFrame with named columns that can be passed to **x=**, **y=**, **color=**, and similar arguments.
 
 Most "I can't get this chart to work" problems for beginners trace back to wide-vs-long format confusion.`}
 />
@@ -249,10 +255,13 @@ Most "I can't get this chart to work" problems for beginners trace back to wide-
   markdown={`You add **log_y=True** to a scatter plot and suddenly some points disappear. Why?
 
 - Plotly randomly samples points on log axes.
+  > Plotly does not randomly sample points on any axis. Every point in the DataFrame is included unless it cannot be plotted — which on a log axis means it has a zero or negative value that is mathematically undefined on that scale.
 - [o] Log of zero or a negative number is undefined, so those points are silently dropped.
   > The log axis can only show positive values. If your data has zeros or negatives, those rows quietly disappear. Either filter them out explicitly (so you know what's gone) or use a linear axis.
 - Log axes only show 100 points.
+  > There is no built-in limit of 100 points on a log axis. Plotly renders all points that have a positive y value; only zero and negative values are dropped because they cannot be represented on a logarithmic scale.
 - The **simple_white** template hides points.
+  > The **simple_white** template controls only visual styling — background color, gridlines, fonts. It does not hide or filter any data points.
 
 If a transform changes your data, do it explicitly so you stay in control.`}
 />
@@ -261,10 +270,13 @@ If a transform changes your data, do it explicitly so you stay in control.`}
   markdown={`When a chart looks wrong, the **first** debugging step should be:
 
 - Try a different chart type.
+  > Switching chart types before understanding the data is premature. A different chart type won't reveal whether columns have wrong dtypes, missing values, or are in the wrong shape — inspection of the DataFrame comes first.
 - Try a different template.
+  > Templates only affect visual styling and cannot fix data issues. If the chart looks wrong, changing the template will produce a differently-styled wrong chart, not the answer.
 - [o] Inspect the DataFrame: **head()**, **dtypes**, **shape**, **isna().sum()**. The chart is usually showing the data correctly; the data isn't what you think it is.
   > The chart is honest about what's in the DataFrame. If the chart looks wrong, almost always the *data* is the surprise — wrong types, unsorted, missing values, or the wrong shape. Look at the data first.
 - Restart the notebook.
+  > Restarting clears execution state and can resolve issues caused by stale variables, but it does not tell you *why* the chart is wrong. Inspecting the DataFrame first is more targeted — you'll learn whether the problem is a dtype, missing values, or the wrong shape.
 
 This single habit — inspect before adjusting — will save you hours.`}
 />

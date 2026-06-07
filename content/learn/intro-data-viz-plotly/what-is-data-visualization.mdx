@@ -182,10 +182,13 @@ When all four are clear, the chart almost makes itself.
   markdown={`According to the definition used in this course, which of these is the **clearest example of a data visualization**?
 
 - A photograph of a sunset.
+  > A photograph is a visual recording of light at a moment in time. It does not encode abstract data into visual properties to answer a question — it captures what was physically present.
 - A company logo.
+  > A logo is a branding element that conveys identity, not an encoding of numerical or categorical data. There is no data→visual mapping and no analytical question being answered.
 - [o] A bar chart of monthly revenue for a small business.
   > The bar chart **encodes** numerical data (revenue) into a visual property (bar height) to help a viewer **answer questions** ("which month was best?", "is there a trend?"). All three pieces of the definition — encoding, visual representation, answering a question — are present.
 - A 3-D rendering of a planned building.
+  > A 3-D architectural rendering visualizes the building itself — its physical form and appearance — rather than encoding abstract measurements about the building. It represents a physical thing, not a dataset.
 
 The bar chart is a textbook statistical visualization. The other three are visual artifacts, but not visualizations of *data* in the analytic sense.`}
 />
@@ -194,10 +197,13 @@ The bar chart is a textbook statistical visualization. The other three are visua
   markdown={`What does it mean to say a chart **"encodes"** data?
 
 - It applies a password to the chart file.
+  > Encryption is a data-security concept that has nothing to do with how charts represent information. "Encoding" in visualization means mapping data values to visual properties so the eye can perceive them.
 - It uses statistical formulas internally.
+  > Some chart types do involve statistical computation (e.g., a box plot computes quartiles, a histogram computes bin counts), but "encoding" specifically refers to the mapping from data values to visual properties — position, length, color, and so on.
 - [o] It maps columns of data to visual properties such as position, length, color, size, or shape.
   > "Encoding" is the term for the *rules* of the map between data and image. **x="year"** is an encoding: it maps the **year** column to horizontal position. Every choice you make in **px.bar(...)** or **px.scatter(...)** is an encoding decision.
 - It compresses the data.
+  > Data compression reduces file size for storage or transmission. Encoding in visualization is the opposite direction: it takes compact data values and expands them into a visual representation that the eye can parse.
 
 Encoding is the central design act of visualization. We'll devote a whole chapter to it shortly.`}
 />
@@ -206,10 +212,13 @@ Encoding is the central design act of visualization. We'll devote a whole chapte
   markdown={`A colleague hands you a beautifully styled chart with no clear takeaway. You ask "what question does this answer?" and they shrug. What is the *most likely* problem?
 
 - The chart is technically broken.
+  > A technically correct chart can still fail as a visualization if it was built without a clear question. Rendering without errors does not mean the chart communicates anything useful.
 - The data is wrong.
+  > Wrong data would produce a chart that makes incorrect claims, not one that makes no claim at all. A chart without a takeaway suggests the underlying problem is conceptual — no question was defined — not that the data is erroneous.
 - [o] The chart was created without a clear question in mind — so even if it's pretty, it isn't really *doing* anything as a visualization.
   > A chart without a question is decoration. Beauty is not enough — the chart has to *help someone reason*. This is one of the most common mistakes in business dashboards, where chart count goes up but information goes down.
 - The chart needs more colors.
+  > Adding more colors increases visual complexity without adding analytical value if there is no clear question to answer. More colors cannot compensate for a missing purpose.
 
 "What question does this chart answer?" is the single best diagnostic question to ask of any visualization, your own or someone else's.`}
 />
@@ -218,10 +227,13 @@ Encoding is the central design act of visualization. We'll devote a whole chapte
   markdown={`Why is it important that data visualization works *with* the human visual system?
 
 - Because computers can't draw without humans.
+  > Computers can generate charts automatically without human input — the visual system's capabilities are independent of who or what produces the image. The reason visualization works with human perception is biological, not computational.
 - Because charts are required to be pretty.
+  > Aesthetic appeal is a secondary goal of visualization, not its fundamental purpose. Charts are designed around the visual system because that system can process spatial patterns and relative differences far faster than sequential reading can.
 - [o] Because the visual system can recognize patterns (relative size, position, color) in milliseconds — much faster than reading raw numbers.
   > Vision is built-in, parallel, pre-conscious hardware. A chart that aligns with how the visual system works (e.g., uses length for quantity) lets the reader perceive structure almost instantly. A chart that fights it (e.g., uses 3-D angles) forces slow, conscious effort.
 - Because eyes are the only sensors humans have.
+  > Humans perceive the world through multiple senses. The reason we use the visual channel for data is specifically that the visual system is very fast and parallel at detecting patterns — not because it is the only option.
 
 We will go deep into this in the next chapter, "How Humans Perceive Visuals."`}
 />

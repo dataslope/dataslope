@@ -175,10 +175,13 @@ ink. Tradeoffs.
   markdown={`Which Plotly Express argument maps a column to **horizontal position**?
 
 - **color="..."**
+  > **color="column_name"** maps a column to the color channel, which distinguishes categories by hue or encodes a continuous variable by color intensity. It does not control horizontal position.
 - **size="..."**
+  > **size="column_name"** maps a column to marker size, encoding a quantitative variable through the area of each marker. It has no effect on horizontal or vertical position.
 - [o] **x="..."**
   > **x="column_name"** tells Plotly Express to use that column for the horizontal axis. Combined with **y**, these two arguments do most of the work in any scatter, line, or bar chart.
 - **facet_col="..."**
+  > **facet_col="column_name"** splits the chart into multiple side-by-side panels, one per unique value of that column. It controls panel layout, not the horizontal position of data within a panel.
 
 Position along x and y are the two most powerful encodings — use them for what matters most.`}
 />
@@ -202,10 +205,13 @@ A general rule: the two most important *quantitative* variables go on x and y.
   markdown={`Which kind of data is **best** encoded with **color hue** (rainbow categorical colors like the default Plotly palette)?
 
 - Continuous prices (e.g., \\$0 – \\$1,000,000).
+  > Continuous quantities need an encoding that conveys gradual change, such as position on an axis or a sequential color intensity scale (light→dark). Categorical hue can only distinguish a handful of discrete groups, not represent a numeric continuum.
 - An ordered scale of customer satisfaction (1-5).
+  > An ordered scale is ordinal data, which is best encoded with a sequential or diverging color intensity scale — or position along an axis — so the viewer can perceive the ordering. Categorical hue treats each level as equally distinct, losing the rank information.
 - [o] A small number (~3-7) of distinct, unordered categories such as continents or product lines.
   > Hue is excellent at saying "these dots belong together" for a handful of categories, and the eye distinguishes the colors instantly. For continuous or ordered data, prefer a sequential or diverging *intensity* scale instead of a categorical hue palette.
 - Time stamps over a 100-year span.
+  > Time is an ordered, continuous dimension best encoded on a position axis (the x-axis for a line chart). Using categorical hue for 100 years of timestamps would produce an unreadable rainbow with no indication of order or proximity.
 
 Color hue = categories. Color intensity (light → dark) = quantity. Mixing them up is a classic beginner mistake.`}
 />
@@ -214,10 +220,13 @@ Color hue = categories. Color intensity (light → dark) = quantity. Mixing them
   markdown={`You facet a Plotly Express chart by **facet_col="region"** *and* also color by **color="region"**. What is the result?
 
 - The chart will fail to render.
+  > Using the same column for both **facet_col** and **color** is perfectly valid syntax and will render without errors. The issue is not technical correctness but wasted visual channels.
 - Plotly will crash.
+  > Plotly handles redundant encodings gracefully — it does not crash or produce an error. The result is a valid chart that happens to use two channels for the same variable instead of reserving one for a different variable.
 - [o] The chart will work, but you've spent two visual channels on a single variable — a missed opportunity that often adds clutter without adding information.
   > Redundant encoding is sometimes deliberate (e.g., for colorblind accessibility), but it's frequently a wasted channel. Each facet panel will be a single color anyway, so the color encoding adds nothing new — and you've used up a channel you could have given to a different variable.
 - Plotly will use a random color per facet.
+  > Plotly assigns colors consistently according to the color scale and the unique values of the **color=** column. It does not use random colors — each value maps to the same color every time.
 
 Use each channel intentionally. If you have five variables, try to give each its own channel before doubling up.`}
 />

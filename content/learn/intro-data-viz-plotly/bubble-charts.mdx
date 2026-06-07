@@ -158,10 +158,13 @@ In those cases, prefer color or a different encoding.
   markdown={`A **bubble chart** is essentially:
 
 - A pie chart with multiple values per slice.
+  > Pie charts show parts of a whole using angles and areas for a small number of categories. A bubble chart is a fundamentally different form — it places dots in a 2-D space defined by x and y axes, with size encoding a third variable.
 - A 3-D scatter plot.
+  > A 3-D scatter plot maps three variables to three spatial axes (x, y, z). A bubble chart stays in 2-D and encodes the third variable as marker *size*, which avoids the depth-perception problems that plague 3-D charts.
 - [o] A scatter plot where marker size encodes a third quantitative variable.
   > By adding **size="..."** to a Plotly Express scatter call, you turn a 2-variable chart into a 3-variable bubble chart. Add **color="..."** for a 4th variable.
 - A type of histogram.
+  > A histogram divides a single continuous variable into bins and counts how many observations fall in each bin. It has no x/y relationship between two separate variables and no marker-size encoding.
 
 The Gapminder chart by Hans Rosling is the canonical example of a bubble chart.`}
 />
@@ -170,10 +173,13 @@ The Gapminder chart by Hans Rosling is the canonical example of a bubble chart.`
   markdown={`Why should you usually pick **less critical** variables for the **size** encoding in a bubble chart?
 
 - Size is calculated last by the rendering engine.
+  > Rendering order is an implementation detail and has no bearing on how accurately viewers can read size. The reason to use size for less critical variables is perceptual: area is a weaker encoding than position for precise comparison.
 - Size cannot be larger than 50 pixels.
+  > Plotly Express uses the **size_max** argument to control the maximum bubble radius in pixels, and there is no hard limit of 50 pixels. The reason to reserve size for less critical variables is perceptual accuracy, not a technical pixel constraint.
 - [o] Area is a relatively weak encoding — the eye perceives "bigger / smaller" categorically but not precise multiples. Reserve size for variables where rough comparison is good enough.
   > According to the Cleveland-McGill ranking, area is much less accurate than position for quantitative comparison. Use size to *flag* which observations are big and which are small; use position (x and y) for the variables where the reader needs precise comparison.
 - Size is hidden from screen readers.
+  > Accessibility for screen readers is a separate concern from encoding choice, and Plotly does expose chart data through hover text and other mechanisms. The reason to use size for secondary variables is the perceptual hierarchy of visual channels, not accessibility.
 
 Always put your most important quantitative variables on x and y.`}
 />
@@ -182,10 +188,13 @@ Always put your most important quantitative variables on x and y.`}
   markdown={`Which Plotly Express argument turns a bubble chart into an **animated** Gapminder-style chart?
 
 - **animation=True**
+  > There is no **animation=True** argument in the Plotly Express API. Animation is enabled by passing a column name to **animation_frame=**, which creates one frame per unique value in that column.
 - **play=True**
+  > **play=True** is not a Plotly Express argument. The play button and slider are automatically added by Plotly when **animation_frame=** is specified — no separate flag is needed.
 - [o] **animation_frame="..."** (and usually **animation_group="..."**)
   > **animation_frame="year"** (for example) creates one frame per unique value of that column. **animation_group="country"** keeps each country's dot connected across frames so it moves smoothly instead of jumping. Plotly Express adds a play button and slider automatically.
 - **time=True**
+  > **time=True** is not part of the Plotly Express API. To animate over time, pass the time column name as a string to **animation_frame=** (e.g., **animation_frame="year"**).
 
 Animation is fun and instantly impressive — but use it only when *time* is meaningfully the third dimension. Animation for animation's sake makes charts harder to study.`}
 />
