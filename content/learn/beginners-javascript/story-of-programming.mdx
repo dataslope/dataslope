@@ -193,10 +193,13 @@ from "what is a value".
   markdown={`Why were high-level programming languages (like FORTRAN, C, and later JavaScript) invented?
 
 - To make programs run faster than assembly
+  > High-level language code typically runs *slower* than hand-tuned assembly because the compiler or interpreter adds translation overhead; the motivation for high-level languages was programmer productivity and expressiveness, not raw speed.
 - [o] To let humans express ideas closer to how they think, and let a translator turn those ideas into machine code
   > High-level languages exist so people can describe *what they want* in a way humans can read, write, and maintain. A compiler or interpreter does the tedious work of turning those descriptions into machine code the CPU can execute.
 - To make every CPU support the same set of instructions
+  > CPUs each have their own instruction sets; a high-level language doesn't change that — a compiler just targets different instruction sets. Portability is a *benefit* of high-level languages, but it's not why they were invented.
 - To replace mathematics in programming
+  > Mathematics remains central to programming; high-level languages are built *on* mathematical foundations (Boolean algebra, lambda calculus, formal grammars) rather than replacing them.
 
 High-level languages don't change what the CPU does — they change what the *programmer* writes. The translation step (compiler or interpreter) bridges human ideas and machine instructions.`}
 />

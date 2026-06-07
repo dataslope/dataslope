@@ -453,10 +453,13 @@ runSequentially(tasks, (err, results) => {
   markdown={`Why does JavaScript provide asynchronous APIs even though it runs on a single thread?
 
 - Because it makes code faster on multi-core CPUs
+  > JavaScript runs on a single thread and cannot use multiple CPU cores simultaneously; async APIs exist to avoid blocking that single thread, not to exploit parallelism.
 - Because the language standard requires it
+  > The ECMAScript specification defines the language itself; the decision to provide async APIs is a practical choice driven by the single-threaded execution model, not a mandate from the spec.
 - [o] Because it lets the single thread stay busy on other work while waiting for slow operations, instead of blocking
   > Async is about *concurrency*, not parallelism. While the host is doing something slow (timers, network, disk), the JS thread is free to handle other code. Without async, every slow operation would freeze the entire program — including, in a browser, the UI.
 - Because asynchronous code is always easier to read
+  > Async code is often harder to read, especially with callbacks. The reason async exists is runtime efficiency, not readability.
 
 JavaScript still runs one piece of code at a time — async simply lets it *choose* what to run instead of being stuck waiting.`}
 />

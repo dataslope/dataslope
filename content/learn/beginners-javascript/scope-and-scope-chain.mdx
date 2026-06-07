@@ -358,10 +358,13 @@ console.log(compute());
   markdown={`In JavaScript, when the runtime needs to resolve a variable name, where does it look?
 
 - Only in the current function's scope
+  > If the name is not found in the current scope, the runtime does not stop there — it continues outward through each enclosing scope until the name is found or the global scope is exhausted.
 - Only in the global scope
+  > The global scope is checked last, not first; the runtime starts at the innermost scope where the reference appears and works outward, so a local declaration always shadows a global one with the same name.
 - [o] First in the current scope, then in the enclosing scope, and so on outward through the *scope chain* until either it finds the name or reaches the global scope
   > JavaScript uses *lexical* scoping: the chain of scopes is determined by where the code is written. Each scope contains its own declarations, and unresolved names fall through to the enclosing scope. The first match wins.
 - Wherever the function was called from (dynamic scoping)
+  > JavaScript uses *lexical* (static) scoping, not dynamic scoping. The scope chain is fixed at the point where the code is written, not at the point where the function is called.
 
 Lexical scoping makes the meaning of a name predictable from the source code — you don't need to know who called a function to know which variable it sees.`}
 />

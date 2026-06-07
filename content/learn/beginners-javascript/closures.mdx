@@ -427,10 +427,13 @@ if (b.value() !== 99) throw new Error("b should be 99");`,
   markdown={`What is a "closure" in JavaScript?
 
 - A way to close (terminate) a function early
+  > Closures have nothing to do with early termination; \`return\` is used to exit a function early. A closure is about a function retaining access to its outer scope.
 - A keyword that hides a variable from the outside world
+  > "Closure" is a concept, not a keyword. Variable hiding is a side-effect of how scoping works, but the closure itself is the function-plus-its-captured-scope-variables package.
 - [o] A function that "remembers" the variables from the scope where it was defined, even after that scope has finished
   > When an inner function refers to a variable from its enclosing scope, JavaScript keeps that variable alive for as long as the inner function exists. This lets us create private state, configurable functions, memoisation caches, modules, and many other powerful patterns — all built on the same underlying mechanism.
 - A way to copy values into a function
+  > Closures capture *references* to variables in the outer scope, not copies of their values at the moment of creation — this is exactly why the \`var\`-in-a-loop puzzle produces unexpected results when a shared variable's final value is seen by all inner functions.
 
 Closures are arguably the single most important idea to understand in JavaScript. Once you see them clearly, an enormous amount of "magic" in libraries and frameworks turns into ordinary code.`}
 />
