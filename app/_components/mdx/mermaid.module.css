@@ -27,6 +27,9 @@
   font-family: var(--font-mono), "JetBrains Mono", "Fira Code", ui-monospace,
     SFMono-Regular, Menlo, monospace;
   font-size: 1em;
+  /* Inherit the node's label color (white on brand fills, set by adaptNodes)
+     instead of the app's default <code> color, which is near-black. */
+  color: inherit;
   background: none;
   padding: 0;
   border: 0;

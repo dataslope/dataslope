@@ -75,12 +75,37 @@ function cachePromise<T>(key: string, setPromise: () => Promise<T>): Promise<T> 
 // so we resolve the brand tokens to hex at render time (brand.css stays the
 // source of truth) with literal fallbacks.
 
-// Inter for regular text. Code spans inside labels are wrapped in <code> by the
-// author and rendered in JetBrains Mono via mermaid.module.css. The CSS var
-// resolves in the DOM (defined on :root and on <html> via next/font); the literal
-// fallbacks keep text measurement correct if the var is ever missing.
+// Inter for regular text; JetBrains Mono for diagrams that are entirely code.
+// Inline <code> spans in flowchart labels are styled via mermaid.module.css; whole
+// class/ER diagrams (see isCodeDiagram) render in mono so Mermaid measures — and
+// therefore sizes the boxes — in the mono face. The CSS vars resolve in the DOM
+// (defined on :root and on <html> via next/font); the literal fallbacks keep text
+// measurement correct if a var is ever missing.
 const SANS =
   'var(--font-sans), Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const MONO =
+  'var(--font-mono), "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace';
+
+// Class diagrams (class names, fields, method signatures) and ER diagrams (tables,
+// typed columns, keys) are entirely code, so they render wholesale in mono. Other
+// types stay sans — flowcharts tag individual code spans with <code> instead, and
+// state/sequence/mindmap/timeline labels are prose. Detected from the first line.
+function isCodeDiagram(chart: string): boolean {
+  const first = chart
+    .replace(/\\n/g, "\n")
+    .split("\n")
+    .map((l) => l.trim())
+    .find(Boolean);
+  return first != null && /^(classDiagram(?:-v2)?|erDiagram)\b/.test(first);
+}
+
+// Mermaid init directive that switches a single diagram to the mono face. It
+// merges over the global brand theme; adaptNodes still owns fills and label
+// colors, so only the font changes.
+const MONO_DIRECTIVE = `%%{init: ${JSON.stringify({
+  fontFamily: MONO,
+  themeVariables: { fontFamily: MONO },
+})}}%%\n`;
 
 const BRAND_FALLBACKS: Record<string, string> = {
   "--ds-blue-300": "#8ABFFF",
@@ -557,7 +582,8 @@ function MermaidContent({ chart }: { chart: string }) {
         document.fonts.load('400 15px "JetBrains Mono"'),
         document.fonts.load('500 15px "JetBrains Mono"'),
       ]);
-      return mermaid.render(id, chart.replaceAll("\\n", "\n"));
+      const prefix = isCodeDiagram(chart) ? MONO_DIRECTIVE : "";
+      return mermaid.render(id, prefix + chart.replaceAll("\\n", "\n"));
     }),
   );
 
