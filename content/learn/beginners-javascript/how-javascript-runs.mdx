@@ -35,6 +35,8 @@ When the function returns, the frame is popped. That's it. The
 "stack" is just the list of "things in progress, most recent on
 top."
 
+<Illustration name="call-stack" />
+
 <CodeBlock
   adapter="javascript"
   starterCode={`function greet(name) {
@@ -118,6 +120,8 @@ other languages and *can* do work in parallel. When they finish,
 they hand a result back to JS by **scheduling a task**.
 
 A simplified picture:
+
+<Illustration name="event-loop" />
 
 ```mermaid
 flowchart TD

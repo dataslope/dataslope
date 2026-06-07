@@ -1,0 +1,56 @@
+/* Frame for the /learn SVG illustrations.
+ *
+ * The <figure> centers the artwork in the article column and caps its width
+ * so a decorative graphic never blows past the prose measure. The SVG itself
+ * is fluid (width:100%, height:auto driven by its viewBox), so these
+ * max-widths are the only sizing knob authors reach for via the `size` prop.
+ *
+ * Colors live entirely inside each SVG (see palette.ts); the frame is
+ * deliberately neutral so it disappears into the page in both themes. */
+
+.figure {
+  margin: 1.75rem auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.sm {
+  max-width: 240px;
+}
+.md {
+  max-width: 420px;
+}
+.lg {
+  max-width: 600px;
+}
+.full {
+  max-width: 100%;
+}
+
+/* Optional surface behind the art. Uses the Fumadocs muted token so it sits a
+   hair above the page in light mode and a hair below it in dark mode — framed
+   illustrations get a soft card without any hard border. */
+.framed {
+  background: var(--color-fd-muted);
+  border: 1px solid var(--color-fd-border);
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
+}
+
+.art {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.caption {
+  margin: 0;
+  text-align: center;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--color-fd-muted-foreground);
+}
