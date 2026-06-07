@@ -485,18 +485,26 @@ code.hljs {
   font-weight: 600;
 }
 /* Title — the first paragraph: 600-weight, sized down from the 1.125rem
-   prose default, and tucked close to its description. */
+   prose default, with a 12px gap down to its description. */
 .prose .fd-step > p:first-child {
   font-size: 1rem;
   font-weight: 600;
   line-height: 1.4;
-  margin-bottom: 0.25rem;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
 }
-/* Description — slightly smaller than the title and snug beneath it. */
+/* Description — slightly smaller than the title, with the body line-height
+   (1.75). Its margins are zeroed so the only vertical gap between steps is
+   the explicit one set on `.fd-step` below. */
 .prose .fd-step > p:not(:first-child) {
   font-size: 0.9375rem;
-  line-height: 1.6;
+  line-height: 1.75;
   margin-top: 0;
+  margin-bottom: 0;
+}
+/* ~32px between consecutive steps. */
+.prose .fd-steps .fd-step + .fd-step {
+  margin-top: 2rem;
 }
 
 /* ── TOC navigation ──────────────────────────────────────────────────────
