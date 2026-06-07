@@ -54,9 +54,9 @@ An **object** is an actual instance built from that blueprint.
 
 ```mermaid
 flowchart LR
-    A["class BankAccount<br/>(blueprint)"] --> O1["object: alice's account<br/>balance = 60"]
-    A --> O2["object: bob's account<br/>balance = 500"]
-    A --> O3["object: cara's account<br/>balance = 0"]
+    A["class BankAccount<br/>(blueprint)"] --> O1["object: alice's account<br/><code>balance = 60</code>"]
+    A --> O2["object: bob's account<br/><code>balance = 500</code>"]
+    A --> O3["object: cara's account<br/><code>balance = 0</code>"]
 ```
 
 The class is the *idea* of a bank account. The objects are the
@@ -114,8 +114,8 @@ Two objects, two independent balances, one class.
 
 ```mermaid
 flowchart LR
-    Stack["stack"] -->|alice ref| H1["heap: BankAccount<br/>Owner='Alice'<br/>Balance=60"]
-    Stack -->|bob ref| H2["heap: BankAccount<br/>Owner='Bob'<br/>Balance=500"]
+    Stack["stack"] -->|alice ref| H1["heap: BankAccount<br/><code>Owner='Alice'</code><br/><code>Balance=60</code>"]
+    Stack -->|bob ref| H2["heap: BankAccount<br/><code>Owner='Bob'</code><br/><code>Balance=500</code>"]
 ```
 
 `alice` and `bob` are *references* sitting on the stack. The

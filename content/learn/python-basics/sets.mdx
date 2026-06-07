@@ -13,9 +13,9 @@ Like dicts, sets are implemented as **hash tables**. A set is essentially a dict
 
 ```mermaid
 flowchart LR
-    A["Set: {1, 2, 3}"] --> B["hash(1) → bucket"]
-    A --> C["hash(2) → bucket"]
-    A --> D["hash(3) → bucket"]
+    A["Set: <code>{1, 2, 3}</code>"] --> B["<code>hash(1)</code> → bucket"]
+    A --> C["<code>hash(2)</code> → bucket"]
+    A --> D["<code>hash(3)</code> → bucket"]
 ```
 
 <Callout type="info">
@@ -160,12 +160,12 @@ print("disjoint?", a.isdisjoint({99}))
 
 ```mermaid
 graph TD
-    A["Set A: {1, 2, 3, 4}"]
-    B["Set B: {3, 4, 5, 6}"]
-    C["Union: {1, 2, 3, 4, 5, 6}"]
-    D["Intersection: {3, 4}"]
-    E["Difference A-B: {1, 2}"]
-    F["Symmetric: {1, 2, 5, 6}"]
+    A["Set A: <code>{1, 2, 3, 4}</code>"]
+    B["Set B: <code>{3, 4, 5, 6}</code>"]
+    C["Union: <code>{1, 2, 3, 4, 5, 6}</code>"]
+    D["Intersection: <code>{3, 4}</code>"]
+    E["Difference A-B: <code>{1, 2}</code>"]
+    F["Symmetric: <code>{1, 2, 5, 6}</code>"]
     
     A --> C
     B --> C

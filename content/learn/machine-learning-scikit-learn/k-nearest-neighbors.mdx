@@ -35,7 +35,7 @@ have similar outputs.**
 ```mermaid
 flowchart TD
     Q["New point<br/>(species unknown)"] --> M["Measure distance<br/>to every training point"]
-    M --> N["Keep the k = 5 closest"]
+    M --> N["Keep the <code>k = 5</code> closest"]
     N --> V["Among those 5 neighbors:<br/>3 class A, 2 class B"]
     V --> P["Predict class A<br/>(the majority vote)"]
 ```

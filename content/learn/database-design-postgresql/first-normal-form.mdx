@@ -24,7 +24,7 @@ Common warning signs:
 
 ```mermaid
 flowchart LR
-    B["Before<br/>order_id: 10<br/>items: Book, Pen"] --> A["After<br/>order_id: 10 item: Book<br/>order_id: 10 item: Pen"]
+    B["Before<br/><code>order_id</code>: 10<br/>items: Book, Pen"] --> A["After<br/><code>order_id</code>: 10 item: Book<br/><code>order_id</code>: 10 item: Pen"]
 ```
 
 The after version has more rows, but each row is simpler. SQL can
@@ -37,7 +37,7 @@ Suppose a school stores student phone numbers like this:
 
 ```mermaid
 flowchart TB
-    T["students<br/>student_id | name | phones"]
+    T["students<br/><code>student_id</code> | name | phones"]
     T --> R1["1 | Ada | 555-1000, 555-2000"]
     T --> R2["2 | Grace | 555-3000"]
 ```
@@ -56,7 +56,7 @@ Some designs avoid comma-separated lists by adding more columns:
 
 ```mermaid
 flowchart TB
-    S["students<br/>student_id | name | phone1 | phone2 | phone3"]
+    S["students<br/><code>student_id</code> | name | phone1 | phone2 | phone3"]
     S --> R["1 | Ada | 555-1000 | 555-2000 | null"]
 ```
 
@@ -171,7 +171,7 @@ list.
 
 ```mermaid
 flowchart LR
-    Bad["orders<br/>id | customer | items<br/>10 | Ada | Book, Pen"] --> Good["order_items<br/>order_id | product<br/>10 | Book<br/>10 | Pen"]
+    Bad["orders<br/>id | customer | items<br/>10 | Ada | Book, Pen"] --> Good["<code>order_items</code><br/><code>order_id</code> | product<br/>10 | Book<br/>10 | Pen"]
 ```
 
 A separate `order_items` table gives every item its own row. Later, when

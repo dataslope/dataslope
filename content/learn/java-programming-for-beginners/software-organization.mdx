@@ -152,11 +152,11 @@ ever written.
 ```mermaid
 flowchart LR
     subgraph H[High cohesion + Low coupling - good]
-        A1[Order] --> A2[OrderRepository]
-        A1 --> A3[PricingService]
+        A1[Order] --> A2["<code>OrderRepository</code>"]
+        A1 --> A3["<code>PricingService</code>"]
     end
     subgraph B[Low cohesion + High coupling - bad]
-        B1[OrderManager] --- B2[DB]
+        B1["<code>OrderManager</code>"] --- B2[DB]
         B1 --- B3[Email]
         B1 --- B4[PDF]
         B1 --- B5[HTTP]

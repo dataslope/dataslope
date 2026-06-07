@@ -22,12 +22,12 @@ and the same `static` method.
 flowchart TB
     subgraph C["Counter (class)"]
         S[("static int created<br/>shared by everyone")]
-        SM["static int totalCreated()"]
+        SM["static int <code>totalCreated()</code>"]
     end
     subgraph I["instances"]
-        I1["c1<br/>id=1"]
-        I2["c2<br/>id=2"]
-        I3["c3<br/>id=3"]
+        I1["c1<br/><code>id=1</code>"]
+        I2["c2<br/><code>id=2</code>"]
+        I3["c3<br/><code>id=3</code>"]
     end
     I1 --- S
     I2 --- S

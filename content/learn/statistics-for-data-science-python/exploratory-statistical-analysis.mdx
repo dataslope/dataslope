@@ -71,16 +71,6 @@ A disciplined exploration moves through a rough sequence. It's iterative,
 not linear — findings send you back upstream — but the stages give you a
 checklist so you don't miss something basic.
 
-```mermaid
-flowchart TD
-  A["1. Understand the shape<br/>(rows, columns, dtypes)"] --> B["2. Each variable alone<br/>(distributions, summaries)"]
-  B --> C["3. Missingness<br/>(how much, where, why)"]
-  C --> D["4. Outliers<br/>(errors vs real extremes)"]
-  D --> E["5. Relationships<br/>(groupby, correlation)"]
-  E --> F["6. Form hypotheses<br/>(to confirm LATER)"]
-  F -. "iterate" .-> B
-```
-
 Here is that checklist as a walkthrough — the question each stage answers:
 
 <Steps>

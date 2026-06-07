@@ -197,9 +197,9 @@ You can write your own context managers with `__enter__` and `__exit__`, or use 
 
 ```mermaid
 flowchart TD
-    A[Enter 'with' block] --> B["__enter__() called"]
+    A[Enter 'with' block] --> B["<code>__enter__()</code> called"]
     B --> C[Body executes]
-    C --> D["__exit__() called"]
+    C --> D["<code>__exit__()</code> called"]
     D --> E[File closed]
     C -->|Exception raised| D
     style D fill:#c8e6c9

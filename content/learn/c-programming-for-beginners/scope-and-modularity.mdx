@@ -163,13 +163,13 @@ constants. It says nothing about *how* those things are implemented.
 
 ```mermaid
 flowchart LR
-    M[main.c<br/>#include parser.h<br/>#include evaluator.h] -.uses.-> PH[parser.h]
-    M -.uses.-> EH[evaluator.h]
-    PH --- P[parser.c]
-    EH --- E[evaluator.c]
-    P -.uses.-> UH[util.h]
+    M["<code>main.c</code><br/>#include <code>parser.h</code><br/>#include <code>evaluator.h</code>"] -.uses.-> PH["<code>parser.h</code>"]
+    M -.uses.-> EH["<code>evaluator.h</code>"]
+    PH --- P["<code>parser.c</code>"]
+    EH --- E["<code>evaluator.c</code>"]
+    P -.uses.-> UH["<code>util.h</code>"]
     E -.uses.-> UH
-    UH --- U[util.c]
+    UH --- U["<code>util.c</code>"]
 ```
 
 ## A worked multi-file example

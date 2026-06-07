@@ -24,12 +24,12 @@ makes its intent obvious.
 
 ```mermaid
 flowchart TD
-    Main[main] --> Load[loadData]
+    Main[main] --> Load["<code>loadData</code>"]
     Main --> Process[process]
-    Main --> Report[printReport]
-    Process --> Filter[filterValid]
-    Process --> Sort[sortByScore]
-    Process --> Avg[computeAverage]
+    Main --> Report["<code>printReport</code>"]
+    Process --> Filter["<code>filterValid</code>"]
+    Process --> Sort["<code>sortByScore</code>"]
+    Process --> Avg["<code>computeAverage</code>"]
 ```
 
 This is **modularity**: each method is a small module that does one

@@ -34,8 +34,8 @@ Machine** (JVM).
 
 ```mermaid
 flowchart TD
-    S["Source code<br/>Hello.java"] --> C["Java compiler<br/>(javac)"]
-    C --> B["Java bytecode<br/>Hello.class"]
+    S["Source code<br/><code>Hello.java</code>"] --> C["Java compiler<br/>(javac)"]
+    C --> B["Java bytecode<br/><code>Hello.class</code>"]
     B --> JVM["Java Virtual Machine<br/>(JVM)"]
     JVM --> W["Windows"]
     JVM --> L["Linux"]
@@ -98,7 +98,7 @@ For most software, this trade — slight runtime overhead for
 
 ```mermaid
 flowchart LR
-    S["MyApp.java"] --> C["javac"] --> B["MyApp.class<br/>(bytecode)"]
+    S["<code>MyApp.java</code>"] --> C["javac"] --> B["<code>MyApp.class</code><br/>(bytecode)"]
     B --> JVMW["JVM on Windows"]
     B --> JVML["JVM on Linux"]
     B --> JVMS["JVM on Solaris"]

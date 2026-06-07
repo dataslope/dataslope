@@ -144,9 +144,9 @@ The condition `T[K] extends string ? K : never` keeps only keys whose values are
 
 ```mermaid
 graph TD
-    A["Original Type<br/>{id: number, name: string, active: boolean}"] --> B["Mapped Type Transform"]
+    A["Original Type<br/><code>{id: number, name: string, active: boolean}</code>"] --> B["Mapped Type Transform"]
     B --> C["Filter: keep string props"]
-    C --> D["Result Type<br/>{name: string}"]
+    C --> D["Result Type<br/><code>{name: string}</code>"]
     style A fill:#e1f5ff
     style D fill:#d4edda
 ```

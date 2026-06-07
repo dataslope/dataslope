@@ -136,12 +136,12 @@ much faster than scanning a list.
 ```mermaid
 flowchart TD
     Q1{"Do you need to look<br/>things up by a key<br/>(not just position)?"}
-    Q1 -- yes --> D["Dictionary&lt;TKey, TValue&gt;"]
+    Q1 -- yes --> D["<code>Dictionary&lt;TKey, TValue&gt;</code>"]
     Q1 -- no --> Q2{"Do you only care<br/>whether an item<br/>is present?"}
-    Q2 -- yes --> S["HashSet&lt;T&gt;"]
+    Q2 -- yes --> S["<code>HashSet&lt;T&gt;</code>"]
     Q2 -- no --> Q3{"Will the size change<br/>after creation?"}
     Q3 -- no --> A["T[ ] (array)"]
-    Q3 -- yes --> L["List&lt;T&gt;"]
+    Q3 -- yes --> L["<code>List&lt;T&gt;</code>"]
 ```
 
 Rough cost picture:

@@ -109,7 +109,7 @@ A better design gives each kind of thing its own table.
 
 ```mermaid
 flowchart LR
-    MIX["mixed_sales<br/>one confusing table"] --> SPLIT["Split by kind of thing"]
+    MIX["<code>mixed_sales</code><br/>one confusing table"] --> SPLIT["Split by kind of thing"]
     SPLIT --> C["customers<br/>one row per customer"]
     SPLIT --> P["products<br/>one row per product"]
     SPLIT --> O["orders<br/>one row per order"]

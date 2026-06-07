@@ -251,10 +251,10 @@ produces predictions; and we judge the whole thing on held-out data.
 ```mermaid
 flowchart TD
     A["Collect labeled examples<br/>(features X, answers y)"] --> B["Split off a test set"]
-    B --> C["Train on the training set<br/>model.fit(X_train, y_train)"]
+    B --> C["Train on the training set<br/><code>model.fit(X_train, y_train)</code>"]
     C --> D["Trained model"]
-    D --> E["Evaluate on the test set<br/>model.score(X_test, y_test)"]
-    D --> F["Predict on brand-new data<br/>model.predict(X_new)"]
+    D --> E["Evaluate on the test set<br/><code>model.score(X_test, y_test)</code>"]
+    D --> F["Predict on brand-new data<br/><code>model.predict(X_new)</code>"]
     E -. "good enough?" .-> F
 ```
 

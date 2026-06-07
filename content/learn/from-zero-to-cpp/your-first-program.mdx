@@ -81,7 +81,7 @@ A single C++ statement that does a *lot*.
 
 ```mermaid
 flowchart TD
-    L["'Hello, World!\\n'<br/>(literal bytes in<br/>read-only memory)"] -->|stream insertion <<| O["std::cout<br/>(an output stream object)"]
+    L["'Hello, World!\\n'<br/>(literal bytes in<br/>read-only memory)"] -->|stream insertion <<| O["<code>std::cout</code><br/>(an output stream object)"]
     O -->|delegates to| OS[Operating system]
     OS --> T[Terminal / browser console]
 ```

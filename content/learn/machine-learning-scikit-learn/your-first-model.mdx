@@ -51,15 +51,15 @@ finally the finished model labels brand-new flowers.
 
 ```mermaid
 flowchart TD
-    A["Raw labeled data<br/>X (features), y (labels)"] --> B{"train_test_split"}
-    B --> C["X_train, y_train"]
-    B --> D["X_test, y_test"]
-    C --> E["model.fit(X_train, y_train)<br/>LEARN the pattern"]
+    A["Raw labeled data<br/>X (features), y (labels)"] --> B{"<code>train_test_split</code>"}
+    B --> C["<code>X_train, y_train</code>"]
+    B --> D["<code>X_test, y_test</code>"]
+    C --> E["<code>model.fit(X_train, y_train)</code><br/>LEARN the pattern"]
     E --> F["Trained model"]
-    D --> G["model.score(X_test, y_test)<br/>GRADE on unseen data"]
+    D --> G["<code>model.score(X_test, y_test)</code><br/>GRADE on unseen data"]
     F --> G
     G --> H["Accuracy:<br/>an honest estimate"]
-    F --> I["model.predict(new_flower)<br/>USE it in the wild"]
+    F --> I["<code>model.predict(new_flower)</code><br/>USE it in the wild"]
     I --> J["Predicted species"]
 ```
 

@@ -44,9 +44,9 @@ The core entities are `customers`, `products`, `categories`, and
 ```mermaid
 flowchart LR
     Customers["customers"] --> Orders["orders"]
-    Orders --> Items["order_items"]
+    Orders --> Items["<code>order_items</code>"]
     Products["products"] --> Items
-    Products --> ProductCategories["product_categories"]
+    Products --> ProductCategories["<code>product_categories</code>"]
     Categories["categories"] --> ProductCategories
 ```
 
@@ -117,8 +117,8 @@ purchased product.
 flowchart TD
     ManyMany["Many-to-many relationship"] --> Pure["No extra facts"]
     ManyMany --> WithFacts["Has quantity or price"]
-    Pure --> ProductCategories["product_categories"]
-    WithFacts --> OrderItems["order_items"]
+    Pure --> ProductCategories["<code>product_categories</code>"]
+    WithFacts --> OrderItems["<code>order_items</code>"]
 ```
 
 ## Why copy unit_price?
@@ -134,7 +134,7 @@ when a product's current price changes.
 flowchart LR
     ProductPrice["Product current price changes"] --> Catalog["Catalog updates"]
     ProductPrice -->|must not change| PastOrder["Past order total"]
-    PastOrder --> LinePrice["Stored unit_price"]
+    PastOrder --> LinePrice["Stored <code>unit_price</code>"]
 ```
 
 This is a design trade-off: a little duplication protects historical

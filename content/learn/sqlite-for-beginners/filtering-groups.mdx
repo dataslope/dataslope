@@ -68,9 +68,9 @@ Only Engineering survives because it has 3 employees. Sales has 2 and Marketing 
 
 ```mermaid
 flowchart TB
-    Groups["Department groups"] --> Eng["Engineering<br/>COUNT = 3"]
-    Groups --> Sales["Sales<br/>COUNT = 2"]
-    Groups --> Mkt["Marketing<br/>COUNT = 1"]
+    Groups["Department groups"] --> Eng["Engineering<br/><code>COUNT = 3</code>"]
+    Groups --> Sales["Sales<br/><code>COUNT = 2</code>"]
+    Groups --> Mkt["Marketing<br/><code>COUNT = 1</code>"]
     Eng --> Keep["HAVING COUNT(*) > 2<br/>keep"]
     Sales --> Drop["drop"]
     Mkt --> Drop

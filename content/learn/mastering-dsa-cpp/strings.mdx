@@ -158,8 +158,8 @@ int main() {
 
 ```mermaid
 flowchart LR
-    A["std::string owns characters"] --> B["dynamic storage"]
-    C["std::string_view"] --> D["pointer + length"]
+    A["<code>std::string</code> owns characters"] --> B["dynamic storage"]
+    C["<code>std::string_view</code>"] --> D["pointer + length"]
     D --> E["does not own data"]
 ```
 

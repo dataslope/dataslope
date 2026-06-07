@@ -35,7 +35,7 @@ much* or *how many*). Each splits once more:
 flowchart TD
     V["A variable"] --> CAT["Categorical<br/>(labels / groups)"]
     V --> NUM["Numerical<br/>(quantities)"]
-    CAT --> NOM["Nominal<br/>(no order)<br/>e.g. country, color, user_id"]
+    CAT --> NOM["Nominal<br/>(no order)<br/>e.g. country, color, <code>user_id</code>"]
     CAT --> ORD["Ordinal<br/>(ordered, uneven gaps)<br/>e.g. S/M/L, ratings, education level"]
     NUM --> DISC["Discrete<br/>(countable, whole)<br/>e.g. logins, defects, children"]
     NUM --> CONT["Continuous<br/>(any value in a range)<br/>e.g. height, price, latency"]
@@ -114,7 +114,7 @@ type, the right summary and chart almost pick themselves.
 ```mermaid
 flowchart TD
     START["A column to summarize"] --> Q1{"Categorical or numerical?"}
-    Q1 -->|"categorical"| C1["Counts / proportions<br/>value_counts, mode"]
+    Q1 -->|"categorical"| C1["Counts / proportions<br/><code>value_counts</code>, mode"]
     C1 --> C2["Plot: bar chart"]
     Q1 -->|"numerical"| Q2{"Roughly symmetric,<br/>no big outliers?"}
     Q2 -->|"yes"| N1["Center: mean<br/>Spread: standard deviation"]

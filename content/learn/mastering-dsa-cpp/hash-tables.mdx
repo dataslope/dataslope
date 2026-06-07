@@ -9,7 +9,7 @@ A hash table stores key-value data in an array of buckets. A hash function conve
 
 ```mermaid
 flowchart TD
-    K["key: apple"] --> H["hash(key)"]
+    K["key: apple"] --> H["<code>hash(key)</code>"]
     H --> M["% capacity"]
     M --> B["bucket index"]
     B --> A["bucket array"]
@@ -80,7 +80,7 @@ Open addressing keeps entries in the array itself. If the home bucket is occupie
 
 ```mermaid
 flowchart TD
-    H["hash(key)=2"] --> B2["bucket 2 occupied"]
+    H["<code>hash(key)=2</code>"] --> B2["bucket 2 occupied"]
     B2 --> B3["linear probe bucket 3 occupied"]
     B3 --> B4["bucket 4 empty: insert"]
 ```

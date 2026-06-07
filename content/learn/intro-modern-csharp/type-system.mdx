@@ -163,8 +163,8 @@ a method.
 ```mermaid
 flowchart LR
     subgraph Stack
-        A["a = 5"]
-        B["b = 5"]
+        A["<code>a = 5</code>"]
+        B["<code>b = 5</code>"]
     end
     Note["b = a copies the bytes"]
 ```
@@ -196,7 +196,7 @@ flowchart LR
         B["b (reference)"]
     end
     subgraph Heap
-        O["List<int> { 1, 2, 3 }"]
+        O["<code>List&lt;int&gt; { 1, 2, 3 }</code>"]
     end
     A --> O
     B --> O
@@ -298,7 +298,7 @@ flowchart LR
     subgraph Before["Before Reassign"]
         Cx["caller's xs"] --> L1["List [10, 20, 1]"]
     end
-    subgraph Inside["Inside Reassign (after 'list = new List<int>()')"]
+    subgraph Inside["Inside Reassign (after 'list = new <code>List&lt;int&gt;()</code>')"]
         Px["parameter 'list'"] --> L2["List [999]"]
         Cx2["caller's xs (unchanged)"] --> L1b["List [10, 20, 1]"]
     end

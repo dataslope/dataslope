@@ -168,9 +168,9 @@ a higher level.
 
 ```mermaid
 flowchart TD
-    M[main] --> R[read_input]
+    M[main] --> R["<code>read_input</code>"]
     M --> P[process]
-    M --> O[print_result]
+    M --> O["<code>print_result</code>"]
     P --> H1[helper 1]
     P --> H2[helper 2]
 ```
@@ -189,10 +189,10 @@ nothing else, then returns. Right at the moment we're inside
 ```mermaid
 flowchart TB
     subgraph Top
-      F1["square's frame<br/>n = 3"]
+      F1["square's frame<br/><code>n = 3</code>"]
     end
     subgraph Below
-      F2["main's frame<br/>a = 7, b = ?"]
+      F2["main's frame<br/><code>a = 7</code>, b = ?"]
     end
     F1 --- F2
 ```

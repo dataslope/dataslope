@@ -16,7 +16,7 @@
    must precede the tailwind/fumadocs imports below — `@import` rules
    are required to come before any non-`@import`/`@layer`/`@charset`
    at-rule, including the inlined CSS pulled in by tailwindcss. */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400..700&display=swap");
 
 /* `source(none)` disables Tailwind v4's automatic content detection,
    which otherwise crawls the entire project on every CSS compile. In this

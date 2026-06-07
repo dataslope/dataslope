@@ -49,13 +49,13 @@ C++ code is typically split across two kinds of file:
 
 ```mermaid
 flowchart LR
-    H1[geometry.h<br/>declarations]
-    C1[geometry.cpp<br/>definitions]
-    M[main.cpp]
+    H1["<code>geometry.h</code><br/>declarations"]
+    C1["<code>geometry.cpp</code><br/>definitions"]
+    M["<code>main.cpp</code>"]
     H1 -. include .-> M
     H1 -. include .-> C1
-    C1 -- compile --> O1[geometry.o]
-    M  -- compile --> OM[main.o]
+    C1 -- compile --> O1["<code>geometry.o</code>"]
+    M  -- compile --> OM["<code>main.o</code>"]
     O1 --> L[linker] --> APP[app]
     OM --> L
 ```

@@ -89,8 +89,8 @@ that `yield return`) make defining sources delightful.
 
 ```mermaid
 flowchart LR
-    A[IAsyncEnumerable&lt;T&gt;] --> W["WhereAwait / WhereAsync"]
-      --> S["SelectAwait / SelectAsync"]
+    A["<code>IAsyncEnumerable&lt;T&gt;</code>"] --> W["<code>WhereAwait / WhereAsync</code>"]
+      --> S["<code>SelectAwait / SelectAsync</code>"]
       --> AF["await foreach"]
 ```
 

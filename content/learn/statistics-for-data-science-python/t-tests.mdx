@@ -70,10 +70,10 @@ data?** Getting this wrong is the single most common t-test mistake.
 ```mermaid
 flowchart TD
   A["You want to compare means"] --> B{"How many groups?"}
-  B -->|"one group vs a fixed number"| C["One-sample t-test<br/>ttest_1samp"]
+  B -->|"one group vs a fixed number"| C["One-sample t-test<br/><code>ttest_1samp</code>"]
   B -->|"two groups"| D{"Are the two columns<br/>the SAME units<br/>measured twice?"}
-  D -->|"yes (before/after,<br/>matched pairs)"| E["Paired t-test<br/>ttest_rel"]
-  D -->|"no (independent groups)"| F["Two-sample t-test<br/>ttest_ind, equal_var=False"]
+  D -->|"yes (before/after,<br/>matched pairs)"| E["Paired t-test<br/><code>ttest_rel</code>"]
+  D -->|"no (independent groups)"| F["Two-sample t-test<br/><code>ttest_ind</code>, <code>equal_var</code>=False"]
 ```
 
 We'll take them one at a time.

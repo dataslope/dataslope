@@ -58,7 +58,7 @@ foreign keys. In `enrollments`, the pair `(student_id, course_id)` says
 
 ```mermaid
 flowchart TB
-    Pair["Primary key:<br/>(student_id, course_id)"] --> One["1 and 10<br/>Ada in Math"]
+    Pair["Primary key:<br/>(<code>student_id</code>, <code>course_id</code>)"] --> One["1 and 10<br/>Ada in Math"]
     Pair --> Two["1 and 11<br/>Ada in History"]
     Pair --> Reject["1 and 10 again<br/>duplicate pairing"]
 ```
@@ -101,7 +101,7 @@ For an enrollment:
 
 ```mermaid
 flowchart LR
-    S["Student: Ada"] --> E["Enrollment:<br/>enrolled_on = 2025-01-15<br/>grade = A"]
+    S["Student: Ada"] --> E["Enrollment:<br/><code>enrolled_on</code> = 2025-01-15<br/>grade = A"]
     C["Course: Math"] --> E
     E --> Meaning["Facts about this pairing"]
 ```

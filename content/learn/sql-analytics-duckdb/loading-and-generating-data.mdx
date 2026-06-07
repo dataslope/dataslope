@@ -14,7 +14,7 @@ datasets in seconds — no files required.
 ```mermaid
 flowchart TB
     A["Typed-in rows<br/>(VALUES)"] --> DB[("DuckDB")]
-    B["Generated rows<br/>(range, generate_series)"] --> DB
+    B["Generated rows<br/>(range, <code>generate_series</code>)"] --> DB
     C["Files<br/>(CSV, Parquet)"] --> DB
     D["Query results<br/>(CREATE TABLE AS)"] --> DB
     DB --> Q["Analytical<br/>queries"]

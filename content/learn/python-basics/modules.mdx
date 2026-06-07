@@ -93,11 +93,11 @@ for p in sys.path[:5]:  # show first 5
 
 ```mermaid
 flowchart TD
-    A["import foo"] --> B["Is foo in sys.modules cache?"]
+    A["import foo"] --> B["Is foo in <code>sys.modules</code> cache?"]
     B -->|yes| C["Return cached module"]
-    B -->|no| D["Search sys.path for foo.py or foo/__init__.py"]
+    B -->|no| D["Search <code>sys.path</code> for <code>foo.py</code> or foo/<code>__init__.py</code>"]
     D --> E["Execute module top to bottom"]
-    E --> F["Store in sys.modules"]
+    E --> F["Store in <code>sys.modules</code>"]
     F --> G["Bind to name foo"]
 ```
 

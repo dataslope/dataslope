@@ -42,12 +42,12 @@ int main() {
 
 ```mermaid
 graph TD
-    A["fib(5)"] --> B["fib(4)"]
-    A --> C["fib(3)"]
-    B --> D["fib(3)"]
-    B --> E["fib(2)"]
-    C --> F["fib(2)"]
-    C --> G["fib(1)"]
+    A["<code>fib(5)</code>"] --> B["<code>fib(4)</code>"]
+    A --> C["<code>fib(3)</code>"]
+    B --> D["<code>fib(3)</code>"]
+    B --> E["<code>fib(2)</code>"]
+    C --> F["<code>fib(2)</code>"]
+    C --> G["<code>fib(1)</code>"]
 ```
 
 <CodeBlock adapter="cpp" starterCode={`#include <iostream>
@@ -201,7 +201,7 @@ For LCS, `dp[i][j]` is the best length for prefixes `a[0..i)` and `b[0..j)`. Exa
 flowchart TD
     R["rows: ABCBDAB"] --> G["DP grid"]
     C["cols: BDCABC"] --> G
-    G --> A["bottom-right = 4"]
+    G --> A["bottom-<code>right = 4</code>"]
 ```
 
 <CodeBlock adapter="cpp" starterCode={`#include <algorithm>

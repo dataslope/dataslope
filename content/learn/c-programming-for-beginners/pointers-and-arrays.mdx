@@ -240,14 +240,14 @@ Most compilers will warn about this. Take the warning seriously.
 flowchart TB
     subgraph "int a[5] in memory"
       direction LR
-      C0["a[0] = 10<br/>addr 0x100"]
-      C1["a[1] = 20<br/>addr 0x104"]
-      C2["a[2] = 30<br/>addr 0x108"]
-      C3["a[3] = 40<br/>addr 0x10c"]
-      C4["a[4] = 50<br/>addr 0x110"]
+      C0["a[0] = 10<br/>addr <code>0x100</code>"]
+      C1["a[1] = 20<br/>addr <code>0x104</code>"]
+      C2["a[2] = 30<br/>addr <code>0x108</code>"]
+      C3["a[3] = 40<br/>addr <code>0x10c</code>"]
+      C4["a[4] = 50<br/>addr <code>0x110</code>"]
     end
-    P["int *p = a;<br/>p = 0x100"] --> C0
-    Q["p + 2 = 0x108"] --> C2
+    P["int *p = a;<br/><code>p = 0x100</code>"] --> C0
+    Q["p + 2 = <code>0x108</code>"] --> C2
 ```
 
 Each cell is 4 bytes apart, but `p + 1` *adds 1 element* — the

@@ -99,7 +99,7 @@ CHECK constraints can compare columns in the same row. For an event,
 
 ```mermaid
 flowchart LR
-    Start["start_date"] --> Rule{"end_date > start_date"}
+    Start["<code>start_date</code>"] --> Rule{"<code>end_date &gt; start_date</code>"}
     End["end_date"] --> Rule
     Rule -->|true| Valid["Valid event"]
     Rule -->|false| Invalid["Reject event"]

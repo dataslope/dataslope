@@ -109,7 +109,7 @@ Prefer `std::sort` unless you specifically need stability. It is an introsort-st
 
 ```mermaid
 flowchart TD
-    A["std::sort range"] --> B["quicksort-style partitioning"]
+    A["<code>std::sort</code> range"] --> B["quicksort-style partitioning"]
     B --> C{"recursion too deep?"}
     C -- "no" --> D["keep partitioning"]
     C -- "yes" --> E["heapsort fallback"]

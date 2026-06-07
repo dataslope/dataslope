@@ -72,7 +72,7 @@ a JavaScript program, here is roughly what happens:
 
 ```mermaid
 flowchart TB
-    A["Your source code<br/>(text, e.g. main.js)"]
+    A["Your source code<br/>(text, e.g. <code>main.js</code>)"]
     B["Parser<br/>(reads the text and builds a tree of meaning)"]
     C["Compiler / interpreter<br/>(turns that tree into something runnable)"]
     D["Machine instructions<br/>(what the CPU actually executes)"]
@@ -182,7 +182,7 @@ of address pointing to it.
 ```mermaid
 flowchart LR
     subgraph Stack["Stack (per running function)"]
-        S1["x = 5"]
+        S1["<code>x = 5</code>"]
         S2["list = (pointer)"]
     end
     subgraph Heap["Heap (long-lived objects)"]

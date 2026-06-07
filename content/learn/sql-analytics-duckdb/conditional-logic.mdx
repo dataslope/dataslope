@@ -153,7 +153,7 @@ clause, which does the same thing more readably.
 flowchart LR
     R[("rows with<br/>status: paid / refunded")] --> C1["SUM(CASE WHEN paid)"]
     R --> C2["SUM(CASE WHEN refunded)"]
-    C1 --> Out["one row:<br/>paid_revenue | refunded_revenue"]
+    C1 --> Out["one row:<br/><code>paid_revenue</code> | <code>refunded_revenue</code>"]
     C2 --> Out
 ```
 

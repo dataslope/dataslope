@@ -227,20 +227,20 @@ always: hinted `ArrayList` fastest, then unhinted `ArrayList`, then
 flowchart TD
     Q[need a container] --> A{key/value?}
     A -- yes --> M{order matters?}
-    M -- "no" --> HM[HashMap]
-    M -- "insertion" --> LHM[LinkedHashMap]
-    M -- "sorted/range" --> TM[TreeMap]
+    M -- "no" --> HM["<code>HashMap</code>"]
+    M -- "insertion" --> LHM["<code>LinkedHashMap</code>"]
+    M -- "sorted/range" --> TM["<code>TreeMap</code>"]
 
     A -- no --> S{unique?}
     S -- "yes" --> SO{order matters?}
-    SO -- "no" --> HS[HashSet]
-    SO -- "insertion" --> LHS[LinkedHashSet]
-    SO -- "sorted/range" --> TS[TreeSet]
+    SO -- "no" --> HS["<code>HashSet</code>"]
+    SO -- "insertion" --> LHS["<code>LinkedHashSet</code>"]
+    SO -- "sorted/range" --> TS["<code>TreeSet</code>"]
 
     S -- "no, allow duplicates" --> E{access pattern?}
-    E -- "index / append" --> AL[ArrayList]
-    E -- "queue / stack / both ends" --> AD[ArrayDeque]
-    E -- "priority order" --> PQ[PriorityQueue]
+    E -- "index / append" --> AL["<code>ArrayList</code>"]
+    E -- "queue / stack / both ends" --> AD["<code>ArrayDeque</code>"]
+    E -- "priority order" --> PQ["<code>PriorityQueue</code>"]
 ```
 
 ## Test your understanding

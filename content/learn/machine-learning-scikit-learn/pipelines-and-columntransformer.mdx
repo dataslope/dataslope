@@ -68,7 +68,7 @@ set, because you never touch the steps individually.
 ```mermaid
 flowchart LR
     subgraph Training ["Training: pipeline.fit(X_train, y_train)"]
-        A["X_train"] --> B["StandardScaler<br/>fit + transform"]
+        A["<code>X_train</code>"] --> B["StandardScaler<br/>fit + transform"]
         B --> C["LogisticRegression<br/>fit"]
         C --> D["fitted pipeline"]
     end
@@ -77,7 +77,7 @@ flowchart LR
 ```mermaid
 flowchart LR
     subgraph Prediction ["Prediction: pipeline.predict(X_new)"]
-        E["X_new"] --> F["StandardScaler<br/>transform only"]
+        E["<code>X_new</code>"] --> F["StandardScaler<br/>transform only"]
         F --> G["LogisticRegression<br/>predict"]
         G --> H["predictions"]
     end
@@ -223,9 +223,9 @@ to its own transformer, then concatenates the results side by side.
 
 ```mermaid
 flowchart TD
-    R["raw DataFrame<br/>numeric + categorical columns"] --> CT{"ColumnTransformer"}
-    CT -->|"numeric columns"| S["StandardScaler"]
-    CT -->|"categorical columns"| O["OneHotEncoder"]
+    R["raw DataFrame<br/>numeric + categorical columns"] --> CT{"<code>ColumnTransformer</code>"}
+    CT -->|"numeric columns"| S["<code>StandardScaler</code>"]
+    CT -->|"categorical columns"| O["<code>OneHotEncoder</code>"]
     S --> J["concatenate side by side"]
     O --> J
     J --> M["one feature matrix<br/>(all numeric, ready for the model)"]

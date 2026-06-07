@@ -31,9 +31,9 @@ different tables; it is one table used in two relationship roles.
 
 ```mermaid
 flowchart TB
-    CEO["Ada<br/>id = 1<br/>manager_id = NULL"] --> Eng["Grace<br/>id = 2<br/>manager_id = 1"]
-    CEO --> Ops["Linus<br/>id = 3<br/>manager_id = 1"]
-    Eng --> Dev["Mina<br/>id = 4<br/>manager_id = 2"]
+    CEO["Ada<br/>id = 1<br/><code>manager_id</code> = NULL"] --> Eng["Grace<br/>id = 2<br/><code>manager_id</code> = 1"]
+    CEO --> Ops["Linus<br/>id = 3<br/><code>manager_id</code> = 1"]
+    Eng --> Dev["Mina<br/>id = 4<br/><code>manager_id</code> = 2"]
 ```
 
 The top row often has no parent. In an org chart, the CEO has no
@@ -46,7 +46,7 @@ happens to be the same table.
 
 ```mermaid
 flowchart LR
-    Child["employees.manager_id = 2<br/>Mina's row"] -->|"FK -> PK"| Parent["employees.id = 2<br/>Grace's row"]
+    Child["employees.<code>manager_id</code> = 2<br/>Mina's row"] -->|"FK -> PK"| Parent["<code>employees.id = 2</code><br/>Grace's row"]
 ```
 
 This design gives you a flexible hierarchy without creating separate
@@ -119,7 +119,7 @@ erDiagram
 
 ```mermaid
 flowchart TB
-    Root["Root category<br/>parent_id = NULL"] --> Data["Data"]
+    Root["Root category<br/><code>parent_id</code> = NULL"] --> Data["Data"]
     Data --> SQL["SQL"]
     Data --> Modeling["Modeling"]
     Root --> Tools["Tools"]

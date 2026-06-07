@@ -13,7 +13,7 @@ Under the hood, a dict is a **hash table**: Python computes a hash of your key, 
 
 ```mermaid
 flowchart TD
-    A["Key: 'apple'"] --> B["hash('apple')"]
+    A["Key: 'apple'"] --> B["<code>hash('apple')</code>"]
     B --> C["Bucket index"]
     C --> D["Value: 1.0"]
 ```

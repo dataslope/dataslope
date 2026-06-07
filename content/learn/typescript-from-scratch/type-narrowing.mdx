@@ -272,9 +272,9 @@ The `switch` on `result.status` narrows `result` in each `case`.
 ```mermaid
 graph TD
     Start["result: Result"]
-    CheckStatus{"switch result.status"}
-    Success["case 'success': result.data"]
-    Failure["case 'failure': result.error"]
+    CheckStatus{"switch <code>result.status</code>"}
+    Success["case 'success': <code>result.data</code>"]
+    Failure["case 'failure': <code>result.error</code>"]
     Pending["case 'pending': (no extra fields)"]
     
     Start --> CheckStatus

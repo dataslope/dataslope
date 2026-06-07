@@ -22,7 +22,7 @@ type becomes **one row**.
 ```mermaid
 flowchart LR
     E["Entity type<br/>customer"] --> T["Table<br/>customers"]
-    R["One real customer<br/>Ada Lovelace"] --> Row["One row<br/>id = 1"]
+    R["One real customer<br/>Ada Lovelace"] --> Row["One row<br/><code>id = 1</code>"]
     T --> Row
 ```
 
@@ -172,7 +172,7 @@ Good entity names are ordinary words from the domain. Prefer
 flowchart TB
     Bad["Vague table<br/>items"] --> Problem["Could mean products,<br/>order lines, tasks, or anything"]
     Good["Clear tables"] --> A["products"]
-    Good --> B["order_items"]
+    Good --> B["<code>order_items</code>"]
     Good --> C["tasks"]
 ```
 

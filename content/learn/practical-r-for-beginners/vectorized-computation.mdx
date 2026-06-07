@@ -68,7 +68,7 @@ This is the heart of how data analysts think: you have
 ```mermaid
 flowchart LR
   q["quantities: [2, 1, 3, 4]"] --> mul
-  p["unit_prices: [9.99, 14.50, 24.00, 5.75]"] --> mul
+  p["<code>unit_prices: [9.99, 14.50, 24.00, 5.75]</code>"] --> mul
   mul["element-wise * "] --> r["totals: [19.98, 14.50, 72.00, 23.00]"]
   style mul fill:#fde68a
 ```
@@ -195,8 +195,8 @@ equivalent loop**, on top of being shorter and easier to read.
 
 ```mermaid
 flowchart TB
-  loop["for (i in 1:n) result[i] <- xs[i] + ys[i]"]:::code -->|interpreted per element| slow["Slow"]
-  vec["result <- xs + ys"]:::code -->|single C call| fast["Fast"]
+  loop["<code>for (i in 1:n) result[i] &lt;- xs[i] + ys[i]</code>"] -->|interpreted per element| slow["Slow"]
+  vec["<code>result &lt;- xs + ys</code>"] -->|single C call| fast["Fast"]
   style fast fill:#dcfce7
   style slow fill:#fee2e2
 ```

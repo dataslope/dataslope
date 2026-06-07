@@ -94,12 +94,12 @@ shapes. Five of the most common:
 
 ```mermaid
 flowchart LR
-    A[CSV] --> P[pandas.read_csv]
-    B[Excel<br/>.xlsx] --> P2[pandas.read_excel]
-    C[JSON<br/>API] --> P3[pandas.read_json]
-    D[Parquet] --> P4[pandas.read_parquet]
-    E[SQL DB] --> P5[pandas.read_sql]
-    P --> DF[(DataFrame)]
+    A[CSV] --> P["pandas.<code>read_csv</code>"]
+    B[Excel<br/>.xlsx] --> P2["pandas.<code>read_excel</code>"]
+    C[JSON<br/>API] --> P3["pandas.<code>read_json</code>"]
+    D[Parquet] --> P4["pandas.<code>read_parquet</code>"]
+    E[SQL DB] --> P5["pandas.<code>read_sql</code>"]
+    P --> DF[("<code>DataFrame</code>")]
     P2 --> DF
     P3 --> DF
     P4 --> DF

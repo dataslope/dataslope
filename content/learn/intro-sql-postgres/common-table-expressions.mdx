@@ -16,7 +16,7 @@ table.
 
 ```mermaid
 flowchart TB
-    CTE["WITH big_orders AS (<br/>SELECT ... FROM orders WHERE amount > 50<br/>)"] -->|"named result"| Main["SELECT ... FROM big_orders"]
+    CTE["WITH <code>big_orders</code> AS (<br/>SELECT ... FROM orders WHERE amount > 50<br/>)"] -->|"named result"| Main["SELECT ... FROM <code>big_orders</code>"]
     Main --> Result["Final rows"]
 ```
 

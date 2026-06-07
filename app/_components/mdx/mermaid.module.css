@@ -17,6 +17,25 @@
   stroke-width: 0 !important;
 }
 
+/* Inline code in diagram labels. Authors mark code-only shapes (type names,
+   identifiers, calls — e.g. `std::unique_ptr`, `value_counts()`) by wrapping the
+   text in a <code> tag in the MDX; render those spans in the app's mono face
+   (JetBrains Mono) instead of the browser's default monospace, with no inherited
+   prose-code background/padding. Applies to both the inline diagram and the
+   fullscreen stage (both use `.diagram`). */
+.diagram :global(code) {
+  font-family: var(--font-mono), "JetBrains Mono", "Fira Code", ui-monospace,
+    SFMono-Regular, Menlo, monospace;
+  font-size: 1em;
+  /* Inherit the node's label color (white on brand fills, set by adaptNodes)
+     instead of the app's default <code> color, which is near-black. */
+  color: inherit;
+  background: none;
+  padding: 0;
+  border: 0;
+  white-space: inherit;
+}
+
 /* Render the diagram at its natural (intrinsic) size, centered in the column.
    Mermaid emits the SVG with width="100%" plus an inline `max-width:<W>px`
    cap equal to the diagram's intrinsic width. Leaving that cap intact keeps

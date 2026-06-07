@@ -25,7 +25,7 @@ flowchart TB
     B --> C["Schema contract"]
     C --> D["customers"]
     C --> E["orders"]
-    C --> F["order_items"]
+    C --> F["<code>order_items</code>"]
     C --> G["products"]
     D --> H["Reliable result"]
     E --> H
@@ -261,7 +261,7 @@ parsing and rewriting historical text.
 ```mermaid
 flowchart TB
     A["Add product SKU"] --> B{"Product has its own table?"}
-    B -->|"yes"| C["Add products.sku"]
+    B -->|"yes"| C["Add <code>products.sku</code>"]
     C --> D["Update product rows"]
     B -->|"no"| E["Find product text in many places"]
     E --> F["Clean inconsistent names"]

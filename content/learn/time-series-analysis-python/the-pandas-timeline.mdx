@@ -387,10 +387,10 @@ timeline, and the rest of pandas' time tooling switches on.
 
 ```mermaid
 flowchart LR
-    S["Raw date strings"] -->|"pd.to_datetime()"| T["DatetimeIndex"]
-    T --> SL["Partial-string slicing<br/>df.loc['1955']"]
-    T --> RS["resample()<br/>(next page)"]
-    T --> RW["rolling()"]
+    S["Raw date strings"] -->|"pd.to_datetime()"| T["<code>DatetimeIndex</code>"]
+    T --> SL["Partial-string slicing<br/><code>df.loc</code>['1955']"]
+    T --> RS["<code>resample()</code><br/>(next page)"]
+    T --> RW["<code>rolling()</code>"]
     T --> AL["Automatic alignment"]
 ```
 

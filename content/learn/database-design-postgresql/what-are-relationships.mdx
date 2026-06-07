@@ -32,9 +32,9 @@ level, a specific customer row is connected to specific order rows.
 
 ```mermaid
 flowchart TB
-    C["customers row<br/>id = 1<br/>Ada"] -->|places| O1["orders row<br/>id = 101"]
-    C -->|places| O2["orders row<br/>id = 102"]
-    G["customers row<br/>id = 2<br/>Grace"] -->|places| O3["orders row<br/>id = 103"]
+    C["customers row<br/><code>id = 1</code><br/>Ada"] -->|places| O1["orders row<br/><code>id = 101</code>"]
+    C -->|places| O2["orders row<br/><code>id = 102</code>"]
+    G["customers row<br/><code>id = 2</code><br/>Grace"] -->|places| O3["orders row<br/><code>id = 103</code>"]
 ```
 
 That is why relationships are central to relational design. They make
@@ -49,7 +49,7 @@ points to it.
 ```mermaid
 flowchart LR
     Real["Real world:<br/>Ada placed order 101"] --> Model["Model:<br/>customer relates to order"]
-    Model --> Schema["Schema:<br/>orders.customer_id points to customers.id"]
+    Model --> Schema["Schema:<br/>orders.<code>customer_id</code> points to customers.id"]
 ```
 
 The relationship is the idea. The foreign key is the database

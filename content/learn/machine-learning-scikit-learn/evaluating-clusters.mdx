@@ -43,7 +43,7 @@ nearest other cluster**. For each point `i`:
 flowchart LR
     P["A point i in cluster C"] --> A["a(i) = mean distance to the<br/>other points in C (cohesion)"]
     P --> B["b(i) = mean distance to points in the<br/>nearest other cluster (separation)"]
-    A --> S["silhouette s(i) = (b - a) / max(a, b)"]
+    A --> S["silhouette s(i) = (b - a) / <code>max(a, b)</code>"]
     B --> S
     S --> R["near +1: snug and separated<br/>near 0: on a border<br/>negative: probably misassigned"]
 ```

@@ -47,7 +47,7 @@ flowchart TD
   A["Two numeric variables;<br/>want their association"] --> B{"Is the relationship<br/>roughly LINEAR<br/>with no wild outliers?"}
   B -->|"yes"| C["Pearson r<br/>pearsonr"]
   B -->|"no: curved-but-monotonic,<br/>ordinal, or outliers"| D["Spearman rho<br/>spearmanr"]
-  C --> E["Reports linear strength<br/>+ p-value vs r = 0"]
+  C --> E["Reports linear strength<br/>+ p-value vs <code>r = 0</code>"]
   D --> F["Reports monotonic strength<br/>on ranks + p-value"]
 ```
 

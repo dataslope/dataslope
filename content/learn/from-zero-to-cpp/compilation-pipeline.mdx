@@ -80,9 +80,9 @@ handles every line that starts with `#`:
 
 ```mermaid
 flowchart LR
-    A[your.cpp<br/>#include &lt;iostream&gt;] --> P[Preprocessor]
+    A["<code>your.cpp</code><br/>#include &lt;iostream&gt;"] --> P[Preprocessor]
     B[iostream<br/>thousands of lines] --> P
-    P --> X[your.cpp.i<br/>tens of thousands of<br/>lines, all C++ text]
+    P --> X["<code>your.cpp.i</code><br/>tens of thousands of<br/>lines, all C++ text"]
 ```
 
 After preprocessing, your single short `.cpp` file may have ballooned
@@ -150,8 +150,8 @@ This step is essentially a one-to-one translation table.
 
 ```mermaid
 flowchart LR
-    A[file.s<br/>'mov eax, 42'] --> AS[Assembler]
-    AS --> B[file.o<br/>binary bytes:<br/>B8 2A 00 00 00 ...]
+    A["<code>file.s</code><br/>'mov eax, 42'"] --> AS[Assembler]
+    AS --> B["<code>file.o</code><br/>binary bytes:<br/>B8 2A 00 00 00 ..."]
 ```
 
 An object file contains:
@@ -174,9 +174,9 @@ must be matched against a "defines" entry in another.
 
 ```mermaid
 flowchart LR
-    M[main.o<br/>defines: main<br/>needs: greet] --> L[Linker]
-    G[greet.o<br/>defines: greet<br/>needs: printf] --> L
-    S[libc / libc++<br/>defines: printf,<br/>std::cout, ...] --> L
+    M["<code>main.o</code><br/>defines: main<br/>needs: greet"] --> L[Linker]
+    G["<code>greet.o</code><br/>defines: greet<br/>needs: printf"] --> L
+    S["libc / libc++<br/>defines: printf,<br/><code>std::cout</code>, ..."] --> L
     L --> E[a.out / .exe<br/>complete, runnable]
 ```
 
@@ -256,13 +256,13 @@ header/implementation split exists to obey this rule even when many
 
 ```mermaid
 flowchart TD
-    H[mathx.h<br/>declarations only] -->|"#include"| M1[main.cpp]
-    H -->|"#include"| M2[other.cpp]
-    H -->|"#include"| M3[third.cpp]
-    Imp[mathx.cpp<br/>ONE definition of add and mul] --> Obj[mathx.o]
-    M1 --> O1[main.o]
-    M2 --> O2[other.o]
-    M3 --> O3[third.o]
+    H["<code>mathx.h</code><br/>declarations only"] -->|"#include"| M1["<code>main.cpp</code>"]
+    H -->|"#include"| M2["<code>other.cpp</code>"]
+    H -->|"#include"| M3["<code>third.cpp</code>"]
+    Imp["<code>mathx.cpp</code><br/>ONE definition of add and mul"] --> Obj["<code>mathx.o</code>"]
+    M1 --> O1["<code>main.o</code>"]
+    M2 --> O2["<code>other.o</code>"]
+    M3 --> O3["<code>third.o</code>"]
     Obj --> Lk[Linker]
     O1 --> Lk
     O2 --> Lk

@@ -212,9 +212,9 @@ least one definition per used symbol — no more, no less.
 
 ```mermaid
 flowchart LR
-    H["greetings.h<br/>void say_hello(...)"] -->|included by| M[main.c]
-    H -->|included by| G[greetings.c]
-    G -->|defines| BODY["body of<br/>say_hello"]
+    H["greetings.h<br/>void <code>say_hello(...)</code>"] -->|included by| M["<code>main.c</code>"]
+    H -->|included by| G["<code>greetings.c</code>"]
+    G -->|defines| BODY["body of<br/><code>say_hello</code>"]
     M -->|calls| BODY
 ```
 

@@ -62,7 +62,7 @@ The table has four order rows, so the answer is one row containing the number `4
 ```mermaid
 flowchart TB
     T[("orders table")] --> C["COUNT(*)<br/>count every row"]
-    C --> R["order_count = 4"]
+    C --> R["<code>order_count = 4</code>"]
 ```
 
 ## Adding values with SUM
@@ -226,7 +226,7 @@ Read this as: "Keep only Ada's rows, then add their amounts."
 
 ```mermaid
 flowchart LR
-    T[("orders table")] --> W["WHERE customer = 'Ada'"]
+    T[("orders table")] --> W["WHERE <code>customer = 'Ada'</code>"]
     W --> S["SUM(amount)"]
     S --> R["one total"]
 ```

@@ -59,7 +59,7 @@ call, and the wrapping of a `float` into a `numpy.float64` and back.
 
 ```mermaid
 flowchart TD
-    Code["np.sin(xs) ** 2"] --> Ufunc["ufunc loop"]
+    Code["<code>np.sin(xs) ** 2</code>"] --> Ufunc["ufunc loop"]
     Ufunc --> C["compiled C loop"]
     C --> SIMD["CPU SIMD instructions"]
     SIMD --> Mem["contiguous memory"]
