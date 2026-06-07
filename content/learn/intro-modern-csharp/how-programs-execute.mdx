@@ -16,8 +16,51 @@ CPU instructions, just build the mental model.
 
 **Source code (`.cs` files) → Compiler (Roslyn) → Intermediate Language (CIL / IL) → Runtime (.NET CLR or WebAssembly) → JIT compiler → CPU + memory → Output to console / files / screen**
 
-There are five real "things" in that pipeline, plus the CPU. Let's
-walk through them.
+There are five real "things" in that pipeline, plus the CPU. Here is
+the whole journey at a glance, before we open up each piece:
+
+<Steps>
+<Step>
+
+**Source code**
+
+You write human-readable C# in `.cs` files — meaningless to the CPU until
+something translates it.
+
+</Step>
+<Step>
+
+**Compile to IL**
+
+Roslyn turns your source into **Intermediate Language** (CIL), packaged in a
+`.dll` — portable, but not yet machine code.
+
+</Step>
+<Step>
+
+**Load and verify**
+
+The runtime (the .NET CLR) loads the `.dll`, type-checks it, and lays out the
+stack and the heap.
+
+</Step>
+<Step>
+
+**JIT to native code**
+
+The just-in-time compiler turns IL into native CPU instructions on demand, the
+first time each method runs.
+
+</Step>
+<Step>
+
+**Execute on the CPU**
+
+The CPU runs that native code — the stack tracks calls, the heap holds objects
+— until the program exits and the OS frees its memory.
+
+</Step>
+</Steps>
 
 ## 1. Source code
 

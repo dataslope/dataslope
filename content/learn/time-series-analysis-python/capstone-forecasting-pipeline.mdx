@@ -23,6 +23,80 @@ flowchart TD
     H -->|"yes"| I["9. Ship, monitor, retrain"]
 ```
 
+Before the code, here is the whole pipeline as a walkthrough — what each stage
+does and why:
+
+<Steps>
+<Step>
+
+**Load and look**
+
+Plot the raw series to see its trend, its seasonality, and its changing
+variance.
+
+</Step>
+<Step>
+
+**Stabilize the variance**
+
+Take logs so the seasonal swings stop growing with the level of the series.
+
+</Step>
+<Step>
+
+**Difference to stationarity**
+
+Apply regular and seasonal differencing until an ADF test says the series is
+stationary.
+
+</Step>
+<Step>
+
+**Identify the orders**
+
+Read the ACF and PACF of the stationary series to choose the ARIMA terms.
+
+</Step>
+<Step>
+
+**Split chronologically**
+
+Hold out the most recent stretch as the "future" — never shuffle a time
+series.
+
+</Step>
+<Step>
+
+**Fit on the training set only**
+
+Estimate the model on the past, leaving the held-out future completely
+untouched.
+
+</Step>
+<Step>
+
+**Forecast with uncertainty**
+
+Project forward and carry prediction intervals, not just a single point line.
+
+</Step>
+<Step>
+
+**Beat the baseline?**
+
+Compare honest out-of-sample error against a trivial baseline and check the
+residuals — if it fails, revise the orders.
+
+</Step>
+<Step>
+
+**Ship, monitor, retrain**
+
+Put the model to work, watch it on new data, and refit as the series evolves.
+
+</Step>
+</Steps>
+
 ## Step 1 — Load and look
 
 Every forecast starts with eyes on the data. We name what we see *before*
