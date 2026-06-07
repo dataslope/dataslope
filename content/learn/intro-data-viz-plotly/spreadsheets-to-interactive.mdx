@@ -174,10 +174,13 @@ Express**, which we will meet properly in the next chapter.
   markdown={`Ben Shneiderman's famous "visual information seeking mantra" is sometimes phrased as which of the following?
 
 - "Always show a pie chart first."
+  > Shneiderman's mantra is about the sequence of interaction in an analytical interface, not about which chart type to use first.
 - [o] "Overview first, zoom and filter, then details on demand."
   > This 1996 phrase defines the loop of modern interactive analysis: see the whole, narrow down, then inspect specifics. Every good interactive chart supports this loop.
 - "Show conclusions, hide data."
+  > Shneiderman's mantra is about the *process of exploration*, not about hiding the underlying data; hiding data would undermine rather than support good analysis.
 - "One chart per page, no exceptions."
+  > Shneiderman's principle concerns the sequence of interaction — starting with an overview and drilling down — not a rule about chart density per page.
 
 If you remember one rule about interactive design, make it this one.`}
 />
@@ -186,10 +189,13 @@ If you remember one rule about interactive design, make it this one.`}
   markdown={`Why is **interactivity** more than a cosmetic feature for analytical work?
 
 - It makes charts look more professional.
+  > Professionalism is a side effect, not the substantive benefit; a static chart can look just as polished, but cannot support the interactive exploration loop that changes how analysis is done.
 - It allows charts to animate.
+  > Animation is one specific form of interactivity, not the core benefit; the fundamental value is that the viewer can explore the data themselves rather than being limited to what the author anticipated.
 - [o] It lets the *viewer* ask follow-up questions — hover for detail, filter to subsets, zoom into regions — without re-running code.
   > Interactivity changes the *cognitive workload* of analysis. A static chart can only answer the questions the author anticipated; an interactive chart can answer the questions the viewer discovers on the spot.
 - It is required by web browsers.
+  > Web browsers have no such requirement; static SVG or PNG images display perfectly in any browser, and interactivity is a deliberate enhancement, not a browser prerequisite.
 
 The exploratory loop "overview → zoom → filter → detail" is dramatically faster with interactive charts than with static ones.`}
 />
@@ -198,10 +204,13 @@ The exploratory loop "overview → zoom → filter → detail" is dramatically f
   markdown={`Which JavaScript library, released in 2011, became the foundation of most modern interactive data graphics on the web?
 
 - jQuery
+  > jQuery (released in 2006) is a DOM-manipulation and AJAX library, not a data visualization library; it was not designed for binding data to graphical elements.
 - React
+  > React (released in 2013) is a UI component library for building web interfaces; it was not the library that pioneered data-driven interactive graphics on the web.
 - [o] D3.js
   > D3 (Data-Driven Documents) by Mike Bostock pioneered the idea of binding data to SVG elements with full control over rendering. Plotly.js is built on top of D3, and many newspaper graphics teams still use D3 directly.
 - TensorFlow.js
+  > TensorFlow.js is a machine-learning library for running neural networks in the browser; it was not released in 2011 and is not a data visualization library.
 
 Plotly Express in Python eventually compiles down to Plotly.js, which itself uses D3 — so when you make a Plotly chart in Python, you are standing on this stack.`}
 />
@@ -210,8 +219,11 @@ Plotly Express in Python eventually compiles down to Plotly.js, which itself use
   markdown={`Which of the following is **NOT** a benefit of interactive visualizations during exploratory data analysis?
 
 - You can hover over points to see exact values.
+  > Hovering to see exact values is a real and direct benefit — it removes the need to look up individual data points in a table.
 - You can zoom into a region of interest.
+  > Zooming is a core interactive feature that supports the "overview → detail" exploration loop, letting the analyst focus on a dense cluster or a specific time window.
 - You can filter series by clicking the legend.
+  > Legend-click filtering lets the viewer toggle groups on and off, making it easy to compare subsets without regenerating the chart.
 - [o] They guarantee that your conclusions are statistically valid.
   > This is the odd one out. Interactive charts make exploration *faster* and *richer*, but they do **not** validate your statistics. You still need careful analysis behind the visualization. Pretty interactivity will not save a bad analysis.
 

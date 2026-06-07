@@ -228,10 +228,13 @@ work, they won't bother to do.
   markdown={`What is the difference between a **descriptive title** and a **narrative title** for a chart?
 
 - Descriptive titles are shorter than narrative titles.
+  > Length is not the defining property; a narrative title might be shorter than a descriptive one depending on the content — what matters is whether the title conveys data structure or a specific message.
 - They are the same thing.
+  > They are distinct: a descriptive title names what is plotted, while a narrative title states the *conclusion* or story the author wants the reader to take away.
 - [o] A descriptive title states what the chart shows ("Sales by month"); a narrative title summarizes the *takeaway* the chart is intended to convey ("Sales grew 23% in Q4").
   > Both are legitimate. Descriptive titles are appropriate for exploratory or reference charts. Narrative titles are better when the chart is making a *point* in a report, dashboard, or article. Choose deliberately.
 - Narrative titles are required by Plotly.
+  > Plotly accepts any string as a title; the choice between descriptive and narrative is a design decision, not a library requirement.
 
 A common upgrade for a beginner: rewriting "Tip vs total bill" as "Tips scale roughly linearly with bill size, regardless of smoker status."`}
 />
@@ -240,10 +243,13 @@ A common upgrade for a beginner: rewriting "Tip vs total bill" as "Tips scale ro
   markdown={`Which Plotly Express / Plotly function lets you add a **horizontal reference line** at a specific y-value, with optional label?
 
 - **fig.add_text(...)**
+  > \`fig.add_text()\` is not a real Plotly method; the correct function for adding standalone text annotations is \`fig.add_annotation()\`.
 - **px.hline(...)**
+  > Plotly Express has no standalone \`px.hline()\` function; reference lines are added to an existing figure object using \`fig.add_hline()\`.
 - [o] **fig.add_hline(y=..., annotation_text=...)**
   > **fig.add_hline()** and **fig.add_vline()** add reference lines with optional text. They're invaluable for marking thresholds: a target value, a regulatory limit, "average," "today," and so on.
 - **fig.draw_line(...)**
+  > \`fig.draw_line()\` does not exist in the Plotly API; reference lines are added with \`fig.add_hline()\` (horizontal) or \`fig.add_vline()\` (vertical).
 
 Reference lines split a chart into meaningful regions, often dramatically improving readability.`}
 />
@@ -252,10 +258,13 @@ Reference lines split a chart into meaningful regions, often dramatically improv
   markdown={`Why is adding a **caption with the data source** important even for an internal chart?
 
 - It is required by GDPR.
+  > GDPR governs personal data privacy; it places no requirement on chart captions or data source attribution.
 - It triples the chart's resolution.
+  > A text caption has no effect on the chart's image resolution; resolution depends on export settings, not annotation content.
 - [o] It lets future readers (including your future self) trust, verify, and reproduce the chart — and it makes the chart safer to share outside its original context.
   > Charts get screenshotted, pasted into decks, and forwarded by email — quickly losing the surrounding context. A caption with source and method travels with the image. Future readers can verify the data; future you doesn't have to re-derive it.
 - It makes the chart load faster.
+  > Chart load time depends on data volume and rendering engine; a short text annotation has a negligible effect on rendering performance.
 
 A 12-word caption can save hours of "wait, where did this number come from?" later.`}
 />

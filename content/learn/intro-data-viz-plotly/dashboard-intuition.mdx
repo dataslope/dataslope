@@ -182,10 +182,13 @@ If yes — add it. If no — delete it. That single question prevents
   markdown={`What is a **dashboard** primarily designed for?
 
 - Telling a story once and never looking at it again.
+  > A one-time narrative belongs in a report or document; dashboards are designed to be revisited repeatedly as the underlying data changes, not viewed once and forgotten.
 - Exploring data in depth.
+  > Deep exploration is the job of a notebook or an interactive analytical tool; dashboards surface recurring high-level metrics quickly, not detailed drill-down analysis.
 - [o] Quickly answering a small number of **recurring** questions about an ongoing situation.
   > Dashboards are meant to be glanced at — repeatedly — and absorbed in seconds. They are not the right tool for one-off analysis or for deep exploration. Those tasks deserve a notebook or an interactive tool.
 - Running statistical tests.
+  > Statistical tests require hypothesis formulation, underlying data, and interpretation — none of which a dashboard is designed to facilitate; the right tool is a notebook or statistical software.
 
 Dashboards = "what is happening right now / this week, and is anything alarming?" Anything else is a different tool.`}
 />
@@ -194,7 +197,9 @@ Dashboards = "what is happening right now / this week, and is anything alarming?
   markdown={`Which is a typical **failure mode** of real-world dashboards?
 
 - Showing too few charts.
+  > Dashboards rarely fail from having too few charts; the chronic problem is accumulation over time — stakeholders keep adding panels until the dashboard is unreadable.
 - Loading too quickly.
+  > Load speed is a performance metric, not a failure mode of dashboard *design*; a dashboard that loads quickly but shows 40 confusing charts is still a bad dashboard.
 - [o] A "wall of charts" — many small panels with no visual priority, no clear question per chart, and no story to read.
   > Dashboards are cheap to add to and expensive to delete from. Over years they accumulate every stakeholder's pet chart until nobody knows what to look at. The cure is a *regular* deletion pass: any chart that hasn't driven a decision in N months goes.
 
@@ -205,10 +210,13 @@ A single number in big text often communicates more than a chart of the same num
   markdown={`Which question is the best **single test** for whether a chart belongs on a dashboard?
 
 - "Does it use bright colors?"
+  > Color choice affects aesthetics and accessibility, but has nothing to do with whether a chart belongs on a dashboard; a dull-colored chart can be essential, and a bright-colored one can be pure clutter.
 - "Is it interactive?"
+  > Interactivity is a rendering feature; a static number in a text widget can belong on a dashboard, while an elaborate interactive chart may not if its value never drives a decision.
 - [o] "If the value on this chart changes, will someone do something different?"
   > The point of a dashboard is to *drive action*. A chart whose changes never trigger any decision is just decoration. Delete it. This question alone prevents most dashboard bloat.
 - "Does it have a legend?"
+  > A legend is a labeling element; whether a chart has one is unrelated to whether it earns its place on a dashboard — what matters is whether it drives decisions.
 
 Make the action-orientation explicit and your dashboards stay focused.`}
 />
