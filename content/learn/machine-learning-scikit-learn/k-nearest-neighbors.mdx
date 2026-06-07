@@ -484,10 +484,13 @@ assert scaled_acc > raw_acc, f"Expected scaling to help: scaled {scaled_acc:.3f}
   markdown={`Why is K-nearest neighbors described as a "lazy" or "instance-based" learner?
 
 - It always uses very few features to save effort
+  > KNN uses all features when computing distances, not a reduced subset. "Lazy" refers to deferring all computation to prediction time, not to using fewer features.
 - [o] It does essentially no work during \`fit\` — it just stores the training data — and defers all computation to prediction time, where it searches for the nearest examples
   > A lazy learner builds no compact model; it keeps the training set and consults it at predict time. This makes training trivial but prediction comparatively expensive.
 - It refuses to train on datasets larger than a few hundred rows
+  > KNN can technically fit any size dataset — \`fit\` just stores the data. The practical limitation at large scale is *prediction* speed, not a hard limit on training set size.
 - It picks a random subset of neighbors to avoid computation
+  > KNN does not pick neighbors randomly. It computes distances to all training points and selects the k nearest ones deterministically. Random neighbor selection would be a different, less reliable algorithm.
 
 The "laziness" is that learning is postponed until a prediction is actually requested.`}
 />
@@ -496,10 +499,13 @@ The "laziness" is that learning is postponed until a prediction is actually requ
   markdown={`You run KNN with \`n_neighbors=1\` and get **100%** accuracy on the training set but mediocre accuracy on the test set. Why is the perfect training score unsurprising?
 
 - The training labels must be leaking into the model
+  > No leakage is occurring — this is an expected artifact of k=1. Each training point is its own single nearest neighbor, so it always retrieves its own label, which produces a trivially perfect training score.
 - [o] With k=1, the single nearest point to any training example is the example itself, so it always votes for the correct label — training accuracy is trivially perfect and tells you nothing about generalization
   > Because each training point is its own nearest neighbor, k=1 memorizes the training set. The test score, where points look up *other* points, is the honest measure.
 - A bug in scikit-learn inflates k=1 scores
+  > A perfect training score at k=1 is the mathematically correct behavior, not a bug. scikit-learn computes it accurately; the issue is that the number is meaningless as a measure of generalization.
 - It proves k=1 is the optimal choice
+  > A perfect training score with mediocre test performance is the signature of overfitting, not optimality. The honest evaluation is the test score, which shows k=1 is overfit for this data.
 
 Perfect training accuracy at k=1 is an artifact of self-matching, not evidence of a good model.`}
 />
@@ -508,10 +514,13 @@ Perfect training accuracy at k=1 is an artifact of self-matching, not evidence o
   markdown={`A dataset has one feature measured in dollars (range 0 to 100000) and one measured as a fraction (range 0 to 1). You run KNN **without scaling**. What goes wrong?
 
 - KNN cannot run on features with different units and will raise an error
+  > KNN will run without error on mixed-scale features — it simply produces poor results because the large-scale feature dominates the distance. The problem is silent degradation, not an error.
 - Nothing — KNN automatically normalizes features internally
+  > scikit-learn's KNN does not apply any internal normalization. Scaling is the user's responsibility and must be done explicitly, typically via a \`StandardScaler\` inside a pipeline.
 - [o] Euclidean distance is dominated by the dollars feature because its numbers are far larger, so the fraction feature is effectively ignored regardless of how informative it is
   > Distance sums squared differences across features. A feature with a huge range contributes huge squared differences and swamps the others, which is why distance-based models require scaling.
 - The fraction feature dominates because smaller numbers count more
+  > The opposite is true: larger numbers produce larger squared differences and therefore dominate the Euclidean distance. The fraction feature (range 0–1) is drowned out by the dollar feature (range 0–100000).
 
 Unscaled distance weights features by their arbitrary units, which is exactly why you standardize first.`}
 />
@@ -520,10 +529,13 @@ Unscaled distance weights features by their arbitrary units, which is exactly wh
   markdown={`How does increasing \`k\` (the number of neighbors) generally affect the bias-variance tradeoff in KNN?
 
 - Larger k increases variance and produces a more jagged boundary
+  > Larger k has the opposite effect: it reduces variance by averaging over more neighbors, smoothing the decision boundary. It is *smaller* k that produces jagged boundaries and high variance.
 - Larger k has no effect on bias or variance
+  > Changing k directly controls the bias-variance tradeoff. Larger k reduces variance (smoother boundary) at the cost of increased bias; smaller k does the opposite.
 - [o] Larger k averages over more neighbors, which smooths the decision boundary — reducing variance but increasing bias (eventually underfitting)
   > Small k follows local detail closely (low bias, high variance, prone to overfit); large k smooths predictions toward the majority (high bias, low variance, prone to underfit). The best k balances the two.
 - Larger k always improves test accuracy without limit
+  > Test accuracy improves as k grows from very small values, but it eventually peaks and then declines as the model over-smooths and ignores meaningful local structure. There is a sweet spot, found with cross-validation.
 
 There is a sweet spot for k, found with cross-validation rather than by inspecting the test set.`}
 />
@@ -532,10 +544,13 @@ There is a sweet spot for k, found with cross-validation rather than by inspecti
   markdown={`What is the "curse of dimensionality" as it relates to KNN?
 
 - KNN cannot accept more than a fixed number of features
+  > KNN has no hard limit on the number of features; scikit-learn will accept any dimensionality. The curse of dimensionality is a statistical degradation in prediction quality, not a technical limitation.
 - Adding features always makes KNN faster but less accurate
+  > More features make KNN *slower* at prediction (distances take longer to compute) and less accurate (the curse of dimensionality degrades the meaning of "nearest"). There is no trade-off where adding features helps speed.
 - [o] As the number of features grows large, distances between points become nearly uniform — the nearest and farthest neighbors are almost equally far away — so "nearest" loses meaning and KNN's core assumption weakens
   > In high dimensions, points spread out so that every pair is roughly equidistant. Since KNN relies on some points being genuinely closer than others, its predictions degrade. Reducing dimensionality and scaling help.
 - It refers to KNN using too much memory on small datasets
+  > Memory usage in KNN scales with dataset size, not dimensionality. The curse of dimensionality is about distance becoming uninformative in high-dimensional spaces, not about memory consumption on small data.
 
 The curse is about distance losing its discriminative power as dimensionality climbs.`}
 />

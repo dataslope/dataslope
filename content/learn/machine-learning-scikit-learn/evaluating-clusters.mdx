@@ -348,10 +348,13 @@ assert best_k == expected, f"best_k {best_k} != argmax {expected}"`,
   markdown={`Why is evaluating a clustering fundamentally harder than evaluating a classifier?
 
 - Clustering algorithms are slower
+  > Speed has nothing to do with the difficulty of evaluation; the challenge is the absence of ground-truth labels, not the runtime of the algorithm.
 - [o] Clustering is unsupervised — there is no ground-truth label to compare against, so "correct" is not even well-defined
   > Without labels you cannot count correct answers. You fall back on geometric quality (internal metrics) or, rarely, a known ground truth (external metrics).
 - Classifiers never make mistakes
+  > Classifiers make mistakes too, but they can be measured precisely because there is a known correct label for every example. That label is exactly what clustering lacks.
 - Clustering cannot be measured at all
+  > Clustering can be measured — with internal metrics like the silhouette score and, when labels exist, external metrics like the adjusted Rand index. The challenge is that there is no single ground truth, not that measurement is impossible.
 
 The absence of a true answer is exactly what makes cluster evaluation subtle.`}
 />
@@ -360,10 +363,13 @@ The absence of a true answer is exactly what makes cluster evaluation subtle.`}
   markdown={`What does a point's silhouette value close to **+1** indicate?
 
 - The point is on the boundary between two clusters
+  > A borderline point would have a silhouette value near 0, not near +1. A value close to +1 indicates the point is firmly inside its cluster, far from the boundary.
 - [o] The point is much closer to its own cluster than to the nearest other cluster — a clean, confident assignment
   > A silhouette near +1 means high cohesion and high separation: tightly within its own cluster and far from the next one.
 - The point was assigned to the wrong cluster
+  > A misassigned point would have a negative silhouette value, meaning it is closer on average to another cluster than to its own. A value near +1 is the opposite: a very confident, correct-looking assignment.
 - The clustering used too many clusters
+  > The silhouette value of a single point says nothing about whether too many clusters were used; it only measures how well that specific point fits its assigned cluster relative to the next-nearest cluster.
 
 Values near +1 are good, near 0 are borderline, and negative suggests a likely misassignment.`}
 />
@@ -372,10 +378,13 @@ Values near +1 are good, near 0 are borderline, and negative suggests a likely m
   markdown={`A negative silhouette value for a point most likely means:
 
 - The point is a perfect cluster center
+  > A cluster center would be surrounded by members of its own cluster and far from other clusters, giving it a silhouette value near +1, not a negative one.
 - [o] The point is, on average, closer to a different cluster than to its own — it was probably assigned to the wrong group
   > A negative s(i) means the nearest other cluster is closer than the point's own, a sign the assignment is poor.
 - The silhouette score was computed incorrectly
+  > A negative silhouette is a valid, meaningful result — it signals a likely misassignment, not a computation error. The formula is well-defined and negative values are an expected output for poorly placed points.
 - The point has no neighbors
+  > The silhouette score is computed using all other points in the same cluster and all points in the nearest other cluster; it is not affected by whether a point has immediate neighbors.
 
 Negative silhouette values flag points that seem to belong elsewhere.`}
 />
@@ -384,10 +393,13 @@ Negative silhouette values flag points that seem to belong elsewhere.`}
   markdown={`On two interleaving crescent-shaped clusters, K-Means's round split scored a **higher** silhouette than the true crescents. What is the lesson?
 
 - The silhouette score was buggy
+  > The silhouette score computed correctly — it gave a high score to the round split because the metric genuinely rewards compact, well-separated spherical clusters, which is what K-Means produced even though those clusters are wrong for this data.
 - The crescents are not really clusters
+  > The two crescents are the true structure in the data, as confirmed by knowing how the data was generated. The silhouette simply cannot reward curved, interleaving shapes.
 - [o] The silhouette score rewards round, compact, separated clusters, so it can prefer a geometrically wrong grouping when the true structure is not round
   > Silhouette measures geometry, not correctness. For elongated or nested shapes a "better" silhouette can mean a worse clustering — domain knowledge must override it.
 - K-Means is always the best clustering method
+  > K-Means performs well on round, globular clusters but struggles with non-convex shapes like crescents or rings. This example shows exactly the opposite: K-Means scored well on the silhouette while missing the true structure.
 
 A higher internal score is not the same as a more correct or meaningful clustering.`}
 />
@@ -396,10 +408,13 @@ A higher internal score is not the same as a more correct or meaningful clusteri
   markdown={`You want to choose the number of clusters \`k\`. How is the silhouette score typically used for this?
 
 - Fit one k and trust it
+  > Fitting a single k gives no basis for comparison. Without trying multiple values you cannot know whether a different k would score higher, so you cannot make an informed choice.
 - [o] Try several values of k, compute the silhouette score for each, and favor the k with the highest score (sanity-checked against domain sense)
   > Sweeping k and comparing silhouette scores gives a concrete, less subjective signal than eyeballing an elbow — though the final call should still make sense for the problem.
 - Pick the k with the lowest score
+  > A lower silhouette score means less cohesion and separation, which is worse. The goal is to maximize the score — higher is better — so the k with the lowest score would be the poorest choice.
 - The silhouette score cannot inform the choice of k
+  > Comparing silhouette scores across different values of k is one of its most common and practical uses, and it gives a more objective signal than the elbow method.
 
 Comparing scores across candidate k values is the silhouette's most common practical use.`}
 />
@@ -408,10 +423,13 @@ Comparing scores across candidate k values is the silhouette's most common pract
   markdown={`Your clustering has a high average silhouette score. What should you still check before trusting it?
 
 - Nothing — a high average is conclusive
+  > A high average can hide a cluster full of borderline or negative silhouette values, and a geometrically tight clustering may have no meaningful business interpretation. The average is a starting point, not a verdict.
 - [o] The per-point silhouette plot and whether the clusters are meaningful for your problem, since a high average can hide borderline clusters and says nothing about real-world value
   > Averages hide detail and geometry is not meaning. Inspect per-point silhouettes and validate the clusters against domain knowledge and intended use.
 - That the cluster ID numbers are sorted
+  > Cluster ID numbers are arbitrary labels with no inherent order or meaning. Checking whether they are sorted would tell you nothing useful about the quality of the clustering.
 - That every cluster has exactly the same size
+  > Meaningful clusters often differ in size — there is no requirement that clusters be balanced. Imposing equal sizes would distort the natural groupings in the data.
 
 A strong average is a good sign, not a verdict; per-cluster detail and domain validation still matter.`}
 />

@@ -557,8 +557,11 @@ assert 0.0 <= p_benign <= 1.0, f"Expected a probability in [0, 1], got {p_benign
 - [o] Classification — predicting a category (and a probability), such as malignant versus benign
   > The "regression" in the name refers to the linear score it computes internally; the model's output is a class. It is a classification algorithm.
 - Predicting a continuous number, like linear regression
+  > Logistic regression predicts a discrete class (and a probability), not a continuous number. That is the job of linear regression. The "regression" in its name refers to the internal linear score, not the type of output.
 - Clustering unlabeled data into groups
+  > Clustering is an unsupervised task that groups data without labels. Logistic regression is a supervised classifier — it requires labeled training examples and produces a class prediction for new inputs.
 - Reducing the number of features in a dataset
+  > Dimensionality reduction is a separate task (handled by methods like PCA). Logistic regression uses all features provided to it in order to make class predictions.
 
 The internal linear score is squashed into a probability and thresholded into a class label.`}
 />
@@ -567,10 +570,13 @@ The internal linear score is squashed into a probability and thresholded into a 
   markdown={`What is the role of the sigmoid function in logistic regression?
 
 - It removes outliers before fitting
+  > The sigmoid function does not touch the training data or remove outliers. Outlier handling, if needed, is a data preprocessing step done before fitting the model.
 - [o] It squashes the unbounded linear score into a probability between 0 and 1
   > The linear score can be any real number, but a probability must be in (0, 1). The S-shaped sigmoid maps any score into that range so the output reads as a probability.
 - It selects which features to keep
+  > Feature selection is a separate preprocessing step. The sigmoid function operates on the output of the linear score computation — it maps a single number to a probability — and plays no role in deciding which features to use.
 - It computes the accuracy of the model
+  > Accuracy is computed by comparing predictions to true labels during evaluation. The sigmoid is part of the model's forward pass — it converts the score to a probability — not part of the evaluation step.
 
 The sigmoid is the step that turns a raw score into a usable confidence.`}
 />
@@ -579,10 +585,13 @@ The sigmoid is the step that turns a raw score into a usable confidence.`}
   markdown={`For a binary logistic regression, how does \`model.predict(X)\` relate to \`model.predict_proba(X)\`?
 
 - They are unrelated methods that can disagree
+  > They are directly related: \`predict\` is exactly \`predict_proba\` plus a threshold. They can never disagree — the class returned by \`predict\` is always the class with the highest probability from \`predict_proba\`.
 - \`predict\` ignores probabilities and uses the raw features
+  > \`predict\` does not bypass the probability step. It calls the same underlying computation as \`predict_proba\` and then applies a 0.5 threshold to the class-1 probability to produce a hard label.
 - [o] \`predict\` applies a threshold (default 0.5) to the class-1 probability from \`predict_proba\`
   > The class is just the probability after thresholding: predict returns class 1 when the class-1 probability is at least 0.5, and class 0 otherwise.
 - \`predict_proba\` rounds the output of \`predict\`
+  > The direction is reversed: \`predict\` is derived from \`predict_proba\`, not the other way around. \`predict_proba\` returns the raw probabilities; \`predict\` applies a threshold to those probabilities to yield hard class labels.
 
 Because of this, you can move the threshold yourself to trade false positives against false negatives.`}
 />
@@ -591,8 +600,11 @@ Because of this, you can move the threshold yourself to trade false positives ag
   markdown={`Why does logistic regression struggle on data shaped like two interleaving moons (\`make_moons\`)?
 
 - The dataset is too small to fit
+  > \`make_moons\` by default produces hundreds of points, and logistic regression fits quickly on data that size. The poor accuracy is not due to insufficient data but to the model's fundamental limitation: a single straight decision boundary.
 - Logistic regression cannot output probabilities
+  > Logistic regression always produces probabilities via \`predict_proba\` — that is one of its core features. The problem here is the shape of the boundary, not the ability to output probabilities.
 - \`make_moons\` produces continuous targets, not classes
+  > \`make_moons\` produces binary class labels (0 and 1), making it a classification problem that logistic regression can handle. The difficulty is geometric: the two classes are not linearly separable.
 - [o] Its decision boundary is a straight line, but the true boundary between the crescents is curved
   > Logistic regression separates classes with a single linear boundary. When the classes are separated by a curve, one straight cut cannot split them, so accuracy suffers.
 
@@ -603,10 +615,13 @@ The remedy is engineered nonlinear features or a model that can bend its boundar
   markdown={`A feature has a large **positive** coefficient in a fitted logistic regression (target: class 1 = benign). What does that imply, intuitively?
 
 - The feature is measured in the wrong units
+  > The units of measurement do not determine the sign or meaning of a coefficient. A large positive coefficient means the feature pushes the prediction toward class 1, regardless of the units used.
 - Increasing that feature lowers the probability of class 1
+  > A *negative* coefficient would lower the class-1 probability as the feature increases. A large *positive* coefficient has the opposite effect: it raises the linear score and thus raises the class-1 probability through the sigmoid.
 - [o] Increasing that feature raises the linear score, pushing the predicted probability of class 1 (benign) upward
   > A positive coefficient increases the score \`z\` as the feature grows, and a higher \`z\` maps to a higher class-1 probability through the sigmoid. The sign gives the direction of the push.
 - The model has overfit the training data
+  > Coefficient size is not a sign of overfitting. Overfitting is diagnosed by comparing training and test performance. A large positive coefficient simply means that feature strongly pushes the model toward predicting class 1.
 
 Coefficient sign gives direction; magnitude gives strength, but only comparably when features share a scale.`}
 />
