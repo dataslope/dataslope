@@ -371,10 +371,13 @@ assert all(vals[i] >= vals[i+1] for i in range(len(vals)-1))`,
   markdown={`The split-apply-combine pattern describes:
 
 - A coding style for indentation
+  > Split-apply-combine is a conceptual framework for grouped computation, not a code formatting convention.
 - A way to import data
+  > Data import is handled by functions like \`pd.read_csv\`; split-apply-combine describes what happens to data after it is already loaded.
 - [o] The three steps of a groupby: partition rows into groups, compute something per group, stitch the results together
   > Once you see groupby through this lens, it stops feeling magical.
 - A method of sorting
+  > Sorting arranges rows in order; split-apply-combine aggregates groups of rows — the two operations have different outputs and purposes.
 
 The phrase was popularized by Hadley Wickham in 2011 and applies in every tabular-data tool.`}
 />
@@ -383,10 +386,13 @@ The phrase was popularized by Hadley Wickham in 2011 and applies in every tabula
   markdown={`What is the practical advantage of \`agg(my_name=("col", "mean"))\` over \`agg({"col": ["mean"]})\`?
 
 - It is faster
+  > Both syntaxes call the same underlying aggregation engine; the named-tuple form is not meaningfully faster.
 - It supports more functions
+  > Both syntaxes support the same set of aggregation functions; the difference is purely in how the output columns are named.
 - [o] It produces flat, well-named output columns instead of a MultiIndex of columns — far easier to use downstream
   > Named aggregations are the modern recommended style. The output looks like a normal table.
 - It works on Series only
+  > Named aggregations work on a grouped DataFrame, not just a Series; the syntax applies whenever you call \`.agg\` on a \`DataFrameGroupBy\`.
 
 If you have ever been confused by MultiIndex columns coming out of groupby, switch to named aggregations.`}
 />
@@ -395,10 +401,13 @@ If you have ever been confused by MultiIndex columns coming out of groupby, swit
   markdown={`When would you use \`groupby(...).transform(...)\` instead of \`.agg(...)\`?
 
 - When you want fewer rows
+  > \`agg\` is the operation that reduces rows (one row per group); \`transform\` keeps the same number of rows as the input.
 - They are equivalent
+  > \`agg\` returns a smaller DataFrame with one row per group; \`transform\` returns a Series or DataFrame with the same number of rows as the original — the outputs are different shapes.
 - [o] When you want a column added back to every original row containing its group's statistic — the result has the same shape as the input
   > \`agg\` collapses to one row per group; \`transform\` broadcasts the group result back to every row in that group.
 - When sorting
+  > Sorting is done with \`.sort_values\` or \`.sort_index\`; neither \`agg\` nor \`transform\` performs a sort.
 
 \`transform\` is the right hammer for "show me each value alongside its group average."`}
 />
@@ -407,10 +416,13 @@ If you have ever been confused by MultiIndex columns coming out of groupby, swit
   markdown={`In a \`groupby(["a","b"])\` result, what kind of index does the output usually have?
 
 - A flat RangeIndex
+  > A flat RangeIndex (0, 1, 2, …) is what you get after calling \`.reset_index()\`; the default output of a multi-column groupby is a MultiIndex.
 - A column index
+  > A column index refers to the column axis of a DataFrame; the output of a groupby result has the group keys in the *row* index, not the column index.
 - [o] A MultiIndex — one level for column \`a\`, one level for column \`b\`
   > Multi-column groupbys naturally produce hierarchical indexes. Call \`.reset_index()\` if you want a flat DataFrame.
 - A DatetimeIndex
+  > A DatetimeIndex arises when the index contains timestamps; grouping by string or integer columns like \`a\` and \`b\` produces a MultiIndex of those values.
 
 The MultiIndex is powerful but adds a learning curve. \`reset_index()\` is your friend.`}
 />

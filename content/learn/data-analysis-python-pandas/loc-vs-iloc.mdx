@@ -185,10 +185,13 @@ print(df.iloc[0])
   markdown={`Which of these slices is **inclusive** of the right endpoint?
 
 - \`df.iloc[0:5]\`
+  > \`iloc\` follows standard Python slicing rules — the right endpoint (position 5) is excluded, so this returns rows at positions 0, 1, 2, 3, and 4.
 - \`mylist[0:5]\` in plain Python
+  > Standard Python list slicing is exclusive of the right endpoint; \`mylist[0:5]\` returns items at indices 0 through 4, not 5.
 - [o] \`df.loc["a":"e"]\`
   > Label-based slicing in Pandas is inclusive of both ends — different from \`iloc\` and from regular Python slicing.
 - \`range(0, 5)\`
+  > \`range(0, 5)\` generates integers 0, 1, 2, 3, 4 — the stop value 5 is excluded, consistent with Python's exclusive-end convention.
 
 This asymmetry surprises everyone the first time. Lock it in.`}
 />
@@ -197,10 +200,13 @@ This asymmetry surprises everyone the first time. Lock it in.`}
   markdown={`Why does Pandas recommend \`df.loc[mask, "col"] = value\` instead of \`df[mask]["col"] = value\`?
 
 - The first is shorter
+  > \`df.loc[mask, "col"] = value\` is slightly longer than the chained form, but brevity is not the reason to prefer it — correctness is.
 - They are equivalent
+  > The chained form \`df[mask]["col"] = value\` may silently modify a temporary copy instead of the original DataFrame; the two are not reliably equivalent.
 - [o] The chained version may operate on a copy of the data and silently fail to update the original DataFrame (the *SettingWithCopyWarning*); \`loc\` guarantees in-place update on the original
   > This is the single most common Pandas footgun. Always use \`loc\` for assignment.
 - Pandas does not support boolean masks
+  > Pandas fully supports boolean masks as row selectors in \`loc\`; the reason to avoid the chained form is copy semantics, not mask support.
 
 Train your fingers to write \`df.loc[mask, "col"] = ...\` and you will save yourself many hours of debugging.`}
 />
@@ -209,10 +215,13 @@ Train your fingers to write \`df.loc[mask, "col"] = ...\` and you will save your
   markdown={`Your DataFrame has integer index \`[10, 20, 30]\`. What does \`df.loc[10]\` return?
 
 - An error
+  > \`df.loc[10]\` does not raise an error here because the label 10 exists in the index; an error would occur if the label were absent or if you used \`df.iloc[10]\` on a 3-row DataFrame.
 - [o] The row whose **label** is 10 — i.e., the first row
   > When the index contains integers, the distinction between label and position becomes very visible: \`df.iloc[10]\` would be out of bounds here.
 - The row at position 10
+  > \`loc\` operates on labels, not positions; the row at position 10 (the eleventh row) does not exist in a 3-row DataFrame, but the row *labeled* 10 is the first row.
 - The integer 10
+  > \`df.loc[10]\` returns a row (a Series), not the scalar value 10; to get a scalar from the index you would use a different operation.
 
 This is the cleanest demonstration of why "label vs position" matters.`}
 />

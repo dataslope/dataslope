@@ -233,10 +233,13 @@ assert int(row["temp"].iloc[0]) == 6`,
   markdown={`In the wide table \`person | 2022 | 2023 | 2024\`, why is "year" considered a hidden variable?
 
 - It is not
+  > Year is a variable (it has multiple values: 2022, 2023, 2024), but it is encoded in the column names rather than in a dedicated column of values — that is precisely what makes it "hidden."
 - Years are integers
+  > The data type of the year values is irrelevant; the issue is that they appear as column headers instead of as rows in a dedicated \`year\` column.
 - [o] The years are sitting in column *names*, not in a column of *values* — to do anything year-aware you must first lift them out
   > That column-names-are-values smell is the classic signal that you should melt.
 - The data is corrupted
+  > The data is structurally valid; it is simply in wide format, which encodes a variable (year) in column names rather than in a value column.
 
 Recognizing this pattern is most of the battle.`}
 />
@@ -245,10 +248,13 @@ Recognizing this pattern is most of the battle.`}
   markdown={`Which operation reshapes wide → long?
 
 - pivot
+  > \`pivot\` (and \`pivot_table\`) reshapes in the opposite direction — from long to wide; it takes values from rows and spreads them across new columns.
 - merge
+  > \`merge\` joins two DataFrames together on a common key; it does not reshape a single DataFrame from wide to long.
 - [o] melt
   > Think "melt the wide table down into a tall one".
 - concat
+  > \`concat\` stacks DataFrames vertically or horizontally; it does not convert column names into row values the way \`melt\` does.
 
 melt unpivots; pivot pivots.`}
 />
@@ -257,10 +263,13 @@ melt unpivots; pivot pivots.`}
   markdown={`Why do plotting libraries usually prefer long format?
 
 - They reject wide DataFrames
+  > Plotting libraries can accept wide DataFrames for some chart types, but they require more manual configuration; they prefer long format because column-to-aesthetic mapping is cleaner.
 - It uses less memory
+  > Long format typically uses *more* memory than wide format for the same data because it repeats identifier columns (like \`person\`) once per observation row.
 - [o] They map columns to plot aesthetics (x, y, color, facet) — a single tidy column for each variable plugs straight in
   > Once you internalize the "one column per variable" rule, plotting becomes mechanical.
 - Wide format is deprecated
+  > Wide format is not deprecated; it remains the preferred form for human-readable reports and spreadsheet exports — the choice depends on the use case.
 
 The same principle underlies Seaborn, Plotly Express, and ggplot2.`}
 />

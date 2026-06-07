@@ -177,10 +177,13 @@ This is the workflow we will use through the rest of the course.
   markdown={`Which of these is the **most accurate** definition of "big data" as discussed in this chapter?
 
 - Any dataset larger than 1,000 rows
+  > 1,000 rows is tiny by any standard — a basic CSV from a survey; the chapter places "bigger than a spreadsheet" at hundreds of thousands to tens of millions of rows.
 - [o] "Big data" is context-dependent — usually it means a dataset that does not fit on one machine's memory or disk, requiring distributed systems
   > The chapter gives three rough tiers — bigger than a spreadsheet, bigger than memory, bigger than one machine — and notes that the third tier is what most practitioners mean by "big data".
 - Any dataset that contains numbers
+  > Nearly every dataset contains numbers; "contains numbers" is not a meaningful threshold for any definition of big data.
 - Any dataset that requires Pandas
+  > Pandas is used comfortably on datasets with a few hundred rows to a few hundred million rows depending on available RAM — it is not a marker of "big data".
 
 Most analyst work, even at large companies, lives in the "fits on a laptop" tier and is well-served by Pandas.`}
 />
@@ -220,10 +223,13 @@ chapter, you will be able to answer it in one line.
   markdown={`Why did digital datasets explode in size starting around the year 2000?
 
 - Pandas was released and people had to fill it with data
+  > Pandas was created in 2008 — well after the data explosion was already underway — and was built *in response* to the flood of data, not the other way around.
 - Excel was upgraded
+  > Excel improvements helped analysts work with existing data; they did not cause the explosion in dataset sizes, which was driven by internet-scale data collection and cheap storage.
 - [o] A combination of cheaper storage, ubiquitous sensors (especially smartphones), and effortless web-based collection (clickstreams, APIs)
   > The chapter highlights cheap storage, cheap sensors, and cheap collection as the three forces behind the data explosion. Each one independently lowered the cost of *keeping* an extra row of data.
 - Hard drives became more reliable
+  > Reliability improvements were incremental; the chapter attributes the explosion to the dramatic *cost* drop in storage (a ten-billion-fold reduction), not to reliability gains.
 
 Pandas appeared *because* of this explosion, not the other way around.`}
 />
@@ -232,10 +238,13 @@ Pandas appeared *because* of this explosion, not the other way around.`}
   markdown={`What does Pandas do once data is loaded into a DataFrame, regardless of whether the source was a CSV, Excel file, JSON, Parquet, or SQL?
 
 - It writes the data back to the source automatically
+  > Pandas does not write back to the source unless you explicitly call a write method like \`to_csv\` or \`to_sql\`; loading is a read-only operation on the source.
 - [o] Downstream code can manipulate the DataFrame in the same way regardless of where it originally came from
   > The "many readers, one DataFrame" pattern means your analysis code is decoupled from the data source. You can swap a CSV for a SQL query without changing the rest of your notebook.
 - It compresses the data
+  > Pandas keeps data in memory in an uncompressed columnar format; it does not compress data on load.
 - It encrypts the data
+  > Pandas performs no encryption; security is handled at the file-system or network level before Pandas reads the data.
 
 Decoupling the *source* of data from the *operations* you perform on it is one of Pandas's biggest practical wins.`}
 />
@@ -244,9 +253,11 @@ Decoupling the *source* of data from the *operations* you perform on it is one o
   markdown={`A junior analyst says "we have big data — about 40,000 rows." How should you (gently) respond?
 
 - They are correct
+  > 40,000 rows loads in milliseconds on any modern laptop; the chapter explicitly places this size well within the "fits in memory" tier, not the "big data" tier.
 - [o] 40,000 rows fits comfortably in memory on any laptop; Pandas will handle it instantly, and "big data" is normally reserved for datasets that no longer fit in memory or on one machine
   > Vocabulary matters. Calling small tabular data "big" causes teams to over-engineer with Spark, BigQuery, or distributed systems when Pandas alone would do the job in seconds.
 - They are correct, but only on Tuesdays
+  > Dataset size is not day-dependent; 40,000 rows is small by any standard regardless of when you load it.
 
 Resist the temptation to use big-data tooling on small-data problems — it adds cost, latency, and operational pain without adding insight.`}
 />
