@@ -50,45 +50,51 @@ function cachePromise<T>(key: string, setPromise: () => Promise<T>): Promise<T> 
 
 // ─── Brand-themed Mermaid palette ──────────────────────────────────────────
 //
-// Diagrams are themed from the brand color system (app/brand.css) via Mermaid's
-// customizable "base" theme — a LIGHT theme in light mode and a DARK theme in
-// dark mode, so each matches the surrounding page (no white card on a dark
-// page).
+// Diagrams are themed from the brand color system (app/brand.css) so every
+// element reads as part of the DataSlope palette:
 //
-// The wrinkle: ~200 MDX diagrams hand-color nodes with `classDef` using light
-// pastel fills and *no* text color (e.g. `classDef bad fill:#fee2e2`). Mermaid
-// has one global node-text color, so in a dark theme (light text) those author
-// nodes would be light-on-light. We fix that after render with
-// `adaptNodeLabels`, which sets each node's label color from its *own* fill
-// luminance — dark text on light fills, light text on dark fills — so author
-// pastels stay legible while our default nodes go properly dark.
+//   • Shapes use saturated brand fills (the 500 shade by default), and those
+//     fills are IDENTICAL in light and dark mode — no translucent or pastel
+//     variants. Only the *page-level* structure (connectors, free-floating
+//     titles, edge-label backdrops, the subtle subgraph surface) follows the
+//     surrounding light/dark page.
+//   • Shapes have NO borders: every theme border color is set equal to its
+//     fill, and `adaptNodes` additionally forces stroke-width to 0 after
+//     render (which also clears any author `stroke:` override).
+//   • The fonts come from the app's type system: Inter (`--font-sans`) for
+//     regular text and JetBrains Mono (`--font-mono`) for nodes the author
+//     tags as code with `:::code`.
+//
+// ~50 MDX diagrams hand-color nodes with `style`/`classDef` using light pastel
+// fills (e.g. `fill:#fee2e2`). To keep those on-brand, `adaptNodes` buckets
+// each node's fill by hue and snaps it to the matching brand 500 (red pastel →
+// red-500, green pastel → green-500, …), then sets a per-fill label color
+// (white on the darker hues, near-black on yellow/green/teal).
 //
 // Mermaid runs color math (khroma) over theme values and needs concrete colors,
 // so we resolve the brand tokens to hex at render time (brand.css stays the
 // source of truth) with literal fallbacks.
+
+// Inter for regular text, JetBrains Mono for code. The CSS vars resolve in the
+// DOM (defined on :root and on <html> via next/font), and the literal fallbacks
+// keep text measurement correct if a var is ever missing.
+const SANS =
+  'var(--font-sans), Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+const MONO =
+  'var(--font-mono), "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace';
+
 const BRAND_FALLBACKS: Record<string, string> = {
-  "--ds-blue-50": "#E8F2FF",
-  "--ds-blue-100": "#D1E6FF",
-  "--ds-blue-200": "#AED3FF",
-  "--ds-blue-300": "#8ABFFF",
-  "--ds-blue-800": "#00519C",
-  "--ds-teal-200": "#AAE0DD",
-  "--ds-teal-800": "#006361",
-  "--ds-green-200": "#B4EAAF",
-  "--ds-green-800": "#006F01",
-  "--ds-red-200": "#FFC2BF",
+  "--ds-blue-500": "#148CFF",
+  "--ds-blue-600": "#0878DD",
+  "--ds-teal-500": "#00AEAA",
+  "--ds-green-500": "#20C621",
+  "--ds-yellow-500": "#FFDD6C",
+  "--ds-orange-500": "#E47600",
   "--ds-red-500": "#FF4F59",
   "--ds-red-600": "#DC3F49",
-  "--ds-red-800": "#99212C",
-  "--ds-yellow-100": "#FDF5D9",
-  "--ds-yellow-200": "#FEF0C3",
-  "--ds-yellow-600": "#D4B651",
-  "--ds-yellow-800": "#836D1C",
-  "--ds-orange-200": "#F6CAAD",
-  "--ds-orange-800": "#844200",
-  "--ds-purple-200": "#DBCAFC",
-  "--ds-purple-800": "#634094",
+  "--ds-purple-500": "#AB77FA",
   "--ds-gray-50": "#F9FAFB",
+  "--ds-gray-100": "#F3F4F6",
   "--ds-gray-200": "#E5E7EB",
   "--ds-gray-300": "#D1D5DB",
   "--ds-gray-400": "#9CA3AF",
@@ -99,6 +105,19 @@ const BRAND_FALLBACKS: Record<string, string> = {
   "--ds-gray-900": "#111827",
   "--ds-white": "#FFFFFF",
 };
+
+// The seven-hue brand wheel (app/brand.css §1.1) used for categorical diagrams
+// (mindmaps / pie) and for snapping author fills back onto the palette. `dark`
+// marks hues light enough that near-black label text reads better than white.
+const WHEEL: ReadonlyArray<{ name: string; dark: boolean }> = [
+  { name: "blue", dark: false },
+  { name: "teal", dark: true },
+  { name: "green", dark: true },
+  { name: "yellow", dark: true },
+  { name: "orange", dark: false },
+  { name: "red", dark: false },
+  { name: "purple", dark: false },
+];
 
 function readBrand(): (token: keyof typeof BRAND_FALLBACKS) => string {
   let resolved: Record<string, string> = BRAND_FALLBACKS;
@@ -116,88 +135,88 @@ function readBrand(): (token: keyof typeof BRAND_FALLBACKS) => string {
 function brandThemeVariables(isDark: boolean): Record<string, string | boolean> {
   const c = readBrand();
 
-  // Surfaces & text, keyed by mode. Light: soft tints on white. Dark: layered
-  // slate (page < cluster < node) with light text. `nodeText` is the theme
-  // default; adaptNodeLabels overrides it per node from the node's own fill.
-  const nodeFill = isDark ? c("--ds-gray-700") : c("--ds-blue-100");
-  const nodeEdge = isDark ? c("--ds-gray-600") : c("--ds-blue-300");
-  const nodeText = isDark ? c("--ds-gray-50") : c("--ds-gray-900");
-  const clusterFill = isDark ? c("--ds-gray-800") : c("--ds-gray-50");
-  const clusterEdge = isDark ? c("--ds-gray-700") : c("--ds-gray-200");
-  const pageText = isDark ? c("--ds-gray-50") : c("--ds-gray-900"); // free-floating
-  const surface = isDark ? c("--ds-gray-900") : c("--ds-white");
+  // ── Shapes — brand fills, identical in light & dark, no borders ──────────
+  // The default node is brand blue. Every *BorderColor below is set equal to
+  // its fill so borders never paint (adaptNodes also forces stroke-width:0).
+  // `nodeText` is the theme default white; adaptNodes refines it per fill.
+  const nodeFill = c("--ds-blue-500");
+  const nodeText = c("--ds-white");
+  const dark = c("--ds-gray-900");
+  const light = c("--ds-gray-50");
+
+  // ── Page-level structure — the only thing that follows light/dark ────────
+  // Connectors, free-floating titles/signals, edge-label backdrops, and the
+  // subtle subgraph/cluster surface sit ON the page, so they track it.
+  const pageText = isDark ? light : dark;
+  const surface = isDark ? dark : c("--ds-white");
   const line = c("--ds-gray-400"); // connectors — visible on light and dark
-  const lifeline = isDark ? c("--ds-gray-500") : c("--ds-gray-300");
-  const edgeLabelBg = isDark ? c("--ds-gray-900") : c("--ds-white");
-  const accentFill = isDark ? c("--ds-gray-600") : c("--ds-blue-100");
+  const clusterFill = isDark ? c("--ds-gray-800") : c("--ds-gray-100");
+  const lifeline = isDark ? c("--ds-gray-600") : c("--ds-gray-300");
 
-  // Notes — bright sticky in light; muted slate with a yellow edge in dark.
-  const noteFill = isDark ? c("--ds-gray-700") : c("--ds-yellow-100");
-  const noteEdge = isDark ? c("--ds-yellow-600") : c("--ds-yellow-200");
+  // ── Notes — brand yellow (attention), dark text, both modes ──────────────
+  const noteFill = c("--ds-yellow-500");
 
-  // Categorical wheel (mindmaps): light = soft -200 + dark labels; dark = deep
-  // -800 + light labels. (Mermaid re-applies overrides after derivation, so
-  // these reach the SVG verbatim; mindmap sections aren't `.node`, so
-  // adaptNodeLabels leaves them alone.)
-  const step = isDark ? "800" : "200";
-  const wheel = ["blue", "teal", "green", "yellow", "orange", "red", "purple"];
+  // ── Categorical wheel (mindmaps / pie) — brand 500s, same in both modes ──
+  // Mindmap sections aren't `.node`, so adaptNodes leaves them alone; set the
+  // label color per hue here instead (white on the darker hues, dark on the
+  // lighter ones).
   const cScale: Record<string, string> = {};
   for (let i = 0; i < 12; i++) {
-    cScale[`cScale${i}`] = c(
-      `--ds-${wheel[i % wheel.length]}-${step}` as keyof typeof BRAND_FALLBACKS,
-    );
+    const hue = WHEEL[i % WHEEL.length];
+    cScale[`cScale${i}`] = c(`--ds-${hue.name}-500` as keyof typeof BRAND_FALLBACKS);
+    cScale[`cScaleLabel${i}`] = hue.dark ? dark : light;
   }
 
   return {
     darkMode: isDark,
     background: surface,
-    fontFamily: '"Source Serif 4", Georgia, "Times New Roman", serif',
+    fontFamily: SANS,
     // Controls the font-size written into the SVG's inline <style> block.
     // Without this, Mermaid inherits the container's computed size (16px from
     // the 1rem wrapper) and writes that into the SVG, overriding the fontSize
     // config which only governs text measurement.
     fontSize: "15px",
 
-    // Nodes (flowchart / class / state / ER) + sequence actors
+    // Nodes (flowchart / class / state / ER) + sequence actors — border = fill
     primaryColor: nodeFill,
-    primaryBorderColor: nodeEdge,
+    primaryBorderColor: nodeFill,
     primaryTextColor: nodeText,
     nodeTextColor: nodeText,
 
-    // Secondary / tertiary — clusters/subgraphs + gentle accents
-    secondaryColor: accentFill,
-    secondaryBorderColor: nodeEdge,
+    // Secondary / tertiary — keep nodes brand blue; clusters get the surface
+    secondaryColor: nodeFill,
+    secondaryBorderColor: nodeFill,
     secondaryTextColor: nodeText,
     tertiaryColor: clusterFill,
-    tertiaryBorderColor: clusterEdge,
-    tertiaryTextColor: nodeText,
+    tertiaryBorderColor: clusterFill,
+    tertiaryTextColor: pageText,
 
     // Connectors + free-floating text (titles / signals sit on the page)
     lineColor: line,
     arrowheadColor: line,
     textColor: pageText,
     titleColor: pageText,
-    edgeLabelBackground: edgeLabelBg,
+    edgeLabelBackground: surface,
 
     // Notes
     noteBkgColor: noteFill,
-    noteBorderColor: noteEdge,
-    noteTextColor: nodeText,
+    noteBorderColor: noteFill,
+    noteTextColor: dark,
 
     // Sequence diagrams
     actorBkg: nodeFill,
-    actorBorder: nodeEdge,
+    actorBorder: nodeFill,
     actorTextColor: nodeText,
     actorLineColor: lifeline,
     signalColor: line,
     signalTextColor: pageText,
     labelBoxBkgColor: nodeFill,
-    labelBoxBorderColor: nodeEdge,
+    labelBoxBorderColor: nodeFill,
     labelTextColor: nodeText,
     loopTextColor: pageText,
-    activationBkgColor: accentFill,
-    activationBorderColor: nodeEdge,
-    sequenceNumberColor: isDark ? c("--ds-gray-900") : c("--ds-white"),
+    activationBkgColor: nodeFill,
+    activationBorderColor: nodeFill,
+    sequenceNumberColor: nodeText,
 
     // Class diagrams
     classText: nodeText,
@@ -205,8 +224,8 @@ function brandThemeVariables(isDark: boolean): Record<string, string | boolean> 
     // State diagrams (composite/alt backgrounds follow the cluster surface)
     compositeBackground: clusterFill,
     altBackground: clusterFill,
-    compositeTitleBackground: nodeFill,
-    compositeBorder: nodeEdge,
+    compositeTitleBackground: clusterFill,
+    compositeBorder: clusterFill,
 
     // ER diagrams — alternating attribute rows
     attributeBackgroundColorOdd: clusterFill,
@@ -215,20 +234,20 @@ function brandThemeVariables(isDark: boolean): Record<string, string | boolean> 
     // Gantt charts
     sectionBkgColor: clusterFill,
     altSectionBkgColor: surface,
-    sectionBkgColor2: isDark ? c("--ds-gray-700") : c("--ds-blue-50"),
+    sectionBkgColor2: clusterFill,
     taskBkgColor: nodeFill,
-    taskBorderColor: nodeEdge,
-    activeTaskBkgColor: isDark ? c("--ds-gray-600") : c("--ds-blue-200"),
-    activeTaskBorderColor: nodeEdge,
-    gridColor: clusterEdge,
-    doneTaskBkgColor: isDark ? c("--ds-gray-700") : c("--ds-gray-300"),
-    doneTaskBorderColor: c("--ds-gray-500"),
-    critBkgColor: isDark ? c("--ds-red-800") : c("--ds-red-200"),
-    critBorderColor: c("--ds-red-600"),
+    taskBorderColor: nodeFill,
+    activeTaskBkgColor: c("--ds-blue-600"),
+    activeTaskBorderColor: c("--ds-blue-600"),
+    gridColor: isDark ? c("--ds-gray-700") : c("--ds-gray-200"),
+    doneTaskBkgColor: isDark ? c("--ds-gray-600") : c("--ds-gray-300"),
+    doneTaskBorderColor: isDark ? c("--ds-gray-600") : c("--ds-gray-300"),
+    critBkgColor: c("--ds-red-500"),
+    critBorderColor: c("--ds-red-500"),
     todayLineColor: c("--ds-red-500"),
     taskTextColor: nodeText,
-    taskTextDarkColor: c("--ds-gray-900"),
-    taskTextLightColor: c("--ds-gray-50"),
+    taskTextDarkColor: dark,
+    taskTextLightColor: light,
     taskTextOutsideColor: pageText,
 
     // Categorical scale (mindmaps / pie) + mindmap root node
@@ -239,42 +258,163 @@ function brandThemeVariables(isDark: boolean): Record<string, string | boolean> 
   };
 }
 
-// Relative luminance (WCAG) of an "rgb(r, g, b)" string, or null if unparseable.
-function rgbLuminance(rgb: string): number | null {
-  const m = rgb.match(/[\d.]+/g);
+// Parse an "rgb(r, g, b)" / "rgba(...)" string to [r, g, b], or null.
+function parseRgb(s: string): [number, number, number] | null {
+  const m = s.match(/[\d.]+/g);
   if (!m || m.length < 3) return null;
-  const [r, g, b] = m.slice(0, 3).map((n) => {
-    const v = Number(n) / 255;
-    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
-  });
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return [Number(m[0]), Number(m[1]), Number(m[2])];
 }
 
-// Set each flowchart node's label color from its own fill luminance, so author
-// `classDef` pastel fills (which carry no text color) stay legible: dark text on
-// light fills, light text on dark fills. Runs after the SVG is in the DOM —
-// fills can come from injected CSS classes, so getComputedStyle is required.
-// Idempotent, and harmless in light mode (re-asserts dark-on-light).
-function adaptNodeLabels(root: Element | null): void {
+// Hue (0–360) + saturation + lightness (0–1) from r,g,b (0–255).
+function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const d = max - min;
+  let h = 0;
+  if (d !== 0) {
+    if (max === r) h = ((g - b) / d) % 6;
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h = h * 60;
+    if (h < 0) h += 360;
+  }
+  const l = (max + min) / 2;
+  const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+  return { h, s, l };
+}
+
+// Map a hue onto the brand wheel. Violet + magenta/pink fold into purple (the
+// nearest decorative hue, since the brand has no pink).
+function hueToWheel(h: number): (typeof WHEEL)[number] {
+  const name =
+    h < 15 ? "red"
+    : h < 45 ? "orange"
+    : h < 70 ? "yellow"
+    : h < 160 ? "green"
+    : h < 198 ? "teal"
+    : h < 258 ? "blue"
+    : h < 345 ? "purple"
+    : "red";
+  return WHEEL.find((w) => w.name === name) ?? WHEEL[0];
+}
+
+// Snap an arbitrary fill onto the brand palette: returns the matching brand-500
+// hex and whether the fill is light enough to need dark label text. Near-neutral
+// or near-white/black fills return null (left as-is, e.g. cluster surfaces).
+function snapToBrand(
+  fill: string,
+  c: (token: keyof typeof BRAND_FALLBACKS) => string,
+): { fill: string; dark: boolean } | null {
+  const rgb = parseRgb(fill);
+  if (!rgb) return null;
+  const { h, s, l } = rgbToHsl(rgb[0], rgb[1], rgb[2]);
+  if (s < 0.12 || l > 0.97 || l < 0.03) return null;
+  const hue = hueToWheel(h);
+  return { fill: c(`--ds-${hue.name}-500` as keyof typeof BRAND_FALLBACKS), dark: hue.dark };
+}
+
+// After the SVG is in the DOM, make every flowchart node consistent with the
+// brand system:
+//   1. snap its fill to the nearest brand 500 (so author pastels go bold);
+//   2. remove its border (stroke-width 0 — also clears author `stroke:`);
+//   3. set the label color from the final fill (white on dark hues, near-black
+//      on yellow/green/teal);
+//   4. for nodes tagged `:::code`, switch the label to monospace and shrink the
+//      font just enough to fit the box (so wider mono glyphs aren't clipped).
+// Runs post-render because fills can come from injected CSS classes, so
+// getComputedStyle is required. Idempotent.
+function adaptNodes(root: Element | null): void {
   if (!root) return;
-  const DARK = "#111827"; // --ds-gray-900
-  const LIGHT = "#F3F4F6"; // --ds-gray-100
-  root.querySelectorAll(".node").forEach((node) => {
-    const shape = node.querySelector("rect, polygon, circle, ellipse, path");
-    if (!shape) return;
-    const lum = rgbLuminance(getComputedStyle(shape).fill);
-    if (lum == null) return;
-    const color = lum > 0.4 ? DARK : LIGHT;
-    node
-      .querySelectorAll<HTMLElement>(
-        "foreignObject div, foreignObject span, foreignObject p",
-      )
-      .forEach((el) => {
-        el.style.color = color;
-      });
-    node.querySelectorAll<SVGElement>("text, tspan").forEach((el) => {
-      el.style.fill = color;
+  const c = readBrand();
+  const DARK = c("--ds-gray-900");
+  const LIGHT = c("--ds-white");
+  const isDark = document.documentElement.classList.contains("dark");
+  const pageText = isDark ? c("--ds-gray-50") : c("--ds-gray-900");
+  const pageBg = isDark ? c("--ds-gray-900") : c("--ds-white");
+
+  // Edge labels sit on the page. Mermaid colors their text from the (white)
+  // node-text variable and gives them a translucent white backdrop — invisible
+  // on a light page and against our "no translucent fills" rule. Recolor the
+  // text to the page foreground and make the backdrop the opaque page surface
+  // (so it just masks the connector behind the text).
+  root.querySelectorAll(".edgeLabel").forEach((lbl) => {
+    lbl.querySelectorAll<HTMLElement>("div, span, p").forEach((el) => {
+      el.style.color = pageText;
+      if (el.classList.contains("labelBkg")) {
+        el.style.background = pageBg;
+        el.style.opacity = "1";
+      }
     });
+    lbl.querySelectorAll<SVGElement>("text, tspan").forEach((el) => {
+      el.style.fill = pageText;
+    });
+  });
+
+  root.querySelectorAll(".node").forEach((node) => {
+    const shapes = node.querySelectorAll<SVGElement>(
+      "rect, polygon, circle, ellipse, path",
+    );
+    if (shapes.length === 0) return;
+    const snapped = snapToBrand(getComputedStyle(shapes[0]).fill, c);
+    shapes.forEach((shape) => {
+      if (snapped) shape.style.setProperty("fill", snapped.fill, "important");
+      // Borderless: kill the outline whatever its source (theme or author).
+      shape.style.setProperty("stroke", "none", "important");
+      shape.style.setProperty("stroke-width", "0", "important");
+    });
+
+    const textColor = snapped ? (snapped.dark ? DARK : LIGHT) : null;
+    const isCode = node.classList.contains("code");
+    const htmlLabels = node.querySelectorAll<HTMLElement>(
+      "foreignObject div, foreignObject span, foreignObject p",
+    );
+    htmlLabels.forEach((el) => {
+      if (textColor) el.style.color = textColor;
+      if (isCode) el.style.fontFamily = MONO;
+    });
+    node.querySelectorAll<SVGElement>("text, tspan").forEach((el) => {
+      if (textColor) el.style.fill = textColor;
+      if (isCode) el.style.fontFamily = MONO;
+    });
+
+    // Mermaid measured the box with Inter; monospace glyphs are wider and the
+    // relabelled code wraps taller, so it can overflow and clip. Grow the box
+    // to fit the mono text at full size, re-centering the shape and label so the
+    // node stays put (edges connect at the center, so they stay aligned). Falls
+    // back to shrinking the label if the shape isn't a simple rect.
+    if (isCode) {
+      const fo = node.querySelector<SVGForeignObjectElement>("foreignObject");
+      const content = fo?.firstElementChild as HTMLElement | null;
+      const rect = node.querySelector<SVGRectElement>("rect");
+      const labelG = node.querySelector<SVGGElement>("g.label");
+      if (fo && content) {
+        const dw = Math.max(0, content.scrollWidth - fo.width.baseVal.value);
+        const dh = Math.max(0, content.scrollHeight - fo.height.baseVal.value);
+        const gw = dw > 0 ? dw + 2 : 0;
+        const gh = dh > 0 ? dh + 2 : 0;
+        if ((gw > 0 || gh > 0) && rect && labelG) {
+          fo.width.baseVal.value += gw;
+          fo.height.baseVal.value += gh;
+          rect.x.baseVal.value -= gw / 2;
+          rect.y.baseVal.value -= gh / 2;
+          rect.width.baseVal.value += gw;
+          rect.height.baseVal.value += gh;
+          const t = labelG.transform.baseVal.consolidate();
+          if (t) t.setTranslate(t.matrix.e - gw / 2, t.matrix.f - gh / 2);
+        } else if (gw > 0 || gh > 0) {
+          const scale = Math.min(
+            gh > 0 ? fo.height.baseVal.value / content.scrollHeight : 1,
+            gw > 0 ? fo.width.baseVal.value / content.scrollWidth : 1,
+          );
+          htmlLabels.forEach((el) => {
+            el.style.fontSize = `${Math.floor(scale * 100)}%`;
+          });
+        }
+      }
+    }
   });
 }
 
@@ -286,27 +426,29 @@ function MermaidContent({ chart }: { chart: string }) {
   mermaid.initialize({
     startOnLoad: false,
     securityLevel: "strict",
-    fontFamily: '"Source Serif 4", Georgia, "Times New Roman", serif',
+    fontFamily: SANS,
     fontSize: 15,
     themeCSS: "margin: 1.5rem auto 0;",
     // Drive diagram colors from the DataSlope brand palette (app/brand.css) via
-    // the customizable "base" theme: a light theme in light mode and a dark
-    // theme in dark mode (adaptNodeLabels keeps author classDef pastels legible
-    // in the dark theme). Replaces Mermaid's stock neutral/dark themes.
+    // the customizable "base" theme. Shapes use brand fills (same in light and
+    // dark); adaptNodes snaps author pastels onto the palette, removes borders,
+    // and sets per-fill label colors. Replaces Mermaid's stock themes.
     theme: "base",
     themeVariables: brandThemeVariables(resolvedTheme === "dark"),
   });
 
   const { svg, bindFunctions } = use(
     cachePromise(`${chart}-${resolvedTheme}`, async () => {
-      // Explicitly request Source Serif 4 at the weight/size Mermaid will use
-      // before asking it to measure text. `document.fonts.ready` is insufficient
-      // because font-display:swap fonts may not be in the "ready" set until
-      // explicitly triggered. `fonts.load()` guarantees the face is available
-      // (or settles with a no-op if it can't load) before we render.
+      // Explicitly request Inter (regular text) and JetBrains Mono (code) at the
+      // weights/size Mermaid measures with, before rendering. `document.fonts.
+      // ready` is insufficient because font-display:swap fonts may not be in the
+      // "ready" set until explicitly triggered. `fonts.load()` guarantees the
+      // face is available (or settles with a no-op if it can't load) first.
       await Promise.allSettled([
-        document.fonts.load('400 15px "Source Serif 4"'),
-        document.fonts.load('700 15px "Source Serif 4"'),
+        document.fonts.load("400 15px Inter"),
+        document.fonts.load("700 15px Inter"),
+        document.fonts.load('400 15px "JetBrains Mono"'),
+        document.fonts.load('500 15px "JetBrains Mono"'),
       ]);
       return mermaid.render(id, chart.replaceAll("\\n", "\n"));
     }),
@@ -321,7 +463,7 @@ function MermaidContent({ chart }: { chart: string }) {
         ref={(container) => {
           if (container) {
             bindFunctions?.(container);
-            adaptNodeLabels(container);
+            adaptNodes(container);
           }
         }}
         dangerouslySetInnerHTML={{ __html: svg }}
@@ -406,9 +548,9 @@ function MermaidFullscreen({
       if (!viewport || !stage) return;
       const svgEl = stage.querySelector("svg");
       if (!svgEl) return;
-      // Keep author classDef pastel nodes legible in the dark theme (matches
-      // the inline diagram).
-      adaptNodeLabels(stage);
+      // Apply the same brand snapping / borderless / label treatment as the
+      // inline diagram.
+      adaptNodes(stage);
       const bbox = svgEl.getBoundingClientRect();
       const naturalW = bbox.width;
       const naturalH = bbox.height;

@@ -3,7 +3,19 @@
   /* 15px matches themeVariables.fontSize so Mermaid measures and renders at
      the same size — container controls what the SVG inherits */
   font-size: 15px;
-  font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+  font-family: var(--font-sans), Inter, system-ui, sans-serif;
+}
+
+/* Borderless shapes: the brand fill carries the color, no outline. Scoped to
+   node shapes so edges/arrowheads (which need their stroke) are untouched. JS
+   (adaptNodes) also enforces this inline; this is a backstop for any shape it
+   doesn't reach. */
+.diagram :global(.node) rect,
+.diagram :global(.node) polygon,
+.diagram :global(.node) circle,
+.diagram :global(.node) ellipse,
+.diagram :global(.node) path {
+  stroke-width: 0 !important;
 }
 
 /* Render the diagram at its natural (intrinsic) size, centered in the column.
