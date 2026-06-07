@@ -1,7 +1,7 @@
 /* ─── Playground (Python / R) shared styles ─────────────────────────────── */
 /* Extracted from public/python.html so the React component can reuse them. */
 
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400..700&display=swap");
 
 :root {
   --bg: #0f1117;
