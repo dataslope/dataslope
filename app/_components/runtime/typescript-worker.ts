@@ -10,13 +10,7 @@
 // share the same message shapes.
 
 import * as ts from "typescript";
-import { VirtualFS } from "almostnode";
-import {
-  normalizeVfsPath,
-  runEntry,
-  stageFiles,
-  wrapEntryAsAsyncIIFE,
-} from "./almostnode-worker-shared";
+import { AlmostNodeRunner, normalizeVfsPath } from "./almostnode-worker-shared";
 
 declare const self: DedicatedWorkerGlobalScope;
 
@@ -81,7 +75,11 @@ function transpileTs(
   return { outputText: result.outputText, diagnostics };
 }
 
-let vfs: VirtualFS = new VirtualFS();
+// One runner shared across messages. It hands each run a VirtualFS that
+// reflects only that run's files (see AlmostNodeRunner), so neither the
+// transpiled entry nor the staged modules from one block's run leak into
+// the next on this long-lived worker.
+const runner = new AlmostNodeRunner();
 // Pending diagnostics from the most recent prepare-fs, replayed as
 // stderr on the next run so the user sees compile errors next to the
 // failed execution rather than in a void.
@@ -95,7 +93,7 @@ async function handlePrepareFs(
     pendingDiagnostics = [];
     const decoder = new TextDecoder();
     const encoder = new TextEncoder();
-    vfs = stageFiles(files, (path, bytes) => {
+    runner.stage(files, (path, bytes) => {
       if (!isTsPath(path)) return [[path, bytes]];
       const source = decoder.decode(bytes);
       const { outputText, diagnostics } = transpileTs(source, path);
@@ -133,26 +131,28 @@ async function handleRun(
   }
   pendingDiagnostics = [];
 
-  // Prefer the staged + transpiled copy of the entry file. Fall back
-  // to transpiling `code` inline if prepare-fs wasn't called (single-
-  // file mode).
-  let entrySource: string;
-  if (vfs.existsSync(entryVfsPath)) {
-    entrySource = new TextDecoder().decode(vfs.readFileSync(entryVfsPath));
-  } else {
-    const { outputText, diagnostics } = transpileTs(code, entryPath);
-    for (const d of diagnostics) {
-      post({ kind: "stderr", id, content: `TS: ${d}` });
-    }
-    entrySource = outputText;
-  }
-
-  vfs.writeFileSync(entryVfsPath, wrapEntryAsAsyncIIFE(entrySource));
-
-  await runEntry(vfs, entryVfsPath, {
-    stdout: (content) => post({ kind: "stdout", id, content }),
-    stderr: (content) => post({ kind: "stderr", id, content }),
-  });
+  await runner.run(
+    entryVfsPath,
+    (vfs) => {
+      // Prefer the staged + transpiled copy of the entry file (multi-
+      // file). Fall back to transpiling `code` inline when this run
+      // wasn't staged (single-file). The runner hands us an empty VFS in
+      // the single-file case, so `existsSync` can't pick up a stale entry
+      // left by a previous block's run.
+      if (vfs.existsSync(entryVfsPath)) {
+        return new TextDecoder().decode(vfs.readFileSync(entryVfsPath));
+      }
+      const { outputText, diagnostics } = transpileTs(code, entryPath);
+      for (const d of diagnostics) {
+        post({ kind: "stderr", id, content: `TS: ${d}` });
+      }
+      return outputText;
+    },
+    {
+      stdout: (content) => post({ kind: "stdout", id, content }),
+      stderr: (content) => post({ kind: "stderr", id, content }),
+    },
+  );
 
   post({ kind: "done", id });
 }

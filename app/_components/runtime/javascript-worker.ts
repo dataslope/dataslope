@@ -18,13 +18,7 @@
 //                  { kind: "stderr"; id: number; content: string }
 //                  { kind: "done"; id: number }
 
-import { VirtualFS } from "almostnode";
-import {
-  normalizeVfsPath,
-  runEntry,
-  stageFiles,
-  wrapEntryAsAsyncIIFE,
-} from "./almostnode-worker-shared";
+import { AlmostNodeRunner, normalizeVfsPath } from "./almostnode-worker-shared";
 
 declare const self: DedicatedWorkerGlobalScope;
 
@@ -44,17 +38,17 @@ function post(msg: OutMessage): void {
   self.postMessage(msg);
 }
 
-// Module-scope VFS so `prepare-fs` and `run` see the same state across
-// messages. Recreated on every `prepare-fs` call so deletions/renames
-// from the editor flow through cleanly.
-let vfs: VirtualFS = new VirtualFS();
+// One runner shared across messages. It hands each run a VirtualFS that
+// reflects only that run's files, so the entry/file state from one
+// block's run can't leak into the next on this long-lived worker.
+const runner = new AlmostNodeRunner();
 
 async function handlePrepareFs(
   id: number,
   files: Array<[string, Uint8Array]>,
 ): Promise<void> {
   try {
-    vfs = stageFiles(files);
+    runner.stage(files);
     post({ kind: "prepare-fs-done", id });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
@@ -69,21 +63,13 @@ async function handleRun(
 ): Promise<void> {
   const entryVfsPath = normalizeVfsPath(entryPath);
 
-  // Prefer the staged copy of the entry file (Playground passes it via
-  // prepare-fs whenever multi-file mode is in use). If the worker is
-  // invoked single-file — no prepare-fs — fall back to the inline
-  // `code` argument. This lets the worker work for both flows without
-  // a separate code path on the caller side.
-  const decoder = new TextDecoder();
-  const entrySource = vfs.existsSync(entryVfsPath)
-    ? decoder.decode(vfs.readFileSync(entryVfsPath))
-    : code;
-
-  // Rewrite the entry file so top-level `await` is legal. See the wrap
-  // helper for the precise transform.
-  vfs.writeFileSync(entryVfsPath, wrapEntryAsAsyncIIFE(entrySource));
-
-  await runEntry(vfs, entryVfsPath, {
+  // The `code` argument is always the authoritative entry source: every
+  // caller passes the entry file's exact bytes here, and in multi-file
+  // mode stages those same bytes via prepare-fs. Using it directly (over
+  // whatever happens to sit at `entryVfsPath`) is what guarantees a
+  // single-file run executes its own code rather than the previous
+  // block's leftover entry file.
+  await runner.run(entryVfsPath, () => code, {
     stdout: (content) => post({ kind: "stdout", id, content }),
     stderr: (content) => post({ kind: "stderr", id, content }),
   });
