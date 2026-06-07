@@ -6,15 +6,14 @@
   font-family: var(--font-sans), Inter, system-ui, sans-serif;
 }
 
-/* Borderless shapes: the brand fill carries the color, no outline. Scoped to
-   node shapes so edges/arrowheads (which need their stroke) are untouched. JS
-   (adaptNodes) also enforces this inline; this is a backstop for any shape it
-   doesn't reach. */
+/* Borderless simple shapes: the brand fill carries the color, no outline. JS
+   (adaptNodes) enforces this inline and decides per shape; this is a backstop
+   for the simple primitives only. `path` is intentionally excluded — cylinders
+   and other structured shapes keep a subtle stroke that adaptNodes manages. */
 .diagram :global(.node) rect,
 .diagram :global(.node) polygon,
 .diagram :global(.node) circle,
-.diagram :global(.node) ellipse,
-.diagram :global(.node) path {
+.diagram :global(.node) ellipse {
   stroke-width: 0 !important;
 }
 

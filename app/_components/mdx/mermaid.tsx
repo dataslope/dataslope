@@ -84,15 +84,24 @@ const MONO =
   'var(--font-mono), "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace';
 
 const BRAND_FALLBACKS: Record<string, string> = {
+  "--ds-blue-300": "#8ABFFF",
+  "--ds-blue-400": "#5BA7FF",
   "--ds-blue-500": "#148CFF",
   "--ds-blue-600": "#0878DD",
+  "--ds-blue-700": "#0064BD",
+  "--ds-blue-800": "#00519C",
   "--ds-teal-500": "#00AEAA",
+  "--ds-teal-600": "#009491",
   "--ds-green-500": "#20C621",
+  "--ds-green-600": "#0AA80F",
   "--ds-yellow-500": "#FFDD6C",
+  "--ds-yellow-600": "#D4B651",
   "--ds-orange-500": "#E47600",
+  "--ds-orange-600": "#C36400",
   "--ds-red-500": "#FF4F59",
   "--ds-red-600": "#DC3F49",
   "--ds-purple-500": "#AB77FA",
+  "--ds-purple-600": "#9263D7",
   "--ds-gray-50": "#F9FAFB",
   "--ds-gray-100": "#F3F4F6",
   "--ds-gray-200": "#E5E7EB",
@@ -107,17 +116,31 @@ const BRAND_FALLBACKS: Record<string, string> = {
 };
 
 // The seven-hue brand wheel (app/brand.css §1.1) used for categorical diagrams
-// (mindmaps / pie) and for snapping author fills back onto the palette. `dark`
-// marks hues light enough that near-black label text reads better than white.
+// (pie) and for snapping author fills back onto the palette. `dark` marks hues
+// that take near-black label text; everything else takes white. Only yellow is
+// light enough to require dark text (white on yellow-500 is unreadable).
 const WHEEL: ReadonlyArray<{ name: string; dark: boolean }> = [
   { name: "blue", dark: false },
-  { name: "teal", dark: true },
-  { name: "green", dark: true },
+  { name: "teal", dark: false },
+  { name: "green", dark: false },
   { name: "yellow", dark: true },
   { name: "orange", dark: false },
   { name: "red", dark: false },
   { name: "purple", dark: false },
 ];
+
+// Mindmaps render all-blue (Request: one hue, varied shades). The root takes
+// brand blue; branches cycle a set of distinct blue shades so sibling sections
+// stay tellable apart. The two lightest shades take dark label text.
+const MINDMAP_ROOT = "--ds-blue-500";
+const MINDMAP_BRANCHES = [
+  "--ds-blue-700",
+  "--ds-blue-400",
+  "--ds-blue-600",
+  "--ds-blue-300",
+  "--ds-blue-800",
+];
+const MINDMAP_DARK_TEXT = new Set(["--ds-blue-300", "--ds-blue-400"]);
 
 function readBrand(): (token: keyof typeof BRAND_FALLBACKS) => string {
   let resolved: Record<string, string> = BRAND_FALLBACKS;
@@ -307,23 +330,31 @@ function hueToWheel(h: number): (typeof WHEEL)[number] {
 function snapToBrand(
   fill: string,
   c: (token: keyof typeof BRAND_FALLBACKS) => string,
-): { fill: string; dark: boolean } | null {
+): { fill: string; name: string; dark: boolean } | null {
   const rgb = parseRgb(fill);
   if (!rgb) return null;
   const { h, s, l } = rgbToHsl(rgb[0], rgb[1], rgb[2]);
   if (s < 0.12 || l > 0.97 || l < 0.03) return null;
   const hue = hueToWheel(h);
-  return { fill: c(`--ds-${hue.name}-500` as keyof typeof BRAND_FALLBACKS), dark: hue.dark };
+  return {
+    fill: c(`--ds-${hue.name}-500` as keyof typeof BRAND_FALLBACKS),
+    name: hue.name,
+    dark: hue.dark,
+  };
 }
 
 // After the SVG is in the DOM, make every flowchart node consistent with the
 // brand system:
-//   1. snap its fill to the nearest brand 500 (so author pastels go bold);
-//   2. remove its border (stroke-width 0 — also clears author `stroke:`);
-//   3. set the label color from the final fill (white on dark hues, near-black
-//      on yellow/green/teal);
-//   4. for nodes tagged `:::code`, switch the label to monospace and shrink the
-//      font just enough to fit the box (so wider mono glyphs aren't clipped).
+//   1. fill — snap to the nearest brand 500 by hue (so author pastels go bold);
+//      mindmap nodes instead get an all-blue shade keyed to their section.
+//   2. borders — removed from simple shapes (rect/circle/polygon/stadium); kept
+//      as a subtle 600 stroke only where it conveys structure: the cylinder lip
+//      (`outer-path`), inner bars (`line`), and class/state compartment
+//      `divider`s (which Mermaid draws in the fill color, i.e. invisible).
+//   3. label color — white, except near-black on yellow (and the two lightest
+//      mindmap blues) where white is unreadable.
+//   4. for nodes tagged `:::code`, switch the label to monospace and grow the
+//      box so the wider mono glyphs aren't clipped.
 // Runs post-render because fills can come from injected CSS classes, so
 // getComputedStyle is required. Idempotent.
 function adaptNodes(root: Element | null, isDark: boolean): void {
@@ -357,15 +388,50 @@ function adaptNodes(root: Element | null, isDark: boolean): void {
       "rect, polygon, circle, ellipse, path",
     );
     if (shapes.length === 0) return;
-    const snapped = snapToBrand(getComputedStyle(shapes[0]).fill, c);
+
+    // Pick the fill + label color. Mindmaps go all-blue by section; every other
+    // node snaps its fill onto the brand palette by hue.
+    let fillHex: string | null = null;
+    let hueName = "blue";
+    let darkText = false;
+    if (node.classList.contains("mindmap-node")) {
+      const m = (node.getAttribute("class") ?? "").match(/\bsection-(\d+)\b/);
+      const token = m
+        ? MINDMAP_BRANCHES[Number(m[1]) % MINDMAP_BRANCHES.length]
+        : MINDMAP_ROOT;
+      fillHex = c(token as keyof typeof BRAND_FALLBACKS);
+      darkText = MINDMAP_DARK_TEXT.has(token);
+    } else {
+      const snapped = snapToBrand(getComputedStyle(shapes[0]).fill, c);
+      if (snapped) {
+        fillHex = snapped.fill;
+        hueName = snapped.name;
+        darkText = snapped.dark;
+      }
+    }
+    const stroke600 = c(`--ds-${hueName}-600` as keyof typeof BRAND_FALLBACKS);
+
     shapes.forEach((shape) => {
-      if (snapped) shape.style.setProperty("fill", snapped.fill, "important");
-      // Borderless: kill the outline whatever its source (theme or author).
-      shape.style.setProperty("stroke", "none", "important");
-      shape.style.setProperty("stroke-width", "0", "important");
+      if (fillHex) shape.style.setProperty("fill", fillHex, "important");
+      // Keep a subtle 600 stroke only on shapes whose structure lives in the
+      // outline (the cylinder lip / other `outer-path` shapes). Simple shapes
+      // get no border — their fill already shows the silhouette.
+      if (shape.classList.contains("outer-path")) {
+        shape.style.setProperty("stroke", stroke600, "important");
+        shape.style.setProperty("stroke-width", "1.5px", "important");
+      } else {
+        shape.style.setProperty("stroke", "none", "important");
+        shape.style.setProperty("stroke-width", "0", "important");
+      }
     });
 
-    const textColor = snapped ? (snapped.dark ? DARK : LIGHT) : null;
+    // Inner bars (e.g. subroutine side rules) → subtle 600 so they stay visible.
+    node.querySelectorAll<SVGElement>("line").forEach((ln) => {
+      ln.style.setProperty("stroke", stroke600, "important");
+      ln.style.setProperty("stroke-width", "1.5px", "important");
+    });
+
+    const textColor = fillHex ? (darkText ? DARK : LIGHT) : null;
     const isCode = node.classList.contains("code");
     const htmlLabels = node.querySelectorAll<HTMLElement>(
       "foreignObject div, foreignObject span, foreignObject p",
@@ -414,6 +480,30 @@ function adaptNodes(root: Element | null, isDark: boolean): void {
         }
       }
     }
+  });
+
+  // Class / state compartment dividers: Mermaid strokes them in the node's
+  // (now brand-500) fill color, i.e. invisible. Recolor to the box's 600 shade
+  // so the attribute/method sections read.
+  root.querySelectorAll<SVGElement>(".divider").forEach((d) => {
+    const host = d.closest(".node");
+    const shape = host?.querySelector("rect, polygon, circle, ellipse, path");
+    const snapped = shape && snapToBrand(getComputedStyle(shape).fill, c);
+    const col = c(`--ds-${snapped?.name ?? "blue"}-600` as keyof typeof BRAND_FALLBACKS);
+    d.style.setProperty("stroke", col, "important");
+    d.querySelectorAll<SVGElement>("line, path, rect").forEach((e) => {
+      e.style.setProperty("stroke", col, "important");
+      e.style.setProperty("stroke-width", "1px", "important");
+    });
+  });
+
+  // Mindmap edges are colored per branch; recolor to match the all-blue nodes
+  // (the `section-edge-N` index maps to the same branch shade).
+  root.querySelectorAll<SVGElement>('[class*="section-edge-"]').forEach((e) => {
+    const m = (e.getAttribute("class") ?? "").match(/section-edge-(\d+)/);
+    if (!m) return;
+    const token = MINDMAP_BRANCHES[Number(m[1]) % MINDMAP_BRANCHES.length];
+    e.style.setProperty("stroke", c(token as keyof typeof BRAND_FALLBACKS), "important");
   });
 }
 
