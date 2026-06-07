@@ -130,7 +130,7 @@ flowchart TB
   decide{"Is missingness informative?"}
   drop["na.rm = TRUE / na.omit"]
   impute["Impute carefully"]
-  flag["Record a 'was_missing' column"]
+  flag["Record a '<code>was_missing</code>' column"]
   raw --> inspect --> decide
   decide -->|"random, small"| drop
   decide -->|"systematic, structural"| flag

@@ -208,7 +208,7 @@ are linked.
 ```mermaid
 flowchart LR
   A["Two categorical columns<br/>(e.g. device, churned)"] --> B["pandas crosstab<br/>(contingency table of COUNTS)"]
-  B --> C["chi2_contingency<br/>compares observed vs expected"]
+  B --> C["<code>chi2_contingency</code><br/>compares observed vs expected"]
   C --> D{"p <= alpha?"}
   D -->|"yes"| E["Variables are associated"]
   D -->|"no"| F["No evidence of association"]

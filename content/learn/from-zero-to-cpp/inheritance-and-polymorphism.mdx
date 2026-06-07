@@ -127,8 +127,8 @@ function for that class. Each object of that class stores a
 
 ```mermaid
 flowchart LR
-    O1[Dog Rex<br/>vptr] --> VTD[Dog vtable<br/>sound -> Dog::sound]
-    O2[Cat Mochi<br/>vptr] --> VTC[Cat vtable<br/>sound -> Cat::sound]
+    O1[Dog Rex<br/>vptr] --> VTD["Dog vtable<br/>sound -> <code>Dog::sound</code>"]
+    O2[Cat Mochi<br/>vptr] --> VTC["Cat vtable<br/>sound -> <code>Cat::sound</code>"]
 ```
 
 When you call `a->sound()`, the compiler emits "look up `sound` in

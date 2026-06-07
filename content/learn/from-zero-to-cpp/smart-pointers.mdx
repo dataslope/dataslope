@@ -116,7 +116,7 @@ destroyed — a **cycle leak**.
 
 ```mermaid
 flowchart LR
-    A[A<br/>shared_ptr to B] --> B[B<br/>shared_ptr to A]
+    A["A<br/><code>shared_ptr</code> to B"] --> B["B<br/><code>shared_ptr</code> to A"]
     B --> A
 ```
 
@@ -145,9 +145,9 @@ merely watches it.
 ```mermaid
 flowchart TB
     Q[Need to manage a heap object?]
-    Q -- "One clear owner?" --> U[std::unique_ptr]
-    Q -- "Truly shared ownership?" --> S[std::shared_ptr]
-    Q -- "Just want to observe it?" --> W[std::weak_ptr]
+    Q -- "One clear owner?" --> U["<code>std::unique_ptr</code>"]
+    Q -- "Truly shared ownership?" --> S["<code>std::shared_ptr</code>"]
+    Q -- "Just want to observe it?" --> W["<code>std::weak_ptr</code>"]
     Q -- "It's stored in a container that already owns it?" --> R[Raw pointer or reference]
 ```
 

@@ -39,7 +39,7 @@ $$
 
 ```mermaid
 flowchart TD
-    Cfg[Config:<br/>sweep over a] --> Sim[simulate.py:<br/>solve_ivp + event]
+    Cfg[Config:<br/>sweep over a] --> Sim["simulate.py:<br/><code>solve_ivp</code> + event"]
     Sim --> Res[results: time-series<br/>+ extinction flag]
     Res --> Agg[aggregate.py:<br/>per-config summary]
     Agg --> Viz[plot.py:<br/>small multiples + phase portrait]

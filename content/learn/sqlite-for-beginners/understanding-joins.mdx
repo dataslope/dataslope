@@ -14,8 +14,8 @@ flowchart LR
         C2["id 2<br/>Grace"]
     end
     subgraph O["orders"]
-        O1["order 101<br/>customer_id 1<br/>42"]
-        O2["order 102<br/>customer_id 2<br/>99"]
+        O1["order 101<br/><code>customer_id</code> 1<br/>42"]
+        O2["order 102<br/><code>customer_id</code> 2<br/>99"]
     end
     O1 -->|"customer_id = id"| C1
     O2 -->|"customer_id = id"| C2
@@ -67,7 +67,7 @@ A useful beginner mental model is **cartesian then filter**:
 ```mermaid
 flowchart TB
     A["Start with one order row"] --> B["Try pairing it with each customer row"]
-    B --> C{"Does<br/>order.customer_id = customer.id?"}
+    B --> C{"Does<br/>order.<code>customer_id</code> = customer.id?"}
     C -->|"yes"| D["keep this pair"]
     C -->|"no"| E["discard this pair"]
 ```

@@ -38,8 +38,8 @@ flowchart LR
 
     subgraph clean["Structured tables"]
         D["customers<br/>id, name, email"]
-        E["orders<br/>id, customer_id, ordered_on"]
-        F["order_items<br/>order_id, product_id, quantity"]
+        E["orders<br/>id, <code>customer_id</code>, <code>ordered_on</code>"]
+        F["<code>order_items</code><br/><code>order_id</code>, <code>product_id</code>, quantity"]
     end
 
     A --> G["Human interpretation"]

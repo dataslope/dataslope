@@ -19,9 +19,9 @@ of a kitchen ("chop, chop, chop, stir, stir, chop, stir, …").
 
 ```mermaid
 flowchart TD
-  call["my_fun(x = 3, y = 4)"] --> args["Arguments bind to parameter names"]
+  call["<code>my_fun(x = 3, y = 4)</code>"] --> args["Arguments bind to parameter names"]
   args --> body["Function body runs"]
-  body --> ret["Last expression (or explicit return()) is returned"]
+  body --> ret["Last expression (or explicit <code>return()</code>) is returned"]
   ret --> out["Returned value flows back to caller"]
 ```
 

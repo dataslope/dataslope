@@ -74,7 +74,7 @@ flowchart TB
     M["Menu"] -. lists .-> D["Drink"]
     C["Customer"] -. selects .-> D
     C -. creates .-> O["Order"]
-    O -. consists of .-> L["LineItem"]
+    O -. consists of .-> L["<code>LineItem</code>"]
     L -. references .-> D
     P["Payment"] -. settles .-> O
     R["Receipt"] -. summarizes .-> O
@@ -338,8 +338,8 @@ A classic shorthand:
 
 ```mermaid
 flowchart LR
-    Bad["account.getBalance() > 100<br/>→ ... do stuff externally"]
-    Good["account.tryWithdraw(100)"]
+    Bad["<code>account.getBalance()</code> > 100<br/>→ ... do stuff externally"]
+    Good["<code>account.tryWithdraw(100)</code>"]
     Bad -. refactor .-> Good
 ```
 

@@ -27,12 +27,12 @@ isolation is the entire point.
 flowchart TD
     subgraph users.js
         U1[users array]
-        U2[getUser]
+        U2["<code>getUser</code>"]
         U3[private helper]
     end
     subgraph orders.js
         O1[orders array]
-        O2[createOrder]
+        O2["<code>createOrder</code>"]
         O3[private helper]
     end
     subgraph index.js
@@ -224,8 +224,8 @@ on B, B may depend on C, but C must not depend on A.
 
 ```mermaid
 flowchart LR
-    A[index.js] --> B[users.js]
-    A --> C[orders.js]
+    A["<code>index.js</code>"] --> B["<code>users.js</code>"]
+    A --> C["<code>orders.js</code>"]
     C --> D[shared/http.js]
     B --> D
     style D fill:#dff,stroke:#066

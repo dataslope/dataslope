@@ -18,7 +18,7 @@ SQLite evaluates that calculation for each row in the result.
 ```mermaid
 flowchart LR
     A["one row<br/>price 12.99<br/>quantity 2"] --> B["expression<br/>price * quantity"]
-    B --> C["new result column<br/>line_total 25.98"]
+    B --> C["new result column<br/><code>line_total</code> 25.98"]
 ```
 
 <SqlCodeBlock
@@ -130,7 +130,7 @@ This course uses `AS` because it makes your intent obvious.
 
 ```mermaid
 flowchart LR
-    E["price * quantity"] --> N["AS line_total"]
+    E["price * quantity"] --> N["AS <code>line_total</code>"]
     N --> R["clear result heading"]
 ```
 

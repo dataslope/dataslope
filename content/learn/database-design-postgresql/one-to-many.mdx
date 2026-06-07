@@ -55,9 +55,9 @@ the **many** side.
 
 ```mermaid
 flowchart LR
-    C["customers.id = 1<br/>Ada"] --> O1["orders.id = 101<br/>customer_id = 1"]
-    C --> O2["orders.id = 102<br/>customer_id = 1"]
-    C --> O3["orders.id = 103<br/>customer_id = 1"]
+    C["customers.id = 1<br/>Ada"] --> O1["<code>orders.id = 101<br/>customer_id = 1</code>"]
+    C --> O2["<code>orders.id = 102<br/>customer_id = 1</code>"]
+    C --> O3["<code>orders.id = 103<br/>customer_id = 1</code>"]
     O1 -->|"FK -> PK"| C
     O2 -->|"FK -> PK"| C
     O3 -->|"FK -> PK"| C

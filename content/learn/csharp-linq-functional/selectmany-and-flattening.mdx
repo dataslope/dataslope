@@ -83,7 +83,7 @@ them all into a single sequence.
 flowchart LR
     A["Departments: [Eng, Sales, Finance]"] --> S["Select(d ⇒ d.Employees)"]
     S --> N["[[Ada, Bilal], [Chiara, Dmitri, Esther], [Farah]]"]
-    A --> M["SelectMany(d ⇒ d.Employees)"]
+    A --> M["<code>SelectMany(d ⇒ d.Employees)</code>"]
     M --> F["[Ada, Bilal, Chiara, Dmitri, Esther, Farah]"]
 ```
 

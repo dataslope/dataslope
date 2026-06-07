@@ -42,9 +42,9 @@ flowchart TD
     A["Full dataset<br/>(all rows)"] --> B{"random split"}
     B --> C["Training set<br/>(about 70-80%)"]
     B --> D["Test set<br/>(about 20-30%)"]
-    C --> E["model.fit(...)"]
+    C --> E["<code>model.fit(...)</code>"]
     E --> G["Trained model"]
-    D --> F["model.score(...)"]
+    D --> F["<code>model.score(...)</code>"]
     G --> F
     F --> H["Honest estimate of<br/>real-world performance"]
 ```

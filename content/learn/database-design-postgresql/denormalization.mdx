@@ -44,8 +44,8 @@ particular read path benefits from having them ready.
 
 ```mermaid
 flowchart LR
-    N["Normalized tables<br/>customers, orders,<br/>order_items, products"] --> R["Derived read table<br/>daily_sales_summary"]
-    N --> C["Cached value<br/>comment_count"]
+    N["Normalized tables<br/>customers, orders,<br/><code>order_items</code>, products"] --> R["Derived read table<br/><code>daily_sales_summary</code>"]
+    N --> C["Cached value<br/><code>comment_count</code>"]
     R --> Benefit["Simpler reads"]
     C --> Benefit
 ```

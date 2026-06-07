@@ -20,7 +20,7 @@ have an order date, status, and total amount.
 flowchart TB
     Customer["Entity: customer"] --> Name["Attribute: name"]
     Customer --> Email["Attribute: email"]
-    Customer --> Joined["Attribute: joined_on"]
+    Customer --> Joined["Attribute: <code>joined_on</code>"]
     Customer --> Status["Attribute: status"]
 ```
 
@@ -120,7 +120,7 @@ identity, attributes, or relationships?"
 flowchart TB
     Q{"Does it have its own details<br/>or many rows?"} -->|"no"| Attr["Keep as attribute"]
     Q -->|"yes"| Entity["Model as entity"]
-    Attr --> Email["customer.email"]
+    Attr --> Email["<code>customer.email</code>"]
     Entity --> Address["addresses table"]
 ```
 
@@ -151,7 +151,7 @@ unit matters.
 ```mermaid
 flowchart TB
     Vague["amount"] --> Question["Dollars? cents?<br/>subtotal? total?"]
-    Clear["total_cents"] --> Meaning["Integer number of cents"]
+    Clear["<code>total_cents</code>"] --> Meaning["Integer number of cents"]
 ```
 
 The name, type, and constraints work together. A column called

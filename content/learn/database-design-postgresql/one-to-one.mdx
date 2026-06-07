@@ -18,7 +18,7 @@ profile details. Some users have those details, many do not.
 
 ```mermaid
 flowchart TB
-    Wide["Wide users table<br/>id | email | display_name | bio | avatar_url | timezone | preferences"]
+    Wide["Wide users table<br/>id | email | <code>display_name</code> | bio | <code>avatar_url</code> | timezone | preferences"]
     Wide --> Sparse["Many optional columns are empty"]
     Wide --> Mixed["Login identity mixed with profile details"]
     Wide --> Split["Split stable identity from optional profile"]
@@ -144,7 +144,7 @@ foreign key. Choose the table whose row is dependent or optional.
 
 ```mermaid
 flowchart TB
-    User["users<br/>core identity"] --> Profile["user_profiles<br/>optional details"]
+    User["users<br/>core identity"] --> Profile["<code>user_profiles</code><br/>optional details"]
     Profile -->|"user_id FK + UNIQUE"| User
     Choice["Put the FK on the dependent table"] --> Profile
 ```

@@ -93,7 +93,7 @@ They also imply the paths software will use to find related data.
 
 ```mermaid
 flowchart TD
-    Customer["customers.id primary key"] --> OrderFK["orders.customer_id foreign key"]
+    Customer["customers.id primary key"] --> OrderFK["orders.<code>customer_id</code> foreign key"]
     Email["customers.email unique"] --> AccountLookup["find account by email"]
     OrderFK --> OrderHistory["find customer orders"]
 ```
@@ -111,7 +111,7 @@ fact across many rows for no good reason.
 flowchart LR
     Repeat["Product name copied into every order item"] --> ManyCopies["many copies"]
     ManyCopies --> ExpensiveChange["hard to change safely"]
-    Normalize["order_items references products"] --> OneCopy["product name stored once"]
+    Normalize["<code>order_items</code> references products"] --> OneCopy["product name stored once"]
 ```
 
 A normalized structure lets related data grow without copying every

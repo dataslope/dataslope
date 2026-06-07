@@ -31,8 +31,8 @@ nasty input.
 ```mermaid
 flowchart TB
     S["Input text: don't stop!"]
-    S --> SP["text.split()"]
-    S --> TK["word_tokenize(text)"]
+    S --> SP["<code>text.split()</code>"]
+    S --> TK["<code>word_tokenize(text)</code>"]
     SP --> SP1["['don't', 'stop!']<br/>contraction hidden,<br/>'!' glued to 'stop'"]
     TK --> TK1["['do', 'n't', 'stop', '!']<br/>negation 'n't' exposed,<br/>'!' separated cleanly"]
 ```
@@ -126,8 +126,8 @@ abbreviates "Dr." and "U.S.A.", and it marks the decimal in "2.5".
 ```mermaid
 flowchart TB
     T["Text: Dr. Lee earned 2.5 million. He smiled."]
-    T --> N["Naive: text.split('.')"]
-    T --> P["sent_tokenize() (Punkt)"]
+    T --> N["Naive: <code>text.split('.')</code>"]
+    T --> P["<code>sent_tokenize()</code> (Punkt)"]
     N --> N1["broken fragments:<br/>'Dr', ' Lee earned 2', '5 million', ' He smiled'<br/>split inside 'Dr.' and '2.5'"]
     P --> P1["2 clean sentences:<br/>'Dr. Lee earned 2.5 million.'<br/>'He smiled.'"]
 ```

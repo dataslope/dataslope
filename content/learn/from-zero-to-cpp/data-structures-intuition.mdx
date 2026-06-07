@@ -83,8 +83,8 @@ Use it for almost everything. The CPU loves contiguous memory.
 ```mermaid
 flowchart LR
     Q[Need a key/value lookup?]
-    Q -- "Iterate in order?" --> M[std::map]
-    Q -- "Don't care about order?" --> UM[std::unordered_map]
+    Q -- "Iterate in order?" --> M["<code>std::map</code>"]
+    Q -- "Don't care about order?" --> UM["<code>std::unordered_map</code>"]
 ```
 
 ## A concrete comparison

@@ -24,12 +24,12 @@ flowchart TB
     R -- "1-D, derivative" --> Newton1[newton]
     R -- "n-D" --> Hybr[fsolve / root]
     P --> O{"min F(x)?"}
-    O -- "1-D, bounded" --> Min1[minimize_scalar]
+    O -- "1-D, bounded" --> Min1["<code>minimize_scalar</code>"]
     O -- "n-D, smooth" --> BFGS["BFGS / L-BFGS-B"]
-    O -- "least squares" --> LS[least_squares / curve_fit]
+    O -- "least squares" --> LS["<code>least_squares / curve_fit</code>"]
     O -- "constrained" --> Con["SLSQP / trust-constr"]
-    O -- "no derivatives" --> NM[Nelder-Mead / differential_evolution]
-    O -- "global" --> Glob[differential_evolution / dual_annealing]
+    O -- "no derivatives" --> NM["Nelder-Mead / <code>differential_evolution</code>"]
+    O -- "global" --> Glob["<code>differential_evolution / dual_annealing</code>"]
 ```
 
 ## Root finding in one dimension

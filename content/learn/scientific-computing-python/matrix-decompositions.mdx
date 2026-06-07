@@ -338,13 +338,13 @@ flowchart TB
     Q --> Q1{"Solve A x = b?"}
     Q1 -- "A is SPD" --> CH[Cholesky]
     Q1 -- "A square general" --> LU
-    Q1 -- "A is sparse" --> SP["scipy.sparse.linalg"]
+    Q1 -- "A is sparse" --> SP["<code>scipy.sparse.linalg</code>"]
     Q --> Q2{"Minimize ||Ax-b||²?"}
     Q2 -- "rank deficient or ill-conditioned" --> SVD
     Q2 -- "full rank" --> QR
     Q --> Q3{"Need eigenvalues?"}
-    Q3 -- "symmetric" --> Eigh["np.linalg.eigh"]
-    Q3 -- "general" --> Eig["np.linalg.eig"]
+    Q3 -- "symmetric" --> Eigh["<code>np.linalg.eigh</code>"]
+    Q3 -- "general" --> Eig["<code>np.linalg.eig</code>"]
     Q --> Q4{"Need rank, compression, or PCA?"}
     Q4 --> SVD
 ```

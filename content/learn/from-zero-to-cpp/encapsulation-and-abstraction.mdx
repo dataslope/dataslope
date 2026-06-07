@@ -91,8 +91,8 @@ public method names and meanings — stays the same. Code that uses a
 ```mermaid
 flowchart TB
     UI[code using TextStorage] -->|append, get| I[Interface]
-    I --> A[Impl: std::string]
-    I --> B[Impl: std::vector char ]
+    I --> A["Impl: <code>std::string</code>"]
+    I --> B["Impl: <code>std::vector</code> char "]
     I --> C[Impl: rope]
     I --> D[Impl: file backed]
 ```

@@ -242,9 +242,9 @@ computation". Every later chapter will use it for some `M<A>`:
 
 ```mermaid
 flowchart LR
-    A["M<A>"] -- "flatMap(f)" --> B["M<B>"]
+    A["<code>M&lt;A&gt;</code>"] -- "flatMap(f)" --> B["<code>M&lt;B&gt;</code>"]
     A -.->|"if 'none'/'err' or empty"| B
-    A -->|"if 'some'/'ok' value a"| C["f(a) = M<B>"] --> B
+    A -->|"if 'some'/'ok' value a"| C["f(a) = <code>M&lt;B&gt;</code>"] --> B
 ```
 
 The diagram captures the idea exactly: `flatMap` *threads* the

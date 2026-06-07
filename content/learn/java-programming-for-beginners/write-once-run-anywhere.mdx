@@ -24,7 +24,7 @@ have to compile it again, on (and for) that target.
 
 ```mermaid
 flowchart LR
-    Src["source.cpp"]
+    Src["<code>source.cpp</code>"]
     Src -->|compile on Windows| ExeW["program.exe<br/>(Windows / x86)"]
     Src -->|compile on Mac| BinM["program<br/>(macOS / ARM)"]
     Src -->|compile on Linux| BinL["program<br/>(Linux / x86)"]
@@ -48,7 +48,7 @@ JVM reads the bytecode and executes it.
 
 ```mermaid
 flowchart LR
-    Src["Hello.java"]
+    Src["<code>Hello.java</code>"]
     Src -->|javac| BC["Hello.class<br/>(bytecode)"]
     BC -->|run by JVM| W[JVM on Windows]
     BC -->|run by JVM| M[JVM on macOS]

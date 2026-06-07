@@ -19,8 +19,8 @@ visual property like color:
 
 ```mermaid
 flowchart TD
-    Q["Do you want color (or size, shape...)<br/>to depend on the data?"] -->|"Yes, varies by a column"| M["MAP it<br/>inside aes()<br/>aes(color = drv)"]
-    Q -->|"No, a fixed constant"| S["SET it<br/>outside aes()<br/>geom_point(color = 'blue')"]
+    Q["Do you want color (or size, shape...)<br/>to depend on the data?"] -->|"Yes, varies by a column"| M["MAP it<br/>inside <code>aes()</code><br/><code>aes(color = drv)</code>"]
+    Q -->|"No, a fixed constant"| S["SET it<br/>outside <code>aes()</code><br/><code>geom_point(color = 'blue')</code>"]
     M --> ML["Legend appears,<br/>colors chosen by a scale"]
     S --> SL["No legend,<br/>your exact constant used"]
 ```

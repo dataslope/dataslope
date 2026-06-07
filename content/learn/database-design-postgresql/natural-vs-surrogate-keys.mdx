@@ -96,9 +96,9 @@ does not. Other tables can keep pointing at the same row.
 
 ```mermaid
 flowchart LR
-    U["users.user_id = 10"]:::pk --> O1["orders.user_id = 10"]
-    U --> O2["reviews.user_id = 10"]
-    U --> O3["addresses.user_id = 10"]
+    U["users.<code>user_id</code> = 10"]:::pk --> O1["orders.<code>user_id</code> = 10"]
+    U --> O2["reviews.<code>user_id</code> = 10"]
+    U --> O3["addresses.<code>user_id</code> = 10"]
     E["email changes"] --> U
     classDef pk fill:#fde68a,stroke:#b45309
 ```
@@ -140,8 +140,8 @@ future update.
 
 ```mermaid
 flowchart TB
-    A["users.email is the PK<br/>ada@old.example"]:::bad --> B["orders.user_email<br/>ada@old.example"]
-    A --> C["tickets.user_email<br/>ada@old.example"]
+    A["users.email is the PK<br/>ada@old.example"]:::bad --> B["orders.<code>user_email</code><br/>ada@old.example"]
+    A --> C["tickets.<code>user_email</code><br/>ada@old.example"]
     D["Email changes to<br/>ada@new.example"] --> E{"What about old references?"}
     B --> E
     C --> E
@@ -158,7 +158,7 @@ an identity.
 
 ```mermaid
 flowchart LR
-    ID["users.user_id = 10"]:::pk --> R["references keep user_id = 10"]
+    ID["users.<code>user_id</code> = 10"]:::pk --> R["references keep <code>user_id</code> = 10"]
     E1["email = ada@old.example"] --> E2["email = ada@new.example"]
     ID --> E2
     classDef pk fill:#fde68a,stroke:#b45309

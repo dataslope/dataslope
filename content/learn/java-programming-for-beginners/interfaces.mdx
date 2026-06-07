@@ -234,10 +234,10 @@ the right to change your storage later.
 
 ```mermaid
 flowchart LR
-    A[ArrayList] -. implements .-> L[List]
-    B[LinkedList] -. implements .-> L
+    A["<code>ArrayList</code>"] -. implements .-> L[List]
+    B["<code>LinkedList</code>"] -. implements .-> L
     C[Stack] -. implements .-> L
-    L --> M["process(List orders)"]
+    L --> M["<code>process(List orders)</code>"]
 ```
 
 The method `process` doesn't care which arrow the data came down. It

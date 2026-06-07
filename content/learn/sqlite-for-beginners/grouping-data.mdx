@@ -278,7 +278,7 @@ The intern row is removed first. Then SQLite groups the remaining rows by depart
 
 ```mermaid
 flowchart LR
-    Raw["Raw employee rows"] --> Where["WHERE is_intern = 0<br/>keep full-time rows"]
+    Raw["Raw employee rows"] --> Where["WHERE <code>is_intern</code> = 0<br/>keep full-time rows"]
     Where --> Group["GROUP BY dept<br/>make department groups"]
     Group --> Avg["AVG(salary)<br/>inside each group"]
     Avg --> Result["One row per department"]

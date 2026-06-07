@@ -62,8 +62,8 @@ function cachePromise<T>(key: string, setPromise: () => Promise<T>): Promise<T> 
 //     fill, and `adaptNodes` additionally forces stroke-width to 0 after
 //     render (which also clears any author `stroke:` override).
 //   • The fonts come from the app's type system: Inter (`--font-sans`) for
-//     regular text and JetBrains Mono (`--font-mono`) for nodes the author
-//     tags as code with `:::code`.
+//     regular text and JetBrains Mono (`--font-mono`) for code spans the author
+//     wraps in a <code> tag (styled in mermaid.module.css).
 //
 // ~50 MDX diagrams hand-color nodes with `style`/`classDef` using light pastel
 // fills (e.g. `fill:#fee2e2`). To keep those on-brand, `adaptNodes` buckets
@@ -75,13 +75,12 @@ function cachePromise<T>(key: string, setPromise: () => Promise<T>): Promise<T> 
 // so we resolve the brand tokens to hex at render time (brand.css stays the
 // source of truth) with literal fallbacks.
 
-// Inter for regular text, JetBrains Mono for code. The CSS vars resolve in the
-// DOM (defined on :root and on <html> via next/font), and the literal fallbacks
-// keep text measurement correct if a var is ever missing.
+// Inter for regular text. Code spans inside labels are wrapped in <code> by the
+// author and rendered in JetBrains Mono via mermaid.module.css. The CSS var
+// resolves in the DOM (defined on :root and on <html> via next/font); the literal
+// fallbacks keep text measurement correct if the var is ever missing.
 const SANS =
   'var(--font-sans), Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-const MONO =
-  'var(--font-mono), "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace';
 
 const BRAND_FALLBACKS: Record<string, string> = {
   "--ds-blue-300": "#8ABFFF",
@@ -361,8 +360,8 @@ function snapToBrand(
 //      `divider`s (which Mermaid draws in the fill color, i.e. invisible).
 //   3. label color — white, except near-black on yellow (and the two lightest
 //      mindmap blues) where white is unreadable.
-//   4. for nodes tagged `:::code`, switch the label to monospace and grow the
-//      box so the wider mono glyphs aren't clipped.
+//   4. for labels containing an inline <code> span, grow the box so the mono
+//      face (styled via CSS) isn't clipped past Mermaid's measured size.
 // Runs post-render because fills can come from injected CSS classes, so
 // getComputedStyle is required. Idempotent.
 function adaptNodes(root: Element | null, isDark: boolean): void {
@@ -450,25 +449,26 @@ function adaptNodes(root: Element | null, isDark: boolean): void {
     });
 
     const textColor = fillHex ? (darkText ? DARK : LIGHT) : null;
-    const isCode = node.classList.contains("code");
+    // Inline <code> spans are styled in mono by mermaid.module.css; the label
+    // color still needs syncing (white on the brand fill) and inherits down to
+    // the <code> child. `hasCode` also drives the box-grow safety net below.
+    const hasCode = node.querySelector("foreignObject code") != null;
     const htmlLabels = node.querySelectorAll<HTMLElement>(
       "foreignObject div, foreignObject span, foreignObject p",
     );
     htmlLabels.forEach((el) => {
       if (textColor) el.style.color = textColor;
-      if (isCode) el.style.fontFamily = MONO;
     });
     node.querySelectorAll<SVGElement>("text, tspan").forEach((el) => {
       if (textColor) el.style.fill = textColor;
-      if (isCode) el.style.fontFamily = MONO;
     });
 
-    // Mermaid measured the box with Inter; monospace glyphs are wider and the
-    // relabelled code wraps taller, so it can overflow and clip. Grow the box
-    // to fit the mono text at full size, re-centering the shape and label so the
-    // node stays put (edges connect at the center, so they stay aligned). Falls
-    // back to shrinking the label if the shape isn't a simple rect.
-    if (isCode) {
+    // Mermaid measures a <code> span in the browser's default monospace; our mono
+    // face (JetBrains Mono) can be marginally wider, so the label may overflow and
+    // clip. Grow the box to fit at full size, re-centering the shape and label so
+    // the node stays put (edges connect at the center, so they stay aligned).
+    // Falls back to shrinking the label if the shape isn't a simple rect.
+    if (hasCode) {
       const fo = node.querySelector<SVGForeignObjectElement>("foreignObject");
       const content = fo?.firstElementChild as HTMLElement | null;
       const rect = node.querySelector<SVGRectElement>("rect");

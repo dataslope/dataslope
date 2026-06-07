@@ -27,7 +27,7 @@ In this picture, order `101` does not copy Ada's whole customer record. It store
 
 ```mermaid
 flowchart LR
-    O["orders row<br/>id = 101<br/>customer_id = 1"] -->|"points to"| C["customers row<br/>id = 1<br/>name = Ada"]
+    O["orders row<br/>id = 101<br/><code>customer_id</code> = 1"] -->|"points to"| C["customers row<br/>id = 1<br/>name = Ada"]
 ```
 
 This keeps data tidy:
@@ -89,8 +89,8 @@ A foreign key value is a reference to a row in another table.`}
 
 ```mermaid
 flowchart TB
-    Good["order.customer_id = 1"] -->|"exists"| Ada["customers.id = 1<br/>Ada"]
-    Bad["order.customer_id = 99"] -->|"missing"| Missing["no customer 99"]
+    Good["order.<code>customer_id</code> = 1"] -->|"exists"| Ada["customers.id = 1<br/>Ada"]
+    Bad["order.<code>customer_id</code> = 99"] -->|"missing"| Missing["no customer 99"]
     Missing --> Warning["dangling reference"]
 ```
 
@@ -183,9 +183,9 @@ flowchart TB
         C2["id = 2<br/>Grace"]
     end
     subgraph O["orders"]
-        O1["101<br/>customer_id = 1"]
-        O2["102<br/>customer_id = 1"]
-        O3["103<br/>customer_id = 2"]
+        O1["<code>101<br/>customer_id = 1</code>"]
+        O2["<code>102<br/>customer_id = 1</code>"]
+        O3["<code>103<br/>customer_id = 2</code>"]
     end
     O1 -->|"FK to PK"| C1
     O2 -->|"FK to PK"| C1

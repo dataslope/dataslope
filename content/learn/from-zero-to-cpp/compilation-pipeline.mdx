@@ -176,7 +176,7 @@ must be matched against a "defines" entry in another.
 flowchart LR
     M[main.o<br/>defines: main<br/>needs: greet] --> L[Linker]
     G[greet.o<br/>defines: greet<br/>needs: printf] --> L
-    S[libc / libc++<br/>defines: printf,<br/>std::cout, ...] --> L
+    S["libc / libc++<br/>defines: printf,<br/><code>std::cout</code>, ..."] --> L
     L --> E[a.out / .exe<br/>complete, runnable]
 ```
 
@@ -256,9 +256,9 @@ header/implementation split exists to obey this rule even when many
 
 ```mermaid
 flowchart TD
-    H[mathx.h<br/>declarations only] -->|"#include"| M1[main.cpp]
-    H -->|"#include"| M2[other.cpp]
-    H -->|"#include"| M3[third.cpp]
+    H[mathx.h<br/>declarations only] -->|"#include"| M1["<code>main.cpp</code>"]
+    H -->|"#include"| M2["<code>other.cpp</code>"]
+    H -->|"#include"| M3["<code>third.cpp</code>"]
     Imp[mathx.cpp<br/>ONE definition of add and mul] --> Obj[mathx.o]
     M1 --> O1[main.o]
     M2 --> O2[other.o]

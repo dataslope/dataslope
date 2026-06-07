@@ -68,7 +68,7 @@ never want to use these as variable names anyway.)
 
 ```mermaid
 flowchart TD
-  Name["A name (e.g. avg_price)"] -->|<-| Value["A value (e.g. 9.99)"]
+  Name["A name (e.g. <code>avg_price</code>)"] -->|<-| Value["A value (e.g. 9.99)"]
   Value -->|stored in environment| Env["Workspace"]
   User["Later code"] -->|references name| Env
   Env -->|returns value| User

@@ -176,7 +176,7 @@ something is wrong.
 flowchart TD
     subgraph "Kernel = your Python session"
         V1[Variables in memory]
-        V1 -->|cell 1 ran| V2[df = read_csv]
+        V1 -->|cell 1 ran| V2["df = <code>read_csv</code>"]
         V2 -->|cell 3 ran| V3[summary = ...]
         V3 -->|cell 2 re-ran| V4[df = ... but summary is stale!]
     end

@@ -22,8 +22,8 @@ If you put `course_id` on `students`, each student could store only one course. 
 
 ```mermaid
 flowchart TB
-    Bad1["students.course_id"] --> Problem1["one student row<br/>can point to only one course"]
-    Bad2["courses.student_id"] --> Problem2["one course row<br/>can point to only one student"]
+    Bad1["students.<code>course_id</code>"] --> Problem1["one student row<br/>can point to only one course"]
+    Bad2["courses.<code>student_id</code>"] --> Problem2["one course row<br/>can point to only one student"]
     Problem1 --> Need["need many links<br/>on both sides"]
     Problem2 --> Need
 ```
@@ -169,7 +169,7 @@ ORDER BY
 
 ```mermaid
 flowchart TB
-    E1["enrollment<br/>student_id 1<br/>course_id 10"] -->|"student_id = id"| S1["Ada"]
+    E1["enrollment<br/><code>student_id</code> 1<br/><code>course_id</code> 10"] -->|"student_id = id"| S1["Ada"]
     E1 -->|"course_id = id"| C1["Math"]
     S1 --> R["Ada takes Math"]
     C1 --> R

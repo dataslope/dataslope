@@ -28,9 +28,9 @@ A typical frame contains:
 flowchart TB
     A["High addresses"]
     A --> F3["main's frame<br/>(locals + return addr<br/>to OS startup)"]
-    F3 --> F2["fib(5) frame<br/>(n=5, return addr to main)"]
-    F2 --> F1["fib(4) frame<br/>(n=4, return addr to fib(5))"]
-    F1 --> F0["fib(3) frame<br/>(n=3, return addr to fib(4))"]
+    F3 --> F2["<code>fib(5)</code> frame<br/>(n=5, return addr to main)"]
+    F2 --> F1["<code>fib(4)</code> frame<br/>(n=4, return addr to <code>fib(5)</code>)"]
+    F1 --> F0["<code>fib(3)</code> frame<br/>(n=3, return addr to <code>fib(4)</code>)"]
     F0 --> SP["stack pointer<br/>(top of stack — grows downward)"]
     SP --> Z["Low addresses"]
 ```

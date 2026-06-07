@@ -85,7 +85,7 @@ disturbing the callers.
 
 ```mermaid
 flowchart TB
-    Caller["Caller:<br/>gradeExam(...)"] -->|sees only this| API["gradeExam returns int"]
+    Caller["Caller:<br/><code>gradeExam(...)</code>"] -->|sees only this| API["gradeExam returns int"]
     API -. hides .-> Inside["Inside: loop, compare,<br/>count, maybe cache"]
 ```
 

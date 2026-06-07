@@ -34,7 +34,7 @@ The customer table has a primary key: `customers.id`. The orders table stores a 
 
 ```mermaid
 flowchart LR
-    C["customers.id<br/>primary key"]:::pk --> O["orders.customer_id<br/>points to customer"]:::fk
+    C["customers.id<br/>primary key"]:::pk --> O["orders.<code>customer_id</code><br/>points to customer"]:::fk
     classDef pk fill:#fde68a,stroke:#b45309
     classDef fk fill:#dcfce7,stroke:#15803d
 ```
@@ -156,7 +156,7 @@ The helper table stores the pairs: which student is in which course.
 
 ```mermaid
 flowchart TB
-    S["students"] --> E["enrollments<br/>student_id plus course_id"]
+    S["students"] --> E["enrollments<br/><code>student_id</code> plus <code>course_id</code>"]
     C["courses"] --> E
     E --> PAIR["One row means<br/>one student-course pairing"]
 ```

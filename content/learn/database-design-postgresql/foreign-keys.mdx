@@ -35,7 +35,7 @@ customer can have many orders, and each order belongs to one customer.
 
 ```mermaid
 flowchart LR
-    O["orders.customer_id = 7"] -->|"FK -> PK"| C["customers.customer_id = 7<br/>Mina Patel"]
+    O["orders.<code>customer_id</code> = 7"] -->|"FK -> PK"| C["customers.<code>customer_id</code> = 7<br/>Mina Patel"]
 ```
 
 That arrow is more than a drawing. When you declare the constraint,
@@ -63,11 +63,11 @@ the stable identity on related rows.
 ```mermaid
 flowchart TB
     subgraph customers["customers"]
-        C1["customer_id = 7<br/>name = Mina<br/>email = mina@new.example"]
+        C1["<code>customer_id</code> = 7<br/>name = Mina<br/>email = mina@new.example"]
     end
     subgraph orders["orders"]
-        O1["order_id = 101<br/>customer_id = 7"]
-        O2["order_id = 102<br/>customer_id = 7"]
+        O1["<code>order_id = 101<br/>customer_id = 7</code>"]
+        O2["<code>order_id = 102<br/>customer_id = 7</code>"]
     end
     O1 -->|"FK -> PK"| C1
     O2 -->|"FK -> PK"| C1
@@ -138,7 +138,7 @@ row does not exist.
 
 ```mermaid
 flowchart LR
-    O["Order 102<br/>customer_id = 99"] --> M["Missing customer 99"]:::bad
+    O["Order 102<br/><code>customer_id</code> = 99"] --> M["Missing customer 99"]:::bad
     M --> R["Rejected by FK constraint"]:::good
     classDef bad fill:#fee2e2,stroke:#b91c1c
     classDef good fill:#dcfce7,stroke:#15803d

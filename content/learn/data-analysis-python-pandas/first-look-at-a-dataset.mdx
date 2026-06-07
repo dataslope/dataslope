@@ -13,13 +13,43 @@ later.
 Every analyst eventually develops a personal version of this
 ritual. Here is a solid one to start with.
 
-```mermaid
-flowchart TD
-    A[1. Shape<br/>and head] --> B[2. dtypes<br/>and memory]
-    B --> C[3. describe<br/>numeric + objects]
-    C --> D[4. Missing-value<br/>map]
-    D --> E[5. Unique-value<br/>counts for categoricals]
-```
+<Steps>
+<Step>
+
+**Shape and head**
+
+How big is the table, and what do the first rows look like?
+
+</Step>
+<Step>
+
+**Dtypes and memory**
+
+Did Pandas read each column as the right type — and will it fit in memory?
+
+</Step>
+<Step>
+
+**Describe (numeric + objects)**
+
+Summary statistics for the numeric columns, then the text/categorical ones.
+
+</Step>
+<Step>
+
+**Missing-value map**
+
+Where is data missing, and is the pattern random or structural?
+
+</Step>
+<Step>
+
+**Unique-value counts for categoricals**
+
+For every text-like column, what distinct values actually appear?
+
+</Step>
+</Steps>
 
 Let us walk each step on a real dataset.
 

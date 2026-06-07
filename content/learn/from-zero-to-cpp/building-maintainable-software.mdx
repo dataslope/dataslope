@@ -51,7 +51,7 @@ C++ code is typically split across two kinds of file:
 flowchart LR
     H1[geometry.h<br/>declarations]
     C1[geometry.cpp<br/>definitions]
-    M[main.cpp]
+    M["<code>main.cpp</code>"]
     H1 -. include .-> M
     H1 -. include .-> C1
     C1 -- compile --> O1[geometry.o]

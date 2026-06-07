@@ -258,9 +258,9 @@ Notice:
 
 ```mermaid
 graph TD
-    A[Input: '5'] --> B[parseNumber]
+    A[Input: '5'] --> B["<code>parseNumber</code>"]
     B --> C{ok?}
-    C -->|yes| D[validatePositive]
+    C -->|yes| D["<code>validatePositive</code>"]
     C -->|no| E[Error: Invalid number]
     D --> F{ok?}
     F -->|yes| G[map: square]

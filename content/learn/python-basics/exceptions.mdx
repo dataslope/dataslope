@@ -77,11 +77,11 @@ When an exception is raised, Python **unwinds the stack**, looking for a `try`/`
 
 ```mermaid
 flowchart TD
-    A["function_c() raises ValueError"] --> B["Is function_c inside a try block?"]
-    B -->|no| C["Propagate to function_b (caller)"]
-    C --> D["Is function_b inside a try block?"]
-    D -->|no| E["Propagate to function_a (caller)"]
-    E --> F["Is function_a inside a try block?"]
+    A["<code>function_c()</code> raises ValueError"] --> B["Is <code>function_c</code> inside a try block?"]
+    B -->|no| C["Propagate to <code>function_b</code> (caller)"]
+    C --> D["Is <code>function_b</code> inside a try block?"]
+    D -->|no| E["Propagate to <code>function_a</code> (caller)"]
+    E --> F["Is <code>function_a</code> inside a try block?"]
     F -->|yes| G["Caught! Execute except block."]
     F -->|no| H["Unhandled: print traceback, exit."]
 ```

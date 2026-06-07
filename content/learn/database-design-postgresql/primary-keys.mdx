@@ -145,14 +145,14 @@ erDiagram
 flowchart TB
     subgraph enrollments["Table: enrollments"]
         direction LR
-        S["student_id"]:::pk
-        C["course_id"]:::pk
-        D["enrolled_on"]:::hdr
+        S["<code>student_id</code>"]:::pk
+        C["<code>course_id</code>"]:::pk
+        D["<code>enrolled_on</code>"]:::hdr
         R1["7"]:::pk
         R2["42"]:::pk
         R3["2026-01-15"]
     end
-    K["Composite PK:<br/>(student_id, course_id)"]:::pk --> S
+    K["Composite PK:<br/>(<code>student_id</code>, <code>course_id</code>)"]:::pk --> S
     K --> C
     classDef hdr fill:#dbeafe,stroke:#1d4ed8
     classDef pk fill:#fde68a,stroke:#b45309

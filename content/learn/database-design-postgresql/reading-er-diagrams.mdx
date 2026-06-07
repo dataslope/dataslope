@@ -57,7 +57,7 @@ flowchart LR
     Diagram["ER diagram"] --> Customers["customers"]
     Diagram --> Orders["orders"]
     Diagram --> Products["products"]
-    Diagram --> Items["order_items"]
+    Diagram --> Items["<code>order_items</code>"]
 ```
 
 Each box is a kind of thing the system tracks. Each will usually
@@ -72,8 +72,8 @@ Inside each box are attributes. For example, `customers` has `id`,
 ```mermaid
 flowchart TB
     Entity["orders"] --> ID["id PK"]
-    Entity --> CustomerID["customer_id FK"]
-    Entity --> Placed["placed_on"]
+    Entity --> CustomerID["<code>customer_id</code> FK"]
+    Entity --> Placed["<code>placed_on</code>"]
     Entity --> Status["status"]
 ```
 
@@ -179,7 +179,7 @@ inside the same order.
 
 ```mermaid
 flowchart TB
-    Key["Primary key:<br/>order_id + line_number"] --> Row1["order 101,<br/>line 1"]
+    Key["Primary key:<br/><code>order_id</code> + <code>line_number</code>"] --> Row1["order 101,<br/>line 1"]
     Key --> Row2["order 101,<br/>line 2"]
     Key --> Row3["order 102,<br/>line 1"]
 ```
