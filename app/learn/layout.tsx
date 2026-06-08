@@ -33,7 +33,16 @@ export default function LearnLayout({ children }: { children: ReactNode }) {
         tabs={false}
         nav={{
           title: (
-            <span style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: "bold" }}>
+            <span
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                fontWeight: 600,
+                fontFamily: "var(--font-sans)",
+                letterSpacing: "-0.01em",
+              }}
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/dataslope-logo-blue.svg"
