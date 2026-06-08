@@ -11,10 +11,10 @@ application ever does to data.
 
 ```mermaid
 flowchart LR
-    I["INSERT<br/>add rows"] --> T[("A table")]
-    U["UPDATE<br/>change rows"] --> T
-    D["DELETE<br/>remove rows"] --> T
-    S["SELECT<br/>read rows"] --> T
+    I["<code>INSERT</code><br/>add rows"] --> T[("A table")]
+    U["<code>UPDATE</code><br/>change rows"] --> T
+    D["<code>DELETE</code><br/>remove rows"] --> T
+    S["<code>SELECT</code><br/>read rows"] --> T
 ```
 
 ## INSERT: adding rows
@@ -136,7 +136,7 @@ accidentally destroy data.
 ```mermaid
 flowchart TB
     D1["DELETE FROM tasks<br/>WHERE <code>id = 5</code>;"] --> R1["Removes 1 row<br/>(good)"]
-    D2["DELETE FROM tasks;"] --> R2["Removes EVERY row<br/>(usually a disaster)"]
+    D2["<code>DELETE FROM tasks;</code>"] --> R2["Removes EVERY row<br/>(usually a disaster)"]
 ```
 
 <Callout type="warn" title="Always think about WHERE first">

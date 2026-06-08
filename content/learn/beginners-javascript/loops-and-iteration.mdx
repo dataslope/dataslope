@@ -335,9 +335,9 @@ classic `for (let i = 0; i < N; i++) { ... }`:
 ```mermaid
 flowchart TD
     A["Initialise <code>i = 0</code>"]
-    B{i < N?}
+    B{"<code>i &lt; N</code>?"}
     C[Body: do something with i]
-    D[i = i + 1]
+    D["<code>i = i + 1</code>"]
     A --> B
     B -- yes --> C --> D --> B
     B -- no --> E[After the loop]

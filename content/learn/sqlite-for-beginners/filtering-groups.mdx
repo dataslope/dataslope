@@ -19,10 +19,10 @@ These are not row-by-row conditions. They are conditions about **groups after ag
 
 ```mermaid
 flowchart LR
-    From["FROM<br/>read rows"] --> Where["WHERE<br/>filter individual rows"]
-    Where --> Group["GROUP BY<br/>form groups"]
-    Group --> Having["HAVING<br/>filter groups"]
-    Having --> Select["SELECT<br/>show results"]
+    From["<code>FROM</code><br/>read rows"] --> Where["<code>WHERE</code><br/>filter individual rows"]
+    Where --> Group["<code>GROUP BY</code><br/>form groups"]
+    Group --> Having["<code>HAVING</code><br/>filter groups"]
+    Having --> Select["<code>SELECT</code><br/>show results"]
 ```
 
 Think of it like making piles of receipts:
@@ -71,7 +71,7 @@ flowchart TB
     Groups["Department groups"] --> Eng["Engineering<br/><code>COUNT = 3</code>"]
     Groups --> Sales["Sales<br/><code>COUNT = 2</code>"]
     Groups --> Mkt["Marketing<br/><code>COUNT = 1</code>"]
-    Eng --> Keep["HAVING COUNT(*) > 2<br/>keep"]
+    Eng --> Keep["<code>HAVING COUNT(*) &gt; 2</code><br/>keep"]
     Sales --> Drop["drop"]
     Mkt --> Drop
 ```

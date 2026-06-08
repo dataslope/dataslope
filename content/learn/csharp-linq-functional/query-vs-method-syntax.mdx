@@ -51,8 +51,8 @@ calls.
 
 ```mermaid
 flowchart LR
-    Q["from p in xs<br/>where p.A &gt; 0<br/>select p.B"]
-      -->|compiler rewrite| M["<code>xs.Where(p =&gt; p.A &gt; 0)</code><br/>.Select(p =&gt; p.B)"]
+    Q["<code>from p in xs<br/>where p.A &gt; 0<br/>select p.B</code>"]
+      -->|compiler rewrite| M["<code>xs.Where(p =&gt; p.A &gt; 0)</code><br/><code>.Select(p =&gt; p.B)</code>"]
     M --> IL[Same IL bytecode]
 ```
 

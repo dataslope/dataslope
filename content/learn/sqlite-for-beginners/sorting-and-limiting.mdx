@@ -71,7 +71,7 @@ ORDER BY
 
 ```mermaid
 flowchart LR
-    A["unsorted result rows"] --> B["ORDER BY price DESC<br/>sort high to low"]
+    A["unsorted result rows"] --> B["<code>ORDER BY price DESC</code><br/>sort high to low"]
     B --> C["ordered result rows"]
 ```
 
@@ -140,7 +140,7 @@ ORDER BY
 
 ```mermaid
 flowchart TB
-    A["ORDER BY genre ASC, price DESC"] --> B["first key<br/>genre A to Z"]
+    A["<code>ORDER BY genre ASC, price DESC</code>"] --> B["first key<br/>genre A to Z"]
     B --> C["tie breaker<br/>price high to low"]
     C --> D["final sorted result"]
 ```
@@ -193,9 +193,9 @@ with `LIMIT`, it is how websites make pages of results.
 
 ```mermaid
 flowchart LR
-    A["all matching rows"] --> S["ORDER BY<br/>sort rows"]
-    S --> O["OFFSET 2<br/>skip two"]
-    O --> L["LIMIT 2<br/>take two"]
+    A["all matching rows"] --> S["<code>ORDER BY</code><br/>sort rows"]
+    S --> O["<code>OFFSET 2</code><br/>skip two"]
+    O --> L["<code>LIMIT 2</code><br/>take two"]
     L --> R["page result"]
 ```
 
@@ -238,9 +238,9 @@ When these clauses appear together, write them in this order:
 
 ```mermaid
 flowchart LR
-    A["SELECT<br/>columns"] --> B["FROM<br/>table"]
-    B --> C["WHERE<br/>filter rows"]
-    C --> D["ORDER BY<br/>sort rows"]
+    A["<code>SELECT</code><br/>columns"] --> B["<code>FROM<br/>table</code>"]
+    B --> C["<code>WHERE</code><br/>filter rows"]
+    C --> D["<code>ORDER BY</code><br/>sort rows"]
     D --> E["LIMIT and OFFSET<br/>trim result"]
 ```
 

@@ -162,7 +162,7 @@ most common ways an analyst's trend chart misleads.
 
 ```mermaid
 flowchart LR
-    Spine["Generated date spine<br/>(every day)"] --> J["LEFT JOIN orders"]
+    Spine["Generated date spine<br/>(every day)"] --> J["<code>LEFT JOIN orders</code>"]
     J --> S["Days with no orders<br/>become 0, not missing"]
 ```
 

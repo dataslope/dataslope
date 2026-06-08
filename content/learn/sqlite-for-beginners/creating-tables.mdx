@@ -28,7 +28,7 @@ Read the statement as: *create a table called `books` with an integer `id`, text
 
 ```mermaid
 flowchart TB
-    S["CREATE TABLE books"] --> P["column list"]
+    S["<code>CREATE TABLE books</code>"] --> P["column list"]
     P --> C1["id INTEGER"]
     P --> C2["title TEXT"]
     P --> C3["author TEXT"]
@@ -41,7 +41,7 @@ The table definition becomes an empty grid. The columns are ready; rows come lat
 
 ```mermaid
 flowchart LR
-    A["CREATE TABLE books<br/>id, title, author, year"] --> B["books grid"]
+    A["<code>CREATE TABLE books<br/>id, title, author, year</code>"] --> B["books grid"]
     B --> C["columns exist<br/>rows are empty"]
 ```
 
@@ -131,7 +131,7 @@ Notice that the `INSERT` statement did not provide `id` values. SQLite filled th
 
 ```mermaid
 flowchart LR
-    I["INSERT title and author"] --> S["SQLite assigns id"]
+    I["<code>INSERT</code> title and author"] --> S["SQLite assigns id"]
     S --> R["stored row<br/>id, title, author"]
 ```
 

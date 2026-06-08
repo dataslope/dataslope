@@ -280,13 +280,13 @@ Three things to remember:
 
 ```mermaid
 flowchart TD
-    A{score >= 90?}
+    A{"<code>score &gt;= 90</code>?"}
     A -- yes --> A1[Grade: A]
-    A -- no --> B{score >= 80?}
+    A -- no --> B{"<code>score &gt;= 80</code>?"}
     B -- yes --> B1[Grade: B]
-    B -- no --> C{score >= 70?}
+    B -- no --> C{"<code>score &gt;= 70</code>?"}
     C -- yes --> C1[Grade: C]
-    C -- no --> D{score >= 60?}
+    C -- no --> D{"<code>score &gt;= 60</code>?"}
     D -- yes --> D1[Grade: D]
     D -- no --> E[Grade: F]
 ```

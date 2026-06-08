@@ -18,7 +18,7 @@ Without `GROUP BY`, an aggregate gives one summary for all rows. With `GROUP BY`
 
 ```mermaid
 flowchart TB
-    Rows["All employee rows"] --> Group{"GROUP BY dept"}
+    Rows["All employee rows"] --> Group{"<code>GROUP BY dept</code>"}
     Group --> Eng["Engineering group"]
     Group --> Sales["Sales group"]
     Group --> Mkt["Marketing group"]
@@ -68,9 +68,9 @@ The `dept` column appears in the result because it labels each group. Without it
 
 ```mermaid
 flowchart LR
-    F["FROM employees"] --> G["GROUP BY dept"]
-    G --> S["SELECT dept,<br/>COUNT(*), AVG(salary)"]
-    S --> O["ORDER BY dept"]
+    F["<code>FROM employees</code>"] --> G["<code>GROUP BY dept</code>"]
+    G --> S["<code>SELECT dept,<br/>COUNT(*), AVG(salary)</code>"]
+    S --> O["<code>ORDER BY dept</code>"]
 ```
 
 ## One result row per group
@@ -279,7 +279,7 @@ The intern row is removed first. Then SQLite groups the remaining rows by depart
 ```mermaid
 flowchart LR
     Raw["Raw employee rows"] --> Where["WHERE <code>is_intern</code> = 0<br/>keep full-time rows"]
-    Where --> Group["GROUP BY dept<br/>make department groups"]
+    Where --> Group["<code>GROUP BY dept</code><br/>make department groups"]
     Group --> Avg["AVG(salary)<br/>inside each group"]
     Avg --> Result["One row per department"]
 ```

@@ -13,11 +13,11 @@ Conditionals are not just syntax — they are the logical heart of every program
 
 ```mermaid
 flowchart TD
-    A[Start] --> B{score >= 90?}
+    A[Start] --> B{"<code>score &gt;= 90</code>?"}
     B -- Yes --> C[Grade: A]
-    B -- No --> D{score >= 80?}
+    B -- No --> D{"<code>score &gt;= 80</code>?"}
     D -- Yes --> E[Grade: B]
-    D -- No --> F{score >= 70?}
+    D -- No --> F{"<code>score &gt;= 70</code>?"}
     F -- Yes --> G[Grade: C]
     F -- No --> H[Grade: F]
 ```

@@ -251,9 +251,9 @@ A classic countdown.
 
 ```mermaid
 flowchart TD
-    A["init: <code>i = 1</code>"] --> B{i <= 5?}
+    A["init: <code>i = 1</code>"] --> B{"<code>i &lt;= 5</code>?"}
     B -- yes --> C[body: print i]
-    C --> D[increment: i = i + 1]
+    C --> D["increment: <code>i = i + 1</code>"]
     D --> B
     B -- no --> E[exit loop]
 ```

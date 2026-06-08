@@ -16,7 +16,7 @@ its answer.
 
 ```mermaid
 flowchart TB
-    Inner["Inner query:<br/>SELECT AVG(amount) FROM orders"] -->|"produces a value"| Outer["Outer query:<br/>SELECT ... WHERE amount > (that value)"]
+    Inner["Inner query:<br/><code>SELECT AVG(amount) FROM orders</code>"] -->|"produces a value"| Outer["Outer query:<br/><code>SELECT ... WHERE amount &gt; (that value)</code>"]
     Outer --> Result["Final rows"]
 ```
 

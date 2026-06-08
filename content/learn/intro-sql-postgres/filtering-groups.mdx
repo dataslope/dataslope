@@ -18,9 +18,9 @@ has been added up.
 
 ```mermaid
 flowchart LR
-    T[("rows")] --> W["WHERE<br/>(per-row filter)<br/>no totals exist yet"]
-    W --> G["GROUP BY<br/>totals computed here"]
-    G --> H["HAVING<br/>(per-group filter)<br/>can see the totals"]
+    T[("rows")] --> W["<code>WHERE</code><br/>(per-row filter)<br/>no totals exist yet"]
+    W --> G["<code>GROUP BY</code><br/>totals computed here"]
+    G --> H["<code>HAVING</code><br/>(per-group filter)<br/>can see the totals"]
     H --> R["Result"]
 ```
 

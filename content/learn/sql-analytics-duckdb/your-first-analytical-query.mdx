@@ -101,9 +101,9 @@ one is an `ORDER BY` followed by a glance at the head of the result.
 
 ```mermaid
 flowchart LR
-    T[("All rows")] --> W["WHERE<br/>(choose a slice)"]
-    W --> O["ORDER BY<br/>(surface extremes)"]
-    O --> L["LIMIT<br/>(look at the top)"]
+    T[("All rows")] --> W["<code>WHERE</code><br/>(choose a slice)"]
+    W --> O["<code>ORDER BY</code><br/>(surface extremes)"]
+    O --> L["<code>LIMIT</code><br/>(look at the top)"]
 ```
 
 This three-step rhythm — **slice, sort, peek** — is the analyst's

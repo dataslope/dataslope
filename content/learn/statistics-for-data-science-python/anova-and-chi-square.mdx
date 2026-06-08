@@ -209,7 +209,7 @@ are linked.
 flowchart LR
   A["Two categorical columns<br/>(e.g. device, churned)"] --> B["pandas crosstab<br/>(contingency table of COUNTS)"]
   B --> C["<code>chi2_contingency</code><br/>compares observed vs expected"]
-  C --> D{"p <= alpha?"}
+  C --> D{"<code>p &lt;= alpha</code>?"}
   D -->|"yes"| E["Variables are associated"]
   D -->|"no"| F["No evidence of association"]
 ```
