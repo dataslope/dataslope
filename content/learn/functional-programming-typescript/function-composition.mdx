@@ -340,7 +340,7 @@ arguments to `pipe` — no reshuffling of loops.
 
 - \`trim(s)\` — strip surrounding whitespace
 - \`lower(s)\` — lowercase
-- \`stripPunct(s)\` — remove non-alphanumeric, non-space characters
+- \`stripPunct(s)\` — replace non-alphanumeric, non-space characters with a space
 - \`collapseSpaces(s)\` — collapse runs of whitespace to one
 - \`hyphenate(s)\` — replace spaces with hyphens
 - \`slug(s)\` — pipeline of the above, in this order
@@ -386,7 +386,7 @@ export const slug = (s: string): string => s; // TODO: pipe the above
 export const trim = (s: string): string => s.trim();
 export const lower = (s: string): string => s.toLowerCase();
 export const stripPunct = (s: string): string =>
-  s.replace(/[^\\p{L}\\p{N}\\s]/gu, "");
+  s.replace(/[^\\p{L}\\p{N}\\s]/gu, " ");
 export const collapseSpaces = (s: string): string => s.replace(/\\s+/g, " ");
 export const hyphenate = (s: string): string => s.replace(/ /g, "-");
 

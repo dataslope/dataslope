@@ -209,7 +209,7 @@ use thousands of times.
 classDiagram
     class Cashier { +ringUp(items) total }
     class Item { +price() }
-    class Receipt { +addLine(item, price); +total() }
+    class Receipt { +addLine(item); +total() }
     Cashier ..> Item
     Cashier ..> Receipt
     Receipt o-- Item
