@@ -162,7 +162,7 @@ body.playground-active {
 .logo {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-weight: 600;
   font-size: 15px;
   color: var(--text);
