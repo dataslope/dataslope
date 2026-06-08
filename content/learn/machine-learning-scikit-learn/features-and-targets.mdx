@@ -115,7 +115,7 @@ print("Target name:    ", y.name)
 `}
 />
 
-That is the entire idea. `X.drop(columns=["price"])` keeps every input
+That is the entire idea. `houses.drop(columns=["price"])` keeps every input
 column; `houses["price"]` pulls out the one answer column. The shapes confirm
 the structure: `X` is `(6, 4)` — six examples, four features each — and `y` is
 `(6,)` — six answers. Notice `X` and `y` still have the *same number of
