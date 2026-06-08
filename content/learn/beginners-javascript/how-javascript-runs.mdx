@@ -121,7 +121,7 @@ A simplified picture:
 
 ```mermaid
 flowchart TD
-    JS[JS Engine + Call Stack] -->|"calls e.g. setTimeout(fn, 100)"| HOST[Host]
+    JS[JS Engine + Call Stack] -->|"calls e.g. <code>setTimeout(fn, 100)</code>"| HOST[Host]
     HOST -->|after 100ms| Q[Task Queue]
     Q -->|when stack is empty| JS
     MQ[Microtask Queue] -->|drained between every task| JS

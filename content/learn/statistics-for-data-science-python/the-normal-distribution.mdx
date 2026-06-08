@@ -195,8 +195,8 @@ arguments.
 ```mermaid
 flowchart LR
   A["raw value x<br/>(score, height, ...)"] -->|"z = (x − mu) / sigma"| B["z-score<br/>(SDs from the mean)"]
-  B -->|"norm.cdf(z)"| C["percentile<br/>(fraction below)"]
-  C -->|"norm.ppf(p)"| B
+  B -->|"<code>norm.cdf(z)</code>"| C["percentile<br/>(fraction below)"]
+  C -->|"<code>norm.ppf(p)</code>"| B
   B -->|"x = mu + z·sigma"| A
 ```
 

@@ -54,9 +54,9 @@ The entity boxes are `customers`, `orders`, `products`, and
 
 ```mermaid
 flowchart LR
-    Diagram["ER diagram"] --> Customers["customers"]
-    Diagram --> Orders["orders"]
-    Diagram --> Products["products"]
+    Diagram["ER diagram"] --> Customers["<code>customers</code>"]
+    Diagram --> Orders["<code>orders</code>"]
+    Diagram --> Products["<code>products</code>"]
     Diagram --> Items["<code>order_items</code>"]
 ```
 
@@ -71,7 +71,7 @@ Inside each box are attributes. For example, `customers` has `id`,
 
 ```mermaid
 flowchart TB
-    Entity["orders"] --> ID["id PK"]
+    Entity["<code>orders</code>"] --> ID["id PK"]
     Entity --> CustomerID["<code>customer_id</code> FK"]
     Entity --> Placed["<code>placed_on</code>"]
     Entity --> Status["status"]

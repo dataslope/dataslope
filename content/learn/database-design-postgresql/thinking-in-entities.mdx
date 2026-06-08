@@ -21,7 +21,7 @@ type becomes **one row**.
 
 ```mermaid
 flowchart LR
-    E["Entity type<br/>customer"] --> T["Table<br/>customers"]
+    E["Entity type<br/><code>customer</code>"] --> T["Table<br/><code>customers</code>"]
     R["One real customer<br/>Ada Lovelace"] --> Row["One row<br/><code>id = 1</code>"]
     T --> Row
 ```
@@ -40,11 +40,11 @@ excellent candidates.
 
 ```mermaid
 flowchart TB
-    S["Sentence:<br/>Customers place orders for products"] --> N["Nouns:<br/>customers, orders, products"]
+    S["Sentence:<br/>Customers place orders for products"] --> N["Nouns:<br/><code>customers</code>, <code>orders</code>, <code>products</code>"]
     N --> C["Candidate entities"]
-    C --> Customers["customers"]
-    C --> Orders["orders"]
-    C --> Products["products"]
+    C --> Customers["<code>customers</code>"]
+    C --> Orders["<code>orders</code>"]
+    C --> Products["<code>products</code>"]
 ```
 
 The verbs matter too. "Place" hints that `customers` and `orders` are
@@ -170,10 +170,10 @@ Good entity names are ordinary words from the domain. Prefer
 
 ```mermaid
 flowchart TB
-    Bad["Vague table<br/>items"] --> Problem["Could mean products,<br/>order lines, tasks, or anything"]
-    Good["Clear tables"] --> A["products"]
+    Bad["Vague table<br/><code>items</code>"] --> Problem["Could mean products,<br/>order lines, tasks, or anything"]
+    Good["Clear tables"] --> A["<code>products</code>"]
     Good --> B["<code>order_items</code>"]
-    Good --> C["tasks"]
+    Good --> C["<code>tasks</code>"]
 ```
 
 Clear names make the design easier to discuss. If the team cannot

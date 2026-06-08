@@ -107,8 +107,8 @@ flowchart TD
   C --> D["4. Collect data,<br/>compute a test statistic"]
   D --> E["5. Get the p-value<br/>(how extreme is the data under H0?)"]
   E --> F{"p-value vs alpha"}
-  F -->|"p <= alpha"| G["Reject H0<br/>(result is 'significant')"]
-  F -->|"p > alpha"| H["Fail to reject H0<br/>(insufficient evidence)"]
+  F -->|"<code>p &lt;= alpha</code>"| G["Reject H0<br/>(result is 'significant')"]
+  F -->|"<code>p &gt; alpha</code>"| H["Fail to reject H0<br/>(insufficient evidence)"]
 ```
 
 Let's unpack the two pieces that trip people up.

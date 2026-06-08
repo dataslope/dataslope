@@ -9,16 +9,16 @@ For example, `orders` knows the amount. `customers` knows the name. A join lets 
 
 ```mermaid
 flowchart LR
-    subgraph C["customers"]
+    subgraph C["<code>customers</code>"]
         C1["id 1<br/>Ada"]
         C2["id 2<br/>Grace"]
     end
-    subgraph O["orders"]
+    subgraph O["<code>orders</code>"]
         O1["order 101<br/><code>customer_id</code> 1<br/>42"]
         O2["order 102<br/><code>customer_id</code> 2<br/>99"]
     end
-    O1 -->|"customer_id = id"| C1
-    O2 -->|"customer_id = id"| C2
+    O1 -->|"<code>customer_id</code> = id"| C1
+    O2 -->|"<code>customer_id</code> = id"| C2
     C1 -->|"combine columns"| R1["Ada<br/>order 101<br/>42"]
     C2 -->|"combine columns"| R2["Grace<br/>order 102<br/>99"]
 ```

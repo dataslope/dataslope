@@ -25,8 +25,8 @@ necessary to *walk* a sequence.
 
 ```mermaid
 flowchart LR
-    A["<code>IEnumerable&lt;T&gt;</code>"] -->|GetEnumerator| B["<code>IEnumerator&lt;T&gt;</code>"]
-    B -->|MoveNext| C{has next?}
+    A["<code>IEnumerable&lt;T&gt;</code>"] -->|"<code>GetEnumerator</code>"| B["<code>IEnumerator&lt;T&gt;</code>"]
+    B -->|"<code>MoveNext</code>"| C{has next?}
     C -- yes --> D[Current] --> B
     C -- no --> E[done]
 ```

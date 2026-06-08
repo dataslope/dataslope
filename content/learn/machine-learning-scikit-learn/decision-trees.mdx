@@ -60,10 +60,10 @@ together as possible (it minimizes squared error).
 
 ```mermaid
 flowchart TD
-    A["All flowers<br/>(mixed species)"] -->|"petal width <= 0.8 cm?"| B["Yes"]
-    A -->|"no"| C["petal width > 0.8 cm"]
+    A["All flowers<br/>(mixed species)"] -->|"petal <code>width &lt;= 0.8</code> cm?"| B["Yes"]
+    A -->|"no"| C["petal <code>width &gt; 0.8</code> cm"]
     B --> D["Pure leaf<br/>all setosa"]
-    C -->|"petal width <= 1.75 cm?"| E["mostly versicolor"]
+    C -->|"petal <code>width &lt;= 1.75</code> cm?"| E["mostly versicolor"]
     C -->|"no"| F["mostly virginica"]
 ```
 

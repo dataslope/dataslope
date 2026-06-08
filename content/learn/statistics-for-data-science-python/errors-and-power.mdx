@@ -524,8 +524,8 @@ flowchart TD
   D --> E
   E --> F["Run the study at that n"]
   F --> G{"Result"}
-  G -->|"p <= alpha"| H["Detected: report effect SIZE + CI,<br/>check it replicates"]
-  G -->|"p > alpha"| I["Not detected: was power adequate?<br/>If low, 'no effect' is unjustified"]
+  G -->|"<code>p &lt;= alpha</code>"| H["Detected: report effect SIZE + CI,<br/>check it replicates"]
+  G -->|"<code>p &gt; alpha</code>"| I["Not detected: was power adequate?<br/>If low, 'no effect' is unjustified"]
 ```
 
 Notice that **power analysis happens before you collect data**, not after.

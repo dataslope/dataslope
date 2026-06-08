@@ -19,16 +19,16 @@ them together:
 
 ```mermaid
 flowchart LR
-    subgraph C["customers"]
+    subgraph C["<code>customers</code>"]
         C1["1 · Ada"]
         C2["2 · Grace"]
     end
-    subgraph O["orders"]
+    subgraph O["<code>orders</code>"]
         O1["101 · cust 1 · $42"]
         O2["102 · cust 2 · $99"]
     end
-    O1 -->|"match on<br/>customer_id = id"| C1
-    O2 -->|"match on<br/>customer_id = id"| C2
+    O1 -->|"match on<br/><code>customer_id</code> = id"| C1
+    O2 -->|"match on<br/><code>customer_id</code> = id"| C2
     C1 --> R1["Ada · $42"]
     C2 --> R2["Grace · $99"]
 ```

@@ -150,12 +150,12 @@ belongs.
 
 ```mermaid
 flowchart TD
-    Event["events"] --> Title["title"]
+    Event["<code>events</code>"] --> Title["title"]
     Event --> Starts["<code>starts_at</code>"]
     Event --> VenueId["<code>venue_id</code>"]
-    Venue["venues"] --> VenueName["name"]
+    Venue["<code>venues</code>"] --> VenueName["name"]
     Venue --> Address["address"]
-    Attendee["attendees"] --> Email["email"]
+    Attendee["<code>attendees</code>"] --> Email["email"]
 ```
 
 Ask whether each attribute describes the row itself. A venue address

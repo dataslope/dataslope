@@ -178,11 +178,11 @@ The join follows the foreign-key arrows and shows readable customer names next t
 
 ```mermaid
 flowchart TB
-    subgraph C["customers"]
+    subgraph C["<code>customers</code>"]
         C1["<code>id = 1</code><br/>Ada"]
         C2["<code>id = 2</code><br/>Grace"]
     end
-    subgraph O["orders"]
+    subgraph O["<code>orders</code>"]
         O1["<code>101<br/>customer_id = 1</code>"]
         O2["<code>102<br/>customer_id = 1</code>"]
         O3["<code>103<br/>customer_id = 2</code>"]

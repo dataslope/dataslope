@@ -116,7 +116,7 @@ A `LEFT JOIN` plus `WHERE right_table.id IS NULL` is the classic pattern for "sh
 flowchart TB
     A["<code>LEFT JOIN</code><br/>keep all customers"] --> B["matched customers<br/>order id present"]
     A --> C["unmatched customers<br/>order id is NULL"]
-    C -->|"WHERE o.id IS NULL"| D["customers with no orders"]
+    C -->|"<code>WHERE o.id IS NULL</code>"| D["customers with no orders"]
     B -->|"filtered out"| X["not returned"]
 ```
 

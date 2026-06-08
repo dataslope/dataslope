@@ -192,8 +192,8 @@ That's a 12-line class with no bugs.
 ```mermaid
 flowchart LR
     A[Mutable original] -->|publish raw| B[Mutable, shared - dangerous]
-    A -->|Collections.unmodifiableList| C[Unmodifiable view - still backed by mutable]
-    A -->|List.copyOf| D[Immutable snapshot - safe forever]
+    A -->|"<code>Collections.unmodifiableList</code>"| C[Unmodifiable view - still backed by mutable]
+    A -->|"<code>List.copyOf</code>"| D[Immutable snapshot - safe forever]
 ```
 
 The further right you go, the safer your API.

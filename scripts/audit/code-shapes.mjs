@@ -291,12 +291,14 @@ const SQL_FUNC = new Set([
 // names in these courses (amount, price, dept, orders, …) are never in this set,
 // so a real clause runs through them.
 const SQL_PROSE = new Set(
-  ("filter rows row keep keeps drop choose pick show read change remove add sort " +
-    "trim form groups grouping result results columns column tables only matches " +
-    "matched totals no can see here computed individual full make department take " +
-    "skip two high low surface extremes top look bins slice value condition true " +
-    "false the before after early late combine related record changes fetch right " +
-    "and or of pairs query final per into nothing")
+  ("filter filters rows row keep keeps drop drops choose chooses pick picks show " +
+    "shows read reads change changes remove removes add adds sort sorts trim trims " +
+    "form forms join joins return returns write writes group grouping groups result " +
+    "results columns column tables only matches matched totals no can see here " +
+    "computed individual full make makes department take takes skip skips two high " +
+    "low surface extremes top look bins slice value condition true false the before " +
+    "after early late combine related record fetch right and or of pairs query " +
+    "final per into nothing")
     .split(/\s+/),
 );
 const sep = (ch) => ch === "" || ":/|,(".includes(ch);
@@ -483,23 +485,24 @@ function isStrongExpr(m) {
 function wrapExprSpans(chunk, tags) {
   return chunk.replace(EXPR_SPAN, (m, ...args) => {
     const offset = args[args.length - 2];
+    const before = chunk.slice(0, offset);
     if (/[A-Za-z_]\w*<[A-Za-z_]/.test(m) && !/\s<\s/.test(m)) return m; // generic, not a comparison
-    // Math interval / inequality notation over single-letter operands (a < X < b,
-    // 0 <= p <= 1) reads as math, not code — same call the first pass made for
-    // y(t) and AR(p). A single comparison (i < N, score >= 90) still wraps.
-    if ((m.match(/[<>]=?/g) || []).length >= 2 && !/[A-Za-z_]{2,}/.test(m)) return m;
     if (!isStrongExpr(m)) return m;
     // For an assignment, the strength must be on the RIGHT of "=" — so "b =
     // nullptr" and "i = i + 1" wrap, but a prose gloss like "null = no effect"
     // (strong only because of the keyword on the left) does not.
     const asg = m.match(/^[A-Za-z_][\w.]*\s*=(?!=)\s*([\s\S]+)$/);
-    if (asg && !isStrongExpr(asg[1])) return m;
-    // A bare single < / > comparison sitting mid-phrase is usually a compound
-    // noun + threshold ("petal width > 0.8 cm", "heap size > 1") whose real
-    // operand is the words before it — wrap it only when it leads the chunk or
-    // follows a separator, never straight after another word.
-    const onlyAngle = /[<>]/.test(m) && !/[=!]=|[<>]=|=>|⇒|=|\breturn\b|\(|\[/.test(m);
-    if (onlyAngle && /\w\s$/.test(chunk.slice(0, offset))) return m;
+    if (asg) {
+      if (!isStrongExpr(asg[1])) return m;
+    } else if (/[<>]=?|[=!]==?/.test(m) && !/=>|⇒/.test(m)) {
+      // Math / probability notation over single-letter operands — a chained
+      // inequality (a < X < b) or one inside a function call P(X <= x) — reads as
+      // math, not code; same call the first pass made for y(t) and AR(p). A real
+      // condition (i < N, score >= 90, ADF p >= 0.05, width <= 0.8) still wraps.
+      const ops = (m.match(/[<>]=?|[=!]==?/g) || []).length;
+      const singleLetters = !/[A-Za-z_]{2,}|\d/.test(m);
+      if (singleLetters && (ops >= 2 || /\($/.test(before))) return m;
+    }
     tags.push(m);
     return `<code>${escHtml(m)}</code>`;
   });
@@ -589,6 +592,37 @@ function rewriteLabel(rawLabel) {
   return { label: `"${out.replace(/"/g, "&quot;")}"`, tags };
 }
 
+// Find edge labels — the text inside the `|…|` of `A -->|"INSERT, UPDATE"| B`.
+// Tracks shape-bracket depth and quotes so a pipe *inside* a node label (e.g.
+// the linked-list cell `["a | next"]`) is never mistaken for an edge label.
+function findEdgeLabels(line) {
+  const out = [];
+  const N = line.length;
+  let depth = 0;
+  let i = 0;
+  while (i < N) {
+    const ch = line[i];
+    if (ch === '"') {
+      i++;
+      while (i < N && line[i] !== '"') { if (line[i] === "\\") i++; i++; }
+      i++;
+      continue;
+    }
+    if (ch === "[" || ch === "{" || ch === "(") { depth++; i++; continue; }
+    if (ch === "]" || ch === "}" || ch === ")") { if (depth > 0) depth--; i++; continue; }
+    if (ch === "|" && depth === 0) {
+      let j = i + 1;
+      while (j < N && line[j] !== "|") {
+        if (line[j] === '"') { j++; while (j < N && line[j] !== '"') { if (line[j] === "\\") j++; j++; } }
+        j++;
+      }
+      if (j < N) { out.push({ contentStart: i + 1, contentEnd: j }); i = j + 1; continue; }
+    }
+    i++;
+  }
+  return out;
+}
+
 function processLine(line, isFlow) {
   if (!isFlow) return { line, tags: [] };
   // Bare subgraph title (`subgraph users.js`): wrap a code-like title, rewriting
@@ -602,22 +636,27 @@ function processLine(line, isFlow) {
     return { line, tags: [] };
   }
   if (SKIP_LINE.test(line)) return { line, tags: [] };
-  const nodes = findNodes(line);
-  if (!nodes.length) return { line, tags: [] };
+  // Node labels and edge labels are disjoint (nodes live inside shape brackets,
+  // edge labels between pipes at bracket depth 0); rewrite each span in place.
+  const spans = [
+    ...findNodes(line).map((n) => ({ start: n.contentStart, end: n.contentEnd })),
+    ...findEdgeLabels(line).map((e) => ({ start: e.contentStart, end: e.contentEnd })),
+  ].sort((a, b) => a.start - b.start);
+  if (!spans.length) return { line, tags: [] };
   const tags = [];
   let out = "";
   let pos = 0;
-  for (const n of nodes) {
-    const raw = line.slice(n.contentStart, n.contentEnd);
+  for (const s of spans) {
+    const raw = line.slice(s.start, s.end);
     const res = rewriteLabel(raw);
-    out += line.slice(pos, n.contentStart);
+    out += line.slice(pos, s.start);
     if (res.tags.length && res.label !== raw) {
       out += res.label;
       tags.push(...res.tags);
     } else {
       out += raw;
     }
-    pos = n.contentEnd;
+    pos = s.end;
   }
   out += line.slice(pos);
   return { line: out, tags };

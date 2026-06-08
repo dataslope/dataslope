@@ -27,7 +27,7 @@ flowchart LR
     subgraph Good["Two related tables"]
         C["customers<br/>(details once)"]
         O["orders<br/>(linked by id)"]
-        O -->|"customer_id"| C
+        O -->|"<code>customer_id</code>"| C
     end
     Bad -->|"better as"| Good
 ```

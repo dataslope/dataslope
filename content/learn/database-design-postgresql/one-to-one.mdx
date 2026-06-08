@@ -145,7 +145,7 @@ foreign key. Choose the table whose row is dependent or optional.
 ```mermaid
 flowchart TB
     User["users<br/>core identity"] --> Profile["<code>user_profiles</code><br/>optional details"]
-    Profile -->|"user_id FK + UNIQUE"| User
+    Profile -->|"<code>user_id</code> FK + UNIQUE"| User
     Choice["Put the FK on the dependent table"] --> Profile
 ```
 

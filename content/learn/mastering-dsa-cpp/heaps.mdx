@@ -177,7 +177,7 @@ flowchart TD
     A["build max heap"] --> B["swap max with last unsorted item"]
     B --> C["shrink heap size"]
     C --> D["sift down root"]
-    D --> E{"heap size > 1?"}
+    D --> E{"heap <code>size &gt; 1</code>?"}
     E -- "yes" --> B
     E -- "no" --> F["array sorted ascending"]
 ```

@@ -42,11 +42,11 @@ table: `post_tags`.
 
 ```mermaid
 flowchart LR
-    Users["users"] --> Posts["posts"]
-    Users --> Comments["comments"]
+    Users["<code>users</code>"] --> Posts["<code>posts</code>"]
+    Users --> Comments["<code>comments</code>"]
     Posts --> Comments
     Posts --> PostTags["<code>post_tags</code>"]
-    Tags["tags"] --> PostTags
+    Tags["<code>tags</code>"] --> PostTags
 ```
 
 `post_tags` is not just a technical trick. It represents the fact
@@ -73,13 +73,13 @@ Each attribute belongs with the entity it describes.
 
 ```mermaid
 flowchart TD
-    User["users"] --> Email["email"]
+    User["<code>users</code>"] --> Email["email"]
     User --> Display["<code>display_name</code>"]
-    Post["posts"] --> Title["title"]
+    Post["<code>posts</code>"] --> Title["title"]
     Post --> Body["body"]
     Post --> Status["status"]
-    Comment["comments"] --> CommentBody["body"]
-    Tag["tags"] --> Name["name"]
+    Comment["<code>comments</code>"] --> CommentBody["body"]
+    Tag["<code>tags</code>"] --> Name["name"]
 ```
 
 The post does not store the author's email. It stores `author_id`, a

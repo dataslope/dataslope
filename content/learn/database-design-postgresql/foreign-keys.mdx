@@ -62,10 +62,10 @@ the stable identity on related rows.
 
 ```mermaid
 flowchart TB
-    subgraph customers["customers"]
+    subgraph customers["<code>customers</code>"]
         C1["<code>customer_id</code> = 7<br/>name = Mina<br/>email = mina@new.example"]
     end
-    subgraph orders["orders"]
+    subgraph orders["<code>orders</code>"]
         O1["<code>order_id = 101<br/>customer_id = 7</code>"]
         O2["<code>order_id = 102<br/>customer_id = 7</code>"]
     end
@@ -156,7 +156,7 @@ When discussing foreign keys, people often say **parent table** and
 flowchart TB
     P["Parent table<br/>customers"]:::parent
     C["Child table<br/>orders"]:::child
-    C -->|"customer_id references customer_id"| P
+    C -->|"<code>customer_id</code> references <code>customer_id</code>"| P
     classDef parent fill:#dbeafe,stroke:#1d4ed8
     classDef child fill:#fef3c7,stroke:#b45309
 ```
