@@ -10,6 +10,11 @@ predict what your code will do** before pressing Run.
 
 This chapter builds that picture.
 
+<Illustration
+  prompt={`Decorative flat-vector hero showing a simple mental model of a computer: a friendly rounded CPU square with a subtle gear or pulse motif on the left, connected by two soft solid arrows (one for read, one for write) to a tall stack of numbered memory cells on the right. Clean and diagrammatic but warm. Arrows as solid filled shapes, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
+
 ## A computer has two main parts (for us)
 
 For our purposes, every computer is made of two cooperating parts:
@@ -45,6 +50,12 @@ Contents:   42   00    00    00    'H'   'i'   '!'   00    ...
 Each mailbox holds one byte (a number between 0 and 255, or a
 character). Larger values like a 32-bit integer occupy several
 consecutive mailboxes — typically 4 bytes for an `int`.
+
+<Illustration
+  prompt={`Flat-vector illustration of RAM as a long horizontal row of numbered mailbox cells, each a small rounded rectangle butting against the next with no gaps. A few cells hold simple value blobs, and one run of four adjacent cells is highlighted together to show a single integer spanning several bytes. Friendly and orderly. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. Minimal text — small sparse address numbers optional.`}
+  alt="Memory as a contiguous row of numbered byte-sized cells, with four cells grouped into one integer"
+  ratio="5 / 2"
+/>
 
 When your C program declares a variable `int score = 42;`, the
 compiler arranges for four mailboxes somewhere in RAM to hold the
@@ -168,6 +179,11 @@ that confuse beginners become obvious:
 Programming is the art of **arranging a sequence of small operations
 in memory** such that, when the CPU walks through them, something
 useful happens at the end.
+
+<Illustration
+  prompt={`Decorative flat-vector illustration of programming as arranging small operations in memory: a neat left-to-right sequence of small colored instruction tiles laid inside a faint memory strip, with a tiny CPU marker walking along them and leaving a soft motion trail, ending in a small spark of useful output. Abstract and tidy. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
 
 Every language we use — Python, JavaScript, Rust, C — ultimately
 exists to make it easier for humans to describe such arrangements.

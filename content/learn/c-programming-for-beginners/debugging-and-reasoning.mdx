@@ -11,6 +11,11 @@ and fix them faster.
 That speed comes from a few habits. None of them are magic. All of
 them can be practiced.
 
+<Illustration
+  prompt={`Decorative flat-vector hero for debugging: a friendly magnifying glass hovering over a small stylized bug sitting on a line of code, with a faint checklist and lightbulb nearby suggesting calm, methodical investigation rather than panic. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
+
 ## Step 1: read the error message
 
 The single biggest improvement a new programmer can make is to
@@ -100,6 +105,12 @@ Two bugs are now obvious from the table:
 You would have stared at the code for a long time before seeing
 either. The trace table reveals both within a minute.
 
+<Illustration
+  prompt={`Informative flat-vector illustration of a trace table: a small neat grid tracking how a couple of variables change across successive steps, with one row subtly highlighted where a value exposes a bug. Conveys writing down variable values step by step. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. Minimal text — small numbers in the cells acceptable, no words.`}
+  alt="A trace table tracking variable values across steps, surfacing a bug"
+  ratio="3 / 2"
+/>
+
 ## Step 4: print debugging
 
 The humble `printf` is the workhorse of C debugging. Insert prints
@@ -139,6 +150,12 @@ The same idea works with code: if you can't tell which function is
 the culprit, **comment out** half of them and see if the bug
 persists.
 
+<Illustration
+  prompt={`Informative flat-vector illustration of shrinking a failing input by halving: a large input bar repeatedly cut in half, each remaining piece still flagged with a small red bug marker, narrowing down to a tiny snippet that still fails. Conveys binary-search input minimization. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  alt="Halving a failing input repeatedly until a tiny reproducer remains"
+  ratio="16 / 9"
+/>
+
 ## Step 6: rubber-duck explanation
 
 Out loud (or in writing), explain the code to an inanimate object,
@@ -147,6 +164,11 @@ the time, you'll hear yourself say something that doesn't make
 sense — "and here we increment `i`, then we add it to `total`, then
 we... wait, why did I subtract `1` here?" — and the bug is found
 without anyone else needing to look.
+
+<Illustration
+  prompt={`Decorative flat-vector illustration of rubber-duck debugging: a simple cheerful rubber duck (a yellow body is fine) beside a line of code with a small speech bubble, suggesting explaining the code out loud line by line. Light and playful. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
 
 ## Memory bugs: the special category
 

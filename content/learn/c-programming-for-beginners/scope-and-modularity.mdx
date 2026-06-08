@@ -13,10 +13,21 @@ in one file. To grow, you need two skills:
 These are the engineering disciplines that turn working code into
 **maintainable** code.
 
+<Illustration
+  prompt={`Decorative flat-vector hero for scope and modularity: on one side, concentric nested rounded frames representing the regions where names live; on the other, a few interlocking modular blocks or puzzle pieces forming a larger whole, joined by a slim seam. Conveys both nested visibility and building from pieces. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
+
 ## What is a scope?
 
 A **scope** is a region of source code in which a name (a variable, a
 function) is meaningful. C's scopes are nested like Russian dolls.
+
+<Illustration
+  prompt={`Informative flat-vector illustration of nested scopes as russian-doll-style concentric containers: an outermost file-scope frame containing a function-scope frame containing a small block-scope frame, each a different brand color, with a tiny name-token visible only inside its own layer. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  alt="Nested scopes: file scope contains function scope contains block scope"
+  ratio="3 / 2"
+/>
 
 ```c
 int g = 10;                   // file scope (a.k.a. "global")
@@ -89,6 +100,11 @@ int main(void) {
 Shadowing is occasionally useful (e.g. a tiny temporary) but more
 often a source of bugs. Most real codebases adopt the rule: **don't
 shadow**.
+
+<Illustration
+  prompt={`Decorative flat-vector illustration of variable shadowing: two stacked name-tokens carrying the same label, where a nearer inner token casts a soft shadow over a farther outer token of the same name, temporarily hiding it. A subtle eclipse-like motif. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
 
 ## Local variables are born and die
 
@@ -253,6 +269,11 @@ Several rules of the craft are visible here:
 If you later replaced `stats.c` with a faster implementation,
 nothing in `main.c` would need to change — as long as the header
 contract stayed the same. That is the power of modularity.
+
+<Illustration
+  prompt={`Decorative flat-vector illustration of modular code: several distinct rounded module blocks, each with a small public connector slot on top representing its header, snapping together through those slots into a clean larger assembly. Conveys files that hide their internals behind a public interface. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
 
 ## A challenge: split a calculator across files
 

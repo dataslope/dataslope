@@ -15,6 +15,11 @@ programming language. They let you:
 You already met one function: `main`. Every C program starts there.
 Now let's write our own.
 
+<Illustration
+  prompt={`Decorative flat-vector hero for functions: a friendly machine box with an input chute on the left receiving a value token and an output spout on the right emitting a result token, a couple of gears turning inside, and a small name-tag on the box. Conveys a named, reusable block — value in, result out. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
+
 ## Anatomy of a function
 
 ```c
@@ -81,6 +86,12 @@ int main(void) {
 copy of the value. To actually modify a caller's variable, you would
 pass a **pointer** to it — which is exactly what pointers are for,
 and what we'll explore in a few chapters.
+
+<Illustration
+  prompt={`Informative flat-vector illustration of pass-by-value: a caller's variable box on the left and a photocopier-style motif producing a separate copy that travels into a function box on the right; a small scribble made on the copy leaves the original untouched. Conveys that the function works on its own copy. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  alt="A function receives a copy of its argument, so changes inside do not affect the caller"
+  ratio="16 / 9"
+/>
 
 ## `void` — when a function returns nothing
 
@@ -271,6 +282,11 @@ Forget the base case and the program will recurse forever — until it
 runs out of stack space and crashes with a *stack overflow*. Recursion
 is powerful but also restrained: prefer a loop unless the problem is
 naturally recursive (trees, divide-and-conquer, parsing).
+
+<Illustration
+  prompt={`Decorative flat-vector illustration of recursion: a set of nested self-similar shapes — like russian-doll boxes, each containing a smaller copy of itself a few times over — with a slim solid arrow spiraling inward toward a tiny base-case shape at the center. Calm and hypnotic. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
 
 ## Challenge: is it prime?
 

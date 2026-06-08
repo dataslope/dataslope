@@ -9,11 +9,22 @@ admission. The payoff is a unified model in which traversing an
 array, walking a string, and scanning a region of memory are all the
 same idea.
 
+<Illustration
+  prompt={`Decorative flat-vector hero for pointers and arrays: a row of array cells with a single pointer arrow gliding along them left to right, leaving a soft trail, suggesting that walking an array is just moving a pointer. Unified and smooth. Arrow as a solid filled shape, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
+
 ## Array name as a pointer
 
 When you mention an array name in most expressions, the compiler
 silently converts it to **a pointer to its first element**. This is
 called *array-to-pointer decay*.
+
+<Illustration
+  prompt={`Informative flat-vector illustration of array-to-pointer decay: an array name-tag dissolving into a single pointer arrow aimed at the array's first cell, with faint motion lines showing the name becoming a pointer to element zero. Arrow as a solid filled shape, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  alt="An array name decays into a pointer to its first element"
+  ratio="16 / 9"
+/>
 
 ```c
 int a[5] = {10, 20, 30, 40, 50};
@@ -128,6 +139,12 @@ Each iteration:
 2. If it's `\0`, stop.
 3. Otherwise print it.
 4. Advance the pointer to the next character.
+
+<Illustration
+  prompt={`Informative flat-vector illustration of walking a null-terminated string with a pointer: a row of character cells ending in a null badge, a pointer arrow advancing one cell at a time, a small printed character emerging at each step, and the walk halting at the null terminator. Arrow as a solid filled shape, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. Minimal text — single letters and a 0 acceptable.`}
+  alt="A pointer advancing through a string one character at a time until the null terminator"
+  ratio="5 / 2"
+/>
 
 The famous one-liner `while (*s) putchar(*s++);` does the same thing
 even more compactly. *Familiarize yourself with the long form first*

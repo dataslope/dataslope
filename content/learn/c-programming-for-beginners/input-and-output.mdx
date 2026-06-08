@@ -12,6 +12,11 @@ C provides I/O through the standard library `<stdio.h>`. The
 philosophy is *small, simple, and printable*. Everything you read or
 write is a stream of bytes.
 
+<Illustration
+  prompt={`Decorative flat-vector hero for input and output: a central program box with a stream of small byte-tokens flowing in from a keyboard motif on the left and another stream flowing out to a terminal panel on the right. Conveys reading and writing streams of bytes. Streams drawn as flowing rows of small filled shapes, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
+
 ## Printing with `printf`
 
 You've used `printf` since the first chapter. Time to look at it
@@ -24,6 +29,12 @@ printf(format_string, args...);
 The **format string** is text with embedded **conversion
 specifications** like `%d`, `%s`, `%f`, each of which is replaced by
 the corresponding argument.
+
+<Illustration
+  prompt={`Informative flat-vector illustration of a printf format string being filled in: a long template bar with a few empty slot-shaped placeholders, and matching value tokens dropping down by solid arrows into their slots to complete the line. Conveys placeholders replaced by arguments in order. Arrows as solid filled shapes, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. Minimal text — tiny percent-style slot markers acceptable, no words.`}
+  alt="A format string with placeholder slots being filled by argument values in order"
+  ratio="5 / 2"
+/>
 
 | Spec  | Type                             | Example                  |
 |-------|----------------------------------|--------------------------|
@@ -200,6 +211,12 @@ Every C program automatically has three streams open:
 `printf` writes to `stdout`. `scanf` reads from `stdin`. For error
 messages, use `fprintf(stderr, "oops: %s\n", msg);`. Separating
 errors lets a user redirect them differently from normal output.
+
+<Illustration
+  prompt={`Informative flat-vector illustration of the three standard streams: a program box with one inbound pipe from a small inbox motif (stdin) and two outbound pipes — one to a normal output panel (stdout) and one to a separate error panel marked with a subtle red accent (stderr). Three clearly distinct channels. Pipes drawn as solid filled shapes, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  alt="The three standard streams: stdin in, stdout and stderr out"
+  ratio="16 / 9"
+/>
 
 ## Formatted vs unformatted I/O
 

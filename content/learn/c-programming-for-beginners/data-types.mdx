@@ -13,6 +13,11 @@ time. The type controls three things:
 - **What operations are legal** (you can add two `int`s; you can't
   add a function to a string).
 
+<Illustration
+  prompt={`Decorative flat-vector hero for C data types: a tidy family of differently sized rounded containers lined up — a tiny 1-byte cube, a medium 4-byte box, and a larger 8-byte box — each a different brand color, each with a small distinguishing emblem (a letter glyph, a whole-number dot cluster, a decimal-point sparkle). Clean and friendly. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No words; a single small emblem per box only.`}
+  ratio="16 / 9"
+/>
+
 ## The fundamental types
 
 | Type      | Typical size | What it stores                                                    |
@@ -104,6 +109,12 @@ int main(void) {
 variable are identical either way — it is the *format string* that
 decides how to display them.
 
+<Illustration
+  prompt={`Decorative flat-vector illustration showing that a char is secretly a small integer: a single tile flipping between two faces — one face shows a letter glyph, the other shows a number — joined by a small rotate/flip arrow, hinting that the same bits read either as a character or as its ASCII code. Arrow as a solid filled shape, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. Minimal text — a single letter and a single number are acceptable.`}
+  alt="The same byte read either as a character or as its numeric ASCII code"
+  ratio="16 / 9"
+/>
+
 ## Floating-point numbers
 
 For numbers with a fractional part, use `float` (less precision) or
@@ -136,6 +147,11 @@ in base 10. The number you store is a *very close approximation*.
 This is why \`0.1 + 0.2\` is famously not exactly \`0.3\` in almost
 every programming language.
 </Callout>
+
+<Illustration
+  prompt={`Decorative flat-vector illustration of floating-point approximation: a clean number line or ruler where a target point sits just slightly off a tidy gridline, with a small magnifier highlighting the tiny gap, suggesting a value that is very close but not exact. Calm and precise-feeling. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
 
 <CodeBlock
   adapter="c"
@@ -240,6 +256,12 @@ Same memory, different sized chunks, different bit interpretations.
 The CPU has separate instructions for integer arithmetic and
 floating-point arithmetic — the type tells the compiler which to
 emit.
+
+<Illustration
+  prompt={`Informative flat-vector illustration comparing how many bytes each type reserves: three horizontal bars built from small byte-squares — one square, four squares, and eight squares — stacked and left-aligned so the differing widths are obvious, each bar a different brand color. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No words; tiny size numbers optional.`}
+  alt="char reserves 1 byte, int reserves 4 bytes, and double reserves 8 bytes"
+  ratio="5 / 2"
+/>
 
 ## Challenge: average of three numbers
 

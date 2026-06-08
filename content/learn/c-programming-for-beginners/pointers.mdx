@@ -12,6 +12,11 @@ The trick is to keep the picture in front of you at all times.
 Every pointer is just a **box that holds an address**. Once you draw
 the boxes, everything else falls into place.
 
+<Illustration
+  prompt={`Decorative flat-vector hero for pointers: one small box labeled as a pointer holding an address value, with a clear solid arrow reaching across to a separate target box that holds the real value. The whole idea in one image — a box that points at another box. Arrow as a solid filled shape, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
+
 ## What a pointer is
 
 Every byte of RAM has an address — a number. A **pointer** is a
@@ -83,6 +88,12 @@ things:
 | `int *p = &n;` | declare `p`, initialize it with the address of `n`              |
 
 Once you internalize that, half of pointer confusion vanishes.
+
+<Illustration
+  prompt={`Informative flat-vector illustration of the two pointer operators: on one side, an address-of motif taking a value box and producing a little address tag; on the other, a dereference motif following an address arrow back to the value it points at. Two complementary actions side by side. Arrows as solid filled shapes, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. Minimal text — the symbols & and * are acceptable.`}
+  alt="The address-of operator produces an address; the dereference operator follows an address to its value"
+  ratio="16 / 9"
+/>
 
 ## Pictures, always pictures
 
@@ -202,6 +213,11 @@ if (p != NULL) {
 
 A common idiom is `if (p)` / `if (!p)`, since `NULL` is zero (false).
 
+<Illustration
+  prompt={`Decorative flat-vector illustration of a null pointer: a small pointer box whose arrow points at nothing — an empty void or crossed-out marker instead of a target box — with a subtle red accent as a gentle warning. Conveys a pointer that points to nothing valid. Arrow as a solid filled shape, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
+
 ## What happens if you forget to initialize a pointer
 
 An uninitialized pointer holds whatever bits were in those bytes
@@ -263,6 +279,12 @@ should see that `tmp` (a local variable inside `swap`) holds `x`'s
 value, then `x` is overwritten by `y`, then `y` is overwritten from
 `tmp`. The pointers `a` and `b` give `swap` access to `main`'s
 variables without copying them.
+
+<Illustration
+  prompt={`Informative flat-vector illustration of swapping two variables through pointers: two value boxes x and y in a caller, two pointer arrows reaching in from a function, and a small temporary holding one value mid-swap as curved solid arrows exchange the contents. Conveys a function reaching into the caller's boxes without copying them. Arrows as solid filled shapes, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. Minimal text — single letters x, y acceptable.`}
+  alt="Two pointers let a function swap the caller's x and y variables in place"
+  ratio="16 / 9"
+/>
 
 ## Challenge: in-place addition
 

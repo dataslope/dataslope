@@ -13,6 +13,11 @@ parameter lists and praying nothing fell out of sync. With structs,
 each "thing" becomes a single, named, typed value you can move
 around as a unit.
 
+<Illustration
+  prompt={`Decorative flat-vector hero for structs: several distinct little field tokens — a number, a tiny name-tag, a small decimal — gathered and bundled together inside one larger labeled container box, like related items packed into a single parcel. Conveys grouping related values into one named thing. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
+
 ## Declaring a struct
 
 ```c
@@ -242,6 +247,12 @@ int main(void) {
 Read `box.top_left.x` as "the `x` of the `top_left` of `box`". Dot
 chains work just like in everyday English.
 
+<Illustration
+  prompt={`Informative flat-vector illustration of nested structs: a large container box holding two smaller point-boxes inside it, each of those holding two tiny field tokens — boxes within boxes. Conveys structs containing other structs. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  alt="A struct containing other structs, like boxes nested inside a box"
+  ratio="16 / 9"
+/>
+
 ## Struct assignment copies
 
 Assigning one struct to another copies every field:
@@ -257,6 +268,12 @@ pointer copies the *pointer*, not the thing it points to. Both
 copies would then "own" the same heap allocation, which is a recipe
 for double-frees. We'll meet this pattern again in the linked-list
 chapter.
+
+<Illustration
+  prompt={`Informative flat-vector illustration of struct assignment making a full copy: one labeled struct box duplicated into a second independent struct box, every field copied across; alongside, a note that a contained pointer copies only the address — shown as two boxes whose pointer arrows aim at the same shared heap chunk. Arrows as solid filled shapes, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  alt="Struct assignment copies every field; a contained pointer is copied as an address, not deeply"
+  ratio="16 / 9"
+/>
 
 ## Challenge: rectangle area
 

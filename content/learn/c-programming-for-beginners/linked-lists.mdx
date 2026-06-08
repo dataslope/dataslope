@@ -13,6 +13,11 @@ canonical "you actually understand pointers now" exercise. Each
 element of the list is a **node** on the heap, and each node holds a
 pointer to the next node.
 
+<Illustration
+  prompt={`Decorative flat-vector hero for linked lists: an abstract chain of connected beads or links flowing across the frame, each link a rounded node with a small arrow tab joining it to the next, the final link trailing off into a tiny null badge. Stylized and friendly rather than strictly diagrammatic. Links and arrows as solid filled shapes, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
+
 ## The shape of a node
 
 ```c
@@ -167,6 +172,12 @@ The temptation is to write `cur = cur->next` *after* `free(cur)`.
 But that reads memory that has just been freed — undefined behavior.
 Always remember "save then free".
 
+<Illustration
+  prompt={`Informative flat-vector illustration of safely freeing a linked list: a traversal where, at each node, a small bookmark first saves the next pointer (marking the following node) and only then removes the current node, so the rest of the chain is never lost. Conveys the save-then-free rule. Arrows as solid filled shapes, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  alt="Freeing a list by saving each node's next pointer before freeing the node"
+  ratio="16 / 9"
+/>
+
 ## Inserting in the middle
 
 To insert a new node *after* an existing one called `prev`:
@@ -207,6 +218,12 @@ If those two pictures aren't crystal clear, the program crashes or
 leaks. If they are, every operation is just rearranging arrows. Once
 you can write `list_free` from scratch without looking it up, you
 have internalized pointers.
+
+<Illustration
+  prompt={`Informative flat-vector illustration contrasting an array with a linked list: on one side, a tidy contiguous block of adjacent cells (fast indexing, cache-friendly); on the other, scattered nodes spread across memory joined by pointer arrows (flexible inserts, but jumping around). Two contrasting layouts side by side, each a different brand color. Arrows as solid filled shapes, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  alt="An array as one contiguous block versus a linked list as scattered nodes joined by pointers"
+  ratio="16 / 9"
+/>
 
 ## Multi-file challenge: a complete linked-list module
 

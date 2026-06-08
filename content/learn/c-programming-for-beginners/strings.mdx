@@ -11,6 +11,11 @@ character" `\0`.
 This page is about how to think about that, and how not to shoot
 yourself in the foot.
 
+<Illustration
+  prompt={`Decorative flat-vector hero for C strings: a row of letter-tiles spelling a short friendly word, capped at the end by a distinct small terminator marker (a tiny stop or zero badge) showing where the string ends. Conveys a string as characters plus a hidden end marker. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. Minimal text — a few simple letters acceptable.`}
+  ratio="16 / 9"
+/>
+
 ## The null-terminated string
 
 ```c
@@ -32,6 +37,12 @@ There is no metadata. The convention is: walk until you see a `\0`.
 This convention is fast and compact, but it shifts a lot of
 responsibility onto the programmer. Forget the terminator and
 everything goes wrong.
+
+<Illustration
+  prompt={`Informative flat-vector illustration of a null-terminated string: six adjacent cells holding h, e, l, l, o and a final distinct cell marked as the null terminator (a small zero or stop badge in a contrasting color), with a tiny walking marker reading left to right and halting at the terminator. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. Minimal text — single letters and a 0 acceptable.`}
+  alt="A string stored as characters followed by a null terminator that marks the end"
+  ratio="5 / 2"
+/>
 
 ## String literals
 
@@ -105,6 +116,12 @@ buffer **without checking how big it is**. If your destination is
 too small, you trash whatever memory is next to it. This was the
 mechanism behind the **Morris worm** (1988), countless web-server
 exploits, and many of the CVEs you read about today.
+
+<Illustration
+  prompt={`Decorative flat-vector illustration of a buffer overflow: a small fixed-size container being overfilled so excess content spills over its edge onto neighboring cells, the spilled region flagged with a subtle red accent. Conveys writing past the end of a too-small buffer. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  alt="Writing more characters than a buffer can hold spills into neighboring memory"
+  ratio="16 / 9"
+/>
 
 ```c
 char buf[8];

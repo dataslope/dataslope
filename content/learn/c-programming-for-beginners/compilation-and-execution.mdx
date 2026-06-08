@@ -9,6 +9,11 @@ pipeline called the **C toolchain**. Understanding it will save you
 hours of confusion later, because most "weird" errors in C trace back
 to one specific stage.
 
+<Illustration
+  prompt={`Decorative flat-vector hero for the C toolchain: a clean assembly-line conveyor belt carrying a source-code document that is transformed step by step into a finished executable cube at the far end, with a few small machine-and-gear stations along the belt. Industrious but tidy. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
+
 ## The four stages
 
 The pipeline runs **`hello.c` → Preprocessor → Compiler → Assembler → Linker → Executable**, and then the operating system loads and runs that executable.
@@ -24,6 +29,12 @@ In real life, you usually invoke all four stages with one command,
 like `clang hello.c -o hello`. The compiler driver runs the rest
 behind the scenes. But each stage has its own kind of error message.
 Recognizing which stage is angry at you is half the debugging battle.
+
+<Illustration
+  prompt={`Informative flat-vector pipeline of four labeled stages connected left-to-right by solid arrows, each a distinct rounded station with a simple emblem: preprocessor (two documents merging, paste motif), compiler (a gear with a small branching tree), assembler (a tile of 0 and 1 glyphs), and linker (two puzzle pieces joining), ending in a finished executable block. Each stage a different brand color. Arrows as solid filled shapes, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No words; tiny 0 and 1 glyphs on a single tile only.`}
+  alt="The four toolchain stages: preprocessor, compiler, assembler, and linker, producing an executable"
+  ratio="5 / 2"
+/>
 
 ## Stage 1: the preprocessor
 
@@ -146,6 +157,11 @@ Real programs are split across many files. The convention is:
 
 The header is the *interface*. The source file is the
 *implementation*.
+
+<Illustration
+  prompt={`Decorative flat-vector illustration of interface versus implementation: a clean storefront-window panel in front (the header — the public interface, showing a few simple labeled slots) with a busier machine-room panel behind it (the source file, full of gears doing the real work). Conveys a tidy public surface hiding private detail. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
 
 The browser sandbox supports multi-file builds. Edit any tab below
 and click *Run* — both files are compiled and linked together.

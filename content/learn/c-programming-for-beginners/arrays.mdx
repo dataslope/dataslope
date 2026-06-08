@@ -9,6 +9,11 @@ sequence of temperatures, a row of pixels. C's most basic answer is
 the **array**: a contiguous block of memory holding many values of
 the same type.
 
+<Illustration
+  prompt={`Decorative flat-vector hero for arrays: a clean horizontal row of identical rounded boxes butting together with no gaps, each holding a small value token, with tiny index numbers 0, 1, 2, 3 beneath the first few. Conveys a contiguous row of same-type cells. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. Minimal text — small index numbers 0, 1, 2 acceptable.`}
+  ratio="16 / 9"
+/>
+
 ## Declaring and indexing
 
 ```c
@@ -60,6 +65,12 @@ Each `int` is (say) 4 bytes. The five cells sit **next to each
 other** in memory. `primes[i]` is shorthand for "the cell at address
 `primes + i * sizeof(int)`". This contiguity is the secret to why
 arrays are fast: predicting the next address is one addition.
+
+<Illustration
+  prompt={`Informative flat-vector illustration of an array's memory layout: five equal cells side by side holding 2, 3, 5, 7, 11, with faint consecutive addresses beneath and a small bracket showing each cell is the same fixed width apart. Conveys contiguous, evenly spaced storage. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. Minimal text — the small numbers inside the cells are acceptable.`}
+  alt="Five array elements stored in contiguous, evenly spaced memory cells"
+  ratio="5 / 2"
+/>
 
 ## The size is fixed at declaration
 
@@ -131,6 +142,12 @@ program may:
 This is called a **buffer overflow**, and it has been responsible for
 an astonishing fraction of all software security flaws since the
 1980s.
+
+<Illustration
+  prompt={`Decorative flat-vector illustration of an array bounds overflow: a tidy row of cells with a token stepping one box past the final cell onto unmarked ground beyond the array, the out-of-bounds step flagged with a subtle red accent. Cautionary but clean. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  alt="Stepping one element past the end of an array, into memory that is not yours"
+  ratio="16 / 9"
+/>
 
 <CodeBlock
   adapter="c"
@@ -258,6 +275,12 @@ int main(void) {
 `grid[3][4]` is laid out as 12 consecutive integers in **row-major**
 order — row 0, then row 1, then row 2. Knowing the layout helps you
 reason about cache performance and pointer arithmetic later.
+
+<Illustration
+  prompt={`Informative flat-vector illustration of a 2D array stored in row-major order: a 3-by-4 grid on top, and below it the same twelve cells unrolled into one long single row, with soft solid arrows showing row 0, then row 1, then row 2 laid end to end. Conveys that a 2D shape is a flat region underneath. Arrows as solid filled shapes, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No words; tiny indices optional.`}
+  alt="A 3x4 grid laid out in memory as twelve consecutive cells, row by row"
+  ratio="3 / 2"
+/>
 
 ## Passing arrays to functions
 

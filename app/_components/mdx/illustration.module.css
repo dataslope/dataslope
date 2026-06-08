@@ -1,0 +1,101 @@
+/* Styling for <Illustration> (app/_components/mdx/illustration.tsx).
+ *
+ * Two states share one <figure>:
+ *   1. The generated SVG (.image) — rendered once `src` is supplied.
+ *   2. The .placeholder frame — a dashed card that surfaces the generation
+ *      prompt while the artwork is still pending.
+ *
+ * All chrome is built from Fumadocs theme tokens (--color-fd-*) so the frame
+ * tracks light/dark automatically, with brand-hue accents from brand.css
+ * (--ds-blue-500 etc.) for the palette hint. */
+
+.figure {
+  margin: 1.75rem 0;
+}
+
+/* ── Real artwork ─────────────────────────────────────────────────────── */
+.image {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-inline: auto;
+  border-radius: 12px;
+}
+
+/* ── Placeholder frame ────────────────────────────────────────────────── */
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 1.5rem 1.75rem;
+  box-sizing: border-box;
+  text-align: center;
+
+  border: 2px dashed
+    var(--color-fd-border, color-mix(in srgb, currentColor 20%, transparent));
+  border-radius: 12px;
+  background: var(
+    --color-fd-muted,
+    color-mix(in srgb, currentColor 4%, transparent)
+  );
+  color: var(--color-fd-muted-foreground, currentColor);
+}
+
+.frameIcon {
+  color: var(--color-fd-muted-foreground, currentColor);
+  opacity: 0.9;
+  line-height: 0;
+}
+
+.kicker {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-fd-muted-foreground, currentColor);
+  opacity: 0.85;
+}
+
+/* The generation prompt. Mono, compact, capped width so longer prompts stay
+   readable. Sits in its own subtle card with a brand-blue accent edge. */
+.prompt {
+  margin: 0;
+  max-width: 46ch;
+  font-family: var(--font-mono), "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--color-fd-foreground, currentColor);
+
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--ds-blue-500);
+  background: var(
+    --color-fd-card,
+    color-mix(in srgb, currentColor 5%, transparent)
+  );
+  text-align: left;
+}
+
+/* Four-dot reminder of the allowed brand palette. */
+.palette {
+  display: inline-flex;
+  gap: 6px;
+}
+.palette i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+/* ── Caption ──────────────────────────────────────────────────────────── */
+.caption {
+  margin-top: 0.6rem;
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-fd-muted-foreground, currentColor);
+}

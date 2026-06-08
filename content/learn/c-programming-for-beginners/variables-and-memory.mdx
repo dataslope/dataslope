@@ -9,6 +9,11 @@ the friendly name is a fixed-size box of bytes at a specific address.
 That mental model — *variable = labelled box in memory* — will guide
 every chapter from now on.
 
+<Illustration
+  prompt={`Decorative flat-vector hero for variables and memory: a friendly labelled box — a rounded container with a small name-tag — sitting in a row of memory cells, a value blob resting inside it. A gentle sticky-note label connects a human-friendly name on top to a faint numbered address below. Warm and simple. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
+
 ## Declaring a variable
 
 The minimum recipe for a variable is:
@@ -58,6 +63,12 @@ Address      Variable          Value (decimal)
 Each box is 4 bytes. The actual addresses are not predictable across
 runs — they depend on the OS, the architecture, and security
 features like ASLR. But the **shape** is reliable.
+
+<Illustration
+  prompt={`Informative flat-vector memory diagram: two stacked 4-byte boxes labelled by small name-tags, the upper holding the value 30 and the lower holding 1995, each sitting at a numbered address shown faintly to the left. Clean, aligned, grid-like. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. Minimal text — the small numbers 30 and 1995 are acceptable.`}
+  alt="Two variables shown as labelled 4-byte boxes at consecutive memory addresses"
+  ratio="3 / 2"
+/>
 
 ## Assignment versus declaration
 
@@ -218,6 +229,12 @@ temporary — but by the time the second line runs, `a` already holds
 the new value, so you copy it back into `b` and lose the original.
 Always think *what's in each box, right now?*
 
+<Illustration
+  prompt={`Informative flat-vector illustration of swapping two variables using a temporary: three labelled boxes a, b, and tmp, with curved solid arrows showing values moving in three steps — a into tmp, then b into a, then tmp into b. Clear and choreographed, like a small dance. Arrows as solid filled shapes, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. Minimal text — single letters a, b, tmp only.`}
+  alt="Swapping two values a and b using a temporary box tmp, in three steps"
+  ratio="16 / 9"
+/>
+
 ## Why memory matters even for `int`
 
 A `int` on most systems is 4 bytes. That means it can hold values
@@ -237,6 +254,11 @@ int main(void) {
   return 0;
 }
 `}
+/>
+
+<Illustration
+  prompt={`Decorative flat-vector illustration of integer overflow: a fixed-width container of bits filled to the very top, with one extra unit tipping it past the edge so the value wraps from the far positive end back to the far negative end — shown as an odometer-style ring or a number line that loops back on itself. A subtle red accent marks the wrap point. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
 />
 
 This is a small but profound lesson: in C, **every variable has a

@@ -7,6 +7,11 @@ A program that always does the same thing isn't very interesting.
 **Conditionals** let a program look at a value and decide what to do
 next. They are the second pillar of computation, after sequence.
 
+<Illustration
+  prompt={`Decorative flat-vector hero for conditionals: a path that reaches a fork and splits into two diverging routes, with a simple diamond decision marker at the junction and small directional arrows down each branch. Conveys a program choosing between paths. Arrows as solid filled shapes, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
+
 ## The `if` statement
 
 The basic form is:
@@ -148,6 +153,12 @@ evaluated**. This lets you write safe checks like
 `if (p != NULL && p->value == 0)` — the dereference on the right
 never runs when `p` is null.
 
+<Illustration
+  prompt={`Informative flat-vector illustration of the three logical operators as simple gate-like tiles: AND (two inputs, both lit, produce a lit output), OR (either input lit produces a lit output), and NOT (a single input flipped to its opposite). Use lit-versus-dim states, green for true and red for false. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No words; tiny symbols only.`}
+  alt="The AND, OR, and NOT logical operators shown as simple gates"
+  ratio="16 / 9"
+/>
+
 ## Truth values: what counts as true?
 
 In C, anything non-zero is true. `0` is false. There is no separate
@@ -275,6 +286,11 @@ Three things to remember:
   fall-through.
 - `default` runs if none of the cases matched. It is optional but
   good practice to include one.
+
+<Illustration
+  prompt={`Decorative flat-vector illustration of a switch statement as a railway junction: a single incoming track meeting a multi-way track switch that routes a little train car onto one of several parallel sidings, with one siding set apart as the default. Clean and playful. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
 
 ## Decision tree, visualized
 

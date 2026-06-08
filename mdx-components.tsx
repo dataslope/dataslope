@@ -19,6 +19,7 @@ import MdxSqlChallengeCard from "@/app/_components/MdxSqlChallengeCard";
 import MdxSqlCodeBlock from "@/app/_components/MdxSqlCodeBlock";
 import MdxMultipleChoiceQuestion from "@/app/_components/multipleChoice/MdxMultipleChoiceQuestion";
 import { Mermaid } from "@/app/_components/mdx/mermaid";
+import { Illustration } from "@/app/_components/mdx/illustration";
 
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
@@ -29,6 +30,10 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     SqlCodeBlock: MdxSqlCodeBlock,
     MultipleChoice: MdxMultipleChoiceQuestion,
     Mermaid,
+    // Decorative / informative vector figures. Renders a prompt-bearing
+    // placeholder until a generated SVG `src` is supplied. See
+    // app/_components/mdx/illustration.tsx and docs/illustrations.md.
+    Illustration,
     // Fumadocs Steps/Step — a numbered vertical walkthrough. Registered
     // globally so lessons can drop `<Steps>…<Step>` in without an import,
     // matching the convention used by the components above.

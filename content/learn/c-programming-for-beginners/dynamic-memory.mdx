@@ -12,6 +12,11 @@ That's what the **heap** is for. The heap is a big pool of memory
 your program can grab chunks from and give back as it sees fit. The
 controls are `malloc` and `free`.
 
+<Illustration
+  prompt={`Decorative flat-vector hero for dynamic memory: a large pool or reservoir of memory from which a claw grabs a right-sized chunk on one side (malloc) and returns a chunk back into the pool on the other (free), with a few chunks floating in the pool. Conveys borrowing and returning memory at runtime. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
+
 ## Stack vs heap
 
 A running program's memory is split into a few regions:
@@ -33,6 +38,12 @@ A running program's memory is split into a few regions:
 If a value is small and short-lived, put it on the stack. If a value
 must outlive the function that created it, or must be sized at
 runtime, put it on the heap.
+
+<Illustration
+  prompt={`Informative flat-vector side-by-side comparison of stack versus heap: on the left, a neat vertical stack of function-frame plates growing and shrinking in order; on the right, a loose pool of variously sized blocks scattered in a larger reservoir. Two contrasting memory regions, each a different brand color. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  alt="The stack as orderly function frames versus the heap as a flexible pool of blocks"
+  ratio="16 / 9"
+/>
 
 ## `malloc` and `free`
 
@@ -140,6 +151,12 @@ Every `_new` call must be balanced by exactly one `_free` call.
 
 These are the classics. Every C programmer will write them at some
 point. The skill is recognizing them quickly.
+
+<Illustration
+  prompt={`Informative flat-vector illustration of the three classic memory bugs as three small vignettes in a row: a memory leak (a chunk drifting away from the program, never returned), a use-after-free (a claw grabbing a chunk already returned to the pool), and a double-free (the same chunk returned to the pool twice). Each vignette tagged with a subtle red accent. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  alt="Three memory bugs: memory leak, use-after-free, and double-free"
+  ratio="5 / 2"
+/>
 
 ### 1. Memory leak
 
@@ -348,6 +365,12 @@ void da_free(DynArr *a) {
 The doubling strategy is what `std::vector` does in C++ and what
 Python's `list` does. Allocating one element at a time would make
 every push O(n); doubling makes each push amortized O(1).
+
+<Illustration
+  prompt={`Informative flat-vector illustration of a growable buffer doubling its capacity: a left-to-right sequence of buffers, each twice as wide as the last, with filled cells carried over and fresh empty capacity added each time the previous buffer fills up. Conveys the capacity-doubling growth strategy. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No words; tiny capacity numbers optional.`}
+  alt="A dynamic array doubling its capacity as it fills"
+  ratio="5 / 2"
+/>
 
 <MultipleChoice
   markdown={`What is wrong with this code?

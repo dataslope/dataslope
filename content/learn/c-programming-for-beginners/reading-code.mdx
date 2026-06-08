@@ -11,6 +11,11 @@ you is C itself.
 
 Reading code well is a skill. Like any skill, it has a method.
 
+<Illustration
+  prompt={`Decorative flat-vector hero for reading code: an eye or magnifier gliding over a stack of code panels, with a few panels gently lifting to reveal the structure beneath, suggesting understanding code by skimming for shape first. Calm and orderly. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
+
 ## Read top-down, then top-down again
 
 The most common mistake is to start at line 1 and try to understand
@@ -35,6 +40,12 @@ This is a *recursive zoom*: stay zoomed out until forced to zoom in,
 then zoom back out. You're never trying to hold every detail in your
 head at once.
 
+<Illustration
+  prompt={`Informative flat-vector illustration of recursive-zoom reading: three nested framing levels — a whole-file overview, then a single function in focus, then a few lines in close-up — joined by soft zoom-in and zoom-out arrows, suggesting staying zoomed out until you must dive in. Arrows as solid filled shapes, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  alt="Reading code by zooming from a whole-file overview to a function to a few lines, then back out"
+  ratio="16 / 9"
+/>
+
 ## Follow the types
 
 C is a statically typed language. The type of a value tells you an
@@ -49,6 +60,11 @@ You instantly know: `head` is presumably a `Node *` (a list), and
 the result is a `Node *` (or `NULL`). Half the structure of the
 program is encoded in the types.
 
+<Illustration
+  prompt={`Decorative flat-vector illustration of following the types while reading code: a few value tokens each wearing a small colored type-badge, with soft connector lines linking matching badges across a snippet, suggesting that types reveal the program's structure. Connectors as solid filled shapes, no outline strokes. Transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  ratio="16 / 9"
+/>
+
 Tools like `ctags`, `clangd`-aware editors, and IDE "go to
 definition" let you jump from a use to the declaration. **Use
 them**. Reading C without the ability to jump to definitions is
@@ -58,6 +74,12 @@ reading C with one hand tied.
 
 C is small. The same idioms recur. Recognizing them on sight is
 half of fluent reading.
+
+<Illustration
+  prompt={`Informative flat-vector illustration of recurring code patterns as a small set of recognizable shape-cards: a loop cycle, a string scan ending in a null badge, a do-or-fail branch with a red accent, and a line-by-line read. Four tidy idiom tiles a reader learns to spot on sight. Flat vector, no outlines or strokes, transparent background, legible in both light and dark mode. Palette: blue #148CFF, green #20C621, yellow #FFDD6C, red #FF4F59. No text.`}
+  alt="Common C idioms: traversal loop, string scan, do-or-fail, and line-by-line read"
+  ratio="3 / 2"
+/>
 
 ### The traversal loop
 
