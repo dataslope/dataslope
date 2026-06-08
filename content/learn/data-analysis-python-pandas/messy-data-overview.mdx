@@ -157,8 +157,9 @@ What did you spot?
 - **Casing** ("DIEGO", "uk").
 - **Country inconsistency** (USA / U.S.A. / United States / U.S.).
 - **Date format chaos** (ISO, slash, MM/DD).
-- **An impossible date** (Feb 29, 2024 is real, but Feb 30 is
-  not — example of values that *look* fine but break).
+- **A date worth double-checking** (`2024-02-29` looks like a typo
+  but is real — 2024 is a leap year; a value like Feb 30 would be
+  the kind that *looks* fine but breaks).
 - **`spend` as strings** (because `"abc"` and `""` poison the
   type inference).
 - **`spend` outlier** (9,999,999 is probably wrong).
