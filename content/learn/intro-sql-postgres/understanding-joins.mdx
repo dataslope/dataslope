@@ -52,7 +52,7 @@ CREATE TABLE orders (
   id SERIAL PRIMARY KEY, customer_id INTEGER REFERENCES customers(id), amount NUMERIC
 );
 INSERT INTO customers (name) VALUES ('Ada'), ('Grace');
-INSERT INTO orders (customer_id, amount) VALUES (1, 42), (2, 99);`}
+INSERT INTO orders (id, customer_id, amount) VALUES (101, 1, 42), (102, 2, 99);`}
   starterCode={`SELECT
   orders.id AS order_id,
   customers.name AS customer,
@@ -83,7 +83,7 @@ CREATE TABLE orders (
   id SERIAL PRIMARY KEY, customer_id INTEGER REFERENCES customers(id), amount NUMERIC
 );
 INSERT INTO customers (name) VALUES ('Ada'), ('Grace');
-INSERT INTO orders (customer_id, amount) VALUES (1, 42), (2, 99);`}
+INSERT INTO orders (id, customer_id, amount) VALUES (101, 1, 42), (102, 2, 99);`}
   starterCode={`SELECT
   o.id AS order_id,
   c.name AS customer,
