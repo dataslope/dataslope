@@ -126,7 +126,7 @@ logs = pd.Series(
 )
 
 parsed = logs.str.extract(
-    r"(?P<date>d{4}-d{2}-d{2}) (?P<time>d{2}:d{2}:d{2}) (?P<level>w+)s+(?P<msg>.*)"
+    r"(?P<date>\\d{4}-\\d{2}-\\d{2}) (?P<time>\\d{2}:\\d{2}:\\d{2}) (?P<level>\\w+)\\s+(?P<msg>.*)"
 )
 print(parsed)
 `}
@@ -144,7 +144,7 @@ turning log files into a real DataFrame.
 s = pd.Series(["(555) 123-4567", "(555) 987-6543", "(212) 555-0100"])
 
 # Strip non-digits to get a clean phone number
-clean = s.str.replace(r"\D", "", regex=True)
+clean = s.str.replace(r"\\D", "", regex=True)
 print(clean)
 `}
 />
@@ -213,7 +213,7 @@ raw = pd.Series(
 
 clean = (
     raw.str.strip()  # outer spaces
-    .str.replace(r"s+", " ", regex=True)  # collapse internal whitespace
+    .str.replace(r"\\s+", " ", regex=True)  # collapse internal whitespace
     .str.title()  # nice casing
     .replace("", pd.NA)  # empties → missing
 )
@@ -276,7 +276,7 @@ print(clean)
 
 clean = (
     titles.str.strip()
-    .str.replace(r"s+", " ", regex=True)
+    .str.replace(r"\\s+", " ", regex=True)
     .str.title()
     .replace({"Data Scientists": "Data Scientist"})
     .replace("", pd.NA)
