@@ -38,11 +38,11 @@ The desired report:
 === Product B ===
   units sold:   12
   gross:        588.00
-  net (paid - refund): 539.00
+  net (paid - refund): 588.00
 === TOTAL ===
   units sold:   29
   gross:        927.83
-  net:          838.85
+  net:          887.85
 ```
 
 ## The architecture
@@ -267,7 +267,7 @@ public static class Pipeline
       name: "Full pipeline produces correct multi-product report",
       description: "Parse + group + summarize + total over the sample dataset",
       expect: {
-        stdoutEquals: "=== Product A ===\n  units sold:   17\n  gross:        339.83\n  net:          299.85\n=== Product B ===\n  units sold:   12\n  gross:        588.00\n  net:          539.00\n=== TOTAL ===\n  units sold:   29\n  gross:        927.83\n  net:          838.85\n",
+        stdoutEquals: "=== Product A ===\n  units sold:   17\n  gross:        339.83\n  net:          299.85\n=== Product B ===\n  units sold:   12\n  gross:        588.00\n  net:          588.00\n=== TOTAL ===\n  units sold:   29\n  gross:        927.83\n  net:          887.85\n",
       },
     },
   ]}
