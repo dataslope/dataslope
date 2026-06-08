@@ -245,8 +245,8 @@ Each step takes the previous output as input.
 
 ```mermaid
 flowchart TD
-    A[orders] --> B["filter: status === 'paid'"]
-    B --> C["map: o => o.amount"]
+    A[orders] --> B["filter: <code>status === 'paid'</code>"]
+    B --> C["map: <code>o =&gt; o.amount</code>"]
     C --> D["reduce: sum"]
     D --> E[revenue: number]
 ```

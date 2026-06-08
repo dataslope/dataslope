@@ -189,8 +189,8 @@ You can chain inner joins. Each `JOIN ... ON ...` adds another table and another
 
 ```mermaid
 flowchart LR
-    C["customers"] -->|"c.id = o.customer_id"| O["orders"]
-    O -->|"o.product_id = p.id"| P["products"]
+    C["<code>customers</code>"] -->|"c.id = o.<code>customer_id</code>"| O["<code>orders</code>"]
+    O -->|"o.<code>product_id</code> = p.id"| P["<code>products</code>"]
     P --> R["customer + product result"]
 ```
 

@@ -117,7 +117,7 @@ There are two kinds of LINQ, and the difference matters.
 ```mermaid
 flowchart TB
     subgraph LinqToObjects[LINQ to Objects]
-        Q1["<code>IEnumerable&lt;T&gt;</code>"] -->|"Func&lt;T,bool&gt;"| F1[Pipeline executes locally]
+        Q1["<code>IEnumerable&lt;T&gt;</code>"] -->|"<code>Func&lt;T,bool&gt;</code>"| F1[Pipeline executes locally]
     end
     subgraph LinqToProviders[LINQ to a provider]
         Q2["<code>IQueryable&lt;T&gt;</code>"] -->|"Expression&lt;Func&lt;T,bool&gt;&gt;"| F2[Pipeline is *translated* to SQL/HTTP/etc.]

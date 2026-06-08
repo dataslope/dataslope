@@ -134,7 +134,7 @@ grouping step.
 ```mermaid
 flowchart LR
     Cond1["Condition on a raw column<br/>(<code>status = 'paid'</code>)"] --> Where["belongs in WHERE"]
-    Cond2["Condition on an aggregate<br/>(SUM(amount) > 150)"] --> Having["belongs in HAVING"]
+    Cond2["Condition on an aggregate<br/>(<code>SUM(amount) &gt; 150</code>)"] --> Having["belongs in HAVING"]
 ```
 
 ## A quick decision rule

@@ -187,9 +187,9 @@ Git turns "I overwrote yesterday's file" from a tragedy into
 
 ```mermaid
 flowchart TD
-  edit["Edit files"] --> stage["git add ."]
-  stage --> commit["git commit -m 'why'"]
-  commit --> push["git push"]
+  edit["Edit files"] --> stage["<code>git add .</code>"]
+  stage --> commit["<code>git commit -m 'why'</code>"]
+  commit --> push["<code>git push</code>"]
   push --> remote[("Remote repo / backup")]
 ```
 

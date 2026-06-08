@@ -38,7 +38,7 @@ business into a rule the database can enforce.
 
 ```mermaid
 flowchart TB
-    B["Business rule<br/>A product price cannot be negative"] --> S["Schema rule<br/>CHECK (price >= 0)"]
+    B["Business rule<br/>A product price cannot be negative"] --> S["Schema rule<br/>CHECK (<code>price &gt;= 0</code>)"]
     S --> E["Every insert and update<br/>must obey it"]
 ```
 

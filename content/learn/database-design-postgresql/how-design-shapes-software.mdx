@@ -23,10 +23,10 @@ schema choices become the foundation every feature stands on.
 flowchart TB
     A["Feature:<br/>customer order history"] --> B["Application query"]
     B --> C["Schema contract"]
-    C --> D["customers"]
-    C --> E["orders"]
+    C --> D["<code>customers</code>"]
+    C --> E["<code>orders</code>"]
     C --> F["<code>order_items</code>"]
-    C --> G["products"]
+    C --> G["<code>products</code>"]
     D --> H["Reliable result"]
     E --> H
     F --> H
@@ -44,7 +44,7 @@ creates data that must obey the schema.
 
 ```mermaid
 flowchart LR
-    A["Application code"] -->|"INSERT, UPDATE, SELECT"| B["Database schema"]
+    A["Application code"] -->|"<code>INSERT, UPDATE, SELECT</code>"| B["Database schema"]
     B -->|"columns, keys, constraints"| A
     B --> C["Stored data"]
     C -->|"query results"| A

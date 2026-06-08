@@ -61,7 +61,7 @@ Visually:
 
 ```mermaid
 flowchart TD
-    A[Start] --> B{age >= 18?}
+    A[Start] --> B{"<code>age &gt;= 18</code>?"}
     B -- yes --> C["Print 'can vote'"]
     B -- no  --> D["Print 'cannot vote yet'"]
     C --> E[Done]
@@ -106,15 +106,15 @@ condition) catches everything left over.
 
 ```mermaid
 flowchart TD
-    A[Start] --> B{score >= 90?}
-    B -- yes --> R1[return 'A']
-    B -- no  --> C{score >= 80?}
-    C -- yes --> R2[return 'B']
-    C -- no  --> D{score >= 70?}
-    D -- yes --> R3[return 'C']
-    D -- no  --> E{score >= 60?}
-    E -- yes --> R4[return 'D']
-    E -- no  --> R5[return 'F']
+    A[Start] --> B{"<code>score &gt;= 90</code>?"}
+    B -- yes --> R1["<code>return 'A'</code>"]
+    B -- no  --> C{"<code>score &gt;= 80</code>?"}
+    C -- yes --> R2["<code>return 'B'</code>"]
+    C -- no  --> D{"<code>score &gt;= 70</code>?"}
+    D -- yes --> R3["<code>return 'C'</code>"]
+    D -- no  --> E{"<code>score &gt;= 60</code>?"}
+    E -- yes --> R4["<code>return 'D'</code>"]
+    E -- no  --> R5["<code>return 'F'</code>"]
 ```
 
 **Order matters.** If you wrote the conditions starting from

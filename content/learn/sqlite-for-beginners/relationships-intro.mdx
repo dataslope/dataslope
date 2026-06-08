@@ -25,7 +25,7 @@ flowchart LR
     BAD["Repeated customer details<br/>inside order rows"] --> GOOD["Separate tables"]
     GOOD --> C["customers<br/>customer details once"]
     GOOD --> O["orders<br/>order facts only"]
-    O -->|"customer_id points to id"| C
+    O -->|"<code>customer_id</code> points to id"| C
 ```
 
 ## Tables connect through keys
@@ -156,8 +156,8 @@ The helper table stores the pairs: which student is in which course.
 
 ```mermaid
 flowchart TB
-    S["students"] --> E["enrollments<br/><code>student_id</code> plus <code>course_id</code>"]
-    C["courses"] --> E
+    S["<code>students</code>"] --> E["enrollments<br/><code>student_id</code> plus <code>course_id</code>"]
+    C["<code>courses</code>"] --> E
     E --> PAIR["One row means<br/>one student-course pairing"]
 ```
 

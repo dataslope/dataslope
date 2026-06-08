@@ -13,9 +13,9 @@ An `INSERT` statement names the table, names the columns you are filling, and su
 
 ```mermaid
 flowchart LR
-    A["INSERT INTO"] --> B["which table"]
+    A["<code>INSERT INTO</code>"] --> B["which table"]
     B --> C["which columns"]
-    C --> D["VALUES"]
+    C --> D["<code>VALUES</code>"]
     D --> E["new row data"]
 ```
 
@@ -75,7 +75,7 @@ The insert only gave `title`. SQLite supplied `id`, and `DEFAULT 0` supplied `do
 
 ```mermaid
 flowchart LR
-    V["VALUES<br/>'Water plants'"] --> T["tasks table"]
+    V["<code>VALUES<br/>'Water plants'</code>"] --> T["tasks table"]
     T --> R["id assigned<br/>done defaults to 0"]
 ```
 
@@ -126,7 +126,7 @@ Each parenthesized group becomes one new row.
 
 ```mermaid
 flowchart TB
-    I["INSERT INTO tasks"] --> R1["row 1<br/>Buy milk, 0"]
+    I["<code>INSERT INTO tasks</code>"] --> R1["row 1<br/>Buy milk, 0"]
     I --> R2["row 2<br/>Walk the dog, 1"]
     I --> R3["row 3<br/>Call dentist, 0"]
     R1 --> T["tasks table"]

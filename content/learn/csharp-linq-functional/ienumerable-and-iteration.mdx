@@ -49,8 +49,8 @@ arrays, files, network streams, and infinite sequences.
 
 ```mermaid
 flowchart TD
-    A["<code>IEnumerable&lt;T&gt;</code>"] -->|GetEnumerator| B["<code>IEnumerator&lt;T&gt;</code>"]
-    B -->|MoveNext| C{has next?}
+    A["<code>IEnumerable&lt;T&gt;</code>"] -->|"<code>GetEnumerator</code>"| B["<code>IEnumerator&lt;T&gt;</code>"]
+    B -->|"<code>MoveNext</code>"| C{has next?}
     C -->|yes| D[Current → consumer]
     D --> B
     C -->|no| E[done]

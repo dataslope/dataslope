@@ -87,11 +87,11 @@ numbers, opposite story.
 ```mermaid
 flowchart LR
   subgraph WITHIN["Within each group"]
-    W1["Women > Men<br/>in Dept Easy"]
-    W2["Women > Men<br/>in Dept Hard"]
+    W1["<code>Women &gt; Men</code><br/>in Dept Easy"]
+    W2["<code>Women &gt; Men</code><br/>in Dept Hard"]
   end
   subgraph POOLED["Pooled together"]
-    P1["Men > Women<br/>overall (!)"]
+    P1["<code>Men &gt; Women</code><br/>overall (!)"]
   end
   WITHIN -->|"ignore the lurking<br/>variable (department)"| POOLED
 ```

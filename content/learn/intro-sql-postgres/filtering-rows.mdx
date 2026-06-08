@@ -15,7 +15,7 @@ the test comes out **true**.
 
 ```mermaid
 flowchart LR
-    A["All rows"] --> T{"WHERE<br/>condition true?"}
+    A["All rows"] --> T{"<code>WHERE</code><br/>condition true?"}
     T -->|"true"| K["Kept in result"]
     T -->|"false"| D["Dropped"]
 ```
@@ -154,8 +154,8 @@ surviving rows.
 
 ```mermaid
 flowchart LR
-    T[("table")] --> W["WHERE<br/>keep matching rows"]
-    W --> S["SELECT<br/>pick columns"]
+    T[("table")] --> W["<code>WHERE</code><br/>keep matching rows"]
+    W --> S["<code>SELECT</code><br/>pick columns"]
     S --> R["Result"]
 ```
 

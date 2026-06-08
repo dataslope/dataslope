@@ -59,7 +59,7 @@ one of the small ergonomics that make DuckDB pleasant for fast analysis.
 
 ```mermaid
 flowchart LR
-    S["SELECT region, product,<br/>channel, SUM(amount)"] --> A["GROUP BY ALL"]
+    S["<code>SELECT region, product,<br/>channel, SUM(amount)</code>"] --> A["<code>GROUP BY ALL</code>"]
     A --> G["Groups by the three<br/>non-aggregated columns"]
 ```
 

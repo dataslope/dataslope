@@ -61,7 +61,7 @@ A SQL statement is one complete instruction. We end statements with a semicolon 
 
 ```mermaid
 flowchart TB
-    A["SELECT"] --> B["what you want back"]
+    A["<code>SELECT</code>"] --> B["what you want back"]
     B --> C["AS <code>optional_name</code>"]
     C --> D["semicolon<br/>end of statement"]
 ```
@@ -111,7 +111,7 @@ Read the final query like a sentence: *select the `name` and `species` columns f
 
 ```mermaid
 flowchart LR
-    Q["SELECT name, species<br/>FROM pets;"] --> T["pets table"]
+    Q["<code>SELECT name, species<br/>FROM pets;</code>"] --> T["pets table"]
     T --> R["name column<br/>species column"]
 ```
 

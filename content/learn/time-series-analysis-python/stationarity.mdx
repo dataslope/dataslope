@@ -274,8 +274,8 @@ statistics, never instead of them:
 ```mermaid
 flowchart TD
     A["Raw series"] --> B{"Constant mean,<br/>variance, and<br/>autocorrelation?"}
-    B -->|"yes (ADF p < 0.05)"| C["Stationary: ready to model"]
-    B -->|"no (ADF p >= 0.05)"| D["Non-stationary"]
+    B -->|"yes (ADF <code>p &lt; 0.05</code>)"| C["Stationary: ready to model"]
+    B -->|"no (ADF <code>p &gt;= 0.05</code>)"| D["Non-stationary"]
     D --> E["Stabilize variance with a log"]
     D --> F["Remove trend/season by differencing"]
     E --> G["Re-test with ADF"]

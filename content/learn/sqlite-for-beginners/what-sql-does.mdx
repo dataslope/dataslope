@@ -83,9 +83,9 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    A["What you write"] --> B["SELECT name"]
-    A --> C["FROM products"]
-    A --> D["WHERE price < 20"]
+    A["What you write"] --> B["<code>SELECT name</code>"]
+    A --> C["<code>FROM products</code>"]
+    A --> D["<code>WHERE price &lt; 20</code>"]
     B --> E["What you want"]
     C --> E
     D --> E
@@ -120,10 +120,10 @@ These match the basic things applications do with stored information.
 ```mermaid
 flowchart TB
     A["Application request"] --> B{"What kind of job?"}
-    B --> C["SELECT<br/>read"]
-    B --> D["INSERT<br/>add"]
-    B --> E["UPDATE<br/>change"]
-    B --> F["DELETE<br/>remove"]
+    B --> C["<code>SELECT</code><br/>read"]
+    B --> D["<code>INSERT</code><br/>add"]
+    B --> E["<code>UPDATE</code><br/>change"]
+    B --> F["<code>DELETE</code><br/>remove"]
 ```
 
 ```mermaid

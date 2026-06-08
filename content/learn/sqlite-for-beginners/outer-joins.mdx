@@ -114,9 +114,9 @@ A `LEFT JOIN` plus `WHERE right_table.id IS NULL` is the classic pattern for "sh
 
 ```mermaid
 flowchart TB
-    A["LEFT JOIN<br/>keep all customers"] --> B["matched customers<br/>order id present"]
+    A["<code>LEFT JOIN</code><br/>keep all customers"] --> B["matched customers<br/>order id present"]
     A --> C["unmatched customers<br/>order id is NULL"]
-    C -->|"WHERE o.id IS NULL"| D["customers with no orders"]
+    C -->|"<code>WHERE o.id IS NULL</code>"| D["customers with no orders"]
     B -->|"filtered out"| X["not returned"]
 ```
 
@@ -205,9 +205,9 @@ For beginners, `LEFT JOIN` is the most important outer join. Recent SQLite versi
 
 ```mermaid
 flowchart LR
-    I["INNER JOIN<br/>only matches"] --- L["LEFT JOIN<br/>all left rows"]
-    L --- R["RIGHT JOIN<br/>all right rows"]
-    R --- F["FULL OUTER JOIN<br/>all rows from both sides"]
+    I["<code>INNER JOIN</code><br/>only matches"] --- L["<code>LEFT JOIN</code><br/>all left rows"]
+    L --- R["<code>RIGHT JOIN</code><br/>all right rows"]
+    R --- F["<code>FULL OUTER JOIN</code><br/>all rows from both sides"]
 ```
 
 <Callout type="info" title="How to choose">

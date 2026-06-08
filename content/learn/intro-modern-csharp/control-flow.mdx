@@ -211,7 +211,7 @@ A `for` loop has three parts in its header:
 ```mermaid
 flowchart TB
     S([Start]) --> Init["<code>i = 0</code>"]
-    Init --> Cond{i < 5?}
+    Init --> Cond{"<code>i &lt; 5</code>?"}
     Cond -- no --> End([End])
     Cond -- yes --> Body["run body"]
     Body --> Inc["i++"]

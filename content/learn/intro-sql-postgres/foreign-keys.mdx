@@ -109,11 +109,11 @@ appears:
 
 ```mermaid
 flowchart TB
-    subgraph customers["customers"]
+    subgraph customers["<code>customers</code>"]
         C1["<code>id = 1</code> (PK)<br/>name = Ada"]
         C2["<code>id = 2</code> (PK)<br/>name = Grace"]
     end
-    subgraph orders["orders"]
+    subgraph orders["<code>orders</code>"]
         O1["id = 101<br/><code>customer_id</code> = 1 (FK)"]
         O2["id = 102<br/><code>customer_id</code> = 1 (FK)"]
         O3["id = 103<br/><code>customer_id</code> = 2 (FK)"]

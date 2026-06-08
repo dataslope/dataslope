@@ -60,8 +60,8 @@ std::unique_ptr<Widget> c = std::move(a);   // OK: ownership transferred
 
 ```mermaid
 flowchart LR
-    Before["a -> Widget<br/>b = nullptr"]
-    After["a = nullptr<br/>c -> Widget"]
+    Before["<code>a -&gt; Widget</code><br/><code>b = nullptr</code>"]
+    After["<code>a = nullptr</code><br/><code>c -&gt; Widget</code>"]
     Before -- std::move --> After
 ```
 

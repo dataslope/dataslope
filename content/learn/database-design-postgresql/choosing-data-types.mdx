@@ -196,7 +196,7 @@ Types are broad constraints. Other constraints narrow the rule.
 
 ```mermaid
 flowchart LR
-    Broad["NUMERIC<br/>any exact number"] --> Narrow["CHECK (price >= 0)<br/>valid price"]
+    Broad["NUMERIC<br/>any exact number"] --> Narrow["CHECK (<code>price &gt;= 0</code>)<br/>valid price"]
     Narrow --> Required["NOT NULL<br/>required valid price"]
 ```
 

@@ -116,9 +116,9 @@ Two subtleties that quietly trip up analysts:
 
 ```mermaid
 flowchart LR
-    R[("Rows")] --> O["ORDER BY amount DESC,<br/>id ASC (tiebreaker)"]
+    R[("Rows")] --> O["<code>ORDER BY amount DESC,<br/>id ASC (tiebreaker)</code>"]
     O --> S["Stable, reproducible<br/>ordering"]
-    S --> L["LIMIT N"]
+    S --> L["<code>LIMIT N</code>"]
 ```
 
 ## Per-group top-N with `QUALIFY`

@@ -368,7 +368,7 @@ honest.
 
 ```mermaid
 flowchart TD
-  A["You have a p-value"] --> B{"p <= alpha?"}
+  A["You have a p-value"] --> B{"<code>p &lt;= alpha</code>?"}
   B -->|"yes"| C["Reject H0:<br/>data is surprising under H0"]
   B -->|"no"| D["Fail to reject H0:<br/>data is compatible with H0"]
   C --> E["Now ask: how BIG is the effect?<br/>(effect size + confidence interval)"]

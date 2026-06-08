@@ -209,10 +209,10 @@ language (SQL, BSON, an HTTP query).
 
 ```mermaid
 flowchart LR
-    L["x => x.Age > 30"] -->|"compiled as Func"| D[Delegate: callable in C#]
+    L["<code>x =&gt; x.Age &gt; 30</code>"] -->|"compiled as Func"| D[Delegate: callable in C#]
     L -->|"compiled as Expression"| T[Tree of nodes: translatable]
-    T --> S["SELECT * FROM ... WHERE Age > 30"]
-    T --> M["{ Age: <code>{ $gt: 30 }</code> }"]
+    T --> S["<code>SELECT * FROM ... WHERE Age &gt; 30</code>"]
+    T --> M["<code>{ Age: { $gt: 30 } }</code>"]
 ```
 
 We're not going to write a LINQ provider in this course, but it is

@@ -127,8 +127,8 @@ The primary key is the pair `(student_id, course_id)`. That means the same stude
 
 ```mermaid
 flowchart LR
-    S["students"] -->|"student_id"| E["enrollments<br/>one row per link"]
-    E -->|"course_id"| C["courses"]
+    S["<code>students</code>"] -->|"<code>student_id</code>"| E["enrollments<br/>one row per link"]
+    E -->|"<code>course_id</code>"| C["<code>courses</code>"]
 ```
 
 ## Join across the bridge
@@ -169,8 +169,8 @@ ORDER BY
 
 ```mermaid
 flowchart TB
-    E1["enrollment<br/><code>student_id</code> 1<br/><code>course_id</code> 10"] -->|"student_id = id"| S1["Ada"]
-    E1 -->|"course_id = id"| C1["Math"]
+    E1["enrollment<br/><code>student_id</code> 1<br/><code>course_id</code> 10"] -->|"<code>student_id</code> = id"| S1["Ada"]
+    E1 -->|"<code>course_id</code> = id"| C1["Math"]
     S1 --> R["Ada takes Math"]
     C1 --> R
 ```

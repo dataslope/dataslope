@@ -150,9 +150,9 @@ flowchart LR
     Parent["Parent row<br/><code>customers.id = 1</code>"] --> ChildA["Child row<br/>order 101"]
     Parent --> ChildB["Child row<br/>order 102"]
     Parent --> ChildC["Child row<br/>order 103"]
-    ChildA -->|"stores customer_id"| Parent
-    ChildB -->|"stores customer_id"| Parent
-    ChildC -->|"stores customer_id"| Parent
+    ChildA -->|"stores <code>customer_id</code>"| Parent
+    ChildB -->|"stores <code>customer_id</code>"| Parent
+    ChildC -->|"stores <code>customer_id</code>"| Parent
 ```
 
 The parent can exist without children: a new customer may not have

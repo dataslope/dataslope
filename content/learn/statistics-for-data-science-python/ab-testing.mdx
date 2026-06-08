@@ -267,7 +267,7 @@ significance-vs-importance distinction from *Effect Sizes*.
 
 ```mermaid
 flowchart TD
-  A["Test result"] --> B{"Significant?<br/>(p <= alpha, CI excludes 0)"}
+  A["Test result"] --> B{"Significant?<br/>(<code>p &lt;= alpha</code>, CI excludes 0)"}
   B -->|"no"| C["Don't ship on this evidence<br/>(maybe underpowered -<br/>was n big enough?)"]
   B -->|"yes"| D{"Is the lift big enough<br/>to matter in practice?"}
   D -->|"no, trivial"| E["Don't ship<br/>(real but not worth it)"]

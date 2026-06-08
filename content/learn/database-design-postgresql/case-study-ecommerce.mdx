@@ -43,11 +43,11 @@ The core entities are `customers`, `products`, `categories`, and
 
 ```mermaid
 flowchart LR
-    Customers["customers"] --> Orders["orders"]
+    Customers["<code>customers</code>"] --> Orders["<code>orders</code>"]
     Orders --> Items["<code>order_items</code>"]
-    Products["products"] --> Items
+    Products["<code>products</code>"] --> Items
     Products --> ProductCategories["<code>product_categories</code>"]
-    Categories["categories"] --> ProductCategories
+    Categories["<code>categories</code>"] --> ProductCategories
 ```
 
 <MultipleChoice

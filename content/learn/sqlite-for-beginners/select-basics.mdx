@@ -18,7 +18,7 @@ names the table that holds them.
 
 ```mermaid
 flowchart LR
-    T[("books table<br/>stored data")] --> C["SELECT title, author<br/>choose columns"]
+    T[("books table<br/>stored data")] --> C["<code>SELECT title, author</code><br/>choose columns"]
     C --> R["result table<br/>title + author"]
     T -.-> T
 ```
@@ -122,7 +122,7 @@ of the result you receive.
 
 ```mermaid
 flowchart TB
-    A["stored row<br/>id, title, author, genre, price"] --> B["SELECT price, title, genre"]
+    A["stored row<br/>id, title, author, genre, price"] --> B["<code>SELECT price, title, genre</code>"]
     B --> C["result row<br/>price, title, genre"]
 ```
 

@@ -17,7 +17,7 @@ group** instead of once for the whole table.
 
 ```mermaid
 flowchart TB
-    All["All employees"] --> G{"GROUP BY dept"}
+    All["All employees"] --> G{"<code>GROUP BY dept</code>"}
     G --> E["Engineering<br/>group"]
     G --> S["Sales<br/>group"]
     G --> M["Marketing<br/>group"]
@@ -148,7 +148,7 @@ ORDER BY
 
 ```mermaid
 flowchart LR
-    T[("rows")] --> W["WHERE<br/>drop interns"] --> G["GROUP BY dept<br/>form groups"] --> A["AVG per group"]
+    T[("rows")] --> W["<code>WHERE</code><br/>drop interns"] --> G["<code>GROUP BY dept</code><br/>form groups"] --> A["AVG per group"]
 ```
 
 `WHERE` thins the rows first; *then* the survivors are grouped and
