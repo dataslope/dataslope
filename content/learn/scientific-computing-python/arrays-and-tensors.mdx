@@ -315,7 +315,7 @@ def weighted_centroid(points, weights):
 points = np.array([[0.0, 0.0], [2.0, 0.0], [0.0, 4.0]])
 weights = np.array([1.0, 1.0, 2.0])
 print("centroid =", weighted_centroid(points, weights))
-# Expected: (2*0 + 1*2 + 1*0)/4, (1*0 + 1*0 + 2*4)/4 = (0.5, 2.0)
+# Expected: (1*0 + 1*2 + 2*0)/4, (1*0 + 1*0 + 2*4)/4 = (0.5, 2.0)
 `}
   solutionCode={`import numpy as np
 

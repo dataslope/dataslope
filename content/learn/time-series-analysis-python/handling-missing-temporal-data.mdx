@@ -215,7 +215,7 @@ print("Sunday is missing because the shop was CLOSED:")
 print(sales)
 print()
 
-wrong = sales.interpolate(method="linear")  # invents ~330 phantom Sunday sales
+wrong = sales.interpolate(method="linear")  # holds Saturday's 300 as phantom Sunday sales
 right = sales.fillna(0)  # closed means zero
 
 print(f"Interpolation invents Sunday sales of ~{wrong.iloc[-1]:.0f} (PHANTOM revenue).")
