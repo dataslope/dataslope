@@ -267,8 +267,9 @@ print("Top 5 WITHOUT stopwords:", FreqDist(content).most_common(5))
 `}
 />
 
-With stopwords, the top words are "the", "a", "that" — useless for guessing
-the topic. Without them, "text", "words", "search", "user", and "engine" rise
+With stopwords, the most frequent word is "the" (7 times), with "a" close
+behind — function words useless for guessing the topic. Without them, "text",
+"words", "search", "user", and "engine" rise
 to the top — and you can immediately tell this passage is about search. This
 is *why* keyword extraction almost always removes stopwords first, and it is a
 concrete payoff of the choice you studied two pages ago.

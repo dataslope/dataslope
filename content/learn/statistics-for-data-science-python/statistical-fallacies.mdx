@@ -447,10 +447,10 @@ Produce two variables:
 Conversion rate = \`conversions / visitors\`. A paradox exists when \`agg_winner != within_winner\`.`}
   initCode={`import pandas as pd
 df = pd.DataFrame([
-    ["mobile",  "A",  900, 270],   # 30.0%
-    ["mobile",  "B",  100,  33],   # 33.0%  (B higher)
-    ["desktop", "A",  100,  70],   # 70.0%
-    ["desktop", "B",  900, 657],   # 73.0%  (B higher)
+    ["mobile",  "A",  100,  30],   # 30.0%
+    ["mobile",  "B",  900, 297],   # 33.0%  (B higher)
+    ["desktop", "A",  900, 630],   # 70.0%
+    ["desktop", "B",  100,  73],   # 73.0%  (B higher)
 ], columns=["device", "group", "visitors", "conversions"])`}
   starterCode={`import pandas as pd
 

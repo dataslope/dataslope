@@ -224,7 +224,7 @@ import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
 
-def rhs(t, z, r=1.0, K=200.0, a=0.015, e=0.1, m=0.4):
+def rhs(t, z, r=1.0, K=200.0, a=0.03, e=0.1, m=0.4):
     x, y = z
     return [r * x * (1 - x / K) - a * x * y, e * a * x * y - m * y]
 
@@ -238,8 +238,8 @@ for x0 in [20, 60, 120, 180]:
     ax.plot(x, y, lw=0.7, label=f"x₀ = {x0}")
 
 # Equilibrium point
-x_eq = 0.4 / (0.1 * 0.015)
-y_eq = 1.0 * (1 - x_eq / 200) / 0.015
+x_eq = 0.4 / (0.1 * 0.03)
+y_eq = 1.0 * (1 - x_eq / 200) / 0.03
 ax.plot(x_eq, y_eq, "k*", ms=14, label="equilibrium")
 
 ax.set_xlabel("prey x")

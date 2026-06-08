@@ -172,7 +172,10 @@ ways to span multiple lines:
 <CodeBlock
   adapter="python"
   starterCode={`# Preferred: implicit continuation inside parentheses.
-total = 1 + 2 + 3 + 4 + 5 + 6
+total = (
+    1 + 2 + 3
+    + 4 + 5 + 6
+)
 
 print("Total:", total)
 `}
@@ -181,7 +184,8 @@ print("Total:", total)
 <CodeBlock
   adapter="python"
   starterCode={`# Works but ugly: explicit backslash continuation.
-total2 = 1 + 2 + 3 + 4 + 5 + 6
+total2 = 1 + 2 + 3 \\
+    + 4 + 5 + 6
 
 print("Total2:", total2)
 `}
@@ -287,14 +291,17 @@ print(average([1, 2, 3, 4]))
 
 Do not change the function's behavior, just improve its style.`}
   starterCode={`def long_sum(a, b, c, d, e):
-    result = a + b + c + d + e
+    result = a + b + c + d \\
+        + e
     return result
 
 
 print(long_sum(1, 2, 3, 4, 5))
 `}
   solutionCode={`def long_sum(a, b, c, d, e):
-    result = a + b + c + d + e
+    result = (
+        a + b + c + d + e
+    )
     return result
 
 

@@ -307,8 +307,8 @@ provided.
 **Expected output**
 
 \`\`\`
-u3 -> linus@example.com
-u2 -> ada@example.com
+u3 -> ada@example.com
+u2 -> grace@example.com
 u1 -> none
 ux -> none
 \`\`\``}
@@ -402,7 +402,7 @@ export function emailOfManagerOf(id: string): Option<string> {
       id: "manager-email",
       name: "Chained Option lookups",
       description: "Compose findUser/managerOf/findUser/emailOf via flatMap.",
-      expect: { stdoutEquals: "u3 -> linus@example.com\nu2 -> ada@example.com\nu1 -> none\nux -> none" },
+      expect: { stdoutEquals: "u3 -> ada@example.com\nu2 -> grace@example.com\nu1 -> none\nux -> none" },
     },
   ]}
 />

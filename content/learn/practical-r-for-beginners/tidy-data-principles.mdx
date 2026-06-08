@@ -107,11 +107,11 @@ written two ways:
 tidy <- data.frame(
   city = c("NYC", "NYC", "LA", "LA"),
   year = c(2022, 2023, 2022, 2023),
-  pop  = c(8.3, 8.4, 3.9, 3.9)
+  population = c(8.3, 8.4, 3.9, 3.9)
 )
 
 # Computing per-city average is trivial
-aggregate(pop ~ city, data = tidy, FUN = mean)
+aggregate(population ~ city, data = tidy, FUN = mean)
 `}
 />
 
@@ -131,7 +131,7 @@ wide
 />
 
 Both produce the right answer. But the tidy version uses a
-*general* operation (`aggregate(pop ~ city)`) that scales to any
+*general* operation (`aggregate(population ~ city)`) that scales to any
 number of years; the wide version requires explicitly enumerating
 the year columns. Add a `y2024` column, and the wide solution
 breaks; the tidy solution does not.
@@ -174,12 +174,12 @@ data is tidy.
 Want a line chart of population over time, colored by city?
 
 ```r
-ggplot(tidy, aes(x = year, y = pop, color = city)) +
+ggplot(tidy, aes(x = year, y = population, color = city)) +
   geom_line()
 ```
 
-That single expression works because `year` is a column, `pop`
-is a column, and `city` is a column. Try doing the same with the
+That single expression works because `year` is a column,
+`population` is a column, and `city` is a column. Try doing the same with the
 wide form — you can't, without reshaping first.
 
 ## Two acid tests
