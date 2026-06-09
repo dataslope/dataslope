@@ -323,16 +323,32 @@ def _pg_reset_user_globals():
         except KeyError:
             pass
 
-# Snapshot taken *after* _pg_reset_user_globals is defined so that
-# both _PG_PROTECTED_NAMES and _pg_reset_user_globals are included.
+def _pg_evict_staged_modules():
+    """Drop modules imported from the staged workspace root so a re-run
+    re-reads edited helper files instead of the copy cached in
+    sys.modules. The per-run global reset above leaves the import cache
+    intact, so a multi-file challenge that edits a helper module between
+    runs (e.g. fixing utils.py after a failed attempt) would otherwise
+    keep executing the stale module. The root literal mirrors
+    STAGED_ROOT in pyodide-worker.ts."""
+    import sys, importlib
+    _root = "/home/pyodide/"
+    for _n in [n for n, m in list(sys.modules.items())
+               if getattr(m, "__file__", None) and m.__file__.startswith(_root)]:
+        sys.modules.pop(_n, None)
+    importlib.invalidate_caches()
+
+# Snapshot taken *after* the helpers above are defined so that
+# _PG_PROTECTED_NAMES and the reset/evict helpers are all included.
 _PG_PROTECTED_NAMES = set(globals().keys()) | {
     "__name__", "__doc__", "__package__", "__loader__", "__spec__",
     "__builtins__", "__file__", "__cached__",
     "_user_code_str", "_complete_line", "_complete_column",
-    # Explicitly guard the set and the reset helper themselves —
+    # Explicitly guard the set and the helpers themselves —
     # set(globals().keys()) above already captures them, but listing them
     # here makes the intent obvious and guards against future reordering.
     "_PG_PROTECTED_NAMES", "_pg_reset_user_globals",
+    "_pg_evict_staged_modules",
 }
 `);
 
@@ -558,6 +574,17 @@ async function prepareFs(files: Array<[string, Uint8Array]>): Promise<void> {
   }
   stagedPaths.clear();
   for (const p of nextPaths) stagedPaths.add(p);
+
+  // The files just changed on disk, but Pyodide may still hold a previous
+  // import of one of them in `sys.modules` (the per-run global reset does
+  // not touch the import cache). Evict staged-origin modules and invalidate
+  // the finder caches so the next run imports the freshly-written source
+  // instead of a stale module — see _pg_evict_staged_modules in initPyodide.
+  try {
+    await pyodide.runPythonAsync("_pg_evict_staged_modules()");
+  } catch {
+    /* best-effort — a stale import cache shouldn't abort staging */
+  }
 }
 
 interface PyodideFS {
