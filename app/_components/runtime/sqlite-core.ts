@@ -141,6 +141,11 @@ export interface TableRebuildSpec {
 }
 
 export interface SqliteEngine {
+  /** Release the engine's resources. Implemented by the worker-backed
+   *  engine (terminates the worker, which closes its OPFS access handles);
+   *  the in-process engine used by /learn code blocks has no out-of-band
+   *  resources, so the method is optional. */
+  dispose?: () => void;
   /** Replace the active in-memory database with a fresh build of the
    *  given sample. Returns the active sample for convenience. */
   loadSampleDatabase: (id: string) => Promise<SqliteSampleMetadata>;
@@ -626,8 +631,10 @@ export async function createSqliteEngineInProcess(
   initialSampleId: string,
   openOptions: SqliteEngineOpenOptions = {},
 ): Promise<{
-  [K in keyof SqliteEngine]: Awaited<ReturnType<SqliteEngine[K]>> extends infer R
-    ? (...args: Parameters<SqliteEngine[K]>) => R
+  [K in keyof SqliteEngine]: Awaited<
+    ReturnType<NonNullable<SqliteEngine[K]>>
+  > extends infer R
+    ? (...args: Parameters<NonNullable<SqliteEngine[K]>>) => R
     : never;
 }> {
   const sqlite3 = await loadSqlite3();

@@ -302,6 +302,61 @@ export function parseDuckDbEnumValues(
   return values.length > 0 ? values : null;
 }
 
+/** Map an Arrow result-field type string to the DuckDB SQL type name a SQL
+ *  IDE would show. Without this, the raw Arrow `toString()` notation leaks
+ *  into the result header: `Decimal[38e+2]` instead of `DECIMAL(38,2)`,
+ *  `Int64` instead of `BIGINT`, `Utf8` instead of `VARCHAR`, `Dictionary<…>`
+ *  instead of `ENUM`. Unknown notations pass through unchanged so new Arrow
+ *  types degrade to their raw name rather than an empty label. */
+export function arrowTypeToSqlName(arrowType: string): string {
+  const t = arrowType.trim();
+  const lower = t.toLowerCase();
+  const scalar: Record<string, string> = {
+    int8: "TINYINT",
+    int16: "SMALLINT",
+    int32: "INTEGER",
+    int64: "BIGINT",
+    uint8: "UTINYINT",
+    uint16: "USMALLINT",
+    uint32: "UINTEGER",
+    uint64: "UBIGINT",
+    float16: "FLOAT",
+    float32: "FLOAT",
+    float64: "DOUBLE",
+    utf8: "VARCHAR",
+    largeutf8: "VARCHAR",
+    bool: "BOOLEAN",
+    binary: "BLOB",
+    largebinary: "BLOB",
+  };
+  if (scalar[lower]) return scalar[lower];
+  // List<Int32> / FixedSizeList[4]<Int32> → INTEGER[]
+  let m =
+    lower.match(/^(?:large)?list<(.+)>$/) ??
+    lower.match(/^fixedsizelist\[\d+\]<(.+)>$/);
+  if (m) return `${arrowTypeToSqlName(m[1])}[]`;
+  // Decimal[38e+2] → DECIMAL(38,2); the exponent part is the scale.
+  m = lower.match(/^decimal\[(\d+)e([+-]?\d+)\]/);
+  if (m) return `DECIMAL(${m[1]},${Number(m[2])})`;
+  // Timestamp<MICROSECOND> → TIMESTAMP; a trailing ", <tz>" marks TIMESTAMPTZ.
+  if (lower.startsWith("timestamp")) {
+    return lower.includes(",")
+      ? "TIMESTAMP WITH TIME ZONE"
+      : "TIMESTAMP";
+  }
+  if (lower.startsWith("date")) return "DATE";
+  if (lower.startsWith("time")) return "TIME";
+  if (lower.startsWith("interval") || lower.startsWith("duration")) {
+    return "INTERVAL";
+  }
+  if (lower.startsWith("fixedsizebinary")) return "BLOB";
+  // DuckDB ENUM columns arrive as an Arrow dictionary of their labels.
+  if (lower.startsWith("dictionary<")) return "ENUM";
+  if (lower.startsWith("struct")) return "STRUCT";
+  if (lower.startsWith("map<")) return "MAP";
+  return t;
+}
+
 function arrowToQueryExecResult(
   table: DuckDbArrowTable,
 ): (QueryExecResult & { columnTypes?: string[] }) | null {
@@ -310,7 +365,7 @@ function arrowToQueryExecResult(
   const columns = fields.map((f) => f.name);
   const columnTypes = fields.map((f) => {
     try {
-      return String(f.type);
+      return arrowTypeToSqlName(String(f.type));
     } catch {
       return "";
     }

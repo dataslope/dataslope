@@ -2,7 +2,8 @@ import type { ReactNode } from "react";
 
 export const metadata = {
   title: "PostgreSQL Playground",
-  description: "Mock PostgreSQL playground shell for future browser-based query execution.",
+  description:
+    "Browser-based PostgreSQL playground powered by PGlite — run real Postgres queries against sample databases entirely in your browser.",
 };
 
 export default function PostgresLayout({ children }: { children: ReactNode }) {

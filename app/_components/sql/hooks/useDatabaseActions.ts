@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 import { startTransition } from "react";
-import { Toast } from "@base-ui-components/react/toast";
+import { Toast } from "@base-ui/react/toast";
 import type { EditorView } from "@codemirror/view";
 import type { SqliteEngine } from "../../runtime/sqlite";
 import type { QueryTab } from "../../sqlitePlaygroundTabs";

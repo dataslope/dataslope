@@ -3,7 +3,7 @@
 import { useCallback } from "react";
 import { startTransition } from "react";
 import { flushSync } from "react-dom";
-import { Toast } from "@base-ui-components/react/toast";
+import { Toast } from "@base-ui/react/toast";
 import type { EditorView } from "@codemirror/view";
 import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
