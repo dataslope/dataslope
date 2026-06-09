@@ -350,6 +350,59 @@
   border-top: 1px solid var(--ch-border-light);
 }
 
+/* Vertical hairline that separates the Copy button from the Load
+   Solution button in the action bar. Uses the same `--ch-border` color as
+   the main toolbar's `.btnGroupUtilSep` so the two separators match. */
+.solutionActionSeparator {
+  width: 1px;
+  height: 18px;
+  flex-shrink: 0;
+  margin: 0 4px;
+  background: var(--ch-border);
+}
+
+/* Filename inside the "Copy <file>" button, rendered in the mono stack so
+   it reads as code. Scoped under `.solutionActionBar` (specificity 0,2,0)
+   so it overrides the ambient Tailwind-Typography `code` styling — pill
+   background, padding, and the backtick ::before/::after — the card may
+   inherit when embedded inside a `.prose` region. */
+.solutionActionBar .solutionActionFileName {
+  font-family: var(--font-mono, var(--ch-font-mono));
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  background: none;
+  padding: 0;
+  border: none;
+  white-space: nowrap;
+}
+
+.solutionActionBar .solutionActionFileName::before,
+.solutionActionBar .solutionActionFileName::after {
+  content: none;
+}
+
+/* Subtle note shown between the file tab bar and the read-only editor in
+   a multi-file solution modal when the active file's solution is identical
+   to its starter, signalling that the tab needs no edits. */
+.solutionUnchangedNote {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+  padding: 8px 14px;
+  font-size: 12.5px;
+  font-family: var(--ch-font-ui);
+  line-height: 1.4;
+  color: var(--ch-text-muted);
+  background: var(--ch-bg-subtle);
+  border-bottom: 1px solid var(--ch-border-light);
+}
+
+.solutionUnchangedNote svg {
+  flex-shrink: 0;
+}
+
 /* ─── Instructions ────────────────────────────────────────────────── */
 
 .instructions {

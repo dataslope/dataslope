@@ -30,7 +30,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { RotateCcw, Check, X, ChevronDown, ChevronUp, Eye, File, FileInput, Play, Terminal } from "lucide-react";
+import { RotateCcw, Check, X, ChevronDown, ChevronUp, Eye, File, FileInput, Info, Play, Terminal } from "lucide-react";
 import { Menu } from "@base-ui-components/react/menu";
 import {
   CopyIcon,
@@ -155,6 +155,12 @@ interface SolutionFile {
    *  labels these "(unchanged)" so the learner can tell the file apart
    *  from one they should edit. */
   hasSolution: boolean;
+  /** True when the displayed solution is byte-for-byte identical to the
+   *  file's `starterCode` — either because the file supplied no
+   *  `solutionCode` (scaffold) or because its `solutionCode` matches the
+   *  starter. In a multi-file workspace the modal surfaces a subtle note
+   *  for these files so the learner knows the tab needs no edits. */
+  isUnchanged: boolean;
 }
 
 export interface ChallengeCardProps {
@@ -343,11 +349,15 @@ export default function ChallengeCard({
   // the learner is not expected to change). The modal opens iff at least
   // one file actually has a solution.
   const solutionFiles: SolutionFile[] = useMemo(() => {
-    return workspaceFiles.map((file) => ({
-      filename: file.filename,
-      source: file.solutionCode ?? file.starterCode,
-      hasSolution: file.solutionCode !== undefined,
-    }));
+    return workspaceFiles.map((file) => {
+      const source = file.solutionCode ?? file.starterCode;
+      return {
+        filename: file.filename,
+        source,
+        hasSolution: file.solutionCode !== undefined,
+        isUnchanged: source === file.starterCode,
+      };
+    });
   }, [workspaceFiles]);
   const hasSolution = solutionFiles.some((f) => f.hasSolution);
 
@@ -2015,6 +2025,12 @@ function SolutionModal({
     () => files.find((f) => f.filename === activeFilename)?.source ?? source,
     [files, activeFilename, source],
   );
+  // Whether the active file's solution is identical to its starter — used
+  // to surface a subtle "no edits needed" note in multi-file workspaces.
+  const activeIsUnchanged = useMemo(
+    () => files.find((f) => f.filename === activeFilename)?.isUnchanged ?? false,
+    [files, activeFilename],
+  );
   const handleCopy = useCallback(async () => {
     try {
       if (!navigator.clipboard?.writeText) return;
@@ -2045,7 +2061,7 @@ function SolutionModal({
       >
         <div className={styles.modalHeader}>
           <div className={styles.badge}>
-            <Terminal size={9} aria-hidden /> Solution
+            <Terminal size={9} aria-hidden />
           </div>
           <div className={styles.modalTitleArea}>
             <div className={styles.modalTitle}>Reference solution</div>
@@ -2112,6 +2128,15 @@ function SolutionModal({
             })}
           </div>
         )}
+        {showTabs && activeIsUnchanged && (
+          <div className={styles.solutionUnchangedNote} role="note">
+            <Info size={13} strokeWidth={2} aria-hidden />
+            <span>
+              This file is unchanged from the starter code — no edits are
+              needed here.
+            </span>
+          </div>
+        )}
         <div
           ref={editorHostRef}
           className={styles.modalEditor}
@@ -2131,8 +2156,20 @@ function SolutionModal({
             ) : (
               <CopyIcon />
             )}
-            <span>{copied ? "Copied!" : `Copy ${activeFilename}`}</span>
+            <span>
+              {copied ? (
+                "Copied!"
+              ) : (
+                <>
+                  Copy{" "}
+                  <code className={styles.solutionActionFileName}>
+                    {activeFilename}
+                  </code>
+                </>
+              )}
+            </span>
           </button>
+          <span className={styles.solutionActionSeparator} aria-hidden />
           <button
             type="button"
             className={styles.utilBtn}
