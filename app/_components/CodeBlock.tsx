@@ -1094,7 +1094,7 @@ function CodeBlockInner({
       )}
 
       <div
-        className={challengeStyles.editor}
+        className={`${challengeStyles.editor} ${challengeStyles.topBorderLight}`}
         ref={editorHostRef}
         aria-label={`${adapter.runtimeInfo.language} source code`}
       />

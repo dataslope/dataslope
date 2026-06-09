@@ -1391,7 +1391,7 @@ export default function ChallengeCard({
             overlay and "Click to expand" prompt; the toggle header
             lets the user also collapse it again after expanding. */}
       {hasInit && (
-        <div className={styles.initWrap}>
+        <div className={`${styles.initWrap} ${styles.topBorderLight}`}>
           {initLineCount > 3 && (
             <button
               type="button"
@@ -1493,9 +1493,14 @@ export default function ChallengeCard({
         </div>
       )}
 
-      {/* ── Editor ── */}
+      {/* ── Editor ──
+            A single-file challenge card with no init drawer has nothing
+            above the editor to supply a divider (no init panel, no file
+            tab bar), so add a light top border in that case. */}
       <div
-        className={styles.editor}
+        className={`${styles.editor}${
+          !hasInit && !isMultiFile ? ` ${styles.topBorderLight}` : ""
+        }`}
         ref={editorHostRef}
         aria-label={`${adapter.runtimeInfo.language} solution editor`}
       />

@@ -528,6 +528,16 @@
   position: relative;
 }
 
+/* Light divider rendered above the editor / init panel. Applied via a
+   modifier class from the component (rather than baked into the shared
+   `.editor` / `.initWrap` base rules) so it only appears where the card
+   actually wants a separator — e.g. a code block's editor, or a
+   single-file challenge card's editor that has no init drawer or file
+   tab bar above it to supply one. */
+.topBorderLight {
+  border-top: 1px solid var(--ch-border-light);
+}
+
 .editor :global(.cm-editor) {
   height: auto;
   min-height: 120px;
@@ -2213,40 +2223,6 @@
 @keyframes ch-result-flash {
   0% { opacity: 0.12; }
   100% { opacity: 0; }
-}
-
-/* ─── Table viewer resize bar ───────────────────────────────────────── */
-
-/* Drag handle at the bottom of the (non-collapsible) tables panel. Drag
-   vertically to grow/shrink the visible table area. */
-.tableViewerResizer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 12px;
-  cursor: ns-resize;
-  background: var(--ch-bg-subtle);
-  border-top: 1px solid var(--ch-border-light);
-  touch-action: none;
-}
-
-.tableViewerResizer:hover,
-.tableViewerResizer:focus-visible {
-  background: var(--ch-bg-hover);
-  outline: none;
-}
-
-.tableViewerResizerGrip {
-  width: 28px;
-  height: 3px;
-  border-radius: 999px;
-  background: var(--ch-border);
-  transition: background 0.12s;
-}
-
-.tableViewerResizer:hover .tableViewerResizerGrip,
-.tableViewerResizer:focus-visible .tableViewerResizerGrip {
-  background: var(--ch-accent);
 }
 
 .tableViewerEmpty {
