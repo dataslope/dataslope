@@ -173,7 +173,10 @@ then — and that still runs, unchanged, today.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// A function is just a value with a name.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// A function is just a value with a name.
 function greet(name) {
   return "Hello, " + name + "!";
 }
@@ -199,7 +202,9 @@ const shout = function (text) {
 };
 
 console.log(shout("javascript was born in 1995"));
-`}
+`,
+    },
+  ]}
 />
 
 Notice the patterns:

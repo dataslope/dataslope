@@ -106,7 +106,10 @@ real clustering situation.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 
@@ -120,7 +123,9 @@ labels = kmeans.fit_predict(X)
 
 print("Cluster label for the first 10 points:", labels[:10])
 print("Final cluster centers:\\n", np.round(kmeans.cluster_centers_, 2))
-`}
+`,
+    },
+  ]}
 />
 
 `fit_predict` does two things at once: it runs the loop to find the centers
@@ -144,7 +149,10 @@ cluster and mark the centers with big stars.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import matplotlib.pyplot as plt
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 
@@ -172,7 +180,9 @@ plt.xlabel("feature 1")
 plt.ylabel("feature 2")
 plt.legend()
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 The colors line up with the blobs your eye already sees, and each red star
@@ -199,7 +209,10 @@ points hug their centers more closely.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import make_blobs
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 
 X, _ = make_blobs(n_samples=300, centers=4, cluster_std=0.70, random_state=0)
@@ -216,7 +229,9 @@ for n in [1, 10]:
         f"min={min(inertias):.1f}  max={max(inertias):.1f}  "
         f"spread={max(inertias) - min(inertias):.1f}"
     )
-`}
+`,
+    },
+  ]}
 />
 
 With `n_init=10` the result is rock-steady across seeds; with `n_init=1` it
@@ -261,7 +276,10 @@ then flattens. That bend is the **elbow**.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import matplotlib.pyplot as plt
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 
@@ -286,7 +304,9 @@ plt.xlabel("number of clusters k")
 plt.ylabel("inertia (lower = tighter)")
 plt.legend()
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 Read the numbers and the plot together. Inertia plummets from `k=1` to
@@ -327,7 +347,10 @@ page; here is why it is non-negotiable for distance-based methods.)
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 
@@ -367,7 +390,9 @@ print(
     f"Avg age spread within clusters, SCALED features: {mean_age_spread(scaled_labels):.1f} years"
 )
 print("Smaller age spread = age actually influenced the clustering.")
-`}
+`,
+    },
+  ]}
 />
 
 On the raw features the clusters ignore age (large within-cluster age
@@ -399,7 +424,10 @@ any human eye separates instantly. Watch k-means butcher them.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import matplotlib.pyplot as plt
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import matplotlib.pyplot as plt
 from sklearn.datasets import make_moons
 from sklearn.cluster import KMeans
 
@@ -416,7 +444,9 @@ axes[1].set_title("What k-means does (a straight cut)")
 for ax in axes:
     ax.set_xlabel("feature 1")
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 K-means slices the two moons with a roughly straight boundary, splitting
@@ -517,7 +547,10 @@ plausible, and only then trusts the result or switches methods.
 
 The hidden tests check that you scaled the data, found exactly 3 clusters,
 assigned all 300 points, and that the cluster sizes sum to 300.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
@@ -526,8 +559,8 @@ from sklearn.preprocessing import StandardScaler
 X, _ = make_blobs(
     n_samples=[120, 100, 80], centers=None,
     cluster_std=0.8, random_state=0
-)`}
-  starterCode={`# 1. Standardize the features
+)`,
+      starterCode: `# 1. Standardize the features
 X_scaled = None
 
 # 2. Fit KMeans (n_clusters=3, n_init=10, random_state=0) and get labels
@@ -541,8 +574,8 @@ cluster_sizes = None
 
 print("clusters found:", n_clusters_found)
 print("cluster sizes:", cluster_sizes)
-`}
-  solutionCode={`# 1. Standardize the features
+`,
+      solutionCode: `# 1. Standardize the features
 X_scaled = StandardScaler().fit_transform(X)
 
 # 2. Fit KMeans and get per-point labels
@@ -558,7 +591,9 @@ cluster_sizes = np.sort(counts)
 
 print("clusters found:", n_clusters_found)
 print("cluster sizes:", cluster_sizes)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "scaled_shape",

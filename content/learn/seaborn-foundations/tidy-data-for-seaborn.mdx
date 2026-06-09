@@ -81,7 +81,10 @@ the old column *names*, one holding the *values*.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 # A WIDE table: one column per city.
 wide = pd.DataFrame(
@@ -94,7 +97,9 @@ wide = pd.DataFrame(
 )
 
 display(wide)
-`}
+`,
+    },
+  ]}
 />
 
 Now melt it. Keep `month` as an identifier; stack `London`, `Tokyo`, and
@@ -102,7 +107,10 @@ Now melt it. Keep `month` as an identifier; stack `London`, `Tokyo`, and
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 wide = pd.DataFrame(
     {
@@ -115,7 +123,9 @@ wide = pd.DataFrame(
 
 long = wide.melt(id_vars="month", var_name="city", value_name="temp")
 display(long)
-`}
+`,
+    },
+  ]}
 />
 
 Three rows became nine — the table got *longer*, and `city` is now
@@ -151,7 +161,10 @@ table there was no single column to hand to `hue` — the cities were three
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import seaborn as sns
 
 sns.set_theme(style="whitegrid")
@@ -177,7 +190,9 @@ sns.relplot(
     height=4,
     aspect=1.4,
 )
-`}
+`,
+    },
+  ]}
 />
 
 One short call drew three colored lines with a legend. Try imagining the
@@ -200,7 +215,10 @@ spreads a long table back into a wide matrix:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 # 'flights' is tidy/long: year, month, passengers (one row per year-month).
 flights = sns.load_dataset("flights")
@@ -209,7 +227,9 @@ display(flights.head())
 # Pivot to a WIDE matrix (year x month) — the shape a heatmap wants.
 matrix = flights.pivot(index="month", columns="year", values="passengers")
 display(matrix.iloc[:5, :5])
-`}
+`,
+    },
+  ]}
 />
 
 So the rule of thumb is: **tidy/long for almost everything; wide/matrix only
@@ -230,7 +250,10 @@ for heatmaps and similar grid views.** When in doubt, go long.
 Reshape it into a **tidy/long** DataFrame named \`tidy\` with exactly these
 three columns, in this order: \`student\`, \`subject\`, \`score\`. Keep
 \`student\` as the identifier and stack the subject columns.`}
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 scores = pd.DataFrame(
     {
@@ -242,8 +265,8 @@ scores = pd.DataFrame(
 
 # Create the tidy/long DataFrame:
 tidy = None
-`}
-  solutionCode={`import pandas as pd
+`,
+      solutionCode: `import pandas as pd
 
 scores = pd.DataFrame(
     {
@@ -254,7 +277,9 @@ scores = pd.DataFrame(
 )
 
 tidy = scores.melt(id_vars="student", var_name="subject", value_name="score")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "columns",

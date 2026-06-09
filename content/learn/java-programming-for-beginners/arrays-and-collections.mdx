@@ -15,7 +15,10 @@ size is fixed at creation time and cannot change later.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int[] scores = new int[5]; // length 5, all zeros
     scores[0] = 80;
@@ -36,7 +39,9 @@ size is fixed at creation time and cannot change later.
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Key facts about arrays:
@@ -74,7 +79,10 @@ operations, and is part of Java's broader **Collections Framework**.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -94,7 +102,9 @@ public class Main {
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 A few things to notice:
@@ -187,7 +197,7 @@ Two safe fixes:
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.List;
+      starterCode: `import java.util.List;
 
 public class Main {
   public static void main(String[] args) {
@@ -201,7 +211,7 @@ public class Main {
     },
     {
       filename: "Stats.java",
-      initialContent: `import java.util.List;
+      starterCode: `import java.util.List;
 
 public class Stats {
   public static double average(List<Integer> values) {
@@ -291,7 +301,7 @@ sumPositive=15
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.List;
+      starterCode: `import java.util.List;
 
 public class Main {
   public static void main(String[] args) {
@@ -303,7 +313,7 @@ public class Main {
     },
     {
       filename: "Numbers.java",
-      initialContent: `import java.util.List;
+      starterCode: `import java.util.List;
 
 public class Numbers {
   public static int sumPositive(List<Integer> values) {
@@ -312,7 +322,7 @@ public class Numbers {
   }
 }
 `,
-      solutionContent: `import java.util.List;
+      solutionCode: `import java.util.List;
 
 public class Numbers {
   public static int sumPositive(List<Integer> values) {

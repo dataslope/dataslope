@@ -19,7 +19,10 @@ A debugging session almost always starts like this:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 df = pd.DataFrame(
@@ -35,7 +38,9 @@ print(df.head())
 print(df.dtypes)
 print(df.shape)
 print(df.isna().sum())
-`}
+`,
+    },
+  ]}
 />
 
 Those four lines of inspection solve half of all visualization
@@ -51,7 +56,10 @@ alphabetically. Fix:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 df = pd.DataFrame(
@@ -77,7 +85,9 @@ fig_good = px.line(
     title="After: x is datetime, sorted",
 )
 fig_good.show()
-`}
+`,
+    },
+  ]}
 />
 
 ### 2. Unsorted x in a line chart
@@ -94,7 +104,10 @@ columns for category/value/time. If you have a wide table
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 wide = pd.DataFrame(
@@ -119,7 +132,9 @@ fig = px.bar(
     title="Long format works with Plotly Express",
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 ### 4. Empty chart after filtering
@@ -186,7 +201,10 @@ you'll encounter as a beginner.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 # Buggy scenario: weird line chart
@@ -216,7 +234,9 @@ fig = px.line(
     title="Sales over time — now correctly ordered",
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 ## Check your understanding

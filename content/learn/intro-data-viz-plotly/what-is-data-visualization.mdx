@@ -100,7 +100,10 @@ answers slightly different questions.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 df = pd.DataFrame(
@@ -140,7 +143,9 @@ fig3 = px.scatter(
 )
 fig3.update_traces(marker_size=15)
 fig3.show()
-`}
+`,
+    },
+  ]}
 />
 
 The data is identical in all three charts. But:

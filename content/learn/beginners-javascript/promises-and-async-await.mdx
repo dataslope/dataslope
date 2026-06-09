@@ -42,7 +42,10 @@ occasionally you create one yourself.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function wait(ms) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function wait(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
@@ -51,7 +54,9 @@ occasionally you create one yourself.
 console.log("A");
 wait(300).then(() => console.log("B (after 300ms)"));
 console.log("C");
-`}
+`,
+    },
+  ]}
 />
 
 `new Promise((resolve, reject) => { ... })` calls your function
@@ -63,7 +68,10 @@ You *consume* a promise with `.then()` (for success), `.catch()`
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function fetchUser(id) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function fetchUser(id) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (id <= 0) reject(new Error("Invalid id"));
@@ -81,7 +89,9 @@ fetchUser(-1)
   .then((user) => console.log("Got:", user))
   .catch((err) => console.error("Failed:", err.message))
   .finally(() => console.log("Done."));
-`}
+`,
+    },
+  ]}
 />
 
 ## Chaining replaces nesting
@@ -90,7 +100,10 @@ Remember callback hell? Here it is with Promises instead.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function later(value, ms) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function later(value, ms) {
   return new Promise((resolve) => setTimeout(() => resolve(value), ms));
 }
 
@@ -100,7 +113,9 @@ later("step 1", 100)
   .then((c) => later(c + " -> step 4", 100))
   .then((d) => console.log(d))
   .catch((err) => console.error(err));
-`}
+`,
+    },
+  ]}
 />
 
 No more rightward drift. Each `.then` returns a *new* promise, so
@@ -122,7 +137,10 @@ the syntax most modern code uses.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function later(value, ms) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function later(value, ms) {
   return new Promise((resolve) => setTimeout(() => resolve(value), ms));
 }
 
@@ -135,7 +153,9 @@ async function pipeline() {
 }
 
 pipeline().then((result) => console.log(result));
-`}
+`,
+    },
+  ]}
 />
 
 That code does the same thing as the previous example, but it
@@ -149,7 +169,10 @@ the default style.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function fetchUser(id) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function fetchUser(id) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (id <= 0) reject(new Error("Invalid id"));
@@ -173,7 +196,9 @@ async function main() {
 }
 
 main();
-`}
+`,
+    },
+  ]}
 />
 
 Try, catch, finally — the same shapes you already know from
@@ -188,7 +213,10 @@ start *several* operations at once and wait for all of them.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function fakeFetch(url, ms) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function fakeFetch(url, ms) {
   return new Promise((resolve) =>
     setTimeout(() => resolve("data for " + url), ms),
   );
@@ -218,7 +246,9 @@ async function inParallel() {
   await inParallel();
   console.log("parallel took", Date.now() - t, "ms");
 })();
-`}
+`,
+    },
+  ]}
 />
 
 `sequential` takes ~900ms; `inParallel` takes ~300ms. The
@@ -241,7 +271,10 @@ A quick tour of the other combinators:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const p = (v, ms, fail = false) =>
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const p = (v, ms, fail = false) =>
   new Promise((res, rej) =>
     setTimeout(() => (fail ? rej(new Error(v)) : res(v)), ms),
   );
@@ -267,7 +300,9 @@ A quick tour of the other combinators:
   const firstOk = await Promise.any([p("err", 30, true), p("ok", 60)]);
   console.log("any winner:", firstOk);
 })();
-`}
+`,
+    },
+  ]}
 />
 
 When you need to call several independent APIs, `Promise.all` (or
@@ -282,7 +317,10 @@ A short list of "gotchas" that catch beginners.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`async function fetchValue() {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `async function fetchValue() {
   return 42;
 }
 
@@ -297,7 +335,9 @@ async function fixed() {
 }
 
 broken().then(fixed);
-`}
+`,
+    },
+  ]}
 />
 
 If a variable holding "the value" turns out to be a Promise, you
@@ -310,7 +350,10 @@ your code doesn't wait.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function wait(ms) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function wait(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
@@ -335,7 +378,9 @@ async function fixed() {
   await wait(500);
   await fixed();
 })();
-`}
+`,
+    },
+  ]}
 />
 
 The rule: when you need to `await` inside iteration, prefer a
@@ -384,7 +429,7 @@ predictable.
   files={[
     {
       filename: "index.js",
-      initialContent: `const { getUserAndPosts } = require("./client");
+      starterCode: `const { getUserAndPosts } = require("./client");
 
 (async () => {
   try {
@@ -399,7 +444,7 @@ predictable.
     },
     {
       filename: "client.js",
-      initialContent: `// Simulated network helpers — both return Promises.
+      starterCode: `// Simulated network helpers — both return Promises.
 
 function delay(ms, value) {
   return new Promise((res) => setTimeout(() => res(value), ms));
@@ -449,7 +494,10 @@ module.exports = { getUserAndPosts };
 Hints:
 - Use a \`for\` loop with \`try/catch\`.
 - Keep track of the last error so you can throw it at the end.`}
-  starterCode={`async function retry(fn, attempts) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `async function retry(fn, attempts) {
   // your code here
 }
 
@@ -466,8 +514,8 @@ function flaky() {
 retry(flaky, 5)
   .then(console.log)
   .catch((e) => console.error("gave up:", e.message));
-`}
-  solutionCode={`async function retry(fn, attempts) {
+`,
+      solutionCode: `async function retry(fn, attempts) {
   let lastErr;
   for (let i = 0; i < attempts; i++) {
     try {
@@ -491,7 +539,9 @@ function flaky() {
 retry(flaky, 5)
   .then(console.log)
   .catch((e) => console.error("gave up:", e.message));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "returns_value",

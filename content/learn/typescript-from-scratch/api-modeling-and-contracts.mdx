@@ -34,7 +34,10 @@ Let's make the contract explicit:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type UserId = string;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type UserId = string;
 
 type User = {
   id: UserId;
@@ -56,7 +59,9 @@ if (user) {
 } else {
   console.log("User not found");
 }
-`}
+`,
+    },
+  ]}
 />
 
 Now the contract is clear:
@@ -77,7 +82,7 @@ In multi-module or multi-service systems, types should live in a **shared module
   files={[
     {
       filename: "client.ts",
-      initialContent: `import { User, UserId } from "./types";
+      starterCode: `import { User, UserId } from "./types";
 import { getUser } from "./service";
 
 const userId: UserId = "user-1";
@@ -92,7 +97,7 @@ if (user) {
     },
     {
       filename: "service.ts",
-      initialContent: `import { User, UserId } from "./types";
+      starterCode: `import { User, UserId } from "./types";
 
 export function getUser(id: UserId): User | null {
   if (id === "user-1") {
@@ -104,7 +109,7 @@ export function getUser(id: UserId): User | null {
     },
     {
       filename: "types.ts",
-      initialContent: `export type UserId = string;
+      starterCode: `export type UserId = string;
 
 export type User = {
   id: UserId;
@@ -140,7 +145,7 @@ In HTTP-like systems, you model requests and responses as **Data Transfer Object
   files={[
     {
       filename: "client.ts",
-      initialContent: `import { GetUserRequest, GetUserResponse } from "./types";
+      starterCode: `import { GetUserRequest, GetUserResponse } from "./types";
 import { handleGetUser } from "./service";
 
 const request: GetUserRequest = { userId: "user-1" };
@@ -155,7 +160,7 @@ if (response.success) {
     },
     {
       filename: "service.ts",
-      initialContent: `import { GetUserRequest, GetUserResponse, User } from "./types";
+      starterCode: `import { GetUserRequest, GetUserResponse, User } from "./types";
 
 export function handleGetUser(req: GetUserRequest): GetUserResponse {
   if (req.userId === "user-1") {
@@ -172,7 +177,7 @@ export function handleGetUser(req: GetUserRequest): GetUserResponse {
     },
     {
       filename: "types.ts",
-      initialContent: `export type UserId = string;
+      starterCode: `export type UserId = string;
 
 export type User = {
   id: UserId;
@@ -205,7 +210,10 @@ You can generalize the response pattern with a generic `Result<T, E>` or `ApiRes
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type ApiResponse<T> =
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type ApiResponse<T> =
   | { status: "ok"; data: T }
   | { status: "error"; message: string };
 
@@ -238,7 +246,9 @@ if (orderResp.status === "ok") {
 } else {
   console.log(\`Error: \${orderResp.message}\`);
 }
-`}
+`,
+    },
+  ]}
 />
 
 Now every handler returns `ApiResponse<T>`, and the client knows to check `.status` before accessing `.data`. This is a **uniform interface** — a contract that spans your entire API surface.
@@ -260,7 +270,7 @@ Types enforce these boundaries:
   files={[
     {
       filename: "transport.ts",
-      initialContent: `import { getUserById } from "./application";
+      starterCode: `import { getUserById } from "./application";
 import { ApiResponse } from "./types";
 
 // Simulates an HTTP handler
@@ -278,7 +288,7 @@ console.log(handleGetUserRequest("user-1"));
     },
     {
       filename: "application.ts",
-      initialContent: `import { User, ApiResponse } from "./types";
+      starterCode: `import { User, ApiResponse } from "./types";
 import { findUserInDatabase } from "./domain";
 
 export function getUserById(id: string): ApiResponse<User> {
@@ -292,7 +302,7 @@ export function getUserById(id: string): ApiResponse<User> {
     },
     {
       filename: "domain.ts",
-      initialContent: `import { User } from "./types";
+      starterCode: `import { User } from "./types";
 
 // Simulates a database lookup
 export function findUserInDatabase(id: string): User | null {
@@ -305,7 +315,7 @@ export function findUserInDatabase(id: string): User | null {
     },
     {
       filename: "types.ts",
-      initialContent: `export type User = {
+      starterCode: `export type User = {
   id: string;
   name: string;
   email: string;
@@ -355,7 +365,7 @@ graph TD
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { getOrder } from "./service";
+      starterCode: `import { getOrder } from "./service";
 
 const resp = getOrder("order-1");
 if (resp.status === "ok") {
@@ -367,14 +377,14 @@ if (resp.status === "ok") {
     },
     {
       filename: "service.ts",
-      initialContent: `import { Order, ApiResponse } from "./types";
+      starterCode: `import { Order, ApiResponse } from "./types";
 
 export function getOrder(orderId: string): ApiResponse<Order> {
   // Implement
   return { status: "error", message: "Not implemented" };
 }
 `,
-      solutionContent: `import { Order, ApiResponse } from "./types";
+      solutionCode: `import { Order, ApiResponse } from "./types";
 
 export function getOrder(orderId: string): ApiResponse<Order> {
   if (orderId === "order-1") {
@@ -386,7 +396,7 @@ export function getOrder(orderId: string): ApiResponse<Order> {
     },
     {
       filename: "types.ts",
-      initialContent: `export type Order = {
+      starterCode: `export type Order = {
   orderId: string;
   total: number;
 };
@@ -415,7 +425,10 @@ Sometimes a single endpoint returns different shapes based on the request. Use d
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type SearchRequest = {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type SearchRequest = {
   query: string;
   type: "user" | "order";
 };
@@ -446,7 +459,9 @@ if (resp.type === "user") {
 } else {
   console.log(\`Error: \${resp.message}\`);
 }
-`}
+`,
+    },
+  ]}
 />
 
 The compiler ensures you check `resp.type` before accessing `results`. If you add a new response variant, exhaustiveness checking forces you to handle it.

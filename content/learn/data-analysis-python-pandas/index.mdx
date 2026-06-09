@@ -98,7 +98,10 @@ have something to look at.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.read_csv(
     "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
@@ -107,7 +110,9 @@ df = pd.read_csv(
 print("Rows, columns:", df.shape)
 print("First few employees:")
 df.head()
-`}
+`,
+    },
+  ]}
 />
 
 That is a real HR dataset with about 1,470 employees and 35

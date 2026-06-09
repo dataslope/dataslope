@@ -13,14 +13,19 @@ The simplest case: when you declare a variable with an initial value, TypeScript
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const message = "Hello, TypeScript!";
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const message = "Hello, TypeScript!";
 const count = 42;
 const isActive = true;
 
 console.log(typeof message); // type is string
 console.log(typeof count); // type is number
 console.log(typeof isActive); // type is boolean
-`}
+`,
+    },
+  ]}
 />
 
 The compiler doesn't need you to write `const message: string = "Hello"`. It sees the string literal and infers `string` automatically. This works for all primitive types, objects, arrays, and more complex structures.
@@ -35,7 +40,10 @@ Here's where inference gets interesting. TypeScript infers **different types** d
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const literal = "hello";
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const literal = "hello";
 let mutableString = "hello";
 
 // Hover over these in your editor:
@@ -44,7 +52,9 @@ let mutableString = "hello";
 
 console.log(\`literal is inferred as the literal type: "\${literal}"\`);
 console.log(\`mutableString is inferred as: string\`);
-`}
+`,
+    },
+  ]}
 />
 
 Why the difference? A `const` binding can never be reassigned, so the compiler can lock down the type to the exact value: the **literal type** `"hello"`. But a `let` binding can be reassigned to any other string later, so the compiler **widens** the type to `string` to allow future assignments like `mutableString = "world"`.
@@ -62,7 +72,10 @@ Sometimes the compiler infers types by looking at **context** — where a value 
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const numbers = [1, 2, 3, 4, 5];
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const numbers = [1, 2, 3, 4, 5];
 
 // The callback parameter 'n' is inferred as number
 // because .map is defined as: map<U>(fn: (value: number) => U)
@@ -82,7 +95,9 @@ onClick((e) => {
   console.log(\`Clicked at (\${e.x}, \${e.y})\`);
   // 'e' is inferred as ClickEvent — no annotation needed!
 });
-`}
+`,
+    },
+  ]}
 />
 
 You didn't write `(n: number)` or `(e: ClickEvent)` — the compiler figured it out from the **signature** of `map` and `onClick`. This is **contextual typing**, also called **type inference from context**. It flows backward from the call site to the callback definition.
@@ -97,7 +112,10 @@ Functions infer their return type from the `return` statements inside.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function add(a: number, b: number) {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function add(a: number, b: number) {
   return a + b; // return type inferred as number
 }
 
@@ -110,7 +128,9 @@ const greeting = greet("Ada");
 
 console.log(sum); // 42
 console.log(greeting); // Hello, Ada!
-`}
+`,
+    },
+  ]}
 />
 
 The compiler looks at `return a + b` and knows that adding two `number`s yields a `number`, so the return type is `number`. You can hover over the function name in your editor to see the full inferred signature: `add(a: number, b: number): number`.
@@ -125,7 +145,10 @@ Even though the compiler can infer return types, many teams **annotate them expl
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Explicit return type for a public API
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Explicit return type for a public API
 function divide(a: number, b: number): number | null {
   if (b === 0) {
     return null; // signal error
@@ -139,7 +162,9 @@ if (result !== null) {
 } else {
   console.log("Cannot divide by zero");
 }
-`}
+`,
+    },
+  ]}
 />
 
 **Rule of thumb:** Let the compiler infer types inside function bodies (local variables, intermediate results). Annotate types at **module boundaries** — function parameters, return types, and exported values — so your API is explicit and self-documenting.
@@ -150,7 +175,10 @@ When you initialize an array with mixed values, the compiler tries to find a **b
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// All numbers → inferred as number[]
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// All numbers → inferred as number[]
 const nums = [1, 2, 3];
 console.log(\`nums: number[] = [\${nums.join(", ")}]\`);
 
@@ -164,14 +192,19 @@ const points = [
   { x: 10, y: 20 },
 ];
 console.log(\`points: { x: number; y: number }[] =\`, JSON.stringify(points));
-`}
+`,
+    },
+  ]}
 />
 
 If no single type fits all elements, the compiler creates a **union** of the candidates. This is usually what you want, but sometimes it's too loose. You can add an explicit type annotation to narrow it:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Without annotation: inferred as (string | number)[]
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Without annotation: inferred as (string | number)[]
 const loose = [42];
 loose.push("hello"); // allowed
 console.log(loose); // [42, "hello"]
@@ -181,7 +214,9 @@ const strict: number[] = [42];
 // strict.push("hello"); // ❌ Error: Argument of type 'string' is not assignable to parameter of type 'number'
 strict.push(100); // ✅ OK
 console.log(strict); // [42, 100]
-`}
+`,
+    },
+  ]}
 />
 
 ## How inference walks expressions
@@ -190,7 +225,10 @@ Let's see inference in action across a more complex expression. The compiler bui
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function getConfig() {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function getConfig() {
   return {
     host: "localhost",
     port: 3000,
@@ -211,7 +249,9 @@ const firstFeature = config.features[0];
 
 console.log(\`Config: \${config.host}:\${config.port}\`);
 console.log(\`First feature: \${firstFeature}\`);
-`}
+`,
+    },
+  ]}
 />
 
 Here's the inference chain:
@@ -243,7 +283,10 @@ If the compiler can't figure out a type, you'll see the dreaded `any`. This usua
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// ❌ Bad: No initializer, no annotation → inferred as any
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// ❌ Bad: No initializer, no annotation → inferred as any
 // let data; // Uncomment to see implicit any error
 
 // ✅ Good: Explicit annotation
@@ -254,7 +297,9 @@ console.log(data); // [1, 2, 3]
 // ✅ Also good: Initializer provides the type
 let items = [10, 20, 30]; // inferred as number[]
 console.log(items); // [10, 20, 30]
-`}
+`,
+    },
+  ]}
 />
 
 ## Challenge: Inference in practice
@@ -270,7 +315,10 @@ Now it's your turn. The compiler has inferred types throughout this example, but
 1. Add an explicit type annotation to \`values\` to restrict it to \`number[]\`.
 2. Remove the string element \`"oops"\` so the code compiles.
 3. The test will verify that the sum is computed correctly.`}
-  starterCode={`function process(nums: number[]): number {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function process(nums: number[]): number {
   return nums.reduce((sum, n) => sum + n, 0);
 }
 
@@ -279,8 +327,8 @@ const values = [10, 20, "oops", 30];
 
 const total = process(values);
 console.log(total);
-`}
-  solutionCode={`function process(nums: number[]): number {
+`,
+      solutionCode: `function process(nums: number[]): number {
   return nums.reduce((sum, n) => sum + n, 0);
 }
 
@@ -289,7 +337,9 @@ const values: number[] = [10, 20, 30];
 
 const total = process(values);
 console.log(total);
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "sum",

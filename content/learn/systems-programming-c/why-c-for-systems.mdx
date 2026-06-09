@@ -38,13 +38,18 @@ program can be measured in *kilobytes*.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   printf("Hello, systems world!\\n");
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 That program, once compiled for a real CPU, is a few kilobytes of
@@ -78,7 +83,10 @@ instruction.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int a = 7;
@@ -87,7 +95,9 @@ int main(void) {
   printf("%d + %d = %d\\n", a, b, c);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## What C gives you that other languages do not
@@ -144,7 +154,10 @@ are 32 bits and pointers are 32 bits.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   printf("char       : %zu byte(s)\\n", sizeof(char));
@@ -157,7 +170,9 @@ int main(void) {
   printf("void *     : %zu byte(s)\\n", sizeof(void *));
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 That single program tells you a great deal about the target: integer

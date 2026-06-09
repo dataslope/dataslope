@@ -29,7 +29,10 @@ After any non-trivial line, print and check.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -43,7 +46,9 @@ print("Before filter:", df.shape)
 filtered = df[df["value"] > 25]
 print("After filter:", filtered.shape)
 print(filtered)
-`}
+`,
+    },
+  ]}
 />
 
 Knowing the row count *before and after* every transformation
@@ -53,14 +58,19 @@ is the cheapest bug-detector in Pandas.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame({"price": ["10", "20", "30"]})  # strings!
 
 # Looks like it works...
 print(df["price"].sum())
 # ...but gives '102030' (string concat), not 60.
-`}
+`,
+    },
+  ]}
 />
 
 Always check `df.dtypes` after loading. Strings that look like
@@ -94,12 +104,17 @@ after the chart is in your boss's deck.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`print("Shape:", df.shape)
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `print("Shape:", df.shape)
 print()
 df.info()
-`}
+`,
+    },
+  ]}
 />
 
 A 30-second `.info()` after loading catches almost every "wait,
@@ -112,7 +127,10 @@ guessing.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -122,7 +140,9 @@ df = pd.DataFrame(
 
 print(df[df["age"] > 100])
 print(df[df["age"] < 0])
-`}
+`,
+    },
+  ]}
 />
 
 Don't reason abstractly — pull up the actual problem rows. Often
@@ -150,7 +170,10 @@ When stuck, recreate the problem with a tiny DataFrame.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 # Real data has 1M rows — too big to inspect.
 # Construct a 4-row mini that triggers the same bug:
@@ -163,7 +186,9 @@ mini = pd.DataFrame(
 
 # Now you can step through the buggy operation by hand.
 print(mini.groupby("k")["x"].sum())
-`}
+`,
+    },
+  ]}
 />
 
 If you can reproduce the bug in a 4-row example, you can
@@ -176,7 +201,10 @@ for help, the 4-row example is what they need.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame({"x": [1, 2, 3], "y": [10, 20, 30]})
 
@@ -187,7 +215,9 @@ sub["y"] = 0  # Risky — may warn or fail silently
 # Safer:
 df.loc[df["x"] > 1, "y"] = 0
 print(df)
-`}
+`,
+    },
+  ]}
 />
 
 Use `.loc[..., col] = value` when you really mean to modify the

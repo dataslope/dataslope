@@ -28,7 +28,12 @@ sequenceDiagram
 
 ## Permutations
 
-<CodeBlock adapter="cpp" starterCode={`#include <iostream>
+<CodeBlock
+  adapter="cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 void permute(std::vector<int> &a, int idx) {
   if (idx == (int)a.size()) {
@@ -48,13 +53,21 @@ int main() {
   permute(a, 0);
   return 0;
 }
-`} />
+`,
+    },
+  ]}
+/>
 
 ## Subsets
 
 Include/exclude recursion visits both decisions for each element.
 
-<CodeBlock adapter="cpp" starterCode={`#include <iostream>
+<CodeBlock
+  adapter="cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 void dfs(const std::vector<int> &nums, int i, std::vector<int> &cur) {
   if (i == (int)nums.size()) {
@@ -71,11 +84,19 @@ int main() {
   dfs({1, 2, 3}, 0, cur);
   return 0;
 }
-`} />
+`,
+    },
+  ]}
+/>
 
 Bitmask iteration is deterministic and iterative.
 
-<CodeBlock adapter="cpp" starterCode={`#include <iostream>
+<CodeBlock
+  adapter="cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 int main() {
   std::vector<int> nums = {1, 2, 3};
@@ -93,13 +114,21 @@ int main() {
   }
   return 0;
 }
-`} />
+`,
+    },
+  ]}
+/>
 
 ## N-Queens
 
 Place one queen per row. Columns and diagonals prune invalid placements.
 
-<CodeBlock adapter="cpp" starterCode={`#include <iostream>
+<CodeBlock
+  adapter="cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 #include <vector>
 void solve(int r, int n, std::vector<std::string> &board, std::vector<int> &col,
@@ -126,13 +155,21 @@ int main() {
   std::cout << count << "\\n";
   return 0;
 }
-`} />
+`,
+    },
+  ]}
+/>
 
 ## Sudoku solver
 
 Try digits 1 through 9 in the next empty cell, recurse, then undo if it fails.
 
-<CodeBlock adapter="cpp" starterCode={`#include <iostream>
+<CodeBlock
+  adapter="cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 bool ok(const std::vector<std::vector<char>> &b, int r, int c, char ch) {
   for (int i = 0; i < 9; i++)
@@ -165,13 +202,21 @@ int main() {
   std::cout << std::boolalpha << solve(b) << "\\n";
   return 0;
 }
-`} />
+`,
+    },
+  ]}
+/>
 
 ## Word search
 
 Mark a cell visited, search neighbors, then unmark it.
 
-<CodeBlock adapter="cpp" starterCode={`#include <iostream>
+<CodeBlock
+  adapter="cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 #include <vector>
 bool dfs(std::vector<std::vector<char>> &b, const std::string &w, int r, int c,
@@ -201,13 +246,23 @@ int main() {
   std::cout << std::boolalpha << exist(b, "ABCCED") << "\\n";
   return 0;
 }
-`} />
+`,
+    },
+  ]}
+/>
 
 ## Pruning techniques
 
 Check constraints before recursing, reject partial states early, and try promising branches first. Backtracking differs from plain recursion because it explicitly manages partial choices and undoes them.
 
-<ChallengeCard adapter="cpp" title="Generate all subsets" instructions={`Implement \`std::vector<std::vector<int>> subsets(const std::vector<int>& nums)\`. Use deterministic bitmask order from 0 to 2^n-1 so stdout matches exactly.`} starterCode={`#include <iostream>
+<ChallengeCard
+  adapter="cpp"
+  title="Generate all subsets"
+  instructions={`Implement \`std::vector<std::vector<int>> subsets(const std::vector<int>& nums)\`. Use deterministic bitmask order from 0 to 2^n-1 so stdout matches exactly.`}
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 std::vector<std::vector<int>> subsets(const std::vector<int> &nums) {
   return {};
@@ -228,7 +283,8 @@ int main() {
     print(v);
   return 0;
 }
-`} solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <vector>
 std::vector<std::vector<int>> subsets(const std::vector<int> &nums) {
   std::vector<std::vector<int>> ans;
@@ -257,9 +313,20 @@ int main() {
     print(v);
   return 0;
 }
-`} tests={[{ id: "subsets", name: "Bitmask subsets", expect: { stdoutLines: ["8", "[]", "[1]", "[2]", "[1,2]", "[3]", "[1,3]", "[2,3]", "[1,2,3]"], stdoutLinesExact: true } }]} />
+`,
+    },
+  ]}
+  tests={[{ id: "subsets", name: "Bitmask subsets", expect: { stdoutLines: ["8", "[]", "[1]", "[2]", "[1,2]", "[3]", "[1,3]", "[2,3]", "[1,2,3]"], stdoutLinesExact: true } }]}
+/>
 
-<ChallengeCard adapter="cpp" title="N-Queens count" instructions={`Implement \`int countNQueens(int n)\`. The driver prints counts for n=1..6.`} starterCode={`#include <iostream>
+<ChallengeCard
+  adapter="cpp"
+  title="N-Queens count"
+  instructions={`Implement \`int countNQueens(int n)\`. The driver prints counts for n=1..6.`}
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 int countNQueens(int n) { return 0; }
 int main() {
@@ -267,7 +334,8 @@ int main() {
     std::cout << countNQueens(n) << "\\n";
   return 0;
 }
-`} solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <vector>
 void dfs(int r, int n, std::vector<int> &col, std::vector<int> &d1,
          std::vector<int> &d2, int &ans) {
@@ -293,9 +361,20 @@ int main() {
     std::cout << countNQueens(n) << "\\n";
   return 0;
 }
-`} tests={[{ id: "queens", name: "Counts n queens", expect: { stdoutLines: ["1", "0", "0", "2", "10", "4"], stdoutLinesExact: true } }]} />
+`,
+    },
+  ]}
+  tests={[{ id: "queens", name: "Counts n queens", expect: { stdoutLines: ["1", "0", "0", "2", "10", "4"], stdoutLinesExact: true } }]}
+/>
 
-<ChallengeCard adapter="cpp" title="Word search" instructions={`Implement \`bool exist(std::vector<std::vector<char>>& board, const std::string& word)\`.`} starterCode={`#include <iostream>
+<ChallengeCard
+  adapter="cpp"
+  title="Word search"
+  instructions={`Implement \`bool exist(std::vector<std::vector<char>>& board, const std::string& word)\`.`}
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 #include <vector>
 bool exist(std::vector<std::vector<char>> &board, const std::string &word) {
@@ -308,7 +387,8 @@ int main() {
   std::cout << std::boolalpha << exist(b, "ABCB") << "\\n";
   return 0;
 }
-`} solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <string>
 #include <vector>
 bool dfs(std::vector<std::vector<char>> &b, const std::string &w, int r, int c,
@@ -339,7 +419,11 @@ int main() {
   std::cout << std::boolalpha << exist(b, "ABCB") << "\\n";
   return 0;
 }
-`} tests={[{ id: "word", name: "Finds words", expect: { stdoutLines: ["true", "false"], stdoutLinesExact: true } }]} />
+`,
+    },
+  ]}
+  tests={[{ id: "word", name: "Finds words", expect: { stdoutLines: ["true", "false"], stdoutLinesExact: true } }]}
+/>
 
 <MultipleChoice markdown={`What is the classic backtracking pattern?
 

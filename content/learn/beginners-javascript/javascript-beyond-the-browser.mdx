@@ -180,7 +180,10 @@ byte, anywhere a JavaScript runtime exists.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// Pure logic: no DOM, no network, no files.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// Pure logic: no DOM, no network, no files.
 // This function counts how many days are in a given month and year.
 function daysInMonth(year, month) {
   // 'month' is 1..12. We ask: what is day 0 of the *next* month?
@@ -192,7 +195,9 @@ console.log("Feb 2024:", daysInMonth(2024, 2)); // Leap year
 console.log("Feb 2025:", daysInMonth(2025, 2));
 console.log("Apr 2025:", daysInMonth(2025, 4));
 console.log("Dec 2025:", daysInMonth(2025, 12));
-`}
+`,
+    },
+  ]}
 />
 
 That same function, copy-pasted, would work without modification in a
@@ -213,7 +218,7 @@ project might break the same logic into two files: one for the
   files={[
     {
       filename: "index.js",
-      initialContent: `const { daysInMonth, monthName } = require("./calendar");
+      starterCode: `const { daysInMonth, monthName } = require("./calendar");
 
 const year = 2025;
 for (let m = 1; m <= 12; m++) {
@@ -223,7 +228,7 @@ for (let m = 1; m <= 12; m++) {
     },
     {
       filename: "calendar.js",
-      initialContent: `// A small helper module. No browser, no network — pure JavaScript.
+      starterCode: `// A small helper module. No browser, no network — pure JavaScript.
 function daysInMonth(year, month) {
   return new Date(year, month, 0).getDate();
 }

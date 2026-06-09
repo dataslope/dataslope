@@ -22,7 +22,10 @@ Examples:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int age = 30;
@@ -32,7 +35,9 @@ int main(void) {
   printf("year of birth = %d\\n", year_of_birth);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Three things happen on the line `int age = 30;`:
@@ -66,7 +71,10 @@ Once a variable has been declared, you can change its value with the
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int score = 0; // declare and initialize
@@ -79,7 +87,9 @@ int main(void) {
   printf("score = %d\\n", score);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 That last line, `score = score + 5;`, is a great example of
@@ -147,14 +157,19 @@ between runs and compilers):
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int x; // not initialized
   printf("x = %d (unpredictable!)\\n", x);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Modern compilers will often warn you about this. Pay attention.
@@ -188,7 +203,10 @@ run it to check:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int a = 1;
@@ -201,7 +219,9 @@ int main(void) {
   printf("a = %d, b = %d\\n", a, b);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 This is the classic **swap** idiom. Trace it with a table:
@@ -227,7 +247,10 @@ overflow**.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <limits.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <limits.h>
 #include <stdio.h>
 
 int main(void) {
@@ -236,7 +259,9 @@ int main(void) {
   printf("INT_MAX + 1 = %d  (oops!)\\n", big + 1);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 This is a small but profound lesson: in C, **every variable has a
@@ -253,7 +278,10 @@ We'll meet more types in the next chapter.
   instructions={`A variable \`celsius\` is set to \`25\`. Compute the equivalent Fahrenheit value using the formula \`F = C * 9 / 5 + 32\` and print exactly:
 
 \`25 C = 77 F\``}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int celsius = 25;
@@ -262,8 +290,8 @@ int main(void) {
   printf("%d C = %d F\\n", celsius, fahrenheit);
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 int main(void) {
   int celsius = 25;
@@ -271,7 +299,9 @@ int main(void) {
   printf("%d C = %d F\\n", celsius, fahrenheit);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "exact",

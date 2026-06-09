@@ -98,7 +98,10 @@ combines both groups' spread.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.default_rng(7)
 
@@ -124,7 +127,9 @@ print(f"Raw difference : {treatment.mean() - control.mean():+.2f}")
 print(f"Cohen's d      : {d:.3f}")
 print()
 print("d ~ 0.5 means the groups are about half a standard deviation apart.")
-`}
+`,
+    },
+  ]}
 />
 
 ### The small / medium / large guideposts (use with care)
@@ -155,7 +160,10 @@ negligible.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(0)
@@ -180,7 +188,9 @@ print(f"Cohen's d             : {d:.4f}  <- utterly negligible")
 print()
 print("The p-value screams 'real!'. The effect size whispers 'who cares?'")
 print("Both are correct. Only one of them should drive a decision.")
-`}
+`,
+    },
+  ]}
 />
 
 The p-value is microscopic — the difference is "real" in the sense that
@@ -222,7 +232,10 @@ to the p-value versus the estimated `d` as `n` grows.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(123)
@@ -245,7 +258,9 @@ for n in [20, 100, 500, 5000, 50000]:
 
 print()
 print("p-value plummets as n grows; d hovers around the true 0.30.")
-`}
+`,
+    },
+  ]}
 />
 
 The p-value falls off a cliff while `d` stays pinned near 0.30. The
@@ -273,7 +288,10 @@ correlation.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(5)
@@ -290,7 +308,9 @@ print(f"p-value          : {p:.2e}")
 print()
 print(f"The relationship explains about {100 * r**2:.0f}% of the variation in scores.")
 print("r itself tells you the STRENGTH; the p-value only tells you it's not zero.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="r as a bridge between worlds">
@@ -314,7 +334,10 @@ different stories.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 # A/B test on a checkout button. Counts of conversions out of visitors.
 conv_control, n_control = 90, 3000  # control arm
@@ -335,7 +358,9 @@ print(
 )
 print(f"Relative risk (ratio): {relative_risk:.3f}x")
 print(f"Relative uplift      : {relative_uplift * 100:+.1f}%")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Relative numbers can mislead">
@@ -364,7 +389,10 @@ That interval does triple duty:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(11)
@@ -396,7 +424,9 @@ if lo > 0:
     print("The CI excludes 0: there's a real effect AND we know roughly how big.")
 else:
     print("The CI includes 0: we can't even be sure of the direction.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="success" title="The reporting standard to adopt">
@@ -422,16 +452,19 @@ Use the **pooled standard deviation** with sample variances (\`ddof=1\`):
 - \`d = (mean_after - mean_before) / s_pooled\`
 
 \`d\` must be a Python \`float\` and, for this data, positive.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 rng = np.random.default_rng(99)
 before = rng.normal(50, 8, size=150)
-after  = rng.normal(55, 8, size=150)`}
-  starterCode={`import numpy as np
+after  = rng.normal(55, 8, size=150)`,
+      starterCode: `import numpy as np
 
 # TODO: compute Cohen's d (after - before) into a float called d
 d = None
-`}
-  solutionCode={`import numpy as np
+`,
+      solutionCode: `import numpy as np
 
 na, nb = len(before), len(after)
 s_pooled = np.sqrt(
@@ -439,7 +472,9 @@ s_pooled = np.sqrt(
 )
 d = float((after.mean() - before.mean()) / s_pooled)
 print(d)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type",
@@ -483,19 +518,22 @@ Demonstrate the gap between significance and importance by computing **both**:
 - \`d\`: Cohen's d for \`b - a\` (pooled sd, \`ddof=1\`) — store it as a float.
 
 For this data, \`p\` should be **below 0.05** (significant) while \`abs(d)\` should be **below 0.1** (negligible). Your job is to show both can be true at once.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 rng = np.random.default_rng(2024)
 n = 80_000
 a = rng.normal(100.00, 15, size=n)
-b = rng.normal(100.12, 15, size=n)`}
-  starterCode={`import numpy as np
+b = rng.normal(100.12, 15, size=n)`,
+      starterCode: `import numpy as np
 from scipy import stats
 
 # TODO: compute p (from ttest_ind) and d (Cohen's d for b - a)
 p = None
 d = None
-`}
-  solutionCode={`import numpy as np
+`,
+      solutionCode: `import numpy as np
 from scipy import stats
 
 _, p = stats.ttest_ind(a, b)
@@ -506,7 +544,9 @@ sp = np.sqrt(((na - 1) * a.var(ddof=1) + (nb - 1) * b.var(ddof=1)) / (na + nb - 
 d = float((b.mean() - a.mean()) / sp)
 
 print(f"p = {p:.2e},  d = {d:.4f}")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "types",

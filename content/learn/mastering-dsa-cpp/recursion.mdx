@@ -45,7 +45,10 @@ sequenceDiagram
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 long long factorial(int n) {
   if (n == 0)
     return 1;
@@ -55,7 +58,9 @@ int main() {
   std::cout << factorial(5) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Naive Fibonacci
@@ -64,7 +69,10 @@ The Fibonacci sequence is recursive by definition: `fib(n) = fib(n - 1) + fib(n 
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 int fib(int n) {
   if (n <= 1)
     return n;
@@ -76,7 +84,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ```mermaid
@@ -99,7 +109,10 @@ A recursive array function often carries an index that moves toward the end.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 int sumFrom(const std::vector<int> &v, int index) {
   if (index == static_cast<int>(v.size()))
@@ -111,7 +124,9 @@ int main() {
   std::cout << sumFrom(values, 0) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Power: naive and fast
@@ -120,7 +135,10 @@ Naive recursive power multiplies by `a` exactly `n` times, so it is O(n).
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 long long powerNaive(long long a, int n) {
   if (n == 0)
     return 1;
@@ -130,14 +148,19 @@ int main() {
   std::cout << powerNaive(2, 10) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Fast exponentiation squares a half-power and reduces the exponent by half, giving O(log n).
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 long long powerFast(long long a, int n) {
   if (n == 0)
     return 1;
@@ -150,7 +173,9 @@ int main() {
   std::cout << powerFast(3, 13) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Stack overflow and tail recursion
@@ -161,7 +186,10 @@ Tail recursion means the recursive call is the final action. Clang may optimize 
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 long long factorialTail(int n, long long acc) {
   if (n == 0)
     return acc;
@@ -171,7 +199,9 @@ int main() {
   std::cout << factorialTail(6, 1) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="success" title="Recursion vs iteration">
@@ -184,7 +214,10 @@ Recursion can make tree-shaped logic elegant and close to the math. Iteration us
   adapter="cpp"
   title="Count digits of a positive integer recursively"
   instructions={`Implement \`int countDigits(int n)\`. The input is positive. Do not print inside the function; the driver prints several calls.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 int countDigits(int n) {
   // your code here
 }
@@ -195,8 +228,8 @@ int main() {
   std::cout << countDigits(123456) << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 int countDigits(int n) {
   if (n < 10)
     return 1;
@@ -209,7 +242,9 @@ int main() {
   std::cout << countDigits(123456) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     { id: "digit_counts", name: "Counts digits", expect: { stdoutLines: ["1", "2", "4", "6"], stdoutLinesExact: true } },
   ]}
@@ -221,7 +256,10 @@ int main() {
   adapter="cpp"
   title="Reverse a string recursively"
   instructions={`Implement \`std::string reverseStr(const std::string& s)\` recursively. The driver prints the reverse of \`recursion\`.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 std::string reverseStr(const std::string &s) {
   // your code here
@@ -230,8 +268,8 @@ int main() {
   std::cout << reverseStr("recursion") << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <string>
 std::string reverseStr(const std::string &s) {
   if (s.empty())
@@ -242,7 +280,9 @@ int main() {
   std::cout << reverseStr("recursion") << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     { id: "reverse_recursion", name: "Reverses recursion", expect: { stdoutEquals: "noisrucer" } },
   ]}

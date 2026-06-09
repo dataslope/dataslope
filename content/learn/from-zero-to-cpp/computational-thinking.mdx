@@ -67,7 +67,10 @@ Here is a pre-pattern-recognition version of a simple program:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   int a = 5, b = 10, c = 3;
@@ -89,7 +92,9 @@ int main() {
   std::cout << "c deviation: " << dc << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Three lines look almost identical: *take a value, subtract the
@@ -98,7 +103,10 @@ function.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <cmath> // std::abs
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <cmath> // std::abs
 #include <iostream>
 
 double deviation(double v, double avg) { return std::abs(v - avg); }
@@ -111,7 +119,9 @@ int main() {
   std::cout << "c deviation: " << deviation(c, avg) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 We *named the pattern* (`deviation`) and used it three times. The
@@ -130,7 +140,10 @@ algorithms that work on *anything that behaves like a sequence*.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <numeric> // std::accumulate
 #include <vector>
 
@@ -141,7 +154,9 @@ int main() {
   std::cout << "average = " << avg << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 `std::accumulate` does not know or care that the data lives in a
@@ -169,7 +184,10 @@ Now the translation into C++ is almost mechanical:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <stdexcept>
 #include <vector>
 
@@ -191,7 +209,9 @@ int main() {
   std::cout << "max = " << max_element(v) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 If you ever feel stuck staring at a blank editor, drop down a level:
@@ -236,7 +256,10 @@ Now the C++ practically writes itself:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   for (int i = 1; i <= 15; ++i) { // shortened to 15 for brevity
@@ -252,7 +275,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Notice that we *thought through* the order of the checks: the most
@@ -282,7 +307,10 @@ yourself to enumerate them *before* you finish the code.
   adapter="cpp"
   title="Count vowels"
   instructions={`Implement a function \`int count_vowels(const std::string& s)\` that returns how many characters in \`s\` are vowels. Treat both upper- and lower-case \`a, e, i, o, u\` as vowels. \`main\` already prints the result for a fixed input — your job is to implement the function.\n\nThink through edge cases: empty string, all-vowel string, no vowels, mixed case.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 
 int count_vowels(const std::string &s) {
@@ -294,8 +322,8 @@ int main() {
   std::cout << count_vowels("Hello, World!") << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <string>
 
 int count_vowels(const std::string &s) {
@@ -325,7 +353,9 @@ int main() {
   std::cout << count_vowels("Hello, World!") << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "hw",

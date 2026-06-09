@@ -127,7 +127,10 @@ it is the compiler — not the linker, not the OS — that complains:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`// Try uncommenting the bad line. The error you see comes from the
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `// Try uncommenting the bad line. The error you see comes from the
 // compiler in step 2, not from the linker, and definitely not at
 // runtime.
 #include <iostream>
@@ -138,7 +141,9 @@ int main() {
   std::cout << x << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Step 3: the assembler
@@ -202,7 +207,7 @@ three files together, links them, and runs the executable.
   files={[
     {
       filename: "main.cpp",
-      initialContent: `#include "mathx.h"
+      starterCode: `#include "mathx.h"
 #include <iostream>
 
 int main() {
@@ -215,7 +220,7 @@ int main() {
     },
     {
       filename: "mathx.h",
-      initialContent: `#pragma once
+      starterCode: `#pragma once
 
 int add(int a, int b);
 int mul(int a, int b);
@@ -223,7 +228,7 @@ int mul(int a, int b);
     },
     {
       filename: "mathx.cpp",
-      initialContent: `#include "mathx.h"
+      starterCode: `#include "mathx.h"
 
 int add(int a, int b) { return a + b; }
 int mul(int a, int b) { return a * b; }
@@ -304,7 +309,7 @@ implementation to the call from `main`.
   files={[
     {
       filename: "main.cpp",
-      initialContent: `#include "greeter.h"
+      starterCode: `#include "greeter.h"
 
 int main() {
   greet("Ada");
@@ -315,7 +320,7 @@ int main() {
     },
     {
       filename: "greeter.h",
-      initialContent: `#pragma once
+      starterCode: `#pragma once
 #include <string>
 
 void greet(const std::string &name);
@@ -323,14 +328,14 @@ void greet(const std::string &name);
     },
     {
       filename: "greeter.cpp",
-      initialContent: `#include "greeter.h"
+      starterCode: `#include "greeter.h"
 #include <iostream>
 
 void greet(const std::string &name) {
   // your code here
 }
 `,
-      solutionContent: `#include "greeter.h"
+      solutionCode: `#include "greeter.h"
 #include <iostream>
 
 void greet(const std::string &name) { std::cout << "Hello, " << name << "!\\n"; }

@@ -71,7 +71,10 @@ their coin is fair. You flip it 100 times and get 62 heads. Under H₀
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.default_rng(0)
 
@@ -96,7 +99,9 @@ print(f"Simulated p-value      : {p_value:.4f}")
 print()
 print("That p-value is literally the fraction of fair-coin runs that")
 print("landed as far from 50 as your 62 did. It is an AREA, not a verdict.")
-`}
+`,
+    },
+  ]}
 />
 
 The p-value you get is the *proportion* of fair-coin simulations that were
@@ -122,7 +127,10 @@ analytically. Let's check against an exact binomial test.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(0)
@@ -142,7 +150,9 @@ print(f"scipy exact p     : {p_exact:.4f}")
 print()
 print("They agree. The p-value was never mysterious — it is just the")
 print("tail area, which we can get by simulation OR by a formula.")
-`}
+`,
+    },
+  ]}
 />
 
 ## Building the p-value as a tail area, visually
@@ -155,7 +165,10 @@ the p-value is the shaded probability beyond them.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.express as px
 from scipy import stats
 
@@ -190,7 +203,9 @@ fig.show()
 print(f"Observed difference : {observed_diff}")
 print(f"p-value (two-sided) : {p_value:.4f}")
 print("The p-value is the share of the histogram beyond the red lines.")
-`}
+`,
+    },
+  ]}
 />
 
 Look at the histogram. It is centered on **zero** — because under H₀
@@ -248,7 +263,10 @@ rare. Flipping the condition changes the answer entirely.
 
 <CodeBlock
   adapter="python"
-  starterCode={`# A rare disease: 1% of people have it.
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# A rare disease: 1% of people have it.
 # Test: if you have it, it flags positive 99% of the time (p-value-like:
 # P(positive | healthy) = 5%, a "5% false-positive rate").
 prevalence = 0.01
@@ -275,7 +293,9 @@ print(
     f"{(1 - p_disease_given_positive) * 100:.0f}% chance you are healthy.",
 )
 print("P(data | H0) is NOT P(H0 | data).")
-`}
+`,
+    },
+  ]}
 />
 
 The false-positive rate is 5%, yet most positives are false alarms,
@@ -308,7 +328,10 @@ p-value collapse toward zero. Same effect, wildly different p-values.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(7)
@@ -327,7 +350,9 @@ print()
 print("The real effect is a constant 0.1 the whole time.")
 print("The p-value still marches to ~0 as n grows.")
 print("=> The p-value is NOT a measure of effect size.")
-`}
+`,
+    },
+  ]}
 />
 
 The effect never changed, yet the p-value swung from "not significant" to
@@ -392,7 +417,10 @@ through enough comparisons and you will always find a "discovery."
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(123)
@@ -416,7 +444,9 @@ print()
 print(f"'Significant' (p <= {alpha}) results: {false_positives}")
 print("None of these effects exist. The 'significant' ones are pure luck.")
 print("Report only the winners and you have manufactured a fake discovery.")
-`}
+`,
+    },
+  ]}
 />
 
 Run it and you'll typically see one or two "significant" results out of
@@ -445,17 +475,22 @@ advance.
 - Store it as a float called **\`p_value\`**.
 
 This is just an "area in the upper tail": count how many simulated values reach at least as far as what you saw, divided by the total.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 rng = np.random.default_rng(5)
 # Null distribution of some statistic (centered near 0 under H0).
 null_stats = rng.normal(0, 1, size=50_000)
-observed_stat = 1.9`}
-  starterCode={`# TODO: right-tailed p-value = fraction of null_stats >= observed_stat
+observed_stat = 1.9`,
+      starterCode: `# TODO: right-tailed p-value = fraction of null_stats >= observed_stat
 p_value = None
-`}
-  solutionCode={`p_value = float(np.mean(null_stats >= observed_stat))
+`,
+      solutionCode: `p_value = float(np.mean(null_stats >= observed_stat))
 print(p_value)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type",
@@ -497,16 +532,21 @@ assert abs(p_value - expected) < 1e-12`,
 - Store it as a float called **\`p_two_sided\`**.
 
 Hint: compare \`np.abs(null_stats)\` to \`abs(observed_stat)\`. The two-sided p-value should be roughly **double** the one-sided one for a symmetric null.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 rng = np.random.default_rng(5)
 null_stats = rng.normal(0, 1, size=50_000)
-observed_stat = 1.9`}
-  starterCode={`# TODO: two-sided p-value = fraction of |null_stats| >= |observed_stat|
+observed_stat = 1.9`,
+      starterCode: `# TODO: two-sided p-value = fraction of |null_stats| >= |observed_stat|
 p_two_sided = None
-`}
-  solutionCode={`p_two_sided = float(np.mean(np.abs(null_stats) >= abs(observed_stat)))
+`,
+      solutionCode: `p_two_sided = float(np.mean(np.abs(null_stats) >= abs(observed_stat)))
 print(p_two_sided)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type",

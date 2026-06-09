@@ -11,7 +11,10 @@ to *hand off* the result. Pandas can write to dozens of formats
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -28,7 +31,9 @@ print()
 # Read it back to verify
 roundtrip = pd.read_csv("scores.csv")
 print(roundtrip)
-`}
+`,
+    },
+  ]}
 />
 
 **`index=False`** is almost always what you want — otherwise you
@@ -46,7 +51,10 @@ get a mystery unnamed column when someone re-reads the file.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -57,14 +65,19 @@ df = pd.DataFrame(
 
 df.to_excel("report.xlsx", index=False, sheet_name="Headcount")
 print("Written.")
-`}
+`,
+    },
+  ]}
 />
 
 Multiple sheets in one file:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 summary = pd.DataFrame({"metric": ["sales", "cost"], "value": [1200, 800]})
 detail = pd.DataFrame({"order": [1, 2, 3], "amount": [300, 500, 400]})
@@ -74,7 +87,9 @@ with pd.ExcelWriter("report.xlsx") as writer:
     detail.to_excel(writer, sheet_name="Detail", index=False)
 
 print("Multi-sheet workbook written.")
-`}
+`,
+    },
+  ]}
 />
 
 Excel preserves types better than CSV but the files are bigger
@@ -84,7 +99,10 @@ and the format is messier under the hood.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -102,7 +120,9 @@ print()
 back = pd.read_parquet("scores.parquet")
 print(back)
 print(back.dtypes)
-`}
+`,
+    },
+  ]}
 />
 
 Parquet is:
@@ -147,7 +167,10 @@ A small habit with huge dividends:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 from datetime import date
 
 df = pd.DataFrame({"value": [1, 2, 3]})
@@ -156,7 +179,9 @@ today = date.today().isoformat()
 fname = f"sales_clean_{today}.csv"
 df.to_csv(fname, index=False)
 print("Wrote", fname)
-`}
+`,
+    },
+  ]}
 />
 
 `sales_clean_2024-03-18.csv` is much friendlier than
@@ -168,7 +193,10 @@ Before declaring "done", read the file back and confirm:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame({"id": [1, 2, 3], "value": [10, 20, 30]})
 df.to_csv("/tmp/check.csv", index=False)
@@ -179,7 +207,9 @@ back = pd.read_csv("/tmp/check.csv")
 assert back.shape == df.shape
 assert list(back.columns) == list(df.columns)
 print("Round-trip OK.")
-`}
+`,
+    },
+  ]}
 />
 
 You'd be amazed how often the answer to "did the export work?"
@@ -206,22 +236,25 @@ is "...no, the dtypes changed."
 - Rows where \`age\` is missing dropped.
 - The result written to CSV at \`/tmp/clean.csv\` with no index.
 - A round-trip read into a variable \`back\` that should equal \`clean\` in shape and columns.`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 
 df = pd.DataFrame({
     "First": ["Aiko","Bilal","Chen","Diego"],
     "Last":  ["Tanaka","Khan","Zhang","Ramirez"],
     "Age":   [29, np.nan, 35, 41],
-})`}
-  starterCode={`clean = None  # TODO
+})`,
+      starterCode: `clean = None  # TODO
 back = None  # TODO
 
 print(clean)
 print()
 print(back)
-`}
-  solutionCode={`import pandas as pd
+`,
+      solutionCode: `import pandas as pd
 
 clean = df.copy()
 clean.columns = clean.columns.str.lower()
@@ -235,7 +268,9 @@ back = pd.read_csv("/tmp/clean.csv")
 print(clean)
 print()
 print(back)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "types",

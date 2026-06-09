@@ -20,7 +20,10 @@ We met `size=` in the chapter on bubble charts. The summary:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.iris()
 
@@ -36,7 +39,9 @@ fig = px.scatter(
     labels={"sepal_width": "Sepal width (cm)", "sepal_length": "Sepal length (cm)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 The reader instantly sees that *setosa* (purple) has the smallest
@@ -58,7 +63,10 @@ marker shape: circle, square, triangle, diamond, cross, etc.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.iris()
 
@@ -73,7 +81,9 @@ fig = px.scatter(
     labels={"sepal_width": "Sepal width (cm)", "sepal_length": "Sepal length (cm)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 We've encoded `species` *twice*: as both color and shape. That
@@ -115,7 +125,10 @@ Try this. Read out loud what each `=` is encoding:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007")
 
@@ -133,7 +146,9 @@ fig = px.scatter(
     labels={"gdpPercap": "GDP per capita (USD, log)", "lifeExp": "Life expectancy"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 You should say: "x = GDP, y = life expectancy, color = continent

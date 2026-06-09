@@ -38,7 +38,10 @@ upward trend.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 flights = sns.load_dataset("flights")
@@ -51,7 +54,9 @@ sns.relplot(
     height=4,
     aspect=1.4,
 )
-`}
+`,
+    },
+  ]}
 />
 
 Air travel grew steadily over the decade — you read that off the slope
@@ -72,7 +77,10 @@ each with its own band.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="darkgrid")
 fmri = sns.load_dataset("fmri")
@@ -86,7 +94,9 @@ sns.relplot(
     height=4,
     aspect=1.5,
 )
-`}
+`,
+    },
+  ]}
 />
 
 The solid line is the **mean signal** at each timepoint; the shaded ribbon
@@ -117,7 +127,10 @@ signal, which is typically wider than a confidence interval.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="darkgrid")
 fmri = sns.load_dataset("fmri")
@@ -131,7 +144,9 @@ sns.relplot(
     height=4,
     aspect=1.5,
 )
-`}
+`,
+    },
+  ]}
 />
 
 And turn it off entirely with `errorbar=None` when you want a clean trend
@@ -139,7 +154,10 @@ line and the uncertainty is not the point.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="darkgrid")
 fmri = sns.load_dataset("fmri")
@@ -153,7 +171,9 @@ sns.relplot(
     height=4,
     aspect=1.5,
 )
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="A confidence interval is not the data's spread">
@@ -172,7 +192,10 @@ Here both `region` and `event` are encoded at once.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 fmri = sns.load_dataset("fmri")
@@ -187,7 +210,9 @@ sns.relplot(
     height=4,
     aspect=1.5,
 )
-`}
+`,
+    },
+  ]}
 />
 
 Color separates the regions; dash style separates the events — four lines
@@ -249,15 +274,18 @@ unordered categories, a bar or point plot tells the truth.`}
 - one colored line per \`region\` (use \`hue\`).
 
 Assign the result to a variable named \`g\`.`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 fmri = sns.load_dataset("fmri")
 
 # Build the line relplot and assign it to g:
 g = None
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 fmri = sns.load_dataset("fmri")
@@ -271,7 +299,9 @@ g = sns.relplot(
     height=4,
     aspect=1.5,
 )
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_grid",

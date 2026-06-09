@@ -31,7 +31,10 @@ runs.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -65,7 +68,9 @@ foreach (var n in pipeline)
 Console.WriteLine("Iterating a SECOND time — source runs again:");
 foreach (var n in pipeline)
     Console.WriteLine($"  got {n}");
-`}
+`,
+    },
+  ]}
 />
 
 Notice three things in the output:
@@ -120,7 +125,10 @@ early when laziness is preserved.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -136,7 +144,9 @@ static IEnumerable<int> Counting()
 // Even though Counting is infinite, this terminates — Any stops as soon as it sees the first match.
 bool hasBig = Counting().Any(n => n > 3);
 Console.WriteLine($"hasBig = {hasBig}");
-`}
+`,
+    },
+  ]}
 />
 
 Without laziness, `Any` over an infinite sequence would loop
@@ -170,7 +180,10 @@ the captured variables' *current* values.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var nums = new[] { 1, 2, 3, 4, 5 };
@@ -183,7 +196,9 @@ Console.WriteLine($"With threshold=4: {string.Join(",", pipeline)}");
 
 threshold = 1;
 Console.WriteLine($"With threshold=1: {string.Join(",", pipeline)}");
-`}
+`,
+    },
+  ]}
 />
 
 Same pipeline, two enumerations, two different results — because

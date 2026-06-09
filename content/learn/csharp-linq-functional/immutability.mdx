@@ -19,7 +19,10 @@ at what happens.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 static decimal Total(List<decimal> cart)
@@ -36,7 +39,9 @@ var t = Total(myCart);
 
 Console.WriteLine($"total: {t}");
 Console.WriteLine($"cart now has {myCart.Count} items: {string.Join(", ", myCart)}");
-`}
+`,
+    },
+  ]}
 />
 
 The caller passed in a cart with three items. The function computed
@@ -66,7 +71,10 @@ positional properties are read-only and equality is by value.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 var a = new Money(10m, "USD");
 var b = new Money(10m, "USD");
@@ -79,7 +87,9 @@ Console.WriteLine($"a==b: {a == b}");
 Console.WriteLine($"a==c: {a == c}");
 
 record Money(decimal Amount, string Currency);
-`}
+`,
+    },
+  ]}
 />
 
 `a` is unchanged. `c` is a brand-new record. Equality compares
@@ -92,7 +102,10 @@ set once during construction:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 var c = new Config { Host = "example.com", Port = 443 };
 // c.Host = "x";   // compile error: init-only property
@@ -104,7 +117,9 @@ class Config
     public string Host { get; init; } = "localhost";
     public int Port { get; init; } = 8080;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ### Immutable collections
@@ -116,7 +131,10 @@ list when you "add" to it.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Immutable;
 
 var a = ImmutableList.Create(1, 2, 3);
@@ -126,7 +144,9 @@ var c = b.SetItem(0, 99);
 Console.WriteLine(string.Join(", ", a)); // 1, 2, 3
 Console.WriteLine(string.Join(", ", b)); // 1, 2, 3, 4
 Console.WriteLine(string.Join(", ", c)); // 99, 2, 3, 4
-`}
+`,
+    },
+  ]}
 />
 
 Each call returns a new structure. Internally, the immutable
@@ -139,7 +159,10 @@ update**. The `with` expression is its idiomatic form for records.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 var p = new Player("Ada", 0, 1);
 
@@ -151,7 +174,9 @@ Console.WriteLine(afterPoint);
 Console.WriteLine(leveledUp);
 
 record Player(string Name, int Score, int Level);
-`}
+`,
+    },
+  ]}
 />
 
 Notice the pattern: each "transition" is a new value. The previous
@@ -223,7 +248,7 @@ The given \`Program.cs\` will call your method and print the result.`}
   files={[
     {
       filename: "Program.cs",
-      initialContent: `var a = new Money(10m, "USD");
+      starterCode: `var a = new Money(10m, "USD");
 var b = new Money(5m, "USD");
 var c = Money.Add(a, b);
 
@@ -234,7 +259,7 @@ System.Console.WriteLine($"{c.Amount} {c.Currency}");
     },
     {
       filename: "Money.cs",
-      initialContent: `public record Money(decimal Amount, string Currency)
+      starterCode: `public record Money(decimal Amount, string Currency)
 {
     public static Money Add(Money a, Money b)
     {
@@ -243,7 +268,7 @@ System.Console.WriteLine($"{c.Amount} {c.Currency}");
     }
 }
 `,
-      solutionContent: `using System;
+      solutionCode: `using System;
 
 public record Money(decimal Amount, string Currency)
 {

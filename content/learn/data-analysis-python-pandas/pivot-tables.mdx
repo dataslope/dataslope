@@ -22,7 +22,10 @@ third one."
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 sales = pd.DataFrame(
     {
@@ -39,7 +42,9 @@ p = sales.pivot_table(
     aggfunc="sum",
 )
 print(p)
-`}
+`,
+    },
+  ]}
 />
 
 Each cell is "sum of `amount` where `region` AND `product`
@@ -62,7 +67,10 @@ because it gracefully handles duplicates.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 sales = pd.DataFrame(
     {
@@ -79,7 +87,9 @@ p = sales.pivot_table(
     aggfunc=["sum", "mean", "count"],
 )
 print(p)
-`}
+`,
+    },
+  ]}
 />
 
 The result has a MultiIndex on the columns. Beautiful for
@@ -90,7 +100,10 @@ want to flatten).
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 sales = pd.DataFrame(
     {
@@ -110,7 +123,9 @@ p = sales.pivot_table(
     fill_value=0,
 )
 print(p)
-`}
+`,
+    },
+  ]}
 />
 
 This produces a row and column called `Total` containing the
@@ -120,7 +135,10 @@ overall sums — exactly like an Excel pivot's grand totals.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 orders = pd.DataFrame(
     {
@@ -139,7 +157,9 @@ p = orders.pivot_table(
     fill_value=0,
 )
 print(p)
-`}
+`,
+    },
+  ]}
 />
 
 Hierarchical indexes are powerful for grouping (`year` is the
@@ -152,7 +172,10 @@ When you need a "flat" DataFrame for export:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 sales = pd.DataFrame(
     {
@@ -171,7 +194,9 @@ flat = p.reset_index()
 flat.columns.name = None  # remove the column-axis name
 print("Flat:")
 print(flat)
-`}
+`,
+    },
+  ]}
 />
 
 This is the right shape if you want to write the result back to
@@ -181,11 +206,14 @@ CSV with no weird header rows.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 
 df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")
-`}
-  starterCode={`# Average monthly hours by department × salary bracket
+`,
+      starterCode: `# Average monthly hours by department × salary bracket
 summary = df.pivot_table(
     index="Department",
     columns="salary",
@@ -194,7 +222,9 @@ summary = df.pivot_table(
 ).round(1)
 
 print(summary)
-`}
+`,
+    },
+  ]}
 />
 
 A single call replaces a multi-step `groupby + unstack`.
@@ -211,18 +241,21 @@ A single call replaces a multi-step `groupby + unstack`.
 - Cells are the **mean** of \`amount\`
 - Missing (region, product) combinations should be 0, not NaN
 - There must be a "Total" row and a "Total" column at the end containing the means across the whole region/product respectively`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 
 sales = pd.DataFrame({
     "region":  ["N","N","S","E","E","W","W","N"],
     "product": ["A","B","A","B","A","A","B","B"],
     "amount":  [10, 20, 30, 25, 15, 18, 22, 40],
-})`}
-  starterCode={`report = None  # TODO
+})`,
+      starterCode: `report = None  # TODO
 
 print(report)
-`}
-  solutionCode={`import pandas as pd
+`,
+      solutionCode: `import pandas as pd
 
 report = sales.pivot_table(
     index="region",
@@ -235,7 +268,9 @@ report = sales.pivot_table(
 )
 
 print(report)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type",

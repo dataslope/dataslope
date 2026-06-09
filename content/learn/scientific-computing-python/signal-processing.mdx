@@ -43,7 +43,10 @@ into a routine operation.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 
 fs = 1000  # sample rate, Hz
@@ -72,7 +75,9 @@ ax[1].set_xlabel("frequency (Hz)")
 ax[1].set_title("FFT magnitude spectrum")
 plt.tight_layout()
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 The noisy time-domain plot looks like garbage; the spectrum reveals
@@ -93,7 +98,10 @@ floor. This is the power of the FFT in one image.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import get_window
 
@@ -112,7 +120,9 @@ plt.xlabel("Hz")
 plt.legend()
 plt.title("Windowing tames spectral leakage")
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 The rectangular window's spectrum is a wide sinc that leaks energy
@@ -127,7 +137,10 @@ filter**, applied with `sosfiltfilt` for zero-phase response.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import butter, sosfiltfilt
 
@@ -150,7 +163,9 @@ ax[1].set_title("after Butterworth low-pass")
 plt.xlabel("time (s)")
 plt.tight_layout()
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 Why **`sosfiltfilt`** instead of `lfilter`?
@@ -169,7 +184,10 @@ to show how its frequency content evolves.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import spectrogram
 
@@ -186,7 +204,9 @@ plt.ylabel("frequency (Hz)")
 plt.title("chirp spectrogram")
 plt.colorbar(label="dB")
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 The bright diagonal stripe traces the instantaneous frequency
@@ -204,7 +224,10 @@ layer in a neural network.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import convolve
 
@@ -221,7 +244,9 @@ plt.plot(t, x, alpha=0.5, label="raw")
 plt.plot(t, y, lw=2, label=f"{K}-pt moving average")
 plt.legend()
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 For large signals or large kernels, use `scipy.signal.fftconvolve`,
@@ -237,7 +262,7 @@ of $O(N \cdot K)$.
   files={[
     {
       filename: "main.py",
-      initialContent: `import numpy as np
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from pipeline import generate_signal, denoise
 
@@ -262,7 +287,7 @@ print(f"RMSE after denoising: {rmse:.4f}")
     },
     {
       filename: "pipeline.py",
-      initialContent: `import numpy as np
+      starterCode: `import numpy as np
 from scipy.signal import butter, sosfiltfilt
 
 

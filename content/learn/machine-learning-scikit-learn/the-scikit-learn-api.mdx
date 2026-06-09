@@ -73,7 +73,10 @@ yet from the outside they are nearly indistinguishable.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import make_regression, load_iris, make_blobs
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import make_regression, load_iris, make_blobs
 from sklearn.linear_model import LinearRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.cluster import KMeans
@@ -95,7 +98,9 @@ Xk, _ = make_blobs(n_samples=80, centers=3, random_state=0)
 km = KMeans(n_clusters=3, n_init=10, random_state=0)
 km.fit(Xk)  # <-- fit  (same method again!)
 print("Clusterer assigns:   ", km.predict(Xk[:1])[0])  # <-- predict
-`}
+`,
+    },
+  ]}
 />
 
 Read that again and let it land. Three models with nothing in common under
@@ -150,7 +155,10 @@ and unit variance — and confirm it exposes `transform`, not `predict`.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.preprocessing import StandardScaler
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression
 from sklearn.datasets import load_iris
 
@@ -169,7 +177,9 @@ print("StandardScaler has transform:", hasattr(scaler, "transform"))
 print("StandardScaler has predict:  ", hasattr(scaler, "predict"))
 print("LinearRegression has predict: ", hasattr(LinearRegression(), "predict"))
 print("LinearRegression has transform:", hasattr(LinearRegression(), "transform"))
-`}
+`,
+    },
+  ]}
 />
 
 A transformer returns *data*; a predictor returns *answers*. That is the
@@ -198,7 +208,10 @@ perfect).
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
@@ -209,7 +222,9 @@ model = LogisticRegression(max_iter=1000).fit(X_train, y_train)
 
 # score on held-out data: for a classifier this is accuracy.
 print(f"Default score (accuracy here): {model.score(X_test, y_test):.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 `score` is perfect for a fast gut check, but it is intentionally simple — one
@@ -234,7 +249,10 @@ classes sum to 1 for each row.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris
 from sklearn.linear_model import LogisticRegression
 
 data = load_iris()
@@ -249,7 +267,9 @@ proba = model.predict_proba(X[:1])[0]
 print("predict_proba gives a vector:", proba.round(3))
 print("Probabilities sum to:        ", round(float(proba.sum()), 3))
 print("Most likely class:           ", data.target_names[proba.argmax()])
-`}
+`,
+    },
+  ]}
 />
 
 Those probabilities are the raw material for so much that follows: setting a
@@ -275,7 +295,10 @@ same model, all with the standard methods.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -292,7 +315,9 @@ acc = clf.score(X_test, y_test)  # 4. quick quality number
 print("First 5 predicted labels:", labels[:5])
 print("Probabilities for row 0: ", probs[0].round(2))
 print(f"Held-out accuracy:        {acc:.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 Four method calls, and you have trained a model, made predictions, gauged its
@@ -365,7 +390,10 @@ are already provided. Drive the model through the standard scikit-learn API.
 The hidden tests check that the model is fitted, that \`predictions\` has one
 label per test row, that each row of \`probs\` sums to 1, and that
 \`accuracy\` matches scoring on the test set.`}
-  initCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -373,8 +401,8 @@ X, y = load_wine(return_X_y=True)
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0
 )
-model = KNeighborsClassifier(n_neighbors=5)`}
-  starterCode={`# 'model' and the train/test split are provided above.
+model = KNeighborsClassifier(n_neighbors=5)`,
+      starterCode: `# 'model' and the train/test split are provided above.
 
 # 1. Train the model
 # (call .fit on the training data)
@@ -390,8 +418,8 @@ accuracy = None
 
 print("First predictions:", None if predictions is None else predictions[:5])
 print("Accuracy:", accuracy)
-`}
-  solutionCode={`model.fit(X_train, y_train)
+`,
+      solutionCode: `model.fit(X_train, y_train)
 
 predictions = model.predict(X_test)
 
@@ -401,7 +429,9 @@ accuracy = model.score(X_test, y_test)
 
 print("First predictions:", predictions[:5])
 print("Accuracy:", accuracy)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "fitted",

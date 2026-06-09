@@ -31,7 +31,10 @@ You index it with `[i]` starting at 0:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   int scores[5] = {90, 85, 72, 95, 88};
@@ -41,7 +44,9 @@ int main() {
   std::cout << "average = " << total / 5 << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Raw arrays have two well-known weaknesses:
@@ -62,7 +67,10 @@ algorithms.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <array>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <array>
 #include <iostream>
 
 int main() {
@@ -74,7 +82,9 @@ int main() {
   std::cout << "total = " << total << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Use `std::array` whenever the size is known at compile time.
@@ -86,7 +96,10 @@ array but can grow at runtime. You'll reach for it constantly.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 int main() {
@@ -101,7 +114,9 @@ int main() {
   std::cout << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Under the hood:
@@ -133,7 +148,10 @@ its character storage, knows its length, and resizes as needed.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 
 int main() {
@@ -148,7 +166,9 @@ int main() {
   std::cout << "last  = " << greeting.back() << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Beware the C-style string (`const char*`, `char[]`). It's a raw
@@ -190,7 +210,10 @@ A grid is naturally a vector of vectors:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 int main() {
@@ -209,7 +232,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 For performance-critical code you'd use a single flat vector and
@@ -222,7 +247,10 @@ in one contiguous block — friendlier to the CPU cache.
   adapter="cpp"
   title="Vector statistics"
   instructions={`Read 5 ints from the input \`{4, 8, 15, 16, 23}\` (already wired in \`main\`). Print the smallest, the largest, and the sum, separated by spaces. Expected output: \`4 23 66\`.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 int main() {
@@ -230,8 +258,8 @@ int main() {
   // your code: compute min, max, sum and print them space-separated
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <vector>
 
 int main() {
@@ -247,7 +275,9 @@ int main() {
   std::cout << mn << ' ' << mx << ' ' << sum;
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "stat",
@@ -262,7 +292,10 @@ int main() {
   adapter="cpp"
   title="Reverse a string"
   instructions={`Read the literal string \`"computational"\` (already in main) and print its reverse: \`lanoitatupmoc\`. You may use indexing or a standard algorithm.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 
 int main() {
@@ -270,8 +303,8 @@ int main() {
   // your code
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <string>
 
 int main() {
@@ -280,7 +313,9 @@ int main() {
     std::cout << s[i];
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "rev",

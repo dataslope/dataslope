@@ -144,7 +144,10 @@ its shape.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 # Load directly from GitHub — Pandas can read URLs as easily as files
 df = pd.read_csv(
@@ -155,7 +158,9 @@ print("Shape (rows, columns):", df.shape)
 print("Columns:")
 for col in df.columns:
     print(" -", col)
-`}
+`,
+    },
+  ]}
 />
 
 That is a tabular dataset of about 15,000 employees and around a

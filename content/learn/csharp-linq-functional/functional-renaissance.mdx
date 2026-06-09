@@ -55,7 +55,10 @@ randomness).
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 static int Pure(int x, int y) => x + y;
 
@@ -67,7 +70,9 @@ static int Impure(int x)
 
 Console.WriteLine(Pure(2, 3)); // always 5
 Console.WriteLine(Impure(2));  // depends on the clock
-`}
+`,
+    },
+  ]}
 />
 
 Pure functions are **testable** (same input → same output),
@@ -80,14 +85,19 @@ An **immutable** value cannot change after it is constructed. To
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `
 var p = new Point(1, 2);
 var moved = p with { X = 10 };
 
 System.Console.WriteLine($"p={p}, moved={moved}");
 
 record Point(double X, double Y);
-`}
+`,
+    },
+  ]}
 />
 
 `p` is unchanged. `moved` is a brand-new value. Two threads can read
@@ -100,7 +110,10 @@ argument or returns one. Every LINQ operator is higher-order.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var nums = new[] { 1, 2, 3, 4, 5 };
@@ -109,7 +122,9 @@ var nums = new[] { 1, 2, 3, 4, 5 };
 var evens = nums.Where(n => n % 2 == 0).ToArray();
 
 System.Console.WriteLine(string.Join(", ", evens));
-`}
+`,
+    },
+  ]}
 />
 
 Higher-order functions let you parameterize *behavior*, not just
@@ -122,7 +137,10 @@ Each one is reusable. The whole pipeline reads top to bottom.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 static bool IsEven(int n) => n % 2 == 0;
@@ -133,7 +151,9 @@ var nums = Enumerable.Range(1, 10);
 int answer = nums.Where(IsEven).Select(Square).Sum();
 
 System.Console.WriteLine(answer); // 220
-`}
+`,
+    },
+  ]}
 />
 
 `IsEven` and `Square` are named, testable, reusable. They can be

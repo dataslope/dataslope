@@ -132,7 +132,10 @@ table above.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 # Installs NLTK and loads the data this page needs. nltk.download() isn't
 # available in this environment, so we fetch the data archives directly
 # and unpack them into NLTK's data directory.
@@ -162,8 +165,8 @@ await _load_nltk("corpora", "stopwords")
 await _load_nltk("corpora", "wordnet")
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer`}
-  starterCode={`text = "The Cats are RUNNING quickly, and the dogs are barking loudly!"
+from nltk.stem import WordNetLemmatizer`,
+      starterCode: `text = "The Cats are RUNNING quickly, and the dogs are barking loudly!"
 
 # Step 1 — word tokenization
 tokens = word_tokenize(text)
@@ -186,7 +189,9 @@ print("4. no stops:  ", tokens)
 lemmatizer = WordNetLemmatizer()
 tokens = [lemmatizer.lemmatize(t) for t in tokens]
 print("5. lemmatized:", tokens)
-`}
+`,
+    },
+  ]}
 />
 
 Each `print` is one row of the pipeline table. The list started as thirteen
@@ -252,7 +257,10 @@ different orders, and compares the results.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -277,8 +285,8 @@ async def _load_nltk(category, package):
 await _load_nltk("tokenizers", "punkt_tab")
 await _load_nltk("corpora", "stopwords")
 from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords`}
-  starterCode={`text = "The The THE end is near"
+from nltk.corpus import stopwords`,
+      starterCode: `text = "The The THE end is near"
 stop = set(stopwords.words("english"))  # all lowercase, includes 'the'
 tokens = word_tokenize(text)
 
@@ -292,7 +300,9 @@ b = [t.lower() for t in b]
 
 print("Order A (lowercase then filter):", a)
 print("Order B (filter then lowercase):", b)
-`}
+`,
+    },
+  ]}
 />
 
 Order A correctly removes all three "the"s, because by the time we compare
@@ -334,7 +344,10 @@ foxes!")\` should return \`['quick', 'brown', 'foxes']\`.
 
 The \`word_tokenize\` function and the \`stop\` set are already available from
 the setup section.`}
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -360,8 +373,8 @@ await _load_nltk("tokenizers", "punkt_tab")
 await _load_nltk("corpora", "stopwords")
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-stop = set(stopwords.words("english"))`}
-  starterCode={`def preprocess(text):
+stop = set(stopwords.words("english"))`,
+      starterCode: `def preprocess(text):
     # your code here — return a list of clean tokens
     tokens = word_tokenize(text)
     # ... lowercase, keep alphabetic, drop stopwords ...
@@ -370,8 +383,8 @@ stop = set(stopwords.words("english"))`}
 
 print(preprocess("The quick brown foxes are jumping!"))
 print(preprocess("It is NOT a good day."))
-`}
-  solutionCode={`def preprocess(text):
+`,
+      solutionCode: `def preprocess(text):
     tokens = word_tokenize(text)
     tokens = [t.lower() for t in tokens]
     tokens = [t for t in tokens if t.isalpha()]
@@ -381,7 +394,9 @@ print(preprocess("It is NOT a good day."))
 
 print(preprocess("The quick brown foxes are jumping!"))
 print(preprocess("It is NOT a good day."))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "returns_list",

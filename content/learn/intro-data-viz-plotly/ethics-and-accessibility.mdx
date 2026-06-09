@@ -28,7 +28,10 @@ turns a 5% difference into a 10× visual gap.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 df = pd.DataFrame({"product": ["A", "B"], "score": [98, 100]})
@@ -49,7 +52,9 @@ fig2 = px.bar(
     range_y=[97, 101],
 )
 fig2.show()
-`}
+`,
+    },
+  ]}
 />
 
 The data is identical. The second chart screams "B is *twice* A" —

@@ -107,7 +107,10 @@ what stops you from accidentally putting an `Integer` next to a name.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -126,7 +129,9 @@ public class Main {
     System.out.println("There are " + names.size() + " names.");
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Three things to notice — they will reappear on almost every page:

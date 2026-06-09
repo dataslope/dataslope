@@ -33,7 +33,10 @@ the rows and measure again. Run it.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 
 # Monthly international airline passengers (thousands), Jan 1949 - Dec 1960.
@@ -53,8 +56,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`# Correlation of each month with the PREVIOUS month (lag-1 autocorrelation).
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `# Correlation of each month with the PREVIOUS month (lag-1 autocorrelation).
 ordered_corr = air.corr(air.shift(1))
 
 # Now shuffle the values, destroying their time order, and measure again.
@@ -66,7 +69,9 @@ print(f"Lag-1 correlation, after shuffling   : {shuffled_corr:.3f}")
 print()
 print("The ordered series is almost perfectly predictable from its own past.")
 print("Shuffling threw that predictability in the trash. The order WAS the signal.")
-`}
+`,
+    },
+  ]}
 />
 
 The ordered series has a lag-1 correlation near **0.95** — knowing this

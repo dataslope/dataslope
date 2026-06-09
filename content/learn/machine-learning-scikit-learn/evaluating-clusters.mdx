@@ -71,7 +71,10 @@ is.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import make_blobs
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
@@ -84,7 +87,9 @@ labels = km.fit_predict(X)
 score = silhouette_score(X, labels)
 print(f"Silhouette score: {score:.3f}")
 print("Closer to 1 means tighter, better-separated clusters.")
-`}
+`,
+    },
+  ]}
 />
 
 For clean, well-separated blobs the score is high — close to the structure's
@@ -98,7 +103,10 @@ clusters. Try several values of `k`, score each, and let the data vote.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import matplotlib.pyplot as plt
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
@@ -123,7 +131,9 @@ plt.legend()
 plt.show()
 
 print("Silhouette picked k =", best_k, "(the data was built with 4 blobs)")
-`}
+`,
+    },
+  ]}
 />
 
 The silhouette score peaks at the number of clusters the data actually has.
@@ -139,7 +149,10 @@ negative points even when the average looks fine.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
@@ -166,7 +179,9 @@ plt.ylabel("Points, grouped by cluster")
 plt.title("Per-point silhouette plot")
 plt.legend(loc="lower right")
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 Wide, tall "knives" that mostly clear the red average line are healthy
@@ -183,7 +198,10 @@ answer.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import make_moons
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import make_moons
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
@@ -198,7 +216,9 @@ print(f"Silhouette of the TRUE crescent labels: {silhouette_score(X, y_true):.3f
 print()
 print("The geometrically 'wrong' round split scores HIGHER than the")
 print("correct crescents — because silhouette prizes round, compact shapes.")
-`}
+`,
+    },
+  ]}
 />
 
 The round clustering that is *wrong* for this data scores **higher** than
@@ -236,7 +256,10 @@ together.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import make_blobs
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 from sklearn.metrics import adjusted_rand_score
 
@@ -246,7 +269,9 @@ labels = KMeans(n_clusters=3, n_init=10, random_state=0).fit_predict(X)
 # Cluster IDs are arbitrary (cluster "0" need not equal true group "0"),
 # but the adjusted Rand index ignores the labeling and compares groupings.
 print(f"Adjusted Rand index vs true groups: {adjusted_rand_score(y_true, labels):.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 A score near 1.0 means the discovered clusters line up almost perfectly with
@@ -296,21 +321,24 @@ valid range from -1 to 1, and that \`best_k\` is the k with the highest
 silhouette score. (Worth noticing: the winning k here need not equal the 5
 blobs the data was generated with — a live reminder that the silhouette
 optimizes geometry, not the "true" count.)`}
-  initCode={`from sklearn.datasets import make_blobs
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
 X, _ = make_blobs(n_samples=400, centers=5, cluster_std=0.6, random_state=42)
-candidate_ks = list(range(2, 8))`}
-  starterCode={`sil_scores = []
+candidate_ks = list(range(2, 8))`,
+      starterCode: `sil_scores = []
 
 # TODO: for each k in candidate_ks, fit KMeans and append its silhouette score
 
 best_k = None
 print("scores:", sil_scores)
 print("best_k:", best_k)
-`}
-  solutionCode={`sil_scores = []
+`,
+      solutionCode: `sil_scores = []
 for k in candidate_ks:
     labels = KMeans(n_clusters=k, n_init=10, random_state=0).fit_predict(X)
     sil_scores.append(silhouette_score(X, labels))
@@ -318,7 +346,9 @@ for k in candidate_ks:
 best_k = candidate_ks[sil_scores.index(max(sil_scores))]
 print("scores:", sil_scores)
 print("best_k:", best_k)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "len",

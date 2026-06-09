@@ -39,7 +39,10 @@ the *call hierarchy* at any moment.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int triple(int n) {
   int t = n * 3;
@@ -59,7 +62,9 @@ int main() {
   std::cout << z << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Let's trace what the stack looks like at each step.
@@ -183,7 +188,10 @@ with a **stack overflow**.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 // DON'T worry, this is intentional. It will likely crash or trip
 // the sandbox's stack guard.
@@ -197,7 +205,9 @@ int main() {
   std::cout << "(uncomment the line above to trigger a stack overflow)\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The cure is always the same: give recursion a real base case, or
@@ -228,7 +238,10 @@ stack frame.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <cstdint>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <cstdint>
 #include <iostream>
 
 void show(const char *who, int depth) {
@@ -250,7 +263,9 @@ int main() {
   recurse(1);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The addresses get smaller as you go deeper (or larger, depending on

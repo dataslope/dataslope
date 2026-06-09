@@ -45,7 +45,10 @@ implement the message in its own way.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Lamp desk = new Lamp();
     desk.turnOn();
@@ -78,7 +81,9 @@ class Lamp {
     return on ? "Lamp on at " + (int)(brightness * 100) + "%" : "Lamp off";
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 The caller in `main` does not know that `Lamp` clamps the brightness
@@ -104,7 +109,10 @@ overloading**.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Printer p = new Printer();
     p.print("hello");   // matches print(String)
@@ -120,7 +128,9 @@ class Printer {
     System.out.println("P: " + s + " x " + n);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Overloading should be used sparingly. If two overloads do *different
@@ -157,7 +167,10 @@ build complex behavior out of small, well-named parts.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Stopwatch s = new Stopwatch();
     s.start();
@@ -191,7 +204,9 @@ class Stopwatch {
     return "Elapsed: " + this.elapsedNs() + " ns (running=" + running + ")";
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 `summary()` doesn't recompute the elapsed time itself — it sends the
@@ -221,7 +236,7 @@ classDiagram
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.Arrays;
+      starterCode: `import java.util.Arrays;
 import java.util.List;
 
 public class Main {
@@ -239,7 +254,7 @@ public class Main {
     },
     {
       filename: "Item.java",
-      initialContent: `public class Item {
+      starterCode: `public class Item {
   private final String name;
   private final int priceCents;
   public Item(String name, int priceCents) {
@@ -253,7 +268,7 @@ public class Main {
     },
     {
       filename: "Receipt.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Receipt {
@@ -280,7 +295,7 @@ public class Receipt {
     },
     {
       filename: "Cashier.java",
-      initialContent: `import java.util.List;
+      starterCode: `import java.util.List;
 
 public class Cashier {
   public Receipt ringUp(List<Item> items) {
@@ -334,7 +349,7 @@ Hello, Eve!
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Greeter g = new Greeter();
     System.out.println(g.greet());
@@ -348,11 +363,11 @@ Hello, Eve!
     },
     {
       filename: "Greeter.java",
-      initialContent: `public class Greeter {
+      starterCode: `public class Greeter {
   // TODO: three overloaded greet methods
 }
 `,
-      solutionContent: `public class Greeter {
+      solutionCode: `public class Greeter {
   public String greet() { return "Hello!"; }
   public String greet(String name) { return "Hello, " + name + "!"; }
   public String greet(String name, String lang) {

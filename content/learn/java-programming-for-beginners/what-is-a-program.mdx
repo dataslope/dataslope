@@ -50,7 +50,10 @@ recipe.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     // 1. INPUT: we already know the numbers
     int a = 7;
@@ -65,7 +68,9 @@ recipe.
     System.out.println("a * b = " + product);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Things to notice, without yet worrying about *why* Java looks the way
@@ -135,10 +140,15 @@ Try this:
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) { System.out.println("Hello World"); }
 }
-`}
+`,
+    },
+  ]}
 />
 
 There it is. You made a computer talk.
@@ -168,13 +178,13 @@ Hello, Linus!
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     // TODO: print the three lines exactly as described
   }
 }
 `,
-      solutionContent: `public class Main {
+      solutionCode: `public class Main {
   public static void main(String[] args) {
     System.out.println("Hello, Ada!");
     System.out.println("Hello, Grace!");

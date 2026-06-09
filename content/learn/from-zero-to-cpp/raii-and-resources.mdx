@@ -57,7 +57,10 @@ which *is* a RAII wrapper around the OS file handle.)
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <cstdio>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <cstdio>
 #include <iostream>
 #include <stdexcept>
 
@@ -93,7 +96,9 @@ int main() {
   std::cout << "done\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 What you should notice:

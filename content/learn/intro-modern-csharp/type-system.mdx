@@ -21,7 +21,10 @@ make sense given the types?*
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 int age = 30;
 string name = "Ada";
@@ -35,7 +38,9 @@ Console.WriteLine($"{name} is {age} years old");
 // You can format strings together, though:
 string description = name + " is " + age + " years old";
 Console.WriteLine(description);
-`}
+`,
+    },
+  ]}
 />
 
 Static typing is not glamorous. But the moment you have a program
@@ -83,7 +88,10 @@ you with no syntax:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 int small = 100;
 long big = small; // implicit int -> long (always safe)
@@ -92,7 +100,9 @@ float f = 3.5f;
 double d = f; // implicit float -> double
 
 Console.WriteLine($"big = {big}, d = {d}");
-`}
+`,
+    },
+  ]}
 />
 
 ### Explicit conversions (you take responsibility)
@@ -102,7 +112,10 @@ unless you cast explicitly with `(type)value`:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 double price = 19.99;
 int rounded = (int)price; // explicit cast — drops the .99
@@ -113,7 +126,9 @@ Console.WriteLine($"rounded (truncated) = {rounded}");
 long bigNumber = 5_000_000_000L;
 int truncated = (int)bigNumber; // overflow — produces a wrong answer
 Console.WriteLine($"truncated = {truncated}");
-`}
+`,
+    },
+  ]}
 />
 
 The `(int)` is the compiler saying *"OK, you're on the hook for any
@@ -125,7 +140,10 @@ A very common operation: turn a string like `"42"` into an `int`.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 string text = "42";
 
@@ -134,7 +152,9 @@ Console.WriteLine($"parsed: {n}");
 
 bool ok = int.TryParse("not a number", out int result);
 Console.WriteLine($"TryParse ok={ok}, result={result}");
-`}
+`,
+    },
+  ]}
 />
 
 `int.Parse` throws an exception on bad input. `int.TryParse`
@@ -171,13 +191,18 @@ flowchart LR
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 int a = 5;
 int b = a; // copies the value 5
 b = 99;    // changes only b
 Console.WriteLine($"a = {a}, b = {b}");
-`}
+`,
+    },
+  ]}
 />
 
 `a` is still `5`. Changing `b` did nothing to `a`. They are
@@ -204,7 +229,10 @@ flowchart LR
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 var a = new List<int> { 1, 2, 3 };
@@ -213,7 +241,9 @@ b.Add(99); // modifies the same list
 
 Console.WriteLine($"a has {a.Count} items: [{string.Join(", ", a)}]");
 Console.WriteLine($"b has {b.Count} items: [{string.Join(", ", b)}]");
-`}
+`,
+    },
+  ]}
 />
 
 `a` and `b` are two *names* for the **same** list. Adding through
@@ -224,7 +254,10 @@ If you wanted a real copy, you'd ask explicitly:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 var a = new List<int> { 1, 2, 3 };
@@ -233,7 +266,9 @@ b.Add(99);
 
 Console.WriteLine($"a: [{string.Join(", ", a)}]");
 Console.WriteLine($"b: [{string.Join(", ", b)}]");
-`}
+`,
+    },
+  ]}
 />
 
 ### Why strings act "like values"
@@ -244,7 +279,10 @@ cannot change the contents of a string once it's created. Every
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 string a = "hello";
 string b = a;       // copies the reference
@@ -252,7 +290,9 @@ b = b + " world"; // does NOT mutate the original; creates a new string
 
 Console.WriteLine($"a = {a}");
 Console.WriteLine($"b = {b}");
-`}
+`,
+    },
+  ]}
 />
 
 Because strings can't be mutated, you get "value-like" behavior
@@ -265,7 +305,10 @@ Reference behavior also matters when you *pass* objects to methods.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 void AppendOne(List<int> list)
@@ -285,7 +328,9 @@ Console.WriteLine($"after AppendOne: [{string.Join(", ", xs)}]");
 
 Reassign(xs);
 Console.WriteLine($"after Reassign:  [{string.Join(", ", xs)}]");
-`}
+`,
+    },
+  ]}
 />
 
 `AppendOne` reaches *through* the reference and changes the list.
@@ -311,7 +356,10 @@ means "no object at all."
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 string? maybeName = null; // 'string?' = "string or null"
 
@@ -323,7 +371,9 @@ else
 {
     Console.WriteLine($"name is {maybeName.ToUpper()}");
 }
-`}
+`,
+    },
+  ]}
 />
 
 In modern C#, `string` (without `?`) means "definitely not null,"

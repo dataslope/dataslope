@@ -41,7 +41,10 @@ pass to LINQ.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 Func<int, int> square = x => x * x;
 Func<int, int, int> add = (a, b) => a + b;
@@ -50,7 +53,9 @@ Func<int, bool> isPositive = x => x > 0;
 Console.WriteLine(square(7));      // 49
 Console.WriteLine(add(3, 4));      // 7
 Console.WriteLine(isPositive(-2)); // False
-`}
+`,
+    },
+  ]}
 />
 
 A lambda captures variables from its enclosing scope. This is called
@@ -58,7 +63,10 @@ a **closure**.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 int factor = 10;
 Func<int, int> times = x => x * factor;
@@ -67,7 +75,9 @@ Console.WriteLine(times(3)); // 30
 
 factor = 100;
 Console.WriteLine(times(3)); // 300 — the lambda *captured* factor, not its value
-`}
+`,
+    },
+  ]}
 />
 
 Captured variables are a common source of bugs in loops. The general
@@ -80,7 +90,10 @@ time, lazily. It's the secret behind almost every LINQ operator.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 static IEnumerable<int> Counting()
@@ -97,7 +110,9 @@ Console.WriteLine("Before foreach");
 foreach (var n in Counting())
     Console.WriteLine($"got {n}");
 Console.WriteLine("After foreach");
-`}
+`,
+    },
+  ]}
 />
 
 Notice the interleaving: the producer runs *only as the consumer
@@ -111,7 +126,10 @@ and `return`.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 var c = new Circle(2);
 Console.WriteLine($"area={c.Area:F2}, circ={c.Circumference():F2}");
@@ -121,7 +139,9 @@ record Circle(double Radius)
     public double Area => Math.PI * Radius * Radius;
     public double Circumference() => 2 * Math.PI * Radius;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Expression bodies make short pure functions look like the math they
@@ -134,7 +154,10 @@ is the closest thing C# has to Haskell-style pattern matching.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 static string Describe(object o) => o switch { null => "nothing",
                                                int n when n <
@@ -149,7 +172,9 @@ Console.WriteLine(Describe(-1));
 Console.WriteLine(Describe("hello"));
 Console.WriteLine(Describe(new[] { 1, 2, 3 }));
 Console.WriteLine(Describe(null));
-`}
+`,
+    },
+  ]}
 />
 
 Switch expressions are *expressions* — they return a value, which
@@ -164,7 +189,10 @@ Records are the workhorse of immutable data in modern C#.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 var a = new Person("Ada", 36);
 var b = new Person("Ada", 36);
@@ -176,7 +204,9 @@ Console.WriteLine(older);      // Person { Name = Ada, Age = 37 }
 Console.WriteLine(a == older); // False
 
 record Person(string Name, int Age);
-`}
+`,
+    },
+  ]}
 />
 
 `with` produces a *new* record with some fields replaced. The
@@ -190,7 +220,10 @@ the class.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 int[] nums = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
@@ -200,7 +233,9 @@ static int Squared(int n) => n * n;
 
 var answer = nums.Where(IsEven).Select(Squared).Sum();
 Console.WriteLine(answer);
-`}
+`,
+    },
+  ]}
 />
 
 Local functions can be `static` (recommended when they don't capture
@@ -213,14 +248,19 @@ multiple values without inventing a class.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 static (int min, int max, double avg) Stats(int[] xs) => (xs.Min(), xs.Max(), xs.Average());
 
 var (lo, hi, mean) = Stats(new[] { 4, 1, 9, 2, 7 });
 Console.WriteLine($"lo={lo}, hi={hi}, mean={mean:F2}");
-`}
+`,
+    },
+  ]}
 />
 
 ## Collection expressions (C# 12)
@@ -230,7 +270,10 @@ the compiler picks the right type.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 int[] a = [1, 2, 3];
@@ -238,7 +281,9 @@ List<int> b = [4, 5, 6];
 int[] c = [..a, ..b, 7, 8];
 
 Console.WriteLine(string.Join(", ", c)); // 1, 2, 3, 4, 5, 6, 7, 8
-`}
+`,
+    },
+  ]}
 />
 
 ## The modern functional toolkit, summarized
@@ -247,7 +292,10 @@ By 2024-era C#, "functional" idioms look like this:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -268,7 +316,9 @@ foreach (var r in report)
     Console.WriteLine($"{r.Region,-5} total={r.Total,8:C}   {string.Join(", ", r.Products)}");
 
 record Sale(string Region, string Product, decimal Amount);
-`}
+`,
+    },
+  ]}
 />
 
 Every page after this one uses some subset of these features. With

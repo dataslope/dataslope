@@ -17,7 +17,10 @@ by one category.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 df = pd.DataFrame(
@@ -35,7 +38,9 @@ fig = px.pie(
     title="Traffic by channel (pie)",
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 The chart says "Organic is the biggest chunk." With 5 slices and a
@@ -58,7 +63,10 @@ criticism: the eye is bad at comparing angles. Try the next chart:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 # Five close-to-equal categories
@@ -86,7 +94,9 @@ fig2 = px.bar(
     title="Same data as a bar — much easier to rank",
 )
 fig2.show()
-`}
+`,
+    },
+  ]}
 />
 
 On the pie, ranking the slices takes real concentration. On the
@@ -126,7 +136,10 @@ When a pie isn't a good fit, the alternatives are almost always:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 df = pd.DataFrame(
@@ -150,7 +163,9 @@ fig = px.bar(
 )
 fig.update_layout(showlegend=True, height=200)
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 A horizontal stacked bar carries the same "part of a whole"

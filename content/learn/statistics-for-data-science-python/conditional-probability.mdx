@@ -103,7 +103,10 @@ paid plan against whether they churned this quarter.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 # Counts of users by plan and churn status.
 table = pd.DataFrame(
@@ -130,7 +133,9 @@ print(
 # Compare to the UNCONDITIONAL churn rate (whole table).
 p_churn = table["churned"].sum() / table.values.sum()
 print(f"\\nP(churn) overall = {p_churn:.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 Free users churn at more than five times the rate of paid users — the
@@ -215,7 +220,10 @@ verify both by direct calculation and by simulating a population.
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Bayes' rule by hand: P(disease | positive).
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Bayes' rule by hand: P(disease | positive).
 base_rate = 0.001  # P(disease)
 sensitivity = 0.99  # P(+ | disease)
 fpr = 0.01  # P(+ | healthy)  = 1 - specificity
@@ -231,12 +239,17 @@ print(f"P(disease | positive)= PPV = {ppv:.4f}  (about {ppv * 100:.0f}%)")
 print()
 print("A POSITIVE on a '99% accurate' test means only a ~9% chance of")
 print("disease here, because the disease is rare. The base rate dominates.")
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.default_rng(7)
 
@@ -261,7 +274,9 @@ print(f"Tested positive:             {positives:,}")
 print(f"   ...of whom truly sick:    {sick_and_positive:,}")
 print(f"\\nEmpirical P(disease | +):   {ppv_empirical:.4f}")
 print(f"(Matches the ~0.09 from Bayes' rule.)")
-`}
+`,
+    },
+  ]}
 />
 
 Both approaches agree: a positive result lifts your probability from
@@ -308,7 +323,10 @@ two paths (the **law of total probability**), then divide:
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Spam filter framing of the SAME math.
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Spam filter framing of the SAME math.
 # Base rate: 20% of incoming email is spam.
 p_spam = 0.20
 
@@ -326,7 +344,9 @@ print(f"Base rate P(spam)            = {p_spam:.2f}")
 print(f"After seeing 'winner':")
 print(f"P(spam | 'winner')           = {p_spam_given_word:.3f}")
 print(f"\\nThe evidence raised our belief from 0.20 to {p_spam_given_word:.2f}.")
-`}
+`,
+    },
+  ]}
 />
 
 That's the entire idea of updating: one informative word pushed a 20%
@@ -357,17 +377,20 @@ Compute, as plain Python **floats**:
 - **\`p_open_overall\`** — \`P(opened)\` across the entire table.
 
 Use the provided \`counts\` DataFrame.`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 counts = pd.DataFrame(
     {"opened": [180, 420], "not_opened": [320, 80]},
     index=["new", "loyal"],
-)`}
-  starterCode={`# TODO: compute the three conditional / overall probabilities as floats
+)`,
+      starterCode: `# TODO: compute the three conditional / overall probabilities as floats
 p_open_given_new = None
 p_open_given_loyal = None
 p_open_overall = None
-`}
-  solutionCode={`new_total = counts.loc["new"].sum()
+`,
+      solutionCode: `new_total = counts.loc["new"].sum()
 loyal_total = counts.loc["loyal"].sum()
 grand_total = counts.values.sum()
 
@@ -376,7 +399,9 @@ p_open_given_loyal = float(counts.loc["loyal", "opened"] / loyal_total)
 p_open_overall = float(counts["opened"].sum() / grand_total)
 
 print(p_open_given_new, p_open_given_loyal, p_open_overall)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "types",
@@ -422,18 +447,23 @@ Compute, as plain Python **floats**:
 - **\`ppv\`** — \`P(fraud | flagged)\` via Bayes' rule.
 
 The answer should be well below 0.5 — most flags are false alarms because fraud is rare.`}
-  initCode={`p_fraud = 0.005
+  files={[
+    {
+      filename: "main.py",
+      initCode: `p_fraud = 0.005
 p_flag_given_fraud = 0.95
-p_flag_given_legit = 0.03`}
-  starterCode={`# TODO: compute p_flag (total probability of a flag) and ppv = P(fraud | flagged)
+p_flag_given_legit = 0.03`,
+      starterCode: `# TODO: compute p_flag (total probability of a flag) and ppv = P(fraud | flagged)
 p_flag = None
 ppv = None
-`}
-  solutionCode={`p_flag = float(p_flag_given_fraud * p_fraud + p_flag_given_legit * (1 - p_fraud))
+`,
+      solutionCode: `p_flag = float(p_flag_given_fraud * p_fraud + p_flag_given_legit * (1 - p_fraud))
 ppv = float((p_flag_given_fraud * p_fraud) / p_flag)
 print("P(flag):", p_flag)
 print("PPV P(fraud | flag):", ppv)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "types",

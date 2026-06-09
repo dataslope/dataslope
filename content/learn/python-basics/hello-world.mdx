@@ -9,8 +9,13 @@ hope.
 
 <CodeBlock
   adapter="python"
-  starterCode={`print("Hello, World!")
-`}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print("Hello, World!")
+`,
+    },
+  ]}
 />
 
 That is the entire program. No `main`, no semicolons, no header
@@ -57,28 +62,43 @@ output. It is more flexible than it might look at first.
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Multiple arguments are joined with spaces.
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Multiple arguments are joined with spaces.
 print("Hello,", "World!")
-`}
+`,
+    },
+  ]}
 />
 
 ### Changing the separator
 
 <CodeBlock
   adapter="python"
-  starterCode={`# 'sep' changes the separator.
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# 'sep' changes the separator.
 print("2025", "11", "30", sep="-")
-`}
+`,
+    },
+  ]}
 />
 
 ### Changing the ending
 
 <CodeBlock
   adapter="python"
-  starterCode={`# 'end' changes what is appended (default is "\\n").
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# 'end' changes what is appended (default is "\\n").
 print("loading", end="...")
 print("done")
-`}
+`,
+    },
+  ]}
 />
 
 ### Printing any object
@@ -88,11 +108,16 @@ directly. Python will call `str(obj)` on each argument:
 
 <CodeBlock
   adapter="python"
-  starterCode={`print(42)
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print(42)
 print([1, 2, 3])
 print({"name": "Ada", "year": 1815})
 print(3.14, type(3.14))
-`}
+`,
+    },
+  ]}
 />
 
 ## Comments
@@ -103,11 +128,16 @@ string literals for that, but a string is not the same as a comment.
 
 <CodeBlock
   adapter="python"
-  starterCode={`# This is a comment. The interpreter skips it.
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# This is a comment. The interpreter skips it.
 x = 1 + 2  # Comments can sit at the end of a line, too.
 
 print(x)
-`}
+`,
+    },
+  ]}
 />
 
 ### Why not multi-line comments?
@@ -120,7 +150,10 @@ enough.
 
 <CodeBlock
   adapter="python"
-  starterCode={`"""
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `"""
 This is a string literal, not a comment.
 Python does evaluate it, then immediately throws it away
 because nothing keeps a reference. It is fine for short
@@ -129,7 +162,9 @@ notes at the top of a file, but '#' is the real comment.
 
 x = 10
 print(x)
-`}
+`,
+    },
+  ]}
 />
 
 ## Docstrings
@@ -140,13 +175,18 @@ these to show documentation.
 
 <CodeBlock
   adapter="python"
-  starterCode={`def add(a, b):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def add(a, b):
     """Return the sum of two numbers."""
     return a + b
 
 
 help(add)
-`}
+`,
+    },
+  ]}
 />
 
 Docstrings are a convention, not a language feature, but they are so
@@ -175,12 +215,17 @@ Hello, Grace!
 Do not hardcode the literal string \`"Hello, Grace!"\`; instead, define a
 variable \`name = "Grace"\` and use it in your \`print\` call. You can use
 string concatenation, f-strings, or \`.format()\`.`}
-  starterCode={`name = "Grace"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `name = "Grace"
 # your code here
-`}
-  solutionCode={`name = "Grace"
+`,
+      solutionCode: `name = "Grace"
 print(f"Hello, {name}!")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "exact_output",
@@ -203,10 +248,15 @@ apple:banana:cherry
 \`\`\`
 
 Pass three separate arguments to \`print\` (not one concatenated string) and use the \`sep\` parameter to join them with \`":"\`.`}
-  starterCode={`# your code here
-`}
-  solutionCode={`print("apple", "banana", "cherry", sep=":")
-`}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# your code here
+`,
+      solutionCode: `print("apple", "banana", "cherry", sep=":")
+`,
+    },
+  ]}
   tests={[
     {
       id: "separator_output",

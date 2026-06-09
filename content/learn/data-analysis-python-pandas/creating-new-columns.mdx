@@ -11,7 +11,10 @@ fits a different situation.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -25,7 +28,9 @@ df["total_comp"] = df["salary"] + df["bonus"]
 df["bonus_pct"] = (df["bonus"] / df["salary"] * 100).round(1)
 
 print(df)
-`}
+`,
+    },
+  ]}
 />
 
 The whole column appears on both sides of `=`. That is the
@@ -38,20 +43,25 @@ which makes it perfect for method chains.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 df = pd.DataFrame({
     "name":   ["Aiko","Bilal","Chen"],
     "salary": [120, 95, 140],
     "bonus":  [12, 8, 20],
-})`}
-  starterCode={`new_df = df.assign(total_comp=lambda x: x["salary"] + x["bonus"]).assign(
+})`,
+      starterCode: `new_df = df.assign(total_comp=lambda x: x["salary"] + x["bonus"]).assign(
     bonus_pct=lambda x: (x["bonus"] / x["salary"] * 100).round(1)
 )
 print(new_df)
 print()
 print("Original is unchanged:")
 print(df)
-`}
+`,
+    },
+  ]}
 />
 
 The `lambda x: ...` lets `.assign` see the *current* state of the
@@ -91,13 +101,18 @@ ized ternary.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 df = pd.DataFrame({"salary": [120, 95, 140, 80, 128]})
 df["band"] = np.where(df["salary"] >= 130, "high", "standard")
 print(df)
-`}
+`,
+    },
+  ]}
 />
 
 ## Multi-condition: `np.select`
@@ -107,7 +122,10 @@ For more than two branches, `np.select` is cleaner than nested
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 df = pd.DataFrame({"score": [92, 73, 58, 85, 41, 99]})
@@ -122,7 +140,9 @@ choices = ["A", "B", "C", "D"]
 
 df["grade"] = np.select(conditions, choices, default="F")
 print(df)
-`}
+`,
+    },
+  ]}
 />
 
 ## Mapping with dictionaries: `.map`
@@ -131,7 +151,10 @@ When the new column is a lookup from old values:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -143,7 +166,9 @@ df = pd.DataFrame(
 rates = {"USD": 1.00, "EUR": 1.08, "GBP": 1.27, "JPY": 0.0067}
 df["amount_usd"] = (df["amount"] * df["currency"].map(rates)).round(2)
 print(df)
-`}
+`,
+    },
+  ]}
 />
 
 `.map(dict)` is the quintessential dictionary-as-lookup pattern.
@@ -157,7 +182,10 @@ flexible.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 
 def grade(score):
@@ -175,7 +203,9 @@ def grade(score):
 df = pd.DataFrame({"score": [92, 73, 58, 85, 41, 99]})
 df["grade"] = df["score"].apply(grade)
 print(df)
-`}
+`,
+    },
+  ]}
 />
 
 For *one column* → use `Series.apply(func)`. For *multiple
@@ -189,7 +219,10 @@ when you can.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame({"age": [22, 35, 47, 61, 18, 29, 71, 45]})
 df["age_group"] = pd.cut(
@@ -198,7 +231,9 @@ df["age_group"] = pd.cut(
     labels=["young", "mid", "senior", "veteran"],
 )
 print(df)
-`}
+`,
+    },
+  ]}
 />
 
 For equal-frequency buckets (quartiles, quintiles) use
@@ -206,12 +241,17 @@ For equal-frequency buckets (quartiles, quintiles) use
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame({"income": [25, 35, 45, 60, 80, 110, 150, 200, 400]})
 df["quartile"] = pd.qcut(df["income"], q=4, labels=["Q1", "Q2", "Q3", "Q4"])
 print(df)
-`}
+`,
+    },
+  ]}
 />
 
 ## A composite example
@@ -221,7 +261,10 @@ fields.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 df = pd.read_csv(
@@ -262,7 +305,9 @@ print(
 )
 print()
 print("At-risk fraction:", df["AtRisk"].mean().round(3))
-`}
+`,
+    },
+  ]}
 />
 
 ## Check your understanding

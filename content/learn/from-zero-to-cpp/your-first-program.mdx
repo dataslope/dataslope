@@ -10,13 +10,18 @@ roughly a dozen distinct language features. Let's name them.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   std::cout << "Hello, World!\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Line 1 — `#include <iostream>`
@@ -96,13 +101,18 @@ programs communicate with each other.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   std::cout << "About to fail on purpose\\n";
   return 42; // non-zero means "I failed"; the number can mean anything.
 }
-`}
+`,
+    },
+  ]}
 />
 
 In a real shell you could check the exit code with `echo $?`. The
@@ -116,7 +126,10 @@ pieces feel new; we'll spend whole chapters on each.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 
 std::string shout(const std::string &s) {
@@ -138,7 +151,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 A quick tour of the new pieces:
@@ -196,14 +211,17 @@ you really need to.
   adapter="cpp"
   title="Print three lines"
   instructions={`Write a program that prints exactly these three lines, in this order:\n\n\`\`\`\nReady\nSet\nGo!\n\`\`\`\n\nEach word should be on its own line.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   // your code here
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 
 int main() {
   std::cout << "Ready\\n";
@@ -211,7 +229,9 @@ int main() {
   std::cout << "Go!\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "three-lines",
@@ -229,7 +249,10 @@ int main() {
   adapter="cpp"
   title="Sum of 1..N"
   instructions={`Write a program that prints \`5050\` followed by a newline. (That is the sum of all integers from 1 to 100 inclusive.) Use a loop, not a formula — we want practice with loops.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   int total = 0;
@@ -237,8 +260,8 @@ int main() {
   std::cout << total << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 
 int main() {
   int total = 0;
@@ -248,7 +271,9 @@ int main() {
   std::cout << total << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "sum",

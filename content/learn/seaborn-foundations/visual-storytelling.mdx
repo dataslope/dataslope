@@ -61,7 +61,10 @@ A short decluttering checklist:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 # A clean canvas plus despine is the fastest decluttering move.
 sns.set_theme(style="ticks")
@@ -76,7 +79,9 @@ g = sns.relplot(
 )
 g.set_axis_labels("Flipper length (mm)", "Body mass (g)")
 sns.despine()
-`}
+`,
+    },
+  ]}
 />
 
 ## Guide the reader's eye
@@ -92,7 +97,10 @@ immediately, and the grayed groups still provide context without competing:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
@@ -120,7 +128,9 @@ g = sns.catplot(
 g.set_axis_labels("Day", "Mean total bill (USD)")
 g.figure.suptitle("Saturday brings the biggest bills")
 g.figure.subplots_adjust(top=0.88)
-`}
+`,
+    },
+  ]}
 />
 
 A short text annotation can do the same job: one arrow or label on the
@@ -226,7 +236,10 @@ it a message-style title.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="ticks")
 penguins = sns.load_dataset("penguins")
@@ -244,7 +257,9 @@ g.set_axis_labels("Body mass (g)", "Flipper length (mm)")
 g.figure.suptitle("Heavier penguins have longer flippers")
 g.figure.subplots_adjust(top=0.9)
 sns.despine()
-`}
+`,
+    },
+  ]}
 />
 
 Everything on that figure earns its place. There is no extra color (one
@@ -273,7 +288,10 @@ between flipper length and body mass, then title it with its *message*.
    named \`ax\`.
 2. Set the title to exactly \`Heavier penguins have longer flippers\` (a
    message-style title, not an axis restatement).`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="ticks")
 penguins = sns.load_dataset("penguins")
@@ -282,15 +300,17 @@ penguins = sns.load_dataset("penguins")
 ax = None
 
 # Give it a message-style title:
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 sns.set_theme(style="ticks")
 penguins = sns.load_dataset("penguins")
 
 ax = sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
 ax.set_title("Heavier penguins have longer flippers")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_axes",

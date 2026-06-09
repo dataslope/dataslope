@@ -217,7 +217,10 @@ Once you can state the invariant, off-by-one bugs become very rare.
   instructions={`The following function should compute \`n!\` (1 * 2 * ... * n). It has two bugs: \`r\` is initialized wrong, and the loop range is wrong. Fix both, then run with \`n = 5\`.
 
 The program must print exactly \`120\`.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int fact(int n) {
   int r = 0;
@@ -231,8 +234,8 @@ int main(void) {
   printf("%d\\n", fact(5));
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 int fact(int n) {
   int r = 1;
@@ -246,7 +249,9 @@ int main(void) {
   printf("%d\\n", fact(5));
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "fact5",

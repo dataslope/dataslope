@@ -147,10 +147,15 @@ cylinders. Here is the analysis in R (a direct descendant of S):
 
 <CodeBlock
   adapter="r"
-  starterCode={`# R-style: one expression, interactive
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# R-style: one expression, interactive
 data(mtcars)
 aggregate(mpg ~ cyl, data = mtcars, FUN = mean)
-`}
+`,
+    },
+  ]}
 />
 
 In SAS (circa 1980), the same analysis would look something like
@@ -246,15 +251,20 @@ otherwise) without writing a loop.
   adapter="r"
   title="Vectorized labeling"
   instructions={`Create a logical vector \`efficient\` the same length as \`mpg\`, where each element is \`TRUE\` if the corresponding mpg is at least 25, and \`FALSE\` otherwise. No loops — use a single comparison.`}
-  initCode={`mpg <- c(21, 24, 22, 30, 18, 33, 26, 19)`}
-  starterCode={`efficient <- NA # TODO
+  files={[
+    {
+      filename: "main.r",
+      initCode: `mpg <- c(21, 24, 22, 30, 18, 33, 26, 19)`,
+      starterCode: `efficient <- NA # TODO
 
 print(efficient)
-`}
-  solutionCode={`efficient <- mpg >= 25
+`,
+      solutionCode: `efficient <- mpg >= 25
 
 print(efficient)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "logical",

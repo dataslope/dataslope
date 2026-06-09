@@ -34,7 +34,10 @@ in `{ ... }`. In Python it is wrapped in **a deeper indentation level**:
 
 <CodeBlock
   adapter="python"
-  starterCode={`def shout(message):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def shout(message):
     if message:
         return message.upper() + "!"
     return ""
@@ -42,7 +45,9 @@ in `{ ... }`. In Python it is wrapped in **a deeper indentation level**:
 
 print(shout("hello"))
 print(shout(""))
-`}
+`,
+    },
+  ]}
 />
 
 The colon (`:`) at the end of `def`, `if`, `for`, `while`, `try`,
@@ -63,14 +68,19 @@ silently broken program (in older Python 2 codebases).
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Try un-indenting the 'return' line (remove the leading spaces)
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Try un-indenting the 'return' line (remove the leading spaces)
 # then run again to see the IndentationError.
 def square(x):
     return x * x
 
 
 print(square(5))
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Mixing tabs and spaces">
@@ -171,24 +181,34 @@ ways to span multiple lines:
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Preferred: implicit continuation inside parentheses.
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Preferred: implicit continuation inside parentheses.
 total = (
     1 + 2 + 3
     + 4 + 5 + 6
 )
 
 print("Total:", total)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Works but ugly: explicit backslash continuation.
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Works but ugly: explicit backslash continuation.
 total2 = 1 + 2 + 3 \\
     + 4 + 5 + 6
 
 print("Total2:", total2)
-`}
+`,
+    },
+  ]}
 />
 
 PEP 8 recommends avoiding backslash continuation where possible. Modern
@@ -203,11 +223,16 @@ polite language; the real sentiment is "never do this".
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Legal Python, but PEP 8 says no.
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Legal Python, but PEP 8 says no.
 a = 1
 b = 2
 print(a + b)
-`}
+`,
+    },
+  ]}
 />
 
 The only exception is in one-liners passed to `python -c`:
@@ -249,14 +274,17 @@ avoid the complexity. Python goes all-in.
 - It returns the arithmetic mean of \`numbers\`, or \`0\` if the list is empty.
 
 The hidden tests will call \`average\` with several inputs.`}
-  starterCode={`def average(numbers):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def average(numbers):
   if not numbers:
         return 0;
    total = sum(numbers);return total / len(numbers)
 
 print(average([1, 2, 3, 4]))
-`}
-  solutionCode={`def average(numbers):
+`,
+      solutionCode: `def average(numbers):
     if not numbers:
         return 0
     total = sum(numbers)
@@ -264,7 +292,9 @@ print(average([1, 2, 3, 4]))
 
 
 print(average([1, 2, 3, 4]))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic_mean",
@@ -290,15 +320,18 @@ print(average([1, 2, 3, 4]))
   instructions={`Rewrite the function \`long_sum\` below to use implicit continuation inside parentheses instead of backslash continuation. The function should return the sum of all its arguments.
 
 Do not change the function's behavior, just improve its style.`}
-  starterCode={`def long_sum(a, b, c, d, e):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def long_sum(a, b, c, d, e):
     result = a + b + c + d \\
         + e
     return result
 
 
 print(long_sum(1, 2, 3, 4, 5))
-`}
-  solutionCode={`def long_sum(a, b, c, d, e):
+`,
+      solutionCode: `def long_sum(a, b, c, d, e):
     result = (
         a + b + c + d + e
     )
@@ -306,7 +339,9 @@ print(long_sum(1, 2, 3, 4, 5))
 
 
 print(long_sum(1, 2, 3, 4, 5))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "sum_five",

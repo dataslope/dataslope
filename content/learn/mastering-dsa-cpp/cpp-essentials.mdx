@@ -19,13 +19,18 @@ flowchart TD
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   std::cout << "C++ code starts in main()\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Variables, types, and `auto`
@@ -42,7 +47,10 @@ A **reference** is another name for an existing object. A **pointer** stores an 
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 void add_one_by_reference(int &x) { x += 1; }
 
@@ -61,7 +69,9 @@ int main() {
   std::cout << "b: " << b << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## `const` and `const&` parameter passing
@@ -70,7 +80,10 @@ Use `const` when a value should not change. Pass large objects as `const&` to av
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 #include <vector>
 
@@ -87,7 +100,9 @@ int main() {
   std::cout << total_length(words) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Headers used throughout this course
@@ -109,7 +124,10 @@ int main() {
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <algorithm>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
 #include <iostream>
 #include <numeric>
 #include <vector>
@@ -130,7 +148,9 @@ int main() {
             << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Function templates
@@ -139,13 +159,18 @@ Templates let one function work for many types while still being checked and opt
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 template <typename T> T twice(T x) { return x + x; }
 int main() {
   std::cout << twice(21) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Lambda expressions
@@ -154,7 +179,10 @@ A lambda is an inline function object. Lambdas are used heavily with algorithms 
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <algorithm>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -165,7 +193,9 @@ int main() {
     std::cout << x << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Practice: functions and templates
@@ -174,7 +204,10 @@ int main() {
   adapter="cpp"
   title="Sum a vector"
   instructions={`Implement \`int sum(const std::vector<int>& v)\` so it returns the total of all values in the vector. Do not print inside the function; the provided \`main\` will print the result.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 int sum(const std::vector<int> &v) {
@@ -186,8 +219,8 @@ int main() {
   std::cout << sum(values) << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <vector>
 
 int sum(const std::vector<int> &v) {
@@ -203,7 +236,9 @@ int main() {
   std::cout << sum(values) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "sum_values",
@@ -217,7 +252,10 @@ int main() {
   adapter="cpp"
   title="Generic max of three"
   instructions={`Implement a templated function \`max3<T>\` that returns the largest of three values. The same function should work for both \`int\` and \`double\`.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 template <typename T> T max3(T a, T b, T c) {
   // your code here
@@ -228,8 +266,8 @@ int main() {
   std::cout << max3<double>(2.5, 8.25, 4.0) << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 
 template <typename T> T max3(T a, T b, T c) {
   T best = a;
@@ -245,7 +283,9 @@ int main() {
   std::cout << max3<double>(2.5, 8.25, 4.0) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "max3_outputs",

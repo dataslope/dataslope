@@ -11,21 +11,29 @@ the [JavaScript](/learn/code-blocks-javascript) blocks are.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface Point {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface Point {
   x: number;
   y: number;
 }
 const p: Point = { x: 3, y: 4 };
 const dist = Math.hypot(p.x, p.y);
 console.log(\`distance = \${dist}\`);
-`}
+`,
+    },
+  ]}
 />
 
 ## Generics
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function pluck<T, K extends keyof T>(items: T[], key: K): T[K][] {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function pluck<T, K extends keyof T>(items: T[], key: K): T[K][] {
   return items.map((it) => it[key]);
 }
 
@@ -35,7 +43,9 @@ const users = [
   { id: 3, name: "Grace" },
 ];
 console.log(pluck(users, "name"));
-`}
+`,
+    },
+  ]}
 />
 
 ## Multiple files
@@ -48,7 +58,7 @@ Import a typed helper module from a sibling file. The TypeScript runtime transpi
   files={[
     {
       filename: "index.ts",
-      initialContent: `import { hello, bye } from "./greetings";
+      starterCode: `import { hello, bye } from "./greetings";
 
 console.log(hello("TypeScript Playground"));
 console.log(bye("TypeScript Playground"));
@@ -56,7 +66,7 @@ console.log(bye("TypeScript Playground"));
     },
     {
       filename: "greetings.ts",
-      initialContent: `export function hello(name: string): string {
+      starterCode: `export function hello(name: string): string {
   return \`Hello, \${name}!\`;
 }
 
@@ -109,23 +119,33 @@ A short init (3 lines or fewer):
 
 <CodeBlock
   adapter="typescript"
-  initCode={`type Celsius = number;`}
-  starterCode={`// 'Celsius' comes from the initialization code above.
+  files={[
+    {
+      filename: "main.ts",
+      initCode: `type Celsius = number;`,
+      starterCode: `// 'Celsius' comes from the initialization code above.
 const t: Celsius = 25;
 console.log(t + " degrees C");
-`}
+`,
+    },
+  ]}
 />
 
 A longer init (4 lines or more), collapsed by default:
 
 <CodeBlock
   adapter="typescript"
-  initCode={`interface Point {
+  files={[
+    {
+      filename: "main.ts",
+      initCode: `interface Point {
   x: number;
   y: number;
-}`}
-  starterCode={`// 'Point' comes from the initialization code above.
+}`,
+      starterCode: `// 'Point' comes from the initialization code above.
 const p: Point = { x: 3, y: 4 };
 console.log("distance =", Math.hypot(p.x, p.y));
-`}
+`,
+    },
+  ]}
 />

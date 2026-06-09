@@ -29,7 +29,10 @@ is 4 bytes.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <float.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <float.h>
 #include <limits.h>
 #include <stdio.h>
 
@@ -43,7 +46,9 @@ int main(void) {
   printf("DBL_MAX     = %g\\n", DBL_MAX);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## When "fixed size" turns into a bug
@@ -53,7 +58,10 @@ silently grow a Python `int` can silently *truncate* in C.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <limits.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <limits.h>
 #include <stdio.h>
 
 int main(void) {
@@ -67,7 +75,9 @@ int main(void) {
   printf("0u - 1      = %u  (wraps to UINT_MAX, well-defined)\\n", v);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Signed overflow is UB, unsigned overflow is not">
@@ -95,7 +105,10 @@ fixed-width types from `<stdint.h>`.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <inttypes.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -111,7 +124,9 @@ int main(void) {
   printf("big    = %" PRId64 "\\n", big);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The `PRI…` macros from `<inttypes.h>` give you portable `printf`
@@ -123,7 +138,10 @@ Mixing signed and unsigned values is one of the most popular C bugs.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int s = -1;
@@ -138,7 +156,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The fix is to keep types consistent: do not mix `int i` with
@@ -168,7 +188,10 @@ integer through a `char *`:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdint.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdint.h>
 #include <stdio.h>
 
 int main(void) {
@@ -181,7 +204,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 On the little-endian WASI target you should see `78 56 34 12` — the
@@ -204,7 +229,10 @@ structs.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdalign.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdalign.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -216,7 +244,9 @@ int main(void) {
   printf("alignof(void *)   = %zu\\n", alignof(void *));
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Practice: count set bits
@@ -225,7 +255,10 @@ int main(void) {
   adapter="c"
   title="Count the number of 1 bits in a uint32_t"
   instructions={`Implement \`int popcount(uint32_t x)\` that returns how many bits of \`x\` are set to 1. Do not call any library popcount intrinsic — write the loop yourself. The provided \`main\` calls it for several values and prints the results, one per line.`}
-  starterCode={`#include <stdint.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdint.h>
 #include <stdio.h>
 
 int popcount(uint32_t x) {
@@ -241,8 +274,8 @@ int main(void) {
   printf("%d\\n", popcount(0xA5A5A5A5u));
   return 0;
 }
-`}
-  solutionCode={`#include <stdint.h>
+`,
+      solutionCode: `#include <stdint.h>
 #include <stdio.h>
 
 int popcount(uint32_t x) {
@@ -262,7 +295,9 @@ int main(void) {
   printf("%d\\n", popcount(0xA5A5A5A5u));
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "popcount",
@@ -278,7 +313,10 @@ int main(void) {
   adapter="c"
   title="Print 'little' or 'big'"
   instructions={`Print \`little\` if this machine is little-endian and \`big\` otherwise. Hint: place a known multi-byte integer at a known address and read its first byte through a \`char *\`.`}
-  starterCode={`#include <stdint.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdint.h>
 #include <stdio.h>
 
 int main(void) {
@@ -286,8 +324,8 @@ int main(void) {
   // your code here
   return 0;
 }
-`}
-  solutionCode={`#include <stdint.h>
+`,
+      solutionCode: `#include <stdint.h>
 #include <stdio.h>
 
 int main(void) {
@@ -300,7 +338,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "wasi_is_little",

@@ -65,7 +65,7 @@ record. *Data first, behavior second* — the functional move.
   files={[
     {
       filename: "Program.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 using System.Linq;
 
 var lines = new[] {
@@ -78,7 +78,7 @@ var lines = new[] {
 
 Console.Write(Pipeline.BuildReport(lines));
 `,
-      solutionContent: `using System;
+      solutionCode: `using System;
 using System.Linq;
 
 var lines = new[] {
@@ -94,13 +94,13 @@ Console.Write(Pipeline.BuildReport(lines));
     },
     {
       filename: "Records.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 
 public record Txn(DateTime Date, string Product, int Quantity, decimal UnitPrice, string Status);
 
 public record ProductSummary(string Product, int UnitsSold, decimal Gross, decimal Net);
 `,
-      solutionContent: `using System;
+      solutionCode: `using System;
 
 public record Txn(DateTime Date, string Product, int Quantity, decimal UnitPrice, string Status);
 
@@ -109,7 +109,7 @@ public record ProductSummary(string Product, int UnitsSold, decimal Gross, decim
     },
     {
       filename: "Parsing.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -130,7 +130,7 @@ public static class Parsing
     }
 }
 `,
-      solutionContent: `using System;
+      solutionCode: `using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -164,7 +164,7 @@ public static class Parsing
     },
     {
       filename: "Summarize.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -181,7 +181,7 @@ public static class Summarize
     }
 }
 `,
-      solutionContent: `using System;
+      solutionCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -204,7 +204,7 @@ public static class Summarize
     },
     {
       filename: "Pipeline.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -229,7 +229,7 @@ public static class Pipeline
     }
 }
 `,
-      solutionContent: `using System;
+      solutionCode: `using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;

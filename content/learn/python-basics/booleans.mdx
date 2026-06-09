@@ -21,9 +21,14 @@ Python's truthiness rules make code concise and readable. Instead of `if len(ite
 
 <CodeBlock
   adapter="python"
-  starterCode={`print(type(True))
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print(type(True))
 print(type(False))
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="The origin of 'boolean'">
@@ -36,16 +41,26 @@ The term "boolean" comes from **George Boole** (1815–1864), an English mathema
 
 <CodeBlock
   adapter="python"
-  starterCode={`print(True == 1, False == 0)
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print(True == 1, False == 0)
 print(isinstance(True, int))
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`print(True + True + True)  # 3
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print(True + True + True)  # 3
 print(False * 100)  # 0
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="The 'is True' antipattern">
@@ -73,22 +88,37 @@ if items:  # Pythonic truthiness check
 
 <CodeBlock
   adapter="python"
-  starterCode={`print(3 < 5 <= 5)  # chained comparisons! Same as (3 < 5) and (5 <= 5)
-`}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print(3 < 5 <= 5)  # chained comparisons! Same as (3 < 5) and (5 <= 5)
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`print("a" in "banana")
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print("a" in "banana")
 print(2 in [1, 2, 3])
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`print(None is None)
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print(None is None)
 print(True is True)
-`}
+`,
+    },
+  ]}
 />
 
 ### `==` vs `is`
@@ -97,18 +127,28 @@ print(True is True)
 
 <CodeBlock
   adapter="python"
-  starterCode={`a = [1, 2, 3]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `a = [1, 2, 3]
 b = [1, 2, 3]
 print(a == b)  # True, same contents
 print(a is b)  # False, different list objects
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`x = None
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `x = None
 print(x is None)  # the idiomatic check
-`}
+`,
+    },
+  ]}
 />
 
 For singletons like `None`, `True`, `False`, always use `is`.
@@ -122,27 +162,42 @@ Any object can be tested in a boolean context (e.g., `if`, `while`, `and`, `or`)
 
 <CodeBlock
   adapter="python"
-  starterCode={`for value in [0, 1, "", "hi", [], [0], None, {}, {0: 0}]:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `for value in [0, 1, "", "hi", [], [0], None, {}, {0: 0}]:
     print(f"{value!r:>10} -> {bool(value)}")
-`}
+`,
+    },
+  ]}
 />
 
 This is why idiomatic Python writes `if items:` instead of `if len(items) > 0:`.
 
 <CodeBlock
   adapter="python"
-  starterCode={`items = [1, 2, 3]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `items = [1, 2, 3]
 if items:
     print("We have items!")
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`items = []
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `items = []
 if not items:
     print("Empty list!")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="The 0 == False surprise">
@@ -169,10 +224,15 @@ Python's logical operators are written as English words, not symbols (`&&`, `||`
 
 <CodeBlock
   adapter="python"
-  starterCode={`print(True and False)
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print(True and False)
 print(True or False)
 print(not True)
-`}
+`,
+    },
+  ]}
 />
 
 ### Short-circuit evaluation
@@ -181,24 +241,34 @@ print(not True)
 
 <CodeBlock
   adapter="python"
-  starterCode={`def expensive():
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def expensive():
     print("expensive() called")
     return True
 
 
 print(False and expensive())  # expensive() is never called
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`def expensive():
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def expensive():
     print("expensive() called")
     return True
 
 
 print(True or expensive())  # expensive() is never called
-`}
+`,
+    },
+  ]}
 />
 
 ### Operators return operands, not just True/False
@@ -210,16 +280,26 @@ print(True or expensive())  # expensive() is never called
 
 <CodeBlock
   adapter="python"
-  starterCode={`print(True and "hello")  # 'hello'
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print(True and "hello")  # 'hello'
 print(False or "default")  # 'default'
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`print(None or 0 or "first truthy")  # 'first truthy'
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print(None or 0 or "first truthy")  # 'first truthy'
 print("a" and "b" and "c")  # 'c'
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Why operators return operands">
@@ -246,25 +326,40 @@ count = user_count if user_count is not None else 10
 
 <CodeBlock
   adapter="python"
-  starterCode={`name = ""
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `name = ""
 print(name or "Anonymous")  # "Anonymous"
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Careful: 0 is falsy, so 'or' replaces it
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Careful: 0 is falsy, so 'or' replaces it
 count = 0
 print(count or 10)  # 10, probably not what you want!
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Use a None check for cases where 0 is valid
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Use a None check for cases where 0 is valid
 count = 0
 print(count if count is not None else 10)  # 0
-`}
+`,
+    },
+  ]}
 />
 
 ## Conditional expressions (ternary operator)
@@ -273,18 +368,28 @@ Python's ternary form puts the condition in the **middle**:
 
 <CodeBlock
   adapter="python"
-  starterCode={`age = 17
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `age = 17
 status = "adult" if age >= 18 else "minor"
 print(status)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`x = 10
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `x = 10
 abs_x = x if x >= 0 else -x
 print(abs_x)
-`}
+`,
+    },
+  ]}
 />
 
 ## Challenges
@@ -293,7 +398,10 @@ print(abs_x)
   adapter="python"
   title="XOR without ^"
   instructions={`Define a function \`xor(a, b)\` that returns \`True\` if exactly one of \`a\` or \`b\` is truthy (not both, not neither). Do **not** use the \`^\` operator—use \`and\`, \`or\`, and \`not\`.`}
-  starterCode={`def xor(a, b):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def xor(a, b):
     # Your code here
     return False
 
@@ -301,15 +409,17 @@ print(abs_x)
 print(xor(True, False))
 print(xor(True, True))
 print(xor(False, False))
-`}
-  solutionCode={`def xor(a, b):
+`,
+      solutionCode: `def xor(a, b):
     return (a or b) and not (a and b)
 
 
 print(xor(True, False))
 print(xor(True, True))
 print(xor(False, False))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "true_false",
@@ -338,7 +448,10 @@ print(xor(False, False))
   adapter="python"
   title="All-truthy detector"
   instructions={`Write a function \`all_truthy(items)\` that returns \`True\` if **all** items in the list are truthy, and \`False\` otherwise. Do not use the built-in \`all()\`—implement it yourself with a loop or comprehension.`}
-  starterCode={`def all_truthy(items):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def all_truthy(items):
     # Your code here
     return False
 
@@ -346,8 +459,8 @@ print(xor(False, False))
 print(all_truthy([1, 2, 3]))
 print(all_truthy([1, 0, 3]))
 print(all_truthy([]))
-`}
-  solutionCode={`def all_truthy(items):
+`,
+      solutionCode: `def all_truthy(items):
     for item in items:
         if not item:
             return False
@@ -357,7 +470,9 @@ print(all_truthy([]))
 print(all_truthy([1, 2, 3]))
 print(all_truthy([1, 0, 3]))
 print(all_truthy([]))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "all_true",

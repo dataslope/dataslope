@@ -24,7 +24,10 @@ live in Berlin."*
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 var people = new List<Person> {
@@ -47,7 +50,9 @@ double avg = count == 0 ? 0.0 : (double)total / count;
 Console.WriteLine($"Average Berlin age: {avg:F1}");
 
 record Person(string Name, string City, int Age);
-`}
+`,
+    },
+  ]}
 />
 
 Look at how much *bookkeeping* there is. The interesting idea is
@@ -111,7 +116,10 @@ sorted by average age descending."*
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 var people = new List<Person> {
@@ -151,7 +159,9 @@ foreach (var row in filtered)
     Console.WriteLine($"{row.City,-8} avg={row.Avg:F1} (n={row.Count})");
 
 record Person(string Name, string City, int Age);
-`}
+`,
+    },
+  ]}
 />
 
 Forty lines for what is, in plain English, one sentence. And every

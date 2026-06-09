@@ -22,14 +22,19 @@ exist on *all* members:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function print(value: string | number): void {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function print(value: string | number): void {
   // console.log(value.length);  // ❌ Property 'length' does not exist on type 'number'
   console.log("value:", value);
 }
 
 print("hello");
 print(42);
-`}
+`,
+    },
+  ]}
 />
 
 To call `value.length`, you need to prove to the compiler that `value` is
@@ -42,7 +47,10 @@ recognizes `typeof` checks and narrows the type accordingly:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function print(value: string | number): void {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function print(value: string | number): void {
   if (typeof value === "string") {
     // In this branch, value is narrowed to string
     console.log("String length:", value.length);
@@ -54,7 +62,9 @@ recognizes `typeof` checks and narrows the type accordingly:
 
 print("hello");
 print(42);
-`}
+`,
+    },
+  ]}
 />
 
 **What the compiler now knows:** Inside the `if` branch, `value` is
@@ -66,7 +76,10 @@ assertion.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function describe(value: string | number | boolean | undefined): string {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function describe(value: string | number | boolean | undefined): string {
   if (typeof value === "string") {
     return \`String: "\${value}"\`;
   } else if (typeof value === "number") {
@@ -82,7 +95,9 @@ console.log(describe("hello"));
 console.log(describe(42));
 console.log(describe(true));
 console.log(describe(undefined));
-`}
+`,
+    },
+  ]}
 />
 
 Each branch refines the type. By the final `else`, the compiler knows
@@ -95,7 +110,10 @@ class. TypeScript narrows based on `instanceof`:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`class Dog {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `class Dog {
   bark() {
     console.log("Woof!");
   }
@@ -117,7 +135,9 @@ function speak(animal: Dog | Cat): void {
 
 speak(new Dog());
 speak(new Cat());
-`}
+`,
+    },
+  ]}
 />
 
 `instanceof` is essential for narrowing class-based unions. It works with
@@ -131,7 +151,10 @@ narrows the type:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function process(value: string | null): void {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function process(value: string | null): void {
   if (value === null) {
     console.log("Value is null");
   } else {
@@ -142,7 +165,9 @@ narrows the type:
 
 process("hello");
 process(null);
-`}
+`,
+    },
+  ]}
 />
 
 The check `value === null` proves that `value` is `null` in the `if`
@@ -152,7 +177,10 @@ You can also compare against literal types:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Direction = "north" | "south" | "east" | "west";
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Direction = "north" | "south" | "east" | "west";
 
 function turn(direction: Direction): void {
   if (direction === "north") {
@@ -167,7 +195,9 @@ function turn(direction: Direction): void {
 
 turn("north");
 turn("east");
-`}
+`,
+    },
+  ]}
 />
 
 ## `in` operator narrowing
@@ -177,7 +207,10 @@ uses this to narrow object unions:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Circle = { kind: "circle"; radius: number };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Circle = { kind: "circle"; radius: number };
 type Rectangle = { kind: "rectangle"; width: number; height: number };
 type Shape = Circle | Rectangle;
 
@@ -196,7 +229,9 @@ const rect: Shape = { kind: "rectangle", width: 20, height: 30 };
 
 console.log(describe(circle));
 console.log(describe(rect));
-`}
+`,
+    },
+  ]}
 />
 
 The check `"radius" in shape` proves that `shape` has a `radius`
@@ -209,7 +244,10 @@ truthy or falsy:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function printLength(value: string | null | undefined): void {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function printLength(value: string | null | undefined): void {
   if (value) {
     // value is truthy, so it's narrowed to string (null and undefined are falsy)
     console.log("Length:", value.length);
@@ -221,7 +259,9 @@ truthy or falsy:
 printLength("hello");
 printLength(null);
 printLength(undefined);
-`}
+`,
+    },
+  ]}
 />
 
 The check `if (value)` eliminates `null` and `undefined` (both falsy),
@@ -239,7 +279,10 @@ The `switch` statement also triggers narrowing:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Result =
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Result =
   | { status: "success"; data: string }
   | { status: "failure"; error: string }
   | { status: "pending" };
@@ -264,7 +307,9 @@ function handle(result: Result): void {
 
 handle({ status: "success", data: "All good!" });
 handle({ status: "failure", error: "Something broke" });
-`}
+`,
+    },
+  ]}
 />
 
 The `switch` on `result.status` narrows `result` in each `case`.
@@ -295,7 +340,10 @@ Sometimes the compiler can't infer narrowing on its own. You can define a
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function isString(value: unknown): value is string {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function isString(value: unknown): value is string {
   return typeof value === "string";
 }
 
@@ -310,7 +358,9 @@ function process(value: unknown): void {
 
 process("hello");
 process(42);
-`}
+`,
+    },
+  ]}
 />
 
 The return type `value is string` tells the compiler: "If this function
@@ -322,7 +372,10 @@ Another example with custom objects:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface Dog {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface Dog {
   breed: string;
   bark(): void;
 }
@@ -351,7 +404,9 @@ const cat: Cat = { color: "Gray", meow: () => console.log("Meow!") };
 
 interact(dog);
 interact(cat);
-`}
+`,
+    },
+  ]}
 />
 
 The predicate `isDog` narrows `Dog | Cat` based on the presence of
@@ -364,7 +419,10 @@ if a condition is false, and *assert* the type if they return:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function assertIsString(value: unknown): asserts value is string {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function assertIsString(value: unknown): asserts value is string {
   if (typeof value !== "string") {
     throw new Error(\`Expected string, got \${typeof value}\`);
   }
@@ -383,7 +441,9 @@ try {
 } catch (e: any) {
   console.log("Caught error:", e.message);
 }
-`}
+`,
+    },
+  ]}
 />
 
 The return type `asserts value is string` tells the compiler: "If this
@@ -395,7 +455,10 @@ Assertion functions are useful for validation logic:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function assertNonNull<T>(value: T | null | undefined): asserts value is T {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function assertNonNull<T>(value: T | null | undefined): asserts value is T {
   if (value === null || value === undefined) {
     throw new Error("Value is null or undefined");
   }
@@ -414,7 +477,9 @@ try {
 } catch (e: any) {
   console.log("Caught error:", e.message);
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Narrowing with array methods
@@ -424,7 +489,10 @@ predicates:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const mixed: (string | number)[] = [1, "two", 3, "four"];
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const mixed: (string | number)[] = [1, "two", 3, "four"];
 
 // Filter to only strings
 const strings = mixed.filter((x): x is string => typeof x === "string");
@@ -433,7 +501,9 @@ console.log("strings:", strings); // strings is string[]
 // Filter to only numbers
 const numbers = mixed.filter((x): x is number => typeof x === "number");
 console.log("numbers:", numbers); // numbers is number[]
-`}
+`,
+    },
+  ]}
 />
 
 The predicate `(x): x is string` tells the compiler that the returned
@@ -449,7 +519,10 @@ area using narrowing.
   adapter="typescript"
   title="Shape Area with Type Guards"
   instructions={`Define a discriminated union \`Shape = Circle | Rectangle | Triangle\` where \`Circle = { kind: "circle"; radius: number }\`, \`Rectangle = { kind: "rectangle"; width: number; height: number }\`, and \`Triangle = { kind: "triangle"; base: number; height: number }\`. Implement \`area(shape: Shape): number\` that computes the area (circle: π·r², rectangle: w·h, triangle: ½·b·h). Use a \`switch\` statement with exhaustiveness checking.`}
-  starterCode={`type Circle = { kind: "circle"; radius: number };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Circle = { kind: "circle"; radius: number };
 type Rectangle = { kind: "rectangle"; width: number; height: number };
 type Triangle = { kind: "triangle"; base: number; height: number };
 type Shape = Circle | Rectangle | Triangle;
@@ -466,8 +539,8 @@ const tri: Shape = { kind: "triangle", base: 10, height: 5 };
 console.log("Circle area:", area(circle).toFixed(2));
 console.log("Rectangle area:", area(rect));
 console.log("Triangle area:", area(tri));
-`}
-  solutionCode={`type Circle = { kind: "circle"; radius: number };
+`,
+      solutionCode: `type Circle = { kind: "circle"; radius: number };
 type Rectangle = { kind: "rectangle"; width: number; height: number };
 type Triangle = { kind: "triangle"; base: number; height: number };
 type Shape = Circle | Rectangle | Triangle;
@@ -493,7 +566,9 @@ const tri: Shape = { kind: "triangle", base: 10, height: 5 };
 console.log("Circle area:", area(circle).toFixed(2));
 console.log("Rectangle area:", area(rect));
 console.log("Triangle area:", area(tri));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "circle",

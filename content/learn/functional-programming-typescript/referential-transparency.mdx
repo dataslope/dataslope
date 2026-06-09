@@ -18,7 +18,10 @@ Impure functions don't.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Pure: referentially transparent
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Pure: referentially transparent
 const square = (x: number): number => x * x;
 
 const a = square(3) + square(3);
@@ -26,7 +29,9 @@ const b = 9 + 9; // replaced square(3) with 9
 const c = square(3) * 2; // factored out the common subexpression
 
 console.log(a, b, c); // all 18
-`}
+`,
+    },
+  ]}
 />
 
 Every transformation we just did — substituting `square(3)` for `9`,
@@ -37,7 +42,10 @@ Compare with an impure function:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`let counter = 0;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `let counter = 0;
 function nextId(): number {
   counter = counter + 1;
   return counter;
@@ -53,7 +61,9 @@ console.log("b:", b);
 counter = 0;
 const c = 2 * nextId(); // 2 * 1 = 2
 console.log("c:", c);
-`}
+`,
+    },
+  ]}
 />
 
 You cannot replace `nextId()` with a fixed value. Two calls give
@@ -97,7 +107,10 @@ at each step.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const double = (x: number): number => x * 2;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const double = (x: number): number => x * 2;
 const inc = (x: number): number => x + 1;
 
 const result = double(inc(3));
@@ -107,7 +120,9 @@ const result = double(inc(3));
 //             = 8
 
 console.log(result);
-`}
+`,
+    },
+  ]}
 />
 
 You evaluated that in your head using *substitution*: replace
@@ -129,7 +144,10 @@ function.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function memoize<A, B>(f: (a: A) => B): (a: A) => B {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function memoize<A, B>(f: (a: A) => B): (a: A) => B {
   const cache = new Map<A, B>();
   return (a: A): B => {
     if (cache.has(a)) return cache.get(a)!;
@@ -155,7 +173,9 @@ console.timeEnd("slow fib(30)");
 console.time("fast fib(30)");
 console.log(fastFib(30));
 console.timeEnd("fast fib(30)");
-`}
+`,
+    },
+  ]}
 />
 
 The memoized version is correct only *because* `fib` is referentially
@@ -169,7 +189,10 @@ expression twice in one block, you can compute it once and reuse it.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function distance(
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function distance(
   a: { x: number; y: number },
   b: { x: number; y: number },
 ): number {
@@ -188,7 +211,9 @@ function distanceCSE(
 
 console.log(distance({ x: 0, y: 0 }, { x: 3, y: 4 }));
 console.log(distanceCSE({ x: 0, y: 0 }, { x: 3, y: 4 }));
-`}
+`,
+    },
+  ]}
 />
 
 The refactor from `distance` to `distanceCSE` is *only* safe because
@@ -231,7 +256,10 @@ Anything impure:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Innocent-looking but NOT referentially transparent
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Innocent-looking but NOT referentially transparent
 function greetWith(name: string): string {
   console.log(\`(building greeting for \${name})\`);
   return \`Hello, \${name}!\`;
@@ -244,7 +272,9 @@ const b = ga + " " + ga; // no extra log
 
 console.log("a:", a);
 console.log("b:", b);
-`}
+`,
+    },
+  ]}
 />
 
 Both produce the same string, but the *programs* are different —
@@ -260,7 +290,10 @@ exposing the randomness as an input.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Before: not referentially transparent — output depends on the RNG
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Before: not referentially transparent — output depends on the RNG
 function pickWinner(candidates: readonly string[]): string {
   const idx = Math.floor(Math.random() * candidates.length);
   return candidates[idx];
@@ -268,12 +301,17 @@ function pickWinner(candidates: readonly string[]): string {
 
 console.log(pickWinner(["A", "B", "C"])); // ??? depends on RNG
 console.log(pickWinner(["A", "B", "C"])); // ??? depends on RNG
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// After: pure. The randomness is now an explicit input.
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// After: pure. The randomness is now an explicit input.
 function pickWinner(candidates: readonly string[], roll01: number): string {
   const idx = Math.floor(roll01 * candidates.length);
   return candidates[idx];
@@ -287,7 +325,9 @@ console.log(pickWinner(["A", "B", "C"], 0.99)); // "C"
 // The impure shell that actually rolls
 const winner = pickWinner(["A", "B", "C"], Math.random());
 console.log("random winner:", winner);
-`}
+`,
+    },
+  ]}
 />
 
 The first version cannot be tested, replayed, or reasoned about

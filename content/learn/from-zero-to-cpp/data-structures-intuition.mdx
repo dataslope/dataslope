@@ -91,7 +91,10 @@ flowchart LR
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <map>
 #include <string>
 #include <unordered_map>
@@ -121,7 +124,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Picking a container

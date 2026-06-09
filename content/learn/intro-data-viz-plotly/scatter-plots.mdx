@@ -25,7 +25,10 @@ If you forget every other chart, remember the scatter plot.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.iris()
 
@@ -38,7 +41,9 @@ fig = px.scatter(
     labels={"sepal_width": "Sepal width (cm)", "sepal_length": "Sepal length (cm)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 The picture answers "are these two measurements related?" in
@@ -51,7 +56,10 @@ richer once we color by species:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.iris()
 
@@ -65,7 +73,9 @@ fig = px.scatter(
     labels={"sepal_width": "Sepal width (cm)", "sepal_length": "Sepal length (cm)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Suddenly the structure becomes obvious: the three species occupy
@@ -80,7 +90,10 @@ whole page to it later):
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.iris()
 
@@ -95,7 +108,9 @@ fig = px.scatter(
     labels={"sepal_width": "Sepal width (cm)", "sepal_length": "Sepal length (cm)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Four variables on one chart — and still readable.
@@ -108,7 +123,10 @@ regression):
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
@@ -123,7 +141,9 @@ fig = px.scatter(
     labels={"total_bill": "Total bill (USD)", "tip": "Tip (USD)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Trendlines turn a noisy cloud into a clear *direction*. Use them
@@ -140,7 +160,10 @@ look equally black. Two fixes:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder()
 
@@ -155,7 +178,9 @@ fig = px.scatter(
     labels={"gdpPercap": "GDP per capita (USD, log)", "lifeExp": "Life expectancy"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Each dot is now semi-transparent, so dense regions become visibly

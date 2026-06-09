@@ -19,7 +19,10 @@ That is the whole rule. Everything else is examples.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -36,7 +39,9 @@ print(df.loc["Bilal"])
 print()
 print(">>> df.iloc[1]")  # position
 print(df.iloc[1])
-`}
+`,
+    },
+  ]}
 />
 
 Both fetch the same row (because Bilal is at position 1), but
@@ -47,17 +52,22 @@ the *intent* is different. `loc` expresses "I know the label";
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 df = pd.DataFrame({
     "salary": [120, 95, 140, 80, 128],
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
-}, index=["Aiko","Bilal","Chen","Diego","Eve"])`}
-  starterCode={`print(">>> df.loc['Aiko':'Chen']     # 3 rows — INCLUSIVE of Chen")
+}, index=["Aiko","Bilal","Chen","Diego","Eve"])`,
+      starterCode: `print(">>> df.loc['Aiko':'Chen']     # 3 rows — INCLUSIVE of Chen")
 print(df.loc["Aiko":"Chen"])
 print()
 print(">>> df.iloc[0:3]              # 3 rows — EXCLUSIVE of position 3")
 print(df.iloc[0:3])
-`}
+`,
+    },
+  ]}
 />
 
 Same rows in this case (positions 0..2). But notice how
@@ -71,13 +81,16 @@ Both take a two-element form `[rows, columns]`:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 df = pd.DataFrame({
     "salary": [120, 95, 140, 80, 128],
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
     "tenure": [3, 6, 7, 2, 4],
-}, index=["Aiko","Bilal","Chen","Diego","Eve"])`}
-  starterCode={`# loc: labels for rows AND columns
+}, index=["Aiko","Bilal","Chen","Diego","Eve"])`,
+      starterCode: `# loc: labels for rows AND columns
 print(df.loc[["Aiko", "Chen"], ["salary", "tenure"]])
 print()
 
@@ -91,7 +104,9 @@ print()
 
 # Some rows, all columns
 print(df.iloc[1:4, :])
-`}
+`,
+    },
+  ]}
 />
 
 ## Boolean masks live in `loc`
@@ -101,13 +116,16 @@ or `loc[mask, cols]`:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 df = pd.DataFrame({
     "salary": [120, 95, 140, 80, 128],
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
     "tenure": [3, 6, 7, 2, 4],
-}, index=["Aiko","Bilal","Chen","Diego","Eve"])`}
-  starterCode={`mask = df["dept"] == "Eng"
+}, index=["Aiko","Bilal","Chen","Diego","Eve"])`,
+      starterCode: `mask = df["dept"] == "Eng"
 
 print(">>> df.loc[mask]")
 print(df.loc[mask])
@@ -115,7 +133,9 @@ print()
 
 print(">>> df.loc[mask, ['salary','tenure']]")
 print(df.loc[mask, ["salary", "tenure"]])
-`}
+`,
+    },
+  ]}
 />
 
 `df[mask]` works too but is a less expressive habit than
@@ -127,15 +147,20 @@ A subtle but important reason to use `loc` is **safe assignment**.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 df = pd.DataFrame({
     "salary": [120, 95, 140, 80, 128],
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
-}, index=["Aiko","Bilal","Chen","Diego","Eve"])`}
-  starterCode={`# Give every Engineer a 10% raise. Use loc — never chained []:
+}, index=["Aiko","Bilal","Chen","Diego","Eve"])`,
+      starterCode: `# Give every Engineer a 10% raise. Use loc — never chained []:
 df.loc[df["dept"] == "Eng", "salary"] *= 1.10
 print(df)
-`}
+`,
+    },
+  ]}
 />
 
 The "chained" alternative — `df[df["dept"] == "Eng"]["salary"]
@@ -166,7 +191,10 @@ and position becomes very obvious in this case.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame({"x": [100, 200, 300]}, index=[10, 20, 30])
 print(df)
@@ -176,7 +204,9 @@ print(df.loc[10])
 print()
 print("df.iloc[0] (position):")
 print(df.iloc[0])
-`}
+`,
+    },
+  ]}
 />
 
 ## Check your understanding

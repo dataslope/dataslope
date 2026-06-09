@@ -26,7 +26,10 @@ These proofs eliminate entire classes of bugs. Let's see them in action.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type User = { id: number; name: string };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type User = { id: number; name: string };
 
 function greet(user: User): string {
   return \`Hello, \${user.name}!\`;
@@ -37,7 +40,9 @@ console.log(greet(user));
 
 // const badUser = { id: "1", name: "Bob" }; // Error: id is string, not number
 // console.log(greet(badUser));
-`}
+`,
+    },
+  ]}
 />
 
 If you uncomment the last two lines, the compiler catches the type mismatch before you ever run the code. This prevents runtime errors like `NaN` from arithmetic on a string.
@@ -52,7 +57,10 @@ With `strictNullChecks` enabled (part of `strict` mode), the compiler forces you
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function getLength(s: string | null): number {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function getLength(s: string | null): number {
   // return s.length; // Error: s is possibly null
   if (s === null) {
     return 0;
@@ -62,7 +70,9 @@ With `strictNullChecks` enabled (part of `strict` mode), the compiler forces you
 
 console.log(getLength("hello")); // 5
 console.log(getLength(null)); // 0
-`}
+`,
+    },
+  ]}
 />
 
 The compiler tracks the control flow and **narrows** `s` from `string | null` to `string` after the `null` check. This is called **control flow analysis**.
@@ -75,7 +85,10 @@ When you have a discriminated union and switch on the discriminant, the compiler
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Shape =
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Shape =
   | { kind: "circle"; radius: number }
   | { kind: "rectangle"; width: number; height: number };
 
@@ -94,7 +107,9 @@ function area(shape: Shape): number {
 
 console.log(area({ kind: "circle", radius: 5 }));
 console.log(area({ kind: "rectangle", width: 10, height: 20 }));
-`}
+`,
+    },
+  ]}
 />
 
 The `never` type is a bottom type — a type with no values. If all cases are handled, `shape` in the `default` branch has type `never`, and the assignment succeeds. If you add a new variant (e.g., `{ kind: "triangle"; ... }`) and don't handle it, `shape` won't be `never`, and the compiler errors.
@@ -132,7 +147,10 @@ Let's see a refactor in action:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type User = { id: number; fullName: string };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type User = { id: number; fullName: string };
 
 function greet(user: User): string {
   return \`Hello, \${user.fullName}!\`;
@@ -146,7 +164,9 @@ const user: User = { id: 1, fullName: "Alice" };
 greet(user);
 displayUser(user);
 console.log("Refactor completed");
-`}
+`,
+    },
+  ]}
 />
 
 Suppose you rename `fullName` to `name`. Every place that accesses `.fullName` becomes a compile error, forcing you to update it. No silent bugs, no missed spots. The compiler is your safety net.
@@ -205,7 +225,10 @@ Let's refactor a function signature and see how the compiler guides us:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type User = { id: number; name: string };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type User = { id: number; name: string };
 
 // Original signature
 function getUser(id: number): User {
@@ -216,14 +239,19 @@ function getUser(id: number): User {
 const user1 = getUser(1);
 const user2 = getUser(2);
 console.log(user1, user2);
-`}
+`,
+    },
+  ]}
 />
 
 Now suppose we change the signature to accept an options object instead of a bare `id`:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type User = { id: number; name: string };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type User = { id: number; name: string };
 
 // New signature
 function getUser(options: { id: number; includeEmail?: boolean }): User {
@@ -237,7 +265,9 @@ function getUser(options: { id: number; includeEmail?: boolean }): User {
 const user1 = getUser({ id: 1 });
 const user2 = getUser({ id: 2, includeEmail: true });
 console.log(user1, user2);
-`}
+`,
+    },
+  ]}
 />
 
 The compiler tells you exactly which call sites need updating. No manual search, no chance of missing one. This scales to codebases with hundreds of thousands of lines.
@@ -250,7 +280,10 @@ The `never` type helps detect unreachable code. If a branch is provably unreacha
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function processValue(value: number): string {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function processValue(value: number): string {
   if (value > 0) {
     return "positive";
   } else if (value < 0) {
@@ -264,7 +297,9 @@ The `never` type helps detect unreachable code. If a branch is provably unreacha
 console.log(processValue(5));
 console.log(processValue(-3));
 console.log(processValue(0));
-`}
+`,
+    },
+  ]}
 />
 
 If you add another `else` after the `value === 0` case, it's unreachable, and the compiler can warn you.
@@ -279,13 +314,16 @@ If you add another `else` after the `value === 0` case, it's unreachable, and th
   instructions={`Define a discriminated union \`Payment\` with three variants: \`{ method: "cash" }\`, \`{ method: "card"; last4: string }\`, \`{ method: "crypto"; address: string }\`.
 
 Write a function \`processPayment(payment: Payment): string\` that handles all three cases and returns a description. Use a \`default\` branch with a \`never\` check to ensure exhaustiveness.`}
-  initCode={`type Payment = any; // Replace 'any'
+  files={[
+    {
+      filename: "main.ts",
+      initCode: `type Payment = any; // Replace 'any'
 
 function processPayment(payment: Payment): string {
   return "Not implemented";
 }
-`}
-  starterCode={`type Payment = any;
+`,
+      starterCode: `type Payment = any;
 
 function processPayment(payment: Payment): string {
   return "Not implemented";
@@ -294,8 +332,8 @@ function processPayment(payment: Payment): string {
 console.log(processPayment({ method: "cash" }));
 console.log(processPayment({ method: "card", last4: "1234" }));
 console.log(processPayment({ method: "crypto", address: "0xabc" }));
-`}
-  solutionCode={`type Payment =
+`,
+      solutionCode: `type Payment =
   | { method: "cash" }
   | { method: "card"; last4: string }
   | { method: "crypto"; address: string };
@@ -317,7 +355,9 @@ function processPayment(payment: Payment): string {
 console.log(processPayment({ method: "cash" }));
 console.log(processPayment({ method: "card", last4: "1234" }));
 console.log(processPayment({ method: "crypto", address: "0xabc" }));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "cash",

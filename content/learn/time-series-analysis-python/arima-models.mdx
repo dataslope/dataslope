@@ -46,7 +46,10 @@ simulated data:
 
 <CodeBlock
   adapter="python"
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
@@ -66,8 +69,8 @@ ar1 = pd.Series(ar[100:])
 ma = np.zeros(n)
 for t in range(1, n):
     ma[t] = e[t] + 0.8 * e[t-1]
-ma1 = pd.Series(ma[100:])`}
-  starterCode={`from statsmodels.tsa.arima.model import ARIMA
+ma1 = pd.Series(ma[100:])`,
+      starterCode: `from statsmodels.tsa.arima.model import ARIMA
 
 ar_fit = ARIMA(ar1, order=(1, 0, 0)).fit()  # one AR term, no differencing, no MA
 ma_fit = ARIMA(ma1, order=(0, 0, 1)).fit()  # no AR, no differencing, one MA term
@@ -79,7 +82,9 @@ print("MA(1) model -- we built it with theta = 0.8:")
 print(f"   estimated ma.L1 = {ma_fit.params['ma.L1']:.3f}")
 print()
 print("Both recovered the true coefficients closely. The model 'learned the rule'.")
-`}
+`,
+    },
+  ]}
 />
 
 ## Putting it together: ARIMA(p, d, q)
@@ -133,7 +138,10 @@ handle it well — fit on a training portion, and forecast the rest.
 
 <CodeBlock
   adapter="python"
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
@@ -149,8 +157,8 @@ for t in range(1, n):
 idx = pd.date_range("2010-01-01", periods=n, freq="MS")
 series = pd.Series(50 + 0.3*np.arange(n) + ar, index=idx, name="y")
 
-train, test = series.iloc[:-24], series.iloc[-24:]   # hold out the last 24 months`}
-  starterCode={`from statsmodels.tsa.arima.model import ARIMA
+train, test = series.iloc[:-24], series.iloc[-24:]   # hold out the last 24 months`,
+      starterCode: `from statsmodels.tsa.arima.model import ARIMA
 import matplotlib.pyplot as plt
 
 # Fit on TRAIN only. (p,d,q) = (1,1,1): one AR term, one difference, one MA term.
@@ -180,7 +188,9 @@ plt.show()
 
 print("The forecast tracks the trend, and the red band WIDENS as it reaches")
 print("further out -- uncertainty compounds the further ahead you predict.")
-`}
+`,
+    },
+  ]}
 />
 
 Two things to notice. First, we fit on **train** and forecast the
@@ -205,7 +215,10 @@ candidate `(p, d, q)` orders.
 
 <CodeBlock
   adapter="python"
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
@@ -219,8 +232,8 @@ for t in range(1, n):
     ar[t] = 0.6 * ar[t-1] + e[t]
 idx = pd.date_range("2010-01-01", periods=n, freq="MS")
 series = pd.Series(50 + 0.3*np.arange(n) + ar, index=idx, name="y")
-train = series.iloc[:-24]`}
-  starterCode={`from statsmodels.tsa.arima.model import ARIMA
+train = series.iloc[:-24]`,
+      starterCode: `from statsmodels.tsa.arima.model import ARIMA
 
 print(f"{'order':>10} | {'AIC':>9}")
 print("-" * 24)
@@ -232,7 +245,9 @@ print()
 print("Lower AIC = better fit-vs-complexity balance. But AIC is computed")
 print("IN-SAMPLE -- it rewards fitting the training data, which is NOT the same")
 print("as forecasting unseen data well. Use it to shortlist, then VALIDATE.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="danger" title="AIC is not out-of-sample accuracy">
@@ -253,7 +268,10 @@ bundles the standard four-panel check.
 
 <CodeBlock
   adapter="python"
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
@@ -274,8 +292,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`from statsmodels.tsa.arima.model import ARIMA
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `from statsmodels.tsa.arima.model import ARIMA
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -288,7 +306,9 @@ plt.show()
 print("Look at the bottom-left CORRELOGRAM (residual ACF): a spike still pokes")
 print("out around lag 12. That leftover SEASONAL structure means plain ARIMA")
 print("under-fits this series -- a SEASONAL model (SARIMA) is what it's asking for.")
-`}
+`,
+    },
+  ]}
 />
 
 The residual ACF still has a spike near lag 12 — the yearly seasonality plain
@@ -339,7 +359,10 @@ Set:
 - \`forecast\` — the 12-step point forecast as a Series (use \`fitted.forecast(steps=12)\`)
 
 The forecast should have exactly 12 values, all finite, continuing monthly after the last training date.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
@@ -351,15 +374,17 @@ ar = np.zeros(n)
 for t in range(1, n):
     ar[t] = 0.5 * ar[t-1] + e[t]
 idx = pd.date_range("2012-01-01", periods=n, freq="MS")
-train = pd.Series(20 + 0.4*np.arange(n) + ar, index=idx, name="y")`}
-  starterCode={`fitted = None
+train = pd.Series(20 + 0.4*np.arange(n) + ar, index=idx, name="y")`,
+      starterCode: `fitted = None
 forecast = None
 print(forecast)
-`}
-  solutionCode={`fitted = ARIMA(train, order=(1, 1, 1)).fit()
+`,
+      solutionCode: `fitted = ARIMA(train, order=(1, 1, 1)).fit()
 forecast = fitted.forecast(steps=12)
 print(forecast)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "length",
@@ -401,7 +426,10 @@ Produce a dict \`pick\`:
 - \`"best_order"\` — the tuple with the **lower** AIC (either \`(1,1,1)\` or \`(0,1,1)\`)
 
 Decide \`best_order\` consistently from your two AICs (lower wins).`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
@@ -413,15 +441,15 @@ ma = np.zeros(n)
 for t in range(1, n):
     ma[t] = e[t] + 0.7 * e[t-1]   # an MA-flavored series
 idx = pd.date_range("2011-01-01", periods=n, freq="MS")
-train = pd.Series(10 + np.cumsum(ma) * 0.0 + ma, index=idx, name="y")`}
-  starterCode={`pick = {
+train = pd.Series(10 + np.cumsum(ma) * 0.0 + ma, index=idx, name="y")`,
+      starterCode: `pick = {
     "aic_111": None,
     "aic_011": None,
     "best_order": None,
 }
 print(pick)
-`}
-  solutionCode={`a111 = float(ARIMA(train, order=(1, 1, 1)).fit().aic)
+`,
+      solutionCode: `a111 = float(ARIMA(train, order=(1, 1, 1)).fit().aic)
 a011 = float(ARIMA(train, order=(0, 1, 1)).fit().aic)
 pick = {
     "aic_111": a111,
@@ -429,7 +457,9 @@ pick = {
     "best_order": (1, 1, 1) if a111 < a011 else (0, 1, 1),
 }
 print(pick)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "floats",

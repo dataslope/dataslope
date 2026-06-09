@@ -26,7 +26,10 @@ The bare minimum on any chart:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007 and continent == 'Europe'")
 
@@ -40,7 +43,9 @@ fig = px.bar(
     labels={"lifeExp": "Life expectancy (years)", "country": "Country"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 The single most common mistake on beginner charts: a title like
@@ -65,7 +70,10 @@ outlier, the day something happened — use `fig.add_annotation(...)`.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("country == 'Japan'")
 
@@ -91,7 +99,9 @@ fig.add_annotation(
 )
 
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 The annotation:
@@ -110,7 +120,10 @@ threshold. Use `fig.add_hline` or `fig.add_vline`:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007")
 
@@ -143,7 +156,9 @@ fig.add_vline(
 )
 
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Reference lines split the chart into *meaningful regions* — in this
@@ -157,7 +172,10 @@ can add one via a layout annotation at the bottom:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007")
 
@@ -191,7 +209,9 @@ fig.add_annotation(
 fig.update_layout(margin=dict(b=80))
 
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 The trick: `xref="paper"` and `yref="paper"` place the text in

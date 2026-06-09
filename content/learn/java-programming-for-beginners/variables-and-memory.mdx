@@ -40,7 +40,10 @@ at one*.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int x = 5;
     System.out.println("x is " + x);
@@ -52,7 +55,9 @@ at one*.
     System.out.println("y is " + y);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Notice that `=` is **not** an equation. `x = 7` does not mean "x
@@ -135,7 +140,10 @@ first assignment. It is a *commitment*.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     final int LIMIT = 100;
     System.out.println("LIMIT = " + LIMIT);
@@ -144,7 +152,9 @@ first assignment. It is a *commitment*.
     // LIMIT = 200;
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Use `final` for values that should never change after being set. It
@@ -157,7 +167,10 @@ in. Outside that block, the name is unknown.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int outer = 10;
 
@@ -173,7 +186,9 @@ in. Outside that block, the name is unknown.
     System.out.println("outer = " + outer);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Scope is what keeps local variables from interfering with each
@@ -222,7 +237,7 @@ where \`P = 2 * (width + height)\` and \`A = width * height\`.`}
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int width = 7;
     int height = 4;
@@ -233,7 +248,7 @@ where \`P = 2 * (width + height)\` and \`A = width * height\`.`}
   }
 }
 `,
-      solutionContent: `public class Main {
+      solutionCode: `public class Main {
   public static void main(String[] args) {
     int width = 7;
     int height = 4;

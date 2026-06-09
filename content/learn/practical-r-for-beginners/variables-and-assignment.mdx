@@ -9,7 +9,10 @@ name, an arrow, and a value, and R remembers it.
 
 <CodeBlock
   adapter="r"
-  starterCode={`# The basic shape: name <- value
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# The basic shape: name <- value
 x <- 42
 greeting <- "Hello, R!"
 prices <- c(9.99, 14.50, 24.00)
@@ -17,7 +20,9 @@ prices <- c(9.99, 14.50, 24.00)
 print(x)
 print(greeting)
 print(prices)
-`}
+`,
+    },
+  ]}
 />
 
 The leftward-pointing arrow `<-` is R's **assignment operator**.
@@ -124,12 +129,17 @@ see the value.
 
 <CodeBlock
   adapter="r"
-  starterCode={`a <- 100 # no output — assignment is silent
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `a <- 100 # no output — assignment is silent
 print(a) # shows 100
 
 # Trick: parenthesize the assignment to both store and print
 (b <- 200)
-`}
+`,
+    },
+  ]}
 />
 
 The "wrap in parentheses" trick is sometimes useful for quick
@@ -143,7 +153,10 @@ you — it just replaces the old value.
 
 <CodeBlock
   adapter="r"
-  starterCode={`count <- 0
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `count <- 0
 print(count)
 
 count <- count + 1 # this is fine: read the right side, then store on the left
@@ -151,7 +164,9 @@ print(count)
 
 count <- count * 10
 print(count)
-`}
+`,
+    },
+  ]}
 />
 
 Notice the line `count <- count + 1`. This is **not** a math
@@ -200,13 +215,18 @@ an *independent* copy. Changing one does not change the other.
 
 <CodeBlock
   adapter="r"
-  starterCode={`x <- c(1, 2, 3)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `x <- c(1, 2, 3)
 y <- x # y now refers to a copy of x's data
 y[1] <- 999 # change y's first element
 
 print(x) # x is unchanged
 print(y) # y has 999 in first position
-`}
+`,
+    },
+  ]}
 />
 
 This *copy-on-modify* behavior is one of R's most thoughtful
@@ -227,7 +247,10 @@ you can remove them.
 
 <CodeBlock
   adapter="r"
-  starterCode={`x <- 1
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `x <- 1
 y <- 2
 z <- 3
 
@@ -241,7 +264,9 @@ print(ls())
 # Remove everything
 rm(list = ls())
 print(ls())
-`}
+`,
+    },
+  ]}
 />
 
 In WebR, every code block starts with a fresh workspace, so you
@@ -326,18 +351,23 @@ correct remaining balance.
 - subtract 8 (parking)
 
 After all three updates, \`budget\` should equal \`100 - 25 - 12 - 8 = 55\`.`}
-  starterCode={`budget <- 100
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `budget <- 100
 
 # Three updates here
 
 cat("Remaining: $", budget, "\\n", sep = "")
-`}
-  solutionCode={`budget <- 100
+`,
+      solutionCode: `budget <- 100
 budget <- budget - 25
 budget <- budget - 12
 budget <- budget - 8
 cat("Remaining: $", budget, "\\n", sep = "")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "budget",

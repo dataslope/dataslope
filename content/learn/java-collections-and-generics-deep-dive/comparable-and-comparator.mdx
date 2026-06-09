@@ -24,7 +24,10 @@ Many built-in types implement it: `Integer`, `Double`, `String`
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.Arrays;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.Arrays;
 
 public class Main {
   public static void main(String[] args) {
@@ -33,7 +36,9 @@ public class Main {
     System.out.println(Arrays.toString(names)); // [Alice, Bob, Charlie]
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Define it for your own types when there is **one obvious order** that
@@ -41,7 +46,10 @@ makes sense most of the time:
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.Arrays;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.Arrays;
 
 public class Main {
   record Version(int major, int minor, int patch)
@@ -67,7 +75,9 @@ public class Main {
       System.out.println(v);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Notice the use of `Integer.compare(a, b)` — never write `a - b`,
@@ -96,7 +106,10 @@ type:
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.*;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.*;
 
 public class Main {
   record Person(String name, int age) {}
@@ -116,7 +129,9 @@ public class Main {
     System.out.println("by age v: " + ps);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 `Comparator.comparing` and `comparingInt` are *key extractor*
@@ -130,7 +145,10 @@ The real elegance of `Comparator` is composition. You can chain
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.*;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.*;
 
 public class Main {
   record Employee(String dept, String name, int salary) {}
@@ -151,7 +169,9 @@ public class Main {
     es.forEach(System.out::println);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 This is far more readable than a 10-line `compareTo` method that
@@ -166,7 +186,10 @@ null-tolerant one:
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.*;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.*;
 
 public class Main {
   public static void main(String[] args) {
@@ -175,7 +198,9 @@ public class Main {
     System.out.println(xs);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Sorting in place vs. producing a sorted copy
@@ -195,7 +220,7 @@ public class Main {
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.*;
+      starterCode: `import java.util.*;
 
 public class Main {
   public static void main(String[] args) {
@@ -212,12 +237,12 @@ public class Main {
     },
     {
       filename: "User.java",
-      initialContent: `public record User(String name, int age, boolean active) {}
+      starterCode: `public record User(String name, int age, boolean active) {}
 `,
     },
     {
       filename: "UserOrders.java",
-      initialContent: `import java.util.Comparator;
+      starterCode: `import java.util.Comparator;
 
 public final class UserOrders {
   private UserOrders() {}
@@ -256,7 +281,7 @@ Grace 90
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.List;
+      starterCode: `import java.util.List;
 
 public class Main {
   public static void main(String[] args) {
@@ -272,12 +297,12 @@ public class Main {
     },
     {
       filename: "Player.java",
-      initialContent: `public record Player(String name, int score) {}
+      starterCode: `public record Player(String name, int score) {}
 `,
     },
     {
       filename: "Leaderboard.java",
-      initialContent: `import java.util.*;
+      starterCode: `import java.util.*;
 
 public final class Leaderboard {
   private Leaderboard() {}
@@ -288,7 +313,7 @@ public final class Leaderboard {
   }
 }
 `,
-      solutionContent: `import java.util.*;
+      solutionCode: `import java.util.*;
 
 public final class Leaderboard {
   private Leaderboard() {}

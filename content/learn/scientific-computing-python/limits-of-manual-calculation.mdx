@@ -39,7 +39,10 @@ Let us simulate, in Python, exactly how fast the work piles up.
 
 <CodeBlock
   adapter="python"
-  starterCode={`# How long would a human computer take to integrate
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# How long would a human computer take to integrate
 # the Earth-Moon-Sun system for one century?
 
 # Assume a step size of 1 hour and that a single update step
@@ -57,7 +60,9 @@ human_years = seconds / (365 * 24 * 3600)
 
 print(f"Total arithmetic operations: {total_ops:,}")
 print(f"Human-years required:        {human_years:,.0f}")
-`}
+`,
+    },
+  ]}
 />
 
 Nearly six human-years of nonstop arithmetic for a problem your laptop
@@ -87,21 +92,26 @@ the *interpolation* runs in microseconds. Try it.
 
 <CodeBlock
   adapter="python"
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from scipy.interpolate import CubicSpline
 
 # A sparse "table" of sine values at 10-degree intervals
 degrees = np.arange(0, 361, 10)
 table = np.sin(np.deg2rad(degrees))
-spline = CubicSpline(degrees, table)`}
-  starterCode={`# Look up sin(37.4°) by interpolating between table entries
+spline = CubicSpline(degrees, table)`,
+      starterCode: `# Look up sin(37.4°) by interpolating between table entries
 true_value = float(np.sin(np.deg2rad(37.4)))
 interpolated = float(spline(37.4))
 
 print(f"True   sin(37.4°) = {true_value:.8f}")
 print(f"Table  sin(37.4°) = {interpolated:.8f}")
 print(f"Error              = {abs(true_value - interpolated):.2e}")
-`}
+`,
+    },
+  ]}
 />
 
 The cubic spline error is on the order of $10^{-6}$ — better than any
@@ -164,7 +174,10 @@ the expression differs.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import math
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import math
 
 # Compute  f(x) = (1 - cos(x)) / x**2  for very small x.
 # Mathematically this approaches 1/2 as x -> 0.
@@ -174,7 +187,9 @@ for k in range(1, 12):
     naive = (1 - math.cos(x)) / x**2
     rewritten = 2 * math.sin(x / 2) ** 2 / x**2  # algebraically identical
     print(f"x=1e-{k:>2}  naive={naive:.10f}  rewritten={rewritten:.10f}")
-`}
+`,
+    },
+  ]}
 />
 
 The "naive" column drifts and then collapses to zero. The

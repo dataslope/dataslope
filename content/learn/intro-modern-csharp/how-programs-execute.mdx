@@ -68,13 +68,18 @@ This is what you write.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 int a = 3;
 int b = 4;
 int c = a + b;
 Console.WriteLine($"a + b = {c}");
-`}
+`,
+    },
+  ]}
 />
 
 It's text. To the computer, it is meaningless until something
@@ -179,7 +184,10 @@ Let's trace a tiny program step by step.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 int Square(int x)
 {
@@ -190,7 +198,9 @@ int Square(int x)
 int main_local = 5;
 int answer = Square(main_local);
 Console.WriteLine($"square = {answer}");
-`}
+`,
+    },
+  ]}
 />
 
 Here is what happens in the stack while this runs:
@@ -250,7 +260,10 @@ without worrying about memory:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 List<int> MakeNumbers(int n)
@@ -272,7 +285,9 @@ Console.WriteLine($"got a list of length {nums.Count}");
 // Overwriting 'nums' makes the old list eligible for collection.
 nums = MakeNumbers(5);
 Console.WriteLine($"now a list of length {nums.Count}");
-`}
+`,
+    },
+  ]}
 />
 
 ## 8. The full lifecycle, one more time

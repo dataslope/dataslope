@@ -33,7 +33,10 @@ a real one, annotated:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -57,7 +60,9 @@ for val, label in [(q1, "Q1"), (med, "median"), (q3, "Q3")]:
     )
 ax.set_ylim(-0.5, 0.6)
 ax.set_title("Anatomy of a box plot (total_bill)")
-`}
+`,
+    },
+  ]}
 />
 
 ## Comparing groups with box plots
@@ -68,7 +73,10 @@ category, and differences in center and spread jump out. Use `catplot` with
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
@@ -81,7 +89,9 @@ sns.catplot(
     height=4,
     aspect=1.3,
 )
-`}
+`,
+    },
+  ]}
 />
 
 Four groups, four five-number summaries, instantly comparable. Box plots
@@ -98,7 +108,10 @@ distributions can produce the *same* box plot.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 import numpy as np
 import pandas as pd
 
@@ -116,7 +129,9 @@ df = pd.DataFrame(
 )
 
 sns.catplot(data=df, x="group", y="value", kind="box", height=4, aspect=1.1)
-`}
+`,
+    },
+  ]}
 />
 
 The two boxes look nearly identical — yet group B is strongly bimodal and
@@ -124,7 +139,10 @@ group A is not. The box plot erased that completely. Now swap to a violin:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 import numpy as np
 import pandas as pd
 
@@ -141,7 +159,9 @@ df = pd.DataFrame(
 )
 
 sns.catplot(data=df, x="group", y="value", kind="violin", height=4, aspect=1.1)
-`}
+`,
+    },
+  ]}
 />
 
 The difference is now obvious: group B's violin has two bulges. This is the
@@ -173,7 +193,10 @@ that a box hides. The `inner` argument controls what's drawn inside:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
@@ -188,7 +211,9 @@ sns.catplot(
     height=4,
     aspect=1.3,
 )
-`}
+`,
+    },
+  ]}
 />
 
 Because a violin *is* a KDE, it inherits the KDE's caveats: it needs enough
@@ -212,7 +237,10 @@ the smoothing assumptions of a violin:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 diamonds = sns.load_dataset("diamonds").sample(n=3000, random_state=0)
@@ -225,7 +253,9 @@ sns.catplot(
     height=4,
     aspect=1.4,
 )
-`}
+`,
+    },
+  ]}
 />
 
 ## Choosing among the three
@@ -251,15 +281,18 @@ compares \`body_mass_g\` across the three \`species\`:
 
 Assign the result to \`g\`. The violins will show each species' full mass
 distribution, not just its quartiles.`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 # Build the violin plot and assign it to g:
 g = None
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
@@ -272,7 +305,9 @@ g = sns.catplot(
     height=4,
     aspect=1.2,
 )
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_grid",

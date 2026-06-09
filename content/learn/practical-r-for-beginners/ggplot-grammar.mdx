@@ -29,12 +29,17 @@ Each part is added with `+`.
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 data(mtcars)
 
 ggplot(mtcars, aes(x = wt, y = mpg)) +
   geom_point(color = "steelblue", size = 3)
-`}
+`,
+    },
+  ]}
 />
 
 Read it as a sentence:
@@ -52,7 +57,10 @@ Try different geoms on the same data:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 data(mtcars)
 
 p <- ggplot(mtcars, aes(x = wt, y = mpg))
@@ -60,7 +68,9 @@ p <- ggplot(mtcars, aes(x = wt, y = mpg))
 p + geom_point() # scatter
 p + geom_smooth() # smoothed trend
 p + geom_point() + geom_smooth(method = "lm") # both!
-`}
+`,
+    },
+  ]}
 />
 
 You change one word (`geom_point` → `geom_smooth`) and you get a
@@ -91,7 +101,10 @@ This is the single most common confusion for ggplot beginners.
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 data(mtcars)
 
 # MAPPING color to a column (cyl): one color per unique value of cyl
@@ -101,7 +114,9 @@ ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
 # SETTING color to a constant: every point the same color
 ggplot(mtcars, aes(x = wt, y = mpg)) +
   geom_point(color = "steelblue", size = 3)
-`}
+`,
+    },
+  ]}
 />
 
 If you put a literal `color = "steelblue"` *inside* `aes()`,
@@ -120,14 +135,19 @@ variable. ggplot makes this trivial with `facet_wrap()` and
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 data(iris)
 
 ggplot(iris, aes(x = Sepal.Length, y = Petal.Length)) +
   geom_point(color = "steelblue") +
   facet_wrap(~Species) +
   labs(title = "Sepal length vs. petal length, by species")
-`}
+`,
+    },
+  ]}
 />
 
 One line — `facet_wrap(~ Species)` — and you get three
@@ -141,7 +161,10 @@ group-level differences.
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 data(mtcars)
 
 ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
@@ -154,7 +177,9 @@ ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
     color    = "Cylinders",
     caption  = "Source: built-in mtcars dataset"
   )
-`}
+`,
+    },
+  ]}
 />
 
 Always set the title and axis labels. *Always*. They cost almost
@@ -166,34 +191,47 @@ A bar chart with counts (categorical x):
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 data(mtcars)
 
 ggplot(mtcars, aes(x = factor(cyl))) +
   geom_bar(fill = "steelblue") +
   labs(x = "Cylinders", y = "Number of cars")
-`}
+`,
+    },
+  ]}
 />
 
 A grouped boxplot (numeric y by categorical x):
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 data(iris)
 
 ggplot(iris, aes(x = Species, y = Petal.Length, fill = Species)) +
   geom_boxplot() +
   labs(y = "Petal length (cm)") +
   theme(legend.position = "none")
-`}
+`,
+    },
+  ]}
 />
 
 A line chart over time:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 data(airquality)
 
 ggplot(airquality, aes(x = Day, y = Temp)) +
@@ -204,7 +242,9 @@ ggplot(airquality, aes(x = Day, y = Temp)) +
     title = "Daily temperatures by month, NY 1973",
     x = "Day of month", y = "Temp (°F)"
   )
-`}
+`,
+    },
+  ]}
 />
 
 Notice how almost identical the structure is across very
@@ -217,7 +257,10 @@ also ships with several full themes:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 data(mtcars)
 
 p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
@@ -226,7 +269,9 @@ p <- ggplot(mtcars, aes(x = wt, y = mpg)) +
 p + theme_minimal()
 p + theme_bw()
 p + theme_classic()
-`}
+`,
+    },
+  ]}
 />
 
 For most analytical work, `theme_minimal()` is a great default —
@@ -300,14 +345,17 @@ title and axis labels.
 - have a title and meaningful axis labels (use \`labs()\`)
 
 Then print(p) to render it.`}
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 data(iris)
 
 p <- NULL # build the plot
 
 print(p)
-`}
-  solutionCode={`library(ggplot2)
+`,
+      solutionCode: `library(ggplot2)
 data(iris)
 
 p <- ggplot(iris, aes(
@@ -323,7 +371,9 @@ p <- ggplot(iris, aes(
     y = "Petal length (cm)"
   )
 print(p)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_gg",

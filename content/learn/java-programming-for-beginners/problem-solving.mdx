@@ -90,7 +90,10 @@ Translate it into Java:
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int n = 5;
 
@@ -102,7 +105,9 @@ Translate it into Java:
     System.out.println("sum 1.." + n + " = " + sum);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Read it aloud:
@@ -207,7 +212,7 @@ where N is the number of vowels.`}
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     String text = "Hello, beautiful World!";
 
@@ -218,7 +223,7 @@ where N is the number of vowels.`}
   }
 }
 `,
-      solutionContent: `public class Main {
+      solutionCode: `public class Main {
   public static void main(String[] args) {
     String text = "Hello, beautiful World!";
 

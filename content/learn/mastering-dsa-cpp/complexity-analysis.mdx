@@ -11,7 +11,10 @@ On ten items, almost any correct solution feels instant. On ten million items, a
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   for (int n : {10, 100, 1000, 10000}) {
@@ -20,7 +23,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Complexity is about growth">
@@ -41,7 +46,10 @@ Formally, `f(n) = O(g(n))` if there exist constants `c` and `n0` such that `f(n)
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 int sum(const std::vector<int> &xs) {
@@ -56,7 +64,9 @@ int main() {
   std::cout << sum(xs) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The `sum` function is Θ(n): it must inspect every element, and it does constant work per element.
@@ -78,7 +88,10 @@ From slowest- to fastest-growing: **O(1) → O(log n) → O(sqrt n) → O(n) →
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <chrono>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <chrono>
 #include <iostream>
 
 int main() {
@@ -95,7 +108,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Timing small programs is noisy, especially in a browser sandbox, but measurement is useful when paired with complexity analysis.
@@ -122,7 +137,10 @@ flowchart TD
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 int main() {
@@ -137,7 +155,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Common pitfalls
@@ -160,7 +180,10 @@ When a problem asks for complexity, state which case you mean. Interviews and al
   instructions={`Implement \`int countPairs(const std::vector<int>& v, int target)\` to count pairs \`(i, j)\` where \`i < j\` and \`v[i] + v[j] == target\`.
 
 Use the straightforward O(n^2) nested-loop version for this challenge. Later, you will learn how a hash map can reduce this idea to O(n).`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 int countPairs(const std::vector<int> &v, int target) {
@@ -172,8 +195,8 @@ int main() {
   std::cout << countPairs(v, 6) << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <vector>
 
 int countPairs(const std::vector<int> &v, int target) {
@@ -192,7 +215,9 @@ int main() {
   std::cout << countPairs(v, 6) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "count_pairs", name: "Counts all matching pairs", expect: { stdoutEquals: "3" } }]}
 />
 
@@ -202,7 +227,10 @@ int main() {
   instructions={`Implement \`bool hasDuplicate(const std::vector<int>& v)\` so it returns true if any value appears at least twice.
 
 A naive O(n^2) solution is accepted here. If you already know \`std::unordered_set\`, that gives an O(n) average-time approach.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 bool hasDuplicate(const std::vector<int> &v) {
@@ -216,8 +244,8 @@ int main() {
   std::cout << hasDuplicate(b) << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <vector>
 
 bool hasDuplicate(const std::vector<int> &v) {
@@ -237,7 +265,9 @@ int main() {
   std::cout << hasDuplicate(b) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "duplicate_outputs", name: "Detects duplicate and non-duplicate vectors", expect: { stdoutLines: ["1", "0"], stdoutLinesExact: true } }]}
 />
 

@@ -30,7 +30,10 @@ of that type can respond to.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Dog rex = new Dog("Rex", 4);
     Dog luna = new Dog("Luna", 2);
@@ -58,7 +61,9 @@ class Dog {
 
   void haveBirthday() { age = age + 1; }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Notice:
@@ -110,7 +115,7 @@ convention from now on. CheerpJ in your browser does the same.
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Book hp = new Book("Harry Potter", "J. K. Rowling", 1997);
     Book lr = new Book("The Lord of the Rings", "J. R. R. Tolkien", 1954);
@@ -125,7 +130,7 @@ convention from now on. CheerpJ in your browser does the same.
     },
     {
       filename: "Book.java",
-      initialContent: `public class Book {
+      starterCode: `public class Book {
   private final String title;
   private final String author;
   private final int year;
@@ -180,7 +185,10 @@ same name as a field, which is why constructors often look like
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Counter c = new Counter();
     c.bump();
@@ -199,7 +207,9 @@ class Counter {
   public void bump() { this.count = this.count + 1; }
   public int value() { return this.count; }
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Beginner-friendly objects exercise
@@ -219,7 +229,7 @@ perimeter: 14.0
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Rectangle r = new Rectangle(4.0, 3.0);
     System.out.println("area: " + r.area());
@@ -230,7 +240,7 @@ perimeter: 14.0
     },
     {
       filename: "Rectangle.java",
-      initialContent: `public class Rectangle {
+      starterCode: `public class Rectangle {
   // TODO: declare private fields width and height (both double)
 
   public Rectangle(double width, double height) {
@@ -248,7 +258,7 @@ perimeter: 14.0
   }
 }
 `,
-      solutionContent: `public class Rectangle {
+      solutionCode: `public class Rectangle {
   private final double width;
   private final double height;
 
@@ -295,7 +305,7 @@ a=3, b=1
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Counter a = new Counter();
     Counter b = new Counter();
@@ -310,11 +320,11 @@ a=3, b=1
     },
     {
       filename: "Counter.java",
-      initialContent: `public class Counter {
+      starterCode: `public class Counter {
   // TODO: a private int field, a bump() method, a value() method
 }
 `,
-      solutionContent: `public class Counter {
+      solutionCode: `public class Counter {
   private int count = 0;
   public void bump() { count++; }
   public int value() { return count; }

@@ -16,7 +16,10 @@ relatable, and has both numeric and categorical columns.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
@@ -24,7 +27,9 @@ print(df.head())
 print()
 print("Shape:", df.shape)
 print("Columns:", list(df.columns))
-`}
+`,
+    },
+  ]}
 />
 
 You should see columns like `total_bill`, `tip`, `sex`, `smoker`,
@@ -67,13 +72,18 @@ place.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
 fig = px.scatter(df, x="total_bill", y="tip", template="simple_white")
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 This is the absolute minimum. We can already see that yes, bigger
@@ -85,13 +95,18 @@ groups.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
 fig = px.scatter(df, x="total_bill", y="tip", color="smoker", template="simple_white")
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Now we can compare. Hover and toggle the legend (click "Yes" or
@@ -102,7 +117,10 @@ dramatic.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
@@ -115,7 +133,9 @@ fig = px.scatter(
     template="simple_white",
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 With `trendline="ols"`, Plotly Express fits an ordinary-least-
@@ -130,7 +150,10 @@ A chart without labels is rude to its readers.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
@@ -149,7 +172,9 @@ fig = px.scatter(
     },
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 The chart now communicates without needing any external context:
@@ -168,7 +193,10 @@ whole story of a row.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
@@ -188,7 +216,9 @@ fig = px.scatter(
     hover_data=["day", "time", "size"],
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Now hover over any dot. You'll see the bill, tip, smoker status,
@@ -237,7 +267,10 @@ Modify the chart below to:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
@@ -251,7 +284,9 @@ fig = px.scatter(
     labels={"total_bill": "Total bill (USD)", "tip": "Tip (USD)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 ## Check your understanding

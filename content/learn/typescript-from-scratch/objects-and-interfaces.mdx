@@ -23,12 +23,17 @@ curly-brace block listing the property names and their types:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const point: { x: number; y: number } = { x: 10, y: 20 };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const point: { x: number; y: number } = { x: 10, y: 20 };
 
 console.log("point:", point);
 console.log("x:", point.x);
 console.log("y:", point.y);
-`}
+`,
+    },
+  ]}
 />
 
 **What the compiler now knows:** `point` has exactly two properties, `x`
@@ -39,7 +44,10 @@ You can nest object types arbitrarily:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const user: {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const user: {
   name: string;
   age: number;
   address: {
@@ -57,7 +65,9 @@ You can nest object types arbitrarily:
 
 console.log("user:", user);
 console.log("city:", user.address.city);
-`}
+`,
+    },
+  ]}
 />
 
 Object type literals are useful for one-off types (like function
@@ -71,7 +81,10 @@ the name wherever you need that shape:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface Point {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface Point {
   x: number;
   y: number;
 }
@@ -81,7 +94,9 @@ const end: Point = { x: 100, y: 50 };
 
 console.log("origin:", origin);
 console.log("end:", end);
-`}
+`,
+    },
+  ]}
 />
 
 Interfaces make your code self-documenting: the name `Point` conveys
@@ -91,7 +106,10 @@ You can also define methods in interfaces:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface Rectangle {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface Rectangle {
   width: number;
   height: number;
   area(): number;
@@ -107,7 +125,9 @@ const rect: Rectangle = {
 
 console.log("rect:", rect);
 console.log("area:", rect.area());
-`}
+`,
+    },
+  ]}
 />
 
 **What bugs does this prevent?** If you forget to implement `area`, or if
@@ -121,7 +141,10 @@ A property marked with `?` is **optional** — it may be present or absent:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface User {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface User {
   name: string;
   age?: number; // optional
 }
@@ -138,7 +161,9 @@ if (bob.age !== undefined) {
 } else {
   console.log("Bob's age is unknown");
 }
-`}
+`,
+    },
+  ]}
 />
 
 The type of `bob.age` is `number | undefined`, so you must narrow before
@@ -152,7 +177,10 @@ reassigned:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface Config {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface Config {
   readonly apiUrl: string;
   timeout: number;
 }
@@ -170,7 +198,9 @@ console.log("Updated timeout:", config.timeout);
 
 // But readonly properties are locked:
 // config.apiUrl = "https://evil.com";  // ❌ Cannot assign to 'apiUrl' because it is a read-only property
-`}
+`,
+    },
+  ]}
 />
 
 `readonly` is a **compile-time** guarantee; it doesn't affect the
@@ -184,7 +214,10 @@ An **index signature** says "this object can have any property name
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface StringMap {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface StringMap {
   [key: string]: string;
 }
 
@@ -197,7 +230,9 @@ const translations: StringMap = {
 console.log("translations:", translations);
 console.log("hello in Spanish:", translations.hello);
 console.log("goodbye in Spanish:", translations.goodbye);
-`}
+`,
+    },
+  ]}
 />
 
 The index signature `[key: string]: string` means "any property name (a
@@ -209,7 +244,10 @@ an index signature with named properties:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface MixedMap {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface MixedMap {
   count: number; // specific property
   [key: string]: number; // any other property is a number
 }
@@ -223,7 +261,9 @@ const data: MixedMap = {
 console.log("data:", data);
 console.log("count:", data.count);
 console.log("apple:", data.apple);
-`}
+`,
+    },
+  ]}
 />
 
 **Caveat:** If you have an index signature, *all* named properties must
@@ -237,7 +277,10 @@ Interfaces can **extend** other interfaces, inheriting their properties:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface Animal {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface Animal {
   name: string;
   age: number;
 }
@@ -255,7 +298,9 @@ const fido: Dog = {
 console.log("fido:", fido);
 console.log("name:", fido.name);
 console.log("breed:", fido.breed);
-`}
+`,
+    },
+  ]}
 />
 
 `Dog` inherits `name` and `age` from `Animal`, then adds `breed`. This is
@@ -266,7 +311,10 @@ You can extend multiple interfaces at once:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface Named {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface Named {
   name: string;
 }
 
@@ -285,7 +333,9 @@ const alice: Person = {
 };
 
 console.log("alice:", alice);
-`}
+`,
+    },
+  ]}
 />
 
 This is called **multiple inheritance** (in a structural sense). The
@@ -311,7 +361,10 @@ TypeScript merges the declarations:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface User {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface User {
   name: string;
 }
 
@@ -323,7 +376,9 @@ interface User {
 const user: User = { name: "Alice", age: 30 };
 
 console.log("user:", user);
-`}
+`,
+    },
+  ]}
 />
 
 This is useful when augmenting third-party types (e.g., adding custom
@@ -355,7 +410,10 @@ Here's a side-by-side comparison:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Using interface
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Using interface
 interface PointI {
   x: number;
   y: number;
@@ -372,7 +430,9 @@ const p2: PointT = { x: 30, y: 40 };
 
 console.log("p1 (interface):", p1);
 console.log("p2 (type):", p2);
-`}
+`,
+    },
+  ]}
 />
 
 For object shapes, the choice is mostly stylistic. But remember: if you
@@ -388,7 +448,10 @@ inheritance.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface Point2D {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface Point2D {
   x: number;
   y: number;
 }
@@ -403,7 +466,9 @@ const vector: Vector2D = point; // ✅ Allowed! Same shape.
 
 console.log("point:", point);
 console.log("vector:", vector);
-`}
+`,
+    },
+  ]}
 />
 
 Even though `Point2D` and `Vector2D` are different names, they're
@@ -416,7 +481,10 @@ fewer properties (in most contexts):
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface Named {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface Named {
   name: string;
 }
 
@@ -426,7 +494,9 @@ const named: Named = user; // ✅ 'user' has at least 'name'
 console.log("named:", named);
 console.log("named.name:", named.name);
 // console.log(named.age);  // ❌ Property 'age' does not exist on type 'Named'
-`}
+`,
+    },
+  ]}
 />
 
 The object `user` has both `name` and `age`, but `Named` only requires
@@ -441,7 +511,10 @@ gracefully:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface Address {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface Address {
   street: string;
   city: string;
   country: string;
@@ -474,7 +547,9 @@ const emp: Employee = {
 console.log("employee:", emp);
 console.log("company name:", emp.company.name);
 console.log("city:", emp.company.address.city);
-`}
+`,
+    },
+  ]}
 />
 
 The compiler tracks the entire structure. If you misspell
@@ -491,7 +566,10 @@ implement a function that pretty-prints the profile.
   adapter="typescript"
   title="User Profile Formatter"
   instructions={`Define an interface \`Profile\` with the following properties: \`username: string\`, \`email: string\`, \`age?: number\` (optional), and \`settings: { theme: string; notifications: boolean }\` (nested object). Then implement the function \`formatProfile(profile: Profile): string\` that returns a formatted string like "Username: alice, Email: alice@example.com, Theme: dark". The test checks that the output contains the username and theme.`}
-  starterCode={`interface Profile {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface Profile {
   // Define the interface here
 }
 
@@ -507,8 +585,8 @@ const alice: Profile = {
 };
 
 console.log(formatProfile(alice));
-`}
-  solutionCode={`interface Profile {
+`,
+      solutionCode: `interface Profile {
   username: string;
   email: string;
   age?: number;
@@ -529,7 +607,9 @@ const alice: Profile = {
 };
 
 console.log(formatProfile(alice));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "format",

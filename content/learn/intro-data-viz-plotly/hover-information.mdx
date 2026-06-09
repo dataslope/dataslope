@@ -16,7 +16,10 @@ that would otherwise require a separate table.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007")
 
@@ -29,7 +32,9 @@ fig = px.scatter(
     title="Default hover — just x and y",
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Hover over any dot. You see `gdpPercap = ...` and `lifeExp = ...`.
@@ -42,7 +47,10 @@ the top of the tooltip.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007")
 
@@ -56,7 +64,9 @@ fig = px.scatter(
     title="With hover_name='country'",
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Now each hover starts with the country name. Already a huge
@@ -69,7 +79,10 @@ pass a dictionary to control formatting and visibility per field.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007")
 
@@ -90,7 +103,9 @@ fig = px.scatter(
     title="Custom hover_data with number formatting",
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Now hovering shows continent, population, GDP, and life expectancy
@@ -116,7 +131,10 @@ in the hover automatically.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007")
 
@@ -138,7 +156,9 @@ fig = px.scatter(
     title="Friendly hover labels via labels={...}",
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Hover over a dot. The labels now read "GDP per capita (USD)"

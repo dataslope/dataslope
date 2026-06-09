@@ -24,7 +24,10 @@ flowchart TD
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct TreeNode {
   int val;
@@ -40,7 +43,9 @@ int main() {
             << root.right->val << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## General trees vs binary trees
@@ -58,7 +63,10 @@ flowchart LR
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 struct GeneralNode {
@@ -74,7 +82,9 @@ int main() {
   std::cout << a.children.size() << " children\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Binary tree representations
@@ -83,7 +93,10 @@ A linked representation is flexible and works well for sparse trees.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct TreeNode {
   int val;
@@ -98,7 +111,9 @@ int main() {
   std::cout << n1.left->val << " " << n1.right->val << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Complete binary trees are often stored in arrays. For index `i`, the left child is `2*i + 1`, the right child is `2*i + 2`, and the parent is `(i - 1) / 2`.
@@ -115,7 +130,10 @@ flowchart TD
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 int main() {
@@ -132,7 +150,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Arrays are best for complete trees">
@@ -159,7 +179,10 @@ For this tree:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct TreeNode {
   int val;
@@ -204,7 +227,9 @@ int main() {
   std::cout << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The three depth-first orders differ only in when the root is visited relative to its subtrees:
@@ -221,7 +246,10 @@ Level-order is breadth-first search. A queue processes nodes one level at a time
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <queue>
 
 struct TreeNode {
@@ -251,7 +279,9 @@ int main() {
   levelOrder(&n1);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Iterative in-order traversal
@@ -260,7 +290,10 @@ The recursion stack can be simulated with `std::stack`.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <stack>
 
 struct TreeNode {
@@ -289,7 +322,9 @@ int main() {
   iterativeInorder(&n2);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Calculating tree properties
@@ -298,7 +333,10 @@ Most tree properties are naturally recursive: solve the left subtree, solve the 
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <algorithm>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
 #include <climits>
 #include <cstdlib>
 #include <iostream>
@@ -348,7 +386,9 @@ int main() {
   std::cout << std::boolalpha << isBalanced(&n1) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Practice: Sum of all node values
@@ -357,7 +397,10 @@ int main() {
   adapter="cpp"
   title="Sum of all node values"
   instructions={`Implement \`int sumTree(TreeNode* root)\`. The driver builds a binary tree and prints the sum of all values.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct TreeNode {
   int val;
@@ -376,8 +419,8 @@ int main() {
   std::cout << sumTree(&n1) << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 
 struct TreeNode {
   int val;
@@ -397,7 +440,9 @@ int main() {
   std::cout << sumTree(&n1) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "sum", name: "Computes tree sum", expect: { stdoutEquals: "15" } }]}
 />
 
@@ -407,7 +452,10 @@ int main() {
   adapter="cpp"
   title="Maximum depth of binary tree"
   instructions={`Implement \`int maxDepth(TreeNode* root)\`. Count nodes on the longest root-to-leaf path.`}
-  starterCode={`#include <algorithm>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
 #include <iostream>
 
 struct TreeNode {
@@ -427,8 +475,8 @@ int main() {
   std::cout << maxDepth(&n1) << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <algorithm>
+`,
+      solutionCode: `#include <algorithm>
 #include <iostream>
 
 struct TreeNode {
@@ -449,7 +497,9 @@ int main() {
   std::cout << maxDepth(&n1) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "depth", name: "Finds max depth", expect: { stdoutEquals: "4" } }]}
 />
 
@@ -459,7 +509,10 @@ int main() {
   adapter="cpp"
   title="Level-order traversal"
   instructions={`Return the tree values grouped by level as \`std::vector<std::vector<int>>\`. The driver prints each level on its own line.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <queue>
 #include <vector>
 
@@ -485,8 +538,8 @@ int main() {
   }
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <queue>
 #include <vector>
 
@@ -530,7 +583,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "levels", name: "Prints levels", expect: { stdoutLines: ["1 ", "2 3 ", "4 5 6 "], stdoutLinesExact: true } }]}
 />
 

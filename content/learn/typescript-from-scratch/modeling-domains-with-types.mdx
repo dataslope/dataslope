@@ -33,7 +33,10 @@ These are **illegal states**: combinations that don't make sense in your domain.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// The bad model
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// The bad model
 type BadUser = {
   id: string;
   name: string;
@@ -72,7 +75,9 @@ const messyUser: BadUser = {
 };
 
 canAccessAdmin(messyUser);
-`}
+`,
+    },
+  ]}
 />
 
 The function `canAccessAdmin` has to guard against impossible states. This is a sign your types aren't pulling their weight.
@@ -83,7 +88,10 @@ The fix is to model the user's **status** as a discriminated union. A user can b
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type UserStatus =
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type UserStatus =
   | { status: "active"; role: "member" | "admin" }
   | { status: "suspended"; reason: string }
   | { status: "inactive" };
@@ -130,7 +138,9 @@ const bob: GoodUser = {
 
 console.log("Alice:", canAccessAdmin(alice));
 console.log("Bob:", canAccessAdmin(bob));
-`}
+`,
+    },
+  ]}
 />
 
 Now the compiler enforces that:
@@ -192,7 +202,7 @@ The type is too loose. Let's tighten it with a discriminated union:
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { Order, summarize } from "./order";
+      starterCode: `import { Order, summarize } from "./order";
 
 const draft: Order = {
   id: "ord-001",
@@ -242,7 +252,7 @@ console.log(summarize(cancelled));
     },
     {
       filename: "order.ts",
-      initialContent: `type OrderItem = {
+      starterCode: `type OrderItem = {
   productId: string;
   quantity: number;
 };
@@ -330,7 +340,10 @@ The `type` discriminant replaces the boolean, and now the compiler knows which f
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type PaymentMethod =
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type PaymentMethod =
   | { type: "credit-card"; cardNumber: string; cvv: string }
   | { type: "bank-account"; accountNumber: string; routingNumber: string }
   | { type: "paypal"; email: string };
@@ -364,7 +377,9 @@ console.log(
 console.log(
   processPayment({ type: "paypal", email: "alice@example.com" }, 25.0),
 );
-`}
+`,
+    },
+  ]}
 />
 
 Each payment method is a distinct variant with its own fields. No optional properties, no runtime checks for "is this a credit card or a bank account?" — the type tells you.
@@ -375,7 +390,10 @@ Sometimes a field can only take a few valid values. Use **literal types** instea
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Priority = "low" | "medium" | "high" | "urgent";
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Priority = "low" | "medium" | "high" | "urgent";
 
 type Task = {
   id: string;
@@ -405,7 +423,9 @@ console.log("After escalation:", task.priority);
 
 task = escalate(task);
 console.log("After another escalation:", task.priority);
-`}
+`,
+    },
+  ]}
 />
 
 If you used `priority: string`, the compiler wouldn't catch typos like `"urgent!"` or `"URGENT"`. The literal union restricts the value to the valid set, and the compiler verifies exhaustiveness when you map over them.
@@ -431,7 +451,7 @@ Now it's your turn. You'll take a sloppy type and refine it into a discriminated
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { Post } from "./post";
+      starterCode: `import { Post } from "./post";
 
 export function describePost(post: Post): string {
   // TODO: switch on post.state.status and return a formatted string
@@ -464,7 +484,7 @@ console.log(describePost(draft));
 console.log(describePost(published));
 console.log(describePost(archived));
 `,
-      solutionContent: `import { Post } from "./post";
+      solutionCode: `import { Post } from "./post";
 
 export function describePost(post: Post): string {
   switch (post.state.status) {
@@ -509,7 +529,7 @@ console.log(describePost(archived));
     },
     {
       filename: "post.ts",
-      initialContent: `// TODO: Define PostState as a discriminated union
+      starterCode: `// TODO: Define PostState as a discriminated union
 type PostState = { status: "draft" };
 
 export type Post = {
@@ -518,7 +538,7 @@ export type Post = {
   state: PostState;
 };
 `,
-      solutionContent: `type PostState =
+      solutionCode: `type PostState =
   | { status: "draft" }
   | { status: "published"; slug: string; publishedAt: number }
   | { status: "archived"; archivedAt: number };

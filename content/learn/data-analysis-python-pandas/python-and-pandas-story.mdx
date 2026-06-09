@@ -180,7 +180,10 @@ saw earlier.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.read_csv(
     "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
@@ -201,7 +204,9 @@ print()
 
 print(">>> df.describe(include='all').T.head(8)")
 print(df.describe(include="all").T.head(8))
-`}
+`,
+    },
+  ]}
 />
 
 You already used three or four pandas idioms in that snippet:

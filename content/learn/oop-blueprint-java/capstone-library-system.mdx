@@ -145,7 +145,7 @@ miniature.
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.Arrays;
+      starterCode: `import java.util.Arrays;
 
 public class Main {
   public static void main(String[] args) {
@@ -186,7 +186,7 @@ public class Main {
     },
     {
       filename: "Book.java",
-      initialContent: `public class Book {
+      starterCode: `public class Book {
   private final String title;
   private final String author;
   private final String isbn;
@@ -203,7 +203,7 @@ public class Main {
     },
     {
       filename: "Member.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Member {
@@ -227,7 +227,7 @@ public class Member {
     },
     {
       filename: "Loan.java",
-      initialContent: `public class Loan {
+      starterCode: `public class Loan {
   private final Book book;
   private final Member member;
   private final int dueDay; // simplified day counter
@@ -248,7 +248,7 @@ public class Member {
   }
 }
 `,
-      solutionContent: `public class Loan {
+      solutionCode: `public class Loan {
   private final Book book;
   private final Member member;
   private final int dueDay;
@@ -269,14 +269,14 @@ public class Member {
     },
     {
       filename: "BorrowingPolicy.java",
-      initialContent: `public interface BorrowingPolicy {
+      starterCode: `public interface BorrowingPolicy {
   boolean mayBorrow(Member member);
 }
 `,
     },
     {
       filename: "LimitPolicy.java",
-      initialContent: `public class LimitPolicy implements BorrowingPolicy {
+      starterCode: `public class LimitPolicy implements BorrowingPolicy {
   private final int max;
   public LimitPolicy(int max) { this.max = max; }
 
@@ -287,7 +287,7 @@ public class Member {
   }
 }
 `,
-      solutionContent: `public class LimitPolicy implements BorrowingPolicy {
+      solutionCode: `public class LimitPolicy implements BorrowingPolicy {
   private final int max;
   public LimitPolicy(int max) { this.max = max; }
 
@@ -300,7 +300,7 @@ public class Member {
     },
     {
       filename: "OpenPolicy.java",
-      initialContent: `public class OpenPolicy implements BorrowingPolicy {
+      starterCode: `public class OpenPolicy implements BorrowingPolicy {
   @Override
   public boolean mayBorrow(Member member) {
     return true;
@@ -310,7 +310,7 @@ public class Member {
     },
     {
       filename: "Library.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Library {

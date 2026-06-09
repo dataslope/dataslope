@@ -44,7 +44,10 @@ flowchart LR
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 class Date {
 public:
@@ -73,7 +76,9 @@ int main() {
   std::cout << d2.year() << "-" << d2.month() << "-" << d2.day() << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 There is no way a `Date` object can exist with `month == 99`.

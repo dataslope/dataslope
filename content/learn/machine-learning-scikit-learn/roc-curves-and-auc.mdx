@@ -51,7 +51,10 @@ threshold; `roc_auc_score` returns the area underneath.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import matplotlib.pyplot as plt
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import matplotlib.pyplot as plt
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -77,7 +80,9 @@ plt.ylabel("True Positive Rate (recall)")
 plt.title("ROC curve")
 plt.legend(loc="lower right")
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 How to read the picture:
@@ -123,7 +128,10 @@ equivalence by brute force.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -147,7 +155,9 @@ concordance = wins / (len(pos_scores) * len(neg_scores))
 print(f"Brute-force ranking probability: {concordance:.4f}")
 print(f"sklearn roc_auc_score:          {roc_auc_score(y_test, probs):.4f}")
 print("They match because AUC IS that ranking probability.")
-`}
+`,
+    },
+  ]}
 />
 
 The two numbers are identical. This is why AUC is so popular for comparing
@@ -161,7 +171,10 @@ genuine model is compared against a deliberately weak one.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import matplotlib.pyplot as plt
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import matplotlib.pyplot as plt
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -196,7 +209,9 @@ plt.ylabel("True Positive Rate")
 plt.title("Higher and more top-left = better")
 plt.legend(loc="lower right")
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 The stronger model's curve sits above and to the left of the weak one, and
@@ -269,7 +284,10 @@ score them by AUC on the test set.
 
 The tests confirm both AUCs are valid probabilities (between 0 and 1) and
 that \`better\` correctly names the higher-AUC model.`}
-  initCode={`from sklearn.datasets import load_breast_cancer
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
@@ -280,23 +298,25 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )
 logreg = LogisticRegression(max_iter=5000).fit(X_train, y_train)
-tree = DecisionTreeClassifier(max_depth=2, random_state=0).fit(X_train, y_train)`}
-  starterCode={`auc_logreg = None
+tree = DecisionTreeClassifier(max_depth=2, random_state=0).fit(X_train, y_train)`,
+      starterCode: `auc_logreg = None
 auc_tree = None
 better = None
 
 print("logreg AUC:", auc_logreg)
 print("tree AUC:", auc_tree)
 print("better:", better)
-`}
-  solutionCode={`auc_logreg = roc_auc_score(y_test, logreg.predict_proba(X_test)[:, 1])
+`,
+      solutionCode: `auc_logreg = roc_auc_score(y_test, logreg.predict_proba(X_test)[:, 1])
 auc_tree = roc_auc_score(y_test, tree.predict_proba(X_test)[:, 1])
 better = "logreg" if auc_logreg > auc_tree else "tree"
 
 print("logreg AUC:", auc_logreg)
 print("tree AUC:", auc_tree)
 print("better:", better)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "valid",

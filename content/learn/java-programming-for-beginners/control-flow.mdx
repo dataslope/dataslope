@@ -23,7 +23,10 @@ when the condition is false. `else if` chains additional conditions.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int score = 72;
 
@@ -38,7 +41,9 @@ when the condition is false. `else if` chains additional conditions.
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Conditions are expressions of type `boolean`. The comparison
@@ -56,7 +61,10 @@ a long `if/else` chain.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int day = 3;
     String name;
@@ -90,7 +98,9 @@ a long `if/else` chain.
     System.out.println("Day " + day + " is " + name);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 A few things to remember about `switch`:
@@ -108,7 +118,10 @@ condition is checked **before** each pass.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int n = 10;
     while (n > 0) {
@@ -118,7 +131,9 @@ condition is checked **before** each pass.
     System.out.println("Lift off!");
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 `do-while` is the same, except the condition is checked **after**
@@ -148,14 +163,19 @@ flowchart TB
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     for (int i = 1; i <= 5; i++) {
       System.out.println("i = " + i);
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 `i++` is shorthand for `i = i + 1`. Likewise `i--`, `i += 2`, `i *=
@@ -168,7 +188,10 @@ has a cleaner form:
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int[] primes = {2, 3, 5, 7, 11, 13};
     int total = 0;
@@ -181,7 +204,9 @@ has a cleaner form:
     System.out.println("total = " + total);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Read `for (int p : primes)` as *"for each int p in primes."*
@@ -193,7 +218,10 @@ Read `for (int p : primes)` as *"for each int p in primes."*
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     for (int i = 1; i <= 10; i++) {
       if (i == 5)
@@ -204,7 +232,9 @@ Read `for (int p : primes)` as *"for each int p in primes."*
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Use these sparingly. Loops are easier to reason about when the
@@ -217,7 +247,10 @@ run it and check.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int sum = 0;
     for (int i = 1; i <= 5; i++) {
@@ -229,7 +262,9 @@ run it and check.
     System.out.println("final sum = " + sum);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 This is a *nested loop* — a loop inside a loop. Each value of the
@@ -297,13 +332,13 @@ Buzz
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     // TODO: print FizzBuzz from 1 to 15
   }
 }
 `,
-      solutionContent: `public class Main {
+      solutionCode: `public class Main {
   public static void main(String[] args) {
     for (int i = 1; i <= 15; i++) {
       if (i % 15 == 0) {

@@ -27,14 +27,19 @@ all of type `T`." For example, `number[]` is an array of numbers,
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const numbers: number[] = [1, 2, 3, 4, 5];
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const numbers: number[] = [1, 2, 3, 4, 5];
 const names: string[] = ["Alice", "Bob", "Charlie"];
 
 console.log("numbers:", numbers);
 console.log("names:", names);
 console.log("First number:", numbers[0]);
 console.log("First name:", names[0]);
-`}
+`,
+    },
+  ]}
 />
 
 **What the compiler now knows:** Every element of `numbers` is a
@@ -47,12 +52,17 @@ functionally identical to `T[]`:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const numbers: Array<number> = [10, 20, 30];
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const numbers: Array<number> = [10, 20, 30];
 const words: Array<string> = ["hello", "world"];
 
 console.log("numbers:", numbers);
 console.log("words:", words);
-`}
+`,
+    },
+  ]}
 />
 
 The two syntaxes are interchangeable. Most codebases prefer `T[]` for
@@ -66,7 +76,10 @@ type:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Inferred as number[]
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Inferred as number[]
 const scores = [95, 87, 92];
 
 // Inferred as string[]
@@ -78,7 +91,9 @@ const mixed = [1, "two", 3];
 console.log("scores:", scores);
 console.log("colors:", colors);
 console.log("mixed:", mixed);
-`}
+`,
+    },
+  ]}
 />
 
 Notice the last case: `mixed` is inferred as `(number | string)[]`,
@@ -97,7 +112,10 @@ be modified. Enter `readonly`:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const fixed: readonly number[] = [1, 2, 3];
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const fixed: readonly number[] = [1, 2, 3];
 
 console.log("fixed:", fixed);
 console.log("First element:", fixed[0]);
@@ -110,7 +128,9 @@ console.log("First element:", fixed[0]);
 for (const num of fixed) {
   console.log("Element:", num);
 }
-`}
+`,
+    },
+  ]}
 />
 
 **What bugs does this prevent?** If you pass an array to a function that
@@ -124,14 +144,19 @@ Alternatively, you can use the `ReadonlyArray<T>` generic:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const immutable: ReadonlyArray<string> = ["a", "b", "c"];
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const immutable: ReadonlyArray<string> = ["a", "b", "c"];
 
 console.log("immutable:", immutable);
 console.log("Length:", immutable.length);
 
 // Mutations are blocked:
 // immutable.push("d");  // ❌ Property 'push' does not exist
-`}
+`,
+    },
+  ]}
 />
 
 `readonly T[]` and `ReadonlyArray<T>` are equivalent; choose whichever
@@ -147,7 +172,10 @@ two-element tuple: the first element is a `string`, the second is a
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// A tuple: [name, age]
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// A tuple: [name, age]
 const person: [string, number] = ["Alice", 30];
 
 console.log("Name:", person[0]); // string
@@ -156,7 +184,9 @@ console.log("Age:", person[1]); // number
 // Destructuring works beautifully:
 const [name, age] = person;
 console.log(\`\${name} is \${age} years old.\`);
-`}
+`,
+    },
+  ]}
 />
 
 **What the compiler now knows:** `person[0]` is *specifically* a `string`,
@@ -168,7 +198,10 @@ Tuples shine when a function returns multiple values:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function divmod(a: number, b: number): [number, number] {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function divmod(a: number, b: number): [number, number] {
   const quotient = Math.floor(a / b);
   const remainder = a % b;
   return [quotient, remainder];
@@ -176,7 +209,9 @@ Tuples shine when a function returns multiple values:
 
 const [q, r] = divmod(17, 5);
 console.log(\`17 ÷ 5 = \${q} remainder \${r}\`);
-`}
+`,
+    },
+  ]}
 />
 
 Without tuples, you'd have to return an object with named properties
@@ -190,7 +225,10 @@ readability without changing the runtime behavior:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Named tuple: [name, age]
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Named tuple: [name, age]
 type Person = [name: string, age: number];
 
 const alice: Person = ["Alice", 30];
@@ -202,7 +240,9 @@ console.log("bob:", bob);
 // The labels are purely for documentation; they don't affect access:
 console.log("alice[0]:", alice[0]);
 console.log("alice[1]:", alice[1]);
-`}
+`,
+    },
+  ]}
 />
 
 The labels appear in editor tooltips and error messages, making the code
@@ -214,7 +254,10 @@ You can mark tuple elements as optional with `?`:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// A tuple with an optional third element
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// A tuple with an optional third element
 type Point = [x: number, y: number, z?: number];
 
 const point2D: Point = [10, 20];
@@ -226,7 +269,9 @@ console.log("3D point:", point3D);
 // Accessing the optional element gives number | undefined
 console.log("Z coordinate of 2D:", point2D[2]); // undefined
 console.log("Z coordinate of 3D:", point3D[2]); // 30
-`}
+`,
+    },
+  ]}
 />
 
 Optional elements must come *after* required elements (just like optional
@@ -239,7 +284,10 @@ number of trailing elements:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// A tuple: [name, ...scores]
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// A tuple: [name, ...scores]
 type StudentRecord = [name: string, ...scores: number[]];
 
 const alice: StudentRecord = ["Alice", 95, 87, 92];
@@ -250,7 +298,9 @@ console.log("bob:", bob);
 
 const [aliceName, ...aliceScores] = alice;
 console.log(\`\${aliceName}'s scores:\`, aliceScores);
-`}
+`,
+    },
+  ]}
 />
 
 The rest element must be last. It behaves like a normal array, so you can
@@ -264,7 +314,10 @@ feature (we'll revisit it when we cover generics), but here's a taste:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// A function that prepends an element to a tuple
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// A function that prepends an element to a tuple
 function prepend<T, U extends any[]>(head: T, tail: U): [T, ...U] {
   return [head, ...tail];
 }
@@ -275,7 +328,9 @@ console.log("result:", result);
 // result has type [string, number, boolean]
 const [name, age, active] = result;
 console.log(\`\${name}, age \${age}, active \${active}\`);
-`}
+`,
+    },
+  ]}
 />
 
 The return type `[T, ...U]` says "a tuple that starts with a `T`, then
@@ -313,13 +368,13 @@ another.
   files={[
     {
       filename: "types.ts",
-      initialContent: `// Define the Point3D tuple type here
+      starterCode: `// Define the Point3D tuple type here
 export type Point3D = [number, number, number];
 `,
     },
     {
       filename: "main.ts",
-      initialContent: `import { Point3D } from "./types";
+      starterCode: `import { Point3D } from "./types";
 
 export function distance(a: Point3D, b: Point3D): number {
   // Your code here
@@ -330,7 +385,7 @@ const origin: Point3D = [0, 0, 0];
 const point: Point3D = [3, 4, 0];
 console.log("Distance:", distance(origin, point));
 `,
-      solutionContent: `import { Point3D } from "./types";
+      solutionCode: `import { Point3D } from "./types";
 
 export function distance(a: Point3D, b: Point3D): number {
   const [x1, y1, z1] = a;
@@ -372,7 +427,10 @@ length: if you declare `pair: [number, number]`, the compiler knows
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const arr: number[] = [1, 2, 3];
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const arr: number[] = [1, 2, 3];
 const tuple: [number, number] = [1, 2];
 
 // Array indexing gives number (but could be undefined at runtime)
@@ -385,7 +443,9 @@ console.log("firstTuple:", firstTuple);
 
 // Tuple bounds are checked:
 // const third = tuple[2];  // ❌ Tuple type '[number, number]' of length '2' has no element at index '2'
-`}
+`,
+    },
+  ]}
 />
 
 This is a subtle but important distinction: **tuples encode length in the

@@ -47,7 +47,10 @@ test.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 // Pretend this reads a file. Mixing logic with IO makes everything harder to test.
@@ -72,7 +75,9 @@ List<decimal> ReadAndSumPositiveSales()
 
 var sales = ReadAndSumPositiveSales();
 Console.WriteLine($"Sum: {sales.Sum()}");
-`}
+`,
+    },
+  ]}
 />
 
 To test the *parsing rule* — "non-numeric and non-positive entries
@@ -84,7 +89,10 @@ IO.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -104,7 +112,9 @@ public static class SalesParser
             .Where(n => n is > 0)
             .Select(n => n!.Value);
 }
-`}
+`,
+    },
+  ]}
 />
 
 `SalesParser.Parse` is *pure*: same input, same output, no side
@@ -123,7 +133,10 @@ pure).
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -149,7 +162,9 @@ public static class Subs
                                                          DateTime now) => subs.Where(s => s.ExpiresOn <=
                                                                                           now.AddDays(7));
 }
-`}
+`,
+    },
+  ]}
 />
 
 In a test, you pass an arbitrary `DateTime`. In production, the
@@ -200,7 +215,7 @@ The function still returns *data*. The shell decides whether
   files={[
     {
       filename: "Program.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -215,7 +230,7 @@ var windowDays = 10;
 var report = Report.Build(rawLines, today, windowDays);
 Console.WriteLine(report);
 `,
-      solutionContent: `using System;
+      solutionCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -232,7 +247,7 @@ Console.WriteLine(report);
     },
     {
       filename: "Report.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -253,7 +268,7 @@ public static class Report
     }
 }
 `,
-      solutionContent: `using System;
+      solutionCode: `using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;

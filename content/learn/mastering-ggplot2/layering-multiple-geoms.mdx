@@ -15,12 +15,17 @@ mappings. Points + a smoother is the canonical example:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy)) +
   geom_point() +
   geom_smooth(method = "lm", se = TRUE)
-`}
+`,
+    },
+  ]}
 />
 
 Both layers inherit `x = displ, y = hwy` from `ggplot()`. The points
@@ -40,14 +45,19 @@ So a `color = drv` mapping in `ggplot()` reaches *every* layer:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # color = drv is in ggplot(), so BOTH layers are split by drivetrain:
 # colored points AND one smoother per drivetrain.
 ggplot(mpg, aes(displ, hwy, color = drv)) +
   geom_point(alpha = 0.6) +
   geom_smooth(method = "lm", se = FALSE)
-`}
+`,
+    },
+  ]}
 />
 
 ## Scoping a mapping to one layer
@@ -58,13 +68,18 @@ point layer only:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # color lives ONLY in geom_point, so the smoother stays a single line.
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(aes(color = drv), alpha = 0.6) +
   geom_smooth(method = "lm", se = FALSE, color = "black")
-`}
+`,
+    },
+  ]}
 />
 
 The points are colored by drivetrain; the smoother — which never saw
@@ -79,7 +94,10 @@ highlight. Here we label only the most fuel-efficient cars:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 best <- subset(mpg, hwy >= 40)
 
@@ -90,7 +108,9 @@ ggplot(mpg, aes(displ, hwy)) +
     data = best, aes(label = model),
     vjust = -1, size = 3
   )
-`}
+`,
+    },
+  ]}
 />
 
 Three layers: all cars in grey, the standout cars re-emphasized in red,

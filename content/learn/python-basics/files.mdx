@@ -42,7 +42,10 @@ Every snippet on this page runs in your browser — no setup required.
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Write a small text file
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Write a small text file
 with open("poem.txt", "w") as f:
     f.write("Beautiful is better than ugly.\\n")
     f.write("Explicit is better than implicit.\\n")
@@ -52,7 +55,9 @@ with open("poem.txt", "w") as f:
 with open("poem.txt", "r") as f:
     contents = f.read()
 print(contents)
-`}
+`,
+    },
+  ]}
 />
 
 `open(path, mode)` returns a file object. The mode string controls what you can do:
@@ -74,7 +79,10 @@ Text mode (`"r"`, `"w"`) assumes the file contains text and handles encoding/dec
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Create a file first
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Create a file first
 with open("data.txt", "w") as f:
     f.write("line one\\nline two\\nline three\\n")
 
@@ -83,7 +91,9 @@ with open("data.txt", "r") as f:
     contents = f.read()
 print("Full contents:")
 print(contents)
-`}
+`,
+    },
+  ]}
 />
 
 Other reading methods:
@@ -95,7 +105,10 @@ Other reading methods:
 
 <CodeBlock
   adapter="python"
-  starterCode={`with open("data.txt", "w") as f:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `with open("data.txt", "w") as f:
     f.write("first\\nsecond\\nthird\\n")
 
 with open("data.txt") as f:
@@ -103,7 +116,9 @@ with open("data.txt") as f:
     line2 = f.readline()
 print("First:", repr(line1))
 print("Second:", repr(line2))
-`}
+`,
+    },
+  ]}
 />
 
 ## Reading line by line
@@ -112,13 +127,18 @@ Iterating over a file object yields one line at a time. This is **memory-efficie
 
 <CodeBlock
   adapter="python"
-  starterCode={`with open("poem.txt", "w") as f:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `with open("poem.txt", "w") as f:
     f.write("alpha\\nbeta\\ngamma\\ndelta\\n")
 
 with open("poem.txt") as f:
     for i, line in enumerate(f, start=1):
         print(f"{i}: {line.rstrip()}")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="Use .rstrip() to remove trailing newlines">
@@ -129,35 +149,48 @@ When iterating over lines, each line includes the trailing `\n`. Use `.rstrip()`
 
 <CodeBlock
   adapter="python"
-  starterCode={`with open("output.txt", "w") as f:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `with open("output.txt", "w") as f:
     f.write("Hello, world!\\n")
     f.write("This is line two.\\n")
 
 # Read it back to verify
 with open("output.txt") as f:
     print(f.read())
-`}
+`,
+    },
+  ]}
 />
 
 `f.write(s)` writes the string `s` and returns the number of characters written. It does **not** add a newline automatically — you must include `\n` yourself.
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Use print(..., file=f) for auto-newline behavior
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Use print(..., file=f) for auto-newline behavior
 with open("numbers.txt", "w") as f:
     for n in range(5):
         print(n, n**2, file=f, sep=" -> ")
 
 with open("numbers.txt") as f:
     print(f.read())
-`}
+`,
+    },
+  ]}
 />
 
 ## Append mode
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Create a file
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Create a file
 with open("log.txt", "w") as f:
     f.write("Program started\\n")
 
@@ -168,7 +201,9 @@ with open("log.txt", "a") as f:
 
 with open("log.txt") as f:
     print(f.read())
-`}
+`,
+    },
+  ]}
 />
 
 Mode `"a"` opens the file for **appending**. All writes go to the end; the file is created if it doesn't exist.
@@ -215,7 +250,10 @@ Forgetting to close files (or only closing them manually) can **leak file descri
 
 <CodeBlock
   adapter="python"
-  starterCode={`from pathlib import Path
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from pathlib import Path
 
 p = Path("note.txt")
 p.write_text("hello from pathlib\\n", encoding="utf-8")
@@ -224,20 +262,27 @@ print("Exists:", p.exists())
 print("Suffix:", p.suffix)
 print("Name:", p.name)
 print("Contents:", p.read_text(encoding="utf-8"))
-`}
+`,
+    },
+  ]}
 />
 
 `Path` supports the `/` operator for joining paths, which is unusually elegant:
 
 <CodeBlock
   adapter="python"
-  starterCode={`from pathlib import Path
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from pathlib import Path
 
 base = Path("logs")
 nested = base / "2024" / "january.log"
 print(nested)
 print("Parts:", nested.parts)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="Prefer pathlib over os.path in modern code">
@@ -259,7 +304,10 @@ JSON is ubiquitous in web APIs and config files. Python's `json` module makes it
 
 <CodeBlock
   adapter="python"
-  starterCode={`import json
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import json
 from pathlib import Path
 
 people = [
@@ -277,7 +325,9 @@ Path("people.json").write_text(json_str, encoding="utf-8")
 # Read and parse
 restored = json.loads(Path("people.json").read_text(encoding="utf-8"))
 print("First name:", restored[0]["name"])
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="json.dump vs json.dumps">
@@ -290,7 +340,10 @@ CSV (Comma-Separated Values) is the universal data interchange format. Python's 
 
 <CodeBlock
   adapter="python"
-  starterCode={`import csv
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import csv
 
 # Write a CSV
 with open("data.csv", "w", newline="") as f:
@@ -304,7 +357,9 @@ with open("data.csv") as f:
     reader = csv.DictReader(f)
     for row in reader:
         print(row["name"], "was born in", row["year"])
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Always pass newline='' when opening CSV files for writing">
@@ -317,7 +372,10 @@ Use `"rb"` or `"wb"` for binary files (images, executables, pickle files, etc.).
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Write binary data
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Write binary data
 with open("data.bin", "wb") as f:
     f.write(b"\\x89PNG\\r\\n\\x1a\\n")  # PNG magic bytes
     f.write(b"\\x00" * 10)
@@ -326,7 +384,9 @@ with open("data.bin", "wb") as f:
 with open("data.bin", "rb") as f:
     data = f.read()
 print("Read", len(data), "bytes:", data[:8])
-`}
+`,
+    },
+  ]}
 />
 
 ## Multi-file challenges
@@ -345,7 +405,7 @@ print("Read", len(data), "bytes:", data[:8])
   files={[
     {
       filename: "main.py",
-      initialContent: `from parser import parse_sales
+      starterCode: `from parser import parse_sales
 
 data = parse_sales("sales.csv")
 for row in data:
@@ -354,7 +414,7 @@ for row in data:
     },
     {
       filename: "sales.csv",
-      initialContent: `product,amount
+      starterCode: `product,amount
 Laptop,1200
 Mouse,25
 Keyboard,75
@@ -363,14 +423,14 @@ Monitor,300
     },
     {
       filename: "parser.py",
-      initialContent: `import csv
+      starterCode: `import csv
 
 
 def parse_sales(filename):
     # your code here
     return []
 `,
-      solutionContent: `import csv
+      solutionCode: `import csv
 
 
 def parse_sales(filename):
@@ -415,7 +475,7 @@ assert products == ["Laptop", "Mouse", "Keyboard", "Monitor"]`,
   files={[
     {
       filename: "main.py",
-      initialContent: `from config_loader import load_config
+      starterCode: `from config_loader import load_config
 
 config = load_config("config.json")
 print(f"App: {config['app_name']}")
@@ -425,19 +485,19 @@ print(f"Port: {config['server']['port']}")
     },
     {
       filename: "config.json",
-      initialContent: `{"app_name": "DataSlope", "debug": true, "server": {"host": "localhost", "port": 8000}}
+      starterCode: `{"app_name": "DataSlope", "debug": true, "server": {"host": "localhost", "port": 8000}}
 `,
     },
     {
       filename: "config_loader.py",
-      initialContent: `import json
+      starterCode: `import json
 
 
 def load_config(filename):
     # your code here
     return {}
 `,
-      solutionContent: `import json
+      solutionCode: `import json
 
 
 def load_config(filename):
@@ -476,7 +536,7 @@ assert config["debug"] is True`,
   files={[
     {
       filename: "main.py",
-      initialContent: `from logger import log
+      starterCode: `from logger import log
 
 log("Application started")
 log("User logged in")
@@ -489,11 +549,11 @@ with open("app.log") as f:
     },
     {
       filename: "logger.py",
-      initialContent: `def log(message):
+      starterCode: `def log(message):
     # your code here
     pass
 `,
-      solutionContent: `def log(message):
+      solutionCode: `def log(message):
     with open("app.log", "a") as f:
         f.write(message + "\\n")
 `,
@@ -535,14 +595,19 @@ assert lines[2].strip() == "third"`,
   adapter="python"
   title="Count lines in a file"
   instructions={`Define a function \`count_lines(path)\` that opens the text file at \`path\` and returns the number of lines in it. Use a \`with\` block. Empty files should return 0.`}
-  starterCode={`def count_lines(path):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def count_lines(path):
     # your code here
     return 0
-`}
-  solutionCode={`def count_lines(path):
+`,
+      solutionCode: `def count_lines(path):
     with open(path) as f:
         return sum(1 for _ in f)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "three_lines",

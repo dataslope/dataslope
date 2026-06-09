@@ -29,20 +29,30 @@ density:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(x = hwy)) +
   geom_histogram(bins = 15, fill = "steelblue", color = "white")
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(x = hwy)) +
   geom_density(fill = "steelblue", alpha = 0.4)
-`}
+`,
+    },
+  ]}
 />
 
 ## One categorical variable: counts
@@ -51,11 +61,16 @@ To count how many rows fall in each category, use `geom_bar()`:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(x = class)) +
   geom_bar(fill = "darkorange")
-`}
+`,
+    },
+  ]}
 />
 
 ## Two continuous variables: relationships
@@ -64,11 +79,16 @@ The classic scatter plot, optionally with a trend line:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(x = displ, y = hwy)) +
   geom_point()
-`}
+`,
+    },
+  ]}
 />
 
 ## Categorical + continuous: compare distributions across groups
@@ -77,20 +97,30 @@ Boxplots and violins compare a numeric variable *across* categories:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(x = class, y = hwy)) +
   geom_boxplot(fill = "lightblue")
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(x = class, y = hwy)) +
   geom_violin(fill = "plum")
-`}
+`,
+    },
+  ]}
 />
 
 ## geom_bar vs. geom_col — a crucial distinction
@@ -105,7 +135,10 @@ is a top-five beginner error:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # geom_col: heights are GIVEN by a column.
 sales <- data.frame(
@@ -115,7 +148,9 @@ sales <- data.frame(
 
 ggplot(sales, aes(x = product, y = revenue)) +
   geom_col(fill = "seagreen")
-`}
+`,
+    },
+  ]}
 />
 
 If you tried `geom_bar()` on this data expecting bars of height

@@ -102,7 +102,7 @@ everything"*. The flow of messages is the conversation.
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.Arrays;
+      starterCode: `import java.util.Arrays;
 
 public class Main {
   public static void main(String[] args) {
@@ -125,7 +125,7 @@ public class Main {
     },
     {
       filename: "Drink.java",
-      initialContent: `public class Drink {
+      starterCode: `public class Drink {
   private final String name;
   private final int priceCents;
   public Drink(String name, int priceCents) {
@@ -139,7 +139,7 @@ public class Main {
     },
     {
       filename: "Menu.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Menu {
@@ -159,7 +159,7 @@ public class Menu {
     },
     {
       filename: "LineItem.java",
-      initialContent: `public class LineItem {
+      starterCode: `public class LineItem {
   private final Drink drink;
   private final int quantity;
 
@@ -178,7 +178,7 @@ public class Menu {
     },
     {
       filename: "Order.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Order {
@@ -203,7 +203,7 @@ public class Order {
     },
     {
       filename: "Payment.java",
-      initialContent: `public class Payment {
+      starterCode: `public class Payment {
   public void charge(Order order) {
     if (order.isPaid())
       return;
@@ -215,7 +215,7 @@ public class Order {
     },
     {
       filename: "Receipt.java",
-      initialContent: `public class Receipt {
+      starterCode: `public class Receipt {
   public String format(Order o) {
     StringBuilder sb = new StringBuilder();
     sb.append("--- RECEIPT ---\\n");
@@ -267,7 +267,10 @@ behavior *envies* the data — it wants to live on `Invoice`.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Invoice inv = new Invoice(100.0, 50.0);
     // Awkward: outsider doing the math
@@ -290,7 +293,9 @@ class Util {
     return (inv.subtotal + inv.shipping) * 0.10; // pokes Invoice's fields
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 The responsibility-driven fix is to move the method onto `Invoice`,
@@ -299,7 +304,10 @@ fields.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Invoice inv = new Invoice(100.0, 50.0);
     System.out.println("tax = " + inv.tax());
@@ -320,7 +328,9 @@ class Invoice {
     return (subtotal + shipping) * RATE; // owns its own behavior
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Five lines of code moved, but the design is dramatically better.
@@ -378,7 +388,7 @@ balance: 60
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Wallet w = new Wallet(100);
     Buyer b = new Buyer();
@@ -391,12 +401,12 @@ balance: 60
     },
     {
       filename: "Wallet.java",
-      initialContent: `public class Wallet {
+      starterCode: `public class Wallet {
   public int cents; // TODO: encapsulate this
   public Wallet(int cents) { this.cents = cents; }
 }
 `,
-      solutionContent: `public class Wallet {
+      solutionCode: `public class Wallet {
   private int cents;
   public Wallet(int cents) { this.cents = cents; }
 
@@ -415,7 +425,7 @@ balance: 60
     },
     {
       filename: "Buyer.java",
-      initialContent: `public class Buyer {
+      starterCode: `public class Buyer {
   public boolean shop(Wallet w, int priceCents) {
     // TODO: replace this feature-envy with a single \`tell\` call
     if (w.cents >= priceCents) {
@@ -426,7 +436,7 @@ balance: 60
   }
 }
 `,
-      solutionContent: `public class Buyer {
+      solutionCode: `public class Buyer {
   public boolean shop(Wallet w, int priceCents) { return w.buy(priceCents); }
 }
 `,

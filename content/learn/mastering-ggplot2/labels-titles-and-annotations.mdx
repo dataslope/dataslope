@@ -18,7 +18,10 @@ aesthetic:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy, color = drv)) +
   geom_point() +
@@ -30,7 +33,9 @@ ggplot(mpg, aes(displ, hwy, color = drv)) +
     color    = "Drivetrain",
     caption  = "Source: ggplot2 mpg dataset"
   )
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Make the title the takeaway, not the topic">
@@ -58,7 +63,10 @@ text label or shape at coordinates you choose — *not* tied to the data:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(alpha = 0.5) +
@@ -71,7 +79,9 @@ ggplot(mpg, aes(displ, hwy)) +
     xmin = 5, xmax = 7, ymin = 22, ymax = 30,
     alpha = 0.1, fill = "red"
   )
-`}
+`,
+    },
+  ]}
 />
 
 `annotate()` differs from a geom: it draws **one** thing from values
@@ -85,7 +95,10 @@ baseline to compare against — an average, a target, a threshold:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 avg <- mean(mpg$hwy)
 
@@ -96,7 +109,9 @@ ggplot(mpg, aes(displ, hwy)) +
     x = 6.5, y = avg + 1.5,
     label = "average", color = "blue", size = 3
   )
-`}
+`,
+    },
+  ]}
 />
 
 - `geom_hline(yintercept = ...)` — horizontal line (a target/average)

@@ -31,15 +31,20 @@ column was actually full of garbage.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`print("Shape:", df.shape)  # rows, columns
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `print("Shape:", df.shape)  # rows, columns
 print()
 print("Dtypes:")
 print(df.dtypes)
 print()
 print("Memory:", df.memory_usage(deep=True).sum() / 1e6, "MB")
-`}
+`,
+    },
+  ]}
 />
 
 Questions to answer:
@@ -54,12 +59,17 @@ Questions to answer:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`print(df.head())
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `print(df.head())
 print()
 print(df.sample(5, random_state=0))  # random rows often reveal weirdness
-`}
+`,
+    },
+  ]}
 />
 
 `head` shows the top — but the top is often not representative.
@@ -71,15 +81,20 @@ know about.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`missing = df.isna().sum()
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `missing = df.isna().sum()
 pct = (missing / len(df) * 100).round(2)
 report = pd.DataFrame({"missing": missing, "pct": pct})
 print(report[report["missing"] > 0].sort_values("missing", ascending=False))
 print()
 print("(If nothing prints, the dataset has no missing values.)")
-`}
+`,
+    },
+  ]}
 />
 
 For each column with missing data, you'll need to decide
@@ -91,23 +106,33 @@ For numeric columns, look at `describe()`:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`print(df.describe().T)
-`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `print(df.describe().T)
+`,
+    },
+  ]}
 />
 
 For categorical columns, look at `value_counts()`:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`for col in df.select_dtypes(include="object").columns:
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `for col in df.select_dtypes(include="object").columns:
     print(f"--- {col} ({df[col].nunique()} unique) ---")
     print(df[col].value_counts().head(10))
     print()
-`}
+`,
+    },
+  ]}
 />
 
 Questions:
@@ -121,12 +146,17 @@ Questions:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`numeric = df.select_dtypes(include="number")
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `numeric = df.select_dtypes(include="number")
 print("Correlation matrix:")
 print(numeric.corr().round(2))
-`}
+`,
+    },
+  ]}
 />
 
 Correlations highlight pairs of columns that move together —
@@ -137,10 +167,15 @@ For categorical-vs-numeric relationships, group:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`print(df.groupby("salary")["satisfaction_level"].describe().round(2))
-`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `print(df.groupby("salary")["satisfaction_level"].describe().round(2))
+`,
+    },
+  ]}
 />
 
 ## Step 6 — Write down what you learned

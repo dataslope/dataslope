@@ -170,7 +170,10 @@ In Pandas:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 employees = pd.DataFrame(
     {
@@ -205,7 +208,9 @@ employees = pd.DataFrame(
 
 print("Average salary by department:")
 print(employees.groupby("department")["salary"].mean().round(1))
-`}
+`,
+    },
+  ]}
 />
 
 One line of Pandas does what required a sort, a series of

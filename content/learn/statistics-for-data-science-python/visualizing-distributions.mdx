@@ -28,7 +28,10 @@ the plot is the original.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.default_rng(0)
 
@@ -44,7 +47,9 @@ for name, x in [("bell", bell), ("bimodal", bimodal), ("uniform", uniform)]:
 
 print("\\nNearly identical mean and std. Three completely different shapes.")
 print("A mean and an SD cannot tell these apart — only a plot can.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="danger" title="Misconception: a mean and standard deviation fully describe a distribution">
@@ -75,7 +80,10 @@ points). There is no single "objective" bin count.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 tips = px.data.tips()
 
@@ -88,7 +96,9 @@ for nbins in [5, 20, 80]:
 
 print("Few bins: smooth but hides detail. Many bins: spiky and noisy.")
 print("Try several bin counts before trusting any single shape.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Misconception: there's one correct, objective bin count">
@@ -126,7 +136,10 @@ two-humped distribution looks just like a box plot of a one-humped one.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 tips = px.data.tips()
 
@@ -144,7 +157,9 @@ fig.show()
 
 print("Box plots make group comparisons easy and flag outliers,")
 print("but a box plot CANNOT show whether a group is bimodal.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Box plots hide modality">
@@ -165,7 +180,10 @@ and more reliable than they are.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 tips = px.data.tips()
 
@@ -183,7 +201,9 @@ fig.show()
 
 print("The violin's width shows where data is dense; a second bulge")
 print("would reveal bimodality that the inner box plot alone cannot.")
-`}
+`,
+    },
+  ]}
 />
 
 ## KDE: a smooth histogram (intuition only)
@@ -219,7 +239,10 @@ features without worrying you've smoothed them away.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 tips = px.data.tips()
 
@@ -234,7 +257,9 @@ fig.show()
 print("Read it like this: find a dollar amount on the x-axis, go up to")
 print("the curve, and the y-value is the proportion of bills at or below it.")
 print("No bins, no bandwidth — nothing tuned away.")
-`}
+`,
+    },
+  ]}
 />
 
 The y-value at any `x` is a **percentile read directly off the curve** —
@@ -286,19 +311,22 @@ Produce:
 - **\`fullest_bin\`** — an \`int\`, the index (0-based) of the bin with the most values, via \`np.argmax\`.
 
 Use \`np.histogram(values, bins=10)\` and unpack its two return values.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 
 rng = np.random.default_rng(42)
-values = rng.normal(100, 15, size=500)`}
-  starterCode={`import numpy as np
+values = rng.normal(100, 15, size=500)`,
+      starterCode: `import numpy as np
 
 # TODO: bin 'values' into 10 equal-width bins
 counts = None
 edges = None
 total_counted = None
 fullest_bin = None
-`}
-  solutionCode={`import numpy as np
+`,
+      solutionCode: `import numpy as np
 
 counts, edges = np.histogram(values, bins=10)
 total_counted = int(counts.sum())
@@ -308,7 +336,9 @@ print("counts:", counts)
 print("edges:", edges.round(1))
 print("total_counted:", total_counted, "(len values =", len(values), ")")
 print("fullest_bin index:", fullest_bin)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "counts_shape",
@@ -371,19 +401,22 @@ Produce:
 - **\`prop_at_threshold\`** — a plain Python \`float\`: the fraction of \`data\` **less than or equal to \`threshold\`** (the ECDF value at \`threshold\`). Compute it as \`(data <= threshold).mean()\`.
 
 Use the provided \`data\` array and \`threshold\` value.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 
 rng = np.random.default_rng(7)
 data = rng.normal(50, 10, size=400)
-threshold = 55.0`}
-  starterCode={`import numpy as np
+threshold = 55.0`,
+      starterCode: `import numpy as np
 
 # TODO: build the ECDF and read it at 'threshold'
 x_sorted = None
 ecdf = None
 prop_at_threshold = None
-`}
-  solutionCode={`import numpy as np
+`,
+      solutionCode: `import numpy as np
 
 n = len(data)
 x_sorted = np.sort(data)
@@ -393,7 +426,9 @@ prop_at_threshold = float((data <= threshold).mean())
 print("first 3 sorted:", x_sorted[:3].round(2))
 print("last ecdf value:", ecdf[-1])
 print(f"proportion <= {threshold}: {prop_at_threshold:.3f}")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "sorted",

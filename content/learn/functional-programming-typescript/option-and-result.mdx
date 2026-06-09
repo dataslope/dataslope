@@ -20,7 +20,10 @@ single most useful pair of patterns in this entire course.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Option<A> = { kind: "none" } | { kind: "some"; value: A };
 
 const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 const none = <A,>(): Option<A> => ({ kind: "none" });
@@ -37,7 +40,9 @@ const r2 = findUser("u2");
 // You CANNOT just do r1.value — the type doesn't have a .value yet
 if (r1.kind === "some") console.log("found:", r1.value.name);
 if (r2.kind === "none") console.log("not found");
-`}
+`,
+    },
+  ]}
 />
 
 The compiler refuses to let you read `.value` until you've checked
@@ -52,7 +57,10 @@ once, and from then on you transform `Option` values directly.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Option<A> = { kind: "none" } | { kind: "some"; value: A };
 const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 const none = <A,>(): Option<A> => ({ kind: "none" });
 
@@ -81,7 +89,9 @@ console.log("doubled age or 0:", getOrElse(doubledAge, 0));
 
 const missing: Option<string> = none();
 console.log("missing fallback:", getOrElse(missing, "none"));
-`}
+`,
+    },
+  ]}
 />
 
 Three operators: **`map`** (transform inside), **`flatMap`** (chain
@@ -93,7 +103,10 @@ might or might not be there" without a single `if`.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Option<A> = { kind: "none" } | { kind: "some"; value: A };
 const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 const none = <A,>(): Option<A> => ({ kind: "none" });
 const flatMap = <A, B>(o: Option<A>, f: (a: A) => Option<B>): Option<B> =>
@@ -128,7 +141,9 @@ const result = flatMap(flatMap(managerOf("u3"), managerOf), (id) =>
 );
 
 console.log(getOrElse(result, "no such chain"));
-`}
+`,
+    },
+  ]}
 />
 
 No null checks, no nested ternaries, no exceptions. If *any* step
@@ -143,7 +158,10 @@ not just its absence.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
 
 const ok = <E, A>(value: A): Result<E, A> => ({ kind: "ok", value });
 const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
@@ -160,7 +178,9 @@ function parseAge(s: string): Result<string, number> {
   const r = parseAge(s);
   console.log(s.padEnd(4), r);
 });
-`}
+`,
+    },
+  ]}
 />
 
 The error type is *generic*. You can use a string, an enum, a
@@ -175,7 +195,10 @@ Same three operators, with error-handling versions:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
 const ok = <E, A>(value: A): Result<E, A> => ({ kind: "ok", value });
 const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
 
@@ -211,7 +234,9 @@ console.log(result);
 
 const failed = flatMap(parseInt2("nope"), positive);
 console.log(failed);
-`}
+`,
+    },
+  ]}
 />
 
 The contract is the same in every step: *if ok, transform; if err,
@@ -258,7 +283,10 @@ boundary so the rest of your code only sees `Option`/`Result`.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Option<A> = { kind: "none" } | { kind: "some"; value: A };
 const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 const none = <A,>(): Option<A> => ({ kind: "none" });
 
@@ -286,7 +314,9 @@ const parsed = tryRun(() => JSON.parse('{"a": 1}'));
 const failed = tryRun(() => JSON.parse("not json"));
 console.log("parsed:", parsed);
 console.log("failed:", failed);
-`}
+`,
+    },
+  ]}
 />
 
 The boundary is the *only* place exceptions and nullables touch your
@@ -316,7 +346,7 @@ ux -> none
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { emailOfManagerOf, getOrElse } from "./lookups";
+      starterCode: `import { emailOfManagerOf, getOrElse } from "./lookups";
 
 for (const id of ["u3", "u2", "u1", "ux"]) {
   const r = emailOfManagerOf(id);
@@ -326,7 +356,7 @@ for (const id of ["u3", "u2", "u1", "ux"]) {
     },
     {
       filename: "lookups.ts",
-      initialContent: `export type Option<A> = { kind: "none" } | { kind: "some"; value: A };
+      starterCode: `export type Option<A> = { kind: "none" } | { kind: "some"; value: A };
 export const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 export const none = <A,>(): Option<A> => ({ kind: "none" });
 
@@ -361,7 +391,7 @@ export function emailOfManagerOf(id: string): Option<string> {
   return none();
 }
 `,
-      solutionContent: `export type Option<A> = { kind: "none" } | { kind: "some"; value: A };
+      solutionCode: `export type Option<A> = { kind: "none" } | { kind: "some"; value: A };
 export const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 export const none = <A,>(): Option<A> => ({ kind: "none" });
 

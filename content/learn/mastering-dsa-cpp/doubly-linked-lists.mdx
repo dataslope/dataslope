@@ -19,7 +19,10 @@ A singly linked list can move forward only. A doubly linked list can walk backwa
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct Node {
   int data;
@@ -37,7 +40,9 @@ int main() {
   std::cout << b.prev->data << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## A tiny implementation
@@ -46,7 +51,10 @@ This class keeps both `head` and `tail`, so pushing at either end is O(1). It al
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 class DoublyLinkedList {
   struct Node {
@@ -109,7 +117,9 @@ int main() {
   list.print_backward();
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Deletion when you have the node">
@@ -122,7 +132,10 @@ If you already have a pointer to a middle node, a doubly linked list can unlink 
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <list>
 
 int main() {
@@ -137,7 +150,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## When should you choose `std::list`?
@@ -152,7 +167,10 @@ Almost never as a default. `std::vector` or `std::deque` usually wins because co
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <list>
 
 int main() {
@@ -170,7 +188,9 @@ int main() {
   std::cout << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Iterator-based erase
@@ -179,7 +199,10 @@ With `std::list`, erasing through an iterator returns the next iterator, which i
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <list>
 
 int main() {
@@ -196,7 +219,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Big-O can hide cache costs">
@@ -209,7 +234,10 @@ A list may advertise O(1) insertion once you have an iterator, but walking to th
   adapter="cpp"
   title="Print a doubly linked list backward"
   instructions={`Walk from \`tail\` to \`head\` using \`prev\` pointers and print each value on its own line.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct Node {
   int data;
@@ -234,8 +262,8 @@ int main() {
   printBackward(&n5);
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 
 struct Node {
   int data;
@@ -262,7 +290,9 @@ int main() {
   printBackward(&n5);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "backward", name: "Prints tail to head", expect: { stdoutLines: ["5", "4", "3", "2", "1"], stdoutLinesExact: true } }]}
 />
 
@@ -272,7 +302,10 @@ int main() {
   adapter="cpp"
   title="Detect a cycle in a singly linked list"
   instructions={`Implement Floyd's slow/fast pointer algorithm in \`hasCycle\`. The driver builds a small cycled list and prints the result.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct Node {
   int data;
@@ -293,8 +326,8 @@ int main() {
   std::cout << (hasCycle(&a) ? "true" : "false") << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 
 struct Node {
   int data;
@@ -323,7 +356,9 @@ int main() {
   std::cout << (hasCycle(&a) ? "true" : "false") << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "cycle", name: "Detects a cycle", expect: { stdoutEquals: "true" } }]}
 />
 

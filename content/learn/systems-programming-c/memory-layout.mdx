@@ -43,7 +43,10 @@ its address.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 
 int g_init = 42; // .data    (initialized global)
@@ -68,7 +71,9 @@ int main(void) {
   free(heap);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The exact addresses will differ run to run (modern OSes randomize
@@ -100,7 +105,10 @@ C splits globals into two pieces purely as a file-size optimization:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int counter = 0; // BSS (zero init takes no file bytes)
 int answer = 42; // DATA (must store the 42 in the binary)
@@ -111,7 +119,9 @@ int main(void) {
   printf("counter=%d answer=%d big[0]=%d\\n", counter, answer, big[0]);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 A common surprise: declaring a 10-million-element zero-initialized
@@ -136,7 +146,10 @@ private "memory across calls":
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int next_id(void) {
   static int counter = 0; // initialized once, lives in BSS/.data
@@ -149,7 +162,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The `counter` is *not* on the stack — if it were, it would be reset
@@ -186,7 +201,10 @@ function call uses — almost always *not* what you wanted.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int *bad(void) {
   int x = 42; // lives on the stack
@@ -199,7 +217,9 @@ int main(void) {
   printf("*p = %d  (undefined; may be garbage)\\n", *p);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The correct fix is to either (a) allocate on the heap and let the
@@ -211,7 +231,10 @@ caller `free` it, or (b) have the caller pass in a buffer.
   adapter="c"
   title="Make next_id persist across calls"
   instructions={`Implement \`int next_id(void)\` so that calling it five times in a row returns \`1 2 3 4 5\` (one per line). Use a function-local variable, not a global. Hint: \`static\` changes the storage class.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int next_id(void) {
   // your code here — make the counter persist across calls
@@ -225,8 +248,8 @@ int main(void) {
   }
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 int next_id(void) {
   static int counter = 0;
@@ -239,7 +262,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "ids",

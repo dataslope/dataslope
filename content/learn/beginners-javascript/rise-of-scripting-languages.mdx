@@ -171,7 +171,10 @@ how much it does.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// A small script that pretends to summarise a server log.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// A small script that pretends to summarise a server log.
 const log = [
   { time: "10:00", level: "INFO", message: "started" },
   { time: "10:01", level: "INFO", message: "user logged in" },
@@ -194,7 +197,9 @@ for (const entry of log) {
     console.log("  ", entry.time, "-", entry.message);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 In a compiled systems language, the same script would be twice as

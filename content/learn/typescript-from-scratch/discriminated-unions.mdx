@@ -15,7 +15,10 @@ A discriminated union is a union of object types that share a common property â€
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Shape =
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Shape =
   | { kind: "circle"; radius: number }
   | { kind: "rectangle"; width: number; height: number }
   | { kind: "triangle"; base: number; height: number };
@@ -39,7 +42,9 @@ const rect: Shape = { kind: "rectangle", width: 20, height: 15 };
 
 console.log(\`Circle area: \${area(circle).toFixed(2)}\`);
 console.log(\`Rectangle area: \${area(rect)}\`);
-`}
+`,
+    },
+  ]}
 />
 
 The `kind` field is the **discriminant** (also called a **tag**). Each variant has a different literal value: `"circle"`, `"rectangle"`, or `"triangle"`. When you check `shape.kind === "circle"`, TypeScript narrows the type to `{ kind: "circle"; radius: number }`, so it knows `shape.radius` exists and is safe to access.
@@ -68,7 +73,10 @@ Here's the trick: assign the unhandled case to `never`. If you've covered all va
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Status =
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Status =
   | { kind: "idle" }
   | { kind: "loading" }
   | { kind: "success"; data: string }
@@ -94,7 +102,9 @@ function render(status: Status): string {
 console.log(render({ kind: "idle" }));
 console.log(render({ kind: "success", data: "All done!" }));
 console.log(render({ kind: "error", message: "Network failure" }));
-`}
+`,
+    },
+  ]}
 />
 
 In the `default` case, we try to assign `status` to a variable of type `never`. If every variant has been handled, `status` is type `never` (the "empty" type), so the assignment succeeds. If we forgot a case, `status` still has a type (the unhandled variant), and assigning it to `never` fails with a compile error.
@@ -113,7 +123,10 @@ Consider a data-fetching flow: you start idle, transition to loading, and then l
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type FetchState<T> =
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type FetchState<T> =
   | { status: "idle" }
   | { status: "loading" }
   | { status: "success"; data: T }
@@ -142,7 +155,9 @@ console.log(describeFetch(idle));
 console.log(describeFetch(loading));
 console.log(describeFetch(success));
 console.log(describeFetch(error));
-`}
+`,
+    },
+  ]}
 />
 
 This pattern is often called **RemoteData** (borrowed from Elm). It makes illegal states unrepresentable: you can't have `status: "success"` without `data`, and you can't have `status: "error"` without an `error` message. Contrast this with a naive approach:
@@ -178,7 +193,10 @@ Discriminated unions are perfect for modeling **domain events** â€” things that 
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type AppEvent =
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type AppEvent =
   | { type: "user-logged-in"; userId: string; timestamp: number }
   | { type: "user-logged-out"; userId: string }
   | { type: "page-viewed"; path: string; referrer: string | null }
@@ -218,7 +236,9 @@ logEvent({
   message: "DB connection lost",
   stack: "at ...",
 });
-`}
+`,
+    },
+  ]}
 />
 
 Each event is self-describing: the `type` field tells you what happened, and the rest of the fields carry event-specific data. You can pass these events to an analytics service, a logger, or an event-sourcing store, and the consumer can handle each type appropriately.
@@ -233,7 +253,7 @@ Let's build a more complete example across multiple files. We'll define a `Remot
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { RemoteData, isLoading, isSuccess, getData } from "./remoteData";
+      starterCode: `import { RemoteData, isLoading, isSuccess, getData } from "./remoteData";
 
 // Simulate a fetch flow
 let state: RemoteData<string> = { status: "idle" };
@@ -252,7 +272,7 @@ console.log("Error:", JSON.stringify(state));
     },
     {
       filename: "remoteData.ts",
-      initialContent: `// A discriminated union for async data
+      starterCode: `// A discriminated union for async data
 export type RemoteData<T> =
   | { status: "idle" }
   | { status: "loading" }
@@ -307,7 +327,7 @@ Now it's your turn. You'll model a notification system with multiple notificatio
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { Notification } from "./notification";
+      starterCode: `import { Notification } from "./notification";
 
 export function renderNotification(notif: Notification): string {
   // TODO: switch on notif.type and return a formatted string
@@ -331,7 +351,7 @@ console.log(renderNotification(info));
 console.log(renderNotification(warning));
 console.log(renderNotification(error));
 `,
-      solutionContent: `import { Notification } from "./notification";
+      solutionCode: `import { Notification } from "./notification";
 
 export function renderNotification(notif: Notification): string {
   switch (notif.type) {
@@ -366,14 +386,14 @@ console.log(renderNotification(error));
     },
     {
       filename: "notification.ts",
-      initialContent: `// TODO: Define a discriminated union Notification with:
+      starterCode: `// TODO: Define a discriminated union Notification with:
 // - { type: "info"; message: string }
 // - { type: "warning"; message: string; severity: number }
 // - { type: "error"; message: string; stack: string }
 
 export type Notification = { type: "info"; message: string };
 `,
-      solutionContent: `export type Notification =
+      solutionCode: `export type Notification =
   | { type: "info"; message: string }
   | { type: "warning"; message: string; severity: number }
   | { type: "error"; message: string; stack: string };

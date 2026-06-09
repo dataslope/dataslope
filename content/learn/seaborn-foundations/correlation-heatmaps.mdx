@@ -24,14 +24,19 @@ pandas computes the whole matrix at once with `.corr(numeric_only=True)`
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 penguins = sns.load_dataset("penguins")
 
 # A square matrix: every numeric column correlated with every other.
 corr = penguins.corr(numeric_only=True)
 display(corr.round(2))
-`}
+`,
+    },
+  ]}
 />
 
 The result is square and symmetric, with **1.0 down the diagonal** (every
@@ -40,7 +45,10 @@ turn on `annot=True` to print each number inside its cell:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme()
 penguins = sns.load_dataset("penguins")
@@ -48,7 +56,9 @@ corr = penguins.corr(numeric_only=True)
 
 # annot=True writes the correlation value into each cell.
 sns.heatmap(corr, annot=True)
-`}
+`,
+    },
+  ]}
 />
 
 To read it: pick a row and a column, find where they cross, and that cell's
@@ -69,7 +79,10 @@ full range so the colors are anchored to their true meaning:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme()
 penguins = sns.load_dataset("penguins")
@@ -77,7 +90,9 @@ corr = penguins.corr(numeric_only=True)
 
 # Diverging map centered at 0, scaled to the full -1..+1 range.
 sns.heatmap(corr, annot=True, cmap="vlag", center=0, vmin=-1, vmax=1)
-`}
+`,
+    },
+  ]}
 />
 
 Now the colors *mean* something consistent: one hue for positive, the other
@@ -130,7 +145,10 @@ monthly airline passengers over a span of years — is perfect:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme()
 flights = sns.load_dataset("flights")
@@ -138,7 +156,9 @@ flights = sns.load_dataset("flights")
 # Reshape tidy/long data into a months x years matrix.
 matrix = flights.pivot(index="month", columns="year", values="passengers")
 sns.heatmap(matrix)
-`}
+`,
+    },
+  ]}
 />
 
 Two patterns jump out of the colors immediately: every column gets brighter
@@ -185,7 +205,10 @@ the annotations become unreadable. Two fixes:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 import numpy as np
 
 sns.set_theme()
@@ -196,7 +219,9 @@ corr = penguins.corr(numeric_only=True)
 mask = np.triu(np.ones_like(corr, dtype=bool))
 
 sns.heatmap(corr, mask=mask, annot=True, cmap="vlag", center=0, vmin=-1, vmax=1)
-`}
+`,
+    },
+  ]}
 />
 
 With the duplicated half hidden, each pair appears exactly once and the eye
@@ -216,7 +241,10 @@ legible.
    (e.g. \`cmap="vlag"\`) **centered at 0**.
 3. Assign the Axes that \`sns.heatmap\` returns to a variable named \`ax\`
    (i.e. \`ax = sns.heatmap(...)\`).`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme()
 mpg = sns.load_dataset("mpg")
@@ -226,8 +254,8 @@ corr = None
 
 # 2) + 3) Draw the annotated, diverging, zero-centered heatmap and keep the Axes:
 ax = None
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 sns.set_theme()
 mpg = sns.load_dataset("mpg")
@@ -235,7 +263,9 @@ mpg = sns.load_dataset("mpg")
 corr = mpg.corr(numeric_only=True)
 
 ax = sns.heatmap(corr, annot=True, cmap="vlag", center=0, vmin=-1, vmax=1)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "corr_square",

@@ -48,7 +48,10 @@ To **read or write through the pointer**, use `*` (the
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int n = 42;
@@ -63,7 +66,9 @@ int main(void) {
   printf("after *p = 100, n = %d\\n", n);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The exact addresses printed will differ every run. That's fine —
@@ -137,7 +142,10 @@ variable, you pass a **pointer** to it.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 void increment(int *x) { (*x)++; }
 
@@ -147,7 +155,9 @@ int main(void) {
   printf("n = %d\\n", n); // now 11
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The parameter `x` is of type `int *`. `*x` is the int it points at.
@@ -165,7 +175,10 @@ several output parameters via pointers:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 void divmod(int a, int b, int *q, int *r) {
   *q = a / b;
@@ -178,7 +191,9 @@ int main(void) {
   printf("23 / 5 = %d remainder %d\\n", q, r);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## The null pointer
@@ -240,7 +255,10 @@ variables:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 void swap(int *a, int *b) {
   int tmp = *a;
@@ -255,7 +273,9 @@ int main(void) {
   printf("after:  x = %d, y = %d\\n", x, y);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Trace it with pictures, before and after each line of `swap`. You
@@ -278,7 +298,10 @@ printf("%d\\n", x);   // should print 17
 \`\`\`
 
 The program must print exactly \`17\` and nothing else.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 void add_to(int *value, int delta) {
   // your code here
@@ -290,8 +313,8 @@ int main(void) {
   printf("%d\\n", x);
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 void add_to(int *value, int delta) { *value = *value + delta; }
 
@@ -301,7 +324,9 @@ int main(void) {
   printf("%d\\n", x);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "add_to",

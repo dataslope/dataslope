@@ -65,28 +65,38 @@ axes-level function returns a matplotlib `Axes`:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 ax = sns.scatterplot(data=tips, x="total_bill", y="tip")
 print(type(ax))  # a matplotlib Axes
-`}
+`,
+    },
+  ]}
 />
 
 A figure-level function returns a Seaborn **grid** object:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 g = sns.relplot(data=tips, x="total_bill", y="tip")
 print(type(g))  # a seaborn FacetGrid
-`}
+`,
+    },
+  ]}
 />
 
 That difference in return type is not a technicality — it determines what
@@ -100,7 +110,10 @@ functions can't do this — they insist on owning the whole figure.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 import matplotlib.pyplot as plt
 
 sns.set_theme(style="whitegrid")
@@ -114,7 +127,9 @@ axes[0].set_title("Tip vs. total bill")
 
 sns.boxplot(data=tips, x="day", y="total_bill", ax=axes[1])
 axes[1].set_title("Bills by day")
-`}
+`,
+    },
+  ]}
 />
 
 This is the axes-level superpower: **drop a Seaborn plot into any matplotlib
@@ -128,7 +143,10 @@ and it's a single keyword:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
@@ -141,7 +159,9 @@ sns.relplot(
     col="time",
     height=4,
 )
-`}
+`,
+    },
+  ]}
 />
 
 Try doing that with `scatterplot` and you'd be writing the subplot loop
@@ -206,15 +226,18 @@ result to \`g\`.
 
 Because \`time\` has two values, you should get a 1-row, 2-column grid of
 panels.`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 # Build a faceted relplot (one column per time) and assign it to g:
 g = None
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
@@ -226,7 +249,9 @@ g = sns.relplot(
     col="time",
     height=4,
 )
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_grid",

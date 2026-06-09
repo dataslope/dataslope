@@ -24,7 +24,10 @@ Consider a "remote data" wrapper used to model an API request:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// ✗ WEAK MODEL — many illegal combinations
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// ✗ WEAK MODEL — many illegal combinations
 type ProfileWeak = {
   loading: boolean;
   data: { name: string } | null;
@@ -37,7 +40,9 @@ const b: ProfileWeak = { loading: false, data: null, error: null };
 const c: ProfileWeak = { loading: true, data: null, error: "x" };
 
 console.log(a, b, c);
-`}
+`,
+    },
+  ]}
 />
 
 The weak model allows "loading and have data and have an error" —
@@ -46,7 +51,10 @@ representable:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// ✓ TIGHT MODEL — only valid states can be written
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// ✓ TIGHT MODEL — only valid states can be written
 type Profile<A> =
   | { kind: "idle" }
   | { kind: "loading" }
@@ -77,7 +85,9 @@ const render = <A,>(p: Profile<A>, show: (a: A) => string): string => {
 
 console.log(render(r1, (u) => u.name));
 console.log(render(r3, (u) => u.name));
-`}
+`,
+    },
+  ]}
 />
 
 The four "real" states become four constructable shapes. Every
@@ -117,7 +127,10 @@ constraint is satisfied because of the type signature.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// ✗ VALIDATE — the constraint is checked, then immediately forgotten
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// ✗ VALIDATE — the constraint is checked, then immediately forgotten
 function validateNonEmpty(s: string): boolean {
   return s.length > 0;
 }
@@ -147,7 +160,9 @@ const bad = parseNonEmpty("");
 console.log("bad =", bad);
 
 // greetB("") // <- compile error: "" is not NonEmpty
-`}
+`,
+    },
+  ]}
 />
 
 The trick is that **`NonEmpty` is a strict subtype of `string`**.
@@ -163,7 +178,10 @@ plain string.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
 const ok = <E, A>(value: A): Result<E, A> => ({ kind: "ok", value });
 const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
 
@@ -203,7 +221,9 @@ if (e.kind === "ok" && a.kind === "ok") {
 // inviteAdult("ada@example.com", 36);              // strings/numbers, not brands
 // inviteAdult(e.kind === "ok" ? e.value : ("" as Email), a.kind === "ok" ? a.value : (0 as Age));
 // because Age is not AdultAge — you must call parseAdult first.
-`}
+`,
+    },
+  ]}
 />
 
 The branded types create a *staircase* of trust. Each `parse` step
@@ -260,7 +280,7 @@ state: confirmed orderId=ORD-1
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { Checkout, next } from "./checkout";
+      starterCode: `import { Checkout, next } from "./checkout";
 
 let s: Checkout = { kind: "cart", items: [{ sku: "A", qty: 1 }] };
 s = next(s, { kind: "add-address", address: "1 Main St" });
@@ -277,7 +297,7 @@ console.log(
     },
     {
       filename: "checkout.ts",
-      initialContent: `type Item = { sku: string; qty: number };
+      starterCode: `type Item = { sku: string; qty: number };
 
 export type Checkout =
   | { kind: "cart"; items: ReadonlyArray<Item> }
@@ -301,7 +321,7 @@ export function next(state: Checkout, event: Event): Checkout {
   return state;
 }
 `,
-      solutionContent: `type Item = { sku: string; qty: number };
+      solutionCode: `type Item = { sku: string; qty: number };
 
 export type Checkout =
   | { kind: "cart"; items: ReadonlyArray<Item> }

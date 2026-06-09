@@ -26,7 +26,10 @@ will assume you think in arrays.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import time
 
 N = 1_000_000
@@ -47,7 +50,9 @@ t3 = time.perf_counter()
 print(f"Python loop : {t1 - t0:.3f} s")
 print(f"NumPy vector: {t3 - t2:.3f} s")
 print(f"Speedup     : {(t1 - t0) / (t3 - t2):.0f}x")
-`}
+`,
+    },
+  ]}
 />
 
 The speedup is usually 100–1000$\times$. The loop version is doing
@@ -107,7 +112,10 @@ The classic example: an outer product written as broadcasting.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 x = np.arange(1, 6)  # shape (5,)
 y = np.arange(1, 4)  # shape (3,)
@@ -119,7 +127,9 @@ y = np.arange(1, 4)  # shape (3,)
 M = x[:, None] * y[None, :]
 print(M)
 print("shape =", M.shape)
-`}
+`,
+    },
+  ]}
 />
 
 You will see `x[:, None]` and `y[None, :]` everywhere in scientific
@@ -136,7 +146,10 @@ lines.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.default_rng(0)
 pts = rng.uniform(0, 10, size=(8, 2))  # 8 points in 2-D
@@ -149,7 +162,9 @@ D = np.sqrt((diff**2).sum(axis=-1))  # collapse the coord axis
 
 print(D.round(2))
 print("symmetric?", np.allclose(D, D.T))
-`}
+`,
+    },
+  ]}
 />
 
 The same trick generalizes to $D$-dimensional point clouds, signed
@@ -163,7 +178,10 @@ operation.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 # A small dataset: 6 patients × 4 measurements
 X = np.array(
@@ -181,7 +199,9 @@ print("X.shape =", X.shape)
 print("mean per measurement (axis=0):", X.mean(axis=0))  # one value per column
 print("mean per patient    (axis=1):", X.mean(axis=1))  # one value per row
 print("grand mean          (no axis):", X.mean())  # one number
-`}
+`,
+    },
+  ]}
 />
 
 Forgetting which axis is which is the source of about half of all
@@ -216,7 +236,7 @@ production setup.
   files={[
     {
       filename: "main.py",
-      initialContent: `import numpy as np
+      starterCode: `import numpy as np
 from kernels import logistic_map_trajectory
 
 r, x0, n = 3.8, 0.2, 50
@@ -227,7 +247,7 @@ print("Long-run mean    :", traj[1000:].mean() if n > 1000 else traj.mean())
     },
     {
       filename: "kernels.py",
-      initialContent: `import numpy as np
+      starterCode: `import numpy as np
 
 
 def logistic_map_trajectory(r: float, x0: float, n: int) -> np.ndarray:
@@ -253,7 +273,10 @@ trajectory runs independently:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 
 # Bifurcation diagram of the logistic map
@@ -273,7 +296,9 @@ plt.xlabel("r")
 plt.ylabel("x*")
 plt.title("Logistic-map bifurcation diagram (vectorized over r)")
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 We ran 1000 independent trajectories simultaneously, with no
@@ -291,7 +316,10 @@ work best on contiguous reads.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import time
 
 n = 10_000
@@ -307,7 +335,9 @@ t3 = time.perf_counter()
 
 print(f"sum(axis=1) [contiguous] : {t1 - t0:.3f} s")
 print(f"sum(axis=0) [strided]    : {t3 - t2:.3f} s")
-`}
+`,
+    },
+  ]}
 />
 
 The difference is usually 2–5$\times$. For deeply nested

@@ -23,13 +23,18 @@ right; each observation steps the curve up a little, so it climbs from
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 sns.displot(penguins, x="flipper_length_mm", kind="ecdf", height=4)
-`}
+`,
+    },
+  ]}
 />
 
 There are no bars and no curve-fitting here — just the data, accumulated.
@@ -81,13 +86,18 @@ several distributions at once. Just map a categorical column to `hue`:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 sns.displot(penguins, x="flipper_length_mm", hue="species", kind="ecdf", height=4)
-`}
+`,
+    },
+  ]}
 />
 
 Read it directly: at any flipper length, the curve that is **higher** has a
@@ -134,14 +144,19 @@ Here it is on its own, via the axes-level `sns.rugplot`:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 # One tick per penguin along the x-axis — the raw 1-D positions.
 sns.rugplot(data=penguins, x="flipper_length_mm", height=0.1)
-`}
+`,
+    },
+  ]}
 />
 
 Its real value shows when you layer it onto another plot. `displot` will add
@@ -150,14 +165,19 @@ the actual observations that produced it:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 # Histogram of the shape, with a rug of the raw points underneath it.
 sns.displot(penguins, x="flipper_length_mm", kind="hist", rug=True, height=4)
-`}
+`,
+    },
+  ]}
 />
 
 The rug is just as natural as fringe along the axes of a **scatter** plot,
@@ -166,7 +186,10 @@ dots show the joint relationship:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 import matplotlib.pyplot as plt
 
 sns.set_theme(style="whitegrid")
@@ -176,7 +199,9 @@ fig, ax = plt.subplots(figsize=(6, 4))
 sns.scatterplot(data=penguins, x="bill_length_mm", y="bill_depth_mm", ax=ax)
 # Add 1-D rugs on both axes to show each variable's marginal spread.
 sns.rugplot(data=penguins, x="bill_length_mm", y="bill_depth_mm", ax=ax)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Rugs need breathing room">
@@ -199,21 +224,26 @@ of plotting every point.
 - use \`kind="ecdf"\`.
 
 Assign the result to a variable named \`g\`.`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 # Build the ECDF and assign it to g:
 g = None
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 g = sns.displot(penguins, x="flipper_length_mm", hue="species", kind="ecdf")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_facetgrid",

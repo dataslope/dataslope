@@ -58,7 +58,10 @@ and feed it straight into `ggplot()`:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 library(dplyr)
 
 mpg |>
@@ -71,7 +74,9 @@ mpg |>
     x = NULL, y = "Mean highway MPG",
     title = "Average highway efficiency by class"
   )
-`}
+`,
+    },
+  ]}
 />
 
 Notice the data is summarized *first*, then piped into a `ggplot()`

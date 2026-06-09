@@ -11,7 +11,10 @@ Run in a session takes a moment to boot.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     System.out.println("Hello, Java!");
     for (int i = 1; i <= 3; i++) {
@@ -19,14 +22,19 @@ Run in a session takes a moment to boot.
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Collections and streams
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.*;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.*;
 import java.util.stream.*;
 
 public class Main {
@@ -38,7 +46,9 @@ public class Main {
     System.out.println("mean: " + mean);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Multiple files
@@ -51,7 +61,7 @@ Reference a class declared in a sibling `.java` file. Each workspace file is com
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Greeter g = new Greeter("Java Playground");
     System.out.println(g.hello());
@@ -62,7 +72,7 @@ Reference a class declared in a sibling `.java` file. Each workspace file is com
     },
     {
       filename: "Greeter.java",
-      initialContent: `public class Greeter {
+      starterCode: `public class Greeter {
   private final String name;
 
   public Greeter(String name) { this.name = name; }
@@ -122,26 +132,34 @@ A short init (3 lines or fewer):
 
 <CodeBlock
   adapter="java"
-  initCode={`import java.util.*;`}
-  starterCode={`// The java.util.* import comes from the initialization code above.
+  files={[
+    {
+      filename: "main.java",
+      initCode: `import java.util.*;`,
+      starterCode: `// The java.util.* import comes from the initialization code above.
 public class Main {
   public static void main(String[] args) {
     List<Integer> xs = Arrays.asList(1, 2, 3);
     System.out.println(xs);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 A longer init (4 lines or more), collapsed by default:
 
 <CodeBlock
   adapter="java"
-  initCode={`import java.util.*;
+  files={[
+    {
+      filename: "main.java",
+      initCode: `import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-// The imports above run before your class.`}
-  starterCode={`// Imports come from the initialization code above.
+// The imports above run before your class.`,
+      starterCode: `// Imports come from the initialization code above.
 public class Main {
   public static void main(String[] args) {
     List<Integer> squares = IntStream.rangeClosed(1, 5)
@@ -150,5 +168,7 @@ public class Main {
     System.out.println(squares);
   }
 }
-`}
+`,
+    },
+  ]}
 />

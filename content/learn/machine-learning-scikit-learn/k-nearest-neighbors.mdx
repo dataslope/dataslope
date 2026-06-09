@@ -73,7 +73,10 @@ other scikit-learn estimator.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -87,7 +90,9 @@ knn = KNeighborsClassifier(n_neighbors=5)
 knn.fit(X_train, y_train)
 
 print(f"Test accuracy with k=5: {knn.score(X_test, y_test):.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 Notice that `fit` returns instantly: there is nothing to optimize. All the
@@ -121,7 +126,10 @@ Let us watch test accuracy respond to `k`.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -138,7 +146,9 @@ for k in [1, 3, 5, 15, 50, 100]:
     tr = knn.score(X_train, y_train)
     te = knn.score(X_test, y_test)
     print(f"{k:>3} | {tr:.3f} | {te:.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 Look at `k=1`: the **training** accuracy is a perfect `1.000`. That is not
@@ -171,7 +181,10 @@ units, then run KNN with and without scaling.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
@@ -199,7 +212,9 @@ print(f"Accuracy WITHOUT scaling: {raw.score(X_test, y_test):.3f}")
 scaler = StandardScaler().fit(X_train)
 scaled = KNeighborsClassifier(n_neighbors=5).fit(scaler.transform(X_train), y_train)
 print(f"Accuracy WITH scaling:    {scaled.score(scaler.transform(X_test), y_test):.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 The unscaled model is barely better than guessing: the noise feature's
@@ -229,7 +244,10 @@ how naturally it fits KNN.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
@@ -250,7 +268,9 @@ print(f"Raw KNN test accuracy:      {raw.score(X_test, y_test):.3f}")
 pipe = make_pipeline(StandardScaler(), KNeighborsClassifier(n_neighbors=5))
 pipe.fit(X_train, y_train)
 print(f"Scaled KNN test accuracy:   {pipe.score(X_test, y_test):.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 The improvement is dramatic, and the pipeline guarantees the scaler is fit
@@ -267,7 +287,10 @@ tradeoff governs smoothness.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.neighbors import KNeighborsRegressor
 
@@ -285,7 +308,9 @@ for k, color in [(1, "tab:red"), (5, "tab:green"), (25, "tab:blue")]:
 plt.legend()
 plt.title("KNN regression: small k is jagged, large k is over-smoothed")
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 The picture tells the whole bias-variance story in one frame. With `k=1`,
@@ -313,7 +338,10 @@ KNN's core assumption quietly breaks down.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.RandomState(0)
 print("dims | nearest dist | farthest dist | ratio")
@@ -324,7 +352,9 @@ for d in [2, 10, 100, 1000]:
     dists = np.sqrt(((pts - query) ** 2).sum(axis=1))
     near, far = dists.min(), dists.max()
     print(f"{d:>4} | {near:12.3f} | {far:13.3f} | {far / near:.2f}")
-`}
+`,
+    },
+  ]}
 />
 
 In 2 dimensions the farthest point is several times farther than the
@@ -415,12 +445,15 @@ so unscaled KNN does poorly — and scaling fixes it. Show both.
 The hidden tests check that \`pipe\` really contains a \`StandardScaler\`,
 that the scaled accuracy is high (above 0.92), and — the key lesson — that
 scaling improved the test accuracy (\`scaled_acc > raw_acc\`).`}
-  initCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import make_pipeline`}
-  starterCode={`X, y = load_wine(return_X_y=True)
+from sklearn.pipeline import make_pipeline`,
+      starterCode: `X, y = load_wine(return_X_y=True)
 
 # 1. Split (30% test, random_state=0, stratified on y)
 X_train, X_test, y_train, y_test = None, None, None, None
@@ -433,8 +466,8 @@ pipe = None
 scaled_acc = None
 
 print("raw:", raw_acc, "scaled:", scaled_acc)
-`}
-  solutionCode={`X, y = load_wine(return_X_y=True)
+`,
+      solutionCode: `X, y = load_wine(return_X_y=True)
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
@@ -449,7 +482,9 @@ pipe.fit(X_train, y_train)
 scaled_acc = pipe.score(X_test, y_test)
 
 print("raw:", raw_acc, "scaled:", scaled_acc)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "pipe_has_scaler",

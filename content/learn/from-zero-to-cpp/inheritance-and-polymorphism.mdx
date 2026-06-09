@@ -73,7 +73,10 @@ will dispatch to the actual concrete class's version:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
@@ -110,7 +113,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Even though the loop variable's static type is "pointer to
@@ -201,7 +206,10 @@ that derived classes must implement.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <memory>
 #include <vector>
 
@@ -240,7 +248,9 @@ int main() {
   std::cout << "total area = " << total << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Challenge
@@ -249,7 +259,10 @@ int main() {
   adapter="cpp"
   title="Shapes hierarchy"
   instructions={`Add a \`Rectangle\` class derived from the abstract \`Shape\` that takes \`width\` and \`height\` and returns \`width * height\` from \`area()\`. \`main\` already creates a \`Rectangle(3.0, 4.0)\`, calls \`area()\`, and expects \`12\` on stdout.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <memory>
 
 class Shape {
@@ -265,8 +278,8 @@ int main() {
   std::cout << s->area();
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <memory>
 
 class Shape {
@@ -289,7 +302,9 @@ int main() {
   std::cout << s->area();
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "rect",

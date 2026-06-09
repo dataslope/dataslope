@@ -58,7 +58,10 @@ collection?" Because the answer literally is not stored anywhere.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -71,7 +74,9 @@ public class Main {
     System.out.println(ss.getClass().getName());        // java.util.ArrayList
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 That is why `if (x instanceof List<String>)` is illegal. You can
@@ -87,7 +92,10 @@ the compiler cannot generate a meaningful element-type check for
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     // T[] arr = new T[10];     // not allowed
     // Pair<String,Integer>[] ps = new Pair<String,Integer>[10];  // not allowed
@@ -100,7 +108,9 @@ the compiler cannot generate a meaningful element-type check for
     System.out.println("ok: " + raw.length + ", " + cast.length);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 In practice you almost never want a generic array — you want a
@@ -129,7 +139,10 @@ parameterizations.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   static class Counter<T> {
     static int instances = 0; // ONE counter, shared
     Counter() { instances++; }
@@ -142,7 +155,9 @@ parameterizations.
     System.out.println("instances = " + Counter.instances); // 3, not 1+1+1
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Usually you do not want static state in a generic class anyway. When
@@ -162,7 +177,10 @@ you can suppress the warning with `@SafeVarargs`:
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -179,7 +197,9 @@ public class Main {
     System.out.println(xs);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 This is exactly how the JDK declares `List.of(E... e)`.
@@ -220,7 +240,10 @@ constructing arrays, looking up in a registry — accept a
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -245,7 +268,9 @@ public class Main {
     System.out.println(strings);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 This is the trick the JDK uses in `Collections.checkedList(List, Class)`

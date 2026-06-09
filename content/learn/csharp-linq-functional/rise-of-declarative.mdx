@@ -73,7 +73,10 @@ a comma-separated string"*. We will execute each.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
@@ -108,7 +111,9 @@ Console.WriteLine("v3: " + v3);
 var v4 = string.Join(", ",
     from n in nums where n % 2 == 0 select n * 2);
 Console.WriteLine("v4: " + v4);
-`}
+`,
+    },
+  ]}
 />
 
 All four print `4, 8, 12`. They are **operationally equivalent**.
@@ -142,7 +147,10 @@ version, you splice in one operator:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var nums = new[] { 1, 2, 3, 4, 5, 6 };
@@ -151,7 +159,9 @@ var nums = new[] { 1, 2, 3, 4, 5, 6 };
 var result = string.Join(", ", nums.Where(n => n % 2 == 0).Skip(1).Select(n => n * 2));
 
 Console.WriteLine(result); // 8, 12
-`}
+`,
+    },
+  ]}
 />
 
 This is what people mean when they say "LINQ is composable". The

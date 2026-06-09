@@ -33,23 +33,33 @@ Compare:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 // hard to read
 double F(double a, double b) => a / (b * b);
 
 Console.WriteLine(F(70, 1.75));
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 double Bmi(double weightKg, double heightMeters) => weightKg / (heightMeters * heightMeters);
 
 Console.WriteLine(Bmi(70, 1.75));
-`}
+`,
+    },
+  ]}
 />
 
 Both produce the same number. Only one tells you *what's
@@ -77,7 +87,10 @@ it's the single biggest readability lever.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -98,12 +111,17 @@ void ProcessOrders(List<int> amounts)
 }
 
 ProcessOrders(new List<int> { 50, 120, 30, 200 });
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -124,7 +142,9 @@ void PrintSummary(List<int> amounts)
 }
 
 PrintSummary(new List<int> { 50, 120, 30, 200 });
-`}
+`,
+    },
+  ]}
 />
 
 The second version is slightly longer but each piece is independently
@@ -144,12 +164,17 @@ diverge tomorrow. Be pragmatic.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`// BAD: restates the code
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `// BAD: restates the code
 i += 1; // increment i by 1
 
 // GOOD: explains why
 i += 1; // skip the header row, which is never an order
-`}
+`,
+    },
+  ]}
 />
 
 A good comment answers a question the code can't: *why* this
@@ -178,7 +203,10 @@ about. Where you can:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 var a = new Money(10m, "USD");
 var b = a with { Amount = 25m }; // a is unchanged
@@ -186,7 +214,9 @@ var b = a with { Amount = 25m }; // a is unchanged
 Console.WriteLine($"{a}, {b}");
 
 public record Money(decimal Amount, string Currency);
-`}
+`,
+    },
+  ]}
 />
 
 `record` types give you value-style equality and the `with`

@@ -109,7 +109,10 @@ Let's slow down and *notice* the interactivity.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 # A small built-in dataset of restaurant tips.
 df = px.data.tips()
@@ -125,7 +128,9 @@ fig = px.scatter(
     labels={"total_bill": "Total bill (USD)", "tip": "Tip (USD)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Try this in the chart above:

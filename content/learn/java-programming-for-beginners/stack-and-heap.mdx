@@ -70,7 +70,10 @@ single most important thing to picture about heap memory.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -86,7 +89,9 @@ public class Main {
     System.out.println("same? " + (a == b));
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 `b = a` did **not** copy the list. It copied the *reference*. Now
@@ -113,7 +118,10 @@ pops it. Watch what happens here:
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int n = 4;
     long result = factorial(n);
@@ -126,7 +134,9 @@ pops it. Watch what happens here:
     return n * factorial(n - 1);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Calling `factorial(4)` builds up a stack of frames:
@@ -167,7 +177,7 @@ type:
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {

@@ -42,7 +42,10 @@ Watch what it implies:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame({"color": ["red", "green", "blue", "red", "blue"]})
 
@@ -54,7 +57,9 @@ print(df)
 # But this quietly asserts FALSE numerical relationships:
 print("\\nIs blue (2) > red (0)?  The numbers say yes.")
 print("Is green (1) the 'average' of red (0) and blue (2)?  The numbers say yes.")
-`}
+`,
+    },
+  ]}
 />
 
 By assigning red = 0, green = 1, blue = 2, you have told the model three
@@ -92,7 +97,10 @@ as S = 0, M = 1, L = 2 *preserves real information* the model can use.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame({"size": ["S", "M", "L", "M", "S", "L"]})
 
@@ -103,7 +111,9 @@ print(df)
 
 print("\\nHere the order is genuine: S < M < L, so 0 < 1 < 2 is TRUE.")
 print("The integer gap reflects a real 'how much bigger' relationship.")
-`}
+`,
+    },
+  ]}
 />
 
 The litmus test is one question: **does a meaningful order exist among the
@@ -159,7 +169,10 @@ it in a moment.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 from sklearn.preprocessing import OneHotEncoder
 
 # A tiny, realistic table with three categorical columns.
@@ -182,7 +195,9 @@ print("New column names:")
 print(encoder.get_feature_names_out())
 print("\\nEncoded values:")
 print(encoded)
-`}
+`,
+    },
+  ]}
 />
 
 Three text columns became several 0/1 columns — one per distinct value
@@ -213,7 +228,10 @@ labels mishandle.
 
 <CodeBlock
   adapter="python"
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 
 # A category whose effect on the target has NO natural order:
@@ -225,8 +243,8 @@ n = 600
 city = rng.choice(cities, n)
 prob = np.array([risk[c] for c in city])
 y = (rng.uniform(0, 1, n) < prob).astype(int)
-df = pd.DataFrame({"city": city})`}
-  starterCode={`from sklearn.linear_model import LogisticRegression
+df = pd.DataFrame({"city": city})`,
+      starterCode: `from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 
@@ -254,7 +272,9 @@ print(f"Integer-label accuracy: {clf_int.score(Xte_int, y_test):.3f}")
 print(
     f"One-hot accuracy:       {clf_oh.score(enc.transform(df_test[['city']]), y_test):.3f}"
 )
-`}
+`,
+    },
+  ]}
 />
 
 The integer-label model is stuck near coin-flip accuracy, while the one-hot
@@ -291,7 +311,10 @@ value, effectively saying "this record's city is none of the ones I know."
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 from sklearn.preprocessing import OneHotEncoder
 
 # Fit on training cities the encoder will "know".
@@ -307,7 +330,9 @@ out = encoder.transform(new)
 print("\\nColumns:", encoder.get_feature_names_out())
 print("Paris  ->", out[0])  # a normal one-hot row
 print("London ->", out[1])  # all zeros: 'none of the known cities'
-`}
+`,
+    },
+  ]}
 />
 
 `Paris` gets its usual one-hot row. `London`, never seen during `fit`,
@@ -422,14 +447,17 @@ The hidden tests check that \`encoded\` has one row per original row, that
 the total number of one-hot columns equals the number of distinct categories
 across both features, that the encoded values are only 0s and 1s, and that
 each row sums to exactly 2 (one '1' for fruit, one '1' for country).`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 from sklearn.preprocessing import OneHotEncoder
 
 df = pd.DataFrame({
     "fruit":   ["apple", "banana", "apple", "cherry", "banana", "apple"],
     "country": ["US", "US", "MX", "MX", "CA", "CA"],
-})`}
-  starterCode={`# 1. Build the encoder (handle_unknown="ignore", sparse_output=False).
+})`,
+      starterCode: `# 1. Build the encoder (handle_unknown="ignore", sparse_output=False).
 encoder = None
 
 # 2. Fit and transform df into a dense array.
@@ -440,14 +468,16 @@ columns = None
 
 print("shape:", None)
 print("columns:", columns)
-`}
-  solutionCode={`encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)
+`,
+      solutionCode: `encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)
 encoded = encoder.fit_transform(df)
 columns = list(encoder.get_feature_names_out())
 
 print("shape:", encoded.shape)
 print("columns:", columns)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "row_count",

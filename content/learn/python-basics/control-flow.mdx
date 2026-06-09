@@ -28,29 +28,44 @@ The simplest form: execute a block only if a condition is true.
 
 <CodeBlock
   adapter="python"
-  starterCode={`x = 10
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `x = 10
 if x > 0:
     print("positive")
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`password = "secret"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `password = "secret"
 if len(password) < 8:
     print("too short")
-`}
+`,
+    },
+  ]}
 />
 
 If the condition is false, the block is skipped entirely.
 
 <CodeBlock
   adapter="python"
-  starterCode={`x = -5
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `x = -5
 if x > 0:
     print("positive")
 print("done")
-`}
+`,
+    },
+  ]}
 />
 
 ## `if` + `elif`
@@ -59,25 +74,35 @@ When you have multiple mutually exclusive conditions, use `elif` (short for "els
 
 <CodeBlock
   adapter="python"
-  starterCode={`score = 85
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `score = 85
 if score >= 90:
     print("A")
 elif score >= 80:
     print("B")
-`}
+`,
+    },
+  ]}
 />
 
 Python evaluates the conditions **in order** and stops at the first true one.
 
 <CodeBlock
   adapter="python"
-  starterCode={`x = 7
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `x = 7
 if x > 0:
     print("a")
 elif x > 5:
     print("b")
 print("done")
-`}
+`,
+    },
+  ]}
 />
 
 Even though `x > 5` is also true, only `"a"` prints because the first branch matches.
@@ -88,7 +113,10 @@ Add an `else` block to catch all remaining cases.
 
 <CodeBlock
   adapter="python"
-  starterCode={`score = 55
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `score = 55
 if score >= 90:
     print("A")
 elif score >= 80:
@@ -99,14 +127,19 @@ elif score >= 60:
     print("D")
 else:
     print("F")
-`}
+`,
+    },
+  ]}
 />
 
 There can be any number of `elif` branches; `else` is optional. Each branch needs its own indented body (no braces).
 
 <CodeBlock
   adapter="python"
-  starterCode={`def classify(score):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def classify(score):
     if score >= 90:
         return "A"
     elif score >= 80:
@@ -121,7 +154,9 @@ There can be any number of `elif` branches; `else` is optional. Each branch need
 
 for s in [95, 82, 73, 60, 50]:
     print(s, "->", classify(s))
-`}
+`,
+    },
+  ]}
 />
 
 ## Truthiness in conditions
@@ -130,20 +165,30 @@ The `if` condition is evaluated for truthiness, not strict equality with `True`.
 
 <CodeBlock
   adapter="python"
-  starterCode={`items = []
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `items = []
 if items:
     print("non-empty")
 else:
     print("empty")
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`result = None
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `result = None
 if result is None:
     print("no result yet")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info">
@@ -160,17 +205,27 @@ When you need a **value**, not a statement, use the inline form:
 
 <CodeBlock
   adapter="python"
-  starterCode={`age = 17
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `age = 17
 status = "adult" if age >= 18 else "minor"
 print(status)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`score = 85
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `score = 85
 print(f"Grade: {'pass' if score >= 60 else 'fail'}")
-`}
+`,
+    },
+  ]}
 />
 
 This reads naturally: "pick X if condition, else pick Y." It combines nicely with f-strings and comprehensions.
@@ -185,28 +240,43 @@ Python lets you chain comparison operators, which usually reads more naturally t
 
 <CodeBlock
   adapter="python"
-  starterCode={`x = 5
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `x = 5
 if 0 < x < 10:
     print("in range")
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`age = 25
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `age = 25
 if 18 <= age <= 65:
     print("working age")
-`}
+`,
+    },
+  ]}
 />
 
 This is **not** syntactic sugar for separate comparisons; Python evaluates each term only once, which matters if the term has side effects.
 
 <CodeBlock
   adapter="python"
-  starterCode={`a, b, c = 1, 2, 3
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `a, b, c = 1, 2, 3
 if a < b < c:
     print("ascending")
-`}
+`,
+    },
+  ]}
 />
 
 ## `match` statement (Python 3.10+)
@@ -215,7 +285,10 @@ if a < b < c:
 
 <CodeBlock
   adapter="python"
-  starterCode={`def describe(point):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def describe(point):
     match point:
         case (0, 0):
             return "origin"
@@ -233,14 +306,19 @@ if a < b < c:
 
 for p in [(0, 0), (0, 5), (3, 0), (4, 4), (2, 7), "nope"]:
     print(p, "->", describe(p))
-`}
+`,
+    },
+  ]}
 />
 
 Patterns can also match class instances, dict shapes, and sequences of varying lengths. See [PEP 634](https://peps.python.org/pep-0634/) for the full reference.
 
 <CodeBlock
   adapter="python"
-  starterCode={`def http_status(code):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def http_status(code):
     match code:
         case 200:
             return "OK"
@@ -254,7 +332,9 @@ Patterns can also match class instances, dict shapes, and sequences of varying l
 
 for c in [200, 404, 500, 999]:
     print(c, "->", http_status(c))
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Why no switch before 3.10?">
@@ -267,7 +347,10 @@ For simple value-to-value mappings, a dict is often clearer than `if`/`elif` or 
 
 <CodeBlock
   adapter="python"
-  starterCode={`def http_label(code):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def http_label(code):
     return {
         200: "OK",
         301: "Moved Permanently",
@@ -279,7 +362,9 @@ For simple value-to-value mappings, a dict is often clearer than `if`/`elif` or 
 print(http_label(200))
 print(http_label(404))
 print(http_label(999))
-`}
+`,
+    },
+  ]}
 />
 
 This pattern is especially useful when the mapping is data-driven (e.g., loaded from a config file).
@@ -306,11 +391,14 @@ It saves a line by combining the assignment and the check. Use sparingly — onl
 - \`"Fizz"\` if i is divisible by 3 only
 - \`"Buzz"\` if i is divisible by 5 only
 - The string form of i otherwise`}
-  starterCode={`def fizzbuzz(n):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def fizzbuzz(n):
     # your code here
     return []
-`}
-  solutionCode={`def fizzbuzz(n):
+`,
+      solutionCode: `def fizzbuzz(n):
     out = []
     for i in range(1, n + 1):
         if i % 15 == 0:
@@ -322,7 +410,9 @@ It saves a line by combining the assignment and the check. Use sparingly — onl
         else:
             out.append(str(i))
     return out
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "first_15",
@@ -341,17 +431,22 @@ It saves a line by combining the assignment and the check. Use sparingly — onl
   adapter="python"
   title="Leap year"
   instructions={`A year is a leap year if it is divisible by 4, **except** century years (divisible by 100), which must also be divisible by 400. Define \`is_leap(year)\` returning \`True\` or \`False\`.`}
-  starterCode={`def is_leap(year):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def is_leap(year):
     # your code here
     return False
-`}
-  solutionCode={`def is_leap(year):
+`,
+      solutionCode: `def is_leap(year):
     if year % 400 == 0:
         return True
     if year % 100 == 0:
         return False
     return year % 4 == 0
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "divisible_by_4",
@@ -388,11 +483,14 @@ It saves a line by combining the assignment and the check. Use sparingly — onl
 - \`"F"\` for below 60
 
 Assume \`score\` is an integer between 0 and 100.`}
-  starterCode={`def letter_grade(score):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def letter_grade(score):
     # your code here
     return "F"
-`}
-  solutionCode={`def letter_grade(score):
+`,
+      solutionCode: `def letter_grade(score):
     if score >= 90:
         return "A"
     elif score >= 80:
@@ -403,7 +501,9 @@ Assume \`score\` is an integer between 0 and 100.`}
         return "D"
     else:
         return "F"
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "a",

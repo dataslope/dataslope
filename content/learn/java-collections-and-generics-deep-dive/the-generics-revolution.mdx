@@ -19,7 +19,10 @@ shipped:
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -36,7 +39,9 @@ public class Main {
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Run that and the third element crashes with `ClassCastException`. The
@@ -73,7 +78,10 @@ the compiler can prove that the cast cannot fail.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -88,7 +96,9 @@ public class Main {
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Notice three changes:
@@ -123,7 +133,10 @@ fact cleans up enormous amounts of code.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.HashMap;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.HashMap;
 import java.util.Map;
 
 public class Main {
@@ -145,7 +158,9 @@ public class Main {
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Trying to write `total += (String) ...` would be flagged by the
@@ -177,7 +192,7 @@ the right type*, with no cast.
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Phonebook book = new Phonebook();
     book.add("Ada", "555-0101");
@@ -194,7 +209,7 @@ the right type*, with no cast.
     },
     {
       filename: "Phonebook.java",
-      initialContent: `import java.util.HashMap;
+      starterCode: `import java.util.HashMap;
 import java.util.Map;
 
 public class Phonebook {
@@ -219,7 +234,7 @@ to *strings*? A general "key-to-record store" looks like this:
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Registry<String, Integer> ages = new Registry<>();
     ages.add("Ada", 36);
@@ -237,7 +252,7 @@ to *strings*? A general "key-to-record store" looks like this:
     },
     {
       filename: "Registry.java",
-      initialContent: `import java.util.HashMap;
+      starterCode: `import java.util.HashMap;
 import java.util.Map;
 
 public class Registry<K, V> {
@@ -280,7 +295,10 @@ warning*, and you lose all the type safety we just gained.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -295,7 +313,9 @@ public class Main {
       System.out.println(o.getClass().getSimpleName());
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Modern Java code essentially never uses raw types. The rule is

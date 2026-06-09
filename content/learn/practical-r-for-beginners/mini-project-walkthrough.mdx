@@ -23,12 +23,17 @@ Look before you leap. Always.
 
 <CodeBlock
   adapter="r"
-  starterCode={`# airquality is built into R — no loading needed
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# airquality is built into R — no loading needed
 dim(airquality)
 head(airquality)
 str(airquality)
 summary(airquality)
-`}
+`,
+    },
+  ]}
 />
 
 What we learn:
@@ -47,7 +52,10 @@ The rest of the walkthrough follows the standard arc:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 
 aq <- airquality |>
   filter(!is.na(Ozone)) |> # drop rows missing the response
@@ -61,7 +69,9 @@ aq <- airquality |>
 
 head(aq)
 cat("Rows after dropping Ozone NAs:", nrow(aq), "\\n")
-`}
+`,
+    },
+  ]}
 />
 
 A few notes:
@@ -77,7 +87,10 @@ A few notes:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 
 aq <- airquality |>
   filter(!is.na(Ozone)) |>
@@ -101,7 +114,9 @@ monthly <- aq |>
     .groups   = "drop"
   )
 print(monthly)
-`}
+`,
+    },
+  ]}
 />
 
 Already the pattern emerges: July and August have the highest
@@ -114,7 +129,10 @@ Plots will tell us more than summary tables ever can.
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 library(ggplot2)
 
 aq <- airquality |>
@@ -135,7 +153,9 @@ ggplot(aq, aes(x = Temp_C, y = Ozone, color = Month_name)) +
     color    = "Month"
   ) +
   theme_minimal()
-`}
+`,
+    },
+  ]}
 />
 
 The picture is unambiguous: warmer days have higher Ozone. The
@@ -146,7 +166,10 @@ temperatures.
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 library(ggplot2)
 
 aq <- airquality |>
@@ -164,7 +187,9 @@ ggplot(aq, aes(x = Month_name, y = Ozone, fill = Month_name)) +
   ) +
   theme_minimal() +
   theme(legend.position = "none")
-`}
+`,
+    },
+  ]}
 />
 
 July and August have clearly higher medians and wider spreads —
@@ -178,7 +203,10 @@ strong is it? And is it surprising given the noise?
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 
 aq <- airquality |>
   filter(!is.na(Ozone)) |>
@@ -190,7 +218,9 @@ cor(aq$Temp_C, aq$Ozone)
 # Simple linear regression: Ozone ~ Temp
 model <- lm(Ozone ~ Temp_C, data = aq)
 summary(model)
-`}
+`,
+    },
+  ]}
 />
 
 Reading the output:
@@ -286,13 +316,13 @@ three columns: `Species`, `median_petal_length`,
   files={[
     {
       filename: "main.R",
-      initialContent: `library(dplyr)
+      starterCode: `library(dplyr)
 
 iris_summary <- NULL   # build me
 
 print(iris_summary)
 `,
-      solutionContent: `library(dplyr)
+      solutionCode: `library(dplyr)
 
 iris_summary <- iris |>
   group_by(Species) |>

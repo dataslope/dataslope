@@ -25,7 +25,10 @@ condition becomes false.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int i = 1;
@@ -36,7 +39,9 @@ int main(void) {
   printf("done\\n");
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Trace it:
@@ -90,7 +95,10 @@ The two snippets below print the same thing:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   for (int i = 1; i <= 5; i++) {
@@ -98,7 +106,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 `i++` is shorthand for `i = i + 1`. Likewise `i--` for `i = i - 1`,
@@ -123,7 +133,10 @@ you must ask first and check the answer second.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int n = 0;
@@ -133,7 +146,9 @@ int main(void) {
   } while (n < 3);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Loops + conditionals: a real example
@@ -142,7 +157,10 @@ Let's print every even number from 1 to 20:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   for (int i = 1; i <= 20; i++) {
@@ -153,7 +171,9 @@ int main(void) {
   printf("\\n");
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 There are two ways to think about this:
@@ -182,7 +202,10 @@ iteration.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   // Print numbers 1..10, but skip multiples of 3 and stop at 8.
@@ -198,7 +221,9 @@ int main(void) {
   printf("\\n");
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Expected output: `1 2 4 5 7 8`.
@@ -210,7 +235,10 @@ You can put a loop inside a loop. The inner loop runs in full for
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   for (int row = 1; row <= 3; row++) {
@@ -221,7 +249,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Nested loops are how you walk a 2D grid: rows and columns, x and y,
@@ -233,7 +263,10 @@ You can run a loop backwards. It's the same idea, just flipped:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   for (int i = 10; i >= 1; i--) {
@@ -242,7 +275,9 @@ int main(void) {
   printf("blast off!\\n");
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 A classic countdown.
@@ -267,7 +302,10 @@ condition, body, update, back to condition.
   adapter="c"
   title="Factorial of N"
   instructions={`Compute \`N!\` (\`N\` factorial — the product of all integers from \`1\` to \`N\`) for \`N = 6\` and print the result followed by a newline. The expected output is \`720\`.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int N = 6;
@@ -276,8 +314,8 @@ int main(void) {
   printf("%ld\\n", result);
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 int main(void) {
   int N = 6;
@@ -288,7 +326,9 @@ int main(void) {
   printf("%ld\\n", result);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "fact",
@@ -313,14 +353,17 @@ int main(void) {
 ****
 *****
 \`\`\``}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   // print the triangle here
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 int main(void) {
   for (int row = 1; row <= 5; row++) {
@@ -331,7 +374,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "triangle",

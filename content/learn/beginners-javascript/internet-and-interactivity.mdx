@@ -169,7 +169,10 @@ thing the early web designers desperately wanted to be able to do —
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// Pretend this is form input from the user.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// Pretend this is form input from the user.
 const userEmail = "ada@example"; // Note: this email is missing a domain.
 
 // A tiny check we can do right here, with no server round-trip.
@@ -185,7 +188,9 @@ if (looksLikeEmail(userEmail)) {
 } else {
   console.log("That email doesn't look right:", userEmail);
 }
-`}
+`,
+    },
+  ]}
 />
 
 In 1994, doing that kind of check required *sending the data to the

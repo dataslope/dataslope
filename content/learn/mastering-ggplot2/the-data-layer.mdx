@@ -16,11 +16,16 @@ plot's mappings then refer to columns by name.
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 # Every column is a variable you can map; every row is one car.
 head(mpg)
 cat("rows:", nrow(mpg), " columns:", ncol(mpg), "\\n")
-`}
+`,
+    },
+  ]}
 />
 
 You can map any of those columns to an aesthetic: `displ` to x, `hwy`
@@ -49,7 +54,10 @@ it is spread across column *names*.
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # "Wide" data: each year is a separate column.
 wide <- data.frame(
@@ -71,14 +79,19 @@ long <- reshape(wide,
 )
 long <- long[order(long$region, long$year), c("region", "year", "sales")]
 print(long, row.names = FALSE)
-`}
+`,
+    },
+  ]}
 />
 
 Now `year` and `sales` are real columns, so they can be mapped:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 long <- data.frame(
   region = rep(c("North", "South"), each = 3),
@@ -89,7 +102,9 @@ long <- data.frame(
 ggplot(long, aes(x = year, y = sales, color = region)) +
   geom_line(linewidth = 1) +
   geom_point(size = 2)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="The rule of thumb">
@@ -116,22 +131,32 @@ categorical with one distinct color per value:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # cyl as a NUMBER -> continuous color gradient (a smooth scale bar).
 ggplot(mpg, aes(displ, hwy, color = cyl)) +
   geom_point()
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # cyl as a FACTOR -> discrete colors, one per cylinder count.
 ggplot(mpg, aes(displ, hwy, color = factor(cyl))) +
   geom_point()
-`}
+`,
+    },
+  ]}
 />
 
 Same column, same mapping target (color), but a completely different

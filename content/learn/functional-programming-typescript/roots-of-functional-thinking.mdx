@@ -38,7 +38,10 @@ parameter.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// A lambda is just a value that happens to be a function
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// A lambda is just a value that happens to be a function
 const identity = <T,>(x: T): T => x;
 const apply = <A, B>(f: (a: A) => B, a: A): B => f(a);
 
@@ -58,7 +61,9 @@ const cond = <A,>(p: (a: A) => (b: A) => A, a: A, b: A) => p(a)(b);
 
 console.log(cond(T, "yes", "no")); // "yes"
 console.log(cond(F, "yes", "no")); // "no"
-`}
+`,
+    },
+  ]}
 />
 
 The key insight: a function is not just a tool *inside* a program.
@@ -109,7 +114,10 @@ TypeScript's discriminated unions are a direct descendant.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// ML-style "Maybe a" (an algebraic data type)
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// ML-style "Maybe a" (an algebraic data type)
 type Maybe<A> = { kind: "none" } | { kind: "some"; value: A };
 
 const some = <A,>(a: A): Maybe<A> => ({ kind: "some", value: a });
@@ -126,7 +134,9 @@ function unwrapOr<A>(m: Maybe<A>, fallback: A): A {
 
 console.log(unwrapOr(some(42), 0));
 console.log(unwrapOr(none<number>(), 0));
-`}
+`,
+    },
+  ]}
 />
 
 In 1990, **Haskell** went further. It is a pure, lazy, statically
@@ -242,7 +252,10 @@ historical voices:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// 1. Imperative (1970s-style for loop in modern JS)
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// 1. Imperative (1970s-style for loop in modern JS)
 const xs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 let sum = 0;
@@ -252,12 +265,17 @@ for (let i = 0; i < xs.length; i++) {
   }
 }
 console.log("imperative:", sum);
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// 2. Lisp/Scheme-style: recursion over a list
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// 2. Lisp/Scheme-style: recursion over a list
 const xs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 function sumSquaresOfEvens(list: readonly number[]): number {
@@ -268,12 +286,17 @@ function sumSquaresOfEvens(list: readonly number[]): number {
 }
 
 console.log("recursive:", sumSquaresOfEvens(xs));
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// 3. ML/Haskell-style: pipelined transformations
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// 3. ML/Haskell-style: pipelined transformations
 const xs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 const result = xs
@@ -282,7 +305,9 @@ const result = xs
   .reduce((a, b) => a + b, 0);
 
 console.log("functional pipeline:", result);
-`}
+`,
+    },
+  ]}
 />
 
 All three produce `220`. The first describes *how to compute*. The

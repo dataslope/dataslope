@@ -56,26 +56,36 @@ A function is **defined once** with `def`, then **called many times**. Each call
 
 <CodeBlock
   adapter="python"
-  starterCode={`def greet(name):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def greet(name):
     """Return a friendly greeting."""
     return f"Hello, {name}!"
 
 
 print(greet("Ada"))
-`}
+`,
+    },
+  ]}
 />
 
 A function that does not explicitly `return` returns `None`.
 
 <CodeBlock
   adapter="python"
-  starterCode={`def say_hello():
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def say_hello():
     print("Hello!")
 
 
 result = say_hello()
 print("returned:", result)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Docstrings are your friend">
@@ -88,7 +98,10 @@ Python distinguishes between **positional** and **keyword** arguments.
 
 <CodeBlock
   adapter="python"
-  starterCode={`def deposit(account, amount, currency="USD"):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def deposit(account, amount, currency="USD"):
     return f"Deposited {amount} {currency} into {account}"
 
 
@@ -100,7 +113,9 @@ print(deposit("acct-1", 100, currency="EUR"))
 
 # all keywords (order doesn't matter)
 print(deposit(amount=50, account="acct-2", currency="GBP"))
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="When to use keyword arguments">
@@ -113,7 +128,10 @@ Defaults are evaluated **once**, when the function is **defined** (not when it's
 
 <CodeBlock
   adapter="python"
-  starterCode={`# WRONG: the same list is reused across calls!
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# WRONG: the same list is reused across calls!
 def add_item_bad(item, items=[]):
     items.append(item)
     return items
@@ -122,7 +140,9 @@ def add_item_bad(item, items=[]):
 print(add_item_bad("a"))
 print(add_item_bad("b"))  # surprise: ["a", "b"]
 print(add_item_bad("c"))  # surprise: ["a", "b", "c"]
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="danger" title="Mutable default argument gotcha">
@@ -131,7 +151,10 @@ print(add_item_bad("c"))  # surprise: ["a", "b", "c"]
 
 <CodeBlock
   adapter="python"
-  starterCode={`# RIGHT: use None as the sentinel
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# RIGHT: use None as the sentinel
 def add_item(item, items=None):
     if items is None:
         items = []
@@ -142,7 +165,9 @@ def add_item(item, items=None):
 print(add_item("a"))
 print(add_item("b"))  # ["b"]
 print(add_item("c"))  # ["c"]
-`}
+`,
+    },
+  ]}
 />
 
 ## `*args` and `**kwargs`
@@ -151,21 +176,29 @@ print(add_item("c"))  # ["c"]
 
 <CodeBlock
   adapter="python"
-  starterCode={`def log_event(name, *tags, **metadata):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def log_event(name, *tags, **metadata):
     print("event:", name)
     print("tags:", tags)  # tuple
     print("metadata:", metadata)  # dict
 
 
 log_event("login", "web", "production", user_id=42, latency_ms=120)
-`}
+`,
+    },
+  ]}
 />
 
 When **calling** a function, `*` and `**` **unpack** iterables/dicts back into arguments:
 
 <CodeBlock
   adapter="python"
-  starterCode={`def add3(a, b, c):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def add3(a, b, c):
     return a + b + c
 
 
@@ -174,7 +207,9 @@ print(add3(*nums))  # unpacks list into a=1, b=2, c=3
 
 opts = {"a": 10, "b": 20, "c": 30}
 print(add3(**opts))  # unpacks dict into keyword arguments
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Why *args, **kwargs?">
@@ -196,7 +231,10 @@ def func(pos_only, /, pos_or_kw, *, kw_only):
 
 <CodeBlock
   adapter="python"
-  starterCode={`def divide(a, b, /, *, rounded=False):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def divide(a, b, /, *, rounded=False):
     # 'a' and 'b' are positional-only (left of /).
     # 'rounded' is keyword-only (right of *).
     result = a / b
@@ -210,7 +248,9 @@ try:
     print(divide(a=7, b=2))  # TypeError: a and b are positional-only
 except TypeError as e:
     print("TypeError:", e)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="When to use / and *">
@@ -223,7 +263,10 @@ A `return` statement exits the function immediately and sends a value back to th
 
 <CodeBlock
   adapter="python"
-  starterCode={`def absolute(x):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def absolute(x):
     if x < 0:
         return -x
     return x
@@ -231,14 +274,19 @@ A `return` statement exits the function immediately and sends a value back to th
 
 print(absolute(-5))
 print(absolute(3))
-`}
+`,
+    },
+  ]}
 />
 
 You can return **multiple values** by separating them with commas. Python packs them into a **tuple**:
 
 <CodeBlock
   adapter="python"
-  starterCode={`def divmod_custom(a, b):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def divmod_custom(a, b):
     quotient = a // b
     remainder = a % b
     return quotient, remainder
@@ -246,14 +294,19 @@ You can return **multiple values** by separating them with commas. Python packs 
 
 q, r = divmod_custom(17, 5)
 print(f"17 = 5 * {q} + {r}")
-`}
+`,
+    },
+  ]}
 />
 
 Use **early return** to avoid deep nesting:
 
 <CodeBlock
   adapter="python"
-  starterCode={`def process(value):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def process(value):
     if value is None:
         return "nothing to do"
     if value < 0:
@@ -265,7 +318,9 @@ Use **early return** to avoid deep nesting:
 print(process(None))
 print(process(-5))
 print(process(10))
-`}
+`,
+    },
+  ]}
 />
 
 ## Lambdas
@@ -274,12 +329,17 @@ A `lambda` is an **anonymous, single-expression function**. They are useful as `
 
 <CodeBlock
   adapter="python"
-  starterCode={`words = ["banana", "apple", "cherry"]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `words = ["banana", "apple", "cherry"]
 print(sorted(words, key=lambda w: w[-1]))  # sort by last letter
 
 doubler = lambda x: x * 2
 print(doubler(7))
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="lambda vs def">
@@ -292,13 +352,18 @@ Type hints (PEP 484+) are **optional annotations**. Python itself does not enfor
 
 <CodeBlock
   adapter="python"
-  starterCode={`def total(prices: list[float], tax_rate: float = 0.07) -> float:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def total(prices: list[float], tax_rate: float = 0.07) -> float:
     """Compute total price including tax."""
     return sum(prices) * (1 + tax_rate)
 
 
 print(total([10.0, 20.0, 30.0]))
-`}
+`,
+    },
+  ]}
 />
 
 You can put them on plain variables too:
@@ -319,7 +384,10 @@ In Python, functions are **first-class objects**: you can pass them as arguments
 
 <CodeBlock
   adapter="python"
-  starterCode={`def apply_twice(func, x):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def apply_twice(func, x):
     return func(func(x))
 
 
@@ -336,7 +404,9 @@ ops = {
     "negate": lambda x: -x,
 }
 print(ops["square"](7))
-`}
+`,
+    },
+  ]}
 />
 
 This is the foundation of **decorators**, **callbacks**, and many design patterns.
@@ -347,7 +417,10 @@ These built-ins take a function and an iterable.
 
 <CodeBlock
   adapter="python"
-  starterCode={`nums = [1, 2, 3, 4, 5]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `nums = [1, 2, 3, 4, 5]
 
 print(list(map(lambda x: x * x, nums)))
 print(list(filter(lambda x: x % 2 == 0, nums)))
@@ -356,7 +429,9 @@ print(sorted(nums, reverse=True))
 # Most Pythonistas prefer comprehensions over map/filter:
 print([x * x for x in nums])
 print([x for x in nums if x % 2 == 0])
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="Comprehensions vs map/filter">
@@ -399,13 +474,18 @@ Here, `lru_cache` is a **decorator** — a function that takes a function and re
   adapter="python"
   title="Compose two functions"
   instructions={`Define a function \`compose(f, g)\` that takes two single-argument functions and returns a new function \`h\` such that \`h(x) == f(g(x))\` for any \`x\`.`}
-  starterCode={`def compose(f, g):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def compose(f, g):
     # your code here
     return lambda x: x
-`}
-  solutionCode={`def compose(f, g):
+`,
+      solutionCode: `def compose(f, g):
     return lambda x: f(g(x))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "math",
@@ -433,13 +513,18 @@ Example:
 greet_all("Ada", "Grace", greeting="Hi")
 # -> "Hi, Ada!\\nHi, Grace!"
 \`\`\``}
-  starterCode={`def greet_all(*names, greeting="Hello"):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def greet_all(*names, greeting="Hello"):
     # your code here
     return ""
-`}
-  solutionCode={`def greet_all(*names, greeting="Hello"):
+`,
+      solutionCode: `def greet_all(*names, greeting="Hello"):
     return "\\n".join(f"{greeting}, {name}!" for name in names)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "two_names",
@@ -463,16 +548,21 @@ greet_all("Ada", "Grace", greeting="Hi")
   adapter="python"
   title="Fix the mutable default"
   instructions={`The function below has a mutable default argument bug. Fix it by using \`None\` as a sentinel and creating a new list inside the function when needed.`}
-  starterCode={`def collect_events(event, log=[]):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def collect_events(event, log=[]):
     log.append(event)
     return log
-`}
-  solutionCode={`def collect_events(event, log=None):
+`,
+      solutionCode: `def collect_events(event, log=None):
     if log is None:
         log = []
     log.append(event)
     return log
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "independent_calls",
@@ -495,15 +585,20 @@ assert my_log is result`,
   adapter="python"
   title="Recursive factorial"
   instructions={`Define a function \`factorial(n)\` that computes \`n!\` recursively. \`factorial(0)\` should return \`1\`.`}
-  starterCode={`def factorial(n):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def factorial(n):
     # your code here
     return 1
-`}
-  solutionCode={`def factorial(n):
+`,
+      solutionCode: `def factorial(n):
     if n == 0:
         return 1
     return n * factorial(n - 1)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "base",

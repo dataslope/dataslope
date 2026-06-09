@@ -16,7 +16,10 @@ once, automatically, when an object is created.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 
 class Greeter {
@@ -35,7 +38,9 @@ int main() {
   g.greet();
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The `: who_(std::move(who))` part is the **member initializer
@@ -50,7 +55,10 @@ A class can have several constructors with different signatures:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 class Rect {
 public:
@@ -71,7 +79,9 @@ int main() {
   std::cout << a.area() << ' ' << b.area() << ' ' << c.area() << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 If you write *no* constructors, the compiler gives you a default
@@ -88,7 +98,10 @@ heap object, when the program ends for a global.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 class Loud {
 public:
@@ -108,7 +121,9 @@ int main() {
   Loud d(4);
   return 0; // <- d then a destroyed here
 }
-`}
+`,
+    },
+  ]}
 />
 
 Watch the output carefully. Destruction happens in **reverse order
@@ -166,7 +181,10 @@ to write any of these by hand.
   adapter="cpp"
   title="A Stopwatch class"
   instructions={`Write a \`Stopwatch\` class with a constructor that takes an initial integer reading (default 0), a \`tick()\` method that increases the reading by 1, and a \`read() const\` method that returns the current reading. The provided \`main\` constructs one with starting value 10, ticks twice, prints \`12\`.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 class Stopwatch {
 public:
@@ -180,8 +198,8 @@ int main() {
   std::cout << s.read();
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 
 class Stopwatch {
 public:
@@ -200,7 +218,9 @@ int main() {
   std::cout << s.read();
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "sw",

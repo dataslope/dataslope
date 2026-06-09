@@ -37,7 +37,10 @@ Your task is to create a summary DataFrame called **\`summary\`** that groups by
 - Average \`revenue\` per transaction, named \`avg_revenue\`
 
 Round all numeric results to **2 decimal places** and sort by \`revenue\` descending.`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 
 _data = {
     "category":   ["Electronics","Electronics","Electronics","Clothing","Clothing","Clothing","Food","Food","Food","Books","Books","Books","Electronics","Clothing","Food"],
@@ -46,8 +49,8 @@ _data = {
     "revenue":    [52080.0, 76800.0, 26130.0, 9025.0, 4200.0, 7200.0, 3400.0, 1400.0, 1050.0, 1320.0, 2750.0, 720.0, 18980.0, 8400.0, 1375.0]
 }
 df = pd.DataFrame(_data)
-`}
-  starterCode={`# df is already loaded — explore it first
+`,
+      starterCode: `# df is already loaded — explore it first
 print(df.head())
 print()
 
@@ -55,8 +58,8 @@ print()
 summary = None  # TODO: replace with your groupby + agg expression
 
 print(summary)
-`}
-  solutionCode={`summary = (
+`,
+      solutionCode: `summary = (
     df.groupby("category")
     .agg(
         units_sold=("units_sold", "sum"),
@@ -67,7 +70,9 @@ print(summary)
     .sort_values("revenue", ascending=False)
 )
 print(summary)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "summary_exists",
@@ -219,16 +224,21 @@ optional elements are omitted.
 <ChallengeCard
   adapter="python"
   title="Compute the mean of a list"
-  initCode={`values = [12, 7, 4, 21, 9, 18, 3]
-`}
-  starterCode={`# values is already loaded.
+  files={[
+    {
+      filename: "main.py",
+      initCode: `values = [12, 7, 4, 21, 9, 18, 3]
+`,
+      starterCode: `# values is already loaded.
 mean = None  # your code here
 print("mean =", mean)
-`}
-  instructions={`Assign the arithmetic mean of \`values\` to a variable called \`mean\`.`}
-  solutionCode={`mean = sum(values) / len(values)
+`,
+      solutionCode: `mean = sum(values) / len(values)
 print("mean =", mean)
-`}
+`,
+    },
+  ]}
+  instructions={`Assign the arithmetic mean of \`values\` to a variable called \`mean\`.`}
   tests={[
     {
       id: "mean_is_defined",
@@ -293,14 +303,17 @@ common case for compiled languages. Works for Python too, of course.
 - If divisible by 3, print \`Fizz\`
 - If divisible by 5, print \`Buzz\`
 - If divisible by both, print \`FizzBuzz\``}
-  initCode={`start = 1
+  files={[
+    {
+      filename: "main.py",
+      initCode: `start = 1
 end = 15
-`}
-  starterCode={`for i in range(start, end + 1):
+`,
+      starterCode: `for i in range(start, end + 1):
     # your code here
     print(i)
-`}
-  solutionCode={`for i in range(start, end + 1):
+`,
+      solutionCode: `for i in range(start, end + 1):
     if i % 15 == 0:
         print("FizzBuzz")
     elif i % 3 == 0:
@@ -309,7 +322,9 @@ end = 15
         print("Buzz")
     else:
         print(i)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "fizzbuzz_output",
@@ -381,21 +396,26 @@ A simple string-oriented challenge exercising native test assertions.
   instructions={`Define a function \`reverse_words(s)\` that returns the same sentence with the order of its words reversed. Word separators are single spaces.
 
 Example: \`"hello world"\` → \`"world hello"\`.`}
-  initCode={`sample_sentence = "hello world"
-`}
-  starterCode={`def reverse_words(s):
+  files={[
+    {
+      filename: "main.py",
+      initCode: `sample_sentence = "hello world"
+`,
+      starterCode: `def reverse_words(s):
     # your code here
     return s
 
 
 print(reverse_words(sample_sentence))
-`}
-  solutionCode={`def reverse_words(s):
+`,
+      solutionCode: `def reverse_words(s):
     return " ".join(reversed(s.split(" ")))
 
 
 print(reverse_words(sample_sentence))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",
@@ -487,17 +507,17 @@ module can `import` from sibling files.
   title="Implement greet() in utils.py"
   instructions={`Open \`utils.py\` and implement \`greet(name)\` so that it returns the string \`"Hello, <name>!"\`. The entry script \`main.py\` already imports your function and prints the result.`}
   entryFilename="main.py"
-  initCode={`target_name = "World"
-`}
   files={[
     {
       filename: "main.py",
-      initialContent: `from utils import greet\n\nprint(greet(target_name))\n`,
+      initCode: `target_name = "World"
+`,
+      starterCode: `from utils import greet\n\nprint(greet(target_name))\n`,
     },
     {
       filename: "utils.py",
-      initialContent: `def greet(name):\n    # your code here\n    return ""\n`,
-      solutionContent: `def greet(name):\n    return f"Hello, {name}!"\n`,
+      starterCode: `def greet(name):\n    # your code here\n    return ""\n`,
+      solutionCode: `def greet(name):\n    return f"Hello, {name}!"\n`,
     },
   ]}
   tests={[

@@ -57,7 +57,7 @@ classDiagram
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     // Members exist on their own:
     Member ada = new Member("Ada");
@@ -76,7 +76,7 @@ classDiagram
     },
     {
       filename: "Member.java",
-      initialContent: `public class Member {
+      starterCode: `public class Member {
   private final String name;
   public Member(String name) { this.name = name; }
   public String name() { return name; }
@@ -85,7 +85,7 @@ classDiagram
     },
     {
       filename: "Library.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Library {
@@ -157,7 +157,7 @@ classDiagram
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Order o = new Order("ORD-42", 19.95);
     Printer console = new Printer();
@@ -170,7 +170,7 @@ classDiagram
     },
     {
       filename: "Order.java",
-      initialContent: `public class Order {
+      starterCode: `public class Order {
   private final String id;
   private final double total;
   public Order(String id, double total) {
@@ -184,14 +184,14 @@ classDiagram
     },
     {
       filename: "Printer.java",
-      initialContent: `public class Printer {
+      starterCode: `public class Printer {
   public void write(String line) { System.out.println("[printer] " + line); }
 }
 `,
     },
     {
       filename: "OrderPrinter.java",
-      initialContent: `public class OrderPrinter {
+      starterCode: `public class OrderPrinter {
   public void print(Order o, Printer printer) {
     printer.write("Order " + o.id() + " total = " + o.total());
   }
@@ -236,7 +236,7 @@ but the simple version is just good Java.
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Logger console = new Logger();
     Greeter g = new Greeter(console); // Greeter aggregates the logger
@@ -247,14 +247,14 @@ but the simple version is just good Java.
     },
     {
       filename: "Logger.java",
-      initialContent: `public class Logger {
+      starterCode: `public class Logger {
   public void log(String message) { System.out.println("[LOG] " + message); }
 }
 `,
     },
     {
       filename: "Greeter.java",
-      initialContent: `public class Greeter {
+      starterCode: `public class Greeter {
   private final Logger logger; // aggregated, not owned
 
   public Greeter(Logger logger) { this.logger = logger; }
@@ -300,7 +300,7 @@ names=Ada, Bob, Cleo
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Classroom room = new Classroom();
     System.out.println("size=" + room.size());
@@ -317,11 +317,11 @@ names=Ada, Bob, Cleo
     },
     {
       filename: "Student.java",
-      initialContent: `public class Student {
+      starterCode: `public class Student {
   // TODO
 }
 `,
-      solutionContent: `public class Student {
+      solutionCode: `public class Student {
   private final String name;
   public Student(String name) { this.name = name; }
   public String name() { return name; }
@@ -330,14 +330,14 @@ names=Ada, Bob, Cleo
     },
     {
       filename: "Classroom.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Classroom {
   // TODO
 }
 `,
-      solutionContent: `import java.util.ArrayList;
+      solutionCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Classroom {

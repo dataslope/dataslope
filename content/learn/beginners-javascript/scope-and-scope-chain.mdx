@@ -32,7 +32,10 @@ scope, which is one of the reasons we avoid `var`.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const outside = "I am global";
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const outside = "I am global";
 
 function show() {
   const inside = "I am inside show";
@@ -43,7 +46,9 @@ function show() {
 show();
 console.log(outside); // visible — global
 // console.log(inside);   // ReferenceError: inside is not defined
-`}
+`,
+    },
+  ]}
 />
 
 The function's scope can "see out" to the global scope, but the
@@ -54,7 +59,10 @@ one-way mirrors.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function example() {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function example() {
   const x = "function-scope x";
   if (true) {
     const x = "block-scope x"; // a brand new x, only inside the if
@@ -64,7 +72,9 @@ one-way mirrors.
 }
 
 example();
-`}
+`,
+    },
+  ]}
 />
 
 The inner `const x` *shadows* the outer one. The two are separate
@@ -92,7 +102,10 @@ first match it finds.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const greeting = "Hello";
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const greeting = "Hello";
 
 function greet(name) {
   if (true) {
@@ -103,7 +116,9 @@ function greet(name) {
 }
 
 greet("Ada");
-`}
+`,
+    },
+  ]}
 />
 
 `stamp` is found in the block. `greeting` is not in the block, not
@@ -118,7 +133,10 @@ into another.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function counter() {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function counter() {
   let n = 0; // a fresh n every time counter() is called
   n = n + 1;
   return n;
@@ -127,7 +145,9 @@ into another.
 console.log(counter()); // 1
 console.log(counter()); // 1 — not 2!
 console.log(counter()); // 1
-`}
+`,
+    },
+  ]}
 />
 
 Each call starts with `n = 0`, increments it to `1`, returns, and
@@ -143,7 +163,10 @@ outer is still there, just hidden inside the inner scope.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`let user = "outer";
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `let user = "outer";
 
 function modify() {
   let user = "inner"; // shadows the outer 'user'
@@ -153,7 +176,9 @@ function modify() {
 
 modify();
 console.log("outside:", user); // unchanged — modify() never touched the outer 'user'
-`}
+`,
+    },
+  ]}
 />
 
 This is sometimes intentional (a local variable that's
@@ -170,7 +195,10 @@ defined.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const country = "Wonderland";
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const country = "Wonderland";
 
 function describe() {
   console.log("country is", country);
@@ -182,7 +210,9 @@ function caller() {
 }
 
 caller();
-`}
+`,
+    },
+  ]}
 />
 
 The output is `"country is Wonderland"`. Even though `describe()`
@@ -210,7 +240,10 @@ are used as possible.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// Bad style: a global counter modified from anywhere
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// Bad style: a global counter modified from anywhere
 let count = 0;
 
 function add() {
@@ -236,7 +269,9 @@ c = increment(c);
 c = increment(c);
 c = increment(c);
 console.log(c);
-`}
+`,
+    },
+  ]}
 />
 
 The "better style" example is more verbose, but every change to
@@ -257,7 +292,10 @@ with `function`), the important things to remember are:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// This works because of function hoisting:
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// This works because of function hoisting:
 console.log(square(4)); // 16
 
 function square(n) {
@@ -267,7 +305,9 @@ function square(n) {
 // This does NOT work — 'x' is in the "temporal dead zone":
 // console.log(x);
 // const x = 5;
-`}
+`,
+    },
+  ]}
 />
 
 Function hoisting is convenient. The `let`/`const` rule prevents a
@@ -281,7 +321,10 @@ what each `console.log` will print, given the scope rules above.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const planet = "Earth";
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const planet = "Earth";
 
 function outer(name) {
   const greeting = "Hello";
@@ -301,7 +344,9 @@ const f = outer("Ada");
 console.log(f("!"));
 console.log(f("?"));
 console.log(f(" (welcome)"));
-`}
+`,
+    },
+  ]}
 />
 
 Two things to notice:
@@ -321,7 +366,10 @@ Two things to notice:
   instructions={`The function \`compute\` below has a subtle scope problem: a local variable accidentally shadows another. Without changing the test, modify the function so that the outer \`total\` (declared at the top of the function) is the one updated and returned.
 
 The function should return the sum of \`1 + 2 + 3\` which is \`6\`. As-is, it returns \`0\`.`}
-  starterCode={`function compute() {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function compute() {
   let total = 0;
   for (let i = 1; i <= 3; i++) {
     let total = i; // BUG: this declares a NEW total, shadowing the outer one
@@ -331,8 +379,8 @@ The function should return the sum of \`1 + 2 + 3\` which is \`6\`. As-is, it re
 }
 
 console.log(compute());
-`}
-  solutionCode={`function compute() {
+`,
+      solutionCode: `function compute() {
   let total = 0;
   for (let i = 1; i <= 3; i++) {
     total += i; // assign to the OUTER total — no inner declaration
@@ -341,7 +389,9 @@ console.log(compute());
 }
 
 console.log(compute());
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "result",

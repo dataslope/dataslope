@@ -52,13 +52,18 @@ analysis:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
-`}
+`,
+    },
+  ]}
 />
 
 Now `white` — the same points on a bare white canvas with no grid. Cleaner,
@@ -67,13 +72,18 @@ eye:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="white")
 penguins = sns.load_dataset("penguins")
 
 sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
-`}
+`,
+    },
+  ]}
 />
 
 And `ticks` — like `white`, but with short tick marks on the axes that give
@@ -82,13 +92,18 @@ for publication figures:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="ticks")
 penguins = sns.load_dataset("penguins")
 
 sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
-`}
+`,
+    },
+  ]}
 />
 
 A reasonable default rule: reach for **`whitegrid`** while you are
@@ -135,13 +150,18 @@ Here is the default `notebook` context on a plain plot:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(context="notebook", style="whitegrid")
 tips = sns.load_dataset("tips")
 
 sns.scatterplot(data=tips, x="total_bill", y="tip")
-`}
+`,
+    },
+  ]}
 />
 
 Now the **same plot** at `talk` context. The data, the axes, and the style
@@ -150,13 +170,18 @@ and even the points scale up so they stay legible from a distance:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(context="talk", style="whitegrid")
 tips = sns.load_dataset("tips")
 
 sns.scatterplot(data=tips, x="total_bill", y="tip")
-`}
+`,
+    },
+  ]}
 />
 
 Why bump it up for a slide? Because the figure will be shrunk to fit a slide
@@ -204,7 +229,10 @@ command:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="ticks")
 penguins = sns.load_dataset("penguins")
@@ -213,7 +241,9 @@ sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
 
 # Drop the top and right spines for a lighter frame.
 sns.despine()
-`}
+`,
+    },
+  ]}
 />
 
 The combination of **`style="ticks"` + `despine()`** is a classic
@@ -239,7 +269,10 @@ applies; outside it, your global theme is untouched.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="darkgrid")  # the global look for the session
 tips = sns.load_dataset("tips")
@@ -247,7 +280,9 @@ tips = sns.load_dataset("tips")
 # Just THIS plot uses a white canvas; the global darkgrid is unchanged.
 with sns.axes_style("white"):
     sns.scatterplot(data=tips, x="total_bill", y="tip")
-`}
+`,
+    },
+  ]}
 />
 
 `plotting_context` works the same way for sizing — wrap a single plot in
@@ -278,20 +313,25 @@ only because each block runs on its own.)
 
 You are not tested on the style itself — just that you called \`set_theme\`
 and produced a Seaborn grid.`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 # 1. Set the global theme:
 
 # 2. Build a relplot on tips and assign it to g:
 g = None
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 g = sns.relplot(data=tips, x="total_bill", y="tip", height=4)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_facetgrid",

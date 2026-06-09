@@ -30,7 +30,10 @@ arranged horizontally.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
@@ -44,7 +47,9 @@ fig = px.histogram(
     labels={"total_bill": "Total bill (USD)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 You can now compare *lunch* vs *dinner* distributions side by side,
@@ -56,7 +61,10 @@ Combine `facet_row` and `facet_col` for a full grid:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
@@ -73,7 +81,9 @@ fig = px.scatter(
     labels={"total_bill": "Total bill (USD)", "tip": "Tip (USD)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 You now have 4 days × 2 times = 8 mini-scatters, each split by
@@ -86,7 +96,10 @@ The classic use of facets is breaking up a too-busy line chart.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("continent in ['Europe', 'Asia']")
 
@@ -105,7 +118,9 @@ fig = px.line(
     labels={"year": "Year", "lifeExp": "Life expectancy"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 `facet_col_wrap=3` tells Plotly to wrap to a new row after every 3

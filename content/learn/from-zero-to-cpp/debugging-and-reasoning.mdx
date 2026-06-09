@@ -40,7 +40,10 @@ when you need to *trace what the program is actually doing*.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int factorial(int n) {
   std::cerr << "[factorial called with n=" << n << "]\\n";
@@ -55,7 +58,9 @@ int main() {
   std::cout << factorial(5) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Use `std::cerr` (the standard *error* stream) for diagnostics so

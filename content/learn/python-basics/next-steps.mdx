@@ -17,7 +17,10 @@ Type hints are optional but increasingly standard in professional Python. They c
 
 <CodeBlock
   adapter="python"
-  starterCode={`from typing import Iterable
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from typing import Iterable
 
 
 def total(prices: Iterable[float], tax_rate: float = 0.07) -> float:
@@ -26,7 +29,9 @@ def total(prices: Iterable[float], tax_rate: float = 0.07) -> float:
 
 
 print(total([10.0, 20.0, 30.0]))
-`}
+`,
+    },
+  ]}
 />
 
 Run a checker like [**mypy**](https://mypy.readthedocs.io/) or [**pyright**](https://microsoft.github.io/pyright/) over your code to catch type mismatches:
@@ -46,7 +51,10 @@ Built-in `unittest` works, but most Python projects use [**pytest**](https://doc
 
 <CodeBlock
   adapter="python"
-  starterCode={`# test_total.py
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# test_total.py
 def total(prices, tax_rate=0.07):
     return sum(prices) * (1 + tax_rate)
 
@@ -58,7 +66,9 @@ def test_total_without_tax():
 def test_total_with_tax():
     result = total([100], tax_rate=0.1)
     assert result == 110.0
-`}
+`,
+    },
+  ]}
 />
 
 Run with:
@@ -76,7 +86,10 @@ pytest
 
 <CodeBlock
   adapter="python"
-  starterCode={`import asyncio
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import asyncio
 
 
 async def fetch(url):
@@ -95,7 +108,9 @@ async def main():
 
 
 asyncio.run(main())
-`}
+`,
+    },
+  ]}
 />
 
 `await asyncio.gather()` runs the three `fetch` calls concurrently, so the total time is ~0.1s, not 0.3s. This pattern scales to thousands of requests.
@@ -148,7 +163,10 @@ Python's killer app. The ecosystem is massive:
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Example: pandas DataFrame
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Example: pandas DataFrame
 import pandas as pd
 
 data = {
@@ -159,7 +177,9 @@ data = {
 df = pd.DataFrame(data)
 print(df)
 print(df[df["age"] > 28])
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="success" title="Python owns data">

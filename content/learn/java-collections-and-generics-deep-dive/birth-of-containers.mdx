@@ -46,7 +46,10 @@ array of `Object`, with `addElement`, `removeElement`,
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.Enumeration;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.Enumeration;
 import java.util.Vector;
 
 public class Main {
@@ -65,7 +68,9 @@ public class Main {
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Read that carefully. **There is no element type.** A `Vector` of
@@ -74,7 +79,10 @@ comes out has to be downcast:
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.Vector;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.Vector;
 
 public class Main {
   public static void main(String[] args) {
@@ -86,7 +94,9 @@ public class Main {
     System.out.println(s.toUpperCase());
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 If a teammate accidentally adds an `Integer`, that cast blows up at
@@ -102,7 +112,10 @@ return to this — modern code prefers `ArrayDeque` for stack behavior).
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.Stack;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.Stack;
 
 public class Main {
   public static void main(String[] args) {
@@ -116,7 +129,9 @@ public class Main {
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Because `Stack extends Vector`, you can *also* call `elementAt(0)` on
@@ -131,7 +146,10 @@ values using a hash function.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.Enumeration;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.Enumeration;
 import java.util.Hashtable;
 
 public class Main {
@@ -153,7 +171,9 @@ public class Main {
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Same problems as `Vector`: untyped, and *also* synchronized on every
@@ -168,7 +188,10 @@ exist yet; everyone wrote the `while` loop by hand.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.Enumeration;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.Enumeration;
 import java.util.Vector;
 
 public class Main {
@@ -185,7 +208,9 @@ public class Main {
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 It worked. It was uniform-*ish*. But it could not be used in the
@@ -223,7 +248,7 @@ needing one for "list", "set", "map", "queue", "stack",
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Bag bag = new Bag();
     bag.add("Ada");
@@ -241,7 +266,7 @@ needing one for "list", "set", "map", "queue", "stack",
     },
     {
       filename: "Bag.java",
-      initialContent: `public class Bag {
+      starterCode: `public class Bag {
   private Object[] data = new Object[2];
   private int size = 0;
 

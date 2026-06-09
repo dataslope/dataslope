@@ -49,7 +49,10 @@ summary statistics per group and reading the numbers off a table.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 # Four datasets (I-IV), stacked tidy: columns dataset, x, y.
 anscombe = sns.load_dataset("anscombe")
@@ -70,7 +73,9 @@ corr = anscombe.groupby("dataset").apply(
 summary["corr_xy"] = corr
 
 display(summary.round(2))
-`}
+`,
+    },
+  ]}
 />
 
 Read that table the way a busy analyst would. Every column is essentially
@@ -97,7 +102,10 @@ straight regression line that those identical statistics describe.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 anscombe = sns.load_dataset("anscombe")
@@ -113,7 +121,9 @@ sns.lmplot(
     facet_kws={"sharex": True, "sharey": True},
     line_kws={"color": "crimson"},
 )
-`}
+`,
+    },
+  ]}
 />
 
 Four wildly different worlds — and the *same* red line slicing through each:
@@ -222,7 +232,10 @@ Using the \`anscombe\` dataset:
    by dataset label \`I\`-\`IV\`).
 
 If the legend of Anscombe holds, all four values should round to **7.50**.`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 anscombe = sns.load_dataset("anscombe")
 
@@ -230,15 +243,17 @@ anscombe = sns.load_dataset("anscombe")
 y_means = None
 
 display(y_means)
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 anscombe = sns.load_dataset("anscombe")
 
 y_means = anscombe.groupby("dataset")["y"].mean().round(2)
 
 display(y_means)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "has_four_groups",

@@ -100,7 +100,10 @@ write — and *understand deeply* — by the end of this course.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 # A built-in dataset of life expectancy & GDP for 142 countries.
 df = px.data.gapminder().query("year == 2007")
@@ -122,7 +125,9 @@ fig = px.scatter(
     },
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 If that looks intimidating right now — good. Every line of that

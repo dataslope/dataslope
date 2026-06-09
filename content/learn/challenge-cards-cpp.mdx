@@ -12,20 +12,25 @@ standard) and run as WASI binaries in your browser.
   adapter="cpp"
   title="Print a greeting with iostream"
   instructions={`Make the program print exactly \`Hello, C++!\`.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   // your code here
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 
 int main() {
   std::cout << "Hello, C++!\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "hello",
@@ -72,7 +77,10 @@ int main() {
   adapter="cpp"
   title="Sort and print"
   instructions={`Given the integer vector below, sort it in ascending order and print each element on its own line.`}
-  starterCode={`#include <algorithm>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -81,8 +89,8 @@ int main() {
   // your code here
   return 0;
 }
-`}
-  solutionCode={`#include <algorithm>
+`,
+      solutionCode: `#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -93,7 +101,9 @@ int main() {
     std::cout << x << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "sorted",
@@ -154,7 +164,10 @@ int main() {
   adapter="cpp"
   title="Implement a Counter class"
   instructions={`Define a class \`Counter\` with a member function \`tick()\` that increments an internal counter and a \`value()\` method that returns its current value. The driver code in \`main\` will then print the counter after each tick.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 class Counter {
 public:
@@ -169,8 +182,8 @@ int main() {
   }
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 
 class Counter {
   int n = 0;
@@ -188,7 +201,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "counts",
@@ -271,7 +286,7 @@ filesystem before each run, so the entry translation unit can
   files={[
     {
       filename: "main.cpp",
-      initialContent: `#include "greeter.h"
+      starterCode: `#include "greeter.h"
 
 int main() {
   Greeter g;
@@ -282,7 +297,7 @@ int main() {
     },
     {
       filename: "greeter.h",
-      initialContent: `#pragma once
+      starterCode: `#pragma once
 class Greeter {
 public:
   void greet();
@@ -291,14 +306,14 @@ public:
     },
     {
       filename: "greeter.cpp",
-      initialContent: `#include "greeter.h"
+      starterCode: `#include "greeter.h"
 #include <iostream>
 
 void Greeter::greet() {
   // your code here
 }
 `,
-      solutionContent: `#include "greeter.h"
+      solutionCode: `#include "greeter.h"
 #include <iostream>
 
 void Greeter::greet() { std::cout << "Hello, World!\\n"; }

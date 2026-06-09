@@ -14,7 +14,10 @@ ints, side by side, and names the start `nums`.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int nums[5] = {10, 20, 30, 40, 50};
@@ -24,7 +27,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The addresses should grow by exactly `sizeof(int)` per element (4 on
@@ -47,7 +52,10 @@ is defined as `*(a + i)`. The `+ i` part is *typed* — it advances by
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int a[4] = {10, 20, 30, 40};
@@ -57,7 +65,9 @@ int main(void) {
   printf("2[a]      = %d  (yes, this is legal!)\\n", 2 [a]);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Yes, `2[a]` is valid C: by definition `i[a] == *(i + a) == *(a + i)
@@ -73,7 +83,10 @@ called *array-to-pointer decay*.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 void show_size_inside(int a[]) {
   // Inside the function, a is just int *.
@@ -86,7 +99,9 @@ int main(void) {
   show_size_inside(a);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Inside a function, `int a[]` is *exactly the same* as `int *a`. The
@@ -114,7 +129,10 @@ If `p` is a pointer to a `T`, then:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int a[] = {10, 20, 30, 40, 50};
@@ -130,7 +148,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Pointers may only be compared within the same allocation">
@@ -146,7 +166,10 @@ function, treat `arr` and `n` as inseparable.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stddef.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stddef.h>
 #include <stdio.h>
 
 long sum(const int *arr, size_t n) {
@@ -163,7 +186,9 @@ int main(void) {
   printf("sum = %ld\\n", sum(data, n));
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The idiom `sizeof(array) / sizeof(array[0])` works *only* where the
@@ -187,7 +212,10 @@ behavior.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int grid[3][4] = {
@@ -204,7 +232,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Row-major layout means `grid[r][c]` lives at offset
@@ -221,7 +251,10 @@ stack. That is *the* C bug.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int a[3] = {1, 2, 3};
@@ -235,7 +268,9 @@ int main(void) {
   printf("After:  sentinel = %d\\n", sentinel);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 On the WASI target you may see `sentinel` change to `42`, stay at
@@ -248,7 +283,10 @@ this in the *Memory Bugs* chapter.
   adapter="c"
   title="Rotate left in-place"
   instructions={`Implement \`void rotate_left(int *arr, size_t n)\` so that the element at index 0 moves to the end and every other element shifts one position to the left. For \`{1,2,3,4,5}\` the result is \`{2,3,4,5,1}\`. The provided \`main\` prints the array space-separated on one line.`}
-  starterCode={`#include <stddef.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stddef.h>
 #include <stdio.h>
 
 void rotate_left(int *arr, size_t n) {
@@ -267,8 +305,8 @@ int main(void) {
   printf("\\n");
   return 0;
 }
-`}
-  solutionCode={`#include <stddef.h>
+`,
+      solutionCode: `#include <stddef.h>
 #include <stdio.h>
 
 void rotate_left(int *arr, size_t n) {
@@ -293,7 +331,9 @@ int main(void) {
   printf("\\n");
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "rotated",
@@ -309,7 +349,10 @@ int main(void) {
   adapter="c"
   title="Sum the main diagonal of a 4x4 matrix"
   instructions={`Implement \`int diag_sum(int m[4][4])\` that returns \`m[0][0] + m[1][1] + m[2][2] + m[3][3]\`. The provided \`main\` defines a 4x4 matrix and prints the result followed by a newline.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int diag_sum(int m[4][4]) {
   // your code here
@@ -326,8 +369,8 @@ int main(void) {
   printf("%d\\n", diag_sum(m));
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 int diag_sum(int m[4][4]) {
   int s = 0;
@@ -346,7 +389,9 @@ int main(void) {
   printf("%d\\n", diag_sum(m));
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "diag",

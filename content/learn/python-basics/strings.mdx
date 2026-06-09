@@ -23,27 +23,42 @@ There are four ways to write a string literal. They're all equivalent at the val
 
 <CodeBlock
   adapter="python"
-  starterCode={`a = "single quotes"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `a = "single quotes"
 b = "double quotes"
 print(a)
 print(b)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`c = """triple-quoted
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `c = """triple-quoted
 spans multiple
 lines"""
 print(c)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`d = """also triple-quoted"""
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `d = """also triple-quoted"""
 print(d)
-`}
+`,
+    },
+  ]}
 />
 
 ### Escape sequences
@@ -59,10 +74,15 @@ print(d)
 
 <CodeBlock
   adapter="python"
-  starterCode={`print("Hello\\nWorld")
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print("Hello\\nWorld")
 print("Column1\\tColumn2")
 print('She said, "Hello!"')
-`}
+`,
+    },
+  ]}
 />
 
 ### Raw strings
@@ -71,19 +91,29 @@ Prefix a literal with `r` to disable escape processing. Useful for regex pattern
 
 <CodeBlock
   adapter="python"
-  starterCode={`print("C:\\nope")  # \\n is a newline
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print("C:\\nope")  # \\n is a newline
 print(r"C:\\nope")  # raw, the backslash is literal
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`import re
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import re
 
 # Regex for a digit: without raw string, you'd need \\\\d
 pattern = r"\\d+"
 print(re.findall(pattern, "Order 123 ships in 5 days"))
-`}
+`,
+    },
+  ]}
 />
 
 ## Indexing and slicing
@@ -92,36 +122,56 @@ Strings are sequences, so they support indexing (`s[i]`) and slicing (`s[start:s
 
 <CodeBlock
   adapter="python"
-  starterCode={`s = "Python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `s = "Python"
 print(s[0])  # 'P'
 print(s[-1])  # 'n'
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`s = "Python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `s = "Python"
 print(s[1:4])  # 'yth'
 print(s[:2])  # 'Py'
 print(s[2:])  # 'thon'
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`s = "Python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `s = "Python"
 print(s[::-1])  # 'nohtyP' (reverse)
 print(s[::2])  # 'Pto' (every other character)
-`}
+`,
+    },
+  ]}
 />
 
 Slicing **never raises `IndexError`**, even with out-of-range bounds. It just returns whatever overlaps.
 
 <CodeBlock
   adapter="python"
-  starterCode={`s = "Python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `s = "Python"
 print(s[100:200])  # '' (empty string, no error)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Unicode and len(): the emoji surprise">
@@ -141,28 +191,43 @@ You **cannot** mutate a string in place. Methods like `upper()`, `replace()`, an
 
 <CodeBlock
   adapter="python"
-  starterCode={`s = "hello"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `s = "hello"
 try:
     s[0] = "H"
 except TypeError as e:
     print("TypeError:", e)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`s = "hello"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `s = "hello"
 print(s.upper())  # returns "HELLO"
 print(s)  # unchanged
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`s = "hello"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `s = "hello"
 s = s.upper()  # rebinding is how you "change" a string
 print(s)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Immutability gotcha">
@@ -192,36 +257,56 @@ A selection of methods you'll use constantly:
 
 <CodeBlock
   adapter="python"
-  starterCode={`s = "  Hello, World!  "
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `s = "  Hello, World!  "
 print(s.strip())  # remove leading/trailing whitespace
 print(s.lower())
 print(s.upper())
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`s = "  Hello, World!  "
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `s = "  Hello, World!  "
 print(s.replace("World", "Python"))
 print(s.split(","))
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`print("-".join(["a", "b", "c"]))
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print("-".join(["a", "b", "c"]))
 print("hello".startswith("he"))
 print("hello".endswith("lo"))
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`print("hello".find("l"))  # 2 (first index) or -1 if not found
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print("hello".find("l"))  # 2 (first index) or -1 if not found
 print("hello".count("l"))  # 2
 print("42".isdigit())
 print("Hello".isalpha())
-`}
+`,
+    },
+  ]}
 />
 
 ## Formatting: f-strings (the killer feature)
@@ -230,47 +315,72 @@ print("Hello".isalpha())
 
 <CodeBlock
   adapter="python"
-  starterCode={`name = "Ada"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `name = "Ada"
 score = 87.4321
 
 print(f"{name} scored {score}")
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`name = "Ada"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `name = "Ada"
 score = 87.4321
 
 print(f"{name} scored {score:.1f}")  # one decimal place
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`name = "Ada"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `name = "Ada"
 score = 87.4321
 
 print(f"{name:>10} | {score:>6.2f}")  # right-aligned, widths
 print(f"{score:,.2f}")  # thousands separator
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`score = 87.4321
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `score = 87.4321
 
 print(f"{score=}")  # debug form (Python 3.8+)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`score = 87.4321
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `score = 87.4321
 
 # Expressions are fine inside the braces.
 print(f"double = {score * 2:.2f}")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="f-string format mini-language">
@@ -291,7 +401,10 @@ Other formatting styles you'll see in older code:
 
 <CodeBlock
   adapter="python"
-  starterCode={`name = "Ada"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `name = "Ada"
 score = 87.4
 
 # str.format (Python 3.0+)
@@ -299,17 +412,24 @@ print("{} scored {:.1f}".format(name, score))
 
 # Old % formatting (still works, ported from C printf)
 print("%s scored %.1f" % (name, score))
-`}
+`,
+    },
+  ]}
 />
 
 ## Concatenation and repetition
 
 <CodeBlock
   adapter="python"
-  starterCode={`print("foo" + "bar")
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print("foo" + "bar")
 print("ab" * 3)
 print("-" * 40)
-`}
+`,
+    },
+  ]}
 />
 
 ## Bytes vs strings
@@ -318,18 +438,28 @@ print("-" * 40)
 
 <CodeBlock
   adapter="python"
-  starterCode={`s = "café"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `s = "café"
 b = s.encode("utf-8")
 print(b, len(b), len(s))
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`s = "café"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `s = "café"
 b = s.encode("utf-8")
 print(b.decode("utf-8"))
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="str vs bytes: a common source of bugs">
@@ -348,19 +478,24 @@ response = b"Hello"  # from a network request
   adapter="python"
   title="Smart title-case"
   instructions={`Define a function \`format_name(first, last)\` that returns the name in the form \`"Last, First"\`, with both names title-cased and any surrounding whitespace stripped. For example, \`format_name("  ada", "LOVELACE ")\` should return \`"Lovelace, Ada"\`.`}
-  starterCode={`def format_name(first, last):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def format_name(first, last):
     # Your code here
     return ""
 
 
 print(format_name("  ada", "LOVELACE "))
-`}
-  solutionCode={`def format_name(first, last):
+`,
+      solutionCode: `def format_name(first, last):
     return f"{last.strip().title()}, {first.strip().title()}"
 
 
 print(format_name("  ada", "LOVELACE "))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",
@@ -384,20 +519,25 @@ print(format_name("  ada", "LOVELACE "))
   adapter="python"
   title="Palindrome checker"
   instructions={`Write a function \`is_palindrome(s)\` that returns \`True\` if \`s\` reads the same forward and backward, ignoring case and any non-alphanumeric characters. For example, \`"A man, a plan, a canal: Panama"\` is a palindrome.`}
-  starterCode={`def is_palindrome(s):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def is_palindrome(s):
     # Your code here
     return False
 
 
 print(is_palindrome("A man, a plan, a canal: Panama"))
-`}
-  solutionCode={`def is_palindrome(s):
+`,
+      solutionCode: `def is_palindrome(s):
     clean = "".join(c.lower() for c in s if c.isalnum())
     return clean == clean[::-1]
 
 
 print(is_palindrome("A man, a plan, a canal: Panama"))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "classic",
@@ -426,22 +566,27 @@ print(is_palindrome("A man, a plan, a canal: Panama"))
   adapter="python"
   title="URL slug generator"
   instructions={`Write a function \`slugify(text)\` that converts a string to a URL-friendly "slug": lowercase, spaces replaced with hyphens, only alphanumerics and hyphens allowed. For example, \`slugify("Hello World!")\` returns \`"hello-world"\`.`}
-  starterCode={`def slugify(text):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def slugify(text):
     # Your code here
     return ""
 
 
 print(slugify("Hello World!"))
 print(slugify("Python 3.12 Released"))
-`}
-  solutionCode={`def slugify(text):
+`,
+      solutionCode: `def slugify(text):
     clean = "".join(c.lower() if c.isalnum() or c == " " else "" for c in text)
     return "-".join(clean.split())
 
 
 print(slugify("Hello World!"))
 print(slugify("Python 3.12 Released"))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",

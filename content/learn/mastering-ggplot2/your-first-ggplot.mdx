@@ -21,10 +21,15 @@ What does `ggplot()` with *only* data and mappings produce?
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(x = displ, y = hwy))
-`}
+`,
+    },
+  ]}
 />
 
 Run it. You get **axes but no points**. That is not a bug — it is the
@@ -44,11 +49,16 @@ Give it a geom and the marks appear:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(x = displ, y = hwy)) +
   geom_point()
-`}
+`,
+    },
+  ]}
 />
 
 Read this aloud as a sentence:
@@ -66,11 +76,16 @@ the geometry, the axes, or anything else.
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
   geom_point()
-`}
+`,
+    },
+  ]}
 />
 
 One new word — `color = drv` — and you get colored points **plus** a
@@ -84,12 +99,17 @@ geom with `+`:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(x = displ, y = hwy)) +
   geom_point() +
   geom_smooth()
-`}
+`,
+    },
+  ]}
 />
 
 The points and the trend line share the *same* data and the *same*
@@ -103,7 +123,10 @@ specific geom (used by that layer only). These two are equivalent:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # Mapping in ggplot(): shared by every layer.
 p1 <- ggplot(mpg, aes(x = displ, y = hwy)) +
@@ -115,7 +138,9 @@ p2 <- ggplot(mpg) +
 
 print(p1)
 print(p2)
-`}
+`,
+    },
+  ]}
 />
 
 Putting shared mappings in `ggplot()` is the common style, because

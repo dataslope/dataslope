@@ -28,7 +28,10 @@ chapter — laziness for composability.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Task<A> = () => Promise<A>;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Task<A> = () => Promise<A>;
 
 const of =
   <A,>(a: A): Task<A> =>
@@ -62,7 +65,9 @@ const program: Task<string> = chain(of(1), (n) =>
   console.log("nothing has run yet");
   console.log(await program()); // single, controlled execution
 })();
-`}
+`,
+    },
+  ]}
 />
 
 The familiar trio appears again: `of`, `map`, `chain`. The exact
@@ -75,7 +80,10 @@ in parallel, combine their results.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Task<A> = () => Promise<A>;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Task<A> = () => Promise<A>;
 
 const of =
   <A,>(a: A): Task<A> =>
@@ -109,7 +117,9 @@ function parallel<A>(ts: ReadonlyArray<Task<A>>): Task<ReadonlyArray<A>> {
   const t1 = Date.now();
   console.log("par:", await parallel(tasks)(), "ms ≈", Date.now() - t1);
 })();
-`}
+`,
+    },
+  ]}
 />
 
 This is the exact same Functor / Applicative / Monad split you
@@ -134,7 +144,10 @@ the underlying promise are *not* part of the success channel.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
 const ok = <E, A>(value: A): Result<E, A> => ({ kind: "ok", value });
 const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
 
@@ -178,7 +191,9 @@ const program2 = mapTR(fetchUser("missing"), greet);
   console.log(await program()); // { kind: 'ok', value: 'Hello, Ada!' }
   console.log(await program2()); // { kind: 'err', error: 'not found' }
 })();
-`}
+`,
+    },
+  ]}
 />
 
 The chain doesn't blow up on failure — it short-circuits as a
@@ -236,7 +251,7 @@ errors**. Errors must propagate via the Result channel.
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { run } from "./workflow";
+      starterCode: `import { run } from "./workflow";
 
 (async () => {
   console.log(await run("u1")());
@@ -247,7 +262,7 @@ errors**. Errors must propagate via the Result channel.
     },
     {
       filename: "workflow.ts",
-      initialContent: `export type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
+      starterCode: `export type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
 export const ok = <E, A>(value: A): Result<E, A> => ({ kind: "ok", value });
 export const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
 
@@ -294,7 +309,7 @@ export function run(userId: string): TaskResult<string, string> {
   return () => Promise.resolve(err("not implemented"));
 }
 `,
-      solutionContent: `export type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
+      solutionCode: `export type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
 export const ok = <E, A>(value: A): Result<E, A> => ({ kind: "ok", value });
 export const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
 

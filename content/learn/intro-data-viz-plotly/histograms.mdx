@@ -26,7 +26,10 @@ count per bin → plot as bars.**
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
@@ -38,7 +41,9 @@ fig = px.histogram(
     labels={"total_bill": "Total bill (USD)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 You can see immediately: most bills are between $10-25, the
@@ -52,7 +57,10 @@ Too few bins hide structure; too many bins create noise.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
@@ -66,7 +74,9 @@ fig = px.histogram(
     labels={"total_bill": "Total bill (USD)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Edit the code: try `nbins=5`, then `100`. You'll see two failure
@@ -85,7 +95,10 @@ Add `color="..."` to split the histogram by a categorical variable:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
@@ -100,7 +113,9 @@ fig = px.histogram(
     labels={"total_bill": "Total bill (USD)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 `barmode="overlay"` with reduced opacity lets two distributions sit
@@ -120,7 +135,10 @@ normalize:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
@@ -136,7 +154,9 @@ fig = px.histogram(
     labels={"total_bill": "Total bill (USD)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Now the bars represent *probability density* (so each group's

@@ -121,7 +121,10 @@ that. Use *relative* paths anchored to the project root, like
 
 <CodeBlock
   adapter="r"
-  starterCode={`# In a real RStudio project, the 'here' package finds the project root automatically:
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# In a real RStudio project, the 'here' package finds the project root automatically:
 #   install.packages("here")
 #   library(here)
 #   read.csv(here("data", "raw", "sales.csv"))
@@ -131,7 +134,9 @@ cat("Working directory:", getwd(), "\\n")
 
 # Build a relative path:
 file.path("data", "raw", "sales.csv")
-`}
+`,
+    },
+  ]}
 />
 
 Relative paths + a consistent project root = portable code.

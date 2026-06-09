@@ -51,7 +51,10 @@ is right-skewed, negative is left-skewed.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(0)
@@ -68,7 +71,9 @@ for name, x in [("symmetric", symmetric), ("right-skew", right), ("left-skew", l
     )
 
 print("\\nPositive skew -> mean above median. Negative -> mean below.")
-`}
+`,
+    },
+  ]}
 />
 
 Notice the `mean − median` column tracks the skew sign exactly. That's
@@ -89,7 +94,10 @@ honestly describes a two-humped distribution.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.express as px
 
 rng = np.random.default_rng(1)
@@ -110,7 +118,9 @@ fig.show()
 
 print(f"Mean of the mixed column: {mixed.mean():.1f} cm")
 print("...which lands in the VALLEY between the peaks — describing nobody.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="danger" title="A single center can describe nobody">
@@ -135,7 +145,10 @@ tails than normal; negative means lighter.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(3)
@@ -151,7 +164,9 @@ for name, x in [("normal", normal_data), ("heavy-tailed", heavy_tail)]:
     )
 
 print("\\nHeavier tails -> many more 'far out' values than normal predicts.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Why heavy tails matter in practice">
@@ -214,7 +229,10 @@ clarifying.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import pandas as pd
 from scipy import stats
 
@@ -246,7 +264,9 @@ print(f"z>3 rule flags {len(z_flags)} points: {sorted(z_flags.round(1).tolist())
 print()
 print("On right-skewed data the two rules DISAGREE: the IQR rule flags")
 print("more, because the extremes inflate the std the z-rule depends on.")
-`}
+`,
+    },
+  ]}
 />
 
 A box plot draws those IQR fences for you — the "whiskers" extend to
@@ -255,7 +275,10 @@ individual outlier dot.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import pandas as pd
 import plotly.express as px
 
@@ -280,7 +303,9 @@ fig = px.box(
 fig.show()
 
 print("The dots above the upper whisker are the 1.5xIQR-flagged points.")
-`}
+`,
+    },
+  ]}
 />
 
 ### From flag to decision
@@ -331,7 +356,10 @@ and how many.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import pandas as pd
 
 
@@ -351,7 +379,9 @@ def flag_outliers_iqr(series, k=1.5):
 rng = np.random.default_rng(0)
 s = pd.Series(np.concatenate([rng.normal(50, 5, 100), [5, 95, 110]]))
 print(flag_outliers_iqr(s))
-`}
+`,
+    },
+  ]}
 />
 
 <ChallengeCard
@@ -372,15 +402,18 @@ Then produce:
 - **\`n_outliers\`** — an \`int\`, the count of those outliers.
 
 Use the provided \`readings\` Series.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 
 rng = np.random.default_rng(99)
 readings = pd.Series(np.concatenate([
     rng.normal(20, 3, size=200),   # normal sensor readings
     [40, 42, -5],                  # three genuine anomalies
-]))`}
-  starterCode={`# TODO: apply the 1.5xIQR rule
+]))`,
+      starterCode: `# TODO: apply the 1.5xIQR rule
 q1 = None
 q3 = None
 iqr = None
@@ -388,8 +421,8 @@ lower_fence = None
 upper_fence = None
 outliers = None  # list of values outside the fences
 n_outliers = None  # int count
-`}
-  solutionCode={`q1 = readings.quantile(0.25)
+`,
+      solutionCode: `q1 = readings.quantile(0.25)
 q3 = readings.quantile(0.75)
 iqr = q3 - q1
 lower_fence = q1 - 1.5 * iqr
@@ -402,7 +435,9 @@ n_outliers = int(mask.sum())
 print("fences:", lower_fence, upper_fence)
 print("n_outliers:", n_outliers)
 print("outliers:", outliers)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "fences",

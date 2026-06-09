@@ -56,7 +56,10 @@ again.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import sys
 
 eps = sys.float_info.epsilon
@@ -71,7 +74,9 @@ print(f"Is it 0.3? {a == 0.3}")
 x = 1e16
 print((x + 1) - x)  # 0.0
 print(x + (1 - x))  # 1.0
-`}
+`,
+    },
+  ]}
 />
 
 In ordinary mathematics, $(x+1) - x$ always equals $1$. In
@@ -115,7 +120,10 @@ at all. Multiplying a matrix by a vector might be well-conditioned;
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 
 # A "Hilbert matrix" — famously ill-conditioned
@@ -128,7 +136,9 @@ for n in [4, 8, 12, 16]:
     H = hilbert(n)
     kappa = np.linalg.cond(H)
     print(f"H_{n:>2}: condition number = {kappa:.2e}")
-`}
+`,
+    },
+  ]}
 />
 
 A condition number of $10^{18}$ means a relative input error of
@@ -150,7 +160,10 @@ $\sin$ as you add more terms.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import math
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import math
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -177,7 +190,9 @@ plt.xlabel("x")
 plt.ylabel("sin(x)")
 plt.title("Approximating sin(x) with finite Taylor sums")
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 Two lessons fall out of this picture:
@@ -217,7 +232,10 @@ throughout the course.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 # Reproducibility starts here:
 rng = np.random.default_rng(seed=42)
@@ -230,7 +248,9 @@ print("Sample 1:", sample.round(4))
 # Re-seed to confirm reproducibility:
 rng = np.random.default_rng(seed=42)
 print("Sample 2:", rng.standard_normal(5).round(4))
-`}
+`,
+    },
+  ]}
 />
 
 The two prints will always agree, on any machine, today and a

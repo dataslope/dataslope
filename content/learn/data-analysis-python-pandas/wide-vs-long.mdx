@@ -59,7 +59,10 @@ reverse.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 wide = pd.DataFrame(
     {
@@ -81,14 +84,19 @@ long = wide.melt(
 )
 print("Long:")
 print(long)
-`}
+`,
+    },
+  ]}
 />
 
 ## Pivot — long to wide
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 long = pd.DataFrame(
     {
@@ -100,7 +108,9 @@ long = pd.DataFrame(
 
 wide = long.pivot(index="person", columns="year", values="happiness")
 print(wide)
-`}
+`,
+    },
+  ]}
 />
 
 `pivot` requires the (index, columns) combinations to be
@@ -141,7 +151,10 @@ A common rhythm:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 sales = pd.DataFrame(
     {
@@ -162,7 +175,9 @@ parsed = long["month"].str.split("_", expand=True)
 long["month_name"] = parsed[0]
 long["year"] = parsed[1].astype(int)
 print(long)
-`}
+`,
+    },
+  ]}
 />
 
 This is the typical post-melt cleanup: get the variable out of
@@ -180,23 +195,28 @@ the column name, then enrich it (parse, sort, type-cast).
 - \`temp\` (numeric)
 
 It should have 9 rows (3 cities × 3 months).`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 
 temps = pd.DataFrame({
     "city": ["Tokyo","Karachi","Beijing"],
     "jan":  [5, 18, -3],
     "feb":  [6, 21, 0],
     "mar":  [10, 26, 7],
-})`}
-  starterCode={`long = None  # TODO
+})`,
+      starterCode: `long = None  # TODO
 
 print(long)
-`}
-  solutionCode={`import pandas as pd
+`,
+      solutionCode: `import pandas as pd
 
 long = temps.melt(id_vars="city", var_name="month", value_name="temp")
 print(long)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type",

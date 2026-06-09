@@ -143,11 +143,16 @@ Try it yourself. You should see exactly that output:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`let a = 2;
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `let a = 2;
 let b = 3;
 let sum = a + b;
 console.log("sum is", sum);
-`}
+`,
+    },
+  ]}
 />
 
 This kind of step-by-step trace is the single most useful skill you
@@ -224,7 +229,10 @@ honestly is worth more than any amount of passive reading.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`let x = 10;
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `let x = 10;
 let y = x; // y is set to the *current* value of x, which is 10.
 x = 99; // We change x. Does y change too?
 
@@ -236,7 +244,9 @@ count = count + 1;
 count = count + 1;
 count = count + 1;
 console.log("count =", count);
-`}
+`,
+    },
+  ]}
 />
 
 If `y` printed `99` and you were surprised, *that surprise is

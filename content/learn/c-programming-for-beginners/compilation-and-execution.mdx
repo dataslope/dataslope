@@ -40,7 +40,10 @@ It also strips comments.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 #define GREETING "Hello"
 #define TIMES 3
@@ -51,7 +54,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Before the compiler sees this code, the preprocessor expands it to
@@ -156,7 +161,7 @@ and click *Run* — both files are compiled and linked together.
   files={[
     {
       filename: "main.c",
-      initialContent: `#include "greetings.h"
+      starterCode: `#include "greetings.h"
 #include <stdio.h>
 
 int main(void) {
@@ -168,7 +173,7 @@ int main(void) {
     },
     {
       filename: "greetings.h",
-      initialContent: `#ifndef GREETINGS_H
+      starterCode: `#ifndef GREETINGS_H
 #define GREETINGS_H
 
 void say_hello(const char *name);
@@ -178,7 +183,7 @@ void say_hello(const char *name);
     },
     {
       filename: "greetings.c",
-      initialContent: `#include "greetings.h"
+      starterCode: `#include "greetings.h"
 #include <stdio.h>
 
 void say_hello(const char *name) { printf("Hello, %s!\\n", name); }
@@ -230,7 +235,7 @@ flowchart LR
   files={[
     {
       filename: "main.c",
-      initialContent: `#include "farewell.h"
+      starterCode: `#include "farewell.h"
 
 int main(void) {
   say_goodbye("Bell Labs");
@@ -240,14 +245,14 @@ int main(void) {
     },
     {
       filename: "farewell.h",
-      initialContent: `#ifndef FAREWELL_H
+      starterCode: `#ifndef FAREWELL_H
 #define FAREWELL_H
 
 // declare say_goodbye here
 
 #endif
 `,
-      solutionContent: `#ifndef FAREWELL_H
+      solutionCode: `#ifndef FAREWELL_H
 #define FAREWELL_H
 
 void say_goodbye(const char *name);
@@ -257,12 +262,12 @@ void say_goodbye(const char *name);
     },
     {
       filename: "farewell.c",
-      initialContent: `#include "farewell.h"
+      starterCode: `#include "farewell.h"
 #include <stdio.h>
 
 // define say_goodbye here
 `,
-      solutionContent: `#include "farewell.h"
+      solutionCode: `#include "farewell.h"
 #include <stdio.h>
 
 void say_goodbye(const char *name) { printf("Goodbye, %s!\\n", name); }

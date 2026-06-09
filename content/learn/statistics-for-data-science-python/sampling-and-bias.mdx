@@ -106,7 +106,10 @@ are all convenience samples wearing a data-science costume.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.default_rng(42)
 
@@ -131,7 +134,9 @@ print(f"Convenience sample mean:     {convenience_sample.mean():6.2f}   (too hig
 print()
 print("The random sample lands near the truth.")
 print("The convenience sample is systematically too optimistic.")
-`}
+`,
+    },
+  ]}
 />
 
 The random sample misses the truth by a little — that's ordinary sampling
@@ -150,7 +155,10 @@ more confident estimate of the *wrong* number.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.express as px
 
 rng = np.random.default_rng(7)
@@ -190,7 +198,9 @@ fig.show()
 print(f"True mean: {true_mean:.2f}")
 print("Random estimate converges TO the truth as n grows.")
 print("Convenience estimate converges to a WRONG value and stays there.")
-`}
+`,
+    },
+  ]}
 />
 
 Watch the two lines. The random estimate homes in on the dashed truth
@@ -244,7 +254,10 @@ instinct for bias.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.default_rng(0)
 
@@ -282,7 +295,9 @@ for n in [200, 5000]:
 
 print(f"true mean = {true_mean:.2f}")
 print("As n grows: SPREAD shrinks for both, but the convenience BIAS stays.")
-`}
+`,
+    },
+  ]}
 />
 
 Run it and compare the rows. Going from `n=200` to `n=5000` shrinks the
@@ -377,7 +392,10 @@ interviewed. Any time your dataset is "the ones still here," ask what the
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.default_rng(3)
 
@@ -398,7 +416,9 @@ print(
 print()
 print(f"Funds that 'disappeared' from the data: {5000 - len(survivors)}")
 print("The database looks better than reality because the losers are gone.")
-`}
+`,
+    },
+  ]}
 />
 
 The survivors' average is inflated not because the funds got better, but
@@ -442,7 +462,10 @@ To separate *bias* from *noise*, draw **each** method **300 times** at sample si
 - \`"conv_bias"\` — (mean of the 300 convenience-sample means) minus \`true_mean\` (a float)
 
 Use the provided \`rng\` for all draws. Both values must be plain Python floats. The convenience bias should be clearly positive (the method systematically overestimates); the random bias should be near zero.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 rng = np.random.default_rng(2024)
 
 population = rng.normal(70, 12, size=200_000).clip(0, 100)
@@ -450,8 +473,8 @@ true_mean = float(population.mean())
 
 # Convenience scheme: high scorers (>75) are ~10x more likely to be sampled.
 conv_weights = (population > 75).astype(float) + 0.1
-conv_weights /= conv_weights.sum()`}
-  starterCode={`# TODO: draw each method 300 times at n=800, record sample means,
+conv_weights /= conv_weights.sum()`,
+      starterCode: `# TODO: draw each method 300 times at n=800, record sample means,
 # then compute the bias of each method's average estimate.
 n = 800
 reps = 300
@@ -460,8 +483,8 @@ result = {
     "random_bias": None,
     "conv_bias": None,
 }
-`}
-  solutionCode={`n = 800
+`,
+      solutionCode: `n = 800
 reps = 300
 
 random_means = np.array(
@@ -479,7 +502,9 @@ result = {
     "conv_bias": float(conv_means.mean() - true_mean),
 }
 print(result)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "keys",
@@ -530,7 +555,10 @@ Produce:
 - \`abs_error\` — \`abs(strat_estimate - true_mean)\` (a float).
 
 The estimate should land close to \`true_mean\` (within about 30).`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 rng = np.random.default_rng(11)
 
@@ -546,8 +574,8 @@ for name, (size, mu, sd) in specs.items():
     }))
 pop = pd.concat(frames, ignore_index=True)
 true_mean = float(pop["spend"].mean())
-total_n = 600`}
-  starterCode={`# TODO: proportional stratified sampling, pooled estimate, and error.
+total_n = 600`,
+      starterCode: `# TODO: proportional stratified sampling, pooled estimate, and error.
 # Hint: for each region, n_region = round(total_n * region_share);
 # sample that many rows without replacement, collect their spend values.
 sampled_spend = []
@@ -556,8 +584,8 @@ sampled_spend = []
 
 strat_estimate = None
 abs_error = None
-`}
-  solutionCode={`sampled_spend = []
+`,
+      solutionCode: `sampled_spend = []
 N = len(pop)
 for name, grp in pop.groupby("region"):
     share = len(grp) / N
@@ -571,7 +599,9 @@ print(
     f"stratified estimate = {strat_estimate:.2f}, true = {true_mean:.2f}, "
     f"abs error = {abs_error:.2f}"
 )
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "types",

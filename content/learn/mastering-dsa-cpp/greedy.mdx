@@ -20,7 +20,12 @@ A local rule that feels right can still fail.
 
 Counterexample: with coins `{1,3,4}` and amount `6`, greedy takes `4+1+1` (3 coins), but optimal is `3+3` (2 coins).
 
-<CodeBlock adapter="cpp" starterCode={`#include <iostream>
+<CodeBlock
+  adapter="cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 int greedyCoins(std::vector<int> coins, int amount) {
   int count = 0;
@@ -36,7 +41,10 @@ int main() {
   std::cout << "optimal is 2\\n";
   return 0;
 }
-`} />
+`,
+    },
+  ]}
+/>
 
 ## Activity selection
 
@@ -53,7 +61,12 @@ gantt
     E :crit, 8, 9
 ```
 
-<CodeBlock adapter="cpp" starterCode={`#include <algorithm>
+<CodeBlock
+  adapter="cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
 #include <iostream>
 #include <utility>
 #include <vector>
@@ -73,7 +86,10 @@ int main() {
             << "\\n";
   return 0;
 }
-`} />
+`,
+    },
+  ]}
+/>
 
 Exchange proof intuition: if an optimal schedule starts with a later-ending activity, swap in the earliest-ending compatible activity. It leaves at least as much room for the rest.
 
@@ -88,7 +104,12 @@ flowchart TD
 
 Sort by value/weight ratio and take the densest remaining item, possibly fractionally.
 
-<CodeBlock adapter="cpp" starterCode={`#include <algorithm>
+<CodeBlock
+  adapter="cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
 #include <iomanip>
 #include <iostream>
 #include <vector>
@@ -114,13 +135,21 @@ int main() {
             << fractionalKnapsack(50, {{10, 60}, {20, 100}, {30, 120}}) << "\\n";
   return 0;
 }
-`} />
+`,
+    },
+  ]}
+/>
 
 ## Jump game
 
 Track the farthest reachable index.
 
-<CodeBlock adapter="cpp" starterCode={`#include <algorithm>
+<CodeBlock
+  adapter="cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
 #include <iostream>
 #include <vector>
 bool canJump(const std::vector<int> &nums) {
@@ -137,7 +166,10 @@ int main() {
             << canJump({3, 2, 1, 0, 4}) << "\\n";
   return 0;
 }
-`} />
+`,
+    },
+  ]}
+/>
 
 ## Huffman coding
 
@@ -151,7 +183,12 @@ graph TD
     N --> C[42]
 ```
 
-<CodeBlock adapter="cpp" starterCode={`#include <functional>
+<CodeBlock
+  adapter="cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <functional>
 #include <iostream>
 #include <queue>
 #include <vector>
@@ -173,13 +210,21 @@ int main() {
   std::cout << huffmanCost({5, 9, 12, 13, 16, 45}) << "\\n";
   return 0;
 }
-`} />
+`,
+    },
+  ]}
+/>
 
 ## Minimum platforms
 
 Sort arrivals and departures; sweep with two pointers.
 
-<CodeBlock adapter="cpp" starterCode={`#include <algorithm>
+<CodeBlock
+  adapter="cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
 #include <iostream>
 #include <vector>
 int minPlatforms(std::vector<int> a, std::vector<int> d) {
@@ -204,9 +249,17 @@ int main() {
             << "\\n";
   return 0;
 }
-`} />
+`,
+    },
+  ]}
+/>
 
-<CodeBlock adapter="cpp" starterCode={`#include <iostream>
+<CodeBlock
+  adapter="cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 int canonicalCoins(int amount) {
   int ans = 0;
@@ -221,9 +274,19 @@ int main() {
     std::cout << canonicalCoins(x) << "\\n";
   return 0;
 }
-`} />
+`,
+    },
+  ]}
+/>
 
-<ChallengeCard adapter="cpp" title="Activity selection" instructions={`Implement \`int maxActivities(std::vector<std::pair<int,int>> intervals)\` where pair is (start,end).`} starterCode={`#include <algorithm>
+<ChallengeCard
+  adapter="cpp"
+  title="Activity selection"
+  instructions={`Implement \`int maxActivities(std::vector<std::pair<int,int>> intervals)\` where pair is (start,end).`}
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
 #include <iostream>
 #include <utility>
 #include <vector>
@@ -233,7 +296,8 @@ int main() {
             << "\\n";
   return 0;
 }
-`} solutionCode={`#include <algorithm>
+`,
+      solutionCode: `#include <algorithm>
 #include <iostream>
 #include <utility>
 #include <vector>
@@ -253,9 +317,20 @@ int main() {
             << "\\n";
   return 0;
 }
-`} tests={[{ id: "activities", name: "Counts activities", expect: { stdoutEquals: "3" } }]} />
+`,
+    },
+  ]}
+  tests={[{ id: "activities", name: "Counts activities", expect: { stdoutEquals: "3" } }]}
+/>
 
-<ChallengeCard adapter="cpp" title="Jump game — can reach end" instructions={`Implement \`bool canJump(const std::vector<int>& nums)\`.`} starterCode={`#include <iostream>
+<ChallengeCard
+  adapter="cpp"
+  title="Jump game — can reach end"
+  instructions={`Implement \`bool canJump(const std::vector<int>& nums)\`.`}
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 bool canJump(const std::vector<int> &nums) { return false; }
 int main() {
@@ -264,7 +339,8 @@ int main() {
             << canJump({0}) << "\\n";
   return 0;
 }
-`} solutionCode={`#include <algorithm>
+`,
+      solutionCode: `#include <algorithm>
 #include <iostream>
 #include <vector>
 bool canJump(const std::vector<int> &nums) {
@@ -282,9 +358,20 @@ int main() {
             << canJump({0}) << "\\n";
   return 0;
 }
-`} tests={[{ id: "jump", name: "Reachability", expect: { stdoutLines: ["true", "false", "true"], stdoutLinesExact: true } }]} />
+`,
+    },
+  ]}
+  tests={[{ id: "jump", name: "Reachability", expect: { stdoutLines: ["true", "false", "true"], stdoutLinesExact: true } }]}
+/>
 
-<ChallengeCard adapter="cpp" title="Minimum coins (when denominations are canonical)" instructions={`Use greedy with coins {1,5,10,25}. Greedy only works for canonical coin systems.`} starterCode={`#include <iostream>
+<ChallengeCard
+  adapter="cpp"
+  title="Minimum coins (when denominations are canonical)"
+  instructions={`Use greedy with coins {1,5,10,25}. Greedy only works for canonical coin systems.`}
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 int minCoinsCanonical(int amount) { return 0; }
 int main() {
@@ -292,7 +379,8 @@ int main() {
     std::cout << minCoinsCanonical(x) << "\\n";
   return 0;
 }
-`} solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <vector>
 int minCoinsCanonical(int amount) {
   int ans = 0;
@@ -307,7 +395,11 @@ int main() {
     std::cout << minCoinsCanonical(x) << "\\n";
   return 0;
 }
-`} tests={[{ id: "coins", name: "Canonical coin counts", expect: { stdoutLines: ["2", "4", "9"], stdoutLinesExact: true } }]} />
+`,
+    },
+  ]}
+  tests={[{ id: "coins", name: "Canonical coin counts", expect: { stdoutLines: ["2", "4", "9"], stdoutLinesExact: true } }]}
+/>
 
 <MultipleChoice markdown={`What is greedy's core idea?
 

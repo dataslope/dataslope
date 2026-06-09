@@ -37,7 +37,10 @@ Here is a tiny version where the sub-problems are obvious:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// Sub-problem 1: compute the tip from the bill and the tip rate.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// Sub-problem 1: compute the tip from the bill and the tip rate.
 function computeTip(billTotal, tipRate) {
   return billTotal * tipRate;
 }
@@ -64,7 +67,9 @@ const perPerson = splitEvenly(total, people);
 console.log("Tip:", round2(tip));
 console.log("Total:", round2(total));
 console.log("Each person pays:", round2(perPerson));
-`}
+`,
+    },
+  ]}
 />
 
 The big problem ("split the bill") got cut into three small
@@ -94,7 +99,10 @@ Here is one of the most fundamental patterns in all of programming
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// Pattern: start with a "blank" result, walk the list, update the result.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// Pattern: start with a "blank" result, walk the list, update the result.
 const numbers = [10, 22, 3, 47, 9];
 
 // Sum:
@@ -117,7 +125,9 @@ for (const n of numbers) {
   if (n > 10) count = count + 1;
 }
 console.log("Count > 10:", count);
-`}
+`,
+    },
+  ]}
 />
 
 Notice that the *shape* of all three solutions is identical:
@@ -172,7 +182,10 @@ We can abstract *further* by giving the steps themselves names:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function totalWithTip(bill, tipRate) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function totalWithTip(bill, tipRate) {
   return bill + bill * tipRate;
 }
 
@@ -189,7 +202,9 @@ const total = totalWithTip(bill, tipRate);
 const share = perPerson(total, people);
 
 console.log("Each person pays:", share.toFixed(2));
-`}
+`,
+    },
+  ]}
 />
 
 Notice how the bottom block reads almost like English: *total with
@@ -226,7 +241,10 @@ Now we translate the recipe into code:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function isPrime(n) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function isPrime(n) {
   if (n < 2) return false; // Step 1.
   for (let i = 2; i < n; i++) {
     // Step 2.
@@ -240,7 +258,9 @@ console.log("3 prime?", isPrime(3));
 console.log("9 prime?", isPrime(9));
 console.log("17 prime?", isPrime(17));
 console.log("25 prime?", isPrime(25));
-`}
+`,
+    },
+  ]}
 />
 
 Notice how the algorithm came *first*, in English. The translation
@@ -275,7 +295,10 @@ instances of the "accumulator over a list" pattern. Count is too.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function average(numbers) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function average(numbers) {
   let total = 0;
   for (const n of numbers) total += n;
   return total / numbers.length;
@@ -308,7 +331,9 @@ function reportGrades(grades) {
 }
 
 reportGrades([82, 47, 91, 58, 73, 65, 99, 30, 88, 60]);
-`}
+`,
+    },
+  ]}
 />
 
 Notice how the *top-level* function, `reportGrades`, reads like a
@@ -334,7 +359,10 @@ For example:
 - \`countWords("   spaced   out   ")\` should return \`2\`.
 
 Hint: \`"a b  c".split(/\\s+/)\` splits on one-or-more whitespace characters. You may need to filter out empty strings.`}
-  starterCode={`function countWords(text) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function countWords(text) {
   // your code here
   return 0;
 }
@@ -342,15 +370,17 @@ Hint: \`"a b  c".split(/\\s+/)\` splits on one-or-more whitespace characters. Yo
 console.log(countWords("hello world"));
 console.log(countWords(""));
 console.log(countWords("   spaced   out   "));
-`}
-  solutionCode={`function countWords(text) {
+`,
+      solutionCode: `function countWords(text) {
   return text.split(/\\s+/).filter((w) => w.length > 0).length;
 }
 
 console.log(countWords("hello world"));
 console.log(countWords(""));
 console.log(countWords("   spaced   out   "));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",

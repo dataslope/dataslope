@@ -18,7 +18,10 @@ You can build one with `data.frame()`:
 
 <CodeBlock
   adapter="r"
-  starterCode={`employees <- data.frame(
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `employees <- data.frame(
   name   = c("Ada", "Ben", "Cleo", "Drew"),
   dept   = c("Eng", "Sales", "Eng", "HR"),
   salary = c(95000, 72000, 110000, 65000),
@@ -26,7 +29,9 @@ You can build one with `data.frame()`:
 )
 
 print(employees)
-`}
+`,
+    },
+  ]}
 />
 
 When you `print` a data frame in WebR, you get a real rendered
@@ -53,7 +58,10 @@ these at the start of *every* real analysis:
 
 <CodeBlock
   adapter="r"
-  starterCode={`# A built-in data frame
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# A built-in data frame
 data(mtcars)
 
 dim(mtcars) # rows, columns
@@ -64,7 +72,9 @@ head(mtcars) # first 6 rows
 tail(mtcars, 3) # last 3 rows
 str(mtcars) # compact summary of structure
 summary(mtcars) # column-by-column statistics
-`}
+`,
+    },
+  ]}
 />
 
 Of these, `str()` and `summary()` are the two you will use the
@@ -78,7 +88,10 @@ or with `[["..."]]`:
 
 <CodeBlock
   adapter="r"
-  starterCode={`employees <- data.frame(
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `employees <- data.frame(
   name   = c("Ada", "Ben", "Cleo", "Drew"),
   salary = c(95000, 72000, 110000, 65000)
 )
@@ -86,7 +99,9 @@ or with `[["..."]]`:
 employees$salary # by name with $
 employees[["salary"]] # by name with [[
 mean(employees$salary) # use it like any vector
-`}
+`,
+    },
+  ]}
 />
 
 Once you've grabbed a column, you're back in vector land — every
@@ -100,13 +115,18 @@ to mean "all":
 
 <CodeBlock
   adapter="r"
-  starterCode={`data(mtcars)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `data(mtcars)
 
 mtcars[1, ] # first row, all columns
 mtcars[, 1] # all rows, first column (returns a vector)
 mtcars[1:5, c("mpg", "hp")] # rows 1-5, just mpg and hp
 mtcars[mtcars$mpg > 25, ] # rows where mpg > 25, all columns
-`}
+`,
+    },
+  ]}
 />
 
 That last line is the classic data-frame *filter*: use a logical
@@ -118,7 +138,10 @@ Adding a new column is just like assigning to a name with `$`:
 
 <CodeBlock
   adapter="r"
-  starterCode={`employees <- data.frame(
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `employees <- data.frame(
   name   = c("Ada", "Ben", "Cleo", "Drew"),
   salary = c(95000, 72000, 110000, 65000)
 )
@@ -130,7 +153,9 @@ employees$bonus <- employees$salary * 0.10
 employees$active <- TRUE
 
 print(employees)
-`}
+`,
+    },
+  ]}
 />
 
 Vectorized arithmetic works exactly as you'd hope —
@@ -144,7 +169,10 @@ freely. A few favorites we'll use throughout the course:
 
 <CodeBlock
   adapter="r"
-  starterCode={`# mtcars: 32 cars (1974 Motor Trend magazine), 11 variables
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# mtcars: 32 cars (1974 Motor Trend magazine), 11 variables
 head(mtcars)
 
 # iris: 150 flowers, 4 measurements, 3 species
@@ -152,7 +180,9 @@ head(iris)
 
 # airquality: New York air quality measurements
 head(airquality)
-`}
+`,
+    },
+  ]}
 />
 
 Real datasets, even classics like these, have quirks: missing
@@ -216,13 +246,16 @@ Build a data frame `students` with columns `name` (character),
 - "Cleo", grade 10, score 85
 
 Then assign \`avg_score\` to the mean of the \`score\` column.`}
-  starterCode={`students <- NULL # build a data.frame with name, grade, score
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `students <- NULL # build a data.frame with name, grade, score
 avg_score <- NULL # mean of students$score
 
 print(students)
 cat("Average:", avg_score, "\\n")
-`}
-  solutionCode={`students <- data.frame(
+`,
+      solutionCode: `students <- data.frame(
   name  = c("Ada", "Ben", "Cleo"),
   grade = c(10, 11, 10),
   score = c(92, 78, 85)
@@ -230,7 +263,9 @@ cat("Average:", avg_score, "\\n")
 avg_score <- mean(students$score)
 print(students)
 cat("Average:", avg_score, "\\n")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_df",

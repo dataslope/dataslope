@@ -22,7 +22,10 @@ non-zero value** as true.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int age = 20;
@@ -32,7 +35,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Change `age` to `15` and rerun. The line should disappear from the
@@ -44,7 +49,10 @@ To do *one or the other*:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int age = 15;
@@ -56,7 +64,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## `else if` chains
@@ -65,7 +75,10 @@ For more than two branches, chain them:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int score = 78;
@@ -83,7 +96,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The branches are checked **top to bottom**. The first one whose
@@ -126,7 +141,10 @@ Combine conditions with logical operators:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int age = 25;
@@ -139,7 +157,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 `&&` and `||` are **short-circuiting**: if the result is already
@@ -174,7 +194,10 @@ You can put `if` inside `if`:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int x = 7;
@@ -192,7 +215,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Deep nesting is hard to read. When it grows past two levels, it's
@@ -232,7 +257,10 @@ sometimes clearer than a long `if/else if` chain.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int day = 3;
@@ -263,7 +291,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Three things to remember:
@@ -312,15 +342,18 @@ Test cases the grader uses internally (you don't need to handle multiple inputs 
 - 1900 → not leap (divisible by 100 but not 400)
 - 2024 → leap (divisible by 4, not 100)
 - 2023 → not leap`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int year = 2000;
   // print "leap" or "not leap"
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 int main(void) {
   int year = 2000;
@@ -328,7 +361,9 @@ int main(void) {
   printf("%s\\n", is_leap ? "leap" : "not leap");
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "leap",

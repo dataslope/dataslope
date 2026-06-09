@@ -23,11 +23,16 @@ nothing to show. In ggplot2 the data is almost always a *data frame*
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 # 'mpg' ships with ggplot2. Look at its structure.
 str(mpg)
 head(mpg)
-`}
+`,
+    },
+  ]}
 />
 
 ## 2. Aesthetic mappings
@@ -80,7 +85,10 @@ to point to where each component lives.
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(x = displ, y = hwy, color = drv)) + # data + mappings
   geom_point() + # geometry
@@ -89,7 +97,9 @@ ggplot(mpg, aes(x = displ, y = hwy, color = drv)) + # data + mappings
   coord_cartesian(xlim = c(1, 7)) + # coordinates
   facet_wrap(~drv) + # facets
   theme_minimal() # theme
-`}
+`,
+    },
+  ]}
 />
 
 | Line | Component |

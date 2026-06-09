@@ -55,7 +55,10 @@ miniature version of what that felt like.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   // Imagine these as "global" data — every procedure can read and write them.
   static String customerName;
   static double customerBalance;
@@ -86,7 +89,9 @@ miniature version of what that felt like.
     System.out.println(customerName + " balance: " + customerBalance);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Now imagine a real bank, with *thousands* of customers, dozens of

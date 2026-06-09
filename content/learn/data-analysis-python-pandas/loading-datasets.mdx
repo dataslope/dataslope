@@ -30,7 +30,10 @@ are fetched over HTTPS in the background and parsed.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 # Direct URL — works because raw.githubusercontent.com supports CORS
 df = pd.read_csv(
@@ -40,7 +43,9 @@ df = pd.read_csv(
 print("Shape:", df.shape)
 print("First 3 rows:")
 df.head(3)
-`}
+`,
+    },
+  ]}
 />
 
 Two notes:
@@ -75,7 +80,10 @@ Let us try a real example with several of these.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.read_csv(
     "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv",
@@ -86,7 +94,9 @@ df = pd.read_csv(
 print(df.dtypes)
 print()
 print(df.head())
-`}
+`,
+    },
+  ]}
 />
 
 Two things to notice:
@@ -102,7 +112,10 @@ Whenever you load a new dataset, run these three commands
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.read_csv(
     "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
@@ -118,7 +131,9 @@ print()
 
 # 3. Dtypes — are the types right?
 print(df.dtypes)
-`}
+`,
+    },
+  ]}
 />
 
 If any of those three looks wrong — surprising row count,
@@ -134,7 +149,10 @@ CORS proxy you can route through:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 # Going through the proxy. The original URL is URL-encoded into ?url=...
 url = "https://dataslope-cors-proxy.subwaymatch.workers.dev/?url=https%3A%2F%2Fgithub.com%2Fbdi475%2Fdatasets%2Fraw%2Frefs%2Fheads%2Fmain%2FHR-dataset-v14.csv"
@@ -142,7 +160,9 @@ url = "https://dataslope-cors-proxy.subwaymatch.workers.dev/?url=https%3A%2F%2Fg
 df = pd.read_csv(url)
 print("Shape:", df.shape)
 df.head()
-`}
+`,
+    },
+  ]}
 />
 
 When you have a choice, **prefer the direct `raw.githubuser
@@ -176,7 +196,10 @@ Pandas can flatten simple cases:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import io
 
 json_text = """
@@ -190,7 +213,9 @@ json_text = """
 df = pd.read_json(io.StringIO(json_text))
 print(df)
 print(df.dtypes)
-`}
+`,
+    },
+  ]}
 />
 
 For deeply nested JSON, use `pd.json_normalize(...)` — it
@@ -257,15 +282,18 @@ But:
 - Convert \`Department\` and \`Attrition\` to the \`category\` dtype as you load.
 
 Store the result in a DataFrame called \`df\`.`}
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
 
 df = None  # TODO
 
 print(df.head() if df is not None else "df is still None")
-`}
-  solutionCode={`import pandas as pd
+`,
+      solutionCode: `import pandas as pd
 
 URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
 
@@ -276,7 +304,9 @@ df = pd.read_csv(
 )
 
 print(df.head())
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_dataframe",

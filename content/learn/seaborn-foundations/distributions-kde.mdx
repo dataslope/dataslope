@@ -45,13 +45,18 @@ KDE tells you about *relative* concentration, not raw counts.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 sns.displot(data=penguins, x="flipper_length_mm", kind="kde", height=4, aspect=1.3)
-`}
+`,
+    },
+  ]}
 />
 
 The two humps are the headline: flipper length is **bimodal**, hinting at
@@ -62,7 +67,10 @@ It's often most useful laid over a histogram, so you get the honest bars
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
@@ -71,7 +79,9 @@ penguins = sns.load_dataset("penguins")
 sns.displot(
     data=penguins, x="flipper_length_mm", kde=True, bins=20, height=4, aspect=1.3
 )
-`}
+`,
+    },
+  ]}
 />
 
 ## Bandwidth: the KDE's "bin width"
@@ -87,7 +97,10 @@ The histogram's most important knob is bin width. The KDE's equivalent is
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
@@ -101,7 +114,9 @@ sns.displot(
     height=4,
     aspect=1.3,
 )
-`}
+`,
+    },
+  ]}
 />
 
 Edit `bw_adjust` to `1.0` and then `2.0`. At `0.3` the curve is jittery; at
@@ -133,7 +148,10 @@ overlap more legibly than stacked bars. Map a categorical column to `hue`:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
@@ -147,7 +165,9 @@ sns.displot(
     height=4,
     aspect=1.4,
 )
-`}
+`,
+    },
+  ]}
 />
 
 Now the "two humps" mystery resolves: each species has its own curve, and
@@ -163,7 +183,10 @@ data cloud. It's a clean way to show density when a scatter would overplot:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
@@ -177,7 +200,9 @@ sns.displot(
     height=4.5,
     aspect=1.2,
 )
-`}
+`,
+    },
+  ]}
 />
 
 ## Where KDEs mislead
@@ -195,14 +220,19 @@ A KDE's smoothness is its gift and its trap. Three distortions to watch:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 # total_bill is strictly positive, yet the KDE's left tail leaks below 0.
 sns.displot(data=tips, x="total_bill", kind="kde", height=4, aspect=1.3)
-`}
+`,
+    },
+  ]}
 />
 
 Look at the left tail: it drifts past 0, even though no bill is negative.
@@ -243,15 +273,18 @@ distribution of \`body_mass_g\` across the three species:
 - \`fill=True\`.
 
 Assign the result to \`g\`.`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 # Build the grouped KDE and assign it to g:
 g = None
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
@@ -265,7 +298,9 @@ g = sns.displot(
     height=4,
     aspect=1.4,
 )
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_grid",

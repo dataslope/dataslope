@@ -39,7 +39,10 @@ ever since.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -50,7 +53,9 @@ df = pd.DataFrame(
 
 # Group by dept, take the mean of salary
 print(df.groupby("dept")["salary"].mean())
-`}
+`,
+    },
+  ]}
 />
 
 Read it as: *"From df, group by dept, pull out salary, take the
@@ -60,20 +65,28 @@ mean of each group."*
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 df = pd.DataFrame({
     "dept":   ["Eng","Sales","Eng","Ops","Eng","Sales","Ops"],
     "salary": [120, 95, 140, 80, 128, 110, 92],
-})`}
-  starterCode={`print(df.groupby("dept")["salary"].agg(["mean", "median", "min", "max", "count"]))
-`}
+})`,
+      starterCode: `print(df.groupby("dept")["salary"].agg(["mean", "median", "min", "max", "count"]))
+`,
+    },
+  ]}
 />
 
 Or apply different aggregations to different columns:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -90,7 +103,9 @@ result = df.groupby("dept").agg(
     }
 )
 print(result)
-`}
+`,
+    },
+  ]}
 />
 
 ## Named aggregations — much cleaner
@@ -100,7 +115,10 @@ columns. This is the modern recommended style.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -122,7 +140,9 @@ result = (
 )
 
 print(result)
-`}
+`,
+    },
+  ]}
 />
 
 This pattern — `result_name=(column, function)` — produces flat
@@ -134,7 +154,10 @@ Pass a list of column names:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -145,7 +168,9 @@ df = pd.DataFrame(
 )
 
 print(df.groupby(["dept", "level"])["salary"].mean())
-`}
+`,
+    },
+  ]}
 />
 
 The result has a *MultiIndex*. To flatten back to a regular
@@ -153,15 +178,20 @@ DataFrame, call `.reset_index()`:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 df = pd.DataFrame({
     "dept":   ["Eng","Eng","Sales","Sales","Eng","Sales"],
     "level":  ["jr","sr","jr","sr","jr","jr"],
     "salary": [110, 160, 80, 120, 95, 75],
-})`}
-  starterCode={`flat = df.groupby(["dept", "level"])["salary"].mean().reset_index()
+})`,
+      starterCode: `flat = df.groupby(["dept", "level"])["salary"].mean().reset_index()
 print(flat)
-`}
+`,
+    },
+  ]}
 />
 
 ## `transform` — broadcast a group statistic back to rows
@@ -171,7 +201,10 @@ add a column to the *original* rows containing a group statistic.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -183,7 +216,9 @@ df = pd.DataFrame(
 df["dept_avg"] = df.groupby("dept")["salary"].transform("mean")
 df["vs_dept_avg"] = (df["salary"] - df["dept_avg"]).round(1)
 print(df)
-`}
+`,
+    },
+  ]}
 />
 
 Each row now knows the average of its department, and how far it
@@ -197,7 +232,10 @@ satisfy a condition.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -209,7 +247,9 @@ df = pd.DataFrame(
 # Keep only departments with average salary > 100
 big = df.groupby("dept").filter(lambda g: g["salary"].mean() > 100)
 print(big)
-`}
+`,
+    },
+  ]}
 />
 
 Note: `filter` here takes a function that receives the whole
@@ -223,7 +263,10 @@ the named aggregations, but flexible.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -238,7 +281,9 @@ def top_two(g):
 
 
 print(df.groupby("dept").apply(top_two, include_groups=False))
-`}
+`,
+    },
+  ]}
 />
 
 Reach for `apply` only when neither `agg` nor `transform` will
@@ -251,7 +296,10 @@ rate by department.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.read_csv(
     "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
@@ -273,7 +321,9 @@ summary = (
 
 summary["attrition_pct"] = (summary["attrition_pct"] * 100).round(1)
 print(summary)
-`}
+`,
+    },
+  ]}
 />
 
 This single chained call answers four business questions at
@@ -296,7 +346,10 @@ Build a DataFrame called \`summary\` indexed by \`Department\` with **exactly** 
 3. \`attrition_pct\` — percentage of employees with \`Attrition == "Yes"\`, rounded to 1 decimal place
 
 Sort the result by \`attrition_pct\` descending.`}
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
 df = pd.read_csv(URL)
@@ -304,8 +357,8 @@ df = pd.read_csv(URL)
 summary = None  # TODO
 
 print(summary)
-`}
-  solutionCode={`import pandas as pd
+`,
+      solutionCode: `import pandas as pd
 
 URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
 df = pd.read_csv(URL)
@@ -327,7 +380,9 @@ summary = (
 )
 
 print(summary)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_df",

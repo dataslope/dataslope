@@ -49,7 +49,10 @@ dependence, this would be a shapeless cloud. Watch what actually happens.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 
 # Monthly international airline passengers (thousands), 1949-1960.
@@ -68,8 +71,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`import matplotlib.pyplot as plt
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `import matplotlib.pyplot as plt
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
 
@@ -91,7 +94,9 @@ plt.show()
 
 print("Left: a tight upward band — each month is close to the one before it.")
 print("Right: a formless cloud — shuffling deleted the relationship entirely.")
-`}
+`,
+    },
+  ]}
 />
 
 The left panel is a tight diagonal band: this month is almost always close
@@ -191,7 +196,10 @@ compute anything.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -208,8 +216,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`import matplotlib.pyplot as plt
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `import matplotlib.pyplot as plt
 
 fig, ax = plt.subplots(figsize=(10, 4))
 air.plot(ax=ax)
@@ -223,7 +231,9 @@ print("Look for three things with your eyes:")
 print(" 1) TREND     - the whole series drifts upward year over year.")
 print(" 2) SEASONALITY - a repeating within-year hump (summer peak, winter dip).")
 print(" 3) GROWING VARIANCE - the summer-to-winter swing gets WIDER over time.")
-`}
+`,
+    },
+  ]}
 />
 
 You can read all three structures straight off the chart: a rising trend,
@@ -274,7 +284,10 @@ the order matters by destroying it and watching predictability evaporate.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -291,8 +304,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`# A laughably simple forecaster: "next month = this month" (a naive forecast).
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `# A laughably simple forecaster: "next month = this month" (a naive forecast).
 # How good is it when order is intact vs destroyed?
 
 
@@ -311,7 +324,9 @@ print(f"Naive forecast error (shuffled):          {shuffled_mae:6.1f}")
 print()
 print("With order intact, 'tomorrow = today' is a decent forecast.")
 print("Shuffled, the same rule is useless — because there's no 'last month' anymore.")
-`}
+`,
+    },
+  ]}
 />
 
 With the time order intact, the dead-simple rule "next month equals this
@@ -381,7 +396,10 @@ adding value. Let's compute both baselines so the idea is concrete.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -398,8 +416,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`y = air.values.astype(float)
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `y = air.values.astype(float)
 
 # Naive: predict y[t] using y[t-1].
 naive_pred = y[:-1]
@@ -418,7 +436,9 @@ print()
 print("Seasonal naive wins big here: this series repeats yearly, so")
 print("'same month last year' is a far better guess than 'last month'.")
 print("Any real model must beat the BETTER of these baselines to earn its keep.")
-`}
+`,
+    },
+  ]}
 />
 
 The seasonal-naive baseline crushes the plain naive one, because the
@@ -437,7 +457,10 @@ we'll hold every fancy model to.
 - \`"shuffled"\` — lag-1 autocorrelation of \`air\` after \`air.sample(frac=1.0, random_state=0)\` (a float)
 
 The ordered value should be high (above 0.8); the shuffled value should be small in magnitude (below 0.4). This is the whole thesis of the page, measured.`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -454,8 +477,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`def lag1_autocorr(series):
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `def lag1_autocorr(series):
     # TODO: correlate the series with itself shifted by 1 step.
     return None
 
@@ -465,8 +488,8 @@ result = {
     "shuffled": None,
 }
 print(result)
-`}
-  solutionCode={`def lag1_autocorr(series):
+`,
+      solutionCode: `def lag1_autocorr(series):
     s = series.reset_index(drop=True)
     return float(s.corr(s.shift(1)))
 
@@ -476,7 +499,9 @@ result = {
     "shuffled": lag1_autocorr(air.sample(frac=1.0, random_state=0)),
 }
 print(result)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "keys",
@@ -515,7 +540,10 @@ assert all(isinstance(result[k], float) for k in result)`,
 - \`test\` — a Series of the final 24 observations
 
 The split must be **leakage-free**: every timestamp in \`train\` must come strictly *before* every timestamp in \`test\`. Do **not** shuffle.`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -532,14 +560,14 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`h = 24  # forecast horizon / test length
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `h = 24  # forecast horizon / test length
 train = None
 test = None
 print("train:", None if train is None else train.shape)
 print("test :", None if test is None else test.shape)
-`}
-  solutionCode={`h = 24
+`,
+      solutionCode: `h = 24
 train = air.iloc[:-h]
 test = air.iloc[-h:]
 print(
@@ -553,7 +581,9 @@ print(
 print(
     "test :", test.shape, "->", test.index.min().date(), "to", test.index.max().date()
 )
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "sizes",

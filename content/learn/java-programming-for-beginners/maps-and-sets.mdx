@@ -19,7 +19,10 @@ Once you have these two in your toolbox, a huge fraction of
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.HashSet;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.HashSet;
 import java.util.Set;
 
 public class Main {
@@ -34,7 +37,9 @@ public class Main {
     System.out.println("contains Linus? " + seen.contains("Linus"));
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 A `HashSet`:
@@ -52,7 +57,10 @@ Use a `Set` when you need to ask "have I seen this before?" or
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.HashMap;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.HashMap;
 import java.util.Map;
 
 public class Main {
@@ -78,7 +86,9 @@ public class Main {
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 A `HashMap<K, V>`:
@@ -155,7 +165,7 @@ trivial.
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.List;
+      starterCode: `import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -176,7 +186,7 @@ public class Main {
     },
     {
       filename: "WordCounter.java",
-      initialContent: `import java.util.HashMap;
+      starterCode: `import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -265,7 +275,7 @@ unique=7
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int n = Letters.uniqueLetterCount("Hello, World! 1234");
     System.out.println("unique=" + n);
@@ -275,7 +285,7 @@ unique=7
     },
     {
       filename: "Letters.java",
-      initialContent: `import java.util.HashSet;
+      starterCode: `import java.util.HashSet;
 import java.util.Set;
 
 public class Letters {
@@ -285,7 +295,7 @@ public class Letters {
   }
 }
 `,
-      solutionContent: `import java.util.HashSet;
+      solutionCode: `import java.util.HashSet;
 import java.util.Set;
 
 public class Letters {

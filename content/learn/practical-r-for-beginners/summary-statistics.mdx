@@ -34,11 +34,16 @@ flowchart TB
 
 <CodeBlock
   adapter="r"
-  starterCode={`incomes <- c(32, 38, 42, 45, 48, 51, 55, 58, 62, 250)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `incomes <- c(32, 38, 42, 45, 48, 51, 55, 58, 62, 250)
 
 mean(incomes) # average — pulled up by the 250
 median(incomes) # middle value — robust to outliers
-`}
+`,
+    },
+  ]}
 />
 
 The mean and the median tell different stories. Both are
@@ -61,7 +66,10 @@ both).
 
 <CodeBlock
   adapter="r"
-  starterCode={`a <- c(48, 49, 50, 51, 52) # tight
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `a <- c(48, 49, 50, 51, 52) # tight
 b <- c(10, 30, 50, 70, 90) # spread
 
 mean(a)
@@ -74,7 +82,9 @@ range(a)
 range(b)
 IQR(a)
 IQR(b) # interquartile range: Q3 - Q1
-`}
+`,
+    },
+  ]}
 />
 
 Two distributions with identical means can have wildly different
@@ -98,7 +108,10 @@ most common.
 
 <CodeBlock
   adapter="r"
-  starterCode={`scores <- c(60, 65, 67, 70, 72, 75, 78, 80, 82, 85, 88, 90, 92, 95, 100)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `scores <- c(60, 65, 67, 70, 72, 75, 78, 80, 82, 85, 88, 90, 92, 95, 100)
 
 # Quartiles (default)
 quantile(scores)
@@ -108,7 +121,9 @@ quantile(scores, probs = seq(0, 1, by = 0.1))
 
 # A single quantile
 quantile(scores, probs = 0.9) # 90th percentile
-`}
+`,
+    },
+  ]}
 />
 
 The classic "five-number summary" (min, Q1, median, Q3, max) is
@@ -122,11 +137,16 @@ five-number summary plus the mean, for free:
 
 <CodeBlock
   adapter="r"
-  starterCode={`data(mtcars)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `data(mtcars)
 
 summary(mtcars$mpg)
 summary(mtcars$hp)
-`}
+`,
+    },
+  ]}
 />
 
 On a data frame, it does this column by column. It's the
@@ -138,7 +158,10 @@ Combine `dplyr` with the summary statistics we know:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 data(iris)
 
 iris |>
@@ -151,7 +174,9 @@ iris |>
     iqr_petal    = IQR(Petal.Length),
     .groups      = "drop"
   )
-`}
+`,
+    },
+  ]}
 />
 
 In one table, you can see that *setosa* petals are much shorter
@@ -181,7 +206,10 @@ summary statistics can describe wildly different datasets:
 
 <CodeBlock
   adapter="r"
-  starterCode={`data(anscombe)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `data(anscombe)
 
 # Compute means and sds of all four (x, y) pairs
 sapply(1:4, function(i) {
@@ -192,7 +220,9 @@ sapply(1:4, function(i) {
     sd_y = sd(anscombe[[paste0("y", i)]])
   )
 })
-`}
+`,
+    },
+  ]}
 />
 
 All four datasets have *nearly identical* means and standard
@@ -256,7 +286,10 @@ iqr) — ignoring NAs throughout.
   adapter="r"
   title="Build a describe() helper"
   instructions={`Implement \`describe(x)\` so that it returns a named numeric vector with the listed statistics. NAs should be ignored.`}
-  starterCode={`describe <- function(x) {
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `describe <- function(x) {
   # return a named numeric vector with:
   # n, mean, median, sd, min, max, iqr
   NULL
@@ -264,8 +297,8 @@ iqr) — ignoring NAs throughout.
 
 # Test:
 print(describe(c(1, 2, 3, 4, 5, NA, 100)))
-`}
-  solutionCode={`describe <- function(x) {
+`,
+      solutionCode: `describe <- function(x) {
   c(
     n      = sum(!is.na(x)),
     mean   = mean(x, na.rm = TRUE),
@@ -278,7 +311,9 @@ print(describe(c(1, 2, 3, 4, 5, NA, 100)))
 }
 
 print(describe(c(1, 2, 3, 4, 5, NA, 100)))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "exists",

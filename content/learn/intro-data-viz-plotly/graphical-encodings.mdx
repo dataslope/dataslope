@@ -42,7 +42,10 @@ Here is a four-encoding chart. Notice how each `=` is mapping a
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007")
 
@@ -63,7 +66,9 @@ fig = px.scatter(
     },
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Read the call out loud:
@@ -144,7 +149,10 @@ which column is mapped to which channel.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.iris()
 
@@ -160,7 +168,9 @@ fig = px.scatter(
     labels={"sepal_width": "Sepal width (cm)", "sepal_length": "Sepal length (cm)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 The answer: **x = sepal width**, **y = sepal length**, **color &

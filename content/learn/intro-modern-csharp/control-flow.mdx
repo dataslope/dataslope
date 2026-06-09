@@ -32,7 +32,10 @@ The most fundamental decision-making tool.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 int score = 78;
 
@@ -52,7 +55,9 @@ else
 {
     Console.WriteLine("F");
 }
-`}
+`,
+    },
+  ]}
 />
 
 A few things to notice:
@@ -81,7 +86,10 @@ basic operators:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 int age = 25;
 bool hasLicense = true;
@@ -99,7 +107,9 @@ else
 {
     Console.WriteLine("you're set");
 }
-`}
+`,
+    },
+  ]}
 />
 
 `&&` and `||` are **short-circuit** — they stop as soon as the
@@ -113,7 +123,10 @@ When you have many possible values for one variable, a chain of
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 string day = "Tue";
 
@@ -124,7 +137,9 @@ string kind = day switch {
 };
 
 Console.WriteLine($"{day} is a {kind}");
-`}
+`,
+    },
+  ]}
 />
 
 That's a modern **switch expression** (introduced in C# 8). The
@@ -142,7 +157,10 @@ loop forms; you'll mostly use two (`foreach` and `for`).
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 int n = 1;
 while (n <= 5)
@@ -151,7 +169,9 @@ while (n <= 5)
     n++;
 }
 Console.WriteLine($"after loop, n = {n}");
-`}
+`,
+    },
+  ]}
 />
 
 The condition is checked **before** each iteration. If it's false
@@ -172,7 +192,10 @@ each iteration.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 int n = 10;
 do
@@ -180,7 +203,9 @@ do
     Console.WriteLine($"n = {n}");
     n--;
 } while (n > 7);
-`}
+`,
+    },
+  ]}
 />
 
 You'll use this less often than `while`. Mostly when you want a
@@ -193,13 +218,18 @@ need a counter variable.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 for (int i = 0; i < 5; i++)
 {
     Console.WriteLine($"i = {i}");
 }
-`}
+`,
+    },
+  ]}
 />
 
 A `for` loop has three parts in its header:
@@ -224,7 +254,10 @@ Almost always your best choice when iterating a collection.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 var names = new[] { "Ada", "Bob", "Cara" };
 
@@ -232,7 +265,9 @@ foreach (var name in names)
 {
     Console.WriteLine($"hello, {name}");
 }
-`}
+`,
+    },
+  ]}
 />
 
 `foreach` works on arrays, lists, dictionaries, sets, strings, and
@@ -249,7 +284,10 @@ Two useful escape hatches:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 for (int i = 1; i <= 10; i++)
 {
@@ -259,7 +297,9 @@ for (int i = 1; i <= 10; i++)
         continue; // skip even numbers
     Console.WriteLine(i);
 }
-`}
+`,
+    },
+  ]}
 />
 
 That prints `1, 3, 5` and then stops when `i` reaches `7`.
@@ -272,7 +312,10 @@ multiples of both print "FizzBuzz".
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 for (int i = 1; i <= 15; i++)
 {
@@ -285,7 +328,9 @@ for (int i = 1; i <= 15; i++)
     else
         Console.WriteLine(i);
 }
-`}
+`,
+    },
+  ]}
 />
 
 This brings together loops, `if`/`else if`/`else`, and the modulo
@@ -322,13 +367,16 @@ vowels = 5
 \`\`\`
 
 Hint: \`foreach (char c in text) { ... }\` lets you iterate the characters of a string. \`char.ToLower(c)\` gives you the lowercase version of a character.`}
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 string text = "Hello, World!";
 
 // your code here
-`}
-  solutionCode={`using System;
+`,
+      solutionCode: `using System;
 
 string text = "Hello, World!";
 int count = 0;
@@ -339,7 +387,9 @@ foreach (char c in text)
         count++;
 }
 Console.WriteLine($"vowels = {count}");
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "vowels",

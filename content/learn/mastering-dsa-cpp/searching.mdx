@@ -11,7 +11,10 @@ Linear search checks each element from left to right until it finds the target o
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 int linearSearch(const std::vector<int> &v, int target) {
   for (int i = 0; i < static_cast<int>(v.size()); i++) {
@@ -26,7 +29,9 @@ int main() {
   std::cout << linearSearch(values, 5) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Linear search is often right for tiny arrays, one-time scans, linked lists, or unsorted data that is not worth sorting first.
@@ -47,7 +52,10 @@ Use `low <= high` when both endpoints are inclusive. Compute `mid` as `low + (hi
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 int binarySearch(const std::vector<int> &v, int target) {
   int low = 0;
@@ -69,7 +77,9 @@ int main() {
   std::cout << binarySearch(values, 6) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## STL search helpers
@@ -78,7 +88,10 @@ C++ already includes binary-search algorithms for sorted ranges.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <algorithm>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
 #include <iostream>
 #include <vector>
 int main() {
@@ -91,7 +104,9 @@ int main() {
   std::cout << (upper - v.begin()) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 * `std::binary_search` returns `true` or `false`.
@@ -110,7 +125,10 @@ When duplicates exist, ordinary binary search may return any matching index. To 
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 int firstOccurrence(const std::vector<int> &v, int target) {
   int low = 0, high = static_cast<int>(v.size()) - 1;
@@ -132,14 +150,19 @@ int main() {
   std::cout << firstOccurrence(v, 2) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The insert position is the first index where the target could be placed while keeping the vector sorted. It is exactly what `lower_bound` computes.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <algorithm>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
 #include <iostream>
 #include <vector>
 int insertPosition(const std::vector<int> &v, int target) {
@@ -153,7 +176,9 @@ int main() {
   std::cout << insertPosition(v, 9) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Practice: implement binary search
@@ -162,7 +187,10 @@ int main() {
   adapter="cpp"
   title="Implement binary search"
   instructions={`Implement \`int binarySearch(const std::vector<int>& v, int target)\` for a sorted vector. Return the index if found, or \`-1\` if missing.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 int binarySearch(const std::vector<int> &v, int target) {
   // your code here
@@ -175,8 +203,8 @@ int main() {
   std::cout << binarySearch(v, 8) << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <vector>
 int binarySearch(const std::vector<int> &v, int target) {
   int low = 0;
@@ -200,7 +228,9 @@ int main() {
   std::cout << binarySearch(v, 8) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "binary_lookup", name: "Finds values", expect: { stdoutLines: ["0", "5", "7", "-1"], stdoutLinesExact: true } }]}
 />
 
@@ -210,7 +240,10 @@ int main() {
   adapter="cpp"
   title="Find first occurrence in a sorted array with duplicates"
   instructions={`Implement \`int firstOccurrence(const std::vector<int>& v, int target)\`. Return the first matching index, or \`-1\` if absent.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 int firstOccurrence(const std::vector<int> &v, int target) {
   // your code here
@@ -222,8 +255,8 @@ int main() {
   std::cout << firstOccurrence(v, 7) << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <vector>
 int firstOccurrence(const std::vector<int> &v, int target) {
   int low = 0, high = static_cast<int>(v.size()) - 1, answer = -1;
@@ -246,7 +279,9 @@ int main() {
   std::cout << firstOccurrence(v, 7) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "first_occurrence", name: "Finds first duplicate positions", expect: { stdoutLines: ["1", "5", "-1"], stdoutLinesExact: true } }]}
 />
 

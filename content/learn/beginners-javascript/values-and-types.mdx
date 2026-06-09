@@ -33,13 +33,18 @@ and displays it.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log(42);
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `console.log(42);
 console.log("hello");
 console.log(true);
 console.log(null);
 console.log([1, 2, 3]);
 console.log({ name: "Ada", age: 28 });
-`}
+`,
+    },
+  ]}
 />
 
 Each of these calls hands a value to `console.log`, which prints it
@@ -53,7 +58,10 @@ what type any value has with the `typeof` operator:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log(typeof 42); // "number"
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `console.log(typeof 42); // "number"
 console.log(typeof 3.14); // "number"
 console.log(typeof "hello"); // "string"
 console.log(typeof true); // "boolean"
@@ -62,7 +70,9 @@ console.log(typeof null); // "object" (a famous historical bug — see below)
 console.log(typeof [1, 2, 3]); // "object"
 console.log(typeof { x: 1 }); // "object"
 console.log(typeof function () {}); // "function"
-`}
+`,
+    },
+  ]}
 />
 
 The output tells us JavaScript's main types are:
@@ -127,7 +137,10 @@ point to a new one.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`let greeting = "hello";
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `let greeting = "hello";
 console.log(greeting); // "hello"
 
 greeting = greeting + " world";
@@ -136,7 +149,9 @@ console.log(greeting); // "hello world"
 // We did not "modify" the original string "hello".
 // The expression  greeting + " world"  produced a brand-new string
 // "hello world", and we then made the variable point at it.
-`}
+`,
+    },
+  ]}
 />
 
 This sounds like a pedantic distinction. It will matter enormously
@@ -151,7 +166,10 @@ parts of the language for beginners.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log("5" + 3); // "53"  — number 3 was converted to the string "3", then strings were joined.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `console.log("5" + 3); // "53"  — number 3 was converted to the string "3", then strings were joined.
 console.log("5" - 3); // 2     — string "5" was converted to the number 5, then subtracted.
 console.log(5 + null); // 5     — null became 0.
 console.log(5 + undefined); // NaN — "Not a Number". undefined cannot meaningfully become a number.
@@ -161,7 +179,9 @@ console.log(Boolean(0)); // false  — 0 is "falsy"
 console.log(Boolean("")); // false  — empty string is falsy
 console.log(Boolean(" ")); // true   — non-empty string is truthy
 console.log(Boolean("0")); // true   — the *string* "0" is truthy!
-`}
+`,
+    },
+  ]}
 />
 
 There are two kinds of conversion:
@@ -194,7 +214,10 @@ equality is predictable.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log(5 === 5); // true
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `console.log(5 === 5); // true
 console.log(5 === "5"); // false  (different types — good!)
 console.log("a" === "a"); // true
 console.log(true === 1); // false  (boolean vs number — good!)
@@ -206,7 +229,9 @@ console.log("" == 0); // true
 console.log("0" == 0); // true
 
 // Stick with === and !==.
-`}
+`,
+    },
+  ]}
 />
 
 ## `null` vs `undefined`
@@ -226,7 +251,10 @@ either is fine, as long as you are deliberate.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`let x; // declared but not assigned
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `let x; // declared but not assigned
 console.log(x); // undefined
 console.log(typeof x); // "undefined"
 
@@ -241,7 +269,9 @@ greet(); // logs "Hello, undefined" — no argument given
 const middleName = null; // deliberately: this user has no middle name
 console.log(middleName); // null
 console.log(typeof middleName); // "object"  (historic bug)
-`}
+`,
+    },
+  ]}
 />
 
 ## "Truthy" and "falsy" values
@@ -267,7 +297,10 @@ boolean context.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function describe(value) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function describe(value) {
   if (value) {
     console.log(JSON.stringify(value), "is TRUTHY");
   } else {
@@ -289,7 +322,9 @@ describe(" ");
 describe("0"); // truthy (non-empty string)
 describe([]); // truthy (an object)
 describe({}); // truthy (an object)
-`}
+`,
+    },
+  ]}
 />
 
 This is incredibly useful in practice — `if (name) { ... }` is a
@@ -310,7 +345,7 @@ values, the other uses them.
   files={[
     {
       filename: "index.js",
-      initialContent: `const { square, isEven, describe } = require("./numbers");
+      starterCode: `const { square, isEven, describe } = require("./numbers");
 
 console.log(square(7)); // 49
 console.log(isEven(4)); // true
@@ -323,7 +358,7 @@ console.log(describe(42));
     },
     {
       filename: "numbers.js",
-      initialContent: `// Each function takes a value, returns a value.
+      starterCode: `// Each function takes a value, returns a value.
 // No side effects, no surprises.
 
 function square(n) {

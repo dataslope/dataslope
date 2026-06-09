@@ -31,7 +31,10 @@ Every numeric Series supports these:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 s = pd.Series([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 
@@ -44,7 +47,9 @@ print(f"25th pct:   {s.quantile(0.25)}")
 print(f"75th pct:   {s.quantile(0.75)}")
 print(f"count:      {s.count()}")
 print(f"nunique:    {s.nunique()}")
-`}
+`,
+    },
+  ]}
 />
 
 ## How aggregations handle missing values
@@ -54,7 +59,10 @@ matters more than you think.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 s = pd.Series([10, 20, np.nan, 40, np.nan])
@@ -63,7 +71,9 @@ print(f"mean:           {s.mean()}")  # 23.33 — only the 3 non-null values
 print(f"count:          {s.count()}")  # 3 (NaNs not counted)
 print(f"sum:            {s.sum()}")  # 70
 print(f"mean(skipna=False): {s.mean(skipna=False)}")  # NaN
-`}
+`,
+    },
+  ]}
 />
 
 Compare with what you might naively expect: dividing by 5 (the
@@ -80,12 +90,17 @@ The two most-cited "averages" mean different things.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 salaries = pd.Series([50, 55, 60, 60, 65, 70, 75, 500])  # one outlier
 print(f"mean:   {salaries.mean()}")
 print(f"median: {salaries.median()}")
-`}
+`,
+    },
+  ]}
 />
 
 A single outlier moved the mean from ~63 (where the typical
@@ -107,11 +122,16 @@ Get all the common statistics in one call:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 s = pd.Series([10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
 print(s.describe())
-`}
+`,
+    },
+  ]}
 />
 
 On a DataFrame, `describe` does the same per numeric column.
@@ -124,7 +144,10 @@ back a Series or DataFrame of results.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -135,7 +158,9 @@ df = pd.DataFrame(
 
 # A list of agg names → one row per agg
 print(df.agg(["mean", "median", "std", "min", "max"]).round(1))
-`}
+`,
+    },
+  ]}
 />
 
 You can also pass a dict to apply different aggregations to
@@ -143,19 +168,24 @@ different columns:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 df = pd.DataFrame({
     "salary": [120, 95, 140, 80, 128, 110, 92],
     "tenure": [3, 6, 7, 2, 4, 5, 6],
-})`}
-  starterCode={`result = df.agg(
+})`,
+      starterCode: `result = df.agg(
     {
         "salary": ["mean", "median"],
         "tenure": ["min", "max"],
     }
 )
 print(result)
-`}
+`,
+    },
+  ]}
 />
 
 ## Aggregating filtered subsets
@@ -165,7 +195,10 @@ like *"average salary of engineers."*
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -177,7 +210,9 @@ df = pd.DataFrame(
 
 eng_mean = df.loc[df["dept"] == "Eng", "salary"].mean()
 print("Average engineer salary:", eng_mean.round(1))
-`}
+`,
+    },
+  ]}
 />
 
 This works, but if you find yourself doing it for every
@@ -190,7 +225,10 @@ distinct values *and* their counts.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.read_csv(
     "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
@@ -201,7 +239,9 @@ print(df["Department"].value_counts())
 print()
 print("Same, but as fractions:")
 print(df["Department"].value_counts(normalize=True).round(3))
-`}
+`,
+    },
+  ]}
 />
 
 `normalize=True` converts counts to proportions — the fastest
@@ -213,13 +253,18 @@ Two cheap and useful one-liners:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`print("Distinct job roles:", df["JobRole"].nunique())
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `print("Distinct job roles:", df["JobRole"].nunique())
 print()
 print("Missing values per column:")
 print(df.isna().sum())
-`}
+`,
+    },
+  ]}
 />
 
 ## Check your understanding

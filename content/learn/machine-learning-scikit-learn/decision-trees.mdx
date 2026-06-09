@@ -89,7 +89,10 @@ honest, then read its accuracy on held-out data.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
@@ -104,7 +107,9 @@ tree.fit(X_train, y_train)
 
 print(f"Train accuracy: {tree.score(X_train, y_train):.3f}")
 print(f"Test accuracy:  {tree.score(X_test, y_test):.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 A shallow tree already classifies most wines correctly, and the train and
@@ -130,7 +135,10 @@ picture stays small) and cap the depth at 2 so every box is legible.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import matplotlib.pyplot as plt
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import matplotlib.pyplot as plt
 from sklearn.datasets import load_iris
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
@@ -151,7 +159,9 @@ plot_tree(
     ax=ax,
 )
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 Read each box from the top down. The first line is the **question** (e.g.
@@ -185,7 +195,10 @@ returning that leaf's average.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_diabetes
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
 
@@ -199,7 +212,9 @@ tree.fit(X_train, y_train)
 # than always predicting the mean).
 print(f"Train R^2: {tree.score(X_train, y_train):.3f}")
 print(f"Test R^2:  {tree.score(X_test, y_test):.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 The mechanics are identical to the classifier — `fit`, `score`, `predict` —
@@ -210,7 +225,10 @@ next code block makes that vivid.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.tree import DecisionTreeRegressor
 
@@ -231,7 +249,9 @@ plt.plot(grid, deep.predict(grid), lw=2, label="max_depth=8 (jagged)")
 plt.legend()
 plt.title("A regression tree predicts a staircase of constants")
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 The shallow tree (depth 2) draws a coarse staircase with just a few steps —
@@ -252,7 +272,10 @@ between train and test accuracy as depth grows.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
@@ -270,7 +293,9 @@ for depth in [1, 2, 3, 5, 10, None]:
     te = tree.score(X_test, y_test)
     label = "None" if depth is None else str(depth)
     print(f"{label:>5} | {tr:.3f} | {te:.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 Read down the columns. The **train** score marches steadily toward `1.000`
@@ -315,7 +340,10 @@ structure entirely.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
@@ -332,7 +360,9 @@ for seed in [0, 1, 2]:
     tree.fit(X_train, y_train)
     root_feature = tree.tree_.feature[0]  # index of the root's feature
     print(f"seed {seed}: root splits on '{feature_names[root_feature]}'")
-`}
+`,
+    },
+  ]}
 />
 
 Resampling the training data can move the root split from one feature to
@@ -424,10 +454,13 @@ The hidden tests check the depth-limited tree's configuration, that it
 generalizes reasonably (test accuracy above 0.88), and that the unlimited
 tree reaches a perfect training score — the memorization you should be wary
 of.`}
-  initCode={`from sklearn.datasets import load_breast_cancer
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier`}
-  starterCode={`X, y = load_breast_cancer(return_X_y=True)
+from sklearn.tree import DecisionTreeClassifier`,
+      starterCode: `X, y = load_breast_cancer(return_X_y=True)
 
 # 1. Split (25% test, random_state=0, stratified on y)
 X_train, X_test, y_train, y_test = None, None, None, None
@@ -443,8 +476,8 @@ deep_train_acc = None
 
 print("depth-3 train/test:", train_acc, test_acc)
 print("unlimited train:", deep_train_acc)
-`}
-  solutionCode={`X, y = load_breast_cancer(return_X_y=True)
+`,
+      solutionCode: `X, y = load_breast_cancer(return_X_y=True)
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0, stratify=y
@@ -461,7 +494,9 @@ deep_train_acc = deep_tree.score(X_train, y_train)
 
 print("depth-3 train/test:", train_acc, test_acc)
 print("unlimited train:", deep_train_acc)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "tree_is_depth3",

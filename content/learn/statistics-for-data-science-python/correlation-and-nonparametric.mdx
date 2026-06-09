@@ -55,7 +55,10 @@ Let's compute both and test whether each differs from zero.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(1)
@@ -73,7 +76,9 @@ print(f"Spearman r = {r_s:.3f}  (p = {p_s:.2e})")
 print()
 print("Both are strongly positive and clearly differ from 0.")
 print("The p-value tests H0: the true correlation is 0 (no association).")
-`}
+`,
+    },
+  ]}
 />
 
 **How to read it.** The coefficient is the effect size: roughly, |r| <
@@ -92,7 +97,10 @@ ranks, sees the perfect order and reports ≈ 1. Pearson, demanding a
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(2)
@@ -110,7 +118,9 @@ print()
 print("The relationship is perfectly monotonic but not linear.")
 print("Spearman captures 'consistently increasing'; Pearson only")
 print("rewards 'increasing in a straight line'.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="Quick rule for choosing">
@@ -133,7 +143,10 @@ not about relationships in general.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(3)
@@ -148,7 +161,9 @@ print()
 print("y is COMPLETELY determined by x, yet Pearson r is ~0.")
 print("r measures LINEAR association only. 'r = 0' is NOT 'no relationship'.")
 print("This is exactly why you plot the data before trusting a number.")
-`}
+`,
+    },
+  ]}
 />
 
 ### The single most important caveat: correlation is not causation
@@ -186,7 +201,10 @@ the slope.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.express as px
 from scipy import stats
 
@@ -216,7 +234,9 @@ fig = px.scatter(
 )
 fig.add_scatter(x=xline, y=yline, mode="lines", name="fit line")
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Slope vs correlation">
@@ -283,7 +303,10 @@ Here heavy outliers wreck the t-test but barely faze Mann–Whitney.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(6)
@@ -307,7 +330,9 @@ print(f"Mann-Whitney U   : p = {u_res.pvalue:.4f}  (robust to outliers)")
 print()
 print("With heavy outliers, the rank-based test is the more trustworthy")
 print("read on whether the two groups differ.")
-`}
+`,
+    },
+  ]}
 />
 
 **How to read it.** `mannwhitneyu` returns the U statistic and a p-value.
@@ -325,7 +350,10 @@ positive or negative.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(8)
@@ -350,7 +378,9 @@ else:
 print()
 print("Satisfaction is ORDINAL (1-10), so a rank-based paired test is")
 print("more appropriate than a paired t-test on these scores.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="What you trade for robustness">
@@ -398,27 +428,32 @@ For independent groups with outliers or small samples, Mann-Whitney U is the rob
 - Set a boolean **\`spearman_stronger\`** to whether \`abs(spearman_r) > abs(pearson_r)\`.
 
 Use the appropriate \`scipy.stats\` functions; each returns the coefficient first, then the p-value.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(505)
 x = np.linspace(1, 10, 70)
 # Monotonic but curved -> Spearman should exceed Pearson in magnitude.
-y = x**3 + rng.normal(0, 30, size=70)`}
-  starterCode={`# TODO: set pearson_r, spearman_r, pearson_p (floats) and spearman_stronger (bool)
+y = x**3 + rng.normal(0, 30, size=70)`,
+      starterCode: `# TODO: set pearson_r, spearman_r, pearson_p (floats) and spearman_stronger (bool)
 pearson_r = None
 spearman_r = None
 pearson_p = None
 spearman_stronger = None
-`}
-  solutionCode={`pr, pp = stats.pearsonr(x, y)
+`,
+      solutionCode: `pr, pp = stats.pearsonr(x, y)
 sr, sp = stats.spearmanr(x, y)
 pearson_r = float(pr)
 spearman_r = float(sr)
 pearson_p = float(pp)
 spearman_stronger = bool(abs(spearman_r) > abs(pearson_r))
 print(pearson_r, spearman_r, pearson_p, spearman_stronger)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "types",
@@ -465,7 +500,10 @@ assert spearman_stronger == bool(abs(spearman_r) > abs(pearson_r))`,
 - Set a boolean **\`differ\`** to whether the groups differ at \`alpha = 0.05\` (reject when \`p_value <= alpha\`).
 
 Choose between Mann-Whitney U and Wilcoxon based on whether the groups are independent or paired.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(606)
@@ -475,17 +513,19 @@ group_a[:2] = [600, 540]                           # outliers
 group_b[:2] = [700, 480]
 time_on_page_a = group_a
 time_on_page_b = group_b
-alpha = 0.05`}
-  starterCode={`# TODO: run the right nonparametric test for INDEPENDENT groups
+alpha = 0.05`,
+      starterCode: `# TODO: run the right nonparametric test for INDEPENDENT groups
 # set p_value (float) and differ (bool)
 p_value = None
 differ = None
-`}
-  solutionCode={`res = stats.mannwhitneyu(time_on_page_a, time_on_page_b, alternative="two-sided")
+`,
+      solutionCode: `res = stats.mannwhitneyu(time_on_page_a, time_on_page_b, alternative="two-sided")
 p_value = float(res.pvalue)
 differ = bool(p_value <= alpha)
 print(p_value, differ)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type",

@@ -105,7 +105,10 @@ types.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 // All of these types come from the Base Class Library.
@@ -121,7 +124,9 @@ foreach (var kv in counts)
 {
     Console.WriteLine($"{kv.Key} -> {kv.Value}");
 }
-`}
+`,
+    },
+  ]}
 />
 
 `List<T>`, `Dictionary<TKey, TValue>`, `string`, `Console`,

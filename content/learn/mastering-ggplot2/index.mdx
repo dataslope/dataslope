@@ -101,7 +101,10 @@ be able to name the component each line belongs to.
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
   geom_point(alpha = 0.7) +
@@ -116,7 +119,9 @@ ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
     color = "Drivetrain"
   ) +
   theme_minimal()
-`}
+`,
+    },
+  ]}
 />
 
 Do not worry about understanding it yet. Notice only this: the plot is

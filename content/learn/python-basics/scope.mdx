@@ -41,7 +41,10 @@ flowchart TD
 
 <CodeBlock
   adapter="python"
-  starterCode={`x = "global x"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `x = "global x"
 
 
 def show():
@@ -51,7 +54,9 @@ def show():
 
 show()
 print("outside:", x)
-`}
+`,
+    },
+  ]}
 />
 
 The local `x` **shadows** the global one. Assigning to `x` inside the function created a new local binding; the global `x` was never touched.
@@ -66,7 +71,10 @@ This is the key gotcha: **reading** a name searches LEGB, but **assigning** a na
 
 <CodeBlock
   adapter="python"
-  starterCode={`counter = 0
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `counter = 0
 
 
 def bump_bad():
@@ -77,7 +85,9 @@ try:
     bump_bad()
 except UnboundLocalError as e:
     print("UnboundLocalError:", e)
-`}
+`,
+    },
+  ]}
 />
 
 Why? Python sees `counter +=` and decides `counter` is a local variable. Then it tries to read the current value of `counter` (for the `+= 1` part), but there is no local `counter` yet. Hence `UnboundLocalError`.
@@ -86,7 +96,10 @@ To rebind the **global** from inside a function, use the `global` keyword:
 
 <CodeBlock
   adapter="python"
-  starterCode={`counter = 0
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `counter = 0
 
 
 def bump():
@@ -98,7 +111,9 @@ bump()
 bump()
 bump()
 print("counter:", counter)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="danger" title="Globals are a code smell">
@@ -111,7 +126,10 @@ When you nest functions, the inner one can **read** names from the outer one (cl
 
 <CodeBlock
   adapter="python"
-  starterCode={`def make_counter():
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def make_counter():
     count = 0
 
     def step():
@@ -124,7 +142,9 @@ When you nest functions, the inner one can **read** names from the outer one (cl
 
 c = make_counter()
 print(c(), c(), c())
-`}
+`,
+    },
+  ]}
 />
 
 Each call to `make_counter()` returns a fresh `step` with its own private `count`. This is the basis of **decorators**, **factory functions**, and many Pythonic patterns.
@@ -139,18 +159,26 @@ The built-in scope contains everything in the [`builtins` module](https://docs.p
 
 <CodeBlock
   adapter="python"
-  starterCode={`import builtins
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import builtins
 
 print(len(dir(builtins)))
 print([n for n in dir(builtins) if n.islower()][:10])
-`}
+`,
+    },
+  ]}
 />
 
 You **can** shadow a built-in by accident:
 
 <CodeBlock
   adapter="python"
-  starterCode={`list = [1, 2, 3]  # bad: list() no longer works in this scope
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `list = [1, 2, 3]  # bad: list() no longer works in this scope
 print(list)
 try:
     print(list((4, 5, 6)))
@@ -159,7 +187,9 @@ except TypeError as e:
 
 del list  # restore access to the built-in
 print(list((4, 5, 6)))
-`}
+`,
+    },
+  ]}
 />
 
 A linter will warn about this; **pay attention**. Shadowing `list`, `dict`, `id`, `type`, `input`, or any other built-in is a common mistake that causes confusing errors.
@@ -174,7 +204,10 @@ A **closure** is a function that remembers variables from its enclosing scope, e
 
 <CodeBlock
   adapter="python"
-  starterCode={`def multiplier(factor):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def multiplier(factor):
     def inner(x):
         return x * factor  # 'factor' comes from the enclosing scope
 
@@ -184,7 +217,9 @@ A **closure** is a function that remembers variables from its enclosing scope, e
 double = multiplier(2)
 triple = multiplier(3)
 print(double(7), triple(7))
-`}
+`,
+    },
+  ]}
 />
 
 When `multiplier(2)` finishes, `factor=2` doesn't disappear. It is **captured** by `inner`, which continues to reference it. Each call to `multiplier` creates a new `factor` binding, so `double` and `triple` are independent.
@@ -224,7 +259,10 @@ This is a classic interview question:
 
 <CodeBlock
   adapter="python"
-  starterCode={`def make_adders():
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def make_adders():
     adders = []
     for i in range(3):
         adders.append(lambda x: x + i)
@@ -233,7 +271,9 @@ This is a classic interview question:
 
 a, b, c = make_adders()
 print(a(10), b(10), c(10))  # all print 12, not 10/11/12!
-`}
+`,
+    },
+  ]}
 />
 
 Why? The lambda captures **i** by **reference**, not by value. When the loop finishes, `i=2`, so all three lambdas add 2.
@@ -246,7 +286,10 @@ Closures capture variables by **reference**, not by **value**. If the variable c
 
 <CodeBlock
   adapter="python"
-  starterCode={`def make_adders():
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def make_adders():
     adders = []
     for i in range(3):
         adders.append(lambda x, i=i: x + i)  # default argument captures value
@@ -255,7 +298,9 @@ Closures capture variables by **reference**, not by **value**. If the variable c
 
 a, b, c = make_adders()
 print(a(10), b(10), c(10))  # 10, 11, 12
-`}
+`,
+    },
+  ]}
 />
 
 ## Real-world: why avoid globals
@@ -299,14 +344,17 @@ Now each `RequestHandler` instance has its own count, tests are isolated, and co
   instructions={`Define a function \`make_counter(start=0, step=1)\` that returns a function \`next_value\` which, each time it is called, returns the current count and then advances by \`step\`. The first call returns \`start\`.
 
 Use a closure with \`nonlocal\`; do not use globals.`}
-  starterCode={`def make_counter(start=0, step=1):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def make_counter(start=0, step=1):
     # your code here
     def next_value():
         return 0
 
     return next_value
-`}
-  solutionCode={`def make_counter(start=0, step=1):
+`,
+      solutionCode: `def make_counter(start=0, step=1):
     current = start
 
     def next_value():
@@ -316,7 +364,9 @@ Use a closure with \`nonlocal\`; do not use globals.`}
         return value
 
     return next_value
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "default",
@@ -345,18 +395,23 @@ assert b() == 0`,
   adapter="python"
   title="Fix the late-binding closure bug"
   instructions={`The function below has a late-binding closure bug: all returned functions add the same value (the final loop value). Fix it by capturing the loop variable's current value in a default argument.`}
-  starterCode={`def make_multipliers():
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def make_multipliers():
     multipliers = []
     for i in range(1, 4):
         multipliers.append(lambda x: x * i)
     return multipliers
-`}
-  solutionCode={`def make_multipliers():
+`,
+      solutionCode: `def make_multipliers():
     multipliers = []
     for i in range(1, 4):
         multipliers.append(lambda x, i=i: x * i)
     return multipliers
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "independent_values",
@@ -375,7 +430,10 @@ assert m3(10) == 30`,
   instructions={`Define a function \`counter()\` that returns two functions: \`increment()\` which increases an internal count by 1, and \`get()\` which returns the current count. Both should close over a shared \`count\` variable initialized to 0.
 
 Return them as a tuple: \`(increment, get)\`.`}
-  starterCode={`def counter():
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def counter():
     # your code here
     def increment():
         pass
@@ -384,8 +442,8 @@ Return them as a tuple: \`(increment, get)\`.`}
         return 0
 
     return increment, get
-`}
-  solutionCode={`def counter():
+`,
+      solutionCode: `def counter():
     count = 0
 
     def increment():
@@ -396,7 +454,9 @@ Return them as a tuple: \`(increment, get)\`.`}
         return count
 
     return increment, get
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",

@@ -41,7 +41,10 @@ Variables declared outside any function, and variables declared
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int global_counter = 0; // data segment, alive for whole program
 
@@ -59,7 +62,9 @@ int main() {
   called_many_times();
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Notice `call_count` keeps incrementing — it lives in the data
@@ -213,7 +218,10 @@ action.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 int main() {
@@ -227,7 +235,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Watch the capacity grow in geometric jumps (typically doubling).
@@ -240,7 +250,10 @@ Trace this program in your head before running it:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 int globals_live_here = 1;
@@ -260,7 +273,9 @@ int main() {
   delete heap_int; // free the raw heap allocation
   return 0;
 } // handle_on_stack auto-frees its heap data
-`}
+`,
+    },
+  ]}
 />
 
 | Variable | Lives in | Frees how |

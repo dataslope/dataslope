@@ -50,7 +50,10 @@ flip when we disaggregate.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 # Two departments. "Easy" admits ~60%, "Hard" admits ~25% — for EVERYONE.
 # Within each department, women are admitted at a HIGHER rate than men.
@@ -76,7 +79,9 @@ agg = data.groupby("gender")[["applicants", "admitted"]].sum()
 agg["rate"] = agg["admitted"] / agg["applicants"]
 print("\\nAggregated across departments (now MEN look favored):")
 print(agg["rate"].round(3))
-`}
+`,
+    },
+  ]}
 />
 
 Read the two tables against each other. Within every department, women
@@ -179,7 +184,10 @@ reported noise as signal. Let's watch it happen.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(1)
@@ -202,7 +210,9 @@ for i, r, p in hits:
     print(f"  feature {i:>2}:  r = {r:+.3f},  p = {p:.4f}  <- a FALSE positive")
 print()
 print("None of these relationships are real. With 20 tests, ~1 'wins' by luck.")
-`}
+`,
+    },
+  ]}
 />
 
 About one of twenty fires even though nothing is real. Report just that
@@ -240,7 +250,10 @@ about **9%**. Run the numbers on 100,000 people:
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Disease prevalence and test accuracy.
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Disease prevalence and test accuracy.
 prevalence = 1 / 1000  # 0.1% of people have it
 false_pos_rate = 0.01  # 1% of healthy people test positive
 sensitivity = 1.00  # catches every true case
@@ -261,7 +274,9 @@ print(f"  False positives      : {false_positives:.0f}")
 print()
 print(f"P(actually sick | tested positive) = {prob_sick_given_positive:.1%}")
 print("A 99%-accurate test, yet a positive means only ~9% chance of disease.")
-`}
+`,
+    },
+  ]}
 />
 
 The 1,000 false positives drown out the 100 true ones. We derived this
@@ -337,7 +352,10 @@ both groups were partly lucky/unlucky and drift back regardless.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.default_rng(3)
 
@@ -359,7 +377,9 @@ print(f"...the SAME people in month 2: avg = {month2[bottom].mean():.1f}")
 print()
 print("Top group drops, bottom group rises -- with NO intervention at all.")
 print("It's just luck not repeating. Don't credit (or blame) a program for this.")
-`}
+`,
+    },
+  ]}
 />
 
 The top group falls and the bottom group rises automatically. If you'd
@@ -445,20 +465,23 @@ Produce two variables:
 - \`within_winner\`: the string \`"A"\` or \`"B"\` — the group that has the higher conversion rate **within both** devices (the same group wins on each device in this data).
 
 Conversion rate = \`conversions / visitors\`. A paradox exists when \`agg_winner != within_winner\`.`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 df = pd.DataFrame([
     ["mobile",  "A",  100,  30],   # 30.0%
     ["mobile",  "B",  900, 297],   # 33.0%  (B higher)
     ["desktop", "A",  900, 630],   # 70.0%
     ["desktop", "B",  100,  73],   # 73.0%  (B higher)
-], columns=["device", "group", "visitors", "conversions"])`}
-  starterCode={`import pandas as pd
+], columns=["device", "group", "visitors", "conversions"])`,
+      starterCode: `import pandas as pd
 
 # TODO: compute agg_winner and within_winner (each "A" or "B")
 agg_winner = None
 within_winner = None
-`}
-  solutionCode={`import pandas as pd
+`,
+      solutionCode: `import pandas as pd
 
 # Aggregate (pooled) rates.
 agg = df.groupby("group")[["visitors", "conversions"]].sum()
@@ -473,7 +496,9 @@ within_winner = "B" if (per_device["B"] > per_device["A"]).all() else "A"
 print("agg_winner   =", agg_winner)
 print("within_winner=", within_winner)
 print("Paradox?", agg_winner != within_winner)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "types",
@@ -517,19 +542,22 @@ Run **100 independent tests**: for each, generate a fresh unrelated random featu
 - Store the count of significant tests (p < 0.05) in an \`int\` variable named \`false_positives\`.
 
 Since nothing is real, **every** significant result is a false positive. Expect roughly 5 out of 100.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from scipy import stats
 rng = np.random.default_rng(42)
 n = 150
-outcome = rng.normal(0, 1, size=n)`}
-  starterCode={`import numpy as np
+outcome = rng.normal(0, 1, size=n)`,
+      starterCode: `import numpy as np
 from scipy import stats
 
 alpha = 0.05
 # TODO: run 100 tests of fresh noise features vs outcome; count p < alpha
 false_positives = None
-`}
-  solutionCode={`import numpy as np
+`,
+      solutionCode: `import numpy as np
 from scipy import stats
 
 alpha = 0.05
@@ -542,7 +570,9 @@ for _ in range(100):
 
 false_positives = int(false_positives)
 print("False positives out of 100:", false_positives)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type",

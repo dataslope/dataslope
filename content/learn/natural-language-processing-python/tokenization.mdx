@@ -48,7 +48,10 @@ for you.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 # Installs NLTK and loads the data this page needs. nltk.download() isn't
 # available in this environment, so we fetch the data archives directly
 # and unpack them into NLTK's data directory.
@@ -74,12 +77,14 @@ async def _load_nltk(category, package):
         zf.extractall(dest)
 
 await _load_nltk("tokenizers", "punkt_tab")
-from nltk.tokenize import word_tokenize, sent_tokenize`}
-  starterCode={`text = "I don't think Mr. Lee's plan will work, but we'll see!"
+from nltk.tokenize import word_tokenize, sent_tokenize`,
+      starterCode: `text = "I don't think Mr. Lee's plan will work, but we'll see!"
 
 print("split():        ", text.split())
 print("word_tokenize():", word_tokenize(text))
-`}
+`,
+    },
+  ]}
 />
 
 Study the differences token by token:
@@ -141,7 +146,10 @@ mistake the period in "Dr." or "2.5" for a sentence boundary. Watch it work.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -164,8 +172,8 @@ async def _load_nltk(category, package):
         zf.extractall(dest)
 
 await _load_nltk("tokenizers", "punkt_tab")
-from nltk.tokenize import sent_tokenize`}
-  starterCode={`text = "Dr. Lee earned 2.5 million. He smiled. Wasn't that great?"
+from nltk.tokenize import sent_tokenize`,
+      starterCode: `text = "Dr. Lee earned 2.5 million. He smiled. Wasn't that great?"
 
 # Naive: split on every period.
 naive = text.split(".")
@@ -180,7 +188,9 @@ sentences = sent_tokenize(text)
 print("sent_tokenize() ->", len(sentences), "sentences")
 for s in sentences:
     print("   ", repr(s))
-`}
+`,
+    },
+  ]}
 />
 
 The naive split shattered "Dr." and "2.5" into nonsense and missed that "?"
@@ -208,7 +218,10 @@ and "NLP"? Do you want the emoji preserved as a token? The default
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -231,8 +244,8 @@ async def _load_nltk(category, package):
         zf.extractall(dest)
 
 await _load_nltk("tokenizers", "punkt_tab")
-from nltk.tokenize import word_tokenize, TweetTokenizer`}
-  starterCode={`tweet = "Loving #NLP @dataslope, this is sooo cool!!! :)"
+from nltk.tokenize import word_tokenize, TweetTokenizer`,
+      starterCode: `tweet = "Loving #NLP @dataslope, this is sooo cool!!! :)"
 
 print("Default word_tokenize:")
 print("  ", word_tokenize(tweet))
@@ -240,7 +253,9 @@ print("  ", word_tokenize(tweet))
 print("TweetTokenizer:")
 tt = TweetTokenizer()
 print("  ", tt.tokenize(tweet))
-`}
+`,
+    },
+  ]}
 />
 
 Notice how the default tokenizer breaks "#NLP" into "#" and "NLP" and may
@@ -299,7 +314,10 @@ The paragraph contains the abbreviation "Dr.", the decimal "98.6", and the
 contraction "didn't". A correct sentence tokenizer must **not** break on the
 period inside "Dr." or "98.6", and a correct word tokenizer must split
 "didn't" so that the negation token \`"n't"\` appears in \`tokens\`.`}
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -322,23 +340,25 @@ async def _load_nltk(category, package):
         zf.extractall(dest)
 
 await _load_nltk("tokenizers", "punkt_tab")
-from nltk.tokenize import sent_tokenize, word_tokenize`}
-  starterCode={`text = "Dr. Adams measured 98.6 degrees. The patient didn't complain."
+from nltk.tokenize import sent_tokenize, word_tokenize`,
+      starterCode: `text = "Dr. Adams measured 98.6 degrees. The patient didn't complain."
 
 sentences = None  # sent_tokenize the text
 tokens = None  # word_tokenize the text
 
 print("sentences:", sentences)
 print("tokens:   ", tokens)
-`}
-  solutionCode={`text = "Dr. Adams measured 98.6 degrees. The patient didn't complain."
+`,
+      solutionCode: `text = "Dr. Adams measured 98.6 degrees. The patient didn't complain."
 
 sentences = sent_tokenize(text)
 tokens = word_tokenize(text)
 
 print("sentences:", sentences)
 print("tokens:   ", tokens)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "two_sentences",

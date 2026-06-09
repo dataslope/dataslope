@@ -37,12 +37,17 @@ measurements in New York, May–September 1973 — as our example.
 
 <CodeBlock
   adapter="r"
-  starterCode={`data(airquality)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `data(airquality)
 
 dim(airquality) # rows, columns
 nrow(airquality)
 ncol(airquality)
-`}
+`,
+    },
+  ]}
 />
 
 The shape tells you what kind of analysis is even feasible.
@@ -53,9 +58,14 @@ A million rows × 200 columns is a different problem entirely.
 
 <CodeBlock
   adapter="r"
-  starterCode={`head(airquality)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `head(airquality)
 tail(airquality)
-`}
+`,
+    },
+  ]}
 />
 
 Glance at the first few and last few rows. You're checking:
@@ -72,8 +82,13 @@ that would have wasted an hour downstream.
 
 <CodeBlock
   adapter="r"
-  starterCode={`str(airquality)
-`}
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `str(airquality)
+`,
+    },
+  ]}
 />
 
 `str()` packs an enormous amount of information into a few lines:
@@ -93,8 +108,13 @@ What you're looking for:
 
 <CodeBlock
   adapter="r"
-  starterCode={`summary(airquality)
-`}
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `summary(airquality)
+`,
+    },
+  ]}
 />
 
 `summary()` gives you, per column:
@@ -124,7 +144,10 @@ clearer to ask explicitly:
 
 <CodeBlock
   adapter="r"
-  starterCode={`# Count of NAs per column
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# Count of NAs per column
 colSums(is.na(airquality))
 
 # Percentage of NAs per column
@@ -133,7 +156,9 @@ round(colMeans(is.na(airquality)) * 100, 1)
 # Are there any complete rows? How many?
 sum(complete.cases(airquality))
 nrow(airquality) - sum(complete.cases(airquality))
-`}
+`,
+    },
+  ]}
 />
 
 In `airquality`, Ozone and Solar.R have meaningful amounts of
@@ -197,12 +222,11 @@ split across files so you can see each step clearly:
   adapter="r"
   title="Inspect the iris dataset"
   instructions={`Use the inspection ritual on \`iris\`. The starter code already loads the data, and there's a helper file with a "report" function. Complete \`main.R\` so the script prints shape, head, structure, and a summary. The test just checks that nothing errors.`}
-  starterCode={null}
   entryFilename="main.R"
   files={[
     {
       filename: "main.R",
-      initialContent: `source("report.R")
+      starterCode: `source("report.R")
 
 data(iris)
 
@@ -214,7 +238,7 @@ data(iris)
 
 # Try filling in each step using the report() helper
 `,
-      solutionContent: `source("report.R")
+      solutionCode: `source("report.R")
 
 data(iris)
 
@@ -227,13 +251,13 @@ report("NAs per column", colSums(is.na(iris)))
     },
     {
       filename: "report.R",
-      initialContent: `report <- function(label, value) {
+      starterCode: `report <- function(label, value) {
   cat("---", label, "---\\n")
   print(value)
   cat("\\n")
 }
 `,
-      solutionContent: `report <- function(label, value) {
+      solutionCode: `report <- function(label, value) {
   cat("---", label, "---\\n")
   print(value)
   cat("\\n")

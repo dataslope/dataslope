@@ -69,7 +69,10 @@ on wildly different scales — some near 0.1, others in the hundreds.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.datasets import load_wine
 from sklearn.preprocessing import StandardScaler
 
@@ -87,7 +90,9 @@ X_scaled = scaler.fit_transform(X)
 print("\\nAFTER scaling")
 print("  column means (first 4):", np.round(X_scaled.mean(axis=0)[:4], 2))
 print("  column stds  (first 4):", np.round(X_scaled.std(axis=0)[:4], 2))
-`}
+`,
+    },
+  ]}
 />
 
 Before scaling, the column means and standard deviations are all over the
@@ -117,7 +122,10 @@ split so the comparison is fair.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
@@ -140,7 +148,9 @@ scaled_acc = knn_scaled.score(scaler.transform(X_test), y_test)
 
 print(f"KNN accuracy on RAW features:    {raw_acc:.3f}")
 print(f"KNN accuracy on SCALED features: {scaled_acc:.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 The scaled version is dramatically better. On the raw data, the single
@@ -214,7 +224,10 @@ scaler peeks at the test set to compute a mean, that promise is broken.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
@@ -231,7 +244,9 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 print("The scaler's mean was computed from ALL", X.shape[0], "rows,")
 print("including the", X_test.shape[0], "rows we pretend are 'unseen'.")
-`}
+`,
+    },
+  ]}
 />
 
 This looks innocent and runs without error, which is exactly why it is
@@ -244,7 +259,10 @@ longer truly held out.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
@@ -264,7 +282,9 @@ X_test_scaled = scaler.transform(X_test)
 print("Train mean after scaling (should be ~0):", round(X_train_scaled.mean(), 6))
 # The test set, scaled with TRAIN stats, is NOT exactly mean 0 — and that is correct.
 print("Test  mean after scaling (need not be 0):", round(X_test_scaled.mean(), 4))
-`}
+`,
+    },
+  ]}
 />
 
 Read those two printouts carefully, because they capture the whole idea.
@@ -316,7 +336,10 @@ range (max minus min).
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.preprocessing import MinMaxScaler
 
 # Three features on very different scales.
@@ -335,7 +358,9 @@ X01 = scaler.fit_transform(X)
 print("Per-column min after scaling:", np.round(X01.min(axis=0), 2))
 print("Per-column max after scaling:", np.round(X01.max(axis=0), 2))
 print(np.round(X01, 3))
-`}
+`,
+    },
+  ]}
 />
 
 Every column now runs from exactly 0 (its smallest value) to exactly 1
@@ -424,15 +449,18 @@ The hidden tests check that the scaler was fit on the training set (so the
 training mean is ~0), that the test set was transformed with the *same*
 scaler (so its mean is close to but not exactly 0), and that the shapes are
 unchanged.`}
-  initCode={`from sklearn.datasets import load_breast_cancer
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 X, y = load_breast_cancer(return_X_y=True)
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0
-)`}
-  starterCode={`# 1. Create and fit a StandardScaler on the TRAINING data only.
+)`,
+      starterCode: `# 1. Create and fit a StandardScaler on the TRAINING data only.
 scaler = None
 
 # 2. Transform both halves with that SAME fitted scaler.
@@ -443,8 +471,8 @@ X_test_scaled = None
 train_mean = None
 
 print("train mean:", train_mean)
-`}
-  solutionCode={`scaler = StandardScaler()
+`,
+      solutionCode: `scaler = StandardScaler()
 scaler.fit(X_train)
 
 X_train_scaled = scaler.transform(X_train)
@@ -453,7 +481,9 @@ X_test_scaled = scaler.transform(X_test)
 train_mean = X_train_scaled.mean()
 
 print("train mean:", train_mean)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "train_centered",

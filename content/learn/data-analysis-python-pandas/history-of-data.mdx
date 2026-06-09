@@ -160,7 +160,10 @@ looks a lot like a Sumerian ledger.
 
 <CodeBlock
   adapter="python"
-  starterCode={`# A fictional but very Sumerian-looking ledger:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# A fictional but very Sumerian-looking ledger:
 # rows = transactions, columns = (item, quantity, recipient)
 
 ledger = [
@@ -181,7 +184,9 @@ for item, qty, recipient in ledger:
 
 for recipient, total in totals.items():
     print(f"{recipient:>18}: {total} units of barley")
-`}
+`,
+    },
+  ]}
 />
 
 Take a moment to appreciate this. We just **filtered** by item,

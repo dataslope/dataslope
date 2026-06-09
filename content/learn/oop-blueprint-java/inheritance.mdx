@@ -38,7 +38,7 @@ is-an Animal*. In Java, the keyword is `extends`.
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Animal a = new Animal("Generic");
     Dog d = new Dog("Rex");
@@ -53,7 +53,7 @@ is-an Animal*. In Java, the keyword is `extends`.
     },
     {
       filename: "Animal.java",
-      initialContent: `public class Animal {
+      starterCode: `public class Animal {
   private final String name;
 
   public Animal(String name) { this.name = name; }
@@ -65,7 +65,7 @@ is-an Animal*. In Java, the keyword is `extends`.
     },
     {
       filename: "Dog.java",
-      initialContent: `public class Dog extends Animal {
+      starterCode: `public class Dog extends Animal {
   public Dog(String name) {
     super(name); // call Animal's constructor
   }
@@ -77,7 +77,7 @@ is-an Animal*. In Java, the keyword is `extends`.
     },
     {
       filename: "Cat.java",
-      initialContent: `public class Cat extends Animal {
+      starterCode: `public class Cat extends Animal {
   public Cat(String name) { super(name); }
   @Override
   public String speak() {
@@ -154,7 +154,7 @@ explicitly with `super.methodName(...)`.
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Employee e = new Employee("Ada", 5_000);
     Manager m = new Manager("Bob", 5_000, 2_000);
@@ -166,7 +166,7 @@ explicitly with `super.methodName(...)`.
     },
     {
       filename: "Employee.java",
-      initialContent: `public class Employee {
+      starterCode: `public class Employee {
   private final String name;
   private final double baseSalary;
 
@@ -183,7 +183,7 @@ explicitly with `super.methodName(...)`.
     },
     {
       filename: "Manager.java",
-      initialContent: `public class Manager extends Employee {
+      starterCode: `public class Manager extends Employee {
   private final double bonus;
 
   public Manager(String name, double baseSalary, double bonus) {
@@ -271,7 +271,7 @@ Shape with area 16.0
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.Arrays;
+      starterCode: `import java.util.Arrays;
 import java.util.List;
 
 public class Main {
@@ -287,7 +287,7 @@ public class Main {
     },
     {
       filename: "Shape.java",
-      initialContent: `public class Shape {
+      starterCode: `public class Shape {
   public double area() { return 0.0; }
   public String describe() { return "Shape with area " + area(); }
 }
@@ -295,11 +295,11 @@ public class Main {
     },
     {
       filename: "Circle.java",
-      initialContent: `public class Circle extends Shape {
+      starterCode: `public class Circle extends Shape {
   // TODO
 }
 `,
-      solutionContent: `public class Circle extends Shape {
+      solutionCode: `public class Circle extends Shape {
   private final double radius;
   public Circle(double radius) { this.radius = radius; }
   @Override
@@ -311,11 +311,11 @@ public class Main {
     },
     {
       filename: "Square.java",
-      initialContent: `public class Square extends Shape {
+      starterCode: `public class Square extends Shape {
   // TODO
 }
 `,
-      solutionContent: `public class Square extends Shape {
+      solutionCode: `public class Square extends Shape {
   private final double side;
   public Square(double side) { this.side = side; }
   @Override

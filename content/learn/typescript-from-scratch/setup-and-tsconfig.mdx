@@ -420,7 +420,10 @@ Try it:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// This is real TypeScript, running in your browser
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// This is real TypeScript, running in your browser
 function greet(name: string): string {
   return \`Hello, \${name}! Welcome to TypeScript.\`;
 }
@@ -430,7 +433,9 @@ console.log(greet("Grace"));
 
 // Uncomment the next line to see a type error:
 // console.log(greet(42));  // Argument of type 'number' is not assignable to parameter of type 'string'.
-`}
+`,
+    },
+  ]}
 />
 
 Edit the code, click *Run*, and see the output instantly. No installation, no build step, no setup. This is the fastest way to learn TypeScript.

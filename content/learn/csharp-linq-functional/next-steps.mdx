@@ -46,7 +46,10 @@ work across CPU cores.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var nums = Enumerable.Range(1, 20);
@@ -61,7 +64,9 @@ var squares = nums.AsParallel()
                   .ToList();
 
 Console.WriteLine(string.Join(",", squares));
-`}
+`,
+    },
+  ]}
 />
 
 PLINQ is ideal when **each element's work is expensive and

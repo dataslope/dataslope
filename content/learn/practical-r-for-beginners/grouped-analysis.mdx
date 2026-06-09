@@ -35,14 +35,19 @@ In dplyr, you do it in two lines: `group_by()` + `summarise()`.
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 data(mtcars)
 
 # Average mpg per number of cylinders
 mtcars |>
   group_by(cyl) |>
   summarise(avg_mpg = mean(mpg))
-`}
+`,
+    },
+  ]}
 />
 
 Read it: "Group the data by `cyl`. Within each group, compute the
@@ -59,7 +64,10 @@ call:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 data(mtcars)
 
 mtcars |>
@@ -71,7 +79,9 @@ mtcars |>
     avg_hp  = mean(hp),
     max_hp  = max(hp)
   )
-`}
+`,
+    },
+  ]}
 />
 
 `n()` is a special dplyr helper meaning "how many rows in this
@@ -83,7 +93,10 @@ Group by more than one column to get all combinations:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 data(mtcars)
 
 mtcars |>
@@ -93,7 +106,9 @@ mtcars |>
     avg_mpg = mean(mpg),
     .groups = "drop"
   )
-`}
+`,
+    },
+  ]}
 />
 
 The `.groups = "drop"` argument is a small dplyr nicety that tells
@@ -108,7 +123,10 @@ a shortcut: `count()`. These two are equivalent:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 data(mtcars)
 
 # Long form
@@ -124,7 +142,9 @@ mtcars |> count(cyl, am)
 
 # Sorted by count descending
 mtcars |> count(cyl, sort = TRUE)
-`}
+`,
+    },
+  ]}
 />
 
 `count()` is your go-to for the question *"what categories exist,
@@ -138,7 +158,10 @@ row.
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 data(mtcars)
 
 # Add each car's mpg as a fraction of the average mpg for cars with that many cyl
@@ -151,7 +174,9 @@ mtcars |>
   ungroup() |>
   select(mpg, cyl, cyl_avg_mpg, pct_of_cyl) |>
   head(10)
-`}
+`,
+    },
+  ]}
 />
 
 This pattern — "compute a per-group statistic, then express each
@@ -169,7 +194,10 @@ verb is `slice_max()` (and friends).
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 data(mtcars)
 
 # Top 2 most fuel-efficient cars per cylinder count
@@ -178,7 +206,9 @@ mtcars |>
   group_by(cyl) |>
   slice_max(mpg, n = 2) |>
   select(car, cyl, mpg)
-`}
+`,
+    },
+  ]}
 />
 
 `slice_max(col, n)` keeps the top `n` rows in each group by some
@@ -192,7 +222,10 @@ summary statistics are the natural question:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 data(iris)
 
 iris |>
@@ -204,7 +237,9 @@ iris |>
     sd_petal_len  = sd(Petal.Length),
     .groups       = "drop"
   )
-`}
+`,
+    },
+  ]}
 />
 
 One row per species, all summaries on the same line.
@@ -225,12 +260,11 @@ one main script that computes a monthly summary.
 - \`n_obs\`     (number of rows in that month)
 
 You can use the helper \`mean_na()\` from \`utils.R\`.`}
-  starterCode={null}
   entryFilename="main.R"
   files={[
     {
       filename: "main.R",
-      initialContent: `library(dplyr)
+      starterCode: `library(dplyr)
 source("utils.R")
 
 data(airquality)
@@ -239,7 +273,7 @@ monthly <- NULL  # build using group_by + summarise
 
 print(monthly)
 `,
-      solutionContent: `library(dplyr)
+      solutionCode: `library(dplyr)
 source("utils.R")
 
 data(airquality)
@@ -258,10 +292,10 @@ print(monthly)
     },
     {
       filename: "utils.R",
-      initialContent: `# Helper to compute mean ignoring NAs
+      starterCode: `# Helper to compute mean ignoring NAs
 mean_na <- function(x) mean(x, na.rm = TRUE)
 `,
-      solutionContent: `mean_na <- function(x) mean(x, na.rm = TRUE)
+      solutionCode: `mean_na <- function(x) mean(x, na.rm = TRUE)
 `,
     },
   ]}

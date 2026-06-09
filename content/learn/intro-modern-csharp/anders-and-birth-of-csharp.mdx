@@ -72,7 +72,10 @@ have to repeat yourself when the compiler can figure it out.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 // Full type written out:
@@ -89,7 +92,9 @@ Console.WriteLine(namesB[0]);
 
 // The compiler still knows namesB is List<string>:
 // namesB.Add(42);  // would not compile
-`}
+`,
+    },
+  ]}
 />
 
 That's the Hejlsberg-style trade-off in miniature: keep the safety
@@ -130,7 +135,10 @@ program looks compared with, say, C++ or older Java.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -151,7 +159,9 @@ foreach (var line in adults)
 
 // 'record' makes a small immutable value type in one line.
 record Person(string Name, int Age);
-`}
+`,
+    },
+  ]}
 />
 
 Five features from five different C# versions appear in that tiny

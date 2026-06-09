@@ -30,7 +30,10 @@ Here's a simple demonstration of each:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const count: number = 42;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const count: number = 42;
 const greeting: string = "Hello, TypeScript";
 const isActive: boolean = true;
 const empty: null = null;
@@ -45,7 +48,9 @@ console.log("null:", empty);
 console.log("undefined:", notYetDefined);
 console.log("bigint:", huge);
 console.log("symbol:", typeof id);
-`}
+`,
+    },
+  ]}
 />
 
 **What the compiler now knows:** Every one of these variables has a fixed
@@ -60,7 +65,10 @@ value:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Inferred as number
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Inferred as number
 let x = 10;
 
 // Inferred as string
@@ -72,7 +80,9 @@ let flag = false;
 console.log("x is", typeof x);
 console.log("message is", typeof message);
 console.log("flag is", typeof flag);
-`}
+`,
+    },
+  ]}
 />
 
 The compiler sees `x = 10` and concludes `x: number`. No annotation
@@ -81,7 +91,10 @@ side is ambiguous, you can (and should) annotate explicitly:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Explicit annotation clarifies intent
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Explicit annotation clarifies intent
 let userId: number;
 userId = 12345;
 
@@ -92,7 +105,9 @@ data = "Loaded";
 
 console.log("userId:", userId);
 console.log("data:", data);
-`}
+`,
+    },
+  ]}
 />
 
 **What bugs does this prevent?** If you accidentally assign `userId =
@@ -132,7 +147,10 @@ TypeScript treats them as distinct types:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`let a: null = null;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `let a: null = null;
 let b: undefined = undefined;
 
 // You cannot swap them without explicit union types
@@ -140,7 +158,9 @@ let b: undefined = undefined;
 
 console.log("a:", a);
 console.log("b:", b);
-`}
+`,
+    },
+  ]}
 />
 
 In practice, `undefined` means "never initialized" or "missing property,"
@@ -163,7 +183,10 @@ track this:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// The type is literally the string "north"
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// The type is literally the string "north"
 const direction = "north";
 
 // The type is literally the number 42
@@ -175,7 +198,9 @@ const yes = true;
 console.log("direction:", direction);
 console.log("answer:", answer);
 console.log("yes:", yes);
-`}
+`,
+    },
+  ]}
 />
 
 When you declare a variable with `const`, TypeScript infers the *literal*
@@ -197,13 +222,18 @@ with an `n` suffix:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const big: bigint = 123456789012345678901234567890n;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const big: bigint = 123456789012345678901234567890n;
 const alsoBig = BigInt("999999999999999999");
 
 console.log("big:", big);
 console.log("alsoBig:", alsoBig);
 console.log("Sum:", big + 1n);
-`}
+`,
+    },
+  ]}
 />
 
 **`symbol`** creates a unique, immutable value. No two symbols are equal,
@@ -211,12 +241,17 @@ even if they have the same description:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const sym1: symbol = Symbol("id");
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const sym1: symbol = Symbol("id");
 const sym2: symbol = Symbol("id");
 
 console.log("sym1 === sym2:", sym1 === sym2); // false
 console.log("typeof sym1:", typeof sym1);
-`}
+`,
+    },
+  ]}
 />
 
 Symbols are rarely used in beginner code, but they're essential for
@@ -285,7 +320,10 @@ Now add types:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function area(width: number, height: number): number {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function area(width: number, height: number): number {
   return width * height;
 }
 
@@ -294,7 +332,9 @@ console.log("Area:", area(10, 5));
 
 // Incorrect usage (uncomment to see compile error):
 // console.log(area("10", 5));
-`}
+`,
+    },
+  ]}
 />
 
 The line `area("10", 5)` is a **compile-time error**. The compiler knows
@@ -315,21 +355,26 @@ should enforce that both input and output are numbers.
   adapter="typescript"
   title="Celsius to Fahrenheit"
   instructions={`Implement the function \`celsiusToFahrenheit(c: number): number\` that converts a Celsius temperature to Fahrenheit. The formula is \`F = C × 9/5 + 32\`. The test will verify that 0°C = 32°F and 100°C = 212°F.`}
-  starterCode={`function celsiusToFahrenheit(c: number): number {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function celsiusToFahrenheit(c: number): number {
   // Your code here
   return 0;
 }
 
 console.log("0°C =", celsiusToFahrenheit(0), "°F");
 console.log("100°C =", celsiusToFahrenheit(100), "°F");
-`}
-  solutionCode={`function celsiusToFahrenheit(c: number): number {
+`,
+      solutionCode: `function celsiusToFahrenheit(c: number): number {
   return (c * 9) / 5 + 32;
 }
 
 console.log("0°C =", celsiusToFahrenheit(0), "°F");
 console.log("100°C =", celsiusToFahrenheit(100), "°F");
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "freezing",

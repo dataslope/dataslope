@@ -135,7 +135,10 @@ instantly explainable.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris
 
 data = load_iris()
 X, y = data.data, data.target
@@ -149,7 +152,9 @@ actually_setosa = y == 0
 
 correct = (rule_says_setosa == actually_setosa).sum()
 print(f"A one-line rule separates setosa perfectly: {correct}/{len(y)} correct.")
-`}
+`,
+    },
+  ]}
 />
 
 A simple rule nailed it, and you should be delighted — that is the
@@ -160,7 +165,10 @@ and a learned model earns its place.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 import numpy as np
@@ -187,7 +195,9 @@ model_acc = model.score(X_test, y_test)
 
 print(f"Hand-picked threshold rule: {rule_acc:.0%} on these two species.")
 print(f"Learned model:              {model_acc:.0%} on held-out flowers.")
-`}
+`,
+    },
+  ]}
 />
 
 For the easy split, a rule won. For the hard split, the learned model pulls
@@ -251,7 +261,10 @@ new data tracks the change.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.linear_model import LinearRegression
 
 rng = np.random.default_rng(0)
@@ -278,7 +291,9 @@ retrained_err = np.mean(np.abs(model.predict(x_new) - y_new))
 print(f"Fixed rule error on new world:        {rule_err:.1f}")
 print(f"Stale (old) model error on new world: {stale_err:.1f}")
 print(f"Retrained model error on new world:   {retrained_err:.1f}")
-`}
+`,
+    },
+  ]}
 />
 
 The fixed rule and the un-updated model both do poorly once the world shifts,
@@ -447,8 +462,11 @@ string \`"rule"\` or the string \`"model"\`:
    viewing history.
 
 The hidden tests check each individual answer.`}
-  initCode={``}
-  starterCode={`choices = {
+  files={[
+    {
+      filename: "main.py",
+      initCode: ``,
+      starterCode: `choices = {
     "flag_orders_over_10000": None,  # "rule" or "model"
     "detect_fraud": None,
     "recognize_handwritten_digits": None,
@@ -457,8 +475,8 @@ The hidden tests check each individual answer.`}
 }
 
 print(choices)
-`}
-  solutionCode={`choices = {
+`,
+      solutionCode: `choices = {
     "flag_orders_over_10000": "rule",
     "detect_fraud": "model",
     "recognize_handwritten_digits": "model",
@@ -467,7 +485,9 @@ print(choices)
 }
 
 print(choices)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "orders_rule",

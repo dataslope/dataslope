@@ -88,7 +88,10 @@ We will generate a cloud of points with `make_regression`, fit a
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_regression
 from sklearn.linear_model import LinearRegression
@@ -115,7 +118,9 @@ plt.show()
 
 print(f"slope     = {model.coef_[0]:.2f}")
 print(f"intercept = {model.intercept_:.2f}")
-`}
+`,
+    },
+  ]}
 />
 
 The red line is the single straight line that minimizes the total squared
@@ -139,7 +144,10 @@ language.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import make_regression
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import make_regression
 from sklearn.linear_model import LinearRegression
 
 X, y = make_regression(n_samples=100, n_features=1, noise=12, random_state=1)
@@ -160,7 +168,9 @@ x_new = 1.5
 by_hand = intercept + slope * x_new
 by_model = model.predict([[x_new]])[0]
 print(f"At x = {x_new}:  by hand = {by_hand:.2f}, by model = {by_model:.2f}")
-`}
+`,
+    },
+  ]}
 />
 
 There is the whole interpretation: **the slope is the price of one unit of
@@ -190,7 +200,10 @@ identical.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_diabetes
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 
@@ -210,7 +223,9 @@ print()
 print("Feature        coefficient")
 for name, coef in zip(diabetes.feature_names, model.coef_):
     print(f"  {name:6s}      {coef:8.1f}")
-`}
+`,
+    },
+  ]}
 />
 
 Each coefficient says how the prediction moves per unit of that feature,
@@ -235,7 +250,10 @@ overall quality.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_diabetes
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 
@@ -254,7 +272,9 @@ for p, a in zip(preds, y_test[:5]):
 print()
 # For a regressor, .score() returns R-squared (not accuracy).
 print(f"R-squared on the test set: {model.score(X_test, y_test):.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 The predictions are in the right ballpark but clearly imperfect — disease
@@ -326,7 +346,10 @@ is actually curved, and you can see the line systematically miss.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 
@@ -349,7 +372,9 @@ plt.legend()
 plt.show()
 
 print(f"R-squared: {model.score(X, y):.3f}  (low -- the line misses the bend)")
-`}
+`,
+    },
+  ]}
 />
 
 The line is the *best possible* straight line, and it is still badly wrong —
@@ -426,9 +451,12 @@ learned.
 The hidden tests check that \`model\` is fitted, that \`slope\` is the
 expected strong positive value, and that \`pred_at_1_5\` matches the line's
 own formula \`intercept + slope * 1.5\`.`}
-  initCode={`from sklearn.datasets import make_regression
-from sklearn.linear_model import LinearRegression`}
-  starterCode={`# 1. Generate the data
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from sklearn.datasets import make_regression
+from sklearn.linear_model import LinearRegression`,
+      starterCode: `# 1. Generate the data
 X, y = None, None
 
 # 2. Create and fit the model
@@ -442,8 +470,8 @@ intercept = None
 pred_at_1_5 = None
 
 print("slope:", slope, "intercept:", intercept, "pred@1.5:", pred_at_1_5)
-`}
-  solutionCode={`# 1. Generate the data
+`,
+      solutionCode: `# 1. Generate the data
 X, y = make_regression(n_samples=100, n_features=1, noise=12, random_state=1)
 
 # 2. Create and fit the model
@@ -458,7 +486,9 @@ intercept = model.intercept_
 pred_at_1_5 = model.predict([[1.5]])[0]
 
 print("slope:", slope, "intercept:", intercept, "pred@1.5:", pred_at_1_5)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "model_fitted",

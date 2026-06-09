@@ -19,7 +19,10 @@ the workhorse.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 raw = ["2014-01-05", "2014-02-10", "2014-03-30"]
 ts = pd.to_datetime(raw)
@@ -32,7 +35,9 @@ print()
 print("It understands the calendar:")
 print("  day names:", list(ts.day_name()))
 print("  is 2014 a leap year? Feb has", ts[1].days_in_month, "days")
-`}
+`,
+    },
+  ]}
 />
 
 Two new types just appeared, and they matter:
@@ -54,7 +59,10 @@ When some values are unparseable, choose your failure mode explicitly:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 messy = pd.Series(["2014-01-05", "not-a-date", "2014-03-30"])
 
@@ -65,7 +73,9 @@ print(parsed)
 print()
 print("dtype stays datetime:", parsed.dtype)
 print("count of valid dates:", parsed.notna().sum())
-`}
+`,
+    },
+  ]}
 />
 
 `NaT` ("Not a Time") is to timestamps what `NaN` is to numbers. Using
@@ -79,7 +89,10 @@ The pivotal move: take a parsed date column and make it the index.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -97,7 +110,9 @@ print(df)
 print()
 print("index type:", type(df.index).__name__)  # DatetimeIndex
 print("Now the timeline tools are available.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Why the index, not a column?">
@@ -116,7 +131,10 @@ generates one. The `freq` argument sets the spacing.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 print("Six month-STARTS (freq='MS'):")
 print(pd.date_range("2014-01-01", periods=6, freq="MS").tolist())
@@ -129,7 +147,9 @@ print(pd.date_range("2014-01-01", periods=4, freq="W").tolist())
 print()
 print("End-date form instead of periods:")
 print(pd.date_range(start="2014-01-01", end="2014-06-01", freq="MS").tolist())
-`}
+`,
+    },
+  ]}
 />
 
 ### The frequency cheat sheet (and a version gotcha)
@@ -167,7 +187,10 @@ off.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -184,8 +207,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`# A whole year, just by naming it:
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `# A whole year, just by naming it:
 print("All of 1955:")
 print(air.loc["1955"].tolist())
 print()
@@ -198,7 +221,9 @@ print()
 # Aggregate a slice directly:
 print("Average monthly passengers in 1960:", round(air.loc["1960"].mean(), 1))
 print("Peak month across the whole series:", air.idxmax().date(), "=", air.max())
-`}
+`,
+    },
+  ]}
 />
 
 Notice that `air.loc["1955-06":"1955-09"]` is **inclusive of the end** —
@@ -228,7 +253,10 @@ To pull out the year, month, weekday, or quarter, use `.dt` on a datetime
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -245,8 +273,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`import pandas as pd
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `import pandas as pd
 
 # Directly off the index:
 print("First five years :", air.index.year[:5].tolist())
@@ -266,7 +294,9 @@ print("Average passengers by calendar month (1=Jan ... 12=Dec):")
 print(by_month)
 print()
 print("Peak travel months are the summer (Jul/Aug) - that's the seasonality.")
-`}
+`,
+    },
+  ]}
 />
 
 Grouping by `date.dt.month` already reveals the yearly seasonal shape —
@@ -297,7 +327,10 @@ keeps you from nonsense like "the sales at exactly midnight on the 1st."
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 instant = pd.Timestamp("2014-03-15 14:32:05")
 month = pd.Period("2014-03", freq="M")
@@ -313,7 +346,9 @@ print("This period:", month, " next period:", month + 1)
 print(
     "Is the instant within the period?", month.start_time <= instant <= month.end_time
 )
-`}
+`,
+    },
+  ]}
 />
 
 <MultipleChoice
@@ -348,7 +383,10 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 a = pd.Series(
     [1, 2, 3], index=pd.to_datetime(["2014-01-01", "2014-01-02", "2014-01-03"])
@@ -362,7 +400,9 @@ print(a + b)
 print()
 print("Jan-01 and Jan-04 are NaN: each exists in only ONE series, so")
 print("there's nothing to add. pandas refuses to guess.")
-`}
+`,
+    },
+  ]}
 />
 
 Compare that to plain Python lists or NumPy arrays, which add by
@@ -406,22 +446,27 @@ flowchart LR
 3. Contains the \`units\` values, ordered by date ascending.
 
 The result must be a \`pd.Series\` whose \`.index\` is a \`DatetimeIndex\` of length 5, sorted in time order.`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 
 log = pd.DataFrame({
     "day":   ["2014-02-03", "2014-02-01", "2014-02-04", "2014-02-02", "2014-02-05"],
     "units": [9, 5, 12, 7, 3],
-})`}
-  starterCode={`# Build the time-indexed Series 'daily' here.
+})`,
+      starterCode: `# Build the time-indexed Series 'daily' here.
 daily = None
 print(daily)
-`}
-  solutionCode={`parsed = pd.to_datetime(log["day"])
+`,
+      solutionCode: `parsed = pd.to_datetime(log["day"])
 daily = pd.Series(log["units"].values, index=parsed, name="units").sort_index()
 print(daily)
 print()
 print("index type:", type(daily.index).__name__)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_series",
@@ -468,7 +513,10 @@ assert daily.loc[pd.Timestamp("2014-02-04")] == 12`,
 - On days present in only one store, use that store's value alone (treat the missing store as 0).
 
 The result should have **one row per date in the union** of the two indices, sorted ascending, with no \`NaN\`s. (Hint: \`Series.add(other, fill_value=0)\`.)`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 
 store_a = pd.Series(
     [10, 12, 9],
@@ -477,13 +525,15 @@ store_a = pd.Series(
 store_b = pd.Series(
     [4, 6, 8],
     index=pd.to_datetime(["2014-03-02", "2014-03-03", "2014-03-04"]),
-)`}
-  starterCode={`total = None  # combine with alignment; missing -> 0
+)`,
+      starterCode: `total = None  # combine with alignment; missing -> 0
 print(total)
-`}
-  solutionCode={`total = store_a.add(store_b, fill_value=0).sort_index()
+`,
+      solutionCode: `total = store_a.add(store_b, fill_value=0).sort_index()
 print(total)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "union_length",

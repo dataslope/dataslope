@@ -23,7 +23,10 @@ type.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct Point {
   double x;
@@ -38,7 +41,9 @@ int main() {
   std::cout << "p = (" << p.x << ", " << p.y << ")\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 In memory, a `Point` is just the two `double`s laid out one after
@@ -98,7 +103,10 @@ Structs compose. A `Rectangle` can be made of two `Point`s:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct Point {
   double x;
@@ -121,7 +129,9 @@ int main() {
   std::cout << "area = " << area(box) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 This is the seed of object-oriented design: small, focused types
@@ -134,7 +144,10 @@ standard library provides:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <tuple>
 #include <utility>
 
@@ -160,7 +173,9 @@ int main() {
   std::cout << a << " " << b << " " << c << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 For anything more than two or three values, or anything that will
@@ -189,7 +204,10 @@ Conventionally:
   adapter="cpp"
   title="Average of points"
   instructions={`Given a hard-coded list of three \`Point\`s in \`main\`, compute the centroid (average of \`x\`, average of \`y\`) and print it as \`x y\` with no extra formatting. Expected output: \`3 4\`.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct Point {
   double x;
@@ -201,8 +219,8 @@ int main() {
   // your code
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 
 struct Point {
   double x;
@@ -219,7 +237,9 @@ int main() {
   std::cout << sx / 3 << ' ' << sy / 3;
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "centroid",

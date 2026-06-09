@@ -32,7 +32,10 @@ someone else's bytes, sometimes it crashes.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -57,7 +60,9 @@ int main(void) {
   free(t);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 **Cure:** the moment you `free(p)`, stop using `p`. Many codebases
@@ -78,7 +83,10 @@ allocators it can silently corrupt the heap.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
@@ -95,7 +103,9 @@ int main(void) {
   printf("freed twice — if you see this, the allocator silently accepted it\\n");
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 **Cure:** same as above — `free(p); p = NULL;`. `free(NULL)` is
@@ -110,7 +120,10 @@ unreachable, until the process exits.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 
 void leaky(int times) {
@@ -129,7 +142,9 @@ int main(void) {
   printf("leaked ~4 MB; in a server this would grow forever\\n");
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 **Cure:** treat every successful allocation as a *promise to free
@@ -147,7 +162,10 @@ function's return address, leading to remote code execution.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <string.h>
 
 int main(void) {
@@ -163,7 +181,9 @@ int main(void) {
   printf("After:  age = %d   (may be corrupted!)\\n", age);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Depending on the layout the compiler chose, `age` may now contain
@@ -186,7 +206,10 @@ you meant `<`).
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <string.h>
 
 int main(void) {
@@ -200,7 +223,9 @@ int main(void) {
   printf("dst = %s   (probably garbage at the end)\\n", dst);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 **Cure:** when sizing a string buffer, always remember the `+ 1` for
@@ -215,7 +240,10 @@ previous user's data.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
@@ -229,7 +257,9 @@ int main(void) {
   free(heap);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 **Cure:**
@@ -247,7 +277,10 @@ another mention here because the failure mode is so quiet.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int *make(void) {
   int x = 42;
@@ -267,7 +300,9 @@ int main(void) {
   printf("*p = %d  (probably -1 now, definitely UB)\\n", *p);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The pattern "returned a pointer to a local, then called another
@@ -284,7 +319,10 @@ type. The compiler trusts you to know what you are doing.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   long x = 0x4142434445464748L; // 'ABCDEFGH' as bytes on a little-endian box
@@ -295,7 +333,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Reading bytes through a `char *` is *legal* (the standard
@@ -332,7 +372,10 @@ the language:
   adapter="c"
   title="Allocate, use, and free correctly"
   instructions={`Implement \`char *make_greeting(const char *name)\` so that it returns a heap-allocated string of the form \`Hello, NAME!\` (without the literal word "NAME" — substitute the parameter). The provided \`main\` calls it, prints the result, and frees it. Make sure not to leak and not to overflow.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -349,8 +392,8 @@ int main(void) {
   free(g);
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -373,7 +416,9 @@ int main(void) {
   free(g);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "greeted",
@@ -389,7 +434,10 @@ int main(void) {
   adapter="c"
   title="Build a string by repeated append"
   instructions={`Implement \`char *repeat(const char *s, int times)\` that returns a fresh heap string containing \`s\` repeated \`times\` times. Use a single \`malloc\` (no \`realloc\` needed). Do not leak; do not overflow. \`repeat("ab", 3)\` must produce \`ababab\`. The provided \`main\` prints and frees the result.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -406,8 +454,8 @@ int main(void) {
   free(r);
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -434,7 +482,9 @@ int main(void) {
   free(r);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "ababab",

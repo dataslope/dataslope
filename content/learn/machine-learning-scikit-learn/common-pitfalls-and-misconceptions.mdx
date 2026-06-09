@@ -45,7 +45,10 @@ difference.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.preprocessing import StandardScaler
@@ -74,7 +77,9 @@ print(f"Correct CV accuracy: {correct_cv:.4f}")
 print("On this gentle example the gap is small, but the leaky number is")
 print("optimistic for the wrong reasons -- and on heavier preprocessing")
 print("(imputation, target encoding) the gap can be enormous.")
-`}
+`,
+    },
+  ]}
 />
 
 **Target leakage** is the nastier cousin: a *feature* secretly encodes the
@@ -109,7 +114,10 @@ about: "how well does the model recall what it has already seen?"
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
@@ -125,7 +133,9 @@ print(
     f"Training accuracy: {tree.score(X_train, y_train):.3f}  <- meaningless as a performance estimate"
 )
 print(f"Test accuracy:     {tree.score(X_test, y_test):.3f}  <- the honest number")
-`}
+`,
+    },
+  ]}
 />
 
 **The fix.** Always report performance on held-out data: a test set, or
@@ -146,7 +156,10 @@ The number looks superb and the model is useless.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import accuracy_score, recall_score, confusion_matrix
 
@@ -164,7 +177,9 @@ print(
 )
 print("Confusion matrix:")
 print(confusion_matrix(y, pred))
-`}
+`,
+    },
+  ]}
 />
 
 A 99% accuracy and a 0% catch rate on the cases that matter. **The fix:**
@@ -221,7 +236,10 @@ that have nothing to do with the thing you changed.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
@@ -236,7 +254,9 @@ for seed_free_run in range(5):
 
 print("Five unseeded runs, five different scores:", scores)
 print("Which one do you report? With a fixed random_state, there is one answer.")
-`}
+`,
+    },
+  ]}
 />
 
 **The fix.** Set `random_state` (and `np.random.seed` where relevant) on
@@ -284,7 +304,10 @@ constant, because it can never output a value beyond what it saw in training.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 
@@ -305,7 +328,9 @@ print(
 print(
     f"Random forest predicts:       {forest.predict(far)[0]:.1f}  (flat -- cannot exceed training range)"
 )
-`}
+`,
+    },
+  ]}
 />
 
 The forest cannot predict anything near 200 — it never saw a target that
@@ -356,7 +381,10 @@ still has never seen.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.datasets import load_wine
 from sklearn.model_selection import cross_val_score
 from sklearn.pipeline import make_pipeline
@@ -380,7 +408,9 @@ score_noisy = cross_val_score(
 print(f"CV accuracy with 13 real features:        {score_clean:.3f}")
 print(f"CV accuracy after adding 200 noise cols:  {score_noisy:.3f}")
 print("More columns made the model WORSE -- the noise drowned the signal.")
-`}
+`,
+    },
+  ]}
 />
 
 **The fix:** prefer features with a plausible connection to the target, and
@@ -432,14 +462,17 @@ By scaling **inside** the pipeline, each fold is scaled using only its own
 training portion — no leakage. The hidden tests check that \`pipe\` is a
 proper two-step pipeline (so scaling happens inside cross-validation) and
 that \`correct_cv\` is a believable accuracy.`}
-  initCode={`from sklearn.datasets import load_breast_cancer
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import cross_val_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 
-X, y = load_breast_cancer(return_X_y=True)`}
-  starterCode={`# LEAKY starter (for reference): scales the whole dataset before CV.
+X, y = load_breast_cancer(return_X_y=True)`,
+      starterCode: `# LEAKY starter (for reference): scales the whole dataset before CV.
 # X_leaked = StandardScaler().fit_transform(X)
 # leaky_cv = cross_val_score(LogisticRegression(max_iter=5000), X_leaked, y, cv=5).mean()
 
@@ -449,8 +482,8 @@ pipe = None
 correct_cv = None
 
 print("correct CV accuracy:", correct_cv)
-`}
-  solutionCode={`# YOUR FIX: scale INSIDE a pipeline so each fold scales only its training rows.
+`,
+      solutionCode: `# YOUR FIX: scale INSIDE a pipeline so each fold scales only its training rows.
 pipe = Pipeline(
     [
         ("scaler", StandardScaler()),
@@ -461,7 +494,9 @@ pipe = Pipeline(
 correct_cv = cross_val_score(pipe, X, y, cv=5).mean()
 
 print("correct CV accuracy:", correct_cv)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_pipeline",
@@ -502,15 +537,18 @@ You should find a high \`acc\` next to a \`rare_recall\` of 0.0 — the model
 looks great on accuracy yet catches none of the cases that matter. The
 hidden tests check that \`acc\` is high (above 0.9) while \`rare_recall\`
 is exactly 0.0, demonstrating the trap.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import accuracy_score, recall_score
 
 y = np.array([0] * 950 + [1] * 50)
 X = np.zeros((1000, 1))
 model = DummyClassifier(strategy="most_frequent").fit(X, y)
-pred = model.predict(X)`}
-  starterCode={`# 1. Plain accuracy of the majority-class predictor
+pred = model.predict(X)`,
+      starterCode: `# 1. Plain accuracy of the majority-class predictor
 acc = None
 
 # 2. Recall on the rare class (class 1)
@@ -518,8 +556,8 @@ rare_recall = None
 
 print("accuracy:", acc)
 print("recall on rare class:", rare_recall)
-`}
-  solutionCode={`# 1. Plain accuracy of the majority-class predictor
+`,
+      solutionCode: `# 1. Plain accuracy of the majority-class predictor
 acc = accuracy_score(y, pred)
 
 # 2. Recall on the rare class (class 1)
@@ -527,7 +565,9 @@ rare_recall = recall_score(y, pred, pos_label=1)
 
 print("accuracy:", acc)
 print("recall on rare class:", rare_recall)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "high_accuracy",

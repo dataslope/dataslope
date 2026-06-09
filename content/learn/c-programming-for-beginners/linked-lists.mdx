@@ -47,7 +47,10 @@ flowchart TD
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 
 typedef struct Node {
@@ -77,7 +80,9 @@ int main(void) {
   // (we still have to free — see below)
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The traversal loop is the heart of working with linked structures:
@@ -241,7 +246,7 @@ The program must print exactly:
   files={[
     {
       filename: "main.c",
-      initialContent: `#include "list.h"
+      starterCode: `#include "list.h"
 
 int main(void) {
   Node *head = NULL;
@@ -256,7 +261,7 @@ int main(void) {
     },
     {
       filename: "list.h",
-      initialContent: `#ifndef LIST_H
+      starterCode: `#ifndef LIST_H
 #define LIST_H
 
 typedef struct Node {
@@ -273,7 +278,7 @@ void list_free(Node *head);
     },
     {
       filename: "list.c",
-      initialContent: `#include "list.h"
+      starterCode: `#include "list.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -290,7 +295,7 @@ void list_free(Node *head) {
   // your code here
 }
 `,
-      solutionContent: `#include "list.h"
+      solutionCode: `#include "list.h"
 #include <stdio.h>
 #include <stdlib.h>
 

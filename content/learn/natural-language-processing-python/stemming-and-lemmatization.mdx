@@ -42,13 +42,16 @@ misbehave.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 # PorterStemmer is pure Python and needs no downloaded data, but we still
 # install NLTK itself.
 import micropip
 await micropip.install("nltk")
-import nltk`}
-  starterCode={`from nltk.stem import PorterStemmer
+import nltk`,
+      starterCode: `from nltk.stem import PorterStemmer
 
 stemmer = PorterStemmer()
 
@@ -70,7 +73,9 @@ words = [
 
 for w in words:
     print(f"  {w:14} -> {stemmer.stem(w)}")
-`}
+`,
+    },
+  ]}
 />
 
 Read that output carefully — it teaches stemming's whole personality:
@@ -102,7 +107,10 @@ always a real word, but there is a catch you must understand.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 # Installs NLTK and loads WordNet, the lexical database the lemmatizer uses.
 import io, os, zipfile
 import micropip
@@ -126,8 +134,8 @@ async def _load_nltk(category, package):
         zf.extractall(dest)
 
 await _load_nltk("corpora", "wordnet")
-from nltk.stem import WordNetLemmatizer`}
-  starterCode={`lemmatizer = WordNetLemmatizer()
+from nltk.stem import WordNetLemmatizer`,
+      starterCode: `lemmatizer = WordNetLemmatizer()
 
 # WordNetLemmatizer defaults to treating each word as a NOUN.
 print("Default (noun) lemmas:")
@@ -142,7 +150,9 @@ print("  ran (verb)         ->", lemmatizer.lemmatize("ran", pos="v"))
 print("  studies (verb)     ->", lemmatizer.lemmatize("studies", pos="v"))
 print("  was (verb)         ->", lemmatizer.lemmatize("was", pos="v"))
 print("  better (adjective) ->", lemmatizer.lemmatize("better", pos="a"))
-`}
+`,
+    },
+  ]}
 />
 
 This is the most important — and most surprising — fact about
@@ -171,7 +181,10 @@ Let us run both on the same words so the trade-off is unmistakable.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -194,8 +207,8 @@ async def _load_nltk(category, package):
         zf.extractall(dest)
 
 await _load_nltk("corpora", "wordnet")
-from nltk.stem import PorterStemmer, WordNetLemmatizer`}
-  starterCode={`stemmer = PorterStemmer()
+from nltk.stem import PorterStemmer, WordNetLemmatizer`,
+      starterCode: `stemmer = PorterStemmer()
 lemmatizer = WordNetLemmatizer()
 
 words = ["studies", "studying", "happily", "better", "was", "mice", "feet"]
@@ -206,7 +219,9 @@ for w in words:
     stem = stemmer.stem(w)
     lemma = lemmatizer.lemmatize(w, pos="v")
     print(f"{w:12}{stem:12}{lemma:14}")
-`}
+`,
+    },
+  ]}
 />
 
 Notice "happily" stems to the non-word "happili" but you would need an
@@ -287,7 +302,10 @@ verb** and returns the list of lemmas. Use the provided \`lemmatizer\` and pass
 For example, \`verb_lemmas(["running", "ran", "studies"])\` should return
 \`["run", "run", "study"]\`. Notice the irregular "ran" correctly becomes
 "run" — something a stemmer cannot do.`}
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -311,22 +329,24 @@ async def _load_nltk(category, package):
 
 await _load_nltk("corpora", "wordnet")
 from nltk.stem import WordNetLemmatizer
-lemmatizer = WordNetLemmatizer()`}
-  starterCode={`def verb_lemmas(words):
+lemmatizer = WordNetLemmatizer()`,
+      starterCode: `def verb_lemmas(words):
     # Lemmatize each word as a verb (pos="v") and return the list.
     return words
 
 
 print(verb_lemmas(["running", "ran", "studies"]))
 print(verb_lemmas(["was", "are", "been"]))
-`}
-  solutionCode={`def verb_lemmas(words):
+`,
+      solutionCode: `def verb_lemmas(words):
     return [lemmatizer.lemmatize(w, pos="v") for w in words]
 
 
 print(verb_lemmas(["running", "ran", "studies"]))
 print(verb_lemmas(["was", "are", "been"]))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "regular_verbs",

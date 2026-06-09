@@ -28,7 +28,10 @@ once and for all.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     String a = "hello";
     String b = new String("hello"); // different object, same value
@@ -37,7 +40,9 @@ once and for all.
     System.out.println("a.equals(b) : " + a.equals(b)); // true
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 If `String` only implemented `==`, `List<String>.contains("hello")`
@@ -93,7 +98,7 @@ inside hash-based collections.
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.HashSet;
+      starterCode: `import java.util.HashSet;
 import java.util.Set;
 
 public class Main {
@@ -109,7 +114,7 @@ public class Main {
     },
     {
       filename: "Point.java",
-      initialContent: `public class Point {
+      starterCode: `public class Point {
   private final int x;
   private final int y;
   public Point(int x, int y) {
@@ -147,7 +152,7 @@ set never even reaches the `.equals` step.
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.HashSet;
+      starterCode: `import java.util.HashSet;
 import java.util.Set;
 
 public class Main {
@@ -166,7 +171,7 @@ public class Main {
     },
     {
       filename: "Point.java",
-      initialContent: `import java.util.Objects;
+      starterCode: `import java.util.Objects;
 
 public class Point {
   private final int x;
@@ -207,7 +212,10 @@ Java 16+ has **records**, which generate a correct `equals`,
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.HashSet;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.HashSet;
 import java.util.Set;
 
 public class Main {
@@ -222,7 +230,9 @@ public class Main {
     System.out.println("contains (1,2)? " + seen.contains(new Point(1, 2)));
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Records were added partly *because* getting `equals`/`hashCode` right
@@ -237,7 +247,10 @@ there, but the collection looks for it in the wrong bucket.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.HashSet;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -265,7 +278,9 @@ public class Main {
     System.out.println("contains? " + set.contains(n)); // false — lost
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 **Rule:** anything you put in a `HashSet` or use as a `HashMap` key
@@ -311,7 +326,7 @@ total unique = 2
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     UniquenessTracker t = new UniquenessTracker();
     System.out.println("first  Ada@x.com? " +
@@ -329,14 +344,14 @@ total unique = 2
     },
     {
       filename: "Email.java",
-      initialContent: `public class Email {
+      starterCode: `public class Email {
   private final String address;
   public Email(String address) { this.address = address; }
   public String address() { return address; }
   // TODO: equals / hashCode that ignore case
 }
 `,
-      solutionContent: `import java.util.Locale;
+      solutionCode: `import java.util.Locale;
 import java.util.Objects;
 
 public class Email {
@@ -361,7 +376,7 @@ public class Email {
     },
     {
       filename: "UniquenessTracker.java",
-      initialContent: `import java.util.HashSet;
+      starterCode: `import java.util.HashSet;
 import java.util.Set;
 
 public class UniquenessTracker {
@@ -373,7 +388,7 @@ public class UniquenessTracker {
   public int size() { return seen.size(); }
 }
 `,
-      solutionContent: `import java.util.HashSet;
+      solutionCode: `import java.util.HashSet;
 import java.util.Set;
 
 public class UniquenessTracker {

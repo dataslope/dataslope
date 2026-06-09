@@ -33,7 +33,10 @@ conclusion.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 penguins = sns.load_dataset("penguins")
 
@@ -45,7 +48,9 @@ print(penguins.head())
 
 # Where are the missing values?
 print(penguins.isna().sum())
-`}
+`,
+    },
+  ]}
 />
 
 Read the output top to bottom. The **shape** is `(344, 7)`: 344 penguins,
@@ -81,14 +86,19 @@ Here is `body_mass_g`, the penguins' weight:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 # The distribution of one numeric column: where does weight pile up?
 sns.displot(penguins, x="body_mass_g", kind="hist", bins=20, height=4)
-`}
+`,
+    },
+  ]}
 />
 
 The shape is not a single tidy hump. There is a big cluster of lighter
@@ -112,15 +122,18 @@ so the groups show up in color.
 - color the bars by species with \`hue="species"\`.
 
 Assign the result to a variable named \`g\`.`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 # Build the histogram and assign it to g:
 g = None
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
@@ -132,7 +145,9 @@ g = sns.displot(
     kind="hist",
     height=4,
 )
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_facetgrid",
@@ -167,7 +182,10 @@ Body mass by species:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
@@ -180,7 +198,9 @@ sns.catplot(
     kind="box",
     height=4,
 )
-`}
+`,
+    },
+  ]}
 />
 
 Now the suspicion is confirmed and quantified: **Gentoo** penguins are
@@ -204,15 +224,18 @@ vary by *where* a penguin lives, the way it varies by species? Find out.
 - use \`kind="box"\` (or \`kind="violin"\` if you prefer).
 
 Assign the result to a variable named \`g\`.`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 # Build the catplot and assign it to g:
 g = None
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
@@ -224,7 +247,9 @@ g = sns.catplot(
     kind="box",
     height=4,
 )
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_facetgrid",
@@ -259,7 +284,10 @@ Flipper length against body mass:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
@@ -272,7 +300,9 @@ sns.relplot(
     hue="species",
     height=4,
 )
-`}
+`,
+    },
+  ]}
 />
 
 This is one of the cleanest relationships you will ever see: longer
@@ -299,15 +329,18 @@ recall from earlier) hide a surprise when you split by species.
 - color (and fit a separate line) by species with \`hue="species"\`.
 
 Assign the result to a variable named \`g\`.`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 # Build the lmplot and assign it to g:
 g = None
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
@@ -319,7 +352,9 @@ g = sns.lmplot(
     hue="species",
     height=4,
 )
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_facetgrid",
@@ -360,14 +395,19 @@ fastest way to scan an entire numeric dataset for structure.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 # Every numeric column vs every other, colored by species.
 sns.pairplot(penguins, hue="species", height=1.8)
-`}
+`,
+    },
+  ]}
 />
 
 In one figure you can confirm everything the earlier steps found and spot
@@ -383,7 +423,10 @@ together, from `-1` (perfect opposite) through `0` (no linear relation) to
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="white")
 penguins = sns.load_dataset("penguins")
@@ -393,7 +436,9 @@ corr = penguins.corr(numeric_only=True)
 
 # A diverging palette centered at 0: red = negative, blue = positive.
 sns.heatmap(corr, annot=True, cmap="vlag", center=0, square=True)
-`}
+`,
+    },
+  ]}
 />
 
 Two choices make this heatmap honest. The palette `"vlag"` is **diverging**
@@ -425,19 +470,24 @@ corr = penguins.corr(numeric_only=True)
 
 The tests will confirm that \`corr\` is square and that its top-left entry
 (a variable's correlation with itself) is \`1\`.`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 penguins = sns.load_dataset("penguins")
 
 # Build the correlation matrix of the numeric columns:
 corr = None
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 penguins = sns.load_dataset("penguins")
 
 corr = penguins.corr(numeric_only=True)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_square",
@@ -473,7 +523,10 @@ is that scatter, dressed for an audience: a title that says what the chart
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid", context="talk")
 penguins = sns.load_dataset("penguins")
@@ -495,7 +548,9 @@ g.legend.set_title("Species")
 g.figure.suptitle("Penguin species separate cleanly by bill shape")
 # Make room for the title above the plot.
 g.figure.subplots_adjust(top=0.9)
-`}
+`,
+    },
+  ]}
 />
 
 Compare this to the bare scatter from Step 4. The data is identical; what

@@ -69,7 +69,10 @@ We will build this table as a small pandas DataFrame and look at it.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 
 houses = pd.DataFrame({
     "size_sqft":    [800, 1200, 1500, 1000, 2000, 1350],
@@ -77,12 +80,14 @@ houses = pd.DataFrame({
     "age_years":    [40, 15, 8, 22, 3, 12],
     "neighborhood": ["downtown", "suburb", "suburb", "downtown", "rural", "suburb"],
     "price":        [320000, 410000, 480000, 350000, 520000, 445000],
-})`}
-  starterCode={`# 'houses' is provided above. Take a look at the whole table.
+})`,
+      starterCode: `# 'houses' is provided above. Take a look at the whole table.
 print(houses)
 print()
 print("Shape of the full table:", houses.shape, "(rows, columns)")
-`}
+`,
+    },
+  ]}
 />
 
 Six houses, five columns. Now comes the central act of framing a supervised
@@ -92,7 +97,10 @@ so `price` becomes `y` and the other four columns become `X`.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 
 houses = pd.DataFrame({
     "size_sqft":    [800, 1200, 1500, 1000, 2000, 1350],
@@ -100,8 +108,8 @@ houses = pd.DataFrame({
     "age_years":    [40, 15, 8, 22, 3, 12],
     "neighborhood": ["downtown", "suburb", "suburb", "downtown", "rural", "suburb"],
     "price":        [320000, 410000, 480000, 350000, 520000, 445000],
-})`}
-  starterCode={`# The target: the column we want to predict.
+})`,
+      starterCode: `# The target: the column we want to predict.
 y = houses["price"]
 
 # The features: everything we are allowed to use as input.
@@ -112,7 +120,9 @@ print("y (target)  has shape:", y.shape, "-> 6 answers, one per row")
 print()
 print("Feature columns:", list(X.columns))
 print("Target name:    ", y.name)
-`}
+`,
+    },
+  ]}
 />
 
 That is the entire idea. `houses.drop(columns=["price"])` keeps every input
@@ -138,7 +148,10 @@ do I have* (rows) and *how many features describe each one* (columns).
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris
 
 X, y = load_iris(return_X_y=True)
 
@@ -147,7 +160,9 @@ print("X.shape:", X.shape)
 print("Number of samples (rows):  ", n_samples)
 print("Number of features (cols): ", n_features)
 print("y.shape:", y.shape, "-> one target per sample")
-`}
+`,
+    },
+  ]}
 />
 
 Whether `X` is a pandas DataFrame or a plain NumPy array, scikit-learn reads
@@ -174,7 +189,10 @@ errors.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 # Five examples, ONE feature each. A flat list is 1-D -- NOT a valid X.
 one_feature_flat = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
@@ -189,7 +207,9 @@ y = np.array([2.0, 4.0, 6.0, 8.0, 10.0])
 print("Target y shape:  ", y.shape, "(1-D: one answer per sample)")
 print()
 print("X is 2-D?", X.ndim == 2, " | y is 1-D?", y.ndim == 1)
-`}
+`,
+    },
+  ]}
 />
 
 The rule of thumb is simple: **`X` has two dimensions (samples by features),
@@ -217,15 +237,18 @@ table. Here are the idioms you will use constantly.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 
 df = pd.DataFrame({
     "feature_a": [1, 2, 3, 4],
     "label":     [0, 1, 0, 1],
     "feature_b": [9, 8, 7, 6],
     "feature_c": [3, 1, 4, 1],
-})`}
-  starterCode={`# The target may sit anywhere -- here 'label' is the SECOND column.
+})`,
+      starterCode: `# The target may sit anywhere -- here 'label' is the SECOND column.
 # Select it by NAME, never by position.
 y = df["label"]
 
@@ -239,7 +262,9 @@ print("Target selected by name:", list(y))
 print("X via drop, columns:   ", list(X_drop.columns))
 print("X via explicit list:   ", list(X_explicit.columns))
 print("Same feature set?      ", list(X_drop.columns) == list(X_explicit.columns))
-`}
+`,
+    },
+  ]}
 />
 
 Both idioms — `drop(columns=[...])` to remove the target, or `df[[...]]` to
@@ -409,7 +434,10 @@ patient. We want to predict whether each patient has the condition — the
 The hidden tests check that \`y\` is the right column, that \`X\` excludes the
 target, that the rows of \`X\` and \`y\` stay aligned, and that \`n_features\`
 is correct.`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 
 patients = pd.DataFrame({
     "age":           [45, 60, 33, 52, 70, 41],
@@ -417,8 +445,8 @@ patients = pd.DataFrame({
     "cholesterol":   [200, 260, 180, 240, 300, 210],
     "max_heartrate": [170, 150, 185, 160, 130, 175],
     "has_condition": [0, 1, 0, 1, 1, 0],
-})`}
-  starterCode={`# 'patients' is provided above (6 patients, 5 columns).
+})`,
+      starterCode: `# 'patients' is provided above (6 patients, 5 columns).
 
 # 1. Target: the column we want to predict.
 y = None
@@ -432,8 +460,8 @@ n_features = None
 print("X shape:", None if X is None else X.shape)
 print("y length:", None if y is None else len(y))
 print("n_features:", n_features)
-`}
-  solutionCode={`y = patients["has_condition"]
+`,
+      solutionCode: `y = patients["has_condition"]
 
 X = patients.drop(columns=["has_condition"])
 
@@ -442,7 +470,9 @@ n_features = X.shape[1]
 print("X shape:", X.shape)
 print("y length:", len(y))
 print("n_features:", n_features)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "y_is_target",

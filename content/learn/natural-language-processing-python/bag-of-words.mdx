@@ -40,7 +40,10 @@ matrix of numbers.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 # Installs NLTK and loads the tokenizer this page needs. nltk.download()
 # isn't available here, so we fetch the archives directly.
 import io, os, zipfile
@@ -65,8 +68,8 @@ async def _load_nltk(category, package):
         zf.extractall(dest)
 
 await _load_nltk("tokenizers", "punkt_tab")
-from nltk.tokenize import word_tokenize`}
-  starterCode={`from collections import Counter
+from nltk.tokenize import word_tokenize`,
+      starterCode: `from collections import Counter
 import pandas as pd
 
 corpus = [
@@ -91,7 +94,9 @@ for doc in docs:
 # 4. Assemble the document-term matrix.
 dtm = pd.DataFrame(rows, columns=vocab, index=["doc1", "doc2", "doc3"])
 display(dtm)
-`}
+`,
+    },
+  ]}
 />
 
 That table *is* the bag-of-words representation. Read doc1's row: "the" appears
@@ -118,7 +123,10 @@ count.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from collections import Counter
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from collections import Counter
 
 vocab = ["cheap", "free", "meeting", "report", "winner"]
 
@@ -138,7 +146,9 @@ spam = "free free free winner cheap".split()
 print("vocab:        ", vocab)
 print("count vector: ", count_vector(spam, vocab))
 print("binary vector:", binary_vector(spam, vocab))
-`}
+`,
+    },
+  ]}
 />
 
 The count vector records that "free" appeared three times (a strong spam
@@ -217,21 +227,26 @@ For example, with \`vocab = ["cat", "dog", "fish"]\` and
 "cat", two "dog", zero "fish", and "bird" ignored.
 
 Tip: \`collections.Counter\` makes this clean (it returns 0 for missing keys).`}
-  initCode={`from collections import Counter`}
-  starterCode={`def bow_vector(tokens, vocab):
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from collections import Counter`,
+      starterCode: `def bow_vector(tokens, vocab):
     # return a list of counts aligned to vocab
     return []
 
 
 print(bow_vector(["dog", "cat", "dog", "bird"], ["cat", "dog", "fish"]))
-`}
-  solutionCode={`def bow_vector(tokens, vocab):
+`,
+      solutionCode: `def bow_vector(tokens, vocab):
     counts = Counter(tokens)
     return [counts[w] for w in vocab]
 
 
 print(bow_vector(["dog", "cat", "dog", "bird"], ["cat", "dog", "fish"]))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic_counts",

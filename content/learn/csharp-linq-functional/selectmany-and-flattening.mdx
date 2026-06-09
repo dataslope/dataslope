@@ -22,7 +22,10 @@ want one flat list of all employees in the company.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -42,7 +45,9 @@ foreach (var group in nested)
 
 record Employee(string Name);
 record Department(string Name, List<Employee> Employees);
-`}
+`,
+    },
+  ]}
 />
 
 `Select` gave us a sequence of *three* groups, not six employees. We
@@ -52,7 +57,10 @@ need to flatten.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -70,7 +78,9 @@ foreach (var e in allEmployees)
 
 record Employee(string Name);
 record Department(string Name, List<Employee> Employees);
-`}
+`,
+    },
+  ]}
 />
 
 The output is six lines — one employee per line. `SelectMany`
@@ -98,7 +108,10 @@ overload for exactly this.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -117,7 +130,9 @@ foreach (var p in pairs)
 
 record Employee(string Name);
 record Department(string Name, List<Employee> Employees);
-`}
+`,
+    },
+  ]}
 />
 
 This is the LINQ equivalent of a SQL `JOIN` between a parent table
@@ -132,7 +147,10 @@ arrays.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var sentences = new[] {
@@ -150,7 +168,9 @@ Console.WriteLine(string.Join(" | ", words));
 // All distinct characters used.
 var chars = sentences.SelectMany(s => s).Distinct().OrderBy(c => c);
 Console.WriteLine($"chars: {string.Join("", chars)}");
-`}
+`,
+    },
+  ]}
 />
 
 Notice that `SelectMany(s => s)` works on strings because `string`
@@ -163,7 +183,10 @@ For deeply nested structures, you chain `SelectMany` calls.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -186,7 +209,9 @@ Console.WriteLine(string.Join(", ", allTags));
 
 record Order(int Id, List<string> Tags);
 record Customer(string Name, List<Order> Orders);
-`}
+`,
+    },
+  ]}
 />
 
 Each `SelectMany` peels off one level of nesting. Two levels of
@@ -226,7 +251,7 @@ Use \`SelectMany\` with the two-argument overload.`}
   files={[
     {
       filename: "Program.cs",
-      initialContent: `var customers = new[] {
+      starterCode: `var customers = new[] {
     new Customer("Ada", new[] { new Order(1), new Order(2) }),
     new Customer("Bilal", new[] { new Order(3) }),
     new Customer("Chiara", new[] { new Order(4), new Order(5), new Order(6) }),
@@ -241,7 +266,7 @@ public record Customer(string Name, Order[] Orders);
     },
     {
       filename: "Reports.cs",
-      initialContent: `using System.Collections.Generic;
+      starterCode: `using System.Collections.Generic;
 
 public static class Reports
 {
@@ -252,7 +277,7 @@ public static class Reports
     }
 }
 `,
-      solutionContent: `using System.Collections.Generic;
+      solutionCode: `using System.Collections.Generic;
 using System.Linq;
 
 public static class Reports

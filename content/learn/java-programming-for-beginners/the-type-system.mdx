@@ -96,7 +96,10 @@ it got.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int x = 5;
     String s = "hello";
@@ -107,7 +110,9 @@ it got.
     System.out.println("x = " + x); // "x = 5"
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Implicit widening, explicit narrowing
@@ -135,7 +140,10 @@ chopped off.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int a = 5;
     double b = a; // widening
@@ -146,7 +154,9 @@ chopped off.
     System.out.println("n = " + n);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Type inference with `var`
@@ -183,7 +193,10 @@ beginners often think of it as primitive. Worth knowing:
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     String a = "java";
     String b = a.toUpperCase();
@@ -196,7 +209,9 @@ beginners often think of it as primitive. Worth knowing:
     System.out.println(greet.substring(7, 12)); // "world"
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Why all this is *good* news, not bad news
@@ -257,7 +272,7 @@ where F is the \`double\` value and R is the cast-to-int value.`}
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     double celsius = 36.6;
 
@@ -265,7 +280,7 @@ where F is the \`double\` value and R is the cast-to-int value.`}
   }
 }
 `,
-      solutionContent: `public class Main {
+      solutionCode: `public class Main {
   public static void main(String[] args) {
     double celsius = 36.6;
 

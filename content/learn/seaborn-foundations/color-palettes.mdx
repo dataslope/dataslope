@@ -35,7 +35,10 @@ one with `palette=`:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
@@ -49,7 +52,9 @@ sns.relplot(
     palette="deep",
     height=4,
 )
-`}
+`,
+    },
+  ]}
 />
 
 No species should look bigger or more important than another, and a
@@ -69,7 +74,10 @@ matplotlib's `viridis`, are all good choices:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
@@ -83,7 +91,9 @@ sns.relplot(
     palette="viridis",
     height=4,
 )
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Why viridis and rocket, not jet/rainbow">
@@ -103,7 +113,10 @@ chapter:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="white")
 penguins = sns.load_dataset("penguins")
@@ -112,7 +125,9 @@ corr = penguins.corr(numeric_only=True)
 
 # 'vlag' is diverging; center=0 puts the neutral color at zero correlation.
 sns.heatmap(corr, annot=True, cmap="vlag", center=0, vmin=-1, vmax=1)
-`}
+`,
+    },
+  ]}
 />
 
 Strong positive correlations glow one color, strong negatives the other, and
@@ -126,7 +141,10 @@ makes the three types easy to compare:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme()
 
@@ -138,7 +156,9 @@ sns.palplot(sns.color_palette("rocket", 8))
 
 print("Diverging (vlag):")
 sns.palplot(sns.color_palette("vlag", 8))
-`}
+`,
+    },
+  ]}
 />
 
 Notice the structure of each strip: the qualitative one jumps between
@@ -188,7 +208,10 @@ for everyone:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
@@ -204,7 +227,9 @@ sns.relplot(
     palette="colorblind",
     height=4,
 )
-`}
+`,
+    },
+  ]}
 />
 
 ## When color stops working
@@ -237,15 +262,18 @@ qualitative, sequential, or diverging — and rules the other two out.
 Assign the result to \`g\`. (Species is an unordered category, so a
 qualitative palette is the right type — and the colorblind one keeps it
 readable for everyone.)`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 # Build the scatter with a colorblind-safe palette and assign it to g:
 g = None
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
@@ -258,7 +286,9 @@ g = sns.relplot(
     palette="colorblind",
     height=4,
 )
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_grid",

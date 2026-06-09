@@ -30,7 +30,10 @@ Plotly Express offers `px.imshow` (for image-like 2-D matrices) and
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
@@ -45,7 +48,9 @@ fig = px.density_heatmap(
     labels={"total_bill": "Total bill (USD)", "tip": "Tip (USD)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Where the scatter plot showed *every dot*, this shows *cell counts*.
@@ -59,7 +64,10 @@ correlated against every other.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.iris().select_dtypes("number")
 corr = df.corr().round(2)
@@ -73,7 +81,9 @@ fig = px.imshow(
     title="Correlation matrix (iris)",
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Three Plotly Express tricks worth noticing:
@@ -93,7 +103,10 @@ Heatmaps also show counts across two categorical axes:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 df = px.data.tips()
@@ -111,7 +124,9 @@ fig = px.imshow(
     labels={"x": "Time", "y": "Day", "color": "Count"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 The hot cell (Sat dinner) leaps out immediately. A table of the

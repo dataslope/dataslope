@@ -31,7 +31,10 @@ by pure luck climbs well above 5%.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(0)
@@ -55,7 +58,9 @@ rate = any_false_alarm / n_trials
 print(f"Groups are all identical, yet at least one of the 10 pairwise")
 print(f"t-tests was 'significant' in {rate:.0%} of trials.")
 print(f"That is FAR above the 5% you thought you were risking.")
-`}
+`,
+    },
+  ]}
 />
 
 That inflation is the heart of the **multiple comparisons problem** —
@@ -106,7 +111,10 @@ question.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(11)
@@ -131,7 +139,9 @@ if p_value <= alpha:
     print("(ANOVA does NOT say which one -- that needs a post-hoc test.)")
 else:
     print("FAIL TO REJECT H0: no evidence the warehouse means differ.")
-`}
+`,
+    },
+  ]}
 />
 
 **How to read it.** The hypotheses are:
@@ -218,7 +228,10 @@ Let's test whether **device type** is associated with **churn**.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import pandas as pd
 from scipy import stats
 
@@ -251,7 +264,9 @@ if p_value <= 0.05:
     print("REJECT H0: device type and churn are associated.")
 else:
     print("FAIL TO REJECT H0: no evidence of association.")
-`}
+`,
+    },
+  ]}
 />
 
 **How to read it.** The hypotheses are:
@@ -295,7 +310,10 @@ last year's category mix? Here you use `stats.chisquare`.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(9)
@@ -324,7 +342,9 @@ if p_value <= 0.05:
     print("REJECT H0: traffic does NOT follow the expected weekday split.")
 else:
     print("FAIL TO REJECT H0: traffic is consistent with the expected split.")
-`}
+`,
+    },
+  ]}
 />
 
 The hypotheses: H₀ says the counts follow the expected proportions;
@@ -368,25 +388,30 @@ Chi-square needs counts because the strength of evidence depends on how many obs
 - Set a string **\`conclusion\`** to **\`"at least one differs"\`** if the result is significant at \`alpha = 0.05\`, otherwise **\`"no difference detected"\`**.
 
 Use the right \`scipy.stats\` function for comparing 3+ group means — do **not** run separate t-tests.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(303)
 method_a = rng.normal(72, 9, size=35)
 method_b = rng.normal(75, 9, size=35)
 method_c = rng.normal(81, 9, size=35)   # this method genuinely helps
-alpha = 0.05`}
-  starterCode={`# TODO: one-way ANOVA; set F_stat, p_value (floats) and conclusion (str)
+alpha = 0.05`,
+      starterCode: `# TODO: one-way ANOVA; set F_stat, p_value (floats) and conclusion (str)
 F_stat = None
 p_value = None
 conclusion = None
-`}
-  solutionCode={`F_stat, p_value = stats.f_oneway(method_a, method_b, method_c)
+`,
+      solutionCode: `F_stat, p_value = stats.f_oneway(method_a, method_b, method_c)
 F_stat = float(F_stat)
 p_value = float(p_value)
 conclusion = "at least one differs" if p_value <= alpha else "no difference detected"
 print(F_stat, p_value, conclusion)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "types",
@@ -433,7 +458,10 @@ assert conclusion == expected`,
 - Set a boolean **\`associated\`** to whether the variables are associated at \`alpha = 0.05\` (reject \`H0\` when \`p_value <= alpha\`).
 
 Remember: chi-square needs **counts**, which is exactly what \`crosstab\` produces.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 from scipy import stats
 
@@ -443,19 +471,21 @@ plan = rng.choice(["basic", "pro", "enterprise"], size=n, p=[0.5, 0.35, 0.15])
 rate = np.where(plan == "basic", 0.30, np.where(plan == "pro", 0.16, 0.10))
 churned = rng.random(n) < rate
 df = pd.DataFrame({"plan": plan, "churned": churned})
-alpha = 0.05`}
-  starterCode={`# TODO: build 'table' with crosstab, run chi-square, set p_value (float) and associated (bool)
+alpha = 0.05`,
+      starterCode: `# TODO: build 'table' with crosstab, run chi-square, set p_value (float) and associated (bool)
 table = None
 p_value = None
 associated = None
-`}
-  solutionCode={`table = pd.crosstab(df["plan"], df["churned"])
+`,
+      solutionCode: `table = pd.crosstab(df["plan"], df["churned"])
 chi2, p_value, dof, expected = stats.chi2_contingency(table)
 p_value = float(p_value)
 associated = bool(p_value <= alpha)
 print(table)
 print(p_value, associated)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "table",

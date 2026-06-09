@@ -50,7 +50,10 @@ replace pass.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #define SQUARE(x) ((x) * (x))
 #define GREETING "Hello"
 
@@ -59,7 +62,9 @@ int main(void) {
   printf("%s, %d squared is %d\\n", GREETING, n, SQUARE(n));
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 After preprocessing, `SQUARE(n)` literally becomes `((n) * (n))`. The
@@ -158,7 +163,7 @@ header / implementation split you would use in a real project.
   files={[
     {
       filename: "main.c",
-      initialContent: `#include "mathx.h"
+      starterCode: `#include "mathx.h"
 #include <stdio.h>
 
 int main(void) {
@@ -171,7 +176,7 @@ int main(void) {
     },
     {
       filename: "mathx.h",
-      initialContent: `#ifndef MATHX_H
+      starterCode: `#ifndef MATHX_H
 #define MATHX_H
 
 int add(int a, int b);
@@ -182,7 +187,7 @@ int mul(int a, int b);
     },
     {
       filename: "mathx.c",
-      initialContent: `#include "mathx.h"
+      starterCode: `#include "mathx.h"
 
 int add(int a, int b) { return a + b; }
 int mul(int a, int b) { return a * b; }
@@ -236,7 +241,7 @@ system. That is why a "hello world" binary is so small.
   files={[
     {
       filename: "main.c",
-      initialContent: `#include "util.h"
+      starterCode: `#include "util.h"
 #include <stdio.h>
 
 int main(void) {
@@ -247,7 +252,7 @@ int main(void) {
     },
     {
       filename: "util.h",
-      initialContent: `#ifndef UTIL_H
+      starterCode: `#ifndef UTIL_H
 #define UTIL_H
 int square(int x);
 #endif
@@ -255,14 +260,14 @@ int square(int x);
     },
     {
       filename: "util.c",
-      initialContent: `#include "util.h"
+      starterCode: `#include "util.h"
 
 int square(int x) {
   // your code here
   return 0;
 }
 `,
-      solutionContent: `#include "util.h"
+      solutionCode: `#include "util.h"
 
 int square(int x) { return x * x; }
 `,

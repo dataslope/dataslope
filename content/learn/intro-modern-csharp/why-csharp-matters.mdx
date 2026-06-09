@@ -50,7 +50,10 @@ A small taste, with three styles side by side:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -82,7 +85,9 @@ class Stats
     }
     public int SumOfEvens() => data.Where(x => x % 2 == 0).Sum();
 }
-`}
+`,
+    },
+  ]}
 />
 
 Same answer, three styles, one language. That is the everyday
@@ -206,7 +211,10 @@ several things, the *shape* of the code is calm and organized.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -240,7 +248,9 @@ class Program
         }
     }
 }
-`}
+`,
+    },
+  ]}
 />
 
 By the end of this course, every line above will feel obvious.

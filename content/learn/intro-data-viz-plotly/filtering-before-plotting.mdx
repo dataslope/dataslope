@@ -78,7 +78,10 @@ biggest gain in life expectancy between 1952 and 2007?"*
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder()
 
@@ -107,7 +110,9 @@ fig = px.bar(
     labels={"gain": "Gain in life expectancy (years)", "country": "Country"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Notice how much of the work is *before* the `px.bar` line. The

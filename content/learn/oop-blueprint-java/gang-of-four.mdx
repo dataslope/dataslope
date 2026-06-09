@@ -103,7 +103,7 @@ classDiagram
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     double subtotal = 100.0;
 
@@ -120,21 +120,21 @@ classDiagram
     },
     {
       filename: "PricingStrategy.java",
-      initialContent: `public interface PricingStrategy {
+      starterCode: `public interface PricingStrategy {
   double price(double subtotal);
 }
 `,
     },
     {
       filename: "RegularPricing.java",
-      initialContent: `public class RegularPricing implements PricingStrategy {
+      starterCode: `public class RegularPricing implements PricingStrategy {
   public double price(double subtotal) { return subtotal; }
 }
 `,
     },
     {
       filename: "HolidayPricing.java",
-      initialContent: `public class HolidayPricing implements PricingStrategy {
+      starterCode: `public class HolidayPricing implements PricingStrategy {
   private final double discount; // e.g. 0.20 = 20% off
   public HolidayPricing(double discount) { this.discount = discount; }
   public double price(double subtotal) { return subtotal * (1.0 - discount); }
@@ -143,7 +143,7 @@ classDiagram
     },
     {
       filename: "LoyaltyPricing.java",
-      initialContent: `public class LoyaltyPricing implements PricingStrategy {
+      starterCode: `public class LoyaltyPricing implements PricingStrategy {
   private final double flatOff;
   public LoyaltyPricing(double flatOff) { this.flatOff = flatOff; }
   public double price(double subtotal) {
@@ -154,7 +154,7 @@ classDiagram
     },
     {
       filename: "Checkout.java",
-      initialContent: `public class Checkout {
+      starterCode: `public class Checkout {
   private final PricingStrategy strategy;
   public Checkout(PricingStrategy strategy) { this.strategy = strategy; }
   public double total(double subtotal) { return strategy.price(subtotal); }

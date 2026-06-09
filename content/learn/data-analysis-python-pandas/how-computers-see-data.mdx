@@ -89,7 +89,10 @@ Let us see them in action.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import io
 
 csv_text = """name,age,city,joined
@@ -104,7 +107,9 @@ print(df)
 print()
 print("Inferred types:")
 print(df.dtypes)
-`}
+`,
+    },
+  ]}
 />
 
 Notice that `joined` came in as `object` (a plain string), not
@@ -113,17 +118,22 @@ that *looks* like a date *is* a date. You can fix that:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd, io
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd, io
 csv_text = """name,age,city,joined
 Aiko,29,Tokyo,2022-01-15
 Bilal,42,Karachi,2019-07-03
 Chen,35,Shanghai,2023-11-20
-"""`}
-  starterCode={`df = pd.read_csv(io.StringIO(csv_text), parse_dates=["joined"])
+"""`,
+      starterCode: `df = pd.read_csv(io.StringIO(csv_text), parse_dates=["joined"])
 print(df.dtypes)
 print()
 print(df)
-`}
+`,
+    },
+  ]}
 />
 
 Now `joined` is `datetime64[ns]` and you can do date arithmetic
@@ -217,7 +227,10 @@ Let us deliberately confuse Pandas and watch it happen.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import io
 
 # Note the leading zero on the second ZIP code:
@@ -232,25 +245,32 @@ print(df)
 print()
 print("zip dtype:", df["zip"].dtype)
 print("First zip:", df["zip"].iloc[0], "<-- lost the leading 0!")
-`}
+`,
+    },
+  ]}
 />
 
 To prevent this you can tell Pandas the type explicitly:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd, io
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd, io
 csv = """name,zip
 Alice,04210
 Bob,90210
 Carol,02134
-"""`}
-  starterCode={`df = pd.read_csv(io.StringIO(csv), dtype={"zip": "string"})
+"""`,
+      starterCode: `df = pd.read_csv(io.StringIO(csv), dtype={"zip": "string"})
 print(df)
 print()
 print("zip dtype:", df["zip"].dtype)
 print("First zip:", df["zip"].iloc[0], "<-- preserved!")
-`}
+`,
+    },
+  ]}
 />
 
 This is a real bug pattern in production analytics — the kind of

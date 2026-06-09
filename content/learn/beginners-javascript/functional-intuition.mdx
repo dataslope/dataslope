@@ -25,7 +25,10 @@ A **pure function** is one that:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// PURE: depends only on its arguments, returns a value, changes nothing.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// PURE: depends only on its arguments, returns a value, changes nothing.
 function add(a, b) {
   return a + b;
 }
@@ -54,7 +57,9 @@ function shout(msg) {
 
 console.log(add(2, 3));
 console.log(double([1, 2, 3]));
-`}
+`,
+    },
+  ]}
 />
 
 Pure functions are easy to reason about because you only need to
@@ -96,7 +101,10 @@ treats them as if they weren't.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// MUTATING style: change the array in place.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// MUTATING style: change the array in place.
 const nums = [1, 2, 3];
 nums.push(4); // nums is now [1,2,3,4] — the SAME array
 console.log(nums);
@@ -112,7 +120,9 @@ const user = { name: "Ada", age: 28 };
 const olderUser = { ...user, age: user.age + 1 };
 console.log(user); // { name: 'Ada', age: 28 }   — unchanged
 console.log(olderUser); // { name: 'Ada', age: 29 }
-`}
+`,
+    },
+  ]}
 />
 
 Why prefer the immutable style?
@@ -155,7 +165,10 @@ are values like any other. You can:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// Pass a function as an argument.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// Pass a function as an argument.
 const nums = [1, 2, 3, 4];
 console.log(nums.map((n) => n * 10));
 
@@ -179,7 +192,9 @@ const double = multiplier(2);
 const triple = multiplier(3);
 console.log(double(7));
 console.log(triple(7));
-`}
+`,
+    },
+  ]}
 />
 
 Treating functions as data is what enables `map`/`filter`/`reduce`,
@@ -194,7 +209,10 @@ bigger one. You can compose at the function level too.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const trim = (s) => s.trim();
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const trim = (s) => s.trim();
 const lower = (s) => s.toLowerCase();
 const dashify = (s) => s.replace(/\\s+/g, "-");
 
@@ -213,7 +231,9 @@ const pipe =
 
 const slugify2 = pipe(trim, lower, dashify);
 console.log(slugify2("  Functional STYLE  ")); // "functional-style"
-`}
+`,
+    },
+  ]}
 />
 
 `pipe` is a tiny but powerful tool: it expresses "do these things
@@ -242,7 +262,10 @@ functional. None of these versions is "wrong" — they're trade-offs.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const orders = [
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const orders = [
   { id: 1, amount: 120, status: "paid" },
   { id: 2, amount: 80, status: "cancelled" },
   { id: 3, amount: 60, status: "paid" },
@@ -279,7 +302,9 @@ function totalPaidV3(orders) {
 console.log(totalPaidV1(orders));
 console.log(totalPaidV2(orders));
 console.log(totalPaidV3(orders));
-`}
+`,
+    },
+  ]}
 />
 
 All three return `380`. The third version *reads* like the
@@ -293,7 +318,7 @@ specification: "of the paid orders, sum the amounts."
   files={[
     {
       filename: "index.js",
-      initialContent: `// IMPURE shell: reads input, calls the pure core, writes output.
+      starterCode: `// IMPURE shell: reads input, calls the pure core, writes output.
 const { summarise } = require("./summary");
 
 const orders = [
@@ -312,7 +337,7 @@ console.log("Top customer: ", result.topCustomer);
     },
     {
       filename: "summary.js",
-      initialContent: `// PURE core: data in, data out. No console.log, no I/O.
+      starterCode: `// PURE core: data in, data out. No console.log, no I/O.
 
 function totalPaid(orders) {
   return orders
@@ -370,7 +395,10 @@ Rules:
 - If no student matches, return an equivalent new array.
 
 This is a classic immutable update.`}
-  starterCode={`function incrementScores(students, name) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function incrementScores(students, name) {
   // your code here — no mutation!
   return students;
 }
@@ -384,8 +412,8 @@ const students = [
 const updated = incrementScores(students, "Linus");
 console.log("Updated:", updated);
 console.log("Original unchanged:", students);
-`}
-  solutionCode={`function incrementScores(students, name) {
+`,
+      solutionCode: `function incrementScores(students, name) {
   return students.map((s) =>
     s.name === name ? { ...s, score: s.score + 1 } : s,
   );
@@ -400,7 +428,9 @@ const students = [
 const updated = incrementScores(students, "Linus");
 console.log("Updated:", updated);
 console.log("Original unchanged:", students);
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "increments",

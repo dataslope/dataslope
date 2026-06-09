@@ -20,10 +20,15 @@ hand:
 
 <CodeBlock
   adapter="r"
-  starterCode={`temperatures <- c(68, 71, 70, 74, 72, 69, 75)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `temperatures <- c(68, 71, 70, 74, 72, 69, 75)
 print(temperatures)
 length(temperatures)
-`}
+`,
+    },
+  ]}
 />
 
 The output starts with `[1]`. That `[1]` is the *index of the first
@@ -39,12 +44,17 @@ length 1:
 
 <CodeBlock
   adapter="r"
-  starterCode={`x <- 42
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `x <- 42
 print(x) # [1] 42
 length(x) # [1] 1
 is.vector(x) # [1] TRUE
 x[1] # [1] 42 — yes, you can index it
-`}
+`,
+    },
+  ]}
 />
 
 There is no `x` that is "the number 42." There is only `x`, which
@@ -77,7 +87,10 @@ shortcuts.
 
 <CodeBlock
   adapter="r"
-  starterCode={`# Integer range
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# Integer range
 1:10
 
 # Same in reverse
@@ -92,7 +105,9 @@ seq(0, 100, length.out = 5)
 # Repeat a pattern
 rep(0, times = 5)
 rep(c("yes", "no"), times = 3)
-`}
+`,
+    },
+  ]}
 />
 
 `:` builds an integer sequence. `seq()` is the general tool — you
@@ -117,12 +132,17 @@ a common type:
 
 <CodeBlock
   adapter="r"
-  starterCode={`# Mixing logical + numeric -> numeric
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# Mixing logical + numeric -> numeric
 c(TRUE, FALSE, 3)
 
 # Mixing anything + character -> character
 c(1, "two", TRUE)
-`}
+`,
+    },
+  ]}
 />
 
 The coercion order is: logical → integer → numeric → character.
@@ -138,7 +158,10 @@ You access elements with `[ ]`. The first element is `[1]`, not
 
 <CodeBlock
   adapter="r"
-  starterCode={`days <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `days <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
 days[1] # first element
 days[3] # third
@@ -147,7 +170,9 @@ days[-1] # everything except the first (negative index = exclude)
 days[-c(1, 7)] # everything except first and last
 days[2:4] # a contiguous slice
 days[length(days)] # the last element
-`}
+`,
+    },
+  ]}
 />
 
 Two things to notice:
@@ -167,7 +192,10 @@ frame.
 
 <CodeBlock
   adapter="r"
-  starterCode={`ages <- c(alice = 30, bob = 25, carol = 41)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `ages <- c(alice = 30, bob = 25, carol = 41)
 print(ages)
 
 # Access by name
@@ -178,7 +206,9 @@ names(ages)
 
 # Or just the values
 unname(ages)
-`}
+`,
+    },
+  ]}
 />
 
 Many R functions return named vectors. When you compute summary
@@ -186,8 +216,13 @@ statistics, you will see this constantly:
 
 <CodeBlock
   adapter="r"
-  starterCode={`summary(c(1, 2, 3, 4, 5, 100))
-`}
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `summary(c(1, 2, 3, 4, 5, 100))
+`,
+    },
+  ]}
 />
 
 That `Min.`, `1st Qu.`, etc., are the names of the result vector.
@@ -268,16 +303,21 @@ Friday.
   adapter="r"
   title="Slice out weekdays"
   instructions={`Use indexing to assign \`weekdays\` to the first 5 elements of \`days\`.`}
-  initCode={`days <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-`}
-  starterCode={`# days is already defined: c("Mon", ..., "Sun")
+  files={[
+    {
+      filename: "main.r",
+      initCode: `days <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+`,
+      starterCode: `# days is already defined: c("Mon", ..., "Sun")
 weekdays <- NULL # replace NULL with the right slice
 
 print(weekdays)
-`}
-  solutionCode={`weekdays <- days[1:5]
+`,
+      solutionCode: `weekdays <- days[1:5]
 print(weekdays)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "weekdays",

@@ -69,14 +69,19 @@ First, **`kind="strip"`** — every single bill as a dot:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 # Show EVERY observation: one dot per bill, jittered within each day.
 sns.catplot(data=tips, x="day", y="total_bill", kind="strip", height=4)
-`}
+`,
+    },
+  ]}
 />
 
 You can count the busy days, spot the high-bill outliers, and see that most
@@ -87,14 +92,19 @@ Now **`kind="box"`** — summarize each day's spread:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 # Summarize the SHAPE: box = middle 50%, line = median, dots = outliers.
 sns.catplot(data=tips, x="day", y="total_bill", kind="box", height=4)
-`}
+`,
+    },
+  ]}
 />
 
 The individual dots are gone, replaced by a tidy summary: the box spans the
@@ -106,14 +116,19 @@ Finally **`kind="bar"`** — one number per day:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 # Collapse to a SINGLE estimate: each bar is the mean bill that day.
 sns.catplot(data=tips, x="day", y="total_bill", kind="bar", height=4)
-`}
+`,
+    },
+  ]}
 />
 
 Now each day is a single bar — its **mean** total bill — with a thin error
@@ -171,14 +186,19 @@ awkwardly along the bottom.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 # Category on y => horizontal. Labels read left-to-right, never cramped.
 sns.catplot(data=tips, y="day", x="total_bill", kind="box", height=4)
-`}
+`,
+    },
+  ]}
 />
 
 Same summary as before, just lying on its side. Reach for horizontal
@@ -219,21 +239,26 @@ across days of the week.
 - Put the numeric \`total_bill\` on the y-axis.
 - Choose \`kind="box"\` (any valid categorical \`kind\` is fine).
 - Assign the result to a variable named \`g\`.`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 # Build the categorical plot and assign it to g:
 g = None
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 g = sns.catplot(data=tips, x="day", y="total_bill", kind="box", height=4)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_facetgrid",

@@ -60,7 +60,10 @@ is it?*
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.read_csv(
     "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
@@ -74,7 +77,9 @@ for col in df.columns:
 print()
 print("First 5 rows:")
 df.head()
-`}
+`,
+    },
+  ]}
 />
 
 What you are looking for:
@@ -95,12 +100,17 @@ and is the dataset going to fit in memory?*
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`print(df.dtypes)
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `print(df.dtypes)
 print()
 df.info(memory_usage="deep")
-`}
+`,
+    },
+  ]}
 />
 
 `df.info(memory_usage="deep")` prints a summary including
@@ -125,14 +135,19 @@ also describe text/categorical columns.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`print("Numeric columns:")
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `print("Numeric columns:")
 print(df.describe().round(1))
 print()
 print("Categorical / object columns:")
 print(df.describe(include=["object"]))
-`}
+`,
+    },
+  ]}
 />
 
 For numeric columns, look at:
@@ -158,9 +173,12 @@ The fourth question: *where is data missing?*
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`# Count missing values per column
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `# Count missing values per column
 missing = df.isna().sum()
 missing_pct = (df.isna().mean() * 100).round(1)
 
@@ -168,7 +186,9 @@ summary = pd.DataFrame({"missing": missing, "pct": missing_pct})
 print(summary[summary["missing"] > 0].sort_values("missing", ascending=False))
 print()
 print("Columns with no missing values:", (missing == 0).sum())
-`}
+`,
+    },
+  ]}
 />
 
 The HR dataset is unusually clean — you may see zero missing.
@@ -190,15 +210,20 @@ For every text-like column, look at the values:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`for col in df.select_dtypes(include="object").columns:
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `for col in df.select_dtypes(include="object").columns:
     counts = df[col].value_counts(dropna=False)
     n_unique = df[col].nunique()
     print(f"--- {col} ({n_unique} unique) ---")
     print(counts.head(8))
     print()
-`}
+`,
+    },
+  ]}
 />
 
 What to look for:
@@ -218,9 +243,12 @@ After the five-minute ritual, do a few quick cross-tabulations.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`# Attrition rate by department — already gives you a feel for the data
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `# Attrition rate by department — already gives you a feel for the data
 print("Attrition by department:")
 ct = pd.crosstab(df["Department"], df["Attrition"])
 ct["pct_left"] = (ct["Yes"] / (ct["Yes"] + ct["No"]) * 100).round(1)
@@ -235,7 +263,9 @@ print(
     .sort_values(ascending=False)
     .head(10)
 )
-`}
+`,
+    },
+  ]}
 />
 
 These take a minute and often reveal the structure of the
@@ -282,7 +312,10 @@ Then compute four values and assign them to specific variables:
 4. \`departments\` — a sorted list of unique values in the \`Department\` column
 
 Use Pandas, not hard-coded numbers.`}
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
 df = pd.read_csv(URL)
@@ -293,8 +326,8 @@ n_missing_total = None
 departments = None
 
 print(n_rows, n_cols, n_missing_total, departments)
-`}
-  solutionCode={`import pandas as pd
+`,
+      solutionCode: `import pandas as pd
 
 URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
 df = pd.read_csv(URL)
@@ -305,7 +338,9 @@ n_missing_total = int(df.isna().sum().sum())
 departments = sorted(df["Department"].unique().tolist())
 
 print(n_rows, n_cols, n_missing_total, departments)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "n_rows",

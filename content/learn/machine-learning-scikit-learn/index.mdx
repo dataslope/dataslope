@@ -94,7 +94,10 @@ flowers it was never trained on. Press **Run**.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -110,7 +113,9 @@ model.fit(X_train, y_train)
 
 accuracy = model.score(X_test, y_test)
 print(f"Correct on {accuracy:.0%} of flowers the model had never seen.")
-`}
+`,
+    },
+  ]}
 />
 
 Five lines of real modeling, and a result you can trust because it was

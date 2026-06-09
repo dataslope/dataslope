@@ -91,7 +91,7 @@ the sequence diagram in the actual code.
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Cart cart = new Cart();
     cart.add(new Item("Notebook", 9.99));
@@ -105,7 +105,7 @@ the sequence diagram in the actual code.
     },
     {
       filename: "Item.java",
-      initialContent: `public class Item {
+      starterCode: `public class Item {
   private final String name;
   private final double price;
 
@@ -121,7 +121,7 @@ the sequence diagram in the actual code.
     },
     {
       filename: "Cart.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Cart {
@@ -140,7 +140,7 @@ public class Cart {
     },
     {
       filename: "Order.java",
-      initialContent: `public class Order {
+      starterCode: `public class Order {
   private final Cart cart;
 
   public Order(Cart cart) { this.cart = cart; }
@@ -221,7 +221,7 @@ internals. Every interaction is a *message*.
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     VendingMachine vm = new VendingMachine();
     vm.stock(new Product("Cola", 150));
@@ -238,7 +238,7 @@ internals. Every interaction is a *message*.
     },
     {
       filename: "Product.java",
-      initialContent: `public class Product {
+      starterCode: `public class Product {
   private final String name;
   private final int priceCents;
 
@@ -254,7 +254,7 @@ internals. Every interaction is a *message*.
     },
     {
       filename: "VendingMachine.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class VendingMachine {

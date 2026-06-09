@@ -19,7 +19,10 @@ With an early-exit flag, bubble sort is O(n) on already sorted input. Its averag
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <utility>
 #include <vector>
 void bubbleSort(std::vector<int> &v) {
@@ -43,7 +46,9 @@ int main() {
     std::cout << x << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Selection sort
@@ -52,7 +57,10 @@ Selection sort finds the smallest element in the unsorted suffix and swaps it in
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <utility>
 #include <vector>
 void selectionSort(std::vector<int> &v) {
@@ -73,7 +81,9 @@ int main() {
     std::cout << x << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Selection sort always does O(n^2) comparisons, even if the input is already sorted, and uses O(1) extra space.
@@ -84,7 +94,10 @@ Insertion sort builds a sorted prefix. For each new value, it shifts larger elem
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 void insertionSort(std::vector<int> &v) {
   for (int i = 1; i < static_cast<int>(v.size()); i++) {
@@ -104,7 +117,9 @@ int main() {
     std::cout << x << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Insertion sort is O(n^2) in the worst case, but O(n) on nearly sorted data. Many hybrid sorts use it for tiny partitions.
@@ -125,7 +140,10 @@ A helper that prints vectors cleanly is useful while debugging sorts.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 void printCommaSeparated(const std::vector<int> &v) {
   for (int i = 0; i < static_cast<int>(v.size()); i++) {
@@ -140,7 +158,9 @@ int main() {
   printCommaSeparated(v);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Insertion sort's invariant is: before each outer-loop iteration, elements before `i` are already sorted.
@@ -151,7 +171,10 @@ Insertion sort's invariant is: before each outer-loop iteration, elements before
   adapter="cpp"
   title="Implement bubble sort with early exit"
   instructions={`Implement \`void bubbleSort(std::vector<int>& v)\` using adjacent swaps and an early-exit flag. The driver prints the sorted vector with comma separators.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <utility>
 #include <vector>
 void bubbleSort(std::vector<int> &v) {
@@ -171,8 +194,8 @@ int main() {
   printVector(v);
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <utility>
 #include <vector>
 void bubbleSort(std::vector<int> &v) {
@@ -203,7 +226,9 @@ int main() {
   printVector(v);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "bubble_sorted", name: "Sorts values ascending", expect: { stdoutEquals: "1,2,3,5,5,9" } }]}
 />
 
@@ -213,7 +238,10 @@ int main() {
   adapter="cpp"
   title="Implement insertion sort"
   instructions={`Implement \`void insertionSort(std::vector<int>& v)\`. The driver prints the sorted result with comma separators.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 void insertionSort(std::vector<int> &v) {
   // your code here
@@ -232,8 +260,8 @@ int main() {
   printVector(v);
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <vector>
 void insertionSort(std::vector<int> &v) {
   for (int i = 1; i < static_cast<int>(v.size()); i++) {
@@ -260,7 +288,9 @@ int main() {
   printVector(v);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "insertion_sorted", name: "Sorts values ascending", expect: { stdoutEquals: "2,4,5,8,9" } }]}
 />
 

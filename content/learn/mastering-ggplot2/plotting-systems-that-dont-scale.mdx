@@ -23,7 +23,10 @@ system that nonetheless makes you manage every detail by hand:
 
 <CodeBlock
   adapter="r"
-  starterCode={`# Base R: a scatter plot, colored by number of cylinders.
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# Base R: a scatter plot, colored by number of cylinders.
 # Notice how much is manual bookkeeping.
 colors <- c("4" = "tomato", "6" = "steelblue", "8" = "darkgreen")
 plot(mtcars$wt, mtcars$mpg,
@@ -36,7 +39,9 @@ legend("topright",
   legend = names(colors),
   col = colors, pch = 19, title = "Cylinders"
 )
-`}
+`,
+    },
+  ]}
 />
 
 This works. But look closely at everything *you* had to do:

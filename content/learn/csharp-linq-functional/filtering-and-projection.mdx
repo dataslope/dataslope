@@ -36,7 +36,10 @@ containing only the elements for which the predicate is true.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var nums = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
@@ -48,7 +51,9 @@ var negatives = nums.Where(n => n < 0); // empty, not null
 Console.WriteLine(string.Join(",", evens));
 Console.WriteLine(string.Join(",", bigOdds));
 Console.WriteLine($"negatives count = {negatives.Count()}");
-`}
+`,
+    },
+  ]}
 />
 
 Important: an "empty result" is an empty sequence, not `null`. You
@@ -59,7 +64,10 @@ each element:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var names = new[] { "Ada", "Bilal", "Chiara", "Dmitri", "Esther" };
@@ -68,7 +76,9 @@ var names = new[] { "Ada", "Bilal", "Chiara", "Dmitri", "Esther" };
 var everyOther = names.Where((name, index) => index % 2 == 0);
 
 Console.WriteLine(string.Join(", ", everyOther));
-`}
+`,
+    },
+  ]}
 />
 
 The two-argument lambda `(name, index) => ...` opts into the indexed
@@ -83,7 +93,10 @@ sometimes called `map` in other languages.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var nums = new[] { 1, 2, 3, 4, 5 };
@@ -95,7 +108,9 @@ Console.WriteLine(string.Join(",", labels));
 
 // Type may change — int -> string.
 Console.WriteLine(labels.GetType().Name);
-`}
+`,
+    },
+  ]}
 />
 
 Note that the result type follows the lambda's return type. Project
@@ -108,7 +123,10 @@ A common pattern: project into a small ad-hoc shape mid-pipeline.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var people = new[] {
@@ -130,7 +148,9 @@ foreach (var (name, decade) in summary2)
     Console.WriteLine($"{name} → {decade}s");
 
 record Person(string Name, int Age, string City);
-`}
+`,
+    },
+  ]}
 />
 
 Use **anonymous types** when the shape is consumed inside the same
@@ -144,7 +164,10 @@ write is some combination of *filter, then transform*.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var orders = new[] {
@@ -161,7 +184,9 @@ foreach (var x in widgetTotals)
     Console.WriteLine($"price={x.Price,6:C}  total={x.Total,6:C}");
 
 record Order(string Product, decimal Price, int Quantity);
-`}
+`,
+    },
+  ]}
 />
 
 Two `Where` clauses chain naturally — they don't have to be combined
@@ -223,7 +248,7 @@ Use \`Where\` and \`Select\`. Do not use \`foreach\`.
   files={[
     {
       filename: "Program.cs",
-      initialContent: `var people = new[] {
+      starterCode: `var people = new[] {
     new Person("Ada", 36),    new Person("Bilal", 12),  new Person("Chiara", 17),
     new Person("Dmitri", 22), new Person("Esther", 41),
 };
@@ -236,7 +261,7 @@ public record Person(string Name, int Age);
     },
     {
       filename: "PeopleFilter.cs",
-      initialContent: `using System.Collections.Generic;
+      starterCode: `using System.Collections.Generic;
 
 public static class PeopleFilter
 {
@@ -247,7 +272,7 @@ public static class PeopleFilter
     }
 }
 `,
-      solutionContent: `using System.Collections.Generic;
+      solutionCode: `using System.Collections.Generic;
 using System.Linq;
 
 public static class PeopleFilter

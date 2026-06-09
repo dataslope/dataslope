@@ -97,7 +97,10 @@ The four knobs trade off against each other:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 # How many users per arm to detect a lift from 10% -> 12% conversion,
@@ -126,7 +129,9 @@ print(
 print()
 print("Smaller lifts need far more users. Decide this BEFORE you run,")
 print("so you don't stop early or chase an effect too small to see.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="Why size up front, not after">
@@ -151,7 +156,10 @@ the same question.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(42)
@@ -196,7 +204,9 @@ print(f"z-test:        z = {z:.2f},  p = {p_value:.4f}")
 print(f"chi-square:    chi2 = {chi2:.2f}, p = {p_chi2:.4f}  (agrees with z)")
 print(f"95% CI on diff:[{ci_low:+.4f}, {ci_high:+.4f}]")
 print(f"Effect size:   Cohen's h = {h:.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 Look at the full picture, not just the p-value. You get a **point
@@ -209,7 +219,10 @@ each arm's conversion rate with an error bar (the CI half-width).
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import pandas as pd
 import plotly.express as px
 from scipy import stats
@@ -247,7 +260,9 @@ fig.show()
 
 print("If the intervals barely overlap and the gap matters, you have a")
 print("real, useful effect. Overlapping intervals -> stay cautious.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Continuous metric? Use a t-test instead">
@@ -352,16 +367,19 @@ Steps for the z-test:
 - \`p_pool = (conv_a + conv_b) / (n_a + n_b)\`
 - \`se = sqrt(p_pool*(1-p_pool)*(1/n_a + 1/n_b))\`
 - \`z = (p_b - p_a) / se\`, then \`p_value = 2*(1 - norm.cdf(abs(z)))\`.`}
-  initCode={`conv_a, n_a = 480, 6000   # control
-conv_b, n_b = 570, 6000   # treatment`}
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `conv_a, n_a = 480, 6000   # control
+conv_b, n_b = 570, 6000   # treatment`,
+      starterCode: `import numpy as np
 from scipy import stats
 
 # TODO: compute rel_lift and p_value (both floats)
 rel_lift = None
 p_value = None
-`}
-  solutionCode={`import numpy as np
+`,
+      solutionCode: `import numpy as np
 from scipy import stats
 
 p_a = conv_a / n_a
@@ -374,7 +392,9 @@ z = (p_b - p_a) / se
 p_value = float(2 * (1 - stats.norm.cdf(abs(z))))
 
 print(f"relative lift = {rel_lift:.3f}, p = {p_value:.4f}")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "types",
@@ -422,16 +442,19 @@ assert abs(p_value - expected) < 1e-9`,
 - Store the endpoints in a tuple \`ci = (low, high)\` of two floats with \`low < high\`.
 
 Then set a boolean \`excludes_zero\` to \`True\` if the whole interval is above 0 (a significant positive difference), else \`False\`.`}
-  initCode={`conv_a, n_a = 500, 5000   # control  (10.0%)
-conv_b, n_b = 610, 5000   # treatment (12.2%)`}
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `conv_a, n_a = 500, 5000   # control  (10.0%)
+conv_b, n_b = 610, 5000   # treatment (12.2%)`,
+      starterCode: `import numpy as np
 from scipy import stats
 
 # TODO: build ci = (low, high) and the boolean excludes_zero
 ci = None
 excludes_zero = None
-`}
-  solutionCode={`import numpy as np
+`,
+      solutionCode: `import numpy as np
 from scipy import stats
 
 p_a = conv_a / n_a
@@ -444,7 +467,9 @@ ci = (float(low), float(high))
 excludes_zero = bool(low > 0)
 
 print("95% CI on difference:", ci, "excludes 0:", excludes_zero)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "shape",

@@ -14,7 +14,10 @@ By default, a date column from a CSV is just text. Convert it:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 s = pd.Series(["2024-01-15", "2024-02-03", "2024-03-30"])
 parsed = pd.to_datetime(s)
@@ -23,7 +26,9 @@ print()
 print("dtype:", parsed.dtype)
 print()
 print("Year of each:", parsed.dt.year.tolist())
-`}
+`,
+    },
+  ]}
 />
 
 If a string cannot be parsed, you can choose to fail loudly or
@@ -31,7 +36,10 @@ silently coerce to NaT:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 bad = pd.Series(["2024-01-15", "not-a-date", "2024-03-30"])
 
@@ -39,7 +47,9 @@ bad = pd.Series(["2024-01-15", "not-a-date", "2024-03-30"])
 # Use errors="coerce" to turn unparseable values into NaT
 parsed = pd.to_datetime(bad, errors="coerce")
 print(parsed)
-`}
+`,
+    },
+  ]}
 />
 
 For ambiguous formats — most famously `04/05/2024` (April 5 in
@@ -47,7 +57,10 @@ the US, May 4 in much of the world) — be explicit:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 s = pd.Series(["04/05/2024", "06/12/2024"])
 
@@ -56,7 +69,9 @@ print(pd.to_datetime(s))
 print()
 print("Day-first (European):")
 print(pd.to_datetime(s, dayfirst=True))
-`}
+`,
+    },
+  ]}
 />
 
 ## Parsing at load time
@@ -77,7 +92,10 @@ date-component extraction:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 s = pd.to_datetime(
     pd.Series(
@@ -95,7 +113,9 @@ print("day:     ", s.dt.day.tolist())
 print("weekday: ", s.dt.day_name().tolist())
 print("hour:    ", s.dt.hour.tolist())
 print("quarter: ", s.dt.quarter.tolist())
-`}
+`,
+    },
+  ]}
 />
 
 These let you derive useful grouping columns:
@@ -112,7 +132,10 @@ Subtracting two datetimes gives a **Timedelta**:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 orders = pd.DataFrame(
     {
@@ -123,19 +146,26 @@ orders = pd.DataFrame(
 
 orders["fulfilment_days"] = (orders["ship_date"] - orders["order_date"]).dt.days
 print(orders)
-`}
+`,
+    },
+  ]}
 />
 
 You can also add a Timedelta to a datetime:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 today = pd.Timestamp("2024-03-18")
 print(today + pd.Timedelta(days=7))
 print(today + pd.DateOffset(months=1))
-`}
+`,
+    },
+  ]}
 />
 
 `Timedelta` is a fixed amount of time (`days=7`). `DateOffset`
@@ -149,7 +179,10 @@ slicing and resampling.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 dates = pd.date_range("2024-01-01", periods=90, freq="D")
@@ -167,7 +200,9 @@ print()
 # Resample to weekly totals
 print("Weekly totals:")
 print(visits.resample("W").sum().head())
-`}
+`,
+    },
+  ]}
 />
 
 `resample` is the time-aware cousin of `groupby` — it splits the
@@ -180,7 +215,10 @@ For moving averages and other windowed statistics:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 dates = pd.date_range("2024-01-01", periods=30, freq="D")
@@ -189,7 +227,9 @@ prices = pd.Series(100 + np.random.RandomState(42).randn(30).cumsum(), index=dat
 # 7-day moving average
 ma7 = prices.rolling(7).mean()
 print(ma7.tail(10).round(2))
-`}
+`,
+    },
+  ]}
 />
 
 `rolling(N)` produces an object you can call aggregations on
@@ -201,7 +241,10 @@ Time-zone handling is its own world. The short version:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 # Naive — no time zone
 naive = pd.Timestamp("2024-03-18 12:00:00")
@@ -214,7 +257,9 @@ print(ny)
 # Convert to another zone
 tokyo = ny.tz_convert("Asia/Tokyo")
 print(tokyo)
-`}
+`,
+    },
+  ]}
 />
 
 A *naive* timestamp has no time zone; a *tz-aware* timestamp
@@ -247,7 +292,10 @@ does. Mixing the two often produces errors — pick a convention
 2. Groups the resulting visits by **day**.
 3. Has columns \`date\` and \`visits\` (total visits per day).
 4. Is sorted by \`date\` ascending.`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 
 raw = pd.DataFrame({
     "timestamp": [
@@ -256,12 +304,12 @@ raw = pd.DataFrame({
         "2024-03-03 17:11", "2024-03-03 18:45", "2024-03-03 22:00", "2024-03-03 22:30",
     ],
     "visits":  [1, 1, 1, 1, 1, 1, 1, 1, 1],
-})`}
-  starterCode={`daily = None  # TODO
+})`,
+      starterCode: `daily = None  # TODO
 
 print(daily)
-`}
-  solutionCode={`import pandas as pd
+`,
+      solutionCode: `import pandas as pd
 
 ts = pd.to_datetime(raw["timestamp"])
 
@@ -273,7 +321,9 @@ daily = (
 )
 
 print(daily)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type",

@@ -92,7 +92,10 @@ Here is the simplest possible pipeline, end to end:
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
@@ -116,7 +119,9 @@ pipe.fit(X_train, y_train)
 
 # One score. X_test is scaled with the TRAINING scaler, then classified.
 print(f"Pipeline test accuracy: {pipe.score(X_test, y_test):.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 The scaling happens inside the pipeline, fit on the training data only, and
@@ -140,7 +145,10 @@ object and names each step after its class automatically:
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
@@ -157,7 +165,9 @@ pipe.fit(X_train, y_train)
 
 print("Auto-generated step names:", list(pipe.named_steps))
 print(f"Test accuracy: {pipe.score(X_test, y_test):.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 ## Why the pipeline prevents leakage in cross-validation
@@ -177,7 +187,10 @@ structurally impossible.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
@@ -192,7 +205,9 @@ scores = cross_val_score(pipe, X, y, cv=5)
 
 print("Per-fold accuracy:", scores.round(3))
 print(f"Mean accuracy:     {scores.mean():.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 Hand `cross_val_score` a bare model with pre-scaled data and you leak; hand
@@ -237,7 +252,10 @@ wrapped in one `Pipeline`.
 
 <CodeBlock
   adapter="python"
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 
 # A tiny, realistic "customer" table: two numeric, two categorical columns,
@@ -251,8 +269,8 @@ df = pd.DataFrame({
     "plan":   rng.choice(["free", "pro"], n),
 })
 # The target depends on both a numeric and a categorical feature.
-df["upgraded"] = ((df["income"] > 50000) | (df["plan"] == "pro")).astype(int)`}
-  starterCode={`from sklearn.compose import ColumnTransformer
+df["upgraded"] = ((df["income"] > 50000) | (df["plan"] == "pro")).astype(int)`,
+      starterCode: `from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
@@ -291,7 +309,9 @@ X_train, X_test, y_train, y_test = train_test_split(
 pipe.fit(X_train, y_train)
 
 print(f"Test accuracy: {pipe.score(X_test, y_test):.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 One `pipe.fit(X_train, y_train)` call: it scaled `age` and `income`, one-hot
@@ -307,7 +327,10 @@ the model never sees your original columns — it sees the transformed ones.
 
 <CodeBlock
   adapter="python"
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 rng = np.random.default_rng(0)
 n = 40
@@ -316,8 +339,8 @@ df = pd.DataFrame({
     "income": rng.integers(20000, 90000, n),
     "city":   rng.choice(["NY", "LA", "SF"], n),
     "plan":   rng.choice(["free", "pro"], n),
-})`}
-  starterCode={`from sklearn.compose import ColumnTransformer
+})`,
+      starterCode: `from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
 numeric_cols = ["age", "income"]
@@ -340,7 +363,9 @@ print("Original columns:", numeric_cols + categorical_cols)
 print("After transform, the model sees these columns:")
 print(preprocess.get_feature_names_out())
 print("Shape:", transformed.shape, "(2 scaled numeric + one-hot of city and plan)")
-`}
+`,
+    },
+  ]}
 />
 
 The two numeric columns stay as two columns (now scaled), while `city` and
@@ -375,7 +400,10 @@ and encoding it learned at training time.
 
 <CodeBlock
   adapter="python"
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 rng = np.random.default_rng(0)
 n = 40
@@ -385,8 +413,8 @@ df = pd.DataFrame({
     "city":   rng.choice(["NY", "LA", "SF"], n),
     "plan":   rng.choice(["free", "pro"], n),
 })
-df["upgraded"] = ((df["income"] > 50000) | (df["plan"] == "pro")).astype(int)`}
-  starterCode={`from sklearn.compose import ColumnTransformer
+df["upgraded"] = ((df["income"] > 50000) | (df["plan"] == "pro")).astype(int)`,
+      starterCode: `from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
@@ -426,7 +454,9 @@ new_customers = pd.DataFrame(
     }
 )
 print("Predictions for new customers:", pipe.predict(new_customers))
-`}
+`,
+    },
+  ]}
 />
 
 The new batch included `Tokyo`, a city the encoder never saw at training
@@ -510,7 +540,10 @@ is a \`LogisticRegression\`, that its preprocessing step is a
 \`ColumnTransformer\`, that the transformer outputs the right number of columns
 (2 scaled numeric + one column per distinct subject), and that \`test_acc\` is
 a sensible accuracy between 0 and 1.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
@@ -533,8 +566,8 @@ X = df[numeric_cols + categorical_cols]
 y = df["passed"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
-)`}
-  starterCode={`# 1. ColumnTransformer: scale numeric, one-hot encode categorical.
+)`,
+      starterCode: `# 1. ColumnTransformer: scale numeric, one-hot encode categorical.
 preprocess = None
 
 # 2. Pipeline: preprocessing -> LogisticRegression.
@@ -546,8 +579,8 @@ pipe = None
 test_acc = None
 
 print("test accuracy:", test_acc)
-`}
-  solutionCode={`preprocess = ColumnTransformer(
+`,
+      solutionCode: `preprocess = ColumnTransformer(
     [
         ("num", StandardScaler(), numeric_cols),
         (
@@ -570,7 +603,9 @@ pipe.fit(X_train, y_train)
 test_acc = pipe.score(X_test, y_test)
 
 print("test accuracy:", test_acc)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_pipeline",

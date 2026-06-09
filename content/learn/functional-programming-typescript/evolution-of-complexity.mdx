@@ -62,7 +62,10 @@ Consider the simplest possible mutable program:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`let count = 0;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `let count = 0;
 
 function increment(): void {
   count = count + 1;
@@ -72,7 +75,9 @@ increment();
 increment();
 increment();
 console.log("count:", count);
-`}
+`,
+    },
+  ]}
 />
 
 `count` is a single number. Three calls. Easy. Now imagine ten
@@ -112,7 +117,10 @@ have *costs*:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// A function that depends on hidden state and time
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// A function that depends on hidden state and time
 let lastId = 0;
 function nextId(): string {
   lastId = lastId + 1;
@@ -127,14 +135,19 @@ console.log(nextId());
 // 1. What lastId currently is
 // 2. What the wall clock says
 // 3. Whether any other code is also incrementing lastId
-`}
+`,
+    },
+  ]}
 />
 
 Compare with a pure version:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function nextId(previous: number, nowMs: number): { id: string; next: number } {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function nextId(previous: number, nowMs: number): { id: string; next: number } {
   const n = previous + 1;
   return { id: \`id-\${n}-\${nowMs}\`, next: n };
 }
@@ -142,7 +155,9 @@ Compare with a pure version:
 const a = nextId(0, 1_700_000_000_000);
 const b = nextId(a.next, 1_700_000_000_001);
 console.log(a, b);
-`}
+`,
+    },
+  ]}
 />
 
 The second version is longer, but you can reason about it with no

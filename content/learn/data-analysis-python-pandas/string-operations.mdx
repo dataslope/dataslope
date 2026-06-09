@@ -15,7 +15,10 @@ behave element-wise.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 s = pd.Series(["  Aiko  ", "BILAL", "chen", "Diego "])
 
@@ -28,7 +31,9 @@ print()
 print(s.str.title())
 print()
 print(s.str.len())
-`}
+`,
+    },
+  ]}
 />
 
 ## Chaining string methods
@@ -37,13 +42,18 @@ These compose naturally:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 s = pd.Series(["  Sales-Engineer ", "Marketing Lead", "  DevOps "])
 
 normalized = s.str.strip().str.replace("-", " ").str.title()
 print(normalized)
-`}
+`,
+    },
+  ]}
 />
 
 ## Search and contains
@@ -52,7 +62,10 @@ print(normalized)
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -71,7 +84,9 @@ print()
 
 # Anyone with "Lead" OR "Senior"
 print(df[df["title"].str.contains("Lead|Senior", regex=True)])
-`}
+`,
+    },
+  ]}
 />
 
 By default, `.contains` uses regex. Use `regex=False` for
@@ -82,7 +97,10 @@ contains special chars).
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 emails = pd.Series(["aiko@example.com", "bilal@work.io", "chen@uni.edu"])
 
@@ -102,7 +120,9 @@ print()
 
 # Or slice characters by position
 print(emails.str[:5])  # first 5 chars
-`}
+`,
+    },
+  ]}
 />
 
 `.split(..., expand=True)` is one of the most useful patterns —
@@ -115,7 +135,10 @@ named groups.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 logs = pd.Series(
     [
@@ -129,7 +152,9 @@ parsed = logs.str.extract(
     r"(?P<date>\\d{4}-\\d{2}-\\d{2}) (?P<time>\\d{2}:\\d{2}:\\d{2}) (?P<level>\\w+)\\s+(?P<msg>.*)"
 )
 print(parsed)
-`}
+`,
+    },
+  ]}
 />
 
 Named groups become column names. This is hugely useful for
@@ -139,14 +164,19 @@ turning log files into a real DataFrame.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 s = pd.Series(["(555) 123-4567", "(555) 987-6543", "(212) 555-0100"])
 
 # Strip non-digits to get a clean phone number
 clean = s.str.replace(r"\\D", "", regex=True)
 print(clean)
-`}
+`,
+    },
+  ]}
 />
 
 ## Padding, justifying, and case
@@ -155,7 +185,10 @@ A grab bag of useful methods:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 s = pd.Series(["5", "42", "123"])
 print(s.str.zfill(4))  # pad with leading zeros to length 4
@@ -164,14 +197,19 @@ print()
 names = pd.Series(["aiko", "BiLaL"])
 print(names.str.capitalize())  # First char upper, rest lower
 print(names.str.swapcase())  # Invert case
-`}
+`,
+    },
+  ]}
 />
 
 ## Length, count, and matches
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 comments = pd.Series(
     [
@@ -189,7 +227,9 @@ print(comments.str.count("stars"))
 print()
 print("Number of whitespace-separated tokens (rough word count):")
 print(comments.str.split().str.len())
-`}
+`,
+    },
+  ]}
 />
 
 ## A small cleaning example
@@ -198,7 +238,10 @@ Bringing several pieces together — normalizing employee names:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 raw = pd.Series(
     [
@@ -218,7 +261,9 @@ clean = (
     .replace("", pd.NA)  # empties → missing
 )
 print(clean)
-`}
+`,
+    },
+  ]}
 />
 
 ## Working with NaN in string columns
@@ -229,14 +274,19 @@ optionally fill NaN with True/False using `na=`.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 s = pd.Series(["Engineer", None, "Sales", "Lead Engineer"])
 
 print(s.str.contains("Engineer"))
 print()
 print(s.str.contains("Engineer", na=False))  # NaN → False
-`}
+`,
+    },
+  ]}
 />
 
 This `na=False` is *essential* when using `.contains` inside a
@@ -257,7 +307,10 @@ boolean indexers.
 5. The strings \`"data scientist"\` and \`"data scientists"\` (any casing) both become \`"Data Scientist"\`.
 
 Use vectorized \`.str\` methods.`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 
 titles = pd.Series([
     " data scientist ",
@@ -267,12 +320,12 @@ titles = pd.Series([
     "data  scientist",
     "",
     None,
-])`}
-  starterCode={`clean = None  # TODO
+])`,
+      starterCode: `clean = None  # TODO
 
 print(clean)
-`}
-  solutionCode={`import pandas as pd
+`,
+      solutionCode: `import pandas as pd
 
 clean = (
     titles.str.strip()
@@ -283,7 +336,9 @@ clean = (
 )
 
 print(clean)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_series",

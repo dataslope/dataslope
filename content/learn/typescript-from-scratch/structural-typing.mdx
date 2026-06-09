@@ -15,7 +15,10 @@ In TypeScript, a type is compatible with another if it has *at least* the requir
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface Point {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface Point {
   x: number;
   y: number;
 }
@@ -35,7 +38,9 @@ printPoint(origin); // ✅ OK — same shape!
 
 // An object literal with the same shape also works
 printPoint({ x: 10, y: 20 }); // ✅ OK
-`}
+`,
+    },
+  ]}
 />
 
 `Point` and `Vector` are structurally identical — both have `x: number` and `y: number`. So the compiler treats them as interchangeable. This is **structural compatibility**: if the shapes match, the types match.
@@ -76,7 +81,10 @@ This design choice unlocks powerful patterns:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Two unrelated interfaces with the same shape
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Two unrelated interfaces with the same shape
 interface DatabaseUser {
   id: string;
   name: string;
@@ -97,7 +105,9 @@ welcomeUser(apiUser); // ✅ OK
 
 // So does a plain object literal
 welcomeUser({ id: "456", name: "Grace" }); // ✅ OK
-`}
+`,
+    },
+  ]}
 />
 
 This is why TypeScript is often described as having **duck typing for compilers**: "If it looks like a duck and quacks like a duck, it's a duck."
@@ -112,7 +122,10 @@ Structural typing says "extra properties are OK," but TypeScript has a special r
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface Config {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface Config {
   host: string;
   port: number;
 }
@@ -132,7 +145,9 @@ connect(myConfig);
 // But this works if we annotate the variable first:
 const configWithTimeout: Config = { host: "localhost", port: 3000 };
 connect(configWithTimeout);
-`}
+`,
+    },
+  ]}
 />
 
 Wait — why does `myConfig` work but the inline literal would fail? This is **excess property checking**, a special-case carveout that TypeScript applies *only* to **fresh object literals**. The goal is to catch typos and accidental properties:
@@ -156,7 +171,10 @@ If you genuinely need extra properties, you have a few options:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface Config {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface Config {
   host: string;
   port: number;
 }
@@ -184,7 +202,9 @@ function connectFlexible(config: FlexibleConfig) {
 }
 
 connectFlexible({ host: "localhost", port: 3000, timeout: 5000 }); // ✅ OK
-`}
+`,
+    },
+  ]}
 />
 
 Each approach has trade-offs. Type assertions (`as Config`) are a last resort — they silence the compiler but don't make your code safer. Index signatures are better when you genuinely expect arbitrary properties (like a config object with plugin options). Storing in a variable is the cleanest if you're just working around the freshness check.
@@ -195,7 +215,10 @@ Let's see a realistic example. Suppose you're building a logging system and want
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface Loggable {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface Loggable {
   message: string;
 }
 
@@ -215,7 +238,9 @@ const event = {
   userId: "123",
 };
 log(event);
-`}
+`,
+    },
+  ]}
 />
 
 None of these objects explicitly "implement" `Loggable`. They just happen to have a `message: string` property, so they're compatible. This is structural typing in action: the `log` function works with *any* object that has the right shape, without needing a shared base class or interface declaration.
@@ -278,7 +303,10 @@ Let's test your understanding. You'll fix a function so it works with any object
 **Your task:**
 1. Change the parameter type of \`logItem\` from \`LogEntry\` to a more general shape.
 2. The test will pass various objects with extra properties — all should work as long as they have \`level\` and \`message\`.`}
-  starterCode={`interface LogEntry {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface LogEntry {
   level: string;
   message: string;
 }
@@ -292,8 +320,8 @@ function logItem(entry: LogEntry) {
 logItem({ level: "info", message: "App started" });
 logItem({ level: "error", message: "Crash", stack: "..." });
 logItem({ level: "warn", message: "Low memory", timestamp: Date.now() });
-`}
-  solutionCode={`// Solution: Keep the same interface, but TypeScript's structural typing
+`,
+      solutionCode: `// Solution: Keep the same interface, but TypeScript's structural typing
 // already allows extra properties on non-literal arguments.
 // The original code works as-is for stored objects!
 
@@ -314,7 +342,9 @@ const entry3 = { level: "warn", message: "Low memory", timestamp: Date.now() };
 logItem(entry1);
 logItem(entry2);
 logItem(entry3);
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "info",

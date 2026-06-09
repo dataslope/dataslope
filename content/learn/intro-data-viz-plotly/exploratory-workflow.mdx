@@ -35,7 +35,10 @@ dataset, your first 30 seconds should always look the same:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
@@ -50,7 +53,9 @@ print(df.head())
 print()
 print("Numeric summary:")
 print(df.describe())
-`}
+`,
+    },
+  ]}
 />
 
 This *single block* answers most "what is this dataset?" questions.
@@ -66,7 +71,10 @@ distributions, weird spikes, and outliers immediately.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
@@ -78,7 +86,9 @@ for col in df.select_dtypes("number").columns:
         title=f"Distribution of {col}",
     )
     fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 You'll see three histograms — one each for `total_bill`, `tip`, and
@@ -94,7 +104,10 @@ The chart almost writes itself once the question is precise:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 df["pct"] = df["tip"] / df["total_bill"] * 100
@@ -108,7 +121,9 @@ fig = px.box(
     labels={"size": "Party size", "pct": "Tip percentage (%)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Read the chart: is there a pattern? Maybe smaller parties tip a
@@ -124,7 +139,10 @@ and look at them.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 df["pct"] = df["tip"] / df["total_bill"] * 100
@@ -132,7 +150,9 @@ df["pct"] = df["tip"] / df["total_bill"] * 100
 # Suspiciously high tip percentages
 suspicious = df[df["pct"] > 30].sort_values("pct", ascending=False)
 print(suspicious)
-`}
+`,
+    },
+  ]}
 />
 
 You found three rows with very high tip percentages — all tiny

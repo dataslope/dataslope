@@ -28,13 +28,18 @@ Here's a simple example that copies a type unchanged:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type User = { id: number; name: string; active: boolean };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type User = { id: number; name: string; active: boolean };
 
 type CopiedUser = { [K in keyof User]: User[K] };
 
 const u: CopiedUser = { id: 1, name: "Alice", active: true };
 console.log(u);
-`}
+`,
+    },
+  ]}
 />
 
 This `CopiedUser` is structurally identical to `User`. But mapped types become powerful when you *change* something during the mapping.
@@ -52,27 +57,37 @@ Here's a type that makes every property readonly:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type User = { id: number; name: string };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type User = { id: number; name: string };
 
 type ReadonlyUser = { readonly [K in keyof User]: User[K] };
 
 const u: ReadonlyUser = { id: 1, name: "Alice" };
 // u.name = "Bob"; // Error: Cannot assign to 'name' because it is a read-only property.
 console.log(u);
-`}
+`,
+    },
+  ]}
 />
 
 And here's one that makes every property optional:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type User = { id: number; name: string };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type User = { id: number; name: string };
 
 type PartialUser = { [K in keyof User]?: User[K] };
 
 const u: PartialUser = { id: 1 }; // 'name' is optional
 console.log(u);
-`}
+`,
+    },
+  ]}
 />
 
 ### Removing Modifiers with `-`
@@ -84,13 +99,18 @@ You can also *remove* modifiers with `-`:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type OptionalUser = { id?: number; name?: string };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type OptionalUser = { id?: number; name?: string };
 
 type RequiredUser = { [K in keyof OptionalUser]-?: OptionalUser[K] };
 
 const u: RequiredUser = { id: 1, name: "Alice" }; // Both required now
 console.log(u);
-`}
+`,
+    },
+  ]}
 />
 
 The `+` prefix is implicit (the default), so `+readonly` is the same as `readonly`. But being explicit helps when you're toggling modifiers dynamically.
@@ -105,7 +125,10 @@ Here's a type that prefixes every key with `get`:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type User = { id: number; name: string };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type User = { id: number; name: string };
 
 type Getters<T> = {
   [K in keyof T as \`get\${Capitalize<string & K>}\`]: () => T[K];
@@ -118,7 +141,9 @@ const userGetters: UserGetters = {
   getName: () => "Alice",
 };
 console.log(userGetters.getId(), userGetters.getName());
-`}
+`,
+    },
+  ]}
 />
 
 We'll cover template literal types like `` `get${...}` `` in the next chapter. For now, notice that `K` is remapped to a new string literal, and the property type becomes a function returning `T[K]`.
@@ -127,7 +152,10 @@ You can also filter keys by remapping to `never`:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type User = { id: number; name: string; active: boolean };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type User = { id: number; name: string; active: boolean };
 
 type StringPropsOnly<T> = {
   [K in keyof T as T[K] extends string ? K : never]: T[K];
@@ -137,7 +165,9 @@ type UserStrings = StringPropsOnly<User>;
 
 const u: UserStrings = { name: "Alice" };
 console.log(u);
-`}
+`,
+    },
+  ]}
 />
 
 The condition `T[K] extends string ? K : never` keeps only keys whose values are strings. Keys that don't match are mapped to `never`, which TypeScript omits.
@@ -167,7 +197,10 @@ Here's a simple example:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type IsString<T> = T extends string ? "yes" : "no";
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type IsString<T> = T extends string ? "yes" : "no";
 
 type A = IsString<string>; // "yes"
 type B = IsString<number>; // "no"
@@ -175,7 +208,9 @@ type B = IsString<number>; // "no"
 const a: A = "yes";
 const b: B = "no";
 console.log(a, b);
-`}
+`,
+    },
+  ]}
 />
 
 Conditional types become powerful when combined with generics. You can build type-level logic that branches based on the input.
@@ -188,7 +223,10 @@ When a conditional type is applied to a **naked type parameter** (one not wrappe
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type ToArray<T> = T extends any ? T[] : never;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type ToArray<T> = T extends any ? T[] : never;
 
 type Result = ToArray<string | number>;
 // Distributes: ToArray<string> | ToArray<number>
@@ -197,7 +235,9 @@ type Result = ToArray<string | number>;
 const x: Result = ["a", "b"];
 const y: Result = [1, 2];
 console.log(x, y);
-`}
+`,
+    },
+  ]}
 />
 
 Notice that `Result` is `string[] | number[]`, not `(string | number)[]`. Each member of the union was processed separately.
@@ -206,21 +246,29 @@ To prevent distribution, wrap the type parameter in brackets:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type ToArrayNoDistribute<T> = [T] extends [any] ? T[] : never;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type ToArrayNoDistribute<T> = [T] extends [any] ? T[] : never;
 
 type Result = ToArrayNoDistribute<string | number>;
 // Result: (string | number)[]
 
 const x: Result = ["a", 1];
 console.log(x);
-`}
+`,
+    },
+  ]}
 />
 
 Distributive behavior is useful for filtering unions. For example, extracting non-nullable types:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type NonNullable<T> = T extends null | undefined ? never : T;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type NonNullable<T> = T extends null | undefined ? never : T;
 
 type Result = NonNullable<string | number | null | undefined>;
 // Distributes over union: string | number | never | never
@@ -229,7 +277,9 @@ type Result = NonNullable<string | number | null | undefined>;
 const x: Result = "hello";
 const y: Result = 42;
 console.log(x, y);
-`}
+`,
+    },
+  ]}
 />
 
 ---
@@ -242,7 +292,10 @@ For example, here's how to extract the return type of a function:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type ReturnType<T> = T extends (...args: any[]) => infer R ? R : never;
 
 function greet(name: string): string {
   return \`Hello, \${name}!\`;
@@ -252,7 +305,9 @@ type GreetReturn = ReturnType<typeof greet>;
 
 const msg: GreetReturn = "Hello, Alice!";
 console.log(msg);
-`}
+`,
+    },
+  ]}
 />
 
 Here's how `infer` works:
@@ -264,7 +319,10 @@ You can use `infer` in multiple positions:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type FirstArg<T> = T extends (first: infer F, ...rest: any[]) => any
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type FirstArg<T> = T extends (first: infer F, ...rest: any[]) => any
   ? F
   : never;
 
@@ -276,14 +334,19 @@ type AddFirstArg = FirstArg<typeof add>;
 
 const x: AddFirstArg = 42;
 console.log(x);
-`}
+`,
+    },
+  ]}
 />
 
 `infer` is powerful for unwrapping nested types. For example, extracting the element type of an array:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Unpack<T> = T extends (infer U)[] ? U : T;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Unpack<T> = T extends (infer U)[] ? U : T;
 
 type Result1 = Unpack<number[]>; // number
 type Result2 = Unpack<string>; // string
@@ -291,7 +354,9 @@ type Result2 = Unpack<string>; // string
 const x: Result1 = 42;
 const y: Result2 = "hello";
 console.log(x, y);
-`}
+`,
+    },
+  ]}
 />
 
 ---
@@ -308,7 +373,10 @@ Let's build a type that makes all function properties in an object optional, lea
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type OptionalFunctions<T> = {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type OptionalFunctions<T> = {
   [K in keyof T]: T[K] extends (...args: any[]) => any
     ? T[K] | undefined
     : T[K];
@@ -328,7 +396,9 @@ const svc: PartialService = {
   stop: () => console.log("Stopping..."),
 };
 console.log(svc);
-`}
+`,
+    },
+  ]}
 />
 
 Here, the conditional type checks if `T[K]` is a function. If so, it unions with `undefined`. Otherwise, it's unchanged.
@@ -343,9 +413,12 @@ Here, the conditional type checks if `T[K]` is a function. If so, it unions with
   instructions={`The standard library provides \`Readonly<T>\`, which adds \`readonly\` to every property. Your task is to implement the opposite: \`Mutable<T>\`, which removes \`readonly\` from every property.
 
 **Hint**: Use a mapped type with the \`-readonly\` modifier.`}
-  initCode={`type Mutable<T> = any; // Replace 'any' with your implementation
-`}
-  starterCode={`type Mutable<T> = any;
+  files={[
+    {
+      filename: "main.ts",
+      initCode: `type Mutable<T> = any; // Replace 'any' with your implementation
+`,
+      starterCode: `type Mutable<T> = any;
 
 type ReadonlyUser = { readonly id: number; readonly name: string };
 type MutableUser = Mutable<ReadonlyUser>;
@@ -353,8 +426,8 @@ type MutableUser = Mutable<ReadonlyUser>;
 const u: MutableUser = { id: 1, name: "Alice" };
 u.name = "Bob"; // Should compile without error
 console.log(u);
-`}
-  solutionCode={`type Mutable<T> = { -readonly [K in keyof T]: T[K] };
+`,
+      solutionCode: `type Mutable<T> = { -readonly [K in keyof T]: T[K] };
 
 type ReadonlyUser = { readonly id: number; readonly name: string };
 type MutableUser = Mutable<ReadonlyUser>;
@@ -362,7 +435,9 @@ type MutableUser = Mutable<ReadonlyUser>;
 const u: MutableUser = { id: 1, name: "Alice" };
 u.name = "Bob";
 console.log(u);
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "t1",

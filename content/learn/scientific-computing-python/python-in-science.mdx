@@ -133,7 +133,10 @@ Each runs in your browser, right now.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import scipy
 import matplotlib
 import pandas as pd
@@ -142,7 +145,9 @@ print("NumPy      :", np.__version__)
 print("SciPy      :", scipy.__version__)
 print("Matplotlib :", matplotlib.__version__)
 print("pandas     :", pd.__version__)
-`}
+`,
+    },
+  ]}
 />
 
 The packages each take a slice of the scientific stack:
@@ -163,11 +168,14 @@ A complete SciPy program often touches several of these:
 
 <CodeBlock
   adapter="python"
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 from scipy import signal
-import matplotlib.pyplot as plt`}
-  starterCode={`# Generate a noisy signal: a 2 Hz sine plus 20 Hz noise
+import matplotlib.pyplot as plt`,
+      starterCode: `# Generate a noisy signal: a 2 Hz sine plus 20 Hz noise
 rng = np.random.default_rng(7)
 t = np.linspace(0, 5, 2000)
 clean = np.sin(2 * np.pi * 2 * t)
@@ -199,7 +207,9 @@ ax.plot(t, clean, "--", label="clean")
 ax.set_xlabel("time (s)")
 ax.legend()
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 Six imports, twenty lines, one complete signal-processing experiment
@@ -222,7 +232,10 @@ fragment:
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Example pyproject.toml metadata (for illustration; not executed)
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Example pyproject.toml metadata (for illustration; not executed)
 example = """
 [project]
 name = "neutron-diffusion-2026"
@@ -236,7 +249,9 @@ dependencies = [
 """
 print(example)
 print("Pinned versions = a paper that still runs in 5 years.")
-`}
+`,
+    },
+  ]}
 />
 
 We dedicate an entire chapter to reproducible experiments later in

@@ -29,7 +29,10 @@ flowchart LR
 
 <CodeBlock
   adapter="r"
-  starterCode={`data(mtcars)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `data(mtcars)
 
 # A single column by name (returns a vector)
 mtcars[, "mpg"][1:6]
@@ -45,7 +48,9 @@ head(mtcars[, 1:3])
 
 # Drop columns by negative index
 head(mtcars[, -c(1, 2)])
-`}
+`,
+    },
+  ]}
 />
 
 The "single column returns a vector" surprise trips beginners up.
@@ -56,7 +61,10 @@ multiple columns or pass `drop = FALSE`.
 
 <CodeBlock
   adapter="r"
-  starterCode={`data(mtcars)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `data(mtcars)
 
 # Rows by position
 mtcars[1:5, ]
@@ -69,7 +77,9 @@ mtcars[mtcars$mpg > 25, ]
 
 # Combine conditions
 mtcars[mtcars$mpg > 20 & mtcars$cyl == 4, ]
-`}
+`,
+    },
+  ]}
 />
 
 The third form — passing a *logical vector* of the same length as
@@ -82,14 +92,19 @@ You can do both in one expression:
 
 <CodeBlock
   adapter="r"
-  starterCode={`data(mtcars)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `data(mtcars)
 
 # Fuel-efficient cars: just mpg, cyl, and weight
 mtcars[mtcars$mpg > 25, c("mpg", "cyl", "wt")]
 
 # 8-cylinder cars: just horsepower and quarter-mile time
 mtcars[mtcars$cyl == 8, c("hp", "qsec")]
-`}
+`,
+    },
+  ]}
 />
 
 Read these out loud: "from mtcars, take the rows where mpg > 25,
@@ -103,7 +118,10 @@ combine many `==` with `|`. Use `%in%`:
 
 <CodeBlock
   adapter="r"
-  starterCode={`data(iris)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `data(iris)
 
 # Tedious and error-prone:
 sub1 <- iris[iris$Species == "setosa" | iris$Species == "virginica", ]
@@ -114,7 +132,9 @@ sub2 <- iris[iris$Species %in% c("setosa", "virginica"), ]
 # Confirm they're the same
 identical(sub1, sub2)
 nrow(sub2)
-`}
+`,
+    },
+  ]}
 />
 
 `%in%` is one of R's nicest small operators. It's vectorized:
@@ -129,7 +149,10 @@ with `NA` yields a row of all `NA`s.
 
 <CodeBlock
   adapter="r"
-  starterCode={`data(airquality)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `data(airquality)
 
 # Naive filter — includes rows of all NAs!
 naive <- airquality[airquality$Ozone > 100, ]
@@ -140,7 +163,9 @@ nrow(naive)
 safe <- airquality[!is.na(airquality$Ozone) & airquality$Ozone > 100, ]
 head(safe)
 nrow(safe)
-`}
+`,
+    },
+  ]}
 />
 
 The fix is to always guard with `!is.na(col)` when filtering on a
@@ -155,7 +180,10 @@ the helper:
 
 <CodeBlock
   adapter="r"
-  starterCode={`data(mtcars)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `data(mtcars)
 
 # Sort by mpg ascending
 head(mtcars[order(mtcars$mpg), c("mpg", "cyl", "wt")])
@@ -165,7 +193,9 @@ head(mtcars[order(-mtcars$mpg), c("mpg", "cyl", "wt")])
 
 # By two columns: first cyl ascending, then mpg descending within each
 head(mtcars[order(mtcars$cyl, -mtcars$mpg), c("mpg", "cyl", "wt")])
-`}
+`,
+    },
+  ]}
 />
 
 `order()` returns the *positions* that would sort the vector; you
@@ -222,14 +252,17 @@ only the rows where `wt > 4` and `mpg < 18`, and only the columns
   adapter="r"
   title="Filter and select"
   instructions={`Use base R subsetting to filter \`mtcars\` to cars with \`wt > 4\` and \`mpg < 18\`, keeping only the \`mpg\`, \`cyl\`, and \`wt\` columns. Assign the result to \`heavy_inefficient\`.`}
-  starterCode={`data(mtcars)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `data(mtcars)
 
 heavy_inefficient <- NULL # replace with a subset of mtcars
 
 print(heavy_inefficient)
 cat("Number of cars:", nrow(heavy_inefficient), "\\n")
-`}
-  solutionCode={`data(mtcars)
+`,
+      solutionCode: `data(mtcars)
 
 heavy_inefficient <- mtcars[
   mtcars$wt > 4 & mtcars$mpg < 18,
@@ -237,7 +270,9 @@ heavy_inefficient <- mtcars[
 ]
 print(heavy_inefficient)
 cat("Number of cars:", nrow(heavy_inefficient), "\\n")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_df",

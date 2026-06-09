@@ -23,7 +23,10 @@ bubble size and continent as color, animated over time.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007")
 
@@ -45,7 +48,9 @@ fig = px.scatter(
     },
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Four variables shown at once, and it's still readable. Hover over
@@ -89,7 +94,10 @@ Plotly Express makes the *animated* Gapminder essentially free:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder()
 
@@ -114,7 +122,9 @@ fig = px.scatter(
     },
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Press the **play button** below the chart. You're watching 50

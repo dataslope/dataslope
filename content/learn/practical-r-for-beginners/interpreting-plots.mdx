@@ -104,7 +104,10 @@ to drive home why looking matters:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 library(tidyr)
 library(dplyr)
 
@@ -126,7 +129,9 @@ ggplot(long, aes(x = x, y = y)) +
   ) +
   facet_wrap(~set) +
   labs(title = "Anscombe's quartet: 4 datasets, 4 stories")
-`}
+`,
+    },
+  ]}
 />
 
 All four datasets have almost identical means, standard
@@ -137,7 +142,10 @@ deviations, correlations, and regression lines. They look
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 data(airquality)
 
 ggplot(airquality, aes(x = Temp, y = Ozone)) +
@@ -151,7 +159,9 @@ ggplot(airquality, aes(x = Temp, y = Ozone)) +
     x     = "Temperature (°F)",
     y     = "Ozone (ppb)"
   )
-`}
+`,
+    },
+  ]}
 />
 
 How might you read it?
@@ -241,7 +251,10 @@ string, and uses pie/3D-style ornamentation we should drop.
   adapter="r"
   title="Fix the bad chart"
   instructions={`Rewrite the ggplot below into a clean one with: meaningful axis labels (mpg → "Miles per gallon", wt → "Weight"), a real title, and color mapped to \`factor(cyl)\` (a real categorical variable). Assign the improved chart to \`fixed\`.`}
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 data(mtcars)
 
 # A bad chart:
@@ -252,8 +265,8 @@ print(bad)
 fixed <- NULL # build a clean version
 
 print(fixed)
-`}
-  solutionCode={`library(ggplot2)
+`,
+      solutionCode: `library(ggplot2)
 data(mtcars)
 
 fixed <- ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
@@ -265,7 +278,9 @@ fixed <- ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
     color = "Cylinders"
   )
 print(fixed)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_gg",

@@ -22,7 +22,10 @@ A **union type** `A | B` represents a value that is *either* type `A`
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type StringOrNumber = string | number;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type StringOrNumber = string | number;
 
 let value: StringOrNumber = "hello";
 console.log("value:", value);
@@ -31,7 +34,9 @@ value = 42;
 console.log("value:", value);
 
 // value = true;  // ❌ Type 'boolean' is not assignable to type 'string | number'
-`}
+`,
+    },
+  ]}
 />
 
 **What the compiler now knows:** `value` can be a `string` or a `number`,
@@ -42,14 +47,19 @@ Unions shine when a function can accept multiple input types:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function printId(id: string | number): void {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function printId(id: string | number): void {
   console.log("ID:", id);
 }
 
 printId(123);
 printId("abc-456");
 // printId(true);  // ❌ Argument of type 'boolean' is not assignable
-`}
+`,
+    },
+  ]}
 />
 
 This is far more precise than using `any` (which disables all type
@@ -63,14 +73,19 @@ exist on *all* members:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function printLength(value: string | number): void {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function printLength(value: string | number): void {
   // console.log(value.length);  // ❌ Property 'length' does not exist on type 'number'
   console.log("value:", value);
 }
 
 printLength("hello");
 printLength(42);
-`}
+`,
+    },
+  ]}
 />
 
 The line `value.length` fails because `number` doesn't have a `length`
@@ -79,7 +94,10 @@ narrowing in detail in [Type Narrowing](./type-narrowing)):
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function printLength(value: string | number): void {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function printLength(value: string | number): void {
   if (typeof value === "string") {
     console.log("Length:", value.length); // ✅ value is narrowed to string
   } else {
@@ -89,7 +107,9 @@ narrowing in detail in [Type Narrowing](./type-narrowing)):
 
 printLength("hello");
 printLength(42);
-`}
+`,
+    },
+  ]}
 />
 
 The `typeof` check tells the compiler "in this branch, `value` is a
@@ -102,7 +122,10 @@ An **intersection type** `A & B` represents a value that is *both* type
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Named = { name: string };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Named = { name: string };
 type Aged = { age: number };
 type Person = Named & Aged;
 
@@ -113,7 +136,9 @@ console.log("age:", alice.age);
 
 // Missing a property causes an error:
 // const bob: Person = { name: "Bob" };  // ❌ Property 'age' is missing
-`}
+`,
+    },
+  ]}
 />
 
 The type `Person` has *both* the `name` property from `Named` *and* the
@@ -124,7 +149,10 @@ or types into one:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface Timestamped {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface Timestamped {
   createdAt: Date;
   updatedAt: Date;
 }
@@ -143,7 +171,9 @@ const entity: Entity = {
 };
 
 console.log("entity:", entity);
-`}
+`,
+    },
+  ]}
 />
 
 The resulting type has all the properties from all three constituents.
@@ -181,14 +211,19 @@ For primitive types, intersections can produce an *empty* set:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Impossible = string & number;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Impossible = string & number;
 // Impossible is 'never' — no value is both a string and a number
 
 // const x: Impossible = "hello";  // ❌ Type 'string' is not assignable to type 'never'
 // const y: Impossible = 42;       // ❌ Type 'number' is not assignable to type 'never'
 
 console.log("Impossible is never:", true);
-`}
+`,
+    },
+  ]}
 />
 
 `string & number` is `never` (the bottom type) because no value can be
@@ -203,7 +238,10 @@ uniquely identifies the variant:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Circle = { kind: "circle"; radius: number };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Circle = { kind: "circle"; radius: number };
 type Rectangle = { kind: "rectangle"; width: number; height: number };
 type Shape = Circle | Rectangle;
 
@@ -222,7 +260,9 @@ const rect: Shape = { kind: "rectangle", width: 20, height: 30 };
 
 console.log("Circle area:", area(circle).toFixed(2));
 console.log("Rectangle area:", area(rect));
-`}
+`,
+    },
+  ]}
 />
 
 The field `kind` is the **discriminator**. By checking `shape.kind`, the
@@ -244,7 +284,10 @@ checking**:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Success = { status: "success"; data: string };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Success = { status: "success"; data: string };
 type Failure = { status: "failure"; error: string };
 type Pending = { status: "pending" };
 type Result = Success | Failure | Pending;
@@ -267,7 +310,9 @@ const pending: Result = { status: "pending" };
 console.log(handleResult(ok));
 console.log(handleResult(err));
 console.log(handleResult(pending));
-`}
+`,
+    },
+  ]}
 />
 
 If you add a fourth variant (say, `Timeout`) to `Result`, the compiler
@@ -279,7 +324,10 @@ variable in the final `else`:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Status = "success" | "failure" | "pending";
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Status = "success" | "failure" | "pending";
 
 function logStatus(status: Status): void {
   if (status === "success") {
@@ -296,7 +344,9 @@ function logStatus(status: Status): void {
 }
 
 logStatus("success");
-`}
+`,
+    },
+  ]}
 />
 
 If `status` is not fully handled, the line `const _exhaustive: never =
@@ -309,7 +359,10 @@ You can also have unions of function types, though this is less common:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type StringFunc = (x: string) => string;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type StringFunc = (x: string) => string;
 type NumberFunc = (x: number) => number;
 type Func = StringFunc | NumberFunc;
 
@@ -318,7 +371,9 @@ const double: Func = (x: number) => x * 2;
 
 console.log("toUpper:", toUpper("hello"));
 console.log("double:", double(21));
-`}
+`,
+    },
+  ]}
 />
 
 When calling a `Func`, the compiler doesn't know which variant it is, so
@@ -333,20 +388,28 @@ both:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Positioned = { x: number; y: number };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Positioned = { x: number; y: number };
 type Colored = { color: string };
 type Sprite = Positioned & Colored;
 
 const player: Sprite = { x: 10, y: 20, color: "red" };
 console.log("player:", player);
-`}
+`,
+    },
+  ]}
 />
 
 This is equivalent to declaring an interface that extends both:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface PositionedI {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface PositionedI {
   x: number;
   y: number;
 }
@@ -357,7 +420,9 @@ interface SpriteI extends PositionedI, ColoredI {}
 
 const enemy: SpriteI = { x: 100, y: 200, color: "blue" };
 console.log("enemy:", enemy);
-`}
+`,
+    },
+  ]}
 />
 
 Both approaches are valid; choose based on style and whether you need
@@ -370,7 +435,10 @@ If you intersect two types with conflicting properties, the result is
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type A = { value: string };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type A = { value: string };
 type B = { value: number };
 type Conflict = A & B;
 // Conflict is { value: string & number }, which is { value: never }
@@ -380,7 +448,9 @@ type Conflict = A & B;
 // const y: Conflict = { value: 42 };       // ❌
 
 console.log("Conflict type is uninhabited");
-`}
+`,
+    },
+  ]}
 />
 
 The property `value` must be both `string` and `number`, which is
@@ -395,7 +465,10 @@ string:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Config = { host: string; port: number };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Config = { host: string; port: number };
 type Input = Config | string;
 
 function connect(input: Input): void {
@@ -408,7 +481,9 @@ function connect(input: Input): void {
 
 connect("localhost:3000");
 connect({ host: "example.com", port: 443 });
-`}
+`,
+    },
+  ]}
 />
 
 This is more ergonomic than forcing callers to always provide a full
@@ -425,7 +500,10 @@ implement functions that construct and consume it.
   adapter="typescript"
   title="Result Type for Error Handling"
   instructions={`Define a discriminated union \`Result<T> = { ok: true; value: T } | { ok: false; error: string }\`. Implement two functions: \`success<T>(value: T): Result<T>\` (constructs a success result) and \`unwrap<T>(result: Result<T>): T\` (returns the value if ok, throws an error otherwise). Test with \`unwrap(success(42))\` (should return 42) and \`unwrap({ ok: false, error: "fail" })\` (should throw).`}
-  starterCode={`type Result<T> = { ok: true; value: T } | { ok: false; error: string };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Result<T> = { ok: true; value: T } | { ok: false; error: string };
 
 function success<T>(value: T): Result<T> {
   // Your code here
@@ -447,8 +525,8 @@ try {
 } catch (e: any) {
   console.log("Caught error:", e.message);
 }
-`}
-  solutionCode={`type Result<T> = { ok: true; value: T } | { ok: false; error: string };
+`,
+      solutionCode: `type Result<T> = { ok: true; value: T } | { ok: false; error: string };
 
 function success<T>(value: T): Result<T> {
   return { ok: true, value };
@@ -468,7 +546,9 @@ try {
 } catch (e: any) {
   console.log("Caught error:", e.message);
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "success-case",

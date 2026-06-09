@@ -46,7 +46,10 @@ once, solve many times**.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy.linalg import lu, lu_factor, lu_solve
 import time
 
@@ -68,7 +71,9 @@ t3 = time.perf_counter()
 print(f"Refactor-each-time : {t1 - t0:.3f} s")
 print(f"Factor-once        : {t3 - t2:.3f} s   ({(t1 - t0) / (t3 - t2):.1f}x faster)")
 print(f"Same answer?       : {np.allclose(X1, X2)}")
-`}
+`,
+    },
+  ]}
 />
 
 ## Cholesky decomposition
@@ -82,7 +87,10 @@ Cholesky attempt fails, the matrix is not SPD.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy.linalg import cholesky
 
 # Build a covariance-like SPD matrix
@@ -94,7 +102,9 @@ L = cholesky(S, lower=True)
 print("L =\\n", L.round(3))
 print("\\nL @ L.T =\\n", (L @ L.T).round(3))
 print("\\nS       =\\n", S.round(3))
-`}
+`,
+    },
+  ]}
 />
 
 A great use of Cholesky: **sampling from a multivariate Gaussian**.
@@ -103,7 +113,10 @@ and set $x = L z$ where $z \sim \mathcal{N}(0, I)$.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy.linalg import cholesky
 
 # Target covariance
@@ -117,7 +130,9 @@ x = L @ z
 est_cov = np.cov(x)
 print("Target covariance:\\n", Sigma)
 print("\\nEmpirical covariance from 5000 samples:\\n", est_cov.round(3))
-`}
+`,
+    },
+  ]}
 />
 
 ## QR decomposition
@@ -134,7 +149,10 @@ practice — modified Gram–Schmidt is unstable, but Householder QR
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 # Fit a degree-3 polynomial to noisy data using QR
 rng = np.random.default_rng(0)
@@ -148,7 +166,9 @@ beta = np.linalg.solve(R, Q.T @ y)  # back substitution
 
 print("Fitted coefficients:", beta.round(3))
 print("True coefficients : [1.000, -2.000, 0.000, 0.500]")
-`}
+`,
+    },
+  ]}
 />
 
 NumPy's `np.linalg.lstsq` does exactly this dance for you — but
@@ -173,7 +193,10 @@ The singular values $\sigma_1 \ge \sigma_2 \ge \cdots$ tell you:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 
 rng = np.random.default_rng(0)
@@ -195,7 +218,9 @@ plt.legend()
 plt.show()
 
 print("Numerical rank (σ > 1e-6 * σ_max):", int((s > 1e-6 * s[0]).sum()))
-`}
+`,
+    },
+  ]}
 />
 
 The first five singular values are huge, the rest are noise.
@@ -211,7 +236,10 @@ low-rank adapters (LoRA).
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 
 # Construct a clean low-rank "image"
@@ -229,7 +257,9 @@ for ax, k in zip(axes[1:], [1, 3, 8]):
     ax.set_title(f"rank {k}\\nrel err = {err:.2e}")
 plt.tight_layout()
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 Notice how few singular values are needed to reproduce the image.
@@ -249,7 +279,10 @@ $V e^{t\Lambda} V^{-1}$.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy.linalg import expm
 
 A = np.array([[0.0, 1.0], [-2.0, -1.0]])  # a damped oscillator in state-space
@@ -265,7 +298,9 @@ exp_direct = expm(A * t)
 print("expm(A*1.5) via eig:\\n", exp_via_eig.real.round(4))
 print("\\nexpm(A*1.5) via scipy:\\n", exp_direct.round(4))
 print("\\nAgree?", np.allclose(exp_via_eig, exp_direct))
-`}
+`,
+    },
+  ]}
 />
 
 In practice **always prefer `scipy.linalg.expm`** — it uses scaling-
@@ -280,7 +315,7 @@ diagonalization (and works for non-diagonalizable matrices too).
   files={[
     {
       filename: "main.py",
-      initialContent: `import numpy as np
+      starterCode: `import numpy as np
 from decompose import pca_via_svd
 
 rng = np.random.default_rng(0)
@@ -301,7 +336,7 @@ print(
     },
     {
       filename: "decompose.py",
-      initialContent: `import numpy as np
+      starterCode: `import numpy as np
 
 
 def pca_via_svd(X, n_components):

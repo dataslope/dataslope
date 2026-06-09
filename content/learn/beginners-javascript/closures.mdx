@@ -15,7 +15,10 @@ Watch this carefully:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function makeGreeter(greeting) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function makeGreeter(greeting) {
   return function (name) {
     return greeting + ", " + name + "!";
   };
@@ -27,7 +30,9 @@ const howdy = makeGreeter("Howdy");
 console.log(hello("Ada"));
 console.log(hello("Linus"));
 console.log(howdy("Grace"));
-`}
+`,
+    },
+  ]}
 />
 
 `makeGreeter` runs, then returns. Yet the inner function `hello`
@@ -64,7 +69,10 @@ across calls, without exposing it to the outside world.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function makeCounter() {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function makeCounter() {
   let count = 0; // private — no one else can see it directly
   return function () {
     count = count + 1;
@@ -80,7 +88,9 @@ console.log(tick()); // 3
 const tock = makeCounter();
 console.log(tock()); // 1 — independent counter
 console.log(tick()); // 4 — tick keeps going
-`}
+`,
+    },
+  ]}
 />
 
 This is huge. The counter behaves like a tiny object with private
@@ -106,7 +116,10 @@ A classic closure puzzle:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// Build an array of functions, one per number 0..4.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// Build an array of functions, one per number 0..4.
 const fs = [];
 for (let i = 0; i < 5; i++) {
   fs.push(function () {
@@ -119,7 +132,9 @@ console.log(fs[1]()); // 1
 console.log(fs[2]()); // 2
 console.log(fs[3]()); // 3
 console.log(fs[4]()); // 4
-`}
+`,
+    },
+  ]}
 />
 
 Because we declared `i` with `let`, each iteration of the loop
@@ -132,7 +147,10 @@ function-scoped, not block-scoped):
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const fs = [];
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const fs = [];
 for (var i = 0; i < 5; i++) {
   fs.push(function () {
     return i;
@@ -144,7 +162,9 @@ console.log(fs[1]()); // 5
 console.log(fs[2]()); // 5
 console.log(fs[3]()); // 5
 console.log(fs[4]()); // 5
-`}
+`,
+    },
+  ]}
 />
 
 Now every function shares the *same* `i`, the one declared by
@@ -164,7 +184,10 @@ Closures are how JavaScript expresses many practical patterns.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function makeTaxCalculator(rate) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function makeTaxCalculator(rate) {
   return function (amount) {
     return amount + amount * rate;
   };
@@ -176,7 +199,9 @@ const addUSCal = makeTaxCalculator(0.0725);
 console.log(addUKTax(100)); // 120
 console.log(addUSCal(100)); // 107.25
 console.log(addUKTax(50)); // 60
-`}
+`,
+    },
+  ]}
 />
 
 `addUKTax` and `addUSCal` are two specialised versions of the same
@@ -187,7 +212,10 @@ into the closure once and never has to be passed again.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function memoize(fn) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function memoize(fn) {
   const cache = new Map();
   return function (x) {
     if (cache.has(x)) {
@@ -212,7 +240,9 @@ console.log(fastSquare(4)); // cache hit
 console.log(fastSquare(5)); // computes
 console.log(fastSquare(5)); // cache hit
 console.log(fastSquare(4)); // cache hit
-`}
+`,
+    },
+  ]}
 />
 
 The `cache` lives inside `memoize`'s call and is *only* accessible
@@ -227,7 +257,10 @@ pre-2015 JavaScript used closures explicitly:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const counterModule = (function () {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const counterModule = (function () {
   let count = 0; // private state
   function increment() {
     count += 1;
@@ -248,7 +281,9 @@ console.log(counterModule.value()); // 3
 counterModule.reset();
 console.log(counterModule.value()); // 0
 // counterModule.count       // undefined — count is private!
-`}
+`,
+    },
+  ]}
 />
 
 This pattern — called the **IIFE** ("immediately invoked function
@@ -268,7 +303,7 @@ state directly.
   files={[
     {
       filename: "index.js",
-      initialContent: `const { makeRateLimiter } = require("./rateLimiter");
+      starterCode: `const { makeRateLimiter } = require("./rateLimiter");
 
 const limiter = makeRateLimiter(3);
 
@@ -281,7 +316,7 @@ console.log(limiter("fifth")); // deny
     },
     {
       filename: "rateLimiter.js",
-      initialContent: `// Returns a function that allows up to \`max\` calls, then denies the rest.
+      starterCode: `// Returns a function that allows up to \`max\` calls, then denies the rest.
 // The state (call count) lives in the closure — no globals, no leaks.
 function makeRateLimiter(max) {
   let calls = 0;
@@ -332,7 +367,10 @@ created, you are looking at a closure.
 - \`value()\` — return the current value without changing it.
 
 The starting value of the counter is the \`start\` argument (default \`0\`). Each call to \`makeCounter\` should produce an independent counter.`}
-  starterCode={`function makeCounter(start = 0) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function makeCounter(start = 0) {
   // your code here — keep \`count\` private via closure.
   return {
     increment() {
@@ -353,8 +391,8 @@ console.log(c.increment()); // 11
 console.log(c.increment()); // 12
 console.log(c.decrement()); // 11
 console.log(c.value()); // 11
-`}
-  solutionCode={`function makeCounter(start = 0) {
+`,
+      solutionCode: `function makeCounter(start = 0) {
   let count = start;
   return {
     increment() {
@@ -377,7 +415,9 @@ console.log(c.increment());
 console.log(c.increment());
 console.log(c.decrement());
 console.log(c.value());
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "start_value",

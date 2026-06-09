@@ -36,7 +36,10 @@ Because BFS visits by increasing number of edges, it finds shortest paths in **u
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <queue>
 #include <vector>
 
@@ -70,7 +73,9 @@ int main() {
   std::cout << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Depth-first search
@@ -88,7 +93,10 @@ DFS(u):
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 void dfsRecursive(int u, const std::vector<std::vector<int>> &adj,
@@ -108,14 +116,19 @@ int main() {
   std::cout << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The iterative version uses a stack. Push neighbors in reverse order if you want the same order as recursive DFS on a normally ordered adjacency list.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <stack>
 #include <vector>
 
@@ -150,7 +163,9 @@ int main() {
   std::cout << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ```mermaid
@@ -174,7 +189,10 @@ To count connected components in an undirected graph, start a BFS or DFS from ev
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <queue>
 #include <vector>
 
@@ -209,7 +227,9 @@ int main() {
   std::cout << countComponents(adj) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Cycle detection
@@ -218,7 +238,10 @@ For an undirected graph, DFS tracks the parent. Seeing a visited neighbor that i
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 bool dfsCycleUndirected(int u, int parent,
@@ -243,14 +266,19 @@ int main() {
             << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 For a directed graph, use colors: white = unvisited, gray = currently in recursion stack, black = fully processed. Finding an edge to gray means a cycle.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 bool hasDirectedCycleFrom(int u, const std::vector<std::vector<int>> &adj,
@@ -273,7 +301,9 @@ int main() {
             << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Topological sort
@@ -282,7 +312,10 @@ A topological ordering places every directed edge `u -> v` with `u` before `v`. 
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <algorithm>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -309,7 +342,9 @@ int main() {
   std::cout << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Kahn's algorithm is the BFS-like alternative: compute in-degrees, repeatedly pop vertices with in-degree 0, and decrement their outgoing neighbors.
@@ -320,7 +355,10 @@ BFS can also record distance and parent arrays.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <queue>
 #include <vector>
 
@@ -349,7 +387,9 @@ int main() {
   std::cout << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Grids as graphs: flood fill and islands
@@ -368,7 +408,10 @@ A number-of-islands solution starts BFS from every unvisited land cell and marks
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <queue>
 #include <utility>
 #include <vector>
@@ -408,7 +451,9 @@ int main() {
   std::cout << islands << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Challenge: BFS from source
@@ -417,7 +462,10 @@ int main() {
   adapter="cpp"
   title="BFS from source"
   instructions={`Implement \`bfsOrder\` to return the BFS visit order starting at \`src\`.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <queue>
 #include <vector>
 
@@ -437,8 +485,8 @@ int main() {
   std::cout << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <queue>
 #include <vector>
 
@@ -473,7 +521,9 @@ int main() {
   std::cout << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "bfs-order",
@@ -489,7 +539,10 @@ int main() {
   adapter="cpp"
   title="Number of connected components"
   instructions={`Implement \`countComponents\` by starting a traversal from every unvisited vertex.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <queue>
 #include <vector>
 
@@ -504,8 +557,8 @@ int main() {
   std::cout << countComponents(n, adj) << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <queue>
 #include <vector>
 
@@ -539,7 +592,9 @@ int main() {
   std::cout << countComponents(n, adj) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "components",
@@ -555,7 +610,10 @@ int main() {
   adapter="cpp"
   title="Number of islands"
   instructions={`Implement \`numIslands\`. Mutating the grid to mark visited land is allowed.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <queue>
 #include <utility>
 #include <vector>
@@ -573,8 +631,8 @@ int main() {
   std::cout << numIslands(grid) << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <queue>
 #include <utility>
 #include <vector>
@@ -621,7 +679,9 @@ int main() {
   std::cout << numIslands(grid) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "islands",

@@ -44,7 +44,10 @@ Three levels of scope appear above:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int counter = 0; // file scope
 
@@ -59,7 +62,9 @@ int main(void) {
   printf("counter = %d\\n", counter);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Shadowing: inner names hide outer names
@@ -70,7 +75,10 @@ ends.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int x = 100;
 
@@ -83,7 +91,9 @@ int main(void) {
   printf("outer x again = %d\\n", x);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Shadowing is occasionally useful (e.g. a tiny temporary) but more
@@ -114,7 +124,10 @@ across calls — a counter, perhaps. Prefix it with `static`.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int next_id(void) {
   static int id = 0; // initialized once, persists across calls
@@ -128,7 +141,9 @@ int main(void) {
   printf("id = %d\\n", next_id());
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 `static` at file scope means something else: "this name is visible
@@ -183,7 +198,7 @@ to compile and run all of them at once.
   files={[
     {
       filename: "main.c",
-      initialContent: `#include "stats.h"
+      starterCode: `#include "stats.h"
 #include <stdio.h>
 
 int main(void) {
@@ -200,7 +215,7 @@ int main(void) {
     },
     {
       filename: "stats.h",
-      initialContent: `#ifndef STATS_H
+      starterCode: `#ifndef STATS_H
 #define STATS_H
 
 int sum(const int *data, int n);
@@ -212,7 +227,7 @@ double average(const int *data, int n);
     },
     {
       filename: "stats.c",
-      initialContent: `#include "stats.h"
+      starterCode: `#include "stats.h"
 
 int sum(const int *data, int n) {
   int total = 0;
@@ -269,7 +284,7 @@ contract stayed the same. That is the power of modularity.
   files={[
     {
       filename: "main.c",
-      initialContent: `#include "calc.h"
+      starterCode: `#include "calc.h"
 #include <stdio.h>
 
 int main(void) {
@@ -282,7 +297,7 @@ int main(void) {
     },
     {
       filename: "calc.h",
-      initialContent: `#ifndef CALC_H
+      starterCode: `#ifndef CALC_H
 #define CALC_H
 
 int add(int a, int b);
@@ -293,11 +308,11 @@ int multiply(int a, int b);
     },
     {
       filename: "calc.c",
-      initialContent: `#include "calc.h"
+      starterCode: `#include "calc.h"
 
 // implement add and multiply here
 `,
-      solutionContent: `#include "calc.h"
+      solutionCode: `#include "calc.h"
 
 int add(int a, int b) { return a + b; }
 

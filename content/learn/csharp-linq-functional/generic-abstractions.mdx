@@ -46,7 +46,10 @@ Watch how much one type parameter buys you.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -67,7 +70,9 @@ public static class MyOps
         }
     }
 }
-`}
+`,
+    },
+  ]}
 />
 
 One implementation. Three element types. Zero casts. Zero boxing.
@@ -80,7 +85,10 @@ To really see how built-in LINQ works, let's reimplement `Where`.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -108,7 +116,9 @@ public static class Mini
             yield return selector(x);
     }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Two short methods, generic over the element type, and they chain.
@@ -133,7 +143,10 @@ Sometimes you need to know *something* about `T`. C# generic
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -159,7 +172,9 @@ public static class Stats
         return best;
     }
 }
-`}
+`,
+    },
+  ]}
 />
 
 The constraint `where T : IComparable<T>` is what allows `CompareTo`
@@ -193,7 +208,7 @@ key extracted from any sequence.
   files={[
     {
       filename: "Program.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 using System.Linq;
 
 var words = new[] { "alpha", "beta", "gamma", "delta", "epsilon", "zeta" };
@@ -212,7 +227,7 @@ var byParity = nums.Histogram(n => n % 2 == 0 ? "even" : "odd");
 foreach (var (key, count) in byParity)
     Console.WriteLine($"{key}: {count}");
 `,
-      solutionContent: `using System;
+      solutionCode: `using System;
 using System.Linq;
 
 var words = new[] { "alpha", "beta", "gamma", "delta", "epsilon", "zeta" };
@@ -232,7 +247,7 @@ foreach (var (key, count) in byParity)
     },
     {
       filename: "Histogram.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -250,7 +265,7 @@ public static class HistogramOp
     }
 }
 `,
-      solutionContent: `using System;
+      solutionCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 

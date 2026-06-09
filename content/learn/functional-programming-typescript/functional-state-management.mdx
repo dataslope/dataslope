@@ -22,7 +22,10 @@ much every modern state library.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type State = { readonly count: number };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type State = { readonly count: number };
 type Action =
   | { kind: "inc" }
   | { kind: "dec" }
@@ -56,7 +59,9 @@ function play(history: ReadonlyArray<Action>): State {
 
 console.log(play([{ kind: "inc" }, { kind: "inc" }, { kind: "add", by: 10 }]));
 console.log(play([{ kind: "inc" }, { kind: "reset" }, { kind: "dec" }]));
-`}
+`,
+    },
+  ]}
 />
 
 `reducer` is a pure function. `play` is a `reduce` over actions —
@@ -73,7 +78,10 @@ point in time.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type State = { readonly count: number };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type State = { readonly count: number };
 type Action = { kind: "inc" } | { kind: "add"; by: number } | { kind: "reset" };
 const initial: State = { count: 0 };
 const reducer = (s: State, a: Action): State => {
@@ -105,7 +113,9 @@ const snapshots = history.reduce<{ state: State; trace: State[] }>(
 ).trace;
 
 snapshots.forEach((s, i) => console.log(\`t=\${i}\`, s));
-`}
+`,
+    },
+  ]}
 />
 
 You can scrub the timeline forward and backward without recomputing
@@ -119,7 +129,10 @@ data structure:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Doc = { readonly text: string };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Doc = { readonly text: string };
 
 type Editor = {
   readonly past: ReadonlyArray<Doc>;
@@ -177,7 +190,9 @@ for (const a of actions) {
   state = step(state, a);
   console.log(JSON.stringify(state.present.text));
 }
-`}
+`,
+    },
+  ]}
 />
 
 Nothing is mutated. Each previous `Editor` snapshot is still alive
@@ -197,7 +212,10 @@ produce a value and the next state".
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// State<S, A> = a function from state to [value, newState]
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// State<S, A> = a function from state to [value, newState]
 type State<S, A> = (s: S) => readonly [A, S];
 
 const of =
@@ -238,7 +256,9 @@ const program = chain(fresh, (a) =>
 const [ids, finalCounter] = program(0);
 console.log(ids);
 console.log("counter advanced to:", finalCounter);
-`}
+`,
+    },
+  ]}
 />
 
 The point isn't that you should write a State monad in production
@@ -299,7 +319,7 @@ The reducer must be **pure** — return a new \`State\`; do not mutate
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { reduce, initial, Action } from "./cart";
+      starterCode: `import { reduce, initial, Action } from "./cart";
 
 const actions: Action[] = [
   { kind: "add", sku: "A", qty: 1 },
@@ -318,7 +338,7 @@ for (const a of actions) {
     },
     {
       filename: "cart.ts",
-      initialContent: `export type Item = { readonly sku: string; readonly qty: number };
+      starterCode: `export type Item = { readonly sku: string; readonly qty: number };
 export type State = { readonly items: ReadonlyArray<Item> };
 export type Action =
   | { kind: "add"; sku: string; qty: number }
@@ -332,7 +352,7 @@ export function reduce(state: State, action: Action): State {
   return state;
 }
 `,
-      solutionContent: `export type Item = { readonly sku: string; readonly qty: number };
+      solutionCode: `export type Item = { readonly sku: string; readonly qty: number };
 export type State = { readonly items: ReadonlyArray<Item> };
 export type Action =
   | { kind: "add"; sku: string; qty: number }

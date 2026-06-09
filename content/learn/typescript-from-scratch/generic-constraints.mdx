@@ -23,7 +23,10 @@ The solution: **constrain** `T` to types that *do* have a `length` property.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Define a constraint: T must have a 'length' property
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Define a constraint: T must have a 'length' property
 interface Lengthwise {
   length: number;
 }
@@ -38,7 +41,9 @@ logLength([1, 2, 3]); // array has length
 logLength({ length: 42, data: "custom" }); // custom object with length
 
 // logLength(123); // ❌ Error: number doesn't have 'length'
-`}
+`,
+    },
+  ]}
 />
 
 The `<T extends Lengthwise>` syntax means "`T` can be any type, as long as it's assignable to `Lengthwise`." Inside the function, you can safely access `item.length` because the compiler knows it exists.
@@ -60,7 +65,10 @@ One of the most useful constraints is `keyof`, which gives you the union of all 
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
   return obj[key];
 }
 
@@ -73,7 +81,9 @@ console.log(\`Name: \${name}\`);
 console.log(\`Age: \${age}\`);
 
 // getProperty(person, "email"); // ❌ Error: "email" is not a key of person
-`}
+`,
+    },
+  ]}
 />
 
 Here's what's happening:
@@ -91,7 +101,10 @@ The syntax `T[K]` is an **indexed access type** (also called a **lookup type**).
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Person = {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Person = {
   name: string;
   age: number;
   active: boolean;
@@ -110,7 +123,9 @@ const nameValue = getValue(p, "name"); // type: string
 const ageValue = getValue(p, "age"); // type: number
 
 console.log(\`Name: \${nameValue}, Age: \${ageValue}\`);
-`}
+`,
+    },
+  ]}
 />
 
 The compiler infers `K = "name"`, so `T[K]` becomes `Person["name"]`, which is `string`. This is how libraries like Lodash's `get` or `pick` functions are typed — they use `keyof` and indexed access types to preserve precise property types.
@@ -121,7 +136,10 @@ Sometimes you want a type parameter to have a **default** value if the caller do
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Default type parameter: T defaults to string if not provided
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Default type parameter: T defaults to string if not provided
 function createArray<T = string>(length: number, value: T): T[] {
   return Array(length).fill(value);
 }
@@ -136,7 +154,9 @@ console.log(numbers); // [42, 42, 42]
 
 // If we call with no second argument, we'd get string[] by default
 // (though this example requires a value, so it's just illustrative)
-`}
+`,
+    },
+  ]}
 />
 
 Default type parameters are useful for APIs where most calls use the same type, but you want to allow overrides. React's `useState<T = undefined>()` is a classic example: if you don't provide a type, it defaults to `undefined`.
@@ -149,7 +169,10 @@ The trick: use `extends` to constrain the input, but still bind to the precise t
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Without 'extends readonly': input widens to string[]
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Without 'extends readonly': input widens to string[]
 function firstBad<T>(arr: T[]): T | undefined {
   return arr[0];
 }
@@ -170,7 +193,9 @@ console.log(\`First color: \${firstColor}\`);
 const mutableArray = [1, 2, 3];
 const firstNum = first(mutableArray); // type: number | undefined
 console.log(\`First number: \${firstNum}\`);
-`}
+`,
+    },
+  ]}
 />
 
 By constraining `T extends readonly unknown[]`, we accept both mutable and readonly arrays, and the return type `T[0]` preserves the element type — including literal types like `"red"`.
@@ -191,7 +216,10 @@ Let's build a `pluck` function that extracts a property from an array of objects
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function pluck<T, K extends keyof T>(array: T[], key: K): T[K][] {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function pluck<T, K extends keyof T>(array: T[], key: K): T[K][] {
   return array.map((item) => item[key]);
 }
 
@@ -208,7 +236,9 @@ console.log(\`Names: \${names.join(", ")}\`);
 console.log(\`Ages: \${ages.join(", ")}\`);
 
 // pluck(users, "email"); // ❌ Error: "email" is not a key of user objects
-`}
+`,
+    },
+  ]}
 />
 
 The `pluck` function is generic over both the object type (`T`) and the key type (`K`). The constraint `K extends keyof T` ensures the key exists, and the return type `T[K][]` gives you an array of the property's type.
@@ -219,7 +249,10 @@ Here's another useful utility: `pick`, which creates a new object with only the 
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function pick<T, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function pick<T, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> {
   const result = {} as Pick<T, K>;
   for (const key of keys) {
     result[key] = obj[key];
@@ -237,7 +270,9 @@ console.log(subset); // { name: "Alice", age: 30 }
 // Access only picked properties
 console.log(\`Name: \${subset.name}, Age: \${subset.age}\`);
 // console.log(subset.city); // ❌ Error: 'city' does not exist on type Pick<...>
-`}
+`,
+    },
+  ]}
 />
 
 The built-in `Pick<T, K>` utility type creates a new type with only the properties `K` from `T`. We use it as the return type to guarantee that the result only has the picked properties.
@@ -258,7 +293,10 @@ TypeScript infers variance automatically based on how the type parameter is used
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Covariant example: readonly containers
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Covariant example: readonly containers
 type ReadonlyBox<T> = {
   readonly value: T;
 };
@@ -289,7 +327,9 @@ const animalHandler: Handler<{ species: string }> = (animal) => {
 
 // ✅ OK: Handler<Animal> can handle Handler<Dog> (contravariance)
 registerHandler(animalHandler);
-`}
+`,
+    },
+  ]}
 />
 
 This is an advanced topic, and the compiler handles it automatically. The key takeaway: when you use generics with subtyping, the compiler checks whether the assignment is safe based on how the type parameter is used (in input positions, output positions, or both).
@@ -315,7 +355,7 @@ Now it's your turn. You'll implement a generic `groupBy` function that groups an
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { groupBy } from "./groupBy";
+      starterCode: `import { groupBy } from "./groupBy";
 
 const users = [
   { name: "Alice", role: "admin" },
@@ -328,7 +368,7 @@ const byRole = groupBy(users, "role");
 console.log("Admins:", byRole["admin"]);
 console.log("Users:", byRole["user"]);
 `,
-      solutionContent: `import { groupBy } from "./groupBy";
+      solutionCode: `import { groupBy } from "./groupBy";
 
 const users = [
   { name: "Alice", role: "admin" },
@@ -344,7 +384,7 @@ console.log("Users:", byRole["user"]);
     },
     {
       filename: "groupBy.ts",
-      initialContent: `// TODO: Implement groupBy<T, K extends keyof T>
+      starterCode: `// TODO: Implement groupBy<T, K extends keyof T>
 // It should return a Record<string, T[]>
 
 export function groupBy<T, K extends keyof T>(
@@ -355,7 +395,7 @@ export function groupBy<T, K extends keyof T>(
   return {};
 }
 `,
-      solutionContent: `export function groupBy<T, K extends keyof T>(
+      solutionCode: `export function groupBy<T, K extends keyof T>(
   array: T[],
   key: K,
 ): Record<string, T[]> {

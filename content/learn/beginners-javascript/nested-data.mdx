@@ -15,7 +15,10 @@ Take a moment to read this object slowly:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const order = {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const order = {
   id: 101,
   customer: {
     name: "Ada Lovelace",
@@ -37,7 +40,9 @@ Take a moment to read this object slowly:
 console.log(order.customer.address.city);
 console.log(order.items[1].title);
 console.log(order.items.length, "line items");
-`}
+`,
+    },
+  ]}
 />
 
 That single value packs a lot of information. The skill is being
@@ -84,7 +89,10 @@ expression returns `undefined` instead of throwing.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const noisy = { user: { profile: { name: "Ada" } } };
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const noisy = { user: { profile: { name: "Ada" } } };
 const sparse = { user: null };
 
 console.log(noisy.user?.profile?.name); // "Ada"
@@ -98,7 +106,9 @@ console.log(orders[0]?.items); // undefined, no crash
 // And for method calls:
 const maybeFn = null;
 maybeFn?.(); // does nothing, returns undefined
-`}
+`,
+    },
+  ]}
 />
 
 The pair of `?.` and `??` (nullish coalescing) is the modern
@@ -113,7 +123,10 @@ recursion). Let's add up the total cost of the order above:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const order = {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const order = {
   id: 101,
   items: [
     { sku: "BK-001", qty: 2, price: 4.5 },
@@ -129,7 +142,9 @@ for (const item of order.items) {
   total += subtotal;
 }
 console.log("Total:", total);
-`}
+`,
+    },
+  ]}
 />
 
 That is just an "accumulator over a list" loop, walking one level
@@ -139,7 +154,10 @@ of nesting. The same pattern scales to any depth.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const class1 = [
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const class1 = [
   { name: "Ada", grades: [82, 95, 78] },
   { name: "Linus", grades: [60, 70, 65] },
   { name: "Grace", grades: [91, 88, 100] },
@@ -151,7 +169,9 @@ for (const student of class1) {
   const avg = total / student.grades.length;
   console.log(student.name, "-> average", avg.toFixed(1));
 }
-`}
+`,
+    },
+  ]}
 />
 
 Outer loop walks each student. Inner loop walks that student's
@@ -171,7 +191,10 @@ something deep inside a nested structure?
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const order = {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const order = {
   id: 101,
   customer: { name: "Ada", email: "ada@example.com" },
   status: "pending",
@@ -189,7 +212,9 @@ const reMailed = {
 };
 console.log("original email:", order.customer.email);
 console.log("new email:     ", reMailed.customer.email);
-`}
+`,
+    },
+  ]}
 />
 
 Notice we had to spread *each level* we wanted to copy. The
@@ -207,7 +232,10 @@ Updating one element of an array, immutably, is a common task. Use
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const items = [
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const items = [
   { sku: "BK-001", qty: 2 },
   { sku: "PN-014", qty: 1 },
   { sku: "IK-002", qty: 3 },
@@ -220,7 +248,9 @@ const updated = items.map((item) =>
 
 console.log("original:", items);
 console.log("updated: ", updated);
-`}
+`,
+    },
+  ]}
 />
 
 The unchanged elements pass through `.map` unmodified. The
@@ -239,7 +269,10 @@ text and live values:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const order = {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const order = {
   id: 101,
   customer: { name: "Ada", email: "ada@example.com" },
   items: [{ sku: "BK-001", qty: 2 }],
@@ -258,7 +291,9 @@ console.log(JSON.stringify(back) === text); // true — equivalent contents
 
 // Pretty-printed JSON:
 console.log(JSON.stringify(order, null, 2));
-`}
+`,
+    },
+  ]}
 />
 
 A neat side-effect: `JSON.parse(JSON.stringify(x))` is a
@@ -313,7 +348,7 @@ small.
   files={[
     {
       filename: "index.js",
-      initialContent: `const { ordersByCustomer, lineTotal } = require("./orders");
+      starterCode: `const { ordersByCustomer, lineTotal } = require("./orders");
 
 const orders = [
   {
@@ -340,7 +375,7 @@ for (const [customer, customerOrders] of Object.entries(byCustomer)) {
     },
     {
       filename: "orders.js",
-      initialContent: `function lineTotal(item) {
+      starterCode: `function lineTotal(item) {
   return item.price * item.qty;
 }
 
@@ -379,7 +414,10 @@ Examples:
 - \`getPath({ a: { b: {} } }, "a.b.c", 0)\` → \`0\`
 - \`getPath({ a: null }, "a.b.c", "n/a")\` → \`"n/a"\`
 - \`getPath({}, "x", "n/a")\` → \`"n/a"\``}
-  starterCode={`function getPath(obj, path, defaultValue) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function getPath(obj, path, defaultValue) {
   // your code here
   return defaultValue;
 }
@@ -388,8 +426,8 @@ console.log(getPath({ a: { b: { c: 42 } } }, "a.b.c", 0));
 console.log(getPath({ a: { b: {} } }, "a.b.c", 0));
 console.log(getPath({ a: null }, "a.b.c", "n/a"));
 console.log(getPath({}, "x", "n/a"));
-`}
-  solutionCode={`function getPath(obj, path, defaultValue) {
+`,
+      solutionCode: `function getPath(obj, path, defaultValue) {
   const parts = path.split(".");
   let current = obj;
   for (const key of parts) {
@@ -403,7 +441,9 @@ console.log(getPath({ a: { b: { c: 42 } } }, "a.b.c", 0));
 console.log(getPath({ a: { b: {} } }, "a.b.c", 0));
 console.log(getPath({ a: null }, "a.b.c", "n/a"));
 console.log(getPath({}, "x", "n/a"));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "present",

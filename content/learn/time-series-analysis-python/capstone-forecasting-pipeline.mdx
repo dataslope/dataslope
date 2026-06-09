@@ -104,7 +104,10 @@ touching a model.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -121,8 +124,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`import matplotlib.pyplot as plt
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `import matplotlib.pyplot as plt
 
 fig, ax = plt.subplots(figsize=(10, 4))
 air.plot(ax=ax, title="Monthly airline passengers, 1949-1960")
@@ -139,7 +142,9 @@ print("Three features to plan around:")
 print(" - TREND: a steady climb in air travel.")
 print(" - SEASONALITY: a summer peak every 12 months.")
 print(" - GROWING VARIANCE: the summer-winter swing widens over time (-> log).")
-`}
+`,
+    },
+  ]}
 />
 
 ## Step 2 — Confirm non-stationarity, then plan the transforms
@@ -150,7 +155,10 @@ difference for the yearly cycle) should drive it to stationarity.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
@@ -170,8 +178,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`import numpy as np
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `import numpy as np
 from statsmodels.tsa.stattools import adfuller
 
 
@@ -193,7 +201,9 @@ print(
 print()
 print("Verdict: we need a log, one regular difference (d=1), and one seasonal")
 print("difference at lag 12 (D=1). That's the recipe the data itself prescribed.")
-`}
+`,
+    },
+  ]}
 />
 
 ## Step 3 — Decompose to understand the structure
@@ -204,7 +214,10 @@ forecast to stakeholders.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -221,8 +234,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`from statsmodels.tsa.seasonal import seasonal_decompose
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `from statsmodels.tsa.seasonal import seasonal_decompose
 import matplotlib.pyplot as plt
 
 dec = seasonal_decompose(air, model="multiplicative", period=12)
@@ -238,7 +251,9 @@ trough = season.idxmin()
 print(f"Busiest month factor ~ {season.max():.2f} (around {peak.strftime('%B')})")
 print(f"Quietest month factor ~ {season.min():.2f} (around {trough.strftime('%B')})")
 print("Multiplicative: summer runs ~+25-30% above trend, winter dips below.")
-`}
+`,
+    },
+  ]}
 />
 
 ## Step 4 — Identify orders from the stationary series
@@ -249,7 +264,10 @@ the seasonal lag 12 (which tells us we need *seasonal* terms).
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
@@ -268,8 +286,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`import numpy as np
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 
@@ -286,7 +304,9 @@ plt.show()
 print("Small significant spikes at the short lags (1) suggest modest p and q.")
 print("A spike near lag 12 confirms a SEASONAL term is needed (period 12).")
 print("Reasonable starting orders: ARIMA(1,1,1) with a seasonal (1,1,1,12) part.")
-`}
+`,
+    },
+  ]}
 />
 
 ## Step 5-7 — Split, fit, and forecast (honestly)
@@ -308,7 +328,10 @@ lag-12 structure plain ARIMA left in its residuals.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
@@ -333,8 +356,8 @@ air = pd.Series(_passengers, index=idx, name="passengers")
 
 def mae(a, b):  return float(np.mean(np.abs(np.asarray(a) - np.asarray(b))))
 def rmse(a, b): return float(np.sqrt(np.mean((np.asarray(a) - np.asarray(b)) ** 2)))
-def mape(a, b): return float(np.mean(np.abs((np.asarray(a) - np.asarray(b)) / np.asarray(a))) * 100)`}
-  starterCode={`import numpy as np
+def mape(a, b): return float(np.mean(np.abs((np.asarray(a) - np.asarray(b)) / np.asarray(a))) * 100)`,
+      starterCode: `import numpy as np
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
@@ -374,7 +397,9 @@ print("The SEASONAL model wins clearly -- it captures both the trend AND the")
 print("yearly cycle. Plain ARIMA handles the trend but leaves the seasonality in")
 print("its errors, so it trails the seasonal model -- exactly what its lag-12")
 print("residual spike warned about on the ARIMA page.")
-`}
+`,
+    },
+  ]}
 />
 
 The seasonal model posts the lowest error on data it never saw — and it
@@ -388,7 +413,10 @@ page — the residual diagnostic, paid off in hard numbers.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
@@ -408,8 +436,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`import numpy as np
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 
@@ -447,7 +475,9 @@ plt.show()
 print("The forecast reproduces the rising trend AND the summer peaks, and the")
 print("actual values land inside the uncertainty band. That is what an honest,")
 print("validated forecast looks like.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="success" title="What 'done' looks like">
@@ -486,7 +516,10 @@ In production, a forecast is a living thing:
 - \`"log_diff_sdiff"\` — ADF p-value of \`np.log(air).diff().diff(12)\`
 
 Drop NaNs before each test. Also set \`is_stationary_final\` to \`True\` if the final stage's p-value is below 0.05. The full recipe should reach stationarity.`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
@@ -506,8 +539,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`import numpy as np
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `import numpy as np
 from statsmodels.tsa.stattools import adfuller
 
 report = {
@@ -519,8 +552,8 @@ report = {
 is_stationary_final = None
 print(report)
 print("final stationary:", is_stationary_final)
-`}
-  solutionCode={`import numpy as np
+`,
+      solutionCode: `import numpy as np
 from statsmodels.tsa.stattools import adfuller
 
 
@@ -538,7 +571,9 @@ report = {
 is_stationary_final = report["log_diff_sdiff"] < 0.05
 print(report)
 print("final stationary:", is_stationary_final)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "keys",
@@ -581,7 +616,10 @@ Produce a dict \`evaluation\` with these exact key names:
 - \`"snaive_better"\` — \`True\` if seasonal-naive has the lower MAE
 
 Use only \`train\` to build both forecasts — never peek at the test set.`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -598,8 +636,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`import numpy as np
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `import numpy as np
 
 evaluation = {
     "snaive_mae": None,
@@ -609,8 +647,8 @@ evaluation = {
     "snaive_better": None,
 }
 print(evaluation)
-`}
-  solutionCode={`import numpy as np
+`,
+      solutionCode: `import numpy as np
 
 H = 12
 train, test = air.iloc[:-H], air.iloc[-H:]
@@ -636,7 +674,9 @@ evaluation = {
 }
 evaluation["snaive_better"] = evaluation["snaive_mae"] < evaluation["mean_mae"]
 print(evaluation)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "keys",

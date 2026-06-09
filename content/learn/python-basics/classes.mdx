@@ -25,7 +25,10 @@ The word "class" comes from **classification** — the practice of grouping thin
 
 <CodeBlock
   adapter="python"
-  starterCode={`class Dog:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class Dog:
     """A very simple dog."""
 
     pass
@@ -35,7 +38,9 @@ d = Dog()
 print(d)
 print(type(d))
 print(isinstance(d, Dog))
-`}
+`,
+    },
+  ]}
 />
 
 `class Dog:` defines a new type. `Dog()` creates an **instance** of that type. The class body can be empty (`pass`), but usually you add an `__init__` method.
@@ -46,7 +51,10 @@ print(isinstance(d, Dog))
 
 <CodeBlock
   adapter="python"
-  starterCode={`class Dog:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class Dog:
     def __init__(self, name, age):
         self.name = name
         self.age = age
@@ -55,7 +63,9 @@ print(isinstance(d, Dog))
 d = Dog("Rex", 4)
 print(d.name)
 print(d.age)
-`}
+`,
+    },
+  ]}
 />
 
 When you call `Dog("Rex", 4)`, Python:
@@ -85,7 +95,10 @@ An **instance attribute** belongs to a single object. A **class attribute** is s
 
 <CodeBlock
   adapter="python"
-  starterCode={`class Dog:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class Dog:
     species = "Canis familiaris"  # class attribute
 
     def __init__(self, name):
@@ -98,7 +111,9 @@ print(a.species, b.species)  # both see the same class attribute
 
 Dog.species = "Canis lupus familiaris"
 print(a.species, b.species)  # change is reflected in all instances
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Mutable class attributes are a gotcha">
@@ -135,7 +150,10 @@ A **method** is a function defined inside a class. The first parameter is always
 
 <CodeBlock
   adapter="python"
-  starterCode={`class Dog:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class Dog:
     def __init__(self, name):
         self.name = name
 
@@ -145,14 +163,19 @@ A **method** is a function defined inside a class. The first parameter is always
 
 d = Dog("Rex")
 print(d.bark())
-`}
+`,
+    },
+  ]}
 />
 
 When you write `d.bark()`, Python translates it to `Dog.bark(d)` — the instance is passed as the first argument.
 
 <CodeBlock
   adapter="python"
-  starterCode={`class Counter:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class Counter:
     def __init__(self, start=0):
         self.value = start
 
@@ -166,7 +189,9 @@ c.increment()
 c.increment()
 c.increment(5)
 print(c.value)
-`}
+`,
+    },
+  ]}
 />
 
 ## `@classmethod` and `@staticmethod`
@@ -175,7 +200,10 @@ Sometimes you want a method that operates on the **class** itself, or a utility 
 
 <CodeBlock
   adapter="python"
-  starterCode={`class Temperature:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class Temperature:
     def __init__(self, celsius):
         self.celsius = celsius
 
@@ -193,7 +221,9 @@ Sometimes you want a method that operates on the **class** itself, or a utility 
 t = Temperature.from_fahrenheit(32)
 print(t.celsius)
 print(Temperature.is_freezing(-1))
-`}
+`,
+    },
+  ]}
 />
 
 - `@classmethod` receives the **class** as the first argument (`cls`). Useful for **alternative constructors**.
@@ -209,7 +239,10 @@ Use `@property` to define a method that looks like an attribute.
 
 <CodeBlock
   adapter="python"
-  starterCode={`class Circle:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class Circle:
     def __init__(self, radius):
         self.radius = radius
 
@@ -225,7 +258,9 @@ Use `@property` to define a method that looks like an attribute.
 c = Circle(5)
 print(c.area)  # looks like an attribute, runs a method
 print(c.diameter)
-`}
+`,
+    },
+  ]}
 />
 
 Properties are useful when you want to compute a value on-the-fly or add logic (validation, logging) when reading/writing an attribute.
@@ -247,7 +282,10 @@ Methods with double underscores ("dunder") define how instances interact with Py
 
 <CodeBlock
   adapter="python"
-  starterCode={`class Money:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class Money:
     def __init__(self, amount, currency="USD"):
         self.amount = amount
         self.currency = currency
@@ -277,7 +315,9 @@ print(a)  # uses __str__
 print(repr(a))  # uses __repr__
 print(a == Money(10))
 print(a + b)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="__repr__ vs __str__">
@@ -297,7 +337,10 @@ Writing `__init__`, `__repr__`, and `__eq__` for every data-holding class is ted
 
 <CodeBlock
   adapter="python"
-  starterCode={`from dataclasses import dataclass
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from dataclasses import dataclass
 
 
 @dataclass
@@ -311,7 +354,9 @@ q = Point(3, 4)
 print(p)  # auto __repr__
 print(p == q)  # auto __eq__
 print(p.x, p.y)
-`}
+`,
+    },
+  ]}
 />
 
 `@dataclass` generates:
@@ -322,7 +367,10 @@ print(p.x, p.y)
 
 <CodeBlock
   adapter="python"
-  starterCode={`from dataclasses import dataclass
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
@@ -337,7 +385,9 @@ p = Point(3, 4)
 # frozen=True makes instances hashable
 points = {Point(0, 0), Point(1, 1), Point(0, 0)}
 print(len(points))  # 2 (duplicates removed)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="Use @dataclass for simple records">
@@ -360,7 +410,7 @@ If your class is mostly "a bundle of named fields", use `@dataclass`. It's less 
   files={[
     {
       filename: "main.py",
-      initialContent: `from account import BankAccount
+      starterCode: `from account import BankAccount
 
 acc = BankAccount("Alice", 100)
 print(f"Initial: {acc.balance}")
@@ -374,7 +424,7 @@ print(f"After withdraw: {acc.balance}")
     },
     {
       filename: "account.py",
-      initialContent: `class BankAccount:
+      starterCode: `class BankAccount:
     def __init__(self, owner, balance=0):
         # your code here
         pass
@@ -387,7 +437,7 @@ print(f"After withdraw: {acc.balance}")
         # your code here
         return 0
 `,
-      solutionContent: `class BankAccount:
+      solutionCode: `class BankAccount:
     def __init__(self, owner, balance=0):
         self.owner = owner
         self.balance = balance
@@ -468,7 +518,7 @@ except ValueError:
   files={[
     {
       filename: "main.py",
-      initialContent: `from product import Product
+      starterCode: `from product import Product
 from cart import ShoppingCart
 
 cart = ShoppingCart()
@@ -481,7 +531,7 @@ print(f"Total: \${cart.total()}")
     },
     {
       filename: "product.py",
-      initialContent: `class Product:
+      starterCode: `class Product:
     def __init__(self, name, price):
         # your code here
         pass
@@ -490,7 +540,7 @@ print(f"Total: \${cart.total()}")
         # your code here
         return ""
 `,
-      solutionContent: `class Product:
+      solutionCode: `class Product:
     def __init__(self, name, price):
         self.name = name
         self.price = price
@@ -501,7 +551,7 @@ print(f"Total: \${cart.total()}")
     },
     {
       filename: "cart.py",
-      initialContent: `class ShoppingCart:
+      starterCode: `class ShoppingCart:
     def __init__(self):
         # your code here
         pass
@@ -514,7 +564,7 @@ print(f"Total: \${cart.total()}")
         # your code here
         return 0
 `,
-      solutionContent: `class ShoppingCart:
+      solutionCode: `class ShoppingCart:
     def __init__(self):
         self.items = []
 
@@ -565,7 +615,7 @@ assert cart.total() == 30`,
   files={[
     {
       filename: "main.py",
-      initialContent: `from geometry import Point
+      starterCode: `from geometry import Point
 
 p = Point(3.0, 4.0)
 q = Point(3.0, 4.0)
@@ -576,11 +626,11 @@ print("Equal?", p == q)
     },
     {
       filename: "geometry.py",
-      initialContent: `from dataclasses import dataclass
+      starterCode: `from dataclasses import dataclass
 
 # Define Point here
 `,
-      solutionContent: `from dataclasses import dataclass
+      solutionCode: `from dataclasses import dataclass
 
 
 @dataclass
@@ -625,10 +675,13 @@ assert "3.0" in repr(p)`,
 - An \`__init__(self, start=0)\` constructor that stores the starting value in \`self.value\`.
 - A method \`increment(step=1)\` that adds \`step\` to \`self.value\` and returns the new value.
 - A method \`reset()\` that sets \`self.value\` back to 0.`}
-  starterCode={`class Counter:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class Counter:
     pass
-`}
-  solutionCode={`class Counter:
+`,
+      solutionCode: `class Counter:
     def __init__(self, start=0):
         self.value = start
 
@@ -638,7 +691,9 @@ assert "3.0" in repr(p)`,
 
     def reset(self):
         self.value = 0
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "init",

@@ -43,8 +43,13 @@ language Guido helped build at CWI. The guiding ideas are captured in
 
 <CodeBlock
   adapter="python"
-  starterCode={`import this
-`}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import this
+`,
+    },
+  ]}
 />
 
 The Zen prizes **readability**, **explicitness**, and **one obvious
@@ -62,13 +67,18 @@ codebase visually consistent.
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Try changing the indentation below and re-run.
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Try changing the indentation below and re-run.
 for i in range(3):
     if i % 2 == 0:
         print(i, "is even")
     else:
         print(i, "is odd")
-`}
+`,
+    },
+  ]}
 />
 
 ## The Python 2 to 3 transition
@@ -183,13 +193,18 @@ behavior.
   adapter="python"
   title="Verify Python 3 division"
   instructions={`Compute \`5 / 2\` and assign the result to a variable named \`result\`. The hidden test will check that \`result\` is \`2.5\` (a float).`}
-  starterCode={`# your code here
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# your code here
 result = None
 print("5 / 2 =", result)
-`}
-  solutionCode={`result = 5 / 2
+`,
+      solutionCode: `result = 5 / 2
 print("5 / 2 =", result)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "division_returns_float",

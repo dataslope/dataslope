@@ -91,7 +91,10 @@ We'll re-derive every bit of it in later chapters.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int scores[] = {72, 88, 65, 91, 77, 83};
@@ -107,7 +110,9 @@ int main(void) {
   printf("The highest score is %d\\n", best);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Notice the line-by-line match with the pseudocode:

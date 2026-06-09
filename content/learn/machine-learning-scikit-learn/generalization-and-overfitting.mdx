@@ -47,7 +47,10 @@ almost anywhere (very flexible).
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
@@ -81,7 +84,9 @@ for ax, degree, label in zip(axes, [1, 4, 15], ["Underfit", "Good fit", "Overfit
 axes[0].legend(fontsize=8)
 plt.tight_layout()
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 Look at the three panels:
@@ -110,7 +115,10 @@ data and on a held-out test set.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
@@ -145,7 +153,9 @@ plt.show()
 
 best = list(degrees)[int(np.argmin(test_err))]
 print("Lowest test error at degree:", best)
-`}
+`,
+    },
+  ]}
 />
 
 This plot is one of the most important pictures in all of machine learning.
@@ -177,7 +187,10 @@ emerge.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import matplotlib.pyplot as plt
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import matplotlib.pyplot as plt
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
@@ -203,7 +216,9 @@ plt.ylabel("Accuracy")
 plt.title("Training accuracy races to 1.0; test accuracy plateaus then dips")
 plt.legend()
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 Different algorithm, same story. As the tree is allowed to grow deeper, its
@@ -295,7 +310,10 @@ Then set \`best_degree\` to the degree with the lowest test error.
 
 The tests check that \`test_errors\` has 10 entries and that \`best_degree\`
 is the argmin (it should land between 3 and 6, not at 1 and not at 10).`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline
@@ -307,16 +325,16 @@ x = np.sort(rng.uniform(0, 4, 80))
 y = np.sin(1.5 * x) + rng.normal(0, 0.25, x.size)
 X = x.reshape(-1, 1)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4, random_state=7)
-degrees = range(1, 11)`}
-  starterCode={`test_errors = []
+degrees = range(1, 11)`,
+      starterCode: `test_errors = []
 
 # TODO: loop over degrees, fit, record test MSE
 
 best_degree = None
 print("test_errors:", test_errors)
 print("best_degree:", best_degree)
-`}
-  solutionCode={`test_errors = []
+`,
+      solutionCode: `test_errors = []
 for degree in degrees:
     model = make_pipeline(PolynomialFeatures(degree), LinearRegression())
     model.fit(X_train, y_train)
@@ -325,7 +343,9 @@ for degree in degrees:
 best_degree = list(degrees)[int(np.argmin(test_errors))]
 print("test_errors:", test_errors)
 print("best_degree:", best_degree)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "len",

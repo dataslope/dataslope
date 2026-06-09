@@ -63,7 +63,10 @@ breast-cancer data, which ships with named features.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.datasets import load_breast_cancer
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
@@ -83,7 +86,9 @@ print("Most influential features (by |coefficient|):")
 for i in order[:5]:
     direction = "raises P(benign)" if coefs[i] > 0 else "lowers P(benign)"
     print(f"  {names[i]:<24} {coefs[i]:+.2f}  ({direction})")
-`}
+`,
+    },
+  ]}
 />
 
 Each coefficient is a small story: this measurement, all else equal, pushes
@@ -132,7 +137,10 @@ This works for a single tree and, more reliably, for a whole random forest
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.datasets import load_wine
 from sklearn.ensemble import RandomForestClassifier
 
@@ -150,7 +158,9 @@ print("Impurity-based importances (random forest):")
 for i in order[:6]:
     print(f"  {names[i]:<28} {importances[i]:.3f}")
 print(f"\\nThey sum to {importances.sum():.2f} (always 1.0).")
-`}
+`,
+    },
+  ]}
 />
 
 Two conveniences jump out. Tree importances are always **non-negative** and
@@ -206,7 +216,10 @@ model memorized.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
@@ -232,7 +245,9 @@ for i in order[:6]:
     print(
         f"  {names[i]:<28} {result.importances_mean[i]:.3f}  +/- {result.importances_std[i]:.3f}"
     )
-`}
+`,
+    },
+  ]}
 />
 
 Because the shuffle is random, permutation importance is itself a *random*
@@ -280,7 +295,10 @@ matplotlib — the kind of plot you will make constantly.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_wine
 from sklearn.ensemble import RandomForestClassifier
@@ -298,7 +316,9 @@ ax.set_xlabel("Importance (impurity-based)")
 ax.set_title("Top features: wine random forest")
 fig.tight_layout()
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 A horizontal bar chart, sorted, with the most important feature on top, is
@@ -423,14 +443,17 @@ out its most important features.
 The hidden tests check that the forest is fitted, that \`importances\` has
 one value per feature and sums to about 1, that \`top_feature\` is the
 correct name, and that \`top3\` has the right three names in order.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from sklearn.datasets import load_wine
 from sklearn.ensemble import RandomForestClassifier
 
 data = load_wine()
 X, y = data.data, data.target
-feature_names = list(data.feature_names)`}
-  starterCode={`# 1. Fit the random forest
+feature_names = list(data.feature_names)`,
+      starterCode: `# 1. Fit the random forest
 forest = None
 
 # 2. Pull out the impurity-based importances
@@ -444,8 +467,8 @@ top3 = None
 
 print("top feature:", top_feature)
 print("top 3:", top3)
-`}
-  solutionCode={`# 1. Fit the random forest
+`,
+      solutionCode: `# 1. Fit the random forest
 forest = RandomForestClassifier(n_estimators=200, random_state=0)
 forest.fit(X, y)
 
@@ -461,7 +484,9 @@ top3 = [feature_names[i] for i in order[:3]]
 
 print("top feature:", top_feature)
 print("top 3:", top3)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "forest_fitted",

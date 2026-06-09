@@ -54,7 +54,10 @@ is stored in **four** consecutive bytes.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <cstddef>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <cstddef>
 #include <iostream>
 
 int main() {
@@ -66,7 +69,9 @@ int main() {
   std::cout << "void *  is " << sizeof(void *) << " bytes\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The `sizeof` operator tells you, in bytes, how big a type is on the
@@ -189,7 +194,10 @@ prints, then run it.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int square(int n) {
   int result = n * n;
@@ -202,7 +210,9 @@ int main() {
   std::cout << "x = " << x << ", y = " << y << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Step by step:

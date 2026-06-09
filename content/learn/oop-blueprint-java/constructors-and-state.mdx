@@ -36,7 +36,10 @@ sequenceDiagram
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Person p = new Person("Ada", 30);
     System.out.println(p.describe());
@@ -54,7 +57,9 @@ class Person {
 
   public String describe() { return name + " (" + age + ")"; }
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## The default constructor and what happens without one
@@ -65,7 +70,10 @@ declare *any* constructor, that freebie disappears.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Empty e = new Empty(); // works: default no-arg constructor
     System.out.println("e built: " + (e != null));
@@ -79,7 +87,9 @@ declare *any* constructor, that freebie disappears.
 class Empty {
   // no constructor declared — Java inserts a default Empty()
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Constructors enforce invariants from the very first moment
@@ -91,7 +101,10 @@ refusing to be constructed in violation of it.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     try {
       Person p = new Person("", -1); // both bad
@@ -115,7 +128,9 @@ class Person {
     this.age = age;
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 This is enormously important. Once that constructor returns
@@ -140,7 +155,10 @@ flowchart LR
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     System.out.println(new Point());
     System.out.println(new Point(5));
@@ -160,7 +178,9 @@ class Point {
 
   public String toString() { return "(" + x + ", " + y + ")"; }
 }
-`}
+`,
+    },
+  ]}
 />
 
 The rule for `this(...)` chains: if you use it, it must be the *first
@@ -182,7 +202,10 @@ accidental mutation.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Money price = new Money(1999, "USD"); // $19.99
     Money taxed = price.add(new Money(160, "USD"));
@@ -213,7 +236,9 @@ class Money {
     return String.format("%.2f %s", cents / 100.0, currency);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 That `add` method is a small pattern worth remembering: **operations
@@ -258,7 +283,7 @@ bad: invalid email
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     try {
       User u = new User("ada", "ada@oop.dev");
@@ -282,11 +307,11 @@ bad: invalid email
     },
     {
       filename: "User.java",
-      initialContent: `public class User {
+      starterCode: `public class User {
   // TODO: private final fields + a validating constructor + accessors
 }
 `,
-      solutionContent: `public class User {
+      solutionCode: `public class User {
   private final String username;
   private final String email;
 

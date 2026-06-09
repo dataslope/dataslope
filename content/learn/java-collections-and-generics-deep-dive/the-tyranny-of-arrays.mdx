@@ -50,7 +50,10 @@ slots forever.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int[] scores = new int[5]; // five slots, all default 0
     scores[0] = 90;
@@ -65,7 +68,9 @@ slots forever.
     // scores[5] = 100;          // ArrayIndexOutOfBoundsException
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Indexing is wonderful. Everything *else* is on you.
@@ -83,7 +88,10 @@ yourself by allocating a bigger array and copying.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   // Hand-rolled "growing array of Strings".
   static String[] data = new String[2];
   static int size = 0;
@@ -110,7 +118,9 @@ yourself by allocating a bigger array and copying.
     System.out.println("capacity = " + data.length + ", size = " + size);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 That little dance — `size`, `capacity`, `grow`, `copy` — is exactly
@@ -193,7 +203,10 @@ Compare the hand-rolled growing array above with the same thing using
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -210,7 +223,9 @@ public class Main {
     System.out.println("size = " + data.size());
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 No `grow`, no `size` counter, no `for (int i = 0; ...)`, no manual

@@ -61,7 +61,10 @@ would have made the eventual conclusion wrong.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 # A small "orders" table — a few suspicious values hidden in there
 orders = pd.DataFrame(
@@ -80,7 +83,9 @@ print(orders["amount"].describe())
 print()
 print("Suspicious rows:")
 print(orders[(orders["amount"] <= 0) | (orders["amount"] > 100000)])
-`}
+`,
+    },
+  ]}
 />
 
 The naive total includes a giant outlier and a refund — both of
@@ -186,7 +191,10 @@ just take the mean. Look first.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 satisfaction = pd.DataFrame(
     {
@@ -203,7 +211,9 @@ print(satisfaction.groupby("submitted_via")["score"].mean().round(2))
 print()
 print("Counts by channel:")
 print(satisfaction["submitted_via"].value_counts())
-`}
+`,
+    },
+  ]}
 />
 
 The naive mean hides the fact that all the low scores came in

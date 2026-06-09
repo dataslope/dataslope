@@ -36,7 +36,10 @@ binary composer:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function compose2<A, B, C>(g: (b: B) => C, f: (a: A) => B): (a: A) => C {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function compose2<A, B, C>(g: (b: B) => C, f: (a: A) => B): (a: A) => C {
   return (a) => g(f(a));
 }
 
@@ -48,7 +51,9 @@ const doubleThenInc = compose2(inc, double);
 
 console.log(incThenDouble(3)); // (3+1)*2 = 8
 console.log(doubleThenInc(3)); // (3*2)+1 = 7
-`}
+`,
+    },
+  ]}
 />
 
 Two things to notice:
@@ -66,7 +71,10 @@ what `pipe` does:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function pipe<A>(a: A): A;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function pipe<A>(a: A): A;
 function pipe<A, B>(a: A, f1: (a: A) => B): B;
 function pipe<A, B, C>(a: A, f1: (a: A) => B, f2: (b: B) => C): C;
 function pipe<A, B, C, D>(
@@ -85,7 +93,9 @@ const toStr = (n: number) => \`#\${n}\`;
 
 const result = pipe(3, inc, double, toStr);
 console.log(result); // "#8"
-`}
+`,
+    },
+  ]}
 />
 
 `pipe(value, f, g, h)` evaluates as `h(g(f(value)))`. It is exactly
@@ -99,7 +109,10 @@ counterpart:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function compose<A>(): (a: A) => A;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function compose<A>(): (a: A) => A;
 function compose<A, B>(f1: (a: A) => B): (a: A) => B;
 function compose<A, B, C>(f2: (b: B) => C, f1: (a: A) => B): (a: A) => C;
 function compose<A, B, C, D>(
@@ -118,7 +131,9 @@ const f = compose<number, number, number, string>(
 );
 
 console.log(f(3)); // "#8"
-`}
+`,
+    },
+  ]}
 />
 
 For most working code, `pipe` is more readable; `compose` shows up
@@ -126,7 +141,10 @@ when you want to *name* a composed function for reuse:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function pipe<T>(x: T, ...fns: ((x: T) => T)[]): T {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function pipe<T>(x: T, ...fns: ((x: T) => T)[]): T {
   return fns.reduce((acc, f) => f(acc), x);
 }
 
@@ -138,7 +156,9 @@ const normalize = (s: string) => pipe(s, trim, lower, noSpaces);
 
 console.log(normalize("  Hello World  "));
 console.log(normalize("  Functional Programming  "));
-`}
+`,
+    },
+  ]}
 />
 
 `normalize` is a value. You can pass it to `Array#map`, store it,
@@ -151,18 +171,26 @@ Before pipelines:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const xs = ["  Hello  ", "  Functional  ", "  Programming  "];
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const xs = ["  Hello  ", "  Functional  ", "  Programming  "];
 
 const result = xs.map((s) => \`#\${s.trim().toLowerCase().replace(/\\s+/g, "-")}\`);
 console.log(result);
-`}
+`,
+    },
+  ]}
 />
 
 With named composed steps:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function pipe<T>(x: T, ...fns: ((x: T) => T)[]): T {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function pipe<T>(x: T, ...fns: ((x: T) => T)[]): T {
   return fns.reduce((acc, f) => f(acc), x);
 }
 
@@ -174,7 +202,9 @@ const tag = (s: string) => pipe(s, trim, lower, slugify, hash);
 
 const xs = ["  Hello  ", "  Functional  ", "  Programming  "];
 console.log(xs.map(tag));
-`}
+`,
+    },
+  ]}
 />
 
 Both are correct. The second one is *legible*: each step has a name,
@@ -187,7 +217,10 @@ arguments into a *chain* of one-argument functions.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Uncurried (the usual way)
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Uncurried (the usual way)
 const add = (a: number, b: number): number => a + b;
 
 // Curried
@@ -202,7 +235,9 @@ console.log(addC(2)(3)); // 5
 // Why? Because addC(2) is now a useful value: a function "add 2 to its input"
 const addTwo = addC(2);
 console.log([1, 2, 3].map(addTwo)); // [3, 4, 5]
-`}
+`,
+    },
+  ]}
 />
 
 A curried function of *N* arguments has type `A1 => A2 => ... => AN
@@ -219,7 +254,10 @@ some arguments and leaving others as parameters.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// A small "partial" helper for ordinary functions
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// A small "partial" helper for ordinary functions
 function partial<A, B, C>(f: (a: A, b: B) => C, a: A): (b: B) => C {
   return (b) => f(a, b);
 }
@@ -233,7 +271,9 @@ const hola = partial(greet, "Hola");
 console.log(hello("Ada"));
 console.log(hola("Linus"));
 console.log(["Ada", "Linus", "Grace"].map(hello));
-`}
+`,
+    },
+  ]}
 />
 
 A *partially applied* function is just an ordinary function whose
@@ -249,7 +289,10 @@ function.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function pipe<T>(x: T, ...fns: ((x: T) => T)[]): T {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function pipe<T>(x: T, ...fns: ((x: T) => T)[]): T {
   return fns.reduce((acc, f) => f(acc), x);
 }
 
@@ -266,7 +309,9 @@ const square = (n: number) => n * n;
 const evenSquares = (xs: readonly number[]) => pipe(xs, filter(isEven), map(square));
 
 console.log(evenSquares([1, 2, 3, 4, 5, 6])); // [4, 16, 36]
-`}
+`,
+    },
+  ]}
 />
 
 Compare with "data-first" (`map(xs, f)`), which doesn't compose into
@@ -280,7 +325,10 @@ Same problem we used in [Declarative Thinking](./declarative-thinking):
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function pipe<T>(x: T, ...fns: ((x: T) => T)[]): T {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function pipe<T>(x: T, ...fns: ((x: T) => T)[]): T {
   return fns.reduce((acc, f) => f(acc), x);
 }
 
@@ -322,7 +370,9 @@ const names = pipe(
 );
 
 console.log(names);
-`}
+`,
+    },
+  ]}
 />
 
 Each step has a name and a single job. You can read the pipeline as
@@ -358,7 +408,7 @@ nice-to-meet-you
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { slug } from "./text";
+      starterCode: `import { slug } from "./text";
 
 console.log(slug("  Hello,   World!  "));
 console.log(slug("Functional...Programming"));
@@ -367,7 +417,7 @@ console.log(slug("  Nice  to !! meet  you  "));
     },
     {
       filename: "text.ts",
-      initialContent: `export function pipe<T>(x: T, ...fns: ((x: T) => T)[]): T {
+      starterCode: `export function pipe<T>(x: T, ...fns: ((x: T) => T)[]): T {
   return fns.reduce((acc, f) => f(acc), x);
 }
 
@@ -379,7 +429,7 @@ export const hyphenate = (s: string): string => s; // TODO
 
 export const slug = (s: string): string => s; // TODO: pipe the above
 `,
-      solutionContent: `export function pipe<T>(x: T, ...fns: ((x: T) => T)[]): T {
+      solutionCode: `export function pipe<T>(x: T, ...fns: ((x: T) => T)[]): T {
   return fns.reduce((acc, f) => f(acc), x);
 }
 

@@ -36,7 +36,10 @@ flowchart LR
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
@@ -53,7 +56,9 @@ int main(void) {
   // Do not use p again — it now points at memory we no longer own.
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Three rules visible in that tiny example:
@@ -72,7 +77,10 @@ runtime.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
@@ -89,7 +97,9 @@ int main(void) {
   free(arr);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="The `sizeof *ptr` idiom">
@@ -108,7 +118,10 @@ It is a small habit that prevents large bugs.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
@@ -123,7 +136,9 @@ int main(void) {
   free(zeros);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Prefer `calloc` whenever you would otherwise call `malloc` followed
@@ -144,7 +159,10 @@ safe pattern is to use a temporary.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
@@ -173,7 +191,9 @@ int main(void) {
   free(arr);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Building a dynamic array (mini `std::vector`)
@@ -182,7 +202,10 @@ A small, complete `vec` type to show how growable arrays really work.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 
 typedef struct {
@@ -231,7 +254,9 @@ int main(void) {
   vec_free(&v);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Doubling the capacity each time gives amortized O(1) `push`. This is
@@ -254,7 +279,10 @@ make **ownership** explicit:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -276,7 +304,9 @@ int main(void) {
   free(greeting); // caller owns it; caller frees it
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Allocating into a caller's pointer
@@ -286,7 +316,10 @@ pointer with the new address. That's a pointer-to-pointer parameter.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 
 int make_zeros(size_t n, int **out) {
@@ -307,7 +340,9 @@ int main(void) {
   free(arr);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Memory leaks
@@ -319,7 +354,10 @@ eventually exhaust memory and crash.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 
 void leak(void) {
@@ -337,7 +375,9 @@ int main(void) {
   printf("leaked 5 blocks; in a real program this would accumulate\\n");
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 We will see leaks again — alongside double-frees and
@@ -349,7 +389,10 @@ use-after-frees — in the *Memory Bugs* chapter.
   adapter="c"
   title="Allocate, fill, average, free"
   instructions={`Allocate a heap array of \`N = 5\` ints, fill it with the values 10, 20, 30, 40, 50 (in that order), print their integer average, then \`free\` the array. The output must be exactly \`30\`.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
@@ -357,8 +400,8 @@ int main(void) {
   // your code here
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
@@ -376,7 +419,9 @@ int main(void) {
   free(a);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "avg",
@@ -392,7 +437,10 @@ int main(void) {
   adapter="c"
   title="Implement my_strdup"
   instructions={`Implement \`char *my_strdup(const char *s)\` that returns a heap-allocated copy of \`s\` (caller frees it). The provided \`main\` calls it, prints the copy, and frees it.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -409,8 +457,8 @@ int main(void) {
   free(copy);
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -433,7 +481,9 @@ int main(void) {
   free(copy);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "copied",

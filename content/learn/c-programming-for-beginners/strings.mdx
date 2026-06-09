@@ -72,7 +72,10 @@ buf[0] = 'H';   // fine: buf is your own copy
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <string.h>
 
 int main(void) {
@@ -92,7 +95,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 `%zu` is the format specifier for `size_t`, the type that `strlen`
@@ -168,7 +173,10 @@ loop:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <string.h>
 
 int main(void) {
@@ -187,7 +195,9 @@ int main(void) {
   printf("\\"%s\\" has %d vowels\\n", s, vowels);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The idiomatic C way to walk a null-terminated string is even more
@@ -231,7 +241,10 @@ spaces = 3
 \`\`\`
 
 A "letter" here means any character that is not a space.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <string.h>
 
 int main(void) {
@@ -241,8 +254,8 @@ int main(void) {
   printf("letters = %d\\nspaces = %d\\n", letters, spaces);
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 #include <string.h>
 
 int main(void) {
@@ -257,7 +270,9 @@ int main(void) {
   printf("letters = %d\\nspaces = %d\\n", letters, spaces);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "counts",

@@ -237,14 +237,17 @@ loaded as \`X\`, \`y\`.
 The hidden tests check the split sizes, that \`pipe\` is the right two-step
 pipeline, that \`cv_mean\` is a strong cross-validated accuracy, and that
 \`test_score\` is a valid accuracy from the held-out set.`}
-  initCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 
-X, y = load_wine(return_X_y=True)`}
-  starterCode={`# 1. Split FIRST (25% test, random_state=0, stratified on y)
+X, y = load_wine(return_X_y=True)`,
+      starterCode: `# 1. Split FIRST (25% test, random_state=0, stratified on y)
 X_train, X_test, y_train, y_test = None, None, None, None
 
 # 2. Leak-free pipeline: steps named "scaler" and "model"
@@ -258,8 +261,8 @@ test_score = None
 
 print("CV mean:", cv_mean)
 print("Final test score:", test_score)
-`}
-  solutionCode={`# 1. Split FIRST (25% test, random_state=0, stratified on y)
+`,
+      solutionCode: `# 1. Split FIRST (25% test, random_state=0, stratified on y)
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0, stratify=y
 )
@@ -281,7 +284,9 @@ test_score = pipe.score(X_test, y_test)
 
 print("CV mean:", cv_mean)
 print("Final test score:", test_score)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "split_sizes",

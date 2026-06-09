@@ -118,7 +118,10 @@ every line — we will earn each piece of it over the next few weeks.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     String name = "world";
     for (int i = 1; i <= 3; i++) {
@@ -126,7 +129,9 @@ every line — we will earn each piece of it over the next few weeks.
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Notice three things, and then we will move on:

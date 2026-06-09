@@ -21,7 +21,10 @@ that, when called, produces a value:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type IO<A> = () => A;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type IO<A> = () => A;
 
 // "describe" some effects (no execution yet)
 const sayHi: IO<void> = () => console.log("hi");
@@ -35,7 +38,9 @@ console.log("nothing happened yet");
 sayHi();
 console.log(random());
 console.log(now());
-`}
+`,
+    },
+  ]}
 />
 
 That's already the entire trick. An `IO<A>` is a recipe for
@@ -50,7 +55,10 @@ Once you have `IO<A>`, you can build the familiar trio:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type IO<A> = () => A;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type IO<A> = () => A;
 
 const of =
   <A,>(a: A): IO<A> =>
@@ -87,7 +95,9 @@ const program: IO<void> = chain(
 
 console.log("about to run...");
 program(); // <-- the one and only effectful call
-`}
+`,
+    },
+  ]}
 />
 
 Notice what just happened: we composed three steps (`read`,
@@ -122,7 +132,10 @@ against actual implementations.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Op = { kind: "log"; msg: string } | { kind: "now" };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Op = { kind: "log"; msg: string } | { kind: "now" };
 
 // A "program" is a list of ops + a continuation that consumes their results.
 // We keep it tiny: a fixed sequence with each op's result available to the next.
@@ -191,7 +204,9 @@ console.log("--- running real ---");
 runReal(program);
 console.log("--- running test ---");
 runTest(program);
-`}
+`,
+    },
+  ]}
 />
 
 Same program, two interpreters. The "real" interpreter calls

@@ -17,7 +17,10 @@ If an exception is raised and **no** `try`/`except` catches it, Python does thre
 
 <CodeBlock
   adapter="python"
-  starterCode={`def divide(a, b):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def divide(a, b):
     return a / b
 
 
@@ -31,7 +34,9 @@ try:
 except ZeroDivisionError as e:
     print("Unhandled exception propagated up:")
     print(f"  {type(e).__name__}: {e}")
-`}
+`,
+    },
+  ]}
 />
 
 The traceback shows the **exception propagation** up the call stack: `main()` called `divide()`, which raised `ZeroDivisionError`. Since `main()` didn't catch it, it propagated up to the caller (in this case, our outer `try` block).
@@ -92,11 +97,16 @@ Each frame in the traceback is one step in this unwinding.
 
 <CodeBlock
   adapter="python"
-  starterCode={`try:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `try:
     n = int("not a number")
 except ValueError as e:
     print("could not parse:", e)
-`}
+`,
+    },
+  ]}
 />
 
 `as e` binds the exception instance so you can inspect it (type, message, attributes).
@@ -109,7 +119,10 @@ Every exception is an object. You can inspect its type (`type(e)`), its message 
 
 <CodeBlock
   adapter="python"
-  starterCode={`def safe_div(a, b):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def safe_div(a, b):
     try:
         return a / b
     except (TypeError, ZeroDivisionError) as e:
@@ -119,7 +132,9 @@ Every exception is an object. You can inspect its type (`type(e)`), its message 
 print(safe_div(10, 2))
 print(safe_div(10, 0))
 print(safe_div("10", 2))
-`}
+`,
+    },
+  ]}
 />
 
 Parentheses group multiple exception types. The first matching `except` block wins.
@@ -147,7 +162,10 @@ finally:
 
 <CodeBlock
   adapter="python"
-  starterCode={`def parse_int(text):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def parse_int(text):
     try:
         n = int(text)
     except ValueError:
@@ -161,7 +179,9 @@ finally:
 
 parse_int("42")
 parse_int("oops")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="finally always runs">
@@ -174,7 +194,10 @@ Use `raise` to signal an error from your own code. Use a specific built-in type 
 
 <CodeBlock
   adapter="python"
-  starterCode={`def withdraw(balance, amount):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def withdraw(balance, amount):
     if amount < 0:
         raise ValueError("amount must be non-negative")
     if amount > balance:
@@ -187,7 +210,9 @@ try:
     print(withdraw(100, 200))
 except ValueError as e:
     print("caught:", e)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="Which exception type to raise?">
@@ -206,7 +231,10 @@ When you wrap a lower-level error in a higher-level one, use `from` to keep the 
 
 <CodeBlock
   adapter="python"
-  starterCode={`class ConfigError(Exception):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class ConfigError(Exception):
     pass
 
 
@@ -222,7 +250,9 @@ try:
 except ConfigError as e:
     print("ConfigError:", e)
     print("cause:", e.__cause__)
-`}
+`,
+    },
+  ]}
 />
 
 Without `from`, the original `ValueError` is hidden. With `from`, the traceback shows both exceptions and their relationship.
@@ -239,7 +269,10 @@ Make your own exception types by subclassing `Exception` (or a more specific bui
 
 <CodeBlock
   adapter="python"
-  starterCode={`class InsufficientFundsError(Exception):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class InsufficientFundsError(Exception):
     """Raised when a withdrawal exceeds the available balance."""
 
 
@@ -258,7 +291,9 @@ try:
     acct.withdraw(100)
 except InsufficientFundsError as e:
     print("nope:", e)
-`}
+`,
+    },
+  ]}
 />
 
 Custom exceptions make your code **self-documenting**: `except InsufficientFundsError` is clearer than `except ValueError` (which could mean anything).
@@ -279,7 +314,10 @@ Every exception inherits from `BaseException`. The ones you usually care about i
 
 <CodeBlock
   adapter="python"
-  starterCode={`import sys
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import sys
 
 # Built-in exception hierarchy (simplified)
 hierarchy = """
@@ -296,7 +334,9 @@ BaseException
     └── ... (many more)
 """
 print(hierarchy)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="danger" title="Never catch BaseException casually">
@@ -324,7 +364,10 @@ Python culture strongly prefers **EAFP** (Easier to Ask for Forgiveness than Per
 
 <CodeBlock
   adapter="python"
-  starterCode={`# LBYL: check first
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# LBYL: check first
 data = {"key": "value"}
 if "key" in data:
     print(data["key"])
@@ -336,7 +379,9 @@ try:
     print(data["key"])
 except KeyError:
     print("key not found")
-`}
+`,
+    },
+  ]}
 />
 
 EAFP is often faster (one operation instead of two) and handles race conditions (state can change between check and use).
@@ -351,16 +396,21 @@ Use **LBYL** when the check is cheap and the exception is expensive (rare). Use 
   adapter="python"
   title="Safer integer parsing"
   instructions={`Define a function \`to_int(text, default=0)\` that returns \`int(text)\` if possible, otherwise \`default\`. It should not propagate any exception to the caller.`}
-  starterCode={`def to_int(text, default=0):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def to_int(text, default=0):
     # your code here
     return default
-`}
-  solutionCode={`def to_int(text, default=0):
+`,
+      solutionCode: `def to_int(text, default=0):
     try:
         return int(text)
     except (ValueError, TypeError):
         return default
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "ok",
@@ -389,15 +439,18 @@ Use **LBYL** when the check is cheap and the exception is expensive (rare). Use 
   adapter="python"
   title="Withdraw with a custom exception"
   instructions={`Define a class \`InsufficientFundsError\` that inherits from \`Exception\`, then define a function \`withdraw(balance, amount)\` that returns the new balance after withdrawing \`amount\`, or raises \`InsufficientFundsError\` if \`amount > balance\`. \`amount\` must be non-negative; raise \`ValueError\` otherwise.`}
-  starterCode={`class InsufficientFundsError(Exception):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class InsufficientFundsError(Exception):
     pass
 
 
 def withdraw(balance, amount):
     # your code here
     return balance
-`}
-  solutionCode={`class InsufficientFundsError(Exception):
+`,
+      solutionCode: `class InsufficientFundsError(Exception):
     pass
 
 
@@ -407,7 +460,9 @@ def withdraw(balance, amount):
     if amount > balance:
         raise InsufficientFundsError(f"requested {amount}, have {balance}")
     return balance - amount
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "ok",
@@ -441,16 +496,21 @@ else:
   adapter="python"
   title="Safe divide with default"
   instructions={`Define a function \`safe_divide(a, b, default=None)\` that returns \`a / b\` if possible, otherwise \`default\`. Catch both \`ZeroDivisionError\` and \`TypeError\`.`}
-  starterCode={`def safe_divide(a, b, default=None):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def safe_divide(a, b, default=None):
     # your code here
     return default
-`}
-  solutionCode={`def safe_divide(a, b, default=None):
+`,
+      solutionCode: `def safe_divide(a, b, default=None):
     try:
         return a / b
     except (ZeroDivisionError, TypeError):
         return default
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "ok",
@@ -478,7 +538,10 @@ else:
 Define \`RateLimitError\` as a custom exception class.
 
 For testing, assume a function that raises \`RateLimitError\` on the first \`n-1\` calls and succeeds on the \`n\`th call.`}
-  starterCode={`class RateLimitError(Exception):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class RateLimitError(Exception):
     pass
 
 
@@ -491,8 +554,8 @@ def retry_on_rate_limit(max_retries=3):
         return wrapper
 
     return decorator
-`}
-  solutionCode={`class RateLimitError(Exception):
+`,
+      solutionCode: `class RateLimitError(Exception):
     pass
 
 
@@ -511,7 +574,9 @@ def retry_on_rate_limit(max_retries=3):
         return wrapper
 
     return decorator
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "succeeds_on_first",

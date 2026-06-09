@@ -109,7 +109,10 @@ and you will be able to say what each one is *for*.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 # A clean, modern look in one line.
 sns.set_theme(style="whitegrid")
@@ -128,7 +131,9 @@ sns.relplot(
     height=4,
     aspect=0.9,
 )
-`}
+`,
+    },
+  ]}
 />
 
 Notice what you did *not* have to do: no loop over species, no manual

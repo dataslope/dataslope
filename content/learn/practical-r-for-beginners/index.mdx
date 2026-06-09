@@ -105,7 +105,10 @@ middle of the course you will.
 
 <CodeBlock
   adapter="r"
-  starterCode={`# Built-in dataset: measurements of 150 iris flowers
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# Built-in dataset: measurements of 150 iris flowers
 data(iris)
 
 # How many flowers? How many of each species?
@@ -114,7 +117,9 @@ print(table(iris$Species))
 
 # Average petal length per species
 aggregate(Petal.Length ~ Species, data = iris, FUN = mean)
-`}
+`,
+    },
+  ]}
 />
 
 In four lines, we loaded a famous dataset, counted it, and computed

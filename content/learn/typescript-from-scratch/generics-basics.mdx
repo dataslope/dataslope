@@ -34,7 +34,10 @@ Generics give you the best of both worlds: one function, full type safety, and t
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Without generics: lose type information
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Without generics: lose type information
 function identityAny(x: any): any {
   return x;
 }
@@ -54,7 +57,9 @@ const obj = identity({ x: 10 }); // type: { x: number }
 console.log(\`num: \${num} (type: number)\`);
 console.log(\`str: \${str} (type: string)\`);
 console.log(\`obj: \${JSON.stringify(obj)} (type: { x: number })\`);
-`}
+`,
+    },
+  ]}
 />
 
 The `<T>` is a **type parameter** (also called a **type variable**). It's a placeholder for "whatever type you pass in." When you call `identity(42)`, TypeScript infers `T = number` and the return type becomes `number`. When you call `identity("hello")`, it infers `T = string` and the return type becomes `string`.
@@ -74,7 +79,10 @@ Let's look at more realistic examples. Suppose you want a function that wraps a 
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function wrap<T>(value: T): T[] {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function wrap<T>(value: T): T[] {
   return [value];
 }
 
@@ -85,7 +93,9 @@ const objects = wrap({ id: 1, name: "Alice" }); // type: { id: number; name: str
 console.log(numbers); // [42]
 console.log(strings); // ["hello"]
 console.log(objects); // [{ id: 1, name: "Alice" }]
-`}
+`,
+    },
+  ]}
 />
 
 The type parameter `T` flows through the signature: the input is `T`, the output is `T[]`. The compiler infers `T` from the argument you pass, so you get precise types at every call site.
@@ -96,7 +106,10 @@ You can have more than one type parameter:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function pair<A, B>(first: A, second: B): [A, B] {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function pair<A, B>(first: A, second: B): [A, B] {
   return [first, second];
 }
 
@@ -105,7 +118,9 @@ const p2 = pair(true, { x: 10 }); // type: [boolean, { x: number }]
 
 console.log(p1); // [42, "hello"]
 console.log(p2); // [true, { x: 10 }]
-`}
+`,
+    },
+  ]}
 />
 
 Here, `A` and `B` are independent type parameters. The compiler infers both from the arguments you pass. This is useful for functions that relate two different types (like a key-value pair, a tuple, or a mapping function).
@@ -116,7 +131,10 @@ Usually, TypeScript infers type parameters from the arguments. But you can also 
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function createArray<T>(): T[] {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function createArray<T>(): T[] {
   return [];
 }
 
@@ -132,7 +150,9 @@ strings.push("a", "b", "c");
 
 console.log(numbers); // [1, 2, 3]
 console.log(strings); // ["a", "b", "c"]
-`}
+`,
+    },
+  ]}
 />
 
 When a generic function has no parameters (or the parameters don't help inference), you must supply the type argument explicitly in angle brackets: `createArray<number>()`.
@@ -143,7 +163,10 @@ Generics aren't limited to functions. You can parameterize interfaces and type a
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Generic interface
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Generic interface
 interface Box<T> {
   value: T;
 }
@@ -178,7 +201,9 @@ if (errResult.success) {
 } else {
   console.log(\`Error: \${errResult.error}\`);
 }
-`}
+`,
+    },
+  ]}
 />
 
 The `Box<T>` interface is parameterized by `T`. When you create a `Box<number>`, `T` is `number`. When you create a `Box<string>`, `T` is `string`. The same interface works for any type.
@@ -195,7 +220,10 @@ Classes can also be generic. Here's a simple generic stack:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`class Stack<T> {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `class Stack<T> {
   private items: T[] = [];
 
   push(item: T): void {
@@ -226,7 +254,9 @@ const stringStack = new Stack<string>();
 stringStack.push("hello");
 stringStack.push("world");
 console.log(\`Top: \${stringStack.peek()}\`); // "world"
-`}
+`,
+    },
+  ]}
 />
 
 The `Stack<T>` class holds items of type `T`. When you instantiate `new Stack<number>()`, all the methods operate on `number`s. When you instantiate `new Stack<string>()`, all the methods operate on `string`s. One class, many types.
@@ -237,7 +267,10 @@ Let's build a generic `map` function (like `Array.prototype.map`). It takes an a
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function map<T, U>(array: T[], fn: (item: T) => U): U[] {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function map<T, U>(array: T[], fn: (item: T) => U): U[] {
   const result: U[] = [];
   for (const item of array) {
     result.push(fn(item));
@@ -255,7 +288,9 @@ console.log(strings); // ["Number 1", "Number 2", ...]
 // The compiler infers T = number and U = string from the callback
 const lengths = map(["hello", "world"], (s) => s.length); // type: number[]
 console.log(lengths); // [5, 5]
-`}
+`,
+    },
+  ]}
 />
 
 Notice how the compiler infers both `T` and `U`:
@@ -276,7 +311,10 @@ Understanding how type parameters flow through a function is key to using generi
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function firstElement<T>(array: T[]): T | undefined {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function firstElement<T>(array: T[]): T | undefined {
   return array[0];
 }
 
@@ -290,7 +328,9 @@ if (first !== undefined) {
 const empty: number[] = [];
 const nope = firstElement(empty); // still number | undefined
 console.log(\`Empty array first: \${nope}\`); // undefined
-`}
+`,
+    },
+  ]}
 />
 
 The type parameter `T` is inferred from the input array. If you pass `number[]`, `T = number`, so the return type is `number | undefined`. The `| undefined` is there because the array might be empty.
@@ -312,7 +352,7 @@ The tests will verify that \`map\` transforms the value and returns a new contai
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { Container } from "./container";
+      starterCode: `import { Container } from "./container";
 
 const numContainer = new Container(42);
 console.log(\`Original: \${numContainer.get()}\`);
@@ -323,7 +363,7 @@ console.log(\`Doubled: \${doubled.get()}\`);
 const stringContainer = numContainer.map((n) => \`Number: \${n}\`);
 console.log(\`String: \${stringContainer.get()}\`);
 `,
-      solutionContent: `import { Container } from "./container";
+      solutionCode: `import { Container } from "./container";
 
 const numContainer = new Container(42);
 console.log(\`Original: \${numContainer.get()}\`);
@@ -337,14 +377,14 @@ console.log(\`String: \${stringContainer.get()}\`);
     },
     {
       filename: "container.ts",
-      initialContent: `export class Container<T> {
+      starterCode: `export class Container<T> {
   // TODO: Add a private field to store the value
   // TODO: Add a constructor that takes an initial value
   // TODO: Implement get() to return the current value
   // TODO: Implement map<U>(fn: (value: T) => U): Container<U>
 }
 `,
-      solutionContent: `export class Container<T> {
+      solutionCode: `export class Container<T> {
   private value: T;
 
   constructor(initialValue: T) {

@@ -21,7 +21,10 @@ histograms, scatter plots, and lines.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 df = pd.DataFrame(
@@ -34,7 +37,9 @@ df = pd.DataFrame(
 
 fig = px.bar(df, x="department", y="headcount", color="year", barmode="group")
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 A single function call:
@@ -48,14 +53,19 @@ A single function call:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import plotly.express as px
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`fig = px.histogram(
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `fig = px.histogram(
     df, x="satisfaction_level", nbins=30, title="Distribution of employee satisfaction"
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Histograms are the single most underrated tool in EDA. Look
@@ -70,14 +80,19 @@ for:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import plotly.express as px
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`fig = px.box(
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `fig = px.box(
     df, x="salary", y="satisfaction_level", title="Satisfaction by salary bracket"
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 A box plot shows median, quartiles, and outliers in one
@@ -87,10 +102,13 @@ glance. Use it to compare a numeric column across categories.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import plotly.express as px
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`fig = px.scatter(
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `fig = px.scatter(
     df,
     x="average_montly_hours",
     y="satisfaction_level",
@@ -99,7 +117,9 @@ df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-data
     title="Hours worked vs satisfaction, by salary",
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Opacity is your friend when many points overlap.
@@ -108,7 +128,10 @@ Opacity is your friend when many points overlap.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 dates = pd.date_range("2024-01-01", periods=60, freq="D")
@@ -124,7 +147,9 @@ fig = px.line(
     df, x="date", y="value", color="metric", title="Daily visits and sign-ups"
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 A few line-chart rules:
@@ -138,10 +163,13 @@ A few line-chart rules:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import plotly.express as px
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`fig = px.histogram(
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `fig = px.histogram(
     df,
     x="satisfaction_level",
     facet_col="salary",
@@ -149,7 +177,9 @@ df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-data
     title="Satisfaction by salary bracket",
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Faceting splits one chart into multiple small ones. It's often
@@ -212,24 +242,29 @@ tell a *different* story?"
 - The figure stored in a variable called \`fig\`
 
 Then assert that the resulting figure is a valid Plotly figure.`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 
 rng = np.random.RandomState(0)
 sales = pd.DataFrame({
     "amount": rng.gamma(shape=2.0, scale=50, size=500),
-})`}
-  starterCode={`import plotly.express as px
+})`,
+      starterCode: `import plotly.express as px
 
 fig = None  # TODO
 
 fig
-`}
-  solutionCode={`import plotly.express as px
+`,
+      solutionCode: `import plotly.express as px
 
 fig = px.histogram(sales, x="amount", nbins=20, title="Sales amount distribution")
 fig
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "fig_exists",

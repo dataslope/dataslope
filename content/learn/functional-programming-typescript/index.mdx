@@ -132,7 +132,10 @@ composition.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Order = {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Order = {
   id: string;
   status: "draft" | "paid" | "cancelled";
   total: number;
@@ -153,12 +156,17 @@ for (let i = 0; i < orders.length; i++) {
   }
 }
 console.log("Imperative total:", total);
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Order = {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Order = {
   id: string;
   status: "draft" | "paid" | "cancelled";
   total: number;
@@ -178,7 +186,9 @@ const total = orders
   .reduce((a, b) => a + b, 0);
 
 console.log("Declarative total:", total);
-`}
+`,
+    },
+  ]}
 />
 
 Both produce `100`. But the second reads like the English sentence we

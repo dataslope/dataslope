@@ -25,7 +25,10 @@ state."
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007")
 
@@ -40,7 +43,9 @@ fig = px.choropleth(
     labels={"lifeExp": "Life expectancy (years)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Hover over countries to read values; zoom and pan to focus on
@@ -64,7 +69,10 @@ events), use `px.scatter_geo`:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007")
 
@@ -79,7 +87,9 @@ fig = px.scatter_geo(
     title="Country populations in 2007",
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Each country is a *dot* (centroid) sized by population. Try
@@ -150,7 +160,10 @@ regions.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder()
 
@@ -177,7 +190,9 @@ fig = px.choropleth(
     labels={"pct_change": "Change (%)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Every country with declining life expectancy will be red; every

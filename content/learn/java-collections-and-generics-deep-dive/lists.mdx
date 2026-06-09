@@ -37,7 +37,10 @@ all about *position*: `get(i)`, `add(i, x)`, `remove(i)`,
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -59,7 +62,9 @@ public class Main {
     System.out.println(xs); // [between, beta]
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## ArrayList: a list backed by an array
@@ -134,7 +139,10 @@ both ends.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -156,7 +164,9 @@ public class Main {
                        " ms");
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 (Numbers depend on the JIT, but `ArrayList` typically beats
@@ -171,7 +181,10 @@ to the constructor. Otherwise you pay for repeated `grow()` and
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -184,7 +197,9 @@ public class Main {
     System.out.println("size = " + xs.size());
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Sublist: a *view*, not a copy
@@ -195,7 +210,10 @@ to the original *invalidate* the sublist.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -214,7 +232,9 @@ public class Main {
     System.out.println("xs = " + xs);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 This is enormously useful for slicing — and a frequent source of
@@ -228,7 +248,10 @@ want for small fixed collections (especially as constants).
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.List;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.List;
 
 public class Main {
   public static void main(String[] args) {
@@ -242,7 +265,9 @@ public class Main {
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 For collections that are computed once and never mutated, this is
@@ -257,7 +282,10 @@ iterator's `remove()`, or use `removeIf` (Java 8+):
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -271,7 +299,9 @@ public class Main {
     System.out.println(xs);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 `removeIf` accepts a `Predicate` and does the safe iteration for you.
@@ -298,7 +328,7 @@ Expected output:
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     RecentHistory<String> h = new RecentHistory<>(3);
     h.record("a");
@@ -315,14 +345,14 @@ Expected output:
     },
     {
       filename: "RecentHistory.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class RecentHistory<E> {
   // TODO
 }
 `,
-      solutionContent: `import java.util.ArrayList;
+      solutionCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class RecentHistory<E> {

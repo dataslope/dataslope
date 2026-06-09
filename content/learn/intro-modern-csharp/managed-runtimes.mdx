@@ -69,7 +69,10 @@ stop *using* it. That's a much smaller responsibility.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 void Burn()
@@ -85,7 +88,9 @@ Burn();
 Burn();
 Burn();
 Console.WriteLine("done");
-`}
+`,
+    },
+  ]}
 />
 
 ### Type safety: the runtime catches you
@@ -100,7 +105,10 @@ throws an **exception** at the exact spot it happened.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 int[] xs = { 10, 20, 30 };
 
@@ -124,7 +132,9 @@ catch (InvalidCastException ex)
 {
     Console.WriteLine($"caught: {ex.Message}");
 }
-`}
+`,
+    },
+  ]}
 />
 
 The runtime *refuses* to do the unsafe thing. That refusal is the

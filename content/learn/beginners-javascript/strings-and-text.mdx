@@ -23,12 +23,17 @@ multi-line strings (more on that in a moment).
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const a = "single quotes";
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const a = "single quotes";
 const b = "double quotes";
 const c = \`backticks\`;
 console.log(a, b, c);
 console.log(typeof a, typeof b, typeof c); // all "string"
-`}
+`,
+    },
+  ]}
 />
 
 ### Escape sequences
@@ -48,11 +53,16 @@ newline or a tab, you escape it with a backslash:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log('She said "hi".');
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `console.log('She said "hi".');
 console.log("It's fine.");
 console.log("first line\\nsecond line");
 console.log("col1\\tcol2\\tcol3");
-`}
+`,
+    },
+  ]}
 />
 
 ## Template literals: the modern default
@@ -65,7 +75,10 @@ things that ordinary strings cannot:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const name = "Ada";
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const name = "Ada";
 const age = 28;
 
 // Old-school: concatenation with +
@@ -84,7 +97,9 @@ Welcome aboard. You are member #\${42}.
 Best,
 The team\`;
 console.log(message);
-`}
+`,
+    },
+  ]}
 />
 
 Template literals are the modern default for any non-trivial
@@ -98,7 +113,10 @@ leaves the original alone.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`let s = "hello";
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `let s = "hello";
 const louder = s.toUpperCase();
 console.log(s); // "hello"  — unchanged
 console.log(louder); // "HELLO"  — a new string
@@ -106,7 +124,9 @@ console.log(louder); // "HELLO"  — a new string
 // You can reassign the variable to point at a new string:
 s = s + " world";
 console.log(s); // "hello world"
-`}
+`,
+    },
+  ]}
 />
 
 This is the same point we made about primitives in general:
@@ -121,14 +141,19 @@ it. You can read an individual character with bracket notation:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const word = "javascript";
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const word = "javascript";
 
 console.log(word.length); // 10
 console.log(word[0]); // "j"   (the first character)
 console.log(word[1]); // "a"
 console.log(word[word.length - 1]); // "t"   (the last)
 console.log(word[100]); // undefined  (out of range)
-`}
+`,
+    },
+  ]}
 />
 
 Indexes start at **0**, not 1. The last character is at index
@@ -144,7 +169,10 @@ for these constantly.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const s = "  Hello, JavaScript World!  ";
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const s = "  Hello, JavaScript World!  ";
 
 // Case
 console.log(s.toUpperCase());
@@ -179,7 +207,9 @@ console.log(parts.join(" | ")); // "apple | banana | cherry"
 console.log("-".repeat(20));
 console.log("7".padStart(4, "0")); // "0007"
 console.log("7".padEnd(4, ".")); // "7..."
-`}
+`,
+    },
+  ]}
 />
 
 Notice how *none* of those methods modified `s`. They all returned
@@ -193,7 +223,10 @@ display, parsing a piece of text into a value to compute with.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// String -> Number
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// String -> Number
 console.log(Number("42")); // 42
 console.log(Number("3.14")); // 3.14
 console.log(Number("")); // 0    (!)
@@ -207,7 +240,9 @@ console.log(String(n)); // "42"
 console.log(n.toString()); // "42"
 console.log(\`Value: \${n}\`); // "Value: 42"  — implicit, via template
 console.log("Value: " + n); // "Value: 42"  — implicit, via concatenation
-`}
+`,
+    },
+  ]}
 />
 
 Be **deliberate** about conversions. `"5" + 3` is `"53"`. `"5" - 3`
@@ -234,11 +269,16 @@ human-character counts in the presence of emoji, use
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log("abc".length); // 3 — easy
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `console.log("abc".length); // 3 — easy
 console.log("café".length); // 4 — easy (if é is precomposed)
 console.log("😀".length); // 2 — surprising!
 console.log(Array.from("😀").length); // 1 — better
-`}
+`,
+    },
+  ]}
 />
 
 ## A multi-file string example
@@ -252,7 +292,7 @@ helper module, one driver.
   files={[
     {
       filename: "index.js",
-      initialContent: `const { wordCount, sentenceCount, summarize } = require("./text");
+      starterCode: `const { wordCount, sentenceCount, summarize } = require("./text");
 
 const article = \`JavaScript is a strange and wonderful language.
 It was created in ten days. It became the language of the web.
@@ -263,7 +303,7 @@ console.log(summarize(article));
     },
     {
       filename: "text.js",
-      initialContent: `function wordCount(text) {
+      starterCode: `function wordCount(text) {
   return text.trim().split(/\\s+/).filter(Boolean).length;
 }
 
@@ -302,7 +342,10 @@ Examples:
 - \`titleCase("hello world")\` → \`"Hello World"\`
 - \`titleCase("javaScript is GREAT")\` → \`"Javascript Is Great"\`
 - \`titleCase("")\` → \`""\``}
-  starterCode={`function titleCase(text) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function titleCase(text) {
   // your code here
   return text;
 }
@@ -310,8 +353,8 @@ Examples:
 console.log(titleCase("hello world"));
 console.log(titleCase("javaScript is GREAT"));
 console.log(titleCase(""));
-`}
-  solutionCode={`function titleCase(text) {
+`,
+      solutionCode: `function titleCase(text) {
   return text
     .split(" ")
     .map((w) =>
@@ -323,7 +366,9 @@ console.log(titleCase(""));
 console.log(titleCase("hello world"));
 console.log(titleCase("javaScript is GREAT"));
 console.log(titleCase(""));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",

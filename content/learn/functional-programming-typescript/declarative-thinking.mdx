@@ -22,7 +22,10 @@ $50, take their customer names, deduplicate, and sort alphabetically.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Order = {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Order = {
   readonly id: string;
   readonly status: "draft" | "paid" | "cancelled";
   readonly total: number;
@@ -53,7 +56,9 @@ for (let i = 0; i < orders.length; i++) {
 
 names.sort();
 console.log(names);
-`}
+`,
+    },
+  ]}
 />
 
 This works. It is also full of *mechanical bookkeeping*: an index
@@ -65,7 +70,10 @@ step by step.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Order = {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Order = {
   readonly id: string;
   readonly status: "draft" | "paid" | "cancelled";
   readonly total: number;
@@ -90,7 +98,9 @@ const names = [
 ].sort();
 
 console.log(names);
-`}
+`,
+    },
+  ]}
 />
 
 The declarative version reads like the English sentence we started
@@ -165,7 +175,10 @@ realistic example — computing per-customer paid totals.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Order = {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Order = {
   readonly id: string;
   readonly status: "draft" | "paid" | "cancelled";
   readonly total: number;
@@ -193,7 +206,9 @@ const byCustomer = paid.reduce<Record<string, number>>((acc, o) => {
 const ranked = Object.entries(byCustomer).sort(([, a], [, b]) => b - a);
 
 console.log(ranked);
-`}
+`,
+    },
+  ]}
 />
 
 Each stage is a named value (`paid`, `byCustomer`, `ranked`). You
@@ -209,7 +224,10 @@ The mental shift applies far beyond list processing.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Validator = {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Validator = {
   readonly required?: boolean;
   readonly minLen?: number;
   readonly maxLen?: number;
@@ -252,7 +270,9 @@ const errors = Object.entries(fields)
   .filter((e): e is string => e !== null);
 
 console.log(errors);
-`}
+`,
+    },
+  ]}
 />
 
 The validation *rules* are data. The engine that interprets them is
@@ -299,7 +319,7 @@ toys: 14
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { avgPerCategory, type Sale } from "./stats";
+      starterCode: `import { avgPerCategory, type Sale } from "./stats";
 
 const sales: readonly Sale[] = [
   { category: "books", amount: 20 },
@@ -319,7 +339,7 @@ for (const line of lines) console.log(line);
     },
     {
       filename: "stats.ts",
-      initialContent: `export type Sale = { readonly category: string; readonly amount: number };
+      starterCode: `export type Sale = { readonly category: string; readonly amount: number };
 
 // Reimplement this declaratively — no \`for\`, no \`let\`, no mutation.
 export function avgPerCategory(
@@ -339,7 +359,7 @@ export function avgPerCategory(
   return out;
 }
 `,
-      solutionContent: `export type Sale = { readonly category: string; readonly amount: number };
+      solutionCode: `export type Sale = { readonly category: string; readonly amount: number };
 
 export function avgPerCategory(
   sales: readonly Sale[],

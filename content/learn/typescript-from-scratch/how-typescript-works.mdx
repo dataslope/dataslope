@@ -17,7 +17,10 @@ Let's see this in action:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Plain JavaScript — no type annotations
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Plain JavaScript — no type annotations
 let x = 10;
 x = "hello"; // JavaScript allows this
 console.log(x);
@@ -36,7 +39,9 @@ console.log("y is", y);
 // The compiled JS looks like:
 // let y = 10;
 // console.log("y is", y);
-`}
+`,
+    },
+  ]}
 />
 
 The code above shows the key mechanic: TypeScript checks that `y` is used consistently as a number. If you try to assign a string to `y`, the compiler stops you. But the *runtime* code — the JavaScript that actually executes — has no mention of `: number`. Types exist only at *compile time*.
@@ -75,7 +80,10 @@ One of TypeScript's defining features is its **structural type system** (also kn
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface User {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface User {
   name: string;
   age: number;
 }
@@ -93,7 +101,9 @@ printUser(bob); // TypeScript accepts this!
 // But this fails:
 const incomplete = { name: "Charlie" };
 // printUser(incomplete); // Error: Property 'age' is missing
-`}
+`,
+    },
+  ]}
 />
 
 TypeScript doesn't care about class hierarchies or explicit `implements` declarations (though you can use them). It cares whether the object has the *right properties*. This makes TypeScript feel like JavaScript — where you often pass around plain objects — rather than forcing OOP patterns.
@@ -202,7 +212,10 @@ One of TypeScript's most powerful features is **control flow analysis** — the 
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function processValue(value: string | number) {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function processValue(value: string | number) {
   // At this point, value could be string OR number
 
   if (typeof value === "string") {
@@ -218,7 +231,9 @@ One of TypeScript's most powerful features is **control flow analysis** — the 
 
 processValue("hello");
 processValue(42);
-`}
+`,
+    },
+  ]}
 />
 
 The type checker doesn't just look at the declared type `string | number`. It tracks the `typeof` check and *narrows* the type in each branch. This is called **type narrowing** or **flow-sensitive typing**, and it eliminates many casts and assertions you'd need in other languages.

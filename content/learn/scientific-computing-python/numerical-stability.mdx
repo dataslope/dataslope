@@ -51,7 +51,10 @@ than a couple of correct bits**.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 
 # Conditioning of evaluating sin(x) near a root, e.g. near pi
@@ -61,7 +64,9 @@ def cond_sin(x):
 
 for x in [0.5, 1.0, 1.5, 3.1, 3.14, 3.1415]:
     print(f"x = {x:8.5f}   κ_sin = {cond_sin(x):8.3e}")
-`}
+`,
+    },
+  ]}
 />
 
 Near $x = \pi$, $\sin(x)$ is nearly zero, so the relative output
@@ -87,7 +92,10 @@ Let us watch both happen.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 # A 2x2 system  Ax = b  that is well-conditioned
 A = np.array([[1.0, 1.0], [1.0, 1.0 + 1e-13]])
@@ -115,7 +123,9 @@ x_c = cramer(A, b)
 print("cramer :", x_c, "  error =", np.linalg.norm(x_c - true_x))
 
 print("\\ncondition number κ(A) =", np.linalg.cond(A))
-`}
+`,
+    },
+  ]}
 />
 
 The condition number $\kappa(A) \approx 4 \times 10^{13}$ tells us
@@ -138,7 +148,10 @@ numbers.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import math
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import math
 
 # Forward recurrence (UNSTABLE)
 I = math.log(1.1)
@@ -146,7 +159,9 @@ print("Forward (I_n = 1/n - 10*I_{n-1}):")
 for n in range(1, 20):
     I = 1 / n - 10 * I
     print(f"  I_{n:2d} = {I:+.5e}")
-`}
+`,
+    },
+  ]}
 />
 
 The recursion produces *negative* values, then enormous oscillations
@@ -161,7 +176,10 @@ $10$ per step.
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Backward recurrence (STABLE), starting from an arbitrary guess at n = 40
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Backward recurrence (STABLE), starting from an arbitrary guess at n = 40
 N = 40
 I = 0.0  # any starting guess
 for n in range(N, 0, -1):
@@ -171,7 +189,9 @@ print(f"Backward result: I_0 = {I:.10f}  (true {0.0953101798:.10f})")
 import math
 
 print(f"Reference ln(1.1) = {math.log(1.1):.10f}")
-`}
+`,
+    },
+  ]}
 />
 
 Same equation. *Same data.* Two algorithms; one is useless, the
@@ -207,7 +227,10 @@ the *algorithm*.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 
 # A Hilbert matrix is a famous ill-conditioned problem
@@ -224,7 +247,9 @@ for n in [5, 8, 10, 12, 15]:
     err = np.linalg.norm(x_hat - x_true) / np.linalg.norm(x_true)
     kappa = np.linalg.cond(H)
     print(f"n={n:3d}  κ={kappa:.2e}  relative error = {err:.2e}")
-`}
+`,
+    },
+  ]}
 />
 
 Watch how the relative error scales with $\kappa$. Once
@@ -253,7 +278,10 @@ recovers most of the digits a naive sum throws away.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import math
 
 # Sum a million numbers, each ~1e-10
@@ -279,7 +307,9 @@ print(f"true             = 1.0")
 print(f"naive sum        = {naive!r}")
 print(f"Kahan sum        = {kahan(xs)!r}")
 print(f"numpy sum        = {xs.sum()!r}")  # numpy uses pairwise summation
-`}
+`,
+    },
+  ]}
 />
 
 NumPy's `.sum()` uses *pairwise summation*, which is much better

@@ -20,7 +20,10 @@ BFS would see `0 -> 1` as one edge, but the cheaper path is `0 -> 2 -> 1` with c
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   int direct = 100;
@@ -28,7 +31,9 @@ int main() {
   std::cout << "direct=" << direct << " viaTwo=" << viaTwo << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Dijkstra's idea
@@ -74,7 +79,10 @@ Use an adjacency list where each edge is `(neighbor, weight)`. The min-heap stor
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <climits>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <climits>
 #include <functional>
 #include <iostream>
 #include <queue>
@@ -121,7 +129,9 @@ int main() {
   std::cout << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 With a binary heap, the time complexity is **O((V + E) log V)**. The adjacency list contributes the `V + E` scan; heap pushes and pops cost `log V`.
@@ -132,7 +142,10 @@ Relaxation means: if going through `u` improves `v`, update `dist[v]`.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <climits>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <climits>
 #include <iostream>
 #include <vector>
 
@@ -149,7 +162,9 @@ int main() {
   std::cout << dist[v] << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Reconstructing the path
@@ -158,7 +173,10 @@ Maintain a `parent` array whenever a relaxation improves a vertex. To reconstruc
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <algorithm>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
 #include <climits>
 #include <functional>
 #include <iostream>
@@ -204,7 +222,9 @@ int main() {
   std::cout << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## When Dijkstra fails
@@ -230,14 +250,19 @@ BellmanFord(edges, n, src):
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   std::cout << "Dijkstra: non-negative weights\\n";
   std::cout << "Bellman-Ford: can handle negative edges\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Floyd-Warshall for all pairs
@@ -260,7 +285,10 @@ graph TD
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <algorithm>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -282,7 +310,9 @@ int main() {
   std::cout << dist[0][2] << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Challenge: Shortest distance from source
@@ -291,7 +321,10 @@ int main() {
   adapter="cpp"
   title="Shortest distance from source"
   instructions={`Implement \`dijkstra\` for a directed weighted graph with non-negative edge weights. Return \`INT_MAX\` for unreachable vertices.`}
-  starterCode={`#include <climits>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <climits>
 #include <functional>
 #include <iostream>
 #include <queue>
@@ -324,8 +357,8 @@ int main() {
   std::cout << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <climits>
+`,
+      solutionCode: `#include <climits>
 #include <functional>
 #include <iostream>
 #include <queue>
@@ -375,7 +408,9 @@ int main() {
   std::cout << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "distances",
@@ -391,7 +426,10 @@ int main() {
   adapter="cpp"
   title="Network delay time"
   instructions={`Implement \`networkDelayTime\`. Nodes are numbered from 1 to \`n\`. Return the maximum shortest distance from \`k\`, or -1 if any node is unreachable.`}
-  starterCode={`#include <algorithm>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
 #include <climits>
 #include <functional>
 #include <iostream>
@@ -412,8 +450,8 @@ int main() {
   std::cout << networkDelayTime(times, 4, 2) << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <algorithm>
+`,
+      solutionCode: `#include <algorithm>
 #include <climits>
 #include <functional>
 #include <iostream>
@@ -462,7 +500,9 @@ int main() {
   std::cout << networkDelayTime(times, 4, 2) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "delay",

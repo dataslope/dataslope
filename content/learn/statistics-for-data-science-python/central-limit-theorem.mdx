@@ -56,7 +56,10 @@ the shape morph from skewed to bell.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import pandas as pd
 import plotly.express as px
 from scipy import stats
@@ -97,7 +100,9 @@ fig.show()
 print()
 print(f"Population skewness (n=1 case) is large and positive (~2).")
 print("As n grows, the skewness of x-bar marches toward 0 -> bell shape.")
-`}
+`,
+    },
+  ]}
 />
 
 At n = 1, the "sampling distribution of the mean" is just the
@@ -126,7 +131,10 @@ comparison.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 from scipy import stats
@@ -172,7 +180,9 @@ fig.update_layout(
 fig.show()
 
 print("\\nAll three sampling distributions hug the same black normal curve.")
-`}
+`,
+    },
+  ]}
 />
 
 Three populations that look nothing alike — a decaying tail, a flat
@@ -223,7 +233,10 @@ noticeably skewed at n = 30. The rule of thumb would have lied to you.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(3)
@@ -244,7 +257,9 @@ print()
 print("At n=30 the mean is STILL clearly skewed for this heavy-tailed population.")
 print("It takes n in the hundreds before x-bar looks reliably normal.")
 print("Lesson: 'n >= 30' is a guideline, not a guarantee.")
-`}
+`,
+    },
+  ]}
 />
 
 At n = 30 the sample mean of this log-normal still carries obvious
@@ -273,7 +288,10 @@ verifying directly.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.express as px
 
 rng = np.random.default_rng(11)
@@ -312,7 +330,9 @@ print(f"{'n':>5} | {'simulated sd':>13} | {'sigma/sqrt(n)':>13}")
 print("-" * 38)
 for n, e, t in zip(ns, empirical, theory):
     print(f"{n:>5} | {e:>13.3f} | {t:>13.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 The simulated spread (the x markers) lands right on the `σ / √n`
@@ -331,25 +351,30 @@ Error*.
 Produce a dict \`skews\` mapping each \`n\` (int key) to the skewness of \`x-bar\` (float value), e.g. \`{2: 1.3, 10: 0.6, ...}\`.
 
 Because averaging washes out asymmetry, the skewness should **decrease** as \`n\` grows: \`skews[2] > skews[10] > skews[50] > skews[200]\`, and \`skews[200]\` should be small (near 0).`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from scipy import stats
 rng = np.random.default_rng(2024)
 
 population = rng.exponential(scale=12.0, size=1_000_000)  # heavily right-skewed
 ns = [2, 10, 50, 200]
-n_samples = 3000`}
-  starterCode={`# TODO: for each n, build the sampling distribution of the mean and
+n_samples = 3000`,
+      starterCode: `# TODO: for each n, build the sampling distribution of the mean and
 # record stats.skew(...) of the sample means in the dict 'skews'.
 skews = {}
-`}
-  solutionCode={`skews = {}
+`,
+      solutionCode: `skews = {}
 for n in ns:
     means = np.array(
         [rng.choice(population, size=n, replace=False).mean() for _ in range(n_samples)]
     )
     skews[n] = float(stats.skew(means))
 print(skews)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "keys",
@@ -396,22 +421,25 @@ Produce a dict \`check\` with:
 - \`"rel_diff"\` — the relative difference \`abs(empirical_sd - theory_sd) / theory_sd\` (a float)
 
 The two should agree closely, so \`rel_diff\` should be small (under ~0.08).`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 rng = np.random.default_rng(555)
 
 population = rng.exponential(scale=15.0, size=1_000_000)
 SIGMA = float(population.std())
 n = 64
-n_samples = 5000`}
-  starterCode={`# TODO: build sample means, compute empirical sd, theory sd = SIGMA/sqrt(n),
+n_samples = 5000`,
+      starterCode: `# TODO: build sample means, compute empirical sd, theory sd = SIGMA/sqrt(n),
 # and their relative difference.
 check = {
     "empirical_sd": None,
     "theory_sd": None,
     "rel_diff": None,
 }
-`}
-  solutionCode={`means = np.array(
+`,
+      solutionCode: `means = np.array(
     [rng.choice(population, size=n, replace=False).mean() for _ in range(n_samples)]
 )
 empirical_sd = float(means.std())
@@ -422,7 +450,9 @@ check = {
     "rel_diff": float(abs(empirical_sd - theory_sd) / theory_sd),
 }
 print(check)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "keys",
