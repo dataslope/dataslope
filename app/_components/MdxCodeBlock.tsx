@@ -9,12 +9,18 @@
  * `runtime/adapters`. All other props are forwarded to `<CodeBlock>`
  * unchanged.
  *
- * Usage in MDX:
+ * Usage in MDX (every block passes a `files` array; each file carries
+ * its own `initCode` and `starterCode`):
  * ```mdx
  * <CodeBlock
  *   adapter="python"
- *   initCode={`import pandas as pd\ndf = pd.DataFrame(...)`}
- *   starterCode={`display(df)`}
+ *   files={[
+ *     {
+ *       filename: "main.py",
+ *       initCode: `import pandas as pd\ndf = pd.DataFrame(...)`,
+ *       starterCode: `display(df)`,
+ *     },
+ *   ]}
  * />
  * ```
  */
@@ -24,20 +30,18 @@ import { getAdapterById, type AdapterId } from "./runtime/adapters";
 
 interface MdxCodeBlockProps {
   adapter: AdapterId;
-  starterCode?: string;
-  files?: CodeBlockFile[];
+  files: CodeBlockFile[];
   entryFilename?: string;
-  initCode?: string;
   label?: string;
+  showFileTabBar?: boolean;
 }
 
 export default function MdxCodeBlock({
   adapter,
-  starterCode,
   files,
   entryFilename,
-  initCode,
   label,
+  showFileTabBar,
 }: MdxCodeBlockProps) {
   const resolved = getAdapterById(adapter);
   if (!resolved) {
@@ -50,11 +54,10 @@ export default function MdxCodeBlock({
   return (
     <CodeBlock
       adapter={resolved}
-      starterCode={starterCode}
       files={files}
       entryFilename={entryFilename}
-      initCode={initCode}
       label={label}
+      showFileTabBar={showFileTabBar}
     />
   );
 }

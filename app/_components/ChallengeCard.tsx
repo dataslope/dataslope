@@ -100,23 +100,28 @@ interface DisplayedTest {
   detail: string | null;
 }
 
-/** One file in a multi-file challenge workspace. Authors who only need
- *  a single editable file should pass `starterCode` instead — `files`
- *  is for cases where the learner edits more than one file (e.g. a
- *  Java challenge with both `Main.java` and `Dog.java`). */
+/** One file in a challenge workspace. Every challenge passes at least
+ *  one file (single-file authors pass a one-element `files` array). A
+ *  file carries its own read-only initialization code, the editable
+ *  starter shown in the editor, and an optional reference solution. */
 export interface ChallengeFile {
   /** Workspace-relative filename, e.g. `"Dog.java"`. */
   filename: string;
+  /** Optional read-only initialization code for THIS file, prepended
+   *  verbatim to the file's code on every run. Rendered in a
+   *  collapsed-by-default read-only panel above the editor whenever this
+   *  file is the active tab, mirroring `<CodeBlock>`'s init drawer. */
+  initCode?: string;
   /** Starter content shown in the editor for this file. Reset restores
    *  this exact text. */
-  initialContent: string;
+  starterCode: string;
   /** Optional reference solution for this file. When at least one file
-   *  in a multi-file challenge supplies `solutionContent`, the
-   *  Solution modal renders the same file tab bar (non-sortable,
-   *  non-closeable) so the learner can flip between files; files that
-   *  omit `solutionContent` are shown with their `initialContent` (the
-   *  scaffold the learner does not need to modify). */
-  solutionContent?: string;
+   *  in the workspace supplies `solutionCode`, the Solution modal
+   *  renders the file tab bar (non-sortable, non-closeable) so the
+   *  learner can flip between files; files that omit `solutionCode` are
+   *  shown with their `starterCode` (the scaffold the learner does not
+   *  need to modify). */
+  solutionCode?: string;
 }
 
 /** Imperative driver exposed on `window.__dsChallenges[adapter::title]`
@@ -144,12 +149,11 @@ export interface ChallengeTestHandle {
 interface SolutionFile {
   filename: string;
   source: string;
-  /** True when the author supplied a real solution for this file
-   *  (single-file `solutionCode`, or multi-file `solutionContent`).
-   *  False when we are echoing back the file's `initialContent`
-   *  because the file is part of the scaffold the learner is not
-   *  expected to modify. The modal labels these "(unchanged)" so
-   *  the learner can tell the file apart from one they should edit. */
+  /** True when the file supplied a real `solutionCode`. False when we
+   *  are echoing back the file's `starterCode` because the file is part
+   *  of the scaffold the learner is not expected to modify. The modal
+   *  labels these "(unchanged)" so the learner can tell the file apart
+   *  from one they should edit. */
   hasSolution: boolean;
 }
 
@@ -165,27 +169,22 @@ export interface ChallengeCardProps {
    *  markdown string for terser authoring. Strings support paragraphs,
    *  bullet lists, **bold**, *italic*, and `inline code`. */
   instructions: React.ReactNode | string;
-  /** Optional initialization code prepended verbatim to the user's
-   *  code on every run. Rendered in a collapsed-by-default read-only
-   *  panel above the editor, mirroring `<CodeBlock>`'s `initCode`. */
-  initCode?: string;
-  /** Starting source loaded into the editor. The Reset button restores
-   *  this exact text. Ignored when `files` is supplied. */
-  starterCode?: string;
-  /** Multi-file workspace. When set, takes precedence over
-   *  `starterCode`. A non-sortable, non-closeable tab bar appears above
-   *  the editor so the learner can switch between files. Tests still
-   *  run against `entryFilename` (or the first file when omitted) —
-   *  every other file is staged into the runtime's virtual file system
-   *  via `prepareFileSystem` so multi-file `import`s / `include`s /
-   *  cross-class references resolve. */
-  files?: ChallengeFile[];
-  /** When `files` is set, the filename whose content is passed to
-   *  `runtime.run()` as the entry. Defaults to the first file. */
+  /** Workspace files. Every challenge supplies at least one file; each
+   *  file carries its own `initCode` (read-only setup), `starterCode`
+   *  (the editable starter), and optional `solutionCode`. With more than
+   *  one file — or with `showFileTabBar` — a non-sortable, non-closeable
+   *  tab bar appears above the editor so the learner can switch between
+   *  files. Tests run against `entryFilename` (or the first file when
+   *  omitted); every other file is staged into the runtime's virtual
+   *  file system via `prepareFileSystem` so multi-file `import`s /
+   *  `include`s / cross-class references resolve. */
+  files: ChallengeFile[];
+  /** When `files` has more than one entry, the filename whose content is
+   *  passed to `runtime.run()` as the entry. Defaults to the first file. */
   entryFilename?: string;
-  /** Canonical reference solution. When provided, a "Show Solution"
-   *  button appears in the toolbar that opens a read-only modal. */
-  solutionCode?: string;
+  /** Force the file tab bar to render even for a single-file workspace.
+   *  Multi-file workspaces always show it; this opts a one-file card in. */
+  showFileTabBar?: boolean;
   /** Tests run when "Check Answer" is pressed. Each test's `code`
    *  should `assert`/`throw`/`stop()` on failure and be silent on
    *  success — the language-specific harness wraps the rest. */
@@ -213,6 +212,17 @@ function lineCommentFor(codeMirrorMode: string): string {
     default:
       return "//";
   }
+}
+
+// Build a line-numbers extension whose gutter starts after `offset`
+// lines, so the editable region's numbering continues from where a
+// file's read-only init code left off. Stored in a compartment so the
+// offset can be reconfigured when the active file (hence its init)
+// changes, without remounting the editor.
+function lineNumbersWithOffset(offset: number) {
+  return lineNumbersExt({
+    formatNumber: offset ? (n) => String(n + offset) : undefined,
+  });
 }
 
 // The challenge card adapts its CodeMirror theme to the surrounding
@@ -289,63 +299,56 @@ export default function ChallengeCard({
   title,
   badge = "Challenge",
   instructions,
-  initCode,
-  starterCode,
   files,
   entryFilename,
-  solutionCode,
+  showFileTabBar = false,
   tests,
 }: ChallengeCardProps) {
   const blockId = useBlockId(adapter);
-  const trimmedInit = initCode?.trimEnd() ?? "";
-  const hasInit = trimmedInit.length > 0;
-  const initLineCount = hasInit ? trimmedInit.split("\n").length : 0;
   const initPanelId = `${blockId}-init`;
 
-  // Normalize prop shape into a list of files. Single-file authors pass
-  // `starterCode`; multi-file authors pass `files`. We always work with
-  // the array internally so the rest of the component is uniform.
+  // Normalize into a non-empty list of files. Authors always pass
+  // `files`; guard against an empty array so the rest of the component
+  // can assume at least one file is present.
   const workspaceFiles: ChallengeFile[] = useMemo(() => {
     if (files && files.length > 0) return files;
     const defaultName = `main.${adapter.defaultFileExtension || "txt"}`;
-    return [{ filename: defaultName, initialContent: starterCode ?? "" }];
-  }, [files, starterCode, adapter.defaultFileExtension]);
+    return [{ filename: defaultName, starterCode: "" }];
+  }, [files, adapter.defaultFileExtension]);
 
   const isMultiFile = workspaceFiles.length > 1;
+  // The tab bar renders for multi-file workspaces, or when a single-file
+  // card explicitly opts in via `showFileTabBar`.
+  const showTabs = isMultiFile || showFileTabBar;
   const resolvedEntryFilename =
     (entryFilename && workspaceFiles.find((f) => f.filename === entryFilename)
       ? entryFilename
       : workspaceFiles[0].filename) ?? workspaceFiles[0].filename;
 
+  // Per-file read-only init code (trimmed). Init now belongs to a file,
+  // so the init drawer + the editor's line-number offset both track
+  // whichever file is the active tab.
+  const initForFile = useCallback(
+    (filename: string) => {
+      const f = workspaceFiles.find((wf) => wf.filename === filename);
+      return f?.initCode?.trimEnd() ?? "";
+    },
+    [workspaceFiles],
+  );
+
   // ─── Solution files ─────────────────────────────────────────────────
-  // Build the per-file solution view the modal renders. For single-file
-  // challenges the legacy `solutionCode` prop becomes the synthetic
-  // entry file's solution. For multi-file challenges, every file
-  // appears in the tab bar — files that supplied `solutionContent`
-  // show that text; files that did not are shown with their
-  // `initialContent` (the scaffold the learner is not expected to
-  // change). The modal opens iff at least one file actually has a
-  // solution.
+  // Build the per-file solution view the modal renders. Every file
+  // appears; files that supplied `solutionCode` show that text, while
+  // files that did not are shown with their `starterCode` (the scaffold
+  // the learner is not expected to change). The modal opens iff at least
+  // one file actually has a solution.
   const solutionFiles: SolutionFile[] = useMemo(() => {
-    const out: SolutionFile[] = [];
-    for (const file of workspaceFiles) {
-      const explicit = file.solutionContent;
-      if (isMultiFile) {
-        out.push({
-          filename: file.filename,
-          source: explicit ?? file.initialContent,
-          hasSolution: explicit !== undefined,
-        });
-      } else if (solutionCode !== undefined) {
-        out.push({
-          filename: file.filename,
-          source: solutionCode,
-          hasSolution: true,
-        });
-      }
-    }
-    return out;
-  }, [workspaceFiles, isMultiFile, solutionCode]);
+    return workspaceFiles.map((file) => ({
+      filename: file.filename,
+      source: file.solutionCode ?? file.starterCode,
+      hasSolution: file.solutionCode !== undefined,
+    }));
+  }, [workspaceFiles]);
   const hasSolution = solutionFiles.some((f) => f.hasSolution);
 
   const editorHostRef = useRef<HTMLDivElement | null>(null);
@@ -359,17 +362,23 @@ export default function ChallengeCard({
   const mainThemeCompRef = useRef<Compartment | null>(null);
   const initThemeCompRef = useRef<Compartment | null>(null);
   const solutionThemeCompRef = useRef<Compartment | null>(null);
+  // Line-number compartment for the main editor — reconfigured when the
+  // active file changes so the gutter offset tracks that file's init
+  // line count (the editable region continues numbering after the init).
+  const mainLineNumberCompRef = useRef<Compartment | null>(null);
   // Debounce handle for the localStorage write that mirrors the editor
-  // buffer. See `persistedKey` below.
+  // buffer. See `persistedKeyForFile` below.
   const persistSaveTimerRef = useRef<number | null>(null);
 
   // Stable per-file localStorage keys. The workspace fingerprint
-  // includes every starter so editing the MDX retires saved attempts
-  // against the old prompt; the filename is appended per file so each
-  // tab persists independently.
+  // includes every file's init + starter so editing the MDX retires
+  // saved attempts against the old prompt; the filename is appended per
+  // file so each tab persists independently.
   const workspaceFingerprint = useMemo(
     () =>
-      workspaceFiles.map((f) => `${f.filename}:${f.initialContent}`).join("|"),
+      workspaceFiles
+        .map((f) => `${f.filename}:${f.initCode ?? ""}:${f.starterCode}`)
+        .join("|"),
     [workspaceFiles],
   );
   const persistedKeyForFile = useCallback(
@@ -379,13 +388,6 @@ export default function ChallengeCard({
         `${adapter.id}|${title}|${workspaceFingerprint}|${filename}`,
       ),
     [adapter.id, title, workspaceFingerprint],
-  );
-  // Legacy single-file key retained so existing challenges don't lose
-  // their saved buffers when this multi-file support shipped.
-  const persistedKey = useMemo(
-    () =>
-      persistKey("challenge", `${adapter.id}|${title}|${starterCode ?? ""}`),
-    [adapter.id, title, starterCode],
   );
   // Shared per-adapter runtime, scoped to the fumadocs surface: every
   // `<CodeBlock>` / `<ChallengeCard>` rendered on the /learn route
@@ -449,14 +451,8 @@ export default function ChallengeCard({
   const fileBuffersRef = useRef<Map<string, string>>(
     new Map(
       workspaceFiles.map((f) => {
-        if (isMultiFile) {
-          const persisted = loadPersistedCode(persistedKeyForFile(f.filename));
-          return [f.filename, persisted ?? f.initialContent];
-        }
-        // Single-file mode honours the legacy persistedKey so existing
-        // saved attempts survive.
-        const persisted = loadPersistedCode(persistedKey);
-        return [f.filename, persisted ?? f.initialContent];
+        const persisted = loadPersistedCode(persistedKeyForFile(f.filename));
+        return [f.filename, persisted ?? f.starterCode];
       }),
     ),
   );
@@ -464,6 +460,16 @@ export default function ChallengeCard({
   useEffect(() => {
     activeFilenameRef.current = activeFilename;
   }, [activeFilename]);
+
+  // Active file's init code (trimmed) + derived line metrics. Init now
+  // belongs to a file, so the read-only init drawer and the editor's
+  // line-number offset both re-render / reconfigure when the active tab
+  // changes.
+  const activeTrimmedInit = initForFile(activeFilename);
+  const activeHasInit = activeTrimmedInit.length > 0;
+  const activeInitLineCount = activeHasInit
+    ? activeTrimmedInit.split("\n").length
+    : 0;
 
   const isMac = useSyncExternalStore(
     () => () => {},
@@ -487,12 +493,9 @@ export default function ChallengeCard({
   // unmount flushes.
   const persistActiveFile = useCallback(
     (filename: string, content: string) => {
-      const key = isMultiFile
-        ? persistedKeyForFile(filename)
-        : persistedKey;
-      savePersistedCode(key, content);
+      savePersistedCode(persistedKeyForFile(filename), content);
     },
-    [isMultiFile, persistedKey, persistedKeyForFile],
+    [persistedKeyForFile],
   );
 
   // ─── Editor mount ───────────────────────────────────────────────────
@@ -500,7 +503,12 @@ export default function ChallengeCard({
     if (!editorHostRef.current || editorRef.current) return;
     const themeComp = new Compartment();
     const languageComp = new Compartment();
-    const lineOffset = hasInit ? initLineCount : 0;
+    const lineNumberComp = new Compartment();
+    // Initial gutter offset = the active file's init line count. The
+    // reconfigure effect below keeps it in sync as the active tab (and
+    // therefore its init code) changes.
+    const initial = initForFile(activeFilenameRef.current);
+    const initialOffset = initial ? initial.split("\n").length : 0;
 
     const initialDoc =
       fileBuffersRef.current.get(activeFilenameRef.current) ?? "";
@@ -516,11 +524,7 @@ export default function ChallengeCard({
         indentOnInput(),
         bracketMatching(),
         closeBrackets(),
-        lineNumbersExt({
-          formatNumber: lineOffset
-            ? (n) => String(n + lineOffset)
-            : undefined,
-        }),
+        lineNumberComp.of(lineNumbersWithOffset(initialOffset)),
         highlightActiveLineGutter(),
         highlightActiveLine(),
         EditorState.tabSize.of(adapter.indentWidth),
@@ -575,6 +579,7 @@ export default function ChallengeCard({
     });
     editorRef.current = view;
     mainThemeCompRef.current = themeComp;
+    mainLineNumberCompRef.current = lineNumberComp;
 
     void loadLanguage(adapter.codeMirrorMode).then((ext) => {
       if (ext && editorRef.current === view) {
@@ -593,13 +598,15 @@ export default function ChallengeCard({
       view.destroy();
       editorRef.current = null;
       mainThemeCompRef.current = null;
+      mainLineNumberCompRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Tab switch: flush any pending debounced save for the previously
   // active file, snapshot the current editor doc into the file
-  // buffers Map, and load the newly-active file's buffer.
+  // buffers Map, load the newly-active file's buffer, and reset the
+  // init drawer to collapsed (each file's init starts collapsed).
   const previousActiveRef = useRef(activeFilename);
   useEffect(() => {
     const view = editorRef.current;
@@ -622,8 +629,22 @@ export default function ChallengeCard({
     view.dispatch({
       changes: { from: 0, to: view.state.doc.length, insert: incoming },
     });
+    setInitExpanded(false);
     previousActiveRef.current = activeFilename;
   }, [activeFilename, persistActiveFile]);
+
+  // Keep the editor's line-number gutter offset in sync with the active
+  // file's init line count (the editable region numbers continue after
+  // the read-only init). Runs on mount (after the view exists) and on
+  // every tab switch.
+  useEffect(() => {
+    const view = editorRef.current;
+    const comp = mainLineNumberCompRef.current;
+    if (!view || !comp) return;
+    view.dispatch({
+      effects: comp.reconfigure(lineNumbersWithOffset(activeInitLineCount)),
+    });
+  }, [activeInitLineCount]);
 
   // Sync the CodeMirror theme across all active editors when the docs
   // colour scheme toggles (Fumadocs dark/light toggle or OS preference).
@@ -640,7 +661,7 @@ export default function ChallengeCard({
 
   // Resolve which file the modal should display. Prefer the user's
   // explicit click; otherwise default to the first file that actually
-  // has a real `solutionContent` so the modal lands on something the
+  // has a real `solutionCode` so the modal lands on something the
   // learner is supposed to read. Derived rather than stored so we
   // don't need a `useEffect` to keep the selection in sync with
   // `solutionFiles` (which would trigger react-hooks/set-state-in-effect).
@@ -660,11 +681,12 @@ export default function ChallengeCard({
   // learner knows there's read-only setup that runs before this code.
   const activeSolutionSource = useMemo(() => {
     if (!activeSolutionFile) return "";
-    if (!hasInit) return activeSolutionFile.source;
+    const fileInit = initForFile(activeSolutionFile.filename);
+    if (!fileInit) return activeSolutionFile.source;
     const prefix = lineCommentFor(adapter.codeMirrorMode);
     const header = `${prefix} Initialization code (read-only) runs before this file. Solution begins below.\n\n`;
     return header + activeSolutionFile.source;
-  }, [activeSolutionFile, hasInit, adapter.codeMirrorMode]);
+  }, [activeSolutionFile, initForFile, adapter.codeMirrorMode]);
 
   // Mount / re-mount the read-only solution editor whenever the modal
   // opens or the active solution file changes. We keep the doc
@@ -716,18 +738,24 @@ export default function ChallengeCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [solutionOpen, activeSolutionFile, activeSolutionSource]);
 
-  // Mount the read-only init editor once whenever `hasInit` becomes
-  // true. We keep the editor mounted even in the collapsed state so
-  // the learner can see the first few lines of context through the
-  // gradient fade — clicking the fade or the toggle expands the
-  // panel to the full height.
+  // Mount / re-mount the read-only init editor for the active file's
+  // init code. Init now belongs to a file, so switching tabs rebuilds
+  // this editor with the new file's init (or tears it down when the
+  // active file has none). We keep it mounted even while collapsed so
+  // the learner can see the first few lines through the gradient fade —
+  // clicking the fade or the toggle expands it to full height.
   useEffect(() => {
-    if (!hasInit) return;
-    if (!initEditorHostRef.current || initEditorRef.current) return;
+    if (!activeHasInit) return;
+    if (!initEditorHostRef.current) return;
+    // Tear down a prior view so switching files rebuilds with the new doc.
+    if (initEditorRef.current) {
+      initEditorRef.current.destroy();
+      initEditorRef.current = null;
+    }
     const languageComp = new Compartment();
     const themeComp = new Compartment();
     const view = new EditorView({
-      doc: trimmedInit,
+      doc: activeTrimmedInit,
       parent: initEditorHostRef.current,
       extensions: [
         EditorState.readOnly.of(true),
@@ -751,11 +779,13 @@ export default function ChallengeCard({
     });
     return () => {
       view.destroy();
-      initEditorRef.current = null;
-      initThemeCompRef.current = null;
+      if (initEditorRef.current === view) {
+        initEditorRef.current = null;
+        initThemeCompRef.current = null;
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasInit]);
+  }, [activeHasInit, activeTrimmedInit]);
 
   // ─── Execution helpers ─────────────────────────────────────────────
 
@@ -775,6 +805,17 @@ export default function ChallengeCard({
     }
     return out;
   }, [workspaceFiles]);
+
+  // Build a file's effective source for a run: its read-only init code
+  // (if any) prepended to the editable buffer, via the adapter-aware
+  // merge so e.g. PHP's leading `<?php` isn't duplicated.
+  const effectiveSourceFor = useCallback(
+    (filename: string, buffer: string) => {
+      const init = initForFile(filename);
+      return init ? mergeInitAndEntry(adapter.id, init, buffer) : buffer;
+    },
+    [adapter.id, initForFile],
+  );
 
   /** Execute the entry file's code against the shared runtime. Before
    *  invoking `run()`, stage every workspace file into the runtime's
@@ -841,7 +882,9 @@ export default function ChallengeCard({
           fileMap.set(
             name,
             encoder.encode(
-              name === resolvedEntryFilename ? entrySource : content,
+              name === resolvedEntryFilename
+                ? entrySource
+                : effectiveSourceFor(name, content),
             ),
           );
         }
@@ -909,7 +952,7 @@ export default function ChallengeCard({
       const elapsedMs = performance.now() - startedAt;
       return { cells, elapsedMs };
     },
-    [adapter, isMultiFile, resolvedEntryFilename],
+    [adapter, isMultiFile, resolvedEntryFilename, effectiveSourceFor],
   );
 
   const formatElapsed = (ms: number) =>
@@ -920,7 +963,7 @@ export default function ChallengeCard({
     setActiveAction("run");
     const snapshot = snapshotAllFiles();
     const entryCode = snapshot.get(resolvedEntryFilename) ?? "";
-    const combined = hasInit ? `${trimmedInit}\n${entryCode}` : entryCode;
+    const combined = effectiveSourceFor(resolvedEntryFilename, entryCode);
     try {
       const { cells, elapsedMs } = await execute(combined, snapshot);
       setOutputs(cells);
@@ -943,7 +986,7 @@ export default function ChallengeCard({
     } finally {
       setActiveAction(null);
     }
-  }, [execute, hasInit, resolvedEntryFilename, snapshotAllFiles, trimmedInit]);
+  }, [execute, resolvedEntryFilename, snapshotAllFiles, effectiveSourceFor]);
 
   // ─── Check Answer (run + tests) ─────────────────────────────────────
   const check = useCallback(async () => {
@@ -951,9 +994,7 @@ export default function ChallengeCard({
     setActiveAction("submit");
     const snapshot = snapshotAllFiles();
     const entryCode = snapshot.get(resolvedEntryFilename) ?? "";
-    const userPart = hasInit
-      ? mergeInitAndEntry(adapter.id, trimmedInit, entryCode)
-      : entryCode;
+    const userPart = effectiveSourceFor(resolvedEntryFilename, entryCode);
     // Build a native harness for the subset of tests that have a `code`
     // field. Stdout-based tests are evaluated separately after the run.
     const harness = buildHarness(adapter.id, tests);
@@ -1061,11 +1102,10 @@ export default function ChallengeCard({
     adapter.id,
     canCheck,
     execute,
-    hasInit,
     resolvedEntryFilename,
     snapshotAllFiles,
+    effectiveSourceFor,
     tests,
-    trimmedInit,
   ]);
 
   // Keep the keymap closure pointing at the latest `run` handler.
@@ -1120,11 +1160,8 @@ export default function ChallengeCard({
     // file's saved copy from localStorage so the next mount picks up
     // the starter cleanly, and reload the active doc into the editor.
     for (const f of workspaceFiles) {
-      fileBuffersRef.current.set(f.filename, f.initialContent);
-      const key = isMultiFile
-        ? persistedKeyForFile(f.filename)
-        : persistedKey;
-      clearPersistedCode(key);
+      fileBuffersRef.current.set(f.filename, f.starterCode);
+      clearPersistedCode(persistedKeyForFile(f.filename));
     }
     const view = editorRef.current;
     if (view) {
@@ -1145,13 +1182,7 @@ export default function ChallengeCard({
     setTestResults([]);
     setBannerState(null);
     toasts.show("Reset to starter code.");
-  }, [
-    isMultiFile,
-    persistedKey,
-    persistedKeyForFile,
-    toasts,
-    workspaceFiles,
-  ]);
+  }, [persistedKeyForFile, toasts, workspaceFiles]);
 
   // ─── Test hook ─────────────────────────────────────────────────────
   // Expose an imperative driver on `window.__dsChallenges` so the
@@ -1201,11 +1232,11 @@ export default function ChallengeCard({
           }
         } else {
           // Persist so a later tab-switch picks up the new buffer.
-          const persisted = isMultiFile
-            ? persistedKeyForFile(filename)
-            : persistedKey;
           try {
-            window.localStorage.setItem(persisted, content);
+            window.localStorage.setItem(
+              persistedKeyForFile(filename),
+              content,
+            );
           } catch {
             /* quota / private mode — ignore, in-memory buffer still updated */
           }
@@ -1250,8 +1281,6 @@ export default function ChallengeCard({
     title,
     resolvedEntryFilename,
     workspaceFiles,
-    isMultiFile,
-    persistedKey,
     persistedKeyForFile,
   ]);
 
@@ -1385,81 +1414,11 @@ export default function ChallengeCard({
         </div>
       </div>
 
-      {/* ── Init code ──
-            When ≤3 lines: always shown expanded, no toggle header.
-            When >3 lines: collapsed by default with a gradient fade
-            overlay and "Click to expand" prompt; the toggle header
-            lets the user also collapse it again after expanding. */}
-      {hasInit && (
-        <div className={`${styles.initWrap} ${styles.topBorderLight}`}>
-          {initLineCount > 3 && (
-            <button
-              type="button"
-              className={styles.initToggle}
-              aria-expanded={initExpanded}
-              aria-controls={initPanelId}
-              onClick={() => setInitExpanded((v) => !v)}
-            >
-              <span
-                className={`${styles.initCaret} ${
-                  initExpanded ? styles.initCaretOpen : ""
-                }`}
-                aria-hidden
-              >
-                ▶
-              </span>
-              <span className={styles.initLabel}>
-                Initialization code ({adapter.runtimeInfo.language})
-              </span>
-              <span className={styles.initMeta}>
-                {initLineCount} line{initLineCount === 1 ? "" : "s"} · read-only
-              </span>
-            </button>
-          )}
-          <div
-            className={`${styles.initEditorWrap} ${
-              initLineCount <= 3 || initExpanded
-                ? styles.initEditorWrapOpen
-                : styles.initEditorWrapCollapsed
-            }`}
-          >
-            <div
-              id={initPanelId}
-              className={styles.initEditor}
-              ref={initEditorHostRef}
-              aria-label="Initialization code (read-only)"
-            />
-            {!initExpanded && initLineCount > 3 && (
-              <button
-                type="button"
-                className={styles.initFade}
-                aria-label="Expand initialization code"
-                title="Expand initialization code"
-                onClick={() => setInitExpanded(true)}
-              >
-                <span className={styles.initFadeLabel}>
-                  <ChevronDown size={13} strokeWidth={2} aria-hidden />
-                  Click to expand
-                </span>
-              </button>
-            )}
-            {initExpanded && initLineCount > 3 && (
-              <button
-                type="button"
-                className={styles.initCollapseBtn}
-                aria-label="Collapse initialization code"
-                onClick={() => setInitExpanded(false)}
-              >
-                <ChevronUp size={13} strokeWidth={2} aria-hidden />
-                Click to collapse
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ── File tab bar (multi-file workspaces only) ── */}
-      {isMultiFile && (
+      {/* ── File tab bar ──
+            Shown for multi-file workspaces, or when a single-file card
+            opts in via `showFileTabBar`. The init drawer (which now
+            belongs to the active file) renders below it. */}
+      {showTabs && (
         <div
           className={styles.fileTabBar}
           role="tablist"
@@ -1493,13 +1452,93 @@ export default function ChallengeCard({
         </div>
       )}
 
+      {/* ── Init code (active file) ──
+            The init drawer belongs to the active file and renders below
+            the file tab bar. When ≤3 lines: always shown expanded, no
+            toggle header. When >3 lines: collapsed by default with a
+            gradient fade overlay and "Click to expand" prompt; the toggle
+            header lets the user collapse it again. The light top border
+            is added only when no file tab bar sits above it. */}
+      {activeHasInit && (
+        <div
+          className={`${styles.initWrap}${
+            showTabs ? "" : ` ${styles.topBorderLight}`
+          }`}
+        >
+          {activeInitLineCount > 3 && (
+            <button
+              type="button"
+              className={styles.initToggle}
+              aria-expanded={initExpanded}
+              aria-controls={initPanelId}
+              onClick={() => setInitExpanded((v) => !v)}
+            >
+              <span
+                className={`${styles.initCaret} ${
+                  initExpanded ? styles.initCaretOpen : ""
+                }`}
+                aria-hidden
+              >
+                ▶
+              </span>
+              <span className={styles.initLabel}>
+                Initialization code ({adapter.runtimeInfo.language})
+              </span>
+              <span className={styles.initMeta}>
+                {activeInitLineCount} line{activeInitLineCount === 1 ? "" : "s"} ·
+                read-only
+              </span>
+            </button>
+          )}
+          <div
+            className={`${styles.initEditorWrap} ${
+              activeInitLineCount <= 3 || initExpanded
+                ? styles.initEditorWrapOpen
+                : styles.initEditorWrapCollapsed
+            }`}
+          >
+            <div
+              id={initPanelId}
+              className={styles.initEditor}
+              ref={initEditorHostRef}
+              aria-label="Initialization code (read-only)"
+            />
+            {!initExpanded && activeInitLineCount > 3 && (
+              <button
+                type="button"
+                className={styles.initFade}
+                aria-label="Expand initialization code"
+                title="Expand initialization code"
+                onClick={() => setInitExpanded(true)}
+              >
+                <span className={styles.initFadeLabel}>
+                  <ChevronDown size={13} strokeWidth={2} aria-hidden />
+                  Click to expand
+                </span>
+              </button>
+            )}
+            {initExpanded && activeInitLineCount > 3 && (
+              <button
+                type="button"
+                className={styles.initCollapseBtn}
+                aria-label="Collapse initialization code"
+                onClick={() => setInitExpanded(false)}
+              >
+                <ChevronUp size={13} strokeWidth={2} aria-hidden />
+                Click to collapse
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* ── Editor ──
-            A single-file challenge card with no init drawer has nothing
-            above the editor to supply a divider (no init panel, no file
-            tab bar), so add a light top border in that case. */}
+            Gets a light top border only when nothing above it (file tab
+            bar or the active file's init drawer) already supplies a
+            divider. */}
       <div
         className={`${styles.editor}${
-          !hasInit && !isMultiFile ? ` ${styles.topBorderLight}` : ""
+          !activeHasInit && !showTabs ? ` ${styles.topBorderLight}` : ""
         }`}
         ref={editorHostRef}
         aria-label={`${adapter.runtimeInfo.language} solution editor`}
