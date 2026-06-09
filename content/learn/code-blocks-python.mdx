@@ -27,6 +27,22 @@ print("x.upper() =", x.upper())
   ]}
 />
 
+```jsx
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `x = "3" * 3 + "3"
+print(x)
+print("len(x) =", len(x))
+print("x.upper() =", x.upper())
+`,
+    },
+  ]}
+/>
+```
+
 ## DataFrames render as tables
 
 Anything passed to `display()` (or returned as the last expression of a
@@ -50,6 +66,23 @@ display(df)
     },
   ]}
 />
+
+```jsx
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.DataFrame({'A': [1, 2, 3], 'B': ['Hello', 'Bye', 'World']})`,
+      starterCode: `# 'df' was created by the initialization code above.
+print("Shape:", df.shape)
+display(df)
+`,
+    },
+  ]}
+/>
+```
 
 ## Matplotlib figures
 
@@ -75,6 +108,28 @@ plt.show()
   ]}
 />
 
+```jsx
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import matplotlib.pyplot as plt
+import numpy as np
+
+x = np.linspace(0, 2 * np.pi, 200)
+plt.figure(figsize=(6, 3))
+plt.plot(x, np.sin(x), label="sin")
+plt.plot(x, np.cos(x), label="cos")
+plt.legend()
+plt.title("Trig functions")
+plt.show()
+`,
+    },
+  ]}
+/>
+```
+
 ## Interactive Plotly charts
 
 Plotly figures render as fully interactive charts — the same rendering
@@ -98,6 +153,27 @@ fig.show()
     },
   ]}
 />
+
+```jsx
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.graph_objects as go
+import numpy as np
+
+t = np.linspace(0, 10, 200)
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=t, y=np.sin(t), name="sin", mode="lines"))
+fig.add_trace(go.Scatter(x=t, y=np.cos(t), name="cos", mode="lines"))
+fig.update_layout(title="Hover, zoom, and pan")
+fig.show()
+`,
+    },
+  ]}
+/>
+```
 
 ## Multiple files
 
@@ -137,7 +213,7 @@ The MDX source for the example above:
   files={[
     {
       filename: "main.py",
-      initialContent: `from greetings import hello, bye
+      starterCode: `from greetings import hello, bye
 
 print(hello("Python Playground"))
 print(bye("Python Playground"))
@@ -145,7 +221,7 @@ print(bye("Python Playground"))
     },
     {
       filename: "greetings.py",
-      initialContent: `def hello(name: str) -> str:
+      starterCode: `def hello(name: str) -> str:
     return f"Hello, {name}!"
 
 
@@ -181,6 +257,23 @@ print(f"area = {math.pi * RADIUS**2:.2f}")
   ]}
 />
 
+```jsx
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import math
+
+RADIUS = 5`,
+      starterCode: `# RADIUS and math come from the initialization code above.
+print(f"area = {math.pi * RADIUS**2:.2f}")
+`,
+    },
+  ]}
+/>
+```
+
 A longer init (4 lines or more), collapsed by default:
 
 <CodeBlock
@@ -199,3 +292,22 @@ display(df)
     },
   ]}
 />
+
+```jsx
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame(
+    {"name": ["Ada", "Linus", "Grace"], "score": [92, 88, 95]}
+)`,
+      starterCode: `# 'df' was created by the initialization code above.
+display(df)
+`,
+    },
+  ]}
+/>
+```

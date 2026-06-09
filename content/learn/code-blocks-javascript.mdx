@@ -22,6 +22,21 @@ console.log("π ≈", Math.PI.toFixed(4));
   ]}
 />
 
+```jsx
+<CodeBlock
+  adapter="javascript"
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const greet = (who) => \`Hello, \${who}!\`;
+console.log(greet("learner"));
+console.log("π ≈", Math.PI.toFixed(4));
+`,
+    },
+  ]}
+/>
+```
+
 ## Top-level await
 
 User code is wrapped in an `async` function, so you can `await`
@@ -39,6 +54,21 @@ console.log("Done waiting!");
     },
   ]}
 />
+
+```jsx
+<CodeBlock
+  adapter="javascript"
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+await wait(50);
+console.log("Done waiting!");
+`,
+    },
+  ]}
+/>
+```
 
 ## Working with arrays
 
@@ -58,6 +88,25 @@ console.log("Total revenue:", total.toLocaleString());
     },
   ]}
 />
+
+```jsx
+<CodeBlock
+  adapter="javascript"
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const sales = [
+  { product: "A", revenue: 42000 },
+  { product: "B", revenue: 51000 },
+  { product: "C", revenue: 29000 },
+];
+const total = sales.reduce((s, r) => s + r.revenue, 0);
+console.log("Total revenue:", total.toLocaleString());
+`,
+    },
+  ]}
+/>
+```
 
 ## Multiple files
 
@@ -100,7 +149,7 @@ The MDX source for the example above:
   files={[
     {
       filename: "index.js",
-      initialContent: `const { hello, bye } = require("./greetings");
+      starterCode: `const { hello, bye } = require("./greetings");
 
 console.log(hello("JavaScript Playground"));
 console.log(bye("JavaScript Playground"));
@@ -108,7 +157,7 @@ console.log(bye("JavaScript Playground"));
     },
     {
       filename: "greetings.js",
-      initialContent: `function hello(name) {
+      starterCode: `function hello(name) {
   return \`Hello, \${name}!\`;
 }
 
@@ -145,6 +194,21 @@ console.log(greeting + ", world!");
   ]}
 />
 
+```jsx
+<CodeBlock
+  adapter="javascript"
+  files={[
+    {
+      filename: "main.js",
+      initCode: `const greeting = "Hello";`,
+      starterCode: `// 'greeting' comes from the initialization code above.
+console.log(greeting + ", world!");
+`,
+    },
+  ]}
+/>
+```
+
 A longer init (4 lines or more), collapsed by default:
 
 <CodeBlock
@@ -163,3 +227,22 @@ console.log("total:", total);
     },
   ]}
 />
+
+```jsx
+<CodeBlock
+  adapter="javascript"
+  files={[
+    {
+      filename: "main.js",
+      initCode: `const orders = [
+  { id: 1, total: 42 },
+  { id: 2, total: 17 },
+];`,
+      starterCode: `// 'orders' comes from the initialization code above.
+const total = orders.reduce((sum, o) => sum + o.total, 0);
+console.log("total:", total);
+`,
+    },
+  ]}
+/>
+```

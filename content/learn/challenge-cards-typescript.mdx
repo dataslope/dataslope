@@ -59,21 +59,26 @@ console.log(identity<string>("hello"));
   adapter="typescript"
   title="Generic identity function"
   instructions={`Define a generic function \`identity<T>(x: T): T\` that returns its argument unchanged. The test checks that it preserves both the value and the type at runtime (TypeScript erases types, so we only verify the value).`}
-  starterCode={`function identity<T>(x: T): T {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function identity<T>(x: T): T {
   // your code here
   return x;
 }
 
 console.log(identity(42));
 console.log(identity("hello"));
-`}
-  solutionCode={`function identity<T>(value: T): T {
+`,
+      solutionCode: `function identity<T>(value: T): T {
   return value;
 }
 
 console.log(identity<number>(42));
 console.log(identity<string>("hello"));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "number",
@@ -172,12 +177,15 @@ console.log(area({ kind: "rect", width: 3, height: 5 }));
 - Circle: π · r²
 - Square: side²
 - Rect: width · height`}
-  initCode={`type Shape =
+  files={[
+    {
+      filename: "main.ts",
+      initCode: `type Shape =
   | { kind: "circle"; radius: number }
   | { kind: "square"; side: number }
   | { kind: "rect"; width: number; height: number };
-`}
-  starterCode={`function area(shape: Shape): number {
+`,
+      starterCode: `function area(shape: Shape): number {
   // your code here
   return 0;
 }
@@ -185,8 +193,8 @@ console.log(area({ kind: "rect", width: 3, height: 5 }));
 console.log(area({ kind: "circle", radius: 1 }));
 console.log(area({ kind: "square", side: 4 }));
 console.log(area({ kind: "rect", width: 3, height: 5 }));
-`}
-  solutionCode={`function area(shape: Shape): number {
+`,
+      solutionCode: `function area(shape: Shape): number {
   switch (shape.kind) {
     case "circle":
       return Math.PI * shape.radius * shape.radius;
@@ -200,7 +208,9 @@ console.log(area({ kind: "rect", width: 3, height: 5 }));
 console.log(area({ kind: "circle", radius: 1 }));
 console.log(area({ kind: "square", side: 4 }));
 console.log(area({ kind: "rect", width: 3, height: 5 }));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "circle",
@@ -254,12 +264,17 @@ console.log(message);
 <ChallengeCard
   adapter="typescript"
   title="Print Hello, TS!"
-  starterCode={`// Print the exact greeting below.
-`}
-  instructions={`Make the program print exactly \`Hello, TS!\`.`}
-  solutionCode={`const message: string = "Hello, TS!";
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Print the exact greeting below.
+`,
+      solutionCode: `const message: string = "Hello, TS!";
 console.log(message);
-`}
+`,
+    },
+  ]}
+  instructions={`Make the program print exactly \`Hello, TS!\`.`}
   tests={[
     {
       id: "stdout",
@@ -308,17 +323,17 @@ sibling files.
 <ChallengeCard
   adapter="typescript"
   title="Implement greet() in utils.ts"
-  instructions={`Open utils.ts and implement greet(name) ...`}
+  instructions={`Open \`utils.ts\` and implement \`greet(name)\` so that it returns the string \`"Hello, <name>!"\`. The entry script \`main.ts\` already imports your function and prints the result.`}
   entryFilename="main.ts"
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { greet } from "./utils";\nconsole.log(greet("World"));\n`,
+      starterCode: `import { greet } from "./utils";\nconsole.log(greet("World"));\n`,
     },
     {
       filename: "utils.ts",
-      initialContent: `export function greet(name: string): string {\n  return "";\n}\n`,
-      solutionContent: `export function greet(name: string): string {\n  return \`Hello, \${name}!\`;\n}\n`,
+      starterCode: `export function greet(name: string): string {\n  // your code here\n  return "";\n}\n`,
+      solutionCode: `export function greet(name: string): string {\n  return \`Hello, \${name}!\`;\n}\n`,
     },
   ]}
   tests={[

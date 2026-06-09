@@ -52,7 +52,10 @@ class Program
   adapter="csharp"
   title="Print a greeting"
   instructions={`Make the program print exactly \`Hello, C#!\`.`}
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 class Program
 {
@@ -61,8 +64,8 @@ class Program
         // your code here
     }
 }
-`}
-  solutionCode={`using System;
+`,
+      solutionCode: `using System;
 
 class Program
 {
@@ -71,7 +74,9 @@ class Program
         Console.WriteLine("Hello, C#!");
     }
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "hello",
@@ -135,7 +140,10 @@ class Program
   adapter="csharp"
   title="Sum of squares"
   instructions={`Given the integer array \`nums\` below, compute the sum of squares of its elements and print the result.`}
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 class Program
@@ -146,8 +154,8 @@ class Program
         // your code here
     }
 }
-`}
-  solutionCode={`using System;
+`,
+      solutionCode: `using System;
 
 class Program
 {
@@ -160,7 +168,9 @@ class Program
         Console.WriteLine(sum);
     }
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "sum_squares",
@@ -251,7 +261,10 @@ class Program
   adapter="csharp"
   title="Implement a Point's distance"
   instructions={`Add a method \`DistanceTo(Point other)\` to the \`Point\` class that returns the Euclidean distance between two points. The driver code prints the distance from (0, 0) to (3, 4), which should be exactly \`5\`.`}
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 class Point
 {
@@ -276,8 +289,8 @@ class Program
         Console.WriteLine(a.DistanceTo(b));
     }
 }
-`}
-  solutionCode={`using System;
+`,
+      solutionCode: `using System;
 
 class Point
 {
@@ -303,7 +316,9 @@ class Program
         Console.WriteLine(a.DistanceTo(b));
     }
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "distance",
@@ -352,17 +367,17 @@ types defined in sibling files.
 <ChallengeCard
   adapter="csharp"
   title="Implement Greeter.Greet()"
-  instructions={`Open Greeter.cs and implement Greet() ...`}
+  instructions={`Open \`Greeter.cs\` and implement \`Greet()\` so that it returns the string \`"Hello, World!"\`. The entry script \`Main.cs\` already constructs a \`Greeter\` and prints the result.`}
   entryFilename="Main.cs"
   files={[
     {
       filename: "Main.cs",
-      initialContent: `var g = new Greeter();\nSystem.Console.WriteLine(g.Greet());\n`,
+      starterCode: `var g = new Greeter();\nSystem.Console.WriteLine(g.Greet());\n`,
     },
     {
       filename: "Greeter.cs",
-      initialContent: `public class Greeter\n{\n    public string Greet()\n    {\n        return "";\n    }\n}\n`,
-      solutionContent: `public class Greeter\n{\n    public string Greet()\n    {\n        return "Hello, World!";\n    }\n}\n`,
+      starterCode: `public class Greeter\n{\n    public string Greet()\n    {\n        // your code here\n        return "";\n    }\n}\n`,
+      solutionCode: `public class Greeter\n{\n    public string Greet()\n    {\n        return "Hello, World!";\n    }\n}\n`,
     },
   ]}
   tests={[

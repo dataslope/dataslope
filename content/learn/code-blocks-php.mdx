@@ -27,6 +27,26 @@ foreach ($names as $i => $name) {
   ]}
 />
 
+```jsx
+<CodeBlock
+  adapter="php"
+  files={[
+    {
+      filename: "main.php",
+      starterCode: `<?php
+
+echo 'Hello from PHP ' . PHP_VERSION . "!\\n";
+
+$names = ['Ada', 'Linus', 'Grace'];
+foreach ($names as $i => $name) {
+    echo ($i + 1) . ". $name\\n";
+}
+`,
+    },
+  ]}
+/>
+```
+
 ## Arrays and JSON
 
 <CodeBlock
@@ -47,6 +67,27 @@ echo json_encode($people, JSON_PRETTY_PRINT);
     },
   ]}
 />
+
+```jsx
+<CodeBlock
+  adapter="php"
+  files={[
+    {
+      filename: "main.php",
+      starterCode: `<?php
+
+$people = [
+    ['name' => 'Ada', 'score' => 92],
+    ['name' => 'Linus', 'score' => 88],
+    ['name' => 'Grace', 'score' => 95],
+];
+usort($people, fn($a, $b) => $b['score'] - $a['score']);
+echo json_encode($people, JSON_PRETTY_PRINT);
+`,
+    },
+  ]}
+/>
+```
 
 ## Multiple files
 
@@ -93,7 +134,7 @@ The MDX source for the example above:
   files={[
     {
       filename: "index.php",
-      initialContent: `<?php
+      starterCode: `<?php
 
 require_once __DIR__ . '/greetings.php';
 
@@ -103,7 +144,7 @@ echo bye('PHP Playground') . "\\n";
     },
     {
       filename: "greetings.php",
-      initialContent: `<?php
+      starterCode: `<?php
 
 function hello(string $name): string
 {
@@ -145,6 +186,24 @@ foreach ($names as $i => $name) {
   ]}
 />
 
+```jsx
+<CodeBlock
+  adapter="php"
+  files={[
+    {
+      filename: "main.php",
+      initCode: `<?php
+$names = ["Ada", "Linus", "Grace"];`,
+      starterCode: `// $names comes from the initialization code above.
+foreach ($names as $i => $name) {
+    echo ($i + 1) . ". " . $name . PHP_EOL;
+}
+`,
+    },
+  ]}
+/>
+```
+
 A longer init (4 lines or more), collapsed by default:
 
 <CodeBlock
@@ -164,3 +223,23 @@ echo json_encode($people, JSON_PRETTY_PRINT) . PHP_EOL;
     },
   ]}
 />
+
+```jsx
+<CodeBlock
+  adapter="php"
+  files={[
+    {
+      filename: "main.php",
+      initCode: `<?php
+$people = [
+    ["name" => "Ada", "score" => 92],
+    ["name" => "Linus", "score" => 88],
+];`,
+      starterCode: `// $people comes from the initialization code above.
+usort($people, fn($a, $b) => $b["score"] - $a["score"]);
+echo json_encode($people, JSON_PRETTY_PRINT) . PHP_EOL;
+`,
+    },
+  ]}
+/>
+```

@@ -25,6 +25,24 @@ int main() {
   ]}
 />
 
+```jsx
+<CodeBlock
+  adapter="cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
+
+int main() {
+  std::cout << "Hello, C++!" << std::endl;
+  return 0;
+}
+`,
+    },
+  ]}
+/>
+```
+
 ## STL: vectors and algorithms
 
 <CodeBlock
@@ -52,6 +70,34 @@ int main() {
     },
   ]}
 />
+
+```jsx
+<CodeBlock
+  adapter="cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
+#include <iostream>
+#include <numeric>
+#include <vector>
+
+int main() {
+  std::vector<int> xs = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3};
+  std::sort(xs.begin(), xs.end());
+  int sum = std::accumulate(xs.begin(), xs.end(), 0);
+
+  std::cout << "sorted:";
+  for (int x : xs)
+    std::cout << " " << x;
+  std::cout << "\\nsum: " << sum << "\\n";
+  return 0;
+}
+`,
+    },
+  ]}
+/>
+```
 
 ## Multiple files
 
@@ -116,7 +162,7 @@ The MDX source for the example above:
   files={[
     {
       filename: "main.cpp",
-      initialContent: `#include "greeter.hpp"
+      starterCode: `#include "greeter.hpp"
 #include <iostream>
 
 int main() {
@@ -129,7 +175,7 @@ int main() {
     },
     {
       filename: "greeter.hpp",
-      initialContent: `#ifndef GREETER_HPP
+      starterCode: `#ifndef GREETER_HPP
 #define GREETER_HPP
 
 #include <string>
@@ -149,7 +195,7 @@ private:
     },
     {
       filename: "greeter.cpp",
-      initialContent: `#include "greeter.hpp"
+      starterCode: `#include "greeter.hpp"
 
 Greeter::Greeter(std::string name) : name_(std::move(name)) {}
 
@@ -187,6 +233,25 @@ int main() {
   ]}
 />
 
+```jsx
+<CodeBlock
+  adapter="cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      initCode: `#include <iostream>
+using namespace std;`,
+      starterCode: `// <iostream> and std come from the initialization code above.
+int main() {
+  cout << "Hello, C++!" << endl;
+  return 0;
+}
+`,
+    },
+  ]}
+/>
+```
+
 A longer init (4 lines or more), collapsed by default:
 
 <CodeBlock
@@ -208,3 +273,25 @@ int main() {
     },
   ]}
 />
+
+```jsx
+<CodeBlock
+  adapter="cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      initCode: `#include <iostream>
+#include <vector>
+#include <numeric>
+using namespace std;`,
+      starterCode: `// The includes and std come from the initialization code above.
+int main() {
+  vector<int> xs = {1, 2, 3, 4};
+  cout << "sum = " << accumulate(xs.begin(), xs.end(), 0) << endl;
+  return 0;
+}
+`,
+    },
+  ]}
+/>
+```

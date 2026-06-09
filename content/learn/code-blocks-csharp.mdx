@@ -26,6 +26,25 @@ for (int i = 1; i <= 3; i++)
   ]}
 />
 
+```jsx
+<CodeBlock
+  adapter="csharp"
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
+
+Console.WriteLine("Hello, C#!");
+for (int i = 1; i <= 3; i++)
+{
+    Console.WriteLine($"  i = {i}");
+}
+`,
+    },
+  ]}
+/>
+```
+
 ## LINQ over collections
 
 <CodeBlock
@@ -45,6 +64,26 @@ Console.WriteLine($"mean:   {xs.Average():F2}");
     },
   ]}
 />
+
+```jsx
+<CodeBlock
+  adapter="csharp"
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
+using System.Linq;
+
+var xs = new[] { 3, 1, 4, 1, 5, 9, 2, 6, 5, 3 };
+var sorted = xs.OrderBy(x => x).ToArray();
+Console.WriteLine($"sorted: [{string.Join(", ", sorted)}]");
+Console.WriteLine($"sum:    {xs.Sum()}");
+Console.WriteLine($"mean:   {xs.Average():F2}");
+`,
+    },
+  ]}
+/>
+```
 
 ## Multiple files
 
@@ -89,14 +128,14 @@ The MDX source for the example above:
   files={[
     {
       filename: "Program.cs",
-      initialContent: `var g = new Greeter("C# Playground");
+      starterCode: `var g = new Greeter("C# Playground");
 Console.WriteLine(g.Hello());
 Console.WriteLine(g.Bye());
 `,
     },
     {
       filename: "Greeter.cs",
-      initialContent: `public class Greeter
+      starterCode: `public class Greeter
 {
     private readonly string _name;
 
@@ -138,6 +177,23 @@ Console.WriteLine($"sum = {xs.Sum()}");
   ]}
 />
 
+```jsx
+<CodeBlock
+  adapter="csharp"
+  files={[
+    {
+      filename: "main.cs",
+      initCode: `using System;
+using System.Linq;`,
+      starterCode: `// The using directives come from the initialization code above.
+int[] xs = { 1, 2, 3 };
+Console.WriteLine($"sum = {xs.Sum()}");
+`,
+    },
+  ]}
+/>
+```
+
 A longer init (4 lines or more), collapsed by default:
 
 <CodeBlock
@@ -159,3 +215,25 @@ Console.WriteLine(sb.ToString().Trim());
     },
   ]}
 />
+
+```jsx
+<CodeBlock
+  adapter="csharp"
+  files={[
+    {
+      filename: "main.cs",
+      initCode: `using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Text;`,
+      starterCode: `// The using directives come from the initialization code above.
+var names = new List<string> { "Ada", "Linus", "Grace" };
+var sb = new StringBuilder();
+foreach (var n in names.OrderBy(x => x))
+    sb.Append(n).Append(" ");
+Console.WriteLine(sb.ToString().Trim());
+`,
+    },
+  ]}
+/>
+```
