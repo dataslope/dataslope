@@ -30,7 +30,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { RotateCcw, Check, X, ChevronDown, ChevronUp, Eye, File, Play, Terminal } from "lucide-react";
+import { RotateCcw, Check, X, ChevronDown, ChevronUp, Eye, File, FileInput, Play, Terminal } from "lucide-react";
 import { Menu } from "@base-ui-components/react/menu";
 import {
   CopyIcon,
@@ -1184,6 +1184,47 @@ export default function ChallengeCard({
     toasts.show("Reset to starter code.");
   }, [persistedKeyForFile, toasts, workspaceFiles]);
 
+  // ─── Apply solution ────────────────────────────────────────────────
+  // Load every file's reference solution into the learner's editor (the
+  // "Load Solution into Editor" button in the solution modal). Files
+  // without their own solution are scaffold the learner isn't meant to
+  // change, so they're left untouched. The active file is written
+  // straight into the live editor; if it has no solution of its own we
+  // hop to the first file that does, so the applied code lands on screen
+  // instead of silently in a background buffer.
+  const applySolutionToEditor = useCallback(() => {
+    const solvable = solutionFiles.filter((f) => f.hasSolution);
+    if (solvable.length === 0) return;
+    const view = editorRef.current;
+    const active = activeFilenameRef.current;
+
+    for (const f of solvable) {
+      fileBuffersRef.current.set(f.filename, f.source);
+      persistActiveFile(f.filename, f.source);
+      if (view && f.filename === active) {
+        view.dispatch({
+          changes: { from: 0, to: view.state.doc.length, insert: f.source },
+        });
+      }
+    }
+
+    // If the active tab is a scaffold file (no solution of its own),
+    // switch to the first solved file. The tab-switch effect snapshots
+    // the unchanged scaffold out and loads the freshly-set solution
+    // buffer in — no clobbering, since we never wrote the scaffold's
+    // buffer above.
+    if (!solvable.some((f) => f.filename === active)) {
+      setActiveFilename(solvable[0].filename);
+    }
+
+    setSolutionOpen(false);
+    toasts.show(
+      solvable.length === 1
+        ? `Solution loaded into ${solvable[0].filename}.`
+        : "Solution loaded into your editor.",
+    );
+  }, [solutionFiles, persistActiveFile, toasts]);
+
   // ─── Test hook ─────────────────────────────────────────────────────
   // Expose an imperative driver on `window.__dsChallenges` so the
   // Playwright solution sweep (e2e/challenge-solutions.spec.ts) can
@@ -1920,6 +1961,7 @@ export default function ChallengeCard({
           files={solutionFiles}
           activeFilename={activeSolutionFile.filename}
           onSelectFile={setSolutionActiveFilename}
+          onApplySolution={applySolutionToEditor}
           showTabs={isMultiFile}
         />
       )}
@@ -1935,6 +1977,7 @@ function SolutionModal({
   files,
   activeFilename,
   onSelectFile,
+  onApplySolution,
   showTabs,
 }: {
   onClose: () => void;
@@ -1943,8 +1986,12 @@ function SolutionModal({
   files: SolutionFile[];
   activeFilename: string;
   onSelectFile: (filename: string) => void;
+  onApplySolution: () => void;
   showTabs: boolean;
 }) {
+  const [copied, setCopied] = useState(false);
+  const copiedTimerRef = useRef<number | null>(null);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -1952,16 +1999,37 @@ function SolutionModal({
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
+  // Tidy the "Copied!" reset timer on unmount.
+  useEffect(
+    () => () => {
+      if (copiedTimerRef.current !== null)
+        window.clearTimeout(copiedTimerRef.current);
+    },
+    [],
+  );
 
-  const copySolution = useCallback(async () => {
+  // Copy the active file's raw solution — not the synthetic
+  // "init runs first" comment header that the read-only editor prepends
+  // for display when the file carries its own init code.
+  const activeRaw = useMemo(
+    () => files.find((f) => f.filename === activeFilename)?.source ?? source,
+    [files, activeFilename, source],
+  );
+  const handleCopy = useCallback(async () => {
     try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(source);
-      }
+      if (!navigator.clipboard?.writeText) return;
+      await navigator.clipboard.writeText(activeRaw);
+      setCopied(true);
+      if (copiedTimerRef.current !== null)
+        window.clearTimeout(copiedTimerRef.current);
+      copiedTimerRef.current = window.setTimeout(() => {
+        setCopied(false);
+        copiedTimerRef.current = null;
+      }, 1500);
     } catch {
-      /* ignore */
+      /* clipboard blocked — leave the label unchanged */
     }
-  }, [source]);
+  }, [activeRaw]);
 
   return (
     <div
@@ -1988,9 +2056,9 @@ function SolutionModal({
           <div className={styles.modalActions}>
             <button
               type="button"
-              onClick={() => void copySolution()}
-              aria-label="Copy solution"
-              title="Copy solution"
+              onClick={() => void handleCopy()}
+              aria-label={`Copy ${activeFilename}`}
+              title={`Copy ${activeFilename}`}
               className={styles.modalIconBtn}
             >
               <CopyIcon />
@@ -2049,6 +2117,32 @@ function SolutionModal({
           className={styles.modalEditor}
           aria-label="Solution editor (read-only)"
         />
+        {/* Action bar pinned below the read-only editor. Borderless
+            utility buttons mirror the card's own `.utilBtn`. */}
+        <div className={styles.solutionActionBar}>
+          <button
+            type="button"
+            className={styles.utilBtn}
+            onClick={() => void handleCopy()}
+            title={`Copy ${activeFilename} to clipboard`}
+          >
+            {copied ? (
+              <Check size={13} strokeWidth={2.4} aria-hidden />
+            ) : (
+              <CopyIcon />
+            )}
+            <span>{copied ? "Copied!" : `Copy ${activeFilename}`}</span>
+          </button>
+          <button
+            type="button"
+            className={styles.utilBtn}
+            onClick={onApplySolution}
+            title="Replace your editor's code with this solution"
+          >
+            <FileInput size={13} strokeWidth={2} aria-hidden />
+            <span>Load Solution into Editor</span>
+          </button>
+        </div>
       </div>
     </div>
   );

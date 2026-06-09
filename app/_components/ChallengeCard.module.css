@@ -337,6 +337,19 @@
   font-family: inherit;
 }
 
+/* Action bar pinned to the bottom of the solution modal, directly below
+   the read-only editor. A plain card-surface strip whose borderless
+   buttons (Copy <file> / Load Solution into Editor) reuse `.utilBtn`. */
+.solutionActionBar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  padding: 7px 12px;
+  background: var(--ch-bg);
+  border-top: 1px solid var(--ch-border-light);
+}
+
 /* ─── Instructions ────────────────────────────────────────────────── */
 
 .instructions {
