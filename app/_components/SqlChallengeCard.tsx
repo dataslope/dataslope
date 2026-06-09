@@ -35,7 +35,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { RotateCcw, Check, X, ChevronDown, Eye, Play, Database, Table, List } from "lucide-react";
+import { RotateCcw, Check, X, ChevronDown, Eye, Play, Database, Table, List, FileInput } from "lucide-react";
 import { Menu } from "@base-ui-components/react/menu";
 import {
   createColumnHelper,
@@ -1521,6 +1521,28 @@ export default function SqlChallengeCard({
     toasts.show("Reset to starter SQL.");
   }, [starterCode, persistedKey, ensureEngine, refreshTableViewer, clearTableViewer, tableViewerEnabled, toasts]);
 
+  // ─── Apply solution ─────────────────────────────────────────────────
+  // Load the reference SQL into the learner's editor (the "Load Solution
+  // into Editor" button in the solution modal), mirroring <ChallengeCard>.
+  const applySolutionToEditor = useCallback(() => {
+    if (!solutionSql) return;
+    const view = editorRef.current;
+    if (view) {
+      view.dispatch({
+        changes: { from: 0, to: view.state.doc.length, insert: solutionSql },
+      });
+    }
+    // Persist immediately and cancel the debounced save the dispatch above
+    // just scheduled, so closing the modal right away doesn't drop it.
+    if (persistSaveTimerRef.current !== null) {
+      window.clearTimeout(persistSaveTimerRef.current);
+      persistSaveTimerRef.current = null;
+    }
+    savePersistedCode(persistedKey, solutionSql);
+    setSolutionOpen(false);
+    toasts.show("Solution loaded into your editor.");
+  }, [solutionSql, persistedKey, toasts]);
+
   const copyCode = useCallback(async () => {
     const code = editorRef.current?.state.doc.toString() ?? "";
     try {
@@ -2004,6 +2026,7 @@ export default function SqlChallengeCard({
           onClose={() => setSolutionOpen(false)}
           editorHostRef={solutionEditorHostRef}
           source={solutionSql}
+          onApplySolution={applySolutionToEditor}
         />
       )}
 
@@ -2015,11 +2038,16 @@ function SolutionModal({
   onClose,
   editorHostRef,
   source,
+  onApplySolution,
 }: {
   onClose: () => void;
   editorHostRef: React.RefObject<HTMLDivElement | null>;
   source: string;
+  onApplySolution: () => void;
 }) {
+  const [copied, setCopied] = useState(false);
+  const copiedTimerRef = useRef<number | null>(null);
+
   // Trap-free modal: click on backdrop to close, Esc to close.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -2028,14 +2056,28 @@ function SolutionModal({
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
+  // Tidy the "Copied!" reset timer on unmount.
+  useEffect(
+    () => () => {
+      if (copiedTimerRef.current !== null)
+        window.clearTimeout(copiedTimerRef.current);
+    },
+    [],
+  );
 
-  const copySolution = useCallback(async () => {
+  const handleCopy = useCallback(async () => {
     try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(source);
-      }
+      if (!navigator.clipboard?.writeText) return;
+      await navigator.clipboard.writeText(source);
+      setCopied(true);
+      if (copiedTimerRef.current !== null)
+        window.clearTimeout(copiedTimerRef.current);
+      copiedTimerRef.current = window.setTimeout(() => {
+        setCopied(false);
+        copiedTimerRef.current = null;
+      }, 1500);
     } catch {
-      /* ignore */
+      /* clipboard blocked — leave the label unchanged */
     }
   }, [source]);
 
@@ -2064,7 +2106,7 @@ function SolutionModal({
           <div className={styles.modalActions}>
             <button
               type="button"
-              onClick={() => void copySolution()}
+              onClick={() => void handleCopy()}
               aria-label="Copy solution"
               title="Copy solution"
               className={styles.modalIconBtn}
@@ -2087,6 +2129,33 @@ function SolutionModal({
           className={styles.modalEditor}
           aria-label="Solution editor (read-only)"
         />
+        {/* Action bar pinned below the read-only editor. Borderless utility
+            buttons mirror <ChallengeCard>'s solution modal. */}
+        <div className={styles.solutionActionBar}>
+          <button
+            type="button"
+            className={styles.utilBtn}
+            onClick={() => void handleCopy()}
+            title="Copy solution query to clipboard"
+          >
+            {copied ? (
+              <Check size={13} strokeWidth={2.4} aria-hidden />
+            ) : (
+              <CopyIcon />
+            )}
+            <span>{copied ? "Copied!" : "Copy Solution Query"}</span>
+          </button>
+          <span className={styles.solutionActionSeparator} aria-hidden />
+          <button
+            type="button"
+            className={styles.utilBtn}
+            onClick={onApplySolution}
+            title="Replace your editor's code with this solution"
+          >
+            <FileInput size={13} strokeWidth={2} aria-hidden />
+            <span>Load Solution into Editor</span>
+          </button>
+        </div>
       </div>
     </div>
   );
