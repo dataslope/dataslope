@@ -351,13 +351,14 @@
 }
 
 /* Vertical hairline that separates the Copy button from the Load
-   Solution button in the action bar. */
+   Solution button in the action bar. Uses the same `--ch-border` color as
+   the main toolbar's `.btnGroupUtilSep` so the two separators match. */
 .solutionActionSeparator {
   width: 1px;
   height: 18px;
   flex-shrink: 0;
   margin: 0 4px;
-  background: var(--ch-border-light);
+  background: var(--ch-border);
 }
 
 /* Filename inside the "Copy <file>" button, rendered in the mono stack so

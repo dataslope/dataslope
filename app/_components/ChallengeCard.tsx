@@ -2061,7 +2061,7 @@ function SolutionModal({
       >
         <div className={styles.modalHeader}>
           <div className={styles.badge}>
-            <Terminal size={9} aria-hidden /> Solution
+            <Terminal size={9} aria-hidden />
           </div>
           <div className={styles.modalTitleArea}>
             <div className={styles.modalTitle}>Reference solution</div>

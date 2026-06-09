@@ -2095,7 +2095,7 @@ function SolutionModal({
       >
         <div className={styles.modalHeader}>
           <div className={styles.badge}>
-            <Database size={9} aria-hidden /> Solution
+            <Database size={9} aria-hidden />
           </div>
           <div className={styles.modalTitleArea}>
             <div className={styles.modalTitle}>Reference solution</div>
