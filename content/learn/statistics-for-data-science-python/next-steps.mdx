@@ -171,19 +171,22 @@ Produce the three numbers you should *always* report together for a comparison, 
 - \`d\`: Cohen's d for the difference (pooled standard deviation, \`ddof=1\`).
 
 This is the habit to carry forward: **effect size + uncertainty + significance**, never a p-value on its own.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 rng = np.random.default_rng(7)
 control   = rng.normal(100, 15, size=200)
-treatment = rng.normal(106, 15, size=200)`}
-  starterCode={`import numpy as np
+treatment = rng.normal(106, 15, size=200)`,
+      starterCode: `import numpy as np
 from scipy import stats
 
 # TODO: compute diff, p_value, and d (all floats)
 diff = None
 p_value = None
 d = None
-`}
-  solutionCode={`import numpy as np
+`,
+      solutionCode: `import numpy as np
 from scipy import stats
 
 diff = float(treatment.mean() - control.mean())
@@ -197,7 +200,9 @@ sp = np.sqrt(
 d = float((treatment.mean() - control.mean()) / sp)
 
 print(f"diff = {diff:+.2f}, p = {p_value:.4f}, d = {d:.3f}")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "types",

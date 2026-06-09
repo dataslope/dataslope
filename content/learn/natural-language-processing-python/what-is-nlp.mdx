@@ -114,13 +114,18 @@ comes next. Run this and read the output carefully.
 
 <CodeBlock
   adapter="python"
-  starterCode={`sentence = "I can't believe it's not butter, Mr. Jones!"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `sentence = "I can't believe it's not butter, Mr. Jones!"
 
 # The naive approach: split on whitespace.
 naive = sentence.split()
 print("split() gives:", naive)
 print("word count:", len(naive))
-`}
+`,
+    },
+  ]}
 />
 
 Look at what `.split()` produced. "can't" stayed glued together, so the
@@ -134,7 +139,10 @@ setup — it is loaded for you in the read-only section above the editor.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 # Installs NLTK and loads the data this page needs. nltk.download() isn't
 # available in this environment, so we fetch the data archives directly
 # and unpack them into NLTK's data directory.
@@ -160,13 +168,15 @@ async def _load_nltk(category, package):
         zf.extractall(dest)
 
 await _load_nltk("tokenizers", "punkt_tab")
-from nltk.tokenize import word_tokenize`}
-  starterCode={`sentence = "I can't believe it's not butter, Mr. Jones!"
+from nltk.tokenize import word_tokenize`,
+      starterCode: `sentence = "I can't believe it's not butter, Mr. Jones!"
 
 tokens = word_tokenize(sentence)
 print("word_tokenize gives:", tokens)
 print("token count:", len(tokens))
-`}
+`,
+    },
+  ]}
 />
 
 The tokenizer split "can't" into `ca` + `n't`, exposing the negation. It

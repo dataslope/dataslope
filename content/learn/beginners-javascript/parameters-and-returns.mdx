@@ -30,13 +30,18 @@ parameter in the same position — first to first, second to second.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function divide(numerator, denominator) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function divide(numerator, denominator) {
   return numerator / denominator;
 }
 
 console.log(divide(10, 2)); // 5
 console.log(divide(2, 10)); // 0.2  — order matters!
-`}
+`,
+    },
+  ]}
 />
 
 This makes long parameter lists fragile. If a function takes five
@@ -54,7 +59,10 @@ arguments. Both are legal.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function describe(name, age, city) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function describe(name, age, city) {
   console.log("name:", name);
   console.log("age: ", age);
   console.log("city:", city);
@@ -65,7 +73,9 @@ console.log("---");
 describe("Linus"); // age and city are undefined
 console.log("---");
 describe("Grace", 80, "NYC", "extra"); // the "extra" is silently dropped
-`}
+`,
+    },
+  ]}
 />
 
 This forgiveness is a double-edged sword. It makes JavaScript
@@ -80,7 +90,10 @@ not pass anything for it (or passes `undefined`).
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function greet(name, greeting = "Hello") {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function greet(name, greeting = "Hello") {
   return greeting + ", " + name + "!";
 }
 
@@ -88,7 +101,9 @@ console.log(greet("Ada")); // "Hello, Ada!"
 console.log(greet("Ada", "Welcome")); // "Welcome, Ada!"
 console.log(greet("Ada", undefined)); // "Hello, Ada!" — undefined triggers the default
 console.log(greet("Ada", null)); // "null, Ada!"  — null does NOT trigger the default
-`}
+`,
+    },
+  ]}
 />
 
 Defaults are a great way to make a function easier to use without
@@ -101,7 +116,10 @@ with, gather them with a **rest parameter** (`...name`):
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function sum(...numbers) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function sum(...numbers) {
   let total = 0;
   for (const n of numbers) total += n;
   return total;
@@ -111,7 +129,9 @@ console.log(sum()); // 0
 console.log(sum(1)); // 1
 console.log(sum(1, 2, 3)); // 6
 console.log(sum(10, 20, 30, 40)); // 100
-`}
+`,
+    },
+  ]}
 />
 
 `numbers` is a real array containing all the arguments. The rest
@@ -133,7 +153,10 @@ call site:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function add(a, b, c) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function add(a, b, c) {
   return a + b + c;
 }
 
@@ -144,7 +167,9 @@ console.log(add(triple[0], triple[1], triple[2])); // 60
 
 // With spread:
 console.log(add(...triple)); // 60
-`}
+`,
+    },
+  ]}
 />
 
 The same `...` syntax means **rest** in a parameter list and
@@ -164,7 +189,10 @@ things to know:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function findFirstNegative(numbers) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function findFirstNegative(numbers) {
   for (const n of numbers) {
     if (n < 0) return n; // exit the function the moment we find one
   }
@@ -173,7 +201,9 @@ things to know:
 
 console.log(findFirstNegative([1, 2, -3, 4])); // -3
 console.log(findFirstNegative([1, 2, 3, 4])); // null
-`}
+`,
+    },
+  ]}
 />
 
 The early `return` inside the `for` loop is idiomatic. There's no
@@ -187,7 +217,10 @@ return several related results.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function summarize(numbers) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function summarize(numbers) {
   let min = numbers[0],
     max = numbers[0],
     total = 0;
@@ -204,7 +237,9 @@ console.log("min:", min);
 console.log("max:", max);
 console.log("total:", total);
 console.log("average:", average);
-`}
+`,
+    },
+  ]}
 />
 
 The `const { min, max, ... } = ...` syntax is called
@@ -220,7 +255,10 @@ more readable than passing many separate positional arguments.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// Hard to read: which argument is which?
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// Hard to read: which argument is which?
 function format1(text, upper, trim, prefix, suffix) {
   let s = text;
   if (trim) s = s.trim();
@@ -242,7 +280,9 @@ function format2(
 console.log(
   format2("  hello  ", { trim: true, upper: true, prefix: "<", suffix: ">" }),
 );
-`}
+`,
+    },
+  ]}
 />
 
 Both calls produce the same string. The second is dramatically
@@ -265,7 +305,10 @@ behaviours:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function f() {}
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function f() {}
 f.label = "my function";
 console.log(f.label); // "my function"
 console.log(typeof f); // "function"
@@ -276,7 +319,9 @@ const g = () => 1;
 const h = () => 1;
 console.log(g === h); // false — two different function values, even with same body
 console.log(g === g); // true
-`}
+`,
+    },
+  ]}
 />
 
 ## Documenting parameters with JSDoc
@@ -286,7 +331,10 @@ to add a **JSDoc** comment block above it:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`/**
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `/**
  * Convert a temperature from Celsius to Fahrenheit.
  *
  * @param {number} celsius - The temperature in degrees Celsius.
@@ -298,7 +346,9 @@ function toFahrenheit(celsius) {
 
 console.log(toFahrenheit(100)); // 212
 console.log(toFahrenheit(0)); // 32
-`}
+`,
+    },
+  ]}
 />
 
 Editors (like VS Code) pick up JSDoc comments and use them for
@@ -319,7 +369,10 @@ Examples:
 - \`range(2, 8, 3)\` → \`[2, 5]\`
 
 Assume \`step\` is always positive and \`start <= end\`.`}
-  starterCode={`function range(start, end, step = 1) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function range(start, end, step = 1) {
   // your code here
   return [];
 }
@@ -328,8 +381,8 @@ console.log(range(0, 5));
 console.log(range(1, 10, 2));
 console.log(range(5, 5));
 console.log(range(2, 8, 3));
-`}
-  solutionCode={`function range(start, end, step = 1) {
+`,
+      solutionCode: `function range(start, end, step = 1) {
   const out = [];
   for (let i = start; i < end; i += step) out.push(i);
   return out;
@@ -339,7 +392,9 @@ console.log(range(0, 5));
 console.log(range(1, 10, 2));
 console.log(range(5, 5));
 console.log(range(2, 8, 3));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "default_step",

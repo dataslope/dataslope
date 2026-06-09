@@ -13,19 +13,24 @@ the test bodies differ.
   adapter="javascript"
   title="Sum of an array"
   instructions={`Define a function \`sumArray(xs)\` that returns the sum of all numbers in the array \`xs\`. An empty array should return \`0\`.`}
-  starterCode={`function sumArray(xs) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function sumArray(xs) {
   // your code here
   return 0;
 }
 
 console.log(sumArray([1, 2, 3, 4, 5]));
-`}
-  solutionCode={`function sumArray(xs) {
+`,
+      solutionCode: `function sumArray(xs) {
   return xs.reduce((a, b) => a + b, 0);
 }
 
 console.log(sumArray([1, 2, 3, 4, 5]));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "small",
@@ -53,19 +58,24 @@ console.log(sumArray([1, 2, 3, 4, 5]));
   adapter="javascript"
   title="Sum of an array"
   instructions={`Define a function \`sumArray(xs)\` that returns the sum of all numbers in the array \`xs\`. An empty array should return \`0\`.`}
-  starterCode={`function sumArray(xs) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function sumArray(xs) {
   // your code here
   return 0;
 }
 
 console.log(sumArray([1, 2, 3, 4, 5]));
-`}
-  solutionCode={`function sumArray(xs) {
+`,
+      solutionCode: `function sumArray(xs) {
   return xs.reduce((a, b) => a + b, 0);
 }
 
 console.log(sumArray([1, 2, 3, 4, 5]));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "small",
@@ -95,25 +105,30 @@ console.log(sumArray([1, 2, 3, 4, 5]));
   adapter="javascript"
   title="Group orders by customer"
   instructions={`Given the array \`orders\` defined above, build an object called \`byCustomer\` mapping each customer name to the total amount they spent (summed across their orders).`}
-  initCode={`const orders = [
+  files={[
+    {
+      filename: "main.js",
+      initCode: `const orders = [
   { customer: "Ada",   amount: 120 },
   { customer: "Linus", amount: 80 },
   { customer: "Ada",   amount: 30 },
   { customer: "Grace", amount: 200 },
   { customer: "Linus", amount: 50 },
 ];
-`}
-  starterCode={`let byCustomer = null; // TODO
+`,
+      starterCode: `let byCustomer = null; // TODO
 
 console.log(byCustomer);
-`}
-  solutionCode={`let byCustomer = {};
+`,
+      solutionCode: `let byCustomer = {};
 for (const o of orders) {
   byCustomer[o.customer] = (byCustomer[o.customer] || 0) + o.amount;
 }
 
 console.log(byCustomer);
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_object",
@@ -147,25 +162,30 @@ console.log(byCustomer);
   adapter="javascript"
   title="Group orders by customer"
   instructions={`Given the array \`orders\` defined above, build an object called \`byCustomer\` mapping each customer name to the total amount they spent (summed across their orders).`}
-  initCode={`const orders = [
+  files={[
+    {
+      filename: "main.js",
+      initCode: `const orders = [
   { customer: "Ada",   amount: 120 },
   { customer: "Linus", amount: 80 },
   { customer: "Ada",   amount: 30 },
   { customer: "Grace", amount: 200 },
   { customer: "Linus", amount: 50 },
 ];
-`}
-  starterCode={`let byCustomer = null; // TODO
+`,
+      starterCode: `let byCustomer = null; // TODO
 
 console.log(byCustomer);
-`}
-  solutionCode={`let byCustomer = {};
+`,
+      solutionCode: `let byCustomer = {};
 for (const o of orders) {
   byCustomer[o.customer] = (byCustomer[o.customer] || 0) + o.amount;
 }
 
 console.log(byCustomer);
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_object",
@@ -201,18 +221,23 @@ console.log(byCustomer);
   adapter="javascript"
   title="Wrap a callback in a Promise"
   instructions={`Define a function \`delay(ms)\` that returns a Promise which resolves to the string \`"done"\` after \`ms\` milliseconds. Use \`setTimeout\`.`}
-  starterCode={`function delay(ms) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function delay(ms) {
   // your code here
 }
 
 delay(10).then((v) => console.log(v));
-`}
-  solutionCode={`function delay(ms) {
+`,
+      solutionCode: `function delay(ms) {
   return new Promise((resolve) => setTimeout(() => resolve("done"), ms));
 }
 
 delay(10).then((v) => console.log(v));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "returns_promise",
@@ -234,18 +259,23 @@ delay(10).then((v) => console.log(v));
   adapter="javascript"
   title="Wrap a callback in a Promise"
   instructions={`Define a function \`delay(ms)\` that returns a Promise which resolves to the string \`"done"\` after \`ms\` milliseconds. Use \`setTimeout\`.`}
-  starterCode={`function delay(ms) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function delay(ms) {
   // your code here
 }
 
 delay(10).then((v) => console.log(v));
-`}
-  solutionCode={`function delay(ms) {
+`,
+      solutionCode: `function delay(ms) {
   return new Promise((resolve) => setTimeout(() => resolve("done"), ms));
 }
 
 delay(10).then((v) => console.log(v));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "returns_promise",
@@ -278,12 +308,12 @@ entry module can `require()` sibling files.
   files={[
     {
       filename: "main.js",
-      initialContent: `const { greet } = require("./utils");\nconsole.log(greet("World"));\n`,
+      starterCode: `const { greet } = require("./utils");\nconsole.log(greet("World"));\n`,
     },
     {
       filename: "utils.js",
-      initialContent: `function greet(name) {\n  // your code here\n  return "";\n}\n\nmodule.exports = { greet };\n`,
-      solutionContent: `function greet(name) {\n  return \`Hello, \${name}!\`;\n}\n\nmodule.exports = { greet };\n`,
+      starterCode: `function greet(name) {\n  // your code here\n  return "";\n}\n\nmodule.exports = { greet };\n`,
+      solutionCode: `function greet(name) {\n  return \`Hello, \${name}!\`;\n}\n\nmodule.exports = { greet };\n`,
     },
   ]}
   tests={[
@@ -300,17 +330,17 @@ entry module can `require()` sibling files.
 <ChallengeCard
   adapter="javascript"
   title="Implement greet() in utils.js"
-  instructions={`Open utils.js and implement greet(name) ...`}
+  instructions={`Open \`utils.js\` and implement \`greet(name)\` so that it returns the string \`"Hello, <name>!"\`. The entry script \`main.js\` already requires your function and prints the result.`}
   entryFilename="main.js"
   files={[
     {
       filename: "main.js",
-      initialContent: `const { greet } = require("./utils");\nconsole.log(greet("World"));\n`,
+      starterCode: `const { greet } = require("./utils");\nconsole.log(greet("World"));\n`,
     },
     {
       filename: "utils.js",
-      initialContent: `function greet(name) {\n  return "";\n}\n\nmodule.exports = { greet };\n`,
-      solutionContent: `function greet(name) {\n  return \`Hello, \${name}!\`;\n}\n\nmodule.exports = { greet };\n`,
+      starterCode: `function greet(name) {\n  // your code here\n  return "";\n}\n\nmodule.exports = { greet };\n`,
+      solutionCode: `function greet(name) {\n  return \`Hello, \${name}!\`;\n}\n\nmodule.exports = { greet };\n`,
     },
   ]}
   tests={[

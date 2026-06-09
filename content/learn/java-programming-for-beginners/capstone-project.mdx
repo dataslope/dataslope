@@ -90,7 +90,7 @@ The given \`Main.java\` drives the behavior. Don't change it.`}
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Library lib = new Library();
     lib.addBook(new Book("Effective Java", 2));
@@ -155,22 +155,22 @@ The given \`Main.java\` drives the behavior. Don't change it.`}
     },
     {
       filename: "BorrowException.java",
-      initialContent: `public class BorrowException extends RuntimeException {
+      starterCode: `public class BorrowException extends RuntimeException {
   // TODO
 }
 `,
-      solutionContent: `public class BorrowException extends RuntimeException {
+      solutionCode: `public class BorrowException extends RuntimeException {
   public BorrowException(String message) { super(message); }
 }
 `,
     },
     {
       filename: "Book.java",
-      initialContent: `public class Book {
+      starterCode: `public class Book {
   // TODO: title, totalCopies, availableCopies + methods
 }
 `,
-      solutionContent: `public class Book {
+      solutionCode: `public class Book {
   private final String title;
   private final int totalCopies;
   private int availableCopies;
@@ -202,14 +202,14 @@ The given \`Main.java\` drives the behavior. Don't change it.`}
     },
     {
       filename: "Member.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Member {
   // TODO
 }
 `,
-      solutionContent: `import java.util.ArrayList;
+      solutionCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Member {
@@ -229,7 +229,7 @@ public class Member {
     },
     {
       filename: "Library.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -237,7 +237,7 @@ public class Library {
   // TODO
 }
 `,
-      solutionContent: `import java.util.ArrayList;
+      solutionCode: `import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 

@@ -152,7 +152,10 @@ The single most important rule the JCF teaches you:
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -179,7 +182,9 @@ public class Main {
     System.out.println("linked-backed: " + totalLength(b));
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 If `totalLength` had been declared `totalLength(ArrayList<String>)`,
@@ -197,7 +202,10 @@ matching collection.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -222,7 +230,9 @@ public class Main {
     System.out.println("max:            " + Collections.max(nums));
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Notice you did not write a sort. You did not write a min. You did not
@@ -238,7 +248,10 @@ for-each loop in Java 5.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -263,7 +276,9 @@ public class Main {
       System.out.println("- " + w);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 That `it.remove()` is what `Enumeration` could never do safely. We
@@ -281,7 +296,7 @@ implementation you hand it.
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -306,7 +321,7 @@ public class Main {
     },
     {
       filename: "Book.java",
-      initialContent: `public class Book {
+      starterCode: `public class Book {
   private final String title;
   private final String author;
   public Book(String title, String author) {
@@ -320,7 +335,7 @@ public class Main {
     },
     {
       filename: "Library.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -376,7 +391,7 @@ Linus
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -397,13 +412,13 @@ public class Main {
     },
     {
       filename: "Roster.java",
-      initialContent: `import java.util.List;
+      starterCode: `import java.util.List;
 
 public class Roster {
   // TODO
 }
 `,
-      solutionContent: `import java.util.List;
+      solutionCode: `import java.util.List;
 
 public class Roster {
   private final List<String> names;

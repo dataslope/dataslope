@@ -16,20 +16,25 @@ interpreter context to inject per-test assertions into.
   adapter="c"
   title="Hello, C!"
   instructions={`Make the program print exactly \`Hello, C!\`.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   // your code here
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 int main(void) {
   printf("Hello, C!\\n");
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "hello",
@@ -51,20 +56,25 @@ int main(void) {
   adapter="c"
   title="Hello, C!"
   instructions={`Make the program print exactly \`Hello, C!\`.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   // your code here
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 int main(void) {
   printf("Hello, C!\\n");
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "hello",
@@ -88,7 +98,10 @@ int main(void) {
   adapter="c"
   title="Sum 1..N"
   instructions={`Compute the sum of integers from 1 to \`N\` (inclusive) where \`N = 100\`, and print it followed by a newline. The expected output is \`5050\`.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int N = 100;
@@ -97,8 +110,8 @@ int main(void) {
   printf("%ld\\n", sum);
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 int main(void) {
   int N = 100;
@@ -108,7 +121,9 @@ int main(void) {
   printf("%ld\\n", sum);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "sum_100",
@@ -124,7 +139,10 @@ int main(void) {
   adapter="c"
   title="Sum 1..N"
   instructions={`Compute the sum of integers from 1 to \`N\` (inclusive) where \`N = 100\`, and print it followed by a newline. The expected output is \`5050\`.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int N = 100;
@@ -133,8 +151,8 @@ int main(void) {
   printf("%ld\\n", sum);
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 int main(void) {
   int N = 100;
@@ -144,7 +162,9 @@ int main(void) {
   printf("%ld\\n", sum);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "sum_100",
@@ -168,14 +188,17 @@ int main(void) {
 3 * 2 = 6
 ...
 \`\`\``}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   // your code here
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 int main(void) {
   for (int i = 1; i <= 5; i++) {
@@ -183,7 +206,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "table",
@@ -214,14 +239,17 @@ int main(void) {
 3 * 2 = 6
 ...
 \`\`\``}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   // your code here
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 int main(void) {
   for (int i = 1; i <= 5; i++) {
@@ -229,7 +257,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "table",
@@ -265,7 +295,7 @@ filesystem before each run, so the entry translation unit can
   files={[
     {
       filename: "main.c",
-      initialContent: `#include "utils.h"
+      starterCode: `#include "utils.h"
 
 int main(void) {
   greet();
@@ -275,18 +305,18 @@ int main(void) {
     },
     {
       filename: "utils.h",
-      initialContent: `#ifndef UTILS_H\n#define UTILS_H\nvoid greet(void);\n#endif\n`,
+      starterCode: `#ifndef UTILS_H\n#define UTILS_H\nvoid greet(void);\n#endif\n`,
     },
     {
       filename: "utils.c",
-      initialContent: `#include "utils.h"
+      starterCode: `#include "utils.h"
 #include <stdio.h>
 
 void greet(void) {
   // your code here
 }
 `,
-      solutionContent: `#include "utils.h"
+      solutionCode: `#include "utils.h"
 #include <stdio.h>
 
 void greet(void) { printf("Hello, World!\\n"); }
@@ -307,12 +337,12 @@ void greet(void) { printf("Hello, World!\\n"); }
 <ChallengeCard
   adapter="c"
   title="Implement greet() in utils.c"
-  instructions={`Open utils.c and implement greet() ...`}
+  instructions={`Open \`utils.c\` and implement \`greet()\` so that it prints \`Hello, World!\` followed by a newline. \`main.c\` is provided — it calls \`greet()\` once.`}
   entryFilename="main.c"
   files={[
     {
       filename: "main.c",
-      initialContent: `#include "utils.h"
+      starterCode: `#include "utils.h"
 
 int main(void) {
   greet();
@@ -322,16 +352,18 @@ int main(void) {
     },
     {
       filename: "utils.h",
-      initialContent: `#ifndef UTILS_H\n#define UTILS_H\nvoid greet(void);\n#endif\n`,
+      starterCode: `#ifndef UTILS_H\n#define UTILS_H\nvoid greet(void);\n#endif\n`,
     },
     {
       filename: "utils.c",
-      initialContent: `#include "utils.h"
+      starterCode: `#include "utils.h"
 #include <stdio.h>
 
-void greet(void) {}
+void greet(void) {
+  // your code here
+}
 `,
-      solutionContent: `#include "utils.h"
+      solutionCode: `#include "utils.h"
 #include <stdio.h>
 
 void greet(void) { printf("Hello, World!\\n"); }

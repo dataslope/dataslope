@@ -145,7 +145,10 @@ want to know whether they look reliably different.
 
 <CodeBlock
   adapter="r"
-  starterCode={`# 5 plots each of two wheat varieties (bushels per acre)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# 5 plots each of two wheat varieties (bushels per acre)
 variety_A <- c(48, 52, 47, 50, 53)
 variety_B <- c(45, 47, 44, 46, 48)
 
@@ -166,7 +169,9 @@ cat("pooled sd:", round(sd_pooled, 3), "\\n")
 # Step 4: the t-statistic
 t_stat <- diff_means / (sd_pooled * sqrt(2 / n))
 cat("t-statistic:", round(t_stat, 3), "\\n")
-`}
+`,
+    },
+  ]}
 />
 
 Every line above is a step Fisher would have done by hand with a
@@ -176,11 +181,16 @@ more line:
 
 <CodeBlock
   adapter="r"
-  initCode={`variety_A <- c(48, 52, 47, 50, 53)
-variety_B <- c(45, 47, 44, 46, 48)`}
-  starterCode={`# R's built-in t-test for two samples
+  files={[
+    {
+      filename: "main.r",
+      initCode: `variety_A <- c(48, 52, 47, 50, 53)
+variety_B <- c(45, 47, 44, 46, 48)`,
+      starterCode: `# R's built-in t-test for two samples
 t.test(variety_A, variety_B, var.equal = TRUE)
-`}
+`,
+    },
+  ]}
 />
 
 Look at the *t* value in the output — it matches what we computed
@@ -268,20 +278,25 @@ the true mean is `40`.
 - \`t_stat\` — the one-sample t-statistic, \`(m - 40) / (s / sqrt(n))\`, where \`n\` is the length of yield.
 
 You can use base R only — no packages needed.`}
-  initCode={`yield <- c(42, 39, 45, 41, 44, 40, 43, 38, 46, 42)`}
-  starterCode={`m <- NA
+  files={[
+    {
+      filename: "main.r",
+      initCode: `yield <- c(42, 39, 45, 41, 44, 40, 43, 38, 46, 42)`,
+      starterCode: `m <- NA
 s <- NA
 t_stat <- NA
 
 cat("mean:", m, " sd:", s, " t:", t_stat, "\\n")
-`}
-  solutionCode={`n <- length(yield)
+`,
+      solutionCode: `n <- length(yield)
 m <- mean(yield)
 s <- sd(yield)
 t_stat <- (m - 40) / (s / sqrt(n))
 
 cat("mean:", m, " sd:", s, " t:", t_stat, "\\n")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "mean",

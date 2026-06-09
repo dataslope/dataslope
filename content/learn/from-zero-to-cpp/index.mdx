@@ -76,13 +76,18 @@ compiler loads.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   std::cout << "Welcome to From Zero to C++!\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="What this course is not">

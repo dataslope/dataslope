@@ -48,7 +48,10 @@ when `X` and `Y` are.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -60,7 +63,9 @@ public class Main {
     System.out.println(ints);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Invariance is *safe* — but it is also *inflexible*. Now we need a way
@@ -76,7 +81,10 @@ can read from it as `Object`, and you cannot write into it (except
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -99,7 +107,9 @@ public class Main {
     printAll(b);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 That's `List<?>`: maximally general, but read-only.
@@ -112,7 +122,10 @@ strict about writes — but reads are guaranteed to be a `Number`:
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -139,7 +152,9 @@ public class Main {
     System.out.println("sum dbls = " + sum(dbls));
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 `? extends T` is what you use when your method **only consumes** the
@@ -155,7 +170,10 @@ collection — it just reads elements.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -178,7 +196,9 @@ public class Main {
     System.out.println(objects);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 `? super T` is what you use when your method **only produces** values
@@ -243,7 +263,10 @@ That's a mouthful, so let's decode it:
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -258,7 +281,9 @@ public class Main {
     System.out.println("max = " + Collections.max(ints));
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## A multi-file challenge of PECS
@@ -273,7 +298,7 @@ differ in the safe direction.
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -293,7 +318,7 @@ public class Main {
     },
     {
       filename: "Copier.java",
-      initialContent: `import java.util.List;
+      starterCode: `import java.util.List;
 
 public class Copier {
   // PECS: src produces (? extends T), dest consumes (? super T)
@@ -348,7 +373,7 @@ Expected output (when the provided \`Main\` runs):
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -370,7 +395,7 @@ public class Main {
     },
     {
       filename: "Bag.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Bag<T> {
@@ -386,7 +411,7 @@ public class Bag<T> {
   public List<T> all() { return data; }
 }
 `,
-      solutionContent: `import java.util.ArrayList;
+      solutionCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Bag<T> {

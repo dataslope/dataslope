@@ -20,10 +20,15 @@ A logical vector is just a vector whose elements are `TRUE` or
 
 <CodeBlock
   adapter="r"
-  starterCode={`flags <- c(TRUE, FALSE, TRUE, TRUE, FALSE)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `flags <- c(TRUE, FALSE, TRUE, TRUE, FALSE)
 print(flags)
 length(flags)
-`}
+`,
+    },
+  ]}
 />
 
 You rarely *type* logical vectors out by hand. Almost always, you
@@ -31,7 +36,10 @@ You rarely *type* logical vectors out by hand. Almost always, you
 
 <CodeBlock
   adapter="r"
-  starterCode={`scores <- c(82, 91, 76, 100, 65, 88, 79, 93, 71, 85)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `scores <- c(82, 91, 76, 100, 65, 88, 79, 93, 71, 85)
 
 # Which scores are 80 or above?
 scores >= 80
@@ -41,7 +49,9 @@ scores == 100
 
 # Which are not perfect?
 scores != 100
-`}
+`,
+    },
+  ]}
 />
 
 Notice the result is a vector of `TRUE`/`FALSE` values, one per
@@ -56,7 +66,10 @@ Here is one of the most useful R tricks of all time: **`sum()` and
 
 <CodeBlock
   adapter="r"
-  starterCode={`scores <- c(82, 91, 76, 100, 65, 88, 79, 93, 71, 85)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `scores <- c(82, 91, 76, 100, 65, 88, 79, 93, 71, 85)
 
 # How many scores are 80 or above?
 sum(scores >= 80)
@@ -69,7 +82,9 @@ any(scores == 100)
 
 # Are all scores above 50?
 all(scores > 50)
-`}
+`,
+    },
+  ]}
 />
 
 Read that out loud:
@@ -89,7 +104,10 @@ and `!` (not):
 
 <CodeBlock
   adapter="r"
-  starterCode={`scores <- c(82, 91, 76, 100, 65, 88, 79, 93, 71, 85)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `scores <- c(82, 91, 76, 100, 65, 88, 79, 93, 71, 85)
 
 # Scores between 75 and 90 (inclusive)
 scores >= 75 & scores <= 90
@@ -99,7 +117,9 @@ scores < 70 | scores == 100
 
 # Scores that are NOT above 80
 !(scores > 80)
-`}
+`,
+    },
+  ]}
 />
 
 Use `&` and `|` (single character) for vector-wise logic. R also
@@ -115,7 +135,10 @@ another vector. R keeps only the positions where the logical is
 
 <CodeBlock
   adapter="r"
-  starterCode={`scores <- c(82, 91, 76, 100, 65, 88, 79, 93, 71, 85)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `scores <- c(82, 91, 76, 100, 65, 88, 79, 93, 71, 85)
 names <- c("alice", "bob", "carol", "dan", "eve", "frank", "grace", "heidi", "ivan", "judy")
 
 # Just the high scores
@@ -126,7 +149,9 @@ names[scores >= 90]
 
 # Mid-range scores
 scores[scores >= 75 & scores <= 90]
-`}
+`,
+    },
+  ]}
 />
 
 This is the foundation of *filtering*. Later we will see how
@@ -152,13 +177,18 @@ string enclosed in double or single quotes:
 
 <CodeBlock
   adapter="r"
-  starterCode={`fruits <- c("apple", "banana", "cherry", "date")
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `fruits <- c("apple", "banana", "cherry", "date")
 print(fruits)
 length(fruits)
 nchar(fruits) # number of characters in each string
 toupper(fruits)
 substr(fruits, 1, 3) # first three characters of each
-`}
+`,
+    },
+  ]}
 />
 
 Like everything else in R, character functions are vectorized:
@@ -172,7 +202,10 @@ coercion) into one:
 
 <CodeBlock
   adapter="r"
-  starterCode={`first <- c("Alice", "Bob", "Carol")
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `first <- c("Alice", "Bob", "Carol")
 last <- c("Smith", "Jones", "Lee")
 
 # paste() puts a space between by default
@@ -186,7 +219,9 @@ paste(first, last, sep = "_")
 
 # Use collapse = "..." to fold a vector into a single string
 paste(first, collapse = ", ")
-`}
+`,
+    },
+  ]}
 />
 
 The two arguments people most confuse are `sep` and `collapse`.
@@ -203,7 +238,10 @@ For checking which strings contain something, the workhorse is
 
 <CodeBlock
   adapter="r"
-  starterCode={`emails <- c("alice@a.com", "bob@b.org", "carol@a.com", "dan@c.net")
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `emails <- c("alice@a.com", "bob@b.org", "carol@a.com", "dan@c.net")
 
 # Which emails are from the ".com" domain?
 grepl(".com", emails, fixed = TRUE)
@@ -213,7 +251,9 @@ sum(grepl(".com", emails, fixed = TRUE))
 
 # Filter to just those emails
 emails[grepl(".com", emails, fixed = TRUE)]
-`}
+`,
+    },
+  ]}
 />
 
 (Setting `fixed = TRUE` tells `grepl()` to treat the pattern as a
@@ -229,12 +269,17 @@ quick exposure:
 
 <CodeBlock
   adapter="r"
-  starterCode={`severity <- c("low", "high", "medium", "low", "high", "low")
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `severity <- c("low", "high", "medium", "low", "high", "low")
 severity_f <- factor(severity, levels = c("low", "medium", "high"))
 
 print(severity_f)
 table(severity_f)
-`}
+`,
+    },
+  ]}
 />
 
 Factors look like character vectors but carry information about
@@ -295,17 +340,22 @@ higher.
   adapter="r"
   title="Filter names by score"
   instructions={`Using a logical index, build a character vector \`passed\` containing the names of every student who scored 70 or higher.`}
-  initCode={`students <- c("Ada", "Ben", "Cleo", "Drew", "Ella")
+  files={[
+    {
+      filename: "main.r",
+      initCode: `students <- c("Ada", "Ben", "Cleo", "Drew", "Ella")
 scores   <- c(82, 64, 91, 70, 58)
-`}
-  starterCode={`# students and scores are already defined
+`,
+      starterCode: `# students and scores are already defined
 passed <- NULL # replace with the filtered names
 
 print(passed)
-`}
-  solutionCode={`passed <- students[scores >= 70]
+`,
+      solutionCode: `passed <- students[scores >= 70]
 print(passed)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "passed",

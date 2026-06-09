@@ -44,7 +44,10 @@ flowchart TD
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   int age = 17;
@@ -55,14 +58,19 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 `else` can chain into another `if`, building a ladder:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   int score = 73;
@@ -80,7 +88,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Two beginner footguns:
@@ -120,7 +130,10 @@ safely.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   int age = 25;
@@ -136,7 +149,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## `switch`: multi-way dispatch
@@ -159,7 +174,10 @@ flowchart TD
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   int dayOfWeek = 3; // 0 = Sun, 1 = Mon, ..., 6 = Sat
@@ -181,7 +199,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 A few rules:
@@ -208,7 +228,10 @@ flowchart TD
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   int n = 1;
@@ -218,7 +241,9 @@ int main() {
   std::cout << "first power of 2 above 100 = " << n << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 A `do { ... } while (cond);` variant exists where the body runs
@@ -238,7 +263,10 @@ for (init; condition; update) {
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   // Print 1, 2, ..., 10
@@ -260,7 +288,9 @@ int main() {
   std::cout << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The variable declared inside the `for` header (here `i`) is **scoped
@@ -274,7 +304,10 @@ range-based `for` is cleaner:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 #include <vector>
 
@@ -285,7 +318,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Notes:
@@ -305,7 +340,10 @@ Inside any loop:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   // Print first odd number above 100 that is divisible by 7.
@@ -317,7 +355,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Use these sparingly. A loop with three `break`s and four `continue`s
@@ -352,7 +392,10 @@ English first.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   int a = 0, b = 1;
@@ -365,7 +408,9 @@ int main() {
   std::cout << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Common loop bugs
@@ -383,14 +428,17 @@ int main() {
   adapter="cpp"
   title="FizzBuzz to 15"
   instructions={`Implement a loop from \`1\` to \`15\` (inclusive). For each number, print:\n\n- \`"FizzBuzz"\` if it is divisible by both 3 and 5,\n- \`"Fizz"\` if it is divisible by only 3,\n- \`"Buzz"\` if it is divisible by only 5,\n- otherwise the number itself.\n\nEach output goes on its own line.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   // your code here
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 
 int main() {
   for (int i = 1; i <= 15; ++i) {
@@ -405,7 +453,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "fizzbuzz",
@@ -426,15 +476,18 @@ int main() {
   adapter="cpp"
   title="Largest digit"
   instructions={`Read the integer \`n = 729384\` (already provided) and print the largest of its decimal digits. For \`729384\` the answer is \`9\`. Use a loop that strips one digit at a time with \`% 10\` and \`/ 10\`. Print just the digit followed by a newline.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   int n = 729384;
   // your code here
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 
 int main() {
   int n = 729384;
@@ -448,7 +501,9 @@ int main() {
   std::cout << best << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "biggest",

@@ -109,7 +109,10 @@ pipeline and watch them produce deliberately different results.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 # Installs NLTK and loads the tokenizer and stopwords this page needs.
 # nltk.download() isn't available here, so we fetch the archives directly.
 import io, os, zipfile
@@ -137,8 +140,8 @@ await _load_nltk("tokenizers", "punkt_tab")
 await _load_nltk("corpora", "stopwords")
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-from nltk.util import ngrams`}
-  starterCode={`review = "The plot was not good, but the acting was brilliant!"
+from nltk.util import ngrams`,
+      starterCode: `review = "The plot was not good, but the acting was brilliant!"
 stop = set(stopwords.words("english"))
 
 # TOPIC pipeline: lowercase, drop punctuation, drop ALL stopwords.
@@ -157,7 +160,9 @@ sent_bigrams = list(ngrams(sent, 2))
 print("SENTIMENT features (how does it feel?):")
 print("  unigrams:", sent)
 print("  bigrams: ", sent_bigrams)
-`}
+`,
+    },
+  ]}
 />
 
 Look at the difference. The topic pipeline threw away "not" and "but" — fine,
@@ -249,7 +254,10 @@ Examples:
 
 - \`preprocess("This is NOT good", True)\` -> \`["good"]\`
 - \`preprocess("This is NOT good", False)\` -> \`["this", "is", "not", "good"]\``}
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -275,8 +283,8 @@ await _load_nltk("tokenizers", "punkt_tab")
 await _load_nltk("corpora", "stopwords")
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-stop = set(stopwords.words("english"))`}
-  starterCode={`def preprocess(text, remove_stopwords):
+stop = set(stopwords.words("english"))`,
+      starterCode: `def preprocess(text, remove_stopwords):
     tokens = word_tokenize(text)
     # lowercase + keep alphabetic
     # then conditionally remove stopwords
@@ -285,8 +293,8 @@ stop = set(stopwords.words("english"))`}
 
 print("topic    :", preprocess("This is NOT good", True))
 print("sentiment:", preprocess("This is NOT good", False))
-`}
-  solutionCode={`def preprocess(text, remove_stopwords):
+`,
+      solutionCode: `def preprocess(text, remove_stopwords):
     tokens = [t.lower() for t in word_tokenize(text) if t.isalpha()]
     if remove_stopwords:
         tokens = [t for t in tokens if t not in stop]
@@ -295,7 +303,9 @@ print("sentiment:", preprocess("This is NOT good", False))
 
 print("topic    :", preprocess("This is NOT good", True))
 print("sentiment:", preprocess("This is NOT good", False))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "remove_true",

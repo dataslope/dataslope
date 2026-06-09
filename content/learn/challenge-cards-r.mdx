@@ -13,19 +13,24 @@ serialise failure messages.
   adapter="r"
   title="Mean, median, sd"
   instructions={`Define three variables — \`m\`, \`md\`, and \`s\` — holding the mean, median, and standard deviation of the vector \`x\`.`}
-  initCode={`x <- c(2, 4, 4, 4, 5, 5, 7, 9)`}
-  starterCode={`m <- NA
+  files={[
+    {
+      filename: "main.r",
+      initCode: `x <- c(2, 4, 4, 4, 5, 5, 7, 9)`,
+      starterCode: `m <- NA
 md <- NA
 s <- NA
 
 cat("mean:", m, "median:", md, "sd:", s, "\\n")
-`}
-  solutionCode={`m <- mean(x)
+`,
+      solutionCode: `m <- mean(x)
 md <- median(x)
 s <- sd(x)
 
 cat("mean:", m, "median:", md, "sd:", s, "\\n")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "mean",
@@ -53,19 +58,24 @@ cat("mean:", m, "median:", md, "sd:", s, "\\n")
   adapter="r"
   title="Mean, median, sd"
   instructions={`Define three variables — \`m\`, \`md\`, and \`s\` — holding the mean, median, and standard deviation of the vector \`x\`.`}
-  initCode={`x <- c(2, 4, 4, 4, 5, 5, 7, 9)`}
-  starterCode={`m <- NA
+  files={[
+    {
+      filename: "main.r",
+      initCode: `x <- c(2, 4, 4, 4, 5, 5, 7, 9)`,
+      starterCode: `m <- NA
 md <- NA
 s <- NA
 
 cat("mean:", m, "median:", md, "sd:", s, "\\n")
-`}
-  solutionCode={`m <- mean(x)
+`,
+      solutionCode: `m <- mean(x)
 md <- median(x)
 s <- sd(x)
 
 cat("mean:", m, "median:", md, "sd:", s, "\\n")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "mean",
@@ -95,19 +105,24 @@ cat("mean:", m, "median:", md, "sd:", s, "\\n")
   adapter="r"
   title="Filter a data frame"
   instructions={`Build a data frame called \`filtered\` containing only the rows of \`df\` where \`score >= 80\`.`}
-  initCode={`df <- data.frame(
+  files={[
+    {
+      filename: "main.r",
+      initCode: `df <- data.frame(
   name  = c("Ada", "Linus", "Grace", "Alan"),
   score = c(92, 88, 75, 81),
   stringsAsFactors = FALSE
-)`}
-  starterCode={`filtered <- NULL # TODO
+)`,
+      starterCode: `filtered <- NULL # TODO
 
 print(filtered)
-`}
-  solutionCode={`filtered <- df[df$score >= 80, ]
+`,
+      solutionCode: `filtered <- df[df$score >= 80, ]
 
 print(filtered)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_df",
@@ -135,19 +150,24 @@ print(filtered)
   adapter="r"
   title="Filter a data frame"
   instructions={`Build a data frame called \`filtered\` containing only the rows of \`df\` where \`score >= 80\`.`}
-  initCode={`df <- data.frame(
+  files={[
+    {
+      filename: "main.r",
+      initCode: `df <- data.frame(
   name  = c("Ada", "Linus", "Grace", "Alan"),
   score = c(92, 88, 75, 81),
   stringsAsFactors = FALSE
-)`}
-  starterCode={`filtered <- NULL # TODO
+)`,
+      starterCode: `filtered <- NULL # TODO
 
 print(filtered)
-`}
-  solutionCode={`filtered <- df[df$score >= 80, ]
+`,
+      solutionCode: `filtered <- df[df$score >= 80, ]
 
 print(filtered)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_df",
@@ -176,13 +196,18 @@ print(filtered)
 <ChallengeCard
   adapter="r"
   title="Print 1 to 5"
-  starterCode={`# print one number per line
-`}
-  instructions={`Print the numbers 1, 2, 3, 4, 5 — one per line.`}
-  solutionCode={`for (i in 1:5) {
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# print one number per line
+`,
+      solutionCode: `for (i in 1:5) {
   cat(i, "\\n", sep = "")
 }
-`}
+`,
+    },
+  ]}
+  instructions={`Print the numbers 1, 2, 3, 4, 5 — one per line.`}
   tests={[
     {
       id: "lines",
@@ -199,13 +224,18 @@ print(filtered)
 <ChallengeCard
   adapter="r"
   title="Print 1 to 5"
-  starterCode={`# print one number per line
-`}
-  instructions={`Print the numbers 1, 2, 3, 4, 5 — one per line.`}
-  solutionCode={`for (i in 1:5) {
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# print one number per line
+`,
+      solutionCode: `for (i in 1:5) {
   cat(i, "\\n", sep = "")
 }
-`}
+`,
+    },
+  ]}
+  instructions={`Print the numbers 1, 2, 3, 4, 5 — one per line.`}
   tests={[
     {
       id: "lines",
@@ -233,12 +263,12 @@ before each run, so the entry script can `source()` sibling files.
   files={[
     {
       filename: "main.R",
-      initialContent: `source("utils.R")\ncat(greet("World"))\n`,
+      starterCode: `source("utils.R")\ncat(greet("World"))\n`,
     },
     {
       filename: "utils.R",
-      initialContent: `greet <- function(name) {\n  # your code here\n  ""\n}\n`,
-      solutionContent: `greet <- function(name) {\n  paste0("Hello, ", name, "!")\n}\n`,
+      starterCode: `greet <- function(name) {\n  # your code here\n  ""\n}\n`,
+      solutionCode: `greet <- function(name) {\n  paste0("Hello, ", name, "!")\n}\n`,
     },
   ]}
   tests={[
@@ -255,17 +285,17 @@ before each run, so the entry script can `source()` sibling files.
 <ChallengeCard
   adapter="r"
   title="Implement greet() in utils.R"
-  instructions={`Open utils.R and implement greet(name) ...`}
+  instructions={`Open \`utils.R\` and implement \`greet(name)\` so that it returns the string \`"Hello, <name>!"\`. The entry script \`main.R\` already sources your file and prints the result.`}
   entryFilename="main.R"
   files={[
     {
       filename: "main.R",
-      initialContent: `source("utils.R")\ncat(greet("World"))\n`,
+      starterCode: `source("utils.R")\ncat(greet("World"))\n`,
     },
     {
       filename: "utils.R",
-      initialContent: `greet <- function(name) {\n  ""\n}\n`,
-      solutionContent: `greet <- function(name) {\n  paste0("Hello, ", name, "!")\n}\n`,
+      starterCode: `greet <- function(name) {\n  # your code here\n  ""\n}\n`,
+      solutionCode: `greet <- function(name) {\n  paste0("Hello, ", name, "!")\n}\n`,
     },
   ]}
   tests={[

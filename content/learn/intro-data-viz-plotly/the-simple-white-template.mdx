@@ -51,7 +51,10 @@ You can see them in action by changing the `template=` argument.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.iris()
 
@@ -65,7 +68,9 @@ fig = px.scatter(
     title="Iris — change the template above to see other styles",
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Edit the code and try `"plotly"`, `"plotly_dark"`, `"ggplot2"`,
@@ -108,7 +113,10 @@ override it. Try it:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 import plotly.io as pio
 
 # Set the default for this code block:
@@ -128,7 +136,9 @@ fig = px.scatter(
     labels={"gdpPercap": "GDP per capita (USD, log)", "lifeExp": "Life expectancy"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 In a notebook or a script, set the default *once* near your imports

@@ -10,12 +10,33 @@ on demand the first time you click Run.
 
 <CodeBlock
   adapter="r"
-  starterCode={`x <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `x <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 cat("mean:", mean(x), "\\n")
 cat("median:", median(x), "\\n")
 cat("sd:", round(sd(x), 3), "\\n")
-`}
+`,
+    },
+  ]}
 />
+
+```jsx
+<CodeBlock
+  adapter="r"
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `x <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+cat("mean:", mean(x), "\\n")
+cat("median:", median(x), "\\n")
+cat("sd:", round(sd(x), 3), "\\n")
+`,
+    },
+  ]}
+/>
+```
 
 ## Data frames render as tables
 
@@ -28,15 +49,39 @@ snippet just inspects it.
 
 <CodeBlock
   adapter="r"
-  initCode={`df <- data.frame(
+  files={[
+    {
+      filename: "main.r",
+      initCode: `df <- data.frame(
   product = c("Widget A", "Widget B", "Widget C"),
   units   = c(120, 85, 47),
   price   = c(9.99, 14.50, 24.00)
-)`}
-  starterCode={`df$revenue <- df$units * df$price
+)`,
+      starterCode: `df$revenue <- df$units * df$price
 df
-`}
+`,
+    },
+  ]}
 />
+
+```jsx
+<CodeBlock
+  adapter="r"
+  files={[
+    {
+      filename: "main.r",
+      initCode: `df <- data.frame(
+  product = c("Widget A", "Widget B", "Widget C"),
+  units   = c(120, 85, 47),
+  price   = c(9.99, 14.50, 24.00)
+)`,
+      starterCode: `df$revenue <- df$units * df$price
+df
+`,
+    },
+  ]}
+/>
+```
 
 ## Plots render as inline images
 
@@ -44,13 +89,35 @@ Base R graphics and ggplot output are captured into PNG cells.
 
 <CodeBlock
   adapter="r"
-  starterCode={`x <- rnorm(1000)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `x <- rnorm(1000)
 hist(x,
   breaks = 30, col = "steelblue", border = "white",
   main = "1000 draws from N(0, 1)"
 )
-`}
+`,
+    },
+  ]}
 />
+
+```jsx
+<CodeBlock
+  adapter="r"
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `x <- rnorm(1000)
+hist(x,
+  breaks = 30, col = "steelblue", border = "white",
+  main = "1000 draws from N(0, 1)"
+)
+`,
+    },
+  ]}
+/>
+```
 
 ## Multiple files
 
@@ -62,7 +129,7 @@ hist(x,
   files={[
     {
       filename: "main.r",
-      initialContent: `source("greetings.r")
+      starterCode: `source("greetings.r")
 
 cat(hello("R Playground"), "\\n")
 cat(bye("R Playground"), "\\n")
@@ -70,7 +137,7 @@ cat(bye("R Playground"), "\\n")
     },
     {
       filename: "greetings.r",
-      initialContent: `hello <- function(name) {
+      starterCode: `hello <- function(name) {
   paste0("Hello, ", name, "!")
 }
 
@@ -91,7 +158,7 @@ The MDX source for the example above:
   files={[
     {
       filename: "main.r",
-      initialContent: `source("greetings.r")
+      starterCode: `source("greetings.r")
 
 cat(hello("R Playground"), "\\n")
 cat(bye("R Playground"), "\\n")
@@ -99,7 +166,7 @@ cat(bye("R Playground"), "\\n")
     },
     {
       filename: "greetings.r",
-      initialContent: `hello <- function(name) {
+      starterCode: `hello <- function(name) {
   paste0("Hello, ", name, "!")
 }
 
@@ -123,21 +190,64 @@ A short init (3 lines or fewer):
 
 <CodeBlock
   adapter="r"
-  initCode={`radius <- 5`}
-  starterCode={`# 'radius' is defined by the initialization code above.
+  files={[
+    {
+      filename: "main.r",
+      initCode: `radius <- 5`,
+      starterCode: `# 'radius' is defined by the initialization code above.
 cat("area =", pi * radius^2, fill = TRUE)
-`}
+`,
+    },
+  ]}
 />
+
+```jsx
+<CodeBlock
+  adapter="r"
+  files={[
+    {
+      filename: "main.r",
+      initCode: `radius <- 5`,
+      starterCode: `# 'radius' is defined by the initialization code above.
+cat("area =", pi * radius^2, fill = TRUE)
+`,
+    },
+  ]}
+/>
+```
 
 A longer init (4 lines or more), collapsed by default:
 
 <CodeBlock
   adapter="r"
-  initCode={`df <- data.frame(
+  files={[
+    {
+      filename: "main.r",
+      initCode: `df <- data.frame(
   name = c("Ada", "Linus", "Grace"),
   score = c(92, 88, 95)
-)`}
-  starterCode={`# 'df' is defined by the initialization code above.
+)`,
+      starterCode: `# 'df' is defined by the initialization code above.
 print(df)
-`}
+`,
+    },
+  ]}
 />
+
+```jsx
+<CodeBlock
+  adapter="r"
+  files={[
+    {
+      filename: "main.r",
+      initCode: `df <- data.frame(
+  name = c("Ada", "Linus", "Grace"),
+  score = c(92, 88, 95)
+)`,
+      starterCode: `# 'df' is defined by the initialization code above.
+print(df)
+`,
+    },
+  ]}
+/>
+```

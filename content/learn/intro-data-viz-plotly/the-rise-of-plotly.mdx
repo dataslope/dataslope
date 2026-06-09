@@ -107,7 +107,10 @@ That's *one* line of meaningful code. Try it:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 df = pd.DataFrame(
@@ -125,7 +128,9 @@ fig = px.bar(
     template="simple_white",
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 The chart that came out is *fully* interactive. You can hover, zoom,
@@ -180,7 +185,10 @@ range:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder()
 
@@ -201,7 +209,9 @@ fig = px.scatter(
     },
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 That's one Plotly Express call. The chart maps four variables at

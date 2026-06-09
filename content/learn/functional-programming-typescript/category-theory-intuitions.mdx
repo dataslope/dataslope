@@ -37,7 +37,10 @@ together with a lawful `map` operation.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Option<A> = { kind: "none" } | { kind: "some"; value: A };
 const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 const none = <A,>(): Option<A> => ({ kind: "none" });
 
@@ -55,7 +58,9 @@ const ArrayFunctor = {
 
 console.log(OptionFunctor.map(some(3), (x) => x * 2));
 console.log(ArrayFunctor.map([1, 2, 3], (x) => x * 2));
-`}
+`,
+    },
+  ]}
 />
 
 ### Functor laws (intuitions)
@@ -97,7 +102,10 @@ With those, you can lift any n-argument function.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Option<A> = { kind: "none" } | { kind: "some"; value: A };
 const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 const none = <A,>(): Option<A> => ({ kind: "none" });
 
@@ -125,7 +133,9 @@ const add = (x: number) => (y: number) => x + y;
 console.log(liftA2(add, some(2), some(3))); // some(5)
 console.log(liftA2(add, none(), some(3))); // none
 console.log(liftA2(add, some(2), none())); // none
-`}
+`,
+    },
+  ]}
 />
 
 The intuition: applicative is for combining **independent**
@@ -141,7 +151,10 @@ A famous use of applicative: validate several fields and gather
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Result<E, A> =
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Result<E, A> =
   | { kind: "ok"; value: A }
   | { kind: "err"; errors: ReadonlyArray<E> };
 const ok = <E, A>(value: A): Result<E, A> => ({ kind: "ok", value });
@@ -170,7 +183,9 @@ const profile = map2<string, string, number, { name: string; age: number }>(
 
 console.log(profile);
 // { kind: 'err', errors: ['name required', 'age must be a number'] }
-`}
+`,
+    },
+  ]}
 />
 
 That's the practical superpower of applicative: form validation
@@ -200,7 +215,10 @@ merges them into one.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Option<A> = { kind: "none" } | { kind: "some"; value: A };
 const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 const none = <A,>(): Option<A> => ({ kind: "none" });
 
@@ -222,7 +240,9 @@ const flatMapP = <A, B>(fa: Promise<A>, f: (a: A) => Promise<B>): Promise<B> =>
     await flatMapP(Promise.resolve(2), (n) => Promise.resolve(n + 1)),
   );
 })();
-`}
+`,
+    },
+  ]}
 />
 
 ### Functor vs. Applicative vs. Monad
@@ -288,7 +308,7 @@ Then in \`main.ts\`, use it to compute \`pair(some(2), some(3))\`,
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { map2, some, none } from "./combine";
+      starterCode: `import { map2, some, none } from "./combine";
 
 const pair = <A, B>(oa: { kind: string }, ob: { kind: string }) =>
   map2<A, B, readonly [A, B]>(
@@ -304,7 +324,7 @@ console.log(pair(some(2), none()));
     },
     {
       filename: "combine.ts",
-      initialContent: `export type Option<A> = { kind: "none" } | { kind: "some"; value: A };
+      starterCode: `export type Option<A> = { kind: "none" } | { kind: "some"; value: A };
 export const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 export const none = <A,>(): Option<A> => ({ kind: "none" });
 
@@ -317,7 +337,7 @@ export function map2<A, B, C>(
   return none();
 }
 `,
-      solutionContent: `export type Option<A> = { kind: "none" } | { kind: "some"; value: A };
+      solutionCode: `export type Option<A> = { kind: "none" } | { kind: "some"; value: A };
 export const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 export const none = <A,>(): Option<A> => ({ kind: "none" });
 

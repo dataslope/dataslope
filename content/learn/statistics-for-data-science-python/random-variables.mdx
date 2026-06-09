@@ -132,7 +132,10 @@ hand and then confirm it by simulation.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 # A weighted die: value -> probability (a pmf).
 values = np.array([1, 2, 3, 4, 5, 6])
@@ -147,7 +150,9 @@ print(f"E[X] by hand = {expected:.3f}")
 rng = np.random.default_rng(0)
 draws = rng.choice(values, size=500_000, p=probs)
 print(f"Mean of 500,000 draws = {draws.mean():.3f}  (-> converges to E[X])")
-`}
+`,
+    },
+  ]}
 />
 
 The hand calculation and the simulated average agree. That's the whole
@@ -182,7 +187,10 @@ original units and reads as a typical distance from the mean.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 values = np.array([1, 2, 3, 4, 5, 6])
 probs = np.array([0.10, 0.10, 0.10, 0.10, 0.10, 0.50])
@@ -199,7 +207,9 @@ print(f"SD(X)       = {sd:.3f}   (same units as X)")
 rng = np.random.default_rng(1)
 draws = rng.choice(values, size=500_000, p=probs)
 print(f"\\nSimulated mean = {draws.mean():.3f}, simulated SD = {draws.std():.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Watch your units">
@@ -221,7 +231,10 @@ repeatedly without re-passing them.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from scipy import stats
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from scipy import stats
 import numpy as np
 
 # A binomial RV: number of successes in 10 trials, each with p = 0.3.
@@ -237,7 +250,9 @@ print(f"P(X = 3) = {X.pmf(3):.3f}")  # pmf: probability of exactly 3
 rng = np.random.default_rng(42)
 sample = X.rvs(size=100_000, random_state=rng)
 print(f"\\nEmpirical mean of 100,000 draws = {sample.mean():.3f}  (vs E[X] above)")
-`}
+`,
+    },
+  ]}
 />
 
 This is the pattern you'll use across every distribution page: pick a
@@ -261,7 +276,10 @@ customers' spending correlates.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.default_rng(7)
 
@@ -274,7 +292,9 @@ print(f"Per-customer mean spend (theory): $40.00")
 print(f"E[total revenue] (theory):        \${n * 40:,.2f}")
 print(f"Simulated total this draw:        \${spend.sum():,.2f}")
 print("\\nRun it again and the total wiggles, but its long-run average is $40,000.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="Why linearity is a superpower">
@@ -310,7 +330,10 @@ offer it? Compute the expected payout and compare to the price.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 price = 80  # what the customer pays
 payout = 300  # what the seller pays IF the device fails
@@ -329,7 +352,9 @@ fails = rng.random(1_000_000) < p_fail
 profit = price - np.where(fails, payout, 0)
 print(f"\\nSimulated mean profit  = \${profit.mean():.2f}  (matches E above)")
 print("Positive expected profit -> favorable for the SELLER, on average.")
-`}
+`,
+    },
+  ]}
 />
 
 The seller nets about \\$35 per warranty on average — favorable for them,
@@ -359,18 +384,23 @@ Compute, as plain Python **floats**:
 - **\`varx\`** — the variance \`Var(X) = Σ (value − E[X])² · prob\`.
 
 Use the provided \`values\` and \`probs\` arrays. Do **not** assume the values are equally likely.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 values = np.array([0, 1, 2, 3, 4])
-probs  = np.array([0.40, 0.25, 0.20, 0.10, 0.05])`}
-  starterCode={`# TODO: compute ex (E[X]) and varx (Var(X)) as floats
+probs  = np.array([0.40, 0.25, 0.20, 0.10, 0.05])`,
+      starterCode: `# TODO: compute ex (E[X]) and varx (Var(X)) as floats
 ex = None
 varx = None
-`}
-  solutionCode={`ex = float(np.sum(values * probs))
+`,
+      solutionCode: `ex = float(np.sum(values * probs))
 varx = float(np.sum((values - ex) ** 2 * probs))
 print("E[X] =", ex)
 print("Var(X) =", varx)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "types",
@@ -418,18 +448,23 @@ Work in terms of **net payoff** (winnings minus the \\$5 cost). Compute:
 - **\`favorable\`** — a \`bool\`, \`True\` if \`ev > 0\` (favorable to the **player**), else \`False\`.
 
 The net payoffs are \`+45\`, \`+5\`, and \`−5\` with the probabilities above.`}
-  initCode={`# Probabilities and NET payoffs (winnings minus the $5 cost to play).
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# Probabilities and NET payoffs (winnings minus the $5 cost to play).
 p = [0.05, 0.20, 0.75]
-net_payoff = [45, 5, -5]`}
-  starterCode={`# TODO: compute ev (expected net payoff) and favorable (bool: ev > 0)
+net_payoff = [45, 5, -5]`,
+      starterCode: `# TODO: compute ev (expected net payoff) and favorable (bool: ev > 0)
 ev = None
 favorable = None
-`}
-  solutionCode={`ev = float(sum(pi * xi for pi, xi in zip(p, net_payoff)))
+`,
+      solutionCode: `ev = float(sum(pi * xi for pi, xi in zip(p, net_payoff)))
 favorable = bool(ev > 0)
 print("Expected net payoff:", ev)
 print("Favorable to player:", favorable)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "types",

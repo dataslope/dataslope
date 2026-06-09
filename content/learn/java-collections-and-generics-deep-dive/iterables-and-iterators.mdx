@@ -46,7 +46,10 @@ fragments below produce identical bytecode:
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -69,7 +72,9 @@ public class Main {
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 If you write your own class and implement `Iterable<E>`, the for-each
@@ -87,7 +92,7 @@ a tiny `IntRange` that produces the integers `[start, end)`:
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     IntRange r = new IntRange(3, 8);
     for (int n : r)
@@ -98,7 +103,7 @@ a tiny `IntRange` that produces the integers `[start, end)`:
     },
     {
       filename: "IntRange.java",
-      initialContent: `import java.util.Iterator;
+      starterCode: `import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class IntRange implements Iterable<Integer> {
@@ -154,7 +159,10 @@ could not iterate it from two places at once.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -173,7 +181,9 @@ public class Main {
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 A list with a single cursor inside it could never produce that
@@ -194,7 +204,10 @@ implementations.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -214,7 +227,9 @@ public class Main {
     System.out.println(xs);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Why does this matter? Because mutating a list with `list.remove(i)`
@@ -229,7 +244,10 @@ the next call to `next()` throws.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -249,7 +267,9 @@ public class Main {
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 This is a *feature*, not a bug. Detecting concurrent mutation early
@@ -264,7 +284,10 @@ iterable:
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.HashMap;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.HashMap;
 import java.util.Map;
 
 public class Main {
@@ -288,7 +311,9 @@ public class Main {
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Prefer `entrySet()` when you need both: it walks the map once. Using
@@ -305,7 +330,7 @@ This is exactly how `Arrays.asList` and friends work conceptually.
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int[] arr = {10, 20, 30, 40};
     IntArrayIterable it = new IntArrayIterable(arr);
@@ -324,7 +349,7 @@ This is exactly how `Arrays.asList` and friends work conceptually.
     },
     {
       filename: "IntArrayIterable.java",
-      initialContent: `import java.util.Iterator;
+      starterCode: `import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class IntArrayIterable implements Iterable<Integer> {
@@ -381,7 +406,7 @@ Expected output:
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Countdown c = new Countdown(3);
     for (int n : c)
@@ -395,7 +420,7 @@ Expected output:
     },
     {
       filename: "Countdown.java",
-      initialContent: `import java.util.Iterator;
+      starterCode: `import java.util.Iterator;
 
 public class Countdown implements Iterable<Integer> {
   // TODO
@@ -410,7 +435,7 @@ public class Countdown implements Iterable<Integer> {
   }
 }
 `,
-      solutionContent: `import java.util.Iterator;
+      solutionCode: `import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class Countdown implements Iterable<Integer> {

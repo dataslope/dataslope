@@ -37,7 +37,10 @@ top."
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function greet(name) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function greet(name) {
   return "Hello, " + name;
 }
 
@@ -50,7 +53,9 @@ function main() {
 }
 
 main();
-`}
+`,
+    },
+  ]}
 />
 
 When `main()` runs, the stack grows and shrinks like this:
@@ -72,7 +77,10 @@ an infinitely recursive function — you get the famous
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function forever() {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function forever() {
   forever();
 }
 
@@ -81,7 +89,9 @@ try {
 } catch (e) {
   console.log("Caught:", e.message);
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Synchronous code blocks everything
@@ -91,7 +101,10 @@ timers, not network responses, not clicks — nothing.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function busyWait(ms) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function busyWait(ms) {
   const start = Date.now();
   while (Date.now() - start < ms) {
     // doing nothing for ms milliseconds
@@ -101,7 +114,9 @@ timers, not network responses, not clicks — nothing.
 console.log("A");
 busyWait(500); // ~half a second of nothing
 console.log("B"); // logs after ~500ms
-`}
+`,
+    },
+  ]}
 />
 
 This is exactly why long synchronous work in a browser freezes
@@ -153,7 +168,10 @@ Try predicting the output *before* running.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log("1: script start");
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `console.log("1: script start");
 
 setTimeout(() => {
   console.log("4: setTimeout callback");
@@ -164,7 +182,9 @@ Promise.resolve().then(() => {
 });
 
 console.log("2: script end");
-`}
+`,
+    },
+  ]}
 />
 
 You should see:
@@ -197,7 +217,10 @@ microtask, and let other code run in the meantime."
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`async function demo() {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `async function demo() {
   console.log("A: before await");
   await Promise.resolve();
   console.log("C: after await");
@@ -206,7 +229,9 @@ microtask, and let other code run in the meantime."
 console.log("1: before demo()");
 demo();
 console.log("2: after demo()");
-`}
+`,
+    },
+  ]}
 />
 
 The output is:
@@ -264,7 +289,7 @@ in that order?"* questions.
   files={[
     {
       filename: "index.js",
-      initialContent: `const { runDemo } = require("./scheduling");
+      starterCode: `const { runDemo } = require("./scheduling");
 
 console.log("> script begin");
 runDemo();
@@ -273,7 +298,7 @@ console.log("> script end");
     },
     {
       filename: "scheduling.js",
-      initialContent: `function runDemo() {
+      starterCode: `function runDemo() {
   setTimeout(() => console.log("[task] timeout 0"), 0);
   setTimeout(() => console.log("[task] timeout 0 #2"), 0);
 
@@ -327,15 +352,18 @@ Constraints:
 - Push \`"micro"\` from a \`Promise.resolve().then\` callback.
 - Push \`"task"\` from a \`setTimeout(..., 0)\` callback.
 - Use a promise that resolves once everything has been pushed, and return it. The tests will \`await\` it.`}
-  starterCode={`function schedule(log) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function schedule(log) {
   // your code here
   // must return a Promise that resolves after the third push.
 }
 
 const log = [];
 schedule(log).then(() => console.log(log));
-`}
-  solutionCode={`function schedule(log) {
+`,
+      solutionCode: `function schedule(log) {
   return new Promise((resolve) => {
     log.push("sync");
     Promise.resolve().then(() => {
@@ -350,7 +378,9 @@ schedule(log).then(() => console.log(log));
 
 const log = [];
 schedule(log).then(() => console.log(log));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "returns_promise",

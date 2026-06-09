@@ -53,7 +53,10 @@ production. Make this a habit:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   int safe = 0; // good: initialized.
@@ -68,7 +71,9 @@ int main() {
   // std::cout << risky2 << "\\n"; // undefined behavior!
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Modern C++ tip: write `int x{};` (called **value initialization**)
@@ -125,7 +130,10 @@ field), use `<cstdint>` types like `int16_t`, `int32_t`, `int64_t`.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <cstdint>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <cstdint>
 #include <iostream>
 
 int main() {
@@ -141,7 +149,9 @@ int main() {
             << ratio << " " << precise << " " << fixed32 << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## `auto`: let the compiler infer the type
@@ -152,7 +162,10 @@ initializer. This is handy for long type names.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 
 int main() {
@@ -164,7 +177,9 @@ int main() {
   std::cout << x << " " << y << " " << name << " " << flag << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 `auto` does *not* mean "no type." It means "you, the compiler,
@@ -191,7 +206,10 @@ flowchart TB
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   int a = 1;
@@ -203,7 +221,9 @@ int main() {
   // std::cout << b;  // <-- error: 'b' was not declared in this scope
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Smaller scopes are *better*. Declare each variable as close to its
@@ -251,7 +271,10 @@ overwrite.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   const int max_users = 100;
@@ -261,7 +284,9 @@ int main() {
   // max_users = 200;
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 A useful habit: declare *everything* `const` by default, and only
@@ -277,7 +302,10 @@ truncates, `signed` to `unsigned` wraps).
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   double pi = 3.14159;
@@ -289,7 +317,9 @@ int main() {
   std::cout << "u = " << u << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Modern advice: prefer `static_cast<T>(value)` when you genuinely want
@@ -301,7 +331,10 @@ a conversion. It makes the intent explicit and easier to grep for.
   adapter="cpp"
   title="Celsius to Fahrenheit"
   instructions={`Implement \`celsius_to_fahrenheit\` so the program prints \`98.6\` (no trailing newline, just \`98.6\`).\n\nThe formula is \`F = C * 9/5 + 32\`. Watch out: \`9/5\` in integer arithmetic is \`1\`, not \`1.8\`!`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 double celsius_to_fahrenheit(double c) {
   // your code here
@@ -312,8 +345,8 @@ int main() {
   std::cout << celsius_to_fahrenheit(37.0);
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 
 double celsius_to_fahrenheit(double c) { return c * 9.0 / 5.0 + 32.0; }
 
@@ -321,7 +354,9 @@ int main() {
   std::cout << celsius_to_fahrenheit(37.0);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "37c",

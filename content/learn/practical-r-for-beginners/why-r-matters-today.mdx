@@ -164,12 +164,17 @@ working tool.
 
 <CodeBlock
   adapter="r"
-  starterCode={`group_a <- c(5.2, 5.4, 5.1, 5.6, 5.3, 5.5)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `group_a <- c(5.2, 5.4, 5.1, 5.6, 5.3, 5.5)
 group_b <- c(4.8, 4.9, 5.1, 4.7, 4.6, 5.0)
 
 result <- t.test(group_a, group_b)
 print(result)
-`}
+`,
+    },
+  ]}
 />
 
 One function call gives you the t-statistic, degrees of freedom,
@@ -182,7 +187,10 @@ trend line:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 data(iris)
 
 ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color = Species)) +
@@ -193,7 +201,9 @@ ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color = Species)) +
     x     = "Sepal length (cm)",
     y     = "Petal length (cm)"
   )
-`}
+`,
+    },
+  ]}
 />
 
 That code reads almost like a description of what you want, and
@@ -204,7 +214,10 @@ data manipulation become a readable chain:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 data(mtcars)
 
 mtcars |>
@@ -216,7 +229,9 @@ mtcars |>
     avg_mpg = mean(mpg),
     avg_horsepower = mean(hp)
   )
-`}
+`,
+    },
+  ]}
 />
 
 This reads, line by line, exactly as you would describe the

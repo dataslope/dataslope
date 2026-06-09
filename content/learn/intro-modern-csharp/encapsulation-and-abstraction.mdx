@@ -20,7 +20,10 @@ They are two angles on the same idea: *separating "what" from "how."*
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 var a = new BankAccount();
 a.Balance = 100;
@@ -31,7 +34,9 @@ public class BankAccount
 {
     public double Balance; // anyone can write this
 }
-`}
+`,
+    },
+  ]}
 />
 
 Nothing about the class prevents an outside caller from setting the
@@ -58,7 +63,10 @@ For now, focus on **`private` for state, `public` for behavior**.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 var a = new BankAccount("Alice", 100);
 a.Deposit(50);
@@ -96,7 +104,9 @@ public class BankAccount
         Balance -= amount;
     }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Now the *only* way the balance can change is by calling `Deposit`
@@ -125,7 +135,10 @@ Consider a `TemperatureSensor`:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 var s = new TemperatureSensor();
 Console.WriteLine($"C: {s.Celsius:F2}");
@@ -139,7 +152,9 @@ public class TemperatureSensor
 
     public double Fahrenheit => Celsius * 9.0 / 5.0 + 32;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Callers never need to know there's a voltage involved, or that the
@@ -173,7 +188,7 @@ something.
   files={[
     {
       filename: "Program.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 
 var w = new Wallet("Ada", 50);
 w.Add(100);
@@ -191,7 +206,7 @@ catch (Exception ex)
     },
     {
       filename: "Wallet.cs",
-      initialContent: `public class Wallet
+      starterCode: `public class Wallet
 {
     public string Owner { get; }
     public decimal Cash { get; private set; }
@@ -260,7 +275,7 @@ caught
   files={[
     {
       filename: "Program.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 
 var c = new Counter(0);
 Console.WriteLine(c.Value);
@@ -286,12 +301,12 @@ catch (ArgumentException)
     },
     {
       filename: "Counter.cs",
-      initialContent: `public class Counter
+      starterCode: `public class Counter
 {
     // TODO: implement
 }
 `,
-      solutionContent: `public class Counter
+      solutionCode: `public class Counter
 {
     public int Value { get; private set; }
 

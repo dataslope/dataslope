@@ -20,7 +20,10 @@ behavior that owns it into a single unit.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 double balance = 0;
 
@@ -36,7 +39,9 @@ void Withdraw(double amount)
 Deposit(100);
 Withdraw(40);
 Console.WriteLine(balance); // 60
-`}
+`,
+    },
+  ]}
 />
 
 It works. But it represents *one* account. If we needed two
@@ -66,7 +71,10 @@ actual accounts.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 var alice = new BankAccount();
 alice.Owner = "Alice";
@@ -94,7 +102,9 @@ public class BankAccount
         Balance -= amount;
     }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Read it carefully:
@@ -130,7 +140,10 @@ object is created, and is the natural place to put initialization.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 var alice = new BankAccount("Alice", 100);
 alice.Withdraw(40);
@@ -157,7 +170,9 @@ public class BankAccount
         Balance -= amount;
     }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Now you cannot create a `BankAccount` without supplying an owner
@@ -172,7 +187,10 @@ parameter has the same name as a field.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 var p = new Point(3, 4);
 Console.WriteLine(p.DistanceFromOrigin()); // 5
@@ -194,7 +212,9 @@ public class Point
         return Math.Sqrt(X * X + Y * Y);
     }
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Properties: smart fields
@@ -207,7 +227,10 @@ validation or computed logic without breaking callers.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 var p = new Person { Name = "Ada", Age = 30 };
 Console.WriteLine($"{p.Name}, adult? {p.IsAdult}");
@@ -221,7 +244,9 @@ public class Person
     // computed (read-only) property
     public bool IsAdult => Age >= 18;
 }
-`}
+`,
+    },
+  ]}
 />
 
 We'll lean on properties heavily in the next chapter when we add
@@ -239,7 +264,7 @@ grow into many files.
   files={[
     {
       filename: "Program.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 
 var alice = new BankAccount("Alice", 100);
 alice.Withdraw(40);
@@ -249,7 +274,7 @@ Console.WriteLine($"{alice.Owner}: {alice.Balance}");
     },
     {
       filename: "BankAccount.cs",
-      initialContent: `public class BankAccount
+      starterCode: `public class BankAccount
 {
     public string Owner { get; }
     public double Balance { get; private set; }
@@ -295,7 +320,7 @@ perimeter=14
   files={[
     {
       filename: "Program.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 
 var r = new Rectangle(3, 4);
 Console.WriteLine($"area={r.Area()}");
@@ -304,12 +329,12 @@ Console.WriteLine($"perimeter={r.Perimeter()}");
     },
     {
       filename: "Rectangle.cs",
-      initialContent: `public class Rectangle
+      starterCode: `public class Rectangle
 {
     // TODO: properties, constructor, Area, Perimeter
 }
 `,
-      solutionContent: `public class Rectangle
+      solutionCode: `public class Rectangle
 {
     public double Width { get; }
     public double Height { get; }

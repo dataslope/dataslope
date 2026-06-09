@@ -31,7 +31,10 @@ Good qualitative palettes: `"Plotly"`, `"D3"`, `"G10"`,
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007")
 
@@ -47,7 +50,9 @@ fig = px.scatter(
     labels={"gdpPercap": "GDP per capita (USD, log)", "lifeExp": "Life expectancy"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Rule of thumb: **keep qualitative palettes to ≤7 colors.** Past
@@ -64,7 +69,10 @@ Good sequential palettes: `"Viridis"`, `"Plasma"`, `"Magma"`,
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007")
 
@@ -80,7 +88,9 @@ fig = px.scatter(
     labels={"gdpPercap": "GDP per capita (USD, log)", "lifeExp": "Life expectancy"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 ### Diverging palettes
@@ -95,7 +105,10 @@ Good diverging palettes: `"RdBu"`, `"RdBu_r"` (reversed),
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 import pandas as pd
 
 # Simulated year-over-year change for several products
@@ -119,7 +132,9 @@ fig = px.bar(
     labels={"yoy_pct": "YoY change (%)", "product": "Product"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 The centerpiece move: `color_continuous_midpoint=0`. Without it,
@@ -158,7 +173,10 @@ Better: **gray out everything except the focus**.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("continent == 'Europe'")
 
@@ -177,7 +195,9 @@ fig = px.line(
     labels={"year": "Year", "lifeExp": "Life expectancy"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 The reader's eye goes directly to Germany. The other 29 countries

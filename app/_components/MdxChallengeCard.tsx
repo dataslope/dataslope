@@ -7,18 +7,24 @@
  * accepts the adapter as a string id (e.g. `"python"`) and resolves it
  * to the corresponding adapter instance — mirroring `<MdxCodeBlock>`.
  *
- * Usage in MDX (instructions can be a markdown string or a JSX node):
+ * Usage in MDX (instructions can be a markdown string or a JSX node;
+ * every card passes a `files` array, each file carrying its own
+ * `initCode`, `starterCode`, and optional `solutionCode`):
  * ```mdx
  * <ChallengeCard
  *   adapter="python"
  *   title="Summarize Sales by Category"
- *   category="pandas · groupby · agg"
- *   estimatedTime="~5 min"
  *   instructions={`You have a DataFrame called \`df\` with sales data.
  *
  * Group by \`category\` and compute totals.`}
- *   initCode={`import pandas as pd\ndf = pd.DataFrame(...)`}
- *   starterCode={`summary = None`}
+ *   files={[
+ *     {
+ *       filename: "main.py",
+ *       initCode: `import pandas as pd\ndf = pd.DataFrame(...)`,
+ *       starterCode: `summary = None`,
+ *       solutionCode: `summary = df.groupby("category").sum()`,
+ *     },
+ *   ]}
  *   tests={[
  *     {
  *       id: "summary_exists",

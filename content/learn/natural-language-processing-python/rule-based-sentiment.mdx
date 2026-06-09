@@ -51,7 +51,10 @@ now predict.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 # Installs NLTK and loads the tokenizer this page needs. nltk.download()
 # isn't available here, so we fetch the archives directly.
 import io, os, zipfile
@@ -76,8 +79,8 @@ async def _load_nltk(category, package):
         zf.extractall(dest)
 
 await _load_nltk("tokenizers", "punkt_tab")
-from nltk.tokenize import word_tokenize`}
-  starterCode={`POSITIVE = {"good", "great", "love", "excellent", "amazing", "wonderful", "best"}
+from nltk.tokenize import word_tokenize`,
+      starterCode: `POSITIVE = {"good", "great", "love", "excellent", "amazing", "wonderful", "best"}
 NEGATIVE = {"bad", "terrible", "hate", "awful", "worst", "poor", "boring"}
 
 
@@ -91,7 +94,9 @@ def naive_sentiment(text):
 
 for review in ["I love this movie", "This film is terrible", "It is not good"]:
     print(f"{naive_sentiment(review):9} <- {review!r}")
-`}
+`,
+    },
+  ]}
 />
 
 The first two are right. The third — "It is not good" — is scored
@@ -116,7 +121,10 @@ punctuation, so it does not bleed across clauses. This is a tiny amount of
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -139,8 +147,8 @@ async def _load_nltk(category, package):
         zf.extractall(dest)
 
 await _load_nltk("tokenizers", "punkt_tab")
-from nltk.tokenize import word_tokenize`}
-  starterCode={`POSITIVE = {"good", "great", "love", "excellent", "amazing", "wonderful", "best"}
+from nltk.tokenize import word_tokenize`,
+      starterCode: `POSITIVE = {"good", "great", "love", "excellent", "amazing", "wonderful", "best"}
 NEGATIVE = {"bad", "terrible", "hate", "awful", "worst", "poor", "boring"}
 NEGATIONS = {"not", "no", "never", "n't"}
 RESET = {".", "!", "?", ",", ";", "but"}  # clause boundaries reset negation
@@ -175,7 +183,9 @@ tests = [
 ]
 for review in tests:
     print(f"{sentiment(review):9} <- {review!r}")
-`}
+`,
+    },
+  ]}
 />
 
 Now "It is not good" is correctly **negative**, and — satisfyingly — "This is
@@ -266,7 +276,10 @@ Algorithm:
    otherwise \`"neutral"\`.
 
 This should make "this is not good" negative and "this is not bad" positive.`}
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -294,8 +307,8 @@ from nltk.tokenize import word_tokenize
 POSITIVE = {"good", "great", "love", "excellent", "amazing", "wonderful", "best", "nice"}
 NEGATIVE = {"bad", "terrible", "hate", "awful", "worst", "poor", "boring", "broken"}
 NEGATIONS = {"not", "no", "never", "n't"}
-RESET = {".", "!", "?", ",", ";", "but"}`}
-  starterCode={`def classify(text):
+RESET = {".", "!", "?", ",", ";", "but"}`,
+      starterCode: `def classify(text):
     tokens = [t.lower() for t in word_tokenize(text)]
     score = 0
     negate = False
@@ -310,8 +323,8 @@ RESET = {".", "!", "?", ",", ";", "but"}`}
 
 for review in ["I love it", "This is not good", "Not bad at all"]:
     print(f"{classify(review):9} <- {review!r}")
-`}
-  solutionCode={`def classify(text):
+`,
+      solutionCode: `def classify(text):
     tokens = [t.lower() for t in word_tokenize(text)]
     score = 0
     negate = False
@@ -337,7 +350,9 @@ for review in ["I love it", "This is not good", "Not bad at all"]:
 
 for review in ["I love it", "This is not good", "Not bad at all"]:
     print(f"{classify(review):9} <- {review!r}")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "plain_positive",

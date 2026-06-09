@@ -87,7 +87,10 @@ The same idea, expressed in modern C#:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 int total = 0;
 for (int i = 1; i <= 100; i++)
@@ -96,7 +99,9 @@ for (int i = 1; i <= 100; i++)
 }
 
 Console.WriteLine($"total = {total}");
-`}
+`,
+    },
+  ]}
 />
 
 Notice how the C# version reads almost like English. You do not need

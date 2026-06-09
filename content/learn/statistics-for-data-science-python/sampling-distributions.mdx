@@ -78,7 +78,10 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.express as px
 
 rng = np.random.default_rng(42)
@@ -110,7 +113,9 @@ print(f"Population sd sigma              = {SIGMA:.2f}")
 print(
     f"SD of the sample means          = {means.std():.2f}   (MUCH smaller than sigma)"
 )
-`}
+`,
+    },
+  ]}
 />
 
 Two facts jump out, and they are the two pillars of inference:
@@ -135,7 +140,10 @@ fundamentally different things.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import pandas as pd
 import plotly.express as px
 
@@ -180,7 +188,9 @@ print(
     f"(b) one sample raw values   -> sd = {one_sample.std():5.2f}  (~ matches population)"
 )
 print(f"(c) sampling dist of x-bar  -> sd = {many_means.std():5.2f}  (FAR narrower)")
-`}
+`,
+    },
+  ]}
 />
 
 Look at the widths. (a) and (b) are roughly the *same* width — because
@@ -215,7 +225,10 @@ produce sample means that cluster more tightly around μ. Let's vary
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import pandas as pd
 import plotly.express as px
 
@@ -250,7 +263,9 @@ fig.show()
 print()
 print("All four pile up on mu = 50. Larger n -> tighter pile.")
 print("Notice: SD roughly HALVES when n goes up 4x (5->20, 20->80, 80->320).")
-`}
+`,
+    },
+  ]}
 />
 
 Two things to internalize. First, **every** curve is centered on 50 —
@@ -287,7 +302,10 @@ classic error.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.default_rng(1)
 MU, SIGMA = 50.0, 18.0
@@ -310,7 +328,9 @@ print("Lever 2: LARGER SAMPLE SIZE (fix n_samples=4000, grow n)")
 for n in [10, 40, 160, 640]:
     print(f"  n={n:4d}, n_samples=4000  ->  SD of x-bar = {sd_of_means(n, 4000):.2f}")
 print("  -> SD shrinks steadily. Larger n is what sharpens the estimate.")
-`}
+`,
+    },
+  ]}
 />
 
 The first block holds `n=40` and cranks the number of samples from 500 to
@@ -346,7 +366,10 @@ number.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import pandas as pd
 import plotly.express as px
 
@@ -381,7 +404,9 @@ fig.show()
 print()
 print("Different statistics -> different centers, spreads, AND shapes.")
 print("The max's sampling distribution is skewed and sits far from the mean's.")
-`}
+`,
+    },
+  ]}
 />
 
 Each statistic gets a different sampling distribution, with its own
@@ -417,23 +442,26 @@ off that picture. We'll formalize the bell shape of the mean's version in
    - \`"spread"\` — the standard deviation of \`means\` (a float)
 
 The \`center\` should land very close to the population mean (~50), and the \`spread\` should be far **smaller** than the population's own standard deviation (~12).`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 rng = np.random.default_rng(321)
 
 # Known population (you may inspect it, but build the sampling dist by sampling).
 population = rng.normal(50, 12, size=1_000_000)
 pop_sd = float(population.std())   # ~12, for your reference
 n = 50
-n_samples = 3000`}
-  starterCode={`# TODO: build 'means' (array of 3000 sample means) and 'summary' dict.
+n_samples = 3000`,
+      starterCode: `# TODO: build 'means' (array of 3000 sample means) and 'summary' dict.
 means = None
 
 summary = {
     "center": None,
     "spread": None,
 }
-`}
-  solutionCode={`means = np.array(
+`,
+      solutionCode: `means = np.array(
     [rng.choice(population, size=n, replace=False).mean() for _ in range(n_samples)]
 )
 
@@ -442,7 +470,9 @@ summary = {
     "spread": float(means.std()),
 }
 print(summary, "  population sd =", round(pop_sd, 2))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "means_shape",
@@ -491,20 +521,23 @@ Produce a dict \`result\` with:
 - \`"ratio"\` — \`sd_small / sd_big\` (a float)
 
 Because \`n_big\` is **4x** \`n_small\`, the spread should roughly **halve**, so \`ratio\` should be near 2 (the $\\sqrt{4}=2$ rule). Tests allow a generous window around 2.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 rng = np.random.default_rng(808)
 
 population = rng.normal(100, 20, size=1_000_000)
 n_small, n_big = 25, 100
-n_samples = 2000`}
-  starterCode={`# TODO: compute sd of sample means at each n, and their ratio.
+n_samples = 2000`,
+      starterCode: `# TODO: compute sd of sample means at each n, and their ratio.
 result = {
     "sd_small": None,
     "sd_big": None,
     "ratio": None,
 }
-`}
-  solutionCode={`def sd_of_means(n):
+`,
+      solutionCode: `def sd_of_means(n):
     means = np.array(
         [rng.choice(population, size=n, replace=False).mean() for _ in range(n_samples)]
     )
@@ -519,7 +552,9 @@ result = {
     "ratio": sd_small / sd_big,
 }
 print(result)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "keys",

@@ -38,7 +38,10 @@ In *one* compact glyph.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
@@ -50,7 +53,9 @@ fig = px.box(
     labels={"total_bill": "Total bill (USD)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Hover over the box — Plotly shows you the median, Q1, Q3, min, max,
@@ -63,7 +68,10 @@ The real power of box plots is *side-by-side comparison*. Add an
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
@@ -78,7 +86,9 @@ fig = px.box(
     labels={"total_bill": "Total bill (USD)", "day": "Day"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Now you can compare *eight* distributions at once: 4 days × 2
@@ -92,7 +102,10 @@ the raw points back:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
@@ -107,7 +120,9 @@ fig = px.box(
     labels={"total_bill": "Total bill (USD)", "day": "Day"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 This hybrid (box + jittered dots) is sometimes the best of both
@@ -120,7 +135,10 @@ shows the same summary plus a smoothed density:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
@@ -137,7 +155,9 @@ fig = px.violin(
     labels={"total_bill": "Total bill (USD)", "day": "Day"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Violins reveal **bimodality**, **skew shape**, and other features

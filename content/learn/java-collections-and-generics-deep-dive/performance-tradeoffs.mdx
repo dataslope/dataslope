@@ -66,7 +66,10 @@ If you know roughly how many elements you'll add, **pre-size**:
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -84,7 +87,9 @@ public class Main {
     System.out.println(b.size());
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 `ensureCapacity(int)` is the runtime equivalent.
@@ -110,7 +115,10 @@ initialCapacity = ceil(n / loadFactor) = ceil(n / 0.75)
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.HashMap;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.HashMap;
 import java.util.Map;
 
 public class Main {
@@ -122,7 +130,9 @@ public class Main {
     System.out.println(m.size());
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## When ArrayList vs. LinkedList actually matters
@@ -164,7 +174,7 @@ collections library (Eclipse Collections, fastutil, Koloboke).
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int n = 200_000;
 
@@ -181,7 +191,7 @@ collections library (Eclipse Collections, fastutil, Koloboke).
     },
     {
       filename: "Bench.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 

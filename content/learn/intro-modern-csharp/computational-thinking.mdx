@@ -82,7 +82,10 @@ Here is the "max of a list" pattern, in C#:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 int[] scores = { 71, 88, 65, 92, 80, 77 };
@@ -95,7 +98,9 @@ foreach (var s in scores)
 }
 
 Console.WriteLine($"highest score: {best}");
-`}
+`,
+    },
+  ]}
 />
 
 Once you know this pattern, you can apply it to longest word,
@@ -169,7 +174,10 @@ In code, the same instinct shows up like this:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 double DivideSafely(double a, double b)
 {
@@ -184,7 +192,9 @@ double DivideSafely(double a, double b)
 
 Console.WriteLine(DivideSafely(10, 2));
 Console.WriteLine(DivideSafely(10, 0));
-`}
+`,
+    },
+  ]}
 />
 
 A vague programmer writes `return a / b;` and ships it. A
@@ -216,7 +226,10 @@ Here is the program:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 int CountUniqueWords(string text)
@@ -238,7 +251,9 @@ Console.WriteLine(CountUniqueWords("the quick brown fox jumps over the lazy dog"
 Console.WriteLine(CountUniqueWords("hello hello HELLO  world"));
 Console.WriteLine(CountUniqueWords(""));
 Console.WriteLine(CountUniqueWords("    "));
-`}
+`,
+    },
+  ]}
 />
 
 Trace the execution mentally:
@@ -284,13 +299,16 @@ Apply computational thinking:
 2. *Pattern:* this is the "filter + sum" pattern.
 3. *Abstraction:* ignore odd numbers entirely.
 4. *Algorithm:* be explicit about starting the sum at \`0\`.`}
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 int[] nums = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
 // your code here
-`}
-  solutionCode={`using System;
+`,
+      solutionCode: `using System;
 
 int[] nums = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
@@ -301,7 +319,9 @@ foreach (var n in nums)
         sum += n;
 }
 Console.WriteLine($"sum of evens = {sum}");
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "sum_evens",

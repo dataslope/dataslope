@@ -139,7 +139,10 @@ S in 1985 or in R today. The semantics are nearly identical.
 
 <CodeBlock
   adapter="r"
-  starterCode={`# Code that is essentially identical to 1985-era S
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# Code that is essentially identical to 1985-era S
 heights <- c(168, 172, 165, 180, 175, 170, 169)
 weights <- c(63, 70, 58, 85, 75, 68, 65)
 
@@ -153,7 +156,9 @@ cat("min:", min(bmi), " median:", median(bmi), " max:", max(bmi), "\\n")
 # A linear model — one of S's signature features
 model <- lm(weights ~ heights)
 print(coef(model))
-`}
+`,
+    },
+  ]}
 />
 
 That same expression — `weights ~ heights` as a model formula —
@@ -167,7 +172,10 @@ But R added things S never had. A modern R script can use
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 data(mtcars)
 
 # A dplyr pipeline — distinctly modern-R idiom
@@ -179,7 +187,9 @@ mtcars |>
     avg_hp    = mean(hp),
     avg_wt    = mean(wt)
   )
-`}
+`,
+    },
+  ]}
 />
 
 The `|>` operator (called the *native pipe*, added to R in 4.1 in
@@ -267,15 +277,20 @@ linear model.
 1. Assign the women's average weight (\`mean\` of \`women$weight\`) to \`avg_weight\`.
 2. Fit a linear model \`weight ~ height\` and assign it to \`model\`.
 3. Extract the slope coefficient (the "height" coefficient) into a numeric scalar \`slope\`.`}
-  initCode={`data(women)`}
-  starterCode={`avg_weight <- NA
+  files={[
+    {
+      filename: "main.r",
+      initCode: `data(women)`,
+      starterCode: `avg_weight <- NA
 model <- NULL
 slope <- NA
-`}
-  solutionCode={`avg_weight <- mean(women$weight)
+`,
+      solutionCode: `avg_weight <- mean(women$weight)
 model <- lm(weight ~ height, data = women)
 slope <- unname(coef(model)["height"])
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "avg_weight",

@@ -23,7 +23,10 @@ the return type:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function add(a: number, b: number): number {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function add(a: number, b: number): number {
   return a + b;
 }
 
@@ -31,7 +34,9 @@ console.log("add(10, 20):", add(10, 20));
 console.log("add(5, 7):", add(5, 7));
 
 // add("10", 20);  // ❌ Argument of type '"10"' is not assignable to parameter of type 'number'
-`}
+`,
+    },
+  ]}
 />
 
 **What the compiler now knows:** `add` requires two `number`s and returns
@@ -44,12 +49,17 @@ the `return` statements:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function multiply(a: number, b: number) {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function multiply(a: number, b: number) {
   return a * b; // inferred return type: number
 }
 
 console.log("multiply(3, 4):", multiply(3, 4));
-`}
+`,
+    },
+  ]}
 />
 
 But for public APIs, **explicit return types** are recommended. They make
@@ -62,7 +72,10 @@ A parameter marked with `?` is **optional** — callers can omit it:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function greet(name: string, greeting?: string): string {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function greet(name: string, greeting?: string): string {
   if (greeting === undefined) {
     return \`Hello, \${name}!\`;
   }
@@ -71,7 +84,9 @@ A parameter marked with `?` is **optional** — callers can omit it:
 
 console.log(greet("Alice"));
 console.log(greet("Bob", "Hi"));
-`}
+`,
+    },
+  ]}
 />
 
 Inside the function, `greeting` has type `string | undefined`, so you
@@ -86,13 +101,18 @@ argument:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function greet(name: string, greeting: string = "Hello"): string {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function greet(name: string, greeting: string = "Hello"): string {
   return \`\${greeting}, \${name}!\`;
 }
 
 console.log(greet("Alice")); // uses default "Hello"
 console.log(greet("Bob", "Hi")); // overrides default
-`}
+`,
+    },
+  ]}
 />
 
 With a default, the parameter is still optional at the call site, but
@@ -106,7 +126,10 @@ into an array:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function sum(...numbers: number[]): number {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function sum(...numbers: number[]): number {
   let total = 0;
   for (const num of numbers) {
     total += num;
@@ -117,7 +140,9 @@ into an array:
 console.log("sum():", sum());
 console.log("sum(1, 2, 3):", sum(1, 2, 3));
 console.log("sum(10, 20, 30, 40):", sum(10, 20, 30, 40));
-`}
+`,
+    },
+  ]}
 />
 
 The type `...numbers: number[]` means "zero or more `number`s, collected
@@ -133,14 +158,19 @@ them as arguments, return them from other functions. To annotate a
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type BinaryOp = (a: number, b: number) => number;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type BinaryOp = (a: number, b: number) => number;
 
 const add: BinaryOp = (a, b) => a + b;
 const multiply: BinaryOp = (a, b) => a * b;
 
 console.log("add(10, 20):", add(10, 20));
 console.log("multiply(3, 4):", multiply(3, 4));
-`}
+`,
+    },
+  ]}
 />
 
 The syntax `(a: number, b: number) => number` is a **function type** — it
@@ -151,7 +181,10 @@ Here's a higher-order function that accepts a callback:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function applyTwice(fn: (x: number) => number, value: number): number {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function applyTwice(fn: (x: number) => number, value: number): number {
   return fn(fn(value));
 }
 
@@ -160,7 +193,9 @@ const square = (x: number) => x * x;
 
 console.log("applyTwice(double, 5):", applyTwice(double, 5)); // 5 * 2 * 2 = 20
 console.log("applyTwice(square, 3):", applyTwice(square, 3)); // 3² = 9, 9² = 81
-`}
+`,
+    },
+  ]}
 />
 
 **What bugs does this prevent?** If you pass a function with the wrong
@@ -174,7 +209,10 @@ interface or type literal:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface MathOp {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface MathOp {
   (a: number, b: number): number;
 }
 
@@ -183,7 +221,9 @@ const subtract: MathOp = (a, b) => a - b;
 
 console.log("add(10, 5):", add(10, 5));
 console.log("subtract(10, 5):", subtract(10, 5));
-`}
+`,
+    },
+  ]}
 />
 
 The syntax `(a: number, b: number): number;` inside an interface is a
@@ -193,7 +233,10 @@ properties (e.g., a function with a `.version` property).
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface CallableWithVersion {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface CallableWithVersion {
   (x: number): number;
   version: string;
 }
@@ -203,7 +246,9 @@ increment.version = "1.0.0";
 
 console.log("increment(5):", increment(5));
 console.log("version:", increment.version);
-`}
+`,
+    },
+  ]}
 />
 
 This pattern is less common in modern TypeScript (object methods are
@@ -216,7 +261,10 @@ A function that doesn't return a value has return type **`void`**:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function logMessage(message: string): void {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function logMessage(message: string): void {
   console.log("LOG:", message);
 }
 
@@ -225,7 +273,9 @@ logMessage("Hello, TypeScript!");
 // The function doesn't return anything useful:
 const result = logMessage("Another message");
 console.log("result is:", result); // undefined
-`}
+`,
+    },
+  ]}
 />
 
 `void` means "this function is called for its side effects, not its
@@ -242,7 +292,10 @@ function explicitly returns `undefined`":
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function doNothing(): void {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function doNothing(): void {
   // No return statement
 }
 
@@ -255,7 +308,9 @@ const b = returnUndefined(); // type: undefined
 
 console.log("a:", a);
 console.log("b:", b);
-`}
+`,
+    },
+  ]}
 />
 
 In practice, `void` is more common for side-effect functions. Use
@@ -270,7 +325,10 @@ patterns:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Overload signatures
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Overload signatures
 function format(value: number): string;
 function format(value: string): string;
 
@@ -284,7 +342,9 @@ function format(value: number | string): string {
 
 console.log("format(42):", format(42));
 console.log("format('hello'):", format("hello"));
-`}
+`,
+    },
+  ]}
 />
 
 The **overload signatures** (the first two lines) describe the public
@@ -304,7 +364,10 @@ typing**:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const numbers = [1, 2, 3, 4, 5];
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const numbers = [1, 2, 3, 4, 5];
 
 // The callback's parameter type is inferred from Array.map's signature
 const doubled = numbers.map((n) => n * 2);
@@ -312,7 +375,9 @@ console.log("doubled:", doubled);
 
 const asStrings = numbers.map((n) => n.toString());
 console.log("asStrings:", asStrings);
-`}
+`,
+    },
+  ]}
 />
 
 You didn't annotate `n` with `: number`, but TypeScript knows `n` is a
@@ -334,7 +399,7 @@ You'll define utility functions in one file and compose them in another.
   files={[
     {
       filename: "utils.ts",
-      initialContent: `export function double(x: number): number {
+      starterCode: `export function double(x: number): number {
   // Your code here
   return 0;
 }
@@ -344,7 +409,7 @@ export function addTen(x: number): number {
   return 0;
 }
 `,
-      solutionContent: `export function double(x: number): number {
+      solutionCode: `export function double(x: number): number {
   return x * 2;
 }
 
@@ -355,7 +420,7 @@ export function addTen(x: number): number {
     },
     {
       filename: "main.ts",
-      initialContent: `import { double, addTen } from "./utils";
+      starterCode: `import { double, addTen } from "./utils";
 
 export function compose(
   f: (x: number) => number,
@@ -368,7 +433,7 @@ export function compose(
 const pipeline = compose(double, addTen);
 console.log("compose(double, addTen)(5):", pipeline(5));
 `,
-      solutionContent: `import { double, addTen } from "./utils";
+      solutionCode: `import { double, addTen } from "./utils";
 
 export function compose(
   f: (x: number) => number,
@@ -414,7 +479,10 @@ compare to TypeScript:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`interface FetchOptions {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `interface FetchOptions {
   timeout?: number;
   retries?: number;
 }
@@ -425,7 +493,9 @@ function fetchUser(id: number, options: FetchOptions = {}): Promise<string> {
 }
 
 fetchUser(123, { timeout: 5000 }).then((data) => console.log(data));
-`}
+`,
+    },
+  ]}
 />
 
 The signature tells you everything: `id` is a `number`, `options` is a

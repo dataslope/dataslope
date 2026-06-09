@@ -54,7 +54,7 @@ flowchart TD
   files={[
     {
       filename: "main.py",
-      initialContent: `import numpy as np
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from simulate import run_one
 from aggregate import summarize
@@ -83,7 +83,7 @@ plt.show()
     },
     {
       filename: "simulate.py",
-      initialContent: `import numpy as np
+      starterCode: `import numpy as np
 from scipy.integrate import solve_ivp
 
 
@@ -137,7 +137,7 @@ def run_one(a, seed, r=1.0, K=200.0, e=0.1, m=0.4, sigma=0.02, t_end=200.0):
     },
     {
       filename: "aggregate.py",
-      initialContent: `import numpy as np
+      starterCode: `import numpy as np
 from collections import defaultdict
 
 
@@ -164,7 +164,7 @@ def summarize(runs):
     },
     {
       filename: "plot.py",
-      initialContent: `import numpy as np
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -219,7 +219,10 @@ oscillations; runaway escape means extinction.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
@@ -247,7 +250,9 @@ ax.set_ylabel("predator y")
 ax.set_title("Lotka–Volterra phase portrait")
 ax.legend()
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 Different starting populations spiral *into the same equilibrium*
@@ -263,7 +268,10 @@ us an answer with confidence bars.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy.integrate import solve_ivp
 
 
@@ -293,7 +301,9 @@ for a in [0.005, 0.010, 0.015, 0.020, 0.030]:
     p = outcomes.mean()
     se = np.sqrt(p * (1 - p) / len(outcomes))
     print(f"a = {a:.3f}   survival = {p:.2f} ± {se:.2f}")
-`}
+`,
+    },
+  ]}
 />
 
 The survival probability falls as predation intensifies, and

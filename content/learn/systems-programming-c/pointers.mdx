@@ -18,7 +18,10 @@ specifier prints it in hex (after a cast to `void *`).
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int x = 42;
@@ -30,7 +33,9 @@ int main(void) {
   printf("c = %c  at address %p\\n", c, (void *)&c);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The addresses you see are inside the WASI sandbox's virtual address
@@ -62,7 +67,10 @@ flowchart LR
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int x = 10;
@@ -75,7 +83,9 @@ int main(void) {
   printf("After *p = 99, x is %d\\n", x);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## NULL: the "points to nothing" pointer
@@ -86,7 +96,10 @@ A pointer that does not point anywhere meaningful should be `NULL`
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stddef.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stddef.h>
 #include <stdio.h>
 
 void print_if_some(int *p) {
@@ -103,7 +116,9 @@ int main(void) {
   print_if_some(NULL);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Always initialize pointers">
@@ -119,7 +134,10 @@ gets a copy. Modifying that copy does nothing to the caller.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 void try_to_swap(int a, int b) {
   int t = a;
@@ -134,7 +152,9 @@ int main(void) {
   printf("outside: x=%d y=%d\\n", x, y);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The `try_to_swap` function does swap its *local copies*, but the
@@ -143,7 +163,10 @@ variables, pass their addresses:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -157,7 +180,9 @@ int main(void) {
   printf("x=%d y=%d\\n", x, y);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 This is also how functions can "return" multiple values — give them
@@ -165,7 +190,10 @@ output pointers.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 // Returns 0 on success and fills *quot and *rem.
 // Returns -1 if denom is zero.
@@ -185,7 +213,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## `const` pointers vs pointers to `const`
@@ -218,7 +248,10 @@ does not know how many bytes to read or how to interpret them.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <string.h>
 
 int main(void) {
@@ -230,7 +263,9 @@ int main(void) {
   printf("b = 0x%X\\n", b);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Pointers to pointers
@@ -242,7 +277,10 @@ variables.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int x = 7;
@@ -257,7 +295,9 @@ int main(void) {
   printf("after **pp = 99, x = %d\\n", x);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 We will see this pattern again in the heap chapter when a function
@@ -269,7 +309,10 @@ needs to *replace* the caller's pointer with a new allocation.
   adapter="c"
   title="Implement swap()"
   instructions={`Implement \`void swap(int *a, int *b)\` so that, after the call, the values pointed to by \`a\` and \`b\` are exchanged. The provided \`main\` calls \`swap\` and prints the result.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 void swap(int *a, int *b) {
   // your code here
@@ -281,8 +324,8 @@ int main(void) {
   printf("%d %d\\n", x, y);
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -296,7 +339,9 @@ int main(void) {
   printf("%d %d\\n", x, y);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "swapped",
@@ -312,7 +357,10 @@ int main(void) {
   adapter="c"
   title="Return two values via output pointers"
   instructions={`Implement \`void min_max(int a, int b, int c, int *out_min, int *out_max)\` so it writes the minimum of \`a, b, c\` to \`*out_min\` and the maximum to \`*out_max\`. The provided \`main\` calls it for \`(7, 2, 9)\` and prints \`min=2 max=9\`.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 void min_max(int a, int b, int c, int *out_min, int *out_max) {
   // your code here
@@ -324,8 +372,8 @@ int main(void) {
   printf("min=%d max=%d\\n", lo, hi);
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 void min_max(int a, int b, int c, int *out_min, int *out_max) {
   int lo = a;
@@ -348,7 +396,9 @@ int main(void) {
   printf("min=%d max=%d\\n", lo, hi);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "min_max_basic",

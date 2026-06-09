@@ -18,7 +18,10 @@ A discriminated union is a sum type where every variant has a
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Shape =
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Shape =
   | { kind: "circle"; radius: number }
   | { kind: "square"; side: number }
   | { kind: "rectangle"; w: number; h: number };
@@ -41,7 +44,9 @@ function show(s: Shape): string {
 
 console.log(show(s1));
 console.log(show(s2));
-`}
+`,
+    },
+  ]}
 />
 
 Inside `case "circle":`, the compiler **narrows** `s` to the circle
@@ -58,7 +63,10 @@ catches it.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Shape =
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Shape =
   | { kind: "circle"; radius: number }
   | { kind: "square"; side: number }
   | { kind: "rectangle"; w: number; h: number };
@@ -80,7 +88,9 @@ function area(s: Shape): number {
 
 console.log(area({ kind: "circle", radius: 2 }).toFixed(3));
 console.log(area({ kind: "rectangle", w: 3, h: 4 }));
-`}
+`,
+    },
+  ]}
 />
 
 Try adding `| { kind: "triangle"; base: number; height: number }`
@@ -102,7 +112,10 @@ calling syntax:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Shape =
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Shape =
   | { kind: "circle"; radius: number }
   | { kind: "square"; side: number }
   | { kind: "rectangle"; w: number; h: number };
@@ -131,7 +144,9 @@ const describe = (s: Shape) =>
 console.log(describe({ kind: "circle", radius: 2 }));
 console.log(describe({ kind: "square", side: 5 }));
 console.log(describe({ kind: "rectangle", w: 3, h: 4 }));
-`}
+`,
+    },
+  ]}
 />
 
 The `Handlers<T, R>` mapped type forces you to provide a handler
@@ -150,7 +165,10 @@ inside a case.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Json =
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Json =
   | { kind: "null" }
   | { kind: "bool"; value: boolean }
   | { kind: "num"; value: number }
@@ -188,7 +206,9 @@ const example: Json = {
 };
 
 console.log("size:", size(example));
-`}
+`,
+    },
+  ]}
 />
 
 Recursive sum types like `Json` show why exhaustive matching
@@ -202,7 +222,10 @@ values:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Light = "red" | "yellow" | "green";
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Light = "red" | "yellow" | "green";
 
 // Pretend we're computing the next light from current + a flag
 function next(current: Light, emergency: boolean): Light {
@@ -221,7 +244,9 @@ for (const l of ["red", "green", "yellow"] as const) {
   console.log(\`\${l}            -> \${next(l, false)}\`);
   console.log(\`\${l} emergency  -> \${next(l, true)}\`);
 }
-`}
+`,
+    },
+  ]}
 />
 
 For more complex tuple cases, you can build a tagged "pair" type
@@ -279,7 +304,7 @@ Rules:
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { apply, Event } from "./interpret";
+      starterCode: `import { apply, Event } from "./interpret";
 
 const events: Event[] = [
   { kind: "deposit", amount: 100 },
@@ -297,7 +322,7 @@ for (const e of events) {
     },
     {
       filename: "interpret.ts",
-      initialContent: `export type Event =
+      starterCode: `export type Event =
   | { kind: "deposit"; amount: number }
   | { kind: "withdraw"; amount: number }
   | { kind: "interest"; rate: number }
@@ -313,7 +338,7 @@ export function apply(balance: number, e: Event): number {
   return balance;
 }
 `,
-      solutionContent: `export type Event =
+      solutionCode: `export type Event =
   | { kind: "deposit"; amount: number }
   | { kind: "withdraw"; amount: number }
   | { kind: "interest"; rate: number }

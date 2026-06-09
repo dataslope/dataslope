@@ -25,7 +25,10 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 # Installs NLTK and loads the tokenizer data this page needs. nltk.download()
 # isn't available in this environment, so we fetch the archives directly.
 import io, os, zipfile
@@ -51,8 +54,8 @@ async def _load_nltk(category, package):
 
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import word_tokenize
-from nltk.probability import FreqDist`}
-  starterCode={`text = """The fox runs. The dog runs too. The fox and the dog run together,
+from nltk.probability import FreqDist`,
+      starterCode: `text = """The fox runs. The dog runs too. The fox and the dog run together,
 and the fox is faster than the dog, but the dog is happier than the fox."""
 
 tokens = [t.lower() for t in word_tokenize(text) if t.isalpha()]
@@ -64,7 +67,9 @@ print("5 most common:       ", fd.most_common(5))
 print("Count of 'fox':      ", fd["fox"])
 print("Count of 'zebra':    ", fd["zebra"], "(absent words are 0, no error)")
 print("Relative freq 'the': ", round(fd.freq("the"), 3))
-`}
+`,
+    },
+  ]}
 />
 
 A few `FreqDist` methods you will use constantly:
@@ -99,7 +104,10 @@ near 0 means heavy repetition.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -122,8 +130,8 @@ async def _load_nltk(category, package):
         zf.extractall(dest)
 
 await _load_nltk("tokenizers", "punkt_tab")
-from nltk.tokenize import word_tokenize`}
-  starterCode={`def lexical_diversity(tokens):
+from nltk.tokenize import word_tokenize`,
+      starterCode: `def lexical_diversity(tokens):
     if not tokens:
         return 0.0
     return len(set(tokens)) / len(tokens)
@@ -134,7 +142,9 @@ varied = word_tokenize("an unusually eclectic vocabulary brimming with novelty")
 
 print("Repetitive text diversity:", round(lexical_diversity(repetitive), 3))
 print("Varied text diversity:    ", round(lexical_diversity(varied), 3))
-`}
+`,
+    },
+  ]}
 />
 
 The repetitive text scores low; the varied text scores near 1. Lexical
@@ -164,7 +174,10 @@ bar chart of the top words.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -188,8 +201,8 @@ async def _load_nltk(category, package):
 
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import word_tokenize
-from nltk.probability import FreqDist`}
-  starterCode={`import matplotlib.pyplot as plt
+from nltk.probability import FreqDist`,
+      starterCode: `import matplotlib.pyplot as plt
 
 text = """A search engine reads text and indexes the words in the text so that
 a user can search for words. When a user searches, the engine finds the text
@@ -211,7 +224,9 @@ plt.ylabel("count")
 plt.xticks(rotation=45, ha="right")
 plt.tight_layout()
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 The bar for "the" dwarfs the others, and a pile of words appear only once.
@@ -226,7 +241,10 @@ content words you actually care about are buried below them.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -252,8 +270,8 @@ await _load_nltk("tokenizers", "punkt_tab")
 await _load_nltk("corpora", "stopwords")
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-from nltk.probability import FreqDist`}
-  starterCode={`text = """A search engine reads text and indexes the words in the text so that
+from nltk.probability import FreqDist`,
+      starterCode: `text = """A search engine reads text and indexes the words in the text so that
 a user can search for words. When a user searches, the engine finds the text
 that best matches the words the user typed, ranking the best text first."""
 
@@ -264,7 +282,9 @@ print("Top 5 WITH stopwords:   ", FreqDist(tokens).most_common(5))
 
 content = [t for t in tokens if t not in stop]
 print("Top 5 WITHOUT stopwords:", FreqDist(content).most_common(5))
-`}
+`,
+    },
+  ]}
 />
 
 With stopwords, the most frequent word is "the" (7 times), with "a" close
@@ -318,12 +338,15 @@ Raw frequency over-represents the commonplace; stopword removal is the standard 
 For example, with \`tokens = ["a", "b", "a", "c", "a", "b"]\`,
 \`lexical_diversity(tokens)\` is \`0.5\` and \`top_words(tokens, 2)\` is
 \`[("a", 3), ("b", 2)]\`.`}
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import micropip
 await micropip.install("nltk")
 import nltk
-from nltk.probability import FreqDist`}
-  starterCode={`def lexical_diversity(tokens):
+from nltk.probability import FreqDist`,
+      starterCode: `def lexical_diversity(tokens):
     # distinct / total, or 0.0 if empty
     return 0.0
 
@@ -336,8 +359,8 @@ def top_words(tokens, n):
 sample = ["a", "b", "a", "c", "a", "b"]
 print("diversity:", lexical_diversity(sample))
 print("top 2:    ", top_words(sample, 2))
-`}
-  solutionCode={`def lexical_diversity(tokens):
+`,
+      solutionCode: `def lexical_diversity(tokens):
     if not tokens:
         return 0.0
     return len(set(tokens)) / len(tokens)
@@ -350,7 +373,9 @@ def top_words(tokens, n):
 sample = ["a", "b", "a", "c", "a", "b"]
 print("diversity:", lexical_diversity(sample))
 print("top 2:    ", top_words(sample, 2))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "diversity_basic",

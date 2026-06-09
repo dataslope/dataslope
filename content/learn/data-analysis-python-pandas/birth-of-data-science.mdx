@@ -161,7 +161,10 @@ end-to-end project right now. We will:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 # 1. Load
 df = pd.read_csv(
@@ -190,7 +193,9 @@ attrition_by_dept = (
 # 4. Communicate
 print("Attrition rate (%) by department:")
 print(attrition_by_dept)
-`}
+`,
+    },
+  ]}
 />
 
 In 15 lines of code we did the whole loop — load, inspect, group,

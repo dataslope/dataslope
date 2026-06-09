@@ -40,7 +40,10 @@ returns a generator, so wrap it in `list(...)` to see or reuse the results.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 # Installs NLTK and loads the tokenizer data this page needs. nltk.download()
 # isn't available here, so we fetch the archives directly.
 import io, os, zipfile
@@ -66,8 +69,8 @@ async def _load_nltk(category, package):
 
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import word_tokenize
-from nltk.util import ngrams`}
-  starterCode={`tokens = [t.lower() for t in word_tokenize("The quick brown fox jumps") if t.isalpha()]
+from nltk.util import ngrams`,
+      starterCode: `tokens = [t.lower() for t in word_tokenize("The quick brown fox jumps") if t.isalpha()]
 print("tokens:", tokens)
 print()
 
@@ -78,7 +81,9 @@ print("bigrams (n=2): ", bigrams)
 print("trigrams (n=3):", trigrams)
 print()
 print(f"{len(tokens)} tokens -> {len(bigrams)} bigrams, {len(trigrams)} trigrams")
-`}
+`,
+    },
+  ]}
 />
 
 Each bigram is a 2-tuple of adjacent words; each trigram is a 3-tuple. The
@@ -99,7 +104,10 @@ Two quick demonstrations of what unigrams miss and bigrams catch.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -123,8 +131,8 @@ async def _load_nltk(category, package):
 
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import word_tokenize
-from nltk.util import ngrams`}
-  starterCode={`a = [t.lower() for t in word_tokenize("the food was not good")]
+from nltk.util import ngrams`,
+      starterCode: `a = [t.lower() for t in word_tokenize("the food was not good")]
 b = [t.lower() for t in word_tokenize("the food was good")]
 
 # As a SET of single words, the only difference is the lone word 'not'.
@@ -134,7 +142,9 @@ print("Unigram sets differ only by:", set(a) ^ set(b))
 print("Bigrams of a:", list(ngrams(a, 2)))
 print("'not good' in a?", ("not", "good") in list(ngrams(a, 2)))
 print("'not good' in b?", ("not", "good") in list(ngrams(b, 2)))
-`}
+`,
+    },
+  ]}
 />
 
 The bigram `("not", "good")` is a concrete, countable feature that a sentiment
@@ -150,7 +160,10 @@ search, and collocation discovery.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -175,8 +188,8 @@ async def _load_nltk(category, package):
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import word_tokenize
 from nltk.util import ngrams
-from nltk.probability import FreqDist`}
-  starterCode={`text = """machine learning is fun. machine learning is powerful.
+from nltk.probability import FreqDist`,
+      starterCode: `text = """machine learning is fun. machine learning is powerful.
 i love machine learning and natural language processing."""
 
 tokens = [t.lower() for t in word_tokenize(text) if t.isalpha()]
@@ -185,7 +198,9 @@ bigram_counts = FreqDist(ngrams(tokens, 2))
 print("Most common bigrams:")
 for pair, count in bigram_counts.most_common(3):
     print(f"  {pair}  x{count}")
-`}
+`,
+    },
+  ]}
 />
 
 "machine learning" rises to the top as the most frequent bigram — the counter
@@ -211,7 +226,10 @@ every one appears just once and counting them tells you nothing. This is the
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -236,8 +254,8 @@ async def _load_nltk(category, package):
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.tokenize import word_tokenize
 from nltk.util import ngrams
-from nltk.probability import FreqDist`}
-  starterCode={`text = """the cat sat on the mat. the dog sat on the log.
+from nltk.probability import FreqDist`,
+      starterCode: `text = """the cat sat on the mat. the dog sat on the log.
 the cat sat on the log. the dog sat on the mat."""
 tokens = [t.lower() for t in word_tokenize(text) if t.isalpha()]
 
@@ -250,7 +268,9 @@ for n in [1, 2, 3, 4]:
         f"n={n}: {len(grams):2} {n}-grams, {distinct:2} distinct, "
         f"{repeated:2} that repeat"
     )
-`}
+`,
+    },
+  ]}
 />
 
 Watch the "that repeat" column collapse as `n` grows. At `n=1` and `n=2` many
@@ -299,26 +319,31 @@ For example:
 
 - \`get_ngrams(["a", "b", "c", "d"], 2)\` -> \`[("a","b"), ("b","c"), ("c","d")]\`
 - \`get_ngrams(["a", "b", "c", "d"], 3)\` -> \`[("a","b","c"), ("b","c","d")]\``}
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import micropip
 await micropip.install("nltk")
 import nltk
-from nltk.util import ngrams`}
-  starterCode={`def get_ngrams(tokens, n):
+from nltk.util import ngrams`,
+      starterCode: `def get_ngrams(tokens, n):
     # return a list of n-gram tuples
     return []
 
 
 print(get_ngrams(["a", "b", "c", "d"], 2))
 print(get_ngrams(["a", "b", "c", "d"], 3))
-`}
-  solutionCode={`def get_ngrams(tokens, n):
+`,
+      solutionCode: `def get_ngrams(tokens, n):
     return list(ngrams(tokens, n))
 
 
 print(get_ngrams(["a", "b", "c", "d"], 2))
 print(get_ngrams(["a", "b", "c", "d"], 3))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "bigrams",

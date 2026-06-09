@@ -12,10 +12,15 @@ larger.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) { System.out.println("Hello, Java!"); }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Run it. You should see `Hello, Java!` in the output area. Now, let
@@ -153,7 +158,7 @@ same greeting, split across two files:
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Greeter g = new Greeter("Java");
     g.greet();
@@ -163,7 +168,7 @@ same greeting, split across two files:
     },
     {
       filename: "Greeter.java",
-      initialContent: `public class Greeter {
+      starterCode: `public class Greeter {
   private final String name;
 
   public Greeter(String name) { this.name = name; }
@@ -197,13 +202,13 @@ Role: First programmer
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     // TODO: print the three lines exactly
   }
 }
 `,
-      solutionContent: `public class Main {
+      solutionCode: `public class Main {
   public static void main(String[] args) {
     System.out.println("Name: Ada Lovelace");
     System.out.println("Year: 1815");

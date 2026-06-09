@@ -11,7 +11,10 @@ A minimal node stores data and a pointer to the next node.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct Node {
   int data;
@@ -26,7 +29,9 @@ int main() {
   std::cout << a.data << " -> " << a.next->data << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ```mermaid
@@ -43,7 +48,10 @@ Traversal starts at `head` and follows `next` until `nullptr`.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct Node {
   int data;
@@ -63,7 +71,9 @@ int main() {
   printList(&n1);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 A vector jumps directly to `v[i]`. A linked list must walk one link at a time to reach the ith node.
@@ -74,7 +84,10 @@ Prepending creates a new node, points it at the old head, then updates the head 
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct Node {
   int data;
@@ -102,7 +115,9 @@ int main() {
   destroy(head);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Append, search, and delete
@@ -111,7 +126,10 @@ Appending without a tail pointer requires walking to the end. Deleting a value r
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct Node {
   int data;
@@ -170,7 +188,9 @@ int main() {
   destroy(head);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Linked list operation costs">
@@ -190,7 +210,10 @@ Manual `new` and `delete` are useful for learning pointers, but production C++ s
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <memory>
 
 struct Node {
@@ -216,7 +239,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Pointers are links, not values">
@@ -229,7 +254,10 @@ When you reverse or delete nodes, you are rewiring addresses. Draw the links bef
   adapter="cpp"
   title="Reverse a linked list"
   instructions={`Implement \`Node* reverse(Node* head)\`. The driver builds \`1->2->3->4\` and prints the reversed values.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct Node {
   int data;
@@ -257,8 +285,8 @@ int main() {
   destroy(head);
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 
 struct Node {
   int data;
@@ -294,7 +322,9 @@ int main() {
   destroy(head);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "reverse_list", name: "Reverses links", expect: { stdoutLines: ["4", "3", "2", "1"], stdoutLinesExact: true } }]}
 />
 
@@ -304,7 +334,10 @@ int main() {
   adapter="cpp"
   title="Length of a linked list"
   instructions={`Implement \`length\` by traversing from head to null and counting nodes.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct Node {
   int data;
@@ -323,8 +356,8 @@ int main() {
   std::cout << length(&n1) << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 
 struct Node {
   int data;
@@ -347,7 +380,9 @@ int main() {
   std::cout << length(&n1) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "length", name: "Counts nodes", expect: { stdoutEquals: "4" } }]}
 />
 

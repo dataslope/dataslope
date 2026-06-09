@@ -19,7 +19,10 @@ good name *tells them*.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// HARD: every name is generic. The reader has to decode the math.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// HARD: every name is generic. The reader has to decode the math.
 function f(a, b) {
   let t = 0;
   for (let i = 0; i < a.length; i++) {
@@ -44,7 +47,9 @@ const items = [
 ];
 
 console.log(totalSalesForCategory(items, "book"));
-`}
+`,
+    },
+  ]}
 />
 
 A few naming rules:
@@ -71,7 +76,10 @@ change. Split it.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// HARD: one function juggling four jobs.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// HARD: one function juggling four jobs.
 function processOrder(order) {
   if (order.amount <= 0) throw new Error("bad amount");
   const tax = order.amount * 0.1;
@@ -102,7 +110,9 @@ function processOrderClean(order) {
 }
 
 console.log(processOrderClean({ amount: 100, email: "a@b" }));
-`}
+`,
+    },
+  ]}
 />
 
 The smaller version is *more* lines, but each piece is testable,
@@ -115,7 +125,10 @@ also called *guard clauses* — flatten the code.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// HARD: rightward drift.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// HARD: rightward drift.
 function checkout(cart, user) {
   if (cart) {
     if (cart.items.length > 0) {
@@ -147,7 +160,9 @@ function checkoutClean(cart, user) {
 }
 
 console.log(checkoutClean({ items: [1, 2] }, { isVerified: true }));
-`}
+`,
+    },
+  ]}
 />
 
 The "happy path" sits at the bottom, unindented. All the failures
@@ -160,7 +175,10 @@ A value that appears out of nowhere with no explanation is called
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// HARD: what is 0.0825? why 86400000?
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// HARD: what is 0.0825? why 86400000?
 function withTax(price) {
   return price * 1.0825;
 }
@@ -182,7 +200,9 @@ function isExpiredClean(timestamp) {
 }
 
 console.log(withTaxClean(100));
-`}
+`,
+    },
+  ]}
 />
 
 Now changing the tax rate is a one-line edit, not a hunt through
@@ -233,7 +253,10 @@ Two anti-patterns to avoid:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// BAD: swallow the error silently. You'll never know it happened.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// BAD: swallow the error silently. You'll never know it happened.
 function fetchData(url) {
   try {
     // ... pretend network call
@@ -262,7 +285,9 @@ async function loadUserClean(id) {
 }
 
 console.log(typeof fetchData, typeof loadUser, typeof loadUserClean);
-`}
+`,
+    },
+  ]}
 />
 
 Two principles:
@@ -296,7 +321,10 @@ sprinkling defensive checks throughout your logic.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// At the boundary: validate.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// At the boundary: validate.
 function parseAge(raw) {
   const n = Number(raw);
   if (!Number.isInteger(n) || n < 0 || n > 150) {
@@ -316,7 +344,9 @@ try {
 } catch (e) {
   console.log(e.message);
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## The Boy Scout Rule
@@ -338,7 +368,7 @@ Before:
   files={[
     {
       filename: "index.js",
-      initialContent: `// Before refactor: everything in one file, no clear shape.
+      starterCode: `// Before refactor: everything in one file, no clear shape.
 function doStuff(arr, x) {
   let r = 0;
   for (let i = 0; i < arr.length; i++) {
@@ -370,7 +400,7 @@ After — same behaviour, far clearer:
   files={[
     {
       filename: "index.js",
-      initialContent: `const { totalWithTaxForType } = require("./reporting");
+      starterCode: `const { totalWithTaxForType } = require("./reporting");
 
 const orders = [
   { type: "a", status: "ok", price: 10, qty: 2 },
@@ -384,7 +414,7 @@ console.log(totalWithTaxForType(orders, "a"));
     },
     {
       filename: "reporting.js",
-      initialContent: `const TAX_RATE = 0.1;
+      starterCode: `const TAX_RATE = 0.1;
 
 function lineTotal(order) {
   return order.price * order.qty;
@@ -430,15 +460,18 @@ Rules:
 - Reject if \`student.age < 16\` → \`"ERROR: too young"\`
 - Reject if \`student.consent !== true\` → \`"ERROR: no consent"\`
 - Otherwise → \`"OK: <name>"\``}
-  starterCode={`function enrollStudent(student) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function enrollStudent(student) {
   // your refactor here
 }
 
 console.log(enrollStudent({ name: "Ada", age: 18, consent: true }));
 console.log(enrollStudent({ name: "Tim", age: 12, consent: true }));
 console.log(enrollStudent(null));
-`}
-  solutionCode={`const MIN_AGE = 16;
+`,
+      solutionCode: `const MIN_AGE = 16;
 
 function enrollStudent(student) {
   if (!student) return "ERROR: no student";
@@ -451,7 +484,9 @@ function enrollStudent(student) {
 console.log(enrollStudent({ name: "Ada", age: 18, consent: true }));
 console.log(enrollStudent({ name: "Tim", age: 12, consent: true }));
 console.log(enrollStudent(null));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "ok",

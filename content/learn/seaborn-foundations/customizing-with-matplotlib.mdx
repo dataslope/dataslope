@@ -38,7 +38,10 @@ conventionally `ax` — and then call its setter methods:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
@@ -51,7 +54,9 @@ ax.set_xlabel("Flipper length (mm)")
 ax.set_ylabel("Body mass (g)")
 ax.set_xlim(160, 240)
 ax.set_ylim(2500, 6500)
-`}
+`,
+    },
+  ]}
 />
 
 Four small calls and the chart reads like a finished figure: a title that
@@ -68,7 +73,10 @@ Seaborn function. This is the one place you reach for
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 import matplotlib.pyplot as plt
 
 sns.set_theme(style="whitegrid")
@@ -79,7 +87,9 @@ fig, ax = plt.subplots(figsize=(7, 4))
 sns.scatterplot(data=tips, x="total_bill", y="tip", ax=ax)
 
 ax.set_title("Tips rise with the bill")
-`}
+`,
+    },
+  ]}
 />
 
 Because you made the `Axes`, you control its size and placement, and you can
@@ -102,7 +112,10 @@ its own polishing methods that apply across all panels at once:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
@@ -124,7 +137,9 @@ g.set_titles("{col_name}")
 # A single big title over the whole figure (with room made for it).
 g.figure.suptitle("Penguin size by sex")
 g.figure.subplots_adjust(top=0.9)
-`}
+`,
+    },
+  ]}
 />
 
 A few things to notice:
@@ -178,7 +193,10 @@ When category names along the x-axis overlap, rotate them. On an `Axes`,
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 mpg = sns.load_dataset("mpg")
@@ -188,7 +206,9 @@ ax.set_title("Cars per model year")
 
 # Tilt the year labels so they don't collide.
 ax.tick_params(axis="x", rotation=45)
-`}
+`,
+    },
+  ]}
 />
 
 An equivalent, slightly more flexible approach is
@@ -206,7 +226,10 @@ zero.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 import matplotlib.pyplot as plt
 
 sns.set_theme(style="ticks")
@@ -222,7 +245,9 @@ ax.set_ylim(0, 50)
 
 # A clean, lighter frame to finish.
 sns.despine()
-`}
+`,
+    },
+  ]}
 />
 
 The statistics — the grouping by `origin`, the color mapping, the legend —
@@ -242,7 +267,10 @@ Then:
 
 1. Set the title to exactly \`Distribution of total bills\`.
 2. Set the x-axis label to exactly \`Total bill (USD)\`.`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
@@ -251,8 +279,8 @@ tips = sns.load_dataset("tips")
 ax = None
 
 # Set the title and x-axis label:
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
@@ -260,7 +288,9 @@ tips = sns.load_dataset("tips")
 ax = sns.histplot(data=tips, x="total_bill")
 ax.set_title("Distribution of total bills")
 ax.set_xlabel("Total bill (USD)")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_axes",

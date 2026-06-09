@@ -30,7 +30,10 @@ center you're actually asking for, and when each one quietly lies.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import pandas as pd
 from scipy import stats
 
@@ -44,7 +47,9 @@ print("Mode   :", tickets.mode().tolist())  # most common value(s)
 # scipy gives the mode plus how often it occurs
 m = stats.mode(tickets, keepdims=False)
 print(f"\\nMost common count is {m.mode} (happened {m.count} times)")
-`}
+`,
+    },
+  ]}
 />
 
 When data is roughly symmetric and has no extreme values — like that
@@ -72,7 +77,10 @@ default for money, sizes, durations, and counts, which are almost all
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import pandas as pd
 
 # Annual salaries (in thousands) for a small company.
@@ -88,7 +96,9 @@ with_ceo = pd.concat([salaries, pd.Series([1000])], ignore_index=True)
 print("\\nWith one CEO earning 1,000k:")
 print(f"  Mean   = {with_ceo.mean():.1f}k   <- jumped by ~85k")
 print(f"  Median = {with_ceo.median():.1f}k   <- barely moved")
-`}
+`,
+    },
+  ]}
 />
 
 Adding a single person moved the **mean** by tens of thousands but
@@ -202,7 +212,10 @@ compound.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 # Right-skewed incomes (in thousands), with a couple of high earners.
@@ -225,7 +238,9 @@ print(f"Geometric mean of factors : {g:.4f}  <- true average growth/yr")
 print(
     f"Compounded over 4 yrs, gmean reproduces total: {g**4:.4f} = {np.prod(factors):.4f}"
 )
-`}
+`,
+    },
+  ]}
 />
 
 Notice the last two lines: raising the **geometric mean** to the 4th
@@ -251,7 +266,10 @@ read them together.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import pandas as pd
 from scipy import stats
 
@@ -272,7 +290,9 @@ for k, v in summary.items():
     print(f"{k:>18}: {v}")
 
 print("\\nmean > median => right-skewed; median is the 'typical' order.")
-`}
+`,
+    },
+  ]}
 />
 
 The positive `mean_minus_median` is your skew alarm. When it's large
@@ -293,13 +313,16 @@ Compute a dictionary called **\`result\`** with exactly these keys (all values p
 Then set a boolean **\`report_median\`** to \`True\` if \`skew_gap\` is greater than \`0\` (i.e. right-skewed, so the median is the more honest headline), else \`False\`.
 
 Use the provided \`prices\` Series.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 from scipy import stats
 
 rng = np.random.default_rng(123)
-prices = pd.Series(np.round(rng.lognormal(mean=2.8, sigma=0.7, size=400), 2))`}
-  starterCode={`# TODO: build the dict 'result' and the bool 'report_median'
+prices = pd.Series(np.round(rng.lognormal(mean=2.8, sigma=0.7, size=400), 2))`,
+      starterCode: `# TODO: build the dict 'result' and the bool 'report_median'
 result = {
     "mean": None,
     "median": None,
@@ -307,8 +330,8 @@ result = {
     "skew_gap": None,
 }
 report_median = None
-`}
-  solutionCode={`mean_ = float(prices.mean())
+`,
+      solutionCode: `mean_ = float(prices.mean())
 median_ = float(prices.median())
 trimmed_ = float(stats.trim_mean(prices, 0.10))
 
@@ -321,7 +344,9 @@ result = {
 report_median = bool(result["skew_gap"] > 0)
 print(result)
 print("report_median:", report_median)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "keys",

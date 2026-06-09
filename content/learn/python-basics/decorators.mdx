@@ -15,7 +15,10 @@ Before decorators, a quick reminder: a **closure** is a function that captures v
 
 <CodeBlock
   adapter="python"
-  starterCode={`def outer(x):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def outer(x):
     def inner(y):
         return x + y
 
@@ -25,7 +28,9 @@ Before decorators, a quick reminder: a **closure** is a function that captures v
 add_five = outer(5)
 print(add_five(10))  # 15
 print(add_five(20))  # 25
-`}
+`,
+    },
+  ]}
 />
 
 `inner` "closes over" `x` from `outer`. Even after `outer` returns, `inner` remembers `x=5`. Decorators use this pattern to wrap functions.
@@ -34,7 +39,10 @@ print(add_five(20))  # 25
 
 <CodeBlock
   adapter="python"
-  starterCode={`def shout(fn):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def shout(fn):
     def wrapper(*args, **kwargs):
         result = fn(*args, **kwargs)
         return result.upper()
@@ -48,7 +56,9 @@ def greet(name):
 
 
 print(greet("Ada"))
-`}
+`,
+    },
+  ]}
 />
 
 The `@shout` line is syntactic sugar for:
@@ -75,7 +85,10 @@ Without `wraps`, the wrapped function loses its name, docstring, and signature:
 
 <CodeBlock
   adapter="python"
-  starterCode={`def shout(fn):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def shout(fn):
     def wrapper(*args, **kwargs):
         return fn(*args, **kwargs).upper()
 
@@ -90,14 +103,19 @@ def greet(name):
 
 print(greet.__name__)  # 'wrapper' -- wrong!
 print(greet.__doc__)  # None -- lost!
-`}
+`,
+    },
+  ]}
 />
 
 **Always** use `functools.wraps` in real decorators:
 
 <CodeBlock
   adapter="python"
-  starterCode={`from functools import wraps
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from functools import wraps
 
 
 def shout(fn):
@@ -116,7 +134,9 @@ def greet(name):
 
 print(greet.__name__)  # 'greet' -- correct!
 print(greet.__doc__)  # 'Return a greeting.' -- preserved!
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="ALWAYS use functools.wraps">
@@ -127,7 +147,10 @@ Tools, debuggers, and stack traces rely on \`__name__\`, \`__doc__\`, and \`__mo
 
 <CodeBlock
   adapter="python"
-  starterCode={`import time
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import time
 from functools import wraps
 
 
@@ -152,7 +175,9 @@ def slow_square(n):
 
 
 print(slow_square(100_000))
-`}
+`,
+    },
+  ]}
 />
 
 This pattern is everywhere in production: timing, logging arguments, checking permissions, retrying on failure, caching results.
@@ -163,7 +188,10 @@ If your decorator needs parameters, you need **three** levels of nesting. The ou
 
 <CodeBlock
   adapter="python"
-  starterCode={`from functools import wraps
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from functools import wraps
 
 
 def repeat(times):
@@ -186,7 +214,9 @@ def hi():
 
 
 hi()
-`}
+`,
+    },
+  ]}
 />
 
 Let's unpack what happens:
@@ -221,7 +251,10 @@ You can apply multiple decorators. They nest bottom-up (the closest to the funct
 
 <CodeBlock
   adapter="python"
-  starterCode={`from functools import wraps
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from functools import wraps
 
 
 def bracketed(fn):
@@ -247,7 +280,9 @@ def greet(name):
 
 
 print(greet("Ada"))
-`}
+`,
+    },
+  ]}
 />
 
 Equivalent to:
@@ -268,7 +303,10 @@ Sometimes you need state that survives across calls. A class with `__call__` can
 
 <CodeBlock
   adapter="python"
-  starterCode={`from functools import wraps
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from functools import wraps
 
 
 class CountCalls:
@@ -291,7 +329,9 @@ def greet(name):
 print(greet("Alice"))
 print(greet("Bob"))
 print(f"Total calls: {greet.count}")
-`}
+`,
+    },
+  ]}
 />
 
 The class instance replaces the original function. `greet` is now a `CountCalls` object, and calling it invokes `__call__`.
@@ -302,7 +342,10 @@ When decorating class methods, remember that the first argument is `self`:
 
 <CodeBlock
   adapter="python"
-  starterCode={`from functools import wraps
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from functools import wraps
 
 
 def logged(fn):
@@ -322,7 +365,9 @@ class Calculator:
 
 calc = Calculator()
 print(calc.add(2, 3))
-`}
+`,
+    },
+  ]}
 />
 
 The decorator sees `self` as the first positional argument in `*args`. This works fine for simple decorators. For more advanced patterns (like caching with `self` awareness), use libraries like `functools.lru_cache` or `cachetools`.
@@ -351,7 +396,10 @@ Applying \`@staticmethod\` first (closest to the function) can cause errors beca
 
 <CodeBlock
   adapter="python"
-  starterCode={`from functools import cache
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from functools import cache
 
 
 @cache
@@ -360,7 +408,9 @@ def fib(n):
 
 
 print(fib(100))
-`}
+`,
+    },
+  ]}
 />
 
 Without `@cache`, computing `fib(100)` recursively would take millions of years. With it, every result is memoized, and the answer is instant.
@@ -373,15 +423,18 @@ Without `@cache`, computing `fib(100)` recursively would take millions of years.
   instructions={`Define a decorator \`timing\` that prints how long a function took to run (in milliseconds) and returns the result. Use \`time.perf_counter()\` for timing and \`functools.wraps\` to preserve metadata.
 
 Example output: \`add took 0.05 ms\``}
-  starterCode={`import time
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import time
 from functools import wraps
 
 
 def timing(fn):
     # your code here
     return fn
-`}
-  solutionCode={`import time
+`,
+      solutionCode: `import time
 from functools import wraps
 
 
@@ -395,7 +448,9 @@ def timing(fn):
         return result
 
     return wrapper
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "returns_result",
@@ -435,7 +490,10 @@ assert "fast took" in output and "ms" in output`,
   instructions={`Define a decorator factory \`retry(n)\` that retries a function up to \`n\` times if it raises an exception. If all attempts fail, let the exception propagate. Use \`functools.wraps\`.
 
 Example: \`@retry(3)\` tries the function up to 3 times.`}
-  starterCode={`from functools import wraps
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from functools import wraps
 
 
 def retry(n):
@@ -444,8 +502,8 @@ def retry(n):
         return fn
 
     return decorator
-`}
-  solutionCode={`from functools import wraps
+`,
+      solutionCode: `from functools import wraps
 
 
 def retry(n):
@@ -462,7 +520,9 @@ def retry(n):
         return wrapper
 
     return decorator
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "succeeds_first_try",
@@ -513,14 +573,17 @@ assert my_func.__name__ == "my_func"`,
   instructions={`Define a decorator \`memoize\` that caches function results based on arguments. Store the cache in a dict on the wrapper. Use \`functools.wraps\`.
 
 Assume all arguments are hashable. The cache should persist across calls.`}
-  starterCode={`from functools import wraps
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from functools import wraps
 
 
 def memoize(fn):
     # your code here
     return fn
-`}
-  solutionCode={`from functools import wraps
+`,
+      solutionCode: `from functools import wraps
 
 
 def memoize(fn):
@@ -533,7 +596,9 @@ def memoize(fn):
         return cache[args]
 
     return wrapper
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "caches_result",
@@ -575,14 +640,17 @@ assert foo.__name__ == "foo"`,
   instructions={`Define a decorator \`only_positive\` that raises \`ValueError\` if any positional argument is not a positive number (> 0). Use \`functools.wraps\`.
 
 Example: \`@only_positive\` on \`add(a, b)\` should raise if \`a <= 0\` or \`b <= 0\`.`}
-  starterCode={`from functools import wraps
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from functools import wraps
 
 
 def only_positive(fn):
     # your code here
     return fn
-`}
-  solutionCode={`from functools import wraps
+`,
+      solutionCode: `from functools import wraps
 
 
 def only_positive(fn):
@@ -594,7 +662,9 @@ def only_positive(fn):
         return fn(*args, **kwargs)
 
     return wrapper
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "accepts_positive",

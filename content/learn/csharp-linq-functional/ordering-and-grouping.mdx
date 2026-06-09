@@ -15,7 +15,10 @@ from each element with a selector lambda.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var people = new[] {
@@ -32,7 +35,9 @@ foreach (var p in people.OrderByDescending(p => p.Name))
     Console.WriteLine($"  {p.Name,-7} {p.Age}");
 
 record Person(string Name, int Age, string City);
-`}
+`,
+    },
+  ]}
 />
 
 A few important details:
@@ -52,7 +57,10 @@ When the primary key has ties, `ThenBy` decides them.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var people = new[] {
@@ -68,7 +76,9 @@ foreach (var p in sorted)
     Console.WriteLine($"{p.City,-7} {p.Age,3} {p.Name}");
 
 record Person(string Name, int Age, string City);
-`}
+`,
+    },
+  ]}
 />
 
 `ThenBy` is *only* available on `IOrderedEnumerable<T>` — that is,
@@ -89,7 +99,10 @@ itself an `IEnumerable<T>` (plus a `Key` property).
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var people = new[] {
@@ -107,7 +120,9 @@ foreach (var group in byCity)
 }
 
 record Person(string Name, int Age, string City);
-`}
+`,
+    },
+  ]}
 />
 
 The result of `GroupBy` is an `IEnumerable<IGrouping<TKey,
@@ -130,7 +145,10 @@ project them into summaries.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var sales = new[] {
@@ -146,7 +164,9 @@ foreach (var r in totals)
     Console.WriteLine($"{r.Region,-5}  total={r.Total,6:C}  ({r.Count} sales)");
 
 record Sale(string Region, decimal Amount);
-`}
+`,
+    },
+  ]}
 />
 
 This is one of the most common shapes you'll write in your career:
@@ -158,7 +178,10 @@ The key can be anything — including a tuple or anonymous type.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var sales = new[] {
@@ -175,7 +198,9 @@ foreach (var r in totals)
     Console.WriteLine($"{r.Region,-5} {r.Product,-7} {r.Total,6:C}");
 
 record Sale(string Region, string Product, decimal Amount);
-`}
+`,
+    },
+  ]}
 />
 
 Anonymous types implement structural equality, so two anonymous
@@ -189,7 +214,10 @@ It returns a `Lookup<TKey, TElement>` you can index into.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var sales = new[] {
@@ -204,7 +232,9 @@ Console.WriteLine($"EU count    = {lookup["EU"].Count()}");
 Console.WriteLine($"AFRICA count = {lookup["AFRICA"].Count()}");
 
 record Sale(string Region, decimal Amount);
-`}
+`,
+    },
+  ]}
 />
 
 When you need to index into groups (especially repeatedly), prefer
@@ -226,7 +256,7 @@ Ties may be broken in any deterministic way (e.g. by region name).
   files={[
     {
       filename: "Program.cs",
-      initialContent: `var sales = new[] {
+      starterCode: `var sales = new[] {
     new Sale("EU", 10m), new Sale("APAC", 15m), new Sale("EU", 30m),
     new Sale("US", 25m), new Sale("EU", 5m),    new Sale("APAC", 20m),
 };
@@ -238,7 +268,7 @@ public record Sale(string Region, decimal Amount);
     },
     {
       filename: "SalesReport.cs",
-      initialContent: `using System.Collections.Generic;
+      starterCode: `using System.Collections.Generic;
 
 public static class SalesReport
 {
@@ -249,7 +279,7 @@ public static class SalesReport
     }
 }
 `,
-      solutionContent: `using System.Collections.Generic;
+      solutionCode: `using System.Collections.Generic;
 using System.Linq;
 
 public static class SalesReport

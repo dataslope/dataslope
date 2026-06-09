@@ -230,7 +230,10 @@ even though the soul is the same.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// 'const' makes a binding you cannot reassign.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// 'const' makes a binding you cannot reassign.
 const users = [
   { name: "Ada", role: "admin", active: true },
   { name: "Linus", role: "member", active: true },
@@ -248,7 +251,9 @@ console.log(activeAdmins);
 // without crashing if something in the middle is missing.
 const first = users[0]?.name?.toUpperCase();
 console.log("First user (shouting):", first);
-`}
+`,
+    },
+  ]}
 />
 
 If this looks like magic, that is *expected*. We will earn each of

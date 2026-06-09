@@ -21,7 +21,10 @@ elsewhere.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`#nullable enable
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,7 +50,9 @@ public static class Users
 
     public static User? Find(int id) => All.FirstOrDefault(u => u.Id == id);
 }
-`}
+`,
+    },
+  ]}
 />
 
 The `?.` operator is *exactly* `Option.Map`. The `??` operator is
@@ -63,7 +68,10 @@ failure *both* first-class.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 Result<int, string> Parse(string s) => int.TryParse(s, out var n) ? new Result<int, string>.Ok(n)
                                                                   : new Result<int, string>.Err($"not a number: '{s}'");
@@ -92,7 +100,9 @@ public abstract record Result<T, E>
         this switch { Ok ok => f(ok.Value), Err err => new Result<U, E>.Err(err.Error),
                       _ => throw new InvalidOperationException() };
 }
-`}
+`,
+    },
+  ]}
 />
 
 Notice: the failure cases *never throw*. The chain short-circuits
@@ -136,7 +146,10 @@ rest.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 // curried: (string sep) => (IEnumerable<string> xs) => string
@@ -147,7 +160,9 @@ var joinPath = join("/");
 
 Console.WriteLine(joinCsv(new[] { "a", "b", "c" }));      // a, b, c
 Console.WriteLine(joinPath(new[] { "usr", "bin", "x" })); // usr/bin/x
-`}
+`,
+    },
+  ]}
 />
 
 This is the trick behind the *configurable* pipeline helpers in the
@@ -162,7 +177,10 @@ pattern matching, branching on them is exhaustive and clear.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 string Describe(Payment p) => p switch { Payment.Cash c => $"cash {c.Amount:C}",
                                          Payment.Card c => $"card ****{c.Last4} {c.Amount:C}",
@@ -179,7 +197,9 @@ public abstract record Payment
     public sealed record Card(decimal Amount, string Last4) : Payment;
     public sealed record Voucher(string Code) : Payment;
 }
-`}
+`,
+    },
+  ]}
 />
 
 If you add a new payment kind, the compiler can warn you about
@@ -198,7 +218,7 @@ combinator** library.
   files={[
     {
       filename: "Program.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 using System.Linq;
 
 var rule = Validator<string>.All(Validator<string>.NonEmpty("name"), Validator<string>.MaxLen("name", 10),
@@ -210,7 +230,7 @@ foreach (var name in new[] { "Ada", "", "alongusername", "Ada1" })
     Console.WriteLine(errs.Count == 0 ? $"OK: {name}" : $"BAD '{name}': {string.Join("; ", errs)}");
 }
 `,
-      solutionContent: `using System;
+      solutionCode: `using System;
 using System.Linq;
 
 var rule = Validator<string>.All(Validator<string>.NonEmpty("name"), Validator<string>.MaxLen("name", 10),
@@ -225,7 +245,7 @@ foreach (var name in new[] { "Ada", "", "alongusername", "Ada1" })
     },
     {
       filename: "Validator.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -247,7 +267,7 @@ public static class Validator<T>
     public static Rule All(params Rule[] rules) => throw new NotImplementedException();
 }
 `,
-      solutionContent: `using System;
+      solutionCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 

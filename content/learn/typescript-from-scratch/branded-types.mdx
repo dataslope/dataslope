@@ -29,7 +29,10 @@ Let's say you're building a financial application. You have `Cents` (integer amo
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Cents = number;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Cents = number;
 type Dollars = number;
 
 function displayPrice(cents: Cents): string {
@@ -38,7 +41,9 @@ function displayPrice(cents: Cents): string {
 
 const price: Dollars = 12.34;
 console.log(displayPrice(price)); // Bug! Expected cents, got dollars
-`}
+`,
+    },
+  ]}
 />
 
 The code compiles, but `displayPrice` expects cents (1234), not dollars (12.34). The output is nonsense.
@@ -60,7 +65,10 @@ Here's how to create branded values:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Cents = number & { readonly __brand: "Cents" };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Cents = number & { readonly __brand: "Cents" };
 type Dollars = number & { readonly __brand: "Dollars" };
 
 function toCents(dollars: number): Cents {
@@ -78,7 +86,9 @@ function displayPrice(cents: Cents): string {
 const price = toCents(12.34);
 console.log(displayPrice(price)); // OK: Cents
 // console.log(displayPrice(12.34)); // Error: number is not Cents
-`}
+`,
+    },
+  ]}
 />
 
 We use **smart constructors** (`toCents`, `toDollars`) to produce branded values. Inside the constructor, we cast the plain `number` to the branded type with `as`. Outside, users can't accidentally pass a plain `number` — they must go through the constructor.
@@ -91,7 +101,10 @@ String brands like `"Cents"` work, but they're not truly unique. If two librarie
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`declare const CentsBrand: unique symbol;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `declare const CentsBrand: unique symbol;
 declare const DollarsBrand: unique symbol;
 
 type Cents = number & { readonly [CentsBrand]: true };
@@ -107,7 +120,9 @@ function displayPrice(cents: Cents): string {
 
 const price = toCents(12.34);
 console.log(displayPrice(price));
-`}
+`,
+    },
+  ]}
 />
 
 A `unique symbol` is a type that's distinct from all others — even if two modules declare the same name, their symbols are different. This prevents accidental collisions.
@@ -122,7 +137,10 @@ Let's apply branding to IDs in a typical application:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`declare const UserIdBrand: unique symbol;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `declare const UserIdBrand: unique symbol;
 declare const OrderIdBrand: unique symbol;
 
 type UserId = string & { readonly [UserIdBrand]: true };
@@ -150,7 +168,9 @@ const orderId = createOrderId("order-456");
 console.log(getUser(userId)); // OK
 console.log(getOrder(orderId)); // OK
 // console.log(getUser(orderId)); // Error: OrderId is not assignable to UserId
-`}
+`,
+    },
+  ]}
 />
 
 Now, if you accidentally pass an `OrderId` to `getUser`, the compiler catches it. The brand forces you to use the right ID type.
@@ -163,7 +183,10 @@ Smart constructors are also the perfect place to validate input. You can ensure 
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`declare const EmailBrand: unique symbol;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `declare const EmailBrand: unique symbol;
 type Email = string & { readonly [EmailBrand]: true };
 
 function createEmail(input: string): Email | null {
@@ -187,7 +210,9 @@ if (email) {
 
 // const badEmail = "not-an-email";
 // sendEmail(badEmail, "Hello!"); // Error: string is not Email
-`}
+`,
+    },
+  ]}
 />
 
 Because `Email` can only be created through `createEmail`, you know that any `Email` value has passed validation. This is a powerful pattern: **make illegal states unrepresentable**.
@@ -204,7 +229,7 @@ Let's organize branded types and their constructors across multiple files for be
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { UserId, createUserId } from "./user-id";
+      starterCode: `import { UserId, createUserId } from "./user-id";
 import { OrderId, createOrderId } from "./order-id";
 
 function processUser(id: UserId): string {
@@ -225,7 +250,7 @@ console.log(processOrder(orderId));
     },
     {
       filename: "user-id.ts",
-      initialContent: `declare const UserIdBrand: unique symbol;
+      starterCode: `declare const UserIdBrand: unique symbol;
 export type UserId = string & { readonly [UserIdBrand]: true };
 
 export function createUserId(id: string): UserId {
@@ -235,7 +260,7 @@ export function createUserId(id: string): UserId {
     },
     {
       filename: "order-id.ts",
-      initialContent: `declare const OrderIdBrand: unique symbol;
+      starterCode: `declare const OrderIdBrand: unique symbol;
 export type OrderId = string & { readonly [OrderIdBrand]: true };
 
 export function createOrderId(id: string): OrderId {
@@ -277,7 +302,10 @@ Brands are *not* necessary for:
 **Conversion formula**: \`F = C × 9/5 + 32\`
 
 The compiler should prevent passing \`Fahrenheit\` where \`Celsius\` is expected, and vice versa.`}
-  initCode={`declare const CelsiusBrand: unique symbol;
+  files={[
+    {
+      filename: "main.ts",
+      initCode: `declare const CelsiusBrand: unique symbol;
 declare const FahrenheitBrand: unique symbol;
 
 type Celsius = number & { readonly [CelsiusBrand]: true };
@@ -295,8 +323,8 @@ function celsiusToFahrenheit(c: Celsius): Fahrenheit {
   // Implement conversion
   return 0 as Fahrenheit;
 }
-`}
-  starterCode={`declare const CelsiusBrand: unique symbol;
+`,
+      starterCode: `declare const CelsiusBrand: unique symbol;
 declare const FahrenheitBrand: unique symbol;
 
 type Celsius = number & { readonly [CelsiusBrand]: true };
@@ -317,8 +345,8 @@ function celsiusToFahrenheit(c: Celsius): Fahrenheit {
 const temp = toCelsius(0);
 const converted = celsiusToFahrenheit(temp);
 console.log(converted); // Should be 32
-`}
-  solutionCode={`declare const CelsiusBrand: unique symbol;
+`,
+      solutionCode: `declare const CelsiusBrand: unique symbol;
 declare const FahrenheitBrand: unique symbol;
 
 type Celsius = number & { readonly [CelsiusBrand]: true };
@@ -339,7 +367,9 @@ function celsiusToFahrenheit(c: Celsius): Fahrenheit {
 const temp = toCelsius(0);
 const converted = celsiusToFahrenheit(temp);
 console.log(converted);
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "t1",
@@ -374,7 +404,7 @@ The compiler should prevent passing a plain \`string\` to \`sendEmail\`.`}
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { createEmail } from "./email";
+      starterCode: `import { createEmail } from "./email";
 import { sendEmail } from "./mailer";
 
 const email = createEmail("alice@example.com");
@@ -387,7 +417,7 @@ if (email) {
     },
     {
       filename: "email.ts",
-      initialContent: `declare const EmailBrand: unique symbol;
+      starterCode: `declare const EmailBrand: unique symbol;
 export type Email = string & { readonly [EmailBrand]: true };
 
 export function createEmail(input: string): Email | null {
@@ -395,7 +425,7 @@ export function createEmail(input: string): Email | null {
   return null;
 }
 `,
-      solutionContent: `declare const EmailBrand: unique symbol;
+      solutionCode: `declare const EmailBrand: unique symbol;
 export type Email = string & { readonly [EmailBrand]: true };
 
 export function createEmail(input: string): Email | null {
@@ -408,7 +438,7 @@ export function createEmail(input: string): Email | null {
     },
     {
       filename: "mailer.ts",
-      initialContent: `import { Email } from "./email";
+      starterCode: `import { Email } from "./email";
 
 export function sendEmail(to: Email, message: string): string {
   return \`Sending "\${message}" to \${to}\`;

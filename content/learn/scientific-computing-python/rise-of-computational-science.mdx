@@ -64,7 +64,10 @@ and counting how many land inside the inscribed circle.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.default_rng(42)
 n = 1_000_000
@@ -73,7 +76,9 @@ inside = (x**2 + y**2) <= 1
 pi_estimate = 4 * inside.mean()
 print(f"Estimate of π from {n:,} samples: {pi_estimate:.6f}")
 print(f"True value:                      {np.pi:.6f}")
-`}
+`,
+    },
+  ]}
 />
 
 The remarkable property is that this works for *any* integral, in
@@ -101,7 +106,10 @@ heat diffusing along a metal rod.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 
 # 1-D heat equation: ∂u/∂t = α ∂²u/∂x²
@@ -133,7 +141,9 @@ plt.ylabel("temperature")
 plt.legend()
 plt.title("Heat diffusion along a 1-D rod")
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 Notice the comment on the time-step `dt`. Pick a `dt` that is too

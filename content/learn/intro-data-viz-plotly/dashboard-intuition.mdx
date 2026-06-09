@@ -98,7 +98,10 @@ making each chart in a single notebook cell:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 # Fabricated sales data
@@ -146,7 +149,9 @@ fig2 = px.bar(
     labels={"region": "Region", "sales": "Sales (USD)"},
 )
 fig2.show()
-`}
+`,
+    },
+  ]}
 />
 
 That's the rough rhythm of a dashboard: **headline numbers →

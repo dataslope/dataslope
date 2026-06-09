@@ -29,12 +29,17 @@ expressions**.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log(5 === 5); // true
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `console.log(5 === 5); // true
 console.log(5 === "5"); // false (different types)
 console.log(3 < 4); // true
 console.log("apple" < "banana"); // true — strings compare lexicographically
 console.log("a" < "B"); // false — uppercase letters come before lowercase in Unicode
-`}
+`,
+    },
+  ]}
 />
 
 A surprising one: strings can be compared with `<`, `>`, etc. They
@@ -57,7 +62,10 @@ operators:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const isAdmin = true;
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const isAdmin = true;
 const isActive = false;
 
 console.log(isAdmin && isActive); // false — needs both
@@ -68,7 +76,9 @@ console.log(!isActive); // true
 // Combine them — parentheses make precedence obvious:
 const canEdit = isAdmin && (isActive || !isActive);
 console.log(canEdit); // true
-`}
+`,
+    },
+  ]}
 />
 
 ### Truth tables
@@ -114,7 +124,10 @@ might never run.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function expensive() {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function expensive() {
   console.log("(expensive was called)");
   return true;
 }
@@ -126,7 +139,9 @@ console.log(a);
 console.log("--- OR ---");
 const b = true || expensive(); // expensive() is NOT called
 console.log(b);
-`}
+`,
+    },
+  ]}
 />
 
 Two practical patterns use short-circuiting all the time:
@@ -142,7 +157,10 @@ triggers on `null`/`undefined` (not `0` or `""`):
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function withDefault(value) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function withDefault(value) {
   return value ?? "default";
 }
 
@@ -158,7 +176,9 @@ function withDefaultOr(value) {
 }
 console.log(withDefaultOr("")); // "default" — empty string got replaced!
 console.log(withDefaultOr(0)); // "default" — zero got replaced!
-`}
+`,
+    },
+  ]}
 />
 
 Pick `??` when you specifically mean "fall back if missing", and
@@ -181,7 +201,10 @@ idioms:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function greet(name) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function greet(name) {
   if (name) {
     console.log("Hello, " + name + "!");
   } else {
@@ -194,7 +217,9 @@ greet("");
 greet();
 greet(null);
 greet(0); // careful — 0 is falsy! we treat it like "no name"
-`}
+`,
+    },
+  ]}
 />
 
 The `if (name)` check covers all "missing or empty" cases at once.
@@ -216,7 +241,10 @@ negations into cleaner conditions.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// Original:
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// Original:
 //   if (!(isAdmin && isActive)) ...
 // Equivalent (often clearer):
 //   if (!isAdmin || !isActive) ...
@@ -237,7 +265,9 @@ const email = "";
 
 console.log(!(name || email)); // true
 console.log(!name && !email); // true — same result
-`}
+`,
+    },
+  ]}
 />
 
 ## The ternary expression: `a ? b : c`
@@ -256,7 +286,10 @@ cleverness.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function describeNumber(n) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function describeNumber(n) {
   const sign = n < 0 ? "negative" : n > 0 ? "positive" : "zero";
   const parity = n % 2 === 0 ? "even" : "odd";
   return n + " is " + sign + " and " + parity + ".";
@@ -266,7 +299,9 @@ console.log(describeNumber(0));
 console.log(describeNumber(5));
 console.log(describeNumber(-4));
 console.log(describeNumber(7));
-`}
+`,
+    },
+  ]}
 />
 
 ## A worked example: a tiny rule engine
@@ -279,7 +314,10 @@ line.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function canComment(user, article) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function canComment(user, article) {
   const isAuthor = user && user.id === article.authorId;
   const isMember = user && user.role === "member";
   const isAdmin = user && user.role === "admin";
@@ -306,7 +344,9 @@ console.log(
 console.log(
   canComment({ id: 7, role: "admin" }, { ...article, closedToComments: true }),
 ); // true
-`}
+`,
+    },
+  ]}
 />
 
 That single boolean expression in `canComment` encodes a rule that
@@ -327,7 +367,10 @@ Examples:
 - 2023 → \`false\`
 
 Write \`isLeapYear(year)\` that returns the correct boolean.`}
-  starterCode={`function isLeapYear(year) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function isLeapYear(year) {
   // your code here
   return false;
 }
@@ -336,8 +379,8 @@ console.log(isLeapYear(2024)); // true
 console.log(isLeapYear(1900)); // false
 console.log(isLeapYear(2000)); // true
 console.log(isLeapYear(2023)); // false
-`}
-  solutionCode={`function isLeapYear(year) {
+`,
+      solutionCode: `function isLeapYear(year) {
   if (year % 400 === 0) return true;
   if (year % 100 === 0) return false;
   if (year % 4 === 0) return true;
@@ -350,7 +393,9 @@ console.log(isLeapYear(2024));
 console.log(isLeapYear(1900));
 console.log(isLeapYear(2000));
 console.log(isLeapYear(2023));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "div4",

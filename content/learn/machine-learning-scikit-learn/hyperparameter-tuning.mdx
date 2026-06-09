@@ -67,7 +67,10 @@ dataset and watch the cross-validated accuracy move.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_wine
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
@@ -81,7 +84,9 @@ for k in [1, 5, 15, 50]:
     model = make_pipeline(StandardScaler(), KNeighborsClassifier(n_neighbors=k))
     score = cross_val_score(model, X, y, cv=5).mean()
     print(f"n_neighbors={k:>2}  ->  CV accuracy {score:.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 The data never changed. The algorithm never changed. Only the
@@ -220,7 +225,10 @@ hyperparameter, wrapped around a small model, judged by cross-validation.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.tree import DecisionTreeClassifier
 
@@ -243,7 +251,9 @@ search.fit(X_train, y_train)
 
 print("Best max_depth:", search.best_params_)
 print(f"Best CV accuracy: {search.best_score_:.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 Three things to notice. First, `GridSearchCV` is itself an estimator: you
@@ -278,7 +288,10 @@ test set. We evaluate `best_estimator_` on it exactly once.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.tree import DecisionTreeClassifier
 
@@ -301,7 +314,9 @@ best_model = search.best_estimator_
 print(f"Chosen settings : {search.best_params_}")
 print(f"CV score (chose with) : {search.best_score_:.3f}")
 print(f"Test score (honest)   : {best_model.score(X_test, y_test):.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 The two numbers are usually close, but they are not the same kind of
@@ -326,7 +341,10 @@ underscores, then the **parameter name**, like `model__C`.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_breast_cancer
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -353,7 +371,9 @@ search.fit(X_train, y_train)
 print("Best C:", search.best_params_)
 print(f"Best CV accuracy: {search.best_score_:.3f}")
 print(f"Test accuracy:    {search.best_estimator_.score(X_test, y_test):.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 Because the scaler lives *inside* the pipeline, cross-validation refits it
@@ -499,15 +519,18 @@ the wine dataset, honestly.
 The hidden tests check that the grid was the right size, that
 \`best_params\` chose a depth from your grid, that \`best_cv_score\` is a
 sensible accuracy, and that you produced a \`test_score\`.`}
-  initCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.tree import DecisionTreeClassifier
 
 X, y = load_wine(return_X_y=True)
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0, stratify=y
-)`}
-  starterCode={`# 1. Build the parameter grid (try max_depth 2, 3, 4)
+)`,
+      starterCode: `# 1. Build the parameter grid (try max_depth 2, 3, 4)
 param_grid = None
 
 # 2. Create and fit GridSearchCV on the TRAINING data only
@@ -523,8 +546,8 @@ test_score = None
 print("best params:", best_params)
 print("best CV score:", best_cv_score)
 print("test score:", test_score)
-`}
-  solutionCode={`# 1. Build the parameter grid (try max_depth 2, 3, 4)
+`,
+      solutionCode: `# 1. Build the parameter grid (try max_depth 2, 3, 4)
 param_grid = {"max_depth": [2, 3, 4]}
 
 # 2. Create and fit GridSearchCV on the TRAINING data only
@@ -545,7 +568,9 @@ test_score = search.best_estimator_.score(X_test, y_test)
 print("best params:", best_params)
 print("best CV score:", best_cv_score)
 print("test score:", test_score)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "grid_shape",

@@ -38,13 +38,18 @@ The simplest possible function:
 
 <CodeBlock
   adapter="r"
-  starterCode={`square <- function(x) {
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `square <- function(x) {
   x * x
 }
 
 square(3)
 square(c(1, 2, 3, 4))
-`}
+`,
+    },
+  ]}
 />
 
 Note: because `*` is vectorized, our `square()` function also
@@ -57,14 +62,19 @@ arguments by name in any order:
 
 <CodeBlock
   adapter="r"
-  starterCode={`greet <- function(name, greeting = "Hello") {
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `greet <- function(name, greeting = "Hello") {
   paste0(greeting, ", ", name, "!")
 }
 
 greet("Ada")
 greet("Bob", greeting = "Hi")
 greet(name = "Cleo", greeting = "Hey")
-`}
+`,
+    },
+  ]}
 />
 
 Defaults are wonderful: they make the *common* case easy while
@@ -77,7 +87,10 @@ vector and returns a small named list summarizing it.
 
 <CodeBlock
   adapter="r"
-  starterCode={`describe <- function(x, na.rm = TRUE) {
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `describe <- function(x, na.rm = TRUE) {
   list(
     n      = length(x),
     n_na   = sum(is.na(x)),
@@ -91,7 +104,9 @@ vector and returns a small named list summarizing it.
 
 describe(mtcars$mpg)
 describe(c(1, 2, NA, 4, 5))
-`}
+`,
+    },
+  ]}
 />
 
 That single function replaces ~7 lines you'd otherwise rewrite
@@ -116,13 +131,18 @@ removes the repetition:
 
 <CodeBlock
   adapter="r"
-  starterCode={`# Compact: one function call per column you care about
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# Compact: one function call per column you care about
 means <- sapply(mtcars[, c("mpg", "hp", "wt", "qsec")], mean)
 print(means)
 
 # Or just use existing tools — colMeans does it directly:
 colMeans(mtcars[, c("mpg", "hp", "wt", "qsec")])
-`}
+`,
+    },
+  ]}
 />
 
 **Rule of thumb:** if you see yourself typing the same shape of
@@ -137,25 +157,35 @@ useful for comparing variables on different scales):
 
 <CodeBlock
   adapter="r"
-  starterCode={`standardize <- function(x) {
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `standardize <- function(x) {
   (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
 }
 
 z <- standardize(mtcars$mpg)
 round(head(z), 2)
 cat("mean:", mean(z), " sd:", sd(z), "\\n")
-`}
+`,
+    },
+  ]}
 />
 
 You can now apply it to many columns:
 
 <CodeBlock
   adapter="r"
-  starterCode={`standardize <- function(x) (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `standardize <- function(x) (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
 
 z_mtcars <- as.data.frame(lapply(mtcars[, c("mpg", "hp", "wt")], standardize))
 head(z_mtcars)
-`}
+`,
+    },
+  ]}
 />
 
 Without the function, you'd repeat the standardization
@@ -198,7 +228,10 @@ Better to separate:
 
 <CodeBlock
   adapter="r"
-  starterCode={`# Pure: just computes and returns
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# Pure: just computes and returns
 signal_to_noise <- function(x) {
   mean(x, na.rm = TRUE) / sd(x, na.rm = TRUE)
 }
@@ -212,7 +245,9 @@ report_snr <- function(x, label = "x") {
 
 report_snr(mtcars$mpg, "mpg")
 report_snr(mtcars$hp, "hp")
-`}
+`,
+    },
+  ]}
 />
 
 `invisible()` returns a value without auto-printing — useful
@@ -225,7 +260,10 @@ don't leak out to your global environment:
 
 <CodeBlock
   adapter="r"
-  starterCode={`temp_var_in_global <- "I exist out here"
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `temp_var_in_global <- "I exist out here"
 
 scoped <- function() {
   temp_var_in_global <- "I'm only inside the function"
@@ -234,7 +272,9 @@ scoped <- function() {
 
 cat(scoped(), "\\n")
 cat(temp_var_in_global, "\\n") # unchanged
-`}
+`,
+    },
+  ]}
 />
 
 This isolation is a feature: it prevents functions from
@@ -294,13 +334,16 @@ the SD.
   adapter="r"
   title="Build summarize_group()"
   instructions={`Define \`summarize_group <- function(x) { ... }\` so that calling it on a numeric vector returns a list with elements \`n\` (length), \`mean\` (mean, ignoring NAs), and \`sd\` (sd, ignoring NAs).`}
-  starterCode={`summarize_group <- function(x) {
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `summarize_group <- function(x) {
   # TODO: return list(n = ..., mean = ..., sd = ...)
 }
 
 summarize_group(c(1, 2, NA, 4, 5))
-`}
-  solutionCode={`summarize_group <- function(x) {
+`,
+      solutionCode: `summarize_group <- function(x) {
   list(
     n    = length(x),
     mean = mean(x, na.rm = TRUE),
@@ -309,7 +352,9 @@ summarize_group(c(1, 2, NA, 4, 5))
 }
 
 summarize_group(c(1, 2, NA, 4, 5))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "isfun",

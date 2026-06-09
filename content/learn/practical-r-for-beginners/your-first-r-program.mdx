@@ -10,8 +10,13 @@ fully functional R session, running in your browser. Click **Run**.
 
 <CodeBlock
   adapter="r"
-  starterCode={`print("Hello, R!")
-`}
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `print("Hello, R!")
+`,
+    },
+  ]}
 />
 
 When you ran that, several things happened invisibly:
@@ -74,7 +79,10 @@ Both are useful; they are easy to confuse at first.
 
 <CodeBlock
   adapter="r"
-  starterCode={`# Auto-printing: the result of an unassigned expression is shown
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# Auto-printing: the result of an unassigned expression is shown
 1 + 1
 
 # Explicit printing: same effect, but you typed the verb
@@ -85,7 +93,9 @@ x <- 3 + 3
 
 # Now explicitly show what's in x
 print(x)
-`}
+`,
+    },
+  ]}
 />
 
 Notice the third line, `x <- 3 + 3`. Nothing appeared in the
@@ -108,7 +118,10 @@ it. It is designed for *making readable output*.
 
 <CodeBlock
   adapter="r"
-  starterCode={`# print() gives you R-style display
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# print() gives you R-style display
 print("Hello, R!")
 print(c(1, 2, 3))
 
@@ -119,7 +132,9 @@ cat("The answer is", 42, "\\n")
 city <- "Auckland"
 temp <- 17.5
 cat("In", city, "today it is", temp, "degrees.\\n")
-`}
+`,
+    },
+  ]}
 />
 
 Use `print()` when you want to *inspect* a value. Use `cat()` when
@@ -137,7 +152,10 @@ Comments are notes you leave for the next human to read your code
 
 <CodeBlock
   adapter="r"
-  starterCode={`# This whole line is a comment
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# This whole line is a comment
 x <- 10 # this part of the line is a comment, too
 
 # Comments are how you explain *why*, not just *what*
@@ -146,7 +164,9 @@ x <- 10 # this part of the line is a comment, too
 n_patients <- 10
 
 cat("There are", n_patients, "patients.\\n")
-`}
+`,
+    },
+  ]}
 />
 
 A good general rule: code should describe *what* you are doing
@@ -160,9 +180,14 @@ message is helpful, if a bit terse.
 
 <CodeBlock
   adapter="r"
-  starterCode={`# Misspelled function name
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# Misspelled function name
 prnt("hello")
-`}
+`,
+    },
+  ]}
 />
 
 That should produce an error like:
@@ -179,9 +204,14 @@ Try fixing it:
 
 <CodeBlock
   adapter="r"
-  starterCode={`# Fix me!
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# Fix me!
 prnt("hello")
-`}
+`,
+    },
+  ]}
 />
 
 Errors are not a sign you have failed; they are a sign R is
@@ -217,7 +247,10 @@ will compute a heart-health summary for a small group of people.
 
 <CodeBlock
   adapter="r"
-  starterCode={`# Tiny health checkup program
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# Tiny health checkup program
 
 names <- c("Alice", "Bob", "Carmen", "Dario")
 heights <- c(165, 178, 170, 182) # cm
@@ -242,7 +275,9 @@ for (i in seq_along(names)) {
   }
   cat(names[i], "-- BMI:", bmi[i], "(", status, ")\\n")
 }
-`}
+`,
+    },
+  ]}
 />
 
 That tiny program already does several things characteristic of
@@ -332,15 +367,20 @@ decimal. Use the formula `F = C * 9/5 + 32`.
   adapter="r"
   title="Print a city/temperature table"
   instructions={`Given the vectors \`cities\` and \`temperatures_c\` (already loaded), print one line per city in the format \`<city>: <temp> C / <temp_f> F\`. Make sure \`temp_f\` is rounded to **1** decimal place.`}
-  initCode={`cities         <- c("Auckland", "Tokyo", "Reykjavik", "Cairo")
-temperatures_c <- c(17.5, 24.0, 3.1, 35.6)`}
-  starterCode={`# Your code here
-`}
-  solutionCode={`temperatures_f <- round(temperatures_c * 9 / 5 + 32, 1)
+  files={[
+    {
+      filename: "main.r",
+      initCode: `cities         <- c("Auckland", "Tokyo", "Reykjavik", "Cairo")
+temperatures_c <- c(17.5, 24.0, 3.1, 35.6)`,
+      starterCode: `# Your code here
+`,
+      solutionCode: `temperatures_f <- round(temperatures_c * 9 / 5 + 32, 1)
 for (i in seq_along(cities)) {
   cat(cities[i], ": ", temperatures_c[i], " C / ", temperatures_f[i], " F\\n", sep = "")
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "temperatures_f",

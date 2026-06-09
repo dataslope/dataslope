@@ -31,25 +31,40 @@ The simplest form: iterate over a sequence.
 
 <CodeBlock
   adapter="python"
-  starterCode={`for fruit in ["apple", "banana", "cherry"]:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `for fruit in ["apple", "banana", "cherry"]:
     print(fruit)
-`}
+`,
+    },
+  ]}
 />
 
 `for` works on **any iterable**: lists, tuples, strings, sets, dicts, files, generators, and your own custom classes (covered later under *Iterators and Generators*).
 
 <CodeBlock
   adapter="python"
-  starterCode={`for char in "hello":
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `for char in "hello":
     print(char)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`for key in {"a": 1, "b": 2, "c": 3}:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `for key in {"a": 1, "b": 2, "c": 3}:
     print(key)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info">
@@ -62,34 +77,54 @@ Iterating a dict yields **keys** by default. Use `.items()` for key-value pairs,
 
 <CodeBlock
   adapter="python"
-  starterCode={`for i in range(5):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `for i in range(5):
     print(i, end=" ")
 print()
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`for i in range(1, 6):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `for i in range(1, 6):
     print(i, end=" ")
 print()
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`for i in range(0, 20, 5):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `for i in range(0, 20, 5):
     print(i, end=" ")
 print()
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`for i in range(10, 0, -2):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `for i in range(10, 0, -2):
     print(i, end=" ")
 print()
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn">
@@ -102,18 +137,28 @@ If your loop needs the index, **do not write `range(len(xs))`**. Use `enumerate`
 
 <CodeBlock
   adapter="python"
-  starterCode={`fruits = ["apple", "banana", "cherry"]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `fruits = ["apple", "banana", "cherry"]
 for i, fruit in enumerate(fruits):
     print(i, fruit)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`fruits = ["apple", "banana", "cherry"]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `fruits = ["apple", "banana", "cherry"]
 for i, fruit in enumerate(fruits, start=1):
     print(i, fruit)
-`}
+`,
+    },
+  ]}
 />
 
 `enumerate` is clearer, more Pythonic, and less error-prone than manual indexing.
@@ -124,30 +169,45 @@ for i, fruit in enumerate(fruits, start=1):
 
 <CodeBlock
   adapter="python"
-  starterCode={`fruits = ["apple", "banana", "cherry"]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `fruits = ["apple", "banana", "cherry"]
 prices = [1.0, 0.5, 3.0]
 for fruit, price in zip(fruits, prices):
     print(f"{fruit}: \${price:.2f}")
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`a = [1, 2, 3]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `a = [1, 2, 3]
 b = ["a", "b", "c"]
 c = [10, 20, 30]
 for x, y, z in zip(a, b, c):
     print(x, y, z)
-`}
+`,
+    },
+  ]}
 />
 
 If the sequences have different lengths, `zip` stops at the shortest.
 
 <CodeBlock
   adapter="python"
-  starterCode={`for x, y in zip([1, 2, 3], ["a", "b"]):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `for x, y in zip([1, 2, 3], ["a", "b"]):
     print(x, y)
-`}
+`,
+    },
+  ]}
 />
 
 ## `reversed`
@@ -156,9 +216,14 @@ Iterate a sequence backwards without mutating it.
 
 <CodeBlock
   adapter="python"
-  starterCode={`for fruit in reversed(["apple", "banana", "cherry"]):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `for fruit in reversed(["apple", "banana", "cherry"]):
     print(fruit)
-`}
+`,
+    },
+  ]}
 />
 
 ## The `while` loop
@@ -167,26 +232,36 @@ Iterate a sequence backwards without mutating it.
 
 <CodeBlock
   adapter="python"
-  starterCode={`n = 16
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `n = 16
 steps = 0
 while n != 1:
     n = n // 2 if n % 2 == 0 else 3 * n + 1
     steps += 1
 print("steps:", steps)
-`}
+`,
+    },
+  ]}
 />
 
 Use `while True` plus `break` for "loop until something happens" code where the loop body knows when to stop.
 
 <CodeBlock
   adapter="python"
-  starterCode={`count = 0
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `count = 0
 while True:
     count += 1
     if count > 5:
         break
     print(count)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Infinite loops">
@@ -200,33 +275,48 @@ while True:
 
 <CodeBlock
   adapter="python"
-  starterCode={`for n in range(1, 11):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `for n in range(1, 11):
     if n == 7:
         print("found 7, stopping")
         break
     print(n)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`for n in range(1, 11):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `for n in range(1, 11):
     if n % 2 == 0:
         continue
     print("odd:", n)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`for n in range(1, 11):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `for n in range(1, 11):
     if n == 7:
         print("found 7, stopping")
         break
     if n % 2 == 0:
         continue
     print("odd:", n)
-`}
+`,
+    },
+  ]}
 />
 
 ## `for ... else` (the weird one)
@@ -235,7 +325,10 @@ Both `for` and `while` accept an `else:` block, which runs **only if the loop co
 
 <CodeBlock
   adapter="python"
-  starterCode={`def first_factor(n):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def first_factor(n):
     for i in range(2, n):
         if n % i == 0:
             print(f"{n} = {i} * {n // i}")
@@ -246,7 +339,9 @@ Both `for` and `while` accept an `else:` block, which runs **only if the loop co
 
 for n in [12, 13, 21, 29]:
     first_factor(n)
-`}
+`,
+    },
+  ]}
 />
 
 The `else` block runs **only if we never hit `break`**, which is exactly what we want for "searched but found nothing" logic.
@@ -257,7 +352,10 @@ The `for...else` pattern is Pythonic, but it confuses many readers because "else
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Alternative without for...else
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Alternative without for...else
 def first_factor_alt(n):
     found = False
     for i in range(2, n):
@@ -271,7 +369,9 @@ def first_factor_alt(n):
 
 for n in [12, 13]:
     first_factor_alt(n)
-`}
+`,
+    },
+  ]}
 />
 
 ## `while ... else`
@@ -280,18 +380,26 @@ The same `else` logic applies to `while` loops.
 
 <CodeBlock
   adapter="python"
-  starterCode={`count = 0
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `count = 0
 while count < 3:
     print(count)
     count += 1
 else:
     print("loop finished normally")
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`count = 0
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `count = 0
 while count < 5:
     if count == 3:
         break
@@ -299,7 +407,9 @@ while count < 5:
     count += 1
 else:
     print("this won't print because we broke")
-`}
+`,
+    },
+  ]}
 />
 
 ## Avoiding common pitfalls
@@ -310,23 +420,33 @@ Changing a list's length during iteration invalidates the iterator and leads to 
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [1, 2, 3, 4, 5]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [1, 2, 3, 4, 5]
 # Iterate over a copy so we can safely mutate the original
 for x in xs[:]:
     if x % 2 == 0:
         xs.remove(x)
 print(xs)
-`}
+`,
+    },
+  ]}
 />
 
 Better: use a list comprehension to build a new list.
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [1, 2, 3, 4, 5]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [1, 2, 3, 4, 5]
 xs = [x for x in xs if x % 2 != 0]
 print(xs)
-`}
+`,
+    },
+  ]}
 />
 
 ## Challenges
@@ -335,17 +455,22 @@ print(xs)
   adapter="python"
   title="Sum of digits"
   instructions={`Define a function \`digit_sum(n)\` that takes a non-negative integer \`n\` and returns the sum of its decimal digits. Use a \`while\` loop. For example, \`digit_sum(1234)\` returns \`10\`.`}
-  starterCode={`def digit_sum(n):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def digit_sum(n):
     # your code here
     return 0
-`}
-  solutionCode={`def digit_sum(n):
+`,
+      solutionCode: `def digit_sum(n):
     total = 0
     while n > 0:
         total += n % 10
         n //= 10
     return total
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",
@@ -369,11 +494,14 @@ print(xs)
   adapter="python"
   title="First prime over N"
   instructions={`Define a function \`first_prime_over(n)\` that returns the smallest prime number strictly greater than \`n\`. Use the \`for ... else\` pattern from above for the inner primality test.`}
-  starterCode={`def first_prime_over(n):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def first_prime_over(n):
     # your code here
     return 2
-`}
-  solutionCode={`def first_prime_over(n):
+`,
+      solutionCode: `def first_prime_over(n):
     candidate = max(n + 1, 2)
     while True:
         for i in range(2, int(candidate**0.5) + 1):
@@ -382,7 +510,9 @@ print(xs)
         else:
             return candidate
         candidate += 1
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "after_10",
@@ -411,17 +541,22 @@ print(xs)
   adapter="python"
   title="Count vowels"
   instructions={`Define a function \`count_vowels(text)\` that returns the number of vowels (\`a\`, \`e\`, \`i\`, \`o\`, \`u\`, case-insensitive) in \`text\`. Use a \`for\` loop.`}
-  starterCode={`def count_vowels(text):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def count_vowels(text):
     # your code here
     return 0
-`}
-  solutionCode={`def count_vowels(text):
+`,
+      solutionCode: `def count_vowels(text):
     count = 0
     for c in text.lower():
         if c in "aeiou":
             count += 1
     return count
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",

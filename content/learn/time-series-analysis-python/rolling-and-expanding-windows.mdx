@@ -20,7 +20,10 @@ value from its own past (a **lag**). `shift(-k)` does the reverse (a
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 s = pd.Series(
     [10, 12, 11, 15, 14],
@@ -41,7 +44,9 @@ print()
 # 'shift' is how you compute change over time:
 print("Day-over-day change (y - y.shift(1)):")
 print((s - s.shift(1)).tolist())
-`}
+`,
+    },
+  ]}
 />
 
 `shift(1)` is the building block for almost everything later: a lag feature,
@@ -81,7 +86,10 @@ trade-off.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -98,8 +106,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`import matplotlib.pyplot as plt
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `import matplotlib.pyplot as plt
 
 window = 12  # <-- change me! try 3 (noisy), 12 (kills seasonality), 36 (very smooth)
 
@@ -115,7 +123,9 @@ plt.show()
 
 print(f"The first {window - 1} values are NaN: a full {window}-wide window")
 print("isn't available until that many points have gone by.")
-`}
+`,
+    },
+  ]}
 />
 
 A 12-month window is special here: because it spans exactly one seasonal
@@ -143,17 +153,22 @@ answers at the start, allow them with `min_periods`.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [112,118,132,129,121,135,148,148,136,119,104,118]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`print("Default: needs a full window, so the first 2 are NaN:")
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `print("Default: needs a full window, so the first 2 are NaN:")
 print(air.rolling(3).mean().round(1).head())
 print()
 print("min_periods=1: compute as soon as there's at least 1 point:")
 print(air.rolling(3, min_periods=1).mean().round(1).head())
-`}
+`,
+    },
+  ]}
 />
 
 ## The trailing-vs-centered trap (a leakage classic)
@@ -178,7 +193,10 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 s = pd.Series(
     [10, 20, 30, 40, 50],
@@ -198,7 +216,9 @@ print()
 print("On 2014-01-02 the centered mean is (10+20+30)/3 = 20.0 -- it used")
 print("2014-01-03, a day that hadn't happened yet at the time of 01-02.")
 print("Great for a smooth trend line; FORBIDDEN as a forecasting feature.")
-`}
+`,
+    },
+  ]}
 />
 
 <MultipleChoice
@@ -226,7 +246,10 @@ stops. People see a smooth upward moving-average curve and imagine it
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -243,8 +266,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`import matplotlib.pyplot as plt
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `import matplotlib.pyplot as plt
 
 ma = air.rolling(12).mean()
 
@@ -270,7 +293,9 @@ plt.show()
 
 print("The orange curve stops at the red line. To say anything about 1961")
 print("you need a MODEL (ARIMA, later) - not a backward-looking average.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="danger" title="Smoother vs forecast">
@@ -292,7 +317,10 @@ growing spread is a non-stationarity we'll learn to fix.)
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -309,8 +337,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`import matplotlib.pyplot as plt
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `import matplotlib.pyplot as plt
 
 roll_std = air.rolling(12).std()
 
@@ -328,7 +356,9 @@ print(
     round(roll_std.dropna().iloc[-1], 1),
 )
 print("The spread roughly TRIPLES - the variance is not constant over time.")
-`}
+`,
+    },
+  ]}
 />
 
 ## Expanding windows: everything so far
@@ -341,7 +371,10 @@ including now." It's the honest, leakage-free way to say "the typical value
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 rng = np.random.default_rng(0)
@@ -360,7 +393,9 @@ print(cmp.head(10))
 print()
 print("rolling7 forgets data older than 7 days; expanding never forgets.")
 print("Both use only PAST+present, so both are safe to use as-of each date.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="Rolling vs expanding, in one line">
@@ -379,18 +414,23 @@ there's exponential weighting, `ewm(span=...).mean()`.
   instructions={`A daily \`visits\` Series is loaded. Compute \`smooth\`: a **7-day trailing** moving average (each day = the mean of that day and the 6 days before it). It must use only past-and-present data — do **not** center the window.
 
 The first 6 entries should be \`NaN\` (a full 7-day window isn't available yet), and from day 7 onward each value is a true 7-day mean.`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 rng = np.random.default_rng(11)
 days = pd.date_range("2014-01-01", periods=40, freq="D")
 visits = pd.Series((150 + rng.normal(0, 20, 40)).round().astype(int),
-                   index=days, name="visits")`}
-  starterCode={`smooth = None  # 7-day TRAILING moving average
+                   index=days, name="visits")`,
+      starterCode: `smooth = None  # 7-day TRAILING moving average
 print(smooth.head(10) if smooth is not None else None)
-`}
-  solutionCode={`smooth = visits.rolling(window=7).mean()
+`,
+      solutionCode: `smooth = visits.rolling(window=7).mean()
 print(smooth.head(10))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type_len",
@@ -432,15 +472,18 @@ assert pd.isna(smooth.iloc[3]), "Index 3 should be NaN for a trailing window (it
 - \`centered_at_1\` — \`s.rolling(3, center=True).mean()\` value at position 1
 
 Then set \`uses_future\` to \`True\` if the centered value at position 1 depends on \`s.iloc[2]\` (a point *after* position 1), and \`False\` otherwise. Decide it by checking whether the centered average at position 1 equals \`(s.iloc[0] + s.iloc[1] + s.iloc[2]) / 3\`.`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 s = pd.Series([10.0, 20.0, 30.0, 40.0, 50.0],
-              index=pd.date_range("2014-01-01", periods=5, freq="D"), name="s")`}
-  starterCode={`trailing_at_1 = None
+              index=pd.date_range("2014-01-01", periods=5, freq="D"), name="s")`,
+      starterCode: `trailing_at_1 = None
 centered_at_1 = None
 uses_future = None
 print(trailing_at_1, centered_at_1, uses_future)
-`}
-  solutionCode={`trailing_at_1 = float(s.rolling(3, min_periods=1).mean().iloc[1])
+`,
+      solutionCode: `trailing_at_1 = float(s.rolling(3, min_periods=1).mean().iloc[1])
 centered_at_1 = float(s.rolling(3, center=True).mean().iloc[1])
 uses_future = abs(centered_at_1 - (s.iloc[0] + s.iloc[1] + s.iloc[2]) / 3) < 1e-9
 print(
@@ -451,7 +494,9 @@ print(
     " uses_future:",
     uses_future,
 )
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "trailing_value",

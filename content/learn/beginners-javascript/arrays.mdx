@@ -14,7 +14,10 @@ An array is written with square brackets and commas:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const empty = [];
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const empty = [];
 const nums = [1, 2, 3, 4, 5];
 const colors = ["red", "green", "blue"];
 const mixed = [1, "two", true, null, [10, 20]]; // any types, even nested arrays
@@ -23,7 +26,9 @@ console.log(empty);
 console.log(nums);
 console.log(colors);
 console.log(mixed);
-`}
+`,
+    },
+  ]}
 />
 
 JavaScript arrays can hold *anything*: numbers, strings, booleans,
@@ -37,11 +42,16 @@ it.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const xs = [10, 20, 30, 40];
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const xs = [10, 20, 30, 40];
 console.log(xs.length); // 4
 
 console.log([].length); // 0
-`}
+`,
+    },
+  ]}
 />
 
 ## Indexing: zero-based
@@ -50,7 +60,10 @@ Read or write an element by its **index**, starting at `0`.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const xs = [10, 20, 30, 40];
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const xs = [10, 20, 30, 40];
 
 console.log(xs[0]); // 10  — first
 console.log(xs[1]); // 20
@@ -65,7 +78,9 @@ console.log(xs); // [10, 999, 30, 40]
 xs[10] = "boo"; // assigning past the end stretches the array!
 console.log(xs);
 console.log(xs.length); // 11 — with "holes" in the middle
-`}
+`,
+    },
+  ]}
 />
 
 That last block is a classic JavaScript surprise: setting an index
@@ -84,7 +99,10 @@ purpose — use `.push` instead.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const xs = [];
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const xs = [];
 xs.push("a");
 xs.push("b");
 xs.push("c");
@@ -98,7 +116,9 @@ console.log(xs); // ["Z","a","b"]
 
 const first = xs.shift();
 console.log("shifted:", first, "-> array:", xs);
-`}
+`,
+    },
+  ]}
 />
 
 These four methods (`push`, `pop`, `shift`, `unshift`) **mutate**
@@ -111,7 +131,10 @@ We met loops in the control-flow chapter. Recall:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const fruits = ["apple", "banana", "cherry"];
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const fruits = ["apple", "banana", "cherry"];
 
 // for...of — cleanest when you only need the element
 for (const fruit of fruits) {
@@ -130,7 +153,9 @@ for (const [i, fruit] of fruits.entries()) {
 
 // forEach — concise, no need for the index
 fruits.forEach((f) => console.log("got:", f));
-`}
+`,
+    },
+  ]}
 />
 
 ## Slicing and copying
@@ -144,7 +169,10 @@ Two methods that look similar but are completely different:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const xs = ["a", "b", "c", "d", "e"];
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const xs = ["a", "b", "c", "d", "e"];
 
 // slice: non-destructive — original is unchanged
 const middle = xs.slice(1, 4); // ["b","c","d"]
@@ -162,7 +190,9 @@ const xs2 = ["a", "b", "c", "d", "e"];
 const removed = xs2.splice(1, 2, "X", "Y", "Z");
 console.log("removed:", removed); // ["b","c"]
 console.log("xs2:", xs2); // ["a","X","Y","Z","d","e"]
-`}
+`,
+    },
+  ]}
 />
 
 When in doubt, **prefer non-destructive operations**. The
@@ -176,7 +206,10 @@ A starter set, with the most common patterns:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const xs = [3, 1, 4, 1, 5, 9, 2, 6];
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const xs = [3, 1, 4, 1, 5, 9, 2, 6];
 
 // Membership / search
 console.log(xs.includes(5)); // true
@@ -209,7 +242,9 @@ const left = [1, 2, 3];
 const right = [4, 5];
 console.log(left.concat(right)); // [1,2,3,4,5]
 console.log([...left, ...right]); // same, using spread
-`}
+`,
+    },
+  ]}
 />
 
 The string-sort-by-default trap is famous. If you call `.sort()`
@@ -224,7 +259,10 @@ Two pieces of modern syntax that come up everywhere with arrays.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const a = [1, 2, 3];
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const a = [1, 2, 3];
 const b = [4, 5];
 
 // Combine
@@ -243,14 +281,19 @@ console.log(surrounded);
 
 // Spread into function arguments
 console.log(Math.max(...a)); // 3
-`}
+`,
+    },
+  ]}
 />
 
 ### Destructuring: pull elements out by position
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const xs = [10, 20, 30, 40, 50];
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const xs = [10, 20, 30, 40, 50];
 
 const [first, second] = xs;
 console.log(first, second); // 10 20
@@ -273,7 +316,9 @@ let x = 1,
   y = 2;
 [x, y] = [y, x];
 console.log(x, y); // 2 1
-`}
+`,
+    },
+  ]}
 />
 
 Destructuring is a *huge* readability win. Once you internalise
@@ -289,7 +334,10 @@ are sharing the same underlying array.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const a = [1, 2, 3];
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const a = [1, 2, 3];
 const b = a; // NOT a copy — b points at the same array
 b.push(99);
 console.log("a:", a); // [1, 2, 3, 99]   — surprising if you weren't expecting it!
@@ -302,7 +350,9 @@ c.push("X");
 console.log("a:", a); // unchanged
 console.log("c:", c);
 console.log(a === c); // false — different arrays
-`}
+`,
+    },
+  ]}
 />
 
 This is the same point we noted about objects in the variables
@@ -332,7 +382,7 @@ that owns the array operations, and a driver that uses them.
   files={[
     {
       filename: "index.js",
-      initialContent: `const { stats } = require("./stats");
+      starterCode: `const { stats } = require("./stats");
 
 const grades = [82, 47, 91, 58, 73, 65, 99, 30, 88, 60];
 
@@ -345,7 +395,7 @@ console.log("Passed:   ", passed);
     },
     {
       filename: "stats.js",
-      initialContent: `function stats(xs) {
+      starterCode: `function stats(xs) {
   if (xs.length === 0) {
     return { count: 0, min: null, max: null, average: 0, passed: 0 };
   }
@@ -389,7 +439,10 @@ Examples:
 - \`rotate([], 3)\` → \`[]\`
 
 Hint: use the modulo operator (\`%\`) to handle \`k\` larger than the array length, then combine \`slice\` with the spread operator.`}
-  starterCode={`function rotate(xs, k) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function rotate(xs, k) {
   // your code here
   return xs;
 }
@@ -399,8 +452,8 @@ console.log(rotate([1, 2, 3, 4, 5], 2));
 console.log(rotate([1, 2, 3, 4, 5], 5));
 console.log(rotate([1, 2, 3, 4, 5], 7));
 console.log(rotate([], 3));
-`}
-  solutionCode={`function rotate(xs, k) {
+`,
+      solutionCode: `function rotate(xs, k) {
   if (xs.length === 0) return [];
   const n = k % xs.length;
   return [...xs.slice(-n), ...xs.slice(0, xs.length - n)];
@@ -411,7 +464,9 @@ console.log(rotate([1, 2, 3, 4, 5], 2));
 console.log(rotate([1, 2, 3, 4, 5], 5));
 console.log(rotate([1, 2, 3, 4, 5], 7));
 console.log(rotate([], 3));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "by_one",

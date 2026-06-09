@@ -24,10 +24,15 @@ Understanding the quirks of Python's numeric types—especially the precision li
 
 <CodeBlock
   adapter="python"
-  starterCode={`big = 2**200
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `big = 2**200
 print(big)
 print("digits:", len(str(big)))
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="No integer overflow in Python">
@@ -38,18 +43,28 @@ Integer literals support several bases:
 
 <CodeBlock
   adapter="python"
-  starterCode={`print(0b1010)  # binary -> 10
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print(0b1010)  # binary -> 10
 print(0o17)  # octal  -> 15
 print(0xFF)  # hex    -> 255
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Underscores for readability (Python 3.6+)
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Underscores for readability (Python 3.6+)
 print(1_000_000)
 print(0b1111_0000)
-`}
+`,
+    },
+  ]}
 />
 
 ## Floats
@@ -60,9 +75,14 @@ print(0b1111_0000)
 
 <CodeBlock
   adapter="python"
-  starterCode={`print(0.1 + 0.2)
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print(0.1 + 0.2)
 print(0.1 + 0.2 == 0.3)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Why does 0.1 + 0.2 ≠ 0.3?">
@@ -86,25 +106,35 @@ For exact decimal arithmetic—like money—use `decimal.Decimal`:
 
 <CodeBlock
   adapter="python"
-  starterCode={`from decimal import Decimal
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from decimal import Decimal
 
 price = Decimal("19.99")
 quantity = Decimal("3")
 total = price * quantity
 print(total)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`from decimal import Decimal
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from decimal import Decimal
 
 # Float precision fails for currency
 print(0.1 + 0.1 + 0.1 == 0.3)
 
 # Decimal is exact
 print(Decimal("0.1") + Decimal("0.1") + Decimal("0.1") == Decimal("0.3"))
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Always construct Decimal from strings">
@@ -123,12 +153,17 @@ For exact rational arithmetic (fractions), use `fractions.Fraction`:
 
 <CodeBlock
   adapter="python"
-  starterCode={`from fractions import Fraction
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from fractions import Fraction
 
 x = Fraction(1, 3)
 y = Fraction(1, 6)
 print(x + y)  # 1/2
-`}
+`,
+    },
+  ]}
 />
 
 ## Complex numbers
@@ -137,19 +172,29 @@ Python has built-in support for complex numbers using `j` (not `i`) for the imag
 
 <CodeBlock
   adapter="python"
-  starterCode={`z = 3 + 4j
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `z = 3 + 4j
 print(z.real, z.imag)
 print(abs(z))  # magnitude
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`z = 3 + 4j
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `z = 3 + 4j
 w = 1 + 2j
 print(z * w)
 print(z / w)
-`}
+`,
+    },
+  ]}
 />
 
 ## Arithmetic operators
@@ -168,36 +213,56 @@ A common surprise: `/` **always** returns a float in Python 3, even when both op
 
 <CodeBlock
   adapter="python"
-  starterCode={`print(7 / 2)  # 3.5 (float)
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print(7 / 2)  # 3.5 (float)
 print(7 // 2)  # 3 (int)
-`}
+`,
+    },
+  ]}
 />
 
 Floor division rounds toward negative infinity, which can surprise C programmers:
 
 <CodeBlock
   adapter="python"
-  starterCode={`print(7 // 2)  # 3
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print(7 // 2)  # 3
 print(-7 // 2)  # -4, not -3
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`print(7 % 2)
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print(7 % 2)
 print(2**0.5)  # square root via exponentiation
-`}
+`,
+    },
+  ]}
 />
 
 Augmented assignment operators work as expected:
 
 <CodeBlock
   adapter="python"
-  starterCode={`x = 10
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `x = 10
 x += 5
 x *= 2
 print(x)
-`}
+`,
+    },
+  ]}
 />
 
 ## The `math` module
@@ -206,31 +271,46 @@ print(x)
 
 <CodeBlock
   adapter="python"
-  starterCode={`import math
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import math
 
 print(math.pi, math.e)
 print(math.sqrt(2))
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`import math
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import math
 
 print(math.sin(math.pi / 2))
 print(math.log(100, 10))
 print(math.factorial(6))
 print(math.gcd(24, 36))
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`import math
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import math
 
 print(math.floor(3.7), math.ceil(3.2))
 print(round(3.5))
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Banker's rounding">
@@ -251,24 +331,34 @@ For non-cryptographic randomness, use `random`. For cryptography, use `secrets`.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import random
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import random
 
 random.seed(42)  # makes output reproducible
 
 print(random.random())  # float in [0.0, 1.0)
 print(random.randint(1, 6))  # inclusive on both ends
 print(random.choice(["a", "b", "c"]))
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`import random
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import random
 
 random.seed(42)
 
 print(random.sample(range(100), 5))  # 5 unique items
-`}
+`,
+    },
+  ]}
 />
 
 ## Challenges
@@ -277,7 +367,10 @@ print(random.sample(range(100), 5))  # 5 unique items
   adapter="python"
   title="Round to cents using Decimal"
   instructions={`Write a function \`round_to_cents(amount)\` that takes a string representing a dollar amount (e.g., \`"19.996"\`) and returns a \`Decimal\` rounded to two decimal places. Use \`Decimal\` and its \`.quantize()\` method with \`ROUND_HALF_UP\`.`}
-  starterCode={`from decimal import Decimal, ROUND_HALF_UP
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from decimal import Decimal, ROUND_HALF_UP
 
 
 def round_to_cents(amount):
@@ -287,8 +380,8 @@ def round_to_cents(amount):
 
 print(round_to_cents("19.996"))
 print(round_to_cents("0.004"))
-`}
-  solutionCode={`from decimal import Decimal, ROUND_HALF_UP
+`,
+      solutionCode: `from decimal import Decimal, ROUND_HALF_UP
 
 
 def round_to_cents(amount):
@@ -298,7 +391,9 @@ def round_to_cents(amount):
 
 print(round_to_cents("19.996"))
 print(round_to_cents("0.004"))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "round_up",
@@ -322,15 +417,18 @@ print(round_to_cents("0.004"))
   adapter="python"
   title="Greatest common divisor"
   instructions={`Define a function \`gcd(a, b)\` that returns the greatest common divisor of two positive integers using the Euclidean algorithm. Do **not** use \`math.gcd\`—implement it yourself using a loop or recursion.`}
-  starterCode={`def gcd(a, b):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def gcd(a, b):
     # Your code here
     return 1
 
 
 print(gcd(48, 18))
 print(gcd(100, 25))
-`}
-  solutionCode={`def gcd(a, b):
+`,
+      solutionCode: `def gcd(a, b):
     while b:
         a, b = b, a % b
     return a
@@ -338,7 +436,9 @@ print(gcd(100, 25))
 
 print(gcd(48, 18))
 print(gcd(100, 25))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",
@@ -362,20 +462,25 @@ print(gcd(100, 25))
   adapter="python"
   title="Compound interest"
   instructions={`Write a function \`compound_interest(principal, rate, years)\` that calculates the final amount using the formula \`A = P * (1 + r)^t\`. \`rate\` is a decimal (e.g., \`0.05\` for 5%). Return a float rounded to 2 decimal places.`}
-  starterCode={`def compound_interest(principal, rate, years):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def compound_interest(principal, rate, years):
     # Your code here
     return 0.0
 
 
 print(compound_interest(1000, 0.05, 10))
-`}
-  solutionCode={`def compound_interest(principal, rate, years):
+`,
+      solutionCode: `def compound_interest(principal, rate, years):
     amount = principal * (1 + rate) ** years
     return round(amount, 2)
 
 
 print(compound_interest(1000, 0.05, 10))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",

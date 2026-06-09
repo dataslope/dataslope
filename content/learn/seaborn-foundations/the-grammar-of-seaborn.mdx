@@ -33,7 +33,10 @@ the legend:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import matplotlib.pyplot as plt
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import matplotlib.pyplot as plt
 import seaborn as sns  # only used here to fetch the example data
 
 penguins = sns.load_dataset("penguins")
@@ -59,7 +62,9 @@ for species, color in zip(species_list, colors):
 ax.set_xlabel("flipper_length_mm")
 ax.set_ylabel("body_mass_g")
 ax.legend(title="species")
-`}
+`,
+    },
+  ]}
 />
 
 Count what you had to manage: finding the unique species, choosing a color
@@ -80,7 +85,10 @@ the labels.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
@@ -94,7 +102,9 @@ sns.relplot(
     height=4,
     aspect=1.2,
 )
-`}
+`,
+    },
+  ]}
 />
 
 That is the whole thing. No loop, no color list, no manual legend, no axis
@@ -222,7 +232,10 @@ adjusting:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
@@ -241,7 +254,9 @@ g = sns.relplot(
 g.set_axis_labels("Flipper length (mm)", "Body mass (g)")
 g.legend.set_title("Species")
 g.figure.suptitle("Penguin size by species", y=1.03)
-`}
+`,
+    },
+  ]}
 />
 
 So the workflow is: let Seaborn make a good chart fast, then drop down to
@@ -284,15 +299,18 @@ single \`sns.relplot\` call, draw a scatter plot of:
 
 Assign the returned grid object to a variable named \`g\`. You should not need
 a loop, a color list, or any manual legend code — that is the whole point.`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 # Build the grouped scatter with one relplot call, assigned to g:
 g = None
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
@@ -305,7 +323,9 @@ g = sns.relplot(
     height=4,
     aspect=1.2,
 )
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_facetgrid",

@@ -62,7 +62,10 @@ much that number was free to move.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.default_rng(11)
 
@@ -78,7 +81,9 @@ for week in range(5):
 print("\\nSame system every week. The mean still wanders by several ms.")
 print("If you reported just one week's mean as THE number, you'd be")
 print("hiding how much it was free to move.")
-`}
+`,
+    },
+  ]}
 />
 
 Notice the means aren't wildly different — they cluster around 200 —
@@ -107,7 +112,10 @@ trend whatsoever.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.express as px
 
 rng = np.random.default_rng(3)
@@ -134,7 +142,9 @@ print(
     f"{(last_six[-1] - last_six[0]):+.1f} units of 'movement'"
 )
 print("...but the generating process was flat the entire time.")
-`}
+`,
+    },
+  ]}
 />
 
 If you squint at that chart you will *see* stories: a dip around month
@@ -150,7 +160,10 @@ range, it's plausibly just noise.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.default_rng(0)
 
@@ -175,7 +188,9 @@ plausibly_noise = abs(observed_gap) < 2 * null_gaps.std()
 print(
     f"\\nObserved gap of {observed_gap:+.2f} -> plausibly just noise? {plausibly_noise}"
 )
-`}
+`,
+    },
+  ]}
 />
 
 That little pattern — *simulate a world with no effect, see how big
@@ -265,7 +280,10 @@ because it carries its own error bars.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.express as px
 
 rng = np.random.default_rng(7)
@@ -296,7 +314,9 @@ print(
     f"[{np.percentile(many_means, 2.5):.1f}, "
     f"{np.percentile(many_means, 97.5):.1f}] ms"
 )
-`}
+`,
+    },
+  ]}
 />
 
 That histogram is the heart of the course in one picture. The point
@@ -394,22 +414,27 @@ You're given \`draw_sample()\`, which returns a fresh sample of 150 values from 
 - Compute the standard deviation of \`means\` into a float named \`wobble\`.
 
 \`wobble\` measures how much the sample mean wanders run-to-run — a first taste of the standard error.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 rng = np.random.default_rng(123)
 
 def draw_sample():
     # One fixed process: true mean 75, true sd 12.
-    return rng.normal(75, 12, size=150)`}
-  starterCode={`# TODO: draw 2000 samples, take each one's mean, collect into 'means'
+    return rng.normal(75, 12, size=150)`,
+      starterCode: `# TODO: draw 2000 samples, take each one's mean, collect into 'means'
 # Then compute the std of those means into 'wobble'
 means = None
 wobble = None
-`}
-  solutionCode={`means = np.array([draw_sample().mean() for _ in range(2000)])
+`,
+      solutionCode: `means = np.array([draw_sample().mean() for _ in range(2000)])
 wobble = float(means.std())
 print(f"Mean of the sample means: {means.mean():.2f}")
 print(f"Wobble (std of the means): {wobble:.3f}")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "means_shape",
@@ -456,7 +481,10 @@ You're given the two groups (\`control\`, \`treatment\`) and a function \`null_g
 - Set a boolean \`plausibly_noise\` to **True** if \`abs(observed)\` is **less than** 2 times the standard deviation of \`null_gaps\`, else **False**.
 
 This is the raw logic that *Hypothesis Testing* later formalizes.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 rng = np.random.default_rng(2024)
 
 # Two groups. Are they really different, or is this gap just luck?
@@ -468,19 +496,21 @@ _pooled = np.concatenate([control, treatment])
 def null_gap():
     perm = rng.permutation(_pooled)
     a, b = perm[:len(control)], perm[len(control):]
-    return b.mean() - a.mean()`}
-  starterCode={`# TODO
+    return b.mean() - a.mean()`,
+      starterCode: `# TODO
 observed = None
 null_gaps = None
 plausibly_noise = None
-`}
-  solutionCode={`observed = float(treatment.mean() - control.mean())
+`,
+      solutionCode: `observed = float(treatment.mean() - control.mean())
 null_gaps = np.array([null_gap() for _ in range(4000)])
 plausibly_noise = bool(abs(observed) < 2 * null_gaps.std())
 print(f"Observed gap: {observed:+.3f}")
 print(f"No-effect gap spread (std): {null_gaps.std():.3f}")
 print(f"Plausibly just noise? {plausibly_noise}")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "observed_type",

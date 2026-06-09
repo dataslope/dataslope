@@ -11,7 +11,10 @@ uses. Let us dissect it and prove the grammar has become second nature.
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
   geom_point(alpha = 0.7) +
@@ -26,7 +29,9 @@ ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
     color = "Drivetrain"
   ) +
   theme_minimal()
-`}
+`,
+    },
+  ]}
 />
 
 ## Decoding it, line by line
@@ -55,7 +60,10 @@ would do — without running them. Test yourself, then run to confirm.
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # PREDICT before running: moving color into geom_point's own aes()
 # means geom_smooth no longer sees it. How many lines per panel now?
@@ -64,7 +72,9 @@ ggplot(mpg, aes(x = displ, y = hwy)) +
   geom_smooth(method = "lm", se = FALSE) +
   facet_wrap(~class) +
   theme_minimal()
-`}
+`,
+    },
+  ]}
 />
 
 If you predicted **one** smoother per panel (instead of one per
@@ -79,24 +89,34 @@ Experienced ggplot users do not type that whole block at once. They
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # Start minimal, then add components one at a time.
 p <- ggplot(mpg, aes(displ, hwy, color = drv)) +
   geom_point()
 p # check: do the points and colors look right?
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 p <- ggplot(mpg, aes(displ, hwy, color = drv)) +
   geom_point()
 # Add the next component and re-check.
 p + facet_wrap(~class)
-`}
+`,
+    },
+  ]}
 />
 
 This incremental rhythm — *add a component, look, add another* — is the

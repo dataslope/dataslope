@@ -66,7 +66,10 @@ ends are `O(1)`.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayDeque;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class Main {
@@ -85,7 +88,9 @@ public class Main {
     System.out.println("left over:  " + dq);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Use ArrayDeque as a queue (FIFO)
@@ -95,7 +100,10 @@ When you need a plain queue (line-at-the-coffee-shop semantics),
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayDeque;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayDeque;
 import java.util.Queue;
 
 public class Main {
@@ -110,7 +118,9 @@ public class Main {
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Use ArrayDeque as a stack (LIFO)
@@ -120,7 +130,10 @@ legacy `java.util.Stack`:
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayDeque;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class Main {
@@ -135,7 +148,9 @@ public class Main {
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 A `Deque` is a *better* stack than `java.util.Stack` for the same
@@ -149,7 +164,10 @@ node is *visited* in the order it was discovered — exactly FIFO.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.*;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.*;
 
 public class Main {
   public static void main(String[] args) {
@@ -175,7 +193,9 @@ public class Main {
     System.out.println("BFS order = " + order);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Swap the `Queue` for an `ArrayDeque`-as-stack and you have DFS.
@@ -189,7 +209,10 @@ you provide). It is backed by a *binary heap*, so `offer` and
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.Comparator;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.Comparator;
 import java.util.PriorityQueue;
 
 public class Main {
@@ -213,7 +236,9 @@ public class Main {
       System.out.println(rev.poll());
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Real uses: Dijkstra's algorithm, scheduling, "top-K" selection, event
@@ -246,7 +271,7 @@ deadline. The "smallest deadline" task runs next.
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Scheduler s = new Scheduler();
     s.add(new Task("backup", 30));
@@ -265,12 +290,12 @@ deadline. The "smallest deadline" task runs next.
     },
     {
       filename: "Task.java",
-      initialContent: `public record Task(String name, int deadline) {}
+      starterCode: `public record Task(String name, int deadline) {}
 `,
     },
     {
       filename: "Scheduler.java",
-      initialContent: `import java.util.Comparator;
+      starterCode: `import java.util.Comparator;
 import java.util.PriorityQueue;
 
 public class Scheduler {
@@ -312,7 +337,7 @@ Expected output:
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     SlidingWindow<Integer> w = new SlidingWindow<>(3);
     w.add(1);
@@ -329,7 +354,7 @@ Expected output:
     },
     {
       filename: "SlidingWindow.java",
-      initialContent: `import java.util.ArrayDeque;
+      starterCode: `import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
@@ -338,7 +363,7 @@ public class SlidingWindow<E> {
   // TODO
 }
 `,
-      solutionContent: `import java.util.ArrayDeque;
+      solutionCode: `import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;

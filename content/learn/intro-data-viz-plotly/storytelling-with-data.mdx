@@ -60,7 +60,10 @@ on framing.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 df = pd.DataFrame(
@@ -99,7 +102,9 @@ fig2 = px.line(
     labels={"sales": "Total sales (units)", "year": "Year"},
 )
 fig2.show()
-`}
+`,
+    },
+  ]}
 />
 
 Both charts are *true*. The first emphasizes the channel mix shift;

@@ -67,14 +67,19 @@ imports and know what they're getting into.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import pandas as pd
 
 rng = np.random.RandomState(42)
 sample = pd.Series(rng.randn(5))
 
 print(sample)
-`}
+`,
+    },
+  ]}
 />
 
 Any operation involving randomness — train/test splits,

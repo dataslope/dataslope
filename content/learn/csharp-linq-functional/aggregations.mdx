@@ -26,7 +26,10 @@ all of them: `Aggregate`.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var products = new[] {
@@ -49,7 +52,9 @@ Console.WriteLine($"cheapest:    {cheapest?.Name}");
 Console.WriteLine($"priciest:    {pricey?.Name}");
 
 record Product(string Name, decimal Price, int Stock);
-`}
+`,
+    },
+  ]}
 />
 
 The lambda overloads (`Sum(p => p.Price)`, `Count(p =>
@@ -76,7 +81,10 @@ want a sentinel.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var empty = System.Array.Empty<int>();
@@ -95,7 +103,9 @@ catch (Exception ex)
 
 // Safe alternatives:
 Console.WriteLine($"min-or-default: {empty.DefaultIfEmpty().Min()}");
-`}
+`,
+    },
+  ]}
 />
 
 `DefaultIfEmpty()` yields one default element if the source is empty.
@@ -115,7 +125,10 @@ general form. You give it:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var nums = new[] { 3, 1, 4, 1, 5, 9, 2, 6, 5 };
@@ -136,7 +149,9 @@ Console.WriteLine($"sum     = {sum}");
 Console.WriteLine($"product = {product}");
 Console.WriteLine($"max     = {max}");
 Console.WriteLine($"csv     = {csv}");
-`}
+`,
+    },
+  ]}
 />
 
 `Aggregate` is the swiss-army knife. Any time you need to *fold*
@@ -151,7 +166,10 @@ several things in one pass.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var nums = new[] { 3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5 };
@@ -166,7 +184,9 @@ double var = (double)stats.Sq / stats.Count - mean * mean;
 
 Console.WriteLine($"count={stats.Count} sum={stats.Sum} min={stats.Min} max={stats.Max}");
 Console.WriteLine($"mean={mean:F2}  variance={var:F2}");
-`}
+`,
+    },
+  ]}
 />
 
 One pass through `nums`, five quantities computed. Compared with five
@@ -225,7 +245,7 @@ with \`Aggregate\` — no \`foreach\` allowed.`}
   files={[
     {
       filename: "Program.cs",
-      initialContent: `var xs = new[] { 1, 2, 3, 4 };
+      starterCode: `var xs = new[] { 1, 2, 3, 4 };
 // 0*31 + 1 = 1
 // 1*31 + 2 = 33
 // 33*31 + 3 = 1026
@@ -235,7 +255,7 @@ System.Console.WriteLine(Checksum.Compute(xs));
     },
     {
       filename: "Checksum.cs",
-      initialContent: `using System.Collections.Generic;
+      starterCode: `using System.Collections.Generic;
 
 public static class Checksum
 {
@@ -246,7 +266,7 @@ public static class Checksum
     }
 }
 `,
-      solutionContent: `using System.Collections.Generic;
+      solutionCode: `using System.Collections.Generic;
 using System.Linq;
 
 public static class Checksum

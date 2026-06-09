@@ -90,7 +90,10 @@ geometry.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 employees = pd.DataFrame(
     {
@@ -107,21 +110,26 @@ print(employees)
 print()
 print("Columns:", employees.columns.tolist())
 print("Each row represents: one employee")
-`}
+`,
+    },
+  ]}
 />
 
 Now look at how naturally the basic operations read:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 employees = pd.DataFrame({
     "name":       ["Aiko","Bilal","Chen","Diego","Eve"],
     "department": ["Eng","Sales","Eng","Ops","Eng"],
     "salary":     [120, 95, 140, 80, 128],
     "tenure_yrs": [3, 6, 7, 2, 4],
-})`}
-  starterCode={`# Filter: rows where the department attribute equals "Eng"
+})`,
+      starterCode: `# Filter: rows where the department attribute equals "Eng"
 eng = employees[employees["department"] == "Eng"]
 print("Engineers:")
 print(eng)
@@ -129,7 +137,9 @@ print()
 
 # Aggregate: average of the salary column for those rows
 print("Average engineer salary:", eng["salary"].mean())
-`}
+`,
+    },
+  ]}
 />
 
 Reading the code out loud as **"rows where ... average of ..."**
@@ -211,13 +221,16 @@ columns-as-attributes idea.
 - \`passed_math\` — a boolean
 
 You can pick any names, grades, GPAs, and pass/fail values.`}
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 students = None  # TODO: replace with a real DataFrame
 
 print(students)
-`}
-  solutionCode={`import pandas as pd
+`,
+      solutionCode: `import pandas as pd
 
 students = pd.DataFrame(
     {
@@ -229,7 +242,9 @@ students = pd.DataFrame(
 )
 
 print(students)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_dataframe",

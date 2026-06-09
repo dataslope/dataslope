@@ -16,23 +16,33 @@ automatically, so these two are identical:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # The coordinate system is implicit here...
 ggplot(mpg, aes(displ, hwy)) +
   geom_point()
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # ...and explicit here. Same plot.
 ggplot(mpg, aes(displ, hwy)) +
   geom_point() +
   coord_cartesian()
-`}
+`,
+    },
+  ]}
 />
 
 ## Coordinates transform the *space*, not the data
@@ -53,14 +63,19 @@ Position Scales page — now you can see *why*.)
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # Zoom into a region with all data still used by the smoother.
 ggplot(mpg, aes(displ, hwy)) +
   geom_point() +
   geom_smooth() +
   coord_cartesian(xlim = c(2, 5), ylim = c(20, 35))
-`}
+`,
+    },
+  ]}
 />
 
 ## Fixing the aspect ratio
@@ -71,7 +86,10 @@ be comparable (maps, before/after on the same measurement scale):
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # city vs highway MPG are the same units; fix the ratio so the
 # y = x reference line is a true 45-degree diagonal.
@@ -79,7 +97,9 @@ ggplot(mpg, aes(cty, hwy)) +
   geom_point(alpha = 0.5) +
   geom_abline(slope = 1, intercept = 0, color = "red") +
   coord_fixed()
-`}
+`,
+    },
+  ]}
 />
 
 With `coord_fixed()`, the red `y = x` line is a genuine 45° diagonal,

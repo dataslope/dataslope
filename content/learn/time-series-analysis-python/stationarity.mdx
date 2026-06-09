@@ -43,7 +43,10 @@ stationary series next to both.
 
 <CodeBlock
   adapter="python"
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -53,8 +56,8 @@ idx = pd.date_range("2014-01-01", periods=n, freq="D")
 
 stationary    = pd.Series(rng.normal(0, 1, n), index=idx)                       # fixed rules
 moving_mean   = pd.Series(rng.normal(0, 1, n) + np.linspace(0, 8, n), index=idx) # mean drifts up
-moving_var    = pd.Series(rng.normal(0, 1, n) * np.linspace(0.3, 5, n), index=idx) # spread grows`}
-  starterCode={`fig, axes = plt.subplots(3, 1, figsize=(10, 8), sharex=True)
+moving_var    = pd.Series(rng.normal(0, 1, n) * np.linspace(0.3, 5, n), index=idx) # spread grows`,
+      starterCode: `fig, axes = plt.subplots(3, 1, figsize=(10, 8), sharex=True)
 
 for ax, s, title in zip(
     axes,
@@ -76,7 +79,9 @@ print("Top: the red rolling mean stays flat and the band keeps a fixed width.")
 print("Middle: the rolling mean climbs -> the mean is time-dependent.")
 print("Bottom: the mean is flat but the band fans out -> variance is time-dependent.")
 print("Only the top series is stationary.")
-`}
+`,
+    },
+  ]}
 />
 
 Watch the red rolling mean. In the stationary panel it stays flat and the
@@ -138,7 +143,10 @@ slowly: **low p → stationary, high p → non-stationary.**
 
 <CodeBlock
   adapter="python"
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
@@ -155,15 +163,17 @@ def adf_report(series, name):
     print(f"   5% crit value : {crit['5%']:8.3f}  (reject H0 when ADF stat < this)")
     print(f"   verdict       : {verdict}\\n")
 
-rng = np.random.default_rng(0)`}
-  starterCode={`# A genuinely stationary series: white noise around 0.
+rng = np.random.default_rng(0)`,
+      starterCode: `# A genuinely stationary series: white noise around 0.
 white = rng.normal(0, 1, 300)
 adf_report(white, "White noise (should be STATIONARY)")
 
 # A random walk: each step adds a shock, so it wanders with no fixed level.
 walk = np.cumsum(rng.normal(0, 1, 300))
 adf_report(walk, "Random walk (should be NON-stationary)")
-`}
+`,
+    },
+  ]}
 />
 
 White noise gives a tiny p-value (reject the null → stationary). The random
@@ -176,7 +186,10 @@ Now the airline series, which we've been calling non-stationary all along:
 
 <CodeBlock
   adapter="python"
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
@@ -202,8 +215,8 @@ def adf_report(series, name):
     s = pd.Series(series).dropna()
     stat, p, *_ = adfuller(s)
     verdict = "STATIONARY" if p < 0.05 else "NON-stationary"
-    print(f"{name:38s} p-value = {p:7.4f}  ->  {verdict}")`}
-  starterCode={`adf_report(air, "Raw airline passengers")
+    print(f"{name:38s} p-value = {p:7.4f}  ->  {verdict}")`,
+      starterCode: `adf_report(air, "Raw airline passengers")
 adf_report(np.log(air), "log(passengers)")
 adf_report(air.diff(), "First difference of passengers")
 adf_report(np.log(air).diff(), "First difference of log(passengers)")
@@ -214,7 +227,9 @@ print("A log alone doesn't fix it (log tames variance, not the trend).")
 print("One difference collapses p from ~0.99 to ~0.05-0.07 -- ALMOST there.")
 print("This series is famously BORDERLINE: the seasonal difference (next page)")
 print("is what finally tips it firmly below 0.05.")
-`}
+`,
+    },
+  ]}
 />
 
 The raw series has a large p-value — non-stationary, as promised. A log
@@ -296,20 +311,23 @@ flowchart TD
 - \`"walk_is_stationary"\` — \`True\` if \`walk_p < 0.05\`, else \`False\`
 
 Remember the ADF direction: **low p-value means stationary**. The white noise should test stationary; the random walk should not.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from statsmodels.tsa.stattools import adfuller
 rng = np.random.default_rng(123)
 noise = rng.normal(0, 1, 400)
-walk = np.cumsum(rng.normal(0, 1, 400))`}
-  starterCode={`adf = {
+walk = np.cumsum(rng.normal(0, 1, 400))`,
+      starterCode: `adf = {
     "noise_p": None,
     "walk_p": None,
     "noise_is_stationary": None,
     "walk_is_stationary": None,
 }
 print(adf)
-`}
-  solutionCode={`noise_p = float(adfuller(noise)[1])
+`,
+      solutionCode: `noise_p = float(adfuller(noise)[1])
 walk_p = float(adfuller(walk)[1])
 adf = {
     "noise_p": noise_p,
@@ -318,7 +336,9 @@ adf = {
     "walk_is_stationary": walk_p < 0.05,
 }
 print(adf)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "keys",
@@ -360,7 +380,10 @@ assert adf["walk_is_stationary"] == (adf["walk_p"] < 0.05)`,
 - \`p_stationary\` = the ADF p-value of \`stationary\` after dropping NaNs (a float).
 
 The raw series should be non-stationary (\`p_raw\` > 0.05) while the transformed series should be stationary (\`p_stationary\` < 0.05). (Note: a *single* difference of this series is famously borderline on the ADF test — the seasonal difference is what tips it firmly into stationarity.)`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
@@ -380,17 +403,19 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`stationary = None
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `stationary = None
 p_raw = None
 p_stationary = None
 print("p_raw:", p_raw, " p_stationary:", p_stationary)
-`}
-  solutionCode={`stationary = np.log(air).diff().diff(12)
+`,
+      solutionCode: `stationary = np.log(air).diff().diff(12)
 p_raw = float(adfuller(air.dropna())[1])
 p_stationary = float(adfuller(stationary.dropna())[1])
 print("p_raw:", round(p_raw, 4), " p_stationary:", round(p_stationary, 4))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "set",

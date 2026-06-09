@@ -108,7 +108,10 @@ subtotal.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function finalTotal(items, code) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function finalTotal(items, code) {
   let subtotal = 0;
   for (const item of items) {
     subtotal += item.price * item.quantity;
@@ -125,7 +128,9 @@ const cart = [
 ];
 
 console.log(finalTotal(cart, ""));
-`}
+`,
+    },
+  ]}
 />
 
 Run it. If the subtotal looks right, we move on. We add the
@@ -133,7 +138,10 @@ discount logic:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function finalTotal(items, code) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function finalTotal(items, code) {
   let subtotal = 0;
   for (const item of items) {
     subtotal += item.price * item.quantity;
@@ -163,7 +171,9 @@ console.log("FLAT5:      ", finalTotal(cart, "FLAT5"));
 console.log("FLAT5 small:", finalTotal([{ price: 2, quantity: 1 }], "FLAT5"));
 console.log("Unknown:    ", finalTotal(cart, "BADCODE"));
 console.log("Empty cart: ", finalTotal([], "SAVE10"));
-`}
+`,
+    },
+  ]}
 />
 
 We **ran after each addition**. That is the most important habit
@@ -196,7 +206,10 @@ improve it.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function subtotal(items) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function subtotal(items) {
   let s = 0;
   for (const item of items) s += item.price * item.quantity;
   return s;
@@ -231,7 +244,9 @@ console.log("FLAT5:      ", finalTotal(cart, "FLAT5"));
 console.log("FLAT5 small:", finalTotal([{ price: 2, quantity: 1 }], "FLAT5"));
 console.log("Unknown:    ", finalTotal(cart, "BADCODE"));
 console.log("Empty cart: ", finalTotal([], "SAVE10"));
-`}
+`,
+    },
+  ]}
 />
 
 Look at the new `finalTotal`. It reads almost like the original
@@ -293,7 +308,7 @@ The rules:
   files={[
     {
       filename: "index.js",
-      initialContent: `const { finalTotal } = require("./cart");
+      starterCode: `const { finalTotal } = require("./cart");
 
 const cart = [
   { price: 10.0, quantity: 2 },
@@ -309,7 +324,7 @@ console.log("FLAT5 small:", finalTotal([{ price: 2, quantity: 1 }], "FLAT5"));
     },
     {
       filename: "cart.js",
-      initialContent: `function subtotal(items) {
+      starterCode: `function subtotal(items) {
   let s = 0;
   for (const item of items) s += item.price * item.quantity;
   return s;
@@ -324,10 +339,7 @@ function finalTotal(items, code) {
 
 module.exports = { finalTotal };
 `,
-    },
-  ]}
-  solutionCode={`// In cart.js:
-function subtotal(items) {
+      solutionCode: `function subtotal(items) {
   let s = 0;
   for (const item of items) s += item.price * item.quantity;
   return s;
@@ -343,7 +355,9 @@ function finalTotal(items, code) {
 }
 
 module.exports = { finalTotal };
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "no_code",

@@ -19,7 +19,10 @@ is almost always the right starting point.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.stocks()
 
@@ -36,7 +39,9 @@ fig = px.line(
     labels={"date": "Date", "price": "Normalized price"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Plotly recognizes `date` as a datetime column and gives you a
@@ -44,7 +49,10 @@ Plotly recognizes `date` as a datetime column and gives you a
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.stocks()
 long = df.melt(id_vars="date", var_name="ticker", value_name="price")
@@ -60,7 +68,9 @@ fig = px.line(
 )
 fig.update_xaxes(rangeslider_visible=True)
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Drag the slider below the chart to zoom into any time window.
@@ -73,7 +83,10 @@ Pandas' `.resample()` is the workhorse:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 import plotly.express as px
 
@@ -97,7 +110,9 @@ fig = px.line(
     labels={"timestamp": "Date", "value": "Mean value"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Resampling is the "zoom level" of time analysis: minute, hour, day,
@@ -112,7 +127,10 @@ the trend is visible.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 import plotly.express as px
 
@@ -136,7 +154,9 @@ fig = px.line(
     labels={"date": "Date", "v": "Value"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 The 30-day average is the *smoothest* and reveals the underlying
@@ -164,7 +184,10 @@ the noise. All three layered gives the whole story.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.stocks()
 
@@ -180,7 +203,9 @@ fig = px.line(
 # Hide weekend gaps so the chart compresses to trading days
 fig.update_xaxes(rangebreaks=[dict(bounds=["sat", "mon"])])
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Notice the x-axis no longer has flat "no movement" stretches over
@@ -193,7 +218,10 @@ To compare years on the same calendar, facet by year (or use a
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 df = px.data.gapminder().query("country in ['China', 'India', 'United States']")
@@ -209,7 +237,9 @@ fig = px.line(
     labels={"year": "Year", "lifeExp": "Life expectancy"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Facets are excellent for time series too — they let you see each

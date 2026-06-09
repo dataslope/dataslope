@@ -27,7 +27,10 @@ At each node, compare the target with the current value and choose one branch.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct TreeNode {
   int val;
@@ -55,7 +58,9 @@ int main() {
   std::cout << std::boolalpha << contains(&n8, 7) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Insert
@@ -74,7 +79,10 @@ flowchart LR
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct TreeNode {
   int val;
@@ -107,7 +115,9 @@ int main() {
   inorder(root);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Min and max
@@ -116,7 +126,10 @@ The minimum is found by walking left until no left child remains. The maximum wa
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct TreeNode {
   int val;
@@ -144,7 +157,9 @@ int main() {
   std::cout << maximum(&n8)->val << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Delete
@@ -163,7 +178,10 @@ flowchart TD
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct TreeNode {
   int val;
@@ -211,7 +229,9 @@ int main() {
   delete root;
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Complexity and balance
@@ -233,7 +253,10 @@ AVL and Red-Black trees rotate nodes to stay balanced. `std::set` and `std::map`
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <map>
 #include <set>
 
@@ -249,7 +272,9 @@ int main() {
     std::cout << k << ":" << v << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## In-order traversal gives sorted order
@@ -258,7 +283,10 @@ Because all left values come first, then the root, then all right values, in-ord
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 struct TreeNode {
@@ -285,7 +313,9 @@ int main() {
     std::cout << x << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Validating a BST
@@ -294,7 +324,10 @@ Checking only immediate children is wrong because a deeper node can violate an a
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <climits>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <climits>
 #include <iostream>
 
 struct TreeNode {
@@ -330,7 +363,9 @@ int main() {
   std::cout << validRange(&root, LLONG_MIN, LLONG_MAX) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Practice: Insert into BST
@@ -339,7 +374,10 @@ int main() {
   adapter="cpp"
   title="Insert into BST"
   instructions={`Implement \`TreeNode* insert(TreeNode* root, int val)\`. The driver inserts values and prints in-order traversal.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct TreeNode {
   int val;
@@ -367,8 +405,8 @@ int main() {
   inorder(root);
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 
 struct TreeNode {
   int val;
@@ -401,7 +439,9 @@ int main() {
   inorder(root);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "sorted", name: "In-order is sorted", expect: { stdoutLines: ["2", "3", "4", "5", "6", "7", "8"], stdoutLinesExact: true } }]}
 />
 
@@ -411,7 +451,10 @@ int main() {
   adapter="cpp"
   title="Search BST"
   instructions={`Implement \`bool contains(TreeNode* root, int val)\` using the BST ordering.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct TreeNode {
   int val;
@@ -433,8 +476,8 @@ int main() {
   std::cout << contains(&n5, 8) << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 
 struct TreeNode {
   int val;
@@ -460,7 +503,9 @@ int main() {
   std::cout << contains(&n5, 8) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "contains", name: "Checks present and missing keys", expect: { stdoutLines: ["true", "false", "true"], stdoutLinesExact: true } }]}
 />
 
@@ -470,7 +515,10 @@ int main() {
   adapter="cpp"
   title="Lowest common ancestor in a BST"
   instructions={`Implement \`TreeNode* lca(TreeNode* root, int a, int b)\`. Use the BST property to walk toward the split point.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 struct TreeNode {
   int val;
@@ -492,8 +540,8 @@ int main() {
   std::cout << lca(&n5, 6, 8)->val << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 
 struct TreeNode {
   int val;
@@ -522,7 +570,9 @@ int main() {
   std::cout << lca(&n5, 6, 8)->val << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "lca", name: "Finds split nodes", expect: { stdoutLines: ["3", "5", "7"], stdoutLinesExact: true } }]}
 />
 

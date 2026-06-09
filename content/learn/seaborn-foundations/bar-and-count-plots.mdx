@@ -22,14 +22,19 @@ involved, just a head-count per group.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 titanic = sns.load_dataset("titanic")
 
 # One categorical variable; the other axis is the count of rows.
 sns.catplot(data=titanic, x="class", kind="count", height=4)
-`}
+`,
+    },
+  ]}
 />
 
 The height of each bar is simply *how many passengers* travelled in that
@@ -60,14 +65,19 @@ estimate (a 95% confidence interval by default).
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 # Categorical x + numeric y: each bar is the MEAN total_bill that day.
 sns.catplot(data=tips, x="day", y="total_bill", kind="bar", height=4)
-`}
+`,
+    },
+  ]}
 />
 
 Each bar is the *average* bill for that day, and the little line on top is
@@ -122,7 +132,10 @@ by bootstrapping. You can change what it represents, or turn it off:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
@@ -132,7 +145,9 @@ tips = sns.load_dataset("tips")
 #   "sd"        -> one standard deviation (spread of the data itself)
 #   None        -> no error bar at all
 sns.catplot(data=tips, x="day", y="total_bill", kind="bar", errorbar="sd", height=4)
-`}
+`,
+    },
+  ]}
 />
 
 Switching to `errorbar="sd"` is a small but meaningful honesty upgrade: the
@@ -156,7 +171,10 @@ reduces a list of numbers to one.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
@@ -165,7 +183,9 @@ tips = sns.load_dataset("tips")
 sns.catplot(
     data=tips, x="day", y="total_bill", kind="bar", estimator="median", height=4
 )
-`}
+`,
+    },
+  ]}
 />
 
 If a single huge bill would drag a day's *mean* upward, the **median** bar
@@ -181,14 +201,19 @@ you compare an aggregate across *two* groupings at once.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 # Each day splits into two bars: mean bill for each sex.
 sns.catplot(data=tips, x="day", y="total_bill", hue="sex", kind="bar", height=4)
-`}
+`,
+    },
+  ]}
 />
 
 Now you can read two things at once: the day-to-day pattern, and within each
@@ -210,7 +235,10 @@ category on **y** for horizontal bars whose names read cleanly left to right.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 mpg = sns.load_dataset("mpg")
@@ -225,7 +253,9 @@ sns.catplot(
     errorbar=None,
     height=4,
 )
-`}
+`,
+    },
+  ]}
 />
 
 The category sits on `y`, so each label gets its own row and never overlaps,
@@ -261,21 +291,26 @@ passengers were in each travel class**.
 - Put \`class\` on the x-axis (the count goes on the other axis
   automatically).
 - Assign the result to a variable named \`g\`.`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 titanic = sns.load_dataset("titanic")
 
 # Build the count plot and assign it to g:
 g = None
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 titanic = sns.load_dataset("titanic")
 
 g = sns.catplot(data=titanic, x="class", kind="count", height=4)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_facetgrid",

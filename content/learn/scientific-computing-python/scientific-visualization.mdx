@@ -41,7 +41,10 @@ breaking a sweat.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 
 x = np.linspace(0, 2 * np.pi, 200)
@@ -62,7 +65,9 @@ for ax in axes.flat:
     ax.axhline(0, color="k", lw=0.5)
     ax.set_xlabel("x")
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 Three habits that pay off forever:
@@ -81,7 +86,10 @@ two great options.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 
 x = np.linspace(-3, 3, 200)
@@ -102,7 +110,9 @@ axes[1].set_title("contourf + contour")
 axes[1].set_aspect("equal")
 fig.colorbar(cf, ax=axes[1])
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 Contours are great when the *level set* (the "ridges and valleys")
@@ -124,7 +134,10 @@ colormaps:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 
 # A ramp shown in three colormaps — convert to grayscale to test perceptual uniformity
@@ -138,7 +151,9 @@ for ax, cm in zip(axes, cmaps):
     ax.set_yticks([])
     ax.set_title(cm)
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 Look at the `jet` ramp — you'll see false "bands" of bright cyan
@@ -152,7 +167,10 @@ engineering.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 
 x = np.linspace(-2, 2, 25)
@@ -172,12 +190,17 @@ axes[1].streamplot(X, Y, U, V, color=M, cmap="viridis")
 axes[1].set_aspect("equal")
 axes[1].set_title("streamplot")
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 
 x = np.linspace(-3, 3, 80)
@@ -193,7 +216,9 @@ ax.set_ylabel("y")
 ax.set_zlabel("f(x,y)")
 ax.set_title("3-D surface")
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 3-D is genuinely useful for *surfaces* and for tracing
@@ -209,7 +234,10 @@ effective layout is the **small-multiples grid** (Edward Tufte's
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 
 rng = np.random.default_rng(0)
@@ -225,7 +253,9 @@ for i, ax in enumerate(axes.flat):
     ax.plot(t, y)
     ax.set_title(f"ω = {omega:.1f}", fontsize=10)
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 `sharex=True, sharey=True` is what makes the comparison *fair*:
@@ -240,7 +270,7 @@ scaling.
   files={[
     {
       filename: "main.py",
-      initialContent: `import numpy as np
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from plotting import phase_portrait
 from scipy.integrate import solve_ivp
@@ -272,7 +302,7 @@ plt.show()
     },
     {
       filename: "plotting.py",
-      initialContent: `import numpy as np
+      starterCode: `import numpy as np
 
 
 def phase_portrait(

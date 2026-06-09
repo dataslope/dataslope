@@ -147,10 +147,15 @@ Modern style (C# 9+ "top-level statements"):
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 Console.WriteLine("Hello, World!");
-`}
+`,
+    },
+  ]}
 />
 
 Both compile to the same thing. The second is just less in your

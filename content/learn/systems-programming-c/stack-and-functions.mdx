@@ -46,7 +46,10 @@ You can see the call chain by printing addresses of local variables.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 void inner(void) {
   int x = 0;
@@ -65,7 +68,9 @@ int main(void) {
   middle();
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The addresses of `x` in `main`, `middle`, and `inner` should be
@@ -81,7 +86,10 @@ a *stack size* limit.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 long fib(int n) {
   if (n < 2)
@@ -95,7 +103,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 `fib(40)` would push roughly 2 × 10⁸ frames in total over its run
@@ -117,7 +127,10 @@ this will crash before `main` runs a single line. Use the heap
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 // Run this and watch how deep the recursion gets before stack overflow.
 // We print a count once per 1000 levels so output stays readable.
@@ -134,7 +147,9 @@ int main(void) {
   recurse(0);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Iteration vs recursion — same algorithm, different memory shape
@@ -144,7 +159,10 @@ stack instead of O(n). Compare:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 // Recursive — uses n stack frames.
 long fact_rec(int n) {
@@ -166,7 +184,9 @@ int main(void) {
   printf("fact_iter(10) = %ld\\n", fact_iter(10));
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Both compute the same value. The iterative version is friendlier on
@@ -203,7 +223,10 @@ The single most important stack rule:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int *bad(void) {
   int x = 42;
@@ -226,14 +249,19 @@ int main(void) {
   printf("*p2 = %d (UB!)\\n", *p2);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The pattern that *is* safe: write into a buffer the caller owns.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stddef.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stddef.h>
 #include <stdio.h>
 
 // Fill the caller's buffer; never returns a pointer to our own locals.
@@ -252,7 +280,9 @@ int main(void) {
   printf("\\n");
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 This *caller owns the buffer* idiom is everywhere in C APIs: think
@@ -264,7 +294,10 @@ This *caller owns the buffer* idiom is everywhere in C APIs: think
   adapter="c"
   title="Compute base^exp iteratively"
   instructions={`Implement \`long my_pow(int base, int exp)\` for non-negative \`exp\` using a loop — not recursion. \`my_pow(2, 10)\` must return \`1024\`. The provided \`main\` prints results.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 long my_pow(int base, int exp) {
   // your code here
@@ -277,8 +310,8 @@ int main(void) {
   printf("%ld\\n", my_pow(3, 5));
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 long my_pow(int base, int exp) {
   long result = 1;
@@ -294,7 +327,9 @@ int main(void) {
   printf("%ld\\n", my_pow(3, 5));
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "pow_outputs",
@@ -310,7 +345,10 @@ int main(void) {
   adapter="c"
   title="Implement gcd iteratively"
   instructions={`Implement \`int gcd(int a, int b)\` using the iterative Euclidean algorithm so that it uses O(1) stack frames regardless of input size. The provided \`main\` calls it for three pairs.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int gcd(int a, int b) {
   // your code here
@@ -323,8 +361,8 @@ int main(void) {
   printf("%d\\n", gcd(1000000, 250000));
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 int gcd(int a, int b) {
   if (a < 0)
@@ -345,7 +383,9 @@ int main(void) {
   printf("%d\\n", gcd(1000000, 250000));
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "gcd",

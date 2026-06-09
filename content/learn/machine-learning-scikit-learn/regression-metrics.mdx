@@ -29,7 +29,10 @@ score — and the *way* you summarize them encodes what you care about.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
@@ -44,7 +47,9 @@ residuals = y_test - y_pred
 print("First five actuals:   ", np.round(y_test[:5], 1))
 print("First five predicted: ", np.round(y_pred[:5], 1))
 print("First five residuals: ", np.round(residuals[:5], 1))
-`}
+`,
+    },
+  ]}
 />
 
 ## MAE — Mean Absolute Error
@@ -69,15 +74,18 @@ $$
 
 <CodeBlock
   adapter="python"
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 X, y = load_diabetes(return_X_y=True)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 model = LinearRegression().fit(X_train, y_train)
-y_pred = model.predict(X_test)`}
-  starterCode={`from sklearn.metrics import mean_absolute_error
+y_pred = model.predict(X_test)`,
+      starterCode: `from sklearn.metrics import mean_absolute_error
 
 mae = mean_absolute_error(y_test, y_pred)
 print(f"MAE: {mae:.1f}")
@@ -85,7 +93,9 @@ print(
     "Interpretation: on average the prediction is off by about",
     f"{mae:.0f} units of the target.",
 )
-`}
+`,
+    },
+  ]}
 />
 
 ## MSE — Mean Squared Error
@@ -133,15 +143,18 @@ outlier predictions doing a lot of damage.
 
 <CodeBlock
   adapter="python"
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 X, y = load_diabetes(return_X_y=True)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 model = LinearRegression().fit(X_train, y_train)
-y_pred = model.predict(X_test)`}
-  starterCode={`from sklearn.metrics import (
+y_pred = model.predict(X_test)`,
+      starterCode: `from sklearn.metrics import (
     mean_absolute_error,
     mean_squared_error,
     root_mean_squared_error,
@@ -156,7 +169,9 @@ print(f"MSE : {mse:.1f}   (squared units, hard to read)")
 print(f"RMSE: {rmse:.1f}   (target units, punishes big misses)")
 print(f"\\nRMSE >= MAE is always true here: {rmse >= mae}")
 print(f"The RMSE/MAE gap hints at how uneven the errors are: {rmse / mae:.2f}x")
-`}
+`,
+    },
+  ]}
 />
 
 ### Seeing how an outlier splits MAE from RMSE
@@ -166,7 +181,10 @@ prediction and watch each metric react.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error
 
 # Ten near-perfect predictions...
@@ -181,7 +199,9 @@ for label, pred in [("All small errors", good_pred), ("One big outlier", bad_pre
     mae = mean_absolute_error(actual, pred)
     rmse = root_mean_squared_error(actual, pred)
     print(f"{label:18s} -> MAE {mae:5.2f} | RMSE {rmse:5.2f} | ratio {rmse / mae:.2f}x")
-`}
+`,
+    },
+  ]}
 />
 
 One outlier barely moves MAE but sends RMSE soaring. **That is the whole
@@ -212,7 +232,10 @@ error of a dumb baseline that always predicts the mean. So:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
@@ -233,7 +256,9 @@ print(f"Mean baseline   R2: {r2_score(y_test, dummy.predict(X_test)):.3f}")
 # A deliberately terrible model -> negative R2
 silly = np.full_like(y_test, y_train.min(), dtype=float)
 print(f"Always-minimum  R2: {r2_score(y_test, silly):.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="danger" title="R² is NOT accuracy, and NOT a percentage of correct predictions">
@@ -265,7 +290,10 @@ randomly around zero with no pattern.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
@@ -284,7 +312,9 @@ plt.xlabel("Predicted value")
 plt.ylabel("Residual (actual - predicted)")
 plt.title("Residual plot: look for a shapeless cloud around zero")
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 If you see a funnel (errors grow with the prediction), a curve (the model
@@ -354,7 +384,10 @@ all comparing \`y_test\` to \`y_pred\`.
 
 The tests verify each value, confirm \`rmse >= mae\` (always true), and
 confirm \`r2\` is between 0 and 1 for this model.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
@@ -363,23 +396,25 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, root_mean_s
 X, y = load_diabetes(return_X_y=True)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 model = LinearRegression().fit(X_train, y_train)
-y_pred = model.predict(X_test)`}
-  starterCode={`mae = None
+y_pred = model.predict(X_test)`,
+      starterCode: `mae = None
 rmse = None
 r2 = None
 
 print("MAE:", mae)
 print("RMSE:", rmse)
 print("R2:", r2)
-`}
-  solutionCode={`mae = mean_absolute_error(y_test, y_pred)
+`,
+      solutionCode: `mae = mean_absolute_error(y_test, y_pred)
 rmse = root_mean_squared_error(y_test, y_pred)
 r2 = r2_score(y_test, y_pred)
 
 print("MAE:", mae)
 print("RMSE:", rmse)
 print("R2:", r2)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "mae_ok",

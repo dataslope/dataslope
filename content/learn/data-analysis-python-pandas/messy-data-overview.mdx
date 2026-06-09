@@ -90,7 +90,10 @@ spot each issue before reading on.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 messy = pd.DataFrame(
@@ -147,7 +150,9 @@ messy = pd.DataFrame(
 print(messy)
 print()
 print(messy.dtypes)
-`}
+`,
+    },
+  ]}
 />
 
 What did you spot?
@@ -178,7 +183,10 @@ pattern.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 messy = pd.DataFrame({
     "customer_id": [1, 2, 3, 4, 5, 5, 6, 7, 8],
@@ -187,8 +195,8 @@ messy = pd.DataFrame({
     "signup_date": ["2024-01-15","2024/02/03","2024-02-29","03/04/2024",None,None,"2024-03-30","2024-04-01","??"],
     "spend":       ["100", "200", "300", "abc", "-50", "-50", "9999999", "150", ""],
     "tier":        ["gold","silver","gold","bronze","silver","silver","gold","silver",None],
-})`}
-  starterCode={`clean = (
+})`,
+      starterCode: `clean = (
     messy
     # 1. Drop duplicates
     .drop_duplicates()
@@ -217,7 +225,9 @@ messy = pd.DataFrame({
 print(clean)
 print()
 print(clean.dtypes)
-`}
+`,
+    },
+  ]}
 />
 
 The remaining mess (missing names, suspicious spends) is now

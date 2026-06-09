@@ -12,7 +12,10 @@ Sort by a single column:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -25,23 +28,30 @@ df = pd.DataFrame(
 
 print("By salary, descending:")
 print(df.sort_values("salary", ascending=False))
-`}
+`,
+    },
+  ]}
 />
 
 Sort by multiple columns — earlier columns take priority:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 df = pd.DataFrame({
     "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
     "salary": [120, 95, 140, 80, 128],
     "tenure": [3, 6, 7, 2, 4],
-})`}
-  starterCode={`# By department ascending, then by salary descending within department
+})`,
+      starterCode: `# By department ascending, then by salary descending within department
 print(df.sort_values(["dept", "salary"], ascending=[True, False]))
-`}
+`,
+    },
+  ]}
 />
 
 `sort_values` returns a *new* DataFrame — it does not modify the
@@ -57,11 +67,16 @@ Sort by the index instead of a column:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame({"salary": [120, 95, 140]}, index=["Chen", "Aiko", "Bilal"])
 print(df.sort_index())
-`}
+`,
+    },
+  ]}
 />
 
 This is especially common with time-series data — `df
@@ -75,7 +90,10 @@ to "sort by A, breaking ties by B":
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -91,7 +109,9 @@ print()
 
 # Or do it in one call:
 print(df.sort_values(["team", "score"]))
-`}
+`,
+    },
+  ]}
 />
 
 The two-call form is occasionally useful, but the single
@@ -105,7 +125,10 @@ direct and slightly faster.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.read_csv(
     "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
@@ -121,7 +144,9 @@ print()
 print(
     df.nsmallest(5, "MonthlyIncome")[["Age", "JobRole", "Department", "MonthlyIncome"]]
 )
-`}
+`,
+    },
+  ]}
 />
 
 ## Handling missing values in sorts
@@ -131,7 +156,10 @@ You can change this:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 df = pd.DataFrame({"x": [3, 1, np.nan, 2, np.nan, 4]})
@@ -141,7 +169,9 @@ print(df.sort_values("x"))
 print()
 print("na_position='first':")
 print(df.sort_values("x", na_position="first"))
-`}
+`,
+    },
+  ]}
 />
 
 ## Ranking
@@ -151,7 +181,10 @@ representing its position in the sort, leaving row order alone.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -162,7 +195,9 @@ df = pd.DataFrame(
 
 df["rank"] = df["salary"].rank(ascending=False)
 print(df)
-`}
+`,
+    },
+  ]}
 />
 
 The `rank` method has a `method` argument controlling how ties
@@ -176,13 +211,18 @@ are broken:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 s = pd.Series([100, 80, 100, 60, 80])
 
 for method in ["average", "min", "dense", "first"]:
     print(f"{method:8s}: {list(s.rank(method=method).astype(float))}")
-`}
+`,
+    },
+  ]}
 />
 
 ## Rank within groups
@@ -192,7 +232,10 @@ the top 3 earners?"* That is a sort + group + head problem.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.read_csv(
     "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
@@ -204,7 +247,9 @@ top3 = (
     .head(3)[["Department", "JobRole", "MonthlyIncome"]]
 )
 print(top3.sort_values("Department"))
-`}
+`,
+    },
+  ]}
 />
 
 Reading this line by line:

@@ -17,7 +17,10 @@ The same query, three ways.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var people = new[] {
@@ -42,7 +45,9 @@ var c = (from p in people where p.Age > 40 select p)
 Console.WriteLine(string.Join(", ", a));
 Console.WriteLine(string.Join(", ", b));
 Console.WriteLine(string.Join(", ", c));
-`}
+`,
+    },
+  ]}
 />
 
 All three produce the same result. The compiler treats query syntax
@@ -104,7 +109,10 @@ the query.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var words = new[] { "functional", "linq", "imperative", "lazy" };
@@ -114,7 +122,9 @@ var withLengths = from w in words let len = w.Length
 
 foreach (var line in withLengths)
     Console.WriteLine(line);
-`}
+`,
+    },
+  ]}
 />
 
 In method syntax, you'd need a tuple projection just to carry `len`
@@ -196,7 +206,7 @@ ergonomics layer on top.
   files={[
     {
       filename: "Program.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 using System.Linq;
 
 // TODO: implement both QueryStyle and MethodStyle below.
@@ -219,7 +229,7 @@ foreach (var line in MethodStyle.Run(books))
 
 public record Book(string Author, string Title, int Pages);
 `,
-      solutionContent: `using System;
+      solutionCode: `using System;
 using System.Linq;
 
 var books = new[] {
@@ -240,7 +250,7 @@ public record Book(string Author, string Title, int Pages);
     },
     {
       filename: "QueryStyle.cs",
-      initialContent: `using System.Collections.Generic;
+      starterCode: `using System.Collections.Generic;
 using System.Linq;
 
 public static class QueryStyle
@@ -252,7 +262,7 @@ public static class QueryStyle
     }
 }
 `,
-      solutionContent: `using System.Collections.Generic;
+      solutionCode: `using System.Collections.Generic;
 using System.Linq;
 
 public static class QueryStyle
@@ -265,7 +275,7 @@ public static class QueryStyle
     },
     {
       filename: "MethodStyle.cs",
-      initialContent: `using System.Collections.Generic;
+      starterCode: `using System.Collections.Generic;
 using System.Linq;
 
 public static class MethodStyle
@@ -277,7 +287,7 @@ public static class MethodStyle
     }
 }
 `,
-      solutionContent: `using System.Collections.Generic;
+      solutionCode: `using System.Collections.Generic;
 using System.Linq;
 
 public static class MethodStyle

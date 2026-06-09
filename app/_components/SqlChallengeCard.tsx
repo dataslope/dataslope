@@ -2261,18 +2261,20 @@ export function VirtualizedResultTable({
   );
 }
 
+// Fixed height (px) of the table viewer's scrollable contents.
+const TABLE_VIEWER_HEIGHT = 240;
+
 /** Renders a single table's contents inside the table viewer panel.
  *  Errors and empty-table cases produce a contextual message rather
  *  than a blank pane. Wires the result table's infinite scroll so more
  *  rows stream in as the learner scrolls. */
 export function TableViewerPane({
   entry,
-  height = 220,
+  height = TABLE_VIEWER_HEIGHT,
   onLoadMore,
 }: {
   entry: TableViewerEntry;
-  /** Height (px) of the table's scroll area — driven by the viewer's
-   *  drag-to-resize bar. */
+  /** Height (px) of the table's scroll area. */
   height?: number;
   onLoadMore?: () => void;
 }) {
@@ -2331,30 +2333,11 @@ export function TableViewerSkeleton() {
   );
 }
 
-// Drag-to-resize bounds for the table viewer's contents (px).
-const TABLE_VIEWER_MIN_HEIGHT = 120;
-const TABLE_VIEWER_MAX_HEIGHT = 520;
-const TABLE_VIEWER_DEFAULT_HEIGHT = 240;
-
-/** Effective maximum height for the resizable table area. Capped at
- *  `TABLE_VIEWER_MAX_HEIGHT`, but also never more than ~70% of the
- *  viewport so the panel can't swallow the whole screen on short
- *  windows. Recomputed per drag/keystroke so it tracks window resizes. */
-function tableViewerMaxHeight(): number {
-  const vh = typeof window !== "undefined" ? window.innerHeight : 0;
-  const viewportCap = vh > 0 ? Math.round(vh * 0.7) : TABLE_VIEWER_MAX_HEIGHT;
-  return Math.max(
-    TABLE_VIEWER_MIN_HEIGHT,
-    Math.min(TABLE_VIEWER_MAX_HEIGHT, viewportCap),
-  );
-}
-
 /** The always-visible "Tables" panel shared by `<SqlChallengeCard>` and
  *  `<SqlCodeBlock>`. Shows a loading skeleton until the first table
  *  list is fetched, then a tab bar (styled to match the non-SQL code
  *  block file tabs) plus the active table's paginated contents. The
- *  panel is not collapsible; instead a drag bar at the bottom lets the
- *  learner resize the visible table area. */
+ *  panel is not collapsible and renders at a fixed height. */
 export function TableViewer({
   dialect,
   entries,
@@ -2372,11 +2355,6 @@ export function TableViewer({
   onLoadMore: () => void;
   resultTabData?: ResultTabData | null;
 }) {
-  const [paneHeight, setPaneHeight] = useState(TABLE_VIEWER_DEFAULT_HEIGHT);
-  // Live drag origin; null when not dragging. Stored in a ref so the
-  // window-level move/up listeners read fresh values without re-binding.
-  const dragRef = useRef<{ startY: number; startH: number } | null>(null);
-
   const [resultTabDismissed, setResultTabDismissed] = useState(false);
   const [resultIsActive, setResultIsActive] = useState(false);
   const [flashKey, setFlashKey] = useState(0);
@@ -2396,45 +2374,6 @@ export function TableViewer({
       setFlashKey((k) => k + 1);
     }
   }, [resultTabData]);
-
-  const onResizeStart = useCallback(
-    (e: React.PointerEvent) => {
-      e.preventDefault();
-      dragRef.current = { startY: e.clientY, startH: paneHeight };
-      const onMove = (ev: PointerEvent) => {
-        if (!dragRef.current) return;
-        const dy = ev.clientY - dragRef.current.startY;
-        const next = Math.min(
-          tableViewerMaxHeight(),
-          Math.max(TABLE_VIEWER_MIN_HEIGHT, dragRef.current.startH + dy),
-        );
-        setPaneHeight(next);
-      };
-      const onUp = () => {
-        dragRef.current = null;
-        window.removeEventListener("pointermove", onMove);
-        window.removeEventListener("pointerup", onUp);
-        document.body.style.userSelect = "";
-      };
-      window.addEventListener("pointermove", onMove);
-      window.addEventListener("pointerup", onUp);
-      // Suppress text selection while dragging the bar.
-      document.body.style.userSelect = "none";
-    },
-    [paneHeight],
-  );
-
-  // Keyboard resize for accessibility (focus the bar, use arrow keys).
-  const onResizeKey = useCallback((e: React.KeyboardEvent) => {
-    const step = e.shiftKey ? 48 : 16;
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setPaneHeight((h) => Math.min(tableViewerMaxHeight(), h + step));
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setPaneHeight((h) => Math.max(TABLE_VIEWER_MIN_HEIGHT, h - step));
-    }
-  }, []);
 
   const resultTabVisible = resultTabData != null && !resultTabDismissed;
   const showSkeleton = initializing && entries.length === 0 && !resultTabVisible;
@@ -2534,7 +2473,7 @@ export function TableViewer({
                   <VirtualizedResultTable
                     columns={resultTabData.resultSet.columns}
                     values={resultTabData.resultSet.values}
-                    maxHeight={paneHeight}
+                    maxHeight={TABLE_VIEWER_HEIGHT}
                   />
                 )
               ) : resultTabData.message ? (
@@ -2551,22 +2490,11 @@ export function TableViewer({
                 // top instead of inheriting the previous table's offset.
                 key={`${active.schema ?? ""}.${active.table}`}
                 entry={active}
-                height={paneHeight}
+                height={TABLE_VIEWER_HEIGHT}
                 onLoadMore={onLoadMore}
               />
             )
           )}
-          <div
-            className={styles.tableViewerResizer}
-            onPointerDown={onResizeStart}
-            onKeyDown={onResizeKey}
-            role="separator"
-            aria-orientation="horizontal"
-            aria-label="Drag to resize the tables panel"
-            tabIndex={0}
-          >
-            <span className={styles.tableViewerResizerGrip} aria-hidden />
-          </div>
         </>
       )}
     </div>

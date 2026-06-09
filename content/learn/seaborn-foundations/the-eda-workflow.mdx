@@ -70,7 +70,10 @@ the first few rows look like? Which columns have missing values?
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 penguins = sns.load_dataset("penguins")
 
@@ -83,7 +86,9 @@ print(penguins.isna().sum())
 
 # What do the first rows actually look like?
 display(penguins.head())
-`}
+`,
+    },
+  ]}
 />
 
 Already we have learned things no chart would have told us first: there are
@@ -108,7 +113,10 @@ spread is, and whether there is more than one peak.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
@@ -122,7 +130,9 @@ sns.displot(
     height=4,
     aspect=1.3,
 )
-`}
+`,
+    },
+  ]}
 />
 
 Look at the shape and a question writes itself. The distribution is **wide and
@@ -140,7 +150,10 @@ measurements — **flipper length** and **body mass** — and coloring by
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
@@ -154,7 +167,9 @@ sns.relplot(
     height=4,
     aspect=1.3,
 )
-`}
+`,
+    },
+  ]}
 />
 
 There it is. Heavier penguins have longer flippers — a clear positive
@@ -262,7 +277,10 @@ a variable:
 
 Hint: \`df.shape\` is a \`(rows, columns)\` tuple, and
 \`df["col"].isna().sum()\` counts the missing values in a column.`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 penguins = sns.load_dataset("penguins")
 
@@ -273,8 +291,8 @@ n_rows = None
 missing_sex = None
 
 print("rows:", n_rows, "| missing sex:", missing_sex)
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 penguins = sns.load_dataset("penguins")
 
@@ -282,7 +300,9 @@ n_rows = penguins.shape[0]
 missing_sex = int(penguins["sex"].isna().sum())
 
 print("rows:", n_rows, "| missing sex:", missing_sex)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "n_rows",

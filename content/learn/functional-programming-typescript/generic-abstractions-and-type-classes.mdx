@@ -15,12 +15,17 @@ The simplest generic function: identity.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const id = <A,>(a: A): A => a;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const id = <A,>(a: A): A => a;
 
 console.log(id(42));
 console.log(id("hello"));
 console.log(id({ x: 1 }));
-`}
+`,
+    },
+  ]}
 />
 
 `id` is *fully* generic — its type `<A>(a: A) => A` doesn't
@@ -40,7 +45,10 @@ types tell you a great deal before you've read any code.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// All of these are fully parametric: they make no assumptions
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// All of these are fully parametric: they make no assumptions
 // about A or B, so they can only do what the types literally allow.
 
 const head = <A,>(xs: ReadonlyArray<A>): A | undefined => xs[0];
@@ -60,7 +68,9 @@ console.log(last(["a", "b", "c"]));
 console.log(pair(1, "x"));
 console.log(swap(pair(1, "x")));
 console.log(reverse([1, 2, 3]));
-`}
+`,
+    },
+  ]}
 />
 
 Nothing in these functions cares whether `A` is a number, a string,
@@ -87,7 +97,10 @@ generic function uses it.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// "Type-class-as-record"
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// "Type-class-as-record"
 type Eq<A> = { equals: (x: A, y: A) => boolean };
 
 // Some instances
@@ -113,7 +126,9 @@ function contains<A>(eq: Eq<A>, xs: ReadonlyArray<A>, target: A): boolean {
 console.log(contains(eqString, ["Ada", "Linus"], "ada")); // false
 console.log(contains(eqCI, ["Ada", "Linus"], "ada")); // true
 console.log(eqArray(eqNumber).equals([1, 2, 3], [1, 2, 3])); // true
-`}
+`,
+    },
+  ]}
 />
 
 The pattern is profound: an *instance* of a type class is just a
@@ -136,7 +151,10 @@ tuples lexicographically.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Ordering = -1 | 0 | 1;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Ordering = -1 | 0 | 1;
 type Ord<A> = { compare: (x: A, y: A) => Ordering };
 
 const ordNumber: Ord<number> = {
@@ -176,7 +194,9 @@ console.log(sortBy(ord, people));
 
 const ordDesc = ordPair(ordString, reverseOrd(ordNumber));
 console.log(sortBy(ordDesc, people));
-`}
+`,
+    },
+  ]}
 />
 
 `ordPair` and `reverseOrd` are *combinators* on instances. Instead
@@ -256,7 +276,7 @@ undefined
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { combineAll, sumSG, prodSG, stringSG } from "./semigroup";
+      starterCode: `import { combineAll, sumSG, prodSG, stringSG } from "./semigroup";
 
 console.log(combineAll(sumSG, [1, 2, 3, 4]));
 console.log(combineAll(prodSG, [1, 2, 3, 4]));
@@ -266,7 +286,7 @@ console.log(combineAll(sumSG, []));
     },
     {
       filename: "semigroup.ts",
-      initialContent: `export type Semigroup<A> = { concat: (x: A, y: A) => A };
+      starterCode: `export type Semigroup<A> = { concat: (x: A, y: A) => A };
 
 export const sumSG: Semigroup<number> = { concat: (x, y) => x + y };
 export const prodSG: Semigroup<number> = { concat: (x, y) => x * y };
@@ -280,7 +300,7 @@ export function combineAll<A>(
   return undefined;
 }
 `,
-      solutionContent: `export type Semigroup<A> = { concat: (x: A, y: A) => A };
+      solutionCode: `export type Semigroup<A> = { concat: (x: A, y: A) => A };
 
 export const sumSG: Semigroup<number> = { concat: (x, y) => x + y };
 export const prodSG: Semigroup<number> = { concat: (x, y) => x * y };

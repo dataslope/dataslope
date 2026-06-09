@@ -31,7 +31,10 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 # A Series — a single labeled column
 s = pd.Series(
@@ -54,7 +57,9 @@ df = pd.DataFrame(
 )
 print(df)
 print("Type:", type(df).__name__)
-`}
+`,
+    },
+  ]}
 />
 
 The Series remembers its values, its index labels, its dtype,
@@ -67,7 +72,10 @@ a Series.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -86,7 +94,9 @@ print()
 subset = df[["salary"]]
 print(subset)
 print("Type:", type(subset).__name__)
-`}
+`,
+    },
+  ]}
 />
 
 This is one of Pandas's most common gotchas:
@@ -107,7 +117,10 @@ the whole thing at once — no for-loop required.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 salaries = pd.Series([120, 95, 140, 80], index=["Aiko", "Bilal", "Chen", "Diego"])
 
@@ -128,7 +141,9 @@ print("Mean:  ", salaries.mean())
 print("Median:", salaries.median())
 print("Max:   ", salaries.max())
 print("Sum:   ", salaries.sum())
-`}
+`,
+    },
+  ]}
 />
 
 Read this as: *"Pandas treats a column of numbers like a single
@@ -142,14 +157,19 @@ together, Pandas **aligns them by index** before adding.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 q1 = pd.Series([100, 120, 90], index=["Aiko", "Bilal", "Chen"], name="q1")
 q2 = pd.Series([110, 95, 130], index=["Chen", "Aiko", "Diego"], name="q2")
 
 total = q1 + q2
 print(total)
-`}
+`,
+    },
+  ]}
 />
 
 Notice:
@@ -170,7 +190,10 @@ You can confirm this by reaching in:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -183,7 +206,9 @@ df = pd.DataFrame(
 # The DataFrame's columns are just Series sharing the same index
 print(df["salary"].index.equals(df["department"].index))
 print(df["salary"].index)
-`}
+`,
+    },
+  ]}
 />
 
 ## DataFrame ↔ Series operations
@@ -193,7 +218,10 @@ column-wise. For example:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -211,7 +239,9 @@ print()
 # .sum(axis=1) sums across columns → one per row (handy for totals)
 df["total_comp"] = df["salary"] + df["bonus"]
 print(df)
-`}
+`,
+    },
+  ]}
 />
 
 The `axis` parameter is your friend: `axis=0` (default) means

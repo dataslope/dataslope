@@ -337,6 +337,19 @@
   font-family: inherit;
 }
 
+/* Action bar pinned to the bottom of the solution modal, directly below
+   the read-only editor. A plain card-surface strip whose borderless
+   buttons (Copy <file> / Load Solution into Editor) reuse `.utilBtn`. */
+.solutionActionBar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  padding: 7px 12px;
+  background: var(--ch-bg);
+  border-top: 1px solid var(--ch-border-light);
+}
+
 /* ─── Instructions ────────────────────────────────────────────────── */
 
 .instructions {
@@ -526,6 +539,16 @@
 .editor {
   background: var(--ch-bg);
   position: relative;
+}
+
+/* Light divider rendered above the editor / init panel. Applied via a
+   modifier class from the component (rather than baked into the shared
+   `.editor` / `.initWrap` base rules) so it only appears where the card
+   actually wants a separator — e.g. a code block's editor, or a
+   single-file challenge card's editor that has no init drawer or file
+   tab bar above it to supply one. */
+.topBorderLight {
+  border-top: 1px solid var(--ch-border-light);
 }
 
 .editor :global(.cm-editor) {
@@ -2213,40 +2236,6 @@
 @keyframes ch-result-flash {
   0% { opacity: 0.12; }
   100% { opacity: 0; }
-}
-
-/* ─── Table viewer resize bar ───────────────────────────────────────── */
-
-/* Drag handle at the bottom of the (non-collapsible) tables panel. Drag
-   vertically to grow/shrink the visible table area. */
-.tableViewerResizer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 12px;
-  cursor: ns-resize;
-  background: var(--ch-bg-subtle);
-  border-top: 1px solid var(--ch-border-light);
-  touch-action: none;
-}
-
-.tableViewerResizer:hover,
-.tableViewerResizer:focus-visible {
-  background: var(--ch-bg-hover);
-  outline: none;
-}
-
-.tableViewerResizerGrip {
-  width: 28px;
-  height: 3px;
-  border-radius: 999px;
-  background: var(--ch-border);
-  transition: background 0.12s;
-}
-
-.tableViewerResizer:hover .tableViewerResizerGrip,
-.tableViewerResizer:focus-visible .tableViewerResizerGrip {
-  background: var(--ch-accent);
 }
 
 .tableViewerEmpty {

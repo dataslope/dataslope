@@ -49,7 +49,10 @@ Same data, two shapes. Same six numbers either way.
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(tidyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(tidyr)
 
 wide <- data.frame(
   country = c("USA", "UK"),
@@ -66,7 +69,9 @@ long <- wide |>
   )
 
 print(long)
-`}
+`,
+    },
+  ]}
 />
 
 Three arguments do all the work:
@@ -82,7 +87,10 @@ You can also clean up the year strings on the fly:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(tidyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(tidyr)
 
 wide <- data.frame(
   country = c("USA", "UK"),
@@ -102,7 +110,9 @@ long <- wide |>
 
 print(long)
 str(long)
-`}
+`,
+    },
+  ]}
 />
 
 Notice `year` is now a proper integer column, not the string
@@ -115,7 +125,10 @@ to compute differences between columns.
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(tidyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(tidyr)
 
 long <- data.frame(
   country = rep(c("USA", "UK"), each = 3),
@@ -130,7 +143,9 @@ wide <- long |>
   )
 
 print(wide)
-`}
+`,
+    },
+  ]}
 />
 
 Just two arguments:
@@ -146,7 +161,10 @@ let's deliberately make it wide and then pivot it back:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 library(tidyr)
 
 data(airquality)
@@ -170,7 +188,9 @@ print(long)
 wide <- long |>
   pivot_wider(names_from = Month, values_from = value)
 print(wide)
-`}
+`,
+    },
+  ]}
 />
 
 Notice what just happened: long form is great for *computing*
@@ -185,7 +205,10 @@ function splits them:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(tidyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(tidyr)
 
 df <- data.frame(
   period = c("2022-Q1", "2022-Q2", "2023-Q1", "2023-Q2"),
@@ -198,7 +221,9 @@ df |>
     delim = "-",
     names = c("year", "quarter")
   )
-`}
+`,
+    },
+  ]}
 />
 
 The result has two columns where there was one. The reverse
@@ -277,22 +302,25 @@ it into a tidy long-form data frame `sales_long` with columns
   adapter="r"
   title="Pivot quarterly sales"
   instructions={`Pivot the columns Q1..Q4 into a single \`quarter\` column and a \`sales\` column. The \`region\` column stays as is.`}
-  initCode={`sales_wide <- data.frame(
+  files={[
+    {
+      filename: "main.r",
+      initCode: `sales_wide <- data.frame(
   region = c("North", "South", "East", "West"),
   Q1     = c(120, 80, 100, 95),
   Q2     = c(140, 90, 110, 105),
   Q3     = c(135, 85, 115, 100),
   Q4     = c(160, 95, 130, 120)
 )
-`}
-  starterCode={`library(tidyr)
+`,
+      starterCode: `library(tidyr)
 
 # sales_wide is already defined
 sales_long <- NULL # pivot it longer
 
 print(sales_long)
-`}
-  solutionCode={`library(tidyr)
+`,
+      solutionCode: `library(tidyr)
 
 sales_long <- sales_wide |>
   pivot_longer(
@@ -302,7 +330,9 @@ sales_long <- sales_wide |>
   )
 
 print(sales_long)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "rows",

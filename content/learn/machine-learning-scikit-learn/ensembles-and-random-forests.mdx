@@ -71,7 +71,10 @@ slice of the world and grows a slightly different structure.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.RandomState(0)
 data = np.arange(10)  # pretend these are 10 training rows
@@ -83,7 +86,9 @@ for i in range(3):
     missing = sorted(set(data) - set(sample))
     print(f"tree {i} sample: {sorted(sample)}")
     print(f"   rows it never saw: {missing}")
-`}
+`,
+    },
+  ]}
 />
 
 Each sample is a distorted view of the same data — some rows duplicated,
@@ -123,7 +128,10 @@ cancer dataset, and compare their **test** accuracy.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_breast_cancer
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
@@ -153,7 +161,9 @@ print(
     " test:",
     round(forest.score(X_test, y_test), 3),
 )
-`}
+`,
+    },
+  ]}
 />
 
 Both models hit (or nearly hit) `1.000` on the training data — individually,
@@ -180,7 +190,10 @@ single regression tree's blocky steps.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_diabetes
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
@@ -194,7 +207,9 @@ forest = RandomForestRegressor(n_estimators=200, random_state=0).fit(X_train, y_
 # .score returns R^2 for regressors (higher is better, 1.0 is perfect).
 print(f"Single tree   test R^2: {tree.score(X_test, y_test):.3f}")
 print(f"Random forest test R^2: {forest.score(X_test, y_test):.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 The lone regression tree, grown without limit, overfits and posts a weak
@@ -217,7 +232,10 @@ not for risk.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 
@@ -232,7 +250,9 @@ for n in [1, 5, 25, 100, 300]:
     forest = RandomForestClassifier(n_estimators=n, random_state=0)
     forest.fit(X_train, y_train)
     print(f"{n:>12} | {forest.score(X_test, y_test):.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 Watch the accuracy climb quickly from a tiny forest, then plateau. A single
@@ -264,7 +284,10 @@ leaned on.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.datasets import load_wine
 from sklearn.ensemble import RandomForestClassifier
 
@@ -279,7 +302,9 @@ order = np.argsort(forest.feature_importances_)[::-1]
 print("Top 5 features by importance:")
 for i in order[:5]:
     print(f"  {data.feature_names[i]:<28} {forest.feature_importances_[i]:.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 The importances sum to 1 and rank the features by their contribution. Treat
@@ -380,11 +405,14 @@ The hidden tests check that \`forest\` is a 200-tree
 \`RandomForestClassifier\`, that the forest is accurate (test accuracy above
 0.95), and — the key point of the page — that the forest's test accuracy is
 **at least as high as** the single tree's (\`forest_acc >= tree_acc\`).`}
-  initCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier`}
-  starterCode={`X, y = load_wine(return_X_y=True)
+from sklearn.ensemble import RandomForestClassifier`,
+      starterCode: `X, y = load_wine(return_X_y=True)
 
 # 1. Split (30% test, random_state=0, stratified on y)
 X_train, X_test, y_train, y_test = None, None, None, None
@@ -397,8 +425,8 @@ forest = None
 forest_acc = None
 
 print("single tree test:", tree_acc, " forest test:", forest_acc)
-`}
-  solutionCode={`X, y = load_wine(return_X_y=True)
+`,
+      solutionCode: `X, y = load_wine(return_X_y=True)
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
@@ -413,7 +441,9 @@ forest.fit(X_train, y_train)
 forest_acc = forest.score(X_test, y_test)
 
 print("single tree test:", tree_acc, " forest test:", forest_acc)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "forest_config",

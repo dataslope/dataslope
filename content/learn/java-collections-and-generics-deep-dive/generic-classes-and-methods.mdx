@@ -17,7 +17,10 @@ typed versions.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     // Without generics — Object, cast everywhere
     UntypedBox a = new UntypedBox();
@@ -43,7 +46,9 @@ class Box<T> {
   public void put(T v) { value = v; }
   public T get() { return value; }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Three things to notice in the typed `Box`:
@@ -80,7 +85,10 @@ example is `Pair<A, B>`:
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Pair<String, Integer> nameAge = new Pair<>("Ada", 36);
     System.out.println(nameAge.first() + " is " + nameAge.second());
@@ -101,7 +109,9 @@ class Pair<A, B> {
   public A first() { return first; }
   public B second() { return second; }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Each occurrence is checked independently — putting a `String` where
@@ -120,7 +130,10 @@ public static <T> T identity(T x) { return x; }
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -150,7 +163,9 @@ public class Main {
     System.out.println(keyMatchesValue("42", 42)); // true
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Generic methods are how the standard library writes things like
@@ -169,7 +184,7 @@ typed LIFO container — `push`, `pop`, `peek`, `size`.
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Stack<String> s = new Stack<>();
     s.push("first");
@@ -194,7 +209,7 @@ typed LIFO container — `push`, `pop`, `peek`, `size`.
     },
     {
       filename: "Stack.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -236,7 +251,10 @@ is what **bounded type parameters** are for, in their simplest form:
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -265,7 +283,9 @@ public class Main {
     // List<String> would not compile — String is not a Number.
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 We will go far deeper into bounds and wildcards in the next chapter.
@@ -279,7 +299,10 @@ type to be `Comparable`:
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayList;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -307,7 +330,9 @@ public class Main {
     System.out.println("max str = " + maxOf(ws)); // "zeta" — lex order
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 You can also combine constraints with `&`:
@@ -335,7 +360,7 @@ ada / 36
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Pair<String, Integer> p = new Pair<>("ada", 36);
     Pair<Integer, String> sp = p.swap();
@@ -347,11 +372,11 @@ ada / 36
     },
     {
       filename: "Pair.java",
-      initialContent: `public class Pair<A, B> {
+      starterCode: `public class Pair<A, B> {
   // TODO
 }
 `,
-      solutionContent: `public class Pair<A, B> {
+      solutionCode: `public class Pair<A, B> {
   private final A first;
   private final B second;
   public Pair(A first, B second) {

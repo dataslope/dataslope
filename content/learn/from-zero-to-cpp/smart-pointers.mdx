@@ -21,7 +21,10 @@ There are three to know:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <memory>
 
 class Widget {
@@ -40,7 +43,9 @@ int main() {
   // when p goes out of scope, the Widget is destroyed.
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 `std::make_unique<Widget>(1)` is preferred over `new Widget(1)` for
@@ -73,7 +78,10 @@ When the count hits zero, the object is deleted.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <memory>
 
 class Note {
@@ -99,7 +107,9 @@ int main() {
   std::cout << "use_count = " << a.use_count() << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Use `shared_ptr` only when you truly need shared ownership — a node
@@ -176,7 +186,10 @@ in a heterogeneous container.
   adapter="cpp"
   title="A unique owner"
   instructions={`Replace the raw \`new\`/\`delete\` in the provided \`main\` with \`std::make_unique\` and \`std::unique_ptr\`. The behaviour and output must be unchanged: prints \`Widget 1 created\`, then \`123\`, then \`Widget 1 destroyed\`, each on its own line.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <memory>
 
 class Widget {
@@ -195,8 +208,8 @@ int main() {
   delete w;
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <memory>
 
 class Widget {
@@ -214,7 +227,9 @@ int main() {
   std::cout << w->value() << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "uptr",

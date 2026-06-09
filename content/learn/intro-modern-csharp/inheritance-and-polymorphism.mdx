@@ -19,7 +19,10 @@ class** adds to or overrides what the base provides.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 var d = new Dog("Rex");
 d.Eat();  // inherited from Animal
@@ -44,7 +47,9 @@ public class Dog : Animal // "Dog : Animal" reads "Dog inherits from Animal"
 
     public void Bark() => Console.WriteLine($"{Name} says woof!");
 }
-`}
+`,
+    },
+  ]}
 />
 
 `Dog` doesn't have to re-implement `Name` or `Eat`. They come "for
@@ -71,7 +76,10 @@ works, not just add new methods. The base marks the method
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 Animal a = new Dog("Rex");
 a.Speak(); // "Rex barks!" — even though a's declared type is Animal
@@ -105,7 +113,9 @@ public class Cat : Animal
     }
     public override void Speak() => Console.WriteLine($"{Name} meows.");
 }
-`}
+`,
+    },
+  ]}
 />
 
 Look at the last block carefully. The variable `a` is declared as
@@ -139,7 +149,10 @@ method** on an **abstract class**.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 Shape[] shapes = { new Circle(3), new Square(4) };
 foreach (var s in shapes)
@@ -171,7 +184,9 @@ public class Square : Shape
     }
     public override double Area() => Side * Side;
 }
-`}
+`,
+    },
+  ]}
 />
 
 `Shape` *cannot* be instantiated directly — there's no such thing
@@ -186,7 +201,10 @@ promises to provide. It's pure shape — no fields, no behavior.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 void GreetEveryone(IGreeter g, string[] names)
 {
@@ -211,7 +229,9 @@ public class Japanese : IGreeter
 {
     public string Greet(string name) => $"こんにちは、{name}さん!";
 }
-`}
+`,
+    },
+  ]}
 />
 
 A class can only inherit from **one** base class but can implement
@@ -251,7 +271,7 @@ A `Car` *has* an `Engine` — it isn't *a kind of* `Engine`. So
   files={[
     {
       filename: "Program.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 
 Shape[] shapes = { new Circle(2), new Rectangle(3, 4) };
 foreach (var s in shapes)
@@ -260,12 +280,12 @@ foreach (var s in shapes)
     },
     {
       filename: "Shape.cs",
-      initialContent: `public abstract class Shape
+      starterCode: `public abstract class Shape
 {
     // TODO: declare abstract Area()
 }
 `,
-      solutionContent: `public abstract class Shape
+      solutionCode: `public abstract class Shape
 {
     public abstract double Area();
 }
@@ -273,13 +293,13 @@ foreach (var s in shapes)
     },
     {
       filename: "Circle.cs",
-      initialContent: `public class Circle : Shape
+      starterCode: `public class Circle : Shape
 {
     // TODO
     public override double Area() => 0;
 }
 `,
-      solutionContent: `public class Circle : Shape
+      solutionCode: `public class Circle : Shape
 {
     public double Radius { get; }
     public Circle(double r)
@@ -292,13 +312,13 @@ foreach (var s in shapes)
     },
     {
       filename: "Rectangle.cs",
-      initialContent: `public class Rectangle : Shape
+      starterCode: `public class Rectangle : Shape
 {
     // TODO
     public override double Area() => 0;
 }
 `,
-      solutionContent: `public class Rectangle : Shape
+      solutionCode: `public class Rectangle : Shape
 {
     public double Width { get; }
     public double Height { get; }

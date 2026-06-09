@@ -33,24 +33,34 @@ points depending on order:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # Points first, then the line on TOP of them.
 ggplot(mpg, aes(displ, hwy)) +
   geom_point() +
   geom_smooth(se = FALSE, color = "red")
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # Line first, then points on TOP of it.
 ggplot(mpg, aes(displ, hwy)) +
   geom_smooth(se = FALSE, color = "red") +
   geom_point()
-`}
+`,
+    },
+  ]}
 />
 
 Same components, different stacking order, different result where they
@@ -65,7 +75,10 @@ layer** a different data frame:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # Base layer: all cars in grey. Second layer: only 7+ seat-equivalent
 # big engines (displ > 5), redrawn larger and in red, on top.
@@ -74,7 +87,9 @@ big <- subset(mpg, displ > 5)
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(color = "grey70") +
   geom_point(data = big, color = "red", size = 3)
-`}
+`,
+    },
+  ]}
 />
 
 The first layer drew every car in grey. The second layer used a
@@ -97,13 +112,18 @@ variables — handy for experimenting:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 base <- ggplot(mpg, aes(displ, hwy)) # shared base, no layers yet
 
 base + geom_point() # one chart
 base + geom_point() + geom_smooth() # a different chart, same base
-`}
+`,
+    },
+  ]}
 />
 
 The `base` object holds the data and mappings; you bolt different

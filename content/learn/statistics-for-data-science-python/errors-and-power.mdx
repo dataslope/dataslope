@@ -115,7 +115,10 @@ beautifully simple:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(0)
@@ -140,7 +143,9 @@ print(f"Estimated power = {power:.3f}")
 print()
 print(f"This test catches the real effect about {power * 100:.0f}% of the time.")
 print(f"It MISSES it (Type II error) about {(1 - power) * 100:.0f}% of the time.")
-`}
+`,
+    },
+  ]}
 />
 
 With an effect of 0.5 and only 30 per group, power lands somewhere around
@@ -166,7 +171,10 @@ effect. We'll draw both curves with Plotly.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.express as px
 from scipy import stats
 
@@ -204,7 +212,9 @@ for n, p in zip(sizes, power_by_n):
     print(f"n = {n:>3} per group  ->  power ≈ {p:.2f}")
 print()
 print("The dashed line is the conventional 0.80 power target.")
-`}
+`,
+    },
+  ]}
 />
 
 The curve climbs toward 1.0 as `n` grows: more data, more power. The green
@@ -214,7 +224,10 @@ running the study. Now hold `n` fixed and grow the effect instead:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.express as px
 from scipy import stats
 
@@ -256,7 +269,9 @@ for e, p in zip(effects, power_by_effect):
 print()
 print("Notice the leftmost point: when effect = 0, H0 is TRUE,")
 print("so the 'power' there is just the Type I error rate ≈ alpha = 0.05.")
-`}
+`,
+    },
+  ]}
 />
 
 The two punchlines: big effects are easy to detect (high power even at
@@ -273,7 +288,10 @@ world with **no effect at all** and counting false positives.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(3)
@@ -298,7 +316,9 @@ print()
 print("Even though there is NO real effect, the test wrongly rejects")
 print(f"about {type_I_rate * 100:.1f}% of the time — by design. That IS alpha.")
 print("This is the price you agree to pay every time you set alpha.")
-`}
+`,
+    },
+  ]}
 />
 
 The false-positive rate lands right around 0.05. That is the literal
@@ -346,7 +366,10 @@ the overshoots. Let's see it.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(4)
@@ -379,7 +402,9 @@ print(f"Power (fraction significant)        : {len(significant_estimates) / reps
 print()
 print("If you only publish/believe the significant runs, the effect looks")
 print("much bigger than 0.3. Low power exaggerates the effects it 'finds'.")
-`}
+`,
+    },
+  ]}
 />
 
 The average of *all* estimates sits near the true 0.3 — the test is
@@ -411,18 +436,21 @@ positives can be believed.
 - Store the rejection **rate** (rejections / n_experiments) as a float called **\`power\`**.
 
 Use the provided \`rng\` for all randomness. Power is just the fraction of experiments that reach significance when the effect is real.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(2024)
 effect = 0.6
 n_per_group = 40
 alpha = 0.05
-n_experiments = 3000`}
-  starterCode={`# TODO: simulate n_experiments t-tests and set power = fraction that reject H0
+n_experiments = 3000`,
+      starterCode: `# TODO: simulate n_experiments t-tests and set power = fraction that reject H0
 power = None
-`}
-  solutionCode={`rejections = 0
+`,
+      solutionCode: `rejections = 0
 for _ in range(n_experiments):
     control = rng.normal(0.0, 1.0, n_per_group)
     treatment = rng.normal(effect, 1.0, n_per_group)
@@ -430,7 +458,9 @@ for _ in range(n_experiments):
         rejections += 1
 power = float(rejections / n_experiments)
 print(power)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type",
@@ -471,17 +501,20 @@ print(power)
 - Store the rejection **rate** as a float called **\`type_I_rate\`**.
 
 Because $H_0$ is true here, this rate should come out close to \`alpha\` (0.05).`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(2025)
 n_per_group = 50
 alpha = 0.05
-n_experiments = 8000`}
-  starterCode={`# TODO: simulate under H0 (no effect) and set type_I_rate = fraction that reject
+n_experiments = 8000`,
+      starterCode: `# TODO: simulate under H0 (no effect) and set type_I_rate = fraction that reject
 type_I_rate = None
-`}
-  solutionCode={`false_positives = 0
+`,
+      solutionCode: `false_positives = 0
 for _ in range(n_experiments):
     a = rng.normal(0.0, 1.0, n_per_group)
     b = rng.normal(0.0, 1.0, n_per_group)
@@ -489,7 +522,9 @@ for _ in range(n_experiments):
         false_positives += 1
 type_I_rate = float(false_positives / n_experiments)
 print(type_I_rate)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type",

@@ -26,7 +26,10 @@ give you both halves of a division.
 
 <CodeBlock
   adapter="r"
-  starterCode={`# Each line produces an answer
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# Each line produces an answer
 
 2 + 3 # addition
 10 - 4 # subtraction
@@ -35,7 +38,9 @@ give you both halves of a division.
 2^10 # exponentiation: 2 to the 10th power
 17 %% 5 # modulo: remainder of 17 / 5
 17 %/% 5 # integer division: how many times 5 fits into 17
-`}
+`,
+    },
+  ]}
 />
 
 Try changing the numbers and re-running. R does not save anything
@@ -49,7 +54,10 @@ subtraction**, with **parentheses overriding** everything.
 
 <CodeBlock
   adapter="r"
-  starterCode={`# These two expressions are NOT the same
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# These two expressions are NOT the same
 print(2 + 3 * 4) # 2 + 12 = 14
 print((2 + 3) * 4) # 5 * 4  = 20
 
@@ -59,7 +67,9 @@ print((2 * 3)^2) # 6^2  = 36
 
 # When in doubt, parenthesize
 print(((1 + 2) * (3 + 4)) / 5)
-`}
+`,
+    },
+  ]}
 />
 
 A good habit: **when an expression has more than two operators,
@@ -75,12 +85,17 @@ R has two kinds of numbers you will routinely encounter:
 
 <CodeBlock
   adapter="r"
-  starterCode={`x <- 42 # double (the default in R!)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `x <- 42 # double (the default in R!)
 y <- 42L # integer (the L stands for "long integer")
 
 cat("type of x:", typeof(x), "\\n")
 cat("type of y:", typeof(y), "\\n")
-`}
+`,
+    },
+  ]}
 />
 
 For most practical purposes you can ignore the difference — R will
@@ -101,14 +116,19 @@ R has a few special "numbers" that pop up in real data analysis:
 
 <CodeBlock
   adapter="r"
-  starterCode={`print(1 / 0) # Inf
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `print(1 / 0) # Inf
 print(-1 / 0) # -Inf
 print(0 / 0) # NaN — "not a number"
 print(NA + 5) # NA — anything plus a missing value is missing
 print(is.na(NA)) # TRUE
 print(is.nan(0 / 0)) # TRUE
 print(is.infinite(1 / 0)) # TRUE
-`}
+`,
+    },
+  ]}
 />
 
 These special values are critical to understand because real
@@ -133,7 +153,10 @@ Each comparison returns a **logical** value: `TRUE` or `FALSE`.
 
 <CodeBlock
   adapter="r"
-  starterCode={`5 == 5 # TRUE
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `5 == 5 # TRUE
 5 != 5 # FALSE
 5 < 10 # TRUE
 5 > 10 # FALSE
@@ -144,7 +167,9 @@ Each comparison returns a **logical** value: `TRUE` or `FALSE`.
 
 # Watch out: floating point equality is tricky!
 (0.1 + 0.2) == 0.3
-`}
+`,
+    },
+  ]}
 />
 
 That last line is one of the most famous traps in numeric
@@ -155,9 +180,14 @@ binary. The right way to compare numbers like this is with
 
 <CodeBlock
   adapter="r"
-  starterCode={`# The "is it basically equal?" check
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# The "is it basically equal?" check
 print(all.equal(0.1 + 0.2, 0.3))
-`}
+`,
+    },
+  ]}
 />
 
 This will return `TRUE` when the two numbers agree within a tiny
@@ -177,7 +207,10 @@ Once you have logical values, you can combine them.
 
 <CodeBlock
   adapter="r"
-  starterCode={`age <- 30
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `age <- 30
 income <- 55000
 
 # Eligible if age between 25 and 60 AND income at least 40000
@@ -191,7 +224,9 @@ print(discounted)
 # NOT eligible
 ineligible <- !eligible
 print(ineligible)
-`}
+`,
+    },
+  ]}
 />
 
 For now, use `&` and `|` (single ones) — they work on both single
@@ -207,7 +242,10 @@ program:
 
 <CodeBlock
   adapter="r"
-  starterCode={`width <- 8
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `width <- 8
 height <- 5
 
 area <- width * height
@@ -219,7 +257,9 @@ cat("Height:   ", height, "\\n")
 cat("Area:     ", area, "\\n")
 cat("Perimeter:", perimeter, "\\n")
 cat("Wide?    ", is_wide, "\\n")
-`}
+`,
+    },
+  ]}
 />
 
 Notice the pattern again: name your inputs, compute things from
@@ -249,7 +289,10 @@ R ships with dozens of math functions. You will use these often:
 
 <CodeBlock
   adapter="r"
-  starterCode={`cat("abs(-7)        =", abs(-7), "\\n")
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `cat("abs(-7)        =", abs(-7), "\\n")
 cat("sqrt(16)       =", sqrt(16), "\\n")
 cat("exp(1)         =", exp(1), "\\n")
 cat("log(exp(5))    =", log(exp(5)), "\\n")
@@ -259,7 +302,9 @@ cat("floor(2.9)     =", floor(2.9), "\\n")
 cat("ceiling(2.1)   =", ceiling(2.1), "\\n")
 cat("sum(1:10)      =", sum(1:10), "\\n") # 1+2+...+10
 cat("mean(1:10)     =", mean(1:10), "\\n") # 5.5
-`}
+`,
+    },
+  ]}
 />
 
 The shortcut `1:10` creates the sequence `1, 2, 3, ..., 10`. We
@@ -338,22 +383,27 @@ Both should be plain numeric scalars.
   instructions={`Using \`bill\` and \`tip_pct\` (both already defined), compute:
 - \`tip\`: the tip amount in dollars, rounded to 2 decimals.
 - \`total\`: \`bill + tip\`, rounded to 2 decimals.`}
-  initCode={`bill    <- 42.75
-tip_pct <- 18`}
-  starterCode={`tip <- NA
+  files={[
+    {
+      filename: "main.r",
+      initCode: `bill    <- 42.75
+tip_pct <- 18`,
+      starterCode: `tip <- NA
 total <- NA
 
 cat("Bill:  $", bill, "\\n", sep = "")
 cat("Tip:   $", tip, "\\n", sep = "")
 cat("Total: $", total, "\\n", sep = "")
-`}
-  solutionCode={`tip <- round(bill * tip_pct / 100, 2)
+`,
+      solutionCode: `tip <- round(bill * tip_pct / 100, 2)
 total <- round(bill + tip, 2)
 
 cat("Bill:  $", bill, "\\n", sep = "")
 cat("Tip:   $", tip, "\\n", sep = "")
 cat("Total: $", total, "\\n", sep = "")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "tip",

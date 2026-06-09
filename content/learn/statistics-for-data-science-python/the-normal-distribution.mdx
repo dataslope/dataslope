@@ -51,7 +51,10 @@ narrower. The shape is always the same symmetric bell.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import pandas as pd
 import plotly.express as px
 from scipy import stats
@@ -85,7 +88,9 @@ fig = px.line(
     title="The normal: mu moves the center, sigma sets the width",
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 ## The 68–95–99.7 empirical rule
@@ -113,7 +118,10 @@ flowchart TD
 
 <CodeBlock
   adapter="python"
-  starterCode={`from scipy import stats
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from scipy import stats
 
 d = stats.norm(loc=0, scale=1)  # standard normal
 
@@ -123,7 +131,9 @@ for k in (1, 2, 3):
     print(f"Within {k} sigma: {inside * 100:5.2f}% of values")
 
 print("\\n68-95-99.7 are the rounded versions of these exact numbers.")
-`}
+`,
+    },
+  ]}
 />
 
 ### Shading the empirical-rule bands
@@ -133,7 +143,10 @@ same multiple of σ for every normal — only the scale changes.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.graph_objects as go
 from scipy import stats
 
@@ -164,7 +177,9 @@ fig.update_layout(
 fig.show()
 
 print(f"~95% of scores fall between {mu - 2 * sigma} and {mu + 2 * sigma}.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="danger" title="Misconception: the empirical rule applies to all data">
@@ -202,7 +217,10 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  starterCode={`from scipy import stats
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from scipy import stats
 
 # IQ-like scores: mean 100, sd 15. How unusual is a score of 130?
 mu, sigma = 100, 15
@@ -219,7 +237,9 @@ pct_direct = stats.norm(loc=mu, scale=sigma).cdf(x)
 print(f"Percentile via z-score:    {pct_via_z * 100:.1f}%")
 print(f"Percentile via norm.cdf(x):{pct_direct * 100:.1f}%")
 print("\\nSame answer: standardizing and using norm.cdf are equivalent.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="danger" title="Misconception: a z-score IS a probability">
@@ -244,7 +264,10 @@ interchangeable. Pick the right tool for the direction you need:
 
 <CodeBlock
   adapter="python"
-  starterCode={`from scipy import stats
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from scipy import stats
 
 mu, sigma = 100, 15
 d = stats.norm(loc=mu, scale=sigma)
@@ -260,7 +283,9 @@ print(f"...which is z = {z_90:.3f}")
 
 # Round-trip check: rebuild the score from the z-score (z -> value)
 print(f"Rebuild from z: mu + z*sigma = {mu + z_90 * sigma:.1f}")
-`}
+`,
+    },
+  ]}
 />
 
 <ChallengeCard
@@ -278,23 +303,28 @@ Hints:
 - z-score for value \`x\`: \`(x - 1050) / 200\`.
 - Percentile for value \`x\`: \`stats.norm(loc=1050, scale=200).cdf(x)\`.
 - A z-score of 0 (for 1050) should give a percentile of 0.5.`}
-  initCode={`from scipy import stats
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from scipy import stats
 mu, sigma = 1050, 200
-scores = [900, 1050, 1300]`}
-  starterCode={`# TODO: compute z_scores and percentiles (both lists of 3 floats, same order)
+scores = [900, 1050, 1300]`,
+      starterCode: `# TODO: compute z_scores and percentiles (both lists of 3 floats, same order)
 z_scores = None
 percentiles = None
 
 print("z-scores:   ", z_scores)
 print("percentiles:", percentiles)
-`}
-  solutionCode={`d = stats.norm(loc=mu, scale=sigma)
+`,
+      solutionCode: `d = stats.norm(loc=mu, scale=sigma)
 z_scores = [float((x - mu) / sigma) for x in scores]
 percentiles = [float(d.cdf(x)) for x in scores]
 
 print("z-scores:   ", z_scores)
 print("percentiles:", percentiles)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "shapes",
@@ -340,18 +370,23 @@ Find the **minimum score** needed to be in the top 5% — i.e. the value with **
 - Build \`d = stats.norm(loc=1050, scale=200)\`.
 - The top 5% starts at the 95th percentile: \`d.ppf(0.95)\`.
 - Store the answer as a plain Python \`float\` in **\`cutoff\`**.`}
-  initCode={`from scipy import stats
-mu, sigma = 1050, 200`}
-  starterCode={`# TODO: find the top-5% cutoff score
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from scipy import stats
+mu, sigma = 1050, 200`,
+      starterCode: `# TODO: find the top-5% cutoff score
 cutoff = None
 
 print("Top-5% cutoff score:", cutoff)
-`}
-  solutionCode={`d = stats.norm(loc=mu, scale=sigma)
+`,
+      solutionCode: `d = stats.norm(loc=mu, scale=sigma)
 cutoff = float(d.ppf(0.95))
 
 print("Top-5% cutoff score:", cutoff)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type",
@@ -399,7 +434,10 @@ Let's *see* the misfit by forcing a normal onto right-skewed income data.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.graph_objects as go
 from scipy import stats
 
@@ -433,7 +471,9 @@ fig.show()
 print(
     f"\\nFitted normal says P(income < 0) = {fitted.cdf(0):.3f} — impossible for income!"
 )
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="danger" title="The most expensive misconception: 'everything is normal'">

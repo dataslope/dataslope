@@ -35,14 +35,19 @@ many values fall in each. The result is a picture of where values
 
 <CodeBlock
   adapter="r"
-  starterCode={`data(mtcars)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `data(mtcars)
 hist(mtcars$mpg,
   main = "Fuel economy (mtcars)",
   xlab = "Miles per gallon",
   col = "steelblue",
   breaks = 10
 )
-`}
+`,
+    },
+  ]}
 />
 
 The `breaks` argument controls how many bins. The default usually
@@ -66,7 +71,10 @@ easier to compare, especially across groups:
 
 <CodeBlock
   adapter="r"
-  starterCode={`data(mtcars)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `data(mtcars)
 d <- density(mtcars$mpg)
 plot(d,
   main = "Density of mpg",
@@ -75,7 +83,9 @@ plot(d,
   lwd  = 2
 )
 polygon(d, col = adjustcolor("darkred", 0.3), border = NA)
-`}
+`,
+    },
+  ]}
 />
 
 Density plots have one parameter to keep in mind: the **bandwidth**
@@ -91,13 +101,18 @@ for marking outliers.
 
 <CodeBlock
   adapter="r"
-  starterCode={`data(mtcars)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `data(mtcars)
 boxplot(mtcars$mpg,
   main = "mpg distribution",
   ylab = "Miles per gallon",
   col  = "lightblue"
 )
-`}
+`,
+    },
+  ]}
 />
 
 - The **box** spans Q1 to Q3 (the middle 50%).
@@ -112,7 +127,10 @@ distributions across groups**:
 
 <CodeBlock
   adapter="r"
-  starterCode={`data(mtcars)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `data(mtcars)
 boxplot(mpg ~ cyl,
   data = mtcars,
   main = "mpg by cylinder count",
@@ -120,7 +138,9 @@ boxplot(mpg ~ cyl,
   ylab = "mpg",
   col = c("lightblue", "lightgreen", "lightpink")
 )
-`}
+`,
+    },
+  ]}
 />
 
 In one picture: 4-cyl cars get the best mileage, 8-cyl the worst,
@@ -135,24 +155,34 @@ verbose but enormously more flexible. Here's a sneak peek:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 data(mtcars)
 
 ggplot(mtcars, aes(x = mpg)) +
   geom_histogram(bins = 10, fill = "steelblue", color = "white")
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 data(mtcars)
 
 ggplot(mtcars, aes(x = factor(cyl), y = mpg, fill = factor(cyl))) +
   geom_boxplot() +
   labs(x = "Cylinders", y = "mpg", title = "mpg by cylinders") +
   theme(legend.position = "none")
-`}
+`,
+    },
+  ]}
 />
 
 ## Reading a distribution: skew
@@ -163,7 +193,10 @@ at low-to-medium values with a long tail of high values.
 
 <CodeBlock
   adapter="r"
-  starterCode={`# A skewed distribution: simulated incomes
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# A skewed distribution: simulated incomes
 set.seed(42)
 incomes <- round(rlnorm(500, meanlog = 10.5, sdlog = 0.6))
 
@@ -177,7 +210,9 @@ boxplot(incomes,
   col = "coral", xlab = "income"
 )
 par(mfrow = c(1, 1))
-`}
+`,
+    },
+  ]}
 />
 
 Notice how the histogram has a long right tail, and the boxplot
@@ -191,14 +226,19 @@ becomes easier to work with statistically.
 
 <CodeBlock
   adapter="r"
-  starterCode={`set.seed(42)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `set.seed(42)
 incomes <- round(rlnorm(500, meanlog = 10.5, sdlog = 0.6))
 
 par(mfrow = c(1, 2))
 hist(incomes, main = "incomes", col = "coral", breaks = 30)
 hist(log10(incomes), main = "log10(incomes)", col = "skyblue", breaks = 30)
 par(mfrow = c(1, 1))
-`}
+`,
+    },
+  ]}
 />
 
 ## Test your understanding
@@ -256,7 +296,10 @@ just checks the plot was produced.
   adapter="r"
   title="Histogram + boxplot for Ozone"
   instructions={`Produce two side-by-side plots: (1) a histogram of \`airquality$Ozone\` (NAs ignored), (2) a boxplot of the same. Set the layout with \`par(mfrow = c(1, 2))\`.`}
-  starterCode={`data(airquality)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `data(airquality)
 oz <- airquality$Ozone # has NAs
 
 par(mfrow = c(1, 2))
@@ -265,8 +308,8 @@ par(mfrow = c(1, 2))
 par(mfrow = c(1, 1))
 
 cat("done\\n")
-`}
-  solutionCode={`data(airquality)
+`,
+      solutionCode: `data(airquality)
 oz <- airquality$Ozone
 
 par(mfrow = c(1, 2))
@@ -278,7 +321,9 @@ boxplot(oz, col = "coral", main = "Ozone boxplot")
 par(mfrow = c(1, 1))
 
 cat("done\\n")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "ran",

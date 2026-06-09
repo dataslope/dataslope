@@ -84,21 +84,31 @@ This is a quirk of Python's design: `True` and `False` are instances of `bool`, 
 
 <CodeBlock
   adapter="python"
-  starterCode={`values = [1, 1.0, True, "1", [1], (1,), {1}, {"1": 1}, None]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `values = [1, 1.0, True, "1", [1], (1,), {1}, {"1": 1}, None]
 
 for v in values:
     print(f"{v!r:>15}  type={type(v).__name__}")
-`}
+`,
+    },
+  ]}
 />
 
 `isinstance` is what you should use in real code, because it respects inheritance:
 
 <CodeBlock
   adapter="python"
-  starterCode={`print(isinstance(True, bool))  # True
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `print(isinstance(True, bool))  # True
 print(isinstance(True, int))  # True (bool is a subclass of int)
 print(isinstance(1, bool))  # False (int is not a subclass of bool)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="bool inherits from int">
@@ -118,36 +128,56 @@ Every built-in type doubles as a converter when you call it as a function.
 
 <CodeBlock
   adapter="python"
-  starterCode={`# String to int / float
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# String to int / float
 print(int("42"))
 print(float("3.14"))
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`# int to string
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# int to string
 print(str(255))
 print(hex(255), bin(255), oct(255))
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`# float to int (truncates toward zero)
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# float to int (truncates toward zero)
 print(int(3.9))
 print(int(-3.9))
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`# list / tuple / set are interchangeable in many cases
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# list / tuple / set are interchangeable in many cases
 items = [1, 2, 2, 3]
 print(tuple(items))
 print(set(items))  # duplicates removed
 print(list("abc"))
-`}
+`,
+    },
+  ]}
 />
 
 ## Mutability matters
@@ -159,26 +189,41 @@ Two patterns to remember:
 
 <CodeBlock
   adapter="python"
-  starterCode={`s = "hello"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `s = "hello"
 s.upper()  # returns "HELLO" but does not change s
 print("s is still", s)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`s = "hello"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `s = "hello"
 s = s.upper()  # rebinding is how you "change" an immutable
 print("now s is", s)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`nums = [1, 2, 3]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `nums = [1, 2, 3]
 nums.append(4)  # changes the list in place
 print("nums is now", nums)
-`}
+`,
+    },
+  ]}
 />
 
 ## `None`
@@ -187,22 +232,32 @@ print("nums is now", nums)
 
 <CodeBlock
   adapter="python"
-  starterCode={`result = None
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `result = None
 if result is None:
     print("nothing yet")
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`# A function with no return statement returns None.
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# A function with no return statement returns None.
 def shout(msg):
     print(msg.upper())
 
 
 ret = shout("hello")
 print("shout returned:", ret)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Why 'is None' not '== None'?">
@@ -222,18 +277,23 @@ print("shout returned:", ret)
 4. The boolean \`True\`
 
 Hard-code the types (you do not need to detect them automatically).`}
-  starterCode={`line = "42,3.14,hello,True"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `line = "42,3.14,hello,True"
 parts = line.split(",")
 print(parts)
 
 parsed = None  # Your code here
 print(parsed)
-`}
-  solutionCode={`line = "42,3.14,hello,True"
+`,
+      solutionCode: `line = "42,3.14,hello,True"
 parts = line.split(",")
 parsed = [int(parts[0]), float(parts[1]), parts[2], parts[3] == "True"]
 print(parsed)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_list",
@@ -260,7 +320,10 @@ assert type(parsed[3]) is bool`,
   adapter="python"
   title="Safe int conversion"
   instructions={`Write a function \`safe_int(s, default=0)\` that tries to convert the string \`s\` to an integer. If the conversion fails (e.g., \`s\` is \`"abc"\`), return \`default\` instead. Use a try/except block.`}
-  starterCode={`def safe_int(s, default=0):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def safe_int(s, default=0):
     # Your code here
     return default
 
@@ -268,8 +331,8 @@ assert type(parsed[3]) is bool`,
 print(safe_int("123"))
 print(safe_int("abc"))
 print(safe_int("", -1))
-`}
-  solutionCode={`def safe_int(s, default=0):
+`,
+      solutionCode: `def safe_int(s, default=0):
     try:
         return int(s)
     except ValueError:
@@ -279,7 +342,9 @@ print(safe_int("", -1))
 print(safe_int("123"))
 print(safe_int("abc"))
 print(safe_int("", -1))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "valid_int",

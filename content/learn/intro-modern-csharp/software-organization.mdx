@@ -54,7 +54,7 @@ clashing, and it lets *your* program group related types.
   files={[
     {
       filename: "Program.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 using Banking;
 
 var a = new BankAccount("Alice", 100);
@@ -63,7 +63,7 @@ Console.WriteLine($"{a.Owner}: {a.Balance}");
     },
     {
       filename: "BankAccount.cs",
-      initialContent: `namespace Banking;
+      starterCode: `namespace Banking;
 
 public class BankAccount
 {
@@ -155,7 +155,7 @@ of against it.
   files={[
     {
       filename: "Program.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 using Bank.Domain;
 using Bank.App;
 
@@ -170,7 +170,7 @@ Console.WriteLine($"{alice.Owner} has {alice.Balance}");
     },
     {
       filename: "BankAccount.cs",
-      initialContent: `namespace Bank.Domain;
+      starterCode: `namespace Bank.Domain;
 
 public class BankAccount
 {
@@ -194,7 +194,7 @@ public class BankAccount
     },
     {
       filename: "Teller.cs",
-      initialContent: `using Bank.Domain;
+      starterCode: `using Bank.Domain;
 
 namespace Bank.App;
 

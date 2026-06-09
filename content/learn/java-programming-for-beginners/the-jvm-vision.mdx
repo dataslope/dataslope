@@ -163,7 +163,10 @@ so far, and how many CPUs it can see.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Runtime r = Runtime.getRuntime();
     long mb = 1024 * 1024;
@@ -173,7 +176,9 @@ so far, and how many CPUs it can see.
     System.out.println("Max memory   (MB):   " + r.maxMemory() / mb);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 `Runtime.getRuntime()` is your handle on the JVM itself, from inside

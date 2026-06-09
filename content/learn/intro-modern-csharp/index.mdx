@@ -104,7 +104,10 @@ field, and two methods. Read it once, then click **Run**.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 class Lamp
 {
@@ -141,7 +144,9 @@ class Program
         Console.WriteLine(desk.Describe());
     }
 }
-`}
+`,
+    },
+  ]}
 />
 
 If that example feels intimidating, that is completely normal — it

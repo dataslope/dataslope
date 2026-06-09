@@ -68,7 +68,10 @@ can see how the pieces relate.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from scipy import stats
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from scipy import stats
 
 # Delivery times: Normal, mean 30 min, sd 6 min.
 d = stats.norm(loc=30, scale=6)
@@ -86,7 +89,9 @@ print("isf(0.05) top 5% =", round(float(d.isf(0.05)), 2))
 
 # 4) Simulation: draw samples.
 print("rvs sample       =", d.rvs(size=5, random_state=0).round(1))
-`}
+`,
+    },
+  ]}
 />
 
 ## The loc/scale convention and frozen distributions
@@ -106,7 +111,10 @@ call. It's cleaner and prevents parameter-mismatch bugs.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from scipy import stats
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from scipy import stats
 
 # Frozen (preferred): bake parameters in once, reuse everywhere.
 d = stats.norm(loc=30, scale=6)
@@ -120,7 +128,9 @@ print(
 )
 
 # Same numbers — the frozen form is just tidier and safer.
-`}
+`,
+    },
+  ]}
 />
 
 ## Fitting a distribution to data
@@ -133,7 +143,10 @@ standard deviation.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(42)
@@ -150,7 +163,9 @@ print(f"Fitted scale (sd) = {scale:.3f} (sample std  = {sample.std():.3f})")
 fitted = stats.norm(loc=loc, scale=scale)
 print(f"\\nModel says P(X > 85)      = {fitted.sf(85):.4f}")
 print(f"Model says 95th pct cutoff = {fitted.ppf(0.95):.2f}")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="Fitting bounded distributions: fix loc with floc">
@@ -180,7 +195,10 @@ good; **you** have to check. Two standard checks:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.graph_objects as go
 from scipy import stats
 
@@ -205,7 +223,9 @@ fig.update_layout(
     yaxis_title="density",
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 ### Q–Q plot intuition
@@ -230,7 +250,10 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.express as px
 from scipy import stats
 
@@ -271,7 +294,9 @@ fig = px.scatter(
 lo, hi = min(theo.min(), samp.min()), max(theo.max(), samp.max())
 fig.add_shape(type="line", x0=lo, y0=lo, x1=hi, y1=hi, line=dict(dash="dash"))
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="A high Q-Q correlation is suggestive, not proof">
@@ -296,19 +321,22 @@ Hints:
 - \`loc, scale = stats.norm.fit(data)\`.
 - A frozen fitted distribution: \`fitted = stats.norm(loc=loc, scale=scale)\`.
 - \`P(X > 100)\` is \`fitted.sf(100)\`.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from scipy import stats
 rng = np.random.default_rng(7)
-data = rng.normal(80, 12, size=400)`}
-  starterCode={`# TODO: fit the normal and compute the tail probability
+data = rng.normal(80, 12, size=400)`,
+      starterCode: `# TODO: fit the normal and compute the tail probability
 loc = None
 scale = None
 p_above_100 = None
 
 print("loc, scale:", loc, scale)
 print("P(X > 100):", p_above_100)
-`}
-  solutionCode={`loc, scale = stats.norm.fit(data)
+`,
+      solutionCode: `loc, scale = stats.norm.fit(data)
 loc, scale = float(loc), float(scale)
 
 fitted = stats.norm(loc=loc, scale=scale)
@@ -316,7 +344,9 @@ p_above_100 = float(fitted.sf(100))
 
 print("loc, scale:", loc, scale)
 print("P(X > 100):", p_above_100)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "params_type",
@@ -362,20 +392,25 @@ Hints:
 
 - Fit with \`loc, scale = stats.norm.fit(data)\`.
 - The 95th percentile is \`stats.norm(loc=loc, scale=scale).ppf(0.95)\`.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from scipy import stats
 rng = np.random.default_rng(7)
-data = rng.normal(80, 12, size=400)`}
-  starterCode={`# TODO: fit the model and find the 95th-percentile cutoff
+data = rng.normal(80, 12, size=400)`,
+      starterCode: `# TODO: fit the model and find the 95th-percentile cutoff
 cutoff_95 = None
 
 print("95th-percentile cutoff:", cutoff_95)
-`}
-  solutionCode={`loc, scale = stats.norm.fit(data)
+`,
+      solutionCode: `loc, scale = stats.norm.fit(data)
 cutoff_95 = float(stats.norm(loc=loc, scale=scale).ppf(0.95))
 
 print("95th-percentile cutoff:", cutoff_95)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type",
@@ -414,7 +449,10 @@ answering a question the data never spoke to.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(0)
@@ -426,7 +464,9 @@ print(f"In-range question  P(X > 100): {fitted.sf(100):.4f}  <- supported by dat
 print(f"Far-tail question  P(X > 200): {fitted.sf(200):.2e}  <- pure extrapolation")
 print("\\nThe second number comes entirely from the assumed normal shape,")
 print("not from anything the data actually observed. Treat it with caution.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="danger" title="Two misconceptions to retire">

@@ -24,7 +24,10 @@ inherited it from Scheme.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Functions are values
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Functions are values
 const double = (x: number) => x * 2;
 
 // Store them in arrays
@@ -40,7 +43,9 @@ const dispatch: Record<string, (x: number) => number> = {
 console.log(double(10));
 console.log(ops.map((f) => f(5))); // apply each op to 5
 console.log(dispatch["square"](6));
-`}
+`,
+    },
+  ]}
 />
 
 The fact that `(x: number) => number` is a *type* you can use
@@ -53,7 +58,10 @@ The three you already know:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const xs = [1, 2, 3, 4, 5];
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const xs = [1, 2, 3, 4, 5];
 
 // map: apply a function to each element
 const doubled = xs.map((x) => x * 2);
@@ -67,7 +75,9 @@ const sum = xs.reduce((acc, x) => acc + x, 0);
 console.log(doubled);
 console.log(evens);
 console.log(sum);
-`}
+`,
+    },
+  ]}
 />
 
 The key insight: `map`, `filter`, and `reduce` are *one
@@ -92,7 +102,10 @@ different inner action, factor out a higher-order function.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Before: two functions that share 95% of their code
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Before: two functions that share 95% of their code
 function logTimings(label: string, work: () => void): void {
   const start = Date.now();
   work();
@@ -119,7 +132,9 @@ const n = logTimingsResult("sum", () => {
 });
 
 console.log("n:", n);
-`}
+`,
+    },
+  ]}
 />
 
 The two functions share the same "wrap with timing" logic. The
@@ -127,7 +142,10 @@ generic version is a *single* higher-order function:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function timed<T>(label: string, work: () => T): T {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function timed<T>(label: string, work: () => T): T {
   const start = Date.now();
   const result = work();
   const end = Date.now();
@@ -145,7 +163,9 @@ console.log("n:", n);
 timed("noop", () => {
   for (let i = 0; i < 1_000_000; i++);
 });
-`}
+`,
+    },
+  ]}
 />
 
 `timed` is a higher-order function in both directions: it *takes* a
@@ -156,7 +176,10 @@ function (`work`) and runs it. We could equally well write a
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// A factory: returns a function configured with 'amount'
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// A factory: returns a function configured with 'amount'
 function adder(amount: number): (n: number) => number {
   return (n) => n + amount;
 }
@@ -185,7 +208,9 @@ console.log(v1("abc")); // "must be at least 8 characters"
 console.log(v1("abcdefghi")); // null
 console.log(v2("nope")); // "must contain @"
 console.log(v2("hi@there")); // null
-`}
+`,
+    },
+  ]}
 />
 
 These returned functions are **closures** — they capture variables
@@ -203,7 +228,10 @@ function.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// A "log calls" decorator
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// A "log calls" decorator
 function withLogging<A extends readonly unknown[], R>(
   name: string,
   f: (...args: A) => R,
@@ -221,7 +249,9 @@ const loggedAdd = withLogging("add", add);
 
 loggedAdd(2, 3);
 loggedAdd(10, -4);
-`}
+`,
+    },
+  ]}
 />
 
 The original `add` is unchanged and still usable. `loggedAdd` is a
@@ -235,7 +265,10 @@ These come up so often they're worth memorizing.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// identity: the function that returns its argument unchanged
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// identity: the function that returns its argument unchanged
 const identity = <A,>(a: A): A => a;
 
 // constant: a function that ignores its argument and always returns x
@@ -275,7 +308,9 @@ console.log([1, 2, 3, 4].filter(isEven));
 const trace = tap<number>((n) => console.log("seen:", n));
 const total = [1, 2, 3].map(trace).reduce((a, b) => a + b, 0);
 console.log("total:", total);
-`}
+`,
+    },
+  ]}
 />
 
 Most "FP libraries" are, at their core, a curated collection of
@@ -289,7 +324,10 @@ the function-as-value pattern shows up directly in the signature:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// A generic "apply twice"
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// A generic "apply twice"
 function twice<A>(f: (a: A) => A, a: A): A {
   return f(f(a));
 }
@@ -311,7 +349,9 @@ console.log(
     1,
   ),
 );
-`}
+`,
+    },
+  ]}
 />
 
 The type `(a: A) => A` *describes* what the function expects. The
@@ -343,7 +383,7 @@ ok
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { every, when, mapInput, type Validator } from "./validators";
+      starterCode: `import { every, when, mapInput, type Validator } from "./validators";
 
 const minLen =
   (n: number): Validator<number> =>
@@ -368,7 +408,7 @@ check("a@b");
     },
     {
       filename: "validators.ts",
-      initialContent: `export type Validator<A> = (a: A) => string | null;
+      starterCode: `export type Validator<A> = (a: A) => string | null;
 
 export function every<A>(...vs: Validator<A>[]): Validator<A> {
   // your code here
@@ -388,7 +428,7 @@ export function mapInput<A, B>(f: (a: A) => B, v: Validator<B>): Validator<A> {
   return () => null;
 }
 `,
-      solutionContent: `export type Validator<A> = (a: A) => string | null;
+      solutionCode: `export type Validator<A> = (a: A) => string | null;
 
 export function every<A>(...vs: Validator<A>[]): Validator<A> {
   return (a) => {

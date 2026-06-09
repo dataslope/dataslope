@@ -61,7 +61,10 @@ owners). It *can* be moved, transferring ownership:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <memory>
 #include <utility>
 
@@ -84,7 +87,9 @@ int main() {
   std::cout << "b holds Toy " << b->id << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 After the move, `a` is null and `b` is the sole owner. Exactly what

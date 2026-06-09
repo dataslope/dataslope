@@ -28,9 +28,14 @@ The literal syntax uses curly braces, but **without** colons.
 
 <CodeBlock
   adapter="python"
-  starterCode={`nums = {1, 2, 3}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `nums = {1, 2, 3}
 print(nums)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Empty set syntax">
@@ -39,29 +44,44 @@ print(nums)
 
 <CodeBlock
   adapter="python"
-  starterCode={`empty = set()
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `empty = set()
 print(empty)
 print(type(empty))
 
 not_empty = {}
 print(type(not_empty))
-`}
+`,
+    },
+  ]}
 />
 
 The `set()` constructor converts any iterable into a set, automatically deduplicating.
 
 <CodeBlock
   adapter="python"
-  starterCode={`unique = set([1, 2, 2, 3, 3, 3])
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `unique = set([1, 2, 2, 3, 3, 3])
 print(unique)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`chars = set("banana")
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `chars = set("banana")
 print(chars)
-`}
+`,
+    },
+  ]}
 />
 
 ## Adding and removing
@@ -70,56 +90,81 @@ print(chars)
 
 <CodeBlock
   adapter="python"
-  starterCode={`s = {1, 2, 3}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `s = {1, 2, 3}
 s.add(4)
 print(s)
-`}
+`,
+    },
+  ]}
 />
 
 Adding an item that already exists does nothing (sets are unique by definition).
 
 <CodeBlock
   adapter="python"
-  starterCode={`s = {1, 2, 3}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `s = {1, 2, 3}
 s.add(2)
 print(s)
-`}
+`,
+    },
+  ]}
 />
 
 `.discard` removes an item without raising an error if it is missing.
 
 <CodeBlock
   adapter="python"
-  starterCode={`s = {1, 2, 3}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `s = {1, 2, 3}
 s.discard(2)
 s.discard(99)
 print(s)
-`}
+`,
+    },
+  ]}
 />
 
 `.remove` removes an item but **raises** `KeyError` if it is missing.
 
 <CodeBlock
   adapter="python"
-  starterCode={`s = {1, 2, 3}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `s = {1, 2, 3}
 s.remove(2)
 try:
     s.remove(99)
 except KeyError as e:
     print("KeyError:", e)
 print(s)
-`}
+`,
+    },
+  ]}
 />
 
 `.pop` removes and returns an arbitrary element. The choice is unpredictable because sets are unordered.
 
 <CodeBlock
   adapter="python"
-  starterCode={`s = {1, 2, 3}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `s = {1, 2, 3}
 popped = s.pop()
 print("popped:", popped)
 print("remaining:", s)
-`}
+`,
+    },
+  ]}
 />
 
 ## Set algebra
@@ -138,7 +183,10 @@ This is the killer feature: classic mathematical set operations are built in wit
 
 <CodeBlock
   adapter="python"
-  starterCode={`a = {1, 2, 3, 4}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `a = {1, 2, 3, 4}
 b = {3, 4, 5, 6}
 
 print("union:        ", a | b)
@@ -146,16 +194,23 @@ print("intersection: ", a & b)
 print("a - b:        ", a - b)
 print("b - a:        ", b - a)
 print("symmetric:    ", a ^ b)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`a = {1, 2, 3, 4}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `a = {1, 2, 3, 4}
 print("subset?  ", {1, 2}.issubset(a))
 print("superset?", a.issuperset({1, 2}))
 print("disjoint?", a.isdisjoint({99}))
-`}
+`,
+    },
+  ]}
 />
 
 ```mermaid
@@ -186,7 +241,10 @@ This is where sets shine. Membership testing in a list is O(n); in a set it is O
 
 <CodeBlock
   adapter="python"
-  starterCode={`import time
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import time
 
 big_list = list(range(1_000_000))
 big_set = set(big_list)
@@ -199,7 +257,9 @@ t2 = time.perf_counter()
 
 print(f"list: {(t1 - t0) * 1000:.2f} ms")
 print(f"set:  {(t2 - t1) * 1000:.4f} ms")
-`}
+`,
+    },
+  ]}
 />
 
 Rule of thumb: if you are checking membership more than once or twice, convert to a set first.
@@ -210,18 +270,28 @@ Same rule as dict keys: ints, strings, tuples of hashables, and frozensets are f
 
 <CodeBlock
   adapter="python"
-  starterCode={`good = {(1, 2), "hi", 42, frozenset({1, 2})}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `good = {(1, 2), "hi", 42, frozenset({1, 2})}
 print(good)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`try:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `try:
     bad = {[1, 2]}
 except TypeError as e:
     print("TypeError:", e)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn">
@@ -230,11 +300,16 @@ The requirement is **hashability**, not immutability. A tuple containing a mutab
 
 <CodeBlock
   adapter="python"
-  starterCode={`try:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `try:
     bad = {(1, [2, 3])}
 except TypeError as e:
     print("TypeError:", e)
-`}
+`,
+    },
+  ]}
 />
 
 ## `frozenset`
@@ -243,17 +318,27 @@ If you need an immutable, hashable set (for example to use as a dict key or anot
 
 <CodeBlock
   adapter="python"
-  starterCode={`tags = frozenset({"python", "tutorial"})
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `tags = frozenset({"python", "tutorial"})
 lookup = {tags: "course-1"}
 print(lookup[frozenset({"tutorial", "python"})])
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`set_of_sets = {frozenset({1, 2}), frozenset({3, 4})}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `set_of_sets = {frozenset({1, 2}), frozenset({3, 4})}
 print(set_of_sets)
-`}
+`,
+    },
+  ]}
 />
 
 ## Challenges
@@ -262,13 +347,18 @@ print(set_of_sets)
   adapter="python"
   title="Common interests"
   instructions={`Define \`common_interests(a, b)\` that takes two lists of interest strings and returns a **set** of the interests that appear in both, case-insensitive.`}
-  starterCode={`def common_interests(a, b):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def common_interests(a, b):
     # your code here
     return set()
-`}
-  solutionCode={`def common_interests(a, b):
+`,
+      solutionCode: `def common_interests(a, b):
     return {x.lower() for x in a} & {x.lower() for x in b}
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",
@@ -292,13 +382,18 @@ print(set_of_sets)
   adapter="python"
   title="Unique vowels"
   instructions={`Define \`unique_vowels(text)\` that returns the set of lowercase vowels (\`a\`, \`e\`, \`i\`, \`o\`, \`u\`) that appear in \`text\`, ignoring case.`}
-  starterCode={`def unique_vowels(text):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def unique_vowels(text):
     # your code here
     return set()
-`}
-  solutionCode={`def unique_vowels(text):
+`,
+      solutionCode: `def unique_vowels(text):
     return {c for c in text.lower() if c in "aeiou"}
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",

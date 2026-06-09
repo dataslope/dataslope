@@ -63,7 +63,7 @@ million-line software systems without going insane.
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     BankAccount a = new BankAccount("Ada");
     a.deposit(500);
@@ -79,7 +79,7 @@ million-line software systems without going insane.
     },
     {
       filename: "BankAccount.java",
-      initialContent: `public class BankAccount {
+      starterCode: `public class BankAccount {
   private final String owner;
   private long balanceCents = 0;
 
@@ -240,7 +240,7 @@ after illegal change: 24
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Thermostat t = new Thermostat(20);
     System.out.println("target=" + t.target());
@@ -256,11 +256,11 @@ after illegal change: 24
     },
     {
       filename: "Thermostat.java",
-      initialContent: `public class Thermostat {
+      starterCode: `public class Thermostat {
   // TODO: implement
 }
 `,
-      solutionContent: `public class Thermostat {
+      solutionCode: `public class Thermostat {
   private int targetC;
 
   public Thermostat(int initialTarget) { this.targetC = clamp(initialTarget); }

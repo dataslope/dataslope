@@ -16,7 +16,10 @@ mask is `True`.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -34,7 +37,9 @@ print()
 
 print("Filtered:")
 print(df[mask])
-`}
+`,
+    },
+  ]}
 />
 
 Two-step or one-step — pick your style:
@@ -54,19 +59,24 @@ All the comparisons return a boolean mask:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 df = pd.DataFrame({
     "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
     "salary": [120, 95, 140, 80, 128],
     "tenure": [3, 6, 7, 2, 4],
-})`}
-  starterCode={`print(df[df["salary"] >= 100])
+})`,
+      starterCode: `print(df[df["salary"] >= 100])
 print()
 print(df[df["dept"] == "Eng"])
 print()
 print(df[df["dept"] != "Eng"])
-`}
+`,
+    },
+  ]}
 />
 
 ## Combining conditions with `&`, `|`, `~`
@@ -77,14 +87,17 @@ in parentheses, because `&` has higher precedence than `>`.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 df = pd.DataFrame({
     "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
     "salary": [120, 95, 140, 80, 128],
     "tenure": [3, 6, 7, 2, 4],
-})`}
-  starterCode={`# Engineers AND high earners
+})`,
+      starterCode: `# Engineers AND high earners
 print(df[(df["dept"] == "Eng") & (df["salary"] > 120)])
 print()
 
@@ -94,7 +107,9 @@ print()
 
 # NOT in Engineering
 print(df[~(df["dept"] == "Eng")])
-`}
+`,
+    },
+  ]}
 />
 
 If you forget the parentheses you will get a cryptic error
@@ -109,49 +124,67 @@ A handful of methods produce boolean masks directly:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 df = pd.DataFrame({
     "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
     "salary": [120, 95, 140, 80, 128],
-})`}
-  starterCode={`# Cleaner than chaining many "or" clauses
+})`,
+      starterCode: `# Cleaner than chaining many "or" clauses
 print(df[df["dept"].isin(["Eng", "Sales"])])
-`}
+`,
+    },
+  ]}
 />
 
 ### `between` — ranges
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 df = pd.DataFrame({
     "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
     "salary": [120, 95, 140, 80, 128],
-})`}
-  starterCode={`print(df[df["salary"].between(90, 130)])
-`}
+})`,
+      starterCode: `print(df[df["salary"].between(90, 130)])
+`,
+    },
+  ]}
 />
 
 ### `str.contains` — substring matching
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 df = pd.DataFrame({
     "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
-})`}
-  starterCode={`print(df[df["name"].str.contains("e", case=False)])
-`}
+})`,
+      starterCode: `print(df[df["name"].str.contains("e", case=False)])
+`,
+    },
+  ]}
 />
 
 ### `isna` / `notna` — missing checks
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 df = pd.DataFrame({"x": [1, 2, np.nan, 4, np.nan]})
@@ -161,7 +194,9 @@ print(df[df["x"].isna()])
 print()
 print("Non-missing rows:")
 print(df[df["x"].notna()])
-`}
+`,
+    },
+  ]}
 />
 
 ## `query` — a string-based DSL
@@ -171,16 +206,21 @@ more readable, especially for multi-condition filters:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 df = pd.DataFrame({
     "name":   ["Aiko","Bilal","Chen","Diego","Eve"],
     "dept":   ["Eng","Sales","Eng","Ops","Eng"],
     "salary": [120, 95, 140, 80, 128],
-})`}
-  starterCode={`print(df.query("dept == 'Eng' and salary > 120"))
+})`,
+      starterCode: `print(df.query("dept == 'Eng' and salary > 120"))
 print()
 print(df.query("dept in ['Eng','Sales']"))
-`}
+`,
+    },
+  ]}
 />
 
 Whether you prefer `query` or boolean masks is mostly a style
@@ -190,7 +230,10 @@ choice. Most codebases use masks; `query` shows up in notebooks.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.read_csv(
     "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
@@ -206,7 +249,9 @@ mask = (
 leavers = df[mask]
 print(f"{len(leavers)} early-tenure Sales leavers")
 print(leavers[["Age", "YearsAtCompany", "MonthlyIncome", "JobRole"]].head())
-`}
+`,
+    },
+  ]}
 />
 
 You will write filters like this all day, every day, as an
@@ -220,7 +265,10 @@ column on just that subset. Use `.loc` for the assignment:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -235,7 +283,9 @@ df["flag"] = ""
 df.loc[(df["dept"] == "Eng") & (df["salary"] > 120), "flag"] = "high_eng"
 
 print(df)
-`}
+`,
+    },
+  ]}
 />
 
 ## A filter challenge
@@ -254,7 +304,10 @@ Then build a DataFrame called \`young_low_pay\` containing **only** employees wh
 - Did **not** leave the company (\`Attrition == "No"\`).
 
 Keep all columns.`}
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
 df = pd.read_csv(URL)
@@ -262,8 +315,8 @@ df = pd.read_csv(URL)
 young_low_pay = None  # TODO
 
 print(len(young_low_pay) if young_low_pay is not None else "still None")
-`}
-  solutionCode={`import pandas as pd
+`,
+      solutionCode: `import pandas as pd
 
 URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
 df = pd.read_csv(URL)
@@ -273,7 +326,9 @@ young_low_pay = df[
 ]
 
 print(len(young_low_pay))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_df",

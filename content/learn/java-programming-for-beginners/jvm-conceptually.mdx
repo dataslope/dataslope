@@ -171,7 +171,10 @@ become unreachable. The JVM quietly reclaims them.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     // Make a million temporary objects
     long total = 0;
@@ -190,7 +193,9 @@ class Box {
   public Box(int value) { this.value = value; }
   public int value() { return value; }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Without garbage collection, this loop would steadily eat memory

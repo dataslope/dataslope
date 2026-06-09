@@ -17,7 +17,10 @@ caller that uses the user afterward.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type User = { id: string; name: string; age: number };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type User = { id: string; name: string; age: number };
 
 function birthday(u: User): void {
   u.age = u.age + 1;
@@ -28,7 +31,9 @@ console.log("before:", alice);
 
 birthday(alice);
 console.log("after:", alice);
-`}
+`,
+    },
+  ]}
 />
 
 Reading the function `birthday`, you might assume it returns a new
@@ -43,7 +48,10 @@ The immutable version is unambiguous:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type User = {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type User = {
   readonly id: string;
   readonly name: string;
   readonly age: number;
@@ -58,7 +66,9 @@ const olderAlice = birthday(alice);
 
 console.log("alice:     ", alice); // unchanged
 console.log("olderAlice:", olderAlice); // new value
-`}
+`,
+    },
+  ]}
 />
 
 The change is *explicit*: a new value is returned, the old one is
@@ -72,7 +82,10 @@ liberally.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// readonly on a single field
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// readonly on a single field
 type Point = { readonly x: number; readonly y: number };
 
 // readonly on an array — disables push/pop/splice etc.
@@ -96,7 +109,9 @@ const pair: Pair = [1, 2];
 // config.retries = 5;       // ❌
 
 console.log(p, path, pair, config);
-`}
+`,
+    },
+  ]}
 />
 
 A useful policy: **start everything as `readonly` and remove the
@@ -112,7 +127,10 @@ Once you commit to immutability, you stop *changing* values and start
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type User = {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type User = {
   readonly id: string;
   readonly name: string;
   readonly age: number;
@@ -127,7 +145,9 @@ const renamed: User = { ...alice, name: "Alicia" };
 const older: User = { ...alice, age: alice.age + 1 };
 
 console.log(alice, renamed, older);
-`}
+`,
+    },
+  ]}
 />
 
 `{ ...x, k: v }` is the canonical "update a field" idiom. It builds
@@ -137,7 +157,10 @@ a brand-new object that shares everything with `x` except `k`.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Address = { readonly city: string; readonly country: string };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Address = { readonly city: string; readonly country: string };
 type User = {
   readonly id: string;
   readonly name: string;
@@ -158,7 +181,9 @@ const moved: User = {
 
 console.log("before:", alice);
 console.log("after: ", moved);
-`}
+`,
+    },
+  ]}
 />
 
 This nesting gets tedious for very deep updates. We will see in
@@ -170,7 +195,10 @@ altogether.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Todo = {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Todo = {
   readonly id: number;
   readonly text: string;
   readonly done: boolean;
@@ -198,7 +226,9 @@ const withNew: readonly Todo[] = [
 
 console.log(todos); // unchanged
 console.log(withNew); // new value
-`}
+`,
+    },
+  ]}
 />
 
 Notice: every operation returns a new array. The original `todos`
@@ -253,7 +283,10 @@ Consider an "undo" feature.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type State = { readonly counter: number; readonly note: string };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type State = { readonly counter: number; readonly note: string };
 
 // Pure transformations
 const inc = (s: State): State => ({ ...s, counter: s.counter + 1 });
@@ -286,7 +319,9 @@ console.log("now:           ", history[history.length - 1]);
 undo();
 undo();
 console.log("after 2 undos: ", history[history.length - 1]);
-`}
+`,
+    },
+  ]}
 />
 
 This implementation is ~20 lines and *correct*. In an imperative
@@ -301,7 +336,10 @@ A few sneaky ways mutation gets in even when you're "trying":
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// 1. Methods that mutate AND return a value (lying about purity)
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// 1. Methods that mutate AND return a value (lying about purity)
 const xs = [3, 1, 2];
 const sorted = xs.sort(); // sort() mutates xs AND returns it
 console.log("xs:    ", xs); // [1, 2, 3]  (mutated!)
@@ -312,12 +350,17 @@ const xs2 = [3, 1, 2];
 const sorted2 = [...xs2].sort();
 console.log("xs2:    ", xs2); // unchanged
 console.log("sorted2:", sorted2);
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// 2. Date objects are mutable
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// 2. Date objects are mutable
 const d = new Date(2024, 0, 1);
 const tomorrow = d;
 tomorrow.setDate(tomorrow.getDate() + 1);
@@ -329,7 +372,9 @@ const d2 = new Date(2024, 0, 1);
 const tomorrow2 = new Date(d2.getTime() + 24 * 3600 * 1000);
 console.log("d2:        ", d2.toISOString());
 console.log("tomorrow2: ", tomorrow2.toISOString());
-`}
+`,
+    },
+  ]}
 />
 
 The standard library is full of these traps. As a rule:
@@ -371,7 +416,7 @@ original unchanged: 3
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { add, remove, setQty, totalQty } from "./cart";
+      starterCode: `import { add, remove, setQty, totalQty } from "./cart";
 
 const empty: readonly { id: string; qty: number }[] = [];
 const cart1 = add(add(add(empty, { id: "a", qty: 1 }), { id: "b", qty: 1 }), {
@@ -391,7 +436,7 @@ console.log(\`original unchanged: \${totalQty(cart1)}\`);
     },
     {
       filename: "cart.ts",
-      initialContent: `export type Item = { readonly id: string; readonly qty: number };
+      starterCode: `export type Item = { readonly id: string; readonly qty: number };
 export type Cart = readonly Item[];
 
 export function add(cart: Cart, item: Item): Cart {
@@ -413,7 +458,7 @@ export function totalQty(cart: Cart): number {
   return cart.reduce((s, i) => s + i.qty, 0);
 }
 `,
-      solutionContent: `export type Item = { readonly id: string; readonly qty: number };
+      solutionCode: `export type Item = { readonly id: string; readonly qty: number };
 export type Cart = readonly Item[];
 
 export function add(cart: Cart, item: Item): Cart {

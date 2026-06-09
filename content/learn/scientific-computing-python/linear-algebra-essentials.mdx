@@ -39,7 +39,10 @@ algorithm we mentioned in the stability chapter.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 A = np.array([[4.0, 1.0, 2.0], [1.0, 3.0, 0.0], [2.0, 0.0, 5.0]])
 b = np.array([7.0, 4.0, 9.0])
@@ -47,7 +50,9 @@ b = np.array([7.0, 4.0, 9.0])
 x = np.linalg.solve(A, b)
 print("x =", x)
 print("residual ||A x - b|| =", np.linalg.norm(A @ x - b))
-`}
+`,
+    },
+  ]}
 />
 
 The residual is at machine epsilon — that is the right answer to
@@ -70,7 +75,10 @@ times faster. **Use them.**
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy.linalg import cho_factor, cho_solve, solve
 import time
 
@@ -91,7 +99,9 @@ t3 = time.perf_counter()
 print(f"General solve : {t1 - t0:.3f} s")
 print(f"Cholesky      : {(t3 - t2) + (t2 - t1):.3f} s   (factor + solve)")
 print(f"Same answer?  : {np.allclose(x1, x2)}")
-`}
+`,
+    },
+  ]}
 />
 
 When you know your matrix is SPD, choosing Cholesky over LU buys
@@ -116,7 +126,10 @@ transformation. They tell us:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 A = np.array([[2.0, 1.0], [1.0, 3.0]])
 
@@ -129,7 +142,9 @@ print("Eigenvectors:\\n", vecs)
 for i in range(2):
     print(f"\\nA v_{i} = {A @ vecs[:, i]}")
     print(f"λ v_{i} = {vals[i] * vecs[:, i]}")
-`}
+`,
+    },
+  ]}
 />
 
 A small classic application: principal component analysis (PCA),
@@ -137,7 +152,10 @@ which finds the directions of largest variance in a dataset.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 
 rng = np.random.default_rng(0)
@@ -174,7 +192,9 @@ for k in range(2):
 plt.axis("equal")
 plt.title("Principal directions")
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 Two arrows, two eigenvalues, one of the most-used data-analysis
@@ -188,7 +208,10 @@ the ratio of largest to smallest singular value.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 v = np.array([3.0, 4.0])
 print("||v||_2 =", np.linalg.norm(v))  # 5
@@ -199,7 +222,9 @@ A = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]])
 print("\\n||A||_F =", np.linalg.norm(A, "fro"))  # Frobenius
 print("rank(A) =", np.linalg.matrix_rank(A))  # 2  (rows are linearly dependent)
 print("κ(A)    =", np.linalg.cond(A))  # huge — A is nearly singular
-`}
+`,
+    },
+  ]}
 />
 
 When `cond(A)` is large and your inputs only have a few correct
@@ -215,7 +240,10 @@ linear model to data.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 
 rng = np.random.default_rng(0)
@@ -232,7 +260,9 @@ plt.scatter(x, y, label="data")
 plt.plot(x, m_hat * x + b_hat, "r", label="fit")
 plt.legend()
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 The same call generalizes effortlessly: polynomial fits, multi-
@@ -251,7 +281,10 @@ solvers.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy.sparse import diags
 from scipy.sparse.linalg import spsolve
 
@@ -266,7 +299,9 @@ f = np.exp(-((x - 0.5) ** 2) / 0.01)
 u = spsolve(A, f)
 print("Solved a 1000x1000 system in CSR format.")
 print(f"NNZ in A: {A.nnz}  (vs {n * n} for a dense matrix)")
-`}
+`,
+    },
+  ]}
 />
 
 Sparse solvers let you handle systems with millions of unknowns on
@@ -286,7 +321,10 @@ substitution — and runs in $O(n)$ time, vs $O(n^3)$ for a dense
 
 Return the solution \`x\` as a NumPy array of length $n$. Do not
 build the dense matrix.`}
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 
 def thomas(a, b, c, d):
@@ -305,8 +343,8 @@ n = len(b)
 T = np.diag(a, -1) + np.diag(b, 0) + np.diag(c, 1)
 print("numpy solve:", np.linalg.solve(T, d))
 print("thomas    :", thomas(a.copy(), b.copy(), c.copy(), d.copy()))
-`}
-  solutionCode={`import numpy as np
+`,
+      solutionCode: `import numpy as np
 
 
 def thomas(a, b, c, d):
@@ -324,7 +362,9 @@ def thomas(a, b, c, d):
     for i in range(n - 2, -1, -1):
         x[i] = (dd[i] - cc[i] * x[i + 1]) / bb[i]
     return x
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "tridiag_small",

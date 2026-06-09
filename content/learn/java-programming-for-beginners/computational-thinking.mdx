@@ -109,7 +109,10 @@ mechanically:
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int[] nums = {3, 8, 1, 9, 4, 7, 2};
 
@@ -123,7 +126,9 @@ mechanically:
     System.out.println("biggest = " + biggest);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Notice how directly the English version maps onto the code. **Good

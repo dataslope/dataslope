@@ -44,7 +44,7 @@ abstract. Concrete subclasses must implement `area()`.
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Shape[] shapes = {new Circle(1), new Square(4)};
     for (Shape s : shapes) {
@@ -57,7 +57,7 @@ abstract. Concrete subclasses must implement `area()`.
     },
     {
       filename: "Shape.java",
-      initialContent: `public abstract class Shape {
+      starterCode: `public abstract class Shape {
   // Concrete behavior shared by every shape:
   public String describe() {
     return getClass().getSimpleName() + " with area " + area();
@@ -70,7 +70,7 @@ abstract. Concrete subclasses must implement `area()`.
     },
     {
       filename: "Circle.java",
-      initialContent: `public class Circle extends Shape {
+      starterCode: `public class Circle extends Shape {
   private final double radius;
   public Circle(double radius) { this.radius = radius; }
 
@@ -83,7 +83,7 @@ abstract. Concrete subclasses must implement `area()`.
     },
     {
       filename: "Square.java",
-      initialContent: `public class Square extends Shape {
+      starterCode: `public class Square extends Shape {
   private final double side;
   public Square(double side) { this.side = side; }
 
@@ -135,7 +135,7 @@ sequenceDiagram
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     TaxReturn us = new USTaxReturn(120_000);
     TaxReturn uk = new UKTaxReturn(120_000);
@@ -148,7 +148,7 @@ sequenceDiagram
     },
     {
       filename: "TaxReturn.java",
-      initialContent: `public abstract class TaxReturn {
+      starterCode: `public abstract class TaxReturn {
   protected final double income;
 
   protected TaxReturn(double income) { this.income = income; }
@@ -175,7 +175,7 @@ sequenceDiagram
     },
     {
       filename: "USTaxReturn.java",
-      initialContent: `public class USTaxReturn extends TaxReturn {
+      starterCode: `public class USTaxReturn extends TaxReturn {
   public USTaxReturn(double income) { super(income); }
 
   @Override
@@ -192,7 +192,7 @@ sequenceDiagram
     },
     {
       filename: "UKTaxReturn.java",
-      initialContent: `public class UKTaxReturn extends TaxReturn {
+      starterCode: `public class UKTaxReturn extends TaxReturn {
   public UKTaxReturn(double income) { super(income); }
 
   @Override
@@ -262,7 +262,7 @@ To +1-555-0100: Your code is 1234
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Notification a = new EmailNotification("ada@oop.dev", "Welcome!");
     Notification b = new SmsNotification("+1-555-0100", "Your code is 1234");
@@ -274,11 +274,11 @@ To +1-555-0100: Your code is 1234
     },
     {
       filename: "Notification.java",
-      initialContent: `public abstract class Notification {
+      starterCode: `public abstract class Notification {
   // TODO: recipient field, constructor, final send(), abstract body()
 }
 `,
-      solutionContent: `public abstract class Notification {
+      solutionCode: `public abstract class Notification {
   private final String recipient;
 
   protected Notification(String recipient) { this.recipient = recipient; }
@@ -291,11 +291,11 @@ To +1-555-0100: Your code is 1234
     },
     {
       filename: "EmailNotification.java",
-      initialContent: `public class EmailNotification extends Notification {
+      starterCode: `public class EmailNotification extends Notification {
   // TODO
 }
 `,
-      solutionContent: `public class EmailNotification extends Notification {
+      solutionCode: `public class EmailNotification extends Notification {
   private final String subject;
   public EmailNotification(String recipient, String subject) {
     super(recipient);
@@ -310,11 +310,11 @@ To +1-555-0100: Your code is 1234
     },
     {
       filename: "SmsNotification.java",
-      initialContent: `public class SmsNotification extends Notification {
+      starterCode: `public class SmsNotification extends Notification {
   // TODO
 }
 `,
-      solutionContent: `public class SmsNotification extends Notification {
+      solutionCode: `public class SmsNotification extends Notification {
   private final String text;
   public SmsNotification(String recipient, String text) {
     super(recipient);

@@ -90,7 +90,10 @@ tell them apart. Run it a few times in your head — sometimes the
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(7)
@@ -107,7 +110,9 @@ print(f"p-value from a t-test:        {p:.3f}")
 print()
 print("Even with NO real effect, random samples differ.")
 print("Statistics is how we decide whether a difference is believable.")
-`}
+`,
+    },
+  ]}
 />
 
 By the end of the course, every line of that snippet — `normal`,

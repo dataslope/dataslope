@@ -74,7 +74,10 @@ On October 1, 2012, Microsoft unveiled **TypeScript 0.8** at the BUILD developer
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Plain JavaScript — valid TypeScript with no changes
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Plain JavaScript — valid TypeScript with no changes
 const user = {
   name: "Alice",
   age: 30,
@@ -97,7 +100,9 @@ const typedUser: User = {
 console.log(typedUser.name); // Still works
 // Uncomment the next line to see the type error:
 // console.log(typedUser.emial); // Error: Property 'emial' does not exist on type 'User'
-`}
+`,
+    },
+  ]}
 />
 
 Try uncommenting that last line in the code block above. You'll see the TypeScript compiler catch the typo *before* the code runs. That's the magic: **types as documentation that the compiler enforces.**

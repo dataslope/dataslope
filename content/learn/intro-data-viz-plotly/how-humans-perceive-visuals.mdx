@@ -76,7 +76,10 @@ compare values more easily?
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 df = pd.DataFrame(
@@ -105,7 +108,9 @@ fig2 = px.bar(
     title="Bar chart — same data, clearer comparison",
 )
 fig2.show()
-`}
+`,
+    },
+  ]}
 />
 
 The bar chart almost forces you to *see* that A is biggest, then

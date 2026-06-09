@@ -16,23 +16,33 @@ overlap on a vertical axis:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # Vertical bars: long class names crowd the x-axis.
 ggplot(mpg, aes(x = class)) +
   geom_bar(fill = "steelblue")
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # coord_flip(): same chart, horizontal -> labels get room to breathe.
 ggplot(mpg, aes(x = class)) +
   geom_bar(fill = "steelblue") +
   coord_flip()
-`}
+`,
+    },
+  ]}
 />
 
 Notice you did **not** swap the mapping (`x = class` stayed put). You
@@ -53,12 +63,17 @@ one bar, segmented by drivetrain:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # A single stacked bar. x is a constant; fill segments it by drv.
 ggplot(mpg, aes(x = factor(1), fill = drv)) +
   geom_bar(width = 1)
-`}
+`,
+    },
+  ]}
 />
 
 That tall stacked bar carries all the information a pie chart does:
@@ -67,13 +82,18 @@ circle with `coord_polar(theta = "y")`. **Nothing else changes:**
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # EXACT same plot + one line: bend the y-axis into a circle.
 ggplot(mpg, aes(x = factor(1), fill = drv)) +
   geom_bar(width = 1) +
   coord_polar(theta = "y")
-`}
+`,
+    },
+  ]}
 />
 
 You just made a pie chart — and you did it without a `geom_pie()`
@@ -97,13 +117,18 @@ made famous:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(x = class, fill = class)) +
   geom_bar() +
   coord_polar(theta = "x") +
   theme(legend.position = "none")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Pies are usually a poor choice — and that is the point">

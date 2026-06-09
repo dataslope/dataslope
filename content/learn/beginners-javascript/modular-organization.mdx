@@ -116,7 +116,7 @@ surface, the freer you are to change the internals.
   files={[
     {
       filename: "index.js",
-      initialContent: `const { format } = require("./currency");
+      starterCode: `const { format } = require("./currency");
 
 console.log(format(1234.5, "USD"));
 console.log(format(99, "EUR"));
@@ -130,7 +130,7 @@ console.log("pad exposed?", typeof require("./currency").pad === "function");
     },
     {
       filename: "currency.js",
-      initialContent: `// PRIVATE helper: not exported.
+      starterCode: `// PRIVATE helper: not exported.
 function pad(n) {
   return n.toFixed(2);
 }
@@ -253,7 +253,7 @@ re-exports.
   files={[
     {
       filename: "index.js",
-      initialContent: `// Top-level entry. Imports each feature's public API.
+      starterCode: `// Top-level entry. Imports each feature's public API.
 const { listActiveUsers, addUser } = require("./users");
 const { createOrder, totalRevenue } = require("./orders");
 
@@ -271,7 +271,7 @@ console.log("total revenue:", totalRevenue());
     },
     {
       filename: "users.js",
-      initialContent: `const { getAll, add } = require("./shared/store");
+      starterCode: `const { getAll, add } = require("./shared/store");
 
 const COLLECTION = "users";
 
@@ -288,7 +288,7 @@ module.exports = { addUser, listActiveUsers };
     },
     {
       filename: "orders.js",
-      initialContent: `const { getAll, add } = require("./shared/store");
+      starterCode: `const { getAll, add } = require("./shared/store");
 
 const COLLECTION = "orders";
 
@@ -308,7 +308,7 @@ module.exports = { createOrder, totalRevenue };
     },
     {
       filename: "shared/store.js",
-      initialContent: `// Tiny in-memory key-value collection store.
+      starterCode: `// Tiny in-memory key-value collection store.
 const collections = {};
 
 function add(name, value) {
@@ -391,7 +391,7 @@ The tests will require \`./budget\` and call the exported functions.`}
   files={[
     {
       filename: "index.js",
-      initialContent: `const budget = require("./budget");
+      starterCode: `const budget = require("./budget");
 
 budget.addIncome(1000);
 budget.addExpense(120, "food");
@@ -401,7 +401,7 @@ budget.addExpense(60, "books");
 console.log("balance:", budget.balance());
 console.log("by category:", budget.expensesByCategory());
 `,
-      solutionContent: `const budget = require("./budget");
+      solutionCode: `const budget = require("./budget");
 
 budget.addIncome(1000);
 budget.addExpense(120, "food");
@@ -414,10 +414,10 @@ console.log("by category:", budget.expensesByCategory());
     },
     {
       filename: "budget.js",
-      initialContent: `// Implement the four functions here and export them.
+      starterCode: `// Implement the four functions here and export them.
 // Keep your storage private to this file.
 `,
-      solutionContent: `let income = 0;
+      solutionCode: `let income = 0;
 const expenses = [];
 
 function addIncome(amount) {

@@ -27,7 +27,10 @@ and known noise, then ask `seasonal_decompose` to hand the pieces back.
 
 <CodeBlock
   adapter="python"
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from statsmodels.tsa.seasonal import seasonal_decompose
@@ -39,8 +42,8 @@ t = np.arange(n)
 true_trend    = 50 + 0.8 * t             # a straight climb we put in by hand
 true_seasonal = 12 * np.sin(2*np.pi*t/12)  # a yearly wave, constant size
 true_noise    = rng.normal(0, 3, n)      # random haze
-y = pd.Series(true_trend + true_seasonal + true_noise, index=idx, name="y")`}
-  starterCode={`from statsmodels.tsa.seasonal import seasonal_decompose
+y = pd.Series(true_trend + true_seasonal + true_noise, index=idx, name="y")`,
+      starterCode: `from statsmodels.tsa.seasonal import seasonal_decompose
 import matplotlib.pyplot as plt
 
 # period=12 tells it the seasonal cycle is 12 months long.
@@ -54,7 +57,9 @@ plt.show()
 print("Top to bottom: Observed, Trend, Seasonal, Residual.")
 print("The recovered Trend is our straight climb; the Seasonal panel is our")
 print("yearly wave repeated 8 times; the Residual is just the leftover noise.")
-`}
+`,
+    },
+  ]}
 />
 
 Four panels: the original on top, then the smooth **trend** it extracted,
@@ -91,7 +96,10 @@ swing is tiny in 1949 and huge by 1960. Watch what additive does with that.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -108,8 +116,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`from statsmodels.tsa.seasonal import seasonal_decompose
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `from statsmodels.tsa.seasonal import seasonal_decompose
 import matplotlib.pyplot as plt
 
 # Decompose the airline series BOTH ways and compare the RESIDUALS.
@@ -129,7 +137,9 @@ print(f"Multiplicative residual: std = {res_mul.std():.3f} around 1.0 -> clean n
 print("The ADDITIVE residual (top panel) is NOT clean noise: it has visible")
 print("structure, swelling where the level sits farthest from its average,")
 print("because a fixed-size additive season can't track a swing that grows.")
-`}
+`,
+    },
+  ]}
 />
 
 The additive residual carries **visible leftover structure** — its swings are
@@ -171,7 +181,10 @@ ones until they're the same size — exactly what an additive model wants.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -188,8 +201,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`import numpy as np
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 4))
@@ -201,7 +214,9 @@ plt.show()
 print("On the log scale the early and late seasonal swings are about equal,")
 print("so an ADDITIVE decomposition of log(air) == a MULTIPLICATIVE one of air.")
 print("The log also tames the growing variance -- a preview of stationarity.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Why we'll keep reaching for the log">
@@ -221,7 +236,10 @@ deseasonalizing question.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -238,8 +256,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`from statsmodels.tsa.seasonal import seasonal_decompose
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `from statsmodels.tsa.seasonal import seasonal_decompose
 import matplotlib.pyplot as plt
 
 dec = seasonal_decompose(air, model="multiplicative", period=12)
@@ -257,7 +275,9 @@ plt.show()
 
 print("The adjusted line is smooth: with December's spike and November's dip")
 print("divided out, the steady climb in demand is unmistakable.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="danger" title="The decomposition 'trend' is not a forecast">
@@ -280,29 +300,34 @@ flagged for moving averages, in a new costume.
 - \`max_err\` = the maximum absolute difference between \`recon\` and \`y\`, computed only where \`recon\` is not \`NaN\` (the trend/residual are \`NaN\` at the ends).
 
 For a true additive decomposition, the pieces must add back to the original, so \`max_err\` should be tiny (below \`1e-6\`).`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 rng = np.random.default_rng(1)
 n = 72
 idx = pd.date_range("2015-01-01", periods=n, freq="MS")
 t = np.arange(n)
 y = pd.Series(40 + 0.5*t + 8*np.sin(2*np.pi*t/12) + rng.normal(0, 2, n),
-              index=idx, name="y")`}
-  starterCode={`from statsmodels.tsa.seasonal import seasonal_decompose
+              index=idx, name="y")`,
+      starterCode: `from statsmodels.tsa.seasonal import seasonal_decompose
 
 dec = None
 recon = None
 max_err = None
 print("max reconstruction error:", max_err)
-`}
-  solutionCode={`from statsmodels.tsa.seasonal import seasonal_decompose
+`,
+      solutionCode: `from statsmodels.tsa.seasonal import seasonal_decompose
 
 dec = seasonal_decompose(y, model="additive", period=12)
 recon = dec.trend + dec.seasonal + dec.resid
 mask = recon.notna()
 max_err = float((recon[mask] - y[mask]).abs().max())
 print("max reconstruction error:", max_err)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "has_components",
@@ -340,7 +365,10 @@ Produce:
 - \`is_multiplicative\` — \`True\` if \`swing_level_corr > 0.7\`
 
 A strong positive correlation means the swing scales with the level, so the series is **multiplicative** (which the airline data clearly is).`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -357,19 +385,21 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`yearly_mean = None
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `yearly_mean = None
 yearly_range = None
 swing_level_corr = None
 is_multiplicative = None
 print("corr:", swing_level_corr, " multiplicative:", is_multiplicative)
-`}
-  solutionCode={`yearly_mean = air.resample("YE").mean()
+`,
+      solutionCode: `yearly_mean = air.resample("YE").mean()
 yearly_range = air.resample("YE").agg(lambda x: x.max() - x.min())
 swing_level_corr = float(yearly_mean.corr(yearly_range))
 is_multiplicative = swing_level_corr > 0.7
 print("corr:", round(swing_level_corr, 3), " multiplicative:", is_multiplicative)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "series",

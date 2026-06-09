@@ -16,7 +16,10 @@ what you want, or run out.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int[] xs = {4, 9, 1, 7, 2};
     System.out.println("index of 7  = " + indexOf(xs, 7));
@@ -31,7 +34,9 @@ what you want, or run out.
     return -1;
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Linear search:
@@ -63,7 +68,10 @@ A list of 1 million elements is fully searched in **20** comparisons
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int[] sorted = {2, 5, 8, 11, 17, 23, 31, 42};
     System.out.println("index of 17 = " + binarySearch(sorted, 17));
@@ -84,7 +92,9 @@ A list of 1 million elements is fully searched in **20** comparisons
     return -1;
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 The cost of binary search: the input must be sorted. So sorting is
@@ -99,7 +109,10 @@ smallest remaining element and put it in the next position.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.Arrays;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.Arrays;
 
 public class Main {
   public static void main(String[] args) {
@@ -122,7 +135,9 @@ public class Main {
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Selection sort takes time proportional to the *square* of the list
@@ -178,7 +193,10 @@ Java has classes for both — `Deque` (often used as a stack via
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.ArrayDeque;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -202,7 +220,9 @@ public class Main {
     System.out.println("poll -> " + q.poll()); // b
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Knowing what to reach for
@@ -278,7 +298,7 @@ But this table covers an *astonishing* fraction of day-to-day code.
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     System.out.println(Reverser.reverse("hello!"));
   }
@@ -287,7 +307,7 @@ But this table covers an *astonishing* fraction of day-to-day code.
     },
     {
       filename: "Reverser.java",
-      initialContent: `import java.util.ArrayDeque;
+      starterCode: `import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class Reverser {
@@ -297,7 +317,7 @@ public class Reverser {
   }
 }
 `,
-      solutionContent: `import java.util.ArrayDeque;
+      solutionCode: `import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class Reverser {

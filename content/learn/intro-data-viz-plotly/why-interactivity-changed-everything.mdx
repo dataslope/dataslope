@@ -50,7 +50,10 @@ Try every one of them on this chart:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("continent == 'Asia'")
 
@@ -64,7 +67,9 @@ fig = px.line(
     labels={"lifeExp": "Life expectancy (years)", "year": "Year"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Things to try:

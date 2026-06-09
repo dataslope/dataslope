@@ -11,7 +11,10 @@ A C-style array such as `int a[5]` has a fixed size known at compile time. It is
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 void print_first(int *values) { std::cout << values[0] << "\\n"; }
 
@@ -21,7 +24,9 @@ int main() {
   std::cout << "sizeof array: " << sizeof(scores) << " bytes\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 You almost never want raw arrays for DSA practice because `std::array` and `std::vector` are safer and more expressive.
@@ -32,7 +37,10 @@ You almost never want raw arrays for DSA practice because `std::array` and `std:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <array>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <array>
 #include <iostream>
 
 int main() {
@@ -44,7 +52,9 @@ int main() {
   std::cout << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## `std::vector<T>`: the workhorse
@@ -53,7 +63,10 @@ int main() {
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 int main() {
@@ -70,7 +83,9 @@ int main() {
   std::cout << "checked index 2: " << points.at(2) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Use `operator[]` when you know the index is valid. Use `.at()` when you want bounds checking and an exception on invalid access.
@@ -91,7 +106,10 @@ flowchart LR
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 int main() {
@@ -101,7 +119,9 @@ int main() {
   std::cout << &xs[2] << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The printed addresses should increase by `sizeof(int)` each time in a normal implementation.
@@ -112,7 +132,10 @@ Index-based loops are useful when you need positions. Range-for loops are clean 
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 int main() {
@@ -134,7 +157,9 @@ int main() {
   std::cout << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Resizing, capacity, and amortized push
@@ -143,7 +168,10 @@ int main() {
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 int main() {
@@ -159,7 +187,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 That rare reallocation is why `push_back` is O(1) **amortized**, as discussed in the complexity page.
@@ -170,7 +200,10 @@ Browser timing is noisy, but this shows how to measure a sequence of pushes with
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <chrono>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <chrono>
 #include <iostream>
 #include <vector>
 
@@ -187,7 +220,9 @@ int main() {
             << " ms\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## 2D vectors
@@ -196,7 +231,10 @@ A matrix is often represented as `std::vector<std::vector<int>>`: a vector of ro
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 int main() {
@@ -209,7 +247,9 @@ int main() {
   std::cout << "diagonal sum: " << diagonal << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="success" title="Vector operation costs">
@@ -229,7 +269,10 @@ int main() {
   adapter="cpp"
   title="Reverse a vector in-place"
   instructions={`Implement \`reverseInPlace\` without using \`std::reverse\`. Swap from both ends until the pointers meet.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 void reverseInPlace(std::vector<int> &values) {
@@ -244,8 +287,8 @@ int main() {
   }
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <vector>
 
 void reverseInPlace(std::vector<int> &values) {
@@ -268,7 +311,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "reverse", name: "Reverses the vector", expect: { stdoutLines: ["5", "4", "3", "2", "1"], stdoutLinesExact: true } }]}
 />
 
@@ -278,7 +323,10 @@ int main() {
   adapter="cpp"
   title="Find the second-largest value"
   instructions={`Implement \`secondLargest\` in one pass without sorting. Keep the best value and the runner-up as you scan.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <limits>
 #include <vector>
 
@@ -291,8 +339,8 @@ int main() {
   std::cout << secondLargest(values) << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <limits>
 #include <vector>
 
@@ -315,7 +363,9 @@ int main() {
   std::cout << secondLargest(values) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "second", name: "Finds runner-up", expect: { stdoutEquals: "42" } }]}
 />
 

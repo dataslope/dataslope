@@ -40,7 +40,10 @@ box.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 // PURE: depends only on x and y, returns a value, touches nothing else.
@@ -72,7 +75,9 @@ Greet("Ada");
 var box = new List<int> { 10, 20 };
 AppendOne(box);
 Console.WriteLine(string.Join(",", box));
-`}
+`,
+    },
+  ]}
 />
 
 `Add` and `Doubled` are pure. `NowMs`, `Greet`, and `AppendOne` are
@@ -90,7 +95,10 @@ f(input))`. There's no setup, no mocking, no teardown.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 static int Add(int x, int y) => x + y;
 
@@ -101,7 +109,9 @@ Check("0+0=0", Add(0, 0) == 0);
 Check("2+3=5", Add(2, 3) == 5);
 Check("-1+1=0", Add(-1, 1) == 0);
 Check("commutative", Add(3, 4) == Add(4, 3));
-`}
+`,
+    },
+  ]}
 />
 
 Contrast with testing an impure method that writes to a database:
@@ -121,7 +131,10 @@ remember it. This is called **memoization**.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 static Func<TArg, TRes> Memoize<TArg, TRes>(Func<TArg, TRes> f)
@@ -144,7 +157,9 @@ Console.WriteLine(fast(5)); // 25, callCount=1
 Console.WriteLine(fast(5)); // 25, callCount=1 (cache hit)
 Console.WriteLine(fast(6)); // 36, callCount=2
 Console.WriteLine($"calls: {callCount}");
-`}
+`,
+    },
+  ]}
 />
 
 You can only do this for pure functions. Memoizing an impure
@@ -225,14 +240,14 @@ Do **not** print, mutate the input, or read external state. The
   files={[
     {
       filename: "Program.cs",
-      initialContent: `var xs = new[] { 1, 2, 3, 4, 5 };
+      starterCode: `var xs = new[] { 1, 2, 3, 4, 5 };
 System.Console.WriteLine($"sum={MathCore.SumOfSquares(xs)}");
 System.Console.WriteLine($"mean={MathCore.MeanOfSquares(xs)}");
 `,
     },
     {
       filename: "MathCore.cs",
-      initialContent: `using System.Collections.Generic;
+      starterCode: `using System.Collections.Generic;
 
 public static class MathCore
 {
@@ -249,7 +264,7 @@ public static class MathCore
     }
 }
 `,
-      solutionContent: `using System.Collections.Generic;
+      solutionCode: `using System.Collections.Generic;
 using System.Linq;
 
 public static class MathCore

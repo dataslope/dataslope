@@ -74,7 +74,10 @@ can be incremented and read, but never reset to a nonsense value.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 class Counter
 {
@@ -104,7 +107,9 @@ class Program
         Console.WriteLine($"count = {c.Value()}");
     }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Look closely:
@@ -143,7 +148,10 @@ The object-oriented way:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 class BankAccount
 {
@@ -181,7 +189,9 @@ class Program
         Console.WriteLine($"final balance: {a.Balance()}");
     }
 }
-`}
+`,
+    },
+  ]}
 />
 
 The rule "balance is never negative" is now **enforced by the

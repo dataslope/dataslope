@@ -86,7 +86,7 @@ If we let the **questions** drive the **shape**, we get:
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.*;
+      starterCode: `import java.util.*;
 
 public class Main {
   public static void main(String[] args) {
@@ -117,7 +117,7 @@ public class Main {
     },
     {
       filename: "Track.java",
-      initialContent: `import java.util.List;
+      starterCode: `import java.util.List;
 
 public record Track(String title, String artist, String album,
                     List<String> genres, int likes) {}
@@ -125,7 +125,7 @@ public record Track(String title, String artist, String album,
     },
     {
       filename: "Library.java",
-      initialContent: `import java.util.*;
+      starterCode: `import java.util.*;
 
 public class Library {
   // shape: ordered list of tracks
@@ -209,7 +209,10 @@ constructor.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.HashMap;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.HashMap;
 import java.util.Map;
 
 public class Main {
@@ -227,7 +230,9 @@ public class Main {
     System.out.println(orders.get(new OrderId("o-1")));
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 This is *type-driven data modeling* — letting the type system carry
@@ -251,7 +256,7 @@ carol: [Order[id=4, customerId=carol, total=200]]
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.*;
+      starterCode: `import java.util.*;
 
 public class Main {
   public static void main(String[] args) {
@@ -266,12 +271,12 @@ public class Main {
     },
     {
       filename: "Order.java",
-      initialContent: `public record Order(int id, String customerId, int total) {}
+      starterCode: `public record Order(int id, String customerId, int total) {}
 `,
     },
     {
       filename: "OrderIndex.java",
-      initialContent: `import java.util.*;
+      starterCode: `import java.util.*;
 
 public final class OrderIndex {
   private OrderIndex() {}
@@ -282,7 +287,7 @@ public final class OrderIndex {
   }
 }
 `,
-      solutionContent: `import java.util.*;
+      solutionCode: `import java.util.*;
 
 public final class OrderIndex {
   private OrderIndex() {}

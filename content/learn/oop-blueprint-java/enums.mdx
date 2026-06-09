@@ -24,7 +24,10 @@ in Java to use.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     respond("red"); // What if you typo "Red"?
     respond("amber");
@@ -42,7 +45,9 @@ in Java to use.
       System.out.println("???");
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 The `String` version compiles fine even for nonsense values. The
@@ -50,7 +55,10 @@ compiler cannot help you. Let's see the same idea with an enum.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     respond(Light.RED);
     respond(Light.AMBER);
@@ -74,7 +82,9 @@ compiler cannot help you. Let's see the same idea with an enum.
 }
 
 enum Light { RED, AMBER, GREEN }
-`}
+`,
+    },
+  ]}
 />
 
 Three concrete benefits in that small change:
@@ -110,7 +120,10 @@ classDiagram
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     for (Planet p : Planet.values()) {
       System.out.printf("%-8s g = %.2f m/s^2%n", p, p.surfaceGravity());
@@ -136,7 +149,9 @@ enum Planet {
 
   public double surfaceGravity() { return G * massKg / (radiusM * radiusM); }
 }
-`}
+`,
+    },
+  ]}
 />
 
 A few things to notice:
@@ -157,7 +172,10 @@ interface implemented by a fixed list of objects."
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     for (Operation op : Operation.values()) {
       System.out.println("10 " + op.symbol() + " 3 = " + op.apply(10, 3));
@@ -185,7 +203,9 @@ enum Operation {
   public String symbol() { return symbol; }
   public abstract int apply(int a, int b); // each constant must implement
 }
-`}
+`,
+    },
+  ]}
 />
 
 Each enum constant is implementing the `abstract apply` method in
@@ -222,7 +242,7 @@ an enum:
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     double subtotal = 200.00;
     for (PaymentMethod m : PaymentMethod.values()) {
@@ -235,7 +255,7 @@ an enum:
     },
     {
       filename: "PaymentMethod.java",
-      initialContent: `public enum PaymentMethod {
+      starterCode: `public enum PaymentMethod {
   CASH("Cash", 0.00),
   DEBIT_CARD("Debit card", 0.01),
   CREDIT_CARD("Credit card", 0.025),
@@ -282,7 +302,7 @@ SUNDAY weekend? true
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     for (Day d : Day.values()) {
       System.out.println(d + " weekend? " + d.isWeekend());
@@ -293,11 +313,11 @@ SUNDAY weekend? true
     },
     {
       filename: "Day.java",
-      initialContent: `public enum Day {
+      starterCode: `public enum Day {
   // TODO: list the seven days, then define isWeekend()
 }
 `,
-      solutionContent: `public enum Day {
+      solutionCode: `public enum Day {
   MONDAY,
   TUESDAY,
   WEDNESDAY,

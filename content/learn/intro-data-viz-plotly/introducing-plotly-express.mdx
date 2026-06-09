@@ -62,7 +62,10 @@ Try it:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 df = pd.DataFrame(
@@ -80,7 +83,9 @@ fig = px.bar(
     template="simple_white",
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Notice the *separation of concerns*:
@@ -142,7 +147,10 @@ The `fig` variable returned by every Plotly Express call is a
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.iris()
 
@@ -152,7 +160,9 @@ print("Type:", type(fig).__name__)
 print("Data traces:", len(fig.data))
 print("X-axis title:", fig.layout.xaxis.title.text)
 print("Y-axis title:", fig.layout.yaxis.title.text)
-`}
+`,
+    },
+  ]}
 />
 
 Most of the time you won't print the figure; you'll just call

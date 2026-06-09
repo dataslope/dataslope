@@ -31,12 +31,17 @@ When you want *every* point blue, you **set** color outside `aes()`:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # SET: every point the same constant color. No legend.
 ggplot(mpg, aes(displ, hwy)) +
   geom_point(color = "blue", size = 3)
-`}
+`,
+    },
+  ]}
 />
 
 `color = "blue"` lives in `geom_point()`, *outside* `aes()`. Result:
@@ -50,12 +55,17 @@ When you want color to *encode a variable*, you **map** it inside
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # MAP: drv controls color. ggplot2 picks colors and adds a legend.
 ggplot(mpg, aes(displ, hwy, color = drv)) +
   geom_point(size = 3)
-`}
+`,
+    },
+  ]}
 />
 
 Here color varies with `drv`, ggplot2 chooses the palette via a scale,
@@ -69,12 +79,17 @@ Now the trap. What happens if you put a *constant* color **inside**
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # BUG: "blue" inside aes() is treated as DATA, not a color.
 ggplot(mpg, aes(displ, hwy, color = "blue")) +
   geom_point(size = 3)
-`}
+`,
+    },
+  ]}
 />
 
 Run it. The points are **red (or salmon), not blue** — and there is a
@@ -102,7 +117,10 @@ The fix for the bug is simply to move the constant *out* of `aes()`:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # Wrong (mapping a constant): reddish points + bogus legend.
 p_bug <- ggplot(mpg, aes(displ, hwy, color = "blue")) +
@@ -114,7 +132,9 @@ p_fixed <- ggplot(mpg, aes(displ, hwy)) +
 
 print(p_bug)
 print(p_fixed)
-`}
+`,
+    },
+  ]}
 />
 
 ## Does this apply to all aesthetics? Yes.
@@ -126,12 +146,17 @@ The same rule governs `size`, `shape`, `alpha`, `fill` — everything:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # size MAPPED to a column (varies + legend) vs size SET to a constant.
 ggplot(mpg, aes(displ, hwy, size = cty)) + # mapping
   geom_point(alpha = 0.5) # alpha set as a constant
-`}
+`,
+    },
+  ]}
 />
 
 <MultipleChoice

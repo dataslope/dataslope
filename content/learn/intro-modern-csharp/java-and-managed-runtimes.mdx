@@ -154,7 +154,10 @@ cleanup. The runtime will reclaim memory whenever it likes.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 void MakeAndForget()
@@ -171,7 +174,9 @@ MakeAndForget();
 MakeAndForget();
 MakeAndForget();
 Console.WriteLine("done");
-`}
+`,
+    },
+  ]}
 />
 
 In an unmanaged language, forgetting to `free` `big` three times

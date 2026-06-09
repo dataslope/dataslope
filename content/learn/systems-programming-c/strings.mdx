@@ -21,7 +21,10 @@ The character `'\0'` is the byte `0`, *not* the digit `'0'` (which is
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   char s[6] = {'H', 'e', 'l', 'l', 'o', '\\0'};
@@ -33,7 +36,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 `printf("%s", s)` walks `s` starting at the address you pass, printing
@@ -61,7 +66,10 @@ when you need to modify the contents.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   char mutable_copy[] = "hi"; // copy of "hi" plus '\\0'
@@ -74,7 +82,9 @@ int main(void) {
   printf("%s\\n", literal);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## The `<string.h>` toolkit
@@ -98,7 +108,10 @@ how big `dst` is. You are responsible for that.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <string.h>
 
 int main(void) {
@@ -118,7 +131,9 @@ int main(void) {
 
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## The `strncpy` footgun
@@ -136,7 +151,10 @@ That second case is the bug factory. Many codebases now use
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <string.h>
 
 int main(void) {
@@ -154,7 +172,9 @@ int main(void) {
   printf("safe = %s (len %zu)\\n", safe, strlen(safe));
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Counting your own `strlen`
@@ -164,7 +184,10 @@ null-termination.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stddef.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stddef.h>
 #include <stdio.h>
 
 size_t my_strlen(const char *s) {
@@ -180,14 +203,19 @@ int main(void) {
   printf("%zu\\n", my_strlen(""));
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The idiomatic version uses a moving pointer:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stddef.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stddef.h>
 #include <stdio.h>
 
 size_t my_strlen(const char *s) {
@@ -201,7 +229,9 @@ int main(void) {
   printf("%zu\\n", my_strlen("Hello, systems!"));
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Buffer sizes are the API
@@ -213,7 +243,10 @@ buffer size.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <ctype.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <ctype.h>
 #include <stddef.h>
 #include <stdio.h>
 
@@ -237,7 +270,9 @@ int main(void) {
   printf("(%zu) %s\\n", n, out);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Note the `(unsigned char)` cast before passing to `toupper`. The
@@ -250,7 +285,10 @@ plain `char` is signed on some platforms.
   adapter="c"
   title="Implement your own strcmp"
   instructions={`Implement \`int my_strcmp(const char *a, const char *b)\` that returns a negative value if \`a < b\`, zero if equal, and positive if \`a > b\` — using byte-wise comparison. The provided \`main\` prints \`<\`, \`=\`, or \`>\` for a few pairs.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int my_strcmp(const char *a, const char *b) {
   // your code here
@@ -271,8 +309,8 @@ int main(void) {
   printf("%s\\n", sign(my_strcmp("zebra", "apple")));
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 int my_strcmp(const char *a, const char *b) {
   while (*a && *a == *b) {
@@ -296,7 +334,9 @@ int main(void) {
   printf("%s\\n", sign(my_strcmp("zebra", "apple")));
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "strcmp_signs",
@@ -312,7 +352,10 @@ int main(void) {
   adapter="c"
   title="Reverse a C string in place"
   instructions={`Implement \`void reverse_str(char *s)\` so that the string \`s\` is reversed without using any helper buffer. The provided \`main\` calls it on \`"systems"\` and prints the result on one line.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <string.h>
 
 void reverse_str(char *s) {
@@ -325,8 +368,8 @@ int main(void) {
   printf("%s\\n", s);
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 #include <string.h>
 
 void reverse_str(char *s) {
@@ -351,7 +394,9 @@ int main(void) {
   printf("%s\\n", s);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "reversed",

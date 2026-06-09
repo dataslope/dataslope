@@ -89,7 +89,10 @@ but is that a genuine breach of the promise, or just a slow afternoon?
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(7)
@@ -111,7 +114,9 @@ if p_value <= alpha:
     print("REJECT H0: the average response time differs from 200 ms.")
 else:
     print("FAIL TO REJECT H0: consistent with a 200 ms average.")
-`}
+`,
+    },
+  ]}
 />
 
 **How to read it.** A positive `t_stat` means the sample mean sits *above*
@@ -125,7 +130,10 @@ that, pair the test with a **confidence interval** for the mean.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(7)
@@ -141,7 +149,9 @@ print()
 print("If 200 is OUTSIDE this interval, the data is hard to square")
 print("with a 200 ms average. The interval also tells you the plausible")
 print("RANGE of the true mean — far more useful than a yes/no verdict.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="Always report the interval, not just the p-value">
@@ -186,7 +196,10 @@ test. It's the safer choice and what most statisticians now recommend.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(0)
@@ -210,7 +223,9 @@ print(f"Student : t = {student.statistic:+.3f}, p = {student.pvalue:.4f}")
 print()
 decision = "REJECT H0" if welch.pvalue <= alpha else "FAIL TO REJECT H0"
 print(f"Using Welch: {decision}")
-`}
+`,
+    },
+  ]}
 />
 
 Notice the two p-values differ. When the spreads and group sizes are
@@ -228,7 +243,10 @@ effect size to learn *how much*.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(0)
@@ -250,7 +268,9 @@ print(f"95% CI for the difference       : ({ci.low:+.2f}, {ci.high:+.2f})")
 print(f"Cohen's d (standardized effect) : {cohens_d:+.2f}")
 print()
 print("The p-value says whether the gap is real; the CI and d say how big.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Effect size, briefly">
@@ -305,7 +325,10 @@ that to ourselves.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(42)
@@ -333,7 +356,9 @@ decision = "REJECT H0" if paired.pvalue <= alpha else "FAIL TO REJECT H0"
 print(
     decision, "- the program changed blood pressure." if paired.pvalue <= alpha else ""
 )
-`}
+`,
+    },
+  ]}
 />
 
 Now watch the power gain. Same numbers, but analyzed the *wrong* way — as
@@ -341,7 +366,10 @@ two independent groups — the person-to-person spread swamps the signal.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(42)
@@ -358,7 +386,9 @@ print()
 print("Same data, same real effect. The unpaired test buries the signal")
 print("under person-to-person variation and may MISS the effect entirely.")
 print("When the data is paired, IGNORING the pairing throws away power.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="danger" title="Misconception: pairing vs independence is interchangeable">
@@ -393,7 +423,10 @@ enough.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(3)
@@ -411,7 +444,9 @@ print()
 print("The data is wildly non-normal, yet the test on the MEAN is fine.")
 print("It's the sampling distribution of the mean that must be ~normal,")
 print("and the CLT delivers that for large n.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="When normality DOES bite">
@@ -471,22 +506,27 @@ When the same units are measured twice, pair the test to harness each unit as it
 - Set a boolean **\`reject\`** to whether the result is significant at \`alpha = 0.05\` (reject when \`p_value <= alpha\`).
 
 Pick the right \`scipy.stats\` function and the right keyword argument — you should not compute anything by hand.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(101)
 control   = rng.normal(140, 35, size=200)   # seconds on page
 treatment = rng.normal(150, 55, size=190)   # different spread on purpose
-alpha = 0.05`}
-  starterCode={`# TODO: run Welch's two-sample t-test; set p_value (float) and reject (bool)
+alpha = 0.05`,
+      starterCode: `# TODO: run Welch's two-sample t-test; set p_value (float) and reject (bool)
 p_value = None
 reject = None
-`}
-  solutionCode={`res = stats.ttest_ind(control, treatment, equal_var=False)
+`,
+      solutionCode: `res = stats.ttest_ind(control, treatment, equal_var=False)
 p_value = float(res.pvalue)
 reject = bool(p_value <= alpha)
 print(f"p = {p_value:.4f}, reject = {reject}")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type",
@@ -536,24 +576,29 @@ assert reject == bool(p_value <= alpha)`,
 - Set a string **\`verdict\`** to **\`"faster"\`** if the test is significant at \`alpha = 0.05\` **and** \`mean_improvement > 0\`; otherwise **\`"no clear change"\`**.
 
 Use the paired \`scipy.stats\` function — do not treat the two columns as independent groups.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(202)
 before = rng.normal(2.4, 0.6, size=30)            # seconds, per page
 after = before - rng.normal(0.25, 0.3, size=30)   # caching shaves time off
-alpha = 0.05`}
-  starterCode={`# TODO: paired t-test; set p_value (float), mean_improvement (float), verdict (str)
+alpha = 0.05`,
+      starterCode: `# TODO: paired t-test; set p_value (float), mean_improvement (float), verdict (str)
 p_value = None
 mean_improvement = None
 verdict = None
-`}
-  solutionCode={`res = stats.ttest_rel(before, after)
+`,
+      solutionCode: `res = stats.ttest_rel(before, after)
 p_value = float(res.pvalue)
 mean_improvement = float((before - after).mean())
 verdict = "faster" if (p_value <= alpha and mean_improvement > 0) else "no clear change"
 print(p_value, mean_improvement, verdict)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "types",

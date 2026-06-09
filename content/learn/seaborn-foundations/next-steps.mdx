@@ -57,14 +57,19 @@ roles, then **add** layers onto it with a small, consistent grammar:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn.objects as so
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn.objects as so
 import seaborn as sns
 
 tips = sns.load_dataset("tips")
 
 # Describe the data and roles, then ADD a layer of marks.
 so.Plot(tips, x="total_bill", y="tip").add(so.Dots())
-`}
+`,
+    },
+  ]}
 />
 
 The idea is that `so.Plot(...)` sets up *what* you are plotting and
@@ -155,7 +160,10 @@ Assign your plot to a variable named \`g\`. (For a figure-level function like
 \`relplot\`/\`displot\`/\`catplot\`, that is the returned grid; for an axes-level
 function like \`scatterplot\`/\`histplot\`/\`boxplot\`, that is the returned
 Axes.)`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 
@@ -164,14 +172,16 @@ df = sns.load_dataset("tips")
 
 # Draw any chart you like and assign it to g:
 g = None
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 df = sns.load_dataset("tips")
 
 g = sns.relplot(data=df, x="total_bill", y="tip", hue="time", height=4)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "made_a_plot",

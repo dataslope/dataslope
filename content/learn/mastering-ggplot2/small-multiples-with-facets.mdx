@@ -16,27 +16,37 @@ mapping struggle:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # Seven classes overlaid by color: busy and hard to compare.
 ggplot(mpg, aes(displ, hwy, color = class)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE)
-`}
+`,
+    },
+  ]}
 />
 
 Now give each class its **own panel** instead:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # One panel per class -> compare like with like, at a glance.
 ggplot(mpg, aes(displ, hwy)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE) +
   facet_wrap(~class)
-`}
+`,
+    },
+  ]}
 />
 
 One busy panel with 7 overlapping groups becomes, via
@@ -65,12 +75,17 @@ like text. Control the shape with `nrow` or `ncol`:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy)) +
   geom_point() +
   facet_wrap(~class, nrow = 2)
-`}
+`,
+    },
+  ]}
 />
 
 ## facet_grid: a 2-D matrix of two variables
@@ -81,13 +96,18 @@ This is ideal for crossing two categorical variables:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # Rows = drivetrain, columns = number of cylinders.
 ggplot(mpg, aes(displ, hwy)) +
   geom_point() +
   facet_grid(drv ~ cyl)
-`}
+`,
+    },
+  ]}
 />
 
 Read it like a table: moving **down** changes drivetrain, moving
@@ -108,12 +128,17 @@ each panel scale independently:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy)) +
   geom_point() +
   facet_wrap(~drv, scales = "free_y")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Free scales break comparability">

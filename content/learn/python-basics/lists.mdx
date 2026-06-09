@@ -13,37 +13,57 @@ The simplest list is written with square brackets, separating items with commas.
 
 <CodeBlock
   adapter="python"
-  starterCode={`empty = []
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `empty = []
 print(empty)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`nums = [1, 2, 3]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `nums = [1, 2, 3]
 print(nums)
-`}
+`,
+    },
+  ]}
 />
 
 Lists are **heterogeneous**: they can mix types freely.
 
 <CodeBlock
   adapter="python"
-  starterCode={`mixed = [1, "two", 3.0, [4, 5]]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `mixed = [1, "two", 3.0, [4, 5]]
 print(mixed)
-`}
+`,
+    },
+  ]}
 />
 
 The `list()` constructor converts any iterable into a list.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from_range = list(range(5))
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from_range = list(range(5))
 print(from_range)
 
 from_str = list("hello")
 print(from_str)
-`}
+`,
+    },
+  ]}
 />
 
 ## How lists work under the hood
@@ -68,29 +88,44 @@ Lists support zero-based indexing. Negative indices count from the end.
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [10, 20, 30, 40, 50]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [10, 20, 30, 40, 50]
 print(xs[0])
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [10, 20, 30, 40, 50]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [10, 20, 30, 40, 50]
 print(xs[-1])
 print(xs[-2])
-`}
+`,
+    },
+  ]}
 />
 
 Out-of-range access raises an `IndexError`.
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [10, 20, 30]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [10, 20, 30]
 try:
     print(xs[10])
 except IndexError as e:
     print("IndexError:", e)
-`}
+`,
+    },
+  ]}
 />
 
 ## Slicing
@@ -99,27 +134,42 @@ Slices let you extract a sublist with `[start:stop:step]`. The `stop` index is *
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [10, 20, 30, 40, 50]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [10, 20, 30, 40, 50]
 print(xs[1:4])
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [10, 20, 30, 40, 50]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [10, 20, 30, 40, 50]
 print(xs[:3])
 print(xs[2:])
-`}
+`,
+    },
+  ]}
 />
 
 The `step` parameter lets you skip items or reverse.
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [10, 20, 30, 40, 50]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [10, 20, 30, 40, 50]
 print(xs[::2])
 print(xs[::-1])
-`}
+`,
+    },
+  ]}
 />
 
 ## Mutation via assignment
@@ -128,20 +178,30 @@ Unlike strings (which are immutable), you can assign directly through an index o
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [10, 20, 30, 40, 50]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [10, 20, 30, 40, 50]
 xs[0] = 99
 print(xs)
-`}
+`,
+    },
+  ]}
 />
 
 Slice assignment can change the list's length.
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [10, 20, 30, 40, 50]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [10, 20, 30, 40, 50]
 xs[1:3] = ["a", "b", "c"]
 print(xs)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Slice assignment replaces, not item-by-item">
@@ -154,26 +214,41 @@ The three main ways to grow a list:
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [1, 2, 3]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [1, 2, 3]
 xs.append(4)
 print(xs)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [1, 2, 3]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [1, 2, 3]
 xs.extend([4, 5, 6])
 print(xs)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [1, 2, 3]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [1, 2, 3]
 xs.insert(0, "start")
 print(xs)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info">
@@ -184,54 +259,84 @@ print(xs)
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [3, 1, 4, 1, 5]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [3, 1, 4, 1, 5]
 xs.remove(1)
 print(xs)
-`}
+`,
+    },
+  ]}
 />
 
 `remove` deletes the **first** occurrence and raises `ValueError` if the item is missing.
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [3, 1, 4, 1, 5]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [3, 1, 4, 1, 5]
 last = xs.pop()
 print("popped:", last)
 print("remaining:", xs)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [3, 1, 4, 1, 5]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [3, 1, 4, 1, 5]
 second = xs.pop(1)
 print("popped xs[1]:", second)
 print("remaining:", xs)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [3, 1, 4, 1, 5]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [3, 1, 4, 1, 5]
 xs.clear()
 print(xs)
-`}
+`,
+    },
+  ]}
 />
 
 ## Common methods: searching and counting
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [3, 1, 4, 1, 5, 9, 2, 6]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [3, 1, 4, 1, 5, 9, 2, 6]
 print(xs.index(4))
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [3, 1, 4, 1, 5, 9, 2, 6]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [3, 1, 4, 1, 5, 9, 2, 6]
 print(xs.count(1))
-`}
+`,
+    },
+  ]}
 />
 
 ## Sorting and reversing
@@ -240,39 +345,59 @@ print(xs.count(1))
 
 <CodeBlock
   adapter="python"
-  starterCode={`nums = [3, 1, 4, 1, 5, 9, 2, 6]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `nums = [3, 1, 4, 1, 5, 9, 2, 6]
 nums.sort()
 print(nums)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`nums = [3, 1, 4, 1, 5, 9, 2, 6]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `nums = [3, 1, 4, 1, 5, 9, 2, 6]
 nums.reverse()
 print(nums)
-`}
+`,
+    },
+  ]}
 />
 
 For case-insensitive string sorting, pass a `key` function.
 
 <CodeBlock
   adapter="python"
-  starterCode={`words = ["banana", "Apple", "cherry"]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `words = ["banana", "Apple", "cherry"]
 words.sort(key=str.lower)
 print(words)
-`}
+`,
+    },
+  ]}
 />
 
 If you want a **new** sorted list without modifying the original, use the built-in `sorted()`.
 
 <CodeBlock
   adapter="python"
-  starterCode={`original = [3, 1, 2]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `original = [3, 1, 2]
 new = sorted(original)
 print("original:", original)
 print("sorted:", new)
-`}
+`,
+    },
+  ]}
 />
 
 ## Iteration
@@ -281,41 +406,61 @@ The `for` loop is the canonical way to visit each item.
 
 <CodeBlock
   adapter="python"
-  starterCode={`fruits = ["apple", "banana", "cherry"]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `fruits = ["apple", "banana", "cherry"]
 for fruit in fruits:
     print(fruit)
-`}
+`,
+    },
+  ]}
 />
 
 When you also need the index, use `enumerate`.
 
 <CodeBlock
   adapter="python"
-  starterCode={`fruits = ["apple", "banana", "cherry"]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `fruits = ["apple", "banana", "cherry"]
 for i, fruit in enumerate(fruits, start=1):
     print(i, fruit)
-`}
+`,
+    },
+  ]}
 />
 
 To iterate two lists in parallel, use `zip`.
 
 <CodeBlock
   adapter="python"
-  starterCode={`fruits = ["apple", "banana", "cherry"]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `fruits = ["apple", "banana", "cherry"]
 prices = [1.0, 0.5, 2.0]
 for fruit, price in zip(fruits, prices):
     print(f"{fruit}: \${price:.2f}")
-`}
+`,
+    },
+  ]}
 />
 
 ## Membership and aggregates
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [3, 1, 4, 1, 5, 9, 2, 6]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [3, 1, 4, 1, 5, 9, 2, 6]
 print(3 in xs)
 print(99 in xs)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Membership testing is O(n)">
@@ -324,12 +469,17 @@ print(99 in xs)
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [3, 1, 4, 1, 5, 9, 2, 6]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [3, 1, 4, 1, 5, 9, 2, 6]
 print("length:", len(xs))
 print("sum:   ", sum(xs))
 print("min:   ", min(xs))
 print("max:   ", max(xs))
-`}
+`,
+    },
+  ]}
 />
 
 ## Copying lists: shallow vs deep
@@ -338,50 +488,70 @@ Assignment does **not** copy. Both names point to the same list.
 
 <CodeBlock
   adapter="python"
-  starterCode={`a = [1, 2, 3]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `a = [1, 2, 3]
 b = a
 b.append(4)
 print("a:", a)
 print("b:", b)
-`}
+`,
+    },
+  ]}
 />
 
 Use `.copy()` or slicing `[:]` for a **shallow copy**.
 
 <CodeBlock
   adapter="python"
-  starterCode={`a = [1, 2, 3]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `a = [1, 2, 3]
 b = a.copy()
 b.append(4)
 print("a:", a)
 print("b:", b)
-`}
+`,
+    },
+  ]}
 />
 
 Shallow means nested structures are still shared.
 
 <CodeBlock
   adapter="python"
-  starterCode={`a = [1, [2, 3]]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `a = [1, [2, 3]]
 b = a.copy()
 b[1].append(4)
 print("a:", a)
 print("b:", b)
-`}
+`,
+    },
+  ]}
 />
 
 For true independence, use `copy.deepcopy`.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import copy
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import copy
 
 a = [1, [2, 3]]
 b = copy.deepcopy(a)
 b[1].append(4)
 print("a:", a)
 print("b:", b)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Modifying while iterating">
@@ -394,27 +564,37 @@ Lists make excellent **stacks** because `append` and `pop` at the end are both O
 
 <CodeBlock
   adapter="python"
-  starterCode={`stack = []
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `stack = []
 stack.append("a")
 stack.append("b")
 stack.append("c")
 print(stack.pop())
 print(stack.pop())
 print(stack)
-`}
+`,
+    },
+  ]}
 />
 
 For **queues** (FIFO), prefer `collections.deque`, which supports O(1) operations at both ends. Using a list as a queue means O(n) `pop(0)` every time you dequeue.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from collections import deque
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from collections import deque
 
 q = deque(["a", "b", "c"])
 q.append("d")
 print(q.popleft())
 print(q)
-`}
+`,
+    },
+  ]}
 />
 
 ## Challenges
@@ -425,14 +605,19 @@ print(q)
   instructions={`Define a function \`rotate(items, n)\` that returns a new list with the items rotated left by \`n\` positions. For example, \`rotate([1, 2, 3, 4, 5], 2)\` returns \`[3, 4, 5, 1, 2]\`.
 
 Hint: slicing makes this one-liner.`}
-  starterCode={`def rotate(items, n):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def rotate(items, n):
     # your code here
     return []
-`}
-  solutionCode={`def rotate(items, n):
+`,
+      solutionCode: `def rotate(items, n):
     n = n % len(items) if items else 0
     return items[n:] + items[:n]
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",
@@ -463,11 +648,14 @@ Hint: slicing makes this one-liner.`}
   instructions={`Define \`dedupe(items)\` that returns a list of the items in \`items\` with duplicates removed, keeping the **first** occurrence of each. For example, \`dedupe([3, 1, 3, 2, 1, 4])\` returns \`[3, 1, 2, 4]\`.
 
 Hint: a \`set\` of "already seen" items is a great fit.`}
-  starterCode={`def dedupe(items):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def dedupe(items):
     # your code here
     return []
-`}
-  solutionCode={`def dedupe(items):
+`,
+      solutionCode: `def dedupe(items):
     seen = set()
     out = []
     for x in items:
@@ -475,7 +663,9 @@ Hint: a \`set\` of "already seen" items is a great fit.`}
             seen.add(x)
             out.append(x)
     return out
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",
@@ -506,16 +696,21 @@ Hint: a \`set\` of "already seen" items is a great fit.`}
   instructions={`Define a function \`flatten(nested)\` that takes a list of lists and returns a single flat list. For example, \`flatten([[1, 2], [3], [4, 5]])\` returns \`[1, 2, 3, 4, 5]\`.
 
 You may assume the list is only one level deep.`}
-  starterCode={`def flatten(nested):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def flatten(nested):
     # your code here
     return []
-`}
-  solutionCode={`def flatten(nested):
+`,
+      solutionCode: `def flatten(nested):
     out = []
     for sublist in nested:
         out.extend(sublist)
     return out
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",

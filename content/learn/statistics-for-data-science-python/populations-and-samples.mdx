@@ -121,7 +121,10 @@ draw samples and watch the statistics estimate the (now visible) truth.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.default_rng(42)
 
@@ -143,7 +146,9 @@ print(f"Parameter  sigma = {SIGMA_TRUE:.2f}")
 print(f"Statistic  s     = {s:.2f}")
 print()
 print("Your statistic lands NEAR the parameter, but not exactly on it.")
-`}
+`,
+    },
+  ]}
 />
 
 The estimate misses by a little — that miss is *estimation error*, and
@@ -169,7 +174,10 @@ different sample.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.express as px
 
 rng = np.random.default_rng(7)
@@ -193,7 +201,9 @@ fig.show()
 print(f"The sample means scatter around the true mu = {MU_TRUE}.")
 print(f"Average of the 1000 sample means: {sample_means.mean():.2f}")
 print(f"Spread of the sample means (std): {sample_means.std():.2f}")
-`}
+`,
+    },
+  ]}
 />
 
 Two things to notice, because they preview the next several pages.
@@ -228,7 +238,10 @@ homes in on the parameter. Watch the sample mean converge.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.express as px
 
 rng = np.random.default_rng(1)
@@ -254,7 +267,9 @@ fig.show()
 
 for n, e in zip(sizes, errors):
     print(f"n = {n:5d}   |x-bar - mu| = {e:.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 The error trends toward zero as `n` grows (it's jagged because each
@@ -302,21 +317,24 @@ A single \`sample\` of size 120 has been drawn. From **the sample only**, produc
 - \`"mean_error"\` — the signed estimation error \`x_bar - MU_TRUE\` (a float)
 
 Use \`sample.mean()\` and \`sample.std(ddof=1)\`. All three values must be plain Python floats.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 rng = np.random.default_rng(2025)
 
 MU_TRUE = 480.0      # true population mean (parameter)
 SIGMA_TRUE = 60.0    # true population sd  (parameter)
 
-sample = rng.normal(MU_TRUE, SIGMA_TRUE, size=120)`}
-  starterCode={`# TODO: build the 'estimates' dict from the sample only
+sample = rng.normal(MU_TRUE, SIGMA_TRUE, size=120)`,
+      starterCode: `# TODO: build the 'estimates' dict from the sample only
 estimates = {
     "x_bar": None,
     "s": None,
     "mean_error": None,
 }
-`}
-  solutionCode={`x_bar = float(sample.mean())
+`,
+      solutionCode: `x_bar = float(sample.mean())
 s = float(sample.std(ddof=1))
 estimates = {
     "x_bar": x_bar,
@@ -324,7 +342,9 @@ estimates = {
     "mean_error": float(x_bar - MU_TRUE),
 }
 print(estimates)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "keys",
@@ -372,21 +392,26 @@ A \`sample\` of 400 users (an array of 0s and 1s) has been drawn. Produce:
 - \`abs_error\` — the absolute error \`abs(p_hat - P_TRUE)\` (a float).
 
 For a 0/1 array, the proportion of 1s is just its mean. Make both values plain Python floats.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 rng = np.random.default_rng(99)
 
 P_TRUE = 0.18   # true population churn proportion (parameter)
 
 # A 0/1 sample drawn from the population.
-sample = rng.binomial(1, P_TRUE, size=400)`}
-  starterCode={`# TODO
+sample = rng.binomial(1, P_TRUE, size=400)`,
+      starterCode: `# TODO
 p_hat = None
 abs_error = None
-`}
-  solutionCode={`p_hat = float(sample.mean())
+`,
+      solutionCode: `p_hat = float(sample.mean())
 abs_error = float(abs(p_hat - P_TRUE))
 print(f"p-hat = {p_hat:.3f}, true p = {P_TRUE}, abs error = {abs_error:.3f}")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "p_hat_type",

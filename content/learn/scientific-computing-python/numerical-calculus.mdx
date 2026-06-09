@@ -47,7 +47,10 @@ $h \approx \sqrt{\epsilon_\text{mach}} \approx 10^{-8}$.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -72,7 +75,9 @@ plt.title("V-shape: truncation vs round-off")
 plt.legend()
 plt.grid(True, which="both", alpha=0.3)
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 Two lessons:
@@ -87,14 +92,19 @@ For most production work, use `scipy.differentiate.derivative`
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 # Numerical gradient on sampled data
 x = np.linspace(0, 2 * np.pi, 200)
 y = np.sin(x)
 dy = np.gradient(y, x)  # centered differences, 2nd-order accurate
 print("Max error vs true cos(x):", np.max(np.abs(dy - np.cos(x))))
-`}
+`,
+    },
+  ]}
 />
 
 `np.gradient` uses second-order centered differences in the
@@ -116,7 +126,10 @@ and weights $w_i$, multiply, add. The art is in choosing them.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import integrate
 
 
@@ -137,7 +150,9 @@ print(f"quad      : {val:.10f}   (error ≤ {err:.2e})")
 # 32-point Gauss-Legendre
 val_g, _ = integrate.fixed_quad(f, 0, 4, n=32)
 print(f"Gauss(32) : {val_g:.10f}")
-`}
+`,
+    },
+  ]}
 />
 
 Notice `quad` returns both the value *and* an error estimate.
@@ -149,7 +164,10 @@ estimated error is below the requested tolerance.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import integrate
 
 
@@ -169,7 +187,9 @@ def h(x):
 
 val2, err2 = integrate.quad(h, 0, 100, limit=200)
 print(f"oscillatory : {val2:.6f}   err≤{err2:.1e}")
-`}
+`,
+    },
+  ]}
 />
 
 `quad` is robust enough to handle integrable singularities and
@@ -183,7 +203,10 @@ For 2-D and 3-D, deterministic rules still work:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import integrate
 
 # Volume under f(x,y) = exp(-(x²+y²)) over the unit square
@@ -195,7 +218,9 @@ val, err = integrate.dblquad(
     lambda x: 1,  # y bounds depend on x
 )
 print(f"dblquad: {val:.8f}   err≤{err:.1e}")
-`}
+`,
+    },
+  ]}
 />
 
 But cost explodes: a rule that uses $n$ nodes per axis costs $n^d$
@@ -211,7 +236,7 @@ whole chapter to it later).
   files={[
     {
       filename: "main.py",
-      initialContent: `import numpy as np
+      starterCode: `import numpy as np
 from calc import centered_diff, adaptive_simpson
 
 
@@ -232,7 +257,7 @@ print(f"\\n∫₀¹⁰ f dx ≈ {val:.10f}")
     },
     {
       filename: "calc.py",
-      initialContent: `import numpy as np
+      starterCode: `import numpy as np
 
 
 def centered_diff(f, x, h=None):
@@ -287,22 +312,27 @@ sophisticated relative, but the idea is the same.
 Implement \`estimate_pi()\` using \`scipy.integrate.quad\` on the appropriate integrand. Return the estimate of $\\pi$ (not $\\pi/2$).
 
 Your answer should agree with \`math.pi\` to at least 10 decimal places.`}
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import integrate
 
 
 def estimate_pi():
     # TODO: integrate sqrt(1 - x**2) from -1 to 1 and return 2 * value
     return 0.0
-`}
-  solutionCode={`import numpy as np
+`,
+      solutionCode: `import numpy as np
 from scipy import integrate
 
 
 def estimate_pi():
     val, _ = integrate.quad(lambda x: np.sqrt(1 - x**2), -1.0, 1.0)
     return 2.0 * val
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "value",

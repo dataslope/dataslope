@@ -130,7 +130,10 @@ one of the most powerful tools in a data scientist's kit.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.default_rng(7)
 
@@ -146,7 +149,9 @@ rolls = rng.integers(1, 7, size=100_000)
 p_even = np.mean(rolls % 2 == 0)
 print(f"\\nEstimated P(even die roll): {p_even:.4f}  (true: 0.5)")
 print(f"Estimated P(roll a 6):      {np.mean(rolls == 6):.4f}  (true: {1 / 6:.4f})")
-`}
+`,
+    },
+  ]}
 />
 
 The estimates land very close to the true values, but not exactly — and
@@ -173,7 +178,10 @@ independent or equally likely.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.default_rng(42)
 
@@ -190,7 +198,9 @@ p_convert = converted.mean()
 
 print(f"Simulated P(complete all 3 steps): {p_convert:.4f}")
 print(f"Exact (0.8 ** 3):                  {0.8**3:.4f}")
-`}
+`,
+    },
+  ]}
 />
 
 The simulated answer matches the multiplication-rule answer to a few
@@ -221,7 +231,10 @@ around; as the flip count climbs it homes in on 0.5.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.express as px
 
 rng = np.random.default_rng(1)
@@ -244,7 +257,9 @@ fig.show()
 print(f"After 10 flips:    {running_prop[9]:.3f}")
 print(f"After 100 flips:   {running_prop[99]:.3f}")
 print(f"After 5,000 flips: {running_prop[-1]:.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 Notice the shape: wild swings on the left that calm into a tight hug of
@@ -298,7 +313,10 @@ The conversions:
 
 <CodeBlock
   adapter="python"
-  starterCode={`def prob_to_odds(p):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def prob_to_odds(p):
     return p / (1 - p)  # returns "to 1" odds
 
 
@@ -317,7 +335,9 @@ print(f"\\nOdds of 1:1  ->  P = {odds_to_prob(1.0):.2f}")
 # A common trap: '3 to 1 against' is NOT 0.25.
 odds_against = 1 / 3  # 1 favorable per 3 unfavorable
 print(f"\\n'3 to 1 against' -> P(win) = {odds_to_prob(odds_against):.3f}  (NOT 0.25)")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Misconception: odds and probability are the same number">
@@ -362,18 +382,23 @@ inference chapters formalize.
 - Compute the fraction of rolls whose sum is exactly 7 into a float called **\`p7\`**.
 
 The exact answer is \`6/36 ≈ 0.1667\`, so a good simulation should land within about \`0.01\` of that.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 rng = np.random.default_rng(2024)
-n = 200_000`}
-  starterCode={`# TODO: simulate n rolls of two dice and estimate P(sum == 7) as a float p7
+n = 200_000`,
+      starterCode: `# TODO: simulate n rolls of two dice and estimate P(sum == 7) as a float p7
 p7 = None
-`}
-  solutionCode={`die1 = rng.integers(1, 7, size=n)
+`,
+      solutionCode: `die1 = rng.integers(1, 7, size=n)
 die2 = rng.integers(1, 7, size=n)
 totals = die1 + die2
 p7 = float(np.mean(totals == 7))
 print(p7)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type",
@@ -407,16 +432,19 @@ Do it two ways and store both as floats:
 - **\`p_sim\`** — estimate the same probability by simulating **100,000** sets of 4 attempts with the provided \`rng\`.
 
 They should agree to within about \`0.01\`.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 rng = np.random.default_rng(99)
 p_success = 0.7
 n_attempts = 4
-n_trials = 100_000`}
-  starterCode={`# TODO: compute p_exact via the complement rule, and p_sim via simulation
+n_trials = 100_000`,
+      starterCode: `# TODO: compute p_exact via the complement rule, and p_sim via simulation
 p_exact = None
 p_sim = None
-`}
-  solutionCode={`# Complement: 1 - P(all fail). Each attempt fails with prob 1 - 0.7 = 0.3.
+`,
+      solutionCode: `# Complement: 1 - P(all fail). Each attempt fails with prob 1 - 0.7 = 0.3.
 p_exact = float(1 - (1 - p_success) ** n_attempts)
 
 # Simulation: each trial is 4 attempts; success if any attempt succeeds.
@@ -425,7 +453,9 @@ at_least_one = attempts.any(axis=1)
 p_sim = float(at_least_one.mean())
 
 print("exact:", p_exact, "sim:", p_sim)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "types",

@@ -42,7 +42,10 @@ Extensions let your custom pipelines chain like built-in LINQ.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -68,7 +71,9 @@ public static class OrderQueries
     public static IEnumerable<Order> HighValue(this IEnumerable<Order> source,
                                                decimal min = 1000m) => source.Where(o => o.Total > min);
 }
-`}
+`,
+    },
+  ]}
 />
 
 The pipeline now *reads as English*: "active orders, recent, high
@@ -90,7 +95,10 @@ previous one.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -116,7 +124,9 @@ public static class Operators
         }
     }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Notice the operator integrated *seamlessly* into the chain. Because
@@ -149,7 +159,10 @@ and selectors from smaller pieces.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 Func<int, bool> Positive = n => n > 0;
@@ -160,7 +173,9 @@ Func<Func<int, bool>, Func<int, bool>, Func<int, bool>> And = (p, q) => n => p(n
 var nums = Enumerable.Range(-5, 11); // -5..5
 var matches = nums.Where(And(Positive, Even));
 Console.WriteLine(string.Join(",", matches)); // 2,4
-`}
+`,
+    },
+  ]}
 />
 
 The same trick scales to selector composition (`Func<A, B>` plus
@@ -175,7 +190,7 @@ to combine before they ever touch LINQ.
   files={[
     {
       filename: "Program.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 using System.Linq;
 
 var events = new[] {
@@ -193,7 +208,7 @@ Console.WriteLine($"Recent errors: {headline}");
 
 public record LogEvent(string Level, string Message, DateTime At);
 `,
-      solutionContent: `using System;
+      solutionCode: `using System;
 using System.Linq;
 
 var events = new[] {
@@ -213,7 +228,7 @@ public record LogEvent(string Level, string Message, DateTime At);
     },
     {
       filename: "LogExtensions.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -234,7 +249,7 @@ public static class LogExtensions
     public static string Join(this IEnumerable<string> src, string sep) => throw new NotImplementedException();
 }
 `,
-      solutionContent: `using System;
+      solutionCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 

@@ -79,7 +79,10 @@ labels are `y` (150 values, each 0, 1, or 2).
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris
 
 # return_X_y=True hands back the feature matrix and label vector directly.
 X, y = load_iris(return_X_y=True)
@@ -89,7 +92,9 @@ print("Labels   y:", y.shape, "-> values:", sorted(set(y)))
 print()
 print("First flower's measurements:", X[0])
 print("First flower's species code:", y[0])
-`}
+`,
+    },
+  ]}
 />
 
 The four numbers in `X[0]` are that flower's measurements in centimeters,
@@ -108,7 +113,10 @@ Let us peek at the names so the integer codes mean something.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris
 
 iris = load_iris()  # the full object, with names attached
 print("Feature names:", iris.feature_names)
@@ -118,7 +126,9 @@ print("Species names:", list(iris.target_names))
 for code, name in enumerate(iris.target_names):
     count = int((iris.target == code).sum())
     print(f"  code {code} = {name:12s} ({count} flowers)")
-`}
+`,
+    },
+  ]}
 />
 
 Fifty of each species, four measurements each. A balanced, tidy dataset —
@@ -135,7 +145,10 @@ proportionally represented in both halves.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 
 X, y = load_iris(return_X_y=True)
@@ -152,7 +165,9 @@ print("Training flowers:", X_train.shape[0])
 print("Test flowers:    ", X_test.shape[0])
 print("Training set is the part the model LEARNS from.")
 print("Test set is locked away until the very end.")
-`}
+`,
+    },
+  ]}
 />
 
 From here on, `X_test` and `y_test` go in a drawer. The model will not see
@@ -183,7 +198,10 @@ compares.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -200,7 +218,9 @@ model.fit(X_train, y_train)
 
 print("Model trained on", X_train.shape[0], "flowers.")
 print(model)
-`}
+`,
+    },
+  ]}
 />
 
 That is the whole of training: construct the estimator, then call `.fit()`
@@ -223,7 +243,10 @@ estimators are.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
@@ -238,7 +261,9 @@ model.fit(X_train, y_train)
 
 print("Same workflow, different estimator.")
 print("Test accuracy:", round(model.score(X_test, y_test), 3))
-`}
+`,
+    },
+  ]}
 />
 
 Same four moves, a different model, and the rest of your code is untouched.
@@ -254,7 +279,10 @@ first few test flowers and compare its guesses to the truth.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -276,7 +304,9 @@ print("predicted -> actual")
 for p, t in zip(predictions, truth):
     mark = "ok" if p == t else "WRONG"
     print(f"  {names[p]:12s} -> {names[t]:12s}  {mark}")
-`}
+`,
+    },
+  ]}
 />
 
 Most or all of those eight will match. But eight flowers is far too few to
@@ -289,7 +319,10 @@ of test flowers labeled correctly.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -309,7 +342,9 @@ print(f"Accuracy on unseen flowers: {accuracy:.1%}")
 predictions = model.predict(X_test)
 manual = (predictions == y_test).mean()
 print(f"Same thing, computed by hand:  {manual:.1%}")
-`}
+`,
+    },
+  ]}
 />
 
 The two numbers are identical, because `.score()` for a classifier is
@@ -335,7 +370,10 @@ trained model, and it tells you the species. Let us do exactly that.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -355,7 +393,9 @@ prediction = model.predict(new_flower)
 species = iris.target_names[prediction[0]]
 print("Measurements:", new_flower[0])
 print("Predicted species:", species)
-`}
+`,
+    },
+  ]}
 />
 
 Two details here are easy to trip over, and both are worth burning in.
@@ -391,7 +431,10 @@ which estimator sits on the highlighted line.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -416,7 +459,9 @@ new_flower = [[6.5, 3.0, 5.5, 2.0]]
 print(
     "New flower predicted as:", load_iris().target_names[model.predict(new_flower)[0]]
 )
-`}
+`,
+    },
+  ]}
 />
 
 Six lines of logic, ignoring imports and comments. Load, split, train,
@@ -517,10 +562,13 @@ the final accuracy so the tests can check it.
 The hidden tests check the split sizes, that \`model\` is fitted, that
 \`accuracy\` is a sensible high number, and that \`new_pred\` is a valid
 species code (0, 1, or 2).`}
-  initCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
-from sklearn.neighbors import KNeighborsClassifier`}
-  starterCode={`# 1. Load
+from sklearn.neighbors import KNeighborsClassifier`,
+      starterCode: `# 1. Load
 X, y = None, None
 
 # 2. Split (20% test, random_state=0, stratified)
@@ -536,8 +584,8 @@ accuracy = None
 new_pred = None
 
 print("accuracy:", accuracy, "new_pred:", new_pred)
-`}
-  solutionCode={`# 1. Load
+`,
+      solutionCode: `# 1. Load
 X, y = load_iris(return_X_y=True)
 
 # 2. Split (20% test, random_state=0, stratified)
@@ -556,7 +604,9 @@ accuracy = model.score(X_test, y_test)
 new_pred = int(model.predict([[6.0, 2.7, 5.1, 1.6]])[0])
 
 print("accuracy:", accuracy, "new_pred:", new_pred)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "test_size",

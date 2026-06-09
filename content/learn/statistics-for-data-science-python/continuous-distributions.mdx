@@ -85,7 +85,10 @@ through almost every scipy distribution — learn it once here.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.express as px
 from scipy import stats
 
@@ -104,7 +107,9 @@ fig = px.line(
     title="Uniform(0, 10) PDF — flat; area, not height, is probability",
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="Interval probability = cdf(b) − cdf(a)">
@@ -133,7 +138,10 @@ shift, but you'll almost always leave it at 0.)
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.express as px
 from scipy import stats
 
@@ -154,7 +162,9 @@ fig = px.line(
     title="Exponential(mean=5): wait times — most short, a long right tail",
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 The exponential is **right-skewed**: short waits are most likely, but
@@ -185,7 +195,10 @@ continuous distribution and practice the same area-based questions.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.express as px
 from scipy import stats
 
@@ -204,7 +217,9 @@ fig = px.line(
     title="Normal(mean=100, sd=15) PDF",
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 ## Quantiles: inverting the question with ppf
@@ -226,7 +241,10 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  starterCode={`from scipy import stats
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from scipy import stats
 
 # Response times, exponential with mean 200 ms.
 d = stats.expon(scale=200)
@@ -242,7 +260,9 @@ print(f"Check: cdf(p95) = {d.cdf(p95):.4f}")
 scores = stats.norm(loc=100, scale=15)
 print(f"\\nMedian score (ppf 0.5) = {scores.ppf(0.5):.1f}")
 print(f"90th percentile score  = {scores.ppf(0.9):.1f}")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="cdf and ppf are inverses">
@@ -262,18 +282,23 @@ Using \`scipy.stats.norm\`, compute the probability that a randomly chosen perso
 - Build a frozen distribution \`d = stats.norm(loc=70, scale=8)\`.
 - An interval probability is \`cdf(upper) - cdf(lower)\`.
 - Store the answer as a plain Python \`float\` in **\`p_between\`**.`}
-  initCode={`from scipy import stats
-mu, sigma = 70, 8`}
-  starterCode={`# TODO: compute P(60 < X < 80)
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from scipy import stats
+mu, sigma = 70, 8`,
+      starterCode: `# TODO: compute P(60 < X < 80)
 p_between = None
 
 print("P(60 < X < 80):", p_between)
-`}
-  solutionCode={`d = stats.norm(loc=mu, scale=sigma)
+`,
+      solutionCode: `d = stats.norm(loc=mu, scale=sigma)
 p_between = float(d.cdf(80) - d.cdf(60))
 
 print("P(60 < X < 80):", p_between)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type",
@@ -309,18 +334,23 @@ You want to publish a service-level promise: "**90%** of customers are served wi
 - Build \`d = stats.expon(scale=4)\` (the \`scale\` is the mean).
 - Use the **percent-point function**: \`d.ppf(0.90)\`.
 - Store the answer as a plain Python \`float\` in **\`cutoff\`**.`}
-  initCode={`from scipy import stats
-mean_wait = 4`}
-  starterCode={`# TODO: find the 90th-percentile wait time
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from scipy import stats
+mean_wait = 4`,
+      starterCode: `# TODO: find the 90th-percentile wait time
 cutoff = None
 
 print("90% served within:", cutoff, "minutes")
-`}
-  solutionCode={`d = stats.expon(scale=mean_wait)
+`,
+      solutionCode: `d = stats.expon(scale=mean_wait)
 cutoff = float(d.ppf(0.90))
 
 print("90% served within:", cutoff, "minutes")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type",
@@ -355,7 +385,10 @@ and *areas*, never absolute heights as probabilities.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 # A tight normal: small spread pushes the peak density above 1.
@@ -367,7 +400,9 @@ print("Peak density at x=0:", round(float(tight.pdf(0)), 3), "(> 1, and that's f
 print("P(X = 0)             :", 0.0, "(a single point has zero width)")
 print("P(-0.3 < X < 0.3)    :", round(float(tight.cdf(0.3) - tight.cdf(-0.3)), 4))
 print("\\nHeight can exceed 1; AREA never does.")
-`}
+`,
+    },
+  ]}
 />
 
 ## Check your understanding

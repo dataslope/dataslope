@@ -64,7 +64,10 @@ it's been divided by √n.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(42)
@@ -87,7 +90,9 @@ print(f"scipy.stats.sem         = {se_scipy:.2f}   (matches)")
 print()
 print(f"SE is about sqrt(n) = {np.sqrt(n):.1f}x smaller than SD.")
 print("The DATA is wide; the ESTIMATE of its mean is precise.")
-`}
+`,
+    },
+  ]}
 />
 
 The SD is around 12 — that's how much ages genuinely differ from person
@@ -114,7 +119,10 @@ the spread you'd see if you actually could draw many samples.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.default_rng(7)
 
@@ -139,7 +147,9 @@ print(f"s / sqrt(n) from ONE sample (est) = {estimated_se:.3f}")
 print()
 print("All three roughly agree. The single-sample SE estimates the")
 print("spread of the whole sampling distribution -- without repeating the study.")
-`}
+`,
+    },
+  ]}
 />
 
 This is the quiet miracle of the standard error: you collect **one**
@@ -180,7 +190,10 @@ The curve drops steeply at first, then flattens into a long, slow crawl.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.express as px
 
 # Fix the data's spread; vary how many observations we collect.
@@ -212,7 +225,9 @@ for n in ns:
 print()
 print("Going 10 -> 100 (10x data) cuts SE a lot.")
 print("Going 1600 -> 12800 (8x data) barely moves it. Diminishing returns.")
-`}
+`,
+    },
+  ]}
 />
 
 The shape tells the whole story. Early on, adding data slashes the SE.
@@ -259,7 +274,10 @@ natural ruler for measuring how far an estimate can stray.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(0)
@@ -284,7 +302,9 @@ print(f"Exact t-based 95% CI:             ({ci[0]:.3f}, {ci[1]:.3f})")
 print()
 print("The SE sets the WIDTH of the interval. Smaller SE -> tighter range.")
 print("Everything in inference is built on this one number.")
-`}
+`,
+    },
+  ]}
 />
 
 Notice the interval is just the estimate ± about two standard errors.
@@ -305,18 +325,21 @@ and *Hypothesis Testing* — are largely about using the SE correctly.
 - \`"ratio"\` — \`sd / se\` (a float)
 
 The \`ratio\` should equal $\\sqrt{n}$ (since SE = SD / $\\sqrt{n}$). All three must be plain Python floats. You may use \`scipy.stats.sem\` to check yourself, but compute \`se\` from \`sd\` and \`n\` so the relationship is explicit.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 rng = np.random.default_rng(314)
 
-sample = rng.normal(loc=500, scale=40, size=250)`}
-  starterCode={`# TODO: compute sd (ddof=1), se = sd/sqrt(n), and ratio = sd/se.
+sample = rng.normal(loc=500, scale=40, size=250)`,
+      starterCode: `# TODO: compute sd (ddof=1), se = sd/sqrt(n), and ratio = sd/se.
 out = {
     "sd": None,
     "se": None,
     "ratio": None,
 }
-`}
-  solutionCode={`import numpy as np
+`,
+      solutionCode: `import numpy as np
 
 n = len(sample)
 sd = float(sample.std(ddof=1))
@@ -327,7 +350,9 @@ out = {
     "ratio": float(sd / se),
 }
 print(out, " sqrt(n) =", np.sqrt(n))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "keys",
@@ -378,19 +403,22 @@ Write a function-free script that computes a dict \`plan\` with:
 - \`"multiple"\` — \`n_needed / n_current\` (a float), which should be about **4**
 
 Hint: solving $\\sigma/\\sqrt{n} \\le \\text{target}$ gives $n \\ge (\\sigma/\\text{target})^2$. Use \`math.ceil\` to round up to a whole sample.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import math
 n_current = 600
-sigma = 18.0`}
-  starterCode={`# TODO: build the 'plan' dict (halve the SE; find the needed n).
+sigma = 18.0`,
+      starterCode: `# TODO: build the 'plan' dict (halve the SE; find the needed n).
 plan = {
     "se_current": None,
     "se_target": None,
     "n_needed": None,
     "multiple": None,
 }
-`}
-  solutionCode={`import numpy as np
+`,
+      solutionCode: `import numpy as np
 import math
 
 se_current = sigma / np.sqrt(n_current)
@@ -403,7 +431,9 @@ plan = {
     "multiple": float(n_needed / n_current),
 }
 print(plan)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "keys",

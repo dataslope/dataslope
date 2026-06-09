@@ -28,7 +28,10 @@ A complete example:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int square(int n) { return n * n; }
 
@@ -39,7 +42,9 @@ int main(void) {
   printf("%d squared = %d\\n", 3, square(3));
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Three things to notice:
@@ -61,7 +66,10 @@ caller's variables.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 void try_to_increment(int x) {
   x = x + 1;
@@ -74,7 +82,9 @@ int main(void) {
   printf("after call:      n = %d\\n", n);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 `n` in `main` is unchanged because `try_to_increment` got its own
@@ -89,7 +99,10 @@ has nothing meaningful to return, use `void` as the return type.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 void banner(void) { printf("============================\\n"); }
 
@@ -99,7 +112,9 @@ int main(void) {
   banner();
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 `void name(void)` means "this function takes no arguments and
@@ -114,7 +129,10 @@ site.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int max(int a, int b) {
   if (a > b) {
@@ -130,7 +148,9 @@ int main(void) {
   printf("max(5, 5)   = %d\\n", max(5, 5));
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 You can stop using `if/else` and write it as a single expression:
@@ -214,7 +234,10 @@ file, you need to tell the compiler the signature first. That's a
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int max(int a, int b); // prototype: tell the compiler the signature
 
@@ -228,7 +251,9 @@ int main(void) {
 }
 
 int max(int a, int b) { return (a > b) ? a : b; }
-`}
+`,
+    },
+  ]}
 />
 
 In multi-file projects, prototypes live in **header files** so any
@@ -242,7 +267,10 @@ example is factorial:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 long factorial(int n) {
   if (n <= 1) {
@@ -257,7 +285,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Recursion always needs:
@@ -285,7 +315,10 @@ naturally recursive (trees, divide-and-conquer, parsing).
 5
 7
 \`\`\``}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int is_prime(int n) {
   // your code here
@@ -300,8 +333,8 @@ int main(void) {
   }
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 int is_prime(int n) {
   if (n < 2)
@@ -321,7 +354,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "primes",

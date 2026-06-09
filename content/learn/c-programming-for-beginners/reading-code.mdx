@@ -214,7 +214,10 @@ of "spelling mistakes you can't help noticing".
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <string.h>
 
 int main(int argc, char **argv) {
@@ -237,7 +240,9 @@ int main(int argc, char **argv) {
   fprintf(stderr, "%d match(es)\\n", matches);
   return matches > 0 ? 0 : 2;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Before reading on, write a one-sentence summary of what this program

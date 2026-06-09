@@ -48,7 +48,10 @@ An adjacency matrix is a `V × V` table. `matrix[u][v]` tells whether edge `u ->
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <utility>
 #include <vector>
 
@@ -69,7 +72,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Matrix lookup is great for dense graphs or repeated `hasEdge(u, v)` checks.
@@ -80,7 +85,10 @@ An adjacency list stores only existing neighbors. It uses **O(V + E)** space, so
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <utility>
 #include <vector>
 
@@ -102,14 +110,19 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 For a weighted graph, store `(neighbor, weight)` pairs.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <utility>
 #include <vector>
 
@@ -132,7 +145,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ### Edge list
@@ -141,7 +156,10 @@ An edge list stores edges directly. For weighted graphs, use `vector<tuple<int,i
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <tuple>
 #include <vector>
 
@@ -154,7 +172,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Degrees and neighbors
@@ -163,7 +183,10 @@ In an undirected graph, the **degree** of a vertex is its number of incident edg
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 int main() {
@@ -182,7 +205,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 A graph is **sparse** when `E` is much smaller than `V²`. It is **dense** when the possible edges are mostly present. Sparse graphs usually prefer adjacency lists; dense graphs can justify matrices.
@@ -202,7 +227,10 @@ graph TD
   adapter="cpp"
   title="Count edges in an undirected graph from adjacency list"
   instructions={`Implement \`countEdges\`. In an undirected adjacency list, each edge appears twice, so sum all degrees and divide by 2.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 int countEdges(const std::vector<std::vector<int>> &adj) {
@@ -215,8 +243,8 @@ int main() {
   std::cout << countEdges(adj) << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <vector>
 
 int countEdges(const std::vector<std::vector<int>> &adj) {
@@ -231,7 +259,9 @@ int main() {
   std::cout << countEdges(adj) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "edge-count",
@@ -247,7 +277,10 @@ int main() {
   adapter="cpp"
   title="Convert adjacency list to adjacency matrix"
   instructions={`Implement \`toMatrix\` so every listed edge \`u -> v\` becomes a 1 in the returned matrix. The driver prints each row with spaces between values.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 std::vector<std::vector<int>> toMatrix(const std::vector<std::vector<int>> &adj,
@@ -269,8 +302,8 @@ int main() {
   }
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <vector>
 
 std::vector<std::vector<int>> toMatrix(const std::vector<std::vector<int>> &adj,
@@ -296,7 +329,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "matrix",

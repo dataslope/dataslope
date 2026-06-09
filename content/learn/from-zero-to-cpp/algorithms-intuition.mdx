@@ -36,7 +36,10 @@ logarithmic.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 int main() {
@@ -59,7 +62,9 @@ int main() {
   std::cout << "sum = " << sum << ", pairs summing to 7 = " << pairs << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 For n=8 the difference is invisible. For n=10,000,000 the linear
@@ -73,7 +78,10 @@ writing a loop.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <algorithm>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
 #include <iostream>
 #include <numeric>
 #include <vector>
@@ -97,7 +105,9 @@ int main() {
   std::cout << "even count = " << count << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 A few rules of thumb:
@@ -153,7 +163,10 @@ The right discipline:
   adapter="cpp"
   title="Sort and median"
   instructions={`Given a hard-coded vector of 7 integers, sort it ascending and print the median (middle element). Use \`std::sort\`. Expected output for \`{8, 1, 6, 4, 2, 9, 3}\` is \`4\`.`}
-  starterCode={`#include <algorithm>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -162,8 +175,8 @@ int main() {
   // your code
   return 0;
 }
-`}
-  solutionCode={`#include <algorithm>
+`,
+      solutionCode: `#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -173,7 +186,9 @@ int main() {
   std::cout << v[v.size() / 2];
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "med",

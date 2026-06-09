@@ -18,14 +18,19 @@ types instead of values:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Point = { x: number; y: number };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Point = { x: number; y: number };
 
 const origin: Point = { x: 0, y: 0 };
 const end: Point = { x: 10, y: 20 };
 
 console.log("origin:", origin);
 console.log("end:", end);
-`}
+`,
+    },
+  ]}
 />
 
 The alias `Point` is just another name for `{ x: number; y: number }`.
@@ -37,7 +42,10 @@ You can alias any type, not just objects:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type ID = number;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type ID = number;
 type Name = string;
 type Callback = (result: string) => void;
 
@@ -48,7 +56,9 @@ const logResult: Callback = (result) => console.log("Result:", result);
 console.log("userId:", userId);
 console.log("userName:", userName);
 logResult("Success");
-`}
+`,
+    },
+  ]}
 />
 
 **What the compiler now knows:** `ID` and `Name` are still just `number`
@@ -81,7 +91,10 @@ Here's a comparison:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Interface with extension
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Interface with extension
 interface Animal {
   name: string;
 }
@@ -98,7 +111,9 @@ const rex: DogT = { name: "Rex", breed: "Beagle" };
 
 console.log("fido (interface):", fido);
 console.log("rex (type):", rex);
-`}
+`,
+    },
+  ]}
 />
 
 Both approaches produce the same shape. The choice is stylistic, but a
@@ -112,12 +127,17 @@ value. For example, the type `"red"` contains only the string `"red"`:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`let color: "red" = "red";
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `let color: "red" = "red";
 console.log("color:", color);
 
 // This would be a compile-time error:
 // color = "blue";  // ❌ Type '"blue"' is not assignable to type '"red"'
-`}
+`,
+    },
+  ]}
 />
 
 By itself, a single literal type is not very useful. But when you combine
@@ -125,7 +145,10 @@ several with a **union**, you get a lightweight enumeration:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type PrimaryColor = "red" | "green" | "blue";
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type PrimaryColor = "red" | "green" | "blue";
 
 let color: PrimaryColor = "red";
 console.log("color:", color);
@@ -135,7 +158,9 @@ console.log("color:", color);
 
 // This would error:
 // color = "yellow";  // ❌ Type '"yellow"' is not assignable to type 'PrimaryColor'
-`}
+`,
+    },
+  ]}
 />
 
 **What bugs does this prevent?** If you have a function that expects a
@@ -144,7 +169,10 @@ compiler catches the mistake.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Direction = "north" | "south" | "east" | "west";
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Direction = "north" | "south" | "east" | "west";
 
 function move(direction: Direction, distance: number): void {
   console.log(\`Moving \${direction} by \${distance} units\`);
@@ -154,7 +182,9 @@ move("north", 10);
 move("west", 5);
 
 // move("up", 3);  // ❌ Argument of type '"up"' is not assignable to parameter of type 'Direction'
-`}
+`,
+    },
+  ]}
 />
 
 This is far superior to using a plain `string`, where any typo would slip
@@ -166,7 +196,10 @@ You can also have **number literals** and **boolean literals**:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Zero = 0;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Zero = 0;
 type One = 1;
 type ZeroOrOne = 0 | 1;
 
@@ -183,7 +216,9 @@ type Answer = true | false; // equivalent to boolean, but explicit
 
 let answer: Answer = true;
 console.log("answer:", answer);
-`}
+`,
+    },
+  ]}
 />
 
 Number literals are useful for modeling fixed sets of codes (HTTP status
@@ -196,12 +231,17 @@ type, not the general primitive:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const message = "Hello"; // inferred as "Hello" (literal)
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const message = "Hello"; // inferred as "Hello" (literal)
 let greeting = "Hi"; // inferred as string (general)
 
 console.log("message:", message);
 console.log("greeting:", greeting);
-`}
+`,
+    },
+  ]}
 />
 
 This is because `const` variables can't be reassigned, so the compiler
@@ -219,7 +259,10 @@ not just top-level `const` bindings? Use the **`as const`** assertion:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Without 'as const'
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Without 'as const'
 const config = { mode: "production", port: 3000 };
 // Type: { mode: string; port: number }
 
@@ -229,7 +272,9 @@ const configConst = { mode: "production", port: 3000 } as const;
 
 console.log("config:", config);
 console.log("configConst:", configConst);
-`}
+`,
+    },
+  ]}
 />
 
 The `as const` assertion does two things:
@@ -243,7 +288,10 @@ the values are fixed at compile time:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const STATUS_CODES = {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const STATUS_CODES = {
   OK: 200,
   NOT_FOUND: 404,
   SERVER_ERROR: 500,
@@ -259,7 +307,9 @@ function handleStatus(code: StatusCode): void {
 handleStatus(STATUS_CODES.OK); // ✅
 handleStatus(STATUS_CODES.NOT_FOUND); // ✅
 // handleStatus(999);                 // ❌ Argument of type '999' is not assignable
-`}
+`,
+    },
+  ]}
 />
 
 The `typeof STATUS_CODES[keyof typeof STATUS_CODES]` idiom extracts a
@@ -273,7 +323,10 @@ TypeScript has a dedicated `enum` keyword, but many developers prefer
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Traditional enum
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Traditional enum
 enum Color {
   Red = "RED",
   Green = "GREEN",
@@ -293,7 +346,9 @@ function paintLiteral(color: ColorLiteral): void {
 
 paintEnum(Color.Red);
 paintLiteral("RED");
-`}
+`,
+    },
+  ]}
 />
 
 The literal union is simpler: no runtime code, no namespace pollution. The
@@ -313,7 +368,10 @@ Intersections](./unions-and-intersections), but here's a taste:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Success = { status: "success"; data: string };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Success = { status: "success"; data: string };
 type Failure = { status: "failure"; error: string };
 type Result = Success | Failure;
 
@@ -330,7 +388,9 @@ const err: Result = { status: "failure", error: "Something broke" };
 
 handleResult(ok);
 handleResult(err);
-`}
+`,
+    },
+  ]}
 />
 
 The literal `"success"` and `"failure"` act as **discriminators** — the
@@ -346,7 +406,10 @@ function that transitions between states.
   adapter="typescript"
   title="Traffic Light Transition"
   instructions={`Define a type \`TrafficLight = "red" | "yellow" | "green"\`. Implement the function \`next(current: TrafficLight): TrafficLight\` that returns the next state in the cycle: red → green → yellow → red. The test checks that red → green, green → yellow, yellow → red.`}
-  starterCode={`type TrafficLight = "red" | "yellow" | "green";
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type TrafficLight = "red" | "yellow" | "green";
 
 function next(current: TrafficLight): TrafficLight {
   // Your code here
@@ -356,8 +419,8 @@ function next(current: TrafficLight): TrafficLight {
 console.log("After red:", next("red"));
 console.log("After green:", next("green"));
 console.log("After yellow:", next("yellow"));
-`}
-  solutionCode={`type TrafficLight = "red" | "yellow" | "green";
+`,
+      solutionCode: `type TrafficLight = "red" | "yellow" | "green";
 
 function next(current: TrafficLight): TrafficLight {
   if (current === "red") return "green";
@@ -368,7 +431,9 @@ function next(current: TrafficLight): TrafficLight {
 console.log("After red:", next("red"));
 console.log("After green:", next("green"));
 console.log("After yellow:", next("yellow"));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "cycle",
@@ -390,7 +455,10 @@ construct new string literal types from existing ones:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Greeting = "hello" | "hi";
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Greeting = "hello" | "hi";
 type Name = "world" | "TypeScript";
 type GreetingMessage = \`\${Greeting}, \${Name}!\`;
 // GreetingMessage is "hello, world!" | "hello, TypeScript!" | "hi, world!" | "hi, TypeScript!"
@@ -399,7 +467,9 @@ const msg: GreetingMessage = "hello, world!";
 console.log(msg);
 
 // const invalid: GreetingMessage = "hey, world!";  // ❌ Not in the union
-`}
+`,
+    },
+  ]}
 />
 
 This is an advanced feature (we'll revisit it when we cover advanced

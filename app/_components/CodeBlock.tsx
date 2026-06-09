@@ -61,9 +61,21 @@ type Status = "idle" | "loading" | "ready" | "running" | "error";
 export interface CodeBlockFile {
   /** Workspace-relative filename, e.g. `"greeter.hpp"`. */
   filename: string;
+  /** Optional read-only initialization code for THIS file, prepended
+   *  verbatim to the file's code on every Run. Rendered in a
+   *  collapsed-by-default read-only panel above the editor when this file
+   *  is the active tab — handy for imports or sample data without
+   *  cluttering the snippet the learner edits.
+   *
+   *  Caveat: the prepend is purely textual, so init must be valid at the
+   *  *top level* of the target language (e.g. `import` / `using` /
+   *  `#include` directives, top-level statements, or — for languages
+   *  without top-level statements like Java — a complete declaration the
+   *  user code can reference). */
+  initCode?: string;
   /** Starter content shown in the editor for this file. Reset restores
    *  this exact text. */
-  initialContent: string;
+  starterCode: string;
 }
 
 interface CodeBlockProps {
@@ -73,37 +85,25 @@ interface CodeBlockProps {
    *  always executes against a freshly-reset state — variables defined
    *  in one block are never visible to another. */
   adapter: LanguageAdapter;
-  /** Initial source the editor is populated with. The Reset button
-   *  restores the editor to this value. Ignored when `files` is set. */
-  starterCode?: string;
-  /** Multi-file workspace. When set, takes precedence over
-   *  `starterCode`. A non-sortable, non-closeable tab bar appears above
-   *  the editor so the learner can switch between files. Code is run
-   *  against `entryFilename` (or the first file when omitted); every
-   *  other file is staged into the runtime's virtual file system via
-   *  `prepareFileSystem` so multi-file `import`s / `include`s /
+  /** Workspace files. Every block supplies at least one file; each file
+   *  carries its own `initCode` (read-only setup prepended on Run) and
+   *  `starterCode` (the editable starter). With more than one file — or
+   *  with `showFileTabBar` — a non-sortable, non-closeable tab bar
+   *  appears above the editor so the learner can switch between files.
+   *  Code runs against `entryFilename` (or the first file when omitted);
+   *  every other file is staged into the runtime's virtual file system
+   *  via `prepareFileSystem` so multi-file `import`s / `include`s /
    *  cross-class references resolve. */
-  files?: CodeBlockFile[];
-  /** When `files` is set, the filename whose content is passed to
-   *  `runtime.run()` as the entry. Defaults to the first file. */
+  files: CodeBlockFile[];
+  /** When `files` has more than one entry, the filename whose content is
+   *  passed to `runtime.run()` as the entry. Defaults to the first file. */
   entryFilename?: string;
   /** Optional human-readable label shown in the header. Defaults to
    *  an auto-generated one like "PyBlock-49b7". */
   label?: string;
-  /** Optional read-only initialization code prepended (verbatim) to the
-   *  user-editable code on every Run. Rendered in a collapsed-by-default
-   *  panel above the editor — handy for setting up imports or sample
-   *  data without cluttering the snippet the learner is meant to focus
-   *  on. The init code is not modifiable from the UI.
-   *
-   *  Caveat: the prepend is purely textual, so the init must be valid
-   *  at the *top level* of the target language (e.g. `import` /
-   *  `using` / `#include` directives, top-level statements, or — for
-   *  languages without top-level statements like Java — a complete
-   *  declaration that the user code can reference). Authors are
-   *  responsible for syntactic compatibility; runtime errors caused by
-   *  invalid init will surface as ordinary stderr cells. */
-  initCode?: string;
+  /** Force the file tab bar to render even for a single-file workspace.
+   *  Multi-file workspaces always show it; this opts a one-file block in. */
+  showFileTabBar?: boolean;
 }
 
 // Match the convention of the existing playground for shortcut hints.
@@ -165,6 +165,17 @@ function useIsDark(): boolean {
 // Light docs → GitHub Light, dark docs → GitHub Dark.
 function cmThemeNameFor(isDark: boolean): string {
   return isDark ? "github-dark" : "github-light";
+}
+
+// Build a line-numbers extension whose gutter starts after `offset`
+// lines, so the editable region's numbering continues from where a
+// file's read-only init code left off. Stored in a compartment so the
+// offset can be reconfigured when the active file (hence its init)
+// changes, without remounting the editor.
+function lineNumbersWithOffset(offset: number) {
+  return lineNumbersExt({
+    formatNumber: offset ? (n) => String(n + offset) : undefined,
+  });
 }
 
 // Small clipboard / "copy to clipboard" glyph reused by the action bar
@@ -317,10 +328,9 @@ export default function CodeBlock(props: CodeBlockProps) {
 
 function CodeBlockInner({
   adapter,
-  starterCode,
-  initCode,
   files,
   entryFilename,
+  showFileTabBar = false,
 }: CodeBlockProps) {
   const blockId = useBlockId(adapter);
 
@@ -329,6 +339,9 @@ function CodeBlockInner({
   const editorHostRef = useRef<HTMLDivElement | null>(null);
   const editorRef = useRef<EditorView | null>(null);
   const themeCompRef = useRef<Compartment | null>(null);
+  // Line-number compartment — reconfigured when the active file changes
+  // so the gutter offset tracks that file's init line count.
+  const lineNumberCompRef = useRef<Compartment | null>(null);
   const initEditorHostRef = useRef<HTMLDivElement | null>(null);
   const initEditorRef = useRef<EditorView | null>(null);
   const initThemeCompRef = useRef<Compartment | null>(null);
@@ -358,33 +371,43 @@ function CodeBlockInner({
   const [isFormatting, setIsFormatting] = useState(false);
 
   const initPanelId = `${blockId}-init`;
-  const trimmedInit = initCode?.trimEnd() ?? "";
-  const hasInit = trimmedInit.length > 0;
-  const initLineCount = hasInit ? trimmedInit.split("\n").length : 0;
 
   // ─── Multi-file workspace ───────────────────────────────────────────
-  // Normalise into a list of files: single-file authors pass
-  // `starterCode`; multi-file authors pass `files`. The rest of the
-  // component always works with the array form, matching how
-  // ChallengeCard manages its workspace.
+  // Normalise into a non-empty list of files. Authors always pass
+  // `files`; guard against an empty array so the rest of the component
+  // can assume at least one file is present.
   const workspaceFiles: CodeBlockFile[] = useMemo(() => {
     if (files && files.length > 0) return files;
     const defaultName = `main.${adapter.defaultFileExtension || "txt"}`;
-    return [{ filename: defaultName, initialContent: starterCode ?? "" }];
-  }, [files, starterCode, adapter.defaultFileExtension]);
+    return [{ filename: defaultName, starterCode: "" }];
+  }, [files, adapter.defaultFileExtension]);
   const isMultiFile = workspaceFiles.length > 1;
+  // The tab bar renders for multi-file workspaces, or when a single-file
+  // block explicitly opts in via `showFileTabBar`.
+  const showTabs = isMultiFile || showFileTabBar;
   const resolvedEntryFilename =
     (entryFilename && workspaceFiles.find((f) => f.filename === entryFilename)
       ? entryFilename
       : workspaceFiles[0].filename) ?? workspaceFiles[0].filename;
 
+  // Per-file read-only init code (trimmed). Init now belongs to a file,
+  // so the init drawer + the editor's line-number offset both track
+  // whichever file is the active tab.
+  const initForFile = useCallback(
+    (filename: string) => {
+      const f = workspaceFiles.find((wf) => wf.filename === filename);
+      return f?.initCode?.trimEnd() ?? "";
+    },
+    [workspaceFiles],
+  );
+
   // Per-file workspace fingerprint so editing the MDX retires saved
-  // attempts against the previous starter. Mirrors the ChallengeCard
-  // approach so multi-file code blocks persist independently per tab.
+  // attempts against the previous starter. The filename is appended per
+  // file so each tab persists independently.
   const workspaceFingerprint = useMemo(
     () =>
       workspaceFiles
-        .map((f) => `${f.filename}:${f.initialContent}`)
+        .map((f) => `${f.filename}:${f.initCode ?? ""}:${f.starterCode}`)
         .join("|"),
     [workspaceFiles],
   );
@@ -397,23 +420,11 @@ function CodeBlockInner({
     [adapter.id, workspaceFingerprint],
   );
 
-  // Stable localStorage key for single-file mode. Hashing
-  // `adapter.id + starterCode` means: same block across reloads → same
-  // key (state restored); author edits `starterCode` in MDX → new key
-  // (old buffer naturally retired, user sees the new starter).
-  const persistedKey = useMemo(
-    () => persistKey("codeblock", `${adapter.id}|${starterCode ?? ""}`),
-    [adapter.id, starterCode],
-  );
-
   const persistActiveFile = useCallback(
     (filename: string, content: string) => {
-      const key = isMultiFile
-        ? persistedKeyForFile(filename)
-        : persistedKey;
-      savePersistedCode(key, content);
+      savePersistedCode(persistedKeyForFile(filename), content);
     },
-    [isMultiFile, persistedKey, persistedKeyForFile],
+    [persistedKeyForFile],
   );
 
   // Active filename + per-file buffer map. The single editor view shows
@@ -425,12 +436,8 @@ function CodeBlockInner({
   const fileBuffersRef = useRef<Map<string, string>>(
     new Map(
       workspaceFiles.map((f) => {
-        if (isMultiFile) {
-          const persisted = loadPersistedCode(persistedKeyForFile(f.filename));
-          return [f.filename, persisted ?? f.initialContent];
-        }
-        const persisted = loadPersistedCode(persistedKey);
-        return [f.filename, persisted ?? f.initialContent];
+        const persisted = loadPersistedCode(persistedKeyForFile(f.filename));
+        return [f.filename, persisted ?? f.starterCode];
       }),
     ),
   );
@@ -438,6 +445,16 @@ function CodeBlockInner({
   useEffect(() => {
     activeFilenameRef.current = activeFilename;
   }, [activeFilename]);
+
+  // Active file's init code (trimmed) + derived line metrics. Init now
+  // belongs to a file, so the read-only init drawer and the editor's
+  // line-number offset both re-render / reconfigure when the active tab
+  // changes.
+  const activeTrimmedInit = initForFile(activeFilename);
+  const activeHasInit = activeTrimmedInit.length > 0;
+  const activeInitLineCount = activeHasInit
+    ? activeTrimmedInit.split("\n").length
+    : 0;
 
   // Use the same SSR-safe pattern as Playground so the keyboard
   // shortcut hint matches what the freshly hydrated page would show.
@@ -459,11 +476,14 @@ function CodeBlockInner({
 
     const themeComp = new Compartment();
     const languageComp = new Compartment();
+    const lineNumberComp = new Compartment();
 
-    // When init code is present, the user-editable region's line numbers
-    // continue from where the init block left off so the combined code
-    // reads as a single contiguous program.
-    const lineOffset = hasInit ? initLineCount : 0;
+    // When the active file has init code, the user-editable region's line
+    // numbers continue from where that init left off so the combined code
+    // reads as a single contiguous program. The reconfigure effect below
+    // keeps the offset in sync as the active tab changes.
+    const initial = initForFile(activeFilenameRef.current);
+    const initialOffset = initial ? initial.split("\n").length : 0;
 
     // Initial doc = active file's buffer (already includes any restored
     // persisted content from the workspace bootstrap above).
@@ -481,11 +501,7 @@ function CodeBlockInner({
         indentOnInput(),
         bracketMatching(),
         closeBrackets(),
-        lineNumbersExt({
-          formatNumber: lineOffset
-            ? (n) => String(n + lineOffset)
-            : undefined,
-        }),
+        lineNumberComp.of(lineNumbersWithOffset(initialOffset)),
         highlightActiveLineGutter(),
         highlightActiveLine(),
         // Indent width tracks the adapter's formatter (see
@@ -531,6 +547,7 @@ function CodeBlockInner({
 
     editorRef.current = view;
     themeCompRef.current = themeComp;
+    lineNumberCompRef.current = lineNumberComp;
 
     // Lazy-load the language extension so the editor mounts immediately
     // and re-highlights once the language module resolves.
@@ -552,6 +569,7 @@ function CodeBlockInner({
       view.destroy();
       editorRef.current = null;
       themeCompRef.current = null;
+      lineNumberCompRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -570,20 +588,26 @@ function CodeBlockInner({
     }
   }, [cmThemeName]);
 
-  // Mount the read-only init editor lazily, the first time the panel is
-  // expanded — keeps the cost zero for collapsed init blocks. The cleanup
-  // mounts once when `hasInit` becomes true so the collapsed preview
-  // can show the first few lines through the gradient fade. The
-  // EditorView lives until the surrounding component unmounts.
+  // Mount / re-mount the read-only init editor for the active file's
+  // init code. Init now belongs to a file, so switching tabs rebuilds
+  // this editor with the new file's init (or tears it down when the
+  // active file has none). We keep it mounted even while collapsed so
+  // the collapsed preview can show the first few lines through the
+  // gradient fade.
   useEffect(() => {
-    if (!hasInit) return;
-    if (!initEditorHostRef.current || initEditorRef.current) return;
+    if (!activeHasInit) return;
+    if (!initEditorHostRef.current) return;
+    // Tear down a prior view so switching files rebuilds with the new doc.
+    if (initEditorRef.current) {
+      initEditorRef.current.destroy();
+      initEditorRef.current = null;
+    }
 
     const themeComp = new Compartment();
     const languageComp = new Compartment();
 
     const view = new EditorView({
-      doc: trimmedInit,
+      doc: activeTrimmedInit,
       parent: initEditorHostRef.current,
       extensions: [
         EditorState.readOnly.of(true),
@@ -610,17 +634,19 @@ function CodeBlockInner({
 
     return () => {
       view.destroy();
-      initEditorRef.current = null;
-      initThemeCompRef.current = null;
+      if (initEditorRef.current === view) {
+        initEditorRef.current = null;
+        initThemeCompRef.current = null;
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasInit]);
+  }, [activeHasInit, activeTrimmedInit]);
 
   // ─── Multi-file tab switching ───────────────────────────────────────
   // When the active tab changes, snapshot the outgoing file's buffer
-  // (so unsaved edits aren't lost), persist it, and load the incoming
-  // file's saved buffer into the single editor view. Mirrors
-  // ChallengeCard's previousActiveRef pattern.
+  // (so unsaved edits aren't lost), persist it, load the incoming file's
+  // saved buffer into the single editor view, and collapse the init
+  // drawer for the newly-active file. Mirrors ChallengeCard's pattern.
   const previousActiveRef = useRef<string>(activeFilename);
   useEffect(() => {
     const view = editorRef.current;
@@ -641,8 +667,21 @@ function CodeBlockInner({
     view.dispatch({
       changes: { from: 0, to: view.state.doc.length, insert: incoming },
     });
+    setInitExpanded(false);
     previousActiveRef.current = activeFilename;
   }, [activeFilename, persistActiveFile]);
+
+  // Keep the editor's line-number gutter offset in sync with the active
+  // file's init line count. Runs on mount (after the view exists) and on
+  // every tab switch.
+  useEffect(() => {
+    const view = editorRef.current;
+    const comp = lineNumberCompRef.current;
+    if (!view || !comp) return;
+    view.dispatch({
+      effects: comp.reconfigure(lineNumbersWithOffset(activeInitLineCount)),
+    });
+  }, [activeInitLineCount]);
 
   // ─── Run / Reset / Format ──────────────────────────────────────────
   // Snapshot every file's current content. Reads the active file from
@@ -662,17 +701,26 @@ function CodeBlockInner({
     return out;
   }, [workspaceFiles]);
 
+  // Build a file's effective source for a run: its read-only init code
+  // (if any) prepended to the editable buffer, via the adapter-aware
+  // merge so e.g. PHP's leading `<?php` isn't duplicated.
+  const effectiveSourceFor = useCallback(
+    (filename: string, buffer: string) => {
+      const init = initForFile(filename);
+      return init ? mergeInitAndEntry(adapter.id, init, buffer) : buffer;
+    },
+    [adapter.id, initForFile],
+  );
+
   const run = useCallback(async () => {
     const filesSnapshot = snapshotAllFiles();
     const entrySource = filesSnapshot.get(resolvedEntryFilename) ?? "";
-    // Init code is prepended verbatim — every adapter resets state at the
-    // start of run(), so init effectively executes inside the same fresh
-    // scope as the user code. Authors are responsible for providing
-    // syntactically-compatible init (e.g. top-level `using`/`#include`
-    // for compiled languages).
-    const code = hasInit
-      ? mergeInitAndEntry(adapter.id, trimmedInit, entrySource)
-      : entrySource;
+    // Each file's init code is prepended verbatim to its buffer — every
+    // adapter resets state at the start of run(), so init effectively
+    // executes inside the same fresh scope as the user code. Authors are
+    // responsible for providing syntactically-compatible init (e.g.
+    // top-level `using`/`#include` for compiled languages).
+    const code = effectiveSourceFor(resolvedEntryFilename, entrySource);
     const mySeq = ++runSeqRef.current;
 
     setOutputs([]);
@@ -704,7 +752,11 @@ function CodeBlockInner({
         for (const [name, content] of filesSnapshot) {
           fileMap.set(
             name,
-            encoder.encode(name === resolvedEntryFilename ? code : content),
+            encoder.encode(
+              name === resolvedEntryFilename
+                ? code
+                : effectiveSourceFor(name, content),
+            ),
           );
         }
         try {
@@ -793,11 +845,10 @@ function CodeBlockInner({
     }
   }, [
     adapter,
-    hasInit,
-    trimmedInit,
     isMultiFile,
     resolvedEntryFilename,
     snapshotAllFiles,
+    effectiveSourceFor,
   ]);
 
   // Keep the ref pointing at the latest handler so the editor's keymap
@@ -841,17 +892,14 @@ function CodeBlockInner({
     // copies. Then push the active file's starter into the editor so
     // the user sees the reset immediately.
     for (const f of workspaceFiles) {
-      fileBuffersRef.current.set(f.filename, f.initialContent);
-      const key = isMultiFile
-        ? persistedKeyForFile(f.filename)
-        : persistedKey;
-      clearPersistedCode(key);
+      fileBuffersRef.current.set(f.filename, f.starterCode);
+      clearPersistedCode(persistedKeyForFile(f.filename));
     }
     const view = editorRef.current;
     if (view) {
       const activeStarter =
         workspaceFiles.find((f) => f.filename === activeFilenameRef.current)
-          ?.initialContent ?? "";
+          ?.starterCode ?? "";
       view.dispatch({
         changes: { from: 0, to: view.state.doc.length, insert: activeStarter },
       });
@@ -871,8 +919,6 @@ function CodeBlockInner({
     });
   }, [
     workspaceFiles,
-    isMultiFile,
-    persistedKey,
     persistedKeyForFile,
     toastManager,
   ]);
@@ -976,92 +1022,11 @@ function CodeBlockInner({
         </div>
       </div>
 
-      {hasInit && (
-        <div className={challengeStyles.initWrap}>
-          {initLineCount > 3 ? (
-            <button
-              type="button"
-              className={challengeStyles.initToggle}
-              aria-expanded={initExpanded}
-              aria-controls={initPanelId}
-              onClick={() => setInitExpanded((v) => !v)}
-            >
-              <span
-                className={`${challengeStyles.initCaret} ${
-                  initExpanded ? challengeStyles.initCaretOpen : ""
-                }`}
-                aria-hidden
-              >
-                ▶
-              </span>
-              <span className={challengeStyles.initLabel}>
-                Initialization code ({adapter.runtimeInfo.language})
-              </span>
-              <span className={challengeStyles.initMeta}>
-                {initLineCount} line{initLineCount === 1 ? "" : "s"} · read-only
-              </span>
-            </button>
-          ) : (
-            // Short init code isn't collapsible, but it still needs a
-            // label so the learner knows the first block is read-only
-            // setup code rather than part of the editable snippet.
-            <div className={challengeStyles.initHeaderStatic}>
-              <Lock
-                size={11}
-                strokeWidth={2}
-                aria-hidden
-                className={challengeStyles.initLockIcon}
-              />
-              <span className={challengeStyles.initLabel}>
-                Initialization code ({adapter.runtimeInfo.language})
-              </span>
-              <span className={challengeStyles.initMeta}>read-only</span>
-            </div>
-          )}
-          <div
-            className={`${challengeStyles.initEditorWrap} ${
-              initLineCount <= 3 || initExpanded
-                ? challengeStyles.initEditorWrapOpen
-                : challengeStyles.initEditorWrapCollapsed
-            }`}
-          >
-            <div
-              id={initPanelId}
-              className={challengeStyles.initEditor}
-              aria-label={`${adapter.runtimeInfo.language} initialization code (read-only)`}
-              ref={initEditorHostRef}
-            />
-            {!initExpanded && initLineCount > 3 && (
-              <button
-                type="button"
-                className={challengeStyles.initFade}
-                aria-label="Expand initialization code"
-                title="Expand initialization code"
-                onClick={() => setInitExpanded(true)}
-              >
-                <span className={challengeStyles.initFadeLabel}>
-                  <ChevronDown size={13} strokeWidth={2} aria-hidden />
-                  Click to expand
-                </span>
-              </button>
-            )}
-            {initExpanded && initLineCount > 3 && (
-              <button
-                type="button"
-                className={challengeStyles.initCollapseBtn}
-                aria-label="Collapse initialization code"
-                onClick={() => setInitExpanded(false)}
-              >
-                <ChevronUp size={13} strokeWidth={2} aria-hidden />
-                Click to collapse
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ── File tab bar (multi-file workspaces only) ── */}
-      {isMultiFile && (
+      {/* ── File tab bar ──
+            Shown for multi-file workspaces, or when a single-file block
+            opts in via `showFileTabBar`. The init drawer (which now
+            belongs to the active file) renders below it. */}
+      {showTabs && (
         <div
           className={challengeStyles.fileTabBar}
           role="tablist"
@@ -1093,8 +1058,107 @@ function CodeBlockInner({
         </div>
       )}
 
+      {/* ── Init code (active file) ──
+            The init drawer belongs to the active file and renders below
+            the file tab bar. A light top border is added only when no
+            file tab bar sits above it to supply the divider. */}
+      {activeHasInit && (
+        <div
+          className={`${challengeStyles.initWrap}${
+            showTabs ? "" : ` ${challengeStyles.topBorderLight}`
+          }`}
+        >
+          {activeInitLineCount > 3 ? (
+            <button
+              type="button"
+              className={challengeStyles.initToggle}
+              aria-expanded={initExpanded}
+              aria-controls={initPanelId}
+              onClick={() => setInitExpanded((v) => !v)}
+            >
+              <span
+                className={`${challengeStyles.initCaret} ${
+                  initExpanded ? challengeStyles.initCaretOpen : ""
+                }`}
+                aria-hidden
+              >
+                ▶
+              </span>
+              <span className={challengeStyles.initLabel}>
+                Initialization code ({adapter.runtimeInfo.language})
+              </span>
+              <span className={challengeStyles.initMeta}>
+                {activeInitLineCount} line{activeInitLineCount === 1 ? "" : "s"} ·
+                read-only
+              </span>
+            </button>
+          ) : (
+            // Short init code isn't collapsible, but it still needs a
+            // label so the learner knows the first block is read-only
+            // setup code rather than part of the editable snippet.
+            <div className={challengeStyles.initHeaderStatic}>
+              <Lock
+                size={11}
+                strokeWidth={2}
+                aria-hidden
+                className={challengeStyles.initLockIcon}
+              />
+              <span className={challengeStyles.initLabel}>
+                Initialization code ({adapter.runtimeInfo.language})
+              </span>
+              <span className={challengeStyles.initMeta}>read-only</span>
+            </div>
+          )}
+          <div
+            className={`${challengeStyles.initEditorWrap} ${
+              activeInitLineCount <= 3 || initExpanded
+                ? challengeStyles.initEditorWrapOpen
+                : challengeStyles.initEditorWrapCollapsed
+            }`}
+          >
+            <div
+              id={initPanelId}
+              className={challengeStyles.initEditor}
+              aria-label={`${adapter.runtimeInfo.language} initialization code (read-only)`}
+              ref={initEditorHostRef}
+            />
+            {!initExpanded && activeInitLineCount > 3 && (
+              <button
+                type="button"
+                className={challengeStyles.initFade}
+                aria-label="Expand initialization code"
+                title="Expand initialization code"
+                onClick={() => setInitExpanded(true)}
+              >
+                <span className={challengeStyles.initFadeLabel}>
+                  <ChevronDown size={13} strokeWidth={2} aria-hidden />
+                  Click to expand
+                </span>
+              </button>
+            )}
+            {initExpanded && activeInitLineCount > 3 && (
+              <button
+                type="button"
+                className={challengeStyles.initCollapseBtn}
+                aria-label="Collapse initialization code"
+                onClick={() => setInitExpanded(false)}
+              >
+                <ChevronUp size={13} strokeWidth={2} aria-hidden />
+                Click to collapse
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Editor ──
+            Gets a light top border only when nothing above it (file tab
+            bar or the active file's init drawer) already supplies a
+            divider. */}
       <div
-        className={challengeStyles.editor}
+        className={`${challengeStyles.editor}${
+          !activeHasInit && !showTabs ? ` ${challengeStyles.topBorderLight}` : ""
+        }`}
         ref={editorHostRef}
         aria-label={`${adapter.runtimeInfo.language} source code`}
       />

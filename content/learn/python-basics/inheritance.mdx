@@ -25,7 +25,10 @@ Every Django model inherits from \`django.db.models.Model\`. That base class pro
 
 <CodeBlock
   adapter="python"
-  starterCode={`class Animal:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class Animal:
     def __init__(self, name):
         self.name = name
 
@@ -45,7 +48,9 @@ class Cat(Animal):
 
 for animal in [Dog("Rex"), Cat("Luna"), Animal("Thing")]:
     print(animal.speak())
-`}
+`,
+    },
+  ]}
 />
 
 `Dog(Animal)` reads as "Dog inherits from Animal" or "Dog is a subclass of Animal". Calling `Dog("Rex")` runs `Animal.__init__` because `Dog` does not define its own `__init__`.
@@ -66,7 +71,10 @@ When a subclass defines a method with the same name as a parent method, the subc
 
 <CodeBlock
   adapter="python"
-  starterCode={`class Animal:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class Animal:
     def speak(self):
         return "some sound"
 
@@ -78,7 +86,9 @@ class Dog(Animal):
 
 d = Dog()
 print(d.speak())  # calls Dog.speak, not Animal.speak
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="When to override">
@@ -91,7 +101,10 @@ Override a method when you need **different behavior** for the subclass. If you 
 
 <CodeBlock
   adapter="python"
-  starterCode={`class Animal:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class Animal:
     def __init__(self, name):
         self.name = name
 
@@ -106,7 +119,9 @@ class Dog(Animal):
 
 
 print(Dog("Rex", "Labrador").describe())
-`}
+`,
+    },
+  ]}
 />
 
 Without `super().__init__(name)`, `self.name` would never be set. `super()` lets you **reuse** the parent's initialization logic.
@@ -129,7 +144,10 @@ In single inheritance, \`super()\` just calls the parent. In multiple inheritanc
 
 <CodeBlock
   adapter="python"
-  starterCode={`class Dog:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class Dog:
     def speak(self):
         return "woof!"
 
@@ -147,7 +165,9 @@ class Duck:
 animals = [Dog(), Cat(), Duck()]
 for animal in animals:
     print(animal.speak())
-`}
+`,
+    },
+  ]}
 />
 
 None of these classes inherit from a common base, but they all work with `for animal in animals: animal.speak()` because they all implement `speak()`. This is **duck typing**.
@@ -162,7 +182,10 @@ Use these instead of `type(x) is SomeClass` when you want to allow subclasses.
 
 <CodeBlock
   adapter="python"
-  starterCode={`class Animal:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class Animal:
     pass
 
 
@@ -175,7 +198,9 @@ print(isinstance(d, Dog))  # True
 print(isinstance(d, Animal))  # True (d is also an Animal)
 print(type(d) is Animal)  # False (d's type is Dog, not Animal)
 print(issubclass(Dog, Animal))  # True
-`}
+`,
+    },
+  ]}
 />
 
 `isinstance(obj, Class)` returns `True` if `obj` is an instance of `Class` **or any subclass**. `type(obj) is Class` only returns `True` for exact type matches.
@@ -190,7 +215,10 @@ Python allows a class to inherit from **multiple** parents. Method lookup uses t
 
 <CodeBlock
   adapter="python"
-  starterCode={`class A:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class A:
     def hello(self):
         return "A"
 
@@ -212,7 +240,9 @@ class D(B, C):
 
 print(D().hello())
 print([cls.__name__ for cls in D.__mro__])
-`}
+`,
+    },
+  ]}
 />
 
 The MRO for `D` is `[D, B, C, A, object]`. `super()` walks this list, so `D.hello()` calls `B.hello()`, which calls `C.hello()`, which calls `A.hello()`.
@@ -240,7 +270,10 @@ An **abstract base class (ABC)** is a class that cannot be instantiated directly
 
 <CodeBlock
   adapter="python"
-  starterCode={`from abc import ABC, abstractmethod
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from abc import ABC, abstractmethod
 
 
 class Shape(ABC):
@@ -262,7 +295,9 @@ try:
     Shape()
 except TypeError as e:
     print("TypeError:", e)
-`}
+`,
+    },
+  ]}
 />
 
 Use ABCs when you want to **enforce a contract**: "any subclass must implement these methods". This is common in framework design.
@@ -345,7 +380,7 @@ Better: don't make `Penguin` inherit from `Bird` if the `fly()` contract is core
   files={[
     {
       filename: "main.py",
-      initialContent: `from shapes import Rectangle, Circle
+      starterCode: `from shapes import Rectangle, Circle
 
 r = Rectangle(3, 4)
 c = Circle(2)
@@ -356,7 +391,7 @@ print(f"Circle area: {c.area():.2f}")
     },
     {
       filename: "shapes.py",
-      initialContent: `from abc import ABC, abstractmethod
+      starterCode: `from abc import ABC, abstractmethod
 import math
 
 
@@ -367,7 +402,7 @@ class Shape(ABC):
 
 # Define Rectangle and Circle here
 `,
-      solutionContent: `from abc import ABC, abstractmethod
+      solutionCode: `from abc import ABC, abstractmethod
 import math
 
 
@@ -442,7 +477,7 @@ except TypeError:
   files={[
     {
       filename: "main.py",
-      initialContent: `from animals import Dog, Cat, Animal
+      starterCode: `from animals import Dog, Cat, Animal
 
 animals = [Dog("Rex"), Cat("Luna"), Animal("Thing")]
 for animal in animals:
@@ -451,7 +486,7 @@ for animal in animals:
     },
     {
       filename: "animals.py",
-      initialContent: `class Animal:
+      starterCode: `class Animal:
     # your code here
     pass
 
@@ -465,7 +500,7 @@ class Cat(Animal):
     # your code here
     pass
 `,
-      solutionContent: `class Animal:
+      solutionCode: `class Animal:
     def __init__(self, name):
         self.name = name
 
@@ -529,7 +564,7 @@ assert isinstance(Cat("Luna"), Animal)`,
   files={[
     {
       filename: "main.py",
-      initialContent: `from employees import Employee, Manager
+      starterCode: `from employees import Employee, Manager
 
 e = Employee("Alice", 50000)
 m = Manager("Bob", 60000, 10000)
@@ -540,7 +575,7 @@ print(f"{m.name}: \${m.salary()}")
     },
     {
       filename: "employees.py",
-      initialContent: `class Employee:
+      starterCode: `class Employee:
     # your code here
     pass
 
@@ -549,7 +584,7 @@ class Manager(Employee):
     # your code here
     pass
 `,
-      solutionContent: `class Employee:
+      solutionCode: `class Employee:
     def __init__(self, name, base_salary):
         self.name = name
         self.base_salary = base_salary
@@ -604,14 +639,17 @@ assert m.base_salary == 60000`,
   adapter="python"
   title="Override a method"
   instructions={`Define a base class \`Vehicle\` with a method \`start()\` that returns \`"Vehicle starting"\`. Then define a subclass \`Car(Vehicle)\` that overrides \`start()\` to return \`"Car engine starting"\`.`}
-  starterCode={`class Vehicle:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class Vehicle:
     pass
 
 
 class Car(Vehicle):
     pass
-`}
-  solutionCode={`class Vehicle:
+`,
+      solutionCode: `class Vehicle:
     def start(self):
         return "Vehicle starting"
 
@@ -619,7 +657,9 @@ class Car(Vehicle):
 class Car(Vehicle):
     def start(self):
         return "Car engine starting"
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "vehicle",

@@ -36,7 +36,10 @@ The whole craft is in answering that "?".
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 rng = np.random.RandomState(0)
@@ -47,7 +50,9 @@ b = pd.Series(rng.normal(100, 15, size=30))
 print(f"Mean A: {a.mean():.2f}")
 print(f"Mean B: {b.mean():.2f}")
 print(f"Difference: {a.mean() - b.mean():.2f}")
-`}
+`,
+    },
+  ]}
 />
 
 Re-run the cell a few times mentally with different seeds —
@@ -101,7 +106,10 @@ You don't need to memorise this — most teams use libraries.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 from scipy import stats
 
@@ -114,7 +122,9 @@ treatment = rng.normal(105, 10, size=40)
 t_stat, p = stats.ttest_ind(control, treatment)
 print(f"t = {t_stat:.2f}")
 print(f"p = {p:.4f}")
-`}
+`,
+    },
+  ]}
 />
 
 The exact mechanics of `ttest_ind` are less important than the
@@ -125,7 +135,10 @@ test, decide based on the p-value plus your domain knowledge.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.RandomState(0)
@@ -135,7 +148,9 @@ for n in [10, 50, 500, 5000]:
     b = rng.normal(100.5, 10, n)  # tiny true difference
     p = stats.ttest_ind(a, b).pvalue
     print(f"n={n:>5}: p = {p:.4f}")
-`}
+`,
+    },
+  ]}
 />
 
 A real-but-tiny difference of 0.5 looks like nothing at small

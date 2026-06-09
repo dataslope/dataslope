@@ -22,7 +22,10 @@ int>` is the type of functions from `int` to `int`.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 // A delegate variable holds a reference to a function.
 Func<int, int> square = x => x * x;
@@ -39,7 +42,9 @@ Console.WriteLine(square(5)); // 125
 var ops = new Func<int, int>[] { square, negate, x => x + 1 };
 foreach (var f in ops)
     Console.WriteLine(f(10));
-`}
+`,
+    },
+  ]}
 />
 
 The built-in delegate types you'll use 99% of the time:
@@ -65,7 +70,10 @@ A **lambda** is an inline literal of a delegate type. It is written
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 Func<int, int> a = x => x * 2;           // single param, no parens
 Func<int, int, int> b = (x, y) => x + y; // multiple params
@@ -82,7 +90,9 @@ Console.WriteLine(c(6));
 Console.WriteLine(d(7));
 e();
 f("Ada");
-`}
+`,
+    },
+  ]}
 />
 
 Two forms of body are allowed:
@@ -101,7 +111,10 @@ pass the method directly — no need to wrap it in a lambda.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 static int Double(int x) => x * 2;
@@ -111,7 +124,9 @@ var nums = new[] { 1, 2, 3 };
 // Both lines do the same thing.
 Console.WriteLine(string.Join(",", nums.Select(x => Double(x))));
 Console.WriteLine(string.Join(",", nums.Select(Double)));
-`}
+`,
+    },
+  ]}
 />
 
 Prefer the method reference — `nums.Select(Double)` — when the
@@ -125,7 +140,10 @@ called a **closure**.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 int threshold = 10;
@@ -137,7 +155,9 @@ Console.WriteLine(string.Join(",", nums.Where(aboveThreshold))); // 12, 20
 // Reassigning the captured variable changes what the closure sees!
 threshold = 4;
 Console.WriteLine(string.Join(",", nums.Where(aboveThreshold))); // 5, 12, 8, 20
-`}
+`,
+    },
+  ]}
 />
 
 The lambda captured the *variable*, not the value of `threshold` at
@@ -150,7 +170,10 @@ The most famous closure bug in C# is capturing a loop variable.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 // In C# 5+ this prints 0,1,2,3,4 (the loop variable is per-iteration).
@@ -163,7 +186,9 @@ for (int i = 0; i < 5; i++)
 
 foreach (var a in actions)
     a();
-`}
+`,
+    },
+  ]}
 />
 
 If you encounter older codebases, you may see explicit
@@ -227,7 +252,10 @@ entirely as data.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -251,7 +279,9 @@ foreach (var p in people)
 }
 
 record Person(string Name, int Age, string City);
-`}
+`,
+    },
+  ]}
 />
 
 The rules are *data*. You could load them from a config file,

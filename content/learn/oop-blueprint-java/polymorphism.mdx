@@ -47,7 +47,10 @@ flowchart LR
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Animal a = new Dog();          // compile-time type Animal, runtime type Dog
     System.out.println(a.speak()); // -> "Woof!" (Dog's override)
@@ -72,7 +75,9 @@ class Cat extends Animal {
     return "Meow!";
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 The compiler only allows `a.speak()` because `Animal` has a method
@@ -106,7 +111,7 @@ brand new `Hexagon` tomorrow, and your function doesn't change.
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.Arrays;
+      starterCode: `import java.util.Arrays;
 import java.util.List;
 
 public class Main {
@@ -121,14 +126,14 @@ public class Main {
     },
     {
       filename: "Shape.java",
-      initialContent: `public interface Shape {
+      starterCode: `public interface Shape {
   String draw();
 }
 `,
     },
     {
       filename: "Circle.java",
-      initialContent: `public class Circle implements Shape {
+      starterCode: `public class Circle implements Shape {
   private final double r;
   public Circle(double r) { this.r = r; }
   @Override
@@ -140,7 +145,7 @@ public class Main {
     },
     {
       filename: "Square.java",
-      initialContent: `public class Square implements Shape {
+      starterCode: `public class Square implements Shape {
   private final double s;
   public Square(double s) { this.s = s; }
   @Override
@@ -152,7 +157,7 @@ public class Main {
     },
     {
       filename: "Triangle.java",
-      initialContent: `public class Triangle implements Shape {
+      starterCode: `public class Triangle implements Shape {
   private final double base, height;
   public Triangle(double base, double height) {
     this.base = base;
@@ -167,7 +172,7 @@ public class Main {
     },
     {
       filename: "Renderer.java",
-      initialContent: `import java.util.List;
+      starterCode: `import java.util.List;
 
 public class Renderer {
   public void drawAll(List<Shape> shapes) {
@@ -223,7 +228,10 @@ expression and may fail at runtime if you're wrong.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Animal a1 = new Dog();
     Animal a2 = new Cat();
@@ -258,7 +266,9 @@ class Cat extends Animal {
   }
   public String purr() { return "purrrr"; }
 }
-`}
+`,
+    },
+  ]}
 />
 
 A heavy reliance on `instanceof` and downcasting is usually a *smell*
@@ -306,7 +316,7 @@ total cents: 800000
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.Arrays;
+      starterCode: `import java.util.Arrays;
 import java.util.List;
 
 public class Main {
@@ -324,18 +334,18 @@ public class Main {
     },
     {
       filename: "Payable.java",
-      initialContent: `public interface Payable {
+      starterCode: `public interface Payable {
   int monthlyPayCents();
 }
 `,
     },
     {
       filename: "SalariedEmployee.java",
-      initialContent: `public class SalariedEmployee implements Payable {
+      starterCode: `public class SalariedEmployee implements Payable {
   // TODO
 }
 `,
-      solutionContent: `public class SalariedEmployee implements Payable {
+      solutionCode: `public class SalariedEmployee implements Payable {
   private final int salaryCents;
   public SalariedEmployee(int salaryCents) { this.salaryCents = salaryCents; }
   @Override
@@ -347,11 +357,11 @@ public class Main {
     },
     {
       filename: "HourlyEmployee.java",
-      initialContent: `public class HourlyEmployee implements Payable {
+      starterCode: `public class HourlyEmployee implements Payable {
   // TODO
 }
 `,
-      solutionContent: `public class HourlyEmployee implements Payable {
+      solutionCode: `public class HourlyEmployee implements Payable {
   private final int hourlyRateCents;
   private final int hoursWorked;
   public HourlyEmployee(int hourlyRateCents, int hoursWorked) {
@@ -367,7 +377,7 @@ public class Main {
     },
     {
       filename: "Payroll.java",
-      initialContent: `import java.util.List;
+      starterCode: `import java.util.List;
 
 public class Payroll {
   public int totalCents(List<Payable> payees) {
@@ -376,7 +386,7 @@ public class Payroll {
   }
 }
 `,
-      solutionContent: `import java.util.List;
+      solutionCode: `import java.util.List;
 
 public class Payroll {
   public int totalCents(List<Payable> payees) {

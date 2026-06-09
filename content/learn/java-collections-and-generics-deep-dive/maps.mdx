@@ -45,7 +45,10 @@ iterate a map. Of those, `entrySet()` is almost always what you want.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.HashMap;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.HashMap;
 import java.util.Map;
 
 public class Main {
@@ -60,7 +63,9 @@ public class Main {
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 `merge(key, defaultValue, remapping)` is the single most useful
@@ -109,7 +114,10 @@ order** (or, optionally, **access order**, for LRU caches).
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.LinkedHashMap;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Main {
@@ -126,7 +134,9 @@ public class Main {
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Use it when the *order in which entries were added* matters for
@@ -140,7 +150,10 @@ everywhere, but in exchange you get range queries, `firstKey`,
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.Map;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.Map;
 import java.util.TreeMap;
 
 public class Main {
@@ -160,7 +173,9 @@ public class Main {
     System.out.println("80-100: " + grades.subMap(80, 101));
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 This is what makes `TreeMap` shine for *ranges* and *bands* — pricing
@@ -174,7 +189,10 @@ ordinal. Use it whenever you have an enum-keyed lookup.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.EnumMap;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.EnumMap;
 import java.util.Map;
 
 public class Main {
@@ -191,7 +209,9 @@ public class Main {
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## The handful of Map methods worth memorizing
@@ -213,7 +233,10 @@ The most useful idiom of all is "map of lists":
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.*;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.*;
 
 public class Main {
   public static void main(String[] args) {
@@ -228,7 +251,9 @@ public class Main {
         (k, v) -> System.out.println(k + " -> " + v));
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Without `computeIfAbsent` that loop would be five lines of "if not
@@ -251,7 +276,7 @@ use `containsKey` to distinguish.
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Cache<String, Integer> sq = new Cache<>(k -> {
       System.out.println("computing " + k);
@@ -267,7 +292,7 @@ use `containsKey` to distinguish.
     },
     {
       filename: "Cache.java",
-      initialContent: `import java.util.HashMap;
+      starterCode: `import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -306,7 +331,7 @@ Expected output (a TreeMap is used in the driver only to make the printout deter
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.List;
+      starterCode: `import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -322,7 +347,7 @@ public class Main {
     },
     {
       filename: "Grouper.java",
-      initialContent: `import java.util.*;
+      starterCode: `import java.util.*;
 
 public class Grouper {
   public static Map<Integer, List<String>> byLength(List<String> words) {
@@ -331,7 +356,7 @@ public class Grouper {
   }
 }
 `,
-      solutionContent: `import java.util.*;
+      solutionCode: `import java.util.*;
 
 public class Grouper {
   public static Map<Integer, List<String>> byLength(List<String> words) {

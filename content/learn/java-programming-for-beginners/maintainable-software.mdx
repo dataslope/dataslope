@@ -27,7 +27,10 @@ Compare two versions of the same logic.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     double[] prices = {12.0, 8.5, 5.0, 20.0};
 
@@ -60,7 +63,9 @@ Compare two versions of the same logic.
 
   static double roundCents(double v) { return Math.round(v * 100.0) / 100.0; }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Version B is longer. It is also *much* easier to:
@@ -183,7 +188,10 @@ it; then read the cleaned-up version below.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     // Compute final price with tax and shipping
     double a = 49.99;
@@ -195,12 +203,17 @@ it; then read the cleaned-up version below.
     System.out.println("$" + c);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   private static final double SHIPPING_FEE = 5.99;
   private static final double FREE_SHIPPING_THRESHOLD = 50.0;
   private static final double TAX_RATE = 0.07;
@@ -223,7 +236,9 @@ it; then read the cleaned-up version below.
 
   static double applyTax(double amount) { return amount + (amount * TAX_RATE); }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Same behavior. Same arithmetic. Vastly easier to change when next

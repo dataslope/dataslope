@@ -24,10 +24,15 @@ analyst needs.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`print(df.describe().round(2).T)
-`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `print(df.describe().round(2).T)
+`,
+    },
+  ]}
 />
 
 `describe()` shows everything at once for numeric columns. Use
@@ -38,10 +43,15 @@ For non-numeric columns:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`print(df.describe(include="object"))
-`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `print(df.describe(include="object"))
+`,
+    },
+  ]}
 />
 
 You get `count`, `unique`, `top` (most common), and `freq`.
@@ -50,14 +60,19 @@ You get `count`, `unique`, `top` (most common), and `freq`.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 # A small team where one CEO skews everything
 salaries = pd.Series([45_000, 52_000, 48_000, 55_000, 60_000, 47_000, 850_000])
 
 print(f"Mean:   $ {salaries.mean():>10,.0f}")
 print(f"Median: $ {salaries.median():>10,.0f}")
-`}
+`,
+    },
+  ]}
 />
 
 The mean salary is \$165K — almost nobody earns that. The median
@@ -75,7 +90,10 @@ file sizes are almost always skewed.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 s = pd.Series([1, 2, 4, 5, 7, 9, 12, 15, 20, 35, 50])
 
@@ -84,7 +102,9 @@ print("50%:", s.quantile(0.50))  # same as median
 print("75%:", s.quantile(0.75))
 print("90%:", s.quantile(0.90))
 print("99%:", s.quantile(0.99))
-`}
+`,
+    },
+  ]}
 />
 
 Quantiles are great for things like SLAs ("95% of our requests
@@ -94,7 +114,10 @@ finish in under X ms") or pay-band analyses.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 a = pd.Series([50, 50, 50, 50, 50])  # no spread
 b = pd.Series([20, 30, 50, 70, 80])  # moderate
@@ -103,7 +126,9 @@ c = pd.Series([0, 10, 50, 90, 100])  # large
 for name, s in [("a", a), ("b", b), ("c", c)]:
     iqr = s.quantile(0.75) - s.quantile(0.25)
     print(f"{name}: mean={s.mean()}, std={s.std():.1f}, IQR={iqr}")
-`}
+`,
+    },
+  ]}
 />
 
 **std** (standard deviation) is the typical distance from the
@@ -114,13 +139,18 @@ spread. IQR is more robust to outliers; std is more sensitive.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`print(df["Department"].value_counts())
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `print(df["Department"].value_counts())
 print()
 print("As percentages:")
 print((df["Department"].value_counts(normalize=True) * 100).round(1))
-`}
+`,
+    },
+  ]}
 />
 
 `normalize=True` gives proportions instead of counts — perfect
@@ -130,12 +160,17 @@ for "what share of our customers are in each tier?".
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`numeric = df.select_dtypes(include="number")
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `numeric = df.select_dtypes(include="number")
 corr = numeric.corr().round(2)
 print(corr)
-`}
+`,
+    },
+  ]}
 />
 
 The correlation between two columns ranges from -1 to +1:
@@ -160,11 +195,16 @@ The natural extension — `describe` per group:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`# Tenure summary per department
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `# Tenure summary per department
 print(df.groupby("Department")["time_spend_company"].describe().round(2))
-`}
+`,
+    },
+  ]}
 />
 
 ## Outlier flags via the 1.5×IQR rule
@@ -174,7 +214,10 @@ A common rule of thumb: anything beyond Q1 − 1.5×IQR or Q3 +
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 s = pd.Series([10, 12, 11, 13, 12, 11, 14, 13, 12, 95])
 
@@ -184,7 +227,9 @@ lo, hi = q1 - 1.5 * iqr, q3 + 1.5 * iqr
 
 print(f"Outlier bounds: [{lo:.1f}, {hi:.1f}]")
 print("Outliers:", s[(s < lo) | (s > hi)].tolist())
-`}
+`,
+    },
+  ]}
 />
 
 This is a **heuristic**, not a verdict — you still have to
@@ -204,15 +249,18 @@ the most important customer on the list.
 - "p95": 95th percentile (float)
 - "iqr": Q3 minus Q1 (float)
 - "n_outliers": number of values outside [Q1 - 1.5*IQR, Q3 + 1.5*IQR] (int)`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 
-values = pd.Series([5, 7, 6, 8, 7, 5, 9, 8, 6, 7, 6, 100, 5, 7, 8, np.nan, 6])`}
-  starterCode={`summary = {}  # TODO
+values = pd.Series([5, 7, 6, 8, 7, 5, 9, 8, 6, 7, 6, 100, 5, 7, 8, np.nan, 6])`,
+      starterCode: `summary = {}  # TODO
 
 print(summary)
-`}
-  solutionCode={`import pandas as pd
+`,
+      solutionCode: `import pandas as pd
 import numpy as np
 
 s = values.dropna()
@@ -230,7 +278,9 @@ summary = {
 }
 
 print(summary)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type",

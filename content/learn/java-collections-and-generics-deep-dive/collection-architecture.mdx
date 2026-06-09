@@ -130,7 +130,7 @@ but its API is safe to use everywhere:
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.*;
+      starterCode: `import java.util.*;
 
 public class Main {
   public static void main(String[] args) {
@@ -157,12 +157,12 @@ public class Main {
     },
     {
       filename: "Book.java",
-      initialContent: `public record Book(String isbn, String title, String author) {}
+      starterCode: `public record Book(String isbn, String title, String author) {}
 `,
     },
     {
       filename: "BookRepo.java",
-      initialContent: `import java.util.*;
+      starterCode: `import java.util.*;
 
 public final class BookRepo {
   private final Map<String, Book> byIsbn; // private mutable state, owned here
@@ -237,7 +237,7 @@ caller mutation was blocked
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -264,7 +264,7 @@ public class Main {
     },
     {
       filename: "Inbox.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Inbox {
@@ -281,7 +281,7 @@ public class Inbox {
   }
 }
 `,
-      solutionContent: `import java.util.ArrayList;
+      solutionCode: `import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 

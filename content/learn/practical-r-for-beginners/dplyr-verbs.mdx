@@ -89,7 +89,10 @@ purposes; we'll use `|>` throughout.
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 data(mtcars)
 
 # Single condition
@@ -103,7 +106,9 @@ mtcars |> filter(mpg > 30 | hp > 200)
 
 # Member of a set
 mtcars |> filter(cyl %in% c(4, 6))
-`}
+`,
+    },
+  ]}
 />
 
 Notice we wrote `mpg`, not `mtcars$mpg`. Inside the dplyr verbs,
@@ -118,7 +123,10 @@ want.
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 data(mtcars)
 
 # By name
@@ -145,7 +153,9 @@ mtcars |>
 mtcars |>
   select(starts_with("d")) |>
   head()
-`}
+`,
+    },
+  ]}
 />
 
 `select()` has many "helper" functions: `starts_with()`,
@@ -157,7 +167,10 @@ ergonomic.
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 data(mtcars)
 
 mtcars |>
@@ -168,7 +181,9 @@ mtcars |>
   ) |>
   select(mpg, kpl, power_wt, is_heavy) |>
   head()
-`}
+`,
+    },
+  ]}
 />
 
 `mutate()` is for *adding* derived columns. The new columns can
@@ -179,21 +194,29 @@ To *replace* a column, mutate with the same name:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 data(mtcars)
 
 mtcars |>
   mutate(mpg = round(mpg, 0)) |>
   select(mpg) |>
   head()
-`}
+`,
+    },
+  ]}
 />
 
 ## `arrange()` — sort rows
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 data(mtcars)
 
 # Ascending
@@ -210,7 +233,9 @@ mtcars |>
 mtcars |>
   arrange(cyl, desc(mpg)) |>
   head()
-`}
+`,
+    },
+  ]}
 />
 
 ## `summarise()` — collapse to a single row
@@ -221,7 +246,10 @@ statistics:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 data(mtcars)
 
 mtcars |>
@@ -231,7 +259,9 @@ mtcars |>
     sd_mpg   = sd(mpg),
     max_hp   = max(hp)
   )
-`}
+`,
+    },
+  ]}
 />
 
 By itself, this isn't more interesting than `mean()` etc. on
@@ -242,7 +272,10 @@ their own. The magic happens when you combine it with
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 data(mtcars)
 
 mtcars |>
@@ -251,7 +284,9 @@ mtcars |>
   select(mpg, cyl, hp, wt, power_wt) |>
   arrange(desc(power_wt)) |>
   head(10)
-`}
+`,
+    },
+  ]}
 />
 
 Read it top to bottom: *"From mtcars, keep four- and six-cylinder
@@ -314,14 +349,17 @@ Using `dplyr` and the pipe, from `mtcars`:
   adapter="r"
   title="A small dplyr pipeline"
   instructions={`Use the pipe and four dplyr verbs (\`filter\`, \`mutate\`, \`select\`, \`arrange\`) to produce \`top_eff\` as described.`}
-  starterCode={`library(dplyr)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(dplyr)
 data(mtcars)
 
 top_eff <- NULL # build a pipeline that produces a data.frame
 
 print(top_eff)
-`}
-  solutionCode={`library(dplyr)
+`,
+      solutionCode: `library(dplyr)
 data(mtcars)
 
 top_eff <- mtcars |>
@@ -331,7 +369,9 @@ top_eff <- mtcars |>
   arrange(desc(mpg_per_cyl))
 
 print(top_eff)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "df",

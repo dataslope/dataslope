@@ -16,16 +16,21 @@ from it. Keep the class named `Main` for these exercises.
   adapter="java"
   title="Print a greeting"
   instructions={`Make the program print exactly \`Hello, Java!\`.`}
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     // your code here
   }
 }
-`}
-  solutionCode={`public class Main {
+`,
+      solutionCode: `public class Main {
   public static void main(String[] args) { System.out.println("Hello, Java!"); }
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "hello",
@@ -41,16 +46,21 @@ from it. Keep the class named `Main` for these exercises.
   adapter="java"
   title="Print a greeting"
   instructions={`Make the program print exactly \`Hello, Java!\`.`}
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     // your code here
   }
 }
-`}
-  solutionCode={`public class Main {
+`,
+      solutionCode: `public class Main {
   public static void main(String[] args) { System.out.println("Hello, Java!"); }
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "hello",
@@ -68,14 +78,17 @@ from it. Keep the class named `Main` for these exercises.
   adapter="java"
   title="Reverse a String"
   instructions={`Reverse the string \`"DataSlope"\` and print it on its own line.`}
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     String s = "DataSlope";
     // your code here
   }
 }
-`}
-  solutionCode={`public class Main {
+`,
+      solutionCode: `public class Main {
   public static String reverse(String s) {
     return new StringBuilder(s).reverse().toString();
   }
@@ -83,7 +96,9 @@ from it. Keep the class named `Main` for these exercises.
     System.out.println(reverse("DataSlope"));
   }
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "reversed",
@@ -99,14 +114,17 @@ from it. Keep the class named `Main` for these exercises.
   adapter="java"
   title="Reverse a String"
   instructions={`Reverse the string \`"DataSlope"\` and print it on its own line.`}
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     String s = "DataSlope";
     // your code here
   }
 }
-`}
-  solutionCode={`public class Main {
+`,
+      solutionCode: `public class Main {
   public static String reverse(String s) {
     return new StringBuilder(s).reverse().toString();
   }
@@ -114,7 +132,9 @@ from it. Keep the class named `Main` for these exercises.
     System.out.println(reverse("DataSlope"));
   }
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "reversed",
@@ -141,7 +161,7 @@ so `Main` can reference `Dog` directly without any imports.
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Dog d = new Dog();
     System.out.println(d.bark());
@@ -151,14 +171,14 @@ so `Main` can reference `Dog` directly without any imports.
     },
     {
       filename: "Dog.java",
-      initialContent: `public class Dog {
+      starterCode: `public class Dog {
   public String bark() {
     // your code here
     return "";
   }
 }
 `,
-      solutionContent: `public class Dog {
+      solutionCode: `public class Dog {
   public String bark() { return "Woof!"; }
 }
 `,
@@ -178,12 +198,12 @@ so `Main` can reference `Dog` directly without any imports.
 <ChallengeCard
   adapter="java"
   title="Implement Dog.bark()"
-  instructions={`Open Dog.java and implement the bark() method ...`}
+  instructions={`Open \`Dog.java\` and implement the \`bark()\` method so that it returns the string \`"Woof!"\`. \`Main.java\` is provided — it constructs a \`Dog\` and prints the result of \`bark()\`.`}
   entryFilename="Main.java"
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Dog d = new Dog();
     System.out.println(d.bark());
@@ -193,11 +213,14 @@ so `Main` can reference `Dog` directly without any imports.
     },
     {
       filename: "Dog.java",
-      initialContent: `public class Dog {
-  public String bark() { return ""; }
+      starterCode: `public class Dog {
+  public String bark() {
+    // your code here
+    return "";
+  }
 }
 `,
-      solutionContent: `public class Dog {
+      solutionCode: `public class Dog {
   public String bark() { return "Woof!"; }
 }
 `,
@@ -220,20 +243,25 @@ so `Main` can reference `Dog` directly without any imports.
   adapter="java"
   title="Print even numbers"
   instructions={`Print every even number from **2** to **10** (inclusive), one per line.`}
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     // your code here
   }
 }
-`}
-  solutionCode={`public class Main {
+`,
+      solutionCode: `public class Main {
   public static void main(String[] args) {
     for (int i = 2; i <= 10; i += 2) {
       System.out.println(i);
     }
   }
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "evens",
@@ -252,20 +280,25 @@ so `Main` can reference `Dog` directly without any imports.
   adapter="java"
   title="Print even numbers"
   instructions={`Print every even number from **2** to **10** (inclusive), one per line.`}
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     // your code here
   }
 }
-`}
-  solutionCode={`public class Main {
+`,
+      solutionCode: `public class Main {
   public static void main(String[] args) {
     for (int i = 2; i <= 10; i += 2) {
       System.out.println(i);
     }
   }
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "evens",

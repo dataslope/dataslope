@@ -38,7 +38,10 @@ A real example:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function double(n) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function double(n) {
   return n * 2;
 }
 
@@ -47,7 +50,9 @@ console.log(double(10)); // 20
 console.log(double(-7)); // -14
 
 // 'double' is the function. We can use it as many times as we like.
-`}
+`,
+    },
+  ]}
 />
 
 Notice four things:
@@ -82,7 +87,10 @@ Compare these two equivalent programs:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// Without functions — the formula is repeated and unnamed.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// Without functions — the formula is repeated and unnamed.
 const bill1 = 80;
 const tip1 = bill1 * 0.18;
 const total1 = bill1 + tip1;
@@ -97,12 +105,17 @@ const bill3 = 120;
 const tip3 = bill3 * 0.18;
 const total3 = bill3 + tip3;
 console.log("Table 3 total:", total3);
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// With a function — the formula has a name and lives in one place.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// With a function — the formula has a name and lives in one place.
 function totalWithTip(bill, tipRate) {
   return bill + bill * tipRate;
 }
@@ -112,7 +125,9 @@ console.log("Table 2 total:", totalWithTip(45, 0.18));
 console.log("Table 3 total:", totalWithTip(120, 0.18));
 
 // And if the tip rate ever changes, you change ONE line.
-`}
+`,
+    },
+  ]}
 />
 
 Both programs produce the same output. One is a maintenance
@@ -163,7 +178,10 @@ Arrow functions have a few useful shorthand rules:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// Three equivalent ways to define the same function:
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// Three equivalent ways to define the same function:
 function squareA(n) {
   return n * n;
 }
@@ -180,7 +198,9 @@ console.log(squareC(5));
 const nums = [1, 2, 3, 4, 5];
 const doubled = nums.map((n) => n * 2);
 console.log(doubled);
-`}
+`,
+    },
+  ]}
 />
 
 (There are a couple of subtle differences between regular
@@ -200,7 +220,10 @@ the secret weapon of modern JavaScript.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// A function in a variable.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// A function in a variable.
 const greet = (name) => "Hello, " + name + "!";
 console.log(greet("Ada"));
 
@@ -228,7 +251,9 @@ for (const op of operations) {
   v = op(v);
   console.log("after op:", v);
 }
-`}
+`,
+    },
+  ]}
 />
 
 If this feels like magic, that's normal — and important. We will
@@ -253,7 +278,10 @@ design is to keep them in well-marked, predictable places.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// Pure: depends only on its inputs, returns a value, no side effects.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// Pure: depends only on its inputs, returns a value, no side effects.
 function add(a, b) {
   return a + b;
 }
@@ -271,7 +299,9 @@ console.log(add(2, 3)); // 5  — same every time
 addToTotal(2);
 addToTotal(3); // result depends on previous calls!
 addToTotal(2);
-`}
+`,
+    },
+  ]}
 />
 
 Whenever you can, write pure functions and put the side effects
@@ -339,7 +369,7 @@ small two-file example that does exactly that.
   files={[
     {
       filename: "index.js",
-      initialContent: `const { totalWithTip, perPerson } = require("./bill");
+      starterCode: `const { totalWithTip, perPerson } = require("./bill");
 
 const bill = 84.5;
 const tipRate = 0.18;
@@ -354,7 +384,7 @@ console.log("Per person:", share.toFixed(2));
     },
     {
       filename: "bill.js",
-      initialContent: `function totalWithTip(bill, tipRate) {
+      starterCode: `function totalWithTip(bill, tipRate) {
   return bill + bill * tipRate;
 }
 
@@ -388,7 +418,10 @@ Then define a function \`bmiCategory(bmi)\` that returns:
 - \`"normal"\` if 18.5 ≤ bmi < 25
 - \`"overweight"\` if 25 ≤ bmi < 30
 - \`"obese"\` if bmi ≥ 30`}
-  starterCode={`function bmi(weightKg, heightM) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function bmi(weightKg, heightM) {
   // your code here
   return 0;
 }
@@ -399,8 +432,8 @@ function bmiCategory(value) {
 }
 
 console.log(bmi(70, 1.75), bmiCategory(bmi(70, 1.75)));
-`}
-  solutionCode={`function bmi(weightKg, heightM) {
+`,
+      solutionCode: `function bmi(weightKg, heightM) {
   return weightKg / (heightM * heightM);
 }
 
@@ -412,7 +445,9 @@ function bmiCategory(value) {
 }
 
 console.log(bmi(70, 1.75), bmiCategory(bmi(70, 1.75)));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "bmi_value",

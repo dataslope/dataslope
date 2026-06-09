@@ -70,7 +70,10 @@ then confirm their ACF/PACF match the table exactly.
 
 <CodeBlock
   adapter="python"
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
@@ -85,8 +88,8 @@ e = rng.normal(0, 1, n)
 y = np.zeros(n)
 for t in range(1, n):
     y[t] = 0.7 * y[t-1] + e[t]
-ar1 = pd.Series(y[50:])   # drop a burn-in so it's settled`}
-  starterCode={`from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+ar1 = pd.Series(y[50:])   # drop a burn-in so it's settled`,
+      starterCode: `from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 import matplotlib.pyplot as plt
 
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 3.6))
@@ -98,7 +101,9 @@ plt.show()
 print("ACF: a smooth decaying staircase (each value echoes through the chain).")
 print("PACF: one big spike at lag 1, then nothing -> the DIRECT dependence is")
 print("only on the immediately previous value. PACF cut at 1 => AR order p = 1.")
-`}
+`,
+    },
+  ]}
 />
 
 The ACF decays gradually (the indirect echoes fade out), while the PACF has a
@@ -109,7 +114,10 @@ One PACF spike → `p = 1`. Exactly the cheat-sheet.
 
 <CodeBlock
   adapter="python"
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
@@ -122,8 +130,8 @@ e = rng.normal(0, 1, n)
 y = np.zeros(n)
 for t in range(2, n):
     y[t] = 0.5 * y[t-1] + 0.3 * y[t-2] + e[t]   # AR(2), stationary (0.5+0.3<1)
-ar2 = pd.Series(y[50:])`}
-  starterCode={`from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+ar2 = pd.Series(y[50:])`,
+      starterCode: `from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 import matplotlib.pyplot as plt
 
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 3.6))
@@ -134,14 +142,19 @@ plt.show()
 
 print("Now the PACF has TWO significant spikes (lags 1 and 2), then nothing.")
 print("Two PACF spikes => AR order p = 2. The ACF still just tails off.")
-`}
+`,
+    },
+  ]}
 />
 
 ### MA(1): the mirror image — ACF cuts off at lag 1
 
 <CodeBlock
   adapter="python"
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
@@ -154,8 +167,8 @@ e = rng.normal(0, 1, n)
 y = np.zeros(n)
 for t in range(1, n):
     y[t] = e[t] + 0.8 * e[t-1]   # MA(1): a value is this shock plus 0.8 of the last shock
-ma1 = pd.Series(y[50:])`}
-  starterCode={`from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+ma1 = pd.Series(y[50:])`,
+      starterCode: `from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
 import matplotlib.pyplot as plt
 
 fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 3.6))
@@ -166,7 +179,9 @@ plt.show()
 
 print("The roles SWAP for an MA process: the ACF has one spike then cuts off,")
 print("and the PACF is the one that tails off. One ACF spike => MA order q = 1.")
-`}
+`,
+    },
+  ]}
 />
 
 <MultipleChoice
@@ -211,7 +226,10 @@ mistake.
 
 <CodeBlock
   adapter="python"
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
@@ -232,8 +250,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`from statsmodels.graphics.tsaplots import plot_acf
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `from statsmodels.graphics.tsaplots import plot_acf
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -252,7 +270,9 @@ print("Left: nearly every lag is 'significant' and the decay is glacial -- the")
 print("classic look of a NON-stationary series, NOT a high-order AR model.")
 print("Right: once stationary, the ACF has structure you can actually read,")
 print("including a spike near lag 12 -- the leftover SEASONAL signal.")
-`}
+`,
+    },
+  ]}
 />
 
 The raw ACF's slow linear-ish decay is a non-stationarity alarm, not a model
@@ -285,7 +305,10 @@ A slowly decaying, persistently high ACF signals non-stationarity — difference
 For lag k: \`sum((y[t]-ybar)*(y[t-k]-ybar) for t=k..n-1) / sum((y[t]-ybar)**2 for t=0..n-1)\`.
 
 Fill a list \`my_acf\` with \`acf_at(k)\` for k = 0..5, and set \`matches\` to \`True\` if it agrees (within 1e-6) with \`statsmodels.tsa.stattools.acf(y, nlags=5)\`. By construction \`acf_at(0)\` must equal \`1.0\`.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from statsmodels.tsa.stattools import acf
 rng = np.random.default_rng(4)
 n = 300
@@ -293,8 +316,8 @@ e = rng.normal(0, 1, n)
 y = np.zeros(n)
 for t in range(1, n):
     y[t] = 0.6 * y[t-1] + e[t]
-y = y[20:]`}
-  starterCode={`def acf_at(lag):
+y = y[20:]`,
+      starterCode: `def acf_at(lag):
     # TODO: mean-centered autocorrelation at the given lag
     return None
 
@@ -303,8 +326,8 @@ my_acf = None  # list of acf_at(0..5)
 matches = None  # True if it matches statsmodels acf(y, nlags=5)
 print(my_acf)
 print("matches statsmodels:", matches)
-`}
-  solutionCode={`import numpy as np
+`,
+      solutionCode: `import numpy as np
 from statsmodels.tsa.stattools import acf
 
 ybar = y.mean()
@@ -323,7 +346,9 @@ ref = acf(y, nlags=5)
 matches = bool(np.allclose(my_acf, ref, atol=1e-6))
 print([round(v, 4) for v in my_acf])
 print("matches statsmodels:", matches)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "lag0",
@@ -361,7 +386,10 @@ print("matches statsmodels:", matches)
 - \`p_hat\` — the AR order, taken as the number of the **leading** lags (1 and 2) that are significant
 
 The PACF here is significant at lags 1 and 2 and then cuts off (later lags fall within the band, give or take the occasional chance spike), so this is an **AR(2)** and \`p_hat\` should be 2.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from statsmodels.tsa.stattools import pacf
 rng = np.random.default_rng(9)
 n = 600
@@ -369,12 +397,12 @@ e = rng.normal(0, 1, n)
 y = np.zeros(n)
 for t in range(2, n):
     y[t] = 0.6 * y[t-1] - 0.3 * y[t-2] + e[t]   # AR(2)
-s = y[50:]`}
-  starterCode={`sig_lags = None  # significant lags in 1..8
+s = y[50:]`,
+      starterCode: `sig_lags = None  # significant lags in 1..8
 p_hat = None  # AR order from the leading significant spikes
 print("significant lags:", sig_lags, " estimated AR order:", p_hat)
-`}
-  solutionCode={`import numpy as np
+`,
+      solutionCode: `import numpy as np
 from statsmodels.tsa.stattools import pacf
 
 vals = pacf(s, nlags=8, method="ywm")
@@ -382,7 +410,9 @@ band = 1.96 / np.sqrt(len(s))
 sig_lags = [k for k in range(1, 9) if abs(vals[k]) > band]
 p_hat = sum(1 for k in (1, 2) if abs(vals[k]) > band)
 print("significant lags:", sig_lags, " estimated AR order:", p_hat)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "leading_two",

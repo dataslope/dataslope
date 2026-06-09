@@ -96,7 +96,10 @@ Let's walk a tiny program through every stage.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int x = 2;
     int y = 3;
@@ -106,7 +109,9 @@ Let's walk a tiny program through every stage.
 
   static int add(int a, int b) { return a + b; }
 }
-`}
+`,
+    },
+  ]}
 />
 
 When you click Run:

@@ -23,14 +23,19 @@ nudge that spreads the points out so you can see them.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 # One dot per bill, jittered within each day so they don't stack up.
 sns.catplot(data=tips, x="day", y="total_bill", kind="strip", height=4)
-`}
+`,
+    },
+  ]}
 />
 
 Every bill is on the chart. You can *see* that weekends carry more
@@ -45,14 +50,19 @@ the category line (useful only when values rarely collide); a number like
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 # Turn jitter off to see WHY it exists: points collapse onto one line.
 sns.catplot(data=tips, x="day", y="total_bill", kind="strip", jitter=False, height=4)
-`}
+`,
+    },
+  ]}
 />
 
 With jitter off, dense regions become a solid stripe and you lose the sense
@@ -68,14 +78,19 @@ points there. It is a strip plot and a rough distribution in one.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 # Points nudged apart so none overlap; the width shows where they pile up.
 sns.catplot(data=tips, x="day", y="total_bill", kind="swarm", height=4)
-`}
+`,
+    },
+  ]}
 />
 
 Look at the *shape* each day makes: it bulges where bills are common and
@@ -129,7 +144,10 @@ you can compare them cleanly.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
@@ -138,7 +156,9 @@ tips = sns.load_dataset("tips")
 sns.catplot(
     data=tips, x="day", y="total_bill", hue="sex", kind="strip", dodge=True, height=4
 )
-`}
+`,
+    },
+  ]}
 />
 
 With `dodge=True` each day shows two separate little clouds — one per `sex` —
@@ -188,21 +208,26 @@ body mass**, grouped by species.
 - Put \`species\` on the x-axis and \`body_mass_g\` on the y-axis.
 - Use \`kind="swarm"\` (or \`kind="strip"\` — either shows every point).
 - Assign the result to a variable named \`g\`.`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 # Build the plot showing every observation, and assign it to g:
 g = None
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 g = sns.catplot(data=penguins, x="species", y="body_mass_g", kind="swarm", height=4)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_facetgrid",

@@ -30,7 +30,10 @@ flowchart TD
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <queue>
 
 int main() {
@@ -45,7 +48,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Producer-consumer style
@@ -54,7 +59,10 @@ One part of a program can produce work while another consumes it in the same ord
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <queue>
 #include <string>
 
@@ -71,7 +79,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## `std::deque<T>`
@@ -80,7 +90,10 @@ A deque is a double-ended queue. It supports O(1) push and pop at both the front
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <deque>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <deque>
 #include <iostream>
 
 int main() {
@@ -95,7 +108,9 @@ int main() {
   std::cout << dq.front() << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Unlike `std::vector`, popping from the front of a deque does not shift every remaining element.
@@ -110,7 +125,10 @@ This example shows the operation shape: vector erases from the front by shifting
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <deque>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <deque>
 #include <iostream>
 #include <vector>
 
@@ -125,7 +143,9 @@ int main() {
   std::cout << "deque front now " << d.front() << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Priority queues teaser
@@ -134,7 +154,10 @@ int main() {
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <queue>
 
 int main() {
@@ -144,7 +167,9 @@ int main() {
   std::cout << scores.top() << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Breadth-first flavor
@@ -153,7 +178,10 @@ Queues also power breadth-first search: visit a node, enqueue its neighbors, the
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <queue>
 #include <vector>
 
@@ -171,7 +199,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Choose deque before list for queue ends">
@@ -184,7 +214,10 @@ A linked list can push and pop at ends, but a deque usually has better locality 
   adapter="cpp"
   title="Implement first non-repeating character in a stream"
   instructions={`Given a stream of lowercase characters, after each character print the first character so far with frequency one, or \`#\` if none exists. Use a queue plus a frequency table.`}
-  starterCode={`#include <array>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <array>
 #include <iostream>
 #include <queue>
 #include <string>
@@ -198,8 +231,8 @@ int main() {
   printFirstNonRepeating(stream);
   return 0;
 }
-`}
-  solutionCode={`#include <array>
+`,
+      solutionCode: `#include <array>
 #include <iostream>
 #include <queue>
 #include <string>
@@ -226,7 +259,9 @@ int main() {
   printFirstNonRepeating(stream);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "first_unique", name: "Prints first non-repeating after each step", expect: { stdoutLines: ["a", "#", "b", "b"], stdoutLinesExact: true } }]}
 />
 
@@ -236,7 +271,10 @@ int main() {
   adapter="cpp"
   title="Reverse the first k elements of a queue"
   instructions={`Given queue \`1,2,3,4,5\` and \`k=3\`, reverse the first three elements and keep the rest in order. Print the resulting queue in order.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <queue>
 #include <stack>
 
@@ -255,8 +293,8 @@ int main() {
   }
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <queue>
 #include <stack>
 
@@ -288,7 +326,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "reverse_k", name: "Reverses first three", expect: { stdoutLines: ["3", "2", "1", "4", "5"], stdoutLinesExact: true } }]}
 />
 

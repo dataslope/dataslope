@@ -32,7 +32,7 @@ constructor, and (traditionally) no method bodies.
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Greeter formal = new FormalGreeter();
     Greeter casual = new CasualGreeter();
@@ -47,14 +47,14 @@ constructor, and (traditionally) no method bodies.
     },
     {
       filename: "Greeter.java",
-      initialContent: `public interface Greeter {
+      starterCode: `public interface Greeter {
   String greet(String name);
 }
 `,
     },
     {
       filename: "FormalGreeter.java",
-      initialContent: `public class FormalGreeter implements Greeter {
+      starterCode: `public class FormalGreeter implements Greeter {
   @Override
   public String greet(String name) {
     return "Good day, " + name + ".";
@@ -64,7 +64,7 @@ constructor, and (traditionally) no method bodies.
     },
     {
       filename: "CasualGreeter.java",
-      initialContent: `public class CasualGreeter implements Greeter {
+      starterCode: `public class CasualGreeter implements Greeter {
   @Override
   public String greet(String name) {
     return "hey " + name + "!";
@@ -141,7 +141,7 @@ your class is — it just trusts the contract.
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.Arrays;
+      starterCode: `import java.util.Arrays;
 
 public class Main {
   public static void main(String[] args) {
@@ -162,7 +162,7 @@ public class Main {
     },
     {
       filename: "Book.java",
-      initialContent: `public class Book implements Comparable<Book> {
+      starterCode: `public class Book implements Comparable<Book> {
   private final String title;
   private final int pages;
 
@@ -198,7 +198,10 @@ implementations.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Greeter g = new Plain();
     System.out.println(g.greet("Ada"));
@@ -216,7 +219,9 @@ interface Greeter {
 class Plain implements Greeter {
   public String greet(String name) { return "hello, " + name; }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Use default methods sparingly. Their main job is *backwards
@@ -291,7 +296,7 @@ Hi, Ada!
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Printable[] items = {
         new Invoice(7, 1299),
@@ -306,22 +311,22 @@ Hi, Ada!
     },
     {
       filename: "Printable.java",
-      initialContent: `public interface Printable {
+      starterCode: `public interface Printable {
   // TODO
 }
 `,
-      solutionContent: `public interface Printable {
+      solutionCode: `public interface Printable {
   String toReport();
 }
 `,
     },
     {
       filename: "Invoice.java",
-      initialContent: `public class Invoice implements Printable {
+      starterCode: `public class Invoice implements Printable {
   // TODO
 }
 `,
-      solutionContent: `public class Invoice implements Printable {
+      solutionCode: `public class Invoice implements Printable {
   private final int id;
   private final int totalCents;
 
@@ -339,11 +344,11 @@ Hi, Ada!
     },
     {
       filename: "Greeting.java",
-      initialContent: `public class Greeting implements Printable {
+      starterCode: `public class Greeting implements Printable {
   // TODO
 }
 `,
-      solutionContent: `public class Greeting implements Printable {
+      solutionCode: `public class Greeting implements Printable {
   private final String who;
 
   public Greeting(String who) { this.who = who; }

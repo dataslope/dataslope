@@ -30,7 +30,10 @@ A short trace, where each operation acts on the top:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <stack>
 
 int main() {
@@ -45,7 +48,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 `top()` is only valid when the stack is not empty.
@@ -56,7 +61,10 @@ A vector already has the right back operations: `push_back`, `back`, and `pop_ba
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 class IntStack {
@@ -81,7 +89,9 @@ int main() {
   std::cout << st.top() << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="success" title="Stack operation costs">
@@ -102,7 +112,10 @@ flowchart TD
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <stack>
 #include <string>
 
@@ -129,7 +142,9 @@ int main() {
   std::cout << (ok && opens.empty() ? "balanced" : "not balanced") << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Reversing a sequence
@@ -138,7 +153,10 @@ Pushing items and popping them reverses their order.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <stack>
 #include <string>
 
@@ -156,7 +174,9 @@ int main() {
   std::cout << reversed << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Function call stack
@@ -179,7 +199,10 @@ sequenceDiagram
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int factorial(int n) {
   if (n <= 1)
@@ -191,7 +214,9 @@ int main() {
   std::cout << factorial(5) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Expression evaluation
@@ -200,7 +225,10 @@ Many parsers use stacks for operators and operands. You will see this idea again
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <stack>
 #include <string>
 
@@ -221,7 +249,9 @@ int main() {
   std::cout << values.top() << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Adapters limit the interface">
@@ -234,7 +264,10 @@ int main() {
   adapter="cpp"
   title="Balanced parentheses"
   instructions={`Implement \`isBalanced\` for \`() [] {}\`. The driver prints \`true\` or \`false\` for a test string.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <stack>
 #include <string>
 
@@ -247,8 +280,8 @@ int main() {
   std::cout << (isBalanced(test) ? "true" : "false") << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <stack>
 #include <string>
 
@@ -276,7 +309,9 @@ int main() {
   std::cout << (isBalanced(test) ? "true" : "false") << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "balanced", name: "Recognizes balanced brackets", expect: { stdoutEquals: "true" } }]}
 />
 
@@ -286,7 +321,10 @@ int main() {
   adapter="cpp"
   title="Reverse a string using a stack"
   instructions={`Push each character into a stack, then pop characters into the output string. The driver prints the reversed string.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <stack>
 #include <string>
 
@@ -299,8 +337,8 @@ int main() {
   std::cout << reverseWithStack(text) << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <stack>
 #include <string>
 
@@ -321,7 +359,9 @@ int main() {
   std::cout << reverseWithStack(text) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "reverse_stack", name: "Reverses string", expect: { stdoutEquals: "desserts" } }]}
 />
 

@@ -212,7 +212,10 @@ Define the comparison:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.read_csv(
     "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
@@ -223,7 +226,9 @@ print("Has MonthlyIncome?", "MonthlyIncome" in df.columns)
 print("Has Attrition?", "Attrition" in df.columns)
 print()
 print(df[["MonthlyIncome", "Attrition"]].head())
-`}
+`,
+    },
+  ]}
 />
 
 ### Step 3: Clean
@@ -233,12 +238,17 @@ need?
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`print("Missing MonthlyIncome:", df["MonthlyIncome"].isna().sum())
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `print("Missing MonthlyIncome:", df["MonthlyIncome"].isna().sum())
 print("Missing Attrition:    ", df["Attrition"].isna().sum())
 print("Unique Attrition values:", df["Attrition"].unique())
-`}
+`,
+    },
+  ]}
 />
 
 If both are zero and `Attrition` only contains `Yes`/`No`, we
@@ -248,15 +258,20 @@ are in good shape.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`}
-  starterCode={`summary = (
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+      starterCode: `summary = (
     df.groupby("Attrition")["MonthlyIncome"]
     .describe()[["count", "25%", "50%", "75%"]]
     .round(0)
 )
 print(summary)
-`}
+`,
+    },
+  ]}
 />
 
 You can see the quartiles for each group at a glance.

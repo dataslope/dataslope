@@ -17,7 +17,10 @@ flowchart TD
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <functional>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <functional>
 #include <iostream>
 #include <string>
 
@@ -28,7 +31,9 @@ int main() {
   std::cout << "bucket = " << (h % capacity) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 A good hash function is **deterministic**, **fast**, and distributes real inputs **uniformly** across buckets. Poor distribution creates long collision chains or probe runs.
@@ -51,7 +56,10 @@ flowchart LR
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <list>
 #include <string>
 #include <utility>
@@ -71,7 +79,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Collisions: open addressing
@@ -87,7 +97,10 @@ flowchart TD
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <optional>
 #include <string>
 #include <vector>
@@ -110,7 +123,9 @@ int main() {
     std::cout << i << ":" << (table[i] ? *table[i] : "empty") << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Load factor and rehashing
@@ -128,7 +143,10 @@ flowchart TD
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 #include <unordered_map>
 
@@ -144,7 +162,9 @@ int main() {
   std::cout << "load = " << score.load_factor() << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## `std::unordered_map` and `std::unordered_set`
@@ -153,7 +173,10 @@ int main() {
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -175,7 +198,9 @@ int main() {
   std::cout << seen.count(10) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## `std::map` vs `std::unordered_map`
@@ -184,7 +209,10 @@ int main() {
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <map>
 #include <string>
 #include <unordered_map>
@@ -201,7 +229,9 @@ int main() {
     std::cout << k << "=" << v << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 | Container | Internal idea | Search/insert/erase | Iteration order | Prefer when |
@@ -213,7 +243,10 @@ int main() {
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <cstddef>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <cstddef>
 #include <iostream>
 #include <unordered_set>
 
@@ -238,7 +271,9 @@ int main() {
   std::cout << points.count({2, 3}) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Common problem patterns
@@ -247,7 +282,10 @@ Frequency counting maps each value to a count.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -263,14 +301,19 @@ int main() {
     std::cout << w << ":" << count << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Two Sum stores values already seen, then asks whether the complement exists.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <unordered_map>
 #include <vector>
 
@@ -288,14 +331,19 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Group anagrams by sorting each word to form a canonical key.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <algorithm>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
 #include <iostream>
 #include <string>
 #include <unordered_map>
@@ -317,7 +365,9 @@ int main() {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Practice: Two Sum
@@ -326,7 +376,10 @@ int main() {
   adapter="cpp"
   title="Two Sum"
   instructions={`Implement \`std::pair<int,int> twoSum(const std::vector<int>& nums, int target)\` using an unordered map. Return the two indices whose values sum to target.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -342,8 +395,8 @@ int main() {
   std::cout << ans.first << " " << ans.second << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -365,7 +418,9 @@ int main() {
   std::cout << ans.first << " " << ans.second << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "two-sum", name: "Finds indices", expect: { stdoutEquals: "0 1" } }]}
 />
 
@@ -375,7 +430,10 @@ int main() {
   adapter="cpp"
   title="Most frequent word"
   instructions={`Return the word with the highest frequency. If several words tie, return the lexicographically smallest one.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -390,8 +448,8 @@ int main() {
   std::cout << mostFrequentWord(words) << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -416,7 +474,9 @@ int main() {
   std::cout << mostFrequentWord(words) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "tie", name: "Breaks ties lexicographically", expect: { stdoutEquals: "apple" } }]}
 />
 
@@ -426,7 +486,10 @@ int main() {
   adapter="cpp"
   title="Contains duplicate within k"
   instructions={`Implement \`containsNearbyDuplicate\`. Return true when two equal values occur at indices whose distance is at most \`k\`.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <unordered_map>
 #include <vector>
 
@@ -442,8 +505,8 @@ int main() {
   std::cout << containsNearbyDuplicate({1, 2, 3, 1, 2, 3}, 2) << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <unordered_map>
 #include <vector>
 
@@ -464,7 +527,9 @@ int main() {
   std::cout << containsNearbyDuplicate({1, 2, 3, 1, 2, 3}, 2) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "nearby", name: "Checks several cases", expect: { stdoutLines: ["true", "true", "false"], stdoutLinesExact: true } }]}
 />
 

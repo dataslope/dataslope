@@ -20,7 +20,10 @@ C++ is compiled ahead of time to machine code. There is no interpreter in the ho
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <numeric>
 #include <vector>
 
@@ -31,7 +34,9 @@ int main() {
   std::cout << "sum: " << total << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Fast does not mean careless">
@@ -56,7 +61,10 @@ The **Standard Template Library (STL)** gives you production-quality containers 
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <queue>
 #include <vector>
 
@@ -71,7 +79,9 @@ int main() {
   std::cout << "next: " << urgent.top() << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Closeness to memory makes DSA visible
@@ -87,7 +97,10 @@ That is why a vector can beat a list even when both have O(n) traversal: Big-O d
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 int main() {
@@ -103,7 +116,9 @@ int main() {
   std::cout << "second address: " << &xs[1] << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Templates: generic without giving up speed
@@ -112,7 +127,10 @@ Templates let you write algorithms once and let the compiler generate type-speci
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 
 template <typename T> T bigger(T a, T b) { return a < b ? b : a; }
@@ -122,7 +140,9 @@ int main() {
   std::cout << bigger(std::string("heap"), std::string("graph")) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## A small end-to-end example
@@ -131,7 +151,10 @@ Here is a tiny program that builds a vector, sorts it with `std::sort`, prints t
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <algorithm>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
 #include <chrono>
 #include <iostream>
 #include <vector>
@@ -155,7 +178,9 @@ int main() {
   std::cout << "sort took about " << micros << " microseconds\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Language landscape
@@ -193,7 +218,10 @@ Expected output:
 \`\`\`
 55 61 72 88 90
 \`\`\``}
-  starterCode={`#include <algorithm>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -202,8 +230,8 @@ int main() {
   // your code here
   return 0;
 }
-`}
-  solutionCode={`#include <algorithm>
+`,
+      solutionCode: `#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -218,7 +246,9 @@ int main() {
   std::cout << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "sorted_scores",
@@ -232,7 +262,10 @@ int main() {
   adapter="cpp"
   title="Find the most urgent task"
   instructions={`Use a \`std::priority_queue<int>\` to print the largest task priority from the vector. Print exactly \`top priority: 9\`.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <queue>
 #include <vector>
 
@@ -241,8 +274,8 @@ int main() {
   // your code here
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <queue>
 #include <vector>
 
@@ -255,7 +288,9 @@ int main() {
   std::cout << "top priority: " << pq.top() << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "top_priority",

@@ -82,7 +82,10 @@ supervised learning needs the answers to learn from.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
@@ -99,7 +102,9 @@ model.fit(X_train, y_train)
 # Because we have true labels for the test set, we can score accuracy.
 accuracy = model.score(X_test, y_test)
 print(f"Accuracy on held-out flowers: {accuracy:.0%}")
-`}
+`,
+    },
+  ]}
 />
 
 Two signatures mark this as supervised. First, `fit(X_train, y_train)`
@@ -129,7 +134,10 @@ point coordinates `X` and must discover the groupings on its own.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import make_blobs
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 
 # UNSUPERVISED: we generate points but DISCARD the true labels.
@@ -144,7 +152,9 @@ model.fit(X)
 # by the algorithm, not given to it.
 labels = model.labels_
 print("Discovered group for the first 10 points:", labels[:10])
-`}
+`,
+    },
+  ]}
 />
 
 Look at how different the call is. `fit(X)` takes **one** argument — there is
@@ -170,7 +180,10 @@ Same library, same `fit` method — but one gets answers and one does not.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris, make_blobs
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris, make_blobs
 from sklearn.linear_model import LogisticRegression
 from sklearn.cluster import KMeans
 
@@ -189,7 +202,9 @@ unsup = KMeans(n_clusters=3, n_init=10, random_state=0)
 unsup.fit(Xu)  # <-- one argument: X only
 print("Unsupervised: fit(X)     -- discovers STRUCTURE, no target given")
 print("              groups data; no ground-truth answer to score against")
-`}
+`,
+    },
+  ]}
 />
 
 The signature difference — `fit(X, y)` versus `fit(X)` — is the entire idea
@@ -242,7 +257,10 @@ contrast in what is even *possible* is the clearest way to feel the divide.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris, make_blobs
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris, make_blobs
 from sklearn.linear_model import LogisticRegression
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
@@ -260,7 +278,9 @@ km = KMeans(n_clusters=3, n_init=10, random_state=0).fit(Xu)
 # how tight and well-separated the discovered groups are.
 sil = silhouette_score(Xu, km.labels_)
 print("Unsupervised -> no accuracy; use a structure score instead:", round(sil, 3))
-`}
+`,
+    },
+  ]}
 />
 
 The supervised side reports accuracy because there are true labels to check
@@ -413,8 +433,11 @@ string \`"supervised"\` or the string \`"unsupervised"\`:
    that experts have already labeled with the correct diagnosis.
 
 The hidden tests check each individual answer.`}
-  initCode={``}
-  starterCode={`answers = {
+  files={[
+    {
+      filename: "main.py",
+      initCode: ``,
+      starterCode: `answers = {
     "predict_house_price": None,  # "supervised" or "unsupervised"
     "segment_customers": None,
     "classify_email_spam": None,
@@ -423,8 +446,8 @@ The hidden tests check each individual answer.`}
 }
 
 print(answers)
-`}
-  solutionCode={`answers = {
+`,
+      solutionCode: `answers = {
     "predict_house_price": "supervised",
     "segment_customers": "unsupervised",
     "classify_email_spam": "supervised",
@@ -433,7 +456,9 @@ print(answers)
 }
 
 print(answers)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "house_price",

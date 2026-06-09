@@ -43,7 +43,10 @@ step, easy to code, and almost always wrong.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -72,7 +75,9 @@ plt.xlabel("t")
 plt.ylabel("y")
 plt.legend()
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 With $h = 0.5$ Euler is wildly off — it can even oscillate. Halve
@@ -100,7 +105,10 @@ halving $h$ shrinks the error by **sixteen**.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 
 def rk4_step(f, t, y, h):
@@ -123,7 +131,9 @@ for _ in range(10):
 print(f"RK4   y(3) = {y:.10f}")
 print(f"exact y(3) = {np.exp(-6):.10f}")
 print(f"error      = {abs(y - np.exp(-6)):.2e}")
-`}
+`,
+    },
+  ]}
 />
 
 With ten steps of size 0.3, RK4 nails the answer to seven decimals.
@@ -138,7 +148,10 @@ RK4 with a built-in error estimator.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
@@ -167,7 +180,9 @@ ax[1].set_title("phase portrait spiraling in")
 plt.tight_layout()
 plt.show()
 print(f"solver took {sol.t.size} steps, {sol.nfev} function evaluations")
-`}
+`,
+    },
+  ]}
 />
 
 Key arguments:
@@ -186,7 +201,10 @@ something happens. `events` lets you catch those moments exactly.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy.integrate import solve_ivp
 
 
@@ -205,7 +223,9 @@ hit_ground.direction = -1  # only catch downward crossings
 sol = solve_ivp(ball, [0, 100], [0, 20], events=hit_ground, dense_output=True)
 print(f"Ball hit the ground at t = {sol.t_events[0][0]:.6f} s")
 print(f"Expected (closed form)  : t = {2 * 20 / 9.81:.6f} s")
-`}
+`,
+    },
+  ]}
 />
 
 `solve_ivp` solves the equation $g(t, y) = 0$ to root-finding
@@ -219,7 +239,10 @@ how big the state is.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
@@ -238,7 +261,9 @@ plt.plot(t, y, label="predator")
 plt.xlabel("time")
 plt.legend()
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 You should see the classic oscillatory boom-bust cycle: prey grow,
@@ -255,7 +280,10 @@ slowly. The classic example is the chemical kinetics problem
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy.integrate import solve_ivp
 import time
 
@@ -280,7 +308,9 @@ for method in ["RK45", "BDF", "LSODA"]:
         )
     except Exception as e:
         print(f"{method:7s}: FAILED  ({e})")
-`}
+`,
+    },
+  ]}
 />
 
 `RK45` either fails or takes thousands of evaluations. `BDF` and
@@ -298,7 +328,7 @@ converge, switch to `BDF` or `LSODA`.
   files={[
     {
       filename: "main.py",
-      initialContent: `import numpy as np
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 from lorenz import lorenz_rhs
@@ -325,7 +355,7 @@ plt.show()
     },
     {
       filename: "lorenz.py",
-      initialContent: `def lorenz_rhs(t, state, sigma, rho, beta):
+      starterCode: `def lorenz_rhs(t, state, sigma, rho, beta):
     """Classic Lorenz 1963 system."""
     x, y, z = state
     return [sigma * (y - x), x * (rho - z) - y, x * y - beta * z]
@@ -349,15 +379,18 @@ few time units — yet the system is fully deterministic.
 Implement \`time_to_apex(v0)\` that returns the apex time as a float.
 
 Verify against the closed-form answer $t^* = v_0 / g$.`}
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy.integrate import solve_ivp
 
 
 def time_to_apex(v0):
     # TODO: integrate, use an event on velocity == 0, return event time
     return 0.0
-`}
-  solutionCode={`import numpy as np
+`,
+      solutionCode: `import numpy as np
 from scipy.integrate import solve_ivp
 
 
@@ -372,7 +405,9 @@ def time_to_apex(v0):
     vel_zero.direction = -1
     sol = solve_ivp(rhs, [0, 1000], [0.0, v0], events=vel_zero, rtol=1e-10, atol=1e-12)
     return float(sol.t_events[0][0])
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "v20",

@@ -158,7 +158,10 @@ the one you'd put in a report.
 
 <CodeBlock
   adapter="r"
-  starterCode={`# A bad chart: rainbow colors, 3D-looking effect, no labels
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# A bad chart: rainbow colors, 3D-looking effect, no labels
 data(mtcars)
 mtcars$car <- rownames(mtcars)
 top <- mtcars[order(-mtcars$mpg), ][1:5, ]
@@ -168,12 +171,17 @@ barplot(top$mpg,
   col       = rainbow(5),
   main      = ""
 )
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="r"
-  starterCode={`# A better chart: single color, sorted, real title, axis label
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# A better chart: single color, sorted, real title, axis label
 data(mtcars)
 mtcars$car <- rownames(mtcars)
 top <- mtcars[order(-mtcars$mpg), ][1:5, ]
@@ -187,7 +195,9 @@ barplot(rev(top$mpg),
   xlab      = "Miles per gallon",
   main      = "Top 5 most fuel-efficient cars (mtcars)"
 )
-`}
+`,
+    },
+  ]}
 />
 
 What changed:

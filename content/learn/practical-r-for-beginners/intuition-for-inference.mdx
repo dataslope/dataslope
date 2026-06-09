@@ -34,7 +34,10 @@ The intuition is easier to see in a simulation:
 
 <CodeBlock
   adapter="r"
-  starterCode={`set.seed(1)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `set.seed(1)
 # Truth: mean = 100
 true_mean <- 100
 
@@ -52,7 +55,9 @@ results <- replicate(100,
 
 contains <- sapply(results, function(r) r$lo <= true_mean && true_mean <= r$hi)
 mean(contains)
-`}
+`,
+    },
+  ]}
 />
 
 Run it a few times. You'll see the fraction of CIs containing
@@ -64,7 +69,10 @@ Visualize it:
 
 <CodeBlock
   adapter="r"
-  starterCode={`set.seed(1)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `set.seed(1)
 true_mean <- 100
 
 n_studies <- 30
@@ -92,7 +100,9 @@ for (i in 1:n_studies) {
   segments(results[i, "lo"], i, results[i, "hi"], i, col = col_i, lwd = 2)
   points(results[i, "x"], i, pch = 19, col = col_i)
 }
-`}
+`,
+    },
+  ]}
 />
 
 Most lines cross the red truth-line. A few miss. That's
@@ -116,14 +126,19 @@ Let's run a quick test:
 
 <CodeBlock
   adapter="r"
-  starterCode={`set.seed(5)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `set.seed(5)
 
 # Two groups; truth: group B is slightly higher (mean 102 vs 100)
 groupA <- rnorm(40, mean = 100, sd = 10)
 groupB <- rnorm(40, mean = 102, sd = 10)
 
 t.test(groupB, groupA)
-`}
+`,
+    },
+  ]}
 />
 
 The output gives you:
@@ -157,7 +172,10 @@ stories:
 
 <CodeBlock
   adapter="r"
-  starterCode={`set.seed(1)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `set.seed(1)
 
 # Study A: small but reliable effect, huge n
 A1 <- rnorm(50000, mean = 100.0, sd = 15)
@@ -174,7 +192,9 @@ cat(
   "B: diff =", round(mean(B2) - mean(B1), 3),
   "p =", format.pval(t.test(B2, B1)$p.value), "\\n"
 )
-`}
+`,
+    },
+  ]}
 />
 
 A and B might both look "highly significant" by p-value, but the
@@ -202,7 +222,10 @@ interpret.
 
 <CodeBlock
   adapter="r"
-  starterCode={`# Built-in dataset: sleep
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# Built-in dataset: sleep
 # Two groups (drug 1 vs drug 2), extra hours of sleep
 head(sleep)
 summary(sleep)
@@ -216,7 +239,9 @@ boxplot(extra ~ group,
 
 # Inference
 t.test(extra ~ group, data = sleep)
-`}
+`,
+    },
+  ]}
 />
 
 A grounded reading of that output:
@@ -306,7 +331,10 @@ output of `t.test()` to a variable `tt`, and pull out:
   adapter="r"
   title="t-test workflow on mtcars"
   instructions={`Run \`t.test(mpg ~ am, data = mtcars)\` and from its returned object set: \`tt\` to the test result, \`est_diff\` to \`mean(manual) - mean(automatic)\` (note: \`am = 1\` is manual, \`am = 0\` is automatic), \`ci\` to the confidence interval as a length-2 numeric, and \`p\` to the p-value.`}
-  starterCode={`tt <- NULL
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `tt <- NULL
 est_diff <- NULL
 ci <- NULL
 p <- NULL
@@ -315,15 +343,17 @@ print(tt)
 cat("est_diff:", est_diff, "\\n")
 cat("ci:      ", ci, "\\n")
 cat("p:       ", p, "\\n")
-`}
-  solutionCode={`tt <- t.test(mpg ~ am, data = mtcars)
+`,
+      solutionCode: `tt <- t.test(mpg ~ am, data = mtcars)
 # t.test with formula uses level order; group 0 (auto) first, group 1 (manual) second.
 # tt$estimate is c("mean in group 0" = auto, "mean in group 1" = manual)
 est_diff <- unname(tt$estimate[2] - tt$estimate[1])
 ci <- as.numeric(tt$conf.int) * -1 # flip CI to match (manual - auto) direction
 ci <- sort(ci)
 p <- tt$p.value
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "ttype",

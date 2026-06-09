@@ -19,7 +19,10 @@ The **`keyof`** operator takes an object type and produces a union of its keys (
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type User = { id: number; name: string; email: string };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type User = { id: number; name: string; email: string };
 
 type UserKeys = keyof User;
 
@@ -27,14 +30,19 @@ const key1: UserKeys = "id"; // OK
 const key2: UserKeys = "name"; // OK
 // const key3: UserKeys = "age"; // Error: not a key of User
 console.log(key1, key2);
-`}
+`,
+    },
+  ]}
 />
 
 `keyof User` resolves to `"id" | "name" | "email"`. This is useful when you want to accept any valid key of an object, but reject invalid ones:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type User = { id: number; name: string; email: string };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type User = { id: number; name: string; email: string };
 
 function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
   return obj[key];
@@ -44,7 +52,9 @@ const user: User = { id: 1, name: "Alice", email: "alice@example.com" };
 const name = getProperty(user, "name"); // Type: string
 const id = getProperty(user, "id"); // Type: number
 console.log(name, id);
-`}
+`,
+    },
+  ]}
 />
 
 Notice that `T[K]` is an **indexed access type**: the type of property `K` in `T`. Since `K extends keyof T`, TypeScript knows `K` is a valid key, and can look up its type.
@@ -57,7 +67,10 @@ The **`typeof`** operator (in a type context) takes a runtime value and produces
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const config = {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const config = {
   apiUrl: "https://api.example.com",
   timeout: 5000,
   retries: 3,
@@ -72,7 +85,9 @@ const newConfig: Config = {
 };
 
 console.log(newConfig);
-`}
+`,
+    },
+  ]}
 />
 
 `typeof config` produces `{ apiUrl: string; timeout: number; retries: number }`. If you add or remove properties from `config`, the type automatically reflects the change.
@@ -81,7 +96,10 @@ You can also use `typeof` with functions:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function greet(name: string): string {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function greet(name: string): string {
   return \`Hello, \${name}!\`;
 }
 
@@ -89,7 +107,9 @@ type GreetType = typeof greet;
 
 const anotherGreet: GreetType = (name) => \`Hi, \${name}!\`;
 console.log(anotherGreet("Alice"));
-`}
+`,
+    },
+  ]}
 />
 
 ---
@@ -100,7 +120,10 @@ When you have a *value* (not a type), you can combine `typeof` and `keyof` to ge
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const routes = {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const routes = {
   home: "/",
   about: "/about",
   contact: "/contact",
@@ -111,7 +134,9 @@ type RouteKey = keyof typeof routes;
 const key: RouteKey = "home"; // OK
 // const invalid: RouteKey = "profile"; // Error
 console.log(key);
-`}
+`,
+    },
+  ]}
 />
 
 Here, `typeof routes` lifts the object into a type, and `keyof` extracts `"home" | "about" | "contact"`. This pattern is common for configuration objects, enums, and lookup tables.
@@ -124,7 +149,10 @@ TypeScript 4.1 introduced **template literal types**, which let you construct ne
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Greeting = "Hello" | "Hi";
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Greeting = "Hello" | "Hi";
 type Name = "Alice" | "Bob";
 
 type Message = \`\${Greeting}, \${Name}!\`;
@@ -133,14 +161,19 @@ const msg1: Message = "Hello, Alice!"; // OK
 const msg2: Message = "Hi, Bob!"; // OK
 // const msg3: Message = "Hey, Alice!"; // Error: "Hey" is not in Greeting
 console.log(msg1, msg2);
-`}
+`,
+    },
+  ]}
 />
 
 When you interpolate a union, TypeScript distributes over it, producing all combinations:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Event = "click" | "focus" | "blur";
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Event = "click" | "focus" | "blur";
 
 type EventHandler = \`on\${Event}\`;
 
@@ -148,7 +181,9 @@ const handler1: EventHandler = "onclick"; // OK
 const handler2: EventHandler = "onfocus"; // OK
 // const handler3: EventHandler = "onhover"; // Error
 console.log(handler1, handler2);
-`}
+`,
+    },
+  ]}
 />
 
 ---
@@ -164,7 +199,10 @@ TypeScript provides four built-in utility types for manipulating string literals
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type LoudGreeting = Uppercase<"hello">;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type LoudGreeting = Uppercase<"hello">;
 type QuietGreeting = Lowercase<"HELLO">;
 type Capitalized = Capitalize<"typescript">;
 type Uncapitalized = Uncapitalize<"TypeScript">;
@@ -175,21 +213,28 @@ const cap: Capitalized = "Typescript";
 const uncap: Uncapitalized = "typeScript";
 
 console.log(loud, quiet, cap, uncap);
-`}
+`,
+    },
+  ]}
 />
 
 These are especially useful in template literals:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Event = "click" | "focus";
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Event = "click" | "focus";
 
 type EventHandler = \`on\${Capitalize<Event>}\`;
 
 const handler1: EventHandler = "onClick"; // OK
 const handler2: EventHandler = "onFocus"; // OK
 console.log(handler1, handler2);
-`}
+`,
+    },
+  ]}
 />
 
 ---
@@ -200,7 +245,10 @@ Let's build a type-safe event system where handler names are derived from event 
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type EventMap = {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type EventMap = {
   click: { x: number; y: number };
   keypress: { key: string };
   focus: { elementId: string };
@@ -223,7 +271,9 @@ const handlers: Handlers = {
 handlers.onClick({ x: 10, y: 20 });
 handlers.onKeypress({ key: "Enter" });
 handlers.onFocus({ elementId: "input-1" });
-`}
+`,
+    },
+  ]}
 />
 
 Notice how:
@@ -250,7 +300,10 @@ You can combine `keyof`, template literals, and conditional types to filter keys
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type User = {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type User = {
   id: number;
   name: string;
   email: string;
@@ -267,7 +320,9 @@ const key1: UserStringKeys = "name"; // OK
 const key2: UserStringKeys = "email"; // OK
 // const key3: UserStringKeys = "id"; // Error
 console.log(key1, key2);
-`}
+`,
+    },
+  ]}
 />
 
 Here's how it works:
@@ -295,9 +350,12 @@ type Handlers = EventHandlerMap<Events>;
 - Use a mapped type with key remapping: \`[E in keyof T as ...]\`.
 - Use a template literal to build the handler name: \`\`on\${Capitalize<E>}\`\`.
 - The value type should be a function \`(payload: T[E]) => void\`.`}
-  initCode={`type EventHandlerMap<T> = any; // Replace 'any'
-`}
-  starterCode={`type EventHandlerMap<T> = any;
+  files={[
+    {
+      filename: "main.ts",
+      initCode: `type EventHandlerMap<T> = any; // Replace 'any'
+`,
+      starterCode: `type EventHandlerMap<T> = any;
 
 type Events = { click: { x: number }; focus: { id: string } };
 type Handlers = EventHandlerMap<Events>;
@@ -309,8 +367,8 @@ const handlers: Handlers = {
 
 handlers.onClick({ x: 10 });
 handlers.onFocus({ id: "input-1" });
-`}
-  solutionCode={`type EventHandlerMap<T> = {
+`,
+      solutionCode: `type EventHandlerMap<T> = {
   [E in keyof T as \`on\${Capitalize<string & E>}\`]: (payload: T[E]) => void;
 };
 
@@ -324,7 +382,9 @@ const handlers: Handlers = {
 
 handlers.onClick({ x: 10 });
 handlers.onFocus({ id: "input-1" });
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "t1",

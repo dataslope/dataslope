@@ -23,11 +23,16 @@ same type, stored the same way. There is no distinction between
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log(typeof 7); // "number"
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `console.log(typeof 7); // "number"
 console.log(typeof 7.0); // "number"
 console.log(typeof -3.14); // "number"
 console.log(7 === 7.0); // true — they are the same value.
-`}
+`,
+    },
+  ]}
 />
 
 (There is a separate, very advanced type called `bigint` for
@@ -54,13 +59,18 @@ Unary operators:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log(7 / 2); // 3.5  — NOT 3, because there is no integer division.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `console.log(7 / 2); // 3.5  — NOT 3, because there is no integer division.
 console.log(7 % 2); // 1
 console.log(2 ** 10); // 1024
 console.log(-5 + 8); // 3
 console.log(+"42"); // 42  — string coerced to number
 console.log(+"hello"); // NaN — cannot be coerced
-`}
+`,
+    },
+  ]}
 />
 
 ## Order of operations
@@ -71,11 +81,16 @@ intent obvious.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log(2 + 3 * 4); // 14, not 20
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `console.log(2 + 3 * 4); // 14, not 20
 console.log((2 + 3) * 4); // 20
 console.log(2 ** (3 ** 2)); // 512  (exponent is right-associative: 2 ** (3 ** 2))
 console.log((2 ** 3) ** 2); // 64
-`}
+`,
+    },
+  ]}
 />
 
 When in doubt, parenthesise. There is no prize for the shortest
@@ -100,7 +115,10 @@ is `x = x - 1`. These are common in loops; we will see them often.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`let n = 10;
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `let n = 10;
 n += 5;
 console.log(n); // 15
 n *= 2;
@@ -117,7 +135,9 @@ i++;
 console.log(i); // 2
 i++;
 console.log(i); // 3
-`}
+`,
+    },
+  ]}
 />
 
 ## Special numeric values
@@ -134,7 +154,10 @@ encounter:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log(1 / 0); // Infinity
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `console.log(1 / 0); // Infinity
 console.log(-1 / 0); // -Infinity
 console.log(0 / 0); // NaN
 console.log(Math.sqrt(-1)); // NaN
@@ -143,7 +166,9 @@ console.log(Number("hello")); // NaN
 // NaN is famously NOT equal to itself:
 console.log(NaN === NaN); // false  (!)
 console.log(Number.isNaN(NaN)); // true — the right way to test for NaN
-`}
+`,
+    },
+  ]}
 />
 
 The `NaN === NaN` trap is one of the most famous quirks in
@@ -158,10 +183,15 @@ errors. The classic example:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log(0.1 + 0.2); // 0.30000000000000004
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `console.log(0.1 + 0.2); // 0.30000000000000004
 console.log(0.1 + 0.2 === 0.3); // false  (!)
 console.log(Math.abs(0.1 + 0.2 - 0.3) < 1e-9); // true  — the safe way to compare
-`}
+`,
+    },
+  ]}
 />
 
 This is not a JavaScript bug — it is how floating-point arithmetic
@@ -186,7 +216,10 @@ A few built-ins you will use constantly:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// Rounding
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// Rounding
 console.log(Math.round(2.4)); // 2
 console.log(Math.round(2.5)); // 3
 console.log(Math.floor(2.9)); // 2  (round down)
@@ -224,7 +257,9 @@ const x = 1234.5678;
 console.log(x.toFixed(2)); // "1234.57"  — note: returns a string!
 console.log(x.toString()); // "1234.5678"
 console.log(x.toLocaleString()); // e.g. "1,234.568"  (locale-dependent)
-`}
+`,
+    },
+  ]}
 />
 
 Notice the very important detail: `toFixed` returns a **string**,
@@ -242,14 +277,19 @@ that, you lose precision.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log(Number.MAX_SAFE_INTEGER); // 9007199254740991
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `console.log(Number.MAX_SAFE_INTEGER); // 9007199254740991
 console.log(Number.MAX_SAFE_INTEGER + 1); // 9007199254740992  (fine)
 console.log(Number.MAX_SAFE_INTEGER + 2); // 9007199254740992  (!! same as +1)
 
 // Beyond MAX_SAFE_INTEGER, neighbouring numbers may collide.
 // For huge integers (cryptography, very large IDs), use BigInt:
 console.log(9007199254740993n + 1n); // 9007199254740994n
-`}
+`,
+    },
+  ]}
 />
 
 This rarely matters for everyday code. It does matter if you
@@ -263,7 +303,10 @@ learned. Try changing the inputs and see what happens.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function format(amount) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function format(amount) {
   // 2 decimals + thousands separators, locale-dependent.
   return amount.toLocaleString(undefined, {
     minimumFractionDigits: 2,
@@ -287,7 +330,9 @@ console.log("Starting:", format(principal));
 console.log("After " + years + " years at " + (rate * 100).toFixed(1) + "%:");
 console.log("  Final:", format(final));
 console.log("  Gain: ", format(gain));
-`}
+`,
+    },
+  ]}
 />
 
 ## Challenge
@@ -301,7 +346,10 @@ console.log("  Gain: ", format(gain));
 - \`toFahrenheit(c)\` — converts Celsius to Fahrenheit using \`c * 9 / 5 + 32\`.
 
 Both should return a *number*, not a string. The tests use a small tolerance to allow for floating-point rounding.`}
-  starterCode={`function toCelsius(f) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function toCelsius(f) {
   // your code here
   return 0;
 }
@@ -315,8 +363,8 @@ console.log(toCelsius(32)); // 0
 console.log(toCelsius(212)); // 100
 console.log(toFahrenheit(0)); // 32
 console.log(toFahrenheit(100)); // 212
-`}
-  solutionCode={`function toCelsius(f) {
+`,
+      solutionCode: `function toCelsius(f) {
   return ((f - 32) * 5) / 9;
 }
 
@@ -328,7 +376,9 @@ console.log(toCelsius(32));
 console.log(toCelsius(212));
 console.log(toFahrenheit(0));
 console.log(toFahrenheit(100));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "freezing_c",

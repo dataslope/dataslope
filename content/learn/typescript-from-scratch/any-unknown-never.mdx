@@ -63,7 +63,10 @@ any method, access any property, and the compiler won't complain:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`let x: any = 42;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `let x: any = 42;
 console.log("x:", x);
 
 x = "hello";
@@ -76,7 +79,9 @@ console.log("x:", x);
 // x.nonExistentMethod();  // No compile error, but runtime error
 
 console.log("any bypasses all type checking");
-`}
+`,
+    },
+  ]}
 />
 
 **When is `any` acceptable?**
@@ -92,14 +97,19 @@ console.log("any bypasses all type checking");
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function double(x: any): any {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function double(x: any): any {
   return x * 2;
 }
 
 console.log("double(5):", double(5)); // 10
 console.log("double('5'):", double("5")); // NaN (no compile error!)
 console.log("double(true):", double(true)); // 2 (true coerces to 1)
-`}
+`,
+    },
+  ]}
 />
 
 The function `double` compiles without errors, but it produces nonsense
@@ -114,7 +124,10 @@ an `unknown` value until you narrow it:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`let x: unknown = 42;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `let x: unknown = 42;
 console.log("x:", x);
 
 x = "hello";
@@ -125,14 +138,19 @@ console.log("x:", x);
 
 // But you can't use it without narrowing:
 // console.log(x.length);  // ❌ Object is of type 'unknown'
-`}
+`,
+    },
+  ]}
 />
 
 To use an `unknown` value, you must prove its type via narrowing:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function process(value: unknown): void {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function process(value: unknown): void {
   if (typeof value === "string") {
     console.log("String length:", value.length); // ✅ value is narrowed to string
   } else if (typeof value === "number") {
@@ -145,7 +163,9 @@ To use an `unknown` value, you must prove its type via narrowing:
 process("hello");
 process(42);
 process(true);
-`}
+`,
+    },
+  ]}
 />
 
 **What bugs does this prevent?** It forces you to handle the "I don't
@@ -162,7 +182,10 @@ Compare `any` vs `unknown` side by side:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function dangerousAny(x: any): number {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function dangerousAny(x: any): number {
   return x.length; // No error, but crashes if x is a number
 }
 
@@ -176,7 +199,9 @@ function safeUnknown(x: unknown): number {
 console.log("safeUnknown('hello'):", safeUnknown("hello"));
 console.log("safeUnknown(42):", safeUnknown(42));
 console.log("safeUnknown([1,2,3]):", safeUnknown([1, 2, 3]));
-`}
+`,
+    },
+  ]}
 />
 
 The `safeUnknown` function is longer, but it's correct — it handles all
@@ -194,7 +219,10 @@ These functions throw or loop forever, so they don't have a return value at all:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function throwError(message: string): never {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function throwError(message: string): never {
   throw new Error(message);
 }
 
@@ -211,14 +239,19 @@ try {
 } catch (e: any) {
   console.log("Caught:", e.message);
 }
-`}
-   />
+`,
+    },
+  ]}
+/>
 
 ### Impossible branches in control flow
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function assertNever(x: never): never {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function assertNever(x: never): never {
   throw new Error("Unexpected value: " + x);
 }
 
@@ -237,7 +270,9 @@ function area(shape: Shape): number {
 }
 
 console.log("area({ kind: 'circle' }):", area({ kind: "circle" }));
-`}
+`,
+    },
+  ]}
 />
 
 In the `default` branch, `shape` is type `never` — the compiler has
@@ -249,13 +284,18 @@ error, forcing you to handle it.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Impossible = string & number;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Impossible = string & number;
 // Impossible is 'never' — no value is both a string and a number
 
 // const x: Impossible = "hello";  // ❌ Type 'string' is not assignable to type 'never'
 
 console.log("string & number is never:", true);
-`}
+`,
+    },
+  ]}
 />
 **Why is `never` useful?** It lets you express "this code is
 unreachable" or "this type is impossible" in a way the compiler
@@ -270,14 +310,19 @@ functions that return `void` typically return `undefined` at runtime):
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function logMessage(message: string): void {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function logMessage(message: string): void {
   console.log("LOG:", message);
   // No return statement, or 'return;' with no value
 }
 
 const result = logMessage("Hello, TypeScript!");
 console.log("result is:", result); // undefined
-`}
+`,
+    },
+  ]}
 />
 
 `void` is a signal to readers (and the compiler) that the function's
@@ -286,7 +331,10 @@ but the compiler won't let you use it in a meaningful way:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function doNothing(): void {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function doNothing(): void {
   return;
 }
 
@@ -295,7 +343,9 @@ console.log("x:", x); // undefined
 
 // You can't do much with it:
 // console.log(x.length);  // ❌ Object is of type 'void'
-`}
+`,
+    },
+  ]}
 />
 
 `void` is the conventional return type for event handlers, loggers, and
@@ -309,7 +359,10 @@ There's a subtle distinction:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function returnsVoid(): void {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function returnsVoid(): void {
   // No return, or 'return;'
 }
 
@@ -322,7 +375,9 @@ const b = returnsUndefined(); // type: undefined
 
 console.log("a:", a);
 console.log("b:", b);
-`}
+`,
+    },
+  ]}
 />
 
 In practice, `void` is more common. Use `undefined` when the return type
@@ -345,7 +400,10 @@ Here's how the four types relate in terms of assignability:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`let a: any = 42;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `let a: any = 42;
 let u: unknown = 42;
 let n: never; // You can't construct a never value, so we leave it uninitialized
 
@@ -363,7 +421,9 @@ u = "hello";
 // let y: string = n;  // ✅ (if n were somehow assigned, which it can't be)
 
 console.log("Type relationships demonstrated");
-`}
+`,
+    },
+  ]}
 />
 
 ## Practice: a safe JSON parser
@@ -375,7 +435,10 @@ that parses JSON and uses `unknown` to ensure type safety.
   adapter="typescript"
   title="Type-Safe JSON Parser"
   instructions={`Implement \`parseJSON(text: string): unknown\` that wraps \`JSON.parse\` and returns \`unknown\` (not \`any\`). Then implement \`getString(value: unknown): string\` that returns the value if it's a string, or throws an error otherwise. Test with valid and invalid inputs.`}
-  starterCode={`function parseJSON(text: string): unknown {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function parseJSON(text: string): unknown {
   return JSON.parse(text);
 }
 
@@ -393,8 +456,8 @@ try {
 } catch (e: any) {
   console.log("Error:", e.message);
 }
-`}
-  solutionCode={`function parseJSON(text: string): unknown {
+`,
+      solutionCode: `function parseJSON(text: string): unknown {
   return JSON.parse(text);
 }
 
@@ -414,7 +477,9 @@ try {
 } catch (e: any) {
   console.log("Error:", e.message);
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "valid-string",

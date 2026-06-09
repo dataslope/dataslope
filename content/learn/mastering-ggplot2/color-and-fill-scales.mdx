@@ -22,13 +22,18 @@ Each has its own family of scales: `scale_color_*()` and
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # Bars are areas -> use fill, and therefore scale_fill_*.
 ggplot(mpg, aes(class, fill = drv)) +
   geom_bar() +
   scale_fill_brewer(palette = "Set2")
-`}
+`,
+    },
+  ]}
 />
 
 ## Discrete vs. continuous color
@@ -50,12 +55,17 @@ are easy to tell apart but none looks "bigger":
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy, color = class)) +
   geom_point(size = 2) +
   scale_color_brewer(palette = "Dark2")
-`}
+`,
+    },
+  ]}
 />
 
 ### Continuous: a gradient for ordered magnitude
@@ -65,12 +75,17 @@ the color changes smoothly from low to high:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy, color = cty)) +
   geom_point(size = 2) +
   scale_color_viridis_c()
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Why viridis?">
@@ -90,7 +105,10 @@ around a meaningful midpoint (great for "above/below average"):
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # Diverging scale centered at the mean: below = blue, above = red.
 mean_cty <- mean(mpg$cty)
@@ -101,7 +119,9 @@ ggplot(mpg, aes(displ, hwy, color = cty)) +
     low = "blue", mid = "grey90", high = "red",
     midpoint = mean_cty
   )
-`}
+`,
+    },
+  ]}
 />
 
 A diverging scale only makes sense when the midpoint *means* something
@@ -115,7 +135,10 @@ When you need specific brand or semantic colors, map them by hand with
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(class, fill = drv)) +
   geom_bar() +
@@ -124,7 +147,9 @@ ggplot(mpg, aes(class, fill = drv)) +
     "f" = "#d95f02",
     "r" = "#7570b3"
   ))
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Color is not free">

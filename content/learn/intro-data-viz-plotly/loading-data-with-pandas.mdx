@@ -27,7 +27,10 @@ named column headers."
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 # Build a tiny DataFrame from a Python dictionary:
 df = pd.DataFrame(
@@ -42,7 +45,9 @@ print(df)
 print()
 print("Columns:", list(df.columns))
 print("Number of rows:", len(df))
-`}
+`,
+    },
+  ]}
 />
 
 That prints a nicely formatted table. `df.columns` lists the column
@@ -87,7 +92,10 @@ When you receive a DataFrame, your first instinct should be to
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder()
 
@@ -112,7 +120,9 @@ print()
 # Quick statistical summary of numeric columns:
 print("DESCRIBE")
 print(df.describe())
-`}
+`,
+    },
+  ]}
 />
 
 Every analyst, every time they load a new dataset, runs some
@@ -133,7 +143,10 @@ universal — use it.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder()
 
@@ -141,7 +154,9 @@ life = df["lifeExp"]
 print("Mean life expectancy:", life.mean())
 print("Min:", life.min(), "Max:", life.max())
 print("Median:", life.median())
-`}
+`,
+    },
+  ]}
 />
 
 ## Filtering rows
@@ -175,7 +190,10 @@ to you in context.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder()
 
@@ -188,7 +206,9 @@ print()
 # Same result via .query():
 asia_2007_q = df.query("continent == 'Asia' and year == 2007")
 print(".query():", asia_2007_q.shape)
-`}
+`,
+    },
+  ]}
 />
 
 ## Sorting
@@ -205,7 +225,10 @@ order.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007 and continent == 'Europe'")
 
@@ -221,7 +244,9 @@ fig = px.bar(
     labels={"lifeExp": "Life expectancy (years)", "country": "Country"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Notice how much more useful the bar chart is when sorted by value —
@@ -247,7 +272,10 @@ into a normal DataFrame so Plotly Express can consume it.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007")
 
@@ -268,7 +296,9 @@ fig = px.bar(
     labels={"lifeExp": "Mean life expectancy (years)", "continent": "Continent"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 ## "Tidy" data: the secret to easy plotting
@@ -305,7 +335,10 @@ The tool to do that is `df.melt(...)`:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 wide = pd.DataFrame(
@@ -337,7 +370,9 @@ fig = px.line(
     labels={"visitors": "Visitors", "year": "Year"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 This `wide → long` reshape pattern is one of the most common moves

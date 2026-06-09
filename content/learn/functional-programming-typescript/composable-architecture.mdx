@@ -77,7 +77,10 @@ gets the data; the core decides the output.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// --- CORE: pure types and functions ---
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// --- CORE: pure types and functions ---
 
 type Invoice = {
   readonly id: string;
@@ -144,7 +147,9 @@ function handler(): void {
 }
 
 handler();
-`}
+`,
+    },
+  ]}
 />
 
 Notice how easy it is to test `summarize`: it's a pure function
@@ -227,7 +232,7 @@ top spender: u2
   files={[
     {
       filename: "main.ts",
-      initialContent: `// SHELL: read inputs, call the core, log the result
+      starterCode: `// SHELL: read inputs, call the core, log the result
 import { topSpender, Order } from "./core";
 
 const orders: Order[] = [
@@ -243,7 +248,7 @@ console.log("top spender:", top ?? "(none)");
     },
     {
       filename: "core.ts",
-      initialContent: `// CORE: pure, no I/O
+      starterCode: `// CORE: pure, no I/O
 export type Order = { readonly customerId: string; readonly amount: number };
 
 // TODO: return the customerId with the highest total amount,
@@ -252,7 +257,7 @@ export function topSpender(orders: ReadonlyArray<Order>): string | null {
   return null;
 }
 `,
-      solutionContent: `export type Order = { readonly customerId: string; readonly amount: number };
+      solutionCode: `export type Order = { readonly customerId: string; readonly amount: number };
 
 export function topSpender(orders: ReadonlyArray<Order>): string | null {
   if (orders.length === 0) return null;

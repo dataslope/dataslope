@@ -50,7 +50,10 @@ The domain layer contains types and functions that model your problem. It depend
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// domain.ts
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// domain.ts
 export type User = {
   id: string;
   name: string;
@@ -74,7 +77,9 @@ export function createUser(
 
 const user = createUser("user-1", "Alice", "alice@example.com");
 console.log(user);
-`}
+`,
+    },
+  ]}
 />
 
 Notice:
@@ -94,7 +99,7 @@ The application layer orchestrates domain logic to fulfill use cases. It defines
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { getUserById } from "./application";
+      starterCode: `import { getUserById } from "./application";
 import { InMemoryUserRepository } from "./infrastructure";
 
 const repo = new InMemoryUserRepository();
@@ -106,7 +111,7 @@ console.log(result); // User | null
     },
     {
       filename: "application.ts",
-      initialContent: `import { User } from "./domain";
+      starterCode: `import { User } from "./domain";
 
 // Port: an interface the application depends on
 export interface UserRepository {
@@ -121,7 +126,7 @@ export function getUserById(repo: UserRepository, id: string): User | null {
     },
     {
       filename: "domain.ts",
-      initialContent: `export type User = {
+      starterCode: `export type User = {
   id: string;
   name: string;
   email: string;
@@ -130,7 +135,7 @@ export function getUserById(repo: UserRepository, id: string): User | null {
     },
     {
       filename: "infrastructure.ts",
-      initialContent: `import { User } from "./domain";
+      starterCode: `import { User } from "./domain";
 import { UserRepository } from "./application";
 
 // Adapter: a concrete implementation of the port
@@ -174,7 +179,10 @@ Dependency inversion is simple in TypeScript: define an interface (or a function
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Application layer defines the contract
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Application layer defines the contract
 type Logger = {
   log(message: string): void;
 };
@@ -200,7 +208,9 @@ const noOpLogger: Logger = {
 
 processOrder(consoleLogger, "order-123");
 processOrder(noOpLogger, "order-456");
-`}
+`,
+    },
+  ]}
 />
 
 The application layer doesn't import a concrete logger. It defines what a logger *looks like* (the `Logger` type), and accepts any implementation. Tests can pass a no-op or in-memory logger; production can pass a file logger or cloud logger.
@@ -220,7 +230,7 @@ Use module boundaries to enforce layering:
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { createOrder } from "./application";
+      starterCode: `import { createOrder } from "./application";
 import { InMemoryOrderRepository } from "./infrastructure";
 
 const repo = new InMemoryOrderRepository();
@@ -237,7 +247,7 @@ if (order) {
     },
     {
       filename: "domain.ts",
-      initialContent: `export type Order = {
+      starterCode: `export type Order = {
   orderId: string;
   total: number;
 };
@@ -252,7 +262,7 @@ export function buildOrder(orderId: string, total: number): Order | null {
     },
     {
       filename: "application.ts",
-      initialContent: `import { Order, buildOrder } from "./domain";
+      starterCode: `import { Order, buildOrder } from "./domain";
 
 // Port: defined by application, implemented by infrastructure
 export interface OrderRepository {
@@ -275,7 +285,7 @@ export function createOrder(
     },
     {
       filename: "infrastructure.ts",
-      initialContent: `import { Order } from "./domain";
+      starterCode: `import { Order } from "./domain";
 import { OrderRepository } from "./application";
 
 export class InMemoryOrderRepository implements OrderRepository {
@@ -312,7 +322,7 @@ A **barrel file** (`index.ts`) re-exports only the public API of a module, hidin
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { createUser } from "./user";
+      starterCode: `import { createUser } from "./user";
 
 const user = createUser("user-1", "Alice", "alice@example.com");
 if (user) {
@@ -322,7 +332,7 @@ if (user) {
     },
     {
       filename: "user/index.ts",
-      initialContent: `// Public API
+      starterCode: `// Public API
 export { createUser } from "./application";
 export type { User } from "./domain";
 // Internal helpers are not exported
@@ -330,7 +340,7 @@ export type { User } from "./domain";
     },
     {
       filename: "user/domain.ts",
-      initialContent: `export type User = {
+      starterCode: `export type User = {
   id: string;
   name: string;
   email: string;
@@ -343,7 +353,7 @@ export function validateEmail(email: string): boolean {
     },
     {
       filename: "user/application.ts",
-      initialContent: `import { User, validateEmail } from "./domain";
+      starterCode: `import { User, validateEmail } from "./domain";
 
 export function createUser(
   id: string,
@@ -370,7 +380,10 @@ Use types to enforce invariants at module boundaries. For example, ensure that a
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`declare const OrderBrand: unique symbol;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `declare const OrderBrand: unique symbol;
 type Order = {
   orderId: string;
   total: number;
@@ -395,7 +408,9 @@ if (order) {
 
 // const badOrder = { orderId: "bad", total: -1 };
 // calculateTax(badOrder); // Error: missing __brand
-`}
+`,
+    },
+  ]}
 />
 
 Here, `Order` is a [branded type](./branded-types). You can't construct an `Order` without going through `createOrder`, which validates inputs. Invalid orders are impossible to represent in the type system.
@@ -416,7 +431,7 @@ Here, `Order` is a [branded type](./branded-types). You can't construct an `Orde
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { toggleTodoById } from "./application";
+      starterCode: `import { toggleTodoById } from "./application";
 import { InMemoryTodoRepository } from "./infrastructure";
 
 const repo = new InMemoryTodoRepository();
@@ -432,7 +447,7 @@ if (toggled) {
     },
     {
       filename: "domain.ts",
-      initialContent: `export type Todo = {
+      starterCode: `export type Todo = {
   id: string;
   title: string;
   done: boolean;
@@ -443,7 +458,7 @@ export function toggleTodo(todo: Todo): Todo {
   return todo;
 }
 `,
-      solutionContent: `export type Todo = {
+      solutionCode: `export type Todo = {
   id: string;
   title: string;
   done: boolean;
@@ -456,7 +471,7 @@ export function toggleTodo(todo: Todo): Todo {
     },
     {
       filename: "application.ts",
-      initialContent: `import { Todo, toggleTodo } from "./domain";
+      starterCode: `import { Todo, toggleTodo } from "./domain";
 
 export interface TodoRepository {
   findById(id: string): Todo | null;
@@ -468,7 +483,7 @@ export function toggleTodoById(repo: TodoRepository, id: string): Todo | null {
   return null;
 }
 `,
-      solutionContent: `import { Todo, toggleTodo } from "./domain";
+      solutionCode: `import { Todo, toggleTodo } from "./domain";
 
 export interface TodoRepository {
   findById(id: string): Todo | null;
@@ -488,7 +503,7 @@ export function toggleTodoById(repo: TodoRepository, id: string): Todo | null {
     },
     {
       filename: "infrastructure.ts",
-      initialContent: `import { Todo } from "./domain";
+      starterCode: `import { Todo } from "./domain";
 import { TodoRepository } from "./application";
 
 export class InMemoryTodoRepository implements TodoRepository {

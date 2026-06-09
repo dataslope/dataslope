@@ -11,7 +11,10 @@ downloads the first time you click Run.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   printf("Hello, C!\\n");
@@ -20,14 +23,40 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
+
+```jsx
+<CodeBlock
+  adapter="c"
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
+
+int main(void) {
+  printf("Hello, C!\\n");
+  for (int i = 1; i <= 5; i++) {
+    printf("  i = %d\\n", i);
+  }
+  return 0;
+}
+`,
+    },
+  ]}
+/>
+```
 
 ## Working with arrays
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int xs[] = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3};
@@ -38,8 +67,33 @@ int main(void) {
   printf("n = %d, sum = %ld, mean = %.2f\\n", n, sum, (double)sum / n);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
+
+```jsx
+<CodeBlock
+  adapter="c"
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
+
+int main(void) {
+  int xs[] = {3, 1, 4, 1, 5, 9, 2, 6, 5, 3};
+  int n = sizeof(xs) / sizeof(xs[0]);
+  long sum = 0;
+  for (int i = 0; i < n; i++)
+    sum += xs[i];
+  printf("n = %d, sum = %ld, mean = %.2f\\n", n, sum, (double)sum / n);
+  return 0;
+}
+`,
+    },
+  ]}
+/>
+```
 
 ## Multiple files
 
@@ -51,7 +105,7 @@ Pass a `files` array alongside an `entryFilename` to compile a multi-translation
   files={[
     {
       filename: "main.c",
-      initialContent: `#include "mathx.h"
+      starterCode: `#include "mathx.h"
 #include <stdio.h>
 
 int main(void) {
@@ -64,7 +118,7 @@ int main(void) {
     },
     {
       filename: "mathx.h",
-      initialContent: `#ifndef MATHX_H
+      starterCode: `#ifndef MATHX_H
 #define MATHX_H
 
 int add(int a, int b);
@@ -75,7 +129,7 @@ int mul(int a, int b);
     },
     {
       filename: "mathx.c",
-      initialContent: `#include "mathx.h"
+      starterCode: `#include "mathx.h"
 
 int add(int a, int b) { return a + b; }
 int mul(int a, int b) { return a * b; }
@@ -93,7 +147,7 @@ The MDX source for the example above:
   files={[
     {
       filename: "main.c",
-      initialContent: `#include "mathx.h"
+      starterCode: `#include "mathx.h"
 #include <stdio.h>
 
 int main(void) {
@@ -106,7 +160,7 @@ int main(void) {
     },
     {
       filename: "mathx.h",
-      initialContent: `#ifndef MATHX_H
+      starterCode: `#ifndef MATHX_H
 #define MATHX_H
 
 int add(int a, int b);
@@ -117,7 +171,7 @@ int mul(int a, int b);
     },
     {
       filename: "mathx.c",
-      initialContent: `#include "mathx.h"
+      starterCode: `#include "mathx.h"
 
 int add(int a, int b) { return a + b; }
 int mul(int a, int b) { return a * b; }
@@ -138,30 +192,82 @@ A short init (3 lines or fewer):
 
 <CodeBlock
   adapter="c"
-  initCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      initCode: `#include <stdio.h>
 
-#define GREETING "Hello from C!"`}
-  starterCode={`/* GREETING and <stdio.h> come from the initialization code above. */
+#define GREETING "Hello from C!"`,
+      starterCode: `/* GREETING and <stdio.h> come from the initialization code above. */
 int main(void) {
   puts(GREETING);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
+
+```jsx
+<CodeBlock
+  adapter="c"
+  files={[
+    {
+      filename: "main.c",
+      initCode: `#include <stdio.h>
+
+#define GREETING "Hello from C!"`,
+      starterCode: `/* GREETING and <stdio.h> come from the initialization code above. */
+int main(void) {
+  puts(GREETING);
+  return 0;
+}
+`,
+    },
+  ]}
+/>
+```
 
 A longer init (4 lines or more), collapsed by default:
 
 <CodeBlock
   adapter="c"
-  initCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      initCode: `#include <stdio.h>
 
 static int square(int x) {
     return x * x;
-}`}
-  starterCode={`/* square() and <stdio.h> come from the initialization code above. */
+}`,
+      starterCode: `/* square() and <stdio.h> come from the initialization code above. */
 int main(void) {
   printf("square(7) = %d", square(7));
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
+
+```jsx
+<CodeBlock
+  adapter="c"
+  files={[
+    {
+      filename: "main.c",
+      initCode: `#include <stdio.h>
+
+static int square(int x) {
+    return x * x;
+}`,
+      starterCode: `/* square() and <stdio.h> come from the initialization code above. */
+int main(void) {
+  printf("square(7) = %d", square(7));
+  return 0;
+}
+`,
+    },
+  ]}
+/>
+```

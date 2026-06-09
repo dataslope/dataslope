@@ -28,7 +28,10 @@ found, the program crashes.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 try
 {
@@ -41,7 +44,9 @@ catch (FormatException ex)
 }
 
 Console.WriteLine("program continues");
-`}
+`,
+    },
+  ]}
 />
 
 Without the `try/catch`, the program would crash with a stack
@@ -70,7 +75,10 @@ up by stack unwinding plus `finally` blocks.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 try
 {
@@ -89,7 +97,9 @@ finally
 {
     Console.WriteLine("finally always runs");
 }
-`}
+`,
+    },
+  ]}
 />
 
 Rules:
@@ -107,7 +117,10 @@ return wrong data.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 double Divide(int a, int b)
 {
@@ -125,7 +138,9 @@ catch (ArgumentException ex)
 {
     Console.WriteLine($"refused: {ex.Message}");
 }
-`}
+`,
+    },
+  ]}
 />
 
 A few common built-in exception types:
@@ -146,7 +161,10 @@ This is a really common beginner trap:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 // BAD — using exceptions as if they were "if not a number"
 int ParseOrZero(string s)
@@ -163,7 +181,9 @@ int ParseOrZero(string s)
 
 Console.WriteLine(ParseOrZero("42"));
 Console.WriteLine(ParseOrZero("oops"));
-`}
+`,
+    },
+  ]}
 />
 
 It works, but it's wasteful and obscures intent. The whole point
@@ -172,14 +192,19 @@ of `TryParse` is to *not* throw for the perfectly ordinary case
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 // GOOD — use TryParse for an expected failure
 int ParseOrZero(string s) => int.TryParse(s, out var n) ? n : 0;
 
 Console.WriteLine(ParseOrZero("42"));
 Console.WriteLine(ParseOrZero("oops"));
-`}
+`,
+    },
+  ]}
 />
 
 Rule of thumb: **if the failure is normal and frequent, use a
@@ -195,7 +220,10 @@ specific exceptions you actually know how to handle.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 // BAD — hides everything, including bugs
 try
@@ -213,7 +241,9 @@ catch (FormatException ex)
 {
     Console.WriteLine($"bad input: {ex.Message}");
 }
-`}
+`,
+    },
+  ]}
 />
 
 A silent `catch` block is one of the most dangerous things in any
@@ -226,7 +256,10 @@ actually know how to recover, **re-throw**:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 void Risky()
 {
@@ -250,7 +283,9 @@ catch (Exception ex)
 {
     Console.WriteLine($"top level got: {ex.Message}");
 }
-`}
+`,
+    },
+  ]}
 />
 
 `throw;` re-throws the *same* exception. `throw ex;` looks similar
@@ -263,7 +298,10 @@ a variable that turned out to be `null`:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 string? maybeName = null;
 
@@ -278,7 +316,9 @@ Console.WriteLine(maybeName?.Length);
 
 // Null-coalescing: provide a default
 Console.WriteLine(maybeName ?? "(none)");
-`}
+`,
+    },
+  ]}
 />
 
 Modern C# (with nullable reference types) lets the compiler warn
@@ -306,7 +346,7 @@ attention to the warnings.
   files={[
     {
       filename: "Program.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 
 string[] data = { "10", "x", "20", "y", "5" };
 Console.WriteLine(SafeMath.SumNumbers(data));
@@ -314,7 +354,7 @@ Console.WriteLine(SafeMath.SumNumbers(data));
     },
     {
       filename: "SafeMath.cs",
-      initialContent: `public static class SafeMath
+      starterCode: `public static class SafeMath
 {
     public static int SumNumbers(string[] inputs)
     {
@@ -323,7 +363,7 @@ Console.WriteLine(SafeMath.SumNumbers(data));
     }
 }
 `,
-      solutionContent: `public static class SafeMath
+      solutionCode: `public static class SafeMath
 {
     public static int SumNumbers(string[] inputs)
     {

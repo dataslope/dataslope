@@ -40,7 +40,10 @@ box.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// PURE: depends only on x and y, returns a value, touches nothing else.
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// PURE: depends only on x and y, returns a value, touches nothing else.
 const add = (x: number, y: number): number => x + y;
 
 // PURE: builds and returns a new array, never mutates input.
@@ -66,7 +69,9 @@ greet("Ada");
 const box: number[] = [10, 20];
 appendOne(box);
 console.log(box);
-`}
+`,
+    },
+  ]}
 />
 
 `add` and `doubled` are pure. `nowMs`, `greet`, and `appendOne` are
@@ -84,7 +89,10 @@ no mocks, no teardown.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`const add = (x: number, y: number): number => x + y;
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `const add = (x: number, y: number): number => x + y;
 
 const check = (label: string, cond: boolean) =>
   console.log(\`\${cond ? "OK  " : "FAIL"} \${label}\`);
@@ -93,7 +101,9 @@ check("0+0=0", add(0, 0) === 0);
 check("2+3=5", add(2, 3) === 5);
 check("-1+1=0", add(-1, 1) === 0);
 check("commutative", add(3, 4) === add(4, 3));
-`}
+`,
+    },
+  ]}
 />
 
 Contrast with testing an impure method that writes to a database:
@@ -114,7 +124,10 @@ remember it. This is called **memoization**.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`function memoize<A, B>(f: (a: A) => B): (a: A) => B {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `function memoize<A, B>(f: (a: A) => B): (a: A) => B {
   const cache = new Map<A, B>();
   return (a: A): B => {
     if (cache.has(a)) return cache.get(a)!;
@@ -135,7 +148,9 @@ console.log(fast(5)); // 25, calls=1
 console.log(fast(5)); // 25, calls=1 (cache hit)
 console.log(fast(6)); // 36, calls=2
 console.log("calls:", calls);
-`}
+`,
+    },
+  ]}
 />
 
 You can only do this for pure functions. Memoizing an impure
@@ -199,7 +214,10 @@ I/O and time-reading into a pure value-builder plus a tiny shell.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Impure: logs, reads the clock, returns void
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Impure: logs, reads the clock, returns void
 function recordPurchase(userId: string, amount: number): void {
   const timestamp = Date.now();
   const id = \`p-\${Math.floor(Math.random() * 1e9)}\`;
@@ -208,12 +226,17 @@ function recordPurchase(userId: string, amount: number): void {
 
 recordPurchase("u-1", 19.99);
 recordPurchase("u-2", 49.0);
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Pure: builds a value
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Pure: builds a value
 type Purchase = {
   readonly id: string;
   readonly userId: string;
@@ -241,7 +264,9 @@ const p2 = makePurchase("u-2", 49.0, 1_700_000_000_001, "def");
 
 console.log(describe(p1));
 console.log(describe(p2));
-`}
+`,
+    },
+  ]}
 />
 
 The pure version is longer. It's also testable, deterministic,
@@ -279,7 +304,7 @@ mean=11
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { sumOfSquares, meanOfSquares } from "./stats";
+      starterCode: `import { sumOfSquares, meanOfSquares } from "./stats";
 
 const xs = [1, 2, 3, 4, 5];
 console.log(\`sum=\${sumOfSquares(xs)}\`);
@@ -288,7 +313,7 @@ console.log(\`mean=\${meanOfSquares(xs)}\`);
     },
     {
       filename: "stats.ts",
-      initialContent: `export function sumOfSquares(xs: readonly number[]): number {
+      starterCode: `export function sumOfSquares(xs: readonly number[]): number {
   // your code here
   return 0;
 }
@@ -298,7 +323,7 @@ export function meanOfSquares(xs: readonly number[]): number {
   return 0;
 }
 `,
-      solutionContent: `export function sumOfSquares(xs: readonly number[]): number {
+      solutionCode: `export function sumOfSquares(xs: readonly number[]): number {
   return xs.reduce((acc, x) => acc + x * x, 0);
 }
 

@@ -160,7 +160,10 @@ that. For now, just notice:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// Anything after // on a line is a "comment" — JavaScript ignores it.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// Anything after // on a line is a "comment" — JavaScript ignores it.
 // This program adds two numbers and prints the result.
 
 const a = 3;
@@ -168,7 +171,9 @@ const b = 4;
 const sum = a + b;
 
 console.log("The sum of", a, "and", b, "is", sum);
-`}
+`,
+    },
+  ]}
 />
 
 You just ran a program. There was a runtime, it read your text, and

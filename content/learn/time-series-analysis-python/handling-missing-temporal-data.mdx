@@ -29,7 +29,10 @@ timestamp into an explicit `NaN` you can see and deal with.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 # Daily readings, but Jan 3 and Jan 4 were never recorded -- the rows are
 # simply absent, so the series LOOKS like 4 tidy points.
@@ -49,7 +52,9 @@ print("After reindexing to a full daily range (gaps now show as NaN):")
 print(exposed)
 print()
 print("Missing days revealed:", int(exposed.isna().sum()))
-`}
+`,
+    },
+  ]}
 />
 
 Until you reindex, those two missing days are silent — averages and plots
@@ -75,7 +80,10 @@ The same gap gets three different answers. Let's compute exactly that:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 s = pd.Series(
@@ -99,7 +107,9 @@ print("bfill  -> 40, 40  (assumes the next value applied retroactively)")
 print("linear -> 20, 30  (assumes a smooth, steady glide)")
 print()
 print("Three different stories about the same two unknown days.")
-`}
+`,
+    },
+  ]}
 />
 
 ### When each one is right
@@ -117,7 +127,10 @@ print("Three different stories about the same two unknown days.")
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -147,7 +160,9 @@ plt.show()
 print("Interpolation traces a believable glide for temperature.")
 print("Forward-fill makes ugly flat steps here -- wrong assumption for a")
 print("continuously varying quantity (but right for a thermostat SETTING).")
-`}
+`,
+    },
+  ]}
 />
 
 ## The leakage twist: which fills peek at the future?
@@ -204,7 +219,10 @@ different, and choosing wrong fabricates data.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 # A shop's daily sales. It is CLOSED on Sundays, so those days have no sales
@@ -220,7 +238,9 @@ right = sales.fillna(0)  # closed means zero
 
 print(f"Interpolation invents Sunday sales of ~{wrong.iloc[-1]:.0f} (PHANTOM revenue).")
 print(f"The correct fill is 0 -- the shop genuinely sold nothing.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="No method substitutes for domain knowledge">
@@ -265,19 +285,24 @@ Dropping rows punctures the even spacing that time-series tooling assumes, which
 2. **Forward-fill** the gaps, because a power setting *holds* until it's next changed.
 
 The result should be a daily Series with no \`NaN\`s, where each missing day carries the most recent prior setting.`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 status = pd.Series(
     [3, 5, 2],
     index=pd.to_datetime(["2014-07-01", "2014-07-02", "2014-07-05"]),
     name="power",
-)`}
-  starterCode={`filled = None  # reindex to daily, then forward-fill
+)`,
+      starterCode: `filled = None  # reindex to daily, then forward-fill
 print(filled)
-`}
-  solutionCode={`full = pd.date_range(status.index.min(), status.index.max(), freq="D")
+`,
+      solutionCode: `full = pd.date_range(status.index.min(), status.index.max(), freq="D")
 filled = status.reindex(full).ffill()
 print(filled)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "daily_complete",
@@ -317,20 +342,25 @@ assert filled.loc[pd.Timestamp("2014-07-04")] == 5, "Interpolation would give ~4
   instructions={`A daily \`temp\` Series of temperatures has interior dropout days as \`NaN\`. Temperature varies continuously, so fill the *interior* gaps with **linear interpolation**. Produce \`smooth\` where every originally-interior \`NaN\` is replaced by the straight-line value between its known neighbours.
 
 Then compute \`may4\` — the interpolated value on \`2014-05-04\`, which sits exactly halfway between the known May 3 (=20.0) and May 5 (=24.0), so it should be \`22.0\`.`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 idx = pd.date_range("2014-05-01", periods=7, freq="D")
-temp = pd.Series([18.0, 19.0, 20.0, np.nan, 24.0, 25.0, 26.0], index=idx, name="temp")`}
-  starterCode={`smooth = None  # linear interpolation of the interior gap
+temp = pd.Series([18.0, 19.0, 20.0, np.nan, 24.0, 25.0, 26.0], index=idx, name="temp")`,
+      starterCode: `smooth = None  # linear interpolation of the interior gap
 may4 = None  # the value on 2014-05-04
 print(smooth)
 print("May 4:", may4)
-`}
-  solutionCode={`smooth = temp.interpolate(method="linear")
+`,
+      solutionCode: `smooth = temp.interpolate(method="linear")
 may4 = float(smooth.loc[pd.Timestamp("2014-05-04")])
 print(smooth)
 print("May 4:", may4)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "no_interior_nans",

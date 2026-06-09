@@ -174,7 +174,10 @@ the program.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -192,7 +195,9 @@ model.fit(X_train, y_train)
 # 4. PREDICT: ask it about flowers it has never seen.
 accuracy = model.score(X_test, y_test)
 print(f"It correctly identified {accuracy:.0%} of brand-new flowers.")
-`}
+`,
+    },
+  ]}
 />
 
 Look at what just happened. You did not write a single rule about petals or
@@ -216,7 +221,10 @@ flower, so "prediction" stops being abstract.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -235,7 +243,9 @@ guess = model.predict([one_flower])[0]
 truth = y_test[0]
 print("Model predicts:", species[guess])
 print("Actually was:  ", species[truth])
-`}
+`,
+    },
+  ]}
 />
 
 The model received four numbers and returned a category. That is the
@@ -379,10 +389,13 @@ you saw above.
 
 The hidden tests check the split sizes, that \`model\` is fitted, and that
 \`accuracy\` is a sensible held-out score.`}
-  initCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
-from sklearn.neighbors import KNeighborsClassifier`}
-  starterCode={`X, y = load_wine(return_X_y=True)
+from sklearn.neighbors import KNeighborsClassifier`,
+      starterCode: `X, y = load_wine(return_X_y=True)
 
 # 1. Split off a test set (25% test, random_state=0)
 X_train, X_test, y_train, y_test = None, None, None, None
@@ -394,8 +407,8 @@ model = None
 accuracy = None
 
 print("Test accuracy:", accuracy)
-`}
-  solutionCode={`X, y = load_wine(return_X_y=True)
+`,
+      solutionCode: `X, y = load_wine(return_X_y=True)
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0
@@ -407,7 +420,9 @@ model.fit(X_train, y_train)
 accuracy = model.score(X_test, y_test)
 
 print("Test accuracy:", accuracy)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "test_size",

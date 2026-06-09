@@ -22,7 +22,10 @@ When you do `import pandas as pd`, you're pulling in hundreds of modules, all or
 
 <CodeBlock
   adapter="python"
-  starterCode={`import math
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import math
 
 print(math.pi)
 print(math.sqrt(2))
@@ -36,7 +39,9 @@ print(pi, sqrt(2))
 import math as m
 
 print(m.cos(0))
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="When to use each import style">
@@ -51,7 +56,10 @@ Python comes with a famously rich standard library. A small tour:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import json
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import json
 import datetime
 import random
 import collections
@@ -64,7 +72,9 @@ print(random.choice("abcde"))
 print(collections.Counter("banana"))
 print(list(itertools.combinations("abc", 2)))
 print(statistics.mean([1, 2, 3, 4, 5]))
-`}
+`,
+    },
+  ]}
 />
 
 The standard library has modules for **everything**: file I/O, networking, threading, regular expressions, unit testing, profiling, etc. Always check the standard library before reaching for a third-party package.
@@ -84,11 +94,16 @@ When you write `import foo`:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import sys
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import sys
 
 for p in sys.path[:5]:  # show first 5
     print(p)
-`}
+`,
+    },
+  ]}
 />
 
 ```mermaid
@@ -111,7 +126,10 @@ It pulls every public name into the current namespace, which makes it impossible
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Bad: where does 'sqrt' come from?
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Bad: where does 'sqrt' come from?
 # from math import *
 # print(sqrt(2))
 
@@ -119,7 +137,9 @@ It pulls every public name into the current namespace, which makes it impossible
 import math
 
 print(math.sqrt(2))
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="danger" title="Star imports hide bugs">
@@ -176,14 +196,19 @@ Python 3.3+ has "namespace packages" which don't require `__init__.py`. But most
 
 <CodeBlock
   adapter="python"
-  starterCode={`# inside myapp/db/queries.py
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# inside myapp/db/queries.py
 # from .connection import open_db        # sibling module
 # from ..cli import parse_args            # one level up
 
 # Relative imports only work when the file is being imported
 # as part of a package, not when run directly.
 print("This block demonstrates relative import syntax (commented out).")
-`}
+`,
+    },
+  ]}
 />
 
 Relative imports only work when the file is being imported as part of a package, not when run directly with `python myapp/db/queries.py`.
@@ -223,7 +248,7 @@ This challenge uses two files. Open the `utils.py` tab and implement the functio
   files={[
     {
       filename: "main.py",
-      initialContent: `from utils import mean, variance
+      starterCode: `from utils import mean, variance
 
 values = [2, 4, 4, 4, 5, 5, 7, 9]
 print("mean =", mean(values))
@@ -232,7 +257,7 @@ print("variance =", variance(values))
     },
     {
       filename: "utils.py",
-      initialContent: `def mean(values):
+      starterCode: `def mean(values):
     # your code here
     return 0
 
@@ -241,7 +266,7 @@ def variance(values):
     # your code here
     return 0
 `,
-      solutionContent: `def mean(values):
+      solutionCode: `def mean(values):
     return sum(values) / len(values)
 
 
@@ -278,13 +303,18 @@ assert variance([3, 3, 3]) == 0`,
   adapter="python"
   title="Filter even numbers"
   instructions={`Define a function \`filter_even(numbers)\` that returns a new list containing only the even numbers from \`numbers\`.`}
-  starterCode={`def filter_even(numbers):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def filter_even(numbers):
     # your code here
     return []
-`}
-  solutionCode={`def filter_even(numbers):
+`,
+      solutionCode: `def filter_even(numbers):
     return [n for n in numbers if n % 2 == 0]
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",

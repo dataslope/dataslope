@@ -16,7 +16,10 @@ box of behavior."
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 int Square(int x)
 {
@@ -26,7 +29,9 @@ int Square(int x)
 Console.WriteLine(Square(5));
 Console.WriteLine(Square(12));
 Console.WriteLine(Square(Square(3))); // 9, then 81
-`}
+`,
+    },
+  ]}
 />
 
 Read the declaration left to right:
@@ -49,7 +54,10 @@ match up in order.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 double Average(int a, int b)
 {
@@ -58,7 +66,9 @@ double Average(int a, int b)
 
 Console.WriteLine(Average(10, 20)); // 15
 Console.WriteLine(Average(7, 8));   // 7.5
-`}
+`,
+    },
+  ]}
 />
 
 The names `a` and `b` exist **only inside** `Average`. They
@@ -71,7 +81,10 @@ If a method doesn't need to return a value, its return type is
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 void Greet(string name)
 {
@@ -80,7 +93,9 @@ void Greet(string name)
 
 Greet("Ada");
 Greet("Bob");
-`}
+`,
+    },
+  ]}
 />
 
 `void` methods are usually about *side effects*: writing to the
@@ -114,7 +129,10 @@ written more compactly with `=>`:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 int Square(int x) => x * x;
 int Cube(int x) => x * x * x;
@@ -123,7 +141,9 @@ bool IsEven(int x) => x % 2 == 0;
 Console.WriteLine(Square(4));
 Console.WriteLine(Cube(3));
 Console.WriteLine(IsEven(10));
-`}
+`,
+    },
+  ]}
 />
 
 Same meaning as the longer form, just less noise. Use whichever
@@ -137,14 +157,19 @@ methods, you write it once.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 double Bmi(double kg, double meters) => kg / (meters * meters);
 
 Console.WriteLine($"Alice: {Bmi(60, 1.65):F1}");
 Console.WriteLine($"Bob:   {Bmi(85, 1.80):F1}");
 Console.WriteLine($"Cara:  {Bmi(72, 1.70):F1}");
-`}
+`,
+    },
+  ]}
 />
 
 Three reasons this is better than copy-pasting the formula three
@@ -164,7 +189,10 @@ arguments **by name**, which makes intent clear at the call site.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 void Log(string message, string level = "INFO", bool toFile = false)
 {
@@ -174,7 +202,9 @@ void Log(string message, string level = "INFO", bool toFile = false)
 Log("starting up");
 Log("disk almost full", level: "WARN");
 Log("crash", level: "ERROR", toFile: true);
-`}
+`,
+    },
+  ]}
 />
 
 `level: "WARN"` is much clearer than passing positional arguments
@@ -190,7 +220,10 @@ arguments you pass.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 int Add(int a, int b) => a + b;
 double Add(double a, double b) => a + b;
@@ -199,7 +232,9 @@ string Add(string a, string b) => a + b;
 Console.WriteLine(Add(2, 3));
 Console.WriteLine(Add(1.5, 2.5));
 Console.WriteLine(Add("hello, ", "world"));
-`}
+`,
+    },
+  ]}
 />
 
 Use overloading sparingly — too many overloads can confuse readers.
@@ -221,7 +256,10 @@ Compare the two versions below.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 void DescribeNumbers(int[] nums)
@@ -246,14 +284,19 @@ void DescribeNumbers(int[] nums)
 }
 
 DescribeNumbers(new[] { 3, 1, 4, 1, 5, 9, 2, 6 });
-`}
+`,
+    },
+  ]}
 />
 
 ### Modular version, same behavior
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 int Sum(int[] xs)
@@ -287,7 +330,9 @@ void Describe(int[] xs)
 }
 
 Describe(new[] { 3, 1, 4, 1, 5, 9, 2, 6 });
-`}
+`,
+    },
+  ]}
 />
 
 Each helper does *exactly one thing*. The summary method `Describe`
@@ -319,7 +364,7 @@ section). The compiler builds them all together.
   files={[
     {
       filename: "Program.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 
 Console.WriteLine(MathUtils.Square(4));
 Console.WriteLine(MathUtils.Average(10, 20));
@@ -327,7 +372,7 @@ Console.WriteLine(MathUtils.Average(10, 20));
     },
     {
       filename: "MathUtils.cs",
-      initialContent: `public static class MathUtils
+      starterCode: `public static class MathUtils
 {
     public static int Square(int x) => x * x;
     public static double Average(int a, int b) => (a + b) / 2.0;
@@ -362,7 +407,7 @@ max=7
   files={[
     {
       filename: "Program.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 
 int[] data = { 3, 7, 5, 1, 4 };
 Console.WriteLine($"sum={Stats.Sum(data)}");
@@ -371,14 +416,14 @@ Console.WriteLine($"max={Stats.Max(data)}");
     },
     {
       filename: "Stats.cs",
-      initialContent: `public static class Stats
+      starterCode: `public static class Stats
 {
     // TODO: implement Sum and Max
     public static int Sum(int[] xs) => 0;
     public static int Max(int[] xs) => 0;
 }
 `,
-      solutionContent: `public static class Stats
+      solutionCode: `public static class Stats
 {
     public static int Sum(int[] xs)
     {

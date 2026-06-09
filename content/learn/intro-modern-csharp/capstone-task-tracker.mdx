@@ -95,7 +95,7 @@ not found
   files={[
     {
       filename: "Program.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 using System.Collections.Generic;
 
 var list = new TaskList();
@@ -127,12 +127,12 @@ catch (KeyNotFoundException)
     },
     {
       filename: "TaskItem.cs",
-      initialContent: `public class TaskItem
+      starterCode: `public class TaskItem
 {
     // TODO: Id, Title, Done, Complete()
 }
 `,
-      solutionContent: `public class TaskItem
+      solutionCode: `public class TaskItem
 {
     public int Id { get; }
     public string Title { get; }
@@ -151,7 +151,7 @@ catch (KeyNotFoundException)
     },
     {
       filename: "TaskList.cs",
-      initialContent: `using System.Collections.Generic;
+      starterCode: `using System.Collections.Generic;
 
 public class TaskList
 {
@@ -164,7 +164,7 @@ public class TaskList
     public IEnumerable<TaskItem> All() => System.Array.Empty<TaskItem>();
 }
 `,
-      solutionContent: `using System.Collections.Generic;
+      solutionCode: `using System.Collections.Generic;
 
 public class TaskList
 {

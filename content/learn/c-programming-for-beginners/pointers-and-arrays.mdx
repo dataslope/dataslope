@@ -31,7 +31,10 @@ real:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int a[5] = {10, 20, 30, 40, 50};
@@ -45,7 +48,9 @@ int main(void) {
   printf("*(p+2)  = %d\\n", *(p + 2));
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 `a[i]`, `p[i]`, and `*(p + i)` are **all the same thing**. The C
@@ -71,7 +76,10 @@ array with a pointer is just incrementing the pointer.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int a[5] = {10, 20, 30, 40, 50};
@@ -90,7 +98,9 @@ int main(void) {
 
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Both print `10 20 30 40 50`. Choose whichever style makes the
@@ -105,7 +115,10 @@ pointer-arithmetic loop in C:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 void my_puts(const char *s) {
   while (*s != '\\0') {
@@ -119,7 +132,9 @@ int main(void) {
   my_puts("Hello, pointers!");
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Each iteration:
@@ -163,7 +178,10 @@ between them, in elements:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <string.h>
 
 int main(void) {
@@ -175,7 +193,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 `comma - s` is `5` — the offset of `,` from the start of the string.
@@ -190,7 +210,10 @@ elements with a single pointer:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int grid[3][4] = {
@@ -208,7 +231,9 @@ int main(void) {
   printf("sum = %d\\n", sum);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Output: `sum = 78`. The 2D shape is a *convenient indexing scheme*
@@ -267,7 +292,10 @@ printf("%d\\n", total);   // should print 15
 \`\`\`
 
 The program must print exactly \`15\`.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int sum(const int *begin, const int *end) {
   // walk from begin up to (but not including) end
@@ -280,8 +308,8 @@ int main(void) {
   printf("%d\\n", total);
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 int sum(const int *begin, const int *end) {
   int total = 0;
@@ -297,7 +325,9 @@ int main(void) {
   printf("%d\\n", total);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "sum",

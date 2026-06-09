@@ -20,13 +20,18 @@ By default the center is a scatter plot and the margins are histograms:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="white")
 penguins = sns.load_dataset("penguins")
 
 sns.jointplot(data=penguins, x="bill_length_mm", y="bill_depth_mm")
-`}
+`,
+    },
+  ]}
 />
 
 Read it in two directions. The **center** is the familiar scatter — bill
@@ -80,13 +85,18 @@ useful when you care about *where the mass is* rather than each observation:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="white")
 penguins = sns.load_dataset("penguins")
 
 sns.jointplot(data=penguins, x="bill_length_mm", y="bill_depth_mm", kind="kde")
-`}
+`,
+    },
+  ]}
 />
 
 ## Handling density with `kind="hex"`
@@ -103,7 +113,10 @@ dataset:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="white")
 
@@ -111,7 +124,9 @@ sns.set_theme(style="white")
 diamonds = sns.load_dataset("diamonds").sample(n=2000, random_state=0)
 
 sns.jointplot(data=diamonds, x="carat", y="price", kind="hex")
-`}
+`,
+    },
+  ]}
 />
 
 A plain scatter of carat against price would be a dark smear in the
@@ -152,7 +167,10 @@ distribution per group, so you see how the categories differ on each axis:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="white")
 penguins = sns.load_dataset("penguins")
@@ -163,7 +181,9 @@ sns.jointplot(
     y="bill_depth_mm",
     hue="species",
 )
-`}
+`,
+    },
+  ]}
 />
 
 That two-humped top margin from the very first plot now explains itself: the
@@ -206,15 +226,18 @@ combination `jointplot` doesn't offer out of the box. For everyday use,
 
 Assign the result to a variable named \`g\`. The marginal distributions
 should appear automatically along the top and right.`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="white")
 penguins = sns.load_dataset("penguins")
 
 # Build the joint plot and assign it to g:
 g = None
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 sns.set_theme(style="white")
 penguins = sns.load_dataset("penguins")
@@ -225,7 +248,9 @@ g = sns.jointplot(
     y="bill_depth_mm",
     kind="scatter",
 )
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_jointgrid",

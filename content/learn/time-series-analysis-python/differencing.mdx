@@ -24,7 +24,10 @@ trend — because a series can wander far from its starting level while its
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -41,8 +44,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`# Differencing by hand is just "value minus its lag":
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `# Differencing by hand is just "value minus its lag":
 manual = air - air.shift(1)
 builtin = air.diff()  # the convenient version
 
@@ -58,7 +61,9 @@ print(frame)
 print()
 print("They match exactly:", manual.dropna().equals(builtin.dropna()))
 print("The first value is NaN -- there's no earlier month to subtract.")
-`}
+`,
+    },
+  ]}
 />
 
 `y.diff()` is exactly `y - y.shift(1)`. The first entry is `NaN` because the
@@ -75,7 +80,10 @@ has no trend.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 # A PERFECT linear trend: y = 3t + 10.
@@ -91,7 +99,9 @@ print()
 print("Differencing turned 'rising level' into 'constant change'.")
 print("A curved (quadratic) trend needs a SECOND difference to flatten;")
 print("each difference peels off one degree of polynomial trend.")
-`}
+`,
+    },
+  ]}
 />
 
 A linear trend vanishes after **one** difference; a curved (quadratic) trend
@@ -100,7 +110,10 @@ needs **two**. In practice almost every real series is stationary after
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
@@ -121,8 +134,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`import matplotlib.pyplot as plt
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `import matplotlib.pyplot as plt
 from statsmodels.tsa.stattools import adfuller
 
 diff1 = air.diff().dropna()
@@ -139,7 +152,9 @@ print(f"First-difference ADF p   : {adfuller(diff1)[1]:.4f}  (much lower!)")
 print()
 print("Notice the differenced series still has a SEASONAL wobble -- the yearly")
 print("hump survived. First differencing removed the trend, not the season.")
-`}
+`,
+    },
+  ]}
 />
 
 The trend is gone after one difference, and the ADF p-value collapses. But
@@ -161,7 +176,10 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 import warnings
 warnings.filterwarnings("ignore")
@@ -182,8 +200,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`import numpy as np
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from statsmodels.tsa.stattools import adfuller
 
@@ -210,7 +228,9 @@ plt.show()
 print()
 print("Each transform drives the p-value down. The final series has no trend,")
 print("no yearly cycle, and a stable spread -- ready for an ARIMA-style model.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="This is exactly what SARIMA automates">
@@ -232,7 +252,10 @@ that went *up* instead of down.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 rng = np.random.default_rng(0)
@@ -249,7 +272,9 @@ print(
 print()
 print("Differencing stationary data manufactured a strong negative correlation")
 print("and doubled the variance. Use the SMALLEST d that achieves stationarity.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="danger" title="Use the minimum number of differences">
@@ -287,13 +312,16 @@ integrates its forecasts back up.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [112,118,132,129,121,135,148,148,136,119,104,118,
                115,126,141,135,125,149,170,170,158,133,114,140]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`import numpy as np
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `import numpy as np
 
 changes = air.diff().dropna()  # the differenced series
 start = air.iloc[0]  # the one anchor we must remember
@@ -313,7 +341,9 @@ print("Perfect recovery:", np.allclose(air.values, reconstructed.values))
 print()
 print("Differencing is reversible IF you keep the starting value. ARIMA does")
 print("this bookkeeping for you -- you give it 'd' and it integrates forecasts back.")
-`}
+`,
+    },
+  ]}
 />
 
 <MultipleChoice
@@ -339,7 +369,10 @@ The "I" means the model operates on differenced data and integrates (cumulativel
   instructions={`The airline \`air\` series is loaded. Without using \`.diff()\`, build the **seasonal difference** at period 12 using \`shift\`: \`seasonal(t) = air(t) - air(t-12)\`. Call it \`manual_sdiff\`.
 
 Then confirm it equals the built-in \`air.diff(12)\` by setting \`matches\` to \`True\` if they're equal everywhere both are defined (drop NaNs before comparing).`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -356,17 +389,19 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`manual_sdiff = None  # air(t) - air(t-12), using shift
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `manual_sdiff = None  # air(t) - air(t-12), using shift
 matches = None  # True if it equals air.diff(12)
 print(manual_sdiff.dropna().head() if manual_sdiff is not None else None)
 print("matches:", matches)
-`}
-  solutionCode={`manual_sdiff = air - air.shift(12)
+`,
+      solutionCode: `manual_sdiff = air - air.shift(12)
 matches = bool(manual_sdiff.dropna().round(9).equals(air.diff(12).dropna().round(9)))
 print(manual_sdiff.dropna().head())
 print("matches:", matches)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "shape",
@@ -396,19 +431,22 @@ assert manual_sdiff.loc[pd.Timestamp("1950-01-01")] == 3`,
   instructions={`A series \`s\` is loaded that is stationary after exactly **one** difference. For \`d\` in 0, 1, 2, 3, compute the ADF p-value of the \`d\`-times-differenced series and the lag-1 autocorrelation. Choose \`best_d\`: the **smallest** \`d\` whose ADF p-value is below 0.05 (the minimum differences that achieve stationarity — do NOT just pick the smallest p-value).
 
 Also set \`over_diff_ac\` to the lag-1 autocorrelation at \`d = 2\` (one difference too many), which should be clearly negative — the over-differencing signature.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 import warnings
 warnings.filterwarnings("ignore")
 from statsmodels.tsa.stattools import adfuller
 rng = np.random.default_rng(7)
 # Random walk with drift -> stationary after ONE difference.
-s = pd.Series(np.cumsum(rng.normal(0.3, 1.0, 300)), name="s")`}
-  starterCode={`best_d = None  # smallest d with ADF p < 0.05
+s = pd.Series(np.cumsum(rng.normal(0.3, 1.0, 300)), name="s")`,
+      starterCode: `best_d = None  # smallest d with ADF p < 0.05
 over_diff_ac = None  # lag-1 autocorrelation at d = 2
 print("best_d:", best_d, " over-diff lag-1 ac:", over_diff_ac)
-`}
-  solutionCode={`best_d = None
+`,
+      solutionCode: `best_d = None
 acs = {}
 for d in range(0, 4):
     x = s.copy()
@@ -421,7 +459,9 @@ for d in range(0, 4):
         best_d = d
 over_diff_ac = acs[2]
 print("best_d:", best_d, " over-diff lag-1 ac:", round(over_diff_ac, 3))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "min_d",

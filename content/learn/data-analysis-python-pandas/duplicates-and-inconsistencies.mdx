@@ -22,7 +22,10 @@ uniquely identify a row?*
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -45,7 +48,9 @@ print()
 # Duplicates based ONLY on customer_id
 print("Duplicate customer_ids:")
 print(df[df.duplicated(subset=["customer_id"])])
-`}
+`,
+    },
+  ]}
 />
 
 By default, `duplicated()` marks the **second and later** copies
@@ -58,19 +63,24 @@ reverses that; `keep=False` marks *all* duplicates.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 df = pd.DataFrame({
     "customer_id": [1, 2, 3, 2, 4, 1],
     "name":        ["Aiko","Bilal","Chen","Bilal","Diego","Aiko"],
     "spend":       [100, 200, 300, 200, 50, 100],
-})`}
-  starterCode={`# Drop full-row duplicates
+})`,
+      starterCode: `# Drop full-row duplicates
 print(df.drop_duplicates())
 print()
 
 # Drop duplicates based on customer_id only — keeps the first
 print(df.drop_duplicates(subset=["customer_id"]))
-`}
+`,
+    },
+  ]}
 />
 
 When you have *almost* duplicates that disagree on some columns
@@ -94,7 +104,10 @@ category can appear under many syntactic forms.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -105,14 +118,19 @@ df = pd.DataFrame(
 # Naive count — every variant is its own group
 print("Before cleanup:")
 print(df["country"].value_counts())
-`}
+`,
+    },
+  ]}
 />
 
 A canonical-mapping cleanup:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -130,7 +148,9 @@ df["country_clean"] = (
 print(df)
 print()
 print(df["country_clean"].value_counts())
-`}
+`,
+    },
+  ]}
 />
 
 The pattern — strip → case-normalize → map known variants —
@@ -169,7 +189,10 @@ keep a column for the original currency if useful.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -189,7 +212,9 @@ def normalize(row):
 
 df["price_usd"] = df.apply(normalize, axis=1).round(2)
 print(df)
-`}
+`,
+    },
+  ]}
 />
 
 You will write code like this every time you receive data from a
@@ -202,14 +227,19 @@ joins. Check with:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame({"x": [1, 2, 3]}, index=["a", "b", "a"])  # duplicate "a"
 print("Index unique?", df.index.is_unique)
 print()
 # Lookup returns multiple rows (no longer a single Series)
 print(df.loc["a"])
-`}
+`,
+    },
+  ]}
 />
 
 If your index is supposed to be a unique identifier, assert it:

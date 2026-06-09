@@ -42,7 +42,10 @@ value.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.HashSet;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.HashSet;
 import java.util.Set;
 
 public class Main {
@@ -60,7 +63,9 @@ public class Main {
     System.out.println(seen); // iteration order is unspecified
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Notice:
@@ -93,7 +98,10 @@ both matter (e.g. "the unique URLs visited, in visit order").
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.LinkedHashSet;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class Main {
@@ -109,7 +117,9 @@ public class Main {
       System.out.println(url);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Output is `/home`, `/about`, `/contact` — in the order they first
@@ -123,7 +133,10 @@ Backed by a red-black tree, every operation is `O(log n)`.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.Set;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.Set;
 import java.util.TreeSet;
 
 public class Main {
@@ -147,7 +160,9 @@ public class Main {
     System.out.println("after kappa = " + words.higher("kappa"));
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 `TreeSet` is also a `NavigableSet`, which gives you `higher(x)`,
@@ -164,7 +179,10 @@ people once and then never again.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.HashSet;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.HashSet;
 import java.util.Set;
 
 public class Main {
@@ -186,7 +204,9 @@ public class Main {
     System.out.println("difference   = " + new java.util.TreeSet<>(difference));
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 We wrap the printout in a `TreeSet` only to get a stable order for
@@ -213,7 +233,7 @@ incoming stream while preserving first-seen order.
   files={[
     {
       filename: "Main.java",
-      initialContent: `import java.util.List;
+      starterCode: `import java.util.List;
 
 public class Main {
   public static void main(String[] args) {
@@ -233,7 +253,7 @@ public class Main {
     },
     {
       filename: "VisitorLog.java",
-      initialContent: `import java.util.LinkedHashSet;
+      starterCode: `import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class VisitorLog {
@@ -274,7 +294,7 @@ Expected output:
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     String s = "the quick brown fox jumps over the lazy dog the fox";
     System.out.println(Distinct.ofWords(s));
@@ -284,7 +304,7 @@ Expected output:
     },
     {
       filename: "Distinct.java",
-      initialContent: `import java.util.ArrayList;
+      starterCode: `import java.util.ArrayList;
 import java.util.List;
 
 public class Distinct {
@@ -294,7 +314,7 @@ public class Distinct {
   }
 }
 `,
-      solutionContent: `import java.util.ArrayList;
+      solutionCode: `import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;

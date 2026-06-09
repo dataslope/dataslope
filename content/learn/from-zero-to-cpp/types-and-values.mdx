@@ -69,7 +69,10 @@ and array indices. It is *unsigned*, which leads to a classic trap:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 int main() {
@@ -87,7 +90,9 @@ int main() {
   // }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 A good habit: use *signed* integer types for arithmetic and *only*
@@ -102,7 +107,10 @@ exactly store many "nice" decimal numbers.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iomanip>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iomanip>
 #include <iostream>
 
 int main() {
@@ -114,7 +122,9 @@ int main() {
   std::cout << "compare to 0.3: " << (c == 0.3 ? "equal" : "NOT equal") << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 `0.1 + 0.2` is not exactly `0.3` in binary floating-point. Never
@@ -154,7 +164,10 @@ C++ has two big categories of conversions:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   int n = 7;
@@ -166,7 +179,9 @@ int main() {
   std::cout << d << " " << n2 << " " << b << " " << k << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Use `static_cast` when you actually mean it. C-style casts
@@ -182,7 +197,10 @@ is false; any non-null pointer is true).
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 void describe(int n) {
   if (n) {
@@ -198,7 +216,9 @@ int main() {
   describe(-1);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 For clarity in real code, prefer explicit comparisons (`if (n != 0)`,
@@ -213,7 +233,10 @@ constant is needed (e.g. as an array size).
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 constexpr int kBoardSize = 8;
 
@@ -224,7 +247,9 @@ int main() {
   std::cout << "corner = " << board[0][0] << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Prefer `constexpr` over preprocessor `#define MAX 100` macros. The
@@ -238,7 +263,10 @@ use a `enum class`:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 enum class TrafficLight { Red, Yellow, Green };
 
@@ -261,7 +289,9 @@ int main() {
   std::cout << describe(l) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Why not just use `int 0/1/2`? Because then nothing prevents you
@@ -301,7 +331,10 @@ Practice this on small examples; the same pattern scales up.
   adapter="cpp"
   title="Average of a vector"
   instructions={`Implement \`double average(const std::vector<int>& xs)\` that returns the mean of \`xs\`. Pay attention to the types: \`xs.size()\` is \`std::size_t\` and the sum is \`int\` — you'll need a cast or careful arithmetic to get the right \`double\` result. The fixed input prints exactly \`3\` on success.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <vector>
 
 double average(const std::vector<int> &xs) {
@@ -314,8 +347,8 @@ int main() {
   std::cout << average(v);
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <vector>
 
 double average(const std::vector<int> &xs) {
@@ -330,7 +363,9 @@ int main() {
   std::cout << average(v);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "avg",

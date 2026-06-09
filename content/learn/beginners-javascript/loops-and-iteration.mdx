@@ -26,13 +26,18 @@ while (condition) {
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`let n = 1;
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `let n = 1;
 while (n <= 5) {
   console.log("n =", n);
   n = n + 1;
 }
 console.log("Done. n is now", n);
-`}
+`,
+    },
+  ]}
 />
 
 Step-by-step trace of what the runtime does:
@@ -78,7 +83,10 @@ for (init; condition; update) {
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`for (let i = 0; i < 5; i++) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `for (let i = 0; i < 5; i++) {
   console.log("i =", i);
 }
 
@@ -86,7 +94,9 @@ for (init; condition; update) {
 for (let i = 10; i >= 0; i -= 2) {
   console.log("i =", i);
 }
-`}
+`,
+    },
+  ]}
 />
 
 That `i++` is a compact way to write `i = i + 1`. Combined with the
@@ -115,7 +125,10 @@ all.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const colors = ["red", "green", "blue"];
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const colors = ["red", "green", "blue"];
 
 for (const color of colors) {
   console.log("color:", color);
@@ -125,7 +138,9 @@ for (const color of colors) {
 for (const ch of "hello") {
   console.log(ch);
 }
-`}
+`,
+    },
+  ]}
 />
 
 If you *do* need the index alongside the element, use
@@ -133,12 +148,17 @@ If you *do* need the index alongside the element, use
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const colors = ["red", "green", "blue"];
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const colors = ["red", "green", "blue"];
 
 for (const [index, color] of colors.entries()) {
   console.log(index, "->", color);
 }
-`}
+`,
+    },
+  ]}
 />
 
 That `[index, color]` is **destructuring**, which we have not
@@ -154,12 +174,17 @@ to look at every named property. It is not appropriate for arrays
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const user = { name: "Ada", age: 28, role: "admin" };
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const user = { name: "Ada", age: 28, role: "admin" };
 
 for (const key in user) {
   console.log(key, "=", user[key]);
 }
-`}
+`,
+    },
+  ]}
 />
 
 We will look at objects in detail in their own chapter. For now,
@@ -176,7 +201,10 @@ ahead:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// Find the first number bigger than 50.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// Find the first number bigger than 50.
 const numbers = [3, 17, 42, 9, 88, 13, 99];
 
 let found;
@@ -193,7 +221,9 @@ for (let i = 1; i <= 10; i++) {
   if (i % 2 === 0) continue; // skip even numbers
   console.log("odd:", i);
 }
-`}
+`,
+    },
+  ]}
 />
 
 Use these sparingly. Heavy use of `break`/`continue` is often a
@@ -208,7 +238,10 @@ blank result, walk a list, update the result**.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const numbers = [10, 22, 3, 47, 9];
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const numbers = [10, 22, 3, 47, 9];
 
 // Sum
 let total = 0;
@@ -237,7 +270,9 @@ for (const n of numbers) {
   if (n > max) max = n;
 }
 console.log("max:", max);
-`}
+`,
+    },
+  ]}
 />
 
 Notice that each example is the same pattern: *initialise; loop;
@@ -252,7 +287,10 @@ chapter to these, but here is a small taste:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const numbers = [1, 2, 3, 4, 5];
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const numbers = [1, 2, 3, 4, 5];
 
 // forEach — just run a function for each element
 numbers.forEach((n) => console.log("element:", n));
@@ -268,7 +306,9 @@ console.log("evens:", evens);
 // reduce — collapse the array into a single value
 const total = numbers.reduce((acc, n) => acc + n, 0);
 console.log("total:", total);
-`}
+`,
+    },
+  ]}
 />
 
 These are the *functional* style of iteration: instead of writing
@@ -288,7 +328,10 @@ item to every other item.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// A small multiplication table.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// A small multiplication table.
 for (let row = 1; row <= 5; row++) {
   let line = "";
   for (let col = 1; col <= 5; col++) {
@@ -297,7 +340,9 @@ for (let row = 1; row <= 5; row++) {
   }
   console.log(line);
 }
-`}
+`,
+    },
+  ]}
 />
 
 Be mindful of cost: nesting an N-element loop inside another
@@ -362,15 +407,18 @@ goes in this cycle.
 For example, \`fizzbuzz(5)\` should return \`["1", "2", "Fizz", "4", "Buzz"]\`.
 
 Implement it with a \`for\` loop and an array you build up with \`.push()\`.`}
-  starterCode={`function fizzbuzz(n) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function fizzbuzz(n) {
   const out = [];
   // your code here
   return out;
 }
 
 console.log(fizzbuzz(15));
-`}
-  solutionCode={`function fizzbuzz(n) {
+`,
+      solutionCode: `function fizzbuzz(n) {
   const out = [];
   for (let i = 1; i <= n; i++) {
     if (i % 15 === 0) out.push("FizzBuzz");
@@ -382,7 +430,9 @@ console.log(fizzbuzz(15));
 }
 
 console.log(fizzbuzz(15));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "size",

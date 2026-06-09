@@ -24,7 +24,10 @@ it just works in your browser.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 tips = sns.load_dataset("tips")
 
@@ -32,7 +35,9 @@ tips = sns.load_dataset("tips")
 print(type(tips))
 print(tips.shape)
 display(tips.head())
-`}
+`,
+    },
+  ]}
 />
 
 Because the result is a regular DataFrame, every pandas habit you have
@@ -83,21 +88,31 @@ Let's actually look at a couple of them rather than just listing columns.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 penguins = sns.load_dataset("penguins")
 display(penguins.head())
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 flights = sns.load_dataset("flights")
 print(flights.shape)
 display(flights.head())
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="See what's available">
@@ -114,13 +129,18 @@ spartan. Watch what a bare plot looks like with no theme applied.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 # No set_theme() here — this is the unstyled matplotlib default.
 tips = sns.load_dataset("tips")
 
 sns.scatterplot(data=tips, x="total_bill", y="tip")
-`}
+`,
+    },
+  ]}
 />
 
 Now add **one line** — `sns.set_theme()` — before the same plot. You get a
@@ -130,14 +150,19 @@ its presentation did.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme()  # the whole makeover, in one call
 
 tips = sns.load_dataset("tips")
 
 sns.scatterplot(data=tips, x="total_bill", y="tip")
-`}
+`,
+    },
+  ]}
 />
 
 The difference is purely cosmetic, but cosmetics matter when you are trying
@@ -171,13 +196,18 @@ Here is `whitegrid` — a white canvas with subtle gridlines.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 penguins = sns.load_dataset("penguins")
 
 sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
-`}
+`,
+    },
+  ]}
 />
 
 Compare that with `ticks`, which drops the grid entirely and adds tick
@@ -185,13 +215,18 @@ marks on the axes — a tidy, minimal look favored in many publications.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="ticks")
 penguins = sns.load_dataset("penguins")
 
 sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
-`}
+`,
+    },
+  ]}
 />
 
 And `dark` — a gray background with no gridlines, which can make brightly
@@ -199,13 +234,18 @@ colored points stand out.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="dark")
 penguins = sns.load_dataset("penguins")
 
 sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
-`}
+`,
+    },
+  ]}
 />
 
 There is no single "right" style. Gridded styles help readers read off
@@ -242,13 +282,18 @@ Here is the default `notebook` context.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(context="notebook", style="whitegrid")
 tips = sns.load_dataset("tips")
 
 sns.scatterplot(data=tips, x="total_bill", y="tip")
-`}
+`,
+    },
+  ]}
 />
 
 Now the **same plot** at `talk` context. Everything — labels, ticks, the
@@ -258,13 +303,18 @@ grew.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(context="talk", style="whitegrid")
 tips = sns.load_dataset("tips")
 
 sns.scatterplot(data=tips, x="total_bill", y="tip")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="Pick context last, by where the chart will live">
@@ -301,7 +351,10 @@ summary numbers:
 place**, in a variable named \`mean_mpg\` (use Python's \`round(value, 1)\`).
 
 You do not need to draw anything — just create the two variables.`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 mpg = sns.load_dataset("mpg")
 
@@ -310,14 +363,16 @@ n_rows = None
 
 # 2. Mean of the "mpg" column, rounded to 1 decimal place:
 mean_mpg = None
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 mpg = sns.load_dataset("mpg")
 
 n_rows = len(mpg)
 mean_mpg = round(mpg["mpg"].mean(), 1)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "n_rows",

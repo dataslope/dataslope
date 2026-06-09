@@ -26,7 +26,10 @@ imply a relationship that isn't there.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.stocks()  # Date + several tech stocks normalized to 1.0
 
@@ -39,7 +42,9 @@ fig = px.line(
     labels={"date": "Date", "GOOG": "Normalized price"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 That's the simplest possible line chart: one x, one y, one line.
@@ -53,7 +58,10 @@ To show several lines, **reshape your data to long form** and use
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.stocks()
 
@@ -70,7 +78,9 @@ fig = px.line(
     labels={"date": "Date", "price": "Normalized price", "ticker": "Ticker"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 Now you have several lines, each in a different color, with an
@@ -84,7 +94,10 @@ Add `markers=True`:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("country in ['Japan', 'Brazil', 'Nigeria']")
 
@@ -99,7 +112,9 @@ fig = px.line(
     labels={"year": "Year", "lifeExp": "Life expectancy (years)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 The markers help when:
@@ -118,7 +133,10 @@ overlapping lines that no one can read.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("continent == 'Europe'")
 
@@ -132,7 +150,9 @@ fig = px.line(
     labels={"year": "Year", "lifeExp": "Life expectancy (years)"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 There are 30 lines on that chart and even with interactive
@@ -154,7 +174,10 @@ linear scale flattens out.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query(
     "country in ['China', 'India', 'United States', 'Japan']"
@@ -182,7 +205,9 @@ fig_log = px.line(
     labels={"year": "Year", "gdpPercap": "GDP per capita (USD, log)"},
 )
 fig_log.show()
-`}
+`,
+    },
+  ]}
 />
 
 On the **linear** chart, the USA's huge values squash everyone

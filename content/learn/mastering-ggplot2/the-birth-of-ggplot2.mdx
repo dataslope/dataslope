@@ -67,13 +67,18 @@ earlier:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # The whole chart described as components:
 # data = mtcars, x = wt, y = mpg, color = cylinder count, mark = point.
 ggplot(mtcars, aes(x = wt, y = mpg, color = factor(cyl))) +
   geom_point(size = 3)
-`}
+`,
+    },
+  ]}
 />
 
 Run it. Notice what you did **not** do: no color lookup table, no

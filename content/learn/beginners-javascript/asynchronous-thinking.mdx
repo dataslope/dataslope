@@ -64,14 +64,19 @@ can be called back later. Many older async APIs use this pattern.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log("1: requesting");
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `console.log("1: requesting");
 
 setTimeout(() => {
   console.log("3: timer fired");
 }, 200);
 
 console.log("2: kept going");
-`}
+`,
+    },
+  ]}
 />
 
 Read the output carefully: `1`, `2`, `3`. The arrow function we
@@ -90,7 +95,10 @@ a timer.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function fakeFetchUser(id, callback) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function fakeFetchUser(id, callback) {
   console.log("Pretending to call API...");
   setTimeout(() => {
     // Pretend this is the response from the server.
@@ -107,7 +115,9 @@ fakeFetchUser(42, (err, user) => {
 });
 
 console.log("Request is in flight; doing other work...");
-`}
+`,
+    },
+  ]}
 />
 
 A few important conventions in the old-style callback world:
@@ -125,7 +135,10 @@ end up with deeply nested code.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function later(value, ms, cb) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function later(value, ms, cb) {
   setTimeout(() => cb(null, value), ms);
 }
 
@@ -143,7 +156,9 @@ later("step 1", 100, (err, a) => {
     });
   });
 });
-`}
+`,
+    },
+  ]}
 />
 
 This "rightward drift" is famously called **callback hell** or
@@ -189,7 +204,10 @@ isn't always the order it *runs* in.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`console.log("A");
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `console.log("A");
 
 setTimeout(() => console.log("B"), 0);
 
@@ -198,7 +216,9 @@ console.log("C");
 setTimeout(() => console.log("D"), 0);
 
 console.log("E");
-`}
+`,
+    },
+  ]}
 />
 
 Output is `A C E B D`. The `setTimeout` callbacks wait until the
@@ -219,7 +239,10 @@ counting.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function loadAll(urls, done) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function loadAll(urls, done) {
   const results = new Array(urls.length);
   let remaining = urls.length;
 
@@ -241,7 +264,9 @@ loadAll(["/a", "/b", "/c"], (err, results) => {
   if (err) console.error(err);
   else console.log("All done:", results);
 });
-`}
+`,
+    },
+  ]}
 />
 
 Counting-down patterns like `remaining--` are easy to get wrong.
@@ -274,7 +299,7 @@ callback-driven by design.
   files={[
     {
       filename: "index.js",
-      initialContent: `const { createBus } = require("./bus");
+      starterCode: `const { createBus } = require("./bus");
 
 const bus = createBus();
 
@@ -291,7 +316,7 @@ console.log("main: subscriptions registered, waiting for events...");
     },
     {
       filename: "bus.js",
-      initialContent: `function createBus() {
+      starterCode: `function createBus() {
   const listeners = {}; // eventName -> array of callbacks
 
   function on(event, cb) {
@@ -329,7 +354,10 @@ pattern the DOM uses (`element.addEventListener`), Node uses
 - If any task calls its callback with an error, call \`done(err)\` immediately and run no more tasks.
 
 This is a small but realistic exercise in "callback orchestration".`}
-  starterCode={`function runSequentially(tasks, done) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function runSequentially(tasks, done) {
   // your code here
 }
 
@@ -344,8 +372,8 @@ runSequentially(tasks, (err, results) => {
   if (err) console.error(err);
   else console.log(results); // ["a","b","c"]
 });
-`}
-  solutionCode={`function runSequentially(tasks, done) {
+`,
+      solutionCode: `function runSequentially(tasks, done) {
   const results = [];
   let i = 0;
 
@@ -375,7 +403,9 @@ runSequentially(tasks, (err, results) => {
   if (err) console.error(err);
   else console.log(results);
 });
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "happy_path",

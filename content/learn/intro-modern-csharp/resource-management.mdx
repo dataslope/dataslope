@@ -71,7 +71,10 @@ is thrown.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 using (var c = new Connection("A"))
 {
@@ -97,7 +100,9 @@ public class Connection : IDisposable
         Console.WriteLine($"closed {Name}");
     }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Run that. You'll see "closed A" *before* "done" — proof that
@@ -111,7 +116,10 @@ of the enclosing scope.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 void DoWork()
 {
@@ -134,7 +142,9 @@ public class Connection : IDisposable
     public void Send(string msg) => Console.WriteLine($"{Name}: {msg}");
     public void Dispose() => Console.WriteLine($"closed {Name}");
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Why `using` and not just `Dispose()`?
@@ -143,7 +153,10 @@ You *could* call `Dispose()` manually:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 var c = new Connection("C");
 try
@@ -166,7 +179,9 @@ public class Connection : IDisposable
     }
     public void Dispose() => Console.WriteLine($"closed {Name}");
 }
-`}
+`,
+    },
+  ]}
 />
 
 But `using` *is* exactly that try/finally, written for you and
@@ -203,7 +218,10 @@ don't have a real filesystem to open. But you can practice the
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 void Job()
@@ -234,7 +252,9 @@ public class Logger : IDisposable
         Console.WriteLine($"close {Name}");
     }
 }
-`}
+`,
+    },
+  ]}
 />
 
 The `using` ensures the log is flushed and closed even if `Job()`

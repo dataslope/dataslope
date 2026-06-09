@@ -60,7 +60,10 @@ them into two groups.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_iris
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 
 X, y = load_iris(return_X_y=True)
@@ -75,7 +78,9 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 print("Training set:", X_train.shape)
 print("Test set:    ", X_test.shape)
-`}
+`,
+    },
+  ]}
 />
 
 Four things come back, always in this order: `X_train, X_test, y_train,
@@ -96,7 +101,10 @@ it memorized, and on the held-out test data. Watch the gap.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_breast_cancer
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
@@ -110,7 +118,9 @@ tree.fit(X_train, y_train)
 
 print(f"Accuracy on TRAINING data: {tree.score(X_train, y_train):.3f}")
 print(f"Accuracy on TEST data:     {tree.score(X_test, y_test):.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 The training score is a perfect (or near-perfect) `1.000`. If that were
@@ -147,7 +157,10 @@ class's proportion in both halves.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.model_selection import train_test_split
 
 # An imbalanced target: 90% class 0, 10% class 1.
@@ -164,7 +177,9 @@ _, _, _, y_test_strat = train_test_split(
 
 print("Class 1 count in test set, no stratify:", int((y_test_plain == 1).sum()))
 print("Class 1 count in test set, stratified: ", int((y_test_strat == 1).sum()))
-`}
+`,
+    },
+  ]}
 />
 
 With `stratify=y`, the test set reliably contains 10% of class 1 — the same
@@ -252,10 +267,13 @@ lives.
 The hidden tests check that the split is the right size, that it is
 stratified, and that \`train_acc\` is higher than \`test_acc\` (the
 overfitting gap).`}
-  initCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier`}
-  starterCode={`X, y = load_wine(return_X_y=True)
+from sklearn.tree import DecisionTreeClassifier`,
+      starterCode: `X, y = load_wine(return_X_y=True)
 
 # 1. Split (30% test, random_state=42, stratified on y)
 X_train, X_test, y_train, y_test = None, None, None, None
@@ -267,8 +285,8 @@ train_acc = None
 test_acc = None
 
 print("train:", train_acc, "test:", test_acc)
-`}
-  solutionCode={`X, y = load_wine(return_X_y=True)
+`,
+      solutionCode: `X, y = load_wine(return_X_y=True)
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=42, stratify=y
@@ -281,7 +299,9 @@ train_acc = tree.score(X_train, y_train)
 test_acc = tree.score(X_test, y_test)
 
 print("train:", train_acc, "test:", test_acc)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "test_size",

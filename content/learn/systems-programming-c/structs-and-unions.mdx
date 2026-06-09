@@ -15,7 +15,10 @@ reality.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 struct Point {
   double x;
@@ -30,7 +33,9 @@ int main(void) {
   printf("via pointer: (%.1f, %.1f)\\n", pp->x, pp->y); // pp->x == (*pp).x
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The `->` operator is just shorthand for "dereference then dot."
@@ -42,7 +47,10 @@ Most modern C codebases `typedef` their structs so callers can write
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 typedef struct {
   double x;
@@ -61,7 +69,9 @@ int main(void) {
   printf("midpoint: (%.1f, %.1f)\\n", m.x, m.y);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Memory layout and padding
@@ -86,7 +96,10 @@ every `i` aligned).
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stddef.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stddef.h>
 #include <stdio.h>
 
 struct Bad {
@@ -109,7 +122,9 @@ int main(void) {
   printf("offsetof Bad.d = %zu\\n", offsetof(struct Bad, d));
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Layout tip: order members from largest to smallest">
@@ -125,7 +140,10 @@ code, and any "container of" macro.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stddef.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stddef.h>
 #include <stdio.h>
 
 typedef struct {
@@ -141,7 +159,9 @@ int main(void) {
   printf("offset balance   = %zu\\n", offsetof(Account, balance));
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Nested structs
@@ -150,7 +170,10 @@ Structs compose naturally; the layout rules apply recursively.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 typedef struct {
   double x, y;
@@ -176,7 +199,9 @@ int main(void) {
   printf("area = %.1f\\n", area(r));
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Struct pointers and heap structs
@@ -185,7 +210,10 @@ Big structs are usually passed by pointer so you do not copy them.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -213,7 +241,9 @@ int main(void) {
   user_free(u);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The pair `user_new` / `user_free` is the standard C "constructor /
@@ -227,7 +257,10 @@ lists, trees, and graphs are built.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 
 typedef struct Node {
@@ -268,7 +301,9 @@ int main(void) {
   free_list(list);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Unions
@@ -279,7 +314,10 @@ union's size is the size of its largest member.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdint.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdint.h>
 #include <stdio.h>
 
 union FloatBits {
@@ -296,7 +334,9 @@ int main(void) {
   printf("0x40490FDB as float = %f\\n", u.f);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 This *type punning* pattern is common in low-level code (graphics,
@@ -305,7 +345,10 @@ union of payloads — is how C encodes sum types like `Result<Ok, Err>`.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 typedef enum { JSON_NULL, JSON_INT, JSON_STR } JsonKind;
 
@@ -342,7 +385,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Bitfields
@@ -354,7 +399,10 @@ byte.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 typedef struct {
   unsigned int read : 1; // 1 bit
@@ -371,7 +419,9 @@ int main(void) {
   printf("rwx = %u%u%u\\n", p.read, p.write, p.execute);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Bitfields are not portable for wire formats">
@@ -389,7 +439,10 @@ unspecified size that lets you allocate the struct and its data in
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -416,7 +469,9 @@ int main(void) {
   free(b);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 One allocation, one free, contiguous storage — friendlier to the
@@ -429,7 +484,10 @@ where `data` is its own allocation.
   adapter="c"
   title="Pack and unpack a pixel"
   instructions={`Implement \`uint32_t pack_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a)\` so the bytes are laid out with \`r\` in the *highest* byte and \`a\` in the *lowest* byte. The provided \`main\` prints the result in hex; \`pack_rgba(0xAA, 0xBB, 0xCC, 0xDD)\` must print \`AABBCCDD\`.`}
-  starterCode={`#include <stdint.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdint.h>
 #include <stdio.h>
 
 uint32_t pack_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
@@ -442,8 +500,8 @@ int main(void) {
   printf("%08X\\n", px);
   return 0;
 }
-`}
-  solutionCode={`#include <stdint.h>
+`,
+      solutionCode: `#include <stdint.h>
 #include <stdio.h>
 
 uint32_t pack_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
@@ -456,7 +514,9 @@ int main(void) {
   printf("%08X\\n", px);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "packed",
@@ -472,7 +532,10 @@ int main(void) {
   adapter="c"
   title="Length of a singly linked list"
   instructions={`Implement \`size_t list_length(const Node *head)\` that returns the number of nodes in the list. The provided \`main\` builds a 5-node list and prints the length on one line. Do not free the list — \`main\` handles that.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 
 typedef struct Node {
@@ -503,8 +566,8 @@ int main(void) {
   }
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 #include <stdlib.h>
 
 typedef struct Node {
@@ -537,7 +600,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "len_5",

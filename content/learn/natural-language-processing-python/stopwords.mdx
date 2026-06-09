@@ -22,7 +22,10 @@ at it.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 # Installs NLTK and loads the data this page needs. nltk.download() isn't
 # available in this environment, so we fetch the data archives directly
 # and unpack them into NLTK's data directory.
@@ -48,15 +51,17 @@ async def _load_nltk(category, package):
         zf.extractall(dest)
 
 await _load_nltk("corpora", "stopwords")
-from nltk.corpus import stopwords`}
-  starterCode={`stop = stopwords.words("english")
+from nltk.corpus import stopwords`,
+      starterCode: `stop = stopwords.words("english")
 
 print("Number of English stopwords:", len(stop))
 print("First 25:", stop[:25])
 print()
 print("Is 'the' a stopword? ", "the" in stop)
 print("Is 'python' a stopword?", "python" in stop)
-`}
+`,
+    },
+  ]}
 />
 
 The list is short — under 200 words — but those words make up a huge fraction
@@ -76,7 +81,10 @@ of stopwords for fast lookup, then keep only the tokens that are not in it.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -101,8 +109,8 @@ async def _load_nltk(category, package):
 await _load_nltk("corpora", "stopwords")
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize`}
-  starterCode={`text = "The quick brown fox jumps over the lazy dog in the park"
+from nltk.tokenize import word_tokenize`,
+      starterCode: `text = "The quick brown fox jumps over the lazy dog in the park"
 stop = set(stopwords.words("english"))  # a set -> fast membership tests
 
 tokens = [t.lower() for t in word_tokenize(text)]
@@ -111,7 +119,9 @@ content = [t for t in tokens if t not in stop]
 print("All tokens:   ", tokens)
 print("Content words:", content)
 print(f"Removed {len(tokens) - len(content)} of {len(tokens)} tokens.")
-`}
+`,
+    },
+  ]}
 />
 
 The content words — "quick", "brown", "fox", "jumps", "lazy", "dog", "park" —
@@ -133,7 +143,10 @@ Now the other personality. Look closely at what is *in* the stopword list.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -156,12 +169,14 @@ async def _load_nltk(category, package):
         zf.extractall(dest)
 
 await _load_nltk("corpora", "stopwords")
-from nltk.corpus import stopwords`}
-  starterCode={`stop = set(stopwords.words("english"))
+from nltk.corpus import stopwords`,
+      starterCode: `stop = set(stopwords.words("english"))
 
 for word in ["not", "no", "nor", "never", "but", "against", "don't", "won't"]:
     print(f"  is '{word}' a stopword? {word in stop}")
-`}
+`,
+    },
+  ]}
 />
 
 The negation words — "not", "no", "nor" — are stopwords. So are many negated
@@ -177,7 +192,10 @@ flowchart TB
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -202,8 +220,8 @@ async def _load_nltk(category, package):
 await _load_nltk("corpora", "stopwords")
 await _load_nltk("tokenizers", "punkt_tab")
 from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize`}
-  starterCode={`review = "The movie was not good at all"
+from nltk.tokenize import word_tokenize`,
+      starterCode: `review = "The movie was not good at all"
 stop = set(stopwords.words("english"))
 
 tokens = [t.lower() for t in word_tokenize(review)]
@@ -214,7 +232,9 @@ print("After stopwords:", content)
 print()
 print("A naive sentiment reader now sees the word 'good' and no 'not'.")
 print("The negative review has been turned positive.")
-`}
+`,
+    },
+  ]}
 />
 
 The review "not good" became simply "good". A sentiment system reading the
@@ -265,7 +285,10 @@ noise words and — crucially — remove words you must keep.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -288,8 +311,8 @@ async def _load_nltk(category, package):
         zf.extractall(dest)
 
 await _load_nltk("corpora", "stopwords")
-from nltk.corpus import stopwords`}
-  starterCode={`base = set(stopwords.words("english"))
+from nltk.corpus import stopwords`,
+      starterCode: `base = set(stopwords.words("english"))
 
 # Keep negation/contrast words so sentiment survives:
 keep = {"not", "no", "nor", "never", "but"}
@@ -301,7 +324,9 @@ custom = (base - keep) | add
 print("'not' still a stopword?  ", "not" in custom, "  <- kept for sentiment")
 print("'movie' now a stopword?  ", "movie" in custom, " <- added domain noise word")
 print("'the' still a stopword?  ", "the" in custom)
-`}
+`,
+    },
+  ]}
 />
 
 This three-line recipe — start from the base list, *subtract* the words you
@@ -342,7 +367,10 @@ subtracting those five words, then keep only tokens not in that custom set.
 
 For example, given \`["this", "is", "not", "good"]\`, the function should
 return \`["not", "good"]\` — ordinary stopwords gone, the negation kept.`}
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -365,8 +393,8 @@ async def _load_nltk(category, package):
         zf.extractall(dest)
 
 await _load_nltk("corpora", "stopwords")
-from nltk.corpus import stopwords`}
-  starterCode={`KEEP = {"not", "no", "nor", "never", "but"}
+from nltk.corpus import stopwords`,
+      starterCode: `KEEP = {"not", "no", "nor", "never", "but"}
 
 
 def clean_keep_negation(tokens):
@@ -376,8 +404,8 @@ def clean_keep_negation(tokens):
 
 print(clean_keep_negation(["this", "is", "not", "good"]))
 print(clean_keep_negation(["the", "food", "was", "never", "fresh"]))
-`}
-  solutionCode={`KEEP = {"not", "no", "nor", "never", "but"}
+`,
+      solutionCode: `KEEP = {"not", "no", "nor", "never", "but"}
 
 
 def clean_keep_negation(tokens):
@@ -387,7 +415,9 @@ def clean_keep_negation(tokens):
 
 print(clean_keep_negation(["this", "is", "not", "good"]))
 print(clean_keep_negation(["the", "food", "was", "never", "fresh"]))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "keeps_not",

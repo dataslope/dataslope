@@ -113,7 +113,10 @@ from the appearance of skill.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_breast_cancer
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.dummy import DummyClassifier
 
@@ -132,7 +135,9 @@ from sklearn.model_selection import cross_val_score
 cv = cross_val_score(baseline, X_train, y_train, cv=5)
 print(f"Baseline (always majority class): {cv.mean():.3f} CV accuracy")
 print("Any real model must beat this to earn its keep.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="A baseline turns a score into a verdict">
@@ -157,7 +162,10 @@ followed by the model.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.pipeline import Pipeline
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 
@@ -172,7 +180,9 @@ pipe = Pipeline(
 
 print(pipe)
 print("\\nThe pipeline is a single estimator: fit it, score it, tune it as one unit.")
-`}
+`,
+    },
+  ]}
 />
 
 ## Step 6 — Evaluate with cross-validation
@@ -187,7 +197,10 @@ Run it on the training data only. The test set is still sealed.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_breast_cancer
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -208,7 +221,9 @@ pipe = Pipeline(
 scores = cross_val_score(pipe, X_train, y_train, cv=5)
 print("Per-fold accuracy:", [round(s, 3) for s in scores])
 print(f"Mean CV accuracy: {scores.mean():.3f}  (+/- {scores.std():.3f})")
-`}
+`,
+    },
+  ]}
 />
 
 This mean is your working estimate of quality, and the one you compare
@@ -226,7 +241,10 @@ the CV score risks overfitting the validation folds.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_breast_cancer
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -250,7 +268,9 @@ search.fit(X_train, y_train)
 
 print("Best C:", search.best_params_)
 print(f"Best CV accuracy: {search.best_score_:.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 If `good enough?` is "no," you loop back to step 5: engineer a feature, try
@@ -273,7 +293,10 @@ real-world performance, the one you report and the one you can defend.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_breast_cancer
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -297,7 +320,9 @@ search.fit(X_train, y_train)
 test_accuracy = search.best_estimator_.score(X_test, y_test)
 print(f"CV accuracy (used to choose): {search.best_score_:.3f}")
 print(f"TEST accuracy (final verdict): {test_accuracy:.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 The CV score and the test score should be in the same neighborhood. If the
@@ -342,7 +367,10 @@ evaluation. This is the shape of nearly every honest scikit-learn project.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import load_breast_cancer
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -386,7 +414,9 @@ print(f"Best C: {search.best_params_['model__C']}, tuned CV: {search.best_score_
 test_acc = search.best_estimator_.score(X_test, y_test)
 print(f"\\nFINAL test accuracy: {test_acc:.3f}")
 print(f"(Baseline was {base_cv:.3f} -- the model clears it comfortably.)")
-`}
+`,
+    },
+  ]}
 />
 
 Read the output as a story: the data is mildly imbalanced, the baseline sits
@@ -455,14 +485,17 @@ and metrics change; the disciplined order does not.
 The hidden tests check the split sizes, that \`pipe\` is a two-step
 pipeline with the right step names, that \`cv_mean\` is a believable CV
 accuracy, and that \`test_score\` is a valid accuracy.`}
-  initCode={`from sklearn.datasets import load_wine
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 
-X, y = load_wine(return_X_y=True)`}
-  starterCode={`# 1. Split FIRST (25% test, random_state=0, stratified)
+X, y = load_wine(return_X_y=True)`,
+      starterCode: `# 1. Split FIRST (25% test, random_state=0, stratified)
 X_train, X_test, y_train, y_test = None, None, None, None
 
 # 2. Build the pipeline: steps named "scaler" and "model"
@@ -476,8 +509,8 @@ test_score = None
 
 print("CV mean:", cv_mean)
 print("Test score:", test_score)
-`}
-  solutionCode={`# 1. Split FIRST (25% test, random_state=0, stratified)
+`,
+      solutionCode: `# 1. Split FIRST (25% test, random_state=0, stratified)
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0, stratify=y
 )
@@ -499,7 +532,9 @@ test_score = pipe.score(X_test, y_test)
 
 print("CV mean:", cv_mean)
 print("Test score:", test_score)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "split_sizes",

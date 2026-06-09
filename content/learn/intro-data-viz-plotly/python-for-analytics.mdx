@@ -147,7 +147,10 @@ all of this in detail soon.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 # Load a tiny built-in dataset:
@@ -167,7 +170,9 @@ fig = px.bar(
     labels={"lifeExp": "Life expectancy (years)", "country": "Country"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 That is the *entire workflow*: load data into a DataFrame, optionally

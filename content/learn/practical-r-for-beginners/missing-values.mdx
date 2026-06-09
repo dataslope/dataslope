@@ -19,12 +19,17 @@ know one of the inputs, you don't know the answer either.
 
 <CodeBlock
   adapter="r"
-  starterCode={`5 + NA # unknown plus 5 = unknown
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `5 + NA # unknown plus 5 = unknown
 NA > 3 # unknown vs. 3 = unknown
 NA == NA # unknown vs. unknown = unknown (!)
 mean(c(1, 2, NA))
 sum(c(1, 2, NA))
-`}
+`,
+    },
+  ]}
 />
 
 Notice that even `NA == NA` returns `NA`. That trips up almost
@@ -36,13 +41,18 @@ missing?":
 
 <CodeBlock
   adapter="r"
-  starterCode={`x <- c(1, 2, NA, 4, NA, 6)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `x <- c(1, 2, NA, 4, NA, 6)
 
 is.na(x) # logical vector: which positions are NA
 sum(is.na(x)) # count of missings
 mean(is.na(x)) # proportion missing
 which(is.na(x)) # positions of NAs
-`}
+`,
+    },
+  ]}
 />
 
 `is.na()` is **the** way to test for missing values. Never use `==
@@ -56,13 +66,18 @@ quietly removes `NA`s before computing.
 
 <CodeBlock
   adapter="r"
-  starterCode={`temps <- c(68, 70, NA, 72, 75, NA, 69)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `temps <- c(68, 70, NA, 72, 75, NA, 69)
 
 mean(temps) # NA — there are missings
 mean(temps, na.rm = TRUE) # works: average of the non-NA values
 sum(temps, na.rm = TRUE)
 max(temps, na.rm = TRUE)
-`}
+`,
+    },
+  ]}
 />
 
 This is *deliberately* not the default. R's designers wanted you
@@ -77,14 +92,19 @@ before doing anything else:
 
 <CodeBlock
   adapter="r"
-  starterCode={`x <- c(1, 2, NA, 4, NA, 6)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `x <- c(1, 2, NA, 4, NA, 6)
 
 # Keep only non-NA values
 x[!is.na(x)]
 
 # Or use na.omit()
 na.omit(x)
-`}
+`,
+    },
+  ]}
 />
 
 Other times, you want to *replace* NAs with some sensible value
@@ -92,7 +112,10 @@ Other times, you want to *replace* NAs with some sensible value
 
 <CodeBlock
   adapter="r"
-  starterCode={`x <- c(10, 20, NA, 40, NA, 60)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `x <- c(10, 20, NA, 40, NA, 60)
 
 # Replace NA with 0
 x2 <- x
@@ -103,7 +126,9 @@ print(x2)
 x3 <- x
 x3[is.na(x3)] <- mean(x3, na.rm = TRUE)
 print(x3)
-`}
+`,
+    },
+  ]}
 />
 
 **Be careful** with the second pattern (mean imputation). It is a
@@ -158,7 +183,10 @@ confuse with `NA`:
 
 <CodeBlock
   adapter="r"
-  starterCode={`0 / 0 # NaN
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `0 / 0 # NaN
 1 / 0 # Inf
 -1 / 0 # -Inf
 
@@ -168,7 +196,9 @@ is.null(NA) # FALSE — NA is not NULL
 
 length(NULL) # 0
 length(NA) # 1
-`}
+`,
+    },
+  ]}
 />
 
 You will mostly only see `NA` in your day-to-day data. The others
@@ -228,21 +258,26 @@ failed, leaving `NA`. Compute:
   adapter="r"
   title="Handle a week of readings"
   instructions={`Given the \`week\` vector, set \`n_missing\` to the count of NAs and \`avg_temp\` to the mean of the non-NA values.`}
-  initCode={`week <- c(68, NA, 72, 70, NA, 75, 71)
-`}
-  starterCode={`# week is already defined: 7 daily temps with NAs
+  files={[
+    {
+      filename: "main.r",
+      initCode: `week <- c(68, NA, 72, 70, NA, 75, 71)
+`,
+      starterCode: `# week is already defined: 7 daily temps with NAs
 
 n_missing <- NULL # replace with the count of NAs
 avg_temp <- NULL # replace with the mean ignoring NAs
 
 cat("Missing readings:", n_missing, "\\n")
 cat("Average temp:", avg_temp, "\\n")
-`}
-  solutionCode={`n_missing <- sum(is.na(week))
+`,
+      solutionCode: `n_missing <- sum(is.na(week))
 avg_temp <- mean(week, na.rm = TRUE)
 cat("Missing readings:", n_missing, "\\n")
 cat("Average temp:", avg_temp, "\\n")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "missing",

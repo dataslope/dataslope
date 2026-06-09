@@ -55,7 +55,10 @@ The shape `malloc(N * sizeof(T))` is the canonical form. Read it as
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 
 int main(void) {
@@ -80,7 +83,9 @@ int main(void) {
   free(nums);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The point is the **runtime-decided size**. You could not have
@@ -182,7 +187,10 @@ pointer to heap memory.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 #include <stdlib.h>
 
 int *make_squares(int n) {
@@ -207,7 +215,9 @@ int main(void) {
   free(sq); // caller is responsible
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 Notice the comment in the source code is doing real work: it tells
@@ -251,7 +261,7 @@ The program must print exactly:
   files={[
     {
       filename: "main.c",
-      initialContent: `#include "dynarr.h"
+      starterCode: `#include "dynarr.h"
 #include <stdio.h>
 
 int main(void) {
@@ -270,7 +280,7 @@ int main(void) {
     },
     {
       filename: "dynarr.h",
-      initialContent: `#ifndef DYNARR_H
+      starterCode: `#ifndef DYNARR_H
 #define DYNARR_H
 
 #include <stddef.h>
@@ -290,7 +300,7 @@ void da_free(DynArr *a);
     },
     {
       filename: "dynarr.c",
-      initialContent: `#include "dynarr.h"
+      starterCode: `#include "dynarr.h"
 #include <stdlib.h>
 
 void da_init(DynArr *a) {
@@ -305,7 +315,7 @@ void da_free(DynArr *a) {
   // your code here
 }
 `,
-      solutionContent: `#include "dynarr.h"
+      solutionCode: `#include "dynarr.h"
 #include <stdlib.h>
 
 void da_init(DynArr *a) {

@@ -50,7 +50,10 @@ Look at this *anti-example* and notice every way it can go wrong.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     OpenAccount a = new OpenAccount();
     a.balance = 100;
@@ -63,7 +66,9 @@ Look at this *anti-example* and notice every way it can go wrong.
 class OpenAccount {
   public double balance; // public field — total exposure
 }
-`}
+`,
+    },
+  ]}
 />
 
 There are two problems here, and they are different:
@@ -79,7 +84,10 @@ Encapsulation fixes both at once.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     BankAccount a = new BankAccount();
     a.deposit(100);
@@ -110,7 +118,9 @@ class BankAccount {
 
   public double balance() { return balance; }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Now the rule "balance is never negative" is *guaranteed by the
@@ -186,7 +196,7 @@ allowed temperature range and a current setting. Outsiders can
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Thermostat t = new Thermostat(60, 80, 68);
     System.out.println(t.describe());
@@ -205,7 +215,7 @@ allowed temperature range and a current setting. Outsiders can
     },
     {
       filename: "Thermostat.java",
-      initialContent: `public class Thermostat {
+      starterCode: `public class Thermostat {
   private final int minF;
   private final int maxF;
   private int target; // not final — changes over time
@@ -278,7 +288,7 @@ balance=20
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Wallet w = new Wallet();
     w.add(100);
@@ -293,11 +303,11 @@ balance=20
     },
     {
       filename: "Wallet.java",
-      initialContent: `public class Wallet {
+      starterCode: `public class Wallet {
   // TODO: implement the Wallet class
 }
 `,
-      solutionContent: `public class Wallet {
+      solutionCode: `public class Wallet {
   private int cents = 0;
 
   public void add(int amount) {

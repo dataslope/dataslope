@@ -34,7 +34,10 @@ word and its neighbors. Let us watch it disambiguate "fish".
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 # Installs NLTK and loads the tokenizer and the part-of-speech tagger model.
 # nltk.download() isn't available here, so we fetch the archives directly.
 import io, os, zipfile
@@ -61,15 +64,17 @@ async def _load_nltk(category, package):
 await _load_nltk("tokenizers", "punkt_tab")
 await _load_nltk("taggers", "averaged_perceptron_tagger_eng")
 from nltk import pos_tag
-from nltk.tokenize import word_tokenize`}
-  starterCode={`for sentence in ["I caught a big fish.", "We fish on weekends."]:
+from nltk.tokenize import word_tokenize`,
+      starterCode: `for sentence in ["I caught a big fish.", "We fish on weekends."]:
     tokens = word_tokenize(sentence)
     tagged = pos_tag(tokens)
     # Show just the word 'fish' and the tag it received.
     for word, tag in tagged:
         if word.lower() == "fish":
             print(f"{sentence!r}\\n   -> 'fish' tagged as {tag}")
-`}
+`,
+    },
+  ]}
 />
 
 Same word, two sentences, two different tags — `NN` (noun) in the first,
@@ -122,7 +127,10 @@ flowchart TD
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -147,13 +155,15 @@ async def _load_nltk(category, package):
 await _load_nltk("tokenizers", "punkt_tab")
 await _load_nltk("taggers", "averaged_perceptron_tagger_eng")
 from nltk import pos_tag
-from nltk.tokenize import word_tokenize`}
-  starterCode={`sentence = "The tall man reads books."
+from nltk.tokenize import word_tokenize`,
+      starterCode: `sentence = "The tall man reads books."
 tagged = pos_tag(word_tokenize(sentence))
 
 for word, tag in tagged:
     print(f"  {word:10} {tag}")
-`}
+`,
+    },
+  ]}
 />
 
 ## A real payoff: extracting syntactic patterns
@@ -165,7 +175,10 @@ starts with `NN`. Want adjectives (useful for opinion mining)? Keep `JJ`. This
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -190,8 +203,8 @@ async def _load_nltk(category, package):
 await _load_nltk("tokenizers", "punkt_tab")
 await _load_nltk("taggers", "averaged_perceptron_tagger_eng")
 from nltk import pos_tag
-from nltk.tokenize import word_tokenize`}
-  starterCode={`text = "The talented young engineer quietly designed a brilliant new system."
+from nltk.tokenize import word_tokenize`,
+      starterCode: `text = "The talented young engineer quietly designed a brilliant new system."
 tagged = pos_tag(word_tokenize(text))
 
 nouns = [w for w, t in tagged if t.startswith("NN")]
@@ -203,7 +216,9 @@ print("Nouns:     ", nouns)
 print("Adjectives:", adjectives)
 print("Verbs:     ", verbs)
 print("Adverbs:   ", adverbs)
-`}
+`,
+    },
+  ]}
 />
 
 ## POS tagging makes lemmatization accurate
@@ -216,7 +231,10 @@ accurate lemmatization recipe.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -244,8 +262,8 @@ await _load_nltk("corpora", "wordnet")
 from nltk import pos_tag
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
-from nltk.corpus import wordnet`}
-  starterCode={`lemmatizer = WordNetLemmatizer()
+from nltk.corpus import wordnet`,
+      starterCode: `lemmatizer = WordNetLemmatizer()
 
 
 def to_wordnet_pos(treebank_tag):
@@ -267,7 +285,9 @@ print("  ", [lemmatizer.lemmatize(w) for w, t in tagged])
 
 print("POS-aware lemmas:")
 print("  ", [lemmatizer.lemmatize(w, to_wordnet_pos(t)) for w, t in tagged])
-`}
+`,
+    },
+  ]}
 />
 
 Compare the two lines. Without POS, "running" and "eaten" survive unchanged.
@@ -328,7 +348,10 @@ words whose tag starts with \`"NN"\`.
 
 For example, \`get_nouns("The hungry cat chased a small mouse.")\` should return
 \`["cat", "mouse"]\`.`}
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 import io, os, zipfile
 import micropip
 await micropip.install("nltk")
@@ -353,23 +376,25 @@ async def _load_nltk(category, package):
 await _load_nltk("tokenizers", "punkt_tab")
 await _load_nltk("taggers", "averaged_perceptron_tagger_eng")
 from nltk import pos_tag
-from nltk.tokenize import word_tokenize`}
-  starterCode={`def get_nouns(text):
+from nltk.tokenize import word_tokenize`,
+      starterCode: `def get_nouns(text):
     # tokenize -> pos_tag -> keep words whose tag starts with "NN"
     return []
 
 
 print(get_nouns("The hungry cat chased a small mouse."))
 print(get_nouns("Alice traveled to Paris."))
-`}
-  solutionCode={`def get_nouns(text):
+`,
+      solutionCode: `def get_nouns(text):
     tagged = pos_tag(word_tokenize(text))
     return [w for w, t in tagged if t.startswith("NN")]
 
 
 print(get_nouns("The hungry cat chased a small mouse."))
 print(get_nouns("Alice traveled to Paris."))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "common_nouns",

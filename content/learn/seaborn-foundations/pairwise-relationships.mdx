@@ -32,14 +32,19 @@ variable's spread at once.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="ticks")
 penguins = sns.load_dataset("penguins")
 
 # One call: every numeric column against every other.
 sns.pairplot(penguins)
-`}
+`,
+    },
+  ]}
 />
 
 Penguins has four numeric columns, so you get a 4×4 grid: sixteen panels,
@@ -70,14 +75,19 @@ once:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="ticks")
 penguins = sns.load_dataset("penguins")
 
 # Color every panel by species — clusters and group distributions appear.
 sns.pairplot(penguins, hue="species")
-`}
+`,
+    },
+  ]}
 />
 
 Look what fell out for free. In the `bill_length_mm` vs `bill_depth_mm`
@@ -116,7 +126,10 @@ care about:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="ticks")
 penguins = sns.load_dataset("penguins")
@@ -127,7 +140,9 @@ sns.pairplot(
     hue="species",
     vars=["bill_length_mm", "flipper_length_mm", "body_mass_g"],
 )
-`}
+`,
+    },
+  ]}
 />
 
 **`corner=True`** drops the upper triangle. The grid is symmetric — the
@@ -137,14 +152,19 @@ the ink and the clutter:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="ticks")
 penguins = sns.load_dataset("penguins")
 
 # corner=True keeps only the lower triangle (drops the mirror-image half).
 sns.pairplot(penguins, hue="species", corner=True)
-`}
+`,
+    },
+  ]}
 />
 
 **`diag_kind`** controls the diagonal: `"hist"` for histograms or `"kde"`
@@ -153,14 +173,19 @@ than several overlaid histograms because the curves don't visually collide:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="ticks")
 penguins = sns.load_dataset("penguins")
 
 # Smooth per-group density curves on the diagonal.
 sns.pairplot(penguins, hue="species", diag_kind="kde")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="When a pair plot becomes unreadable">
@@ -202,7 +227,10 @@ onto the diagonal and onto the off-diagonal cells yourself:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="ticks")
 penguins = sns.load_dataset("penguins")
@@ -211,7 +239,9 @@ penguins = sns.load_dataset("penguins")
 g = sns.PairGrid(penguins)
 g.map_diag(sns.histplot)  # diagonal: univariate
 g.map_offdiag(sns.scatterplot)  # off-diagonal: bivariate
-`}
+`,
+    },
+  ]}
 />
 
 That reproduces a basic pair plot, but the power is that you can map *any*
@@ -247,15 +277,18 @@ that:
 
 Assign the result to a variable named \`g\`. (Restricting to three columns
 keeps it a tidy 3×3 grid.)`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="ticks")
 penguins = sns.load_dataset("penguins")
 
 # Build the pair plot and assign it to g:
 g = None
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 sns.set_theme(style="ticks")
 penguins = sns.load_dataset("penguins")
@@ -265,7 +298,9 @@ g = sns.pairplot(
     hue="species",
     vars=["bill_length_mm", "flipper_length_mm", "body_mass_g"],
 )
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_pairgrid",

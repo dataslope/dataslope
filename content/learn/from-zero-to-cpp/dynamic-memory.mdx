@@ -38,7 +38,10 @@ returns the bytes to the allocator.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   int *p = new int(42);    // allocate one int on the heap, initialized to 42
@@ -51,7 +54,9 @@ int main() {
   p = nullptr; // good habit: don't keep stale pointers around
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 A picture of what happened:
@@ -78,7 +83,10 @@ To allocate `n` objects in a row, use `new[]` and pair it with
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   int n = 5;
@@ -91,7 +99,9 @@ int main() {
   delete[] arr; // [] is mandatory: must match new[]
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 > **The mismatch trap.** `new` must be matched with `delete`, and
@@ -177,7 +187,10 @@ A preview of the safer version of dynamic memory, using
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <memory>
 
 int main() {
@@ -186,7 +199,9 @@ int main() {
   // no delete needed — the unique_ptr's destructor frees it on scope exit
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 We'll devote a whole chapter to smart pointers. For now, just know
@@ -202,7 +217,10 @@ estimating memory usage.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   std::cout << "int:    " << sizeof(int) << " bytes\\n";
@@ -214,7 +232,9 @@ int main() {
   delete[] arr;
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The exact numbers depend on the target. On the WebAssembly target
@@ -227,14 +247,17 @@ used by this course's runtime, `int*` is 4 bytes; on a typical
   adapter="cpp"
   title="Allocate, use, free"
   instructions={`Allocate a single \`int\` on the heap with the value \`123\`. Print it. Then free it. The output should be exactly \`123\`. Make sure you do not leak memory.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   // your code here
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 
 int main() {
   int *p = new int(123);
@@ -242,7 +265,9 @@ int main() {
   delete p;
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "alloc",
@@ -257,7 +282,10 @@ int main() {
   adapter="cpp"
   title="A dynamic array of squares"
   instructions={`Read an integer \`n\` (assume 5 for testing). Allocate a heap array of \`n\` ints, fill it with the squares of \`1..n\` (so for \`n = 5\` you get \`1 4 9 16 25\`), print the numbers space-separated, then \`delete[]\` the array. For the test, \`main\` is already wired with \`n = 5\` and expects \`1 4 9 16 25\` followed by a newline.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 
 int main() {
   int n = 5;
@@ -265,8 +293,8 @@ int main() {
   // your code: allocate, fill, print, free
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 
 int main() {
   int n = 5;
@@ -280,7 +308,9 @@ int main() {
   delete[] arr;
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "sq",

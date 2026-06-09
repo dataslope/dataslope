@@ -37,7 +37,9 @@
  * behavior.
  */
 
-// Attribute names whose template-literal value IS the code.
+// Attribute names whose template-literal value IS the code. These are the
+// top-level props still used by the SQL components (`starterCode`,
+// `initSql`, `solutionSql`).
 const CODE_ATTRS = new Set([
   "starterCode",
   "solutionCode",
@@ -45,8 +47,17 @@ const CODE_ATTRS = new Set([
   "initCode",
   "initSql",
 ]);
-// Object keys carrying code inside `files={[ { … } ]}` multi-file blocks.
-const CODE_OBJECT_KEYS = new Set(["initialContent", "solutionContent"]);
+// Object keys carrying code inside `files={[ { … } ]}` blocks. The non-SQL
+// CodeBlock/ChallengeCard now keep all per-file code here as `initCode` /
+// `starterCode` / `solutionCode`; `initialContent` / `solutionContent` are
+// the legacy key names kept for safety.
+const CODE_OBJECT_KEYS = new Set([
+  "initCode",
+  "starterCode",
+  "solutionCode",
+  "initialContent",
+  "solutionContent",
+]);
 
 type AnyNode = Record<string, unknown> & { type?: string };
 

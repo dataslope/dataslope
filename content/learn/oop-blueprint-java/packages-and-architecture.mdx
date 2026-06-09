@@ -265,7 +265,7 @@ concern.
   files={[
     {
       filename: "Main.java",
-      initialContent: `// presentation layer (would live in com.lib.cli)
+      starterCode: `// presentation layer (would live in com.lib.cli)
 public class Main {
   public static void main(String[] args) {
     Catalog catalog = new Catalog();
@@ -283,7 +283,7 @@ public class Main {
     },
     {
       filename: "Book.java",
-      initialContent: `// domain layer (would live in com.lib.model)
+      starterCode: `// domain layer (would live in com.lib.model)
 public class Book {
   private final String title;
   private final String author;
@@ -302,7 +302,7 @@ public class Book {
     },
     {
       filename: "Catalog.java",
-      initialContent: `// domain layer (would live in com.lib.model)
+      starterCode: `// domain layer (would live in com.lib.model)
 import java.util.ArrayList;
 import java.util.List;
 
@@ -321,7 +321,7 @@ public class Catalog {
     },
     {
       filename: "LibraryService.java",
-      initialContent: `// application layer (would live in com.lib.service)
+      starterCode: `// application layer (would live in com.lib.service)
 import java.util.ArrayList;
 import java.util.List;
 

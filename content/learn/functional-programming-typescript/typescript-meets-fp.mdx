@@ -51,7 +51,10 @@ The atom of the language:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// A function is a value with a function type.
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// A function is a value with a function type.
 const double: (n: number) => number = (n) => n * 2;
 
 // Functions can be passed as arguments.
@@ -69,7 +72,9 @@ function adder(amount: number): (n: number) => number {
 const addTen = adder(10);
 console.log(addTen(5)); // 15
 console.log(addTen(100)); // 110
-`}
+`,
+    },
+  ]}
 />
 
 The signature `(n: number) => number` is itself a *type*. You can
@@ -85,7 +90,10 @@ huge category of bugs at compile time.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Point = { readonly x: number; readonly y: number };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Point = { readonly x: number; readonly y: number };
 
 const p: Point = { x: 1, y: 2 };
 // p.x = 10;  // ❌ Cannot assign to 'x' because it is a read-only property.
@@ -105,7 +113,9 @@ const config = {
 console.log("point:", p);
 console.log("xs:", xs);
 console.log("config:", config);
-`}
+`,
+    },
+  ]}
 />
 
 We will use `readonly` everywhere in this course. It costs nothing
@@ -119,7 +129,10 @@ or a B or a C", with a tag that tells you which.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// "A loading widget's state is one of three things"
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// "A loading widget's state is one of three things"
 type LoadState<A> =
   | { kind: "idle" }
   | { kind: "loading" }
@@ -143,7 +156,9 @@ console.log(describe<number>({ kind: "idle" }));
 console.log(describe<number>({ kind: "loading" }));
 console.log(describe<number>({ kind: "ready", data: 42 }));
 console.log(describe<number>({ kind: "error", message: "timeout" }));
-`}
+`,
+    },
+  ]}
 />
 
 If you add a new case (`"cancelled"`) to `LoadState`, the compiler
@@ -157,7 +172,10 @@ been narrowed to "impossible".
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Color = "red" | "green" | "blue";
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Color = "red" | "green" | "blue";
 
 function describe(c: Color): string {
   switch (c) {
@@ -177,7 +195,9 @@ function describe(c: Color): string {
 console.log(describe("red"));
 console.log(describe("green"));
 console.log(describe("blue"));
-`}
+`,
+    },
+  ]}
 />
 
 This pattern — `const _exhaustive: never = x` in the default case —
@@ -191,7 +211,10 @@ type, with no extra runtime cost.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// "Pair" is generic in two types.
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// "Pair" is generic in two types.
 type Pair<A, B> = { readonly first: A; readonly second: B };
 
 function pair<A, B>(a: A, b: B): Pair<A, B> {
@@ -206,7 +229,9 @@ const x = pair("age", 30); // Pair<string, number>
 const y = swap(x); // Pair<number, string>
 console.log(x);
 console.log(y);
-`}
+`,
+    },
+  ]}
 />
 
 Generics let us write each FP combinator (`map`, `flatMap`,
@@ -221,7 +246,10 @@ types, generics, exhaustiveness — come together.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Option<A> = { kind: "none" } | { kind: "some"; value: A };
 
 const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 const none = <A,>(): Option<A> => ({ kind: "none" });
@@ -259,7 +287,9 @@ console.log(
     0,
   ),
 );
-`}
+`,
+    },
+  ]}
 />
 
 Notice:
@@ -282,7 +312,7 @@ them. Here is a tiny taste of that shape, spread across three files.
   entryFilename="main.ts"
   files={[{
     filename: "main.ts",
-    initialContent: `import { greetings, makeMessage } from "./greet";
+    starterCode: `import { greetings, makeMessage } from "./greet";
 
 const names = ["Ada", "Linus", "Grace"];
 
@@ -293,7 +323,7 @@ for (const g of greetings(names)) {
 `,
   }, {
     filename: "greet.ts",
-    initialContent: `import { Greeting, formatGreeting } from "./types";
+    starterCode: `import { Greeting, formatGreeting } from "./types";
 
 // pure: build values
 export function greetings(names: readonly string[]): readonly Greeting[] {
@@ -305,7 +335,7 @@ export const makeMessage = (g: Greeting): string => formatGreeting(g);
 `,
   }, {
     filename: "types.ts",
-    initialContent: `export type Greeting = {
+    starterCode: `export type Greeting = {
   readonly name: string;
   readonly language: "en" | "es" | "fr";
 };

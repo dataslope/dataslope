@@ -131,7 +131,10 @@ the quartiles that hint at skew.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 tips = px.data.tips()
 
@@ -140,7 +143,9 @@ print("\\nColumns and dtypes:")
 print(tips.dtypes)
 print("\\nNumeric summary (describe):")
 print(tips.describe().round(2))
-`}
+`,
+    },
+  ]}
 />
 
 Read `describe()` like a statistician, not just a reader of numbers. For
@@ -155,7 +160,10 @@ to see the categories and how (im)balanced they are.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 tips = px.data.tips()
 
@@ -167,7 +175,9 @@ for col in ["sex", "smoker", "day", "time"]:
 print("Notice the imbalance: far more dinners than lunches, more weekend")
 print("days, more non-smokers. Imbalanced groups make some comparisons")
 print("underpowered -- worth noting before you trust any group difference.")
-`}
+`,
+    },
+  ]}
 />
 
 A picture makes the shape obvious. A histogram of `total_bill` shows the
@@ -176,7 +186,10 @@ extreme values.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 tips = px.data.tips()
 
@@ -194,7 +207,9 @@ fig2 = px.box(
     title="Total bill: center, spread, and high outliers",
 )
 fig2.show()
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="What you're hunting for in distributions">
@@ -213,7 +228,10 @@ realistic gap to demonstrate the checks you'd run on messy data.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.express as px
 
 rng = np.random.default_rng(0)
@@ -234,7 +252,9 @@ print(missing_pct[missing_pct > 0])
 print(
     f"\\nRows lost if you naively dropna(): {tips.isna().any(axis=1).sum()} of {len(tips)}"
 )
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Missingness is rarely random">
@@ -255,7 +275,10 @@ more than 1.5 times the interquartile range are flagged for inspection
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 tips = px.data.tips()
 
@@ -277,7 +300,9 @@ print(
 )
 print("\\nThese look like genuine big-party bills, not errors -- KEEP them,")
 print("but be aware they'll pull the mean around.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="danger" title="Don't delete outliers reflexively">
@@ -296,7 +321,10 @@ matrix** (linear association between numeric columns).
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 tips = px.data.tips()
 tips["tip_pct"] = tips["tip"] / tips["total_bill"] * 100
@@ -312,7 +340,9 @@ print(by_time)
 
 print("\\nThese gaps are SUGGESTIVE, not conclusive. Small groups (few")
 print("lunches) wobble a lot. Each gap is a hypothesis to test later.")
-`}
+`,
+    },
+  ]}
 />
 
 A correlation matrix scans all numeric pairs at once. It's the fastest
@@ -321,7 +351,10 @@ hypotheses.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 tips = px.data.tips()
 
@@ -343,7 +376,9 @@ fig.show()
 print("\\nStrongest link: total_bill and tip move together (bigger bills,")
 print("bigger tips). That's expected. The job of EDA is to surface such")
 print("relationships -- then ask which are worth a formal test.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Correlation matrices are an exploration tool, not a conclusion machine">
@@ -406,19 +441,24 @@ EDA generates hypotheses; confirmation tests them — on different data.`}
 - Store the result in a pandas \`Series\` named \`tip_pct_by_day\`, indexed by day, with the mean tip percentage as values.
 
 This grouped summary is a *generated hypothesis* — "tip % varies by day" — not yet a confirmed conclusion.`}
-  initCode={`import plotly.express as px
-tips = px.data.tips()`}
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import plotly.express as px
+tips = px.data.tips()`,
+      starterCode: `import plotly.express as px
 
 # TODO: build a Series of mean tip percentage by day -> tip_pct_by_day
 tip_pct_by_day = None
-`}
-  solutionCode={`import plotly.express as px
+`,
+      solutionCode: `import plotly.express as px
 
 tips = tips.assign(tip_pct=tips["tip"] / tips["total_bill"] * 100)
 tip_pct_by_day = tips.groupby("day")["tip_pct"].mean()
 print(tip_pct_by_day.round(2))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type",
@@ -463,16 +503,19 @@ Produce two variables:
 - \`best_r\`: a Python \`float\`, their Pearson correlation.
 
 The pair order within the tuple does not matter for grading. This is the strongest relationship EDA surfaces — a hypothesis worth confirming, not yet a conclusion.`}
-  initCode={`import plotly.express as px
-tips = px.data.tips()`}
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import plotly.express as px
+tips = px.data.tips()`,
+      starterCode: `import plotly.express as px
 import numpy as np
 
 # TODO: find the most-correlated distinct numeric pair
 best_pair = None  # (col_a, col_b)
 best_r = None  # float
-`}
-  solutionCode={`import plotly.express as px
+`,
+      solutionCode: `import plotly.express as px
 import numpy as np
 
 corr = tips.select_dtypes("number").corr()
@@ -488,7 +531,9 @@ for i in range(len(cols)):
 
 best_r = float(best_r)
 print(best_pair, round(best_r, 3))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "types",

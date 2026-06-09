@@ -63,7 +63,10 @@ A `foreach` loop in C# is just a sugar over `GetEnumerator`/
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 var nums = new List<int> { 10, 20, 30 };
@@ -80,7 +83,9 @@ using (var e = nums.GetEnumerator())
     while (e.MoveNext())
         Console.WriteLine(e.Current);
 }
-`}
+`,
+    },
+  ]}
 />
 
 When you call a LINQ operator like `Where(...)`, you receive
@@ -98,7 +103,10 @@ implements `IEnumerator<T>` for you.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 static IEnumerable<int> Naturals()
@@ -118,7 +126,9 @@ foreach (var n in Naturals())
         break;
     Console.WriteLine(n);
 }
-`}
+`,
+    },
+  ]}
 />
 
 Read that carefully. `Naturals()` would loop forever if you let it.
@@ -132,7 +142,10 @@ To prove how simple the contract is, let's implement our own `Where`.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 static IEnumerable<T> MyWhere<T>(IEnumerable<T> source, Func<T, bool> predicate)
@@ -145,7 +158,9 @@ static IEnumerable<T> MyWhere<T>(IEnumerable<T> source, Func<T, bool> predicate)
 var nums = new[] { 1, 2, 3, 4, 5, 6, 7 };
 foreach (var n in MyWhere(nums, n => n % 2 == 0))
     Console.WriteLine(n);
-`}
+`,
+    },
+  ]}
 />
 
 That's the entire implementation. The built-in `Enumerable.Where` is
@@ -170,7 +185,10 @@ Practical example of the "iterate twice" trap:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 static IEnumerable<int> Source()
@@ -192,7 +210,9 @@ foreach (var n in seq)
 Console.WriteLine("Second pass:");
 foreach (var n in seq)
     Console.WriteLine($"  got {n}");
-`}
+`,
+    },
+  ]}
 />
 
 The source method runs **twice**. If `Source()` were reading from a
@@ -204,7 +224,10 @@ collection:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -227,7 +250,9 @@ foreach (var n in seq)
 Console.WriteLine("Second pass:");
 foreach (var n in seq)
     Console.WriteLine($"  got {n}");
-`}
+`,
+    },
+  ]}
 />
 
 Now `Source()` runs only once. The two passes iterate the
@@ -241,7 +266,10 @@ data sitting in memory".
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var nums = Enumerable.Range(1, 5); // deferred
@@ -254,7 +282,9 @@ Console.WriteLine($"arr = [{string.Join(", ", arr)}]");
 Console.WriteLine($"list count = {list.Count}");
 foreach (var kv in dict)
     Console.WriteLine($"  {kv.Key} → {kv.Value}");
-`}
+`,
+    },
+  ]}
 />
 
 A useful rule:

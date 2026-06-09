@@ -47,7 +47,10 @@ The cardinality literally follows the rules of arithmetic — hence
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`// Record / object: a product
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Record / object: a product
 type User = {
   readonly name: string;
   readonly age: number;
@@ -61,7 +64,9 @@ type Point = readonly [number, number];
 const p: Point = [3, 4];
 
 console.log(ada, p);
-`}
+`,
+    },
+  ]}
 />
 
 A product type is "all of these fields, simultaneously". TypeScript
@@ -76,7 +81,10 @@ record types, each with a unique tag field.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Shape =
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Shape =
   | { kind: "circle"; radius: number }
   | { kind: "rectangle"; width: number; height: number }
   | { kind: "triangle"; base: number; height: number };
@@ -99,7 +107,9 @@ const shapes: readonly Shape[] = [
 ];
 
 for (const s of shapes) console.log(s.kind, area(s));
-`}
+`,
+    },
+  ]}
 />
 
 A few things to notice:
@@ -116,7 +126,10 @@ A few things to notice:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Shape =
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Shape =
   | { kind: "circle"; radius: number }
   | { kind: "rectangle"; width: number; height: number };
 
@@ -137,7 +150,9 @@ function area(s: Shape): number {
 
 console.log(area({ kind: "circle", radius: 1 }));
 console.log(area({ kind: "rectangle", width: 2, height: 3 }));
-`}
+`,
+    },
+  ]}
 />
 
 Try adding a `{ kind: "triangle"; base: number; height: number }`
@@ -155,7 +170,10 @@ states to exist in the type. Sums let you forbid them.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type BadUser = {
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type BadUser = {
   readonly id: string;
   readonly isActive: boolean;
   readonly isSuspended: boolean;
@@ -172,7 +190,9 @@ const wat: BadUser = {
 };
 
 console.log(wat);
-`}
+`,
+    },
+  ]}
 />
 
 The type *allows* "active and suspended" — a nonsense state. Every
@@ -183,7 +203,10 @@ really suspended?*
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type UserStatus =
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type UserStatus =
   | { kind: "active" }
   | { kind: "suspended"; reason: string; until: number }
   | { kind: "deleted"; deletedAt: number };
@@ -212,7 +235,9 @@ const s: User = {
 const d: User = { id: "u3", status: { kind: "deleted", deletedAt: 2024 } };
 
 [a, s, d].forEach((u) => console.log(describe(u)));
-`}
+`,
+    },
+  ]}
 />
 
 Now "active and suspended" is *unrepresentable*. The data carried by
@@ -232,7 +257,10 @@ chapters explore them in depth.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Option<A> = { kind: "none" } | { kind: "some"; value: A };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Option<A> = { kind: "none" } | { kind: "some"; value: A };
 
 const some = <A,>(value: A): Option<A> => ({ kind: "some", value });
 const none = <A,>(): Option<A> => ({ kind: "none" });
@@ -244,7 +272,9 @@ function head<A>(xs: readonly A[]): Option<A> {
 const a = head([1, 2, 3]);
 const b = head<number>([]);
 console.log(a, b);
-`}
+`,
+    },
+  ]}
 />
 
 Replaces `null` and `undefined` with a type the compiler tracks.
@@ -253,7 +283,10 @@ Replaces `null` and `undefined` with a type the compiler tracks.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Result<E, A> = { kind: "ok"; value: A } | { kind: "err"; error: E };
 
 const ok = <E, A>(value: A): Result<E, A> => ({ kind: "ok", value });
 const err = <E, A>(error: E): Result<E, A> => ({ kind: "err", error });
@@ -265,7 +298,9 @@ function parseInt2(s: string): Result<string, number> {
 
 console.log(parseInt2("42"));
 console.log(parseInt2("nope"));
-`}
+`,
+    },
+  ]}
 />
 
 Replaces exceptions with a type that *forces* the caller to handle
@@ -275,7 +310,10 @@ the error case.
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type Tree<A> =
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Tree<A> =
   | { kind: "leaf" }
   | { kind: "node"; value: A; left: Tree<A>; right: Tree<A> };
 
@@ -302,7 +340,9 @@ const t: Tree<number> = node(
   node(3, leaf(), leaf()),
 );
 console.log("size:", size(t));
-`}
+`,
+    },
+  ]}
 />
 
 A *recursive* sum: a tree is either empty, or a node holding a value
@@ -329,7 +369,10 @@ In TypeScript:
 
 <CodeBlock
   adapter="typescript"
-  starterCode={`type PaymentMethod =
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type PaymentMethod =
   | { kind: "card"; last4: string; brand: "visa" | "mastercard" | "amex" }
   | { kind: "bank"; iban: string; sortCode: string }
   | { kind: "crypto"; currency: "BTC" | "ETH"; txHash: string };
@@ -384,7 +427,9 @@ const events: readonly Event[] = [
 ];
 
 for (const e of events) console.log(summarize(e));
-`}
+`,
+    },
+  ]}
 />
 
 Sums nest inside sums (`Event.payment_received.method` is itself a
@@ -421,7 +466,7 @@ square:   16
   files={[
     {
       filename: "main.ts",
-      initialContent: `import { area } from "./shape";
+      starterCode: `import { area } from "./shape";
 
 console.log("circle:  ", area({ kind: "circle", radius: 2 }));
 console.log("rectangle:", area({ kind: "rectangle", width: 3, height: 4 }));
@@ -431,7 +476,7 @@ console.log("square:  ", area({ kind: "square", side: 4 }));
     },
     {
       filename: "shape.ts",
-      initialContent: `export type Shape = { kind: "circle"; radius: number };
+      starterCode: `export type Shape = { kind: "circle"; radius: number };
 // TODO: add rectangle, triangle, square variants
 
 export function area(s: Shape): number {
@@ -440,7 +485,7 @@ export function area(s: Shape): number {
   return 0;
 }
 `,
-      solutionContent: `export type Shape =
+      solutionCode: `export type Shape =
   | { kind: "circle"; radius: number }
   | { kind: "rectangle"; width: number; height: number }
   | { kind: "triangle"; base: number; height: number }

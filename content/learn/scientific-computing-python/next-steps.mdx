@@ -51,7 +51,10 @@ vectorization (e.g. a stencil with data-dependent control flow).
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Numba is not bundled with the in-browser Python.
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Numba is not bundled with the in-browser Python.
 # This snippet shows the pattern you would use in a local environment.
 
 CODE = """
@@ -74,7 +77,9 @@ for _ in range(500):
 """
 print(CODE)
 print("Typical speedup over pure-Python loops: 100–500×.")
-`}
+`,
+    },
+  ]}
 />
 
 Numba shines when you have:
@@ -103,7 +108,10 @@ batching. Beloved in scientific ML and probabilistic programming.
 
 <CodeBlock
   adapter="python"
-  starterCode={`# JAX example (display only; JAX is not in the in-browser environment).
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# JAX example (display only; JAX is not in the in-browser environment).
 EXAMPLE = """
 import jax.numpy as jnp
 from jax import grad, jit, vmap
@@ -119,7 +127,9 @@ predict = lambda p, x: p[0]*x*x + p[1]*x + p[2]
 batch_predict = vmap(predict, in_axes=(None, 0))
 """
 print(EXAMPLE)
-`}
+`,
+    },
+  ]}
 />
 
 If you ever found yourself hand-deriving gradients of a simulation
@@ -170,7 +180,10 @@ system.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import sympy as sp
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import sympy as sp
 
 x = sp.symbols("x")
 expr = sp.sin(x) * sp.exp(-(x**2))
@@ -187,7 +200,9 @@ f_num = sp.lambdify(x, sp.diff(expr, x), modules="numpy")
 import numpy as np
 
 print("derivative at x=1:", f_num(1.0))
-`}
+`,
+    },
+  ]}
 />
 
 The killer combo: derive a complicated formula symbolically with

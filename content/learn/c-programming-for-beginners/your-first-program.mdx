@@ -17,13 +17,18 @@ Here is the entire program. Click **Run**.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   printf("Hello, world!\\n");
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 You should see `Hello, world!` in the output panel. Eight words of
@@ -153,7 +158,10 @@ Let's print a few numbers as well. Two new ideas appear:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int year = 1972;
@@ -161,7 +169,9 @@ int main(void) {
   printf("That makes it about %d years old in 2025.\\n", 2025 - year);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 The `printf` function fills `%d` with the next integer argument in
@@ -175,7 +185,10 @@ of the line. Use comments to explain *why*, not *what*.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   // print a friendly greeting
@@ -188,7 +201,9 @@ int main(void) {
   printf("Welcome to C.\\n");
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Your first challenge
@@ -197,22 +212,27 @@ int main(void) {
   adapter="c"
   title="Print your favorite number"
   instructions={`Print the line \`My favorite number is 7\` (exactly that text). The number must come from a variable, not be hard-coded into the format string.`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int favorite = 0;
   // change the value and use printf
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 int main(void) {
   int favorite = 7;
   printf("My favorite number is %d\\n", favorite);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "exact",

@@ -25,7 +25,10 @@ Let's make the delivery story concrete. Both services have a mean of
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import pandas as pd
 
 # Two delivery services, both averaging 30 minutes.
@@ -39,7 +42,9 @@ for name, s in [("consistent", consistent), ("erratic", erratic)]:
     )
 
 print("\\nIdentical means. The spread is the whole story.")
-`}
+`,
+    },
+  ]}
 />
 
 ```mermaid
@@ -72,7 +77,10 @@ different sample sizes.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.default_rng(0)
 small = rng.normal(50, 5, size=20)
@@ -82,7 +90,9 @@ print(f"Same process, n=20    -> range = {small.ptp():.1f}")
 print(f"Same process, n=20000 -> range = {large.ptp():.1f}")
 print("\\nThe range grows with sample size even though the spread did not.")
 print("(np.ptp = 'peak to peak' = max - min)")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="The range is fragile">
@@ -113,7 +123,10 @@ the shape matters: square the distances, average them, square-root back.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 data = np.array([28, 29, 30, 30, 31, 32, 30, 29, 31, 30])
 
@@ -127,7 +140,9 @@ std = np.sqrt(variance)
 print(f"\\nVariance (squared units): {variance:.3f}")
 print(f"Std dev  (original units): {std:.3f}")
 print(f"NumPy std agrees:          {data.std():.3f}")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="How to read a standard deviation">
@@ -169,7 +184,10 @@ source of "why don't my numbers match?" bugs.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import pandas as pd
 
 sample = np.array([42, 45, 48, 50, 52, 55, 58, 60, 62, 65])
@@ -184,7 +202,9 @@ print("np.var ddof=1 :", round(np.var(sample, ddof=1), 4))
 
 print("\\nThe ddof=1 values are LARGER — they correct the underestimate.")
 print("pandas matches np with ddof=1, NOT np's default.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Misconception: NumPy and pandas give the same std">
@@ -218,7 +238,10 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import pandas as pd
 from scipy import stats
 
@@ -232,7 +255,9 @@ print(f"IQR (scipy.stats)   : {stats.iqr(income):.1f}")
 print(f"Std dev (ddof=1)    : {income.std():.1f}  <- wrecked by the 9000")
 print()
 print("The lone 9000 barely touches the IQR but explodes the std.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="Std vs IQR: which spread to report">
@@ -254,7 +279,10 @@ measured robustly."
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 data = np.array([38, 41, 44, 47, 49, 52, 55, 60, 120, 9000])
@@ -267,7 +295,9 @@ print(f"MAD (by hand)           : {mad_manual:.1f}")
 # scipy's median_abs_deviation; scale=1 gives the raw MAD.
 print(f"MAD (scipy, raw)        : {stats.median_abs_deviation(data):.1f}")
 print(f"Std dev for comparison  : {data.std(ddof=1):.1f}  <- outlier-driven")
-`}
+`,
+    },
+  ]}
 />
 
 ## CV: comparing spread across different scales
@@ -286,7 +316,10 @@ totally different scales.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 # Two metrics on completely different scales.
@@ -300,7 +333,9 @@ for name, x in [("house prices", house_prices), ("daily visits", daily_visits)]:
 
 print("\\nHouse prices have a far LARGER std, but a much SMALLER CV.")
 print("Relative to their size, visits are far more variable than prices.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Misconception: a bigger standard deviation means more spread, period">
@@ -336,7 +371,10 @@ skew are present.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import pandas as pd
 from scipy import stats
 
@@ -359,7 +397,9 @@ for k, v in summary.items():
 
 print("\\nstd >> iqr  =>  a heavy tail is inflating the std.")
 print("Report median + IQR for skewed data like this.")
-`}
+`,
+    },
+  ]}
 />
 
 <ChallengeCard
@@ -376,22 +416,25 @@ print("Report median + IQR for skewed data like this.")
 **Part 2 — compare.** Set a string **\`more_variable\`** to \`"a"\` if \`group_a\` has the larger sample standard deviation, otherwise \`"b"\`.
 
 Use the provided Series. Make sure every dict value is a \`float\` (not a NumPy scalar).`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 import pandas as pd
 from scipy import stats
 
 rng = np.random.default_rng(2024)
 group_a = pd.Series(rng.normal(100, 8, size=300))
-group_b = pd.Series(rng.normal(100, 15, size=300))`}
-  starterCode={`# TODO: build spread_a and set more_variable
+group_b = pd.Series(rng.normal(100, 15, size=300))`,
+      starterCode: `# TODO: build spread_a and set more_variable
 spread_a = {
     "std": None,
     "iqr": None,
     "cv": None,
 }
 more_variable = None
-`}
-  solutionCode={`spread_a = {
+`,
+      solutionCode: `spread_a = {
     "std": float(group_a.std(ddof=1)),
     "iqr": float(stats.iqr(group_a)),
     "cv": float(stats.variation(group_a, ddof=1)),
@@ -401,7 +444,9 @@ more_variable = "a" if group_a.std(ddof=1) > group_b.std(ddof=1) else "b"
 
 print(spread_a)
 print("more_variable:", more_variable)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "keys",

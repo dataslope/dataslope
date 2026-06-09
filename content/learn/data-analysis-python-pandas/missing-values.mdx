@@ -24,7 +24,10 @@ NaN/NaT.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 s = pd.Series([1.0, np.nan, 3.0, None, 5.0])
@@ -32,7 +35,9 @@ print(s)
 print()
 print("dtype:", s.dtype)
 print("NaN positions:", s.isna().tolist())
-`}
+`,
+    },
+  ]}
 />
 
 ## Detecting missing values
@@ -41,7 +46,10 @@ The basics:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 df = pd.DataFrame(
@@ -58,7 +66,9 @@ print("Counts per column:")
 print(df.isna().sum())
 print()
 print("Any NaN at all?", df.isna().any().any())
-`}
+`,
+    },
+  ]}
 />
 
 A useful one-liner for a dataset-wide audit:
@@ -93,7 +103,10 @@ The remediation differs for each.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 df = pd.DataFrame(
@@ -111,7 +124,9 @@ print(df.dropna(subset=["a"]))
 print()
 print("Drop rows where ALL values are NaN:")
 print(df.dropna(how="all"))
-`}
+`,
+    },
+  ]}
 />
 
 `subset` and `how` give you the fine control you need.
@@ -130,7 +145,10 @@ analysis and may be noise.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 df = pd.DataFrame(
@@ -145,7 +163,9 @@ df = pd.DataFrame(
 threshold = 0.5
 keep = df.columns[df.isna().mean() <= threshold]
 print(df[keep])
-`}
+`,
+    },
+  ]}
 />
 
 ## Strategy 3 — impute
@@ -154,7 +174,10 @@ Fill in a plausible value. The simplest options:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 s = pd.Series([10, 20, np.nan, 40, np.nan])
@@ -173,7 +196,9 @@ print(s.ffill().tolist())
 print()
 print("Back-fill:")
 print(s.bfill().tolist())
-`}
+`,
+    },
+  ]}
 />
 
 For categorical columns, common choices are:
@@ -204,7 +229,10 @@ downstream code to handle them.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 df = pd.DataFrame(
@@ -220,7 +248,9 @@ print("Mean:", df["score"].mean())
 # A 'has score' flag can be useful downstream:
 df["has_score"] = df["score"].notna()
 print(df)
-`}
+`,
+    },
+  ]}
 />
 
 ## Combining strategies
@@ -229,7 +259,10 @@ A real-world cleaning step often mixes:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import numpy as np
 
 df = pd.DataFrame(
@@ -254,7 +287,9 @@ clean = (
     .assign(score_missing=lambda x: x["score"].isna())
 )
 print(clean)
-`}
+`,
+    },
+  ]}
 />
 
 ## Detecting "fake" missing values
@@ -302,18 +337,23 @@ Whichever strategy you use, end with a quick sanity check:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 df = pd.DataFrame({
     "customer_id": [1, 2, 3, 4, 5],
     "age":         [25, 30, 35, 40, 45],
     "city":        ["NY", "LA", "unknown", "SF", "NY"],
-})`}
-  starterCode={`print("Any NaN remaining?", df.isna().any().any())
+})`,
+      starterCode: `print("Any NaN remaining?", df.isna().any().any())
 print()
 print("Per-column counts:")
 print(df.isna().sum())
-`}
+`,
+    },
+  ]}
 />
 
 If the count is not what you expected, fix it. The mistake is

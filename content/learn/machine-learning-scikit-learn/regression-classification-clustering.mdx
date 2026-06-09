@@ -52,7 +52,10 @@ the line it learns.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_regression
 from sklearn.linear_model import LinearRegression
@@ -78,7 +81,9 @@ plt.ylabel("target (a number)")
 plt.title("Regression: a line through the points")
 plt.legend()
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 The output is a *number*, and it is continuous: nudge the input and the
@@ -111,7 +116,10 @@ features (so we can plot it in 2-D) and color each flower by its species.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import matplotlib.pyplot as plt
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import matplotlib.pyplot as plt
 from sklearn.datasets import load_iris
 from sklearn.linear_model import LogisticRegression
 
@@ -137,7 +145,9 @@ plt.ylabel("petal width (cm)")
 plt.title("Classification: points colored by class")
 plt.legend(handles=scatter.legend_elements()[0], labels=list(data.target_names))
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 The output is a *label*, drawn from a fixed set of three species. There is no
@@ -187,7 +197,10 @@ assigns. Notice we never pass any labels.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import matplotlib.pyplot as plt
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 
@@ -210,7 +223,9 @@ plt.ylabel("feature 2")
 plt.title("Clustering: groups discovered without labels")
 plt.legend()
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 The colors here did not come from any answer key — they are *invented* by the
@@ -265,7 +280,10 @@ intent, not in the rows.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.datasets import load_diabetes
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.cluster import KMeans
@@ -284,7 +302,9 @@ print("Classification -> predicts a category (0/1):", int(clf.predict(X[:1])[0])
 # 3) CLUSTERING: ignore y entirely and discover groups of similar patients.
 km = KMeans(n_clusters=3, n_init=10, random_state=0).fit(X)
 print("Clustering  -> discovers a group id:", int(km.labels_[0]))
-`}
+`,
+    },
+  ]}
 />
 
 Nothing about the underlying measurements changed between the three blocks.
@@ -374,8 +394,11 @@ the strings \`"regression"\`, \`"classification"\`, or \`"clustering"\`:
    of similar-sounding songs.
 
 The hidden tests check each individual answer.`}
-  initCode={``}
-  starterCode={`tasks = {
+  files={[
+    {
+      filename: "main.py",
+      initCode: ``,
+      starterCode: `tasks = {
     "predict_tomorrows_temperature": None,  # "regression" / "classification" / "clustering"
     "is_email_spam": None,
     "segment_shoppers": None,
@@ -385,8 +408,8 @@ The hidden tests check each individual answer.`}
 }
 
 print(tasks)
-`}
-  solutionCode={`tasks = {
+`,
+      solutionCode: `tasks = {
     "predict_tomorrows_temperature": "regression",
     "is_email_spam": "classification",
     "segment_shoppers": "clustering",
@@ -396,7 +419,9 @@ print(tasks)
 }
 
 print(tasks)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "temperature",

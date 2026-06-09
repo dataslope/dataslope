@@ -28,7 +28,10 @@ Every basic operator works element-by-element on vectors:
 
 <CodeBlock
   adapter="r"
-  starterCode={`prices <- c(9.99, 14.50, 24.00, 5.75)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `prices <- c(9.99, 14.50, 24.00, 5.75)
 
 # Add 8% sales tax to every price
 prices * 1.08
@@ -38,7 +41,9 @@ prices * 0.92
 
 # Round each to two decimals
 round(prices * 1.08, 2)
-`}
+`,
+    },
+  ]}
 />
 
 No loops, no temporary variables. The expression *describes the
@@ -50,7 +55,10 @@ When you combine two vectors, R lines them up element-by-element:
 
 <CodeBlock
   adapter="r"
-  starterCode={`quantities <- c(2, 1, 3, 4)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `quantities <- c(2, 1, 3, 4)
 unit_prices <- c(9.99, 14.50, 24.00, 5.75)
 
 # Line item totals
@@ -59,7 +67,9 @@ print(totals)
 
 # Grand total
 sum(totals)
-`}
+`,
+    },
+  ]}
 />
 
 This is the heart of how data analysts think: you have
@@ -81,7 +91,10 @@ longer one.
 
 <CodeBlock
   adapter="r"
-  starterCode={`# Length 6 + length 1 — the scalar gets recycled
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# Length 6 + length 1 — the scalar gets recycled
 c(10, 20, 30, 40, 50, 60) + 1
 
 # Length 6 + length 2 — (1, 2) is repeated as (1,2,1,2,1,2)
@@ -89,7 +102,9 @@ c(10, 20, 30, 40, 50, 60) + c(1, 2)
 
 # Length 6 + length 3 — (1,2,3) repeats as (1,2,3,1,2,3)
 c(10, 20, 30, 40, 50, 60) + c(1, 2, 3)
-`}
+`,
+    },
+  ]}
 />
 
 This is most useful in the very common case where one vector is
@@ -98,9 +113,14 @@ will *warn* you — that warning almost always means a bug:
 
 <CodeBlock
   adapter="r"
-  starterCode={`# Length 5 + length 2: doesn't divide evenly, R warns
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# Length 5 + length 2: doesn't divide evenly, R warns
 c(1, 2, 3, 4, 5) + c(10, 20)
-`}
+`,
+    },
+  ]}
 />
 
 The result is computed (R recycles `(10, 20)` to `(10, 20, 10, 20,
@@ -115,7 +135,10 @@ single summary value. You will use these constantly:
 
 <CodeBlock
   adapter="r"
-  starterCode={`scores <- c(82, 91, 76, 100, 65, 88, 79, 93, 71, 85)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `scores <- c(82, 91, 76, 100, 65, 88, 79, 93, 71, 85)
 
 mean(scores) # average
 median(scores) # middle value
@@ -127,7 +150,9 @@ range(scores) # min and max together
 sum(scores)
 length(scores)
 quantile(scores) # five-number summary
-`}
+`,
+    },
+  ]}
 />
 
 Notice how every one of these functions has the same shape:
@@ -142,7 +167,10 @@ length out, computing as they go:
 
 <CodeBlock
   adapter="r"
-  starterCode={`daily_sales <- c(120, 150, 80, 200, 175, 90, 110)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `daily_sales <- c(120, 150, 80, 200, 175, 90, 110)
 
 # Running totals
 cumsum(daily_sales)
@@ -152,7 +180,9 @@ cumsum(daily_sales) / seq_along(daily_sales)
 
 # Differences day to day
 diff(daily_sales)
-`}
+`,
+    },
+  ]}
 />
 
 ## A small but mighty example: standardizing a vector
@@ -163,7 +193,10 @@ mean 0 and standard deviation 1.
 
 <CodeBlock
   adapter="r"
-  starterCode={`heights <- c(160, 172, 168, 181, 155, 175, 169, 178)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `heights <- c(160, 172, 168, 181, 155, 175, 169, 178)
 
 # Step by step
 mean_h <- mean(heights)
@@ -175,7 +208,9 @@ print(round(z, 2))
 # Check: standardized vector has mean ~0, sd ~1
 mean(z)
 sd(z)
-`}
+`,
+    },
+  ]}
 />
 
 Three lines, no loops. This is *the* archetypal R operation: a
@@ -255,16 +290,21 @@ temperatures in Fahrenheit using the formula `F = C * 9/5 + 32`.
   adapter="r"
   title="Vectorized temperature conversion"
   instructions={`Given \`celsius\`, compute \`fahrenheit\` as a vector. No loops needed — use vectorized arithmetic.`}
-  initCode={`celsius <- c(0, 10, 20, 30, 37, 100)
-`}
-  starterCode={`# celsius is already defined
+  files={[
+    {
+      filename: "main.r",
+      initCode: `celsius <- c(0, 10, 20, 30, 37, 100)
+`,
+      starterCode: `# celsius is already defined
 fahrenheit <- NULL # replace NULL with the vectorized formula
 
 print(fahrenheit)
-`}
-  solutionCode={`fahrenheit <- celsius * 9 / 5 + 32
+`,
+      solutionCode: `fahrenheit <- celsius * 9 / 5 + 32
 print(fahrenheit)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "temps",

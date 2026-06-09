@@ -31,7 +31,10 @@ flowchart LR
 
 <CodeBlock
   adapter="python"
-  starterCode={`words = ["The", "the", "THE", "Dog", "dog", "DOG"]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `words = ["The", "the", "THE", "Dog", "dog", "DOG"]
 
 # Without normalization, casing creates spurious distinct words.
 print("Distinct as-is:    ", len(set(words)), "->", set(words))
@@ -39,7 +42,9 @@ print("Distinct as-is:    ", len(set(words)), "->", set(words))
 # Case folding collapses them.
 folded = [w.lower() for w in words]
 print("Distinct lowercased:", len(set(folded)), "->", set(folded))
-`}
+`,
+    },
+  ]}
 />
 
 Six "different" words became two. If your goal is to count how often each
@@ -85,7 +90,10 @@ recognition, casing is signal.
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Same letters, very different meanings — case is the only clue.
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Same letters, very different meanings — case is the only clue.
 print("US".lower(), "  <- 'US' the country becomes the pronoun 'us'")
 print("WHO".lower(), " <- 'WHO' the organization becomes the question word 'who'")
 print("Apple".lower(), "<- the company becomes the fruit")
@@ -93,7 +101,9 @@ print("Apple".lower(), "<- the company becomes the fruit")
 # For shouting, case can be a sentiment signal:
 review = "this product is GARBAGE"
 print("Has ALL-CAPS word:", any(w.isupper() and len(w) > 1 for w in review.split()))
-`}
+`,
+    },
+  ]}
 />
 
 ## Punctuation stripping
@@ -106,7 +116,10 @@ common ways to strip it; know more than one.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import re
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import re
 import string
 
 text = "Hello, World! It's a GREAT day... isn't it?"
@@ -127,7 +140,9 @@ print("3. regex findall:  ", approach3)
 
 print()
 print("string.punctuation =", repr(string.punctuation))
-`}
+`,
+    },
+  ]}
 />
 
 Compare the three results carefully — they disagree, and the disagreements
@@ -203,8 +218,11 @@ For example, \`normalize("Hello, World!")\` should return \`['hello',
 (Heads up: because step 2 removes the apostrophe, a contraction like "it's"
 will become "its". That is a real side effect of character-level punctuation
 stripping — you do not need to fix it here, just be aware of it.)`}
-  initCode={`import string`}
-  starterCode={`def normalize(text):
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import string`,
+      starterCode: `def normalize(text):
     # 1. lowercase
     # 2. remove punctuation characters
     # 3. split and drop empties
@@ -213,8 +231,8 @@ stripping — you do not need to fix it here, just be aware of it.)`}
 
 print(normalize("Hello, World!"))
 print(normalize("Wow!!!  Amazing??"))
-`}
-  solutionCode={`def normalize(text):
+`,
+      solutionCode: `def normalize(text):
     text = text.lower()
     table = str.maketrans("", "", string.punctuation)
     text = text.translate(table)
@@ -223,7 +241,9 @@ print(normalize("Wow!!!  Amazing??"))
 
 print(normalize("Hello, World!"))
 print(normalize("Wow!!!  Amazing??"))
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",

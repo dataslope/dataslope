@@ -19,7 +19,10 @@ watch this happen for real.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import make_classification
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import accuracy_score, recall_score
@@ -39,7 +42,9 @@ y_pred = dummy.predict(X_test)
 print(f"Accuracy: {accuracy_score(y_test, y_pred):.1%}")
 print(f"Recall on the positive class: {recall_score(y_test, y_pred):.1%}")
 print("Positives it actually caught:", int((y_pred[y_test == 1] == 1).sum()))
-`}
+`,
+    },
+  ]}
 />
 
 Over 90% accuracy, and it caught **zero** positive cases. The accuracy is
@@ -82,7 +87,10 @@ lays it out with actual classes as rows and predicted classes as columns.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import make_classification
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix
@@ -105,7 +113,9 @@ print(f"  actual 1 (pos)   {cm[1, 0]:4d}     {cm[1, 1]:4d}")
 print()
 tn, fp, fn, tp = cm.ravel()
 print(f"TN={tn}  FP={fp}  FN={fn}  TP={tp}")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Read the corners carefully">
@@ -169,7 +179,10 @@ Moving that threshold is exactly how you trade precision against recall.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
@@ -190,7 +203,9 @@ for t in [0.2, 0.35, 0.5, 0.65, 0.8]:
     p = precision_score(y_test, pred, zero_division=0)
     r = recall_score(y_test, pred, zero_division=0)
     print(f"   {t:.2f}   |    {p:.2f}    |   {r:.2f}")
-`}
+`,
+    },
+  ]}
 />
 
 Read the table top to bottom: as the threshold rises, the model demands more
@@ -228,7 +243,10 @@ true examples of each class there were).
 
 <CodeBlock
   adapter="python"
-  starterCode={`from sklearn.datasets import make_classification
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report
@@ -243,7 +261,9 @@ model = LogisticRegression(max_iter=1000).fit(X_train, y_train)
 y_pred = model.predict(X_test)
 
 print(classification_report(y_test, y_pred, target_names=["negative", "positive"]))
-`}
+`,
+    },
+  ]}
 />
 
 Look at the positive row specifically — its precision and recall are the
@@ -318,7 +338,10 @@ the team actually argues over.
 
 The tests confirm your hand-computed precision and recall match
 scikit-learn's \`precision_score\` and \`recall_score\`.`}
-  initCode={`from sklearn.datasets import make_classification
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix, precision_score, recall_score
@@ -330,23 +353,25 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=5, stratify=y
 )
 model = LogisticRegression(max_iter=1000).fit(X_train, y_train)
-y_pred = model.predict(X_test)`}
-  starterCode={`cm = None
+y_pred = model.predict(X_test)`,
+      starterCode: `cm = None
 tn = fp = fn = tp = None
 precision = None
 recall = None
 
 print("Confusion matrix:\\n", cm)
 print("precision:", precision, "recall:", recall)
-`}
-  solutionCode={`cm = confusion_matrix(y_test, y_pred)
+`,
+      solutionCode: `cm = confusion_matrix(y_test, y_pred)
 tn, fp, fn, tp = cm.ravel()
 precision = tp / (tp + fp)
 recall = tp / (tp + fn)
 
 print("Confusion matrix:\\n", cm)
 print("precision:", precision, "recall:", recall)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "cm_shape",

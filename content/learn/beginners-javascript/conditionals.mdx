@@ -26,14 +26,19 @@ block runs; otherwise it is skipped entirely.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const age = 17;
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const age = 17;
 
 if (age >= 18) {
   console.log("You can vote.");
 }
 
 console.log("Done.");
-`}
+`,
+    },
+  ]}
 />
 
 Run the program. Then change `age` to `19` and run again. The
@@ -47,14 +52,19 @@ otherwise, add `else`:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const age = 17;
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const age = 17;
 
 if (age >= 18) {
   console.log("You can vote.");
 } else {
   console.log("You cannot vote yet.");
 }
-`}
+`,
+    },
+  ]}
 />
 
 Visually:
@@ -78,7 +88,10 @@ When there are several mutually exclusive cases:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function describeScore(score) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function describeScore(score) {
   if (score >= 90) {
     return "A";
   } else if (score >= 80) {
@@ -97,7 +110,9 @@ console.log(describeScore(82));
 console.log(describeScore(73));
 console.log(describeScore(64));
 console.log(describeScore(50));
-`}
+`,
+    },
+  ]}
 />
 
 The runtime checks each condition top-to-bottom. The *first one
@@ -132,7 +147,10 @@ Compare. Both functions compute the same thing.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// Nested style — hard to read past a few levels.
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// Nested style — hard to read past a few levels.
 function shippingCost1(weight, distance, isPriority) {
   let cost;
   if (weight > 0) {
@@ -165,7 +183,9 @@ console.log(shippingCost1(2, 50, true));
 console.log(shippingCost2(2, 50, true));
 console.log(shippingCost1(0, 50, true));
 console.log(shippingCost2(0, 50, true));
-`}
+`,
+    },
+  ]}
 />
 
 The second version is far easier to read, especially as logic
@@ -195,7 +215,10 @@ When you are dispatching on the value of a single variable, the
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function describeDay(day) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function describeDay(day) {
   switch (day) {
     case "Mon":
     case "Tue":
@@ -214,7 +237,9 @@ When you are dispatching on the value of a single variable, the
 console.log(describeDay("Mon"));
 console.log(describeDay("Sat"));
 console.log(describeDay("Xyz"));
-`}
+`,
+    },
+  ]}
 />
 
 A few things to know about `switch`:
@@ -239,7 +264,10 @@ any of the above. Build a small table, look up the answer.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const ROLES_TO_GREETING = {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const ROLES_TO_GREETING = {
   admin: "Welcome, administrator.",
   member: "Welcome back!",
   guest: "Hello, guest.",
@@ -253,7 +281,9 @@ console.log(greetRole("admin"));
 console.log(greetRole("member"));
 console.log(greetRole("guest"));
 console.log(greetRole("alien")); // falls through to the default
-`}
+`,
+    },
+  ]}
 />
 
 This pattern scales well. Adding a new role is a one-line edit to
@@ -266,7 +296,10 @@ where the logical operators from the previous chapter come in.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`function canRent(age, hasLicence, hasCard) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function canRent(age, hasLicence, hasCard) {
   if (age < 25) return "Too young.";
   if (!hasLicence) return "Need a driving licence.";
   if (!hasCard) return "Need a credit card.";
@@ -277,7 +310,9 @@ console.log(canRent(30, true, true));
 console.log(canRent(22, true, true));
 console.log(canRent(30, false, true));
 console.log(canRent(30, true, false));
-`}
+`,
+    },
+  ]}
 />
 
 Three guard clauses, each handling one failure case in turn. This
@@ -293,7 +328,10 @@ replace multiples of 3 with `"Fizz"`, multiples of 5 with
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`for (let n = 1; n <= 30; n++) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `for (let n = 1; n <= 30; n++) {
   let out;
   if (n % 15 === 0) {
     out = "FizzBuzz";
@@ -306,7 +344,9 @@ replace multiples of 3 with `"Fizz"`, multiples of 5 with
   }
   console.log(out);
 }
-`}
+`,
+    },
+  ]}
 />
 
 The **order** of the conditions is critical: we test the most
@@ -331,7 +371,10 @@ For now, just take it on faith that the body runs once for each
 - \`"unknown signal"\` for anything else (including the empty string)
 
 Use comparisons and conditionals, not a lookup table — practise the syntax.`}
-  starterCode={`function action(color) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function action(color) {
   // your code here
   return "";
 }
@@ -340,8 +383,8 @@ console.log(action("red"));
 console.log(action("yellow"));
 console.log(action("green"));
 console.log(action("purple"));
-`}
-  solutionCode={`function action(color) {
+`,
+      solutionCode: `function action(color) {
   if (color === "red") return "stop";
   if (color === "yellow") return "slow down";
   if (color === "green") return "go";
@@ -352,7 +395,9 @@ console.log(action("red"));
 console.log(action("yellow"));
 console.log(action("green"));
 console.log(action("purple"));
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "red",

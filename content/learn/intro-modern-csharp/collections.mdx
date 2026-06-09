@@ -26,7 +26,10 @@ Each one is good at something the others are bad at.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 
 int[] scores = { 91, 84, 77, 65 };
 
@@ -37,7 +40,9 @@ Console.WriteLine(scores.Length);
 scores[2] = 80;
 foreach (var s in scores)
     Console.WriteLine(s);
-`}
+`,
+    },
+  ]}
 />
 
 Arrays have a fixed size at creation time. They're fast and
@@ -50,7 +55,10 @@ If you don't know exactly how many items you'll have, reach for
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 var names = new List<string>();
@@ -66,7 +74,9 @@ names.Insert(0, "Zoe");
 
 foreach (var n in names)
     Console.WriteLine(n);
-`}
+`,
+    },
+  ]}
 />
 
 Mental model: a `List<T>` is "an array that grows for you." It
@@ -80,7 +90,10 @@ even for a dictionary with millions of entries.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 var phoneBook = new Dictionary<string, string> {
@@ -100,7 +113,9 @@ else
 
 foreach (var (name, number) in phoneBook)
     Console.WriteLine($"{name} -> {number}");
-`}
+`,
+    },
+  ]}
 />
 
 `TryGetValue` is the idiomatic way to look up a key that *might
@@ -114,7 +129,10 @@ not order.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 var visited = new HashSet<string>();
@@ -125,7 +143,9 @@ visited.Add("home"); // ignored — already there
 Console.WriteLine(visited.Count);            // 2
 Console.WriteLine(visited.Contains("home")); // True
 Console.WriteLine(visited.Contains("blog")); // False
-`}
+`,
+    },
+  ]}
 />
 
 A set's `Contains` is roughly as fast as a dictionary's lookup —
@@ -163,7 +183,10 @@ Rough cost picture:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 var nums = new List<int> { 10, 20, 30 };
@@ -176,7 +199,9 @@ foreach (var (k, v) in counts)
     Console.WriteLine($"{k}={v}");
 foreach (var s in seen)
     Console.WriteLine(s);
-`}
+`,
+    },
+  ]}
 />
 
 Inside a `foreach`, **don't modify** the collection you're
@@ -189,7 +214,10 @@ A classic use of `Dictionary<string, int>`:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Collections.Generic;
 
 string text = "the rain in spain falls mainly on the plain the rain stays";
@@ -205,7 +233,9 @@ foreach (var word in text.Split(' '))
 
 foreach (var (w, c) in counts)
     Console.WriteLine($"{w}: {c}");
-`}
+`,
+    },
+  ]}
 />
 
 Notice the pattern: "if key exists, increment; otherwise initialize."
@@ -232,7 +262,7 @@ the=3
   files={[
     {
       filename: "Program.cs",
-      initialContent: `using System;
+      starterCode: `using System;
 using System.Linq;
 
 var counts = WordCounter.Counts("the cat and the dog and the cat");
@@ -243,7 +273,7 @@ foreach (var (w, c) in counts.OrderBy(kv => kv.Key))
     },
     {
       filename: "WordCounter.cs",
-      initialContent: `using System.Collections.Generic;
+      starterCode: `using System.Collections.Generic;
 
 public static class WordCounter
 {
@@ -254,7 +284,7 @@ public static class WordCounter
     }
 }
 `,
-      solutionContent: `using System.Collections.Generic;
+      solutionCode: `using System.Collections.Generic;
 
 public static class WordCounter
 {

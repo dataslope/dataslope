@@ -25,13 +25,18 @@ modeling function expects tidy input. Getting your data tidy is
 
 <CodeBlock
   adapter="r"
-  starterCode={`tidy <- data.frame(
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `tidy <- data.frame(
   city        = c("NYC", "NYC", "LA", "LA"),
   year        = c(2022, 2023, 2022, 2023),
   population  = c(8.3, 8.4, 3.9, 3.9)
 )
 print(tidy)
-`}
+`,
+    },
+  ]}
 />
 
 Every column is a variable (city, year, population). Every row is
@@ -44,13 +49,18 @@ Here is the same data, but **wide** — years spread across columns:
 
 <CodeBlock
   adapter="r"
-  starterCode={`wide <- data.frame(
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `wide <- data.frame(
   city  = c("NYC", "LA"),
   y2022 = c(8.3, 3.9),
   y2023 = c(8.4, 3.9)
 )
 print(wide)
-`}
+`,
+    },
+  ]}
 />
 
 What's wrong with this? Two things:
@@ -103,7 +113,10 @@ written two ways:
 
 <CodeBlock
   adapter="r"
-  starterCode={`# Tidy data
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# Tidy data
 tidy <- data.frame(
   city = c("NYC", "NYC", "LA", "LA"),
   year = c(2022, 2023, 2022, 2023),
@@ -112,12 +125,17 @@ tidy <- data.frame(
 
 # Computing per-city average is trivial
 aggregate(population ~ city, data = tidy, FUN = mean)
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="r"
-  starterCode={`# Wide data
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# Wide data
 wide <- data.frame(
   city  = c("NYC", "LA"),
   y2022 = c(8.3, 3.9),
@@ -127,7 +145,9 @@ wide <- data.frame(
 # Computing per-city average is awkward
 wide$avg <- rowMeans(wide[, c("y2022", "y2023")])
 wide
-`}
+`,
+    },
+  ]}
 />
 
 Both produce the right answer. But the tidy version uses a
@@ -248,7 +268,10 @@ Assign `tidy_df` to whichever one is tidy.
   adapter="r"
   title="Pick the tidy one"
   instructions={`Two data frames \`a\` and \`b\` are provided. They contain the same data, but one is tidy and the other is wide. Set \`tidy_df\` to the tidy one.`}
-  initCode={`a <- data.frame(
+  files={[
+    {
+      filename: "main.r",
+      initCode: `a <- data.frame(
   product = c("Widget","Gadget"),
   q1 = c(120, 200),
   q2 = c(150, 230),
@@ -259,16 +282,18 @@ b <- data.frame(
   quarter = rep(c("q1","q2","q3"), times = 2),
   sales   = c(120, 150, 170, 200, 230, 210)
 )
-`}
-  starterCode={`# Two data frames are available: a (wide) and b (tidy?)
+`,
+      starterCode: `# Two data frames are available: a (wide) and b (tidy?)
 print(a)
 print(b)
 
 tidy_df <- NULL # set this to the tidy one
-`}
-  solutionCode={`tidy_df <- b
+`,
+      solutionCode: `tidy_df <- b
 print(tidy_df)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "right",

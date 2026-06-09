@@ -43,7 +43,10 @@ weekend dip — and roll it up.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 
 rng = np.random.default_rng(0)
@@ -53,8 +56,8 @@ weekend_dip = np.where(days.weekday >= 5, -25, 5)   # Sat/Sun are quieter
 visits = pd.Series(
     (trend + weekend_dip + rng.normal(0, 6, 120)).round().astype(int),
     index=days, name="visits",
-)`}
-  starterCode={`print("Daily visits (first 10 days):")
+)`,
+      starterCode: `print("Daily visits (first 10 days):")
 print(visits.head(10))
 print()
 
@@ -66,7 +69,9 @@ print()
 # Monthly AVERAGE daily visits (mean):
 print("Monthly average daily visits (mean):")
 print(visits.resample("ME").mean().round(1))
-`}
+`,
+    },
+  ]}
 />
 
 One series, two resamples, two very different numbers — and they answer
@@ -90,15 +95,18 @@ This is the choice beginners get wrong most often. The rule:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 rng = np.random.default_rng(1)
 days = pd.date_range("2014-06-01", periods=30, freq="D")
 # A FLOW: units sold per day. A LEVEL: that day's average temperature.
 units_sold = pd.Series(rng.integers(20, 60, 30), index=days, name="units")
 temp_c     = pd.Series((22 + 4*np.sin(np.arange(30)/3) + rng.normal(0,1,30)).round(1),
-                       index=days, name="temp_c")`}
-  starterCode={`# Roll both up to a single monthly number, the RIGHT way for each.
+                       index=days, name="temp_c")`,
+      starterCode: `# Roll both up to a single monthly number, the RIGHT way for each.
 print("Units sold is a FLOW -> SUM:")
 print("  June total units:", units_sold.resample("ME").sum().iloc[0])
 print()
@@ -111,7 +119,9 @@ print(
     temp_c.resample("ME").sum().round(1).iloc[0],
     "C  <- nonsense",
 )
-`}
+`,
+    },
+  ]}
 />
 
 <MultipleChoice
@@ -136,7 +146,10 @@ columns side by side — handy for a quick profile of each bucket.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 rng = np.random.default_rng(0)
 days = pd.date_range("2014-01-01", periods=120, freq="D")
@@ -145,13 +158,15 @@ weekend_dip = np.where(days.weekday >= 5, -25, 5)
 visits = pd.Series(
     (trend + weekend_dip + rng.normal(0, 6, 120)).round().astype(int),
     index=days, name="visits",
-)`}
-  starterCode={`weekly = visits.resample("W").agg(["sum", "mean", "min", "max"]).round(1)
+)`,
+      starterCode: `weekly = visits.resample("W").agg(["sum", "mean", "min", "max"]).round(1)
 print("Per-week profile:")
 print(weekly.head())
 print()
 print("The 'max' and 'min' columns show the best and worst day each week.")
-`}
+`,
+    },
+  ]}
 />
 
 And monthly data downsamples further still — our airline series rolls up to
@@ -159,7 +174,10 @@ quarterly or yearly views that make the long-run **trend** obvious:
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -176,8 +194,8 @@ _passengers = [
     417,391,419,461,472,535,622,606,508,461,390,432,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`# Monthly -> yearly average: the trend, stripped of seasonality.
+air = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `# Monthly -> yearly average: the trend, stripped of seasonality.
 print("Average monthly passengers, by YEAR:")
 print(air.resample("YE").mean().round(0))
 print()
@@ -187,7 +205,9 @@ print(air.resample("YE").sum())
 print()
 print("Downsampling to yearly removes the within-year seasonal wiggle,")
 print("leaving the steady climb in air travel - the long-run trend.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="Downsampling is a seasonality filter">
@@ -207,7 +227,10 @@ there.
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -215,8 +238,8 @@ _passengers = [
     145,150,178,163,172,178,199,199,184,162,146,166,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air3 = pd.Series(_passengers, index=idx, name="passengers")  # first 3 years`}
-  starterCode={`# Upsample monthly -> daily. asfreq() lays down the finer grid and leaves
+air3 = pd.Series(_passengers, index=idx, name="passengers")  # first 3 years`,
+      starterCode: `# Upsample monthly -> daily. asfreq() lays down the finer grid and leaves
 # the brand-new in-between days as NaN, because there is no data for them.
 daily = air3.resample("D").asfreq()
 
@@ -226,7 +249,9 @@ print()
 print(f"Real data points : {air3.notna().sum()}")
 print(f"Rows after upsample: {len(daily)}")
 print(f"NaNs introduced  : {daily.isna().sum()}  <- pandas refuses to fabricate these")
-`}
+`,
+    },
+  ]}
 />
 
 Those `NaN`s are pandas being *honest*: it knows the value on January 15th
@@ -237,7 +262,10 @@ next page):
 
 <CodeBlock
   adapter="python"
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 _passengers = [
     112,118,132,129,121,135,148,148,136,119,104,118,
@@ -245,8 +273,8 @@ _passengers = [
     145,150,178,163,172,178,199,199,184,162,146,166,
 ]
 idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air3 = pd.Series(_passengers, index=idx, name="passengers")`}
-  starterCode={`daily = air3.resample("D").asfreq()
+air3 = pd.Series(_passengers, index=idx, name="passengers")`,
+      starterCode: `daily = air3.resample("D").asfreq()
 
 # Assumption A: "the value holds until the next reading" (forward fill).
 held = daily.ffill()
@@ -259,7 +287,9 @@ print(compare.head(5))
 print()
 print("Same data, different invented values. Upsampling didn't add knowledge;")
 print("it forced us to declare what we believe happened between observations.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="danger" title="Upsampling does not create information">
@@ -318,21 +348,26 @@ Coarser grid -> aggregate the many; finer grid -> fill the gaps.`}
   instructions={`A daily \`visits\` Series (90 days) is loaded. Build \`weekly_total\`: the **total** visits per week, with weeks ending on **Sunday** (the \`"W"\` default). The result should be a Series indexed by week-ending dates.
 
 Then also compute \`busiest_week\` — the week-ending \`Timestamp\` with the highest total.`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 rng = np.random.default_rng(7)
 days = pd.date_range("2014-01-01", periods=90, freq="D")
-visits = pd.Series(rng.integers(80, 200, 90), index=days, name="visits")`}
-  starterCode={`weekly_total = None  # total visits per week (sum)
+visits = pd.Series(rng.integers(80, 200, 90), index=days, name="visits")`,
+      starterCode: `weekly_total = None  # total visits per week (sum)
 busiest_week = None  # week-ending Timestamp with the max total
 print(weekly_total.head() if weekly_total is not None else None)
 print("busiest:", busiest_week)
-`}
-  solutionCode={`weekly_total = visits.resample("W").sum()
+`,
+      solutionCode: `weekly_total = visits.resample("W").sum()
 busiest_week = weekly_total.idxmax()
 print(weekly_total.head())
 print("busiest:", busiest_week.date(), "with", int(weekly_total.max()), "visits")
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_series",
@@ -371,25 +406,30 @@ assert isinstance(weekly_total, pd.Series)`,
 - \`"avg_humidity"\` — June's typical humidity (the correct aggregation for a level), as a float rounded to 1 decimal
 
 Pick \`sum\` vs \`mean\` to match what each quantity *means*.`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 rng = np.random.default_rng(3)
 days = pd.date_range("2014-06-01", periods=30, freq="D")
 rainfall_mm  = pd.Series(rng.gamma(1.2, 3.0, 30).round(1), index=days, name="rain")
 humidity_pct = pd.Series((60 + rng.normal(0, 8, 30)).clip(20, 100).round(1),
-                         index=days, name="humidity")`}
-  starterCode={`june = {
+                         index=days, name="humidity")`,
+      starterCode: `june = {
     "total_rain": None,  # rainfall is a FLOW
     "avg_humidity": None,  # humidity is a LEVEL
 }
 print(june)
-`}
-  solutionCode={`june = {
+`,
+      solutionCode: `june = {
     "total_rain": float(rainfall_mm.resample("ME").sum().iloc[0]),
     "avg_humidity": float(humidity_pct.resample("ME").mean().round(1).iloc[0]),
 }
 print(june)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "keys",

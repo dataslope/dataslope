@@ -15,13 +15,18 @@ order of first appearance.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var xs = new[] { 3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5 };
 
 Console.WriteLine(string.Join(",", xs.Distinct())); // 3,1,4,5,9,2,6
-`}
+`,
+    },
+  ]}
 />
 
 Equality is determined by the type's `Equals` / `GetHashCode`. For
@@ -32,7 +37,10 @@ records are equal.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var people = new[] {
@@ -46,7 +54,9 @@ foreach (var p in people.DistinctBy(p => p.Name))
     Console.WriteLine(p);
 
 record Person(string Name, int Age);
-`}
+`,
+    },
+  ]}
 />
 
 `DistinctBy` keeps the *first* person per key. The second "Ada" is
@@ -59,7 +69,10 @@ the operation.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var a = new[] { 1, 2, 3, 4, 5 };
@@ -69,7 +82,9 @@ Console.WriteLine($"Union     : [{string.Join(",", a.Union(b))}]");
 Console.WriteLine($"Intersect : [{string.Join(",", a.Intersect(b))}]");
 Console.WriteLine($"Except a-b: [{string.Join(",", a.Except(b))}]");
 Console.WriteLine($"Except b-a: [{string.Join(",", b.Except(a))}]");
-`}
+`,
+    },
+  ]}
 />
 
 ```mermaid
@@ -90,14 +105,19 @@ to the first.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var a = new[] { 1, 2, 3 };
 var b = new[] { 3, 4, 5 };
 
 Console.WriteLine(string.Join(",", a.Concat(b))); // 1,2,3,3,4,5
-`}
+`,
+    },
+  ]}
 />
 
 Use `Concat` when order matters and duplicates are okay. Use `Union`
@@ -110,7 +130,10 @@ function.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var names = new[] { "Ada", "Bilal", "Chiara", "Dmitri" };
@@ -120,7 +143,9 @@ var pairs = names.Zip(ages, (name, age) => $"{name}({age})");
 
 foreach (var p in pairs)
     Console.WriteLine(p);
-`}
+`,
+    },
+  ]}
 />
 
 Output: three lines. `Zip` stops at the **shorter** sequence — there
@@ -129,7 +154,10 @@ tuples:
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var names = new[] { "Ada", "Bilal", "Chiara" };
@@ -137,7 +165,9 @@ var ages = new[] { 36, 41, 29 };
 
 foreach (var (n, a) in names.Zip(ages))
     Console.WriteLine($"{n} is {a}");
-`}
+`,
+    },
+  ]}
 />
 
 A common use of `Zip`: pair items with their index without using
@@ -157,7 +187,10 @@ equivalent of a SQL `INNER JOIN`.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var customers = new[] {
@@ -184,7 +217,9 @@ foreach (var row in joined)
 
 record Customer(int Id, string Name);
 record Order(int CustomerId, string Product);
-`}
+`,
+    },
+  ]}
 />
 
 Customer 3 produces no rows (no matching order). The "Mystery" order
@@ -199,7 +234,10 @@ outer join is `GroupJoin` followed by `SelectMany` with
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var customers = new[] {
@@ -223,7 +261,9 @@ foreach (var row in leftJoined)
 
 record Customer(int Id, string Name);
 record Order(int CustomerId, string Product);
-`}
+`,
+    },
+  ]}
 />
 
 Customer 3 appears with `(none)`. That's the difference from inner
@@ -236,7 +276,10 @@ together.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 
 var classA = new[] { "Ada", "Bilal", "Chiara" };
@@ -247,7 +290,9 @@ var dropped = new[] { "Bilal" };
 var active = classA.Union(classB).Except(dropped).OrderBy(name => name);
 
 Console.WriteLine(string.Join(", ", active));
-`}
+`,
+    },
+  ]}
 />
 
 The shape — *union, except, order* — comes up constantly in
@@ -268,7 +313,7 @@ Use \`Except\` and \`OrderBy\`. Don't write a \`foreach\`.`}
   files={[
     {
       filename: "Program.cs",
-      initialContent: `var last = new[] { "Ada", "Bilal", "Chiara", "Bilal" };
+      starterCode: `var last = new[] { "Ada", "Bilal", "Chiara", "Bilal" };
 var current = new[] { "Ada", "Chiara", "Dmitri", "Esther", "Dmitri" };
 
 foreach (var name in Roster.NewThisSemester(last, current))
@@ -277,7 +322,7 @@ foreach (var name in Roster.NewThisSemester(last, current))
     },
     {
       filename: "Roster.cs",
-      initialContent: `using System.Collections.Generic;
+      starterCode: `using System.Collections.Generic;
 
 public static class Roster
 {
@@ -288,7 +333,7 @@ public static class Roster
     }
 }
 `,
-      solutionContent: `using System.Collections.Generic;
+      solutionCode: `using System.Collections.Generic;
 using System.Linq;
 
 public static class Roster

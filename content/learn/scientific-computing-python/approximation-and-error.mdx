@@ -44,7 +44,10 @@ picture.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 
 # Approximate f'(1) with f(x) = sin(x).  True derivative = cos(1) ≈ 0.5403
@@ -64,7 +67,9 @@ plt.title("Truncation + round-off tradeoff")
 plt.legend()
 plt.grid(True, which="both")
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 The curves form a "V". The left side of each V is *truncation*: a
@@ -99,7 +104,10 @@ $$ p \approx \log_2 \frac{E(h_1)}{E(h_2)} $$
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 
 # Simpson's rule for ∫_0^1 e^x dx = e - 1
@@ -121,7 +129,9 @@ for n in [8, 16, 32, 64, 128, 256, 512]:
     order = "" if prev is None else f"{np.log2(prev / err):.2f}"
     print(f"{n:6d}  {err:12.3e}  {order:>7}")
     prev = err
-`}
+`,
+    },
+  ]}
 />
 
 The third column hovers around $4$, because Simpson's rule is
@@ -157,7 +167,10 @@ of a handful of terms.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 # Partial sums of the Leibniz series for π/4
 N = 30
@@ -174,7 +187,9 @@ for _ in range(20):
     acc = 0.5 * (acc[:-1] + acc[1:])
 print("\\nAfter 20 averaging passes:")
 print(f"  4*S = {4 * acc[-1]:.10f}  error = {abs(4 * acc[-1] - np.pi):.2e}")
-`}
+`,
+    },
+  ]}
 />
 
 The plain partial sum after 30 terms is off by about $0.03$. The
@@ -194,7 +209,10 @@ Try integrating something with a sharp spike.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy.integrate import quad, simpson
 
 
@@ -212,7 +230,9 @@ for n in [101, 1001, 10001]:
     xs = np.linspace(-1, 1, n)
     s = simpson(f(xs), x=xs)
     print(f"Simpson n={n:5d}  ∫ f dx = {s:.10f}  err = {abs(s - value):.2e}")
-`}
+`,
+    },
+  ]}
 />
 
 `quad` converges fast because it concentrates samples near the
@@ -230,7 +250,10 @@ to.**
 For consecutive errors $E_1, E_2$ at step sizes $h$ and $h/2$,
 $p \\approx \\log_2(E_1 / E_2)$. Return the **mean** of those
 estimates across consecutive pairs.`}
-  starterCode={`import math
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import math
 
 
 def estimate_order(errors):
@@ -241,8 +264,8 @@ def estimate_order(errors):
 # Quick check: O(h²) data
 errs = [1e-2, 2.5e-3, 6.25e-4, 1.5625e-4]
 print("Estimated order:", estimate_order(errs))  # ~2
-`}
-  solutionCode={`import math
+`,
+      solutionCode: `import math
 
 
 def estimate_order(errors):
@@ -250,7 +273,9 @@ def estimate_order(errors):
     for a, b in zip(errors, errors[1:]):
         ratios.append(math.log2(a / b))
     return sum(ratios) / len(ratios)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "order_2",

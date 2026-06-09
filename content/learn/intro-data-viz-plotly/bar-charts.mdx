@@ -32,7 +32,10 @@ single variable, prefer a **histogram**. Bar charts are for
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 df = pd.DataFrame(
@@ -51,7 +54,9 @@ fig = px.bar(
     labels={"team": "Team", "people": "Headcount"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 That's the canonical Plotly Express call. Note:
@@ -69,7 +74,10 @@ time.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 import plotly.express as px
 
 df = pd.DataFrame(
@@ -88,7 +96,9 @@ fig = px.bar(
     labels={"team": "Team", "people": "Headcount"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 The only time you should *not* sort by value is when the categories
@@ -105,7 +115,10 @@ readable than vertical bars with rotated labels.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.gapminder().query("year == 2007 and continent == 'Europe'")
 df = df.sort_values("lifeExp")
@@ -120,7 +133,9 @@ fig = px.bar(
     labels={"lifeExp": "Life expectancy (years)", "country": "Country"},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 The pattern: `orientation="h"` plus swap the x and y arguments.
@@ -135,7 +150,10 @@ with `color="..."` and `barmode="group"`.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
@@ -153,7 +171,9 @@ fig = px.bar(
     category_orders={"day": ["Thur", "Fri", "Sat", "Sun"]},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 `category_orders={...}` is a small but invaluable trick — it forces
@@ -166,7 +186,10 @@ break into parts.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import plotly.express as px
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import plotly.express as px
 
 df = px.data.tips()
 
@@ -184,7 +207,9 @@ fig = px.bar(
     category_orders={"day": ["Thur", "Fri", "Sat", "Sun"]},
 )
 fig.show()
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Be careful with stacked bars">

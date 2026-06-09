@@ -113,7 +113,10 @@ random starts to retry.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.datasets import make_blobs
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.preprocessing import StandardScaler
@@ -132,7 +135,9 @@ values, counts = np.unique(labels, return_counts=True)
 print("Cluster labels found:", values)
 print("Points per cluster:  ", counts)
 print("Total points:        ", counts.sum())
-`}
+`,
+    },
+  ]}
 />
 
 On clean blobs this gives essentially the same answer k-means would — four
@@ -164,7 +169,10 @@ scale for the labels.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import matplotlib.pyplot as plt
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
 from sklearn.preprocessing import StandardScaler
 from scipy.cluster.hierarchy import dendrogram, linkage
@@ -182,7 +190,9 @@ plt.title("Dendrogram (ward linkage) — read the merges bottom to top")
 plt.xlabel("point index")
 plt.ylabel("merge distance (height)")
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 Spend a moment reading it, because this picture is the whole point:
@@ -216,7 +226,10 @@ exactly this.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.datasets import make_blobs
 from sklearn.preprocessing import StandardScaler
 from scipy.cluster.hierarchy import linkage, fcluster
@@ -232,7 +245,9 @@ for k in [2, 3, 4, 5]:
     labels = fcluster(Z, t=k, criterion="maxclust")
     sizes = np.bincount(labels)[1:]  # fcluster labels start at 1
     print(f"Cut into k={k}:  cluster sizes = {sorted(sizes, reverse=True)}")
-`}
+`,
+    },
+  ]}
 />
 
 The same tree yields 2, 3, 4, or 5 clusters depending only on where you
@@ -269,7 +284,10 @@ default.)
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from sklearn.datasets import make_blobs
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.preprocessing import StandardScaler
@@ -283,7 +301,9 @@ for link in ["ward", "complete", "average"]:
     labels = agg.fit_predict(X_scaled)
     sizes = np.bincount(labels)
     print(f"linkage={link:9s}  cluster sizes = {sorted(sizes, reverse=True)}")
-`}
+`,
+    },
+  ]}
 />
 
 On tidy, well-separated blobs all three linkages agree. The differences
@@ -312,7 +332,10 @@ keeping around.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.datasets import make_blobs
 from sklearn.cluster import AgglomerativeClustering
@@ -349,7 +372,9 @@ plt.title("Full dendrogram from a scikit-learn AgglomerativeClustering model")
 plt.xlabel("point index")
 plt.ylabel("merge distance")
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 Now you can get scikit-learn's labels for any `k` and visualize the same
@@ -469,7 +494,10 @@ labels.
 The hidden tests check that you standardized the data, found exactly 3
 clusters, labeled all 150 points, and that the largest cluster size is
 consistent with the data.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from sklearn.datasets import make_blobs
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.preprocessing import StandardScaler
@@ -478,8 +506,8 @@ from sklearn.preprocessing import StandardScaler
 X, _ = make_blobs(
     n_samples=[70, 50, 30], centers=None,
     cluster_std=0.7, random_state=0
-)`}
-  starterCode={`# 1. Standardize the features
+)`,
+      starterCode: `# 1. Standardize the features
 X_scaled = None
 
 # 2. Fit AgglomerativeClustering (n_clusters=3, linkage="ward") and get labels
@@ -493,8 +521,8 @@ largest_cluster = None
 
 print("clusters found:", n_found)
 print("largest cluster size:", largest_cluster)
-`}
-  solutionCode={`# 1. Standardize the features
+`,
+      solutionCode: `# 1. Standardize the features
 X_scaled = StandardScaler().fit_transform(X)
 
 # 2. Fit AgglomerativeClustering and get per-point labels
@@ -509,7 +537,9 @@ largest_cluster = int(np.bincount(labels).max())
 
 print("clusters found:", n_found)
 print("largest cluster size:", largest_cluster)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "scaled_shape",

@@ -19,7 +19,10 @@ every *combination* of the two faceting variables:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
@@ -33,7 +36,9 @@ sns.relplot(
     row="sex",
     height=3.2,
 )
-`}
+`,
+    },
+  ]}
 />
 
 Each panel holds the same scatter plot for its slice of the data, and —
@@ -56,7 +61,10 @@ row. `col_wrap` wraps the panels after N columns into a tidy block:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 mpg = sns.load_dataset("mpg")
@@ -70,7 +78,9 @@ sns.relplot(
     col_wrap=3,
     height=2.8,
 )
-`}
+`,
+    },
+  ]}
 />
 
 ## The FacetGrid workflow underneath
@@ -92,7 +102,10 @@ In code, those steps look like this:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
@@ -105,7 +118,9 @@ g.map_dataframe(sns.scatterplot, x="total_bill", y="tip")
 
 # 3. Add the legend and tidy up.
 g.add_legend()
-`}
+`,
+    },
+  ]}
 />
 
 That is exactly the machinery `sns.relplot(..., col="time", hue="sex")` runs
@@ -180,15 +195,18 @@ firehose — a few well-chosen facets beat a wall of thumbnails.
 
 Assign the result to \`g\`. Since each variable has two levels, you should get
 a 2 × 2 grid of panels.`}
-  starterCode={`import seaborn as sns
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
 
 # Build the 2x2 faceted relplot and assign it to g:
 g = None
-`}
-  solutionCode={`import seaborn as sns
+`,
+      solutionCode: `import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 tips = sns.load_dataset("tips")
@@ -201,7 +219,9 @@ g = sns.relplot(
     row="sex",
     height=3.2,
 )
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_grid",

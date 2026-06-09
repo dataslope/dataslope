@@ -18,7 +18,10 @@ The classic syntax — **object literal** notation:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const user = {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const user = {
   name: "Ada",
   age: 28,
   email: "ada@example.com",
@@ -27,7 +30,9 @@ The classic syntax — **object literal** notation:
 
 console.log(user);
 console.log(typeof user); // "object"
-`}
+`,
+    },
+  ]}
 />
 
 Each entry is a **property** with a **key** (the name) and a
@@ -47,7 +52,10 @@ There are two ways to read a property:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const user = { name: "Ada", age: 28, "favourite color": "blue" };
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const user = { name: "Ada", age: 28, "favourite color": "blue" };
 
 console.log(user.name); // "Ada"
 console.log(user["name"]); // "Ada"
@@ -57,7 +65,9 @@ const key = "age";
 console.log(user[key]); // 28 — bracket required for dynamic keys
 
 console.log(user.email); // undefined — missing property
-`}
+`,
+    },
+  ]}
 />
 
 That last line is important: reading a property that doesn't
@@ -70,7 +80,10 @@ You can set (or change, or add) a property with assignment:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const user = { name: "Ada" };
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const user = { name: "Ada" };
 
 user.age = 28; // add a new property
 user.name = "Ada Lovelace"; // change an existing one
@@ -81,7 +94,9 @@ console.log(user);
 // Delete a property
 delete user.role;
 console.log(user);
-`}
+`,
+    },
+  ]}
 />
 
 Notice that `const user = {...}` does *not* prevent us from
@@ -95,7 +110,10 @@ the same name, you can omit the repetition:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const name = "Ada";
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const name = "Ada";
 const age = 28;
 
 // Long form:
@@ -106,7 +124,9 @@ const user2 = { name, age };
 
 console.log(user1);
 console.log(user2);
-`}
+`,
+    },
+  ]}
 />
 
 This crops up all the time in modern JavaScript. Functions
@@ -125,7 +145,10 @@ There is a tidy shorthand for declaring methods:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const greeter = {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const greeter = {
   name: "Ada",
   // Long form:
   greet1: function (other) {
@@ -139,7 +162,9 @@ There is a tidy shorthand for declaring methods:
 
 console.log(greeter.greet1("Linus"));
 console.log(greeter.greet2("Grace"));
-`}
+`,
+    },
+  ]}
 />
 
 Notice the keyword `this`. Inside a method, `this` refers to the
@@ -153,7 +178,10 @@ Three common ways to walk an object's contents.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const scores = { math: 90, science: 87, history: 73 };
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const scores = { math: 90, science: 87, history: 73 };
 
 // Keys
 console.log(Object.keys(scores)); // ["math","science","history"]
@@ -173,7 +201,9 @@ for (const [subject, score] of Object.entries(scores)) {
 for (const subject in scores) {
   console.log(subject, "->", scores[subject]);
 }
-`}
+`,
+    },
+  ]}
 />
 
 For most everyday code, `Object.entries` + `for...of` is the
@@ -186,7 +216,10 @@ line. This is one of modern JavaScript's most-loved features.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const user = { name: "Ada", age: 28, email: "ada@example.com" };
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const user = { name: "Ada", age: 28, email: "ada@example.com" };
 
 // Basic destructuring
 const { name, age } = user;
@@ -209,7 +242,9 @@ const {
   customer: { name: customerName, email },
 } = order;
 console.log(customerName, email);
-`}
+`,
+    },
+  ]}
 />
 
 Destructuring is wonderful in **function parameters**, where it
@@ -217,7 +252,10 @@ replaces a stack of `options.x` lookups:
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`// Without destructuring:
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// Without destructuring:
 function describe1(user) {
   return user.name + " (" + user.age + ")";
 }
@@ -231,7 +269,9 @@ function describe2({ name, age }) {
 const u = { name: "Ada", age: 28, email: "irrelevant" };
 console.log(describe1(u));
 console.log(describe2(u));
-`}
+`,
+    },
+  ]}
 />
 
 ## Spread, rest, and copying
@@ -240,7 +280,10 @@ The `...` syntax works for objects too.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const base = { color: "red", size: "M" };
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const base = { color: "red", size: "M" };
 const extra = { material: "cotton", size: "L" }; // overrides 'size'
 
 const merged = { ...base, ...extra };
@@ -258,7 +301,9 @@ console.log("copy:", copy);
 const { color, ...rest } = merged;
 console.log("color:", color); // "red"
 console.log("rest: ", rest); // { size: "L", material: "cotton" }
-`}
+`,
+    },
+  ]}
 />
 
 A note: this is a **shallow** copy. If a property's value is itself
@@ -273,7 +318,10 @@ objects.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const a = { count: 0 };
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const a = { count: 0 };
 const b = a;
 b.count = 99;
 console.log("a:", a); // { count: 99 } — surprising if you weren't expecting it
@@ -283,7 +331,9 @@ const c = { ...a }; // copy
 c.count = "different";
 console.log("a:", a); // unchanged
 console.log("c:", c);
-`}
+`,
+    },
+  ]}
 />
 
 ## Comparing objects
@@ -294,7 +344,10 @@ considered equal unless they are *literally the same object*.
 
 <CodeBlock
   adapter="javascript"
-  starterCode={`const a = { x: 1 };
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const a = { x: 1 };
 const b = { x: 1 };
 const c = a;
 
@@ -305,7 +358,9 @@ console.log(a === c); // true  — same reference
 // doesn't have built in. A common trick (for simple data) is to compare
 // JSON strings:
 console.log(JSON.stringify(a) === JSON.stringify(b)); // true
-`}
+`,
+    },
+  ]}
 />
 
 The JSON trick has limitations (it can't handle functions, dates,
@@ -342,7 +397,7 @@ file uses them.
   files={[
     {
       filename: "index.js",
-      initialContent: `const { newPlayer, move, hit, describe } = require("./player");
+      starterCode: `const { newPlayer, move, hit, describe } = require("./player");
 
 let p = newPlayer("Ada");
 console.log(describe(p));
@@ -359,7 +414,7 @@ console.log(describe(p));
     },
     {
       filename: "player.js",
-      initialContent: `function newPlayer(name) {
+      starterCode: `function newPlayer(name) {
   return { name, x: 0, y: 0, hp: 100, alive: true };
 }
 
@@ -402,7 +457,10 @@ keeps the state of the program much easier to reason about.
 Examples:
 - \`mergeUser({name:"Ada",age:28}, {age:29})\` → \`{name:"Ada", age:29}\`
 - \`mergeUser({name:"Ada",age:28}, {age:undefined, role:"admin"})\` → \`{name:"Ada", age:28, role:"admin"}\``}
-  starterCode={`function mergeUser(base, updates) {
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `function mergeUser(base, updates) {
   // your code here
   return { ...base };
 }
@@ -411,8 +469,8 @@ console.log(mergeUser({ name: "Ada", age: 28 }, { age: 29 }));
 console.log(
   mergeUser({ name: "Ada", age: 28 }, { age: undefined, role: "admin" }),
 );
-`}
-  solutionCode={`function mergeUser(base, updates) {
+`,
+      solutionCode: `function mergeUser(base, updates) {
   const out = { ...base };
   for (const [key, value] of Object.entries(updates)) {
     if (value !== undefined) out[key] = value;
@@ -424,7 +482,9 @@ console.log(mergeUser({ name: "Ada", age: 28 }, { age: 29 }));
 console.log(
   mergeUser({ name: "Ada", age: 28 }, { age: undefined, role: "admin" }),
 );
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "override",

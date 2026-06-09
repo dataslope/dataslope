@@ -15,7 +15,10 @@ When Python sees `for item in collection:`, it calls `iter(collection)` to get a
 
 <CodeBlock
   adapter="python"
-  starterCode={`xs = [10, 20, 30]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `xs = [10, 20, 30]
 it = iter(xs)
 
 print(next(it))
@@ -26,7 +29,9 @@ try:
     print(next(it))
 except StopIteration:
     print("exhausted")
-`}
+`,
+    },
+  ]}
 />
 
 The `for` loop does exactly this, catching `StopIteration` invisibly.
@@ -56,7 +61,10 @@ You rarely call `next()` by hand, but understanding it clarifies how generators 
 
 <CodeBlock
   adapter="python"
-  starterCode={`data = ["alpha", "beta", "gamma"]
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `data = ["alpha", "beta", "gamma"]
 it = iter(data)
 
 # Pull one item
@@ -66,7 +74,9 @@ print(first)
 # Iterate over the rest
 for item in it:
     print(item)
-`}
+`,
+    },
+  ]}
 />
 
 Notice that after pulling `"alpha"` with `next()`, the `for` loop sees only what remains. Iterators are **stateful** and **single-pass**.
@@ -77,7 +87,10 @@ If you need complex state, write your own iterator with `__iter__` and `__next__
 
 <CodeBlock
   adapter="python"
-  starterCode={`class Countdown:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class Countdown:
     def __init__(self, start):
         self.current = start
 
@@ -93,7 +106,9 @@ If you need complex state, write your own iterator with `__iter__` and `__next__
 
 for n in Countdown(5):
     print(n)
-`}
+`,
+    },
+  ]}
 />
 
 The class returns `self` from `__iter__` because it *is* its own iterator. This pattern works but is verbose.
@@ -104,7 +119,10 @@ Writing `__iter__` and `__next__` by hand is tedious. A function that uses `yiel
 
 <CodeBlock
   adapter="python"
-  starterCode={`def countdown(n):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def countdown(n):
     while n > 0:
         yield n
         n -= 1
@@ -112,7 +130,9 @@ Writing `__iter__` and `__next__` by hand is tedious. A function that uses `yiel
 
 for x in countdown(5):
     print(x)
-`}
+`,
+    },
+  ]}
 />
 
 Each `yield` **pauses** the function and hands a value to the caller. The next `next()` call resumes the function right after that `yield`, with all local state (variables, the instruction pointer) intact.
@@ -127,7 +147,10 @@ Here's proof that local variables survive across `yield` calls:
 
 <CodeBlock
   adapter="python"
-  starterCode={`def stateful():
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def stateful():
     count = 0
     while count < 3:
         count += 1
@@ -138,7 +161,9 @@ gen = stateful()
 print(next(gen))
 print(next(gen))
 print(next(gen))
-`}
+`,
+    },
+  ]}
 />
 
 The `count` variable increments each time we resume. This is the superpower of generators: cheap, lazy iteration with arbitrary local state.
@@ -149,7 +174,10 @@ Generators can run forever. You take as much as you need and stop:
 
 <CodeBlock
   adapter="python"
-  starterCode={`def naturals():
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def naturals():
     n = 1
     while True:
         yield n
@@ -159,7 +187,9 @@ Generators can run forever. You take as much as you need and stop:
 from itertools import islice
 
 print(list(islice(naturals(), 10)))
-`}
+`,
+    },
+  ]}
 />
 
 Calling `list(naturals())` would hang forever. The `islice` adapter takes a finite slice, so it's safe. Infinite generators power `itertools.count`, `itertools.cycle`, and many streaming pipelines.
@@ -174,9 +204,14 @@ You've met list comprehensions. A **generator expression** uses `()` instead of 
 
 <CodeBlock
   adapter="python"
-  starterCode={`squares = (x * x for x in range(1_000_000))
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `squares = (x * x for x in range(1_000_000))
 print(sum(squares))
-`}
+`,
+    },
+  ]}
 />
 
 No million-item list is built. Each square is computed, added to the sum, and discarded. Memory usage is constant.
@@ -185,11 +220,16 @@ When a generator expression is the sole argument to a function, the inner parens
 
 <CodeBlock
   adapter="python"
-  starterCode={`# These are equivalent:
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# These are equivalent:
 total1 = sum((x * x for x in range(10)))
 total2 = sum(x * x for x in range(10))
 print(total1, total2)
-`}
+`,
+    },
+  ]}
 />
 
 ## Streaming pipelines
@@ -198,7 +238,10 @@ Generators chain naturally. Each stage processes one item at a time:
 
 <CodeBlock
   adapter="python"
-  starterCode={`def read_lines():
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def read_lines():
     """Simulate reading lines from a huge file."""
     for line in ["alpha", "  beta  ", "", "gamma", "  ", "delta", "zeta"]:
         yield line
@@ -221,7 +264,9 @@ pipeline = uppercase(clean(read_lines()))
 
 for item in pipeline:
     print(item)
-`}
+`,
+    },
+  ]}
 />
 
 No intermediate lists are built. Memory usage is O(1) regardless of how many lines flow through. This pattern is the backbone of big-data tools like Apache Spark's lazy transformations.
@@ -236,14 +281,19 @@ In production, you might chain generators to process log files too large for RAM
 
 <CodeBlock
   adapter="python"
-  starterCode={`def chain(*iterables):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def chain(*iterables):
     for it in iterables:
         yield from it
 
 
 for x in chain([1, 2], (3, 4), "ab"):
     print(x)
-`}
+`,
+    },
+  ]}
 />
 
 Without `yield from`, you'd write:
@@ -261,7 +311,10 @@ The `itertools` module is a treasure chest of lazy functions. A small sample:
 
 <CodeBlock
   adapter="python"
-  starterCode={`from itertools import (
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from itertools import (
     count,
     cycle,
     repeat,
@@ -294,7 +347,9 @@ print(list(accumulate([1, 2, 3, 4])))  # [1, 3, 6, 10]
 # Combinatorics
 print(list(combinations("abcd", 2)))  # [('a','b'), ('a','c'), ...]
 print(list(product("ab", "12")))  # [('a','1'), ('a','2'), ...]
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="itertools is your friend">
@@ -307,7 +362,10 @@ Once exhausted, a generator cannot be restarted:
 
 <CodeBlock
   adapter="python"
-  starterCode={`def gen():
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def gen():
     yield 1
     yield 2
 
@@ -315,7 +373,9 @@ Once exhausted, a generator cannot be restarted:
 g = gen()
 print(list(g))  # [1, 2]
 print(list(g))  # []  — already exhausted
-`}
+`,
+    },
+  ]}
 />
 
 If you need to iterate multiple times, either call the generator function again or materialize the result into a list (defeating laziness).
@@ -328,17 +388,22 @@ If you need to iterate multiple times, either call the generator function again 
   instructions={`Define a generator function \`take(n, iterable)\` that yields the first \`n\` items from \`iterable\`. If \`iterable\` has fewer than \`n\` items, yield all of them.
 
 Example: \`list(take(3, [1, 2, 3, 4, 5]))\` returns \`[1, 2, 3]\`.`}
-  starterCode={`def take(n, iterable):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def take(n, iterable):
     # your code here
     if False:
         yield None
-`}
-  solutionCode={`def take(n, iterable):
+`,
+      solutionCode: `def take(n, iterable):
     for i, item in enumerate(iterable):
         if i >= n:
             break
         yield item
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",
@@ -368,16 +433,21 @@ assert isinstance(take(3, [1, 2, 3]), types.GeneratorType)`,
   adapter="python"
   title="Infinite Fibonacci generator"
   instructions={`Define a generator function \`fib()\` that yields the Fibonacci sequence indefinitely, starting with \`0, 1, 1, 2, 3, 5, 8, ...\`. The tests will take a finite slice.`}
-  starterCode={`def fib():
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def fib():
     # your code here
     yield 0
-`}
-  solutionCode={`def fib():
+`,
+      solutionCode: `def fib():
     a, b = 0, 1
     while True:
         yield a
         a, b = b, a + b
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "is_generator",
@@ -407,19 +477,24 @@ assert f[20] == 6765`,
   instructions={`Define a generator function \`running_avg(iterable)\` that yields the running average of the items seen so far.
 
 Example: \`list(running_avg([10, 20, 30]))\` returns \`[10.0, 15.0, 20.0]\`.`}
-  starterCode={`def running_avg(iterable):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def running_avg(iterable):
     # your code here
     if False:
         yield 0.0
-`}
-  solutionCode={`def running_avg(iterable):
+`,
+      solutionCode: `def running_avg(iterable):
     total = 0
     count = 0
     for item in iterable:
         total += item
         count += 1
         yield total / count
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",
@@ -452,12 +527,15 @@ assert result == expected`,
   instructions={`Define a generator function \`batched(iterable, n)\` that yields tuples of \`n\` consecutive items from \`iterable\`. If the final batch has fewer than \`n\` items, yield it as-is.
 
 Example: \`list(batched([1, 2, 3, 4, 5], 2))\` returns \`[(1, 2), (3, 4), (5,)]\`.`}
-  starterCode={`def batched(iterable, n):
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def batched(iterable, n):
     # your code here
     if False:
         yield ()
-`}
-  solutionCode={`def batched(iterable, n):
+`,
+      solutionCode: `def batched(iterable, n):
     it = iter(iterable)
     while True:
         batch = tuple(islice(it, n))
@@ -467,7 +545,9 @@ Example: \`list(batched([1, 2, 3, 4, 5], 2))\` returns \`[(1, 2), (3, 4), (5,)]\
 
 
 from itertools import islice
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",

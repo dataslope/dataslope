@@ -27,22 +27,32 @@ Watch the geom change while everything else stays fixed:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 base <- ggplot(mpg, aes(displ, hwy))
 
 base + geom_point() # marks = points  -> scatter plot
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 base <- ggplot(mpg, aes(displ, hwy))
 
 base + geom_smooth() # marks = a smoothed trend line + confidence band
-`}
+`,
+    },
+  ]}
 />
 
 You changed exactly one word and the chart's *character* changed
@@ -76,12 +86,17 @@ time). Using a line on unordered data produces the dreaded "spaghetti":
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # economics is a time series shipped with ggplot2: unemployment over time.
 ggplot(economics, aes(x = date, y = unemploy)) +
   geom_line(color = "steelblue")
-`}
+`,
+    },
+  ]}
 />
 
 A line is right here because `date` is ordered. On `mpg`'s `displ`

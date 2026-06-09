@@ -13,7 +13,10 @@ they can see file-scope variables defined by the learner's code.
   adapter="php"
   title="Greeting function"
   instructions={`Define a function \`greet($name)\` that returns the string \`"Hello, NAME!"\` with \`NAME\` replaced by the argument.`}
-  starterCode={`<?php
+  files={[
+    {
+      filename: "main.php",
+      starterCode: `<?php
 
 function greet($name)
 {
@@ -22,8 +25,8 @@ function greet($name)
 }
 
 echo greet('World') . "\\n";
-`}
-  solutionCode={`<?php
+`,
+      solutionCode: `<?php
 
 function greet(string $name): string
 {
@@ -32,7 +35,9 @@ function greet(string $name): string
 
 echo greet('Ada') . "\\n";
 echo greet('Linus') . "\\n";
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",
@@ -54,7 +59,10 @@ echo greet('Linus') . "\\n";
   adapter="php"
   title="Greeting function"
   instructions={`Define a function \`greet($name)\` that returns the string \`"Hello, NAME!"\` with \`NAME\` replaced by the argument.`}
-  starterCode={`<?php
+  files={[
+    {
+      filename: "main.php",
+      starterCode: `<?php
 
 function greet($name)
 {
@@ -63,8 +71,8 @@ function greet($name)
 }
 
 echo greet('World') . "\\n";
-`}
-  solutionCode={`<?php
+`,
+      solutionCode: `<?php
 
 function greet(string $name): string
 {
@@ -73,7 +81,9 @@ function greet(string $name): string
 
 echo greet('Ada') . "\\n";
 echo greet('Linus') . "\\n";
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "basic",
@@ -97,21 +107,24 @@ echo greet('Linus') . "\\n";
   adapter="php"
   title="Sum prices for in-stock items"
   instructions={`Given the \`$items\` array of associative arrays, compute the sum of \`price\` across all items where \`in_stock\` is true. Assign the result to \`$total\`.`}
-  initCode={`<?php
+  files={[
+    {
+      filename: "main.php",
+      initCode: `<?php
 $items = [
     ["name" => "A", "price" => 10.0, "in_stock" => true],
     ["name" => "B", "price" => 15.5, "in_stock" => false],
     ["name" => "C", "price" => 7.25, "in_stock" => true],
     ["name" => "D", "price" => 12.0, "in_stock" => true],
 ];
-`}
-  starterCode={`<?php
+`,
+      starterCode: `<?php
 
 $total = 0; // TODO
 
 echo $total;
-`}
-  solutionCode={`<?php
+`,
+      solutionCode: `<?php
 
 $total = 0.0;
 foreach ($items as $item) {
@@ -120,7 +133,9 @@ foreach ($items as $item) {
 }
 
 echo $total;
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type",
@@ -142,21 +157,24 @@ echo $total;
   adapter="php"
   title="Sum prices for in-stock items"
   instructions={`Given the \`$items\` array of associative arrays, compute the sum of \`price\` across all items where \`in_stock\` is true. Assign the result to \`$total\`.`}
-  initCode={`<?php
+  files={[
+    {
+      filename: "main.php",
+      initCode: `<?php
 $items = [
     ["name" => "A", "price" => 10.0, "in_stock" => true],
     ["name" => "B", "price" => 15.5, "in_stock" => false],
     ["name" => "C", "price" => 7.25, "in_stock" => true],
     ["name" => "D", "price" => 12.0, "in_stock" => true],
 ];
-`}
-  starterCode={`<?php
+`,
+      starterCode: `<?php
 
 $total = 0; // TODO
 
 echo $total;
-`}
-  solutionCode={`<?php
+`,
+      solutionCode: `<?php
 
 $total = 0.0;
 foreach ($items as $item) {
@@ -165,7 +183,9 @@ foreach ($items as $item) {
 }
 
 echo $total;
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type",
@@ -188,17 +208,22 @@ echo $total;
 <ChallengeCard
   adapter="php"
   title="Print the multiplication table for 7"
-  starterCode={`<?php
+  files={[
+    {
+      filename: "main.php",
+      starterCode: `<?php
 
 // Print 7 × 1 through 7 × 5, one per line.
-`}
-  instructions={`Print five lines, where line *i* reads \`7 x i = (7*i)\`. Example first line: \`7 x 1 = 7\`.`}
-  solutionCode={`<?php
+`,
+      solutionCode: `<?php
 
 for ($i = 1; $i <= 5; $i++) {
     echo "7 x $i = " . (7 * $i) . "\\n";
 }
-`}
+`,
+    },
+  ]}
+  instructions={`Print five lines, where line *i* reads \`7 x i = (7*i)\`. Example first line: \`7 x 1 = 7\`.`}
   tests={[
     {
       id: "lines",
@@ -222,17 +247,22 @@ for ($i = 1; $i <= 5; $i++) {
 <ChallengeCard
   adapter="php"
   title="Print the multiplication table for 7"
-  starterCode={`<?php
+  files={[
+    {
+      filename: "main.php",
+      starterCode: `<?php
 
 // Print 7 × 1 through 7 × 5, one per line.
-`}
-  instructions={`Print five lines, where line *i* reads \`7 x i = (7*i)\`. Example first line: \`7 x 1 = 7\`.`}
-  solutionCode={`<?php
+`,
+      solutionCode: `<?php
 
 for ($i = 1; $i <= 5; $i++) {
     echo "7 x $i = " . (7 * $i) . "\\n";
 }
-`}
+`,
+    },
+  ]}
+  instructions={`Print five lines, where line *i* reads \`7 x i = (7*i)\`. Example first line: \`7 x 1 = 7\`.`}
   tests={[
     {
       id: "lines",
@@ -268,7 +298,7 @@ sibling files.
   files={[
     {
       filename: "main.php",
-      initialContent: `<?php
+      starterCode: `<?php
 
 require_once 'utils.php';
 echo greet('World');
@@ -276,7 +306,7 @@ echo greet('World');
     },
     {
       filename: "utils.php",
-      initialContent: `<?php
+      starterCode: `<?php
 
 function greet($name)
 {
@@ -284,7 +314,7 @@ function greet($name)
     return '';
 }
 `,
-      solutionContent: `<?php
+      solutionCode: `<?php
 
 function greet($name)
 {
@@ -307,12 +337,12 @@ function greet($name)
 <ChallengeCard
   adapter="php"
   title="Implement greet() in utils.php"
-  instructions={`Open utils.php and implement greet($name) ...`}
+  instructions={`Open \`utils.php\` and implement \`greet($name)\` so that it returns the string \`"Hello, <name>!"\`. The entry script \`main.php\` already requires your file and echoes the result.`}
   entryFilename="main.php"
   files={[
     {
       filename: "main.php",
-      initialContent: `<?php
+      starterCode: `<?php
 
 require_once 'utils.php';
 echo greet('World');
@@ -320,14 +350,15 @@ echo greet('World');
     },
     {
       filename: "utils.php",
-      initialContent: `<?php
+      starterCode: `<?php
 
 function greet($name)
 {
+    // your code here
     return '';
 }
 `,
-      solutionContent: `<?php
+      solutionCode: `<?php
 
 function greet($name)
 {

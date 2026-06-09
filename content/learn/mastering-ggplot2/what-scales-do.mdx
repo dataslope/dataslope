@@ -50,23 +50,33 @@ scale ggplot2 was adding silently:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # Default: the x scale is implicit.
 ggplot(mpg, aes(displ, hwy)) +
   geom_point()
-`}
+`,
+    },
+  ]}
 />
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 # Identical result, but the x scale is now explicit.
 ggplot(mpg, aes(displ, hwy)) +
   geom_point() +
   scale_x_continuous()
-`}
+`,
+    },
+  ]}
 />
 
 You add a scale explicitly only when you want to **change** something
@@ -86,7 +96,10 @@ labeled. Concretely, you reach for a scale to set:
 
 <CodeBlock
   adapter="r"
-  starterCode={`library(ggplot2)
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
 
 ggplot(mpg, aes(displ, hwy)) +
   geom_point() +
@@ -95,7 +108,9 @@ ggplot(mpg, aes(displ, hwy)) +
     breaks = c(2, 4, 6),
     labels = c("2L", "4L", "6L")
   )
-`}
+`,
+    },
+  ]}
 />
 
 The points did not move in *meaning*; you only changed how the x scale

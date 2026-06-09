@@ -40,7 +40,10 @@ page is what happens when you start combining Bernoulli trials.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from scipy import stats
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from scipy import stats
 
 # A visitor converts with probability p = 0.3.
 p = 0.3
@@ -54,7 +57,9 @@ print("variance (= p(1-p))   =", round(float(b.var()), 4))
 # Simulate 10 visitors (1 = converted, 0 = not).
 sample = b.rvs(size=10, random_state=0)
 print("\\n10 simulated visitors:", sample)
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="The frozen-distribution pattern you'll reuse everywhere">
@@ -94,7 +99,10 @@ and its variance is `np(1 − p)`.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from scipy import stats
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from scipy import stats
 
 # 200 visitors, each converts independently with probability 0.03.
 n, p = 200, 0.03
@@ -109,7 +117,9 @@ print(f"P(at most 4 convert)          = {d.cdf(4):.4f}")
 # but more accurate in the tail. Note .sf(9) = P(X > 9) = P(X >= 10).
 print(f"P(10 or more convert) sf(9)   = {d.sf(9):.4f}")
 print(f"same via 1 - cdf(9)           = {1 - d.cdf(9):.4f}")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Off-by-one: P(X ≥ k) is .sf(k − 1), not .sf(k)">
@@ -129,7 +139,10 @@ possible count, with bar heights summing to 1.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.express as px
 from scipy import stats
 
@@ -149,7 +162,9 @@ fig = px.bar(
 fig.show()
 
 print("Most likely outcomes cluster around the mean of", d.mean())
-`}
+`,
+    },
+  ]}
 />
 
 ### The binomial assumptions (where it breaks)
@@ -187,23 +202,28 @@ Hints:
 - Build a frozen distribution \`d = stats.binom(n, p)\`.
 - The mean is \`d.mean()\`.
 - \`P(X >= 25)\` is the survival function evaluated at **24**: \`d.sf(24)\` (because \`.sf(k)\` is \`P(X > k)\`).`}
-  initCode={`from scipy import stats
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from scipy import stats
 n = 500
-p = 0.04`}
-  starterCode={`# TODO: build the distribution and compute the two values
+p = 0.04`,
+      starterCode: `# TODO: build the distribution and compute the two values
 expected = None
 p_at_least_25 = None
 
 print("expected:", expected)
 print("P(X >= 25):", p_at_least_25)
-`}
-  solutionCode={`d = stats.binom(n, p)
+`,
+      solutionCode: `d = stats.binom(n, p)
 expected = float(d.mean())
 p_at_least_25 = float(d.sf(24))  # P(X > 24) = P(X >= 25)
 
 print("expected:", expected)
 print("P(X >= 25):", p_at_least_25)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "expected_type",
@@ -275,7 +295,10 @@ more** — a spike worth staffing for?
 
 <CodeBlock
   adapter="python"
-  starterCode={`from scipy import stats
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from scipy import stats
 
 # Average rate: 3 tickets per hour.
 lam = 3
@@ -290,7 +313,9 @@ print(f"P(0 tickets this hour)         = {d.pmf(0):.4f}")
 p_spike = d.sf(7)
 print(f"\\nP(8 or more tickets) = {p_spike:.4f}  (~{p_spike * 100:.1f}% of hours)")
 print("So a spike that big happens in roughly 1 hour out of 84.")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="tip" title="Scaling the rate to the interval">
@@ -332,22 +357,27 @@ Hints:
 
 - \`d = stats.poisson(mu=4.5)\`.
 - \`P(X > 9)\` is exactly \`d.sf(9)\` (the survival function).`}
-  initCode={`from scipy import stats
-rate = 4.5`}
-  starterCode={`# TODO: build the Poisson model and compute the two values
+  files={[
+    {
+      filename: "main.py",
+      initCode: `from scipy import stats
+rate = 4.5`,
+      starterCode: `# TODO: build the Poisson model and compute the two values
 mean_errors = None
 p_more_than_9 = None
 
 print("mean errors/min:", mean_errors)
 print("P(X > 9):", p_more_than_9)
-`}
-  solutionCode={`d = stats.poisson(mu=rate)
+`,
+      solutionCode: `d = stats.poisson(mu=rate)
 mean_errors = float(d.mean())
 p_more_than_9 = float(d.sf(9))  # P(X > 9)
 
 print("mean errors/min:", mean_errors)
 print("P(X > 9):", p_more_than_9)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "mean_type",
@@ -389,7 +419,10 @@ succeeds, days until the first failure.
 
 <CodeBlock
   adapter="python"
-  starterCode={`from scipy import stats
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from scipy import stats
 
 # Each call closes a sale with probability 0.2.
 p = 0.2
@@ -401,7 +434,9 @@ print(f"Expected calls until first sale (1/p) = {d.mean()}")
 print(f"P(first sale on the 1st call)         = {d.pmf(1):.4f}")
 print(f"P(first sale on the 5th call)         = {d.pmf(5):.4f}")
 print(f"P(more than 10 calls needed)          = {d.sf(10):.4f}")
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Watch the convention: scipy's geom starts at 1">
@@ -447,7 +482,10 @@ your confidence the model is set up correctly.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(0)
@@ -463,7 +501,9 @@ empirical = np.mean(hours >= 8)
 print(f"Analytic  P(X >= 8) = {analytic:.4f}")
 print(f"Simulated P(X >= 8) = {empirical:.4f}")
 print("\\nClose agreement = the model is set up correctly.")
-`}
+`,
+    },
+  ]}
 />
 
 ## Check your understanding

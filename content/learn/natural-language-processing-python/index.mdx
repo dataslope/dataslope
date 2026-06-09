@@ -104,7 +104,10 @@ are curious what is being loaded for you.
 
 <CodeBlock
   adapter="python"
-  initCode={`# ── NLTK setup (read-only) ─────────────────────────────────────────────
+  files={[
+    {
+      filename: "main.py",
+      initCode: `# ── NLTK setup (read-only) ─────────────────────────────────────────────
 # Installs NLTK and loads just the data this page needs. nltk.download()
 # isn't available in this environment, so we fetch the data archives
 # directly and unpack them into NLTK's data directory.
@@ -134,8 +137,8 @@ await _load_nltk("corpora", "stopwords")
 await _load_nltk("corpora", "wordnet")
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer`}
-  starterCode={`text = (
+from nltk.stem import WordNetLemmatizer`,
+      starterCode: `text = (
     "Natural language processing lets computers work with human language. "
     "It powers the search bars, spam filters, and assistants you use daily."
 )
@@ -157,7 +160,9 @@ lemmas = [lemmatizer.lemmatize(w) for w in content]
 print("Tokens:  ", tokens)
 print("Content: ", content)
 print("Lemmas:  ", lemmas)
-`}
+`,
+    },
+  ]}
 />
 
 Five short steps, and a result a program can actually work with. You do not

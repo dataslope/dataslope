@@ -61,7 +61,10 @@ sources:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.default_rng(42)
 
@@ -74,7 +77,9 @@ print(week)
 print(f"\\nHighest day is {week.max():.0f}, lowest is {week.min():.0f}.")
 print("If you only saw two of these days, you might invent a 'trend'")
 print("that isn't there.")
-`}
+`,
+    },
+  ]}
 />
 
 Nothing in that business changed, yet the numbers swing by 30+ units.
@@ -91,7 +96,10 @@ your first thought should not be "*A is better*" — it should be
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 
 rng = np.random.default_rng(0)
 
@@ -106,7 +114,9 @@ for trial in range(5):
     )
 
 print("\\nSame underlying truth every time — the gap is just noise.")
-`}
+`,
+    },
+  ]}
 />
 
 Watch the `gap` column: +2, then −3, then +1... There's no real

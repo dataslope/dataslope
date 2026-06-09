@@ -102,7 +102,10 @@ simulation.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy import stats
 
 rng = np.random.default_rng(42)
@@ -135,7 +138,9 @@ print(f"t-based   95% CI = ({t_low:.3f}, {t_high:.3f})")
 print()
 print("The two CIs nearly agree — the bootstrap reproduces the formula")
 print("for the mean, then generalizes to statistics that HAVE no formula.")
-`}
+`,
+    },
+  ]}
 />
 
 The bootstrap standard error and the `s / √n` formula match closely,
@@ -162,7 +167,10 @@ is *identical* to the mean case except for one word.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import plotly.express as px
 
 rng = np.random.default_rng(7)
@@ -195,7 +203,9 @@ print(f"bootstrap SE     = {boot_se:,.0f}")
 print(f"95% percentile CI= ({ci_low:,.0f}, {ci_high:,.0f})")
 print()
 print("No median-SE formula needed — the resampling did the work.")
-`}
+`,
+    },
+  ]}
 />
 
 The histogram *is* the sampling distribution of the median,
@@ -274,17 +284,20 @@ Steps:
 - \`ci\` = the **2.5th and 97.5th percentiles** of the recorded medians, as a tuple of two floats with \`ci[0] < ci[1]\`.
 
 Use \`np.percentile(boot, [2.5, 97.5])\`.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 rng = np.random.default_rng(123)
 data = rng.lognormal(mean=3.0, sigma=0.5, size=80)
-B = 4000`}
-  starterCode={`import numpy as np
+B = 4000`,
+      starterCode: `import numpy as np
 
 # TODO: fill boot with B bootstrap medians, then take the 2.5/97.5 percentiles
 boot = np.empty(B)
 ci = None
-`}
-  solutionCode={`import numpy as np
+`,
+      solutionCode: `import numpy as np
 
 boot = np.empty(B)
 for i in range(B):
@@ -294,7 +307,9 @@ for i in range(B):
 low, high = np.percentile(boot, [2.5, 97.5])
 ci = (float(low), float(high))
 print(ci)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "shape",
@@ -341,17 +356,20 @@ assert 0.5 * ref < got < 2.0 * ref`,
 - \`boot_se = float(np.std(boot_means, ddof=1))\`.
 
 The bootstrap SE should land close to the textbook \`data.std(ddof=1) / sqrt(len(data))\`.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 rng = np.random.default_rng(7)
 data = rng.normal(50.0, 8.0, size=100)
-B = 4000`}
-  starterCode={`import numpy as np
+B = 4000`,
+      starterCode: `import numpy as np
 
 # TODO: collect B bootstrap means, then set boot_se = their std (ddof=1)
 boot_means = np.empty(B)
 boot_se = None
-`}
-  solutionCode={`import numpy as np
+`,
+      solutionCode: `import numpy as np
 
 boot_means = np.empty(B)
 for i in range(B):
@@ -360,7 +378,9 @@ for i in range(B):
 
 boot_se = float(np.std(boot_means, ddof=1))
 print(boot_se)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "type",

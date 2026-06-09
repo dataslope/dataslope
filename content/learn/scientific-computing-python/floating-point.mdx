@@ -32,7 +32,10 @@ You can pry the bits open and look:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import struct
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import struct
 
 
 def bits(x):
@@ -48,7 +51,9 @@ for x in [1.0, 2.0, 0.5, 0.1, -3.0, float("inf"), float("nan")]:
     print(
         f"{x!r:>25}  sign={s}  exp={e:4d} (unbiased={e - 1023:+5d})  mantissa=0x{m:013x}"
     )
-`}
+`,
+    },
+  ]}
 />
 
 A few things to notice:
@@ -68,7 +73,10 @@ constant in numerical analysis.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import sys, math
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import sys, math
 
 eps = sys.float_info.epsilon
 print(f"epsilon          = {eps}")
@@ -78,7 +86,9 @@ print(f"1 + eps/2 == 1?  {1 + eps / 2 == 1}")
 
 # log2(eps) tells us how many bits of relative precision we have:
 print(f"bits of precision = {-math.log2(eps):.0f}")
-`}
+`,
+    },
+  ]}
 />
 
 When you read a number off a `print(x)`, you can usually trust the
@@ -102,7 +112,10 @@ silently producing a finite garbage result).
 
 <CodeBlock
   adapter="python"
-  starterCode={`import math
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import math
 import numpy as np
 
 print(1.0 / 0.0 if False else float("inf"))
@@ -115,7 +128,9 @@ arr = np.array([1.0, 2.0, np.nan, 4.0])
 print("sum  =", arr.sum())  # -> nan
 print("mean =", arr.mean())  # -> nan
 print("nansum =", np.nansum(arr))  # -> ignores NaN
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="warn" title="Always check for NaN at the boundary">
@@ -135,7 +150,10 @@ that plain "round half up" would introduce.
 
 <CodeBlock
   adapter="python"
-  starterCode={`# Python's built-in round() also uses banker's rounding
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Python's built-in round() also uses banker's rounding
 print(round(0.5))  # 0
 print(round(1.5))  # 2
 print(round(2.5))  # 2
@@ -143,7 +161,9 @@ print(round(3.5))  # 4
 
 # This is *not* a Python bug — it is the IEEE 754 standard.
 # Banker's rounding keeps the average rounding error at zero.
-`}
+`,
+    },
+  ]}
 />
 
 ## Comparing floats
@@ -154,7 +174,10 @@ and *relative* tolerance:
 
 <CodeBlock
   adapter="python"
-  starterCode={`import math, numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import math, numpy as np
 
 a = 0.1 + 0.2
 b = 0.3
@@ -166,7 +189,9 @@ print(np.isclose(a, b, atol=1e-12, rtol=1e-9))  # True
 x = np.linspace(0, 1, 5)
 y = (x * 3) / 3
 print(np.allclose(x, y))  # True
-`}
+`,
+    },
+  ]}
 />
 
 The rule of thumb: `rtol` should be a few times machine epsilon if
@@ -188,7 +213,10 @@ The classic example: a midpoint approximation of the derivative.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import math
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import math
 import numpy as np
 
 # f'(x) ≈ (f(x+h) - f(x-h)) / (2h)   for small h
@@ -202,7 +230,9 @@ for k in range(0, 18):
     est = (f(x0 + h) - f(x0 - h)) / (2 * h)
     err = abs(est - fp(x0))
     print(f"  10^{-k:>3d}     {err:.3e}")
-`}
+`,
+    },
+  ]}
 />
 
 Truncation error shrinks like $h^2$ at first — you can see the
@@ -226,7 +256,10 @@ subtract the maximum first.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 from scipy.special import logsumexp
 
 xs = np.array([1000.0, 1001.0, 999.0])
@@ -242,7 +275,9 @@ print("manual  =", stable)
 
 # SciPy already implements this
 print("logsumexp =", logsumexp(xs))
-`}
+`,
+    },
+  ]}
 />
 
 The naive answer is `inf`. The stable answer is around $1001.41$.
@@ -267,13 +302,16 @@ $$\\bar\{x\} = \\frac\{1\}\{n\}\\sum_i x_i, \\qquad \\mathrm\{Var\}(x) = \\frac\
 
 The naive implementation is provided as \`naive_variance\` so you
 can see what it returns.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 
 def naive_variance(xs):
     xs = np.asarray(xs, dtype=float)
     return (xs**2).mean() - xs.mean()**2
-`}
-  starterCode={`def stable_variance(xs):
+`,
+      starterCode: `def stable_variance(xs):
     # TODO: two-pass algorithm
     return 0.0
 
@@ -283,12 +321,14 @@ data = [1e9 + 1, 1e9 + 2, 1e9 + 3, 1e9 + 4, 1e9 + 5]
 print("naive  =", naive_variance(data))
 print("stable =", stable_variance(data))
 print("numpy  =", np.var(data))
-`}
-  solutionCode={`def stable_variance(xs):
+`,
+      solutionCode: `def stable_variance(xs):
     xs = np.asarray(xs, dtype=float)
     mean = xs.mean()
     return ((xs - mean) ** 2).mean()
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "matches_numpy_simple",

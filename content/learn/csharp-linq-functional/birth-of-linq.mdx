@@ -65,7 +65,10 @@ shape of query target four different data sources.
 
 <CodeBlock
   adapter="csharp"
-  starterCode={`using System;
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Xml.Linq;
@@ -92,7 +95,9 @@ var ages = new[] { 36, 41, 29, 52, 33, 27 };
 var bucketed = ages.GroupBy(a => a / 10 * 10).OrderBy(g => g.Key).Select(g => $"{g.Key}s: {g.Count()}");
 
 Console.WriteLine("Group:   " + string.Join(" | ", bucketed));
-`}
+`,
+    },
+  ]}
 />
 
 Three different data sources. **The same operators.** That is the

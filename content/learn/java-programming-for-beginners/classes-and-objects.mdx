@@ -32,7 +32,10 @@ class's **fields** (its state) and can respond to the class's
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Dog rex = new Dog("Rex", 4);
     Dog luna = new Dog("Luna", 2);
@@ -61,7 +64,9 @@ class Dog {
 
   void haveBirthday() { age = age + 1; }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Pay attention to the punctuation:
@@ -134,7 +139,7 @@ has more than one class, we will show each in its own file.
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Book hp = new Book("Harry Potter", "J. K. Rowling", 1997);
     Book lr = new Book("The Lord of the Rings", "J. R. R. Tolkien", 1954);
@@ -149,7 +154,7 @@ has more than one class, we will show each in its own file.
     },
     {
       filename: "Book.java",
-      initialContent: `public class Book {
+      starterCode: `public class Book {
   private final String title;
   private final String author;
   private final int year;
@@ -207,7 +212,10 @@ special value `null`. Calling a method on `null` throws a
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     String s = null;
 
@@ -219,7 +227,9 @@ special value `null`. Calling a method on `null` throws a
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 We will return to exceptions later. For now: when you see
@@ -273,7 +283,7 @@ d=1
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Counter c = new Counter();
     c.bump();
@@ -289,11 +299,11 @@ d=1
     },
     {
       filename: "Counter.java",
-      initialContent: `public class Counter {
+      starterCode: `public class Counter {
   // TODO: implement
 }
 `,
-      solutionContent: `public class Counter {
+      solutionCode: `public class Counter {
   private int value = 0;
 
   public void bump() { value++; }

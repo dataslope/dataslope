@@ -32,7 +32,10 @@ flowchart TB
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int[] xs = {10, 20, 30};
 
@@ -48,7 +51,9 @@ flowchart TB
     System.out.println("program continues normally");
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Three keywords:
@@ -121,7 +126,10 @@ catch, the method must declare it:
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     try {
       int age = parseAge("not a number");
@@ -147,7 +155,9 @@ catch, the method must declare it:
 class BadInputException extends Exception {
   public BadInputException(String message) { super(message); }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Notice the **wrapping** technique: we catch the JDK's
@@ -228,7 +238,7 @@ a normal end of input, use a `boolean hasNext()` instead.
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     printSafe("42");
     printSafe("oops");
@@ -249,7 +259,7 @@ a normal end of input, use a `boolean hasNext()` instead.
     },
     {
       filename: "SafeParser.java",
-      initialContent: `public class SafeParser {
+      starterCode: `public class SafeParser {
   public static int parse(String s) {
     if (s == null) {
       throw new IllegalArgumentException("input was null");
@@ -335,7 +345,7 @@ done
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     System.out.println("10/2 = " + SafeMath.divide(10, 2));
     try {
@@ -351,14 +361,14 @@ done
     },
     {
       filename: "SafeMath.java",
-      initialContent: `public class SafeMath {
+      starterCode: `public class SafeMath {
   public static int divide(int a, int b) {
     // TODO
     return 0;
   }
 }
 `,
-      solutionContent: `public class SafeMath {
+      solutionCode: `public class SafeMath {
   public static int divide(int a, int b) {
     if (b == 0) {
       throw new IllegalArgumentException("cannot divide by zero");

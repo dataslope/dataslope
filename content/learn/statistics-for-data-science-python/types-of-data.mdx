@@ -134,7 +134,10 @@ flowchart TD
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 # A small mixed-type dataset: each column is a different data type.
 df = pd.DataFrame(
@@ -161,7 +164,9 @@ print()
 print(f"mean logins (discrete):        {df['logins'].mean():.2f}")
 print(f"median monthly_spend:          {df['monthly_spend'].median():.2f}")
 print(f"std  monthly_spend:            {df['monthly_spend'].std():.2f}")
-`}
+`,
+    },
+  ]}
 />
 
 Notice that `user_id` is stored as an integer, so pandas reports its
@@ -176,7 +181,10 @@ you a number. The dtype is `int64`; the meaning is gibberish.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 df = pd.DataFrame(
     {
@@ -203,7 +211,9 @@ print("Correct summaries instead:")
 print("  zip_code     -> count distinct / mode:", df["zip_code"].mode().tolist())
 print("  rating_1to5  -> median:", df["rating_1to5"].median())
 print("  price_usd    -> mean is fine:", round(df["price_usd"].mean(), 2))
-`}
+`,
+    },
+  ]}
 />
 
 The averaged zip code (~48,705) isn't a place; it's the centroid of
@@ -257,7 +267,10 @@ Two practical moves. First, convert genuine categoricals to the
 
 <CodeBlock
   adapter="python"
-  starterCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 from pandas.api.types import CategoricalDtype
 
 df = pd.DataFrame(
@@ -285,7 +298,9 @@ print(
     "-> averaging it is off the table",
 )
 print(df["region_code"].value_counts())
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Likert scales: the gray zone">
@@ -314,7 +329,10 @@ Classify by **meaning**, not by dtype. The columns are:
 - \`customer_id\` (an identifier), \`country\` (a label), \`satisfaction\` (1–5 rating), \`num_purchases\` (a count), \`account_balance\` (a dollar amount).
 
 \`types\` must have exactly those 5 keys.`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 
 df = pd.DataFrame({
     "customer_id":    [501, 502, 503, 504],
@@ -322,8 +340,8 @@ df = pd.DataFrame({
     "satisfaction":   [4, 5, 2, 3],
     "num_purchases":  [1, 0, 7, 3],
     "account_balance":[120.50, 0.0, 980.25, 45.10],
-})`}
-  starterCode={`# TODO: classify each column by its STATISTICAL type (not its dtype)
+})`,
+      starterCode: `# TODO: classify each column by its STATISTICAL type (not its dtype)
 types = {
     "customer_id": None,
     "country": None,
@@ -331,8 +349,8 @@ types = {
     "num_purchases": None,
     "account_balance": None,
 }
-`}
-  solutionCode={`types = {
+`,
+      solutionCode: `types = {
     "customer_id": "nominal",  # an ID that looks numeric
     "country": "nominal",  # unordered label
     "satisfaction": "ordinal",  # ordered 1-5 rating, uneven gaps
@@ -340,7 +358,9 @@ types = {
     "account_balance": "continuous",  # a measured dollar amount
 }
 print(types)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "keys",
@@ -388,27 +408,32 @@ assert types["country"] == "nominal"`,
 - \`"price_mean"\` — the **mean** of the continuous \`price\` column, as a float.
 
 The point: mode for nominal, median for ordinal, mean for continuous — *not* a mean for all three.`}
-  initCode={`import pandas as pd
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 
 df = pd.DataFrame({
     "country": ["US", "US", "UK", "CA", "US", "UK"],  # nominal
     "rating":  [5, 3, 4, 4, 2, 5],                     # ordinal (1-5)
     "price":   [19.99, 5.0, 42.5, 8.25, 30.0, 12.0],   # continuous
-})`}
-  starterCode={`# TODO: pick the summary that MATCHES each column's type
+})`,
+      starterCode: `# TODO: pick the summary that MATCHES each column's type
 summary = {
     "country_mode": None,
     "rating_median": None,
     "price_mean": None,
 }
-`}
-  solutionCode={`summary = {
+`,
+      solutionCode: `summary = {
     "country_mode": str(df["country"].mode()[0]),
     "rating_median": float(df["rating"].median()),
     "price_mean": float(df["price"].mean()),
 }
 print(summary)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "keys",

@@ -53,7 +53,10 @@ bullseye. Each dart is the model's prediction; the bullseye is the truth.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 
 rng = np.random.default_rng(1)
@@ -77,7 +80,9 @@ for ax, (title, center, spread) in zip(axes.ravel(), settings):
     ax.set_title(title, fontsize=10)
 plt.tight_layout()
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 - **Low bias, low variance** (top-left): darts cluster tightly on the
@@ -104,7 +109,10 @@ low-variance model produces nearly the same curve every time.
 
 <CodeBlock
   adapter="python"
-  starterCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
@@ -152,7 +160,9 @@ for ax, degree, label in zip(
     ax.legend(fontsize=9)
 plt.tight_layout()
 plt.show()
-`}
+`,
+    },
+  ]}
 />
 
 The left panel (degree 1) shows gray lines that barely move — **low
@@ -257,7 +267,10 @@ pipeline = \`flexible\`):
 
 The tests check both variances are computed and that
 \`var_flexible > var_simple\` — the flexible model is far less stable.`}
-  initCode={`import numpy as np
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import make_pipeline
@@ -270,8 +283,8 @@ def make_dataset():
 
 x_star = np.array([[2.0]])
 simple = make_pipeline(PolynomialFeatures(1), LinearRegression())
-flexible = make_pipeline(PolynomialFeatures(15), LinearRegression())`}
-  starterCode={`var_simple = None
+flexible = make_pipeline(PolynomialFeatures(15), LinearRegression())`,
+      starterCode: `var_simple = None
 var_flexible = None
 
 # TODO: refit each model on 60 fresh datasets, collect predictions at x_star,
@@ -279,8 +292,8 @@ var_flexible = None
 
 print("var_simple:", var_simple)
 print("var_flexible:", var_flexible)
-`}
-  solutionCode={`def variance_at_point(model):
+`,
+      solutionCode: `def variance_at_point(model):
     preds = []
     for _ in range(60):
         X, y = make_dataset()
@@ -294,7 +307,9 @@ var_flexible = variance_at_point(flexible)
 
 print("var_simple:", var_simple)
 print("var_flexible:", var_flexible)
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "computed",

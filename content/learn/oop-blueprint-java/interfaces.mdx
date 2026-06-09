@@ -40,7 +40,7 @@ opposed to `<|--` for "extends a class"). In Java, the keywords are
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Noisy[] things = {new Dog(), new Doorbell(), new MotionSensor()};
     for (Noisy n : things) {
@@ -52,14 +52,14 @@ opposed to `<|--` for "extends a class"). In Java, the keywords are
     },
     {
       filename: "Noisy.java",
-      initialContent: `public interface Noisy {
+      starterCode: `public interface Noisy {
   String sound();
 }
 `,
     },
     {
       filename: "Dog.java",
-      initialContent: `public class Dog implements Noisy {
+      starterCode: `public class Dog implements Noisy {
   @Override
   public String sound() {
     return "Woof!";
@@ -69,7 +69,7 @@ opposed to `<|--` for "extends a class"). In Java, the keywords are
     },
     {
       filename: "Doorbell.java",
-      initialContent: `public class Doorbell implements Noisy {
+      starterCode: `public class Doorbell implements Noisy {
   @Override
   public String sound() {
     return "Ding-dong";
@@ -79,7 +79,7 @@ opposed to `<|--` for "extends a class"). In Java, the keywords are
     },
     {
       filename: "MotionSensor.java",
-      initialContent: `public class MotionSensor implements Noisy {
+      starterCode: `public class MotionSensor implements Noisy {
   @Override
   public String sound() {
     return "BEEP! BEEP!";
@@ -151,7 +151,10 @@ return type, prefer the interface type over a specific class.
 
 <CodeBlock
   adapter="java"
-  starterCode={`import java.util.*;
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.*;
 
 public class Main {
   public static void main(String[] args) {
@@ -172,7 +175,9 @@ public class Main {
     System.out.println(items.size() + " items: " + items);
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 `report(List<String>)` works for `ArrayList`, `LinkedList`, an
@@ -193,7 +198,7 @@ interface without breaking every existing implementer.
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Greeter polite = new Polite();
     Greeter casual = new Casual();
@@ -207,7 +212,7 @@ interface without breaking every existing implementer.
     },
     {
       filename: "Greeter.java",
-      initialContent: `public interface Greeter {
+      starterCode: `public interface Greeter {
   String greet(String name);
 
   // Implementers get this for free, but may override:
@@ -217,7 +222,7 @@ interface without breaking every existing implementer.
     },
     {
       filename: "Polite.java",
-      initialContent: `public class Polite implements Greeter {
+      starterCode: `public class Polite implements Greeter {
   @Override
   public String greet(String name) {
     return "Good day, " + name + ".";
@@ -228,7 +233,7 @@ interface without breaking every existing implementer.
     },
     {
       filename: "Casual.java",
-      initialContent: `public class Casual implements Greeter {
+      starterCode: `public class Casual implements Greeter {
   @Override
   public String greet(String name) {
     return "Hey " + name + "!";
@@ -280,7 +285,7 @@ classDiagram
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Checkout c1 = new Checkout(new StripeProcessor());
     Checkout c2 = new Checkout(new FakeProcessor());
@@ -293,14 +298,14 @@ classDiagram
     },
     {
       filename: "PaymentProcessor.java",
-      initialContent: `public interface PaymentProcessor {
+      starterCode: `public interface PaymentProcessor {
   boolean charge(int cents);
 }
 `,
     },
     {
       filename: "StripeProcessor.java",
-      initialContent: `public class StripeProcessor implements PaymentProcessor {
+      starterCode: `public class StripeProcessor implements PaymentProcessor {
   @Override
   public boolean charge(int cents) {
     System.out.println("[stripe] charged " + cents + " cents");
@@ -311,7 +316,7 @@ classDiagram
     },
     {
       filename: "FakeProcessor.java",
-      initialContent: `public class FakeProcessor implements PaymentProcessor {
+      starterCode: `public class FakeProcessor implements PaymentProcessor {
   @Override
   public boolean charge(int cents) {
     System.out.println("[fake] pretended to charge " + cents + " cents");
@@ -322,7 +327,7 @@ classDiagram
     },
     {
       filename: "Checkout.java",
-      initialContent: `public class Checkout {
+      starterCode: `public class Checkout {
   private final PaymentProcessor processor;
   public Checkout(PaymentProcessor processor) { this.processor = processor; }
   public void purchase(int cents) {
@@ -365,7 +370,7 @@ name: 1
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     Length a = new Length(1.0);
     Length b = new Length(2.0);
@@ -388,14 +393,14 @@ name: 1
     },
     {
       filename: "Comparable2.java",
-      initialContent: `public interface Comparable2<T> {
+      starterCode: `public interface Comparable2<T> {
   int compareWith(T other);
 }
 `,
     },
     {
       filename: "Length.java",
-      initialContent: `public class Length implements Comparable2<Length> {
+      starterCode: `public class Length implements Comparable2<Length> {
   private final double value;
   public Length(double value) { this.value = value; }
 
@@ -406,7 +411,7 @@ name: 1
   }
 }
 `,
-      solutionContent: `public class Length implements Comparable2<Length> {
+      solutionCode: `public class Length implements Comparable2<Length> {
   private final double value;
   public Length(double value) { this.value = value; }
 
@@ -419,7 +424,7 @@ name: 1
     },
     {
       filename: "Name.java",
-      initialContent: `public class Name implements Comparable2<Name> {
+      starterCode: `public class Name implements Comparable2<Name> {
   private final String value;
   public Name(String value) { this.value = value; }
 
@@ -430,7 +435,7 @@ name: 1
   }
 }
 `,
-      solutionContent: `public class Name implements Comparable2<Name> {
+      solutionCode: `public class Name implements Comparable2<Name> {
   private final String value;
   public Name(String value) { this.value = value; }
 

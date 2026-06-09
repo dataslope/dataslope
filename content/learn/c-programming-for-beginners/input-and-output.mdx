@@ -39,7 +39,10 @@ the corresponding argument.
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int n = 42;
@@ -55,7 +58,9 @@ int main(void) {
   printf("percent:  100%%\\n");
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ### Field width and padding
@@ -64,7 +69,10 @@ You can ask for a minimum field width — useful for tables:
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   printf("%-10s %5s\\n", "name", "score");
@@ -73,7 +81,9 @@ int main(void) {
   printf("%-10s %5d\\n", "Charlie", 145);
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 - `%-10s` — string in a 10-wide field, left-justified (the `-`).
@@ -100,7 +110,10 @@ pointers, this will make even more sense.)
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int age;
@@ -114,7 +127,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 <Callout type="info" title="Why `if (scanf(...) == 1)`?">
@@ -131,7 +146,10 @@ for `%c`).
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   int a, b;
@@ -143,7 +161,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ### `scanf` and strings
@@ -168,7 +188,10 @@ For character-by-character I/O, the standard library offers
 
 <CodeBlock
   adapter="c"
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   // Echo every character from stdin until EOF.
@@ -178,7 +201,9 @@ int main(void) {
   }
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 This is a tiny, classic loop. Why is `c` an `int` rather than a
@@ -234,7 +259,10 @@ Use the field widths:
 - \`%-8s\` for \`item\`
 - plain \`%d\` for \`qty\`
 - \`%.2f\` for prices`}
-  starterCode={`#include <stdio.h>
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
 
 int main(void) {
   const char *item = "Widget";
@@ -243,8 +271,8 @@ int main(void) {
   // print the invoice line here
   return 0;
 }
-`}
-  solutionCode={`#include <stdio.h>
+`,
+      solutionCode: `#include <stdio.h>
 
 int main(void) {
   const char *item = "Widget";
@@ -255,7 +283,9 @@ int main(void) {
          unit_price, total);
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[
     {
       id: "invoice",

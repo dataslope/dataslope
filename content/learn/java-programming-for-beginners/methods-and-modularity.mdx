@@ -60,7 +60,10 @@ A few rules:
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int a = square(5);
     int b = square(7);
@@ -73,7 +76,9 @@ A few rules:
 
   static int square(int x) { return x * x; }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Notice:
@@ -125,7 +130,10 @@ each in its own method.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int[] scores = {72, 85, 90, 64, 91, 78};
 
@@ -154,7 +162,9 @@ each in its own method.
     return m;
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 Read `main`. You can understand the *story* — load scores, take the
@@ -178,7 +188,10 @@ mutate the object's contents.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int x = 5;
     bumpInt(x);
@@ -202,7 +215,9 @@ mutate the object's contents.
     }
   }
 }
-`}
+`,
+    },
+  ]}
 />
 
 This trips up nearly every Java beginner once. Take it slowly.
@@ -215,7 +230,10 @@ based on the argument types.
 
 <CodeBlock
   adapter="java"
-  starterCode={`public class Main {
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
   public static void main(String[] args) {
     System.out.println(area(5));       // square
     System.out.println(area(3, 4));    // rectangle
@@ -226,7 +244,9 @@ based on the argument types.
   static int area(int width, int height) { return width * height; }
   static double area(double r1, double r2) { return Math.PI * r1 * r2; }
 }
-`}
+`,
+    },
+  ]}
 />
 
 This is purely a convenience for readers — the same *name* across
@@ -281,7 +301,7 @@ max = 91
   files={[
     {
       filename: "Main.java",
-      initialContent: `public class Main {
+      starterCode: `public class Main {
   public static void main(String[] args) {
     int[] xs = {72, 85, 91, 2, 64, 78};
     System.out.println("min = " + MathTools.min(xs));
@@ -292,12 +312,12 @@ max = 91
     },
     {
       filename: "MathTools.java",
-      initialContent: `public class MathTools {
+      starterCode: `public class MathTools {
   // TODO: implement static int min(int[] xs)
   // TODO: implement static int max(int[] xs)
 }
 `,
-      solutionContent: `public class MathTools {
+      solutionCode: `public class MathTools {
   public static int min(int[] xs) {
     int m = xs[0];
     for (int i = 1; i < xs.length; i++) {

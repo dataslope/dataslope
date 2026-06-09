@@ -39,7 +39,10 @@ For lowercase English letters, `std::array<TrieNode*, 26>` is compact and fast. 
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <array>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <array>
 #include <iostream>
 
 struct TrieNode {
@@ -55,7 +58,9 @@ int main() {
   delete root.child[0];
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Full implementation with `unordered_map`
@@ -64,7 +69,10 @@ This version is easy to read and works for any character.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 #include <unordered_map>
 
@@ -118,7 +126,9 @@ int main() {
   std::cout << trie.startsWith("ca") << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Insert
@@ -133,7 +143,10 @@ Starting at the root, for each character:
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 #include <unordered_map>
 
@@ -158,7 +171,9 @@ int main() {
   std::cout << root.next['h']->next['i']->word << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Search vs prefix search
@@ -167,7 +182,10 @@ Exact search requires the final node to have `isWord = true`. Prefix search only
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 #include <unordered_map>
 
@@ -197,7 +215,9 @@ int main() {
   std::cout << (walk(&root, "ca") && walk(&root, "ca")->word) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Autocomplete by DFS
@@ -206,7 +226,10 @@ Once you walk to a prefix node, collect all words below that node.
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -239,7 +262,9 @@ int main() {
     std::cout << w << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Use cases
@@ -248,7 +273,10 @@ Tries are useful for autocomplete, spellcheck, IP routing, longest-prefix matchi
 
 <CodeBlock
   adapter="cpp"
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 #include <vector>
 
@@ -259,7 +287,9 @@ int main() {
     std::cout << item << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
 />
 
 ## Practice: Implement a Trie
@@ -268,7 +298,10 @@ int main() {
   adapter="cpp"
   title="Implement a Trie"
   instructions={`Complete the \`Trie\` class with \`insert\`, \`search\`, and \`startsWith\`.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 #include <unordered_map>
 
@@ -308,8 +341,8 @@ int main() {
   std::cout << trie.startsWith("do") << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <string>
 #include <unordered_map>
 
@@ -363,7 +396,9 @@ int main() {
   std::cout << trie.startsWith("do") << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "trie", name: "Searches words and prefixes", expect: { stdoutLines: ["true", "false", "true", "true"], stdoutLinesExact: true } }]}
 />
 
@@ -373,7 +408,10 @@ int main() {
   adapter="cpp"
   title="Count words starting with prefix"
   instructions={`Build a trie from the words and return how many inserted words start with the given prefix.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -391,8 +429,8 @@ int main() {
   std::cout << countWithPrefix(words, "z") << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -431,7 +469,9 @@ int main() {
   std::cout << countWithPrefix(words, "z") << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "prefix-count", name: "Counts prefix matches", expect: { stdoutLines: ["3", "2", "0"], stdoutLinesExact: true } }]}
 />
 
@@ -441,7 +481,10 @@ int main() {
   adapter="cpp"
   title="Longest common prefix"
   instructions={`Build a trie and walk while there is exactly one child and the current node is not the end of a word.`}
-  starterCode={`#include <iostream>
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -455,8 +498,8 @@ int main() {
   std::cout << longestCommonPrefix({"flower", "flow", "flight"}) << "\\n";
   return 0;
 }
-`}
-  solutionCode={`#include <iostream>
+`,
+      solutionCode: `#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -493,7 +536,9 @@ int main() {
   std::cout << longestCommonPrefix({"flower", "flow", "flight"}) << "\\n";
   return 0;
 }
-`}
+`,
+    },
+  ]}
   tests={[{ id: "lcp", name: "Finds fl", expect: { stdoutEquals: "fl" } }]}
 />
 
