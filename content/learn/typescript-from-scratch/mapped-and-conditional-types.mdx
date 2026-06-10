@@ -7,6 +7,58 @@ You've learned how to build generic types that work with any input. But what if 
 
 These questions lead us to **mapped types** and **conditional types**, two of TypeScript's most powerful metaprogramming tools. They let you write type-level functions that inspect, filter, and reshape other types. They're the building blocks behind the standard library's utility types (which we'll tour in the next chapter), and they're essential for modeling complex, real-world constraints.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="A loom: five key threads hang from a beam and pass through a single blue heddle bar; below it every surviving thread wears an identical green ring while one thread simply ends at the bar — a mapped type transforms every property uniformly and can drop keys as it goes"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.25">
+    <rect x="120" y="30" width="400" height="12" rx="6" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <rect x="158" y="42" width="4" height="66" rx="2" />
+    <rect x="238" y="42" width="4" height="66" rx="2" />
+    <rect x="318" y="42" width="4" height="66" rx="2" />
+    <rect x="398" y="42" width="4" height="66" rx="2" />
+    <rect x="478" y="42" width="4" height="66" rx="2" />
+    <rect x="158" y="130" width="4" height="56" rx="2" />
+    <rect x="238" y="130" width="4" height="56" rx="2" />
+    <rect x="318" y="130" width="4" height="56" rx="2" />
+    <rect x="398" y="130" width="4" height="56" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="160" cy="36" r="6" />
+    <circle cx="400" cy="36" r="6" />
+    <rect x="120" y="108" width="400" height="22" rx="11" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="240" cy="36" r="6" />
+    <circle cx="480" cy="36" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="320" cy="36" r="6" />
+  </g>
+  <g fill="var(--ds-white)">
+    <circle cx="160" cy="119" r="4" />
+    <circle cx="240" cy="119" r="4" />
+    <circle cx="320" cy="119" r="4" />
+    <circle cx="400" cy="119" r="4" />
+    <circle cx="480" cy="119" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M151 162 A9 9 0 1 1 169 162 A9 9 0 1 1 151 162 Z M154.5 162 A5.5 5.5 0 1 0 165.5 162 A5.5 5.5 0 1 0 154.5 162 Z" fillRule="evenodd" />
+    <path d="M231 162 A9 9 0 1 1 249 162 A9 9 0 1 1 231 162 Z M234.5 162 A5.5 5.5 0 1 0 245.5 162 A5.5 5.5 0 1 0 234.5 162 Z" fillRule="evenodd" />
+    <path d="M311 162 A9 9 0 1 1 329 162 A9 9 0 1 1 311 162 Z M314.5 162 A5.5 5.5 0 1 0 325.5 162 A5.5 5.5 0 1 0 314.5 162 Z" fillRule="evenodd" />
+    <path d="M391 162 A9 9 0 1 1 409 162 A9 9 0 1 1 391 162 Z M394.5 162 A5.5 5.5 0 1 0 405.5 162 A5.5 5.5 0 1 0 394.5 162 Z" fillRule="evenodd" />
+  </g>
+  <g fill="currentColor" opacity="0.15">
+    <circle cx="480" cy="140" r="2.5" />
+    <circle cx="480" cy="152" r="2" />
+    <rect x="120" y="196" width="400" height="14" rx="7" />
+  </g>
+</svg>
+
 ---
 
 ## Mapped Types
@@ -215,6 +267,46 @@ console.log(a, b);
 
 Conditional types become powerful when combined with generics. You can build type-level logic that branches based on the input.
 
+<svg
+  viewBox="0 0 640 190"
+  role="img"
+  aria-label="A dotted track reaches a blue gate pierced by a diamond window: the piece that fits the window rides the upper rail to the green terminal, the round one curves down to the yellow terminal — a conditional type picks one of two branches with an extends test"
+  style={{ display: "block", width: "100%", maxWidth: "500px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="60" cy="95" r="2.5" />
+    <circle cx="90" cy="95" r="2.5" />
+    <circle cx="120" cy="95" r="2.5" />
+    <circle cx="150" cy="95" r="2.5" />
+    <circle cx="180" cy="95" r="2.5" />
+    <circle cx="210" cy="95" r="2.5" />
+    <circle cx="310" cy="80" r="2.5" />
+    <circle cx="340" cy="68" r="2.5" />
+    <circle cx="370" cy="56" r="2.5" />
+    <circle cx="400" cy="47" r="2.5" />
+    <circle cx="430" cy="42" r="2.5" />
+    <circle cx="310" cy="110" r="2.5" />
+    <circle cx="340" cy="122" r="2.5" />
+    <circle cx="370" cy="134" r="2.5" />
+    <circle cx="400" cy="143" r="2.5" />
+    <circle cx="430" cy="148" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M260 58 L297 95 L260 132 L223 95 Z" />
+  </g>
+  <g fill="var(--ds-white)">
+    <path d="M260 80 L275 95 L260 110 L245 95 Z" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M348 56 L358 66 L348 76 L338 66 Z" />
+    <rect x="452" y="136" width="26" height="26" rx="6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="356" cy="126" r="9" />
+    <circle cx="468" cy="40" r="13" />
+  </g>
+</svg>
+
 ---
 
 ## Distributive Conditional Types
@@ -287,6 +379,32 @@ console.log(x, y);
 ## The `infer` Keyword
 
 The `infer` keyword lets you **extract** parts of a type inside a conditional. It's like pattern matching for types.
+
+<svg
+  viewBox="0 0 640 160"
+  role="img"
+  aria-label="Tweezers reach into a blue capsule and lift out its green pearl, leaving a pale hollow behind — infer names the type packed inside a wrapper so you can carry it away"
+  style={{ display: "block", width: "100%", maxWidth: "440px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="120" y="64" width="150" height="54" rx="27" fillOpacity="0.9" />
+  </g>
+  <g fill="var(--ds-white)">
+    <circle cx="195" cy="91" r="13" />
+  </g>
+  <g fill="currentColor" opacity="0.4">
+    <path d="M352 18 L228 80 L233 90 L357 28 Z" />
+    <path d="M352 18 L262 108 L270 114 L359 26 Z" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="300" cy="74" r="2.5" />
+    <circle cx="350" cy="64" r="2.5" />
+    <circle cx="400" cy="58" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="452" cy="56" r="14" />
+  </g>
+</svg>
 
 For example, here's how to extract the return type of a function:
 

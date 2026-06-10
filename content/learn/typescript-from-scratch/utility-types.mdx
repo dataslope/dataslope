@@ -7,6 +7,71 @@ TypeScript ships with a rich set of **utility types** — pre-built generic type
 
 These utilities aren't magic. They're all built from the primitives you've learned: mapped types, conditional types, `keyof`, indexed access, and `infer`. By the end of this chapter, you'll see that you could write them yourself — and you'll know when to reach for them in real code.
 
+<svg
+  viewBox="0 0 640 260"
+  role="img"
+  aria-label="A workbench: one solid blue plate with four portholes sits under a press, and dotted rays lead out to four stamped variants — ghosted optional holes, a narrower two-hole cut, a hole patched over in red, and a plate sealed with a green ring — utility types mint new shapes from a single original"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.35">
+    <rect x="310" y="46" width="20" height="12" rx="4" />
+    <rect x="316" y="58" width="8" height="20" rx="3" />
+    <rect x="296" y="78" width="48" height="10" rx="5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="250" y="100" width="140" height="64" rx="12" />
+    <rect x="80" y="32" width="120" height="48" rx="10" fillOpacity="0.25" />
+    <rect x="440" y="32" width="90" height="48" rx="10" />
+    <rect x="90" y="182" width="120" height="48" rx="10" />
+    <rect x="440" y="182" width="120" height="48" rx="10" />
+  </g>
+  <g fill="var(--ds-white)">
+    <circle cx="278" cy="132" r="6" />
+    <circle cx="306" cy="132" r="6" />
+    <circle cx="334" cy="132" r="6" />
+    <circle cx="362" cy="132" r="6" />
+    <circle cx="468" cy="56" r="6" />
+    <circle cx="498" cy="56" r="6" />
+    <circle cx="112" cy="206" r="5" />
+    <circle cx="136" cy="206" r="5" />
+    <circle cx="160" cy="206" r="5" />
+    <circle cx="184" cy="206" r="5" />
+    <circle cx="462" cy="206" r="6" />
+    <circle cx="490" cy="206" r="6" />
+    <circle cx="518" cy="206" r="6" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <path d="M100 56 A6 6 0 1 1 112 56 A6 6 0 1 1 100 56 Z M102.5 56 A3.5 3.5 0 1 0 109.5 56 A3.5 3.5 0 1 0 102.5 56 Z" fillRule="evenodd" />
+    <path d="M124 56 A6 6 0 1 1 136 56 A6 6 0 1 1 124 56 Z M126.5 56 A3.5 3.5 0 1 0 133.5 56 A3.5 3.5 0 1 0 126.5 56 Z" fillRule="evenodd" />
+    <path d="M148 56 A6 6 0 1 1 160 56 A6 6 0 1 1 148 56 Z M150.5 56 A3.5 3.5 0 1 0 157.5 56 A3.5 3.5 0 1 0 150.5 56 Z" fillRule="evenodd" />
+    <path d="M172 56 A6 6 0 1 1 184 56 A6 6 0 1 1 172 56 Z M174.5 56 A3.5 3.5 0 1 0 181.5 56 A3.5 3.5 0 1 0 174.5 56 Z" fillRule="evenodd" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="544" cy="206" r="8" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M186 184 A10 10 0 1 1 206 184 A10 10 0 1 1 186 184 Z M190 184 A6 6 0 1 0 202 184 A6 6 0 1 0 190 184 Z" fillRule="evenodd" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="230" cy="96" r="2.5" />
+    <circle cx="206" cy="80" r="2.5" />
+    <circle cx="182" cy="66" r="2.5" />
+    <circle cx="404" cy="96" r="2.5" />
+    <circle cx="424" cy="80" r="2.5" />
+    <circle cx="442" cy="66" r="2.5" />
+    <circle cx="230" cy="168" r="2.5" />
+    <circle cx="202" cy="180" r="2.5" />
+    <circle cx="176" cy="190" r="2.5" />
+    <circle cx="404" cy="168" r="2.5" />
+    <circle cx="426" cy="180" r="2.5" />
+    <circle cx="446" cy="192" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="352" cy="68" r="3" fillOpacity="0.8" />
+    <circle cx="362" cy="58" r="2.5" fillOpacity="0.6" />
+  </g>
+</svg>
+
 ---
 
 ## Object Transformation Utilities
@@ -225,6 +290,44 @@ A mapped type that iterates over `K` (a union of keys) and assigns type `T` to e
 ## Union Filtering Utilities
 
 These types filter or extract members from unions.
+
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="A yellow magnet hovers over a line of mixed beads and pulls every triangle down into a tray while the circles and squares continue along the wire — Extract collects the matching members of a union and Exclude is the line that carries on without them"
+  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.15">
+    <rect x="50" y="66" width="540" height="4" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="90" cy="68" r="10" />
+    <circle cx="230" cy="68" r="10" />
+    <circle cx="450" cy="68" r="10" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="150" y="58" width="20" height="20" rx="4" />
+    <rect x="500" y="58" width="20" height="20" rx="4" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M298 90 A22 22 0 1 1 342 90 L328 90 A8 8 0 1 0 312 90 Z" />
+    <path d="M276 56 L288 56 L282 66 Z" fillOpacity="0.8" />
+    <path d="M352 56 L364 56 L358 66 Z" fillOpacity="0.8" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="296" cy="112" r="2.5" />
+    <circle cx="306" cy="130" r="2.5" />
+    <circle cx="334" cy="112" r="2.5" />
+    <circle cx="328" cy="130" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.12">
+    <path d="M270 168 L370 168 L360 186 L280 186 Z" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M300 146 L314 146 L307 158 Z" />
+    <path d="M326 146 L340 146 L333 158 Z" />
+  </g>
+</svg>
 
 ### `Exclude<UnionType, ExcludedMembers>`
 

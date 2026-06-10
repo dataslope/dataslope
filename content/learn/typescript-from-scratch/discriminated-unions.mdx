@@ -9,6 +9,58 @@ The idea: define a union of object types, each with a **discriminant** field (a 
 
 This is how you model state machines, API responses, domain events, parser results, and anything else with "one of several possibilities." Let's see why discriminated unions are so powerful.
 
+<svg
+  viewBox="0 0 640 250"
+  role="img"
+  aria-label="Identical parcels ride a belt, each bearing one small colored corner tag; at a junction an arm reads the tag and routes every parcel into its matching tinted bin, while one untagged parcel waits aside under a red alert — the discriminant field tells the compiler exactly which variant it holds"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.15">
+    <rect x="50" y="92" width="330" height="6" rx="3" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <rect x="70" y="58" width="40" height="32" rx="5" />
+    <rect x="150" y="58" width="40" height="32" rx="5" />
+    <rect x="230" y="58" width="40" height="32" rx="5" />
+    <rect x="96" y="150" width="40" height="32" rx="5" />
+    <rect x="500" y="32" width="40" height="28" rx="5" />
+    <rect x="500" y="102" width="40" height="28" rx="5" />
+    <rect x="500" y="172" width="40" height="28" rx="5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="104" cy="64" r="5" />
+    <rect x="480" y="20" width="110" height="50" rx="10" fillOpacity="0.12" />
+    <circle cx="534" cy="38" r="5" />
+    <path d="M390 71 L448 50 L451 58 L392 79 Z" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M178 67 L190 67 L184 57 Z" />
+    <rect x="480" y="90" width="110" height="50" rx="10" fillOpacity="0.12" />
+    <path d="M528 116 L540 116 L534 106 Z" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="258" y="59" width="10" height="10" rx="2" />
+    <rect x="480" y="160" width="110" height="50" rx="10" fillOpacity="0.12" />
+    <rect x="529" y="176" width="10" height="10" rx="2" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <path d="M390 55 L412 75 L390 95 L368 75 Z" />
+    <circle cx="424" cy="62" r="2.5" />
+    <circle cx="444" cy="50" r="2.5" />
+    <circle cx="464" cy="42" r="2.5" />
+    <circle cx="424" cy="84" r="2.5" />
+    <circle cx="446" cy="98" r="2.5" />
+    <circle cx="466" cy="110" r="2.5" />
+    <circle cx="412" cy="100" r="2.5" />
+    <circle cx="430" cy="132" r="2.5" />
+    <circle cx="450" cy="160" r="2.5" />
+    <circle cx="466" cy="178" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="144" cy="146" r="5.5" />
+  </g>
+</svg>
+
 ## The discriminant field
 
 A discriminated union is a union of object types that share a common property — the **discriminant** — with distinct literal values for each variant.
@@ -70,6 +122,52 @@ You can name the discriminant field anything you want, but `kind` and `type` are
 The real power of discriminated unions is **exhaustiveness checking**: the compiler can verify you've handled *every* variant. If you add a new variant later and forget to update a `switch` statement, the compiler catches it.
 
 Here's the trick: assign the unhandled case to `never`. If you've covered all variants, the code is unreachable and `never` is satisfied. If you missed a variant, the compiler complains that the leftover type isn't assignable to `never`.
+
+<svg
+  viewBox="0 0 640 170"
+  role="img"
+  aria-label="Three tinted bins each hold a parcel matching their tag, but a newly arrived parcel with a red diamond tag hovers in front of a bin that exists only as a dotted outline — exhaustiveness checking complains until every variant has a place to go"
+  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="50" y="60" width="110" height="60" rx="10" fillOpacity="0.12" />
+    <circle cx="105" cy="78" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="190" y="60" width="110" height="60" rx="10" fillOpacity="0.12" />
+    <path d="M239 84 L251 84 L245 74 Z" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="330" y="60" width="110" height="60" rx="10" fillOpacity="0.12" />
+    <rect x="380" y="73" width="10" height="10" rx="2" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <rect x="71" y="74" width="40" height="30" rx="5" />
+    <rect x="211" y="74" width="40" height="30" rx="5" />
+    <rect x="351" y="74" width="40" height="30" rx="5" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="470" cy="62" r="2" />
+    <circle cx="494" cy="62" r="2" />
+    <circle cx="518" cy="62" r="2" />
+    <circle cx="542" cy="62" r="2" />
+    <circle cx="566" cy="62" r="2" />
+    <circle cx="470" cy="90" r="2" />
+    <circle cx="470" cy="118" r="2" />
+    <circle cx="566" cy="90" r="2" />
+    <circle cx="566" cy="118" r="2" />
+    <circle cx="494" cy="118" r="2" />
+    <circle cx="518" cy="118" r="2" />
+    <circle cx="542" cy="118" r="2" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <rect x="498" y="20" width="40" height="30" rx="5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M530 18 L537 25 L530 32 L523 25 Z" />
+    <circle cx="554" cy="14" r="5" fillOpacity="0.8" />
+  </g>
+</svg>
 
 <CodeBlock
   adapter="typescript"

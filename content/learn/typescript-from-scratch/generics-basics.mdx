@@ -23,6 +23,49 @@ function identity<T>(x: T): T {
 
 Now `identity(42)` returns `number`, `identity("hello")` returns `string`, and the compiler tracks the exact type through the function. This is the power of generics: **abstraction without information loss**.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="A pantograph linkage rests its tracer on a blue triangle while its pen reproduces the very same triangle across the desk, and a circle and a square wait in line to be traced next — one generic mechanism that works for any shape without forgetting which it was given"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.2">
+    <rect x="60" y="232" width="520" height="4" rx="2" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <rect x="306" y="26" width="28" height="12" rx="6" />
+    <rect x="317" y="36" width="6" height="58" rx="3" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <path d="M177 183 L317 93 L325 103 L185 194 Z" />
+    <path d="M323 93 L463 183 L455 194 L315 103 Z" />
+  </g>
+  <g fill="currentColor" opacity="0.5">
+    <circle cx="320" cy="99" r="7" />
+    <path d="M170 187 A11 11 0 1 1 192 187 A11 11 0 1 1 170 187 Z M175 187 A6 6 0 1 0 187 187 A6 6 0 1 0 175 187 Z" fillRule="evenodd" />
+    <circle cx="459" cy="188" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M181 198 L203 232 L159 232 Z" />
+    <path d="M459 198 L481 232 L437 232 Z" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="466" cy="196" r="2.5" fillOpacity="0.8" />
+    <circle cx="474" cy="190" r="2" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="80" cy="220" r="11" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="106" y="210" width="22" height="22" rx="4" />
+  </g>
+  <g fill="currentColor" opacity="0.15">
+    <circle cx="560" cy="60" r="3" />
+    <circle cx="600" cy="140" r="3" />
+    <circle cx="60" cy="110" r="3" />
+  </g>
+</svg>
+
 ## Why generics matter
 
 Without generics, you face a painful trade-off:
@@ -305,6 +348,36 @@ The inference flows in one direction: **`map(array, fn)` → infer `T` from the 
 
 This is the power of generics: you write one function, and the compiler figures out the specific types for every call site.
 
+<svg
+  viewBox="0 0 640 180"
+  role="img"
+  aria-label="Four blue circles pass through a translucent transformation band marked with a function symbol and emerge as four green squares in exactly the same order and count — map changes the element type while the shape of the array survives"
+  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="160" cy="46" r="13" />
+    <circle cx="250" cy="46" r="13" />
+    <circle cx="340" cy="46" r="13" />
+    <circle cx="430" cy="46" r="13" />
+  </g>
+  <g fill="currentColor" opacity="0.08">
+    <rect x="120" y="76" width="440" height="28" rx="14" />
+  </g>
+  <text x="96" y="99" fontFamily="Georgia, serif" fontStyle="italic" fontSize="22" fill="currentColor" fillOpacity="0.45" textAnchor="middle">ƒ</text>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="160" cy="90" r="2.5" />
+    <circle cx="250" cy="90" r="2.5" />
+    <circle cx="340" cy="90" r="2.5" />
+    <circle cx="430" cy="90" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="148" y="122" width="24" height="24" rx="5" />
+    <rect x="238" y="122" width="24" height="24" rx="5" />
+    <rect x="328" y="122" width="24" height="24" rx="5" />
+    <rect x="418" y="122" width="24" height="24" rx="5" />
+  </g>
+</svg>
+
 ## Type parameter flow
 
 Understanding how type parameters flow through a function is key to using generics effectively. Let's trace through an example:
@@ -334,6 +407,46 @@ console.log(\`Empty array first: \${nope}\`); // undefined
 />
 
 The type parameter `T` is inferred from the input array. If you pass `number[]`, `T = number`, so the return type is `number | undefined`. The `| undefined` is there because the array might be empty.
+
+<svg
+  viewBox="0 0 640 190"
+  role="img"
+  aria-label="Two runs of the same capsule: whatever color enters, a thread of that color runs through the inside and the very same color exits — the type parameter is a thread tying the output type to the input type"
+  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.1">
+    <rect x="260" y="38" width="160" height="44" rx="22" />
+    <rect x="260" y="110" width="160" height="44" rx="22" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="140" cy="60" r="13" />
+    <circle cx="278" cy="60" r="2.5" fillOpacity="0.5" />
+    <circle cx="304" cy="60" r="2.5" fillOpacity="0.5" />
+    <circle cx="330" cy="60" r="2.5" fillOpacity="0.5" />
+    <circle cx="356" cy="60" r="2.5" fillOpacity="0.5" />
+    <circle cx="382" cy="60" r="2.5" fillOpacity="0.5" />
+    <circle cx="404" cy="60" r="2.5" fillOpacity="0.5" />
+    <circle cx="500" cy="60" r="13" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="128" y="120" width="24" height="24" rx="5" />
+    <circle cx="278" cy="132" r="2.5" fillOpacity="0.5" />
+    <circle cx="304" cy="132" r="2.5" fillOpacity="0.5" />
+    <circle cx="330" cy="132" r="2.5" fillOpacity="0.5" />
+    <circle cx="356" cy="132" r="2.5" fillOpacity="0.5" />
+    <circle cx="382" cy="132" r="2.5" fillOpacity="0.5" />
+    <circle cx="404" cy="132" r="2.5" fillOpacity="0.5" />
+    <rect x="488" y="120" width="24" height="24" rx="5" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="190" cy="60" r="2.5" />
+    <circle cx="220" cy="60" r="2.5" />
+    <circle cx="448" cy="60" r="2.5" />
+    <circle cx="190" cy="132" r="2.5" />
+    <circle cx="220" cy="132" r="2.5" />
+    <circle cx="448" cy="132" r="2.5" />
+  </g>
+</svg>
 
 ## Challenge: Generic container
 

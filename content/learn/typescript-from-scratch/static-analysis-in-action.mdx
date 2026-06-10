@@ -7,6 +7,50 @@ You've written types, modeled domains, and structured architectures. But what do
 
 This chapter reveals the compiler's inner workings: how it catches bugs at compile time, enables refactoring with confidence, proves exhaustiveness, and drives the language service that powers autocomplete, go-to-definition, and instant feedback in your editor.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="Parcels ride a belt through a translucent scanning arch on their way to the departure flag: inside the arch one parcel turns see-through and reveals a red flaw, while cleared parcels carry green rings — static analysis inspects code before it ever ships"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.2">
+    <rect x="50" y="160" width="540" height="8" rx="4" />
+  </g>
+  <g fill="currentColor" opacity="0.15">
+    <circle cx="90" cy="178" r="4" />
+    <circle cx="170" cy="178" r="4" />
+    <circle cx="250" cy="178" r="4" />
+    <circle cx="330" cy="178" r="4" />
+    <circle cx="410" cy="178" r="4" />
+    <circle cx="490" cy="178" r="4" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <rect x="110" y="118" width="52" height="42" rx="6" />
+    <rect x="190" y="126" width="44" height="34" rx="6" />
+    <rect x="430" y="118" width="48" height="42" rx="6" />
+    <rect x="510" y="126" width="40" height="34" rx="6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M260 160 L260 60 Q260 36 284 36 L356 36 Q380 36 380 60 L380 160 L352 160 L352 64 Q352 60 348 60 L292 60 Q288 60 288 64 L288 160 Z" fillOpacity="0.35" />
+    <rect x="288" y="60" width="64" height="100" fillOpacity="0.08" />
+    <rect x="288" y="102" width="64" height="5" fillOpacity="0.3" />
+  </g>
+  <g fill="currentColor" opacity="0.12">
+    <rect x="296" y="118" width="48" height="42" rx="6" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M320 128 L324 136 L333 137 L326 143 L329 152 L320 147 L311 152 L314 143 L307 137 L316 136 Z" fillOpacity="0.9" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M445 100 A9 9 0 1 1 463 100 A9 9 0 1 1 445 100 Z M448.5 100 A5.5 5.5 0 1 0 459.5 100 A5.5 5.5 0 1 0 448.5 100 Z" fillRule="evenodd" />
+    <circle cx="530" cy="108" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="586" y="118" width="4" height="42" rx="2" />
+    <path d="M590 120 L612 127 L590 134 Z" />
+  </g>
+</svg>
+
 ---
 
 ## What the Compiler Proves
@@ -303,6 +347,41 @@ console.log(processValue(0));
 />
 
 If you add another `else` after the `value === 0` case, it's unreachable, and the compiler can warn you.
+
+<svg
+  viewBox="0 0 640 170"
+  role="img"
+  aria-label="A bright dotted route runs straight through, while a faint spur drops away to a node nothing ever reaches, ringed in red — the compiler proves that code after a return or an impossible branch can never run"
+  style={{ display: "block", width: "100%", maxWidth: "460px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="70" cy="70" r="4" />
+    <circle cx="115" cy="70" r="4" />
+    <circle cx="160" cy="70" r="4" />
+    <circle cx="205" cy="70" r="4" />
+    <circle cx="250" cy="70" r="4" />
+    <circle cx="295" cy="70" r="4" />
+    <circle cx="340" cy="70" r="4" />
+    <circle cx="385" cy="70" r="4" />
+    <circle cx="430" cy="70" r="4" />
+    <circle cx="475" cy="70" r="4" />
+    <circle cx="520" cy="70" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="565" cy="70" r="9" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="312" cy="96" r="3" />
+    <circle cx="336" cy="116" r="3" />
+    <circle cx="358" cy="134" r="3" />
+  </g>
+  <g fill="currentColor" opacity="0.12">
+    <circle cx="390" cy="144" r="10" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M376 144 A14 14 0 1 1 404 144 A14 14 0 1 1 376 144 Z M379 144 A11 11 0 1 0 401 144 A11 11 0 1 0 379 144 Z" fillRule="evenodd" fillOpacity="0.45" />
+  </g>
+</svg>
 
 ---
 

@@ -14,6 +14,78 @@ This chapter answers: **What is `any` and when should you (not) use it?**
 **How is `unknown` different?** **What does `never` represent?** **How do
 these types relate to each other?**
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="Three stalls side by side: a wild storm of dots that leaks across its own boundary, a locked blue crate with a keyhole while a visitor hovers above, and a spot where only a dotted outline with a faint afterglow remains — any ignores the rules, unknown demands a check first, never holds nothing at all"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="235" cy="36" r="2" />
+    <circle cx="235" cy="62" r="2" />
+    <circle cx="235" cy="88" r="2" />
+    <circle cx="235" cy="114" r="2" />
+    <circle cx="235" cy="140" r="2" />
+    <circle cx="235" cy="166" r="2" />
+    <circle cx="235" cy="192" r="2" />
+    <circle cx="425" cy="36" r="2" />
+    <circle cx="425" cy="62" r="2" />
+    <circle cx="425" cy="88" r="2" />
+    <circle cx="425" cy="114" r="2" />
+    <circle cx="425" cy="140" r="2" />
+    <circle cx="425" cy="166" r="2" />
+    <circle cx="425" cy="192" r="2" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M70 130 C80 86 140 70 170 96 C196 118 180 160 140 162 C112 164 96 146 104 126" fillOpacity="0.14" />
+    <circle cx="100" cy="80" r="5" />
+    <circle cx="156" cy="64" r="4" fillOpacity="0.8" />
+    <circle cx="186" cy="110" r="6" fillOpacity="0.9" />
+    <circle cx="80" cy="140" r="4" fillOpacity="0.7" />
+    <circle cx="140" cy="172" r="5" fillOpacity="0.8" />
+    <circle cx="196" cy="160" r="3.5" fillOpacity="0.6" />
+    <circle cx="60" cy="100" r="3" fillOpacity="0.5" />
+    <circle cx="252" cy="74" r="4" fillOpacity="0.7" />
+    <circle cx="266" cy="180" r="3" fillOpacity="0.5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="124" cy="108" r="6" fillOpacity="0.85" />
+    <circle cx="170" cy="140" r="3.5" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="92" cy="174" r="4" fillOpacity="0.7" />
+    <circle cx="206" cy="76" r="4" fillOpacity="0.6" />
+    <rect x="276" y="90" width="110" height="78" rx="10" />
+    <rect x="276" y="78" width="110" height="20" rx="9" fillOpacity="0.75" />
+  </g>
+  <g fill="var(--ds-white)">
+    <circle cx="331" cy="122" r="6" />
+    <path d="M331 126 L337 144 L325 144 Z" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="331" cy="40" r="9" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="331" cy="58" r="2.5" />
+    <circle cx="331" cy="68" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="538" cy="115" r="2.5" />
+    <circle cx="533.4" cy="127.7" r="2.5" />
+    <circle cx="520" cy="133" r="2.5" />
+    <circle cx="506.6" cy="127.7" r="2.5" />
+    <circle cx="502" cy="115" r="2.5" />
+    <circle cx="506.6" cy="102.3" r="2.5" />
+    <circle cx="520" cy="97" r="2.5" />
+    <circle cx="533.4" cy="102.3" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="520" cy="115" r="3.5" fillOpacity="0.25" />
+    <circle cx="547" cy="86" r="2" fillOpacity="0.3" />
+    <circle cx="556" cy="76" r="1.8" fillOpacity="0.2" />
+  </g>
+</svg>
+
 ## The type hierarchy: top and bottom
 
 Imagine the type system as a lattice. At the very top sits a type that
@@ -425,6 +497,51 @@ console.log("Type relationships demonstrated");
     },
   ]}
 />
+
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="A fountain of basins: values rain from the wide top pool into the middle pools, the tiny basin at the bottom receives nothing, yet faint streams rise from it back to every pool above — anything fits in unknown, nothing fits in never, and never fits anywhere"
+  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.1">
+    <path d="M120 40 L520 40 L504 78 L136 78 Z" />
+    <path d="M150 120 L300 120 L288 152 L162 152 Z" />
+    <path d="M340 120 L490 120 L478 152 L352 152 Z" />
+  </g>
+  <g fill="currentColor" opacity="0.14">
+    <path d="M290 196 L350 196 L344 218 L296 218 Z" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="200" cy="60" r="7" />
+    <circle cx="380" cy="58" r="7" />
+    <circle cx="400" cy="136" r="7" />
+    <circle cx="430" cy="136" r="7" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="260" cy="58" r="7" />
+    <circle cx="440" cy="60" r="7" />
+    <circle cx="200" cy="136" r="7" />
+    <circle cx="240" cy="136" r="7" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="320" cy="62" r="7" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="225" cy="92" r="2.5" />
+    <circle cx="225" cy="106" r="2.5" />
+    <circle cx="415" cy="92" r="2.5" />
+    <circle cx="415" cy="106" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="284" cy="186" r="2" />
+    <circle cx="272" cy="170" r="2" />
+    <circle cx="260" cy="154" r="2" />
+    <circle cx="356" cy="186" r="2" />
+    <circle cx="368" cy="170" r="2" />
+    <circle cx="380" cy="154" r="2" />
+  </g>
+</svg>
 
 ## Practice: a safe JSON parser
 

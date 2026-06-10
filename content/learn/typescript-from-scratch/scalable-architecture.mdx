@@ -7,6 +7,54 @@ As codebases grow, they become harder to navigate, test, and change. Functions d
 
 This chapter introduces **layered architecture** — a pattern for organizing code into distinct layers (domain, application, infrastructure) with clear boundaries and dependencies flowing in one direction. You'll learn how to use **TypeScript's type system** to enforce these boundaries, prevent circular dependencies, and make large systems understandable and maintainable.
 
+<svg
+  viewBox="0 0 640 250"
+  role="img"
+  aria-label="A temple in cross-section: the yellow roof of infrastructure rests on blue application columns standing on a deep green domain foundation, weather dots kept outside; one column is only a dotted outline — a port — with its green implementation sliding in from the side — layers depend downward and the foundation knows nothing above it"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="200" cy="24" r="3" />
+    <circle cx="320" cy="12" r="3" />
+    <circle cx="440" cy="24" r="3" />
+    <circle cx="566" cy="60" r="3" />
+    <circle cx="76" cy="60" r="3" />
+    <circle cx="600" cy="140" r="3" />
+    <circle cx="40" cy="160" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M104 100 L320 38 L536 100 Z" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="164" y="100" width="40" height="12" rx="4" fillOpacity="0.5" />
+    <rect x="254" y="100" width="40" height="12" rx="4" fillOpacity="0.5" />
+    <rect x="344" y="100" width="40" height="12" rx="4" fillOpacity="0.5" />
+    <rect x="434" y="100" width="40" height="12" rx="4" fillOpacity="0.5" />
+    <rect x="170" y="112" width="28" height="78" rx="6" fillOpacity="0.8" />
+    <rect x="260" y="112" width="28" height="78" rx="6" fillOpacity="0.8" />
+    <rect x="440" y="112" width="28" height="78" rx="6" fillOpacity="0.8" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="364" cy="120" r="2.5" />
+    <circle cx="364" cy="136" r="2.5" />
+    <circle cx="364" cy="152" r="2.5" />
+    <circle cx="364" cy="168" r="2.5" />
+    <circle cx="364" cy="184" r="2.5" />
+    <circle cx="352" cy="120" r="2.5" />
+    <circle cx="352" cy="136" r="2.5" />
+    <circle cx="352" cy="152" r="2.5" />
+    <circle cx="352" cy="168" r="2.5" />
+    <circle cx="352" cy="184" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="404" cy="152" r="8" />
+    <circle cx="422" cy="152" r="2.5" fillOpacity="0.5" />
+    <circle cx="436" cy="152" r="2.5" fillOpacity="0.35" />
+    <rect x="120" y="190" width="400" height="30" rx="8" fillOpacity="0.85" />
+    <rect x="100" y="220" width="440" height="14" rx="7" fillOpacity="0.5" />
+  </g>
+</svg>
+
 ---
 
 ## The Problem: Tangled Dependencies
@@ -315,6 +363,48 @@ Notice:
 ## Barrel Files for Clean Exports
 
 A **barrel file** (`index.ts`) re-exports only the public API of a module, hiding internal details:
+
+<svg
+  viewBox="0 0 640 180"
+  role="img"
+  aria-label="Three scattered trails of exports pour into one barrel that has a single tap, from which one green stream leaves; a faint extra trail stops outside the barrel wall — a barrel file gathers a module's public surface into one import path and keeps internals inside"
+  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="80" cy="44" r="6" />
+    <circle cx="118" cy="52" r="5" fillOpacity="0.7" />
+    <circle cx="156" cy="62" r="4" fillOpacity="0.5" />
+    <circle cx="80" cy="90" r="6" />
+    <circle cx="122" cy="90" r="5" fillOpacity="0.7" />
+    <circle cx="164" cy="90" r="4" fillOpacity="0.5" />
+    <circle cx="80" cy="136" r="6" />
+    <circle cx="118" cy="128" r="5" fillOpacity="0.7" />
+    <circle cx="156" cy="118" r="4" fillOpacity="0.5" />
+    <circle cx="194" cy="80" r="3.5" fillOpacity="0.4" />
+    <circle cx="194" cy="100" r="3.5" fillOpacity="0.4" />
+  </g>
+  <g fill="currentColor" opacity="0.15">
+    <path d="M250 40 C242 40 236 46 236 54 L236 126 C236 134 242 140 250 140 L350 140 C358 140 364 134 364 126 L364 54 C364 46 358 40 350 40 Z" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <rect x="236" y="62" width="128" height="6" rx="3" />
+    <rect x="236" y="112" width="128" height="6" rx="3" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <rect x="364" y="82" width="22" height="14" rx="4" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="412" cy="89" r="6" />
+    <circle cx="448" cy="89" r="5" fillOpacity="0.7" />
+    <circle cx="484" cy="89" r="4" fillOpacity="0.5" />
+    <circle cx="518" cy="89" r="3.5" fillOpacity="0.35" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <circle cx="280" cy="160" r="3" />
+    <circle cx="310" cy="164" r="3" />
+    <circle cx="340" cy="160" r="3" />
+  </g>
+</svg>
 
 <CodeBlock
   adapter="typescript"

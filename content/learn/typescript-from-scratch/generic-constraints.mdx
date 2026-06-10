@@ -7,6 +7,47 @@ In [Generics Basics](./generics-basics), we saw how unconstrained type parameter
 
 This is where **generic constraints** come in. You can restrict a type parameter to types that satisfy certain conditions using the `extends` keyword. This unlocks richer operations: accessing properties, calling methods, indexing into objects, and more — all while keeping the code generic and type-safe.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="Wildly different shapes all hang from one rail by the same small ring, while a shape born without a ring lies fallen on the floor below — a constraint lets any type in, as long as it brings the required part"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.3">
+    <rect x="60" y="40" width="520" height="8" rx="4" />
+  </g>
+  <g fill="currentColor" opacity="0.5">
+    <path d="M123 58 A7 7 0 1 1 137 58 A7 7 0 1 1 123 58 Z M126 58 A4 4 0 1 0 134 58 A4 4 0 1 0 126 58 Z" fillRule="evenodd" />
+    <path d="M233 58 A7 7 0 1 1 247 58 A7 7 0 1 1 233 58 Z M236 58 A4 4 0 1 0 244 58 A4 4 0 1 0 236 58 Z" fillRule="evenodd" />
+    <path d="M353 58 A7 7 0 1 1 367 58 A7 7 0 1 1 353 58 Z M356 58 A4 4 0 1 0 364 58 A4 4 0 1 0 356 58 Z" fillRule="evenodd" />
+    <path d="M463 58 A7 7 0 1 1 477 58 A7 7 0 1 1 463 58 Z M466 58 A4 4 0 1 0 474 58 A4 4 0 1 0 466 58 Z" fillRule="evenodd" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <rect x="128" y="64" width="4" height="12" rx="2" />
+    <rect x="238" y="64" width="4" height="12" rx="2" />
+    <rect x="358" y="64" width="4" height="12" rx="2" />
+    <rect x="468" y="64" width="4" height="12" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="130" cy="98" r="22" />
+    <path d="M470 76 L496 124 L444 124 Z" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="218" y="76" width="44" height="44" rx="8" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="342" y="76" width="36" height="70" rx="10" />
+  </g>
+  <g fill="currentColor" opacity="0.15">
+    <rect x="60" y="214" width="520" height="4" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="560" cy="196" r="18" />
+    <circle cx="540" cy="162" r="2.5" fillOpacity="0.4" />
+    <circle cx="549" cy="176" r="2.5" fillOpacity="0.3" />
+  </g>
+</svg>
+
 ## The problem: operations on unconstrained types
 
 Suppose you want a function that logs the length of an array or a string. With an unconstrained type parameter, this doesn't work:
@@ -242,6 +283,50 @@ console.log(\`Ages: \${ages.join(", ")}\`);
 />
 
 The `pluck` function is generic over both the object type (`T`) and the key type (`K`). The constraint `K extends keyof T` ensures the key exists, and the return type `T[K][]` gives you an array of the property's type.
+
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="Three record cards each carry the same three slots; a translucent band lifts the middle slot out of every card into one tidy green column — pluck extracts a single keyed property from every object, and the constraint guarantees the key exists"
+  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.12">
+    <rect x="80" y="30" width="280" height="40" rx="10" />
+    <rect x="80" y="84" width="280" height="40" rx="10" />
+    <rect x="80" y="138" width="280" height="40" rx="10" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="186" y="18" width="56" height="170" rx="12" fillOpacity="0.13" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="120" cy="50" r="9" />
+    <circle cx="120" cy="104" r="9" />
+    <circle cx="120" cy="158" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="202" y="41" width="24" height="18" rx="5" />
+    <rect x="202" y="95" width="24" height="18" rx="5" />
+    <rect x="202" y="149" width="24" height="18" rx="5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="310" cy="50" r="9" />
+    <circle cx="310" cy="104" r="9" />
+    <circle cx="310" cy="158" r="9" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="396" cy="50" r="2.5" />
+    <circle cx="424" cy="50" r="2.5" />
+    <circle cx="396" cy="104" r="2.5" />
+    <circle cx="424" cy="104" r="2.5" />
+    <circle cx="396" cy="158" r="2.5" />
+    <circle cx="424" cy="158" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="460" y="41" width="24" height="18" rx="5" />
+    <rect x="460" y="95" width="24" height="18" rx="5" />
+    <rect x="460" y="149" width="24" height="18" rx="5" />
+  </g>
+</svg>
 
 ## A practical example: typed `pick`
 
