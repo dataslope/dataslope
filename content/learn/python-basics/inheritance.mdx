@@ -5,6 +5,34 @@ description: Subclassing, super(), method overriding, and duck typing
 
 A class can **inherit** from another, getting all its attributes and methods for free. The new class can add behavior, override behavior, or both. Inheritance is one of the pillars of object-oriented programming — but it's also easy to overuse.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A green tracing sheet laid over a blue parent drawing: the parent's dot and bar show through for free, a new green square is added, and the inherited triangle is redrawn in the child's own yellow — inherit, extend, override"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="90" y="60" width="280" height="140" rx="12" fillOpacity="0.12" />
+    <circle cx="140" cy="100" r="12" fillOpacity="0.7" />
+    <rect x="180" y="92" width="100" height="16" rx="8" fillOpacity="0.5" />
+    <polygon points="130,160 160,132 190,160" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="250" y="90" width="280" height="120" rx="12" fillOpacity="0.12" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="300" cy="130" r="12" fillOpacity="0.28" />
+    <rect x="340" y="122" width="100" height="16" rx="8" fillOpacity="0.22" />
+    <polygon points="290,190 320,162 350,190" fillOpacity="0.18" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="440" y="120" width="26" height="26" rx="7" fillOpacity="0.9" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <polygon points="298,186 328,158 358,186" fillOpacity="0.9" />
+  </g>
+</svg>
+
 ## Why inheritance matters: the real world
 
 Inheritance shows up everywhere in Python:

@@ -7,6 +7,38 @@ A `set` is an unordered collection of unique, hashable items. Membership testing
 
 Every snippet on this page runs in your browser — no setup required.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Two overlapping translucent circles hold one dot per member, the shared lens glowing green, while a pair of identical dots merges into a single one on the way in — sets keep only unique items and make overlaps cheap to find"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="255" cy="105" r="85" fillOpacity="0.16" />
+    <circle cx="195" cy="82" r="9" fillOpacity="0.85" />
+    <circle cx="212" cy="132" r="9" fillOpacity="0.85" />
+    <circle cx="245" cy="55" r="9" fillOpacity="0.85" />
+    <circle cx="234" cy="142" r="9" />
+    <circle cx="140" cy="182" r="8" fillOpacity="0.25" />
+    <circle cx="156" cy="182" r="8" fillOpacity="0.4" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="385" cy="105" r="85" fillOpacity="0.16" />
+    <circle cx="445" cy="82" r="9" fillOpacity="0.85" />
+    <circle cx="428" cy="132" r="9" fillOpacity="0.85" />
+    <circle cx="395" cy="55" r="9" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="320" cy="90" r="9" />
+    <circle cx="320" cy="125" r="9" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="180" cy="172" r="3" />
+    <circle cx="200" cy="162" r="3" />
+    <circle cx="218" cy="152" r="3" />
+  </g>
+</svg>
+
 ## How sets work
 
 Like dicts, sets are implemented as **hash tables**. A set is essentially a dict with only keys (no values). This gives O(1) average-case membership testing, insertion, and deletion.
