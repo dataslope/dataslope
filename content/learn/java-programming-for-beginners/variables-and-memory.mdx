@@ -7,6 +7,53 @@ A **variable** is a name for a place in memory where a value lives.
 That sentence is doing a lot of work. Let's unpack it slowly, with
 pictures.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A row of mailboxes on posts, one open to show the green value stored inside while a new yellow value arrives at the next box along a dotted arc — variables as named places in memory"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.25">
+    <rect x="131" y="146" width="8" height="50" rx="3" />
+    <rect x="251" y="146" width="8" height="50" rx="3" />
+    <rect x="371" y="146" width="8" height="50" rx="3" />
+    <rect x="491" y="146" width="8" height="50" rx="3" />
+  </g>
+  <g fill="currentColor" opacity="0.15">
+    <rect x="70" y="196" width="500" height="4" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="90" y="90" width="90" height="56" rx="16" fillOpacity="0.25" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="210" y="90" width="90" height="56" rx="16" fillOpacity="0.25" />
+    <circle cx="255" cy="118" r="11" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="330" y="90" width="90" height="56" rx="16" fillOpacity="0.3" />
+    <rect x="425" y="76" width="6" height="20" rx="3" fillOpacity="0.9" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="450" y="90" width="90" height="56" rx="16" fillOpacity="0.12" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <rect x="113" y="98" width="44" height="10" rx="5" />
+    <rect x="233" y="98" width="44" height="10" rx="5" />
+    <rect x="353" y="98" width="44" height="10" rx="5" />
+    <rect x="473" y="98" width="44" height="10" rx="5" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="290" cy="42" r="3" />
+    <circle cx="318" cy="36" r="3" />
+    <circle cx="346" cy="38" r="3" />
+    <circle cx="368" cy="48" r="3" />
+    <circle cx="382" cy="62" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="386" cy="78" r="9" />
+  </g>
+</svg>
+
 ## Memory as a row of boxes
 
 Imagine the computer's memory as a giant row of boxes. Each box can

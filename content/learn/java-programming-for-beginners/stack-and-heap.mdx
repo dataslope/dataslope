@@ -8,6 +8,56 @@ You can write Java for years without thinking about memory. But the
 unexpected shared mutation, a stack overflow — a mental model of
 the **stack** and the **heap** turns confusion into clarity.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="A tidy column of stacked frames holds small values that tether out by dotted lines to free-floating green shapes on the heap, while one shape with no tether quietly fades — stack, heap, and reachability"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="110" y="150" width="150" height="34" rx="8" fillOpacity="0.18" />
+    <rect x="110" y="114" width="150" height="34" rx="8" fillOpacity="0.26" />
+    <rect x="110" y="78" width="150" height="34" rx="8" fillOpacity="0.34" />
+    <rect x="110" y="42" width="150" height="34" rx="8" fillOpacity="0.45" />
+    <circle cx="140" cy="59" r="5" />
+    <circle cx="166" cy="59" r="5" />
+    <circle cx="140" cy="95" r="5" />
+    <circle cx="140" cy="131" r="5" />
+    <circle cx="166" cy="131" r="5" />
+    <circle cx="140" cy="167" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="196" cy="59" r="5" />
+    <circle cx="196" cy="131" r="5" />
+    <circle cx="420" cy="80" r="30" fillOpacity="0.4" />
+    <rect x="490" y="150" width="70" height="44" rx="20" fillOpacity="0.35" />
+    <circle cx="540" cy="70" r="20" fillOpacity="0.3" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="236" cy="62" r="3" />
+    <circle cx="276" cy="66" r="3" />
+    <circle cx="316" cy="70" r="3" />
+    <circle cx="356" cy="74" r="3" />
+    <circle cx="390" cy="77" r="3" />
+    <circle cx="244" cy="134" r="3" />
+    <circle cx="292" cy="139" r="3" />
+    <circle cx="340" cy="143" r="3" />
+    <circle cx="388" cy="147" r="3" />
+    <circle cx="436" cy="149" r="3" />
+    <circle cx="464" cy="151" r="3" />
+    <circle cx="458" cy="76" r="3" />
+    <circle cx="492" cy="72" r="3" />
+  </g>
+  <g fill="currentColor" opacity="0.15">
+    <circle cx="430" cy="184" r="16" />
+    <circle cx="462" cy="200" r="3" />
+    <circle cx="474" cy="210" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <rect x="104" y="188" width="162" height="5" rx="2.5" />
+  </g>
+</svg>
+
 ## The two regions, side by side
 
 ```mermaid
