@@ -34,8 +34,18 @@ import {
 //
 // Returns `null` for unknown modes — callers should treat that as
 // "render plain text", which is how v5 behaved when a mode wasn't loaded.
+// A failed chunk load (flaky network on a deployed site) resolves `null`
+// too, so callers never see an unhandled rejection for a cosmetic feature.
 
 export async function loadLanguage(mode: string): Promise<Extension | null> {
+  try {
+    return await loadLanguageModule(mode);
+  } catch {
+    return null;
+  }
+}
+
+async function loadLanguageModule(mode: string): Promise<Extension | null> {
   switch (mode) {
     case "python": {
       const { python } = await import("@codemirror/lang-python");

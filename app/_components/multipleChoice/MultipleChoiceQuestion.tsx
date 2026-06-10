@@ -204,17 +204,13 @@ export default function MultipleChoiceQuestion({
         })}
       </div>
 
-      {submitted ? (
-        <div className={styles.actionBar}>
-          <button type="button" className={styles.retryBtn} onClick={onRetry}>
-            <RotateCcw size={13} aria-hidden />
-            Try again
-          </button>
-        </div>
-      ) : null}
-
+      {/* Feedback first, action last: the verdict banner and explanation
+          read before the "Try again" affordance, mirroring the usual
+          quiz flow (see what happened → understand why → act).
+          `role="status"` announces the verdict to screen readers when
+          it appears. */}
       {result ? (
-        <div className={styles.banner} data-state={result}>
+        <div className={styles.banner} data-state={result} role="status">
           <span className={styles.bannerIcon}>
             {result === "pass" ? (
               <Check size={14} strokeWidth={3} aria-hidden />
@@ -239,6 +235,15 @@ export default function MultipleChoiceQuestion({
           <div className={styles.overallBody}>
             <MarkdownInline source={parsed.explanation} />
           </div>
+        </div>
+      ) : null}
+
+      {submitted ? (
+        <div className={styles.actionBar}>
+          <button type="button" className={styles.retryBtn} onClick={onRetry}>
+            <RotateCcw size={13} aria-hidden />
+            Try again
+          </button>
         </div>
       ) : null}
     </section>
