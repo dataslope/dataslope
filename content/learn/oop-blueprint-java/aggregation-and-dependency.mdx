@@ -13,6 +13,37 @@ Knowing the difference is not pedantry — it changes *how you draw
 your model*, *which object's constructor takes which*, and *what
 happens when one object goes away*.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Three pairs of shapes bond ever more loosely — a green part sealed inside its whole, a part docked half out of the edge, and a part merely waved at across a gap — composition, aggregation, and dependency"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="60" y="60" width="110" height="90" rx="14" fillOpacity="0.2" />
+    <rect x="250" y="60" width="110" height="90" rx="14" fillOpacity="0.2" />
+    <rect x="440" y="60" width="110" height="90" rx="14" fillOpacity="0.2" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="85" y="88" width="60" height="36" rx="10" />
+    <rect x="330" y="88" width="60" height="36" rx="10" />
+    <rect x="588" y="88" width="44" height="36" rx="10" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="558" cy="106" r="3" />
+    <circle cx="570" cy="106" r="3" />
+    <circle cx="580" cy="106" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="100" cy="174" r="4.5" fillOpacity="0.7" />
+    <circle cx="115" cy="174" r="4.5" fillOpacity="0.7" />
+    <circle cx="130" cy="174" r="4.5" fillOpacity="0.7" />
+    <circle cx="297" cy="174" r="4.5" fillOpacity="0.7" />
+    <circle cx="312" cy="174" r="4.5" fillOpacity="0.7" />
+    <circle cx="495" cy="174" r="4.5" fillOpacity="0.7" />
+  </g>
+</svg>
+
 ## A spectrum of relationships
 
 ```mermaid
