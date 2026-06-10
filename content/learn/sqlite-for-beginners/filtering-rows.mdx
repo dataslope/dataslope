@@ -9,6 +9,48 @@ That difference matters. A table may hold hundreds or millions of rows,
 but most questions only need some of them: books under a certain price,
 employees in one department, or customers in one city.
 
+<svg
+  viewBox="0 0 640 250"
+  role="img"
+  aria-label="Mixed dots rain into a yellow colander; only the small green ones fit through its holes and collect in the bowl below, while the big red ones stay caught — WHERE is a sieve that lets matching rows through"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="248" cy="22" r="5.5" fillOpacity="0.8" />
+    <circle cx="330" cy="14" r="5.5" fillOpacity="0.9" />
+    <circle cx="296" cy="44" r="5.5" fillOpacity="0.7" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="368" cy="36" r="11" fillOpacity="0.8" />
+    <circle cx="222" cy="52" r="10" fillOpacity="0.7" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="394" cy="64" r="8" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path fillRule="evenodd" d="M 196 96 A 98 98 0 0 0 392 96 Z M 243 124 A 7 7 0 1 0 257 124 A 7 7 0 1 0 243 124 Z M 287 146 A 7 7 0 1 0 301 146 A 7 7 0 1 0 287 146 Z M 331 124 A 7 7 0 1 0 345 124 A 7 7 0 1 0 331 124 Z M 287 108 A 7 7 0 1 0 301 108 A 7 7 0 1 0 287 108 Z" fillOpacity="0.85" />
+    <rect x="162" y="90" width="36" height="11" rx="5.5" fillOpacity="0.85" />
+    <rect x="390" y="90" width="36" height="11" rx="5.5" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="262" cy="106" r="11" fillOpacity="0.85" />
+    <circle cx="322" cy="110" r="10" fillOpacity="0.7" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="294" cy="128" r="8" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="294" cy="158" r="5.5" fillOpacity="0.9" />
+    <circle cx="250" cy="178" r="5.5" fillOpacity="0.7" />
+    <circle cx="338" cy="172" r="5.5" fillOpacity="0.8" />
+    <circle cx="280" cy="196" r="5.5" fillOpacity="0.6" />
+    <circle cx="312" cy="206" r="5.5" fillOpacity="0.9" />
+  </g>
+  <g fill="currentColor" opacity="0.16">
+    <path d="M 216 218 A 78 78 0 0 0 372 218 Z" />
+  </g>
+</svg>
+
 ## WHERE keeps matching rows
 
 A `WHERE` clause is a test that SQLite applies to each row. If the test
@@ -277,6 +319,47 @@ WHERE
 
 In SQLite, `LIKE` is case-insensitive for ordinary ASCII letters by
 default. That means `'sql%'` can match `SQL Street`.
+
+<svg
+  viewBox="0 0 640 190"
+  role="img"
+  aria-label="A pattern card shows a solid blue start followed by trailing wildcard dots; below it, two text bars whose beginnings match glow green while the bar with a different start fades out — LIKE matches the shape of text, not the whole exact value"
+  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.12">
+    <rect x="180" y="18" width="280" height="44" rx="10" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="198" y="32" width="84" height="16" rx="8" />
+  </g>
+  <g fill="currentColor" opacity="0.4">
+    <circle cx="300" cy="40" r="4" />
+    <circle cx="320" cy="40" r="4" />
+    <circle cx="340" cy="40" r="4" />
+    <circle cx="360" cy="40" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="146" y="92" width="84" height="14" rx="7" />
+    <rect x="146" y="156" width="84" height="14" rx="7" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <rect x="238" y="92" width="120" height="14" rx="7" />
+    <rect x="238" y="156" width="56" height="14" rx="7" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="146" y="124" width="84" height="14" rx="7" fillOpacity="0.45" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <rect x="238" y="124" width="96" height="14" rx="7" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="406" cy="99" r="8" />
+    <circle cx="406" cy="163" r="8" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="406" cy="131" r="8" fillOpacity="0.5" />
+  </g>
+</svg>
 
 <SqlCodeBlock
   dialect="sqlite"

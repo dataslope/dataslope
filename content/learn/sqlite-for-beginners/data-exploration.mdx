@@ -11,6 +11,59 @@ and methodically — before you write a single "real" query.
 This page gives you a repeatable routine. Think of it as the
 questions a careful analyst always asks first.
 
+<svg
+  viewBox="0 0 640 250"
+  role="img"
+  aria-label="A treasure-map of table islands joined by a dotted route, a compass rose in the corner, and a magnifying glass hovering over one island making its value dots crisp, while a red cross marks an oddity on another — exploring an unfamiliar database island by island"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.12">
+    <path d="M 80 92 Q 64 56 104 44 Q 152 30 176 58 Q 196 84 168 102 Q 124 122 80 92 Z" />
+    <path d="M 280 190 Q 258 160 296 144 Q 344 128 372 152 Q 396 178 360 198 Q 312 216 280 190 Z" />
+    <path d="M 472 84 Q 456 52 496 40 Q 548 28 570 56 Q 588 84 556 100 Q 508 116 472 84 Z" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="196" cy="86" r="2.5" />
+    <circle cx="222" cy="102" r="2.5" />
+    <circle cx="246" cy="120" r="2.5" />
+    <circle cx="268" cy="138" r="2.5" />
+    <circle cx="396" cy="160" r="2.5" />
+    <circle cx="420" cy="140" r="2.5" />
+    <circle cx="442" cy="118" r="2.5" />
+    <circle cx="460" cy="98" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="116" cy="74" r="4" />
+    <circle cx="134" cy="74" r="4" />
+    <circle cx="116" cy="90" r="4" />
+    <circle cx="134" cy="90" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="306" cy="168" r="5" />
+    <circle cx="324" cy="168" r="5" fillOpacity="0.7" />
+    <circle cx="306" cy="184" r="5" fillOpacity="0.7" />
+    <circle cx="324" cy="184" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path fillRule="evenodd" d="M 315 132 A 44 44 0 1 0 315 220 A 44 44 0 1 0 315 132 Z M 315 142 A 34 34 0 1 1 315 210 A 34 34 0 1 1 315 142 Z" fillOpacity="0.85" />
+    <rect x="352" y="206" width="52" height="14" rx="7" transform="rotate(38 358 212)" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="500" y="58" width="34" height="9" rx="4.5" transform="rotate(45 517 62)" />
+    <rect x="500" y="58" width="34" height="9" rx="4.5" transform="rotate(-45 517 62)" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M 86 184 L 94 204 L 86 224 L 78 204 Z" />
+    <path d="M 66 204 L 86 197 L 106 204 L 86 211 Z" fillOpacity="0.6" />
+    <circle cx="86" cy="204" r="4" style={{ color: "var(--ds-white)" }} />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <circle cx="560" cy="184" r="4" />
+    <circle cx="588" cy="206" r="3" />
+    <circle cx="200" cy="206" r="3" />
+  </g>
+</svg>
+
 ## The exploration loop
 
 You rarely understand a dataset in one look. You **loop**: get the

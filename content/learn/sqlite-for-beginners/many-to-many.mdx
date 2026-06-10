@@ -16,6 +16,73 @@ flowchart LR
 
 Ada connects to more than one course. Math connects to more than one student. A single foreign-key column on either table cannot describe all those crossings.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="An old telephone switchboard: student jacks on the left and course jacks on the right are connected by dotted cords, and every cord plugs through its own yellow socket on the central panel — each socket is one row of the junction table, with one cord still waiting to be plugged in"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.08">
+    <rect x="250" y="28" width="140" height="184" rx="14" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <circle cx="290" cy="196" r="5" />
+    <circle cx="320" cy="196" r="5" />
+    <circle cx="350" cy="196" r="5" />
+    <circle cx="350" cy="160" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path fillRule="evenodd" d="M 96 48 A 17 17 0 1 0 96 82 A 17 17 0 1 0 96 48 Z M 96 56 A 9 9 0 1 1 96 74 A 9 9 0 1 1 96 56 Z" />
+    <path fillRule="evenodd" d="M 96 104 A 17 17 0 1 0 96 138 A 17 17 0 1 0 96 104 Z M 96 112 A 9 9 0 1 1 96 130 A 9 9 0 1 1 96 112 Z" fillOpacity="0.8" />
+    <path fillRule="evenodd" d="M 96 160 A 17 17 0 1 0 96 194 A 17 17 0 1 0 96 160 Z M 96 168 A 9 9 0 1 1 96 186 A 9 9 0 1 1 96 168 Z" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path fillRule="evenodd" d="M 544 48 A 17 17 0 1 0 544 82 A 17 17 0 1 0 544 48 Z M 544 56 A 9 9 0 1 1 544 74 A 9 9 0 1 1 544 56 Z" />
+    <path fillRule="evenodd" d="M 544 104 A 17 17 0 1 0 544 138 A 17 17 0 1 0 544 104 Z M 544 112 A 9 9 0 1 1 544 130 A 9 9 0 1 1 544 112 Z" fillOpacity="0.8" />
+    <path fillRule="evenodd" d="M 544 160 A 17 17 0 1 0 544 194 A 17 17 0 1 0 544 160 Z M 544 168 A 9 9 0 1 1 544 186 A 9 9 0 1 1 544 168 Z" fillOpacity="0.6" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="136" cy="62" r="2.5" />
+    <circle cx="174" cy="58" r="2.5" />
+    <circle cx="212" cy="56" r="2.5" />
+    <circle cx="250" cy="56" r="2.5" />
+    <circle cx="136" cy="74" r="2.5" />
+    <circle cx="172" cy="86" r="2.5" />
+    <circle cx="208" cy="98" r="2.5" />
+    <circle cx="244" cy="108" r="2.5" />
+    <circle cx="136" cy="124" r="2.5" />
+    <circle cx="174" cy="116" r="2.5" />
+    <circle cx="212" cy="106" r="2.5" />
+    <circle cx="248" cy="92" r="2.5" />
+    <circle cx="390" cy="60" r="2.5" />
+    <circle cx="428" cy="58" r="2.5" />
+    <circle cx="466" cy="58" r="2.5" />
+    <circle cx="504" cy="60" r="2.5" />
+    <circle cx="390" cy="92" r="2.5" />
+    <circle cx="426" cy="100" r="2.5" />
+    <circle cx="464" cy="110" r="2.5" />
+    <circle cx="502" cy="118" r="2.5" />
+    <circle cx="392" cy="118" r="2.5" />
+    <circle cx="430" cy="124" r="2.5" />
+    <circle cx="468" cy="130" r="2.5" />
+    <circle cx="506" cy="142" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="290" cy="62" r="7" />
+    <circle cx="320" cy="88" r="7" />
+    <circle cx="290" cy="116" r="7" />
+    <circle cx="320" cy="124" r="7" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="136" cy="180" r="2.5" />
+    <circle cx="166" cy="190" r="2.5" />
+    <circle cx="194" cy="202" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="216" cy="212" r="7" fillOpacity="0.55" />
+  </g>
+</svg>
+
 ## Why one foreign key is not enough
 
 If you put `course_id` on `students`, each student could store only one course. If you put `student_id` on `courses`, each course could store only one student. Both designs lose information.
