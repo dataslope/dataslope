@@ -10,6 +10,56 @@ separates a real forecaster from someone with a good-looking notebook is
 future it has never seen. Get this wrong and every accuracy number you report
 is a comfortable fiction.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="A yellow fence divides the timeline into blue past dots for training and green future dots for testing, while below a small interleaved blue-and-green row is struck through in red — the chronological split is the law, and the shuffled split is the forbidden alternative"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="44" y="148" width="552" height="5" rx="2.5" fill="currentColor" opacity="0.25" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="64" cy="128" r="5" />
+    <circle cx="96" cy="136" r="5" />
+    <circle cx="128" cy="122" r="5" />
+    <circle cx="160" cy="130" r="5" />
+    <circle cx="192" cy="114" r="5" />
+    <circle cx="224" cy="124" r="5" />
+    <circle cx="256" cy="108" r="5" />
+    <circle cx="288" cy="118" r="5" />
+    <circle cx="320" cy="104" r="5" />
+    <circle cx="348" cy="110" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="374" y="82" width="9" height="70" rx="4" />
+    <rect x="398" y="82" width="9" height="70" rx="4" />
+    <rect x="366" y="94" width="50" height="7" rx="3.5" fillOpacity="0.8" />
+    <rect x="366" y="122" width="50" height="7" rx="3.5" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="440" cy="100" r="5" />
+    <circle cx="472" cy="108" r="5" />
+    <circle cx="504" cy="94" r="5" />
+    <circle cx="536" cy="102" r="5" />
+    <circle cx="568" cy="88" r="5" />
+    <circle cx="592" cy="96" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="220" cy="198" r="4" fillOpacity="0.6" />
+    <circle cx="260" cy="198" r="4" fillOpacity="0.6" />
+    <circle cx="300" cy="198" r="4" fillOpacity="0.6" />
+    <circle cx="340" cy="198" r="4" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="240" cy="198" r="4" fillOpacity="0.6" />
+    <circle cx="280" cy="198" r="4" fillOpacity="0.6" />
+    <circle cx="320" cy="198" r="4" fillOpacity="0.6" />
+    <circle cx="360" cy="198" r="4" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="286" y="170" width="8" height="58" rx="4" transform="rotate(52 290 199)" fillOpacity="0.85" />
+  </g>
+</svg>
+
 <Callout type="danger" title="The cardinal rule, one more time">
 **You may only use the past to predict the future, never the reverse.** Every
 validation technique on this page is a mechanism for enforcing that rule.
@@ -178,6 +228,39 @@ net flows). When in doubt, report MAE *and* RMSE, and add MAPE only when a
 percentage genuinely makes sense.
 </Callout>
 
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="Two forecast records around the same truth line: on the left, green dots miss by small even amounts; on the right, blue dots sit perfectly except for one towering red blunder under a yellow magnifier — squared-error metrics like RMSE make that single blunder dominate the score"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="50" y="108" width="230" height="4" rx="2" fill="currentColor" opacity="0.25" />
+  <rect x="360" y="108" width="230" height="4" rx="2" fill="currentColor" opacity="0.25" />
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="66" cy="100" r="4.5" />
+    <circle cx="102" cy="120" r="4.5" />
+    <circle cx="138" cy="102" r="4.5" />
+    <circle cx="174" cy="118" r="4.5" />
+    <circle cx="210" cy="101" r="4.5" />
+    <circle cx="246" cy="119" r="4.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="376" cy="110" r="4.5" />
+    <circle cx="412" cy="110" r="4.5" />
+    <circle cx="448" cy="110" r="4.5" />
+    <circle cx="484" cy="110" r="4.5" />
+    <circle cx="556" cy="110" r="4.5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="517" y="48" width="6" height="60" rx="3" fillOpacity="0.3" />
+    <circle cx="520" cy="42" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M 504 42 a 16 16 0 1 0 32 0 a 16 16 0 1 0 -32 0 Z M 508 42 a 12 12 0 1 0 24 0 a 12 12 0 1 0 -24 0 Z" fillRule="evenodd" />
+    <rect x="529" y="51" width="7" height="20" rx="3.5" transform="rotate(-45 532.5 61)" />
+  </g>
+</svg>
+
 ## Beyond one split: walk-forward backtesting
 
 A single train/test split gives *one* estimate of forecast skill — and one
@@ -197,6 +280,34 @@ set grows each fold while the test window marches forward. A **rolling-window**
 scheme instead keeps the training window a fixed *size* and slides it — useful
 when old history stops being relevant. Either way, you get several honest
 out-of-sample scores instead of one.
+
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Three stacked timelines show a blue training bar growing longer in each fold while a green test block marches further into the future past a yellow cut mark — walk-forward backtesting, where training always ends before testing begins"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="60" y="48" width="200" height="28" rx="8" fillOpacity="0.55" />
+    <rect x="60" y="104" width="284" height="28" rx="8" fillOpacity="0.55" />
+    <rect x="60" y="160" width="368" height="28" rx="8" fillOpacity="0.55" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="263" y="44" width="5" height="36" rx="2.5" />
+    <rect x="347" y="100" width="5" height="36" rx="2.5" />
+    <rect x="431" y="156" width="5" height="36" rx="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="271" y="48" width="84" height="28" rx="8" />
+    <rect x="355" y="104" width="84" height="28" rx="8" />
+    <rect x="439" y="160" width="84" height="28" rx="8" />
+  </g>
+  <g fill="currentColor" opacity="0.1">
+    <rect x="363" y="48" width="217" height="28" rx="8" />
+    <rect x="447" y="104" width="133" height="28" rx="8" />
+    <rect x="531" y="160" width="49" height="28" rx="8" />
+  </g>
+</svg>
 
 <CodeBlock
   adapter="python"
@@ -296,6 +407,45 @@ it won't have at prediction time:
   and keeping the one with the best *test* score, the test set has trained
   your choices. You need a separate **validation** set (or nested CV); the
   final test set is looked at **once**.
+
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="The yellow fence guards the split above the ground, but a red trail of dots tunnels beneath it from the future side back into training, surfacing among the blue past dots — preprocessing computed on the whole series leaks the future even when the split itself looks correct"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="44" y="130" width="552" height="5" rx="2.5" fill="currentColor" opacity="0.25" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="80" cy="112" r="5" />
+    <circle cx="130" cy="104" r="5" />
+    <circle cx="180" cy="112" r="5" />
+    <circle cx="230" cy="102" r="5" />
+    <circle cx="280" cy="110" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="310" y="68" width="9" height="62" rx="4" />
+    <rect x="334" y="68" width="9" height="62" rx="4" />
+    <rect x="302" y="80" width="50" height="6" rx="3" fillOpacity="0.8" />
+    <rect x="302" y="104" width="50" height="6" rx="3" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="372" cy="104" r="5" />
+    <circle cx="422" cy="112" r="5" />
+    <circle cx="472" cy="100" r="5" />
+    <circle cx="522" cy="110" r="5" />
+    <circle cx="572" cy="102" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="462" cy="142" r="3.5" fillOpacity="0.7" />
+    <circle cx="420" cy="164" r="3.5" fillOpacity="0.7" />
+    <circle cx="378" cy="178" r="3.5" fillOpacity="0.7" />
+    <circle cx="330" cy="182" r="3.5" fillOpacity="0.7" />
+    <circle cx="282" cy="178" r="3.5" fillOpacity="0.7" />
+    <circle cx="240" cy="164" r="3.5" fillOpacity="0.7" />
+    <circle cx="198" cy="142" r="3.5" fillOpacity="0.7" />
+    <circle cx="190" cy="120" r="5.5" />
+  </g>
+</svg>
 
 <CodeBlock
   adapter="python"

@@ -102,6 +102,53 @@ Put the model to work, watch it on new data, and refit as the series evolves.
 Every forecast starts with eyes on the data. We name what we see *before*
 touching a model.
 
+<svg
+  viewBox="0 0 640 260"
+  role="img"
+  aria-label="A dotted trail climbs from a blue seasonal wave in the foothills, passes a red pitfall and a yellow gate partway up, and reaches a green summit flag where a beam of light fans into the sky — the whole forecasting pipeline as one journey from raw data to a validated forecast"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="90" cy="52" r="14" fillOpacity="0.9" />
+  </g>
+  <g fill="currentColor" opacity="0.08">
+    <path d="M 40 210 C 120 170 200 190 280 170 C 360 150 440 170 520 140 C 560 126 580 130 600 122 L 600 230 L 40 230 Z" />
+  </g>
+  <g fill="currentColor" opacity="0.13">
+    <path d="M 40 224 C 140 200 220 210 320 188 C 420 166 500 174 600 146 L 600 236 L 40 236 Z" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M 40 232 C 60 232 70 206 90 206 C 110 206 118 224 138 224 C 158 224 166 196 186 196 C 206 196 214 218 234 218 C 254 218 262 188 282 188 L 282 232 Z" fillOpacity="0.3" />
+  </g>
+  <g fill="currentColor" opacity="0.4">
+    <circle cx="120" cy="216" r="3.5" />
+    <circle cx="160" cy="208" r="3.5" />
+    <circle cx="200" cy="200" r="3.5" />
+    <circle cx="240" cy="192" r="3.5" />
+    <circle cx="280" cy="184" r="3.5" />
+    <circle cx="316" cy="172" r="3.5" />
+    <circle cx="352" cy="160" r="3.5" />
+    <circle cx="388" cy="148" r="3.5" />
+    <circle cx="424" cy="136" r="3.5" />
+    <circle cx="460" cy="124" r="3.5" />
+    <circle cx="496" cy="112" r="3.5" />
+    <circle cx="524" cy="100" r="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="362" y="128" width="7" height="44" rx="3" />
+    <rect x="386" y="120" width="7" height="44" rx="3" />
+    <rect x="356" y="114" width="44" height="7" rx="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="302" cy="200" r="4.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 550 62 L 604 12 L 632 48 Z" fillOpacity="0.12" />
+    <rect x="544" y="64" width="5" height="56" rx="2.5" />
+    <path d="M 549 64 L 583 76 L 549 88 Z" />
+  </g>
+</svg>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -409,6 +456,28 @@ errors, so it trails the seasonal model. The gap between them is precisely the
 seasonality that plain ARIMA's lag-12 residual spike warned about on the ARIMA
 page — the residual diagnostic, paid off in hard numbers.
 
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="Three error columns stand against a yellow line set by the baseline: the neutral baseline column reaches it exactly, the blue model only just dips beneath it, and the green seasonal model sits far lower with a small medal dot above — an error score only means something when it beats the baseline on the same honest test"
+  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="50" y="170" width="540" height="5" rx="2.5" fill="currentColor" opacity="0.25" />
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="60" y="78" width="500" height="6" rx="3" fillOpacity="0.55" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <rect x="100" y="84" width="64" height="86" rx="7" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="268" y="96" width="64" height="74" rx="7" fillOpacity="0.75" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="436" y="130" width="64" height="40" rx="7" />
+    <circle cx="468" cy="112" r="5.5" />
+  </g>
+</svg>
+
 ## Step 8 — Visualize the forecast against reality
 
 <CodeBlock
@@ -502,6 +571,41 @@ In production, a forecast is a living thing:
 - **Respect the horizon.** Short-horizon forecasts are trustworthy; far-out
   ones come with wide bands for a reason. Don't promise precision the
   uncertainty doesn't support.
+
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Around a continuous loop, a blue gear-like model node hands off to green monitoring pulse dots and yellow retraining arrows, while one red dot drifts away from the orbit trailing a fading tail — in production a forecast lives in a cycle of monitoring, drift detection, and refitting"
+  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
+>
+  <path d="M 248 105 a 72 72 0 1 0 144 0 a 72 72 0 1 0 -144 0 Z M 254 105 a 66 66 0 1 0 132 0 a 66 66 0 1 0 -132 0 Z" fillRule="evenodd" fill="currentColor" opacity="0.15" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="315" y="14" width="10" height="10" rx="2" />
+    <rect x="315" y="42" width="10" height="10" rx="2" />
+    <rect x="301" y="28" width="10" height="10" rx="2" />
+    <rect x="329" y="28" width="10" height="10" rx="2" />
+    <circle cx="320" cy="33" r="12" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="382" cy="142" r="6.5" />
+    <circle cx="392" cy="118" r="5" fillOpacity="0.7" />
+    <circle cx="390" cy="92" r="4" fillOpacity="0.45" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="244" y="152" width="20" height="8" rx="4" transform="rotate(32 254 156)" />
+    <rect x="222" y="132" width="20" height="8" rx="4" transform="rotate(52 232 136)" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="394" cy="64" r="3" fillOpacity="0.35" />
+    <circle cx="406" cy="54" r="3.5" fillOpacity="0.55" />
+    <circle cx="420" cy="44" r="5.5" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="120" cy="60" r="4" />
+    <circle cx="520" cy="160" r="4" />
+    <circle cx="150" cy="170" r="3" />
+  </g>
+</svg>
 
 ## Practice
 

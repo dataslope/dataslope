@@ -16,6 +16,53 @@ passage of time. Reorder the rows of an ordinary table and you lose
 nothing. Reorder the rows of a time series and you have **destroyed the
 data** — because in a time series, the *order is the information*.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="A seasonal wave grows along a timeline of dots toward a yellow now-post, a green forecast cone fans wider into the future beyond it, and the same points lie scattered as dust beneath the axis — in time series the order is the information, and honest forecasts carry widening uncertainty"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="36" y="186" width="568" height="5" rx="2.5" fill="currentColor" opacity="0.25" />
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="64" cy="38" r="4" />
+    <circle cx="600" cy="210" r="3" />
+    <circle cx="336" cy="30" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M 48 186 C 70 186 78 168 96 168 C 114 168 120 183 138 183 C 156 183 164 148 184 148 C 204 148 210 178 228 178 C 246 178 256 118 280 118 C 304 118 310 172 328 172 C 346 172 356 84 384 84 L 384 186 Z" fillOpacity="0.2" />
+    <circle cx="96" cy="168" r="4" />
+    <circle cx="138" cy="183" r="4" />
+    <circle cx="184" cy="148" r="4.5" />
+    <circle cx="228" cy="178" r="4.5" />
+    <circle cx="280" cy="118" r="5" />
+    <circle cx="328" cy="172" r="5" />
+    <circle cx="384" cy="84" r="5.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="396" y="96" width="8" height="90" rx="4" />
+    <circle cx="400" cy="82" r="8" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 410 96 L 600 24 L 600 164 Z" fillOpacity="0.1" />
+    <path d="M 410 96 L 600 56 L 600 124 Z" fillOpacity="0.16" />
+    <circle cx="446" cy="92" r="4.5" fillOpacity="0.95" />
+    <circle cx="486" cy="87" r="4.5" fillOpacity="0.8" />
+    <circle cx="526" cy="83" r="4.5" fillOpacity="0.65" />
+    <circle cx="566" cy="79" r="4.5" fillOpacity="0.5" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="76" cy="206" r="3" />
+    <circle cx="118" cy="222" r="3" />
+    <circle cx="164" cy="210" r="3" />
+    <circle cx="246" cy="224" r="3" />
+    <circle cx="298" cy="206" r="3" />
+    <circle cx="352" cy="219" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="206" cy="215" r="3.5" />
+  </g>
+</svg>
+
 <Callout type="info" title="What we assume you already know">
 You can write basic Python (slicing, list comprehensions), use pandas
 (`DataFrame`, `Series`, filtering), make a simple line chart, and you

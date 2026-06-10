@@ -9,6 +9,64 @@ those skills into the workhorses of classical forecasting: **AR**, **MA**,
 **ARMA**, and their union **ARIMA**. By the end you'll fit one, read its
 output, and produce a forecast with honest uncertainty bands.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="Three interlocking gears turn together — a blue one carrying a trail of recent values, a yellow one carrying a tiny staircase of differences, and a green one carrying fading shock dots, with one small red shock caught between the teeth — AR, I, and MA meshing into a single forecasting machine"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="163" y="50" width="14" height="18" rx="3" />
+    <rect x="163" y="50" width="14" height="18" rx="3" transform="rotate(45 170 112)" />
+    <rect x="163" y="50" width="14" height="18" rx="3" transform="rotate(90 170 112)" />
+    <rect x="163" y="50" width="14" height="18" rx="3" transform="rotate(135 170 112)" />
+    <rect x="163" y="50" width="14" height="18" rx="3" transform="rotate(180 170 112)" />
+    <rect x="163" y="50" width="14" height="18" rx="3" transform="rotate(225 170 112)" />
+    <rect x="163" y="50" width="14" height="18" rx="3" transform="rotate(270 170 112)" />
+    <rect x="163" y="50" width="14" height="18" rx="3" transform="rotate(315 170 112)" />
+    <path d="M 124 112 a 46 46 0 1 0 92 0 a 46 46 0 1 0 -92 0 Z M 150 112 a 20 20 0 1 0 40 0 a 20 20 0 1 0 -40 0 Z" fillRule="evenodd" />
+    <circle cx="158" cy="112" r="3.5" fillOpacity="0.4" />
+    <circle cx="170" cy="112" r="3.5" fillOpacity="0.65" />
+    <circle cx="182" cy="112" r="3.5" fillOpacity="0.95" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="293" y="94" width="13" height="18" rx="3" transform="rotate(22.5 300 150)" />
+    <rect x="293" y="94" width="13" height="18" rx="3" transform="rotate(67.5 300 150)" />
+    <rect x="293" y="94" width="13" height="18" rx="3" transform="rotate(112.5 300 150)" />
+    <rect x="293" y="94" width="13" height="18" rx="3" transform="rotate(157.5 300 150)" />
+    <rect x="293" y="94" width="13" height="18" rx="3" transform="rotate(202.5 300 150)" />
+    <rect x="293" y="94" width="13" height="18" rx="3" transform="rotate(247.5 300 150)" />
+    <rect x="293" y="94" width="13" height="18" rx="3" transform="rotate(292.5 300 150)" />
+    <rect x="293" y="94" width="13" height="18" rx="3" transform="rotate(337.5 300 150)" />
+    <path d="M 260 150 a 40 40 0 1 0 80 0 a 40 40 0 1 0 -80 0 Z M 283 150 a 17 17 0 1 0 34 0 a 17 17 0 1 0 -34 0 Z" fillRule="evenodd" />
+    <rect x="288" y="156" width="8" height="5" rx="1.5" />
+    <rect x="296" y="150" width="8" height="5" rx="1.5" />
+    <rect x="304" y="144" width="8" height="5" rx="1.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="425" y="48" width="14" height="18" rx="3" transform="rotate(22.5 432 108)" />
+    <rect x="425" y="48" width="14" height="18" rx="3" transform="rotate(67.5 432 108)" />
+    <rect x="425" y="48" width="14" height="18" rx="3" transform="rotate(112.5 432 108)" />
+    <rect x="425" y="48" width="14" height="18" rx="3" transform="rotate(157.5 432 108)" />
+    <rect x="425" y="48" width="14" height="18" rx="3" transform="rotate(202.5 432 108)" />
+    <rect x="425" y="48" width="14" height="18" rx="3" transform="rotate(247.5 432 108)" />
+    <rect x="425" y="48" width="14" height="18" rx="3" transform="rotate(292.5 432 108)" />
+    <rect x="425" y="48" width="14" height="18" rx="3" transform="rotate(337.5 432 108)" />
+    <path d="M 388 108 a 44 44 0 1 0 88 0 a 44 44 0 1 0 -88 0 Z M 413 108 a 19 19 0 1 0 38 0 a 19 19 0 1 0 -38 0 Z" fillRule="evenodd" />
+    <circle cx="420" cy="108" r="4" />
+    <circle cx="432" cy="108" r="3.5" fillOpacity="0.6" />
+    <circle cx="444" cy="108" r="3" fillOpacity="0.35" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="368" cy="128" r="4.5" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="80" cy="190" r="4" />
+    <circle cx="540" cy="186" r="4" />
+    <circle cx="566" cy="48" r="3" />
+  </g>
+</svg>
+
 ## The two ingredients: AR and MA
 
 An ARIMA model is built from two simple ideas about where the next value
@@ -206,6 +264,44 @@ stretching years into the future — is hiding how little it really knows.
 Always look at the bands, not just the central line.
 </Callout>
 
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="A blue trail of observations climbs to a yellow post where the data ends, and a green cone fans wider and wider around the forecast dots beyond it, with the eventual actual values landing inside the band — uncertainty compounds with every step ahead, and an honest forecast admits it"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="44" y="174" width="552" height="4" rx="2" fill="currentColor" opacity="0.2" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="56" cy="130" r="4.5" />
+    <circle cx="86" cy="138" r="4.5" />
+    <circle cx="116" cy="122" r="4.5" />
+    <circle cx="146" cy="130" r="4.5" />
+    <circle cx="176" cy="112" r="4.5" />
+    <circle cx="206" cy="120" r="4.5" />
+    <circle cx="236" cy="104" r="4.5" />
+    <circle cx="266" cy="112" r="4.5" />
+    <circle cx="296" cy="98" r="4.5" />
+    <circle cx="320" cy="102" r="4.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="332" y="56" width="7" height="118" rx="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 346 98 L 596 26 L 596 178 Z" fillOpacity="0.1" />
+    <path d="M 346 98 L 596 60 L 596 136 Z" fillOpacity="0.16" />
+    <circle cx="386" cy="94" r="4.5" fillOpacity="0.95" />
+    <circle cx="428" cy="91" r="4.5" fillOpacity="0.8" />
+    <circle cx="470" cy="89" r="4.5" fillOpacity="0.65" />
+    <circle cx="512" cy="87" r="4.5" fillOpacity="0.5" />
+    <circle cx="554" cy="85" r="4.5" fillOpacity="0.4" />
+  </g>
+  <g fill="currentColor" opacity="0.45">
+    <circle cx="428" cy="102" r="3.5" />
+    <circle cx="512" cy="70" r="3.5" />
+    <circle cx="576" cy="96" r="3.5" />
+  </g>
+</svg>
+
 ## Choosing orders with AIC (and its limits)
 
 ACF/PACF suggest candidate orders, but often several are plausible. The
@@ -316,6 +412,36 @@ ARIMA can't capture. That's the residual diagnostic doing its job: telling
 you the model is incomplete and pointing at *seasonality* as the culprit.
 The fix is a **seasonal** ARIMA (SARIMA), which adds seasonal AR/I/MA terms
 at the period — conceptually just "do the AR/I/MA trick at lag 12 too."
+
+<svg
+  viewBox="0 0 640 170"
+  role="img"
+  aria-label="Residual dots hug the zero line quietly until the twelfth one leaps high in red with a halo around it — a lag-12 spike left in the residuals is the model confessing that it is missing a seasonal term"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="50" y="100" width="540" height="4" rx="2" fill="currentColor" opacity="0.2" />
+  <g fill="currentColor" opacity="0.45">
+    <circle cx="70" cy="94" r="4" />
+    <circle cx="106" cy="106" r="4" />
+    <circle cx="142" cy="98" r="4" />
+    <circle cx="178" cy="104" r="4" />
+    <circle cx="214" cy="92" r="4" />
+    <circle cx="250" cy="108" r="4" />
+    <circle cx="286" cy="96" r="4" />
+    <circle cx="322" cy="102" r="4" />
+    <circle cx="358" cy="94" r="4" />
+    <circle cx="394" cy="106" r="4" />
+    <circle cx="430" cy="98" r="4" />
+    <circle cx="502" cy="104" r="4" />
+    <circle cx="538" cy="96" r="4" />
+    <circle cx="574" cy="102" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="463" y="46" width="6" height="52" rx="3" fillOpacity="0.3" />
+    <circle cx="466" cy="40" r="11" fillOpacity="0.25" />
+    <circle cx="466" cy="40" r="6" />
+  </g>
+</svg>
 
 <MultipleChoice
   markdown={`A teammate says, "I'll use an MA(2) model — that's just a 2-period moving average of the data, right?" What's the correction?

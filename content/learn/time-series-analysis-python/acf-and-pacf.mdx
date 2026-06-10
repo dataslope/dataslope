@@ -10,6 +10,42 @@ model orders without brute-force search. Master these two plots and the
 otherwise-mysterious `(p, d, q)` of ARIMA becomes something you can often
 *read off a chart*.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="Two rows of echoes spread from the same starting dot: the blue top row fades gradually lag by lag while the green bottom row sounds once and then falls silent into hollow rings — an ACF that tails off and a PACF that cuts off, the paired fingerprint that names a model"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="122" y="42" width="36" height="146" rx="13" fillOpacity="0.12" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="80" cy="70" r="11" />
+    <circle cx="140" cy="70" r="8.5" fillOpacity="0.85" />
+    <circle cx="196" cy="70" r="7.5" fillOpacity="0.72" />
+    <circle cx="252" cy="70" r="6.6" fillOpacity="0.6" />
+    <circle cx="308" cy="70" r="5.8" fillOpacity="0.5" />
+    <circle cx="364" cy="70" r="5.1" fillOpacity="0.41" />
+    <circle cx="420" cy="70" r="4.5" fillOpacity="0.33" />
+    <circle cx="476" cy="70" r="4" fillOpacity="0.26" />
+    <circle cx="532" cy="70" r="3.6" fillOpacity="0.2" />
+    <circle cx="584" cy="70" r="3.2" fillOpacity="0.15" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="80" cy="160" r="11" />
+    <circle cx="140" cy="160" r="8.5" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <path d="M 191 160 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0 Z M 193.5 160 a 2.5 2.5 0 1 0 5 0 a 2.5 2.5 0 1 0 -5 0 Z" fillRule="evenodd" />
+    <path d="M 247 160 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0 Z M 249.5 160 a 2.5 2.5 0 1 0 5 0 a 2.5 2.5 0 1 0 -5 0 Z" fillRule="evenodd" />
+    <path d="M 303 160 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0 Z M 305.5 160 a 2.5 2.5 0 1 0 5 0 a 2.5 2.5 0 1 0 -5 0 Z" fillRule="evenodd" />
+    <path d="M 359 160 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0 Z M 361.5 160 a 2.5 2.5 0 1 0 5 0 a 2.5 2.5 0 1 0 -5 0 Z" fillRule="evenodd" />
+    <path d="M 415 160 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0 Z M 417.5 160 a 2.5 2.5 0 1 0 5 0 a 2.5 2.5 0 1 0 -5 0 Z" fillRule="evenodd" />
+    <path d="M 471 160 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0 Z M 473.5 160 a 2.5 2.5 0 1 0 5 0 a 2.5 2.5 0 1 0 -5 0 Z" fillRule="evenodd" />
+    <path d="M 527 160 a 5 5 0 1 0 10 0 a 5 5 0 1 0 -10 0 Z M 529.5 160 a 2.5 2.5 0 1 0 5 0 a 2.5 2.5 0 1 0 -5 0 Z" fillRule="evenodd" />
+  </g>
+</svg>
+
 ## Two kinds of correlation with the past
 
 - The **ACF** (Autocorrelation Function) measures the correlation between
@@ -26,6 +62,32 @@ correlated with `y(t-2)` too — through the chain — even though there's no
 direct link. The **ACF** at lag 2 sees that indirect echo and is nonzero;
 the **PACF** at lag 2 strips the chain away and reveals the truth: no direct
 lag-2 relationship.
+
+<svg
+  viewBox="0 0 640 190"
+  role="img"
+  aria-label="Two solid links join three dots in a chain while a faint arc of small dots leaps directly from the first to the last; a green ring pins the middle dot in place — the ACF counts the leaping indirect echo, the PACF holds the middleman fixed and keeps only direct ties"
+  style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="60" y="158" width="520" height="4" rx="2" fill="currentColor" opacity="0.15" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="185" cy="88" r="3.5" fillOpacity="0.3" />
+    <circle cx="230" cy="66" r="3.5" fillOpacity="0.3" />
+    <circle cx="275" cy="52" r="3.5" fillOpacity="0.3" />
+    <circle cx="320" cy="48" r="3.5" fillOpacity="0.3" />
+    <circle cx="365" cy="52" r="3.5" fillOpacity="0.3" />
+    <circle cx="410" cy="66" r="3.5" fillOpacity="0.3" />
+    <circle cx="455" cy="88" r="3.5" fillOpacity="0.3" />
+    <rect x="162" y="115" width="136" height="10" rx="5" fillOpacity="0.35" />
+    <rect x="342" y="115" width="136" height="10" rx="5" fillOpacity="0.35" />
+    <circle cx="140" cy="120" r="10" />
+    <circle cx="320" cy="120" r="10" />
+    <circle cx="500" cy="120" r="10" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 303 120 a 17 17 0 1 0 34 0 a 17 17 0 1 0 -34 0 Z M 307 120 a 13 13 0 1 0 26 0 a 13 13 0 1 0 -26 0 Z" fillRule="evenodd" />
+  </g>
+</svg>
 
 <Callout type="tip" title="The intuition in one line">
 ACF asks "how related are values `k` apart, *however* that relationship
@@ -206,6 +268,35 @@ the band are statistically indistinguishable from zero — noise. Spikes
 *poking outside* are "significant." When we say a plot "cuts off after lag
 `p`," we mean the spikes are significant up through lag `p` and then duck
 inside the band.
+
+<svg
+  viewBox="0 0 640 190"
+  role="img"
+  aria-label="Thin bars rise and dip around a shaded zero band: the first two clear it convincingly in blue, most hide inside it, and one lone red bar pokes out far down the row — spikes inside the band are noise, and an isolated far-out spike deserves suspicion"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="50" y="96" width="540" height="48" rx="10" fill="currentColor" opacity="0.08" />
+  <rect x="50" y="118" width="540" height="4" rx="2" fill="currentColor" opacity="0.25" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="78" y="50" width="9" height="68" rx="4.5" />
+    <rect x="116" y="66" width="9" height="52" rx="4.5" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <rect x="154" y="122" width="9" height="16" rx="4.5" />
+    <rect x="192" y="102" width="9" height="16" rx="4.5" />
+    <rect x="230" y="122" width="9" height="12" rx="4.5" />
+    <rect x="268" y="106" width="9" height="12" rx="4.5" />
+    <rect x="306" y="122" width="9" height="17" rx="4.5" />
+    <rect x="344" y="104" width="9" height="14" rx="4.5" />
+    <rect x="382" y="122" width="9" height="13" rx="4.5" />
+    <rect x="420" y="103" width="9" height="15" rx="4.5" />
+    <rect x="458" y="122" width="9" height="15" rx="4.5" />
+    <rect x="534" y="108" width="9" height="10" rx="4.5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="496" y="46" width="9" height="72" rx="4.5" fillOpacity="0.9" />
+  </g>
+</svg>
 
 <Callout type="warn" title="Don't over-read the bands">
 With many lags plotted, a few spikes will breach the band *by chance* alone
