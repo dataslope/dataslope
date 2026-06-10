@@ -9,6 +9,43 @@ that turn `displ = 4.5` into a pixel position and `drv = "f"` into a
 specific blue. Every axis and every legend you have ever seen on a
 ggplot is a scale showing its work.
 
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="A ruler with five evenly spaced ticks wired down to five blue swatches deepening from pale to solid — a scale translating data values into visual intensity"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.12">
+    <rect x="90" y="48" width="460" height="12" rx="6" />
+  </g>
+  <g fill="currentColor" opacity="0.4">
+    <rect x="118" y="42" width="4" height="24" rx="2" />
+    <rect x="208" y="42" width="4" height="24" rx="2" />
+    <rect x="298" y="42" width="4" height="24" rx="2" />
+    <rect x="388" y="42" width="4" height="24" rx="2" />
+    <rect x="478" y="42" width="4" height="24" rx="2" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="120" cy="86" r="2.5" />
+    <circle cx="120" cy="106" r="2.5" />
+    <circle cx="210" cy="86" r="2.5" />
+    <circle cx="210" cy="106" r="2.5" />
+    <circle cx="300" cy="86" r="2.5" />
+    <circle cx="300" cy="106" r="2.5" />
+    <circle cx="390" cy="86" r="2.5" />
+    <circle cx="390" cy="106" r="2.5" />
+    <circle cx="480" cy="86" r="2.5" />
+    <circle cx="480" cy="106" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="98" y="128" width="44" height="34" rx="8" fillOpacity="0.12" />
+    <rect x="188" y="128" width="44" height="34" rx="8" fillOpacity="0.3" />
+    <rect x="278" y="128" width="44" height="34" rx="8" fillOpacity="0.52" />
+    <rect x="368" y="128" width="44" height="34" rx="8" fillOpacity="0.75" />
+    <rect x="458" y="128" width="44" height="34" rx="8" />
+  </g>
+</svg>
+
 ## The mapping/scale division of labor
 
 This pairing mirrors the stat/geom split from earlier. One component

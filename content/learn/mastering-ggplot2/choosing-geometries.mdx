@@ -7,6 +7,67 @@ With the *concept* of a geom in hand, let us build a working
 vocabulary. The goal is not to memorize a list but to develop a reflex:
 *look at your variables, and the right geom suggests itself.*
 
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="Two variable chips send dotted leaders down to a shelf of geom tokens — dots, line, bars, boxplot, area — and the bar token lights up: the variables choose the geom"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="200" y="28" width="80" height="22" rx="8" />
+  </g>
+  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
+    <rect x="212" y="35" width="8" height="8" rx="2" fillOpacity="0.85" />
+    <rect x="224" y="35" width="8" height="8" rx="2" fillOpacity="0.85" />
+    <rect x="236" y="35" width="8" height="8" rx="2" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="330" y="28" width="90" height="22" rx="8" />
+  </g>
+  <g style={{ color: "var(--ds-blue-50)" }} fill="currentColor">
+    <circle cx="344" cy="39" r="3" fillOpacity="0.9" />
+    <circle cx="356" cy="36" r="3" fillOpacity="0.9" />
+    <circle cx="368" cy="40" r="3" fillOpacity="0.9" />
+    <circle cx="380" cy="37" r="3" fillOpacity="0.9" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="246" cy="60" r="3" />
+    <circle cx="254" cy="72" r="3" />
+    <circle cx="262" cy="84" r="3" />
+    <circle cx="366" cy="62" r="3" />
+    <circle cx="348" cy="74" r="3" />
+    <circle cx="330" cy="86" r="3" />
+    <circle cx="312" cy="93" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="285" cy="116" r="44" fillOpacity="0.15" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <rect x="60" y="150" width="520" height="5" rx="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="100" cy="138" r="4.5" />
+    <circle cx="112" cy="124" r="4.5" />
+    <circle cx="124" cy="136" r="4.5" />
+    <circle cx="165" cy="140" r="3.5" />
+    <circle cx="177" cy="130" r="3.5" />
+    <circle cx="189" cy="133" r="3.5" />
+    <circle cx="201" cy="120" r="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="262" y="112" width="12" height="38" rx="3" />
+    <rect x="278" y="96" width="12" height="54" rx="3" />
+    <rect x="294" y="122" width="12" height="28" rx="3" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <rect x="368" y="100" width="4" height="14" rx="2" />
+    <rect x="355" y="114" width="30" height="24" rx="4" fillOpacity="0.7" />
+    <rect x="355" y="124" width="30" height="4" />
+    <rect x="368" y="138" width="4" height="12" rx="2" />
+    <polygon points="440,150 440,128 462,112 484,124 504,104 504,150" />
+  </g>
+</svg>
+
 ## Let the variables choose the geom
 
 A reliable way to pick a geom is to count and classify the variables
