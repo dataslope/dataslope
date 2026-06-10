@@ -10,6 +10,43 @@ column.
 **Third normal form (3NF)** says non-key columns should depend on the
 key, the whole key, and nothing but the key.
 
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="Inside one table three columns form a chain: short dotted hops run key to fact to fact, while the long red arc shows the fact reaching the key only secondhand — a transitive dependency"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.08">
+    <rect x="90" y="86" width="460" height="80" rx="18" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="170" cy="126" r="11" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="320" cy="126" r="11" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="470" cy="126" r="11" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="220" cy="110" r="3" />
+    <circle cx="245" cy="104" r="3" />
+    <circle cx="270" cy="110" r="3" />
+    <circle cx="370" cy="110" r="3" />
+    <circle cx="395" cy="104" r="3" />
+    <circle cx="420" cy="110" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="206" cy="86" r="3.5" fillOpacity="0.6" />
+    <circle cx="248" cy="62" r="3.5" fillOpacity="0.6" />
+    <circle cx="296" cy="48" r="3.5" fillOpacity="0.6" />
+    <circle cx="344" cy="48" r="3.5" fillOpacity="0.6" />
+    <circle cx="392" cy="62" r="3.5" fillOpacity="0.6" />
+    <circle cx="434" cy="86" r="3.5" fillOpacity="0.6" />
+    <rect x="306" y="44" width="28" height="6" rx="3" transform="rotate(-45 320 47)" />
+  </g>
+</svg>
+
 ## The transitive dependency problem
 
 A **transitive dependency** happens when a non-key column depends on

@@ -12,6 +12,43 @@ code through **inheritance**. And once you have a family of related
 types, you can write code that doesn't care which member it's
 holding — that's **polymorphism**.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="A parent capsule connected down to two child capsules; each child carries the parent's blue dot plus a new shape of its own — a family of types sharing and extending behavior"
+  style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="250" y="30" width="140" height="48" rx="24" fillOpacity="0.2" />
+    <circle cx="290" cy="54" r="9" />
+    <rect x="312" y="48" width="56" height="12" rx="6" fillOpacity="0.5" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <rect x="318" y="78" width="4" height="34" rx="2" />
+    <rect x="178" y="110" width="284" height="4" rx="2" />
+    <rect x="178" y="110" width="4" height="30" rx="2" />
+    <rect x="458" y="110" width="4" height="30" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="110" y="140" width="140" height="48" rx="24" fillOpacity="0.18" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="150" cy="164" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="182" y="155" width="18" height="18" rx="4" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="390" y="140" width="140" height="48" rx="24" fillOpacity="0.18" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="430" cy="164" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <polygon points="462,173 482,173 472,155" />
+  </g>
+</svg>
+
 ## Inheritance: the basic mechanics
 
 A **base class** holds the common state and behavior. A **derived

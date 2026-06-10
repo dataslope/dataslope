@@ -19,6 +19,48 @@ C# splits resources into two camps:
 
 Understanding this split is the foundation of clean, leak-free C#.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Green tokens leave a depot, travel a dotted loop through a yellow work zone, and come back to be reused — but one red token has fallen off the loop and never returned"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="80" y="70" width="120" height="80" rx="14" fillOpacity="0.12" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="98" y="84" width="22" height="22" rx="5" fillOpacity="0.85" />
+    <rect x="132" y="84" width="22" height="22" rx="5" fillOpacity="0.6" />
+    <rect x="98" y="116" width="22" height="22" rx="5" fillOpacity="0.4" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="230" cy="88" r="3" />
+    <circle cx="270" cy="70" r="3" />
+    <circle cx="320" cy="58" r="3" />
+    <circle cx="375" cy="56" r="3" />
+    <circle cx="430" cy="66" r="3" />
+    <circle cx="466" cy="80" r="3" />
+    <circle cx="452" cy="130" r="3" />
+    <circle cx="400" cy="146" r="3" />
+    <circle cx="340" cy="152" r="3" />
+    <circle cx="280" cy="146" r="3" />
+    <circle cx="236" cy="130" r="3" />
+  </g>
+  <polygon points="398,48 398,64 414,56" fill="currentColor" opacity="0.35" />
+  <polygon points="312,144 312,160 296,152" fill="currentColor" opacity="0.35" />
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="505" cy="102" r="26" fillOpacity="0.22" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="494" y="91" width="22" height="22" rx="5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="368" cy="162" r="2.5" fillOpacity="0.5" />
+    <circle cx="363" cy="171" r="2.5" fillOpacity="0.4" />
+    <rect x="350" y="178" width="20" height="20" rx="5" fillOpacity="0.75" transform="rotate(12 360 188)" />
+  </g>
+</svg>
+
 ## Memory: handled (mostly) for you
 
 In low-level languages like C, you call `malloc` and `free` by

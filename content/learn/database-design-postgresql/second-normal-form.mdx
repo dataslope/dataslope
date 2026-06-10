@@ -10,6 +10,52 @@ store facts in the wrong place.
 **Second normal form (2NF)** asks one focused question: when a table has
 a composite key, does every non-key column depend on the whole key?
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="In a table with two yellow key tabs, a green fact clings to only one tab and the link is cut in red; on the right the fact lives in its own table under the single key it depends on"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="60" y="56" width="200" height="118" rx="16" fillOpacity="0.1" />
+    <circle cx="206" cy="142" r="8" fillOpacity="0.55" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="84" y="44" width="42" height="22" rx="11" />
+    <rect x="136" y="44" width="42" height="22" rx="11" fillOpacity="0.55" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="120" cy="142" r="9" />
+    <circle cx="116" cy="118" r="3" fillOpacity="0.6" />
+    <circle cx="110" cy="96" r="3" fillOpacity="0.6" />
+    <circle cx="106" cy="76" r="3" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="100" y="94" width="20" height="5" rx="2.5" transform="rotate(45 110 96)" />
+    <rect x="100" y="94" width="20" height="5" rx="2.5" transform="rotate(-45 110 96)" />
+  </g>
+  <g fill="currentColor" opacity="0.28">
+    <circle cx="292" cy="112" r="3" />
+    <circle cx="316" cy="112" r="3" />
+    <circle cx="340" cy="112" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="380" y="38" width="200" height="64" rx="14" fillOpacity="0.1" />
+    <circle cx="496" cy="76" r="8" fillOpacity="0.55" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="400" y="27" width="42" height="22" rx="11" />
+    <rect x="452" y="27" width="42" height="22" rx="11" fillOpacity="0.55" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="380" y="126" width="160" height="62" rx="14" fillOpacity="0.12" />
+    <circle cx="452" cy="163" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="400" y="115" width="42" height="22" rx="11" />
+  </g>
+</svg>
+
 ## 2NF only matters with composite keys
 
 A **composite key** is a primary key made from more than one column. For

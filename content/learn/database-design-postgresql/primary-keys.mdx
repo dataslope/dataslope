@@ -11,6 +11,43 @@ That is the **identity problem**. A table does not just need values; it
 needs a reliable way to say *this exact row, not that similar-looking
 one*.
 
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="Two rows with identical contents are told apart only by the numbered yellow key tab on each — a primary key gives look-alike rows distinct identity"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="110" y="78" width="160" height="84" rx="16" fillOpacity="0.18" />
+    <rect x="370" y="78" width="160" height="84" rx="16" fillOpacity="0.18" />
+    <rect x="134" y="100" width="92" height="10" rx="5" fillOpacity="0.4" />
+    <rect x="394" y="100" width="92" height="10" rx="5" fillOpacity="0.4" />
+    <rect x="134" y="122" width="70" height="10" rx="5" fillOpacity="0.25" />
+    <rect x="394" y="122" width="70" height="10" rx="5" fillOpacity="0.25" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="246" cy="140" r="8" />
+    <circle cx="506" cy="140" r="8" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="128" y="64" width="44" height="26" rx="13" />
+    <rect x="388" y="64" width="44" height="26" rx="13" />
+  </g>
+  <g style={{ color: "var(--ds-gray-900)" }} fill="currentColor">
+    <text x="150" y="82" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="15" fontWeight="bold">1</text>
+    <text x="410" y="82" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="15" fontWeight="bold">2</text>
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="320" cy="40" r="3" />
+    <circle cx="320" cy="120" r="3" />
+    <circle cx="320" cy="100" r="3" />
+    <circle cx="320" cy="80" r="3" />
+    <circle cx="320" cy="60" r="3" />
+    <circle cx="320" cy="140" r="3" />
+    <circle cx="320" cy="160" r="3" />
+  </g>
+</svg>
+
 ## Rows need identity
 
 Human descriptions are often messy. Names repeat. Titles change. Email

@@ -11,6 +11,32 @@ one-row-to-one-row connection.
 That is a **one-to-one relationship**. It is rarer, but useful when a
 separate table makes the design clearer or safer.
 
+<svg
+  viewBox="0 0 640 180"
+  role="img"
+  aria-label="A faint capsule ghost shows one original entity, now split into two half capsules joined by a single tether with one tick mark on each end — one row to exactly one row"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.05">
+    <rect x="140" y="48" width="360" height="94" rx="47" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M250 60 L195 60 A35 35 0 0 0 195 130 L250 130 Z" fillOpacity="0.4" />
+    <circle cx="208" cy="95" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M390 60 L445 60 A35 35 0 0 1 445 130 L390 130 Z" fillOpacity="0.4" />
+    <circle cx="432" cy="95" r="9" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <rect x="262" y="80" width="5" height="30" rx="2.5" />
+    <rect x="373" y="80" width="5" height="30" rx="2.5" />
+    <circle cx="290" cy="95" r="3" />
+    <circle cx="320" cy="95" r="3" />
+    <circle cx="350" cy="95" r="3" />
+  </g>
+</svg>
+
 ## Why split a one-to-one?
 
 Imagine a `users` table that starts small, then grows a large set of

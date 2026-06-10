@@ -9,6 +9,49 @@ design decisions with very different consequences.
 
 `NULL`, `NOT NULL`, and `DEFAULT` are how the schema answers them.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="In a row of filled cells one cell is only a ghost outline, and a yellow default value drops in along a dotted trail to fill the gap"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.1">
+    <rect x="110" y="120" width="70" height="46" rx="10" />
+    <rect x="190" y="120" width="70" height="46" rx="10" />
+    <rect x="350" y="120" width="70" height="46" rx="10" />
+    <rect x="430" y="120" width="70" height="46" rx="10" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="145" cy="143" r="9" />
+    <circle cx="385" cy="143" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="225" cy="143" r="9" />
+    <circle cx="465" cy="143" r="9" />
+  </g>
+  <g fill="currentColor" opacity="0.22">
+    <circle cx="278" cy="120" r="2.5" />
+    <circle cx="298" cy="120" r="2.5" />
+    <circle cx="318" cy="120" r="2.5" />
+    <circle cx="338" cy="120" r="2.5" />
+    <circle cx="270" cy="132" r="2.5" />
+    <circle cx="270" cy="152" r="2.5" />
+    <circle cx="278" cy="166" r="2.5" />
+    <circle cx="298" cy="166" r="2.5" />
+    <circle cx="318" cy="166" r="2.5" />
+    <circle cx="338" cy="166" r="2.5" />
+    <circle cx="340" cy="132" r="2.5" />
+    <circle cx="340" cy="152" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="305" cy="38" r="11" />
+    <circle cx="305" cy="66" r="3.5" fillOpacity="0.6" />
+    <circle cx="305" cy="84" r="3.5" fillOpacity="0.6" />
+    <circle cx="305" cy="102" r="3.5" fillOpacity="0.6" />
+    <circle cx="305" cy="143" r="9" fillOpacity="0.45" />
+  </g>
+</svg>
+
 ## NULL means unknown or absent
 
 In SQL, **NULL** means "there is no value here." It might mean the

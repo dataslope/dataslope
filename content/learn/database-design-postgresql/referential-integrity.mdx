@@ -11,6 +11,50 @@ comment stores `post_id = 20`, then post `20` must exist. The database
 protects those promises so your design cannot quietly drift into broken
 links.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Three child squares point up at their parents, but one pointer ends at a ghost outline crossed in red — an orphan reference to a parent that does not exist"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="170" cy="58" r="13" />
+    <circle cx="320" cy="58" r="13" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="483" cy="58" r="2.5" />
+    <circle cx="479" cy="48" r="2.5" />
+    <circle cx="470" cy="45" r="2.5" />
+    <circle cx="461" cy="48" r="2.5" />
+    <circle cx="457" cy="58" r="2.5" />
+    <circle cx="461" cy="68" r="2.5" />
+    <circle cx="470" cy="71" r="2.5" />
+    <circle cx="479" cy="68" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="460" y="55" width="20" height="5" rx="2.5" transform="rotate(45 470 58)" />
+    <rect x="460" y="55" width="20" height="5" rx="2.5" transform="rotate(-45 470 58)" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="158" y="138" width="24" height="24" rx="7" />
+    <rect x="308" y="138" width="24" height="24" rx="7" />
+    <rect x="458" y="138" width="24" height="24" rx="7" />
+  </g>
+  <g fill="currentColor" opacity="0.32">
+    <circle cx="170" cy="122" r="3" />
+    <circle cx="170" cy="104" r="3" />
+    <circle cx="170" cy="86" r="3" />
+    <circle cx="320" cy="122" r="3" />
+    <circle cx="320" cy="104" r="3" />
+    <circle cx="320" cy="86" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="470" cy="122" r="3" fillOpacity="0.5" />
+    <circle cx="470" cy="104" r="3" fillOpacity="0.6" />
+    <circle cx="470" cy="86" r="3" fillOpacity="0.7" />
+  </g>
+</svg>
+
 ## The orphan-row problem
 
 An **orphan row** is a child row that points to a parent row that does

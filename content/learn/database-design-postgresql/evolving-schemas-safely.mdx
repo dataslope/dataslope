@@ -17,6 +17,36 @@ steps, not one dramatic rewrite:
 6. Tighten the constraint.
 7. Remove the old structure later.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Version circles climb a dotted trail, each one carrying a larger green wedge of completed change — a migration advancing in small deliberate steps"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="130" cy="150" r="26" fillOpacity="0.85" />
+    <circle cx="320" cy="105" r="26" fillOpacity="0.85" />
+    <circle cx="510" cy="60" r="26" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M130 150 L130 124 A26 26 0 0 1 156 150 Z" />
+    <path d="M320 105 L320 79 A26 26 0 0 1 320 131 Z" />
+    <path d="M510 60 L510 34 A26 26 0 1 1 484 60 Z" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="180" cy="142" r="3" />
+    <circle cx="210" cy="132" r="3" />
+    <circle cx="270" cy="114" r="3" />
+    <circle cx="370" cy="97" r="3" />
+    <circle cx="400" cy="88" r="3" />
+    <circle cx="460" cy="69" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="240" cy="123" r="5" />
+    <circle cx="430" cy="78" r="5" />
+  </g>
+</svg>
+
 ## Migrations are ordered changes
 
 A **migration** is an intentional change to the schema. It might add a
