@@ -1105,6 +1105,9 @@ body.playground-active {
   background: color-mix(in srgb, currentColor 18%, transparent);
   border-radius: 3px;
   padding: 0.05em 0.35em;
+  /* Breathing room between the "Run" verb and the entry-file chip so
+     the two don't read as one crammed token (e.g. Run · index). */
+  margin-left: 0.25em;
 }
 .playground-run-multi-chevron {
   background: transparent !important;
@@ -1134,6 +1137,8 @@ body.playground-active {
 .playground-run-multi-item {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   padding: 8px 12px;
   font-family: var(--font-ui);
   font-size: 13px;
@@ -1144,6 +1149,16 @@ body.playground-active {
 .playground-run-multi-item[data-highlighted],
 .playground-run-multi-item:hover {
   background: var(--bg3);
+}
+.playground-run-multi-item-label {
+  flex: 1 1 auto;
+}
+/* Right-aligned, muted keyboard-shortcut hint inside a Run dropdown
+   row — mirrors the SQL playground's `.run-split-item-kbd`. */
+.playground-run-multi-item-kbd {
+  color: var(--text-dim);
+  font-size: 11px;
+  flex-shrink: 0;
 }
 
 .editor-wrap {
