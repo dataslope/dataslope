@@ -7,6 +7,44 @@ When something goes wrong, Python raises an **exception**. If nothing catches it
 
 Exceptions are Python's way of encoding **expected failure paths**: file not found, network down, invalid input, permission denied. They let you separate "happy path" logic from error handling.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="A dot speeding along its path hits a thin red tripwire and drops onto the soft green cushion waiting below, then rolls on along a lower road — an exception raised, caught by except, and the program continues"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="70" cy="70" r="3" />
+    <circle cx="100" cy="70" r="3" />
+    <circle cx="130" cy="70" r="3" />
+    <circle cx="160" cy="70" r="3" />
+    <circle cx="190" cy="70" r="3" />
+    <circle cx="220" cy="70" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="252" cy="70" r="10" />
+  </g>
+  <g fill="currentColor" opacity="0.4">
+    <circle cx="312" cy="38" r="4" />
+    <circle cx="312" cy="102" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="309" y="42" width="5" height="56" rx="2.5" fillOpacity="0.85" />
+    <circle cx="328" cy="82" r="3" fillOpacity="0.45" />
+    <circle cx="345" cy="110" r="9" fillOpacity="0.9" />
+    <circle cx="360" cy="134" r="3" fillOpacity="0.45" />
+    <circle cx="366" cy="146" r="3" fillOpacity="0.45" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="310" y="158" width="180" height="36" rx="18" fillOpacity="0.3" />
+    <rect x="326" y="166" width="148" height="10" rx="5" fillOpacity="0.25" />
+    <circle cx="400" cy="150" r="10" />
+    <circle cx="500" cy="148" r="3" fillOpacity="0.4" />
+    <circle cx="528" cy="140" r="3" fillOpacity="0.4" />
+    <circle cx="556" cy="132" r="3" fillOpacity="0.4" />
+  </g>
+</svg>
+
 ## What happens when exceptions are not handled?
 
 If an exception is raised and **no** `try`/`except` catches it, Python does three things:

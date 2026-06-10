@@ -12,6 +12,37 @@ This page is dedicated to making it concrete: when does a LINQ
 operator actually do its work, why is that the default, and what
 goes wrong when you forget.
 
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="A pipeline of unlit gray circles waiting dormant; a lightning bolt at the far end has just lit up the nearest stages in blue — nothing runs until something asks for results"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.15">
+    <circle cx="120" cy="100" r="20" />
+    <circle cx="220" cy="100" r="20" />
+    <circle cx="320" cy="100" r="20" />
+    <circle cx="420" cy="100" r="20" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="158" cy="100" r="3" />
+    <circle cx="182" cy="100" r="3" />
+    <circle cx="258" cy="100" r="3" />
+    <circle cx="282" cy="100" r="3" />
+    <circle cx="358" cy="100" r="3" />
+    <circle cx="382" cy="100" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="320" cy="100" r="20" fillOpacity="0.45" />
+    <circle cx="420" cy="100" r="20" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="470" cy="100" r="4" />
+    <circle cx="488" cy="100" r="3" />
+    <polygon points="532,62 512,98 525,98 517,130 548,92 534,92 543,62" />
+  </g>
+</svg>
+
 ## Two kinds of operator
 
 LINQ operators fall into two camps:

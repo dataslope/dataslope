@@ -9,6 +9,38 @@ program does not pretend otherwise — it has a clear, designed
 answer to *every* category of failure. In Java, that answer is
 **exceptions**.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="A red ball thrown at the bottom of a stack of platforms bounces upward past frame after frame until a green mitt on one of them catches it — exceptions travel up the call stack to the nearest handler"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="200" y="196" width="240" height="22" rx="10" fillOpacity="0.15" />
+    <rect x="220" y="156" width="200" height="22" rx="10" fillOpacity="0.22" />
+    <rect x="240" y="116" width="160" height="22" rx="10" fillOpacity="0.3" />
+    <rect x="260" y="76" width="120" height="22" rx="10" fillOpacity="0.38" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="350" cy="190" r="4" fillOpacity="0.4" />
+    <circle cx="382" cy="180" r="3.5" fillOpacity="0.4" />
+    <circle cx="408" cy="162" r="3.5" fillOpacity="0.4" />
+    <circle cx="424" cy="138" r="3.5" fillOpacity="0.4" />
+    <circle cx="436" cy="112" r="3.5" fillOpacity="0.4" />
+    <circle cx="444" cy="92" r="3.5" fillOpacity="0.4" />
+    <circle cx="446" cy="78" r="9" fillOpacity="0.9" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M420 96A26 26 0 0 0 472 96L462 96A16 16 0 0 1 430 96Z" fillOpacity="0.9" />
+    <rect x="396" y="106" width="30" height="6" rx="3" fillOpacity="0.5" />
+    <circle cx="486" cy="66" r="3" fillOpacity="0.6" />
+    <circle cx="496" cy="80" r="2.5" fillOpacity="0.6" />
+  </g>
+  <g fill="currentColor" opacity="0.12">
+    <rect x="160" y="224" width="320" height="4" rx="2" />
+  </g>
+</svg>
+
 ## What is an exception?
 
 An exception is an object that represents "something went wrong

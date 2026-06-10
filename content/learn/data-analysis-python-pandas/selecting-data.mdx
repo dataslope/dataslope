@@ -10,6 +10,59 @@ each one solves a slightly different problem.
 This chapter is the overview; the next one (*loc vs iloc*)
 zooms in on the two most important.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="Five colored arrows approach the same grid from different directions, all converging on one highlighted block of cells — five selection syntaxes, one goal"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.12">
+    <rect x="210" y="60" width="52" height="26" rx="5" />
+    <rect x="270" y="60" width="52" height="26" rx="5" />
+    <rect x="330" y="60" width="52" height="26" rx="5" />
+    <rect x="390" y="60" width="52" height="26" rx="5" />
+    <rect x="210" y="96" width="52" height="26" rx="5" />
+    <rect x="390" y="96" width="52" height="26" rx="5" />
+    <rect x="210" y="132" width="52" height="26" rx="5" />
+    <rect x="390" y="132" width="52" height="26" rx="5" />
+    <rect x="210" y="168" width="52" height="26" rx="5" />
+    <rect x="270" y="168" width="52" height="26" rx="5" />
+    <rect x="330" y="168" width="52" height="26" rx="5" />
+    <rect x="390" y="168" width="52" height="26" rx="5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="270" y="96" width="52" height="26" rx="5" fillOpacity="0.45" />
+    <rect x="330" y="96" width="52" height="26" rx="5" fillOpacity="0.45" />
+    <rect x="270" y="132" width="52" height="26" rx="5" fillOpacity="0.45" />
+    <rect x="330" y="132" width="52" height="26" rx="5" fillOpacity="0.45" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="150" cy="30" r="3" />
+    <circle cx="172" cy="42" r="3" />
+    <polygon points="188,46 206,58 184,62" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="502" cy="28" r="3" />
+    <circle cx="480" cy="40" r="3" />
+    <polygon points="468,44 446,58 470,60" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="130" cy="128" r="3" />
+    <circle cx="155" cy="128" r="3" />
+    <polygon points="172,120 192,128 172,136" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="150" cy="212" r="3" fillOpacity="0.6" />
+    <circle cx="172" cy="200" r="3" fillOpacity="0.6" />
+    <polygon points="186,198 206,188 188,180" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="520" cy="150" r="3" fillOpacity="0.6" />
+    <circle cx="496" cy="150" r="3" fillOpacity="0.6" />
+    <polygon points="482,142 462,150 482,158" fillOpacity="0.6" />
+  </g>
+</svg>
+
 ## The five access methods
 
 | Syntax           | Picks by   | Returns   | Use when                        |

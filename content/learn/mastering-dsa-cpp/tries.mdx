@@ -5,6 +5,60 @@ description: Learn prefix trees, trie operations, memory trade-offs, and prefix-
 
 A trie, or prefix tree, stores strings by sharing common prefixes. Each node represents a prefix. Edges represent characters, and a boolean flag marks whether the prefix is a complete word.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A trie sharing prefixes — one yellow-haloed trunk spells the shared prefix while branches fan out to green word-end letters for cat, car, cart, and dog"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="228" y="48" width="44" height="80" rx="22" fillOpacity="0.16" />
+  </g>
+  <circle cx="320" cy="28" r="6" fill="currentColor" opacity="0.35" />
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="296" cy="41" r="2" />
+    <circle cx="272" cy="55" r="2" />
+    <circle cx="348" cy="41" r="2" />
+    <circle cx="374" cy="55" r="2" />
+    <circle cx="250" cy="84" r="2" />
+    <circle cx="250" cy="94" r="2" />
+    <circle cx="400" cy="84" r="2" />
+    <circle cx="400" cy="94" r="2" />
+    <circle cx="230" cy="121" r="2" />
+    <circle cx="210" cy="135" r="2" />
+    <circle cx="270" cy="121" r="2" />
+    <circle cx="290" cy="135" r="2" />
+    <circle cx="310" cy="161" r="2" />
+    <circle cx="310" cy="175" r="2" />
+    <circle cx="400" cy="121" r="2" />
+    <circle cx="400" cy="135" r="2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="250" cy="68" r="12" />
+    <circle cx="400" cy="68" r="12" />
+    <circle cx="250" cy="108" r="12" />
+    <circle cx="400" cy="108" r="12" />
+  </g>
+  <g style={{ fill: "var(--ds-blue-50)" }} fontFamily="ui-monospace, monospace" fontSize="12" fontWeight="700" textAnchor="middle">
+    <text x="250" y="72">c</text>
+    <text x="400" y="72">d</text>
+    <text x="250" y="112">a</text>
+    <text x="400" y="112">o</text>
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="190" cy="148" r="12" />
+    <circle cx="310" cy="148" r="12" />
+    <circle cx="310" cy="188" r="12" />
+    <circle cx="400" cy="148" r="12" />
+  </g>
+  <g style={{ fill: "var(--ds-gray-900)" }} fontFamily="ui-monospace, monospace" fontSize="12" fontWeight="700" textAnchor="middle">
+    <text x="190" y="152">t</text>
+    <text x="310" y="152">r</text>
+    <text x="310" y="192">t</text>
+    <text x="400" y="152">g</text>
+  </g>
+</svg>
+
 ## Trie shape
 
 This trie contains `cat`, `car`, `cart`, and `dog`.

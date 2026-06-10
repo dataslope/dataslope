@@ -7,6 +7,34 @@ Every decision in software is a conditional. From "should I cache this result?" 
 
 Every snippet on this page runs in your browser — no setup required.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="A river meets a pointed yellow island and splits three ways, but only one channel runs full, carrying the boat to the flag — execution flows down exactly one branch of if, elif, else"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="40" y="90" width="160" height="34" rx="17" fillOpacity="0.35" />
+    <rect x="214" y="60.5" width="272" height="22" rx="11" fillOpacity="0.1" transform="rotate(-11 350 71)" />
+    <rect x="214" y="132" width="272" height="22" rx="11" fillOpacity="0.1" transform="rotate(11 350 143)" />
+    <rect x="225" y="92" width="265" height="30" rx="15" fillOpacity="0.4" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <polygon points="210,84 252,107 210,130" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="430" cy="107" r="9" />
+    <circle cx="400" cy="107" r="3" fillOpacity="0.4" />
+    <circle cx="378" cy="107" r="2.5" fillOpacity="0.4" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <rect x="510" y="76" width="5" height="46" rx="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <polygon points="515,78 548,87 515,96" fillOpacity="0.9" />
+  </g>
+</svg>
+
 ## Real-world impact
 
 Conditionals are not just syntax — they are the logical heart of every program. A web server routes requests with `if method == "GET"`. A data pipeline filters invalid rows with `if is_valid(row)`. A game checks `if player.health <= 0`. You write conditionals hundreds of times a day. Mastering them means writing clear, correct, maintainable logic.

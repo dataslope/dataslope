@@ -14,6 +14,36 @@ approximation method (**truncation error** from "stopping early" and
 **round-off error** from finite precision), how they interact, and
 how to think about the *order* of convergence of a method.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Two translucent error wedges crossing in an X — truncation falling as round-off rises — with a dotted total-error curve and a green dot marking the sweet spot at the crossing"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor">
+    <rect x="80" y="40" width="5" height="135" rx="2.5" opacity="0.2" />
+    <rect x="80" y="170" width="480" height="5" rx="2.5" opacity="0.2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <polygon points="100,48 540,148 540,158 100,58" fillOpacity="0.3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <polygon points="100,148 540,48 540,58 100,158" fillOpacity="0.3" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="140" cy="64" r="3.5" />
+    <circle cx="200" cy="78" r="3.5" />
+    <circle cx="260" cy="92" r="3.5" />
+    <circle cx="380" cy="92" r="3.5" />
+    <circle cx="440" cy="78" r="3.5" />
+    <circle cx="500" cy="64" r="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="320" cy="103" r="14" fillOpacity="0.25" />
+    <circle cx="320" cy="103" r="7" />
+  </g>
+</svg>
+
 ## Truncation vs round-off
 
 Pick any approximation parameter $h$ that controls the

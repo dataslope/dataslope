@@ -15,6 +15,47 @@ lemmatization, n-grams — each is a *choice*, and a step that sharpens one task
 will quietly sabotage another. Choosing well means understanding what each
 step does to your data and matching it to what your task needs.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="A menu panel of pipeline steps with switches — two toggled on in green, one off, one yellow and still undecided — leading by a dotted trail to a target of concentric rings"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor">
+    <rect x="100" y="28" width="270" height="184" rx="16" opacity="0.07" />
+    <rect x="124" y="48" width="104" height="20" rx="10" opacity="0.25" />
+    <rect x="124" y="90" width="104" height="20" rx="10" opacity="0.25" />
+    <rect x="124" y="132" width="104" height="20" rx="10" opacity="0.25" />
+    <rect x="124" y="174" width="104" height="20" rx="10" opacity="0.25" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="252" y="48" width="46" height="20" rx="10" fillOpacity="0.9" />
+    <rect x="252" y="132" width="46" height="20" rx="10" fillOpacity="0.9" />
+  </g>
+  <g fill="currentColor">
+    <rect x="252" y="90" width="46" height="20" rx="10" opacity="0.15" />
+    <circle cx="265" cy="100" r="7" opacity="0.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="252" y="174" width="46" height="20" rx="10" fillOpacity="0.9" />
+  </g>
+  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
+    <circle cx="285" cy="58" r="7" />
+    <circle cx="285" cy="142" r="7" />
+    <circle cx="275" cy="184" r="7" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="396" cy="120" r="3.5" />
+    <circle cx="420" cy="120" r="3.5" />
+    <circle cx="444" cy="120" r="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="520" cy="120" r="32" fillOpacity="0.12" />
+    <circle cx="520" cy="120" r="20" fillOpacity="0.3" />
+    <circle cx="520" cy="120" r="9" fillOpacity="0.95" />
+  </g>
+</svg>
+
 ## The pipeline is a menu, not a fixed recipe
 
 Picture the steps as a menu of optional transformations. Only tokenization is

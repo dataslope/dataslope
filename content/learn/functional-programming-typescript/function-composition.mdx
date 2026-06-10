@@ -13,6 +13,38 @@ This chapter covers function composition, the closely related
 techniques of **currying** and **partial application**, and the two
 helper functions (`compose` and `pipe`) you'll use everywhere.
 
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="Three colored stations inside one long capsule pass a baton left to right; seen from outside, a single dot enters and a single dot leaves — composed functions behave as one function"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="80" y="50" width="480" height="110" rx="55" fill="currentColor" opacity="0.07" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="40" cy="105" r="8" />
+    <circle cx="58" cy="105" r="3" fillOpacity="0.4" />
+    <circle cx="70" cy="105" r="3" fillOpacity="0.4" />
+    <circle cx="180" cy="105" r="22" />
+    <rect x="236" y="84" width="26" height="9" rx="4.5" fillOpacity="0.8" transform="rotate(-14 249 88)" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="244" cy="101" r="3" />
+    <circle cx="258" cy="97" r="3" />
+    <circle cx="384" cy="101" r="3" />
+    <circle cx="398" cy="97" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="320" cy="105" r="22" />
+    <rect x="376" y="84" width="26" height="9" rx="4.5" fillOpacity="0.9" transform="rotate(-14 389 88)" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="460" cy="105" r="22" />
+    <circle cx="570" cy="105" r="3" fillOpacity="0.4" />
+    <circle cx="582" cy="105" r="3" fillOpacity="0.4" />
+    <circle cx="600" cy="105" r="8" />
+  </g>
+</svg>
+
 ## What composition means, mathematically
 
 In math, given `f: A → B` and `g: B → C`, the composition `g ∘ f`

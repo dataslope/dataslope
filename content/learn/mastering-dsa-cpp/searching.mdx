@@ -5,6 +5,41 @@ description: Learn linear search, binary search, STL search helpers, common pitf
 
 Searching means locating a target value in a collection. The right technique depends mainly on whether the data is sorted.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="An open dictionary where each probe at the middle of a highlighted page range halves it — the bands shrink step by step until a green entry is pinned down — searching sorted data"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor">
+    <rect x="90" y="50" width="220" height="140" rx="10" opacity="0.07" />
+    <rect x="330" y="50" width="220" height="140" rx="10" opacity="0.07" />
+    <rect x="318" y="46" width="4" height="148" rx="2" opacity="0.2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="104" y="70" width="432" height="16" rx="8" fillOpacity="0.15" />
+    <rect x="320" y="98" width="216" height="16" rx="8" fillOpacity="0.25" />
+    <rect x="320" y="126" width="108" height="16" rx="8" fillOpacity="0.4" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="320" cy="78" r="4.5" />
+    <circle cx="428" cy="106" r="4.5" />
+    <circle cx="374" cy="134" r="4.5" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="356" cy="86" r="2" />
+    <circle cx="392" cy="92" r="2" />
+    <circle cx="410" cy="116" r="2" />
+    <circle cx="392" cy="123" r="2" />
+    <circle cx="383" cy="142" r="2" />
+    <circle cx="392" cy="148" r="2" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="374" y="154" width="54" height="16" rx="8" fillOpacity="0.3" />
+    <circle cx="401" cy="162" r="5.5" />
+  </g>
+</svg>
+
 ## Linear search
 
 Linear search checks each element from left to right until it finds the target or reaches the end. It works on unsorted data and runs in O(n).

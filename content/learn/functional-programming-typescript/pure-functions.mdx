@@ -11,6 +11,44 @@ That's it. Pure functions are the atom of functional programming.
 Composition, immutability, type-driven design, parallelism, testing,
 caching — they all get easier when the building blocks are pure.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="A sealed function box with one inlet and one outlet; dotted side channels from outside shapes are stopped by red bars above and below — a pure function's output depends on its input alone"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="240" y="70" width="160" height="80" rx="18" />
+    <circle cx="140" cy="110" r="10" />
+    <polygon points="216,103 230,110 216,117" fillOpacity="0.6" />
+  </g>
+  <text x="320" y="123" fontFamily="Georgia, serif" fontStyle="italic" fontSize="34" textAnchor="middle" style={{ fill: "var(--ds-white)" }}>ƒ</text>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="172" cy="110" r="3.5" />
+    <circle cx="196" cy="110" r="3.5" />
+    <circle cx="424" cy="110" r="3.5" />
+    <circle cx="448" cy="110" r="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <polygon points="472,103 486,110 472,117" fillOpacity="0.6" />
+    <circle cx="510" cy="110" r="10" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="308" y="10" width="24" height="24" rx="6" />
+    <circle cx="320" cy="192" r="10" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="320" cy="42" r="3" />
+    <circle cx="320" cy="50" r="3" />
+    <circle cx="320" cy="170" r="3" />
+    <circle cx="320" cy="178" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="298" y="56" width="44" height="6" rx="3" />
+    <rect x="298" y="156" width="44" height="6" rx="3" />
+  </g>
+</svg>
+
 ## A definition you can hold in your head
 
 A function `f` is **pure** if and only if:

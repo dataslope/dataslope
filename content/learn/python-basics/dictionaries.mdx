@@ -7,6 +7,66 @@ A `dict` maps **keys** to **values**. Lookups, insertions, and deletions are all
 
 Every snippet on this page runs in your browser — no setup required.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="Tap a code on the keypad and exactly one slot in the machine lights up, dropping its value straight to the tray — a dict hashes the key and jumps to the right slot without searching the others"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.07">
+    <rect x="110" y="30" width="300" height="170" rx="16" />
+  </g>
+  <g fill="currentColor" opacity="0.08">
+    <rect x="130" y="48" width="70" height="36" rx="8" />
+    <rect x="210" y="48" width="70" height="36" rx="8" />
+    <rect x="290" y="48" width="70" height="36" rx="8" />
+    <rect x="130" y="96" width="70" height="36" rx="8" />
+    <rect x="210" y="96" width="70" height="36" rx="8" />
+    <rect x="290" y="96" width="70" height="36" rx="8" />
+    <rect x="130" y="144" width="70" height="36" rx="8" />
+    <rect x="290" y="144" width="70" height="36" rx="8" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="165" cy="66" r="6" />
+    <rect x="237" y="58" width="16" height="16" rx="4" />
+    <circle cx="325" cy="66" r="6" />
+    <rect x="157" y="106" width="16" height="16" rx="4" />
+    <circle cx="245" cy="114" r="6" />
+    <rect x="317" y="106" width="16" height="16" rx="4" />
+    <circle cx="165" cy="162" r="6" />
+    <circle cx="325" cy="162" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="210" y="144" width="70" height="36" rx="8" fillOpacity="0.25" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="440" y="72" width="90" height="64" rx="12" fillOpacity="0.18" />
+    <circle cx="462" cy="92" r="6" fillOpacity="0.8" />
+    <circle cx="490" cy="92" r="7" />
+    <circle cx="518" cy="92" r="6" fillOpacity="0.8" />
+    <circle cx="462" cy="116" r="6" fillOpacity="0.8" />
+    <circle cx="490" cy="116" r="6" fillOpacity="0.8" />
+    <circle cx="518" cy="116" r="6" fillOpacity="0.8" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="430" cy="116" r="3" />
+    <circle cx="404" cy="124" r="3" />
+    <circle cx="378" cy="132" r="3" />
+    <circle cx="352" cy="142" r="3" />
+    <circle cx="326" cy="152" r="3" />
+    <circle cx="300" cy="158" r="3" />
+  </g>
+  <g fill="currentColor" opacity="0.12">
+    <rect x="130" y="212" width="260" height="12" rx="6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="245" cy="162" r="10" />
+    <circle cx="245" cy="186" r="3" fillOpacity="0.4" />
+    <circle cx="245" cy="198" r="3.5" fillOpacity="0.4" />
+    <circle cx="245" cy="216" r="9" fillOpacity="0.9" />
+  </g>
+</svg>
+
 ## How dictionaries work
 
 Under the hood, a dict is a **hash table**: Python computes a hash of your key, uses that to find a bucket, and stores the key-value pair there. Hash collisions are handled with open addressing. This gives O(1) average-case access.

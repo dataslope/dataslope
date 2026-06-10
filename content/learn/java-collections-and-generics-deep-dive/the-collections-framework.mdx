@@ -14,6 +14,49 @@ describe what a container *is*, and a small set of high-quality
 *implementations* of each. The combination of those two ideas is what
 makes the JCF feel coherent even today, almost three decades later.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="A root translucent container branches down to List, Set, and Queue boxes, each with a solid implementation chip beneath, while a green Map container stands apart on the right"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="245" y="28" width="110" height="38" rx="12" fillOpacity="0.16" />
+    <circle cx="289" cy="47" r="5" fillOpacity="0.5" />
+    <circle cx="311" cy="47" r="5" fillOpacity="0.5" />
+    <rect x="80" y="120" width="110" height="38" rx="12" fillOpacity="0.16" />
+    <circle cx="111" cy="139" r="5" fillOpacity="0.5" />
+    <circle cx="131" cy="139" r="5" fillOpacity="0.5" />
+    <circle cx="151" cy="139" r="5" fillOpacity="0.5" />
+    <rect x="245" y="120" width="110" height="38" rx="12" fillOpacity="0.16" />
+    <circle cx="285" cy="133" r="5" fillOpacity="0.5" />
+    <circle cx="313" cy="144" r="5" fillOpacity="0.5" />
+    <rect x="410" y="120" width="110" height="38" rx="12" fillOpacity="0.16" />
+    <circle cx="440" cy="139" r="5" fillOpacity="0.5" />
+    <circle cx="460" cy="139" r="5" fillOpacity="0.5" />
+    <polygon points="488,133 488,145 500,139" fillOpacity="0.5" />
+    <rect x="97" y="196" width="76" height="24" rx="12" />
+    <rect x="262" y="196" width="76" height="24" rx="12" />
+    <rect x="427" y="196" width="76" height="24" rx="12" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="245" cy="84" r="3" />
+    <circle cx="190" cy="102" r="3" />
+    <circle cx="300" cy="84" r="3" />
+    <circle cx="300" cy="102" r="3" />
+    <circle cx="355" cy="84" r="3" />
+    <circle cx="410" cy="102" r="3" />
+    <circle cx="135" cy="177" r="3" />
+    <circle cx="300" cy="177" r="3" />
+    <circle cx="465" cy="177" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="540" y="28" width="88" height="38" rx="12" fillOpacity="0.18" />
+    <circle cx="566" cy="47" r="5" fillOpacity="0.6" />
+    <rect x="578" y="41" width="12" height="12" rx="3" fillOpacity="0.6" />
+  </g>
+</svg>
+
 ## The two big ideas
 
 The JCF was built around four goals:

@@ -13,6 +13,34 @@ A **schema decision** is not isolated inside the database. It shapes the
 code that reads, writes, validates, displays, imports, exports, and
 reports on the data.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="Two towers of stacked slabs: one rises straight on a solid blue foundation, the other tilts above a cracked base — software standing on its schema"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="100" y="170" width="180" height="26" rx="8" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="115" y="136" width="150" height="24" rx="8" fillOpacity="0.55" />
+    <rect x="130" y="102" width="120" height="24" rx="8" fillOpacity="0.35" />
+    <rect x="145" y="68" width="90" height="24" rx="8" fillOpacity="0.2" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <rect x="380" y="170" width="82" height="26" rx="8" />
+    <rect x="476" y="174" width="74" height="24" rx="8" transform="rotate(4 513 186)" />
+  </g>
+  <g fill="currentColor" opacity="0.16">
+    <rect x="385" y="136" width="150" height="24" rx="8" transform="rotate(-5 460 148)" />
+    <rect x="402" y="102" width="120" height="24" rx="8" transform="rotate(7 462 114)" />
+    <rect x="424" y="66" width="90" height="24" rx="8" transform="rotate(-9 469 78)" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <polygon points="462,170 470,178 463,186 471,196 459,196 465,186 458,178" fillOpacity="0.8" />
+  </g>
+</svg>
+
 ## The schema is the foundation
 
 Application code does not talk to vague ideas like "an order" in the

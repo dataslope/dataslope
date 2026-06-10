@@ -5,6 +5,46 @@ description: Learn fixed arrays, std::array, std::vector, contiguous memory, ite
 
 Arrays are the first data structure most programmers meet: a sequence of values stored side by side. In modern C++, the array you will use most is `std::vector<T>` because it grows dynamically while keeping fast O(1) indexing.
 
+<svg
+  viewBox="0 0 640 180"
+  role="img"
+  aria-label="A full vector of four cells grows along a dotted arrow into a container with doubled capacity — old elements copied over, a green element just pushed, and empty slots held in reserve"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="60" y="80" width="120" height="48" rx="12" fillOpacity="0.12" />
+    <rect x="68" y="88" width="24" height="32" rx="6" />
+    <rect x="94" y="88" width="24" height="32" rx="6" fillOpacity="0.75" />
+    <rect x="120" y="88" width="24" height="32" rx="6" />
+    <rect x="146" y="88" width="24" height="32" rx="6" fillOpacity="0.75" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="202" cy="104" r="3" />
+    <circle cx="222" cy="104" r="3" />
+    <circle cx="242" cy="104" r="3" />
+    <polygon points="254,96 254,112 266,104" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="290" y="72" width="292" height="64" rx="14" fillOpacity="0.1" />
+    <rect x="300" y="86" width="30" height="36" rx="7" />
+    <rect x="333" y="86" width="30" height="36" rx="7" fillOpacity="0.75" />
+    <rect x="366" y="86" width="30" height="36" rx="7" />
+    <rect x="399" y="86" width="30" height="36" rx="7" fillOpacity="0.75" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="447" cy="34" r="6" fillOpacity="0.5" />
+    <circle cx="447" cy="50" r="3" fillOpacity="0.4" />
+    <circle cx="447" cy="62" r="3" fillOpacity="0.4" />
+    <circle cx="447" cy="74" r="3" fillOpacity="0.4" />
+    <rect x="432" y="86" width="30" height="36" rx="7" />
+  </g>
+  <g fill="currentColor" opacity="0.08">
+    <rect x="465" y="86" width="30" height="36" rx="7" />
+    <rect x="498" y="86" width="30" height="36" rx="7" />
+    <rect x="531" y="86" width="30" height="36" rx="7" />
+  </g>
+</svg>
+
 ## C-style arrays
 
 A C-style array such as `int a[5]` has a fixed size known at compile time. It is compact and fast, but it loses size information easily because it **decays to a pointer** when passed to many functions.

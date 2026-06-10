@@ -22,6 +22,36 @@ learning. It forces you to confront two ideas you will use forever: what it
 means for examples to be "close," and why **feature scaling** can make or
 break a distance-based model.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A yellow query dot sits inside its translucent neighborhood circle where three green neighbors outvote two blue ones, while dots outside the circle take no part — k-nearest neighbors decides by local vote"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="320" cy="110" r="78" fillOpacity="0.12" />
+    <circle cx="320" cy="110" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="270" cy="80" r="8" />
+    <circle cx="355" cy="60" r="8" />
+    <circle cx="370" cy="150" r="8" />
+    <circle cx="120" cy="60" r="8" fillOpacity="0.45" />
+    <circle cx="185" cy="185" r="8" fillOpacity="0.45" />
+    <circle cx="490" cy="45" r="8" fillOpacity="0.45" />
+    <circle cx="560" cy="175" r="8" fillOpacity="0.45" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="280" cy="155" r="8" />
+    <circle cx="345" cy="115" r="8" />
+    <circle cx="85" cy="135" r="8" fillOpacity="0.45" />
+    <circle cx="155" cy="35" r="8" fillOpacity="0.45" />
+    <circle cx="450" cy="190" r="8" fillOpacity="0.45" />
+    <circle cx="575" cy="95" r="8" fillOpacity="0.45" />
+    <circle cx="225" cy="40" r="8" fillOpacity="0.45" />
+  </g>
+</svg>
+
 ## The intuition: you are who you sit next to
 
 The premise is something you already believe about the world. If you want

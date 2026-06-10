@@ -8,6 +8,37 @@ So far each question has been one `SELECT`. But some questions are
 cannot know the average until you compute it — so you write a query
 **inside** a query. That inner query is a **subquery**.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A query inside a query — the inner box computes a single yellow value that rises to plug into the waiting socket of the outer query"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="140" y="40" width="360" height="140" rx="16" fillOpacity="0.1" />
+    <rect x="160" y="60" width="70" height="10" rx="5" />
+    <rect x="238" y="60" width="46" height="10" rx="5" fillOpacity="0.7" />
+    <rect x="292" y="60" width="30" height="10" rx="5" fillOpacity="0.5" />
+    <rect x="362" y="60" width="56" height="10" rx="5" fillOpacity="0.45" />
+    <rect x="426" y="60" width="34" height="10" rx="5" fillOpacity="0.3" />
+  </g>
+  <g fill="currentColor" opacity="0.12">
+    <circle cx="344" cy="65" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="250" y="104" width="190" height="56" rx="12" fillOpacity="0.15" />
+    <rect x="266" y="118" width="50" height="8" rx="4" fillOpacity="0.8" />
+    <rect x="322" y="118" width="34" height="8" rx="4" fillOpacity="0.55" />
+    <circle cx="344" cy="100" r="3" fillOpacity="0.5" />
+    <circle cx="344" cy="86" r="8" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="272" cy="142" r="3" />
+    <circle cx="284" cy="142" r="3" />
+    <circle cx="296" cy="142" r="3" />
+  </g>
+</svg>
+
 ## The idea: a query as an input
 
 A subquery is a `SELECT` wrapped in parentheses, whose result feeds

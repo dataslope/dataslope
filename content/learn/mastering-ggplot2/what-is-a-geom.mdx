@@ -8,6 +8,46 @@ represent your data: a point, a line, a bar, a box. It is the most
 visible component — when someone says "make a scatter plot" or "make a
 bar chart," they are really choosing a *geom*.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="The same four data points drawn three ways in three panels — as scatter dots, as bars over faint ghost points, and as a dotted line — one description, many geoms"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor">
+    <rect x="40" y="35" width="170" height="140" rx="10" opacity="0.07" />
+    <rect x="235" y="35" width="170" height="140" rx="10" opacity="0.07" />
+    <rect x="430" y="35" width="170" height="140" rx="10" opacity="0.07" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="65" cy="140" r="7" />
+    <circle cx="105" cy="90" r="7" />
+    <circle cx="145" cy="120" r="7" />
+    <circle cx="185" cy="65" r="7" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="260" cy="140" r="4" />
+    <circle cx="300" cy="90" r="4" />
+    <circle cx="340" cy="120" r="4" />
+    <circle cx="380" cy="65" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="253" y="140" width="14" height="20" rx="4" fillOpacity="0.85" />
+    <rect x="293" y="90" width="14" height="70" rx="4" fillOpacity="0.85" />
+    <rect x="333" y="120" width="14" height="40" rx="4" fillOpacity="0.85" />
+    <rect x="373" y="65" width="14" height="95" rx="4" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="455" cy="140" r="5" />
+    <circle cx="475" cy="115" r="3" />
+    <circle cx="495" cy="90" r="5" />
+    <circle cx="515" cy="105" r="3" />
+    <circle cx="535" cy="120" r="5" />
+    <circle cx="555" cy="93" r="3" />
+    <circle cx="575" cy="65" r="5" />
+  </g>
+</svg>
+
 ## One data + mapping, many geoms
 
 Here is the liberating idea. The data and mappings describe *what

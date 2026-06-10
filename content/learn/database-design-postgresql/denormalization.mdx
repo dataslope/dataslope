@@ -11,6 +11,39 @@ choose a controlled amount of duplication.
 from normalized tables. The word deliberately matters. This is not a
 shortcut around design; it is a trade-off you make with your eyes open.
 
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="A green fact from one table is copied into another, but the copy wears a yellow badge ring and a sync trail back to its source — duplication done deliberately, with eyes open"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="80" y="56" width="180" height="92" rx="16" fillOpacity="0.14" />
+    <rect x="156" y="76" width="84" height="10" rx="5" fillOpacity="0.4" />
+    <rect x="106" y="116" width="70" height="10" rx="5" fillOpacity="0.25" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="126" cy="81" r="10" />
+    <rect x="380" y="56" width="180" height="92" rx="16" fillOpacity="0.1" />
+    <circle cx="495" cy="112" r="10" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="416" cy="81" r="8" />
+    <rect x="436" y="75" width="86" height="10" rx="5" fillOpacity="0.4" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path fillRule="evenodd" d="M477 112 a18 18 0 1 0 36 0 a18 18 0 1 0 -36 0 M481 112 a14 14 0 1 0 28 0 a14 14 0 1 0 -28 0" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="172" cy="170" r="3.5" fillOpacity="0.5" />
+    <circle cx="240" cy="182" r="3.5" fillOpacity="0.5" />
+    <circle cx="320" cy="186" r="3.5" fillOpacity="0.5" />
+    <circle cx="400" cy="182" r="3.5" fillOpacity="0.5" />
+    <circle cx="462" cy="166" r="3.5" fillOpacity="0.5" />
+    <polygon points="487,140 478,158 496,156" fillOpacity="0.7" />
+  </g>
+</svg>
+
 ## Normalize first
 
 Start with the clean design. Give each fact one home. Use keys and

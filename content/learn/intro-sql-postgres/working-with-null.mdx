@@ -8,6 +8,58 @@ in SQL. It is the source of countless beginner bugs. Slow down here:
 a clear understanding of `NULL` will save you real confusion later,
 which is why this page has extra checks at the end.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="Three equality tests: two known dots agree with a green check, but once a hazy unknown value is involved every answer becomes a yellow question mark"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="180" cy="50" r="10" />
+    <circle cx="300" cy="50" r="10" />
+    <circle cx="180" cy="110" r="10" />
+  </g>
+  <g fill="currentColor" opacity="0.5">
+    <text x="240" y="58" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="22" fontWeight="700">=</text>
+    <text x="240" y="118" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="22" fontWeight="700">=</text>
+    <text x="240" y="178" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="22" fontWeight="700">=</text>
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="300" cy="110" r="14" fillOpacity="0.15" />
+    <circle cx="300" cy="110" r="10" fillOpacity="0.25" />
+    <circle cx="300" cy="110" r="6" fillOpacity="0.35" />
+    <circle cx="180" cy="170" r="14" fillOpacity="0.15" />
+    <circle cx="180" cy="170" r="10" fillOpacity="0.25" />
+    <circle cx="180" cy="170" r="6" fillOpacity="0.35" />
+    <circle cx="300" cy="170" r="14" fillOpacity="0.15" />
+    <circle cx="300" cy="170" r="10" fillOpacity="0.25" />
+    <circle cx="300" cy="170" r="6" fillOpacity="0.35" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="350" cy="50" r="3" />
+    <circle cx="370" cy="50" r="3" />
+    <circle cx="390" cy="50" r="3" />
+    <circle cx="350" cy="110" r="3" />
+    <circle cx="370" cy="110" r="3" />
+    <circle cx="390" cy="110" r="3" />
+    <circle cx="350" cy="170" r="3" />
+    <circle cx="370" cy="170" r="3" />
+    <circle cx="390" cy="170" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="440" cy="50" r="12" />
+  </g>
+  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
+    <polygon points="433,51 436,48 438,51 446,42 449,45 438,56" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="440" cy="110" r="12" fillOpacity="0.25" />
+    <circle cx="440" cy="170" r="12" fillOpacity="0.25" />
+    <text x="440" y="117" textAnchor="middle" fontFamily="Georgia, serif" fontSize="17" fontWeight="700">?</text>
+    <text x="440" y="177" textAnchor="middle" fontFamily="Georgia, serif" fontSize="17" fontWeight="700">?</text>
+  </g>
+</svg>
+
 ## NULL means "unknown," not "zero" or "empty"
 
 A cell can be **`NULL`**, which means *there is no value here — it is

@@ -5,6 +5,57 @@ description: Defining your own types with attributes, methods, and dataclasses
 
 A **class** bundles data and behavior. Every value in Python is an instance of some class — `42` is an `int`, `"hello"` is a `str`, `[1, 2, 3]` is a `list`. Classes let you define your own types to model the problem you're solving.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A faint master disc presses three records below it — identical grooves, but each wears its own center label — a class is the master, and every instance carries its own state"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.12">
+    <circle cx="320" cy="64" r="46" />
+  </g>
+  <g fill="currentColor" opacity="0.1">
+    <circle cx="320" cy="64" r="33" />
+  </g>
+  <g fill="currentColor" opacity="0.08">
+    <circle cx="320" cy="64" r="20" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="320" cy="64" r="5" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="236" cy="104" r="3" />
+    <circle cx="204" cy="122" r="3" />
+    <circle cx="176" cy="140" r="3" />
+    <circle cx="320" cy="112" r="3" />
+    <circle cx="320" cy="128" r="3" />
+    <circle cx="320" cy="144" r="3" />
+    <circle cx="404" cy="104" r="3" />
+    <circle cx="436" cy="122" r="3" />
+    <circle cx="464" cy="140" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="150" cy="170" r="34" fillOpacity="0.3" />
+    <circle cx="150" cy="170" r="25" fillOpacity="0.3" />
+    <circle cx="150" cy="170" r="16" fillOpacity="0.3" />
+    <circle cx="320" cy="170" r="34" fillOpacity="0.3" />
+    <circle cx="320" cy="170" r="25" fillOpacity="0.3" />
+    <circle cx="320" cy="170" r="16" fillOpacity="0.3" />
+    <circle cx="490" cy="170" r="34" fillOpacity="0.3" />
+    <circle cx="490" cy="170" r="25" fillOpacity="0.3" />
+    <circle cx="490" cy="170" r="16" fillOpacity="0.3" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="150" cy="170" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="320" cy="170" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
+    <circle cx="490" cy="170" r="9" fillOpacity="0.9" />
+  </g>
+</svg>
+
 ## Why classes matter: the real world
 
 Classes are how you model **entities** in your domain:

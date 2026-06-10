@@ -9,6 +9,46 @@ summarize a numeric distribution. Unlike a histogram, which shows
 key summary statistics — and that compactness lets you compare
 *many* distributions side by side without clutter.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="A translucent box with a solid median bar and whiskers ending in dots, two red outliers beyond — and below it the strip of raw points it summarizes"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="240" y="80" width="180" height="60" rx="16" fillOpacity="0.3" />
+    <rect x="322" y="80" width="10" height="60" rx="5" />
+    <circle cx="146" cy="110" r="7" fillOpacity="0.8" />
+    <circle cx="504" cy="110" r="7" fillOpacity="0.8" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <rect x="150" y="107" width="90" height="6" rx="3" />
+    <rect x="420" y="107" width="80" height="6" rx="3" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="556" cy="110" r="6" fillOpacity="0.85" />
+    <circle cx="586" cy="110" r="4.5" fillOpacity="0.7" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.25">
+    <circle cx="160" cy="178" r="3" />
+    <circle cx="205" cy="178" r="3" />
+    <circle cx="250" cy="178" r="3.5" />
+    <circle cx="270" cy="178" r="3.5" />
+    <circle cx="287" cy="178" r="3.5" />
+    <circle cx="302" cy="178" r="3.5" />
+    <circle cx="317" cy="178" r="3.5" />
+    <circle cx="332" cy="178" r="3.5" />
+    <circle cx="347" cy="178" r="3.5" />
+    <circle cx="365" cy="178" r="3.5" />
+    <circle cx="388" cy="178" r="3.5" />
+    <circle cx="422" cy="178" r="3" />
+    <circle cx="470" cy="178" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="556" cy="178" r="3" fillOpacity="0.4" />
+  </g>
+</svg>
+
 ## Anatomy of a box plot
 
 A box plot is built from a handful of ordered summary statistics:

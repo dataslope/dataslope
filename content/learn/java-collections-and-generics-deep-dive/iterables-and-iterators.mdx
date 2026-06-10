@@ -10,6 +10,44 @@ are all iterable in the same way**. Whether you have a `List`, a
 you walk through it is the same. That uniformity is enforced by two
 tiny interfaces: `Iterable<E>` and `Iterator<E>`.
 
+<svg
+  viewBox="0 0 640 170"
+  role="img"
+  aria-label="A yellow cursor dot pauses above the fifth cell of a track, the four cells behind it dimmed, the ones ahead still bright, and a question mark hovering over the next cell"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.08">
+    <rect x="61" y="78" width="56" height="48" rx="10" />
+    <rect x="127" y="78" width="56" height="48" rx="10" />
+    <rect x="193" y="78" width="56" height="48" rx="10" />
+    <rect x="259" y="78" width="56" height="48" rx="10" />
+    <rect x="325" y="78" width="56" height="48" rx="10" />
+    <rect x="391" y="78" width="56" height="48" rx="10" />
+    <rect x="457" y="78" width="56" height="48" rx="10" />
+    <rect x="523" y="78" width="56" height="48" rx="10" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="89" cy="102" r="7" fillOpacity="0.2" />
+    <circle cx="155" cy="102" r="7" fillOpacity="0.2" />
+    <circle cx="221" cy="102" r="7" fillOpacity="0.2" />
+    <circle cx="287" cy="102" r="7" fillOpacity="0.2" />
+    <circle cx="353" cy="102" r="7" />
+    <circle cx="419" cy="102" r="7" fillOpacity="0.7" />
+    <circle cx="485" cy="102" r="7" fillOpacity="0.7" />
+    <circle cx="551" cy="102" r="7" fillOpacity="0.7" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="89" cy="56" r="3" />
+    <circle cx="155" cy="46" r="3" />
+    <circle cx="221" cy="40" r="3" />
+    <circle cx="287" cy="42" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="353" cy="48" r="9" />
+    <text x="419" y="54" fontFamily="ui-monospace, monospace" fontSize="20" fontWeight="700" textAnchor="middle">{"?"}</text>
+  </g>
+</svg>
+
 ## The two interfaces
 
 ```mermaid

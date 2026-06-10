@@ -13,6 +13,55 @@ proportion of your data, and the **rug** plots the raw observations
 themselves. Neither hides anything behind a parameter, which makes them
 honest companions to the histogram.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A staircase climbs from the baseline, stepping up once above every rug tick, until the final green step reaches the faint 100 percent line — the running proportion of data with nothing to tune"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="70" y="180" width="500" height="5" rx="2.5" fill="currentColor" opacity="0.3" />
+  <rect x="70" y="40" width="500" height="3" rx="1.5" fill="currentColor" opacity="0.15" />
+  <g fill="currentColor" opacity="0.4">
+    <rect x="108.5" y="190" width="3" height="11" rx="1.5" />
+    <rect x="148.5" y="190" width="3" height="11" rx="1.5" />
+    <rect x="173.5" y="190" width="3" height="11" rx="1.5" />
+    <rect x="213.5" y="190" width="3" height="11" rx="1.5" />
+    <rect x="248.5" y="190" width="3" height="11" rx="1.5" />
+    <rect x="268.5" y="190" width="3" height="11" rx="1.5" />
+    <rect x="293.5" y="190" width="3" height="11" rx="1.5" />
+    <rect x="328.5" y="190" width="3" height="11" rx="1.5" />
+    <rect x="368.5" y="190" width="3" height="11" rx="1.5" />
+    <rect x="418.5" y="190" width="3" height="11" rx="1.5" />
+    <rect x="478.5" y="190" width="3" height="11" rx="1.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="110" y="167" width="40" height="5" rx="2.5" />
+    <rect x="150" y="155" width="25" height="5" rx="2.5" />
+    <rect x="175" y="142" width="40" height="5" rx="2.5" />
+    <rect x="215" y="129" width="35" height="5" rx="2.5" />
+    <rect x="250" y="116" width="20" height="5" rx="2.5" />
+    <rect x="270" y="104" width="25" height="5" rx="2.5" />
+    <rect x="295" y="91" width="35" height="5" rx="2.5" />
+    <rect x="330" y="78" width="40" height="5" rx="2.5" />
+    <rect x="370" y="65" width="50" height="5" rx="2.5" />
+    <rect x="420" y="53" width="60" height="5" rx="2.5" />
+    <circle cx="110" cy="169" r="4" />
+    <circle cx="150" cy="157" r="4" />
+    <circle cx="175" cy="144" r="4" />
+    <circle cx="215" cy="131" r="4" />
+    <circle cx="250" cy="118" r="4" />
+    <circle cx="270" cy="106" r="4" />
+    <circle cx="295" cy="93" r="4" />
+    <circle cx="330" cy="80" r="4" />
+    <circle cx="370" cy="67" r="4" />
+    <circle cx="420" cy="55" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="480" y="40" width="80" height="5" rx="2.5" />
+    <circle cx="480" cy="42" r="4" />
+  </g>
+</svg>
+
 ## The ECDF: a running tally of proportions
 
 The **empirical cumulative distribution function** (ECDF) answers a precise

@@ -6,6 +6,42 @@ description: Ordering rows by one or more columns, and assigning ranks within gr
 After filtering, ordering is the second most common manipulation
 you will perform on a DataFrame. Pandas keeps it simple.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A stack of jumbled bars passes through an arrow and reorders into a neat descending stack with small yellow rank medals beside the leaders — sort_values and rank at work"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.3">
+    <rect x="80" y="45" width="120" height="18" rx="9" />
+    <rect x="80" y="77" width="60" height="18" rx="9" />
+    <rect x="80" y="109" width="150" height="18" rx="9" />
+    <rect x="80" y="141" width="90" height="18" rx="9" />
+    <rect x="80" y="173" width="40" height="18" rx="9" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="270" cy="118" r="3" />
+    <circle cx="293" cy="118" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <polygon points="312,108 330,118 312,128" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="390" y="45" width="150" height="18" rx="9" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="390" y="77" width="120" height="18" rx="9" fillOpacity="0.8" />
+    <rect x="390" y="109" width="90" height="18" rx="9" fillOpacity="0.6" />
+    <rect x="390" y="141" width="60" height="18" rx="9" fillOpacity="0.45" />
+    <rect x="390" y="173" width="40" height="18" rx="9" fillOpacity="0.3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="370" cy="54" r="8" />
+    <circle cx="370" cy="86" r="6.5" />
+    <circle cx="370" cy="118" r="5" />
+  </g>
+</svg>
+
 ## `sort_values`
 
 Sort by a single column:

@@ -8,6 +8,48 @@ will adjust most often. This page covers limits, breaks, labels, and —
 most importantly — *transformations* like the log scale, plus a subtle
 trap about how scales filter data.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="The same six value ticks on two rulers — crowded to the left on a linear axis, spread evenly on a log axis — with dotted leaders showing how the transformation re-spaces them"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.12">
+    <rect x="80" y="44" width="480" height="10" rx="5" />
+    <rect x="80" y="152" width="480" height="10" rx="5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="88" y="38" width="4" height="22" rx="2" />
+    <rect x="99" y="38" width="4" height="22" rx="2" />
+    <rect x="126" y="38" width="4" height="22" rx="2" />
+    <rect x="172" y="38" width="4" height="22" rx="2" />
+    <rect x="264" y="38" width="4" height="22" rx="2" />
+    <rect x="538" y="38" width="4" height="22" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="88" y="146" width="4" height="22" rx="2" />
+    <rect x="159" y="146" width="4" height="22" rx="2" />
+    <rect x="267" y="146" width="4" height="22" rx="2" />
+    <rect x="349" y="146" width="4" height="22" rx="2" />
+    <rect x="430" y="146" width="4" height="22" rx="2" />
+    <rect x="538" y="146" width="4" height="22" rx="2" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="90" cy="88" r="2.5" />
+    <circle cx="90" cy="118" r="2.5" />
+    <circle cx="106" cy="88" r="2.5" />
+    <circle cx="126" cy="118" r="2.5" />
+    <circle cx="148" cy="88" r="2.5" />
+    <circle cx="216" cy="118" r="2.5" />
+    <circle cx="200" cy="88" r="2.5" />
+    <circle cx="296" cy="118" r="2.5" />
+    <circle cx="302" cy="88" r="2.5" />
+    <circle cx="384" cy="118" r="2.5" />
+    <circle cx="540" cy="88" r="2.5" />
+    <circle cx="540" cy="118" r="2.5" />
+  </g>
+</svg>
+
 ## Continuous position scales
 
 For numeric axes you use `scale_x_continuous()` and

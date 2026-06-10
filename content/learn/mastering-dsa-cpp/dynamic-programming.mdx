@@ -5,6 +5,56 @@ description: Learn memoization, tabulation, and classic dynamic programming patt
 
 Dynamic programming solves problems by combining answers to **overlapping subproblems** with **optimal substructure**. It is the next step after recursion: the Fibonacci tree in `recursion.mdx` repeats calls; DP stores those answers.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A table filling cell by cell — base cases green, solved rows blue, and the yellow current cell drawing dotted arrows from the two earlier answers it combines"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.3">
+    <rect x="108" y="30" width="52" height="32" rx="6" />
+    <rect x="170" y="30" width="52" height="32" rx="6" />
+    <rect x="232" y="30" width="52" height="32" rx="6" />
+    <rect x="294" y="30" width="52" height="32" rx="6" />
+    <rect x="356" y="30" width="52" height="32" rx="6" />
+    <rect x="418" y="30" width="52" height="32" rx="6" />
+    <rect x="480" y="30" width="52" height="32" rx="6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.35">
+    <rect x="108" y="74" width="52" height="32" rx="6" />
+    <rect x="170" y="74" width="52" height="32" rx="6" />
+    <rect x="232" y="74" width="52" height="32" rx="6" />
+    <rect x="294" y="74" width="52" height="32" rx="6" />
+    <rect x="356" y="74" width="52" height="32" rx="6" />
+    <rect x="418" y="74" width="52" height="32" rx="6" />
+    <rect x="480" y="74" width="52" height="32" rx="6" />
+    <rect x="108" y="118" width="52" height="32" rx="6" />
+    <rect x="170" y="118" width="52" height="32" rx="6" />
+    <rect x="232" y="118" width="52" height="32" rx="6" />
+    <rect x="294" y="118" width="52" height="32" rx="6" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="356" y="118" width="52" height="32" rx="6" fillOpacity="0.9" />
+    <circle cx="382" cy="96" r="2" fillOpacity="0.8" />
+    <circle cx="382" cy="106" r="2" fillOpacity="0.8" />
+    <polygon points="377,110 387,110 382,119" fillOpacity="0.8" />
+    <circle cx="336" cy="134" r="2" fillOpacity="0.8" />
+    <circle cx="346" cy="134" r="2" fillOpacity="0.8" />
+    <polygon points="350,129 350,139 358,134" fillOpacity="0.8" />
+  </g>
+  <g fill="currentColor" opacity="0.06">
+    <rect x="418" y="118" width="52" height="32" rx="6" />
+    <rect x="480" y="118" width="52" height="32" rx="6" />
+    <rect x="108" y="162" width="52" height="32" rx="6" />
+    <rect x="170" y="162" width="52" height="32" rx="6" />
+    <rect x="232" y="162" width="52" height="32" rx="6" />
+    <rect x="294" y="162" width="52" height="32" rx="6" />
+    <rect x="356" y="162" width="52" height="32" rx="6" />
+    <rect x="418" y="162" width="52" height="32" rx="6" />
+    <rect x="480" y="162" width="52" height="32" rx="6" />
+  </g>
+</svg>
+
 ## Mindset
 
 Top-down **memoization** is recursion plus a cache. Bottom-up **tabulation** fills a table from base cases upward.

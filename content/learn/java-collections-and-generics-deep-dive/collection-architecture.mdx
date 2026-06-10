@@ -11,6 +11,58 @@ constrain everyone who calls your code, often for years.
 This chapter is a short, practical guide to designing module
 boundaries with collections.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="A blue collection in one module crosses a dotted boundary and arrives in the next module as a green copy wearing a shield, while a red arrow trying to flow back is barred"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.06">
+    <rect x="40" y="36" width="250" height="148" rx="16" />
+    <rect x="350" y="36" width="250" height="148" rx="16" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="320" cy="48" r="3" />
+    <circle cx="320" cy="76" r="3" />
+    <circle cx="320" cy="104" r="3" />
+    <circle cx="320" cy="132" r="3" />
+    <circle cx="320" cy="160" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="95" y="86" width="110" height="56" rx="12" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
+    <circle cx="125" cy="114" r="6" fillOpacity="0.9" />
+    <circle cx="150" cy="114" r="6" fillOpacity="0.9" />
+    <circle cx="175" cy="114" r="6" fillOpacity="0.9" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="225" cy="98" r="3" />
+    <circle cx="258" cy="94" r="3" />
+    <circle cx="290" cy="92" r="3" />
+    <circle cx="352" cy="92" r="3" />
+    <circle cx="384" cy="94" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="415" y="86" width="110" height="56" rx="12" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
+    <circle cx="445" cy="114" r="6" fillOpacity="0.9" />
+    <circle cx="470" cy="114" r="6" fillOpacity="0.9" />
+    <circle cx="495" cy="114" r="6" fillOpacity="0.9" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <polygon points="525,62 543,69 543,84 525,98 507,84 507,69" />
+  </g>
+  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
+    <circle cx="525" cy="78" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <polygon points="352,158 352,174 336,166" fillOpacity="0.8" />
+    <rect x="326" y="156" width="5" height="20" rx="2.5" />
+  </g>
+</svg>
+
 ## Three principles
 
 1. **Accept the widest type you can; return the narrowest type that's useful.**

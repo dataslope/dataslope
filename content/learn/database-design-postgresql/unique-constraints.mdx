@@ -10,6 +10,34 @@ the schema.
 A **UNIQUE** constraint tells PostgreSQL that a value, or combination of
 values, must not repeat.
 
+<svg
+  viewBox="0 0 640 180"
+  role="img"
+  aria-label="A row of distinct dots already contains a green value, so the identical green newcomer is ghosted out and slashed in red — duplicates may not enter"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="140" cy="90" r="13" />
+    <circle cx="380" cy="90" r="13" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="300" cy="90" r="13" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="220" cy="90" r="13" />
+    <circle cx="220" cy="90" r="21" fillOpacity="0.18" />
+    <circle cx="530" cy="90" r="13" fillOpacity="0.25" />
+  </g>
+  <g fill="currentColor" opacity="0.22">
+    <circle cx="478" cy="90" r="3" />
+    <circle cx="455" cy="90" r="3" />
+    <circle cx="432" cy="90" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="508" y="86" width="44" height="6" rx="3" transform="rotate(-42 530 89)" />
+  </g>
+</svg>
+
 ## Uniqueness beyond the primary key
 
 A primary key already guarantees one kind of uniqueness: every row has a

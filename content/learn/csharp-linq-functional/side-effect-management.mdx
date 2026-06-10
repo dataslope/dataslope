@@ -12,6 +12,34 @@ This page is about *where* the impurity lives. The pattern is older
 than C#, but it fits LINQ exceptionally well: **functional core,
 imperative shell**.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="A solid green core inside a translucent yellow shell: red effect dots live only in the shell, while blue dots flow in one side and green dots flow out the other"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="320" cy="120" r="85" fillOpacity="0.14" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="320" cy="120" r="48" />
+    <circle cx="430" cy="120" r="4" />
+    <circle cx="455" cy="120" r="4" />
+    <circle cx="480" cy="120" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="255" cy="75" r="7" />
+    <circle cx="390" cy="80" r="7" />
+    <circle cx="380" cy="170" r="7" />
+    <circle cx="250" cy="160" r="7" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="160" cy="120" r="4" />
+    <circle cx="185" cy="120" r="4" />
+    <circle cx="210" cy="120" r="4" />
+  </g>
+</svg>
+
 ## The two halves of a program
 
 ```mermaid

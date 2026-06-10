@@ -17,6 +17,49 @@ picked them. This page is about picking them *deliberately*, with evidence,
 instead of guessing — and about the one mistake that can make a careful
 tuning process worse than useless.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Two slider knobs you set by hand feed a grid of candidate scores in which one green cell glows as the best combination — hyperparameter tuning searches the grid with evidence instead of guesswork"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.2">
+    <rect x="60" y="60" width="160" height="8" rx="4" />
+    <rect x="60" y="120" width="160" height="8" rx="4" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="150" cy="64" r="10" />
+    <circle cx="105" cy="124" r="10" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="300" y="40" width="40" height="30" rx="6" fillOpacity="0.1" />
+    <rect x="348" y="40" width="40" height="30" rx="6" fillOpacity="0.15" />
+    <rect x="396" y="40" width="40" height="30" rx="6" fillOpacity="0.22" />
+    <rect x="444" y="40" width="40" height="30" rx="6" fillOpacity="0.15" />
+    <rect x="492" y="40" width="40" height="30" rx="6" fillOpacity="0.1" />
+    <rect x="300" y="78" width="40" height="30" rx="6" fillOpacity="0.15" />
+    <rect x="348" y="78" width="40" height="30" rx="6" fillOpacity="0.25" />
+    <rect x="396" y="78" width="40" height="30" rx="6" fillOpacity="0.35" />
+    <rect x="444" y="78" width="40" height="30" rx="6" fillOpacity="0.28" />
+    <rect x="492" y="78" width="40" height="30" rx="6" fillOpacity="0.18" />
+    <rect x="300" y="116" width="40" height="30" rx="6" fillOpacity="0.2" />
+    <rect x="348" y="116" width="40" height="30" rx="6" fillOpacity="0.35" />
+    <rect x="444" y="116" width="40" height="30" rx="6" fillOpacity="0.4" />
+    <rect x="492" y="116" width="40" height="30" rx="6" fillOpacity="0.25" />
+    <rect x="300" y="154" width="40" height="30" rx="6" fillOpacity="0.12" />
+    <rect x="348" y="154" width="40" height="30" rx="6" fillOpacity="0.22" />
+    <rect x="396" y="154" width="40" height="30" rx="6" fillOpacity="0.3" />
+    <rect x="444" y="154" width="40" height="30" rx="6" fillOpacity="0.26" />
+    <rect x="492" y="154" width="40" height="30" rx="6" fillOpacity="0.14" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="416" cy="131" r="27" fillOpacity="0.2" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="396" y="116" width="40" height="30" rx="6" fillOpacity="0.9" />
+  </g>
+</svg>
+
 ## Parameters vs. hyperparameters
 
 The distinction sounds like pedantry, but it is the whole foundation of

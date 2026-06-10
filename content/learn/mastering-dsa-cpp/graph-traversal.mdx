@@ -5,6 +5,61 @@ description: Learn breadth-first search, depth-first search, components, cycle d
 
 Graph traversal means systematically visiting vertices reachable from a starting point. The two core tools are **breadth-first search (BFS)** and **depth-first search (DFS)**.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="Side by side traversals — breadth-first search expands as translucent rings of neighbors around a source, while depth-first search threads one deep winding dotted path and backtracks as faint ghosts"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="170" cy="112" r="90" fillOpacity="0.06" />
+    <circle cx="170" cy="112" r="62" fillOpacity="0.09" />
+    <circle cx="170" cy="112" r="34" fillOpacity="0.13" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="170" cy="112" r="8" />
+    <circle cx="470" cy="52" r="8" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="143" cy="92" r="6" />
+    <circle cx="201" cy="98" r="6" />
+    <circle cx="178" cy="144" r="6" />
+    <circle cx="118" cy="80" r="6" fillOpacity="0.55" />
+    <circle cx="232" cy="104" r="6" fillOpacity="0.55" />
+    <circle cx="150" cy="170" r="6" fillOpacity="0.55" />
+    <circle cx="222" cy="146" r="6" fillOpacity="0.55" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="414" cy="90" r="6" />
+    <circle cx="388" cy="134" r="6" />
+    <circle cx="372" cy="176" r="6" />
+    <circle cx="468" cy="118" r="6" />
+    <circle cx="516" cy="158" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.6">
+    <circle cx="451" cy="65" r="2.5" />
+    <circle cx="432" cy="78" r="2.5" />
+    <circle cx="405" cy="105" r="2.5" />
+    <circle cx="396" cy="120" r="2.5" />
+    <circle cx="383" cy="148" r="2.5" />
+    <circle cx="377" cy="162" r="2.5" />
+    <circle cx="432" cy="99" r="2.5" />
+    <circle cx="450" cy="108" r="2.5" />
+    <circle cx="484" cy="131" r="2.5" />
+    <circle cx="500" cy="144" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <circle cx="385" cy="160" r="2" />
+    <circle cx="391" cy="146" r="2" />
+    <circle cx="400" cy="122" r="2" />
+    <circle cx="409" cy="107" r="2" />
+  </g>
+  <g fill="currentColor" opacity="0.45" fontFamily="ui-monospace, monospace" fontSize="12" textAnchor="middle">
+    <text x="170" y="212">BFS</text>
+    <text x="470" y="212">DFS</text>
+  </g>
+</svg>
+
 ## Breadth-first search
 
 BFS explores level by level from a source. It uses a queue: push the source, pop the oldest vertex, then push each unvisited neighbor.

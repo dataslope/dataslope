@@ -13,6 +13,50 @@ ownership of internal storage from one object to another without
 copying the contents. This chapter is about the intuition, not the
 full template machinery — that comes later if you go deep.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="A heavy grid of blue dots stays exactly where it is while a dotted handle arcs from a faded old box to a crisp green one — moving transfers ownership of the buffer instead of copying its contents"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="260" cy="130" r="7" />
+    <circle cx="290" cy="130" r="7" />
+    <circle cx="320" cy="130" r="7" />
+    <circle cx="350" cy="130" r="7" />
+    <circle cx="260" cy="160" r="7" />
+    <circle cx="290" cy="160" r="7" />
+    <circle cx="320" cy="160" r="7" />
+    <circle cx="350" cy="160" r="7" />
+    <circle cx="260" cy="190" r="7" />
+    <circle cx="290" cy="190" r="7" />
+    <circle cx="320" cy="190" r="7" />
+    <circle cx="350" cy="190" r="7" />
+  </g>
+  <g fill="currentColor" opacity="0.15">
+    <rect x="80" y="40" width="110" height="54" rx="12" />
+    <circle cx="180" cy="102" r="3" />
+    <circle cx="196" cy="114" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="450" y="40" width="110" height="54" rx="12" />
+    <circle cx="448" cy="104" r="3" fillOpacity="0.6" />
+    <circle cx="420" cy="112" r="3" fillOpacity="0.6" />
+    <circle cx="392" cy="120" r="3" fillOpacity="0.6" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="216" cy="44" r="3" />
+    <circle cx="254" cy="31" r="3" />
+    <circle cx="294" cy="23" r="3" />
+    <circle cx="334" cy="21" r="3" />
+    <circle cx="374" cy="25" r="3" />
+    <circle cx="410" cy="33" r="3" />
+  </g>
+  <g fill="currentColor" opacity="0.45">
+    <polygon points="428,26 444,34 426,42" />
+  </g>
+</svg>
+
 ## Copy vs. move, in pictures
 
 Suppose a `std::vector<int>` owns a heap buffer of 1,000,000 ints.

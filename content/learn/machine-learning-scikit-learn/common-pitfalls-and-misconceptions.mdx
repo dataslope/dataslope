@@ -15,6 +15,40 @@ This page is a catalog of those traps. For each one: **what the trap is**,
 to it whenever a result looks too good to be true — because that feeling is
 usually right.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="A wall separates solid training dots from ghosted test dots, but a dotted tunnel runs underground beneath it and a red dot has surfaced on the training side — leakage smuggles test information into training"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.3">
+    <rect x="310" y="30" width="20" height="132" rx="8" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <rect x="60" y="160" width="520" height="4" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="120" cy="70" r="8" />
+    <circle cx="180" cy="120" r="8" />
+    <circle cx="240" cy="60" r="8" />
+    <circle cx="150" cy="145" r="8" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="420" cy="75" r="8" fillOpacity="0.25" />
+    <circle cx="490" cy="120" r="8" fillOpacity="0.25" />
+    <circle cx="550" cy="65" r="8" fillOpacity="0.25" />
+    <circle cx="460" cy="145" r="8" fillOpacity="0.25" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="380" cy="170" r="3" fillOpacity="0.45" />
+    <circle cx="355" cy="181" r="3" fillOpacity="0.45" />
+    <circle cx="322" cy="186" r="3" fillOpacity="0.45" />
+    <circle cx="289" cy="181" r="3" fillOpacity="0.45" />
+    <circle cx="264" cy="170" r="3" fillOpacity="0.45" />
+    <circle cx="258" cy="138" r="9" />
+  </g>
+</svg>
+
 ```mermaid
 flowchart TD
     A["A result that looks<br/>too good to be true"] --> B{"Did you peek<br/>at the test set?"}

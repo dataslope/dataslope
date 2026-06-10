@@ -8,6 +8,31 @@ default and most common kind. Its rule is simple and worth saying
 precisely: an inner join keeps **only the rows that have a match in
 both tables.** Rows with no partner are dropped.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="Two overlapping circles of rows — only the dots standing in the shared overlap stay bright green; rows with no partner fade outside it"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.08">
+    <circle cx="260" cy="110" r="85" />
+    <circle cx="380" cy="110" r="85" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M320 50 A85 85 0 0 1 320 170 A85 85 0 0 1 320 50 Z" fillOpacity="0.2" />
+    <circle cx="320" cy="80" r="6.5" fillOpacity="0.95" />
+    <circle cx="320" cy="110" r="6.5" fillOpacity="0.95" />
+    <circle cx="320" cy="140" r="6.5" fillOpacity="0.95" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <circle cx="215" cy="90" r="6" />
+    <circle cx="245" cy="68" r="6" />
+    <circle cx="228" cy="142" r="6" />
+    <circle cx="425" cy="90" r="6" />
+    <circle cx="412" cy="144" r="6" />
+  </g>
+</svg>
+
 ## The rule, in a picture
 
 ```mermaid

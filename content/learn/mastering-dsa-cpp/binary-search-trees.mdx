@@ -5,6 +5,41 @@ description: Learn the BST invariant, search, insertion, deletion, validation, a
 
 A binary search tree (BST) is a binary tree with an ordering invariant: every value in the left subtree is less than the root, and every value in the right subtree is greater than the root. The rule applies recursively at every node.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A binary search tree of size-coded dots — every left child smaller, every right child larger — with a yellow comparison path descending from the root to a green target"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="360" cy="65" r="2" />
+    <circle cx="400" cy="87" r="2" />
+    <circle cx="180" cy="129" r="2" />
+    <circle cx="160" cy="151" r="2" />
+    <circle cx="420" cy="129" r="2" />
+    <circle cx="400" cy="151" r="2" />
+    <circle cx="460" cy="129" r="2" />
+    <circle cx="480" cy="151" r="2" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="280" cy="65" r="3" fillOpacity="0.8" />
+    <circle cx="240" cy="87" r="3" fillOpacity="0.8" />
+    <circle cx="220" cy="129" r="3" fillOpacity="0.8" />
+    <circle cx="240" cy="151" r="3" fillOpacity="0.8" />
+    <circle cx="320" cy="44" r="11" />
+    <circle cx="200" cy="108" r="7" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="440" cy="108" r="13" />
+    <circle cx="140" cy="172" r="4.5" />
+    <circle cx="380" cy="172" r="12" />
+    <circle cx="500" cy="172" r="15" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="260" cy="172" r="8.5" />
+  </g>
+</svg>
+
 ```mermaid
 flowchart TD
     A["8"] --> B["3"]

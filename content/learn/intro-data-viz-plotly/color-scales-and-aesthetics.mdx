@@ -9,6 +9,51 @@ data visualization. A well-chosen palette is invisible: the reader
 just *reads* the chart. A poorly-chosen one fights the data and
 sometimes lies about it.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="Three rows of swatch dots: a sequential ramp of deepening blue, a diverging ramp from red through neutral to green, and a categorical row of distinct hues"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.15">
+    <rect x="120" y="54" width="44" height="12" rx="6" />
+    <rect x="120" y="114" width="44" height="12" rx="6" />
+    <rect x="120" y="174" width="44" height="12" rx="6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="212" cy="60" r="13" fillOpacity="0.12" />
+    <circle cx="248" cy="60" r="13" fillOpacity="0.25" />
+    <circle cx="284" cy="60" r="13" fillOpacity="0.4" />
+    <circle cx="320" cy="60" r="13" fillOpacity="0.55" />
+    <circle cx="356" cy="60" r="13" fillOpacity="0.7" />
+    <circle cx="392" cy="60" r="13" fillOpacity="0.85" />
+    <circle cx="428" cy="60" r="13" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="212" cy="120" r="13" />
+    <circle cx="248" cy="120" r="13" fillOpacity="0.55" />
+    <circle cx="284" cy="120" r="13" fillOpacity="0.2" />
+  </g>
+  <circle cx="320" cy="120" r="13" fill="currentColor" opacity="0.12" />
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="356" cy="120" r="13" fillOpacity="0.2" />
+    <circle cx="392" cy="120" r="13" fillOpacity="0.55" />
+    <circle cx="428" cy="120" r="13" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="266" cy="180" r="13" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="302" cy="180" r="13" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="338" cy="180" r="13" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="374" cy="180" r="13" />
+  </g>
+</svg>
+
 ## The three families of color scales
 
 There are essentially three families. Knowing which family fits

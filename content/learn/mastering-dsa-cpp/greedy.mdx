@@ -5,6 +5,51 @@ description: Learn local-choice algorithms, exchange arguments, and classic gree
 
 Greedy algorithms make the locally optimal choice at each step, hoping it leads to a global optimum.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="From the same start, a bold yellow path always grabs the biggest next coin while a faint green ghost path through smaller coins reaches the goal too — the locally best choice is not always globally best"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="90" cy="123" r="2.5" fillOpacity="0.3" />
+    <circle cx="120" cy="137" r="2.5" fillOpacity="0.3" />
+    <circle cx="190" cy="143" r="2.5" fillOpacity="0.3" />
+    <circle cx="230" cy="137" r="2.5" fillOpacity="0.3" />
+    <circle cx="310" cy="140" r="2.5" fillOpacity="0.3" />
+    <circle cx="350" cy="150" r="2.5" fillOpacity="0.3" />
+    <circle cx="447" cy="145" r="2.5" fillOpacity="0.3" />
+    <circle cx="504" cy="130" r="2.5" fillOpacity="0.3" />
+    <circle cx="150" cy="150" r="9" fillOpacity="0.35" />
+    <circle cx="270" cy="130" r="8" fillOpacity="0.35" />
+    <circle cx="390" cy="160" r="7" fillOpacity="0.35" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="90" cy="97" r="3" fillOpacity="0.7" />
+    <circle cx="120" cy="84" r="3" fillOpacity="0.7" />
+    <circle cx="190" cy="67" r="3" fillOpacity="0.7" />
+    <circle cx="230" cy="63" r="3" fillOpacity="0.7" />
+    <circle cx="310" cy="67" r="3" fillOpacity="0.7" />
+    <circle cx="350" cy="74" r="3" fillOpacity="0.7" />
+    <circle cx="447" cy="92" r="3" fillOpacity="0.7" />
+    <circle cx="504" cy="104" r="3" fillOpacity="0.7" />
+    <circle cx="150" cy="70" r="16" />
+    <circle cx="270" cy="60" r="13" />
+    <circle cx="390" cy="80" r="12" />
+  </g>
+  <g style={{ fill: "var(--ds-white)" }} fillOpacity="0.4">
+    <circle cx="150" cy="70" r="7" />
+    <circle cx="270" cy="60" r="5.5" />
+    <circle cx="390" cy="80" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="60" cy="110" r="8" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="560" cy="115" r="10" />
+  </g>
+</svg>
+
 ```mermaid
 flowchart LR
     S[State] --> C[Choose best local move]

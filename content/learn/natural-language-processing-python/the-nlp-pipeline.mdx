@@ -9,6 +9,51 @@ output of each step becomes the input to the next. Before we spend a page
 each on the individual steps, it is worth seeing the whole assembly line at
 once, because the shape will repeat on nearly every page that follows.
 
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="An assembly line: a raw text blob rides a conveyor through four stations, becoming token chips, then uniform chips, dropping one rejected piece, and ending as a small result chart"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor">
+    <rect x="40" y="140" width="560" height="8" rx="4" opacity="0.16" />
+    <circle cx="90" cy="160" r="6" opacity="0.14" />
+    <circle cx="240" cy="160" r="6" opacity="0.14" />
+    <circle cx="400" cy="160" r="6" opacity="0.14" />
+    <circle cx="550" cy="160" r="6" opacity="0.14" />
+    <ellipse cx="82" cy="127" rx="27" ry="13" opacity="0.3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="120" y="52" width="64" height="64" rx="12" fillOpacity="0.18" />
+    <circle cx="152" cy="68" r="4" fillOpacity="0.7" />
+    <rect x="190" y="121" width="17" height="17" rx="8.5" fillOpacity="0.8" />
+    <rect x="211" y="121" width="12" height="17" rx="6" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="232" y="52" width="64" height="64" rx="12" fillOpacity="0.18" />
+    <circle cx="264" cy="68" r="4" fillOpacity="0.7" />
+    <rect x="302" y="124" width="14" height="14" rx="7" fillOpacity="0.8" />
+    <rect x="320" y="124" width="14" height="14" rx="7" fillOpacity="0.8" />
+  </g>
+  <g fill="currentColor">
+    <rect x="344" y="52" width="64" height="64" rx="12" opacity="0.12" />
+    <circle cx="376" cy="68" r="4" opacity="0.4" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="414" y="124" width="14" height="14" rx="7" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="430" y="166" width="12" height="12" rx="6" fillOpacity="0.4" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="456" y="52" width="64" height="64" rx="12" fillOpacity="0.18" />
+    <circle cx="488" cy="68" r="4" fillOpacity="0.7" />
+    <rect x="540" y="124" width="10" height="14" rx="3" fillOpacity="0.5" />
+    <rect x="554" y="112" width="10" height="26" rx="3" fillOpacity="0.7" />
+    <rect x="568" y="100" width="10" height="38" rx="3" fillOpacity="0.9" />
+  </g>
+</svg>
+
 ## The standard text preprocessing pipeline
 
 Here is the canonical flow. Almost every classic NLP project is some subset

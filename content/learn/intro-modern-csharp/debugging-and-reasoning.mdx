@@ -11,6 +11,41 @@ calmly they *find* them.
 This chapter is less about syntax and more about the *method* of
 debugging — a mental discipline you can practice on every program.
 
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="Two dotted storylines run as one until a yellow-ringed point where they split — the expected story climbing to a green circle, the actual story drifting down to a red square; the bug lives in the gap"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="80" cy="100" r="3.5" fillOpacity="0.5" />
+    <circle cx="108" cy="100" r="3.5" fillOpacity="0.5" />
+    <circle cx="136" cy="100" r="3.5" fillOpacity="0.5" />
+    <circle cx="164" cy="100" r="3.5" fillOpacity="0.5" />
+    <circle cx="192" cy="100" r="3.5" fillOpacity="0.5" />
+    <circle cx="220" cy="100" r="3.5" fillOpacity="0.5" />
+    <circle cx="248" cy="100" r="3.5" fillOpacity="0.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M290 84 A16 16 0 1 0 290 116 A16 16 0 1 0 290 84 Z M290 90 A10 10 0 1 1 290 110 A10 10 0 1 1 290 90 Z" fillRule="evenodd" fillOpacity="0.7" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="324" cy="90" r="3.5" fillOpacity="0.6" />
+    <circle cx="354" cy="84" r="3.5" fillOpacity="0.6" />
+    <circle cx="384" cy="80" r="3.5" fillOpacity="0.6" />
+    <circle cx="414" cy="77" r="3.5" fillOpacity="0.6" />
+    <circle cx="444" cy="76" r="3.5" fillOpacity="0.6" />
+    <circle cx="488" cy="76" r="12" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="322" cy="112" r="3.5" fillOpacity="0.6" />
+    <circle cx="350" cy="122" r="3.5" fillOpacity="0.6" />
+    <circle cx="378" cy="134" r="3.5" fillOpacity="0.6" />
+    <circle cx="406" cy="147" r="3.5" fillOpacity="0.6" />
+    <rect x="438" y="150" width="22" height="22" rx="5" transform="rotate(8 449 161)" />
+  </g>
+</svg>
+
 ## A bug is a gap between two stories
 
 Whenever a program misbehaves, you really have two stories:

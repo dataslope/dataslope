@@ -9,6 +9,46 @@ they come alive. This page builds an intuition for the JVM at the
 level a thoughtful beginner needs: enough to reason about programs,
 not enough to write a JIT compiler.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A gray, inert class file passes under a green arch and comes out the other side as a bright object trailing motion and orbiting sparks — the JVM is what makes compiled code come alive"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.12">
+    <rect x="60" y="178" width="520" height="4" rx="2" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <rect x="110" y="128" width="44" height="44" rx="8" />
+  </g>
+  <g fill="currentColor" opacity="0.4">
+    <rect x="120" y="140" width="24" height="6" rx="3" />
+    <rect x="120" y="152" width="18" height="6" rx="3" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="180" cy="150" r="3" />
+    <circle cx="206" cy="150" r="3" />
+    <circle cx="232" cy="150" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M260 178A60 60 0 0 1 380 178L362 178A42 42 0 0 0 278 178Z" fillOpacity="0.4" />
+    <circle cx="320" cy="112" r="7" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="398" cy="160" r="3" fillOpacity="0.3" />
+    <circle cx="386" cy="166" r="3" fillOpacity="0.3" />
+    <rect x="420" y="124" width="48" height="48" rx="12" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="488" cy="118" r="4" />
+    <circle cx="452" cy="108" r="3.5" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="478" cy="160" r="3.5" />
+    <circle cx="500" cy="140" r="3" fillOpacity="0.6" />
+  </g>
+</svg>
+
 ## What is a "virtual machine," really?
 
 Your CPU is a physical machine: it has its own instruction set,

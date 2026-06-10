@@ -24,6 +24,40 @@ nothing; calling it (`task()`) actually kicks off the work. This
 is the same trick as [`IO<A>`](./effect-management) from the last
 chapter — laziness for composability.
 
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="A coiled spiral of blue dots sits wound like a spring; past a yellow trigger dot it unrolls into a straight timeline whose green dots arrive farther and farther apart until one large final value — a Task is an async recipe that runs only when called"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="168" cy="100" r="3" fillOpacity="0.45" />
+    <circle cx="167" cy="111" r="3.3" fillOpacity="0.5" />
+    <circle cx="154" cy="117" r="3.6" fillOpacity="0.55" />
+    <circle cx="138" cy="106" r="4" fillOpacity="0.6" />
+    <circle cx="139" cy="82" r="4.4" fillOpacity="0.7" />
+    <circle cx="163" cy="67" r="4.8" fillOpacity="0.8" />
+    <circle cx="193" cy="81" r="5.4" fillOpacity="0.9" />
+    <circle cx="199" cy="118" r="6" />
+    <circle cx="168" cy="147" r="6.6" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="244" cy="100" r="3" />
+    <circle cx="268" cy="100" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="300" cy="100" r="7" />
+  </g>
+  <rect x="330" y="98" width="250" height="5" rx="2.5" fill="currentColor" opacity="0.18" />
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="352" cy="100" r="4.5" />
+    <circle cx="390" cy="100" r="5" />
+    <circle cx="436" cy="100" r="5.5" />
+    <circle cx="494" cy="100" r="6" />
+    <circle cx="566" cy="100" r="14" />
+  </g>
+</svg>
+
 ## Tasks and their three operators
 
 <CodeBlock

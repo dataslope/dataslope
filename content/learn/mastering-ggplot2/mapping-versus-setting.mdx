@@ -7,6 +7,57 @@ This page covers the mistake *every* ggplot2 learner makes at least
 once. It is worth its own page because once it clicks, a whole class of
 "why is my chart the wrong color?" bugs disappears forever.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Left: a three-color data column wired to dots of three different colors (mapping); right: one fixed blue swatch wired to identical blue dots (setting)"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="80" y="45" width="46" height="18" rx="5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="80" y="67" width="46" height="18" rx="5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="80" y="89" width="46" height="18" rx="5" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="140" cy="78" r="3" />
+    <circle cx="160" cy="80" r="3" />
+    <circle cx="180" cy="82" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="215" cy="60" r="7" />
+    <circle cx="262" cy="124" r="7" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="250" cy="82" r="7" />
+    <circle cx="232" cy="148" r="7" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="222" cy="112" r="7" />
+  </g>
+  <g fill="currentColor" opacity="0.1">
+    <rect x="318" y="35" width="3" height="140" rx="1.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="370" y="68" width="40" height="28" rx="8" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="424" cy="84" r="3" />
+    <circle cx="444" cy="85" r="3" />
+    <circle cx="464" cy="86" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="510" cy="60" r="7" />
+    <circle cx="548" cy="82" r="7" />
+    <circle cx="518" cy="112" r="7" />
+    <circle cx="558" cy="126" r="7" />
+    <circle cx="528" cy="148" r="7" />
+  </g>
+</svg>
+
 ## The two situations
 
 There are two completely different things you might want to do with a

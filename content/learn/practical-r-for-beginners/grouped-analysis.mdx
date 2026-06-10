@@ -31,6 +31,50 @@ flowchart TD
 
 In dplyr, you do it in two lines: `group_by()` + `summarise()`.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="A mixed row of blue, green, and yellow dots streams down into three single-color circles sized and numbered by their counts — each group collapsing to one summary row"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="140" cy="44" r="6" />
+    <circle cx="268" cy="44" r="6" />
+    <circle cx="332" cy="44" r="6" />
+    <circle cx="364" cy="44" r="6" />
+    <circle cx="492" cy="44" r="6" />
+    <circle cx="210" cy="90" r="3" fillOpacity="0.35" />
+    <circle cx="216" cy="118" r="3" fillOpacity="0.35" />
+    <circle cx="220" cy="144" r="3" fillOpacity="0.35" />
+    <circle cx="222" cy="172" r="28" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="172" cy="44" r="6" />
+    <circle cx="236" cy="44" r="6" />
+    <circle cx="396" cy="44" r="6" />
+    <circle cx="460" cy="44" r="6" />
+    <circle cx="322" cy="92" r="3" fillOpacity="0.35" />
+    <circle cx="321" cy="120" r="3" fillOpacity="0.35" />
+    <circle cx="320" cy="148" r="3" fillOpacity="0.35" />
+    <circle cx="322" cy="175" r="25" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="204" cy="44" r="6" />
+    <circle cx="300" cy="44" r="6" />
+    <circle cx="428" cy="44" r="6" />
+    <circle cx="424" cy="92" r="3" fillOpacity="0.35" />
+    <circle cx="421" cy="120" r="3" fillOpacity="0.35" />
+    <circle cx="419" cy="150" r="3" fillOpacity="0.35" />
+    <circle cx="420" cy="178" r="22" />
+  </g>
+  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
+    <text x="222" y="179" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="17" fontWeight="700">5</text>
+    <text x="322" y="182" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="16" fontWeight="700">4</text>
+    <text x="420" y="184" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="15" fontWeight="700">3</text>
+  </g>
+  <rect x="160" y="206" width="320" height="5" rx="2.5" fill="currentColor" opacity="0.12" />
+</svg>
+
 ## The basic pattern
 
 <CodeBlock

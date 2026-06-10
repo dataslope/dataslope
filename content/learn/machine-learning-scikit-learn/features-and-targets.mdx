@@ -14,6 +14,45 @@ look at any table and confidently say "these columns are the features, this
 column is the target," you can frame essentially any supervised problem.
 That framing is the skill this page builds.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="A grid of translucent blue feature cells beside a single green target column, with one sample row highlighted — every supervised dataset splits into a feature matrix X and a target y"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <text x="243" y="32" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="18" fontWeight="700" fill="currentColor" opacity="0.55">X</text>
+  <text x="447" y="32" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="18" fontWeight="700" fill="currentColor" opacity="0.55">y</text>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="120" y="46" width="54" height="26" rx="6" fillOpacity="0.18" />
+    <rect x="184" y="46" width="54" height="26" rx="6" fillOpacity="0.18" />
+    <rect x="248" y="46" width="54" height="26" rx="6" fillOpacity="0.18" />
+    <rect x="312" y="46" width="54" height="26" rx="6" fillOpacity="0.18" />
+    <rect x="120" y="80" width="54" height="26" rx="6" fillOpacity="0.18" />
+    <rect x="184" y="80" width="54" height="26" rx="6" fillOpacity="0.18" />
+    <rect x="248" y="80" width="54" height="26" rx="6" fillOpacity="0.18" />
+    <rect x="312" y="80" width="54" height="26" rx="6" fillOpacity="0.18" />
+    <rect x="120" y="114" width="54" height="26" rx="6" fillOpacity="0.55" />
+    <rect x="184" y="114" width="54" height="26" rx="6" fillOpacity="0.55" />
+    <rect x="248" y="114" width="54" height="26" rx="6" fillOpacity="0.55" />
+    <rect x="312" y="114" width="54" height="26" rx="6" fillOpacity="0.55" />
+    <rect x="120" y="148" width="54" height="26" rx="6" fillOpacity="0.18" />
+    <rect x="184" y="148" width="54" height="26" rx="6" fillOpacity="0.18" />
+    <rect x="248" y="148" width="54" height="26" rx="6" fillOpacity="0.18" />
+    <rect x="312" y="148" width="54" height="26" rx="6" fillOpacity="0.18" />
+    <rect x="120" y="182" width="54" height="26" rx="6" fillOpacity="0.18" />
+    <rect x="184" y="182" width="54" height="26" rx="6" fillOpacity="0.18" />
+    <rect x="248" y="182" width="54" height="26" rx="6" fillOpacity="0.18" />
+    <rect x="312" y="182" width="54" height="26" rx="6" fillOpacity="0.18" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="420" y="46" width="54" height="26" rx="6" fillOpacity="0.4" />
+    <rect x="420" y="80" width="54" height="26" rx="6" fillOpacity="0.4" />
+    <rect x="420" y="114" width="54" height="26" rx="6" fillOpacity="0.95" />
+    <rect x="420" y="148" width="54" height="26" rx="6" fillOpacity="0.4" />
+    <rect x="420" y="182" width="54" height="26" rx="6" fillOpacity="0.4" />
+  </g>
+</svg>
+
 ## The two pieces every model needs
 
 A supervised machine learning model learns to map *inputs* to *outputs*. We

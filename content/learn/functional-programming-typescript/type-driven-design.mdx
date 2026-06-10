@@ -14,6 +14,45 @@ huge classes of bugs before you ever run the program.
 
 There are three slogans that capture the approach.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Two grids of state cells: the left grid contains three red illegal cells among the blue, the right grid simply has gaps where those cells would be — tight types make illegal states unrepresentable instead of merely flagged"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="90" y="35" width="40" height="40" rx="8" fillOpacity="0.4" />
+    <rect x="140" y="35" width="40" height="40" rx="8" fillOpacity="0.4" />
+    <rect x="90" y="85" width="40" height="40" rx="8" fillOpacity="0.4" />
+    <rect x="90" y="135" width="40" height="40" rx="8" fillOpacity="0.4" />
+    <rect x="140" y="135" width="40" height="40" rx="8" fillOpacity="0.4" />
+    <rect x="190" y="135" width="40" height="40" rx="8" fillOpacity="0.4" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="190" y="35" width="40" height="40" rx="8" fillOpacity="0.6" />
+    <rect x="140" y="85" width="40" height="40" rx="8" fillOpacity="0.6" />
+    <rect x="190" y="85" width="40" height="40" rx="8" fillOpacity="0.6" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="285" cy="105" r="3.5" />
+    <circle cx="305" cy="105" r="3.5" />
+    <polygon points="325,97 339,105 325,113" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="380" y="35" width="40" height="40" rx="8" fillOpacity="0.55" />
+    <rect x="430" y="35" width="40" height="40" rx="8" fillOpacity="0.55" />
+    <rect x="380" y="85" width="40" height="40" rx="8" fillOpacity="0.55" />
+    <rect x="380" y="135" width="40" height="40" rx="8" fillOpacity="0.55" />
+    <rect x="430" y="135" width="40" height="40" rx="8" fillOpacity="0.55" />
+    <rect x="480" y="135" width="40" height="40" rx="8" fillOpacity="0.55" />
+  </g>
+  <g fill="currentColor" opacity="0.06">
+    <rect x="480" y="35" width="40" height="40" rx="8" />
+    <rect x="430" y="85" width="40" height="40" rx="8" />
+    <rect x="480" y="85" width="40" height="40" rx="8" />
+  </g>
+</svg>
+
 ## Slogan 1 — "Make illegal states unrepresentable"
 
 If your data model can *express* a state that should never exist,

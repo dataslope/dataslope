@@ -5,6 +5,41 @@ description: Learn FIFO queues, std::queue, std::deque, producer-consumer patter
 
 A queue is a **first in, first out** data structure. The oldest item waiting in line is served first. Queues model printers, web requests, breadth-first search frontiers, and producer-consumer pipelines.
 
+<svg
+  viewBox="0 0 640 190"
+  role="img"
+  aria-label="Dots stream through a horizontal tunnel — a yellow newcomer enters at the back while the green oldest dot leaves the front — first in, first out, with a small two-ended deque tunnel below"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="150" y="58" width="340" height="56" rx="28" fill="currentColor" opacity="0.08" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="200" cy="86" r="11" />
+    <circle cx="250" cy="86" r="11" fillOpacity="0.8" />
+    <circle cx="300" cy="86" r="11" />
+    <circle cx="350" cy="86" r="11" fillOpacity="0.8" />
+    <circle cx="400" cy="86" r="11" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="100" cy="86" r="11" />
+    <circle cx="132" cy="86" r="2.5" fillOpacity="0.4" />
+    <circle cx="146" cy="86" r="2.5" fillOpacity="0.4" />
+    <polygon points="84,78 84,94 68,86" fillOpacity="0.7" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="540" cy="86" r="11" />
+    <circle cx="566" cy="86" r="2.5" fillOpacity="0.5" />
+    <circle cx="580" cy="86" r="2.5" fillOpacity="0.5" />
+    <polygon points="520,78 520,94 504,86" fillOpacity="0.7" />
+  </g>
+  <g fill="currentColor">
+    <rect x="240" y="146" width="160" height="18" rx="9" opacity="0.08" />
+    <circle cx="302" cy="155" r="5" opacity="0.3" />
+    <circle cx="338" cy="155" r="5" opacity="0.3" />
+    <polygon points="232,148 232,162 220,155" opacity="0.35" />
+    <polygon points="408,148 408,162 420,155" opacity="0.35" />
+  </g>
+</svg>
+
 ## The queue ADT
 
 | Operation | Meaning |

@@ -21,6 +21,37 @@ questions:
 | Heap | whatever `new` allocates | until you free it — **you** manage it |
 | Stack | function calls and locals | end of scope — auto-managed |
 
+<svg
+  viewBox="0 0 640 260"
+  role="img"
+  aria-label="A vertical address-space tower: faint code and blue data bands at the bottom, a green heap growing upward and a yellow stack growing downward into the translucent gap between them"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.06">
+    <rect x="232" y="20" width="176" height="234" rx="14" />
+  </g>
+  <g fill="currentColor" opacity="0.12">
+    <rect x="240" y="212" width="160" height="34" rx="8" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="240" y="172" width="160" height="34" rx="8" fillOpacity="0.35" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="240" y="132" width="160" height="34" rx="8" fillOpacity="0.85" />
+    <polygon points="272,126 288,126 280,112" />
+    <polygon points="352,126 368,126 360,112" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="240" y="28" width="160" height="34" rx="8" />
+    <polygon points="272,68 288,68 280,82" />
+    <polygon points="352,68 368,68 360,82" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="320" cy="92" r="3" />
+    <circle cx="320" cy="104" r="3" />
+  </g>
+</svg>
+
 ## The four regions, one by one
 
 ### 1. Text (code) segment

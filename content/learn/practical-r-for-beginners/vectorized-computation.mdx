@@ -22,6 +22,74 @@ automatically. This is called **vectorized computation**, and once
 you internalize it, your R code becomes shorter, clearer, and
 often *much* faster.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="Above, a yellow dot hops cell to cell transforming one value at a time; below, one wide plus-one bar presses down on every cell of the row at once — vectorized computation replaces the loop"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.08">
+    <rect x="150" y="40" width="36" height="36" rx="8" />
+    <rect x="198" y="40" width="36" height="36" rx="8" />
+    <rect x="246" y="40" width="36" height="36" rx="8" />
+    <rect x="294" y="40" width="36" height="36" rx="8" />
+    <rect x="342" y="40" width="36" height="36" rx="8" />
+    <rect x="390" y="40" width="36" height="36" rx="8" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="168" cy="58" r="6" fillOpacity="0.9" />
+    <circle cx="216" cy="58" r="6" fillOpacity="0.9" />
+    <circle cx="264" cy="58" r="6" fillOpacity="0.9" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="312" cy="58" r="6" fillOpacity="0.3" />
+    <circle cx="360" cy="58" r="6" fillOpacity="0.3" />
+    <circle cx="408" cy="58" r="6" fillOpacity="0.3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="312" cy="24" r="6.5" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="268" cy="32" r="2.5" />
+    <circle cx="282" cy="20" r="2.5" />
+    <circle cx="298" cy="17" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="150" y="128" width="276" height="18" rx="9" />
+    <rect x="166" y="150" width="4" height="16" fillOpacity="0.6" />
+    <rect x="214" y="150" width="4" height="16" fillOpacity="0.6" />
+    <rect x="262" y="150" width="4" height="16" fillOpacity="0.6" />
+    <rect x="310" y="150" width="4" height="16" fillOpacity="0.6" />
+    <rect x="358" y="150" width="4" height="16" fillOpacity="0.6" />
+    <rect x="406" y="150" width="4" height="16" fillOpacity="0.6" />
+    <polygon points="161,166 175,166 168,178" fillOpacity="0.8" />
+    <polygon points="209,166 223,166 216,178" fillOpacity="0.8" />
+    <polygon points="257,166 271,166 264,178" fillOpacity="0.8" />
+    <polygon points="305,166 319,166 312,178" fillOpacity="0.8" />
+    <polygon points="353,166 367,166 360,178" fillOpacity="0.8" />
+    <polygon points="401,166 415,166 408,178" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
+    <text x="276" y="142" fontFamily="ui-monospace, monospace" fontSize="13" fontWeight="700">+1</text>
+  </g>
+  <g fill="currentColor" opacity="0.08">
+    <rect x="150" y="182" width="36" height="36" rx="8" />
+    <rect x="198" y="182" width="36" height="36" rx="8" />
+    <rect x="246" y="182" width="36" height="36" rx="8" />
+    <rect x="294" y="182" width="36" height="36" rx="8" />
+    <rect x="342" y="182" width="36" height="36" rx="8" />
+    <rect x="390" y="182" width="36" height="36" rx="8" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="168" cy="200" r="6" />
+    <circle cx="216" cy="200" r="6" />
+    <circle cx="264" cy="200" r="6" />
+    <circle cx="312" cy="200" r="6" />
+    <circle cx="360" cy="200" r="6" />
+    <circle cx="408" cy="200" r="6" />
+  </g>
+</svg>
+
 ## Arithmetic on whole vectors
 
 Every basic operator works element-by-element on vectors:

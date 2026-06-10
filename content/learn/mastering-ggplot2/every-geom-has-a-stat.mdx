@@ -8,6 +8,49 @@ grasping it will make a lot of "magic" behavior suddenly make sense.
 **Every layer runs a statistical transformation before it draws.**
 Sometimes that transformation does nothing; sometimes it does a lot.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="Scattered raw dots pour through a narrow chute and land in neat counted stacks on a baseline — the last stack already fused into a solid bar ready to draw"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="62" cy="58" r="6" fillOpacity="0.8" />
+    <circle cx="96" cy="92" r="6" fillOpacity="0.55" />
+    <circle cx="76" cy="132" r="6" fillOpacity="0.8" />
+    <circle cx="120" cy="68" r="6" fillOpacity="0.55" />
+    <circle cx="142" cy="118" r="6" fillOpacity="0.8" />
+    <circle cx="106" cy="152" r="6" fillOpacity="0.55" />
+    <circle cx="160" cy="88" r="6" fillOpacity="0.8" />
+    <circle cx="170" cy="142" r="6" fillOpacity="0.55" />
+    <circle cx="134" cy="42" r="6" fillOpacity="0.8" />
+  </g>
+  <g fill="currentColor" opacity="0.15">
+    <polygon points="200,50 268,92 268,104 200,62" />
+    <polygon points="200,158 268,116 268,128 200,170" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="282" cy="110" r="3" />
+    <circle cx="298" cy="110" r="3" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <rect x="330" y="176" width="250" height="4" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="365" cy="164" r="6" fillOpacity="0.7" />
+    <circle cx="365" cy="148" r="6" fillOpacity="0.7" />
+    <circle cx="365" cy="132" r="6" fillOpacity="0.7" />
+    <circle cx="425" cy="164" r="6" fillOpacity="0.7" />
+    <circle cx="425" cy="148" r="6" fillOpacity="0.7" />
+    <circle cx="425" cy="132" r="6" fillOpacity="0.7" />
+    <circle cx="425" cy="116" r="6" fillOpacity="0.7" />
+    <circle cx="425" cy="100" r="6" fillOpacity="0.7" />
+    <circle cx="485" cy="164" r="6" fillOpacity="0.7" />
+    <circle cx="485" cy="148" r="6" fillOpacity="0.7" />
+    <rect x="533" y="112" width="26" height="64" rx="6" />
+  </g>
+</svg>
+
 ## The mystery of geom_bar
 
 Recall that `geom_bar()` needs only an x aesthetic, yet it produces

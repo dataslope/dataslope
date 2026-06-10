@@ -10,6 +10,51 @@ That is a **many-to-many relationship**: many rows on the left can
 connect to many rows on the right. It is common, but it cannot be
 stored directly with one foreign key.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Every dot in the left column is dotted-linked to every dot in the right column, weaving a tangle that a single foreign key cannot hold"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="320" cy="105" r="30" fillOpacity="0.15" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="150" cy="55" r="12" />
+    <circle cx="150" cy="105" r="12" />
+    <circle cx="150" cy="155" r="12" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="490" cy="55" r="12" />
+    <circle cx="490" cy="105" r="12" />
+    <circle cx="490" cy="155" r="12" />
+  </g>
+  <g fill="currentColor" opacity="0.22">
+    <circle cx="249" cy="55" r="3" />
+    <circle cx="320" cy="55" r="3" />
+    <circle cx="391" cy="55" r="3" />
+    <circle cx="249" cy="69" r="3" />
+    <circle cx="320" cy="80" r="3" />
+    <circle cx="391" cy="92" r="3" />
+    <circle cx="249" cy="82" r="3" />
+    <circle cx="391" cy="128" r="3" />
+    <circle cx="249" cy="92" r="3" />
+    <circle cx="391" cy="69" r="3" />
+    <circle cx="249" cy="105" r="3" />
+    <circle cx="320" cy="105" r="3" />
+    <circle cx="391" cy="105" r="3" />
+    <circle cx="249" cy="119" r="3" />
+    <circle cx="320" cy="130" r="3" />
+    <circle cx="391" cy="142" r="3" />
+    <circle cx="249" cy="128" r="3" />
+    <circle cx="249" cy="142" r="3" />
+    <circle cx="391" cy="119" r="3" />
+    <circle cx="249" cy="155" r="3" />
+    <circle cx="320" cy="155" r="3" />
+    <circle cx="391" cy="155" r="3" />
+  </g>
+</svg>
+
 ## Seeing both sides as many
 
 Start with the real-world picture, before tables. Ada takes Math and

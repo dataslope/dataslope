@@ -8,6 +8,43 @@ timestamps, sensor readings, log lines. Pandas's time-handling is
 one of its strongest features and was, historically, the very
 reason the library was built.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="A clock face beside a ticked timeline where colored event dots drift upward over time — timestamps turning rows of data into a story that unfolds"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="140" cy="95" r="46" fillOpacity="0.12" />
+    <circle cx="140" cy="57" r="3" fillOpacity="0.5" />
+    <circle cx="178" cy="95" r="3" fillOpacity="0.5" />
+    <circle cx="140" cy="133" r="3" fillOpacity="0.5" />
+    <circle cx="102" cy="95" r="3" fillOpacity="0.5" />
+    <rect x="137" y="62" width="6" height="36" rx="3" />
+    <polygon points="137,92 163,109 159,115 136,99" />
+    <circle cx="140" cy="95" r="5" />
+  </g>
+  <rect x="230" y="128" width="330" height="6" rx="3" fill="currentColor" opacity="0.15" />
+  <g fill="currentColor" opacity="0.25">
+    <rect x="258" y="124" width="4" height="14" rx="2" />
+    <rect x="328" y="124" width="4" height="14" rx="2" />
+    <rect x="398" y="124" width="4" height="14" rx="2" />
+    <rect x="468" y="124" width="4" height="14" rx="2" />
+    <rect x="538" y="124" width="4" height="14" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="260" cy="100" r="6" />
+    <circle cx="330" cy="86" r="8" />
+    <circle cx="470" cy="78" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="400" cy="104" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="540" cy="60" r="7" />
+  </g>
+</svg>
+
 ## Parsing dates
 
 By default, a date column from a CSV is just text. Convert it:

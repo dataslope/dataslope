@@ -10,6 +10,46 @@ column, the count of rows, the maximum price, the sum of revenue
 This chapter covers single-Series aggregations. The next chapter
 introduces `groupby`, which is aggregations *per group*.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Six values in a column converge along dotted paths into a single large green circle marked with a sigma — an aggregation collapsing many numbers into one"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="180" y="25" width="56" height="21" rx="5" fillOpacity="0.25" />
+    <rect x="180" y="52" width="56" height="21" rx="5" fillOpacity="0.25" />
+    <rect x="180" y="79" width="56" height="21" rx="5" fillOpacity="0.25" />
+    <rect x="180" y="106" width="56" height="21" rx="5" fillOpacity="0.25" />
+    <rect x="180" y="133" width="56" height="21" rx="5" fillOpacity="0.25" />
+    <rect x="180" y="160" width="56" height="21" rx="5" fillOpacity="0.25" />
+    <circle cx="208" cy="35" r="5" />
+    <circle cx="208" cy="62" r="5" />
+    <circle cx="208" cy="89" r="5" />
+    <circle cx="208" cy="116" r="5" />
+    <circle cx="208" cy="143" r="5" />
+    <circle cx="208" cy="170" r="5" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="304" cy="62" r="2.5" />
+    <circle cx="348" cy="83" r="2.5" />
+    <circle cx="304" cy="79" r="2.5" />
+    <circle cx="348" cy="91" r="2.5" />
+    <circle cx="304" cy="95" r="2.5" />
+    <circle cx="348" cy="99" r="2.5" />
+    <circle cx="304" cy="111" r="2.5" />
+    <circle cx="348" cy="107" r="2.5" />
+    <circle cx="304" cy="127" r="2.5" />
+    <circle cx="348" cy="115" r="2.5" />
+    <circle cx="304" cy="143" r="2.5" />
+    <circle cx="348" cy="123" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="430" cy="103" r="30" />
+  </g>
+  <text x="430" y="114" fontFamily="Georgia, serif" fontSize="30" fontWeight="700" textAnchor="middle" style={{ fill: "var(--ds-gray-900)" }}>Σ</text>
+</svg>
+
 ## The reduction methods
 
 Every numeric Series supports these:

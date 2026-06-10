@@ -5,6 +5,62 @@ description: Learn choose-explore-unchoose search, pruning, and classic backtrac
 
 Backtracking builds a solution incrementally and abandons a candidate as soon as it cannot become valid. The template is **choose → explore → un-choose**.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A dotted route explores a small maze, hits a red dead end, retreats as faint ghost dots, and threads the other corridor to the green exit — choose, explore, un-choose"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.2">
+    <rect x="170" y="30" width="300" height="6" rx="3" />
+    <rect x="170" y="184" width="300" height="6" rx="3" />
+    <rect x="170" y="30" width="6" height="36" rx="3" />
+    <rect x="170" y="94" width="6" height="96" rx="3" />
+    <rect x="464" y="30" width="6" height="96" rx="3" />
+    <rect x="464" y="154" width="6" height="36" rx="3" />
+    <rect x="270" y="30" width="6" height="90" rx="3" />
+    <rect x="370" y="100" width="6" height="84" rx="3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="136" cy="80" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.65">
+    <circle cx="158" cy="80" r="3" />
+    <circle cx="186" cy="80" r="3" />
+    <circle cx="214" cy="80" r="3" />
+    <circle cx="240" cy="80" r="3" />
+    <circle cx="240" cy="104" r="3" />
+    <circle cx="240" cy="128" r="3" />
+    <circle cx="240" cy="150" r="3" />
+    <circle cx="268" cy="150" r="3" />
+    <circle cx="296" cy="150" r="3" />
+    <circle cx="324" cy="150" r="3" />
+    <circle cx="324" cy="126" r="3" />
+    <circle cx="324" cy="100" r="3" />
+    <circle cx="324" cy="74" r="3" />
+    <circle cx="352" cy="72" r="3" />
+    <circle cx="380" cy="70" r="3" />
+    <circle cx="408" cy="70" r="3" />
+    <circle cx="424" cy="94" r="3" />
+    <circle cx="424" cy="118" r="3" />
+    <circle cx="424" cy="140" r="3" />
+    <circle cx="450" cy="140" r="3" />
+    <circle cx="474" cy="140" r="3" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <circle cx="344" cy="150" r="2.5" />
+    <circle cx="350" cy="158" r="2" />
+    <circle cx="336" cy="158" r="2" />
+    <circle cx="322" cy="158" r="2" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="354" y="144" width="12" height="12" rx="3" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="496" cy="140" r="7" />
+  </g>
+</svg>
+
 ```mermaid
 flowchart TD
     A[Start] --> B[Choice 1]

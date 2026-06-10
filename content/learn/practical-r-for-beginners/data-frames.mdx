@@ -12,6 +12,46 @@ A data frame is, fundamentally, just **a list of equal-length
 vectors, displayed as a table.** Each column is a vector. All
 columns must have the same length. That's it.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="Four test tubes of identical height stand in one rack, each filled to the same level with a different colored liquid — a data frame is equal-length column vectors standing side by side"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="130" y="208" width="400" height="6" rx="3" fill="currentColor" opacity="0.1" />
+  <rect x="140" y="148" width="380" height="11" rx="5.5" fill="currentColor" opacity="0.15" />
+  <rect x="146" y="155" width="10" height="56" rx="4" fill="currentColor" opacity="0.15" />
+  <rect x="504" y="155" width="10" height="56" rx="4" fill="currentColor" opacity="0.15" />
+  <g fill="currentColor" opacity="0.08">
+    <rect x="180" y="36" width="44" height="152" rx="22" />
+    <rect x="270" y="36" width="44" height="152" rx="22" />
+    <rect x="360" y="36" width="44" height="152" rx="22" />
+    <rect x="450" y="36" width="44" height="152" rx="22" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="186" y="88" width="32" height="94" rx="16" fillOpacity="0.7" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="276" y="88" width="32" height="94" rx="16" fillOpacity="0.7" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="366" y="88" width="32" height="94" rx="16" fillOpacity="0.7" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="456" y="88" width="32" height="94" rx="16" fillOpacity="0.35" />
+  </g>
+  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
+    <circle cx="196" cy="116" r="3" fillOpacity="0.5" />
+    <circle cx="206" cy="152" r="3" fillOpacity="0.5" />
+    <circle cx="286" cy="124" r="3" fillOpacity="0.5" />
+    <circle cx="296" cy="160" r="3" fillOpacity="0.5" />
+    <circle cx="376" cy="112" r="3" fillOpacity="0.5" />
+    <circle cx="386" cy="148" r="3" fillOpacity="0.5" />
+    <circle cx="466" cy="128" r="3" fillOpacity="0.5" />
+    <circle cx="476" cy="164" r="3" fillOpacity="0.5" />
+  </g>
+</svg>
+
 ## Creating a data frame from scratch
 
 You can build one with `data.frame()`:

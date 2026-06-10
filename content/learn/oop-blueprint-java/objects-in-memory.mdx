@@ -10,6 +10,43 @@ not go deep — just deep enough to make `null`, "two variables
 referring to the same object," and "objects passed to methods" feel
 obvious.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="Small variable pills in a stack strip hold strings to balloon objects floating in a faint heap region; two strings rise to the same balloon and one cut string ends in red — references, sharing, and null"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.06">
+    <rect x="300" y="26" width="310" height="150" rx="18" />
+  </g>
+  <g fill="currentColor" opacity="0.12">
+    <rect x="56" y="192" width="260" height="28" rx="9" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <polygon points="94.5,199 97.5,199 403.5,114 400.5,114" />
+    <polygon points="150.5,199 153.5,199 417.5,114 414.5,114" />
+    <polygon points="206.5,199 209.5,199 519.5,90 516.5,90" />
+    <polygon points="262.5,199 265.5,199 331.5,158 328.5,158" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="78" y="199" width="36" height="14" rx="7" fillOpacity="0.85" />
+    <rect x="134" y="199" width="36" height="14" rx="7" fillOpacity="0.85" />
+    <rect x="190" y="199" width="36" height="14" rx="7" fillOpacity="0.85" />
+    <rect x="246" y="199" width="36" height="14" rx="7" fillOpacity="0.85" />
+    <circle cx="410" cy="86" r="30" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="520" cy="68" r="24" />
+  </g>
+  <g style={{ color: "var(--ds-blue-50)" }} fill="currentColor">
+    <circle cx="400" cy="76" r="5" fillOpacity="0.8" />
+    <circle cx="512" cy="60" r="4" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="332" cy="154" r="4.5" />
+  </g>
+</svg>
+
 ## The two regions: stack and heap
 
 When a JVM program runs, it uses (among other things) two regions of

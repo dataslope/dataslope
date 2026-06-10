@@ -13,6 +13,42 @@ This page covers the `List` interface, its two main implementations
 their memory layout that explain almost every performance question
 you'll ever ask.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="A full row of four cells has no room for the waiting yellow dot, so below it a doubled row of eight appears — old cells copied, the newcomer in green, three faint ghost cells in reserve"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="196" y="36" width="56" height="42" rx="8" fillOpacity="0.6" />
+    <rect x="260" y="36" width="56" height="42" rx="8" fillOpacity="0.35" />
+    <rect x="324" y="36" width="56" height="42" rx="8" fillOpacity="0.6" />
+    <rect x="388" y="36" width="56" height="42" rx="8" fillOpacity="0.35" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="478" cy="57" r="9" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="320" cy="96" r="3" />
+    <circle cx="320" cy="110" r="3" />
+    <polygon points="312,122 328,122 320,134" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="68" y="150" width="56" height="42" rx="8" fillOpacity="0.6" />
+    <rect x="132" y="150" width="56" height="42" rx="8" fillOpacity="0.35" />
+    <rect x="196" y="150" width="56" height="42" rx="8" fillOpacity="0.6" />
+    <rect x="260" y="150" width="56" height="42" rx="8" fillOpacity="0.35" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="324" y="150" width="56" height="42" rx="8" fillOpacity="0.7" />
+  </g>
+  <g fill="currentColor" opacity="0.07">
+    <rect x="388" y="150" width="56" height="42" rx="8" />
+    <rect x="452" y="150" width="56" height="42" rx="8" />
+    <rect x="516" y="150" width="56" height="42" rx="8" />
+  </g>
+</svg>
+
 ## The List interface
 
 ```mermaid

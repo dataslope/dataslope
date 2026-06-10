@@ -8,6 +8,40 @@ not one monolithic object; it is a **stack of layers**, each drawn on
 top of the previous one. Understanding layering is what separates
 people who *copy* ggplot code from people who *write* it.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="Three numbered translucent panels overlap in draw order — points, then a trend, then styling — each painted over the previous, with an upward arrow marking the stacking direction"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="150" y="30" width="200" height="130" rx="14" fillOpacity="0.3" />
+    <circle cx="185" cy="75" r="5" />
+    <circle cx="210" cy="100" r="5" />
+    <circle cx="190" cy="130" r="5" />
+    <text x="172" y="64" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="18" fontWeight="bold">{"1"}</text>
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="230" y="55" width="200" height="130" rx="14" fillOpacity="0.3" />
+    <circle cx="300" cy="170" r="3.5" />
+    <circle cx="330" cy="160" r="3.5" />
+    <circle cx="360" cy="150" r="3.5" />
+    <circle cx="390" cy="142" r="3.5" />
+    <text x="252" y="89" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="18" fontWeight="bold">{"2"}</text>
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="310" y="80" width="200" height="130" rx="14" fillOpacity="0.3" />
+    <rect x="430" y="180" width="60" height="10" rx="5" fillOpacity="0.9" />
+    <text x="332" y="114" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="18" fontWeight="bold">{"3"}</text>
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="560" cy="150" r="3" />
+    <circle cx="560" cy="128" r="3" />
+    <circle cx="560" cy="106" r="3" />
+    <polygon points="552,96 568,96 560,80" />
+  </g>
+</svg>
+
 ## What a layer is
 
 A layer is, roughly, **one geometry plus the data, mappings, and

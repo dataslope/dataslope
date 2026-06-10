@@ -8,6 +8,42 @@ DataFrame, choose an appropriate chart, build it with Plotly
 Express, and reason critically about whether it tells the truth.
 That's the foundation. Everything from here is depth.
 
+<svg
+  viewBox="0 0 640 250"
+  role="img"
+  aria-label="From one starting dot, three paths fan out toward green, blue, and yellow destinations, each trailing onward — the routes available after the course"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="90" cy="125" r="10" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <rect x="110" y="121.5" width="330" height="7" rx="3.5" transform="rotate(-11.3 105 125)" />
+    <rect x="110" y="121.5" width="345" height="7" rx="3.5" />
+    <rect x="110" y="121.5" width="330" height="7" rx="3.5" transform="rotate(11.3 105 125)" />
+  </g>
+  <g fill="currentColor" opacity="0.32">
+    <polygon points="448,114 448,136 468,125" transform="rotate(-11.3 105 125)" />
+    <polygon points="463,114 463,136 483,125" />
+    <polygon points="448,114 448,136 468,125" transform="rotate(11.3 105 125)" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="497" cy="47" r="12" />
+    <circle cx="532" cy="40" r="4" fillOpacity="0.35" />
+    <circle cx="556" cy="35" r="3" fillOpacity="0.25" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="512" cy="125" r="12" />
+    <circle cx="547" cy="125" r="4" fillOpacity="0.35" />
+    <circle cx="571" cy="125" r="3" fillOpacity="0.25" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="497" cy="203" r="12" />
+    <circle cx="532" cy="210" r="4" fillOpacity="0.35" />
+    <circle cx="556" cy="215" r="3" fillOpacity="0.25" />
+  </g>
+</svg>
+
 ## Where to go in Plotly
 
 Plotly Express is the gentle front door to a much larger

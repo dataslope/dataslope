@@ -8,6 +8,54 @@ exists in a valid state from the moment it is born.** A class that
 fails at this lets the rest of the system inherit half-built objects
 — and half-built objects produce bugs that look like ghosts.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="Constructor arguments pour into an open vessel which is then sealed with a green cap, all state settled inside — while a faint half-filled vessel with a red crack shows the half-built object a constructor prevents"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="90" y="112" width="80" height="78" rx="14" fillOpacity="0.12" />
+    <circle cx="130" cy="38" r="5.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="118" cy="62" r="5.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="142" cy="84" r="5.5" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="200" cy="150" r="3" />
+    <circle cx="220" cy="150" r="3" />
+    <circle cx="240" cy="150" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="270" y="112" width="80" height="78" rx="14" fillOpacity="0.22" />
+    <circle cx="295" cy="168" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="266" y="98" width="88" height="14" rx="7" />
+    <circle cx="312" cy="146" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="330" cy="168" r="6" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="380" cy="150" r="3" />
+    <circle cx="400" cy="150" r="3" />
+    <circle cx="420" cy="150" r="3" />
+  </g>
+  <g fill="currentColor" opacity="0.08">
+    <rect x="450" y="112" width="80" height="78" rx="14" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="475" cy="170" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <polygon points="528,118 522,140 530,152 524,170 519,168 526,150 518,138 523,116" fillOpacity="0.65" />
+  </g>
+</svg>
+
 ## What a constructor is
 
 A constructor looks like a method but with two differences:
