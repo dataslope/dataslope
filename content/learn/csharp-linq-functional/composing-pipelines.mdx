@@ -11,6 +11,28 @@ combine, and extend.
 This page is about turning ad-hoc chains into a small, reusable
 vocabulary tailored to your domain.
 
+<svg
+  viewBox="0 0 640 250"
+  role="img"
+  aria-label="Colored pipe segments snake down the canvas in a gentle S-curve with a bright dot traveling inside, ending at a green outlet — pipelines assembled from named pieces"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="90" y="50" width="110" height="36" rx="18" transform="rotate(8 145 68)" />
+    <rect x="420" y="180" width="110" height="36" rx="18" transform="rotate(-10 475 198)" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="200" y="95" width="110" height="36" rx="18" transform="rotate(22 255 113)" />
+    <circle cx="585" cy="180" r="14" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="310" y="150" width="110" height="36" rx="18" transform="rotate(8 365 168)" />
+  </g>
+  <g style={{ color: "var(--ds-white, #ffffff)" }} fill="currentColor">
+    <circle cx="255" cy="113" r="8" fillOpacity="0.9" />
+  </g>
+</svg>
+
 ## The "every pipeline is a value" insight
 
 Because LINQ operators return `IEnumerable<T>`, any chain of

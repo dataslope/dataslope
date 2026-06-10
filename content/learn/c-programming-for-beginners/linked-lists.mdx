@@ -13,6 +13,38 @@ canonical "you actually understand pointers now" exercise. Each
 element of the list is a **node** on the heap, and each node holds a
 pointer to the next node.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Three nodes, each a data square with a small pointer tab, chained by dotted arcs, ending in a red square for null — a linked list"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <polygon points="74,118 50,106 50,130" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="90" y="90" width="56" height="56" rx="10" />
+    <rect x="270" y="90" width="56" height="56" rx="10" />
+    <rect x="450" y="90" width="56" height="56" rx="10" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="146" y="104" width="28" height="28" rx="6" />
+    <rect x="326" y="104" width="28" height="28" rx="6" />
+    <rect x="506" y="104" width="28" height="28" rx="6" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="198" cy="100" r="3.5" />
+    <circle cx="222" cy="92" r="3.5" />
+    <circle cx="246" cy="100" r="3.5" />
+    <circle cx="378" cy="100" r="3.5" />
+    <circle cx="402" cy="92" r="3.5" />
+    <circle cx="426" cy="100" r="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="512" y="110" width="16" height="16" rx="4" />
+  </g>
+</svg>
+
 ## The shape of a node
 
 ```c

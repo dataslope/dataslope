@@ -9,6 +9,63 @@ the friendly name is a fixed-size box of bytes at a specific address.
 That mental model — *variable = labelled box in memory* — will guide
 every chapter from now on.
 
+<svg
+  viewBox="0 0 640 160"
+  role="img"
+  aria-label="A long strip of memory cells with a few occupied by colored values, one holding a half-faded dot — a variable never initialized — and address ticks underneath"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.08">
+    <rect x="75" y="80" width="30" height="30" rx="6" />
+    <rect x="110" y="80" width="30" height="30" rx="6" />
+    <rect x="145" y="80" width="30" height="30" rx="6" />
+    <rect x="180" y="80" width="30" height="30" rx="6" />
+    <rect x="215" y="80" width="30" height="30" rx="6" />
+    <rect x="250" y="80" width="30" height="30" rx="6" />
+    <rect x="285" y="80" width="30" height="30" rx="6" />
+    <rect x="320" y="80" width="30" height="30" rx="6" />
+    <rect x="355" y="80" width="30" height="30" rx="6" />
+    <rect x="390" y="80" width="30" height="30" rx="6" />
+    <rect x="425" y="80" width="30" height="30" rx="6" />
+    <rect x="460" y="80" width="30" height="30" rx="6" />
+    <rect x="495" y="80" width="30" height="30" rx="6" />
+    <rect x="530" y="80" width="30" height="30" rx="6" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="90" cy="128" r="2" />
+    <circle cx="125" cy="128" r="2" />
+    <circle cx="160" cy="128" r="2" />
+    <circle cx="195" cy="128" r="2" />
+    <circle cx="230" cy="128" r="2" />
+    <circle cx="265" cy="128" r="2" />
+    <circle cx="300" cy="128" r="2" />
+    <circle cx="335" cy="128" r="2" />
+    <circle cx="370" cy="128" r="2" />
+    <circle cx="405" cy="128" r="2" />
+    <circle cx="440" cy="128" r="2" />
+    <circle cx="475" cy="128" r="2" />
+    <circle cx="510" cy="128" r="2" />
+    <circle cx="545" cy="128" r="2" />
+  </g>
+  <g fill="currentColor" opacity="0.15">
+    <rect x="138" y="58" width="44" height="12" rx="6" />
+    <rect x="248" y="58" width="44" height="12" rx="6" />
+    <rect x="383" y="58" width="44" height="12" rx="6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="160" cy="95" r="10" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="270" cy="95" r="10" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="405" cy="95" r="10" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="510" cy="95" r="10" fillOpacity="0.4" />
+  </g>
+</svg>
+
 ## Declaring a variable
 
 The minimum recipe for a variable is:

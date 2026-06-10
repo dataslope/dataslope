@@ -12,6 +12,33 @@ weapon against an entire family of bugs that every programmer has
 written at least once — and once you stop fighting it, you'll find
 your code gets *simpler*, not more complex.
 
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="Three versions of a circle along dotted arrows, each gaining a larger green wedge while the faint untouched predecessor still peeks out from behind"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="140" cy="100" r="36" />
+    <circle cx="306" cy="90" r="36" fillOpacity="0.15" />
+    <circle cx="320" cy="100" r="36" />
+    <circle cx="486" cy="90" r="36" fillOpacity="0.15" />
+    <circle cx="500" cy="100" r="36" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="196" cy="100" r="3.5" />
+    <circle cx="220" cy="100" r="3.5" />
+    <circle cx="244" cy="100" r="3.5" />
+    <circle cx="376" cy="100" r="3.5" />
+    <circle cx="400" cy="100" r="3.5" />
+    <circle cx="424" cy="100" r="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M320 100 L320 64 A36 36 0 0 1 356 100 Z" />
+    <path d="M500 64 A36 36 0 0 1 500 136 L500 100 Z" />
+  </g>
+</svg>
+
 ## The bug that immutability prevents
 
 Here is a tiny "shopping cart" written with a mutable list. Look

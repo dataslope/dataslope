@@ -13,6 +13,36 @@ This page is about what that interface actually *is*, what it
 promises, and what it deliberately does *not* promise. Once you
 understand this, every later page in the course makes more sense.
 
+<svg
+  viewBox="0 0 640 190"
+  role="img"
+  aria-label="A row of cells where only the first few have been opened to reveal colored dots, the rest still closed, with a cursor under the next one — a sequence yielding one element at a time"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.08">
+    <rect x="70" y="70" width="52" height="52" rx="10" />
+    <rect x="132" y="70" width="52" height="52" rx="10" />
+    <rect x="194" y="70" width="52" height="52" rx="10" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <rect x="256" y="70" width="52" height="52" rx="10" />
+    <rect x="318" y="70" width="52" height="52" rx="10" />
+    <rect x="380" y="70" width="52" height="52" rx="10" />
+    <rect x="442" y="70" width="52" height="52" rx="10" />
+    <rect x="504" y="70" width="52" height="52" rx="10" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="96" cy="96" r="12" />
+    <polygon points="282,146 270,164 294,164" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="158" cy="96" r="12" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="220" cy="96" r="12" />
+  </g>
+</svg>
+
 ## The interface itself
 
 `IEnumerable<T>` is **two methods**:
