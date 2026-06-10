@@ -19,6 +19,33 @@ We'll cover three workhorse ideas:
 We'll do all of them in R using built-in functions like
 `t.test()`. The math is secondary; the meaning is the goal.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="Six interval bars with center dots stack beside a thin green line marking the unknown true value — five capture it and one red interval misses — what a confidence procedure really promises"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="318" y="28" width="4" height="174" rx="2" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="235" y="45" width="130" height="12" rx="6" fillOpacity="0.3" />
+    <circle cx="300" cy="51" r="5" />
+    <rect x="270" y="72" width="140" height="12" rx="6" fillOpacity="0.3" />
+    <circle cx="340" cy="78" r="5" />
+    <rect x="250" y="99" width="110" height="12" rx="6" fillOpacity="0.3" />
+    <circle cx="305" cy="105" r="5" />
+    <rect x="215" y="126" width="150" height="12" rx="6" fillOpacity="0.3" />
+    <circle cx="290" cy="132" r="5" />
+    <rect x="278" y="153" width="120" height="12" rx="6" fillOpacity="0.3" />
+    <circle cx="338" cy="159" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="365" y="180" width="110" height="12" rx="6" fillOpacity="0.35" />
+    <circle cx="420" cy="186" r="5" />
+  </g>
+</svg>
+
 ## A confidence interval, plainly
 
 A **95% confidence interval** for a parameter is a range

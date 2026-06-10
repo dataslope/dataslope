@@ -10,6 +10,55 @@ and to notice everything it is *not* telling you.
 This page is a tour of how to look at a chart. Every analyst
 needs this, and almost nobody teaches it explicitly.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="An eye traces a dotted path over a chart — down past the axis labels, across the body of points, ending circled on one surprising yellow outlier — reading a plot is a deliberate tour, not a glance"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="140" y="50" width="5" height="140" rx="2.5" fill="currentColor" opacity="0.25" />
+  <rect x="140" y="185" width="360" height="5" rx="2.5" fill="currentColor" opacity="0.25" />
+  <g fill="currentColor" opacity="0.2">
+    <rect x="180" y="198" width="30" height="6" rx="3" />
+    <rect x="300" y="198" width="30" height="6" rx="3" />
+    <rect x="420" y="198" width="30" height="6" rx="3" />
+    <rect x="108" y="70" width="22" height="6" rx="3" />
+    <rect x="108" y="120" width="22" height="6" rx="3" />
+    <rect x="108" y="160" width="22" height="6" rx="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="180" cy="160" r="5.5" />
+    <circle cx="220" cy="150" r="5.5" />
+    <circle cx="260" cy="135" r="5.5" />
+    <circle cx="300" cy="125" r="5.5" />
+    <circle cx="340" cy="108" r="5.5" />
+    <circle cx="380" cy="95" r="5.5" />
+    <circle cx="420" cy="85" r="5.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="455" cy="62" r="13" fillOpacity="0.2" />
+    <circle cx="455" cy="62" r="6" />
+  </g>
+  <ellipse cx="95" cy="38" rx="20" ry="12" fill="currentColor" opacity="0.15" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="95" cy="38" r="5" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="112" cy="52" r="3" />
+    <circle cx="119" cy="70" r="3" />
+    <circle cx="118" cy="92" r="3" />
+    <circle cx="135" cy="140" r="3" />
+    <circle cx="162" cy="172" r="3" />
+    <circle cx="205" cy="194" r="3" />
+    <circle cx="255" cy="201" r="3" />
+    <circle cx="310" cy="180" r="3" />
+    <circle cx="330" cy="152" r="3" />
+    <circle cx="368" cy="118" r="3" />
+    <circle cx="408" cy="92" r="3" />
+    <circle cx="437" cy="74" r="3" />
+  </g>
+</svg>
+
 ## Step 1: read the axes before the picture
 
 Before you stare at the shape, look at:
