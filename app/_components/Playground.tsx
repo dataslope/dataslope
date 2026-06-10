@@ -801,6 +801,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // Latest run handler in a ref so the editor's keymap can call into it
   // without being re-bound on every render.
   const runRef = useRef<() => void>(() => undefined);
+  // Secondary run action (⌘/Ctrl+Shift+Enter) — runs the Run dropdown's
+  // first/canonical entry. Kept as a ref so the CodeMirror keymap stays
+  // stable while the target entry updates as tabs/files change.
+  const runSecondaryRef = useRef<() => void>(() => undefined);
 
   // The id of the first output cell produced by the most recent run.
   // The auto-scroll effect uses it to scroll that cell into view rather
@@ -1337,6 +1341,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               },
             },
             {
+              key: "Mod-Shift-Enter",
+              run: () => {
+                runSecondaryRef.current();
+                return true;
+              },
+            },
+            {
               key: "Ctrl-Space",
               run: (v) => {
                 startCompletion(v);
@@ -1868,6 +1879,16 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       computeRunButtonState(adapter, files, activeFileId, fileContentsByPath),
     [adapter, files, activeFileId, fileContentsByPath],
   );
+
+  // Keep the ⌘/Ctrl+Shift+Enter handler pointed at the Run dropdown's
+  // first entry (the canonical/default file, runnable from any tab).
+  // No-op when there's no secondary entry to run.
+  useEffect(() => {
+    runSecondaryRef.current = () => {
+      const secondary = runButtonState.dropdownItems[0];
+      if (secondary) void runCode(secondary.entryFilename);
+    };
+  }, [runButtonState, runCode]);
 
   // ─── File tab management ────────────────────────────────────────────────
 
@@ -3777,7 +3798,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     <Menu.Portal>
                       <Menu.Positioner sideOffset={6} align="end">
                         <Menu.Popup className="bui-popup playground-run-multi-dropdown">
-                          {runButtonState.dropdownItems.map((item) => (
+                          {runButtonState.dropdownItems.map((item, idx) => (
                             <Menu.Item
                               key={item.entryFilename}
                               className="playground-run-multi-item"
@@ -3785,7 +3806,14 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                                 void runCode(item.entryFilename);
                               }}
                             >
-                              {item.label}
+                              <span className="playground-run-multi-item-label">
+                                {item.label}
+                              </span>
+                              {idx === 0 && (
+                                <span className="playground-run-multi-item-kbd">
+                                  {isMac ? "⌘⇧Enter" : "Ctrl+Shift+Enter"}
+                                </span>
+                              )}
                             </Menu.Item>
                           ))}
                         </Menu.Popup>
