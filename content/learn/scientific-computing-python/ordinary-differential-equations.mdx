@@ -13,6 +13,36 @@ This chapter takes you from the simplest ODE solver you can write
 by hand to the production-grade adaptive solvers in SciPy, and
 shows you how to recognize when a problem is **stiff**.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="Green straight-line hops step along a faint smooth trajectory and drift away from it, leaving a small red gap at the end — Euler's method following one tangent at a time"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.18">
+    <path d="M80 190 C200 185 320 150 540 50 L540 60 C330 158 210 193 80 198 Z" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.55">
+    <polygon points="80,187 170,181 170,187 80,193" />
+    <polygon points="170,181 260,161 260,167 170,187" />
+    <polygon points="260,161 350,131 350,137 260,167" />
+    <polygon points="350,131 440,101 440,107 350,137" />
+    <polygon points="440,101 530,73 530,79 440,107" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.9">
+    <circle cx="80" cy="190" r="6" />
+    <circle cx="170" cy="184" r="6" />
+    <circle cx="260" cy="164" r="6" />
+    <circle cx="350" cy="134" r="6" />
+    <circle cx="440" cy="104" r="6" />
+    <circle cx="530" cy="76" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor" fillOpacity="0.7">
+    <circle cx="533" cy="60" r="2.5" />
+    <circle cx="532" cy="67" r="2.5" />
+  </g>
+</svg>
+
 ## The initial-value problem
 
 $$
