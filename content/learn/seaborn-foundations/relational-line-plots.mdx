@@ -14,6 +14,41 @@ x** — usually time, or a measured sequence — where you want to see a
 **trend**, a direction of travel. Reach for it when "what happens as x
 increases?" is the question.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Ordered observations joined into one continuous ribbon, with one segment highlighted and a yellow interpolated point dropping a dotted line to the axis — the connection promises the space between points is meaningful"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="80" y="172" width="480" height="5" rx="2.5" fill="currentColor" opacity="0.25" />
+  <g fill="currentColor" opacity="0.3">
+    <rect x="108" y="181" width="3" height="8" rx="1.5" />
+    <rect x="188" y="181" width="3" height="8" rx="1.5" />
+    <rect x="268" y="181" width="3" height="8" rx="1.5" />
+    <rect x="348" y="181" width="3" height="8" rx="1.5" />
+    <rect x="428" y="181" width="3" height="8" rx="1.5" />
+    <rect x="518" y="181" width="3" height="8" rx="1.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <polygon points="110,150 190,95 270,125 350,70 430,95 520,45 520,51 430,101 350,76 270,131 190,101 110,156" fillOpacity="0.55" />
+    <circle cx="110" cy="153" r="5.5" />
+    <circle cx="190" cy="98" r="5.5" />
+    <circle cx="270" cy="128" r="5.5" />
+    <circle cx="350" cy="73" r="5.5" />
+    <circle cx="430" cy="98" r="5.5" />
+    <circle cx="520" cy="48" r="5.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <polygon points="350,70 430,95 430,101 350,76" />
+    <circle cx="390" cy="86" r="5" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="390" cy="112" r="3" />
+    <circle cx="390" cy="134" r="3" />
+    <circle cx="390" cy="156" r="3" />
+  </g>
+</svg>
+
 ## What a line plot needs and shows
 
 * **Data it needs:** an **ordered** x (numeric or time-like) and a

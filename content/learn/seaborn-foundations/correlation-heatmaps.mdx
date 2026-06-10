@@ -14,6 +14,43 @@ job by far is rendering a **correlation matrix** — a square table whose
 cell at row *i*, column *j* is the correlation between variable *i* and
 variable *j*.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A five-by-five grid of cells, solid along its diagonal and perfectly mirrored across it, with one red pair marking a negative relationship — every pairwise correlation in a single symmetric glance"
+  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="225" y="15" width="34" height="34" rx="6" />
+    <rect x="263" y="15" width="34" height="34" rx="6" fillOpacity="0.55" />
+    <rect x="301" y="15" width="34" height="34" rx="6" fillOpacity="0.3" />
+    <rect x="339" y="15" width="34" height="34" rx="6" fillOpacity="0.15" />
+    <rect x="377" y="15" width="34" height="34" rx="6" fillOpacity="0.08" />
+    <rect x="225" y="53" width="34" height="34" rx="6" fillOpacity="0.55" />
+    <rect x="263" y="53" width="34" height="34" rx="6" />
+    <rect x="301" y="53" width="34" height="34" rx="6" fillOpacity="0.45" />
+    <rect x="339" y="53" width="34" height="34" rx="6" fillOpacity="0.2" />
+    <rect x="377" y="53" width="34" height="34" rx="6" fillOpacity="0.12" />
+    <rect x="225" y="91" width="34" height="34" rx="6" fillOpacity="0.3" />
+    <rect x="263" y="91" width="34" height="34" rx="6" fillOpacity="0.45" />
+    <rect x="301" y="91" width="34" height="34" rx="6" />
+    <rect x="339" y="91" width="34" height="34" rx="6" fillOpacity="0.6" />
+    <rect x="377" y="91" width="34" height="34" rx="6" fillOpacity="0.25" />
+    <rect x="225" y="129" width="34" height="34" rx="6" fillOpacity="0.15" />
+    <rect x="263" y="129" width="34" height="34" rx="6" fillOpacity="0.2" />
+    <rect x="301" y="129" width="34" height="34" rx="6" fillOpacity="0.6" />
+    <rect x="339" y="129" width="34" height="34" rx="6" />
+    <rect x="225" y="167" width="34" height="34" rx="6" fillOpacity="0.08" />
+    <rect x="263" y="167" width="34" height="34" rx="6" fillOpacity="0.12" />
+    <rect x="301" y="167" width="34" height="34" rx="6" fillOpacity="0.25" />
+    <rect x="377" y="167" width="34" height="34" rx="6" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="377" y="129" width="34" height="34" rx="6" fillOpacity="0.5" />
+    <rect x="339" y="167" width="34" height="34" rx="6" fillOpacity="0.5" />
+  </g>
+</svg>
+
 ## Building a correlation matrix
 
 A correlation coefficient (Pearson's *r*) measures how tightly two numeric

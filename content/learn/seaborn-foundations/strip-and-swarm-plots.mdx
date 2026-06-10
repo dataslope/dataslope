@@ -13,6 +13,51 @@ Both are `catplot` kinds: `kind="strip"` and `kind="swarm"`. They show the
 same thing — all the points — and differ only in *how they arrange* points
 that would otherwise land on top of each other.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="The same column of observations twice: jittered into a loose overlapping cloud on the left, and packed side by side into a tidy non-overlapping swarm whose widening silhouette is the distribution on the right"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="120" y="206" width="140" height="5" rx="2.5" fill="currentColor" opacity="0.3" />
+  <rect x="380" y="206" width="140" height="5" rx="2.5" fill="currentColor" opacity="0.3" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="182" cy="184" r="5.5" fillOpacity="0.55" />
+    <circle cx="201" cy="177" r="5.5" fillOpacity="0.55" />
+    <circle cx="174" cy="168" r="5.5" fillOpacity="0.55" />
+    <circle cx="193" cy="163" r="5.5" fillOpacity="0.55" />
+    <circle cx="186" cy="149" r="5.5" fillOpacity="0.55" />
+    <circle cx="182" cy="144" r="5.5" fillOpacity="0.55" />
+    <circle cx="196" cy="131" r="5.5" fillOpacity="0.55" />
+    <circle cx="188" cy="126" r="5.5" fillOpacity="0.55" />
+    <circle cx="173" cy="114" r="5.5" fillOpacity="0.55" />
+    <circle cx="199" cy="111" r="5.5" fillOpacity="0.55" />
+    <circle cx="187" cy="98" r="5.5" fillOpacity="0.55" />
+    <circle cx="179" cy="83" r="5.5" fillOpacity="0.55" />
+    <circle cx="197" cy="71" r="5.5" fillOpacity="0.55" />
+    <circle cx="186" cy="58" r="5.5" fillOpacity="0.55" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="450" cy="190" r="5.5" />
+    <circle cx="444" cy="178" r="5.5" />
+    <circle cx="456" cy="178" r="5.5" />
+    <circle cx="438" cy="166" r="5.5" />
+    <circle cx="450" cy="166" r="5.5" />
+    <circle cx="462" cy="166" r="5.5" />
+    <circle cx="432" cy="154" r="5.5" />
+    <circle cx="444" cy="154" r="5.5" />
+    <circle cx="456" cy="154" r="5.5" />
+    <circle cx="468" cy="154" r="5.5" />
+    <circle cx="438" cy="142" r="5.5" />
+    <circle cx="450" cy="142" r="5.5" />
+    <circle cx="462" cy="142" r="5.5" />
+    <circle cx="444" cy="130" r="5.5" />
+    <circle cx="456" cy="130" r="5.5" />
+    <circle cx="450" cy="118" r="5.5" />
+    <circle cx="450" cy="104" r="5.5" />
+  </g>
+</svg>
+
 ## Strip plot: every point, with jitter
 
 A **strip plot** is a scatter of all the observations over each category.
