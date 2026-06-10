@@ -50,33 +50,33 @@ For `intro-sql-postgres`, `sqlite-for-beginners`, `sql-analytics-duckdb`, and `d
 
 | Dataset | Tables | Size | Formats | License | Re-host? | Best for |
 | --- | --- | --- | --- | --- | --- | --- |
-| **Chinook** ⭐ | 11 | **~1 MB** | SQLite `.db`, SQL (PG/MySQL/SQLite/SQL Server/Oracle), CSV-exportable | **MIT** 🟢B | **Yes — top pick** | Joins, FK chains, GROUP BY, subqueries |
-| **Northwind** ⭐ | 13 | ~0.5 MB (schema) | SQLite `.db`, Postgres SQL, SQL Server | **MIT** (jpwhite3 & MS ports) 🟢B | **Yes — top pick** | Classic ERP/orders schema, joins, aggregation |
-| **Sakila** | 16 + 7 views | ~6 MB | MySQL SQL; **SQLite ports** (BSD) | **BSD-3** (schema+data files) 🟢B | **Yes** | Views, many-to-many, partitioning concepts |
-| **Pagila** (Postgres Sakila) | 15–21 | ~3–6 MB | Postgres SQL dump / `pg_restore` | **PostgreSQL License** 🟢B | **Yes** | The canonical Postgres teaching DB |
-| **Mondial** | ~33 | ~5–20 MB | SQL (PG/MySQL/Oracle), XML, RDF | **CC BY 3.0** 🟢B | Yes (advanced) | Rich geography schema, cyclic FKs, advanced joins |
-| **AdventureWorksLT** | ~12 | small | SQLite port (MIT), MS scripts | **MIT** 🟢B | Yes | Sales/product schema; Microsoft-style |
-| Lahman Baseball | ~27 | ~50 MB | CSV, SQLite, Postgres | CC BY-SA 3.0 🟡C | Caution (copyleft + size) | Deep historical stats, window functions |
-| MySQL `employees` | 6 | ~167 MB | MySQL SQL | CC BY-SA 3.0 🟡C | No (too large) | — |
-| MySQL `world` | 3 | <1 MB | MySQL SQL | **Unclear (Statistics Finland ©)** 🔴D | **No** | — |
+| **[Chinook](https://github.com/lerocha/chinook-database)** ⭐ | 11 | **~1 MB** | SQLite `.db`, SQL (PG/MySQL/SQLite/SQL Server/Oracle), CSV-exportable | **MIT** 🟢B | **Yes — top pick** | Joins, FK chains, GROUP BY, subqueries |
+| **[Northwind](https://github.com/jpwhite3/northwind-SQLite3)** ⭐ | 13 | ~0.5 MB (schema) | SQLite `.db`, Postgres SQL, SQL Server | **MIT** (jpwhite3 & MS ports) 🟢B | **Yes — top pick** | Classic ERP/orders schema, joins, aggregation |
+| **[Sakila](https://dev.mysql.com/doc/sakila/en/)** | 16 + 7 views | ~6 MB | MySQL SQL; **SQLite ports** (BSD) | **BSD-3** (schema+data files) 🟢B | **Yes** | Views, many-to-many, partitioning concepts |
+| **[Pagila](https://github.com/devrimgunduz/pagila)** (Postgres Sakila) | 15–21 | ~3–6 MB | Postgres SQL dump / `pg_restore` | **PostgreSQL License** 🟢B | **Yes** | The canonical Postgres teaching DB |
+| **[Mondial](https://github.com/ullenboom/mondial-database)** | ~33 | ~5–20 MB | SQL (PG/MySQL/Oracle), XML, RDF | **CC BY 3.0** 🟢B | Yes (advanced) | Rich geography schema, cyclic FKs, advanced joins |
+| **[AdventureWorksLT](https://github.com/microsoft/sql-server-samples)** | ~12 | small | SQLite port (MIT), MS scripts | **MIT** 🟢B | Yes | Sales/product schema; Microsoft-style |
+| [Lahman Baseball](https://github.com/chadwickbureau/baseballdatabank) | ~27 | ~50 MB | CSV, SQLite, Postgres | CC BY-SA 3.0 🟡C | Caution (copyleft + size) | Deep historical stats, window functions |
+| [MySQL `employees`](https://github.com/datacharmer/test_db) | 6 | ~167 MB | MySQL SQL | CC BY-SA 3.0 🟡C | No (too large) | — |
+| [MySQL `world`](https://dev.mysql.com/doc/world-setup/en/) | 3 | <1 MB | MySQL SQL | **Unclear (Statistics Finland ©)** 🔴D | **No** | — |
 | ClassicModels | 8 | <1 MB | MySQL SQL | **No license stated** 🔴D | **No** | — |
 
 ### Recommended SQL picks, in order
 
-1. **Chinook** — *Digital music store* (artists → albums → tracks → invoice lines → invoices → customers; self-referential employee hierarchy). 11 tables, ~1 MB, ships as a native **SQLite `.db`**, MIT-licensed. The single best fit for an in-browser SQL course.
+1. **[Chinook](https://github.com/lerocha/chinook-database)** — *Digital music store* (artists → albums → tracks → invoice lines → invoices → customers; self-referential employee hierarchy). 11 tables, ~1 MB, ships as a native **SQLite `.db`**, MIT-licensed. The single best fit for an in-browser SQL course.
    Source: <https://github.com/lerocha/chinook-database> · License (MIT): <https://github.com/lerocha/chinook-database/blob/master/LICENSE.md> *(hand-verified)*
-2. **Northwind** — *Food import/export company* (customers, orders, order-details, products, suppliers, employees, shippers, categories). The quintessential ERP teaching schema; the **jpwhite3 SQLite port** and **Microsoft's own `sql-server-samples`** are both MIT.
+2. **[Northwind](https://github.com/jpwhite3/northwind-SQLite3)** — *Food import/export company* (customers, orders, order-details, products, suppliers, employees, shippers, categories). The quintessential ERP teaching schema; the **jpwhite3 SQLite port** and **Microsoft's own `sql-server-samples`** are both MIT.
    Source: <https://github.com/jpwhite3/northwind-SQLite3> (MIT, ships `dist/northwind.db`) *(hand-verified)* · <https://github.com/microsoft/sql-server-samples> (MIT)
-3. **Sakila / Pagila** — *DVD-rental store* (films, actors, inventory, rentals, payments, staff, stores). 16 tables incl. views and a many-to-many `film_actor`. Use **MySQL Sakila** (BSD), the **SQLite ports** (`bradleygrant/sakila-sqlite3` BSD-3, `jOOQ/sakila` BSD-2), or **Pagila** for Postgres.
+3. **[Sakila](https://dev.mysql.com/doc/sakila/en/) / [Pagila](https://github.com/devrimgunduz/pagila)** — *DVD-rental store* (films, actors, inventory, rentals, payments, staff, stores). 16 tables incl. views and a many-to-many `film_actor`. Use **MySQL Sakila** (BSD), the **SQLite ports** (`bradleygrant/sakila-sqlite3` BSD-3, `jOOQ/sakila` BSD-2), or **Pagila** for Postgres.
    ⚠️ Nuance (hand-verified): only the `sakila-schema.sql` + `sakila-data.sql` files are **New BSD**; the Sakila *documentation* is **not** open-licensed — re-host the SQL/data files only.
    Sources: <https://dev.mysql.com/doc/sakila/en/sakila-license.html> · <https://github.com/jOOQ/sakila> · <https://github.com/devrimgunduz/pagila>
-4. **Mondial** — *World geography* (countries, cities, rivers, mountains, organizations, languages, religions…). ~33 tables, **CC BY 3.0**; great for an intermediate/advanced course but needs conversion to SQLite. Source: <https://github.com/ullenboom/mondial-database>
+4. **[Mondial](https://github.com/ullenboom/mondial-database)** — *World geography* (countries, cities, rivers, mountains, organizations, languages, religions…). ~33 tables, **CC BY 3.0**; great for an intermediate/advanced course but needs conversion to SQLite. Source: <https://github.com/ullenboom/mondial-database>
 
 ### SQL datasets to AVOID / handle carefully
 
-- 🔴 **MySQL `world`** — the data carries a *"Copyright Statistics Finland"* notice with **no open license**, plus Oracle's restrictive doc boilerplate. Do not re-host. (<https://dev.mysql.com/doc/world-setup/en/world-setup-preface.html>)
+- 🔴 **[MySQL `world`](https://dev.mysql.com/doc/world-setup/en/)** — the data carries a *"Copyright Statistics Finland"* notice with **no open license**, plus Oracle's restrictive doc boilerplate. Do not re-host. (<https://dev.mysql.com/doc/world-setup/en/world-setup-preface.html>)
 - 🔴 **ClassicModels** (mysqltutorial.org) — **no license file anywhere**; all-rights-reserved by default. Tempting (8 clean tables) but not redistributable.
-- 🟡 **Lahman Baseball** & **MySQL `employees`** — both **CC BY-SA 3.0**. Commercial *verbatim* re-hosting is allowed, but ShareAlike adds copyleft friction and both are large (50 MB / 167 MB). If used, isolate with their own LICENSE; otherwise skip.
+- 🟡 **[Lahman Baseball](https://github.com/chadwickbureau/baseballdatabank)** & **[MySQL `employees`](https://github.com/datacharmer/test_db)** — both **CC BY-SA 3.0**. Commercial *verbatim* re-hosting is allowed, but ShareAlike adds copyleft friction and both are large (50 MB / 167 MB). If used, isolate with their own LICENSE; otherwise skip.
 - 🟡 **AdventureWorks (full)** — MIT but ~198 MB and distributed as a SQL-Server `.bak`. Use **AdventureWorksLT** (SQLite port) instead.
 
 ---
@@ -87,27 +87,27 @@ These small tables are the workhorses shared across `data-analysis-python-pandas
 
 | Dataset | Rows × Cols | Size | License | Tier | Best for |
 | --- | --- | --- | --- | --- | --- |
-| **Palmer Penguins** ⭐ | 344 × 8 | ~52 KB | **CC0** | 🟢A | EDA, classification — the clean **Iris replacement** |
-| Iris | 150 × 5 | ~4 KB | CC BY 4.0 (UCI) | 🟢B | Classic classification *(ethics note below)* |
-| Wine | 178 × 13 | ~13 KB | CC BY 4.0 (UCI) | 🟢B | Multiclass classification |
-| Wine Quality (red+white) | 6,497 × 12 | ~340 KB | CC BY 4.0 (UCI) | 🟢B | Regression, ordinal targets |
-| Auto MPG | 398 × 8 | ~30 KB | CC BY 4.0 (UCI) | 🟢B | Regression, missing values |
-| Abalone | 4,177 × 8 | ~187 KB | CC BY 4.0 (UCI) | 🟢B | Regression/classification |
-| Breast Cancer Wisconsin | 569 × 30 | ~121 KB | CC BY 4.0 (UCI) | 🟢B | Binary classification |
-| Heart Disease (Cleveland) | 303 × 13 | ~59 KB | CC BY 4.0 (UCI) | 🟢B | Clinical classification |
-| **Gapminder** (excerpt) ⭐ | 1,704 × 6 | <100 KB | CC BY 4.0 | 🟢B | Life-exp/GDP/pop — bubble charts, groupby |
+| **[Palmer Penguins](https://allisonhorst.github.io/palmerpenguins/)** ⭐ | 344 × 8 | ~52 KB | **CC0** | 🟢A | EDA, classification — the clean **Iris replacement** |
+| [Iris](https://archive.ics.uci.edu/dataset/53/iris) | 150 × 5 | ~4 KB | CC BY 4.0 (UCI) | 🟢B | Classic classification *(ethics note below)* |
+| [Wine](https://archive.ics.uci.edu/dataset/109/wine) | 178 × 13 | ~13 KB | CC BY 4.0 (UCI) | 🟢B | Multiclass classification |
+| [Wine Quality](https://archive.ics.uci.edu/dataset/186/wine+quality) (red+white) | 6,497 × 12 | ~340 KB | CC BY 4.0 (UCI) | 🟢B | Regression, ordinal targets |
+| [Auto MPG](https://archive.ics.uci.edu/dataset/9/auto+mpg) | 398 × 8 | ~30 KB | CC BY 4.0 (UCI) | 🟢B | Regression, missing values |
+| [Abalone](https://archive.ics.uci.edu/dataset/1/abalone) | 4,177 × 8 | ~187 KB | CC BY 4.0 (UCI) | 🟢B | Regression/classification |
+| [Breast Cancer Wisconsin](https://archive.ics.uci.edu/dataset/17/breast+cancer+wisconsin+diagnostic) | 569 × 30 | ~121 KB | CC BY 4.0 (UCI) | 🟢B | Binary classification |
+| [Heart Disease](https://archive.ics.uci.edu/dataset/45/heart+disease) (Cleveland) | 303 × 13 | ~59 KB | CC BY 4.0 (UCI) | 🟢B | Clinical classification |
+| **[Gapminder](https://www.gapminder.org/free-material/)** (excerpt) ⭐ | 1,704 × 6 | <100 KB | CC BY 4.0 | 🟢B | Life-exp/GDP/pop — bubble charts, groupby |
 | mtcars | 32 × 11 | <5 KB | GPL pkg / facts free | 🟡C | Regression, R teaching |
 | Old Faithful (`faithful`) | 272 × 2 | <10 KB | GPL pkg / facts free | 🟡C | Bimodal distributions, density |
-| **Anscombe's Quartet** ⭐ | 48 × 3 | <5 KB | CC0 / ODbL | 🟢A | "Always plot your data" |
-| **Datasaurus Dozen** ⭐ | ~1,846 × 3 | <100 KB | **MIT** | 🟢B | Same-stats/different-shape demo |
-| Diamonds | 53,940 × 10 | ~3 MB | CC BY 4.0 (Zenodo) | 🟢B | Regression, big-ish categorical EDA |
-| California Housing | 20,640 × 9 | ~1.6 MB | US-Gov public domain (1990 Census) | 🟢A | Regression — **Boston Housing replacement** |
-| Ames Housing | 2,930 × ~80 | ~700 KB | Public records (unstated) | 🟡C | Rich regression / feature engineering |
-| SSA Baby Names | ~2 MB series | ~2 MB | **CC0** (US gov) | 🟢A | Time-trend EDA, groupby, joins |
+| **[Anscombe's Quartet](https://en.wikipedia.org/wiki/Anscombe%27s_quartet)** ⭐ | 48 × 3 | <5 KB | CC0 / ODbL | 🟢A | "Always plot your data" |
+| **[Datasaurus Dozen](https://github.com/jumpingrivers/datasauRus)** ⭐ | ~1,846 × 3 | <100 KB | **MIT** | 🟢B | Same-stats/different-shape demo |
+| [Diamonds](https://zenodo.org/records/3522106) | 53,940 × 10 | ~3 MB | CC BY 4.0 (Zenodo) | 🟢B | Regression, big-ish categorical EDA |
+| [California Housing](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_california_housing.html) | 20,640 × 9 | ~1.6 MB | US-Gov public domain (1990 Census) | 🟢A | Regression — **Boston Housing replacement** |
+| [Ames Housing](https://jse.amstat.org/v19n3/decock/DataDocumentation.txt) | 2,930 × ~80 | ~700 KB | Public records (unstated) | 🟡C | Rich regression / feature engineering |
+| [SSA Baby Names](https://catalog.data.gov/dataset/baby-names-from-social-security-card-applications-national-data) | ~2 MB series | ~2 MB | **CC0** (US gov) | 🟢A | Time-trend EDA, groupby, joins |
 | FiveThirtyEight: Candy Power Ranking | 86 × 13 | tiny | CC BY 4.0 | 🟢B | A/B-style ranking, correlation |
 | FiveThirtyEight: US Births (1994–2014) | ~7,300 × 4 | small | CC BY 4.0 | 🟢B | Seasonality, calendar effects |
 | FiveThirtyEight: Bechdel Test | ~1,800 × ~15 | small | CC BY 4.0 | 🟢B | Categorical analysis |
-| nycflights13 | 336,776 × 19 | ~26 MB ⚠️ | **CC0** | 🟢A (down-sample) | **Multi-table joins** (flights/airlines/airports/weather/planes) |
+| [nycflights13](https://cran.r-project.org/web/packages/nycflights13/index.html) | 336,776 × 19 | ~26 MB ⚠️ | **CC0** | 🟢A (down-sample) | **Multi-table joins** (flights/airlines/airports/weather/planes) |
 
 **Notes & flagged items**
 
