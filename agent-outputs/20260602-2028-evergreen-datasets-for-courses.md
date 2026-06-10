@@ -4,7 +4,7 @@
 **Purpose:** A curated, license-verified catalogue of small "evergreen" datasets that DataSlope can **re-host in a public GitHub repo** and use across its courses (Pandas, data visualization, scientific computing, statistics, machine learning, NLP, time series, R, and SQL).
 **Special focus:** multi-table relational datasets for the SQL courses.
 
-**Methodology:** Five parallel research agents fanned out across the web; every license claim was checked against a primary source (the actual `LICENSE` file, dataset page, or terms-of-use page), not from memory. The nine most load-bearing claims (Chinook, Sakila, Northwind, UCI, Palmer Penguins, FiveThirtyEight, seaborn-data, diamonds→Zenodo, SILSO) were then independently re-verified by hand. **A second pass (§14–§15)** added ~50 more *standalone* datasets — from Kaggle, a broader UCI sweep, the Hugging Face Hub, government/institutional portals, and data hubs — under the same discipline (MovieLens's non-commercial terms, `banking77`'s CC BY 4.0, and Natural Earth's public-domain status were hand-checked). A third pass (§16) catalogues **scraped / legally gray-area** datasets — *for awareness only* — each with its specific risk and a clean substitute. A fourth pass (§17) adds ~90 more real-world datasets browsed from GitHub, museums/libraries, sports & science sites, and civic/transit portals. A fifth pass (§18) adds ~70 more **English-language** datasets across US-federal, finance, health, text/legal, and computer-vision sources. A sixth pass (§19) adds ~70 more English datasets — reference/lookup tables, US state & city portals, English-speaking-country government data, survey/elections data, and environment/agriculture. A seventh pass (§20) adds ~70 more — astronomy/space, bioinformatics & chemistry, BLS and more US-federal agencies, NLP/linguistics, and sports/music/history. Source URLs are cited inline and collected at the end.
+**Methodology:** Five parallel research agents fanned out across the web; every license claim was checked against a primary source (the actual `LICENSE` file, dataset page, or terms-of-use page), not from memory. The nine most load-bearing claims ([Chinook](https://github.com/lerocha/chinook-database), [Sakila](https://dev.mysql.com/doc/sakila/en/), [Northwind](https://github.com/jpwhite3/northwind-SQLite3), UCI, [Palmer Penguins](https://allisonhorst.github.io/palmerpenguins/), FiveThirtyEight, seaborn-data, diamonds→[Zenodo](https://zenodo.org/records/3522106), SILSO) were then independently re-verified by hand. **A second pass (§14–§15)** added ~50 more *standalone* datasets — from Kaggle, a broader UCI sweep, the Hugging Face Hub, government/institutional portals, and data hubs — under the same discipline (MovieLens's non-commercial terms, [`banking77`](https://huggingface.co/datasets/PolyAI/banking77)'s CC BY 4.0, and [Natural Earth](https://www.naturalearthdata.com/downloads/)'s public-domain status were hand-checked). A third pass (§16) catalogues **scraped / legally gray-area** datasets — *for awareness only* — each with its specific risk and a clean substitute. A fourth pass (§17) adds ~90 more real-world datasets browsed from GitHub, museums/libraries, sports & science sites, and civic/transit portals. A fifth pass (§18) adds ~70 more **English-language** datasets across US-federal, finance, health, text/legal, and computer-vision sources. A sixth pass (§19) adds ~70 more English datasets — reference/lookup tables, US state & city portals, English-speaking-country government data, survey/elections data, and environment/agriculture. A seventh pass (§20) adds ~70 more — astronomy/space, bioinformatics & chemistry, BLS and more US-federal agencies, NLP/linguistics, and sports/music/history. Source URLs are cited inline and collected at the end.
 
 ---
 
@@ -29,18 +29,18 @@ A dataset can fail part 2 even when it's "free to use." The clearest example: th
 ### Six cross-cutting rules that decide most cases
 
 1. **US federal government works are public domain** (17 U.S.C. §105). This single rule clears a huge amount of data: **NOAA, USGS, NASA, US Census, BLS, SSA, FEC, EPA, BTS**. Most release under CC0 explicitly via NOAA's NODD program. 🟢
-2. **The entire UCI Machine Learning Repository is now CC BY 4.0** (adopted site-wide ~2022–23; verified on the Iris, Wine, Wine Quality, Auto MPG, Abalone, Breast Cancer, Heart Disease, Spambase, and SMS-Spam pages). One attribution line clears dozens of classic ML datasets. 🟢
+2. **The entire UCI Machine Learning Repository is now CC BY 4.0** (adopted site-wide ~2022–23; verified on the [Iris](https://archive.ics.uci.edu/dataset/53/iris), [Wine](https://archive.ics.uci.edu/dataset/109/wine), [Wine Quality](https://archive.ics.uci.edu/dataset/186/wine+quality), [Auto MPG](https://archive.ics.uci.edu/dataset/9/auto+mpg), [Abalone](https://archive.ics.uci.edu/dataset/1/abalone), [Breast Cancer Wisconsin](https://archive.ics.uci.edu/dataset/17/breast+cancer+wisconsin+diagnostic), [Heart Disease](https://archive.ics.uci.edu/dataset/45/heart+disease), [Spambase](https://archive.ics.uci.edu/dataset/94/spambase), and [SMS Spam Collection](https://archive.ics.uci.edu/dataset/228/sms+spam+collection) pages). One attribution line clears dozens of classic ML datasets. 🟢
 3. **"Facts aren't copyrightable"** (US, *Feist v. Rural* 1991). The numbers inside R's GPL-licensed `datasets` package (`mtcars`, `faithful`, …) can be extracted to CSV and re-hosted; only the R *package binary* carries the GPL. Still, prefer a cleaner-licensed source when one exists. 🟡
 4. **`seaborn-data` has no license** — never clone-and-host it. Pull each dataset from its real origin (`palmerpenguins`, EPA, Zenodo, `reshape2`, …). 🔴→🟢
-5. **Project Gutenberg:** the *trademark/header* is licensed (20% royalty for commercial use **with** the PG branding); the **underlying public-domain text is unencumbered once you strip the PG header/footer**. Strip it, then re-host freely. 🟢
+5. **[Project Gutenberg](https://www.gutenberg.org/):** the *trademark/header* is licensed (20% royalty for commercial use **with** the PG branding); the **underlying public-domain text is unencumbered once you strip the PG header/footer**. Strip it, then re-host freely. 🟢
 6. **Freeze time series to a closed historical window.** A live feed (current CO₂, latest earthquakes, this year's sunspots) is never evergreen. Snapshot e.g. *1958–2001* and the dataset is stable forever. 🟢
 
 ### Practical re-hosting notes for DataSlope's WASM playgrounds
 
-- **SQLite/sql.js:** ship the prebuilt `.db` (Chinook, Northwind, Sakila port). **PGlite/Postgres:** ship the `.sql` dump. **DuckDB-WASM:** point it at CSV/Parquet.
+- **SQLite/sql.js:** ship the prebuilt `.db` ([Chinook](https://github.com/lerocha/chinook-database), [Northwind](https://github.com/jpwhite3/northwind-SQLite3), [Sakila](https://dev.mysql.com/doc/sakila/en/) port). **PGlite/Postgres:** ship the `.sql` dump. **DuckDB-WASM:** point it at CSV/Parquet.
 - Keep an `ATTRIBUTION.md`/`NOTICE` in the repo for all 🟢B (CC BY / MIT / BSD) datasets.
-- Put any 🟡C **ShareAlike** dataset (HYG stars, Lahman, MySQL `employees`) in its **own subdirectory with its own `LICENSE`** so the copyleft doesn't bleed into the rest of the repo.
-- **Down-sample** the oversized-but-clean sets for in-browser use: `nycflights13` (~26 MB), `diamonds` (~3 MB), California Housing (~1.6 MB), HYG (~14 MB).
+- Put any 🟡C **ShareAlike** dataset (HYG stars, [Lahman Baseball](https://github.com/chadwickbureau/baseballdatabank), [MySQL `employees`](https://github.com/datacharmer/test_db)) in its **own subdirectory with its own `LICENSE`** so the copyleft doesn't bleed into the rest of the repo.
+- **Down-sample** the oversized-but-clean sets for in-browser use: [`nycflights13`](https://cran.r-project.org/web/packages/nycflights13/index.html) (~26 MB), [`diamonds`](https://zenodo.org/records/3522106) (~3 MB), [California Housing](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_california_housing.html) (~1.6 MB), HYG (~14 MB).
 
 ---
 
@@ -50,34 +50,34 @@ For `intro-sql-postgres`, `sqlite-for-beginners`, `sql-analytics-duckdb`, and `d
 
 | Dataset | Tables | Size | Formats | License | Re-host? | Best for |
 | --- | --- | --- | --- | --- | --- | --- |
-| **Chinook** ⭐ | 11 | **~1 MB** | SQLite `.db`, SQL (PG/MySQL/SQLite/SQL Server/Oracle), CSV-exportable | **MIT** 🟢B | **Yes — top pick** | Joins, FK chains, GROUP BY, subqueries |
-| **Northwind** ⭐ | 13 | ~0.5 MB (schema) | SQLite `.db`, Postgres SQL, SQL Server | **MIT** (jpwhite3 & MS ports) 🟢B | **Yes — top pick** | Classic ERP/orders schema, joins, aggregation |
-| **Sakila** | 16 + 7 views | ~6 MB | MySQL SQL; **SQLite ports** (BSD) | **BSD-3** (schema+data files) 🟢B | **Yes** | Views, many-to-many, partitioning concepts |
-| **Pagila** (Postgres Sakila) | 15–21 | ~3–6 MB | Postgres SQL dump / `pg_restore` | **PostgreSQL License** 🟢B | **Yes** | The canonical Postgres teaching DB |
-| **Mondial** | ~33 | ~5–20 MB | SQL (PG/MySQL/Oracle), XML, RDF | **CC BY 3.0** 🟢B | Yes (advanced) | Rich geography schema, cyclic FKs, advanced joins |
-| **AdventureWorksLT** | ~12 | small | SQLite port (MIT), MS scripts | **MIT** 🟢B | Yes | Sales/product schema; Microsoft-style |
-| Lahman Baseball | ~27 | ~50 MB | CSV, SQLite, Postgres | CC BY-SA 3.0 🟡C | Caution (copyleft + size) | Deep historical stats, window functions |
-| MySQL `employees` | 6 | ~167 MB | MySQL SQL | CC BY-SA 3.0 🟡C | No (too large) | — |
-| MySQL `world` | 3 | <1 MB | MySQL SQL | **Unclear (Statistics Finland ©)** 🔴D | **No** | — |
+| **[Chinook](https://github.com/lerocha/chinook-database)** ⭐ | 11 | **~1 MB** | SQLite `.db`, SQL (PG/MySQL/SQLite/SQL Server/Oracle), CSV-exportable | **MIT** 🟢B | **Yes — top pick** | Joins, FK chains, GROUP BY, subqueries |
+| **[Northwind](https://github.com/jpwhite3/northwind-SQLite3)** ⭐ | 13 | ~0.5 MB (schema) | SQLite `.db`, Postgres SQL, SQL Server | **MIT** (jpwhite3 & MS ports) 🟢B | **Yes — top pick** | Classic ERP/orders schema, joins, aggregation |
+| **[Sakila](https://dev.mysql.com/doc/sakila/en/)** | 16 + 7 views | ~6 MB | MySQL SQL; **SQLite ports** (BSD) | **BSD-3** (schema+data files) 🟢B | **Yes** | Views, many-to-many, partitioning concepts |
+| **[Pagila](https://github.com/devrimgunduz/pagila)** (Postgres Sakila) | 15–21 | ~3–6 MB | Postgres SQL dump / `pg_restore` | **PostgreSQL License** 🟢B | **Yes** | The canonical Postgres teaching DB |
+| **[Mondial](https://github.com/ullenboom/mondial-database)** | ~33 | ~5–20 MB | SQL (PG/MySQL/Oracle), XML, RDF | **CC BY 3.0** 🟢B | Yes (advanced) | Rich geography schema, cyclic FKs, advanced joins |
+| **[AdventureWorksLT](https://github.com/microsoft/sql-server-samples)** | ~12 | small | SQLite port (MIT), MS scripts | **MIT** 🟢B | Yes | Sales/product schema; Microsoft-style |
+| [Lahman Baseball](https://github.com/chadwickbureau/baseballdatabank) | ~27 | ~50 MB | CSV, SQLite, Postgres | CC BY-SA 3.0 🟡C | Caution (copyleft + size) | Deep historical stats, window functions |
+| [MySQL `employees`](https://github.com/datacharmer/test_db) | 6 | ~167 MB | MySQL SQL | CC BY-SA 3.0 🟡C | No (too large) | — |
+| [MySQL `world`](https://dev.mysql.com/doc/world-setup/en/) | 3 | <1 MB | MySQL SQL | **Unclear (Statistics Finland ©)** 🔴D | **No** | — |
 | ClassicModels | 8 | <1 MB | MySQL SQL | **No license stated** 🔴D | **No** | — |
 
 ### Recommended SQL picks, in order
 
-1. **Chinook** — *Digital music store* (artists → albums → tracks → invoice lines → invoices → customers; self-referential employee hierarchy). 11 tables, ~1 MB, ships as a native **SQLite `.db`**, MIT-licensed. The single best fit for an in-browser SQL course.
+1. **[Chinook](https://github.com/lerocha/chinook-database)** — *Digital music store* (artists → albums → tracks → invoice lines → invoices → customers; self-referential employee hierarchy). 11 tables, ~1 MB, ships as a native **SQLite `.db`**, MIT-licensed. The single best fit for an in-browser SQL course.
    Source: <https://github.com/lerocha/chinook-database> · License (MIT): <https://github.com/lerocha/chinook-database/blob/master/LICENSE.md> *(hand-verified)*
-2. **Northwind** — *Food import/export company* (customers, orders, order-details, products, suppliers, employees, shippers, categories). The quintessential ERP teaching schema; the **jpwhite3 SQLite port** and **Microsoft's own `sql-server-samples`** are both MIT.
+2. **[Northwind](https://github.com/jpwhite3/northwind-SQLite3)** — *Food import/export company* (customers, orders, order-details, products, suppliers, employees, shippers, categories). The quintessential ERP teaching schema; the **jpwhite3 SQLite port** and **Microsoft's own `sql-server-samples`** are both MIT.
    Source: <https://github.com/jpwhite3/northwind-SQLite3> (MIT, ships `dist/northwind.db`) *(hand-verified)* · <https://github.com/microsoft/sql-server-samples> (MIT)
-3. **Sakila / Pagila** — *DVD-rental store* (films, actors, inventory, rentals, payments, staff, stores). 16 tables incl. views and a many-to-many `film_actor`. Use **MySQL Sakila** (BSD), the **SQLite ports** (`bradleygrant/sakila-sqlite3` BSD-3, `jOOQ/sakila` BSD-2), or **Pagila** for Postgres.
+3. **[Sakila](https://dev.mysql.com/doc/sakila/en/) / [Pagila](https://github.com/devrimgunduz/pagila)** — *DVD-rental store* (films, actors, inventory, rentals, payments, staff, stores). 16 tables incl. views and a many-to-many `film_actor`. Use **MySQL Sakila** (BSD), the **SQLite ports** (`bradleygrant/sakila-sqlite3` BSD-3, `jOOQ/sakila` BSD-2), or **Pagila** for Postgres.
    ⚠️ Nuance (hand-verified): only the `sakila-schema.sql` + `sakila-data.sql` files are **New BSD**; the Sakila *documentation* is **not** open-licensed — re-host the SQL/data files only.
    Sources: <https://dev.mysql.com/doc/sakila/en/sakila-license.html> · <https://github.com/jOOQ/sakila> · <https://github.com/devrimgunduz/pagila>
-4. **Mondial** — *World geography* (countries, cities, rivers, mountains, organizations, languages, religions…). ~33 tables, **CC BY 3.0**; great for an intermediate/advanced course but needs conversion to SQLite. Source: <https://github.com/ullenboom/mondial-database>
+4. **[Mondial](https://github.com/ullenboom/mondial-database)** — *World geography* (countries, cities, rivers, mountains, organizations, languages, religions…). ~33 tables, **CC BY 3.0**; great for an intermediate/advanced course but needs conversion to SQLite. Source: <https://github.com/ullenboom/mondial-database>
 
 ### SQL datasets to AVOID / handle carefully
 
-- 🔴 **MySQL `world`** — the data carries a *"Copyright Statistics Finland"* notice with **no open license**, plus Oracle's restrictive doc boilerplate. Do not re-host. (<https://dev.mysql.com/doc/world-setup/en/world-setup-preface.html>)
+- 🔴 **[MySQL `world`](https://dev.mysql.com/doc/world-setup/en/)** — the data carries a *"Copyright Statistics Finland"* notice with **no open license**, plus Oracle's restrictive doc boilerplate. Do not re-host. (<https://dev.mysql.com/doc/world-setup/en/world-setup-preface.html>)
 - 🔴 **ClassicModels** (mysqltutorial.org) — **no license file anywhere**; all-rights-reserved by default. Tempting (8 clean tables) but not redistributable.
-- 🟡 **Lahman Baseball** & **MySQL `employees`** — both **CC BY-SA 3.0**. Commercial *verbatim* re-hosting is allowed, but ShareAlike adds copyleft friction and both are large (50 MB / 167 MB). If used, isolate with their own LICENSE; otherwise skip.
-- 🟡 **AdventureWorks (full)** — MIT but ~198 MB and distributed as a SQL-Server `.bak`. Use **AdventureWorksLT** (SQLite port) instead.
+- 🟡 **[Lahman Baseball](https://github.com/chadwickbureau/baseballdatabank)** & **[MySQL `employees`](https://github.com/datacharmer/test_db)** — both **CC BY-SA 3.0**. Commercial *verbatim* re-hosting is allowed, but ShareAlike adds copyleft friction and both are large (50 MB / 167 MB). If used, isolate with their own LICENSE; otherwise skip.
+- 🟡 **AdventureWorks (full)** — MIT but ~198 MB and distributed as a SQL-Server `.bak`. Use **[AdventureWorksLT](https://github.com/microsoft/sql-server-samples)** (SQLite port) instead.
 
 ---
 
@@ -87,35 +87,35 @@ These small tables are the workhorses shared across `data-analysis-python-pandas
 
 | Dataset | Rows × Cols | Size | License | Tier | Best for |
 | --- | --- | --- | --- | --- | --- |
-| **Palmer Penguins** ⭐ | 344 × 8 | ~52 KB | **CC0** | 🟢A | EDA, classification — the clean **Iris replacement** |
-| Iris | 150 × 5 | ~4 KB | CC BY 4.0 (UCI) | 🟢B | Classic classification *(ethics note below)* |
-| Wine | 178 × 13 | ~13 KB | CC BY 4.0 (UCI) | 🟢B | Multiclass classification |
-| Wine Quality (red+white) | 6,497 × 12 | ~340 KB | CC BY 4.0 (UCI) | 🟢B | Regression, ordinal targets |
-| Auto MPG | 398 × 8 | ~30 KB | CC BY 4.0 (UCI) | 🟢B | Regression, missing values |
-| Abalone | 4,177 × 8 | ~187 KB | CC BY 4.0 (UCI) | 🟢B | Regression/classification |
-| Breast Cancer Wisconsin | 569 × 30 | ~121 KB | CC BY 4.0 (UCI) | 🟢B | Binary classification |
-| Heart Disease (Cleveland) | 303 × 13 | ~59 KB | CC BY 4.0 (UCI) | 🟢B | Clinical classification |
-| **Gapminder** (excerpt) ⭐ | 1,704 × 6 | <100 KB | CC BY 4.0 | 🟢B | Life-exp/GDP/pop — bubble charts, groupby |
+| **[Palmer Penguins](https://allisonhorst.github.io/palmerpenguins/)** ⭐ | 344 × 8 | ~52 KB | **CC0** | 🟢A | EDA, classification — the clean **Iris replacement** |
+| [Iris](https://archive.ics.uci.edu/dataset/53/iris) | 150 × 5 | ~4 KB | CC BY 4.0 (UCI) | 🟢B | Classic classification *(ethics note below)* |
+| [Wine](https://archive.ics.uci.edu/dataset/109/wine) | 178 × 13 | ~13 KB | CC BY 4.0 (UCI) | 🟢B | Multiclass classification |
+| [Wine Quality](https://archive.ics.uci.edu/dataset/186/wine+quality) (red+white) | 6,497 × 12 | ~340 KB | CC BY 4.0 (UCI) | 🟢B | Regression, ordinal targets |
+| [Auto MPG](https://archive.ics.uci.edu/dataset/9/auto+mpg) | 398 × 8 | ~30 KB | CC BY 4.0 (UCI) | 🟢B | Regression, missing values |
+| [Abalone](https://archive.ics.uci.edu/dataset/1/abalone) | 4,177 × 8 | ~187 KB | CC BY 4.0 (UCI) | 🟢B | Regression/classification |
+| [Breast Cancer Wisconsin](https://archive.ics.uci.edu/dataset/17/breast+cancer+wisconsin+diagnostic) | 569 × 30 | ~121 KB | CC BY 4.0 (UCI) | 🟢B | Binary classification |
+| [Heart Disease](https://archive.ics.uci.edu/dataset/45/heart+disease) (Cleveland) | 303 × 13 | ~59 KB | CC BY 4.0 (UCI) | 🟢B | Clinical classification |
+| **[Gapminder](https://www.gapminder.org/free-material/)** (excerpt) ⭐ | 1,704 × 6 | <100 KB | CC BY 4.0 | 🟢B | Life-exp/GDP/pop — bubble charts, groupby |
 | mtcars | 32 × 11 | <5 KB | GPL pkg / facts free | 🟡C | Regression, R teaching |
 | Old Faithful (`faithful`) | 272 × 2 | <10 KB | GPL pkg / facts free | 🟡C | Bimodal distributions, density |
-| **Anscombe's Quartet** ⭐ | 48 × 3 | <5 KB | CC0 / ODbL | 🟢A | "Always plot your data" |
-| **Datasaurus Dozen** ⭐ | ~1,846 × 3 | <100 KB | **MIT** | 🟢B | Same-stats/different-shape demo |
-| Diamonds | 53,940 × 10 | ~3 MB | CC BY 4.0 (Zenodo) | 🟢B | Regression, big-ish categorical EDA |
-| California Housing | 20,640 × 9 | ~1.6 MB | US-Gov public domain (1990 Census) | 🟢A | Regression — **Boston Housing replacement** |
-| Ames Housing | 2,930 × ~80 | ~700 KB | Public records (unstated) | 🟡C | Rich regression / feature engineering |
-| SSA Baby Names | ~2 MB series | ~2 MB | **CC0** (US gov) | 🟢A | Time-trend EDA, groupby, joins |
+| **[Anscombe's Quartet](https://en.wikipedia.org/wiki/Anscombe%27s_quartet)** ⭐ | 48 × 3 | <5 KB | CC0 / ODbL | 🟢A | "Always plot your data" |
+| **[Datasaurus Dozen](https://github.com/jumpingrivers/datasauRus)** ⭐ | ~1,846 × 3 | <100 KB | **MIT** | 🟢B | Same-stats/different-shape demo |
+| [Diamonds](https://zenodo.org/records/3522106) | 53,940 × 10 | ~3 MB | CC BY 4.0 (Zenodo) | 🟢B | Regression, big-ish categorical EDA |
+| [California Housing](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_california_housing.html) | 20,640 × 9 | ~1.6 MB | US-Gov public domain (1990 Census) | 🟢A | Regression — **Boston Housing replacement** |
+| [Ames Housing](https://jse.amstat.org/v19n3/decock/DataDocumentation.txt) | 2,930 × ~80 | ~700 KB | Public records (unstated) | 🟡C | Rich regression / feature engineering |
+| [SSA Baby Names](https://catalog.data.gov/dataset/baby-names-from-social-security-card-applications-national-data) | ~2 MB series | ~2 MB | **CC0** (US gov) | 🟢A | Time-trend EDA, groupby, joins |
 | FiveThirtyEight: Candy Power Ranking | 86 × 13 | tiny | CC BY 4.0 | 🟢B | A/B-style ranking, correlation |
 | FiveThirtyEight: US Births (1994–2014) | ~7,300 × 4 | small | CC BY 4.0 | 🟢B | Seasonality, calendar effects |
 | FiveThirtyEight: Bechdel Test | ~1,800 × ~15 | small | CC BY 4.0 | 🟢B | Categorical analysis |
-| nycflights13 | 336,776 × 19 | ~26 MB ⚠️ | **CC0** | 🟢A (down-sample) | **Multi-table joins** (flights/airlines/airports/weather/planes) |
+| [nycflights13](https://cran.r-project.org/web/packages/nycflights13/index.html) | 336,776 × 19 | ~26 MB ⚠️ | **CC0** | 🟢A (down-sample) | **Multi-table joins** (flights/airlines/airports/weather/planes) |
 
 **Notes & flagged items**
 
-- 🟢 **Palmer Penguins** (CC0, 344 penguins, Palmer Station LTER) is the community-standard, ethically-clean **drop-in replacement for Iris** — same 3-class structure, nicer story. Credit Dr. Kristen Gorman / Palmer Station LTER. <https://allisonhorst.github.io/palmerpenguins/> *(hand-verified CC0)*
-- ⚠️ **Iris** is *legally* fine (CC BY 4.0 via UCI) but was published in the *Annals of Eugenics* (Fisher, 1936). Many educators now lead with Palmer Penguins and mention the history. Pedagogical, not legal.
+- 🟢 **[Palmer Penguins](https://allisonhorst.github.io/palmerpenguins/)** (CC0, 344 penguins, Palmer Station LTER) is the community-standard, ethically-clean **drop-in replacement for Iris** — same 3-class structure, nicer story. Credit Dr. Kristen Gorman / Palmer Station LTER. <https://allisonhorst.github.io/palmerpenguins/> *(hand-verified CC0)*
+- ⚠️ **[Iris](https://archive.ics.uci.edu/dataset/53/iris)** is *legally* fine (CC BY 4.0 via UCI) but was published in the *Annals of Eugenics* (Fisher, 1936). Many educators now lead with [Palmer Penguins](https://allisonhorst.github.io/palmerpenguins/) and mention the history. Pedagogical, not legal.
 - 🟡 **mtcars / Old Faithful / R base datasets** — the R `datasets` package is GPL-2|3, but the underlying *numbers* aren't copyrightable; extract to CSV and re-host (don't ship the `.rda` binary). Prefer cleaner upstreams where they exist.
-- 🟡 **Ames Housing** — derived from public Ames, Iowa assessor records (effectively public domain) but with **no explicit license**; cite the public-records origin. The De Cock (2011) paper offers it explicitly as the Boston Housing alternative.
-- 🟢 **nycflights13** is itself a tidy **multi-table** set (5 related tables) and doubles as a friendly SQL/join teaching set — but down-sample for WASM.
+- 🟡 **[Ames Housing](https://jse.amstat.org/v19n3/decock/DataDocumentation.txt)** — derived from public Ames, Iowa assessor records (effectively public domain) but with **no explicit license**; cite the public-records origin. The De Cock (2011) paper offers it explicitly as the Boston Housing alternative.
+- 🟢 **[nycflights13](https://cran.r-project.org/web/packages/nycflights13/index.html)** is itself a tidy **multi-table** set (5 related tables) and doubles as a friendly SQL/join teaching set — but down-sample for WASM.
 
 ---
 
@@ -123,9 +123,9 @@ These small tables are the workhorses shared across `data-analysis-python-pandas
 
 `seaborn-foundations`, `intro-data-viz-plotly`, `mastering-ggplot2`. The best viz datasets have clear categories, correlations, and a story.
 
-**Great evergreen picks (all 🟢):** Palmer Penguins (CC0), Gapminder (CC BY 4.0 — the Hans Rosling bubble chart), Diamonds (CC BY 4.0 — price vs carat/cut), **Anscombe's Quartet** (CC0) and the **Datasaurus Dozen** (MIT) for "why you must plot," `mpg`/fuel-economy (EPA, public domain), `midwest` US-census demographics (public domain), and NOAA **Seattle weather** (public domain, the canonical Vega-Lite teaching set).
+**Great evergreen picks (all 🟢):** [Palmer Penguins](https://allisonhorst.github.io/palmerpenguins/) (CC0), [Gapminder](https://www.gapminder.org/free-material/) (CC BY 4.0 — the Hans Rosling bubble chart), [Diamonds](https://zenodo.org/records/3522106) (CC BY 4.0 — price vs carat/cut), **[Anscombe's Quartet](https://en.wikipedia.org/wiki/Anscombe%27s_quartet)** (CC0) and the **[Datasaurus Dozen](https://github.com/jumpingrivers/datasauRus)** (MIT) for "why you must plot," `mpg`/fuel-economy (EPA, public domain), `midwest` US-census demographics (public domain), and NOAA **Seattle weather** (public domain, the canonical Vega-Lite teaching set).
 
-⚠️ **The library-bundled-data trap** — see §11 for the full breakdown. In short: **don't re-host `seaborn-data` directly** (no license); from **vega-datasets**, avoid `movies`, `sp500`, `stocks`, `ohlc`, `driving`; and in **ggplot2** avoid `economics` (FRED terms). The clean ones (penguins, gapminder, co2, seattle-weather, global-temp, earthquakes, political-contributions, diamonds, mpg) are all fine from their canonical sources.
+⚠️ **The library-bundled-data trap** — see §11 for the full breakdown. In short: **don't re-host `seaborn-data` directly** (no license); from **vega-datasets**, avoid `movies`, `sp500`, `stocks`, `ohlc`, `driving`; and in **ggplot2** avoid `economics` (FRED terms). The clean ones (penguins, gapminder, co2, seattle-weather, global-temp, earthquakes, political-contributions, [diamonds](https://zenodo.org/records/3522106), mpg) are all fine from their canonical sources.
 
 ---
 
@@ -133,10 +133,10 @@ These small tables are the workhorses shared across `data-analysis-python-pandas
 
 `statistics-for-data-science-python`, `practical-r-for-beginners`, `time-series-analysis-python`.
 
-- **Distributions / EDA:** Old Faithful (bimodal), Wine Quality, Penguins, Abalone, Gapminder.
-- **"Summary stats can lie":** **Anscombe's Quartet** (CC0) and **Datasaurus Dozen** (MIT) — identical means/correlations, wildly different plots.
-- **Regression & hypothesis testing:** Auto MPG, mtcars, California/Ames Housing, Wine Quality, FiveThirtyEight US Births (seasonality).
-- **Numerical-accuracy / certified answers:** **NIST StRD** (Longley, Wampler, NoInt — certified regression/ANOVA results) — public domain, tiny; perfect for "did my implementation get the right answer?" labs (see §12).
+- **Distributions / EDA:** Old Faithful (bimodal), [Wine Quality](https://archive.ics.uci.edu/dataset/186/wine+quality), [Palmer Penguins](https://allisonhorst.github.io/palmerpenguins/), [Abalone](https://archive.ics.uci.edu/dataset/1/abalone), [Gapminder](https://www.gapminder.org/free-material/).
+- **"Summary stats can lie":** **[Anscombe's Quartet](https://en.wikipedia.org/wiki/Anscombe%27s_quartet)** (CC0) and **[Datasaurus Dozen](https://github.com/jumpingrivers/datasauRus)** (MIT) — identical means/correlations, wildly different plots.
+- **Regression & hypothesis testing:** [Auto MPG](https://archive.ics.uci.edu/dataset/9/auto+mpg), mtcars, [California Housing](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_california_housing.html)/[Ames Housing](https://jse.amstat.org/v19n3/decock/DataDocumentation.txt), [Wine Quality](https://archive.ics.uci.edu/dataset/186/wine+quality), FiveThirtyEight US Births (seasonality).
+- **Numerical-accuracy / certified answers:** **[NIST StRD](https://www.itl.nist.gov/div898/strd/)** (Longley, Wampler, NoInt — certified regression/ANOVA results) — public domain, tiny; perfect for "did my implementation get the right answer?" labs (see §12).
 
 ---
 
@@ -146,11 +146,11 @@ These small tables are the workhorses shared across `data-analysis-python-pandas
 
 | Task | Datasets (all UCI CC BY 4.0 unless noted) |
 | --- | --- |
-| Multiclass classification | **Palmer Penguins (CC0)**, Iris, Wine |
-| Binary classification | Breast Cancer Wisconsin, Heart Disease, **Spambase** (CC BY 4.0), **SMS Spam** (CC BY 4.0) |
-| Regression | **California Housing (public domain)**, **Ames Housing**, Auto MPG, Abalone, Wine Quality, Diamonds (CC BY 4.0) |
+| Multiclass classification | **[Palmer Penguins](https://allisonhorst.github.io/palmerpenguins/) (CC0)**, [Iris](https://archive.ics.uci.edu/dataset/53/iris), [Wine](https://archive.ics.uci.edu/dataset/109/wine) |
+| Binary classification | [Breast Cancer Wisconsin](https://archive.ics.uci.edu/dataset/17/breast+cancer+wisconsin+diagnostic), [Heart Disease](https://archive.ics.uci.edu/dataset/45/heart+disease), **[Spambase](https://archive.ics.uci.edu/dataset/94/spambase)** (CC BY 4.0), **[SMS Spam](https://archive.ics.uci.edu/dataset/228/sms+spam+collection)** (CC BY 4.0) |
+| Regression | **[California Housing](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_california_housing.html) (public domain)**, **[Ames Housing](https://jse.amstat.org/v19n3/decock/DataDocumentation.txt)**, [Auto MPG](https://archive.ics.uci.edu/dataset/9/auto+mpg), [Abalone](https://archive.ics.uci.edu/dataset/1/abalone), [Wine Quality](https://archive.ics.uci.edu/dataset/186/wine+quality), [Diamonds](https://zenodo.org/records/3522106) (CC BY 4.0) |
 
-🔴 **AVOID — Boston Housing.** Removed from scikit-learn in **v1.2 (Dec 2022)**: its `B` feature mathematically encodes the proportion of Black residents under an explicitly racist modeling assumption. It is ethically condemned regardless of license. **Use California Housing or Ames Housing instead** — scikit-learn's own deprecation message points there. (<https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_california_housing.html>)
+🔴 **AVOID — Boston Housing.** Removed from scikit-learn in **v1.2 (Dec 2022)**: its `B` feature mathematically encodes the proportion of Black residents under an explicitly racist modeling assumption. It is ethically condemned regardless of license. **Use [California Housing](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_california_housing.html) or [Ames Housing](https://jse.amstat.org/v19n3/decock/DataDocumentation.txt) instead** — scikit-learn's own deprecation message points there. (<https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_california_housing.html>)
 
 ---
 
@@ -160,18 +160,18 @@ These small tables are the workhorses shared across `data-analysis-python-pandas
 
 | Dataset | What / use | Size | License | Tier | Source |
 | --- | --- | --- | --- | --- | --- |
-| **NOAA Mauna Loa CO₂** (monthly) | Trend + curve fitting; the Keeling curve | ~600 rows | **CC0** | 🟢A | <https://gml.noaa.gov/ccgg/trends/data.html> |
-| Scripps CO₂ (flask) | Original Keeling record | ~800 rows | CC BY 4.0 | 🟢B | <https://scrippsco2.ucsd.edu/data/atmospheric_co2/> |
-| **NIST StRD** (SRD 140) | 58 sets w/ **certified** numerical answers (regression, ANOVA, nonlinear fit) | <1 MB total | US-Gov, no copyright | 🟢A | <https://www.itl.nist.gov/div898/strd/> |
-| USGS earthquakes (fixed window) | Spatial stats, Gutenberg–Richter law | 2k–25k rows | **CC0** / US-Gov | 🟢A | <https://earthquake.usgs.gov/earthquakes/search/> |
-| NOAA GHCN-Monthly (station extract) | Temperature series; FFT of seasonal cycle | per-station | **CC0** | 🟢A | <https://www.ncei.noaa.gov/products/.../ghcn-monthly> |
-| NOAA US Climate Normals **1991–2020** | 30-yr averages — *fixed by definition* | small | US-Gov public domain | 🟢A | <https://www.ncei.noaa.gov/access/us-climate-normals/> |
-| NASA GISS global temp anomalies | 1880–present anomaly series | ~143 rows | US-Gov public domain | 🟢A | <https://data.giss.nasa.gov/gistemp/> |
+| **[NOAA Mauna Loa CO₂](https://gml.noaa.gov/ccgg/trends/data.html)** (monthly) | Trend + curve fitting; the Keeling curve | ~600 rows | **CC0** | 🟢A | <https://gml.noaa.gov/ccgg/trends/data.html> |
+| [Scripps CO₂](https://scrippsco2.ucsd.edu/data/atmospheric_co2/) (flask) | Original Keeling record | ~800 rows | CC BY 4.0 | 🟢B | <https://scrippsco2.ucsd.edu/data/atmospheric_co2/> |
+| **[NIST StRD](https://www.itl.nist.gov/div898/strd/)** (SRD 140) | 58 sets w/ **certified** numerical answers (regression, ANOVA, nonlinear fit) | <1 MB total | US-Gov, no copyright | 🟢A | <https://www.itl.nist.gov/div898/strd/> |
+| [USGS earthquakes](https://earthquake.usgs.gov/earthquakes/search/) (fixed window) | Spatial stats, Gutenberg–Richter law | 2k–25k rows | **CC0** / US-Gov | 🟢A | <https://earthquake.usgs.gov/earthquakes/search/> |
+| [NOAA GHCN-Monthly](https://www.ncei.noaa.gov/products/land-based-station/global-historical-climatology-network-monthly) (station extract) | Temperature series; FFT of seasonal cycle | per-station | **CC0** | 🟢A | <https://www.ncei.noaa.gov/products/.../ghcn-monthly> |
+| [NOAA US Climate Normals](https://www.ncei.noaa.gov/access/us-climate-normals/) **1991–2020** | 30-yr averages — *fixed by definition* | small | US-Gov public domain | 🟢A | <https://www.ncei.noaa.gov/access/us-climate-normals/> |
+| [NASA GISS](https://data.giss.nasa.gov/gistemp/) global temp anomalies | 1880–present anomaly series | ~143 rows | US-Gov public domain | 🟢A | <https://data.giss.nasa.gov/gistemp/> |
 | Burtin antibiotics (1951) | Small, famous viz/measurement set | 16 rows | BSD-3 (via vega) | 🟢B | vega-datasets |
 
 🔴 **AVOID — SILSO sunspot numbers** (Royal Observatory of Belgium) are **CC BY-NC 4.0 — non-commercial** *(hand-verified at <https://www.sidc.be/SILSO/datafiles>)*. Use **`statsmodels.datasets.sunspots`** instead (1700–2008, NOAA-sourced, **public domain**).
 🟡 **CAUTION — NIST CODATA physical constants (SRD 121):** governed by the Standard Reference Data Act; redistribution of the compiled file needs NIST permission. **Link to it / fetch at runtime; don't host a copy.** (scipy/astropy already ship the constants if you need them in-playground.)
-🟡 **CAUTION — HYG star database:** CC BY-SA 4.0 (copyleft) and ~14 MB. Usable, but isolate it with its own LICENSE and down-sample.
+🟡 **CAUTION — [HYG Star Database](https://codeberg.org/astronexus/hyg):** CC BY-SA 4.0 (copyleft) and ~14 MB. Usable, but isolate it with its own LICENSE and down-sample.
 
 ---
 
@@ -188,7 +188,7 @@ These small tables are the workhorses shared across `data-analysis-python-pandas
 | `statsmodels` **macrodata** | 1959–2009 (quarterly) | 202 | Multivariate macro TS | Public domain 🟢A |
 | Canadian Lynx | 1821–1934 (annual) | 114 | Predator-prey cycles, ARIMA | R GPL / facts free 🟡C |
 
-🟡 **CAUTION — AirPassengers** (the famous 1949–1960 Box–Jenkins airline series): heavily used, but its provenance (IATA records, bundled via R's GPL `datasets`) gives it **no clean open license**. Practical risk is low, but for a commercial re-host prefer **US BTS T-100 air-traffic data** (US-Gov public domain) or the `statsmodels` series above.
+🟡 **CAUTION — AirPassengers** (the famous 1949–1960 Box–Jenkins airline series): heavily used, but its provenance (IATA records, bundled via R's GPL `datasets`) gives it **no clean open license**. Practical risk is low, but for a commercial re-host prefer **[US BTS T-100](https://www.transtats.bts.gov/) air-traffic data** (US-Gov public domain) or the `statsmodels` series above.
 🔴 Reminder: **never** ship a *live* feed (current CO₂, latest quakes, this-year sunspots) — freeze a closed window.
 
 ---
@@ -199,12 +199,12 @@ These small tables are the workhorses shared across `data-analysis-python-pandas
 
 | Corpus | What | License | Tier | Notes |
 | --- | --- | --- | --- | --- |
-| **Project Gutenberg** books | *Pride & Prejudice*, *Alice in Wonderland*, *Moby Dick*, complete Shakespeare | Public domain (text) | 🟢A | **Strip the PG header/footer**, then re-host freely |
+| **[Project Gutenberg](https://www.gutenberg.org/)** books | *Pride & Prejudice*, *Alice in Wonderland*, *Moby Dick*, complete Shakespeare | Public domain (text) | 🟢A | **Strip the PG header/footer**, then re-host freely |
 | NLTK `gutenberg` / `words` / `inaugural` | 18 PD novels; word list; US inaugural addresses | Public domain | 🟢A | The clean subset of NLTK's corpora |
 | US Presidential speeches / SOTU | Inaugurals, State of the Union | Public domain (US gov) | 🟢A | Use Miller Center / official text, **not** NLTK `state_union` (C-SPAN ©) |
-| **UCI SMS Spam Collection** | 5,574 SMS labelled spam/ham | CC BY 4.0 | 🟢B | Clean labelled text classification set |
-| **UCI Spambase** | 4,601 emails as word-frequency features | CC BY 4.0 | 🟢B | Features only (no raw email) |
-| UCI Sentiment Labelled Sentences | 3,000 short reviews, pos/neg | CC BY 4.0 | 🟢B | Sentiment baseline |
+| **[UCI SMS Spam Collection](https://archive.ics.uci.edu/dataset/228/sms+spam+collection)** | 5,574 SMS labelled spam/ham | CC BY 4.0 | 🟢B | Clean labelled text classification set |
+| **[UCI Spambase](https://archive.ics.uci.edu/dataset/94/spambase)** | 4,601 emails as word-frequency features | CC BY 4.0 | 🟢B | Features only (no raw email) |
+| [UCI Sentiment Labelled Sentences](https://archive.ics.uci.edu/dataset/331/sentiment+labelled+sentences) | 3,000 short reviews, pos/neg | CC BY 4.0 | 🟢B | Sentiment baseline |
 
 🔴 **AVOID (non-commercial / no grant / proprietary):** IMDb official datasets and the **Stanford Large Movie Review** set (non-commercial); NLTK **`reuters`** (Reuters ©), **`twitter_samples`** (X/Twitter Developer Agreement), **`movie_reviews`** (no stated license); **SpamAssassin** corpus (sender © retained); **Enron** email (privacy + non-commercial mirrors).
 🟡 **CAUTION:** NLTK **`names`** / **`stopwords`** have undocumented licenses (open GitHub issue #2501) — use an alternative stopword list; NLTK **`state_union`** text is PD but compiled from copyrighted C-SPAN material — use official government text instead.
@@ -217,12 +217,12 @@ When a course needs a fresh example, these sources have clear, **commercial-frie
 
 | Source | License | Tier | Good evergreen examples |
 | --- | --- | --- | --- |
-| **US data.gov / federal agencies** | Public domain / CC0 (17 U.S.C. §105) | 🟢A | SSA Baby Names, BLS CPI, Census, NOAA, USGS, FEC, EPA |
-| **UCI ML Repository** | CC BY 4.0 (site-wide) | 🟢B | Iris, Wine, Abalone, Spambase, … (dozens) |
+| **US data.gov / federal agencies** | Public domain / CC0 (17 U.S.C. §105) | 🟢A | [SSA Baby Names](https://catalog.data.gov/dataset/baby-names-from-social-security-card-applications-national-data), [BLS](https://www.bls.gov/data/) CPI, Census, [NOAA](https://gml.noaa.gov/ccgg/trends/data.html), [USGS](https://earthquake.usgs.gov/earthquakes/search/), FEC, EPA |
+| **UCI ML Repository** | CC BY 4.0 (site-wide) | 🟢B | [Iris](https://archive.ics.uci.edu/dataset/53/iris), [Wine](https://archive.ics.uci.edu/dataset/109/wine), [Abalone](https://archive.ics.uci.edu/dataset/1/abalone), [Spambase](https://archive.ics.uci.edu/dataset/94/spambase), … (dozens) |
 | **FiveThirtyEight** (GitHub) | CC BY 4.0 (data) / MIT (code) | 🟢B | Candy rankings, US births, Bechdel test |
 | **Our World in Data** | CC BY 4.0 (OWID's own work) | 🟢B | CO₂ & GHG emissions, life expectancy, energy mix ⚠️ trace 3rd-party indicators |
 | **World Bank Open Data** | CC BY 4.0 | 🟢B | Life expectancy, fertility, GDP/capita (1960–) |
-| **Gapminder** | CC BY 4.0 | 🟢B | Life exp / GDP / population (1800–) — also a CC0 R package |
+| **[Gapminder](https://www.gapminder.org/free-material/)** | CC BY 4.0 | 🟢B | Life exp / GDP / population (1800–) — also a CC0 R package |
 | **Wikidata** | CC0 | 🟢A | Structured facts for many TidyTuesday weeks |
 | TidyTuesday | **Mixed (per-dataset)** | 🟡C | Great index, but **verify each upstream** before re-hosting |
 | Kaggle / data.world | **Per-dataset** | 🟡C | Filter to CC0/CC BY; confirm against the *primary* source |
@@ -233,12 +233,12 @@ When a course needs a fresh example, these sources have clear, **commercial-frie
 
 Course authors instinctively reach for `sns.load_dataset(...)`, `px.data.*`, `vega_datasets`, or R's `data()`. The **data inside a library usually has a different license than the library's code** — and sometimes none at all.
 
-- 🔴 **seaborn (`mwaskom/seaborn-data`)** — **no LICENSE file; all rights reserved by default** *(hand-verified — GitHub shows no license)*. Do **not** clone-and-host. Re-source each: `penguins`→palmerpenguins (CC0), `tips`→`reshape2` (MIT), `mpg`→EPA (PD), `diamonds`→Zenodo (CC BY 4.0), `flights`→build from BTS, `titanic`→see caution below.
+- 🔴 **seaborn (`mwaskom/seaborn-data`)** — **no LICENSE file; all rights reserved by default** *(hand-verified — GitHub shows no license)*. Do **not** clone-and-host. Re-source each: `penguins`→[palmerpenguins](https://allisonhorst.github.io/palmerpenguins/) (CC0), `tips`→`reshape2` (MIT), `mpg`→EPA (PD), `diamonds`→[Zenodo](https://zenodo.org/records/3522106) (CC BY 4.0), `flights`→build from [US BTS T-100](https://www.transtats.bts.gov/), `titanic`→see caution below.
 - 🟡 **plotly express (`plotly.express.data`)** — repo is **MIT**. `gapminder` (CC BY 4.0), `iris` (PD), `tips` (MIT) are clean. `carshare`, `election`, `wind`, `stocks`, `medals` have undocumented provenance — low-risk Plotly demo data but no explicit data license.
 - 🟡 **vega-datasets** — code is **BSD-3**; **data is per-file**. Clean: `penguins` (CC0), `gapminder`/`co2_concentration` (CC BY 4.0), `seattle_weather`/`global_temp`/`earthquakes`/`birdstrikes`/`iowa_electricity` (US-Gov PD), `political_contributions` (CC0), `burtin`/synthetic (BSD).
   🔴 **AVOID:** **`movies`** (no license, no source — IMDB/box-office data), **`sp500`/`stocks`** (Yahoo Finance ToS), **`ohlc`** (CBOE), **`driving`** (NYT ©). 🟡 caution: `cars`/`barley`/`iris` ("notspecified," old/PD, low risk), `jobs`/`population` (IPUMS terms).
 - 🟡 **R base `datasets`** — package is **GPL-2|3**; the *facts* aren't copyrightable. Extract `mtcars`, `faithful`, `airquality`, `ToothGrowth`, `PlantGrowth`, etc. to CSV and re-host; don't ship the `.rda`.
-- 🟡 **ggplot2** — code is **MIT**. Clean: **`diamonds`** (CC BY 4.0 via Wickham's Zenodo upload *(hand-verified)*), **`mpg`** (EPA PD), **`midwest`** (Census PD), **`presidential`** (explicitly PD). 🔴 **`economics`/`economics_long`** come from **FRED**, which prohibits commercial redistribution of third-party series — **don't re-host**. 🟡 `msleep` (Wikipedia CC BY-**SA**), `txhousing` (TAMU, unstated).
+- 🟡 **ggplot2** — code is **MIT**. Clean: **[`diamonds`](https://zenodo.org/records/3522106)** (CC BY 4.0 via Wickham's Zenodo upload *(hand-verified)*), **`mpg`** (EPA PD), **`midwest`** (Census PD), **`presidential`** (explicitly PD). 🔴 **`economics`/`economics_long`** come from **FRED**, which prohibits commercial redistribution of third-party series — **don't re-host**. 🟡 `msleep` (Wikipedia CC BY-**SA**), `txhousing` (TAMU, unstated).
 
 🟡 **Titanic** — the *1912 manifest* is historical/PD, but the **Kaggle competition version is non-commercial** (Kaggle rules). For a commercial re-host, use the **Vanderbilt Biostatistics** version (`hbiostat.org/data`, permissive notice, attribution) or a CC0 re-release — not the Kaggle file.
 
@@ -250,7 +250,7 @@ Course authors instinctively reach for `sns.load_dataset(...)`, `px.data.*`, `ve
 
 | Item | Why |
 | --- | --- |
-| **Boston Housing** | Encodes racial bias in `B`; removed from scikit-learn 1.2. Use California/Ames Housing |
+| **Boston Housing** | Encodes racial bias in `B`; removed from scikit-learn 1.2. Use [California Housing](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_california_housing.html)/[Ames Housing](https://jse.amstat.org/v19n3/decock/DataDocumentation.txt) |
 | **SILSO sunspot numbers** | CC BY-**NC** (non-commercial). Use `statsmodels.sunspots` (PD) |
 | MySQL **`world`** DB | "Copyright Statistics Finland," no open license |
 | **ClassicModels** DB | No license stated anywhere |
@@ -268,13 +268,13 @@ Course authors instinctively reach for `sns.load_dataset(...)`, `px.data.*`, `ve
 
 | Item | Why / how to handle |
 | --- | --- |
-| Lahman Baseball, MySQL `employees`, HYG stars | **CC BY-SA / ShareAlike** copyleft — isolate in own subfolder + LICENSE (and they're large) |
+| [Lahman Baseball](https://github.com/chadwickbureau/baseballdatabank), [MySQL `employees`](https://github.com/datacharmer/test_db), HYG stars | **CC BY-SA / ShareAlike** copyleft — isolate in own subfolder + LICENSE (and they're large) |
 | NIST CODATA constants (SRD 121) | SRD-Act copyright — link/fetch at runtime, don't host |
-| AirPassengers | No clean license (IATA/R GPL) — prefer BTS data or `statsmodels` |
+| AirPassengers | No clean license (IATA/R GPL) — prefer [US BTS T-100](https://www.transtats.bts.gov/) data or `statsmodels` |
 | mtcars, Old Faithful, R base datasets | GPL package; extract facts to CSV, don't ship `.rda` |
-| Ames Housing, seaborn `tips` | Effectively open (public records / 30-yr MIT redistribution) but **no explicit grant** — cite origin |
-| nycflights13, diamonds, California Housing | Clean license but **large** — down-sample for WASM |
-| OWID / World Bank / Gapminder | CC BY 4.0 on their work, but **trace third-party indicators** |
+| [Ames Housing](https://jse.amstat.org/v19n3/decock/DataDocumentation.txt), seaborn `tips` | Effectively open (public records / 30-yr MIT redistribution) but **no explicit grant** — cite origin |
+| [nycflights13](https://cran.r-project.org/web/packages/nycflights13/index.html), [diamonds](https://zenodo.org/records/3522106), [California Housing](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_california_housing.html) | Clean license but **large** — down-sample for WASM |
+| OWID / World Bank / [Gapminder](https://www.gapminder.org/free-material/) | CC BY 4.0 on their work, but **trace third-party indicators** |
 | TidyTuesday / Kaggle / data.world | Mixed per-dataset — verify each before re-hosting |
 
 ---
@@ -283,18 +283,18 @@ Course authors instinctively reach for `sns.load_dataset(...)`, `px.data.*`, `ve
 
 | Course | Drop-in datasets (all 🟢 unless noted) |
 | --- | --- |
-| `data-analysis-python-pandas` | Palmer Penguins, Gapminder, SSA Baby Names, nycflights13 (sampled), Auto MPG, Wine Quality |
-| `statistics-for-data-science-python` | Anscombe's Quartet, Datasaurus Dozen, Old Faithful, Wine Quality, NIST StRD, FiveThirtyEight US Births |
-| `machine-learning-scikit-learn` | Palmer Penguins, Wine, Breast Cancer, Heart Disease, California Housing, Ames Housing *(not Boston!)* |
-| `scientific-computing-python` | NOAA Mauna Loa CO₂, NIST StRD, USGS earthquakes, NASA GISS temps, NOAA Climate Normals |
+| `data-analysis-python-pandas` | [Palmer Penguins](https://allisonhorst.github.io/palmerpenguins/), [Gapminder](https://www.gapminder.org/free-material/), [SSA Baby Names](https://catalog.data.gov/dataset/baby-names-from-social-security-card-applications-national-data), [nycflights13](https://cran.r-project.org/web/packages/nycflights13/index.html) (sampled), [Auto MPG](https://archive.ics.uci.edu/dataset/9/auto+mpg), [Wine Quality](https://archive.ics.uci.edu/dataset/186/wine+quality) |
+| `statistics-for-data-science-python` | [Anscombe's Quartet](https://en.wikipedia.org/wiki/Anscombe%27s_quartet), [Datasaurus Dozen](https://github.com/jumpingrivers/datasauRus), Old Faithful, [Wine Quality](https://archive.ics.uci.edu/dataset/186/wine+quality), [NIST StRD](https://www.itl.nist.gov/div898/strd/), FiveThirtyEight US Births |
+| `machine-learning-scikit-learn` | [Palmer Penguins](https://allisonhorst.github.io/palmerpenguins/), [Wine](https://archive.ics.uci.edu/dataset/109/wine), [Breast Cancer Wisconsin](https://archive.ics.uci.edu/dataset/17/breast+cancer+wisconsin+diagnostic), [Heart Disease](https://archive.ics.uci.edu/dataset/45/heart+disease), [California Housing](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_california_housing.html), [Ames Housing](https://jse.amstat.org/v19n3/decock/DataDocumentation.txt) *(not Boston!)* |
+| `scientific-computing-python` | [NOAA Mauna Loa CO₂](https://gml.noaa.gov/ccgg/trends/data.html), [NIST StRD](https://www.itl.nist.gov/div898/strd/), [USGS earthquakes](https://earthquake.usgs.gov/earthquakes/search/), [NASA GISS](https://data.giss.nasa.gov/gistemp/) temps, [NOAA US Climate Normals](https://www.ncei.noaa.gov/access/us-climate-normals/) |
 | `time-series-analysis-python` | `statsmodels` co2 / sunspots / nile / elnino / macrodata *(not SILSO/AirPassengers)* |
-| `natural-language-processing-python` | Gutenberg (header-stripped), NLTK inaugural/gutenberg/words, UCI SMS Spam & Sentiment Sentences |
-| `seaborn-foundations` / `intro-data-viz-plotly` | Penguins, Gapminder, Diamonds, mpg, Seattle weather, Anscombe/Datasaurus *(re-source, don't clone seaborn-data)* |
-| `mastering-ggplot2` / `practical-r-for-beginners` | Penguins, Gapminder (CC0 R pkg), diamonds (CC BY), mpg/midwest/presidential, mtcars (CSV) |
-| `intro-sql-postgres` / `database-design-postgresql` | **Pagila**, Chinook, Northwind, Mondial |
-| `sqlite-for-beginners` / `sql-analytics-duckdb` | **Chinook**, **Northwind** (SQLite ports), Sakila-SQLite, nycflights13 (CSV→DuckDB) |
+| `natural-language-processing-python` | [Gutenberg](https://www.gutenberg.org/) (header-stripped), NLTK inaugural/gutenberg/words, [UCI SMS Spam](https://archive.ics.uci.edu/dataset/228/sms+spam+collection) & [Sentiment Sentences](https://archive.ics.uci.edu/dataset/331/sentiment+labelled+sentences) |
+| `seaborn-foundations` / `intro-data-viz-plotly` | [Palmer Penguins](https://allisonhorst.github.io/palmerpenguins/), [Gapminder](https://www.gapminder.org/free-material/), [Diamonds](https://zenodo.org/records/3522106), mpg, Seattle weather, [Anscombe's Quartet](https://en.wikipedia.org/wiki/Anscombe%27s_quartet)/[Datasaurus Dozen](https://github.com/jumpingrivers/datasauRus) *(re-source, don't clone seaborn-data)* |
+| `mastering-ggplot2` / `practical-r-for-beginners` | [Palmer Penguins](https://allisonhorst.github.io/palmerpenguins/), [Gapminder](https://www.gapminder.org/free-material/) (CC0 R pkg), [diamonds](https://zenodo.org/records/3522106) (CC BY), mpg/midwest/presidential, mtcars (CSV) |
+| `intro-sql-postgres` / `database-design-postgresql` | **[Pagila](https://github.com/devrimgunduz/pagila)**, [Chinook](https://github.com/lerocha/chinook-database), [Northwind](https://github.com/jpwhite3/northwind-SQLite3), [Mondial](https://github.com/ullenboom/mondial-database) |
+| `sqlite-for-beginners` / `sql-analytics-duckdb` | **[Chinook](https://github.com/lerocha/chinook-database)**, **[Northwind](https://github.com/jpwhite3/northwind-SQLite3)** (SQLite ports), [Sakila](https://dev.mysql.com/doc/sakila/en/)-SQLite, [nycflights13](https://cran.r-project.org/web/packages/nycflights13/index.html) (CSV→DuckDB) |
 
-**The five "no-asterisk, ship-today" picks:** **Chinook** (MIT), **Palmer Penguins** (CC0), **Gapminder** (CC BY 4.0), **NOAA Mauna Loa CO₂** (CC0), **NIST StRD** (public domain).
+**The five "no-asterisk, ship-today" picks:** **[Chinook](https://github.com/lerocha/chinook-database)** (MIT), **[Palmer Penguins](https://allisonhorst.github.io/palmerpenguins/)** (CC0), **[Gapminder](https://www.gapminder.org/free-material/)** (CC BY 4.0), **[NOAA Mauna Loa CO₂](https://gml.noaa.gov/ccgg/trends/data.html)** (CC0), **[NIST StRD](https://www.itl.nist.gov/div898/strd/)** (public domain).
 
 ---
 
@@ -320,10 +320,10 @@ Also avoid the whole **Pokémon / Netflix / Spotify / FIFA** cluster (Nintendo /
 
 | Dataset | Rows | License (verified at source) | Tier | Course |
 | --- | --- | --- | --- | --- |
-| Heart Failure Clinical Records | 299 | CC BY 4.0 (UCI #519) | 🟢B | ML, stats |
-| Adult / Census Income (`uciml`) | 48,842 | CC BY 4.0 (UCI #2) | 🟢B | ML (+fairness), SQL |
-| Bank Marketing (`uciml`) | 45,211 | CC BY 4.0 (UCI #222) | 🟢B | ML, SQL |
-| Students Performance in Exams | 1,000 | CC BY (roycekimmons.com; synthetic) | 🟡C | Pandas, stats, viz |
+| [Heart Failure Clinical Records](https://archive.ics.uci.edu/dataset/519/heart+failure+clinical+records) | 299 | CC BY 4.0 (UCI #519) | 🟢B | ML, stats |
+| [Adult / Census Income](https://archive.ics.uci.edu/dataset/2/adult) (`uciml`) | 48,842 | CC BY 4.0 (UCI #2) | 🟢B | ML (+fairness), SQL |
+| [Bank Marketing](https://archive.ics.uci.edu/dataset/222/bank+marketing) (`uciml`) | 45,211 | CC BY 4.0 (UCI #222) | 🟢B | ML, SQL |
+| [Students Performance in Exams](https://www.kaggle.com/datasets/spscientist/students-performance-in-exams) | 1,000 | CC BY (roycekimmons.com; synthetic) | 🟡C | Pandas, stats, viz |
 | Mall Customer Segmentation | 200 | CC0 (uploader; synthetic) | 🟡C | clustering, viz |
 | Medical Cost / `insurance.csv` | 1,338 | public-domain claim (synthetic; weak chain) | 🟡C | regression |
 
@@ -331,51 +331,51 @@ Also avoid the whole **Pokémon / Netflix / Spotify / FIFA** cluster (Nintendo /
 
 ### 14.2 UCI ML Repository — 20+ more datasets, all CC BY 4.0
 
-UCI is uniformly **CC BY 4.0** (re-confirmed on Adult/Mushroom/Bank Marketing). A broad sweep of small, evergreen classics beyond those in §3/§6:
+UCI is uniformly **CC BY 4.0** (re-confirmed on [Adult / Census Income](https://archive.ics.uci.edu/dataset/2/adult)/[Mushroom](https://archive.ics.uci.edu/dataset/73/mushroom)/[Bank Marketing](https://archive.ics.uci.edu/dataset/222/bank+marketing)). A broad sweep of small, evergreen classics beyond those in §3/§6:
 
 | Dataset | Rows × Feats | Size | Task | Course |
 | --- | --- | --- | --- | --- |
-| **Mushroom** | 8,124 × 22 | 365 KB | Classification (edible/poison) | ML, Pandas |
-| **Bike Sharing** | 17,389 × 13 | ~1 MB | Regression + seasonality | ML, stats, time series |
-| **Banknote Authentication** | 1,372 × 4 | 45 KB | Binary classification | ML, stats |
-| **Glass Identification** | 214 × 9 | 12 KB | Multiclass (forensic) | ML, stats |
-| **Seeds** | 210 × 7 | 9 KB | Classification / clustering | ML, stats |
-| **Zoo** | 101 × 16 | 4 KB | Multiclass (boolean attrs) | ML, Pandas |
-| **Wholesale Customers** | 440 × 7 | 15 KB | Clustering | clustering, Pandas |
-| Car Evaluation | 1,728 × 6 | 51 KB | Ordinal classification | ML |
-| Student Performance | 649 × 30 | ~40 KB | Classification / regression | ML, stats |
-| Raisin | 900 × 7 | 112 KB | Binary classification | ML, stats |
-| Rice (Cammeo / Osmancik) | 3,810 × 7 | 168 KB | Binary classification | ML, stats |
-| Yeast | 1,484 × 8 | 93 KB | Classification | ML |
-| Ionosphere | 351 × 34 | 75 KB | Binary classification | ML |
-| Energy Efficiency | 768 × 8 | 74 KB | Regression | ML, stats |
-| Forest Fires | 517 × 12 | 25 KB | Regression | ML, stats |
-| Concrete Compressive Strength | 1,030 × 8 | 122 KB (.xls) | Regression | ML, stats |
-| Bank Marketing | 45,211 × 16 | 566 KB | Classification (imbalanced) | ML, SQL |
-| Default of Credit Card Clients | 30,000 × 23 | 5.3 MB | Classification | ML |
-| Letter Recognition | 20,000 × 16 | 696 KB | Classification | ML |
-| Optical / Pen Digits | 5,620 / 10,992 | ~0.6 / 1.6 MB | Classification | ML |
-| Adult / Census Income ⚠️ | 48,842 × 14 | ~4 MB | Classification (+fairness) | ML, SQL |
-| Statlog German Credit ⚠️ | 1,000 × 20 | 100 KB | Classification (+fairness) | ML |
+| **[Mushroom](https://archive.ics.uci.edu/dataset/73/mushroom)** | 8,124 × 22 | 365 KB | Classification (edible/poison) | ML, Pandas |
+| **[Bike Sharing](https://archive.ics.uci.edu/dataset/275/bike+sharing+dataset)** | 17,389 × 13 | ~1 MB | Regression + seasonality | ML, stats, time series |
+| **[Banknote Authentication](https://archive.ics.uci.edu/dataset/267/banknote+authentication)** | 1,372 × 4 | 45 KB | Binary classification | ML, stats |
+| **[Glass Identification](https://archive.ics.uci.edu/dataset/42/glass+identification)** | 214 × 9 | 12 KB | Multiclass (forensic) | ML, stats |
+| **[Seeds](https://archive.ics.uci.edu/dataset/236/seeds)** | 210 × 7 | 9 KB | Classification / clustering | ML, stats |
+| **[Zoo](https://archive.ics.uci.edu/dataset/111/zoo)** | 101 × 16 | 4 KB | Multiclass (boolean attrs) | ML, Pandas |
+| **[Wholesale Customers](https://archive.ics.uci.edu/dataset/292/wholesale+customers)** | 440 × 7 | 15 KB | Clustering | clustering, Pandas |
+| [Car Evaluation](https://archive.ics.uci.edu/dataset/19/car+evaluation) | 1,728 × 6 | 51 KB | Ordinal classification | ML |
+| [Student Performance (UCI)](https://archive.ics.uci.edu/dataset/320/student+performance) | 649 × 30 | ~40 KB | Classification / regression | ML, stats |
+| [Raisin](https://archive.ics.uci.edu/dataset/850/raisin) | 900 × 7 | 112 KB | Binary classification | ML, stats |
+| [Rice (Cammeo / Osmancik)](https://archive.ics.uci.edu/dataset/545/rice+cammeo+and+osmancik) | 3,810 × 7 | 168 KB | Binary classification | ML, stats |
+| [Yeast](https://archive.ics.uci.edu/dataset/110/yeast) | 1,484 × 8 | 93 KB | Classification | ML |
+| [Ionosphere](https://archive.ics.uci.edu/dataset/52/ionosphere) | 351 × 34 | 75 KB | Binary classification | ML |
+| [Energy Efficiency](https://archive.ics.uci.edu/dataset/242/energy+efficiency) | 768 × 8 | 74 KB | Regression | ML, stats |
+| [Forest Fires](https://archive.ics.uci.edu/dataset/162/forest+fires) | 517 × 12 | 25 KB | Regression | ML, stats |
+| [Concrete Compressive Strength](https://archive.ics.uci.edu/dataset/165/concrete+compressive+strength) | 1,030 × 8 | 122 KB (.xls) | Regression | ML, stats |
+| [Bank Marketing](https://archive.ics.uci.edu/dataset/222/bank+marketing) | 45,211 × 16 | 566 KB | Classification (imbalanced) | ML, SQL |
+| [Default of Credit Card Clients](https://archive.ics.uci.edu/dataset/350/default+of+credit+card+clients) | 30,000 × 23 | 5.3 MB | Classification | ML |
+| [Letter Recognition](https://archive.ics.uci.edu/dataset/59/letter+recognition) | 20,000 × 16 | 696 KB | Classification | ML |
+| [Optical / Pen Digits](https://archive.ics.uci.edu/dataset/80/optical+recognition+of+handwritten+digits) | 5,620 / 10,992 | ~0.6 / 1.6 MB | Classification | ML |
+| [Adult / Census Income](https://archive.ics.uci.edu/dataset/2/adult) ⚠️ | 48,842 × 14 | ~4 MB | Classification (+fairness) | ML, SQL |
+| [Statlog German Credit](https://archive.ics.uci.edu/dataset/144/statlog+german+credit+data) ⚠️ | 1,000 × 20 | 100 KB | Classification (+fairness) | ML |
 
-⚠️ **Sensitive-attribute / ethics flags (pedagogical, not license):** **Adult** (race, sex) and **German Credit** ("foreign worker," sex/marital status) are useful for fairness lessons but need framing. **Online Retail I/II** (CC BY 4.0) are great e-commerce sets but **too large (22–43 MB) — sample them**. The dataset historically named **"Pima Indians Diabetes" — avoid** (collected without modern consent; the name reduces a community to a disease label); use CDC BRFSS if a diabetes set is needed.
+⚠️ **Sensitive-attribute / ethics flags (pedagogical, not license):** **[Adult / Census Income](https://archive.ics.uci.edu/dataset/2/adult)** (race, sex) and **[Statlog German Credit](https://archive.ics.uci.edu/dataset/144/statlog+german+credit+data)** ("foreign worker," sex/marital status) are useful for fairness lessons but need framing. **Online Retail I/II** (CC BY 4.0) are great e-commerce sets but **too large (22–43 MB) — sample them**. The dataset historically named **"Pima Indians Diabetes" — avoid** (collected without modern consent; the name reduces a community to a disease label); use CDC BRFSS if a diabetes set is needed.
 
 ### 14.3 Hugging Face Hub — cleanly-licensed text & tabular
 
-The Hub is license-murky; verify each card's `license:` tag. (Round 1 already covered UCI SMS Spam / Spambase / Sentiment Sentences.)
+The Hub is license-murky; verify each card's `license:` tag. (Round 1 already covered [UCI SMS Spam Collection](https://archive.ics.uci.edu/dataset/228/sms+spam+collection) / [Spambase](https://archive.ics.uci.edu/dataset/94/spambase) / [Sentiment Labelled Sentences](https://archive.ics.uci.edu/dataset/331/sentiment+labelled+sentences).)
 
 🟢 **Safe (commercial + redistribute):**
 
 | Dataset | Rows | License | Tier | Course |
 | --- | --- | --- | --- | --- |
-| `PolyAI/banking77` | 13,083 | CC BY 4.0 | 🟢B | NLP (intent classification) |
-| `google-research-datasets/poem_sentiment` | 1,101 | CC BY 4.0 | 🟢B | NLP (Gutenberg-sourced) |
-| `leondz/wnut_17` | 5,690 | CC BY 4.0 | 🟢B | NLP (NER / token tagging) |
-| `karpathy/tiny_shakespeare` | ~40K lines | public-domain text (no tag) | 🟢A | NLP (char-level LM) |
-| `CFPB/consumer-finance-complaints` | 1M+ | CC0 | 🟢A (large→sample) | Pandas / stats |
-| `google/civil_comments` | 2M | CC0 | 🟢A (large→sample) | stats (toxicity regression) |
+| [`PolyAI/banking77`](https://huggingface.co/datasets/PolyAI/banking77) | 13,083 | CC BY 4.0 | 🟢B | NLP (intent classification) |
+| [`google-research-datasets/poem_sentiment`](https://huggingface.co/datasets/google-research-datasets/poem_sentiment) | 1,101 | CC BY 4.0 | 🟢B | NLP (Gutenberg-sourced) |
+| [`leondz/wnut_17`](https://huggingface.co/datasets/leondz/wnut_17) | 5,690 | CC BY 4.0 | 🟢B | NLP (NER / token tagging) |
+| [`karpathy/tiny_shakespeare`](https://huggingface.co/datasets/karpathy/tiny_shakespeare) | ~40K lines | public-domain text (no tag) | 🟢A | NLP (char-level LM) |
+| [`CFPB/consumer-finance-complaints`](https://huggingface.co/datasets/CFPB/consumer-finance-complaints) | 1M+ | CC0 | 🟢A (large→sample) | Pandas / stats |
+| [`google/civil_comments`](https://huggingface.co/datasets/google/civil_comments) | 2M | CC0 | 🟢A (large→sample) | stats (toxicity regression) |
 
-🟡 **Copyleft (CC BY-SA — keep the SA license on re-host):** `Salesforce/wikitext`, `rajpurkar/squad` & `squad_v2`, `fancyzhx/dbpedia_14`.
+🟡 **Copyleft (CC BY-SA — keep the SA license on re-host):** [`Salesforce/wikitext`](https://huggingface.co/datasets/Salesforce/wikitext), [`rajpurkar/squad`](https://huggingface.co/datasets/rajpurkar/squad) & `squad_v2`, [`fancyzhx/dbpedia_14`](https://huggingface.co/datasets/fancyzhx/dbpedia_14).
 
 🔴 **AVOID (don't assume these common ones are free):** `ag_news` (non-commercial source), `stanfordnlp/imdb` / `rotten_tomatoes` / `sst2` (scraped movie reviews / IMDb-NC), `yelp_*` (Yelp agreement: NC + no redistribution), `tweet_eval` (Twitter/X terms), `conll2003` (Reuters), `financial_phrasebank` (CC BY-NC-SA), `bookcorpus` (copyright), `openwebtext` (CC0 packaging only — scraped content), `Open-Orca/OpenOrca` (OpenAI ToS on GPT outputs), `dair-ai/emotion` (research-only), `common_voice` (moved off HF + huge).
 
@@ -385,17 +385,17 @@ Mostly US-federal **public domain** or **CC BY**. Evergreen if you snapshot a fi
 
 | Dataset | What | Size | License | Tier | Course |
 | --- | --- | --- | --- | --- | --- |
-| **USDA FoodData Central — SR Legacy** ⭐ | Nutrient composition of 7,793 foods | 6.7 MB zip | US-gov public domain (frozen 2018) | 🟢A | Pandas, stats, viz, SQL |
-| **Natural Earth** (countries, places) ⭐ | Cartographic vector data | 2.7–4.7 MB | **Public domain** (no attribution) | 🟢A | maps / choropleths |
-| **OurAirports** ⭐ | Airports table (clean OpenFlights substitute) | few MB | **CC0** | 🟢A | SQL, geo |
-| **GeoNames** (cities1000/5000/15000) | Global populated-places gazetteer | few MB | CC BY 4.0 | 🟢B | geo viz, SQL joins |
-| **NASA Exoplanet Archive** | ~6,300 confirmed exoplanets | <10 MB | US-gov public domain | 🟢A | sci computing, stats |
-| **Penn World Table 11.0** ⭐ | Macro/productivity, 185 countries 1950–2023 | small | CC BY 4.0 | 🟢B | stats, econ, time series |
-| **UK STATS19 Road Safety** | Collisions + Vehicles + Casualties (multi-table) | ~50 MB/yr (sample) | OGL v3 (commercial OK) | 🟢B | SQL joins, stats |
-| FBI UCR (SRS 1960–2014) | Crime counts by state/year | small–MB | US-gov public domain | 🟢A | stats, viz |
-| US BTS T-100 | Domestic air traffic by route/month | MB/yr | US-gov public domain | 🟢A | SQL, Pandas |
-| USGS NWIS water quality | Measurements (pH, DO, nutrients…) | filtered MB | US-gov public domain | 🟢A | sci computing |
-| Eurostat (e.g. `une_rt_a_h`) | EU unemployment 1992–2020 | <1 MB | CC BY 4.0 (**EU data only**) | 🟡C | stats, time series |
+| **[USDA FoodData Central](https://fdc.nal.usda.gov/download-datasets/) — SR Legacy** ⭐ | Nutrient composition of 7,793 foods | 6.7 MB zip | US-gov public domain (frozen 2018) | 🟢A | Pandas, stats, viz, SQL |
+| **[Natural Earth](https://www.naturalearthdata.com/downloads/)** (countries, places) ⭐ | Cartographic vector data | 2.7–4.7 MB | **Public domain** (no attribution) | 🟢A | maps / choropleths |
+| **[OurAirports](https://ourairports.com/data/)** ⭐ | Airports table (clean OpenFlights substitute) | few MB | **CC0** | 🟢A | SQL, geo |
+| **[GeoNames](https://www.geonames.org/export/)** (cities1000/5000/15000) | Global populated-places gazetteer | few MB | CC BY 4.0 | 🟢B | geo viz, SQL joins |
+| **[NASA Exoplanet Archive](https://exoplanetarchive.ipac.caltech.edu/)** | ~6,300 confirmed exoplanets | <10 MB | US-gov public domain | 🟢A | sci computing, stats |
+| **[Penn World Table 11.0](https://www.rug.nl/ggdc/productivity/pwt/)** ⭐ | Macro/productivity, 185 countries 1950–2023 | small | CC BY 4.0 | 🟢B | stats, econ, time series |
+| **[UK STATS19 Road Safety](https://www.gov.uk/government/statistical-data-sets/road-safety-open-data)** | Collisions + Vehicles + Casualties (multi-table) | ~50 MB/yr (sample) | OGL v3 (commercial OK) | 🟢B | SQL joins, stats |
+| [FBI UCR](https://ucr.fbi.gov/crime-in-the-u.s) (SRS 1960–2014) | Crime counts by state/year | small–MB | US-gov public domain | 🟢A | stats, viz |
+| [US BTS T-100](https://www.transtats.bts.gov/) | Domestic air traffic by route/month | MB/yr | US-gov public domain | 🟢A | SQL, Pandas |
+| [USGS NWIS](https://waterdata.usgs.gov/nwis) water quality | Measurements (pH, DO, nutrients…) | filtered MB | US-gov public domain | 🟢A | sci computing |
+| [Eurostat](https://ec.europa.eu/eurostat/data/database) (e.g. `une_rt_a_h`) | EU unemployment 1992–2020 | <1 MB | CC BY 4.0 (**EU data only**) | 🟡C | stats, time series |
 
 🔴 **AVOID:** **GTD (Global Terrorism Database)** — explicitly non-commercial / non-redistributable. **CDC NHANES** — files are PD but a statutory clause limits use to "statistical reporting and analysis," which conflicts with re-hosting as a course asset (confirm with NCHS first). **ICPSR** deposits — registration + no redistribution.
 
@@ -404,10 +404,10 @@ Mostly US-federal **public domain** or **CC BY**. Evergreen if you snapshot a fi
 Beyond Chinook / Sakila / Northwind (§2):
 
 🟢 **Recommended:**
-- **`unitedstates/congress-legislators`** ⭐ — **CC0**, genuinely relational (legislators, terms, committees, memberships); clean and small. <https://github.com/unitedstates/congress-legislators>
-- **UK STATS19** ⭐ — 3 linked tables (Collisions / Vehicles / Casualties), OGL v3, commercial OK (see §14.4).
-- **DataHub.io reference tables** ⭐ — `country-codes`, `language-codes`, `continent-codes` are **PDDL (public domain)** lookup tables; `gdp` / `inflation` are CC BY 4.0 (World Bank). Ideal small dimension tables to JOIN against. <https://datahub.io/core>
-- **MusicBrainz core** — **CC0** (50+ tables: artists / releases / recordings / labels…); rich but multi-GB → host a curated subset and **exclude** the CC BY-NC-SA supplementary tables (ratings, tags, edit history).
+- **[`unitedstates/congress-legislators`](https://github.com/unitedstates/congress-legislators)** ⭐ — **CC0**, genuinely relational (legislators, terms, committees, memberships); clean and small. <https://github.com/unitedstates/congress-legislators>
+- **[UK STATS19](https://www.gov.uk/government/statistical-data-sets/road-safety-open-data)** ⭐ — 3 linked tables (Collisions / Vehicles / Casualties), OGL v3, commercial OK (see §14.4).
+- **[DataHub.io reference tables](https://datahub.io/core)** ⭐ — `country-codes`, `language-codes`, `continent-codes` are **PDDL (public domain)** lookup tables; `gdp` / `inflation` are CC BY 4.0 (World Bank). Ideal small dimension tables to JOIN against. <https://datahub.io/core>
+- **[MusicBrainz](https://musicbrainz.org/doc/MusicBrainz_Database/Download) core** — **CC0** (50+ tables: artists / releases / recordings / labels…); rich but multi-GB → host a curated subset and **exclude** the CC BY-NC-SA supplementary tables (ratings, tags, edit history).
 
 🟡 **Caution / 🔴 avoid:**
 
@@ -415,22 +415,22 @@ Beyond Chinook / Sakila / Northwind (§2):
 | --- | --- |
 | 🔴 **MovieLens** (GroupLens) | **Non-commercial** — *"may not use… for any commercial or revenue-bearing purposes"*; redistribution must carry the same restriction *(hand-verified)*. The classic recommender dataset is **out**. |
 | 🔴 **IMDb non-commercial datasets** | "personal and non-commercial use"; "must not be republished… to create any kind of database" |
-| 🟡 **OpenFlights** (airports/airlines/routes) | ODbL **+ a separate commercial-license ask**, and route data frozen since 2014 → use **OurAirports (CC0)** for the airports table instead |
+| 🟡 **OpenFlights** (airports/airlines/routes) | ODbL **+ a separate commercial-license ask**, and route data frozen since 2014 → use **[OurAirports](https://ourairports.com/data/) (CC0)** for the airports table instead |
 | 🟡 **goodbooks-10k** | CC BY-SA 4.0 (copyleft) + ~230 MB |
 | 🟡 **Stack Exchange dump** | CC BY-SA 4.0, but ~92 GB (use one small site), per-post attribution, and **watermarking in post-2025-06 dumps** |
 | 🟡 **Open Food Facts** | ODbL / DbCL copyleft + large; not natively relational |
 | ❓ **Olist Brazilian E-Commerce** | Popular 9-table e-commerce set, but its **license could not be confirmed** (possibly CC BY-NC-SA) — **verify on the Kaggle page before any use** |
-| 🟢 **Lichess** | CC0, but PGN games aren't relational; the Puzzles CSV (~250 MB) is a single flat table |
+| 🟢 **[Lichess](https://database.lichess.org/)** | CC0, but PGN games aren't relational; the Puzzles CSV (~250 MB) is a single flat table |
 
 ### 14.6 Where to find more — repositories & discovery tools
 
 **Research-data repositories (filter by license):**
-- **Dryad** ⭐ — *every* dataset is **CC0** (it accepts nothing else); curated, paper-linked, usually small tabular. Best default for guaranteed-clean data. <https://datadryad.org>
+- **[Dryad](https://datadryad.org)** ⭐ — *every* dataset is **CC0** (it accepts nothing else); curated, paper-linked, usually small tabular. Best default for guaranteed-clean data. <https://datadryad.org>
 - **Zenodo** (CERN) — CC0 default; filter the search facet to `CC0-1.0` / `CC-BY-4.0`. **Harvard Dataverse** — CC0 default (e.g., US House elections 1976–2024, CC0). **Figshare** — CC BY 4.0 default. **Mendeley Data** — mixed; filter to CC0 / CC BY. **OSF** — mixed; verify per dataset.
 - 🔴 **PhysioNet** (MIMIC, etc.) — credentialed, research-only, no redistribution.
 
 **Discovery tools:**
-- **Google Dataset Search** ⭐ — has a **"Usage rights → Commercial use allowed"** filter (the most license-aware discovery tool). <https://datasetsearch.research.google.com>
+- **[Google Dataset Search](https://datasetsearch.research.google.com)** ⭐ — has a **"Usage rights → Commercial use allowed"** filter (the most license-aware discovery tool). <https://datasetsearch.research.google.com>
 - **AWS Open Data Registry** (per-dataset license field; grep the YAML in `awslabs/open-data-registry`), **Awesome Public Datasets** (GitHub link list — verify each), **Data Is Plural** (Jeremy Singer-Vine's archive of niche datasets), **DataHub.io** (clean PDDL / CC-BY cores), **Rdatasets** (3,499 CSVs — but the maintainer can't guarantee individual licenses; verify case-by-case).
 
 ---
@@ -438,7 +438,7 @@ Beyond Chinook / Sakila / Northwind (§2):
 ## 15. Quick-reference — second-pass picks & expanded AVOID
 
 🟢 **New "ship-with-attribution" picks (cleanest of the second pass):**
-USDA FoodData Central (PD) · Natural Earth (PD) · OurAirports (CC0) · `unitedstates/congress-legislators` (CC0) · DataHub `country-codes`/`language-codes` (PDDL) · NASA Exoplanet Archive (PD) · GeoNames (CC BY 4.0) · Penn World Table 11.0 (CC BY 4.0) · UK STATS19 (OGL) · `PolyAI/banking77`, `poem_sentiment`, `wnut_17` (CC BY 4.0) · `tiny_shakespeare` (PD) · Heart Failure Clinical Records (CC BY 4.0) · and the UCI sweep (Mushroom, Bike Sharing, Banknote, Glass, Seeds, Zoo, Wholesale Customers…).
+[USDA FoodData Central](https://fdc.nal.usda.gov/download-datasets/) (PD) · [Natural Earth](https://www.naturalearthdata.com/downloads/) (PD) · [OurAirports](https://ourairports.com/data/) (CC0) · [`unitedstates/congress-legislators`](https://github.com/unitedstates/congress-legislators) (CC0) · [DataHub](https://datahub.io/core) `country-codes`/`language-codes` (PDDL) · [NASA Exoplanet Archive](https://exoplanetarchive.ipac.caltech.edu/) (PD) · [GeoNames](https://www.geonames.org/export/) (CC BY 4.0) · [Penn World Table 11.0](https://www.rug.nl/ggdc/productivity/pwt/) (CC BY 4.0) · [UK STATS19](https://www.gov.uk/government/statistical-data-sets/road-safety-open-data) (OGL) · [`PolyAI/banking77`](https://huggingface.co/datasets/PolyAI/banking77), [`poem_sentiment`](https://huggingface.co/datasets/google-research-datasets/poem_sentiment), [`wnut_17`](https://huggingface.co/datasets/leondz/wnut_17) (CC BY 4.0) · [`tiny_shakespeare`](https://huggingface.co/datasets/karpathy/tiny_shakespeare) (PD) · [Heart Failure Clinical Records](https://archive.ics.uci.edu/dataset/519/heart+failure+clinical+records) (CC BY 4.0) · and the UCI sweep ([Mushroom](https://archive.ics.uci.edu/dataset/73/mushroom), [Bike Sharing](https://archive.ics.uci.edu/dataset/275/bike+sharing+dataset), [Banknote Authentication](https://archive.ics.uci.edu/dataset/267/banknote+authentication), [Glass Identification](https://archive.ics.uci.edu/dataset/42/glass+identification), [Seeds](https://archive.ics.uci.edu/dataset/236/seeds), [Zoo](https://archive.ics.uci.edu/dataset/111/zoo), [Wholesale Customers](https://archive.ics.uci.edu/dataset/292/wholesale+customers)…).
 
 🔴 **Expanded AVOID (added this pass):**
 
@@ -454,7 +454,7 @@ USDA FoodData Central (PD) · Natural Earth (PD) · OurAirports (CC0) · `united
 | **GTD** (Global Terrorism Database) | Explicitly non-commercial |
 | **CDC NHANES** | Statutory "statistical analysis only" restriction |
 | **PhysioNet** (MIMIC, …) | Credentialed, research-only |
-| **OpenFlights** (as-is) | ODbL + commercial-license ask → use OurAirports |
+| **OpenFlights** (as-is) | ODbL + commercial-license ask → use [OurAirports](https://ourairports.com/data/) |
 | **Olist** Brazilian E-Commerce | License unconfirmed — verify first |
 
 ---
@@ -478,16 +478,16 @@ Treat every entry below as 🔴 (or the 🔴🔴 privacy tier in §16.8).
 | IMDB 5000 / Box Office Mojo | IMDb (Amazon) | No-scraping ToS; the IMDB 5000 set was **DMCA'd off Kaggle** | IMDb's **official non-commercial TSVs** (their terms); TMDB API; Wikidata box office (CC0) |
 | TMDB 5000 / The Movies Dataset | TMDB API (+ MovieLens) | API ToS bars "archived/cached datasets" & commercial use; MovieLens part is **non-commercial** | TMDB API with attribution; MovieLens direct (research only) |
 | Netflix titles | Netflix (no public API) | No-scraping ToS; catalog is Netflix's DB | TMDB "watch providers" endpoint |
-| Rotten Tomatoes reviews | Fandango / RT | No-scraping ToS; reviewer copyright | Cornell movie-review / SST (research); **UCI Sentiment Sentences** (CC BY) |
-| Spotify audio-feature sets (114k–600k tracks) | Spotify Web API | Policy bans standalone metadata, DBs, and ML training; **the `audio-features` endpoint was deprecated Nov 2024** | **MusicBrainz** (CC0) metadata; **FMA *metadata*** (CC BY 4.0; audio is per-track); compute features with **Essentia** |
-| Million Song Dataset | Echo Nest → Spotify | Inherits Spotify terms; Taste Profile subset = user data (privacy) | **FMA** dataset; MusicBrainz |
-| Genius / AZLyrics lyrics | Music publishers (via Genius/AZ) | **Highest copyright certainty** — lyrics are publisher-owned; no scraper holds a license (cf. *Genius v. Google*, preempted by copyright) | None at scale; license via Musixmatch/LyricFind; for NLP use Gutenberg poetry or **OpenSubtitles** |
+| Rotten Tomatoes reviews | Fandango / RT | No-scraping ToS; reviewer copyright | Cornell movie-review / SST (research); **[UCI Sentiment Labelled Sentences](https://archive.ics.uci.edu/dataset/331/sentiment+labelled+sentences)** (CC BY) |
+| Spotify audio-feature sets (114k–600k tracks) | Spotify Web API | Policy bans standalone metadata, DBs, and ML training; **the `audio-features` endpoint was deprecated Nov 2024** | **[MusicBrainz](https://musicbrainz.org/doc/MusicBrainz_Database/Download)** (CC0) metadata; **[FMA](https://github.com/mdeff/fma) *metadata*** (CC BY 4.0; audio is per-track); compute features with **Essentia** |
+| Million Song Dataset | Echo Nest → Spotify | Inherits Spotify terms; Taste Profile subset = user data (privacy) | **[FMA](https://github.com/mdeff/fma)** dataset; [MusicBrainz](https://musicbrainz.org/doc/MusicBrainz_Database/Download) |
+| Genius / AZLyrics lyrics | Music publishers (via Genius/AZ) | **Highest copyright certainty** — lyrics are publisher-owned; no scraper holds a license (cf. *Genius v. Google*, preempted by copyright) | None at scale; license via Musixmatch/LyricFind; for NLP use [Gutenberg Poetry Corpus](https://github.com/aparrish/gutenberg-poetry-corpus) or **OpenSubtitles** |
 
 ### 16.2 Sports
 
 | Dataset | Scraped from | The specific issue | Cleaner alternative |
 | --- | --- | --- | --- |
-| sports-reference family (NBA/NFL/MLB/NHL) | sports-reference.com (paid 3rd-party data) | Explicit "no scraping / no competing database"; rate-limited & IP-blocked | **Retrosheet** (commercial use OK + attribution ✓), **Lahman** (CC BY-SA) for baseball; **nflverse** (CC BY 4.0), **OpenPowerlifting** (public domain), `nba_api` |
+| sports-reference family (NBA/NFL/MLB/NHL) | sports-reference.com (paid 3rd-party data) | Explicit "no scraping / no competing database"; rate-limited & IP-blocked | **[Retrosheet](https://www.retrosheet.org/)** (commercial use OK + attribution ✓), **[Lahman Baseball](https://github.com/chadwickbureau/baseballdatabank)** (CC BY-SA) for baseball; **[nflverse](https://github.com/nflverse/nflverse-data)** (CC BY 4.0), **[OpenPowerlifting](https://openpowerlifting.gitlab.io/opl-csv/)** (public domain), `nba_api` |
 | 120 Years of Olympic History | sports-reference (now Olympedia) | Scraped → CC0 tag invalid; IOC marks | **Olympedia** (check terms); IOC Olympic Data Feed |
 | FIFA / EA FC players (SoFIFA) | EA Sports IP via SoFIFA | EA owns the in-game ratings; player attributes are group-licensed | no clean commercial event-data swap — **StatsBomb** is research-licensed (verify its `LICENSE.pdf`); see §17.2 |
 
@@ -495,8 +495,8 @@ Treat every entry below as 🔴 (or the 🔴🔴 privacy tier in §16.8).
 
 | Dataset | Scraped from | The specific issue | Cleaner alternative |
 | --- | --- | --- | --- |
-| Amazon reviews (SNAP / McAuley / Amazon Reviews 2023) | Amazon | No-scraping ToS; no license; review pages behind login since Nov 2024 | **UCI Sentiment Sentences** (CC BY); MovieLens (research) |
-| Yelp Open Dataset | Yelp (self-distributed) | **Explicitly non-commercial + no redistribution** (each user must accept Yelp's agreement) | Yelp Fusion API; UCI Sentiment Sentences |
+| Amazon reviews (SNAP / McAuley / Amazon Reviews 2023) | Amazon | No-scraping ToS; no license; review pages behind login since Nov 2024 | **[UCI Sentiment Labelled Sentences](https://archive.ics.uci.edu/dataset/331/sentiment+labelled+sentences)** (CC BY); MovieLens (research) |
+| Yelp Open Dataset | Yelp (self-distributed) | **Explicitly non-commercial + no redistribution** (each user must accept Yelp's agreement) | Yelp Fusion API; [UCI Sentiment Labelled Sentences](https://archive.ics.uci.edu/dataset/331/sentiment+labelled+sentences) |
 | TripAdvisor (scraped) | TripAdvisor | No-scraping ToS; reviewer PII | None equivalent |
 | Google Play / Apple App Store apps | Google / Apple | No-scraping ToS; developer copyrights | Official developer APIs |
 | Olist Brazilian E-Commerce | **Olist (self-published)** | ✅ valid license — but **CC BY-NC-SA** (NC blocks commercial use) | This *is* the clean option; honor NC-SA, so still not for commercial re-host |
@@ -505,7 +505,7 @@ Treat every entry below as 🔴 (or the 🔴🔴 privacy tier in §16.8).
 
 | Dataset | Scraped from | The specific issue | Cleaner alternative |
 | --- | --- | --- | --- |
-| Sentiment140, Twitter US Airline Sentiment | Twitter / X | Redistributing full tweet **text** violates X's ID-only policy; CC tag covers only the *annotations*; usernames = PII | **UCI SMS Spam** / Sentiment Sentences; **SST-2** (research) |
+| Sentiment140, Twitter US Airline Sentiment | Twitter / X | Redistributing full tweet **text** violates X's ID-only policy; CC tag covers only the *annotations*; usernames = PII | **[UCI SMS Spam Collection](https://archive.ics.uci.edu/dataset/228/sms+spam+collection)** / [Sentiment Labelled Sentences](https://archive.ics.uci.edu/dataset/331/sentiment+labelled+sentences); **SST-2** (research) |
 | Reddit / Pushshift | Reddit | Reddit **sanctioned Pushshift** (2023); bulk redistribution barred; posts contain PII | Reddit Academic API; ConvoKit (same upstream caveat) |
 
 ### 16.5 News
@@ -521,10 +521,10 @@ Treat every entry below as 🔴 (or the 🔴🔴 privacy tier in §16.8).
 
 | Dataset | Scraped from | The specific issue | Cleaner alternative |
 | --- | --- | --- | --- |
-| Common Crawl | The open web | ToU **shifts AI-use indemnity onto you**; ~45% of derived C4 is ToS-restricted; copyrighted content; active publisher lawsuits | **Common Corpus** (2025), **Wikipedia**, **Gutenberg** |
+| Common Crawl | The open web | ToU **shifts AI-use indemnity onto you**; ~45% of derived C4 is ToS-restricted; copyrighted content; active publisher lawsuits | **Common Corpus** (2025), **Wikipedia**, **[Gutenberg](https://www.gutenberg.org/)** |
 | C4 | Common Crawl (2019) | ODC-BY covers Google's *curation*, not the underlying content | FineWeb (same base caveat); Common Corpus |
-| OpenWebText | Reddit-linked web pages | CC0 covers *packaging only*; card states "we don't own the text" | Common Corpus; Gutenberg; Wikipedia |
-| BookCorpus | Smashwords | **Documented copyright violations** — includes paid and "do not redistribute" books | **Project Gutenberg**, **Standard Ebooks** (public domain) |
+| OpenWebText | Reddit-linked web pages | CC0 covers *packaging only*; card states "we don't own the text" | Common Corpus; [Gutenberg](https://www.gutenberg.org/); Wikipedia |
+| BookCorpus | Smashwords | **Documented copyright violations** — includes paid and "do not redistribute" books | **[Project Gutenberg](https://www.gutenberg.org/)**, **Standard Ebooks** (public domain) |
 | The Pile (**Books3**) | Bibliotik (pirate library) | **Books3 = pirated books**; active lawsuits + DMCA takedown | **Common Pile v0.1**, **Dolma** (clean rebuilds) |
 
 ### 16.7 Other commonly-scraped
@@ -532,7 +532,7 @@ Treat every entry below as 🔴 (or the 🔴🔴 privacy tier in §16.8).
 | Dataset | Scraped from | The specific issue | Cleaner alternative |
 | --- | --- | --- | --- |
 | Goodreads books / reviews | Goodreads (Amazon) | No-scraping ToS; public API shut down 2022 | **Open Library** (CC0); Book-Crossing (research) |
-| Zillow listings | Zillow | No-scraping ToS; cease-&-desist history; MLS rights; Zestimate IP | **Redfin Data Center** (free housing CSVs — confirm terms); **HUD** / **Census ACS** (public domain); **Ames Housing** (§3) |
+| Zillow listings | Zillow | No-scraping ToS; cease-&-desist history; MLS rights; Zestimate IP | **Redfin Data Center** (free housing CSVs — confirm terms); **HUD** / **Census ACS** (public domain); **[Ames Housing](https://jse.amstat.org/v19n3/decock/DataDocumentation.txt)** (§3) |
 
 ### 16.8 🔴🔴 Privacy / PII tier — avoid entirely (GDPR/CCPA territory, not just licensing)
 
@@ -548,7 +548,7 @@ When a scraped set contains **identifiable people** — names, profiles, faces, 
 The obvious "big web" sources are **openly licensed**, not illegally scraped:
 
 - **Wikipedia / Wikimedia dumps** — CC BY-SA (bulk download is the *intended* access); **Wikidata** — CC0.
-- **Project Gutenberg / Standard Ebooks** — public domain (strip the PG header).
+- **[Project Gutenberg](https://www.gutenberg.org/) / Standard Ebooks** — public domain (strip the PG header).
 - **GDELT** (global news events) — open · **O*NET / BLS / US Census** — US-gov public domain · **Stack Overflow Developer Survey** — ODbL · **Redfin Data Center** — free housing CSVs.
 
 ### Clean-substitute cheat sheet
@@ -556,22 +556,22 @@ The obvious "big web" sources are **openly licensed**, not illegally scraped:
 | If you reached for (scraped)… | Use instead |
 | --- | --- |
 | Movie metadata / recommender | TMDB API (attrib) · MovieLens (research) |
-| Movie-review sentiment | UCI Sentiment Sentences (CC BY) · Cornell/SST (research) |
-| Music metadata / features | MusicBrainz (CC0) · FMA metadata (CC BY 4.0) · Essentia |
-| Baseball / sports stats | **Retrosheet** (commercial OK) · Lahman (CC BY-SA) · nflverse (CC BY 4.0) · OpenPowerlifting (PD) |
-| Product-review NLP | UCI Sentiment Sentences (CC BY) |
-| Tweets / social sentiment | UCI SMS Spam · SST-2 (research) |
-| News classification | GDELT (open) · arXiv abstracts (CC0) · 20 Newsgroups (unlicensed — verify) |
-| LLM text corpus | Common Corpus / Common Pile (clean) · Wikipedia · Gutenberg |
-| Books (full text) | Project Gutenberg · Standard Ebooks · Open Library (CC0) |
-| Housing prices | Redfin Data Center · Census ACS / HUD (PD) · Ames Housing (§3) |
+| Movie-review sentiment | [UCI Sentiment Labelled Sentences](https://archive.ics.uci.edu/dataset/331/sentiment+labelled+sentences) (CC BY) · Cornell/SST (research) |
+| Music metadata / features | [MusicBrainz](https://musicbrainz.org/doc/MusicBrainz_Database/Download) (CC0) · [FMA](https://github.com/mdeff/fma) metadata (CC BY 4.0) · Essentia |
+| Baseball / sports stats | **[Retrosheet](https://www.retrosheet.org/)** (commercial OK) · [Lahman Baseball](https://github.com/chadwickbureau/baseballdatabank) (CC BY-SA) · [nflverse](https://github.com/nflverse/nflverse-data) (CC BY 4.0) · [OpenPowerlifting](https://openpowerlifting.gitlab.io/opl-csv/) (PD) |
+| Product-review NLP | [UCI Sentiment Labelled Sentences](https://archive.ics.uci.edu/dataset/331/sentiment+labelled+sentences) (CC BY) |
+| Tweets / social sentiment | [UCI SMS Spam Collection](https://archive.ics.uci.edu/dataset/228/sms+spam+collection) · SST-2 (research) |
+| News classification | GDELT (open) · [arXiv metadata](https://info.arxiv.org/help/bulk_data_s3.html) abstracts (CC0) · 20 Newsgroups (unlicensed — verify) |
+| LLM text corpus | Common Corpus / Common Pile (clean) · Wikipedia · [Gutenberg](https://www.gutenberg.org/) |
+| Books (full text) | [Project Gutenberg](https://www.gutenberg.org/) · Standard Ebooks · Open Library (CC0) |
+| Housing prices | Redfin Data Center · Census ACS / HUD (PD) · [Ames Housing](https://jse.amstat.org/v19n3/decock/DataDocumentation.txt) (§3) |
 | Jobs / salaries | O*NET · BLS OES (PD) · ESCO (CC BY) · SO Developer Survey (ODbL) |
 
 ---
 
 ## 17. Even more real-world datasets (fourth pass — museums · sports · science · civic · GitHub)
 
-This pass browsed GitHub, specialized sites, and open-data portals directly (per request) and adds ~90 more datasets/sources. Same tiers; 🔴 = don't re-host. Hand-verified this pass: OpenPowerlifting (PD), geoBoundaries (CC BY 4.0), National Gallery of Art (CC0), StatsBomb (correction below).
+This pass browsed GitHub, specialized sites, and open-data portals directly (per request) and adds ~90 more datasets/sources. Same tiers; 🔴 = don't re-host. Hand-verified this pass: [OpenPowerlifting](https://openpowerlifting.gitlab.io/opl-csv/) (PD), [geoBoundaries](https://www.geoboundaries.org/) (CC BY 4.0), [National Gallery of Art](https://github.com/NationalGalleryOfArt/opendata) (CC0), StatsBomb (correction below).
 
 > **Correction to §16:** I'd listed **StatsBomb Open Data** as a clean substitute for scraped soccer data. Its README restricts use to *"research projects and genuine interest in football analytics"* under a custom `LICENSE.pdf` and does **not** clearly permit commercial use → treat as 🟡 **research-licensed, verify before use**, not a clean swap.
 
@@ -581,11 +581,11 @@ Evergreen (historical art/artifacts), mostly **CC0**, and many ship as multiple 
 
 | Dataset | License | Size | Notes / course |
 | --- | --- | --- | --- |
-| **National Gallery of Art** ⭐ | **CC0** | 130K artworks, **15 relational CSVs** | Best museum **SQL** schema (objects/constituents/locations…) |
-| **MoMA** (collection + exhibitions) ⭐ | **CC0** | 126K + 15K + 1.8K rows | Multi-table, famous → Pandas/SQL |
-| The Met | CC0 | 470K rows / 303 MB (subset) | Pandas/viz; filter by department |
-| Cooper Hewitt · Cleveland · Carnegie · Whitney · Walters · Williams College | CC0 | 10K–215K | Right-sized museum collections |
-| **Tate** | **CC0** (not the assumed BY-NC-ND) | 70K + 3.5K | Pandas/SQL (artworks + artists) |
+| **[National Gallery of Art](https://github.com/NationalGalleryOfArt/opendata)** ⭐ | **CC0** | 130K artworks, **15 relational CSVs** | Best museum **SQL** schema (objects/constituents/locations…) |
+| **[MoMA](https://github.com/MuseumofModernArt/collection)** (collection + exhibitions) ⭐ | **CC0** | 126K + 15K + 1.8K rows | Multi-table, famous → Pandas/SQL |
+| [The Met](https://github.com/metmuseum/openaccess) | CC0 | 470K rows / 303 MB (subset) | Pandas/viz; filter by department |
+| [Cooper Hewitt](https://github.com/cooperhewitt/collection) · Cleveland · Carnegie · Whitney · Walters · Williams College | CC0 | 10K–215K | Right-sized museum collections |
+| **[Tate](https://github.com/tategallery/collection)** | **CC0** (not the assumed BY-NC-ND) | 70K + 3.5K | Pandas/SQL (artworks + artists) |
 | NYPL public-domain · Smithsonian · DPLA · Europeana | CC0 (metadata) | large → subset | Big aggregations; per-item rights vary |
 | Rijksmuseum | CC0 + CC BY 4.0 | 800K (filter `usageRights`) | API teaching |
 | Penn Museum · Open Context | CC BY 4.0 | 100s–430K | Archaeology / anthropology |
@@ -596,12 +596,12 @@ Evergreen (historical art/artifacts), mostly **CC0**, and many ship as multiple 
 
 | Dataset | License | Tier | Notes |
 | --- | --- | --- | --- |
-| **OpenPowerlifting** ⭐ | Public domain | 🟢A | ~4M rows (subset); superb for stats/ML |
-| **Cricsheet** | ODC-BY 1.0 | 🟢B | Ball-by-ball cricket, ~22K matches |
-| **nflverse** | CC BY 4.0 (FTN subset BY-SA) | 🟢B | NFL play-by-play (processed derivative) |
-| **Retrosheet** | custom, commercial-OK ✓ | 🟢B | MLB play-by-play to 1871 |
+| **[OpenPowerlifting](https://openpowerlifting.gitlab.io/opl-csv/)** ⭐ | Public domain | 🟢A | ~4M rows (subset); superb for stats/ML |
+| **[Cricsheet](https://cricsheet.org/)** | ODC-BY 1.0 | 🟢B | Ball-by-ball cricket, ~22K matches |
+| **[nflverse](https://github.com/nflverse/nflverse-data)** | CC BY 4.0 (FTN subset BY-SA) | 🟢B | NFL play-by-play (processed derivative) |
+| **[Retrosheet](https://www.retrosheet.org/)** | custom, commercial-OK ✓ | 🟢B | MLB play-by-play to 1871 |
 | **Open Trivia DB** | CC BY-SA 4.0 | 🟡C | Trivia Q&A; copyleft |
-| Lichess | CC0 | 🟢A | Chess games/puzzles (also in §14.5) |
+| [Lichess](https://database.lichess.org/) | CC0 | 🟢A | Chess games/puzzles (also in §14.5) |
 
 🔴 **AVOID / flag:** **Jeff Sackmann tennis** (atp/wta/MCP — **CC BY-NC-SA**), **Ergast F1** (CC BY-NC-SA + shut down), **StatsBomb** (research-licensed — verify), **Scryfall / MTGJSON** (Wizards of the Coast Fan Content Policy), **Pokémon** (Nintendo IP), **Baseball Savant / Statcast** (MLB proprietary), **football-data.co.uk** (no stated license).
 
@@ -609,12 +609,12 @@ Evergreen (historical art/artifacts), mostly **CC0**, and many ship as multiple 
 
 | Dataset | License | Notes / course |
 | --- | --- | --- |
-| **OpenFDA** | CC0 | Drug/device/food events (subset); JSON wrangling |
-| **ClinicalTrials.gov / AACT** | US-gov PD | Multi-table relational → SQL, biomedical NLP |
-| **SEC EDGAR Financial Statement Data Sets** | ODC-PDDL / US PD | 4 tables/quarter → finance SQL, XBRL |
-| **NASA Meteorite Landings** ⭐ | CC0 (US-gov) | 34K rows / **3 MB** — clean small geospatial set |
-| Materials Project | CC BY 4.0 | Materials ML / regression |
-| GBIF · iNaturalist · Movebank | per-record CC0/CC BY (**filter!**) | Ecology/biodiversity; exclude CC BY-NC records |
+| **[OpenFDA](https://open.fda.gov/)** | CC0 | Drug/device/food events (subset); JSON wrangling |
+| **[ClinicalTrials.gov / AACT](https://aact.ctti-clinicaltrials.org/)** | US-gov PD | Multi-table relational → SQL, biomedical NLP |
+| **[SEC EDGAR Financial Statement Data Sets](https://www.sec.gov/data-research/sec-markets-data/financial-statement-data-sets)** | ODC-PDDL / US PD | 4 tables/quarter → finance SQL, XBRL |
+| **[NASA Meteorite Landings](https://data.nasa.gov/dataset/meteorite-landings)** ⭐ | CC0 (US-gov) | 34K rows / **3 MB** — clean small geospatial set |
+| [Materials Project](https://materialsproject.org/) | CC BY 4.0 | Materials ML / regression |
+| [GBIF](https://www.gbif.org/occurrence/download) · [iNaturalist](https://www.inaturalist.org/observations/export) · [Movebank](https://www.movebank.org/cms/movebank-content/download-data) | per-record CC0/CC BY (**filter!**) | Ecology/biodiversity; exclude CC BY-NC records |
 
 🔴 **AVOID:** **WHO GHO** (CC BY-NC-SA), **eBird** (non-commercial). ⚠️ **PubChem** (depositor-asserted IP — caution).
 
@@ -622,11 +622,11 @@ Evergreen (historical art/artifacts), mostly **CC0**, and many ship as multiple 
 
 | Dataset | License | Tier | Notes |
 | --- | --- | --- | --- |
-| **Fashion-MNIST** ⭐ | MIT | 🟢B | 70K clothing images; clean MNIST swap |
-| **EMNIST** | CC0 (NIST PD) | 🟢A | Letters + digits |
-| **Speech Commands · LibriSpeech · NSynth** | CC BY 4.0 | 🟢B | Audio ML (host a subset — LibriSpeech `dev-clean` ~337 MB) |
-| Open Images (annotations) | CC BY 4.0 | 🟢B | Object detection (annotations; images by URL) |
-| MNIST | CC BY-SA 3.0 | 🟡C | Copyleft, but commercial OK |
+| **[Fashion-MNIST](https://github.com/zalandoresearch/fashion-mnist)** ⭐ | MIT | 🟢B | 70K clothing images; clean MNIST swap |
+| **[EMNIST](https://www.nist.gov/itl/products-and-services/emnist-dataset)** | CC0 (NIST PD) | 🟢A | Letters + digits |
+| **[Speech Commands](https://www.tensorflow.org/datasets/catalog/speech_commands) · [LibriSpeech](https://www.openslr.org/12/) · [NSynth](https://magenta.tensorflow.org/datasets/nsynth)** | CC BY 4.0 | 🟢B | Audio ML (host a subset — LibriSpeech `dev-clean` ~337 MB) |
+| [Open Images](https://storage.googleapis.com/openimages/web/index.html) (annotations) | CC BY 4.0 | 🟢B | Object detection (annotations; images by URL) |
+| [MNIST](https://yann.lecun.com/exdb/mnist/) | CC BY-SA 3.0 | 🟡C | Copyleft, but commercial OK |
 | KMNIST · Free Spoken Digit | CC BY-SA 4.0 | 🟡C | Copyleft |
 
 🔴 **AVOID:** **ESC-50**, **UrbanSound8K** (CC BY-NC). ⚠️ **CIFAR-10/100** — no stated license + derived from the **withdrawn** 80 Million Tiny Images dataset; legally/ethically murky → don't re-host.
@@ -637,29 +637,29 @@ Evergreen (historical art/artifacts), mostly **CC0**, and many ship as multiple 
 
 | Dataset | License | Notes |
 | --- | --- | --- |
-| **SF DataSF** (Muni stops, 311, districts) ⭐ | **PDDL (public domain)** | Cleanest US city portal |
-| **NYC Open Data** (tree census, boundaries) | no-restrictions by law | Effectively public domain |
+| **[SF DataSF](https://data.sfgov.org/)** (Muni stops, 311, districts) ⭐ | **PDDL (public domain)** | Cleanest US city portal |
+| **[NYC Open Data](https://opendata.cityofnewyork.us/)** (tree census, boundaries) | no-restrictions by law | Effectively public domain |
 | Chicago (libraries, speed cameras) | CC BY 4.0 | Small clean tables |
-| US **Census TIGER/Line + ACS** | US-gov PD | Boundaries + income/pop → choropleths, joins |
-| **geoBoundaries** ⭐ | **CC BY 4.0** | World admin boundaries — the clean **GADM replacement** |
-| **IANA time-zone DB** ⭐ | Public domain | Tiny; nice many-to-many SQL (zones ↔ countries) |
+| US **[Census TIGER/Line + ACS](https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html)** | US-gov PD | Boundaries + income/pop → choropleths, joins |
+| **[geoBoundaries](https://www.geoboundaries.org/)** ⭐ | **CC BY 4.0** | World admin boundaries — the clean **GADM replacement** |
+| **[IANA time-zone DB](https://www.iana.org/time-zones)** ⭐ | Public domain | Tiny; nice many-to-many SQL (zones ↔ countries) |
 | OpenStreetMap (Geofabrik) · Overture Base/Buildings | ODbL 🟡C | Copyleft; commercial OK with share-alike |
 | Overture **Places** · Who's On First | CDLA-Permissive / CC BY | POIs, gazetteer |
 | UK **NaPTAN/NSPL** (OGL) · **StatCan** (OGL-Canada) · **ABS** Australia (CC BY 4.0) | 🟢B | National gov data, commercial OK w/ attribution |
 
-🔴 **AVOID:** **GADM** (non-commercial — use geoBoundaries), some **Eurostat GISCO** boundary layers (NC), **CTA/WMATA** GTFS. ⚠️ OpenAddresses & the LA portal — per-source / unstated, verify first.
+🔴 **AVOID:** **GADM** (non-commercial — use [geoBoundaries](https://www.geoboundaries.org/)), some **Eurostat GISCO** boundary layers (NC), **CTA/WMATA** GTFS. ⚠️ OpenAddresses & the LA portal — per-source / unstated, verify first.
 
 ### 17.6 Curated GitHub repos & discovery channels
 
 | Source | License | Notes |
 | --- | --- | --- |
-| **the-pudding/data** | MIT | 50+ tiny, clean story CSVs (culture / journalism) |
-| **BuzzFeedNews** (e.g. NICS firearm checks) | MIT (code) + CC BY 4.0 (data) | Investigative data; verify per repo |
-| **JHU COVID-19** (CSSE) | CC BY 4.0 | Archived → evergreen time series |
-| **DataHub core** (airport / currency / country codes) | PDDL | Clean reference/lookup tables for joins |
-| **Tatoeba** | CC BY 2.0 (+ CC0 subset) | Multilingual sentences → NLP |
-| **WordNet** | Princeton permissive (OSI-approved) | Lexical database → NLP |
-| **ConceptNet · Open Trivia DB** | CC BY-SA 4.0 | Copyleft |
+| **[the-pudding/data](https://github.com/the-pudding/data)** | MIT | 50+ tiny, clean story CSVs (culture / journalism) |
+| **[BuzzFeedNews](https://github.com/BuzzFeedNews/nics-firearm-background-checks)** (e.g. NICS firearm checks) | MIT (code) + CC BY 4.0 (data) | Investigative data; verify per repo |
+| **[JHU COVID-19](https://github.com/CSSEGISandData/COVID-19)** (CSSE) | CC BY 4.0 | Archived → evergreen time series |
+| **[DataHub core](https://datahub.io/core)** (airport / currency / country codes) | PDDL | Clean reference/lookup tables for joins |
+| **[Tatoeba](https://tatoeba.org/en/downloads)** | CC BY 2.0 (+ CC0 subset) | Multilingual sentences → NLP |
+| **[WordNet](https://wordnet.princeton.edu/)** | Princeton permissive (OSI-approved) | Lexical database → NLP |
+| **[ConceptNet](https://github.com/commonsense/conceptnet5) · Open Trivia DB** | CC BY-SA 4.0 | Copyleft |
 
 🔴 **AVOID:** **WaPo police-shootings / school-shootings** (CC BY-NC-SA — a course staple, but non-commercial), **NYT COVID** (custom NC), **Tableau "Sample Superstore"** (EULA forbids redistribution — widely re-shared in violation), **jbrownlee/Datasets** & **selva86/datasets** (no license → trace to UCI / the primary source), Academic Torrents (unvetted).
 **Discovery (vet per-dataset):** `r/datasets`, **Data Is Plural**, Awesome Public Datasets, HDX (filter to CC BY / CC0), data.world.
@@ -668,7 +668,7 @@ Evergreen (historical art/artifacts), mostly **CC0**, and many ship as multiple 
 
 ## 18. English-language real-world datasets (fifth pass — US-federal · finance · health · text/legal · CV)
 
-English-scoped per request (English-language text corpora; English-documented tabular data). ~70 more datasets. Hand-verified this pass: Caselaw Access Project (CC0), Open Brewery DB (MIT), Google QuickDraw (CC BY 4.0), US Treasury yield curve (CC0), Natural Earth (earlier) — plus the **20 Newsgroups** correction to §16 (it's widely used but carries no clear license grant).
+English-scoped per request (English-language text corpora; English-documented tabular data). ~70 more datasets. Hand-verified this pass: [Caselaw Access Project](https://huggingface.co/datasets/free-law/Caselaw_Access_Project) (CC0), [Open Brewery DB](https://www.openbrewerydb.org/) (MIT), [Google QuickDraw](https://quickdraw.withgoogle.com/data) (CC BY 4.0), [US Treasury yield curve](https://catalog.data.gov/dataset/interest-rate-statistics-daily-treasury-yield-curve-rates) (CC0), [Natural Earth](https://www.naturalearthdata.com/downloads/) (earlier) — plus the **20 Newsgroups** correction to §16 (it's widely used but carries no clear license grant).
 
 ### 18.1 US federal public-domain data (mostly 17 U.S.C. §105)
 
@@ -676,16 +676,16 @@ A deep, clean vein — US federal works carry no copyright. Best small picks:
 
 | Dataset | License | Size | Course |
 | --- | --- | --- | --- |
-| **NPS Park Visitation** ⭐ | CC0 | ~2,900 rows | Beginner EDA / time series |
-| **FDIC failed-bank list** | US-gov PD | ~600 rows | Pandas/SQL |
-| **EIA Henry Hub gas price** | US-gov PD | ~7K rows | Time series, regression |
-| **US Treasury yield curve** ⭐ | **CC0** | ~8K rows (daily, 1990–) | Time series, finance |
+| **[NPS Park Visitation](https://catalog.data.gov/dataset/nps-visitor-use-statistics-data-package-2024)** ⭐ | CC0 | ~2,900 rows | Beginner EDA / time series |
+| **[FDIC failed-bank list](https://catalog.data.gov/dataset/fdic-bankfind-suite-api)** | US-gov PD | ~600 rows | Pandas/SQL |
+| **[EIA Henry Hub gas price](https://www.eia.gov/dnav/ng/hist/rngwhhdd.htm)** | US-gov PD | ~7K rows | Time series, regression |
+| **[US Treasury yield curve](https://catalog.data.gov/dataset/interest-rate-statistics-daily-treasury-yield-curve-rates)** ⭐ | **CC0** | ~8K rows (daily, 1990–) | Time series, finance |
 | Treasury "Debt to the Penny" · BEA GDP/NIPA | US-gov PD | small | Time series |
 | USGS Mineral Commodity Summaries | CC0 | tiny | Stats/viz |
 | IRS SOI ZIP-code tax data | US-gov PD | ~166K/yr | Geographic income, SQL |
-| **NOAA Storm Events** | CC0 (subset 1996–) | ~1M (subset) | Time series, multi-table |
-| **NHTSA FARS** fatal crashes | US-gov PD | ~40K/yr, **25 tables** | SQL joins |
-| FAA aircraft registry · NHTSA ODI complaints | US-gov PD | 350K / 2M (subset) | Pandas, NLP (complaint text) |
+| **[NOAA Storm Events](https://www.ncdc.noaa.gov/stormevents/)** | CC0 (subset 1996–) | ~1M (subset) | Time series, multi-table |
+| **[NHTSA FARS](https://catalog.data.gov/dataset/fatality-analysis-reporting-system-fars)** fatal crashes | US-gov PD | ~40K/yr, **25 tables** | SQL joins |
+| [FAA aircraft registry](https://www.faa.gov/licenses_certificates/aircraft_certification/aircraft_registry/releasable_aircraft_download) · NHTSA ODI complaints | US-gov PD | 350K / 2M (subset) | Pandas, NLP (complaint text) |
 
 ⚠️ **Caution:** **College Scorecard** is **CC BY** (attribution, *not* PD); **NHTSA VPIC** carries an "unknown license" tag on data.gov (verify); **USAspending** is ~1.5 TB (subset hard); CMS files can embed **AHA-copyrighted UB-04** codes (the Hospital General Info file is clean).
 
@@ -693,13 +693,13 @@ A deep, clean vein — US federal works carry no copyright. Best small picks:
 
 | Dataset | License | Tier | Notes |
 | --- | --- | --- | --- |
-| **Caselaw Access Project** ⭐ | **CC0** (restrictions lifted Mar 2024) | 🟢A | 6.6M US court decisions (subset by state/era) |
-| **arXiv metadata** | CC0 | 🟢A | ~1.7M STEM abstracts → topic classification |
-| **Gutenberg Poetry Corpus** | CC0 | 🟢A | 3M lines English poetry |
+| **[Caselaw Access Project](https://huggingface.co/datasets/free-law/Caselaw_Access_Project)** ⭐ | **CC0** (restrictions lifted Mar 2024) | 🟢A | 6.6M US court decisions (subset by state/era) |
+| **[arXiv metadata](https://info.arxiv.org/help/bulk_data_s3.html)** | CC0 | 🟢A | ~1.7M STEM abstracts → topic classification |
+| **[Gutenberg Poetry Corpus](https://github.com/aparrish/gutenberg-poetry-corpus)** | CC0 | 🟢A | 3M lines English poetry |
 | US legal/gov text (US Code · Federal Register · bills · SCOTUS) | US-gov PD | 🟢A | Legal NLP |
-| **Google Books Ngrams** (standard) | CC BY 3.0 | 🟢B | Word-frequency history *(NOT the syntactic ngrams — those are CC BY-NC-SA)* |
-| **CMU Pronouncing Dictionary** | BSD-2 | 🟢B | 134K words → phonetics |
-| SCOWL · dwyl/english-words | permissive / Unlicense | 🟢B | Word lists |
+| **[Google Books Ngrams](https://storage.googleapis.com/books/ngrams/books/datasetsv3.html)** (standard) | CC BY 3.0 | 🟢B | Word-frequency history *(NOT the syntactic ngrams — those are CC BY-NC-SA)* |
+| **[CMU Pronouncing Dictionary](https://github.com/cmusphinx/cmudict)** | BSD-2 | 🟢B | 134K words → phonetics |
+| [SCOWL](https://wordlist.aspell.net/) · [dwyl/english-words](https://github.com/dwyl/english-words) | permissive / Unlicense | 🟢B | Word lists |
 | UD English Web Treebank · UK Hansard · CourtListener | CC BY-SA / Open Parliament / CC BY-ND | 🟡C | Parsing / legislative / case law |
 
 🔴 **AVOID:** **20 Newsgroups** (no license grant — author copyright; common but unverified), **google-10000-english** (LDC-restricted), **CNN/DailyMail** (news copyright), **Reuters-21578 / Brown Corpus** (research-only), **AG News** (non-commercial), Google Ngrams **syntactic** variant (CC BY-NC-SA).
@@ -708,7 +708,7 @@ A deep, clean vein — US federal works carry no copyright. Best small picks:
 
 > **The stock-price problem:** recent market prices are almost never redistributable — exchanges + S&P/Dow Jones index copyright + ToS stack up. **FRED rule:** series tagged *"Public Domain: Citation Requested"* (Treasury/BLS/BEA — DGS10, UNRATE, GDPC1) are fine; *"Copyright"*-tagged series (SP500, DJIA, Case-Shiller) are **not**.
 
-🟢 **Clean:** US Treasury yield curve (CC0) & debt (PD), BEA GDP (PD), **EIA energy prices** (PD), **FDIC** bank/failed-bank lists (PD), FRED public-domain series, **Open Brewery DB** (MIT — nice SQL set), **OECD** indicators (CC BY 4.0, post-2024). 🟡 **DataHub packages** (PDDL): 10-yr bond yields, gold, exchange rates, and the **Shiller S&P 500 monthly back to 1871** — *truncate at 2023-06* (later rows are tainted by the copyrighted FRED SP500 series).
+🟢 **Clean:** [US Treasury yield curve](https://catalog.data.gov/dataset/interest-rate-statistics-daily-treasury-yield-curve-rates) (CC0) & debt (PD), BEA GDP (PD), **EIA energy prices** (PD), **[FDIC](https://catalog.data.gov/dataset/fdic-bankfind-suite-api)** bank/failed-bank lists (PD), FRED public-domain series, **[Open Brewery DB](https://www.openbrewerydb.org/)** (MIT — nice SQL set), **OECD** indicators (CC BY 4.0, post-2024). 🟡 **[DataHub](https://datahub.io/core) packages** (PDDL): 10-yr bond yields, gold, exchange rates, and the **Shiller S&P 500 monthly back to 1871** — *truncate at 2023-06* (later rows are tainted by the copyrighted FRED SP500 series).
 🔴 **AVOID:** Yahoo Finance & Bloomberg (no redistribution), **IMF** (non-commercial), Nasdaq Data Link / Quandl, DataHub **nasdaq-listings** (NASDAQ © despite the PDDL tag), DataHub **S&P 500 constituents** (Wikipedia CC BY-SA + goes stale).
 
 ### 18.4 Aggregate health data (US-gov public domain)
@@ -717,8 +717,8 @@ Use the *aggregate* CDC/CMS tables (clean PD); avoid individual-level/credential
 
 | Dataset | License | Notes |
 | --- | --- | --- |
-| **NCHS Leading Causes of Death** ⭐ | US-gov PD | ~10K rows — excellent beginner set |
-| **CMS Medicare Part D drug spending** | US-gov PD | ~4K rows — drug-pricing analysis |
+| **[NCHS Leading Causes of Death](https://catalog.data.gov/dataset/nchs-leading-causes-of-death-united-states)** ⭐ | US-gov PD | ~10K rows — excellent beginner set |
+| **[CMS Medicare Part D drug spending](https://data.cms.gov/summary-statistics-on-use-and-payments/medicare-medicaid-spending-by-drug)** | US-gov PD | ~4K rows — drug-pricing analysis |
 | **CMS Hospital Care Compare** (general info) | US-gov PD | ~5K hospitals — joins/groupby |
 | CDC **PLACES** · **Chronic Disease Indicators** | US-gov PD | County/tract health estimates → stats/ML/choropleths |
 | NCHS Drug Poisoning · CDC SchoolVaxView | US-gov PD | Time series, demographics |
@@ -728,9 +728,9 @@ Use the *aggregate* CDC/CMS tables (clean PD); avoid individual-level/credential
 
 ### 18.5 "Fun" tabular + clean computer-vision
 
-**Fun tabular:** **Bob Ross paintings** (CC BY 4.0 — 403 episodes' visual elements), **Open Brewery DB** (MIT), **Stanford Open Policing** (ODC-BY — use a single-state slice; full corpus is huge).
+**Fun tabular:** **[Bob Ross paintings](https://github.com/fivethirtyeight/data/tree/master/bob-ross)** (CC BY 4.0 — 403 episodes' visual elements), **[Open Brewery DB](https://www.openbrewerydb.org/)** (MIT), **[Stanford Open Policing](https://openpolicing.stanford.edu/data/)** (ODC-BY — use a single-state slice; full corpus is huge).
 
-**Computer vision (clean):** **Google QuickDraw** (CC BY 4.0 — 50M sketches, subset), **Caltech-101** (CC BY 4.0), **USGS Landsat** (US-gov PD) & **Copernicus Sentinel** (open licence) satellite imagery, **COCO *annotations*** (CC BY 4.0). 🟡 **Oxford-IIIT Pet** (CC BY-SA, copyleft).
+**Computer vision (clean):** **[Google QuickDraw](https://quickdraw.withgoogle.com/data)** (CC BY 4.0 — 50M sketches, subset), **[Caltech-101](https://data.caltech.edu/records/mzrjq-6wc02)** (CC BY 4.0), **USGS Landsat** (US-gov PD) & **Copernicus Sentinel** (open licence) satellite imagery, **COCO *annotations*** (CC BY 4.0). 🟡 **Oxford-IIIT Pet** (CC BY-SA, copyleft).
 
 🔴 **AVOID:** **ImageNet · SVHN · Places365 · Stanford Dogs/Cars** (non-commercial / research-only), **CelebA · LFW · MS-Celeb** (non-commercial + face PII), **COCO images** (Flickr terms — annotations are fine, images aren't), **Oxford Flowers-102** (no stated license); and scraped "fun" sets: **TheCocktailDB/TheMealDB** (ToS), **Coffee Quality DB** (scraped CQI), **80 Cereals** (Consumer Reports ©), **NUFORC UFO** (scraped), **BoardGameGeek** (commercial license required), **AKC dog breeds** (scraped).
 
@@ -738,7 +738,7 @@ Use the *aggregate* CDC/CMS tables (clean PD); avoid individual-level/credential
 
 ## 19. Still more English datasets (sixth pass — reference tables · state/city portals · world-English gov · surveys · environment)
 
-~70 more. Hand-verified this pass: PubChem periodic table (PD), USDA NASS (CC0), Capital Bikeshare (prohibits standalone redistribution), CES (CC0), geoBoundaries (earlier).
+~70 more. Hand-verified this pass: [PubChem Periodic Table](https://pubchem.ncbi.nlm.nih.gov/periodic-table/) (PD), USDA NASS (CC0), Capital Bikeshare (prohibits standalone redistribution), [CES/CCES](https://dataverse.harvard.edu/dataverse/cces) (CC0), [geoBoundaries](https://www.geoboundaries.org/) (earlier).
 
 ### 19.1 Reference / lookup tables for SQL joins (small, clean)
 
@@ -746,13 +746,13 @@ Perfect small dimension tables to JOIN against larger sets.
 
 | Dataset | License | Tier | Notes |
 | --- | --- | --- | --- |
-| **PubChem Periodic Table** ⭐ | US-gov PD | 🟢A | 118 elements × 17 cols — clean SQL/merge anchor |
-| **US Census FIPS + ZCTA→county crosswalks** ⭐ | US-gov PD | 🟢A | The canonical join-teaching tables |
-| **annexare/Countries** | MIT | 🟢B | 250 countries: capital, currency, languages, calling codes |
-| **meodai/color-names** | MIT | 🟢B | ~30K color names + hex |
+| **[PubChem Periodic Table](https://pubchem.ncbi.nlm.nih.gov/periodic-table/)** ⭐ | US-gov PD | 🟢A | 118 elements × 17 cols — clean SQL/merge anchor |
+| **[US Census FIPS + ZCTA→county crosswalks](https://www.census.gov/geographies/reference-files/2010/geo/state-local-geo-guides-2010/list-state-fips.html)** ⭐ | US-gov PD | 🟢A | The canonical join-teaching tables |
+| **[annexare/Countries](https://github.com/annexare/Countries)** | MIT | 🟢B | 250 countries: capital, currency, languages, calling codes |
+| **[meodai/color-names](https://github.com/meodai/color-names)** | MIT | 🟢B | ~30K color names + hex |
 | Unicode Character Database + emoji | Unicode License (permissive) | 🟢B | NLP/string processing |
-| Nager.Date public holidays | MIT | 🟢B | Calendar joins, business-day logic |
-| **Wikipedia Clickstream / Pageviews** ⭐ | CC0 | 🟢A | ~25M rows/month — engaging analytics (subset) |
+| [Nager.Date public holidays](https://github.com/nager/Nager.Date) | MIT | 🟢B | Calendar joins, business-day logic |
+| **[Wikipedia Clickstream / Pageviews](https://dumps.wikimedia.org/other/clickstream/)** ⭐ | CC0 | 🟢A | ~25M rows/month — engaging analytics (subset) |
 | dr5hn countries-states-cities | ODbL | 🟡C | 153K cities → multi-table SQL (copyleft) |
 | Bowserinator Periodic-Table-JSON | CC BY-SA 3.0 | 🟡C | Richer element data, but copyleft (not CC0) |
 
@@ -788,31 +788,31 @@ Always check the portal/dataset license — "open data" ≠ automatically re-hos
 
 ### 19.4 Survey & elections data
 
-🟢 **Clean:** **Cooperative Election Study (CES/CCES)** — **CC0** (Harvard Dataverse, ~642K US political-survey rows — the clean GSS replacement); **OpenElections** — MIT (US precinct results → great SQL); **V-Dem** — CC BY-SA (democracy indices, country-year).
+🟢 **Clean:** **[Cooperative Election Study (CES/CCES)](https://dataverse.harvard.edu/dataverse/cces)** — **CC0** (Harvard Dataverse, ~642K US political-survey rows — the clean GSS replacement); **[OpenElections](https://github.com/openelections)** — MIT (US precinct results → great SQL); **[V-Dem](https://v-dem.net/data/)** — CC BY-SA (democracy indices, country-year).
 🔴 **AVOID:** **GSS (General Social Survey)** — ubiquitous in courses but **no open license grant** (use CES instead); **QOG** (explicitly bans redistribution + commercial use); **Freedom House** (non-commercial); **Pew Research** & **ANES** (registration + no-redistribution); IPUMS / World Values Survey (registration).
 
 ### 19.5 Environment / agriculture + quirky
 
-🟢 **Clean:** **EPA** TRI / AQS / ECHO / ENERGY STAR (US-gov PD — pollution, air quality), **USDA NASS QuickStats** (CC0 — agriculture), **FHFA House Price Index** + **HUD Fair Market Rents** (PD — housing), **Global Carbon Budget** (CC BY 4.0 — emissions), **Wikipedia Clickstream** (CC0), **Austin Animal Center** intakes/outcomes (city open data — engaging "shelter" narrative; verify portal terms).
+🟢 **Clean:** **EPA** TRI / AQS / ECHO / ENERGY STAR (US-gov PD — pollution, air quality), **USDA NASS QuickStats** (CC0 — agriculture), **FHFA House Price Index** + **HUD Fair Market Rents** (PD — housing), **[Global Carbon Budget](https://zenodo.org/records/13981696)** (CC BY 4.0 — emissions), **[Wikipedia Clickstream](https://dumps.wikimedia.org/other/clickstream/)** (CC0), **Austin Animal Center** intakes/outcomes (city open data — engaging "shelter" narrative; verify portal terms).
 🔴 **AVOID:** **Bike-share** data (Capital Bikeshare, Divvy, Bay Wheels, Bluebikes) — the Motivate/Lyft license **forbids redistributing it as a standalone dataset** (analyze it in a pipeline, don't re-host the files); **SWAPI / Star Wars** (Lucasfilm IP); **Smithsonian Global Volcanism** (non-commercial); **Scrabble** word lists (Hasbro/Mattel); **Hacker News** / **GH Archive** (user-content / no clear data license); scraped fun sets (**Coffee Quality**, **NUFORC UFO**, **80 Cereals**).
 
 ---
 
 ## 20. Yet more English datasets (seventh pass — astronomy · bio/chemistry · BLS+federal · NLP · sports/music/history)
 
-~70 more. Hand-verified this pass: NASA mission data (CC0), MovieLens (non-commercial — correction), openfootball (CC0), Moby Project (PD).
+~70 more. Hand-verified this pass: NASA mission data (CC0), MovieLens (non-commercial — correction), [openfootball](https://github.com/openfootball/football.json) (CC0), [Moby Project](https://en.wikipedia.org/wiki/Moby_Project) (PD).
 
 ### 20.1 Astronomy & space catalogs (engaging — HR diagrams, exoplanet ML)
 
 | Dataset | License | Tier | Notes |
 | --- | --- | --- | --- |
-| **NASA Exoplanet Archive** ⭐ | CC0 (NASA) | 🟢A | ~6,300 planets — classification/regression |
-| **NASA Kepler KOI table** | CC0 | 🟢A | ~9,564 rows — planet vs. false-positive |
-| **JPL Small-Body Database** | US-gov PD | 🟢A | Asteroids; ~2,300-row near-Earth subset is ideal |
-| **HYG Star Database** | CC BY-SA 4.0 | 🟡C | 119K stars — the classic HR-diagram set |
-| **OpenNGC** | CC BY-SA 4.0 | 🟡C | ~13K deep-sky objects (classification) |
-| Open Exoplanet Catalogue | MIT | 🟢B | ~4,000 planets (XML parsing) |
-| IAU Star Names (WGSN) | CC BY | 🟢B | ~570 named stars — tiny join table |
+| **[NASA Exoplanet Archive](https://exoplanetarchive.ipac.caltech.edu/)** ⭐ | CC0 (NASA) | 🟢A | ~6,300 planets — classification/regression |
+| **[NASA Kepler KOI table](https://exoplanetarchive.ipac.caltech.edu/cgi-bin/TblView/nph-tblView?app=ExoTbls&config=cumulative)** | CC0 | 🟢A | ~9,564 rows — planet vs. false-positive |
+| **[JPL Small-Body Database](https://ssd.jpl.nasa.gov/tools/sbdb_query.html)** | US-gov PD | 🟢A | Asteroids; ~2,300-row near-Earth subset is ideal |
+| **[HYG Star Database](https://codeberg.org/astronexus/hyg)** | CC BY-SA 4.0 | 🟡C | 119K stars — the classic HR-diagram set |
+| **[OpenNGC](https://github.com/mattiaverga/OpenNGC)** | CC BY-SA 4.0 | 🟡C | ~13K deep-sky objects (classification) |
+| [Open Exoplanet Catalogue](https://github.com/OpenExoplanetCatalogue/open_exoplanet_catalogue) | MIT | 🟢B | ~4,000 planets (XML parsing) |
+| [IAU Star Names](https://www.iau.org/public/themes/naming_stars/) (WGSN) | CC BY | 🟢B | ~570 named stars — tiny join table |
 
 🔴 **AVOID:** **Gaia DR3** (CC BY-NC — non-commercial), **Minor Planet Center** (no explicit license — use JPL instead), **SDSS** (contradictory policy — verify before use).
 
@@ -820,14 +820,14 @@ Always check the portal/dataset license — "open data" ≠ automatically re-hos
 
 | Dataset | License | Tier | Notes |
 | --- | --- | --- | --- |
-| **ESOL / Delaney solubility** ⭐ | MIT | 🟢B | 1,128 rows — regression from SMILES |
-| **FreeSolv** | CC BY 4.0 | 🟢B | 642 rows — hydration free energy |
-| **BBBP** | MIT | 🟢B | 2,050 rows — binary classification |
-| **Tox21** | MIT / US-gov | 🟢A/B | 7,831 × 12 — multi-label toxicity |
-| RCSB PDB | CC0 | 🟢A | Protein structures (curate 50–200) |
-| PubChem · GenBank/RefSeq | US-gov PD | 🟢A | Compounds / sequences (large → subset) |
-| UniProt · Gene Ontology · Materials Project · Human Protein Atlas | CC BY 4.0 | 🟢B | Proteins / ontology / materials / expression |
-| ChEMBL (+ Lipophilicity) | CC BY-SA 3.0 | 🟡C | Bioactivity (copyleft) |
+| **[ESOL / Delaney solubility](https://github.com/deepchem/deepchem/tree/master/datasets)** ⭐ | MIT | 🟢B | 1,128 rows — regression from SMILES |
+| **[FreeSolv](https://github.com/MobleyLab/FreeSolv)** | CC BY 4.0 | 🟢B | 642 rows — hydration free energy |
+| **[BBBP](https://github.com/deepchem/deepchem/tree/master/datasets)** | MIT | 🟢B | 2,050 rows — binary classification |
+| **[Tox21](https://tox21.gov/resources/)** | MIT / US-gov | 🟢A/B | 7,831 × 12 — multi-label toxicity |
+| [RCSB PDB](https://www.rcsb.org/) | CC0 | 🟢A | Protein structures (curate 50–200) |
+| [PubChem](https://pubchem.ncbi.nlm.nih.gov/) · GenBank/RefSeq | US-gov PD | 🟢A | Compounds / sequences (large → subset) |
+| [UniProt](https://www.uniprot.org/) · [Gene Ontology](https://geneontology.org/) · [Materials Project](https://materialsproject.org/) · [Human Protein Atlas](https://www.proteinatlas.org/) | CC BY 4.0 | 🟢B | Proteins / ontology / materials / expression |
+| [ChEMBL](https://www.ebi.ac.uk/chembl/) (+ Lipophilicity) | CC BY-SA 3.0 | 🟡C | Bioactivity (copyleft) |
 
 🔴 **AVOID:** **KEGG** (commercial license), **COSMIC** (academic-only), **DrugBank** full (CC BY-NC; Vocabulary/Structures subset is CC0), **TCGA/dbGaP** (controlled access), **1000 Genomes** (data-use agreement since 2024).
 
@@ -835,26 +835,26 @@ Always check the portal/dataset license — "open data" ≠ automatically re-hos
 
 | Dataset | License | Tier | Notes |
 | --- | --- | --- | --- |
-| **fueleconomy.gov vehicles.csv** ⭐ | US-gov PD (EPA) | 🟢A | ~47K vehicles, MPG/CO₂ — engaging Pandas intro |
-| **BLS** — CPI, OEWS wages, JOLTS | US-gov PD | 🟢A | Inflation / wages-by-occupation / labor (time-series) |
-| **FEMA** disaster declarations | PD / CC0 | 🟢A | ~68K declared disasters since 1953 |
-| **CPSC** product recalls | US-gov PD | 🟢A | ~20K recalls (text + EDA) |
-| **NCES / IPEDS** colleges | US-gov PD | 🟢A | Institutional characteristics / completions |
-| **Census County Business Patterns** | US-gov PD | 🟢A | Establishments by county × NAICS |
+| **[fueleconomy.gov vehicles.csv](https://www.fueleconomy.gov/feg/download.shtml)** ⭐ | US-gov PD (EPA) | 🟢A | ~47K vehicles, MPG/CO₂ — engaging Pandas intro |
+| **[BLS](https://www.bls.gov/data/)** — CPI, OEWS wages, JOLTS | US-gov PD | 🟢A | Inflation / wages-by-occupation / labor (time-series) |
+| **[FEMA](https://www.fema.gov/openfema-data-page/disaster-declarations-summaries-v2)** disaster declarations | PD / CC0 | 🟢A | ~68K declared disasters since 1953 |
+| **[CPSC](https://catalog.data.gov/dataset/recalls-api)** product recalls | US-gov PD | 🟢A | ~20K recalls (text + EDA) |
+| **[NCES / IPEDS](https://nces.ed.gov/ipeds/use-the-data)** colleges | US-gov PD | 🟢A | Institutional characteristics / completions |
+| **[Census County Business Patterns](https://www.census.gov/programs-surveys/cbp.html)** | US-gov PD | 🟢A | Establishments by county × NAICS |
 | **BJS** (direct CSV tables) · USAspending (CC0) | PD / CC0 | 🟢A | Justice stats / federal spending (subset) |
-| PatentsView (USPTO) | CC BY 4.0 | 🟡C | Patents — **attribution required** (not PD) |
+| [PatentsView](https://patentsview.org/) (USPTO) | CC BY 4.0 | 🟡C | Patents — **attribution required** (not PD) |
 
 🔴 **AVOID:** **FCC broadband map / BDC fabric** (CostQuest private-vendor license — no commercial redistribution), **BJS NCVS microdata via ICPSR** (ICPSR bars redistribution even of PD data — use BJS.gov tables). Note: fueleconomy.gov *web-page* content carries an ORNL non-commercial disclaimer, but the EPA-produced CSV files are PD; agency website *photos* are separately licensed.
 
 ### 20.4 NLP / linguistics
 
-🟢 **Clean:** **Moby Project** (Grady Ward — **public domain**: thesaurus, pronunciations, POS, hyphenation, ~640K word lists), **dwyl/english-words** (Unlicense, ~479K), **ENABLE** word list (PD), **SCOWL** spell-check lists & **VADER** sentiment lexicon (MIT), **Brysbaert concreteness** + **Kuperman age-of-acquisition** norms (CC BY 4.0), **MASC** annotated sub-corpus (CC BY 3.0).
-🟡 **Copyleft (usable, share-alike):** ConceptNet, SentiWordNet, UD English-EWT (CC BY-SA 4.0); AFINN (ODbL); GCIDE dictionary (GPL).
+🟢 **Clean:** **[Moby Project](https://en.wikipedia.org/wiki/Moby_Project)** (Grady Ward — **public domain**: thesaurus, pronunciations, POS, hyphenation, ~640K word lists), **[dwyl/english-words](https://github.com/dwyl/english-words)** (Unlicense, ~479K), **ENABLE** word list (PD), **[SCOWL](https://wordlist.aspell.net/)** spell-check lists & **[VADER](https://github.com/cjhutto/vaderSentiment)** sentiment lexicon (MIT), **Brysbaert concreteness** + **Kuperman age-of-acquisition** norms (CC BY 4.0), **MASC** annotated sub-corpus (CC BY 3.0).
+🟡 **Copyleft (usable, share-alike):** [ConceptNet](https://github.com/commonsense/conceptnet5), SentiWordNet, UD English-EWT (CC BY-SA 4.0); AFINN (ODbL); GCIDE dictionary (GPL).
 🔴 **AVOID:** **NRC Emotion/VAD lexicons** (redistribution prohibited), **Brown Corpus** via NLTK (non-commercial), **Bing Liu opinion lexicon** (no license), **Loughran-McDonald** (academic-only), **UD English-GUM** (CC BY-NC-SA, unlike EWT), Scrabble word lists (Hasbro).
 
 ### 20.5 Sports / music / history
 
-🟢 **Clean:** **openfootball** (CC0 — football fixtures/results → SQL), **Discogs** monthly dumps (CC0 — music DB, subset), **Maddison Project** (CC BY 4.0 — 2,000 years of GDP, ideal time-series), **Pleiades** ancient places (CC BY 3.0 — geo/digital-humanities), **FMA metadata** (CC BY 4.0 — music; metadata only, not audio).
+🟢 **Clean:** **[openfootball](https://github.com/openfootball/football.json)** (CC0 — football fixtures/results → SQL), **[Discogs](https://data.discogs.com/)** monthly dumps (CC0 — music DB, subset), **[Maddison Project](https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2023)** (CC BY 4.0 — 2,000 years of GDP, ideal time-series), **[Pleiades](https://pleiades.stoa.org/downloads)** ancient places (CC BY 3.0 — geo/digital-humanities), **[FMA](https://github.com/mdeff/fma) metadata** (CC BY 4.0 — music; metadata only, not audio).
 🔴 **AVOID:** **MovieLens** — *non-commercial* (UMN license); it's the canonical recommender-systems dataset but **cannot be re-hosted commercially** — use FMA metadata instead. Also **Correlates of War** (no redistribution), **StatsBomb**, **Sackmann tennis**, **Ergast F1**, **MAESTRO**, **Million Song** (all non-commercial), **GTZAN** (unlicensed scraped audio).
 
 ---
