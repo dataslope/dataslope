@@ -10,6 +10,61 @@ mechanics only make sense once you see the problem they solve. Because
 this is a foundational, often-confusing concept, this page has extra
 practice questions.
 
+<svg
+  viewBox="0 0 640 235"
+  role="img"
+  aria-label="The same five rows take two paths: down the left they collapse into a single green summary dot, down the right all five survive and each carries an identical small green badge — GROUP BY summarizes instead of the rows, a window function summarizes alongside them"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="230" cy="42" r="8" />
+    <circle cx="275" cy="42" r="8" />
+    <circle cx="320" cy="42" r="8" />
+    <circle cx="365" cy="42" r="8" />
+    <circle cx="410" cy="42" r="8" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="206" cy="76" r="2.5" />
+    <circle cx="184" cy="104" r="2.5" />
+    <circle cx="168" cy="132" r="2.5" />
+    <circle cx="244" cy="80" r="2.5" />
+    <circle cx="208" cy="112" r="2.5" />
+    <circle cx="182" cy="140" r="2.5" />
+    <circle cx="296" cy="84" r="2.5" />
+    <circle cx="234" cy="120" r="2.5" />
+    <circle cx="190" cy="148" r="2.5" />
+    <circle cx="404" cy="78" r="2.5" />
+    <circle cx="416" cy="108" r="2.5" />
+    <circle cx="430" cy="138" r="2.5" />
+    <circle cx="462" cy="84" r="2.5" />
+    <circle cx="486" cy="116" r="2.5" />
+    <circle cx="506" cy="142" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="160" cy="186" r="26" fillOpacity="0.2" />
+    <circle cx="160" cy="186" r="16" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="356" cy="186" r="9" />
+    <circle cx="408" cy="186" r="9" />
+    <circle cx="460" cy="186" r="9" />
+    <circle cx="512" cy="186" r="9" />
+    <circle cx="564" cy="186" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="366" cy="172" r="5" />
+    <circle cx="418" cy="172" r="5" />
+    <circle cx="470" cy="172" r="5" />
+    <circle cx="522" cy="172" r="5" />
+    <circle cx="574" cy="172" r="5" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <circle cx="64" cy="60" r="3" />
+    <circle cx="592" cy="46" r="3" />
+    <circle cx="78" cy="200" r="3" />
+  </g>
+</svg>
+
 ## The problem `GROUP BY` cannot solve
 
 `GROUP BY` is powerful but it **destroys the individual rows**. When you
@@ -77,6 +132,36 @@ ORDER BY
 Notice all five rows survived, each carrying the grand total `505`. A
 plain `SUM(amount)` would have returned a single row. The `OVER ()` is the
 entire difference.
+
+<svg
+  viewBox="0 0 640 165"
+  role="img"
+  aria-label="Five faint rows of different lengths each end in an identical yellow chip stacked in one neat column — an empty OVER clause writes the same grand total onto every surviving row"
+  style={{ display: "block", width: "100%", maxWidth: "460px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.13">
+    <rect x="80" y="36" width="244" height="13" rx="6.5" />
+    <rect x="80" y="60" width="190" height="13" rx="6.5" />
+    <rect x="80" y="84" width="266" height="13" rx="6.5" />
+    <rect x="80" y="108" width="150" height="13" rx="6.5" />
+    <rect x="80" y="132" width="216" height="13" rx="6.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="396" y="22" width="60" height="141" rx="14" fillOpacity="0.12" />
+    <rect x="406" y="34" width="40" height="17" rx="8.5" />
+    <rect x="406" y="58" width="40" height="17" rx="8.5" />
+    <rect x="406" y="82" width="40" height="17" rx="8.5" />
+    <rect x="406" y="106" width="40" height="17" rx="8.5" />
+    <rect x="406" y="130" width="40" height="17" rx="8.5" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="358" cy="42" r="2.5" />
+    <circle cx="358" cy="66" r="2.5" />
+    <circle cx="358" cy="90" r="2.5" />
+    <circle cx="358" cy="114" r="2.5" />
+    <circle cx="358" cy="138" r="2.5" />
+  </g>
+</svg>
 
 ## `PARTITION BY` — windows per group
 

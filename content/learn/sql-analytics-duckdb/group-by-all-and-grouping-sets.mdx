@@ -10,6 +10,46 @@ multi-level summaries in a single query. This page covers `GROUP BY ALL`
 SETS`) for subtotals — the kind of thing you would otherwise stitch
 together with several queries.
 
+<svg
+  viewBox="0 0 640 215"
+  role="img"
+  aria-label="Six blue detail chips merge upward into two green subtotal chips and one yellow grand total, all inside a single soft outline — one rolled-up query returning every level of summary at once"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.05">
+    <rect x="64" y="18" width="512" height="184" rx="28" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="96" y="164" width="58" height="16" rx="8" fillOpacity="0.6" />
+    <rect x="166" y="164" width="58" height="16" rx="8" fillOpacity="0.6" />
+    <rect x="236" y="164" width="58" height="16" rx="8" fillOpacity="0.6" />
+    <rect x="330" y="164" width="58" height="16" rx="8" fillOpacity="0.6" />
+    <rect x="400" y="164" width="58" height="16" rx="8" fillOpacity="0.6" />
+    <rect x="470" y="164" width="58" height="16" rx="8" fillOpacity="0.6" />
+  </g>
+  <g fill="currentColor" opacity="0.22">
+    <circle cx="160" cy="142" r="2.5" />
+    <circle cx="195" cy="134" r="2.5" />
+    <circle cx="230" cy="142" r="2.5" />
+    <circle cx="394" cy="142" r="2.5" />
+    <circle cx="429" cy="134" r="2.5" />
+    <circle cx="464" cy="142" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="130" y="102" width="130" height="18" rx="9" fillOpacity="0.75" />
+    <rect x="364" y="102" width="130" height="18" rx="9" fillOpacity="0.75" />
+  </g>
+  <g fill="currentColor" opacity="0.22">
+    <circle cx="240" cy="82" r="2.5" />
+    <circle cx="285" cy="72" r="2.5" />
+    <circle cx="384" cy="82" r="2.5" />
+    <circle cx="339" cy="72" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="222" y="40" width="180" height="20" rx="10" />
+  </g>
+</svg>
+
 ## `GROUP BY ALL` — stop repeating yourself
 
 A normal grouped query forces you to list the grouping columns *twice*:
@@ -155,6 +195,37 @@ ORDER BY
 
 You now have per-region subtotals, per-product subtotals, the detail, and
 the grand total — the full cross-tabulation, in one query.
+
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="A two-by-two grid of blue detail cells grows a green margin column, a yellow margin row, and a red corner total — CUBE computing the detail and every marginal subtotal in a single pass"
+  style={{ display: "block", width: "100%", maxWidth: "440px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="160" y="30" width="92" height="44" rx="9" fillOpacity="0.55" />
+    <rect x="262" y="30" width="92" height="44" rx="9" fillOpacity="0.4" />
+    <rect x="160" y="84" width="92" height="44" rx="9" fillOpacity="0.35" />
+    <rect x="262" y="84" width="92" height="44" rx="9" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="382" y="30" width="60" height="44" rx="9" fillOpacity="0.8" />
+    <rect x="382" y="84" width="60" height="44" rx="9" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="160" y="146" width="92" height="28" rx="9" fillOpacity="0.85" />
+    <rect x="262" y="146" width="92" height="28" rx="9" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="382" y="146" width="60" height="28" rx="9" fillOpacity="0.8" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="368" cy="52" r="2.5" />
+    <circle cx="368" cy="106" r="2.5" />
+    <circle cx="206" cy="138" r="2.5" />
+    <circle cx="308" cy="138" r="2.5" />
+  </g>
+</svg>
 
 ## Distinguishing real NULLs from subtotal NULLs
 

@@ -9,6 +9,55 @@ moderation, though, subqueries are a precise, expressive tool. This page
 sorts the common kinds, shows where each shines in analysis, and gives you
 a rule for choosing between a subquery, a CTE, and a join.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Value dots float above and below a dashed yellow line whose height was forged inside a small medallion where miniature rows collapse to a single point — a subquery computes one number and every outer row is measured against it"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="84" cy="64" r="8" />
+    <circle cx="188" cy="48" r="8" />
+    <circle cx="292" cy="76" r="8" />
+    <circle cx="396" cy="56" r="8" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="136" cy="148" r="8" fillOpacity="0.45" />
+    <circle cx="240" cy="166" r="8" fillOpacity="0.45" />
+    <circle cx="344" cy="140" r="8" fillOpacity="0.45" />
+    <circle cx="422" cy="172" r="8" fillOpacity="0.45" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="60" y="106" width="20" height="5" rx="2.5" />
+    <rect x="92" y="106" width="20" height="5" rx="2.5" />
+    <rect x="124" y="106" width="20" height="5" rx="2.5" />
+    <rect x="156" y="106" width="20" height="5" rx="2.5" />
+    <rect x="188" y="106" width="20" height="5" rx="2.5" />
+    <rect x="220" y="106" width="20" height="5" rx="2.5" />
+    <rect x="252" y="106" width="20" height="5" rx="2.5" />
+    <rect x="284" y="106" width="20" height="5" rx="2.5" />
+    <rect x="316" y="106" width="20" height="5" rx="2.5" />
+    <rect x="348" y="106" width="20" height="5" rx="2.5" />
+    <rect x="380" y="106" width="20" height="5" rx="2.5" />
+    <rect x="412" y="106" width="20" height="5" rx="2.5" />
+    <rect x="444" y="106" width="20" height="5" rx="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.07">
+    <circle cx="552" cy="104" r="60" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <rect x="524" y="72" width="32" height="6" rx="3" />
+    <rect x="536" y="86" width="32" height="6" rx="3" />
+    <rect x="524" y="100" width="32" height="6" rx="3" />
+    <rect x="536" y="114" width="32" height="6" rx="3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="548" cy="140" r="8" />
+    <circle cx="497" cy="116" r="2.5" fillOpacity="0.8" />
+    <circle cx="480" cy="110" r="2.5" fillOpacity="0.8" />
+  </g>
+</svg>
+
 ## Three kinds of subquery
 
 ```mermaid
@@ -213,6 +262,36 @@ ORDER BY
 
 Bo has no orders, so Bo is excluded. `EXISTS` stops at the first match,
 making it an efficient "has any" test.
+
+<svg
+  viewBox="0 0 640 155"
+  role="img"
+  aria-label="Three customer capsules are inspected for contents: the ones holding at least one yellow order dot earn a solid green lamp, while the empty capsule gets a hollow red ring — EXISTS asks only whether a match exists, never how many"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.08">
+    <rect x="84" y="56" width="136" height="66" rx="18" />
+    <rect x="252" y="56" width="136" height="66" rx="18" />
+    <rect x="420" y="56" width="136" height="66" rx="18" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="134" cy="89" r="9" />
+    <circle cx="166" cy="89" r="9" />
+    <circle cx="488" cy="89" r="9" />
+  </g>
+  <g fill="currentColor" opacity="0.14">
+    <rect x="296" y="86" width="12" height="6" rx="3" />
+    <rect x="316" y="86" width="12" height="6" rx="3" />
+    <rect x="336" y="86" width="12" height="6" rx="3" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="152" cy="36" r="9" />
+    <circle cx="488" cy="36" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M 320 36 m -9 0 a 9 9 0 1 0 18 0 a 9 9 0 1 0 -18 0 M 320 36 m -5 0 a 5 5 0 1 1 10 0 a 5 5 0 1 1 -10 0" fillRule="evenodd" fillOpacity="0.75" />
+  </g>
+</svg>
 
 ## Choosing: subquery vs. CTE vs. join
 

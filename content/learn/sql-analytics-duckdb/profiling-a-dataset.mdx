@@ -10,6 +10,57 @@ Skipping this step is how analysts get fooled — by duplicates, missing
 values, or a date column that secretly stops in March. This page is the
 profiling checklist, expressed in SQL.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="A blue magnifier hovers over one column of a faint table and blows it up into quick stats — a range bar, distinct-value dots, and a red ring around a hole where a value is missing — profiling a dataset before trusting it"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.12">
+    <rect x="70" y="40" width="38" height="20" rx="5" />
+    <rect x="70" y="68" width="38" height="20" rx="5" />
+    <rect x="70" y="96" width="38" height="20" rx="5" />
+    <rect x="70" y="124" width="38" height="20" rx="5" />
+    <rect x="70" y="152" width="38" height="20" rx="5" />
+    <rect x="122" y="40" width="38" height="20" rx="5" />
+    <rect x="122" y="68" width="38" height="20" rx="5" />
+    <rect x="122" y="96" width="38" height="20" rx="5" />
+    <rect x="122" y="124" width="38" height="20" rx="5" />
+    <rect x="122" y="152" width="38" height="20" rx="5" />
+    <rect x="174" y="40" width="38" height="20" rx="5" />
+    <rect x="174" y="68" width="38" height="20" rx="5" />
+    <rect x="174" y="96" width="38" height="20" rx="5" />
+    <rect x="174" y="124" width="38" height="20" rx="5" />
+    <rect x="174" y="152" width="38" height="20" rx="5" />
+    <rect x="226" y="40" width="38" height="20" rx="5" />
+    <rect x="226" y="68" width="38" height="20" rx="5" />
+    <rect x="226" y="124" width="38" height="20" rx="5" />
+    <rect x="226" y="152" width="38" height="20" rx="5" />
+  </g>
+  <g fill="currentColor" opacity="0.05">
+    <circle cx="400" cy="104" r="56" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M 400 40 a 64 64 0 1 0 0.01 0 Z M 400 49 a 55 55 0 1 1 -0.01 0 Z" fillRule="evenodd" />
+    <path d="M 441 156 L 456 141 L 524 201 L 511 218 Z" />
+    <rect x="364" y="76" width="72" height="13" rx="6.5" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="372" cy="110" r="6" />
+    <circle cx="394" cy="110" r="6" />
+    <circle cx="416" cy="110" r="6" />
+    <circle cx="438" cy="110" r="6" fillOpacity="0.4" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M 400 124 a 12 12 0 1 0 0.01 0 Z M 400 130 a 6 6 0 1 1 -0.01 0 Z" fillRule="evenodd" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="560" cy="60" r="3" />
+    <circle cx="590" cy="106" r="3" />
+    <circle cx="566" cy="150" r="3" />
+  </g>
+</svg>
+
 ## Why profile first
 
 A dataset can lie to you in quiet ways:
@@ -123,6 +174,31 @@ FROM
 
 Knowing *how many* values are missing tells you whether a column is
 trustworthy or needs cleaning before analysis.
+
+<svg
+  viewBox="0 0 640 130"
+  role="img"
+  aria-label="Two left-aligned measuring bars — every row in blue above, only the non-null values in green below — leave a red overhang where they differ: the exact count of missing values"
+  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="80" y="34" width="400" height="22" rx="11" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="80" y="72" width="296" height="22" rx="11" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="384" y="72" width="96" height="22" rx="11" fillOpacity="0.25" />
+    <circle cx="412" cy="83" r="4" fillOpacity="0.85" />
+    <circle cx="432" cy="83" r="4" fillOpacity="0.85" />
+    <circle cx="452" cy="83" r="4" fillOpacity="0.85" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <rect x="80" y="106" width="3" height="10" rx="1.5" />
+    <rect x="478" y="106" width="3" height="10" rx="1.5" />
+    <rect x="376" y="106" width="3" height="10" rx="1.5" />
+  </g>
+</svg>
 
 ## The shortcut: `SUMMARIZE`
 

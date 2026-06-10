@@ -9,6 +9,55 @@ produce the same result, and you should be able to explain exactly how it
 was computed. This closing-technique page is about **reproducibility**:
 the habits that turn a one-off query into analysis others can rely on.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="Three colored stations sit on a dotted loop that can be run lap after lap, and every lap drops one more identical green chip onto the stack at the right — a reproducible workflow returns the same answer every time it runs"
+  style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="240" cy="38" r="3" />
+    <circle cx="277" cy="48" r="3" />
+    <circle cx="303" cy="74" r="3" />
+    <circle cx="312" cy="110" r="3" />
+    <circle cx="303" cy="146" r="3" />
+    <circle cx="277" cy="172" r="3" />
+    <circle cx="240" cy="182" r="3" />
+    <circle cx="203" cy="172" r="3" />
+    <circle cx="177" cy="146" r="3" />
+    <circle cx="168" cy="110" r="3" />
+    <circle cx="177" cy="74" r="3" />
+    <circle cx="203" cy="48" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="240" cy="38" r="12" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="303" cy="146" r="12" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="177" cy="146" r="12" />
+  </g>
+  <g fill="currentColor" opacity="0.22">
+    <circle cx="352" cy="110" r="2.5" />
+    <circle cx="374" cy="110" r="2.5" />
+    <circle cx="396" cy="110" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.4">
+    <text x="424" y="118" fontFamily="ui-monospace, monospace" fontSize="22" textAnchor="middle">=</text>
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="452" y="62" width="116" height="20" rx="10" fillOpacity="0.85" />
+    <rect x="452" y="100" width="116" height="20" rx="10" fillOpacity="0.85" />
+    <rect x="452" y="138" width="116" height="20" rx="10" fillOpacity="0.85" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <circle cx="84" cy="60" r="3" />
+    <circle cx="64" cy="160" r="3" />
+    <circle cx="600" cy="190" r="3" />
+  </g>
+</svg>
+
 ## Why reproducibility is non-negotiable
 
 Analysis drives decisions, and decisions get questioned. "Where did this
@@ -155,6 +204,40 @@ ORDER BY
 The definition of "paid revenue by region" now lives in *one* place. If
 the business redefines it, you change the view once and every downstream
 query follows.
+
+<svg
+  viewBox="0 0 640 175"
+  role="img"
+  aria-label="Three readers draw from one yellow named definition along dotted rays, while below two faded copy-pasted chips have already drifted out of line — a view keeps everyone computing the same metric"
+  style={{ display: "block", width: "100%", maxWidth: "500px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="86" y="48" width="128" height="36" rx="18" />
+  </g>
+  <g fill="currentColor" opacity="0.22">
+    <circle cx="248" cy="46" r="2.5" />
+    <circle cx="286" cy="36" r="2.5" />
+    <circle cx="324" cy="30" r="2.5" />
+    <circle cx="248" cy="66" r="2.5" />
+    <circle cx="290" cy="66" r="2.5" />
+    <circle cx="332" cy="66" r="2.5" />
+    <circle cx="248" cy="86" r="2.5" />
+    <circle cx="286" cy="96" r="2.5" />
+    <circle cx="324" cy="102" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="372" cy="28" r="11" />
+    <circle cx="380" cy="66" r="11" />
+    <circle cx="372" cy="104" r="11" />
+  </g>
+  <g fill="currentColor" opacity="0.14">
+    <rect x="118" y="128" width="84" height="16" rx="8" />
+    <rect x="232" y="138" width="84" height="16" rx="8" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="206" y="124" width="34" height="6" rx="3" fillOpacity="0.6" />
+  </g>
+</svg>
 
 ## Structure for readability and auditability
 

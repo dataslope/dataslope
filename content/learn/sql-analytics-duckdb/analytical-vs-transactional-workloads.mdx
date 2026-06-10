@@ -10,6 +10,61 @@ Processing*. You do not need to memorize the acronyms, but understanding
 what each workload *demands* explains why analytical databases like
 DuckDB are built so differently from the database behind a typical app.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A narrow ledger tape records transactions tick by tick, with a fresh yellow entry still sliding in, while across a dotted trail the same history is condensed into an isometric analytics cube — OLTP records what happened, OLAP explains what it means"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.08">
+    <rect x="96" y="30" width="84" height="162" rx="10" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <rect x="110" y="46" width="44" height="5" rx="2.5" />
+    <rect x="110" y="64" width="52" height="5" rx="2.5" />
+    <rect x="110" y="82" width="38" height="5" rx="2.5" />
+    <rect x="110" y="100" width="50" height="5" rx="2.5" />
+    <rect x="110" y="118" width="42" height="5" rx="2.5" />
+    <rect x="110" y="136" width="54" height="5" rx="2.5" />
+    <rect x="110" y="154" width="40" height="5" rx="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="166" cy="48" r="2.8" />
+    <circle cx="166" cy="84" r="2.8" />
+    <circle cx="166" cy="120" r="2.8" />
+    <circle cx="166" cy="156" r="2.8" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="124" y="172" width="48" height="6" rx="3" />
+    <circle cx="184" cy="175" r="3" fillOpacity="0.6" />
+  </g>
+  <g fill="currentColor" opacity="0.28">
+    <circle cx="228" cy="110" r="3" />
+    <circle cx="258" cy="104" r="3.5" />
+    <circle cx="290" cy="100" r="4" />
+    <circle cx="324" cy="98" r="4.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M 462 36 L 540 76 L 462 116 L 384 76 Z" fillOpacity="0.9" />
+    <path d="M 384 76 L 462 116 L 462 196 L 384 156 Z" fillOpacity="0.55" />
+    <path d="M 540 76 L 462 116 L 462 196 L 540 156 Z" fillOpacity="0.3" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="462" cy="76" r="7" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="420" cy="140" r="5" fillOpacity="0.9" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="504" cy="140" r="5" fillOpacity="0.9" />
+  </g>
+  <g fill="currentColor" opacity="0.22">
+    <circle cx="586" cy="48" r="3" />
+    <circle cx="350" cy="180" r="3" />
+    <circle cx="60" cy="70" r="3" />
+  </g>
+</svg>
+
 ## A transaction vs. an analysis
 
 A **transaction** is a small, complete unit of business activity: place
@@ -72,6 +127,85 @@ On a wide table that can mean reading 5% of the data instead of 100%.
 That single design choice is why purpose-built analytical engines crush
 row-oriented databases on summary queries. DuckDB is column-oriented,
 which is a big part of *why DuckDB exists* (more on that soon).
+
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="The same table stored two ways: on the left each row keeps its four mixed-color values side by side and one whole row is lit for a point read; on the right every column's values stand together as one vertical stripe and only the green amount stripe glows — a column store reads just what the question needs"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="56" y="36" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="56" y="60" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="56" y="84" width="44" height="16" rx="5" fillOpacity="0.9" />
+    <rect x="56" y="108" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="56" y="132" width="44" height="16" rx="5" fillOpacity="0.22" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="106" y="36" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="106" y="60" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="106" y="84" width="44" height="16" rx="5" fillOpacity="0.9" />
+    <rect x="106" y="108" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="106" y="132" width="44" height="16" rx="5" fillOpacity="0.22" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="156" y="36" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="156" y="60" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="156" y="84" width="44" height="16" rx="5" fillOpacity="0.9" />
+    <rect x="156" y="108" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="156" y="132" width="44" height="16" rx="5" fillOpacity="0.22" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="206" y="36" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="206" y="60" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="206" y="84" width="44" height="16" rx="5" fillOpacity="0.9" />
+    <rect x="206" y="108" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="206" y="132" width="44" height="16" rx="5" fillOpacity="0.22" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <rect x="86" y="168" width="134" height="4" rx="2" />
+  </g>
+  <g fill="currentColor" opacity="0.28">
+    <circle cx="306" cy="92" r="2.5" />
+    <circle cx="320" cy="92" r="2.5" />
+    <circle cx="334" cy="92" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="388" y="36" width="40" height="112" rx="8" fillOpacity="0.14" />
+    <rect x="396" y="44" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="396" y="64" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="396" y="84" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="396" y="104" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="396" y="124" width="24" height="14" rx="4" fillOpacity="0.3" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="438" y="30" width="44" height="124" rx="8" fillOpacity="0.3" />
+    <rect x="448" y="44" width="24" height="14" rx="4" />
+    <rect x="448" y="64" width="24" height="14" rx="4" />
+    <rect x="448" y="84" width="24" height="14" rx="4" />
+    <rect x="448" y="104" width="24" height="14" rx="4" />
+    <rect x="448" y="124" width="24" height="14" rx="4" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="492" y="36" width="40" height="112" rx="8" fillOpacity="0.14" />
+    <rect x="500" y="44" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="500" y="64" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="500" y="84" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="500" y="104" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="500" y="124" width="24" height="14" rx="4" fillOpacity="0.3" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="542" y="36" width="40" height="112" rx="8" fillOpacity="0.14" />
+    <rect x="550" y="44" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="550" y="64" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="550" y="84" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="550" y="104" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="550" y="124" width="24" height="14" rx="4" fillOpacity="0.3" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="448" y="168" width="24" height="4" rx="2" fillOpacity="0.7" />
+  </g>
+</svg>
 
 ## You write SQL the same way either way
 

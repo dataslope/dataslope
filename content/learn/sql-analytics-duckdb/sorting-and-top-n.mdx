@@ -9,6 +9,68 @@ to *sort, then look at the head*. This page treats `ORDER BY` not as
 presentation but as a way to **find the rows that matter**, and introduces
 the per-group top-N pattern analysts use constantly.
 
+<svg
+  viewBox="0 0 640 235"
+  role="img"
+  aria-label="Loose dots pour into a vessel and settle into layers sorted by size, while a yellow ladle skims the three biggest green dots off the top — and an equally large red dot left in the layer below hints at the tie that almost made the cut"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="62" cy="44" r="5" />
+    <circle cx="96" cy="28" r="7" />
+    <circle cx="128" cy="52" r="4" />
+    <circle cx="158" cy="30" r="6" />
+    <circle cx="118" cy="84" r="3.5" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <circle cx="184" cy="62" r="3" />
+    <circle cx="208" cy="84" r="3" />
+    <circle cx="228" cy="108" r="3" />
+  </g>
+  <g fill="currentColor" opacity="0.07">
+    <rect x="244" y="84" width="252" height="124" rx="16" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M 252 58 Q 370 86 488 58 L 488 68 Q 370 96 252 68 Z" fillOpacity="0.55" />
+    <rect x="488" y="50" width="64" height="10" rx="5" fillOpacity="0.55" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="306" cy="42" r="10" />
+    <circle cx="370" cy="48" r="10" />
+    <circle cx="434" cy="42" r="10" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="294" cy="110" r="7" fillOpacity="0.6" />
+    <circle cx="350" cy="110" r="7" fillOpacity="0.6" />
+    <circle cx="462" cy="110" r="7" fillOpacity="0.6" />
+    <circle cx="286" cy="140" r="5.5" fillOpacity="0.45" />
+    <circle cx="330" cy="140" r="5.5" fillOpacity="0.45" />
+    <circle cx="374" cy="140" r="5.5" fillOpacity="0.45" />
+    <circle cx="418" cy="140" r="5.5" fillOpacity="0.45" />
+    <circle cx="460" cy="140" r="5.5" fillOpacity="0.45" />
+    <circle cx="280" cy="166" r="4" fillOpacity="0.3" />
+    <circle cx="316" cy="166" r="4" fillOpacity="0.3" />
+    <circle cx="352" cy="166" r="4" fillOpacity="0.3" />
+    <circle cx="388" cy="166" r="4" fillOpacity="0.3" />
+    <circle cx="424" cy="166" r="4" fillOpacity="0.3" />
+    <circle cx="460" cy="166" r="4" fillOpacity="0.3" />
+    <circle cx="276" cy="190" r="3" fillOpacity="0.18" />
+    <circle cx="308" cy="190" r="3" fillOpacity="0.18" />
+    <circle cx="340" cy="190" r="3" fillOpacity="0.18" />
+    <circle cx="372" cy="190" r="3" fillOpacity="0.18" />
+    <circle cx="404" cy="190" r="3" fillOpacity="0.18" />
+    <circle cx="436" cy="190" r="3" fillOpacity="0.18" />
+    <circle cx="466" cy="190" r="3" fillOpacity="0.18" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="406" cy="110" r="9.5" fillOpacity="0.85" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="560" cy="120" r="3" />
+    <circle cx="586" cy="160" r="3" />
+  </g>
+</svg>
+
 ## Sorting surfaces the extremes
 
 The fastest way to learn something about a dataset is to look at its
@@ -162,6 +224,41 @@ section explains them in full. For now, note the *shape* of the question:
 **rank within each group, then keep the top of each**. It is one of the
 most common analytical patterns there is, and `QUALIFY` expresses it
 without an extra subquery.
+
+<svg
+  viewBox="0 0 640 195"
+  role="img"
+  aria-label="Three vertical lanes of dots sorted by size, each with a translucent green band hugging its own two largest — top-N applied within every group instead of once across the whole result"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.06">
+    <rect x="98" y="24" width="92" height="156" rx="16" />
+    <rect x="274" y="24" width="92" height="156" rx="16" />
+    <rect x="450" y="24" width="92" height="156" rx="16" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="106" y="34" width="76" height="68" rx="13" fillOpacity="0.16" />
+    <rect x="282" y="34" width="76" height="62" rx="13" fillOpacity="0.16" />
+    <rect x="458" y="34" width="76" height="74" rx="13" fillOpacity="0.16" />
+    <circle cx="144" cy="54" r="10" />
+    <circle cx="144" cy="84" r="8" />
+    <circle cx="320" cy="52" r="9" />
+    <circle cx="320" cy="80" r="7.5" />
+    <circle cx="496" cy="56" r="11" />
+    <circle cx="496" cy="90" r="8.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="144" cy="116" r="6" fillOpacity="0.4" />
+    <circle cx="144" cy="142" r="4.5" fillOpacity="0.28" />
+    <circle cx="144" cy="163" r="3.5" fillOpacity="0.18" />
+    <circle cx="320" cy="108" r="6" fillOpacity="0.4" />
+    <circle cx="320" cy="134" r="4.5" fillOpacity="0.28" />
+    <circle cx="320" cy="156" r="3.5" fillOpacity="0.18" />
+    <circle cx="496" cy="122" r="6" fillOpacity="0.4" />
+    <circle cx="496" cy="148" r="4.5" fillOpacity="0.28" />
+    <circle cx="496" cy="168" r="3.5" fillOpacity="0.18" />
+  </g>
+</svg>
 
 ## Check your understanding
 

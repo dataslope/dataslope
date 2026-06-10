@@ -10,6 +10,60 @@ have ever seen in a report is an aggregate. This page explains not just
 the five functions but *why* aggregation is the analyst's most important
 move.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A wide beam of faint rows strikes a translucent blue prism and fans out as five single colored values — one unreadable pile of data refracted into count, sum, average, minimum, and maximum"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.28">
+    <circle cx="48" cy="78" r="3.5" />
+    <circle cx="76" cy="96" r="3.5" />
+    <circle cx="58" cy="118" r="3.5" />
+    <circle cx="92" cy="134" r="3.5" />
+    <circle cx="104" cy="84" r="3.5" />
+    <circle cx="128" cy="106" r="3.5" />
+    <circle cx="118" cy="128" r="3.5" />
+    <circle cx="148" cy="92" r="3.5" />
+    <circle cx="160" cy="116" r="3.5" />
+    <circle cx="178" cy="102" r="3.5" />
+    <circle cx="196" cy="118" r="3.5" />
+    <circle cx="208" cy="100" r="3.5" />
+    <circle cx="226" cy="110" r="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M 312 42 L 374 168 L 250 168 Z" fillOpacity="0.25" />
+    <path d="M 312 74 L 352 156 L 272 156 Z" fillOpacity="0.25" />
+  </g>
+  <g fill="currentColor" opacity="0.22">
+    <circle cx="404" cy="62" r="2.5" />
+    <circle cx="446" cy="48" r="2.5" />
+    <circle cx="408" cy="88" r="2.5" />
+    <circle cx="452" cy="80" r="2.5" />
+    <circle cx="412" cy="112" r="2.5" />
+    <circle cx="458" cy="112" r="2.5" />
+    <circle cx="408" cy="136" r="2.5" />
+    <circle cx="452" cy="144" r="2.5" />
+    <circle cx="404" cy="160" r="2.5" />
+    <circle cx="446" cy="176" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.55">
+    <circle cx="530" cy="34" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="548" cy="76" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="556" cy="112" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="548" cy="148" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="530" cy="188" r="9" />
+  </g>
+</svg>
+
 ## Why aggregation exists
 
 A human cannot comprehend a million rows. But "the average order was
@@ -139,6 +193,43 @@ Product A averages over its two real scores (5 and 3 → 4.0), ignoring the
 missing one. If `NULL` counted as 0, the average would be a misleading
 2.67. SQL's choice to skip NULLs is what makes aggregates trustworthy —
 but you must *know* it is happening.
+
+<svg
+  viewBox="0 0 640 160"
+  role="img"
+  aria-label="Solid green values roll into a blue averaging bowl while two hollow unknown values detour around it on a dotted path — aggregates skip NULLs rather than counting them as zero"
+  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="66" cy="64" r="8" />
+    <circle cx="104" cy="64" r="8" />
+    <circle cx="142" cy="64" r="8" />
+    <circle cx="180" cy="64" r="8" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <path d="M 226 64 a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0 M 230 64 a 4 4 0 1 1 8 0 a 4 4 0 1 1 -8 0" fillRule="evenodd" />
+    <path d="M 264 64 a 8 8 0 1 0 16 0 a 8 8 0 1 0 -16 0 M 268 64 a 4 4 0 1 1 8 0 a 4 4 0 1 1 -8 0" fillRule="evenodd" />
+  </g>
+  <g fill="currentColor" opacity="0.22">
+    <circle cx="296" cy="92" r="2.5" />
+    <circle cx="312" cy="112" r="2.5" />
+    <circle cx="336" cy="126" r="2.5" />
+    <circle cx="364" cy="132" r="2.5" />
+    <circle cx="392" cy="126" r="2.5" />
+    <circle cx="414" cy="112" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M 320 58 A 42 42 0 0 0 404 58 L 392 58 A 30 30 0 0 1 332 58 Z" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="436" cy="64" r="2.5" />
+    <circle cx="454" cy="64" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="500" cy="64" r="18" fillOpacity="0.2" />
+    <circle cx="500" cy="64" r="10" />
+  </g>
+</svg>
 
 ## Aggregating a filtered slice
 
