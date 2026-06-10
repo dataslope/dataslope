@@ -15,6 +15,45 @@ attention to *syntax* rather than just the word's spelling, and it unlocks a
 lot: better lemmatization, extracting "all the nouns", recognizing names, and
 finding grammatical patterns.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Two sentences as rows of word chips with small colored part-of-speech badges clipped beneath; the same word chip appears in both rows but earns a blue noun badge in one and a green verb badge in the other"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor">
+    <rect x="166" y="52" width="30" height="26" rx="10" opacity="0.18" />
+    <rect x="208" y="52" width="78" height="26" rx="10" opacity="0.18" />
+    <rect x="298" y="52" width="28" height="26" rx="10" opacity="0.18" />
+    <rect x="338" y="52" width="64" height="26" rx="10" opacity="0.32" />
+    <rect x="166" y="126" width="44" height="26" rx="10" opacity="0.18" />
+    <rect x="222" y="126" width="64" height="26" rx="10" opacity="0.32" />
+    <rect x="298" y="126" width="70" height="26" rx="10" opacity="0.18" />
+    <rect x="380" y="126" width="98" height="26" rx="10" opacity="0.18" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="169" y="86" width="24" height="12" rx="6" fillOpacity="0.85" />
+    <rect x="358" y="86" width="24" height="12" rx="6" fillOpacity="0.85" />
+    <rect x="176" y="160" width="24" height="12" rx="6" fillOpacity="0.85" />
+    <rect x="417" y="160" width="24" height="12" rx="6" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="235" y="86" width="24" height="12" rx="6" fillOpacity="0.85" />
+    <rect x="242" y="160" width="24" height="12" rx="6" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="321" y="160" width="24" height="12" rx="6" fillOpacity="0.85" />
+  </g>
+  <g fill="currentColor">
+    <rect x="300" y="86" width="24" height="12" rx="6" opacity="0.25" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="326" cy="92" r="3" />
+    <circle cx="310" cy="103" r="3" />
+    <circle cx="294" cy="114" r="3" />
+  </g>
+</svg>
+
 ## The problem POS tagging solves: words wear many hats
 
 A word's category depends on **context**, not just the word itself. This is

@@ -14,6 +14,41 @@ contractions hide words, punctuation glues itself to words, and a period
 means three different things. A good tokenizer encodes a surprising amount of
 linguistic knowledge to get the cuts right.
 
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="One long sentence pill splits along dotted fall lines into word-sized token chips of different widths, the negation piece in green and the punctuation mark as its own tiny chip"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="90" y="40" width="460" height="30" rx="15" fillOpacity="0.22" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="153" cy="90" r="3" />
+    <circle cx="153" cy="106" r="3" />
+    <circle cx="211" cy="90" r="3" />
+    <circle cx="211" cy="106" r="3" />
+    <circle cx="313" cy="90" r="3" />
+    <circle cx="313" cy="106" r="3" />
+    <circle cx="397" cy="90" r="3" />
+    <circle cx="397" cy="106" r="3" />
+    <circle cx="521" cy="90" r="3" />
+    <circle cx="521" cy="106" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="90" y="126" width="56" height="30" rx="15" fillOpacity="0.85" />
+    <rect x="218" y="126" width="88" height="30" rx="15" fillOpacity="0.85" />
+    <rect x="320" y="126" width="70" height="30" rx="15" fillOpacity="0.85" />
+    <rect x="404" y="126" width="110" height="30" rx="15" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="160" y="126" width="44" height="30" rx="15" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="528" y="126" width="22" height="30" rx="11" />
+  </g>
+</svg>
+
 <Callout type="warn" title="The misconception to unlearn first">
 "Tokenization is just `string.split()`." This is the single most common
 misunderstanding in beginner NLP. Splitting on whitespace is a crude
