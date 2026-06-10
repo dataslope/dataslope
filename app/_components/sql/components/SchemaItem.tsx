@@ -68,6 +68,7 @@ function TruncatedText({
         openOnHover
         delay={180}
         closeDelay={80}
+        nativeButton={false}
         render={(props) => (
           <span {...props} className={className}>
             {display}

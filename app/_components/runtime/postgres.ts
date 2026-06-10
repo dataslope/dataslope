@@ -771,6 +771,25 @@ export async function createPostgresEngine(
             `ALTER SEQUENCE ${schemaPrefix}${quoteIdent(oldSeq)} RENAME TO ${quoteIdent(newSeq)}`,
           );
         }
+        // Like the sequences above, constraints auto-named by CREATE TABLE
+        // (`<tmpName>_pkey`, `<tmpName>_<col>_key`, `<tmpName>_<col>_fkey`,
+        // …) keep the temp prefix after RENAME TO — which would surface in
+        // the sidebar as e.g. `books__tmp_rebuild_1_pkey`. Rename every
+        // constraint that carries the temp prefix; renaming a constraint
+        // also renames its backing index.
+        const likePattern = `${tmpName.replace(/([%_\\])/g, "\\$1")}%`;
+        const tmpConstraints = await db.query<{ conname: string }>(
+          `SELECT conname FROM pg_constraint
+           WHERE conrelid = $1::regclass AND conname LIKE $2`,
+          [`${schemaPrefix}${quoteIdent(finalName)}`, likePattern],
+        );
+        for (const { conname } of tmpConstraints.rows) {
+          const renamed = conname.replace(tmpName, finalName);
+          if (renamed === conname) continue;
+          await db.exec(
+            `ALTER TABLE ${schemaPrefix}${quoteIdent(finalName)} RENAME CONSTRAINT ${quoteIdent(conname)} TO ${quoteIdent(renamed)}`,
+          );
+        }
         await db.exec("COMMIT");
       } catch (err) {
         try {

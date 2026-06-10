@@ -64,7 +64,7 @@ import Link from "next/link";
 import { Menu } from "@base-ui-components/react/menu";
 import { Popover } from "@base-ui-components/react/popover";
 import { AlertDialog } from "@base-ui-components/react/alert-dialog";
-import { Toast } from "@base-ui-components/react/toast";
+import { Toast } from "@base-ui/react/toast";
 import { Select } from "@base-ui-components/react/select";
 import { Drawer } from "@base-ui/react/drawer";
 import {
@@ -806,6 +806,19 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // The auto-scroll effect uses it to scroll that cell into view rather
   // than jumping all the way to the end of the scroll container.
   const newRunFirstIdRef = useRef<number | null>(null);
+
+  // Pending error→ready status reset. Tracked so a new run can cancel it —
+  // otherwise failing a run and re-running within 3s would let the stale
+  // timer flip the status to "ready" while the new run is still executing.
+  const errorResetTimerRef = useRef<number | null>(null);
+  useEffect(
+    () => () => {
+      if (errorResetTimerRef.current !== null) {
+        window.clearTimeout(errorResetTimerRef.current);
+      }
+    },
+    [],
+  );
 
   const scrollToLatestOutput = useCallback(() => {
     const el = outputBodyRef.current;
@@ -1670,6 +1683,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     }
     if (!code.trim()) return;
 
+    if (errorResetTimerRef.current !== null) {
+      window.clearTimeout(errorResetTimerRef.current);
+      errorResetTimerRef.current = null;
+    }
     setStatusState("running");
 
     if (clearBeforeRun) {
@@ -1806,7 +1823,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         },
       ]);
       setStatusState("error");
-      window.setTimeout(() => {
+      errorResetTimerRef.current = window.setTimeout(() => {
+        errorResetTimerRef.current = null;
         setStatusState("ready");
       }, 3000);
     } finally {

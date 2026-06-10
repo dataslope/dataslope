@@ -156,6 +156,7 @@ function ErTableNode({ data }: NodeProps) {
                     openOnHover
                     delay={120}
                     closeDelay={80}
+                    nativeButton={false}
                     render={(triggerProps) => (
                       <span {...triggerProps} className="er-col-icon-trigger">
                         <MdOutlineKey
@@ -181,6 +182,7 @@ function ErTableNode({ data }: NodeProps) {
                     openOnHover
                     delay={120}
                     closeDelay={80}
+                    nativeButton={false}
                     render={(triggerProps) => (
                       <span {...triggerProps} className="er-col-icon-trigger">
                         <IoLink

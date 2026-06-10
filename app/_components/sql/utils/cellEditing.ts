@@ -53,8 +53,9 @@ export function classifyCellEditor(sqlType: string | undefined): CellEditorKind 
   if (/^bool(ean)?$/.test(t)) return "boolean";
   // Arrays / lists get a dedicated JSON-array editor (checked before the
   // scalar temporal/json rules so an array of timestamps isn't mistaken for a
-  // single timestamp). Postgres reports `integer[]` / `text[]`; DuckDB result
-  // metadata uses Arrow notation, `list<int32>` / `list<utf8>`.
+  // single timestamp). Postgres and DuckDB report `integer[]` / `text[]`;
+  // raw Arrow notation (`list<int32>`) is kept as a fallback for callers
+  // that bypass `arrowTypeToSqlName`.
   if (t.endsWith("[]") || t.startsWith("list<") || t.startsWith("list(")) {
     return "array";
   }

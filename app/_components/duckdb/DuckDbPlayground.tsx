@@ -31,7 +31,7 @@ import { Menu } from "@base-ui-components/react/menu";
 import { Popover } from "@base-ui-components/react/popover";
 import { Select } from "@base-ui-components/react/select";
 import { Switch } from "@base-ui-components/react/switch";
-import { Toast } from "@base-ui-components/react/toast";
+import { Toast } from "@base-ui/react/toast";
 import {
   ArrowDownToLine,
   ArrowUpFromLine,

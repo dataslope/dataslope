@@ -40,7 +40,7 @@ import { Popover } from "@base-ui-components/react/popover";
 import { AlertDialog } from "@base-ui-components/react/alert-dialog";
 import { Dialog } from "@base-ui-components/react/dialog";
 import { Tabs } from "@base-ui-components/react/tabs";
-import { Toast } from "@base-ui-components/react/toast";
+import { Toast } from "@base-ui/react/toast";
 import { Menu } from "@base-ui-components/react/menu";
 import {
   ArrowDownToLine,
@@ -1344,6 +1344,14 @@ function SqlPlaygroundInner() {
     })();
     return () => {
       cancelled = true;
+      // Terminate the engine worker so its OPFS access handles are
+      // released — a zombie worker would otherwise keep the workspace's
+      // opfs-sahpool locked across StrictMode remounts and client-side
+      // route changes, failing the next boot's OPFS acquisition. A boot
+      // still in flight here is handled by createSqliteEngine itself,
+      // which terminates the previous worker before spawning a new one.
+      engineRef.current?.dispose?.();
+      engineRef.current = null;
       editorRef.current?.destroy();
       editorRef.current = null;
       themeCompRef.current = null;

@@ -195,6 +195,7 @@ function HistoryEntryRow({
               openOnHover
               delay={200}
               closeDelay={80}
+              nativeButton={false}
               render={(triggerProps) => (
                 <span
                   {...triggerProps}

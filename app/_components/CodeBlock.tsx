@@ -11,7 +11,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { ChevronDown, ChevronUp, File, Lock, Play, RotateCcw } from "lucide-react";
-import { Toast } from "@base-ui-components/react/toast";
+import { Toast } from "@base-ui/react/toast";
 import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR,

@@ -309,12 +309,13 @@ function valueEquals(a: unknown, b: unknown): boolean {
   // return numeric-typed columns as JS numbers while sqlite-wasm
   // returns them as strings for INTEGER columns wider than 2^53. For a
   // learner-facing test framework, treating "42" and 42 as equal is
-  // the principle of least surprise.
+  // the principle of least surprise. Blank strings are excluded —
+  // Number("") is 0, which would make '' compare equal to 0.
   if (typeof a === "number" && typeof b === "string") {
-    return Number(b) === a;
+    return b.trim() !== "" && Number(b) === a;
   }
   if (typeof a === "string" && typeof b === "number") {
-    return Number(a) === b;
+    return a.trim() !== "" && Number(a) === b;
   }
   if (typeof a === "bigint" || typeof b === "bigint") {
     return String(a) === String(b);
@@ -682,10 +683,16 @@ export function useSqlTableViewer({
   // while one is already in flight (the scroll handler can fire many
   // times before React commits the `loadingMore` flag).
   const inFlightRef = useRef<Set<number>>(new Set());
+  // Invalidates in-flight refreshes: a Reset destroys the engine and
+  // immediately starts a refresh against the fresh one — without this,
+  // a slower refresh that was already in flight (e.g. the mount-time
+  // boot on DuckDB) could land last and show the pre-reset rows.
+  const refreshSeqRef = useRef(0);
 
   const refresh = useCallback(
     async (engine: SqlEngineLike) => {
       if (!enabled) return;
+      const mySeq = ++refreshSeqRef.current;
       const defaultSchema = defaultSchemaFor(dialect);
       let plan: { schema: string | null; table: string }[];
       if (Array.isArray(tables)) {
@@ -720,6 +727,7 @@ export function useSqlTableViewer({
           };
         }),
       );
+      if (refreshSeqRef.current !== mySeq) return;
       setEntries(next);
       setActiveIdx((idx) => (next.length === 0 ? 0 : Math.min(idx, next.length - 1)));
       setInitializing(false);
@@ -778,8 +786,10 @@ export function useSqlTableViewer({
   );
 
   /** Clear all entries and re-arm the loading skeleton — used by Reset,
-   *  which destroys and re-seeds the engine. */
+   *  which destroys and re-seeds the engine. Also invalidates any
+   *  refresh still in flight so it can't resurrect the cleared rows. */
   const clear = useCallback(() => {
+    refreshSeqRef.current++;
     inFlightRef.current.clear();
     setEntries([]);
     setInitializing(enabled);
@@ -1139,12 +1149,16 @@ export default function SqlChallengeCard({
   const executeSql = useCallback(
     async (
       sql: string,
+      // The caller's run sequence (from `++runSeqRef.current`). Owning
+      // the increment in the caller lets it guard its own post-await
+      // state updates too — a newer run/check/reset supersedes both
+      // this execution's streaming updates and the caller's final ones.
+      mySeq: number,
     ): Promise<{
       results: SqlResult[];
       last: SqlResult | null;
       elapsedMs: number;
     }> => {
-      const mySeq = ++runSeqRef.current;
       setStatus("loading");
       setStatusMessage("Initializing database…");
       const engine = await ensureEngine();
@@ -1188,6 +1202,7 @@ export default function SqlChallengeCard({
 
   // ─── Run (no tests) ─────────────────────────────────────────────────
   const run = useCallback(async () => {
+    const mySeq = ++runSeqRef.current;
     setResultRunSeq((s) => s + 1);
     setActiveAction("run");
     const userSql = editorRef.current?.state.doc.toString() ?? "";
@@ -1196,7 +1211,8 @@ export default function SqlChallengeCard({
     setResultError("");
     setResultMessage("");
     try {
-      const { results, last, elapsedMs } = await executeSql(userSql);
+      const { results, last, elapsedMs } = await executeSql(userSql, mySeq);
+      if (runSeqRef.current !== mySeq) return;
       setElapsed(formatElapsed(elapsedMs));
       setResultSet(last);
       if (!last || last.columns.length === 0) {
@@ -1220,19 +1236,23 @@ export default function SqlChallengeCard({
         }
       }
     } catch (err) {
+      if (runSeqRef.current !== mySeq) return;
       const message = err instanceof Error ? err.message : String(err);
       setResultSet(null);
       setResultError(message);
       setStatus("error");
       setStatusMessage(message);
     } finally {
-      setActiveAction(null);
+      // Only the latest run owns the busy spinner — a superseded run
+      // clearing it would re-enable Submit mid-flight for its successor.
+      if (runSeqRef.current === mySeq) setActiveAction(null);
     }
   }, [executeSql, ensureEngine, refreshTableViewer, tableViewerEnabled]);
 
   // ─── Check Answer (run + tests) ─────────────────────────────────────
   const check = useCallback(async () => {
     if (!canCheck) return;
+    const mySeq = ++runSeqRef.current;
     setResultRunSeq((s) => s + 1);
     setActiveAction("submit");
     try {
@@ -1256,6 +1276,7 @@ export default function SqlChallengeCard({
     try {
       engine = await ensureEngine();
     } catch (err) {
+      if (runSeqRef.current !== mySeq) return;
       const message = err instanceof Error ? err.message : String(err);
       setStatus("error");
       setStatusMessage(message);
@@ -1270,12 +1291,14 @@ export default function SqlChallengeCard({
       setBannerState("fail");
       return;
     }
+    if (runSeqRef.current !== mySeq) return;
 
     // Run the learner's SQL first, capturing the final result set.
     let last: SqlResult | null = null;
     let elapsedMs = 0;
     try {
-      const out = await executeSql(userSql);
+      const out = await executeSql(userSql, mySeq);
+      if (runSeqRef.current !== mySeq) return;
       last = out.last;
       elapsedMs = out.elapsedMs;
       setElapsed(formatElapsed(elapsedMs));
@@ -1290,6 +1313,7 @@ export default function SqlChallengeCard({
         setResultMessage("");
       }
     } catch (err) {
+      if (runSeqRef.current !== mySeq) return;
       const message = err instanceof Error ? err.message : String(err);
       setResultError(message);
       setStatus("error");
@@ -1336,6 +1360,7 @@ export default function SqlChallengeCard({
           if (r.columns.length > 0) solutionResult = r;
         }
       } catch (err) {
+        if (runSeqRef.current !== mySeq) return;
         const msg = err instanceof Error ? err.message : String(err);
         setTestResults(
           tests.map((t) => ({
@@ -1351,6 +1376,7 @@ export default function SqlChallengeCard({
         setBannerState("fail");
         return;
       }
+      if (runSeqRef.current !== mySeq) return;
     }
 
     // Evaluate every test against the captured state.
@@ -1380,6 +1406,7 @@ export default function SqlChallengeCard({
         });
       }
     }
+    if (runSeqRef.current !== mySeq) return;
     setTestResults(displayed);
     const passed = displayed.filter((d) => d.state === "pass").length;
     const allPass = passed === displayed.length && displayed.length > 0;
@@ -1396,7 +1423,8 @@ export default function SqlChallengeCard({
       }
     }
     } finally {
-      setActiveAction(null);
+      // Only the latest submission owns the busy spinner (see `run`).
+      if (runSeqRef.current === mySeq) setActiveAction(null);
     }
   }, [canCheck, ensureEngine, executeSql, refreshTableViewer, solutionSql, tableViewerEnabled, tests]);
 
@@ -1510,6 +1538,9 @@ export default function SqlChallengeCard({
     setStatusMessage("");
     setTestResults([]);
     setBannerState(null);
+    // A run superseded by this reset skips its own spinner cleanup
+    // (its `finally` is sequence-guarded), so clear it here.
+    setActiveAction(null);
     clearTableViewer();
     if (tableViewerEnabled) {
       void ensureEngine()

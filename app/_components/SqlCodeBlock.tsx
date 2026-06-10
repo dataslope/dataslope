@@ -335,12 +335,16 @@ export default function SqlCodeBlock({
   const executeSql = useCallback(
     async (
       sql: string,
+      // The caller's run sequence (from `++runSeqRef.current`). Owning
+      // the increment in the caller lets it guard its own post-await
+      // state updates too — a newer run/reset supersedes both this
+      // execution's status updates and the caller's final ones.
+      mySeq: number,
     ): Promise<{
       results: SqlResult[];
       last: SqlResult | null;
       elapsedMs: number;
     }> => {
-      const mySeq = ++runSeqRef.current;
       setStatus("loading");
       setStatusMessage("Initializing database…");
       const engine = await ensureEngine();
@@ -378,12 +382,14 @@ export default function SqlCodeBlock({
 
   // ─── Run ────────────────────────────────────────────────────────────
   const run = useCallback(async () => {
+    const mySeq = ++runSeqRef.current;
     setResultRunSeq((s) => s + 1);
     const userSql = editorRef.current?.state.doc.toString() ?? "";
     setResultError("");
     setResultMessage("");
     try {
-      const { results, last, elapsedMs } = await executeSql(userSql);
+      const { results, last, elapsedMs } = await executeSql(userSql, mySeq);
+      if (runSeqRef.current !== mySeq) return;
       setElapsed(formatElapsed(elapsedMs));
       setResultSet(last);
       if (!last || last.columns.length === 0) {
@@ -407,6 +413,7 @@ export default function SqlCodeBlock({
         }
       }
     } catch (err) {
+      if (runSeqRef.current !== mySeq) return;
       const message = err instanceof Error ? err.message : String(err);
       setResultSet(null);
       setResultError(message);

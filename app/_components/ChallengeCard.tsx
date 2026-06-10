@@ -494,7 +494,7 @@ export default function ChallengeCard({
   const cmThemeNameRef = useRef(cmThemeName);
   useEffect(() => {
     cmThemeNameRef.current = cmThemeName;
-  });
+  }, [cmThemeName]);
 
   const canCheck = canRunTests(adapter.id, tests);
 
@@ -841,8 +841,12 @@ export default function ChallengeCard({
     async (
       entrySource: string,
       filesSnapshot: Map<string, string>,
+      // The caller's run sequence (from `++runSeqRef.current`). Owning
+      // the increment in the caller lets it guard its own post-await
+      // state updates too — a newer run/check/reset supersedes both
+      // this execution's streaming updates and the caller's final ones.
+      mySeq: number,
     ): Promise<{ cells: OutputCell[]; elapsedMs: number }> => {
-      const mySeq = ++runSeqRef.current;
       setOutputs([]);
       setStatus("loading");
       setStatusMessage("Initializing runtime…");
@@ -970,18 +974,21 @@ export default function ChallengeCard({
 
   // ─── Run (no tests) ────────────────────────────────────────────────
   const run = useCallback(async () => {
+    const mySeq = ++runSeqRef.current;
     setActiveAction("run");
     const snapshot = snapshotAllFiles();
     const entryCode = snapshot.get(resolvedEntryFilename) ?? "";
     const combined = effectiveSourceFor(resolvedEntryFilename, entryCode);
     try {
-      const { cells, elapsedMs } = await execute(combined, snapshot);
+      const { cells, elapsedMs } = await execute(combined, snapshot, mySeq);
+      if (runSeqRef.current !== mySeq) return;
       setOutputs(cells);
       setElapsed(formatElapsed(elapsedMs));
       const erred = cells.some((c) => c.type === "stderr");
       setStatus(erred ? "error" : "ready");
       setStatusMessage(erred ? "Errored" : "Done");
     } catch (err) {
+      if (runSeqRef.current !== mySeq) return;
       const message = err instanceof Error ? err.message : String(err);
       setOutputs([
         {
@@ -994,13 +1001,17 @@ export default function ChallengeCard({
       setStatus("error");
       setStatusMessage(message);
     } finally {
-      setActiveAction(null);
+      // Only the latest run owns the busy spinner — a superseded run
+      // clearing it would re-enable Run/Submit mid-flight for its
+      // successor.
+      if (runSeqRef.current === mySeq) setActiveAction(null);
     }
   }, [execute, resolvedEntryFilename, snapshotAllFiles, effectiveSourceFor]);
 
   // ─── Check Answer (run + tests) ─────────────────────────────────────
   const check = useCallback(async () => {
     if (!canCheck) return;
+    const mySeq = ++runSeqRef.current;
     setActiveAction("submit");
     const snapshot = snapshotAllFiles();
     const entryCode = snapshot.get(resolvedEntryFilename) ?? "";
@@ -1025,7 +1036,8 @@ export default function ChallengeCard({
     setTestListOpen(true);
 
     try {
-      const { cells, elapsedMs } = await execute(combined, snapshot);
+      const { cells, elapsedMs } = await execute(combined, snapshot, mySeq);
+      if (runSeqRef.current !== mySeq) return;
 
       // Split stdout cells into "user-visible" + parsed harness results.
       // Non-stdout cells (html / image / plot / stderr) pass through
@@ -1091,6 +1103,7 @@ export default function ChallengeCard({
         allPass ? "All tests passed" : `${passed}/${displayed.length} passed`,
       );
     } catch (err) {
+      if (runSeqRef.current !== mySeq) return;
       const message = err instanceof Error ? err.message : String(err);
       setOutputs([
         { id: 1, type: "stderr", content: message, elapsed: "" },
@@ -1106,7 +1119,8 @@ export default function ChallengeCard({
       );
       setBannerState("fail");
     } finally {
-      setActiveAction(null);
+      // Only the latest submission owns the busy spinner (see `run`).
+      if (runSeqRef.current === mySeq) setActiveAction(null);
     }
   }, [
     adapter.id,
@@ -1191,6 +1205,9 @@ export default function ChallengeCard({
     setStatusMessage("");
     setTestResults([]);
     setBannerState(null);
+    // A run superseded by this reset skips its own spinner cleanup
+    // (its `finally` is sequence-guarded), so clear it here.
+    setActiveAction(null);
     toasts.show("Reset to starter code.");
   }, [persistedKeyForFile, toasts, workspaceFiles]);
 

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import { startTransition } from "react";
-import { Toast } from "@base-ui-components/react/toast";
+import { Toast } from "@base-ui/react/toast";
 import type { EditorView } from "@codemirror/view";
 import type { QueryExecResult } from "../../runtime/sqlite-wasm";
 import type { SqliteEngine } from "../../runtime/sqlite";

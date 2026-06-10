@@ -18,7 +18,7 @@ import { ContextMenu } from "@base-ui-components/react/context-menu";
 import { Menu } from "@base-ui-components/react/menu";
 import { Select } from "@base-ui-components/react/select";
 import { Checkbox } from "@base-ui-components/react/checkbox";
-import { Toast } from "@base-ui-components/react/toast";
+import { Toast } from "@base-ui/react/toast";
 import { ToggleGroup } from "@base-ui/react/toggle-group";
 import { Toggle } from "@base-ui/react/toggle";
 import {
@@ -438,6 +438,28 @@ export function sqlValueEqual(a: unknown, b: unknown): boolean {
   return false;
 }
 
+/** True when two results have the same statement *shape* — same set count,
+ *  same per-set has-result-ness and column names — i.e. they look like
+ *  re-runs of the same statements (an edit/sort/filter re-fetch, or the user
+ *  re-running the same tab) rather than a different query. Cheaper than
+ *  `queryResultsIdentical`, which also compares every cell. */
+export function sameResultShape(
+  a: QueryRunResult | null,
+  b: QueryRunResult | null,
+): boolean {
+  if (a === null || b === null) return false;
+  if (a.sets.length !== b.sets.length) return false;
+  for (let i = 0; i < a.sets.length; i++) {
+    const sa = a.sets[i];
+    const sb = b.sets[i];
+    if (sa === null && sb === null) continue;
+    if (sa === null || sb === null) return false;
+    if (sa.columns.length !== sb.columns.length) return false;
+    if (!sa.columns.every((col, j) => col === sb.columns[j])) return false;
+  }
+  return true;
+}
+
 export function queryResultsIdentical(
   a: QueryRunResult | null,
   b: QueryRunResult | null,
@@ -688,12 +710,24 @@ function ResultViewImpl({
     const cachedSorting = result ? sortingCacheRef.current.get(result) : undefined;
     setSortingByIndex(preserved?.sortingByIndex ?? cachedSorting ?? {});
     setActiveEditCellByIndex({});
-    // Keep the active result-set tab across reloads — clamped to the new set
-    // count. (Clamping rather than restoring from a single "preserved" slot is
-    // robust when an edit triggers more than one queued re-fetch, e.g. quickly
-    // editing Set 1 then Set 2: each re-fetch would otherwise reset to Set 1.)
-    const nextSetCount = result?.sets.length ?? 1;
-    setActiveSetIdx((prev) => Math.max(0, Math.min(prev, nextSetCount - 1)));
+    if (preserved || sameResultShape(result, prevResultRef.current)) {
+      // A reload of the same statements (edit/sort/filter re-fetch — which
+      // preserves state — or a same-shape re-run, including a queued
+      // re-fetch that arrives without a preserve slot): keep the active
+      // result-set tab, clamped to the new set count. (Clamping rather than
+      // restoring from a single "preserved" slot is robust when an edit
+      // triggers more than one queued re-fetch, e.g. quickly editing Set 1
+      // then Set 2: each re-fetch would otherwise reset to Set 1.)
+      const nextSetCount = result?.sets.length ?? 1;
+      setActiveSetIdx((prev) => Math.max(0, Math.min(prev, nextSetCount - 1)));
+    } else {
+      // Fresh run: land on the first set that actually returned a result
+      // table. A multi-statement script commonly ends in a SELECT after
+      // DDL/DML setup statements — defaulting to Set 1 would show the
+      // "no result set returned" notice instead of the data just queried.
+      const firstWithTable = (result?.sets ?? []).findIndex((s) => s !== null);
+      setActiveSetIdx(firstWithTable >= 0 ? firstWithTable : 0);
+    }
     // A fresh result (or a filter/sort/edit reload) settles any pending filter
     // overlay — the rows shown now already reflect the applied filter.
     setFilterPending(false);
@@ -2164,6 +2198,16 @@ export function ResultTableBody({
     colIdx: number;
     value: unknown;
   } | null>(null);
+  // One delegated context menu serves every row: a per-row <ContextMenu.Root>
+  // would make Base UI render its hidden focus-guard <span>s as direct
+  // children of <tbody> (invalid HTML that React flags as a hydration
+  // hazard), and would mount one menu instance per row. The right-clicked
+  // row is captured here as the event bubbles from the <tr> to the
+  // table-wrap trigger.
+  const [ctxMenuRow, setCtxMenuRow] = useState<{
+    absoluteRow: number;
+    values: QueryExecResult["values"][number];
+  } | null>(null);
 
   const [modalEditCell, setModalEditCell] = useState<{
     cellKey: string;
@@ -2378,6 +2422,7 @@ export function ResultTableBody({
                                   openOnHover
                                   delay={150}
                                   closeDelay={100}
+                                  nativeButton={false}
                                   render={(triggerProps) => (
                                     <span
                                       {...triggerProps}
@@ -2415,6 +2460,7 @@ export function ResultTableBody({
                                   openOnHover
                                   delay={150}
                                   closeDelay={100}
+                                  nativeButton={false}
                                   render={(triggerProps) => (
                                     <span
                                       {...triggerProps}
@@ -3070,20 +3116,28 @@ export function ResultTableBody({
       );
     });
     return (
-      <ContextMenu.Root key={absoluteRow}>
-        <ContextMenu.Trigger
-          render={(props) => (
-            <tr
-              {...props}
-              className={checked ? "sql-result-row-selected" : undefined}
-            >
-              {cells}
-            </tr>
-          )}
-        />
-        <ContextMenu.Portal>
-          <ContextMenu.Positioner sideOffset={4}>
-            <ContextMenu.Popup className="bui-popup examples-dropdown sql-row-context-menu">
+      <tr
+        className={checked ? "sql-result-row-selected" : undefined}
+        onContextMenu={() => {
+          setCtxMenuRow({ absoluteRow, values: rowValues });
+        }}
+      >
+        {cells}
+      </tr>
+    );
+  };
+
+  // Rendered once per table, inside the wrap-level <ContextMenu.Root>; the
+  // items close over the row captured by the <tr> onContextMenu above.
+  const rowContextMenu = (
+    <ContextMenu.Portal>
+      <ContextMenu.Positioner sideOffset={4}>
+        <ContextMenu.Popup className="bui-popup examples-dropdown sql-row-context-menu">
+          {ctxMenuRow !== null &&
+            (() => {
+              const { absoluteRow, values: rowValues } = ctxMenuRow;
+              return (
+                <>
               <ContextMenu.Item
                 className="example-item"
                 onClick={() => {
@@ -3226,6 +3280,7 @@ export function ResultTableBody({
                       delay={200}
                       closeDelay={100}
                       className="example-item sql-ctx-disabled"
+                      nativeButton={false}
                       render={<div />}
                       aria-disabled="true"
                     >
@@ -3249,16 +3304,38 @@ export function ResultTableBody({
                   <div className="ex-title">Delete row</div>
                 </ContextMenu.Item>
               )}
-            </ContextMenu.Popup>
-          </ContextMenu.Positioner>
-        </ContextMenu.Portal>
-      </ContextMenu.Root>
-    );
-  };
+                </>
+              );
+            })()}
+        </ContextMenu.Popup>
+      </ContextMenu.Positioner>
+    </ContextMenu.Portal>
+  );
 
   return (
     <div className="sql-result-set">
-      <div className="sql-result-table-wrap">
+      <ContextMenu.Root
+        onOpenChange={(open) => {
+          if (!open) setCtxMenuRow(null);
+        }}
+      >
+        <ContextMenu.Trigger
+          render={(props) => (
+            <div
+              {...props}
+              className="sql-result-table-wrap"
+              onContextMenu={(e) => {
+                // Open the row menu only for right-clicks on a data row —
+                // column headers have their own menu, and the virtualizer's
+                // aria-hidden spacer rows and empty space keep the native
+                // browser menu.
+                const row = (e.target as HTMLElement).closest(
+                  'tbody tr:not([aria-hidden="true"])',
+                );
+                if (!row) return;
+                props.onContextMenu?.(e);
+              }}
+            >
         <table className="sql-result-table">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -3307,7 +3384,11 @@ export function ResultTableBody({
             )}
           </tbody>
         </table>
-      </div>
+            </div>
+          )}
+        />
+        {rowContextMenu}
+      </ContextMenu.Root>
       {tableRows.length === 0 && (
         <div className="sql-result-empty-msg">
           <SearchX size={14} aria-hidden="true" />
