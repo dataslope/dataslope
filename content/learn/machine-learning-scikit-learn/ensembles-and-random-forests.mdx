@@ -18,6 +18,43 @@ than any single tree, and it is the model most experienced practitioners
 reach for first on tabular data. Understanding *why* averaging works is one
 of the most valuable intuitions in classical machine learning.
 
+<svg
+  viewBox="0 0 640 170"
+  role="img"
+  aria-label="A row of faint blue trees each casts a small vote dot — four green, one blue dissenter — and the votes stream into one large green consensus dot — a forest averages many unstable trees into a stable answer"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <polygon points="70,30 44,78 96,78" fillOpacity="0.2" />
+    <rect x="65" y="78" width="10" height="22" rx="3" fillOpacity="0.2" />
+    <polygon points="150,30 124,78 176,78" fillOpacity="0.28" />
+    <rect x="145" y="78" width="10" height="22" rx="3" fillOpacity="0.28" />
+    <polygon points="230,30 204,78 256,78" fillOpacity="0.2" />
+    <rect x="225" y="78" width="10" height="22" rx="3" fillOpacity="0.2" />
+    <polygon points="310,30 284,78 336,78" fillOpacity="0.28" />
+    <rect x="305" y="78" width="10" height="22" rx="3" fillOpacity="0.28" />
+    <polygon points="390,30 364,78 416,78" fillOpacity="0.2" />
+    <rect x="385" y="78" width="10" height="22" rx="3" fillOpacity="0.2" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="70" cy="124" r="7" />
+    <circle cx="150" cy="124" r="7" />
+    <circle cx="310" cy="124" r="7" />
+    <circle cx="390" cy="124" r="7" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="230" cy="124" r="7" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="445" cy="124" r="3" />
+    <circle cx="470" cy="124" r="3" />
+    <circle cx="495" cy="124" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="545" cy="124" r="20" />
+  </g>
+</svg>
+
 ## The intuition: the wisdom of crowds
 
 There is a famous story: at a county fair, hundreds of people guessed the

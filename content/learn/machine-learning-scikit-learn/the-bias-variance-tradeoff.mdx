@@ -9,6 +9,40 @@ and **bias** — and explains the deep reason you cannot simply eliminate
 both at once. Understanding this tradeoff is what separates someone who can
 *run* models from someone who can *reason* about them.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Two targets: on the left the shots cluster tightly but away from the bullseye (bias); on the right they scatter widely around it (variance) — the two distinct ways a model misses"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor">
+    <circle cx="170" cy="105" r="62" opacity="0.06" />
+    <circle cx="170" cy="105" r="42" opacity="0.09" />
+    <circle cx="170" cy="105" r="22" opacity="0.12" />
+    <circle cx="470" cy="105" r="62" opacity="0.06" />
+    <circle cx="470" cy="105" r="42" opacity="0.09" />
+    <circle cx="470" cy="105" r="22" opacity="0.12" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="170" cy="105" r="5" />
+    <circle cx="470" cy="105" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="206" cy="64" r="6" />
+    <circle cx="218" cy="72" r="6" />
+    <circle cx="208" cy="78" r="6" />
+    <circle cx="216" cy="58" r="6" />
+    <circle cx="222" cy="80" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="430" cy="60" r="6" />
+    <circle cx="515" cy="75" r="6" />
+    <circle cx="445" cy="150" r="6" />
+    <circle cx="505" cy="140" r="6" />
+    <circle cx="470" cy="55" r="6" />
+  </g>
+</svg>
+
 ## Error has parts
 
 When a model makes mistakes on new data, that error comes from three
