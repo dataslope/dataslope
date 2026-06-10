@@ -8,6 +8,43 @@ student takes **many** courses; a course holds **many** students.
 This is a **many-to-many** relationship, and it needs a special
 structure — because no single foreign key can express it.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="Two columns of dots — students and courses — joined through a column of small junction pills, each pill recording one student-course pairing"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.2">
+    <polygon points="132,47 296,27 296,33 132,53" />
+    <polygon points="344,27 508,47 508,53 344,33" />
+    <polygon points="132,47 296,67 296,73 132,53" />
+    <polygon points="344,67 508,107 508,113 344,73" />
+    <polygon points="132,107 296,107 296,113 132,113" />
+    <polygon points="344,107 508,47 508,53 344,113" />
+    <polygon points="132,167 296,147 296,153 132,173" />
+    <polygon points="344,147 508,167 508,173 344,153" />
+    <polygon points="132,107 296,187 296,193 132,113" />
+    <polygon points="344,187 508,167 508,173 344,193" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="120" cy="50" r="12" />
+    <circle cx="120" cy="110" r="12" />
+    <circle cx="120" cy="170" r="12" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="520" cy="50" r="12" />
+    <circle cx="520" cy="110" r="12" />
+    <circle cx="520" cy="170" r="12" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="296" y="22" width="48" height="16" rx="8" fillOpacity="0.85" />
+    <rect x="296" y="62" width="48" height="16" rx="8" fillOpacity="0.85" />
+    <rect x="296" y="102" width="48" height="16" rx="8" fillOpacity="0.85" />
+    <rect x="296" y="142" width="48" height="16" rx="8" fillOpacity="0.85" />
+    <rect x="296" y="182" width="48" height="16" rx="8" fillOpacity="0.85" />
+  </g>
+</svg>
+
 ## Why a foreign key is not enough
 
 Picture trying to store this with one column. If `students` had a

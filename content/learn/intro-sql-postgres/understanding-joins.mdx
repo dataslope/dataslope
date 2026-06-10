@@ -10,6 +10,34 @@ model delivers on its promise: data split for storage, recombined
 for answers. This page builds the intuition; the next two cover the
 specific kinds.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="Two tables zip together — rows angle in from each side and click into combined rows where their yellow key dots align"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="70" y="30" width="110" height="22" rx="8" fillOpacity="0.5" transform="rotate(20 125 41)" />
+    <rect x="100" y="64" width="110" height="22" rx="8" fillOpacity="0.65" transform="rotate(14 155 75)" />
+    <rect x="200" y="120" width="110" height="24" rx="8" fillOpacity="0.85" />
+    <rect x="200" y="152" width="110" height="24" rx="8" fillOpacity="0.85" />
+    <rect x="200" y="184" width="110" height="24" rx="8" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="460" y="30" width="110" height="22" rx="8" fillOpacity="0.5" transform="rotate(-20 515 41)" />
+    <rect x="430" y="64" width="110" height="22" rx="8" fillOpacity="0.65" transform="rotate(-14 485 75)" />
+    <rect x="330" y="120" width="110" height="24" rx="8" fillOpacity="0.85" />
+    <rect x="330" y="152" width="110" height="24" rx="8" fillOpacity="0.85" />
+    <rect x="330" y="184" width="110" height="24" rx="8" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <polygon points="308,96 332,96 320,114" fillOpacity="0.9" />
+    <circle cx="320" cy="132" r="6" />
+    <circle cx="320" cy="164" r="6" />
+    <circle cx="320" cy="196" r="6" />
+  </g>
+</svg>
+
 ## The question a join answers
 
 You have customers in one table and orders in another. Neither table

@@ -8,6 +8,57 @@ you do not need to know the deep internals of a database to use one
 well. But a *little* intuition about how data is stored will make
 everything that follows click into place.
 
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="A jumble of colored facts on the left is lined up into a neat grid of rows and columns on the right"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="105" cy="60" r="9" />
+    <rect x="126" y="114" width="20" height="13" rx="4" transform="rotate(-15 136 120)" fillOpacity="0.7" />
+    <circle cx="160" cy="160" r="6" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="142" y="44" width="17" height="17" rx="5" transform="rotate(20 150 52)" />
+    <circle cx="178" cy="95" r="10" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="90" cy="112" r="7" />
+    <polygon points="100,164 118,164 109,148" fillOpacity="0.8" />
+  </g>
+  <g fill="currentColor">
+    <rect x="232" y="100" width="46" height="8" rx="4" opacity="0.25" />
+    <polygon points="278,88 278,120 308,104" opacity="0.3" />
+  </g>
+  <g fill="currentColor" opacity="0.08">
+    <rect x="350" y="58" width="56" height="28" rx="6" />
+    <rect x="412" y="58" width="56" height="28" rx="6" />
+    <rect x="474" y="58" width="56" height="28" rx="6" />
+    <rect x="350" y="92" width="56" height="28" rx="6" />
+    <rect x="412" y="92" width="56" height="28" rx="6" />
+    <rect x="474" y="92" width="56" height="28" rx="6" />
+    <rect x="350" y="126" width="56" height="28" rx="6" />
+    <rect x="412" y="126" width="56" height="28" rx="6" />
+    <rect x="474" y="126" width="56" height="28" rx="6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="378" cy="72" r="6" />
+    <circle cx="440" cy="106" r="6" />
+    <circle cx="502" cy="106" r="6" fillOpacity="0.6" />
+    <circle cx="440" cy="140" r="6" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="440" cy="72" r="6" />
+    <circle cx="378" cy="106" r="6" />
+    <circle cx="502" cy="140" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="502" cy="72" r="6" />
+    <circle cx="378" cy="140" r="6" />
+  </g>
+</svg>
+
 ## From facts to rows
 
 Almost all useful data is a collection of **facts about things**.
