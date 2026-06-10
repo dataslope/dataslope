@@ -5,6 +5,29 @@ description: Learn recursive thinking, the call stack, classic recursive functio
 
 Recursion is a technique where a function solves a problem by calling itself on a smaller version of the same problem. It is a natural fit for trees, divide-and-conquer algorithms, backtracking, and definitions that already refer to themselves.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="Self-similar triangles nest and shrink toward the center, where a dotted descent ends at one solid green base-case dot — recursion reducing a problem to its smallest case"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <polygon points="320,28 170,196 470,196" fillOpacity="0.1" />
+    <polygon points="320,57 209,181 431,181" fillOpacity="0.14" />
+    <polygon points="320,82 242,169 398,169" fillOpacity="0.18" />
+    <polygon points="320,103 271,159 369,159" fillOpacity="0.22" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="320" cy="44" r="2.5" />
+    <circle cx="320" cy="69" r="2.5" />
+    <circle cx="320" cy="92" r="2.5" />
+    <circle cx="320" cy="115" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="320" cy="140" r="7" />
+  </g>
+</svg>
+
 ## Recursive thinking
 
 Every correct recursive function needs two parts:

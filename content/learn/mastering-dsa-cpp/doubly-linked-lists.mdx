@@ -5,6 +5,61 @@ description: Learn previous and next pointers, bidirectional traversal, std::lis
 
 A doubly linked list gives every node two links: `prev` and `next`. That extra pointer allows bidirectional traversal and O(1) deletion when you already have a pointer or iterator to the node.
 
+<svg
+  viewBox="0 0 640 190"
+  role="img"
+  aria-label="Three node capsules joined by two dotted rails — green next arrows running right above, yellow prev arrows running left below — with red null stops at both ends of a doubly linked list"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="145" y="73" width="70" height="44" rx="14" fillOpacity="0.85" />
+    <rect x="285" y="73" width="70" height="44" rx="14" fillOpacity="0.85" />
+    <rect x="425" y="73" width="70" height="44" rx="14" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="160" cy="95" r="4.5" />
+    <circle cx="300" cy="95" r="4.5" />
+    <circle cx="440" cy="95" r="4.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="200" cy="95" r="4.5" />
+    <circle cx="340" cy="95" r="4.5" />
+    <circle cx="480" cy="95" r="4.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.6">
+    <circle cx="226" cy="64" r="2.5" />
+    <circle cx="242" cy="57" r="2.5" />
+    <circle cx="258" cy="57" r="2.5" />
+    <circle cx="274" cy="64" r="2.5" />
+    <polygon points="276,60 288,70 272,73" />
+    <circle cx="366" cy="64" r="2.5" />
+    <circle cx="382" cy="57" r="2.5" />
+    <circle cx="398" cy="57" r="2.5" />
+    <circle cx="414" cy="64" r="2.5" />
+    <polygon points="416,60 428,70 412,73" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor" fillOpacity="0.7">
+    <circle cx="414" cy="126" r="2.5" />
+    <circle cx="398" cy="133" r="2.5" />
+    <circle cx="382" cy="133" r="2.5" />
+    <circle cx="366" cy="126" r="2.5" />
+    <polygon points="364,130 352,120 368,117" />
+    <circle cx="274" cy="126" r="2.5" />
+    <circle cx="258" cy="133" r="2.5" />
+    <circle cx="242" cy="133" r="2.5" />
+    <circle cx="226" cy="126" r="2.5" />
+    <polygon points="224,130 212,120 228,117" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="132" cy="95" r="2" />
+    <circle cx="508" cy="95" r="2" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="112" y="89" width="11" height="11" rx="3" fillOpacity="0.8" />
+    <rect x="517" y="89" width="11" height="11" rx="3" fillOpacity="0.8" />
+  </g>
+</svg>
+
 ## The shape of a doubly linked list
 
 ```mermaid

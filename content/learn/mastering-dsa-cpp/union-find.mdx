@@ -10,6 +10,55 @@ description: Learn DSU find and unite operations, path compression, union by ran
 
 DSU shines when connectivity changes over time by adding edges.
 
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="Two translucent sets, each with members linking up to their representative, merge along a dotted arrow into one set where the old green root now answers to the surviving blue one"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="150" cy="100" r="56" fillOpacity="0.1" />
+    <circle cx="150" cy="76" r="9" />
+    <circle cx="124" cy="114" r="5.5" fillOpacity="0.7" />
+    <circle cx="172" cy="118" r="5.5" fillOpacity="0.7" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="133" cy="101" r="1.8" />
+    <circle cx="142" cy="88" r="1.8" />
+    <circle cx="164" cy="104" r="1.8" />
+    <circle cx="157" cy="90" r="1.8" />
+    <circle cx="310" cy="109" r="1.8" />
+    <circle cx="310" cy="94" r="1.8" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="310" cy="100" r="44" fillOpacity="0.1" />
+    <circle cx="310" cy="80" r="8" />
+    <circle cx="310" cy="124" r="5.5" fillOpacity="0.7" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="380" cy="100" r="3" />
+    <circle cx="400" cy="100" r="3" />
+    <circle cx="420" cy="100" r="3" />
+    <polygon points="432,92 432,108 444,100" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="530" cy="100" r="62" fillOpacity="0.1" />
+    <circle cx="530" cy="68" r="9" />
+    <circle cx="500" cy="114" r="5.5" fillOpacity="0.7" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="556" cy="108" r="8" />
+    <circle cx="548" cy="134" r="5.5" fillOpacity="0.7" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="548" cy="95" r="1.8" />
+    <circle cx="539" cy="82" r="1.8" />
+    <circle cx="552" cy="121" r="1.8" />
+    <circle cx="510" cy="99" r="1.8" />
+    <circle cx="520" cy="84" r="1.8" />
+  </g>
+</svg>
+
 ## Parent trees
 
 Each set is represented as a tree. Every node points to a parent, and the root points to itself.

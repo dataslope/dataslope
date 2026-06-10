@@ -5,6 +5,47 @@ description: Learn merge sort, quicksort, std::sort, std::stable_sort, custom co
 
 Efficient sorting algorithms reduce the cost from O(n^2) to O(n log n) for large inputs. They rely on divide and conquer, partitioning, and hybrid engineering.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Two small sorted runs of bars flow down dotted paths and interleave into one fully sorted row below — merge sort combining sorted halves"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="150" y="70" width="20" height="18" rx="5" />
+    <rect x="176" y="58" width="20" height="30" rx="5" />
+    <rect x="202" y="46" width="20" height="42" rx="5" />
+    <rect x="228" y="34" width="20" height="54" rx="5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="360" y="74" width="20" height="14" rx="5" />
+    <rect x="386" y="62" width="20" height="26" rx="5" />
+    <rect x="412" y="50" width="20" height="38" rx="5" />
+    <rect x="438" y="38" width="20" height="50" rx="5" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="212" cy="106" r="2.5" />
+    <circle cx="230" cy="120" r="2.5" />
+    <circle cx="248" cy="134" r="2.5" />
+    <circle cx="428" cy="106" r="2.5" />
+    <circle cx="410" cy="120" r="2.5" />
+    <circle cx="392" cy="134" r="2.5" />
+  </g>
+  <rect x="200" y="185" width="240" height="4" rx="2" fill="currentColor" opacity="0.15" />
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="219" y="171" width="20" height="14" rx="5" />
+    <rect x="271" y="159" width="20" height="26" rx="5" />
+    <rect x="323" y="147" width="20" height="38" rx="5" />
+    <rect x="375" y="135" width="20" height="50" rx="5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="245" y="167" width="20" height="18" rx="5" />
+    <rect x="297" y="155" width="20" height="30" rx="5" />
+    <rect x="349" y="143" width="20" height="42" rx="5" />
+    <rect x="401" y="131" width="20" height="54" rx="5" />
+  </g>
+</svg>
+
 ## Merge sort
 
 Merge sort divides the array in half, recursively sorts each half, then merges the sorted halves. It guarantees O(n log n) time, uses O(n) extra memory, and is stable when merging prefers the left element on ties.

@@ -3,6 +3,39 @@ title: Basic Sorting Algorithms
 description: Learn bubble sort, selection sort, insertion sort, stability, and loop invariants in C++
 ---
 Sorting rearranges data into an order, usually ascending or descending. These algorithms are not the fastest for large inputs, but they teach loop invariants and the structure of comparison-based sorting.
+
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="A row of bars mid bubble sort — two adjacent yellow bars circle around each other in a swap while the tallest bars already sit settled and green at the right end"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="100" y="170" width="440" height="4" rx="2" fill="currentColor" opacity="0.15" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="112" y="130" width="34" height="40" rx="6" fillOpacity="0.8" />
+    <rect x="160" y="104" width="34" height="66" rx="6" fillOpacity="0.8" />
+    <rect x="208" y="140" width="34" height="30" rx="6" fillOpacity="0.8" />
+    <rect x="352" y="96" width="34" height="74" rx="6" fillOpacity="0.8" />
+    <rect x="400" y="112" width="34" height="58" rx="6" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="256" y="78" width="34" height="92" rx="6" />
+    <rect x="304" y="122" width="34" height="48" rx="6" />
+    <circle cx="279" cy="50" r="2.5" fillOpacity="0.7" />
+    <circle cx="297" cy="42" r="2.5" fillOpacity="0.7" />
+    <circle cx="315" cy="50" r="2.5" fillOpacity="0.7" />
+    <polygon points="313,50 325,54 315,64" fillOpacity="0.7" />
+    <circle cx="315" cy="66" r="2.5" fillOpacity="0.7" />
+    <circle cx="297" cy="74" r="2.5" fillOpacity="0.7" />
+    <circle cx="279" cy="66" r="2.5" fillOpacity="0.7" />
+    <polygon points="281,66 269,62 279,52" fillOpacity="0.7" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="448" y="60" width="34" height="110" rx="6" />
+    <rect x="496" y="44" width="34" height="126" rx="6" />
+  </g>
+</svg>
+
 ## Why study slow sorts?
 Basic sorts make hidden ideas visible: sorted prefixes and suffixes grow, comparisons decide order, and swaps or shifts move elements into place. These ideas reappear in efficient sorting and interview problems.
 ## Bubble sort

@@ -5,6 +5,58 @@ description: Learn binary heaps, heapify, heap sort, priority_queue, and heap-ba
 
 A binary heap is a complete binary tree stored in an array. A max-heap keeps every parent greater than or equal to its children. A min-heap keeps every parent less than or equal to its children.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A heap pyramid with the largest dot glowing at the apex while a new green dot bubbles up a dotted path toward its parent, above the flat array row that actually stores the levels"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="320" cy="48" r="30" fillOpacity="0.08" />
+    <circle cx="320" cy="48" r="22" fillOpacity="0.16" />
+    <circle cx="320" cy="48" r="14" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="282" cy="71" r="2" />
+    <circle cx="254" cy="90" r="2" />
+    <circle cx="358" cy="71" r="2" />
+    <circle cx="386" cy="90" r="2" />
+    <circle cx="197" cy="133" r="2" />
+    <circle cx="176" cy="155" r="2" />
+    <circle cx="243" cy="133" r="2" />
+    <circle cx="266" cy="155" r="2" />
+    <circle cx="405" cy="133" r="2" />
+    <circle cx="390" cy="155" r="2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="220" cy="110" r="10" />
+    <circle cx="420" cy="110" r="10" />
+    <circle cx="160" cy="170" r="7" />
+    <circle cx="280" cy="170" r="7" />
+    <circle cx="380" cy="170" r="7" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="460" cy="170" r="8" />
+    <circle cx="452" cy="156" r="2.5" fillOpacity="0.5" />
+    <circle cx="444" cy="142" r="2.5" fillOpacity="0.5" />
+    <circle cx="436" cy="128" r="2.5" fillOpacity="0.5" />
+    <polygon points="430,120 442,126 438,112" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="230" y="196" width="24" height="14" rx="4" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="256" y="196" width="24" height="14" rx="4" fillOpacity="0.5" />
+    <rect x="282" y="196" width="24" height="14" rx="4" fillOpacity="0.5" />
+    <rect x="308" y="196" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="334" y="196" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="360" y="196" width="24" height="14" rx="4" fillOpacity="0.3" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="386" y="196" width="24" height="14" rx="4" fillOpacity="0.85" />
+  </g>
+</svg>
+
 ## Conceptual tree and array storage
 
 ```mermaid
