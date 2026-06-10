@@ -20,6 +20,67 @@ given A. By the end of this page you'll see exactly why a test that's
 people it flags — and you'll be able to compute the truth in a few lines
 of Python.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A faint full sample space with a small blue region inside it expands along dotted zoom lines into a world of its own, where four of twelve dots glow green — conditioning throws away everything outside B and recomputes the probability inside what is left"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="40" y="30" width="240" height="160" rx="16" fill="currentColor" opacity="0.06" />
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="64" cy="54" r="3" />
+    <circle cx="100" cy="44" r="3" />
+    <circle cx="138" cy="58" r="3" />
+    <circle cx="176" cy="44" r="3" />
+    <circle cx="218" cy="56" r="3" />
+    <circle cx="254" cy="44" r="3" />
+    <circle cx="62" cy="96" r="3" />
+    <circle cx="98" cy="84" r="3" />
+    <circle cx="132" cy="100" r="3" />
+    <circle cx="256" cy="86" r="3" />
+    <circle cx="64" cy="140" r="3" />
+    <circle cx="100" cy="128" r="3" />
+    <circle cx="128" cy="150" r="3" />
+    <circle cx="74" cy="174" r="3" />
+    <circle cx="110" cy="168" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="194" cy="128" r="44" fillOpacity="0.2" />
+    <circle cx="176" cy="124" r="3.5" />
+    <circle cx="192" cy="148" r="3.5" />
+    <circle cx="212" cy="132" r="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="196" cy="106" r="3.5" />
+    <circle cx="212" cy="112" r="3.5" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="244" cy="74" r="2.5" />
+    <circle cx="294" cy="62" r="2.5" />
+    <circle cx="344" cy="50" r="2.5" />
+    <circle cx="246" cy="178" r="2.5" />
+    <circle cx="296" cy="184" r="2.5" />
+    <circle cx="346" cy="190" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="462" cy="112" r="82" fillOpacity="0.12" />
+    <circle cx="408" cy="112" r="6" />
+    <circle cx="428" cy="142" r="6" />
+    <circle cx="458" cy="152" r="6" />
+    <circle cx="492" cy="138" r="6" />
+    <circle cx="516" cy="112" r="6" />
+    <circle cx="418" cy="78" r="6" />
+    <circle cx="528" cy="86" r="6" />
+    <circle cx="474" cy="124" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="432" cy="82" r="6" />
+    <circle cx="470" cy="70" r="6" />
+    <circle cx="450" cy="110" r="6" />
+    <circle cx="496" cy="92" r="6" />
+  </g>
+</svg>
+
 ## What conditioning means
 
 The notation P(A | B) reads "the probability of A **given** B" —
@@ -217,6 +278,58 @@ The killer is in the leaves: only **100** people are actually sick, but
 healthy people, 1% of a huge number (999) dwarfs the 99 true positives
 from the tiny sick group. So most positives are false alarms. Let's
 verify both by direct calculation and by simulating a population.
+
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="In a large grid of faint people exactly one red dot is truly sick, yet the flagged group gathered at the right holds nine yellow false alarms beside that single red case — when a condition is rare, even an accurate test's positives are mostly healthy people"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.15">
+    <circle cx="60" cy="40" r="4" /><circle cx="84" cy="40" r="4" /><circle cx="108" cy="40" r="4" /><circle cx="132" cy="40" r="4" /><circle cx="156" cy="40" r="4" /><circle cx="180" cy="40" r="4" /><circle cx="204" cy="40" r="4" /><circle cx="228" cy="40" r="4" /><circle cx="276" cy="40" r="4" /><circle cx="300" cy="40" r="4" /><circle cx="324" cy="40" r="4" /><circle cx="348" cy="40" r="4" /><circle cx="372" cy="40" r="4" /><circle cx="396" cy="40" r="4" /><circle cx="420" cy="40" r="4" />
+    <circle cx="60" cy="64" r="4" /><circle cx="108" cy="64" r="4" /><circle cx="132" cy="64" r="4" /><circle cx="156" cy="64" r="4" /><circle cx="180" cy="64" r="4" /><circle cx="204" cy="64" r="4" /><circle cx="228" cy="64" r="4" /><circle cx="252" cy="64" r="4" /><circle cx="276" cy="64" r="4" /><circle cx="324" cy="64" r="4" /><circle cx="348" cy="64" r="4" /><circle cx="372" cy="64" r="4" /><circle cx="396" cy="64" r="4" /><circle cx="420" cy="64" r="4" />
+    <circle cx="60" cy="88" r="4" /><circle cx="84" cy="88" r="4" /><circle cx="108" cy="88" r="4" /><circle cx="132" cy="88" r="4" /><circle cx="156" cy="88" r="4" /><circle cx="180" cy="88" r="4" /><circle cx="204" cy="88" r="4" /><circle cx="228" cy="88" r="4" /><circle cx="252" cy="88" r="4" /><circle cx="276" cy="88" r="4" /><circle cx="300" cy="88" r="4" /><circle cx="324" cy="88" r="4" /><circle cx="348" cy="88" r="4" /><circle cx="372" cy="88" r="4" /><circle cx="420" cy="88" r="4" />
+    <circle cx="84" cy="112" r="4" /><circle cx="108" cy="112" r="4" /><circle cx="132" cy="112" r="4" /><circle cx="156" cy="112" r="4" /><circle cx="204" cy="112" r="4" /><circle cx="228" cy="112" r="4" /><circle cx="252" cy="112" r="4" /><circle cx="276" cy="112" r="4" /><circle cx="300" cy="112" r="4" /><circle cx="324" cy="112" r="4" /><circle cx="348" cy="112" r="4" /><circle cx="372" cy="112" r="4" /><circle cx="396" cy="112" r="4" /><circle cx="420" cy="112" r="4" />
+    <circle cx="60" cy="136" r="4" /><circle cx="84" cy="136" r="4" /><circle cx="108" cy="136" r="4" /><circle cx="132" cy="136" r="4" /><circle cx="156" cy="136" r="4" /><circle cx="180" cy="136" r="4" /><circle cx="204" cy="136" r="4" /><circle cx="228" cy="136" r="4" /><circle cx="252" cy="136" r="4" /><circle cx="276" cy="136" r="4" /><circle cx="300" cy="136" r="4" /><circle cx="348" cy="136" r="4" /><circle cx="372" cy="136" r="4" /><circle cx="396" cy="136" r="4" /><circle cx="420" cy="136" r="4" />
+    <circle cx="60" cy="160" r="4" /><circle cx="84" cy="160" r="4" /><circle cx="132" cy="160" r="4" /><circle cx="156" cy="160" r="4" /><circle cx="180" cy="160" r="4" /><circle cx="204" cy="160" r="4" /><circle cx="228" cy="160" r="4" /><circle cx="252" cy="160" r="4" /><circle cx="276" cy="160" r="4" /><circle cx="300" cy="160" r="4" /><circle cx="324" cy="160" r="4" /><circle cx="348" cy="160" r="4" /><circle cx="372" cy="160" r="4" /><circle cx="396" cy="160" r="4" /><circle cx="420" cy="160" r="4" />
+    <circle cx="60" cy="184" r="4" /><circle cx="84" cy="184" r="4" /><circle cx="108" cy="184" r="4" /><circle cx="132" cy="184" r="4" /><circle cx="156" cy="184" r="4" /><circle cx="180" cy="184" r="4" /><circle cx="228" cy="184" r="4" /><circle cx="252" cy="184" r="4" /><circle cx="276" cy="184" r="4" /><circle cx="300" cy="184" r="4" /><circle cx="324" cy="184" r="4" /><circle cx="396" cy="184" r="4" /><circle cx="420" cy="184" r="4" />
+    <circle cx="60" cy="208" r="4" /><circle cx="84" cy="208" r="4" /><circle cx="108" cy="208" r="4" /><circle cx="132" cy="208" r="4" /><circle cx="156" cy="208" r="4" /><circle cx="180" cy="208" r="4" /><circle cx="228" cy="208" r="4" /><circle cx="252" cy="208" r="4" /><circle cx="276" cy="208" r="4" /><circle cx="300" cy="208" r="4" /><circle cx="324" cy="208" r="4" /><circle cx="348" cy="208" r="4" /><circle cx="372" cy="208" r="4" /><circle cx="396" cy="208" r="4" /><circle cx="420" cy="208" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="84" cy="64" r="4.5" />
+    <circle cx="252" cy="40" r="4.5" />
+    <circle cx="396" cy="88" r="4.5" />
+    <circle cx="108" cy="160" r="4.5" />
+    <circle cx="324" cy="136" r="4.5" />
+    <circle cx="204" cy="208" r="4.5" />
+    <circle cx="372" cy="184" r="4.5" />
+    <circle cx="60" cy="112" r="4.5" />
+    <circle cx="300" cy="64" r="4.5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="180" cy="112" r="5" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="444" cy="122" r="2.5" />
+    <circle cx="458" cy="122" r="2.5" />
+    <circle cx="472" cy="122" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="490" y="44" width="112" height="156" rx="20" fillOpacity="0.1" />
+    <circle cx="524" cy="94" r="6" />
+    <circle cx="568" cy="94" r="6" />
+    <circle cx="524" cy="122" r="6" />
+    <circle cx="568" cy="122" r="6" />
+    <circle cx="524" cy="150" r="6" />
+    <circle cx="568" cy="150" r="6" />
+    <circle cx="524" cy="178" r="6" />
+    <circle cx="568" cy="178" r="6" />
+    <circle cx="568" cy="66" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="524" cy="66" r="6.5" />
+  </g>
+</svg>
 
 <CodeBlock
   adapter="python"

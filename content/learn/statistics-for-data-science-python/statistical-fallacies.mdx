@@ -15,6 +15,37 @@ This page is a field guide to the classics. For each one: **what it is**,
 fancy math to understand. All of them have ended real projects, shipped
 real bad features, and made it into real headlines.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="Two dot clusters each climb upward inside their own blue and green trend bands, yet one red band drawn through everything together slopes firmly downward — Simpson's paradox in miniature: the combined trend can contradict every group it contains"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="80" y="196" width="480" height="4" rx="2" fill="currentColor" opacity="0.18" />
+  <rect x="80" y="36" width="4" height="160" rx="2" fill="currentColor" opacity="0.18" />
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M 100 56 L 510 152 L 510 164 L 100 68 Z" fillOpacity="0.3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M 112 92 L 226 54 L 226 46 L 112 84 Z" fillOpacity="0.35" />
+    <circle cx="122" cy="84" r="5.5" />
+    <circle cx="152" cy="76" r="5.5" />
+    <circle cx="182" cy="68" r="5.5" />
+    <circle cx="212" cy="58" r="5.5" />
+    <circle cx="140" cy="94" r="5.5" />
+    <circle cx="172" cy="86" r="5.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 372 178 L 486 140 L 486 132 L 372 170 Z" fillOpacity="0.35" />
+    <circle cx="382" cy="170" r="5.5" />
+    <circle cx="412" cy="162" r="5.5" />
+    <circle cx="442" cy="154" r="5.5" />
+    <circle cx="472" cy="144" r="5.5" />
+    <circle cx="400" cy="180" r="5.5" />
+    <circle cx="432" cy="172" r="5.5" />
+  </g>
+</svg>
+
 Even with a correct calculation, the reasoning can still spring one of
 these leaks:
 
@@ -350,6 +381,39 @@ looks like a decline. The same logic explains why "punishing the worst
 performers seems to work" and "rewarding the best seems to backfire":
 both groups were partly lucky/unlucky and drift back regardless.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Dots from a first measurement drift along faint trails toward a second column: the ringed high flyers sink back toward the yellow mean line and the ringed strugglers float up to it, with no intervention anywhere — extreme readings carry luck, and luck does not repeat"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="120" y="106" width="400" height="4" rx="2" fillOpacity="0.55" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="180" cy="38" r="7" />
+    <path d="M166 38 a14 14 0 1 0 28 0 a14 14 0 1 0 -28 0 M170 38 a10 10 0 1 0 20 0 a10 10 0 1 0 -20 0" fillRule="evenodd" fillOpacity="0.4" />
+    <circle cx="180" cy="84" r="6" fillOpacity="0.6" />
+    <circle cx="180" cy="132" r="6" fillOpacity="0.6" />
+    <circle cx="180" cy="178" r="7" />
+    <path d="M166 178 a14 14 0 1 0 28 0 a14 14 0 1 0 -28 0 M170 178 a10 10 0 1 0 20 0 a10 10 0 1 0 -20 0" fillRule="evenodd" fillOpacity="0.4" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="250" cy="48" r="2.5" />
+    <circle cx="320" cy="62" r="2.5" />
+    <circle cx="390" cy="74" r="2.5" />
+    <circle cx="250" cy="170" r="2.5" />
+    <circle cx="320" cy="156" r="2.5" />
+    <circle cx="390" cy="144" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="460" cy="84" r="7" />
+    <circle cx="460" cy="134" r="7" />
+    <circle cx="460" cy="70" r="6" fillOpacity="0.6" />
+    <circle cx="460" cy="148" r="6" fillOpacity="0.6" />
+  </g>
+</svg>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -434,6 +498,41 @@ chance, and zooming in on the worst one *after the fact* (drawing the
 target around it) manufactures a story from noise. The same logic powers
 "this stock-picking strategy would have crushed the market" when the
 strategy was tuned on the very history it's tested against.
+
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Bullet holes scattered at random across a faint barn wall, with bright red and yellow target rings painted afterwards around the one chance cluster — the Texas sharpshooter draws the bullseye after the shooting, and so does an analyst who builds the hypothesis around the pattern"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="60" y="24" width="520" height="166" rx="14" fill="currentColor" opacity="0.06" />
+  <g fill="currentColor" opacity="0.45">
+    <circle cx="110" cy="60" r="4.5" />
+    <circle cx="170" cy="140" r="4.5" />
+    <circle cx="240" cy="52" r="4.5" />
+    <circle cx="300" cy="160" r="4.5" />
+    <circle cx="350" cy="86" r="4.5" />
+    <circle cx="520" cy="60" r="4.5" />
+    <circle cx="545" cy="150" r="4.5" />
+    <circle cx="92" cy="168" r="4.5" />
+    <circle cx="262" cy="112" r="4.5" />
+    <circle cx="386" cy="170" r="4.5" />
+    <circle cx="438" cy="96" r="4.5" />
+    <circle cx="450" cy="110" r="4.5" />
+    <circle cx="466" cy="98" r="4.5" />
+    <circle cx="456" cy="84" r="4.5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M412 97 a40 40 0 1 0 80 0 a40 40 0 1 0 -80 0 M419 97 a33 33 0 1 0 66 0 a33 33 0 1 0 -66 0" fillRule="evenodd" fillOpacity="0.75" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M430 97 a22 22 0 1 0 44 0 a22 22 0 1 0 -44 0 M436 97 a16 16 0 1 0 32 0 a16 16 0 1 0 -32 0" fillRule="evenodd" fillOpacity="0.75" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="500" y="148" width="8" height="34" rx="4" transform="rotate(-35 504 165)" fillOpacity="0.9" />
+    <path d="M 488 144 L 500 138 L 506 150 L 494 156 Z" fillOpacity="0.55" />
+  </g>
+</svg>
 
 **How to avoid it.** State the hypothesis and the analysis window
 *before* looking, report *all* the comparisons you ran (not just the

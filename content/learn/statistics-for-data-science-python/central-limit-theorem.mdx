@@ -17,6 +17,41 @@ skewed, lumpy, or weird-shaped. Without it, every analysis would need a
 custom distribution for every dataset. The CLT says: don't bother — for
 the **mean**, things converge to the same familiar bell curve.
 
+<svg
+  viewBox="0 0 640 190"
+  role="img"
+  aria-label="Four small distributions morph from left to right — a red skewed slide, a yellow lopsided hump, a blue almost-bell, and a clean green bell — as the sample size beneath each grows from one to one hundred, the distribution of the mean forgets the parent's shape"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="44" y="130" width="556" height="4" rx="2" fill="currentColor" opacity="0.15" />
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M 48 130 L 48 52 C 70 60 95 105 150 124 C 158 127 164 129 168 130 Z" fillOpacity="0.4" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M 198 130 C 210 130 212 80 232 76 C 260 70 286 112 318 126 L 322 130 Z" fillOpacity="0.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M 348 130 C 364 130 368 70 396 70 C 424 70 432 118 468 127 L 472 130 Z" fillOpacity="0.45" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 498 130 C 518 130 522 62 548 62 C 574 62 578 130 598 130 Z" fillOpacity="0.5" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="176" cy="94" r="2.5" />
+    <circle cx="186" cy="94" r="2.5" />
+    <circle cx="328" cy="94" r="2.5" />
+    <circle cx="338" cy="94" r="2.5" />
+    <circle cx="478" cy="94" r="2.5" />
+    <circle cx="488" cy="94" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.5">
+    <text x="106" y="158" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="14">1</text>
+    <text x="258" y="158" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="14">5</text>
+    <text x="408" y="158" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="14">30</text>
+    <text x="548" y="158" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="14">100</text>
+  </g>
+</svg>
+
 ## The theorem in plain words
 
 Here is the whole idea, stated as plainly as possible:
@@ -128,6 +163,43 @@ different populations at it — right-skewed, flat uniform, and bimodal
 (two separated humps) — and confirm the *mean's* sampling distribution
 goes normal in every case at large `n`. A normal curve is overlaid for
 comparison.
+
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Three wildly different parent shapes — a skewed slide, a flat slab, and a two-humped camel — all funnel along dotted trails into the same single green bell on the right — averaging washes out every parent's shape into one universal curve"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.15">
+    <rect x="50" y="62" width="150" height="4" rx="2" />
+    <rect x="50" y="124" width="150" height="4" rx="2" />
+    <rect x="50" y="186" width="150" height="4" rx="2" />
+    <rect x="420" y="170" width="170" height="4" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.4">
+    <path d="M 56 62 L 56 20 C 75 26 100 48 140 58 C 148 60 154 61 158 62 Z" />
+    <rect x="58" y="96" width="130" height="28" rx="5" />
+    <path d="M 58 186 C 70 186 72 152 86 152 C 100 152 98 176 108 176 C 118 176 116 152 130 152 C 144 152 146 186 158 186 Z" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="240" cy="58" r="2.5" />
+    <circle cx="290" cy="80" r="2.5" />
+    <circle cx="340" cy="104" r="2.5" />
+    <circle cx="240" cy="124" r="2.5" />
+    <circle cx="290" cy="126" r="2.5" />
+    <circle cx="340" cy="128" r="2.5" />
+    <circle cx="240" cy="184" r="2.5" />
+    <circle cx="290" cy="168" r="2.5" />
+    <circle cx="340" cy="152" r="2.5" />
+    <circle cx="384" cy="130" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 424 170 C 460 170 466 64 504 64 C 542 64 548 170 584 170 Z" fillOpacity="0.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="501.5" y="70" width="5" height="100" rx="2.5" fillOpacity="0.8" />
+  </g>
+</svg>
 
 <CodeBlock
   adapter="python"

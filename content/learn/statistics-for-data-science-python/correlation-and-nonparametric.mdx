@@ -15,6 +15,39 @@ Both keep the same mindset as the rest of the course: get a number (an
 effect size or a statistic), get a p-value, and — above all — interpret
 it honestly.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A scatter of blue dots climbs steeply then flattens while one red outlier sits far off the pattern; the straight yellow line the outlier dragged misses the bend that the green rank-following band hugs — Pearson measures straight lines, Spearman follows any monotonic climb"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="80" y="180" width="480" height="4" rx="2" fill="currentColor" opacity="0.2" />
+  <rect x="80" y="40" width="4" height="144" rx="2" fill="currentColor" opacity="0.2" />
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M 100 138 L 530 96 L 530 106 L 100 148 Z" fillOpacity="0.45" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 105 150 C 200 102 320 68 480 50 L 480 60 C 320 78 200 114 105 162 Z" fillOpacity="0.35" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.85">
+    <circle cx="110" cy="160" r="5" />
+    <circle cx="140" cy="142" r="5" />
+    <circle cx="170" cy="122" r="5" />
+    <circle cx="200" cy="106" r="5" />
+    <circle cx="235" cy="92" r="5" />
+    <circle cx="270" cy="82" r="5" />
+    <circle cx="305" cy="74" r="5" />
+    <circle cx="340" cy="68" r="5" />
+    <circle cx="375" cy="64" r="5" />
+    <circle cx="410" cy="60" r="5" />
+    <circle cx="445" cy="58" r="5" />
+    <circle cx="480" cy="56" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="522" cy="166" r="6" />
+  </g>
+</svg>
+
 ## Part A — Correlation: how two variables move together
 
 A **correlation coefficient** condenses the relationship between two
@@ -292,6 +325,42 @@ flowchart TD
 The pairing logic mirrors the t-tests in *t-Tests*: **Mann–Whitney U**
 is the rank-based cousin of the **independent** two-sample t-test, and
 **Wilcoxon signed-rank** is the cousin of the **paired** t-test.
+
+<svg
+  viewBox="0 0 640 190"
+  role="img"
+  aria-label="A top row of wildly different sized dots — one enormous red outlier among small blue values — funnels down into a bottom row of identical evenly spaced dots numbered one to five — converting values to ranks keeps their order but strips the outlier of its size"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="120" cy="56" r="6" />
+    <circle cx="210" cy="56" r="9" />
+    <circle cx="300" cy="56" r="12" />
+    <circle cx="390" cy="56" r="15" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="500" cy="56" r="26" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="310" cy="92" r="2.5" />
+    <circle cx="310" cy="104" r="2.5" />
+    <circle cx="310" cy="116" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.8">
+    <circle cx="120" cy="146" r="8" />
+    <circle cx="215" cy="146" r="8" />
+    <circle cx="310" cy="146" r="8" />
+    <circle cx="405" cy="146" r="8" />
+    <circle cx="500" cy="146" r="8" />
+  </g>
+  <g fill="currentColor" opacity="0.55">
+    <text x="120" y="178" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="13">1</text>
+    <text x="215" y="178" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="13">2</text>
+    <text x="310" y="178" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="13">3</text>
+    <text x="405" y="178" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="13">4</text>
+    <text x="500" y="178" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="13">5</text>
+  </g>
+</svg>
 
 ### Mann–Whitney U: independent groups, robustly
 

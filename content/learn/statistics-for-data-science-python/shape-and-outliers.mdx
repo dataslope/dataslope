@@ -16,6 +16,31 @@ The headline you should carry in: an outlier is a *question*, not a
 verdict. "This point is far from the others" tells you to look, not to
 delete.
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="A dune-shaped distribution peaks on the left and drags a long tail to the right, its green median post standing nearer the peak than the yellow mean post the tail has pulled away, while one red point sits far down the tail — skew is named for the tail, and an outlier is a question, not a verdict"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="50" y="170" width="540" height="5" rx="2.5" fill="currentColor" opacity="0.2" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M 70 170 C 90 170 100 60 160 60 C 240 60 280 150 400 162 C 470 168 520 170 560 170 Z" fillOpacity="0.3" />
+    <path d="M 92 170 C 108 170 118 96 162 96 C 222 96 252 158 360 166 C 400 169 420 170 440 170 Z" fillOpacity="0.25" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="186" y="92" width="5" height="78" rx="2.5" />
+    <circle cx="188.5" cy="84" r="5.5" fillOpacity="0.9" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="244" y="118" width="5" height="52" rx="2.5" />
+    <circle cx="246.5" cy="110" r="5.5" fillOpacity="0.9" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="548" cy="161" r="10" fillOpacity="0.2" />
+    <circle cx="548" cy="161" r="5.5" />
+  </g>
+</svg>
+
 ## Skewness: which way the tail leans
 
 A distribution is **symmetric** if its left and right halves mirror
@@ -91,6 +116,35 @@ response times split between cache-hit and cache-miss, purchase amounts
 from two customer segments. When you see two peaks, the right move is
 usually to *split the groups*, because no single center or spread
 honestly describes a two-humped distribution.
+
+<svg
+  viewBox="0 0 640 190"
+  role="img"
+  aria-label="Two translucent humps, one blue and one green, hide inside a single column of data while the yellow mean post stands in the empty valley between them — a bimodal shape means two groups got mixed together, and one center describes nobody"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="70" y="152" width="500" height="4" rx="2" fill="currentColor" opacity="0.18" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M 100 152 C 140 152 150 70 200 70 C 250 70 260 152 300 152 Z" fillOpacity="0.35" />
+    <circle cx="170" cy="166" r="3" />
+    <circle cx="186" cy="166" r="3" />
+    <circle cx="202" cy="166" r="3" />
+    <circle cx="218" cy="166" r="3" />
+    <circle cx="234" cy="166" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 290 152 C 335 152 345 62 400 62 C 455 62 465 152 510 152 Z" fillOpacity="0.35" />
+    <circle cx="370" cy="166" r="3" />
+    <circle cx="386" cy="166" r="3" />
+    <circle cx="402" cy="166" r="3" />
+    <circle cx="418" cy="166" r="3" />
+    <circle cx="434" cy="166" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="297" y="86" width="6" height="66" rx="3" />
+    <circle cx="300" cy="78" r="6" />
+  </g>
+</svg>
 
 <CodeBlock
   adapter="python"
@@ -194,6 +248,36 @@ for opposite responses:
    case, a real record-breaking day. These are often the **most
    important rows in the dataset** — deleting them throws away the
    signal you're being paid to find.
+
+<svg
+  viewBox="0 0 640 180"
+  role="img"
+  aria-label="A cluster of ordinary dots on the left and one red point far away on the right, held under a blue magnifying lens with a small question mark — an outlier is simply far away, which earns it an investigation, not a deletion"
+  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="90" cy="120" r="4" />
+    <circle cx="120" cy="95" r="4" />
+    <circle cx="150" cy="130" r="4" />
+    <circle cx="180" cy="105" r="4" />
+    <circle cx="210" cy="125" r="4" />
+    <circle cx="240" cy="100" r="4" />
+    <circle cx="270" cy="118" r="4" />
+    <circle cx="300" cy="108" r="4" />
+    <circle cx="150" cy="80" r="4" />
+    <circle cx="220" cy="142" r="4" />
+    <circle cx="115" cy="142" r="4" />
+    <circle cx="255" cy="135" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="430" cy="80" r="6.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M396 80 a34 34 0 1 0 68 0 a34 34 0 1 0 -68 0 M404 80 a26 26 0 1 0 52 0 a26 26 0 1 0 -52 0" fillRule="evenodd" />
+    <rect x="448" y="98" width="14" height="56" rx="7" transform="rotate(-45 455 105)" />
+  </g>
+  <text x="430" y="66" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="18" fill="currentColor" opacity="0.55">?</text>
+</svg>
 
 <Callout type="danger" title="Misconception: outliers are errors you should delete">
 The single most damaging habit in data cleaning. Auto-deleting outliers

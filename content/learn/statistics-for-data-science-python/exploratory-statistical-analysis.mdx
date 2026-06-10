@@ -18,6 +18,59 @@ Exploration **generates** hypotheses; it must never be mistaken for
 **confirming** them. The single most important habit in all of applied
 statistics is to keep those two activities on opposite sides of a wall.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A messy playground of little charts and a question badge on one side of a brick wall, a single clean interval with a green check on the other, and one yellow hypothesis dot arcing over the top — explore freely, then confirm on data that never saw the exploring"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.3">
+    <rect x="310" y="44" width="22" height="30" rx="4" />
+    <rect x="310" y="80" width="22" height="30" rx="4" />
+    <rect x="310" y="116" width="22" height="30" rx="4" />
+    <rect x="310" y="152" width="22" height="30" rx="4" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.5">
+    <rect x="70" y="122" width="10" height="34" rx="3" />
+    <rect x="84" y="108" width="10" height="48" rx="3" />
+    <rect x="98" y="130" width="10" height="26" rx="3" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 142 100 C 156 100 158 70 174 70 C 190 70 192 100 206 100 Z" fillOpacity="0.45" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="92" cy="62" r="3.5" />
+    <circle cx="114" cy="48" r="3.5" />
+    <circle cx="136" cy="58" r="3.5" />
+    <circle cx="158" cy="42" r="3.5" />
+    <circle cx="130" cy="172" r="3.5" />
+    <circle cx="156" cy="160" r="3.5" />
+    <circle cx="182" cy="170" r="3.5" />
+    <circle cx="208" cy="156" r="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="244" cy="120" r="11" fillOpacity="0.25" />
+  </g>
+  <text x="244" y="126" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="14" fill="currentColor" opacity="0.6">?</text>
+  <g fill="currentColor" opacity="0.4">
+    <circle cx="262" cy="88" r="2.5" />
+    <circle cx="286" cy="56" r="2.5" />
+    <circle cx="320" cy="36" r="2.5" />
+    <circle cx="354" cy="56" r="2.5" />
+    <circle cx="378" cy="88" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="320" cy="30" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="420" y="128" width="130" height="9" rx="4.5" fillOpacity="0.4" />
+    <rect x="418" y="122" width="5" height="21" rx="2.5" fillOpacity="0.85" />
+    <rect x="547" y="122" width="5" height="21" rx="2.5" fillOpacity="0.85" />
+    <circle cx="485" cy="132.5" r="5.5" />
+    <path d="M 466 84 L 480 98 L 502 68 L 510 74 L 481 112 L 458 92 Z" fillOpacity="0.85" />
+  </g>
+</svg>
+
 ## Exploratory vs confirmatory: the wall you must not cross
 
 There are two fundamentally different modes of data analysis, and
@@ -264,6 +317,63 @@ where the tip went unrecorded, so `dropna()` would silently bias your
 average tip downward. Always ask *why* a value is missing before
 deciding how to handle it — the mechanism matters more than the count.
 </Callout>
+
+<svg
+  viewBox="0 0 640 190"
+  role="img"
+  aria-label="A data grid of solid blue cells pocked with empty holes: in the left block the holes scatter randomly, but in the rightmost column they stack up together, ringed in red — missingness with a pattern is information, and dropping those rows would quietly bias everything"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.45">
+    <rect x="100" y="36" width="34" height="20" rx="5" />
+    <rect x="142" y="36" width="34" height="20" rx="5" />
+    <rect x="184" y="36" width="34" height="20" rx="5" />
+    <rect x="226" y="36" width="34" height="20" rx="5" />
+    <rect x="268" y="36" width="34" height="20" rx="5" />
+    <rect x="310" y="36" width="34" height="20" rx="5" />
+    <rect x="352" y="36" width="34" height="20" rx="5" />
+    <rect x="394" y="36" width="34" height="20" rx="5" />
+    <rect x="436" y="36" width="34" height="20" rx="5" />
+    <rect x="100" y="64" width="34" height="20" rx="5" />
+    <rect x="184" y="64" width="34" height="20" rx="5" />
+    <rect x="226" y="64" width="34" height="20" rx="5" />
+    <rect x="268" y="64" width="34" height="20" rx="5" />
+    <rect x="310" y="64" width="34" height="20" rx="5" />
+    <rect x="352" y="64" width="34" height="20" rx="5" />
+    <rect x="394" y="64" width="34" height="20" rx="5" />
+    <rect x="436" y="64" width="34" height="20" rx="5" />
+    <rect x="436" y="92" width="34" height="20" rx="5" />
+    <rect x="100" y="92" width="34" height="20" rx="5" />
+    <rect x="142" y="92" width="34" height="20" rx="5" />
+    <rect x="184" y="92" width="34" height="20" rx="5" />
+    <rect x="268" y="92" width="34" height="20" rx="5" />
+    <rect x="310" y="92" width="34" height="20" rx="5" />
+    <rect x="352" y="92" width="34" height="20" rx="5" />
+    <rect x="394" y="92" width="34" height="20" rx="5" />
+    <rect x="100" y="120" width="34" height="20" rx="5" />
+    <rect x="142" y="120" width="34" height="20" rx="5" />
+    <rect x="184" y="120" width="34" height="20" rx="5" />
+    <rect x="226" y="120" width="34" height="20" rx="5" />
+    <rect x="310" y="120" width="34" height="20" rx="5" />
+    <rect x="352" y="120" width="34" height="20" rx="5" />
+    <rect x="394" y="120" width="34" height="20" rx="5" />
+    <rect x="436" y="120" width="34" height="20" rx="5" />
+  </g>
+  <g fill="currentColor" opacity="0.1">
+    <rect x="142" y="64" width="34" height="20" rx="5" />
+    <rect x="226" y="92" width="34" height="20" rx="5" />
+    <rect x="268" y="120" width="34" height="20" rx="5" />
+    <rect x="478" y="36" width="34" height="20" rx="5" />
+    <rect x="478" y="64" width="34" height="20" rx="5" />
+    <rect x="478" y="92" width="34" height="20" rx="5" />
+    <rect x="478" y="120" width="34" height="20" rx="5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="472" y="28" width="46" height="120" rx="12" fillOpacity="0.14" />
+    <rect x="472" y="28" width="46" height="5" rx="2.5" fillOpacity="0.7" />
+    <rect x="472" y="143" width="46" height="5" rx="2.5" fillOpacity="0.7" />
+  </g>
+</svg>
 
 ## Step 4: outliers
 

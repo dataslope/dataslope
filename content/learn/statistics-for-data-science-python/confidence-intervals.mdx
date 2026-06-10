@@ -19,6 +19,39 @@ that intuition, then spends most of its energy on the single most
 misunderstood sentence in all of applied statistics: what "95%
 confidence" actually means.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="Nine horizontal interval pills stack beside one fixed yellow truth line, each centered somewhere a little different yet almost all crossing the line, while a single red interval floats clear of it — 95 percent confidence is the recipe's long-run hit rate, and yours might be the unlucky one"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="318" y="20" width="4" height="200" rx="2" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="250" y="33" width="130" height="7" rx="3.5" fillOpacity="0.35" />
+    <circle cx="315" cy="36.5" r="4" />
+    <rect x="270" y="54" width="110" height="7" rx="3.5" fillOpacity="0.35" />
+    <circle cx="325" cy="57.5" r="4" />
+    <rect x="216" y="75" width="150" height="7" rx="3.5" fillOpacity="0.35" />
+    <circle cx="291" cy="78.5" r="4" />
+    <rect x="296" y="96" width="96" height="7" rx="3.5" fillOpacity="0.35" />
+    <circle cx="344" cy="99.5" r="4" />
+    <rect x="232" y="117" width="124" height="7" rx="3.5" fillOpacity="0.35" />
+    <circle cx="294" cy="120.5" r="4" />
+    <rect x="262" y="159" width="126" height="7" rx="3.5" fillOpacity="0.35" />
+    <circle cx="325" cy="162.5" r="4" />
+    <rect x="204" y="180" width="132" height="7" rx="3.5" fillOpacity="0.35" />
+    <circle cx="270" cy="183.5" r="4" />
+    <rect x="286" y="201" width="104" height="7" rx="3.5" fillOpacity="0.35" />
+    <circle cx="338" cy="204.5" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="352" y="138" width="118" height="7" rx="3.5" fillOpacity="0.5" />
+    <circle cx="411" cy="141.5" r="4.5" />
+  </g>
+</svg>
+
 ## A point estimate alone hides its own uncertainty
 
 You sample 50 users, the mean is \$48.20. That's your **point
@@ -315,6 +348,48 @@ responds to exactly three levers:
   margin. (The same diminishing return from *Standard Error*.)
 - **Variability `s` ↑ → wider.** Noisier data gives a noisier estimate.
   You don't control this directly, but cleaner measurement helps.
+
+<svg
+  viewBox="0 0 640 190"
+  role="img"
+  aria-label="Three lever panels, each squeezing or stretching an interval pill: piling on more data dots narrows the blue pill, demanding a higher confidence percentage widens the green pill, and noisier jittered data widens the red pill — the three levers that set a confidence interval's width"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.06">
+    <rect x="48" y="26" width="170" height="140" rx="14" />
+    <rect x="234" y="26" width="170" height="140" rx="14" />
+    <rect x="420" y="26" width="170" height="140" rx="14" />
+  </g>
+  <g fill="currentColor" opacity="0.4">
+    <circle cx="118" cy="50" r="3" />
+    <circle cx="133" cy="50" r="3" />
+    <circle cx="148" cy="50" r="3" />
+    <circle cx="110" cy="62" r="3" />
+    <circle cx="125" cy="62" r="3" />
+    <circle cx="140" cy="62" r="3" />
+    <circle cx="155" cy="62" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="68" y="88" width="130" height="8" rx="4" fillOpacity="0.3" />
+    <rect x="103" y="126" width="60" height="8" rx="4" fillOpacity="0.75" />
+  </g>
+  <text x="319" y="62" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="18" fill="currentColor" opacity="0.5">%</text>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="289" y="88" width="60" height="8" rx="4" fillOpacity="0.75" />
+    <rect x="254" y="126" width="130" height="8" rx="4" fillOpacity="0.3" />
+  </g>
+  <g fill="currentColor" opacity="0.4">
+    <circle cx="478" cy="44" r="3" />
+    <circle cx="492" cy="58" r="3" />
+    <circle cx="506" cy="42" r="3" />
+    <circle cx="520" cy="60" r="3" />
+    <circle cx="534" cy="46" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="475" y="88" width="60" height="8" rx="4" fillOpacity="0.75" />
+    <rect x="440" y="126" width="130" height="8" rx="4" fillOpacity="0.35" />
+  </g>
+</svg>
 
 Let's watch the first two levers move.
 
