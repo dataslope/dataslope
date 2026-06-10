@@ -11,6 +11,44 @@ indexes, configuration, frequency counts, lookup tables, JSON
 objects, and the symbol tables of every compiler in the world are
 maps under the skin.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="Four blue key dots tether across to green value blocks — two keys share one value, and a yellow-ringed key lights up its whole path — a map is a function from key to value"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="160" cy="90" r="15" fillOpacity="0.25" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="160" cy="42" r="9" />
+    <circle cx="160" cy="90" r="9" />
+    <circle cx="160" cy="138" r="9" />
+    <circle cx="160" cy="186" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="440" y="30" width="64" height="24" rx="8" fillOpacity="0.7" />
+    <rect x="440" y="78" width="88" height="24" rx="8" fillOpacity="0.7" />
+    <rect x="440" y="150" width="64" height="24" rx="8" fillOpacity="0.7" />
+  </g>
+  <g fill="currentColor" opacity="0.28">
+    <circle cx="230" cy="42" r="3" />
+    <circle cx="300" cy="42" r="3" />
+    <circle cx="370" cy="42" r="3" />
+    <circle cx="230" cy="144" r="3" />
+    <circle cx="300" cy="150" r="3" />
+    <circle cx="370" cy="156" r="3" />
+    <circle cx="230" cy="164" r="3" />
+    <circle cx="300" cy="143" r="3" />
+    <circle cx="370" cy="122" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="230" cy="90" r="3.5" />
+    <circle cx="300" cy="90" r="3.5" />
+    <circle cx="370" cy="90" r="3.5" />
+  </g>
+</svg>
+
 ## The Map interface
 
 `Map<K, V>` is its own root — it does not extend `Collection`,

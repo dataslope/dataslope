@@ -13,6 +13,39 @@ There are two ways to provide that ordering:
 - **`Comparator<T>`** — an *external* object defines an order on the
   type, often one of many possible orderings.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="Five dots of jumbled sizes funnel past a small yellow judge diamond and emerge below in a green row ordered from smallest to largest — a comparator decides the order"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="150" cy="46" r="13" />
+    <circle cx="225" cy="46" r="6" />
+    <circle cx="300" cy="46" r="16" />
+    <circle cx="375" cy="46" r="9" />
+    <circle cx="450" cy="46" r="11" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="300" cy="84" r="3" />
+    <circle cx="320" cy="88" r="3" />
+    <circle cx="340" cy="84" r="3" />
+    <circle cx="300" cy="152" r="3" />
+    <circle cx="320" cy="148" r="3" />
+    <circle cx="340" cy="152" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="304" y="102" width="32" height="32" rx="6" transform="rotate(45 320 118)" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="160" cy="188" r="6" />
+    <circle cx="240" cy="188" r="9" />
+    <circle cx="320" cy="188" r="11" />
+    <circle cx="400" cy="188" r="13" />
+    <circle cx="480" cy="188" r="16" />
+  </g>
+</svg>
+
 ## Comparable: the natural order
 
 `Comparable<T>` has a single method, `int compareTo(T other)`, which

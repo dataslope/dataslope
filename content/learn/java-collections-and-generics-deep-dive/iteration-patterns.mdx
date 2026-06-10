@@ -11,6 +11,60 @@ process the whole thing as a pipeline?
 This chapter is a tour of the five iteration patterns you'll use
 every week, plus the single most common bug each one introduces.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="Four track lanes each walked differently — straight through, with one element lifted out mid-walk, struck by a red bolt when the track is changed underfoot, and traversed in reverse"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.08">
+    <rect x="110" y="24" width="420" height="30" rx="15" />
+    <rect x="110" y="78" width="420" height="30" rx="15" />
+    <rect x="110" y="132" width="420" height="30" rx="15" />
+    <rect x="110" y="186" width="420" height="30" rx="15" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="150" cy="39" r="6" fillOpacity="0.25" />
+    <circle cx="200" cy="39" r="6" fillOpacity="0.25" />
+    <circle cx="250" cy="39" r="6" fillOpacity="0.25" />
+    <circle cx="300" cy="39" r="6" fillOpacity="0.25" />
+    <circle cx="350" cy="39" r="9" />
+    <circle cx="400" cy="39" r="6" fillOpacity="0.7" />
+    <circle cx="450" cy="39" r="6" fillOpacity="0.7" />
+    <polygon points="496,32 496,46 510,39" fillOpacity="0.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="150" cy="93" r="6" fillOpacity="0.25" />
+    <circle cx="200" cy="93" r="6" fillOpacity="0.25" />
+    <circle cx="250" cy="122" r="6" fillOpacity="0.2" />
+    <circle cx="300" cy="93" r="9" />
+    <circle cx="350" cy="93" r="6" fillOpacity="0.7" />
+    <circle cx="400" cy="93" r="6" fillOpacity="0.7" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="150" cy="147" r="6" fillOpacity="0.25" />
+    <circle cx="200" cy="147" r="6" fillOpacity="0.25" />
+    <circle cx="300" cy="147" r="6" fillOpacity="0.7" />
+    <circle cx="350" cy="147" r="6" fillOpacity="0.7" />
+    <circle cx="400" cy="147" r="6" fillOpacity="0.7" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="250" cy="147" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <polygon points="318,108 304,140 314,140 306,166 330,134 319,134 327,108" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="450" cy="201" r="6" fillOpacity="0.25" />
+    <circle cx="400" cy="201" r="6" fillOpacity="0.25" />
+    <circle cx="350" cy="201" r="9" />
+    <circle cx="300" cy="201" r="6" fillOpacity="0.7" />
+    <circle cx="250" cy="201" r="6" fillOpacity="0.7" />
+    <circle cx="200" cy="201" r="6" fillOpacity="0.7" />
+    <polygon points="144,194 144,208 130,201" fillOpacity="0.5" />
+  </g>
+</svg>
+
 ## 1. Enhanced for-each
 
 The for-each loop is sugar over an `Iterator`. It is the right tool
