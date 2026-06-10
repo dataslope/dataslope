@@ -34,6 +34,76 @@ time. It was the world's first major internet worm and led directly
 to the creation of CERT/CC, the first computer-emergency response
 team.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A constellation of networked machines: from one red node, infection ripples outward in rings, turning near neighbours red and the frontier yellow, while distant green nodes wait — the 1988 Morris worm crossing the early internet"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="165" cy="99" r="1.5" />
+    <circle cx="180" cy="88" r="1.5" />
+    <circle cx="169" cy="120" r="1.5" />
+    <circle cx="188" cy="130" r="1.5" />
+    <circle cx="218" cy="84" r="1.5" />
+    <circle cx="240" cy="90" r="1.5" />
+    <circle cx="223" cy="146" r="1.5" />
+    <circle cx="238" cy="152" r="1.5" />
+    <circle cx="291" cy="104" r="1.5" />
+    <circle cx="320" cy="112" r="1.5" />
+    <circle cx="373" cy="100" r="1.5" />
+    <circle cx="396" cy="80" r="1.5" />
+    <circle cx="363" cy="137" r="1.5" />
+    <circle cx="377" cy="153" r="1.5" />
+    <circle cx="457" cy="70" r="1.5" />
+    <circle cx="493" cy="80" r="1.5" />
+    <circle cx="490" cy="117" r="1.5" />
+    <circle cx="510" cy="103" r="1.5" />
+    <circle cx="417" cy="157" r="1.5" />
+    <circle cx="443" cy="143" r="1.5" />
+    <circle cx="553" cy="80" r="1.5" />
+    <circle cx="577" cy="70" r="1.5" />
+    <circle cx="540" cy="117" r="1.5" />
+    <circle cx="550" cy="143" r="1.5" />
+    <circle cx="114" cy="85" r="1.5" />
+    <circle cx="132" cy="97" r="1.5" />
+    <circle cx="129" cy="143" r="1.5" />
+    <circle cx="139" cy="127" r="1.5" />
+    <circle cx="189" cy="49" r="1.5" />
+    <circle cx="193" cy="63" r="1.5" />
+    <circle cx="307" cy="59" r="1.5" />
+    <circle cx="284" cy="77" r="1.5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M116 110 a34 34 0 1 1 68 0 a34 34 0 1 1 -68 0 Z M122 110 a28 28 0 1 1 56 0 a28 28 0 1 1 -56 0 Z" fillRule="evenodd" fillOpacity="0.3" />
+    <path d="M88 110 a62 62 0 1 1 124 0 a62 62 0 1 1 -124 0 Z M94 110 a56 56 0 1 1 112 0 a56 56 0 1 1 -112 0 Z" fillRule="evenodd" fillOpacity="0.14" />
+    <circle cx="150" cy="110" r="9" />
+    <circle cx="196" cy="78" r="5" />
+    <circle cx="208" cy="140" r="5" />
+    <circle cx="118" cy="160" r="5" />
+    <circle cx="96" cy="72" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="262" cy="96" r="4.5" />
+    <circle cx="252" cy="158" r="4.5" />
+    <circle cx="186" cy="34" r="4.5" />
+  </g>
+  <g fill="currentColor" opacity="0.45">
+    <circle cx="350" cy="120" r="4" />
+    <circle cx="390" cy="170" r="4" />
+    <circle cx="330" cy="40" r="4" />
+    <circle cx="600" cy="60" r="4" />
+    <circle cx="430" cy="190" r="4" />
+    <circle cx="580" cy="30" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="420" cy="60" r="4" />
+    <circle cx="470" cy="130" r="4" />
+    <circle cx="530" cy="90" r="4" />
+    <circle cx="560" cy="170" r="4" />
+  </g>
+</svg>
+
 One of its key propagation vectors exploited a *stack buffer
 overflow* in the BSD `fingerd` daemon. `fingerd` read a request into
 a fixed-size local buffer using `gets()`:
@@ -106,6 +176,67 @@ implementation of the TLS Heartbeat extension. It did not corrupt
 memory or crash the server — it did something arguably worse: it
 let any attacker read up to ~64 KB of the server's process memory
 *per request*, with no authentication and no log trace.
+
+<svg
+  viewBox="0 0 640 190"
+  role="img"
+  aria-label="A vault of memory dots leaks a long stream of secrets — yellow keys and green session dots among them — out through a small red heart-shaped opening in its wall toward a waiting attacker: Heartbleed"
+  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="120" y="40" width="260" height="120" rx="12" fillOpacity="0.18" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="144" cy="62" r="2.5" />
+    <circle cx="172" cy="62" r="2.5" />
+    <circle cx="200" cy="62" r="2.5" />
+    <circle cx="228" cy="62" r="2.5" />
+    <circle cx="256" cy="62" r="2.5" />
+    <circle cx="284" cy="62" r="2.5" />
+    <circle cx="312" cy="62" r="2.5" />
+    <circle cx="144" cy="88" r="2.5" />
+    <circle cx="200" cy="88" r="2.5" />
+    <circle cx="228" cy="88" r="2.5" />
+    <circle cx="284" cy="88" r="2.5" />
+    <circle cx="340" cy="88" r="2.5" />
+    <circle cx="144" cy="114" r="2.5" />
+    <circle cx="172" cy="114" r="2.5" />
+    <circle cx="228" cy="114" r="2.5" />
+    <circle cx="284" cy="114" r="2.5" />
+    <circle cx="312" cy="114" r="2.5" />
+    <circle cx="144" cy="140" r="2.5" />
+    <circle cx="200" cy="140" r="2.5" />
+    <circle cx="256" cy="140" r="2.5" />
+    <circle cx="312" cy="140" r="2.5" />
+    <circle cx="340" cy="140" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="172" cy="88" r="4" />
+    <circle cx="340" cy="114" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="256" cy="114" r="4" />
+    <circle cx="312" cy="88" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M388 116 C376 102 368 96 368 84 C368 74 376 68 384 70 C387 71 388 74 388 76 C388 74 389 71 392 70 C400 68 408 74 408 84 C408 96 400 102 388 116 Z" />
+  </g>
+  <g fill="currentColor" opacity="0.4">
+    <circle cx="420" cy="96" r="3" />
+    <circle cx="438" cy="92" r="3" />
+    <circle cx="474" cy="94" r="3" />
+    <circle cx="510" cy="92" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="456" cy="98" r="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="492" cy="98" r="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M548 86 L568 95 L548 104 Z" fillOpacity="0.75" />
+  </g>
+</svg>
 
 The bug, distilled:
 
@@ -275,6 +406,48 @@ removing safety hardware on the assumption that the code is correct.
 On its maiden flight, the European Space Agency's Ariane 5 rocket
 self-destructed 37 seconds after launch, taking with it four
 scientific satellites and roughly $370 million.
+
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="A dotted launch arc climbs steadily until a wide faint band must squeeze through a narrow yellow slot — the 64-to-16-bit conversion — where the trail kinks red and the abstract craft breaks into drifting shards: Ariane 5, flight 501"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="60" y="186" width="180" height="6" rx="3" fill="currentColor" opacity="0.2" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="90" cy="180" r="3" fillOpacity="0.3" />
+    <circle cx="110" cy="162" r="3" fillOpacity="0.38" />
+    <circle cx="132" cy="144" r="3" fillOpacity="0.46" />
+    <circle cx="156" cy="127" r="3" fillOpacity="0.54" />
+    <circle cx="182" cy="111" r="3" fillOpacity="0.62" />
+    <circle cx="210" cy="97" r="3" fillOpacity="0.7" />
+    <circle cx="240" cy="85" r="3" fillOpacity="0.8" />
+    <circle cx="272" cy="75" r="3" fillOpacity="0.9" />
+  </g>
+  <path d="M250 50 L332 38 L332 102 L250 122 Z" fill="currentColor" opacity="0.07" />
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor" fillOpacity="0.75">
+    <path d="M332 22 L374 22 L374 60 L332 44 Z" />
+    <path d="M332 116 L374 116 L374 78 L332 96 Z" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M292 90 L316 70 L330 76 L306 96 Z" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="388" cy="72" r="3" />
+    <circle cx="402" cy="84" r="3" />
+    <circle cx="412" cy="100" r="3" />
+    <path d="M418 84 L432 80 L424 96 Z" fillOpacity="0.7" />
+    <path d="M430 110 L444 106 L436 122 Z" fillOpacity="0.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M396 60 L410 54 L404 70 Z" fillOpacity="0.6" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="452" cy="130" r="2.5" />
+    <circle cx="458" cy="150" r="2.5" />
+    <circle cx="462" cy="170" r="2.5" />
+  </g>
+</svg>
 
 The cause was not, strictly, a memory bug — but it is a textbook
 example of the kind of UB-adjacent disaster C programmers are

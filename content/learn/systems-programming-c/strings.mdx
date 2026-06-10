@@ -19,6 +19,50 @@ The character `'\0'` is the byte `0`, *not* the digit `'0'` (which is
 `0x30` in ASCII). Until the runtime finds it, every byte is still
 "part of the string."
 
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Two bead strings: the top one ends in a solid knot so the read stops there — the null terminator — while the bottom string is missing its knot and the read runs straight off the frayed end into junk shapes and a red crash"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <path d="M64 70 Q320 44 556 70 L556 74 Q320 48 64 74 Z" fill="currentColor" opacity="0.25" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="120" cy="65" r="9" />
+    <circle cx="164" cy="62" r="9" />
+    <circle cx="252" cy="58" r="9" />
+    <circle cx="340" cy="57" r="9" />
+    <circle cx="384" cy="58" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="208" cy="59" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="296" cy="57" r="9" />
+  </g>
+  <circle cx="428" cy="60" r="7" fill="currentColor" opacity="0.75" />
+  <path d="M64 150 Q260 128 440 150 L440 154 Q260 132 64 154 Z" fill="currentColor" opacity="0.25" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="120" cy="144" r="9" />
+    <circle cx="170" cy="141" r="9" />
+    <circle cx="220" cy="139" r="9" />
+    <circle cx="270" cy="139" r="9" />
+    <circle cx="320" cy="140" r="9" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="448" cy="150" r="2" />
+    <circle cx="454" cy="145" r="2" />
+    <circle cx="452" cy="156" r="2" />
+  </g>
+  <g fill="currentColor">
+    <rect x="470" y="146" width="12" height="12" rx="2" opacity="0.3" />
+    <path d="M500 158 L512 142 L522 158 Z" opacity="0.35" />
+    <circle cx="546" cy="152" r="6" opacity="0.25" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="574" y="145" width="13" height="13" rx="3" />
+  </g>
+</svg>
+
 <CodeBlock
   adapter="c"
   files={[
@@ -148,6 +192,39 @@ int main(void) {
 That second case is the bug factory. Many codebases now use
 `snprintf(dst, sizeof dst, "%s", src)` or platform-specific
 `strlcpy` instead.
+
+<svg
+  viewBox="0 0 640 170"
+  role="img"
+  aria-label="Two ribbons trimmed at the same length: snprintf finishes with a solid green end cap — always terminated — while the strncpy cut below is raw and fraying, so reads continue past it into junk and a red overrun"
+  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.3">
+    <rect x="80" y="26" width="308" height="3" rx="1.5" />
+    <rect x="80" y="26" width="3" height="9" rx="1.5" />
+    <rect x="385" y="26" width="3" height="9" rx="1.5" />
+  </g>
+  <rect x="386" y="40" width="4" height="106" rx="2" fill="currentColor" opacity="0.12" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="80" y="52" width="294" height="24" rx="12" fillOpacity="0.55" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="382" cy="64" r="12" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M92 108 H388 V132 H92 Q80 132 80 120 Q80 108 92 108 Z" fillOpacity="0.55" />
+    <path d="M388 108 L402 113 L388 119 Z" fillOpacity="0.45" />
+    <path d="M388 121 L400 125 L388 130 Z" fillOpacity="0.45" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="416" cy="118" r="2.5" />
+    <circle cx="434" cy="122" r="2.5" />
+    <circle cx="452" cy="118" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="476" cy="120" r="6" />
+  </g>
+</svg>
 
 <CodeBlock
   adapter="c"
