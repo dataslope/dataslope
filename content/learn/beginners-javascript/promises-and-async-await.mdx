@@ -14,6 +14,39 @@ much nicer tools:
 By the end of this chapter, you'll be able to read and write
 real-world async code.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A yellow orb with orbiting dots splits along two dotted paths into a green orb and a red orb — pending, fulfilled, rejected"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="160" cy="110" r="46" fillOpacity="0.12" />
+    <circle cx="160" cy="110" r="28" />
+    <circle cx="160" cy="62" r="5" />
+    <circle cx="206" cy="124" r="5" />
+    <circle cx="128" cy="150" r="5" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="220" cy="98" r="3.5" />
+    <circle cx="260" cy="86" r="3.5" />
+    <circle cx="300" cy="76" r="3.5" />
+    <circle cx="340" cy="68" r="3.5" />
+    <circle cx="380" cy="63" r="3.5" />
+    <circle cx="220" cy="124" r="3.5" />
+    <circle cx="260" cy="136" r="3.5" />
+    <circle cx="300" cy="146" r="3.5" />
+    <circle cx="340" cy="156" r="3.5" />
+    <circle cx="380" cy="163" r="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="430" cy="60" r="26" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="430" cy="170" r="26" />
+  </g>
+</svg>
+
 ## A Promise is a placeholder
 
 When you start a slow operation, a Promise is the thing you
@@ -210,6 +243,50 @@ along.
 
 `await` waits for one thing at a time. Sometimes you want to
 start *several* operations at once and wait for all of them.
+
+<svg
+  viewBox="0 0 640 170"
+  role="img"
+  aria-label="Three parallel lanes of dots running side by side, then converging into a single green circle — many promises awaited as one"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="80" cy="40" r="6" />
+    <circle cx="120" cy="40" r="6" />
+    <circle cx="160" cy="40" r="6" />
+    <circle cx="200" cy="40" r="6" />
+    <circle cx="240" cy="40" r="6" />
+    <circle cx="280" cy="40" r="6" />
+    <circle cx="320" cy="40" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="80" cy="85" r="6" />
+    <circle cx="120" cy="85" r="6" />
+    <circle cx="160" cy="85" r="6" />
+    <circle cx="200" cy="85" r="6" />
+    <circle cx="240" cy="85" r="6" />
+    <circle cx="280" cy="85" r="6" />
+    <circle cx="320" cy="85" r="6" />
+    <circle cx="450" cy="85" r="22" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="80" cy="130" r="6" />
+    <circle cx="120" cy="130" r="6" />
+    <circle cx="160" cy="130" r="6" />
+    <circle cx="200" cy="130" r="6" />
+    <circle cx="240" cy="130" r="6" />
+    <circle cx="280" cy="130" r="6" />
+    <circle cx="320" cy="130" r="6" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="360" cy="52" r="3" />
+    <circle cx="394" cy="66" r="3" />
+    <circle cx="360" cy="85" r="3" />
+    <circle cx="394" cy="85" r="3" />
+    <circle cx="360" cy="118" r="3" />
+    <circle cx="394" cy="104" r="3" />
+  </g>
+</svg>
 
 <CodeBlock
   adapter="javascript"

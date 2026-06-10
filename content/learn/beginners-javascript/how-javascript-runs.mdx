@@ -17,6 +17,53 @@ We'll focus on three structures:
 Sitting on top of them: the **event loop**, the bit that ties
 them together.
 
+<svg
+  viewBox="0 0 640 235"
+  role="img"
+  aria-label="A single blue dot runs around a dotted ring while two queues of squares wait to enter, one closer to the ring than the other"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.22">
+    <circle cx="390" cy="120" r="4" />
+    <circle cx="385" cy="147" r="4" />
+    <circle cx="369" cy="169" r="4" />
+    <circle cx="347" cy="185" r="4" />
+    <circle cx="320" cy="190" r="4" />
+    <circle cx="293" cy="185" r="4" />
+    <circle cx="271" cy="169" r="4" />
+    <circle cx="255" cy="147" r="4" />
+    <circle cx="250" cy="120" r="4" />
+    <circle cx="255" cy="93" r="4" />
+    <circle cx="271" cy="71" r="4" />
+    <circle cx="293" cy="55" r="4" />
+    <circle cx="320" cy="50" r="4" />
+    <circle cx="347" cy="55" r="4" />
+    <circle cx="385" cy="93" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="320" cy="120" r="14" fillOpacity="0.12" />
+    <circle cx="369" cy="71" r="10" />
+    <circle cx="252" cy="196" r="5" fillOpacity="0.35" />
+    <circle cx="232" cy="210" r="4" fillOpacity="0.2" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="460" y="102" width="18" height="18" rx="5" />
+    <rect x="486" y="102" width="18" height="18" rx="5" />
+    <rect x="512" y="102" width="18" height="18" rx="5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="470" y="44" width="24" height="24" rx="6" />
+    <rect x="504" y="44" width="24" height="24" rx="6" />
+    <rect x="538" y="44" width="24" height="24" rx="6" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="440" cy="108" r="3" />
+    <circle cx="424" cy="110" r="3" />
+    <circle cx="450" cy="60" r="3" />
+    <circle cx="432" cy="64" r="3" />
+  </g>
+</svg>
+
 ## JavaScript is single-threaded
 
 This is the most important sentence in the whole chapter:
@@ -34,6 +81,23 @@ When a function is called, JS pushes a **stack frame** for it.
 When the function returns, the frame is popped. That's it. The
 "stack" is just the list of "things in progress, most recent on
 top."
+
+<svg
+  viewBox="0 0 640 175"
+  role="img"
+  aria-label="Blue slabs stacked like pancakes, narrowing toward the top, with a green dot beside the topmost slab — the frame currently running"
+  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="230" y="130" width="180" height="26" rx="13" fillOpacity="0.35" />
+    <rect x="240" y="100" width="160" height="26" rx="13" fillOpacity="0.55" />
+    <rect x="250" y="70" width="140" height="26" rx="13" fillOpacity="0.75" />
+    <rect x="260" y="40" width="120" height="26" rx="13" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="402" cy="53" r="8" />
+  </g>
+</svg>
 
 <CodeBlock
   adapter="javascript"
