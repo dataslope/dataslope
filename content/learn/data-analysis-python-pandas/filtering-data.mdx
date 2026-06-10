@@ -8,6 +8,44 @@ it is the **boolean mask**. Almost every interesting question
 you ask of a dataset starts with "first, give me the rows
 where..."
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="Rows pass a checkpoint column of green and red mask cells; rows beside green cells continue onward with a green badge while rows beside red cells fall away faint — a boolean mask filtering a DataFrame"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="110" y="40" width="90" height="16" rx="8" fillOpacity="0.5" />
+    <rect x="110" y="72" width="90" height="16" rx="8" fillOpacity="0.5" />
+    <rect x="110" y="104" width="90" height="16" rx="8" fillOpacity="0.5" />
+    <rect x="110" y="136" width="90" height="16" rx="8" fillOpacity="0.5" />
+    <rect x="110" y="168" width="90" height="16" rx="8" fillOpacity="0.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="262" y="38" width="22" height="20" rx="5" />
+    <rect x="262" y="102" width="22" height="20" rx="5" />
+    <rect x="262" y="166" width="22" height="20" rx="5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="262" y="70" width="22" height="20" rx="5" />
+    <rect x="262" y="134" width="22" height="20" rx="5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="340" y="40" width="90" height="16" rx="8" fillOpacity="0.9" />
+    <rect x="340" y="104" width="90" height="16" rx="8" fillOpacity="0.9" />
+    <rect x="340" y="168" width="90" height="16" rx="8" fillOpacity="0.9" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="444" cy="48" r="4" />
+    <circle cx="444" cy="112" r="4" />
+    <circle cx="444" cy="176" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="350" y="198" width="80" height="14" rx="7" fillOpacity="0.3" />
+    <rect x="370" y="214" width="70" height="12" rx="6" fillOpacity="0.2" />
+  </g>
+</svg>
+
 ## The basic shape
 
 A boolean mask is a Series of `True`/`False` values, one per row.

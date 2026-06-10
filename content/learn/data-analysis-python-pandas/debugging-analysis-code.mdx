@@ -8,6 +8,37 @@ mistakes** — numbers that look fine but are subtly wrong. Real
 analysts are not "people who never write bugs". They're "people
 who catch their own bugs early."
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="Five look-alike bars stand over green check dots, but a yellow inspection beam shining on one of them reveals a hidden red core and a red dot below — silent bugs are found only by checking"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <polygon points="385,20 425,20 445,180 365,180" fillOpacity="0.18" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="110" y="100" width="50" height="80" rx="8" fillOpacity="0.5" />
+    <rect x="200" y="92" width="50" height="88" rx="8" fillOpacity="0.5" />
+    <rect x="290" y="96" width="50" height="84" rx="8" fillOpacity="0.5" />
+    <rect x="380" y="90" width="50" height="90" rx="8" fillOpacity="0.5" />
+    <rect x="470" y="98" width="50" height="82" rx="8" fillOpacity="0.5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="395" y="120" width="20" height="40" rx="6" fillOpacity="0.9" />
+  </g>
+  <rect x="80" y="180" width="470" height="5" rx="2.5" fill="currentColor" opacity="0.15" />
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="135" cy="200" r="5" fillOpacity="0.6" />
+    <circle cx="225" cy="200" r="5" fillOpacity="0.6" />
+    <circle cx="315" cy="200" r="5" fillOpacity="0.6" />
+    <circle cx="495" cy="200" r="5" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="405" cy="200" r="5" />
+  </g>
+</svg>
+
 ## The taxonomy of analysis bugs
 
 ```mermaid

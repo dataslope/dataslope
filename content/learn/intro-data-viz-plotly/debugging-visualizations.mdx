@@ -8,6 +8,41 @@ everyday frustrations of visualization. The good news: most
 visualization bugs fall into a small number of recognizable
 patterns. Learn the patterns and you'll stop being stuck.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="A magnifying glass held over the gap in a dotted data series reveals two hollow red rings where points should be — the chart faithfully reporting missing data"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.25">
+    <rect x="80" y="40" width="3" height="160" rx="1.5" />
+    <rect x="80" y="197" width="440" height="3" rx="1.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.8">
+    <circle cx="110" cy="170" r="4.5" />
+    <circle cx="140" cy="158" r="4.5" />
+    <circle cx="170" cy="150" r="4.5" />
+    <circle cx="200" cy="138" r="4.5" />
+    <circle cx="230" cy="130" r="4.5" />
+    <circle cx="260" cy="122" r="4.5" />
+    <circle cx="380" cy="98" r="4.5" />
+    <circle cx="410" cy="92" r="4.5" />
+    <circle cx="440" cy="84" r="4.5" />
+    <circle cx="470" cy="75" r="4.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="315" cy="115" r="46" fillOpacity="0.1" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <path d="M265 115 a50 50 0 1 0 100 0 a50 50 0 1 0 -100 0 Z M271 115 a44 44 0 1 0 88 0 a44 44 0 1 0 -88 0 Z" fillRule="evenodd" />
+    <rect x="348" y="148" width="64" height="14" rx="7" transform="rotate(45 354 155)" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor" fillOpacity="0.75">
+    <path d="M290 118 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0 Z M292.5 118 a3.5 3.5 0 1 0 7 0 a3.5 3.5 0 1 0 -7 0 Z" fillRule="evenodd" />
+    <path d="M328 106 a6 6 0 1 0 12 0 a6 6 0 1 0 -12 0 Z M330.5 106 a3.5 3.5 0 1 0 7 0 a3.5 3.5 0 1 0 -7 0 Z" fillRule="evenodd" />
+  </g>
+</svg>
+
 ## The mindset: "the chart is honest about the data"
 
 If your chart looks wrong, the chart is *probably* showing the

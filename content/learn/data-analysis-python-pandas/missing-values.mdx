@@ -6,6 +6,56 @@ description: NaN, NaT, None — what they are, where they come from, how Pandas 
 Missing data is the single most universal property of real-world
 datasets. This chapter is the playbook for handling it.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="A row of cells with one ghostly gap marked by a yellow question badge, and two remedies fanning out below — dropping leaves a shorter row, filling drops a green value into the hole"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="145" y="50" width="62" height="30" rx="6" fillOpacity="0.5" />
+    <rect x="217" y="50" width="62" height="30" rx="6" fillOpacity="0.5" />
+    <rect x="361" y="50" width="62" height="30" rx="6" fillOpacity="0.5" />
+    <rect x="433" y="50" width="62" height="30" rx="6" fillOpacity="0.5" />
+  </g>
+  <rect x="289" y="50" width="62" height="30" rx="6" fill="currentColor" opacity="0.05" />
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="320" cy="65" r="11" />
+  </g>
+  <text x="320" y="71" fontFamily="ui-monospace, monospace" fontSize="15" fontWeight="700" textAnchor="middle" style={{ fill: "var(--ds-gray-900)" }}>?</text>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="272" cy="100" r="3" />
+    <circle cx="240" cy="116" r="3" />
+    <circle cx="368" cy="100" r="3" />
+    <circle cx="400" cy="116" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <polygon points="226,124 204,138 228,142" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <polygon points="414,124 436,138 412,142" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="100" y="160" width="42" height="24" rx="5" fillOpacity="0.5" />
+    <rect x="150" y="160" width="42" height="24" rx="5" fillOpacity="0.5" />
+    <rect x="200" y="160" width="42" height="24" rx="5" fillOpacity="0.5" />
+    <rect x="250" y="160" width="42" height="24" rx="5" fillOpacity="0.5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="170" y="200" width="42" height="20" rx="5" fillOpacity="0.25" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="360" y="160" width="42" height="24" rx="5" fillOpacity="0.5" />
+    <rect x="410" y="160" width="42" height="24" rx="5" fillOpacity="0.5" />
+    <rect x="510" y="160" width="42" height="24" rx="5" fillOpacity="0.5" />
+    <rect x="560" y="160" width="42" height="24" rx="5" fillOpacity="0.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="460" y="160" width="42" height="24" rx="5" fillOpacity="0.9" />
+    <circle cx="481" cy="140" r="5" />
+  </g>
+</svg>
+
 ## What "missing" looks like in Pandas
 
 Pandas uses two sentinel values:

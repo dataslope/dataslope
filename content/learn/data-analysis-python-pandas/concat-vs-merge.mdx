@@ -7,6 +7,71 @@ Two datasets rarely live alone. You'll often need to combine
 them. Pandas offers two core tools, and beginners often confuse
 them.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="Left: one small table stacks on top of another along a downward arrow. Right: two tables sit side by side with their yellow key columns linked row by row — concat stacks, merge matches"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="318" y="30" width="4" height="180" rx="2" fill="currentColor" opacity="0.08" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="90" y="40" width="44" height="20" rx="4" fillOpacity="0.5" />
+    <rect x="140" y="40" width="44" height="20" rx="4" fillOpacity="0.5" />
+    <rect x="190" y="40" width="44" height="20" rx="4" fillOpacity="0.5" />
+    <rect x="90" y="66" width="44" height="20" rx="4" fillOpacity="0.5" />
+    <rect x="140" y="66" width="44" height="20" rx="4" fillOpacity="0.5" />
+    <rect x="190" y="66" width="44" height="20" rx="4" fillOpacity="0.5" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="162" cy="100" r="2.5" />
+    <circle cx="162" cy="112" r="2.5" />
+    <polygon points="155,122 169,122 162,132" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="90" y="142" width="44" height="20" rx="4" fillOpacity="0.25" />
+    <rect x="140" y="142" width="44" height="20" rx="4" fillOpacity="0.25" />
+    <rect x="190" y="142" width="44" height="20" rx="4" fillOpacity="0.25" />
+    <rect x="90" y="168" width="44" height="20" rx="4" fillOpacity="0.25" />
+    <rect x="140" y="168" width="44" height="20" rx="4" fillOpacity="0.25" />
+    <rect x="190" y="168" width="44" height="20" rx="4" fillOpacity="0.25" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="370" y="60" width="44" height="20" rx="4" fillOpacity="0.6" />
+    <rect x="370" y="86" width="44" height="20" rx="4" fillOpacity="0.6" />
+    <rect x="370" y="112" width="44" height="20" rx="4" fillOpacity="0.6" />
+    <rect x="500" y="60" width="44" height="20" rx="4" fillOpacity="0.6" />
+    <rect x="500" y="86" width="44" height="20" rx="4" fillOpacity="0.6" />
+    <rect x="500" y="112" width="44" height="20" rx="4" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="420" y="60" width="44" height="20" rx="4" fillOpacity="0.5" />
+    <rect x="420" y="86" width="44" height="20" rx="4" fillOpacity="0.5" />
+    <rect x="420" y="112" width="44" height="20" rx="4" fillOpacity="0.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="550" y="60" width="44" height="20" rx="4" fillOpacity="0.5" />
+    <rect x="550" y="86" width="44" height="20" rx="4" fillOpacity="0.5" />
+    <rect x="550" y="112" width="44" height="20" rx="4" fillOpacity="0.5" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="474" cy="70" r="2.5" />
+    <circle cx="490" cy="70" r="2.5" />
+    <circle cx="474" cy="96" r="2.5" />
+    <circle cx="490" cy="96" r="2.5" />
+    <circle cx="474" cy="122" r="2.5" />
+    <circle cx="490" cy="122" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="392" cy="160" r="5" fillOpacity="0.8" />
+    <circle cx="522" cy="160" r="5" fillOpacity="0.8" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="430" cy="160" r="2.5" />
+    <circle cx="457" cy="160" r="2.5" />
+    <circle cx="484" cy="160" r="2.5" />
+  </g>
+</svg>
+
 ## The mental model
 
 ```mermaid

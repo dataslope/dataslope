@@ -14,6 +14,57 @@ library returns one or the other.
 A DataFrame is essentially a dictionary of Series that all share
 the same row index.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A blue column slides out of a faint grid, carrying its little row labels along with it — a DataFrame is a stack of Series that all share one index"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.2">
+    <rect x="70" y="40" width="28" height="26" rx="5" />
+    <rect x="70" y="76" width="28" height="26" rx="5" />
+    <rect x="70" y="112" width="28" height="26" rx="5" />
+    <rect x="70" y="148" width="28" height="26" rx="5" />
+  </g>
+  <g fill="currentColor" opacity="0.12">
+    <rect x="110" y="40" width="52" height="26" rx="5" />
+    <rect x="110" y="76" width="52" height="26" rx="5" />
+    <rect x="110" y="112" width="52" height="26" rx="5" />
+    <rect x="110" y="148" width="52" height="26" rx="5" />
+    <rect x="170" y="40" width="52" height="26" rx="5" />
+    <rect x="170" y="76" width="52" height="26" rx="5" />
+    <rect x="170" y="112" width="52" height="26" rx="5" />
+    <rect x="170" y="148" width="52" height="26" rx="5" />
+    <rect x="290" y="40" width="52" height="26" rx="5" />
+    <rect x="290" y="76" width="52" height="26" rx="5" />
+    <rect x="290" y="112" width="52" height="26" rx="5" />
+    <rect x="290" y="148" width="52" height="26" rx="5" />
+  </g>
+  <g fill="currentColor" opacity="0.04">
+    <rect x="230" y="40" width="52" height="26" rx="5" />
+    <rect x="230" y="76" width="52" height="26" rx="5" />
+    <rect x="230" y="112" width="52" height="26" rx="5" />
+    <rect x="230" y="148" width="52" height="26" rx="5" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="370" cy="95" r="3" />
+    <circle cx="415" cy="85" r="3" />
+    <circle cx="460" cy="75" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="500" y="30" width="52" height="26" rx="5" fillOpacity="0.85" />
+    <rect x="500" y="66" width="52" height="26" rx="5" fillOpacity="0.85" />
+    <rect x="500" y="102" width="52" height="26" rx="5" fillOpacity="0.85" />
+    <rect x="500" y="138" width="52" height="26" rx="5" fillOpacity="0.85" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="488" cy="43" r="3.5" />
+    <circle cx="488" cy="79" r="3.5" />
+    <circle cx="488" cy="115" r="3.5" />
+    <circle cx="488" cy="151" r="3.5" />
+  </g>
+</svg>
+
 ```mermaid
 flowchart LR
     subgraph "DataFrame"
