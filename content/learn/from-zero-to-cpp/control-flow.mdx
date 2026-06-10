@@ -13,6 +13,54 @@ A useful mental model: at every moment, the CPU is following exactly
 one path through your program. Control-flow statements are
 *forks* and *loops* in that path.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A dotted footpath forks at a yellow diamond: one branch runs straight over the top, the other circles a small loop before both rejoin and reach a green flag — decisions and repetition along a program's single path"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="50" cy="110" r="9" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="80" cy="110" r="3.5" />
+    <circle cx="104" cy="110" r="3.5" />
+    <circle cx="128" cy="110" r="3.5" />
+    <circle cx="208" cy="96" r="3.5" />
+    <circle cx="232" cy="84" r="3.5" />
+    <circle cx="256" cy="76" r="3.5" />
+    <circle cx="280" cy="72" r="3.5" />
+    <circle cx="304" cy="72" r="3.5" />
+    <circle cx="328" cy="76" r="3.5" />
+    <circle cx="352" cy="84" r="3.5" />
+    <circle cx="372" cy="96" r="3.5" />
+    <circle cx="208" cy="124" r="3.5" />
+    <circle cx="228" cy="136" r="3.5" />
+    <circle cx="248" cy="146" r="3.5" />
+    <circle cx="308" cy="158" r="3.5" />
+    <circle cx="302" cy="174" r="3.5" />
+    <circle cx="286" cy="180" r="3.5" />
+    <circle cx="270" cy="174" r="3.5" />
+    <circle cx="264" cy="158" r="3.5" />
+    <circle cx="270" cy="142" r="3.5" />
+    <circle cx="286" cy="136" r="3.5" />
+    <circle cx="302" cy="142" r="3.5" />
+    <circle cx="324" cy="146" r="3.5" />
+    <circle cx="344" cy="136" r="3.5" />
+    <circle cx="364" cy="124" r="3.5" />
+    <circle cx="392" cy="110" r="3.5" />
+    <circle cx="416" cy="110" r="3.5" />
+    <circle cx="440" cy="110" r="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <polygon points="165,88 187,110 165,132 143,110" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="460" y="82" width="6" height="54" rx="3" />
+    <polygon points="466,84 508,95 466,106" />
+  </g>
+</svg>
+
 ## Sequential flow
 
 The simplest flow is straight-line execution: one statement after

@@ -14,6 +14,36 @@ That something is the **call stack**. Every running program has one,
 and once you can picture it, almost every "how does this work?"
 question in C++ has an obvious answer.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="A spring-loaded plate dispenser: blue plates stacked in a translucent canister, a green plate being pushed down on top while a faded one pops up and away — calls pile onto the stack and unwind from the same end"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.1">
+    <rect x="250" y="70" width="140" height="140" rx="18" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="266" y="178" width="108" height="18" rx="9" fillOpacity="0.3" />
+    <rect x="266" y="152" width="108" height="18" rx="9" fillOpacity="0.5" />
+    <rect x="266" y="126" width="108" height="18" rx="9" fillOpacity="0.7" />
+    <rect x="266" y="100" width="108" height="18" rx="9" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="266" y="40" width="108" height="18" rx="9" />
+    <polygon points="396,44 412,44 404,58" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <rect x="460" y="84" width="108" height="18" rx="9" />
+    <polygon points="506,72 522,72 514,58" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="160" cy="60" r="3" />
+    <circle cx="178" cy="110" r="3" />
+    <circle cx="152" cy="160" r="3" />
+  </g>
+</svg>
+
 ## A stack of frames
 
 Each function call gets its own little block of memory called a

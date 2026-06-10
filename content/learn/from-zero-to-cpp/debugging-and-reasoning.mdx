@@ -8,6 +8,35 @@ craft of figuring out *why* a program does what it does — is at
 least half of professional programming. The good news is that it's a
 learnable skill, not a talent.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="Translucent boxes nest tighter and tighter around a single red dot, with green dots marking regions already ruled out — debugging as systematically shrinking where the bug can hide"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.06">
+    <rect x="60" y="30" width="520" height="160" rx="20" />
+  </g>
+  <g fill="currentColor" opacity="0.1">
+    <rect x="140" y="52" width="360" height="116" rx="16" />
+  </g>
+  <g fill="currentColor" opacity="0.16">
+    <rect x="210" y="72" width="220" height="76" rx="12" />
+  </g>
+  <g fill="currentColor" opacity="0.24">
+    <rect x="260" y="88" width="120" height="44" rx="10" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="320" cy="110" r="9" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="100" cy="160" r="4" fillOpacity="0.6" />
+    <circle cx="545" cy="64" r="4" fillOpacity="0.6" />
+    <circle cx="176" cy="92" r="4" fillOpacity="0.6" />
+    <circle cx="462" cy="140" r="4" fillOpacity="0.6" />
+  </g>
+</svg>
+
 ## The debugging mindset
 
 A bug is a contradiction between what you *believe* the program does

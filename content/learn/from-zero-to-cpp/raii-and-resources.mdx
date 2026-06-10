@@ -10,6 +10,40 @@ mutexes, and acquire any other resource you can imagine — and have
 them all released correctly, on every code path, with no manual
 cleanup calls.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="Inside a translucent scope bubble a blue dot holds a green resource on a dotted leash; where the bubble has closed on the right, the resource is gone and only green sparks remain — acquisition tied to lifetime, release guaranteed at the end"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="200" cy="110" r="85" fillOpacity="0.1" />
+    <circle cx="185" cy="92" r="12" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="205" cy="108" r="3" />
+    <circle cx="222" cy="122" r="3" />
+    <circle cx="238" cy="134" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="244" y="138" width="28" height="28" rx="8" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="330" cy="110" r="3" />
+    <circle cx="358" cy="110" r="3" />
+    <circle cx="386" cy="110" r="3" />
+  </g>
+  <g fill="currentColor" opacity="0.08">
+    <circle cx="480" cy="110" r="40" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="524" y="92" width="24" height="24" rx="6" fillOpacity="0.18" />
+    <circle cx="560" cy="80" r="4" fillOpacity="0.5" />
+    <circle cx="574" cy="104" r="3.5" fillOpacity="0.45" />
+    <circle cx="562" cy="128" r="3" fillOpacity="0.4" />
+  </g>
+</svg>
+
 ## What is a "resource"?
 
 Anything you *acquire* and must later *release*. Examples:

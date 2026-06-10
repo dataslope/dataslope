@@ -8,6 +8,41 @@ passing the *same* group of values around together: a point's `x`
 and `y`, a person's `name`, `age`, `email`. C++ lets you give that
 group a name — a **struct** — and then treat it as one thing.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="Loose faint shapes on the left are gathered into one compartmented bento box where a circle, a square, and a triangle each get their own slot — a struct bundles related values into a single thing"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="80" cy="60" r="10" fillOpacity="0.35" />
+    <circle cx="350" cy="115" r="26" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="116" y="100" width="20" height="20" rx="5" fillOpacity="0.35" />
+    <rect x="480" y="64" width="40" height="40" rx="8" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <polygon points="85,166 99,138 71,138" fillOpacity="0.35" />
+    <polygon points="500,168 524,128 476,128" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="165" cy="110" r="3" />
+    <circle cx="190" cy="110" r="3" />
+    <circle cx="215" cy="110" r="3" />
+  </g>
+  <g fill="currentColor" opacity="0.4">
+    <polygon points="237,102 237,118 253,110" />
+  </g>
+  <g fill="currentColor" opacity="0.1">
+    <rect x="270" y="40" width="300" height="150" rx="18" />
+  </g>
+  <g fill="currentColor" opacity="0.12">
+    <rect x="430" y="52" width="6" height="126" rx="3" />
+    <rect x="442" y="112" width="116" height="6" rx="3" />
+  </g>
+</svg>
+
 ## A struct is a named bundle
 
 ```cpp

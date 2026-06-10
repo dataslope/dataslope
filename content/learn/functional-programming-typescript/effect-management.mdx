@@ -14,6 +14,46 @@ The functional approach is not to *avoid* effects — it's to
 single, controlled place at the edge of the program. Pure
 functions stay pure; effects become first-class data.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="Rocket capsules with unlit fuses rest in a tray and are carried around safely; only past a dotted boundary does one ignite with a yellow spark — effects described as inert values and run only at the edge"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="70" y="130" width="260" height="60" rx="14" fill="currentColor" opacity="0.1" />
+  <g fill="currentColor" opacity="0.4">
+    <rect x="111" y="124" width="4" height="14" rx="2" />
+    <rect x="171" y="124" width="4" height="14" rx="2" />
+    <rect x="231" y="124" width="4" height="14" rx="2" />
+    <rect x="371" y="110" width="4" height="14" rx="2" />
+    <rect x="491" y="96" width="4" height="14" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="100" y="138" width="26" height="44" rx="13" fillOpacity="0.85" />
+    <rect x="160" y="138" width="26" height="44" rx="13" fillOpacity="0.65" />
+    <rect x="220" y="138" width="26" height="44" rx="13" fillOpacity="0.85" />
+    <rect x="360" y="124" width="26" height="44" rx="13" fillOpacity="0.5" />
+    <rect x="480" y="110" width="26" height="44" rx="13" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="336" cy="152" r="3" />
+    <circle cx="350" cy="148" r="3" />
+  </g>
+  <g fill="currentColor" opacity="0.15">
+    <circle cx="430" cy="40" r="3.5" />
+    <circle cx="430" cy="75" r="3.5" />
+    <circle cx="430" cy="110" r="3.5" />
+    <circle cx="430" cy="145" r="3.5" />
+    <circle cx="430" cy="180" r="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="493" cy="82" r="6" />
+    <circle cx="493" cy="62" r="3.5" />
+    <circle cx="477" cy="72" r="3" />
+    <circle cx="509" cy="72" r="3" />
+  </g>
+</svg>
+
 ## The core idea: a thunk
 
 The smallest possible "effect" is just a zero-argument function

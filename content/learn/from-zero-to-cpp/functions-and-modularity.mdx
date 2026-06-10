@@ -18,6 +18,48 @@ flowchart LR
 Every C++ program already uses one function: `main`. Now let's
 write our own.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="Three yellow call sites send dotted arguments into one blue function box marked with an italic f, and three green results fan back out — one definition reused from many places"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="60" y="40" width="26" height="26" rx="7" />
+    <rect x="60" y="97" width="26" height="26" rx="7" />
+    <rect x="60" y="154" width="26" height="26" rx="7" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="108" cy="58" r="3.5" />
+    <circle cx="150" cy="72" r="3.5" />
+    <circle cx="195" cy="86" r="3.5" />
+    <circle cx="108" cy="110" r="3.5" />
+    <circle cx="150" cy="110" r="3.5" />
+    <circle cx="195" cy="110" r="3.5" />
+    <circle cx="108" cy="162" r="3.5" />
+    <circle cx="150" cy="148" r="3.5" />
+    <circle cx="195" cy="134" r="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="260" y="75" width="120" height="70" rx="18" />
+  </g>
+  <text x="320" y="124" fontFamily="Georgia, serif" fontStyle="italic" fontSize="42" textAnchor="middle" style={{ fill: "var(--ds-blue-50)" }}>ƒ</text>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="400" cy="86" r="3.5" fillOpacity="0.5" />
+    <circle cx="445" cy="70" r="3.5" fillOpacity="0.5" />
+    <circle cx="495" cy="56" r="3.5" fillOpacity="0.5" />
+    <circle cx="400" cy="110" r="3.5" fillOpacity="0.5" />
+    <circle cx="445" cy="110" r="3.5" fillOpacity="0.5" />
+    <circle cx="495" cy="110" r="3.5" fillOpacity="0.5" />
+    <circle cx="400" cy="134" r="3.5" fillOpacity="0.5" />
+    <circle cx="445" cy="150" r="3.5" fillOpacity="0.5" />
+    <circle cx="495" cy="164" r="3.5" fillOpacity="0.5" />
+    <rect x="548" y="40" width="26" height="26" rx="7" />
+    <rect x="548" y="97" width="26" height="26" rx="7" />
+    <rect x="548" y="154" width="26" height="26" rx="7" />
+  </g>
+</svg>
+
 ## Anatomy of a function
 
 ```cpp

@@ -14,6 +14,38 @@ the same thing. That is referential transparency.
 Pure functions produce referentially transparent expressions.
 Impure functions don't.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A perfectly level balance scale weighing a small ƒ capsule with its input dot against a plain green value circle — an expression and the value it evaluates to are interchangeable"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.3">
+    <rect x="140" y="66" width="360" height="10" rx="5" />
+    <rect x="314" y="76" width="12" height="92" rx="6" />
+    <polygon points="320,164 284,200 356,200" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="180" cy="88" r="3" />
+    <circle cx="180" cy="102" r="3" />
+    <circle cx="180" cy="116" r="3" />
+    <circle cx="460" cy="88" r="3" />
+    <circle cx="460" cy="102" r="3" />
+    <circle cx="460" cy="116" r="3" />
+    <rect x="120" y="128" width="120" height="14" rx="7" />
+    <rect x="400" y="128" width="120" height="14" rx="7" />
+  </g>
+  <text x="320" y="52" fontFamily="ui-monospace, monospace" fontSize="28" textAnchor="middle" fill="currentColor" opacity="0.55">=</text>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="142" y="92" width="76" height="36" rx="18" />
+  </g>
+  <text x="172" y="117" fontFamily="Georgia, serif" fontStyle="italic" fontSize="22" textAnchor="middle" style={{ fill: "var(--ds-white)" }}>ƒ</text>
+  <circle cx="198" cy="110" r="6" style={{ fill: "var(--ds-white)" }} fillOpacity="0.9" />
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="460" cy="110" r="18" />
+  </g>
+</svg>
+
 ## A concrete demonstration
 
 <CodeBlock

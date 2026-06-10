@@ -12,6 +12,38 @@ is running? What if an object needs to outlive the function that
 created it? You need a different region of memory whose lifetime you
 control: the **heap**.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="Two balloons on strings: a green one held by a solid stack-frame box below, and a red one whose string was cut drifting away from a faded frame — heap objects outlive their scope, and forgotten ones float off as leaks"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="70" y="180" width="160" height="46" rx="12" fillOpacity="0.25" />
+  </g>
+  <g fill="currentColor" opacity="0.1">
+    <rect x="370" y="180" width="160" height="46" rx="12" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <rect x="148" y="96" width="4" height="84" rx="2" />
+    <rect x="448" y="168" width="4" height="12" rx="2" />
+    <rect x="438" y="92" width="4" height="24" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="150" cy="62" r="26" />
+    <polygon points="144,98 156,98 150,86" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="430" cy="54" r="24" />
+    <polygon points="424,88 436,88 430,77" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="472" cy="38" r="3" />
+    <circle cx="492" cy="28" r="3" />
+    <circle cx="512" cy="20" r="2.5" />
+  </g>
+</svg>
+
 ## Stack vs. heap, one more time
 
 | Stack | Heap |
