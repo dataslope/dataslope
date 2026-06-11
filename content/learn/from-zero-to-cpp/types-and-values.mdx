@@ -220,6 +220,22 @@ Use `static_cast` when you actually mean it. C-style casts
 (they will silently strip `const`, perform reinterpretation, or do
 both).
 
+If you ever doubt that a humble numeric conversion deserves respect,
+consider the most expensive type error in history. On June 4, 1996,
+the maiden flight of the European **Ariane 5** rocket veered off
+course and self-destructed about 37 seconds after liftoff,
+destroying the launcher and its four scientific satellites. The
+inquiry board traced the failure to one line of guidance software,
+reused from the older Ariane 4: a 64-bit floating-point value
+representing the rocket's horizontal velocity was converted to a
+16-bit signed integer. Ariane 5 flew a steeper trajectory than its
+predecessor, the value no longer fit, the unguarded conversion
+overflowed, and the guidance computer shut itself down mid-flight.
+The conversion had been left unprotected because, on Ariane 4, the
+value *provably* couldn't overflow. Types are promises about the
+values that can appear — and the Ariane team learned that a promise
+made for one rocket does not transfer to another.
+
 ## Truthiness
 
 In conditions like `if (x)`, C++ treats any non-zero value as
@@ -290,7 +306,7 @@ can reason about it.
 ## Enumerations: a small set of named values
 
 When a variable should hold *one of* a small fixed set of options,
-use a `enum class`:
+use an `enum class`:
 
 <CodeBlock
   adapter="cpp"

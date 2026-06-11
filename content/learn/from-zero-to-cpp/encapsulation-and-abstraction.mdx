@@ -143,6 +143,36 @@ That is abstraction. You name the *what* (`append`, `get`) and hide
 the *how* (the data structure). Later you can swap implementations
 without changing any caller.
 
+## When the interface leaks: Hyrum's Law
+
+There is a famous observation about why hiding details matters so
+much in practice. Hyrum Wright, a Google engineer who spent years
+doing large-scale refactoring across one of the biggest C++
+codebases in the world, summarized what he kept running into:
+
+> With a sufficient number of users of an API, it does not matter
+> what you promise in the contract: all observable behaviors of your
+> system will be depended on by somebody.
+
+This became known as **Hyrum's Law**. If your class exposes a field,
+someone will write code that depends on its exact representation.
+If your function happens to return results in sorted order — even
+though you never promised that — someone's code will break the day
+it stops. Every detail you fail to hide eventually becomes a detail
+you can never change.
+
+Language designers take this seriously. The Go team deliberately
+*randomizes* the iteration order of its built-in hash maps on every
+run, precisely so that no program can accidentally start depending
+on an order that was never guaranteed. They turned the contract into
+something the runtime *enforces*, rather than a comment nobody
+reads.
+
+Encapsulation is your everyday tool for the same job: the smaller
+the observable surface of your class, the more freedom you keep to
+improve it later. `private:` is not bureaucracy — it is you,
+protecting your future self's ability to change the code.
+
 ## Why this matters
 
 When a program is small you can keep everything in your head. When
@@ -179,6 +209,83 @@ private:
 
 If a class has no invariants and no behaviour, just use a `struct`.
 Reach for `class` when you have something to protect.
+
+## Challenge: defend an invariant
+
+Practice the core move of this chapter: write a class whose
+invariant — *the count can never go negative* — is impossible to
+break from the outside.
+
+<ChallengeCard
+  adapter="cpp"
+  title="An Inventory that can't go negative"
+  instructions={`Implement the \`Inventory\` class with three members:
+
+- \`void add(int n)\` — increases the count by \`n\`, but only if \`n\` is positive.
+- \`bool remove(int n)\` — if \`n\` is positive and at most the current count, decreases the count by \`n\` and returns \`true\`; otherwise changes nothing and returns \`false\`.
+- \`int count() const\` — returns the current count.
+
+The count starts at 0 and must never go negative. The provided \`main\` adds 5, removes 3 (succeeds), tries to remove 9 (must be refused), and prints exactly \`1 0 2\`.`}
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
+
+class Inventory {
+public:
+  // your code here
+};
+
+int main() {
+  Inventory inv;
+  inv.add(5);
+  bool ok1 = inv.remove(3); // should succeed
+  bool ok2 = inv.remove(9); // should be refused
+  std::cout << ok1 << ' ' << ok2 << ' ' << inv.count();
+  return 0;
+}
+`,
+      solutionCode: `#include <iostream>
+
+class Inventory {
+public:
+  void add(int n) {
+    if (n > 0)
+      count_ += n;
+  }
+  bool remove(int n) {
+    if (n > 0 && n <= count_) {
+      count_ -= n;
+      return true;
+    }
+    return false;
+  }
+  int count() const { return count_; }
+
+private:
+  int count_ = 0;
+};
+
+int main() {
+  Inventory inv;
+  inv.add(5);
+  bool ok1 = inv.remove(3); // should succeed
+  bool ok2 = inv.remove(9); // should be refused
+  std::cout << ok1 << ' ' << ok2 << ' ' << inv.count();
+  return 0;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "invariant",
+      name: "Invariant holds",
+      description: "remove(3) succeeds, remove(9) is refused, count ends at 2",
+      expect: { stdoutEquals: "1 0 2" },
+    },
+  ]}
+/>
 
 ## Test your understanding
 

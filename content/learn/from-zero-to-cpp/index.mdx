@@ -52,6 +52,41 @@ Once those two models click, *the syntax becomes the easy part*.
   </g>
 </svg>
 
+## Try it right now
+
+This whole course runs in your browser. Every C++ snippet you see
+compiles with a real compiler (`clang++`, built to WebAssembly) and
+runs right on the page — there is nothing to install, ever. Here is
+your first program. Press **Run**:
+
+<CodeBlock
+  adapter="cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
+#include <string>
+
+int main() {
+  int height = 4; // <-- try changing this to 8, then Run again
+  for (int i = 1; i <= height; ++i) {
+    std::cout << std::string(i, '*') << "\\n";
+  }
+  std::cout << "Welcome to From Zero to C++!\\n";
+  return 0;
+}
+`,
+    },
+  ]}
+/>
+
+You just compiled and executed a C++ program. Now change `height`
+to `8` and run it again — the staircase grows. Don't worry about
+what `#include` or `std::cout` mean yet; we will take that program
+apart line by line in a few pages. The point, for now, is that this
+is a course you *do*, not just read. (The very first run may take a
+few seconds while the compiler loads.)
+
 ## What is C++, and why learn it?
 
 C++ is one of the most influential programming languages ever
@@ -95,29 +130,6 @@ You will see three kinds of interactive widgets on most pages:
 3. **Multiple-choice questions.** Quick comprehension checks at the
    end of most pages. Every option has its own explanation, so even
    a wrong answer teaches you something.
-
-<Callout type="info" title="The browser is your toolchain">
-There is nothing to install. Every block below compiles and runs on
-your own machine, *in your browser*, using `clang++` built to
-WebAssembly. Hit *Run* — the first time may take a moment while the
-compiler loads.
-</Callout>
-
-<CodeBlock
-  adapter="cpp"
-  files={[
-    {
-      filename: "main.cpp",
-      starterCode: `#include <iostream>
-
-int main() {
-  std::cout << "Welcome to From Zero to C++!\\n";
-  return 0;
-}
-`,
-    },
-  ]}
-/>
 
 <Callout type="warn" title="What this course is not">
 This is not a competitive-programming bootcamp, an interview-prep
