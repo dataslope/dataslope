@@ -10,6 +10,15 @@ mutexes, and acquire any other resource you can imagine — and have
 them all released correctly, on every code path, with no manual
 cleanup calls.
 
+The name comes from Bjarne Stroustrup himself, who developed the
+technique while designing C++'s exception handling: if an error can
+interrupt a function at almost any point, the *only* reliable place
+to release resources is in destructors, which the language
+guarantees to run. Even Stroustrup has admitted the name is clumsy
+— but the idea behind it is so load-bearing that the C++ community
+kept the awkward acronym and built the entire modern standard
+library on top of it.
+
 <svg
   viewBox="0 0 640 220"
   role="img"
@@ -206,6 +215,99 @@ RAII wrappers, where the language can enforce correctness.
 5. **Avoid copying owners** unless you have a clear, well-defined
    copy operation. Otherwise prefer moves (next chapter) or delete
    the copy operations entirely.
+
+## Challenge: see RAII run
+
+The essence of RAII is that destructors run *exactly* when scopes
+end. Prove it to yourself by building the smallest possible RAII
+class — one whose "resource" is just a log message.
+
+<ChallengeCard
+  adapter="cpp"
+  title="A ScopeLogger"
+  instructions={`Implement \`ScopeLogger\` so that:
+
+- its constructor takes a \`std::string\` name and prints \`enter <name>\` (e.g. \`enter outer\`), and
+- its destructor prints \`exit <name>\`.
+
+Each message goes on its own line. The provided \`main\` then produces exactly:
+
+\`\`\`
+enter outer
+enter inner
+working
+exit inner
+done
+exit outer
+\`\`\`
+
+Note the order: \`inner\` exits when its block ends, but \`outer\` exits only after \`done\` — destruction is tied to scope, not to the end of the program text.`}
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
+#include <string>
+
+class ScopeLogger {
+public:
+  // your code here
+};
+
+int main() {
+  ScopeLogger outer("outer");
+  {
+    ScopeLogger inner("inner");
+    std::cout << "working\\n";
+  }
+  std::cout << "done\\n";
+  return 0;
+}
+`,
+      solutionCode: `#include <iostream>
+#include <string>
+
+class ScopeLogger {
+public:
+  ScopeLogger(std::string name) : name_(std::move(name)) {
+    std::cout << "enter " << name_ << "\\n";
+  }
+  ~ScopeLogger() { std::cout << "exit " << name_ << "\\n"; }
+
+private:
+  std::string name_;
+};
+
+int main() {
+  ScopeLogger outer("outer");
+  {
+    ScopeLogger inner("inner");
+    std::cout << "working\\n";
+  }
+  std::cout << "done\\n";
+  return 0;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "scopes",
+      name: "Enter/exit in scope order",
+      description: "Six lines, with inner exiting before done and outer after",
+      expect: {
+        stdoutLines: [
+          "enter outer",
+          "enter inner",
+          "working",
+          "exit inner",
+          "done",
+          "exit outer",
+        ],
+        stdoutLinesExact: true,
+      },
+    },
+  ]}
+/>
 
 ## Test your understanding
 

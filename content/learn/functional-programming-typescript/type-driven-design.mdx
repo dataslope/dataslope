@@ -55,9 +55,15 @@ There are three slogans that capture the approach.
 
 ## Slogan 1 — "Make illegal states unrepresentable"
 
-If your data model can *express* a state that should never exist,
-sooner or later your program will get into that state. The fix is
-to redesign the type so the bad state cannot be written.
+The phrase comes from Yaron Minsky of Jane Street, the trading firm
+that famously runs its entire business on OCaml — an environment
+where a software bug can lose millions of dollars before a human
+notices. His advice for surviving that environment became one of
+FP's most quoted design principles.
+
+The idea: if your data model can *express* a state that should never
+exist, sooner or later your program will get into that state. The
+fix is to redesign the type so the bad state cannot be written.
 
 Consider a "remote data" wrapper used to model an API request:
 
@@ -158,6 +164,11 @@ type Form<A, E> =
 The transition functions become tiny, total, and exhaustive.
 
 ## Slogan 2 — "Parse, don't validate"
+
+This slogan is the title of a 2019 essay by Alexis King that became
+one of the most-shared pieces of writing in the typed-FP world —
+required reading in many teams' onboarding documents. The essay's
+insight fits in one sentence:
 
 Validation is a *runtime check* that *returns the same type* you
 already had. Parsing is a runtime check that *returns a stricter

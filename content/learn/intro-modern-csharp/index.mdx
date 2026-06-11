@@ -57,15 +57,43 @@ language. By the end of the course you should be able to:
   </g>
 </svg>
 
+## Try it right now
+
+Every code example in this course is live: it compiles with the real
+C# compiler and runs **in your browser**, with nothing to install.
+Prove it to yourself — press **Run**, then change `"world"` to your
+own name and run it again:
+
+<CodeBlock
+  adapter="csharp"
+  files={[
+    {
+      filename: "main.cs",
+      starterCode: `using System;
+
+string name = "world"; // <-- change this to your name, then Run again
+
+Console.WriteLine($"Hello, {name}!");
+Console.WriteLine($"Your name has {name.Length} letters.");
+`,
+    },
+  ]}
+/>
+
+You just wrote, compiled, and ran a C# program — and the program
+even inspected your name's length for you. That edit–run loop is how
+this whole course works: read a little, run a little, change a
+little. (The very first run takes a few seconds while the .NET
+runtime boots in your browser; after that it's quick.)
+
 ## What you will learn
 
 ```mermaid
 mindmap
   root((Intro to<br/>Modern C#))
     Story
-      Software history
-      Birth of OOP
-      Birth of .NET and C#
+      The road to C#
+      From crisis to .NET
     Foundations
       Computational thinking
       How programs execute
@@ -86,12 +114,15 @@ mindmap
       Maintainable software
 ```
 
-The course is split into seven parts. The first part is a **story** —
-how programming languages evolved, why object-oriented programming
-appeared, where Java fit in, why Microsoft built .NET, and why
-**Anders Hejlsberg** ended up designing C#. The rest of the course is
-hands-on: variables, types, control flow, methods, classes, objects,
-collections, errors, debugging, and software organization.
+The course opens with a single **story chapter** — how programming
+evolved from rewiring machines to the software crisis, why Java
+forced Microsoft's hand, and how **Anders Hejlsberg** came to design
+C#. From there the course is hands-on: variables, types, control
+flow, methods, classes, objects, collections, errors, debugging, and
+software organization, ending in a capstone project. (For history
+lovers, four optional deep-dive chapters near the end of the course
+tell the full versions of the stories the opening chapter
+compresses.)
 
 ## What this course is *not*
 
@@ -190,3 +221,10 @@ you what a real C# program looks like. By the end of the course,
 every line of that example will feel obvious.
 
 ## Where to next
+
+Start with [The Road to C#](./the-road-to-csharp) — the story of
+how fifty years of hard lessons produced the language you'll be
+learning. Then continue through the chapters in order using the
+menu; each part builds on the one before it. When you reach the
+[capstone](./capstone-task-tracker), you'll put every concept from
+the course into one small, real program.

@@ -215,6 +215,69 @@ even when an algorithmic analysis suggests otherwise.
 Rule of thumb: **don't choose `std::list` to "save copies." It will
 almost always be slower than a vector.**
 
+## Challenge: pick the right container
+
+The classic use case for an ordered map, in one tiny exercise:
+
+<ChallengeCard
+  adapter="cpp"
+  title="Word frequency"
+  instructions={`Count how many times each word appears in the vector \`words\`, then print each distinct word and its count — separated by a single space, one pair per line, in **alphabetical order**.
+
+For the provided input, the expected output is exactly:
+
+\`\`\`
+be 2
+not 1
+or 1
+to 2
+\`\`\`
+
+Hint: \`std::map<std::string, int>\` keeps its keys sorted, so iterating it gives you alphabetical order for free. \`++counts[w]\` inserts a zero-initialized entry the first time it sees \`w\`.`}
+  files={[
+    {
+      filename: "main.cpp",
+      starterCode: `#include <iostream>
+#include <map>
+#include <string>
+#include <vector>
+
+int main() {
+  std::vector<std::string> words = {"to", "be", "or", "not", "to", "be"};
+  // your code here
+  return 0;
+}
+`,
+      solutionCode: `#include <iostream>
+#include <map>
+#include <string>
+#include <vector>
+
+int main() {
+  std::vector<std::string> words = {"to", "be", "or", "not", "to", "be"};
+  std::map<std::string, int> counts;
+  for (const auto &w : words)
+    ++counts[w];
+  for (const auto &[word, n] : counts)
+    std::cout << word << ' ' << n << "\\n";
+  return 0;
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "freq",
+      name: "Counts in alphabetical order",
+      description: "Four lines: be 2 / not 1 / or 1 / to 2",
+      expect: {
+        stdoutLines: ["be 2", "not 1", "or 1", "to 2"],
+        stdoutLinesExact: true,
+      },
+    },
+  ]}
+/>
+
 ## Test your understanding
 
 <MultipleChoice

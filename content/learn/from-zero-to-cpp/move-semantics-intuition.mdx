@@ -98,7 +98,49 @@ std::vector<int> b = std::move(a);            // a's buffer transferred to b
 // a is now valid but unspecified; safe to assign to or destroy.
 ```
 
-## Why this matters for unique_ptr
+## Watch the moves happen
+
+You don't have to take any of this on faith. The little `Tracer`
+struct below announces every time it is constructed, copied, or
+moved. Read the three `push_back` lines, predict the output, then
+run it:
+
+<CodeBlock
+  adapter="cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      initCode: `#include <iostream>
+#include <utility>
+#include <vector>
+
+struct Tracer {
+  Tracer() { std::cout << "construct\\n"; }
+  Tracer(const Tracer &) { std::cout << "COPY\\n"; }
+  Tracer(Tracer &&) noexcept { std::cout << "move\\n"; }
+};`,
+      starterCode: `int main() {
+  std::vector<Tracer> v;
+  v.reserve(3); // pre-allocate so reallocation doesn't add noise
+
+  Tracer t;
+  v.push_back(t);            // t is an lvalue: copied
+  v.push_back(std::move(t)); // cast to rvalue: moved
+  v.push_back(Tracer{});     // a temporary is already an rvalue: moved
+  return 0;
+}
+`,
+    },
+  ]}
+/>
+
+The first `push_back` prints `COPY` — `t` has a name, you might
+still use it, so the vector must duplicate it. The second prints
+`move`, because `std::move(t)` granted permission to pillage. The
+third constructs a nameless temporary and moves it in; no cast was
+needed, because a temporary is *already* an rvalue. Try deleting the
+`v.reserve(3)` line and watch extra moves appear as the vector
+reallocates its buffer mid-growth.
 
 `std::unique_ptr` cannot be copied (because then there would be two
 owners). It *can* be moved, transferring ownership:

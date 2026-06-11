@@ -16,6 +16,16 @@ in the type**, so the compiler forces you to think about it.
 The two types are `Option<A>` and `Result<E, A>`. They are the
 single most useful pair of patterns in this entire course.
 
+The problem they solve is old and expensive. Tony Hoare, who
+introduced the null reference into ALGOL W in 1965, publicly
+apologized for it in 2009, calling it his "billion-dollar mistake"
+for the decades of crashes and vulnerabilities it enabled. The
+industry's verdict is now in: every major language designed since —
+Rust's `Option`, Swift's optionals, Kotlin's nullable types, Haskell
+and ML's `Maybe` before them all — replaces the invisible null with
+a type the compiler can see. That is exactly what we're about to
+build, in about six lines of TypeScript.
+
 <svg
   viewBox="0 0 640 230"
   role="img"
@@ -224,11 +234,23 @@ function parseAge(s: string): Result<string, number> {
   ]}
 />
 
-The error type is *generic*. You can use a string, an enum, a
-discriminated union of structured errors — anything. We'll see in
-[Functional Error Handling](./functional-error-handling) how
-structured error types let you express your domain's failure modes
-precisely.
+The error type is *generic*. You can use a string, an enum, or —
+best of all — a discriminated union of structured errors:
+
+```ts
+type ParseError =
+  | { kind: "not_a_number"; input: string }
+  | { kind: "out_of_range"; value: number; min: number; max: number }
+  | { kind: "not_an_integer"; value: number };
+```
+
+With an error union like this, the caller can `switch` on the
+failure exhaustively, render a precise message for each case, and —
+because it's all just data — log it, serialize it, or translate it
+at a service boundary. Errors stop being opaque strings and become
+part of your domain model, designed with the same care as the happy
+path. The [Type-Driven Design](./type-driven-design) chapter pushes
+this idea further.
 
 ### Operations on Result
 

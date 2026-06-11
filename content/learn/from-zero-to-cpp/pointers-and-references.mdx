@@ -137,6 +137,23 @@ int main() {
 Older code uses `0` or `NULL` instead of `nullptr`. Always use
 `nullptr` in modern C++: it has its own type and avoids ambiguities.
 
+The null reference has a famous father, and he regrets it. Tony
+Hoare introduced null into the ALGOL W language in 1965, and in a
+2009 conference talk he called it his **"billion-dollar mistake"**:
+
+> I couldn't resist the temptation to put in a null reference,
+> simply because it was so easy to implement. This has led to
+> innumerable errors, vulnerabilities, and system crashes, which
+> have probably caused a billion dollars of pain and damage in the
+> last forty years.
+
+C++ inherits the mistake — every pointer type carries a "maybe
+nothing" state whether you want it or not. The discipline that
+keeps you safe is the same one Hoare wished he had enforced:
+treat "can this be null?" as a question you answer *deliberately*
+for every pointer, and prefer references (which cannot be null)
+when absence is not a meaningful state.
+
 ## References: aliases, not pointers
 
 A **reference** is a second name for an existing variable. Once
@@ -219,7 +236,7 @@ flowchart LR
     subgraph "int a[5] in memory"
         A0[10] --- A1[20] --- A2[30] --- A3[40] --- A4[50]
     end
-    P["<code>p = &amp;a</code> 0"] --> A0
+    P["<code>p = &amp;a[0]</code>"] --> A0
     PP1["<code>p + 1</code>"] --> A1
     PP2["<code>p + 2</code>"] --> A2
 ```

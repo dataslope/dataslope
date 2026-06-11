@@ -14,6 +14,21 @@ The functional approach is not to *avoid* effects — it's to
 single, controlled place at the edge of the program. Pure
 functions stay pure; effects become first-class data.
 
+This idea was forged under unusual pressure. Haskell, defined in
+1990 as a *pure and lazy* language, painted itself into a corner: a
+language where evaluation order is undefined and side effects are
+forbidden cannot simply call `print`. Early Haskell programs did
+I/O through awkward schemes involving lazy streams of requests and
+responses. The escape came when Philip Wadler connected Eugenio
+Moggi's theoretical work on monads to the I/O problem: a Haskell
+program could *construct a value describing the I/O it wants*, and
+the runtime would execute that description. Simon Peyton Jones later
+joked that this machinery made Haskell "the world's finest
+imperative programming language" — because effects, once they were
+values, became more controllable than in languages where they run
+loose. You don't need Haskell to use the trick. It's a few lines of
+TypeScript.
+
 <svg
   viewBox="0 0 640 220"
   role="img"
@@ -283,6 +298,92 @@ flowchart LR
 The outer ring is the part that talks to the world. The inner core
 never does — it only manipulates *descriptions* of what it would
 like to happen.
+
+## A small challenge
+
+Convince yourself that `IO` really is just three tiny functions by
+writing two of them.
+
+<ChallengeCard
+  adapter="typescript"
+  title="Implement map and chain for IO"
+  instructions={`In \`io.ts\`, implement:
+
+- \`map(io, f)\` — returns a **new IO** that, when run, runs \`io\` and applies \`f\` to its result.
+- \`chain(io, f)\` — returns a new IO that, when run, runs \`io\`, passes the result to \`f\`, and runs the IO that \`f\` returns.
+
+Neither function may execute anything at construction time — all
+work must happen inside the returned thunk.
+
+\`main.ts\` builds a program from your combinators and runs it once.
+
+**Expected output**
+
+\`\`\`
+nothing has run yet
+doubled: 42
+\`\`\``}
+  entryFilename="main.ts"
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `import { of, map, chain, IO } from "./io";
+
+const readNumber: IO<number> = of(21);
+const double = (n: number): number => n * 2;
+const describe = (n: number): IO<string> => of(\`doubled: \${n}\`);
+
+const program: IO<string> = chain(map(readNumber, double), describe);
+
+console.log("nothing has run yet");
+console.log(program());
+`,
+    },
+    {
+      filename: "io.ts",
+      starterCode: `export type IO<A> = () => A;
+
+export const of =
+  <A,>(a: A): IO<A> =>
+  () =>
+    a;
+
+export function map<A, B>(io: IO<A>, f: (a: A) => B): IO<B> {
+  // your code here
+  return () => undefined as unknown as B;
+}
+
+export function chain<A, B>(io: IO<A>, f: (a: A) => IO<B>): IO<B> {
+  // your code here
+  return () => undefined as unknown as B;
+}
+`,
+      solutionCode: `export type IO<A> = () => A;
+
+export const of =
+  <A,>(a: A): IO<A> =>
+  () =>
+    a;
+
+export function map<A, B>(io: IO<A>, f: (a: A) => B): IO<B> {
+  return () => f(io());
+}
+
+export function chain<A, B>(io: IO<A>, f: (a: A) => IO<B>): IO<B> {
+  return () => f(io())();
+}
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "io-combinators",
+      name: "Lazy map and chain",
+      description: "The composed program produces 'doubled: 42' when run.",
+      expect: { stdoutEquals: "nothing has run yet\ndoubled: 42" },
+    },
+  ]}
+/>
 
 ---
 

@@ -84,6 +84,24 @@ The single biggest beginner mistake is to change five things at
 once and hope something works. That doesn't *teach* you anything,
 even if the symptom goes away.
 
+The method works even on bugs that sound impossible. A famous
+example from sysadmin lore: in the 1990s, Trey Harris, then a
+university systems administrator, got a complaint from a statistics
+department chairman that his team **couldn't send email farther
+than about 500 miles** — they had mapped it, and emails to anywhere
+closer worked. It sounds like a prank. Harris took the observation
+seriously anyway: he confirmed the symptom, examined the mail
+server, and found that an OS upgrade had quietly downgraded the
+mail software's configuration, leaving the connection timeout
+effectively near zero — a few milliseconds. And how far can a
+signal travel through the network in a few milliseconds before the
+timeout kills the connection? Roughly... 500 miles. The "impossible"
+geography was the timeout, measured in the speed of light. The
+lesson is not about email. It's that *observing carefully and
+trusting the evidence* beats dismissing a weird symptom — the
+weirder the bug, the more precisely its cause is hiding in plain
+sight.
+
 ## Reading a stack trace
 
 When an unhandled exception is thrown, C# prints a **stack trace**

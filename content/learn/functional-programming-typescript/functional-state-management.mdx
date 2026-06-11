@@ -161,6 +161,18 @@ You can scrub the timeline forward and backward without recomputing
 anything that hasn't changed. You can also persist the history,
 replay it on another machine, or save it for debugging.
 
+This exact property launched one of the most popular libraries in
+JavaScript history. In 2015, Dan Abramov wanted a flashy demo for
+his React Europe talk, *"Live React: Hot Reloading with Time
+Travel"* — edit your code while the app runs, then scrub the app's
+state backward and forward like a video. To make the demo possible
+he and Andrew Clark distilled state management down to exactly what
+this page describes: one state value, a pure reducer, a list of
+actions. That demo library was **Redux**. The time-travel debugger
+wasn't a feature bolted onto Redux — Redux was the *minimum
+machinery required* for time travel to work at all. Purity wasn't
+the marketing; it was the engineering.
+
 ## Modeling undo / redo
 
 Undo/redo is a state machine over *stacks of states*. As a pure

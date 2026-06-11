@@ -312,6 +312,34 @@ The three patterns *compose*. Real FP code is a mix of all three,
 chosen per step depending on whether things are independent or
 sequential.
 
+## A word about the fearsome reputation
+
+Monads earned their mystique honestly. The concept entered
+programming through Eugenio Moggi's dense theoretical papers around
+1990, and Philip Wadler then showed Haskell programmers how monads
+could structure real programs — including, famously, how a *pure*
+language could finally do I/O without compromising itself. The
+mathematics is real, and it is genuinely abstract.
+
+The internet's favorite summary of the situation comes from James
+Iry's 2009 satirical history of programming languages, which has a
+fictional Wadler reassuring programmers that there's nothing to
+fear because *"a monad is just a monoid in the category of
+endofunctors."* The joke stuck precisely because it captures how
+most monad explanations feel — technically true and totally
+unhelpful.
+
+There is even a name for why tutorials so often fail here: the
+**monad tutorial fallacy**, coined by Brent Yorgey. The pattern
+finally *clicks* for someone after they've worked through enough
+concrete examples — and then, flush with insight, they write a
+tutorial built around whatever metaphor (burritos, boxes, conveyor
+belts) happened to accompany their personal click, which transfers
+nothing. The fix is the approach this chapter took: no metaphors,
+just `Option`, `Array`, and `Promise`, side by side, until you
+notice they share a shape. If the shape *hasn't* clicked yet, that
+is normal — keep writing `flatMap` chains and it will.
+
 ## Why this matters
 
 Once you see Functor / Applicative / Monad, you start noticing

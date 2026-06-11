@@ -226,8 +226,19 @@ class Car {
 A useful rule: ask "is the relationship really 'is-a' in every
 sense?" If a `Square` *is-a* `Rectangle`, then you should be able
 to use a `Square` wherever a `Rectangle` is expected. (Famously,
-this fails in many ways, which is why "Square inherits from
-Rectangle" is a textbook OOP anti-example.)
+this fails in many ways — set a "rectangle's" width and its height
+changes too — which is why "Square inherits from Rectangle" is a
+textbook OOP anti-example.)
+
+That test has a name: the **Liskov Substitution Principle**, after
+computer scientist Barbara Liskov, who formulated the idea in a 1987
+keynote. The principle says a derived class must be usable anywhere
+its base class is expected, *without the caller noticing any broken
+promises*. Liskov went on to win the 2008 Turing Award — computing's
+highest honor — in part for this work on data abstraction. When a
+hierarchy starts requiring "well, unless it's actually a Square"
+checks in calling code, the substitution principle is being
+violated, and composition is usually the way out.
 
 When in doubt, compose.
 
