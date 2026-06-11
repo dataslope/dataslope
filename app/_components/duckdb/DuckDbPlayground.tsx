@@ -2061,18 +2061,40 @@ function DuckDbPlaygroundInner() {
     const completionComp = completionCompRef.current;
     if (!view || !langCompRef.current || !completionComp) return;
     const schema: Record<string, string[]> = {};
-    const completionSchema: SqlCompletionSchema = { entities: [] };
+    const completionSchema: SqlCompletionSchema = {
+      entities: [],
+      schemas,
+    };
     for (const name of tables) {
-      const cols = columnsByEntity[name]?.map((column) => column.name) ?? [];
-      schema[name] = cols;
-      completionSchema.entities.push({ name, columns: cols, kind: "table" });
+      const cols = columnsByEntity[name] ?? [];
+      schema[name] = cols.map((column) => column.name);
+      completionSchema.entities.push({
+        name,
+        columns: cols.map((column) => ({
+          name: column.name,
+          type: column.type,
+        })),
+        kind: "table",
+        foreignKeys: (foreignKeysByEntity[name] ?? []).map((fk) => ({
+          column: fk.from,
+          refEntity: fk.table,
+          refColumn: fk.to,
+        })),
+      });
     }
     for (const name of views) {
-      const cols = columnsByEntity[name]?.map((column) => column.name) ?? [];
-      schema[name] = cols;
-      completionSchema.entities.push({ name, columns: cols, kind: "view" });
+      const cols = columnsByEntity[name] ?? [];
+      schema[name] = cols.map((column) => column.name);
+      completionSchema.entities.push({
+        name,
+        columns: cols.map((column) => ({
+          name: column.name,
+          type: column.type,
+        })),
+        kind: "view",
+      });
     }
-    const key = JSON.stringify(completionSchema.entities);
+    const key = JSON.stringify(completionSchema);
     if (key === lastReconfigureKeyRef.current) return;
     // Dispatch the completion reconfigure immediately so user-defined
     // tables/views show up in autocomplete the moment the schema lands.
@@ -2104,7 +2126,7 @@ function DuckDbPlaygroundInner() {
     return () => {
       cancelled = true;
     };
-  }, [tables, views, columnsByEntity]);
+  }, [tables, views, columnsByEntity, foreignKeysByEntity, schemas]);
 
   // Drop result entries whose owning tab no longer exists.
   useEffect(() => {

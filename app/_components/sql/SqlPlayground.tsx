@@ -1392,28 +1392,45 @@ function SqlPlaygroundInner() {
     let cancelled = false;
     void (async () => {
       const schema: Record<string, string[]> = {};
-      const completionSchema: SqlCompletionSchema = { entities: [] };
+      const completionSchema: SqlCompletionSchema = {
+        entities: [],
+        schemas: ["main", "temp"],
+      };
       for (const name of tables) {
+        let cols: Awaited<ReturnType<typeof engine.listColumns>> = [];
+        let fks: Awaited<ReturnType<typeof engine.listForeignKeys>> = [];
         try {
-          schema[name] = (await engine.listColumns(name)).map((c) => c.name);
+          [cols, fks] = await Promise.all([
+            engine.listColumns(name),
+            engine.listForeignKeys(name).catch(() => []),
+          ]);
         } catch {
-          schema[name] = [];
+          // Leave the entity in place with no columns so the table name
+          // itself still completes.
         }
+        schema[name] = cols.map((c) => c.name);
         completionSchema.entities.push({
           name,
-          columns: schema[name],
+          columns: cols.map((c) => ({ name: c.name, type: c.type })),
           kind: "table",
+          foreignKeys: fks.map((fk) => ({
+            column: fk.from,
+            refEntity: fk.table,
+            refColumn: fk.to,
+          })),
         });
       }
       for (const name of views) {
+        let cols: Awaited<ReturnType<typeof engine.listColumns>> = [];
         try {
-          schema[name] = (await engine.listColumns(name)).map((c) => c.name);
+          cols = await engine.listColumns(name);
         } catch {
-          schema[name] = [];
+          // Same fallback as tables: keep the view name completable.
         }
+        schema[name] = cols.map((c) => c.name);
         completionSchema.entities.push({
           name,
-          columns: schema[name],
+          columns: cols.map((c) => ({ name: c.name, type: c.type })),
           kind: "view",
         });
       }
