@@ -117,6 +117,12 @@ export function makeSqlAutocompletionExtension(
     activateOnTyping: true,
     activateOnTypingDelay: AUTOCOMPLETE_DELAY_MS,
     closeOnBlur: true,
+    // The extension's built-in keymap binds Enter → acceptCompletion at
+    // the highest precedence, which would shadow the Enter-less keymap
+    // assembled in `createSqlEditorExtensions` and hijack newlines
+    // whenever the (eagerly opened) popup is visible. We register the
+    // completion keys ourselves instead.
+    defaultKeymap: false,
     override: [createSqlCompletionSource(schema, { dialect })],
   });
 }
@@ -246,15 +252,19 @@ export function createSqlEditorExtensions(
         },
       },
       ...closeBracketsKeymap,
+      // Completion keys must come before `defaultKeymap`, otherwise
+      // ArrowUp/ArrowDown would move the cursor instead of the popup
+      // selection. Enter is removed so it always inserts a newline —
+      // Tab accepts the active completion instead (falling through to
+      // indentWithTab when no completion is shown). This only works
+      // because the autocompletion extension's own keymap is disabled
+      // (`defaultKeymap: false` above); that built-in copy binds Enter
+      // at the highest precedence and would override anything here.
+      ...completionKeymap.filter((b) => b.key !== "Enter"),
+      { key: "Tab", run: acceptCompletion },
       ...defaultKeymap,
       ...searchKeymap,
       ...historyKeymap,
-      // Remove Enter from the default completion keymap so that Enter
-      // always inserts a newline. Tab accepts the active completion
-      // instead, falling through to indentWithTab when no completion is
-      // shown.
-      ...completionKeymap.filter((b) => b.key !== "Enter"),
-      { key: "Tab", run: acceptCompletion },
       indentWithTab,
     ]),
   ];
