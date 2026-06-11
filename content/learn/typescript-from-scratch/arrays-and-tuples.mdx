@@ -522,10 +522,14 @@ if (result !== 5) throw new Error("Expected 5, got " + result);
 
 TypeScript's array type does *not* track length. If you declare `numbers:
 number[]`, the compiler doesn't know if the array has 0, 1, or 100
-elements. Indexing `numbers[0]` gives `number | undefined` (in strict
-mode), because the array might be empty. Tuples, by contrast, *do* track
+elements. By default it optimistically types `numbers[0]` as plain
+`number` even though the array might be empty — and with the
+`noUncheckedIndexedAccess` compiler option (from the
+[tsconfig chapter](./setup-and-tsconfig)) it honestly reports
+`number | undefined`. Tuples, by contrast, *do* track
 length: if you declare `pair: [number, number]`, the compiler knows
-`pair[0]` and `pair[1]` exist and are `number`s (no `| undefined`).
+`pair[0]` and `pair[1]` exist and are `number`s (no `| undefined`),
+under either setting.
 
 <CodeBlock
   adapter="typescript"

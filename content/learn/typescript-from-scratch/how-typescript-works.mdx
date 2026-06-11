@@ -161,6 +161,8 @@ We'll explore structural typing in depth later. For now, just know: **TypeScript
 
 When you run `tsc` (the TypeScript compiler) or save a file in VS Code, your code flows through a multi-stage pipeline. Each stage transforms or analyzes the code, building up information until the type checker can prove your program is safe (or report errors).
 
+Before we open it up, one detail worth savoring: **the TypeScript compiler is written in TypeScript.** Every stage you're about to read about — scanner, parser, binder, checker, emitter — is itself TypeScript source code, type-checked by an earlier build of itself. This is a classic compiler tradition called *self-hosting* (C's compilers are written in C, for the same reason), and it doubles as the ultimate confidence test: a language good enough to build its own hundred-thousand-line compiler is good enough for your application.
+
 Here's the high-level flow:
 
 ```mermaid

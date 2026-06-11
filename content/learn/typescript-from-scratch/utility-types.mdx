@@ -673,9 +673,7 @@ console.log(directory);
   files={[
     {
       filename: "main.ts",
-      initCode: `type MyPick<T, K extends keyof T> = any; // Replace 'any'
-`,
-      starterCode: `type MyPick<T, K extends keyof T> = any;
+      starterCode: `type MyPick<T, K extends keyof T> = any; // Replace 'any'
 
 type User = { id: number; name: string; email: string };
 type UserPreview = MyPick<User, "id" | "name">;
@@ -719,9 +717,7 @@ if (p.id !== 1 || p.name !== "Alice") throw new Error("Pick failed");`,
   files={[
     {
       filename: "main.ts",
-      initCode: `type MyExclude<T, U> = any; // Replace 'any'
-`,
-      starterCode: `type MyExclude<T, U> = any;
+      starterCode: `type MyExclude<T, U> = any; // Replace 'any'
 
 type All = "a" | "b" | "c";
 type Result = MyExclude<All, "a" | "c">;

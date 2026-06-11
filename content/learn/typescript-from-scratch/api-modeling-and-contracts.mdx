@@ -479,7 +479,7 @@ export type ApiResponse<T> =
       id: "out",
       name: "Prints order-1 with total",
       description: "stdout includes 'order-1' and '99.99'",
-      expect: { stdoutIncludes: "order-1" },
+      expect: { stdoutContains: ["order-1", "99.99"] },
     },
   ]}
 />

@@ -478,9 +478,7 @@ type Handlers = EventHandlerMap<Events>;
   files={[
     {
       filename: "main.ts",
-      initCode: `type EventHandlerMap<T> = any; // Replace 'any'
-`,
-      starterCode: `type EventHandlerMap<T> = any;
+      starterCode: `type EventHandlerMap<T> = any; // Replace 'any'
 
 type Events = { click: { x: number }; focus: { id: string } };
 type Handlers = EventHandlerMap<Events>;

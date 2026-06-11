@@ -693,22 +693,16 @@ export type Post = {
 ## Multiple choice check
 
 <MultipleChoice
-  markdown={`You're modeling a feature flag that can be:
-- Disabled
-  > This state means the feature is completely off; no percentage applies.
-- Enabled for everyone
-  > This state means the feature is on for all users; no percentage applies.
-- Enabled for a specific percentage of users
-  > This state requires a percentage value; the other two states do not.
+  markdown={`You're modeling a feature flag with three possible states: *disabled*, *enabled for everyone*, or *enabled for a specific percentage of users* (only this last state carries a percentage value).
 
 Which type definition makes illegal states **unrepresentable**?
 
 - \`type Flag = { enabled: boolean; percentage?: number }\`
-  > No. This allows \`enabled: false, percentage: 50\` (disabled but with a percentage?) and \`enabled: true, percentage: undefined\` (enabled for everyone or for a percentage?). The type is ambiguous.
+  > This allows \`enabled: false, percentage: 50\` (disabled but with a percentage?) and \`enabled: true, percentage: undefined\` (enabled for everyone, or for a percentage that wasn't given?). The type is ambiguous.
 - [o] \`type Flag = { kind: "disabled" } | { kind: "enabled-all" } | { kind: "enabled-percentage"; percentage: number }\`
   > Each state is a distinct variant. Disabled has no percentage, enabled-all has no percentage, and enabled-percentage requires a percentage. Illegal states cannot be represented.
 - \`type Flag = { kind: "disabled" | "enabled-all" | "enabled-percentage"; percentage?: number }\`
-  > No. This allows \`kind: "disabled", percentage: 50\` (disabled but with a percentage?). The discriminant and the optional field are independent, so invalid combinations are possible.
+  > This allows \`kind: "disabled", percentage: 50\` (disabled but with a percentage?). The discriminant and the optional field are independent, so invalid combinations are possible.
 
 Discriminated unions eliminate ambiguity by making each state explicit and self-contained. If a field only makes sense in one state, include it in that state's variant — not as a shared optional field.`}
 />

@@ -374,6 +374,16 @@ When you have generic types, you might wonder: is `Box<Dog>` assignable to `Box<
 - **Contravariant:** If `A extends B`, then `Handler<B>` extends `Handler<A>`. (Function parameters are contravariant.)
 - **Invariant:** No subtyping relationship. (Mutable containers are often invariant.)
 
+Why does anyone care about these rules? Because getting them wrong is a famous, expensive mistake. Java (1995) made its arrays **covariant**: a `String[]` may be used wherever an `Object[]` is expected. That sounds harmless — every string *is* an object — until someone writes through the wider type:
+
+```java
+// Java — compiles without complaint
+Object[] objects = new String[3];
+objects[0] = Integer.valueOf(42); // runtime ArrayStoreException!
+```
+
+A *mutable* container can't safely be covariant, because the wider alias lets you put a wrong-typed value in. Java's designers knew this and accepted the runtime check as the price of making early APIs like `sort(Object[])` usable before the language had generics; every Java programmer since has met `ArrayStoreException`, the type error that escaped to runtime. The covariance-of-mutable-arrays decision is now a standard cautionary tale in language design. (Full disclosure: TypeScript knowingly makes the same bet — its mutable arrays are covariant too, trading a sliver of soundness for ergonomics, with no runtime check to catch you. Pragmatism is a theme with this language.) Here are the safe rules, which TypeScript otherwise applies for you:
+
 TypeScript infers variance automatically based on how the type parameter is used. You don't usually need to think about it, but it's good to know the terms:
 
 <CodeBlock

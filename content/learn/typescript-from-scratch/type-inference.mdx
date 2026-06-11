@@ -272,27 +272,30 @@ console.log(\`points: { x: number; y: number }[] =\`, JSON.stringify(points));
   ]}
 />
 
-If no single type fits all elements, the compiler creates a **union** of the candidates. This is usually what you want, but sometimes it's too loose. You can add an explicit type annotation to narrow it:
+If no single type fits all elements, the compiler creates a **union** of the candidates. This is usually what you want, but sometimes it's too loose — and the inference is locked in at the moment of initialization, so a union you created by accident follows the array around forever:
 
 <CodeBlock
   adapter="typescript"
   files={[
     {
       filename: "main.ts",
-      starterCode: `// Without annotation: inferred as (string | number)[]
-const loose = [42];
-loose.push("hello"); // allowed
-console.log(loose); // [42, "hello"]
+      starterCode: `// One stray string in the initializer...
+const loose = [42, "hello"]; // inferred as (string | number)[]
+loose.push("world"); // ...and now strings are allowed forever
+loose.push(7); // numbers too, of course
+console.log(loose); // [42, "hello", "world", 7]
 
-// With annotation: restricted to number[]
+// An explicit annotation pins the element type down
 const strict: number[] = [42];
-// strict.push("hello"); // ❌ Error: Argument of type 'string' is not assignable to parameter of type 'number'
+// strict.push("hello"); // ❌ Error: 'string' is not assignable to 'number'
 strict.push(100); // ✅ OK
 console.log(strict); // [42, 100]
 `,
     },
   ]}
 />
+
+Note what inference does *not* do: it never widens beyond the evidence. `const nums = [42]` is inferred as `number[]`, so `nums.push("hello")` is already an error with no annotation needed. You only reach for an explicit annotation when the initializer's evidence is wrong about your intent — usually because a value snuck in that shouldn't be there at all.
 
 ## How inference walks expressions
 

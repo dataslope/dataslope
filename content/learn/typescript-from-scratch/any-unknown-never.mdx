@@ -423,38 +423,13 @@ console.log("x:", x); // undefined
 `void` is the conventional return type for event handlers, loggers, and
 other side-effect functions.
 
-## `void` vs `undefined`
-
-There's a subtle distinction:
-- **`void`** means "I don't care about the return value."
-- **`undefined`** means "the return value is explicitly `undefined`."
-
-<CodeBlock
-  adapter="typescript"
-  files={[
-    {
-      filename: "main.ts",
-      starterCode: `function returnsVoid(): void {
-  // No return, or 'return;'
-}
-
-function returnsUndefined(): undefined {
-  return undefined;
-}
-
-const a = returnsVoid(); // type: void
-const b = returnsUndefined(); // type: undefined
-
-console.log("a:", a);
-console.log("b:", b);
-`,
-    },
-  ]}
-/>
-
-In practice, `void` is more common. Use `undefined` when the return type
-matters (e.g., a function that might return `T | undefined` to signal
-absence).
+We drew the line between `void` and `undefined` back in
+[Functions and Signatures](./functions-and-signatures), so just the
+one-sentence recap here: `void` says "callers shouldn't use this
+return value at all," while `undefined` makes the absence of a value
+an explicit, inspectable part of the contract. What's new on this
+page is seeing where `void` sits in the lattice — it's a deliberate
+blind spot, not a real point on the `unknown`-to-`never` axis.
 
 ## Type relationships: assignability
 

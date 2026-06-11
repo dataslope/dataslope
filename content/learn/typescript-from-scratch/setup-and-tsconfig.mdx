@@ -298,7 +298,7 @@ if (name !== null) {
 }
 ```
 
-This eliminates the "billion-dollar mistake" — `TypeError: Cannot read property 'x' of null/undefined` — which plagues JavaScript.
+This eliminates the famous "billion-dollar mistake." That phrase is Tony Hoare's own: he invented the null reference for ALGOL W in 1965 ("simply because it was so easy to implement," he said), and in a 2009 conference talk he publicly apologized, estimating that null dereferences had cost the industry a billion dollars in crashes and vulnerabilities over the decades since. JavaScript inherited the mistake *twice over* — it has both `null` and `undefined` — which makes `strictNullChecks` arguably the single highest-value flag in the entire compiler.
 
 <svg
   viewBox="0 0 640 210"

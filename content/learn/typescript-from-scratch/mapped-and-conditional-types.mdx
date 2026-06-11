@@ -534,9 +534,7 @@ Here, the conditional type checks if `T[K]` is a function. If so, it unions with
   files={[
     {
       filename: "main.ts",
-      initCode: `type Mutable<T> = any; // Replace 'any' with your implementation
-`,
-      starterCode: `type Mutable<T> = any;
+      starterCode: `type Mutable<T> = any; // Replace 'any' with your implementation
 
 type ReadonlyUser = { readonly id: number; readonly name: string };
 type MutableUser = Mutable<ReadonlyUser>;
