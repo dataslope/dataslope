@@ -18,7 +18,7 @@ All variants draw with `currentColor` (brand blue by default, light/dark aware) 
 
 ## Wave
 
-Four dynamics variants of the same rolling-logo wave — pick the one that works best:
+The rolling-logo wave with a traveling light, in two edge treatments:
 
 <LoadingAnimationsGallery section="wave" />
 
@@ -44,8 +44,9 @@ import {
 <DiamondAssembleTurnLoader size={72} />
 
 // Full-width rolling wave band for empty states and panel loading.
-// variant: "flow" | "glow" (traveling light) | "depth" (parallax) | "full"
-<LogoWave variant="glow" height={96} duration={6.5} />
+// edges: "soft" (default) | "blend" (long fades so the band melts
+// into any background)
+<LogoWave edges="blend" height={96} duration={4.8} />
 ```
 
-Every component accepts a `label` prop for its accessible name (default `"Loading…"`); the spinner accepts `duration` (seconds per revolution) and the wave accepts `variant`, `height` (the band renders aspect-true, so height also sets the crest spacing), and `duration` (snapped slightly for the glow variants so the traveling light loops seamlessly).
+Every component accepts a `label` prop for its accessible name (default `"Loading…"`); the spinner accepts `duration` (seconds per revolution) and the wave accepts `edges`, `height` (the band renders aspect-true, so height also sets the crest spacing), and `duration` (snapped slightly so the traveling light loops seamlessly).

@@ -19,9 +19,9 @@
  *    distance between the two foot-cap centres) makes adjacent feet
  *    coincide; the translucent overlaps show as darker blob accents at
  *    each trough, producing a rolling wave that scrolls seamlessly.
- *    On top of the scroll, <LogoWave> offers dynamics variants: a
- *    traveling-light pulse (per-tile phased opacity) and a parallax
- *    background wave.
+ *    On top of the scroll, a traveling-light pulse (per-tile phased
+ *    opacity) rolls along the crests; an optional blended-ends mode
+ *    fades both ends out so the band melts into any background.
  *
  * All shapes render with `currentColor`; the CSS module sets the brand
  * blue (light/dark aware) on each wrapper, and honours
@@ -294,7 +294,7 @@ export function DiamondRippleLoader({
  *  the <svg> (whose viewBox is vertically symmetric around the
  *  diamond's centre, so the element centre is the rotation centre)
  *  while the translation lives on the inner half groups — the two
- *  keyframe sets share one 4.4s timeline in the CSS. */
+ *  keyframe sets share one 3.2s timeline in the CSS. */
 export function DiamondAssembleTurnLoader({
   size = 64,
   label = "Loading…",
@@ -384,78 +384,52 @@ function snapGlowDuration(duration: number): number {
   return Math.max(PULSE_PERIOD_S, duration + delta);
 }
 
-/** Wave dynamics:
- *  - "flow":  the plain scrolling wave (the approved stitched-logo look).
- *  - "glow":  a brightness pulse rolls along the crests — each tile's
- *             opacity oscillates with a per-tile phase offset, reading
- *             as a light source moving along the wave.
- *  - "depth": a second, smaller and fainter wave scrolls more slowly
- *             behind the main one for a parallax depth effect.
- *  - "full":  glow + depth combined. */
-export type WaveVariant = "flow" | "glow" | "depth" | "full";
-
 export interface LogoWaveProps {
-  variant?: WaveVariant;
+  /** Edge treatment: "soft" keeps a narrow fade where the band is
+   *  clipped; "blend" fades the ends out over a long run on both
+   *  sides, so the wave dissolves into whatever background it sits
+   *  on. */
+  edges?: "soft" | "blend";
   /** Band height in px. The wave renders aspect-true (no stretching),
    *  so this also sets the crest-to-crest spacing. */
   height?: number;
-  /** Seconds per scroll loop (two crests) — lower is faster. For the
-   *  glow/full variants the value is snapped (±0.9s) so the traveling
-   *  light stays seamless across the scroll loop. */
+  /** Seconds per scroll loop (two crests) — lower is faster. The value
+   *  is snapped (±0.9s) so the traveling light stays seamless across
+   *  the scroll loop. */
   duration?: number;
   label?: string;
 }
 
-/** How much the parallax background wave is scaled down (anchored to
- *  the bottom edge so the feet stay grounded). */
-const WAVE_BACK_SCALE = 0.72;
-
 /** Animation 2 (requested): the gradient mark repeated horizontally
- *  into a rolling wave. Tiles step by TILE_STEP so adjacent foot caps
- *  coincide, and because the fills keep the logo's translucent radial
- *  gradients, the doubled foot regions show through as darker blob
- *  accents at each trough — the stitched-logo look. The svg is sized
- *  in px (aspect-true) wider than any container and cropped by the
- *  band, so the blobs stay circular; each track scrolls by exactly two
- *  tile steps per loop (matching waveScroll in the CSS). */
+ *  into a rolling wave with a traveling light. Tiles step by TILE_STEP
+ *  so adjacent foot caps coincide, and because the fills keep the
+ *  logo's translucent radial gradients, the doubled foot regions show
+ *  through as darker blob accents at each trough — the stitched-logo
+ *  look. Each tile's opacity oscillates with a per-tile phase offset,
+ *  so a brightness pulse rolls along the crests. The svg is sized in
+ *  px (aspect-true) wider than any container and cropped by the band,
+ *  so the blobs stay circular; the track scrolls by exactly two tile
+ *  steps per loop (matching waveScroll in the CSS). */
 export function LogoWave({
-  variant = "flow",
+  edges = "soft",
   height = 96,
-  duration = 6.5,
+  duration = 4.8,
   label = "Loading…",
 }: LogoWaveProps) {
   const gradId = useSafeId("ds-wave");
   const tileId = `${gradId}-tile`;
-  const pulse = variant === "glow" || variant === "full";
-  const depth = variant === "depth" || variant === "full";
-  const frontDur = pulse ? snapGlowDuration(duration) : duration;
+  const scrollDur = snapGlowDuration(duration);
   const pxPerUnit = height / LOGO_H;
   // Cover MAX_WAVE_BAND_PX plus one scroll loop of slack.
   const neededUnits = MAX_WAVE_BAND_PX / pxPerUnit + WAVE_PERIOD;
   const tileCount = Math.ceil((neededUnits - LOGO_W) / TILE_STEP) + 1;
   const viewW = (tileCount - 1) * TILE_STEP + LOGO_W;
-  // The background layer is scaled down, so it needs proportionally
-  // more tiles to span the same screen width.
-  const backTileCount = Math.ceil(tileCount / WAVE_BACK_SCALE) + 2;
-
-  const renderTiles = (count: number, withPulse: boolean) =>
-    Array.from({ length: count }, (_, k) => (
-      <use
-        key={k}
-        href={`#${tileId}`}
-        x={k * TILE_STEP}
-        className={withPulse ? styles.waveTilePulse : undefined}
-        style={
-          withPulse
-            ? { animationDelay: `${(-k * PULSE_STEP_S).toFixed(2)}s` }
-            : undefined
-        }
-      />
-    ));
 
   return (
     <span
-      className={styles.waveBand}
+      className={`${styles.waveBand}${
+        edges === "blend" ? ` ${styles.waveBandBlend}` : ""
+      }`}
       style={{ height }}
       role="img"
       aria-label={label}
@@ -473,24 +447,19 @@ export function LogoWave({
             <GradientMarkPaths idPrefix={gradId} />
           </g>
         </defs>
-        {depth && (
-          <g
-            transform={`translate(0 ${LOGO_H * (1 - WAVE_BACK_SCALE)}) scale(${WAVE_BACK_SCALE})`}
-            opacity={0.32}
-          >
-            <g
-              className={styles.waveTrack}
-              style={{ "--wave-dur": `${duration * 1.7}s` } as CSSProperties}
-            >
-              {renderTiles(backTileCount, false)}
-            </g>
-          </g>
-        )}
         <g
           className={styles.waveTrack}
-          style={{ "--wave-dur": `${frontDur}s` } as CSSProperties}
+          style={{ "--wave-dur": `${scrollDur}s` } as CSSProperties}
         >
-          {renderTiles(tileCount, pulse)}
+          {Array.from({ length: tileCount }, (_, k) => (
+            <use
+              key={k}
+              href={`#${tileId}`}
+              x={k * TILE_STEP}
+              className={styles.waveTilePulse}
+              style={{ animationDelay: `${(-k * PULSE_STEP_S).toFixed(2)}s` }}
+            />
+          ))}
         </g>
       </svg>
     </span>
@@ -542,34 +511,18 @@ export default function LoadingAnimationsGallery({
         <DemoCard
           wide
           fill
-          title="Wave — flow"
-          blurb="The baseline: the gradient mark repeated horizontally (adjacent foot caps coincide, translucent overlaps form the trough accents), scrolling quicker than before."
-        >
-          <LogoWave variant="flow" height={96} duration={6.5} />
-        </DemoCard>
-        <DemoCard
-          wide
-          fill
           title="Wave — traveling light"
-          blurb="A brightness pulse rolls along the crests: each tile's opacity oscillates with a per-tile phase offset, reading as a light source sweeping along the wave while it scrolls."
+          blurb="The gradient mark repeated horizontally with a brightness pulse rolling along the crests: each tile's opacity oscillates with a per-tile phase offset, reading as a light source sweeping along the wave while it scrolls."
         >
-          <LogoWave variant="glow" height={96} duration={6.5} />
+          <LogoWave height={96} duration={4.8} />
         </DemoCard>
         <DemoCard
           wide
           fill
-          title="Wave — depth"
-          blurb="A smaller, fainter wave drifts more slowly behind the main one — parallax depth, like swells behind the breaker."
+          title="Wave — blended ends"
+          blurb="The same wave with both ends faded out over a long run, so the band dissolves into whatever background it sits on."
         >
-          <LogoWave variant="depth" height={96} duration={6.5} />
-        </DemoCard>
-        <DemoCard
-          wide
-          fill
-          title="Wave — full dynamics"
-          blurb="Traveling light and parallax depth combined — the liveliest variant."
-        >
-          <LogoWave variant="full" height={96} duration={6.5} />
+          <LogoWave edges="blend" height={96} duration={4.8} />
         </DemoCard>
       </div>
     );

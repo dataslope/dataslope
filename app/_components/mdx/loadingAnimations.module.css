@@ -89,7 +89,7 @@
 }
 
 .assembleHalf {
-  animation: assembleHalf 1.8s ease-in-out infinite;
+  animation: assembleHalf 1.2s ease-in-out infinite;
 }
 
 /* ── Diamond ripple (radar ping) ───────────────────────────────────── */
@@ -172,11 +172,11 @@
 }
 
 .comboRotor {
-  animation: comboTurn 4.4s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+  animation: comboTurn 3.2s cubic-bezier(0.45, 0, 0.2, 1) infinite;
 }
 
 .comboHalf {
-  animation: comboHalf 4.4s ease-in-out infinite;
+  animation: comboHalf 3.2s ease-in-out infinite;
 }
 
 /* ── Logo hop (three marks hopping in sequence) ────────────────────── */
@@ -271,6 +271,26 @@
 
 :global(.dark) .waveBand {
   color: var(--ds-blue-400, #5ba7ff);
+}
+
+/* Blended ends: the fade runs deep into the band from both sides, so
+   only the middle stays at full strength and the wave dissolves into
+   whatever background it sits on. */
+.waveBandBlend {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 32%,
+    #000 68%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 32%,
+    #000 68%,
+    transparent
+  );
 }
 
 /* ── Inline boot notice demo (CodeBlock-style row) ─────────────────── */
