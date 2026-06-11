@@ -205,9 +205,7 @@ console.log(render({ kind: "error", message: "Network failure" }));
   ]}
 />
 
-In the `default` case, we try to assign `status` to a variable of type `never`. If every variant has been handled, `status` is type `never` (the "empty" type), so the assignment succeeds. If we forgot a case, `status` still has a type (the unhandled variant), and assigning it to `never` fails with a compile error.
-
-Try it: comment out one of the cases above and uncomment the code. The `_exhaustive` assignment will error, telling you exactly which variant you missed.
+In the `default` case, we try to assign `status` to a variable of type `never`. If every variant has been handled, `status` is type `never` (the "empty" type), so the assignment succeeds. If we forgot a case, `status` still has a type (the unhandled variant), and assigning it to `never` fails with a compile error — under `tsc`, deleting the `"error"` case from the function above produces *Type '\{ kind: "error"; message: string; \}' is not assignable to type 'never'*, an error message that names the exact variant you forgot.
 
 <Callout type="success" title="Add a variant, get a compile error">
 This is the dream: you add a new variant to the union (e.g., `| { kind: "cancelled" }`), and every `switch` statement that handles `Status` lights up with an error until you add the new case. The compiler becomes your refactoring assistant.

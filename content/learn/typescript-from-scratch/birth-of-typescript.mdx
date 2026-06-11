@@ -185,7 +185,7 @@ timeline
     title TypeScript's Journey
     2010 : Microsoft internal team starts project
     2012 Oct : TypeScript 0.8 public announcement
-               Anders Hejlsberg presents at Microsoft's BUILD conference
+               Anders Hejlsberg introduces the language in a launch video
     2013 : TypeScript 0.9 adds generics
     2014 : TypeScript 1.0 released (production-ready)
            Facebook releases Flow (main competitor)
@@ -197,13 +197,13 @@ timeline
     2018 : TypeScript 3.0 (project references for monorepos)
     2019 : TypeScript becomes default for new projects in many surveys
     2020 : TypeScript 4.0 (variadic tuple types, labeled tuple elements)
-    2023 : Over 3 million npm packages use TypeScript
+    2023 : Used by nearly 39 percent of professional developers (Stack Overflow survey)
            TypeScript is the default for serious JavaScript projects
 ```
 
 ## The October 2012 announcement
 
-On October 1, 2012, Microsoft unveiled **TypeScript 0.8** at the BUILD developer conference. Hejlsberg demoed the language live, showing how a simple JavaScript object could gain type safety with a single annotation:
+On October 1, 2012, Microsoft unveiled **TypeScript 0.8** to the public, with Hejlsberg introducing the language on camera and showing how a simple JavaScript object could gain type safety with a single annotation:
 
 <CodeBlock
   adapter="typescript"
@@ -238,7 +238,7 @@ console.log(typedUser.name); // Still works
   ]}
 />
 
-Try uncommenting that last line in the code block above. You'll see the TypeScript compiler catch the typo *before* the code runs. That's the magic: **types as documentation that the compiler enforces.**
+That commented-out last line is the whole pitch. In an editor, `typedUser.emial` gets a red squiggle the instant you type it, and `tsc` refuses to build until it's fixed: *Property 'emial' does not exist on type 'User'. Did you mean 'email'?* — the compiler even guesses the fix. That's the magic Hejlsberg demonstrated: **types as documentation that the compiler enforces.**
 
 The initial reaction was mixed. JavaScript purists worried Microsoft was trying to "embrace, extend, extinguish" their beloved language. Skeptics pointed out that Closure Compiler and other tools had tried annotations before. Why would this succeed?
 

@@ -17,36 +17,49 @@ type-driven architecture.
 ## This course runs in your browser — try it
 
 One thing before anything else: **every code block in this course is
-live.** The TypeScript compiler itself runs inside your browser tab,
-type-checks what you write, and executes it. Click *Run*:
+live.** The TypeScript compiler runs inside your browser tab,
+translates what you write into JavaScript, and executes it on the
+spot. Click *Run*:
 
 <CodeBlock
   adapter="typescript"
   files={[
     {
       filename: "main.ts",
-      starterCode: `type Greeting = "hello" | "ahoy" | "howdy";
+      starterCode: `type Mood = "delighted" | "curious" | "skeptical";
 
-function greet(style: Greeting, name: string): string {
-  return \`\${style}, \${name}!\`;
+function announce(mood: Mood, language: string): string {
+  return \`\${language} makes me \${mood}.\`;
 }
 
-console.log(greet("ahoy", "TypeScript"));
+console.log(announce("curious", "TypeScript"));
+console.log(announce("skeptical", "JavaScript"));
 
-// Now change "ahoy" above to "yo" and press Run again.
-// The compiler rejects it before a single line executes —
-// "yo" is not one of the three allowed greetings.
-// Then add "yo" to the Greeting type and watch it pass.
+// Change "skeptical" to "delighted" and press Run again.
+// That type on the first line is a real contract: in an editor or a
+// real project build, announce("bored", ...) is rejected before the
+// program ever runs, because "bored" is not a Mood.
 `,
     },
   ]}
 />
 
-That little loop — write, get corrected by the compiler, fix, run —
-is the entire experience of TypeScript compressed into ten lines,
-and it is how every page of this course works. You will read a
-little, run a little, and break things on purpose to see exactly
-where the compiler draws its lines.
+That little file already contains the whole idea of the course: a
+`type` that pins down exactly which values are allowed, a function
+whose signature declares its contract, and code you can edit and
+re-run in seconds. Every page works this way — you read a little,
+run a little, and poke at the examples to see where the rules bend.
+
+<Callout type="info" title="Where the red squiggles live">
+The in-page runner favors speed: it checks syntax, strips the types,
+and executes — like the real TypeScript toolchain, where types never
+survive to runtime. The full type-checking experience (squiggles
+under `announce("bored")` before you run anything) lives in
+editors like VS Code and in the `tsc` compiler, which the
+[setup chapter](./setup-and-tsconfig) shows you how to run. The
+course will tell you, for each "broken" line, exactly what the
+compiler would say about it.
+</Callout>
 
 <svg
   viewBox="0 0 640 250"
@@ -103,7 +116,7 @@ Each page mixes narrative, diagrams, runnable code, and short
 challenges. Three interactive widgets appear throughout:
 
 1. **Executable TypeScript code blocks.** Every snippet is
-   type-checked and transpiled in your browser, then executed by
+   compiled to JavaScript in your browser, then executed by
    [almostnode](https://almostnode.dev/) — no setup required. Edit
    any block and click *Run*.
 2. **Multi-file code blocks and challenge cards.** Real software is

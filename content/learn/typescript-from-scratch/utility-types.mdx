@@ -673,7 +673,8 @@ console.log(directory);
   files={[
     {
       filename: "main.ts",
-      starterCode: `type MyPick<T, K extends keyof T> = any; // Replace 'any'
+      starterCode: `// Replace the right-hand side with a mapped type over K
+type MyPick<T, K extends keyof T> = T;
 
 type User = { id: number; name: string; email: string };
 type UserPreview = MyPick<User, "id" | "name">;
