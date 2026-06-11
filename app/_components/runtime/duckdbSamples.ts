@@ -6,8 +6,32 @@ import {
   type SqlSampleDatabaseBase,
 } from "./sqlSamples";
 
+/** A remote data file registered with duckdb-wasm's virtual filesystem
+ *  before a sample's seed SQL runs. */
+export interface DuckDbRemoteFile {
+  /** Path inside the dataslope/datasets GitHub repo, or a full URL. */
+  path: string;
+  /** Filename to register in the virtual filesystem — what the seed SQL
+   *  refers to, e.g. `read_parquet('trips.parquet')`. Defaults to the
+   *  basename of `path`. */
+  registerAs?: string;
+}
+
 export interface DuckDbSampleDatabase extends SqlSampleDatabaseBase {
-  sql: string;
+  /** Inline DDL + seed SQL. Ignored when `remoteSql` is set. */
+  sql?: string;
+  /** Path (inside the dataslope/datasets GitHub repo) or full URL of a
+   *  SQL script that creates *and* populates the database, fetched from
+   *  raw.githubusercontent.com when the sample is loaded — see
+   *  remoteDatasets.ts. The script itself can also read remote data
+   *  directly (e.g. `... FROM read_parquet('https://raw.githubusercontent.com/…')`),
+   *  since duckdb-wasm can query CORS-enabled https URLs natively. */
+  remoteSql?: string;
+  /** Remote data files (`.parquet`, `.csv`, `.json`, …) fetched from
+   *  the datasets repo and registered with duckdb-wasm's virtual
+   *  filesystem before the seed SQL runs, so `sql`/`remoteSql` can
+   *  query them by name: `SELECT * FROM read_parquet('trips.parquet')`. */
+  remoteFiles?: readonly DuckDbRemoteFile[];
   defaultTabs: QueryTabSeed[];
 }
 

@@ -311,3 +311,54 @@ ORDER BY
   id;`}
 />
 ```
+
+## 6. Remote dataset — Chinook from GitHub
+
+`remoteInitSql` clones a complete sample database from the
+[dataslope/datasets](https://github.com/dataslope/datasets) GitHub repo
+before the block boots — here the full **Chinook** music store (11
+tables). Pass a path inside the repo (or any full URL) and the script is
+fetched from raw.githubusercontent.com; no seed SQL is embedded in the
+page. `tables` keeps the viewer focused on a hand-picked subset.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Explore the Chinook music store"
+  remoteInitSql="sqlite/chinook_sqlite.sql"
+  tables={["Artist", "Album", "Track"]}
+  starterCode={`SELECT
+  t.Name AS Track,
+  ar.Name AS Artist,
+  t.UnitPrice
+FROM
+  Track t
+  JOIN Album a ON a.AlbumId = t.AlbumId
+  JOIN Artist ar ON ar.ArtistId = a.ArtistId
+ORDER BY
+  ar.Name,
+  t.Name
+LIMIT
+  15;`}
+/>
+
+```jsx
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Explore the Chinook music store"
+  remoteInitSql="sqlite/chinook_sqlite.sql"
+  tables={["Artist", "Album", "Track"]}
+  starterCode={`SELECT
+  t.Name AS Track,
+  ar.Name AS Artist,
+  t.UnitPrice
+FROM
+  Track t
+  JOIN Album a ON a.AlbumId = t.AlbumId
+  JOIN Artist ar ON ar.ArtistId = a.ArtistId
+ORDER BY
+  ar.Name,
+  t.Name
+LIMIT
+  15;`}
+/>
+```

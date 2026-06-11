@@ -59,6 +59,7 @@ import styles from "./ChallengeCard.module.css";
 import {
   createEngineForDialect,
   DialectGlyph,
+  fetchRemoteInitSql,
   sqlFormatterLanguage,
   TableViewer,
   useSqlTableViewer,
@@ -80,6 +81,14 @@ export interface SqlCodeBlockProps {
   /** Setup SQL run once before the first execution — creates tables,
    *  seeds data, etc. */
   initSql?: string;
+  /** Remote dataset to load before `initSql`: a path inside the
+   *  dataslope/datasets GitHub repo (e.g. `sqlite/chinook_sqlite.sql`)
+   *  or a full URL. The script is downloaded from
+   *  raw.githubusercontent.com and executed against the block's engine,
+   *  so a block can clone a complete sample database (Chinook,
+   *  Northwind, …) without embedding it. `initSql` still runs after it
+   *  for any block-specific extras. */
+  remoteInitSql?: string;
   /** Starter SQL shown in the editor. */
   starterCode: string;
   /** Hand-picked tables (and optional schemas) to display in the table
@@ -109,6 +118,7 @@ export default function SqlCodeBlock({
   title,
   badge = "SQL",
   initSql,
+  remoteInitSql,
   starterCode,
   tables,
   tableRowLimit = 50,
@@ -284,8 +294,19 @@ export default function SqlCodeBlock({
   const ensureEngine = useCallback(async (): Promise<SqlEngineLike> => {
     if (!enginePromiseRef.current) {
       enginePromiseRef.current = (async () => {
+        // Start the dataset download while the engine boots — the two
+        // are independent and the WASM fetch usually dominates. The
+        // no-op catch keeps an engine-boot failure from leaving this
+        // promise's rejection unhandled; awaiting it below still throws.
+        const remoteSqlPromise = remoteInitSql
+          ? fetchRemoteInitSql(dialect, remoteInitSql)
+          : null;
+        remoteSqlPromise?.catch(() => {});
         const engine = await createEngineForDialect(dialect);
         setEngineLabel(`${engine.label} ${engine.version}`.trim());
+        if (remoteSqlPromise) {
+          await engine.exec(await remoteSqlPromise);
+        }
         if (initSql && initSql.trim()) {
           await engine.exec(initSql);
         }
@@ -298,7 +319,7 @@ export default function SqlCodeBlock({
       });
     }
     return enginePromiseRef.current;
-  }, [dialect, initSql]);
+  }, [dialect, initSql, remoteInitSql]);
 
   // ─── Table viewer ───────────────────────────────────────────────────
   // Shared with `<SqlChallengeCard>` so both stay consistent.

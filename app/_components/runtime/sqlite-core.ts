@@ -26,6 +26,7 @@ import {
   type SqlValue,
 } from "./sqlite-wasm";
 import { findSampleDatabase, type SqliteSampleDatabase, type SqliteSampleMetadata } from "./sqliteSamples";
+import { fetchDatasetBytes, fetchDatasetText } from "./remoteDatasets";
 
 export type { QueryExecResult } from "./sqlite-wasm";
 
@@ -627,16 +628,51 @@ function copyDatabaseContents(src: Database, dst: Database): void {
   }
 }
 
+/** The `SqliteEngine` surface with every promise unwrapped — the
+ *  in-process engine executes synchronously — except for
+ *  `loadSampleDatabase`, which stays async because samples backed by
+ *  `remoteSql` download their seed script before the rebuild. */
+export type InProcessSqliteEngine = Omit<
+  {
+    [K in keyof SqliteEngine]: Awaited<
+      ReturnType<NonNullable<SqliteEngine[K]>>
+    > extends infer R
+      ? (...args: Parameters<NonNullable<SqliteEngine[K]>>) => R
+      : never;
+  },
+  "loadSampleDatabase"
+> & {
+  loadSampleDatabase: (id: string) => Promise<SqliteSampleMetadata>;
+};
+
+/** Execute a multi-statement script that creates *and* populates a
+ *  database (a remote sample download or imported dump). Wrapped in a
+ *  transaction when the script doesn't manage its own, so scripts made
+ *  of thousands of single-row INSERTs commit in one journal write
+ *  instead of one implicit transaction per statement. */
+function execSeedScript(target: Database, script: string): void {
+  if (/^\s*(BEGIN|COMMIT)\b/im.test(script)) {
+    target.exec(script);
+    return;
+  }
+  target.exec("BEGIN");
+  try {
+    target.exec(script);
+    target.exec("COMMIT");
+  } catch (err) {
+    try {
+      target.exec("ROLLBACK");
+    } catch {
+      /* ignore */
+    }
+    throw err;
+  }
+}
+
 export async function createSqliteEngineInProcess(
   initialSampleId: string,
   openOptions: SqliteEngineOpenOptions = {},
-): Promise<{
-  [K in keyof SqliteEngine]: Awaited<
-    ReturnType<NonNullable<SqliteEngine[K]>>
-  > extends infer R
-    ? (...args: Parameters<NonNullable<SqliteEngine[K]>>) => R
-    : never;
-}> {
+): Promise<InProcessSqliteEngine> {
   const sqlite3 = await loadSqlite3();
   let db: Database | null = null;
   let active: SqliteSampleDatabase = findSampleDatabase(initialSampleId);
@@ -672,15 +708,75 @@ export async function createSqliteEngineInProcess(
     }
   }
 
-  function build(sample: SqliteSampleDatabase, opts: { skipSeed?: boolean } = {}): void {
-    let firstOpenOfPersistent = false;
+  /** Replace the active database's contents with the database encoded
+   *  in `bytes` (a binary `.sqlite` file). Persistent (OPFS) mode
+   *  copies object-by-object into the on-disk file — we can't
+   *  sqlite3_deserialize into an OPFS-backed DB because the OPFS VFS
+   *  requires the file backing to remain in place. In-memory mode
+   *  deserialises directly. */
+  function adoptDatabaseBytes(bytes: Uint8Array): void {
+    if (persistent && db) {
+      // Open a transient in-memory DB from `bytes` to validate, dump
+      // every CREATE/INSERT into the on-disk DB, then close the
+      // transient one. For most databases this is fine; very large
+      // ones should go through the export/import flow instead.
+      const transient = openDatabase(sqlite3, { bytes });
+      try {
+        transient.exec("PRAGMA foreign_keys = ON;");
+        dropAllUserObjects(db);
+        copyDatabaseContents(transient, db);
+      } finally {
+        transient.close();
+      }
+    } else {
+      const next = openDatabase(sqlite3, { bytes });
+      try {
+        next.exec("PRAGMA foreign_keys = ON;");
+      } catch (err) {
+        try {
+          next.close();
+        } catch {
+          /* ignore */
+        }
+        throw err;
+      }
+      if (db) {
+        try {
+          db.close();
+        } catch {
+          // Ignore close errors.
+        }
+      }
+      db = next;
+    }
+  }
+
+  async function build(
+    sample: SqliteSampleDatabase,
+    opts: { skipSeed?: boolean } = {},
+  ): Promise<void> {
+    const firstOpenOfPersistent = persistent && !db;
+    // Download a remote sample's payload *before* touching the current
+    // database so a failed download leaves the existing contents
+    // intact. Deferred on the first open of a persistent (OPFS) file:
+    // that path usually re-attaches to an existing workspace and never
+    // seeds, and when the file does turn out to be empty the late
+    // fetch below can at worst leave a blank database.
+    let remoteSqlText: string | null = null;
+    let remoteDbBytes: Uint8Array | null = null;
+    if (!opts.skipSeed && !firstOpenOfPersistent) {
+      if (sample.remoteSql) {
+        remoteSqlText = await fetchDatasetText(sample.remoteSql);
+      } else if (sample.remoteDb) {
+        remoteDbBytes = await fetchDatasetBytes(sample.remoteDb);
+      }
+    }
     if (persistent) {
       // Open the persistent file lazily on the first build call, and
       // wipe its current schema on subsequent calls so a sample swap
       // doesn't accumulate stale tables.
       if (!db) {
         db = openFresh();
-        firstOpenOfPersistent = true;
       } else {
         dropAllUserObjects(db);
       }
@@ -707,13 +803,21 @@ export async function createSqliteEngineInProcess(
       opts.skipSeed === true ||
       (firstOpenOfPersistent && hasUserObjects(db));
     if (!shouldSkipSeed) {
-      if (sample.schema) db.exec(sample.schema);
-      sample.seed(db);
+      if (sample.remoteSql) {
+        remoteSqlText ??= await fetchDatasetText(sample.remoteSql);
+        execSeedScript(db, remoteSqlText);
+      } else if (sample.remoteDb) {
+        remoteDbBytes ??= await fetchDatasetBytes(sample.remoteDb);
+        adoptDatabaseBytes(remoteDbBytes);
+      } else {
+        if (sample.schema) db.exec(sample.schema);
+        sample.seed?.(db);
+      }
     }
     active = sample;
   }
 
-  build(active, { skipSeed: openOptions.skipSeed });
+  await build(active, { skipSeed: openOptions.skipSeed });
 
   function require(): Database {
     if (!db) throw new Error("SQLite database is not initialised");
@@ -746,8 +850,8 @@ export async function createSqliteEngineInProcess(
   }
 
   return {
-    loadSampleDatabase(id: string) {
-      build(findSampleDatabase(id));
+    async loadSampleDatabase(id: string) {
+      await build(findSampleDatabase(id));
       const { seed: _seed, ...meta } = active;
       return meta;
     },
@@ -1395,46 +1499,7 @@ export async function createSqliteEngineInProcess(
       return meta;
     },
     loadFromBytes(bytes: Uint8Array, filename: string) {
-      if (persistent && db) {
-        // Persistent mode: open a transient in-memory DB from `bytes`
-        // to validate, dump every CREATE/INSERT into the on-disk DB,
-        // then close the transient one. We can't sqlite3_deserialize
-        // into an OPFS-backed DB because the OPFS VFS requires the
-        // file backing to remain in place.
-        const transient = openDatabase(sqlite3, { bytes });
-        try {
-          transient.exec("PRAGMA foreign_keys = ON;");
-          dropAllUserObjects(db);
-          // Copy every CREATE statement + every row out via a small
-          // backup loop. For most user uploads this is fine; for very
-          // large databases the user should be using the export/import
-          // flow instead.
-          copyDatabaseContents(transient, db);
-        } finally {
-          transient.close();
-        }
-      } else {
-        // In-memory mode: just open a fresh DB from the bytes.
-        const next = openDatabase(sqlite3, { bytes });
-        try {
-          next.exec("PRAGMA foreign_keys = ON;");
-        } catch (err) {
-          try {
-            next.close();
-          } catch {
-            /* ignore */
-          }
-          throw err;
-        }
-        if (db) {
-          try {
-            db.close();
-          } catch {
-            // Ignore close errors.
-          }
-        }
-        db = next;
-      }
+      adoptDatabaseBytes(bytes);
       // Derive a stable-ish id from the filename so the UI can
       // distinguish this from the blank placeholder.
       const basename = filename

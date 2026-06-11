@@ -256,3 +256,55 @@ ORDER BY
   id;`}
 />
 ```
+
+## 6. Remote dataset — Chinook from GitHub
+
+`remoteInitSql` clones a complete sample database from the
+[dataslope/datasets](https://github.com/dataslope/datasets) GitHub repo
+before the block boots — here the full **Chinook** music store (11
+tables, snake_case names). Pass a path inside the repo (or any full URL)
+and the script is fetched from raw.githubusercontent.com, then prepared
+for PGlite (psql meta-commands and `CREATE DATABASE` lines are
+stripped). `tables` keeps the viewer focused on a hand-picked subset.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Explore the Chinook music store"
+  remoteInitSql="postgres/chinook_postgres_AutoIncrementPKs.sql"
+  tables={["artist", "album", "track"]}
+  starterCode={`SELECT
+  t.name AS track,
+  ar.name AS artist,
+  t.unit_price
+FROM
+  track t
+  JOIN album a ON a.album_id = t.album_id
+  JOIN artist ar ON ar.artist_id = a.artist_id
+ORDER BY
+  ar.name,
+  t.name
+LIMIT
+  15;`}
+/>
+
+```jsx
+<SqlCodeBlock
+  dialect="postgres"
+  title="Explore the Chinook music store"
+  remoteInitSql="postgres/chinook_postgres_AutoIncrementPKs.sql"
+  tables={["artist", "album", "track"]}
+  starterCode={`SELECT
+  t.name AS track,
+  ar.name AS artist,
+  t.unit_price
+FROM
+  track t
+  JOIN album a ON a.album_id = t.album_id
+  JOIN artist ar ON ar.artist_id = a.artist_id
+ORDER BY
+  ar.name,
+  t.name
+LIMIT
+  15;`}
+/>
+```

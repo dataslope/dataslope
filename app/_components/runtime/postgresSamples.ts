@@ -7,7 +7,14 @@ import {
 } from "./sqlSamples";
 
 export interface PostgresSampleDatabase extends SqlSampleDatabaseBase {
-  sql: string;
+  /** Inline DDL + seed SQL. Ignored when `remoteSql` is set. */
+  sql?: string;
+  /** Path (inside the dataslope/datasets GitHub repo) or full URL of a
+   *  SQL script that creates *and* populates the database. Fetched from
+   *  raw.githubusercontent.com when the sample is loaded and prepared
+   *  for PGlite (psql meta-commands and CREATE/DROP DATABASE statements
+   *  stripped) — see remoteDatasets.ts and postgres.ts. */
+  remoteSql?: string;
   defaultTabs: QueryTabSeed[];
 }
 
@@ -436,253 +443,36 @@ const CREDIT_CARD_TABS: QueryTabSeed[] = [
   },
 ];
 
-const CHINOOK_SQL = `
-CREATE TABLE artists (artist_id integer PRIMARY KEY, name text NOT NULL);
-CREATE TABLE albums (album_id integer PRIMARY KEY, title text NOT NULL, artist_id integer REFERENCES artists(artist_id));
-CREATE TABLE tracks (
-  track_id integer PRIMARY KEY,
-  name text NOT NULL,
-  album_id integer REFERENCES albums(album_id),
-  genre text,
-  milliseconds integer,
-  unit_price numeric(10,2),
-  duration_seconds numeric(10,1) GENERATED ALWAYS AS (ROUND(milliseconds / 1000.0, 1)) STORED
-);
-CREATE TABLE customers (
-  customer_id integer PRIMARY KEY,
-  first_name text,
-  last_name text,
-  country text,
-  email text,
-  full_name text GENERATED ALWAYS AS (first_name || ' ' || last_name) STORED
-);
-CREATE TABLE invoices (
-  invoice_id integer PRIMARY KEY,
-  customer_id integer REFERENCES customers(customer_id),
-  invoice_date date,
-  billing_country text,
-  total numeric(10,2)
-);
-CREATE TABLE invoice_items (
-  invoice_item_id integer PRIMARY KEY,
-  invoice_id integer REFERENCES invoices(invoice_id),
-  track_id integer REFERENCES tracks(track_id),
-  unit_price numeric(10,2),
-  quantity integer
-);
-CREATE INDEX idx_albums_artist_id ON albums(artist_id);
-CREATE INDEX idx_tracks_album_id ON tracks(album_id);
-CREATE INDEX idx_invoices_customer_id ON invoices(customer_id);
-CREATE INDEX idx_invoice_items_invoice_id ON invoice_items(invoice_id);
-
-INSERT INTO artists VALUES
-  (1,'AC/DC'),(2,'Accept'),(3,'Aerosmith'),(4,'Alanis Morissette'),
-  (5,'Alice In Chains'),(6,'Antônio Carlos Jobim'),(7,'Apocalyptica'),
-  (8,'Audioslave'),(9,'BackBeat'),(10,'Billy Cobham');
-INSERT INTO albums VALUES
-  (1,'For Those About To Rock We Salute You',1),
-  (2,'Balls to the Wall',2),
-  (3,'Restless and Wild',2),
-  (4,'Let There Be Rock',1),
-  (5,'Big Ones',3),
-  (6,'Jagged Little Pill',4),
-  (7,'Facelift',5),
-  (8,'Warner 25 Anos',6),
-  (9,'Plays Metallica By Four Cellos',7),
-  (10,'Audioslave',8);
-INSERT INTO tracks (track_id, name, album_id, genre, milliseconds, unit_price) VALUES
-  (1,'For Those About To Rock (We Salute You)',1,'Rock',343719,0.99),
-  (2,'Put The Finger On You',1,'Rock',205662,0.99),
-  (3,'Let''s Get It Up',1,'Rock',233926,0.99),
-  (4,'Inject The Venom',1,'Rock',210834,0.99),
-  (5,'Snowballed',1,'Rock',203102,0.99),
-  (6,'Balls to the Wall',2,'Rock',342562,0.99),
-  (7,'Fast As a Shark',3,'Rock',230619,0.99),
-  (8,'Restless and Wild',3,'Rock',252051,0.99),
-  (9,'Princess of the Dawn',3,'Rock',375418,0.99),
-  (10,'Go Down',4,'Rock',313398,0.99),
-  (11,'Dream On',5,'Rock',275866,0.99),
-  (12,'Walk This Way',5,'Rock',211098,0.99),
-  (13,'All I Really Want',6,'Rock',284891,0.99),
-  (14,'You Oughta Know',6,'Rock',249234,0.99),
-  (15,'Ironic',6,'Rock',229733,0.99),
-  (16,'Man In The Box',7,'Alternative',286641,0.99),
-  (17,'Them Bones',7,'Alternative',150221,0.99),
-  (18,'Garota De Ipanema',8,'Latin',285673,0.99),
-  (19,'Enter Sandman',9,'Classical',214665,0.99),
-  (20,'Cochise',10,'Alternative',222380,0.99);
-INSERT INTO customers (customer_id, first_name, last_name, country, email) VALUES
-  (1,'Luís','Gonçalves','Brazil','luisg@embraer.com.br'),
-  (2,'Leonie','Köhler','Germany','leonekohler@surfeu.de'),
-  (3,'François','Tremblay','Canada','ftremblay@gmail.com'),
-  (4,'Bjørn','Hansen','Norway','bjorn.hansen@yahoo.no'),
-  (5,'František','Wichterlová','Czech Republic','frantisekw@jetbrains.com'),
-  (6,'Helena','Holý','Czech Republic','hholy@gmail.com'),
-  (7,'Astrid','Gruber','Austria','astrid.gruber@apple.at'),
-  (8,'Daan','Peeters','Belgium','daan_peeters@apple.be'),
-  (9,'Kara','Nielsen','Denmark','kara.nielsen@jubii.dk'),
-  (10,'Eduardo','Martins','Brazil','eduardo@woodstock.com.br');
-INSERT INTO invoices VALUES
-  (1,1,'2023-01-01','Brazil',1.98),
-  (2,2,'2023-01-02','Germany',3.96),
-  (3,3,'2023-01-03','Canada',5.94),
-  (4,4,'2023-01-04','Norway',8.91),
-  (5,5,'2023-01-05','Czech Republic',13.86),
-  (6,6,'2023-02-01','Czech Republic',0.99),
-  (7,7,'2023-02-02','Austria',1.98),
-  (8,8,'2023-02-03','Belgium',3.96),
-  (9,9,'2023-02-04','Denmark',5.94),
-  (10,10,'2023-02-05','Brazil',8.91),
-  (11,1,'2023-03-01','Brazil',13.86),
-  (12,2,'2023-03-02','Germany',0.99),
-  (13,3,'2023-03-03','Canada',1.98),
-  (14,4,'2023-03-04','Norway',7.92),
-  (15,5,'2023-03-05','Czech Republic',1.98);
-INSERT INTO invoice_items VALUES
-  (1,1,1,0.99,1),(2,1,2,0.99,1),
-  (3,2,3,0.99,1),(4,2,4,0.99,1),(5,2,5,0.99,1),(6,2,6,0.99,1),
-  (7,3,7,0.99,1),(8,3,8,0.99,1),(9,3,9,0.99,1),(10,3,10,0.99,1),(11,3,11,0.99,1),(12,3,12,0.99,1),
-  (13,4,13,0.99,1),(14,4,14,0.99,1),(15,4,15,0.99,1),(16,4,16,0.99,1),(17,4,17,0.99,1),(18,4,18,0.99,1),(19,4,19,0.99,1),(20,4,20,0.99,1),(21,4,1,0.99,1),
-  (22,5,2,0.99,1),(23,5,3,0.99,1),(24,5,4,0.99,1),(25,5,5,0.99,1),(26,5,6,0.99,1),(27,5,7,0.99,1),(28,5,8,0.99,1),(29,5,9,0.99,1),(30,5,10,0.99,1),(31,5,11,0.99,1),(32,5,12,0.99,1),(33,5,13,0.99,1),(34,5,14,0.99,1),(35,5,15,0.99,1),
-  (36,6,16,0.99,1),
-  (37,7,17,0.99,1),(38,7,18,0.99,1),
-  (39,8,19,0.99,1),(40,8,20,0.99,1),(41,8,1,0.99,1),(42,8,2,0.99,1),
-  (43,9,3,0.99,1),(44,9,4,0.99,1),(45,9,5,0.99,1),(46,9,6,0.99,1),(47,9,7,0.99,1),(48,9,8,0.99,1),
-  (49,10,9,0.99,1),(50,10,10,0.99,1),(51,10,11,0.99,1),(52,10,12,0.99,1),(53,10,13,0.99,1),(54,10,14,0.99,1),(55,10,15,0.99,1),(56,10,16,0.99,1),(57,10,17,0.99,1),
-  (58,11,18,0.99,1),(59,11,19,0.99,1),(60,11,20,0.99,1),(61,11,1,0.99,1),(62,11,2,0.99,1),(63,11,3,0.99,1),(64,11,4,0.99,1),(65,11,5,0.99,1),(66,11,6,0.99,1),(67,11,7,0.99,1),(68,11,8,0.99,1),(69,11,9,0.99,1),(70,11,10,0.99,1),(71,11,11,0.99,1),
-  (72,12,12,0.99,1),
-  (73,13,13,0.99,1),(74,13,14,0.99,1),
-  (75,14,15,0.99,1),(76,14,16,0.99,1),(77,14,17,0.99,1),(78,14,18,0.99,1),(79,14,19,0.99,1),(80,14,20,0.99,1),(81,14,1,0.99,1),(82,14,2,0.99,1),
-  (83,15,3,0.99,1),(84,15,4,0.99,1);
-
-CREATE VIEW top_genres AS
-  SELECT t.genre, COUNT(*) AS tracks_sold, ROUND(SUM(ii.unit_price * ii.quantity), 2) AS catalog_value
-  FROM tracks t
-  JOIN invoice_items ii ON ii.track_id = t.track_id
-  GROUP BY t.genre;
-CREATE VIEW artist_catalog AS
-  SELECT ar.name AS artist, COUNT(DISTINCT al.album_id) AS album_count,
-         COUNT(t.track_id) AS track_count, ROUND(SUM(t.unit_price), 2) AS catalog_value
-  FROM artists ar
-  LEFT JOIN albums al ON al.artist_id = ar.artist_id
-  LEFT JOIN tracks t ON t.album_id = al.album_id
-  GROUP BY ar.artist_id, ar.name
-  ORDER BY catalog_value DESC;
-`;
+// ────────────────────────────────────────────────────────────────────────
+// Sample 2: chinook.pg — the complete Chinook music store database
+// (v1.4.5, auto-increment PKs variant), fetched from the
+// dataslope/datasets GitHub repo at load time. Table names are
+// snake_case singular: album, artist, track, genre, media_type,
+// playlist, playlist_track, customer, employee, invoice, invoice_line.
+// ────────────────────────────────────────────────────────────────────────
 
 const CHINOOK_TABS: QueryTabSeed[] = [
   {
     title: "Browse tracks",
-    code: `-- Browse the track catalogue\nSELECT t.name, a.title AS album, ar.name AS artist, t.genre\nFROM tracks t\nJOIN albums a ON t.album_id = a.album_id\nJOIN artists ar ON a.artist_id = ar.artist_id\nORDER BY ar.name, a.title\nLIMIT 25;`,
+    code: `-- Browse the track catalogue\nSELECT t.name AS track, a.title AS album, ar.name AS artist, g.name AS genre\nFROM track t\nJOIN album a ON t.album_id = a.album_id\nJOIN artist ar ON a.artist_id = ar.artist_id\nLEFT JOIN genre g ON t.genre_id = g.genre_id\nORDER BY ar.name, a.title\nLIMIT 25;`,
   },
   {
     title: "Top genres",
-    code: `-- Catalogue value by genre\nSELECT *\nFROM top_genres\nORDER BY catalog_value DESC;`,
+    code: `-- Track count and catalogue value by genre\nSELECT g.name AS genre,\n       COUNT(*) AS track_count,\n       ROUND(SUM(t.unit_price), 2) AS catalog_value\nFROM track t\nJOIN genre g ON t.genre_id = g.genre_id\nGROUP BY g.genre_id\nORDER BY catalog_value DESC;`,
   },
   {
     title: "Customer spend",
-    code: `-- Total spend per customer\nSELECT c.first_name || ' ' || c.last_name AS customer,\n       c.country,\n       ROUND(SUM(i.total), 2) AS total_spend\nFROM customers c\nJOIN invoices i ON i.customer_id = c.customer_id\nGROUP BY c.customer_id\nORDER BY total_spend DESC;`,
+    code: `-- Total spend per customer\nSELECT c.first_name || ' ' || c.last_name AS customer,\n       c.country,\n       ROUND(SUM(i.total), 2) AS total_spend\nFROM customer c\nJOIN invoice i ON i.customer_id = c.customer_id\nGROUP BY c.customer_id\nORDER BY total_spend DESC\nLIMIT 20;`,
   },
 ];
 
-const NORTHWIND_SQL = `
-CREATE TABLE customers (customer_id text PRIMARY KEY, company_name text, contact_name text, country text);
-CREATE TABLE employees (employee_id integer PRIMARY KEY, first_name text, last_name text, title text, hire_date date);
-CREATE TABLE products (product_id integer PRIMARY KEY, product_name text, category text, unit_price numeric(10,2), units_in_stock integer, inventory_value numeric(10,2) GENERATED ALWAYS AS (unit_price * units_in_stock) STORED);
-CREATE TABLE orders (
-  order_id integer PRIMARY KEY,
-  customer_id text REFERENCES customers(customer_id),
-  employee_id integer REFERENCES employees(employee_id),
-  order_date date,
-  ship_country text
-);
-CREATE TABLE order_details (
-  order_id integer REFERENCES orders(order_id),
-  product_id integer REFERENCES products(product_id),
-  quantity integer,
-  unit_price numeric(10,2),
-  line_total numeric(10,2) GENERATED ALWAYS AS (quantity * unit_price) STORED,
-  PRIMARY KEY (order_id, product_id)
-);
-CREATE INDEX idx_orders_customer_id ON orders(customer_id);
-CREATE INDEX idx_orders_employee_id ON orders(employee_id);
-CREATE INDEX idx_order_details_product_id ON order_details(product_id);
-
-INSERT INTO customers VALUES
-  ('ALFKI','Alfreds Futterkiste','Maria Anders','Germany'),
-  ('ANATR','Ana Trujillo Emparedados','Ana Trujillo','Mexico'),
-  ('ANTON','Antonio Moreno Taquería','Antonio Moreno','Mexico'),
-  ('AROUT','Around the Horn','Thomas Hardy','UK'),
-  ('BERGS','Berglunds snabbköp','Christina Berglund','Sweden'),
-  ('BLAUS','Blauer See Delikatessen','Hanna Moos','Germany'),
-  ('BLONP','Blondesddsl père et fils','Frédérique Citeaux','France'),
-  ('BOLID','Bólido Comidas preparadas','Martín Sommer','Spain'),
-  ('BONAP','Bon app''','Laurence Lebihan','France'),
-  ('BOTTM','Bottom-Dollar Markets','Elizabeth Lincoln','Canada');
-INSERT INTO employees VALUES
-  (1,'Nancy','Davolio','Sales Representative','1992-05-01'),
-  (2,'Andrew','Fuller','Vice President, Sales','1992-08-14'),
-  (3,'Janet','Leverling','Sales Representative','1992-04-01'),
-  (4,'Margaret','Peacock','Sales Representative','1993-05-03'),
-  (5,'Steven','Buchanan','Sales Manager','1993-10-17');
-INSERT INTO products (product_id, product_name, category, unit_price, units_in_stock) VALUES
-  (1,'Chai','Beverages',18.00,39),
-  (2,'Chang','Beverages',19.00,17),
-  (3,'Aniseed Syrup','Condiments',10.00,13),
-  (4,'Chef Anton''s Cajun Seasoning','Condiments',22.00,53),
-  (5,'Grandma''s Boysenberry Spread','Condiments',25.00,120),
-  (6,'Uncle Bob''s Organic Dried Pears','Produce',30.00,15),
-  (7,'Northwoods Cranberry Sauce','Condiments',40.00,50),
-  (8,'Mishi Kobe Niku','Meat/Poultry',97.00,29),
-  (9,'Ikura','Seafood',31.00,31),
-  (10,'Queso Cabrales','Dairy Products',21.00,30);
-INSERT INTO orders VALUES
-  (10248,'ALFKI',1,'2023-07-04','France'),
-  (10249,'ANATR',2,'2023-07-05','Germany'),
-  (10250,'ANTON',3,'2023-07-08','Brazil'),
-  (10251,'AROUT',4,'2023-07-08','France'),
-  (10252,'BERGS',5,'2023-07-09','Belgium'),
-  (10253,'BLAUS',1,'2023-07-10','Germany'),
-  (10254,'BLONP',2,'2023-07-11','France'),
-  (10255,'BOLID',3,'2023-07-12','Spain'),
-  (10256,'BONAP',4,'2023-07-15','France'),
-  (10257,'BOTTM',5,'2023-07-16','Canada');
-INSERT INTO order_details (order_id, product_id, quantity, unit_price) VALUES
-  (10248,1,12,18.00),
-  (10248,2,10,19.00),
-  (10249,3,5,10.00),
-  (10250,4,9,22.00),
-  (10250,5,35,25.00),
-  (10251,6,6,30.00),
-  (10252,7,40,40.00),
-  (10253,8,20,97.00),
-  (10254,9,15,31.00),
-  (10255,10,25,21.00),
-  (10256,1,5,18.00),
-  (10257,2,4,19.00);
-
-CREATE VIEW order_totals AS
-  SELECT o.order_id, o.order_date, c.company_name, ROUND(SUM(od.quantity * od.unit_price), 2) AS total
-  FROM orders o
-  JOIN customers c ON o.customer_id = c.customer_id
-  JOIN order_details od ON od.order_id = o.order_id
-  GROUP BY o.order_id, o.order_date, c.company_name;
-CREATE VIEW product_revenue AS
-  SELECT p.product_id, p.product_name, p.category, COALESCE(SUM(od.quantity), 0) AS units_sold,
-         ROUND(COALESCE(SUM(od.quantity * od.unit_price), 0), 2) AS revenue
-  FROM products p
-  LEFT JOIN order_details od ON od.product_id = p.product_id
-  GROUP BY p.product_id, p.product_name, p.category;
-CREATE VIEW sales_by_employee AS
-  SELECT e.employee_id, e.first_name || ' ' || e.last_name AS employee, e.title,
-         COUNT(DISTINCT o.order_id) AS order_count,
-         ROUND(SUM(od.quantity * od.unit_price), 2) AS total_sales
-  FROM employees e
-  LEFT JOIN orders o ON o.employee_id = e.employee_id
-  LEFT JOIN order_details od ON od.order_id = o.order_id
-  GROUP BY e.employee_id, e.first_name, e.last_name, e.title
-  ORDER BY total_sales DESC;
-`;
+// ────────────────────────────────────────────────────────────────────────
+// Sample 3: northwind.pg — the classic Northwind database (the
+// pgsql-flavoured port), fetched from the dataslope/datasets GitHub
+// repo at load time. Table names are snake_case plural: categories,
+// customers, employees, order_details, orders, products, region,
+// shippers, suppliers, territories, us_states, …
+// ────────────────────────────────────────────────────────────────────────
 
 const NORTHWIND_TABS: QueryTabSeed[] = [
   {
@@ -691,11 +481,11 @@ const NORTHWIND_TABS: QueryTabSeed[] = [
   },
   {
     title: "Top products",
-    code: `-- Best-selling products by units shipped\nSELECT p.product_name,\n       p.category,\n       SUM(od.quantity) AS units_sold,\n       ROUND(SUM(od.quantity * od.unit_price), 2) AS revenue\nFROM order_details od\nJOIN products p ON od.product_id = p.product_id\nGROUP BY p.product_id, p.product_name, p.category\nORDER BY revenue DESC;`,
+    code: `-- Best-selling products by revenue (after discount)\nSELECT p.product_name,\n       cat.category_name,\n       SUM(od.quantity) AS units_sold,\n       ROUND(SUM(od.unit_price * od.quantity * (1 - od.discount))::numeric, 2) AS revenue\nFROM order_details od\nJOIN products p ON od.product_id = p.product_id\nJOIN categories cat ON p.category_id = cat.category_id\nGROUP BY p.product_id, cat.category_name\nORDER BY revenue DESC\nLIMIT 15;`,
   },
   {
     title: "Order totals",
-    code: `-- Order totals view\nSELECT *\nFROM order_totals\nORDER BY total DESC\nLIMIT 10;`,
+    code: `-- Largest orders by total value\nSELECT o.order_id,\n       o.order_date,\n       c.company_name,\n       ROUND(SUM(od.unit_price * od.quantity * (1 - od.discount))::numeric, 2) AS total\nFROM orders o\nJOIN customers c ON o.customer_id = c.customer_id\nJOIN order_details od ON od.order_id = o.order_id\nGROUP BY o.order_id, c.company_name\nORDER BY total DESC\nLIMIT 10;`,
   },
 ];
 
@@ -712,16 +502,16 @@ export const POSTGRES_SAMPLE_DATABASES: PostgresSampleDatabase[] = [
     id: "chinook",
     label: "Chinook music store",
     filename: "chinook.pg",
-    description: "Artists, albums, tracks, customers, and invoices.",
-    sql: CHINOOK_SQL,
+    description: "The complete Chinook music store: artists, albums, tracks, playlists, customers, and invoices.",
+    remoteSql: "postgres/chinook_postgres_AutoIncrementPKs.sql",
     defaultTabs: CHINOOK_TABS,
   },
   {
     id: "northwind",
     label: "Northwind",
     filename: "northwind.pg",
-    description: "Classic Northwind subset: customers, products, and orders.",
-    sql: NORTHWIND_SQL,
+    description: "The classic Northwind store: customers, products, orders, and suppliers.",
+    remoteSql: "postgres/northwind_postgres.sql",
     defaultTabs: NORTHWIND_TABS,
   },
 ];
