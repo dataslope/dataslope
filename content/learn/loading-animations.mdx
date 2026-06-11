@@ -1,6 +1,6 @@
 ---
 title: Loading Animations
-description: Brand loading animations built from the Dataslope logo — diamond spinners, logo waves, progress bars, and full-surface loading backdrops.
+description: Brand loading animations built from the Dataslope logo — diamond spinners and a rolling logo wave.
 ---
 
 ## Overview
@@ -8,7 +8,7 @@ description: Brand loading animations built from the Dataslope logo — diamond 
 Every animation on this page is built from the Dataslope logo mark (`public/dataslope-logo-blue.svg`) and two facts about its geometry:
 
 - **Diamond.** Stacking the mark on a vertically mirrored copy makes both copies' rounded foot caps coincide, forming a 4-point star whose centre opens into a small **hollow diamond**. The shapes keep the logo's translucent radial gradients, so the four overlapping swooshes show through as lighter petals around that hollow.
-- **Wave.** The two foot caps sit 815.81 logo units apart. Tiling copies horizontally at that step makes adjacent feet coincide, and alternating upright tiles (crests) with exactly mirrored tiles (troughs) produces a **continuous wave** that scrolls seamlessly.
+- **Wave.** The two foot caps sit 815.81 logo units apart. Repeating the gradient mark horizontally at that step makes adjacent feet coincide, and the translucent overlaps show as darker blob accents at each trough — a **continuous rolling wave** that scrolls seamlessly.
 
 All variants draw with `currentColor` (brand blue by default, light/dark aware) and honour `prefers-reduced-motion` by replacing motion with a gentle opacity pulse.
 
@@ -16,13 +16,9 @@ All variants draw with `currentColor` (brand blue by default, light/dark aware) 
 
 <LoadingAnimationsGallery section="spinners" />
 
-## Waves and bars
+## Wave
 
-<LoadingAnimationsGallery section="waves" />
-
-## Full-surface loaders
-
-<LoadingAnimationsGallery section="surfaces" />
+<LoadingAnimationsGallery section="wave" />
 
 ## Using the components
 
@@ -33,22 +29,20 @@ import {
   DiamondSpinner,
   DiamondTurnSpinner,
   DiamondAssembleLoader,
+  DiamondAssembleTurnLoader,
   DiamondRippleLoader,
-  LogoTraceLoader,
   LogoHopLoader,
   LogoWave,
-  LogoWaveBar,
-  SlopeBackdrop,
 } from "@/app/_components/mdx/loadingAnimations";
 
 // Small inline spinner (e.g. beside a status message)
 <DiamondSpinner size={20} />
 
-// Indeterminate progress bar for a runtime download
-<LogoWaveBar width={240} height={10} duration={4.5} />
+// Assemble + half-turn sequence for longer "preparing…" waits
+<DiamondAssembleTurnLoader size={72} />
 
-// Full-surface boot overlay with a status message
-<SlopeBackdrop height={240} message="Setting up the Python runtime…" />
+// Full-width rolling wave band for empty states and panel loading
+<LogoWave height={96} duration={10} />
 ```
 
-Every component accepts a `label` prop for its accessible name (default `"Loading…"`), and the wave variants accept `duration` (seconds per period) so the speed can match the gravity of the wait.
+Every component accepts a `label` prop for its accessible name (default `"Loading…"`); the spinner accepts `duration` (seconds per revolution) and the wave accepts `height` (the band renders aspect-true, so height also sets the crest spacing) and `duration`.

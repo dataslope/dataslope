@@ -15,11 +15,10 @@
  *    Rendered with the logo's own translucent radial gradients, the
  *    four overlapping swooshes show through as lighter petals around
  *    that hollow — this is the brand spinner shape.
- *  - Tiling copies horizontally every 815.81 units (the distance
- *    between the two foot-cap centres) makes adjacent feet coincide,
- *    so upright tiles form a rolling ridgeline — and alternating
- *    upright/mirrored tiles a sine-style wave — with a pattern period
- *    of 1631.62 units.
+ *  - Tiling gradient copies horizontally every 815.81 units (the
+ *    distance between the two foot-cap centres) makes adjacent feet
+ *    coincide; the translucent overlaps show as darker blob accents at
+ *    each trough, producing a rolling wave that scrolls seamlessly.
  *
  * All shapes render with `currentColor`; the CSS module sets the brand
  * blue (light/dark aware) on each wrapper, and honours
@@ -27,8 +26,8 @@
  *
  * Exported pieces:
  *  - <DiamondSpinner />, <DiamondTurnSpinner />, <DiamondAssembleLoader />,
- *    <DiamondRippleLoader />, <LogoTraceLoader />, <LogoHopLoader />
- *  - <LogoWave />, <LogoWaveBar />, <SlopeBackdrop />
+ *    <DiamondAssembleTurnLoader />, <DiamondRippleLoader />, <LogoHopLoader />
+ *  - <LogoWave />
  *  - <LoadingAnimationsGallery section=… /> — the /learn demo grid.
  */
 
@@ -282,36 +281,37 @@ export function DiamondRippleLoader({
   );
 }
 
-/** The mark's outline draws itself on and off, one half after the
- *  other. `pathLength={1}` normalises the dash maths in the CSS. */
-export function LogoTraceLoader({
-  size = 110,
+/** Combined sequence: the halves drift together (assemble), the
+ *  assembled diamond makes an eased half turn, the halves part again,
+ *  and the loop repeats. Rotation lives on the <svg> (whose viewBox is
+ *  vertically symmetric around the diamond's centre, so the element
+ *  centre is the rotation centre) while the translation lives on the
+ *  inner half groups — the two keyframe sets share one 3.6s timeline
+ *  in the CSS. */
+export function DiamondAssembleTurnLoader({
+  size = 64,
   label = "Loading…",
 }: Omit<SpinnerProps, "duration">) {
-  const height = Math.round(size * (LOGO_H / LOGO_W));
+  const gradId = useSafeId("ds-asmturn");
+  const viewH = DIAMOND_H + ASSEMBLE_GAP * 2;
   return (
     <span className={styles.loader} role="img" aria-label={label}>
       <svg
-        viewBox={`0 0 ${LOGO_W} ${LOGO_H}`}
+        viewBox={`0 ${-ASSEMBLE_GAP} ${LOGO_W} ${viewH}`}
         width={size}
-        height={height}
+        height={size}
+        className={styles.comboRotor}
         aria-hidden
       >
-        <path d={LEFT_D} className={styles.traceBase} vectorEffect="non-scaling-stroke" />
-        <path d={RIGHT_D} className={styles.traceBase} vectorEffect="non-scaling-stroke" />
-        <path
-          d={LEFT_D}
-          pathLength={1}
-          className={styles.tracePath}
-          vectorEffect="non-scaling-stroke"
-        />
-        <path
-          d={RIGHT_D}
-          pathLength={1}
-          className={styles.tracePath}
-          style={{ animationDelay: "-1.5s" }}
-          vectorEffect="non-scaling-stroke"
-        />
+        <MarkGradientDefs idPrefix={gradId} />
+        <g className={styles.comboHalf}>
+          <GradientMarkPaths idPrefix={gradId} />
+        </g>
+        <g transform={FLIP_TRANSFORM}>
+          <g className={styles.comboHalf}>
+            <GradientMarkPaths idPrefix={gradId} />
+          </g>
+        </g>
       </svg>
     </span>
   );
@@ -349,115 +349,42 @@ export function LogoHopLoader({
   );
 }
 
-// ─── Waves ─────────────────────────────────────────────────────────────
+// ─── Wave ──────────────────────────────────────────────────────────────
 
-interface WaveSvgProps {
-  /** Wave construction:
-   *  - "ridge": upright mountains tiled side by side (the logo simply
-   *    repeated horizontally) — reads as a rolling ridgeline.
-   *  - "sine": upright crests alternate with vertically mirrored
-   *    troughs for a full sine-style wave (double the vertical span;
-   *    the shared foot caps form slightly thicker knots at the
-   *    inflection points). */
-  variant?: WaveVariant;
-  /** How many full wave periods the viewBox spans (controls how many
-   *  crests are visible at once — more periods = smaller ripples). */
-  periods?: number;
-  /** Seconds to scroll one full period (lower = faster). */
-  duration?: number;
-  /** Negative delay offsets the phase so stacked layers desynchronise. */
-  delay?: number;
-  /** Opacity applied to the whole tile track (overlaps stay seamless
-   *  because the opacity composites after the group is flattened). */
-  trackOpacity?: number;
-}
-
-export type WaveVariant = "ridge" | "sine";
-
-/** Animation 2 (requested): the mark tiled into a continuous wave.
- *  Tiles repeat every TILE_STEP units so neighbouring foot caps
- *  coincide; the track scrolls by exactly one WAVE_PERIOD (= two tile
- *  steps — a whole number of periods for both variants) per loop,
- *  which is what makes the repeat seamless. Rendered with
- *  preserveAspectRatio="none" so callers size the band freely. */
-function WaveSvg({
-  variant = "ridge",
-  periods = 2,
-  duration = 9,
-  delay = 0,
-  trackOpacity = 1,
-}: WaveSvgProps) {
-  const tileId = useSafeId("ds-wave");
-  const width = WAVE_PERIOD * periods;
-  // Tiles must cover the viewBox plus one extra period of scroll range.
-  const tileCount = Math.ceil((width + WAVE_PERIOD) / TILE_STEP) + 1;
-  const tiles: ReactNode[] = [];
-  for (let k = 0; k < tileCount; k++) {
-    const x = k * TILE_STEP;
-    tiles.push(
-      variant === "ridge" || k % 2 === 0 ? (
-        <use key={k} href={`#${tileId}`} x={x} />
-      ) : (
-        // <use> can't mirror, so odd (trough) tiles wrap the reference
-        // in an exact foot-line mirror (no diamond gap here — crest and
-        // trough feet must coincide for the wave to be continuous).
-        <g key={k} transform={`translate(${x} ${MIRROR_H}) scale(1 -1)`}>
-          <use href={`#${tileId}`} />
-        </g>
-      ),
-    );
-  }
-  return (
-    <svg
-      className={styles.waveSvg}
-      viewBox={`0 0 ${width} ${variant === "sine" ? MIRROR_H : LOGO_H}`}
-      preserveAspectRatio="none"
-      aria-hidden
-    >
-      <defs>
-        <g id={tileId}>
-          <path d={LEFT_D} />
-          <path d={RIGHT_D} />
-        </g>
-      </defs>
-      <g
-        className={styles.waveTrack}
-        fill="currentColor"
-        opacity={trackOpacity}
-        style={
-          {
-            "--wave-dur": `${duration}s`,
-            animationDelay: delay ? `${delay}s` : undefined,
-          } as CSSProperties
-        }
-      >
-        {tiles}
-      </g>
-    </svg>
-  );
-}
+/** Widest container (in px) the pre-tiled wave must be able to fill.
+ *  The tile count is derived from this so the band covers any
+ *  realistic surface without runtime measurement. */
+const MAX_WAVE_BAND_PX = 4000;
 
 export interface LogoWaveProps {
-  /** "ridge" (mountains tiled side by side) or "sine" (crests
-   *  alternating with mirrored troughs). */
-  variant?: WaveVariant;
-  /** Band height in px (the wave stretches to fill it). */
+  /** Band height in px. The wave renders aspect-true (no stretching),
+   *  so this also sets the crest-to-crest spacing. */
   height?: number;
-  /** Seconds per period — lower is faster. */
+  /** Seconds per scroll loop (two crests) — lower is faster. */
   duration?: number;
-  /** Wave opacity, for ambient/background bands. */
-  opacity?: number;
   label?: string;
 }
 
-/** A full-width wave band with soft-faded edges. */
+/** Animation 2 (requested): the gradient mark repeated horizontally
+ *  into a rolling wave. Tiles step by TILE_STEP so adjacent foot caps
+ *  coincide, and because the fills keep the logo's translucent radial
+ *  gradients, the doubled foot regions show through as darker blob
+ *  accents at each trough — the stitched-logo look. The svg is sized
+ *  in px (aspect-true) wider than any container and cropped by the
+ *  band, so the blobs stay circular; the track scrolls by exactly two
+ *  tile steps per loop (matching waveScroll in the CSS). */
 export function LogoWave({
-  variant = "ridge",
-  height = 88,
-  duration = 9,
-  opacity = 1,
+  height = 96,
+  duration = 10,
   label = "Loading…",
 }: LogoWaveProps) {
+  const gradId = useSafeId("ds-wave");
+  const tileId = `${gradId}-tile`;
+  const pxPerUnit = height / LOGO_H;
+  // Cover MAX_WAVE_BAND_PX plus one scroll loop of slack.
+  const neededUnits = MAX_WAVE_BAND_PX / pxPerUnit + WAVE_PERIOD;
+  const tileCount = Math.ceil((neededUnits - LOGO_W) / TILE_STEP) + 1;
+  const viewW = (tileCount - 1) * TILE_STEP + LOGO_W;
   return (
     <span
       className={styles.waveBand}
@@ -465,103 +392,29 @@ export function LogoWave({
       role="img"
       aria-label={label}
     >
-      <WaveSvg
-        variant={variant}
-        periods={2}
-        duration={duration}
-        trackOpacity={opacity}
-      />
+      <svg
+        className={styles.waveSvg}
+        viewBox={`0 0 ${viewW} ${LOGO_H}`}
+        width={Math.ceil(viewW * pxPerUnit)}
+        height={height}
+        aria-hidden
+      >
+        <MarkGradientDefs idPrefix={gradId} />
+        <defs>
+          <g id={tileId}>
+            <GradientMarkPaths idPrefix={gradId} />
+          </g>
+        </defs>
+        <g
+          className={styles.waveTrack}
+          style={{ "--wave-dur": `${duration}s` } as CSSProperties}
+        >
+          {Array.from({ length: tileCount }, (_, k) => (
+            <use key={k} href={`#${tileId}`} x={k * TILE_STEP} />
+          ))}
+        </g>
+      </svg>
     </span>
-  );
-}
-
-export interface LogoWaveBarProps {
-  width?: number;
-  height?: number;
-  duration?: number;
-  label?: string;
-}
-
-/** Pill-clipped wave — an indeterminate progress bar. The sine variant
- *  reads best at bar heights: the squashed crest/trough alternation
- *  looks like a flowing squiggle. */
-export function LogoWaveBar({
-  width = 260,
-  height = 14,
-  duration = 5,
-  label = "Loading…",
-}: LogoWaveBarProps) {
-  return (
-    <span
-      className={styles.waveBar}
-      style={{ width, height }}
-      role="img"
-      aria-label={label}
-    >
-      <WaveSvg variant="sine" periods={4} duration={duration} trackOpacity={0.9} />
-    </span>
-  );
-}
-
-// ─── Full-surface backdrop ─────────────────────────────────────────────
-
-export interface SlopeBackdropProps {
-  /** Surface height in px. */
-  height?: number;
-  /** Status message under the spinner (ignored when children given). */
-  message?: string;
-  /** Replaces the default spinner + message centre slot. */
-  children?: ReactNode;
-}
-
-/** A full-surface loading state: three wave layers scroll at different
- *  speeds/opacities (slow in back, fast in front) for a parallax slope,
- *  with a centred spinner and status message. Drop-in for runtime-boot
- *  overlays and route-level suspense fallbacks. */
-export function SlopeBackdrop({
-  height = 240,
-  message = "Loading…",
-  children,
-}: SlopeBackdropProps) {
-  // Ridge variant on purpose: layered rolling slopes, back to front.
-  const layers = [
-    { height: "78%", opacity: 0.14, duration: 30, delay: -11 },
-    { height: "58%", opacity: 0.26, duration: 19, delay: -5 },
-    { height: "42%", opacity: 0.5, duration: 12, delay: 0 },
-  ];
-  return (
-    <div
-      className={styles.backdrop}
-      style={{ height }}
-      role="status"
-      aria-label={message}
-    >
-      <div className={styles.backdropWaves} aria-hidden>
-        {layers.map((layer, i) => (
-          <span
-            key={i}
-            className={styles.backdropLayer}
-            style={{ height: layer.height }}
-          >
-            <WaveSvg
-              variant="ridge"
-              periods={2}
-              duration={layer.duration}
-              delay={layer.delay}
-              trackOpacity={layer.opacity}
-            />
-          </span>
-        ))}
-      </div>
-      <div className={styles.backdropContent}>
-        {children ?? (
-          <>
-            <DiamondSpinner size={40} label="" />
-            <div className={styles.backdropMsg}>{message}</div>
-          </>
-        )}
-      </div>
-    </div>
   );
 }
 
@@ -595,7 +448,7 @@ function DemoCard({
   );
 }
 
-export type GallerySection = "spinners" | "waves" | "surfaces";
+export type GallerySection = "spinners" | "wave";
 
 /** The /learn demo grid. Rendered per section so the MDX page can put
  *  its own (TOC-visible) headings between groups. */
@@ -604,87 +457,16 @@ export default function LoadingAnimationsGallery({
 }: {
   section?: GallerySection;
 }) {
-  if (section === "waves") {
+  if (section === "wave") {
     return (
       <div className={`not-prose ${styles.gallery}`}>
         <DemoCard
           wide
           fill
-          title="Logo wave — ridgeline"
-          blurb="The mountain mark repeated horizontally — adjacent foot caps coincide, so the ridge scrolls seamlessly. Suits empty states and panel-level loading."
+          title="Logo wave"
+          blurb="The gradient mark repeated horizontally — adjacent foot caps coincide, and the translucent overlaps show as darker blob accents at each trough. Scrolls seamlessly; suits empty states and panel-level loading."
         >
-          <LogoWave variant="ridge" height={72} duration={8} />
-        </DemoCard>
-        <DemoCard
-          wide
-          fill
-          title="Logo wave — sine"
-          blurb="Upright crests alternate with vertically mirrored troughs for a full sine-style wave with twice the swing."
-        >
-          <LogoWave variant="sine" height={96} duration={8} />
-        </DemoCard>
-        <DemoCard
-          wide
-          fill
-          title="Ambient wave"
-          blurb="The ridgeline, slower and fainter — an unobtrusive divider or footer treatment for long-running background work."
-        >
-          <LogoWave variant="ridge" height={44} duration={18} opacity={0.35} />
-        </DemoCard>
-        <DemoCard
-          title="Wave progress bar"
-          blurb="The wave clipped to a pill — an indeterminate progress bar for downloads and runtime boots."
-        >
-          <span style={{ display: "inline-flex", flexDirection: "column", gap: 14 }}>
-            <LogoWaveBar width={250} height={14} duration={5} />
-            <LogoWaveBar width={250} height={8} duration={4} />
-          </span>
-        </DemoCard>
-      </div>
-    );
-  }
-
-  if (section === "surfaces") {
-    return (
-      <div className={`not-prose ${styles.gallery}`}>
-        <DemoCard
-          wide
-          fill
-          title="Slope backdrop"
-          blurb="Full-surface loading state: three wave layers scroll at different speeds and opacities for a parallax slope, with a centred spinner and message. Drop-in for runtime-boot overlays and suspense fallbacks."
-        >
-          <SlopeBackdrop height={250} message="Setting up the Python runtime…" />
-        </DemoCard>
-        <DemoCard
-          wide
-          fill
-          title="Slope backdrop — progress variant"
-          blurb="The same surface with a wave progress bar in the centre slot, for boots that report download stages."
-        >
-          <SlopeBackdrop height={200}>
-            <LogoWaveBar width={240} height={10} duration={4.5} />
-            <div className={styles.backdropMsg}>
-              Downloading DuckDB (about 6 MB) — first run only…
-            </div>
-          </SlopeBackdrop>
-        </DemoCard>
-        <DemoCard
-          wide
-          title="Inline boot notice"
-          blurb="A compact row for embedded code blocks: small diamond spinner beside staged boot copy, mirroring the CodeBlock boot notice."
-        >
-          <div className={styles.bootDemo}>
-            <DiamondSpinner size={22} label="" />
-            <span className={styles.bootText}>
-              <span className={styles.bootTitle}>
-                Setting up the Python runtime…
-              </span>
-              <span className={styles.bootHint}>
-                Downloading the Python runtime — this happens once; later runs
-                are instant.
-              </span>
-            </span>
-          </div>
+          <LogoWave height={96} duration={10} />
         </DemoCard>
       </div>
     );
@@ -721,16 +503,34 @@ export default function LoadingAnimationsGallery({
         <DiamondAssembleLoader size={62} />
       </DemoCard>
       <DemoCard
-        title="Logo trace"
-        blurb="The outline of the mark draws itself on and off, one half chasing the other."
+        title="Diamond assemble + half-turn"
+        blurb="The combined sequence: the halves snap together, the assembled diamond makes an eased half turn, then the halves part again and the cycle repeats."
       >
-        <LogoTraceLoader size={120} />
+        <DiamondAssembleTurnLoader size={72} />
       </DemoCard>
       <DemoCard
         title="Logo hop"
         blurb="Three small marks hop in sequence — a typing-indicator-style loader for inline and chat-ish contexts."
       >
         <LogoHopLoader size={28} />
+      </DemoCard>
+      <DemoCard
+        wide
+        title="Inline boot notice"
+        blurb="A compact row for embedded code blocks: small diamond spinner beside staged boot copy, mirroring the CodeBlock boot notice."
+      >
+        <div className={styles.bootDemo}>
+          <DiamondSpinner size={22} label="" />
+          <span className={styles.bootText}>
+            <span className={styles.bootTitle}>
+              Setting up the Python runtime…
+            </span>
+            <span className={styles.bootHint}>
+              Downloading the Python runtime — this happens once; later runs
+              are instant.
+            </span>
+          </span>
+        </div>
       </DemoCard>
     </div>
   );

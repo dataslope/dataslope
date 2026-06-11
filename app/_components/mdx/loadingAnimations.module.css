@@ -114,31 +114,52 @@
   animation: rippleScale 2.1s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
 }
 
-/* ── Logo trace (outline draws itself on and off) ──────────────────────
-   The animated paths set pathLength=1, so dasharray/dashoffset are
-   normalised: offset 1 → invisible, 0 → fully drawn, -1 → erased again. */
+/* ── Diamond assemble + half-turn (one combined timeline) ──────────────
+   Two keyframe sets with EQUAL durations drive one sequence:
+     0–30%   the halves drift together (translation, on the inner groups)
+     30–45%  rest, assembled
+     45–75%  the whole diamond makes an eased half turn (rotation, on
+             the <svg> — the assemble viewBox is vertically symmetric
+             around the diamond's centre, so the element centre is the
+             rotation centre)
+     75–82%  rest
+     82–100% the halves part again
+   The diamond's 2-fold symmetry makes the 180° pose identical to 0°,
+   so the loop is seamless. */
 
-@keyframes drawDash {
-  to {
-    stroke-dashoffset: -1;
+@keyframes comboHalf {
+  0% {
+    transform: translateY(-170px);
+    opacity: 0.45;
+  }
+  30%,
+  82% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-170px);
+    opacity: 0.45;
   }
 }
 
-.traceBase {
-  fill: none;
-  stroke: currentColor;
-  stroke-opacity: 0.16;
-  stroke-width: 1.25;
+@keyframes comboTurn {
+  0%,
+  45% {
+    transform: rotate(0deg);
+  }
+  75%,
+  100% {
+    transform: rotate(180deg);
+  }
 }
 
-.tracePath {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: drawDash 3s linear infinite;
+.comboRotor {
+  animation: comboTurn 3.6s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+
+.comboHalf {
+  animation: comboHalf 3.6s ease-in-out infinite;
 }
 
 /* ── Logo hop (three marks hopping in sequence) ────────────────────── */
@@ -166,9 +187,11 @@
   animation: hop 1.15s ease-in-out infinite;
 }
 
-/* ── Wave (mark tiled into a continuous sine wave) ──────────────────────
-   The track scrolls by exactly one pattern period (two tiles:
-   mountain + mirrored valley = 2 × 815.81 = 1631.62 user units) so the
+/* ── Wave (gradient mark tiled into a rolling wave) ─────────────────────
+   Tiles repeat every 815.81 user units (adjacent foot caps coincide);
+   the translucent gradients let the overlapping feet show through as
+   darker blob accents at each trough. The track scrolls by exactly two
+   tile steps (1631.62 user units — a whole number of periods) so the
    loop is seamless. On SVG elements, CSS `px` equals user units. */
 
 @keyframes waveScroll {
@@ -178,13 +201,14 @@
 }
 
 .waveTrack {
-  animation: waveScroll var(--wave-dur, 9s) linear infinite;
+  animation: waveScroll var(--wave-dur, 10s) linear infinite;
 }
 
+/* The wave svg is sized in px by the component (aspect-true, wider than
+   any container) and cropped by the band, so the foot blobs stay
+   circular instead of stretching. */
 .waveSvg {
   display: block;
-  width: 100%;
-  height: 100%;
 }
 
 .waveBand {
@@ -195,92 +219,21 @@
   -webkit-mask-image: linear-gradient(
     to right,
     transparent,
-    #000 10%,
-    #000 90%,
+    #000 8%,
+    #000 92%,
     transparent
   );
   mask-image: linear-gradient(
     to right,
     transparent,
-    #000 10%,
-    #000 90%,
+    #000 8%,
+    #000 92%,
     transparent
   );
 }
 
 :global(.dark) .waveBand {
   color: var(--ds-blue-400, #5ba7ff);
-}
-
-/* ── Wave progress bar (pill-clipped indeterminate bar) ────────────── */
-
-.waveBar {
-  display: inline-block;
-  overflow: hidden;
-  border-radius: 999px;
-  background: rgba(20, 140, 255, 0.14);
-  background: color-mix(in srgb, var(--ds-blue, #148cff) 14%, transparent);
-  color: var(--ds-blue, #148cff);
-}
-
-:global(.dark) .waveBar {
-  color: var(--ds-blue-400, #5ba7ff);
-}
-
-/* ── Slope backdrop (full-surface loading state) ───────────────────── */
-
-.backdrop {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-  border-radius: 12px;
-  border: 1px solid var(--color-fd-border, rgba(20, 140, 255, 0.18));
-  background: linear-gradient(
-    to bottom,
-    rgba(20, 140, 255, 0.06),
-    rgba(20, 140, 255, 0.012)
-  );
-  color: var(--ds-blue, #148cff);
-}
-
-:global(.dark) .backdrop {
-  background: linear-gradient(
-    to bottom,
-    rgba(91, 167, 255, 0.07),
-    rgba(91, 167, 255, 0.015)
-  );
-  color: var(--ds-blue-400, #5ba7ff);
-}
-
-.backdropWaves {
-  position: absolute;
-  inset: 0;
-}
-
-.backdropLayer {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -1px;
-}
-
-.backdropContent {
-  position: relative;
-  z-index: 1;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-}
-
-.backdropMsg {
-  font-family: var(--font-sans, "Inter", system-ui, sans-serif);
-  font-size: 13.5px;
-  font-weight: 500;
-  letter-spacing: -0.005em;
-  color: var(--color-fd-muted-foreground, #5c6470);
 }
 
 /* ── Inline boot notice demo (CodeBlock-style row) ─────────────────── */
@@ -397,22 +350,16 @@
   .spin,
   .turn,
   .assembleHalf,
+  .comboRotor,
+  .comboHalf,
   .rippleCopy,
   .hopGlyph,
-  .tracePath,
   .waveTrack {
     animation: none;
   }
 
-  /* With drawDash disabled, show the traced outline fully drawn. */
-  .tracePath {
-    stroke-dashoffset: 0;
-  }
-
   .loader,
-  .waveBand,
-  .waveBar,
-  .backdrop {
+  .waveBand {
     animation: rmPulse 2.5s ease-in-out infinite;
   }
 }
