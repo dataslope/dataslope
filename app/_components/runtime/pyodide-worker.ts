@@ -119,19 +119,19 @@ async function ensureMicropipPackages(code: string): Promise<void> {
   }
 }
 
-function isStringArray(v: unknown): v is string[] {
-  return Array.isArray(v) && v.every((x) => typeof x === "string");
-}
-
 interface PyDisplayDataframe { type: "dataframe"; html: string }
 interface PyDisplayHtml { type: "html"; html: string }
 interface PyDisplayImage { type: "image"; data: string }
 interface PyDisplayStdout { type: "stdout"; text: string }
+interface PyDisplayStderr { type: "stderr"; text: string }
+interface PyDisplayPlot { type: "plot"; json: string }
 type PyDisplayOutput =
   | PyDisplayDataframe
   | PyDisplayHtml
   | PyDisplayImage
-  | PyDisplayStdout;
+  | PyDisplayStdout
+  | PyDisplayStderr
+  | PyDisplayPlot;
 
 function isPyDisplayOutputs(v: unknown): v is PyDisplayOutput[] {
   return Array.isArray(v);
@@ -184,6 +184,45 @@ import matplotlib.pyplot as plt
 
 _display_outputs = []
 
+def _pg_emit_text(kind, s):
+    """Append stream text to the ordered output list, merging consecutive
+    writes of the same stream into one segment (print() emits the text and
+    its newline as separate writes)."""
+    if not s:
+        return
+    if _display_outputs and _display_outputs[-1].get("type") == kind:
+        _display_outputs[-1]["text"] += s
+    else:
+        _display_outputs.append({"type": kind, "text": s})
+
+# Tee installed over sys.stdout/sys.stderr while user code runs, so prints
+# land in _display_outputs *in order* with display() tables, figures and
+# charts — print → display(df) → print renders exactly in that sequence,
+# like a notebook.
+class _PgTee(io.TextIOBase):
+    def __init__(self, kind):
+        self._kind = kind
+    def writable(self):
+        return True
+    def write(self, s):
+        _pg_emit_text(self._kind, s)
+        return len(s)
+
+def _ensure_pd_notebook_options(pd):
+    """Pin pandas' Jupyter-style display limits once per session.
+
+    Pyodide is not an IPython session, so pandas falls back to its
+    terminal defaults — display.max_columns resolves to 0 (no limit) and
+    a wide frame renders every column. Pin the notebook default (20) so
+    wide frames middle-truncate with "..." columns; a later explicit
+    pd.set_option(...) by the user still wins because this runs once.
+    """
+    if getattr(pd, "_pg_display_defaults_applied", False):
+        return
+    pd._pg_display_defaults_applied = True
+    if not pd.get_option("display.max_columns"):
+        pd.set_option("display.max_columns", 20)
+
 def _strip_html_styles(h):
     """Remove <style> blocks from HTML to prevent them from overriding playground CSS."""
     return _re.sub(r'<style[^>]*>.*?</style>', '', h, flags=_re.DOTALL)
@@ -192,6 +231,7 @@ def display(*objs):
     import pandas as pd
     import matplotlib.axes
     import matplotlib.figure
+    _ensure_pd_notebook_options(pd)
     for obj in objs:
         if obj is None:
             continue
@@ -226,7 +266,7 @@ def display(*objs):
                 h = _strip_html_styles(h)
                 _display_outputs.append({"type": "html", "html": h})
         else:
-            _display_outputs.append({"type": "stdout", "text": repr(obj)})
+            _pg_emit_text("stdout", repr(obj) + "\\n")
 
 import builtins
 builtins.display = display
@@ -410,22 +450,33 @@ import plotly as _plotly
 import plotly.io as _pio
 _pio.templates.default = "${plotlyDefaultTemplate}"
 
-_plotly_json_outputs = []
 _orig_plotly_show = _plotly.io.show
 
+# Plotly figures land in the same ordered output list as prints and
+# display() tables, so fig.show() keeps its place in the run's output.
 def _patched_plotly_show(fig, *args, **kwargs):
-    _plotly_json_outputs.append(fig.to_json())
+    _display_outputs.append({"type": "plot", "json": fig.to_json()})
 
 _plotly.io.show = _patched_plotly_show
 try:
     import plotly.graph_objects as _go
     _orig_go_show = _go.Figure.show
     def _patched_go_show(self, *args, **kwargs):
-        _plotly_json_outputs.append(self.to_json())
+        _display_outputs.append({"type": "plot", "json": self.to_json()})
     _go.Figure.show = _patched_go_show
 except: pass
 
-await _execute_with_last_display(_user_code_str)
+# Route the user code's stdout/stderr into the ordered output list (see
+# _PgTee) so text interleaves chronologically with tables/figures/charts.
+_pg_prev_stdout, _pg_prev_stderr = sys.stdout, sys.stderr
+sys.stdout, sys.stderr = _PgTee("stdout"), _PgTee("stderr")
+try:
+    await _execute_with_last_display(_user_code_str)
+finally:
+    sys.stdout, sys.stderr = _pg_prev_stdout, _pg_prev_stderr
+    _plotly.io.show = _orig_plotly_show
+    try: _go.Figure.show = _orig_go_show
+    except: pass
 
 # Auto-flush any matplotlib figures that the user did not explicitly show.
 # This handles patterns like df.x.plot.density() which create a figure
@@ -436,44 +487,57 @@ for _fig_num in list(plt.get_fignums()):
     _fig.savefig(_buf, format="png", bbox_inches="tight", dpi=130, facecolor=_fig.get_facecolor())
     _display_outputs.append({"type": "image", "data": base64.b64encode(_buf.getvalue()).decode()})
 plt.close("all")
-
-_plotly.io.show = _orig_plotly_show
-try: _go.Figure.show = _orig_go_show
-except: pass
 `;
 
-  await pyodide.runPythonAsync(wrappedCode);
+  // Post the ordered output stream. Runs in a finally so that output
+  // produced *before* an exception (prints, tables, figures) still
+  // renders — the traceback then follows it, like a notebook.
+  const flushOutputs = () => {
+    if (!pyodide) return;
+    let displayOutputsRaw: unknown;
+    try {
+      const displayProxy = pyodide.globals.get("_display_outputs");
+      displayOutputsRaw = displayProxy.toJs({
+        dict_converter: Object.fromEntries,
+      });
+      displayProxy.destroy();
+    } catch {
+      return;
+    }
 
-  const displayProxy = pyodide.globals.get("_display_outputs");
-  const displayOutputsRaw = displayProxy.toJs({
-    dict_converter: Object.fromEntries,
-  });
-  displayProxy.destroy();
+    // Anything the JS-level capture saw (output emitted outside the
+    // per-run tee window) is posted first — in practice this is the
+    // pre-run package-loader failure note added above.
+    if (stdout.trim()) post({ kind: "output", id, cell: { type: "stdout", content: stdout.trim() } });
+    if (stderr.trim()) post({ kind: "output", id, cell: { type: "stderr", content: stderr.trim() } });
 
-  const plotlyProxy = pyodide.globals.get("_plotly_json_outputs");
-  const plotlyOutputsRaw = plotlyProxy.toJs();
-  plotlyProxy.destroy();
-
-  if (stdout.trim()) post({ kind: "output", id, cell: { type: "stdout", content: stdout.trim() } });
-  if (stderr.trim()) post({ kind: "output", id, cell: { type: "stderr", content: stderr.trim() } });
-
-  if (isPyDisplayOutputs(displayOutputsRaw)) {
+    if (!isPyDisplayOutputs(displayOutputsRaw)) return;
     for (const out of displayOutputsRaw) {
       if (out.type === "dataframe" || out.type === "html") {
         post({ kind: "output", id, cell: { type: "html", content: out.html } });
       } else if (out.type === "image") {
         post({ kind: "output", id, cell: { type: "image", content: out.data } });
-      } else if (out.type === "stdout") {
-        post({ kind: "output", id, cell: { type: "stdout", content: out.text } });
+      } else if (out.type === "stdout" || out.type === "stderr") {
+        const text = out.text.trim();
+        if (text) post({ kind: "output", id, cell: { type: out.type, content: text } });
+      } else if (out.type === "plot") {
+        try {
+          const fig = JSON.parse(out.json) as {
+            data: unknown[];
+            layout?: Record<string, unknown>;
+          };
+          post({ kind: "output", id, cell: { type: "plot", content: out.json, plot: fig } });
+        } catch {
+          /* malformed figure JSON — skip the cell */
+        }
       }
     }
-  }
+  };
 
-  if (isStringArray(plotlyOutputsRaw)) {
-    for (const jsonStr of plotlyOutputsRaw) {
-      const fig = JSON.parse(jsonStr) as { data: unknown[]; layout?: Record<string, unknown> };
-      post({ kind: "output", id, cell: { type: "plot", content: jsonStr, plot: fig } });
-    }
+  try {
+    await pyodide.runPythonAsync(wrappedCode);
+  } finally {
+    flushOutputs();
   }
 }
 

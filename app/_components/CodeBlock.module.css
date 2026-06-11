@@ -141,10 +141,12 @@
   line-height: 1.35;
 }
 
+/* One frame per run. The body is transparent (it sits on the output
+   panel's background) so dataframes, figures, and text read as one
+   continuous output — only the header strip carries a fill. */
 .outCell {
   border-radius: var(--cb-radius);
   overflow: hidden;
-  background: var(--cb-bg2);
   animation: cb-fadeSlide 0.2s ease;
   flex: 0 0 auto;
 }
@@ -162,15 +164,6 @@
 }
 .outCellStderr {
   border-left: 3px solid var(--cb-red);
-}
-.outCellHtml {
-  border-left: 3px solid var(--cb-accent);
-}
-.outCellImage {
-  border-left: 3px solid var(--cb-yellow);
-}
-.outCellPlot {
-  border-left: 3px solid var(--cb-accent);
 }
 
 .outCellHeader {
@@ -222,60 +215,63 @@
   color: var(--cb-red);
 }
 
-/* Cap the body height for visually heavy cells so a giant figure /
-   wide DataFrame / Plotly chart stays inside the page flow but is
-   still fully reachable via a scrollbar. Plain text cells (stdout /
-   stderr) intentionally have no cap so short outputs read inline. */
-.outCellHtml .outCellBody {
-  padding: 0;
-  max-height: 480px;
-  overflow: auto;
+/* ─── Output segments ───
+   One run renders as a single OUTPUT cell whose body stacks segments in
+   chronological order: text, dataframes, figures, charts. stderr mixed
+   into other output reads red inline (a pure-error run gets the
+   .outCellStderr frame instead). Visually heavy segments are
+   height-capped so a giant figure / wide frame stays in the page flow
+   but remains reachable via its own scrollbar. */
+.outSegStderr {
+  color: var(--cb-red);
 }
-.outCellImage .outCellBody {
+.outSegImage {
   text-align: center;
   max-height: 600px;
   overflow: auto;
+  white-space: normal;
 }
-.outCellPlot .outCellBody {
-  padding: 0;
-  max-height: 600px;
-  overflow: auto;
-}
-
-.outCellHtml :global(img),
-.outCellHtml :global(svg) {
+.outSegImage :global(img),
+.outSegImage :global(svg) {
   max-width: 100%;
 }
-
-.outCellPlot :global(.js-plotly-plot) {
+.outSegPlot {
+  max-height: 600px;
+  overflow: auto;
+  white-space: normal;
+}
+.outSegPlot :global(.js-plotly-plot) {
   width: 100%;
 }
 
 /* ─── DataFrame tables ─── */
 
 /* Pandas / polars / R data frames arrive as bare <table> markup (the
-   runtimes strip any injected <style> blocks). Typography: slightly
-   tightened Inter (--font-sans) at a compact size with minimal vertical
-   padding — a Jupyter-style dense table. The table is content-width
-   (like Jupyter), never stretched, and the wrapper scrolls horizontally
-   for wide frames. The wrapper also carries `not-prose` so the docs'
-   prose typography (serif font, table margins, roomy cell padding)
-   can't restyle the cells.
+   runtimes strip any injected <style> blocks). The look mirrors a
+   Jupyter notebook's default dataframe: 600-weight header row and index
+   column, very subtle row striping, right-aligned cells, no cell
+   borders — in slightly tightened Inter (--font-sans) at a compact size
+   with minimal vertical padding. The table is content-width (like
+   Jupyter), never stretched; the wrapper scrolls both axes for big
+   frames. `not-prose` keeps the docs' prose typography (serif font,
+   table margins, roomy cell padding) from restyling the cells.
 
    Selectors use `table th` / `table td` (specificity 0,1,2) so they
    outrank the learn.css prose-typography rules regardless of stylesheet
    order. */
 .dataframeWrap {
-  overflow-x: auto;
-  padding: 10px 12px;
-  /* .outCellBody renders text cells with pre-wrap; the newlines between
-     the tags of pandas' HTML must not become blank lines above/below
-     the table. */
+  overflow: auto;
+  max-height: 480px;
+  padding: 6px 0;
+  /* .outCellBody renders text with pre-wrap; the newlines between the
+     tags of pandas' HTML must not become blank lines above/below the
+     table. */
   white-space: normal;
 }
 
 .dataframeWrap :global(table) {
   border-collapse: collapse;
+  border: none;
   font-family: var(--font-sans, Inter, system-ui, sans-serif);
   letter-spacing: -0.011em;
   font-size: 12.5px;
@@ -283,41 +279,42 @@
   color: var(--cb-text);
   width: auto;
   margin: 0;
-  border: 1px solid var(--cb-border);
 }
 .dataframeWrap :global(table th) {
   padding: 3px 10px;
-  background: var(--cb-bg3);
-  border-bottom: 1px solid var(--cb-border);
-  border-right: 1px solid var(--cb-border);
-  text-align: left;
+  background: transparent;
+  border: none;
+  text-align: right;
   font-weight: 600;
   font-size: 12px;
   line-height: 1.45;
-  color: var(--cb-accent);
+  color: var(--cb-text);
   white-space: nowrap;
+  vertical-align: bottom;
+}
+.dataframeWrap :global(table thead th) {
+  border-bottom: 1px solid var(--cb-border);
 }
 .dataframeWrap :global(table td) {
-  padding: 2px 10px;
-  border-bottom: 1px solid var(--cb-border);
-  border-right: 1px solid var(--cb-border);
+  padding: 3px 10px;
+  border: none;
+  text-align: right;
   white-space: nowrap;
-  color: var(--cb-text-muted);
   /* One enormous value shouldn't blow out its column — clip with an
      ellipsis (pandas itself truncates cell text, R values can be long). */
   max-width: 320px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.dataframeWrap :global(table th:last-child),
-.dataframeWrap :global(table td:last-child) {
-  border-right: none;
+/* Very subtle striping on alternate body rows, like Jupyter. The index
+   <th> cells stripe with their row. */
+.dataframeWrap :global(tbody tr:nth-child(even) td),
+.dataframeWrap :global(tbody tr:nth-child(even) th) {
+  background: color-mix(in srgb, var(--cb-text) 4%, transparent);
 }
-.dataframeWrap :global(tr:hover td) {
-  background: var(--cb-bg3);
-}
-.dataframeWrap :global(tr:last-child td) {
-  border-bottom: none;
+.dataframeWrap :global(tbody tr:hover td),
+.dataframeWrap :global(tbody tr:hover th) {
+  background: color-mix(in srgb, var(--cb-text) 8%, transparent);
 }
 /* Middle-truncation marker cells/columns (R runtime) — pandas renders
    its own "..." cells which inherit the same muted colour. */

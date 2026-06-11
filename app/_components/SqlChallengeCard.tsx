@@ -1775,7 +1775,9 @@ export default function SqlChallengeCard({
                 type="button"
                 className={styles.runBtn}
                 onClick={() => void check()}
-                disabled={isBusy}
+                // Also disabled while the table viewer's first load seeds
+                // the database, so Submit can't race the engine boot.
+                disabled={isBusy || tablesInitializing}
               >
                 {isBusy ? (
                   <svg
@@ -1818,7 +1820,7 @@ export default function SqlChallengeCard({
               <Menu.Root>
                 <Menu.Trigger
                   className={styles.runBtnChevron}
-                  disabled={isBusy}
+                  disabled={isBusy || tablesInitializing}
                   aria-label="More run options"
                   title="More run options"
                 >
@@ -1878,7 +1880,9 @@ export default function SqlChallengeCard({
               type="button"
               className={styles.runBtn}
               onClick={() => void run()}
-              disabled={isBusy}
+              // Also disabled while the table viewer's first load seeds
+              // the database, so Run can't race the engine boot.
+              disabled={isBusy || tablesInitializing}
             >
               {isBusy ? (
                 <svg

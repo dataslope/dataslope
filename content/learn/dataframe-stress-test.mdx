@@ -4,10 +4,11 @@ description: Large pandas and R data frames for verifying Jupyter-style middle t
 ---
 
 This page exists to exercise the DataFrame renderer with outputs that are
-much larger than the usual examples. Every frame below should render as a
-compact, sans-serif (Inter) table with minimal vertical padding, truncated
-in the middle — head rows … tail rows, and head columns … tail columns —
-the way Jupyter notebooks display large frames. Wide tables scroll
+much larger than the usual examples. Every frame below should render in a
+single OUTPUT cell, interleaved with prints in execution order, as a
+compact Jupyter-style table (600-weight header row and index column,
+subtle row striping, no cell borders) truncated in the middle — head rows
+… tail rows, and head columns … tail columns. Wide tables scroll
 horizontally inside the output cell instead of stretching the page.
 
 ## Pandas: 1,000 rows × 41 columns
@@ -15,7 +16,8 @@ horizontally inside the output cell instead of stretching the page.
 Pandas applies its own display limits (`display.max_rows`,
 `display.max_columns`), so `display(df)` shows the first and last five
 rows and the first and last ten columns with `...` markers in between,
-plus a dimensions line below the table.
+plus a dimensions line below the table. The prints before and after the
+`display()` call must surround the table in the output.
 
 <CodeBlock
   adapter="python"
@@ -34,6 +36,7 @@ df["category"] = rng.choice(["alpha", "beta", "gamma", "delta"], size=len(df))
 
 print("Shape:", df.shape)
 display(df)
+print("Printed after the display() call")
 `,
     },
   ]}

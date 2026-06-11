@@ -600,7 +600,9 @@ export default function SqlCodeBlock({
             type="button"
             className={styles.runBtn}
             onClick={() => void run()}
-            disabled={isBusy}
+            // Also disabled while the table viewer's first load seeds the
+            // database, so Run can't race the engine boot.
+            disabled={isBusy || tablesInitializing}
             data-testid="sql-codeblock-run"
           >
             {isBusy ? (

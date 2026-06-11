@@ -11,6 +11,11 @@ export interface OutputCell {
   /** For "plot" cells, the parsed Plotly figure JSON. */
   plot?: PlotlyFigure;
   elapsed: string;
+  /** Identifies the run that produced this cell, so the UI can render
+   *  one merged output frame per run (cells of one run stack inside a
+   *  single OUTPUT cell, notebook-style). Surfaces that clear outputs
+   *  on every run can omit it. */
+  runId?: number;
 }
 
 export interface PlotlyFigure {

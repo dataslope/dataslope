@@ -1409,8 +1409,9 @@
 }
 
 .outCellHtml {
-  /* Wide frames scroll sideways instead of blowing out the card. */
-  overflow-x: auto;
+  /* Big frames scroll inside the cell instead of blowing out the card. */
+  overflow: auto;
+  max-height: 480px;
 }
 
 .outCellHtml :global(img),
@@ -1419,14 +1420,16 @@
 }
 
 /* DataFrame tables — kept in lockstep with `.dataframeWrap` in
-   CodeBlock.module.css: slightly tightened Inter (--font-sans) at a
-   compact size with minimal vertical padding, content-width like a
-   Jupyter table. Semantic --ch-* tokens rebind in dark mode, so no
+   CodeBlock.module.css: the Jupyter-notebook default look (600-weight
+   header row and index column, very subtle row striping, right-aligned
+   cells, no cell borders) in slightly tightened Inter (--font-sans) at
+   a compact size. Semantic --ch-* tokens rebind in dark mode, so no
    separate dark overrides are needed. Selectors use `table th` /
    `table td` (specificity 0,1,2) so they outrank the learn.css
    prose-typography rules regardless of stylesheet order. */
 .outCellHtml :global(table) {
   border-collapse: collapse;
+  border: none;
   font-family: var(--font-sans, Inter, system-ui, sans-serif);
   letter-spacing: -0.011em;
   font-size: 12.5px;
@@ -1434,44 +1437,45 @@
   color: var(--ch-text);
   width: auto;
   margin: 0;
-  border: 1px solid var(--ch-border-light);
 }
 
 .outCellHtml :global(table th) {
   padding: 3px 10px;
-  background: var(--ch-bg-hover);
-  border-bottom: 1px solid var(--ch-border-light);
-  border-right: 1px solid var(--ch-border-light);
-  text-align: left;
+  background: transparent;
+  border: none;
+  text-align: right;
   font-weight: 600;
   font-size: 12px;
   line-height: 1.45;
-  color: var(--ch-accent);
+  color: var(--ch-text);
   white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.outCellHtml :global(table thead th) {
+  border-bottom: 1px solid var(--ch-border-light);
 }
 
 .outCellHtml :global(table td) {
-  padding: 2px 10px;
-  border-bottom: 1px solid var(--ch-border-light);
-  border-right: 1px solid var(--ch-border-light);
+  padding: 3px 10px;
+  border: none;
+  text-align: right;
   white-space: nowrap;
-  color: var(--ch-text-secondary);
   max-width: 320px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.outCellHtml :global(table th:last-child),
-.outCellHtml :global(table td:last-child) {
-  border-right: none;
+/* Very subtle striping on alternate body rows, like Jupyter. The index
+   <th> cells stripe with their row. */
+.outCellHtml :global(tbody tr:nth-child(even) td),
+.outCellHtml :global(tbody tr:nth-child(even) th) {
+  background: color-mix(in srgb, var(--ch-text) 4%, transparent);
 }
 
-.outCellHtml :global(tr:hover td) {
-  background: var(--ch-bg-hover);
-}
-
-.outCellHtml :global(tr:last-child td) {
-  border-bottom: none;
+.outCellHtml :global(tbody tr:hover td),
+.outCellHtml :global(tbody tr:hover th) {
+  background: color-mix(in srgb, var(--ch-text) 8%, transparent);
 }
 
 /* Middle-truncation marker cells/columns (R runtime) — pandas renders

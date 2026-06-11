@@ -1320,15 +1320,14 @@ function CodeBlockInner({
               </span>
             </div>
           )}
-          {outputs.map((cell) => (
-            <OutputCellView
-              key={cell.id}
-              cell={cell}
+          {outputs.length > 0 && (
+            <OutputGroupView
+              cells={outputs}
               onCopy={(content) => {
                 void copyToClipboard(content);
               }}
             />
-          ))}
+          )}
           <RunOverlay active={isBusy} />
         </div>
       )}
@@ -1358,93 +1357,103 @@ async function copyToClipboard(text: string): Promise<void> {
   }
 }
 
-// Cell-type → playground-style header label. Keeping these in sync with
-// `Playground.tsx`'s `typeLabel` map ensures a code block's outputs read
-// identically to the playground's outputs.
-const CELL_TYPE_LABEL: Record<OutputCell["type"], string> = {
-  stdout: "OUTPUT",
-  stderr: "ERROR",
-  html: "DATAFRAME",
-  image: "FIGURE",
-  plot: "CHART",
-};
-
-function OutputCellView({
-  cell,
+/** Renders one run's outputs as a single OUTPUT cell — text, dataframes,
+ *  figures, and charts stacked in chronological order inside one frame,
+ *  the way a notebook shows a cell's output. The frame reads as ERROR
+ *  when the run produced nothing but stderr; stderr mixed into other
+ *  output renders red inline. */
+function OutputGroupView({
+  cells,
   onCopy,
 }: {
-  cell: OutputCell;
+  cells: OutputCell[];
   onCopy: (content: string) => void;
 }) {
-  // Renders text (stdout/stderr), HTML (e.g. dataframes from Python/R),
-  // base64 PNG images (e.g. matplotlib figures), and Plotly figures —
-  // matching what the main playground supports so a code block dropped
-  // into a learning page can show the same dynamic outputs as the
-  // playground itself.
-  const wrapperClass = (() => {
-    switch (cell.type) {
-      case "stderr":
-        return `${styles.outCell} ${styles.outCellStderr}`;
-      case "html":
-        return `${styles.outCell} ${styles.outCellHtml}`;
-      case "image":
-        return `${styles.outCell} ${styles.outCellImage}`;
-      case "plot":
-        return `${styles.outCell} ${styles.outCellPlot}`;
-      default:
-        return `${styles.outCell} ${styles.outCellStdout}`;
-    }
-  })();
-  const headerLabel = CELL_TYPE_LABEL[cell.type];
-  // Only text-ish cells are sensibly copyable. Skipping image/plot
-  // cells avoids exposing the raw base64 PNG / Plotly JSON blob behind
-  // a misleading "Copy" affordance — same rule the playground uses.
-  const isCopyable =
-    cell.type === "stdout" || cell.type === "stderr" || cell.type === "html";
+  const onlyStderr = cells.every((c) => c.type === "stderr");
+  // Only text is sensibly copyable. Skipping image/plot content avoids
+  // dumping a raw base64 PNG / Plotly JSON blob behind a misleading
+  // "Copy" affordance — same rule the playground uses.
+  const copyText = cells
+    .filter((c) => c.type === "stdout" || c.type === "stderr")
+    .map((c) => c.content)
+    .join("\n");
+  // Cells stream in during the run, each stamped with the elapsed time at
+  // its arrival — the last one is the closest to the run's total.
+  const elapsed = cells[cells.length - 1]?.elapsed;
 
   return (
-    <div className={wrapperClass} data-cell-type={cell.type}>
+    <div
+      className={`${styles.outCell} ${onlyStderr ? styles.outCellStderr : styles.outCellStdout}`}
+    >
       <div className={styles.outCellHeader}>
-        <span className={styles.outCellType}>{headerLabel}</span>
-        {cell.elapsed && (
-          <span className={styles.outCellTime}>{cell.elapsed}</span>
-        )}
-        {isCopyable && (
+        <span className={styles.outCellType}>
+          {onlyStderr ? "ERROR" : "OUTPUT"}
+        </span>
+        {elapsed && <span className={styles.outCellTime}>{elapsed}</span>}
+        {copyText.length > 0 && (
           <button
             type="button"
             className={`${styles.iconBtn} ${styles.outCellCopy}`}
             title="Copy output to clipboard"
             aria-label="Copy output to clipboard"
-            onClick={() => onCopy(cell.content)}
+            onClick={() => onCopy(copyText)}
           >
             <CopyIcon />
           </button>
         )}
       </div>
       <div className={styles.outCellBody}>
-        {cell.type === "html" ? (
-          // Same trust assumption as the main playground: HTML cells are
-          // produced by the embedded runtime executing code the user
-          // themselves typed in this very widget. `not-prose` keeps the
-          // docs' prose typography (serif, table margins) from restyling
-          // the dataframe markup when the block sits inside MDX content.
-          <div
-            className={`${styles.dataframeWrap} not-prose`}
-            dangerouslySetInnerHTML={{ __html: cell.content }}
-          />
-        ) : cell.type === "image" ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={`data:image/png;base64,${cell.content}`}
-            alt=""
-            style={{ maxWidth: "100%" }}
-          />
-        ) : cell.type === "plot" && cell.plot ? (
-          <PlotlyChart figure={cell.plot} />
-        ) : (
-          cell.content
-        )}
+        {cells.map((cell) => (
+          <OutputSegment key={cell.id} cell={cell} />
+        ))}
       </div>
+    </div>
+  );
+}
+
+/** One chronological piece of a run's output. Keeps the `data-cell-type`
+ *  attribute the per-cell rendering used to carry, so tests and tooling
+ *  can keep counting stdout/stderr/html/image/plot outputs. */
+function OutputSegment({ cell }: { cell: OutputCell }) {
+  if (cell.type === "html") {
+    // Same trust assumption as the main playground: HTML cells are
+    // produced by the embedded runtime executing code the user
+    // themselves typed in this very widget. `not-prose` keeps the
+    // docs' prose typography (serif, table margins) from restyling
+    // the dataframe markup when the block sits inside MDX content.
+    return (
+      <div
+        className={`${styles.dataframeWrap} not-prose`}
+        data-cell-type="html"
+        dangerouslySetInnerHTML={{ __html: cell.content }}
+      />
+    );
+  }
+  if (cell.type === "image") {
+    return (
+      <div className={styles.outSegImage} data-cell-type="image">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`data:image/png;base64,${cell.content}`}
+          alt=""
+          style={{ maxWidth: "100%" }}
+        />
+      </div>
+    );
+  }
+  if (cell.type === "plot" && cell.plot) {
+    return (
+      <div className={styles.outSegPlot} data-cell-type="plot">
+        <PlotlyChart figure={cell.plot} />
+      </div>
+    );
+  }
+  return (
+    <div
+      className={cell.type === "stderr" ? styles.outSegStderr : undefined}
+      data-cell-type={cell.type}
+    >
+      {cell.content}
     </div>
   );
 }

@@ -789,6 +789,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const [isFormatting, setIsFormatting] = useState(false);
   const [formatPopoverOpen, setFormatPopoverOpen] = useState(false);
   const outputCounter = useRef(0);
+  // Monotonic per-run id stamped on every cell a run appends, so the
+  // output pane can render one merged frame per run (see outputGroups).
+  const runCounter = useRef(0);
   const runtimeRef = useRef<LanguageRuntime | null>(null);
 
   // ─── CodeMirror ─────────────────────────────────────────────────────────
@@ -1708,6 +1711,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     const collected: Omit<OutputCell, "id" | "elapsed">[] = [];
     const firstId = outputCounter.current + 1;
     newRunFirstIdRef.current = firstId;
+    const runId = ++runCounter.current;
 
     // Mirror files the runtime created during the run (e.g. an R
     // download.file() destination) into the Files pane and persist them to
@@ -1802,6 +1806,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           ...c,
           id: ++outputCounter.current,
           elapsed,
+          runId,
         })),
       ]);
       if (collected.length === 0) {
@@ -1825,12 +1830,14 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
           ...c,
           id: ++outputCounter.current,
           elapsed,
+          runId,
         })),
         {
           id: ++outputCounter.current,
           type: "stderr" as const,
           content: msg,
           elapsed,
+          runId,
         },
       ]);
       setStatusState("error");
@@ -2684,20 +2691,25 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // and Escape themselves, so the legacy click-outside effects for the
   // examples / export / info dropdowns are no longer needed.
 
-  const typeLabel: Record<OutputCell["type"], string> = {
-    stdout: "OUTPUT",
-    stderr: "ERROR",
-    html: "DATAFRAME",
-    image: "FIGURE",
-    plot: "CHART",
-  };
-
-  // The output cell shows a copy button only when its content is plain
-  // text or HTML markup that is meaningful to copy. Skipping image/plot
-  // cells avoids exposing the raw base64 PNG / Plotly JSON blob behind a
-  // misleading "Copy" affordance.
-  const isCopyableCell = (cell: OutputCell) =>
-    cell.type === "stdout" || cell.type === "stderr" || cell.type === "html";
+  // One merged output frame per run: cells produced by the same run stack
+  // inside a single OUTPUT cell in chronological order (text, dataframes,
+  // figures, charts), notebook-style. Cells without a runId (defensive —
+  // shouldn't occur) each get their own group.
+  const outputGroups = useMemo(() => {
+    const groups: OutputCell[][] = [];
+    let current: OutputCell[] | null = null;
+    let currentRun: number | undefined;
+    for (const cell of outputs) {
+      if (current && cell.runId !== undefined && cell.runId === currentRun) {
+        current.push(cell);
+      } else {
+        current = [cell];
+        currentRun = cell.runId;
+        groups.push(current);
+      }
+    }
+    return groups;
+  }, [outputs]);
 
   // Rotate through the witty loading messages while the runtime is
   // still initialising. The cadence is intentionally a touch slower than
@@ -3841,9 +3853,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             <div className="pane-bar">
               <span className="pane-label">
                 <Terminal size={12} aria-hidden="true" />
-                {outputs.length === 0
+                {/* Count merged per-run frames, not raw cells. */}
+                {outputGroups.length === 0
                   ? "Output"
-                  : `${outputs.length} ${outputs.length === 1 ? "Output" : "Outputs"}`}
+                  : `${outputGroups.length} ${outputGroups.length === 1 ? "Output" : "Outputs"}`}
               </span>
               <div className="pane-bar-sep" />
               <button
@@ -3865,58 +3878,96 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                   {capabilitiesBlurb && <p>{capabilitiesBlurb}</p>}
                 </div>
               ) : (
-                outputs.map((cell) => (
-                  <div
-                    key={cell.id}
-                    data-cell-id={cell.id}
-                    className={`out-cell ${cell.type}`}
-                  >
-                    <div className="out-cell-header">
-                      <span className="cell-type">{typeLabel[cell.type]}</span>
-                      <span className="cell-time">
-                        <Timer size={12} aria-hidden="true" />
-                        <span>Done in {cell.elapsed}</span>
-                      </span>
-                      {isCopyableCell(cell) && (
-                        <button
-                          type="button"
-                          className="icon-btn out-cell-copy"
-                          title="Copy output to clipboard"
-                          aria-label="Copy output to clipboard"
-                          onClick={() =>
-                            void copyToClipboard(
-                              cell.content,
-                              cell.type === "stderr" ? "Error" : "Output",
-                            )
-                          }
-                        >
-                          <CopyIcon />
-                        </button>
-                      )}
+                outputGroups.map((group) => {
+                  // One frame per run: stderr-only runs read as ERROR;
+                  // stderr mixed into other output renders red inline.
+                  const onlyStderr = group.every((c) => c.type === "stderr");
+                  const copyText = group
+                    .filter(
+                      (c) => c.type === "stdout" || c.type === "stderr",
+                    )
+                    .map((c) => c.content)
+                    .join("\n");
+                  return (
+                    <div
+                      key={group[0].id}
+                      data-cell-id={group[0].id}
+                      className={`out-cell ${onlyStderr ? "stderr" : "stdout"}`}
+                    >
+                      <div className="out-cell-header">
+                        <span className="cell-type">
+                          {onlyStderr ? "ERROR" : "OUTPUT"}
+                        </span>
+                        <span className="cell-time">
+                          <Timer size={12} aria-hidden="true" />
+                          <span>Done in {group[group.length - 1].elapsed}</span>
+                        </span>
+                        {copyText.length > 0 && (
+                          <button
+                            type="button"
+                            className="icon-btn out-cell-copy"
+                            title="Copy output to clipboard"
+                            aria-label="Copy output to clipboard"
+                            onClick={() =>
+                              void copyToClipboard(
+                                copyText,
+                                onlyStderr ? "Error" : "Output",
+                              )
+                            }
+                          >
+                            <CopyIcon />
+                          </button>
+                        )}
+                      </div>
+                      <div className="out-cell-body">
+                        {group.map((cell) =>
+                          cell.type === "image" ? (
+                            <div
+                              key={cell.id}
+                              className="out-seg out-seg-image"
+                              data-cell-type="image"
+                            >
+                              {/* Base64 PNGs from Pyodide/WebR have unknown
+                                  intrinsic dimensions and are not eligible
+                                  for next/image. */}
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={`data:image/png;base64,${cell.content}`}
+                                alt="figure"
+                                onLoad={scrollToLatestOutput}
+                              />
+                            </div>
+                          ) : cell.type === "html" ? (
+                            <div
+                              key={cell.id}
+                              className="dataframe-wrap"
+                              data-cell-type="html"
+                              dangerouslySetInnerHTML={{
+                                __html: cell.content,
+                              }}
+                            />
+                          ) : cell.type === "plot" && cell.plot ? (
+                            <div
+                              key={cell.id}
+                              className="out-seg out-seg-plot"
+                              data-cell-type="plot"
+                            >
+                              <PlotlyChart figure={cell.plot} />
+                            </div>
+                          ) : (
+                            <div
+                              key={cell.id}
+                              className={`out-seg out-seg-${cell.type}`}
+                              data-cell-type={cell.type}
+                            >
+                              {cell.content}
+                            </div>
+                          ),
+                        )}
+                      </div>
                     </div>
-                    <div className="out-cell-body">
-                      {cell.type === "image" ? (
-                        // Base64 PNGs from Pyodide/WebR have unknown intrinsic
-                        // dimensions and are not eligible for next/image.
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={`data:image/png;base64,${cell.content}`}
-                          alt="figure"
-                          onLoad={scrollToLatestOutput}
-                        />
-                      ) : cell.type === "html" ? (
-                        <div
-                          className="dataframe-wrap"
-                          dangerouslySetInnerHTML={{ __html: cell.content }}
-                        />
-                      ) : cell.type === "plot" && cell.plot ? (
-                        <PlotlyChart figure={cell.plot} />
-                      ) : (
-                        <span>{cell.content}</span>
-                      )}
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
             <DataslopeRunOverlay running={statusState === "running"} />
