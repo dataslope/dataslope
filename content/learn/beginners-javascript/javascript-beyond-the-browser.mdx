@@ -3,6 +3,9 @@ title: JavaScript Beyond the Browser
 description: How JavaScript spread from web pages to servers, command-line tools, desktops, phones, and even hardware devices.
 ---
 
+This is the second of the optional "interesting discussions" — a
+tour rather than a lesson, best read with the course behind you.
+
 After Node.js, JavaScript could run *anywhere a runtime could run*.
 And it turned out that with a little effort, a JavaScript runtime
 could be embedded into almost anything. In this page we look at the
@@ -102,8 +105,9 @@ Why JavaScript on the server? A few reasons:
   longer needed two completely different stacks. The same developers
   could move freely between front and back.
 - **Strong asynchronous model.** JavaScript's event-driven design
-  (which we will study in detail later) happens to be very well
-  suited to network servers that handle many connections at once.
+  (which you studied in the runtime chapters) happens to be very
+  well suited to network servers that handle many connections at
+  once.
 - **The npm ecosystem.** Two million ready-made packages is a
   powerful gravitational pull.
 
@@ -170,9 +174,9 @@ JavaScript runtimes have been squeezed into surprising places:
 
 - **Espruino** and **Johnny-Five** let you control microcontrollers,
   LEDs, sensors, and robots using JavaScript.
-- **Hilt and IoT devices** sometimes ship a JavaScript engine
-  (often a small one like **Duktape** or **QuickJS**) so users can
-  script behaviour.
+- **Embedded devices** sometimes ship a small JavaScript engine
+  (such as **Duktape** or **QuickJS** — engines designed to fit in
+  a few hundred kilobytes) so users can script behaviour.
 - **Game engines** sometimes embed JavaScript for scripting game
   rules (similar to how Lua is traditionally used).
 - **Databases** like **MongoDB** use JavaScript as their query and
@@ -182,9 +186,9 @@ JavaScript runtimes have been squeezed into surprising places:
 
 ## The point of this tour
 
-We are not going to *use* most of these environments in this course.
-We are going to focus on the language itself, with a runtime that
-runs JavaScript right in the browser. But it matters that you know:
+This course didn't *use* most of these environments — we focused on
+the language itself, with a runtime that runs JavaScript right in
+the browser. But it matters that you know:
 
 > *Once you really understand JavaScript, you can run useful code
 > almost anywhere — on a website, a server, your laptop's command

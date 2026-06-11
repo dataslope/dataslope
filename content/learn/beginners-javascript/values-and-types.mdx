@@ -157,19 +157,13 @@ The types divide into two large families:
 - **Primitive types**: `number`, `string`, `boolean`, `undefined`,
   `null`, `symbol`, `bigint`. These are *simple* values: small,
   copied by value, and immutable.
-- **Object types**: arrays, plain objects, functions, dates, and
-  more. These are *composite* values: they have parts, they live in
-  the heap, and they are referred to by reference.
+- **Object types**: arrays, plain objects, functions, dates,
+  regexes, `Map`s, `Set`s, and more. These are *composite* values:
+  they have parts, they live in the heap, and they are referred to
+  by reference.
 
 We will spend the next several pages on the primitives, then build
 up to objects later.
-
-Every value falls into one of these two families:
-
-- **Primitives**: `number`, `string`, `boolean`, `null`, `undefined`,
-  `symbol`, `bigint`.
-- **Objects**: plain `{}` objects, `[]` arrays, functions, and the
-  rest (dates, regexes, `Map`s, `Set`s, ...).
 
 ## What "immutable" means for primitives
 

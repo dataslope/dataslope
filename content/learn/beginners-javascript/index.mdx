@@ -53,6 +53,35 @@ amount of code before, you will still benefit, because we focus on
 the *why* and the *mental model*, not just the syntax.
 </Callout>
 
+## Try it — right now
+
+This whole course runs in your browser. The block below is not a
+picture of code; it is a live program. Press **Run** and watch the
+output appear.
+
+<CodeBlock
+  adapter="javascript"
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const name = "world"; // ← 1. change "world" to your name
+const excitement = 1; // ← 2. then try cranking this up to 10
+
+console.log("Hello, " + name + "!".repeat(excitement));
+console.log("You just ran a real JavaScript program.");
+`,
+    },
+  ]}
+/>
+
+Did it print a greeting? Then you have already done the two things
+this course is built around: you ran a program, and — if you
+followed the arrows — you *changed* it and ran it again. Every page
+ahead works like this. The code blocks are all editable, all
+runnable, and breaking them costs nothing: press Run, see what
+happens, edit, repeat. That loop is how programming is actually
+learned.
+
 ## What this course is — and is not
 
 This is a course about **programming**, with JavaScript as the
@@ -106,10 +135,10 @@ The pages are designed to be read in order. Later chapters lean on
 ideas from earlier ones.
 
 ### 1. The story of JavaScript
-Where programming languages came from, why scripting languages
-appeared, how the internet changed software, who created JavaScript
-and why, and how it grew into the most widely used language on the
-planet.
+Two chapters: how programming languages came to exist and how
+Brendan Eich, in ten days, built one for the browser — then how
+that ten-day prototype grew into the most widely used language on
+the planet, and what it is today.
 
 ### 2. Thinking like a programmer
 What it actually means for a computer to "run" a program, how to
@@ -146,7 +175,13 @@ without freezing up.
 Debugging, reading code, organising files, writing code that future
 humans will thank you for.
 
-### 10. Where to go next
+### 10. Interesting discussions
+Two optional deep-dives for the curious: where scripting languages
+came from and why big systems embed small ones, and a tour of the
+surprising places JavaScript runs — desktops, phones, robots,
+databases.
+
+### 11. Where to go next
 A short map of the JavaScript world, and the most useful next steps
 once you finish.
 

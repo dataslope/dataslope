@@ -5,12 +5,7 @@
   "pages": [
     "index",
     "---",
-    "story-of-programming",
-    "rise-of-scripting-languages",
-    "internet-and-interactivity",
     "birth-of-javascript",
-    "ecosystem-explosion",
-    "javascript-beyond-the-browser",
     "javascript-today",
     "---",
     "how-computers-execute-programs",
@@ -45,6 +40,9 @@
     "debugging-and-reasoning",
     "maintainable-code",
     "modular-organization",
+    "---",
+    "scripting-and-glue",
+    "javascript-beyond-the-browser",
     "---",
     "next-steps"
   ]

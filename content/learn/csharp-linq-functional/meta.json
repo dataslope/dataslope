@@ -5,10 +5,7 @@
     "pages": [
         "index",
         "---",
-        "limits-of-imperative",
-        "rise-of-declarative",
         "birth-of-linq",
-        "functional-renaissance",
         "modern-csharp-functional",
         "---",
         "pure-functions",
@@ -32,6 +29,9 @@
         "side-effect-management",
         "---",
         "capstone-data-pipeline",
+        "---",
+        "why-declarative-won",
+        "---",
         "next-steps"
     ]
 }
