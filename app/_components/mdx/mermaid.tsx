@@ -625,10 +625,10 @@ function MermaidContent({ chart }: { chart: string }) {
         data-svg-id={figureId}
         style={{
           fontFamily: "var(--font-sans)",
-          fontSize: "0.6875rem",
-          color: "var(--ds-gray-400, #9CA3AF)",
+          fontSize: "0.8125rem",
+          color: "var(--ds-gray-600, #4B5563)",
           textAlign: "center",
-          marginTop: "0.25rem",
+          marginTop: "0.375rem",
           letterSpacing: "0.025em",
         }}
       >
