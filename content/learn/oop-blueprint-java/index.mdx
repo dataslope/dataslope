@@ -17,6 +17,57 @@ real-world problem — a library, a hospital ward, a vending machine, a
 ride-share system — and **decompose it into a small society of
 collaborating objects**.
 
+## Try it right now
+
+This whole course runs in your browser — every page has live,
+editable Java. Here is the simplest possible object: a `Lamp` that
+can be turned on and off. Press **Run** (the first run takes a moment
+while the JVM boots in your browser), then change `"desk"` to
+`"bedside"`, or add a fourth call like `desk.turnOn();`, and run it
+again.
+
+<CodeBlock
+  adapter="java"
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
+  public static void main(String[] args) {
+    Lamp desk = new Lamp("desk");
+    System.out.println(desk.describe());
+    desk.turnOn();
+    System.out.println(desk.describe());
+    desk.turnOff();
+    System.out.println(desk.describe());
+  }
+}
+
+class Lamp {
+  private final String name;
+  private boolean isOn;
+
+  public Lamp(String name) {
+    this.name = name;
+    this.isOn = false;
+  }
+
+  public void turnOn() { this.isOn = true; }
+  public void turnOff() { this.isOn = false; }
+
+  public String describe() {
+    return name + " lamp is " + (isOn ? "ON" : "off");
+  }
+}
+`,
+    },
+  ]}
+/>
+
+Notice that the lamp keeps its own state (`isOn`) and exposes
+*behavior* (`turnOn`, `turnOff`, `describe`) rather than letting
+outside code touch its fields. That is the seed of every idea in this
+course.
+
 <svg
   viewBox="0 0 640 220"
   role="img"
@@ -129,50 +180,6 @@ visible in the next. This keeps every example self-contained. For a
 persistent multi-file workspace, open the
 [Java Playground](/playground/java) in a new tab.
 </Callout>
-
-## A tiny taste
-
-This is the simplest possible object: a `Lamp` that can be turned on
-and off. Notice that the lamp keeps its own state (`isOn`) and exposes
-*behavior* (`turnOn`, `turnOff`, `describe`) rather than letting outside
-code touch its fields. That is the seed of every idea in this course.
-
-<CodeBlock
-  adapter="java"
-  files={[
-    {
-      filename: "main.java",
-      starterCode: `public class Main {
-  public static void main(String[] args) {
-    Lamp desk = new Lamp("desk");
-    System.out.println(desk.describe());
-    desk.turnOn();
-    System.out.println(desk.describe());
-    desk.turnOff();
-    System.out.println(desk.describe());
-  }
-}
-
-class Lamp {
-  private final String name;
-  private boolean isOn;
-
-  public Lamp(String name) {
-    this.name = name;
-    this.isOn = false;
-  }
-
-  public void turnOn() { this.isOn = true; }
-  public void turnOff() { this.isOn = false; }
-
-  public String describe() {
-    return name + " lamp is " + (isOn ? "ON" : "off");
-  }
-}
-`,
-    },
-  ]}
-/>
 
 ## Course outline
 

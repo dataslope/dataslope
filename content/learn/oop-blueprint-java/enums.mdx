@@ -137,7 +137,10 @@ Three concrete benefits in that small change:
 Java enums are not just integer codes with names. **Each enum
 constant is a full object**, and the enum *type* is a class. That
 means each constant can carry its own state and define its own
-behavior.
+behavior. The example below — planets that each know their own
+surface gravity — is a small classic: it comes from the official
+Java tutorial, written when enums arrived in Java 5 to show that
+this feature was something far richer than C's integer enums.
 
 ```mermaid
 classDiagram

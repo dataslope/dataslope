@@ -72,7 +72,10 @@ include what we now call **classes** and **objects**, along with
 **inheritance** and **virtual methods**. Long before anyone was
 philosophizing about software design, Simula was already organized
 this way because it was the obviously-correct way to write
-simulations.
+simulations. The field eventually recognized what Dahl and Nygaard
+had done: in 2001 they shared the **Turing Award** — computing's
+Nobel Prize — for inventing the concepts on which this entire course
+is built.
 
 ```mermaid
 flowchart LR
@@ -101,6 +104,16 @@ In Smalltalk, even a number like `3` is an object. When you write
 `3 + 4`, you are *sending the message* `+ 4` to the object `3`. The
 object decides how to respond. This may sound abstract, but it is
 exactly the mental model we will use for Java in this course.
+
+The metaphor behind it came from outside computing. Kay had studied
+molecular biology before computer science, and he described imagining
+objects as **biological cells**: each cell is sealed inside its
+membrane, carries its own machinery, and interacts with other cells
+only by passing chemical messages across that membrane. No cell
+reaches inside another. Scale that picture up — trillions of simple,
+encapsulated units producing a functioning organism — and you have
+Kay's vision of how software should be built. (Kay received the
+Turing Award in 2003 for this body of work.)
 
 Kay later said he regretted the name *object-oriented programming*.
 He felt the important word was **messaging**, not *objects*. The
