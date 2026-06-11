@@ -19,7 +19,8 @@ The goal: the course should read like a well-written, genuinely interesting
 technical book — think *Code* by Charles Petzold, not API documentation —
 while taking full advantage of the platform's interactive widgets. Work
 through **every page**. This is a real editing pass, not a light proofread:
-restructure, rewrite, expand, and trim as needed.
+restructure, rewrite, expand, trim, and add pages as needed. You have broad
+license to make changes throughout the course.
 
 ## Before you edit anything
 
@@ -36,8 +37,9 @@ restructure, rewrite, expand, and trim as needed.
 ## How a course is put together
 
 - `meta.json` — `title`, `description`, and `pages`: an ordered list of page
-  slugs with `"---"` entries as section separators. Update it whenever you
-  add, remove, merge, or reorder pages.
+  slugs with `"---"` entries as section separators (see directive 7 — plain
+  `"---"` only). Update it whenever you add, remove, merge, or reorder
+  pages.
 - One `.mdx` file per page, with `title` and `description` frontmatter.
   `index.mdx` is the welcome page.
 - Widgets are JSX components. Code is passed as JS template literals, so
@@ -152,6 +154,22 @@ directive 3. These courses are designed to be *read* like a book, with
 interaction woven in — every widget deserves narrative context. There is no
 fixed word count, but a page whose prose takes under two minutes to read is
 almost certainly too thin.
+
+### 7. Add pages where the course needs them, and keep `meta.json` tidy
+
+You are not limited to the existing set of pages.
+
+- **Add new pages** wherever the narrative calls for one: a page that is
+  trying to teach two big ideas and should be split, a missing
+  stepping-stone between two topics, or the "Interesting discussions"
+  section from directive 2. Create the `.mdx` file with `title` and
+  `description` frontmatter, give it a kebab-case slug consistent with its
+  neighbors, and insert it at the right spot in `meta.json`.
+- **Use only plain `"---"` separators** in `meta.json`. Some courses use
+  labeled separators such as `"---The Time Dimension---"`; replace every
+  labeled separator with a plain `"---"`, keeping the grouping itself
+  intact. Section identity should come from page titles and narrative
+  flow, not separator labels.
 
 ## Don't
 
