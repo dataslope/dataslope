@@ -30,7 +30,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { RotateCcw, Check, X, ChevronDown, ChevronUp, Eye, File, FileInput, Info, Play, Terminal } from "lucide-react";
+import { RotateCcw, Check, CheckCheck, ListChecks, ListX, X, ChevronDown, ChevronUp, Eye, File, FileInput, Info, Play, Terminal, Timer } from "lucide-react";
 import { Menu } from "@base-ui-components/react/menu";
 import {
   CopyIcon,
@@ -41,6 +41,7 @@ import {
   ChallengeToastViewport,
   useIsDark,
   cmThemeNameFor,
+  TestResultsRail,
 } from "./challengeShared";
 import { EditorState, Compartment } from "@codemirror/state";
 import {
@@ -83,6 +84,7 @@ import {
   isNativeTest,
   isStdoutTest,
   parseHarnessOutput,
+  stdoutExpectSummary,
   type ChallengeTest,
   type ParsedTestResult,
 } from "./challengeHarness";
@@ -1398,6 +1400,17 @@ export default function ChallengeCard({
   }, [adapter, toasts]);
 
   const isBusy = status === "loading" || status === "running";
+
+  // Code (or a readable summary of a declarative stdout expectation) per
+  // test id, surfaced by the test-details popover in the results rail.
+  const testCodeById = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const t of tests) {
+      if (isNativeTest(t)) m.set(t.id, t.code);
+      else if (isStdoutTest(t)) m.set(t.id, stdoutExpectSummary(t.expect));
+    }
+    return m;
+  }, [tests]);
   const passedCount = testResults.filter((t) => t.state === "pass").length;
   const totalTests = testResults.length;
   const allPassed = totalTests > 0 && passedCount === totalTests;
@@ -1861,7 +1874,12 @@ export default function ChallengeCard({
               data-error={outputs.some((c) => c.type === "stderr")}
             />
             <span className={styles.outputLabel}>Output</span>
-            {elapsed && <span className={styles.outputTime}>{elapsed}</span>}
+            {elapsed && (
+              <span className={styles.outputTime}>
+                <Timer size={12} aria-hidden="true" />
+                {elapsed}
+              </span>
+            )}
           </div>
           {outputs.length === 0 ? (
             <div className={styles.outputEmpty}>Running…</div>
@@ -1885,18 +1903,20 @@ export default function ChallengeCard({
             onClick={() => setTestListOpen((v) => !v)}
             aria-expanded={testListOpen}
           >
-            <span className={styles.testLabel}>Test Results</span>
+            <span className={styles.testLabel} data-state={summaryState}>
+              Test Results
+            </span>
             <div className={styles.testSummary}>
               <span className={styles.testPill} data-state={summaryState}>
                 {summaryState === "pending" ? (
                   "Running…"
                 ) : summaryState === "pass" ? (
                   <>
-                    <Check size={10} strokeWidth={3} aria-hidden /> {passedCount}/{totalTests} passed
+                    <ListChecks size={11} strokeWidth={2.5} aria-hidden /> {passedCount}/{totalTests} passed
                   </>
                 ) : (
                   <>
-                    <X size={10} strokeWidth={3} aria-hidden /> {passedCount}/{totalTests} passed
+                    <ListX size={11} strokeWidth={2.5} aria-hidden /> {passedCount}/{totalTests} passed
                   </>
                 )}
               </span>
@@ -1910,38 +1930,12 @@ export default function ChallengeCard({
             />
           </button>
           {testListOpen && (
-            <div className={styles.testList}>
-              {testResults.map((t) => (
-                <div key={t.id} className={styles.testItem}>
-                  <div className={styles.testIcon} data-state={t.state}>
-                    {t.state === "pass" ? (
-                      <Check size={9} strokeWidth={3} aria-hidden />
-                    ) : t.state === "fail" ? (
-                      <X size={9} strokeWidth={3} aria-hidden />
-                    ) : (
-                      <svg
-                        width="9"
-                        height="9"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        aria-hidden
-                      >
-                        <circle cx="12" cy="12" r="5" />
-                      </svg>
-                    )}
-                  </div>
-                  <div className={styles.testItemBody}>
-                    <div className={styles.testItemName}>{t.name}</div>
-                    {t.description && <div className={styles.testItemDesc}>{t.description}</div>}
-                    {t.state === "fail" && t.detail && (
-                      <div className={styles.testItemDetail}>{t.detail}</div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <TestResultsRail
+              tests={testResults.map((t) => ({
+                ...t,
+                code: testCodeById.get(t.id),
+              }))}
+            />
           )}
         </div>
       )}
@@ -1953,28 +1947,19 @@ export default function ChallengeCard({
           data-state={bannerState}
           data-testid="challenge-banner"
         >
-          <div className={styles.bannerIcon}>
-            {bannerState === "pass" ? (
-              <Check size={14} strokeWidth={2.5} aria-hidden />
-            ) : (
-              <X size={14} strokeWidth={2.5} aria-hidden />
-            )}
-          </div>
           {bannerState === "pass" ? (
-            <span>
-              All tests passed!{" "}
-              <span className={styles.bannerSub}>
-                Great work — your solution is correct.
-              </span>
-            </span>
+            <>
+              <CheckCheck size={16} strokeWidth={2.5} aria-hidden />
+              <span>All tests passed!</span>
+            </>
           ) : (
-            <span>
-              {totalTests - passedCount} test
-              {totalTests - passedCount === 1 ? "" : "s"} failed{" "}
-              <span className={styles.bannerSub}>
-                — review the details and try again.
+            <>
+              <X size={16} strokeWidth={2.5} aria-hidden />
+              <span>
+                {totalTests - passedCount} test
+                {totalTests - passedCount === 1 ? "" : "s"} failed
               </span>
-            </span>
+            </>
           )}
         </div>
       )}
@@ -2211,7 +2196,10 @@ function OutputCellView({ cell }: { cell: OutputCell }) {
   if (cell.type === "html") {
     return (
       <div
-        className={styles.outCellHtml}
+        // `not-prose` keeps the docs' prose typography (serif font,
+        // table margins) from restyling the dataframe markup when the
+        // card sits inside MDX content.
+        className={`${styles.outCellHtml} not-prose`}
         // Same trust assumption as the playground / code block: HTML
         // cells originate from code the user typed in this very widget.
         dangerouslySetInnerHTML={{ __html: cell.content }}

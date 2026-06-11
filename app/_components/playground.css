@@ -1381,20 +1381,14 @@ body.playground-active {
   flex-shrink: 0;
 }
 
+/* One frame per run: stderr-only runs read as ERROR (red edge); runs with
+   any other output read as OUTPUT (green edge) and render stderr text red
+   inline via .out-seg-stderr. */
 .out-cell.stdout {
   border-left: 3px solid var(--green);
 }
 .out-cell.stderr {
   border-left: 3px solid var(--red);
-}
-.out-cell.html {
-  border-left: 3px solid var(--primary);
-}
-.out-cell.plot {
-  border-left: 3px solid var(--yellow);
-}
-.out-cell.image {
-  border-left: 3px solid var(--yellow);
 }
 
 .out-cell-body {
@@ -1418,86 +1412,118 @@ body.playground-active {
   word-break: break-word;
 }
 
-/* DataFrame tables */
-.out-cell.html .out-cell-body {
-  overflow-x: auto;
-  padding: 0;
+/* ─── Output segments ───
+   One run renders as a single OUTPUT cell whose body stacks segments in
+   chronological order: text, dataframes, figures, charts — notebook
+   style. Visually heavy segments are height-capped so a giant figure /
+   frame stays in the page flow but remains reachable via its own
+   scrollbar. */
+.out-seg-stderr {
+  color: var(--red);
 }
-.dataframe-wrap {
-  overflow-x: auto;
-  padding: 12px;
-}
-
-.out-cell.html table {
-  border-collapse: collapse;
-  font-family: var(--font-mono);
-  font-size: 12.5px;
-  color: var(--text);
-  width: 100%;
-  min-width: max-content;
-}
-.out-cell.html th {
-  padding: 7px 14px;
-  background: var(--bg3);
-  border-bottom: 1px solid var(--border);
-  border-right: 1px solid var(--border);
-  text-align: left;
-  font-weight: 600;
-  color: var(--primary);
-  white-space: nowrap;
-}
-.out-cell.html td {
-  padding: 6px 14px;
-  border-bottom: 1px solid var(--border);
-  border-right: 1px solid var(--border);
-  white-space: nowrap;
-  color: var(--text-muted);
-}
-.out-cell.html tr:hover td {
-  background: var(--bg3);
-}
-.out-cell.html tr:last-child td {
-  border-bottom: none;
-}
-/* Ellipsis row shown when a data frame is truncated (R runtime). */
-.out-cell.html .dataframe-ellipsis-row td {
+.out-seg-image {
   text-align: center;
-  color: var(--text-dim);
-  letter-spacing: 0.15em;
-  background: var(--bg2);
+  white-space: normal;
+  max-height: 600px;
+  overflow: auto;
 }
-/* Footer row that states total row count for truncated data frames. */
-.out-cell.html .dataframe-rows-footer {
-  padding: 5px 14px;
-  font-size: 11.5px;
-  color: var(--text-dim);
-  font-style: italic;
-  text-align: right;
-  border-top: 1px solid var(--border);
-  border-right: none;
+.out-seg-image img {
+  max-width: 100%;
+  border-radius: 4px;
 }
-/* tfoot inherits the last-child no-border rule — override so the footer
-   cell keeps its top border. */
-.out-cell.html tfoot tr:last-child td {
-  border-bottom: none;
-}
-
-/* Plotly chart */
-.out-cell.plot .out-cell-body {
-  padding: 0;
+.out-seg-plot {
+  white-space: normal;
+  max-height: 600px;
+  overflow: auto;
 }
 .plotly-chart {
   width: 100%;
   height: 380px;
 }
 
-/* Matplotlib / R image */
-.out-cell.image .out-cell-body {
-  text-align: center;
+/* DataFrame tables — kept in lockstep with `.dataframeWrap` in
+   CodeBlock.module.css and `.outCellHtml` in ChallengeCard.module.css:
+   the Jupyter-notebook default look (600-weight header row and index
+   column, very subtle row striping, right-aligned cells, no cell
+   borders) in slightly tightened Inter (--font-sans) at a compact size.
+   Content-width like Jupyter, never stretched; the wrapper scrolls both
+   axes for big frames. */
+.dataframe-wrap {
+  overflow: auto;
+  max-height: 480px;
+  padding: 6px 0;
+  /* The merged output body renders text with pre-wrap — the newlines
+     between the tags of pandas' HTML must not become blank lines. */
+  white-space: normal;
 }
-.out-cell.image img {
-  max-width: 100%;
-  border-radius: 4px;
+
+.dataframe-wrap table {
+  border-collapse: collapse;
+  border: none;
+  font-family: var(--font-sans, Inter, system-ui, sans-serif);
+  letter-spacing: -0.011em;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text);
+  width: auto;
+  margin: 0;
+}
+.dataframe-wrap th {
+  padding: 3px 10px;
+  background: transparent;
+  border: none;
+  text-align: right;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--text);
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+.dataframe-wrap thead th {
+  border-bottom: 1px solid var(--border);
+}
+.dataframe-wrap td {
+  padding: 3px 10px;
+  border: none;
+  text-align: right;
+  white-space: nowrap;
+  /* One enormous value shouldn't blow out its column. */
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Very subtle striping on alternate body rows, like Jupyter. The index
+   <th> cells stripe with their row. */
+.dataframe-wrap tbody tr:nth-child(even) td,
+.dataframe-wrap tbody tr:nth-child(even) th {
+  background: color-mix(in srgb, var(--text) 4%, transparent);
+}
+.dataframe-wrap tbody tr:hover td,
+.dataframe-wrap tbody tr:hover th {
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+}
+/* Middle-truncation marker cells/columns (R runtime) — pandas renders
+   its own "..." cells which inherit the same muted colour. */
+.dataframe-wrap .dataframe-ellipsis-row td,
+.dataframe-wrap .dataframe-ellipsis-col {
+  text-align: center;
+  color: var(--text-dim);
+}
+/* Footer row that states the full row/column count for truncated frames. */
+.dataframe-wrap .dataframe-rows-footer {
+  padding: 4px 10px;
+  font-family: var(--font-inter, var(--font-sans, Inter, system-ui, sans-serif));
+  font-size: 14px;
+  color: var(--text-dim);
+  text-align: right;
+  border-top: 1px solid var(--border);
+}
+/* Dimensions line pandas appends below a truncated frame. */
+.dataframe-wrap p {
+  margin: 6px 0 0;
+  font-family: var(--font-inter, var(--font-sans, Inter, system-ui, sans-serif));
+  font-size: 14px;
+  color: var(--text-dim);
 }
 
 /* Clear button — uses a subtle border that blends with the pane bar

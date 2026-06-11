@@ -621,11 +621,17 @@ async function imageBitmapToPngBase64(bmp: ImageBitmap): Promise<string> {
 const R_MAX_DISPLAY_ROWS = 20;
 const R_HEAD_ROWS = 10;
 const R_TAIL_ROWS = 5;
+// Column-display limits (Jupyter/pandas-style): a frame wider than MAX
+// columns shows the first HEAD and last TAIL columns with an ellipsis
+// column between, so very wide frames stay scannable.
+const R_MAX_DISPLAY_COLS = 20;
+const R_HEAD_COLS = 10;
+const R_TAIL_COLS = 10;
 
 function dataFrameToHtml(rows: Record<string, unknown>[]): string | null {
   if (rows.length === 0) return null;
-  const cols = Object.keys(rows[0] ?? {});
-  if (cols.length === 0) return null;
+  const allCols = Object.keys(rows[0] ?? {});
+  if (allCols.length === 0) return null;
   const escape = (v: unknown): string => {
     const s = v === null || v === undefined ? "" : String(v);
     return s
@@ -633,14 +639,33 @@ function dataFrameToHtml(rows: Record<string, unknown>[]): string | null {
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
   };
-  const head = cols.map((c) => `<th>${escape(c)}</th>`).join("");
 
   const totalRows = rows.length;
-  const truncated = totalRows > R_MAX_DISPLAY_ROWS;
+  const totalCols = allCols.length;
+  const rowsTruncated = totalRows > R_MAX_DISPLAY_ROWS;
+  const colsTruncated = totalCols > R_MAX_DISPLAY_COLS;
 
-  // Build the list of rows to render: real rows or null (= ellipsis row).
+  // Columns to render: real names or null (= the "⋯" marker column).
+  type DisplayCol = string | null;
+  const displayCols: DisplayCol[] = colsTruncated
+    ? [
+        ...allCols.slice(0, R_HEAD_COLS),
+        null,
+        ...allCols.slice(totalCols - R_TAIL_COLS),
+      ]
+    : allCols;
+
+  const head = displayCols
+    .map((c) =>
+      c === null
+        ? '<th class="dataframe-ellipsis-col">&#x22EF;</th>'
+        : `<th>${escape(c)}</th>`,
+    )
+    .join("");
+
+  // Rows to render: real rows or null (= ellipsis row).
   type DisplayRow = Record<string, unknown> | null;
-  const displayRows: DisplayRow[] = truncated
+  const displayRows: DisplayRow[] = rowsTruncated
     ? [
         ...rows.slice(0, R_HEAD_ROWS),
         null,
@@ -651,19 +676,33 @@ function dataFrameToHtml(rows: Record<string, unknown>[]): string | null {
   const body = displayRows
     .map((r) => {
       if (r === null) {
-        return `<tr class="dataframe-ellipsis-row">${cols
+        return `<tr class="dataframe-ellipsis-row">${displayCols
           .map(() => "<td>&#x22EF;</td>")
           .join("")}</tr>`;
       }
-      return `<tr>${cols.map((c) => `<td>${escape(r[c])}</td>`).join("")}</tr>`;
+      return `<tr>${displayCols
+        .map((c) =>
+          c === null
+            ? '<td class="dataframe-ellipsis-col">&#x22EF;</td>'
+            : `<td>${escape(r[c])}</td>`,
+        )
+        .join("")}</tr>`;
     })
     .join("");
 
-  const footer = truncated
-    ? `<tfoot><tr><td colspan="${cols.length}" class="dataframe-rows-footer">` +
-      `Showing ${R_HEAD_ROWS + R_TAIL_ROWS} of ${totalRows} rows` +
-      `</td></tr></tfoot>`
-    : "";
+  const footerParts: string[] = [];
+  if (rowsTruncated) {
+    footerParts.push(`${R_HEAD_ROWS + R_TAIL_ROWS} of ${totalRows} rows`);
+  }
+  if (colsTruncated) {
+    footerParts.push(`${R_HEAD_COLS + R_TAIL_COLS} of ${totalCols} columns`);
+  }
+  const footer =
+    footerParts.length > 0
+      ? `<tfoot><tr><td colspan="${displayCols.length}" class="dataframe-rows-footer">` +
+        `Showing ${footerParts.join(" · ")}` +
+        `</td></tr></tfoot>`
+      : "";
 
   return `<table class="dataframe"><thead><tr>${head}</tr></thead><tbody>${body}</tbody>${footer}</table>`;
 }

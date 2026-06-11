@@ -33,6 +33,7 @@
     "---",
     "multiple-choice",
     "mermaid-test",
-    "loading-animations"
+    "loading-animations",
+    "dataframe-stress-test"
   ]
 }

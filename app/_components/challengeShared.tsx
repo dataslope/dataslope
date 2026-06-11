@@ -217,3 +217,119 @@ export function useShortId(prefix: string): string {
   const suffix = h.toString(16).slice(0, 4).padStart(4, "0");
   return `${prefix}-${suffix}`;
 }
+
+// ─── Test results rail ───────────────────────────────────────────────
+// Shared by `<ChallengeCard>` and `<SqlChallengeCard>`: a minimal
+// pass/fail readout. A vertical rail runs down the left; each test is a
+// circle on the rail — green (--ds-green-500) with a white check for a
+// pass, red (--ds-red-500) with a white ✕ for a fail — and the rail
+// segment below each circle is painted in that test's colour. Rows are
+// just the test name; the description, the test's code/checks, and the
+// exact error message live in a click-popover so the list stays clean.
+
+import { Info } from "lucide-react";
+import { Popover } from "@base-ui-components/react/popover";
+import railStyles from "./ChallengeCard.module.css";
+
+export interface TestRailEntry {
+  id: string;
+  name: string;
+  description?: string | null;
+  state: "pass" | "fail" | "pending";
+  detail?: string | null;
+  /** Code (or a readable summary of declarative checks) shown in the
+   *  details popover under `codeLabel`. */
+  code?: string;
+}
+
+const TEST_STATE_LABEL: Record<TestRailEntry["state"], string> = {
+  pass: "Passed",
+  fail: "Failed",
+  pending: "Pending",
+};
+
+export function TestResultsRail({
+  tests,
+  codeLabel = "Test code",
+}: {
+  tests: TestRailEntry[];
+  /** Heading for the code section of the popover (e.g. "Checks" for
+   *  SQL's declarative expectations). */
+  codeLabel?: string;
+}) {
+  return (
+    <div className={railStyles.testRail}>
+      {tests.map((t, i) => (
+        <div key={t.id} className={railStyles.testRailRow}>
+          <div className={railStyles.testRailTrack} aria-hidden>
+            <span className={railStyles.testRailNode} data-state={t.state}>
+              {/* Failures keep the ✕ for emphasis; passing/pending
+                  circles carry the 1-based test number. */}
+              {t.state === "fail" ? (
+                <X size={11} strokeWidth={3.2} aria-hidden />
+              ) : (
+                i + 1
+              )}
+            </span>
+            {i < tests.length - 1 && (
+              <span className={railStyles.testRailSeg} data-state={t.state} />
+            )}
+          </div>
+          <Popover.Root>
+            <Popover.Trigger
+              className={railStyles.testRailItemBtn}
+              aria-label={`${t.name} — ${TEST_STATE_LABEL[t.state]}. View details`}
+            >
+              <span className={railStyles.testRailName}>{t.name}</span>
+              <Info size={13} className={railStyles.testRailInfoIcon} aria-hidden />
+            </Popover.Trigger>
+            <Popover.Portal>
+              <Popover.Positioner
+                side="bottom"
+                align="start"
+                sideOffset={6}
+                className={railStyles.testPopoverPositioner}
+              >
+                <Popover.Popup className={railStyles.testPopover}>
+                  <div className={railStyles.testPopoverHead}>
+                    <span
+                      className={railStyles.testPopoverStateDot}
+                      data-state={t.state}
+                      aria-hidden
+                    />
+                    <span className={railStyles.testPopoverName}>{t.name}</span>
+                    <span
+                      className={railStyles.testPopoverState}
+                      data-state={t.state}
+                    >
+                      {TEST_STATE_LABEL[t.state]}
+                    </span>
+                  </div>
+                  {t.description && (
+                    <p className={railStyles.testPopoverDesc}>{t.description}</p>
+                  )}
+                  {t.code && (
+                    <>
+                      <div className={railStyles.testPopoverSectionLabel}>
+                        {codeLabel}
+                      </div>
+                      <pre className={railStyles.testPopoverCode}>{t.code}</pre>
+                    </>
+                  )}
+                  {t.state === "fail" && t.detail && (
+                    <>
+                      <div className={railStyles.testPopoverSectionLabel}>
+                        Error
+                      </div>
+                      <pre className={railStyles.testPopoverError}>{t.detail}</pre>
+                    </>
+                  )}
+                </Popover.Popup>
+              </Popover.Positioner>
+            </Popover.Portal>
+          </Popover.Root>
+        </div>
+      ))}
+    </div>
+  );
+}

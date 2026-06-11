@@ -220,11 +220,6 @@ export default function MultipleChoiceQuestion({
           </span>
           <span>
             {result === "pass" ? "Correct!" : "Not quite — try again"}
-            <span className={styles.bannerSub}>
-              {result === "pass"
-                ? "Great choice."
-                : "Review the explanations and give it another go."}
-            </span>
           </span>
         </div>
       ) : null}

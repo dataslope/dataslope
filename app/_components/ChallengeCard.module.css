@@ -1331,7 +1331,7 @@
 .accentBar {
   width: 4px;
   height: 20px;
-  background: var(--ch-green-dot);
+  background: var(--ds-blue-500);
   border-radius: 2px;
   margin-right: 10px;
   flex-shrink: 0;
@@ -1346,18 +1346,25 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--ch-text-muted);
+  color: var(--ds-blue-500);
 }
 
 .outputTime {
   margin-left: auto;
-  font-size: 12.5px;
+  font-size: 11.5px;
   color: var(--ch-text-muted);
   font-family: var(--ch-font-mono);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.outputTime svg {
+  flex-shrink: 0;
 }
 
 .outputBody {
-  padding: 10px 14px 14px 27px;
+  padding: 10px 14px 14px 18px;
   font-family: var(--ch-font-mono);
   font-size: 13.5px;
   line-height: 1.8;
@@ -1366,7 +1373,7 @@
   word-break: break-word;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
   max-height: 360px;
   overflow-y: auto;
   scrollbar-width: thin;
@@ -1408,38 +1415,111 @@
   white-space: normal;
 }
 
+.outCellHtml {
+  /* Big frames scroll inside the cell instead of blowing out the card. */
+  overflow: auto;
+  max-height: 480px;
+}
+
 .outCellHtml :global(img),
 .outCellHtml :global(svg) {
   max-width: 100%;
 }
 
+/* DataFrame tables — kept in lockstep with `.dataframeWrap` in
+   CodeBlock.module.css: the Jupyter-notebook default look (600-weight
+   header row and index column, very subtle row striping, right-aligned
+   cells, no cell borders) in slightly tightened Inter (--font-sans) at
+   a compact size. Semantic --ch-* tokens rebind in dark mode, so no
+   separate dark overrides are needed. Selectors use `table th` /
+   `table td` (specificity 0,1,2) so they outrank the learn.css
+   prose-typography rules regardless of stylesheet order. */
 .outCellHtml :global(table) {
   border-collapse: collapse;
-  font-family: var(--ch-font-mono);
+  border: none;
+  font-family: var(--font-sans, Inter, system-ui, sans-serif);
+  letter-spacing: -0.011em;
   font-size: 13px;
-}
-
-.outCellHtml :global(th) {
-  background: var(--ch-slate-50);
-  border: 1px solid var(--ch-slate-200);
-  padding: 5px 12px;
-  text-align: right;
-  font-size: 12.5px;
-  color: var(--ch-text-muted);
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.outCellHtml :global(td) {
-  border: 1px solid var(--ch-slate-100);
-  padding: 4px 12px;
-  text-align: right;
-  white-space: nowrap;
+  line-height: 1.45;
   color: var(--ch-text);
+  width: auto;
+  margin: 0;
 }
 
-.outCellHtml :global(tr:hover td) {
-  background: var(--ch-slate-50);
+.outCellHtml :global(table th) {
+  padding: 3px 10px;
+  background: transparent;
+  border: none;
+  text-align: right;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--ch-text);
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.outCellHtml :global(table thead th) {
+  border-bottom: 1px solid var(--ch-border-light);
+}
+
+.outCellHtml :global(table td) {
+  padding: 3px 10px;
+  border: none;
+  text-align: right;
+  white-space: nowrap;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Very subtle striping on alternate body rows, like Jupyter. The index
+   <th> cells stripe with their row. */
+.outCellHtml :global(tbody tr:nth-child(even) td),
+.outCellHtml :global(tbody tr:nth-child(even) th) {
+  background: color-mix(in srgb, var(--ch-text) 4%, transparent);
+}
+
+.outCellHtml :global(tbody tr:hover td),
+.outCellHtml :global(tbody tr:hover th) {
+  background: color-mix(in srgb, var(--ch-text) 8%, transparent);
+}
+
+/* Middle-truncation marker cells/columns (R runtime) — pandas renders
+   its own "..." cells which inherit the same muted colour. */
+.outCellHtml :global(tr.dataframe-ellipsis-row td),
+.outCellHtml :global(.dataframe-ellipsis-col) {
+  text-align: center;
+  color: var(--ch-text-muted);
+}
+
+/* Footer row stating the full row/column count of a truncated frame. */
+.outCellHtml :global(td.dataframe-rows-footer) {
+  padding: 4px 10px;
+  font-family: var(--font-inter, var(--font-sans, Inter, system-ui, sans-serif));
+  font-size: 14px;
+  color: var(--ch-text-muted);
+  font-style: normal;
+  text-align: right;
+  border-top: 1px solid var(--ch-border-light);
+}
+
+/* Dimensions line pandas appends below a truncated frame. */
+.outCellHtml :global(p) {
+  margin: 6px 0 0;
+  font-family: var(--font-inter, var(--font-sans, Inter, system-ui, sans-serif));
+  font-size: 14px;
+  color: var(--ch-text-muted);
+}
+
+/* Plotly chart segment (emitted by code blocks sharing this panel). */
+.outCellPlot {
+  white-space: normal;
+  max-height: 600px;
+  overflow: auto;
+}
+
+.outCellPlot :global(.js-plotly-plot) {
+  width: 100%;
 }
 
 /* ─── Running overlay (sine-wave animation) ──────────────────────────
@@ -1562,9 +1642,11 @@
 
 /* ─── Test panel ──────────────────────────────────────────────────── */
 
+/* Transparent in both themes — the section sits directly on the card
+   surface to keep the design clean. */
 .testPanel {
   border-top: 1px solid var(--ch-border-light);
-  background: var(--ch-bg-muted);
+  background: transparent;
 }
 
 .testPanelHeader {
@@ -1593,6 +1675,16 @@
   color: var(--ch-text-muted);
 }
 
+/* The label takes the verdict colour (brand 500 shades) once results
+   are in. */
+.testLabel[data-state="pass"] {
+  color: var(--ds-green-500);
+}
+
+.testLabel[data-state="fail"] {
+  color: var(--ds-red-500);
+}
+
 .testSummary {
   display: inline-flex;
   align-items: center;
@@ -1610,22 +1702,25 @@
   gap: 4px;
 }
 
+/* Solid, borderless chips with white text — green-500 / red-500 in
+   light mode, stepped down to the 600 shades in dark mode (see the
+   html.dark overrides near the end of this file). */
 .testPill[data-state="pass"] {
-  background: var(--ch-green-bg);
-  color: var(--ch-green);
-  border: 1px solid var(--ds-green-200);
+  background: var(--ds-green-500);
+  color: #fff;
+  border: none;
 }
 
 .testPill[data-state="fail"] {
-  background: var(--ch-red-bg);
-  color: var(--ch-red);
-  border: 1px solid var(--ds-red-200);
+  background: var(--ds-red-500);
+  color: #fff;
+  border: none;
 }
 
 .testPill[data-state="pending"] {
-  background: var(--ds-gray-100);
-  color: var(--ch-text-muted);
-  border: 1px solid var(--ds-gray-200);
+  background: var(--ds-gray-500);
+  color: #fff;
+  border: none;
 }
 
 .testChevron {
@@ -1637,127 +1732,292 @@
   transform: rotate(180deg);
 }
 
-.testList {
-  padding: 0 14px 12px;
+/* ─── Test results rail ───
+   Minimal pass/fail readout: a vertical rail down the left with one
+   circle per test — green with a white check for a pass, red with a
+   white ✕ for a fail (500 shades in light mode, 600 in dark — see the
+   html.dark overrides near the end of this file) — and the rail segment
+   below each circle painted in that test's colour. Rows carry no boxes
+   or borders; the description, test code/checks, and the exact error
+   message live in a click popover. */
+.testRail {
+  padding: 6px 14px 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 
-.testItem {
+.testRailRow {
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 8px 10px;
-  border-radius: 6px;
-  background: var(--ds-white);
-  border: 1px solid var(--ch-border-light);
+  align-items: stretch;
+  gap: 10px;
 }
 
-.testIcon {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
+.testRailTrack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 18px;
   flex-shrink: 0;
+}
+
+.testRailNode {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-top: 1px;
+  color: #fff;
+  flex-shrink: 0;
+  /* Centers the circle on the row's text line. */
+  margin-top: 2px;
+  /* Passing/pending circles carry the 1-based test number. */
+  font-family: var(--ch-font-ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1;
 }
 
-.testIcon[data-state="pass"] {
-  background: var(--ch-green-bg);
-  color: var(--ch-green);
+.testRailNode[data-state="pass"] {
+  background: var(--ds-green-500);
 }
 
-.testIcon[data-state="fail"] {
-  background: var(--ch-red-bg);
-  color: var(--ch-red);
+.testRailNode[data-state="fail"] {
+  background: var(--ds-red-500);
 }
 
-.testIcon[data-state="pending"] {
-  background: var(--ds-gray-100);
+.testRailNode[data-state="pending"] {
+  background: transparent;
+  border: 2px solid var(--ch-border);
   color: var(--ch-text-muted);
 }
 
-.testItemBody {
+.testRailSeg {
   flex: 1;
+  width: 2px;
+  min-height: 10px;
+  border-radius: 1px;
+}
+
+.testRailSeg[data-state="pass"] {
+  background: var(--ds-green-500);
+}
+
+.testRailSeg[data-state="fail"] {
+  background: var(--ds-red-500);
+}
+
+.testRailSeg[data-state="pending"] {
+  background: var(--ch-border);
+}
+
+/* The whole row is the popover trigger; only text + a hover-revealed
+   info glyph, no chrome. */
+.testRailItemBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin-bottom: 18px;
+  min-height: 22px;
+  cursor: pointer;
+  font-family: var(--ch-font-ui);
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--ch-text);
+  text-align: left;
+}
+
+.testRailRow:last-child .testRailItemBtn {
+  margin-bottom: 0;
+}
+
+.testRailName {
+  color: var(--ch-text-secondary);
+  font-weight: 500;
+}
+
+.testRailItemBtn:hover .testRailName,
+.testRailItemBtn:focus-visible .testRailName {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--ch-text-muted);
+}
+
+.testRailInfoIcon {
+  color: var(--ch-text-muted);
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  flex-shrink: 0;
+}
+
+.testRailItemBtn:hover .testRailInfoIcon,
+.testRailItemBtn:focus-visible .testRailInfoIcon,
+.testRailItemBtn[data-popup-open] .testRailInfoIcon {
+  opacity: 1;
+}
+
+/* ── Details popover (description, code/checks, exact error) ──
+   Matches `.runMenuPositioner`'s portaled-overlay z-index so the popup
+   clears the card chrome (the modal/menu in this file sit at 1000/1100). */
+.testPopoverPositioner {
+  z-index: 1100;
+}
+
+/* The popup is portaled outside `.card`, so the --ch-* tokens defined on
+   `.card` (and re-pointed for dark mode under `html.dark .card`) don't
+   reach it — `var(--ch-bg)` would resolve to nothing, leaving the popup
+   with a transparent background that the page shows through. Re-declare
+   the token subset this popup uses, mapped to the global --ds-* palette
+   (available at :root) so it stays theme-aware; the `html.dark` block
+   below supplies the dark values, mirroring `.card`. */
+.testPopover {
+  --ch-bg: var(--ds-white);
+  --ch-bg-subtle: var(--ds-gray-50);
+  --ch-border-light: var(--ds-gray-100);
+  --ch-text: var(--ds-gray-900);
+  --ch-text-secondary: var(--ds-gray-500);
+  --ch-text-muted: var(--ds-gray-400);
+  --ch-red: var(--ds-red-600);
+  --ch-green: var(--ds-green-600);
+  --ch-font-ui: "Inter", system-ui, -apple-system, sans-serif;
+  --ch-font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+
+  width: min(460px, 92vw);
+  background: var(--ch-bg);
+  border: 1px solid var(--ch-border-light);
+  border-radius: 8px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+  padding: 12px 14px;
+  font-family: var(--ch-font-ui);
+}
+
+:global(html.dark) .testPopover {
+  --ch-bg: var(--color-fd-background, #121212);
+  --ch-bg-subtle: color-mix(in srgb, var(--color-fd-background, #121212) 85%, #000000);
+  --ch-border-light: #232323;
+  --ch-text: #e0e0e0;
+  --ch-text-secondary: #b0b0b0;
+  --ch-text-muted: #808080;
+  --ch-red: var(--ds-red-400);
+  --ch-green: var(--ds-green-400);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+}
+
+.testPopoverHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.testPopoverStateDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.testPopoverStateDot[data-state="pass"] {
+  background: var(--ds-green-500);
+}
+
+.testPopoverStateDot[data-state="fail"] {
+  background: var(--ds-red-500);
+}
+
+.testPopoverStateDot[data-state="pending"] {
+  background: var(--ch-border);
+}
+
+.testPopoverName {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ch-text);
   min-width: 0;
 }
 
-.testItemName {
-  font-family: var(--ch-font-mono);
-  font-size: 12.5px;
-  color: var(--ch-text);
-  font-weight: 500;
-  line-height: 1.4;
-}
-
-.testItemDesc {
-  font-size: 12.5px;
+.testPopoverState {
+  margin-left: auto;
+  font-size: 12px;
   color: var(--ch-text-muted);
-  margin-top: 2px;
+  flex-shrink: 0;
 }
 
-.testItemDetail {
-  margin-top: 4px;
-  font-size: 12.5px;
-  font-family: var(--ch-font-mono);
+/* Verdict word takes the state colour (theme-aware via the token block
+   on .testPopover above); pending stays muted. */
+.testPopoverState[data-state="pass"] {
+  color: var(--ch-green);
+}
+
+.testPopoverState[data-state="fail"] {
   color: var(--ch-red);
-  background: var(--ch-red-bg);
-  border-radius: 4px;
-  padding: 3px 8px;
+}
+
+.testPopoverDesc {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ch-text-secondary);
+}
+
+.testPopoverSectionLabel {
+  margin-top: 12px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ch-text-muted);
+}
+
+.testPopoverCode,
+.testPopoverError {
+  margin: 4px 0 0;
+  padding: 8px 10px;
+  background: var(--ch-bg-subtle);
+  border-radius: 6px;
+  font-family: var(--ch-font-mono);
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--ch-text);
   white-space: pre-wrap;
   word-break: break-word;
+  max-height: 220px;
+  overflow: auto;
+}
+
+.testPopoverError {
+  color: var(--ch-red);
 }
 
 /* ─── Status banner ───────────────────────────────────────────────── */
 
+/* Quiet, centered verdict line on a transparent background — a bare
+   icon + short text in the verdict colour, no band or icon well. */
 .banner {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  gap: 8px;
   padding: 12px 20px;
-  border-top: 1px solid var(--ch-border-light);
+  border-top: none;
   font-size: 14px;
   font-weight: 500;
+  background: transparent;
 }
 
 .banner[data-state="pass"] {
-  background: var(--ch-green-bg);
-  color: var(--ch-green);
-  border-top-color: var(--ds-green-200);
+  color: var(--ds-green-500);
 }
 
 .banner[data-state="fail"] {
-  background: var(--ch-red-bg);
-  color: var(--ch-red);
-  border-top-color: var(--ds-red-200);
+  color: var(--ds-red-500);
 }
 
-.bannerIcon {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.banner svg {
   flex-shrink: 0;
-}
-
-.banner[data-state="pass"] .bannerIcon {
-  background: var(--ds-green-100);
-}
-
-.banner[data-state="fail"] .bannerIcon {
-  background: var(--ds-red-100);
-}
-
-.bannerSub {
-  font-size: 13px;
-  font-weight: 400;
-  opacity: 0.8;
-  margin-left: 2px;
 }
 
 /* ─── SQL result table ────────────────────────────────────────────────
@@ -1777,21 +2037,6 @@
   align-items: center;
   padding: 8px 14px 6px;
   gap: 8px;
-}
-
-.sqlResultLabel {
-  font-size: 11.5px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ch-text-muted);
-}
-
-.sqlResultCount {
-  margin-left: auto;
-  font-size: 12.5px;
-  color: var(--ch-text-muted);
-  font-family: var(--ch-font-mono);
 }
 
 /* Full-bleed: no horizontal margin so the table spans the whole card
@@ -1860,6 +2105,16 @@
 
 .sqlResultTable tr:hover td {
   background: var(--ch-bg-subtle);
+}
+
+/* Trailing filler column: zero content, takes all leftover width so the
+   data columns keep their natural (content) width instead of stretching
+   across the card. The filler header still paints the header band to the
+   card's right edge; filler body cells keep the row hover full-width. */
+.sqlResultTable th.sqlResultFiller,
+.sqlResultTable td.sqlResultFiller {
+  width: 100%;
+  padding: 0;
 }
 
 .sqlNullValue {
@@ -2023,59 +2278,33 @@
 }
 
 
-:global(html.dark) .testItem {
-  background: #0d0d0d;
-  border-color: #2a2a2a;
-}
-
 :global(html.dark) .testPanelHeader:hover {
   background: #222222;
 }
 
+/* The test pill and test rail use solid green/red fills with white
+   text/numerals in both themes — light uses the 500 shades; dark steps
+   down to the 600 shades below so the fills sit more comfortably on
+   dark surfaces. (The status banner is transparent with verdict-coloured
+   text, so it adapts via the --ch-* tokens and needs nothing here.) */
 :global(html.dark) .testPill[data-state="pass"] {
-  background: color-mix(in srgb, var(--ds-green-500) 12%, transparent);
-  border-color: color-mix(in srgb, var(--ds-green-500) 28%, transparent);
+  background: var(--ds-green-600);
 }
 
 :global(html.dark) .testPill[data-state="fail"] {
-  background: color-mix(in srgb, var(--ds-red-500) 12%, transparent);
-  border-color: color-mix(in srgb, var(--ds-red-500) 28%, transparent);
+  background: var(--ds-red-600);
 }
 
-:global(html.dark) .testPill[data-state="pending"] {
-  background: #252525;
-  border-color: #333333;
+:global(html.dark) .testRailNode[data-state="pass"],
+:global(html.dark) .testRailSeg[data-state="pass"],
+:global(html.dark) .testPopoverStateDot[data-state="pass"] {
+  background: var(--ds-green-600);
 }
 
-:global(html.dark) .banner[data-state="pass"] {
-  border-top-color: color-mix(in srgb, var(--ds-green-500) 28%, transparent);
-}
-
-:global(html.dark) .banner[data-state="fail"] {
-  border-top-color: color-mix(in srgb, var(--ds-red-500) 28%, transparent);
-}
-
-:global(html.dark) .banner[data-state="pass"] .bannerIcon {
-  background: color-mix(in srgb, var(--ds-green-500) 22%, transparent);
-}
-
-:global(html.dark) .banner[data-state="fail"] .bannerIcon {
-  background: color-mix(in srgb, var(--ds-red-500) 22%, transparent);
-}
-
-:global(html.dark) .outCellHtml :global(th) {
-  background: #1a1a1a;
-  border-color: #252525;
-  color: #909090;
-}
-
-:global(html.dark) .outCellHtml :global(td) {
-  border-color: #2a2a2a;
-  color: var(--ch-text);
-}
-
-:global(html.dark) .outCellHtml :global(tr:hover td) {
-  background: #1a1a1a;
+:global(html.dark) .testRailNode[data-state="fail"],
+:global(html.dark) .testRailSeg[data-state="fail"],
+:global(html.dark) .testPopoverStateDot[data-state="fail"] {
+  background: var(--ds-red-600);
 }
 
 /* ─── Table viewer (SQL) ────────────────────────────────────────────── */
@@ -2264,16 +2493,6 @@
 .resultPane {
   position: relative;
   overflow: hidden;
-}
-
-.resultPaneInfo {
-  display: flex;
-  align-items: center;
-  padding: 5px 14px;
-  gap: 8px;
-  background: var(--ch-bg-subtle);
-  border-bottom: 1px solid var(--ch-border-light);
-  min-height: 28px;
 }
 
 .resultFlashOverlay {

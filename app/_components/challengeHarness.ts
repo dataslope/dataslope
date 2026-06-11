@@ -95,6 +95,33 @@ export function isNativeTest(t: ChallengeTest): t is NativeChallengeTest {
   return "code" in t && typeof (t as NativeChallengeTest).code === "string";
 }
 
+/** Human-readable, one-check-per-line summary of a declarative stdout
+ *  expectation — shown by the test-details popover where a native test
+ *  would show its code. */
+export function stdoutExpectSummary(e: StdoutExpect): string {
+  const lines: string[] = [];
+  const list = (v: string | string[]) =>
+    (Array.isArray(v) ? v : [v]).map((s) => JSON.stringify(s)).join(", ");
+  if (e.stdoutEquals !== undefined)
+    lines.push(`stdout equals ${JSON.stringify(e.stdoutEquals)}`);
+  if (e.stdoutContains !== undefined)
+    lines.push(`stdout contains ${list(e.stdoutContains)}`);
+  if (e.stdoutDoesNotContain !== undefined)
+    lines.push(`stdout does not contain ${list(e.stdoutDoesNotContain)}`);
+  if (e.stdoutMatches !== undefined)
+    lines.push(`stdout matches /${e.stdoutMatches}/${e.stdoutMatchesFlags ?? "s"}`);
+  if (e.stdoutLines !== undefined)
+    lines.push(
+      `stdout lines${e.stdoutLinesExact ? " (exact)" : ""}:\n${e.stdoutLines
+        .map((l) => `  ${l}`)
+        .join("\n")}`,
+    );
+  if (e.noStderr) lines.push("no stderr output");
+  if (e.stderrContains !== undefined)
+    lines.push(`stderr contains ${list(e.stderrContains)}`);
+  return lines.join("\n");
+}
+
 /** Sentinel printed once, before any per-test result, so the component
  *  can locate where the harness output begins inside captured stdout. */
 export const HARNESS_BEGIN = "__DSTEST_BEGIN__";

@@ -917,11 +917,28 @@
   font-size: 13px;
 }
 
+/* The grid renders in two phases. Measure pass (no explicit widths yet):
+   the browser's auto table layout sizes every column to its content —
+   `width: auto` so columns are NOT stretched across the pane. The
+   component then freezes those widths and adds `.sql-result-table-sized`:
+   fixed layout + explicit <col> widths + a trailing filler column that
+   absorbs the leftover space. Columns only take the width they need, stay
+   put when a cell enters inline edit or more rows stream in, and resize
+   independently via the header drag handles. */
 .sql-result-table {
-  width: 100%;
+  width: auto;
   border-collapse: collapse;
   font-family: var(--font-ui);
   font-size: 13px;
+}
+
+.sql-result-table-sized {
+  /* Fixed layout reads widths from <colgroup>; width:100% guarantees the
+     table never paints narrower than the pane (the filler column soaks up
+     the difference). When the column widths sum to more than the pane the
+     table grows past 100% and the pane scrolls horizontally, as before. */
+  table-layout: fixed;
+  width: 100%;
 }
 
 .sql-result-table thead th {
@@ -944,12 +961,62 @@
   padding: 5px 10px;
   color: var(--text);
   white-space: nowrap;
-  max-width: 320px;
   overflow: hidden;
   text-overflow: ellipsis;
   /* Containing block for the absolutely-positioned inline cell editor
      (.sql-cell-input), so editing never resizes the column/row. */
   position: relative;
+}
+
+/* Cap each column's *measured* contribution during the auto-layout pass
+   so one long value or column name can't take the whole pane. Once sized,
+   the <col> widths govern and the cap must not fight a user resize. */
+.sql-result-table:not(.sql-result-table-sized) tbody td {
+  max-width: 320px;
+}
+
+.sql-result-table:not(.sql-result-table-sized) thead th {
+  max-width: 340px;
+}
+
+/* Trailing filler column: zero content, absorbs the leftover width. The
+   header keeps the sticky band painting to the pane's right edge; body
+   filler cells keep zebra striping / row hover spanning the full row. */
+.sql-result-table th.sql-result-th-filler,
+.sql-result-table td.sql-result-td-filler {
+  padding: 0;
+}
+
+/* ─── Column resize handles ───
+   A slim hit area straddling each column boundary (rendered in the
+   right-hand header cell so the sticky stacking order can't swallow it).
+   The visible 2px bar only appears on hover/drag. */
+.sql-result-col-resizer {
+  position: absolute;
+  top: 0;
+  left: -4px;
+  width: 9px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 3;
+  /* Required for pointer-capture dragging on touch devices. */
+  touch-action: none;
+}
+
+.sql-result-col-resizer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 3.5px;
+  width: 2px;
+  background: transparent;
+  transition: background 100ms ease;
+}
+
+.sql-result-col-resizer:hover::after,
+.sql-result-col-resizer:active::after {
+  background: var(--primary);
 }
 
 /* Subtle zebra stripes that read more as a tint than a strong band.
@@ -1651,6 +1718,13 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  /* Let the label shrink (ellipsizing the name) in a narrowed column. */
+  min-width: 0;
+}
+
+.sql-result-th-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sql-result-th-pk {
@@ -2511,6 +2585,10 @@
   width: 100%;
   text-align: left;
   white-space: nowrap;
+  /* Clip (rather than bleed into the neighbour) when the user resizes a
+     column narrower than its header text. */
+  min-width: 0;
+  overflow: hidden;
 }
 
 /* Top row: column name + sort chevron */
@@ -2567,6 +2645,9 @@
   display: inline-flex;
   align-items: center;
   gap: 3px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sql-result-th-type svg {

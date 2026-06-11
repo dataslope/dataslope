@@ -1,0 +1,169 @@
+---
+title: DataFrame Stress Test
+description: Large pandas and R data frames for verifying Jupyter-style middle truncation, compact typography, and table layout in code blocks and challenge cards.
+---
+
+This page exists to exercise the DataFrame renderer with outputs that are
+much larger than the usual examples. Every frame below should render in a
+single OUTPUT cell, interleaved with prints in execution order, as a
+compact Jupyter-style table (600-weight header row and index column,
+subtle row striping, no cell borders) truncated in the middle — head rows
+… tail rows, and head columns … tail columns. Wide tables scroll
+horizontally inside the output cell instead of stretching the page.
+
+## Pandas: 1,000 rows × 41 columns
+
+Pandas applies its own display limits (`display.max_rows`,
+`display.max_columns`), so `display(df)` shows the first and last five
+rows and the first and last ten columns with `...` markers in between,
+plus a dimensions line below the table. The prints before and after the
+`display()` call must surround the table in the output.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+import pandas as pd
+
+rng = np.random.default_rng(42)
+df = pd.DataFrame(
+    rng.integers(0, 1_000, size=(1_000, 40)),
+    columns=[f"col_{i:02d}" for i in range(40)],
+)
+df["category"] = rng.choice(["alpha", "beta", "gamma", "delta"], size=len(df))
+
+print("Shape:", df.shape)
+display(df)
+print("Printed after the display() call")
+`,
+    },
+  ]}
+/>
+
+## Pandas: long text values
+
+Long strings are truncated by pandas itself (`display.max_colwidth`), and
+the table styles additionally clip any oversized cell with an ellipsis so
+one column can never blow out the layout.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
+
+quotes = pd.DataFrame({
+    "id": range(1, 6),
+    "title": ["Very long text example for checking cell clipping behaviour " * 3] * 5,
+    "note": ["short value"] * 5,
+})
+display(quotes)
+`,
+    },
+  ]}
+/>
+
+## Pandas challenge card with a large frame
+
+The same truncation rules must hold inside a challenge card's output
+panel.
+
+<ChallengeCard
+  adapter="python"
+  title="Count the rows of a wide frame"
+  instructions={`The init code created a DataFrame called \`wide\` with 800 rows and 60 columns. Set \`row_total\` to the number of rows in \`wide\`.`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+import pandas as pd
+
+rng = np.random.default_rng(7)
+wide = pd.DataFrame(
+    rng.normal(0, 1, size=(800, 60)).round(3),
+    columns=[f"metric_{i:02d}" for i in range(60)],
+)`,
+      starterCode: `# 'wide' is 800 rows x 60 columns - display() truncates it like Jupyter.
+display(wide)
+
+row_total = None  # TODO: number of rows in wide
+print(row_total)
+`,
+      solutionCode: `display(wide)
+
+row_total = len(wide)
+print(row_total)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "row_total",
+      name: "row_total is correct",
+      description: "row_total equals the number of rows in wide (800)",
+      code: `assert row_total == 800, f"expected 800, got {row_total}"`,
+    },
+  ]}
+/>
+
+## R: 500 rows × 41 columns
+
+The R runtime truncates frames itself: ten head rows, an ellipsis row,
+five tail rows — and for wide frames the first and last ten columns with
+an ellipsis column between. The footer states the full dimensions.
+
+<CodeBlock
+  adapter="r"
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `set.seed(42)
+n <- 500
+wide <- as.data.frame(matrix(round(rnorm(n * 40), 2), nrow = n))
+names(wide) <- sprintf("metric_%02d", seq_len(40))
+wide$group <- sample(c("alpha", "beta", "gamma"), n, replace = TRUE)
+
+cat("dim:", dim(wide), "\\n")
+
+# A returned data.frame renders as a truncated table.
+wide
+`,
+    },
+  ]}
+/>
+
+## R challenge card with a large frame
+
+<ChallengeCard
+  adapter="r"
+  title="Count the rows of a wide frame"
+  instructions={`The init code created a data.frame called \`metrics\` with 300 rows and 30 columns. Set \`n_rows\` to the number of rows in \`metrics\`.`}
+  files={[
+    {
+      filename: "main.r",
+      initCode: `set.seed(7)
+metrics <- as.data.frame(matrix(round(rnorm(300 * 30), 2), nrow = 300))
+names(metrics) <- sprintf("metric_%02d", seq_len(30))`,
+      starterCode: `n_rows <- NA  # TODO: number of rows in metrics
+
+# The frame below renders as a truncated table.
+metrics
+`,
+      solutionCode: `n_rows <- nrow(metrics)
+
+metrics
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "n_rows",
+      name: "n_rows is correct",
+      description: "n_rows equals the number of rows in metrics (300)",
+      code: `if (!isTRUE(all.equal(n_rows, 300L)) && !isTRUE(all.equal(n_rows, 300))) stop(sprintf("expected 300, got %s", n_rows))`,
+    },
+  ]}
+/>

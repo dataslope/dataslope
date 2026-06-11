@@ -35,7 +35,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { RotateCcw, Check, X, ChevronDown, Eye, Play, Database, Table, List, FileInput } from "lucide-react";
+import { RotateCcw, Check, CheckCheck, ListChecks, ListX, X, ChevronDown, Eye, Play, Database, Table, List, FileInput } from "lucide-react";
 import { Menu } from "@base-ui-components/react/menu";
 import {
   createColumnHelper,
@@ -57,6 +57,7 @@ import {
   ChallengeToastViewport,
   useIsDark,
   cmThemeNameFor,
+  TestResultsRail,
 } from "./challengeShared";
 import { EditorState, Compartment } from "@codemirror/state";
 import {
@@ -136,6 +137,35 @@ export interface SqlChallengeTest {
   runAfterEquals?: unknown;
   /** Required row count of the `runAfterSql` result. */
   runAfterRowCount?: number;
+}
+
+/** Human-readable, one-check-per-line summary of a SQL test's
+ *  declarative expectations — shown by the test-details popover where a
+ *  code-based test would show its code. */
+export function sqlTestChecksSummary(t: SqlChallengeTest): string {
+  const lines: string[] = [];
+  if (t.expectedRowCount !== undefined)
+    lines.push(`row count = ${t.expectedRowCount}`);
+  if (t.rowCountAtLeast !== undefined)
+    lines.push(`row count >= ${t.rowCountAtLeast}`);
+  if (t.expectedColumns)
+    lines.push(`columns = [${t.expectedColumns.join(", ")}]`);
+  if (t.expectedColumnsInclude)
+    lines.push(`columns include [${t.expectedColumnsInclude.join(", ")}]`);
+  if (t.expectedRows)
+    lines.push(
+      `rows equal the expected values${t.expectedRows.ordered ? " (in order)" : ""}`,
+    );
+  if (t.matchesSolution)
+    lines.push(
+      `result matches the reference solution${t.ordered ? " (in order)" : ""}`,
+    );
+  if (t.runAfterSql) lines.push(`after your SQL, run:\n${t.runAfterSql.trim()}`);
+  if (t.runAfterEquals !== undefined)
+    lines.push(`…its first cell = ${JSON.stringify(t.runAfterEquals)}`);
+  if (t.runAfterRowCount !== undefined)
+    lines.push(`…its row count = ${t.runAfterRowCount}`);
+  return lines.join("\n");
 }
 
 /** Specification for which tables the table viewer should display.
@@ -1662,6 +1692,15 @@ export default function SqlChallengeCard({
   }, [dialect, toasts]);
 
   const isBusy = status === "loading" || status === "running";
+
+  // Readable summary of each test's declarative checks, surfaced by the
+  // test-details popover in the results rail.
+  const testChecksById = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const t of tests) m.set(t.id, sqlTestChecksSummary(t));
+    return m;
+  }, [tests]);
+
   const hasResult = isBusy || resultSet !== null || resultError !== "" || resultMessage !== "";
   const resultTabDataProp: ResultTabData | null = hasResult
     ? {
@@ -1775,7 +1814,9 @@ export default function SqlChallengeCard({
                 type="button"
                 className={styles.runBtn}
                 onClick={() => void check()}
-                disabled={isBusy}
+                // Also disabled while the table viewer's first load seeds
+                // the database, so Submit can't race the engine boot.
+                disabled={isBusy || tablesInitializing}
               >
                 {isBusy ? (
                   <svg
@@ -1818,7 +1859,7 @@ export default function SqlChallengeCard({
               <Menu.Root>
                 <Menu.Trigger
                   className={styles.runBtnChevron}
-                  disabled={isBusy}
+                  disabled={isBusy || tablesInitializing}
                   aria-label="More run options"
                   title="More run options"
                 >
@@ -1878,7 +1919,9 @@ export default function SqlChallengeCard({
               type="button"
               className={styles.runBtn}
               onClick={() => void run()}
-              disabled={isBusy}
+              // Also disabled while the table viewer's first load seeds
+              // the database, so Run can't race the engine boot.
+              disabled={isBusy || tablesInitializing}
             >
               {isBusy ? (
                 <svg
@@ -2001,18 +2044,20 @@ export default function SqlChallengeCard({
             onClick={() => setTestListOpen((v) => !v)}
             aria-expanded={testListOpen}
           >
-            <span className={styles.testLabel}>Test Results</span>
+            <span className={styles.testLabel} data-state={summaryState}>
+              Test Results
+            </span>
             <div className={styles.testSummary}>
               <span className={styles.testPill} data-state={summaryState}>
                 {summaryState === "pending" ? (
                   "Running…"
                 ) : summaryState === "pass" ? (
                   <>
-                    <Check size={10} strokeWidth={3} aria-hidden /> {passedCount}/{totalTests} passed
+                    <ListChecks size={11} strokeWidth={2.5} aria-hidden /> {passedCount}/{totalTests} passed
                   </>
                 ) : (
                   <>
-                    <X size={10} strokeWidth={3} aria-hidden /> {passedCount}/{totalTests} passed
+                    <ListX size={11} strokeWidth={2.5} aria-hidden /> {passedCount}/{totalTests} passed
                   </>
                 )}
               </span>
@@ -2026,38 +2071,13 @@ export default function SqlChallengeCard({
             />
           </button>
           {testListOpen && (
-            <div className={styles.testList}>
-              {testResults.map((t) => (
-                <div key={t.id} className={styles.testItem}>
-                  <div className={styles.testIcon} data-state={t.state}>
-                    {t.state === "pass" ? (
-                      <Check size={9} strokeWidth={3} aria-hidden />
-                    ) : t.state === "fail" ? (
-                      <X size={9} strokeWidth={3} aria-hidden />
-                    ) : (
-                      <svg
-                        width="9"
-                        height="9"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        aria-hidden
-                      >
-                        <circle cx="12" cy="12" r="5" />
-                      </svg>
-                    )}
-                  </div>
-                  <div className={styles.testItemBody}>
-                    <div className={styles.testItemName}>{t.name}</div>
-                    {t.description && <div className={styles.testItemDesc}>{t.description}</div>}
-                    {t.state === "fail" && t.detail && (
-                      <div className={styles.testItemDetail}>{t.detail}</div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <TestResultsRail
+              tests={testResults.map((t) => ({
+                ...t,
+                code: testChecksById.get(t.id),
+              }))}
+              codeLabel="Checks"
+            />
           )}
         </div>
       )}
@@ -2065,28 +2085,19 @@ export default function SqlChallengeCard({
       {/* ── Banner ── */}
       {bannerState && (
         <div className={styles.banner} data-state={bannerState}>
-          <div className={styles.bannerIcon}>
-            {bannerState === "pass" ? (
-              <Check size={14} strokeWidth={2.5} aria-hidden />
-            ) : (
-              <X size={14} strokeWidth={2.5} aria-hidden />
-            )}
-          </div>
           {bannerState === "pass" ? (
-            <span>
-              All tests passed!{" "}
-              <span className={styles.bannerSub}>
-                Great work — your solution is correct.
-              </span>
-            </span>
+            <>
+              <CheckCheck size={16} strokeWidth={2.5} aria-hidden />
+              <span>All tests passed!</span>
+            </>
           ) : (
-            <span>
-              {totalTests - passedCount} test
-              {totalTests - passedCount === 1 ? "" : "s"} failed{" "}
-              <span className={styles.bannerSub}>
-                — review the details and try again.
+            <>
+              <X size={16} strokeWidth={2.5} aria-hidden />
+              <span>
+                {totalTests - passedCount} test
+                {totalTests - passedCount === 1 ? "" : "s"} failed
               </span>
-            </span>
+            </>
           )}
         </div>
       )}
@@ -2325,7 +2336,8 @@ export function VirtualizedResultTable({
       ? rowVirtualizer.getTotalSize() -
         (virtualRows[virtualRows.length - 1]?.end ?? 0)
       : 0;
-  const colSpan = tableColumns.length;
+  // Data columns + the trailing filler column that absorbs leftover width.
+  const colSpan = tableColumns.length + 1;
 
   // Infinite scroll: when the last virtualised row gets within a short
   // distance of the end of what's loaded, ask the owner for the next
@@ -2358,6 +2370,10 @@ export function VirtualizedResultTable({
                     : flexRender(h.column.columnDef.header, h.getContext())}
                 </th>
               ))}
+              {/* Filler column — absorbs the leftover width so the data
+                  columns only take the space their content needs instead
+                  of stretching across the card. */}
+              <th className={styles.sqlResultFiller} aria-hidden />
             </tr>
           ))}
         </thead>
@@ -2380,6 +2396,7 @@ export function VirtualizedResultTable({
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
+                <td className={styles.sqlResultFiller} aria-hidden />
               </tr>
             );
           })}
@@ -2588,36 +2605,42 @@ export function TableViewer({
               {flashKey > 0 && (
                 <div key={flashKey} className={styles.resultFlashOverlay} aria-hidden />
               )}
-              <div className={styles.resultPaneInfo}>
-                {resultTabData.error ? (
-                  <span className={styles.sqlResultLabel} style={{ color: "var(--ch-red)" }}>
-                    Error
-                  </span>
-                ) : resultTabData.resultSet && resultTabData.resultSet.columns.length > 0 ? (
-                  <span className={styles.sqlResultCount}>
-                    {resultTabData.resultSet.values.length} row{resultTabData.resultSet.values.length === 1 ? "" : "s"}
-                    {resultTabData.elapsed ? ` · ${resultTabData.elapsed}` : ""}
-                  </span>
-                ) : resultTabData.elapsed ? (
-                  <span className={styles.sqlResultCount}>{resultTabData.elapsed}</span>
-                ) : null}
-              </div>
+              {/* Mirrors TableViewerPane's layout — table first, then the
+                  row-count footnote — so the Result tab reads exactly like
+                  the table tabs. The execution time rides along in the
+                  footnote instead of a separate info bar above the table. */}
               {resultTabData.error ? (
                 <div className={styles.sqlMessage} style={{ color: "var(--ch-red)" }}>
                   {resultTabData.error}
                 </div>
               ) : resultTabData.resultSet && resultTabData.resultSet.columns.length > 0 ? (
                 resultTabData.resultSet.values.length === 0 ? (
-                  <div className={styles.sqlEmptyResult}>Query returned no rows.</div>
+                  <>
+                    <div className={styles.sqlEmptyResult}>Query returned no rows.</div>
+                    <div className={styles.tableViewerFootnote}>
+                      0 rows
+                      {resultTabData.elapsed ? ` · ${resultTabData.elapsed}` : ""}
+                    </div>
+                  </>
                 ) : (
-                  <VirtualizedResultTable
-                    columns={resultTabData.resultSet.columns}
-                    values={resultTabData.resultSet.values}
-                    maxHeight={TABLE_VIEWER_HEIGHT}
-                  />
+                  <>
+                    <VirtualizedResultTable
+                      columns={resultTabData.resultSet.columns}
+                      values={resultTabData.resultSet.values}
+                      maxHeight={TABLE_VIEWER_HEIGHT}
+                    />
+                    <div className={styles.tableViewerFootnote}>
+                      {resultTabData.resultSet.values.length} row
+                      {resultTabData.resultSet.values.length === 1 ? "" : "s"}
+                      {resultTabData.elapsed ? ` · ${resultTabData.elapsed}` : ""}
+                    </div>
+                  </>
                 )
               ) : resultTabData.message ? (
-                <div className={styles.sqlMessage}>{resultTabData.message}</div>
+                <div className={styles.sqlMessage}>
+                  {resultTabData.message}
+                  {resultTabData.elapsed ? ` · ${resultTabData.elapsed}` : ""}
+                </div>
               ) : (
                 <div className={styles.sqlMessage}>Running…</div>
               )}
