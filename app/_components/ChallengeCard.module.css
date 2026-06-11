@@ -1833,12 +1833,31 @@
   opacity: 1;
 }
 
-/* ── Details popover (description, code/checks, exact error) ── */
+/* ── Details popover (description, code/checks, exact error) ──
+   Matches `.runMenuPositioner`'s portaled-overlay z-index so the popup
+   clears the card chrome (the modal/menu in this file sit at 1000/1100). */
 .testPopoverPositioner {
-  z-index: 220;
+  z-index: 1100;
 }
 
+/* The popup is portaled outside `.card`, so the --ch-* tokens defined on
+   `.card` (and re-pointed for dark mode under `html.dark .card`) don't
+   reach it — `var(--ch-bg)` would resolve to nothing, leaving the popup
+   with a transparent background that the page shows through. Re-declare
+   the token subset this popup uses, mapped to the global --ds-* palette
+   (available at :root) so it stays theme-aware; the `html.dark` block
+   below supplies the dark values, mirroring `.card`. */
 .testPopover {
+  --ch-bg: var(--ds-white);
+  --ch-bg-subtle: var(--ds-gray-50);
+  --ch-border-light: var(--ds-gray-100);
+  --ch-text: var(--ds-gray-900);
+  --ch-text-secondary: var(--ds-gray-500);
+  --ch-text-muted: var(--ds-gray-400);
+  --ch-red: var(--ds-red-600);
+  --ch-font-ui: "Inter", system-ui, -apple-system, sans-serif;
+  --ch-font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+
   width: min(460px, 92vw);
   background: var(--ch-bg);
   border: 1px solid var(--ch-border-light);
@@ -1846,6 +1865,17 @@
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
   padding: 12px 14px;
   font-family: var(--ch-font-ui);
+}
+
+:global(html.dark) .testPopover {
+  --ch-bg: var(--color-fd-background, #121212);
+  --ch-bg-subtle: color-mix(in srgb, var(--color-fd-background, #121212) 85%, #000000);
+  --ch-border-light: #232323;
+  --ch-text: #e0e0e0;
+  --ch-text-secondary: #b0b0b0;
+  --ch-text-muted: #808080;
+  --ch-red: var(--ds-red-400);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
 }
 
 .testPopoverHead {
