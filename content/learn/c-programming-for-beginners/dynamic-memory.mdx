@@ -86,11 +86,9 @@ The shape `malloc(N * sizeof(T))` is the canonical form. Read it as
 #include <stdlib.h>
 
 int main(void) {
-  int n;
-  printf("How many numbers? ");
-  if (scanf("%d", &n) != 1 || n <= 0) {
-    return 1;
-  }
+  /* In a real program this would come from the user or a file —
+     the point is that it is only known at runtime. Try changing it. */
+  int n = 7;
 
   int *nums = malloc(n * sizeof(int));
   if (nums == NULL) {

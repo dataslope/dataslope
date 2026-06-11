@@ -1,6 +1,6 @@
 ---
-title: The Story of C
-description: How UNIX, Bell Labs, and Dennis Ritchie gave the world its most influential programming language
+title: From Counting Machines to C
+description: Two centuries of trying to talk to machines, and how a video game at Bell Labs gave the world its most influential programming language
 ---
 
 In 1969, in a small office at **Bell Telephone Laboratories** in New
@@ -15,7 +15,133 @@ help from a colleague named **Dennis Ritchie**. They jokingly named it
 *Multics* that they had been working on.
 
 That side project — half operating system, half playground — went on
-to change computing forever.
+to change computing forever, and it forced the invention of the
+language this course teaches. But to feel *why* C was such a big
+deal, you need to know what programming was like before it. So let's
+rewind — briefly — about a hundred and thirty years.
+
+## The long road to "just type instructions"
+
+For most of human history, "computing" meant moving beads on an
+abacus or doing arithmetic on paper. In the 1800s, **Charles
+Babbage** designed mechanical machines — the *Difference Engine* and
+the *Analytical Engine* — that could in principle calculate
+automatically by turning gears, and his collaborator **Ada Lovelace**
+wrote what is widely considered the first algorithm intended for a
+machine. The machines were never fully built in their lifetimes, but
+the idea was planted: one machine, fed a list of instructions, could
+perform *any* calculation.
+
+Electricity made it real. Machines like **ENIAC** (1945) and the
+**Manchester Baby** (1948) were the first general-purpose electronic
+computers, and they introduced the design we still use: the
+**stored-program** architecture, where instructions live in the same
+memory as data. A program, it turns out, is just data.
+
+<svg
+  viewBox="0 0 640 250"
+  role="img"
+  aria-label="A punch card with a clipped corner and rows of holes, a few punched out in color — the earliest physical shape of a program"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <path d="M140 64 L164 40 H486 A14 14 0 0 1 500 54 V206 A14 14 0 0 1 486 220 H154 A14 14 0 0 1 140 206 Z" fill="currentColor" opacity="0.07" />
+  <g fill="currentColor" opacity="0.15">
+    <circle cx="220" cy="80" r="6" />
+    <circle cx="300" cy="80" r="6" />
+    <circle cx="380" cy="80" r="6" />
+    <circle cx="460" cy="80" r="6" />
+    <circle cx="180" cy="116" r="6" />
+    <circle cx="220" cy="116" r="6" />
+    <circle cx="340" cy="116" r="6" />
+    <circle cx="380" cy="116" r="6" />
+    <circle cx="420" cy="116" r="6" />
+    <circle cx="260" cy="152" r="6" />
+    <circle cx="300" cy="152" r="6" />
+    <circle cx="340" cy="152" r="6" />
+    <circle cx="420" cy="152" r="6" />
+    <circle cx="460" cy="152" r="6" />
+    <circle cx="180" cy="188" r="6" />
+    <circle cx="220" cy="188" r="6" />
+    <circle cx="260" cy="188" r="6" />
+    <circle cx="340" cy="188" r="6" />
+    <circle cx="420" cy="188" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="180" cy="80" r="7" />
+    <circle cx="260" cy="116" r="7" />
+    <circle cx="340" cy="80" r="7" />
+    <circle cx="420" cy="80" r="7" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="220" cy="152" r="7" />
+    <circle cx="300" cy="188" r="7" />
+    <circle cx="460" cy="116" r="7" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="260" cy="80" r="7" />
+    <circle cx="380" cy="152" r="7" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="300" cy="116" r="7" />
+    <circle cx="460" cy="188" r="7" />
+  </g>
+</svg>
+
+How did you program these machines? Directly in **machine code** —
+the raw numeric patterns the CPU understands:
+
+```text
+01001000 11000111 11000000 00000001 00000000
+00000000 00000000 01001000 11000111 11000111
+00000001 00000000 00000000 00000000 00001111
+```
+
+A human being was supposed to read that, debug that, and modify
+that. Change the third instruction and every address after it might
+shift, so every jump had to be recalculated by hand. A single
+mistyped bit could crash the program in ways indistinguishable from
+a hardware fault. **It was no way to live**, and the first
+programmers — brilliant, patient, frustrated — invented their way
+out of it one layer at a time.
+
+The first layer was **assembly language**: short names for the raw
+patterns, like `MOV AL, 5` instead of `10110000 00000101`, with a
+small program (the *assembler*) translating names back into bits.
+Far better — but each line was still one machine instruction, and
+assembly for an Intel chip was useless on anything else.
+
+The second layer, in the late 1950s, was the **high-level language**:
+write something closer to math or English, and let a program called
+a **compiler** translate it into machine code. **FORTRAN** (1957)
+let scientists write `SUM = A + B` instead of a dozen instructions,
+and — crucially — the same source could be compiled for different
+machines. **COBOL** followed for business, **Lisp** for symbolic
+computation, **ALGOL** with ideas (block structure, recursion) that
+nearly every later language borrowed.
+
+<Callout type="info" title="What 'high-level' means">
+"High-level" doesn't mean "advanced" or "fancy". It means **far from
+the hardware**. A high-level language hides registers, addresses, and
+opcodes behind friendlier ideas like variables, expressions, loops,
+and functions.
+</Callout>
+
+But there was a hole in the middle. FORTRAN crunched numbers; COBOL
+shuffled business records; neither could write the **software that
+runs the computer itself** — operating systems, compilers, drivers —
+because that work needs direct, byte-level control of memory and
+hardware. So for two more decades, the answer to "what do I write an
+operating system in?" remained: *assembly*. Which kept operating
+systems painful to build and impossible to move between machines.
+
+The world was waiting for a language that was high-level enough to
+be readable and portable, low-level enough to control memory
+directly, and small enough that one programmer could hold all of it
+in their head.
+
+Which brings us back to that office in New Jersey.
+
+## A game, a discarded computer, and a typeless language
 
 <svg
   viewBox="0 0 640 200"
@@ -47,15 +173,13 @@ to change computing forever.
   </g>
 </svg>
 
-## Why a new language was needed
-
 The first version of UNIX was written entirely in **assembly
 language** for the PDP-7, then rewritten in assembly for a newer
-machine called the **PDP-11**. Each time UNIX moved to a new computer,
-the entire OS had to be re-translated by hand. This was painful and
-fragile.
+machine called the **PDP-11**. Each time UNIX moved to a new
+computer, the entire OS had to be re-translated by hand — exactly
+the pain the whole industry was stuck with.
 
-Ken Thompson tried to write UNIX in an existing high-level language
+Ken Thompson tried to escape using an existing high-level language
 called **B** (itself derived from **BCPL**), but B had no notion of
 data **types** — every value was a single machine word. That made it
 hopeless for code that needed to deal with bytes, characters, and
@@ -63,21 +187,22 @@ structures of mixed-size data, which is most of what an operating
 system does.
 
 So between 1969 and 1973, Dennis Ritchie did something quietly
-historic. He took B, added **types** (`int`, `char`, `float`, arrays,
-pointers, structs), kept it small, and called the result **C**.
+historic. He took B, added **types** (`int`, `char`, `float`,
+arrays, pointers, structs), kept it small, and called the result
+**C**.
 
 ```mermaid
 timeline
     title The C family tree
-    1963 : CPL designed at Cambridge / London
-    1967 : BCPL — typeless successor to CPL
+    1837 : Babbage designs the Analytical Engine
+    1945 : ENIAC — programs as raw machine code
+    1957 : FORTRAN — the compiler is born
+    1967 : BCPL — typeless systems language
     1969 : B by Ken Thompson at Bell Labs
     1972 : C by Dennis Ritchie at Bell Labs
     1973 : UNIX rewritten in C
     1978 : K&R, "The C Programming Language", published
     1989 : ANSI C (C89) standardized
-    1999 : C99 — new features, broader portability
-    2011 : C11 — concurrency, atomics
     2024 : C23 — modern cleanups
 ```
 
@@ -211,7 +336,22 @@ treats memory honestly* — has never been seriously displaced. Fifty
 years later, we are still building on top of it.
 
 In the next chapter, we'll zoom into the machine itself: what happens
-when a program runs. Then, finally, we'll write some code.
+when a program runs. Then, finally, we'll write some code of our own.
+
+<MultipleChoice
+  markdown={`What was the main problem with writing programs directly in machine code (binary)?
+
+- It was too slow for the CPU to execute.
+  > Machine code is literally what the CPU executes — speed of execution is not the issue. The issue is for humans, not the machine.
+- It used too much electricity.
+  > Power consumption is a hardware concern unrelated to the representation of programs. Early computers were power-hungry, but that had nothing to do with writing in machine code.
+- [o] It was extremely difficult for humans to read, write, and debug.
+  > The machine doesn't care, but human beings can barely look at long sequences of 1s and 0s without making mistakes. This is why assembly language, and later high-level languages, were invented.
+- It only worked on machines built after 1960.
+  > Machine code ran on the earliest computers, including those built in the 1940s; there was no such temporal restriction.
+
+Machine code is the native language of the CPU, so it always runs at full speed. The pain is on the human side: writing and maintaining anything non-trivial in raw bits is essentially impossible.`}
+/>
 
 <MultipleChoice
   markdown={`Why was C originally created at Bell Labs?

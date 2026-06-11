@@ -65,6 +65,36 @@ actually works**.
 - Anyone who wants to *understand* programs, not just type them.
 </Callout>
 
+## Run some C — right now
+
+Before anything else, you should know that this course is
+interactive: every example compiles and runs **in your browser**,
+using a real `clang` compiler. The block below is a live C program.
+Press **Run**, then change `42` to another number and run it again.
+
+<CodeBlock
+  adapter="c"
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
+
+int main(void) {
+  int number = 42; /* <- change this and run again */
+  printf("Hello! Your number is %d.\\n", number);
+  printf("Twice your number is %d.\\n", number * 2);
+  return 0;
+}
+`,
+    },
+  ]}
+/>
+
+If you just ran a C program for the first time in your life — that
+took most programmers of earlier generations an afternoon of
+installing compilers. You'll learn what every character of that
+program means a few chapters from now.
+
 ## What makes this course different
 
 Most programming tutorials throw syntax at you on page one: "here is a
@@ -72,15 +102,16 @@ variable, here is an `if` statement, now write a calculator." That is
 fine if you already think like a programmer. If you don't, it feels
 like learning French by being handed a French dictionary.
 
-We are going to do the opposite. We will start with **stories**:
+This course pairs every piece of syntax with the **story and the
+machine underneath**:
 
-1. The story of how computers were invented and how humans slowly
-   learned to talk to them.
-2. The story of UNIX, Dennis Ritchie, and the birth of C.
-3. The story of how a program actually runs — what the CPU does, how
+1. The story of how humans learned to talk to machines at all, and
+   how UNIX, Dennis Ritchie, and a discarded computer gave birth
+   to C.
+2. The story of how a program actually runs — what the CPU does, how
    memory is organized, and what "executing code" really means.
-
-Only after that foundation do we open a code editor.
+3. Then the language itself, idea by idea, with the memory diagrams
+   that make pointers and the stack feel obvious instead of scary.
 
 The whole journey, end to end, is this: a **real-world problem →
 computational thinking → algorithm steps → C source code → compiler →
