@@ -404,8 +404,9 @@
 
 /* ─── Status banner ───────────────────────────────────────────────── */
 
-/* Solid colour band, white text (matches the challenge card's banner).
-   green-500 / red-500 read on both themes, so no dark-mode overrides. */
+/* Solid colour band, white text (matches the challenge card's banner) —
+   green-500 / red-500 in light mode, the 600 shades in dark mode (see
+   the html.dark overrides further down). */
 .banner {
   display: flex;
   align-items: center;
@@ -511,8 +512,15 @@
   background: color-mix(in srgb, var(--ds-red) 15%, transparent);
 }
 
-/* The verdict banner uses solid green-500 / red-500 with white text in
-   both themes, so it needs no dark-mode overrides. */
+/* Verdict banner: step the solid fill down to the 600 shades on dark
+   surfaces (matches the challenge card's banner). */
+:global(html.dark) .banner[data-state="pass"] {
+  background: var(--ds-green-600);
+}
+
+:global(html.dark) .banner[data-state="fail"] {
+  background: var(--ds-red-600);
+}
 
 :global(html.dark) .choiceLabel code,
 :global(html.dark) .choiceExplanation code,

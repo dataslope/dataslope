@@ -1690,9 +1690,9 @@
   gap: 4px;
 }
 
-/* Solid, borderless chips with white text. green-500 / red-500 read on
-   both light and dark card surfaces, so no dark-mode overrides are
-   needed (the former translucent variants are gone). */
+/* Solid, borderless chips with white text — green-500 / red-500 in
+   light mode, stepped down to the 600 shades in dark mode (see the
+   html.dark overrides near the end of this file). */
 .testPill[data-state="pass"] {
   background: var(--ds-green-500);
   color: #fff;
@@ -1722,11 +1722,12 @@
 
 /* ─── Test results rail ───
    Minimal pass/fail readout: a vertical rail down the left with one
-   circle per test — green-500 with a white check for a pass, red-500
-   with a white ✕ for a fail — and the rail segment below each circle
-   painted in that test's colour. Rows carry no boxes or borders; the
-   description, test code/checks, and the exact error message live in a
-   click popover. */
+   circle per test — green with a white check for a pass, red with a
+   white ✕ for a fail (500 shades in light mode, 600 in dark — see the
+   html.dark overrides near the end of this file) — and the rail segment
+   below each circle painted in that test's colour. Rows carry no boxes
+   or borders; the description, test code/checks, and the exact error
+   message live in a click popover. */
 .testRail {
   padding: 6px 14px 14px 16px;
   display: flex;
@@ -1962,8 +1963,9 @@
 
 /* ─── Status banner ───────────────────────────────────────────────── */
 
-/* Solid colour band, white text, no top border. green-500 / red-500
-   read on both themes, so no dark-mode overrides are needed. */
+/* Solid colour band, white text, no top border — green-500 / red-500 in
+   light mode, the 600 shades in dark mode (see the html.dark overrides
+   near the end of this file). */
 .banner {
   display: flex;
   align-items: center;
@@ -2264,8 +2266,37 @@
   background: #222222;
 }
 
-/* The test pill and status banner use solid green-500 / red-500 with
-   white text in both themes, so they need no dark-mode overrides. */
+/* The test pill, status banner, and test rail use solid green/red fills
+   with white text in both themes — light uses the 500 shades; dark steps
+   down to the 600 shades below so the bands sit more comfortably on dark
+   surfaces. */
+:global(html.dark) .testPill[data-state="pass"] {
+  background: var(--ds-green-600);
+}
+
+:global(html.dark) .testPill[data-state="fail"] {
+  background: var(--ds-red-600);
+}
+
+:global(html.dark) .banner[data-state="pass"] {
+  background: var(--ds-green-600);
+}
+
+:global(html.dark) .banner[data-state="fail"] {
+  background: var(--ds-red-600);
+}
+
+:global(html.dark) .testRailNode[data-state="pass"],
+:global(html.dark) .testRailSeg[data-state="pass"],
+:global(html.dark) .testPopoverStateDot[data-state="pass"] {
+  background: var(--ds-green-600);
+}
+
+:global(html.dark) .testRailNode[data-state="fail"],
+:global(html.dark) .testRailSeg[data-state="fail"],
+:global(html.dark) .testPopoverStateDot[data-state="fail"] {
+  background: var(--ds-red-600);
+}
 
 /* ─── Table viewer (SQL) ────────────────────────────────────────────── */
 
