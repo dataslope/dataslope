@@ -241,6 +241,21 @@ sequenceDiagram
 Two clicks. One lost update. No error, no exception, no log line —
 just a number that is quietly wrong.
 
+Races like this are not just a nuisance — they have a body count.
+The **Therac-25**, a radiation therapy machine of the mid-1980s,
+massively overdosed six patients, several fatally. Nancy Leveson and
+Clark Turner's landmark investigation found that the control software
+contained race conditions in shared state: if an experienced operator
+edited the treatment setup quickly enough, one part of the program
+read a shared variable at exactly the wrong moment and the machine
+delivered a radiation beam without its safety configuration. The bug
+had been latent in earlier models too, but those machines had
+hardware interlocks that masked it — the Therac-25 trusted the
+software alone. The case is now taught in every software engineering
+program in the world, and its core lesson is the lesson of this
+chapter: *state shared across concurrent activities is where the
+worst bugs live*.
+
 Functional programming offers a different deal. Instead of "look at
 the world, change the world", you say: *"given this snapshot of the
 world, what is the next snapshot?"* Time becomes an input, not a
@@ -282,12 +297,12 @@ TypeScript, for real applications.
 
 The shape of a computation changes accordingly:
 
-| Imperative | Functional |
-| --- | --- |
-| mutate `x` | a value |
-| mutate `y` | a pure transformation |
-| side effect | a new value |
-| | the effect, at the edge |
+| | Imperative style | Functional style |
+| --- | --- | --- |
+| Unit of expression | a statement that mutates a variable | a value produced by a transformation |
+| State over time | one box, overwritten in place | a series of snapshots, each derived from the last |
+| Side effects | sprinkled wherever convenient | pushed to the edges, visible in the types |
+| Reading the code | replay the history in your head | substitute values, like arithmetic |
 
 The next chapter looks at where these ideas *came from* — the
 mathematical and historical roots of functional programming, from

@@ -149,12 +149,11 @@ sort.* There's no index, no mutation, no `seen` set, no `for` loop.
 
 The two styles build a result along very different paths:
 
-| Imperative | Declarative |
-| --- | --- |
-| loop variables | data |
-| mutate accumulators | transformations |
-| control flow | data |
-| result | |
+| | Imperative | Declarative |
+| --- | --- | --- |
+| Building blocks | loop variables, accumulators, `for`/`if` | data and named transformations |
+| The result | emerges from executing the steps | *is* the expression you wrote |
+| To understand it | simulate the steps in your head | read the pipeline like a sentence |
 
 Declarative code:
 

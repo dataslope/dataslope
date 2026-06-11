@@ -39,6 +39,85 @@ core of the curriculum.
   </g>
 </svg>
 
+## Try it: the same problem, two shapes
+
+Everything in this course runs in your browser — every code block
+is type-checked, transpiled, and executed on the page, with nothing
+to install. Here are two programs that solve the same problem:
+*"From a list of orders, keep the paid ones, take their totals, and
+sum them."* The first is classic imperative style. Run it:
+
+<CodeBlock
+  adapter="typescript"
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Order = {
+  id: string;
+  status: "draft" | "paid" | "cancelled";
+  total: number;
+};
+
+const orders: Order[] = [
+  { id: "a", status: "paid", total: 30 },
+  { id: "b", status: "draft", total: 10 },
+  { id: "c", status: "paid", total: 50 },
+  { id: "d", status: "cancelled", total: 99 },
+  { id: "e", status: "paid", total: 20 },
+];
+
+let total = 0;
+for (let i = 0; i < orders.length; i++) {
+  if (orders[i].status === "paid") {
+    total += orders[i].total;
+  }
+}
+console.log("Imperative total:", total);
+`,
+    },
+  ]}
+/>
+
+Now the functional version — same data, same answer:
+
+<CodeBlock
+  adapter="typescript"
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Order = {
+  id: string;
+  status: "draft" | "paid" | "cancelled";
+  total: number;
+};
+
+const orders: Order[] = [
+  { id: "a", status: "paid", total: 30 },
+  { id: "b", status: "draft", total: 10 },
+  { id: "c", status: "paid", total: 50 },
+  { id: "d", status: "cancelled", total: 99 },
+  { id: "e", status: "paid", total: 20 },
+];
+
+const total = orders
+  .filter((o) => o.status === "paid")
+  .map((o) => o.total)
+  .reduce((a, b) => a + b, 0);
+
+console.log("Declarative total:", total);
+`,
+    },
+  ]}
+/>
+
+Both print `100`. But the second reads like the English sentence we
+started from: *"From orders, keep the paid ones, take their totals,
+sum them."* Try changing `"paid"` to `"draft"` in either block and
+re-running. That alignment between intention and code is what this
+entire course is about — and the coming chapters give you the
+principles and the type-level vocabulary to achieve it for problems
+much harder than a sum of integers.
+
 ## What this course is about
 
 ```mermaid
@@ -145,81 +224,6 @@ visible in the next. Every example is self-contained. For a
 persistent multi-file TypeScript workspace, open the
 [TypeScript Playground](/playground/typescript) in a new tab.
 </Callout>
-
-## A tiny taste
-
-Two programs that solve the same problem: *"From a list of orders,
-keep the paid ones, take their totals, and sum them."* The first
-uses the classic imperative style. The second uses functional
-composition.
-
-<CodeBlock
-  adapter="typescript"
-  files={[
-    {
-      filename: "main.ts",
-      starterCode: `type Order = {
-  id: string;
-  status: "draft" | "paid" | "cancelled";
-  total: number;
-};
-
-const orders: Order[] = [
-  { id: "a", status: "paid", total: 30 },
-  { id: "b", status: "draft", total: 10 },
-  { id: "c", status: "paid", total: 50 },
-  { id: "d", status: "cancelled", total: 99 },
-  { id: "e", status: "paid", total: 20 },
-];
-
-let total = 0;
-for (let i = 0; i < orders.length; i++) {
-  if (orders[i].status === "paid") {
-    total += orders[i].total;
-  }
-}
-console.log("Imperative total:", total);
-`,
-    },
-  ]}
-/>
-
-<CodeBlock
-  adapter="typescript"
-  files={[
-    {
-      filename: "main.ts",
-      starterCode: `type Order = {
-  id: string;
-  status: "draft" | "paid" | "cancelled";
-  total: number;
-};
-
-const orders: Order[] = [
-  { id: "a", status: "paid", total: 30 },
-  { id: "b", status: "draft", total: 10 },
-  { id: "c", status: "paid", total: 50 },
-  { id: "d", status: "cancelled", total: 99 },
-  { id: "e", status: "paid", total: 20 },
-];
-
-const total = orders
-  .filter((o) => o.status === "paid")
-  .map((o) => o.total)
-  .reduce((a, b) => a + b, 0);
-
-console.log("Declarative total:", total);
-`,
-    },
-  ]}
-/>
-
-Both produce `100`. But the second reads like the English sentence we
-wrote above the code: *"From orders, keep the paid ones, take their
-totals, sum them."* That alignment between intention and code is what
-this entire course is about — and the rest of the chapters will give
-you the principles and the type-level vocabulary to do it for
-problems that are much harder than a sum of integers.
 
 ## What you should already know
 

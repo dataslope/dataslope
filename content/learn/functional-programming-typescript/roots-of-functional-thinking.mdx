@@ -234,10 +234,19 @@ algebraic data types, persistent data structures.
 
 ## JavaScript discovers functional programming
 
-JavaScript had functions as first-class values from day one — it
-inherited that from Scheme, a Lisp dialect. But for years, the
-language was used mostly imperatively: `for` loops, mutation,
-prototypes.
+JavaScript had functions as first-class values from day one — and
+that is not an accident. When Netscape recruited Brendan Eich in
+1995, the pitch that drew him in was the chance to put **Scheme** —
+a famously elegant Lisp dialect — in the browser. Management then
+decided the new language had to *look* like Java, and Eich built the
+first version in a now-legendary ten days in May 1995. The result
+was a language with Java's curly braces but Scheme's soul:
+first-class functions and closures survived the corporate
+makeover. Every `.map` and every callback you've ever written runs
+on machinery smuggled in from the functional tradition.
+
+For years, though, the language was used mostly imperatively:
+`for` loops, mutation, prototypes.
 
 A few things changed that:
 
