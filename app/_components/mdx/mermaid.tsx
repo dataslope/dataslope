@@ -552,6 +552,7 @@ function adaptNodes(root: Element | null, isDark: boolean): void {
 
 function MermaidContent({ chart }: { chart: string }) {
   const id = useId();
+  const figureId = `diagram-${id.replace(/:/g, "")}`;
   const { resolvedTheme } = useTheme();
   const { default: mermaid } = use(cachePromise("mermaid", () => import("mermaid")));
 
@@ -591,33 +592,48 @@ function MermaidContent({ chart }: { chart: string }) {
   const [fullscreen, setFullscreen] = useState(false);
 
   return (
-    <div className={styles.wrap}>
-      <div
-        className={styles.diagram}
-        ref={(container) => {
-          if (container) {
-            bindFunctions?.(container);
-            adaptNodes(container, resolvedTheme === "dark");
-          }
-        }}
-        dangerouslySetInnerHTML={{ __html: svg }}
-      />
-      <button
-        type="button"
-        className={styles.expandBtn}
-        title="Expand to full page"
-        aria-label="Expand diagram to full page"
-        onClick={() => setFullscreen(true)}
-      >
-        <Maximize2 size={14} strokeWidth={2} aria-hidden />
-      </button>
-      {fullscreen && (
-        <MermaidFullscreen
-          svg={svg}
-          isDark={resolvedTheme === "dark"}
-          onClose={() => setFullscreen(false)}
+    <div>
+      <div className={styles.wrap}>
+        <div
+          className={styles.diagram}
+          ref={(container) => {
+            if (container) {
+              bindFunctions?.(container);
+              adaptNodes(container, resolvedTheme === "dark");
+            }
+          }}
+          dangerouslySetInnerHTML={{ __html: svg }}
         />
-      )}
+        <button
+          type="button"
+          className={styles.expandBtn}
+          title="Expand to full page"
+          aria-label="Expand diagram to full page"
+          onClick={() => setFullscreen(true)}
+        >
+          <Maximize2 size={14} strokeWidth={2} aria-hidden />
+        </button>
+        {fullscreen && (
+          <MermaidFullscreen
+            svg={svg}
+            isDark={resolvedTheme === "dark"}
+            onClose={() => setFullscreen(false)}
+          />
+        )}
+      </div>
+      <div
+        data-svg-id={figureId}
+        style={{
+          fontFamily: "var(--font-sans)",
+          fontSize: "0.6875rem",
+          color: "var(--ds-gray-400, #9CA3AF)",
+          textAlign: "center",
+          marginTop: "0.25rem",
+          letterSpacing: "0.025em",
+        }}
+      >
+        {figureId}
+      </div>
     </div>
   );
 }
