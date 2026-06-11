@@ -1,24 +1,234 @@
 ---
-title: Brendan Eich and the Birth of JavaScript
-description: How a 10-day prototype, written under impossible pressure, became one of the most influential programming languages ever made.
+title: From Punch Cards to the Browser — the Birth of JavaScript
+description: Why programming languages exist, why the early web desperately needed one inside the browser, and how Brendan Eich built it in ten days.
 ---
 
-In April 1995, a programmer named **Brendan Eich** joined **Netscape
-Communications**, the company that made the dominant web browser of
-the day. Within weeks, he was handed an assignment that, in
-hindsight, sounds absurd:
+In May 1995, a programmer named Brendan Eich wrote a programming
+language in **ten days**. Today that language runs on every phone,
+laptop, server farm, and smart television on Earth. It is, by most
+measures, the most widely used programming language ever created —
+and it was built in less time than most teams spend naming a
+project.
 
-> *Design and implement a new programming language for the next
-> release of Netscape Navigator. It must be embeddable directly in
-> HTML pages. It must look familiar to Java programmers. It must be
-> small and forgiving enough for amateurs and designers. We need a
-> working prototype in ten days.*
+How does that happen? Not by accident, it turns out, but by a
+collision of three stories: what programming languages *are*, what
+the early web *couldn't do*, and what one company needed shipped
+*immediately*. This page tells all three. By the end, half of
+JavaScript's famous quirks will already make sense — because almost
+all of them were decided in those ten days.
 
-Eich was 33 years old. He had a background in operating systems and
-compilers, and a deep interest in *functional* and *object-oriented*
-language design. He liked elegant, mathematically grounded languages
-like **Scheme** (a tiny, beautiful descendant of Lisp). He was about
-to invent something very different.
+## The machine underneath
+
+A computer, at its absolute lowest level, does not understand
+"JavaScript", "Python", "English", or even "math". A computer is, in
+the end, a vast collection of tiny switches, each either **on** or
+**off** — `1` or `0`. Patterns of bits flow through circuits, and
+the circuits react. Some patterns mean "add two numbers". Some mean
+"read the value at this position in memory". These patterns are
+called **machine code**, and they are the *only* thing a CPU truly
+understands.
+
+Here is what a single instruction looks like in raw bits:
+
+```
+10110000 01100001
+```
+
+That is genuinely how the earliest computers were programmed: by
+flipping physical switches or punching holes in cards. A "program"
+was a stack of cards, and a single mistake meant combing through
+thousands of bits by hand.
+
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="Three stacked layers: dense binary blocks at the bottom, short instruction dashes in the middle, and one smooth bar at the top — code rising from bits to ideas"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor">
+    <circle cx="56" cy="196" r="4" opacity="0.12" />
+    <circle cx="56" cy="160" r="4" opacity="0.18" />
+    <circle cx="56" cy="124" r="4" opacity="0.24" />
+    <circle cx="56" cy="88" r="4" opacity="0.3" />
+    <circle cx="56" cy="56" r="4" opacity="0.36" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="88" y="168" width="20" height="20" rx="4" />
+    <rect x="122" y="168" width="20" height="20" rx="4" fillOpacity="0.35" />
+    <rect x="156" y="168" width="20" height="20" rx="4" />
+    <rect x="190" y="168" width="20" height="20" rx="4" />
+    <rect x="224" y="168" width="20" height="20" rx="4" fillOpacity="0.35" />
+    <rect x="258" y="168" width="20" height="20" rx="4" />
+    <rect x="292" y="168" width="20" height="20" rx="4" fillOpacity="0.35" />
+    <rect x="326" y="168" width="20" height="20" rx="4" fillOpacity="0.35" />
+    <rect x="360" y="168" width="20" height="20" rx="4" />
+    <rect x="394" y="168" width="20" height="20" rx="4" fillOpacity="0.35" />
+    <rect x="428" y="168" width="20" height="20" rx="4" />
+    <rect x="462" y="168" width="20" height="20" rx="4" />
+    <rect x="496" y="168" width="20" height="20" rx="4" fillOpacity="0.35" />
+    <rect x="530" y="168" width="20" height="20" rx="4" />
+    <rect x="88" y="196" width="20" height="20" rx="4" fillOpacity="0.35" />
+    <rect x="122" y="196" width="20" height="20" rx="4" />
+    <rect x="156" y="196" width="20" height="20" rx="4" fillOpacity="0.35" />
+    <rect x="190" y="196" width="20" height="20" rx="4" />
+    <rect x="224" y="196" width="20" height="20" rx="4" />
+    <rect x="258" y="196" width="20" height="20" rx="4" fillOpacity="0.35" />
+    <rect x="292" y="196" width="20" height="20" rx="4" />
+    <rect x="326" y="196" width="20" height="20" rx="4" />
+    <rect x="360" y="196" width="20" height="20" rx="4" fillOpacity="0.35" />
+    <rect x="394" y="196" width="20" height="20" rx="4" />
+    <rect x="428" y="196" width="20" height="20" rx="4" fillOpacity="0.35" />
+    <rect x="462" y="196" width="20" height="20" rx="4" fillOpacity="0.35" />
+    <rect x="496" y="196" width="20" height="20" rx="4" />
+    <rect x="530" y="196" width="20" height="20" rx="4" fillOpacity="0.35" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="88" y="116" width="54" height="16" rx="8" />
+    <rect x="154" y="116" width="30" height="16" rx="8" />
+    <rect x="196" y="116" width="72" height="16" rx="8" />
+    <rect x="280" y="116" width="42" height="16" rx="8" />
+    <rect x="334" y="116" width="64" height="16" rx="8" />
+    <rect x="410" y="116" width="34" height="16" rx="8" />
+    <rect x="456" y="116" width="84" height="16" rx="8" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="88" y="52" width="300" height="24" rx="12" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="430" cy="64" r="12" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="470" y="52" width="24" height="24" rx="7" />
+  </g>
+</svg>
+
+Programmers climbed out of the bit-mine one rung at a time. The
+first rung was **assembly language**: short names for each bit
+pattern, translated back into bits by a program called an
+assembler. Instead of `10110000 01100001`, you could write
+`MOV AL, 0x61`. Vastly better — but still one line per machine
+instruction, and still specific to one kind of CPU.
+
+The second rung, in the late 1950s, was the real revolution:
+**high-level languages** like FORTRAN and COBOL, where a programmer
+could write `SUM = A + B` and a new kind of program — a
+**compiler** — would translate that human-friendly text into
+machine code. The same source code could now run on many different
+machines. From that point on, language designers kept asking the
+same question with different answers: *how close to human thought
+can we get, and what does it cost?* C chose speed. Lisp chose
+mathematical elegance. Smalltalk chose objects. Every language is a
+set of opinions.
+
+Hold on to the core picture, because it is the foundation of
+everything in this course: **source code is just text**. By itself
+it does nothing. The magic happens when a **runtime** — a compiler
+or an interpreter — reads that text and makes the machine act.
+
+## Run your first program
+
+JavaScript's runtimes are programs like V8 (inside Chrome and
+Node.js), SpiderMonkey (Firefox), and JavaScriptCore (Safari) — and
+there is one running in your browser right now. Below is a real,
+runnable JavaScript program. Don't worry about understanding every
+symbol; we will spend the whole course on that. Just notice that
+the code is plain text, and that pressing *Run* makes a runtime
+bring it to life.
+
+<CodeBlock
+  adapter="javascript"
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `// Anything after // on a line is a "comment" — JavaScript ignores it.
+// This program adds two numbers and prints the result.
+
+const a = 3;
+const b = 4;
+const sum = a + b;
+
+console.log("The sum of", a, "and", b, "is", sum);
+`,
+    },
+  ]}
+/>
+
+You just ran a program. There was a runtime, it read your text, and
+the text caused something to happen. That is the entire story of
+computing, in miniature. Now: why did a language like this end up
+*inside a web browser*?
+
+## The web before JavaScript
+
+In the late 1980s, a researcher at CERN named **Tim Berners-Lee**
+designed a system for sharing scientific documents. It had three
+pieces we still use today: **HTML** (documents with links),
+**HTTP** (a way to ask another computer for a document), and
+**URLs** (a way to name any document anywhere). That is *all* the
+early web was: a global, hyperlinked library of documents. You
+opened a browser; it downloaded a page; you read it. The page was
+exactly as static as a printed one.
+
+If you wanted anything "interactive" — say, submitting a form — the
+entire form went to the server, the server checked it, and the
+server sent back a *brand new page*. Forgot to fill in your email?
+Round trip. Typo in the date? Round trip. On a mid-1990s modem,
+every round trip took seconds.
+
+```mermaid
+sequenceDiagram
+    participant U as You (in browser)
+    participant S as Web server
+    U->>S: Submit form
+    S-->>U: New page, "email is missing"
+    U->>S: Submit form again
+    S-->>U: New page, "date looks wrong"
+    Note over U: Seconds of waiting, per mistake.
+```
+
+The experience felt like passing notes through a closed door.
+Everyone could see what was needed: the **browser itself** should
+be able to run small programs — check the form *before* sending it,
+open a menu, update a clock — without asking the server's
+permission for every move. In other words, the browser needed to
+host a programming language.
+
+## The Java detour
+
+The first serious attempt was not JavaScript. In 1995, Sun
+Microsystems released **Java**, a serious, statically typed
+language with a famous promise: *write once, run anywhere*. Sun and
+Netscape — maker of Navigator, the dominant browser — struck a
+deal: Navigator would embed a Java Virtual Machine, and web pages
+could include small Java programs called **applets**.
+
+Applets worked, but they were the wrong shape for the job. Each one
+downloaded a chunk of code and booted a virtual machine, so they
+were slow to start. They lived in an isolated box, largely cut off
+from the rest of the page. And Java itself was simply *too big* for
+the small jobs a typical page needed. You should not need a
+compiler, a class hierarchy, and a virtual machine to check whether
+an email field contains an `@`.
+
+Netscape's leadership saw the gap clearly: Java would be the big,
+serious language in the page, and next to it they needed a **small,
+friendly scripting language** — something a graphic designer could
+pick up in an afternoon, something that lived directly inside the
+HTML. It had to be easy, forgiving, vaguely Java-looking so the
+syntax felt familiar, and — because Netscape was in a knife-fight
+with competitors — it had to ship in the *next browser release*.
+
+That is the job Brendan Eich was hired for.
+
+## Ten days in May
+
+Eich joined Netscape in April 1995. He was 33, with a background in
+operating systems and compilers, and a deep fondness for **Scheme**
+— a tiny, elegant descendant of Lisp in which functions are values
+you can pass around like numbers. The assignment he was handed
+sounds absurd in hindsight: design and implement a new language,
+embeddable in HTML, friendly to amateurs, Java-flavoured on the
+surface, and demo-ready in ten days.
 
 <svg
   viewBox="0 0 640 270"
@@ -54,156 +264,62 @@ to invent something very different.
   </g>
 </svg>
 
-## The constraints, in detail
-
-Several decisions had already been made for him before he wrote a
-single line of code:
+Several decisions had been made for him before he wrote a line:
 
 1. **It must look like Java.** Java was the buzz of the industry,
-   and Netscape's marketing wanted to ride that wave. The syntax —
-   curly braces, semicolons, `if`, `while`, `for`, `function` — was
-   essentially mandatory.
-2. **It must be tiny.** It would live inside an `<script>` tag, run
-   in milliseconds, and not require a separate compiler.
+   and Netscape's marketing wanted to ride the wave. Curly braces,
+   semicolons, `if`, `while`, `for` — essentially mandatory.
+2. **It must be tiny.** It would live inside a `<script>` tag and
+   run instantly, with no compile step.
 3. **It must never crash the browser.** A bug in a script on some
-   random web page must not bring down Navigator. The language had
-   to be *forgiving* — silent coercions instead of hard errors,
-   defaults for missing values, no risky pointer operations.
-4. **It must ship in weeks.** There was no time to design a clean,
-   minimalist language and revise it for years. Whatever Eich
-   shipped would be locked in by deployment to millions of users.
+   random web page could not be allowed to bring down Navigator.
+   The language had to be *forgiving*: silent conversions instead
+   of hard errors, defaults for missing values, no dangerous memory
+   operations.
+4. **It must ship in weeks.** No years of careful revision.
+   Whatever Eich shipped would be locked in by deployment to
+   millions of users.
 
 These are not the conditions under which a beautiful language gets
 designed. They are the conditions under which a *useful, weird,
 incredibly successful* language gets designed.
 
-## The first prototype
+In ten days in May 1995, Eich produced a working prototype, called
+**Mocha** internally, then renamed **LiveScript**, and finally —
+purely to ride Java's hype — **JavaScript**. It was one of the most
+consequential marketing decisions in software history, and one of
+the most confusing. JavaScript and Java are **not the same
+language**. They are not even relatives. They share little beyond
+curly braces, yet thirty years later beginners still ask "is Java
+like JavaScript?" and seasoned programmers still grit their teeth.
 
-Eich worked feverishly. In **ten days in May 1995**, he produced a
-working prototype. The language was internally called **Mocha**, then
-**LiveScript**, and finally — for marketing reasons, to ride Java's
-hype — **JavaScript**.
+The disguise mattered less than what Eich smuggled in underneath
+it. Behind the Java-shaped syntax, he planted ideas from the
+languages he actually loved:
 
-The choice of name was, in hindsight, one of the most consequential
-marketing decisions in software history. JavaScript and Java are
-**not the same language**. They are not from the same family. They
-share little more than curly braces. But the name "JavaScript" stuck
-forever, and to this day beginners ask *"is Java like JavaScript?"*
-and seasoned programmers grit their teeth.
+- **First-class functions**, from Scheme. A function in JavaScript
+  is a value — you can store it in a variable, hand it to another
+  function, return it from a function. This single idea is the
+  bedrock of modern JavaScript style, and we will spend several
+  chapters on it.
+- **Prototype-based objects**, from a research language called
+  **Self**. Instead of classes as blueprints, JavaScript objects
+  can inherit directly from other objects.
+- **Dynamic typing**, from the scripting-language tradition:
+  variables don't declare types; values carry them.
 
-Inside Mocha/LiveScript/JavaScript, Eich smuggled in ideas that had
-nothing to do with Java:
+Learning JavaScript well largely means noticing the Scheme-and-Self
+soul peeking out from behind the Java-shaped curly braces.
 
-- **First-class functions** from Scheme. A function in JavaScript is
-  a value — you can store it in a variable, pass it as an argument,
-  return it from another function. This is the bedrock of modern
-  JavaScript style.
-- **Prototype-based objects** from a niche language called **Self**.
-  Instead of classes-as-blueprints (as in Java), JavaScript objects
-  inherit directly from other objects.
-- **Dynamic typing** from a long lineage of scripting languages.
-  Variables don't have a fixed type; values do.
-- **A tiny set of primitive types** (number, string, boolean, null,
-  undefined) and one universal container (the object).
+## What the tiny language could do
 
-The Java-flavoured syntax was the **disguise**. The Scheme-and-Self
-soul was the **substance**. To this day, learning JavaScript well
-means slowly noticing the Scheme/Self ideas peeking out from behind
-the Java-shaped curly braces.
-
-## The first JavaScript program in the wild
-
-By the end of 1995, **Netscape Navigator 2.0** shipped with
-JavaScript built in. Web designers could now write things like this
-directly inside their HTML:
-
-```html
-<script>
-  // Validate before submitting!
-  function checkForm() {
-    if (document.forms[0].email.value === "") {
-      alert("Please enter your email.");
-      return false;
-    }
-    return true;
-  }
-</script>
-```
-
-This looks unremarkable now. In late 1995, it was magical. A web
-page could *react* to the user without asking the server. Designers
-who had never written software in their lives could make their
-pages come alive.
-
-Microsoft, watching from across the industry, panicked. In 1996, they
-reverse-engineered JavaScript and shipped their own version inside
-Internet Explorer 3. They called it **JScript**, partly to avoid
-trademark issues with the name "Java", and partly because Microsoft
-was Microsoft. The two implementations were similar but not
-identical — and the great browser wars began, with web developers
-caught in the middle.
-
-To bring order to the chaos, Netscape and Microsoft both submitted
-the language to a standards body called **Ecma International**. The
-standardised version of the language was called **ECMAScript**
-(yes, an ugly name — "JavaScript" was a trademark held by Sun, and
-politics required a different word). To this day, the *language* is
-formally ECMAScript and **JavaScript** is the popular name for it.
-
-```mermaid
-timeline
-    title The birth and early years of JavaScript
-    1994 May : Marc Andreessen co-founds Netscape; web becomes mainstream
-    1995 Apr : Brendan Eich joins Netscape
-    1995 May : Eich writes the first prototype in 10 days
-              Originally called "Mocha"
-    1995 Sep : Renamed "LiveScript", then "JavaScript" for marketing
-    1995 Dec : Netscape Navigator 2.0 ships with JavaScript
-    1996 : Microsoft ships JScript in Internet Explorer 3
-    1997 : ECMAScript 1 standardised by Ecma International
-    1998 : ECMAScript 2 (minor edits to align with ISO)
-    1999 : ECMAScript 3 (huge update — regular expressions, try/catch)
-    2000–2008 : "The dark ages" — ES4 attempted, then abandoned
-    2009 : ECMAScript 5 (strict mode, JSON, getters/setters)
-```
-
-## What the language actually was
-
-Strip away the marketing and the lawsuits, and that first JavaScript
-was a tiny language with a few simple ingredients:
-
-- A handful of **primitive values**: numbers, strings, `true`,
-  `false`, and a couple of "absence" values (`null` and `undefined`).
-- A single composite shape: the **object** — a bag of named values.
-- **Functions** as first-class citizens, able to be stored, passed,
-  and returned.
-- A small set of **control structures** — `if`, `while`, `for`,
-  `return`.
-- Automatic memory management — you never write `malloc` or `free`.
-- And a single, surprisingly powerful idea: **almost anything can be
-  reshaped at runtime.** You can add properties to objects, change
-  the behaviour of functions, even modify built-in types.
-
-Notice what is *not* in that list:
-
-- No types you have to declare ahead of time.
-- No separate compile step.
-- No threading.
-- No file system access (it was a browser language!).
-- No standard way to import code from other files (that came much,
-  much later).
-
-Almost every later feature of JavaScript — classes, modules,
-`async`/`await`, destructuring, template literals — is something
-added *on top of* that original tiny core, in a backward-compatible
-way. The language has grown enormously since 1995, but it has never
-been allowed to break the millions of web pages already in the wild.
-
-## A taste of "1995-style" JavaScript
-
-The original JavaScript was small, but it could already do a lot.
-Here is a flavour of the kind of code that was being written back
-then — and that still runs, unchanged, today.
+By December 1995, Netscape Navigator 2.0 shipped with JavaScript
+built in, and web designers could make a page *react* without a
+server round trip. The language was small: a handful of primitive
+values, one universal container (the object), functions as values,
+a few control structures, and automatic memory management. Here is
+the flavour of mid-90s JavaScript — and every line of it still runs
+today, unchanged:
 
 <CodeBlock
   adapter="javascript"
@@ -222,15 +338,13 @@ const user = {
 };
 
 console.log(greet(user.name));
-console.log("Age:", user.age);
 
 // You can add properties to an object at any time —
 // JavaScript will not stop you.
 user.email = "ada@example.com";
 console.log("Email:", user.email);
 
-// A function can be stored in a variable
-// (and called via that variable).
+// A function can be stored in a variable, like a number.
 const shout = function (text) {
   return text.toUpperCase() + "!!!";
 };
@@ -241,47 +355,70 @@ console.log(shout("javascript was born in 1995"));
   ]}
 />
 
-Notice the patterns:
+Look at what happened there: we added a property to an object after
+creating it, and we put a function in a variable as if it were a
+string. Both of those design choices — radical permissiveness, and
+functions as ordinary values — were made in those frantic ten days,
+and both shaped how the entire web works now.
 
-- We declared a function, then later used it.
-- We made an object with two properties, then *added a third one
-  later*. JavaScript is happy to let us do that.
-- We stored a function in a variable as if it were a number or a
-  string. (That is the **first-class function** idea from Scheme.)
+## Standard wars and a strange name
 
-Every one of those design choices was made in those frantic ten days
-in 1995, and every one of them shaped how the entire web works
-today.
+Microsoft noticed. In 1996 they reverse-engineered the language and
+shipped their own version, **JScript**, in Internet Explorer 3. Two
+similar-but-not-identical implementations in two warring browsers
+was a nightmare for developers, so the language was submitted to a
+standards body, **Ecma International**. The standardized language
+was named **ECMAScript** — "JavaScript" was trademarked, and
+politics demanded a different word. To this day the specification
+says ECMAScript and everyone on Earth says JavaScript.
 
-## Why this language, of all languages, took over
+```mermaid
+timeline
+    title The birth and early years of JavaScript
+    1995 Apr : Brendan Eich joins Netscape
+    1995 May : Eich writes the first prototype in 10 days
+              Originally called "Mocha"
+    1995 Sep : Renamed "LiveScript", then "JavaScript" for marketing
+    1995 Dec : Netscape Navigator 2.0 ships with JavaScript
+    1996 : Microsoft ships JScript in Internet Explorer 3
+    1997 : ECMAScript 1 standardised by Ecma International
+    1999 : ECMAScript 3 — regular expressions, try/catch
+    2009 : ECMAScript 5 — strict mode, JSON
+```
 
-It is worth pausing to ask: **why** did this hurried, ten-day,
-designed-by-pressure language end up running on every device
-connected to the internet?
+## Why this language, of all languages?
 
-A few reasons, none of which are about elegance:
+It is worth pausing on the question, because the answer is *not*
+"because it was the best design". A few reasons, none of them about
+elegance:
 
-1. **It shipped first, and shipped in the most important place** —
-   the world's most-used browser, at the exact moment the web was
-   exploding.
-2. **It was forgiving.** Beginners could ignore many subtleties,
-   make mistakes, and still see something work. That accessibility
-   pulled in millions of people who would never have learned a more
-   strict language.
-3. **It was light.** A tiny script in a tag could change a page —
-   no installer, no plugin, no virtual machine to set up.
-4. **It was universal.** No matter which browser, no matter which
-   operating system, JavaScript was *there*. For a long time, it
-   was the **only** programming language with that property.
+1. **It shipped first, in the most important place** — the world's
+   dominant browser, at the precise moment the web exploded.
+2. **It was forgiving.** Beginners could make mistakes and still
+   see something work. That accessibility pulled in millions of
+   people a stricter language would have turned away.
+3. **It was light.** A few lines in a tag could change a page — no
+   installer, no plugin, no virtual machine.
+4. **It was universal.** Whatever the browser, whatever the
+   operating system, JavaScript was *there*. For decades it was the
+   only language with that property.
 
-JavaScript did not win because it was the best language. It won
-because it was the **right language in the right place at the right
-time**, and because nobody had a chance to replace it before it
-became too entrenched.
+JavaScript won because it was the right language in the right place
+at the right time — and because, once it was everywhere, nobody
+could replace it. What happened next is its own story: the language
+everyone dismissed as a toy grew into the backbone of modern
+software. That story is the next page.
 
-Once JavaScript was everywhere, something interesting happened:
-people started using it for things it was never designed for. That
-is the next part of our story.
+<Callout type="info" title="Want more of the deep history?">
+This page compresses a much longer story. If you enjoy this kind of
+thing, the **Interesting discussions** section at the end of the
+course digs further: [Scripting languages and the art of
+glue](/learn/beginners-javascript/scripting-and-glue) explains where
+"scripting" languages came from and why big systems embed small
+languages, and [JavaScript beyond the
+browser](/learn/beginners-javascript/javascript-beyond-the-browser)
+tours the surprising places JavaScript runs today.
+</Callout>
 
 ---
 

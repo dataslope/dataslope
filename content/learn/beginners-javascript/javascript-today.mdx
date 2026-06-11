@@ -1,208 +1,278 @@
 ---
-title: JavaScript Today — A General-Purpose Language
-description: Why JavaScript is the right language to learn first in 2025, what it has become, and what its strengths and weaknesses are.
+title: From Toy to Everywhere — JavaScript Today
+description: How a ten-day prototype grew into the world's most-used language, and what JavaScript actually is in 2025.
 ---
 
-We have walked through how JavaScript came to be. Now let's pin down
-what it actually *is*, today, in 2025 — and why it is a good first
-programming language to learn deeply.
+When JavaScript shipped in 1995, almost nobody thought of it as a
+*real* programming language. It validated forms. It animated
+snowflakes on personal homepages. It put a digital clock in the
+corner of a page. Serious software lived on the server, written in
+PHP, Java, or Perl; JavaScript was a sprinkle on top.
+
+This page tells the story of how that changed — slowly, then
+suddenly — and ends with a clear-eyed picture of what JavaScript
+*is* today, including the one distinction that will save you more
+confusion than any other as you learn.
 
 <svg
-  viewBox="0 0 640 210"
+  viewBox="0 0 640 260"
   role="img"
-  aria-label="A row of rounded bars rising from left to right, the tallest in blue, with an even taller faint bar still ahead"
+  aria-label="Circles, squares, and triangles bursting outward in rings from a central circle — an ecosystem exploding"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="80" y="190" width="480" height="4" rx="2" fill="currentColor" opacity="0.12" />
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <rect x="120" y="116" width="56" height="70" rx="12" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <rect x="212" y="86" width="56" height="100" rx="12" />
-    <circle cx="424" cy="16" r="7" />
-  </g>
-  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
-    <rect x="304" y="56" width="56" height="130" rx="12" />
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="560" cy="130" r="3" />
+    <circle cx="80" cy="130" r="3" />
+    <circle cx="525" cy="38" r="3" />
+    <circle cx="115" cy="222" r="3" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <rect x="396" y="30" width="56" height="156" rx="12" />
-    <rect x="488" y="10" width="56" height="176" rx="12" fillOpacity="0.22" />
+    <circle cx="320" cy="130" r="26" />
+    <circle cx="250" cy="130" r="10" />
+    <circle cx="435" cy="130" r="7" />
+    <rect x="233" y="205" width="12" height="12" rx="3" />
+    <circle cx="450" cy="55" r="4" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="390" cy="130" r="10" />
+    <rect x="276" y="182" width="18" height="18" rx="4" />
+    <rect x="395" y="43" width="12" height="12" rx="3" />
+    <circle cx="205" cy="130" r="7" />
+    <circle cx="320" cy="245" r="5" />
+    <circle cx="450" cy="205" r="4" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="346" y="60" width="18" height="18" rx="4" />
+    <circle cx="355" cy="191" r="9" />
+    <circle cx="320" cy="15" r="6" />
+    <circle cx="401" cy="211" r="6" />
+    <circle cx="190" cy="55" r="4" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <polygon points="285,58 296,78 274,78" />
+    <circle cx="239" cy="49" r="5" />
+    <circle cx="170" cy="205" r="3" fillOpacity="0.6" />
   </g>
 </svg>
+
+## The dark ages (1995–2005)
+
+The first decade was, frankly, painful. Netscape, Internet
+Explorer, and later Firefox each had subtly different
+implementations of the language and the page. The same code might
+work in one browser and silently fail in another, so programmers
+shipped piles of defensive scaffolding:
+
+```javascript
+// Pseudo-real code from the early 2000s
+if (window.attachEvent) {
+  element.attachEvent("onclick", handler);   // Internet Explorer
+} else if (window.addEventListener) {
+  element.addEventListener("click", handler); // Everyone else
+}
+```
+
+Writing serious software on this ground felt like building a house
+during an earthquake, and the language's toy reputation hardened.
+But three things were quietly improving underneath: browser engines
+were getting dramatically faster, the ECMAScript standard was
+pulling implementations into line, and web pages were getting more
+ambitious. People wanted *applications*, not documents.
+
+## The AJAX revolution (2004–2005)
+
+Then two products shocked the industry: **Gmail** (2004) and
+**Google Maps** (2005). Gmail behaved like a desktop email client
+that happened to live in a browser tab — instant, no full-page
+reloads. Google Maps let you *drag* a world map smoothly while new
+tiles streamed in under your cursor.
+
+The trick underneath both was the same: JavaScript could silently
+ask the server for new data **in the background**, using a
+half-forgotten browser feature called `XMLHttpRequest`, and update
+parts of the page without reloading it. The pattern got a catchy
+name — **AJAX** (Asynchronous JavaScript And XML) — and it
+instantly reframed the language in everyone's mind. Maybe
+JavaScript wasn't a toy. Maybe it was the foundation of a new kind
+of software.
+
+## Libraries, then a jailbreak
+
+Even after AJAX, raw browser programming was rough, so the
+community built layers to smooth it over. The most famous was
+**jQuery**, released by John Resig in 2006 — one line of jQuery
+replaced fifty lines of cross-browser plumbing, and for years it
+was the most-used library on the web. Hundreds of libraries
+followed. The lesson stuck: when the platform lags, the JavaScript
+community builds what's missing rather than waiting.
+
+The real turning point came in 2009, when **Ryan Dahl** took V8 —
+the high-performance JavaScript engine Google built for Chrome —
+and wrapped it so it could run **outside the browser**: on a
+server, or on your laptop's command line. He called the result
+**Node.js**.
+
+It is hard to overstate what this changed. Until Node.js,
+JavaScript was a language *trapped* inside a browser. After it, you
+could write web servers, command-line tools, and build scripts in
+JavaScript — and share code between the browser and the server.
+
+```mermaid
+flowchart LR
+    subgraph Before["Before Node.js (pre-2009)"]
+        B1[JavaScript] --> B2[Only runs inside browsers]
+    end
+    subgraph After["After Node.js"]
+        A1[JavaScript] --> A2[Browsers]
+        A1 --> A3[Servers]
+        A1 --> A4[Command-line tools]
+        A1 --> A5[Build pipelines]
+        A1 --> A6[Desktop apps, IoT, ...]
+    end
+```
+
+Node.js brought a companion that mattered just as much: **npm**,
+a central registry where anyone could publish a reusable package.
+Today npm hosts millions of packages — the largest collection of
+shared code in the history of software. (The full tour of where
+JavaScript ended up running — desktops, phones, robots, databases —
+is a story of its own; we keep it for the [Interesting discussions
+section](/learn/beginners-javascript/javascript-beyond-the-browser)
+at the end of the course.)
+
+On top of this platform grew the **frameworks** you have probably
+heard of — React, Vue, Angular, Svelte — and an industry of build
+tools: bundlers, linters, formatters, type checkers. You need none
+of them to learn the language, and this course deliberately uses
+none of them. When people say "I'm learning JavaScript" they often
+mean "I'm learning React"; this course is the other way around. We
+are learning the language those frameworks stand on.
+
+## The language grows up
+
+While the ecosystem exploded, the language itself was transformed.
+After years of standards stagnation, **ECMAScript 2015** (usually
+called ES6) landed the largest upgrade in the language's history:
+`let` and `const`, arrow functions, classes, template literals,
+destructuring, modules, and Promises all arrived at once. Since
+then the language has shipped a small, careful release every
+year — `async`/`await` in 2017, optional chaining `?.` and nullish
+coalescing `??` in 2020, and so on.
+
+Through all of it, the committee has kept one iron rule: **don't
+break the web**. Features are added; almost nothing is ever
+removed. A page written in 1996 should still run today. That is
+why JavaScript carries its entire history with it — `var` and
+`==` still exist, even though modern code avoids them — and why
+this course will occasionally say "this exists, don't use it".
+
+Here is a taste of the modern language, using several features that
+did not exist in 1995. If it looks like magic, good — by the end of
+this course, every line will be ordinary to you:
+
+<CodeBlock
+  adapter="javascript"
+  files={[
+    {
+      filename: "main.js",
+      starterCode: `const users = [
+  { name: "Ada", role: "admin", active: true },
+  { name: "Linus", role: "member", active: true },
+  { name: "Grace", role: "admin", active: false },
+];
+
+// Arrow function + .filter() + destructuring + template literal:
+const activeAdmins = users
+  .filter(({ role, active }) => role === "admin" && active)
+  .map(({ name }) => \`Active admin: \${name}\`);
+
+console.log(activeAdmins);
+
+// Optional chaining: safely read a nested value
+// without crashing if something in the middle is missing.
+const first = users[0]?.name?.toUpperCase();
+console.log("First user (shouting):", first);
+`,
+    },
+  ]}
+/>
 
 ## What JavaScript is, in one sentence
 
 > **JavaScript is a dynamic, multi-paradigm, garbage-collected
-> programming language that runs almost everywhere, with first-class
-> functions, mutable objects, and a single-threaded asynchronous
+> programming language that runs almost everywhere, with
+> first-class functions and a single-threaded asynchronous
 > execution model.**
 
-That sentence is dense. Let's pull it apart.
+That sentence is dense, and unpacking it is a preview of the whole
+course:
 
-### Dynamic
+**Dynamic** means decisions about what a value *is* are made while
+the program runs. A variable can hold a number on one line and a
+string on the next. This makes the language flexible and easy to
+start with — and it means some mistakes only reveal themselves at
+runtime, which is why we will spend real time on debugging.
 
-"Dynamic" means decisions about what a value *is* are made while the
-program is running, not before. A variable can hold a number on one
-line and a string on the next. A function can be passed a number
-where it expected a string and it will not refuse — it will try to
-do something reasonable (sometimes too reasonable).
+**Multi-paradigm** means JavaScript doesn't force one style on you.
+You can write step-by-step imperative code, organise behaviour into
+objects, or compose pure functions into pipelines — and a healthy
+codebase often mixes all three. This course teaches each style and,
+more importantly, when each one shines.
 
-This makes JavaScript flexible and easy to start. It also means
-some classes of bug — like calling `.toLowerCase()` on something
-that turned out to be `undefined` — can only be caught at runtime.
+**Garbage-collected** means you never manually free memory. The
+runtime watches which values your program can still reach and
+quietly reclaims the rest. In a language like C, forgetting to
+free memory is an entire category of painful bugs; in JavaScript,
+the category simply does not exist.
 
-### Multi-paradigm
+**First-class functions** — the Scheme inheritance from the
+previous page — means functions are values: storable, passable,
+returnable. It sounds abstract and is actually the single most
+practical feature of the language. Every modern JavaScript library
+leans on it, and so will you.
 
-A "paradigm" is a style of organising programs. The big ones are:
+**Single-threaded and asynchronous** is the big one. JavaScript
+does one thing at a time — yet it handles thousands of slow
+operations (network requests, timers, clicks) without freezing, by
+*scheduling* work instead of waiting for it. This sounds
+paradoxical now. The runtime chapters near the end of the course
+will make it precise, and it will become one of your favourite
+things about the language.
 
-- **Imperative** — give the computer step-by-step instructions
-  ("first do this, then do that").
-- **Procedural** — group instructions into procedures (functions)
-  that can be called repeatedly.
-- **Object-oriented** — group data and behaviour together into
-  objects.
-- **Functional** — treat computation as the application of
-  functions, mostly without changing state.
+## The three layers (the distinction that saves you)
 
-JavaScript supports all four. You can write tight imperative loops,
-elegant functional pipelines, classical class hierarchies, or any
-mix. Different parts of the same codebase often use different styles
-on purpose. We will see all of them in this course.
+The single most useful mental model for a beginner is that
+"JavaScript" is used to mean three different layers:
 
-### Garbage-collected
+1. **The language itself** — syntax, values, functions, closures,
+   async. Standardized, portable, slow-changing. *This is what
+   this course teaches.*
+2. **The platform APIs** — what your code can *do* depends on
+   where it runs. Browsers add the DOM and `fetch`; Node.js adds
+   files and servers. Same language, different toolbelts.
+3. **The frameworks and tools** — React, Vue, Express, Vite,
+   TypeScript, ESLint… an ever-shifting landscape built *on top of*
+   the other two layers.
 
-You never have to explicitly free memory in JavaScript. When you
-create an object, the runtime keeps it alive as long as something
-in your program is referring to it. When nothing refers to it any
-more, the runtime quietly reclaims that memory. The thing that does
-the reclaiming is called a **garbage collector**, and it is a
-hugely complex piece of engineering inside the runtime, but for you
-as the programmer, it is **invisible**.
+Layer 3 changes every few years. Layer 1 essentially never changes
+— code you write in it, and the understanding you build of it,
+does not expire. That is why this course lives in layer 1: learn
+the language deeply once, and every framework becomes "just a
+library I can read the docs for".
 
-This is a beginner-friendly choice. In a language like C, forgetting
-to free memory is a common, frustrating, security-sensitive class
-of bug. In JavaScript, the whole category just does not exist.
-
-### First-class functions
-
-Functions in JavaScript are values, like numbers and strings. You
-can:
-
-- Store a function in a variable.
-- Pass a function as an argument to another function.
-- Return a function from a function.
-- Put functions inside arrays and objects.
-
-This may sound abstract; it is actually one of JavaScript's most
-practical and important features. Every modern JavaScript library
-uses it constantly. We have a whole later chapter on it.
-
-### Mutable objects
-
-Once you make an object, you can usually change it in place — add a
-property, change a value, remove a field. This is convenient and
-can also be a source of subtle bugs (different parts of a program
-might share an object and step on each other). Modern JavaScript
-encourages *avoiding* unnecessary mutation; we will see why and how.
-
-### Single-threaded, asynchronous
-
-This is a big one. By default, **JavaScript runs in a single
-thread** — that is, it does one thing at a time. There is no
-parallel `do this and that simultaneously` model baked into the
-language at the basic level.
-
-So how does JavaScript handle waiting for the network, reading a
-file, or running a timer without freezing up? Through an
-**asynchronous, event-driven** model. The runtime keeps a queue of
-"things to do later", and your code says things like "*when this
-network request finishes, run this function*". The runtime takes
-care of scheduling.
-
-We will spend an entire chapter on this. For now, just internalise:
-**one thing at a time, but never block waiting**.
-
-## What JavaScript is good at
-
-- **Getting started fast.** Open a browser, open the console, type
-  code, see results. No install, no setup.
-- **Interactive software.** Web pages, dashboards, real-time
-  collaborative tools.
-- **Networked applications.** Both client and server, including
-  real-time things like chat and collaborative editing.
-- **Gluing things together.** Reading and reshaping data, calling
-  APIs, transforming files.
-- **Cross-platform code.** The same skill set works in browsers,
-  on servers, on desktops, and on phones.
-
-## What JavaScript is *not* especially good at
-
-It is honest to acknowledge JavaScript's limits:
-
-- **Raw numerical performance.** For heavy maths or simulations, C,
-  Rust, Julia, or Fortran will outperform JavaScript significantly.
-- **Strict correctness guarantees.** Type errors that languages like
-  Rust or Haskell can prevent at compile time will, in JavaScript,
-  often only show up at runtime. (TypeScript helps a lot here.)
-- **Tiny memory footprints.** A JavaScript runtime is not as small
-  as a C binary, so it is not the natural choice for the most
-  constrained embedded systems.
-- **Multi-threaded CPU-bound work.** JavaScript can do this (via
-  workers), but languages built around threads from day one (Go,
-  Rust, Java) have a much smoother story.
-
-For most application programming, none of these limitations matter.
-For some specialised domains, they do, and that is why other
-languages will always exist.
-
-## A useful mental model: "JavaScript the language" vs "everything around it"
-
-A common source of confusion for beginners is that "learning
-JavaScript" is sometimes used to mean three quite different things:
-
-1. **The language itself.** Syntax, control flow, functions,
-   closures, objects, async/await. This is what this course is
-   about. Stable, well-defined, slow-changing.
-2. **The platform APIs.** What you can *do* from JavaScript depends
-   on where you run it. In a browser: the DOM, `fetch`,
-   `localStorage`. In Node.js: the filesystem, child processes,
-   HTTP servers. These differ between runtimes.
-3. **The frameworks and tools.** React, Vue, Angular, Express,
-   Next.js, Webpack, Vite, Babel, TypeScript, ESLint… an
-   ever-changing landscape of libraries built **on top of** the
-   language.
-
-Each layer builds on the one before it: the platform APIs assume the
-language, and the frameworks and tools assume both. Layer 1 is the
-foundation. The things in layer 3 change every few
-years. The things in layer 1 essentially never change. By focusing
-this course on layer 1, we are giving you a skill that will not
-expire.
-
-## Why this is a great first programming language
-
-A few reasons, in plain English:
-
-- **You see results instantly.** Type, press Run, watch it happen.
-- **The setup is zero.** Every device with a browser is a
-  development environment.
-- **The community is enormous.** Almost any question you have has
-  been answered online.
-- **The job market is huge.** JavaScript developers are needed
-  everywhere, in every industry.
-- **It teaches good ideas.** First-class functions, closures, and
-  asynchronous programming are *real* programming concepts you will
-  use again in every other language.
-- **It scales with you.** Today you might write a 20-line script.
-  Eventually you might work on a codebase with millions of lines.
-  The same language handles both.
+JavaScript is honestly not the best tool for everything — heavy
+numerical computing, hard real-time systems, and tiny embedded
+chips are better served by other languages. But for a *first*
+language, it is hard to beat: zero setup (a browser is a
+development environment), instant feedback, an enormous community,
+and concepts — closures, first-class functions, asynchronous
+thinking — that transfer to every language you will ever learn.
 
 ## One last warm-up
 
-Let's run one more program before we leave the historical chapters
-and start learning the language properly. This one prints a small
-table — a hint of the kind of program you'll be writing yourself in
-a few pages' time.
+Let's run one more program before we leave the history and start
+learning properly. This one prints a small table — a hint of the
+kind of program you'll be writing yourself within a few pages.
 
 <CodeBlock
   adapter="javascript"
@@ -226,14 +296,12 @@ table(12);
   ]}
 />
 
-If you understand even roughly what is happening here — *a function
-called `table` is printing a table of multiplications for a given
-number* — you already have the right intuition. The rest is detail.
-
-That brings us to the end of the story chapters. From here on, we
-**learn** JavaScript, properly, step by step, starting with the
-most fundamental question of all: *what does it mean for a computer
-to run a program?*
+If you understand even roughly what is happening — *a function
+called `table` prints multiplications for a given number* — you
+already have the right instincts. The rest is detail, and the
+details start on the next page with the most fundamental question
+of all: *what does it actually mean for a computer to run a
+program?*
 
 ---
 
