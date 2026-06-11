@@ -5,14 +5,7 @@
     "pages": [
         "index",
         "---",
-        "early-programming-complexity",
-        "rise-of-oop",
-        "windows-and-enterprise-software",
-        "java-and-managed-runtimes",
-        "microsoft-dotnet-vision",
-        "anders-and-birth-of-csharp",
-        "evolution-of-dotnet",
-        "why-csharp-matters",
+        "the-road-to-csharp",
         "---",
         "computational-thinking",
         "how-programs-execute",
@@ -36,6 +29,12 @@
         "software-organization",
         "---",
         "capstone-task-tracker",
+        "---",
+        "rise-of-oop",
+        "java-and-managed-runtimes",
+        "anders-and-birth-of-csharp",
+        "evolution-of-dotnet",
+        "---",
         "next-steps"
     ]
 }

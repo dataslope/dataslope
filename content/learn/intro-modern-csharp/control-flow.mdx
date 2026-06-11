@@ -400,10 +400,10 @@ clearest in most situations.
 <ChallengeCard
   adapter="csharp"
   title="Count vowels"
-  instructions={`Write code that counts the number of vowels (\`a\`, \`e\`, \`i\`, \`o\`, \`u\`, in upper or lower case) in the hard-coded string \`text\` and prints:
+  instructions={`Write code that counts the number of vowels (\`a\`, \`e\`, \`i\`, \`o\`, \`u\`, in upper or lower case) in the hard-coded string \`text\`. The string \`"Hello, World!"\` contains three vowels (\`e\`, \`o\`, \`o\`), so your program must print exactly:
 
 \`\`\`
-vowels = 5
+vowels = 3
 \`\`\`
 
 Hint: \`foreach (char c in text) { ... }\` lets you iterate the characters of a string. \`char.ToLower(c)\` gives you the lowercase version of a character.`}
@@ -433,17 +433,11 @@ Console.WriteLine($"vowels = {count}");
   tests={[
     {
       id: "vowels",
-      name: "Counts 5 vowels in 'Hello, World!'",
+      name: "Counts 3 vowels in 'Hello, World!'",
       expect: { stdoutEquals: "vowels = 3" },
     },
   ]}
 />
-
-<Callout type="info" title="If your count is wrong">
-"Hello, World!" has three vowels (`e`, `o`, `o`), not five. The
-intro text was bait — fix your loop so it prints `vowels = 3`. A
-real test was watching the whole time.
-</Callout>
 
 ## Test your understanding
 
