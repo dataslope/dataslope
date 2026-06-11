@@ -71,28 +71,29 @@
 
 /* ─── Output ──────────────────────────────────────────────────────── */
 
-/* Cap the overall output column height — without this, a code block
-   that emits many cells (or a single very tall one) can grow far past
-   the viewport and force the surrounding page to scroll just to reach
-   the action bar. Capping at ~60vh keeps the output panel reachable
-   while still letting individual cells render at a reasonable size.
-   The per-cell caps (`.outCellBody` rules below) still apply for
-   visually heavy single cells. */
-.output {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  background: var(--cb-bg);
-  border-top: 1px solid var(--cb-border);
-  max-height: 68vh;
-  overflow-y: auto;
-  position: relative;
-}
-
 .outputRunning {
   min-height: 84px;
   padding-bottom: 48px;
+}
+
+/* Right side of the shared output-panel header: elapsed time + copy.
+   The wrapper carries the margin-left:auto so the copy button stays on
+   the right edge whether or not the time is present. */
+.outputHeaderRight {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.outputCopyBtn {
+  width: 22px;
+  height: 22px;
+}
+
+/* Aligns the boot notice with the output body's text inset. */
+.bootNoticeWrap {
+  padding: 4px 14px 14px 18px;
 }
 
 /* First-run boot affordance — shown while the runtime is downloading /
@@ -139,205 +140,6 @@
   color: var(--cb-text-dim);
   font-size: 11.5px;
   line-height: 1.35;
-}
-
-/* One frame per run. The body is transparent (it sits on the output
-   panel's background) so dataframes, figures, and text read as one
-   continuous output — only the header strip carries a fill. */
-.outCell {
-  border-radius: var(--cb-radius);
-  overflow: hidden;
-  animation: cb-fadeSlide 0.2s ease;
-  flex: 0 0 auto;
-}
-@keyframes cb-fadeSlide {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.outCellStdout {
-  border-left: 3px solid var(--cb-green);
-}
-.outCellStderr {
-  border-left: 3px solid var(--cb-red);
-}
-
-.outCellHeader {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 4px 10px;
-  background: var(--cb-bg2);
-  border-bottom: 1px solid var(--cb-border);
-  font-size: 10px;
-  font-family: var(--cb-font-mono);
-  color: var(--cb-text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-weight: 600;
-}
-
-.outCellType {
-  font-weight: 600;
-}
-
-.outCellTime {
-  margin-left: auto;
-  font-weight: 500;
-  text-transform: none;
-  letter-spacing: 0;
-  color: var(--cb-text-dim);
-}
-
-/* Anchor the cell-header copy button on the right edge regardless of
-   whether `outCellTime` (which uses `margin-left: auto`) is present. */
-.outCellCopy {
-  margin-left: 4px;
-  width: 22px;
-  height: 22px;
-}
-
-.outCellBody {
-  padding: 10px 12px;
-  font-family: var(--cb-font-mono);
-  font-size: 13px;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  word-break: break-word;
-  color: var(--cb-text);
-}
-
-.outCellStderr .outCellBody {
-  color: var(--cb-red);
-}
-
-/* ─── Output segments ───
-   One run renders as a single OUTPUT cell whose body stacks segments in
-   chronological order: text, dataframes, figures, charts. stderr mixed
-   into other output reads red inline (a pure-error run gets the
-   .outCellStderr frame instead). Visually heavy segments are
-   height-capped so a giant figure / wide frame stays in the page flow
-   but remains reachable via its own scrollbar. */
-.outSegStderr {
-  color: var(--cb-red);
-}
-.outSegImage {
-  text-align: center;
-  max-height: 600px;
-  overflow: auto;
-  white-space: normal;
-}
-.outSegImage :global(img),
-.outSegImage :global(svg) {
-  max-width: 100%;
-}
-.outSegPlot {
-  max-height: 600px;
-  overflow: auto;
-  white-space: normal;
-}
-.outSegPlot :global(.js-plotly-plot) {
-  width: 100%;
-}
-
-/* ─── DataFrame tables ─── */
-
-/* Pandas / polars / R data frames arrive as bare <table> markup (the
-   runtimes strip any injected <style> blocks). The look mirrors a
-   Jupyter notebook's default dataframe: 600-weight header row and index
-   column, very subtle row striping, right-aligned cells, no cell
-   borders — in slightly tightened Inter (--font-sans) at a compact size
-   with minimal vertical padding. The table is content-width (like
-   Jupyter), never stretched; the wrapper scrolls both axes for big
-   frames. `not-prose` keeps the docs' prose typography (serif font,
-   table margins, roomy cell padding) from restyling the cells.
-
-   Selectors use `table th` / `table td` (specificity 0,1,2) so they
-   outrank the learn.css prose-typography rules regardless of stylesheet
-   order. */
-.dataframeWrap {
-  overflow: auto;
-  max-height: 480px;
-  padding: 6px 0;
-  /* .outCellBody renders text with pre-wrap; the newlines between the
-     tags of pandas' HTML must not become blank lines above/below the
-     table. */
-  white-space: normal;
-}
-
-.dataframeWrap :global(table) {
-  border-collapse: collapse;
-  border: none;
-  font-family: var(--font-sans, Inter, system-ui, sans-serif);
-  letter-spacing: -0.011em;
-  font-size: 12.5px;
-  line-height: 1.45;
-  color: var(--cb-text);
-  width: auto;
-  margin: 0;
-}
-.dataframeWrap :global(table th) {
-  padding: 3px 10px;
-  background: transparent;
-  border: none;
-  text-align: right;
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 1.45;
-  color: var(--cb-text);
-  white-space: nowrap;
-  vertical-align: bottom;
-}
-.dataframeWrap :global(table thead th) {
-  border-bottom: 1px solid var(--cb-border);
-}
-.dataframeWrap :global(table td) {
-  padding: 3px 10px;
-  border: none;
-  text-align: right;
-  white-space: nowrap;
-  /* One enormous value shouldn't blow out its column — clip with an
-     ellipsis (pandas itself truncates cell text, R values can be long). */
-  max-width: 320px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-/* Very subtle striping on alternate body rows, like Jupyter. The index
-   <th> cells stripe with their row. */
-.dataframeWrap :global(tbody tr:nth-child(even) td),
-.dataframeWrap :global(tbody tr:nth-child(even) th) {
-  background: color-mix(in srgb, var(--cb-text) 4%, transparent);
-}
-.dataframeWrap :global(tbody tr:hover td),
-.dataframeWrap :global(tbody tr:hover th) {
-  background: color-mix(in srgb, var(--cb-text) 8%, transparent);
-}
-/* Middle-truncation marker cells/columns (R runtime) — pandas renders
-   its own "..." cells which inherit the same muted colour. */
-.dataframeWrap :global(tr.dataframe-ellipsis-row td),
-.dataframeWrap :global(.dataframe-ellipsis-col) {
-  text-align: center;
-  color: var(--cb-text-dim);
-}
-/* Footer row stating the full row/column count of a truncated frame. */
-.dataframeWrap :global(td.dataframe-rows-footer) {
-  padding: 3px 10px;
-  font-size: 11.5px;
-  color: var(--cb-text-dim);
-  font-style: italic;
-  text-align: right;
-  border-top: 1px solid var(--cb-border);
-}
-/* Dimensions line pandas appends below a truncated frame
-   ("100 rows × 40 columns"). */
-.dataframeWrap :global(p) {
-  margin: 6px 0 0;
-  font-size: 11.5px;
-  color: var(--cb-text-dim);
 }
 
 /* ─── Running overlay (sine-wave animation) ──────────────────────────

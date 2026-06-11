@@ -1354,10 +1354,17 @@
   font-size: 12.5px;
   color: var(--ch-text-muted);
   font-family: var(--ch-font-mono);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.outputTime svg {
+  flex-shrink: 0;
 }
 
 .outputBody {
-  padding: 10px 14px 14px 27px;
+  padding: 10px 14px 14px 18px;
   font-family: var(--ch-font-mono);
   font-size: 13.5px;
   line-height: 1.8;
@@ -1366,7 +1373,7 @@
   word-break: break-word;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
   max-height: 360px;
   overflow-y: auto;
   scrollbar-width: thin;
@@ -1432,7 +1439,7 @@
   border: none;
   font-family: var(--font-sans, Inter, system-ui, sans-serif);
   letter-spacing: -0.011em;
-  font-size: 12.5px;
+  font-size: 13px;
   line-height: 1.45;
   color: var(--ch-text);
   width: auto;
@@ -1445,7 +1452,6 @@
   border: none;
   text-align: right;
   font-weight: 600;
-  font-size: 12px;
   line-height: 1.45;
   color: var(--ch-text);
   white-space: nowrap;
@@ -1488,10 +1494,11 @@
 
 /* Footer row stating the full row/column count of a truncated frame. */
 .outCellHtml :global(td.dataframe-rows-footer) {
-  padding: 3px 10px;
-  font-size: 11.5px;
+  padding: 4px 10px;
+  font-family: var(--font-inter, var(--font-sans, Inter, system-ui, sans-serif));
+  font-size: 14px;
   color: var(--ch-text-muted);
-  font-style: italic;
+  font-style: normal;
   text-align: right;
   border-top: 1px solid var(--ch-border-light);
 }
@@ -1499,8 +1506,20 @@
 /* Dimensions line pandas appends below a truncated frame. */
 .outCellHtml :global(p) {
   margin: 6px 0 0;
-  font-size: 11.5px;
+  font-family: var(--font-inter, var(--font-sans, Inter, system-ui, sans-serif));
+  font-size: 14px;
   color: var(--ch-text-muted);
+}
+
+/* Plotly chart segment (emitted by code blocks sharing this panel). */
+.outCellPlot {
+  white-space: normal;
+  max-height: 600px;
+  overflow: auto;
+}
+
+.outCellPlot :global(.js-plotly-plot) {
+  width: 100%;
 }
 
 /* ─── Running overlay (sine-wave animation) ──────────────────────────
@@ -1698,78 +1717,214 @@
   transform: rotate(180deg);
 }
 
-.testList {
-  padding: 0 14px 12px;
+/* ─── Test results rail ───
+   Minimal pass/fail readout: a vertical rail down the left with one
+   circle per test — green-500 with a white check for a pass, red-500
+   with a white ✕ for a fail — and the rail segment below each circle
+   painted in that test's colour. Rows carry no boxes or borders; the
+   description, test code/checks, and the exact error message live in a
+   click popover. */
+.testRail {
+  padding: 6px 14px 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 
-.testItem {
+.testRailRow {
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 8px 10px;
-  border-radius: 6px;
-  background: var(--ds-white);
-  border: 1px solid var(--ch-border-light);
+  align-items: stretch;
+  gap: 10px;
 }
 
-.testIcon {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
+.testRailTrack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 18px;
   flex-shrink: 0;
+}
+
+.testRailNode {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-top: 1px;
-}
-
-.testIcon[data-state="pass"] {
-  background: var(--ch-green-bg);
-  color: var(--ch-green);
-}
-
-.testIcon[data-state="fail"] {
-  background: var(--ch-red-bg);
-  color: var(--ch-red);
-}
-
-.testIcon[data-state="pending"] {
-  background: var(--ds-gray-100);
-  color: var(--ch-text-muted);
-}
-
-.testItemBody {
-  flex: 1;
-  min-width: 0;
-}
-
-.testItemName {
-  font-family: var(--ch-font-mono);
-  font-size: 12.5px;
-  color: var(--ch-text);
-  font-weight: 500;
-  line-height: 1.4;
-}
-
-.testItemDesc {
-  font-size: 12.5px;
-  color: var(--ch-text-muted);
+  color: #fff;
+  flex-shrink: 0;
+  /* Centers the circle on the row's text line. */
   margin-top: 2px;
 }
 
-.testItemDetail {
-  margin-top: 4px;
-  font-size: 12.5px;
+.testRailNode[data-state="pass"] {
+  background: var(--ds-green-500);
+}
+
+.testRailNode[data-state="fail"] {
+  background: var(--ds-red-500);
+}
+
+.testRailNode[data-state="pending"] {
+  background: transparent;
+  border: 2px solid var(--ch-border);
+}
+
+.testRailSeg {
+  flex: 1;
+  width: 2px;
+  min-height: 10px;
+  border-radius: 1px;
+}
+
+.testRailSeg[data-state="pass"] {
+  background: var(--ds-green-500);
+}
+
+.testRailSeg[data-state="fail"] {
+  background: var(--ds-red-500);
+}
+
+.testRailSeg[data-state="pending"] {
+  background: var(--ch-border);
+}
+
+/* The whole row is the popover trigger; only text + a hover-revealed
+   info glyph, no chrome. */
+.testRailItemBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin-bottom: 18px;
+  min-height: 22px;
+  cursor: pointer;
+  font-family: var(--ch-font-ui);
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--ch-text);
+  text-align: left;
+}
+
+.testRailRow:last-child .testRailItemBtn {
+  margin-bottom: 0;
+}
+
+.testRailItemBtn:hover .testRailName,
+.testRailItemBtn:focus-visible .testRailName {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--ch-text-muted);
+}
+
+.testRailInfoIcon {
+  color: var(--ch-text-muted);
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  flex-shrink: 0;
+}
+
+.testRailItemBtn:hover .testRailInfoIcon,
+.testRailItemBtn:focus-visible .testRailInfoIcon,
+.testRailItemBtn[data-popup-open] .testRailInfoIcon {
+  opacity: 1;
+}
+
+/* ── Details popover (description, code/checks, exact error) ── */
+.testPopoverPositioner {
+  z-index: 220;
+}
+
+.testPopover {
+  width: min(460px, 92vw);
+  background: var(--ch-bg);
+  border: 1px solid var(--ch-border-light);
+  border-radius: 8px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+  padding: 12px 14px;
+  font-family: var(--ch-font-ui);
+}
+
+.testPopoverHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.testPopoverStateDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.testPopoverStateDot[data-state="pass"] {
+  background: var(--ds-green-500);
+}
+
+.testPopoverStateDot[data-state="fail"] {
+  background: var(--ds-red-500);
+}
+
+.testPopoverStateDot[data-state="pending"] {
+  background: var(--ch-border);
+}
+
+.testPopoverName {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ch-text);
+  min-width: 0;
+}
+
+.testPopoverState {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--ch-text-muted);
+  flex-shrink: 0;
+}
+
+.testPopoverState[data-state="fail"] {
+  color: var(--ds-red-500);
+}
+
+.testPopoverDesc {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ch-text-secondary);
+}
+
+.testPopoverSectionLabel {
+  margin-top: 12px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ch-text-muted);
+}
+
+.testPopoverCode,
+.testPopoverError {
+  margin: 4px 0 0;
+  padding: 8px 10px;
+  background: var(--ch-bg-subtle);
+  border-radius: 6px;
   font-family: var(--ch-font-mono);
-  color: var(--ch-red);
-  background: var(--ch-red-bg);
-  border-radius: 4px;
-  padding: 3px 8px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--ch-text);
   white-space: pre-wrap;
   word-break: break-word;
+  max-height: 220px;
+  overflow: auto;
+}
+
+.testPopoverError {
+  color: var(--ch-red);
 }
 
 /* ─── Status banner ───────────────────────────────────────────────── */
@@ -2078,11 +2233,6 @@
   background: var(--ds-blue-300);
 }
 
-
-:global(html.dark) .testItem {
-  background: #0d0d0d;
-  border-color: #2a2a2a;
-}
 
 :global(html.dark) .testPanelHeader:hover {
   background: #222222;

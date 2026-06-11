@@ -57,6 +57,7 @@ import {
   ChallengeToastViewport,
   useIsDark,
   cmThemeNameFor,
+  TestResultsRail,
 } from "./challengeShared";
 import { EditorState, Compartment } from "@codemirror/state";
 import {
@@ -136,6 +137,35 @@ export interface SqlChallengeTest {
   runAfterEquals?: unknown;
   /** Required row count of the `runAfterSql` result. */
   runAfterRowCount?: number;
+}
+
+/** Human-readable, one-check-per-line summary of a SQL test's
+ *  declarative expectations — shown by the test-details popover where a
+ *  code-based test would show its code. */
+export function sqlTestChecksSummary(t: SqlChallengeTest): string {
+  const lines: string[] = [];
+  if (t.expectedRowCount !== undefined)
+    lines.push(`row count = ${t.expectedRowCount}`);
+  if (t.rowCountAtLeast !== undefined)
+    lines.push(`row count >= ${t.rowCountAtLeast}`);
+  if (t.expectedColumns)
+    lines.push(`columns = [${t.expectedColumns.join(", ")}]`);
+  if (t.expectedColumnsInclude)
+    lines.push(`columns include [${t.expectedColumnsInclude.join(", ")}]`);
+  if (t.expectedRows)
+    lines.push(
+      `rows equal the expected values${t.expectedRows.ordered ? " (in order)" : ""}`,
+    );
+  if (t.matchesSolution)
+    lines.push(
+      `result matches the reference solution${t.ordered ? " (in order)" : ""}`,
+    );
+  if (t.runAfterSql) lines.push(`after your SQL, run:\n${t.runAfterSql.trim()}`);
+  if (t.runAfterEquals !== undefined)
+    lines.push(`…its first cell = ${JSON.stringify(t.runAfterEquals)}`);
+  if (t.runAfterRowCount !== undefined)
+    lines.push(`…its row count = ${t.runAfterRowCount}`);
+  return lines.join("\n");
 }
 
 /** Specification for which tables the table viewer should display.
@@ -1662,6 +1692,15 @@ export default function SqlChallengeCard({
   }, [dialect, toasts]);
 
   const isBusy = status === "loading" || status === "running";
+
+  // Readable summary of each test's declarative checks, surfaced by the
+  // test-details popover in the results rail.
+  const testChecksById = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const t of tests) m.set(t.id, sqlTestChecksSummary(t));
+    return m;
+  }, [tests]);
+
   const hasResult = isBusy || resultSet !== null || resultError !== "" || resultMessage !== "";
   const resultTabDataProp: ResultTabData | null = hasResult
     ? {
@@ -2030,38 +2069,13 @@ export default function SqlChallengeCard({
             />
           </button>
           {testListOpen && (
-            <div className={styles.testList}>
-              {testResults.map((t) => (
-                <div key={t.id} className={styles.testItem}>
-                  <div className={styles.testIcon} data-state={t.state}>
-                    {t.state === "pass" ? (
-                      <Check size={9} strokeWidth={3} aria-hidden />
-                    ) : t.state === "fail" ? (
-                      <X size={9} strokeWidth={3} aria-hidden />
-                    ) : (
-                      <svg
-                        width="9"
-                        height="9"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        aria-hidden
-                      >
-                        <circle cx="12" cy="12" r="5" />
-                      </svg>
-                    )}
-                  </div>
-                  <div className={styles.testItemBody}>
-                    <div className={styles.testItemName}>{t.name}</div>
-                    {t.description && <div className={styles.testItemDesc}>{t.description}</div>}
-                    {t.state === "fail" && t.detail && (
-                      <div className={styles.testItemDetail}>{t.detail}</div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <TestResultsRail
+              tests={testResults.map((t) => ({
+                ...t,
+                code: testChecksById.get(t.id),
+              }))}
+              codeLabel="Checks"
+            />
           )}
         </div>
       )}

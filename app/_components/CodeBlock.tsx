@@ -10,7 +10,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { ChevronDown, ChevronUp, File, Lock, Play, RotateCcw } from "lucide-react";
+import { ChevronDown, ChevronUp, File, Lock, Play, RotateCcw, Timer } from "lucide-react";
 import { Toast } from "@base-ui/react/toast";
 import {
   LANGUAGE_ICONS,
@@ -994,6 +994,17 @@ function CodeBlockInner({
 
   const isBusy = status === "loading" || status === "running";
 
+  // Header readouts for the merged output panel. Cells stream in during
+  // the run, each stamped with the elapsed time at its arrival — the last
+  // one is the closest to the run's total. Only text is sensibly
+  // copyable: skipping image/plot content avoids dumping a raw base64
+  // PNG / Plotly JSON blob behind a misleading "Copy" affordance.
+  const outputElapsed = outputs[outputs.length - 1]?.elapsed ?? "";
+  const outputCopyText = outputs
+    .filter((c) => c.type === "stdout" || c.type === "stderr")
+    .map((c) => c.content)
+    .join("\n");
+
   // ─── Render ────────────────────────────────────────────────────────────
   return (
     <div
@@ -1288,45 +1299,79 @@ function CodeBlockInner({
       </div>
 
       {(outputs.length > 0 || isBusy) && (
+        // Same output panel as the challenge card (its styles are shared
+        // through ChallengeCard.module.css): an accent-bar header with the
+        // elapsed time, and one clean body that stacks the run's segments
+        // in chronological order, no per-segment chrome.
         <div
-          className={`${styles.output}${isBusy ? ` ${styles.outputRunning}` : ""}`}
+          className={`${challengeStyles.outputPanel}${isBusy ? ` ${styles.outputRunning}` : ""}`}
           aria-live="polite"
         >
-          {status === "loading" && (
-            <div className={styles.bootNotice} data-testid="codeblock-boot">
-
-              <svg
-                viewBox="0 0 24 24"
-                className={styles.bootSpinner}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                aria-hidden
-              >
-                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-              </svg>
-              <span className={styles.bootNoticeText}>
-                <span className={styles.bootNoticeTitle}>
-                  {statusMessage ||
-                    `Setting up the ${adapter.runtimeInfo.language} runtime…`}
+          <div className={challengeStyles.outputHeader}>
+            <div
+              className={challengeStyles.accentBar}
+              data-error={outputs.some((c) => c.type === "stderr")}
+            />
+            <span className={challengeStyles.outputLabel}>Output</span>
+            <span className={styles.outputHeaderRight}>
+              {outputElapsed && (
+                <span className={challengeStyles.outputTime}>
+                  <Timer size={12} aria-hidden="true" />
+                  {outputElapsed}
                 </span>
-                {bootCold && (
-                  <span className={styles.bootNoticeHint}>
-                    Downloading the {adapter.runtimeInfo.language} runtime — this
-                    happens once; later runs are instant.
+              )}
+              {outputCopyText.length > 0 && (
+                <button
+                  type="button"
+                  className={`${styles.iconBtn} ${styles.outputCopyBtn}`}
+                  title="Copy output to clipboard"
+                  aria-label="Copy output to clipboard"
+                  onClick={() => void copyToClipboard(outputCopyText)}
+                >
+                  <CopyIcon />
+                </button>
+              )}
+            </span>
+          </div>
+          {status === "loading" && (
+            <div className={styles.bootNoticeWrap}>
+              <div className={styles.bootNotice} data-testid="codeblock-boot">
+                <svg
+                  viewBox="0 0 24 24"
+                  className={styles.bootSpinner}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  aria-hidden
+                >
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                </svg>
+                <span className={styles.bootNoticeText}>
+                  <span className={styles.bootNoticeTitle}>
+                    {statusMessage ||
+                      `Setting up the ${adapter.runtimeInfo.language} runtime…`}
                   </span>
-                )}
-              </span>
+                  {bootCold && (
+                    <span className={styles.bootNoticeHint}>
+                      Downloading the {adapter.runtimeInfo.language} runtime —
+                      this happens once; later runs are instant.
+                    </span>
+                  )}
+                </span>
+              </div>
             </div>
           )}
-          {outputs.length > 0 && (
-            <OutputGroupView
-              cells={outputs}
-              onCopy={(content) => {
-                void copyToClipboard(content);
-              }}
-            />
+          {outputs.length > 0 ? (
+            <div className={challengeStyles.outputBody}>
+              {outputs.map((cell) => (
+                <OutputSegment key={cell.id} cell={cell} />
+              ))}
+            </div>
+          ) : (
+            status === "running" && (
+              <div className={challengeStyles.outputEmpty}>Running…</div>
+            )
           )}
           <RunOverlay active={isBusy} />
         </div>
@@ -1357,63 +1402,11 @@ async function copyToClipboard(text: string): Promise<void> {
   }
 }
 
-/** Renders one run's outputs as a single OUTPUT cell — text, dataframes,
- *  figures, and charts stacked in chronological order inside one frame,
- *  the way a notebook shows a cell's output. The frame reads as ERROR
- *  when the run produced nothing but stderr; stderr mixed into other
- *  output renders red inline. */
-function OutputGroupView({
-  cells,
-  onCopy,
-}: {
-  cells: OutputCell[];
-  onCopy: (content: string) => void;
-}) {
-  const onlyStderr = cells.every((c) => c.type === "stderr");
-  // Only text is sensibly copyable. Skipping image/plot content avoids
-  // dumping a raw base64 PNG / Plotly JSON blob behind a misleading
-  // "Copy" affordance — same rule the playground uses.
-  const copyText = cells
-    .filter((c) => c.type === "stdout" || c.type === "stderr")
-    .map((c) => c.content)
-    .join("\n");
-  // Cells stream in during the run, each stamped with the elapsed time at
-  // its arrival — the last one is the closest to the run's total.
-  const elapsed = cells[cells.length - 1]?.elapsed;
-
-  return (
-    <div
-      className={`${styles.outCell} ${onlyStderr ? styles.outCellStderr : styles.outCellStdout}`}
-    >
-      <div className={styles.outCellHeader}>
-        <span className={styles.outCellType}>
-          {onlyStderr ? "ERROR" : "OUTPUT"}
-        </span>
-        {elapsed && <span className={styles.outCellTime}>{elapsed}</span>}
-        {copyText.length > 0 && (
-          <button
-            type="button"
-            className={`${styles.iconBtn} ${styles.outCellCopy}`}
-            title="Copy output to clipboard"
-            aria-label="Copy output to clipboard"
-            onClick={() => onCopy(copyText)}
-          >
-            <CopyIcon />
-          </button>
-        )}
-      </div>
-      <div className={styles.outCellBody}>
-        {cells.map((cell) => (
-          <OutputSegment key={cell.id} cell={cell} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/** One chronological piece of a run's output. Keeps the `data-cell-type`
- *  attribute the per-cell rendering used to carry, so tests and tooling
- *  can keep counting stdout/stderr/html/image/plot outputs. */
+/** One chronological piece of a run's output, rendered with the challenge
+ *  card's output-panel styles so both surfaces read identically. Keeps the
+ *  `data-cell-type` attribute the per-cell rendering used to carry, so
+ *  tests and tooling can keep counting stdout/stderr/html/image/plot
+ *  outputs. */
 function OutputSegment({ cell }: { cell: OutputCell }) {
   if (cell.type === "html") {
     // Same trust assumption as the main playground: HTML cells are
@@ -1423,7 +1416,7 @@ function OutputSegment({ cell }: { cell: OutputCell }) {
     // the dataframe markup when the block sits inside MDX content.
     return (
       <div
-        className={`${styles.dataframeWrap} not-prose`}
+        className={`${challengeStyles.outCellHtml} not-prose`}
         data-cell-type="html"
         dangerouslySetInnerHTML={{ __html: cell.content }}
       />
@@ -1431,7 +1424,7 @@ function OutputSegment({ cell }: { cell: OutputCell }) {
   }
   if (cell.type === "image") {
     return (
-      <div className={styles.outSegImage} data-cell-type="image">
+      <div className={challengeStyles.outCellImage} data-cell-type="image">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={`data:image/png;base64,${cell.content}`}
@@ -1443,14 +1436,18 @@ function OutputSegment({ cell }: { cell: OutputCell }) {
   }
   if (cell.type === "plot" && cell.plot) {
     return (
-      <div className={styles.outSegPlot} data-cell-type="plot">
+      <div className={challengeStyles.outCellPlot} data-cell-type="plot">
         <PlotlyChart figure={cell.plot} />
       </div>
     );
   }
   return (
     <div
-      className={cell.type === "stderr" ? styles.outSegStderr : undefined}
+      className={
+        cell.type === "stderr"
+          ? challengeStyles.outCellStderr
+          : challengeStyles.outCellStdout
+      }
       data-cell-type={cell.type}
     >
       {cell.content}
