@@ -72,6 +72,11 @@ import type {
 } from "./types";
 import { getSharedRuntime, RuntimeScope } from "./runtimeRegistry";
 import {
+  datasetStageFilename,
+  fetchDatasetBytes,
+  type DatasetStageSpec,
+} from "./runtime/remoteDatasets";
+import {
   clearPersistedCode,
   loadPersistedCode,
   persistKey,
@@ -190,6 +195,17 @@ export interface ChallengeCardProps {
   /** When `files` has more than one entry, the filename whose content is
    *  passed to `runtime.run()` as the entry. Defaults to the first file. */
   entryFilename?: string;
+  /** Remote dataset files staged into the runtime's working directory
+   *  before every Run / Check Answer, so init/starter/solution code
+   *  reads them like local files (e.g. `pd.read_csv("penguins.csv")`).
+   *  Each entry names a path in the dataslope/datasets repo (or a full
+   *  URL); the bytes are fetched through the globally cached dataset
+   *  path — memoised in-session and persisted via the browser's Cache
+   *  API — so every card, block, page, and visit that references the
+   *  same file shares one download. Requires an adapter whose runtime
+   *  implements `prepareFileSystem` (Python, R, JavaScript, TypeScript,
+   *  PHP, …). */
+  datasets?: DatasetStageSpec[];
   /** Force the file tab bar to render even for a single-file workspace.
    *  Multi-file workspaces always show it; this opts a one-file card in. */
   showFileTabBar?: boolean;
@@ -302,6 +318,10 @@ function useBlockId(adapter: LanguageAdapter): string {
   }, [reactId, adapter.logoText]);
 }
 
+// Stable empty list so cards without a `datasets` prop don't re-create
+// hook dependencies on every render.
+const NO_DATASETS: DatasetStageSpec[] = [];
+
 export default function ChallengeCard({
   adapter,
   title,
@@ -309,6 +329,7 @@ export default function ChallengeCard({
   instructions,
   files,
   entryFilename,
+  datasets,
   showFileTabBar = false,
   tests,
 }: ChallengeCardProps) {
@@ -332,6 +353,16 @@ export default function ChallengeCard({
     (entryFilename && workspaceFiles.find((f) => f.filename === entryFilename)
       ? entryFilename
       : workspaceFiles[0].filename) ?? workspaceFiles[0].filename;
+
+  // Remote datasets staged before every run (see the `datasets` prop).
+  // Mirrored into a ref so the mount-once warm-up effect can prefetch
+  // them without re-registering its IntersectionObserver when MDX
+  // re-creates the prop array.
+  const cardDatasets = datasets ?? NO_DATASETS;
+  const datasetsRef = useRef(cardDatasets);
+  useEffect(() => {
+    datasetsRef.current = cardDatasets;
+  }, [cardDatasets]);
 
   // Per-file read-only init code (trimmed). Init now belongs to a file,
   // so the init drawer + the editor's line-number offset both track
@@ -853,6 +884,23 @@ export default function ChallengeCard({
       setStatus("loading");
       setStatusMessage("Initializing runtime…");
 
+      // Kick dataset downloads in parallel with the runtime boot so a
+      // cold first Run overlaps the two waits. Usually instant: the
+      // bytes are memoised in-session and persisted in the Cache API.
+      // The no-op catch keeps an early bail-out (superseded run, boot
+      // failure) from surfacing an unhandled rejection; awaiting the
+      // promise below still observes the real error.
+      const datasetsPromise =
+        cardDatasets.length > 0
+          ? Promise.all(
+              cardDatasets.map(async (spec) => ({
+                filename: datasetStageFilename(spec),
+                bytes: await fetchDatasetBytes(spec.path),
+              })),
+            )
+          : null;
+      datasetsPromise?.catch(() => {});
+
       // Re-use the shared per-adapter runtime — see runtimeRegistry.ts.
       // Once Pyodide / WebR / CheerpJ has loaded for any block on this
       // page, every other `<CodeBlock>` and `<ChallengeCard>` for the
@@ -873,6 +921,19 @@ export default function ChallengeCard({
       if (runSeqRef.current !== mySeq)
         return { cells: [], elapsedMs: 0 };
 
+      let datasetFiles: { filename: string; bytes: Uint8Array }[] = [];
+      if (datasetsPromise) {
+        if (!runtime.prepareFileSystem) {
+          throw new Error(
+            `The ${adapter.runtimeInfo.language} runtime cannot stage dataset files (no virtual file system) — remove the card's \`datasets\` prop.`,
+          );
+        }
+        setStatusMessage("Downloading dataset files…");
+        datasetFiles = await datasetsPromise;
+        if (runSeqRef.current !== mySeq)
+          return { cells: [], elapsedMs: 0 };
+      }
+
       setStatus("running");
       setStatusMessage("Running…");
 
@@ -880,29 +941,40 @@ export default function ChallengeCard({
       let nextOutputId = 0;
       const cells: OutputCell[] = [];
 
-      // Multi-file workspaces: stage every file into the runtime VFS so
-      // imports resolve. The entry file's bytes mirror what we pass to
-      // `run()` below, including any init prelude / harness suffix the
-      // caller bolted on.
+      // Stage files into the runtime VFS: the card's remote datasets
+      // (so init/starter code can read them like local files) and — for
+      // multi-file workspaces — every workspace file, so imports
+      // resolve. The entry file's bytes mirror what we pass to `run()`
+      // below, including any init prelude / harness suffix the caller
+      // bolted on.
       //
       // Single-file cards pass their source straight to `run()` and must
       // NOT pre-stage it: some runtimes (CheerpJ/Java, .NET/C#) compile the
       // staged file set when the VFS is populated, and with no
       // `entryFilename` (single-file) they then can't locate `main`, so the
       // program produces no output. This mirrors <CodeBlock>, which only
-      // stages for multi-file workspaces.
-      if (isMultiFile && runtime.prepareFileSystem) {
+      // stages for multi-file workspaces. (Staging only *dataset* files is
+      // safe: those runtimes ignore non-source files.)
+      if (
+        (isMultiFile || datasetFiles.length > 0) &&
+        runtime.prepareFileSystem
+      ) {
         const fileMap = new Map<string, Uint8Array>();
-        const encoder = new TextEncoder();
-        for (const [name, content] of filesSnapshot) {
-          fileMap.set(
-            name,
-            encoder.encode(
-              name === resolvedEntryFilename
-                ? entrySource
-                : effectiveSourceFor(name, content),
-            ),
-          );
+        // Dataset bytes first, so a (misauthored) workspace file with
+        // the same name deterministically wins.
+        for (const f of datasetFiles) fileMap.set(f.filename, f.bytes);
+        if (isMultiFile) {
+          const encoder = new TextEncoder();
+          for (const [name, content] of filesSnapshot) {
+            fileMap.set(
+              name,
+              encoder.encode(
+                name === resolvedEntryFilename
+                  ? entrySource
+                  : effectiveSourceFor(name, content),
+              ),
+            );
+          }
         }
         try {
           await runtime.prepareFileSystem(fileMap);
@@ -968,7 +1040,7 @@ export default function ChallengeCard({
       const elapsedMs = performance.now() - startedAt;
       return { cells, elapsedMs };
     },
-    [adapter, isMultiFile, resolvedEntryFilename, effectiveSourceFor],
+    [adapter, cardDatasets, isMultiFile, resolvedEntryFilename, effectiveSourceFor],
   );
 
   const formatElapsed = (ms: number) =>
@@ -1160,6 +1232,13 @@ export default function ChallengeCard({
           .catch(() => {
             warmedRef.current = false;
           });
+        // Prefetch the card's datasets alongside the runtime, so a cold
+        // Run/Submit finds both the engine and the data already local.
+        // Also best-effort: the Run path re-requests (and reports)
+        // failures.
+        for (const spec of datasetsRef.current) {
+          void fetchDatasetBytes(spec.path).catch(() => {});
+        }
       },
       { rootMargin: "200px" },
     );

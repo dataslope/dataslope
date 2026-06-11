@@ -10,15 +10,18 @@
  * unchanged.
  *
  * Usage in MDX (every block passes a `files` array; each file carries
- * its own `initCode` and `starterCode`):
+ * its own `initCode` and `starterCode`; an optional `datasets` array
+ * stages remote files from the dataslope/datasets repo into the
+ * runtime's working directory before each run):
  * ```mdx
  * <CodeBlock
  *   adapter="python"
+ *   datasets={[{ path: "csv/penguins.csv", stageAs: "penguins.csv" }]}
  *   files={[
  *     {
  *       filename: "main.py",
- *       initCode: `import pandas as pd\ndf = pd.DataFrame(...)`,
- *       starterCode: `display(df)`,
+ *       initCode: `import pandas as pd\npenguins = pd.read_csv("penguins.csv")`,
+ *       starterCode: `penguins.head()`,
  *     },
  *   ]}
  * />
@@ -27,11 +30,13 @@
 
 import CodeBlock, { type CodeBlockFile } from "./CodeBlock";
 import { getAdapterById, type AdapterId } from "./runtime/adapters";
+import type { DatasetStageSpec } from "./runtime/remoteDatasets";
 
 interface MdxCodeBlockProps {
   adapter: AdapterId;
   files: CodeBlockFile[];
   entryFilename?: string;
+  datasets?: DatasetStageSpec[];
   label?: string;
   showFileTabBar?: boolean;
 }
@@ -40,6 +45,7 @@ export default function MdxCodeBlock({
   adapter,
   files,
   entryFilename,
+  datasets,
   label,
   showFileTabBar,
 }: MdxCodeBlockProps) {
@@ -56,6 +62,7 @@ export default function MdxCodeBlock({
       adapter={resolved}
       files={files}
       entryFilename={entryFilename}
+      datasets={datasets}
       label={label}
       showFileTabBar={showFileTabBar}
     />

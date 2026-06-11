@@ -45,6 +45,11 @@ import type {
 import { getSharedRuntime, isRuntimeReady, RuntimeScope } from "./runtimeRegistry";
 import { mergeInitAndEntry } from "./runtime/mergeInit";
 import {
+  datasetStageFilename,
+  fetchDatasetBytes,
+  type DatasetStageSpec,
+} from "./runtime/remoteDatasets";
+import {
   clearPersistedCode,
   loadPersistedCode,
   persistKey,
@@ -98,6 +103,17 @@ interface CodeBlockProps {
   /** When `files` has more than one entry, the filename whose content is
    *  passed to `runtime.run()` as the entry. Defaults to the first file. */
   entryFilename?: string;
+  /** Remote dataset files staged into the runtime's working directory
+   *  before every Run, so init/starter code reads them like local files
+   *  (e.g. `pd.read_csv("penguins.csv")`). Each entry names a path in
+   *  the dataslope/datasets repo (or a full URL); the bytes are fetched
+   *  through the globally cached dataset path — memoised in-session and
+   *  persisted via the browser's Cache API — so every block, page, and
+   *  visit that references the same file shares one download. Blocks
+   *  with different init code share the same staged bytes. Requires an
+   *  adapter whose runtime implements `prepareFileSystem` (Python, R,
+   *  JavaScript, TypeScript, PHP, …). */
+  datasets?: DatasetStageSpec[];
   /** Optional human-readable label shown in the header. Defaults to
    *  an auto-generated one like "PyBlock-49b7". */
   label?: string;
@@ -326,10 +342,15 @@ export default function CodeBlock(props: CodeBlockProps) {
   );
 }
 
+// Stable empty list so blocks without a `datasets` prop don't re-create
+// hook dependencies on every render.
+const NO_DATASETS: DatasetStageSpec[] = [];
+
 function CodeBlockInner({
   adapter,
   files,
   entryFilename,
+  datasets,
   showFileTabBar = false,
 }: CodeBlockProps) {
   const blockId = useBlockId(adapter);
@@ -389,6 +410,16 @@ function CodeBlockInner({
     (entryFilename && workspaceFiles.find((f) => f.filename === entryFilename)
       ? entryFilename
       : workspaceFiles[0].filename) ?? workspaceFiles[0].filename;
+
+  // Remote datasets staged before every run (see the `datasets` prop).
+  // Mirrored into a ref so the mount-once warm-up effect can prefetch
+  // them without re-registering its IntersectionObserver when MDX
+  // re-creates the prop array.
+  const blockDatasets = datasets ?? NO_DATASETS;
+  const datasetsRef = useRef(blockDatasets);
+  useEffect(() => {
+    datasetsRef.current = blockDatasets;
+  }, [blockDatasets]);
 
   // Per-file read-only init code (trimmed). Init now belongs to a file,
   // so the init drawer + the editor's line-number offset both track
@@ -729,6 +760,23 @@ function CodeBlockInner({
     setStatusMessage("Initialising runtime…");
 
     try {
+      // Kick dataset downloads in parallel with the runtime boot so a
+      // cold first Run overlaps the two waits. Usually instant: the
+      // bytes are memoised in-session and persisted in the Cache API.
+      // The no-op catch keeps an early bail-out (superseded run, boot
+      // failure) from surfacing an unhandled rejection; awaiting the
+      // promise below still observes the real error.
+      const datasetsPromise =
+        blockDatasets.length > 0
+          ? Promise.all(
+              blockDatasets.map(async (spec) => ({
+                filename: datasetStageFilename(spec),
+                bytes: await fetchDatasetBytes(spec.path),
+              })),
+            )
+          : null;
+      datasetsPromise?.catch(() => {});
+
       if (!runtimeRef.current) {
         runtimeRef.current = await getSharedRuntime(
           RuntimeScope.Fumadocs,
@@ -740,24 +788,48 @@ function CodeBlockInner({
       }
       if (runSeqRef.current !== mySeq) return;
 
+      let datasetFiles: { filename: string; bytes: Uint8Array }[] = [];
+      if (datasetsPromise) {
+        if (!runtimeRef.current.prepareFileSystem) {
+          throw new Error(
+            `The ${adapter.runtimeInfo.language} runtime cannot stage dataset files (no virtual file system) — remove the block's \`datasets\` prop.`,
+          );
+        }
+        setStatusMessage("Downloading dataset files…");
+        datasetFiles = await datasetsPromise;
+        if (runSeqRef.current !== mySeq) return;
+      }
+
       setStatus("running");
       setStatusMessage("Running…");
 
-      // Multi-file workspaces: stage every file into the runtime VFS so
-      // imports / #includes / cross-class references resolve. The entry
-      // file's bytes mirror what we pass to `run()` below.
-      if (isMultiFile && runtimeRef.current.prepareFileSystem) {
+      // Stage files into the runtime VFS: the block's remote datasets
+      // (so init/starter code can read them like local files) and — for
+      // multi-file workspaces — every workspace file, so imports /
+      // #includes / cross-class references resolve. The entry file's
+      // bytes mirror what we pass to `run()` below. Single-file blocks
+      // without datasets skip the call entirely (see ChallengeCard's
+      // `execute` for why their source must not be pre-staged).
+      if (
+        (isMultiFile || datasetFiles.length > 0) &&
+        runtimeRef.current.prepareFileSystem
+      ) {
         const fileMap = new Map<string, Uint8Array>();
-        const encoder = new TextEncoder();
-        for (const [name, content] of filesSnapshot) {
-          fileMap.set(
-            name,
-            encoder.encode(
-              name === resolvedEntryFilename
-                ? code
-                : effectiveSourceFor(name, content),
-            ),
-          );
+        // Dataset bytes first, so a (misauthored) workspace file with
+        // the same name deterministically wins.
+        for (const f of datasetFiles) fileMap.set(f.filename, f.bytes);
+        if (isMultiFile) {
+          const encoder = new TextEncoder();
+          for (const [name, content] of filesSnapshot) {
+            fileMap.set(
+              name,
+              encoder.encode(
+                name === resolvedEntryFilename
+                  ? code
+                  : effectiveSourceFor(name, content),
+              ),
+            );
+          }
         }
         try {
           await runtimeRef.current.prepareFileSystem(fileMap);
@@ -845,6 +917,7 @@ function CodeBlockInner({
     }
   }, [
     adapter,
+    blockDatasets,
     isMultiFile,
     resolvedEntryFilename,
     snapshotAllFiles,
@@ -879,6 +952,12 @@ function CodeBlockInner({
             // Warm-up is best-effort; let a later Run retry and surface errors.
             warmedRef.current = false;
           });
+        // Prefetch the block's datasets alongside the runtime, so a cold
+        // Run finds both the engine and the data already local. Also
+        // best-effort: the Run path re-requests (and reports) failures.
+        for (const spec of datasetsRef.current) {
+          void fetchDatasetBytes(spec.path).catch(() => {});
+        }
       },
       { rootMargin: "200px" },
     );
