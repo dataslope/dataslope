@@ -13,6 +13,48 @@ Developers felt the pain acutely:
 
 The tools didn't help. JavaScript's dynamism — its greatest strength for quick prototyping — made it nearly impossible for editors to provide reliable autocomplete, refactoring, or go-to-definition. The language itself offered no way to declare contracts or constraints.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="An island map: the solid JavaScript island keeps all its blue city blocks while a larger translucent landmass grows around it, one yellow block straddles the old coastline and a dotted ferry route arrives from open water — TypeScript as a strict superset that leaves everything in place"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M85 130 C90 70 180 38 300 36 C420 34 520 70 522 125 C525 180 430 215 295 216 C175 218 80 190 85 130 Z" fillOpacity="0.16" />
+    <circle cx="442" cy="92" r="6" />
+    <circle cx="468" cy="134" r="5" />
+    <circle cx="424" cy="172" r="5" />
+    <circle cx="158" cy="70" r="5" />
+    <circle cx="122" cy="142" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M170 130 C175 95 220 75 270 78 C330 70 375 95 378 125 C380 155 330 175 275 178 C220 180 168 162 170 130 Z" fillOpacity="0.3" />
+    <rect x="222" y="108" width="26" height="18" rx="4" />
+    <rect x="260" y="130" width="30" height="16" rx="4" />
+    <rect x="298" y="104" width="22" height="22" rx="4" />
+    <rect x="234" y="148" width="24" height="14" rx="4" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="360" y="116" width="30" height="20" rx="4" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="42" cy="216" r="3" />
+    <circle cx="76" cy="206" r="3" />
+    <circle cx="110" cy="198" r="3" />
+    <circle cx="144" cy="190" r="3" />
+    <circle cx="178" cy="180" r="3" />
+    <circle cx="206" cy="166" r="3" />
+  </g>
+  <g fill="currentColor" opacity="0.15">
+    <circle cx="580" cy="200" r="4" />
+    <circle cx="606" cy="96" r="4" />
+    <circle cx="48" cy="56" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="588" cy="38" r="5.5" />
+  </g>
+</svg>
+
 ## The early experiments
 
 Several teams tried to bring types to JavaScript:
@@ -22,6 +64,51 @@ Several teams tried to bring types to JavaScript:
 **Facebook's Flow** (2014) was a true static type checker for JavaScript. You added type annotations (`let x: number = 5`), and Flow checked them. It was fast, pragmatic, and integrated well with React. But it required a build step, the ecosystem was small, and Facebook's internal priorities meant external users often felt like second-class citizens.
 
 Both tools pointed toward the same insight: **JavaScript developers wanted types, but they wanted them to feel like a natural extension of the language, not a bolt-on.** The syntax had to be clean. The tooling had to be excellent. The migration path had to be gradual — you couldn't force a million-line codebase to convert overnight.
+
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="Three dotted trails set off up the same hillside: a yellow one and a red one fade out partway up, while the blue trail climbs all the way to the summit flag — earlier attempts at typing JavaScript pointed the way without reaching the top"
+  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.07">
+    <path d="M30 192 C160 56 360 26 612 192 Z" />
+  </g>
+  <g fill="currentColor" opacity="0.12">
+    <path d="M330 192 C420 110 520 96 626 192 Z" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="70" cy="180" r="4" />
+    <circle cx="100" cy="170" r="4" fillOpacity="0.8" />
+    <circle cx="128" cy="159" r="4" fillOpacity="0.55" />
+    <circle cx="154" cy="149" r="4" fillOpacity="0.35" />
+    <circle cx="178" cy="141" r="4" fillOpacity="0.16" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="92" cy="188" r="4" />
+    <circle cx="132" cy="180" r="4" fillOpacity="0.75" />
+    <circle cx="170" cy="170" r="4" fillOpacity="0.5" />
+    <circle cx="208" cy="161" r="4" fillOpacity="0.3" />
+    <circle cx="242" cy="155" r="4" fillOpacity="0.14" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="58" cy="174" r="4" />
+    <circle cx="94" cy="162" r="4" />
+    <circle cx="130" cy="148" r="4" />
+    <circle cx="165" cy="134" r="4" />
+    <circle cx="200" cy="120" r="4" />
+    <circle cx="235" cy="106" r="4" />
+    <circle cx="268" cy="93" r="4" />
+    <circle cx="300" cy="81" r="4" />
+    <circle cx="330" cy="70" r="4" />
+    <circle cx="356" cy="61" r="4" />
+    <circle cx="372" cy="52" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="384" y="14" width="4" height="34" rx="2" />
+    <path d="M388 16 L412 24 L388 32 Z" />
+  </g>
+</svg>
 
 ## Enter Anders Hejlsberg
 

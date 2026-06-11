@@ -23,6 +23,90 @@ These are not "exotic" bugs — they are the source of an enormous
 share of real-world security vulnerabilities (CVEs). Recognizing the
 patterns is half the battle.
 
+<svg
+  viewBox="0 0 640 250"
+  role="img"
+  aria-label="A collector's case of eight memory-bug specimens — a faded block still being touched, a twice-freed pair, a dripping leak, an overflowing vessel, a dot past the bracket, a question-mark cell, a string whose balloon is gone, and a square peg over a round hole"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="40" y="24" width="560" height="204" rx="14" fill="currentColor" opacity="0.05" />
+  <g fill="currentColor" opacity="0.08">
+    <rect x="64" y="44" width="116" height="80" rx="10" />
+    <rect x="196" y="44" width="116" height="80" rx="10" />
+    <rect x="328" y="44" width="116" height="80" rx="10" />
+    <rect x="460" y="44" width="116" height="80" rx="10" />
+    <rect x="64" y="136" width="116" height="80" rx="10" />
+    <rect x="196" y="136" width="116" height="80" rx="10" />
+    <rect x="328" y="136" width="116" height="80" rx="10" />
+    <rect x="460" y="136" width="116" height="80" rx="10" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="92" y="62" width="40" height="28" rx="6" fillOpacity="0.15" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="138" cy="92" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M140 66 L152 60 L150 74 Z" fillOpacity="0.8" />
+    <circle cx="240" cy="84" r="12" />
+    <path d="M252 76 a12 12 0 1 1 24 0 a12 12 0 1 1 -24 0 Z M256 76 a8 8 0 1 1 16 0 a8 8 0 1 1 -16 0 Z" fillRule="evenodd" fillOpacity="0.7" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="362" y="58" width="36" height="26" rx="5" fillOpacity="0.4" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="380" cy="94" r="4" />
+    <circle cx="386" cy="106" r="3" fillOpacity="0.7" />
+    <circle cx="377" cy="117" r="2.5" fillOpacity="0.45" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <rect x="492" y="60" width="5" height="40" rx="2" />
+    <rect x="537" y="60" width="5" height="40" rx="2" />
+    <rect x="492" y="96" width="50" height="5" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="501" y="66" width="32" height="30" fillOpacity="0.5" />
+    <rect x="503" y="48" width="28" height="18" rx="4" fillOpacity="0.7" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="517" cy="44" r="4" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <rect x="84" y="160" width="3" height="11" />
+    <rect x="84" y="168" width="56" height="3" />
+    <rect x="137" y="160" width="3" height="11" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="94" cy="186" r="4" />
+    <circle cx="108" cy="186" r="4" />
+    <circle cx="122" cy="186" r="4" />
+    <circle cx="136" cy="186" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="154" cy="186" r="4" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="232" cy="160" r="2.5" />
+    <circle cx="249" cy="158" r="2.5" />
+    <circle cx="266" cy="160" r="2.5" />
+    <circle cx="230" cy="178" r="2.5" />
+    <circle cx="268" cy="178" r="2.5" />
+    <circle cx="232" cy="196" r="2.5" />
+    <circle cx="249" cy="198" r="2.5" />
+    <circle cx="266" cy="196" r="2.5" />
+  </g>
+  <text x="249" y="186" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="24" fill="currentColor" opacity="0.45">?</text>
+  <circle cx="386" cy="150" r="13" fill="currentColor" opacity="0.1" />
+  <path d="M384 204 Q378 190 384 176 Q390 165 386 152 L389 151 Q394 165 388 177 Q382 190 388 204 Z" fill="currentColor" opacity="0.4" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="386" cy="206" r="5" />
+  </g>
+  <path d="M504 174 a12 12 0 1 1 24 0 a12 12 0 1 1 -24 0 Z M509 174 a7 7 0 1 1 14 0 a7 7 0 1 1 -14 0 Z" fillRule="evenodd" fill="currentColor" opacity="0.3" />
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="528" y="142" width="24" height="24" rx="4" fillOpacity="0.85" />
+  </g>
+</svg>
+
 ## 1. Use-after-free
 
 After `free(p)` the memory is returned to the allocator and may be
@@ -159,6 +243,42 @@ Writing past the end of an allocation (stack or heap) is the canonical
 C bug. Depending on the layout it may corrupt neighboring variables,
 allocator metadata, or — historically, before stack protections — the
 function's return address, leading to remote code execution.
+
+<svg
+  viewBox="0 0 640 180"
+  role="img"
+  aria-label="Liquid poured into the left vessel rises past its rim and spills over the shared wall onto the green value stored next door — a buffer overflow corrupting its neighbour"
+  style={{ display: "block", width: "100%", maxWidth: "500px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="180" cy="24" r="4" fillOpacity="0.8" />
+    <circle cx="184" cy="40" r="4" fillOpacity="0.8" />
+    <circle cx="180" cy="56" r="4" fillOpacity="0.8" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <rect x="140" y="72" width="6" height="76" rx="3" />
+    <rect x="296" y="72" width="6" height="76" rx="3" />
+    <rect x="140" y="142" width="162" height="6" rx="3" />
+    <rect x="320" y="92" width="6" height="56" rx="3" />
+    <rect x="320" y="142" width="126" height="6" rx="3" />
+    <rect x="440" y="92" width="6" height="56" rx="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="150" y="78" width="142" height="64" rx="4" fillOpacity="0.5" />
+    <rect x="150" y="64" width="142" height="16" rx="6" fillOpacity="0.65" />
+    <circle cx="305" cy="60" r="4" fillOpacity="0.8" />
+    <circle cx="316" cy="70" r="4" fillOpacity="0.7" />
+    <circle cx="324" cy="84" r="4" fillOpacity="0.6" />
+    <rect x="330" y="120" width="106" height="22" rx="4" fillOpacity="0.35" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="383" cy="124" r="11" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="383" cy="98" r="5" />
+    <path d="M376 84 L383 72 L390 84 Z" fillOpacity="0.7" />
+  </g>
+</svg>
 
 <CodeBlock
   adapter="c"
@@ -350,6 +470,43 @@ a `union`. Do not cast unrelated pointer types and dereference them.
 
 C cannot give you safety, but you can build habits and tooling around
 the language:
+
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Red darts fly toward a green core and each is stopped at a different concentric shield ring — warnings, sanitizers, runtime checks — defense in depth for memory safety"
+  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M240 105 a80 80 0 1 1 160 0 a80 80 0 1 1 -160 0 Z M246 105 a74 74 0 1 1 148 0 a74 74 0 1 1 -148 0 Z" fillRule="evenodd" fillOpacity="0.18" />
+    <path d="M264 105 a56 56 0 1 1 112 0 a56 56 0 1 1 -112 0 Z M270 105 a50 50 0 1 1 100 0 a50 50 0 1 1 -100 0 Z" fillRule="evenodd" fillOpacity="0.3" />
+    <path d="M288 105 a32 32 0 1 1 64 0 a32 32 0 1 1 -64 0 Z M294 105 a26 26 0 1 1 52 0 a26 26 0 1 1 -52 0 Z" fillRule="evenodd" fillOpacity="0.45" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="320" cy="105" r="10" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="178" cy="105" r="2.5" />
+    <circle cx="196" cy="105" r="2.5" />
+    <circle cx="214" cy="105" r="2.5" />
+    <circle cx="416" cy="32" r="2.5" />
+    <circle cx="402" cy="42" r="2.5" />
+    <circle cx="388" cy="52" r="2.5" />
+    <circle cx="320" cy="188" r="2.5" />
+    <circle cx="320" cy="174" r="2.5" />
+    <circle cx="320" cy="160" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M222 99 L238 105 L222 111 Z" />
+    <path d="M374 50 L362 66 L380 62 Z" />
+    <path d="M314 156 L320 140 L326 156 Z" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="242" cy="105" r="3.5" />
+    <circle cx="360" cy="68" r="3.5" />
+    <circle cx="320" cy="138" r="3.5" />
+  </g>
+</svg>
 
 | Defense | What it catches |
 | --- | --- |

@@ -11,6 +11,50 @@ a sequence of named, readable steps, like a recipe. This is arguably the
 most important *style* skill in analytical SQL, so it gets a page of its
 own.
 
+<svg
+  viewBox="0 0 640 235"
+  role="img"
+  aria-label="Scaffolding rises in three named levels, each platform standing on posts planted in the one below, with a yellow flag flying from the top — a CTE pipeline that builds the final query step by step instead of nesting it inside out"
+  style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.2">
+    <rect x="80" y="208" width="480" height="6" rx="3" />
+  </g>
+  <g fill="currentColor" opacity="0.16">
+    <rect x="158" y="166" width="9" height="42" rx="4" />
+    <rect x="473" y="166" width="9" height="42" rx="4" />
+    <rect x="198" y="114" width="9" height="44" rx="4" />
+    <rect x="433" y="114" width="9" height="44" rx="4" />
+    <rect x="238" y="62" width="9" height="44" rx="4" />
+    <rect x="393" y="62" width="9" height="44" rx="4" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <rect x="140" y="158" width="360" height="9" rx="4.5" />
+    <rect x="180" y="106" width="280" height="9" rx="4.5" />
+    <rect x="220" y="54" width="200" height="9" rx="4.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="226" y="130" width="96" height="20" rx="10" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="266" y="78" width="96" height="20" rx="10" fillOpacity="0.85" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="356" cy="124" r="2.5" />
+    <circle cx="366" cy="113" r="2.5" />
+    <circle cx="396" cy="72" r="2.5" />
+    <circle cx="406" cy="61" r="2.5" />
+    <circle cx="316" cy="176" r="2.5" />
+    <circle cx="326" cy="165" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <rect x="318" y="16" width="5" height="38" rx="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M 323 18 L 368 28 L 323 38 Z" />
+  </g>
+</svg>
+
 ## The problem: queries that nest inward
 
 Without CTEs, a multi-step analysis nests subqueries inside subqueries.
@@ -166,6 +210,41 @@ ORDER BY
 The `region_rev` step is computed once and reused; `overall` summarizes
 it; the final query compares them. Three small, verifiable steps replace
 one inscrutable nest.
+
+<svg
+  viewBox="0 0 640 165"
+  role="img"
+  aria-label="One solid green step sends copies of itself along two dotted trails into two waiting sockets downstream — a CTE is computed once and referenced as many times as the query needs"
+  style={{ display: "block", width: "100%", maxWidth: "500px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="64" y="66" width="110" height="32" rx="16" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="206" cy="68" r="2.5" />
+    <circle cx="234" cy="54" r="2.5" />
+    <circle cx="264" cy="44" r="2.5" />
+    <circle cx="296" cy="40" r="2.5" />
+    <circle cx="206" cy="96" r="2.5" />
+    <circle cx="234" cy="110" r="2.5" />
+    <circle cx="264" cy="120" r="2.5" />
+    <circle cx="296" cy="124" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.08">
+    <rect x="330" y="16" width="240" height="52" rx="12" />
+    <rect x="330" y="98" width="240" height="52" rx="12" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="348" y="30" width="74" height="24" rx="12" fillOpacity="0.45" />
+    <rect x="348" y="112" width="74" height="24" rx="12" fillOpacity="0.45" />
+  </g>
+  <g fill="currentColor" opacity="0.22">
+    <rect x="436" y="36" width="56" height="12" rx="6" />
+    <rect x="500" y="36" width="40" height="12" rx="6" />
+    <rect x="436" y="118" width="42" height="12" rx="6" />
+    <rect x="486" y="118" width="62" height="12" rx="6" />
+  </g>
+</svg>
 
 ## A note on recursive CTEs
 

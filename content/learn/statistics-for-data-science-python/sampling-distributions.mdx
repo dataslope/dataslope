@@ -16,6 +16,51 @@ about inference traces back to that collapse. So we're going to slow
 down, name all three, and build the third one with our own hands in code
 until it's concrete.
 
+<svg
+  viewBox="0 0 640 250"
+  role="img"
+  aria-label="Three stacked shapes share one yellow truth line: the population's wide hump, one sample's scruffy dots whose own blue mean tick lands slightly off the line, and at the bottom the slim green hump of the means themselves — the sampling distribution that inference actually lives on"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="318" y="16" width="4" height="222" rx="2" fillOpacity="0.45" />
+  </g>
+  <g fill="currentColor" opacity="0.15">
+    <rect x="100" y="80" width="440" height="4" rx="2" />
+    <rect x="100" y="153" width="440" height="4" rx="2" />
+    <rect x="100" y="226" width="440" height="4" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M 120 80 C 200 80 220 28 320 28 C 420 28 440 80 520 80 Z" fillOpacity="0.3" />
+  </g>
+  <g fill="currentColor" opacity="0.4">
+    <circle cx="150" cy="148" r="3.5" />
+    <circle cx="180" cy="142" r="3.5" />
+    <circle cx="205" cy="135" r="3.5" />
+    <circle cx="225" cy="144" r="3.5" />
+    <circle cx="248" cy="128" r="3.5" />
+    <circle cx="262" cy="140" r="3.5" />
+    <circle cx="280" cy="122" r="3.5" />
+    <circle cx="300" cy="133" r="3.5" />
+    <circle cx="312" cy="118" r="3.5" />
+    <circle cx="332" cy="126" r="3.5" />
+    <circle cx="348" cy="116" r="3.5" />
+    <circle cx="366" cy="130" r="3.5" />
+    <circle cx="390" cy="138" r="3.5" />
+    <circle cx="412" cy="128" r="3.5" />
+    <circle cx="440" cy="144" r="3.5" />
+    <circle cx="470" cy="148" r="3.5" />
+    <circle cx="295" cy="146" r="3.5" />
+    <circle cx="338" cy="142" r="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M 334 160 L 342 172 L 326 172 Z" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 268 226 C 294 226 300 170 320 170 C 340 170 346 226 372 226 Z" fillOpacity="0.5" />
+  </g>
+</svg>
+
 ## The three distributions you must keep separate
 
 Here are the three. Read them slowly — the differences are the whole
@@ -363,6 +408,32 @@ maximum has a sampling distribution, the standard deviation has one, a
 proportion has one. Whenever you summarize a sample into a number and
 imagine repeating the sampling, you get a sampling distribution for that
 number.
+
+<svg
+  viewBox="0 0 640 170"
+  role="img"
+  aria-label="Three little sampling distributions side by side — a slim blue hump for the mean, a green hump for the median, and a yellow lopsided hump for the maximum leaning against its wall — every statistic you can compute has its own distribution across repeated samples"
+  style={{ display: "block", width: "100%", maxWidth: "620px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.15">
+    <rect x="56" y="130" width="160" height="4" rx="2" />
+    <rect x="240" y="130" width="160" height="4" rx="2" />
+    <rect x="424" y="130" width="160" height="4" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M 96 130 C 116 130 120 64 136 64 C 152 64 156 130 176 130 Z" fillOpacity="0.45" />
+    <circle cx="136" cy="146" r="4.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 272 130 C 294 130 298 72 318 72 C 338 72 342 130 364 130 Z" fillOpacity="0.45" />
+    <circle cx="318" cy="146" r="4.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M 438 130 C 470 130 500 118 522 92 C 534 78 540 66 544 56 L 548 130 Z" fillOpacity="0.5" />
+    <rect x="548" y="44" width="5" height="90" rx="2.5" fillOpacity="0.8" />
+    <circle cx="540" cy="146" r="4.5" />
+  </g>
+</svg>
 
 <CodeBlock
   adapter="python"

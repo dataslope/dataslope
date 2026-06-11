@@ -9,6 +9,44 @@ TypeScript takes a different approach. It uses **structural typing** (also calle
 
 This makes TypeScript remarkably flexible and composable. You can reuse types across unrelated modules without needing a shared base class or interface. But it also has surprising edge cases, especially around object literals. Let's explore how structural typing works and when it bites.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="Two completely different builds — one stacked from blocks, one molded in a single piece — cast exactly the same notched shadow, joined by a dotted trail of equivalence, while a third object's plain shadow matches nothing — the compiler compares the shapes things cast, not what they are called"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="320" cy="32" r="11" />
+    <circle cx="344" cy="18" r="2.5" fillOpacity="0.6" />
+    <circle cx="296" cy="18" r="2.5" fillOpacity="0.6" />
+    <circle cx="320" cy="6" r="2.5" fillOpacity="0.6" />
+  </g>
+  <g fill="currentColor" opacity="0.22">
+    <rect x="60" y="190" width="520" height="4" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="120" y="150" width="64" height="40" rx="8" />
+    <circle cx="152" cy="130" r="20" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M420 190 L420 158 C420 132 436 118 452 118 C468 118 484 132 484 158 L484 190 Z" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <path d="M116 198 L140 198 A12 7 0 0 0 164 198 L200 198 L200 210 L116 210 Z" />
+    <path d="M412 198 L436 198 A12 7 0 0 0 460 198 L496 198 L496 210 L412 210 Z" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="240" cy="204" r="2.5" fillOpacity="0.6" />
+    <circle cx="280" cy="204" r="2.5" fillOpacity="0.6" />
+    <circle cx="320" cy="204" r="2.5" fillOpacity="0.6" />
+    <circle cx="360" cy="204" r="2.5" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="548" y="158" width="52" height="32" rx="6" />
+    <path d="M544 198 L606 198 L606 210 L544 210 Z" fillOpacity="0.25" />
+  </g>
+</svg>
+
 ## Shape-based compatibility
 
 In TypeScript, a type is compatible with another if it has *at least* the required properties, with the correct types. The name doesn't matter.
@@ -164,6 +202,45 @@ So TypeScript adds a **freshness** check: when you pass an object literal direct
 <Callout type="warning" title="Fresh vs. non-fresh">
 An object literal is "fresh" when it's created inline as an argument or assignment. Once you store it in a variable (even without a type annotation), it loses freshness and reverts to structural compatibility. This is why `myConfig` above works — by the time it reaches `connect`, it's no longer a fresh literal.
 </Callout>
+
+<svg
+  viewBox="0 0 640 210"
+  role="img"
+  aria-label="Two journeys for the same parcel with an extra yellow ribbon: handed straight to the blue portal it is stopped by a red bar, but after first resting on a pallet it glides through untouched — fresh object literals get strict excess-property checks while stored variables do not"
+  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="180" cy="70" r="2.5" />
+    <circle cx="220" cy="70" r="2.5" />
+    <circle cx="260" cy="70" r="2.5" />
+    <circle cx="300" cy="70" r="2.5" />
+    <circle cx="244" cy="150" r="2.5" />
+    <circle cx="284" cy="150" r="2.5" />
+    <circle cx="324" cy="150" r="2.5" />
+    <circle cx="364" cy="150" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="352" y="52" width="36" height="36" rx="6" />
+    <rect x="148" y="132" width="36" height="36" rx="6" />
+    <rect x="488" y="132" width="36" height="36" rx="6" />
+    <circle cx="556" cy="124" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="352" y="64" width="36" height="8" rx="4" />
+    <rect x="148" y="144" width="36" height="8" rx="4" />
+    <rect x="488" y="144" width="36" height="8" rx="4" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="402" y="50" width="6" height="40" rx="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M424 70 A26 26 0 1 1 476 70 A26 26 0 1 1 424 70 Z M431 70 A19 19 0 1 0 469 70 A19 19 0 1 0 431 70 Z" fillRule="evenodd" />
+    <path d="M424 150 A26 26 0 1 1 476 150 A26 26 0 1 1 424 150 Z M431 150 A19 19 0 1 0 469 150 A19 19 0 1 0 431 150 Z" fillRule="evenodd" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <rect x="136" y="170" width="72" height="10" rx="5" />
+  </g>
+</svg>
 
 ### Bypassing excess property checking
 

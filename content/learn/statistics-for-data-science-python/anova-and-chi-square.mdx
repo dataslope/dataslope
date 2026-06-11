@@ -19,6 +19,31 @@ This page covers the two tools that handle these cases:
 Both are one-liners in `scipy.stats`. As always, the value is in picking
 the right one and reading the result honestly.
 
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="Three colored group humps stand on one shared axis, each raising a post to its own mean around a faint grand-mean line — ANOVA asks a single global question: are the posts farther apart than the width of the humps can explain?"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="60" y="160" width="520" height="4" rx="2" fill="currentColor" opacity="0.18" />
+  <rect x="100" y="93" width="420" height="3" rx="1.5" fill="currentColor" opacity="0.3" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M 80 160 C 105 160 110 96 140 96 C 170 96 175 160 200 160 Z" fillOpacity="0.35" />
+    <rect x="137.5" y="100" width="5" height="60" rx="2.5" />
+    <circle cx="140" cy="92" r="5.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 230 160 C 255 160 260 78 290 78 C 320 78 325 160 350 160 Z" fillOpacity="0.35" />
+    <rect x="287.5" y="84" width="5" height="76" rx="2.5" />
+    <circle cx="290" cy="74" r="5.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M 390 160 C 415 160 420 110 450 110 C 480 110 485 160 510 160 Z" fillOpacity="0.4" />
+    <rect x="447.5" y="114" width="5" height="46" rx="2.5" />
+    <circle cx="450" cy="106" r="5.5" />
+  </g>
+</svg>
+
 ## Part A — One-way ANOVA: comparing 3+ group means
 
 ### Why not just run a bunch of t-tests?
@@ -225,6 +250,36 @@ flowchart LR
 ```
 
 Let's test whether **device type** is associated with **churn**.
+
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A mosaic of device columns split into churn and stay tiles, each crossed by a thin yellow line where its count would sit if the variables were unrelated — the red mobile-churn tile bulging past its line is exactly the deviation a chi-square test adds up"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="120" y="60" width="200" height="36" rx="6" fillOpacity="0.55" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.45">
+    <rect x="326" y="60" width="160" height="20" rx="6" />
+    <rect x="492" y="60" width="44" height="25" rx="6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.2">
+    <rect x="120" y="102" width="200" height="68" rx="6" />
+    <rect x="326" y="86" width="160" height="84" rx="6" />
+    <rect x="492" y="91" width="44" height="79" rx="6" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor" fillOpacity="0.85">
+    <rect x="120" y="86" width="200" height="3" rx="1.5" />
+    <rect x="326" y="86" width="160" height="3" rx="1.5" />
+    <rect x="492" y="86" width="44" height="3" rx="1.5" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="220" cy="190" r="3" />
+    <circle cx="406" cy="190" r="3" />
+    <circle cx="514" cy="190" r="3" />
+  </g>
+</svg>
 
 <CodeBlock
   adapter="python"

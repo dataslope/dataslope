@@ -7,6 +7,45 @@ As systems grow, they're split into modules, services, and teams. Each boundary 
 
 TypeScript offers a better way: **types as contracts**. By modeling your API surfaces with precise types, you move entire classes of integration bugs to compile time. In this chapter, you'll learn to design contracts that span module boundaries, model request/response cycles, separate domain logic from transport concerns, and build systems where the compiler enforces compatibility.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="Two halves of a bridge built from opposite cliffs meet mid-air in interlocking fingers and a parcel rolls across, while a faint earlier attempt below never met and lets a red drop fall through the gap — a shared type contract makes both sides meet exactly"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.08">
+    <path d="M40 128 L240 128 L240 232 L40 232 Z" />
+    <path d="M400 128 L600 128 L600 232 L400 232 Z" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="120" y="84" width="180" height="32" rx="6" />
+    <rect x="300" y="84" width="22" height="10" />
+    <rect x="300" y="106" width="22" height="10" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="342" y="84" width="180" height="32" rx="6" />
+    <rect x="320" y="94" width="22" height="12" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="250" cy="72" r="9" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="180" cy="72" r="2.5" />
+    <circle cx="210" cy="72" r="2.5" />
+    <circle cx="288" cy="72" r="2.5" />
+    <circle cx="318" cy="72" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.15">
+    <rect x="160" y="176" width="120" height="20" rx="5" />
+    <rect x="360" y="176" width="120" height="20" rx="5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="320" cy="206" r="6" fillOpacity="0.7" />
+    <circle cx="320" cy="188" r="2.5" fillOpacity="0.4" />
+    <circle cx="320" cy="222" r="2.5" fillOpacity="0.3" />
+  </g>
+</svg>
+
 ---
 
 ## The Problem: Implicit Contracts
@@ -207,6 +246,34 @@ This pattern:
 ## Generic API Response Envelopes
 
 You can generalize the response pattern with a generic `Result<T, E>` or `ApiResponse<T>` type:
+
+<svg
+  viewBox="0 0 640 150"
+  role="img"
+  aria-label="Two identical envelopes differ only in their edge stripe: the green-striped one carries a blue payload disc, the red-striped one carries an error diamond — one generic envelope wraps every response with a status the caller must inspect"
+  style={{ display: "block", width: "100%", maxWidth: "460px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.1">
+    <rect x="110" y="40" width="180" height="70" rx="16" />
+    <rect x="350" y="40" width="180" height="70" rx="16" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="110" y="40" width="14" height="70" rx="7" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="350" y="40" width="14" height="70" rx="7" />
+    <path d="M452 58 L466 75 L452 92 L438 75 Z" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="212" cy="75" r="15" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="248" cy="75" r="3" />
+    <circle cx="262" cy="75" r="3" />
+    <circle cx="490" cy="75" r="3" />
+    <circle cx="504" cy="75" r="3" />
+  </g>
+</svg>
 
 <CodeBlock
   adapter="typescript"

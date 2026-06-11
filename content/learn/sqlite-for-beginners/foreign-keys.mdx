@@ -36,6 +36,59 @@ This keeps data tidy:
 - Many orders can point to the same customer.
 - If Ada's name changes, the orders still point to customer `1`.
 
+<svg
+  viewBox="0 0 640 250"
+  role="img"
+  aria-label="A cloakroom rail with three numbered hooks holding coats, and below, claim tickets tied by dotted threads to their matching hooks — but the red ticket numbered seven points at a hook that does not exist, a dangling foreign key"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.2">
+    <rect x="90" y="24" width="460" height="9" rx="4.5" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="170" cy="44" r="6" />
+    <circle cx="320" cy="44" r="6" />
+    <circle cx="470" cy="44" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M 150 58 Q 150 50 158 50 L 166 50 L 170 56 L 174 50 L 182 50 Q 190 50 190 58 L 187 106 Q 170 112 153 106 Z" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 300 58 Q 300 50 308 50 L 316 50 L 320 56 L 324 50 L 332 50 Q 340 50 340 58 L 337 106 Q 320 112 303 106 Z" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M 450 58 Q 450 50 458 50 L 466 50 L 470 56 L 474 50 L 482 50 Q 490 50 490 58 L 487 106 Q 470 112 453 106 Z" fillOpacity="0.85" />
+  </g>
+  <g fill="currentColor" opacity="0.28">
+    <circle cx="172" cy="128" r="2.5" />
+    <circle cx="174" cy="146" r="2.5" />
+    <circle cx="176" cy="164" r="2.5" />
+    <circle cx="464" cy="128" r="2.5" />
+    <circle cx="452" cy="146" r="2.5" />
+    <circle cx="440" cy="164" r="2.5" />
+    <circle cx="560" cy="150" r="2.5" />
+    <circle cx="572" cy="128" r="2.5" />
+    <circle cx="580" cy="104" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="138" y="178" width="76" height="44" rx="7" transform="rotate(-5 176 200)" fillOpacity="0.3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="386" y="178" width="76" height="44" rx="7" transform="rotate(4 424 200)" fillOpacity="0.35" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="508" y="166" width="76" height="44" rx="7" transform="rotate(-7 546 188)" fillOpacity="0.4" />
+  </g>
+  <g fill="currentColor" opacity="0.6">
+    <text x="176" y="207" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="20" fontWeight="700" transform="rotate(-5 176 200)">1</text>
+    <text x="424" y="207" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="20" fontWeight="700" transform="rotate(4 424 200)">3</text>
+    <text x="546" y="195" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="20" fontWeight="700" transform="rotate(-7 546 188)">7</text>
+  </g>
+  <g fill="currentColor" opacity="0.14">
+    <circle cx="588" cy="80" r="8" />
+  </g>
+</svg>
+
 <SqlCodeBlock
   dialect="sqlite"
   title="A foreign key stores another table's id"

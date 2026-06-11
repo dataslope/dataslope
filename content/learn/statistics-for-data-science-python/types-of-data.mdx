@@ -17,6 +17,54 @@ is nonsense, because those numbers are labels, not quantities. This
 page is about telling those apart — by eye and in pandas — so you never
 ship a 1.8-flavored conclusion.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="A four-tile mosaic of data types: unordered mixed shapes for nominal labels, circles growing along unevenly spaced steps for ordinal, separate countable dots for discrete with a faint red ghost where no in-between value exists, and a smooth continuous ramp carrying a yellow marker at an arbitrary value"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.06">
+    <rect x="56" y="28" width="256" height="88" rx="14" />
+    <rect x="328" y="28" width="256" height="88" rx="14" />
+    <rect x="56" y="128" width="256" height="88" rx="14" />
+    <rect x="328" y="128" width="256" height="88" rx="14" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="112" cy="72" r="13" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="160" y="59" width="26" height="26" rx="7" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M 225 85 L 239 59 L 253 85 Z" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <rect x="362" y="94" width="36" height="7" rx="3.5" />
+    <rect x="408" y="86" width="40" height="7" rx="3.5" />
+    <rect x="488" y="76" width="44" height="7" rx="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="380" cy="86" r="6" />
+    <circle cx="428" cy="76" r="8.5" />
+    <circle cx="510" cy="64" r="11" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="100" cy="180" r="7" />
+    <circle cx="140" cy="180" r="7" />
+    <circle cx="220" cy="180" r="7" />
+    <circle cx="260" cy="180" r="7" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="180" cy="180" r="5" fillOpacity="0.35" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 350 192 C 420 192 470 156 562 150 L 562 160 C 470 166 420 202 350 202 Z" fillOpacity="0.55" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="470" cy="173" r="6.5" />
+  </g>
+</svg>
+
 <Callout type="info" title="Why this page comes before the statistics">
 Every later technique assumes you've classified your variables
 correctly. *Measures of Center* asks "mean or mode?" — the answer is a
@@ -220,6 +268,43 @@ The averaged zip code (~48,705) isn't a place; it's the centroid of
 four arbitrary labels. The rating mean is *less* wrong but still rests
 on assuming equal spacing. Only `price_usd` — a true ratio quantity —
 earns its mean.
+
+<svg
+  viewBox="0 0 640 190"
+  role="img"
+  aria-label="Four blue code tags pinned at scattered spots on a faint map, with dotted trails converging on a red diamond in the middle of nowhere — averaging labels lands you at a point that means nothing"
+  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="70" y="20" width="500" height="150" rx="16" fill="currentColor" opacity="0.05" />
+  <g fill="currentColor" opacity="0.15">
+    <circle cx="110" cy="150" r="3" />
+    <circle cx="250" cy="40" r="3" />
+    <circle cx="540" cy="150" r="3" />
+    <circle cx="380" cy="32" r="3" />
+    <circle cx="96" cy="92" r="3" />
+    <circle cx="548" cy="76" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="112" y="38" width="46" height="24" rx="7" fillOpacity="0.8" />
+    <rect x="446" y="50" width="46" height="24" rx="7" fillOpacity="0.8" />
+    <rect x="148" y="118" width="46" height="24" rx="7" fillOpacity="0.8" />
+    <rect x="452" y="124" width="46" height="24" rx="7" fillOpacity="0.8" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="190" cy="65" r="2.5" />
+    <circle cx="244" cy="78" r="2.5" />
+    <circle cx="416" cy="74" r="2.5" />
+    <circle cx="368" cy="84" r="2.5" />
+    <circle cx="224" cy="115" r="2.5" />
+    <circle cx="264" cy="105" r="2.5" />
+    <circle cx="412" cy="116" r="2.5" />
+    <circle cx="370" cy="106" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="316" cy="95" r="20" fillOpacity="0.15" />
+    <path d="M 316 81 L 329 95 L 316 109 L 303 95 Z" />
+  </g>
+</svg>
 
 <Callout type="danger" title="The numeric-looking ID trap">
 If a column's numbers are **identifiers or codes** — `user_id`,

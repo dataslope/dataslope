@@ -28,6 +28,91 @@ flowchart TD
 In one `clang hello.c -o hello` command, the driver actually runs all
 four stages in sequence — but you can stop after any one of them.
 
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="A part rides a dotted conveyor through four inspection gates — preprocess, compile, assemble, link — morphing from a source sheet into pasted sheets, a jagged assembly shard, a grid of object-code dots with one unresolved hole, and finally one solid green runnable block as library dots drop in at the last gate"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="56" cy="160" r="2.5" />
+    <circle cx="84" cy="160" r="2.5" />
+    <circle cx="112" cy="160" r="2.5" />
+    <circle cx="140" cy="160" r="2.5" />
+    <circle cx="168" cy="160" r="2.5" />
+    <circle cx="196" cy="160" r="2.5" />
+    <circle cx="224" cy="160" r="2.5" />
+    <circle cx="252" cy="160" r="2.5" />
+    <circle cx="280" cy="160" r="2.5" />
+    <circle cx="308" cy="160" r="2.5" />
+    <circle cx="336" cy="160" r="2.5" />
+    <circle cx="364" cy="160" r="2.5" />
+    <circle cx="392" cy="160" r="2.5" />
+    <circle cx="420" cy="160" r="2.5" />
+    <circle cx="448" cy="160" r="2.5" />
+    <circle cx="476" cy="160" r="2.5" />
+    <circle cx="504" cy="160" r="2.5" />
+    <circle cx="532" cy="160" r="2.5" />
+    <circle cx="560" cy="160" r="2.5" />
+    <circle cx="588" cy="160" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <rect x="112" y="70" width="10" height="86" rx="3" />
+    <rect x="178" y="70" width="10" height="86" rx="3" />
+    <rect x="106" y="56" width="88" height="14" rx="7" />
+    <rect x="232" y="70" width="10" height="86" rx="3" />
+    <rect x="298" y="70" width="10" height="86" rx="3" />
+    <rect x="226" y="56" width="88" height="14" rx="7" />
+    <rect x="352" y="70" width="10" height="86" rx="3" />
+    <rect x="418" y="70" width="10" height="86" rx="3" />
+    <rect x="346" y="56" width="88" height="14" rx="7" />
+    <rect x="472" y="70" width="10" height="86" rx="3" />
+    <rect x="538" y="70" width="10" height="86" rx="3" />
+    <rect x="466" y="56" width="88" height="14" rx="7" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="150" cy="63" r="5" />
+    <rect x="58" y="118" width="24" height="30" rx="3" fillOpacity="0.3" />
+    <rect x="62" y="126" width="14" height="3" rx="1.5" fillOpacity="0.55" />
+    <rect x="62" y="133" width="16" height="3" rx="1.5" fillOpacity="0.55" />
+    <rect x="62" y="140" width="10" height="3" rx="1.5" fillOpacity="0.55" />
+    <rect x="198" y="114" width="24" height="32" rx="3" fillOpacity="0.18" />
+    <rect x="206" y="118" width="24" height="30" rx="3" fillOpacity="0.38" />
+    <rect x="211" y="126" width="14" height="3" rx="1.5" fillOpacity="0.6" />
+    <rect x="211" y="133" width="13" height="3" rx="1.5" fillOpacity="0.6" />
+    <path d="M318 148 L326 116 L334 132 L342 112 L350 134 L344 148 Z" fillOpacity="0.55" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="270" cy="63" r="5" />
+    <rect x="438" y="116" width="8" height="8" rx="2" fillOpacity="0.8" />
+    <rect x="450" y="116" width="8" height="8" rx="2" fillOpacity="0.5" />
+    <rect x="462" y="116" width="8" height="8" rx="2" fillOpacity="0.8" />
+    <rect x="438" y="128" width="8" height="8" rx="2" fillOpacity="0.5" />
+    <rect x="450" y="128" width="8" height="8" rx="2" fillOpacity="0.8" />
+    <rect x="462" y="128" width="8" height="8" rx="2" fillOpacity="0.5" />
+    <rect x="438" y="140" width="8" height="8" rx="2" fillOpacity="0.8" />
+    <rect x="450" y="140" width="8" height="8" rx="2" fillOpacity="0.5" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <rect x="462" y="140" width="8" height="8" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="390" cy="63" r="5" />
+    <circle cx="600" cy="100" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="510" cy="63" r="5" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <rect x="492" y="14" width="44" height="16" rx="4" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="512" cy="40" r="3.5" />
+    <circle cx="510" cy="50" r="3.5" fillOpacity="0.7" />
+    <rect x="562" y="112" width="34" height="34" rx="9" />
+  </g>
+</svg>
+
 | Stage | Input | Output | Tool flag (clang/gcc) |
 | --- | --- | --- | --- |
 | Preprocess | `.c` | `.i` | `-E` |
@@ -144,6 +229,33 @@ undefined reference to `greet`
 `main.c`, but never compiled or passed `greet.c` (or its `.o`) to the
 linker.
 
+<svg
+  viewBox="0 0 640 180"
+  role="img"
+  aria-label="Three blue object pieces interlock into a binary with one empty outlined slot marked by a question mark — an undefined reference — while the matching green piece slides in along a dotted arc"
+  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="150" y="46" width="110" height="52" rx="10" fillOpacity="0.35" />
+    <rect x="262" y="46" width="90" height="52" rx="10" fillOpacity="0.2" />
+    <rect x="150" y="100" width="90" height="52" rx="10" fillOpacity="0.25" />
+    <circle cx="260" cy="72" r="7" fillOpacity="0.55" />
+    <circle cx="205" cy="100" r="7" fillOpacity="0.55" />
+  </g>
+  <path d="M242 100 h110 v52 h-110 Z M248 106 h98 v40 h-98 Z" fillRule="evenodd" fill="currentColor" opacity="0.18" />
+  <text x="297" y="134" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="22" fill="currentColor" opacity="0.4">?</text>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="470" cy="116" r="2.5" />
+    <circle cx="440" cy="128" r="2.5" />
+    <circle cx="408" cy="134" r="2.5" />
+    <circle cx="376" cy="134" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="436" y="58" width="104" height="48" rx="10" />
+    <circle cx="436" cy="82" r="8" />
+  </g>
+</svg>
+
 <Callout type="info" title="The declaration / definition split">
 A **declaration** says "such a function exists somewhere" — that's
 what headers do. A **definition** is the actual body — that's what
@@ -213,6 +325,41 @@ Two flavors of library exist on most systems:
   the binary just records "I depend on `libfoo`"; the OS loads it at
   runtime and resolves the symbols. Smaller binaries; multiple
   programs share one copy in memory; but you must ship the library.
+
+<svg
+  viewBox="0 0 640 190"
+  role="img"
+  aria-label="Static linking on the left copies the green library inside one big binary; dynamic linking on the right keeps a single green library outside, tethered by dotted lines to two slim binaries that share it"
+  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="318" y="30" width="4" height="130" rx="2" fill="currentColor" opacity="0.12" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="70" y="46" width="200" height="104" rx="14" fillOpacity="0.18" />
+    <rect x="88" y="66" width="76" height="64" rx="8" fillOpacity="0.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="176" y="66" width="76" height="64" rx="8" fillOpacity="0.7" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="360" y="38" width="110" height="56" rx="10" fillOpacity="0.18" />
+    <rect x="372" y="48" width="56" height="36" rx="6" fillOpacity="0.5" />
+  </g>
+  <g fill="currentColor">
+    <rect x="360" y="118" width="110" height="56" rx="10" opacity="0.12" />
+    <rect x="372" y="128" width="56" height="36" rx="6" opacity="0.3" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="482" cy="70" r="2.5" />
+    <circle cx="496" cy="76" r="2.5" />
+    <circle cx="510" cy="82" r="2.5" />
+    <circle cx="482" cy="142" r="2.5" />
+    <circle cx="496" cy="134" r="2.5" />
+    <circle cx="510" cy="124" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="524" y="78" width="72" height="46" rx="10" fillOpacity="0.7" />
+  </g>
+</svg>
 
 `printf` lives in libc, which is dynamic on virtually every desktop
 system. That is why a "hello world" binary is so small.

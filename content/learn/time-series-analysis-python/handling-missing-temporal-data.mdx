@@ -11,6 +11,46 @@ question is rarely "drop or keep?" but "**what do I believe happened
 during the gap?**" — and every fill method is a different answer to that
 question.
 
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="A dotted ribbon runs along the timeline with two torn gaps — one stitched closed by green interpolated dots on a mending strip, the other still a row of hollow red rings — a missing stretch of temporal data is either repaired by an assumption or left honestly empty"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.08">
+    <rect x="44" y="86" width="172" height="48" rx="20" />
+    <rect x="312" y="86" width="100" height="48" rx="20" />
+    <rect x="500" y="86" width="96" height="48" rx="20" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="60" cy="114" r="5" />
+    <circle cx="94" cy="104" r="5" />
+    <circle cx="128" cy="116" r="5" />
+    <circle cx="162" cy="106" r="5" />
+    <circle cx="196" cy="98" r="5" />
+    <circle cx="328" cy="110" r="5" />
+    <circle cx="362" cy="100" r="5" />
+    <circle cx="396" cy="112" r="5" />
+    <circle cx="516" cy="108" r="5" />
+    <circle cx="550" cy="98" r="5" />
+    <circle cx="582" cy="110" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 196 95 L 328 107 L 328 113 L 196 101 Z" fillOpacity="0.35" />
+    <circle cx="240" cy="102" r="4.5" fillOpacity="0.9" />
+    <circle cx="284" cy="106" r="4.5" fillOpacity="0.9" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M 423 104 a 7 7 0 1 0 14 0 a 7 7 0 1 0 -14 0 Z M 426.5 104 a 3.5 3.5 0 1 0 7 0 a 3.5 3.5 0 1 0 -7 0 Z" fillRule="evenodd" fillOpacity="0.8" />
+    <path d="M 457 104 a 7 7 0 1 0 14 0 a 7 7 0 1 0 -14 0 Z M 460.5 104 a 3.5 3.5 0 1 0 7 0 a 3.5 3.5 0 1 0 -7 0 Z" fillRule="evenodd" fillOpacity="0.8" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="80" cy="40" r="3" />
+    <circle cx="560" cy="166" r="3" />
+    <circle cx="340" cy="170" r="3" />
+  </g>
+</svg>
+
 <Callout type="info" title="Two kinds of 'missing' in time series">
 1. **A missing value at a present timestamp** — the row exists, but the
    value is `NaN` (the sensor returned nothing at 14:00).
@@ -124,6 +164,42 @@ print("Three different stories about the same two unknown days.")
 - **Linear interpolation** — "the value **glided smoothly** between the two
   knowns." Ideal for *continuous physical* quantities sampled with dropouts:
   temperature, sensor voltage, a slowly drifting measurement.
+
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="Three copies of the same gap between a low known dot and a high known dot: yellow holds the last value flat, red drags the next value backwards, and green glides evenly between them — forward-fill, back-fill, and interpolation are three different beliefs about the unseen"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="110" cy="56" r="6" />
+    <circle cx="470" cy="32" r="6" />
+    <circle cx="110" cy="132" r="6" />
+    <circle cx="470" cy="108" r="6" />
+    <circle cx="110" cy="208" r="6" />
+    <circle cx="470" cy="184" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="118" y="53" width="234" height="6" rx="3" fillOpacity="0.45" />
+    <circle cx="230" cy="56" r="5" />
+    <circle cx="350" cy="56" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="222" y="105" width="240" height="6" rx="3" fillOpacity="0.4" />
+    <circle cx="230" cy="108" r="5" />
+    <circle cx="350" cy="108" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 116 205 L 464 181 L 464 187 L 116 211 Z" fillOpacity="0.45" />
+    <circle cx="230" cy="200" r="5" />
+    <circle cx="350" cy="192" r="5" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="540" cy="56" r="3.5" />
+    <circle cx="540" cy="108" r="3.5" />
+    <circle cx="540" cy="184" r="3.5" />
+  </g>
+</svg>
 
 <CodeBlock
   adapter="python"
@@ -250,6 +326,34 @@ a sensor that's off, a holiday with no trading — these are *zeros or
 genuine absences*, not values to interpolate. Decide what the gap *means*
 first; only then pick a fill.
 </Callout>
+
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="Six solid blue sales columns finish the week, and in Sunday's empty slot a hollow red phantom bar looms at the height interpolation would invent while the true value — a flat green zero tile — sits on the floor; a closed shop is a real zero, not a gap to fill"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="56" y="170" width="528" height="5" rx="2.5" fill="currentColor" opacity="0.25" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="72" y="106" width="36" height="64" rx="6" fillOpacity="0.8" />
+    <rect x="138" y="114" width="36" height="56" rx="6" fillOpacity="0.8" />
+    <rect x="204" y="100" width="36" height="70" rx="6" fillOpacity="0.8" />
+    <rect x="270" y="110" width="36" height="60" rx="6" fillOpacity="0.8" />
+    <rect x="336" y="84" width="36" height="86" rx="6" fillOpacity="0.8" />
+    <rect x="402" y="64" width="36" height="106" rx="6" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M 468 60 L 504 60 L 504 170 L 468 170 Z M 474 66 L 498 66 L 498 164 L 474 164 Z" fillRule="evenodd" fillOpacity="0.55" />
+    <circle cx="486" cy="44" r="4" fillOpacity="0.45" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="468" y="162" width="36" height="8" rx="4" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="546" cy="150" r="4" />
+    <circle cx="566" cy="160" r="4" />
+  </g>
+</svg>
 
 ## When dropping is actually fine
 

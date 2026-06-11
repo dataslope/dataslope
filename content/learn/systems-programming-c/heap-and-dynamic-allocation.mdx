@@ -12,6 +12,73 @@ return it later with `free`.
 Manual heap management is C's most distinctive (and most dangerous)
 feature. This page is the long, careful introduction.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="A wall of storage lockers run from a small allocator kiosk: a yellow key arcs out to open one green locker, several others sit claimed, and one locker stays latched forever because its red key lies lost beneath the floor — malloc hands out space that only free can return"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.1">
+    <rect x="64" y="40" width="56" height="40" rx="5" />
+    <rect x="196" y="40" width="56" height="40" rx="5" />
+    <rect x="262" y="40" width="56" height="40" rx="5" />
+    <rect x="394" y="40" width="56" height="40" rx="5" />
+    <rect x="130" y="90" width="56" height="40" rx="5" />
+    <rect x="328" y="90" width="56" height="40" rx="5" />
+    <rect x="130" y="140" width="56" height="40" rx="5" />
+    <rect x="196" y="140" width="56" height="40" rx="5" />
+    <rect x="262" y="140" width="56" height="40" rx="5" />
+    <rect x="328" y="140" width="56" height="40" rx="5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="130" y="40" width="56" height="40" rx="5" fillOpacity="0.45" />
+    <rect x="328" y="40" width="56" height="40" rx="5" fillOpacity="0.45" />
+    <rect x="196" y="90" width="56" height="40" rx="5" fillOpacity="0.45" />
+    <rect x="64" y="140" width="56" height="40" rx="5" fillOpacity="0.45" />
+    <rect x="64" y="90" width="56" height="40" rx="5" fillOpacity="0.45" />
+    <rect x="262" y="90" width="56" height="40" rx="5" fillOpacity="0.9" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="148" cy="60" r="3" />
+    <circle cx="346" cy="60" r="3" />
+    <circle cx="214" cy="110" r="3" />
+    <circle cx="82" cy="160" r="3" />
+    <circle cx="82" cy="110" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="394" y="140" width="56" height="40" rx="5" fillOpacity="0.45" />
+  </g>
+  <g fill="currentColor" opacity="0.45">
+    <rect x="412" y="156" width="20" height="7" rx="3.5" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="500" cy="92" r="2.5" />
+    <circle cx="470" cy="80" r="2.5" />
+    <circle cx="436" cy="76" r="2.5" />
+    <circle cx="400" cy="80" r="2.5" />
+    <circle cx="366" cy="90" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="326" cy="100" r="7" />
+    <rect x="333" y="97" width="16" height="6" rx="2" />
+    <rect x="343" y="103" width="4" height="7" rx="1.5" />
+    <rect x="337" y="103" width="3" height="5" rx="1.5" />
+  </g>
+  <circle cx="326" cy="100" r="3" fill="var(--ds-white)" />
+  <g fill="currentColor" opacity="0.12">
+    <rect x="488" y="68" width="104" height="122" rx="12" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M508 130 A22 22 0 0 1 552 130 L552 152 L508 152 Z" fillOpacity="0.45" />
+    <rect x="500" y="156" width="60" height="8" rx="4" fillOpacity="0.25" />
+  </g>
+  <rect x="40" y="190" width="560" height="7" rx="3.5" fill="currentColor" opacity="0.2" />
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor" fillOpacity="0.55">
+    <circle cx="414" cy="208" r="6" />
+    <rect x="420" y="205" width="14" height="5" rx="2" />
+  </g>
+</svg>
+
 ## The four heap functions
 
 | Function | Purpose | Returns |
@@ -152,6 +219,47 @@ by `memset(p, 0, ...)`.
 - allocate a *new* block, copy the old contents, and free the old one,
 - or return `NULL` (the old block is **still valid** in this case).
 
+<svg
+  viewBox="0 0 640 170"
+  role="img"
+  aria-label="Four dots move from a snug container along a dotted arc into a roomier one with four empty slots waiting — realloc copies the contents to a bigger block and retires the old one, marked with a red dot"
+  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="70" y="62" width="128" height="56" rx="12" fillOpacity="0.12" />
+    <circle cx="96" cy="90" r="9" fillOpacity="0.4" />
+    <circle cx="120" cy="90" r="9" fillOpacity="0.4" />
+    <circle cx="144" cy="90" r="9" fillOpacity="0.4" />
+    <circle cx="168" cy="90" r="9" fillOpacity="0.4" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="198" cy="62" r="5" fillOpacity="0.8" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="222" cy="56" r="2.5" />
+    <circle cx="250" cy="44" r="2.5" />
+    <circle cx="282" cy="38" r="2.5" />
+    <circle cx="314" cy="40" r="2.5" />
+    <circle cx="344" cy="48" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="330" y="62" width="240" height="56" rx="12" fillOpacity="0.2" />
+    <circle cx="358" cy="90" r="9" />
+    <circle cx="384" cy="90" r="9" />
+    <circle cx="410" cy="90" r="9" />
+    <circle cx="436" cy="90" r="9" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <path d="M453 90 a9 9 0 1 1 18 0 a9 9 0 1 1 -18 0 Z M456 90 a6 6 0 1 1 12 0 a6 6 0 1 1 -12 0 Z" fillRule="evenodd" />
+    <path d="M479 90 a9 9 0 1 1 18 0 a9 9 0 1 1 -18 0 Z M482 90 a6 6 0 1 1 12 0 a6 6 0 1 1 -12 0 Z" fillRule="evenodd" />
+    <path d="M505 90 a9 9 0 1 1 18 0 a9 9 0 1 1 -18 0 Z M508 90 a6 6 0 1 1 12 0 a6 6 0 1 1 -12 0 Z" fillRule="evenodd" />
+    <path d="M531 90 a9 9 0 1 1 18 0 a9 9 0 1 1 -18 0 Z M534 90 a6 6 0 1 1 12 0 a6 6 0 1 1 -12 0 Z" fillRule="evenodd" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="570" cy="62" r="5" />
+  </g>
+</svg>
+
 <Callout type="warn" title="Never assign realloc's result back over the only pointer">
 `p = realloc(p, n);` leaks the original block if `realloc` fails. The
 safe pattern is to use a temporary.
@@ -261,6 +369,49 @@ int main(void) {
 
 Doubling the capacity each time gives amortized O(1) `push`. This is
 exactly how `std::vector<T>` in C++ and `Vec<T>` in Rust grow.
+
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="Capacity columns double from two to four to eight slots as green pushes fill them, with yellow arcs marking the occasional copy-everything resize — rare big moves that stay cheap on average"
+  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="80" y="174" width="480" height="5" rx="2.5" fill="currentColor" opacity="0.18" />
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.85">
+    <rect x="120" y="152" width="40" height="14" rx="3" />
+    <rect x="120" y="134" width="40" height="14" rx="3" />
+    <rect x="240" y="152" width="40" height="14" rx="3" />
+    <rect x="240" y="134" width="40" height="14" rx="3" />
+    <rect x="240" y="116" width="40" height="14" rx="3" />
+    <rect x="240" y="98" width="40" height="14" rx="3" />
+    <rect x="400" y="152" width="40" height="14" rx="3" />
+    <rect x="400" y="134" width="40" height="14" rx="3" />
+    <rect x="400" y="116" width="40" height="14" rx="3" />
+    <rect x="400" y="98" width="40" height="14" rx="3" />
+    <rect x="400" y="80" width="40" height="14" rx="3" />
+    <rect x="400" y="62" width="40" height="14" rx="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.15">
+    <rect x="400" y="44" width="40" height="14" rx="3" />
+    <rect x="400" y="26" width="40" height="14" rx="3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="176" cy="120" r="3" />
+    <circle cx="198" cy="106" r="3" />
+    <circle cx="220" cy="100" r="3" fillOpacity="0.7" />
+    <circle cx="298" cy="78" r="3" />
+    <circle cx="330" cy="58" r="3" />
+    <circle cx="364" cy="50" r="3" fillOpacity="0.7" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="504" cy="44" r="6" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="488" cy="48" r="2" />
+    <circle cx="472" cy="50" r="2" />
+    <circle cx="456" cy="51" r="2" />
+  </g>
+</svg>
 
 ## Ownership: who frees what?
 

@@ -11,6 +11,56 @@ You've learned how to transform and filter types with [mapped and conditional ty
 
 Together, these tools let you derive types from your code's structure, ensuring that types and values stay in sync automatically. You'll build event systems, configuration validators, and API contracts where the types are generated from your data, not manually duplicated.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="A cabinet wears three shaped keyholes — circle, square, and triangle — and the ring beside it holds exactly three matching keys, with only a dotted ghost where a fourth would hang — keyof lifts an object's true keys into a type, no more and no fewer"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="80" y="40" width="200" height="160" rx="14" />
+  </g>
+  <g fill="var(--ds-white)">
+    <circle cx="135" cy="85" r="14" />
+    <rect x="191" y="71" width="28" height="28" rx="5" />
+    <path d="M135 138 L151 166 L119 166 Z" />
+  </g>
+  <g fill="currentColor" opacity="0.45">
+    <path d="M394 70 A26 26 0 1 1 446 70 A26 26 0 1 1 394 70 Z M400 70 A20 20 0 1 0 440 70 A20 20 0 1 0 400 70 Z" fillRule="evenodd" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="402" cy="104" r="2.5" />
+    <circle cx="420" cy="101" r="2.5" />
+    <circle cx="442" cy="104" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="390" cy="122" r="11" />
+    <rect x="386" y="132" width="8" height="40" rx="3" />
+    <rect x="394" y="158" width="8" height="6" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="409" y="112" width="22" height="22" rx="5" />
+    <rect x="416" y="134" width="8" height="42" rx="3" />
+    <rect x="424" y="162" width="8" height="6" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M470 110 L483 132 L457 132 Z" />
+    <rect x="466" y="132" width="8" height="40" rx="3" />
+    <rect x="474" y="158" width="8" height="6" rx="2" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <circle cx="540" cy="112" r="2.5" />
+    <circle cx="550" cy="120" r="2.5" />
+    <circle cx="552" cy="132" r="2.5" />
+    <circle cx="546" cy="143" r="2.5" />
+    <circle cx="534" cy="146" r="2.5" />
+    <circle cx="526" cy="138" r="2.5" />
+    <circle cx="526" cy="124" r="2.5" />
+    <circle cx="540" cy="158" r="2.5" />
+    <circle cx="540" cy="172" r="2.5" />
+  </g>
+</svg>
+
 ---
 
 ## `keyof T`: The Keys of a Type
@@ -92,6 +142,43 @@ console.log(newConfig);
 
 `typeof config` produces `{ apiUrl: string; timeout: number; retries: number }`. If you add or remove properties from `config`, the type automatically reflects the change.
 
+<svg
+  viewBox="0 0 640 190"
+  role="img"
+  aria-label="A solid green square on the ground projects a beam up through the dotted cloud line, where its hollow twin appears in the type sky — typeof lifts a runtime value into the world of types"
+  style={{ display: "block", width: "100%", maxWidth: "460px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.2">
+    <rect x="100" y="170" width="440" height="4" rx="2" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <circle cx="120" cy="92" r="2.5" />
+    <circle cx="150" cy="92" r="2.5" />
+    <circle cx="180" cy="92" r="2.5" />
+    <circle cx="210" cy="92" r="2.5" />
+    <circle cx="240" cy="92" r="2.5" />
+    <circle cx="270" cy="92" r="2.5" />
+    <circle cx="300" cy="92" r="2.5" />
+    <circle cx="330" cy="92" r="2.5" />
+    <circle cx="360" cy="92" r="2.5" />
+    <circle cx="390" cy="92" r="2.5" />
+    <circle cx="420" cy="92" r="2.5" />
+    <circle cx="450" cy="92" r="2.5" />
+    <circle cx="480" cy="92" r="2.5" />
+    <circle cx="510" cy="92" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M282 170 L318 170 L342 36 L258 36 Z" fillOpacity="0.1" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="282" y="134" width="36" height="36" rx="6" />
+    <path d="M278 18 L322 18 L322 62 L278 62 Z M286 26 L314 26 L314 54 L286 54 Z" fillRule="evenodd" fillOpacity="0.55" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="560" cy="36" r="10" />
+  </g>
+</svg>
+
 You can also use `typeof` with functions:
 
 <CodeBlock
@@ -167,6 +254,44 @@ console.log(msg1, msg2);
 />
 
 When you interpolate a union, TypeScript distributes over it, producing all combinations:
+
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="Two blue prefix chips cross three yellow suffix chips in a small multiplication table, minting six two-tone combination chips — a template literal type generates every pairing automatically"
+  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="210" y="24" width="64" height="24" rx="12" />
+    <rect x="306" y="24" width="64" height="24" rx="12" />
+    <rect x="402" y="24" width="64" height="24" rx="12" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="90" y="84" width="64" height="24" rx="12" />
+    <rect x="90" y="144" width="64" height="24" rx="12" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="180" cy="36" r="3" />
+    <circle cx="180" cy="96" r="3" />
+    <circle cx="180" cy="156" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M222 84 L242 84 L242 108 L222 108 A12 12 0 0 1 222 84 Z" />
+    <path d="M318 84 L338 84 L338 108 L318 108 A12 12 0 0 1 318 84 Z" />
+    <path d="M414 84 L434 84 L434 108 L414 108 A12 12 0 0 1 414 84 Z" />
+    <path d="M222 144 L242 144 L242 168 L222 168 A12 12 0 0 1 222 144 Z" />
+    <path d="M318 144 L338 144 L338 168 L318 168 A12 12 0 0 1 318 144 Z" />
+    <path d="M414 144 L434 144 L434 168 L414 168 A12 12 0 0 1 414 144 Z" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M242 84 L262 84 A12 12 0 0 1 262 108 L242 108 Z" />
+    <path d="M338 84 L358 84 A12 12 0 0 1 358 108 L338 108 Z" />
+    <path d="M434 84 L454 84 A12 12 0 0 1 454 108 L434 108 Z" />
+    <path d="M242 144 L262 144 A12 12 0 0 1 262 168 L242 168 Z" />
+    <path d="M338 144 L358 144 A12 12 0 0 1 358 168 L338 168 Z" />
+    <path d="M434 144 L454 144 A12 12 0 0 1 454 168 L434 168 Z" />
+  </g>
+</svg>
 
 <CodeBlock
   adapter="typescript"

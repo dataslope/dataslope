@@ -13,6 +13,58 @@ For example:
 
 These are not row-by-row conditions. They are conditions about **groups after aggregation**. That is what `HAVING` is for.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="Three stacks of dots line up at a fairground measuring post with a dotted you-must-be-this-tall line; only the stack that reaches above the line earns the green check — HAVING measures each finished group and keeps the ones that qualify"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.14">
+    <rect x="70" y="208" width="500" height="7" rx="3.5" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <rect x="440" y="40" width="14" height="168" rx="5" />
+    <rect x="456" y="58" width="12" height="5" rx="2.5" />
+    <rect x="456" y="94" width="12" height="5" rx="2.5" />
+    <rect x="456" y="130" width="12" height="5" rx="2.5" />
+    <rect x="456" y="166" width="12" height="5" rx="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M 438 102 L 416 92 L 416 112 Z" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="96" cy="102" r="2.5" />
+    <circle cx="124" cy="102" r="2.5" />
+    <circle cx="152" cy="102" r="2.5" />
+    <circle cx="180" cy="102" r="2.5" />
+    <circle cx="208" cy="102" r="2.5" />
+    <circle cx="236" cy="102" r="2.5" />
+    <circle cx="264" cy="102" r="2.5" />
+    <circle cx="292" cy="102" r="2.5" />
+    <circle cx="320" cy="102" r="2.5" />
+    <circle cx="348" cy="102" r="2.5" />
+    <circle cx="376" cy="102" r="2.5" />
+    <circle cx="404" cy="102" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="118" cy="194" r="14" fillOpacity="0.4" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="226" cy="194" r="14" fillOpacity="0.45" />
+    <circle cx="226" cy="164" r="14" fillOpacity="0.45" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="354" cy="194" r="14" />
+    <circle cx="354" cy="164" r="14" fillOpacity="0.85" />
+    <circle cx="354" cy="134" r="14" fillOpacity="0.7" />
+    <circle cx="354" cy="104" r="14" fillOpacity="0.9" />
+    <circle cx="354" cy="74" r="14" fillOpacity="0.75" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 506 96 L 520 114 L 552 70 L 526 122 L 506 108 Z" />
+  </g>
+</svg>
+
 ## WHERE filters rows before groups exist
 
 `WHERE` runs before grouping. At that moment, there are only individual rows. There are no group totals yet, so `WHERE COUNT(*) > 2` does not make sense.

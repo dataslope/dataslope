@@ -25,6 +25,45 @@ The honest way to trust a tool is to feed it data whose answer you already
 know. We'll *construct* a series from a known trend, a known seasonal sine,
 and known noise, then ask `seasonal_decompose` to hand the pieces back.
 
+<svg
+  viewBox="0 0 640 250"
+  role="img"
+  aria-label="A blue observed ridge sits above three translucent strata that add up to it — a rising green trend ramp, a steady yellow seasonal wave, and a dusting of residual noise dots — decomposition pulls one series apart into trend, season, and remainder"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M 90 92 C 105 80 118 62 140 62 C 162 62 168 80 190 80 C 212 80 218 52 240 52 C 262 52 268 72 290 72 C 312 72 318 44 340 44 C 362 44 368 64 390 64 C 412 64 418 34 440 34 C 462 34 470 56 492 56 C 514 56 530 40 550 36 L 550 92 Z" fillOpacity="0.28" />
+    <circle cx="140" cy="62" r="4" />
+    <circle cx="240" cy="52" r="4" />
+    <circle cx="340" cy="44" r="4" />
+    <circle cx="440" cy="34" r="4" />
+  </g>
+  <text x="60" y="124" fontFamily="ui-monospace, monospace" fontSize="20" fill="currentColor" opacity="0.45" textAnchor="middle">=</text>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 90 130 L 550 96 L 550 104 L 90 138 Z" fillOpacity="0.55" />
+  </g>
+  <text x="60" y="182" fontFamily="ui-monospace, monospace" fontSize="20" fill="currentColor" opacity="0.45" textAnchor="middle">+</text>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M 90 176 C 113 158 136 158 159 176 C 182 194 205 194 228 176 C 251 158 274 158 297 176 C 320 194 343 194 366 176 C 389 158 412 158 435 176 C 458 194 481 194 504 176 C 527 158 538 158 550 166 L 550 176 C 538 168 527 168 504 186 C 481 204 458 204 435 186 C 412 168 389 168 366 186 C 343 204 320 204 297 186 C 274 168 251 168 228 186 C 205 204 182 204 159 186 C 136 168 113 168 90 186 Z" fillOpacity="0.55" />
+  </g>
+  <text x="60" y="232" fontFamily="ui-monospace, monospace" fontSize="20" fill="currentColor" opacity="0.45" textAnchor="middle">+</text>
+  <g fill="currentColor" opacity="0.45">
+    <circle cx="104" cy="228" r="3" />
+    <circle cx="140" cy="220" r="3" />
+    <circle cx="176" cy="232" r="3" />
+    <circle cx="212" cy="224" r="3" />
+    <circle cx="248" cy="230" r="3" />
+    <circle cx="284" cy="218" r="3" />
+    <circle cx="320" cy="234" r="3" />
+    <circle cx="356" cy="226" r="3" />
+    <circle cx="392" cy="220" r="3" />
+    <circle cx="428" cy="232" r="3" />
+    <circle cx="464" cy="222" r="3" />
+    <circle cx="500" cy="230" r="3" />
+    <circle cx="536" cy="224" r="3" />
+  </g>
+</svg>
+
 <CodeBlock
   adapter="python"
   files={[
@@ -90,6 +129,29 @@ The choice between the two models isn't a coin flip — the data tells you:
 - **Multiplicative** (`Observed = Trend x Seasonal x Residual`): use it when
   the seasonal swings **grow with the level**. The summer bump is "+30%" — so
   it's small when the series is low and large when it's high.
+
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="Two waves climb side by side: the green one swings by the same amount all the way up, while the blue one swings wider and wider inside a faint red funnel as its level rises — constant-size swings are additive, swings that grow with the level are multiplicative"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="52" y="176" width="244" height="4" rx="2" fill="currentColor" opacity="0.2" />
+  <rect x="344" y="176" width="244" height="4" rx="2" fill="currentColor" opacity="0.2" />
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 60 150 C 68 138 74 132 82 132 C 94 132 112 152 127 152 C 142 152 158 116 172 116 C 186 116 202 137 217 137 C 232 137 248 101 262 101 C 272 101 280 104 288 108 L 288 117 C 280 113 272 110 262 110 C 248 110 232 146 217 146 C 202 146 186 125 172 125 C 158 125 142 161 127 161 C 112 161 94 141 82 141 C 74 141 68 147 60 159 Z" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M 350 142 L 580 66 L 580 166 L 350 158 Z" fillOpacity="0.1" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M 350 150 C 358 142 364 138 372 138 C 384 138 402 152 417 152 C 432 152 446 109 462 109 C 478 109 492 153 507 153 C 522 153 536 77 552 77 C 562 77 570 82 580 88 L 580 97 C 570 91 562 86 552 86 C 536 86 522 162 507 162 C 492 162 478 118 462 118 C 446 118 432 161 417 161 C 402 161 384 147 372 147 C 364 147 358 151 350 159 Z" fillOpacity="0.6" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="318" cy="60" r="3" />
+    <circle cx="318" cy="120" r="3" />
+  </g>
+</svg>
 
 The airline series is the textbook multiplicative case: its summer-to-winter
 swing is tiny in 1949 and huge by 1960. Watch what additive does with that.
@@ -178,6 +240,30 @@ There's an elegant shortcut. Taking the **logarithm** of a multiplicative
 series makes it *additive*, because `log(T x S x R) = log T + log S + log R`.
 A log compresses the big late-period swings and stretches the small early
 ones until they're the same size — exactly what an additive model wants.
+
+<svg
+  viewBox="0 0 640 190"
+  role="img"
+  aria-label="A wave whose swings grow ever larger flows into a yellow lens marked ln and emerges on the other side with calm, equal swings — the log transform turns multiplicative growth into the additive world classical models live in"
+  style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M 50 100 C 60 94 70 92 80 92 C 95 92 110 114 125 114 C 140 114 155 78 170 78 C 185 78 200 130 215 130 C 230 130 244 76 258 70 L 258 79 C 244 85 230 139 215 139 C 200 139 185 87 170 87 C 155 87 140 123 125 123 C 110 123 95 101 80 101 C 70 101 60 103 50 109 Z" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M 286 100 a 34 34 0 1 0 68 0 a 34 34 0 1 0 -68 0 Z M 294 100 a 26 26 0 1 0 52 0 a 26 26 0 1 0 -52 0 Z" fillRule="evenodd" />
+  </g>
+  <text x="320" y="107" fontFamily="Georgia, serif" fontStyle="italic" fontSize="20" fill="currentColor" opacity="0.55" textAnchor="middle">ln</text>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 370 100 C 380 88 390 84 400 84 C 415 84 430 116 445 116 C 460 116 475 84 490 84 C 505 84 520 116 535 116 C 550 116 562 96 580 92 L 580 101 C 562 105 550 125 535 125 C 520 125 505 93 490 93 C 475 93 460 125 445 125 C 430 125 415 93 400 93 C 390 93 380 97 370 109 Z" fillOpacity="0.6" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="320" cy="34" r="3" />
+    <circle cx="320" cy="166" r="3" />
+    <circle cx="80" cy="160" r="3" />
+    <circle cx="560" cy="44" r="3" />
+  </g>
+</svg>
 
 <CodeBlock
   adapter="python"

@@ -13,6 +13,55 @@ number never accidentally receives a string.
 This chapter answers three questions: **What are the primitive types?**
 **How does the compiler track them?** **What bugs does this prevent?**
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="Seven atoms drift in a field: blue, green, and yellow nuclei with orbiting electrons, a double-ringed heavyweight, a one-of-a-kind red atom with a sparkle, a deliberately hollow ring, and a barely-there ghost — the primitive types as the indivisible atoms of the type system"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.15">
+    <circle cx="60" cy="40" r="3" />
+    <circle cx="600" cy="60" r="3" />
+    <circle cx="330" cy="20" r="2.5" />
+    <circle cx="610" cy="214" r="3" />
+    <circle cx="40" cy="120" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M120 84 A30 30 0 1 1 180 84 A30 30 0 1 1 120 84 Z M123 84 A27 27 0 1 0 177 84 A27 27 0 1 0 123 84 Z" fillRule="evenodd" fillOpacity="0.3" />
+    <circle cx="150" cy="84" r="15" />
+    <circle cx="171" cy="63" r="4" />
+    <circle cx="129" cy="105" r="4" />
+    <path d="M186 178 A34 34 0 1 1 254 178 A34 34 0 1 1 186 178 Z M189 178 A31 31 0 1 0 251 178 A31 31 0 1 0 189 178 Z" fillRule="evenodd" fillOpacity="0.25" />
+    <path d="M174 178 A46 46 0 1 1 266 178 A46 46 0 1 1 174 178 Z M177 178 A43 43 0 1 0 263 178 A43 43 0 1 0 177 178 Z" fillRule="evenodd" fillOpacity="0.14" />
+    <circle cx="220" cy="178" r="17" fillOpacity="0.85" />
+    <circle cx="266" cy="178" r="4" />
+    <circle cx="220" cy="132" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M303 76 A27 27 0 1 1 357 76 A27 27 0 1 1 303 76 Z M306 76 A24 24 0 1 0 354 76 A24 24 0 1 0 306 76 Z" fillRule="evenodd" fillOpacity="0.3" />
+    <circle cx="330" cy="76" r="13" />
+    <circle cx="352" cy="58" r="3.5" />
+    <circle cx="366" cy="46" r="3" />
+    <circle cx="380" cy="36" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M446 64 A24 24 0 1 1 494 64 A24 24 0 1 1 446 64 Z M449 64 A21 21 0 1 0 491 64 A21 21 0 1 0 449 64 Z" fillRule="evenodd" fillOpacity="0.35" />
+    <circle cx="470" cy="64" r="11" />
+    <circle cx="494" cy="64" r="4.5" />
+    <circle cx="446" cy="64" r="4.5" />
+  </g>
+  <g fill="currentColor">
+    <path d="M376 170 A14 14 0 1 1 404 170 A14 14 0 1 1 376 170 Z M382 170 A8 8 0 1 0 398 170 A8 8 0 1 0 382 170 Z" fillRule="evenodd" opacity="0.45" />
+    <circle cx="96" cy="190" r="8" opacity="0.1" />
+    <path d="M80 190 A16 16 0 1 1 112 190 A16 16 0 1 1 80 190 Z M82 190 A14 14 0 1 0 110 190 A14 14 0 1 0 82 190 Z" fillRule="evenodd" opacity="0.07" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M500 170 A20 20 0 1 1 540 170 A20 20 0 1 1 500 170 Z M503 170 A17 17 0 1 0 537 170 A17 17 0 1 0 503 170 Z" fillRule="evenodd" fillOpacity="0.3" />
+    <circle cx="520" cy="170" r="9" />
+    <path d="M551 142 L554 150 L562 153 L554 156 L551 164 L548 156 L540 153 L548 150 Z" />
+  </g>
+</svg>
+
 ## The seven primitive types
 
 JavaScript has seven primitive types. TypeScript provides a corresponding
@@ -167,6 +216,40 @@ In practice, `undefined` means "never initialized" or "missing property,"
 while `null` means "intentionally empty." By giving each its own type,
 TypeScript forces you to be explicit about which kind of emptiness you
 expect.
+
+<svg
+  viewBox="0 0 640 180"
+  role="img"
+  aria-label="Two kinds of nothing: on the left a solid pedestal holds an empty bowl with a green placed marker, on the right only a dotted outline shows where a bowl would stand — null is emptiness on purpose, undefined is a value that never arrived"
+  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M120 70 L220 70 C218 102 196 118 170 118 C144 118 122 102 120 70 Z" fillOpacity="0.85" />
+    <rect x="160" y="118" width="20" height="22" rx="4" fillOpacity="0.6" />
+    <rect x="130" y="140" width="80" height="10" rx="5" fillOpacity="0.4" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M156 50 A14 14 0 1 1 184 50 A14 14 0 1 1 156 50 Z M162 50 A8 8 0 1 0 178 50 A8 8 0 1 0 162 50 Z" fillRule="evenodd" />
+  </g>
+  <g fill="currentColor" opacity="0.22">
+    <circle cx="420" cy="70" r="3" />
+    <circle cx="446" cy="74" r="3" />
+    <circle cx="470" cy="84" r="3" />
+    <circle cx="488" cy="100" r="3" />
+    <circle cx="496" cy="116" r="3" />
+    <circle cx="500" cy="70" r="3" />
+    <circle cx="474" cy="74" r="3" />
+    <circle cx="424" cy="100" r="3" />
+    <circle cx="432" cy="116" r="3" />
+    <circle cx="460" cy="120" r="3" />
+    <circle cx="460" cy="140" r="3" />
+    <circle cx="436" cy="150" r="2.5" />
+    <circle cx="484" cy="150" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.12">
+    <rect x="80" y="160" width="480" height="4" rx="2" />
+  </g>
+</svg>
 
 **Strict null checks:** By default (in `strict` mode), TypeScript does
 *not* allow `null` or `undefined` to inhabit other types. A variable of

@@ -16,6 +16,57 @@ This chapter covers: **parameter and return types**, **optional and
 default parameters**, **rest parameters**, **function type expressions**,
 **call signatures**, **overloads**, and **contextual typing**.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="A solid blue panel bears one opening per parameter — a circle, a square, and a dotted optional triangle; matching shapes glide in on guide dots, a green result pops out the far side, and a red extra argument below finds no opening — a function signature enforced at the call site"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="250" y="60" width="140" height="120" rx="16" />
+  </g>
+  <g fill="var(--ds-white)">
+    <circle cx="285" cy="92" r="11" />
+    <rect x="274" y="121" width="22" height="22" rx="4" />
+    <circle cx="287" cy="152" r="2" />
+    <circle cx="297" cy="170" r="2" />
+    <circle cx="277" cy="170" r="2" />
+    <circle cx="292" cy="161" r="2" />
+    <circle cx="282" cy="161" r="2" />
+    <circle cx="287" cy="170" r="2" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="120" cy="92" r="11" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="109" y="121" width="22" height="22" rx="4" />
+    <circle cx="430" cy="120" r="13" />
+    <circle cx="454" cy="120" r="3.5" fillOpacity="0.45" />
+    <circle cx="472" cy="120" r="3" fillOpacity="0.25" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="160" cy="92" r="2.5" />
+    <circle cx="190" cy="92" r="2.5" />
+    <circle cx="220" cy="92" r="2.5" />
+    <circle cx="160" cy="132" r="2.5" />
+    <circle cx="190" cy="132" r="2.5" />
+    <circle cx="220" cy="132" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.12">
+    <circle cx="190" cy="163" r="2.5" />
+    <circle cx="220" cy="163" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="290" y="192" width="20" height="5" rx="2.5" fillOpacity="0.7" />
+    <path d="M300 204 L312 224 L288 224 Z" />
+  </g>
+  <g fill="currentColor" opacity="0.15">
+    <circle cx="540" cy="60" r="3" />
+    <circle cx="70" cy="210" r="3" />
+    <circle cx="586" cy="186" r="3" />
+  </g>
+</svg>
+
 ## Parameter and return types
 
 The simplest function signature specifies the type of each parameter and
@@ -350,6 +401,42 @@ console.log("format('hello'):", format("hello"));
 The **overload signatures** (the first two lines) describe the public
 API. The **implementation signature** (the third line) handles all cases.
 Callers see only the overloads; the implementation is hidden.
+
+<svg
+  viewBox="0 0 640 190"
+  role="img"
+  aria-label="Two solid faceplates with different openings both feed one faint capsule holding a circle and a square, which emits a single green result — overload signatures are the public faces of one hidden implementation"
+  style={{ display: "block", width: "100%", maxWidth: "460px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="90" y="30" width="100" height="56" rx="12" />
+    <rect x="90" y="110" width="100" height="56" rx="12" fillOpacity="0.8" />
+  </g>
+  <g fill="var(--ds-white)">
+    <circle cx="130" cy="58" r="9" />
+    <rect x="120" y="127" width="22" height="22" rx="4" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="215" cy="66" r="2.5" />
+    <circle cx="240" cy="74" r="2.5" />
+    <circle cx="265" cy="82" r="2.5" />
+    <circle cx="215" cy="132" r="2.5" />
+    <circle cx="240" cy="124" r="2.5" />
+    <circle cx="265" cy="116" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.12">
+    <rect x="295" y="68" width="185" height="62" rx="31" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="352" cy="99" r="9" fillOpacity="0.7" />
+    <rect x="382" y="90" width="18" height="18" rx="4" fillOpacity="0.7" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="508" cy="99" r="10" />
+    <circle cx="530" cy="99" r="3.5" fillOpacity="0.45" />
+    <circle cx="546" cy="99" r="3" fillOpacity="0.25" />
+  </g>
+</svg>
 
 **When to use overloads:** When a function has *distinct* parameter
 patterns that can't be expressed with a single union type. Overloads make

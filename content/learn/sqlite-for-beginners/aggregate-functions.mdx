@@ -14,6 +14,54 @@ But many everyday questions are not detail questions. They are summary questions
 
 **Aggregate functions** answer questions like these by reading many rows and returning one summary value.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="A whole bunch of grape dots feeds into a little press marked with a sigma, and a single drop falls into the waiting glass — an aggregate squeezes many row values down to one summary value"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="148" y="20" width="4" height="20" rx="2" fillOpacity="0.7" />
+    <ellipse cx="166" cy="28" rx="12" ry="6" transform="rotate(20 166 28)" fillOpacity="0.7" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="124" cy="56" r="13" fillOpacity="0.85" />
+    <circle cx="152" cy="50" r="13" fillOpacity="0.7" />
+    <circle cx="180" cy="58" r="13" fillOpacity="0.85" />
+    <circle cx="110" cy="84" r="13" fillOpacity="0.6" />
+    <circle cx="138" cy="80" r="13" fillOpacity="0.9" />
+    <circle cx="166" cy="84" r="13" fillOpacity="0.65" />
+    <circle cx="124" cy="110" r="13" fillOpacity="0.8" />
+    <circle cx="152" cy="108" r="13" fillOpacity="0.55" />
+    <circle cx="138" cy="134" r="13" fillOpacity="0.75" />
+  </g>
+  <g fill="currentColor" opacity="0.28">
+    <circle cx="216" cy="96" r="3" />
+    <circle cx="242" cy="88" r="3" />
+    <circle cx="268" cy="82" r="3" />
+    <circle cx="294" cy="78" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="330" y="16" width="44" height="10" rx="5" />
+    <rect x="347" y="24" width="10" height="20" rx="4" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="308" y="42" width="88" height="74" rx="12" fillOpacity="0.9" />
+  </g>
+  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
+    <text x="352" y="90" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="30" fontWeight="700">Σ</text>
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M 352 132 Q 340 152 352 162 Q 364 152 352 132 Z" fillOpacity="0.85" />
+  </g>
+  <g fill="currentColor" opacity="0.16">
+    <path d="M 316 178 L 388 178 L 378 226 Q 377 232 371 232 L 333 232 Q 327 232 326 226 Z" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M 322 206 L 382 206 L 378 226 Q 377 232 371 232 L 333 232 Q 327 232 326 226 Z" fillOpacity="0.45" />
+  </g>
+</svg>
+
 ## From many rows to one answer
 
 Think of an aggregate as a tiny summarizing machine. Many rows go in. One value comes out.
@@ -133,6 +181,31 @@ Aggregates are for summary questions, not row-by-row detail questions.`}
 ## Finding the smallest and largest values
 
 `MIN(column)` returns the smallest value. `MAX(column)` returns the largest value.
+
+<svg
+  viewBox="0 0 640 150"
+  role="img"
+  aria-label="A line of pebbles of different sizes on a beach, with a green ring around the tiniest and a red ring around the biggest — MIN and MAX walk the whole column and point at its two extremes"
+  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.12">
+    <rect x="70" y="112" width="500" height="6" rx="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="130" cy="92" r="18" fillOpacity="0.6" />
+    <circle cx="208" cy="102" r="8" fillOpacity="0.8" />
+    <circle cx="282" cy="86" r="24" fillOpacity="0.5" />
+    <circle cx="368" cy="96" r="14" fillOpacity="0.7" />
+    <circle cx="452" cy="78" r="32" fillOpacity="0.6" />
+    <circle cx="532" cy="98" r="12" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path fillRule="evenodd" d="M 208 86 A 16 16 0 1 0 208 118 A 16 16 0 1 0 208 86 Z M 208 92 A 10 10 0 1 1 208 112 A 10 10 0 1 1 208 92 Z" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path fillRule="evenodd" d="M 452 36 A 42 42 0 1 0 452 120 A 42 42 0 1 0 452 36 Z M 452 44 A 34 34 0 1 1 452 112 A 34 34 0 1 1 452 44 Z" />
+  </g>
+</svg>
 
 <SqlCodeBlock
   dialect="sqlite"

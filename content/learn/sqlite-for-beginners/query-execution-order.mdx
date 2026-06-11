@@ -9,6 +9,85 @@ but SQLite does **not** run it in that order. SQL has a hidden
 of confusing errors — like *"why can't I use an alias in `WHERE`?"*
 This is one of the most clarifying ideas in all of SQL.
 
+<svg
+  viewBox="0 0 640 250"
+  role="img"
+  aria-label="Rows ride a factory conveyor past numbered stations: a loose pile is gathered, a reject drops into the scrap bin at station two, survivors merge into group stacks, get their colors at station four, and only the first one passes the end gate — a query runs as an ordered assembly line, not in the order it is written"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.12">
+    <rect x="40" y="150" width="560" height="16" rx="8" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="80" cy="176" r="6" />
+    <circle cx="180" cy="176" r="6" />
+    <circle cx="280" cy="176" r="6" />
+    <circle cx="380" cy="176" r="6" />
+    <circle cx="480" cy="176" r="6" />
+    <circle cx="560" cy="176" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="96" y="40" width="30" height="30" rx="8" fillOpacity="0.95" />
+    <rect x="206" y="40" width="30" height="30" rx="8" fillOpacity="0.9" />
+    <rect x="316" y="40" width="30" height="30" rx="8" fillOpacity="0.85" />
+    <rect x="426" y="40" width="30" height="30" rx="8" fillOpacity="0.8" />
+    <rect x="536" y="40" width="30" height="30" rx="8" fillOpacity="0.75" />
+  </g>
+  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
+    <text x="111" y="62" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="17" fontWeight="700">1</text>
+    <text x="221" y="62" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="17" fontWeight="700">2</text>
+    <text x="331" y="62" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="17" fontWeight="700">3</text>
+    <text x="441" y="62" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="17" fontWeight="700">4</text>
+    <text x="551" y="62" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="17" fontWeight="700">5</text>
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <rect x="108" y="70" width="6" height="80" rx="3" />
+    <rect x="218" y="70" width="6" height="80" rx="3" />
+    <rect x="328" y="70" width="6" height="80" rx="3" />
+    <rect x="438" y="70" width="6" height="80" rx="3" />
+    <rect x="548" y="70" width="6" height="80" rx="3" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="56" cy="136" r="7" />
+    <circle cx="72" cy="128" r="7" />
+    <circle cx="66" cy="142" r="7" />
+    <circle cx="84" cy="140" r="7" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <circle cx="142" cy="140" r="7" />
+    <circle cx="162" cy="140" r="7" />
+    <circle cx="182" cy="140" r="7" />
+    <circle cx="202" cy="140" r="7" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="248" cy="196" r="7" fillOpacity="0.7" />
+  </g>
+  <g fill="currentColor" opacity="0.14">
+    <path d="M 230 214 L 268 214 L 264 238 Q 263 244 257 244 L 241 244 Q 235 244 234 238 Z" />
+  </g>
+  <g fill="currentColor" opacity="0.4">
+    <circle cx="262" cy="140" r="7" />
+    <circle cx="282" cy="140" r="7" />
+    <circle cx="302" cy="140" r="7" />
+    <circle cx="368" cy="143" r="7" />
+    <circle cx="368" cy="128" r="7" />
+    <circle cx="396" cy="143" r="7" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="476" cy="143" r="7" />
+    <circle cx="476" cy="128" r="7" fillOpacity="0.7" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="504" cy="143" r="7" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="580" y="108" width="10" height="46" rx="5" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="612" cy="143" r="7" />
+  </g>
+</svg>
+
 ## Written order vs. execution order
 
 The order you type is for human readability. The order the database

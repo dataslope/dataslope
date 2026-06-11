@@ -15,6 +15,48 @@ This chapter covers: **`typeof` guards**, **`instanceof` guards**,
 narrowing**, **user-defined type predicates**, and **assertion
 functions**.
 
+<svg
+  viewBox="0 0 640 260"
+  role="img"
+  aria-label="A mixed batch of shapes drops through two sieve trays: a triangle and a red pentagon are held by the first, the square is caught by the second, and only blue circles reach the cup at the bottom — each type guard lets fewer possibilities through"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="140" y="90" width="80" height="10" rx="5" fillOpacity="0.5" />
+    <rect x="260" y="90" width="90" height="10" rx="5" fillOpacity="0.5" />
+    <rect x="390" y="90" width="110" height="10" rx="5" fillOpacity="0.5" />
+    <rect x="140" y="170" width="100" height="10" rx="5" fillOpacity="0.5" />
+    <rect x="280" y="170" width="70" height="10" rx="5" fillOpacity="0.5" />
+    <rect x="410" y="170" width="90" height="10" rx="5" fillOpacity="0.5" />
+    <circle cx="240" cy="40" r="11" />
+    <circle cx="240" cy="132" r="11" />
+    <circle cx="316" cy="236" r="10" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="350" y="32" width="22" height="22" rx="4" />
+    <rect x="310" y="148" width="22" height="22" rx="4" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M300 62 L316 90 L284 90 Z" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M450 64 L462.4 73 L457.6 87.6 L442.4 87.6 L437.6 73 Z" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="240" cy="68" r="2.5" />
+    <circle cx="240" cy="108" r="2.5" />
+    <circle cx="240" cy="156" r="2.5" />
+    <circle cx="252" cy="196" r="2.5" />
+    <circle cx="268" cy="212" r="2.5" />
+    <circle cx="361" cy="76" r="2.5" />
+    <circle cx="361" cy="106" r="2.5" />
+    <circle cx="345" cy="130" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.15">
+    <path d="M250 232 L390 232 L378 254 L262 254 Z" />
+  </g>
+</svg>
+
 ## The narrowing problem
 
 Given a union type, you can only access properties or call methods that
@@ -367,6 +409,39 @@ The return type `value is string` tells the compiler: "If this function
 returns `true`, then `value` is a `string` in the caller's scope." This
 is more powerful than returning `boolean`, because it lets you encapsulate
 complex checks in a reusable function.
+
+<svg
+  viewBox="0 0 640 180"
+  role="img"
+  aria-label="Shapes ride a belt under a magnifying lens: circles emerge wearing a green certification ring while squares pass unmarked — a user-defined type predicate teaches the compiler which values to trust as the narrowed type"
+  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.15">
+    <rect x="60" y="120" width="520" height="5" rx="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="110" cy="107" r="11" />
+    <circle cx="300" cy="107" r="11" />
+    <circle cx="430" cy="107" r="11" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="168" y="85" width="22" height="22" rx="4" />
+    <rect x="498" y="85" width="22" height="22" rx="4" />
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <path d="M270 98 A30 30 0 1 1 330 98 A30 30 0 1 1 270 98 Z M276 98 A24 24 0 1 0 324 98 A24 24 0 1 0 276 98 Z" fillRule="evenodd" />
+    <path d="M320 122 L348 150 L338 160 L310 132 Z" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M413 107 A17 17 0 1 1 447 107 A17 17 0 1 1 413 107 Z M417 107 A13 13 0 1 0 443 107 A13 13 0 1 0 417 107 Z" fillRule="evenodd" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="240" cy="107" r="2.5" />
+    <circle cx="262" cy="107" r="2.5" />
+    <circle cx="362" cy="107" r="2.5" />
+    <circle cx="384" cy="107" r="2.5" />
+  </g>
+</svg>
 
 Another example with custom objects:
 

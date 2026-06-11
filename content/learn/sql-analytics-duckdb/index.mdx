@@ -14,6 +14,64 @@ summarize ten million sales into a single trend line. Learning *how
 analysts wield SQL* — and *why* analytical queries are shaped the way
 they are — is the whole point of what follows.
 
+<svg
+  viewBox="0 0 640 250"
+  role="img"
+  aria-label="An abstract duck built from filled circles glides along a waterline under a yellow sun, and its reflection below the surface is a bar chart of columnar stripes — data turning into insight wherever DuckDB swims"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.22">
+    <circle cx="86" cy="62" r="3" />
+    <circle cx="128" cy="34" r="2.5" />
+    <circle cx="178" cy="78" r="2" />
+    <circle cx="466" cy="96" r="2.5" />
+    <circle cx="598" cy="112" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="540" cy="48" r="26" fillOpacity="0.18" />
+    <circle cx="540" cy="48" r="16" />
+  </g>
+  <g fill="currentColor" opacity="0.16">
+    <rect x="36" y="146" width="568" height="4" rx="2" />
+    <rect x="64" y="160" width="92" height="3" rx="1.5" />
+    <rect x="470" y="160" width="110" height="3" rx="1.5" />
+    <rect x="104" y="172" width="58" height="3" rx="1.5" />
+    <rect x="506" y="174" width="64" height="3" rx="1.5" />
+  </g>
+  <g fill="currentColor" opacity="0.28">
+    <circle cx="236" cy="140" r="3" />
+    <circle cx="210" cy="134" r="2.5" />
+    <circle cx="186" cy="140" r="2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path d="M 276 104 L 242 82 L 260 116 Z" />
+    <circle cx="302" cy="116" r="34" />
+    <rect x="332" y="76" width="16" height="38" rx="8" />
+    <circle cx="344" cy="76" r="17" />
+  </g>
+  <g fill="currentColor" opacity="0.16">
+    <circle cx="296" cy="118" r="14" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M 359 68 L 384 76 L 359 86 Z" />
+  </g>
+  <circle cx="349" cy="71" r="2.6" fill="var(--ds-white)" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="254" y="154" width="17" height="50" rx="5" fillOpacity="0.4" />
+    <rect x="277" y="154" width="17" height="30" rx="5" fillOpacity="0.28" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="300" y="154" width="17" height="68" rx="5" fillOpacity="0.5" />
+    <rect x="323" y="154" width="17" height="42" rx="5" fillOpacity="0.32" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="346" y="154" width="17" height="56" rx="5" fillOpacity="0.42" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="369" y="154" width="17" height="24" rx="5" fillOpacity="0.4" />
+  </g>
+</svg>
+
 <Callout type="info" title="Nothing to install">
 Every SQL example on every page runs **inside your browser** on a real
 DuckDB engine (DuckDB compiled to WebAssembly). There is no server, no

@@ -7,6 +7,59 @@ A table's structure is only the beginning. To make a table useful, you add rows.
 
 The SQL statement for adding rows is `INSERT INTO`.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="A tilted seed packet scatters three seeds along a dotted arc into an empty garden furrow, while the furrow above already has a line of green sprouts and one ladybug resting on a leaf — INSERT plants new rows into the table bed"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="64" y="26" width="66" height="84" rx="9" transform="rotate(24 97 68)" fillOpacity="0.8" />
+    <path d="M 76 38 L 118 20 L 124 34 L 82 52 Z" transform="rotate(24 97 68)" fillOpacity="0.4" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="172" cy="96" r="6" />
+    <circle cx="232" cy="120" r="6" />
+    <circle cx="296" cy="136" r="6" />
+  </g>
+  <g fill="currentColor" opacity="0.28">
+    <circle cx="200" cy="108" r="2.5" />
+    <circle cx="262" cy="129" r="2.5" />
+    <circle cx="330" cy="141" r="2.5" />
+    <circle cx="364" cy="144" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.13">
+    <rect x="80" y="76" width="480" height="18" rx="9" />
+    <rect x="80" y="146" width="480" height="18" rx="9" />
+    <rect x="80" y="196" width="480" height="18" rx="9" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="128" y="48" width="4" height="28" rx="2" />
+    <ellipse cx="121" cy="52" rx="9" ry="5" transform="rotate(-28 121 52)" />
+    <ellipse cx="139" cy="52" rx="9" ry="5" transform="rotate(28 139 52)" />
+    <rect x="238" y="48" width="4" height="28" rx="2" />
+    <ellipse cx="231" cy="52" rx="9" ry="5" transform="rotate(-28 231 52)" />
+    <ellipse cx="249" cy="52" rx="9" ry="5" transform="rotate(28 249 52)" />
+    <rect x="348" y="48" width="4" height="28" rx="2" />
+    <ellipse cx="341" cy="52" rx="9" ry="5" transform="rotate(-28 341 52)" />
+    <ellipse cx="359" cy="52" rx="9" ry="5" transform="rotate(28 359 52)" />
+    <rect x="458" y="48" width="4" height="28" rx="2" />
+    <ellipse cx="451" cy="52" rx="9" ry="5" transform="rotate(-28 451 52)" />
+    <ellipse cx="469" cy="52" rx="9" ry="5" transform="rotate(28 469 52)" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="466" cy="46" r="5.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="428" y="122" width="4" height="24" rx="2" fillOpacity="0.7" />
+    <ellipse cx="421" cy="126" rx="8" ry="4.5" transform="rotate(-28 421 126)" fillOpacity="0.7" />
+    <ellipse cx="439" cy="126" rx="8" ry="4.5" transform="rotate(28 439 126)" fillOpacity="0.7" />
+    <rect x="508" y="126" width="4" height="20" rx="2" fillOpacity="0.45" />
+    <ellipse cx="502" cy="129" rx="7" ry="4" transform="rotate(-28 502 129)" fillOpacity="0.45" />
+    <ellipse cx="516" cy="129" rx="7" ry="4" transform="rotate(28 516 129)" fillOpacity="0.45" />
+  </g>
+</svg>
+
 ## INSERT adds rows
 
 An `INSERT` statement names the table, names the columns you are filling, and supplies matching values.
@@ -137,6 +190,48 @@ flowchart TB
 ## Column order matters
 
 The column list and values match by position. The first value goes into the first named column, the second value goes into the second named column, and so on.
+
+<svg
+  viewBox="0 0 640 180"
+  role="img"
+  aria-label="Three value tokens drop straight down dotted lines into three labeled slots, first to first, second to second, third to third — insert values line up with the column list purely by position"
+  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="118" y="22" width="96" height="26" rx="13" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="272" y="22" width="96" height="26" rx="13" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="426" y="22" width="96" height="26" rx="13" fillOpacity="0.85" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="166" cy="64" r="2.5" />
+    <circle cx="166" cy="80" r="2.5" />
+    <circle cx="166" cy="96" r="2.5" />
+    <circle cx="320" cy="64" r="2.5" />
+    <circle cx="320" cy="80" r="2.5" />
+    <circle cx="320" cy="96" r="2.5" />
+    <circle cx="474" cy="64" r="2.5" />
+    <circle cx="474" cy="80" r="2.5" />
+    <circle cx="474" cy="96" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.14">
+    <rect x="110" y="112" width="112" height="44" rx="8" />
+    <rect x="264" y="112" width="112" height="44" rx="8" />
+    <rect x="418" y="112" width="112" height="44" rx="8" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="126" y="126" width="80" height="16" rx="8" fillOpacity="0.3" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="280" y="126" width="80" height="16" rx="8" fillOpacity="0.3" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="434" y="126" width="80" height="16" rx="8" fillOpacity="0.3" />
+  </g>
+</svg>
 
 <SqlCodeBlock
   dialect="sqlite"

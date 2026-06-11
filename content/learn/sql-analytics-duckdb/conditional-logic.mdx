@@ -11,6 +11,51 @@ how analysts reshape values on the fly. This page also introduces
 **conditional aggregation**, one of the most useful patterns in all of
 analytical SQL.
 
+<svg
+  viewBox="0 0 640 215"
+  role="img"
+  aria-label="Plain dots ride a single track into a yellow switch diamond that routes each one onto the first branch whose test it passes, coloring it on the way out — CASE turning raw values into clean categories"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.08">
+    <rect x="36" y="96" width="200" height="24" rx="12" />
+  </g>
+  <g fill="currentColor" opacity="0.4">
+    <circle cx="70" cy="108" r="7" />
+    <circle cx="116" cy="108" r="7" />
+    <circle cx="162" cy="108" r="7" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M 270 80 L 298 108 L 270 136 L 242 108 Z" fillOpacity="0.9" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <circle cx="322" cy="88" r="2.5" />
+    <circle cx="354" cy="72" r="2.5" />
+    <circle cx="386" cy="58" r="2.5" />
+    <circle cx="322" cy="108" r="2.5" />
+    <circle cx="354" cy="108" r="2.5" />
+    <circle cx="386" cy="108" r="2.5" />
+    <circle cx="322" cy="128" r="2.5" />
+    <circle cx="354" cy="144" r="2.5" />
+    <circle cx="386" cy="158" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="424" cy="46" r="7" />
+    <circle cx="468" cy="40" r="7" />
+    <rect x="506" y="30" width="34" height="18" rx="9" fillOpacity="0.45" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="424" cy="108" r="7" />
+    <circle cx="468" cy="108" r="7" />
+    <circle cx="512" cy="108" r="7" />
+    <rect x="544" y="99" width="52" height="18" rx="9" fillOpacity="0.45" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="424" cy="170" r="7" />
+    <rect x="460" y="161" width="70" height="18" rx="9" fillOpacity="0.45" />
+  </g>
+</svg>
+
 ## `CASE`: if/else for a column
 
 A `CASE` expression evaluates conditions in order and returns the value
@@ -216,6 +261,40 @@ Two small but constant companions of conditional logic:
   for filling in a default: `COALESCE(discount, 0)`.
 - **`NULLIF(a, b)`** returns `NULL` when `a = b` — most often used to
   avoid divide-by-zero: `amount / NULLIF(quantity, 0)`.
+
+<svg
+  viewBox="0 0 640 160"
+  role="img"
+  aria-label="Two divisions side by side: dividing by a raw red zero ends in a jagged burst, while NULLIF first softens the zero into a hollow ring so the same division lands as a calm, harmless NULL"
+  style={{ display: "block", width: "100%", maxWidth: "500px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="70" y="40" width="68" height="16" rx="8" fillOpacity="0.8" />
+    <rect x="70" y="104" width="68" height="16" rx="8" fillOpacity="0.8" />
+  </g>
+  <g fill="currentColor" opacity="0.5">
+    <text x="178" y="56" fontFamily="ui-monospace, monospace" fontSize="22" textAnchor="middle">÷</text>
+    <text x="178" y="120" fontFamily="ui-monospace, monospace" fontSize="22" textAnchor="middle">÷</text>
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <text x="232" y="57" fontFamily="ui-monospace, monospace" fontSize="22" textAnchor="middle" fontWeight="700">0</text>
+  </g>
+  <g fill="currentColor" opacity="0.35">
+    <path d="M 232 104 m -9 0 a 9 9 0 1 0 18 0 a 9 9 0 1 0 -18 0 M 232 104 m -5 0 a 5 5 0 1 1 10 0 a 5 5 0 1 1 -10 0" fillRule="evenodd" />
+  </g>
+  <g fill="currentColor" opacity="0.22">
+    <circle cx="290" cy="48" r="2.5" />
+    <circle cx="316" cy="48" r="2.5" />
+    <circle cx="290" cy="112" r="2.5" />
+    <circle cx="316" cy="112" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <path d="M 392 48 L 401 32 L 406 46 L 422 38 L 416 52 L 432 56 L 416 62 L 424 76 L 408 68 L 402 82 L 396 66 L 380 72 L 388 58 L 372 52 L 388 50 Z" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 402 112 m -13 0 a 13 13 0 1 0 26 0 a 13 13 0 1 0 -26 0 M 402 112 m -7 0 a 7 7 0 1 1 14 0 a 7 7 0 1 1 -14 0" fillRule="evenodd" />
+  </g>
+</svg>
 
 <SqlCodeBlock
   dialect="duckdb"

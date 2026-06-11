@@ -7,6 +7,62 @@ Imagine two people have the same name. If your table only stores names, how can 
 
 That is the job of a **primary key**: it gives each row a reliable identity.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="A hotel key board holds three keys, each cut with its own teeth, above two guest cards that look exactly alike — only the numbered key each card holds tells the look-alike rows apart"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.1">
+    <rect x="150" y="14" width="340" height="120" rx="12" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="220" cy="34" r="5" />
+    <circle cx="320" cy="34" r="5" />
+    <circle cx="420" cy="34" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <path fillRule="evenodd" d="M 220 28 A 14 14 0 1 0 220 56 A 14 14 0 1 0 220 28 Z M 220 36 A 6 6 0 1 1 220 48 A 6 6 0 1 1 220 36 Z" />
+    <rect x="216" y="54" width="8" height="48" rx="3" />
+    <rect x="224" y="86" width="10" height="6" rx="2" />
+    <rect x="224" y="96" width="7" height="6" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path fillRule="evenodd" d="M 320 28 A 14 14 0 1 0 320 56 A 14 14 0 1 0 320 28 Z M 320 36 A 6 6 0 1 1 320 48 A 6 6 0 1 1 320 36 Z" />
+    <rect x="316" y="54" width="8" height="48" rx="3" />
+    <rect x="324" y="78" width="8" height="6" rx="2" />
+    <rect x="324" y="92" width="12" height="6" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path fillRule="evenodd" d="M 420 28 A 14 14 0 1 0 420 56 A 14 14 0 1 0 420 28 Z M 420 36 A 6 6 0 1 1 420 48 A 6 6 0 1 1 420 36 Z" />
+    <rect x="416" y="54" width="8" height="48" rx="3" />
+    <rect x="424" y="84" width="11" height="6" rx="2" />
+    <rect x="424" y="96" width="6" height="6" rx="2" />
+  </g>
+  <g fill="currentColor" opacity="0.12">
+    <rect x="150" y="158" width="160" height="66" rx="9" />
+    <rect x="330" y="158" width="160" height="66" rx="9" />
+  </g>
+  <g fill="currentColor" opacity="0.4">
+    <rect x="200" y="172" width="92" height="7" rx="3.5" />
+    <rect x="200" y="188" width="70" height="7" rx="3.5" />
+    <rect x="200" y="204" width="82" height="7" rx="3.5" />
+    <rect x="380" y="172" width="92" height="7" rx="3.5" />
+    <rect x="380" y="188" width="70" height="7" rx="3.5" />
+    <rect x="380" y="204" width="82" height="7" rx="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="177" cy="190" r="13" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="357" cy="190" r="13" />
+  </g>
+  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
+    <text x="177" y="196" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="15" fontWeight="700">1</text>
+    <text x="357" y="196" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="15" fontWeight="700">2</text>
+  </g>
+</svg>
+
 ## The identity problem
 
 Two rows can look almost the same:

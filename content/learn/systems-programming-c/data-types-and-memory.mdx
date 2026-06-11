@@ -9,6 +9,51 @@ fixed number of bytes. That fixed size is both C's greatest strength
 of overflow bugs. This page builds the mental model you need to
 reason about *what is actually in memory*.
 
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="A circular gauge whose blue dots sweep clockwise toward a red boundary bar at twelve o'clock — one step past the maximum and the needle wraps to the green minimum just beyond it, because fixed-size integers roll over instead of growing"
+  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+>
+  <path d="M240 120 A80 80 0 1 1 400 120 A80 80 0 1 1 240 120 Z M258 120 A62 62 0 1 1 382 120 A62 62 0 1 1 258 120 Z" fillRule="evenodd" fill="currentColor" opacity="0.13" />
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="391" cy="120" r="2.5" />
+    <circle cx="381" cy="155" r="2.5" />
+    <circle cx="355" cy="181" r="2.5" />
+    <circle cx="320" cy="191" r="2.5" />
+    <circle cx="285" cy="181" r="2.5" />
+    <circle cx="259" cy="155" r="2.5" />
+    <circle cx="249" cy="120" r="2.5" />
+    <circle cx="259" cy="85" r="2.5" />
+    <circle cx="285" cy="59" r="2.5" />
+    <circle cx="355" cy="59" r="2.5" />
+    <circle cx="381" cy="85" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="320" cy="191" r="4.5" fillOpacity="0.25" />
+    <circle cx="290" cy="184" r="4.5" fillOpacity="0.35" />
+    <circle cx="266" cy="166" r="4.5" fillOpacity="0.45" />
+    <circle cx="251" cy="138" r="4.5" fillOpacity="0.55" />
+    <circle cx="250" cy="108" r="4.5" fillOpacity="0.65" />
+    <circle cx="262" cy="79" r="4.5" fillOpacity="0.78" />
+    <circle cx="285" cy="59" r="4.5" fillOpacity="0.9" />
+    <circle cx="302" cy="51" r="4.5" />
+    <path d="M320 120 L301 53 L312 49 Z" />
+    <circle cx="320" cy="120" r="7" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="316" y="32" width="9" height="52" rx="4" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="322" cy="22" r="2" />
+    <circle cx="332" cy="20" r="2" />
+    <circle cx="342" cy="23" r="2" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="338" cy="51" r="5.5" />
+  </g>
+</svg>
+
 ## The fundamental types
 
 | Type | Typical size | Range (signed) |
@@ -183,6 +228,59 @@ Little-endian:   0x78     0x56     0x34     0x12     (x86, WASI)
 Big-endian:      0x12     0x34     0x56     0x78
 ```
 
+<svg
+  viewBox="0 0 640 180"
+  role="img"
+  aria-label="The same four byte dominoes mirrored across a line: read left to right, big-endian leads with the four-pip heavy byte while little-endian leads with the yellow-underlined one-pip byte — opposite orders, identical value"
+  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.8">
+    <path d="M116 50 L132 58 L116 66 Z" />
+    <path d="M116 124 L132 132 L116 140 Z" />
+  </g>
+  <g fill="currentColor" opacity="0.1">
+    <rect x="150" y="36" width="54" height="44" rx="8" />
+    <rect x="236" y="36" width="54" height="44" rx="8" />
+    <rect x="322" y="36" width="54" height="44" rx="8" />
+    <rect x="408" y="36" width="54" height="44" rx="8" />
+    <rect x="150" y="110" width="54" height="44" rx="8" />
+    <rect x="236" y="110" width="54" height="44" rx="8" />
+    <rect x="322" y="110" width="54" height="44" rx="8" />
+    <rect x="408" y="110" width="54" height="44" rx="8" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="167" cy="49" r="3.5" />
+    <circle cx="187" cy="49" r="3.5" />
+    <circle cx="167" cy="67" r="3.5" />
+    <circle cx="187" cy="67" r="3.5" />
+    <circle cx="253" cy="50" r="3.5" />
+    <circle cx="263" cy="58" r="3.5" />
+    <circle cx="273" cy="66" r="3.5" />
+    <circle cx="341" cy="51" r="3.5" />
+    <circle cx="357" cy="65" r="3.5" />
+    <circle cx="435" cy="58" r="3.5" />
+    <circle cx="177" cy="132" r="3.5" />
+    <circle cx="255" cy="125" r="3.5" />
+    <circle cx="271" cy="139" r="3.5" />
+    <circle cx="339" cy="124" r="3.5" />
+    <circle cx="349" cy="132" r="3.5" />
+    <circle cx="359" cy="140" r="3.5" />
+    <circle cx="425" cy="123" r="3.5" />
+    <circle cx="445" cy="123" r="3.5" />
+    <circle cx="425" cy="141" r="3.5" />
+    <circle cx="445" cy="141" r="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="408" y="86" width="54" height="5" rx="2.5" />
+    <rect x="150" y="160" width="54" height="5" rx="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <rect x="110" y="93" width="420" height="4" rx="2" />
+    <path d="M98 95 L106 90 L114 95 L106 100 Z" />
+    <path d="M526 95 L534 90 L542 95 L534 100 Z" />
+  </g>
+</svg>
+
 You can *see* the byte order at runtime by reading the bytes of an
 integer through a `char *`:
 
@@ -226,6 +324,44 @@ The compiler enforces alignment automatically: local variables and
 struct members are placed at aligned addresses, sometimes with unused
 padding bytes in between. We will see padding clearly when we cover
 structs.
+
+<svg
+  viewBox="0 0 640 150"
+  role="img"
+  aria-label="Typed blocks park against a kerb only at evenly spaced alignment ticks, leaving small padding gaps between them, while one red block hovers off-grid straddling a boundary it is not allowed to land on"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="60" y="118" width="520" height="6" rx="3" fill="currentColor" opacity="0.25" />
+  <g fill="currentColor" opacity="0.35">
+    <rect x="60" y="102" width="4" height="16" rx="2" />
+    <rect x="124" y="102" width="4" height="16" rx="2" />
+    <rect x="188" y="102" width="4" height="16" rx="2" />
+    <rect x="252" y="102" width="4" height="16" rx="2" />
+    <rect x="316" y="102" width="4" height="16" rx="2" />
+    <rect x="380" y="102" width="4" height="16" rx="2" />
+    <rect x="444" y="102" width="4" height="16" rx="2" />
+    <rect x="508" y="102" width="4" height="16" rx="2" />
+    <rect x="572" y="102" width="4" height="16" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="62" y="76" width="124" height="40" rx="8" fillOpacity="0.55" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="190" y="76" width="60" height="40" rx="8" fillOpacity="0.55" />
+    <rect x="254" y="76" width="28" height="40" rx="6" fillOpacity="0.35" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="292" cy="96" r="2.5" />
+    <circle cx="304" cy="96" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="318" y="76" width="12" height="40" rx="4" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="398" y="28" width="60" height="28" rx="8" fillOpacity="0.7" />
+    <circle cx="446" cy="64" r="3.5" />
+  </g>
+</svg>
 
 <CodeBlock
   adapter="c"

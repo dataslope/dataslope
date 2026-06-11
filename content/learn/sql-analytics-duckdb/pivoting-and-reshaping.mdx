@@ -10,6 +10,58 @@ wide is great for reading. This page explains the two shapes, why they
 matter, and how to pivot in DuckDB both by hand and with the dedicated
 `PIVOT` syntax.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="A tall one-value-per-row strip swings along a dotted arc around a yellow pivot pin and lands as a short wide grid, every colored cell finding its own column — the same data turned ninety degrees from long to wide"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="100" y="28" width="44" height="26" rx="6" fillOpacity="0.85" />
+    <rect x="100" y="118" width="44" height="26" rx="6" fillOpacity="0.4" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="100" y="58" width="44" height="26" rx="6" fillOpacity="0.85" />
+    <rect x="100" y="148" width="44" height="26" rx="6" fillOpacity="0.4" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="100" y="88" width="44" height="26" rx="6" fillOpacity="0.85" />
+    <rect x="100" y="178" width="44" height="26" rx="6" fillOpacity="0.4" />
+  </g>
+  <g fill="currentColor" opacity="0.22">
+    <circle cx="186" cy="36" r="2.5" />
+    <circle cx="226" cy="24" r="2.5" />
+    <circle cx="268" cy="18" r="2.5" />
+    <circle cx="310" cy="20" r="2.5" />
+    <circle cx="350" cy="30" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="302" cy="120" r="13" fillOpacity="0.25" />
+    <circle cx="302" cy="120" r="7" />
+  </g>
+  <g fill="currentColor" opacity="0.12">
+    <rect x="368" y="64" width="32" height="26" rx="6" />
+    <rect x="368" y="100" width="32" height="26" rx="6" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="410" y="64" width="56" height="26" rx="6" fillOpacity="0.85" />
+    <rect x="410" y="100" width="56" height="26" rx="6" fillOpacity="0.4" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="476" y="64" width="56" height="26" rx="6" fillOpacity="0.85" />
+    <rect x="476" y="100" width="56" height="26" rx="6" fillOpacity="0.4" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="542" y="64" width="56" height="26" rx="6" fillOpacity="0.85" />
+    <rect x="542" y="100" width="56" height="26" rx="6" fillOpacity="0.4" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <circle cx="430" cy="170" r="3" />
+    <circle cx="62" cy="190" r="3" />
+    <circle cx="580" cy="170" r="3" />
+  </g>
+</svg>
+
 ## Long vs. wide: the same data, two layouts
 
 Imagine quarterly sales per region. In **long** form, each region-quarter
@@ -164,6 +216,39 @@ spreadsheet someone built for reading rather than computing.
   wide** at the end.
 
 A good rule: **compute in long, present in wide.**
+
+<svg
+  viewBox="0 0 640 165"
+  role="img"
+  aria-label="A tall strip of cells stands beside an italic function mark, while a wide row of cells rests beside an open eye — compute in long form, present in wide form"
+  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="104" y="28" width="40" height="24" rx="6" fillOpacity="0.75" />
+    <rect x="104" y="58" width="40" height="24" rx="6" fillOpacity="0.55" />
+    <rect x="104" y="88" width="40" height="24" rx="6" fillOpacity="0.65" />
+    <rect x="104" y="118" width="40" height="24" rx="6" fillOpacity="0.45" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <text x="200" y="98" fontFamily="Georgia, serif" fontSize="52" fontStyle="italic" textAnchor="middle">ƒ</text>
+  </g>
+  <g fill="currentColor" opacity="0.15">
+    <rect x="276" y="80" width="4" height="10" rx="2" />
+    <rect x="288" y="80" width="4" height="10" rx="2" />
+    <rect x="300" y="80" width="4" height="10" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="336" y="72" width="46" height="24" rx="6" fillOpacity="0.75" />
+    <rect x="388" y="72" width="46" height="24" rx="6" fillOpacity="0.55" />
+    <rect x="440" y="72" width="46" height="24" rx="6" fillOpacity="0.65" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <path d="M 516 84 Q 552 56 588 84 Q 552 112 516 84 Z" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="552" cy="84" r="9" />
+  </g>
+</svg>
 
 ## Check your understanding
 

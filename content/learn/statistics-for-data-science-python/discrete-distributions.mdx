@@ -19,6 +19,64 @@ important, *which one fits which situation*. Picking the wrong model is
 the most common way these tools go wrong, so we'll spend real time on
 when each one applies and when it doesn't.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="A single yes-or-no Bernoulli pair at the top branches down into three children — a lollipop hill of success counts, a timeline of irregularly spaced event ticks, and a row of misses ending in the first green hit — binomial, Poisson, and geometric all grown from one tiny atom"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="304" cy="44" r="12" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="336" cy="44" r="12" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="262" cy="76" r="2.5" />
+    <circle cx="216" cy="104" r="2.5" />
+    <circle cx="174" cy="132" r="2.5" />
+    <circle cx="320" cy="84" r="2.5" />
+    <circle cx="320" cy="114" r="2.5" />
+    <circle cx="320" cy="144" r="2.5" />
+    <circle cx="378" cy="76" r="2.5" />
+    <circle cx="424" cy="104" r="2.5" />
+    <circle cx="466" cy="132" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.15">
+    <rect x="64" y="200" width="180" height="4" rx="2" />
+    <rect x="250" y="200" width="140" height="4" rx="2" />
+    <rect x="430" y="200" width="160" height="4" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="86" y="172" width="4" height="28" rx="2" fillOpacity="0.5" />
+    <circle cx="88" cy="166" r="5.5" />
+    <rect x="120" y="142" width="4" height="58" rx="2" fillOpacity="0.5" />
+    <circle cx="122" cy="136" r="7" />
+    <rect x="154" y="126" width="4" height="74" rx="2" fillOpacity="0.5" />
+    <circle cx="156" cy="120" r="8" />
+    <rect x="188" y="150" width="4" height="50" rx="2" fillOpacity="0.5" />
+    <circle cx="190" cy="144" r="6.5" />
+    <rect x="222" y="178" width="4" height="22" rx="2" fillOpacity="0.5" />
+    <circle cx="224" cy="172" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="262" y="184" width="4" height="14" rx="2" />
+    <rect x="288" y="184" width="4" height="14" rx="2" />
+    <rect x="296" y="184" width="4" height="14" rx="2" />
+    <rect x="342" y="184" width="4" height="14" rx="2" />
+    <rect x="376" y="184" width="4" height="14" rx="2" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="448" cy="190" r="7" />
+    <circle cx="480" cy="190" r="7" />
+    <circle cx="512" cy="190" r="7" />
+    <circle cx="544" cy="190" r="7" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="578" cy="190" r="8.5" />
+  </g>
+</svg>
+
 <Callout type="info" title="Discrete means countable">
 A distribution is **discrete** when the outcomes are separate, countable
 values — 0, 1, 2, 3 tickets; never 2.7 tickets. The function that gives
@@ -292,6 +350,35 @@ flowchart TD
 Suppose your queue gets about **3 support tickets per hour** on average,
 arriving independently. What's the chance a single hour brings **8 or
 more** — a spike worth staffing for?
+
+<svg
+  viewBox="0 0 640 170"
+  role="img"
+  aria-label="One long timeline of irregularly arriving yellow event ticks sliced into three equal translucent windows that capture two, five, and one events — a fixed interval, a constant average rate, and a count that varies window to window is exactly the Poisson setting"
+  style={{ display: "block", width: "100%", maxWidth: "620px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="60" y="108" width="520" height="5" rx="2.5" fill="currentColor" opacity="0.2" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.12">
+    <rect x="66" y="44" width="160" height="84" rx="12" />
+    <rect x="240" y="44" width="160" height="84" rx="12" />
+    <rect x="414" y="44" width="160" height="84" rx="12" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="96" y="84" width="5" height="24" rx="2.5" />
+    <rect x="178" y="84" width="5" height="24" rx="2.5" />
+    <rect x="252" y="84" width="5" height="24" rx="2.5" />
+    <rect x="268" y="84" width="5" height="24" rx="2.5" />
+    <rect x="300" y="84" width="5" height="24" rx="2.5" />
+    <rect x="338" y="84" width="5" height="24" rx="2.5" />
+    <rect x="382" y="84" width="5" height="24" rx="2.5" />
+    <rect x="500" y="84" width="5" height="24" rx="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.55">
+    <text x="146" y="68" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="17">2</text>
+    <text x="320" y="68" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="17">5</text>
+    <text x="494" y="68" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="17">1</text>
+  </g>
+</svg>
 
 <CodeBlock
   adapter="python"

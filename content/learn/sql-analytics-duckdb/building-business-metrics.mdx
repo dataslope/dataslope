@@ -9,6 +9,58 @@ conversion rate, average revenue per user, retention, growth. The SQL is
 familiar by now; the new skill is **reasoning about what a number really
 means** and constructing it so it tells the truth.
 
+<svg
+  viewBox="0 0 640 240"
+  role="img"
+  aria-label="Faint raw rows at the bottom dissolve upward into four abstract dashboard tiles — a headline bar, a rising sparkline, a donut with one slice set apart, and a ratio of two bars — records becoming the numbers a business steers by"
+  style={{ display: "block", width: "100%", maxWidth: "600px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.07">
+    <rect x="150" y="22" width="160" height="64" rx="12" />
+    <rect x="330" y="22" width="160" height="64" rx="12" />
+    <rect x="150" y="100" width="160" height="64" rx="12" />
+    <rect x="330" y="100" width="160" height="64" rx="12" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="168" y="38" width="86" height="20" rx="7" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <rect x="168" y="66" width="40" height="7" rx="3.5" />
+    <rect x="216" y="66" width="26" height="7" rx="3.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="352" cy="72" r="4" />
+    <circle cx="378" cy="64" r="4" />
+    <circle cx="404" cy="66" r="4" />
+    <circle cx="430" cy="50" r="4" />
+    <circle cx="456" cy="40" r="4.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M 206 132 m -24 0 a 24 24 0 1 0 48 0 a 24 24 0 1 0 -48 0 M 206 132 m -13 0 a 13 13 0 1 1 26 0 a 13 13 0 1 1 -26 0" fillRule="evenodd" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 236 106 A 26 26 0 0 1 262 132 L 245 132 A 15 15 0 0 0 230 119 Z" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="350" y="116" width="118" height="14" rx="7" fillOpacity="0.8" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <rect x="350" y="134" width="118" height="3" rx="1.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="350" y="141" width="66" height="14" rx="7" fillOpacity="0.8" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="240" cy="182" r="2.5" />
+    <circle cx="320" cy="176" r="2.5" />
+    <circle cx="400" cy="182" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.13">
+    <rect x="128" y="198" width="384" height="9" rx="4.5" />
+    <rect x="160" y="216" width="320" height="9" rx="4.5" />
+  </g>
+</svg>
+
 ## A metric is a definition first, SQL second
 
 Before writing any query, an analyst pins down the **definition**. "Active
@@ -145,6 +197,60 @@ FROM
 both correct — for different questions. Quoting the wrong one, or not
 saying which, is how metrics mislead. The analytical skill is choosing the
 denominator that matches the decision.
+
+<svg
+  viewBox="0 0 640 195"
+  role="img"
+  aria-label="One green revenue disc is shared out two ways: spread across ten faint heads it becomes slim slivers, but across only the three who actually paid it becomes thick slabs — the same total, two denominators, two honest metrics"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="320" cy="44" r="26" />
+    <circle cx="320" cy="44" r="36" fillOpacity="0.15" />
+  </g>
+  <g fill="currentColor" opacity="0.2">
+    <circle cx="270" cy="74" r="2.5" />
+    <circle cx="232" cy="94" r="2.5" />
+    <circle cx="198" cy="112" r="2.5" />
+    <circle cx="370" cy="74" r="2.5" />
+    <circle cx="408" cy="94" r="2.5" />
+    <circle cx="442" cy="112" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="56" y="132" width="14" height="8" rx="4" fillOpacity="0.55" />
+    <rect x="80" y="132" width="14" height="8" rx="4" fillOpacity="0.55" />
+    <rect x="104" y="132" width="14" height="8" rx="4" fillOpacity="0.55" />
+    <rect x="128" y="132" width="14" height="8" rx="4" fillOpacity="0.55" />
+    <rect x="152" y="132" width="14" height="8" rx="4" fillOpacity="0.55" />
+    <rect x="176" y="132" width="14" height="8" rx="4" fillOpacity="0.55" />
+    <rect x="200" y="132" width="14" height="8" rx="4" fillOpacity="0.55" />
+    <rect x="224" y="132" width="14" height="8" rx="4" fillOpacity="0.55" />
+    <rect x="248" y="132" width="14" height="8" rx="4" fillOpacity="0.55" />
+    <rect x="272" y="132" width="14" height="8" rx="4" fillOpacity="0.55" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="63" cy="160" r="6" />
+    <circle cx="87" cy="160" r="6" />
+    <circle cx="111" cy="160" r="6" />
+    <circle cx="135" cy="160" r="6" />
+    <circle cx="159" cy="160" r="6" />
+    <circle cx="183" cy="160" r="6" />
+    <circle cx="207" cy="160" r="6" />
+    <circle cx="231" cy="160" r="6" />
+    <circle cx="255" cy="160" r="6" />
+    <circle cx="279" cy="160" r="6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="384" y="126" width="56" height="14" rx="7" />
+    <rect x="452" y="126" width="56" height="14" rx="7" />
+    <rect x="520" y="126" width="56" height="14" rx="7" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="412" cy="162" r="8" />
+    <circle cx="480" cy="162" r="8" />
+    <circle cx="548" cy="162" r="8" />
+  </g>
+</svg>
 
 ## Period-over-period growth
 

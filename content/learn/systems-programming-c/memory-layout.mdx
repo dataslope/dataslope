@@ -36,6 +36,59 @@ The WASI runtime uses a similar layout in linear memory; the
 addresses just happen to be inside the WebAssembly module's memory
 rather than your laptop's physical RAM.
 
+<svg
+  viewBox="0 0 640 250"
+  role="img"
+  aria-label="A cave cross-section of a process address space: read-only code bedrock and globals strata form the floor, green heap stalagmites grow upward, yellow stack stalactites grow down from the high-address ceiling, and a red spark marks the narrowing gap where the two would meet"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="40" y="28" width="560" height="14" rx="6" fill="currentColor" opacity="0.15" />
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M316 42 L344 42 L330 116 Z" fillOpacity="0.8" />
+    <path d="M380 42 L408 42 L394 100 Z" fillOpacity="0.65" />
+    <path d="M422 42 L448 42 L435 78 Z" fillOpacity="0.5" />
+    <path d="M462 42 L490 42 L476 108 Z" fillOpacity="0.7" />
+    <path d="M504 42 L530 42 L517 70 Z" fillOpacity="0.45" />
+    <path d="M544 42 L570 42 L557 90 Z" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M76 158 L91 100 L106 158 Z" fillOpacity="0.6" />
+    <path d="M118 158 L131 124 L144 158 Z" fillOpacity="0.45" />
+    <path d="M156 158 L171 84 L186 158 Z" fillOpacity="0.7" />
+    <path d="M198 158 L210 132 L222 158 Z" fillOpacity="0.4" />
+    <path d="M236 158 L250 108 L264 158 Z" fillOpacity="0.55" />
+    <path d="M286 158 L302 80 L318 158 Z" fillOpacity="0.8" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <circle cx="320" cy="97" r="4" />
+    <path d="M310 88 L316 92 L308 96 Z" fillOpacity="0.7" />
+    <path d="M330 102 L336 99 L334 108 Z" fillOpacity="0.7" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="40" y="158" width="560" height="22" rx="4" fillOpacity="0.12" />
+    <circle cx="370" cy="169" r="3" fillOpacity="0.3" />
+    <circle cx="430" cy="169" r="3" fillOpacity="0.3" />
+    <circle cx="490" cy="169" r="3" fillOpacity="0.3" />
+    <circle cx="550" cy="169" r="3" fillOpacity="0.3" />
+    <rect x="40" y="182" width="560" height="22" rx="4" fillOpacity="0.3" />
+    <circle cx="140" cy="193" r="3.5" />
+    <circle cx="240" cy="193" r="3.5" />
+    <circle cx="340" cy="193" r="3.5" />
+    <circle cx="460" cy="193" r="3.5" />
+  </g>
+  <g fill="currentColor">
+    <rect x="40" y="206" width="560" height="26" rx="6" opacity="0.3" />
+    <rect x="100" y="217" width="16" height="4" rx="2" opacity="0.5" />
+    <rect x="132" y="217" width="10" height="4" rx="2" opacity="0.5" />
+    <rect x="170" y="217" width="20" height="4" rx="2" opacity="0.5" />
+    <rect x="240" y="217" width="12" height="4" rx="2" opacity="0.5" />
+    <rect x="300" y="217" width="18" height="4" rx="2" opacity="0.5" />
+    <rect x="380" y="217" width="14" height="4" rx="2" opacity="0.5" />
+    <rect x="450" y="217" width="20" height="4" rx="2" opacity="0.5" />
+    <rect x="520" y="217" width="12" height="4" rx="2" opacity="0.5" />
+  </g>
+</svg>
+
 ## Seeing the regions
 
 You can roughly identify which region a variable lives in by printing
@@ -127,6 +180,43 @@ int main(void) {
 A common surprise: declaring a 10-million-element zero-initialized
 global does **not** make your binary 40 MB larger, because BSS is
 "described by metadata" rather than stored as bytes.
+
+<svg
+  viewBox="0 0 640 180"
+  role="img"
+  aria-label="On the cargo deck of the executable, initialized globals travel as solid crates with real contents, while zeroed globals are just ghost outlines plus one small yellow manifest tag — BSS ships as metadata, not bytes"
+  style={{ display: "block", width: "100%", maxWidth: "520px", height: "auto", margin: "2.5rem auto" }}
+>
+  <rect x="60" y="136" width="520" height="8" rx="4" fill="currentColor" opacity="0.18" />
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="92" y="76" width="56" height="56" rx="8" fillOpacity="0.55" />
+    <rect x="156" y="76" width="56" height="56" rx="8" fillOpacity="0.4" />
+    <rect x="124" y="42" width="56" height="56" rx="8" fillOpacity="0.7" />
+    <circle cx="120" cy="104" r="5" />
+    <circle cx="184" cy="104" r="5" />
+    <circle cx="152" cy="70" r="5" />
+  </g>
+  <g fill="currentColor" opacity="0.16">
+    <path d="M330 76 h56 v56 h-56 Z M336 82 h44 v44 h-44 Z" fillRule="evenodd" />
+    <path d="M394 76 h56 v56 h-56 Z M400 82 h44 v44 h-44 Z" fillRule="evenodd" />
+    <path d="M458 76 h56 v56 h-56 Z M464 82 h44 v44 h-44 Z" fillRule="evenodd" />
+    <path d="M362 42 h56 v56 h-56 Z M368 48 h44 v44 h-44 Z" fillRule="evenodd" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="496" y="36" width="58" height="34" rx="6" fillOpacity="0.9" />
+  </g>
+  <g fill="currentColor" opacity="0.55">
+    <circle cx="512" cy="48" r="2.5" />
+    <circle cx="525" cy="48" r="2.5" />
+    <circle cx="538" cy="48" r="2.5" />
+    <rect x="508" y="57" width="34" height="3" rx="1.5" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="524" cy="78" r="2" />
+    <circle cx="520" cy="88" r="2" />
+    <circle cx="514" cy="98" r="2" />
+  </g>
+</svg>
 
 ## Storage classes for variables
 

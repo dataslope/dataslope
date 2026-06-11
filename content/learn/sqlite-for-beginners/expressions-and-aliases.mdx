@@ -10,6 +10,56 @@ Those calculations are called **expressions**. An expression might
 multiply price by quantity, join two pieces of text, round a number, or
 make text uppercase. An **alias** gives the computed result a clear name.
 
+<svg
+  viewBox="0 0 640 220"
+  role="img"
+  aria-label="Two value dots tumble into a mixing bowl with a multiplication spark, and out comes a brand-new dot wearing a little name tag on a string — an expression computes a fresh value and an alias gives it a friendly name"
+  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="172" cy="34" r="13" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="262" cy="28" r="13" />
+  </g>
+  <g fill="currentColor" opacity="0.5">
+    <text x="217" y="44" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="22" fontWeight="700">*</text>
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <circle cx="180" cy="60" r="2.5" />
+    <circle cx="190" cy="78" r="2.5" />
+    <circle cx="200" cy="94" r="2.5" />
+    <circle cx="256" cy="54" r="2.5" />
+    <circle cx="248" cy="72" r="2.5" />
+    <circle cx="240" cy="90" r="2.5" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <path d="M 132 112 L 308 112 Q 304 178 220 178 Q 136 178 132 112 Z" />
+    <rect x="196" y="178" width="48" height="10" rx="5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <path d="M 320 92 L 324 102 L 334 106 L 324 110 L 320 120 L 316 110 L 306 106 L 316 102 Z" fillOpacity="0.8" />
+    <path d="M 348 64 L 351 72 L 359 75 L 351 78 L 348 86 L 345 78 L 337 75 L 345 72 Z" fillOpacity="0.55" />
+  </g>
+  <g fill="currentColor" opacity="0.28">
+    <circle cx="372" cy="120" r="2.5" />
+    <circle cx="396" cy="116" r="2.5" />
+    <circle cx="420" cy="114" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="468" cy="118" r="20" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="486" cy="132" r="2" />
+    <circle cx="494" cy="140" r="2" />
+    <circle cx="502" cy="148" r="2" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <path d="M 506 148 L 568 148 L 580 160 L 568 172 L 506 172 Q 500 172 500 166 L 500 154 Q 500 148 506 148 Z" fillOpacity="0.3" />
+    <rect x="512" y="155" width="44" height="10" rx="5" fillOpacity="0.9" />
+  </g>
+</svg>
+
 ## Expressions create computed columns
 
 Anywhere you can select a column, you can also write a calculation.
@@ -138,6 +188,37 @@ flowchart LR
 
 In SQLite, `||` concatenates text. "Concatenate" means join pieces of
 text together.
+
+<svg
+  viewBox="0 0 640 150"
+  role="img"
+  aria-label="Two separate text ribbons slide together and click into one continuous ribbon joined by a small knot — the double-bar operator threads pieces of text into a single value"
+  style={{ display: "block", width: "100%", maxWidth: "480px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="96" y="34" width="120" height="18" rx="9" fillOpacity="0.85" />
+  </g>
+  <g fill="currentColor" opacity="0.5">
+    <text x="248" y="50" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="18" fontWeight="700">||</text>
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="282" y="34" width="96" height="18" rx="9" fillOpacity="0.85" />
+  </g>
+  <g fill="currentColor" opacity="0.28">
+    <circle cx="420" cy="62" r="2.5" />
+    <circle cx="404" cy="76" r="2.5" />
+    <circle cx="388" cy="90" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="142" y="100" width="120" height="18" rx="9" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="262" y="100" width="96" height="18" rx="9" fillOpacity="0.85" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="262" cy="109" r="7" />
+  </g>
+</svg>
 
 <SqlCodeBlock
   dialect="sqlite"
