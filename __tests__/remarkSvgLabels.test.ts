@@ -38,60 +38,98 @@ function labelIds(tree: { children: Array<Record<string, unknown>> }): string[] 
 }
 
 const LEARN = "/repo/content/learn";
+const SVG_A = '<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" /></svg>';
+const SVG_B = '<svg viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" /></svg>';
+const HASH = /^[0-9a-f]{6}$/;
 
 describe("remarkSvgLabels", () => {
-  it("labels each inline <svg> with a page-namespaced, document-ordered id", () => {
-    const src = [
-      "# Title",
-      "",
-      '<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" /></svg>',
-      "",
-      "Some prose.",
-      "",
-      '<svg viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" /></svg>',
-    ].join("\n");
+  it("labels each inline <svg> with a page-namespaced, content-hashed id", () => {
+    const src = `# Title\n\n${SVG_A}\n\nSome prose.\n\n${SVG_B}`;
+    const ids = labelIds(process(src, `${LEARN}/python-basics/variables.mdx`));
 
-    const tree = process(src, `${LEARN}/python-basics/variables.mdx`);
-    expect(labelIds(tree)).toEqual([
-      "svg-python-basics-variables-1",
-      "svg-python-basics-variables-2",
-    ]);
+    expect(ids).toHaveLength(2);
+    for (const id of ids) {
+      const m = id.match(/^svg-python-basics-variables-([0-9a-f]{6})$/);
+      expect(m, id).not.toBeNull();
+    }
+    // Different content → different hash suffixes.
+    expect(ids[0]).not.toBe(ids[1]);
   });
 
-  it("labels Mermaid diagrams in the same numbering sequence as svgs", () => {
-    const src = [
-      '<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" /></svg>',
-      "",
-      "```mermaid",
-      "flowchart LR",
-      "  A --> B",
-      "```",
-    ].join("\n");
+  it("labels Mermaid diagrams with the same scheme as svgs", () => {
+    const src = `${SVG_A}\n\n\`\`\`mermaid\nflowchart LR\n  A --> B\n\`\`\``;
+    const ids = labelIds(process(src, `${LEARN}/ml/intro.mdx`));
 
-    const tree = process(src, `${LEARN}/ml/intro.mdx`);
-    expect(labelIds(tree)).toEqual(["svg-ml-intro-1", "svg-ml-intro-2"]);
+    expect(ids).toHaveLength(2);
+    for (const id of ids) {
+      expect(id.startsWith("svg-ml-intro-"), id).toBe(true);
+      expect(id.slice("svg-ml-intro-".length)).toMatch(HASH);
+    }
+    expect(ids[0]).not.toBe(ids[1]);
+  });
+
+  it("derives the Mermaid hash from the chart text (not its position)", () => {
+    // Same chart on two different pages → identical hash suffix (the suffix is
+    // a pure function of the graphic's own content).
+    const chart = "```mermaid\nflowchart LR\n  A --> B\n```";
+    const a = labelIds(process(chart, `${LEARN}/course-a/lesson.mdx`))[0];
+    const b = labelIds(process(chart, `${LEARN}/course-b/lesson.mdx`))[0];
+    expect(a.replace("svg-course-a-lesson-", "")).toBe(
+      b.replace("svg-course-b-lesson-", ""),
+    );
+  });
+
+  it("keeps each id stable when other graphics are reordered or removed", () => {
+    const both = `${SVG_A}\n\n${SVG_B}`;
+    const reordered = `${SVG_B}\n\n${SVG_A}`;
+    const onlyB = `Intro.\n\n${SVG_B}`;
+
+    const page = `${LEARN}/python-basics/variables.mdx`;
+    const idsBoth = labelIds(process(both, page));
+    const idsReordered = labelIds(process(reordered, page));
+    const idsOnlyB = labelIds(process(onlyB, page));
+
+    const idA = idsBoth[0];
+    const idB = idsBoth[1];
+
+    // Reordering swaps document order but each graphic keeps its own id.
+    expect(idsReordered).toEqual([idB, idA]);
+    // Deleting SVG_A leaves SVG_B's id untouched (no positional shift).
+    expect(idsOnlyB).toEqual([idB]);
+  });
+
+  it("is deterministic: identical input yields identical ids", () => {
+    const src = `${SVG_A}\n\n${SVG_B}`;
+    const page = `${LEARN}/python-basics/variables.mdx`;
+    expect(labelIds(process(src, page))).toEqual(labelIds(process(src, page)));
+  });
+
+  it("ignores indentation/whitespace differences in the hash", () => {
+    const inline = `<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" /></svg>`;
+    const indented = `<svg viewBox="0 0 10 10">\n  <circle cx="5" cy="5" r="4" />\n</svg>`;
+    const page = `${LEARN}/python-basics/variables.mdx`;
+    expect(labelIds(process(inline, page))[0]).toBe(
+      labelIds(process(indented, page))[0],
+    );
   });
 
   it("strips a trailing /index from the page slug", () => {
-    const src = '<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" /></svg>';
-    const tree = process(src, `${LEARN}/machine-learning-scikit-learn/index.mdx`);
-    expect(labelIds(tree)).toEqual([
-      "svg-machine-learning-scikit-learn-1",
-    ]);
+    const ids = labelIds(
+      process(SVG_A, `${LEARN}/machine-learning-scikit-learn/index.mdx`),
+    );
+    expect(ids[0]).toMatch(/^svg-machine-learning-scikit-learn-[0-9a-f]{6}$/);
   });
 
   it("produces ids that are unique across different course pages", () => {
-    const svg = '<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" /></svg>';
-    const a = labelIds(process(svg, `${LEARN}/course-a/lesson.mdx`));
-    const b = labelIds(process(svg, `${LEARN}/course-b/lesson.mdx`));
-    expect(a).toEqual(["svg-course-a-lesson-1"]);
-    expect(b).toEqual(["svg-course-b-lesson-1"]);
-    expect(new Set([...a, ...b]).size).toBe(2);
+    const a = labelIds(process(SVG_A, `${LEARN}/course-a/lesson.mdx`));
+    const b = labelIds(process(SVG_A, `${LEARN}/course-b/lesson.mdx`));
+    expect(a[0]).toMatch(/^svg-course-a-lesson-[0-9a-f]{6}$/);
+    expect(b[0]).toMatch(/^svg-course-b-lesson-[0-9a-f]{6}$/);
+    expect(a[0]).not.toBe(b[0]);
   });
 
   it("inserts each label immediately after its graphic", () => {
-    const src = '<svg viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" /></svg>';
-    const tree = process(src, `${LEARN}/python-basics/variables.mdx`);
+    const tree = process(SVG_A, `${LEARN}/python-basics/variables.mdx`);
     const idx = tree.children.findIndex(
       (n) => n.type === "mdxJsxFlowElement" && n.name === "svg",
     );

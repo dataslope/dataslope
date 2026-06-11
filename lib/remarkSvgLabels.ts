@@ -14,37 +14,49 @@
  * exist in the tree and get labelled here too — keeping a single,
  * consistent ID scheme for every graphic on the page.
  *
- * Globally-unique, location-encoding IDs:
- * Each ID is `svg-<page-slug>-<n>`, where `<page-slug>` is the lesson's
+ * Globally-unique, stable IDs:
+ * Each ID is `svg-<page-slug>-<hash>`, where `<page-slug>` is the lesson's
  * path under content/learn/ (slashes and punctuation flattened to dashes)
- * and `<n>` is the graphic's 1-based position in document order on that
- * page. Because the page slug includes the course folder, IDs are unique
- * across ALL courses, and any ID decodes straight back to its source file
- * + position — so a graphic can be referenced by its ID alone, without
- * also naming the course or page.
+ * and `<hash>` is a 6-char hex digest derived deterministically from the
+ * graphic's own content (the authored <svg> source, or a Mermaid chart's
+ * text). Because the page slug includes the course folder, IDs are unique
+ * across ALL courses, and any ID decodes back to its source file — so a
+ * graphic can be referenced by its ID alone, without also naming the course
+ * or page.
  *
- * Both inline <svg> blocks and <Mermaid> diagrams share one numbering
- * sequence, so the index reflects the graphic's visual order on the page
- * regardless of type.
+ * The hash (not a positional index) makes an ID stable when other graphics
+ * on the same page are added, removed, or reordered: a graphic keeps its ID
+ * as long as its own content is unchanged. Both inline <svg> blocks and
+ * <Mermaid> diagrams are labelled with the same scheme.
  */
 
 import type { Root } from "mdast";
 import type { VFile } from "vfile";
 
+interface JsxAttribute {
+  type?: string;
+  name?: string;
+  value?: unknown;
+}
+
 type AnyNode = Record<string, unknown> & {
   type?: string;
   name?: string;
   children?: AnyNode[];
+  attributes?: JsxAttribute[];
+  position?: { start?: { offset?: number }; end?: { offset?: number } };
 };
 
-// Lowercase djb2 hash → short hex, used only as a namespace fallback when the
-// source file path is unavailable (keeps IDs globally unique either way).
-function shortHash(input: string): string {
-  let h = 5381;
+// FNV-1a 32-bit hash → 6 lowercase hex chars (the low 24 bits). Deterministic
+// and dependency-free; 24 bits is ample to distinguish the handful of graphics
+// on a page while staying short and opaque.
+function hash6(input: string): string {
+  let h = 0x811c9dc5;
   for (let i = 0; i < input.length; i++) {
-    h = ((h << 5) + h + input.charCodeAt(i)) >>> 0;
+    h ^= input.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
   }
-  return h.toString(36);
+  return ((h >>> 0) & 0xffffff).toString(16).padStart(6, "0");
 }
 
 // Derive a page slug from the lesson's absolute .mdx path: drop everything up
@@ -61,7 +73,7 @@ function pageSlug(file: VFile | undefined): string {
     .replace(/[^a-zA-Z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .toLowerCase();
-  return slug || `x-${shortHash(raw)}`;
+  return slug || `x-${hash6(raw)}`;
 }
 
 function isGraphic(node: AnyNode): boolean {
@@ -69,6 +81,36 @@ function isGraphic(node: AnyNode): boolean {
     node.type === "mdxJsxFlowElement" &&
     (node.name === "svg" || node.name === "Mermaid")
   );
+}
+
+// A stable text signature of the graphic's content, used to derive its hash.
+// For Mermaid the chart text lives in the `chart` attribute (the original code
+// fence was already replaced by remarkMdxMermaid). For an inline <svg> we slice
+// the authored source via the node's position offsets — the most faithful
+// representation — falling back to a structural serialization if positions are
+// missing. Whitespace is collapsed so reindenting a graphic doesn't change its
+// ID.
+function graphicSignature(node: AnyNode, source: string): string {
+  let raw: string | undefined;
+
+  if (node.name === "Mermaid") {
+    const chart = node.attributes?.find((a) => a.name === "chart")?.value;
+    if (typeof chart === "string") raw = chart;
+  }
+
+  if (raw === undefined) {
+    const start = node.position?.start?.offset;
+    const end = node.position?.end?.offset;
+    if (typeof start === "number" && typeof end === "number" && source) {
+      raw = source.slice(start, end);
+    }
+  }
+
+  raw ??= JSON.stringify(node, (key, value) => (key === "position" ? undefined : value));
+
+  // Collapse runs of whitespace and drop whitespace between adjacent tags
+  // (insignificant in SVG/XML) so reindenting a graphic doesn't change its ID.
+  return raw.replace(/\s+/g, " ").replace(/>\s+</g, "><").trim();
 }
 
 function makeLabel(figId: string): AnyNode {
@@ -83,11 +125,11 @@ function makeLabel(figId: string): AnyNode {
 export function remarkSvgLabels() {
   return (tree: Root, file: VFile): void => {
     const slug = pageSlug(file);
-    const counter = { n: 0 };
+    const source = String(file?.value ?? "");
 
-    // Pre-order walk so IDs follow document (top-to-bottom) order. After
-    // labelling a graphic we don't recurse into it: a graphic's own subtree
-    // (e.g. decorative nested shapes) isn't a separate referenceable figure.
+    // Pre-order walk so labels are inserted in document order. After labelling
+    // a graphic we don't recurse into it: a graphic's own subtree (e.g.
+    // decorative nested shapes) isn't a separate referenceable figure.
     const walk = (node: AnyNode): void => {
       const children = node.children;
       if (!Array.isArray(children)) return;
@@ -96,8 +138,8 @@ export function remarkSvgLabels() {
       for (const child of children) {
         next.push(child);
         if (isGraphic(child)) {
-          counter.n += 1;
-          next.push(makeLabel(`svg-${slug}-${counter.n}`));
+          const figId = `svg-${slug}-${hash6(graphicSignature(child, source))}`;
+          next.push(makeLabel(figId));
         } else {
           walk(child);
         }
