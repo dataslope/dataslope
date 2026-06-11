@@ -1,0 +1,423 @@
+/*
+ * Brand loading animations built from the Dataslope logo mark
+ * (public/dataslope-logo-blue.svg).
+ *
+ * Every shape is drawn with `currentColor`, so the wrappers below set a
+ * single brand `color` and each variant retints automatically for
+ * light/dark mode. Geometry constants (diamond stacking offset, wave
+ * tile step) live next to the path data in loadingAnimations.tsx.
+ *
+ * Under `prefers-reduced-motion: reduce`, all transform/stroke
+ * animations are disabled and replaced by a gentle opacity pulse on the
+ * loader wrapper, so the indicator still reads as "busy" without
+ * large-scale motion.
+ */
+
+/* ── Shared wrappers ───────────────────────────────────────────────── */
+
+.loader {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  color: var(--ds-blue, #148cff);
+}
+
+:global(.dark) .loader {
+  color: var(--ds-blue-400, #5ba7ff);
+}
+
+.loader svg {
+  display: block;
+}
+
+/* ── Diamond spinner (continuous) ──────────────────────────────────── */
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: spin var(--spin-dur, 1.5s) linear infinite;
+}
+
+/* ── Diamond half-turn (eased 180° steps with a rest) ──────────────────
+   The diamond has 2-fold rotational symmetry, so each 180° step lands on
+   an identical pose and the loop reads as a calm "tick … tick" rotation. */
+
+@keyframes halfTurn {
+  0% {
+    transform: rotate(0deg);
+  }
+  35% {
+    transform: rotate(180deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  85% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.turn {
+  animation: halfTurn 1.6s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+
+/* ── Diamond assemble (halves part and rejoin) ──────────────────────────
+   Both halves share one keyframe: the bottom half sits inside a
+   scale(1,-1) group, so the same local translateY(-170px) moves the top
+   half up and the bottom half down. 170 SVG user units ≈ 15% of the
+   diamond's height. */
+
+@keyframes assembleHalf {
+  0%,
+  100% {
+    transform: translateY(-170px);
+    opacity: 0.45;
+  }
+  40%,
+  62% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}
+
+.assembleHalf {
+  animation: assembleHalf 1.2s ease-in-out infinite;
+}
+
+/* ── Diamond ripple (radar ping) ───────────────────────────────────── */
+
+@keyframes rippleScale {
+  0% {
+    transform: scale(0.32);
+    opacity: 0.9;
+  }
+  60% {
+    opacity: 0.35;
+  }
+  100% {
+    transform: scale(1.02);
+    opacity: 0;
+  }
+}
+
+.rippleCopy {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: rippleScale 2.1s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+
+/* ── Diamond assemble + quarter-turn (one combined timeline) ───────────
+   Two keyframe sets with EQUAL durations drive one sequence of TWO
+   assemble-and-turn steps. The diamond is only 2-fold symmetric, so a
+   90° step can't loop on its own — two steps (180° total) land back on
+   an identical pose. Because the halves always part along the
+   diamond's LOCAL vertical axis, the drift reads vertical at 0° and
+   horizontal at 90°:
+     0–15%   halves drift together (vertically, on screen)
+     15–20%  rest, assembled
+     20–35%  eased quarter turn to 90°
+     35–38%  rest
+     38–50%  halves part (now horizontally, on screen)
+     50–100% the same step again: snap, turn to 180°, part
+   Translation lives on the inner half groups; rotation lives on the
+   <svg>, whose assemble viewBox is vertically symmetric around the
+   diamond's centre, so the element centre is the rotation centre. */
+
+@keyframes comboHalf {
+  0% {
+    transform: translateY(-170px);
+    opacity: 0.45;
+  }
+  15%,
+  38% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-170px);
+    opacity: 0.45;
+  }
+  65%,
+  88% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-170px);
+    opacity: 0.45;
+  }
+}
+
+@keyframes comboTurn {
+  0%,
+  20% {
+    transform: rotate(0deg);
+  }
+  35%,
+  70% {
+    transform: rotate(90deg);
+  }
+  85%,
+  100% {
+    transform: rotate(180deg);
+  }
+}
+
+.comboRotor {
+  animation: comboTurn 3.2s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+
+.comboHalf {
+  animation: comboHalf 3.2s ease-in-out infinite;
+}
+
+/* ── Logo hop (three marks hopping in sequence) ────────────────────── */
+
+@keyframes hop {
+  0%,
+  55%,
+  100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-58%);
+  }
+}
+
+.hopRow {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 7px;
+}
+
+.hopGlyph {
+  display: inline-block;
+  line-height: 0;
+  animation: hop 1.15s ease-in-out infinite;
+}
+
+/* ── Wave (gradient mark tiled into a rolling wave) ─────────────────────
+   Tiles repeat every 815.81 user units (adjacent foot caps coincide);
+   the translucent gradients let the overlapping feet show through as
+   darker blob accents at each trough. The track scrolls by exactly two
+   tile steps (1631.62 user units — a whole number of periods) so the
+   loop is seamless. On SVG elements, CSS `px` equals user units. */
+
+@keyframes waveScroll {
+  to {
+    transform: translateX(-1631.62px);
+  }
+}
+
+.waveTrack {
+  animation: waveScroll var(--wave-dur, 10s) linear infinite;
+}
+
+/* Traveling light: each tile's opacity oscillates, phase-shifted per
+   tile via a negative inline animation-delay, so a brightness pulse
+   rolls along the crests (the "moving light source" effect). The
+   component snaps the scroll duration so the pulse phase also lines up
+   across the scroll seam — see snapGlowDuration in
+   loadingAnimations.tsx, which must stay in sync with this period. */
+@keyframes tileGlow {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.waveTilePulse {
+  animation: tileGlow 1.8s ease-in-out infinite;
+}
+
+/* The wave svg is sized in px by the component (aspect-true, wider than
+   any container) and cropped by the band, so the foot blobs stay
+   circular instead of stretching. */
+.waveSvg {
+  display: block;
+}
+
+.waveBand {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  color: var(--ds-blue, #148cff);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+}
+
+:global(.dark) .waveBand {
+  color: var(--ds-blue-400, #5ba7ff);
+}
+
+/* Blended ends: the fade runs deep into the band from both sides, so
+   only the middle stays at full strength and the wave dissolves into
+   whatever background it sits on. */
+.waveBandBlend {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 32%,
+    #000 68%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 32%,
+    #000 68%,
+    transparent
+  );
+}
+
+/* ── Inline boot notice demo (CodeBlock-style row) ─────────────────── */
+
+.bootDemo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--color-fd-border, rgba(20, 140, 255, 0.18));
+  background: rgba(20, 140, 255, 0.05);
+}
+
+.bootText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--font-sans, "Inter", system-ui, sans-serif);
+}
+
+.bootTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-fd-foreground, #18181b);
+}
+
+.bootHint {
+  font-size: 12px;
+  color: var(--color-fd-muted-foreground, #6b7280);
+}
+
+/* ── Demo gallery ──────────────────────────────────────────────────── */
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 14px;
+  margin: 1rem 0 2rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--color-fd-border, #e3e6ea);
+  border-radius: 12px;
+  background: var(--color-fd-card, transparent);
+}
+
+.cardWide {
+  grid-column: 1 / -1;
+}
+
+.cardPreview {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+  padding: 18px;
+}
+
+/* Full-bleed previews (wave bands, backdrops) drop the padding so the
+   animation runs edge to edge. */
+.cardPreviewFill {
+  display: block;
+  padding: 0;
+}
+
+.cardMeta {
+  padding: 10px 14px 12px;
+  border-top: 1px solid var(--color-fd-border, #e3e6ea);
+  font-family: var(--font-sans, "Inter", system-ui, sans-serif);
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-fd-foreground, #18181b);
+}
+
+.cardBlurb {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--color-fd-muted-foreground, #6b7280);
+}
+
+.sizeRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 28px;
+}
+
+/* ── Reduced motion ────────────────────────────────────────────────────
+   Drop all transform/stroke animations and signal activity with a calm
+   opacity pulse on the loader wrapper instead. With `drawDash` disabled
+   the trace paths fall back to their static base outline. */
+
+@keyframes rmPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin,
+  .turn,
+  .assembleHalf,
+  .comboRotor,
+  .comboHalf,
+  .rippleCopy,
+  .hopGlyph,
+  .waveTrack,
+  .waveTilePulse {
+    animation: none;
+  }
+
+  .loader,
+  .waveBand {
+    animation: rmPulse 2.5s ease-in-out infinite;
+  }
+}
