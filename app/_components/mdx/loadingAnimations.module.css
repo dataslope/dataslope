@@ -66,7 +66,7 @@
 }
 
 .turn {
-  animation: halfTurn 2.4s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+  animation: halfTurn 1.6s cubic-bezier(0.45, 0, 0.2, 1) infinite;
 }
 
 /* ── Diamond assemble (halves part and rejoin) ──────────────────────────
@@ -89,7 +89,7 @@
 }
 
 .assembleHalf {
-  animation: assembleHalf 2.7s ease-in-out infinite;
+  animation: assembleHalf 1.8s ease-in-out infinite;
 }
 
 /* ── Diamond ripple (radar ping) ───────────────────────────────────── */
@@ -114,26 +114,39 @@
   animation: rippleScale 2.1s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
 }
 
-/* ── Diamond assemble + half-turn (one combined timeline) ──────────────
-   Two keyframe sets with EQUAL durations drive one sequence:
-     0–30%   the halves drift together (translation, on the inner groups)
-     30–45%  rest, assembled
-     45–75%  the whole diamond makes an eased half turn (rotation, on
-             the <svg> — the assemble viewBox is vertically symmetric
-             around the diamond's centre, so the element centre is the
-             rotation centre)
-     75–82%  rest
-     82–100% the halves part again
-   The diamond's 2-fold symmetry makes the 180° pose identical to 0°,
-   so the loop is seamless. */
+/* ── Diamond assemble + quarter-turn (one combined timeline) ───────────
+   Two keyframe sets with EQUAL durations drive one sequence of TWO
+   assemble-and-turn steps. The diamond is only 2-fold symmetric, so a
+   90° step can't loop on its own — two steps (180° total) land back on
+   an identical pose. Because the halves always part along the
+   diamond's LOCAL vertical axis, the drift reads vertical at 0° and
+   horizontal at 90°:
+     0–15%   halves drift together (vertically, on screen)
+     15–20%  rest, assembled
+     20–35%  eased quarter turn to 90°
+     35–38%  rest
+     38–50%  halves part (now horizontally, on screen)
+     50–100% the same step again: snap, turn to 180°, part
+   Translation lives on the inner half groups; rotation lives on the
+   <svg>, whose assemble viewBox is vertically symmetric around the
+   diamond's centre, so the element centre is the rotation centre. */
 
 @keyframes comboHalf {
   0% {
     transform: translateY(-170px);
     opacity: 0.45;
   }
-  30%,
-  82% {
+  15%,
+  38% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-170px);
+    opacity: 0.45;
+  }
+  65%,
+  88% {
     transform: translateY(0px);
     opacity: 1;
   }
@@ -145,21 +158,25 @@
 
 @keyframes comboTurn {
   0%,
-  45% {
+  20% {
     transform: rotate(0deg);
   }
-  75%,
+  35%,
+  70% {
+    transform: rotate(90deg);
+  }
+  85%,
   100% {
     transform: rotate(180deg);
   }
 }
 
 .comboRotor {
-  animation: comboTurn 3.6s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+  animation: comboTurn 4.4s cubic-bezier(0.45, 0, 0.2, 1) infinite;
 }
 
 .comboHalf {
-  animation: comboHalf 3.6s ease-in-out infinite;
+  animation: comboHalf 4.4s ease-in-out infinite;
 }
 
 /* ── Logo hop (three marks hopping in sequence) ────────────────────── */
@@ -202,6 +219,26 @@
 
 .waveTrack {
   animation: waveScroll var(--wave-dur, 10s) linear infinite;
+}
+
+/* Traveling light: each tile's opacity oscillates, phase-shifted per
+   tile via a negative inline animation-delay, so a brightness pulse
+   rolls along the crests (the "moving light source" effect). The
+   component snaps the scroll duration so the pulse phase also lines up
+   across the scroll seam — see snapGlowDuration in
+   loadingAnimations.tsx, which must stay in sync with this period. */
+@keyframes tileGlow {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.waveTilePulse {
+  animation: tileGlow 1.8s ease-in-out infinite;
 }
 
 /* The wave svg is sized in px by the component (aspect-true, wider than
@@ -354,7 +391,8 @@
   .comboHalf,
   .rippleCopy,
   .hopGlyph,
-  .waveTrack {
+  .waveTrack,
+  .waveTilePulse {
     animation: none;
   }
 
