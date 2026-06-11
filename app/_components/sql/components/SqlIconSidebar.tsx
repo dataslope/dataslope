@@ -12,8 +12,6 @@ export interface SqlIconSidebarButton {
 
 interface SqlIconSidebarProps {
   buttons: SqlIconSidebarButton[];
-  /** Buttons pinned to the bottom of the sidebar (e.g. Settings). */
-  bottomButtons?: SqlIconSidebarButton[];
 }
 
 /**
@@ -24,10 +22,8 @@ interface SqlIconSidebarProps {
  * Reuses the `.playground-icon-sidebar` / `.playground-icon-sidebar-btn` CSS from
  * `playground.css` so the visual treatment stays consistent with the
  * language playground (Python, R, etc.) activity bars.
- *
- * `buttons` appear at the top; `bottomButtons` are pinned to the bottom.
  */
-export function SqlIconSidebar({ buttons, bottomButtons }: SqlIconSidebarProps) {
+export function SqlIconSidebar({ buttons }: SqlIconSidebarProps) {
   return (
     <nav className="playground-icon-sidebar" aria-label="Panel navigation">
       <div className="playground-icon-sidebar-top">
@@ -37,15 +33,6 @@ export function SqlIconSidebar({ buttons, bottomButtons }: SqlIconSidebarProps) 
           </React.Fragment>
         ))}
       </div>
-      {bottomButtons && bottomButtons.length > 0 && (
-        <div className="playground-icon-sidebar-bottom">
-          {bottomButtons.map((btn) => (
-            <React.Fragment key={btn.label}>
-              <IconSidebarButton btn={btn} />
-            </React.Fragment>
-          ))}
-        </div>
-      )}
     </nav>
   );
 }

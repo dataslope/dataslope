@@ -102,6 +102,7 @@ import {
   SettingsPanelContent,
   detectIsMac,
 } from "./playgroundShared";
+import { DiamondMark } from "./mdx/loadingAnimations";
 import { TabBar } from "./tabs/TabBar";
 import type { TabContextMenuItem, TabDescriptor } from "./tabs/tabTypes";
 import {
@@ -3071,9 +3072,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               </Popover.Portal>
             </Popover.Root>
 
-            {/* Settings entry co-located with the other global controls so
-                it's reachable from the top-right cluster (it's also still
-                pinned at the bottom of the left icon rail). */}
+            {/* Settings entry co-located with the other global controls in
+                the top-right cluster. */}
             <button
               type="button"
               className="header-btn icon-only"
@@ -3571,36 +3571,6 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 </Popover.Portal>
               </Popover.Root>
             </div>
-            <div className="playground-icon-sidebar-bottom">
-              <Popover.Root>
-                <Popover.Trigger
-                  openOnHover
-                  delay={150}
-                  closeDelay={100}
-                  render={(triggerProps) => (
-                    <button
-                      {...triggerProps}
-                      type="button"
-                      className="playground-icon-sidebar-btn"
-                      aria-label="Settings"
-                      onClick={openSettingsTab}
-                    >
-                      <svg className="stroke-icon" viewBox="0 0 24 24" width={15} height={15} fill="none" stroke="currentColor" strokeWidth="1.8">
-                        <circle cx="12" cy="12" r="3" />
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                      </svg>
-                    </button>
-                  )}
-                />
-                <Popover.Portal>
-                  <Popover.Positioner sideOffset={6} side="right">
-                    <Popover.Popup className="bui-popup pane-btn-popover">
-                      Settings
-                    </Popover.Popup>
-                  </Popover.Positioner>
-                </Popover.Portal>
-              </Popover.Root>
-            </div>
           </nav>
           {filesPaneOpen && (
             <div className="playground-files-sidebar">
@@ -3873,7 +3843,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             <div className="output-body" ref={outputBodyRef}>
               {outputs.length === 0 && statusState !== "running" ? (
                 <div className="welcome">
-                  <div className="welcome-icon">⌬</div>
+                  <div className="welcome-icon">
+                    <DiamondMark size={40} />
+                  </div>
                   <h3>Run your code to see output</h3>
                   {capabilitiesBlurb && <p>{capabilitiesBlurb}</p>}
                 </div>
@@ -3991,6 +3963,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 onRestoreDefaults={() => setConfirmRestoreOpen(true)}
                 onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
                 onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
+                onClose={closeSettingsTab}
               />
             </div>
           )}

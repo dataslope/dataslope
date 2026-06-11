@@ -86,7 +86,6 @@ import { SqlSettingsConfirmDialogs } from "./components/SqlSettingsConfirmDialog
 import { DdlViewerDialog } from "./components/DdlViewerDialog";
 import { SwitchDatabaseDialog } from "./components/SwitchDatabaseDialog";
 import { ImportBinaryFileDialog } from "./components/ImportBinaryFileDialog";
-import { ImportSqlDumpDialog } from "./components/ImportSqlDumpDialog";
 import { RenameDatabaseDialog } from "./components/RenameDatabaseDialog";
 import { SqlEditorToolbar } from "./components/SqlEditorToolbar";
 import { findSampleDatabase } from "../runtime/sqliteSamples";
@@ -172,16 +171,10 @@ const SQLITE_DB_ACTIONS: readonly DatabaseSelectorAction[] = [
     description: "Create a blank database",
   },
   {
-    id: "__import_sqlite__",
+    id: "__import_database__",
     icon: <Upload size={14} />,
-    label: "Import SQLite File",
-    description: "Open a .sqlite or .db file",
-  },
-  {
-    id: "__import_sql_dump__",
-    icon: <FileCode2 size={14} />,
-    label: "Import SQL Dump",
-    description: "Load database from a .sql file",
+    label: "Import Database",
+    description: "Open a SQLite file or SQL dump",
   },
   {
     id: "__export_sql_dump__",
@@ -676,12 +669,6 @@ function SqlPlaygroundInner() {
   const setImportSqliteDragging = useDialogStore(
     (s) => s.setImportSqliteDragging,
   );
-  const importSqlDumpOpen = useDialogStore((s) => s.importSqlDumpOpen);
-  const setImportSqlDumpOpen = useDialogStore((s) => s.setImportSqlDumpOpen);
-  const importSqlDumpDragging = useDialogStore((s) => s.importSqlDumpDragging);
-  const setImportSqlDumpDragging = useDialogStore(
-    (s) => s.setImportSqlDumpDragging,
-  );
   const importCsvOpen = useDialogStore((s) => s.importCsvOpen);
   const setImportCsvOpen = useDialogStore((s) => s.setImportCsvOpen);
   const importCsvDragging = useDialogStore((s) => s.importCsvDragging);
@@ -784,6 +771,17 @@ function SqlPlaygroundInner() {
       setSettingsOpen(true);
       activeTabIdRef.current = SETTINGS_TAB_ID;
       setActiveTabId(SETTINGS_TAB_ID);
+    }
+  }, [setSettingsOpen, setActiveTabId]);
+
+  /** Close the Settings tab (✕ in its tab strip entry or in the settings
+   *  tab bar) and return focus to the most-recent query tab. */
+  const closeSettingsTab = useCallback(() => {
+    setSettingsOpen(false);
+    const fallback = tabsRef.current[0]?.id;
+    if (fallback && activeTabIdRef.current === SETTINGS_TAB_ID) {
+      activeTabIdRef.current = fallback;
+      setActiveTabId(fallback);
     }
   }, [setSettingsOpen, setActiveTabId]);
 
@@ -945,8 +943,7 @@ function SqlPlaygroundInner() {
 
   const {
     performDbSwitch,
-    performImportSqlite,
-    performImportSqlDump,
+    performImportDatabaseFile,
     requestDbSwitch,
     exportDatabase,
     exportDatabaseToXlsx,
@@ -1873,25 +1870,16 @@ function SqlPlaygroundInner() {
                     >
                       <div className="export-item-text">
                         <div className="ex-title">
-                          from SQLite
-                          <span className="ext-badge">.sqlite</span>
+                          <span className="ex-title-text">from file</span>
+                          <span className="ext-badge-group">
+                            <span className="ext-badge">.sql</span>
+                            <span className="ext-badge">.db</span>
+                            <span className="ext-badge">.sqlite</span>
+                            <span className="ext-badge">.sqlite3</span>
+                          </span>
                         </div>
                         <div className="ex-desc">
-                          Replace database from .sqlite file
-                        </div>
-                      </div>
-                    </Menu.Item>
-                    <Menu.Item
-                      className="example-item export-item"
-                      onClick={() => setImportSqlDumpOpen(true)}
-                    >
-                      <div className="export-item-text">
-                        <div className="ex-title">
-                          from SQL dump
-                          <span className="ext-badge">.sql</span>
-                        </div>
-                        <div className="ex-desc">
-                          Load database from a SQL dump file
+                          Replace database from a SQLite or SQL dump file
                         </div>
                       </div>
                     </Menu.Item>
@@ -2110,6 +2098,31 @@ function SqlPlaygroundInner() {
                 </Popover.Positioner>
               </Popover.Portal>
             </Popover.Root>
+            <Popover.Root>
+              <Popover.Trigger
+                openOnHover
+                delay={150}
+                closeDelay={400}
+                render={(triggerProps) => (
+                  <button
+                    {...triggerProps}
+                    type="button"
+                    className="header-btn icon-only"
+                    aria-label="Settings"
+                    onClick={openSettingsTab}
+                  >
+                    <SettingsIcon size={14} aria-hidden="true" />
+                  </button>
+                )}
+              />
+              <Popover.Portal>
+                <Popover.Positioner sideOffset={6} align="end">
+                  <Popover.Popup className="bui-popup pane-btn-popover">
+                    Settings
+                  </Popover.Popup>
+                </Popover.Positioner>
+              </Popover.Portal>
+            </Popover.Root>
           </div>
         </>
       }
@@ -2262,33 +2275,28 @@ function SqlPlaygroundInner() {
           dragging={importSqliteDragging}
           onClose={() => setImportSqliteOpen(false)}
           onDraggingChange={setImportSqliteDragging}
-          onImport={(data, filename) => performImportSqlite(data, filename)}
-          title="Import SQLite File"
+          onImport={(data, filename) =>
+            performImportDatabaseFile(data, filename)
+          }
+          title="Import Database"
           description={
             <>
-              Open a local <code>.sqlite</code> or <code>.db</code> file as a
-              new in-memory database.
+              Open a local SQLite file (<code>.db</code>,{" "}
+              <code>.sqlite</code>, <code>.sqlite3</code>) or SQL dump (
+              <code>.sql</code>) as a new in-memory database. The file&rsquo;s
+              content decides how it is imported, so any extension works.
             </>
           }
           warningText={
             <>
-              This is a playground environment. Your file will{" "}
+              This will replace the current database. Your file will{" "}
               <strong>not</strong> be uploaded or persisted — it is only loaded
               into browser memory and will be gone on reload.
             </>
           }
-          dropText="Drop a SQLite file here"
-          browseHint="or click to browse — .sqlite, .db"
-          accept=".sqlite,.db,.sqlite3"
-          inputAriaLabel="Choose SQLite file"
-        />
-
-        <ImportSqlDumpDialog
-          open={importSqlDumpOpen}
-          dragging={importSqlDumpDragging}
-          onClose={() => setImportSqlDumpOpen(false)}
-          onDraggingChange={setImportSqlDumpDragging}
-          onImport={(sql, filename) => performImportSqlDump(sql, filename)}
+          dropText="Drop a database file here"
+          browseHint="or click to browse — .sql, .db, .sqlite, .sqlite3"
+          inputAriaLabel="Choose database file"
         />
 
         <RenameDatabaseDialog
@@ -3374,12 +3382,8 @@ function SqlPlaygroundInner() {
                       requestDbSwitch("__blank__");
                       return;
                     }
-                    if (value === "__import_sqlite__") {
+                    if (value === "__import_database__") {
                       setImportSqliteOpen(true);
-                      return;
-                    }
-                    if (value === "__import_sql_dump__") {
-                      setImportSqlDumpOpen(true);
                       return;
                     }
                     if (value === "__export_sql_dump__") {
@@ -3423,18 +3427,6 @@ function SqlPlaygroundInner() {
                     label: "Tables",
                     onClick: () => {},
                     isActive: true,
-                  },
-                ]}
-                bottomButtons={[
-                  {
-                    icon: (
-                      <svg className="stroke-icon" viewBox="0 0 24 24" width={15} height={15} fill="none" stroke="currentColor" strokeWidth="1.8">
-                        <circle cx="12" cy="12" r="3" />
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                      </svg>
-                    ),
-                    label: "Settings",
-                    onClick: openSettingsTab,
                   },
                 ]}
               />
@@ -3596,15 +3588,7 @@ function SqlPlaygroundInner() {
                   : undefined
               }
               onExtraTabClose={(tabId) => {
-                if (tabId === SETTINGS_TAB_ID) {
-                  setSettingsOpen(false);
-                  // Return focus to the most-recent non-settings tab.
-                  const fallback = tabs[0]?.id;
-                  if (fallback && activeTabIdRef.current === SETTINGS_TAB_ID) {
-                    activeTabIdRef.current = fallback;
-                    setActiveTabId(fallback);
-                  }
-                }
+                if (tabId === SETTINGS_TAB_ID) closeSettingsTab();
               }}
               onTabActivate={(tabId) => {
                 const prevId = activeTabIdRef.current;
@@ -3868,6 +3852,7 @@ function SqlPlaygroundInner() {
                   onRestoreDefaults={() => setConfirmRestoreOpen(true)}
                   onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
                   onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
+                  onClose={closeSettingsTab}
                   resetTabsLabel={`Reset query tabs for ${activeSample.label}`}
                   onResetTabs={resetTabsForCurrentDb}
                   extraTabs={[

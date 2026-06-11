@@ -33,6 +33,9 @@ export interface SqlSettingsPanelProps {
   /** Dialect-specific extra tabs (e.g. Pragmas for SQLite, Database for
    *  Postgres/DuckDB). Forwarded verbatim to SettingsPanelContent. */
   extraTabs?: SettingsPanelProps["extraTabs"];
+  /** Close the Settings tab — forwarded to SettingsPanelContent, which
+   *  renders the ✕ button at the right end of the settings tab bar. */
+  onClose?: () => void;
 }
 
 /** Body-only SQL settings panel — same controls shared by SQLite,
@@ -59,6 +62,7 @@ export function SqlSettingsPanelContent(props: SqlSettingsPanelProps) {
     resetTabsLabel,
     onResetTabs,
     extraTabs,
+    onClose,
   } = props;
   const extraActionRows: ReactNode = (
     <button
@@ -66,8 +70,10 @@ export function SqlSettingsPanelContent(props: SqlSettingsPanelProps) {
       className="settings-action-btn"
       onClick={onResetTabs}
     >
-      <RotateCcw size={14} aria-hidden="true" />
-      <span>{resetTabsLabel}</span>
+      <span className="settings-action-icon" aria-hidden="true">
+        <RotateCcw size={14} />
+      </span>
+      <span className="settings-action-label">{resetTabsLabel}</span>
     </button>
   );
   return (
@@ -94,6 +100,7 @@ export function SqlSettingsPanelContent(props: SqlSettingsPanelProps) {
       extraGeneralRows={null}
       extraActionRows={extraActionRows}
       extraTabs={extraTabs}
+      onClose={onClose}
     />
   );
 }

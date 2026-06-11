@@ -26,8 +26,6 @@ interface DialogState {
   } | null;
   importSqliteOpen: boolean;
   importSqliteDragging: boolean;
-  importSqlDumpOpen: boolean;
-  importSqlDumpDragging: boolean;
   importCsvOpen: boolean;
   importCsvState: CsvImportState | null;
   importCsvDragging: boolean;
@@ -76,8 +74,6 @@ interface DialogState {
   ) => void;
   setImportSqliteOpen: (open: boolean) => void;
   setImportSqliteDragging: (dragging: boolean) => void;
-  setImportSqlDumpOpen: (open: boolean) => void;
-  setImportSqlDumpDragging: (dragging: boolean) => void;
   setImportCsvOpen: (open: boolean) => void;
   setImportCsvState: (
     state:
@@ -127,8 +123,6 @@ export const useDialogStore = create<DialogState>((set) => ({
   pendingDropEntity: null,
   importSqliteOpen: false,
   importSqliteDragging: false,
-  importSqlDumpOpen: false,
-  importSqlDumpDragging: false,
   importCsvOpen: false,
   importCsvState: null,
   importCsvDragging: false,
@@ -183,9 +177,6 @@ export const useDialogStore = create<DialogState>((set) => ({
   setImportSqliteOpen: (importSqliteOpen) => set({ importSqliteOpen }),
   setImportSqliteDragging: (importSqliteDragging) =>
     set({ importSqliteDragging }),
-  setImportSqlDumpOpen: (importSqlDumpOpen) => set({ importSqlDumpOpen }),
-  setImportSqlDumpDragging: (importSqlDumpDragging) =>
-    set({ importSqlDumpDragging }),
   setImportCsvOpen: (importCsvOpen) => set({ importCsvOpen }),
   setImportCsvState: (updater) =>
     set((state) => ({
