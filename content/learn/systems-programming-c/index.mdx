@@ -17,6 +17,44 @@ language but a *model of the machine* — a small, honest model in which
 every byte has an address, every variable has a type with a known
 size, and every allocation is yours to manage.
 
+## This course runs in your browser — try it
+
+Before anything else, here is the most important fact about this
+course: **every C snippet on every page is live.** Click *Run* below
+and a real `clang` compiler — running as WebAssembly inside your
+browser tab — will compile this program and execute it. No
+installation, no setup, no account.
+
+<CodeBlock
+  adapter="c"
+  files={[
+    {
+      filename: "main.c",
+      starterCode: `#include <stdio.h>
+
+int main(void) {
+  int height = 5; // try changing this, then press Run again
+
+  for (int row = 1; row <= height; row++) {
+    for (int i = 0; i < row; i++) {
+      putchar('#');
+    }
+    putchar('\\n');
+  }
+  printf("Compiled with clang, in your browser.\\n");
+  return 0;
+}
+`,
+    },
+  ]}
+/>
+
+Change `height` to `8` and run it again. That edit–run–observe loop
+is how the whole course works: the prose explains an idea, a code
+block makes it concrete, and you are expected to poke at it. The
+pages where you break things on purpose — and there will be several —
+are where C actually sinks in.
+
 <svg
   viewBox="0 0 640 280"
   role="img"
@@ -132,9 +170,10 @@ free it twice, or read from it after, or write past its end, the
 program may crash, leak, or silently corrupt unrelated data.
 
 That's why this course pairs *systems programming* (the toolchain,
-process layout, file I/O, syscalls) with *memory management* (stack
-vs heap, pointer arithmetic, allocators, common bugs and how to spot
-them). The two are inseparable.
+the process address space, the contracts between your program and
+the operating system) with *memory management* (stack vs heap,
+pointer arithmetic, allocators, common bugs and how to spot them).
+The two are inseparable.
 
 ```mermaid
 flowchart TD

@@ -7,6 +7,16 @@ A pointer is just a variable whose value is the address of another
 piece of memory. That one sentence is the whole concept — and also
 the source of half the things that make C feel hard.
 
+If the sentence feels slippery, try the postal version. Every house
+on a street has an address. A pointer is a slip of paper with an
+address written on it. The slip is not the house: you can copy the
+slip, lose the slip, or write a different address on it, all without
+touching the house. But if you *walk to* the address on the slip —
+that's dereferencing — you arrive at the actual house and can look
+inside or repaint the door. Everything on this page is a precise
+version of that picture: `&` writes a house's address onto a slip,
+`*` walks to whatever address a slip currently holds.
+
 <svg
   viewBox="0 0 640 220"
   role="img"
@@ -161,6 +171,17 @@ int main(void) {
 A pointer that does not point anywhere meaningful should be `NULL`
 (defined in `<stddef.h>`, usually as `((void*)0)`). Dereferencing a
 `NULL` pointer is undefined behavior — usually a crash.
+
+The idea of a special "points at nothing" value is older than C, and
+its inventor regrets it. Tony Hoare added the null reference to the
+ALGOL W language in 1965 — in his words, "simply because it was so
+easy to implement." At a conference in 2009 he formally apologized,
+calling it his **billion-dollar mistake**: his estimate of what null
+dereferences have cost the industry in crashes, vulnerabilities, and
+debugging time over four decades. C inherited the idea wholesale, so
+you will be living with Hoare's mistake for the rest of this course.
+The discipline that keeps it survivable is simple and non-negotiable:
+*check before you dereference.*
 
 <CodeBlock
   adapter="c"

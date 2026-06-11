@@ -210,6 +210,18 @@ standard libraries (libc for `printf`, libm for `sqrt`, etc.) and
 resolves *undefined symbols* — references that one object file makes
 to functions defined in another.
 
+<Callout type="info" title="Why is the default output called a.out?">
+If you link without `-o`, the executable is named `a.out` — short for
+*assembler output*. The name comes from the assembler on the PDP-7
+that the first version of Unix was built on around 1969, where it was
+the fixed name of the assembler's output file. The file *format*
+called a.out was replaced decades ago (by COFF, then ELF on Linux),
+but the default file *name* has now outlived the machine that coined
+it by more than half a century. When you type `clang hello.c` today,
+you are participating in a tradition older than the C language
+itself.
+</Callout>
+
 If you see:
 
 ```

@@ -90,6 +90,21 @@ feature. This page is the long, careful introduction.
 
 They all live in `<stdlib.h>`.
 
+It is worth pausing on what `malloc` actually *is*: not a syscall,
+not magic, just a library function managing a big region of memory
+with ordinary data structures — free lists, size bins, boundary
+tags. Anyone can write one, and one person famously did. In 1987,
+computer science professor Doug Lea began writing a general-purpose
+allocator, **dlmalloc**, and placed it in the public domain. It was
+so well engineered that the GNU C library's allocator (ptmalloc2,
+which Linux programs use to this day) was built directly on it. For
+decades, nearly every `malloc` call on a Linux box has been running
+a descendant of one professor's freely given code — a useful thing
+to remember when the allocator feels like an inscrutable black box.
+Near the end of this course's roadmap you will find "write a toy
+malloc" as a suggested project; after this page you will know enough
+to try.
+
 ```mermaid
 flowchart LR
     A[Program] -->|"<code>malloc(n)</code>"| B[Allocator]
@@ -306,14 +321,19 @@ int main(void) {
 
 ## Building a dynamic array (mini `std::vector`)
 
-A small, complete `vec` type to show how growable arrays really work.
+Everything on this page comes together in one small data structure:
+a growable array. The struct and its boilerplate live in the
+read-only setup; the part worth your attention is `vec_push`, which
+contains the whole growth strategy — when the array is full, double
+the capacity with `realloc` (using the safe temporary pattern from
+above), then append.
 
 <CodeBlock
   adapter="c"
   files={[
     {
       filename: "main.c",
-      starterCode: `#include <stdio.h>
+      initCode: `#include <stdio.h>
 #include <stdlib.h>
 
 typedef struct {
@@ -322,14 +342,14 @@ typedef struct {
   size_t cap;
 } Vec;
 
-static int vec_init(Vec *v) {
-  v->data = NULL;
-  v->len = 0;
-  v->cap = 0;
-  return 0;
-}
+static void vec_init(Vec *v) { v->data = NULL; v->len = v->cap = 0; }
 
-static int vec_push(Vec *v, int x) {
+static void vec_free(Vec *v) {
+  free(v->data);
+  v->data = NULL;
+  v->len = v->cap = 0;
+}`,
+      starterCode: `static int vec_push(Vec *v, int x) {
   if (v->len == v->cap) {
     size_t new_cap = v->cap == 0 ? 4 : v->cap * 2;
     int *tmp = realloc(v->data, new_cap * sizeof *v->data);
@@ -340,12 +360,6 @@ static int vec_push(Vec *v, int x) {
   }
   v->data[v->len++] = x;
   return 0;
-}
-
-static void vec_free(Vec *v) {
-  free(v->data);
-  v->data = NULL;
-  v->len = v->cap = 0;
 }
 
 int main(void) {
@@ -366,6 +380,10 @@ int main(void) {
     },
   ]}
 />
+
+Watch the final line of output: after ten pushes the length is 10
+but the capacity is 16, because the array grew 4 → 8 → 16. Try
+pushing 17 elements and predict the capacity before you run.
 
 Doubling the capacity each time gives amortized O(1) `push`. This is
 exactly how `std::vector<T>` in C++ and `Vec<T>` in Rust grow.

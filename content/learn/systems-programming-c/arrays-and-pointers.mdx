@@ -134,6 +134,16 @@ Yes, `2[a]` is valid C: by definition `i[a] == *(i + a) == *(a + i)
 == a[i]`. Do not write that in real code — but knowing it explains
 *why* arrays and pointers feel so interchangeable.
 
+It also explains a question every beginner asks: why does indexing
+start at 0 instead of 1? Because the index is not a position — it is
+an **offset**. `a[0]` means "zero elements past the start," which is
+the start itself. Edsger Dijkstra wrote a famously opinionated 1982
+note, *"Why numbering should start at zero"* (EWD831), defending the
+convention on mathematical grounds, but in C the justification is
+mechanical: the index is literally the number the compiler multiplies
+by `sizeof` and adds to the base address. Starting at 1 would mean
+paying for a subtraction on every single array access.
+
 ## Array decay
 
 Almost every time you *use* an array (pass it to a function, assign
