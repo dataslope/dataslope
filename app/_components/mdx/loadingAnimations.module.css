@@ -1,0 +1,418 @@
+/*
+ * Brand loading animations built from the Dataslope logo mark
+ * (public/dataslope-logo-blue.svg).
+ *
+ * Every shape is drawn with `currentColor`, so the wrappers below set a
+ * single brand `color` and each variant retints automatically for
+ * light/dark mode. Geometry constants (diamond stacking offset, wave
+ * tile step) live next to the path data in loadingAnimations.tsx.
+ *
+ * Under `prefers-reduced-motion: reduce`, all transform/stroke
+ * animations are disabled and replaced by a gentle opacity pulse on the
+ * loader wrapper, so the indicator still reads as "busy" without
+ * large-scale motion.
+ */
+
+/* ── Shared wrappers ───────────────────────────────────────────────── */
+
+.loader {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  color: var(--ds-blue, #148cff);
+}
+
+:global(.dark) .loader {
+  color: var(--ds-blue-400, #5ba7ff);
+}
+
+.loader svg {
+  display: block;
+}
+
+/* ── Diamond spinner (continuous) ──────────────────────────────────── */
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: spin var(--spin-dur, 1.5s) linear infinite;
+}
+
+/* ── Diamond half-turn (eased 180° steps with a rest) ──────────────────
+   The diamond has 2-fold rotational symmetry, so each 180° step lands on
+   an identical pose and the loop reads as a calm "tick … tick" rotation. */
+
+@keyframes halfTurn {
+  0% {
+    transform: rotate(0deg);
+  }
+  35% {
+    transform: rotate(180deg);
+  }
+  50% {
+    transform: rotate(180deg);
+  }
+  85% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.turn {
+  animation: halfTurn 2.4s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+
+/* ── Diamond assemble (halves part and rejoin) ──────────────────────────
+   Both halves share one keyframe: the bottom half sits inside a
+   scale(1,-1) group, so the same local translateY(-170px) moves the top
+   half up and the bottom half down. 170 SVG user units ≈ 15% of the
+   diamond's height. */
+
+@keyframes assembleHalf {
+  0%,
+  100% {
+    transform: translateY(-170px);
+    opacity: 0.45;
+  }
+  40%,
+  62% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}
+
+.assembleHalf {
+  animation: assembleHalf 2.7s ease-in-out infinite;
+}
+
+/* ── Diamond ripple (radar ping) ───────────────────────────────────── */
+
+@keyframes rippleScale {
+  0% {
+    transform: scale(0.32);
+    opacity: 0.9;
+  }
+  60% {
+    opacity: 0.35;
+  }
+  100% {
+    transform: scale(1.02);
+    opacity: 0;
+  }
+}
+
+.rippleCopy {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: rippleScale 2.1s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+}
+
+/* ── Logo trace (outline draws itself on and off) ──────────────────────
+   The animated paths set pathLength=1, so dasharray/dashoffset are
+   normalised: offset 1 → invisible, 0 → fully drawn, -1 → erased again. */
+
+@keyframes drawDash {
+  to {
+    stroke-dashoffset: -1;
+  }
+}
+
+.traceBase {
+  fill: none;
+  stroke: currentColor;
+  stroke-opacity: 0.16;
+  stroke-width: 1.25;
+}
+
+.tracePath {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: drawDash 3s linear infinite;
+}
+
+/* ── Logo hop (three marks hopping in sequence) ────────────────────── */
+
+@keyframes hop {
+  0%,
+  55%,
+  100% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-58%);
+  }
+}
+
+.hopRow {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 7px;
+}
+
+.hopGlyph {
+  display: inline-block;
+  line-height: 0;
+  animation: hop 1.15s ease-in-out infinite;
+}
+
+/* ── Wave (mark tiled into a continuous sine wave) ──────────────────────
+   The track scrolls by exactly one pattern period (two tiles:
+   mountain + mirrored valley = 2 × 815.81 = 1631.62 user units) so the
+   loop is seamless. On SVG elements, CSS `px` equals user units. */
+
+@keyframes waveScroll {
+  to {
+    transform: translateX(-1631.62px);
+  }
+}
+
+.waveTrack {
+  animation: waveScroll var(--wave-dur, 9s) linear infinite;
+}
+
+.waveSvg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.waveBand {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  color: var(--ds-blue, #148cff);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 10%,
+    #000 90%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 10%,
+    #000 90%,
+    transparent
+  );
+}
+
+:global(.dark) .waveBand {
+  color: var(--ds-blue-400, #5ba7ff);
+}
+
+/* ── Wave progress bar (pill-clipped indeterminate bar) ────────────── */
+
+.waveBar {
+  display: inline-block;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(20, 140, 255, 0.14);
+  background: color-mix(in srgb, var(--ds-blue, #148cff) 14%, transparent);
+  color: var(--ds-blue, #148cff);
+}
+
+:global(.dark) .waveBar {
+  color: var(--ds-blue-400, #5ba7ff);
+}
+
+/* ── Slope backdrop (full-surface loading state) ───────────────────── */
+
+.backdrop {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid var(--color-fd-border, rgba(20, 140, 255, 0.18));
+  background: linear-gradient(
+    to bottom,
+    rgba(20, 140, 255, 0.06),
+    rgba(20, 140, 255, 0.012)
+  );
+  color: var(--ds-blue, #148cff);
+}
+
+:global(.dark) .backdrop {
+  background: linear-gradient(
+    to bottom,
+    rgba(91, 167, 255, 0.07),
+    rgba(91, 167, 255, 0.015)
+  );
+  color: var(--ds-blue-400, #5ba7ff);
+}
+
+.backdropWaves {
+  position: absolute;
+  inset: 0;
+}
+
+.backdropLayer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+}
+
+.backdropContent {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.backdropMsg {
+  font-family: var(--font-sans, "Inter", system-ui, sans-serif);
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  color: var(--color-fd-muted-foreground, #5c6470);
+}
+
+/* ── Inline boot notice demo (CodeBlock-style row) ─────────────────── */
+
+.bootDemo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--color-fd-border, rgba(20, 140, 255, 0.18));
+  background: rgba(20, 140, 255, 0.05);
+}
+
+.bootText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--font-sans, "Inter", system-ui, sans-serif);
+}
+
+.bootTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-fd-foreground, #18181b);
+}
+
+.bootHint {
+  font-size: 12px;
+  color: var(--color-fd-muted-foreground, #6b7280);
+}
+
+/* ── Demo gallery ──────────────────────────────────────────────────── */
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 14px;
+  margin: 1rem 0 2rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--color-fd-border, #e3e6ea);
+  border-radius: 12px;
+  background: var(--color-fd-card, transparent);
+}
+
+.cardWide {
+  grid-column: 1 / -1;
+}
+
+.cardPreview {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+  padding: 18px;
+}
+
+/* Full-bleed previews (wave bands, backdrops) drop the padding so the
+   animation runs edge to edge. */
+.cardPreviewFill {
+  display: block;
+  padding: 0;
+}
+
+.cardMeta {
+  padding: 10px 14px 12px;
+  border-top: 1px solid var(--color-fd-border, #e3e6ea);
+  font-family: var(--font-sans, "Inter", system-ui, sans-serif);
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-fd-foreground, #18181b);
+}
+
+.cardBlurb {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--color-fd-muted-foreground, #6b7280);
+}
+
+.sizeRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 28px;
+}
+
+/* ── Reduced motion ────────────────────────────────────────────────────
+   Drop all transform/stroke animations and signal activity with a calm
+   opacity pulse on the loader wrapper instead. With `drawDash` disabled
+   the trace paths fall back to their static base outline. */
+
+@keyframes rmPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin,
+  .turn,
+  .assembleHalf,
+  .rippleCopy,
+  .hopGlyph,
+  .tracePath,
+  .waveTrack {
+    animation: none;
+  }
+
+  /* With drawDash disabled, show the traced outline fully drawn. */
+  .tracePath {
+    stroke-dashoffset: 0;
+  }
+
+  .loader,
+  .waveBand,
+  .waveBar,
+  .backdrop {
+    animation: rmPulse 2.5s ease-in-out infinite;
+  }
+}
