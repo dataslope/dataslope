@@ -1690,22 +1690,25 @@
   gap: 4px;
 }
 
+/* Solid, borderless chips with white text. green-500 / red-500 read on
+   both light and dark card surfaces, so no dark-mode overrides are
+   needed (the former translucent variants are gone). */
 .testPill[data-state="pass"] {
-  background: var(--ch-green-bg);
-  color: var(--ch-green);
-  border: 1px solid var(--ds-green-200);
+  background: var(--ds-green-500);
+  color: #fff;
+  border: none;
 }
 
 .testPill[data-state="fail"] {
-  background: var(--ch-red-bg);
-  color: var(--ch-red);
-  border: 1px solid var(--ds-red-200);
+  background: var(--ds-red-500);
+  color: #fff;
+  border: none;
 }
 
 .testPill[data-state="pending"] {
-  background: var(--ds-gray-100);
-  color: var(--ch-text-muted);
-  border: 1px solid var(--ds-gray-200);
+  background: var(--ds-gray-500);
+  color: #fff;
+  border: none;
 }
 
 .testChevron {
@@ -1959,26 +1962,25 @@
 
 /* ─── Status banner ───────────────────────────────────────────────── */
 
+/* Solid colour band, white text, no top border. green-500 / red-500
+   read on both themes, so no dark-mode overrides are needed. */
 .banner {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 12px 20px;
-  border-top: 1px solid var(--ch-border-light);
+  border-top: none;
   font-size: 14px;
   font-weight: 500;
+  color: #fff;
 }
 
 .banner[data-state="pass"] {
-  background: var(--ch-green-bg);
-  color: var(--ch-green);
-  border-top-color: var(--ds-green-200);
+  background: var(--ds-green-500);
 }
 
 .banner[data-state="fail"] {
-  background: var(--ch-red-bg);
-  color: var(--ch-red);
-  border-top-color: var(--ds-red-200);
+  background: var(--ds-red-500);
 }
 
 .bannerIcon {
@@ -1989,14 +1991,8 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-}
-
-.banner[data-state="pass"] .bannerIcon {
-  background: var(--ds-green-100);
-}
-
-.banner[data-state="fail"] .bannerIcon {
-  background: var(--ds-red-100);
+  /* Lightened well of the band colour so the white check / ✕ reads. */
+  background: rgba(255, 255, 255, 0.22);
 }
 
 .bannerSub {
@@ -2268,36 +2264,8 @@
   background: #222222;
 }
 
-:global(html.dark) .testPill[data-state="pass"] {
-  background: color-mix(in srgb, var(--ds-green-500) 12%, transparent);
-  border-color: color-mix(in srgb, var(--ds-green-500) 28%, transparent);
-}
-
-:global(html.dark) .testPill[data-state="fail"] {
-  background: color-mix(in srgb, var(--ds-red-500) 12%, transparent);
-  border-color: color-mix(in srgb, var(--ds-red-500) 28%, transparent);
-}
-
-:global(html.dark) .testPill[data-state="pending"] {
-  background: #252525;
-  border-color: #333333;
-}
-
-:global(html.dark) .banner[data-state="pass"] {
-  border-top-color: color-mix(in srgb, var(--ds-green-500) 28%, transparent);
-}
-
-:global(html.dark) .banner[data-state="fail"] {
-  border-top-color: color-mix(in srgb, var(--ds-red-500) 28%, transparent);
-}
-
-:global(html.dark) .banner[data-state="pass"] .bannerIcon {
-  background: color-mix(in srgb, var(--ds-green-500) 22%, transparent);
-}
-
-:global(html.dark) .banner[data-state="fail"] .bannerIcon {
-  background: color-mix(in srgb, var(--ds-red-500) 22%, transparent);
-}
+/* The test pill and status banner use solid green-500 / red-500 with
+   white text in both themes, so they need no dark-mode overrides. */
 
 /* ─── Table viewer (SQL) ────────────────────────────────────────────── */
 
