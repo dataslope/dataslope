@@ -2211,7 +2211,10 @@ function OutputCellView({ cell }: { cell: OutputCell }) {
   if (cell.type === "html") {
     return (
       <div
-        className={styles.outCellHtml}
+        // `not-prose` keeps the docs' prose typography (serif font,
+        // table margins) from restyling the dataframe markup when the
+        // card sits inside MDX content.
+        className={`${styles.outCellHtml} not-prose`}
         // Same trust assumption as the playground / code block: HTML
         // cells originate from code the user typed in this very widget.
         dangerouslySetInnerHTML={{ __html: cell.content }}

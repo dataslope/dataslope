@@ -1,6 +1,14 @@
 "use client";
 
-import { memo, useState, useCallback, useEffect, useRef, useMemo } from "react";
+import {
+  memo,
+  useState,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useMemo,
+} from "react";
 import React from "react";
 import {
   flexRender,
@@ -267,6 +275,22 @@ const PAGE_SIZE_OPTIONS: ReadonlyArray<{ value: number; label: string }> = [
 
 const VIRTUAL_ROW_HEIGHT_ESTIMATE = 30;
 const LOAD_MORE_THRESHOLD_ROWS = 25;
+// ─── Column sizing ──────────────────────────────────────────────────────
+// Data columns get an explicit pixel width right after the first paint of a
+// result: the grid renders once with the browser's auto table layout,
+// measures each header cell, freezes those widths and switches to
+// `table-layout: fixed` (plus a trailing filler column that absorbs any
+// leftover space, so columns only take the width their content needs).
+// Frozen widths keep the grid predictable — entering/leaving inline cell
+// edit or streaming in more rows can no longer reflow every column — and
+// they're what the drag-to-resize header handles adjust.
+const COL_MIN_WIDTH = 48;
+// Cap for the *measured* width — mirrors the auto-layout `max-width` clamp
+// the CSS applies to cells, so one long value can't take the whole pane.
+// Users can still drag a column wider, up to COL_MAX_WIDTH.
+const COL_MAX_MEASURED_WIDTH = 340;
+const COL_MAX_WIDTH = 1600;
+const SELECT_COL_WIDTH = 28;
 // Stage 1 (DuckDB perf): when a paged result still contains more than
 // this many DOM rows (e.g. the user disabled pagination, or chose a
 // very large page size), switch the rendering path to the same
@@ -2239,6 +2263,96 @@ export function ResultTableBody({
     stats: ColumnStats;
   } | null>(null);
 
+  // ── Column widths ──────────────────────────────────────────────────────
+  // Explicit pixel width per leaf column id, frozen from a one-time
+  // auto-layout measurement and then user-adjustable via the header drag
+  // handles (the model every desktop SQL IDE uses — DBeaver, DataGrip,
+  // TablePlus: size to content once, keep stable, let the user resize).
+  // `null` = not measured yet → the table renders one frame with the
+  // browser's natural auto layout and the layout effect below freezes
+  // what that produced, before paint.
+  const tableElRef = useRef<HTMLTableElement | null>(null);
+  const thElsRef = useRef<Record<string, HTMLTableCellElement | null>>({});
+  const colElsRef = useRef<Record<string, HTMLTableColElement | null>>({});
+  const [colWidths, setColWidths] = useState<Record<string, number> | null>(
+    null,
+  );
+  const colWidthsRef = useRef(colWidths);
+  colWidthsRef.current = colWidths;
+  // Re-measure only when the column set changes (a different query shape).
+  // Re-fetches of the same shape — cell-edit/sort/filter reloads, paging,
+  // infinite-scroll appends — keep the frozen widths so the grid never
+  // reflows under the user.
+  const colSig = `${deletable ? "select" : ""}${set.columns.join("")}`;
+  const [prevColSig, setPrevColSig] = useState(colSig);
+  if (prevColSig !== colSig) {
+    setPrevColSig(colSig);
+    setColWidths(null);
+  }
+
+  // During a drag the <col> element is updated imperatively (a cheap
+  // fixed-layout reflow, no React re-render per pointermove); the final
+  // width is committed to state on release.
+  const resizeRef = useRef<{
+    colId: string;
+    startX: number;
+    startWidth: number;
+    latest: number;
+  } | null>(null);
+
+  const handleResizePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLElement>, colId: string) => {
+      if (e.button !== 0) return;
+      const startWidth = colWidthsRef.current?.[colId];
+      if (startWidth === undefined) return;
+      e.preventDefault();
+      e.stopPropagation();
+      resizeRef.current = {
+        colId,
+        startX: e.clientX,
+        startWidth,
+        latest: startWidth,
+      };
+      e.currentTarget.setPointerCapture(e.pointerId);
+    },
+    [],
+  );
+
+  const handleResizePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLElement>) => {
+      const r = resizeRef.current;
+      if (!r) return;
+      const w = Math.max(
+        COL_MIN_WIDTH,
+        Math.min(
+          COL_MAX_WIDTH,
+          Math.round(r.startWidth + (e.clientX - r.startX)),
+        ),
+      );
+      if (w !== r.latest) {
+        r.latest = w;
+        const colEl = colElsRef.current[r.colId];
+        if (colEl) colEl.style.width = `${w}px`;
+      }
+    },
+    [],
+  );
+
+  const handleResizePointerEnd = useCallback(
+    (e: React.PointerEvent<HTMLElement>) => {
+      const r = resizeRef.current;
+      if (!r) return;
+      resizeRef.current = null;
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch {
+        /* capture already released (e.g. pointercancel) */
+      }
+      setColWidths((prev) => (prev ? { ...prev, [r.colId]: r.latest } : prev));
+    },
+    [],
+  );
+
   // Keep mutable refs so that click handlers inside the columns useMemo
   // always access the latest values without needing them in the dep array.
   const visibleRef = useRef(visible);
@@ -2492,7 +2606,9 @@ export function ResultTableBody({
                                 </Popover.Portal>
                               </Popover.Root>
                             )}
-                            <span>{displayName}</span>
+                            <span className="sql-result-th-name">
+                              {displayName}
+                            </span>
                             {isReadOnly && (
                               <span
                                 className="sql-result-th-readonly"
@@ -3049,7 +3165,80 @@ export function ResultTableBody({
     virtualized,
   ]);
 
-  const colSpan = table.getAllLeafColumns().length;
+  // Freeze the auto-layout column widths before the first paint of a new
+  // result shape. Virtualized grids materialize their rows in the
+  // virtualizer's own layout effect (a second commit in the same frame) —
+  // wait for that commit so widths reflect real cell content, not just the
+  // headers.
+  useLayoutEffect(() => {
+    if (colWidths !== null) return;
+    if (virtualized && tableRows.length > 0 && renderedRows.length === 0) {
+      return;
+    }
+    const next: Record<string, number> = {};
+    for (const col of table.getAllLeafColumns()) {
+      if (col.id === "select") continue;
+      const th = thElsRef.current[col.id];
+      if (!th) continue;
+      // +2 guards against fractional-width rounding re-clipping a value
+      // that just fit during the measure pass.
+      next[col.id] = Math.min(
+        COL_MAX_MEASURED_WIDTH,
+        Math.max(
+          COL_MIN_WIDTH,
+          Math.ceil(th.getBoundingClientRect().width) + 2,
+        ),
+      );
+    }
+    if (Object.keys(next).length > 0) setColWidths(next);
+  }, [colWidths, virtualized, tableRows.length, renderedRows.length, table]);
+
+  // Double-clicking a resize handle auto-fits the column to its rendered
+  // content (same affordance as DBeaver / DataGrip / spreadsheet apps).
+  const handleAutoFitColumn = useCallback(
+    (colId: string) => {
+      const tableEl = tableElRef.current;
+      if (!tableEl) return;
+      const leafIndex = table
+        .getAllLeafColumns()
+        .findIndex((c) => c.id === colId);
+      if (leafIndex < 0) return;
+      let fit = COL_MIN_WIDTH;
+      const rows = tableEl.querySelectorAll<HTMLTableRowElement>(
+        'tbody tr:not([aria-hidden="true"])',
+      );
+      rows.forEach((tr) => {
+        const td = tr.cells[leafIndex];
+        // scrollWidth includes the cell padding; +2 for rounding.
+        if (td) fit = Math.max(fit, td.scrollWidth + 2);
+      });
+      fit = Math.min(COL_MAX_WIDTH, fit);
+      setColWidths((prev) => (prev ? { ...prev, [colId]: fit } : prev));
+    },
+    [table],
+  );
+
+  /** Drag handle for one column boundary. Pointer-only affordance (like
+   *  desktop SQL IDEs); double-click auto-fits the column to its content. */
+  const renderColResizer = (targetId: string) => (
+    <span
+      className="sql-result-col-resizer"
+      aria-hidden="true"
+      onPointerDown={(e) => handleResizePointerDown(e, targetId)}
+      onPointerMove={handleResizePointerMove}
+      onPointerUp={handleResizePointerEnd}
+      onPointerCancel={handleResizePointerEnd}
+      onDoubleClick={() => handleAutoFitColumn(targetId)}
+      onClick={(e) => e.stopPropagation()}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+    />
+  );
+
+  // Leaf columns + the trailing filler column that absorbs leftover width.
+  const colSpan = table.getAllLeafColumns().length + 1;
 
   const renderRow = (row: (typeof tableRows)[number]) => {
     const absoluteRow = row.original.absoluteRow;
@@ -3123,6 +3312,14 @@ export function ResultTableBody({
         }}
       >
         {cells}
+        {/* Filler cell — absorbs the leftover width so data columns keep
+            their natural (content) width instead of stretching. */}
+        <td
+          className="sql-result-td-filler"
+          onContextMenu={() => {
+            rightClickedCellRef.current = null;
+          }}
+        />
       </tr>
     );
   };
@@ -3336,29 +3533,86 @@ export function ResultTableBody({
                 props.onContextMenu?.(e);
               }}
             >
-        <table className="sql-result-table">
+        <table
+          ref={tableElRef}
+          className={`sql-result-table${colWidths ? " sql-result-table-sized" : ""}`}
+        >
+          {/* Explicit per-column widths (once measured) + a width-less
+              filler col. With table-layout:fixed and width:100%, the
+              filler absorbs all leftover space, so the data columns only
+              take the width they need — and resizing one column never
+              reflows its neighbours. */}
+          <colgroup>
+            {table.getAllLeafColumns().map((col) => (
+              <col
+                key={col.id}
+                ref={(el) => {
+                  colElsRef.current[col.id] = el;
+                }}
+                style={{
+                  width:
+                    col.id === "select"
+                      ? SELECT_COL_WIDTH
+                      : colWidths?.[col.id],
+                }}
+              />
+            ))}
+            <col />
+          </colgroup>
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th
-                    key={header.id}
-                    className={
-                      header.column.id === "select"
-                        ? "sql-result-th-select"
-                        : header.column.getIsSorted()
-                          ? "sql-result-th-sorted"
-                          : undefined
-                    }
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </th>
-                ))}
+                {headerGroup.headers.map((header, hi) => {
+                  // Drag handle on the *left* edge of each header,
+                  // controlling the previous column's width: rendered in
+                  // the later (higher-painted) sticky cell, it can
+                  // straddle the boundary without the neighbour
+                  // swallowing its hit area.
+                  const prevId =
+                    hi > 0 ? headerGroup.headers[hi - 1].column.id : null;
+                  const resizeTarget =
+                    colWidths && prevId && prevId !== "select"
+                      ? prevId
+                      : null;
+                  return (
+                    <th
+                      key={header.id}
+                      ref={(el) => {
+                        thElsRef.current[header.column.id] = el;
+                      }}
+                      className={
+                        header.column.id === "select"
+                          ? "sql-result-th-select"
+                          : header.column.getIsSorted()
+                            ? "sql-result-th-sorted"
+                            : undefined
+                      }
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                      {resizeTarget && renderColResizer(resizeTarget)}
+                    </th>
+                  );
+                })}
+                {/* Filler header keeps the sticky band painting to the
+                    pane's right edge; its left handle resizes the last
+                    data column. */}
+                <th className="sql-result-th-filler" aria-hidden="true">
+                  {colWidths &&
+                    headerGroup.headers.length > 0 &&
+                    (() => {
+                      const lastId =
+                        headerGroup.headers[headerGroup.headers.length - 1]
+                          .column.id;
+                      return lastId === "select"
+                        ? null
+                        : renderColResizer(lastId);
+                    })()}
+                </th>
               </tr>
             ))}
           </thead>

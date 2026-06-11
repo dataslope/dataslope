@@ -2325,7 +2325,8 @@ export function VirtualizedResultTable({
       ? rowVirtualizer.getTotalSize() -
         (virtualRows[virtualRows.length - 1]?.end ?? 0)
       : 0;
-  const colSpan = tableColumns.length;
+  // Data columns + the trailing filler column that absorbs leftover width.
+  const colSpan = tableColumns.length + 1;
 
   // Infinite scroll: when the last virtualised row gets within a short
   // distance of the end of what's loaded, ask the owner for the next
@@ -2358,6 +2359,10 @@ export function VirtualizedResultTable({
                     : flexRender(h.column.columnDef.header, h.getContext())}
                 </th>
               ))}
+              {/* Filler column — absorbs the leftover width so the data
+                  columns only take the space their content needs instead
+                  of stretching across the card. */}
+              <th className={styles.sqlResultFiller} aria-hidden />
             </tr>
           ))}
         </thead>
@@ -2380,6 +2385,7 @@ export function VirtualizedResultTable({
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
+                <td className={styles.sqlResultFiller} aria-hidden />
               </tr>
             );
           })}
@@ -2588,36 +2594,42 @@ export function TableViewer({
               {flashKey > 0 && (
                 <div key={flashKey} className={styles.resultFlashOverlay} aria-hidden />
               )}
-              <div className={styles.resultPaneInfo}>
-                {resultTabData.error ? (
-                  <span className={styles.sqlResultLabel} style={{ color: "var(--ch-red)" }}>
-                    Error
-                  </span>
-                ) : resultTabData.resultSet && resultTabData.resultSet.columns.length > 0 ? (
-                  <span className={styles.sqlResultCount}>
-                    {resultTabData.resultSet.values.length} row{resultTabData.resultSet.values.length === 1 ? "" : "s"}
-                    {resultTabData.elapsed ? ` · ${resultTabData.elapsed}` : ""}
-                  </span>
-                ) : resultTabData.elapsed ? (
-                  <span className={styles.sqlResultCount}>{resultTabData.elapsed}</span>
-                ) : null}
-              </div>
+              {/* Mirrors TableViewerPane's layout — table first, then the
+                  row-count footnote — so the Result tab reads exactly like
+                  the table tabs. The execution time rides along in the
+                  footnote instead of a separate info bar above the table. */}
               {resultTabData.error ? (
                 <div className={styles.sqlMessage} style={{ color: "var(--ch-red)" }}>
                   {resultTabData.error}
                 </div>
               ) : resultTabData.resultSet && resultTabData.resultSet.columns.length > 0 ? (
                 resultTabData.resultSet.values.length === 0 ? (
-                  <div className={styles.sqlEmptyResult}>Query returned no rows.</div>
+                  <>
+                    <div className={styles.sqlEmptyResult}>Query returned no rows.</div>
+                    <div className={styles.tableViewerFootnote}>
+                      0 rows
+                      {resultTabData.elapsed ? ` · ${resultTabData.elapsed}` : ""}
+                    </div>
+                  </>
                 ) : (
-                  <VirtualizedResultTable
-                    columns={resultTabData.resultSet.columns}
-                    values={resultTabData.resultSet.values}
-                    maxHeight={TABLE_VIEWER_HEIGHT}
-                  />
+                  <>
+                    <VirtualizedResultTable
+                      columns={resultTabData.resultSet.columns}
+                      values={resultTabData.resultSet.values}
+                      maxHeight={TABLE_VIEWER_HEIGHT}
+                    />
+                    <div className={styles.tableViewerFootnote}>
+                      {resultTabData.resultSet.values.length} row
+                      {resultTabData.resultSet.values.length === 1 ? "" : "s"}
+                      {resultTabData.elapsed ? ` · ${resultTabData.elapsed}` : ""}
+                    </div>
+                  </>
                 )
               ) : resultTabData.message ? (
-                <div className={styles.sqlMessage}>{resultTabData.message}</div>
+                <div className={styles.sqlMessage}>
+                  {resultTabData.message}
+                  {resultTabData.elapsed ? ` · ${resultTabData.elapsed}` : ""}
+                </div>
               ) : (
                 <div className={styles.sqlMessage}>Running…</div>
               )}

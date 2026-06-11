@@ -32,6 +32,7 @@
     "sql-challenge-cards-postgres",
     "---",
     "multiple-choice",
-    "mermaid-test"
+    "mermaid-test",
+    "dataframe-stress-test"
   ]
 }

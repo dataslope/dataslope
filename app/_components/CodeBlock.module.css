@@ -253,45 +253,94 @@
 
 /* ─── DataFrame tables ─── */
 
-/* Mirrors `.dataframe-wrap` + `.out-cell.html table` in playground.css
-   so a DataFrame rendered inside a learning code block matches the
-   playground's table chrome (accent-coloured headers, hover rows,
-   horizontal scroll for wide frames). */
+/* Pandas / polars / R data frames arrive as bare <table> markup (the
+   runtimes strip any injected <style> blocks). Typography: slightly
+   tightened Inter (--font-sans) at a compact size with minimal vertical
+   padding — a Jupyter-style dense table. The table is content-width
+   (like Jupyter), never stretched, and the wrapper scrolls horizontally
+   for wide frames. The wrapper also carries `not-prose` so the docs'
+   prose typography (serif font, table margins, roomy cell padding)
+   can't restyle the cells.
+
+   Selectors use `table th` / `table td` (specificity 0,1,2) so they
+   outrank the learn.css prose-typography rules regardless of stylesheet
+   order. */
 .dataframeWrap {
   overflow-x: auto;
-  padding: 12px;
+  padding: 10px 12px;
+  /* .outCellBody renders text cells with pre-wrap; the newlines between
+     the tags of pandas' HTML must not become blank lines above/below
+     the table. */
+  white-space: normal;
 }
 
 .dataframeWrap :global(table) {
   border-collapse: collapse;
-  font-family: var(--cb-font-mono);
+  font-family: var(--font-sans, Inter, system-ui, sans-serif);
+  letter-spacing: -0.011em;
   font-size: 12.5px;
+  line-height: 1.45;
   color: var(--cb-text);
-  width: 100%;
-  min-width: max-content;
+  width: auto;
+  margin: 0;
+  border: 1px solid var(--cb-border);
 }
-.dataframeWrap :global(th) {
-  padding: 7px 14px;
+.dataframeWrap :global(table th) {
+  padding: 3px 10px;
   background: var(--cb-bg3);
   border-bottom: 1px solid var(--cb-border);
   border-right: 1px solid var(--cb-border);
   text-align: left;
   font-weight: 600;
+  font-size: 12px;
+  line-height: 1.45;
   color: var(--cb-accent);
   white-space: nowrap;
 }
-.dataframeWrap :global(td) {
-  padding: 6px 14px;
+.dataframeWrap :global(table td) {
+  padding: 2px 10px;
   border-bottom: 1px solid var(--cb-border);
   border-right: 1px solid var(--cb-border);
   white-space: nowrap;
   color: var(--cb-text-muted);
+  /* One enormous value shouldn't blow out its column — clip with an
+     ellipsis (pandas itself truncates cell text, R values can be long). */
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dataframeWrap :global(table th:last-child),
+.dataframeWrap :global(table td:last-child) {
+  border-right: none;
 }
 .dataframeWrap :global(tr:hover td) {
   background: var(--cb-bg3);
 }
 .dataframeWrap :global(tr:last-child td) {
   border-bottom: none;
+}
+/* Middle-truncation marker cells/columns (R runtime) — pandas renders
+   its own "..." cells which inherit the same muted colour. */
+.dataframeWrap :global(tr.dataframe-ellipsis-row td),
+.dataframeWrap :global(.dataframe-ellipsis-col) {
+  text-align: center;
+  color: var(--cb-text-dim);
+}
+/* Footer row stating the full row/column count of a truncated frame. */
+.dataframeWrap :global(td.dataframe-rows-footer) {
+  padding: 3px 10px;
+  font-size: 11.5px;
+  color: var(--cb-text-dim);
+  font-style: italic;
+  text-align: right;
+  border-top: 1px solid var(--cb-border);
+}
+/* Dimensions line pandas appends below a truncated frame
+   ("100 rows × 40 columns"). */
+.dataframeWrap :global(p) {
+  margin: 6px 0 0;
+  font-size: 11.5px;
+  color: var(--cb-text-dim);
 }
 
 /* ─── Running overlay (sine-wave animation) ──────────────────────────

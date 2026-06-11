@@ -1418,40 +1418,56 @@ body.playground-active {
   word-break: break-word;
 }
 
-/* DataFrame tables */
+/* DataFrame tables — kept in lockstep with `.dataframeWrap` in
+   CodeBlock.module.css and `.outCellHtml` in ChallengeCard.module.css:
+   slightly tightened Inter (--font-sans) at a compact size with minimal
+   vertical padding, content-width like a Jupyter table. */
 .out-cell.html .out-cell-body {
   overflow-x: auto;
   padding: 0;
 }
 .dataframe-wrap {
   overflow-x: auto;
-  padding: 12px;
+  padding: 10px 12px;
 }
 
 .out-cell.html table {
   border-collapse: collapse;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans, Inter, system-ui, sans-serif);
+  letter-spacing: -0.011em;
   font-size: 12.5px;
+  line-height: 1.45;
   color: var(--text);
-  width: 100%;
-  min-width: max-content;
+  width: auto;
+  margin: 0;
+  border: 1px solid var(--border);
 }
 .out-cell.html th {
-  padding: 7px 14px;
+  padding: 3px 10px;
   background: var(--bg3);
   border-bottom: 1px solid var(--border);
   border-right: 1px solid var(--border);
   text-align: left;
   font-weight: 600;
+  font-size: 12px;
+  line-height: 1.45;
   color: var(--primary);
   white-space: nowrap;
 }
 .out-cell.html td {
-  padding: 6px 14px;
+  padding: 2px 10px;
   border-bottom: 1px solid var(--border);
   border-right: 1px solid var(--border);
   white-space: nowrap;
   color: var(--text-muted);
+  /* One enormous value shouldn't blow out its column. */
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.out-cell.html th:last-child,
+.out-cell.html td:last-child {
+  border-right: none;
 }
 .out-cell.html tr:hover td {
   background: var(--bg3);
@@ -1459,16 +1475,16 @@ body.playground-active {
 .out-cell.html tr:last-child td {
   border-bottom: none;
 }
-/* Ellipsis row shown when a data frame is truncated (R runtime). */
-.out-cell.html .dataframe-ellipsis-row td {
+/* Middle-truncation marker cells/columns (R runtime) — pandas renders
+   its own "..." cells which inherit the same muted colour. */
+.out-cell.html .dataframe-ellipsis-row td,
+.out-cell.html .dataframe-ellipsis-col {
   text-align: center;
   color: var(--text-dim);
-  letter-spacing: 0.15em;
-  background: var(--bg2);
 }
-/* Footer row that states total row count for truncated data frames. */
+/* Footer row that states the full row/column count for truncated frames. */
 .out-cell.html .dataframe-rows-footer {
-  padding: 5px 14px;
+  padding: 3px 10px;
   font-size: 11.5px;
   color: var(--text-dim);
   font-style: italic;
@@ -1480,6 +1496,12 @@ body.playground-active {
    cell keeps its top border. */
 .out-cell.html tfoot tr:last-child td {
   border-bottom: none;
+}
+/* Dimensions line pandas appends below a truncated frame. */
+.out-cell.html .dataframe-wrap p {
+  margin: 6px 0 0;
+  font-size: 11.5px;
+  color: var(--text-dim);
 }
 
 /* Plotly chart */

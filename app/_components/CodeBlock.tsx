@@ -1425,9 +1425,11 @@ function OutputCellView({
         {cell.type === "html" ? (
           // Same trust assumption as the main playground: HTML cells are
           // produced by the embedded runtime executing code the user
-          // themselves typed in this very widget.
+          // themselves typed in this very widget. `not-prose` keeps the
+          // docs' prose typography (serif, table margins) from restyling
+          // the dataframe markup when the block sits inside MDX content.
           <div
-            className={styles.dataframeWrap}
+            className={`${styles.dataframeWrap} not-prose`}
             dangerouslySetInnerHTML={{ __html: cell.content }}
           />
         ) : cell.type === "image" ? (
