@@ -227,7 +227,7 @@ export function useShortId(prefix: string): string {
 // just the test name; the description, the test's code/checks, and the
 // exact error message live in a click-popover so the list stays clean.
 
-import { Check, Info } from "lucide-react";
+import { Info } from "lucide-react";
 import { Popover } from "@base-ui-components/react/popover";
 import railStyles from "./ChallengeCard.module.css";
 
@@ -263,11 +263,13 @@ export function TestResultsRail({
         <div key={t.id} className={railStyles.testRailRow}>
           <div className={railStyles.testRailTrack} aria-hidden>
             <span className={railStyles.testRailNode} data-state={t.state}>
-              {t.state === "pass" ? (
-                <Check size={11} strokeWidth={3.2} aria-hidden />
-              ) : t.state === "fail" ? (
+              {/* Failures keep the ✕ for emphasis; passing/pending
+                  circles carry the 1-based test number. */}
+              {t.state === "fail" ? (
                 <X size={11} strokeWidth={3.2} aria-hidden />
-              ) : null}
+              ) : (
+                i + 1
+              )}
             </span>
             {i < tests.length - 1 && (
               <span className={railStyles.testRailSeg} data-state={t.state} />

@@ -30,7 +30,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
-import { RotateCcw, Check, X, ChevronDown, ChevronUp, Eye, File, FileInput, Info, Play, Terminal, Timer } from "lucide-react";
+import { RotateCcw, Check, CheckCheck, ListChecks, ListX, X, ChevronDown, ChevronUp, Eye, File, FileInput, Info, Play, Terminal, Timer } from "lucide-react";
 import { Menu } from "@base-ui-components/react/menu";
 import {
   CopyIcon,
@@ -1903,18 +1903,20 @@ export default function ChallengeCard({
             onClick={() => setTestListOpen((v) => !v)}
             aria-expanded={testListOpen}
           >
-            <span className={styles.testLabel}>Test Results</span>
+            <span className={styles.testLabel} data-state={summaryState}>
+              Test Results
+            </span>
             <div className={styles.testSummary}>
               <span className={styles.testPill} data-state={summaryState}>
                 {summaryState === "pending" ? (
                   "Running…"
                 ) : summaryState === "pass" ? (
                   <>
-                    <Check size={10} strokeWidth={3} aria-hidden /> {passedCount}/{totalTests} passed
+                    <ListChecks size={11} strokeWidth={2.5} aria-hidden /> {passedCount}/{totalTests} passed
                   </>
                 ) : (
                   <>
-                    <X size={10} strokeWidth={3} aria-hidden /> {passedCount}/{totalTests} passed
+                    <ListX size={11} strokeWidth={2.5} aria-hidden /> {passedCount}/{totalTests} passed
                   </>
                 )}
               </span>
@@ -1945,28 +1947,19 @@ export default function ChallengeCard({
           data-state={bannerState}
           data-testid="challenge-banner"
         >
-          <div className={styles.bannerIcon}>
-            {bannerState === "pass" ? (
-              <Check size={14} strokeWidth={2.5} aria-hidden />
-            ) : (
-              <X size={14} strokeWidth={2.5} aria-hidden />
-            )}
-          </div>
           {bannerState === "pass" ? (
-            <span>
-              All tests passed!{" "}
-              <span className={styles.bannerSub}>
-                Great work — your solution is correct.
-              </span>
-            </span>
+            <>
+              <CheckCheck size={16} strokeWidth={2.5} aria-hidden />
+              <span>All tests passed!</span>
+            </>
           ) : (
-            <span>
-              {totalTests - passedCount} test
-              {totalTests - passedCount === 1 ? "" : "s"} failed{" "}
-              <span className={styles.bannerSub}>
-                — review the details and try again.
+            <>
+              <X size={16} strokeWidth={2.5} aria-hidden />
+              <span>
+                {totalTests - passedCount} test
+                {totalTests - passedCount === 1 ? "" : "s"} failed
               </span>
-            </span>
+            </>
           )}
         </div>
       )}

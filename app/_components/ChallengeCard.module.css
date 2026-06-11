@@ -1331,7 +1331,7 @@
 .accentBar {
   width: 4px;
   height: 20px;
-  background: var(--ch-green-dot);
+  background: var(--ds-blue-500);
   border-radius: 2px;
   margin-right: 10px;
   flex-shrink: 0;
@@ -1346,12 +1346,12 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--ch-text-muted);
+  color: var(--ds-blue-500);
 }
 
 .outputTime {
   margin-left: auto;
-  font-size: 12.5px;
+  font-size: 11.5px;
   color: var(--ch-text-muted);
   font-family: var(--ch-font-mono);
   display: inline-flex;
@@ -1642,9 +1642,11 @@
 
 /* ─── Test panel ──────────────────────────────────────────────────── */
 
+/* Transparent in both themes — the section sits directly on the card
+   surface to keep the design clean. */
 .testPanel {
   border-top: 1px solid var(--ch-border-light);
-  background: var(--ch-bg-muted);
+  background: transparent;
 }
 
 .testPanelHeader {
@@ -1671,6 +1673,16 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ch-text-muted);
+}
+
+/* The label takes the verdict colour (brand 500 shades) once results
+   are in. */
+.testLabel[data-state="pass"] {
+  color: var(--ds-green-500);
+}
+
+.testLabel[data-state="fail"] {
+  color: var(--ds-red-500);
 }
 
 .testSummary {
@@ -1759,6 +1771,11 @@
   flex-shrink: 0;
   /* Centers the circle on the row's text line. */
   margin-top: 2px;
+  /* Passing/pending circles carry the 1-based test number. */
+  font-family: var(--ch-font-ui);
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1;
 }
 
 .testRailNode[data-state="pass"] {
@@ -1772,6 +1789,7 @@
 .testRailNode[data-state="pending"] {
   background: transparent;
   border: 2px solid var(--ch-border);
+  color: var(--ch-text-muted);
 }
 
 .testRailSeg {
@@ -1817,6 +1835,11 @@
   margin-bottom: 0;
 }
 
+.testRailName {
+  color: var(--ch-text-secondary);
+  font-weight: 500;
+}
+
 .testRailItemBtn:hover .testRailName,
 .testRailItemBtn:focus-visible .testRailName {
   text-decoration: underline;
@@ -1859,6 +1882,7 @@
   --ch-text-secondary: var(--ds-gray-500);
   --ch-text-muted: var(--ds-gray-400);
   --ch-red: var(--ds-red-600);
+  --ch-green: var(--ds-green-600);
   --ch-font-ui: "Inter", system-ui, -apple-system, sans-serif;
   --ch-font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
 
@@ -1879,6 +1903,7 @@
   --ch-text-secondary: #b0b0b0;
   --ch-text-muted: #808080;
   --ch-red: var(--ds-red-400);
+  --ch-green: var(--ds-green-400);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
 }
 
@@ -1921,8 +1946,14 @@
   flex-shrink: 0;
 }
 
+/* Verdict word takes the state colour (theme-aware via the token block
+   on .testPopover above); pending stays muted. */
+.testPopoverState[data-state="pass"] {
+  color: var(--ch-green);
+}
+
 .testPopoverState[data-state="fail"] {
-  color: var(--ds-red-500);
+  color: var(--ch-red);
 }
 
 .testPopoverDesc {
@@ -1963,45 +1994,30 @@
 
 /* ─── Status banner ───────────────────────────────────────────────── */
 
-/* Solid colour band, white text, no top border — green-500 / red-500 in
-   light mode, the 600 shades in dark mode (see the html.dark overrides
-   near the end of this file). */
+/* Quiet, centered verdict line on a transparent background — a bare
+   icon + short text in the verdict colour, no band or icon well. */
 .banner {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  gap: 8px;
   padding: 12px 20px;
   border-top: none;
   font-size: 14px;
   font-weight: 500;
-  color: #fff;
+  background: transparent;
 }
 
 .banner[data-state="pass"] {
-  background: var(--ds-green-500);
+  color: var(--ds-green-500);
 }
 
 .banner[data-state="fail"] {
-  background: var(--ds-red-500);
+  color: var(--ds-red-500);
 }
 
-.bannerIcon {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.banner svg {
   flex-shrink: 0;
-  /* Lightened well of the band colour so the white check / ✕ reads. */
-  background: rgba(255, 255, 255, 0.22);
-}
-
-.bannerSub {
-  font-size: 13px;
-  font-weight: 400;
-  opacity: 0.8;
-  margin-left: 2px;
 }
 
 /* ─── SQL result table ────────────────────────────────────────────────
@@ -2266,23 +2282,16 @@
   background: #222222;
 }
 
-/* The test pill, status banner, and test rail use solid green/red fills
-   with white text in both themes — light uses the 500 shades; dark steps
-   down to the 600 shades below so the bands sit more comfortably on dark
-   surfaces. */
+/* The test pill and test rail use solid green/red fills with white
+   text/numerals in both themes — light uses the 500 shades; dark steps
+   down to the 600 shades below so the fills sit more comfortably on
+   dark surfaces. (The status banner is transparent with verdict-coloured
+   text, so it adapts via the --ch-* tokens and needs nothing here.) */
 :global(html.dark) .testPill[data-state="pass"] {
   background: var(--ds-green-600);
 }
 
 :global(html.dark) .testPill[data-state="fail"] {
-  background: var(--ds-red-600);
-}
-
-:global(html.dark) .banner[data-state="pass"] {
-  background: var(--ds-green-600);
-}
-
-:global(html.dark) .banner[data-state="fail"] {
   background: var(--ds-red-600);
 }
 
