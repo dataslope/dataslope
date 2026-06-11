@@ -8,6 +8,22 @@ sequence of `char` ending in a zero byte (`'\0'`). Every function in
 `<string.h>` relies on that single byte to know where the string
 stops.
 
+It did not have to be this way. The other classic design —
+used by Pascal, and by many languages since — stores the *length*
+in front of the characters, so the runtime always knows where a
+string ends without scanning it. Thompson, Ritchie, and Kernighan
+chose the terminator instead, probably because it made strings of
+any length cost exactly one extra byte on the tiny machines Unix
+ran on. In 2011, veteran FreeBSD developer Poul-Henning Kamp wrote
+an ACM Queue essay calling that choice
+*"The Most Expensive One-Byte Mistake"*: four decades of buffer
+overflows, `strlen` scans, and security advisories, all downstream
+of one byte saved per string in 1970. Whether or not you accept his
+accounting, the lesson of this page is that the terminator is a
+**convention enforced by nothing**. The language will not stop you
+from losing it — and the moment a string loses its `'\0'`, every
+function in `<string.h>` becomes a loaded gun.
+
 ## Null-terminated character arrays
 
 ```mermaid

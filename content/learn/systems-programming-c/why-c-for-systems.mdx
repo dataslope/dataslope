@@ -73,6 +73,29 @@ the language — and what *not* to expect.
   </g>
 </svg>
 
+## A language named after its predecessor
+
+C did not appear from nowhere — it is the third draft of an idea.
+At Bell Labs in the late 1960s, Ken Thompson wrote **B**, a
+stripped-down descendant of the British language BCPL, to program a
+cast-off PDP-7 minicomputer. B had a fatal limitation: it knew only
+one data type, the machine word. That was tolerable on the
+word-addressed PDP-7, but the new PDP-11 the Unix group acquired in
+1970 was *byte*-addressed, and B simply could not express "a byte"
+or "a structure." So Ritchie extended B with types and structs, and
+the extended language needed a name. After B came **C** — the joke
+writes itself, and yes, people immediately began asking whether the
+successor would be called D or P (the next letter in "BCPL").
+
+The payoff came in 1973, when Thompson and Ritchie rewrote the Unix
+kernel itself in C. This was a radical act: operating systems were
+written in assembly, period, because nothing else was believed fast
+enough. A kernel in a high-level language meant the *operating
+system itself* became portable — and when Unix spread to new
+machines in the late 1970s, C went everywhere with it. Twenty years
+later, Ritchie summed up his creation with characteristic dryness:
+*"C is quirky, flawed, and an enormous success."*
+
 ## C runs the world
 
 | Software | Written in |

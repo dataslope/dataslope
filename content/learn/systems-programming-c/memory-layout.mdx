@@ -181,6 +181,15 @@ A common surprise: declaring a 10-million-element zero-initialized
 global does **not** make your binary 40 MB larger, because BSS is
 "described by metadata" rather than stored as bytes.
 
+The name, by the way, is one of computing's oldest living fossils.
+"Block Started by Symbol" was an assembler directive on the IBM 704
+in the mid-1950s — a machine programmed with punched cards, a decade
+before C existed. The directive reserved a block of memory without
+storing its contents, which is exactly what the segment still does.
+Like `a.out` from the toolchain chapter, it is a name that outlived
+every machine, operating system, and programmer fashion of its era
+because the *idea* it names never stopped being useful.
+
 <svg
   viewBox="0 0 640 180"
   role="img"

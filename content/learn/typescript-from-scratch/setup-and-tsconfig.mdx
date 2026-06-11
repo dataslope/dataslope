@@ -298,7 +298,7 @@ if (name !== null) {
 }
 ```
 
-This eliminates the "billion-dollar mistake" — `TypeError: Cannot read property 'x' of null/undefined` — which plagues JavaScript.
+This eliminates the famous "billion-dollar mistake." That phrase is Tony Hoare's own: he invented the null reference for ALGOL W in 1965 ("simply because it was so easy to implement," he said), and in a 2009 conference talk he publicly apologized, estimating that null dereferences had cost the industry a billion dollars in crashes and vulnerabilities over the decades since. JavaScript inherited the mistake *twice over* — it has both `null` and `undefined` — which makes `strictNullChecks` arguably the single highest-value flag in the entire compiler.
 
 <svg
   viewBox="0 0 640 210"
@@ -501,7 +501,7 @@ If you're building a browser app, add `"DOM"` and `"DOM.Iterable"` to `lib`. If 
 
 ## Running TypeScript in the browser (this course)
 
-Every code block on this site is a live TypeScript environment. The TypeScript compiler runs in your browser (via WebAssembly), type-checks your code, transpiles it to JavaScript, and executes it using [almostnode](https://almostnode.dev/) — a browser-based Node.js runtime.
+Every code block on this site is a live TypeScript environment. The TypeScript compiler runs in your browser, transpiles your code to JavaScript, and executes it using [almostnode](https://almostnode.dev/) — a browser-based Node.js runtime. (Like a production build, the in-page runner erases the types before executing; the red-squiggle, refuse-to-build experience described on this page is what `tsc` and your editor add on a real machine.)
 
 Try it:
 
@@ -518,8 +518,8 @@ function greet(name: string): string {
 console.log(greet("Ada"));
 console.log(greet("Grace"));
 
-// Uncomment the next line to see a type error:
-// console.log(greet(42));  // Argument of type 'number' is not assignable to parameter of type 'string'.
+// Under tsc, calling greet(42) is a compile error:
+// "Argument of type 'number' is not assignable to parameter of type 'string'."
 `,
     },
   ]}

@@ -293,10 +293,13 @@ of the page buffer — into whatever happened to be in the next memory
 region.
 
 **Bug class:** *off-by-one*, leading to a buffer over-read.
-**Fallout:** Cloudflare estimated ~3,400 customer sites were
-affected and ~770,000 requests potentially leaked sensitive data.
-The fix was a single character; the cleanup (purging caches
-worldwide) took weeks.
+**Fallout:** during the worst stretch, Cloudflare estimated that
+roughly 1 in every 3.3 million HTTP requests passing through its
+edge leaked memory — a tiny rate multiplied by an enormous volume of
+traffic, over a period of months. The fix was a single character;
+the cleanup — hunting down and purging leaked fragments from search
+engine caches across the entire web — took weeks of coordinated
+work with Google, Bing, and others.
 
 ## 6. Stagefright (2015) — Android, a media file, and one integer overflow
 
@@ -469,15 +472,19 @@ widely studied accident reports in software engineering. The lesson
 different environment"* — applies directly to porting C code across
 architectures.
 
-## 12. PlayStation 3 hypervisor break (2010) — `hvcall_repository_node_lookup`
+## 12. PlayStation 3 hypervisor break (2010) — a glitch and a dangling mapping
 
-George Hotz published a glitch attack against the PS3 hypervisor
-that, combined with carefully chosen hypervisor calls, allowed
-arbitrary read/write of hypervisor memory. The root cause was that
-the hypervisor handled a freed memory region in a way that allowed
-an unprivileged guest to *re-allocate the same physical page* and
-read or modify hypervisor state through it — essentially a
-hypervisor-scope use-after-free.
+In January 2010, George Hotz (geohot) published an attack on the
+PS3's hypervisor — the privileged layer that kept the console's
+"OtherOS" Linux feature safely caged. His technique combined
+software and a literal hardware glitch: he had Linux ask the
+hypervisor to create and then tear down memory mappings while he
+pulsed a wire on the memory bus at precisely the wrong moment, so
+the hypervisor's *deallocation write was lost in transit*. The
+hypervisor believed a mapping was gone; the page tables still
+contained it. Through that dangling, stale mapping he could read
+and write hypervisor-owned memory — in effect, a use-after-free
+where the "free" itself was sabotaged from outside the software.
 
 **Bug class:** use-after-free across a privilege boundary.
 **Fallout:** "OtherOS" Linux support on the PS3 was permanently

@@ -1,17 +1,63 @@
 ---
 title: The Birth of TypeScript
-description: The story of how Microsoft built a static type system on top of JavaScript — and why it succeeded where others failed.
+description: How a language built in ten days conquered the world, hit a maintainability wall, and got a type system bolted on by one of the great compiler designers.
 ---
 
-By 2010, large JavaScript applications were everywhere. They were also incredibly fragile. A single typo — `user.emial` instead of `user.email` — could hide in a codebase for months, lurking until the right (wrong) code path triggered a runtime error. Refactoring a function used in fifty places meant manually hunting down every call site and hoping you didn't miss one. Your IDE's "Find All References" barely worked because JavaScript is so dynamic.
+JavaScript was never designed for what we ask of it. In May 1995,
+Netscape gave a programmer named **Brendan Eich ten days** to build a
+scripting language for the browser — something forgiving and small,
+meant for sprinkling a little interactivity onto web pages. It worked
+far better than anyone planned. The AJAX revolution of 2004–2005
+(Gmail, Google Maps) turned web pages into applications; **Node.js**
+in 2009 carried JavaScript onto servers; and by 2010 the ten-day
+prototype language was running codebases of hundreds of thousands of
+lines, maintained by teams of dozens. (The full, decade-by-decade
+version of that story is great reading, and it lives in this
+course's appendix:
+[The Evolution of JavaScript](./evolution-of-javascript). You don't
+need it to continue — what you need is the problem it created.)
 
-Developers felt the pain acutely:
+The problem was that JavaScript's forgiving nature stops being
+charming at scale. Run this — it executes without a single
+complaint:
 
-- **At 3am**, your pager goes off: `TypeError: Cannot read property 'map' of undefined`. You forgot that `/api/users` sometimes returns `null` instead of an array.
-- **During a refactor**, you rename `calculatePrice(item)` to `calculatePrice(item, taxRate)`. You update 47 of the 50 call sites. The other three silently pass `undefined` for `taxRate`. Your unit tests don't catch it because those code paths only run in production under rare conditions.
-- **While onboarding**, a new developer asks, "What shape does this function expect?" You point them to a 500-line JSDoc comment that's six months out of sync with the code.
+<CodeBlock
+  adapter="typescript"
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `// Four lines of perfectly legal JavaScript chaos:
+console.log("5" + 3); // "53"  (string concatenation)
+console.log("5" - 3); // 2     (numeric subtraction!)
+console.log(5 + null); // 5    (null quietly becomes 0)
+console.log(5 + undefined); // NaN
 
-The tools didn't help. JavaScript's dynamism — its greatest strength for quick prototyping — made it nearly impossible for editors to provide reliable autocomplete, refactoring, or go-to-definition. The language itself offered no way to declare contracts or constraints.
+// And the classic: a typo that nobody will notice for months.
+const user = { name: "Alice", age: 30, email: "alice@example.com" };
+console.log(user.emial); // undefined — no error, no warning
+`,
+    },
+  ]}
+/>
+
+That last line is the one that ruins weekends. `user.emial` is not an
+error in JavaScript — it is merely a property that doesn't exist, so
+you get `undefined`, which flows silently through your program until
+some distant function calls `.toLowerCase()` on it and pages you at
+3am. In a 1,000-line script you'd spot it. In a 100,000-line
+application split across dozens of modules and maintained by a
+rotating cast of developers, these bugs are a tax on everything:
+refactoring means manually hunting down every call site and hoping;
+onboarding means absorbing tribal knowledge about what shape each
+function secretly expects; "Find All References" barely works
+because the editor can't reason about a language this dynamic.
+
+Teams tried workarounds — JSDoc comments that nothing enforced,
+linters that couldn't reason about types, runtime assertions that
+bloated every function. None of it solved the core problem:
+**JavaScript had no static type system**, so nothing could check,
+before the code ran, whether a variable held a string or a number,
+or whether an object actually had a `save()` method.
 
 <svg
   viewBox="0 0 640 240"
@@ -139,7 +185,7 @@ timeline
     title TypeScript's Journey
     2010 : Microsoft internal team starts project
     2012 Oct : TypeScript 0.8 public announcement
-               Anders Hejlsberg presents at Microsoft's BUILD conference
+               Anders Hejlsberg introduces the language in a launch video
     2013 : TypeScript 0.9 adds generics
     2014 : TypeScript 1.0 released (production-ready)
            Facebook releases Flow (main competitor)
@@ -151,13 +197,13 @@ timeline
     2018 : TypeScript 3.0 (project references for monorepos)
     2019 : TypeScript becomes default for new projects in many surveys
     2020 : TypeScript 4.0 (variadic tuple types, labeled tuple elements)
-    2023 : Over 3 million npm packages use TypeScript
+    2023 : Used by nearly 39 percent of professional developers (Stack Overflow survey)
            TypeScript is the default for serious JavaScript projects
 ```
 
 ## The October 2012 announcement
 
-On October 1, 2012, Microsoft unveiled **TypeScript 0.8** at the BUILD developer conference. Hejlsberg demoed the language live, showing how a simple JavaScript object could gain type safety with a single annotation:
+On October 1, 2012, Microsoft unveiled **TypeScript 0.8** to the public, with Hejlsberg introducing the language on camera and showing how a simple JavaScript object could gain type safety with a single annotation:
 
 <CodeBlock
   adapter="typescript"
@@ -192,7 +238,7 @@ console.log(typedUser.name); // Still works
   ]}
 />
 
-Try uncommenting that last line in the code block above. You'll see the TypeScript compiler catch the typo *before* the code runs. That's the magic: **types as documentation that the compiler enforces.**
+That commented-out last line is the whole pitch. In an editor, `typedUser.emial` gets a red squiggle the instant you type it, and `tsc` refuses to build until it's fixed: *Property 'emial' does not exist on type 'User'. Did you mean 'email'?* — the compiler even guesses the fix. That's the magic Hejlsberg demonstrated: **types as documentation that the compiler enforces.**
 
 The initial reaction was mixed. JavaScript purists worried Microsoft was trying to "embrace, extend, extinguish" their beloved language. Skeptics pointed out that Closure Compiler and other tools had tried annotations before. Why would this succeed?
 
@@ -243,14 +289,14 @@ Looking back, TypeScript's success came from getting the fundamentals right:
 
 ## The modern landscape
 
-In 2024, TypeScript is the default for serious JavaScript development. It powers:
+Today, TypeScript is the default for serious JavaScript development. It powers:
 
 - **Frontend frameworks**: React, Vue, Angular, Svelte, Solid all have first-class TypeScript support
 - **Backend frameworks**: Express, Fastify, NestJS, tRPC, Deno (Deno is TypeScript-first by design)
 - **Tools and libraries**: VS Code, Jest, Storybook, ESLint, Prettier
 - **Platforms**: AWS CDK, Terraform CDK, GitHub Actions
 
-A 2023 Stack Overflow survey found that **over 38%** of professional developers use TypeScript — more than C, C++, or Go. npm reports that **over 60%** of new projects** include TypeScript.
+The 2023 Stack Overflow Developer Survey found that nearly **39%** of professional developers use TypeScript — more than C, C++, or Go — and it has ranked among the survey's most admired languages year after year.
 
 The question is no longer "Should we use TypeScript?" but "How strict should our `tsconfig.json` be?"
 

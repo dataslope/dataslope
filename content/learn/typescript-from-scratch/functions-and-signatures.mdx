@@ -292,8 +292,12 @@ properties (e.g., a function with a `.version` property).
   version: string;
 }
 
-const increment: CallableWithVersion = ((x: number) => x + 1) as any;
-increment.version = "1.0.0";
+// Object.assign merges the function with the extra property in one
+// step, so the compiler can verify the combined shape — no casts.
+const increment: CallableWithVersion = Object.assign(
+  (x: number) => x + 1,
+  { version: "1.0.0" },
+);
 
 console.log("increment(5):", increment(5));
 console.log("version:", increment.version);

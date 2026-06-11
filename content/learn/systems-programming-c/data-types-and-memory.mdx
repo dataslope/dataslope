@@ -313,6 +313,20 @@ disk or send them over a network; protocols like TCP/IP standardize
 on big-endian ("network byte order") and provide `htonl` / `ntohl` to
 convert.
 
+<Callout type="info" title="Why &quot;endian&quot;? Blame Jonathan Swift">
+The names come from *Gulliver's Travels* (1726), in which the empire
+of Lilliput fights a bitter civil war over which end of a boiled egg
+to crack first — the Big-Endians versus the Little-Endians. In 1980,
+network engineer Danny Cohen borrowed the names for a satirical
+memo, *"On Holy Wars and a Plea for Peace"* (IEN 137, dated April
+1), pointing out that the byte-order argument raging between
+computer architectures was exactly as theological as Swift's egg
+war: both orders work fine, and the only real sin is failing to
+agree. The names stuck; the holy war, as you can see from the table
+above, was never fully resolved — we just learned to convert at the
+border.
+</Callout>
+
 ## Alignment
 
 Most CPUs read memory most efficiently when an `N`-byte type lives at

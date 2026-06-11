@@ -217,9 +217,9 @@ Suppose you rename `fullName` to `name`. Every place that accesses `.fullName` b
 
 ---
 
-## The Compiler Pipeline
+## The Pipeline, Revisited
 
-The TypeScript compiler is organized into phases:
+Back in [How TypeScript Works](./how-typescript-works), near the very start of the course, we walked through the compiler's stages — scanner, parser, binder, checker, emitter — when most of them were still abstractions. Now you can read the same diagram with different eyes: every guarantee on this page is the **Checker** doing its job, and everything you've learned since (narrowing, discriminated unions, generics, mapped types) is vocabulary the checker reasons in.
 
 ```mermaid
 graph TD
@@ -233,29 +233,7 @@ graph TD
     style G fill:#d4edda
 ```
 
-1. **Scanner**: Breaks source code into tokens (keywords, identifiers, operators).
-2. **Parser**: Builds an Abstract Syntax Tree (AST) from tokens.
-3. **Binder**: Resolves identifiers to their declarations, builds symbol tables.
-4. **Checker**: Performs type checking, control flow analysis, and error reporting.
-5. **Emitter**: Generates JavaScript and type declarations (`.d.ts`).
-6. **Language Service**: Provides editor features (autocomplete, go-to-definition, refactoring).
-
-The **Checker** is the heart of static analysis. It's what proves your types are correct.
-
----
-
-## The Language Service
-
-The language service is a persistent process that runs in your editor (VS Code, IntelliJ, etc.). It provides:
-
-- **Autocomplete**: As you type, it suggests completions based on the type context.
-- **Type hints**: Hover over a variable to see its type.
-- **Go-to-definition**: Jump from a usage to its declaration.
-- **Find references**: Find all places a symbol is used.
-- **Quick fixes**: Suggest fixes for common errors (e.g., "Add missing property").
-- **Rename refactoring**: Rename a symbol across all files safely.
-
-All of these are powered by the same type checker that runs when you compile. The editor is constantly recompiling in the background, giving you instant feedback.
+Notice the arrow this chapter cares about: the checker feeds two consumers. The **emitter** uses it once per build. The **language service** uses it *continuously* — every keystroke in your editor re-runs the same analysis, which is why the red squiggle under `user.emial`, the autocomplete dropdown, "Find All References," and project-wide rename are not separate features bolted onto your editor. They are one type checker, asked different questions. When you rename `fullName` to `name` and twelve files light up with errors, that's static analysis acting as a refactoring engine: the compiler has a complete, always-current map of every place each symbol flows, so nothing can hide.
 
 <Callout type="info" title="The Editor Is Your Compiler">
 With TypeScript, the editor *is* the compiler. Every red squiggle, autocomplete suggestion, and refactor command is driven by the same type analysis that runs at build time. This tight integration is what makes TypeScript so productive.
@@ -396,13 +374,7 @@ Write a function \`processPayment(payment: Payment): string\` that handles all t
   files={[
     {
       filename: "main.ts",
-      initCode: `type Payment = any; // Replace 'any'
-
-function processPayment(payment: Payment): string {
-  return "Not implemented";
-}
-`,
-      starterCode: `type Payment = any;
+      starterCode: `type Payment = any; // Replace 'any' with the discriminated union
 
 function processPayment(payment: Payment): string {
   return "Not implemented";

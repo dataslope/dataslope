@@ -384,11 +384,11 @@ Brands are *not* necessary for:
 <ChallengeCard
   adapter="typescript"
   title="Branded Temperature Units"
-  instructions={`Create two branded types, \`Celsius\` and \`Fahrenheit\`, both based on \`number\`. Implement smart constructors \`toCelsius\` and \`toFahrenheit\`, and a conversion function \`celsiusToFahrenheit\` that accepts \`Celsius\` and returns \`Fahrenheit\`.
+  instructions={`The read-only setup defines two branded types, \`Celsius\` and \`Fahrenheit\` (both \`number\` underneath), plus their smart constructors. Implement \`celsiusToFahrenheit\` so it accepts a \`Celsius\` value and returns the equivalent \`Fahrenheit\` value.
 
-**Conversion formula**: \`F = C × 9/5 + 32\`
+**Conversion formula**: \`F = C × 9/5 + 32\` — so \`toCelsius(0)\` must convert to \`32\` and \`toCelsius(100)\` to \`212\`.
 
-The compiler should prevent passing \`Fahrenheit\` where \`Celsius\` is expected, and vice versa.`}
+Because the result type is branded, remember to cast your computed number with \`as Fahrenheit\` before returning it.`}
   files={[
     {
       filename: "main.ts",
@@ -404,28 +404,10 @@ function toCelsius(value: number): Celsius {
 
 function toFahrenheit(value: number): Fahrenheit {
   return value as Fahrenheit;
-}
-
+}`,
+      starterCode: `// The branded types and smart constructors are provided above.
 function celsiusToFahrenheit(c: Celsius): Fahrenheit {
-  // Implement conversion
-  return 0 as Fahrenheit;
-}
-`,
-      starterCode: `declare const CelsiusBrand: unique symbol;
-declare const FahrenheitBrand: unique symbol;
-
-type Celsius = number & { readonly [CelsiusBrand]: true };
-type Fahrenheit = number & { readonly [FahrenheitBrand]: true };
-
-function toCelsius(value: number): Celsius {
-  return value as Celsius;
-}
-
-function toFahrenheit(value: number): Fahrenheit {
-  return value as Fahrenheit;
-}
-
-function celsiusToFahrenheit(c: Celsius): Fahrenheit {
+  // Your code here: F = C × 9/5 + 32
   return 0 as Fahrenheit;
 }
 
@@ -433,21 +415,7 @@ const temp = toCelsius(0);
 const converted = celsiusToFahrenheit(temp);
 console.log(converted); // Should be 32
 `,
-      solutionCode: `declare const CelsiusBrand: unique symbol;
-declare const FahrenheitBrand: unique symbol;
-
-type Celsius = number & { readonly [CelsiusBrand]: true };
-type Fahrenheit = number & { readonly [FahrenheitBrand]: true };
-
-function toCelsius(value: number): Celsius {
-  return value as Celsius;
-}
-
-function toFahrenheit(value: number): Fahrenheit {
-  return value as Fahrenheit;
-}
-
-function celsiusToFahrenheit(c: Celsius): Fahrenheit {
+      solutionCode: `function celsiusToFahrenheit(c: Celsius): Fahrenheit {
   return ((c * 9) / 5 + 32) as Fahrenheit;
 }
 
@@ -538,7 +506,7 @@ export function sendEmail(to: Email, message: string): string {
       id: "out",
       name: "Sends valid email",
       description: "Output contains 'Sending'",
-      expect: { stdoutIncludes: "Sending" },
+      expect: { stdoutContains: "Sending" },
     },
   ]}
 />

@@ -172,6 +172,16 @@ When recursion is too deep — or a function declares a huge local
 array — you hit the end of the stack region and the program crashes
 with a stack overflow.
 
+The error is common enough to have a website named after it. When
+Jeff Atwood and Joel Spolsky launched their programming Q&A site in
+2008, they let readers vote on the name, and *Stack Overflow* won —
+a knowing joke that the place you go when your program crashes
+should be named after one of the crashes. The bug earned that fame
+honestly: it is one of the few failures that can happen *before
+your first line of code runs* (a too-large local array can blow the
+stack during function entry) and one of the few that recursion makes
+trivially easy to write.
+
 <svg
   viewBox="0 0 640 230"
   role="img"

@@ -150,6 +150,8 @@ welcomeUser({ id: "456", name: "Grace" }); // ✅ OK
 
 This is why TypeScript is often described as having **duck typing for compilers**: "If it looks like a duck and quacks like a duck, it's a duck."
 
+The phrase has a real lineage, and it's older than any programming language. The "duck test" — *if it looks like a duck, swims like a duck, and quacks like a duck, it's probably a duck* — was a piece of American folk reasoning long before computing. The Python community adopted it around 2000 to describe their language's habit of caring only about what an object can *do*, never what class it claims to be; Alex Martelli's postings on the comp.lang.python newsgroup are usually credited with cementing the term. TypeScript's contribution was to take this runtime philosophy and make a *compiler* enforce it: you get duck typing's flexibility, but the quack-check happens before the program ever runs.
+
 <Callout type="info" title="Contrast with Go's interfaces">
 Go also uses structural typing for interfaces, but it's stricter: a type must implement *all* methods of an interface to satisfy it. TypeScript is more permissive — extra properties are fine, and even functions can be structurally compatible if their parameter and return types align.
 </Callout>
@@ -370,16 +372,14 @@ TypeScript's structural typing gives you flexibility by default, but you can lay
 
 ## Challenge: Structural compatibility
 
-Let's test your understanding. You'll fix a function so it works with any object that has the required shape.
+Let's test your understanding. The function below is typed against a small `LogEntry` interface, and — thanks to structural typing — the program feeds it objects that were never declared as `LogEntry` but happen to have the right shape (plus extra fields). Your job is just the body.
 
 <ChallengeCard
   adapter="typescript"
-  title="Making a structurally compatible logger"
-  instructions={`The \`logItem\` function currently expects a specific \`LogEntry\` type, but we want it to work with *any* object that has \`level\` and \`message\` properties.
+  title="A structurally typed log formatter"
+  instructions={`Implement the body of \`formatEntry\` so it returns the entry's level in uppercase, wrapped in square brackets, followed by a space and the message — exactly like \`[INFO] App started\`.
 
-**Your task:**
-1. Change the parameter type of \`logItem\` from \`LogEntry\` to a more general shape.
-2. The test will pass various objects with extra properties — all should work as long as they have \`level\` and \`message\`.`}
+Note the two objects passed in \`main.ts\`: neither was declared as a \`LogEntry\`, and both carry extra properties (\`uptimeMs\`, \`stack\`). Structural typing accepts them anyway, because each has at least \`level\` and \`message\`.`}
   files={[
     {
       filename: "main.ts",
@@ -388,52 +388,51 @@ Let's test your understanding. You'll fix a function so it works with any object
   message: string;
 }
 
-// Fix this function's parameter type to accept any compatible shape
-function logItem(entry: LogEntry) {
-  console.log(\`[\${entry.level.toUpperCase()}] \${entry.message}\`);
+function formatEntry(entry: LogEntry): string {
+  // Your code here: return "[LEVEL] message", e.g. "[INFO] App started"
+  return "";
 }
 
-// These should all work:
-logItem({ level: "info", message: "App started" });
-logItem({ level: "error", message: "Crash", stack: "..." });
-logItem({ level: "warn", message: "Low memory", timestamp: Date.now() });
-`,
-      solutionCode: `// Solution: Keep the same interface, but TypeScript's structural typing
-// already allows extra properties on non-literal arguments.
-// The original code works as-is for stored objects!
+// Structural typing in action: not declared as LogEntry, extra
+// properties included — both are accepted because the shape fits.
+const boot = { level: "info", message: "App started", uptimeMs: 12 };
+const crash = { level: "error", message: "Crash", stack: "at main.ts:1" };
 
-interface LogEntry {
+console.log(formatEntry(boot));
+console.log(formatEntry(crash));
+`,
+      solutionCode: `interface LogEntry {
   level: string;
   message: string;
 }
 
-function logItem(entry: LogEntry) {
-  console.log(\`[\${entry.level.toUpperCase()}] \${entry.message}\`);
+function formatEntry(entry: LogEntry): string {
+  return \`[\${entry.level.toUpperCase()}] \${entry.message}\`;
 }
 
-// Store in variables to bypass excess property checking
-const entry1 = { level: "info", message: "App started" };
-const entry2 = { level: "error", message: "Crash", stack: "..." };
-const entry3 = { level: "warn", message: "Low memory", timestamp: Date.now() };
+const boot = { level: "info", message: "App started", uptimeMs: 12 };
+const crash = { level: "error", message: "Crash", stack: "at main.ts:1" };
 
-logItem(entry1);
-logItem(entry2);
-logItem(entry3);
+console.log(formatEntry(boot));
+console.log(formatEntry(crash));
 `,
     },
   ]}
   tests={[
     {
       id: "info",
-      name: "Logs info level",
-      description: "logItem({ level: 'info', message: '...' }) works",
-      code: `const entry = { level: "info", message: "Test" }; logItem(entry);`,
+      name: "Formats a plain entry",
+      description: "formatEntry({level:'info',message:'Test'}) === '[INFO] Test'",
+      code: `const r = formatEntry({ level: "info", message: "Test" });
+if (r !== "[INFO] Test") throw new Error("Expected '[INFO] Test', got: " + r);`,
     },
     {
       id: "extra",
-      name: "Allows extra properties",
-      description: "logItem({ level, message, extra }) works",
-      code: `const entry = { level: "debug", message: "Extra", extra: 123 }; logItem(entry);`,
+      name: "Accepts extra properties",
+      description: "An object with extra fields formats the same way",
+      code: `const e = { level: "warn", message: "Low memory", extra: 123 };
+const r = formatEntry(e);
+if (r !== "[WARN] Low memory") throw new Error("Expected '[WARN] Low memory', got: " + r);`,
     },
   ]}
 />

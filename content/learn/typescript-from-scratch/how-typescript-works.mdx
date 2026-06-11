@@ -67,31 +67,29 @@ Let's see this in action:
   files={[
     {
       filename: "main.ts",
-      starterCode: `// Plain JavaScript — no type annotations
-let x = 10;
-x = "hello"; // JavaScript allows this
-console.log(x);
-
-// TypeScript will accept the above (x has inferred type 'number',
-// but we reassign to string, which would be an error in strict mode)
-// Let's demonstrate explicit types:
+      starterCode: `let x = 10; // no annotation, but TypeScript infers x: number
+// x = "hello";  // tsc rejects this even without an annotation —
+//                  inference already locked x to 'number'.
 
 let y: number = 10;
-// y = "hello";  // Uncommenting this line causes a compile error:
-// Type 'string' is not assignable to type 'number'.
+// y = "hello";  // and this is the classic compile error:
+//                  Type 'string' is not assignable to type 'number'.
 
+console.log("x is", x);
 console.log("y is", y);
 
-// TypeScript checks the types, then erases them.
-// The compiled JS looks like:
-// let y = 10;
-// console.log("y is", y);
+// After checking, TypeScript erases the types. The JavaScript that
+// actually runs is just:
+//   let x = 10;
+//   let y = 10;
 `,
     },
   ]}
 />
 
-The code above shows the key mechanic: TypeScript checks that `y` is used consistently as a number. If you try to assign a string to `y`, the compiler stops you. But the *runtime* code — the JavaScript that actually executes — has no mention of `: number`. Types exist only at *compile time*.
+The code above shows the key mechanic: TypeScript checks that `x` and `y` are used consistently as numbers — whether the type came from an explicit annotation or from inference. But the *runtime* code — the JavaScript that actually executes — has no mention of `: number` at all. Types exist only at *compile time*.
+
+You can verify the "erased" half of that claim right here: this page's in-browser runner deliberately behaves like the *runtime* side of TypeScript — it strips the types and executes. If you uncomment `y = "hello"` and run, the sandbox will shrug and print `hello`, exactly as the compiled JavaScript would. The *checking* half is the compiler's job, done before the code ships; it's what your editor and `tsc` add on top. Holding both halves in your head — checked before, erased after — is the single most important model in this chapter.
 
 ## Compile time vs. runtime
 
@@ -160,6 +158,8 @@ We'll explore structural typing in depth later. For now, just know: **TypeScript
 ## The compiler pipeline
 
 When you run `tsc` (the TypeScript compiler) or save a file in VS Code, your code flows through a multi-stage pipeline. Each stage transforms or analyzes the code, building up information until the type checker can prove your program is safe (or report errors).
+
+Before we open it up, one detail worth savoring: **the TypeScript compiler is written in TypeScript.** Every stage you're about to read about — scanner, parser, binder, checker, emitter — is itself TypeScript source code, type-checked by an earlier build of itself. This is a classic compiler tradition called *self-hosting* (C's compilers are written in C, for the same reason), and it doubles as the ultimate confidence test: a language good enough to build its own hundred-thousand-line compiler is good enough for your application.
 
 Here's the high-level flow:
 

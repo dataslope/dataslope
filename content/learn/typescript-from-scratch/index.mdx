@@ -14,6 +14,53 @@ shape of modules. From there, we build up the *why* and *how* of
 TypeScript layer by layer, all the way to advanced type modeling and
 type-driven architecture.
 
+## This course runs in your browser — try it
+
+One thing before anything else: **every code block in this course is
+live.** The TypeScript compiler runs inside your browser tab,
+translates what you write into JavaScript, and executes it on the
+spot. Click *Run*:
+
+<CodeBlock
+  adapter="typescript"
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Mood = "delighted" | "curious" | "skeptical";
+
+function announce(mood: Mood, language: string): string {
+  return \`\${language} makes me \${mood}.\`;
+}
+
+console.log(announce("curious", "TypeScript"));
+console.log(announce("skeptical", "JavaScript"));
+
+// Change "skeptical" to "delighted" and press Run again.
+// That type on the first line is a real contract: in an editor or a
+// real project build, announce("bored", ...) is rejected before the
+// program ever runs, because "bored" is not a Mood.
+`,
+    },
+  ]}
+/>
+
+That little file already contains the whole idea of the course: a
+`type` that pins down exactly which values are allowed, a function
+whose signature declares its contract, and code you can edit and
+re-run in seconds. Every page works this way — you read a little,
+run a little, and poke at the examples to see where the rules bend.
+
+<Callout type="info" title="Where the red squiggles live">
+The in-page runner favors speed: it checks syntax, strips the types,
+and executes — like the real TypeScript toolchain, where types never
+survive to runtime. The full type-checking experience (squiggles
+under `announce("bored")` before you run anything) lives in
+editors like VS Code and in the `tsc` compiler, which the
+[setup chapter](./setup-and-tsconfig) shows you how to run. The
+course will tell you, for each "broken" line, exactly what the
+compiler would say about it.
+</Callout>
+
 <svg
   viewBox="0 0 640 250"
   role="img"
@@ -69,7 +116,7 @@ Each page mixes narrative, diagrams, runnable code, and short
 challenges. Three interactive widgets appear throughout:
 
 1. **Executable TypeScript code blocks.** Every snippet is
-   type-checked and transpiled in your browser, then executed by
+   compiled to JavaScript in your browser, then executed by
    [almostnode](https://almostnode.dev/) — no setup required. Edit
    any block and click *Run*.
 2. **Multi-file code blocks and challenge cards.** Real software is
@@ -147,9 +194,11 @@ own, but later chapters lean on earlier ideas.
 </svg>
 
 ### 1. The story of TypeScript
-How JavaScript outgrew its scripting roots, the maintainability
-crisis that followed, and why Microsoft built a static type system on
-top of it. We also peek inside the compiler.
+Why a language built in ten days needed a type system bolted on
+thirty years later, how Microsoft pulled it off, and what the
+compiler actually does with your annotations. (The full
+decade-by-decade history of JavaScript lives in an appendix at the
+end of the course, for when you want the whole saga.)
 
 ### 2. The core type system
 Primitives, objects, arrays and tuples, functions, type aliases,

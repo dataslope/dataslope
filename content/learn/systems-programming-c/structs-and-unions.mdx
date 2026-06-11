@@ -421,7 +421,23 @@ int main(void) {
 />
 
 This *type punning* pattern is common in low-level code (graphics,
-serialization). A "tagged union" — a struct with an enum tag and a
+serialization), and it has one genuinely legendary appearance. When
+id Software released the *Quake III Arena* source code in 2005,
+readers found a function that computes 1/√x — needed constantly for
+normalizing 3D vectors — by reinterpreting a float's bits as an
+integer, shifting them right, and subtracting them from the magic
+constant `0x5f3759df`. The technique exploits exactly what the code
+block above shows: an IEEE 754 float's bit pattern, read as an
+integer, approximates its logarithm. The routine became famous both
+for its near-sorcery and for its bewildered comments (the politest
+of which is "evil floating point bit level hacking"). John Carmack,
+to whom the internet immediately attributed it, said he didn't write
+it; later sleuthing traced its lineage back through earlier graphics
+companies. The lesson for you: understanding *exactly* how your
+bytes are laid out occasionally lets you do things that look like
+magic.
+
+A "tagged union" — a struct with an enum tag and a
 union of payloads — is how C encodes sum types like `Result<Ok, Err>`.
 
 <CodeBlock

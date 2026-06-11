@@ -615,7 +615,7 @@ export class InMemoryTodoRepository implements TodoRepository {
       id: "out",
       name: "Toggles todo",
       description: "done: true appears in output",
-      expect: { stdoutIncludes: "done: true" },
+      expect: { stdoutContains: "done: true" },
     },
   ]}
 />
