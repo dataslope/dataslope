@@ -5,7 +5,6 @@
     "pages": [
         "index",
         "---",
-        "evolution-of-javascript",
         "birth-of-typescript",
         "how-typescript-works",
         "setup-and-tsconfig",
@@ -37,6 +36,9 @@
         "scalable-architecture",
         "---",
         "static-analysis-in-action",
+        "---",
+        "evolution-of-javascript",
+        "---",
         "next-steps"
     ]
 }

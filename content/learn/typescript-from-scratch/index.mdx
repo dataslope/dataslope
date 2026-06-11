@@ -14,6 +14,40 @@ shape of modules. From there, we build up the *why* and *how* of
 TypeScript layer by layer, all the way to advanced type modeling and
 type-driven architecture.
 
+## This course runs in your browser — try it
+
+One thing before anything else: **every code block in this course is
+live.** The TypeScript compiler itself runs inside your browser tab,
+type-checks what you write, and executes it. Click *Run*:
+
+<CodeBlock
+  adapter="typescript"
+  files={[
+    {
+      filename: "main.ts",
+      starterCode: `type Greeting = "hello" | "ahoy" | "howdy";
+
+function greet(style: Greeting, name: string): string {
+  return \`\${style}, \${name}!\`;
+}
+
+console.log(greet("ahoy", "TypeScript"));
+
+// Now change "ahoy" above to "yo" and press Run again.
+// The compiler rejects it before a single line executes —
+// "yo" is not one of the three allowed greetings.
+// Then add "yo" to the Greeting type and watch it pass.
+`,
+    },
+  ]}
+/>
+
+That little loop — write, get corrected by the compiler, fix, run —
+is the entire experience of TypeScript compressed into ten lines,
+and it is how every page of this course works. You will read a
+little, run a little, and break things on purpose to see exactly
+where the compiler draws its lines.
+
 <svg
   viewBox="0 0 640 250"
   role="img"
@@ -147,9 +181,11 @@ own, but later chapters lean on earlier ideas.
 </svg>
 
 ### 1. The story of TypeScript
-How JavaScript outgrew its scripting roots, the maintainability
-crisis that followed, and why Microsoft built a static type system on
-top of it. We also peek inside the compiler.
+Why a language built in ten days needed a type system bolted on
+thirty years later, how Microsoft pulled it off, and what the
+compiler actually does with your annotations. (The full
+decade-by-decade history of JavaScript lives in an appendix at the
+end of the course, for when you want the whole saga.)
 
 ### 2. The core type system
 Primitives, objects, arrays and tuples, functions, type aliases,
