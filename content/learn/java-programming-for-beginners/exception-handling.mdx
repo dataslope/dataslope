@@ -151,6 +151,18 @@ A practical rule:
 - *Throw* a checked exception when the failure is normal-but-rare
   and the caller realistically has to handle it.
 
+Worth knowing: checked exceptions are one of Java's most contested
+design decisions, and Java remains nearly alone in having them.
+When Anders Hejlsberg designed C#, he deliberately left them out,
+arguing in a widely-read 2003 interview that in large systems they
+breed exactly the reflexive, do-nothing `catch` blocks this page
+warns about — developers appeasing the compiler rather than handling
+failures. Kotlin, which runs on the JVM beside Java, dropped them
+too. You will form your own opinion with experience; for now, treat
+a checked exception as the compiler asking a fair question — "what
+is your plan when this fails?" — and answer it honestly rather than
+silencing it.
+
 ## Declaring with `throws`
 
 If a method can throw a *checked* exception that it does not

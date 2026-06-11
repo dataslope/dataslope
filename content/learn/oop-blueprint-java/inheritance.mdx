@@ -276,6 +276,16 @@ from its height violates the square's invariant. The "is-a"
 relationship in mathematics does not always translate cleanly into
 behavioral substitutability in software.
 
+The principle hiding in that example has a name. In a 1987 keynote,
+**Barbara Liskov** — who would go on to win the 2008 Turing Award for
+her work on data abstraction — articulated what we now call the
+**Liskov Substitution Principle**: anywhere a program expects the
+parent type, an instance of the child type must work *correctly*, not
+just compile. The square/rectangle puzzle is the canonical
+demonstration that "is-a" in English is a weaker test than "is
+substitutable for" in code. When you are unsure whether to inherit,
+ask Liskov's question, not the grammarian's.
+
 ## Practice
 
 <ChallengeCard

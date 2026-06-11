@@ -144,6 +144,21 @@ This explains a lot:
 - Why a `HashMap` uses more memory than you'd guess: it has empty
   buckets to keep the load factor low.
 
+That "since Java 8" tree detail has a war story behind it. At the
+Chaos Communication Congress in December 2011, security researchers
+Alexander Klink and Julian Wälde demonstrated **hash flooding**:
+because the string hash functions of most web platforms were
+predictable, an attacker could precompute thousands of parameter
+names that all collide into the same bucket and stuff them into a
+single POST request. Every insert then crawled one enormous chain —
+quadratic total work — so a few hundred kilobytes of crafted request
+could pin a CPU core for minutes. PHP, Python, Ruby, ASP.NET, and
+Java servers were all vulnerable, and vendors scrambled out patches.
+Java's deeper fix arrived in Java 8: once a bucket's chain grows past
+eight entries, `HashMap` converts it into a red-black tree, capping
+even an adversarial worst case at `O(log n)`. The data structure you
+are studying was hardened by an actual attack.
+
 ## LinkedHashMap
 
 `LinkedHashMap` is to `HashMap` what `LinkedHashSet` is to `HashSet`:

@@ -218,6 +218,23 @@ Trying to write `total += (String) ...` would be flagged by the
 compiler. That is what *type safety* means in practice: the compiler
 prevents whole categories of mistake.
 
+## Where Java's generics actually came from
+
+Generics took six years to arrive after the JCF, and the gap was not
+procrastination — it was research. In 1998, programming-language
+researchers **Philip Wadler**, **Martin Odersky**, **Gilad Bracha**,
+and **Dave Stoutamire** published **GJ** ("Generic Java"), an
+extension of Java with parameterized types designed around one brutal
+constraint: the millions of lines of existing Java code, and every
+existing `.class` file, had to keep working unchanged. GJ's solution
+— check the types at compile time, then *erase* them — is exactly
+what shipped in Java 5, and Odersky's GJ compiler was so solid that
+Sun adopted it as the basis of the standard `javac` itself. (Odersky
+took what he learned about bolting a sophisticated type system onto
+the JVM and went on to create **Scala**; Wadler had earlier helped
+design Haskell. Java's generics have a serious pedigree.) The
+erasure decision has consequences we'll meet two pages from now.
+
 ## Why generic *types* and not just generic *methods*?
 
 Other languages (notably Smalltalk and pre-2.0 Python) made the bet
@@ -229,7 +246,7 @@ cost of a `ClassCastException` in production.
 
 The bet paid off. Today every mainstream typed language has generics
 or something like them: C# (2005), Scala (2004), Kotlin (2011), Swift
-(2014), TypeScript (2012), modern C++ templates, even Go (1.18, 2022).
+(2014), TypeScript (2013), modern C++ templates, even Go (1.18, 2022).
 
 ## A multi-file taste: a typed phonebook
 

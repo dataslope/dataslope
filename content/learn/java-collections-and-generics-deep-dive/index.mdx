@@ -19,6 +19,57 @@ customer, in arrival order, with fast lookup by id") and reach for
 the right container without thinking, model the data with confidence,
 and explain *why* one collection wins over another.
 
+## Try it right now
+
+Everything in this course runs live in your browser. Here is the very
+first idea of the course in code: a `List<String>` is a typed,
+resizable sequence — and the *type parameter* `<String>` is what
+stops you from accidentally putting an `Integer` next to a name.
+Press **Run** (the first run takes a moment while the JVM boots),
+then add a fourth name — or try un-commenting the `names.add(42)`
+line and watch the compiler protect you.
+
+<CodeBlock
+  adapter="java"
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+  public static void main(String[] args) {
+    List<String> names = new ArrayList<>();
+    names.add("Ada");
+    names.add("Linus");
+    names.add("Grace");
+
+    // names.add(42);   // compile error — the list is List<String>
+
+    for (String name : names) {
+      System.out.println("Hello, " + name);
+    }
+
+    System.out.println("There are " + names.size() + " names.");
+  }
+}
+`,
+    },
+  ]}
+/>
+
+Three things to notice — they will reappear on almost every page:
+
+- `List<String>` is a **generic type**. The `<String>` is the
+  *type parameter*. Without it, the list would hold `Object`s and
+  every read would need a cast.
+- We program to the **interface** `List`, not the concrete
+  implementation `ArrayList`. Swapping in `new LinkedList<>()`
+  would not change a single other line.
+- `for (String name : names)` is **iteration through `Iterable`** —
+  the for-each loop only works because `List` extends `Iterable`,
+  which is the single most important interface in the framework.
+
 <svg
   viewBox="0 0 640 200"
   role="img"
@@ -147,53 +198,6 @@ visible in the next. This keeps every example self-contained. For a
 persistent multi-file workspace, open the
 [Java Playground](/playground/java) in a new tab.
 </Callout>
-
-## A tiny taste
-
-Here is the very first idea of the course in code: a `List<String>` is
-a typed, resizable sequence — and the *type parameter* `<String>` is
-what stops you from accidentally putting an `Integer` next to a name.
-
-<CodeBlock
-  adapter="java"
-  files={[
-    {
-      filename: "main.java",
-      starterCode: `import java.util.ArrayList;
-import java.util.List;
-
-public class Main {
-  public static void main(String[] args) {
-    List<String> names = new ArrayList<>();
-    names.add("Ada");
-    names.add("Linus");
-    names.add("Grace");
-
-    // names.add(42);   // compile error — the list is List<String>
-
-    for (String name : names) {
-      System.out.println("Hello, " + name);
-    }
-
-    System.out.println("There are " + names.size() + " names.");
-  }
-}
-`,
-    },
-  ]}
-/>
-
-Three things to notice — they will reappear on almost every page:
-
-- `List<String>` is a **generic type**. The `<String>` is the
-  *type parameter*. Without it, the list would hold `Object`s and
-  every read would need a cast.
-- We program to the **interface** `List`, not the concrete
-  implementation `ArrayList`. Swapping in `new LinkedList<>()`
-  would not change a single other line.
-- `for (String name : names)` is **iteration through `Iterable`** —
-  the for-each loop only works because `List` extends `Iterable`,
-  which is the single most important interface in the framework.
 
 ## What you'll be able to do by the end
 

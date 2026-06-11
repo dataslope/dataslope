@@ -225,10 +225,15 @@ class Dog {
 />
 
 <Callout type="warn" title="Avoid null when you can">
-`null` is convenient but dangerous. Modern Java code tries hard to
-*avoid* `null` for "no value here" — preferring constructors that
-never produce a half-built object, default values, and
-`java.util.Optional`. We will see those techniques later.
+`null` is convenient but dangerous. Its own inventor agrees: Tony
+Hoare, who added the null reference to the ALGOL W language in 1965
+"simply because it was so easy to implement," publicly called it his
+**billion-dollar mistake** in 2009, estimating that the crashes and
+vulnerabilities it enabled have cost the industry at least that much.
+Modern Java code tries hard to *avoid* `null` for "no value here" —
+preferring constructors that never produce a half-built object,
+default values, and `java.util.Optional`. We will see those
+techniques later.
 </Callout>
 
 ## Passing objects to methods: still references

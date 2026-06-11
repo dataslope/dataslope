@@ -9,10 +9,9 @@ software engineering — across totally unrelated languages — were
 either invented, popularized, or first proven at scale by the Java
 ecosystem.
 
-We end the story with a survey of these influences. Understanding
-them will help you recognize Java's fingerprints in languages you
-will meet later, like C#, Kotlin, TypeScript, Swift, Go, and even
-modern JavaScript.
+This closing discussion is a survey of those influences. It will
+help you recognize Java's fingerprints in languages you will meet
+later, like C#, Kotlin, TypeScript, Go, and even modern JavaScript.
 
 <svg
   viewBox="0 0 640 230"
@@ -88,9 +87,11 @@ and prove, in production, that **you can build huge fast systems
 without manual memory management**.
 
 Today, garbage collection is the default in C#, Python, Ruby, Go,
-JavaScript, Kotlin, Swift (mostly), and nearly every new language.
-Even C++ and Rust have, in different ways, designed their memory
-models *in reaction to* the convenience that Java demonstrated.
+JavaScript, Kotlin, and nearly every new language (Swift achieves
+the same freedom-from-`delete` through automatic reference counting
+instead). Even C++ and Rust have, in different ways, designed their
+memory models *in reaction to* the convenience that Java
+demonstrated.
 
 ## 2. "Strong typing is a good idea, even at scale"
 
@@ -154,11 +155,14 @@ default in *every* major ecosystem: npm (JavaScript), pip/PyPI
 
 ## 7. "Test-driven development with JUnit"
 
-**JUnit**, written by Kent Beck and Erich Gamma in 1997, made
-automated unit testing easy in Java. It became so influential that an
-entire family of testing frameworks across other languages — pytest,
-Jest, RSpec, NUnit, Mocha, Go's `testing` package — are descended
-from its design.
+**JUnit** made automated unit testing easy in Java — and it began as
+an in-flight hack. In 1997, Kent Beck and Erich Gamma found
+themselves on the same long flight to the OOPSLA conference in
+Atlanta and spent it pair-programming a tiny Java test framework,
+based on Beck's earlier SUnit for Smalltalk. That airplane project
+became so influential that an entire family of testing frameworks in
+other languages — pytest, Jest, RSpec, NUnit, Mocha, Go's `testing`
+package — descends from its design.
 
 The very phrase **xUnit framework** comes from JUnit.
 
@@ -199,15 +203,18 @@ flowchart TB
     JAVA --> CSHARP[C#]
     JAVA --> KOTLIN[Kotlin]
     JAVA --> SCALA[Scala]
-    JAVA --> SWIFT[Swift]
     JAVA --> TYPESCRIPT[TypeScript<br/>via class syntax]
     JAVA --> GO[Go<br/>portable, GC, simple]
 ```
 
 Almost every modern mainstream OOP language is a descendant of Java,
-sometimes literally — Microsoft hired one of Java's early designers,
-Anders Hejlsberg, to create C# — and sometimes by absorbing Java's
-lessons.
+sometimes nearly literally. C# is the clearest case: Microsoft first
+shipped its own Java dialect (Visual J++), fought Sun in court over
+it, and then had Anders Hejlsberg — the creator of Turbo Pascal and
+Delphi, whom Microsoft had hired from Borland — design C# as its
+own Java-shaped language for the .NET platform. Kotlin and Scala
+were built directly *on* Java's virtual machine. TypeScript and Go
+absorbed Java's lessons from a greater distance.
 
 <MultipleChoice
   markdown={`Which idea did Java *not* invent, but popularized so successfully that it is now standard?
@@ -237,18 +244,14 @@ lessons.
 
 ## End of the story
 
-You now have, in your head, the *story* of how programming arrived at
-Java, and the story of how Java in turn shaped programming. This
-mental backdrop is what we will draw on for the rest of the course.
-When we meet a feature like exception handling, garbage collection,
-or interfaces, you will be able to think: *ah, this is solving the
-software-crisis problem of XYZ, the way Gosling decided it should be
-solved in 1995*.
+You now have, in your head, both halves of the story: how
+programming arrived at Java, and how Java in turn reshaped
+programming. Every feature you worked with in this course —
+exception handling, garbage collection, interfaces, packages — was
+solving a specific software-crisis problem, the way Gosling and his
+successors decided it should be solved. That kind of contextual
+understanding is what makes a real engineer out of someone who only
+knows the syntax.
 
-That kind of contextual understanding is what makes a real engineer
-out of someone who only knows the syntax.
-
-In the next section, we set the story aside and start training the
-muscles a programmer actually uses: computational thinking, problem
-solving, and the habit of breaking complicated work into small,
-precise steps.
+All that remains is the road ahead — the final page sketches where
+to take your Java from here.
