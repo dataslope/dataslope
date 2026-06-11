@@ -23,6 +23,7 @@ import {
   DUCKDB_BLANK_DATABASE,
   type DuckDbSampleDatabase,
 } from "./duckdbSamples";
+import { datasetFileName, fetchDatasetBytes, fetchDatasetText } from "./remoteDatasets";
 import {
   toDateOnlyString,
   unscaledDecimalToString,
@@ -796,14 +797,38 @@ async function bootstrapDatabase(
   db: AsyncDuckDB,
 ): Promise<DuckDbConnection> {
   const run = async (): Promise<DuckDbConnection> => {
+    // Resolve remote payloads first — the seed script and any data
+    // files (parquet/CSV/…) the sample registers. Downloading before
+    // the cleanup step means a failed download leaves the current
+    // catalog intact.
+    const seedSql = sample.remoteSql
+      ? await fetchDatasetText(sample.remoteSql)
+      : sample.sql;
+    const remoteFiles = await Promise.all(
+      (sample.remoteFiles ?? []).map(async (file) => ({
+        name: file.registerAs ?? datasetFileName(file.path),
+        bytes: await fetchDatasetBytes(file.path),
+      })),
+    );
     const conn = await db.connect();
     // Force consistent timestamp formatting for reproducible output.
     await conn.query("SET TimeZone='UTC'");
     // Clear any previously loaded sample so that revisiting the page or
     // switching samples never hits "Table with name … already exists!" errors.
     await cleanDuckDbSchema(conn);
-    if (sample.sql && sample.sql.trim()) {
-      const stmts = splitDuckDbStatements(sample.sql);
+    for (const { name, bytes } of remoteFiles) {
+      // Drop any same-named file from a previous bootstrap (re-register
+      // throws), and hand DuckDB a copy — the buffer is transferred to
+      // its worker, which would detach the module-level bytes cache.
+      try {
+        await db.dropFile?.(name);
+      } catch {
+        /* not registered yet */
+      }
+      await db.registerFileBuffer(name, bytes.slice());
+    }
+    if (seedSql && seedSql.trim()) {
+      const stmts = splitDuckDbStatements(seedSql);
       for (const stmt of stmts) {
         await conn.query(stmt);
       }

@@ -21,6 +21,7 @@ import {
   type PostgresSampleDatabase,
 } from "./postgresSamples";
 import { PGLITE_WORKER_CDN } from "./cdn";
+import { fetchDatasetText } from "./remoteDatasets";
 import { toDateOnlyString } from "./valueFormat";
 
 let _pgliteWorkerModulePromise: Promise<{ PGliteWorker: typeof PGliteWorkerType }> | null = null;
@@ -301,6 +302,35 @@ async function createFreshWorker(opts: { dataDir?: string } = {}): Promise<PGlit
   ) as unknown as PGlite;
 }
 
+/** Prepare a SQL script authored for a full Postgres server so it can
+ *  run inside PGlite. Dumps and distribution scripts (e.g. the Chinook
+ *  release scripts) open with psql meta-commands and CREATE/DROP
+ *  DATABASE statements; PGlite is a single-database embedded build, so
+ *  those lines can never succeed and are dropped. Works line-by-line —
+ *  both constructs are single-line statements in practice. */
+export function preparePostgresScriptForPglite(sql: string): string {
+  return sql
+    .split("\n")
+    .filter((line) => {
+      const trimmed = line.trimStart();
+      if (trimmed.startsWith("\\")) return false; // psql meta-command (\c, \connect, …)
+      if (/^(CREATE|DROP)\s+DATABASE\b/i.test(trimmed)) return false;
+      return true;
+    })
+    .join("\n");
+}
+
+/** Resolve the SQL that seeds `sample`: its inline `sql`, or — for
+ *  remote samples — the script fetched from the datasets repo, prepared
+ *  for PGlite. Resolve *before* tearing anything down so a failed
+ *  download leaves the current database intact. */
+async function resolveSampleSql(sample: PostgresSampleDatabase): Promise<string> {
+  if (sample.remoteSql) {
+    return preparePostgresScriptForPglite(await fetchDatasetText(sample.remoteSql));
+  }
+  return sample.sql ?? "";
+}
+
 /** True when the connected PGlite cluster already has at least one
  *  user table in the `public` schema — i.e. it is an existing OPFS
  *  workspace we should *not* re-seed. */
@@ -337,7 +367,8 @@ async function createFreshDatabase(
   if (opts.dataDir && !opts.forceSeed && (await pgHasUserTables(db))) {
     return db;
   }
-  if (sample.sql) await db.exec(sample.sql);
+  const sql = await resolveSampleSql(sample);
+  if (sql) await db.exec(sql);
   return db;
 }
 
@@ -366,6 +397,10 @@ export async function createPostgresEngine(
    *  legacy "spin up a brand-new in-memory PGlite per sample" path. */
   async function rebuildForSample(target: PostgresSampleDatabase): Promise<PGlite> {
     if (dataDir) {
+      // Resolve (and, for remote samples, download) the seed SQL before
+      // wiping the cluster, so a failed download can't leave the
+      // workspace empty.
+      const sql = await resolveSampleSql(target);
       // In-place reset of the persistent cluster. PGlite supports
       // `DROP SCHEMA public CASCADE; CREATE SCHEMA public;` to wipe
       // every user object in one statement; we keep extensions intact.
@@ -375,7 +410,7 @@ export async function createPostgresEngine(
         // If the bulk reset fails (e.g. permissions on a system extension),
         // fall through to per-table drops as a best-effort fallback.
       }
-      if (target.sql) await db.exec(target.sql);
+      if (sql) await db.exec(sql);
       return db;
     }
     const next = await createFreshDatabase(target, { dataDir, forceSeed: true });
@@ -385,8 +420,11 @@ export async function createPostgresEngine(
 
   const engine: PostgresEngine = {
     async loadSampleDatabase(id) {
-      sample = findPostgresSampleDatabase(id);
-      db = await rebuildForSample(sample);
+      // Rebuild before adopting the new sample so a failed download /
+      // seed leaves both the database and `activeSample()` unchanged.
+      const target = findPostgresSampleDatabase(id);
+      db = await rebuildForSample(target);
+      sample = target;
       return sample;
     },
 
@@ -958,7 +996,10 @@ export async function createPostgresEngine(
       const next = await createFreshWorker();
       await next.waitReady;
       try {
-        await next.exec(sql);
+        // Dumps taken from a full Postgres server often open with
+        // `\connect` / CREATE DATABASE lines that can never run in
+        // PGlite — strip them instead of failing the whole import.
+        await next.exec(preparePostgresScriptForPglite(sql));
       } catch (err) {
         try {
           await next.close();

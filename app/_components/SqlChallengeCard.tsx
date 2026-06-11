@@ -158,6 +158,14 @@ export interface SqlChallengeCardProps {
    *  tables, populates seed data, etc. Replaces DataCamp's
    *  `pre-exercise-code` block. */
   initSql?: string;
+  /** Remote dataset to load before `initSql`: a path inside the
+   *  dataslope/datasets GitHub repo (e.g. `sqlite/chinook_sqlite.sql`)
+   *  or a full URL. The script is downloaded from
+   *  raw.githubusercontent.com and executed against the card's engine,
+   *  so a card can clone a complete sample database (Chinook,
+   *  Northwind, …) without embedding it. `initSql` still runs after it
+   *  for any card-specific extras. */
+  remoteInitSql?: string;
   /** Starter SQL shown in the editor. */
   starterCode: string;
   /** Canonical reference solution. When provided, a "Show Solution"
@@ -260,6 +268,26 @@ export function createEngineForDialect(dialect: SqlDialect): Promise<SqlEngineLi
     case "postgres":
       return createPostgresChallengeEngine();
   }
+}
+
+/** Download a remote dataset script (a path inside the
+ *  dataslope/datasets GitHub repo, or a full URL) and prepare it for
+ *  the given dialect's embedded engine. Used by the `remoteInitSql`
+ *  prop of `<SqlChallengeCard>` and `<SqlCodeBlock>`. */
+export async function fetchRemoteInitSql(
+  dialect: SqlDialect,
+  pathOrUrl: string,
+): Promise<string> {
+  const { fetchDatasetText } = await import("./runtime/remoteDatasets");
+  const script = await fetchDatasetText(pathOrUrl);
+  if (dialect === "postgres") {
+    // Scripts authored for a full Postgres server may open with psql
+    // meta-commands / CREATE DATABASE lines that can never run in
+    // PGlite — strip them before execution.
+    const { preparePostgresScriptForPglite } = await import("./runtime/postgres");
+    return preparePostgresScriptForPglite(script);
+  }
+  return script;
 }
 
 /** Default schema where a dialect's user tables live unless qualified
@@ -818,6 +846,7 @@ export default function SqlChallengeCard({
   badge = "SQL Challenge",
   instructions,
   initSql,
+  remoteInitSql,
   starterCode,
   solutionSql,
   tables,
@@ -1089,8 +1118,19 @@ export default function SqlChallengeCard({
   const ensureEngine = useCallback(async (): Promise<SqlEngineLike> => {
     if (!enginePromiseRef.current) {
       enginePromiseRef.current = (async () => {
+        // Start the dataset download while the engine boots — the two
+        // are independent and the WASM fetch usually dominates. The
+        // no-op catch keeps an engine-boot failure from leaving this
+        // promise's rejection unhandled; awaiting it below still throws.
+        const remoteSqlPromise = remoteInitSql
+          ? fetchRemoteInitSql(dialect, remoteInitSql)
+          : null;
+        remoteSqlPromise?.catch(() => {});
         const engine = await createEngineForDialect(dialect);
         setEngineLabel(`${engine.label} ${engine.version}`.trim());
+        if (remoteSqlPromise) {
+          await engine.exec(await remoteSqlPromise);
+        }
         if (initSql && initSql.trim()) {
           await engine.exec(initSql);
         }
@@ -1103,7 +1143,7 @@ export default function SqlChallengeCard({
       });
     }
     return enginePromiseRef.current;
-  }, [dialect, initSql]);
+  }, [dialect, initSql, remoteInitSql]);
 
   // ─── Table viewer ───────────────────────────────────────────────────
   // All table-list / paging / loading state lives in the shared hook so

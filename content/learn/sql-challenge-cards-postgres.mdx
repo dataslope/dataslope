@@ -415,3 +415,101 @@ ORDER BY
   ]}
 />
 ```
+
+## 5. Remote dataset — Northwind from GitHub
+
+`remoteInitSql` clones a complete sample database from the
+[dataslope/datasets](https://github.com/dataslope/datasets) GitHub repo
+before the first run — here the classic **Northwind** store (the
+Postgres port, snake_case names). The script is fetched from
+raw.githubusercontent.com and prepared for PGlite (psql meta-commands
+and `CREATE DATABASE` lines are stripped); `initSql` (when present)
+still runs afterwards for challenge-specific extras.
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Five most expensive products"
+  instructions={`The classic **Northwind** database has been cloned straight from the dataslope/datasets GitHub repo. Query its \`products\` table for the five most expensive products — columns \`product_name\` and \`unit_price\`, sorted by \`unit_price\` descending.`}
+  remoteInitSql="postgres/northwind_postgres.sql"
+  tables={["products", "categories", "suppliers"]}
+  starterCode={`-- Your query here:
+SELECT
+  *
+FROM
+  products;`}
+  solutionSql={`SELECT
+  product_name,
+  unit_price
+FROM
+  products
+ORDER BY
+  unit_price DESC
+LIMIT
+  5;`}
+  tests={[
+    {
+      id: "row_count",
+      name: "Returns 5 rows",
+      description: "Northwind has 77 products; only the top five should remain",
+      expectedRowCount: 5,
+    },
+    {
+      id: "columns",
+      name: "Has product_name and unit_price columns",
+      description: "In that exact order",
+      expectedColumns: ["product_name", "unit_price"],
+    },
+    {
+      id: "ordering",
+      name: "Most expensive first",
+      description: "Côte de Blaye (263.5) should lead the list",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
+/>
+
+```jsx
+<SqlChallengeCard
+  dialect="postgres"
+  title="Five most expensive products"
+  instructions={`The classic **Northwind** database has been cloned straight from the dataslope/datasets GitHub repo. Query its \`products\` table for the five most expensive products — columns \`product_name\` and \`unit_price\`, sorted by \`unit_price\` descending.`}
+  remoteInitSql="postgres/northwind_postgres.sql"
+  tables={["products", "categories", "suppliers"]}
+  starterCode={`-- Your query here:
+SELECT
+  *
+FROM
+  products;`}
+  solutionSql={`SELECT
+  product_name,
+  unit_price
+FROM
+  products
+ORDER BY
+  unit_price DESC
+LIMIT
+  5;`}
+  tests={[
+    {
+      id: "row_count",
+      name: "Returns 5 rows",
+      description: "Northwind has 77 products; only the top five should remain",
+      expectedRowCount: 5,
+    },
+    {
+      id: "columns",
+      name: "Has product_name and unit_price columns",
+      description: "In that exact order",
+      expectedColumns: ["product_name", "unit_price"],
+    },
+    {
+      id: "ordering",
+      name: "Most expensive first",
+      description: "Côte de Blaye (263.5) should lead the list",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
+/>
+```

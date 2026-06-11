@@ -405,3 +405,100 @@ ORDER BY
   ]}
 />
 ```
+
+## 5. Remote dataset — Northwind from GitHub
+
+`remoteInitSql` clones a complete sample database from the
+[dataslope/datasets](https://github.com/dataslope/datasets) GitHub repo
+before the first run — here the classic **Northwind** store. The script
+is fetched from raw.githubusercontent.com, so the card embeds no seed
+SQL at all; `initSql` (when present) still runs afterwards for
+challenge-specific extras.
+
+<SqlChallengeCard
+  dialect="sqlite"
+  title="Five most expensive products"
+  instructions={`The classic **Northwind** database has been cloned straight from the dataslope/datasets GitHub repo. Query its \`Products\` table for the five most expensive products — columns \`ProductName\` and \`Price\`, sorted by \`Price\` descending.`}
+  remoteInitSql="sqlite/northwind_sqlite.sql"
+  tables={["Products", "Categories", "Suppliers"]}
+  starterCode={`-- Your query here:
+SELECT
+  *
+FROM
+  Products;`}
+  solutionSql={`SELECT
+  ProductName,
+  Price
+FROM
+  Products
+ORDER BY
+  Price DESC
+LIMIT
+  5;`}
+  tests={[
+    {
+      id: "row_count",
+      name: "Returns 5 rows",
+      description: "Northwind has 77 products; only the top five should remain",
+      expectedRowCount: 5,
+    },
+    {
+      id: "columns",
+      name: "Has ProductName and Price columns",
+      description: "In that exact order",
+      expectedColumns: ["ProductName", "Price"],
+    },
+    {
+      id: "ordering",
+      name: "Most expensive first",
+      description: "Côte de Blaye (263.5) should lead the list",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
+/>
+
+```jsx
+<SqlChallengeCard
+  dialect="sqlite"
+  title="Five most expensive products"
+  instructions={`The classic **Northwind** database has been cloned straight from the dataslope/datasets GitHub repo. Query its \`Products\` table for the five most expensive products — columns \`ProductName\` and \`Price\`, sorted by \`Price\` descending.`}
+  remoteInitSql="sqlite/northwind_sqlite.sql"
+  tables={["Products", "Categories", "Suppliers"]}
+  starterCode={`-- Your query here:
+SELECT
+  *
+FROM
+  Products;`}
+  solutionSql={`SELECT
+  ProductName,
+  Price
+FROM
+  Products
+ORDER BY
+  Price DESC
+LIMIT
+  5;`}
+  tests={[
+    {
+      id: "row_count",
+      name: "Returns 5 rows",
+      description: "Northwind has 77 products; only the top five should remain",
+      expectedRowCount: 5,
+    },
+    {
+      id: "columns",
+      name: "Has ProductName and Price columns",
+      description: "In that exact order",
+      expectedColumns: ["ProductName", "Price"],
+    },
+    {
+      id: "ordering",
+      name: "Most expensive first",
+      description: "Côte de Blaye (263.5) should lead the list",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
+/>
+```
