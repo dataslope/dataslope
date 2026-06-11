@@ -288,6 +288,17 @@ We will return to exceptions later. For now: when you see
 `NullPointerException`, it means *you tried to use an object that
 wasn't there*.
 
+You are in good company when it bites you. The inventor of the null
+reference, Tony Hoare — the same computer scientist who gave us
+quicksort — publicly apologized for it at a 2009 conference, calling
+null his "billion-dollar mistake": he added it to the ALGOL W
+language in 1965 "simply because it was so easy to implement," and
+estimates the resulting decades of crashes and vulnerabilities have
+cost the industry well over a billion dollars. Newer languages (and
+newer Java APIs like `Optional`) try hard to make "no object here"
+visible in the type system instead of lurking inside every
+reference.
+
 <MultipleChoice
   markdown={`Which sentence correctly distinguishes a class from an object?
 

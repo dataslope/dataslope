@@ -12,16 +12,44 @@ This is not a course about memorizing Java syntax. This is a course
 about **learning to think like a programmer**, with Java as the
 language we happen to speak while we do it.
 
-By the end you should be able to:
+## Try it right now
 
-- Read a problem written in English and turn it into a working program.
-- Picture in your head what a program is doing while it runs.
-- Understand *why* concepts like variables, classes, objects,
-  inheritance, and exceptions exist — not just how to type them.
-- Organize a small program across many files in a way that other
-  humans (including future-you) can understand.
-- Talk about software systems using the right mental model, so you
-  can pick up new languages and frameworks much faster afterwards.
+The whole course runs in your browser — every page has live code.
+Below is a complete Java program. Press **Run** and watch the output
+appear. (The very first run takes a moment while a real Java Virtual
+Machine boots inside your browser; runs after that are fast.)
+
+<CodeBlock
+  adapter="java"
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
+  public static void main(String[] args) {
+    String name = "world";
+    for (int i = 1; i <= 3; i++) {
+      System.out.println("Hello, " + name + "! (" + i + ")");
+    }
+  }
+}
+`,
+    },
+  ]}
+/>
+
+Now change `"world"` to your own name, or change the `3` to a `10`,
+and run it again. That edit–run–observe loop is how this entire
+course works: nothing here is a spectator sport.
+
+Three things are worth noticing before we move on:
+
+- The program is wrapped in a `class` called `Main`. **Every Java
+  program lives inside a class.** We will learn what a class really
+  is, conceptually, soon.
+- The line that starts with `public static void main` is the
+  *entry point* — the first thing the JVM runs.
+- The output box below the editor is the closest thing we have to
+  the "voice" of your program.
 
 <svg
   viewBox="0 0 640 220"
@@ -48,6 +76,19 @@ By the end you should be able to:
   </g>
 </svg>
 
+## What you will be able to do
+
+By the end you should be able to:
+
+- Read a problem written in English and turn it into a working program.
+- Picture in your head what a program is doing while it runs.
+- Understand *why* concepts like variables, classes, objects,
+  inheritance, and exceptions exist — not just how to type them.
+- Organize a small program across many files in a way that other
+  humans (including future-you) can understand.
+- Talk about software systems using the right mental model, so you
+  can pick up new languages and frameworks much faster afterwards.
+
 ## Why Java?
 
 Java is one of the most influential programming languages ever
@@ -67,10 +108,9 @@ to hide.
 mindmap
   root((Java for<br/>Beginners))
     Story
-      Early programming
-      The OOP revolution
-      Java's birth
-      JVM and WORA
+      The software crisis
+      Birth of objects
+      Gosling and Java
     Thinking
       Computational thinking
       Problem solving
@@ -98,14 +138,15 @@ mindmap
 
 ## How this course is structured
 
-The course begins with a **story**. Before we write any code, you
-will learn how programming languages came to exist, what problems
-they were invented to solve, and how Java in particular emerged from
-a crisis in the software industry. This story is not decoration. It
-will give you a permanent intuition for *why* programs look the way
-they do.
+The course opens with a **two-page story**. Before the syntax, you
+will learn where programming languages came from, what crisis
+object-oriented programming was invented to solve, and how Java in
+particular escaped a doomed smart-appliance project to take over the
+software world. This is not decoration: it gives you a permanent
+intuition for *why* Java programs look the way they do. (You will
+also run your first programs right there in the story.)
 
-After the story we move into **thinking** — computational thinking,
+After the story we train **thinking** — computational thinking,
 problem solving, and the habits a programmer develops over time.
 
 Only then do we open Java itself. We learn variables, types, control
@@ -113,17 +154,20 @@ flow, and methods, with constant reference to **what is happening in
 memory**. Then we meet objects and classes, the central ideas of
 modern software design. After that we look under the hood — how the
 **Java Virtual Machine** turns your code into running behavior — and
-we round out the course with data organization, exceptions,
-debugging, basic algorithms, and a small capstone project.
+we round out the course with collections, exceptions, debugging,
+basic algorithms, and a small capstone project. At the very end,
+just before the roadmap, an **Interesting discussions** section
+collects the longer campfire stories: how Java conquered education,
+Android, and the courts, and how it reshaped every language that
+came after it.
 
 ## How to use this site
 
 Every page mixes narrative prose with three interactive widgets.
 
 1. **Executable Java code blocks.** Each block is compiled by `javac`
-   and run on the JVM inside your browser via **CheerpJ**. The first
-   run in a session is slow because the JVM has to boot; subsequent
-   runs are fast.
+   and run on the JVM inside your browser via **CheerpJ** — exactly
+   like the one you just ran.
 2. **Multi-file challenge cards.** Real programs live in many files.
    You will see workspaces with several `.java` files side by side
    and fill in the missing parts; automated tests check your work.
@@ -135,39 +179,6 @@ Every page mixes narrative prose with three interactive widgets.
 A variable, class, or method defined in one `<CodeBlock>` is **not**
 visible in the next. Every example is self-contained.
 </Callout>
-
-## A tiny taste
-
-Here is a complete Java program. Do not worry about understanding
-every line — we will earn each piece of it over the next few weeks.
-
-<CodeBlock
-  adapter="java"
-  files={[
-    {
-      filename: "main.java",
-      starterCode: `public class Main {
-  public static void main(String[] args) {
-    String name = "world";
-    for (int i = 1; i <= 3; i++) {
-      System.out.println("Hello, " + name + "! (" + i + ")");
-    }
-  }
-}
-`,
-    },
-  ]}
-/>
-
-Notice three things, and then we will move on:
-
-- The program is wrapped in a `class` called `Main`. **Every Java
-  program lives inside a class.** We will learn what a class really
-  is, conceptually, soon.
-- The line that starts with `public static void main` is the
-  *entry point* — the first thing the JVM runs.
-- The output appears below the editor. That little box is the
-  closest thing we have to the "voice" of your program.
 
 When you are ready, turn the page. We are going to start a long way
 from Java — back when programs were punched into paper cards.

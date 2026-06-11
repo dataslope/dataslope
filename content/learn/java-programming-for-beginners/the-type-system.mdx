@@ -171,6 +171,21 @@ The `(int) pi` is a **cast**: a programmer-asserted "yes I know I
 might lose information, do it anyway." The fractional part is
 chopped off.
 
+If forcing you to *write out* that assertion seems pedantic,
+consider the most expensive type conversion in history. On June 4,
+1996, the first Ariane 5 rocket veered off course and self-destructed
+about forty seconds after liftoff, scattering its uninsured
+scientific payload over French Guiana. The inquiry board traced the
+failure to a single conversion in guidance software reused from the
+older Ariane 4: a 64-bit floating-point value describing the rocket's
+horizontal velocity was converted to a 16-bit integer. Ariane 5 flew
+faster than Ariane 4, the value no longer fit, the conversion
+overflowed, the resulting error shut down the guidance computers, and
+the rocket was lost. Java's insistence that narrowing conversions be
+explicit — visible, greppable, reviewable — exists precisely so that
+this kind of silent information loss cannot hide in a million-line
+codebase.
+
 <CodeBlock
   adapter="java"
   files={[

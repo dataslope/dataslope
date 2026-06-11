@@ -5,16 +5,8 @@
     "pages": [
         "index",
         "---",
-        "early-programming",
-        "software-complexity-crisis",
         "birth-of-oop",
-        "enterprise-and-cross-platform",
         "gosling-and-java",
-        "write-once-run-anywhere",
-        "the-jvm-vision",
-        "java-becomes-dominant",
-        "evolution-of-java",
-        "javas-influence",
         "---",
         "what-is-a-program",
         "computational-thinking",
@@ -47,6 +39,10 @@
         "software-organization",
         "---",
         "capstone-project",
+        "---",
+        "java-conquers-the-world",
+        "javas-influence",
+        "---",
         "next-steps"
     ]
 }

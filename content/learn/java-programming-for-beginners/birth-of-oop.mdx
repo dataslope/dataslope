@@ -1,14 +1,233 @@
 ---
-title: The Birth of Object-Oriented Programming
-description: How Simula and Smalltalk reframed programs as societies of collaborating objects, and why this idea stuck
+title: From Punched Cards to Objects
+description: How programming hit a wall in the 1960s — and how a strange new idea from a Norwegian simulation lab rescued it
 ---
 
-The deepest answer to the software crisis did not come from
-re-arranging procedures. It came from a totally different way of
-thinking about what a program *is*.
+Before there was Java, a "program" was not a file. It was a physical
+object: a deck of **punched cards**, or a roll of paper tape, or a
+patch panel with wires plugged from socket to socket. A programmer
+in the 1950s would write a program on paper, punch it onto cards —
+one card per line — carry the deck to an operator in a cardboard
+box, and come back the next day to learn whether it had worked.
 
-The new idea: a program is not a recipe. A program is a **society of
-objects** that talk to each other by sending messages.
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="An early plugboard: rows of faint sockets with three colored patch cables looped between them, one draping below the board — programs wired by hand, one connection at a time"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.07">
+    <rect x="110" y="50" width="420" height="150" rx="16" />
+  </g>
+  <g fill="currentColor" opacity="0.18">
+    <circle cx="150" cy="85" r="5" />
+    <circle cx="220" cy="85" r="5" />
+    <circle cx="290" cy="85" r="5" />
+    <circle cx="360" cy="85" r="5" />
+    <circle cx="430" cy="85" r="5" />
+    <circle cx="500" cy="85" r="5" />
+    <circle cx="150" cy="135" r="5" />
+    <circle cx="220" cy="135" r="5" />
+    <circle cx="290" cy="135" r="5" />
+    <circle cx="360" cy="135" r="5" />
+    <circle cx="430" cy="135" r="5" />
+    <circle cx="500" cy="135" r="5" />
+    <circle cx="150" cy="185" r="5" />
+    <circle cx="220" cy="185" r="5" />
+    <circle cx="290" cy="185" r="5" />
+    <circle cx="360" cy="185" r="5" />
+    <circle cx="430" cy="185" r="5" />
+    <circle cx="500" cy="185" r="5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="220" cy="85" r="8" />
+    <circle cx="430" cy="185" r="8" />
+    <circle cx="258" cy="64" r="3.5" fillOpacity="0.5" />
+    <circle cx="300" cy="54" r="3.5" fillOpacity="0.5" />
+    <circle cx="345" cy="58" r="3.5" fillOpacity="0.5" />
+    <circle cx="385" cy="82" r="3.5" fillOpacity="0.5" />
+    <circle cx="412" cy="122" r="3.5" fillOpacity="0.5" />
+    <circle cx="424" cy="156" r="3.5" fillOpacity="0.5" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="290" cy="185" r="8" />
+    <circle cx="500" cy="85" r="8" />
+    <circle cx="330" cy="196" r="3.5" fillOpacity="0.5" />
+    <circle cx="372" cy="196" r="3.5" fillOpacity="0.5" />
+    <circle cx="412" cy="180" r="3.5" fillOpacity="0.5" />
+    <circle cx="448" cy="150" r="3.5" fillOpacity="0.5" />
+    <circle cx="478" cy="116" r="3.5" fillOpacity="0.5" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <circle cx="150" cy="185" r="8" />
+    <circle cx="360" cy="135" r="8" />
+    <circle cx="172" cy="212" r="3.5" fillOpacity="0.6" />
+    <circle cx="210" cy="222" r="3.5" fillOpacity="0.6" />
+    <circle cx="252" cy="224" r="3.5" fillOpacity="0.6" />
+    <circle cx="295" cy="214" r="3.5" fillOpacity="0.6" />
+    <circle cx="330" cy="186" r="3.5" fillOpacity="0.6" />
+    <circle cx="350" cy="158" r="3.5" fillOpacity="0.6" />
+  </g>
+</svg>
+
+```mermaid
+flowchart TD
+    H[Human writes<br/>program on paper] --> P[Punch cards<br/>one per line]
+    P --> O[Operator loads<br/>cards into machine]
+    O --> M[Mainframe runs<br/>program overnight]
+    M --> R[Result printed<br/>on paper]
+    R --> H
+```
+
+Every cycle of "edit, run, see what happened" could take *days*. So
+programmers learned to think extremely carefully before committing a
+single instruction to cardboard. That instinct is worth keeping even
+now that our tools answer in milliseconds: a program is a plan you
+are handing to a machine, and bad planning is expensive.
+
+The languages themselves improved quickly. **Machine code** — raw
+`0`s and `1`s — gave way to **assembly language**, where you could
+write readable mnemonics like `ADD R1, R2` instead of binary. Then,
+in the late 1950s and 1960s, languages like **FORTRAN**, **COBOL**,
+and later **C** and **Pascal** let programmers write something that
+looked like math or English and have a **compiler** translate it
+into machine code. These languages were **procedural**: a program
+was a sequence of *procedures* (also called functions) that
+manipulated data, calling one another until a result emerged.
+
+## A program is a recipe — see for yourself
+
+The mental model of that whole era was simple: a program is a
+**recipe**. Write down the steps, in order. Run the recipe. Get a
+result. Sixty years later, that model still holds inside every
+method you will ever write — including in Java. Here is a recipe,
+as a real Java program. Run it, and read the output top to bottom:
+
+<CodeBlock
+  adapter="java"
+  files={[
+    {
+      filename: "main.java",
+      starterCode: `public class Main {
+  public static void main(String[] args) {
+    System.out.println("Step 1: take 6 eggs");
+    int eggs = 6;
+
+    System.out.println("Step 2: use 2 for the cake");
+    eggs = eggs - 2;
+
+    System.out.println("Step 3: count what is left");
+    System.out.println("Eggs remaining: " + eggs);
+  }
+}
+`,
+    },
+  ]}
+/>
+
+The machine executed your instructions exactly, in order, top to
+bottom. Change the numbers and run it again — the recipe obediently
+recomputes. This "do this, then that" style is the foundation under
+everything in this course. The question of the 1960s was: what
+happens when the recipe grows to a million lines?
+
+## The software crisis
+
+The answer arrived fast, and it was ugly.
+
+Through the 1960s, hardware roughly doubled in power every couple of
+years, and ambition grew even faster: payroll for entire
+corporations, airline reservations, banking networks, the flight
+software for the Apollo missions. And those programs were *failing* —
+not occasionally, but chronically. Projects shipped years late and
+far over budget, full of bugs, and so tangled that nobody — including
+the original authors — could safely change them.
+
+The most famous casualty was IBM's **OS/360**, the operating system
+for its System/360 mainframes. It consumed thousands of
+programmer-years and shipped late anyway. Its manager, **Fred
+Brooks**, distilled the experience into the 1975 classic *The
+Mythical Man-Month*, including the observation now known as
+**Brooks's law**: *adding manpower to a late software project makes
+it later* — because every new person multiplies the communication
+overhead among everyone else.
+
+In October 1968, NATO sponsored a conference in Garmisch, Germany,
+to confront the problem head-on. The attendees put a name to it —
+the **software crisis** — and proposed, half as aspiration, a new
+discipline to fix it: *software engineering*. The profession you are
+now entering was invented, in real time, in response to a disaster.
+
+```mermaid
+flowchart TD
+    H[Hardware<br/>2x faster every<br/>~2 years] --> A[Ambition grows<br/>even faster]
+    A --> B[Programs become<br/>huge and tangled]
+    B --> C[Bugs everywhere<br/>Changes are scary]
+    C --> D[Software crisis]
+```
+
+## Why procedural programs got tangled
+
+What exactly went wrong when recipes grew huge? Two patterns of pain
+showed up over and over.
+
+**Global state.** Many procedural programs kept their data in
+**global variables** — variables that any procedure anywhere could
+read or write. In a tiny program this is fine. In a 200,000-line
+program it is a nightmare: a bug in one corner could silently corrupt
+data, and hours later, on the far side of the codebase, a completely
+unrelated feature would crash because of it.
+
+```mermaid
+flowchart LR
+    G[(Global data)]
+    A[Procedure A] -->|writes| G
+    B[Procedure B] -->|writes| G
+    C[Procedure C] -->|reads| G
+    D[Procedure D] -->|writes| G
+    E[Procedure E] -->|reads| G
+    style G fill:#fee,stroke:#a00
+```
+
+Try to imagine debugging this: if `C` reads a wrong value, *who
+corrupted it?* `A`? `B`? `D`? Any of them, at any time. The search
+space is the entire program.
+
+**No grouping of data and behavior.** The data for a "bank account"
+might live in one place — an array of numbers — while the procedures
+that operate on accounts lived somewhere else entirely. Nothing
+*forced* the rule "only account code may touch account data." Any
+programmer in a hurry could bypass the official procedures and poke
+the numbers directly. Now the rules about accounts exist in two
+places: the official procedures, and the head of whoever wrote the
+shortcut.
+
+There is a deeper mathematical reason the crisis was inevitable:
+**complexity grows faster than size**. Each new piece of code
+interacts with the pieces around it, so doubling a program's length
+roughly *squares* the number of interactions a human is expected to
+keep straight. Past a certain size, no amount of discipline or
+overtime can compensate. You need techniques that *limit how much of
+the program you must think about at once*.
+
+<MultipleChoice
+  markdown={`What was the central observation of the 1968 NATO conference on the "software crisis"?
+
+- That computers were too slow to run real programs
+  > Hardware was actually improving very quickly.
+- [o] That building large software systems was much harder than anyone had expected, and existing techniques did not scale
+  > Big programs were collapsing under their own weight.
+- That programmers were not paid enough
+  > Compensation was not the issue named at the conference.
+- That assembly language was about to disappear
+  > Assembly was alive and well; the issue was managing complexity, not language choice.`}
+/>
+
+## A new idea from a simulation lab
+
+The deepest answer to the crisis did not come from rearranging
+procedures. It came from a totally different way of thinking about
+what a program *is*.
 
 <svg
   viewBox="0 0 640 230"
@@ -59,18 +278,16 @@ objects** that talk to each other by sending messages.
   </g>
 </svg>
 
-## Simula: the first OOP language
+In 1960s Oslo, two Norwegian researchers — **Ole-Johan Dahl** and
+**Kristen Nygaard** — were building software to *simulate* physical
+systems: ships moving through a harbor, customers queuing at a bank.
+They noticed something. The most natural way to write a simulation
+is to model each *thing in the world* as a *thing in the program*: a
+ship in the harbor becomes a `Ship` in the code, carrying its own
+position and speed, and offering its own behaviors.
 
-In the 1960s, two Norwegian researchers, **Ole-Johan Dahl** and
-**Kristen Nygaard**, were building software to simulate physical
-systems — ships in a harbor, customers at a bank, particles in a
-fluid. They noticed something. The most natural way to write a
-simulation is to model each *thing in the real world* as a *thing in
-the program*: a ship in the harbor *is* a `Ship` in the code, with
-its own position, speed, and behaviors.
-
-They built a language called **Simula 67** around this idea. Simula
-introduced two words that we still use every single day:
+They built this insight into a language, **Simula 67**, which
+introduced two words we still use every single day:
 
 - **Class** — the description, the template, the blueprint of a kind
   of thing.
@@ -84,50 +301,37 @@ flowchart LR
     C -->|new| O3["Ship 'Endurance'"]
 ```
 
-This was a quiet revolution. Programs were no longer just "code that
-manipulates data." Programs were *populations of small things*, each
-holding their own data and offering their own behavior.
-
-## Smalltalk: the radical version
+This was a quiet revolution — quiet enough that it took the field
+decades to absorb, and significant enough that Dahl and Nygaard
+eventually received the 2001 Turing Award, computing's highest
+honor, for it. A program was no longer just "code that manipulates
+data." A program was a *population of small things*, each holding
+its own data and offering its own behavior.
 
 In the 1970s, at Xerox PARC in California, **Alan Kay** and his team
-took Simula's idea to the extreme and built **Smalltalk**. Smalltalk
-said:
+pushed the idea to its limit in a language called **Smalltalk**:
+*everything* is an object — even numbers, even `true` and `false` —
+and objects interact only by sending each other messages. Kay coined
+the very phrase "object-oriented programming." (He later quipped, at
+the 1997 OOPSLA conference, "I made up the term 'object-oriented',
+and I can tell you I did not have C++ in mind.") The same PARC group
+invented overlapping windows, the bitmapped graphical interface, and
+much of what a young Steve Jobs saw on his famous 1979 visit — the
+visit that shaped the Lisa and the Macintosh. A staggering amount of
+modern computing traces back to that one research lab.
 
-> **Everything is an object. Objects communicate only by sending
-> messages.**
-
-In Smalltalk, even a number was an object. Even `true` and `false`
-were objects. There was no other way to do anything — if you wanted
-something to happen, you sent a message to an object.
-
-Smalltalk also introduced the modern graphical user interface, the
-window-and-mouse environment, and the idea of *live* programming
-where you could change a running program while it was still running.
-A staggering amount of what we now take for granted in computing came
-out of this one research group.
-
-```mermaid
-flowchart LR
-    A[Object A] -- send msg --> B[Object B]
-    B -- reply --> A
-    A -- send msg --> C[Object C]
-    C -- send msg --> D[Object D]
-```
-
-## Why "objects" tamed complexity
+## Why objects tamed complexity
 
 Recall the central pain of the procedural era: global data that any
-procedure could change. OOP solved this in a beautifully simple way.
+procedure could change. The object idea dissolves it with one rule:
 
-> **Each object owns its own data, and only its own methods can touch
-> that data.**
+> **Each object owns its own data, and only its own methods may
+> touch that data.**
 
-That single rule — later called **encapsulation** — meant that when a
-piece of data was wrong, you only had to look at *one* object's
-methods to find out who was responsible. It scoped the search. It put
-the data behind a door, and the door had a label saying *who* could
-open it.
+That rule — later named **encapsulation** — means that when a piece
+of data is wrong, you only have to look at *one* object's methods to
+find the culprit. It scopes the search. It puts the data behind a
+door, and the door has a label saying who may open it.
 
 ```mermaid
 flowchart TB
@@ -145,16 +349,13 @@ flowchart TB
     User -- "withdraw(10)" --> M2
 ```
 
-Outside code can ask an account to deposit or withdraw, but it
-cannot reach in and just rewrite the balance. The rules of the
-account live *with* the account.
+Outside code can *ask* an account to deposit or withdraw, but it
+cannot reach in and rewrite the balance. The rules of the account
+live *with* the account.
 
-## The four big ideas you will keep meeting
-
-Object-oriented programming, as it stabilized over the 1970s and 80s,
-is built on four ideas. Don't try to memorize them yet — we will
-spend many pages on each of them later. Just notice the shape of the
-list:
+As the idea matured through the 1970s and 80s, it stabilized into
+four pillars. Do not memorize them now — we will spend whole
+chapters on each. Just notice the shape of the list:
 
 | Idea | One-sentence summary |
 | --- | --- |
@@ -162,9 +363,6 @@ list:
 | **Abstraction** | Callers see *what* an object does, not *how* it does it. |
 | **Inheritance** | A new class can be defined as "a kind of" an existing class. |
 | **Polymorphism** | The same message can mean different things to different objects. |
-
-These four ideas, together, are the toolkit that lets us build
-programs in the millions of lines without our heads exploding.
 
 <MultipleChoice
   markdown={`Which language introduced the concepts of *class* and *object*?
@@ -195,14 +393,16 @@ programs in the millions of lines without our heads exploding.
 ## From research to industry
 
 Simula and Smalltalk were brilliant, but they were also rare. Most
-real software was still written in C, COBOL, and Pascal. The ideas
-were powerful; they had not yet escaped the research labs.
+real software in 1985 was still written in C, COBOL, and Pascal. The
+object idea was powerful; it had not yet escaped the research labs.
 
-Three things had to happen for OOP to take over the world:
+Three things had to happen for it to take over the world: a
+practical, production-grade language had to absorb the ideas; that
+language had to run on every kind of computer, not just one research
+workstation; and the industry had to be in enough pain to try
+something new.
 
-1. A practical, *production-grade* language had to absorb the ideas.
-2. That language had to work on every kind of computer — not just one
-   research workstation.
-3. The industry had to be in enough pain to *try something new*.
-
-In the 1980s and 90s, the planets aligned. We will look at that next.
+In the early 1990s, all three conditions were met at once — by a
+secret project at Sun Microsystems whose actual goal was to program
+*television set-top boxes and smart appliances*. That gloriously
+sideways origin story is the next page.
