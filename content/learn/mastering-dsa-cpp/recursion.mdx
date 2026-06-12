@@ -53,10 +53,10 @@ The leap of faith explains how to *write* recursion; the call stack explains how
 
 ```mermaid
 sequenceDiagram
-    participant F3 as factorial(3)
-    participant F2 as factorial(2)
-    participant F1 as factorial(1)
-    participant F0 as factorial(0)
+    participant F3 as factorial 3
+    participant F2 as factorial 2
+    participant F1 as factorial 1
+    participant F0 as factorial 0
     F3->>F2: needs 3 * factorial(2)
     F2->>F1: needs 2 * factorial(1)
     F1->>F0: needs 1 * factorial(0)

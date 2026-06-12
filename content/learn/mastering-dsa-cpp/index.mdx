@@ -31,7 +31,9 @@ using namespace std;`,
   long long candidates = 1000000; // try 1000000000000 next!
   int questions = 0;
   while (candidates > 1) {
-    candidates /= 2; // each yes/no question halves the field
+    // each question halves the field (round up: the
+    // answer might be hiding in the bigger half)
+    candidates = (candidates + 1) / 2;
     questions++;
   }
   cout << "I can find your number in " << questions << " questions\\n";
@@ -155,12 +157,12 @@ trades, and the craft is in knowing which trade your problem wants.
 
 ```mermaid
 flowchart TD
-    A[Problem] --> B{What ops<br/>are hot?}
+    A[Problem] --> B{"What ops<br/>are hot?"}
     B -->|lookup by key| C[Hash table]
     B -->|lookup by order| D[Balanced BST]
-    B -->|min/max| E[Heap]
-    B -->|prefix queries| F[Trie / Segment tree]
-    B -->|reachability| G[Graph + BFS/DFS]
+    B -->|"min/max"| E[Heap]
+    B -->|prefix queries| F["Trie / Segment tree"]
+    B -->|reachability| G["Graph + BFS/DFS"]
     C --> H[Fast algorithm]
     D --> H
     E --> H
