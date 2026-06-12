@@ -8,9 +8,6 @@
   --faint: #9ca3af;
   --border: #e5e7eb;
   --border-soft: #f3f4f6;
-  --card: #ffffff;
-  --figure-bg: #fbfbfc;
-  --checker: #f0f1f3;
   --link: var(--ds-blue-ink, #1d4ed8);
   --btn-bg: #ffffff;
   --btn-hover: #f3f4f6;
@@ -29,9 +26,6 @@
   --faint: #6b6b6b;
   --border: #2a2a2a;
   --border-soft: #1f1f1f;
-  --card: #181818;
-  --figure-bg: #1a1a1a;
-  --checker: #242424;
   --link: var(--ds-blue-400, #5ba7ff);
   --btn-bg: #1c1c1c;
   --btn-hover: #262626;
@@ -199,7 +193,6 @@
   border: 1px solid var(--border);
   border-radius: 0.75rem;
   overflow: hidden;
-  background: var(--card);
 }
 
 .figure {
@@ -207,16 +200,6 @@
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
-  /* Subtle checkerboard so fully-transparent / white-on-white graphics are
-     still visible against the card. */
-  background-color: var(--figure-bg);
-  background-image:
-    linear-gradient(45deg, var(--checker) 25%, transparent 25%),
-    linear-gradient(-45deg, var(--checker) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, var(--checker) 75%),
-    linear-gradient(-45deg, transparent 75%, var(--checker) 75%);
-  background-size: 16px 16px;
-  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
 }
 
 .figure svg {
