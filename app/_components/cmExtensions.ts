@@ -8,7 +8,8 @@
 // extensions / decorations / annotations later is just appending to the
 // extension list at the call site.
 
-import { EditorView } from "@codemirror/view";
+import { EditorView, type KeyBinding } from "@codemirror/view";
+import { redo } from "@codemirror/commands";
 import {
   HighlightStyle,
   StreamLanguage,
@@ -23,6 +24,19 @@ import {
   THEME_PALETTES,
   type ThemePalette,
 } from "./playgroundTheme";
+
+// ─── Redo keybinding ─────────────────────────────────────────────────────
+//
+// `@codemirror/commands`' default `historyKeymap` binds redo to Ctrl-y on
+// Windows/Linux and Cmd-Shift-z on macOS, so the near-universal Ctrl-Shift-z
+// redo chord does nothing on Windows/Linux. `Mod-Shift-z` fills that gap:
+// `Mod` resolves to Ctrl on Windows/Linux and Cmd on macOS, so redo now
+// fires on Ctrl-Shift-z (Win/Linux) and Cmd-Shift-z (macOS), alongside the
+// existing Ctrl-y. Append after `historyKeymap` wherever an editable editor
+// is mounted.
+export const redoKeymap: readonly KeyBinding[] = [
+  { key: "Mod-Shift-z", run: redo, preventDefault: true },
+];
 
 // ─── Language loader ─────────────────────────────────────────────────────
 //
