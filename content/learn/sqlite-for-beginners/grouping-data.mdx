@@ -163,6 +163,22 @@ ORDER BY
 
 There are six ticket rows, but only three priority groups: `High`, `Medium`, and `Low`.
 
+It is worth tracing this once by hand, because it is the mental
+model you will use for every grouped query you ever write. SQLite
+conceptually sorts the six rows into labeled buckets, then runs
+`COUNT(*)` once *inside each bucket*:
+
+```text
+bucket "High":    High, High            -> COUNT(*) = 2
+bucket "Medium":  Medium                -> COUNT(*) = 1
+bucket "Low":     Low, Low, Low         -> COUNT(*) = 3
+```
+
+Each bucket then contributes exactly one row to the result: its
+label and its summary. Six rows in, three rows out. When a grouped
+query ever surprises you, redraw the buckets on paper — the
+confusion almost always dissolves.
+
 <MultipleChoice
   markdown={`What does \`GROUP BY priority\` do before \`COUNT(*)\` runs?
 
@@ -377,6 +393,71 @@ ORDER BY
 />
 
 The result does not show Luna, Milo, or Nori as separate rows. It shows one row per species.
+
+## Practice challenge
+
+One concept, one query: group rows into buckets and count each
+bucket.
+
+<SqlChallengeCard
+  dialect="sqlite"
+  title="Pets per species"
+  instructions={`The \`pets\` table is preloaded. Return one row per \`species\` with the columns \`species\` and \`pet_count\` (the number of pets of that species, using \`COUNT(*)\`). Sort by \`pet_count\` descending, then by \`species\` ascending to break ties.`}
+  initSql={`CREATE TABLE pets (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  species TEXT
+);
+INSERT INTO pets (name, species) VALUES
+  ('Luna', 'Cat'),
+  ('Milo', 'Dog'),
+  ('Nori', 'Cat'),
+  ('Pip', 'Bird'),
+  ('Rex', 'Dog'),
+  ('Suki', 'Cat');`}
+  starterCode={`SELECT
+  species
+FROM
+  pets;`}
+  solutionSql={`SELECT
+  species,
+  COUNT(*) AS pet_count
+FROM
+  pets
+GROUP BY
+  species
+ORDER BY
+  pet_count DESC,
+  species ASC;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Has species and pet_count columns",
+      description: "In that exact order",
+      expectedColumns: ["species", "pet_count"],
+    },
+    {
+      id: "row_count",
+      name: "Returns 3 rows",
+      description: "One per species: Cat, Dog, Bird",
+      expectedRowCount: 3,
+    },
+    {
+      id: "rows",
+      name: "Largest group first",
+      description: "Cat (3), Dog (2), Bird (1)",
+      expectedRows: {
+        columns: ["species", "pet_count"],
+        ordered: true,
+        values: [
+          ["Cat", 3],
+          ["Dog", 2],
+          ["Bird", 1],
+        ],
+      },
+    },
+  ]}
+/>
 
 ## Check your understanding
 
