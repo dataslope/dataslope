@@ -98,6 +98,7 @@ import {
   type ColumnStats,
 } from "../utils/columnStats";
 import { orderEditedStatementByPk } from "../utils/sqlAnalysis";
+import { DiamondMark } from "../../mdx/loadingAnimations";
 
 // ────────────────────────────────────────────────────────────────────────
 // Local helpers
@@ -1500,7 +1501,9 @@ function ResultViewImpl({
   if (loading) {
     return (
       <div className="welcome" data-result-empty="loading">
-        <div className="welcome-icon">⌬</div>
+        <div className="welcome-icon">
+          <DiamondMark size={40} />
+        </div>
         <h3>Loading {engineLabel} engine…</h3>
       </div>
     );
@@ -1508,7 +1511,9 @@ function ResultViewImpl({
   if (!result) {
     return (
       <div className="welcome" data-result-empty="idle">
-        <div className="welcome-icon">⌬</div>
+        <div className="welcome-icon">
+          <DiamondMark size={40} />
+        </div>
         <h3>Run a query to see results</h3>
         <p>
           Press <kbd className="kbd">Run</kbd> or use the keyboard shortcut to

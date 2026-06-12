@@ -475,21 +475,13 @@ body.playground-active {
   z-index: 5;
 }
 
-/* Top group: regular panel buttons. Bottom group is pinned to the bottom. */
+/* Top group: regular panel buttons. */
 .playground-icon-sidebar-top {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
   flex: 1;
-}
-
-.playground-icon-sidebar-bottom {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding-top: 4px;
 }
 
 .playground-icon-sidebar-btn {
@@ -805,10 +797,26 @@ body.playground-active {
 .panes {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  /* Pin the single grid row to the container height. Without this the
+     implicit `auto` row tracks its tallest item's content — so a tall
+     Settings pane (e.g. the Themes grid) silently stretched the editor
+     past the viewport, and a short one didn't fill it. */
+  grid-template-rows: minmax(0, 1fr);
   flex: 1;
   min-height: 0;
   overflow: hidden;
   position: relative;
+}
+
+/* While the Settings tab is active, pin the output pane to the cell the
+   settings panel overlays (row 1, column 2). Without this, the settings
+   pane's explicit placement claims that cell first and grid
+   auto-placement spills the output pane into an implicit second row —
+   which both shrank row 1 (the editor) and let the settings panel's
+   content height drive the editor's height. */
+.panes[data-settings-active] .output-pane {
+  grid-row: 1;
+  grid-column: 2;
 }
 
 /* On desktop the settings tab sits in the output column only (so the
@@ -817,6 +825,13 @@ body.playground-active {
    mobile the settings panel covers the whole pane area, so hide the bar
    underneath it there. */
 @media (max-width: 768px) {
+  /* The mobile panes area is a single tab-switched column and the
+     settings panel covers it absolutely, so undo the desktop pinning —
+     an explicit column 2 would otherwise open an implicit track. */
+  .panes[data-settings-active] .output-pane {
+    grid-row: auto;
+    grid-column: auto;
+  }
   .panes[data-settings-active] .pane-bar {
     display: none;
   }
@@ -1317,8 +1332,13 @@ body.playground-active {
   padding: 32px;
 }
 .welcome-icon {
+  /* Tints the static DiamondMark brand SVG (it draws with currentColor). */
   color: var(--primary);
-  font-size: 32px;
+  line-height: 0;
+  margin-bottom: 4px;
+}
+.welcome-icon svg {
+  display: block;
 }
 .welcome h3 {
   /* "Run a query to see results" is an <h3>. A bare `h3` selector (e.g. the
@@ -1687,9 +1707,8 @@ body.playground-active {
 .settings-tabs-list {
   display: flex;
   flex-direction: row;
-  /* Extra right padding so the floating close button doesn't overlap
-     the rightmost tab. */
-  padding: 0 44px 0 10px;
+  align-items: center;
+  padding: 0 10px;
   flex-shrink: 0;
   background: var(--bg2);
 }
@@ -1732,6 +1751,34 @@ body.playground-active {
   flex-shrink: 0;
 }
 
+/* ✕ button pinned to the far right of the settings tab bar — closes the
+   Settings tab and returns to the previously-active surface. */
+.settings-tabs-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin-left: auto;
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+.settings-tabs-close:hover {
+  background: color-mix(in srgb, var(--text) 8%, transparent);
+  color: var(--text);
+}
+.settings-tabs-close:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--text-muted);
+}
+
 .settings-panel-pane {
   flex: 1;
   min-height: 0;
@@ -1768,64 +1815,91 @@ body.playground-active {
 
 /* Restore-defaults / clear-localStorage actions. Sit at the bottom of
    the General tab, separated from the rest by a divider so they don't
-   read as just-another-toggle. The buttons are styled as a vertical
-   grouped control — shared borders, corner-radius only on the outermost
-   buttons — so they read as one cohesive section. */
+   read as just-another-toggle. The buttons are grouped into rounded
+   cards — neutral maintenance actions in one, destructive actions in a
+   red-tinted "danger" one — with each row carrying a soft tinted icon
+   chip, so the section reads as deliberate UI rather than a raw button
+   stack. */
 .settings-actions {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  padding-top: 14px;
+  gap: 12px;
+  padding-top: 16px;
   border-top: 1px solid var(--border);
 }
-.settings-action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 13px 16px;
-  background: transparent;
+.settings-actions-group {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg2);
   border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.settings-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
   color: var(--text);
   font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 500;
-  border-radius: 0;
+  text-align: left;
   cursor: pointer;
-  position: relative;
   transition:
     background-color 0.15s,
     color 0.15s;
 }
-/* Collapse adjacent borders so each shared edge is 1 px, not 2. */
-.settings-action-btn:not(:first-child) {
-  margin-top: -1px;
+/* Hairline divider between stacked rows inside a group. */
+.settings-action-btn + .settings-action-btn {
+  border-top: 1px solid var(--border);
 }
-/* Hover needs z-index so its border renders on top of siblings. */
 .settings-action-btn:hover {
-  z-index: 1;
-  border-color: color-mix(in srgb, var(--text) 40%, var(--border) 60%);
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
 }
-/* Corner radius: top on first, bottom on last, all four on an only-child. */
-.settings-action-btn:first-child {
-  border-radius: var(--radius) var(--radius) 0 0;
+.settings-action-btn:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--primary);
 }
-.settings-action-btn:last-child {
-  border-radius: 0 0 var(--radius) var(--radius);
-}
-.settings-action-btn:only-child {
-  border-radius: var(--radius);
-}
-.settings-action-btn svg {
+/* Soft tinted chip behind each row's icon — brand blue for neutral
+   actions, red for destructive ones. */
+.settings-action-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
-  color: currentColor;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+  color: var(--primary);
+}
+.settings-action-icon svg {
+  flex-shrink: 0;
+}
+.settings-action-label {
+  min-width: 0;
+}
+/* Destructive rows: red text + red-tinted chip, with the group border
+   warmed toward red so the danger card reads at a glance. */
+.settings-actions-group-danger {
+  border-color: color-mix(in srgb, var(--red) 35%, var(--border));
+}
+.settings-actions-group-danger .settings-action-btn + .settings-action-btn {
+  border-top-color: color-mix(in srgb, var(--red) 20%, var(--border));
 }
 .settings-action-danger {
   color: var(--red);
-  border-color: var(--red);
+}
+.settings-action-danger .settings-action-icon {
+  background: color-mix(in srgb, var(--red) 14%, transparent);
+  color: var(--red);
 }
 .settings-action-danger:hover {
+  background: color-mix(in srgb, var(--red) 9%, transparent);
   color: var(--red);
-  border-color: oklch(from var(--red) calc(l - 0.3) c h);
 }
 
 /* Editor-themes tab — grid of preview cards. */
@@ -1902,23 +1976,18 @@ body.playground-active {
 }
 
 /* On narrow viewports the settings panel takes (almost) the full screen
-   and the tabs switch to a left-side icon-only rail so the body has
-   more vertical room. The labels are visually hidden but kept in the
-   DOM for screen readers. */
+   and the tabs collapse to a horizontal row of icon-only pills across
+   the top, so the body keeps its vertical room. The labels are visually
+   hidden but kept in the DOM for screen readers. */
 @media (max-width: 768px) {
-  .settings-tabs {
-    flex-direction: row;
-  }
   .settings-tabs-list {
-    flex-direction: column;
     gap: 6px;
-    padding: 10px 6px;
-    border-bottom: none;
-    border-right: 1px solid var(--border);
-    flex-shrink: 0;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
   }
   .settings-tab {
-    padding: 10px;
+    flex: 1;
+    padding: 9px 10px;
     margin-bottom: 0;
     border: 1px solid transparent;
     border-radius: 8px;
@@ -1944,6 +2013,10 @@ body.playground-active {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+  }
+  /* The ✕ keeps its intrinsic size at the end of the pill row. */
+  .settings-tabs-close {
+    margin-left: 4px;
   }
   .theme-grid {
     grid-template-columns: 1fr;
@@ -2628,6 +2701,21 @@ input[type="range"].fs-slider:disabled {
 .import-section-label:first-child {
   margin-top: 8px;
   padding-top: 4px;
+}
+
+/* Group of several extension badges beside one item title (the unified
+   database-import entry). The title text keeps to one line; the badges
+   right-align and wrap to extra rows instead of squeezing it. */
+.ex-title-text {
+  white-space: nowrap;
+}
+.ext-badge-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 3px;
+  min-width: 0;
+  margin-left: 8px;
 }
 
 /* File-extension badge — compact inline badge rendered beside the item title. */
