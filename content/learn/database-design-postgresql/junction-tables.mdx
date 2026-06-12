@@ -224,6 +224,71 @@ flowchart TB
 The design principle is the same either way: one row represents one
 pairing, and the database should prevent accidental duplicate pairings.
 
+## Try it: create a pairing
+
+A junction row is just an ordinary insert — the design does the hard
+work. Prove it to yourself with the schema from above.
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Enroll Linus in Math"
+  instructions={`Linus (\`student_id = 3\`) wants to join Math (\`course_id = 10\`). Insert **one row** into \`enrollments\` with those two ids, \`enrolled_on = DATE '2026-02-01'\`, and \`grade = NULL\` (you can simply omit the grade column). Ada's and Grace's existing enrollments must be left alone.`}
+  initSql={`CREATE TABLE students (
+  id   INTEGER PRIMARY KEY,
+  name TEXT NOT NULL
+);
+
+CREATE TABLE courses (
+  id    INTEGER PRIMARY KEY,
+  title TEXT NOT NULL
+);
+
+CREATE TABLE enrollments (
+  student_id  INTEGER NOT NULL REFERENCES students(id),
+  course_id   INTEGER NOT NULL REFERENCES courses(id),
+  enrolled_on DATE NOT NULL,
+  grade       TEXT CHECK (grade IN ('A', 'B', 'C', 'D', 'F')),
+  PRIMARY KEY (student_id, course_id)
+);
+
+INSERT INTO students (id, name) VALUES
+  (1, 'Ada'), (2, 'Grace'), (3, 'Linus');
+
+INSERT INTO courses (id, title) VALUES
+  (10, 'Math'), (11, 'History');
+
+INSERT INTO enrollments (student_id, course_id, enrolled_on, grade) VALUES
+  (1, 10, DATE '2025-01-15', 'A'),
+  (1, 11, DATE '2025-01-16', 'B'),
+  (2, 10, DATE '2025-01-18', 'A');`}
+  starterCode={`-- INSERT one enrollment row: Linus (3) into Math (10), enrolled 2026-02-01.`}
+  solutionSql={`INSERT INTO
+  enrollments (student_id, course_id, enrolled_on)
+VALUES
+  (3, 10, DATE '2026-02-01');`}
+  tests={[
+    {
+      id: "pairing_exists",
+      name: "Linus is enrolled in Math",
+      description: "One row with student_id 3 and course_id 10",
+      runAfterSql:
+        "SELECT COUNT(*) FROM enrollments WHERE student_id = 3 AND course_id = 10 AND enrolled_on = DATE '2026-02-01';",
+      runAfterEquals: 1,
+    },
+    {
+      id: "total_rows",
+      name: "Exactly one new row",
+      description: "Four enrollments in total",
+      runAfterSql: "SELECT COUNT(*) FROM enrollments;",
+      runAfterEquals: 4,
+    },
+  ]}
+/>
+
+After it passes, run the challenge again with the same insert — the
+composite primary key rejects the duplicate pairing, exactly as this
+page promised.
+
 ## Check your understanding
 
 <MultipleChoice

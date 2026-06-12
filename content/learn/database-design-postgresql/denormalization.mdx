@@ -206,6 +206,55 @@ The summary table is not the source of truth. The orders and order items
 are. If an order changes later, the summary must be refreshed or updated
 according to the system's rules.
 
+## Spot it in the wild: Northwind's "duplicated" prices
+
+The classic **Northwind** sample database — Microsoft's demo store,
+ported to PostgreSQL — is a nice place to see this thinking in a
+finished schema. Its `products` table stores `unit_price`, the
+catalog price today. Its `order_details` table *also* stores a
+`unit_price` on every order line. Duplication? Run the query and
+look at the rows where the two prices disagree.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Catalog price now vs. price actually charged"
+  remoteInitSql="postgres/northwind_postgres.sql"
+  tables={["products", "order_details"]}
+  starterCode={`SELECT
+  p.product_name,
+  p.unit_price AS catalog_price_now,
+  od.unit_price AS price_charged,
+  COUNT(*) AS order_lines
+FROM
+  order_details od
+  JOIN products p ON p.product_id = od.product_id
+WHERE
+  od.unit_price <> p.unit_price
+GROUP BY
+  p.product_name,
+  p.unit_price,
+  od.unit_price
+ORDER BY
+  p.product_name
+LIMIT
+  12;`}
+/>
+
+Those disagreements are not bugs — they are history. Prices rose, and
+the old order lines kept the price the customer actually paid. This
+is the most important nuance on the page: what looks like a
+duplicated fact is sometimes *two different facts that happen to
+share a name*. "What does this product cost?" and "what did this
+customer pay on that day?" have different answers, different owners,
+and different update rules, so they each deserve a column. A copied
+fact needs a sync plan; a historical fact needs the opposite — a
+guarantee that nobody will ever "fix" it to match the catalog. Part
+of designing well is telling those two situations apart.
+
+You will see the same move again in the e-commerce case study later
+in this course, where we put `unit_price` on `order_items` for
+exactly this reason.
+
 ## A decision checklist
 
 Before denormalizing, ask:

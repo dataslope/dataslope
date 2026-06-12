@@ -271,6 +271,75 @@ erDiagram
 Only after data and code use `task_assignees` would a later migration
 remove `tasks.owner_id`.
 
+## Try it: run the safe pattern yourself
+
+Earlier you watched the add-backfill-tighten sequence; now write one.
+The `tasks` table below has existing rows, and the team wants a new
+**required** column. Remember the order: a one-step `ADD COLUMN ...
+NOT NULL` would fail, because the old rows have no value yet.
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Add a required column without breaking old rows"
+  instructions={`Add a required \`category\` column to \`tasks\` in three steps, in one script: (1) \`ALTER TABLE tasks ADD COLUMN category TEXT;\` — nullable at first; (2) backfill every existing row with \`UPDATE tasks SET category = 'general' ...\`; (3) tighten with \`ALTER TABLE tasks ALTER COLUMN category SET NOT NULL;\`. When you are done, both existing tasks must have the category \`'general'\` and the column must be \`NOT NULL\`.`}
+  initSql={`CREATE TABLE tasks (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    title TEXT NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('open', 'done'))
+);
+
+INSERT INTO tasks (title, status) VALUES
+    ('Draft design', 'open'),
+    ('Review keys', 'done');`}
+  starterCode={`-- Step 1: add the column (nullable).
+
+-- Step 2: backfill existing rows with 'general'.
+
+-- Step 3: set the column NOT NULL.`}
+  solutionSql={`ALTER TABLE tasks
+ADD COLUMN category TEXT;
+
+UPDATE tasks
+SET
+  category = 'general'
+WHERE
+  category IS NULL;
+
+ALTER TABLE tasks
+ALTER COLUMN category
+SET NOT NULL;`}
+  tests={[
+    {
+      id: "column_required",
+      name: "category exists and is NOT NULL",
+      description: "The column is present and the constraint is tightened",
+      runAfterSql:
+        "SELECT COUNT(*) FROM information_schema.columns WHERE table_name = 'tasks' AND column_name = 'category' AND is_nullable = 'NO';",
+      runAfterEquals: 1,
+    },
+    {
+      id: "backfilled",
+      name: "Both old rows are backfilled",
+      description: "Every existing task has category 'general'",
+      runAfterSql:
+        "SELECT COUNT(*) FROM tasks WHERE category = 'general';",
+      runAfterEquals: 2,
+    },
+    {
+      id: "rows_intact",
+      name: "No rows lost",
+      description: "The two original tasks still exist",
+      runAfterSql: "SELECT COUNT(*) FROM tasks;",
+      runAfterEquals: 2,
+    },
+  ]}
+/>
+
+The sequence matters more than the syntax. On a production table with
+millions of rows, each of those three steps might ship days apart —
+but the logical order, *add, backfill, verify, tighten*, is exactly
+what you just wrote.
+
 ## Check your understanding
 
 <MultipleChoice
