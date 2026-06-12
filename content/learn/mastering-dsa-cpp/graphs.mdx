@@ -3,7 +3,9 @@ title: Graphs
 description: Learn graph vocabulary, representations, density, degrees, and C++ graph construction patterns
 ---
 
-A **graph** is a collection of **vertices** `V` and **edges** `E`. Vertices are the objects; edges are relationships between them. Graphs are the language of networks: social follows, road maps, web links, package dependencies, neural network topology, game maps, and workflow pipelines.
+In 1736, the citizens of Königsberg had a puzzle: their city straddled a river, with two islands joined to the banks by seven bridges, and nobody could find a walk that crossed every bridge exactly once. Leonhard Euler proved no such walk exists — and the way he proved it founded a field. He realized the city's geography was irrelevant: only which landmasses connect to which mattered. Shrink each landmass to a dot, each bridge to a line, and reason about dots and lines. With that abstraction, graph theory was born.
+
+Euler's move is the one you will make constantly as a programmer. A **graph** is a collection of **vertices** `V` and **edges** `E` — objects and the relationships between them, with everything else abstracted away. Social follows, road maps, web links, package dependencies, game maps, workflow pipelines: wildly different surfaces, identical bones. Learn one set of graph algorithms and you have learned them all at once. This page covers the part everyone skips and then regrets skipping: how to *represent* a graph in memory, because that choice silently decides which algorithms run fast.
 
 <svg
   viewBox="0 0 640 210"
@@ -79,11 +81,11 @@ A linked list is a graph where each vertex has at most one outgoing edge. A tree
 
 ## The same example in three representations
 
-Use vertices `0, 1, 2, 3` and undirected edges `0-1`, `0-2`, `1-2`, `2-3`.
+Unlike a tree, a graph has no root, no parent pointers, no natural "shape" to hang in memory — so we must choose an encoding, and the three standard choices answer different questions quickly. We will store the same little graph all three ways: vertices `0, 1, 2, 3` and undirected edges `0-1`, `0-2`, `1-2`, `2-3`.
 
 ### Adjacency matrix
 
-An adjacency matrix is a `V × V` table. `matrix[u][v]` tells whether edge `u -> v` exists. It uses **O(V²)** space and supports **O(1)** edge lookup.
+An adjacency matrix is a `V × V` table. `matrix[u][v]` tells whether edge `u -> v` exists. It uses **O(V²)** space and supports **O(1)** edge lookup. Note how the undirected edges are written twice — `matrix[u][v]` and `matrix[v][u]` — making the matrix symmetric about its diagonal.
 
 <CodeBlock
   adapter="cpp"
@@ -116,11 +118,11 @@ int main() {
   ]}
 />
 
-Matrix lookup is great for dense graphs or repeated `hasEdge(u, v)` checks.
+Matrix lookup is great for dense graphs or repeated `hasEdge(u, v)` checks. But consider the cost for a big sparse network: a million-user social graph needs a trillion-cell matrix, almost entirely zeros, just to record a few million friendships. That absurdity motivates the second representation.
 
 ### Adjacency list
 
-An adjacency list stores only existing neighbors. It uses **O(V + E)** space, so it is usually best for sparse graphs.
+An adjacency list stores, for each vertex, only the neighbors it actually has: `adj[u]` is a vector of `u`'s neighbors. Space drops to **O(V + E)** — you pay for what exists, not for what could exist — and "visit all neighbors of `u`," the inner loop of nearly every graph algorithm, becomes a tight scan of exactly the right data. This is why the adjacency list is the default representation in practice and in the rest of this course.
 
 <CodeBlock
   adapter="cpp"
@@ -249,7 +251,7 @@ int main() {
   ]}
 />
 
-A graph is **sparse** when `E` is much smaller than `V²`. It is **dense** when the possible edges are mostly present. Sparse graphs usually prefer adjacency lists; dense graphs can justify matrices.
+A graph is **sparse** when `E` is much smaller than `V²`. It is **dense** when the possible edges are mostly present. Almost every graph arising from the real world is sparse — road intersections connect to a handful of streets, people follow hundreds of accounts out of billions — which is why the adjacency list wins by default, and the matrix is reserved for small or genuinely dense graphs.
 
 ```mermaid
 graph TD

@@ -3,7 +3,7 @@ title: Next Steps
 description: Where to go after mastering data structures and algorithms in C++
 ---
 
-Congratulations. You have traveled from foundations to linear structures, recursion, search, sort, hashing, trees, graphs, and algorithmic paradigms.
+Congratulations. You have traveled from foundations to linear structures, recursion, search, sort, hashing, trees, graphs, and algorithmic paradigms — and picked up some history on the way: Hoare's Moscow sorting problem, Dijkstra's café, Huffman's term paper, Bloch's overflow bug. If one meta-lesson is worth keeping, it is the one those stories share: every structure in this course is a *trade*, invented by someone who needed one operation to be cheap and accepted that another would get expensive. When you face a new problem, ask which operations are hot, and the right structure usually names itself.
 
 <svg
   viewBox="0 0 640 230"
@@ -52,9 +52,11 @@ Congratulations. You have traveled from foundations to linear structures, recurs
 You now have the toolkit to read serious algorithmic code, solve interview-style problems, and build systems that depend on efficient data structures. Thank you for learning with this course.
 </Callout>
 
+What follows is a map, not a syllabus — pick the direction that matches what you want to build, and go deep rather than wide.
+
 ## Advanced data structures
 
-Explore segment trees, Fenwick trees (BIT), suffix arrays, sparse tables, treaps, and splay trees.
+Explore segment trees and Fenwick trees (range queries with updates — the natural next step after heaps), suffix arrays (the string-search workhorse), sparse tables, treaps, and splay trees.
 
 ## Advanced graph algorithms
 
@@ -99,6 +101,8 @@ LeetCode, Codeforces, AtCoder, HackerRank, and USACO all give different styles o
 - C++ Primer
 
 ## A final C++ wave-off
+
+One last runnable program, as a send-off. It is nothing exotic — a frequency count, a custom-sorted vector of pairs, a tidy printout — but notice how many chapters it quietly uses: hashing-by-tree (`std::map`), introsort (`std::sort`), a lambda comparator with a tiebreak, amortized vector growth. Fluency is when this reads as one thought.
 
 <CodeBlock
   adapter="cpp"

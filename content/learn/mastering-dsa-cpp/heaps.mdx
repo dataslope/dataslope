@@ -3,7 +3,9 @@ title: Heaps and Priority Queues
 description: Learn binary heaps, heapify, heap sort, priority_queue, and heap-based problem patterns in C++
 ---
 
-A binary heap is a complete binary tree stored in an array. A max-heap keeps every parent greater than or equal to its children. A min-heap keeps every parent less than or equal to its children.
+An emergency room does not serve patients first-come-first-served, and it does not keep them fully sorted by severity either — it only ever needs to know *who is most urgent right now*. That is a **priority queue**: insert items in any order, always extract the most important one. A sorted array could do it, but every arrival costs O(n) shifting. A BST could do it in O(log n), but it maintains *total* order — far more than the problem asks — and drags pointer overhead along.
+
+The binary heap, introduced by J. W. J. Williams in 1964 as the engine of his heapsort algorithm, is the just-enough structure: a complete binary tree that maintains only one promise. In a **max-heap**, every parent is ≥ its children; in a **min-heap**, every parent is ≤ its children. That single local rule guarantees the global winner sits at the root — and nothing more. Siblings may be in any order. By refusing to promise total order, the heap gets away with O(log n) insert and extract, O(1) peek, and — Williams's masterstroke — no pointers at all, because a *complete* tree packs perfectly into an array.
 
 <svg
   viewBox="0 0 640 220"
@@ -73,7 +75,7 @@ flowchart LR
     I0["0:50"] --> I1["1:30"] --> I2["2:40"] --> I3["3:10"] --> I4["4:20"] --> I5["5:35"]
 ```
 
-For index `i`, children are `2*i + 1` and `2*i + 2`. The parent is `(i - 1) / 2`.
+For index `i`, children are `2*i + 1` and `2*i + 2`. The parent is `(i - 1) / 2`. Read the tree above left to right, level by level, and you get exactly the array below it — completeness means no gaps, so the formulas never miss. Navigation becomes arithmetic: no `left`/`right` pointers, no allocations, and the whole structure enjoys the vector's cache-friendliness.
 
 <CodeBlock
   adapter="cpp"
@@ -100,7 +102,7 @@ int main() {
 
 ## Push: sift up
 
-Insert at the end to preserve completeness, then swap upward until the heap property is restored.
+Both heap operations follow the same playbook: *restore completeness first, then repair the one broken promise.* To push, append the new value at the end of the array — the only spot that keeps the tree complete. The shape is now right, but the newcomer may outrank its parent, so it bubbles upward, swapping with its parent until the heap property holds. The path from any node to the root is at most log n long, so a push is O(log n).
 
 ```mermaid
 flowchart LR
@@ -144,7 +146,7 @@ int main() {
 
 ## Pop: sift down
 
-Remove the root by moving the last value to index 0, then swapping down with the larger child.
+Pop runs the same playbook in reverse. The root must go, but ripping out index 0 would tear a hole — so move the *last* array element into the root's place (completeness restored), then let this usually-too-small impostor sink: swap it with its **larger** child until both children are smaller. Swapping with the larger child is essential — promote the smaller one and it would immediately violate the property against its sibling.
 
 <CodeBlock
   adapter="cpp"
@@ -191,7 +193,7 @@ int main() {
 
 ## Bottom-up heapify
 
-Building a heap by repeatedly pushing is O(n log n). Bottom-up heapify runs sift-down from the last internal node to the root and takes O(n).
+Given n values all at once, you could push them one by one — O(n log n). Robert Floyd observed in 1964 that you can do better: treat the raw array as an almost-heap and run sift-down on each internal node from the *bottom up*. Why is that only O(n)? Because the cost of a sift-down is the node's distance to the leaves, and almost all nodes live near the bottom: half the nodes are leaves (cost 0), a quarter sit one level up (cost ≤ 1), an eighth two levels up — the sum `n/2·0 + n/4·1 + n/8·2 + …` converges to O(n). The expensive nodes are exactly the rare ones.
 
 ```text
 for i from parent(last_index) down to 0:
@@ -242,7 +244,7 @@ int main() {
 
 ## Heap sort
 
-Heap sort builds a max-heap, then repeatedly swaps the root with the end and shrinks the heap.
+Williams's original application falls out almost for free. Build a max-heap (O(n), as above); now the maximum is at index 0. Swap it with the last element — the maximum is in its final sorted position — shrink the heap by one, and sift the new root down. Repeat n−1 times: O(n log n) total, in place, no merge buffer. Heapsort is rarely the fastest sort in practice (its memory access pattern jumps around, which caches dislike), but its guaranteed bound is why introsort keeps it as the emergency parachute behind `std::sort`.
 
 ```mermaid
 flowchart TD
@@ -332,11 +334,9 @@ int main() {
 
 ## Applications
 
-Heaps appear whenever you need the next best item quickly.
+Heaps appear whenever you need the next best item quickly — schedulers picking the next task, simulations picking the next event, Dijkstra's algorithm (two chapters ahead) picking the next closest vertex.
 
-* Top-k elements: keep a min-heap of size k.
-* Streaming median: use a max-heap for the lower half and a min-heap for the upper half.
-* Dijkstra preview: repeatedly extract the unvisited node with smallest tentative distance.
+The most useful interview pattern is **top-k with an inverted heap**, and it is delightfully counterintuitive: to track the k *largest* items in a stream, keep a *min*-heap of size k. The heap's root is the smallest of your current top k — the gatekeeper. Each new item either beats the gatekeeper (pop it, push the newcomer) or is ignored. Memory stays O(k) even if the stream is endless. Other classics: the streaming median (a max-heap for the lower half facing a min-heap for the upper half) and k-way merging (the second challenge below).
 
 <CodeBlock
   adapter="cpp"
