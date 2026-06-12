@@ -3,7 +3,14 @@ title: Dynamic Programming
 description: Learn memoization, tabulation, and classic dynamic programming patterns in C++
 ---
 
-Dynamic programming solves problems by combining answers to **overlapping subproblems** with **optimal substructure**. It is the next step after recursion: the Fibonacci tree in `recursion.mdx` repeats calls; DP stores those answers.
+Dynamic programming has the most intimidating name in algorithms, and the name is a lie — a deliberate one. Richard Bellman, who developed the method at the RAND Corporation in the 1950s, recounted in his autobiography that he needed a name that would shield his mathematical research from a Secretary of Defense who, he said, "had a pathological fear and hatred of the word 'research.'" He chose "dynamic" partly because "it's impossible to use the word dynamic in a pejorative sense" — and "programming" here means *planning*, as in a schedule, not coding. So: dynamic programming is multistage planning with a politically bulletproof name.
+
+Strip away the camouflage and the idea is one you have already met. On the [recursion page](/learn/mastering-dsa-cpp/recursion), naive Fibonacci was exponential because it kept re-solving the same subproblems — `fib(40)` makes 300+ million calls to derive a handful of distinct values. Dynamic programming is the cure: **when a recursion's subproblems overlap, solve each one once and remember the answer.** Two properties tell you DP applies:
+
+* **Overlapping subproblems** — the recursion revisits the same states (otherwise a cache buys nothing).
+* **Optimal substructure** — the best answer to the whole problem is built from best answers to subproblems (otherwise cached sub-answers don't compose).
+
+When both hold, an exponential search collapses to "number of distinct states × work per state," which is usually polynomial. That collapse is the entire trick; the rest of this page is practice recognizing it in different costumes.
 
 <svg
   viewBox="0 0 640 220"
@@ -57,7 +64,7 @@ Dynamic programming solves problems by combining answers to **overlapping subpro
 
 ## Mindset
 
-Top-down **memoization** is recursion plus a cache. Bottom-up **tabulation** fills a table from base cases upward.
+There are two ways to "remember the answers," and they are mirror images. Top-down **memoization** keeps the recursive code you would naturally write and adds a cache: before computing, check the cache; after computing, fill it. Bottom-up **tabulation** flips the direction — start from the base cases and fill a table forward until the goal state is reached, no recursion at all. Memoization is easier to write (it *is* the recursion, plus three lines) and only computes states actually needed; tabulation avoids recursion depth limits and usually runs faster per state. Both visit each state once; pick whichever lets you think clearly.
 
 ```mermaid
 flowchart TD
@@ -72,9 +79,9 @@ flowchart TD
 Before coding, say exactly what `dp[i]` or `dp[i][j]` means. The transition usually follows naturally.
 </Callout>
 
-## Fibonacci
+## Fibonacci, four ways
 
-Naive recursion is exponential because it repeats work.
+Fibonacci is DP's "hello, world" — too simple to be impressive, perfect for watching the same problem pass through every stage of refinement. Stage one, the naive recursion, repeated here from the recursion chapter:
 
 <CodeBlock
   adapter="cpp"
@@ -108,6 +115,8 @@ graph TD
     C --> G["<code>fib(1)</code>"]
 ```
 
+Stage two: memoization. Same recursion, plus a `memo` vector where `-1` means "not yet computed." Each distinct `n` is now computed once — O(n) total. Notice how little the code changed; the cache check and the cache write are the only additions.
+
 <CodeBlock
   adapter="cpp"
   files={[
@@ -131,6 +140,8 @@ int main() {
     },
   ]}
 />
+
+Stage three: tabulation. Drop the recursion and fill the table forward from the base cases — `dp[i]` only ever reads `dp[i-1]` and `dp[i-2]`, which are already final by the time `i` is reached.
 
 <CodeBlock
   adapter="cpp"
@@ -156,6 +167,8 @@ int main() {
     },
   ]}
 />
+
+Stage four: notice that the table only ever looks back two cells, so keep two variables instead of an array — O(1) space. This "rolling" trick applies to any DP whose transition reaches back a bounded distance.
 
 <CodeBlock
   adapter="cpp"
@@ -185,7 +198,7 @@ int main() {
 
 ## Climbing stairs
 
-If you may climb 1 or 2 steps, `f(n) = f(n-1) + f(n-2)` because the last move comes from one of those states.
+Now the same mathematics in a costume. You climb a staircase of n steps, taking 1 or 2 steps at a time — how many distinct ways up? The DP habit is to interrogate the *last move*: every route to step n arrived either from step n−1 (final hop of 1) or from step n−2 (final hop of 2), and those two groups overlap nowhere. So `f(n) = f(n-1) + f(n-2)` — Fibonacci wearing a tracksuit. Spotting a known recurrence under an unfamiliar story is half the DP skill.
 
 ```mermaid
 flowchart LR
@@ -222,7 +235,9 @@ int main() {
 
 ## Coin change: min coins
 
-Let `dp[a]` be the minimum coins for amount `a`; try each coin as the last coin.
+This is the problem that will defeat greedy algorithms on the next page, so watch DP solve it properly here. With coins `{1, 3, 4}`, what is the fewest coins making amount 6? (Grabbing the biggest coin first gives 4+1+1 = three coins; the true answer is 3+3 = two.)
+
+Define the state: `dp[a]` = minimum coins for amount `a`. Transition, again via the last move: the final coin in an optimal solution is *some* coin `c`, and before it the pile summed to `a - c` — optimally, by optimal substructure. So `dp[a] = 1 + min over coins c of dp[a - c]`. Trace it for the example: `dp[3] = 1` (one 3-coin), `dp[6] = 1 + dp[3] = 2`. The table considers *every* coin as the last one, which is exactly the consideration greedy refuses to do.
 
 <CodeBlock
   adapter="cpp"
@@ -254,7 +269,7 @@ int main() {
 
 ## 0/1 knapsack
 
-`dp[i][w]` is the best value using the first `i` items and capacity `w`.
+The knapsack is DP's most famous two-dimensional problem: given items with weights and values and a pack of capacity W, choose items (each at most once — that is the "0/1") to maximize value. The state needs two coordinates because two things constrain you: `dp[i][w]` = best value using only the first `i` items within capacity `w`. Each item presents exactly one binary decision — skip it (`dp[i-1][w]`) or take it (`val[i-1] + dp[i-1][w - wt[i-1]]`, if it fits) — and the table tries both.
 
 | item | weight | value |
 | --- | ---: | ---: |
@@ -301,7 +316,7 @@ int main() {
 
 ## LCS and LIS
 
-For LCS, `dp[i][j]` is the best length for prefixes `a[0..i)` and `b[0..j)`. Example `ABCBDAB` / `BDCABC` has length 4.
+String DP runs on the same two-coordinate idea. The **longest common subsequence** (LCS) of two strings is the longest sequence of characters appearing in both, in order but not necessarily adjacent — it is the algorithm under `git diff`, which displays whatever is *not* in the LCS as your changes. State: `dp[i][j]` = LCS length of prefixes `a[0..i)` and `b[0..j)`. If the last characters match, they extend the diagonal answer by one; if not, drop a character from one string or the other and take the better. Example: `ABCBDAB` vs `BDCABC` gives length 4.
 
 ```mermaid
 flowchart TD
@@ -337,7 +352,7 @@ int main() {
   ]}
 />
 
-For LIS, `dp[i]` is the longest increasing subsequence ending at `i`. The O(n log n) patience-sort version is faster, but O(n²) is the clearest DP.
+The **longest increasing subsequence** (LIS) shows how much the *wording* of a state matters. Defining `dp[i]` as "LIS of the first i elements" leads nowhere — knowing a length doesn't tell you whether the next element can extend it. The state that works is `dp[i]` = "length of the LIS *ending exactly at index i*": now extension is checkable (`nums[j] < nums[i]`), and the global answer is the max over all endings. (An O(n log n) patience-sorting version exists; the O(n²) DP below is the one to understand first.)
 
 <CodeBlock
   adapter="cpp"
@@ -367,9 +382,11 @@ int main() {
   ]}
 />
 
-## Identifying and optimizing DP
+## A recipe, and practice
 
-Use DP when you see optimal substructure and overlapping subproblems. Optimize space with rolling arrays when a row only depends on previous rows.
+Every DP on this page followed the same four moves, and they make a usable recipe: **(1) define the state in words** — "dp[a] is the minimum coins for amount a" — and be pedantic about the wording, because LIS showed that a near-miss definition sinks everything; **(2) find the transition** by interrogating the last move or last decision; **(3) nail the base cases**; **(4) read off where the answer lives** (sometimes the last cell, sometimes a max over many). Space optimization with rolling arrays comes last, only after the table version works.
+
+The three challenges below are the three difficulty tiers of this page: a 1D recurrence, a 1D minimization with impossibility handling, and the 2D knapsack (the solution uses the rolling-array form — note the *backward* capacity loop that keeps each item single-use).
 
 <ChallengeCard
   adapter="cpp"
