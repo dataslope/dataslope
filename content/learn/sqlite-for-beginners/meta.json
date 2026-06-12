@@ -6,12 +6,6 @@
         "index",
         "---",
         "what-is-a-database",
-        "why-databases-exist",
-        "how-applications-store-information",
-        "spreadsheets-vs-databases",
-        "what-sql-does",
-        "why-structured-data",
-        "why-relational-databases",
         "why-sqlite",
         "---",
         "tables-rows-columns",
@@ -43,6 +37,9 @@
         "data-exploration",
         "data-organization",
         "query-execution-order",
+        "---",
+        "spreadsheets-vs-databases",
+        "how-applications-store-information",
         "---",
         "next-steps"
     ]
