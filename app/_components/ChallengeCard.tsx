@@ -979,6 +979,10 @@ export default function ChallengeCard({
   const run = useCallback(async () => {
     const mySeq = ++runSeqRef.current;
     setActiveAction("run");
+    // Running without submitting isn't a graded attempt, so clear any prior
+    // test results and pass/fail banner instead of leaving stale state behind.
+    setTestResults([]);
+    setBannerState(null);
     const snapshot = snapshotAllFiles();
     const entryCode = snapshot.get(resolvedEntryFilename) ?? "";
     const combined = effectiveSourceFor(resolvedEntryFilename, entryCode);
