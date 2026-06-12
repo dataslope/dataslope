@@ -229,3 +229,71 @@ A junction table records each pairing as a row with a foreign key to each side.`
 
 A value that describes the pairing itself belongs on the junction row.`}
 />
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Courses per student"
+  instructions={`Using the \`enrollments\` junction table, return each student's \`name\` and the number of courses they take as \`course_count\`, sorted by \`name\` ascending (A to Z). The starter is missing only the JOIN to the junction table.`}
+  initSql={`CREATE TABLE students (
+  id   INTEGER PRIMARY KEY,
+  name TEXT NOT NULL
+);
+CREATE TABLE courses (
+  id    INTEGER PRIMARY KEY,
+  title TEXT NOT NULL
+);
+CREATE TABLE enrollments (
+  student_id INTEGER REFERENCES students(id),
+  course_id  INTEGER REFERENCES courses(id),
+  PRIMARY KEY (student_id, course_id)
+);
+INSERT INTO students (id, name) VALUES (1,'Ada'),(2,'Grace'),(3,'Linus');
+INSERT INTO courses (id, title) VALUES (10,'Math'),(11,'History'),(12,'Art');
+INSERT INTO enrollments (student_id, course_id) VALUES
+  (1,10), (1,11),
+  (2,10), (2,12),
+  (3,11);`}
+  starterCode={`SELECT
+  s.name,
+  COUNT(*) AS course_count
+FROM
+  students s
+  -- JOIN the enrollments junction table here
+GROUP BY
+  s.name
+ORDER BY
+  s.name;`}
+  solutionSql={`SELECT
+  s.name,
+  COUNT(*) AS course_count
+FROM
+  students s
+  JOIN enrollments e ON e.student_id = s.id
+GROUP BY
+  s.name
+ORDER BY
+  s.name;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns name and course_count",
+      description: "Two columns, in that order.",
+      expectedColumns: ["name", "course_count"],
+    },
+    {
+      id: "row_count",
+      name: "Returns three students",
+      description: "Every student is enrolled in at least one course.",
+      expectedRowCount: 3,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Ada takes 2 courses, Grace 2, Linus 1.",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
+/>

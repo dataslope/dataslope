@@ -160,6 +160,42 @@ Each `JOIN ... ON ...` adds one more connected table. The pattern
 scales: the `orders` table sits in the middle, linking customers to
 the products they bought. This is everyday relational querying.
 
+## The same pattern on a real database
+
+Toy tables prove the mechanics; real data proves the point. This
+block clones the **Chinook** sample database — a music store with
+hundreds of artists, hundreds of albums, and thousands of tracks —
+and walks the exact same chain you just wrote: each track joins to
+its album, each album to its artist.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Track → album → artist, across thousands of rows"
+  remoteInitSql="postgres/chinook_postgres_AutoIncrementPKs.sql"
+  tables={["artist", "album", "track"]}
+  starterCode={`SELECT
+  ar.name AS artist,
+  al.title AS album,
+  t.name AS track
+FROM
+  track t
+  JOIN album al ON al.album_id = t.album_id
+  JOIN artist ar ON ar.artist_id = al.artist_id
+ORDER BY
+  ar.name,
+  al.title,
+  t.name
+LIMIT
+  12;`}
+/>
+
+Notice that nothing about the query got harder — three tables,
+two `ON` conditions, same shape as the toy version. Try changing it:
+add `WHERE ar.name = 'Aerosmith'` to focus on one artist, or raise
+the `LIMIT` and scroll. The join machinery you just learned is the
+same machinery powering every "album page" you have ever seen in a
+music app.
+
 ## Check your understanding
 
 <MultipleChoice

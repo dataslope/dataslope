@@ -283,3 +283,56 @@ Use \`IS NULL\` (never \`= NULL\`) to test for missing values.`}
 
 \`NULL\` exists so the database can distinguish genuinely missing data from a real zero or empty value.`}
 />
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="A friendly fallback for missing emails"
+  instructions={`The \`customers\` table has \`name\` and \`email\` columns, and some emails are missing (\`NULL\`). Return every customer's \`name\` plus a column named \`email_display\` that shows the email when present and the text \`no email\` when it is missing. Sort by \`name\` ascending (A to Z).`}
+  initSql={`CREATE TABLE customers (
+  id    SERIAL PRIMARY KEY,
+  name  TEXT NOT NULL,
+  email TEXT
+);
+INSERT INTO customers (name, email) VALUES
+  ('Ada', 'ada@example.com'),
+  ('Grace', NULL),
+  ('Linus', 'linus@example.com'),
+  ('Mae', NULL);`}
+  starterCode={`SELECT
+  name,
+  email AS email_display -- wrap this in COALESCE with a fallback
+FROM
+  customers
+ORDER BY
+  name;`}
+  solutionSql={`SELECT
+  name,
+  COALESCE(email, 'no email') AS email_display
+FROM
+  customers
+ORDER BY
+  name;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns name and email_display",
+      description: "Two columns, in that order.",
+      expectedColumns: ["name", "email_display"],
+    },
+    {
+      id: "row_count",
+      name: "Returns all four customers",
+      description: "Nobody is filtered out — missing emails get a fallback instead.",
+      expectedRowCount: 4,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Grace and Mae show 'no email'; Ada and Linus show their addresses.",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
+/>
