@@ -6,13 +6,7 @@
         "index",
         "---",
         "what-is-a-database",
-        "why-databases-exist",
-        "how-data-is-stored",
-        "spreadsheets-vs-databases",
-        "how-applications-use-databases",
         "why-sql-exists",
-        "why-relational-databases",
-        "why-postgresql",
         "---",
         "tables-rows-columns",
         "primary-keys",
@@ -46,6 +40,9 @@
         "subqueries",
         "common-table-expressions",
         "query-execution-order",
+        "---",
+        "spreadsheets-vs-databases",
+        "how-applications-use-databases",
         "---",
         "next-steps"
     ]
