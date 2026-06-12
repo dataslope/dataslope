@@ -20,6 +20,10 @@
 
 4. **Cloudflare is a viable and cheaper home** for this workload (flat pricing, unlimited bandwidth, no per-read ISR meter), but the migration is *not* zero-cost: Next.js on Cloudflare runs via the **OpenNext adapter**, which has real caveats (Worker size limits, no edge runtime, you wire up your own KV/R2/D1 for caching). Details and alternatives below.
 
+5. **Once you add the planned backend** (user accounts, workspace DB, "Ask AI"), a *pure* static export can't host those features — but a **hybrid** keeps the 758 lessons free-static and runs only the new `/api/*` routes as server compute. On Cloudflare that means **Workers + OpenNext** (Pages is no longer the steered path for full-stack Next.js), with D1/R2 + Claude via the Anthropic SDK behind AI Gateway. Staying on Vercel supports all of this first-class too. See §5.
+
+6. **Build/preview costs are a separate bill line.** Your build is heavy (758 lessons + WASM toolchain) and you run many previews. The biggest lever is build *hygiene* — extend your existing `ignoreCommand` to skip non-shipping pushes, cache dependencies, and don't build throwaway branches — which works on any host. Cloudflare's build minutes are also more generous/cheaper than Vercel's if volume is the driver. See §7. The Phase 1 runtime fixes **also carry over to Cloudflare** (§8) — nothing is wasted if you migrate.
+
 ---
 
 ## 1. How Vercel bills these three things (and why they move together)
@@ -151,11 +155,82 @@ Because **Writes = 0** and content only changes on deploy, DataSlope is *nearly*
 - No Next Image optimization server — fine, you serve your own assets / jsDelivr.
 - Confirm none of the playground routes rely on server behavior (they're client/WASM, so they should export fine).
 
-If you're willing to convert search to static, **Path B is the strongest structural fix** — it makes *every* static host (Cloudflare Pages, Netlify, even S3+CloudFront or GitHub Pages) cheap and removes the entire class of problem permanently.
+If you're willing to convert search to static, **Path B is the strongest structural fix** — it makes *every* static host (Cloudflare Pages, Netlify, even S3+CloudFront or GitHub Pages) cheap and removes the entire class of problem permanently. **But note:** this is only true *today*, while the site is read-only. The planned user accounts, workspace database, and "Ask AI" features need server-side compute — which changes the calculus. See the next section.
 
 ---
 
-## 5. Other hosting alternatives (excluding self-hosting / VPS)
+## 5. Planned features (user accounts, workspace DB, "Ask AI") — how they change the Cloudflare picture
+
+You're planning to add three things that all require **server-side execution**:
+
+1. **User management** (accounts, login/sessions).
+2. **A database** to save playground workspaces online (today they live client-side in OPFS).
+3. **"Ask AI"** — an LLM feature that must run server-side (to keep API keys secret and stream responses).
+
+This is the single most important input to the hosting decision, so take it section by section.
+
+### 5.1 — Does this kill the "pure static export" option (Path B)?
+
+**For the new features, yes — but not for the site as a whole.** Path B (`output: 'export'`, zero server runtime) can only ship static files; it cannot run auth, write to a database, or call an LLM. The moment you add those, a fully-static export no longer covers your whole app.
+
+But you do **not** lose the static benefit for the part that matters. The right shape is a **hybrid**, and it's exactly what OpenNext-on-Workers gives you for free:
+
+- Your **758 lessons stay prerendered static assets** → served free from the CDN, no per-request meter (this is what fixes the original ISR-read problem).
+- Only the **new dynamic routes** — `/api/auth/*`, `/api/workspaces/*`, `/api/ask-ai` — run as server (Worker) invocations, billed per request.
+
+So the structural win survives: the expensive, high-volume traffic (lesson reads + prefetches) is still free static; only genuine app actions (login, save, ask) hit metered compute, and those are far lower volume.
+
+### 5.2 — Is Cloudflare Pages "no longer an option"?
+
+**Pages still exists and still works, but as of 2026 it is no longer the path Cloudflare steers full-stack Next.js apps toward — Workers is.** The relevant facts:
+
+- Cloudflare's official guidance now says: to deploy a **full-stack / SSR Next.js app, use OpenNext + Cloudflare Workers**, not Pages. Their own Next.js adapter is being built for the Workers + OpenNext path.
+- As of **early 2026, Workers reached feature parity with Pages** for static assets, SSR, and custom domains — Workers gained native static-asset hosting (declared in `wrangler` config), and **static-asset requests are free, same as Pages**.
+- Several capabilities you'll likely want are **Workers-only**: **Durable Objects** (stateful/realtime — useful if workspace sync ever needs live collaboration), Containers, Workflows, and the Secrets Store.
+- Pages is **not formally deprecated** — it still gets maintenance — but new features land on Workers first or only. For a new build, the advice is unambiguous: **go straight to Workers + OpenNext and skip Pages.**
+
+Bottom line: don't think "Pages vs Workers." Think **"Workers + OpenNext"** as the single Cloudflare target. It serves your static lessons free *and* hosts the dynamic auth/DB/AI routes — Pages would just be a more limited subset of the same platform.
+
+### 5.3 — Your Cloudflare building blocks for each feature
+
+Cloudflare is actually a *strong* fit here because it has first-party primitives for all three, billed flat with no egress fees:
+
+| Need | Cloudflare-native option | Notes / alternatives |
+| --- | --- | --- |
+| **Auth / user management** | **Better Auth** (self-hosted, first-class D1 support: email/password, social, magic links, passkeys, 2FA, RBAC) | Auth.js (NextAuth) has a D1 adapter too. Or external: Clerk / Supabase Auth / WorkOS if you'd rather not run auth yourself. Better Auth + D1 is the popular CF-native combo. |
+| **Workspace database** | **D1** (serverless SQLite) for structured data (users, workspace metadata); **R2** (zero-egress object storage) for the workspace file blobs themselves | Today workspaces sit in browser OPFS; "save online" = push the OPFS tree to R2 (files) keyed by a row in D1. **KV** for small/cache data, **Durable Objects** if you later want live multi-device sync. Or external Postgres (Neon/Supabase) via **Hyperdrive** if you prefer Postgres. |
+| **"Ask AI"** | A **Worker route** (`/api/ask-ai`) that calls **Claude via the official Anthropic SDK** (`@anthropic-ai/sdk`), optionally behind **Cloudflare AI Gateway** (caching, rate-limiting, retries, fallback, observability) | Cloudflare **Workers AI** (open models on CF's GPUs) is the fully-in-house option, but for a learning tutor the answer quality of Claude is worth the external call. Stream the response (Workers support SSE streaming) so long answers don't time out. |
+
+### 5.4 — Notes specific to the "Ask AI" feature
+
+Since this is a tutoring feature layered over your lesson content, two Anthropic-API capabilities matter a lot for cost and latency:
+
+- **Prompt caching.** If every "Ask AI" call injects the same lesson text / course context as a prefix, cache that prefix. Cache reads cost ~10% of normal input price, so a tutor that answers many questions against the same lesson gets dramatically cheaper. Structure the request as `[cached lesson context] → [user's question]`.
+- **Streaming.** Always stream the response for a chat-style feature — it shows tokens immediately and avoids Worker/SDK timeouts on long answers.
+- **Model tier is a cost/quality dial.** For a free public site doing potentially high question volume, you can route by need: **Claude Haiku 4.5** for cheap/fast answers, **Claude Sonnet 4.6** for a balance, **Claude Opus 4.8** for the most capable tutoring. Start at whichever tier matches your quality bar and adjust — caching + a sensible tier keeps the bill predictable. (I can hand you exact model IDs and a working `/api/ask-ai` Route Handler in chat — kept out of this report.)
+- **Keep the key server-side.** The whole reason "Ask AI" needs a server is to hold the Anthropic API key. Never ship it to the browser; the Worker route (or AI Gateway) is the boundary.
+
+### 5.5 — What this means for the decision
+
+Adding server features **tips the recommendation toward Cloudflare Workers + OpenNext** (or staying on Vercel), because:
+
+- A pure static host (GitHub Pages, S3-only, Netlify static) can no longer run your whole app — you'd need a *separate* backend service anyway, adding ops surface.
+- Cloudflare gives you the static-lessons-are-free win **and** D1/R2/Workers-AI/AI-Gateway for the dynamic features, under one flat bill with no egress fees — a genuinely good fit for a free, public, content-heavy learning site that's growing a backend.
+- Staying on Vercel also works (Vercel has first-class support for all of this — Postgres, Blob, auth, streaming AI routes) and is the lowest-effort path; the tradeoff is the metered model that prompted this report. With the Phase 1 tuning applied, Vercel may stay free even with the new routes, since auth/save/ask are low-volume compared to lesson reads.
+
+---
+
+## 6. Other hosting alternatives (excluding self-hosting / VPS)
+
+| Host | Best for | ISR-Read-style meter? | Bandwidth | Pricing shape | Fit for DataSlope |
+| --- | --- | --- | --- | --- | --- |
+| **Stay on Vercel + tune** | Keeping zero-config DX, easiest path to add auth/DB/AI | Yes (the thing biting you) | Metered (FOT on miss) | Free → $20/dev Pro | **Do this first.** Tuning likely keeps you free; first-class support for the planned backend features. |
+| **Cloudflare (OpenNext on Workers)** | Full Next features + auth/DB/AI, cheap, unlimited bandwidth | **No ISR-Read meter** | **Unlimited** | Flat $0/$20 (not per-user) | **Strong** once you add server features — D1/R2/Workers-AI/AI-Gateway under one flat bill. Adapter caveats. |
+| **Cloudflare Pages/Workers Static** | Static export of *today's* read-only site | None | **Unlimited** | Free at this scale | Removes the meter, but **can't host the planned auth/DB/AI** — you'd need a separate backend. Superseded by the Workers path above once features land. |
+| **Netlify** | Content/docs sites, nice DX | Limited free tier; SSR via functions | Metered (100 GB free) | $0 → **$20/seat** Pro | Good DX, but **per-seat** billing and metered bandwidth — less cost-advantaged than Cloudflare for a public free site. |
+| **AWS Amplify Hosting** | Teams already in AWS | Pay-per-use (build/host/transfer) | Metered (AWS egress) | Usage-based | Powerful, but AWS egress + complexity; overkill unless you're already on AWS. |
+| **SST (OpenNext on your AWS)** | Max control, IaC | You configure (S3/CloudFront/Lambda) | AWS egress | AWS usage | Most control, most ops burden. Same OpenNext engine as Cloudflare path, different cloud. |
+| **Render** | Flat-rate PaaS, predictable bills | N/A (container) | Generous, predictable | Flat monthly | Simple and predictable, but you'd run Next as a Node server (less CDN-native for a static docs site). |
 
 | Host | Best for | ISR-Read-style meter? | Bandwidth | Pricing shape | Fit for DataSlope |
 | --- | --- | --- | --- | --- | --- |
@@ -174,7 +249,54 @@ If you're willing to convert search to static, **Path B is the strongest structu
 
 ---
 
-## 6. Recommended action plan
+## 7. Build & preview-deployment pricing (you run many preview builds)
+
+This is a *separate bill line* from the runtime meters above (ISR/Edge/FOT), and for an active-development repo with many preview builds it can dominate. Your build is also **not cheap per run**: `npm run build` chains `fumadocs-mdx` (processing 758 lessons) → `build-almostnode-workers` → `next build`, on top of a `postinstall` that patches and rebuilds workers, with a very large dependency tree (Pyodide, WebR, sqlite-wasm, parquet-wasm, etc.). Every preview push pays that cost.
+
+### How the platforms bill builds
+
+| Platform | Included build allowance | Overage | Concurrency | Notes |
+| --- | --- | --- | --- | --- |
+| **Vercel Pro** | **6,000 build-minutes / mo** | **$0.014/min** (standard); enhanced/turbo machines cost ~2×/~9× more | **12 concurrent** builds | 45-min cap per build. Faster machines bill at a higher per-minute rate, so a "turbo" build that's 2× faster can still cost more in absolute dollars. |
+| **Vercel Hobby** | No paid build minutes (free-tier builds only; not for commercial use) | — | 1 concurrent | The plan you're on now. |
+| **Cloudflare (Workers/Pages CI)** | **3,000 build-min / mo Free**, **6,000 / mo Paid** | **$0.005/min** (Paid) | 1 default (more on Workers paid) | ~2.8× cheaper per overage minute than Vercel, and the free tier already includes 3,000 min. |
+
+**Takeaway on the platform question:** Cloudflare's build minutes are both more generous on the free tier (3,000 vs Vercel's zero free paid-builds) and ~2.8× cheaper per overage minute ($0.005 vs $0.014). So if **build volume** is a real cost driver, that's another point in Cloudflare's favor — but the bigger wins are the build-hygiene fixes below, which apply on *either* host.
+
+### Reduce preview-build spend (do these regardless of host)
+
+You already have the most important lever in place — lean into it:
+
+1. **You already skip no-op builds** (`scripts/vercel-ignore-build.sh` cancels deploys that only touch `agent-outputs/`). **Extend that `ignoreCommand`** to also skip pushes that only touch other non-shipping paths — `__tests__/`, `e2e/`, `*.md` docs, `.github/`, etc. Every skipped preview build is build-minutes saved at zero risk. This is the single highest-leverage change for your situation.
+2. **Cache `node_modules` / the build cache.** Your `postinstall` rebuilds almostnode workers on every install — make sure the platform's dependency cache is warm between builds so you're not re-running heavy install steps each preview. (Vercel caches `node_modules` by commit; Cloudflare CI caches too. Verify it's actually hitting.)
+3. **Don't rebuild on every commit to a PR.** Configure deploys so only the *latest* commit on a branch builds (Vercel cancels superseded queued builds automatically if enabled) rather than every intermediate push. Squash-style workflows or pushing less often cuts build count directly.
+4. **Skip builds for draft PRs / WIP branches.** Only build previews for branches that are actually under review. You can gate this in the `ignoreCommand` (e.g. check `$VERCEL_GIT_COMMIT_REF` against a prefix like `wip/`) so experimental branches never trigger a paid build.
+5. **Speed up the build itself.** Faster builds = fewer minutes. The `dynamic: true` Fumadocs mode already keeps the 758 lessons out of the bundler (good — see `source.config.ts`). Beyond that: ensure Turbopack is used for `next build` where stable, and confirm `build-almostnode-workers` output is cached rather than rebuilt from scratch each time.
+6. **Run previews locally / in your own CI for throwaway work.** For rapid iteration that doesn't need a shareable URL, `next dev` or a local build avoids platform build minutes entirely; reserve preview deployments for changes you actually want to review or share.
+
+> Net: the `ignoreCommand` extension (#1) plus build caching (#2) usually cut preview-build minutes the most, and they work the same on Vercel or Cloudflare. The platform difference (Cloudflare's cheaper, more-included minutes) is a secondary, additional saving.
+
+---
+
+## 8. Do the Phase 1 fixes still help if you move to Cloudflare?
+
+**Yes — almost all of them carry over, they just optimize a different bill line.** None of the Phase 1 work is wasted if you later migrate.
+
+| Phase 1 fix | Still useful on Cloudflare? | Why |
+| --- | --- | --- |
+| **Prefetch control** (`<Link prefetch={false}`, Fumadocs sidebar) | **Yes — arguably more so** | Cloudflare serves static lessons free, but any prefetch that hits a *dynamic* route (your future `/api/*`, auth-gated pages) is a billed **Worker request** + CPU. Fewer needless prefetches = fewer Worker invocations and less client bandwidth. The ISR-read meter disappears; the Worker-request meter takes its place, and prefetch discipline reduces that. |
+| **`staleTimes`** (client router cache) | **Yes — host-independent** | This is pure client-side behavior. It reduces refetches and navigation requests no matter who hosts. |
+| **Edge cache headers** (`s-maxage` on `/api/search`, `.md`) | **Yes — reframed** | On Vercel it saves metered ISR reads; on Cloudflare it raises CDN cache-hit ratio so requests are served from cache instead of invoking a Worker. Same code, still beneficial. |
+| **Robots / crawler tightening** | **Yes — universal** | Bots hitting cold routes cost Worker invocations on Cloudflare just as they cost ISR reads on Vercel. Keeping crawlers off `/playground/*`, `/api/*`, etc. helps on every host. |
+| **Offloading large assets to jsDelivr** | **Yes — still smart** | Keeps heavy WASM bandwidth off *any* host's bill. Already done; keep doing it. |
+
+**The one thing that changes:** on Cloudflare there is **no ISR-read meter at all**, and static prerendered pages are served as **free** assets. So the *original problem* (ISR reads) largely evaporates on migration — but the Phase 1 fixes still pay off because Cloudflare bills **Worker requests + CPU time** for the dynamic routes you're about to add (auth, workspace save, Ask AI), and prefetch/caching discipline directly reduces *those*.
+
+**Practical sequencing:** do Phase 1 now on Vercel (cheap, reversible, likely keeps you free). If you later migrate to Cloudflare for the backend features, you carry the same optimizations over unchanged — you'll just be reading a Worker-requests dashboard instead of an ISR-reads dashboard.
+
+---
+
+## 9. Recommended action plan
 
 **Phase 1 — This week (no migration, reversible):**
 1. Add a `<Link>` wrapper defaulting `prefetch={false}`; opt back in on primary nav only.
@@ -182,12 +304,12 @@ If you're willing to convert search to static, **Path B is the strongest structu
 3. Add `experimental.staleTimes` (`static: 300+`) in `next.config.ts`.
 4. Add long `s-maxage` cache headers to `/api/search` and the `.md` route handlers.
 5. Add a tightened `robots.ts` to keep crawlers off `/playground/*`, `/svg-gallery`, `/color-test`, `/api/*`, `*.md`.
-6. Re-check the Vercel usage dashboard after 3–5 days. This should drop ISR Reads / Edge Requests materially.
+6. **Cut build spend:** extend `scripts/vercel-ignore-build.sh` to also skip `__tests__/`, `e2e/`, `.github/`, and doc-only pushes; gate `wip/`-prefixed branches out of preview builds; confirm the dependency/build cache is warm (§7).
+7. Re-check the Vercel usage dashboard after 3–5 days. This should drop ISR Reads / Edge Requests (and, from #6, build minutes) materially.
 
-**Phase 2 — If usage still trends toward the cap:**
-7. Decide static-export feasibility (convert Orama to Fumadocs **static search**).
-8. If yes → **Cloudflare Pages/Workers Static** (or any static host): problem gone permanently.
-9. If you need server features → **Cloudflare via OpenNext**; validate Worker size and all 11 playgrounds + search in a preview before DNS cutover.
+**Phase 2 — If usage still trends toward the cap, or once you start the backend (auth / workspace DB / Ask AI):**
+8. For a *read-only* site staying lean: decide static-export feasibility (convert Orama to Fumadocs **static search**) → any static host removes the meter permanently.
+9. **Once you add server features (the likelier path):** go **Cloudflare Workers + OpenNext** (not Pages — see §5.2). Lessons stay free static; auth/DB/AI run as Worker routes via D1/R2/AI-Gateway (§5.3). Validate Worker size and all 11 playgrounds + search in a preview before DNS cutover. Staying on Vercel is also fine — it supports all three features first-class; the tradeoff is the metered model.
 
 ---
 
@@ -209,5 +331,12 @@ If you're willing to convert search to static, **Path B is the strongest structu
 - [MakerKit — 10 Best Next.js Hosting Providers in 2026](https://makerkit.dev/blog/tutorials/best-hosting-nextjs)
 - [Lucky Media — Web Hosting Comparison 2026: Vercel vs Netlify vs Cloudflare vs Render](https://www.luckymedia.dev/insights/hosting)
 - [Logarithmic Spirals — AWS Amplify vs Cloudflare Pages vs S3 (2026)](https://logarithmicspirals.com/blog/website-migration-aws-amplify-to-cloudflare-insights/)
+- [Cloudflare — Migrate from Pages to Workers](https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/)
+- [Cloudflare Pages vs Workers 2026 (pricing, free plan, migration)](https://cogley.jp/articles/cloudflare-pages-to-workers-migration)
+- [Better Auth + Cloudflare (D1, R2, Workers)](https://github.com/zpg6/better-auth-cloudflare)
+- [Cloudflare Workers AI — overview](https://developers.cloudflare.com/workers-ai/)
+- [Vercel — Managing builds](https://vercel.com/docs/builds/managing-builds)
+- [Vercel — Pricing docs](https://vercel.com/docs/pricing)
+- [Cloudflare Workers CI — builds limits & pricing](https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/)
 
 *Prepared from the live repository state (Next.js 16.2.4, Fumadocs, 758 static lessons, WASM runtimes offloaded to jsDelivr) and the attached Vercel ISR observability screenshots showing Writes = 0 across all routes.*
