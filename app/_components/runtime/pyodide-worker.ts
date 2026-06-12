@@ -53,9 +53,10 @@ type InMessage =
     };
 
 type OutMessage =
-  | { kind: "loading"; message: string }
+  | { kind: "loading"; message: string; fraction?: number }
   | { kind: "ready" }
   | { kind: "init-error"; message: string }
+  | { kind: "run-status"; id: number; message: string }
   | { kind: "output"; id: number; cell: OutputCellMessage }
   | { kind: "done"; id: number }
   | { kind: "error"; id: number; message: string }
@@ -72,8 +73,23 @@ function post(msg: OutMessage) {
   self.postMessage(msg);
 }
 
+// ─── Two-phase boot state ──────────────────────────────────────────────
+// Phase A (initPyodide / `initPromise`): the interpreter plus the
+// display/tee/reset plumbing — enough to run any stdlib-only snippet.
+// `ready` is posted at the end of phase A, so plain-Python blocks run
+// seconds before the data stack is in.
+// Phase B (`ensurePackages`): the heavy package set (numpy, pandas,
+// matplotlib, scipy, micropip + plotly + pyodide_http) and the
+// matplotlib/urllib patches that depend on it. It starts in the
+// background right after phase A; a run whose code needs it awaits it
+// (with a run-status notice), everything else doesn't.
 let pyodide: PyodideInterface | null = null;
 let initPromise: Promise<void> | null = null;
+// Python's stdlib top-level module names (sys.stdlib_module_names),
+// snapshotted after phase A for the needs-heavy-packages gate.
+let stdlibModuleNames: Set<string> | null = null;
+let packagesReady = false;
+let packagesPromise: Promise<void> | null = null;
 
 // Some packages advertised in the Packages drawer ship as pure-Python
 // wheels on PyPI but are NOT part of the Pyodide distribution, so
@@ -138,49 +154,23 @@ function isPyDisplayOutputs(v: unknown): v is PyDisplayOutput[] {
 }
 
 async function initPyodide(): Promise<void> {
-  post({ kind: "loading", message: "Loading Pyodide…" });
+  post({ kind: "loading", message: "Loading Pyodide…", fraction: 0.06 });
   pyodide = await self.loadPyodide({ indexURL: PYODIDE_INDEX_URL });
 
-  // Pyodide 0.29's package loader writes its progress messages
-  // ("Loading numpy, …", "pandas already loaded from default channel",
-  // "No new packages to load", …) through Python's `sys.stdout`. Once
-  // `runCode()` installs a `setStdout({ batched })` capture, those
-  // messages would otherwise be conflated with the user's real `print`
-  // output. Provide explicit callbacks so the loader noise stays out of
-  // user-visible output cells.
-  const pkgCallbacks = {
-    messageCallback: (m: string) => {
-      console.log("[pyodide:loadPackage]", m);
-    },
-    errorCallback: (m: string) => {
-      console.error("[pyodide:loadPackage]", m);
-    },
-  };
+  post({
+    kind: "loading",
+    message: "Preparing the Python environment…",
+    fraction: 0.8,
+  });
 
-  post({ kind: "loading", message: "Installing packages…" });
-  await pyodide.loadPackage(["numpy", "pandas", "matplotlib", "scipy"], pkgCallbacks);
-  await pyodide.loadPackage("micropip", pkgCallbacks);
-  const micropip = pyodide.pyimport("micropip");
-  await micropip.install("plotly");
-  // pyodide_http reroutes urllib/requests through the browser's fetch/XHR so
-  // that `requests.get(...)`, `pd.read_csv(url)`, etc. work in the worker.
-  // It does NOT bypass CORS — cross-origin hosts still need the CORS proxy.
-  await micropip.install("pyodide_http");
-
-  // Set up display() and a matplotlib show() patch that captures figures
-  // as base64 PNGs into _display_outputs.
+  // Set up display(), the stdout/stderr tee, and the per-run reset
+  // helpers. Deliberately matplotlib-free: the plotting stack arrives
+  // in boot phase B (see SETUP_SCRIPT_B), so this script must run on
+  // the bare interpreter. find_imports is hoisted here for the
+  // needs-heavy-packages gate in runCode().
   await pyodide.runPythonAsync(`
 import sys, io, base64, json, ast as _ast, re as _re
-
-# Patch urllib/requests once so user code can make HTTP(S) calls (subject to
-# CORS — cross-origin hosts still need the CORS proxy). Called a single time
-# at init; re-patching already-patched modules is unnecessary.
-import pyodide_http
-pyodide_http.patch_all()
-
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+from pyodide.code import find_imports as _pg_find_imports
 
 _display_outputs = []
 
@@ -228,19 +218,27 @@ def _strip_html_styles(h):
     return _re.sub(r'<style[^>]*>.*?</style>', '', h, flags=_re.DOTALL)
 
 def display(*objs):
-    import pandas as pd
-    import matplotlib.axes
-    import matplotlib.figure
-    _ensure_pd_notebook_options(pd)
+    # The heavy libraries arrive in boot phase B, so this must work on
+    # the bare interpreter: an object can only BE a DataFrame / Axes /
+    # Figure if its module is already imported, which makes sys.modules
+    # lookups exactly equivalent to the hard imports they replace —
+    # without failing before phase B finishes.
+    pd = sys.modules.get("pandas")
+    _mpl_axes = sys.modules.get("matplotlib.axes")
+    _mpl_figure = sys.modules.get("matplotlib.figure")
+    if pd is not None:
+        _ensure_pd_notebook_options(pd)
     for obj in objs:
         if obj is None:
             continue
         # Matplotlib Axes/Figure objects are captured by the auto-flush that
         # runs after user code executes—skip them here to avoid printing
         # an unhelpful repr like "<Axes: ylabel='Density'>".
-        if isinstance(obj, (matplotlib.axes.Axes, matplotlib.figure.Figure)):
+        if _mpl_axes is not None and isinstance(obj, _mpl_axes.Axes):
             continue
-        if isinstance(obj, pd.DataFrame):
+        if _mpl_figure is not None and isinstance(obj, _mpl_figure.Figure):
+            continue
+        if pd is not None and isinstance(obj, pd.DataFrame):
             # Use _repr_html_() so pandas respects display.max_rows,
             # display.min_rows, display.max_columns and other options,
             # producing head+ellipsis+tail output just like a Jupyter notebook.
@@ -270,17 +268,6 @@ def display(*objs):
 
 import builtins
 builtins.display = display
-
-_original_show = plt.show
-def _patched_show(*args, **kwargs):
-    buf = io.BytesIO()
-    plt.savefig(buf, format="png", bbox_inches="tight", dpi=130, facecolor=plt.gcf().get_facecolor())
-    buf.seek(0)
-    img_b64 = base64.b64encode(buf.read()).decode()
-    _display_outputs.append({"type": "image", "data": img_b64})
-    plt.clf()
-    plt.close("all")
-plt.show = _patched_show
 
 import asyncio as _asyncio
 
@@ -392,7 +379,137 @@ _PG_PROTECTED_NAMES = set(globals().keys()) | {
 }
 `);
 
+  // Snapshot the stdlib module names for the gate in runCode(): code
+  // whose imports all resolve against the bare interpreter never waits
+  // for the heavy package set.
+  stdlibModuleNames = new Set(
+    (
+      pyodide.runPython(
+        "','.join(sorted(sys.stdlib_module_names))",
+      ) as string
+    ).split(","),
+  );
+
   post({ kind: "ready" });
+
+  // Phase B starts immediately in the background so the package set is
+  // usually in place before the first pandas-importing run. Failures
+  // are deliberately swallowed here: ensurePackages() clears itself on
+  // error, and the next run that needs packages retries (and surfaces
+  // the real error through the run's error path).
+  void ensurePackages().catch(() => {});
+}
+
+// ─── Boot phase B: the heavy package set ───────────────────────────────
+
+// Globals (and patches) this script adds on top of SETUP_SCRIPT A. It
+// runs as ONE synchronous Python exec — no awaits — so it can never
+// interleave with a concurrently executing stdlib-only run.
+const SETUP_SCRIPT_B = `
+# Patch urllib/requests once so user code can make HTTP(S) calls (subject to
+# CORS — cross-origin hosts still need the CORS proxy). Called a single time
+# per worker; re-patching already-patched modules is unnecessary.
+import pyodide_http
+pyodide_http.patch_all()
+
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
+_original_show = plt.show
+def _patched_show(*args, **kwargs):
+    buf = io.BytesIO()
+    plt.savefig(buf, format="png", bbox_inches="tight", dpi=130, facecolor=plt.gcf().get_facecolor())
+    buf.seek(0)
+    img_b64 = base64.b64encode(buf.read()).decode()
+    _display_outputs.append({"type": "image", "data": img_b64})
+    plt.clf()
+    plt.close("all")
+plt.show = _patched_show
+
+# These globals postdate setup A's protected-names snapshot — protect
+# them explicitly or the per-run global reset would delete them.
+_PG_PROTECTED_NAMES |= {
+    "pyodide_http", "matplotlib", "plt", "_original_show", "_patched_show",
+}
+`;
+
+async function loadHeavyPackages(): Promise<void> {
+  if (!pyodide) throw new Error("Pyodide is not initialised");
+
+  // Pyodide 0.29's package loader writes its progress messages
+  // ("Loading numpy, …", "pandas already loaded from default channel",
+  // "No new packages to load", …) through Python's `sys.stdout`. Once
+  // `runCode()` installs a `setStdout({ batched })` capture, those
+  // messages would otherwise be conflated with the user's real `print`
+  // output. Provide explicit callbacks so the loader noise stays out of
+  // user-visible output cells.
+  const pkgCallbacks = {
+    messageCallback: (m: string) => {
+      console.log("[pyodide:loadPackage]", m);
+    },
+    errorCallback: (m: string) => {
+      console.error("[pyodide:loadPackage]", m);
+    },
+  };
+
+  await pyodide.loadPackage(["numpy", "pandas", "matplotlib", "scipy"], pkgCallbacks);
+  await pyodide.loadPackage("micropip", pkgCallbacks);
+  const micropip = pyodide.pyimport("micropip");
+  await micropip.install("plotly");
+  // pyodide_http reroutes urllib/requests through the browser's fetch/XHR so
+  // that `requests.get(...)`, `pd.read_csv(url)`, etc. work in the worker.
+  // It does NOT bypass CORS — cross-origin hosts still need the CORS proxy.
+  await micropip.install("pyodide_http");
+
+  await pyodide.runPythonAsync(SETUP_SCRIPT_B);
+}
+
+/** Memoised phase B with retry-on-failure: a failed attempt clears the
+ *  memo so the next package-needing run re-kicks the download instead
+ *  of caching a transient network error forever. */
+function ensurePackages(): Promise<void> {
+  if (!packagesPromise) {
+    packagesPromise = loadHeavyPackages().then(
+      () => {
+        packagesReady = true;
+      },
+      (err) => {
+        packagesPromise = null;
+        throw err;
+      },
+    );
+  }
+  return packagesPromise;
+}
+
+// Phase-B-provided ambient names: the setup scripts define a global
+// `plt`/`matplotlib`, and pyodide_http patches urllib/http/requests —
+// code that *references* any of these needs phase B even when it never
+// import-statements a heavy package. False positives (say, a variable
+// named http) merely wait for the full boot, i.e. today's behaviour.
+const PHASE_B_AMBIENT_RE = /\b(?:plt|matplotlib|urllib|requests|http)\b/;
+
+/** True when `code` can't run correctly on the bare (phase A)
+ *  interpreter. Conservative: any uncertainty (unparseable code,
+ *  unknown imports) waits for the full boot — the failure mode is
+ *  "behaves like before the two-phase split", never a broken run. */
+function runNeedsHeavyPackages(code: string): boolean {
+  const stdlib = stdlibModuleNames;
+  if (!pyodide || !stdlib) return true;
+  if (PHASE_B_AMBIENT_RE.test(code)) return true;
+  try {
+    pyodide.globals.set("_pg_gate_code", code);
+    const proxy = pyodide.runPython("_pg_find_imports(_pg_gate_code)") as {
+      toJs(): string[];
+      destroy?: () => void;
+    };
+    const imports = proxy.toJs();
+    proxy.destroy?.();
+    return imports.some((mod) => !stdlib.has(mod));
+  } catch {
+    return true;
+  }
 }
 
 async function runCode(
@@ -401,6 +518,20 @@ async function runCode(
   theme: "light" | "dark" = "dark",
 ): Promise<void> {
   if (!pyodide) throw new Error("Pyodide is not initialised");
+
+  // Two-phase boot gate: stdlib-only code runs on the bare interpreter
+  // immediately; anything touching the data stack (or the ambient
+  // names phase B provides) waits for the package set, with a status
+  // notice so the wait doesn't masquerade as a slow user program.
+  if (!packagesReady && runNeedsHeavyPackages(code)) {
+    post({
+      kind: "run-status",
+      id,
+      message: "Installing the Python data packages — first run only…",
+    });
+    await ensurePackages();
+    post({ kind: "run-status", id, message: "Running…" });
+  }
 
   let stdout = "";
   let stderr = "";
@@ -446,25 +577,32 @@ async function runCode(
   const plotlyDefaultTemplate = theme === "light" ? "plotly" : "plotly_dark";
 
   const wrappedCode = `
-import plotly as _plotly
-import plotly.io as _pio
-_pio.templates.default = "${plotlyDefaultTemplate}"
-
-_orig_plotly_show = _plotly.io.show
-
-# Plotly figures land in the same ordered output list as prints and
-# display() tables, so fig.show() keeps its place in the run's output.
-def _patched_plotly_show(fig, *args, **kwargs):
-    _display_outputs.append({"type": "plot", "json": fig.to_json()})
-
-_plotly.io.show = _patched_plotly_show
+# Plotly arrives with boot phase B (micropip) — a stdlib-only run on the
+# bare phase A interpreter simply skips the show() patch.
 try:
-    import plotly.graph_objects as _go
-    _orig_go_show = _go.Figure.show
-    def _patched_go_show(self, *args, **kwargs):
-        _display_outputs.append({"type": "plot", "json": self.to_json()})
-    _go.Figure.show = _patched_go_show
-except: pass
+    import plotly as _plotly
+    import plotly.io as _pio
+except Exception:
+    _plotly = None
+
+if _plotly is not None:
+    _pio.templates.default = "${plotlyDefaultTemplate}"
+
+    _orig_plotly_show = _plotly.io.show
+
+    # Plotly figures land in the same ordered output list as prints and
+    # display() tables, so fig.show() keeps its place in the run's output.
+    def _patched_plotly_show(fig, *args, **kwargs):
+        _display_outputs.append({"type": "plot", "json": fig.to_json()})
+
+    _plotly.io.show = _patched_plotly_show
+    try:
+        import plotly.graph_objects as _go
+        _orig_go_show = _go.Figure.show
+        def _patched_go_show(self, *args, **kwargs):
+            _display_outputs.append({"type": "plot", "json": self.to_json()})
+        _go.Figure.show = _patched_go_show
+    except: pass
 
 # Route the user code's stdout/stderr into the ordered output list (see
 # _PgTee) so text interleaves chronologically with tables/figures/charts.
@@ -474,19 +612,24 @@ try:
     await _execute_with_last_display(_user_code_str)
 finally:
     sys.stdout, sys.stderr = _pg_prev_stdout, _pg_prev_stderr
-    _plotly.io.show = _orig_plotly_show
-    try: _go.Figure.show = _orig_go_show
-    except: pass
+    if _plotly is not None:
+        _plotly.io.show = _orig_plotly_show
+        try: _go.Figure.show = _orig_go_show
+        except: pass
 
 # Auto-flush any matplotlib figures that the user did not explicitly show.
 # This handles patterns like df.x.plot.density() which create a figure
-# and return an Axes object without ever calling plt.show().
-for _fig_num in list(plt.get_fignums()):
-    _fig = plt.figure(_fig_num)
-    _buf = io.BytesIO()
-    _fig.savefig(_buf, format="png", bbox_inches="tight", dpi=130, facecolor=_fig.get_facecolor())
-    _display_outputs.append({"type": "image", "data": base64.b64encode(_buf.getvalue()).decode()})
-plt.close("all")
+# and return an Axes object without ever calling plt.show(). Before boot
+# phase B (stdlib-only runs) pyplot isn't importable — guard via
+# sys.modules, which is also exactly "no figures can exist yet".
+_plt = sys.modules.get("matplotlib.pyplot")
+if _plt is not None:
+    for _fig_num in list(_plt.get_fignums()):
+        _fig = _plt.figure(_fig_num)
+        _buf = io.BytesIO()
+        _fig.savefig(_buf, format="png", bbox_inches="tight", dpi=130, facecolor=_fig.get_facecolor())
+        _display_outputs.append({"type": "image", "data": base64.b64encode(_buf.getvalue()).decode()})
+    _plt.close("all")
 `;
 
   // Post the ordered output stream. Runs in a finally so that output

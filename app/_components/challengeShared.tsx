@@ -25,6 +25,54 @@ import { X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
+// ─── Boot progress smoothing ─────────────────────────────────────────
+// Adapters report coarse stage *floors* (0.05, 0.55, 0.85, …) during a
+// runtime boot. A bar that only moves on those few events looks stuck
+// for the long middle of a download, so this hook animates the
+// displayed fraction asymptotically toward a ceiling a little above
+// the latest report — classic capped pseudo-progress. It never reaches
+// 1: completion is signalled by the boot UI unmounting, not the bar.
+
+/** Smooth a stage-floor boot fraction for display. Returns null (render
+ *  an indeterminate spinner) until the first fraction arrives; resets
+ *  when `active` goes false so the next boot starts clean.
+ *
+ *  All state writes happen inside timer callbacks (a 0 ms kick plus the
+ *  creep interval) with functional updaters: the kick jumps the value
+ *  up to a freshly reported stage floor (never backwards), and each
+ *  interval tick eases it toward just shy of the next stage so the bar
+ *  never looks stuck mid-download. */
+export function useCreepingBootFraction(
+  target: number | null,
+  active: boolean,
+): number | null {
+  const [display, setDisplay] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!active || target == null) {
+      // Reset for the next boot — scheduled, not set synchronously in
+      // the effect body.
+      const reset = window.setTimeout(() => setDisplay(null), 0);
+      return () => window.clearTimeout(reset);
+    }
+    const ceiling = Math.min(target + 0.18, 0.97);
+    const advance = () =>
+      setDisplay((prev) => {
+        const base = Math.max(prev ?? 0, target);
+        return base + (ceiling - base) * 0.045;
+      });
+    // Apply the new stage floor on the next macrotask, then keep creeping.
+    const kick = window.setTimeout(advance, 0);
+    const tick = window.setInterval(advance, 180);
+    return () => {
+      window.clearTimeout(kick);
+      window.clearInterval(tick);
+    };
+  }, [target, active]);
+
+  return active ? display : null;
+}
+
 // ─── Dark mode detection ─────────────────────────────────────────────
 // Mirrors the logic in CodeBlock.tsx: Fumadocs toggles a `dark` class
 // on <html> when the user switches themes; we fall back to the OS

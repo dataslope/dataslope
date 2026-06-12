@@ -111,18 +111,18 @@
   font-size: 12.5px;
 }
 
-.bootSpinner {
+/* Anchors the brand diamond spinner beside the boot copy and hands it
+   the block's accent colour (the loader renders with currentColor). */
+.bootGlyph {
   flex: none;
-  width: 15px;
-  height: 15px;
+  display: inline-flex;
   color: var(--cb-accent);
-  animation: cb-bootspin 0.75s linear infinite;
 }
 
-@keyframes cb-bootspin {
-  to {
-    transform: rotate(360deg);
-  }
+/* Determinate wave bar below the boot copy — rendered once the adapter
+   starts reporting stage fractions. */
+.bootProgress {
+  margin-top: 8px;
 }
 
 .bootNoticeText {

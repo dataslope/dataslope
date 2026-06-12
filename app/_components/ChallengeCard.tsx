@@ -39,10 +39,12 @@ import {
   renderInstructions,
   useChallengeToasts,
   ChallengeToastViewport,
+  useCreepingBootFraction,
   useIsDark,
   cmThemeNameFor,
   TestResultsRail,
 } from "./challengeShared";
+import { DiamondSpinner, LogoWaveBar } from "./mdx/loadingAnimations";
 import { EditorState, Compartment } from "@codemirror/state";
 import {
   EditorView,
@@ -70,12 +72,13 @@ import type {
   LanguageRuntime,
   OutputCell,
 } from "./types";
-import { getSharedRuntime, RuntimeScope } from "./runtimeRegistry";
+import { getSharedRuntime, isRuntimeReady, RuntimeScope } from "./runtimeRegistry";
 import {
   datasetStageFilename,
   fetchDatasetBytes,
   type DatasetStageSpec,
 } from "./runtime/remoteDatasets";
+import { warmRuntimeOnRouteLand } from "./runtime/warmup";
 import {
   clearPersistedCode,
   loadPersistedCode,
@@ -95,6 +98,9 @@ import {
 } from "./challengeHarness";
 import { mergeInitAndEntry } from "./runtime/mergeInit";
 import styles from "./ChallengeCard.module.css";
+// Boot-notice styles are shared with `<CodeBlock>` (which already
+// shares this card's styles for its chrome — the reuse runs both ways).
+import codeBlockStyles from "./CodeBlock.module.css";
 
 type Status = "idle" | "loading" | "ready" | "running" | "error";
 type TestState = "pending" | "pass" | "fail";
@@ -465,6 +471,13 @@ export default function ChallengeCard({
     null,
   );
   const [statusMessage, setStatusMessage] = useState<string>("");
+  // True while a *cold* runtime download is in flight, so the boot
+  // notice only promises "first run only" when it really is the first
+  // run. Mirrors `<CodeBlock>`.
+  const [bootCold, setBootCold] = useState(false);
+  // Latest stage-floor fraction reported by the adapter's boot (null
+  // until the adapter reports one); smoothed for display below.
+  const [bootFraction, setBootFraction] = useState<number | null>(null);
   const [outputs, setOutputs] = useState<OutputCell[]>([]);
   const [elapsed, setElapsed] = useState<string>("");
   const [initExpanded, setInitExpanded] = useState(false);
@@ -881,6 +894,8 @@ export default function ChallengeCard({
       mySeq: number,
     ): Promise<{ cells: OutputCell[]; elapsedMs: number }> => {
       setOutputs([]);
+      setBootCold(!isRuntimeReady(RuntimeScope.Fumadocs, adapter.id));
+      setBootFraction(null);
       setStatus("loading");
       setStatusMessage("Initializing runtime…");
 
@@ -909,11 +924,16 @@ export default function ChallengeCard({
       // every execution, so cards still can't observe each other's
       // variable state.
       if (!runtimeRef.current) {
+        // The registry subscribes this callback to the in-flight boot
+        // even when a silent warm-up started it, replaying the current
+        // stage — so a Run click mid-boot shows live progress.
         runtimeRef.current = await getSharedRuntime(
           RuntimeScope.Fumadocs,
           adapter,
-          (msg) => {
-            if (runSeqRef.current === mySeq) setStatusMessage(msg);
+          (msg, fraction) => {
+            if (runSeqRef.current !== mySeq) return;
+            setStatusMessage(msg);
+            if (fraction !== undefined) setBootFraction(fraction);
           },
         );
       }
@@ -1023,7 +1043,15 @@ export default function ChallengeCard({
               cells.push(full);
             }
           },
-          isMultiFile ? { entryFilename: resolvedEntryFilename } : undefined,
+          {
+            entryFilename: isMultiFile ? resolvedEntryFilename : undefined,
+            // Mid-run waits (e.g. Python's deferred package set on the
+            // first run) surface in the status line instead of leaving
+            // a bare "Running…" while megabytes download.
+            onStatus: (message) => {
+              if (runSeqRef.current === mySeq) setStatusMessage(message);
+            },
+          },
         );
       } finally {
         // Hold the running overlay for at least MIN_RUN_OVERLAY_MS so
@@ -1211,9 +1239,19 @@ export default function ChallengeCard({
     runRef.current = run;
   }, [run]);
 
+  // Warm the shared runtime as soon as the page lands (idle-scheduled,
+  // Save-Data-guarded, one boot at a time — see runtime/warmup.ts), so
+  // the time a reader spends on the page's prose pays for the runtime
+  // download instead of the first Run/Submit click.
+  useEffect(() => {
+    warmRuntimeOnRouteLand(RuntimeScope.Fumadocs, adapter);
+  }, [adapter]);
+
   // Warm the shared runtime when the card first scrolls into view, so the
   // learner's first Run/Submit reuses an already-initialised runtime instead
-  // of triggering a cold download on click. Best-effort and deduped across all
+  // of triggering a cold download on click. Kept as the fallback for
+  // Save-Data users (the route-land warm-up skips them) and for additional
+  // languages further down the page. Best-effort and deduped across all
   // cards/blocks of the same language by the registry; failures are swallowed
   // so an actual Run can retry and surface the real error.
   useEffect(() => {
@@ -1479,6 +1517,12 @@ export default function ChallengeCard({
   }, [adapter, toasts]);
 
   const isBusy = status === "loading" || status === "running";
+
+  // Smoothed boot fraction for the wave progress bar (null → spinner only).
+  const bootDisplayFraction = useCreepingBootFraction(
+    bootFraction,
+    status === "loading",
+  );
 
   // Code (or a readable summary of a declarative stdout expectation) per
   // test id, surfaced by the test-details popover in the results rail.
@@ -1960,8 +2004,52 @@ export default function ChallengeCard({
               </span>
             )}
           </div>
+          {status === "loading" && (
+            // Same boot affordance as `<CodeBlock>`: brand spinner,
+            // staged copy with the cold-download size, and a wave
+            // progress bar once the adapter reports stage fractions.
+            <div className={codeBlockStyles.bootNoticeWrap}>
+              <div
+                className={codeBlockStyles.bootNotice}
+                data-testid="challenge-boot"
+              >
+                <span className={codeBlockStyles.bootGlyph} aria-hidden>
+                  <DiamondSpinner size={22} label="" />
+                </span>
+                <span className={codeBlockStyles.bootNoticeText}>
+                  <span className={codeBlockStyles.bootNoticeTitle}>
+                    {statusMessage ||
+                      `Setting up the ${adapter.runtimeInfo.language} runtime…`}
+                  </span>
+                  {bootCold && (
+                    <span className={codeBlockStyles.bootNoticeHint}>
+                      Downloading the {adapter.runtimeInfo.language} runtime
+                      {adapter.coldDownloadMB
+                        ? ` (~${adapter.coldDownloadMB} MB)`
+                        : ""}{" "}
+                      — this happens once; later runs are instant.
+                    </span>
+                  )}
+                </span>
+              </div>
+              {bootDisplayFraction != null && (
+                <div className={codeBlockStyles.bootProgress}>
+                  <LogoWaveBar
+                    fraction={bootDisplayFraction}
+                    height={12}
+                    label={
+                      statusMessage ||
+                      `Setting up the ${adapter.runtimeInfo.language} runtime…`
+                    }
+                  />
+                </div>
+              )}
+            </div>
+          )}
           {outputs.length === 0 ? (
-            <div className={styles.outputEmpty}>Running…</div>
+            status !== "loading" && (
+              <div className={styles.outputEmpty}>Running…</div>
+            )
           ) : (
             <div className={styles.outputBody}>
               {outputs.map((cell) => (

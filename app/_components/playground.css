@@ -2520,6 +2520,13 @@ input[type="range"].fs-slider:disabled {
   border-radius: 2px;
   animation: playground-loadBar 2.5s ease-in-out infinite;
 }
+/* Determinate variant — used once the adapter reports boot fractions;
+   width is driven inline by the smoothed fraction. */
+.loading-bar.determinate {
+  animation: none;
+  margin-left: 0;
+  transition: width 360ms ease;
+}
 @keyframes playground-loadBar {
   0% {
     width: 5%;

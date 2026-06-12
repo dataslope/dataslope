@@ -671,6 +671,9 @@ export const javaAdapter: LanguageAdapter = {
   // CodeMirror's clike mode handles Java syntax. `text/x-java` is the
   // standard MIME alias for Java inside that mode.
   codeMirrorMode: "text/x-java",
+  // CheerpJ runtime from cjrtnc.leaningtech.com plus the bundled
+  // tools.jar (~18 MB) that provides javac.
+  coldDownloadMB: 30,
   // clang-format LLVM style (see formatCode) — keep in sync.
   indentWidth: 2,
   examples: EXAMPLES,
@@ -721,6 +724,7 @@ export const javaAdapter: LanguageAdapter = {
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage(
       "Loading CheerpJ (OpenJDK + javac in WebAssembly — this can take a moment on first load)…",
+      0.08,
     );
     const api = await loadCheerpJ();
     return new JavaRuntime(api);

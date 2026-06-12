@@ -1231,6 +1231,8 @@ export const rAdapter: LanguageAdapter = {
     notes: "Runs entirely in the browser via WebAssembly — no server roundtrip.",
   },
   codeMirrorMode: "r",
+  // R WASM image + base VFS, compressed transfer (webR 0.6).
+  coldDownloadMB: 15,
   // styler's tidyverse style (see formatCode) — keep in sync.
   indentWidth: 2,
   examples: EXAMPLES,
@@ -1266,18 +1268,20 @@ export const rAdapter: LanguageAdapter = {
     return formatRWithStyler(code);
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Loading WebR…");
+    setLoadingMessage("Loading WebR…", 0.03);
     // @ts-expect-error -- webr ships without bundled type declarations
     const { WebR } = (await import("webr")) as { WebR: new () => WebRInstance };
 
-    setLoadingMessage("Initialising R runtime…");
+    // webR.init() is the heavy stage: it downloads and instantiates the
+    // R WASM image (~15 MB compressed).
+    setLoadingMessage("Initialising R runtime…", 0.12);
     const webR = new WebR();
     await webR.init();
     // Expose this session to the styler-based formatter (see formatRWithStyler)
     // so the "Format code" button reuses it instead of starting a second R.
     activeWebR = webR;
 
-    setLoadingMessage("Configuring graphics device…");
+    setLoadingMessage("Configuring graphics device…", 0.9);
     await webR.evalRVoid(
       `options(device = function() webr::canvas(width = 720, height = 432, capture = TRUE))`,
     );

@@ -16,7 +16,12 @@ import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR,
 } from "./languageIcons";
-import { FormatIcon, PlayIcon } from "./challengeShared";
+import {
+  FormatIcon,
+  PlayIcon,
+  useCreepingBootFraction,
+} from "./challengeShared";
+import { DiamondSpinner, LogoWaveBar } from "./mdx/loadingAnimations";
 import { EditorState, Compartment } from "@codemirror/state";
 import {
   EditorView,
@@ -49,6 +54,7 @@ import {
   fetchDatasetBytes,
   type DatasetStageSpec,
 } from "./runtime/remoteDatasets";
+import { warmRuntimeOnRouteLand } from "./runtime/warmup";
 import {
   clearPersistedCode,
   loadPersistedCode,
@@ -387,6 +393,9 @@ function CodeBlockInner({
   // already initialised), so the boot notice only promises "first run only"
   // when it really is the first run.
   const [bootCold, setBootCold] = useState(false);
+  // Latest stage-floor fraction reported by the adapter's boot (null
+  // until the adapter reports one); smoothed for display below.
+  const [bootFraction, setBootFraction] = useState<number | null>(null);
   const [outputs, setOutputs] = useState<OutputCell[]>([]);
   const [initExpanded, setInitExpanded] = useState(false);
   const [isFormatting, setIsFormatting] = useState(false);
@@ -756,6 +765,7 @@ function CodeBlockInner({
 
     setOutputs([]);
     setBootCold(!isRuntimeReady(RuntimeScope.Fumadocs, adapter.id));
+    setBootFraction(null);
     setStatus("loading");
     setStatusMessage("Initialising runtime…");
 
@@ -778,11 +788,16 @@ function CodeBlockInner({
       datasetsPromise?.catch(() => {});
 
       if (!runtimeRef.current) {
+        // The registry subscribes this callback to the in-flight boot
+        // even when a silent warm-up started it, replaying the current
+        // stage — so a Run click mid-boot shows live progress.
         runtimeRef.current = await getSharedRuntime(
           RuntimeScope.Fumadocs,
           adapter,
-          (msg) => {
-            if (runSeqRef.current === mySeq) setStatusMessage(msg);
+          (msg, fraction) => {
+            if (runSeqRef.current !== mySeq) return;
+            setStatusMessage(msg);
+            if (fraction !== undefined) setBootFraction(fraction);
           },
         );
       }
@@ -885,7 +900,15 @@ function CodeBlockInner({
               return [...prev, fullCell];
             });
           },
-          isMultiFile ? { entryFilename: resolvedEntryFilename } : undefined,
+          {
+            entryFilename: isMultiFile ? resolvedEntryFilename : undefined,
+            // Mid-run waits (e.g. Python's deferred package set on the
+            // first run) surface in the status line instead of leaving
+            // a bare "Running…" while megabytes download.
+            onStatus: (message) => {
+              if (runSeqRef.current === mySeq) setStatusMessage(message);
+            },
+          },
         );
       } finally {
         // Hold the running overlay for at least MIN_RUN_OVERLAY_MS so
@@ -930,9 +953,19 @@ function CodeBlockInner({
     runRef.current = run;
   }, [run]);
 
+  // Warm the shared runtime as soon as the page lands (idle-scheduled,
+  // Save-Data-guarded, one boot at a time — see runtime/warmup.ts), so
+  // the time a reader spends on the page's prose pays for the runtime
+  // download instead of the first Run click.
+  useEffect(() => {
+    warmRuntimeOnRouteLand(RuntimeScope.Fumadocs, adapter);
+  }, [adapter]);
+
   // Warm the shared runtime when the block first scrolls into view, so the
   // learner's first Run reuses an already-initialised runtime instead of
-  // triggering a cold (~10 s for Pyodide) download on click. Best-effort:
+  // triggering a cold (~10 s for Pyodide) download on click. Kept as the
+  // fallback for Save-Data users (the route-land warm-up skips them) and
+  // for additional languages further down the page. Best-effort:
   // the registry dedupes warm-ups across blocks of the same language, and
   // any failure here is swallowed so an actual Run can retry and report it.
   useEffect(() => {
@@ -1072,6 +1105,12 @@ function CodeBlockInner({
   }, [toastManager]);
 
   const isBusy = status === "loading" || status === "running";
+
+  // Smoothed boot fraction for the wave progress bar (null → spinner only).
+  const bootDisplayFraction = useCreepingBootFraction(
+    bootFraction,
+    status === "loading",
+  );
 
   // Header readouts for the merged output panel. Cells stream in during
   // the run, each stamped with the elapsed time at its arrival — the last
@@ -1415,17 +1454,9 @@ function CodeBlockInner({
           {status === "loading" && (
             <div className={styles.bootNoticeWrap}>
               <div className={styles.bootNotice} data-testid="codeblock-boot">
-                <svg
-                  viewBox="0 0 24 24"
-                  className={styles.bootSpinner}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  aria-hidden
-                >
-                  <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                </svg>
+                <span className={styles.bootGlyph} aria-hidden>
+                  <DiamondSpinner size={22} label="" />
+                </span>
                 <span className={styles.bootNoticeText}>
                   <span className={styles.bootNoticeTitle}>
                     {statusMessage ||
@@ -1433,12 +1464,27 @@ function CodeBlockInner({
                   </span>
                   {bootCold && (
                     <span className={styles.bootNoticeHint}>
-                      Downloading the {adapter.runtimeInfo.language} runtime —
-                      this happens once; later runs are instant.
+                      Downloading the {adapter.runtimeInfo.language} runtime
+                      {adapter.coldDownloadMB
+                        ? ` (~${adapter.coldDownloadMB} MB)`
+                        : ""}{" "}
+                      — this happens once; later runs are instant.
                     </span>
                   )}
                 </span>
               </div>
+              {bootDisplayFraction != null && (
+                <div className={styles.bootProgress}>
+                  <LogoWaveBar
+                    fraction={bootDisplayFraction}
+                    height={12}
+                    label={
+                      statusMessage ||
+                      `Setting up the ${adapter.runtimeInfo.language} runtime…`
+                    }
+                  />
+                </div>
+              )}
             </div>
           )}
           {outputs.length > 0 ? (

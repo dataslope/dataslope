@@ -491,6 +491,8 @@ export const csharpAdapter: LanguageAdapter = {
   // CodeMirror's clike mode handles C#. `text/x-csharp` is the
   // standard MIME alias for C# inside that mode.
   codeMirrorMode: "text/x-csharp",
+  // .NET runtime + Roslyn assembly bundle from jsDelivr — see cdn.ts.
+  coldDownloadMB: 35,
   // clang-format Microsoft style (see formatCode) — keep in sync.
   indentWidth: 4,
   examples: EXAMPLES,

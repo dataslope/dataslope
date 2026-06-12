@@ -388,6 +388,46 @@
   gap: 28px;
 }
 
+/* ── Wave progress bar ─────────────────────────────────────────────────
+   Determinate variant of the wave: a subtle full-width track whose
+   filled window (width = progress) reveals the animated wave band.
+   The bar inherits the brand blue via .waveBand inside the fill. */
+
+.waveBar {
+  display: block;
+  position: relative;
+  width: 100%;
+  border-radius: 999px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--ds-blue, #148cff) 14%, transparent);
+}
+
+:global(.dark) .waveBar {
+  background: color-mix(in srgb, var(--ds-blue-400, #5ba7ff) 16%, transparent);
+}
+
+.waveBarFill {
+  display: block;
+  position: absolute;
+  inset: 0 auto 0 0;
+  overflow: hidden;
+  border-radius: inherit;
+  transition: width 360ms ease;
+}
+
+/* Inside the bar the fill window is the only edge treatment we want —
+   disable the band's own end fades so progress reads as a hard edge. */
+.waveBarFill .waveBand {
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .waveBarFill {
+    transition: none;
+  }
+}
+
 /* ── Reduced motion ────────────────────────────────────────────────────
    Drop all transform/stroke animations and signal activity with a calm
    opacity pulse on the loader wrapper instead. With `drawDash` disabled

@@ -90,9 +90,11 @@ let dotnetPromise: Promise<DotnetApi> | null = null;
 
 /** Dynamically import the boot script (once per page), configure the
  *  runtime to load all assets from the jsDelivr CDN bundle, and
- *  resolve with a `runScript` function the C# adapter calls for every Run press. */
+ *  resolve with a `runScript` function the C# adapter calls for every Run press.
+ *  `setLoadingMessage` mirrors `LanguageAdapter.init`'s reporter: a stage
+ *  line plus an optional coarse overall boot fraction. */
 export function loadDotnet(
-  setLoadingMessage: (message: string) => void,
+  setLoadingMessage: (message: string, fraction?: number) => void,
 ): Promise<DotnetApi> {
   if (dotnetPromise) return dotnetPromise;
   dotnetPromise = (async () => {
@@ -100,7 +102,7 @@ export function loadDotnet(
       throw new Error(".NET runtime requires a browser environment.");
     }
 
-    setLoadingMessage("Loading .NET runtime (Mono WebAssembly)…");
+    setLoadingMessage("Loading .NET runtime (Mono WebAssembly)…", 0.05);
 
     // dotnet.js is an ES module that exports a `dotnet` DotnetHostBuilder.
     // Dynamic import() lets the module's internal relative imports
@@ -116,7 +118,9 @@ export function loadDotnet(
       );
     }
 
-    setLoadingMessage("Initialising .NET runtime…");
+    // `create()` is the heavy stage: it streams the ~35 MB assembly
+    // bundle from jsDelivr and instantiates the Mono WASM runtime.
+    setLoadingMessage("Initialising .NET runtime…", 0.15);
     const host = await dotnetBuilder
       .withConfigSrc(BOOT_CONFIG_URL)
       .withResourceLoader((_type, name) => {
@@ -130,7 +134,7 @@ export function loadDotnet(
       getDotnetBundleBaseUrl: () => RUNTIME_BUNDLE_BASE,
     });
 
-    setLoadingMessage("Loading Roslyn (C# scripting engine)…");
+    setLoadingMessage("Loading Roslyn (C# scripting engine)…", 0.85);
     const exports = await host.getAssemblyExports("ScriptRunner");
     const runScriptExport = lookupExport(exports, [
       "ScriptRunner",

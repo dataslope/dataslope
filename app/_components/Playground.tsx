@@ -56,6 +56,7 @@ import type {
   PlotlyFigure,
 } from "./types";
 import { PLAYGROUNDS } from "./playgrounds";
+import { useCreepingBootFraction } from "./challengeShared";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 // Base UI primitives — used for menus, popovers, dialogs, and toasts so
@@ -699,6 +700,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     "Initializing runtime…",
   );
   const [loaded, setLoaded] = useState(false);
+  // Latest stage-floor fraction reported by the adapter's boot (null
+  // until one arrives); smoothed below to drive a determinate loading
+  // bar instead of the indeterminate sweep.
+  const [bootFraction, setBootFraction] = useState<number | null>(null);
   // Two-phase teardown for the loading overlay: when `loaded` flips
   // true we keep the overlay mounted briefly so its CSS opacity
   // transition can play out (avoids the "blink" effect on languages
@@ -715,6 +720,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const [statusState, setStatusState] = useState<
     "loading" | "ready" | "running" | "error"
   >("loading");
+
+  // Smoothed boot fraction for the loading overlay's bar: determinate
+  // once the adapter reports stage fractions, indeterminate sweep
+  // otherwise. Inactive after load / on error so the next boot (e.g.
+  // adapter switch remount) starts clean.
+  const bootDisplayFraction = useCreepingBootFraction(
+    bootFraction,
+    !loaded && statusState === "loading",
+  );
 
   // ─── Per-adapter playground store ───────────────────────────────────────
   // Workspaces, files (tabs), per-file dirty buffers and per-file output
@@ -1391,9 +1405,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         // effects from the playground (pip installs, monkey-patched
         // modules, files staged into the VFS) can't leak into the
         // learn-page CodeBlocks/ChallengeCards.
-        const rt = await getSharedRuntime(RuntimeScope.Playground, adapter, (m) => {
-          if (!cancelled) setLoadingMessage(m);
-        });
+        const rt = await getSharedRuntime(
+          RuntimeScope.Playground,
+          adapter,
+          (m, fraction) => {
+            if (cancelled) return;
+            setLoadingMessage(m);
+            if (fraction !== undefined) setBootFraction(fraction);
+          },
+        );
         if (cancelled) return;
         runtimeRef.current = rt;
         setLoaded(true);
@@ -2885,7 +2905,18 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 : LOADING_QUIPS[quipIndex]}
             </div>
             <div className="loading-bar-wrap">
-              <div className="loading-bar" />
+              {/* Determinate once the adapter reports boot fractions;
+                  indeterminate sweep until then. */}
+              <div
+                className={`loading-bar${
+                  bootDisplayFraction != null ? " determinate" : ""
+                }`}
+                style={
+                  bootDisplayFraction != null
+                    ? { width: `${Math.round(bootDisplayFraction * 1000) / 10}%` }
+                    : undefined
+                }
+              />
             </div>
           </div>
         </div>
