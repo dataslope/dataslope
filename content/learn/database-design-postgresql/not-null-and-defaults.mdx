@@ -181,9 +181,49 @@ Use `IS NULL` and `IS NOT NULL` when you want to test for missing data.
 | `email IS NOT NULL` | True when a value is present  |
 
 This is called **three-valued logic**: SQL conditions can be true,
-false, or unknown. You do not need the formal theory yet. Just remember
-that NULL is special, and ordinary `=` comparisons are not how you find
-it.
+false, or unknown. The reasoning behind it is worth one slow pass,
+because it explains every NULL surprise you will ever hit. NULL means
+*the value is unknown*. So ask: is an unknown value equal to 5?
+Unknown — it might be. Is an unknown value equal to another unknown
+value? Also unknown — they might both be 5, or not. SQL refuses to
+guess in either direction, so any ordinary comparison touching NULL
+produces neither true nor false. And a `WHERE` clause only keeps rows
+whose condition is *true* — unknown rows are dropped. That is why
+`WHERE nickname = NULL` matches nothing, and why `IS NULL` exists as
+a separate operator that asks a different question: not "what is the
+value?" but "is there a value at all?"
+
+Run the comparisons yourself — the result of each one appears as its
+own column:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Three-valued logic, demonstrated"
+  starterCode={`SELECT
+  NULL = NULL AS null_equals_null,
+  NULL <> NULL AS null_not_equals_null,
+  NULL = 5 AS null_equals_five,
+  (NULL IS NULL) AS null_is_null,
+  (5 IS NULL) AS five_is_null;`}
+/>
+
+The first three columns come back empty — that blank is PostgreSQL
+displaying *unknown*. Only the `IS NULL` tests produce a definite
+`true` or `false`.
+
+<Callout type="info" title="NULL has been controversial for fifty years">
+NULL was part of E. F. Codd's relational model from its early days,
+and database theorists have argued about it ever since. Codd himself
+eventually decided one kind of missing was not enough — his later
+writing proposed separate markers for "missing and applicable"
+(a salary we have not recorded) and "missing and inapplicable" (a
+salary for a volunteer who has none). Christopher J. Date, one of the
+field's most prominent authors, has spent decades arguing the
+opposite: that NULL was a mistake and well-designed databases should
+avoid it almost entirely. Working designers land in the middle —
+allow NULL where a fact is genuinely optional, require values
+everywhere else, and never use `=` to look for missing data.
+</Callout>
 
 <SqlCodeBlock
   dialect="postgres"

@@ -227,6 +227,54 @@ flowchart LR
 For example, prefer `price NUMERIC NOT NULL CHECK (price >= 0)` when
 every product must have a price.
 
+## Try it: encode the rule yourself
+
+A table already exists in the database below, but it was created
+without the price rule — right now nothing stops a negative price.
+Add the missing constraint. (You can add a constraint to an existing
+table with `ALTER TABLE ... ADD CONSTRAINT name CHECK (...)`.)
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Add a CHECK constraint to a live table"
+  instructions={`The \`products\` table has no price rule yet. Add a CHECK constraint named exactly \`products_price_nonnegative\` that enforces \`price >= 0\`, using a single \`ALTER TABLE products ADD CONSTRAINT ...\` statement. Do not modify the existing rows.`}
+  initSql={`CREATE TABLE products (
+  id    SERIAL PRIMARY KEY,
+  name  TEXT NOT NULL,
+  price NUMERIC NOT NULL
+);
+
+INSERT INTO products (name, price) VALUES
+  ('Notebook', 4.50),
+  ('Pen', 1.25);`}
+  starterCode={`-- ALTER TABLE ... ADD CONSTRAINT products_price_nonnegative ...`}
+  solutionSql={`ALTER TABLE products
+ADD CONSTRAINT products_price_nonnegative CHECK (price >= 0);`}
+  tests={[
+    {
+      id: "constraint_exists",
+      name: "The constraint exists and mentions price",
+      description: "A CHECK named products_price_nonnegative on products",
+      runAfterSql:
+        "SELECT COUNT(*) FROM pg_constraint WHERE conname = 'products_price_nonnegative' AND contype = 'c' AND conrelid = 'products'::regclass AND pg_get_constraintdef(oid) LIKE '%price%';",
+      runAfterEquals: 1,
+    },
+    {
+      id: "rows_intact",
+      name: "Existing rows are untouched",
+      description: "Both seeded products remain",
+      runAfterSql: "SELECT COUNT(*) FROM products;",
+      runAfterEquals: 2,
+    },
+  ]}
+/>
+
+Once it passes, convince yourself the rule is real: open the page's
+earlier block (or the playground) and try inserting a negative price
+into a table with this constraint. The error message names the
+constraint — one more reason to give constraints readable names
+instead of accepting the defaults.
+
 ## Quick check
 
 <MultipleChoice
