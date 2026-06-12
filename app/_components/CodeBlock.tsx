@@ -1313,7 +1313,12 @@ function CodeBlockInner({
               className={challengeStyles.accentBar}
               data-error={outputs.some((c) => c.type === "stderr")}
             />
-            <span className={challengeStyles.outputLabel}>Output</span>
+            <span
+              className={challengeStyles.outputLabel}
+              data-error={outputs.some((c) => c.type === "stderr")}
+            >
+              Output
+            </span>
             <span className={styles.outputHeaderRight}>
               {outputElapsed && (
                 <span className={challengeStyles.outputTime}>
