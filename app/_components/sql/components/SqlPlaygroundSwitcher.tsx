@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "../../Link";
 import { useRouter } from "next/navigation";
 import { Select } from "@base-ui-components/react/select";
 import { ChevronDown } from "lucide-react";

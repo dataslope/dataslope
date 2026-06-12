@@ -1,6 +1,6 @@
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
-import Link from "next/link";
+import Link from "./_components/Link";
 import styles from "./root.module.css";
 
 export const metadata = {
@@ -62,7 +62,8 @@ export default async function Home() {
           A growing collection of browser-based developer tools.
         </p>
         <div className={styles.ctas}>
-          <Link href="/learn" className={styles.cta}>
+          {/* Primary CTA — the one link worth prefetching eagerly. */}
+          <Link href="/learn" prefetch className={styles.cta}>
             Browse Learn
             <span aria-hidden="true" className={styles.arrow}>
               →

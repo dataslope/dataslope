@@ -31,6 +31,12 @@ export default function LearnLayout({ children }: { children: ReactNode }) {
       <DocsLayout
         tree={source.pageTree}
         tabs={false}
+        // Don't prefetch sidebar links. The sidebar renders hundreds of
+        // lesson links per page; with Next.js's default viewport prefetch
+        // every visible link fans out segment requests, and on Vercel each
+        // edge-cache miss is a billed ISR Read. Navigation falls back to
+        // fetching on click, which is fast for these fully static pages.
+        sidebar={{ prefetch: false }}
         nav={{
           title: (
             <span

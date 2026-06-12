@@ -57,7 +57,7 @@ import type {
 } from "./types";
 import { PLAYGROUNDS } from "./playgrounds";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import Link from "./Link";
 // Base UI primitives — used for menus, popovers, dialogs, and toasts so
 // that the playground gets consistent positioning, focus management,
 // and natural enter/exit animations out of the box.
