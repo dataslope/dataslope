@@ -3,7 +3,9 @@ title: Binary Search Trees
 description: Learn the BST invariant, search, insertion, deletion, validation, and ordered C++ containers
 ---
 
-A binary search tree (BST) is a binary tree with an ordering invariant: every value in the left subtree is less than the root, and every value in the right subtree is greater than the root. The rule applies recursively at every node.
+Binary search on a sorted array is wonderful — until you need to *insert*. Adding one element to a sorted array means shifting everything after it: O(log n) lookups, O(n) updates. A linked list flips the trade: cheap splicing, but no way to jump to the middle, so no binary search. For decades-old reasons that still bite today, you often need both at once: a phone directory that takes new entries all day, a database index under constant writes.
+
+The binary search tree is the answer: take binary search's decision process — "smaller? go left; larger? go right" — and *build it out of pointers*. A BST is a binary tree with an ordering invariant: every value in the left subtree is less than the node, every value in the right subtree is greater, recursively at every node. Now the middle of the data is just the root, and inserting a value means hanging one new node off a leaf — no shifting. Search, insert, and erase all walk one root-to-leaf path.
 
 <svg
   viewBox="0 0 640 220"
@@ -199,7 +201,7 @@ int main() {
 
 ## Delete
 
-Deletion has three cases: leaf, one child, and two children. With two children, copy the in-order successor, then delete that successor from the right subtree.
+Deletion is where BST code earns its keep, because removing a node must not break the ordering invariant for everything beneath it. There are three cases, in rising difficulty. A **leaf** just disappears. A node with **one child** is replaced by that child — splice it out like a linked-list node. The hard case is **two children**: you cannot delete the node without orphaning a subtree, so instead you *replace its value* with the in-order successor — the smallest value in the right subtree, which is by definition the next value in sorted order — and then delete that successor from the right subtree. The successor has no left child (it is a minimum), so deleting it falls into one of the two easy cases. The recursion bottoms out cleanly.
 
 ```mermaid
 flowchart TD
@@ -271,7 +273,7 @@ int main() {
 
 ## Complexity and balance
 
-Every operation follows one root-to-leaf path, so cost is O(h), where `h` is height.
+Every operation follows one root-to-leaf path, so cost is O(h), where `h` is height — and there lies the BST's embarrassing secret. Height depends on *insertion order*. Insert `{4, 2, 6, 1, 3, 5, 7}` and you get a bushy tree of height 3. Insert the same values as `{1, 2, 3, 4, 5, 6, 7}` and every node hangs off the right of the previous one: the "tree" is a linked list in disguise, and every operation is O(n). Sorted input — the most natural input in the world — is the BST's worst case, just as it was naive quicksort's.
 
 | Shape | Height | Operation cost |
 | --- | --- | --- |
@@ -284,7 +286,9 @@ flowchart LR
     S1["skewed: like a linked list"] --> S2["linear search"]
 ```
 
-AVL and Red-Black trees rotate nodes to stay balanced. `std::set` and `std::map` are ordered containers typically implemented as red-black trees.
+The cure was found in Moscow in 1962, when the mathematicians Georgy Adelson-Velsky and Evgenii Landis published the first self-balancing search tree — the **AVL tree**, named for their initials. The idea: detect when a subtree leans too far and fix it with a *rotation*, a constant-time pointer shuffle that lifts the heavy side up without disturbing the in-order sequence. A long line of balanced trees followed, most influentially the **red-black tree** (formulated by Leonidas Guibas and Robert Sedgewick in 1978), which tolerates slightly more lean in exchange for cheaper maintenance.
+
+You rarely implement these by hand outside a classroom, because C++ ships them: `std::set` and `std::map` are ordered containers typically implemented as red-black trees, giving guaranteed O(log n) insert, erase, and find — plus sorted iteration and range queries, the two things `unordered_map` cannot do.
 
 <CodeBlock
   adapter="cpp"
@@ -355,7 +359,9 @@ int main() {
 
 ## Validating a BST
 
-Checking only immediate children is wrong because a deeper node can violate an ancestor's allowed range. Correct validation carries lower and upper bounds.
+"Is this tree a valid BST?" looks trivial — check each node against its children — and that obvious answer is wrong in a way worth understanding. Consider a root 5 whose left child is 3, and give 3 a right child of 6. Both parent-child pairs look fine locally (3 < 5, 6 > 3), but 6 sits in the *left subtree of 5*, where everything must be less than 5. The invariant is about whole subtrees, not adjacent pairs.
+
+Correct validation carries the constraint downward: each node must lie within an `(low, high)` range inherited from all its ancestors; going left tightens `high` to the current value, going right tightens `low`. The program below runs both versions on the trap tree — watch the naive one approve it.
 
 <CodeBlock
   adapter="cpp"
