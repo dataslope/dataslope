@@ -123,6 +123,43 @@ ORDER BY
 A good design lets PostgreSQL reject values that do not belong. That
 makes bad data harder to create in the first place.
 
+## The danger of "obvious" attributes
+
+Choosing attributes feels easy because the obvious ones come from
+everyday life: a person has a first name and a last name, an address
+has a house number and a street, a phone number has ten digits. The
+trouble is that almost every one of those "obvious" facts is false
+for someone, somewhere.
+
+There is a whole genre of programming essays about this, started by
+Patrick McKenzie's widely shared 2010 post "Falsehoods Programmers
+Believe About Names." Its list of wrong assumptions — that everyone
+has exactly one full name, that names have a first and last part in
+that order, that names do not change, that names fit in ASCII — has
+since been joined by similar lists for addresses, phone numbers, time
+zones, and calendars. Each list is really a catalog of schema designs
+that hurt real users: the mononymous person who cannot pass a form
+that requires a "last name," the rural address with no street name,
+the customer whose legal name will not fit in `VARCHAR(20)`.
+
+The design lesson is not "never structure anything." It is that an
+attribute and its domain are *claims about the world*, and you should
+make claims you can defend. `NOT NULL` on `family_name` claims every
+person has one. `VARCHAR(20)` claims no name is longer. A `CHECK`
+that statuses come from a fixed list claims the business will warn
+you before inventing a new status. Some of those claims are solid;
+others quietly exclude real people and real cases. The strongest
+designers are not the ones with the strictest constraints — they are
+the ones who know *which* facts the system genuinely guarantees.
+
+<Callout type="info" title="When in doubt, constrain what you control">
+Values your own system generates — statuses, roles, internal codes —
+deserve tight domains, because you control the full list. Values that
+come from the outside world — names, addresses — deserve more
+humility and looser domains. Required versus optional is still worth
+deciding; pretending to know the format often is not.
+</Callout>
+
 ## Atomic values: one value per cell
 
 A column should usually hold one value, not a list packed into a

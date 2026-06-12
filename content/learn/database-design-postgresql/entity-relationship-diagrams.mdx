@@ -7,6 +7,15 @@ Before you build a schema, it helps to draw it. An
 **entity-relationship diagram** — usually called an **ER diagram** — is
 a picture of the main things in your system and how they connect.
 
+The idea has a precise birthday: computer scientist Peter Chen
+introduced the entity-relationship model in a 1976 paper, "The
+Entity-Relationship Model — Toward a Unified View of Data," arguing
+that designers should describe a system's *meaning* — its entities
+and relationships — before committing to any particular database
+structure. Half a century later, his diagrams (in various visual
+dialects) are still the standard way design conversations happen on
+whiteboards.
+
 The goal is not art. The goal is shared understanding before the SQL
 hardens your choices into a database.
 
@@ -99,8 +108,11 @@ key or unique constraint.
 
 ## Reading the relationship line
 
-Crow's-foot notation puts symbols at both ends of the relationship
-line. The symbols tell you how many rows may connect on each side.
+The diagrams in this course use **crow's-foot notation**, the most
+common dialect in industry tools. It gets its name from the
+three-pronged "many" symbol, which looks like a bird's footprint.
+Crow's-foot puts symbols at both ends of the relationship line, and
+the symbols tell you how many rows may connect on each side.
 
 ```mermaid
 flowchart LR
