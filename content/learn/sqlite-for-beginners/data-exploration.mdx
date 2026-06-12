@@ -274,6 +274,43 @@ loop on any database and within minutes you will understand it far
 better than someone who jumped straight to writing queries.
 </Callout>
 
+## Your turn: a database you have never seen
+
+Everything above used tables this course built for you. Now do it
+for real. The block below loads **Northwind** — a classic sample
+database modeling a food-trading company, with customers, orders,
+products, suppliers, and more. Nobody is going to tell you what is
+inside. Run the starter query to list its tables, then work the
+loop yourself.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Explore Northwind with the five-step loop"
+  remoteInitSql="sqlite/northwind_sqlite.sql"
+  starterCode={`SELECT
+  name
+FROM
+  sqlite_master
+WHERE
+  type = 'table'
+ORDER BY
+  name;`}
+/>
+
+Some prompts to keep you honest, one loop step at a time:
+
+- `PRAGMA table_info (Products);` — what columns does the products
+  table have?
+- `SELECT * FROM Products LIMIT 5;` — what do real rows look like?
+- `SELECT COUNT(*), MIN(Price), MAX(Price) FROM Products;` — how
+  big, and what is the price range?
+- `SELECT CategoryID, COUNT(*) FROM Products GROUP BY CategoryID
+  ORDER BY COUNT(*) DESC;` — how are products distributed across
+  categories?
+
+If you can answer those four questions about a database you opened
+two minutes ago, you have the skill this page set out to teach.
+
 ## Check your understanding
 
 <MultipleChoice
