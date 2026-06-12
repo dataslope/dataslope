@@ -3,7 +3,9 @@ title: Complexity Analysis
 description: Understand Big-O, Big-Omega, Big-Theta, amortized analysis, and common performance pitfalls
 ---
 
-Algorithms are not judged only by whether they work. They are judged by how their resource usage grows. Hardware changes constants; asymptotic growth explains what happens when input size becomes huge.
+Here is an uncomfortable fact: a fast computer cannot save a slow algorithm. Buy a machine ten times faster and an O(n²) program handles only about three times more data in the same time. Meanwhile an O(n log n) program on the *old* machine happily processes inputs the quadratic one will never finish. When inputs grow, the *shape* of the growth curve beats raw hardware every time.
+
+This page gives you the vocabulary for talking about those shapes. The notation itself is older than computers: the big-O symbol comes from nineteenth-century number theory — Paul Bachmann introduced it in 1894 and Edmund Landau popularized it — and Donald Knuth later championed it as the standard language for analyzing programs. Mathematicians needed a way to say "grows like n², give or take a constant," and it turned out programmers needed exactly the same sentence.
 
 <svg
   viewBox="0 0 640 220"
@@ -54,7 +56,7 @@ Algorithms are not judged only by whether they work. They are judged by how thei
 
 ## Why we care
 
-On ten items, almost any correct solution feels instant. On ten million items, an O(n^2) loop can be impossible while an O(n log n) solution still finishes.
+On ten items, almost any correct solution feels instant. On ten million items, an O(n^2) loop can be impossible while an O(n log n) solution still finishes. The program below makes the gap concrete: watch how the `quadratic` column races away from the `linear` one as `n` grows by factors of ten.
 
 <CodeBlock
   adapter="cpp"
@@ -89,7 +91,9 @@ Let `f(n)` be the work your algorithm does and `g(n)` be a comparison function s
 | Big-Ω | Lower bound | Grows at least this fast, up to constants. |
 | Big-Θ | Tight bound | Both an upper and lower bound. |
 
-Formally, `f(n) = O(g(n))` if there exist constants `c` and `n0` such that `f(n) <= c*g(n)` for all `n >= n0`.
+Formally, `f(n) = O(g(n))` if there exist constants `c` and `n0` such that `f(n) <= c*g(n)` for all `n >= n0`. In plain words: past some input size, `f` never climbs above a constant multiple of `g`. The constants are the notation's way of saying "I don't care whether your machine is fast or slow — show me the shape."
+
+A small example to calibrate on: the `sum` function below touches each of the `n` elements exactly once and does constant work per element.
 
 <CodeBlock
   adapter="cpp"
@@ -116,7 +120,7 @@ int main() {
   ]}
 />
 
-The `sum` function is Θ(n): it must inspect every element, and it does constant work per element.
+`sum` is Θ(n) — not just *at most* linear but *exactly* linear, because it cannot answer without inspecting every element. When you can prove both bounds, Θ is the honest claim; in casual conversation programmers say "O(n)" and usually mean Θ(n).
 
 ## Growth rates hierarchy
 
@@ -132,6 +136,10 @@ From slowest- to fastest-growing: **O(1) → O(log n) → O(sqrt n) → O(n) →
 | O(n^2) | Check every pair |
 | O(2^n) | Try every subset |
 | O(n!) | Try every permutation |
+
+The gaps between rows are not gentle. At n = 1,000,000: log n is about 20, n log n is about 20 million (fine), n² is a *trillion* (minutes to hours), and 2^n is a number with more digits than there are atoms in the observable universe. The bottom rows of this table are not "slower" — they are walls.
+
+You can also feel linear growth directly. The timing loop below runs the same simple accumulation at three sizes; each tenfold input increase should cost roughly tenfold time.
 
 <CodeBlock
   adapter="cpp"
@@ -162,17 +170,21 @@ int main() {
 
 Timing small programs is noisy, especially in a browser sandbox, but measurement is useful when paired with complexity analysis.
 
-## Reading loops and binary search
+## Reading complexity off the code
 
-A single loop over `n` items is usually O(n). A nested loop over all pairs is usually O(n^2). Binary search is O(log n) because each comparison halves the remaining search space.
+With practice you can read growth rates straight from a function's shape. A single loop over `n` items is usually O(n). A nested loop over all pairs is usually O(n²) — more precisely, the inner body runs `n(n-1)/2` times, and the constant `1/2` gets absorbed by the notation. A loop whose variable *halves* each iteration (`n`, `n/2`, `n/4`, …) runs O(log n) times; that is exactly why binary search, which discards half of the remaining candidates per comparison, is O(log n).
 
-A pair-counting loop runs `n(n - 1) / 2` times, which is Θ(n^2).
+Two patterns to be suspicious of: a loop that *looks* single but hides an O(n) operation in its body (like `v.erase(v.begin())` or substring copies), and recursion — for recursive functions, count the total number of calls, not the lines of code. Both pitfalls will come up again, by name, in the sorting and recursion chapters.
 
 ## Amortized analysis
 
-Some operations are occasionally expensive but cheap on average over a sequence. `std::vector::push_back` is the classic example: most pushes write one element, but when capacity is full, the vector allocates a larger array and moves existing elements.
+Now for the subtlest idea on this page — and one of the most useful, because it explains the data structure you will use most.
 
-The doubling argument: if capacity doubles, each element is moved only a small number of times across many insertions. The total work for `n` pushes is O(n), so each push is O(1) **amortized**.
+Some operations are occasionally expensive but cheap on average over a sequence. `std::vector::push_back` is the classic example: most pushes write one element into spare capacity, but when capacity runs out, the vector must allocate a larger array and move *every existing element* into it. That one push is O(n). So how can anyone call `push_back` "O(1)"?
+
+Think of it like a savings account. Suppose every push deposits three imaginary coins: one pays for writing the element itself, and two go into savings. When the vector doubles from capacity `k` to `2k`, it must move `k` elements — but the `k/2` pushes since the *last* doubling have saved up `k` coins between them, exactly enough to pay for the move. No push is ever billed more than three coins, so over any sequence of `n` pushes the total work is O(n), and each push is O(1) **amortized**.
+
+The crucial ingredient is *doubling*. If the vector instead grew by a fixed amount — say, 10 slots at a time — the savings would never keep up, and `n` pushes would cost O(n²) total. Geometric growth is what makes the bill come out constant.
 
 ```mermaid
 flowchart TD
@@ -181,6 +193,8 @@ flowchart TD
     C --> D["grow to 8"]
     D --> E["many cheap pushes pay for rare moves"]
 ```
+
+You can watch the doubling happen. This program pushes twenty values and prints a line only when `capacity()` changes — the reallocation moments:
 
 <CodeBlock
   adapter="cpp"
@@ -206,6 +220,8 @@ int main() {
     },
   ]}
 />
+
+Notice the capacities roughly doubling (the exact sequence is implementation-defined). Each printed line is one of those rare expensive pushes — and they get rarer as the vector grows.
 
 ## Common pitfalls
 
