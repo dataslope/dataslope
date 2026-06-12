@@ -228,3 +228,60 @@ Outer-join everyone, then keep the rows whose match is NULL to find the unmatche
 
 A full join keeps all rows from both tables, using NULLs where either side is unmatched.`}
 />
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Customers who never ordered"
+  instructions={`Return the \`name\` of every customer who has **never** placed an order, sorted alphabetically (A to Z). The starter already LEFT JOINs \`orders\` onto \`customers\` — add the filter that keeps only the unmatched customers.`}
+  initSql={`CREATE TABLE customers (
+  id   SERIAL PRIMARY KEY,
+  name TEXT NOT NULL
+);
+CREATE TABLE orders (
+  id          SERIAL PRIMARY KEY,
+  customer_id INTEGER REFERENCES customers(id),
+  amount      NUMERIC(8, 2)
+);
+INSERT INTO customers (name) VALUES ('Ada'), ('Grace'), ('Linus'), ('Mae');
+INSERT INTO orders (customer_id, amount) VALUES
+  (1, 42.00), (2, 99.00), (2, 15.00);`}
+  starterCode={`SELECT
+  c.name
+FROM
+  customers c
+  LEFT JOIN orders o ON o.customer_id = c.id
+ORDER BY
+  c.name;`}
+  solutionSql={`SELECT
+  c.name
+FROM
+  customers c
+  LEFT JOIN orders o ON o.customer_id = c.id
+WHERE
+  o.id IS NULL
+ORDER BY
+  c.name;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns a single name column",
+      description: "Just the customer's name.",
+      expectedColumns: ["name"],
+    },
+    {
+      id: "row_count",
+      name: "Returns two customers",
+      description: "Only the customers with no orders.",
+      expectedRowCount: 2,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Linus, then Mae.",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
+/>

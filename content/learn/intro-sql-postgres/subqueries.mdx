@@ -199,3 +199,63 @@ The subquery recomputes the value each run, so the comparison never goes stale.`
 
 \`IN\` pairs with a subquery that returns a single column of values to match against.`}
 />
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Pricier than average"
+  instructions={`The \`products\` table has \`name\` and \`price\` columns. Return the \`name\` and \`price\` of every product priced **above the average price of all products**, sorted from the most expensive to the least. Compute the average with a subquery — do not type the number yourself.`}
+  initSql={`CREATE TABLE products (
+  id    SERIAL PRIMARY KEY,
+  name  TEXT NOT NULL,
+  price NUMERIC(8, 2) NOT NULL
+);
+INSERT INTO products (name, price) VALUES
+  ('Mouse', 25.00), ('Keyboard', 40.00), ('Headset', 55.00),
+  ('Webcam', 80.00), ('Monitor', 100.00);`}
+  starterCode={`SELECT
+  name,
+  price
+FROM
+  products
+WHERE
+  price > 0 -- replace 0 with a subquery that computes the average price
+ORDER BY
+  price DESC;`}
+  solutionSql={`SELECT
+  name,
+  price
+FROM
+  products
+WHERE
+  price > (
+    SELECT
+      AVG(price)
+    FROM
+      products
+  )
+ORDER BY
+  price DESC;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns name and price",
+      description: "Two columns, in that order.",
+      expectedColumns: ["name", "price"],
+    },
+    {
+      id: "row_count",
+      name: "Returns two products",
+      description: "The average price is 60.00; only two products exceed it.",
+      expectedRowCount: 2,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Monitor (100.00), then Webcam (80.00).",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
+/>
