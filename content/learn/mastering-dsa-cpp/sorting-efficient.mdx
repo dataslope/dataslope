@@ -3,7 +3,9 @@ title: Efficient Sorting Algorithms
 description: Learn merge sort, quicksort, std::sort, std::stable_sort, custom comparators, and stability trade-offs in C++
 ---
 
-Efficient sorting algorithms reduce the cost from O(n^2) to O(n log n) for large inputs. They rely on divide and conquer, partitioning, and hybrid engineering.
+The slow sorts of the last page all share a flaw: they move information one comparison at a time across short distances. The efficient sorts escape O(n²) with one strategic idea — *divide and conquer*. Split the array, solve the halves, and combine. Each element participates in only about log n levels of splitting, and each level does O(n) work, giving O(n log n) — which, for comparison-based sorting, is provably as good as it gets.
+
+The two stars of this page were born decades apart and embody opposite temperaments. Merge sort is the careful one: John von Neumann worked it out in 1945, making it one of the first algorithms ever written for a stored-program computer, and it *guarantees* O(n log n) no matter what you feed it. Quicksort is the daring one — usually faster in practice, occasionally catastrophic — and its origin story is one of the best in computing.
 
 <svg
   viewBox="0 0 640 210"
@@ -48,11 +50,13 @@ Efficient sorting algorithms reduce the cost from O(n^2) to O(n log n) for large
 
 ## Merge sort
 
-Merge sort divides the array in half, recursively sorts each half, then merges the sorted halves. It guarantees O(n log n) time, uses O(n) extra memory, and is stable when merging prefers the left element on ties.
+Merge sort divides the array in half, recursively sorts each half, then merges the sorted halves. The merge step is the whole secret, and it rests on a simple observation: combining two *already sorted* sequences is easy. Look at the front of each, take the smaller, repeat — one pass, no searching. The recursion exists only to manufacture the sorted halves that make merging possible.
 
 ```text
 mergeSort(a): if size <= 1 return; sort left; sort right; merge
 ```
+
+The guarantees are ironclad: O(n log n) time on every input, no exceptions, plus stability when the merge prefers the left element on ties (note the `<=` in the code below — change it to `<` and stability dies silently). The price is O(n) extra memory for the merge buffer.
 
 ```mermaid
 graph TD
@@ -109,7 +113,9 @@ int main() {
 
 ## Quicksort
 
-Quicksort chooses a pivot, partitions values around it, then recursively sorts both sides. It is in-place and O(n log n) on average, but O(n^2) in the worst case with bad pivots. This version uses Lomuto partition.
+In 1960, a 26-year-old Tony Hoare was a visiting student at Moscow State University, working on a machine-translation project that needed to sort the words of Russian sentences before looking them up on a dictionary tape. He thought of the partitioning idea — pick a *pivot*, sweep everything smaller to its left and everything larger to its right — but couldn't express the "sort the two sides the same way" step in the languages he knew. Soon after, he learned ALGOL 60, one of the first languages to support recursion, and the algorithm finally fit on a page. He published it in 1961 as a half-column algorithm in the *Communications of the ACM*; in 1980 he received the Turing Award. Quicksort remains, six decades on, the backbone of most standard-library sorts.
+
+The mechanism: choose a pivot, partition values around it, and recursively sort both sides. Unlike merge sort, all the real work happens *before* the recursive calls, and no merge buffer is needed — quicksort rearranges in place. The version below uses the Lomuto partition scheme (pivot at the end, one sweep with a write frontier `i`); after `partition` returns, the pivot sits at its final sorted position, with smaller values on its left and larger on its right.
 
 <CodeBlock
   adapter="cpp"
@@ -150,13 +156,15 @@ int main() {
   ]}
 />
 
+Why "O(n log n) on average but O(n²) worst case"? Everything depends on the pivot's luck. A pivot near the median splits the range in half and the recursion is log n deep. But always picking the *smallest* element splits n into (0, n−1) — the recursion becomes n levels deep and the total work quadratic. With the last-element pivot used above, the input that triggers this disaster is embarrassingly ordinary: an **already sorted array**.
+
 <Callout type="warn" title="Pivot strategy matters">
-Naive quicksort can degrade to O(n^2). Random pivots and median-of-three pivots reduce the chance of consistently bad partitions.
+Naive quicksort can degrade to O(n^2). Random pivots and median-of-three pivots reduce the chance of consistently bad partitions — and make it hard for an adversary to construct a killer input on purpose.
 </Callout>
 
 ## `std::sort`
 
-Prefer `std::sort` unless you specifically need stability. It is an introsort-style hybrid: quicksort for speed, heapsort fallback to avoid quadratic worst cases, and insertion sort for tiny ranges.
+So which do you actually use? Neither, directly: `std::sort`. In 1997 David Musser proposed *introsort* ("introspective sort"), the hybrid most C++ standard libraries adopted: run quicksort for speed, but track recursion depth, and if it exceeds about 2·log n — the signature of bad pivots — switch to heapsort, which guarantees O(n log n). Tiny sub-ranges go to insertion sort. The result is quicksort's average speed with merge-sort-class worst-case insurance, which is why `std::sort` is the right default unless you specifically need stability.
 
 ```mermaid
 flowchart TD
@@ -220,7 +228,7 @@ int main() {
   ]}
 />
 
-Sorting `std::pair` values by their second field is a common lambda example.
+Sorting `std::pair` values by their second field is the everyday version of the same idea — "sort these word counts by count, descending" is half of every frequency-analysis task:
 
 <CodeBlock
   adapter="cpp"
