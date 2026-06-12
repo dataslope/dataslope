@@ -233,17 +233,18 @@ ergonomics layer on top.
 
 <ChallengeCard
   adapter="csharp"
+  title="Rewrite both ways"
+  instructions={`Implement **both** \`QueryStyle\` and \`MethodStyle\` so they produce the **same output in the same order**.
+
+Each should return, one per line, the authors whose books total **more than 1500 pages**, **ordered by author name**, formatted as \`"Name: totalPages"\`.
+
+Write \`QueryStyle\` using **query syntax** (the SQL-like \`from … where … select\` form) and \`MethodStyle\` using **method syntax** (the fluent \`.GroupBy().Where()…\` chain). Edit \`QueryStyle.cs\` and \`MethodStyle.cs\` — \`Program.cs\` is already wired up.`}
   entryFilename="Program.cs"
   files={[
     {
       filename: "Program.cs",
       starterCode: `using System;
 using System.Linq;
-
-// TODO: implement both QueryStyle and MethodStyle below.
-// They must produce the same output (in the same order):
-// authors whose books total > 1500 pages, ordered by author name,
-// printed as "Name: totalPages".
 
 var books = new[] {
     new Book("Knuth", "TAOCP V1", 650), new Book("Knuth", "TAOCP V2", 700),

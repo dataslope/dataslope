@@ -1874,7 +1874,12 @@ export default function ChallengeCard({
               className={styles.accentBar}
               data-error={outputs.some((c) => c.type === "stderr")}
             />
-            <span className={styles.outputLabel}>Output</span>
+            <span
+              className={styles.outputLabel}
+              data-error={outputs.some((c) => c.type === "stderr")}
+            >
+              Output
+            </span>
             {elapsed && (
               <span className={styles.outputTime}>
                 <Timer size={12} aria-hidden="true" />

@@ -1349,6 +1349,10 @@
   color: var(--ds-blue-500);
 }
 
+.outputLabel[data-error="true"] {
+  color: var(--ch-red);
+}
+
 .outputTime {
   margin-left: auto;
   font-size: 11.5px;
