@@ -3,7 +3,9 @@ title: Arrays and std::vector
 description: Learn fixed arrays, std::array, std::vector, contiguous memory, iteration, capacity, and matrix-style storage in C++
 ---
 
-Arrays are the first data structure most programmers meet: a sequence of values stored side by side. In modern C++, the array you will use most is `std::vector<T>` because it grows dynamically while keeping fast O(1) indexing.
+How do you find the 7,000th element of a sequence instantly, without looking at the first 6,999? You can't — unless the elements are stored side by side. If element 0 lives at address `A` and every element is `s` bytes wide, then element `i` lives at exactly `A + i*s`. One multiplication, one addition, done. That single formula is the array's superpower, and it only works because of contiguity: the layout *is* the data structure.
+
+Everything else about arrays follows from that bargain. Indexing is O(1) and iteration flies through the CPU cache, but inserting in the middle means physically shoving everything after it — there is no spare room between neighbors. In modern C++, the array you will use most is `std::vector<T>`, which keeps the contiguous layout while adding the one thing raw arrays lack: the ability to grow.
 
 <svg
   viewBox="0 0 640 180"
@@ -47,7 +49,7 @@ Arrays are the first data structure most programmers meet: a sequence of values 
 
 ## C-style arrays
 
-A C-style array such as `int a[5]` has a fixed size known at compile time. It is compact and fast, but it loses size information easily because it **decays to a pointer** when passed to many functions.
+A C-style array such as `int a[5]` has a fixed size known at compile time. It is compact and fast, but it carries a famous trap inherited from C: when passed to a function, it **decays to a pointer** — the size information silently falls off. Run the program below and notice that `print_first` receives only an address; inside that function there is no way to ask "how long is this array?"
 
 <CodeBlock
   adapter="cpp"
@@ -69,7 +71,7 @@ int main() {
   ]}
 />
 
-You almost never want raw arrays for DSA practice because `std::array` and `std::vector` are safer and more expressive.
+The `sizeof` line still works in `main` (20 bytes — five 4-byte ints) because the array has not decayed there yet. Decades of buffer-overflow bugs trace back to this size-loss design, which is why you almost never want raw arrays for DSA practice: `std::array` and `std::vector` keep their size with them.
 
 ## `std::array<T, N>`
 
@@ -132,7 +134,7 @@ Use `operator[]` when you know the index is valid. Use `.at()` when you want bou
 
 ## Contiguous memory layout
 
-A vector keeps values next to each other in memory. That makes iteration cache-friendly: when the CPU loads one element, nearby elements are likely pulled into cache too.
+A vector keeps values next to each other in memory, and modern hardware rewards that handsomely. When the CPU needs one value from main memory, it does not fetch four bytes — it fetches a whole *cache line*, typically 64 bytes, on the bet that you will want the neighbors next. With a vector of `int`s, that bet pays off sixteen to one: one slow memory trip delivers the next fifteen elements for free. A linked structure scattered across the heap loses the bet on almost every step.
 
 ```mermaid
 flowchart LR
@@ -204,7 +206,7 @@ int main() {
 
 ## Resizing, capacity, and amortized push
 
-`size()` is how many elements are currently stored. `capacity()` is how many elements fit before reallocation. When capacity is full, a vector usually grows by allocating a larger buffer, often about double the old capacity.
+A vector cannot literally grow in place — the memory just past its last element may belong to something else. So it cheats: it keeps two numbers. `size()` is how many elements are currently stored; `capacity()` is how many fit before the next reallocation. While `size < capacity`, `push_back` just writes into the spare room. When the room runs out, the vector allocates a larger buffer (typically about double), moves everything across, and frees the old block — the expensive-but-rare event behind the amortized O(1) analysis from the complexity page.
 
 <CodeBlock
   adapter="cpp"
@@ -232,11 +234,11 @@ int main() {
   ]}
 />
 
-That rare reallocation is why `push_back` is O(1) **amortized**, as discussed in the complexity page.
+Each printed line marks a reallocation. Note the side effect: a reallocation moves elements to a *new address*, so any pointer or iterator you saved into the old buffer is now dangling. Iterator invalidation on growth is one of the most common real-world vector bugs — if you hold an iterator, do not `push_back`.
 
 ## Timing one million pushes
 
-Browser timing is noisy, but this shows how to measure a sequence of pushes with `<chrono>`.
+Browser timing is noisy, but this shows how to measure a sequence of pushes with `<chrono>`. A million pushes, including all the reallocation copying along the way, typically lands in the low tens of milliseconds — the amortization argument, verified by stopwatch.
 
 <CodeBlock
   adapter="cpp"
@@ -265,9 +267,11 @@ int main() {
   ]}
 />
 
+If you know the final size in advance, call `reserve(n)` first — one allocation instead of a whole doubling cascade.
+
 ## 2D vectors
 
-A matrix is often represented as `std::vector<std::vector<int>>`: a vector of rows, where each row is another vector.
+A matrix is often represented as `std::vector<std::vector<int>>`: a vector of rows, where each row is another vector. It is convenient and you will see it constantly in graph and grid problems — just know that each row is its own allocation, so a 2D vector is *not* one contiguous block the way a true matrix library's storage is.
 
 <CodeBlock
   adapter="cpp"

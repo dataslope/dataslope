@@ -3,7 +3,9 @@ title: Stacks
 description: Learn the LIFO stack ADT, std::stack, vector-backed stacks, balanced parentheses, call stacks, and stack-based string reversal
 ---
 
-A stack is a **last in, first out** data structure: the most recently pushed item is the first one popped. Think of plates in a cafeteria tray stack or browser pages in a back-button history.
+Some problems care only about *the most recent thing*. Which bracket needs closing next? The one opened last. Which page does the browser's back button return to? The one visited last. Which function resumes when the current one returns? The one that called it. Whenever "most recent first" is the rule, the right structure is a stack: **last in, first out**, like a stack of cafeteria plates where you only ever touch the top.
+
+The idea is old enough to predate most of computing's vocabulary. Alan Turing described subroutine calls in his 1945 ACE report using operations he called "bury" and "unbury." In the 1950s, the German computer scientists Friedrich Bauer and Klaus Samelson worked out the same principle for evaluating expressions and named it the *Keller* — the "cellar," because values are dropped in and the last one dropped is the first one fetched. Bauer later received the IEEE Computer Pioneer Award for the stack principle. Today the stack is so central that the dedicated memory region for function calls is simply called *the stack*, and the most famous programming Q&A site on the internet is named after what happens when it fills up.
 
 <svg
   viewBox="0 0 640 240"
@@ -130,7 +132,7 @@ For `std::stack` backed by `std::deque`, `push`, `pop`, `top`, and `empty` are O
 
 ## Balanced parentheses
 
-A stack is perfect when recent history matters. For parentheses, push opening brackets; when a closing bracket appears, the top must be the matching opener.
+Here is the stack's signature party trick, and the warm-up question of a thousand interviews: is `{[()]}` balanced? The insight is that a closing bracket must match the *most recently opened, not yet closed* bracket — exactly the item a stack keeps on top. So: push every opener; on every closer, check that the top is its partner and pop it. If a closer arrives with the wrong opener on top (or no opener at all), the string is unbalanced. If anything is left on the stack at the end, some opener was never closed.
 
 ```mermaid
 flowchart TD
@@ -209,9 +211,11 @@ int main() {
   ]}
 />
 
+This same algorithm, scaled up, is how your compiler checks that every `{` in your C++ source has a partner.
+
 ## Function call stack
 
-Every function call needs a place to remember local variables and where to return. Recursive calls naturally form a stack.
+Every function call needs a place to remember local variables and where to return — and calls finish in reverse order of starting, which is LIFO by definition. So the machine keeps a stack of *frames*, pushing one per call and popping it on return. This is Turing's "bury and unbury" and Bauer's cellar, built into every CPU you own.
 
 ```mermaid
 sequenceDiagram
@@ -249,9 +253,11 @@ int main() {
   ]}
 />
 
+When `factorial(5)` runs, five frames pile up before the first multiplication happens — which is why a recursion that never reaches its base case ends in a *stack overflow*. The recursion page returns to this in depth.
+
 ## Expression evaluation
 
-Many parsers use stacks for operators and operands. You will see this idea again with monotonic stacks, expression parsing, and depth-first search.
+Bauer and Samelson's original cellar was built to evaluate arithmetic, and the cleanest descendant of that idea is *postfix* notation, where operators follow their operands: `23+4*` means `(2+3)*4`. Postfix needs no parentheses and no precedence rules — you just scan left to right, push numbers, and when an operator appears, pop two values, apply it, and push the result. Watch the stack do all the bookkeeping:
 
 <CodeBlock
   adapter="cpp"
@@ -283,6 +289,8 @@ int main() {
     },
   ]}
 />
+
+Try changing the expression to `34*2+` and predicting the output before you run. You will see this push-pop-apply idea again with monotonic stacks, expression parsing, and depth-first search.
 
 <Callout type="info" title="Adapters limit the interface">
 `std::stack` intentionally hides iteration and random access. If you need those, use the underlying container directly, such as `std::vector` or `std::deque`.
@@ -414,7 +422,7 @@ int main() {
   markdown={`What is the usual time complexity of \`push\` and \`pop\` on \`std::stack\`?
 
 - [o] O(1)
-  > Correct for the default deque-backed stack.
+  > The default deque-backed stack pushes and pops at one end in constant time.
 - O(log n)
   > No tree operation is required.
 - O(n)
