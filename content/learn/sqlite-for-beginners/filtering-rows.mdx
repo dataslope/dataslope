@@ -411,6 +411,74 @@ WHERE
   title LIKE '%ar%';`}
 />
 
+## Practice challenge
+
+You have seen every tool this challenge needs: `WHERE`, `AND`, and
+a comparison. The table is already loaded — you only write the
+query.
+
+<SqlChallengeCard
+  dialect="sqlite"
+  title="Affordable fiction"
+  instructions={`The \`books\` table is preloaded. Return the \`title\` and \`price\` columns (in that order) for books whose \`genre\` is \`'Fiction'\` **and** whose \`price\` is under \`20\`. Sort the result by \`price\` ascending. Two books should match.`}
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC,
+  pages INTEGER
+);
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  starterCode={`SELECT
+  title,
+  price
+FROM
+  books;`}
+  solutionSql={`SELECT
+  title,
+  price
+FROM
+  books
+WHERE
+  genre = 'Fiction'
+  AND price < 20
+ORDER BY
+  price ASC;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Has title and price columns",
+      description: "In that exact order",
+      expectedColumns: ["title", "price"],
+    },
+    {
+      id: "row_count",
+      name: "Returns 2 rows",
+      description: "Only the two fiction books under 20",
+      expectedRowCount: 2,
+    },
+    {
+      id: "rows",
+      name: "Cheapest fiction first",
+      description: "The Solar Bakery (12.99), then Cloud Recipes (18.25)",
+      expectedRows: {
+        columns: ["title", "price"],
+        ordered: true,
+        values: [
+          ["The Solar Bakery", 12.99],
+          ["Cloud Recipes", 18.25],
+        ],
+      },
+    },
+  ]}
+/>
+
 ## Check your understanding
 
 <MultipleChoice

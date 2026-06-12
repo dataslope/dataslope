@@ -63,11 +63,28 @@ That sounds technical, but the beginner idea is simple:
   </g>
 </svg>
 
-## SQLite is flexible about types
+## SQLite is the odd one out — on purpose
 
-Some database systems are rigid: if a column is declared as a number, text that is not a number is rejected.
+Almost every other SQL database is rigidly typed: declare a column
+as a number, and any value that is not a number gets rejected at
+the door. PostgreSQL, MySQL, and SQL Server all work this way, and
+most SQL books simply assume it.
 
-SQLite is different. SQLite uses **dynamic typing**. A column declaration gives SQLite a preference, called **affinity**, but SQLite may still store a value of another kind.
+SQLite made a different and deliberate choice. It uses **dynamic
+typing**: the type belongs to the *value*, not to the column. A
+column declaration gives SQLite a preference, called **affinity**,
+but SQLite may still store a value of another kind. This is not an
+oversight — the SQLite documentation describes flexible typing as
+a feature, and it fits the project's history: SQLite began life as
+an extension for the Tcl scripting language, a world where values
+flow freely between representations. The design made SQLite
+forgiving in exactly the situations where small applications live.
+
+If you ever want the strict behavior other databases give you,
+modern SQLite has it as an opt-in: tables created with the
+`STRICT` keyword (added in 2021) reject values that do not match
+the declared type. For this course, we work with ordinary flexible
+tables, because understanding them is understanding SQLite.
 
 ```mermaid
 flowchart LR

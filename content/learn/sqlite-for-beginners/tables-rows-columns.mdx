@@ -1,11 +1,14 @@
 ---
 title: Tables, Rows, and Columns
-description: Learn how SQLite tables are built from rows, columns, cells, schemas, and data.
+description: How SQLite tables are built from rows, columns, cells, and schemas — and the one design question that makes every table make sense.
 ---
 
-A SQLite database stores information in **tables**. A table looks a lot like a spreadsheet grid, but it has a stronger purpose: it stores facts about **one kind of thing** in a predictable structure.
-
-If tables, rows, and columns make sense, the rest of SQL starts to feel much less mysterious.
+A SQLite database stores information in **tables**. A table looks
+a lot like a spreadsheet grid, but it has a stronger purpose: it
+stores facts about **one kind of thing** in a predictable
+structure. If tables, rows, and columns make sense, the rest of
+SQL starts to feel much less mysterious — every query you will
+ever write is just a way of asking questions about this grid.
 
 ## The big picture
 
@@ -40,7 +43,8 @@ Read one row as a sentence:
 
 > Pet `1` is named `Mochi`, has species `cat`, and is age `3`.
 
-That sentence works because the table is organized around one kind of thing: pets.
+That sentence works because the table is organized around one kind
+of thing: pets.
 
 <svg
   viewBox="0 0 640 230"
@@ -99,7 +103,8 @@ That sentence works because the table is organized around one kind of thing: pet
 
 ## Rows are records
 
-A **row** is one complete record. In the `pets` table, one row means one pet.
+A **row** is one complete record. In the `pets` table, one row
+means one pet.
 
 ```mermaid
 flowchart LR
@@ -109,17 +114,14 @@ flowchart LR
     ROW --> AGE["age: 5"]
 ```
 
-Rows answer the question: **which one?**
+Rows answer the question: **which one?** Which pet? Mochi. Which
+pet? Biscuit. A row should describe one specific thing, event, or
+fact — never a pile of several.
 
-- Which pet? Mochi.
-- Which pet? Biscuit.
-- Which pet? Sunny.
+## Columns are attributes
 
-A row should describe one specific thing, event, or fact.
-
-## Columns are fields or attributes
-
-A **column** is one attribute that every row can have. In the `pets` table, `name` is a column and `age` is a column.
+A **column** is one attribute that every row can have. In the
+`pets` table, `name` is a column and `age` is a column.
 
 ```mermaid
 flowchart TB
@@ -130,13 +132,14 @@ flowchart TB
     classDef hdr fill:#dbeafe,stroke:#1d4ed8
 ```
 
-Columns answer the question: **what about it?**
+Columns answer the question: **what about it?** What is the pet's
+name? What species? What age?
 
-- What is the pet's name?
-- What species is the pet?
-- What age is the pet?
-
-A column should hold one kind of value. Do not put ages in the `name` column or names in the `age` column.
+A column should hold one kind of value, and a cell — the crossing
+of one row and one column — should usually hold exactly one value.
+Store `cat`, not `cat, dog, bird`, in a single cell. A column
+named `misc` that holds phone numbers, dates, and notes is a
+warning sign that the table has lost track of what it is about.
 
 <MultipleChoice
   markdown={`In a table called \`books\`, what should one row most naturally represent?
@@ -151,20 +154,60 @@ A column should hold one kind of value. Do not put ages in the `name` column or 
   > The database can contain many tables; a row is much smaller than the whole database.`}
 />
 
-## Cells are single values
+## The grain: what does one row mean?
 
-A **cell** is the value at one row-column crossing.
+Here is the single most useful question in all of database design,
+and it costs nothing to ask:
+
+> **Each row in this table is one *what*?**
+
+The answer is called the table's **grain**. A well-shaped table
+has a grain you can say out loud in one breath:
+
+| Table | Grain sentence |
+| --- | --- |
+| `students` | Each row is one student. |
+| `orders` | Each row is one order. |
+| `products` | Each row is one product. |
+
+If you cannot finish the sentence — or the honest answer is
+"sometimes a customer, sometimes an order, sometimes a note" —
+the table is trying to store too many kinds of facts at once.
+Watch what that looks like:
+
+| product_name | product_price | customer_name | customer_phone | order_date |
+| --- | --- | --- | --- | --- |
+| Notebook | 3.50 | Ada | 555-0101 | 2026-02-01 |
+| Notebook | 3.50 | Ada | 555-0101 | 2026-02-10 |
+
+Is one row a product? A customer? An order? It is a little of
+each, and the cost shows immediately: the notebook's price and
+Ada's phone number are copied into both rows. When Ada's number
+changes, someone must find and fix every copy — miss one, and the
+table disagrees with itself. The cure is to give each kind of
+thing its own table and connect them, which is exactly where this
+course is heading over the next few pages.
 
 ```mermaid
 flowchart LR
-    R["Row: Biscuit"] --> X["Cell value: 5"]:::cell
-    C["Column: age"] --> X
-    classDef cell fill:#dcfce7,stroke:#15803d
+    MIX["one confusing table<br/>mixed facts"] --> SPLIT["split by kind of thing"]
+    SPLIT --> C["customers<br/>one row per customer"]
+    SPLIT --> P["products<br/>one row per product"]
+    SPLIT --> O["orders<br/>one row per order"]
 ```
 
-The cell shown above means: Biscuit's age is `5`.
+<MultipleChoice
+  markdown={`What does the **grain** of a table describe?
 
-A cell should usually hold one value, not a list of values. For example, store `cat`, not `cat, dog, bird` in one cell.
+- The color used to display the table.
+  > Grain is about meaning, not visual style.
+- [o] What one row in the table represents.
+  > Grain answers the question, "Each row is one what?"
+- The number of columns in the table.
+  > Column count is part of structure, but grain is the row-level meaning.
+- Whether the table is stored on disk or in memory.
+  > Storage location is separate from the table's grain.`}
+/>
 
 ## Schema versus data
 
@@ -181,9 +224,8 @@ flowchart LR
     D --> D2["2, Biscuit, dog, 5"]
 ```
 
-The **schema** says what shape the table has. The **data** is what fills that shape.
-
-For `pets`, the schema might say:
+The **schema** says what shape the table has. The **data** is what
+fills that shape. For `pets`, the schema might say:
 
 | Column | Declared type | Meaning |
 | --- | --- | --- |
@@ -192,17 +234,14 @@ For `pets`, the schema might say:
 | `species` | `TEXT` | Kind of animal |
 | `age` | `INTEGER` | Age in whole years |
 
-The rows are the data:
-
-| id | name | species | age |
-| --- | --- | --- | --- |
-| 1 | Mochi | cat | 3 |
-| 2 | Biscuit | dog | 5 |
-| 3 | Sunny | bird | 1 |
+The schema is a promise about the future: every row that ever
+lands in this table will have these named slots. That promise is
+what lets one query reason about a million rows at once.
 
 ## Row order is not guaranteed
 
-A table is not a numbered list. SQLite may return rows in any order unless you ask for an order.
+A table is not a numbered list. SQLite may return rows in any
+order unless you ask for an order.
 
 ```mermaid
 flowchart LR
@@ -210,11 +249,14 @@ flowchart LR
     QUERY --> ORDER["Use ORDER BY"]
 ```
 
-When order matters, use `ORDER BY`. Otherwise, do not assume the first row you see will always appear first.
+When order matters, use `ORDER BY`. Otherwise, do not assume the
+first row you see will always appear first.
 
 ## See it in SQLite
 
-Run this example and connect each result part to the words you learned: table, row, column, and cell.
+Run this example and connect each result part to the words you
+learned: table, row, column, cell — and notice the grain: each row
+is one pet.
 
 <SqlCodeBlock
   dialect="sqlite"
@@ -241,14 +283,10 @@ ORDER BY
   id;`}
 />
 
-Try changing the query to:
-
-```sql
-SELECT name, species
-FROM pets;
-```
-
-That asks SQLite for two columns instead of all four.
+Try changing the query to `SELECT name, species FROM pets;` — that
+asks SQLite for two columns instead of all four. The stored table
+does not change; you are simply choosing which attributes to look
+at.
 
 ## Check your understanding
 
@@ -266,19 +304,6 @@ That asks SQLite for two columns instead of all four.
 />
 
 <MultipleChoice
-  markdown={`In the \`pets\` table, what is the column \`species\`?
-
-- One specific pet.
-  > One specific pet is a row.
-- [o] An attribute that can be recorded for every pet row.
-  > A column is one named attribute shared by the rows in the table.
-- The whole database.
-  > A database can contain many tables; a column is only one part of one table.
-- The order in which rows are displayed.
-  > Display order is controlled with queries such as \`ORDER BY\`.`}
-/>
-
-<MultipleChoice
   markdown={`What is the difference between a table's **schema** and its **data**?
 
 - The schema is the first row, and the data is every row after it.
@@ -292,14 +317,31 @@ That asks SQLite for two columns instead of all four.
 />
 
 <MultipleChoice
-  markdown={`If you need rows returned from oldest pet to youngest pet, what should you do?
+  markdown={`A table named \`orders\` turns out to have one row for each order *item*, not each order. What should you notice first?
 
-- Trust SQLite to return rows in the order you inserted them.
-  > Without an explicit sort, row order is not guaranteed.
-- Put the age inside the table name.
-  > A table name does not sort rows.
-- [o] Use an \`ORDER BY\` clause on the age column.
-  > \`ORDER BY\` is how you request a specific result order.
-- Store all pets in one cell.
-  > Combining records into one cell destroys the row structure.`}
+- The table automatically becomes invalid SQLite.
+  > SQLite can store the table; the issue is whether people understand what one row means.
+- [o] The table's grain is different from what its name suggests, and queries must account for that.
+  > Knowing what one row represents prevents wrong assumptions and wrong counts.
+- The table cannot contain numbers.
+  > Row grain does not determine whether numbers can be stored.
+- Every row must be deleted.
+  > The data may be useful; the issue is understanding or redesigning the structure.`}
 />
+
+<MultipleChoice
+  markdown={`What is a good sign that a table may need to be split?
+
+- Every row has the same columns.
+  > Shared columns are normal for a table.
+- [o] The same customer phone number is copied into many order rows.
+  > Repeated facts often belong in their own table and should be referenced instead of copied.
+- The table has a primary key.
+  > A primary key is usually a good thing.
+- The table stores one kind of thing.
+  > One kind of thing is the goal, not a warning sign.`}
+/>
+
+Next: if two rows can look identical — two customers named John
+Smith in Springfield — how does the database tell them apart? That
+is the job of the **primary key**.
