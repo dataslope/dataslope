@@ -76,7 +76,7 @@ import {
   indentUnit,
 } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
-import { themeFor, noActiveLine } from "./cmExtensions";
+import { themeFor, noActiveLine, redoKeymap } from "./cmExtensions";
 import { DUCKDB_VERSION } from "./runtime/duckdb";
 import {
   clearPersistedCode,
@@ -1012,6 +1012,7 @@ export default function SqlChallengeCard({
           ...closeBracketsKeymap,
           ...defaultKeymap,
           ...historyKeymap,
+          ...redoKeymap,
           indentWithTab,
         ]),
         languageComp.of([]),

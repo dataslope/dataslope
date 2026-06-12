@@ -60,7 +60,7 @@ import {
   indentUnit,
 } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
-import { loadLanguage, themeFor, noActiveLine } from "./cmExtensions";
+import { loadLanguage, themeFor, noActiveLine, redoKeymap } from "./cmExtensions";
 import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR,
@@ -568,6 +568,7 @@ export default function ChallengeCard({
           ...closeBracketsKeymap,
           ...defaultKeymap,
           ...historyKeymap,
+          ...redoKeymap,
           indentWithTab,
         ]),
         languageComp.of([]),

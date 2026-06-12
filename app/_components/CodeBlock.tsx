@@ -34,7 +34,7 @@ import {
   indentUnit,
 } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
-import { loadLanguage, themeFor, noActiveLine } from "./cmExtensions";
+import { loadLanguage, themeFor, noActiveLine, redoKeymap } from "./cmExtensions";
 
 import type {
   LanguageAdapter,
@@ -521,6 +521,7 @@ function CodeBlockInner({
           ...closeBracketsKeymap,
           ...defaultKeymap,
           ...historyKeymap,
+          ...redoKeymap,
           indentWithTab,
         ]),
         languageComp.of([]),

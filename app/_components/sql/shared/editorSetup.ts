@@ -33,7 +33,7 @@ import {
   rectangularSelection,
   tooltips,
 } from "@codemirror/view";
-import { themeFor } from "../../cmExtensions";
+import { themeFor, redoKeymap } from "../../cmExtensions";
 import {
   createSqlCompletionSource,
   type SqlCompletionSchema,
@@ -265,6 +265,7 @@ export function createSqlEditorExtensions(
       ...defaultKeymap,
       ...searchKeymap,
       ...historyKeymap,
+      ...redoKeymap,
       indentWithTab,
     ]),
   ];

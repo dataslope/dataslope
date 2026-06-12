@@ -44,7 +44,7 @@ import {
   type CompletionResult,
 } from "@codemirror/autocomplete";
 import { searchKeymap, highlightSelectionMatches } from "@codemirror/search";
-import { loadLanguage, themeFor } from "./cmExtensions";
+import { loadLanguage, themeFor, redoKeymap } from "./cmExtensions";
 
 import type {
   ExampleSnippet,
@@ -1362,6 +1362,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             ...defaultKeymap,
             ...searchKeymap,
             ...historyKeymap,
+            ...redoKeymap,
             ...completionKeymap,
             indentWithTab,
           ]),
