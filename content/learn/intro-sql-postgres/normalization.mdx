@@ -194,7 +194,11 @@ flowchart LR
   `customers`, not `orders`.
 
 A handy summary of 3NF: every column should describe **"the key, the
-whole key, and nothing but the key."**
+whole key, and nothing but the key."** That phrasing comes from a
+1983 paper by William Kent that translated the normal forms into
+plain English — and database folk traditionally complete it with a
+wink: *"…so help me Codd,"* in honor of Edgar Codd, who defined the
+normal forms in the first place.
 
 <Callout type="warn" title="Normalization is a balance">
 More tables mean more joins. Most application databases aim for

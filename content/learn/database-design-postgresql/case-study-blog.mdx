@@ -331,6 +331,97 @@ VALUES
   (1, 1);`}
 />
 
+## Try it: ask the schema a question
+
+A schema earns its keep when new questions are easy. Here is one the
+product team will ask on day two: *how active is each post?* The full
+blog schema and its sample data are loaded below.
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Count comments per post"
+  instructions={`Return one row per post with the columns \`title\` and \`comment_count\` (the number of comments on that post). Posts with **zero comments must still appear** with a count of 0 — use a \`LEFT JOIN\`. Sort by \`title\` ascending.`}
+  initSql={`CREATE TABLE users (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    email TEXT NOT NULL UNIQUE,
+    display_name TEXT NOT NULL
+);
+
+CREATE TABLE posts (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    author_id INT NOT NULL REFERENCES users(id),
+    title TEXT NOT NULL,
+    body TEXT NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('draft', 'published')),
+    published_at TIMESTAMP
+);
+
+CREATE TABLE comments (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    post_id INT NOT NULL REFERENCES posts(id),
+    user_id INT NOT NULL REFERENCES users(id),
+    parent_comment_id INT REFERENCES comments(id),
+    body TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL
+);
+
+INSERT INTO users (email, display_name) VALUES
+    ('ana@example.com', 'Ana'),
+    ('ben@example.com', 'Ben'),
+    ('cam@example.com', 'Cam');
+
+INSERT INTO posts (author_id, title, body, status, published_at) VALUES
+    (1, 'Designing Tables', 'Start with entities.', 'published', '2025-03-01 09:00'),
+    (1, 'Draft Notes', 'Still thinking.', 'draft', NULL);
+
+INSERT INTO comments (post_id, user_id, parent_comment_id, body, created_at) VALUES
+    (1, 2, NULL, 'This helped me see why keys matter.', '2025-03-02 10:00'),
+    (1, 3, 1, 'The comment thread example helped too.', '2025-03-02 11:00');`}
+  starterCode={`SELECT
+  p.title,
+  0 AS comment_count
+FROM
+  posts p
+ORDER BY
+  p.title;`}
+  solutionSql={`SELECT
+  p.title,
+  COUNT(c.id) AS comment_count
+FROM
+  posts p
+  LEFT JOIN comments c ON c.post_id = p.id
+GROUP BY
+  p.id,
+  p.title
+ORDER BY
+  p.title;`}
+  tests={[
+    {
+      id: "row_count",
+      name: "Returns 2 rows",
+      description: "One per post, including the draft with no comments",
+      expectedRowCount: 2,
+    },
+    {
+      id: "columns",
+      name: "Has title and comment_count",
+      description: "In that exact order",
+      expectedColumns: ["title", "comment_count"],
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Designing Tables has 2 comments; Draft Notes has 0",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
+/>
+
+Notice what you did *not* have to do: parse any text, deduplicate any
+names, or guess which comment belongs to which post. The design
+already answered those questions.
+
 ## Check your understanding
 
 <MultipleChoice

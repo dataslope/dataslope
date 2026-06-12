@@ -327,6 +327,72 @@ LIMIT
   2;`}
 />
 
+## Practice challenge
+
+A classic "top N" question: sort, then trim. The table is loaded
+for you.
+
+<SqlChallengeCard
+  dialect="sqlite"
+  title="The two longest books"
+  instructions={`The \`books\` table is preloaded. Return the \`title\` and \`pages\` columns (in that order) for the **two** books with the most pages, longest first. Sort by \`pages\` descending and use \`LIMIT\`.`}
+  initSql={`CREATE TABLE books (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  genre TEXT,
+  price NUMERIC,
+  pages INTEGER
+);
+INSERT INTO books (title, author, genre, price, pages) VALUES
+  ('The Solar Bakery', 'Mina Park', 'Fiction', 12.99, 240),
+  ('Data Garden', 'Owen Lee', 'Technology', 29.50, 410),
+  ('Pocket Rivers', 'Lena Ortiz', 'Travel', 16.00, 180),
+  ('SQL Street', 'Mina Park', 'Technology', 24.00, 320),
+  ('Cloud Recipes', 'Ava Stone', 'Fiction', 18.25, 275);`}
+  starterCode={`SELECT
+  title,
+  pages
+FROM
+  books;`}
+  solutionSql={`SELECT
+  title,
+  pages
+FROM
+  books
+ORDER BY
+  pages DESC
+LIMIT
+  2;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Has title and pages columns",
+      description: "In that exact order",
+      expectedColumns: ["title", "pages"],
+    },
+    {
+      id: "row_count",
+      name: "Returns 2 rows",
+      description: "LIMIT 2 keeps only the top two",
+      expectedRowCount: 2,
+    },
+    {
+      id: "rows",
+      name: "Longest book first",
+      description: "Data Garden (410 pages), then SQL Street (320 pages)",
+      expectedRows: {
+        columns: ["title", "pages"],
+        ordered: true,
+        values: [
+          ["Data Garden", 410],
+          ["SQL Street", 320],
+        ],
+      },
+    },
+  ]}
+/>
+
 ## Check your understanding
 
 <MultipleChoice

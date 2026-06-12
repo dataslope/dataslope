@@ -201,3 +201,60 @@ takeaway.
 
 Per-row conditions go in \`WHERE\`; conditions on aggregated values go in \`HAVING\`.`}
 />
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Repeat customers only"
+  instructions={`The \`orders\` table has a \`customer\` column. Return each customer who has placed **more than one** order, with the columns \`customer\` and \`order_count\`, sorted from the highest order count to the lowest. The starter already groups and counts — add the group filter.`}
+  initSql={`CREATE TABLE orders (
+  id       SERIAL PRIMARY KEY,
+  customer TEXT NOT NULL,
+  amount   NUMERIC(8, 2) NOT NULL
+);
+INSERT INTO orders (customer, amount) VALUES
+  ('Ada', 20.00), ('Linus', 35.00), ('Ada', 12.00),
+  ('Grace', 50.00), ('Linus', 8.00), ('Ada', 41.00);`}
+  starterCode={`SELECT
+  customer,
+  COUNT(*) AS order_count
+FROM
+  orders
+GROUP BY
+  customer
+ORDER BY
+  order_count DESC;`}
+  solutionSql={`SELECT
+  customer,
+  COUNT(*) AS order_count
+FROM
+  orders
+GROUP BY
+  customer
+HAVING
+  COUNT(*) > 1
+ORDER BY
+  order_count DESC;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns customer and order_count",
+      description: "The group key and its count.",
+      expectedColumns: ["customer", "order_count"],
+    },
+    {
+      id: "row_count",
+      name: "Returns two customers",
+      description: "Only Ada and Linus ordered more than once.",
+      expectedRowCount: 2,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Ada (3 orders), then Linus (2).",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
+/>

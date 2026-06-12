@@ -3,7 +3,11 @@ title: Recursion
 description: Learn recursive thinking, the call stack, classic recursive functions, stack overflow, and recursion trade-offs in C++
 ---
 
-Recursion is a technique where a function solves a problem by calling itself on a smaller version of the same problem. It is a natural fit for trees, divide-and-conquer algorithms, backtracking, and definitions that already refer to themselves.
+Search Google for "recursion" and it asks: *Did you mean: recursion?* The joke works because the concept genuinely loops back on itself — a function that solves a problem by calling *itself* on a smaller version of the same problem. For most programmers this is the first idea in computing that feels less like engineering and more like vertigo.
+
+The vertigo has a cure, and it is worth stating up front because everything on this page depends on it. **Do not try to mentally trace every nested call.** That way lies madness — and it is also not how recursion is designed to be understood. Instead, take what is sometimes called the *recursive leap of faith*: when writing `factorial(n)`, simply *assume* `factorial(n - 1)` already returns the right answer, and ask only two questions — is the smallest case handled directly, and does combining `n` with a correct `factorial(n - 1)` give a correct `factorial(n)`? If both answers are yes, the whole tower stands. This is mathematical induction wearing a programmer's clothes, and induction has held up since Euclid.
+
+Recursion is the natural language for trees, divide-and-conquer algorithms, backtracking, and any definition that refers to itself. Master the leap of faith now and four later chapters get dramatically easier.
 
 <svg
   viewBox="0 0 640 220"
@@ -45,14 +49,14 @@ What is the smallest input I can answer immediately? How does every other input 
 
 ## The call stack
 
-Each call gets its own **stack frame** containing parameters, local variables, and a return address. Recursive calls add frames until a base case returns.
+The leap of faith explains how to *write* recursion; the call stack explains how the machine *runs* it. Each call gets its own **stack frame** containing parameters, local variables, and a return address — so `factorial(3)` and `factorial(2)` each have their own private `n`, stacked one atop the other exactly like the plates from the stacks chapter. Frames pile up on the way down until a base case returns, then unwind in reverse order, each frame finishing its pending multiplication as control passes back through it.
 
 ```mermaid
 sequenceDiagram
-    participant F3 as factorial(3)
-    participant F2 as factorial(2)
-    participant F1 as factorial(1)
-    participant F0 as factorial(0)
+    participant F3 as factorial 3
+    participant F2 as factorial 2
+    participant F1 as factorial 1
+    participant F0 as factorial 0
     F3->>F2: needs 3 * factorial(2)
     F2->>F1: needs 2 * factorial(1)
     F1->>F0: needs 1 * factorial(0)
@@ -64,7 +68,7 @@ sequenceDiagram
 
 ## Factorial
 
-`n!` means `n * (n - 1) * ... * 1`, and `0!` is `1`.
+`n!` means `n * (n - 1) * ... * 1`, and `0!` is `1`. Read the function below with the two questions from the top of the page. Base case: `factorial(0)` returns 1 directly — correct. Recursive case: *assuming* `factorial(n - 1)` is right, is `n * factorial(n - 1)` equal to `n!`? Yes, by the definition of factorial. Done — no tracing required.
 
 <CodeBlock
   adapter="cpp"
@@ -88,7 +92,9 @@ int main() {
 
 ## Naive Fibonacci
 
-The Fibonacci sequence is recursive by definition: `fib(n) = fib(n - 1) + fib(n - 2)`. The direct version is short, but exponential because it repeats subproblems.
+The Fibonacci numbers come with eight centuries of backstory: Leonardo of Pisa — nicknamed Fibonacci — posed the famous rabbit-breeding puzzle in his 1202 book *Liber Abaci*, the same book that introduced Hindu-Arabic numerals to European readers. The sequence is recursive by definition: `fib(n) = fib(n - 1) + fib(n - 2)`, with `fib(0) = 0` and `fib(1) = 1`.
+
+Translating the definition straight into code is honest and correct — and a performance disaster. The version below is exponential, and the reason matters more than the example:
 
 <CodeBlock
   adapter="cpp"
@@ -124,7 +130,7 @@ graph TD
     D --> I["<code>fib(0)</code>"]
 ```
 
-Repeated calls motivate **memoization**, a dynamic programming idea we will revisit later.
+Look at the call tree: `fib(2)` is computed twice just inside `fib(4)`, and the duplication explodes from there — `fib(40)` makes over 300 million calls to compute a number you could find with 39 additions. The function is not wrong; it is *forgetful*. It keeps re-deriving answers it already produced. Caching those answers — **memoization** — collapses the exponential tree to straight-line work, and that single observation is the seed of dynamic programming, which gets its own chapter later.
 
 ## Recursive array sum
 
@@ -176,7 +182,7 @@ int main() {
   ]}
 />
 
-Fast exponentiation squares a half-power and reduces the exponent by half, giving O(log n).
+But recursion can also make things *faster*, not just prettier. To compute `a^n`, notice that `a^n = (a^(n/2))² ` when `n` is even — one recursive call on half the exponent, then one multiplication. The exponent halves every level, so the recursion is only O(log n) deep: `powerFast(3, 13)` finishes in four recursive steps where the naive version needs thirteen. Halving the problem instead of shrinking it by one is the divide-and-conquer move, and the sorting chapter is built on it.
 
 <CodeBlock
   adapter="cpp"
@@ -203,9 +209,9 @@ int main() {
 
 ## Stack overflow and tail recursion
 
-A **stack overflow** happens when recursive calls create more frames than the stack can hold. Causes include missing base cases, huge inputs, or recursion that shrinks too slowly. Avoid it by verifying the base case, switching to iteration for deep inputs, converting tail recursion to a loop, or increasing stack size only when you control the runtime.
+Every frame costs memory, and the stack region is finite — typically a few megabytes. A **stack overflow** happens when recursive calls create more frames than the stack can hold: a missing or unreachable base case is the classic cause, but even a *correct* recursion can overflow on a deep enough input (a recursive list traversal over a million nodes, say). The defenses, in order of preference: verify the base case is always reachable, switch to iteration when depth can be large, or convert tail recursion to a loop.
 
-Tail recursion means the recursive call is the final action. Clang may optimize some tail calls, but C++ does not guarantee this optimization.
+Tail recursion means the recursive call is the very last action — nothing is pending after it returns. In `factorialTail` below, the running product travels *down* the recursion in the `acc` parameter instead of being multiplied on the way back up. Because no frame has unfinished work, a compiler *may* reuse the current frame for the next call, turning the recursion into a loop. Clang often does; but C++ (unlike Scheme) does not guarantee it, so never bet a deep recursion's correctness on the optimizer's mood.
 
 <CodeBlock
   adapter="cpp"

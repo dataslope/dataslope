@@ -3,7 +3,9 @@ title: Queues and Deques
 description: Learn FIFO queues, std::queue, std::deque, producer-consumer patterns, priority queue teasers, and queue-based interview patterns
 ---
 
-A queue is a **first in, first out** data structure. The oldest item waiting in line is served first. Queues model printers, web requests, breadth-first search frontiers, and producer-consumer pipelines.
+Flip the stack's rule and you get its mirror twin. A queue is **first in, first out**: the oldest item waiting in line is served first. Where a stack is the right shape for "most recent first" problems, a queue is the right shape for *fairness* and *order of arrival* — print jobs, web requests, message pipelines, and (most importantly for this course) the frontier of breadth-first search, where vertices must be explored in the order they were discovered.
+
+Queues were studied mathematically before computers existed to hold them: in 1909 the Danish engineer A. K. Erlang, working for the Copenhagen Telephone Company, founded queueing theory to answer how many circuits a telephone exchange needs before callers start hearing busy signals. The unit of telecom traffic load is still called the *erlang*. Software queues inherit the same questions — how fast must the consumer drain the line to keep the producer from backing up? — which is why the producer-consumer pattern below appears in every messaging system ever built.
 
 <svg
   viewBox="0 0 640 190"
@@ -121,7 +123,7 @@ int main() {
 
 ## `std::deque<T>`
 
-A deque is a double-ended queue. It supports O(1) push and pop at both the front and the back. It is the unsung hero of competitive C++ because it handles queue and stack-like workloads well.
+Why can't a `std::vector` back a queue? Because popping its *front* is O(n) — every remaining element shifts left. The deque ("double-ended queue," pronounced "deck") solves this by storing elements in a sequence of fixed-size blocks plus a small index of block pointers: growing or shrinking at either end just adds or drops a block, so push and pop are O(1) at *both* ends, while indexing stays O(1). It is the unsung hero of container choice — the default backing store for both `std::stack` and `std::queue`.
 
 <CodeBlock
   adapter="cpp"
@@ -209,7 +211,7 @@ int main() {
 
 ## Breadth-first flavor
 
-Queues also power breadth-first search: visit a node, enqueue its neighbors, then process nodes in discovery order.
+Here is a preview of the queue's biggest job, three chapters early. Breadth-first search explores a graph in waves: visit a node, enqueue its neighbors, and keep serving the queue in arrival order — so everything one hop away is processed before anything two hops away. The miniature below traverses a four-node graph (it is tree-shaped, so no visited-tracking is needed yet; real graphs with cycles will demand one, as the graph chapter explains).
 
 <CodeBlock
   adapter="cpp"
@@ -245,10 +247,12 @@ A linked list can push and pop at ends, but a deque usually has better locality 
 
 ## Practice: first non-repeating character in a stream
 
+This one combines a queue with a frequency table. The queue holds *candidates* in arrival order; after each new character, evict from the front any candidate whose count has risen above one. Whatever survives at the front is the oldest still-unique character. For the stream `aabc` the answers are `a` (a is unique), `#` (nothing unique), `b`, `b`.
+
 <ChallengeCard
   adapter="cpp"
   title="Implement first non-repeating character in a stream"
-  instructions={`Given a stream of lowercase characters, after each character print the first character so far with frequency one, or \`#\` if none exists. Use a queue plus a frequency table.`}
+  instructions={`Given a stream of lowercase characters, after each character print (on its own line) the first character so far with frequency one, or \`#\` if none exists. For the driver's stream \`aabc\` the expected output lines are \`a\`, \`#\`, \`b\`, \`b\`. Use a queue plus a frequency table.`}
   files={[
     {
       filename: "main.cpp",

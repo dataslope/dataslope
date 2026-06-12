@@ -235,3 +235,55 @@ A computed column is produced per row in the result and is not stored in the tab
 
 An alias names a result column for readability without changing stored data.`}
 />
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Compute each sale's line total"
+  instructions={`The \`sales\` table has \`product\`, \`price\`, and \`qty\` columns. Return each sale's \`product\` plus a computed column named \`line_total\` (the price multiplied by the quantity), sorted from the largest \`line_total\` to the smallest.`}
+  initSql={`CREATE TABLE sales (
+  id      SERIAL PRIMARY KEY,
+  product TEXT NOT NULL,
+  price   NUMERIC(8, 2) NOT NULL,
+  qty     INTEGER NOT NULL
+);
+INSERT INTO sales (product, price, qty) VALUES
+  ('Latte', 4.50, 3),
+  ('Mocha', 5.00, 2),
+  ('Tea',   3.00, 5),
+  ('Water', 1.00, 1);`}
+  starterCode={`SELECT
+  product
+  -- add a computed line_total column, then sort by it
+FROM
+  sales;`}
+  solutionSql={`SELECT
+  product,
+  price * qty AS line_total
+FROM
+  sales
+ORDER BY
+  line_total DESC;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns product and line_total",
+      description: "The computed column must be aliased line_total.",
+      expectedColumns: ["product", "line_total"],
+    },
+    {
+      id: "row_count",
+      name: "Returns all four sales",
+      description: "One row per sale.",
+      expectedRowCount: 4,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Tea (15.00) first, down to Water (1.00).",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
+/>

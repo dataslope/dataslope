@@ -1,13 +1,50 @@
 ---
 title: Why SQLite?
-description: Learn why SQLite is widely used, beginner-friendly, and different from server databases.
+description: The battleship story behind SQLite, how it became the most deployed database engine on Earth, and why it is the perfect place to learn SQL.
 ---
 
-SQLite is popular because it is small, reliable, zero-config, and built directly into applications.
+Every database course has to pick an engine, and this one picks
+SQLite. That choice deserves an explanation, because SQLite is a
+genuinely odd database — and the things that make it odd are the
+things that make it perfect for learning. The explanation starts,
+of all places, on a warship.
 
-It is one of the most widely used database engines in the world. You may use it many times a day without noticing.
+## A database born on a destroyer program
 
-SQLite is not a toy database. It is a real relational DBMS that understands SQL and stores durable data.
+In 2000, a software engineer named **D. Richard Hipp** was working
+on a contract for General Dynamics, writing software used aboard
+the U.S. Navy's guided-missile destroyers. His program needed a
+database, and the standard answer at the time was a client-server
+system: a separate database server process that his application
+connected to.
+
+The arrangement had a failure mode that drove him up the wall.
+Whenever the database server was down or misconfigured — which
+was not his code and not his fault — his application could not
+run, and *his* program was the one showing the error dialog. The
+people seeing the failure blamed the software in front of them.
+
+So Hipp asked a heretical question: what if the database were not
+a separate server at all? What if it were just a **library** —
+code living inside the application itself, reading and writing an
+ordinary file, with no server to be down? In mid-2000 he built
+exactly that and released it as SQLite. There was nothing to
+install, nothing to configure, nothing to administer, and nothing
+else to blame.
+
+```mermaid
+flowchart TB
+    subgraph CS["Client-server database"]
+        A1["Application"] -->|"network connection"| S1[("Database server<br/>separate process")]
+    end
+    subgraph EM["SQLite"]
+        A2["Application<br/>with SQLite inside"] --> F2[("One ordinary file")]
+    end
+```
+
+This design is called an **embedded** database. Both designs are
+useful — they solve different problems — but the embedded design
+turned out to solve a problem almost every program has.
 
 <svg
   viewBox="0 0 640 240"
@@ -72,119 +109,51 @@ SQLite is not a toy database. It is a real relational DBMS that understands SQL 
   </g>
 </svg>
 
-## SQLite is embedded
+## The most deployed database engine on Earth
 
-Many database systems run as a separate server process. An application connects to that server.
+What began as one engineer's fix for an annoying error dialog is
+now, by a wide margin, **the most widely deployed database engine
+in the world**. SQLite ships inside every iPhone and every Android
+phone. It is inside every major web browser — Chrome, Firefox,
+Safari — and built into Windows and macOS. It stores your text
+message history, your browser history, your photo metadata, your
+podcast subscriptions. The SQLite project estimates there are over
+a *trillion* SQLite databases in active use.
 
-SQLite works differently. SQLite is usually embedded inside the application process.
+You have probably used SQLite hundreds of times today without
+knowing it. There is a decent chance a copy of it is involved in
+displaying this very page.
 
-```mermaid
-flowchart LR
-    A["Application"] --> B["SQLite library"]
-    B --> C[("Database file")]
-```
-
-This means an app can use SQLite without installing, configuring, or running a separate database server.
-
-## Client-server database vs. embedded SQLite
-
-A client-server database often looks like this:
-
-```mermaid
-flowchart LR
-    A["Application"] -->|"network or local connection"| B[("Database server")]
-    B --> C[("Data files")]
-```
-
-SQLite often looks like this:
-
-```mermaid
-flowchart LR
-    A["Application"] --> B["SQLite in the app"]
-    B --> C[("Single database file")]
-```
-
-Both designs are useful. They solve different problems.
-
-## SQLite is zero-config
-
-Zero-config means you can start using it without setting up a database server, users, ports, background services, or server permissions.
-
-For beginners, that matters. You can focus on the core ideas:
-
-- tables
-- rows
-- columns
-- SQL
-- relationships
-- queries
-
-```mermaid
-flowchart TB
-    A["Start learning"] --> B["Create a table"]
-    B --> C["Insert rows"]
-    C --> D["Ask SQL questions"]
-```
-
-## SQLite stores data in one ordinary file
-
-A SQLite database is commonly one file on disk.
-
-That file can contain many tables, indexes, and rows.
-
-```mermaid
-flowchart TB
-    A[("<code>app.db</code>")]
-    A --> B["users table"]
-    A --> C["orders table"]
-    A --> D["settings table"]
-    A --> E["indexes"]
-```
-
-This single-file design makes SQLite easy to copy, back up, move, attach to tests, or include with an application.
+And the entire thing is **public domain** — not just open source,
+but given away with no license at all. Anyone may use it, for
+anything, forever. That generosity is a large part of why it
+spread everywhere.
 
 <MultipleChoice
-  markdown={`What does SQLite's single-file design mean?
+  markdown={`What does embedded mean for SQLite?
 
-- Every SQLite table must be stored in a separate cloud server
-  > SQLite does not require a separate server for each table.
-- [o] A SQLite database is commonly stored as one ordinary file on disk
-  > The file can contain tables, rows, and indexes.
-- SQLite can only store one row
-  > A SQLite database file can store many rows and tables.
-- SQLite requires a separate server for every table
-  > SQLite does not require a separate database server.`}
+- SQLite must always run on a separate database server process
+  > SQLite is commonly embedded directly into the application process.
+- [o] SQLite runs inside the application process instead of as a separate server
+  > The application uses the SQLite library directly, with no server to administer.
+- SQLite can only be used on paper
+  > SQLite is software.
+- SQL stops working
+  > SQLite understands SQL.`}
 />
 
-## SQLite runs almost everywhere
+## Trusted because it is tested like an aircraft
 
-SQLite appears in many places, including:
-
-- phones
-- browsers
-- desktop apps
-- command-line tools
-- games
-- embedded devices
-- test suites
-- aircraft and other specialized systems
-
-It is useful when an application needs dependable local storage without a separate database server.
-
-```mermaid
-flowchart TB
-    S["SQLite"] --> A["Phones"]
-    S --> B["Browsers"]
-    S --> C["Apps"]
-    S --> D["Devices"]
-    S --> E["Tools"]
-```
-
-## SQLite is public-domain and extremely well tested
-
-SQLite is public-domain software, which makes it unusually easy for projects to use.
-
-It is also famous for careful testing. Beginners do not need to understand the testing details yet. The beginner version is:
+A database that lives in two billion phones cannot afford to lose
+data, so the SQLite project developed one of the most famous
+testing cultures in all of software. The test suites contain
+*hundreds of times* more code than the library itself, and they
+exercise **100% of the branches** in the code — verified to the
+strict MC/DC standard used to certify avionics software. The
+tests deliberately simulate power failures, full disks, out-of-
+memory conditions, and corrupted files, because somewhere out
+there, every one of those things is happening to a SQLite
+database right now.
 
 <svg
   viewBox="0 0 640 180"
@@ -216,100 +185,126 @@ It is also famous for careful testing. Beginners do not need to understand the t
   </g>
 </svg>
 
-> SQLite is trusted because a huge amount of software relies on it to store important local data correctly.
+The point for you as a learner: SQLite is small and friendly, but
+it is **not a toy**. It is a real relational DBMS, holding real
+data in some of the most demanding environments in the world.
 
-## SQLite uses SQL
+## One database, one ordinary file
 
-SQLite understands SQL, the shared language of relational databases.
+A SQLite database — all its tables, indexes, and rows — lives in
+a single ordinary file on disk, often named something like
+`app.db`. You can copy it, email it, back it up by dragging it,
+and hand it to a colleague. That single-file design is why apps,
+games, phones, and test suites adopt SQLite so readily, and it
+keeps the mental model refreshingly small:
 
-That means the ideas you learn are not trapped in one product.
+```mermaid
+flowchart TB
+    A[("<code>app.db</code>")]
+    A --> B["users table"]
+    A --> C["orders table"]
+    A --> D["settings table"]
+    A --> E["indexes"]
+```
+
+<MultipleChoice
+  markdown={`What does SQLite's single-file design mean?
+
+- Every SQLite table must be stored in a separate cloud server
+  > SQLite does not require a separate server for each table.
+- [o] A SQLite database is commonly stored as one ordinary file on disk
+  > The file can contain many tables, rows, and indexes.
+- SQLite can only store one row
+  > A SQLite database file can store many rows and tables.
+- SQLite requires a separate server for every table
+  > SQLite does not require a separate database server.`}
+/>
+
+## Why this makes SQLite ideal for learning
+
+Put the pieces together and you get an unusually good classroom:
+
+- **Zero configuration.** No server to install, no users or ports
+  to set up. You spend your attention on tables, rows, and SQL —
+  the ideas — instead of on plumbing. (In this course it goes one
+  step further: SQLite compiled to WebAssembly runs right in your
+  browser.)
+- **Real SQL.** SQLite speaks the same core SQL as PostgreSQL,
+  MySQL, and SQL Server. The `SELECT`, `JOIN`, and `GROUP BY` you
+  learn here transfer almost unchanged to every major database.
+- **Real stakes.** You are learning the actual engine that runs in
+  your own pocket, not a teaching simulator.
 
 ```mermaid
 flowchart LR
-    A["SQL ideas"] --> S["SQLite"]
+    A["SQL ideas you learn here"] --> S["SQLite"]
     A --> P["PostgreSQL"]
     A --> M["MySQL"]
     A --> O["Other relational databases"]
 ```
 
-## When SQLite is a great fit
+## The honest tradeoff
 
-SQLite is often a great choice when:
-
-- your app needs local storage
-- you want a simple database for a personal project
-- you are building a prototype
-- you are writing tests
-- you are making a desktop or mobile app
-- you want to learn SQL without server setup
-- your app has many reads and modest write concurrency
-
-## When SQLite may not be the best fit
-
-SQLite is not the best answer for every situation.
-
-You may want a client-server database when:
-
-- many users write to the database at the same time
-- the database must live on a central server for many applications
-- you need advanced permission roles for many different users
-- your workload is a large, busy web application with heavy write concurrency
+No tool is right for everything, and SQLite's documentation is
+refreshingly blunt about its limits. Because the whole database is
+one file with no central server, SQLite shines when an
+application needs **local** storage — and struggles when *many
+users must write to the same database at the same moment* from
+different machines. A busy social network or a bank's central
+ledger calls for a client-server database, where a dedicated
+process coordinates thousands of simultaneous writers.
 
 ```mermaid
 flowchart TB
     A{"What does the app need?"}
-    A -->|"Local and simple"| B["SQLite"]
-    A -->|"Many simultaneous writers"| C["Client-server database"]
-    A -->|"Learning SQL"| D["SQLite is a friendly start"]
+    A -->|"Local, simple, reliable"| B["SQLite"]
+    A -->|"Many simultaneous writers<br/>on a central server"| C["Client-server database"]
+    A -->|"Learning SQL"| D["SQLite is the friendly start"]
 ```
 
-Being honest about tradeoffs is part of choosing tools well.
-
-## The main idea
-
-SQLite is a real, widely used relational DBMS that is embedded, zero-config, single-file, portable, public-domain, and carefully tested.
-
-It is a wonderful place to learn database foundations because you can focus on the ideas instead of server setup.
+Knowing a tool's limits is part of knowing the tool. For learning
+— and for an enormous share of real software — SQLite is exactly
+right.
 
 ## Check your understanding
 
 <MultipleChoice
-  markdown={`What is SQLite?
+  markdown={`What problem pushed D. Richard Hipp to create SQLite?
 
-- A tool for choosing spreadsheet fonts
-  > SQLite stores and queries data; it is not a font tool.
-- [o] A relational database management system
-  > SQLite is software that manages relational databases.
-- A spreadsheet color theme
-  > SQLite is not a color theme.
-- A phone brand
-  > SQLite is not hardware.`}
+- He needed a database that could store images
+  > Image storage was not the motivation.
+- [o] His software depended on a separate database server, and when that server was down his application took the blame
+  > Building the database into the application as a library removed the server as a point of failure.
+- SQL did not exist yet
+  > SQL had existed for decades; SQLite adopted it.
+- He wanted to sell an expensive commercial license
+  > SQLite was released into the public domain, free for any use.`}
 />
 
 <MultipleChoice
-  markdown={`What does embedded mean for SQLite?
+  markdown={`Which statement about SQLite's reach is accurate?
 
-- SQLite must always run on a separate database server process
-  > SQLite is commonly embedded directly into the application process.
-- [o] SQLite usually runs inside the application process instead of as a separate server
-  > The application uses the SQLite library directly.
-- SQLite can only be used on paper
-  > SQLite is software.
-- SQL stops working
-  > SQLite understands SQL.`}
+- It is rarely used outside classrooms
+  > SQLite is the most widely deployed database engine in the world.
+- [o] It ships inside every major smartphone and web browser, with an estimated trillion-plus databases in use
+  > Phones, browsers, and operating systems all bundle SQLite.
+- It only runs on naval ships
+  > It began on a Navy contract, but it now runs almost everywhere.
+- It was replaced by spreadsheets
+  > Spreadsheets and databases solve different problems, and SQLite remains everywhere.`}
 />
 
 <MultipleChoice
-  markdown={`Why is SQLite beginner-friendly?
+  markdown={`Why is SQLite's testing culture famous?
 
-- It requires beginners to configure server users and network ports first
-  > SQLite is often chosen because it avoids that setup.
-- [o] It usually requires no separate database server setup
-  > Zero-config lets beginners focus on database ideas and SQL.
-- It refuses to store rows
-  > SQLite stores rows in tables.
-- It only works if you already run a large server team
-  > SQLite is often chosen because it avoids server setup.`}
+- It has no tests, which makes it fast
+  > The opposite is true: its test suites are enormous.
+- [o] Its tests contain hundreds of times more code than the library and reach 100% branch coverage to an avionics-grade standard
+  > The project deliberately simulates crashes, power loss, and corruption to earn trust.
+- Its tests are written by users after bugs appear
+  > The project maintains its own exhaustive test harnesses.
+- Testing is only done once per decade
+  > Testing is continuous and central to the project.`}
 />
 
 <MultipleChoice
@@ -319,8 +314,14 @@ It is a wonderful place to learn database foundations because you can focus on t
   > SQLite is often excellent for local app storage.
 - Learning SQL basics without server setup
   > SQLite is a friendly learning database.
-- [o] A large system with many users writing at the same time
-  > Heavy multi-user write concurrency is often better served by a client-server database.
+- [o] A large system with many users writing at the same time from different machines
+  > Heavy multi-user write concurrency is the classic case for a client-server database.
 - A test database for a small project
   > SQLite is commonly useful in tests.`}
 />
+
+You now know what a database is, why the relational model won,
+and why this course's engine fits in your browser tab. Time to
+stop reading about tables and start taking them apart: the next
+section opens up rows, columns, keys, and types — the anatomy of
+everything you will query for the rest of the course.

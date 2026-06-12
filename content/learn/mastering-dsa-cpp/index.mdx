@@ -3,11 +3,55 @@ title: Welcome
 description: A hands-on, browser-based tour of data structures and algorithms using modern C++
 ---
 
-Welcome to **Mastering Data Structures & Algorithms in C++**, a course
-that takes you from the basics of `std::vector` all the way to graph
-algorithms, dynamic programming, and the algorithmic patterns that
-power systems software, game engines, competitive programming, and
-technical interviews.
+Think of a number between 1 and a million. If I'm allowed yes/no
+questions, I can guess it in twenty tries — not because I'm clever,
+but because every question of the form "is it bigger than 500,000?"
+throws away *half* of the remaining possibilities. Halving is
+ruthless: a million numbers collapse to one in just 20 steps, and a
+*trillion* takes only 40.
+
+That trick — and a few dozen like it — is what this course is about.
+Data structures and algorithms are the difference between a program
+that answers instantly and one that is still grinding when the heat
+death of the universe arrives.
+
+Here is the twenty-questions trick as a real C++ program. **This whole
+course runs in your browser** — every snippet compiles with `clang++`
+to WebAssembly and executes right on the page. Press *Run* and watch
+the halving happen:
+
+<CodeBlock
+  adapter="cpp"
+  files={[
+    {
+      filename: "main.cpp",
+      initCode: `#include <iostream>
+using namespace std;`,
+      starterCode: `int main() {
+  long long candidates = 1000000; // try 1000000000000 next!
+  int questions = 0;
+  while (candidates > 1) {
+    // each question halves the field (round up: the
+    // answer might be hiding in the bigger half)
+    candidates = (candidates + 1) / 2;
+    questions++;
+  }
+  cout << "I can find your number in " << questions << " questions\\n";
+  return 0;
+}
+`,
+    },
+  ]}
+/>
+
+Now edit the code: change `1000000` to `1000000000000` (a trillion)
+and run it again. The answer barely moves. That stubborn refusal to
+grow is called *logarithmic time*, and it is the engine inside binary
+search, balanced trees, and heaps — all of which you will build in
+this course. Everything here is editable like that: break the
+examples, fix them, and make them yours.
+
+## Why C++ for this?
 
 C++ is one of the best languages on the planet for *learning* data
 structures and algorithms. It is close enough to the hardware that you
@@ -73,20 +117,25 @@ the same structures from scratch* — the two skills are complementary.
   </g>
 </svg>
 
-## What you will learn
+## How to study this course
 
 Each page mixes prose with three kinds of interactive widgets:
 
-1. **Executable code blocks.** Every C++ snippet compiles to
-   WebAssembly with `clang++` in your browser and runs as a tiny WASI
-   binary. No installation, no toolchain setup. Edit any block and
-   click *Run*.
-2. **Challenge cards.** Hidden-test coding problems. Some are
-   single-file, some span multiple translation units so you can
-   practice header/implementation splitting.
+1. **Executable code blocks** like the one above. No installation, no
+   toolchain setup. Edit any block and click *Run* — the fastest way
+   to learn an algorithm is to poke it and watch what changes.
+2. **Challenge cards.** Small coding exercises with tests and a model
+   solution. Most ask you to write only the interesting few lines;
+   the plumbing is already there. Treat them as five-minute wins, not
+   exams.
 3. **Multiple choice questions.** Quick checks at the end of most
    pages. Each option has its own explanation, so a wrong answer
    still teaches you something.
+
+The course assumes you can read basic C++ (variables, loops,
+functions) but nothing more — the second page is a refresher on
+exactly the slice of the language we use. If you are coming from
+Python or JavaScript, you will be fine; the refresher exists for you.
 
 <Callout type="info" title="How to use the interactive widgets">
 Every code block runs in a fresh process, so a variable defined in one
@@ -99,19 +148,21 @@ the [C++ Playground](/playground/cpp) in a new tab.
 
 You cannot really separate them. A data structure is a way of arranging
 data so that the algorithms you care about become fast. Choose a hash
-table and `contains?` becomes O(1); choose a sorted array and you can
-binary-search in O(log n); choose a heap and you can always pull the
-minimum in O(log n). Every chapter of this course pairs a structure
-with the operations it makes cheap (and the ones it makes expensive).
+table and membership checks become O(1); choose a sorted array and you
+can binary-search in O(log n); choose a heap and you can always pull
+the minimum in O(log n). Every chapter of this course pairs a structure
+with the operations it makes cheap — and, just as importantly, the
+ones it makes expensive. There is no free lunch in this subject, only
+trades, and the craft is in knowing which trade your problem wants.
 
 ```mermaid
 flowchart TD
-    A[Problem] --> B{What ops<br/>are hot?}
+    A[Problem] --> B{"What ops<br/>are hot?"}
     B -->|lookup by key| C[Hash table]
     B -->|lookup by order| D[Balanced BST]
-    B -->|min/max| E[Heap]
-    B -->|prefix queries| F[Trie / Segment tree]
-    B -->|reachability| G[Graph + BFS/DFS]
+    B -->|"min/max"| E[Heap]
+    B -->|prefix queries| F["Trie / Segment tree"]
+    B -->|reachability| G["Graph + BFS/DFS"]
     C --> H[Fast algorithm]
     D --> H
     E --> H
@@ -161,3 +212,14 @@ A roadmap for what to study after this course: advanced graph
 algorithms, string algorithms, computational geometry, randomized and
 parallel algorithms, and where to practice (competitive programming
 judges, system design, low-latency engineering).
+
+Along the way you will also meet the people behind the algorithms —
+Tony Hoare inventing quicksort as a side effect of a Russian
+translation project, Edsger Dijkstra working out his shortest-path
+algorithm over coffee, a graduate student named David Huffman
+out-thinking his own professor. These are not decorations. Knowing
+*why* an algorithm was invented is the best mnemonic for how it works.
+
+Ready? The next page makes the case for C++ as your instrument; the
+two after it sharpen the language and the analysis tools. Then we
+start building.

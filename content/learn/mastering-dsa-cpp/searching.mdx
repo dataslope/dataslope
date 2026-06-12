@@ -3,7 +3,9 @@ title: Searching
 description: Learn linear search, binary search, STL search helpers, common pitfalls, and duplicate-aware variants in C++
 ---
 
-Searching means locating a target value in a collection. The right technique depends mainly on whether the data is sorted.
+Searching means locating a target value in a collection, and it splits the world cleanly in two. If the data is in no particular order, you have no choice: check items one by one. But if the data is *sorted*, you inherit the twenty-questions superpower from the welcome page — each comparison can discard half of everything that remains, and a million elements fall to a target in twenty steps.
+
+That second idea, binary search, carries a warning label earned over decades. Jon Bentley reported in *Programming Pearls* that when he asked professional programmers to write it, the majority produced buggy versions — and Donald Knuth notes that although the idea was first published in 1946, the first published version that worked correctly for arrays of *every* size did not appear until 1962. Sixteen years to get a dozen lines right. This page teaches you the algorithm *and* the traps.
 
 <svg
   viewBox="0 0 640 220"
@@ -73,7 +75,9 @@ Linear search is often right for tiny arrays, one-time scans, linked lists, or u
 
 ## Binary search
 
-Binary search only works on sorted data. It keeps a search interval, checks the middle, and discards half the remaining values each step. That gives O(log n) time.
+Binary search only works on sorted data. It maintains an interval `[low, high]` that is guaranteed to contain the target if it exists anywhere. Check the middle element: if it is too small, the target (if present) must be to the right, so move `low`; too big, move `high`; equal, done. Every comparison halves the interval, giving O(log n) time.
+
+The discipline that keeps you out of trouble is the *invariant*: at every moment, "if the target exists, it is inside `[low, high]`." Each update must preserve that sentence. The classic off-by-one bugs — `low = mid` instead of `mid + 1`, looping while `low < high` when both ends are inclusive — are all violations of the invariant, and checking your code against the sentence catches them.
 
 ```mermaid
 flowchart TD
@@ -83,7 +87,7 @@ flowchart TD
     D --> E["found index 5"]
 ```
 
-Use `low <= high` when both endpoints are inclusive. Compute `mid` as `low + (high - low) / 2` to avoid overflow.
+Use `low <= high` when both endpoints are inclusive. The `mid` calculation below is written as `low + (high - low) / 2` rather than the more obvious `(low + high) / 2` — that is deliberate, and the story behind it gets its own section further down.
 
 <CodeBlock
   adapter="cpp"
@@ -152,11 +156,17 @@ int main() {
 If the range is not sorted according to the same comparison used by the search, binary search results are meaningless.
 </Callout>
 
-Another classic bug is calculating `mid` as `(low + high) / 2`. For very large indices, `low + high` can overflow, so use `low + (high - low) / 2`.
+## The bug that hid for decades
+
+There is one more trap, and its story is worth telling in full. The obvious way to compute the middle index is `mid = (low + high) / 2`. In 2006, Joshua Bloch — author of Java's collections framework — wrote a now-famous post titled "Extra, Extra — Read All About It: Nearly All Binary Searches and Mergesorts are Broken." A colleague's program had crashed inside `java.util.Arrays.binarySearch`, code Bloch himself had written years earlier, adapted from a version in *Programming Pearls* that had been considered proven correct.
+
+The flaw: for very large arrays, `low + high` can exceed the maximum value an `int` can hold. The sum overflows, `mid` comes out negative or nonsensical, and the search reads outside the array. On arrays of fewer than about a billion elements the bug is invisible — which is exactly why it sat unnoticed in textbooks, in the JDK, and in countless production systems for decades, until data got big enough to trip it.
+
+The fix costs nothing: compute `mid = low + (high - low) / 2`. The subtraction cannot overflow because `high - low` is at most the array length. Write it this way from day one, even on toy inputs — the habit is free and the bug is not.
 
 ## Variants
 
-When duplicates exist, ordinary binary search may return any matching index. To find the first occurrence, keep searching left after a match.
+Real problems rarely ask plain "is it there?" — they ask *where does it start*, *where would it go*, *how many are there*. All are small mutations of the same loop. When duplicates exist, ordinary binary search may return any matching index; to find the *first* occurrence, record a match but keep searching left instead of stopping.
 
 <CodeBlock
   adapter="cpp"

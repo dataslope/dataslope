@@ -45,13 +45,21 @@ That conceptual foundation is the hard part, and you have it.
 
 The course moved deliberately from "why" to "how" to "how to think":
 
-1. **Why databases exist** — beyond spreadsheets.
+1. **What databases are and where SQL came from** — the five
+   nightmares, Codd's idea, and PostgreSQL's lineage.
 2. **Relational foundations** — tables, keys, types.
 3. **Querying data** — `SELECT`, `WHERE`, `ORDER BY`.
 4. **Summarizing data** — aggregates, `GROUP BY`, `HAVING`.
 5. **Connecting tables** — foreign keys, joins, many-to-many.
 6. **Data modeling** — entities, ER diagrams, normalization.
 7. **Composing queries** — subqueries, CTEs, execution order.
+
+And if you skipped the **Interesting discussions** pages —
+[Spreadsheets vs. Databases](/learn/intro-sql-postgres/spreadsheets-vs-databases)
+and [How Applications Use
+Databases](/learn/intro-sql-postgres/how-applications-use-databases)
+— now is a lovely time to read them. They land differently once you
+can write the queries yourself.
 
 Each layer rested on the one before it. Joins only made sense once
 keys did; normalization only made sense once you felt the pain of
@@ -74,7 +82,7 @@ If you remember only a handful of things, make it these:
 - **Model before you build.** Naming entities and relationships first
   saves you from tangled tables later.
 
-<Callout type="success" title="You can now read real queries">
+<Callout type="info" title="You can now read real queries">
 Pick almost any SQL query in the wild and you can now decode it:
 identify the tables in `FROM`, the row filter in `WHERE`, the groups,
 the joins, and the columns. That literacy is exactly what this course
@@ -86,14 +94,16 @@ set out to give you.
 Concepts solidify by *doing*. A few ways to keep going:
 
 - **Re-solve the examples from memory.** Close the page, then rebuild
-  a join or a `GROUP BY` query from scratch in any playground on this
-  site.
+  a join or a `GROUP BY` query from scratch in the
+  [PostgreSQL Playground](/playground/postgres).
 - **Model something you know.** Sketch tables and an ER diagram for a
   hobby, a sports league, or your music library. Ask: what are the
   entities and relationships?
-- **Ask questions of data.** Take any dataset and write five
-  questions, then answer each with a query — counts, averages,
-  filters, joins.
+- **Ask questions of data.** You met the Chinook music store in the
+  aggregate and join chapters — go back to those blocks, write five
+  questions of your own about its artists and tracks, and answer each
+  with a query. Counts, averages, filters, joins: it can take them
+  all.
 
 <SqlCodeBlock
   dialect="postgres"
