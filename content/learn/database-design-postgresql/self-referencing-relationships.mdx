@@ -161,6 +161,36 @@ flowchart TB
 A `parent_id` column gives each row one parent. Many rows can share the
 same parent, which creates a tree.
 
+## A self-reference in the wild
+
+This pattern is not a textbook curiosity. The Chinook sample database
+— a model of a digital music store — stores its staff in a single
+`employee` table with a `reports_to` column pointing back at
+`employee_id`. The whole org chart lives in one table. Run the query
+and read the result from the top down: the general manager has no
+manager, and everyone else's `reports_to` chain ends at her.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Chinook's org chart is one self-referencing table"
+  remoteInitSql="postgres/chinook_postgres_AutoIncrementPKs.sql"
+  tables={["employee"]}
+  starterCode={`SELECT
+  e.first_name || ' ' || e.last_name AS employee,
+  e.title,
+  m.first_name || ' ' || m.last_name AS manager
+FROM
+  employee e
+  LEFT JOIN employee m ON m.employee_id = e.reports_to
+ORDER BY
+  e.employee_id;`}
+/>
+
+Notice it is the same query shape you wrote above — two aliases, one
+table, a `LEFT JOIN` to keep the root row. Once you can read this
+pattern, you will spot it everywhere: ticketing systems, folder
+trees, category hierarchies, comment threads.
+
 ## Guardrails and design limits
 
 A basic self foreign key proves that the parent exists. It does not by
