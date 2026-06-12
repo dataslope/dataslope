@@ -25,7 +25,9 @@ export interface GalleryGraphic {
   id: string;
   /** Render-ready SVG markup (JSX-isms rewritten to valid HTML). */
   html: string;
-  /** URL of the lesson that contains this graphic, anchored to its label. */
+  /** URL of the lesson that contains this graphic (e.g. /learn/foo/bar). */
+  route: string;
+  /** Same lesson URL, anchored to this graphic's label. */
   href: string;
 }
 
@@ -76,7 +78,11 @@ export function getSvgGallery(): GalleryCourse[] {
       courses.set(slug, bucket);
     }
     for (const g of graphics) {
-      bucket.graphics.push({ ...g, href: `${page.url}#${g.id}` });
+      bucket.graphics.push({
+        ...g,
+        route: page.url,
+        href: `${page.url}#${g.id}`,
+      });
     }
   }
 

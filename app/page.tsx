@@ -74,6 +74,9 @@ export default async function Home() {
           <Link href="/color-test" className={styles.ctaSecondary}>
             Color Theme Test
           </Link>
+          <Link href="/svg-gallery" className={styles.ctaSecondary}>
+            SVG Gallery
+          </Link>
           <a
             href="https://github.com/dataslope/dataslope/"
             target="_blank"
