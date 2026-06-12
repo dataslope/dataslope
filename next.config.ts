@@ -22,6 +22,16 @@ const nextConfig: NextConfig = {
   // graphs into every page's chunk.
   experimental: {
     optimizePackageImports: ["lucide-react", "react-icons"],
+    // Keep prefetched/visited route payloads reusable in the client router
+    // cache so re-hovers and back/forward navigations don't re-hit the edge
+    // (every edge-cache miss is a billed ISR Read on Vercel). Lessons are
+    // fully static and only change on deploy, so long client-side staleness
+    // is safe. `dynamic` applies to links without an explicit `prefetch`
+    // prop, `static` to `prefetch={true}` links.
+    staleTimes: {
+      dynamic: 300,
+      static: 1800,
+    },
   },
   redirects: async () => [
     {

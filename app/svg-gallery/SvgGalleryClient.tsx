@@ -2,11 +2,14 @@
 
 /**
  * Interactive shell for the SVG graphics gallery. The graphic data is collected
- * at build time (see `lib/svgGallery.ts`) and handed in as a prop; everything
- * here — the light/dark theme toggle, course pagination, and per-graphic copy
- * buttons — is client-side.
+ * at build time (see `lib/svgGallery.ts` and `scripts/build-svg-gallery-data.mjs`)
+ * into the static asset `/svg-gallery/data.json`, which
+ * `SvgGalleryFromStaticData` fetches on mount — keeping the prerendered page a
+ * tiny shell with zero ISR-store involvement. Everything here — the light/dark
+ * theme toggle, course pagination, and per-graphic copy buttons — is
+ * client-side.
  */
-import { useCallback, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 import { Check, Copy, Moon, Sun } from "lucide-react";
 import type { GalleryCourse } from "@/lib/svgGallery";
 import styles from "./svg-gallery.module.css";
@@ -44,6 +47,48 @@ function useTheme(): [Theme, () => void] {
     themeListeners.forEach((l) => l());
   }, [theme]);
   return [theme, toggle];
+}
+
+/**
+ * Fetches the build-time gallery data from its static-asset home and renders
+ * the gallery once it arrives. The JSON is a few hundred kB, so there's a
+ * brief loading state — acceptable for a dev-only review page, and the
+ * trade that keeps the route off Vercel's ISR-read meter entirely.
+ */
+export function SvgGalleryFromStaticData() {
+  const [courses, setCourses] = useState<GalleryCourse[] | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/svg-gallery/data.json")
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data: GalleryCourse[]) => {
+        if (!cancelled) setCourses(data);
+      })
+      .catch(() => {
+        if (!cancelled) setFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (courses) return <SvgGalleryClient courses={courses} />;
+  return (
+    <div className={styles.page}>
+      <div className={styles.inner}>
+        <p className={styles.empty}>
+          {failed
+            ? "Couldn't load /svg-gallery/data.json — run `npm run build:svg-gallery` and reload."
+            : "Loading gallery data…"}
+        </p>
+      </div>
+    </div>
+  );
 }
 
 export function SvgGalleryClient({ courses }: { courses: GalleryCourse[] }) {

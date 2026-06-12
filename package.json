@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "fumadocs-mdx && node scripts/build-almostnode-workers.mjs && next dev",
-    "build": "fumadocs-mdx && node scripts/build-almostnode-workers.mjs && next build",
+    "dev": "fumadocs-mdx && node scripts/build-almostnode-workers.mjs && node scripts/build-svg-gallery-data.mjs && next dev",
+    "build": "fumadocs-mdx && node scripts/build-almostnode-workers.mjs && node scripts/build-svg-gallery-data.mjs && next build",
     "build:workers": "node scripts/build-almostnode-workers.mjs",
+    "build:svg-gallery": "node scripts/build-svg-gallery-data.mjs",
     "postinstall": "fumadocs-mdx && node scripts/patch-almostnode.mjs && node scripts/build-almostnode-workers.mjs",
     "start": "next start",
     "lint": "eslint .",

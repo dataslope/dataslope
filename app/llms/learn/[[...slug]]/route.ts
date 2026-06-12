@@ -22,6 +22,7 @@ import path from "node:path";
 import { source } from "@/lib/source";
 
 export const revalidate = false;
+export const dynamic = "force-static";
 
 export async function GET(
   _req: Request,
@@ -39,7 +40,13 @@ export async function GET(
   const content = await readFile(filePath, "utf8");
 
   return new Response(content, {
-    headers: { "Content-Type": "text/markdown; charset=utf-8" },
+    headers: {
+      "Content-Type": "text/markdown; charset=utf-8",
+      // The raw Markdown only changes on deploy (which purges the edge
+      // cache), so let the CDN hold it as long as it likes — every CDN hit
+      // is a free read instead of a metered ISR Read.
+      "Cache-Control": "public, s-maxage=31536000, stale-while-revalidate",
+    },
   });
 }
 

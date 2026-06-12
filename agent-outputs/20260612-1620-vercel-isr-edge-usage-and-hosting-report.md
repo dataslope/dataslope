@@ -18,7 +18,7 @@
    - **Cache static output harder at the edge** so the CDN absorbs reads instead of falling through to durable storage. *(low risk)*
    - **Structural fix:** this site is *static enough* that a host which serves prerendered pages as free CDN assets (Cloudflare, Netlify) — or a full `output: 'export'` — **removes the ISR-Read meter entirely.** That's the durable answer if usage keeps climbing.
 
-4. **Cloudflare is a viable and cheaper home** for this workload (flat pricing, unlimited bandwidth, no per-read ISR meter), but the migration is *not* zero-cost: Next.js on Cloudflare runs via the **OpenNext adapter**, which has real caveats (Worker size limits, no edge runtime, you wire up your own KV/R2/D1 for caching). Details and alternatives below.
+4. **Cloudflare is a viable and cheaper home** for this workload (flat pricing, unlimited bandwidth, no per-read ISR meter), but the migration is *not* zero-cost: Next.js on Cloudflare runs via the **OpenNext adapter**, which has real caveats (Worker size limits, no edge runtime, you wire up your own KV/R2/D1 for caching). Details and alternatives below. **Self-hosting on a VPS (e.g. a DigitalOcean droplet managed by Coolify) is the other no-meters path** — flat $6–24/mo, native Next.js with zero adapter caveats, deploy-on-push + PR previews via Coolify, at the cost of owning the server; see §6.1.
 
 5. **Once you add the planned backend** (user accounts, workspace DB, "Ask AI"), a *pure* static export can't host those features — but a **hybrid** keeps the 758 lessons free-static and runs only the new `/api/*` routes as server compute. On Cloudflare that means **Workers + OpenNext** (Pages is no longer the steered path for full-stack Next.js), with D1/R2 + Claude via the Anthropic SDK behind AI Gateway. Staying on Vercel supports all of this first-class too. See §5.
 
@@ -220,32 +220,54 @@ Adding server features **tips the recommendation toward Cloudflare Workers + Ope
 
 ---
 
-## 6. Other hosting alternatives (excluding self-hosting / VPS)
+## 6. Other hosting alternatives (including self-hosting / VPS)
 
 | Host | Best for | ISR-Read-style meter? | Bandwidth | Pricing shape | Fit for DataSlope |
 | --- | --- | --- | --- | --- | --- |
 | **Stay on Vercel + tune** | Keeping zero-config DX, easiest path to add auth/DB/AI | Yes (the thing biting you) | Metered (FOT on miss) | Free → $20/dev Pro | **Do this first.** Tuning likely keeps you free; first-class support for the planned backend features. |
 | **Cloudflare (OpenNext on Workers)** | Full Next features + auth/DB/AI, cheap, unlimited bandwidth | **No ISR-Read meter** | **Unlimited** | Flat $0/$20 (not per-user) | **Strong** once you add server features — D1/R2/Workers-AI/AI-Gateway under one flat bill. Adapter caveats. |
 | **Cloudflare Pages/Workers Static** | Static export of *today's* read-only site | None | **Unlimited** | Free at this scale | Removes the meter, but **can't host the planned auth/DB/AI** — you'd need a separate backend. Superseded by the Workers path above once features land. |
+| **VPS + Coolify (DigitalOcean / Hetzner)** | Full control, flat bill, zero per-request meters, 100% Next.js feature support (plain Node) | **None — no meters of any kind** | Included quota (DO: 500 GB–11 TB; overage $0.01/GiB), pair with a free CDN | Flat **$6–24/mo** droplet (+$0–5/mo Coolify) | **Strong if you accept ops ownership.** No adapter, no meters, easy Postgres for the future backend. Single-region origin → put Cloudflare's free CDN in front. See §6.1. |
 | **Netlify** | Content/docs sites, nice DX | Limited free tier; SSR via functions | Metered (100 GB free) | $0 → **$20/seat** Pro | Good DX, but **per-seat** billing and metered bandwidth — less cost-advantaged than Cloudflare for a public free site. |
 | **AWS Amplify Hosting** | Teams already in AWS | Pay-per-use (build/host/transfer) | Metered (AWS egress) | Usage-based | Powerful, but AWS egress + complexity; overkill unless you're already on AWS. |
 | **SST (OpenNext on your AWS)** | Max control, IaC | You configure (S3/CloudFront/Lambda) | AWS egress | AWS usage | Most control, most ops burden. Same OpenNext engine as Cloudflare path, different cloud. |
 | **Render** | Flat-rate PaaS, predictable bills | N/A (container) | Generous, predictable | Flat monthly | Simple and predictable, but you'd run Next as a Node server (less CDN-native for a static docs site). |
 
-| Host | Best for | ISR-Read-style meter? | Bandwidth | Pricing shape | Fit for DataSlope |
-| --- | --- | --- | --- | --- | --- |
-| **Stay on Vercel + tune** | Keeping zero-config DX | Yes (the thing biting you) | Metered (FOT on miss) | Free → $20/dev Pro | **Do this first.** Tuning likely keeps you free. |
-| **Cloudflare (OpenNext)** | Full Next features, cheap, unlimited bandwidth | **No ISR-Read meter** | **Unlimited** | Flat $0/$20 (not per-user) | **Strong** if you want server features + low cost. Adapter caveats. |
-| **Cloudflare Pages/Workers Static** | Static export of this site | None | **Unlimited** | Free at this scale | **Best long-term** if you convert search to static. |
-| **Netlify** | Content/docs sites, nice DX | Limited free tier; SSR via functions | Metered (100 GB free) | $0 → **$20/seat** Pro | Good DX, but **per-seat** billing and metered bandwidth — less cost-advantaged than Cloudflare for a public free site. |
-| **AWS Amplify Hosting** | Teams already in AWS | Pay-per-use (build/host/transfer) | Metered (AWS egress) | Usage-based | Powerful, but AWS egress + complexity; overkill unless you're already on AWS. |
-| **SST (OpenNext on your AWS)** | Max control, IaC | You configure (S3/CloudFront/Lambda) | AWS egress | AWS usage | Most control, most ops burden. Same OpenNext engine as Cloudflare path, different cloud. |
-| **Render** | Flat-rate PaaS, predictable bills | N/A (container) | Generous, predictable | Flat monthly | Simple and predictable, but you'd run Next as a Node server (less CDN-native for a static docs site). |
+### 6.1 — Self-hosting on a VPS with Coolify (e.g. a DigitalOcean droplet)
+
+You asked about running DataSlope on your own VPS — for example a DigitalOcean droplet managed through **Coolify**. This is a legitimate fourth path, and in some ways the most *complete* fix: there are **no per-request meters at all** (no ISR Reads, no Edge Requests, no Fast Origin Transfer, no function invocations, no build minutes). You pay one flat monthly price for a box and everything on it is yours.
+
+**What Coolify is.** An open-source (Apache 2.0), self-hostable PaaS that recreates the Vercel workflow on your own server: connect the GitHub repo via a GitHub App, get **deploy-on-push**, **per-PR preview deployment URLs**, automatic HTTPS (Let's Encrypt via Traefik/Caddy), logs/monitoring, rollbacks, and **280+ one-click services** (including Postgres — relevant for the planned workspace DB). It deploys Next.js either via Nixpacks auto-detection or a Dockerfile; for this repo you'd use Next's `output: "standalone"` mode so the runtime image stays small. The software is **free self-hosted** (you run the Coolify panel on the droplet itself or a $4–6 side box); **Coolify Cloud** — where they host just the control panel for you — is **~$5/mo for up to 2 servers** (+$3/server beyond that), and your apps still run on your own droplet.
+
+**How the economics compare for DataSlope:**
+
+| Cost line | Vercel today | DO droplet + Coolify |
+| --- | --- | --- |
+| ISR Reads / Edge Requests / FOT | Metered (the problem) | **Don't exist** |
+| Bandwidth | Metered (FDT) | DO includes 500 GB–11 TB by droplet size; **$0.01/GiB** overage — and ~free if Cloudflare CDN fronts it |
+| Builds / previews | Build-minute meter (§7) | **Your hardware** — unlimited builds; each PR preview is just another container on the box |
+| Backend (auth/DB/AI later) | First-class, metered | One-click Postgres next to the app; `/api/ask-ai` is just a Node route on the same box |
+| Monthly bill | $0 → unpredictable | **Flat $6–24/mo** (droplet size-dependent) + optional $5 Coolify Cloud |
+
+**Droplet sizing — the build is the constraint, not serving.** Serving 758 static pages from a Node `next start` is light (1 GB RAM is plenty). But *building* this repo (fumadocs-mdx over 758 lessons → esbuild workers → `next build` with the WASM-heavy dependency tree) wants **4 GB+ RAM**; on a $6/mo 1 GB droplet, on-box builds will OOM or crawl, and a build will starve the live site while it runs. Three sane configurations:
+1. **$12/mo (2 GB) droplet + swap**, builds tolerated as slow — minimum viable, previews will hurt.
+2. **$24/mo (4 GB) droplet** — comfortable for app + builds + a few PR preview containers. *(Recommended starting point.)*
+3. **Build elsewhere:** run `next build` in GitHub Actions (free for public repos) and have Coolify deploy the artifact/image, or attach a second cheap box as a dedicated Coolify **build server**. Keeps the serving droplet tiny.
+   - Hetzner equivalent for the same money is roughly 2× the hardware (CPX-class ~€8/mo ≈ $9.50 for 3 vCPU/4 GB; EU regions include 20 TB egress, US regions 1 TB) — same Coolify experience, better $/perf, slightly less polished ecosystem than DO.
+
+**The two things you give up vs. a managed edge platform:**
+1. **A global CDN by default.** A droplet is one origin in one region; Vercel/Cloudflare serve your static lessons from dozens of PoPs. Mitigation is standard and free: put **Cloudflare's free tier in front** (DNS + proxy + cache). Static assets and prerendered HTML then serve from Cloudflare's edge worldwide, origin egress drops to near nothing, and you keep zero meters. (The Phase 1 prefetch/caching fixes carry over here too — they reduce origin hits exactly the same way; see §8.)
+2. **Ops ownership.** You patch the OS, watch disk space, configure backups (DO droplet backups are +20% of droplet price, or snapshot to Spaces), and you are the on-call. Coolify automates the deploy workflow, not the sysadmin work. Budget a few hours up front and ~an hour a month steady-state. Coolify is also still a v4 *beta* line (very widely used — ~56k GitHub stars — but expect occasional rough edges; the announced v5 rewrite has no public timeline yet).
+
+**Migration shape for this repo:** `output: "standalone"` Dockerfile (or Nixpacks) → Coolify app from the GitHub repo → keep the existing `npm run build` chain (fumadocs-mdx + workers + svg-gallery data are all plain Node steps and run fine in a container build) → Cloudflare DNS/proxy in front → done. The jsDelivr WASM offload (§2.5) stays exactly as-is. ISR/`revalidate` semantics work natively (it's just Next on Node — the *only* host class with zero adapter caveats), though for this fully-static site there's nothing to revalidate anyway.
+
+**Verdict:** the strongest fit if you value a *fixed* bill and full control, and the planned backend makes it more attractive (Postgres on the same box, no per-invocation pricing for "Ask AI" calls — you pay only Anthropic). The honest counterweight: for a solo-maintained free site, Cloudflare Workers + OpenNext buys ~the same "no meters that matter" outcome with zero server administration. Pick VPS+Coolify if the ops ownership reads as a feature to you, not a chore.
 
 **Shortlist for your situation (free, public, static-heavy, content site):**
 1. **Tune Vercel** (today) — cheapest change, probably solves it.
-2. **Cloudflare** — if you want to stop watching meters: Path B (static) if you can convert search, else Path A (OpenNext).
-3. **Netlify** — viable, but the per-seat Pro pricing and metered bandwidth make it less attractive than Cloudflare for an ad-free public learning site.
+2. **Cloudflare** — if you want to stop watching meters with zero server ops: Path B (static) if you can convert search, else Path A (OpenNext).
+3. **VPS + Coolify (DO/Hetzner)** — if you want a flat bill, no meters anywhere, native Next.js, and you're happy owning a server (§6.1).
+4. **Netlify** — viable, but the per-seat Pro pricing and metered bandwidth make it less attractive than Cloudflare for an ad-free public learning site.
 
 ---
 
@@ -309,7 +331,7 @@ You already have the most important lever in place — lean into it:
 
 **Phase 2 — If usage still trends toward the cap, or once you start the backend (auth / workspace DB / Ask AI):**
 8. For a *read-only* site staying lean: decide static-export feasibility (convert Orama to Fumadocs **static search**) → any static host removes the meter permanently.
-9. **Once you add server features (the likelier path):** go **Cloudflare Workers + OpenNext** (not Pages — see §5.2). Lessons stay free static; auth/DB/AI run as Worker routes via D1/R2/AI-Gateway (§5.3). Validate Worker size and all 11 playgrounds + search in a preview before DNS cutover. Staying on Vercel is also fine — it supports all three features first-class; the tradeoff is the metered model.
+9. **Once you add server features (the likelier path):** go **Cloudflare Workers + OpenNext** (not Pages — see §5.2). Lessons stay free static; auth/DB/AI run as Worker routes via D1/R2/AI-Gateway (§5.3). Validate Worker size and all 11 playgrounds + search in a preview before DNS cutover. Staying on Vercel is also fine — it supports all three features first-class; the tradeoff is the metered model. If you'd rather own the box than watch any dashboard, the **VPS + Coolify** path (§6.1) hosts the same hybrid — static lessons + Node API routes + one-click Postgres — for a flat monthly price, with Cloudflare's free CDN in front for global edge caching.
 
 ---
 
@@ -338,5 +360,13 @@ You already have the most important lever in place — lean into it:
 - [Vercel — Managing builds](https://vercel.com/docs/builds/managing-builds)
 - [Vercel — Pricing docs](https://vercel.com/docs/pricing)
 - [Cloudflare Workers CI — builds limits & pricing](https://developers.cloudflare.com/workers/ci-cd/builds/limits-and-pricing/)
+- [Coolify — official site](https://coolify.io/) / [Coolify pricing (self-hosted free, Cloud $5/mo)](https://coolify.io/pricing)
+- [Coolify on GitHub (Apache 2.0, ~56k stars)](https://github.com/coollabsio/coolify)
+- [Coolify docs — deploying Next.js](https://coolify.io/docs/applications/nextjs)
+- [Coolify — GitHub PR preview deployments guide](https://lumadock.com/tutorials/coolify-github-pr-previews)
+- [Coolify pricing breakdown 2026 (self-hosted vs Cloud)](https://temps.sh/blog/coolify-pricing-explained-2026)
+- [DigitalOcean pricing in 2026 — plans and real costs](https://kuberns.com/blogs/digitalocean-pricing/)
+- [DigitalOcean vs Hetzner 2026 (pricing, bandwidth, regions)](https://betterstack.com/community/guides/web-servers/digitalocean-vs-hetzner/)
+- [Vercel vs Coolify in 2026](https://uibakery.io/blog/vercel-vs-coolify)
 
 *Prepared from the live repository state (Next.js 16.2.4, Fumadocs, 758 static lessons, WASM runtimes offloaded to jsDelivr) and the attached Vercel ISR observability screenshots showing Writes = 0 across all routes.*

@@ -53,6 +53,10 @@ script-runner-src/__pycache__/
 # `scripts/build-almostnode-workers.mjs` on postinstall + build + dev).
 /public/_workers/
 
+# Static data behind /svg-gallery (rebuilt by
+# `scripts/build-svg-gallery-data.mjs` on build + dev).
+/public/svg-gallery/
+
 # Output of scripts/check-mermaid-errors.mjs (regenerated on demand).
 /mermaid-check-results.json
 

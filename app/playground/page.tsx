@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "../_components/Link";
 import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_COLORS,

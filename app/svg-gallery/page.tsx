@@ -8,15 +8,15 @@
  * link to the lesson — so the whole set can be skimmed in one place to spot
  * graphics that need replacing or removing.
  *
- * Generated entirely at build time: `force-static` pre-renders the route, and
- * `getSvgGallery()` reads the MDX content from disk during that render. The
- * interactive shell (theme toggle, pagination, copy buttons) lives in the
- * client component below. The page is intended for development but is harmless
- * if publicly reachable.
+ * Cost note: this page is deliberately just a tiny prerendered shell. The
+ * heavy payload (every SVG in every course) is generated at build time by
+ * `scripts/build-svg-gallery-data.mjs` into `public/svg-gallery/data.json`
+ * and fetched client-side — a plain static asset served from the CDN that
+ * never touches Vercel's metered ISR store. Loading is slower than inlining
+ * the data, which is fine for a development-only review tool.
  */
 import type { Metadata } from "next";
-import { getSvgGallery } from "@/lib/svgGallery";
-import { SvgGalleryClient } from "./SvgGalleryClient";
+import { SvgGalleryFromStaticData } from "./SvgGalleryClient";
 
 export const dynamic = "force-static";
 
@@ -27,5 +27,5 @@ export const metadata: Metadata = {
 };
 
 export default function SvgGalleryPage() {
-  return <SvgGalleryClient courses={getSvgGallery()} />;
+  return <SvgGalleryFromStaticData />;
 }
