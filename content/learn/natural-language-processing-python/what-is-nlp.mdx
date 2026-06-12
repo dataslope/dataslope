@@ -18,7 +18,7 @@ which marks matter, or what any of it *means*. Natural Language Processing
 <svg
   viewBox="0 0 640 190"
   role="img"
-  aria-label="A long flat string bar with confident green cut marks where words clearly end, and two yellow question-mark badges hovering where the right cut is ambiguous"
+  aria-label="A long flat string bar with confident green cut marks where words clearly end, and two teal question-mark badges hovering where the right cut is ambiguous"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
   <g fill="currentColor" opacity="0.14">
@@ -32,12 +32,14 @@ which marks matter, or what any of it *means*. Natural Language Processing
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <rect x="228" y="104" width="5" height="50" rx="2.5" fillOpacity="0.55" />
     <rect x="408" y="104" width="5" height="50" rx="2.5" fillOpacity="0.55" />
+  </g>
+  <g style={{ color: "var(--ds-teal-500)" }} fill="currentColor">
     <circle cx="230.5" cy="62" r="14" />
     <circle cx="410.5" cy="62" r="14" />
   </g>
-  <g style={{ color: "var(--ds-gray-900)" }} fill="currentColor" fontFamily="Georgia, serif" fontSize="17" fontWeight="700" textAnchor="middle">
-    <text x="230.5" y="68">?</text>
-    <text x="410.5" y="68">?</text>
+  <g fill="currentColor" fontFamily="var(--font-sans), Georgia, serif" fontSize="17" fontWeight="700" textAnchor="middle">
+    <text x="230.5" y="68" style={{ fill: "var(--ds-white)" }}>?</text>
+    <text x="410.5" y="68" style={{ fill: "var(--ds-white)" }}>?</text>
   </g>
   <g fill="currentColor" opacity="0.3">
     <circle cx="230.5" cy="88" r="3" />
