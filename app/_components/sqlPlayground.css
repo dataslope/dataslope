@@ -127,6 +127,17 @@
   color: var(--text-dim);
 }
 
+/* Non-scrolling positioning context for the schema tree. The loading
+   overlay lives here (a sibling of the scrollable .sql-tree) so it stays
+   pinned to the viewport and is not dragged along when the tree scrolls. */
+.sql-tree-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .sql-tree {
   flex: 1;
   overflow-y: auto;
@@ -135,16 +146,18 @@
 }
 
 /* ─── Schema-loading overlay (shown while a schema switch is in flight) ───
-   Covers the entire sql-tree with a semi-transparent backdrop and a
-   DataslopeRunOverlay wave at the bottom so the loading state matches the
-   code-execution animation used in the results pane. */
+   Covers the visible schema-tree area with a semi-transparent backdrop and
+   a DiamondRippleLoader above the loading label. Positioned against the
+   non-scrolling .sql-tree-wrap so it stays fixed while the tree scrolls. */
 .sql-tree-loading-overlay {
   position: absolute;
   inset: 0;
   z-index: 10;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 12px;
   background: color-mix(in oklab, var(--bg) 72%, transparent);
   backdrop-filter: blur(2px);
   pointer-events: auto;
@@ -154,9 +167,6 @@
   font-family: var(--font-ui);
   font-size: 12px;
   color: var(--text);
-  /* Keep the label above the wave overlay that sits at the bottom */
-  position: relative;
-  z-index: 5;
 }
 
 .sql-tree-section {

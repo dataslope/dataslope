@@ -90,6 +90,7 @@ import {
   RuntimeInfoContent,
   detectIsMac,
 } from "../playgroundShared";
+import { DiamondRippleLoader } from "../mdx/loadingAnimations";
 import {
   SqlSettingsPanelContent,
 } from "../sql/components/SqlSettingsPanel";
@@ -4623,15 +4624,19 @@ function PostgresPlaygroundInner() {
                 </Popover.Portal>
               </Popover.Root>
             </div>
-            <div className="sql-tree">
+            <div className="sql-tree-wrap">
               {(schemaLoading || dbLoading) && (
                 <div className="sql-tree-loading-overlay">
+                  <DiamondRippleLoader
+                    size={56}
+                    label={dbLoading ? "Loading database…" : "Loading schema…"}
+                  />
                   <span className="sql-tree-loading-label">
                     {dbLoading ? "Loading database…" : "Loading schema…"}
                   </span>
-                  <DataslopeRunOverlay running />
                 </div>
               )}
+              <div className="sql-tree">
               <SchemaSection
                 label="TABLES"
                 count={tables.length}
@@ -4765,6 +4770,7 @@ function PostgresPlaygroundInner() {
                   />
                 ))}
               </SchemaSection>
+              </div>
             </div>
               </div>
             </div>
