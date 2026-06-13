@@ -91,6 +91,7 @@ import {
   RuntimeInfoContent,
   detectIsMac,
 } from "../playgroundShared";
+import { DiamondRippleLoader } from "../mdx/loadingAnimations";
 import { SqlSettingsPanelContent } from "../sql/components/SqlSettingsPanel";
 import { SqlSettingsConfirmDialogs } from "../sql/components/SqlSettingsConfirmDialogs";
 import { DdlViewerDialog } from "../sql/components/DdlViewerDialog";
@@ -5027,15 +5028,19 @@ function DuckDbPlaygroundInner() {
               </div>
             </div>
             )}
-            <div className="sql-tree">
+            <div className="sql-tree-wrap">
               {(schemaLoading || dbLoading) && (
                 <div className="sql-tree-loading-overlay">
+                  <DiamondRippleLoader
+                    size={56}
+                    label={dbLoading ? "Loading database…" : "Loading schema…"}
+                  />
                   <span className="sql-tree-loading-label">
                     {dbLoading ? "Loading database…" : "Loading schema…"}
                   </span>
-                  <DataslopeRunOverlay running />
                 </div>
               )}
+              <div className="sql-tree">
               {sidebarView === "files" && (
                 <FilesPanel
                   files={virtualFiles}
@@ -5176,6 +5181,7 @@ function DuckDbPlaygroundInner() {
               */}
                 </>
               )}
+              </div>
             </div>
               </div>
             </div>
