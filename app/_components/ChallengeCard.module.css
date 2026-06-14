@@ -2432,6 +2432,17 @@
   overflow: hidden;
 }
 
+/* Hosts the shared <RuntimeBootNotice> while a dialect's WASM engine
+   downloads / seeds. Centred in a skeleton-sized box so the panel keeps
+   a stable height across the boot → skeleton → tables transition. */
+.tableViewerBoot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 132px;
+  padding: 18px 16px;
+}
+
 .skeletonRow {
   display: flex;
   gap: 10px;
