@@ -39,7 +39,7 @@ import {
   indentUnit,
 } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
-import { loadLanguage, themeFor, noActiveLine } from "./cmExtensions";
+import { loadLanguage, themeFor, noActiveLine, redoKeymap } from "./cmExtensions";
 
 import type {
   LanguageAdapter,
@@ -561,6 +561,7 @@ function CodeBlockInner({
           ...closeBracketsKeymap,
           ...defaultKeymap,
           ...historyKeymap,
+          ...redoKeymap,
           indentWithTab,
         ]),
         languageComp.of([]),
@@ -1430,7 +1431,12 @@ function CodeBlockInner({
               className={challengeStyles.accentBar}
               data-error={outputs.some((c) => c.type === "stderr")}
             />
-            <span className={challengeStyles.outputLabel}>Output</span>
+            <span
+              className={challengeStyles.outputLabel}
+              data-error={outputs.some((c) => c.type === "stderr")}
+            >
+              Output
+            </span>
             <span className={styles.outputHeaderRight}>
               {outputElapsed && (
                 <span className={challengeStyles.outputTime}>

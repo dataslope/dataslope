@@ -3,7 +3,11 @@ title: Singly Linked Lists
 description: Understand node-based linked lists, traversal, insertion, deletion, search, memory management, and pointer reversal in C++
 ---
 
-A singly linked list stores values in separate nodes connected by `next` pointers. Unlike a vector, nodes are not contiguous in memory. That means no O(1) random access, but adding to the front is simple and O(1).
+The array's contiguity is its superpower and its curse. Insert one element at the front of a million-element vector and all million existing elements must shuffle right to make room. What if, instead of demanding that neighbors sit next to each other in memory, each element simply *knew where the next one lives*? Then "inserting" would mean rewriting one or two addresses — no shuffling at all.
+
+That is the linked list: values in separate nodes, stitched together by `next` pointers. It is one of the oldest ideas in programming — Allen Newell, Cliff Shaw, and Herbert Simon developed linked lists in the mid-1950s for their IPL language while building the Logic Theorist, one of the first artificial intelligence programs, precisely because they needed structures that could grow and reshape themselves mid-computation. John McCarthy's Lisp then made the linked list the very fabric of a language.
+
+The price of this flexibility is the loss of the array's address formula. Nodes are not contiguous, so there is no O(1) random access: to reach the ith node you must walk i links. Linked lists trade arithmetic for navigation.
 
 <svg
   viewBox="0 0 640 210"
@@ -20,7 +24,7 @@ A singly linked list stores values in separate nodes connected by `next` pointer
     <circle cx="210" cy="154" r="14" />
     <circle cx="450" cy="114" r="14" />
   </g>
-  <g style={{ fill: "var(--ds-blue-50)" }} fontFamily="ui-monospace, monospace" fontSize="13" fontWeight="700" textAnchor="middle">
+  <g style={{ fill: "var(--ds-blue-50)" }} fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="13" fontWeight="700" textAnchor="middle">
     <text x="110" y="89">1</text>
     <text x="300" y="61">2</text>
     <text x="210" y="159">3</text>
@@ -48,7 +52,9 @@ A singly linked list stores values in separate nodes connected by `next` pointer
 
 ## Nodes and links
 
-A minimal node stores data and a pointer to the next node.
+A minimal node stores data and a pointer to the next node. The last node's `next` is `nullptr` — the "address of nothing" that marks the end of the chain.
+
+A historical aside about that null: the null reference was introduced by Tony Hoare in 1965, in the type system of ALGOL W, "simply because it was so easy to implement." Speaking at a conference in 2009, Hoare publicly called it his "billion-dollar mistake," estimating that null-related crashes and vulnerabilities have cost roughly that much over the decades. You are about to spend a chapter deliberately handling `nullptr` at every turn — consider it supervised practice with the most dangerous value in programming.
 
 <CodeBlock
   adapter="cpp"
@@ -121,7 +127,7 @@ A vector jumps directly to `v[i]`. A linked list must walk one link at a time to
 
 ## Prepend with `push_front`
 
-Prepending creates a new node, points it at the old head, then updates the head pointer.
+Here is the operation that justifies the whole structure. Prepending creates a new node, points it at the old head, then updates the head pointer — two pointer writes, regardless of whether the list holds three nodes or three million. Note the parameter type `Node *&head`: a *reference to a pointer*, so the function can re-aim the caller's own head. The order of the two steps matters; point the new node at the old head *before* overwriting `head`, or the rest of the list is lost.
 
 <CodeBlock
   adapter="cpp"
@@ -163,7 +169,9 @@ int main() {
 
 ## Append, search, and delete
 
-Appending without a tail pointer requires walking to the end. Deleting a value requires tracking both the current node and the previous link.
+Appending without a tail pointer requires walking to the end — O(n) just to find the last node. Deletion is the genuinely tricky one: to unlink a node you must rewrite the pointer that *leads to it*, which means you need access to the previous link, not just the node itself.
+
+The `deleteValue` below uses a technique worth studying closely: instead of tracking a `previous` node, it walks a `Node **link` — a pointer to the pointer currently being followed. At any moment, `*link` is either `head` or some node's `next` field. When the victim is found, `*link = victim->next` rewires whichever pointer led to it, with no special case for deleting the first node. Draw it on paper once; the trick will feel like a magic key afterward.
 
 <CodeBlock
   adapter="cpp"
@@ -291,10 +299,12 @@ When you reverse or delete nodes, you are rewiring addresses. Draw the links bef
 
 ## Practice: reverse a linked list
 
+Reversing a singly linked list in place is *the* classic pointer exercise — simple to state, unforgiving of sloppy thinking. The standard solution walks the list once with three pointers: `previous` (the already-reversed part), `current` (the node being flipped), and `next` (a bookmark so the rest of the list isn't lost when `current->next` is overwritten). Trace it by hand on `1->2->3->4` before you code: after one step, `previous` is `1`, `current` is `2`, and `1->next` is null.
+
 <ChallengeCard
   adapter="cpp"
   title="Reverse a linked list"
-  instructions={`Implement \`Node* reverse(Node* head)\`. The driver builds \`1->2->3->4\` and prints the reversed values.`}
+  instructions={`Implement \`Node* reverse(Node* head)\`. Return the new head. The driver builds \`1->2->3->4\` and prints the reversed values, one per line.`}
   files={[
     {
       filename: "main.cpp",

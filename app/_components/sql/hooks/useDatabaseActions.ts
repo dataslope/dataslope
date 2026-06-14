@@ -18,6 +18,7 @@ import {
   parseCsv,
   tableNameFromFilename,
   readParquetFile,
+  isSqliteBinary,
 } from "../utils/importUtils";
 import {
   applyPragmasToEngine,
@@ -86,7 +87,6 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
   const setResultsByTab = useTabStore((s) => s.setResultsByTab);
 
   const setImportSqliteOpen = useDialogStore((s) => s.setImportSqliteOpen);
-  const setImportSqlDumpOpen = useDialogStore((s) => s.setImportSqlDumpOpen);
   const setImportCsvOpen = useDialogStore((s) => s.setImportCsvOpen);
   const setImportCsvState = useDialogStore((s) => s.setImportCsvState);
   const setImportJsonOpen = useDialogStore((s) => s.setImportJsonOpen);
@@ -226,7 +226,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
           });
           await engine.execAll(sqlText);
           await applyDbLoad(sample);
-          setImportSqlDumpOpen(false);
+          setImportSqliteOpen(false);
           showToast(`Imported "${filename}".`);
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
@@ -234,7 +234,22 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
         }
       })();
     },
-    [applyDbLoad, showToast, engineRef, setCustomFilenames, setImportSqlDumpOpen],
+    [applyDbLoad, showToast, engineRef, setCustomFilenames, setImportSqliteOpen],
+  );
+
+  /** Unified entry point for the single "import a database file" dialog.
+   *  Sniffs the file's magic header to decide between the binary SQLite
+   *  path and the SQL-dump path, so any extension (.sql, .db, .sqlite,
+   *  .sqlite3, .db3, …) imports correctly. */
+  const performImportDatabaseFile = useCallback(
+    (bytes: Uint8Array, filename: string) => {
+      if (isSqliteBinary(bytes)) {
+        performImportSqlite(bytes, filename);
+      } else {
+        performImportSqlDump(new TextDecoder().decode(bytes), filename);
+      }
+    },
+    [performImportSqlite, performImportSqlDump],
   );
 
   const exportDatabaseAsSqlDump = useCallback(() => {
@@ -721,8 +736,7 @@ export function useDatabaseActions(refs: DatabaseActionsRefs) {
   return {
     applyDbLoad,
     performDbSwitch,
-    performImportSqlite,
-    performImportSqlDump,
+    performImportDatabaseFile,
     requestDbSwitch,
     exportDatabase,
     exportDatabaseToXlsx,

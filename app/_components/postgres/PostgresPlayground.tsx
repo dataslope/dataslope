@@ -90,6 +90,7 @@ import {
   RuntimeInfoContent,
   detectIsMac,
 } from "../playgroundShared";
+import { DiamondRippleLoader } from "../mdx/loadingAnimations";
 import {
   SqlSettingsPanelContent,
 } from "../sql/components/SqlSettingsPanel";
@@ -1256,6 +1257,16 @@ function PostgresPlaygroundInner() {
       setSettingsOpen(true);
       activeTabIdRef.current = SETTINGS_TAB_ID;
       setActiveTabId(SETTINGS_TAB_ID);
+    }
+  }, [setSettingsOpen, setActiveTabId]);
+  /** Close the Settings tab (✕ in its tab strip entry or in the settings
+   *  tab bar) and return focus to the most-recent query tab. */
+  const closeSettingsTab = useCallback(() => {
+    setSettingsOpen(false);
+    const fallback = tabsRef.current[0]?.id;
+    if (fallback && activeTabIdRef.current === SETTINGS_TAB_ID) {
+      activeTabIdRef.current = fallback;
+      setActiveTabId(fallback);
     }
   }, [setSettingsOpen, setActiveTabId]);
   const result = activeTab ? (resultsByTab[activeTab.id] ?? null) : null;
@@ -3676,6 +3687,31 @@ function PostgresPlaygroundInner() {
                 </Popover.Positioner>
               </Popover.Portal>
             </Popover.Root>
+            <Popover.Root>
+              <Popover.Trigger
+                openOnHover
+                delay={150}
+                closeDelay={400}
+                render={(triggerProps) => (
+                  <button
+                    {...triggerProps}
+                    type="button"
+                    className="header-btn icon-only"
+                    aria-label="Settings"
+                    onClick={openSettingsTab}
+                  >
+                    <SettingsIcon size={14} aria-hidden="true" />
+                  </button>
+                )}
+              />
+              <Popover.Portal>
+                <Popover.Positioner sideOffset={6} align="end">
+                  <Popover.Popup className="bui-popup pane-btn-popover">
+                    Settings
+                  </Popover.Popup>
+                </Popover.Positioner>
+              </Popover.Portal>
+            </Popover.Root>
           </div>
         </>
       }
@@ -4403,18 +4439,6 @@ function PostgresPlaygroundInner() {
                     isActive: true,
                   },
                 ]}
-                bottomButtons={[
-                  {
-                    icon: (
-                      <svg className="stroke-icon" viewBox="0 0 24 24" width={15} height={15} fill="none" stroke="currentColor" strokeWidth="1.8">
-                        <circle cx="12" cy="12" r="3" />
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-                      </svg>
-                    ),
-                    label: "Settings",
-                    onClick: openSettingsTab,
-                  },
-                ]}
               />
               <div className="sql-sidebar-content">
             <div className="sql-schema-selector-wrap">
@@ -4600,15 +4624,19 @@ function PostgresPlaygroundInner() {
                 </Popover.Portal>
               </Popover.Root>
             </div>
-            <div className="sql-tree">
+            <div className="sql-tree-wrap">
               {(schemaLoading || dbLoading) && (
                 <div className="sql-tree-loading-overlay">
+                  <DiamondRippleLoader
+                    size={56}
+                    label={dbLoading ? "Loading database…" : "Loading schema…"}
+                  />
                   <span className="sql-tree-loading-label">
                     {dbLoading ? "Loading database…" : "Loading schema…"}
                   </span>
-                  <DataslopeRunOverlay running />
                 </div>
               )}
+              <div className="sql-tree">
               <SchemaSection
                 label="TABLES"
                 count={tables.length}
@@ -4742,6 +4770,7 @@ function PostgresPlaygroundInner() {
                   />
                 ))}
               </SchemaSection>
+              </div>
             </div>
               </div>
             </div>
@@ -4775,13 +4804,7 @@ function PostgresPlaygroundInner() {
                   : undefined
               }
               onExtraTabClose={(tabId) => {
-                if (tabId === SETTINGS_TAB_ID) {
-                  setSettingsOpen(false);
-                  const fallback = tabs[0]?.id;
-                  if (fallback && activeTabIdRef.current === SETTINGS_TAB_ID) {
-                    setActiveTabId(fallback);
-                  }
-                }
+                if (tabId === SETTINGS_TAB_ID) closeSettingsTab();
               }}
               onTabActivate={(tabId) => {
                 const prevId = activeTabIdRef.current;
@@ -5009,6 +5032,7 @@ function PostgresPlaygroundInner() {
                   onRestoreDefaults={() => setConfirmRestoreOpen(true)}
                   onClearLocalStorage={() => setConfirmClearStorageOpen(true)}
                   onClearAllLocalData={() => setConfirmClearAllDataOpen(true)}
+                  onClose={closeSettingsTab}
                   resetTabsLabel={`Reset query tabs for ${activeSample.label}`}
                   onResetTabs={resetTabsForCurrentDb}
                   extraTabs={[

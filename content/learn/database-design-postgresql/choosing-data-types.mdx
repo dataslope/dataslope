@@ -170,6 +170,20 @@ The exact result is what you want for prices, invoices, balances, and
 other financial values. Floating point may display surprising tiny
 rounding differences because it stores approximate binary fractions.
 
+If a fraction of a cent sounds too small to matter, consider what
+happened to the Vancouver Stock Exchange. When the exchange launched
+its index in 1982 it set the value at 1,000. The index was
+recalculated after every trade, and each recalculation *truncated*
+the result to three decimal places instead of rounding it — shaving
+off a microscopic sliver of value, thousands of times a day, always
+in the same direction. By late 1983 the index had drifted down to
+around 520 even though the market it tracked had not crashed at all.
+When analysts finally diagnosed the bug and recomputed the index
+correctly, it jumped overnight to roughly 1,098 — the error had
+quietly eaten about half the index. Tiny numeric errors do not stay
+tiny when an automated system repeats them; choosing exact arithmetic
+for values that accumulate is a design decision, not a nicety.
+
 ## Quick check
 
 <MultipleChoice

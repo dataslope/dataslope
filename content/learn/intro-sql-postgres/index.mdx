@@ -6,13 +6,58 @@ description: A friendly, visual, zero-prerequisite introduction to SQL, relation
 Welcome to **Introduction to SQL and Relational Databases with
 PostgreSQL**. If the words *database*, *query*, and *table* feel
 vague — or if you have only ever organized information in a
-spreadsheet — you are in exactly the right place.
+spreadsheet — you are in exactly the right place. This course
+assumes **no programming experience, no database experience, and no
+SQL experience.**
 
-This course assumes **no programming experience, no database
-experience, and no SQL experience.** We start from the most basic
-question of all — *what is a database, really?* — and build up,
-one small idea at a time, until you can read and write real SQL
-queries with confidence.
+Before we say another word about what you will learn, here is the
+most important fact about this course: **it runs in your browser.**
+Every page contains live SQL editors backed by a real PostgreSQL
+engine — no server, no signup, nothing to install. The block below
+is one of them. Click **Run** right now:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Your very first query — click Run"
+  initSql={`CREATE TABLE pets (
+  name    TEXT,
+  species TEXT,
+  age     INTEGER
+);
+INSERT INTO pets (name, species, age) VALUES
+  ('Mochi', 'cat', 3),
+  ('Pixel', 'dog', 5),
+  ('Sunny', 'cat', 2),
+  ('Rex',   'dog', 8);`}
+  starterCode={`SELECT
+  name,
+  species,
+  age
+FROM
+  pets
+WHERE
+  species = 'cat'
+ORDER BY
+  age DESC;`}
+/>
+
+You just ran real SQL against a real database. The query says, in
+almost plain English: *"Show me the name, species, and age from the
+pets table, but only the cats, sorted from oldest to youngest."*
+
+Now change one thing: in the editor above, replace `'cat'` with
+`'dog'` and click **Run** again. Different question, different
+answer — that is the entire rhythm of working with a database, and
+you have already done it. Everything else in this course is about
+doing it with precision and confidence.
+
+<Callout type="info" title="Nothing to install, nothing to break">
+The SQL blocks run on **PGlite** — actual PostgreSQL compiled to
+WebAssembly, living entirely inside your browser tab. Each block
+sets up its own tiny database, so you can edit anything, run
+anything, and never damage anything. Experimenting is the whole
+point.
+</Callout>
 
 <svg
   viewBox="0 0 640 220"
@@ -62,14 +107,6 @@ queries with confidence.
   </g>
 </svg>
 
-<Callout type="info" title="Nothing to install">
-Every SQL example on every page runs **inside your browser** on a
-real PostgreSQL engine (PGlite — PostgreSQL compiled to
-WebAssembly). There is no server, no signup, and nothing to
-install. Edit the query, click *Run*, and the results appear right
-below the editor.
-</Callout>
-
 ## Who this course is for
 
 You will feel at home here if any of these sound like you:
@@ -83,12 +120,9 @@ You will feel at home here if any of these sound like you:
 - You tried a SQL tutorial once and bounced off a wall of syntax
   with no explanation of *why* any of it exists.
 
-You do **not** need:
-
-- Any prior coding experience.
-- Any prior database or SQL experience.
-- Any math beyond everyday arithmetic.
-- Anything installed on your computer.
+You do **not** need any prior coding experience, any database or
+SQL experience, any math beyond everyday arithmetic, or anything
+installed on your computer.
 
 ## What you will be able to do
 
@@ -107,34 +141,34 @@ By the end of the course you will be able to:
 - Think analytically about data — the skill that outlasts any
   particular tool.
 
-## What this course is *not*
-
 This is a **foundations** course about SQL and relational thinking.
-It deliberately spends **little or no time** on database
-administration topics such as production deployment, high
-availability, replication, query-planner tuning, security
-hardening, cloud infrastructure, ORMs, or backend frameworks. Those
-are important — but they are not the foundation, and they make far
-more sense *after* you understand the ideas taught here.
+It deliberately spends little time on database administration —
+deployment, replication, tuning, security hardening. Those matter,
+but they make far more sense *after* the ideas taught here.
 
 ## How the course is organized
 
-We start with **ideas, not syntax**. The first section answers the
-questions most tutorials skip: what a database is, why it exists,
-how data is stored, and why SQL and PostgreSQL became so popular.
-Only once those ideas are solid do we start writing queries — and
-from then on, every new piece of SQL is introduced to answer a
-question you already understand.
+We believe in **motivation before mechanism**: every piece of SQL
+in this course is introduced to answer a question you already care
+about. The first two pages after this one build the conceptual
+ground — what a database actually is, and where SQL and PostgreSQL
+came from (the history is shorter and stranger than you might
+expect). From the third section onward, you are writing queries on
+every page. Near the end, an **Interesting discussions** section
+collects a couple of optional deep-dives — spreadsheets versus
+databases, and how real applications talk to databases — that are
+worth reading whenever curiosity strikes.
 
 ## The three kinds of interactive widgets
 
 You will meet three kinds of interactive elements:
 
-1. **Runnable SQL blocks.** A live PostgreSQL editor. Some blocks
-   pre-load sample tables for you; edit the query, click *Run*, and
-   inspect the result table.
-2. **Challenge cards.** Small problems with hidden tests — write a
-   query, run the tests, and see which ones pass.
+1. **Runnable SQL blocks** — like the one above. Some pre-load
+   sample tables for you; edit the query, click *Run*, and inspect
+   the result.
+2. **Challenge cards.** Small problems with tests — write a query,
+   run the tests, and see which ones pass. They are designed to be
+   two-to-five-minute confidence builders, not exams.
 3. **Multiple-choice questions.** Quick conceptual checks, with an
    explanation for every choice, so you can confirm an idea has
    landed before moving on.
@@ -147,39 +181,5 @@ experiment in, open the
 [PostgreSQL Playground](/playground/postgres) in a new tab.
 </Callout>
 
-## A first taste
-
-You do not need to understand this yet. Just click *Run* and notice
-that, in a few lines, we created a table, put some rows in it, and
-asked a question of the data.
-
-<SqlCodeBlock
-  dialect="postgres"
-  title="Your very first query"
-  initSql={`CREATE TABLE pets (
-  name    TEXT,
-  species TEXT,
-  age     INTEGER
-);
-INSERT INTO pets (name, species, age) VALUES
-  ('Mochi', 'cat', 3),
-  ('Pixel', 'dog', 5),
-  ('Sunny', 'cat', 2),
-  ('Rex',   'dog', 8);`}
-  starterCode={`SELECT
-  name,
-  species,
-  age
-FROM
-  pets
-WHERE
-  species = 'cat'
-ORDER BY
-  age DESC;`}
-/>
-
-That query says, in almost plain English: *"Show me the name,
-species, and age from the pets table, but only the cats, sorted
-from oldest to youngest."* By the time you finish the **Querying
-Data** section, reading and writing queries like this will feel
-natural.
+Ready? Let us answer the question almost every tutorial skips:
+what *is* a database, really?

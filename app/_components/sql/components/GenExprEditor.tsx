@@ -5,7 +5,7 @@ import { Compartment } from "@codemirror/state";
 import { EditorView, keymap, placeholder as cmPlaceholder } from "@codemirror/view";
 import { history, historyKeymap, defaultKeymap } from "@codemirror/commands";
 import { sql as sqlLang, SQLite, PostgreSQL } from "@codemirror/lang-sql";
-import { themeFor } from "../../cmExtensions";
+import { themeFor, redoKeymap } from "../../cmExtensions";
 
 /**
  * A compact, auto-expanding CodeMirror editor for SQL expressions, used in
@@ -51,7 +51,7 @@ export function GenExprEditor({
           upperCaseKeywords: false,
         }),
         themeComp.of(themeFor(theme)),
-        keymap.of([...defaultKeymap, ...historyKeymap]),
+        keymap.of([...defaultKeymap, ...historyKeymap, ...redoKeymap]),
         history(),
         EditorView.lineWrapping,
         EditorView.updateListener.of((update) => {

@@ -3,7 +3,11 @@ title: Tries
 description: Learn prefix trees, trie operations, memory trade-offs, and prefix-query challenges in C++
 ---
 
-A trie, or prefix tree, stores strings by sharing common prefixes. Each node represents a prefix. Edges represent characters, and a boolean flag marks whether the prefix is a complete word.
+Type "ca" into a search box and suggestions appear instantly: *cat, car, cart, castle…* How? A hash set of words is useless here — hashing scatters `cat` and `car` to unrelated buckets, so "every word starting with ca" would mean scanning the entire set. The query is about *prefixes*, and we need a structure whose very shape is organized around them.
+
+The trie (or prefix tree) is that structure: it stores strings by *sharing* their common prefixes. Each edge is a character; each node is the prefix spelled by the path from the root; a boolean flag marks which prefixes are complete words. All words beginning with `ca` live, by construction, in one subtree — autocomplete is "walk two edges, then collect the subtree."
+
+The name has a story: Edward Fredkin coined *trie* in 1960, from the middle of the word "re**trie**val" — and pronounced it "tree," which everyone found maximally confusing since it *is* a tree. Most programmers now say "try," and the structure quietly runs your phone's keyboard predictions, router tables, and IDE symbol completion.
 
 <svg
   viewBox="0 0 640 220"
@@ -39,7 +43,7 @@ A trie, or prefix tree, stores strings by sharing common prefixes. Each node rep
     <circle cx="250" cy="108" r="12" />
     <circle cx="400" cy="108" r="12" />
   </g>
-  <g style={{ fill: "var(--ds-blue-50)" }} fontFamily="ui-monospace, monospace" fontSize="12" fontWeight="700" textAnchor="middle">
+  <g style={{ fill: "var(--ds-blue-50)" }} fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="12" fontWeight="700" textAnchor="middle">
     <text x="250" y="72">c</text>
     <text x="400" y="72">d</text>
     <text x="250" y="112">a</text>
@@ -51,7 +55,7 @@ A trie, or prefix tree, stores strings by sharing common prefixes. Each node rep
     <circle cx="310" cy="188" r="12" />
     <circle cx="400" cy="148" r="12" />
   </g>
-  <g style={{ fill: "var(--ds-gray-900)" }} fontFamily="ui-monospace, monospace" fontSize="12" fontWeight="700" textAnchor="middle">
+  <g style={{ fill: "var(--ds-white)" }} fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="12" fontWeight="700" textAnchor="middle">
     <text x="190" y="152">t</text>
     <text x="310" y="152">r</text>
     <text x="310" y="192">t</text>
@@ -81,10 +85,8 @@ flowchart LR
     Cat --> Car["car word"] --> Cart["cart word"]
 ```
 
-Compared with `std::unordered_set<std::string>`, a trie often uses more memory because every node stores child links. In exchange, prefix queries are fast and natural.
-
 <Callout type="info" title="Length-based complexity">
-Trie insert, exact search, and prefix search are O(L), where L is the length of the key, independent of how many other words are stored.
+Trie insert, exact search, and prefix search are O(L), where L is the length of the key, independent of how many other words are stored. A dictionary of ten words and a dictionary of ten million answer "is `cart` a word?" in the same four steps.
 </Callout>
 
 ## Node representation
@@ -321,30 +323,9 @@ int main() {
   ]}
 />
 
-## Use cases
+## Where tries earn their memory
 
-Tries are useful for autocomplete, spellcheck, IP routing, longest-prefix matching, and dictionary-word search on a board.
-
-<CodeBlock
-  adapter="cpp"
-  files={[
-    {
-      filename: "main.cpp",
-      starterCode: `#include <iostream>
-#include <string>
-#include <vector>
-
-int main() {
-  std::vector<std::string> useCases = {"autocomplete", "spellcheck", "routing",
-                                       "board search"};
-  for (const std::string &item : useCases)
-    std::cout << item << "\\n";
-  return 0;
-}
-`,
-    },
-  ]}
-/>
+The trie's costs are worth restating before you decide to use one: every node carries a child table, so a trie usually spends more memory per string than a hash set — that is the price of prefix structure. It pays off when prefixes *are* the workload. Autocomplete and spellcheck are the obvious cases. Internet routers run on the same idea: forwarding a packet means finding the routing-table entry with the **longest prefix match** against the destination address, which is a root-to-leaf walk in a binary trie of address bits. And word-game solvers (find all dictionary words on this letter board) use a trie to prune their search the instant a path stops being any word's prefix — turning an exponential board walk into a brisk one.
 
 ## Practice: Implement a Trie
 

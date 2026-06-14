@@ -272,6 +272,85 @@ ORDER BY
 
 The `orders` table sits in the middle: it points to both the customer and the product.
 
+## An inner join on a real database
+
+Every example so far used tiny hand-made tables, so you could see
+every row. Time for the payoff: this block loads **Chinook**, a
+complete sample database modeled on a digital music store, with
+real tables for artists, albums, and tracks. The join below climbs
+two foreign keys — track to album, album to artist — exactly the
+pattern you just learned, only now across thousands of rows.
+
+<SqlCodeBlock
+  dialect="sqlite"
+  title="Tracks with their artists, from the Chinook music store"
+  remoteInitSql="sqlite/chinook_sqlite.sql"
+  tables={["Artist", "Album", "Track"]}
+  starterCode={`SELECT
+  ar.Name AS Artist,
+  a.Title AS Album,
+  t.Name AS Track
+FROM
+  Track t
+  JOIN Album a ON a.AlbumId = t.AlbumId
+  JOIN Artist ar ON ar.ArtistId = a.ArtistId
+ORDER BY
+  ar.Name,
+  a.Title,
+  t.TrackId
+LIMIT
+  10;`}
+/>
+
+Notice that nothing about the query got harder — only the data got
+bigger. Try changing `LIMIT 10` to `LIMIT 30`, or adding
+`WHERE ar.Name = 'Queen'` before `ORDER BY` to focus on one
+artist. Joins scale; your mental model does not have to change.
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="sqlite"
+  title="Albums by AC/DC"
+  instructions={`Using the Chinook database, return the \`Title\` column of every album by the artist whose \`Name\` is \`'AC/DC'\`, sorted by \`Title\` ascending. Join \`Album\` to \`Artist\` on \`ArtistId\`. Chinook stores exactly 2 such albums.`}
+  remoteInitSql="sqlite/chinook_sqlite.sql"
+  tables={["Artist", "Album"]}
+  starterCode={`SELECT
+  Title
+FROM
+  Album;`}
+  solutionSql={`SELECT
+  a.Title
+FROM
+  Album a
+  JOIN Artist ar ON ar.ArtistId = a.ArtistId
+WHERE
+  ar.Name = 'AC/DC'
+ORDER BY
+  a.Title ASC;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Has a single Title column",
+      description: "Only the album title is returned",
+      expectedColumns: ["Title"],
+    },
+    {
+      id: "row_count",
+      name: "Returns 2 rows",
+      description: "AC/DC has two albums in Chinook",
+      expectedRowCount: 2,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Same albums, alphabetical order",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
+/>
+
 ## When inner joins are the right tool
 
 Use an inner join when your question means **with a matching partner**:

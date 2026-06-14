@@ -208,6 +208,15 @@ to combine before they ever touch LINQ.
 
 <ChallengeCard
   adapter="csharp"
+  title="Build a log-pipeline vocabulary"
+  instructions={`Implement the four extension methods in \`LogExtensions.cs\` so the composed pipeline in \`Program.cs\` runs:
+
+- \`Recent(window)\` — keep events whose \`At\` falls within the past \`window\` from now.
+- \`OfLevel(level)\` — keep only events whose \`Level\` matches.
+- \`Messages()\` — project each event to its \`Message\` string.
+- \`Join(sep)\` — join the strings with the given separator.
+
+Each method should be a tiny one-liner of LINQ — the goal is a readable vocabulary that names the intent.`}
   entryFilename="Program.cs"
   files={[
     {
@@ -256,18 +265,18 @@ using System.Linq;
 
 public static class LogExtensions
 {
-    // TODO: return events whose At is within the past 'window' from now.
+    // TODO: implement
     public static IEnumerable<LogEvent> Recent(this IEnumerable<LogEvent> src,
                                                TimeSpan window) => throw new NotImplementedException();
 
-    // TODO: return only events whose Level matches.
+    // TODO: implement
     public static IEnumerable<LogEvent> OfLevel(this IEnumerable<LogEvent> src,
                                                 string level) => throw new NotImplementedException();
 
-    // TODO: project to the Message strings.
+    // TODO: implement
     public static IEnumerable<string> Messages(this IEnumerable<LogEvent> src) => throw new NotImplementedException();
 
-    // TODO: join strings with the given separator.
+    // TODO: implement
     public static string Join(this IEnumerable<string> src, string sep) => throw new NotImplementedException();
 }
 `,

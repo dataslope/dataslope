@@ -5,10 +5,7 @@
     "pages": [
         "index",
         "---",
-        "why-structured-data",
-        "cost-of-poor-design",
         "what-is-database-design",
-        "how-design-shapes-software",
         "---",
         "thinking-in-entities",
         "attributes-and-domains",
@@ -50,6 +47,9 @@
         "---",
         "design-and-data-quality",
         "design-and-scale",
+        "---",
+        "the-relational-revolution",
+        "from-ingres-to-postgresql",
         "---",
         "next-steps"
     ]

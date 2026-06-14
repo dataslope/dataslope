@@ -18,6 +18,7 @@ import {
   Sliders,
   Trash2,
   WrapText,
+  X,
 } from "lucide-react";
 import {
   ALL_THEMES,
@@ -342,6 +343,9 @@ export interface SettingsPanelProps {
     trigger: ReactNode;
     panel: ReactNode;
   }>;
+  /** Close the Settings tab. When provided, a ✕ button is rendered at
+   *  the far right of the settings tab bar (after the last tab). */
+  onClose?: () => void;
 }
 
 /** Tabbed settings UI body (General + Editor Themes + extra tabs)
@@ -372,6 +376,7 @@ export function SettingsPanelContent({
   extraGeneralRows,
   extraActionRows,
   extraTabs,
+  onClose,
 }: SettingsPanelProps) {
   const [tab, setTab] = useState<string>(() => {
     try {
@@ -414,6 +419,17 @@ export function SettingsPanelContent({
             {t.trigger}
           </Tabs.Tab>
         ))}
+        {onClose && (
+          <button
+            type="button"
+            className="settings-tabs-close"
+            aria-label="Close settings"
+            title="Close settings"
+            onClick={onClose}
+          >
+            <X size={15} aria-hidden="true" />
+          </button>
+        )}
       </Tabs.List>
 
       <Tabs.Panel value="general" className="settings-panel-pane">
@@ -513,33 +529,49 @@ export function SettingsPanelContent({
           {extraGeneralRows}
 
           <div className="settings-actions">
-            {extraActionRows}
-            <button
-              type="button"
-              className="settings-action-btn"
-              onClick={onRestoreDefaults}
-            >
-              <RotateCcw size={14} aria-hidden="true" />
-              <span>Restore default settings</span>
-            </button>
-            <button
-              type="button"
-              className="settings-action-btn settings-action-danger"
-              onClick={onClearLocalStorage}
-            >
-              <Trash2 size={14} aria-hidden="true" />
-              <span>Clear all localStorage data</span>
-            </button>
-            {onClearAllLocalData && (
+            <div className="settings-actions-group">
+              {extraActionRows}
+              <button
+                type="button"
+                className="settings-action-btn"
+                onClick={onRestoreDefaults}
+              >
+                <span className="settings-action-icon" aria-hidden="true">
+                  <RotateCcw size={14} />
+                </span>
+                <span className="settings-action-label">
+                  Restore default settings
+                </span>
+              </button>
+            </div>
+            <div className="settings-actions-group settings-actions-group-danger">
               <button
                 type="button"
                 className="settings-action-btn settings-action-danger"
-                onClick={onClearAllLocalData}
+                onClick={onClearLocalStorage}
               >
-                <Trash2 size={14} aria-hidden="true" />
-                <span>Clear all local data (storage + OPFS)</span>
+                <span className="settings-action-icon" aria-hidden="true">
+                  <Trash2 size={14} />
+                </span>
+                <span className="settings-action-label">
+                  Clear all localStorage data
+                </span>
               </button>
-            )}
+              {onClearAllLocalData && (
+                <button
+                  type="button"
+                  className="settings-action-btn settings-action-danger"
+                  onClick={onClearAllLocalData}
+                >
+                  <span className="settings-action-icon" aria-hidden="true">
+                    <Trash2 size={14} />
+                  </span>
+                  <span className="settings-action-label">
+                    Clear all local data (storage + OPFS)
+                  </span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </Tabs.Panel>

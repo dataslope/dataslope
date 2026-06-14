@@ -250,6 +250,119 @@ When you meet a new ER diagram, use this order:
 This keeps you from staring at symbols randomly. You are translating a
 picture into plain English and then into schema rules.
 
+## Read a real schema: the Chinook music store
+
+Toy diagrams are good for learning symbols, but the skill pays off on
+schemas you did not design. The block below loads **Chinook**, a
+sample database modeled on a digital music store, with eleven tables.
+Here is the corner of it that describes the catalog:
+
+```mermaid
+erDiagram
+    artist ||--o{ album : records
+    album ||--o{ track : contains
+    genre ||--o{ track : classifies
+    artist {
+        int artist_id PK
+        text name
+    }
+    album {
+        int album_id PK
+        int artist_id FK
+        text title
+    }
+    track {
+        int track_id PK
+        int album_id FK
+        int genre_id FK
+        text name
+        numeric unit_price
+    }
+    genre {
+        int genre_id PK
+        text name
+    }
+```
+
+Practice the checklist on it. The entities are `artist`, `album`,
+`track`, and `genre`. The sentences: one artist records zero or many
+albums; one album contains zero or many tracks; one genre classifies
+zero or many tracks. The foreign keys predict the joins — and the
+query below follows exactly the path the diagram promises, from
+artist through album to track.
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Follow the diagram through a real database"
+  remoteInitSql="postgres/chinook_postgres_AutoIncrementPKs.sql"
+  tables={["artist", "album", "track", "genre"]}
+  starterCode={`SELECT
+  ar.name AS artist,
+  a.title AS album,
+  COUNT(t.track_id) AS tracks
+FROM
+  artist ar
+  JOIN album a ON a.artist_id = ar.artist_id
+  JOIN track t ON t.album_id = a.album_id
+GROUP BY
+  ar.name,
+  a.title
+ORDER BY
+  tracks DESC
+LIMIT
+  10;`}
+/>
+
+Browse the **Tables** viewer above the editor and you can verify the
+diagram against reality: every `album` row carries an `artist_id`,
+exactly as the `FK` marker predicted. Try rewriting the query to join
+`track` to `genre` instead — the diagram already tells you which
+columns to match.
+
+Now prove you can navigate the diagram on your own. The challenge
+uses the same database.
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Walk one relationship line"
+  instructions={`Using the Chinook database, list every **album by the artist named 'Queen'**. Return two columns named exactly \`album_title\` and \`artist_name\` (alias \`album.title\` and \`artist.name\`), sorted by \`album_title\` ascending. The diagram above shows you the join path: \`album.artist_id\` points at \`artist.artist_id\`.`}
+  remoteInitSql="postgres/chinook_postgres_AutoIncrementPKs.sql"
+  tables={["artist", "album"]}
+  starterCode={`SELECT
+  a.title AS album_title,
+  ar.name AS artist_name
+FROM
+  album a
+  -- your JOIN and WHERE here
+ORDER BY
+  album_title;`}
+  solutionSql={`SELECT
+  a.title AS album_title,
+  ar.name AS artist_name
+FROM
+  album a
+  JOIN artist ar ON ar.artist_id = a.artist_id
+WHERE
+  ar.name = 'Queen'
+ORDER BY
+  album_title;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Has album_title and artist_name",
+      description: "In that exact order",
+      expectedColumns: ["album_title", "artist_name"],
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Only Queen's albums, sorted by title",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
+/>
+
 ## Check your understanding
 
 Use this small diagram for the questions below:

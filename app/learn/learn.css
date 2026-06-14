@@ -427,8 +427,10 @@ code.hljs {
                                       text overflows its measured node boxes
    - h1–h6                            headings (handled separately)
    Optical size axis (opsz) is enabled via font-variation-settings so the
-   typeface self-optimises at body text sizes. Letter-spacing resets to 0
-   to avoid the tight value set on `body` above bleeding into serif text.
+   typeface self-optimises at body text sizes. Letter-spacing is pulled in
+   slightly (−0.006em) for a tighter, more polished editorial colour — a
+   gentler value than the −0.011em Inter tracking on `body`, since Source
+   Serif sets a touch looser than Inter at the same measure.
    ─────────────────────────────────────────────────────────────────────── */
 .prose :where(p, li, td, th):not(
   :where([class~="not-prose"], [class~="not-prose"] *),
@@ -444,7 +446,7 @@ code.hljs {
   font-size: 1.125rem;
   line-height: 1.75;
   font-variation-settings: "opsz" 16;
-  letter-spacing: 0;
+  letter-spacing: -0.006em;
 }
 
 /* ── Table and callout font-size override ────────────────────────────────

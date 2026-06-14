@@ -6,7 +6,8 @@ description: Why spreadsheets are wonderful — until they aren't — and the sp
 Spreadsheets are one of the most successful tools ever made. They
 are visual, immediate, and forgiving. Almost everyone who works
 with data starts there, and for good reason. So why move to a
-database at all?
+database at all? This optional discussion page takes the question
+seriously instead of waving it away.
 
 The honest answer: **for small, personal, one-off work, you often
 shouldn't.** Databases earn their keep when a spreadsheet starts to
@@ -124,8 +125,8 @@ This is the big one. Real data is full of **connections**:
 customers *have* orders, orders *contain* products. Spreadsheets
 have no real notion of a relationship — you end up copying data
 between sheets and praying it stays in sync. Relational databases
-are *designed* around relationships, which is exactly what the rest
-of this course is about.
+are *designed* around relationships — primary keys, foreign keys,
+and joins, the machinery this course has spent whole sections on.
 
 ## A side-by-side summary
 
@@ -181,11 +182,12 @@ ORDER BY
   o.id;`}
 />
 
-Do not worry about the `JOIN` syntax yet — we build up to it
-carefully. The point to absorb now is that "Ada" appears **once**
-in storage, and the database stitches the two tables together on
-demand. That single idea is why relational databases conquered the
-data world.
+You can read that `JOIN` fluently now — which is itself a nice
+measure of how far you have come. The point to absorb: "Ada"
+appears **once** in storage, and the database stitches the two
+tables together on demand. That single idea is why relational
+databases conquered the data world, and it is the one thing a
+spreadsheet fundamentally cannot give you.
 
 ## Check your understanding
 

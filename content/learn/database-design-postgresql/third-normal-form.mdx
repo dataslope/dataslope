@@ -265,6 +265,38 @@ flowchart LR
 Together, they push every fact toward the table where it naturally
 belongs.
 
+<Callout type="info" title="The jingle, and where it came from">
+The memory aid you met earlier — every non-key column should depend
+on *"the key, the whole key, and nothing but the key"* — compresses
+2NF and 3NF into one sentence: "the whole key" rules out partial
+dependencies, and "nothing but the key" rules out transitive ones.
+The phrasing comes from William Kent's 1983 article "A Simple Guide
+to Five Normal Forms in Relational Database Theory," which translated
+the normalization papers into plain English for working programmers.
+Later wags appended "...so help me Codd," and the joke stuck —
+database people have repeated the oath ever since.
+</Callout>
+
+## Beyond 3NF: a normal form named for two people
+
+3NF is where this course stops, and where most practical designs
+stop, but the ladder continues. In 1974, E. F. Codd and Raymond
+Boyce — the IBM researcher who co-designed SQL itself — described a
+slightly stricter rule now called **Boyce–Codd normal form (BCNF)**.
+It closes a subtle loophole: a table can technically satisfy 3NF
+while a non-key column still determines part of a key, which can
+happen when a table has overlapping candidate keys. The cases are
+rare enough that many working designers never meet one outside a
+textbook.
+
+The practical takeaway: if every table you design keeps each non-key
+column loyal to the key, the whole key, and nothing but the key, you
+are in the territory where update anomalies go to die. The exotic
+higher forms (BCNF, 4NF, 5NF) refine the same instinct you have
+already built — every fact gets exactly one home. (Boyce's story, and
+how SQL got its name, is told in [The Relational
+Revolution](/learn/database-design-postgresql/the-relational-revolution).)
+
 ## Check your understanding
 
 <MultipleChoice

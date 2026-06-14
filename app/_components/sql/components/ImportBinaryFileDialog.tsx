@@ -20,8 +20,10 @@ export interface ImportBinaryFileDialogProps {
   dropText: string;
   /** Secondary hint inside the drop zone ("or click to browse — .sqlite, .db"). */
   browseHint: string;
-  /** `accept` attribute on the hidden file input. */
-  accept: string;
+  /** `accept` attribute on the hidden file input. Omit to accept any
+   *  file — useful when the import sniffs the content rather than
+   *  trusting the extension. */
+  accept?: string;
   /** `aria-label` for the hidden file input. */
   inputAriaLabel: string;
 }

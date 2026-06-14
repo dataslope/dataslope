@@ -62,7 +62,7 @@ import {
   indentUnit,
 } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
-import { loadLanguage, themeFor, noActiveLine } from "./cmExtensions";
+import { loadLanguage, themeFor, noActiveLine, redoKeymap } from "./cmExtensions";
 import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_SIZE_FACTOR,
@@ -612,6 +612,7 @@ export default function ChallengeCard({
           ...closeBracketsKeymap,
           ...defaultKeymap,
           ...historyKeymap,
+          ...redoKeymap,
           indentWithTab,
         ]),
         languageComp.of([]),
@@ -1078,6 +1079,10 @@ export default function ChallengeCard({
   const run = useCallback(async () => {
     const mySeq = ++runSeqRef.current;
     setActiveAction("run");
+    // Running without submitting isn't a graded attempt, so clear any prior
+    // test results and pass/fail banner instead of leaving stale state behind.
+    setTestResults([]);
+    setBannerState(null);
     const snapshot = snapshotAllFiles();
     const entryCode = snapshot.get(resolvedEntryFilename) ?? "";
     const combined = effectiveSourceFor(resolvedEntryFilename, entryCode);
@@ -1996,7 +2001,12 @@ export default function ChallengeCard({
               className={styles.accentBar}
               data-error={outputs.some((c) => c.type === "stderr")}
             />
-            <span className={styles.outputLabel}>Output</span>
+            <span
+              className={styles.outputLabel}
+              data-error={outputs.some((c) => c.type === "stderr")}
+            >
+              Output
+            </span>
             {elapsed && (
               <span className={styles.outputTime}>
                 <Timer size={12} aria-hidden="true" />

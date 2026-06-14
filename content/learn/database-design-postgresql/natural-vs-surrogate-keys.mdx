@@ -41,12 +41,12 @@ keys**.
     <rect x="128" y="86" width="28" height="5" rx="2.5" fillOpacity="0.9" />
     <rect x="128" y="98" width="20" height="5" rx="2.5" fillOpacity="0.7" />
   </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+  <g style={{ color: "var(--ds-teal-500)" }} fill="currentColor">
     <circle cx="474" cy="94" r="19" />
     <circle cx="474" cy="94" r="14" fillOpacity="0.5" />
   </g>
-  <g style={{ color: "var(--ds-gray-900)" }} fill="currentColor">
-    <text x="474" y="100" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="16" fontWeight="bold">7</text>
+  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
+    <text x="474" y="100" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="16" fontWeight="bold">7</text>
   </g>
 </svg>
 
@@ -107,6 +107,37 @@ Real-world values are controlled by the real world, not by your schema.
 If the value can be corrected, reassigned, merged, privatized, or
 changed by policy, it may be risky as a primary key.
 </Callout>
+
+## A cautionary tale: the most-used number in America
+
+If you want one story to carry into every key discussion for the rest
+of your career, take this one. In 1938, a wallet manufacturer in
+Lockport, New York decided to show off how well a Social Security
+card fit into its product by tucking a sample card into every wallet
+it sold. The sample was a real card — it carried the actual Social
+Security number of Hilda Schrader Whitcher, a secretary at the
+company. Wallets went out to department stores across the country,
+and thousands of buyers, finding an official-looking card already in
+the pocket, simply adopted the number as their own. By 1943, more
+than five thousand people were using Mrs. Whitcher's number; the
+Social Security Administration eventually had to void it and issue
+her a new one, and stray uses of the original were still turning up
+decades later.
+
+Every assumption a designer might make about a natural identifier
+failed at once: the "unique" value was shared by thousands of
+people, the "stable" value had to be changed, and the system that
+issued it had no power over how the outside world used it. Real-world
+identifiers live in the real world, and the real world is under no
+obligation to respect your schema.
+
+The pattern repeats in quieter ways. ISBNs — the textbook example of
+a good natural key — were reissued in a new 13-digit format in 2007,
+and every system that had keyed its tables on the 10-digit form had
+to migrate. Usernames get recycled. Email addresses change employers.
+Even national tax numbers get corrected. None of this means natural
+keys are forbidden; it means a natural primary key is a bet that an
+organization you do not control will keep its promises forever.
 
 ## Quick check
 

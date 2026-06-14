@@ -324,6 +324,98 @@ VALUES
   (1, 1, 0, 12.00);`}
 />
 
+## Try it: total an order from its lines
+
+The schema deliberately does **not** store an order total — it would
+be a derived value that could drift out of sync with the line items.
+Instead, anyone who needs the total computes it. Your turn.
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="Compute each order's total"
+  instructions={`Return one row per order with the columns \`order_id\` and \`order_total\`, where \`order_total\` is the sum of \`quantity * unit_price\` across that order's line items. Sort by \`order_id\` ascending. (The sample data contains one order: 2 mugs at 10.00 plus 1 t-shirt at 24.00.)`}
+  initSql={`CREATE TABLE customers (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    email TEXT NOT NULL UNIQUE,
+    full_name TEXT NOT NULL
+);
+
+CREATE TABLE products (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    sku TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL,
+    current_price NUMERIC(10, 2) NOT NULL CHECK (current_price >= 0),
+    active BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+CREATE TABLE orders (
+    id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    customer_id INT NOT NULL REFERENCES customers(id),
+    ordered_at TIMESTAMP NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('placed', 'paid', 'shipped', 'cancelled'))
+);
+
+CREATE TABLE order_items (
+    order_id INT NOT NULL REFERENCES orders(id),
+    product_id INT NOT NULL REFERENCES products(id),
+    quantity INT NOT NULL CHECK (quantity > 0),
+    unit_price NUMERIC(10, 2) NOT NULL CHECK (unit_price >= 0),
+    PRIMARY KEY (order_id, product_id)
+);
+
+INSERT INTO customers (email, full_name) VALUES
+    ('ana@example.com', 'Ana Rivera'),
+    ('ben@example.com', 'Ben Cho');
+
+INSERT INTO products (sku, name, current_price) VALUES
+    ('MUG-001', 'Postgres Mug', 12.00),
+    ('TEE-001', 'Schema T-Shirt', 24.00);
+
+INSERT INTO orders (customer_id, ordered_at, status) VALUES
+    (1, '2025-04-10 14:00', 'paid');
+
+INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES
+    (1, 1, 2, 10.00),
+    (1, 2, 1, 24.00);`}
+  starterCode={`SELECT
+  o.id AS order_id,
+  0 AS order_total
+FROM
+  orders o
+ORDER BY
+  order_id;`}
+  solutionSql={`SELECT
+  o.id AS order_id,
+  SUM(oi.quantity * oi.unit_price) AS order_total
+FROM
+  orders o
+  JOIN order_items oi ON oi.order_id = o.id
+GROUP BY
+  o.id
+ORDER BY
+  order_id;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Has order_id and order_total",
+      description: "In that exact order",
+      expectedColumns: ["order_id", "order_total"],
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Order 1 totals 44.00 from its two line items",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
+/>
+
+Note that the total uses `order_items.unit_price` — the price
+charged — not `products.current_price`. The mug's catalog price has
+risen to 12.00 since this order was placed at 10.00, so totaling from
+the catalog would silently rewrite history.
+
 ## Check your understanding
 
 <MultipleChoice

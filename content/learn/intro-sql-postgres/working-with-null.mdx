@@ -20,9 +20,9 @@ which is why this page has extra checks at the end.
     <circle cx="180" cy="110" r="10" />
   </g>
   <g fill="currentColor" opacity="0.5">
-    <text x="240" y="58" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="22" fontWeight="700">=</text>
-    <text x="240" y="118" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="22" fontWeight="700">=</text>
-    <text x="240" y="178" textAnchor="middle" fontFamily="ui-monospace, monospace" fontSize="22" fontWeight="700">=</text>
+    <text x="240" y="58" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="22" fontWeight="700">=</text>
+    <text x="240" y="118" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="22" fontWeight="700">=</text>
+    <text x="240" y="178" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="22" fontWeight="700">=</text>
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <circle cx="300" cy="110" r="14" fillOpacity="0.15" />
@@ -55,8 +55,8 @@ which is why this page has extra checks at the end.
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
     <circle cx="440" cy="110" r="12" fillOpacity="0.25" />
     <circle cx="440" cy="170" r="12" fillOpacity="0.25" />
-    <text x="440" y="117" textAnchor="middle" fontFamily="Georgia, serif" fontSize="17" fontWeight="700">?</text>
-    <text x="440" y="177" textAnchor="middle" fontFamily="Georgia, serif" fontSize="17" fontWeight="700">?</text>
+    <text x="440" y="117" textAnchor="middle" fontFamily="var(--font-sans), Georgia, serif" fontSize="17" fontWeight="700">?</text>
+    <text x="440" y="177" textAnchor="middle" fontFamily="var(--font-sans), Georgia, serif" fontSize="17" fontWeight="700">?</text>
   </g>
 </svg>
 
@@ -101,6 +101,14 @@ Look closely at the third column. Even `NULL = NULL` is **not true**
 equal to another unknown?" cannot be answered. This is the trap that
 catches everyone.
 
+There is a name for what you just witnessed: **three-valued
+logic**. In most programming, a comparison is either true or false.
+In SQL there is a third outcome — *unknown* — and it matters
+enormously for filtering, because `WHERE` keeps only the rows where
+the condition is **true**. Not false, and *not unknown*. A
+comparison against `NULL` is always unknown, so the row is dropped.
+That is why the next section's rule exists.
+
 ## Testing for NULL: use IS NULL, never = NULL
 
 Since `= NULL` does not work, SQL gives you special tests:
@@ -136,6 +144,26 @@ it just silently matches **no rows**, because the comparison is never
 true. Always use `IS NULL` / `IS NOT NULL` to test for missing
 values.
 </Callout>
+
+## When NULL escapes into the real world
+
+Mishandled NULLs are not just a beginner's stumble — they cause
+real, expensive, occasionally hilarious bugs in production systems.
+The most famous example: in 2016, security researcher **Joseph
+Tartaro** registered a California vanity license plate reading
+`NULL`. He thought of it as a nerdy joke. The joke reversed itself:
+systems that processed traffic citations apparently associated
+tickets that had a *missing* plate value with the literal string
+"NULL" — and Tartaro started receiving **thousands of dollars'
+worth of other drivers' tickets**, eventually totaling over
+\$12,000. He told the story at the DEF CON security conference in
+2019, by which point clearing his record had become a recurring
+chore.
+
+The bug at the heart of it is exactly the distinction this page is
+teaching: *the text `'NULL'`* is a known value, while *`NULL`* is
+the absence of one. Somewhere, a system blurred that line. After
+this page, you will not.
 
 ## Filling in NULLs with COALESCE
 
@@ -254,4 +282,57 @@ Use \`IS NULL\` (never \`= NULL\`) to test for missing values.`}
   > Columns can forbid \`NULL\` with \`NOT NULL\`; \`NULL\` exists to honestly represent the unknown when allowed.
 
 \`NULL\` exists so the database can distinguish genuinely missing data from a real zero or empty value.`}
+/>
+
+## Practice challenge
+
+<SqlChallengeCard
+  dialect="postgres"
+  title="A friendly fallback for missing emails"
+  instructions={`The \`customers\` table has \`name\` and \`email\` columns, and some emails are missing (\`NULL\`). Return every customer's \`name\` plus a column named \`email_display\` that shows the email when present and the text \`no email\` when it is missing. Sort by \`name\` ascending (A to Z).`}
+  initSql={`CREATE TABLE customers (
+  id    SERIAL PRIMARY KEY,
+  name  TEXT NOT NULL,
+  email TEXT
+);
+INSERT INTO customers (name, email) VALUES
+  ('Ada', 'ada@example.com'),
+  ('Grace', NULL),
+  ('Linus', 'linus@example.com'),
+  ('Mae', NULL);`}
+  starterCode={`SELECT
+  name,
+  email AS email_display -- wrap this in COALESCE with a fallback
+FROM
+  customers
+ORDER BY
+  name;`}
+  solutionSql={`SELECT
+  name,
+  COALESCE(email, 'no email') AS email_display
+FROM
+  customers
+ORDER BY
+  name;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Returns name and email_display",
+      description: "Two columns, in that order.",
+      expectedColumns: ["name", "email_display"],
+    },
+    {
+      id: "row_count",
+      name: "Returns all four customers",
+      description: "Nobody is filtered out — missing emails get a fallback instead.",
+      expectedRowCount: 4,
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Grace and Mae show 'no email'; Ada and Linus show their addresses.",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
 />

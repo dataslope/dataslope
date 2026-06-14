@@ -3,7 +3,9 @@ title: "Graph Traversal: BFS and DFS"
 description: Learn breadth-first search, depth-first search, components, cycle detection, topological sort, and grid traversal in C++
 ---
 
-Graph traversal means systematically visiting vertices reachable from a starting point. The two core tools are **breadth-first search (BFS)** and **depth-first search (DFS)**.
+Storing a graph was the easy part. Now: given a starting vertex, how do you visit everything reachable from it — every vertex exactly once, without getting lost in cycles? This is the maze problem, and people solved it for actual mazes before computers existed. In the 1800s the French engineer Charles Pierre Trémaux devised a string-and-chalk method for escaping any labyrinth — go deep, mark where you've been, back up when stuck — which is depth-first search a century early. And when Edward F. Moore presented breadth-first search in 1959, his paper was literally titled "The shortest path through a maze"; at almost the same time, C. Y. Lee was using the identical wave-expansion idea to route wires on circuit boards.
+
+The two strategies have opposite personalities. **Depth-first search (DFS)** is the spelunker: follow one passage as far as it goes, backtrack only when stuck. **Breadth-first search (BFS)** is the ripple in a pond: explore everything one step away, then everything two steps away, expanding in rings. Same guarantee — every reachable vertex visited once — but the *order* differs, and the order is what you exploit: BFS order gives shortest hop-counts, DFS order reveals structure like cycles and dependency ordering. Nearly every graph algorithm you will ever run is one of these two with extra bookkeeping.
 
 <svg
   viewBox="0 0 640 220"
@@ -54,7 +56,7 @@ Graph traversal means systematically visiting vertices reachable from a starting
     <circle cx="400" cy="122" r="2" />
     <circle cx="409" cy="107" r="2" />
   </g>
-  <g fill="currentColor" opacity="0.45" fontFamily="ui-monospace, monospace" fontSize="12" textAnchor="middle">
+  <g fill="currentColor" opacity="0.45" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="12" textAnchor="middle">
     <text x="170" y="212">BFS</text>
     <text x="470" y="212">DFS</text>
   </g>
@@ -133,9 +135,11 @@ int main() {
   ]}
 />
 
+The visited check happens *at enqueue time*, not at dequeue time — a vertex is claimed the moment it is discovered. With an adjacency list, BFS touches each vertex once and each edge once: O(V + E).
+
 ## Depth-first search
 
-DFS goes as deep as possible before backtracking. It can be written with recursion or with an explicit stack.
+DFS goes as deep as possible before backtracking — Trémaux's string and chalk. The chalk is the `visited` array; the string is the call stack itself, which remembers the way back automatically. That is why recursive DFS is so short: the language's own function-call machinery does the backtracking.
 
 ```text
 DFS(u):
@@ -240,7 +244,7 @@ Use `vector<bool>` or another visited structure before pushing or recursing into
 
 ## Connected components
 
-To count connected components in an undirected graph, start a BFS or DFS from every unvisited vertex. Each new start discovers one component.
+A single traversal reaches only one "island" of the graph. To count the islands — the **connected components** — wrap the traversal in a loop over all vertices: every time you find a vertex that no previous traversal touched, you have discovered a new component, so increment the count and flood it. The visited array is shared across all the traversals, which is what keeps the total work at O(V + E) no matter how many components there are.
 
 <CodeBlock
   adapter="cpp"
@@ -363,7 +367,9 @@ int main() {
 
 ## Topological sort
 
-A topological ordering places every directed edge `u -> v` with `u` before `v`. It exists only for DAGs. DFS can produce it by pushing each vertex after all outgoing neighbors finish.
+Here is DFS's most practical payoff. Think of a build system: file `u` must compile before file `v` that includes it; a course catalog: prerequisite before course. You need an ordering of vertices that respects every directed edge `u -> v` — `u` before `v`, always. That is a **topological ordering**, and it exists exactly when the graph is a DAG (a cycle makes the demand circular and unsatisfiable — which is why your build tool errors on circular dependencies).
+
+DFS produces one almost by accident: when a vertex *finishes* (all its outgoing neighbors fully explored), append it to a list. Everything `u` points to finishes before `u` does, so the finish order is the reverse of a valid topological order — reverse the list and you are done.
 
 <CodeBlock
   adapter="cpp"
@@ -406,7 +412,7 @@ Kahn's algorithm is the BFS-like alternative: compute in-degrees, repeatedly pop
 
 ## Shortest path in an unweighted graph
 
-BFS can also record distance and parent arrays.
+Moore's 1959 maze result is one extra array away. Because BFS explores in rings of increasing hop-count, the first time it reaches a vertex is via a shortest path. Record `dist[v] = dist[u] + 1` when `v` is discovered from `u`, and a `parent` array if you want to reconstruct the route itself by walking backward from the target.
 
 <CodeBlock
   adapter="cpp"
@@ -449,7 +455,7 @@ int main() {
 
 ## Grids as graphs: flood fill and islands
 
-A grid cell can be a vertex. Edges connect up, down, left, and right neighbors.
+The most common graphs in interviews never declare themselves as graphs — they arrive disguised as 2D grids. The translation is mechanical: each cell is a vertex, and edges connect it to its up/down/left/right neighbors. No adjacency list is even built; the neighbor relation is computed on the fly from `(row ± 1, col)` and `(row, col ± 1)`. The paint-bucket tool in every image editor is exactly this: BFS/DFS from the clicked pixel across same-colored neighbors — *flood fill*.
 
 ```mermaid
 graph TD

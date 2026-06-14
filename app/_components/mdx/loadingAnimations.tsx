@@ -28,6 +28,7 @@
  * `prefers-reduced-motion` by swapping motion for an opacity pulse.
  *
  * Exported pieces:
+ *  - <DiamondMark /> — the hollow diamond as a static (non-animated) mark
  *  - <DiamondSpinner />, <DiamondTurnSpinner />, <DiamondAssembleLoader />,
  *    <DiamondAssembleTurnLoader />, <DiamondRippleLoader />, <LogoHopLoader />
  *  - <LogoWave />
@@ -150,6 +151,38 @@ function GradientDiamond({ idPrefix }: { idPrefix: string }) {
 function useSafeId(prefix: string): string {
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   return `${prefix}-${uid}`;
+}
+
+// ─── Static mark ───────────────────────────────────────────────────────
+
+/** The hollow-diamond brand shape as a plain, static SVG — the same
+ *  4-point star the spinners rotate, without any animation. Renders
+ *  with `currentColor`, so the parent's CSS `color` sets the tint
+ *  (e.g. the playgrounds' welcome empty-states tint it brand blue via
+ *  `.welcome-icon`). Decorative by default; pass `label` to expose it
+ *  to assistive tech instead. */
+export function DiamondMark({
+  size = 44,
+  label,
+}: {
+  /** Rendered width in px (the diamond is ~square). */
+  size?: number;
+  /** Accessible label; omitted = decorative (aria-hidden). */
+  label?: string;
+}) {
+  const gradId = useSafeId("ds-mark");
+  return (
+    <svg
+      viewBox={`0 0 ${LOGO_W} ${DIAMOND_H}`}
+      width={size}
+      height={size}
+      role={label ? "img" : undefined}
+      aria-label={label}
+      aria-hidden={label ? undefined : true}
+    >
+      <GradientDiamond idPrefix={gradId} />
+    </svg>
+  );
 }
 
 // ─── Spinners ──────────────────────────────────────────────────────────

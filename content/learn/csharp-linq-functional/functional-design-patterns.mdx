@@ -255,6 +255,15 @@ combinator** library.
 
 <ChallengeCard
   adapter="csharp"
+  title="Validator combinators"
+  instructions={`A *validator* is a function from a value to a (possibly empty) list of error messages. Implement these rules in \`Validator.cs\`:
+
+- \`NonEmpty(field)\` — yields the error \`"{field} is empty"\` when the value is null or an empty string.
+- \`MaxLen(field, max)\` — yields \`"{field} too long"\` when \`value.Length > max\`.
+- \`NoDigits(field)\` — yields \`"{field} contains digits"\` when the value contains any digit character.
+- \`All(rules)\` — a *combinator* that runs every rule and concatenates their errors in argument order.
+
+A rule that passes returns an **empty** sequence (no error).`}
   entryFilename="Program.cs"
   files={[
     {
@@ -295,16 +304,16 @@ public static class Validator<T>
     // A validator is a function from a value to a (possibly empty) list of error messages.
     public delegate IEnumerable<string> Rule(T value);
 
-    // TODO: NonEmpty<string>: error "{field} is empty" iff value is null or empty string.
+    // TODO: implement
     public static Rule NonEmpty(string field) => throw new NotImplementedException();
 
-    // TODO: MaxLen<string>: error "{field} too long" iff value.Length > max.
+    // TODO: implement
     public static Rule MaxLen(string field, int max) => throw new NotImplementedException();
 
-    // TODO: NoDigits<string>: error "{field} contains digits" iff value has any digit char.
+    // TODO: implement
     public static Rule NoDigits(string field) => throw new NotImplementedException();
 
-    // TODO: All: combine rules; concatenate all their errors in argument order.
+    // TODO: implement
     public static Rule All(params Rule[] rules) => throw new NotImplementedException();
 }
 `,

@@ -102,6 +102,33 @@ record. *Data first, behavior second* — the functional move.
 
 <ChallengeCard
   adapter="csharp"
+  title="Build the full data pipeline"
+  instructions={`Assemble a pure, LINQ-driven batch pipeline across four files. \`Program.cs\` is already wired to call \`Pipeline.BuildReport\` — implement the three classes below.
+
+**\`Parsing.cs\`**
+- \`ParseLine\` — parse one \`"yyyy-MM-dd,product,quantity,unitPrice,status"\` line into a \`Txn\`, returning \`null\` on any failure.
+- \`ParseAll\` — parse every line and drop the nulls.
+
+**\`Summarize.cs\`**
+- \`ByProduct\` — group transactions by product and, for each group, compute:
+  - \`UnitsSold\` = sum of \`Quantity\` over **paid** transactions only,
+  - \`Gross\` = sum of \`Quantity * UnitPrice\` over **paid** transactions only,
+  - \`Net\` = paid total minus refund total (the refund total also uses \`Quantity * UnitPrice\`).
+  - Return the summaries ordered by \`Product\` ascending.
+
+**\`Pipeline.cs\`**
+- \`BuildReport\` — compose the stages and produce the report string in **exactly** this format (amounts formatted as \`0.00\`), with one block per product followed by a \`TOTAL\` block:
+
+\`\`\`
+=== Product {key} ===
+  units sold:   {units}
+  gross:        {gross}
+  net:          {net}
+=== TOTAL ===
+  units sold:   {sumUnits}
+  gross:        {sumGross}
+  net:          {sumNet}
+\`\`\``}
   entryFilename="Program.cs"
   files={[
     {
@@ -157,14 +184,13 @@ using System.Linq;
 
 public static class Parsing
 {
-    // TODO: parse one line into a Txn or null on failure.
-    // Format: "yyyy-MM-dd,product,quantity,unitPrice,status".
+    // TODO: implement
     public static Txn? ParseLine(string line)
     {
         throw new NotImplementedException();
     }
 
-    // TODO: parse all lines, dropping nulls.
+    // TODO: implement
     public static IEnumerable<Txn> ParseAll(IEnumerable<string> lines)
     {
         throw new NotImplementedException();
@@ -211,11 +237,7 @@ using System.Linq;
 
 public static class Summarize
 {
-    // TODO: group txns by product; for each group compute:
-    //   UnitsSold = sum of Quantity for paid txns only,
-    //   Gross     = sum of Quantity * UnitPrice for paid txns only,
-    //   Net       = paid total minus refund total (refund total uses Quantity*UnitPrice).
-    // Return summaries ordered by Product ascending.
+    // TODO: implement
     public static IEnumerable<ProductSummary> ByProduct(IEnumerable<Txn> txns)
     {
         throw new NotImplementedException();
@@ -253,17 +275,7 @@ using System.Text;
 
 public static class Pipeline
 {
-    // TODO: assemble the full pipeline and produce the report string.
-    // Format EXACTLY:
-    //   === Product {key} ===
-    //     units sold:   {units}
-    //     gross:        {gross:0.00}
-    //     net:          {net:0.00}
-    //   ...repeat...
-    //   === TOTAL ===
-    //     units sold:   {sumUnits}
-    //     gross:        {sumGross:0.00}
-    //     net:          {sumNet:0.00}
+    // TODO: implement
     public static string BuildReport(IEnumerable<string> lines)
     {
         throw new NotImplementedException();

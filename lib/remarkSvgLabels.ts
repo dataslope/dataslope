@@ -39,7 +39,7 @@ interface JsxAttribute {
   value?: unknown;
 }
 
-type AnyNode = Record<string, unknown> & {
+export type AnyNode = Record<string, unknown> & {
   type?: string;
   name?: string;
   children?: AnyNode[];
@@ -50,7 +50,7 @@ type AnyNode = Record<string, unknown> & {
 // FNV-1a 32-bit hash → 6 lowercase hex chars (the low 24 bits). Deterministic
 // and dependency-free; 24 bits is ample to distinguish the handful of graphics
 // on a page while staying short and opaque.
-function hash6(input: string): string {
+export function hash6(input: string): string {
   let h = 0x811c9dc5;
   for (let i = 0; i < input.length; i++) {
     h ^= input.charCodeAt(i);
@@ -59,11 +59,12 @@ function hash6(input: string): string {
   return ((h >>> 0) & 0xffffff).toString(16).padStart(6, "0");
 }
 
-// Derive a page slug from the lesson's absolute .mdx path: drop everything up
+// Derive a page slug from a lesson's absolute .mdx path: drop everything up
 // to and including `content/learn/`, strip the extension and a trailing
-// `/index`, then flatten to a dash-delimited lowercase slug.
-function pageSlug(file: VFile | undefined): string {
-  const raw = file?.path ?? file?.history?.[file.history.length - 1] ?? "";
+// `/index`, then flatten to a dash-delimited lowercase slug. Exported so the
+// build-time SVG gallery (lib/svgGallery.ts) can reproduce the exact same IDs
+// this plugin stamps onto the rendered pages.
+export function pageSlugFromPath(raw: string): string {
   const marker = "content/learn/";
   const at = raw.indexOf(marker);
   const rel = at >= 0 ? raw.slice(at + marker.length) : raw;
@@ -74,6 +75,11 @@ function pageSlug(file: VFile | undefined): string {
     .replace(/^-+|-+$/g, "")
     .toLowerCase();
   return slug || `x-${hash6(raw)}`;
+}
+
+function pageSlug(file: VFile | undefined): string {
+  const raw = file?.path ?? file?.history?.[file.history.length - 1] ?? "";
+  return pageSlugFromPath(raw);
 }
 
 function isGraphic(node: AnyNode): boolean {
@@ -90,7 +96,7 @@ function isGraphic(node: AnyNode): boolean {
 // representation — falling back to a structural serialization if positions are
 // missing. Whitespace is collapsed so reindenting a graphic doesn't change its
 // ID.
-function graphicSignature(node: AnyNode, source: string): string {
+export function graphicSignature(node: AnyNode, source: string): string {
   let raw: string | undefined;
 
   if (node.name === "Mermaid") {

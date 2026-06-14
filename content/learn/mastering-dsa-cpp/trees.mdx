@@ -3,7 +3,11 @@ title: Trees and Binary Trees
 description: Learn tree terminology, binary-tree storage, traversals, and recursive tree properties in C++
 ---
 
-A tree is a connected acyclic graph. In a rooted tree, one node is the root, every non-root node has a parent, and edges lead from parent to child.
+Everything you have built so far has been a line — arrays, lists, stacks, queues all arrange data single-file. But the world's information is rarely a line. Your filesystem is folders inside folders; an HTML page is elements inside elements; this very course is sections inside chapters; a company is teams inside departments. Hierarchy is the natural shape of nested things, and the data structure for hierarchy is the **tree**.
+
+Trees also smuggle in a performance gift. A line of n elements is n steps long, but a tree that branches in two at every level fits n elements in only log₂ n levels — a million nodes, twenty levels deep. Every "fast" structure in the chapters ahead (binary search trees, heaps, tries) is some scheme for arranging data so that work follows a root-to-leaf *path* instead of the whole collection.
+
+Formally, a tree is a connected acyclic graph. In a rooted tree, one node is the root, every non-root node has exactly one parent, and edges lead from parent to child.
 
 <svg
   viewBox="0 0 640 210"
@@ -16,7 +20,7 @@ A tree is a connected acyclic graph. In a rooted tree, one node is the root, eve
     <rect x="120" y="92" width="400" height="36" rx="10" opacity="0.09" />
     <rect x="120" y="148" width="400" height="36" rx="10" opacity="0.05" />
   </g>
-  <g fill="currentColor" opacity="0.45" fontFamily="ui-monospace, monospace" fontSize="12" textAnchor="middle">
+  <g fill="currentColor" opacity="0.45" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="12" textAnchor="middle">
     <text x="98" y="60">0</text>
     <text x="98" y="116">1</text>
     <text x="98" y="172">2</text>
@@ -203,7 +207,11 @@ The array formulas are perfect for heaps. Sparse trees waste many array position
 
 ## Depth-first traversals
 
-Pre-order visits root, left, right. In-order visits left, root, right. Post-order visits left, right, root.
+A linear structure has an obvious visiting order; a tree does not. The depth-first family explores one subtree fully before the other, and the only real choice is *when to handle the root* relative to its children. That one choice produces three named orders, and each corresponds to a real task:
+
+* **Pre-order** (root, left, right): handle a node before its children — copying a tree, serializing it, printing a directory listing with subfolders indented beneath.
+* **In-order** (left, root, right): handle the node between its subtrees — on a binary *search* tree, this visits values in sorted order, as the next page exploits.
+* **Post-order** (left, right, root): handle a node after its children — computing folder sizes (you need the children's totals first), or safely deleting a tree (free the children before the parent).
 
 ```mermaid
 flowchart TD
@@ -284,7 +292,7 @@ The three depth-first orders differ only in when the root is visited relative to
 
 ## Level-order traversal
 
-Level-order is breadth-first search. A queue processes nodes one level at a time.
+The fourth traversal abandons depth-first entirely: visit the tree floor by floor, like reading a family portrait from grandparents down. This is breadth-first search, and — as the queues chapter previewed — a queue runs it: pop a node, print it, enqueue its children, repeat. Children enter the line after everything already discovered, so each level fully drains before the next begins.
 
 <CodeBlock
   adapter="cpp"
@@ -371,7 +379,9 @@ int main() {
 
 ## Calculating tree properties
 
-Most tree properties are naturally recursive: solve the left subtree, solve the right subtree, then combine the answers.
+Here is where the recursion chapter pays off. Most tree properties are naturally recursive — solve the left subtree, solve the right subtree, combine the answers — and the leap of faith makes each one a three-line function. The height of a tree is 1 plus the taller of its subtrees' heights; its node count is 1 plus the children's counts; its maximum is the largest of the root and the subtree maxima. In every case the base case is the empty tree, and `nullptr` checks do double duty as base cases.
+
+The most instructive function below is `checkHeight`, which answers "is this tree balanced?" while computing height, using `-1` as an "already failed" signal that propagates up without extra bookkeeping. This combine-results-while-recursing pattern solves a large share of tree interview problems.
 
 <CodeBlock
   adapter="cpp"

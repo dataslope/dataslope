@@ -45,11 +45,11 @@ are aggregate questions, and they are the heart of reporting.
     <circle cx="331" cy="140" r="5" />
     <circle cx="318" cy="156" r="4" />
   </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+  <g style={{ color: "var(--ds-teal-500)" }} fill="currentColor">
     <circle cx="452" cy="124" r="14" />
   </g>
   <g style={{ color: "var(--ds-gray-900)" }} fill="currentColor">
-    <text x="452" y="131" textAnchor="middle" fontFamily="Georgia, serif" fontSize="17" fontWeight="700" fontStyle="italic">ƒ</text>
+    <text x="452" y="131" textAnchor="middle" fontFamily="var(--font-sans), Georgia, serif" fontSize="17" fontWeight="700" fontStyle="italic" style={{ fill: "var(--ds-white)" }}>ƒ</text>
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
     <circle cx="320" cy="198" r="16" />
@@ -121,6 +121,35 @@ FROM
 One row, five numbers — a complete summary of the whole table. This
 single query would be a whole afternoon of manual spreadsheet work
 on a large dataset.
+
+## Aggregates shine on real data
+
+Five rows is a toy. To feel what aggregates are *for*, run them on
+something real. The block below clones the **Chinook** sample
+database — a fictional digital music store with thousands of actual
+tracks — straight into your browser, then summarizes the entire
+`track` table in one row:
+
+<SqlCodeBlock
+  dialect="postgres"
+  title="Summarize thousands of real tracks in one row"
+  remoteInitSql="postgres/chinook_postgres_AutoIncrementPKs.sql"
+  tables={["track"]}
+  starterCode={`SELECT
+  COUNT(*) AS track_count,
+  ROUND(AVG(milliseconds) / 60000.0, 2) AS avg_minutes,
+  ROUND(MAX(milliseconds) / 60000.0, 1) AS longest_minutes
+FROM
+  track;`}
+/>
+
+Thousands of rows collapse into three honest numbers. The average
+track runs about four minutes — but look at that maximum. Chinook's
+catalog includes whole TV episodes sold as "tracks," which is
+exactly the kind of surprise a quick aggregate sweep is good at
+surfacing. Try swapping `MAX` for `MIN` to find the shortest track,
+or add `SUM(milliseconds) / 3600000 AS total_hours` to see how long
+the whole catalog would take to listen to.
 
 ## Aggregates over a filtered set
 
