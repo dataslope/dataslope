@@ -52,8 +52,69 @@ const cache = new Map<string, Promise<LanguageRuntime>>();
 // UI can show "first run only" boot copy without lying on later runs.
 const ready = new Set<string>();
 
+/** Boot-progress report: a human-readable stage line plus an optional
+ *  coarse overall fraction (0..1) — see `LanguageAdapter.init`. */
+export type BootProgressListener = (message: string, fraction?: number) => void;
+
+// Every caller of `getSharedRuntime` that passes a progress callback is
+// subscribed for the duration of the boot — not just the first caller.
+// This matters because boots usually start from a silent warm-up
+// (route land / scroll-into-view) and the user only *sees* progress if
+// the Run-click subscriber that arrives mid-boot still receives stage
+// events. `lastProgress` replays the current stage to late subscribers
+// so their UI starts at the right point instead of a stale default.
+const progressListeners = new Map<string, Set<BootProgressListener>>();
+const lastProgress = new Map<string, { message: string; fraction?: number }>();
+
 function cacheKey(scope: RuntimeScope, adapterId: string): string {
   return `${scope}:${adapterId}`;
+}
+
+function subscribeProgress(key: string, listener: BootProgressListener): void {
+  let set = progressListeners.get(key);
+  if (!set) {
+    set = new Set();
+    progressListeners.set(key, set);
+  }
+  set.add(listener);
+  const last = lastProgress.get(key);
+  if (last) listener(last.message, last.fraction);
+}
+
+function emitProgress(key: string, message: string, fraction?: number): void {
+  lastProgress.set(key, { message, fraction });
+  const set = progressListeners.get(key);
+  if (!set) return;
+  for (const listener of [...set]) listener(message, fraction);
+}
+
+// Listeners are only useful while a boot is in flight; drop them (and
+// the replay snapshot) once init settles so per-Run-click subscriber
+// closures don't accumulate across a session.
+function settleProgress(key: string): void {
+  progressListeners.delete(key);
+  lastProgress.delete(key);
+}
+
+// Cold-boot timing via the Performance API (visible in DevTools and
+// collectable later): one `runtime-boot:<scope>:<adapter>` measure per
+// first init. Best-effort — never let instrumentation break a boot.
+function markBoot(key: string, promise: Promise<unknown>): void {
+  try {
+    if (typeof performance === "undefined" || !performance.mark) return;
+    const start = `runtime-boot:${key}:start`;
+    performance.mark(start);
+    void promise.then(
+      () => {
+        const end = `runtime-boot:${key}:end`;
+        performance.mark(end);
+        performance.measure(`runtime-boot:${key}`, start, end);
+      },
+      () => {},
+    );
+  } catch {
+    /* instrumentation is best-effort */
+  }
 }
 
 /** Whether the `(scope, adapter)` runtime has finished initialising and is
@@ -67,29 +128,39 @@ export function isRuntimeReady(scope: RuntimeScope, adapterId: string): boolean 
  *  callers with the same `(scope, adapter.id)` pair receive the same
  *  promise (and therefore the same runtime instance once it resolves).
  *
- *  The optional `setLoadingMessage` callback is forwarded to
- *  `adapter.init()` only on the first call within a given scope — once a
- *  runtime is being initialised, later callers attach to the existing
- *  promise without receiving loading progress (they just `await`). */
+ *  Every caller's optional `onProgress` callback is subscribed to the
+ *  in-flight boot's stage events (with the current stage replayed on
+ *  subscribe), so a caller that attaches mid-boot — e.g. a Run click
+ *  while a warm-up download is in progress — still renders live
+ *  progress. Subscriptions end when the boot settles. */
 export function getSharedRuntime(
   scope: RuntimeScope,
   adapter: LanguageAdapter,
-  setLoadingMessage: (message: string) => void = () => {},
+  onProgress?: BootProgressListener,
 ): Promise<LanguageRuntime> {
   const key = cacheKey(scope, adapter.id);
   const existing = cache.get(key);
-  if (existing) return existing;
-  const promise = adapter.init(setLoadingMessage).then(
-    (runtime) => {
-      ready.add(key);
-      return runtime;
-    },
-    (err) => {
-      // Don't cache failures — let the next caller retry.
-      cache.delete(key);
-      throw err;
-    },
-  );
+  if (existing) {
+    if (onProgress && !ready.has(key)) subscribeProgress(key, onProgress);
+    return existing;
+  }
+  if (onProgress) subscribeProgress(key, onProgress);
+  const promise = adapter
+    .init((message, fraction) => emitProgress(key, message, fraction))
+    .then(
+      (runtime) => {
+        ready.add(key);
+        settleProgress(key);
+        return runtime;
+      },
+      (err) => {
+        // Don't cache failures — let the next caller retry.
+        cache.delete(key);
+        settleProgress(key);
+        throw err;
+      },
+    );
+  markBoot(key, promise);
   cache.set(key, promise);
   return promise;
 }

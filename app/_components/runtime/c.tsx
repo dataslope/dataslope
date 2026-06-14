@@ -443,6 +443,9 @@ type WorkerOutMessage =
   | { kind: "loading"; message: string }
   | { kind: "ready" }
   | { kind: "init-error"; message: string }
+  // C never triggers the PCH wait (C++-only), but the shared browsercc
+  // worker's message union includes it — keep the type accurate.
+  | { kind: "run-status"; id: number; message: string; preparing: boolean }
   | { kind: "output"; id: number; cell: { type: string; content: string } }
   | { kind: "done"; id: number }
   | { kind: "error"; id: number; message: string };
@@ -539,6 +542,8 @@ export const cAdapter: LanguageAdapter = {
   // CodeMirror's clike mode handles C syntax. `text/x-csrc` is the
   // standard MIME alias for C inside that mode.
   codeMirrorMode: "text/x-csrc",
+  // clang + lld WASM and the sysroot from jsDelivr, compressed transfer.
+  coldDownloadMB: 35,
   // clang-format LLVM style (see formatCode) — keep in sync.
   indentWidth: 2,
   examples: EXAMPLES,
@@ -581,7 +586,7 @@ export const cAdapter: LanguageAdapter = {
     return format(code, "main.c", "LLVM");
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Loading C worker…");
+    setLoadingMessage("Loading C worker…", 0.02);
     const worker = new Worker(
       new URL("./browsercc-worker.ts", import.meta.url),
     );
@@ -589,7 +594,9 @@ export const cAdapter: LanguageAdapter = {
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
         const msg = ev.data;
         if (msg.kind === "loading") {
-          setLoadingMessage(msg.message);
+          // The worker's single loading stage covers the clang/lld
+          // toolchain download — the bulk of the boot.
+          setLoadingMessage(msg.message, 0.1);
         } else if (msg.kind === "ready") {
           worker.removeEventListener("message", onMessage);
           resolve(new CWorkerRuntime(worker));

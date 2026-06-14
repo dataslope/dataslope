@@ -91,55 +91,11 @@
   height: 22px;
 }
 
-/* Aligns the boot notice with the output body's text inset. */
+/* Aligns the boot notice with the output body's text inset. The notice
+   itself (loader, staged copy, progress bar) is the self-contained
+   <RuntimeBootNotice> component; this wrapper only supplies the inset. */
 .bootNoticeWrap {
   padding: 4px 14px 14px 18px;
-}
-
-/* First-run boot affordance — shown while the runtime is downloading /
-   initialising (status === "loading"), so a ~10s cold start reads as
-   "setting up" rather than "broken". */
-.bootNotice {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border: 1px solid var(--cb-border);
-  border-radius: var(--cb-radius);
-  background: var(--cb-bg2);
-  color: var(--cb-text);
-  font-size: 12.5px;
-}
-
-.bootSpinner {
-  flex: none;
-  width: 15px;
-  height: 15px;
-  color: var(--cb-accent);
-  animation: cb-bootspin 0.75s linear infinite;
-}
-
-@keyframes cb-bootspin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.bootNoticeText {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.bootNoticeTitle {
-  font-weight: 600;
-}
-
-.bootNoticeHint {
-  color: var(--cb-text-dim);
-  font-size: 11.5px;
-  line-height: 1.35;
 }
 
 /* ─── Running overlay (sine-wave animation) ──────────────────────────

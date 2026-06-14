@@ -495,6 +495,7 @@ type WorkerOutMessage =
   | { kind: "loading"; message: string }
   | { kind: "ready" }
   | { kind: "init-error"; message: string }
+  | { kind: "run-status"; id: number; message: string; preparing: boolean }
   | { kind: "output"; id: number; cell: { type: string; content: string } }
   | { kind: "done"; id: number }
   | { kind: "error"; id: number; message: string };
@@ -564,8 +565,20 @@ class CppWorkerRuntime implements LanguageRuntime {
     return new Promise<void>((resolve, reject) => {
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
         const msg = ev.data;
-        if (msg.kind !== "output" && msg.kind !== "done" && msg.kind !== "error") return;
+        if (
+          msg.kind !== "output" &&
+          msg.kind !== "done" &&
+          msg.kind !== "error" &&
+          msg.kind !== "run-status"
+        )
+          return;
         if (msg.id !== id) return;
+        if (msg.kind === "run-status") {
+          // Mid-run wait (the first C++ run awaiting the precompiled
+          // header) — surface the boot notice for the duration.
+          options?.onStatus?.(msg.message, msg.preparing);
+          return;
+        }
         if (msg.kind === "output") {
           emit(msg.cell as Parameters<EmitOutput>[0]);
           return;
@@ -597,6 +610,9 @@ export const cppAdapter: LanguageAdapter = {
   // CodeMirror's clike mode handles C++ syntax. `text/x-c++src` is the
   // standard MIME alias for C++ inside that mode.
   codeMirrorMode: "text/x-c++src",
+  // clang + lld WASM, the sysroot, and the C++ precompiled header
+  // from jsDelivr, compressed transfer.
+  coldDownloadMB: 45,
   // clang-format LLVM style (see formatCode) — keep in sync.
   indentWidth: 2,
   examples: EXAMPLES,
@@ -645,7 +661,7 @@ export const cppAdapter: LanguageAdapter = {
     return format(code, "main.cpp", "LLVM");
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Loading C++ worker…");
+    setLoadingMessage("Loading C++ worker…", 0.02);
     const worker = new Worker(
       new URL("./browsercc-worker.ts", import.meta.url),
     );
@@ -653,7 +669,9 @@ export const cppAdapter: LanguageAdapter = {
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
         const msg = ev.data;
         if (msg.kind === "loading") {
-          setLoadingMessage(msg.message);
+          // The worker's single loading stage covers the clang/lld
+          // toolchain download — the bulk of the boot.
+          setLoadingMessage(msg.message, 0.1);
         } else if (msg.kind === "ready") {
           worker.removeEventListener("message", onMessage);
           resolve(new CppWorkerRuntime(worker));

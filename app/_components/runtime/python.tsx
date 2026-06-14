@@ -6,6 +6,7 @@ import type {
   LanguageRuntime,
   PackageInfo,
   PlotlyFigure,
+  RunOptions,
 } from "../types";
 import { getRuffFmt } from "./ruffFmt";
 
@@ -664,9 +665,10 @@ interface OutputCellMessage {
   plot?: PlotlyFigure;
 }
 type WorkerOutMessage =
-  | { kind: "loading"; message: string }
+  | { kind: "loading"; message: string; fraction?: number }
   | { kind: "ready" }
   | { kind: "init-error"; message: string }
+  | { kind: "run-status"; id: number; message: string; preparing: boolean }
   | { kind: "output"; id: number; cell: OutputCellMessage }
   | { kind: "done"; id: number }
   | { kind: "error"; id: number; message: string }
@@ -697,16 +699,33 @@ class PyodideWorkerRuntime implements LanguageRuntime {
 
   constructor(private worker: Worker) {}
 
-  async run(code: string, emit: EmitOutput): Promise<void> {
+  async run(
+    code: string,
+    emit: EmitOutput,
+    options?: RunOptions,
+  ): Promise<void> {
     const id = ++this.nextId;
     return new Promise<void>((resolve, reject) => {
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
         const msg = ev.data;
         // Ignore messages from earlier or unrelated runs.
-        if (msg.kind !== "output" && msg.kind !== "done" && msg.kind !== "error") {
+        if (
+          msg.kind !== "output" &&
+          msg.kind !== "done" &&
+          msg.kind !== "error" &&
+          msg.kind !== "run-status"
+        ) {
           return;
         }
         if (msg.id !== id) return;
+        if (msg.kind === "run-status") {
+          // Mid-run wait notices (e.g. the deferred package set still
+          // installing on the first data-stack run) — see RunOptions.
+          // `preparing` lets the UI show the boot notice during the wait
+          // and drop it once execution actually starts.
+          options?.onStatus?.(msg.message, msg.preparing);
+          return;
+        }
         if (msg.kind === "output") {
           emit(msg.cell);
           return;
@@ -777,6 +796,10 @@ export const pythonAdapter: LanguageAdapter = {
     notes: "Runs in a Web Worker so the UI stays responsive while your code executes.",
   },
   codeMirrorMode: "python",
+  // Phase A of the two-phase boot (interpreter + stdlib — what the boot
+  // notice actually waits for); the ~32 MB package set follows in the
+  // background and surfaces via run-status if a run needs it earlier.
+  coldDownloadMB: 6,
   // ruff_fmt (PEP 8) (see formatCode) — keep in sync.
   indentWidth: 4,
   examples: EXAMPLES,
@@ -817,7 +840,7 @@ export const pythonAdapter: LanguageAdapter = {
     return format(code, "main.py");
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Starting Python worker…");
+    setLoadingMessage("Starting Python worker…", 0.02);
     // Standard Web Worker construction pattern that Next.js / Turbopack
     // recognises: it bundles the worker as a separate chunk. The worker
     // itself avoids the bundler's dynamic-import handling by loading
@@ -831,7 +854,7 @@ export const pythonAdapter: LanguageAdapter = {
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
         const msg = ev.data;
         if (msg.kind === "loading") {
-          setLoadingMessage(msg.message);
+          setLoadingMessage(msg.message, msg.fraction);
         } else if (msg.kind === "ready") {
           worker.removeEventListener("message", onMessage);
           resolve(new PyodideWorkerRuntime(worker));

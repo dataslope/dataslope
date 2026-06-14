@@ -21,6 +21,7 @@ import MdxMultipleChoiceQuestion from "@/app/_components/multipleChoice/MdxMulti
 import { Mermaid } from "@/app/_components/mdx/mermaid";
 import { SvgLabel } from "@/app/_components/mdx/SvgLabel";
 import LoadingAnimationsGallery from "@/app/_components/mdx/loadingAnimations";
+import RuntimeLoadingStates from "@/app/_components/RuntimeBootNotice";
 
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
@@ -33,6 +34,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     Mermaid,
     SvgLabel,
     LoadingAnimationsGallery,
+    RuntimeLoadingStates,
     // Fumadocs Steps/Step — a numbered vertical walkthrough. Registered
     // globally so lessons can drop `<Steps>…<Step>` in without an import,
     // matching the convention used by the components above.

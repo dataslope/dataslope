@@ -39,10 +39,13 @@ import {
   renderInstructions,
   useChallengeToasts,
   ChallengeToastViewport,
+  useCreepingBootFraction,
+  useMidRunPreparing,
   useIsDark,
   cmThemeNameFor,
   TestResultsRail,
 } from "./challengeShared";
+import { RuntimeBootNotice } from "./RuntimeBootNotice";
 import { EditorState, Compartment } from "@codemirror/state";
 import {
   EditorView,
@@ -70,7 +73,13 @@ import type {
   LanguageRuntime,
   OutputCell,
 } from "./types";
-import { getSharedRuntime, RuntimeScope } from "./runtimeRegistry";
+import { getSharedRuntime, isRuntimeReady, RuntimeScope } from "./runtimeRegistry";
+import {
+  datasetStageFilename,
+  fetchDatasetBytes,
+  type DatasetStageSpec,
+} from "./runtime/remoteDatasets";
+import { warmRuntimeOnRouteLand } from "./runtime/warmup";
 import {
   clearPersistedCode,
   loadPersistedCode,
@@ -90,6 +99,9 @@ import {
 } from "./challengeHarness";
 import { mergeInitAndEntry } from "./runtime/mergeInit";
 import styles from "./ChallengeCard.module.css";
+// Boot-notice styles are shared with `<CodeBlock>` (which already
+// shares this card's styles for its chrome — the reuse runs both ways).
+import codeBlockStyles from "./CodeBlock.module.css";
 
 type Status = "idle" | "loading" | "ready" | "running" | "error";
 type TestState = "pending" | "pass" | "fail";
@@ -190,6 +202,17 @@ export interface ChallengeCardProps {
   /** When `files` has more than one entry, the filename whose content is
    *  passed to `runtime.run()` as the entry. Defaults to the first file. */
   entryFilename?: string;
+  /** Remote dataset files staged into the runtime's working directory
+   *  before every Run / Check Answer, so init/starter/solution code
+   *  reads them like local files (e.g. `pd.read_csv("penguins.csv")`).
+   *  Each entry names a path in the dataslope/datasets repo (or a full
+   *  URL); the bytes are fetched through the globally cached dataset
+   *  path — memoised in-session and persisted via the browser's Cache
+   *  API — so every card, block, page, and visit that references the
+   *  same file shares one download. Requires an adapter whose runtime
+   *  implements `prepareFileSystem` (Python, R, JavaScript, TypeScript,
+   *  PHP, …). */
+  datasets?: DatasetStageSpec[];
   /** Force the file tab bar to render even for a single-file workspace.
    *  Multi-file workspaces always show it; this opts a one-file card in. */
   showFileTabBar?: boolean;
@@ -302,6 +325,10 @@ function useBlockId(adapter: LanguageAdapter): string {
   }, [reactId, adapter.logoText]);
 }
 
+// Stable empty list so cards without a `datasets` prop don't re-create
+// hook dependencies on every render.
+const NO_DATASETS: DatasetStageSpec[] = [];
+
 export default function ChallengeCard({
   adapter,
   title,
@@ -309,6 +336,7 @@ export default function ChallengeCard({
   instructions,
   files,
   entryFilename,
+  datasets,
   showFileTabBar = false,
   tests,
 }: ChallengeCardProps) {
@@ -332,6 +360,16 @@ export default function ChallengeCard({
     (entryFilename && workspaceFiles.find((f) => f.filename === entryFilename)
       ? entryFilename
       : workspaceFiles[0].filename) ?? workspaceFiles[0].filename;
+
+  // Remote datasets staged before every run (see the `datasets` prop).
+  // Mirrored into a ref so the mount-once warm-up effect can prefetch
+  // them without re-registering its IntersectionObserver when MDX
+  // re-creates the prop array.
+  const cardDatasets = datasets ?? NO_DATASETS;
+  const datasetsRef = useRef(cardDatasets);
+  useEffect(() => {
+    datasetsRef.current = cardDatasets;
+  }, [cardDatasets]);
 
   // Per-file read-only init code (trimmed). Init now belongs to a file,
   // so the init drawer + the editor's line-number offset both track
@@ -434,6 +472,21 @@ export default function ChallengeCard({
     null,
   );
   const [statusMessage, setStatusMessage] = useState<string>("");
+  // True while a *cold* runtime download is in flight, so the boot
+  // notice only promises "first run only" when it really is the first
+  // run. Mirrors `<CodeBlock>`.
+  const [bootCold, setBootCold] = useState(false);
+  // Latest stage-floor fraction reported by the adapter's boot (null
+  // until the adapter reports one); smoothed for display below.
+  const [bootFraction, setBootFraction] = useState<number | null>(null);
+  // Mid-run blocking waits (e.g. Python's on-first-run package install)
+  // — surfaces the boot notice during the wait. Callbacks are stable.
+  const {
+    preparing: midRunPreparing,
+    message: midRunMessage,
+    report: reportPrepare,
+    reset: resetPrepare,
+  } = useMidRunPreparing();
   const [outputs, setOutputs] = useState<OutputCell[]>([]);
   const [elapsed, setElapsed] = useState<string>("");
   const [initExpanded, setInitExpanded] = useState(false);
@@ -851,8 +904,28 @@ export default function ChallengeCard({
       mySeq: number,
     ): Promise<{ cells: OutputCell[]; elapsedMs: number }> => {
       setOutputs([]);
+      setBootCold(!isRuntimeReady(RuntimeScope.Fumadocs, adapter.id));
+      setBootFraction(null);
+      resetPrepare();
       setStatus("loading");
       setStatusMessage("Initializing runtime…");
+
+      // Kick dataset downloads in parallel with the runtime boot so a
+      // cold first Run overlaps the two waits. Usually instant: the
+      // bytes are memoised in-session and persisted in the Cache API.
+      // The no-op catch keeps an early bail-out (superseded run, boot
+      // failure) from surfacing an unhandled rejection; awaiting the
+      // promise below still observes the real error.
+      const datasetsPromise =
+        cardDatasets.length > 0
+          ? Promise.all(
+              cardDatasets.map(async (spec) => ({
+                filename: datasetStageFilename(spec),
+                bytes: await fetchDatasetBytes(spec.path),
+              })),
+            )
+          : null;
+      datasetsPromise?.catch(() => {});
 
       // Re-use the shared per-adapter runtime — see runtimeRegistry.ts.
       // Once Pyodide / WebR / CheerpJ has loaded for any block on this
@@ -862,17 +935,35 @@ export default function ChallengeCard({
       // every execution, so cards still can't observe each other's
       // variable state.
       if (!runtimeRef.current) {
+        // The registry subscribes this callback to the in-flight boot
+        // even when a silent warm-up started it, replaying the current
+        // stage — so a Run click mid-boot shows live progress.
         runtimeRef.current = await getSharedRuntime(
           RuntimeScope.Fumadocs,
           adapter,
-          (msg) => {
-            if (runSeqRef.current === mySeq) setStatusMessage(msg);
+          (msg, fraction) => {
+            if (runSeqRef.current !== mySeq) return;
+            setStatusMessage(msg);
+            if (fraction !== undefined) setBootFraction(fraction);
           },
         );
       }
       const runtime = runtimeRef.current;
       if (runSeqRef.current !== mySeq)
         return { cells: [], elapsedMs: 0 };
+
+      let datasetFiles: { filename: string; bytes: Uint8Array }[] = [];
+      if (datasetsPromise) {
+        if (!runtime.prepareFileSystem) {
+          throw new Error(
+            `The ${adapter.runtimeInfo.language} runtime cannot stage dataset files (no virtual file system) — remove the card's \`datasets\` prop.`,
+          );
+        }
+        setStatusMessage("Downloading dataset files…");
+        datasetFiles = await datasetsPromise;
+        if (runSeqRef.current !== mySeq)
+          return { cells: [], elapsedMs: 0 };
+      }
 
       setStatus("running");
       setStatusMessage("Running…");
@@ -881,29 +972,40 @@ export default function ChallengeCard({
       let nextOutputId = 0;
       const cells: OutputCell[] = [];
 
-      // Multi-file workspaces: stage every file into the runtime VFS so
-      // imports resolve. The entry file's bytes mirror what we pass to
-      // `run()` below, including any init prelude / harness suffix the
-      // caller bolted on.
+      // Stage files into the runtime VFS: the card's remote datasets
+      // (so init/starter code can read them like local files) and — for
+      // multi-file workspaces — every workspace file, so imports
+      // resolve. The entry file's bytes mirror what we pass to `run()`
+      // below, including any init prelude / harness suffix the caller
+      // bolted on.
       //
       // Single-file cards pass their source straight to `run()` and must
       // NOT pre-stage it: some runtimes (CheerpJ/Java, .NET/C#) compile the
       // staged file set when the VFS is populated, and with no
       // `entryFilename` (single-file) they then can't locate `main`, so the
       // program produces no output. This mirrors <CodeBlock>, which only
-      // stages for multi-file workspaces.
-      if (isMultiFile && runtime.prepareFileSystem) {
+      // stages for multi-file workspaces. (Staging only *dataset* files is
+      // safe: those runtimes ignore non-source files.)
+      if (
+        (isMultiFile || datasetFiles.length > 0) &&
+        runtime.prepareFileSystem
+      ) {
         const fileMap = new Map<string, Uint8Array>();
-        const encoder = new TextEncoder();
-        for (const [name, content] of filesSnapshot) {
-          fileMap.set(
-            name,
-            encoder.encode(
-              name === resolvedEntryFilename
-                ? entrySource
-                : effectiveSourceFor(name, content),
-            ),
-          );
+        // Dataset bytes first, so a (misauthored) workspace file with
+        // the same name deterministically wins.
+        for (const f of datasetFiles) fileMap.set(f.filename, f.bytes);
+        if (isMultiFile) {
+          const encoder = new TextEncoder();
+          for (const [name, content] of filesSnapshot) {
+            fileMap.set(
+              name,
+              encoder.encode(
+                name === resolvedEntryFilename
+                  ? entrySource
+                  : effectiveSourceFor(name, content),
+              ),
+            );
+          }
         }
         try {
           await runtime.prepareFileSystem(fileMap);
@@ -952,7 +1054,18 @@ export default function ChallengeCard({
               cells.push(full);
             }
           },
-          isMultiFile ? { entryFilename: resolvedEntryFilename } : undefined,
+          {
+            entryFilename: isMultiFile ? resolvedEntryFilename : undefined,
+            // Mid-run waits (e.g. Python's deferred package set on the
+            // first run, or an on-demand `import`) show the boot notice
+            // for the duration instead of a bare "Running…" while
+            // megabytes download.
+            onStatus: (message, preparing) => {
+              if (runSeqRef.current !== mySeq) return;
+              setStatusMessage(message);
+              reportPrepare(message, preparing);
+            },
+          },
         );
       } finally {
         // Hold the running overlay for at least MIN_RUN_OVERLAY_MS so
@@ -969,7 +1082,15 @@ export default function ChallengeCard({
       const elapsedMs = performance.now() - startedAt;
       return { cells, elapsedMs };
     },
-    [adapter, isMultiFile, resolvedEntryFilename, effectiveSourceFor],
+    [
+      adapter,
+      cardDatasets,
+      isMultiFile,
+      resolvedEntryFilename,
+      effectiveSourceFor,
+      reportPrepare,
+      resetPrepare,
+    ],
   );
 
   const formatElapsed = (ms: number) =>
@@ -1144,9 +1265,19 @@ export default function ChallengeCard({
     runRef.current = run;
   }, [run]);
 
+  // Warm the shared runtime as soon as the page lands (idle-scheduled,
+  // Save-Data-guarded, one boot at a time — see runtime/warmup.ts), so
+  // the time a reader spends on the page's prose pays for the runtime
+  // download instead of the first Run/Submit click.
+  useEffect(() => {
+    warmRuntimeOnRouteLand(RuntimeScope.Fumadocs, adapter);
+  }, [adapter]);
+
   // Warm the shared runtime when the card first scrolls into view, so the
   // learner's first Run/Submit reuses an already-initialised runtime instead
-  // of triggering a cold download on click. Best-effort and deduped across all
+  // of triggering a cold download on click. Kept as the fallback for
+  // Save-Data users (the route-land warm-up skips them) and for additional
+  // languages further down the page. Best-effort and deduped across all
   // cards/blocks of the same language by the registry; failures are swallowed
   // so an actual Run can retry and surface the real error.
   useEffect(() => {
@@ -1165,6 +1296,13 @@ export default function ChallengeCard({
           .catch(() => {
             warmedRef.current = false;
           });
+        // Prefetch the card's datasets alongside the runtime, so a cold
+        // Run/Submit finds both the engine and the data already local.
+        // Also best-effort: the Run path re-requests (and reports)
+        // failures.
+        for (const spec of datasetsRef.current) {
+          void fetchDatasetBytes(spec.path).catch(() => {});
+        }
       },
       { rootMargin: "200px" },
     );
@@ -1405,6 +1543,19 @@ export default function ChallengeCard({
   }, [adapter, toasts]);
 
   const isBusy = status === "loading" || status === "running";
+
+  // Smoothed boot fraction for the wave progress bar (null → spinner only).
+  const bootDisplayFraction = useCreepingBootFraction(
+    bootFraction,
+    status === "loading",
+  );
+
+  // Show the boot notice during a cold boot (status "loading") and during
+  // a mid-run blocking wait (e.g. installing packages mid-run, while
+  // status is "running"). The mid-run case has no runtime download and no
+  // determinate fraction — just the loader + the wait message.
+  const showBootNotice =
+    status === "loading" || (status === "running" && midRunPreparing);
 
   // Code (or a readable summary of a declarative stdout expectation) per
   // test id, surfaced by the test-details popover in the results rail.
@@ -1873,26 +2024,53 @@ export default function ChallengeCard({
       {/* ── Output panel ── */}
       {(outputs.length > 0 || isBusy) && (
         <div className={styles.outputPanel} aria-live="polite">
-          <div className={styles.outputHeader}>
-            <div
-              className={styles.accentBar}
-              data-error={outputs.some((c) => c.type === "stderr")}
-            />
-            <span
-              className={styles.outputLabel}
-              data-error={outputs.some((c) => c.type === "stderr")}
-            >
-              Output
-            </span>
-            {elapsed && (
-              <span className={styles.outputTime}>
-                <Timer size={12} aria-hidden="true" />
-                {elapsed}
+          {/* The "Output" header is hidden while the boot notice (loading
+              animation) is showing — there's no output yet, just setup.
+              It returns the moment user code actually runs. */}
+          {!showBootNotice && (
+            <div className={styles.outputHeader}>
+              <div
+                className={styles.accentBar}
+                data-error={outputs.some((c) => c.type === "stderr")}
+              />
+              <span
+                className={styles.outputLabel}
+                data-error={outputs.some((c) => c.type === "stderr")}
+              >
+                Output
               </span>
-            )}
-          </div>
+              {elapsed && (
+                <span className={styles.outputTime}>
+                  <Timer size={12} aria-hidden="true" />
+                  {elapsed}
+                </span>
+              )}
+            </div>
+          )}
+          {showBootNotice && (
+            // Same boot affordance as `<CodeBlock>`: the brand
+            // assemble-and-quarter-turn loader, staged copy with the
+            // cold-download size, and a determinate bar once the adapter
+            // reports stage fractions (see RuntimeBootNotice). Also shown
+            // for mid-run blocking waits (package install) — no runtime
+            // download or fraction in that case.
+            <div className={codeBlockStyles.bootNoticeWrap}>
+              <RuntimeBootNotice
+                language={adapter.runtimeInfo.language}
+                statusMessage={midRunPreparing ? midRunMessage : statusMessage}
+                cold={status === "loading" && bootCold}
+                downloadMB={
+                  status === "loading" ? adapter.coldDownloadMB : undefined
+                }
+                fraction={status === "loading" ? bootDisplayFraction : null}
+                testId="challenge-boot"
+              />
+            </div>
+          )}
           {outputs.length === 0 ? (
-            <div className={styles.outputEmpty}>Running…</div>
+            !showBootNotice && (
+              <div className={styles.outputEmpty}>Running…</div>
+            )
           ) : (
             <div className={styles.outputBody}>
               {outputs.map((cell) => (

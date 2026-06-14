@@ -4,6 +4,7 @@ import type {
   LanguageAdapter,
   LanguageRuntime,
   PackageInfo,
+  RunOptions,
 } from "../types";
 
 const EXAMPLES: ExampleSnippet[] = [
@@ -906,22 +907,35 @@ class WebRRuntime implements LanguageRuntime {
     for (const p of nextPaths) this.stagedPaths.add(p);
   }
 
-  private async ensurePackages(code: string): Promise<string> {
+  private async ensurePackages(
+    code: string,
+    onStatus?: RunOptions["onStatus"],
+  ): Promise<string> {
     const referenced = extractLibraryCalls(code);
     const toInstall = referenced.filter((p) => !this.installedPackages.has(p));
     if (toInstall.length === 0) return "";
     for (const p of toInstall) this.installedPackages.add(p);
+    // A real mid-run download — surface the boot notice for the duration
+    // (the main thread debounces it, so a fast install doesn't flash).
+    const label = `Installing R package${toInstall.length > 1 ? "s" : ""}: ${toInstall.join(", ")}…`;
+    onStatus?.(label, true);
     try {
       await this.webR.installPackages(toInstall);
       return "";
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       return `Failed to auto-install R package(s) [${toInstall.join(", ")}]: ${msg}\n`;
+    } finally {
+      onStatus?.("Running…", false);
     }
   }
 
-  async run(code: string, emit: EmitOutput): Promise<void> {
-    const installWarnings = await this.ensurePackages(code);
+  async run(
+    code: string,
+    emit: EmitOutput,
+    options?: RunOptions,
+  ): Promise<void> {
+    const installWarnings = await this.ensurePackages(code, options?.onStatus);
 
     await this.webR.evalRVoid(
       `rm(list = ls(envir = .GlobalEnv, all.names = TRUE), envir = .GlobalEnv)
@@ -1231,6 +1245,8 @@ export const rAdapter: LanguageAdapter = {
     notes: "Runs entirely in the browser via WebAssembly — no server roundtrip.",
   },
   codeMirrorMode: "r",
+  // R WASM image + base VFS, compressed transfer (webR 0.6).
+  coldDownloadMB: 15,
   // styler's tidyverse style (see formatCode) — keep in sync.
   indentWidth: 2,
   examples: EXAMPLES,
@@ -1266,18 +1282,20 @@ export const rAdapter: LanguageAdapter = {
     return formatRWithStyler(code);
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Loading WebR…");
+    setLoadingMessage("Loading WebR…", 0.03);
     // @ts-expect-error -- webr ships without bundled type declarations
     const { WebR } = (await import("webr")) as { WebR: new () => WebRInstance };
 
-    setLoadingMessage("Initialising R runtime…");
+    // webR.init() is the heavy stage: it downloads and instantiates the
+    // R WASM image (~15 MB compressed).
+    setLoadingMessage("Initialising R runtime…", 0.12);
     const webR = new WebR();
     await webR.init();
     // Expose this session to the styler-based formatter (see formatRWithStyler)
     // so the "Format code" button reuses it instead of starting a second R.
     activeWebR = webR;
 
-    setLoadingMessage("Configuring graphics device…");
+    setLoadingMessage("Configuring graphics device…", 0.9);
     await webR.evalRVoid(
       `options(device = function() webr::canvas(width = 720, height = 432, capture = TRUE))`,
     );

@@ -62,6 +62,19 @@ export default function RootLayout({
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/dataslope-logo-blue.svg" type="image/svg+xml" />
+        {/* Warm up the CDNs the WASM runtimes and sample datasets load
+            from, so the first runtime boot skips the DNS + TLS round
+            trips. Full preconnect for the two hosts almost every page
+            hits (jsDelivr serves Pyodide, sqlite-wasm, PGlite, the .NET
+            assemblies, browsercc and the datasets; raw.githubusercontent
+            is the datasets fallback); cheap dns-prefetch for the
+            language-specific rest. */}
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://raw.githubusercontent.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://webr.r-wasm.org" />
+        <link rel="dns-prefetch" href="https://cjrtnc.leaningtech.com" />
+        <link rel="dns-prefetch" href="https://esm.sh" />
+        <link rel="dns-prefetch" href="https://unpkg.com" />
         <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
       </head>
       <body>{children}</body>

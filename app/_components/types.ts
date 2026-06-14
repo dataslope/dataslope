@@ -95,6 +95,17 @@ export interface RunOptions {
    *  this to pick the right translation unit / class to compile and
    *  to exclude that file from the "extra sources" list. */
   entryFilename?: string;
+  /** Optional transient status line for waits that happen *inside* a
+   *  run — e.g. Python's deferred package set still installing on the
+   *  first run after the two-phase boot, or R installing a `library()`
+   *  on demand. Surfaces in the caller's status text; adapters that
+   *  never wait mid-run simply ignore it.
+   *
+   *  `preparing` marks a *blocking* wait (a download/install before the
+   *  user's code runs) so the surface can show the runtime boot notice
+   *  for the duration and drop it once execution starts. Omit / false
+   *  for ordinary status text. */
+  onStatus?: (message: string, preparing?: boolean) => void;
 }
 
 export interface CompletionResult {
@@ -194,6 +205,12 @@ export interface LanguageAdapter {
    *  filename is the chosen entry. Defaults to the basename without
    *  extension (e.g. `"main.c"` → `"main"`). */
   entryLabel?: (filename: string) => string;
+  /** Approximate compressed download for a cold boot, in MB. Shown in
+   *  the first-run boot copy ("Downloading the Python runtime (~6 MB)…")
+   *  so long waits come with a size expectation. Keep in sync with the
+   *  version pins the adapter maintains; omit for runtimes that boot
+   *  from local/bundled assets in well under a second. */
+  coldDownloadMB?: number;
   /** Render-only: footer note shown at the bottom of the packages drawer. */
   packagesFooter: React.ReactNode;
   /** Build the snippet inserted at the top of the editor when the user
@@ -203,8 +220,16 @@ export interface LanguageAdapter {
    *  the insertion (and surface a "already imported" toast) when the
    *  relevant import statement is present. */
   hasImport(code: string, packageName: string): boolean;
-  /** Initialise the runtime. Called once after scripts/stylesheets load. */
-  init(setLoadingMessage: (message: string) => void): Promise<LanguageRuntime>;
+  /** Initialise the runtime. Called once after scripts/stylesheets load.
+   *  `setLoadingMessage` reports boot progress: a human-readable stage
+   *  line plus an optional coarse overall fraction (0..1) where the
+   *  adapter can estimate one — the UI renders a determinate-ish bar
+   *  when fractions arrive and falls back to a spinner when they don't.
+   *  Report stage *floors* (the UI animates within a stage) and never
+   *  report 1 — resolving the promise is what means "ready". */
+  init(
+    setLoadingMessage: (message: string, fraction?: number) => void,
+  ): Promise<LanguageRuntime>;
   /** Optional: auto-format the given source code and return the formatted
    *  string. Implemented by adapters that ship a browser-side formatter
    *  (e.g. the C adapter uses clang-format via WASM). The playground UI
