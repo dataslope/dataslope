@@ -44,7 +44,7 @@ import {
   cmThemeNameFor,
   TestResultsRail,
 } from "./challengeShared";
-import { DiamondSpinner, LogoWaveBar } from "./mdx/loadingAnimations";
+import { RuntimeBootNotice } from "./RuntimeBootNotice";
 import { EditorState, Compartment } from "@codemirror/state";
 import {
   EditorView,
@@ -2015,45 +2015,19 @@ export default function ChallengeCard({
             )}
           </div>
           {status === "loading" && (
-            // Same boot affordance as `<CodeBlock>`: brand spinner,
-            // staged copy with the cold-download size, and a wave
-            // progress bar once the adapter reports stage fractions.
+            // Same boot affordance as `<CodeBlock>`: the brand
+            // assemble-and-quarter-turn loader, staged copy with the
+            // cold-download size, and a determinate bar once the adapter
+            // reports stage fractions (see RuntimeBootNotice).
             <div className={codeBlockStyles.bootNoticeWrap}>
-              <div
-                className={codeBlockStyles.bootNotice}
-                data-testid="challenge-boot"
-              >
-                <span className={codeBlockStyles.bootGlyph} aria-hidden>
-                  <DiamondSpinner size={22} label="" />
-                </span>
-                <span className={codeBlockStyles.bootNoticeText}>
-                  <span className={codeBlockStyles.bootNoticeTitle}>
-                    {statusMessage ||
-                      `Setting up the ${adapter.runtimeInfo.language} runtime…`}
-                  </span>
-                  {bootCold && (
-                    <span className={codeBlockStyles.bootNoticeHint}>
-                      Downloading the {adapter.runtimeInfo.language} runtime
-                      {adapter.coldDownloadMB
-                        ? ` (~${adapter.coldDownloadMB} MB)`
-                        : ""}{" "}
-                      — this happens once; later runs are instant.
-                    </span>
-                  )}
-                </span>
-              </div>
-              {bootDisplayFraction != null && (
-                <div className={codeBlockStyles.bootProgress}>
-                  <LogoWaveBar
-                    fraction={bootDisplayFraction}
-                    height={12}
-                    label={
-                      statusMessage ||
-                      `Setting up the ${adapter.runtimeInfo.language} runtime…`
-                    }
-                  />
-                </div>
-              )}
+              <RuntimeBootNotice
+                language={adapter.runtimeInfo.language}
+                statusMessage={statusMessage}
+                cold={bootCold}
+                downloadMB={adapter.coldDownloadMB}
+                fraction={bootDisplayFraction}
+                testId="challenge-boot"
+              />
             </div>
           )}
           {outputs.length === 0 ? (

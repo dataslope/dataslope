@@ -21,7 +21,7 @@ import {
   PlayIcon,
   useCreepingBootFraction,
 } from "./challengeShared";
-import { DiamondSpinner, LogoWaveBar } from "./mdx/loadingAnimations";
+import { RuntimeBootNotice } from "./RuntimeBootNotice";
 import { EditorState, Compartment } from "@codemirror/state";
 import {
   EditorView,
@@ -1459,38 +1459,14 @@ function CodeBlockInner({
           </div>
           {status === "loading" && (
             <div className={styles.bootNoticeWrap}>
-              <div className={styles.bootNotice} data-testid="codeblock-boot">
-                <span className={styles.bootGlyph} aria-hidden>
-                  <DiamondSpinner size={22} label="" />
-                </span>
-                <span className={styles.bootNoticeText}>
-                  <span className={styles.bootNoticeTitle}>
-                    {statusMessage ||
-                      `Setting up the ${adapter.runtimeInfo.language} runtime…`}
-                  </span>
-                  {bootCold && (
-                    <span className={styles.bootNoticeHint}>
-                      Downloading the {adapter.runtimeInfo.language} runtime
-                      {adapter.coldDownloadMB
-                        ? ` (~${adapter.coldDownloadMB} MB)`
-                        : ""}{" "}
-                      — this happens once; later runs are instant.
-                    </span>
-                  )}
-                </span>
-              </div>
-              {bootDisplayFraction != null && (
-                <div className={styles.bootProgress}>
-                  <LogoWaveBar
-                    fraction={bootDisplayFraction}
-                    height={12}
-                    label={
-                      statusMessage ||
-                      `Setting up the ${adapter.runtimeInfo.language} runtime…`
-                    }
-                  />
-                </div>
-              )}
+              <RuntimeBootNotice
+                language={adapter.runtimeInfo.language}
+                statusMessage={statusMessage}
+                cold={bootCold}
+                downloadMB={adapter.coldDownloadMB}
+                fraction={bootDisplayFraction}
+                testId="codeblock-boot"
+              />
             </div>
           )}
           {outputs.length > 0 ? (

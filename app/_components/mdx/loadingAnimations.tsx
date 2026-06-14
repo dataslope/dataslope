@@ -499,45 +499,6 @@ export function LogoWave({
   );
 }
 
-// ─── Wave progress bar ─────────────────────────────────────────────────
-
-export interface LogoWaveBarProps {
-  /** Progress in 0..1. The filled region reveals the animated brand
-   *  wave; the rest stays a subtle track. */
-  fraction: number;
-  /** Bar height in px. */
-  height?: number;
-  label?: string;
-}
-
-/** Determinate progress bar whose fill is the brand wave: a track with
- *  a width-animated window that reveals `<LogoWave>` underneath. Used
- *  by the runtime boot notices, where adapters report coarse stage
- *  fractions. The wave inside is aspect-true and wider than any
- *  container, so the window only ever crops it — no stretching. */
-export function LogoWaveBar({
-  fraction,
-  height = 12,
-  label = "Loading…",
-}: LogoWaveBarProps) {
-  const pct = Math.max(0, Math.min(1, fraction)) * 100;
-  return (
-    <span
-      className={styles.waveBar}
-      style={{ height }}
-      role="progressbar"
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-valuenow={Math.round(pct)}
-      aria-label={label}
-    >
-      <span className={styles.waveBarFill} style={{ width: `${pct}%` }}>
-        <LogoWave height={height} duration={4.8} label="" />
-      </span>
-    </span>
-  );
-}
-
 // ─── Demo gallery (the /learn/loading-animations page) ────────────────
 
 function DemoCard({
