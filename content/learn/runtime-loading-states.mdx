@@ -1,85 +1,56 @@
 ---
 title: Runtime Loading States
-description: The first-execution loading UI for code blocks and challenge cards — the brand boot notice in every state, with the JSX that renders each.
+description: The first-execution loading UI for code blocks and challenge cards — the brand boot notice shown in the real code-block layout, with the JSX that renders each.
 ---
 
 ## Overview
 
 The first time a learner runs code on a page, the language runtime (Pyodide, WebR, CheerpJ, .NET, the clang toolchain…) has to download and instantiate — a multi-second wait on a cold cache. The **runtime boot notice** turns that wait into something legible: the brand **assemble-and-quarter-turn** mark, the current setup stage, a one-time size hint, and a determinate progress bar.
 
-It is one shared component, [`<RuntimeBootNotice>`](https://github.com/dataslope/dataslope/blob/main/app/_components/RuntimeBootNotice.tsx), rendered by both `<CodeBlock>` and `<ChallengeCard>` while their runtime is `loading`. The bar is driven by coarse **stage fractions** each adapter reports through the runtime registry; between stages a smoothing hook eases it forward so it never looks frozen, and it deliberately never reaches 100% — the notice unmounts the instant the runtime is ready.
+It is one shared component, [`<RuntimeBootNotice>`](https://github.com/dataslope/dataslope/blob/main/app/_components/RuntimeBootNotice.tsx), rendered by both `<CodeBlock>` and `<ChallengeCard>` in their output panel while the runtime is `loading`. The bar is driven by coarse **stage fractions** each adapter reports through the runtime registry; between stages a smoothing hook eases it forward so it never looks frozen, and it deliberately never reaches 100% — the notice unmounts the instant the runtime is ready.
 
-## States
+> **Why you rarely see this on a real lesson:** every block warms its runtime in the background as soon as the page lands (idle-scheduled, one boot at a time, skipped on Save-Data). By the time you finish reading and click **Run**, the runtime is usually already warm, so the boot is instant. The previews below are static (no runtime) so the loading display can be reviewed on demand.
 
-Each example below is the real component, with the exact JSX underneath.
+## In a code block
 
-<RuntimeLoadingStates />
+The loading display in context — the real code-block card chrome (header, editor, action bar, output panel) frozen in its loading state. The first example animates through a simulated boot.
 
-## See it live
+<RuntimeLoadingStates section="code-block" />
 
-The blocks below boot a real runtime. The **first** Run on this page is a cold start, so you'll see the notice above in action; later runs are instant because the runtime is shared across the whole `/learn` route.
+## The notice on its own
 
-A stdlib-only snippet runs the moment the interpreter is ready (Python's two-phase boot doesn't wait for the data stack):
+The same `<RuntimeBootNotice>` across representative states, isolated from the card chrome.
 
-<CodeBlock
-  adapter="python"
-  files={[
-    {
-      filename: "main.py",
-      starterCode: `import sys\nprint("Python", sys.version.split()[0], "is ready!")`,
-    },
-  ]}
-/>
+<RuntimeLoadingStates section="notice" />
 
-Importing `pandas` triggers the second phase — if the data packages are still downloading, the run shows the "Installing the Python data packages — first run only…" notice before it executes:
+## Using the components
 
-<CodeBlock
-  adapter="python"
-  files={[
-    {
-      filename: "main.py",
-      starterCode: `import pandas as pd\n\ndf = pd.DataFrame({"city": ["NYC", "SF", "LA"], "temp": [72, 64, 81]})\ndf`,
-    },
-  ]}
-/>
-
-A challenge card shows the same boot notice in its output panel on the first Check Answer:
-
-<ChallengeCard
-  adapter="python"
-  title="Warm-up: sum a list"
-  instructions={`Return the sum of \`nums\` in a variable called \`total\`.`}
-  files={[
-    {
-      filename: "main.py",
-      initCode: `nums = [4, 8, 15, 16, 23, 42]`,
-      starterCode: `total = 0`,
-      solutionCode: `total = sum(nums)`,
-    },
-  ]}
-  tests={[
-    {
-      id: "total",
-      name: "`total` is correct",
-      description: "total equals the sum of nums",
-      code: `assert total == 108, f"expected 108, got {total}"`,
-    },
-  ]}
-/>
-
-## Using the component
-
-`<RuntimeBootNotice>` is presentational and self-contained (it carries its own theme tokens), so it renders correctly embedded in a block or standalone:
+Both pieces are presentational and self-contained (they carry their own theme tokens), so they render correctly embedded in a block or standalone:
 
 ```tsx
-import { RuntimeBootNotice } from "@/app/_components/RuntimeBootNotice";
+import {
+  RuntimeBootNotice,
+  CodeBlockLoadingPreview,
+} from "@/app/_components/RuntimeBootNotice";
 
+// Just the notice (what the output panel renders while loading):
 <RuntimeBootNotice
   language="Python"
   statusMessage="Loading Pyodide…"  // current stage from the adapter
   cold                              // first-run download in flight
   downloadMB={6}                    // adapter.coldDownloadMB
   fraction={0.42}                   // smoothed 0..1, or null = indeterminate
+/>;
+
+// The whole code-block layout, frozen loading (static preview, no runtime):
+<CodeBlockLoadingPreview
+  language="Python"
+  version="3.13.2"
+  code={`import pandas as pd\n# …`}
+  statusMessage="Loading Pyodide…"
+  cold
+  downloadMB={6}
+  fraction={0.42}
 />;
 ```
 
@@ -90,5 +61,7 @@ import { RuntimeBootNotice } from "@/app/_components/RuntimeBootNotice";
 | `cold` | When true, shows the size hint and the "happens once" reassurance. |
 | `downloadMB` | Approximate first-run download size in MB. |
 | `fraction` | Smoothed boot fraction `0..1`; `null` renders the loader and copy with no bar. |
+
+`<CodeBlockLoadingPreview>` adds `version`, `langId` (for the header glyph), and `code` (the faux editor contents) on top of those.
 
 The brand loader itself is [`<DiamondAssembleTurnLoader>`](/learn/loading-animations) — see the Loading Animations page for the full set of brand spinners and the wave.

@@ -10,8 +10,6 @@
    token scopes. */
 
 .notice {
-  --bn-bg: var(--ds-blue-50, #e8f2ff);
-  --bn-border: color-mix(in srgb, var(--ds-blue-500, #148cff) 22%, transparent);
   --bn-text: var(--ds-gray-900, #111827);
   --bn-dim: var(--ds-gray-500, #6b7280);
   --bn-accent: var(--ds-blue-600, #0878dd);
@@ -20,26 +18,16 @@
   display: flex;
   align-items: center;
   gap: 13px;
-  padding: 12px 14px;
-  border: 1px solid var(--bn-border);
-  border-radius: 10px;
-  background: var(--bn-bg);
+  padding: 4px 0;
   color: var(--bn-text);
   font-size: 12.5px;
-  /* A soft inner glow so the panel reads as "active / working". */
-  box-shadow: inset 0 0 0 1px
-    color-mix(in srgb, var(--ds-white, #fff) 30%, transparent);
 }
 
 :global(html.dark) .notice {
-  --bn-bg: color-mix(in srgb, var(--ds-blue-500, #148cff) 12%, #121212);
-  --bn-border: color-mix(in srgb, var(--ds-blue-400, #5ba7ff) 26%, transparent);
   --bn-text: #e6edf6;
   --bn-dim: #93a4b8;
   --bn-accent: var(--ds-blue-400, #5ba7ff);
   --bn-track: color-mix(in srgb, var(--ds-blue-400, #5ba7ff) 20%, transparent);
-  box-shadow: inset 0 0 0 1px
-    color-mix(in srgb, var(--ds-blue-400, #5ba7ff) 8%, transparent);
 }
 
 /* The brand loader (DiamondAssembleTurnLoader) tinted to the accent. */
@@ -228,4 +216,36 @@
   font: inherit;
   background: none;
   padding: 0;
+}
+
+/* ── Faux editor (CodeBlockLoadingPreview) ──────────────────────────────
+   A static code listing standing in for the live CodeMirror editor, so
+   the preview shows the code-block layout without a runtime. Inherits the
+   block's --cb-* tokens (it renders inside .card .outputScope). */
+
+.previewEditor {
+  padding: 12px 4px;
+  font-family: var(--ch-font-mono, "JetBrains Mono", ui-monospace, monospace);
+  font-size: 13px;
+  line-height: 1.65;
+  overflow-x: auto;
+}
+
+.previewLine {
+  display: flex;
+}
+
+.previewGutter {
+  flex: none;
+  width: 40px;
+  padding-right: 14px;
+  text-align: right;
+  color: var(--cb-text-dim, #9ca3af);
+  opacity: 0.55;
+  user-select: none;
+}
+
+.previewCode {
+  white-space: pre;
+  color: var(--cb-text, #111827);
 }
