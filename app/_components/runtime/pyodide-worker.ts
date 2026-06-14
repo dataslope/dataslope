@@ -56,7 +56,7 @@ type OutMessage =
   | { kind: "loading"; message: string; fraction?: number }
   | { kind: "ready" }
   | { kind: "init-error"; message: string }
-  | { kind: "run-status"; id: number; message: string }
+  | { kind: "run-status"; id: number; message: string; preparing: boolean }
   | { kind: "output"; id: number; cell: OutputCellMessage }
   | { kind: "done"; id: number }
   | { kind: "error"; id: number; message: string }
@@ -528,9 +528,10 @@ async function runCode(
       kind: "run-status",
       id,
       message: "Installing the Python data packages — first run only…",
+      preparing: true,
     });
     await ensurePackages();
-    post({ kind: "run-status", id, message: "Running…" });
+    post({ kind: "run-status", id, message: "Running…", preparing: false });
   }
 
   let stdout = "";
@@ -542,6 +543,15 @@ async function runCode(
   // (e.g. `import sklearn` triggers loading of scikit-learn). Suppress the
   // loader's progress messages so they don't pollute the captured user
   // stdout — see the comment on `pkgCallbacks` in `initPyodide()`.
+  // `preparing: true` surfaces the boot notice during the download; the
+  // main thread debounces it, so an all-cached run (nothing to fetch)
+  // doesn't flash the notice.
+  post({
+    kind: "run-status",
+    id,
+    message: "Installing packages…",
+    preparing: true,
+  });
   try {
     await pyodide.loadPackagesFromImports(code, {
       messageCallback: (m: string) => {
@@ -558,6 +568,9 @@ async function runCode(
     stderr += `Failed to auto-load packages: ${
       err instanceof Error ? err.message : String(err)
     }\n`;
+  } finally {
+    // End the preparing window — the user's code is about to execute.
+    post({ kind: "run-status", id, message: "Running…", preparing: false });
   }
 
   await pyodide.runPythonAsync("_pg_reset_user_globals(); _display_outputs.clear()");

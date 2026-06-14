@@ -4,6 +4,7 @@ import type {
   LanguageAdapter,
   LanguageRuntime,
   PackageInfo,
+  RunOptions,
 } from "../types";
 
 const EXAMPLES: ExampleSnippet[] = [
@@ -906,22 +907,35 @@ class WebRRuntime implements LanguageRuntime {
     for (const p of nextPaths) this.stagedPaths.add(p);
   }
 
-  private async ensurePackages(code: string): Promise<string> {
+  private async ensurePackages(
+    code: string,
+    onStatus?: RunOptions["onStatus"],
+  ): Promise<string> {
     const referenced = extractLibraryCalls(code);
     const toInstall = referenced.filter((p) => !this.installedPackages.has(p));
     if (toInstall.length === 0) return "";
     for (const p of toInstall) this.installedPackages.add(p);
+    // A real mid-run download — surface the boot notice for the duration
+    // (the main thread debounces it, so a fast install doesn't flash).
+    const label = `Installing R package${toInstall.length > 1 ? "s" : ""}: ${toInstall.join(", ")}…`;
+    onStatus?.(label, true);
     try {
       await this.webR.installPackages(toInstall);
       return "";
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       return `Failed to auto-install R package(s) [${toInstall.join(", ")}]: ${msg}\n`;
+    } finally {
+      onStatus?.("Running…", false);
     }
   }
 
-  async run(code: string, emit: EmitOutput): Promise<void> {
-    const installWarnings = await this.ensurePackages(code);
+  async run(
+    code: string,
+    emit: EmitOutput,
+    options?: RunOptions,
+  ): Promise<void> {
+    const installWarnings = await this.ensurePackages(code, options?.onStatus);
 
     await this.webR.evalRVoid(
       `rm(list = ls(envir = .GlobalEnv, all.names = TRUE), envir = .GlobalEnv)

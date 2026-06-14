@@ -20,6 +20,7 @@ import {
   FormatIcon,
   PlayIcon,
   useCreepingBootFraction,
+  useMidRunPreparing,
 } from "./challengeShared";
 import { RuntimeBootNotice } from "./RuntimeBootNotice";
 import { EditorState, Compartment } from "@codemirror/state";
@@ -396,6 +397,14 @@ function CodeBlockInner({
   // Latest stage-floor fraction reported by the adapter's boot (null
   // until the adapter reports one); smoothed for display below.
   const [bootFraction, setBootFraction] = useState<number | null>(null);
+  // Mid-run blocking waits (e.g. Python's on-first-run package install)
+  // — surfaces the boot notice during the wait. Callbacks are stable.
+  const {
+    preparing: midRunPreparing,
+    message: midRunMessage,
+    report: reportPrepare,
+    reset: resetPrepare,
+  } = useMidRunPreparing();
   const [outputs, setOutputs] = useState<OutputCell[]>([]);
   const [initExpanded, setInitExpanded] = useState(false);
   const [isFormatting, setIsFormatting] = useState(false);
@@ -767,6 +776,7 @@ function CodeBlockInner({
     setOutputs([]);
     setBootCold(!isRuntimeReady(RuntimeScope.Fumadocs, adapter.id));
     setBootFraction(null);
+    resetPrepare();
     setStatus("loading");
     setStatusMessage("Initialising runtime…");
 
@@ -904,10 +914,13 @@ function CodeBlockInner({
           {
             entryFilename: isMultiFile ? resolvedEntryFilename : undefined,
             // Mid-run waits (e.g. Python's deferred package set on the
-            // first run) surface in the status line instead of leaving
-            // a bare "Running…" while megabytes download.
-            onStatus: (message) => {
-              if (runSeqRef.current === mySeq) setStatusMessage(message);
+            // first run, or an on-demand `import`) show the boot notice
+            // for the duration instead of a bare "Running…" while
+            // megabytes download.
+            onStatus: (message, preparing) => {
+              if (runSeqRef.current !== mySeq) return;
+              setStatusMessage(message);
+              reportPrepare(message, preparing);
             },
           },
         );
@@ -946,6 +959,8 @@ function CodeBlockInner({
     resolvedEntryFilename,
     snapshotAllFiles,
     effectiveSourceFor,
+    reportPrepare,
+    resetPrepare,
   ]);
 
   // Keep the ref pointing at the latest handler so the editor's keymap
@@ -1112,6 +1127,13 @@ function CodeBlockInner({
     bootFraction,
     status === "loading",
   );
+
+  // Show the boot notice during a cold boot (status "loading") and during
+  // a mid-run blocking wait (e.g. installing packages mid-run, while
+  // status is "running"). The mid-run case has no runtime download and no
+  // determinate fraction — just the loader + the wait message.
+  const showBootNotice =
+    status === "loading" || (status === "running" && midRunPreparing);
 
   // Header readouts for the merged output panel. Cells stream in during
   // the run, each stamped with the elapsed time at its arrival — the last
@@ -1426,45 +1448,52 @@ function CodeBlockInner({
           className={`${challengeStyles.outputPanel}${isBusy ? ` ${styles.outputRunning}` : ""}`}
           aria-live="polite"
         >
-          <div className={challengeStyles.outputHeader}>
-            <div
-              className={challengeStyles.accentBar}
-              data-error={outputs.some((c) => c.type === "stderr")}
-            />
-            <span
-              className={challengeStyles.outputLabel}
-              data-error={outputs.some((c) => c.type === "stderr")}
-            >
-              Output
-            </span>
-            <span className={styles.outputHeaderRight}>
-              {outputElapsed && (
-                <span className={challengeStyles.outputTime}>
-                  <Timer size={12} aria-hidden="true" />
-                  {outputElapsed}
-                </span>
-              )}
-              {outputCopyText.length > 0 && (
-                <button
-                  type="button"
-                  className={`${styles.iconBtn} ${styles.outputCopyBtn}`}
-                  title="Copy output to clipboard"
-                  aria-label="Copy output to clipboard"
-                  onClick={() => void copyToClipboard(outputCopyText)}
-                >
-                  <CopyIcon />
-                </button>
-              )}
-            </span>
-          </div>
-          {status === "loading" && (
+          {/* The "Output" header is hidden while the boot notice (loading
+              animation) is showing — there's no output yet, just setup.
+              It returns the moment user code actually runs. */}
+          {!showBootNotice && (
+            <div className={challengeStyles.outputHeader}>
+              <div
+                className={challengeStyles.accentBar}
+                data-error={outputs.some((c) => c.type === "stderr")}
+              />
+              <span
+                className={challengeStyles.outputLabel}
+                data-error={outputs.some((c) => c.type === "stderr")}
+              >
+                Output
+              </span>
+              <span className={styles.outputHeaderRight}>
+                {outputElapsed && (
+                  <span className={challengeStyles.outputTime}>
+                    <Timer size={12} aria-hidden="true" />
+                    {outputElapsed}
+                  </span>
+                )}
+                {outputCopyText.length > 0 && (
+                  <button
+                    type="button"
+                    className={`${styles.iconBtn} ${styles.outputCopyBtn}`}
+                    title="Copy output to clipboard"
+                    aria-label="Copy output to clipboard"
+                    onClick={() => void copyToClipboard(outputCopyText)}
+                  >
+                    <CopyIcon />
+                  </button>
+                )}
+              </span>
+            </div>
+          )}
+          {showBootNotice && (
             <div className={styles.bootNoticeWrap}>
               <RuntimeBootNotice
                 language={adapter.runtimeInfo.language}
-                statusMessage={statusMessage}
-                cold={bootCold}
-                downloadMB={adapter.coldDownloadMB}
-                fraction={bootDisplayFraction}
+                statusMessage={midRunPreparing ? midRunMessage : statusMessage}
+                cold={status === "loading" && bootCold}
+                downloadMB={
+                  status === "loading" ? adapter.coldDownloadMB : undefined
+                }
+                fraction={status === "loading" ? bootDisplayFraction : null}
                 testId="codeblock-boot"
               />
             </div>
@@ -1476,7 +1505,8 @@ function CodeBlockInner({
               ))}
             </div>
           ) : (
-            status === "running" && (
+            status === "running" &&
+            !midRunPreparing && (
               <div className={challengeStyles.outputEmpty}>Running…</div>
             )
           )}

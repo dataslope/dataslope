@@ -238,13 +238,11 @@ export function CodeBlockLoadingPreview({
         </div>
       </div>
 
+      {/* No "Output" header while loading — matches the real block,
+          which hides it until user code actually runs. */}
       <div
         className={`${challengeStyles.outputPanel} ${codeBlockStyles.outputRunning}`}
       >
-        <div className={challengeStyles.outputHeader}>
-          <div className={challengeStyles.accentBar} />
-          <span className={challengeStyles.outputLabel}>Output</span>
-        </div>
         <div className={codeBlockStyles.bootNoticeWrap}>
           <RuntimeBootNotice
             language={language}

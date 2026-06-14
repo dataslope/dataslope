@@ -97,9 +97,15 @@ export interface RunOptions {
   entryFilename?: string;
   /** Optional transient status line for waits that happen *inside* a
    *  run — e.g. Python's deferred package set still installing on the
-   *  first run after the two-phase boot. Surfaces in the caller's
-   *  status text; adapters that never wait mid-run simply ignore it. */
-  onStatus?: (message: string) => void;
+   *  first run after the two-phase boot, or R installing a `library()`
+   *  on demand. Surfaces in the caller's status text; adapters that
+   *  never wait mid-run simply ignore it.
+   *
+   *  `preparing` marks a *blocking* wait (a download/install before the
+   *  user's code runs) so the surface can show the runtime boot notice
+   *  for the duration and drop it once execution starts. Omit / false
+   *  for ordinary status text. */
+  onStatus?: (message: string, preparing?: boolean) => void;
 }
 
 export interface CompletionResult {

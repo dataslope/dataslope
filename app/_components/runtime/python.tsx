@@ -668,7 +668,7 @@ type WorkerOutMessage =
   | { kind: "loading"; message: string; fraction?: number }
   | { kind: "ready" }
   | { kind: "init-error"; message: string }
-  | { kind: "run-status"; id: number; message: string }
+  | { kind: "run-status"; id: number; message: string; preparing: boolean }
   | { kind: "output"; id: number; cell: OutputCellMessage }
   | { kind: "done"; id: number }
   | { kind: "error"; id: number; message: string }
@@ -721,7 +721,9 @@ class PyodideWorkerRuntime implements LanguageRuntime {
         if (msg.kind === "run-status") {
           // Mid-run wait notices (e.g. the deferred package set still
           // installing on the first data-stack run) — see RunOptions.
-          options?.onStatus?.(msg.message);
+          // `preparing` lets the UI show the boot notice during the wait
+          // and drop it once execution actually starts.
+          options?.onStatus?.(msg.message, msg.preparing);
           return;
         }
         if (msg.kind === "output") {

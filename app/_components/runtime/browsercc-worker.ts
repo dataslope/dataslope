@@ -92,6 +92,7 @@ type OutMessage =
   | { kind: "loading"; message: string }
   | { kind: "ready" }
   | { kind: "init-error"; message: string }
+  | { kind: "run-status"; id: number; message: string; preparing: boolean }
   | { kind: "output"; id: number; cell: OutputCellMessage }
   | { kind: "done"; id: number }
   | { kind: "error"; id: number; message: string };
@@ -215,7 +216,18 @@ async function runCode(
   let extraSource = "";
 
   if (language === "cpp") {
+    // The ~10 MB precompiled header is fetched in the background at boot.
+    // On a fast first C++ run it may still be downloading — surface the
+    // boot notice for the wait (the main thread debounces it, so an
+    // already-cached PCH doesn't flash anything).
+    post({
+      kind: "run-status",
+      id,
+      message: "Preparing the C++ standard library…",
+      preparing: true,
+    });
     const pch = await pchPromise;
+    post({ kind: "run-status", id, message: "Compiling…", preparing: false });
     flags = [...CPP_COMPILE_FLAGS];
     if (pch) {
       flags.push("-include-pch", PCH_VFS_PATH);

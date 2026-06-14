@@ -40,6 +40,7 @@ import {
   useChallengeToasts,
   ChallengeToastViewport,
   useCreepingBootFraction,
+  useMidRunPreparing,
   useIsDark,
   cmThemeNameFor,
   TestResultsRail,
@@ -478,6 +479,14 @@ export default function ChallengeCard({
   // Latest stage-floor fraction reported by the adapter's boot (null
   // until the adapter reports one); smoothed for display below.
   const [bootFraction, setBootFraction] = useState<number | null>(null);
+  // Mid-run blocking waits (e.g. Python's on-first-run package install)
+  // — surfaces the boot notice during the wait. Callbacks are stable.
+  const {
+    preparing: midRunPreparing,
+    message: midRunMessage,
+    report: reportPrepare,
+    reset: resetPrepare,
+  } = useMidRunPreparing();
   const [outputs, setOutputs] = useState<OutputCell[]>([]);
   const [elapsed, setElapsed] = useState<string>("");
   const [initExpanded, setInitExpanded] = useState(false);
@@ -897,6 +906,7 @@ export default function ChallengeCard({
       setOutputs([]);
       setBootCold(!isRuntimeReady(RuntimeScope.Fumadocs, adapter.id));
       setBootFraction(null);
+      resetPrepare();
       setStatus("loading");
       setStatusMessage("Initializing runtime…");
 
@@ -1047,10 +1057,13 @@ export default function ChallengeCard({
           {
             entryFilename: isMultiFile ? resolvedEntryFilename : undefined,
             // Mid-run waits (e.g. Python's deferred package set on the
-            // first run) surface in the status line instead of leaving
-            // a bare "Running…" while megabytes download.
-            onStatus: (message) => {
-              if (runSeqRef.current === mySeq) setStatusMessage(message);
+            // first run, or an on-demand `import`) show the boot notice
+            // for the duration instead of a bare "Running…" while
+            // megabytes download.
+            onStatus: (message, preparing) => {
+              if (runSeqRef.current !== mySeq) return;
+              setStatusMessage(message);
+              reportPrepare(message, preparing);
             },
           },
         );
@@ -1069,7 +1082,15 @@ export default function ChallengeCard({
       const elapsedMs = performance.now() - startedAt;
       return { cells, elapsedMs };
     },
-    [adapter, cardDatasets, isMultiFile, resolvedEntryFilename, effectiveSourceFor],
+    [
+      adapter,
+      cardDatasets,
+      isMultiFile,
+      resolvedEntryFilename,
+      effectiveSourceFor,
+      reportPrepare,
+      resetPrepare,
+    ],
   );
 
   const formatElapsed = (ms: number) =>
@@ -1528,6 +1549,13 @@ export default function ChallengeCard({
     bootFraction,
     status === "loading",
   );
+
+  // Show the boot notice during a cold boot (status "loading") and during
+  // a mid-run blocking wait (e.g. installing packages mid-run, while
+  // status is "running"). The mid-run case has no runtime download and no
+  // determinate fraction — just the loader + the wait message.
+  const showBootNotice =
+    status === "loading" || (status === "running" && midRunPreparing);
 
   // Code (or a readable summary of a declarative stdout expectation) per
   // test id, surfaced by the test-details popover in the results rail.
@@ -1996,42 +2024,51 @@ export default function ChallengeCard({
       {/* ── Output panel ── */}
       {(outputs.length > 0 || isBusy) && (
         <div className={styles.outputPanel} aria-live="polite">
-          <div className={styles.outputHeader}>
-            <div
-              className={styles.accentBar}
-              data-error={outputs.some((c) => c.type === "stderr")}
-            />
-            <span
-              className={styles.outputLabel}
-              data-error={outputs.some((c) => c.type === "stderr")}
-            >
-              Output
-            </span>
-            {elapsed && (
-              <span className={styles.outputTime}>
-                <Timer size={12} aria-hidden="true" />
-                {elapsed}
+          {/* The "Output" header is hidden while the boot notice (loading
+              animation) is showing — there's no output yet, just setup.
+              It returns the moment user code actually runs. */}
+          {!showBootNotice && (
+            <div className={styles.outputHeader}>
+              <div
+                className={styles.accentBar}
+                data-error={outputs.some((c) => c.type === "stderr")}
+              />
+              <span
+                className={styles.outputLabel}
+                data-error={outputs.some((c) => c.type === "stderr")}
+              >
+                Output
               </span>
-            )}
-          </div>
-          {status === "loading" && (
+              {elapsed && (
+                <span className={styles.outputTime}>
+                  <Timer size={12} aria-hidden="true" />
+                  {elapsed}
+                </span>
+              )}
+            </div>
+          )}
+          {showBootNotice && (
             // Same boot affordance as `<CodeBlock>`: the brand
             // assemble-and-quarter-turn loader, staged copy with the
             // cold-download size, and a determinate bar once the adapter
-            // reports stage fractions (see RuntimeBootNotice).
+            // reports stage fractions (see RuntimeBootNotice). Also shown
+            // for mid-run blocking waits (package install) — no runtime
+            // download or fraction in that case.
             <div className={codeBlockStyles.bootNoticeWrap}>
               <RuntimeBootNotice
                 language={adapter.runtimeInfo.language}
-                statusMessage={statusMessage}
-                cold={bootCold}
-                downloadMB={adapter.coldDownloadMB}
-                fraction={bootDisplayFraction}
+                statusMessage={midRunPreparing ? midRunMessage : statusMessage}
+                cold={status === "loading" && bootCold}
+                downloadMB={
+                  status === "loading" ? adapter.coldDownloadMB : undefined
+                }
+                fraction={status === "loading" ? bootDisplayFraction : null}
                 testId="challenge-boot"
               />
             </div>
           )}
           {outputs.length === 0 ? (
-            status !== "loading" && (
+            !showBootNotice && (
               <div className={styles.outputEmpty}>Running…</div>
             )
           ) : (

@@ -73,6 +73,71 @@ export function useCreepingBootFraction(
   return active ? display : null;
 }
 
+// ─── Mid-run "preparing" wait ─────────────────────────────────────────
+// Some runtimes block *inside* a run to download/install something before
+// the user's code executes — Python's two-phase data-package install, its
+// on-demand `loadPackagesFromImports`, R installing a `library()` on
+// demand. Those arrive via `RunOptions.onStatus(message, preparing)`.
+// This hook turns that stream into a `preparing` flag the surface uses to
+// show the runtime boot notice for the duration. The transition to
+// visible is debounced (~150 ms) so an all-cached run — which reports
+// preparing→done almost instantly — never flashes the notice.
+
+const PREPARING_SHOW_DELAY_MS = 150;
+
+export interface MidRunPreparing {
+  /** True once a blocking wait has lasted past the debounce window. */
+  preparing: boolean;
+  /** Latest preparing status message (for the notice title). */
+  message: string;
+  /** Feed every `onStatus(message, preparing)` from a run here. */
+  report: (message: string, preparing?: boolean) => void;
+  /** Clear all state — call at the start of each run. */
+  reset: () => void;
+}
+
+export function useMidRunPreparing(): MidRunPreparing {
+  const [preparing, setPreparing] = useState(false);
+  const [message, setMessage] = useState("");
+  const timerRef = useRef<number | null>(null);
+
+  const clearTimer = useCallback(() => {
+    if (timerRef.current !== null) {
+      window.clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  const report = useCallback(
+    (msg: string, isPreparing?: boolean) => {
+      if (isPreparing) {
+        setMessage(msg);
+        // Debounce becoming visible so a fast (all-cached) wait is silent.
+        if (timerRef.current === null) {
+          timerRef.current = window.setTimeout(() => {
+            timerRef.current = null;
+            setPreparing(true);
+          }, PREPARING_SHOW_DELAY_MS);
+        }
+      } else {
+        clearTimer();
+        setPreparing(false);
+      }
+    },
+    [clearTimer],
+  );
+
+  const reset = useCallback(() => {
+    clearTimer();
+    setPreparing(false);
+    setMessage("");
+  }, [clearTimer]);
+
+  useEffect(() => clearTimer, [clearTimer]);
+
+  return { preparing, message, report, reset };
+}
+
 // ─── Dark mode detection ─────────────────────────────────────────────
 // Mirrors the logic in CodeBlock.tsx: Fumadocs toggles a `dark` class
 // on <html> when the user switches themes; we fall back to the OS

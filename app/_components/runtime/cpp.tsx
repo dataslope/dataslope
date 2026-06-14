@@ -495,6 +495,7 @@ type WorkerOutMessage =
   | { kind: "loading"; message: string }
   | { kind: "ready" }
   | { kind: "init-error"; message: string }
+  | { kind: "run-status"; id: number; message: string; preparing: boolean }
   | { kind: "output"; id: number; cell: { type: string; content: string } }
   | { kind: "done"; id: number }
   | { kind: "error"; id: number; message: string };
@@ -564,8 +565,20 @@ class CppWorkerRuntime implements LanguageRuntime {
     return new Promise<void>((resolve, reject) => {
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {
         const msg = ev.data;
-        if (msg.kind !== "output" && msg.kind !== "done" && msg.kind !== "error") return;
+        if (
+          msg.kind !== "output" &&
+          msg.kind !== "done" &&
+          msg.kind !== "error" &&
+          msg.kind !== "run-status"
+        )
+          return;
         if (msg.id !== id) return;
+        if (msg.kind === "run-status") {
+          // Mid-run wait (the first C++ run awaiting the precompiled
+          // header) — surface the boot notice for the duration.
+          options?.onStatus?.(msg.message, msg.preparing);
+          return;
+        }
         if (msg.kind === "output") {
           emit(msg.cell as Parameters<EmitOutput>[0]);
           return;

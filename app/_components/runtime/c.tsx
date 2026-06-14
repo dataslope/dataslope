@@ -443,6 +443,9 @@ type WorkerOutMessage =
   | { kind: "loading"; message: string }
   | { kind: "ready" }
   | { kind: "init-error"; message: string }
+  // C never triggers the PCH wait (C++-only), but the shared browsercc
+  // worker's message union includes it — keep the type accurate.
+  | { kind: "run-status"; id: number; message: string; preparing: boolean }
   | { kind: "output"; id: number; cell: { type: string; content: string } }
   | { kind: "done"; id: number }
   | { kind: "error"; id: number; message: string };
