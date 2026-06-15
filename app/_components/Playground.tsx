@@ -104,6 +104,7 @@ import {
   detectIsMac,
 } from "./playgroundShared";
 import { DiamondMark } from "./mdx/loadingAnimations";
+import { PlaygroundBootOverlay } from "./PlaygroundBootOverlay";
 import { TabBar } from "./tabs/TabBar";
 import type { TabContextMenuItem, TabDescriptor } from "./tabs/tabTypes";
 import {
@@ -2885,59 +2886,20 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   return (
     <div className="playground-root">
       {showLoadingOverlay && (
-        <div
-          className={`pyodide-loading${
-            statusState === "error" ? " has-error" : ""
-          }${loadingFading ? " hidden" : ""}`}
-          role="status"
-          aria-live="polite"
-        >
-          {/* Hero — gigantic horizontally-moving title with faded
-              left/right edges. The text repeats so there is always
-              something visible mid-translate, and the surrounding mask
-              fades the strip into the background at both ends. */}
-          <div className="loading-hero" aria-hidden="true">
-            <div className="loading-hero-track">
-              <span className="loading-hero-text">
-                {adapter.displayName}
-              </span>
-              <span className="loading-hero-text">
-                {adapter.displayName}
-              </span>
-              <span className="loading-hero-text">
-                {adapter.displayName}
-              </span>
-              <span className="loading-hero-text">
-                {adapter.displayName}
-              </span>
-            </div>
-          </div>
-
-          {/* Witty quip + indeterminate progress bar pinned to the
-              bottom of the viewport. On error we surface the failure
-              message instead of the rotating quip. */}
-          <div className="loading-bottom">
-            <div className="loading-quip">
-              {statusState === "error"
-                ? loadingMessage
-                : LOADING_QUIPS[quipIndex]}
-            </div>
-            <div className="loading-bar-wrap">
-              {/* Determinate once the adapter reports boot fractions;
-                  indeterminate sweep until then. */}
-              <div
-                className={`loading-bar${
-                  bootDisplayFraction != null ? " determinate" : ""
-                }`}
-                style={
-                  bootDisplayFraction != null
-                    ? { width: `${Math.round(bootDisplayFraction * 1000) / 10}%` }
-                    : undefined
-                }
-              />
-            </div>
-          </div>
-        </div>
+        <PlaygroundBootOverlay
+          title={adapter.displayName.replace(/\s*Playground$/i, "")}
+          statusMessage={
+            statusState === "error"
+              ? loadingMessage
+              : loadingMessage || LOADING_QUIPS[quipIndex]
+          }
+          cold={adapter.coldDownloadMB != null}
+          downloadMB={adapter.coldDownloadMB}
+          compiled={adapter.compiled}
+          fraction={bootDisplayFraction}
+          error={statusState === "error"}
+          className={loadingFading ? "hidden" : ""}
+        />
       )}
 
       <div className="playground-app">

@@ -7,6 +7,7 @@ import "../../sqlPlayground.css";
 import { SqlPlaygroundSwitcher } from "./SqlPlaygroundSwitcher";
 import { paneForActivatedTab, type SqlMobilePane } from "../utils/mobilePane";
 import { MobileMenuSheet } from "../../MobileMenuSheet";
+import { PlaygroundBootOverlay } from "../../PlaygroundBootOverlay";
 
 /**
  * Re-exported from the pure helper module (`../utils/mobilePane`) so existing
@@ -97,7 +98,6 @@ export function SqlPlaygroundShell({
   loadingOverlayClassName = "",
   keepOverlayMounted = false,
   loadingCaption,
-  loadingHeroRepeat = 3,
   headerActions,
   mobileMenu,
   children,
@@ -111,6 +111,17 @@ export function SqlPlaygroundShell({
   // the settings pane. Detected from the DOM (below) so the three
   // playground bodies stay untouched.
   const [settingsTabActive, setSettingsTabActive] = useState(false);
+  // The SQL engines don't report a real boot fraction, so creep a
+  // determinate bar toward ~90% while booting — matching the language
+  // playgrounds' progress bar. It stops (and the overlay unmounts) on load.
+  const [bootFraction, setBootFraction] = useState(0.05);
+  useEffect(() => {
+    if (loaded) return;
+    const id = window.setInterval(() => {
+      setBootFraction((f) => Math.min(0.9, f + (0.9 - f) * 0.05));
+    }, 200);
+    return () => window.clearInterval(id);
+  }, [loaded]);
 
   // ─── Mobile single-pane navigation ───────────────────────────────────
   // Below the mobile breakpoint the desktop 3-pane IDE collapses to one
@@ -257,29 +268,14 @@ export function SqlPlaygroundShell({
       data-settings-active={settingsTabActive || undefined}
     >
       {showLoadingOverlay && (
-        <div
-          className={`pyodide-loading${
-            statusState === "error" ? " has-error" : ""
-          }${loadingOverlayClassName ? ` ${loadingOverlayClassName}` : ""}`}
-          role="status"
-          aria-live="polite"
-        >
-          <div className="loading-hero" aria-hidden="true">
-            <div className="loading-hero-track">
-              {Array.from({ length: loadingHeroRepeat }).map((_, i) => (
-                <span key={i} className="loading-hero-text">
-                  {playgroundTitle}
-                </span>
-              ))}
-            </div>
-          </div>
-          <div className="loading-bottom">
-            <div className="loading-quip">{loadingCaption}</div>
-            <div className="loading-bar-wrap">
-              <div className="loading-bar" />
-            </div>
-          </div>
-        </div>
+        <PlaygroundBootOverlay
+          title={playgroundTitle.replace(/\s*Playground$/i, "")}
+          statusMessage={loadingCaption}
+          cold
+          fraction={bootFraction}
+          error={statusState === "error"}
+          className={loadingOverlayClassName}
+        />
       )}
       <div className="playground-app">
         <header className="playground-header">

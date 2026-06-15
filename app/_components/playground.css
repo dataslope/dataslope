@@ -2501,6 +2501,75 @@ input[type="range"].fs-slider:disabled {
   pointer-events: none;
 }
 
+/* ── Shared boot overlay: the brand diamond + status + progress bar,
+   matching the embedded code-block / challenge-card boot notice. ── */
+.pyodide-loading.playground-boot-overlay {
+  align-items: center;
+}
+.playground-boot-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 24px;
+  max-width: min(420px, calc(100vw - 48px));
+  text-align: center;
+}
+.playground-boot-loader {
+  display: inline-flex;
+}
+.playground-boot-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+.playground-boot-title {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+.playground-boot-hint {
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  color: var(--text-muted, #9aa4b2);
+  line-height: 1.5;
+}
+.playground-boot-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 4px;
+}
+.playground-boot-bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--bg3);
+  overflow: hidden;
+}
+.playground-boot-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--primary);
+  transition: width 0.2s ease;
+}
+.playground-boot-pct {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted, #9aa4b2);
+  min-width: 34px;
+  text-align: right;
+}
+.pyodide-loading.playground-boot-overlay.has-error .playground-boot-title {
+  color: var(--red, #e57373);
+}
+
 /* Big horizontally-moving title text. The track holds 4 copies of the
    title so something is always on-screen as it translates. The mask on
    the parent fades the text out toward the left/right edges so it
