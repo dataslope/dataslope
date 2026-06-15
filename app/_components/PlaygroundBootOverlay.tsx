@@ -11,6 +11,28 @@
 import type { ReactNode } from "react";
 import { DiamondAssembleTurnLoader } from "./mdx/loadingAnimations";
 
+/** Renders a status string with its trailing ellipsis ("…" or "...")
+ *  replaced by three dots that cycle one → two → three. Non-string
+ *  messages (or ones without a trailing ellipsis) render unchanged. */
+function BootTitle({ message }: { message: ReactNode }) {
+  if (typeof message === "string") {
+    const match = message.match(/^(.*?)\s*(?:…|\.{2,})\s*$/);
+    if (match) {
+      return (
+        <>
+          {match[1]}
+          <span className="playground-boot-ellipsis" aria-hidden="true">
+            <span>.</span>
+            <span>.</span>
+            <span>.</span>
+          </span>
+        </>
+      );
+    }
+  }
+  return <>{message}</>;
+}
+
 export interface PlaygroundBootOverlayProps {
   /** Runtime / language name used in the download hint (e.g. "Python"). */
   title: string;
@@ -61,7 +83,9 @@ export function PlaygroundBootOverlay({
           </span>
         )}
         <div className="playground-boot-text">
-          <span className="playground-boot-title">{statusMessage}</span>
+          <span className="playground-boot-title">
+            <BootTitle message={statusMessage} />
+          </span>
           {!error && cold && (
             <span className="playground-boot-hint">
               Downloading the {title} runtime

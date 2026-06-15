@@ -15,6 +15,10 @@ test("language playground boot overlay: diamond + status + progress bar", async 
   // The brand diamond loader renders an SVG.
   await expect(overlay.locator(".playground-boot-loader svg").first()).toBeVisible();
   await expect(overlay.locator(".playground-boot-title")).not.toBeEmpty();
+  // The trailing ellipsis is animated (three dots that cycle 1 → 2 → 3).
+  await expect(
+    overlay.locator(".playground-boot-ellipsis span"),
+  ).toHaveCount(3);
   // The progress bar appears once a boot fraction is reported.
   await expect(overlay.locator(".playground-boot-bar")).toBeVisible({
     timeout: 20_000,
