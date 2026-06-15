@@ -211,6 +211,11 @@ export interface LanguageAdapter {
    *  version pins the adapter maintains; omit for runtimes that boot
    *  from local/bundled assets in well under a second. */
   coldDownloadMB?: number;
+  /** True for languages that compile on every run (Java, C, C++, C#), so
+   *  the first-run boot copy doesn't promise that "later runs are
+   *  instant" — they still pay a per-run compile step even once the
+   *  runtime is warm. Omit (falsy) for interpreted runtimes. */
+  compiled?: boolean;
   /** Render-only: footer note shown at the bottom of the packages drawer. */
   packagesFooter: React.ReactNode;
   /** Build the snippet inserted at the top of the editor when the user

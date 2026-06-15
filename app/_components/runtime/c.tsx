@@ -544,6 +544,8 @@ export const cAdapter: LanguageAdapter = {
   codeMirrorMode: "text/x-csrc",
   // clang + lld WASM and the sysroot from jsDelivr, compressed transfer.
   coldDownloadMB: 35,
+  // Compiles (clang) on every run, so later runs are faster, not instant.
+  compiled: true,
   // clang-format LLVM style (see formatCode) — keep in sync.
   indentWidth: 2,
   examples: EXAMPLES,

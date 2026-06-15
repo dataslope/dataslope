@@ -493,6 +493,8 @@ export const csharpAdapter: LanguageAdapter = {
   codeMirrorMode: "text/x-csharp",
   // .NET runtime + Roslyn assembly bundle from jsDelivr — see cdn.ts.
   coldDownloadMB: 35,
+  // Compiles (Roslyn) on every run, so later runs are faster, not instant.
+  compiled: true,
   // clang-format Microsoft style (see formatCode) — keep in sync.
   indentWidth: 4,
   examples: EXAMPLES,

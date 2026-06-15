@@ -2023,7 +2023,10 @@ export default function ChallengeCard({
 
       {/* ── Output panel ── */}
       {(outputs.length > 0 || isBusy) && (
-        <div className={styles.outputPanel} aria-live="polite">
+        <div
+          className={`${styles.outputPanel}${isBusy ? ` ${styles.outputRunning}` : ""}`}
+          aria-live="polite"
+        >
           {/* The "Output" header is hidden while the boot notice (loading
               animation) is showing — there's no output yet, just setup.
               It returns the moment user code actually runs. */}
@@ -2062,22 +2065,21 @@ export default function ChallengeCard({
                 downloadMB={
                   status === "loading" ? adapter.coldDownloadMB : undefined
                 }
+                compiled={adapter.compiled}
                 fraction={status === "loading" ? bootDisplayFraction : null}
                 testId="challenge-boot"
               />
             </div>
           )}
-          {outputs.length === 0 ? (
-            !showBootNotice && (
-              <div className={styles.outputEmpty}>Running…</div>
-            )
-          ) : (
+          {outputs.length > 0 && (
             <div className={styles.outputBody}>
               {outputs.map((cell) => (
                 <OutputCellView key={cell.id} cell={cell} />
               ))}
             </div>
           )}
+          {/* No "Running…" placeholder while output is empty — the blue
+              wave overlay already signals the run is in progress. */}
           <RunOverlay active={isBusy} />
         </div>
       )}

@@ -48,7 +48,6 @@ import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirro
 import { bracketMatching, indentOnInput, indentUnit } from "@codemirror/language";
 import { closeBrackets, closeBracketsKeymap } from "@codemirror/autocomplete";
 import { themeFor, noActiveLine, redoKeymap } from "./cmExtensions";
-import { DUCKDB_VERSION } from "./runtime/duckdb";
 import {
   clearPersistedCode,
   loadPersistedCode,
@@ -57,15 +56,13 @@ import {
 } from "./codePersistence";
 import styles from "./ChallengeCard.module.css";
 import {
-  createEngineForDialect,
   DialectGlyph,
-  fetchRemoteInitSql,
   sqlFormatterLanguage,
   TableViewer,
+  useSqlEngineBoot,
   useSqlTableViewer,
   type ResultTabData,
   type SqlDialect,
-  type SqlEngineLike,
   type SqlResult,
   type SqlTableViewerSpec,
 } from "./SqlChallengeCard";
@@ -139,9 +136,10 @@ export default function SqlCodeBlock({
 
   // Each block owns its own engine instance — sharing across blocks
   // would let one block's CREATE TABLE leak into another's results. The
-  // promise (not the resolved engine) is cached so two near-simultaneous
-  // clicks share a single boot.
-  const enginePromiseRef = useRef<Promise<SqlEngineLike> | null>(null);
+  // shared hook owns the cached boot+seed promise, the live engine
+  // label, and the boot-progress state that drives the boot loader.
+  const { ensureEngine, engineLabel, bootState, destroyEngine, resetEngine } =
+    useSqlEngineBoot({ dialect, initSql, remoteInitSql });
   const runSeqRef = useRef(0);
   const runRef = useRef<() => void>(() => {});
 
@@ -154,13 +152,6 @@ export default function SqlCodeBlock({
   const [isFormatting, setIsFormatting] = useState(false);
   const [resultRunSeq, setResultRunSeq] = useState(0);
   const toasts = useChallengeToasts();
-  const [engineLabel, setEngineLabel] = useState<string>(
-    dialect === "sqlite"
-      ? "SQLite 3.53"
-      : dialect === "duckdb"
-        ? `DuckDB ${DUCKDB_VERSION}`
-        : "PostgreSQL 17",
-  );
 
   const isMac = useSyncExternalStore(
     () => () => {},
@@ -268,59 +259,15 @@ export default function SqlCodeBlock({
     }
   }, [cmThemeName]);
 
-  // Clean up the engine on unmount so workers don't leak.
+  // Clean up the engine on unmount so workers don't leak. (Bumping the
+  // run sequence makes any in-flight run bail out of its post-await
+  // state updates.)
   useEffect(() => {
     return () => {
       runSeqRef.current = runSeqRef.current + 1;
-      const p = enginePromiseRef.current;
-      if (p) {
-        void p
-          .then((e) => e.destroy?.())
-          .catch(() => {
-            /* engine never finished initialising; nothing to clean up */
-          });
-      }
+      destroyEngine();
     };
-  }, []);
-
-  // ─── Engine bootstrap ───────────────────────────────────────────────
-  // Seeding (running `initSql`) is folded INTO the cached promise so
-  // every caller awaits the same fully-seeded engine. A previous design
-  // flipped a separate "seeded" flag *before* `await engine.exec(initSql)`
-  // resolved, which let a second caller — e.g. the user clicking Run
-  // while the mount-time table-viewer boot was still seeding — get the
-  // engine back and query a table that didn't exist yet. That race is
-  // invisible for in-process SQLite but fired reliably on DuckDB, whose
-  // multi-second WASM download widens the window.
-  const ensureEngine = useCallback(async (): Promise<SqlEngineLike> => {
-    if (!enginePromiseRef.current) {
-      enginePromiseRef.current = (async () => {
-        // Start the dataset download while the engine boots — the two
-        // are independent and the WASM fetch usually dominates. The
-        // no-op catch keeps an engine-boot failure from leaving this
-        // promise's rejection unhandled; awaiting it below still throws.
-        const remoteSqlPromise = remoteInitSql
-          ? fetchRemoteInitSql(dialect, remoteInitSql)
-          : null;
-        remoteSqlPromise?.catch(() => {});
-        const engine = await createEngineForDialect(dialect);
-        setEngineLabel(`${engine.label} ${engine.version}`.trim());
-        if (remoteSqlPromise) {
-          await engine.exec(await remoteSqlPromise);
-        }
-        if (initSql && initSql.trim()) {
-          await engine.exec(initSql);
-        }
-        return engine;
-      })().catch((err) => {
-        // Don't poison the cache with a failed init — let the next
-        // attempt try again.
-        enginePromiseRef.current = null;
-        throw err;
-      });
-    }
-    return enginePromiseRef.current;
-  }, [dialect, initSql, remoteInitSql]);
+  }, [destroyEngine]);
 
   // ─── Table viewer ───────────────────────────────────────────────────
   // Shared with `<SqlChallengeCard>` so both stay consistent.
@@ -465,11 +412,9 @@ export default function SqlCodeBlock({
       persistSaveTimerRef.current = null;
     }
     clearPersistedCode(persistedKey);
-    const oldEngine = enginePromiseRef.current;
-    enginePromiseRef.current = null;
-    if (oldEngine) {
-      void oldEngine.then((e) => e.destroy?.()).catch(() => {});
-    }
+    // Destroy the engine and re-arm boot state so the next ensureEngine()
+    // boots + re-seeds a fresh instance (the boot loader shows again).
+    resetEngine();
     setResultSet(null);
     setResultError("");
     setResultMessage("");
@@ -485,7 +430,7 @@ export default function SqlCodeBlock({
         });
     }
     toasts.show("Reset to starter SQL.");
-  }, [starterCode, persistedKey, ensureEngine, refreshTableViewer, clearTableViewer, markTablesInitDone, tableViewerEnabled, toasts]);
+  }, [starterCode, persistedKey, resetEngine, ensureEngine, refreshTableViewer, clearTableViewer, markTablesInitDone, tableViewerEnabled, toasts]);
 
   const copyCode = useCallback(async () => {
     const code = editorRef.current?.state.doc.toString() ?? "";
@@ -584,6 +529,7 @@ export default function SqlCodeBlock({
           initializing={tablesInitializing}
           onLoadMore={loadMoreActiveTable}
           resultTabData={resultTabDataProp}
+          bootState={bootState}
         />
       )}
 

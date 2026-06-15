@@ -84,6 +84,7 @@ import {
   persistKey,
   savePersistedCode,
 } from "./codePersistence";
+import { RuntimeBootNotice } from "./RuntimeBootNotice";
 import styles from "./ChallengeCard.module.css";
 
 // ─── Types ────────────────────────────────────────────────────────────
@@ -298,6 +299,181 @@ export function createEngineForDialect(dialect: SqlDialect): Promise<SqlEngineLi
     case "postgres":
       return createPostgresChallengeEngine();
   }
+}
+
+/** Human-readable engine name for a dialect — used in the boot loader
+ *  copy ("Setting up the DuckDB runtime…"). */
+export function sqlDialectDisplayName(dialect: SqlDialect): string {
+  return dialect === "sqlite"
+    ? "SQLite"
+    : dialect === "duckdb"
+      ? "DuckDB"
+      : "PostgreSQL";
+}
+
+/** Approximate cold-download size (MB) of each dialect's in-browser
+ *  WASM engine — feeds the boot notice's "downloads once (~N MB)" hint.
+ *  Ballpark figures (SQLite ~1 MB, PGlite ~3 MB, DuckDB ~5–10 MB), in
+ *  the same spirit as `LanguageAdapter.coldDownloadMB` for the other
+ *  runtimes. */
+export function sqlDialectColdMB(dialect: SqlDialect): number {
+  return dialect === "sqlite" ? 1 : dialect === "duckdb" ? 6 : 3;
+}
+
+/** Engine label shown before the live runtime reports its exact version. */
+function defaultSqlEngineLabel(dialect: SqlDialect): string {
+  return dialect === "sqlite"
+    ? "SQLite 3.53"
+    : dialect === "duckdb"
+      ? `DuckDB ${DUCKDB_VERSION}`
+      : "PostgreSQL 17";
+}
+
+// Dialects whose engine has booted at least once this page session.
+// Mirrors runtimeRegistry's `ready` set for the non-SQL adapters: it
+// lets the boot notice show its "downloads once (~N MB)" cold copy only
+// on the first block of each dialect, not on every later block (whose
+// WASM is already served from the HTTP cache).
+const bootedSqlDialects = new Set<SqlDialect>();
+
+/** Boot-progress snapshot consumed by `<TableViewer>` to render the
+ *  shared `<RuntimeBootNotice>` while a dialect's WASM engine downloads
+ *  and seeds. `null` once the engine is ready (or if the boot failed —
+ *  the error surfaces in the result pane instead). */
+export interface SqlEngineBootState {
+  cold: boolean;
+  message: string;
+  dialect: SqlDialect;
+  downloadMB: number;
+}
+
+export interface UseSqlEngineBootOptions {
+  dialect: SqlDialect;
+  initSql?: string;
+  remoteInitSql?: string;
+}
+
+/** Shared engine-boot lifecycle for `<SqlChallengeCard>` and
+ *  `<SqlCodeBlock>`. Owns the per-block engine promise (boot + seed
+ *  folded into one cached promise so every caller awaits the same
+ *  fully-seeded engine — see the race note below), the live engine
+ *  label, and the boot-progress state that drives the branded boot
+ *  loader. Keeping it here lets both card components surface the same
+ *  loading affordance the non-SQL blocks already show. */
+export function useSqlEngineBoot({
+  dialect,
+  initSql,
+  remoteInitSql,
+}: UseSqlEngineBootOptions) {
+  // The promise (not the resolved engine) is cached so two near-
+  // simultaneous callers — e.g. the mount-time table-viewer boot and a
+  // Run click — share one boot. Seeding (`initSql`) is folded INTO the
+  // promise so every caller awaits the same fully-seeded engine; an
+  // earlier design flipped a "seeded" flag before `await
+  // engine.exec(initSql)` resolved, letting a second caller query a
+  // table that didn't exist yet — invisible on in-process SQLite but
+  // reliably racy on DuckDB, whose multi-second WASM download widens the
+  // window.
+  const enginePromiseRef = useRef<Promise<SqlEngineLike> | null>(null);
+  const [engineLabel, setEngineLabel] = useState<string>(() =>
+    defaultSqlEngineLabel(dialect),
+  );
+  const [booting, setBooting] = useState(false);
+  const [bootFailed, setBootFailed] = useState(false);
+  const [bootCold, setBootCold] = useState<boolean>(
+    () => !bootedSqlDialects.has(dialect),
+  );
+  const [bootMessage, setBootMessage] = useState<string>(
+    () => `Starting the ${sqlDialectDisplayName(dialect)} engine…`,
+  );
+
+  const ensureEngine = useCallback(async (): Promise<SqlEngineLike> => {
+    if (!enginePromiseRef.current) {
+      setBooting(true);
+      setBootFailed(false);
+      setBootCold(!bootedSqlDialects.has(dialect));
+      setBootMessage(`Starting the ${sqlDialectDisplayName(dialect)} engine…`);
+      enginePromiseRef.current = (async () => {
+        // Start the dataset download while the engine boots — the two
+        // are independent and the WASM fetch usually dominates. The
+        // no-op catch keeps an engine-boot failure from leaving this
+        // promise's rejection unhandled; awaiting it below still throws.
+        const remoteSqlPromise = remoteInitSql
+          ? fetchRemoteInitSql(dialect, remoteInitSql)
+          : null;
+        remoteSqlPromise?.catch(() => {});
+        const engine = await createEngineForDialect(dialect);
+        setEngineLabel(`${engine.label} ${engine.version}`.trim());
+        bootedSqlDialects.add(dialect);
+        if (remoteSqlPromise || (initSql && initSql.trim())) {
+          setBootMessage("Loading sample data…");
+        }
+        if (remoteSqlPromise) {
+          await engine.exec(await remoteSqlPromise);
+        }
+        if (initSql && initSql.trim()) {
+          await engine.exec(initSql);
+        }
+        return engine;
+      })().then(
+        (engine) => {
+          setBooting(false);
+          return engine;
+        },
+        (err) => {
+          // Don't poison the cache with a failed init — let the next
+          // attempt try again.
+          enginePromiseRef.current = null;
+          setBooting(false);
+          setBootFailed(true);
+          throw err;
+        },
+      );
+    }
+    return enginePromiseRef.current;
+  }, [dialect, initSql, remoteInitSql]);
+
+  /** Destroy the current engine (if any) — used on unmount so the
+   *  underlying WASM workers don't leak. */
+  const destroyEngine = useCallback(() => {
+    const p = enginePromiseRef.current;
+    if (p) {
+      void p.then((e) => e.destroy?.()).catch(() => {
+        /* engine never finished initialising; nothing to clean up */
+      });
+    }
+  }, []);
+
+  /** Destroy the current engine and re-arm boot state so the next
+   *  `ensureEngine()` boots + re-seeds a fresh instance — used by Reset. */
+  const resetEngine = useCallback(() => {
+    const old = enginePromiseRef.current;
+    enginePromiseRef.current = null;
+    setBooting(false);
+    setBootFailed(false);
+    if (old) {
+      void old.then((e) => e.destroy?.()).catch(() => {});
+    }
+  }, []);
+
+  const bootState: SqlEngineBootState | null =
+    booting && !bootFailed
+      ? {
+          cold: bootCold,
+          message: bootMessage,
+          dialect,
+          downloadMB: sqlDialectColdMB(dialect),
+        }
+      : null;
+
+  return {
+    ensureEngine,
+    engineLabel,
+    setEngineLabel,
+    bootState,
+    destroyEngine,
+    resetEngine,
+  };
 }
 
 /** Download a remote dataset script (a path inside the
@@ -904,11 +1080,12 @@ export default function SqlChallengeCard({
     [dialect, title, starterCode],
   );
 
-  // Each card owns its own engine instance — sharing across cards
-  // would let one challenge's CREATE TABLE leak into another's
-  // checks. The promise (not the resolved engine) is cached so two
-  // near-simultaneous clicks share a single boot.
-  const enginePromiseRef = useRef<Promise<SqlEngineLike> | null>(null);
+  // Each card owns its own engine instance — sharing across cards would
+  // let one challenge's CREATE TABLE leak into another's checks. The
+  // shared hook owns the cached boot+seed promise, the live engine
+  // label, and the boot-progress state that drives the boot loader.
+  const { ensureEngine, engineLabel, bootState, destroyEngine, resetEngine } =
+    useSqlEngineBoot({ dialect, initSql, remoteInitSql });
   const runSeqRef = useRef(0);
   const runRef = useRef<() => void>(() => {});
   // Default action of the split button (Submit when canCheck,
@@ -934,13 +1111,6 @@ export default function SqlChallengeCard({
   const [isFormatting, setIsFormatting] = useState(false);
   const [resultRunSeq, setResultRunSeq] = useState(0);
   const toasts = useChallengeToasts();
-  const [engineLabel, setEngineLabel] = useState<string>(
-    dialect === "sqlite"
-      ? "SQLite 3.53"
-      : dialect === "duckdb"
-        ? `DuckDB ${DUCKDB_VERSION}`
-        : "PostgreSQL 17",
-  );
 
   const isMac = useSyncExternalStore(
     () => () => {},
@@ -1119,62 +1289,15 @@ export default function SqlChallengeCard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [solutionOpen]);
 
-  // Clean up the engine on unmount so workers don't leak. The ref is
-  // a counter we mutate (not a DOM node we read), so the standard
-  // exhaustive-deps caveat about stale ref values doesn't apply.
+  // Clean up the engine on unmount so workers don't leak. (Bumping the
+  // run sequence makes any in-flight run bail out of its post-await
+  // state updates.)
   useEffect(() => {
     return () => {
       runSeqRef.current = runSeqRef.current + 1;
-      const p = enginePromiseRef.current;
-      if (p) {
-        void p
-          .then((e) => e.destroy?.())
-          .catch(() => {
-            /* engine never finished initialising; nothing to clean up */
-          });
-      }
+      destroyEngine();
     };
-  }, []);
-
-  // ─── Engine bootstrap ───────────────────────────────────────────────
-  // Seeding (running `initSql`) is folded INTO the cached promise so
-  // every caller awaits the same fully-seeded engine. A previous design
-  // flipped a separate "seeded" flag *before* `await engine.exec(initSql)`
-  // resolved, which let a second caller — e.g. the user clicking Submit
-  // while the mount-time table-viewer boot was still seeding — get the
-  // engine back and query a table that didn't exist yet. That race is
-  // invisible for in-process SQLite but fired reliably on DuckDB (whose
-  // multi-second WASM download widens the window), especially for
-  // multi-statement `initSql` that seeds several tables.
-  const ensureEngine = useCallback(async (): Promise<SqlEngineLike> => {
-    if (!enginePromiseRef.current) {
-      enginePromiseRef.current = (async () => {
-        // Start the dataset download while the engine boots — the two
-        // are independent and the WASM fetch usually dominates. The
-        // no-op catch keeps an engine-boot failure from leaving this
-        // promise's rejection unhandled; awaiting it below still throws.
-        const remoteSqlPromise = remoteInitSql
-          ? fetchRemoteInitSql(dialect, remoteInitSql)
-          : null;
-        remoteSqlPromise?.catch(() => {});
-        const engine = await createEngineForDialect(dialect);
-        setEngineLabel(`${engine.label} ${engine.version}`.trim());
-        if (remoteSqlPromise) {
-          await engine.exec(await remoteSqlPromise);
-        }
-        if (initSql && initSql.trim()) {
-          await engine.exec(initSql);
-        }
-        return engine;
-      })().catch((err) => {
-        // Don't poison the cache with a failed init — let the next
-        // attempt try again.
-        enginePromiseRef.current = null;
-        throw err;
-      });
-    }
-    return enginePromiseRef.current;
-  }, [dialect, initSql, remoteInitSql]);
+  }, [destroyEngine]);
 
   // ─── Table viewer ───────────────────────────────────────────────────
   // All table-list / paging / loading state lives in the shared hook so
@@ -1596,11 +1719,9 @@ export default function SqlChallengeCard({
       persistSaveTimerRef.current = null;
     }
     clearPersistedCode(persistedKey);
-    const oldEngine = enginePromiseRef.current;
-    enginePromiseRef.current = null;
-    if (oldEngine) {
-      void oldEngine.then((e) => e.destroy?.()).catch(() => {});
-    }
+    // Destroy the engine and re-arm boot state so the next ensureEngine()
+    // boots + re-seeds a fresh instance (the boot loader shows again).
+    resetEngine();
     setResultSet(null);
     setResultError("");
     setResultMessage("");
@@ -1621,7 +1742,7 @@ export default function SqlChallengeCard({
         });
     }
     toasts.show("Reset to starter SQL.");
-  }, [starterCode, persistedKey, ensureEngine, refreshTableViewer, clearTableViewer, tableViewerEnabled, toasts]);
+  }, [starterCode, persistedKey, resetEngine, ensureEngine, refreshTableViewer, clearTableViewer, tableViewerEnabled, toasts]);
 
   // ─── Apply solution ─────────────────────────────────────────────────
   // Load the reference SQL into the learner's editor (the "Load Solution
@@ -1796,6 +1917,7 @@ export default function SqlChallengeCard({
           initializing={tablesInitializing}
           onLoadMore={loadMoreActiveTable}
           resultTabData={resultTabDataProp}
+          bootState={bootState}
         />
       )}
 
@@ -2504,6 +2626,7 @@ export function TableViewer({
   initializing,
   onLoadMore,
   resultTabData,
+  bootState,
 }: {
   dialect: SqlDialect;
   entries: TableViewerEntry[];
@@ -2512,6 +2635,11 @@ export function TableViewer({
   initializing: boolean;
   onLoadMore: () => void;
   resultTabData?: ResultTabData | null;
+  /** When set, the dialect's WASM engine is still downloading / seeding;
+   *  show the shared branded boot loader in place of the skeleton (and
+   *  in the result area for table-less blocks) so SQL matches the other
+   *  runtimes' first-run loading affordance. */
+  bootState?: SqlEngineBootState | null;
 }) {
   const [resultTabDismissed, setResultTabDismissed] = useState(false);
   const [resultIsActive, setResultIsActive] = useState(false);
@@ -2534,13 +2662,35 @@ export function TableViewer({
   }, [resultTabData]);
 
   const resultTabVisible = resultTabData != null && !resultTabDismissed;
-  const showSkeleton = initializing && entries.length === 0 && !resultTabVisible;
-  // Nothing to show: not initializing and no tables were found.
-  if (!showSkeleton && entries.length === 0 && !resultTabVisible) return null;
+  // While the engine cold-boots there are no tables (and any result tab
+  // is only showing "Running…"), so the boot loader takes the panel —
+  // mirroring how the non-SQL blocks show the notice before first output.
+  const showBootNotice = bootState != null && entries.length === 0;
+  const showSkeleton =
+    !showBootNotice && initializing && entries.length === 0 && !resultTabVisible;
+  // Nothing to show: engine ready, no tables found, no result yet.
+  if (
+    !showBootNotice &&
+    !showSkeleton &&
+    entries.length === 0 &&
+    !resultTabVisible
+  )
+    return null;
   const active = entries[activeIdx];
   return (
     <div className={styles.tableViewer}>
-      {showSkeleton ? (
+      {showBootNotice ? (
+        <div className={styles.tableViewerBoot}>
+          <RuntimeBootNotice
+            language={sqlDialectDisplayName(bootState.dialect)}
+            statusMessage={bootState.message}
+            cold={bootState.cold}
+            downloadMB={bootState.cold ? bootState.downloadMB : undefined}
+            fraction={null}
+            testId="sql-boot"
+          />
+        </div>
+      ) : showSkeleton ? (
         <TableViewerSkeleton />
       ) : (
         <>
@@ -2602,7 +2752,10 @@ export function TableViewer({
             )}
           </div>
           {resultIsActive && resultTabVisible && resultTabData ? (
-            <div className={styles.resultPane} style={{ position: "relative" }}>
+            <div
+              className={`${styles.resultPane}${resultTabData.loading ? ` ${styles.resultPaneBusy}` : ""}`}
+              style={{ position: "relative" }}
+            >
               {flashKey > 0 && (
                 <div key={flashKey} className={styles.resultFlashOverlay} aria-hidden />
               )}
@@ -2642,9 +2795,8 @@ export function TableViewer({
                   {resultTabData.message}
                   {resultTabData.elapsed ? ` · ${resultTabData.elapsed}` : ""}
                 </div>
-              ) : (
-                <div className={styles.sqlMessage}>Running…</div>
-              )}
+              ) : null /* No "Running…" text — the blue wave overlay below
+                          signals the run; .resultPaneBusy reserves height. */}
               <RunOverlay active={resultTabData.loading} />
             </div>
           ) : (

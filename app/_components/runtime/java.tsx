@@ -515,8 +515,90 @@ class JavaRuntime implements LanguageRuntime {
   // staged by prepareFileSystem. The active file (from run()) is
   // always added to this set so javac sees all workspace files.
   private stagedJavaPaths: string[] = [];
+  // Set once the JVM has compiled + run a throwaway program (see
+  // `warmUp`) so the warm-up only runs on the first init per instance.
+  private warmedUp = false;
 
   constructor(private api: CheerpJApi) {}
+
+  // Capture javac's diagnostics + a program's output by intercepting
+  // console.log / console.error for the duration of one cheerpjRunMain
+  // invocation. CheerpJ writes Java's System.out/System.err to those
+  // globals (verified in cj3.js — there's no other println sink to
+  // hook); it forwards each underlying `write` as one console.log call
+  // and includes the chunk's own newline bytes (so `println("x")`
+  // arrives as "x\n"). We therefore concatenate the args verbatim —
+  // adding our own "\n" per call would produce a blank line between
+  // every chunk. The wrap+restore is in a try/finally so a thrown error
+  // during `await` can't leave the page's console permanently patched.
+  private async runWithCapture(
+    fn: () => Promise<number>,
+  ): Promise<{ exitCode: number; stdout: string; stderr: string }> {
+    const origLog = console.log;
+    const origErr = console.error;
+    let stdout = "";
+    let stderr = "";
+    console.log = (...args: unknown[]) => {
+      stdout += args.map(String).join(" ");
+    };
+    console.error = (...args: unknown[]) => {
+      stderr += args.map(String).join(" ");
+    };
+    try {
+      const exitCode = await fn();
+      return { exitCode, stdout, stderr };
+    } finally {
+      console.log = origLog;
+      console.error = origErr;
+    }
+  }
+
+  /** Compile and run a tiny throwaway program so the expensive
+   *  first-use costs happen now, behind the boot animation, instead of
+   *  on the learner's first Run.
+   *
+   *  `cheerpjInit` (in `loadCheerpJ`) only bootstraps the CheerpJ
+   *  runtime — it does NOT load `tools.jar`, `javac`, or the core
+   *  OpenJDK classes. Those are pulled in (and JIT-compiled) lazily on
+   *  the *first* `cheerpjRunMain` call, which without this warm-up is
+   *  the user's first Run: that one execution paid the whole
+   *  tools.jar + javac + runtime class-load + JIT bill while later runs
+   *  were instant. Running a no-op `main` here moves that cost into
+   *  `init()` (covered by the loading notice). Best-effort: any failure
+   *  is swallowed so a warm-up hiccup never blocks running real code. */
+  async warmUp(
+    report?: (message: string, fraction?: number) => void,
+  ): Promise<void> {
+    if (this.warmedUp) return;
+    this.warmedUp = true;
+    try {
+      const warmupClass = "__DataslopeWarmup";
+      const source = `public class ${warmupClass} { public static void main(String[] args) { System.out.print(""); } }`;
+      const sourcePath = `${SOURCE_DIR}${warmupClass}.java`;
+      this.api.cheerpjAddStringFile(
+        sourcePath,
+        new TextEncoder().encode(source),
+      );
+      report?.("Warming up the Java compiler…", 0.55);
+      const compiled = await this.runWithCapture(() =>
+        this.api.cheerpjRunMain(
+          "com.sun.tools.javac.Main",
+          CLASSPATH,
+          sourcePath,
+          "-d",
+          OUTPUT_DIR,
+        ),
+      );
+      if (compiled.exitCode === 0) {
+        report?.("Warming up the Java runtime…", 0.85);
+        await this.runWithCapture(() =>
+          this.api.cheerpjRunMain(warmupClass, CLASSPATH),
+        );
+      }
+    } catch {
+      // Warm-up is best-effort — never let it block real runs.
+    }
+  }
 
   async prepareFileSystem(files: Map<string, Uint8Array>): Promise<void> {
     this.stagedJavaPaths = [];
@@ -573,48 +655,17 @@ class JavaRuntime implements LanguageRuntime {
       filesToCompile.push(sourcePath);
     }
 
-    // 3) Capture javac's diagnostics + the program's output by
-    //    intercepting console.log / console.error for the duration of
-    //    each invocation. CheerpJ writes Java's System.out/System.err
-    //    to those globals (verified in cj3.js — there's no other
-    //    println sink to hook). We wrap+restore in a try/finally so a
-    //    thrown error during `await` can't leave the page's console
-    //    permanently patched.
-    //
-    //    CheerpJ forwards each underlying `write` call as one
-    //    `console.log` invocation and includes the chunk's own newline
-    //    bytes in the string (so `println("x")` arrives as "x\n").
-    //    `printf("%a %b%n", …)` triggers several writes per logical
-    //    line. We therefore concatenate the args verbatim — adding our
-    //    own "\n" per call would produce a blank line between every
-    //    chunk (the bug fixed here).
-    const runWithCapture = async (
-      fn: () => Promise<number>,
-    ): Promise<{ exitCode: number; stdout: string; stderr: string }> => {
-      const origLog = console.log;
-      const origErr = console.error;
-      let stdout = "";
-      let stderr = "";
-      console.log = (...args: unknown[]) => {
-        stdout += args.map(String).join(" ");
-      };
-      console.error = (...args: unknown[]) => {
-        stderr += args.map(String).join(" ");
-      };
-      try {
-        const exitCode = await fn();
-        return { exitCode, stdout, stderr };
-      } finally {
-        console.log = origLog;
-        console.error = origErr;
-      }
-    };
+    // 3) Capture javac's diagnostics + the program's output via the
+    //    shared `runWithCapture` helper (which intercepts console.log /
+    //    console.error — CheerpJ's only println sink). `printf("%a
+    //    %b%n", …)` triggers several writes per logical line, so the
+    //    helper concatenates chunks verbatim rather than adding newlines.
 
     // 4) Compile all staged .java files together. Passing every source
     //    file in a single javac invocation lets the compiler resolve
     //    cross-file references (e.g. Main.java using Dog from Dog.java)
     //    in one pass. `-Xlint` matches JavaFiddle's defaults.
-    const javacResult = await runWithCapture(() =>
+    const javacResult = await this.runWithCapture(() =>
       this.api.cheerpjRunMain(
         "com.sun.tools.javac.Main",
         CLASSPATH,
@@ -637,7 +688,7 @@ class JavaRuntime implements LanguageRuntime {
     }
 
     // 5) Run the user's main() with /files/ on the classpath.
-    const runResult = await runWithCapture(() =>
+    const runResult = await this.runWithCapture(() =>
       this.api.cheerpjRunMain(className, CLASSPATH),
     );
 
@@ -674,6 +725,8 @@ export const javaAdapter: LanguageAdapter = {
   // CheerpJ runtime from cjrtnc.leaningtech.com plus the bundled
   // tools.jar (~18 MB) that provides javac.
   coldDownloadMB: 30,
+  // Compiles (javac) on every run, so later runs are faster, not instant.
+  compiled: true,
   // clang-format LLVM style (see formatCode) — keep in sync.
   indentWidth: 2,
   examples: EXAMPLES,
@@ -727,6 +780,13 @@ export const javaAdapter: LanguageAdapter = {
       0.08,
     );
     const api = await loadCheerpJ();
-    return new JavaRuntime(api);
+    const runtime = new JavaRuntime(api);
+    // Compile + run a throwaway program now so the first user Run
+    // doesn't pay the one-time tools.jar + javac + runtime class-load +
+    // JIT cost (see `JavaRuntime.warmUp`). Done before resolving init so
+    // the boot notice stays up — and `isRuntimeReady` only reports ready
+    // — once the JVM can actually run code without a multi-second stall.
+    await runtime.warmUp(setLoadingMessage);
+    return runtime;
   },
 };

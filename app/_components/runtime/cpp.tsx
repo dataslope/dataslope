@@ -613,6 +613,8 @@ export const cppAdapter: LanguageAdapter = {
   // clang + lld WASM, the sysroot, and the C++ precompiled header
   // from jsDelivr, compressed transfer.
   coldDownloadMB: 45,
+  // Compiles (clang) on every run, so later runs are faster, not instant.
+  compiled: true,
   // clang-format LLVM style (see formatCode) — keep in sync.
   indentWidth: 2,
   examples: EXAMPLES,

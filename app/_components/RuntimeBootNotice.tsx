@@ -39,6 +39,10 @@ export interface RuntimeBootNoticeProps {
   cold?: boolean;
   /** Approximate cold download size in MB (adapter.coldDownloadMB). */
   downloadMB?: number;
+  /** True for compiled languages (Java, C, C++, C#): the cold hint then
+   *  promises "later runs are much faster" instead of "instant", since
+   *  they still compile on every run once the runtime is warm. */
+  compiled?: boolean;
   /** Smoothed boot fraction in 0..1, or null for an indeterminate boot
    *  (loader + copy only, no bar). */
   fraction?: number | null;
@@ -51,6 +55,7 @@ export function RuntimeBootNotice({
   statusMessage,
   cold = false,
   downloadMB,
+  compiled = false,
   fraction = null,
   testId,
 }: RuntimeBootNoticeProps) {
@@ -73,8 +78,8 @@ export function RuntimeBootNotice({
         {cold && (
           <span className={styles.hint}>
             Downloading the {language} runtime
-            {downloadMB ? ` (~${downloadMB} MB)` : ""} — this happens once;
-            later runs are instant.
+            {downloadMB ? ` (~${downloadMB} MB)` : ""} — this happens once;{" "}
+            {compiled ? "later runs are much faster" : "later runs are instant"}.
           </span>
         )}
         {pct != null && (
@@ -147,6 +152,7 @@ export function CodeBlockLoadingPreview({
   statusMessage,
   cold = false,
   downloadMB,
+  compiled = false,
   fraction = null,
 }: CodeBlockLoadingPreviewProps) {
   const lines = code.replace(/\n$/, "").split("\n");
@@ -249,6 +255,7 @@ export function CodeBlockLoadingPreview({
             statusMessage={statusMessage}
             cold={cold}
             downloadMB={downloadMB}
+            compiled={compiled}
             fraction={fraction}
           />
         </div>
@@ -448,14 +455,15 @@ function noticeItems(): ShowcaseItem[] {
       ),
     },
     {
-      title: "Cold start — finishing",
+      title: "Cold start — finishing (compiled language)",
       blurb:
-        "Near the end (the bar never hits 100% — the notice unmounts the moment the runtime is ready).",
+        "Near the end (the bar never hits 100% — the notice unmounts the moment the runtime is ready). Compiled languages (C#, Java, C, C++) promise faster — not instant — later runs, since they still compile on every run.",
       jsx: `<RuntimeBootNotice
   language="C#"
   statusMessage="Loading Roslyn (C# scripting engine)…"
   cold
   downloadMB={35}
+  compiled
   fraction={0.9}
 />`,
       node: (
@@ -464,6 +472,7 @@ function noticeItems(): ShowcaseItem[] {
           statusMessage="Loading Roslyn (C# scripting engine)…"
           cold
           downloadMB={35}
+          compiled
           fraction={0.9}
         />
       ),
