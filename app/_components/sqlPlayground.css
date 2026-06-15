@@ -4591,6 +4591,12 @@
     display: none;
   }
 
+  /* The database selector moves into the hamburger drawer on mobile, so
+     drop it from the Schema-tab sidebar (the schema selector stays). */
+  .sql-db-selector-wrap {
+    display: none;
+  }
+
   /* ── Collapse the 3-column shell to one full-width column. The sidebar
      and both drag handles leave the flow; the bottom tab bar decides which
      surface is on screen. ── */

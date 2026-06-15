@@ -4533,7 +4533,7 @@ function PostgresPlaygroundInner() {
                 >
                   <Select.Trigger
                     ref={schemaSelectorTriggerRef}
-                    className="sql-db-selector sql-schema-selector"
+                    className="sql-database-selector sql-schema-selector"
                     aria-label="Select schema"
                   >
                     <Layers
