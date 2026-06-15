@@ -653,6 +653,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // sheet) instead of a Menu so its inline sub-sections (Examples,
   // Information, …) can't be cut off the side of a narrow viewport.
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // Full workspace-manager drawer, opened from the mobile hamburger menu
+  // (the header badge that normally opens it is hidden on mobile).
+  const [workspaceManagerOpen, setWorkspaceManagerOpen] = useState(false);
   // Confirm dialog shown when picking an example would discard editor
   // contents the user has already typed.
   const [pendingExample, setPendingExample] = useState<ExampleSnippet | null>(
@@ -3007,6 +3010,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               playgroundId={adapter.id}
               activeWorkspaceId={workspaceId}
               activeWorkspaceName={workspaceName}
+              managerOpen={workspaceManagerOpen}
+              onManagerOpenChange={setWorkspaceManagerOpen}
             />
           )}
 
@@ -3158,6 +3163,23 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                       </Drawer.Close>
                     </div>
                     <div className="mobile-menu-drawer-body">
+                      {/* Workspace — the header badge is hidden on mobile,
+                          so open the full workspace manager from here. */}
+                      {workspaceReady && (
+                        <button
+                          type="button"
+                          className="mobile-menu-action"
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            setWorkspaceManagerOpen(true);
+                          }}
+                        >
+                          <span>Workspace</span>
+                          <span className="mobile-menu-chev" aria-hidden="true">
+                            ›
+                          </span>
+                        </button>
+                      )}
                       {/* Files — the desktop icon rail (which toggles the
                           file panel) is hidden on mobile, so surface file
                           management here as a bottom-sheet instead. */}
@@ -3637,7 +3659,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             className="playground-file-tabbar"
           />
         )}
-        <div className="mobile-tabs" role="tablist" aria-label="Pane">
+        <div
+          className="mobile-tabs"
+          role="tablist"
+          aria-label="Pane"
+          data-settings-active={activeTabId === SETTINGS_TAB_ID || undefined}
+        >
           <button
             type="button"
             role="tab"

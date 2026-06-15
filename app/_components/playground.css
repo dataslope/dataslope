@@ -1998,7 +1998,8 @@ body.playground-active {
     height: 18px;
   }
   .settings-tab[data-active] {
-    border-color: var(--primary);
+    /* No border around the active pill on mobile — the filled background
+       and primary text colour already mark it as selected. */
     background: var(--bg3);
     color: var(--primary);
   }
@@ -2797,6 +2798,17 @@ input[type="range"].fs-slider:disabled {
     align-items: stretch;
     background: var(--bg2);
     border-bottom: 1px solid var(--border);
+  }
+  /* The Settings tab fills the whole pane, so its own Editor/Output pane
+     switcher is meaningless while it's open — hide it. */
+  .mobile-tabs[data-settings-active] {
+    display: none;
+  }
+
+  /* The workspace badge moves into the hamburger menu on mobile so the
+     header keeps just the logo, language switcher, and menu button. */
+  .workspace-badge {
+    display: none;
   }
 
   .panes {
