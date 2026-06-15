@@ -35,7 +35,7 @@ export function SwitchDatabaseDialog({
             Choose how to open this database in workspace{" "}
             <strong>{currentWorkspaceName}</strong>.
           </Dialog.Description>
-          <div className="confirm-actions">
+          <div className="confirm-actions confirm-actions-stack">
             <Dialog.Close className="confirm-btn confirm-btn-secondary">
               Cancel
             </Dialog.Close>

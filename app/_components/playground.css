@@ -2260,6 +2260,10 @@ input[type="range"].fs-slider:disabled {
   flex-shrink: 0;
 }
 .pkg-drawer-title {
+  /* Same serif-leak guard as .mobile-menu-drawer-title — this Drawer.Title
+     heading is portalled to body and would otherwise pick up the /learn
+     docs' serif `h1–h6` rule. */
+  font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 600;
   color: var(--text);
@@ -3005,6 +3009,11 @@ input[type="range"].fs-slider:disabled {
   padding: 10px 16px 8px;
 }
 .mobile-menu-drawer-title {
+  /* Drawer.Title renders as a heading; pin the UI font so the docs'
+     `h1–h6 { font-family: var(--font-serif) }` rule (active when the
+     playground is embedded in /learn) can't leak serif into the
+     portalled bottom sheet. */
+  font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 600;
   color: var(--text);
@@ -3311,6 +3320,10 @@ input[type="range"].fs-slider:disabled {
   opacity: 0;
 }
 .confirm-popup {
+  /* Anchor the whole dialog to the UI font so a serif-scoped host (the
+     /learn docs, where these playgrounds embed) can't leak in via the
+     portal. The title still needs its own rule below to beat `h1–h6`. */
+  font-family: var(--font-ui);
   position: fixed;
   top: 50%;
   left: 50%;
@@ -3336,6 +3349,11 @@ input[type="range"].fs-slider:disabled {
   transform: translate(-50%, -50%) scale(0.94);
 }
 .confirm-title {
+  /* Base UI renders Dialog.Title as an <h2>. This dialog is portalled to
+     document.body, so when a playground is embedded in /learn the docs'
+     `h1–h6 { font-family: var(--font-serif) }` rule lands on it; pin the
+     UI font so the title never falls into serif. */
+  font-family: var(--font-ui);
   font-size: 15px;
   font-weight: 600;
   color: var(--text);
@@ -3414,6 +3432,17 @@ input[type="range"].fs-slider:disabled {
   box-shadow:
     0 0 0 2px var(--bg2),
     0 0 0 4px var(--text-muted);
+}
+/* On narrow screens a row of three workspace-choice buttons ("Cancel",
+   "Open in new workspace", "Overwrite this workspace") no longer fits:
+   the labels wrap to several lines and the buttons stretch to uneven
+   heights. Stack them full-width so each label sits on one line and the
+   spacing reads evenly. Opt-in via .confirm-actions-stack so two-button
+   confirms keep their compact row. */
+@media (max-width: 768px) {
+  .confirm-actions-stack {
+    flex-direction: column;
+  }
 }
 
 /* ─── Tab rename dialog (used by the generic TabBar across every
