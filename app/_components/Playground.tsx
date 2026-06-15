@@ -656,6 +656,19 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // Full workspace-manager drawer, opened from the mobile hamburger menu
   // (the header badge that normally opens it is hidden on mobile).
   const [workspaceManagerOpen, setWorkspaceManagerOpen] = useState(false);
+  // Mutually-exclusive mobile menu sub-sheets (Files / Examples / Export /
+  // Information): opening one closes any other, so selecting a different
+  // item never leaves a stale sub-sheet open behind it.
+  const [activeMobileSubmenu, setActiveMobileSubmenu] = useState<string | null>(
+    null,
+  );
+  // Forget the open sub-sheet whenever the whole menu closes, so a flat
+  // action that dismisses the menu doesn't leave a nested sheet orphaned
+  // (and it reopens from the top next time).
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (!mobileMenuOpen) setActiveMobileSubmenu(null);
+  }, [mobileMenuOpen]);
   // Confirm dialog shown when picking an example would discard editor
   // contents the user has already typed.
   const [pendingExample, setPendingExample] = useState<ExampleSnippet | null>(
@@ -3183,7 +3196,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                       {/* Files — the desktop icon rail (which toggles the
                           file panel) is hidden on mobile, so surface file
                           management here as a bottom-sheet instead. */}
-                      <Drawer.Root swipeDirection="down">
+                      <Drawer.Root
+                        swipeDirection="down"
+                        open={activeMobileSubmenu === "files"}
+                        onOpenChange={(o) =>
+                          setActiveMobileSubmenu(o ? "files" : null)
+                        }
+                      >
                         <Drawer.Trigger className="mobile-menu-action">
                           <span>Files</span>
                           <span className="mobile-menu-chev" aria-hidden="true">
@@ -3222,7 +3241,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         </Drawer.Portal>
                       </Drawer.Root>
 
-                      <Drawer.Root swipeDirection="down">
+                      <Drawer.Root
+                        swipeDirection="down"
+                        open={activeMobileSubmenu === "examples"}
+                        onOpenChange={(o) =>
+                          setActiveMobileSubmenu(o ? "examples" : null)
+                        }
+                      >
                         <Drawer.Trigger className="mobile-menu-action">
                           <span>Examples</span>
                           <span className="mobile-menu-chev" aria-hidden="true">
@@ -3274,7 +3299,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         </Drawer.Portal>
                       </Drawer.Root>
 
-                      <Drawer.Root swipeDirection="down">
+                      <Drawer.Root
+                        swipeDirection="down"
+                        open={activeMobileSubmenu === "export"}
+                        onOpenChange={(o) =>
+                          setActiveMobileSubmenu(o ? "export" : null)
+                        }
+                      >
                         <Drawer.Trigger className="mobile-menu-action">
                           <span>Export</span>
                           <span className="mobile-menu-chev" aria-hidden="true">
@@ -3346,7 +3377,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         </button>
                       )}
 
-                      <Drawer.Root swipeDirection="down">
+                      <Drawer.Root
+                        swipeDirection="down"
+                        open={activeMobileSubmenu === "information"}
+                        onOpenChange={(o) =>
+                          setActiveMobileSubmenu(o ? "information" : null)
+                        }
+                      >
                         <Drawer.Trigger className="mobile-menu-action">
                           <span>Information</span>
                           <span className="mobile-menu-chev" aria-hidden="true">

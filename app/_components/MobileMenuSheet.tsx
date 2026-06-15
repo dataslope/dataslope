@@ -16,12 +16,31 @@
 // context below) so a tap both runs the action and dismisses the menu —
 // matching the language playgrounds' behaviour.
 
-import { createContext, useContext, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { Drawer } from "@base-ui/react/drawer";
 
-/** Closes the root menu sheet. Provided by `MobileMenuSheet`, consumed by
- *  `MobileMenuAction` (including those nested inside a sub-sheet). */
-const CloseRootContext = createContext<() => void>(() => {});
+interface MobileMenuContextValue {
+  /** Closes the whole menu (root sheet + any open sub-sheet). */
+  closeRoot: () => void;
+  /** Id of the sub-sheet that's currently open, or null. Sub-sheets are
+   *  mutually exclusive: opening one closes any other, so selecting a
+   *  different menu item never leaves a stale sub-sheet open behind it. */
+  activeSubmenu: string | null;
+  setActiveSubmenu: (id: string | null) => void;
+}
+
+const MobileMenuContext = createContext<MobileMenuContextValue>({
+  closeRoot: () => {},
+  activeSubmenu: null,
+  setActiveSubmenu: () => {},
+});
 
 export interface MobileMenuSheetProps {
   open: boolean;
@@ -54,8 +73,30 @@ export function MobileMenuSheet({
   title = "Menu",
   children,
 }: MobileMenuSheetProps) {
+  const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
+  // Forget the open sub-sheet whenever the whole menu closes, so it
+  // reopens from the top next time.
+  const handleOpenChange = useCallback(
+    (next: boolean) => {
+      if (!next) setActiveSubmenu(null);
+      onOpenChange(next);
+    },
+    [onOpenChange],
+  );
+  const closeRoot = useCallback(() => {
+    setActiveSubmenu(null);
+    onOpenChange(false);
+  }, [onOpenChange]);
+  const ctx = useMemo<MobileMenuContextValue>(
+    () => ({ closeRoot, activeSubmenu, setActiveSubmenu }),
+    [closeRoot, activeSubmenu],
+  );
   return (
-    <Drawer.Root open={open} onOpenChange={onOpenChange} swipeDirection="down">
+    <Drawer.Root
+      open={open}
+      onOpenChange={handleOpenChange}
+      swipeDirection="down"
+    >
       <Drawer.Trigger
         className="header-btn icon-only mobile-only mobile-menu-btn"
         title="Menu"
@@ -78,9 +119,9 @@ export function MobileMenuSheet({
                 </Drawer.Close>
               </div>
               <div className="mobile-menu-drawer-body">
-                <CloseRootContext.Provider value={() => onOpenChange(false)}>
+                <MobileMenuContext.Provider value={ctx}>
                   {children}
-                </CloseRootContext.Provider>
+                </MobileMenuContext.Provider>
               </div>
             </Drawer.Content>
           </Drawer.Popup>
@@ -107,7 +148,7 @@ export function MobileMenuAction({
   chevron,
   keepOpen,
 }: MobileMenuActionProps) {
-  const closeRoot = useContext(CloseRootContext);
+  const { closeRoot } = useContext(MobileMenuContext);
   return (
     <button
       type="button"
@@ -136,6 +177,9 @@ export interface MobileMenuSubSheetProps {
   /** Extra class appended to the body (e.g. `info-popover` for the
    *  runtime-info panel). */
   bodyClassName?: string;
+  /** Identity used to enforce one-open-sub-sheet-at-a-time. Defaults to a
+   *  string `label`; pass explicitly if `label` isn't a unique string. */
+  id?: string;
   children: ReactNode;
 }
 
@@ -147,10 +191,17 @@ export function MobileMenuSubSheet({
   title,
   ariaLabel,
   bodyClassName,
+  id,
   children,
 }: MobileMenuSubSheetProps) {
+  const { activeSubmenu, setActiveSubmenu } = useContext(MobileMenuContext);
+  const submenuId = id ?? (typeof label === "string" ? label : "submenu");
   return (
-    <Drawer.Root swipeDirection="down">
+    <Drawer.Root
+      open={activeSubmenu === submenuId}
+      onOpenChange={(next) => setActiveSubmenu(next ? submenuId : null)}
+      swipeDirection="down"
+    >
       <Drawer.Trigger className="mobile-menu-action">
         <span>{label}</span>
         <span className="mobile-menu-chev" aria-hidden="true">
