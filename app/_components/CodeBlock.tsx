@@ -1493,23 +1493,21 @@ function CodeBlockInner({
                 downloadMB={
                   status === "loading" ? adapter.coldDownloadMB : undefined
                 }
+                compiled={adapter.compiled}
                 fraction={status === "loading" ? bootDisplayFraction : null}
                 testId="codeblock-boot"
               />
             </div>
           )}
-          {outputs.length > 0 ? (
+          {outputs.length > 0 && (
             <div className={challengeStyles.outputBody}>
               {outputs.map((cell) => (
                 <OutputSegment key={cell.id} cell={cell} />
               ))}
             </div>
-          ) : (
-            status === "running" &&
-            !midRunPreparing && (
-              <div className={challengeStyles.outputEmpty}>Running…</div>
-            )
           )}
+          {/* No "Running…" placeholder while output is empty — the blue
+              wave overlay already signals the run is in progress. */}
           <RunOverlay active={isBusy} />
         </div>
       )}

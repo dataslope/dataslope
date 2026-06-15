@@ -1321,6 +1321,14 @@
   position: relative;
 }
 
+/* While a run is in flight the output body can be empty (no "Running…"
+   placeholder anymore), so reserve height for the blue wave overlay —
+   mirrors `<CodeBlock>`'s `.outputRunning`. */
+.outputRunning {
+  min-height: 84px;
+  padding-bottom: 48px;
+}
+
 .outputHeader {
   display: flex;
   align-items: center;
@@ -2508,6 +2516,12 @@
 .resultPane {
   position: relative;
   overflow: hidden;
+}
+
+/* While a query is in flight the pane can be empty (no "Running…" text),
+   so reserve height for the blue wave overlay on a first run. */
+.resultPaneBusy {
+  min-height: 96px;
 }
 
 .resultFlashOverlay {

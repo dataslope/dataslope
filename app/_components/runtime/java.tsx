@@ -725,6 +725,8 @@ export const javaAdapter: LanguageAdapter = {
   // CheerpJ runtime from cjrtnc.leaningtech.com plus the bundled
   // tools.jar (~18 MB) that provides javac.
   coldDownloadMB: 30,
+  // Compiles (javac) on every run, so later runs are faster, not instant.
+  compiled: true,
   // clang-format LLVM style (see formatCode) — keep in sync.
   indentWidth: 2,
   examples: EXAMPLES,

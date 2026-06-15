@@ -2752,7 +2752,10 @@ export function TableViewer({
             )}
           </div>
           {resultIsActive && resultTabVisible && resultTabData ? (
-            <div className={styles.resultPane} style={{ position: "relative" }}>
+            <div
+              className={`${styles.resultPane}${resultTabData.loading ? ` ${styles.resultPaneBusy}` : ""}`}
+              style={{ position: "relative" }}
+            >
               {flashKey > 0 && (
                 <div key={flashKey} className={styles.resultFlashOverlay} aria-hidden />
               )}
@@ -2792,9 +2795,8 @@ export function TableViewer({
                   {resultTabData.message}
                   {resultTabData.elapsed ? ` · ${resultTabData.elapsed}` : ""}
                 </div>
-              ) : (
-                <div className={styles.sqlMessage}>Running…</div>
-              )}
+              ) : null /* No "Running…" text — the blue wave overlay below
+                          signals the run; .resultPaneBusy reserves height. */}
               <RunOverlay active={resultTabData.loading} />
             </div>
           ) : (
