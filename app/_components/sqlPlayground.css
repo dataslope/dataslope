@@ -94,6 +94,23 @@
   white-space: nowrap;
 }
 
+/* Transparent full-screen backdrop behind the open database dropdown.
+   The SQL playground is a fixed `overflow:hidden` layout whose scrolling
+   lives in inner panes (schema tree, results), not on `body` — so Base
+   UI's modal body-scroll-lock has nothing to lock and the panes behind
+   the dropdown stay touch-scrollable on mobile. Sitting above those panes
+   and one step below the popup, this backdrop swallows touch gestures
+   (`touch-action: none`) so the background can't scroll while the dropdown
+   is open. Kept transparent so it doesn't dim the page. */
+.sql-db-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 499;
+  background: transparent;
+  touch-action: none;
+  overscroll-behavior: contain;
+}
+
 .sql-db-positioner {
   z-index: 500;
 }

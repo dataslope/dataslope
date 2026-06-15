@@ -99,6 +99,13 @@ export function DatabaseSelector({
         <Select.Icon className="playground-switcher-icon">{chevron}</Select.Icon>
       </Select.Trigger>
       <Select.Portal>
+        {/* The SQL playground is a fixed `overflow:hidden` layout whose
+            scrolling lives in inner panes, not on `body`, so Base UI's
+            modal body-scroll-lock can't stop the panes behind an open
+            dropdown from scrolling on touch. A transparent backdrop with
+            `touch-action: none` (see `.sql-db-backdrop`) swallows those
+            gestures so the background stays put. */}
+        <Select.Backdrop className="sql-db-backdrop" />
         <Select.Positioner
           className="sql-db-positioner"
           sideOffset={6}
