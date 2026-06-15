@@ -69,6 +69,10 @@ export interface SqlPlaygroundShellProps {
    *  History, ER Diagram, Information, Settings) via `MobileMenuAction` /
    *  `MobileMenuSubSheet`. Omit to render no menu. */
   mobileMenu?: ReactNode;
+  /** Real, smoothed boot fraction (0..1) when the engine reports download
+   *  progress (DuckDB). Omit for engines that don't — the shell then
+   *  creeps a determinate bar over time instead. */
+  bootFraction?: number | null;
   /** Main body of the page — typically the top toolbar + sidebar +
    *  editor + results pane structure. Rendered directly inside
    *  `<div className="playground-app">` after the header. */
@@ -100,6 +104,7 @@ export function SqlPlaygroundShell({
   loadingCaption,
   headerActions,
   mobileMenu,
+  bootFraction,
   children,
 }: SqlPlaygroundShellProps) {
   const showLoadingOverlay = keepOverlayMounted || !loaded;
@@ -111,17 +116,19 @@ export function SqlPlaygroundShell({
   // the settings pane. Detected from the DOM (below) so the three
   // playground bodies stay untouched.
   const [settingsTabActive, setSettingsTabActive] = useState(false);
-  // The SQL engines don't report a real boot fraction, so creep a
-  // determinate bar toward ~90% while booting — matching the language
-  // playgrounds' progress bar. It stops (and the overlay unmounts) on load.
-  const [bootFraction, setBootFraction] = useState(0.05);
+  // Fallback for engines that don't report real download progress
+  // (Postgres, SQLite): creep a determinate bar toward ~90% while booting.
+  // Skipped when the dialect supplies a real `bootFraction` (DuckDB).
+  const [creepFraction, setCreepFraction] = useState(0.05);
   useEffect(() => {
-    if (loaded) return;
+    if (loaded || bootFraction !== undefined) return;
     const id = window.setInterval(() => {
-      setBootFraction((f) => Math.min(0.9, f + (0.9 - f) * 0.05));
+      setCreepFraction((f) => Math.min(0.9, f + (0.9 - f) * 0.05));
     }, 200);
     return () => window.clearInterval(id);
-  }, [loaded]);
+  }, [loaded, bootFraction]);
+  const overlayFraction =
+    bootFraction !== undefined ? bootFraction : creepFraction;
 
   // ─── Mobile single-pane navigation ───────────────────────────────────
   // Below the mobile breakpoint the desktop 3-pane IDE collapses to one
@@ -272,7 +279,7 @@ export function SqlPlaygroundShell({
           title={playgroundTitle.replace(/\s*Playground$/i, "")}
           statusMessage={loadingCaption}
           cold
-          fraction={bootFraction}
+          fraction={overlayFraction}
           error={statusState === "error"}
           className={loadingOverlayClassName}
         />

@@ -120,6 +120,7 @@ import {
 } from "../files/opfsDataStorage";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
 import { MobileMenuAction, MobileMenuSubSheet } from "../MobileMenuSheet";
+import { useCreepingBootFraction } from "../challengeShared";
 import { type DuckDbEngine, DUCKDB_VERSION } from "../runtime/duckdb";
 
 const DUCKDB_SAMPLE_DATABASES = duckdbAdapter.samples;
@@ -1008,6 +1009,10 @@ function DuckDbPlaygroundInner() {
     Record<string, QueryRunResult | null>
   >({});
   const [loaded, setLoaded] = useState(false);
+  // Real DuckDB-wasm download progress (0..1), smoothed for the boot
+  // overlay's progress bar.
+  const [bootRawFraction, setBootRawFraction] = useState<number | null>(null);
+  const bootDisplayFraction = useCreepingBootFraction(bootRawFraction, !loaded);
   const [statusState, setStatusState] = useState<
     "loading" | "ready" | "running" | "error"
   >("loading");
@@ -1917,6 +1922,7 @@ function DuckDbPlaygroundInner() {
         const engine = await duckdbAdapter.createEngine(
           initialDbId,
           workspaceId,
+          setBootRawFraction,
         );
         if (cancelled) {
           // The component already unmounted while bootstrap was in flight.
@@ -3968,6 +3974,7 @@ function DuckDbPlaygroundInner() {
       playgroundId={PLAYGROUND_ID}
       playgroundTitle="DuckDB Playground"
       loaded={loaded}
+      bootFraction={bootDisplayFraction}
       statusState={statusState}
       loadingCaption={loadingMessage}
       headerActions={
