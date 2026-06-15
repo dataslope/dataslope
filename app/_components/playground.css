@@ -2219,7 +2219,7 @@ input[type="range"].fs-slider:disabled {
   z-index: 301;
   width: 380px;
   max-width: 100vw;
-  background: var(--bg2);
+  background: var(--bg);
   border-left: 1px solid var(--border);
   box-shadow: -8px 0 32px #0006;
   display: flex;
@@ -2257,7 +2257,6 @@ input[type="range"].fs-slider:disabled {
   align-items: center;
   justify-content: space-between;
   padding: 8px 16px;
-  border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
 .pkg-drawer-title {
@@ -2885,7 +2884,7 @@ input[type="range"].fs-slider:disabled {
    positioner — we use these to drive natural enter/exit animations. */
 .bui-popup {
   outline: none;
-  background: var(--bg2);
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: 0 8px 32px #0008;
@@ -2966,7 +2965,7 @@ input[type="range"].fs-slider:disabled {
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--bg2);
+  background: var(--bg);
   border-top: 1px solid var(--border);
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
@@ -3096,6 +3095,19 @@ input[type="range"].fs-slider:disabled {
   font-size: 16px;
   line-height: 1;
   transition: transform 0.15s ease;
+}
+
+/* Database selector surfaced at the top of the SQL playgrounds' mobile
+   drawer menu (an experiment alongside the sidebar copy). The trigger is
+   borderless by default and the drawer is now var(--bg), so give it a
+   visible outline and a divider to read as a distinct control. */
+.mobile-menu-db-selector {
+  padding: 2px 2px 10px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.mobile-menu-db-selector .sql-database-selector {
+  border-color: var(--border);
 }
 
 .mobile-menu-drawer-body > button.example-item {
@@ -3909,8 +3921,27 @@ html[data-playground-theme="dark"] .welcome h3 {
   align-items: stretch;
   flex: 0 1 auto;
   min-width: 0;
-  overflow: hidden;
+  /* Scroll horizontally when there are more tabs than fit, rather than
+     shrinking every tab into an unreadable sliver. A thin, unobtrusive
+     scrollbar hints that more tabs are off-screen; touch devices get
+     native momentum scrolling. The active tab is scrolled into view from
+     TabBar.tsx. */
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  -webkit-overflow-scrolling: touch;
   gap: 2px;
+}
+.playground-tabs::-webkit-scrollbar {
+  height: 6px;
+}
+.playground-tabs::-webkit-scrollbar-track {
+  background: transparent;
+}
+.playground-tabs::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
 }
 
 .playground-tab {
@@ -3926,7 +3957,8 @@ html[data-playground-theme="dark"] .welcome h3 {
   font-size: 12px;
   cursor: pointer;
   position: relative;
-  flex: 0 1 auto;
+  /* Don't shrink — keep each tab readable and let the strip scroll. */
+  flex: 0 0 auto;
   min-width: 60px;
   max-width: 240px;
   overflow: hidden;
@@ -4197,8 +4229,7 @@ html[data-playground-theme="dark"] .welcome h3 {
   gap: 8px;
   padding: 10px 14px;
   background: color-mix(in srgb, var(--primary) 18%, transparent);
-  border: 1px dashed
-    color-mix(in srgb, var(--primary) 50%, var(--border));
+  border: none;
   border-radius: var(--radius);
   color: var(--text);
   font-family: var(--font-ui);
@@ -4220,13 +4251,18 @@ html[data-playground-theme="dark"] .welcome h3 {
   flex-direction: column;
   gap: 6px;
   padding: 10px 12px;
-  border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: color-mix(in srgb, var(--bg) 85%, transparent);
+}
+
+/* Flat list — separate consecutive items with a bit more breathing room
+   (they no longer carry a card background/border). */
+.workspace-manager-item + .workspace-manager-item {
+  margin-top: 8px;
 }
 
 .workspace-manager-item.active {
-  border-color: color-mix(in srgb, var(--primary) 55%, var(--border));
+  /* Subtle fill marks the active workspace; the "Active" pill carries the
+     explicit label. No border, to match the flat list. */
   background: color-mix(in srgb, var(--primary) 8%, transparent);
 }
 
@@ -4284,16 +4320,18 @@ html[data-playground-theme="dark"] .welcome h3 {
 .workspace-manager-item-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  /* No gap — consecutive actions are separated by a subtle divider
+     (border-left below) instead of pills with their own borders. */
+  gap: 0;
 }
 
 .workspace-manager-action {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 8px;
-  background: color-mix(in srgb, var(--bg) 75%, transparent);
-  border: 1px solid var(--border);
+  padding: 4px 10px;
+  background: transparent;
+  border: none;
   border-radius: var(--radius);
   color: var(--text);
   font-family: var(--font-ui);
@@ -4301,9 +4339,13 @@ html[data-playground-theme="dark"] .welcome h3 {
   cursor: pointer;
 }
 
+/* Subtle divider between consecutive actions (Export · Rename · …). */
+.workspace-manager-action + .workspace-manager-action {
+  border-left: 1px solid var(--border);
+}
+
 .workspace-manager-action:hover:not(:disabled) {
-  background: var(--bg);
-  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+  background: color-mix(in srgb, var(--text) 8%, transparent);
 }
 
 .workspace-manager-action.danger {
@@ -4312,7 +4354,6 @@ html[data-playground-theme="dark"] .welcome h3 {
 
 .workspace-manager-action.danger:hover:not(:disabled) {
   background: color-mix(in srgb, var(--danger, #e57373) 14%, transparent);
-  border-color: color-mix(in srgb, var(--danger, #e57373) 50%, var(--border));
 }
 
 .workspace-manager-action:disabled {
