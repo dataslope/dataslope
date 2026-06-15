@@ -4,20 +4,23 @@
 // compiled to WebAssembly that runs entirely in the browser — the same
 // "everything in the browser" approach used by Pyodide (Python),
 // WebR (R), php-wasm (PHP), and browsercc (C/C++) elsewhere in this
-// repo. We bundle a Java 8 `tools.jar` under `public/tools.jar`
-// (served by Next.js at `/tools.jar`) and pre-load it into CheerpJ's
-// virtual FS at `/app/tools.jar`, so we can drive `javac`
-// (`com.sun.tools.javac.Main`) on user source at runtime, then run
-// the resulting class with `cheerpjRunMain` — exactly what JavaFiddle
-// does (https://github.com/leaningtech/javafiddle). CheerpJ maps `/app`
-// to the hosting app, so `/app/tools.jar` is fetched from this Next.js
-// app's `/tools.jar`. CheerpJ itself does not ship `tools.jar`; without
-// our bundled copy `cheerpjRunMain` would fail with "Could not find or
-// load main class com.sun.tools.javac.Main".
+// repo. CheerpJ itself does not ship `tools.jar`, so we supply a Java 8
+// `tools.jar` (which contains `com.sun.tools.javac.Main`) and load it
+// into CheerpJ's in-memory `/str/` filesystem at runtime; we then drive
+// `javac` on user source and run the resulting class with
+// `cheerpjRunMain` — exactly what JavaFiddle does
+// (https://github.com/leaningtech/javafiddle). Without it `cheerpjRunMain`
+// fails with "Could not find or load main class
+// com.sun.tools.javac.Main".
 //
-// tools.jar lives in `public/` (rather than `cdn-assets/` like the
-// .NET runtime bundle) because jsDelivr does not serve `.jar` files,
-// so we cannot host it on a GitHub-tag-backed CDN.
+// The jar is fetched cross-origin from unpkg (the `dataslope-tools-jar`
+// npm package — see TOOLS_JAR_CDN in cdn.ts) rather than served from this
+// app's own origin, so Vercel never handles its ~18 MB of bandwidth. We
+// fetch the bytes ourselves and inject them via `cheerpjAddStringFile`
+// instead of relying on CheerpJ's `/app` → origin mapping; that is what
+// lets the jar live on an external CDN. jsDelivr refuses .jar files and
+// GitHub release assets omit CORS headers, so unpkg (which serves .jar
+// with `access-control-allow-origin: *`) is the host.
 //
 // CheerpJ is distributed as a non-module loader script that injects
 // globals (`cheerpjInit`, `cheerpjRunMain`, `cheerpjAddStringFile`,
@@ -28,8 +31,16 @@
 // `status: "none"` suppresses CheerpJ's own loading banner — the
 // playground UI already renders its own.
 
+import { TOOLS_JAR_CDN } from "./cdn";
+
 const CHEERPJ_VERSION = "4.3";
 const CHEERPJ_LOADER_URL = `https://cjrtnc.leaningtech.com/${CHEERPJ_VERSION}/loader.js`;
+
+// Where we mount tools.jar inside CheerpJ's in-memory /str/ filesystem;
+// java.tsx puts this on the classpath. `/str/` is CheerpJ's
+// host-populated, read-only FS — the same one user .java sources are
+// staged into.
+export const TOOLS_JAR_VFS_PATH = "/str/tools.jar";
 // ─── Public types ──────────────────────────────────────────────────────
 
 /** Narrow slice of the CheerpJ globals we actually consume. */
@@ -65,6 +76,23 @@ export function loadCheerpJ(): Promise<CheerpJApi> {
     }
     const w = window as CheerpJWindow;
 
+    // Start downloading tools.jar from the CDN immediately, in parallel
+    // with loading + initialising CheerpJ's (separately hosted) runtime —
+    // both are large. The bytes are injected into /str/ once init
+    // completes, before any cheerpjRunMain call. The no-op `.catch`
+    // suppresses an "unhandled rejection" warning during the window before
+    // `finishInit` awaits the promise; the real error is surfaced by that
+    // await, which rejects the whole loadCheerpJ promise.
+    const jarBytesPromise = fetch(TOOLS_JAR_CDN).then(async (res) => {
+      if (!res.ok) {
+        throw new Error(
+          `Failed to fetch tools.jar from ${TOOLS_JAR_CDN} (HTTP ${res.status}).`,
+        );
+      }
+      return new Uint8Array(await res.arrayBuffer());
+    });
+    void jarBytesPromise.catch(() => {});
+
     const finishInit = async () => {
       try {
         if (typeof w.cheerpjInit !== "function") {
@@ -77,6 +105,11 @@ export function loadCheerpJ(): Promise<CheerpJApi> {
         ) {
           throw new Error("CheerpJ globals missing after init.");
         }
+
+        // Mount tools.jar (javac) into CheerpJ's /str/ FS before the first
+        // cheerpjRunMain — java.tsx references it via TOOLS_JAR_VFS_PATH on
+        // the classpath.
+        w.cheerpjAddStringFile(TOOLS_JAR_VFS_PATH, await jarBytesPromise);
 
         resolve({
           cheerpjRunMain: w.cheerpjRunMain.bind(w),

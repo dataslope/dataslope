@@ -1,0 +1,25 @@
+{
+  "name": "dataslope-tools-jar",
+  "version": "1.0.0",
+  "description": "OpenJDK 8 tools.jar (com.sun.tools.javac.Main) packaged for CDN delivery to the Dataslope in-browser Java playground, which drives javac via CheerpJ. Fetched at runtime from unpkg.",
+  "license": "GPL-2.0-with-classpath-exception",
+  "files": [
+    "tools.jar"
+  ],
+  "keywords": [
+    "openjdk",
+    "tools.jar",
+    "javac",
+    "cheerpj",
+    "dataslope"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dataslope/dataslope.git",
+    "directory": "tools-jar"
+  },
+  "homepage": "https://github.com/dataslope/dataslope/tree/main/tools-jar",
+  "publishConfig": {
+    "access": "public"
+  }
+}
