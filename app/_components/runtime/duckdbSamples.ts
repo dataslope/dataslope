@@ -230,6 +230,44 @@ const PARQUET_DEMO_TABS: QueryTabSeed[] = [
   },
 ];
 
+// ─── Lending Club loans sample ───────────────────────────────────────
+// A real-world analytical dataset: ~205k Lending Club consumer loans
+// with credit grade, interest rate, term, borrower income, loan
+// purpose, and whether the loan ultimately defaulted. The data lives as
+// a Parquet file in the dataslope/datasets repo and is loaded over
+// jsDelivr — the same CDN the rest of the playground uses — then
+// materialized into a single `loans` table so it shows up in the schema
+// browser like the inline samples.
+//
+// The file was added to dataslope/datasets after the pinned DATASETS_REF
+// (a repo-relative path would 404 against the pin), so the URL targets
+// `@main`. jsDelivr serves it CORS-enabled; the dataset cache treats
+// mutable-ref URLs as per-session — see remoteDatasets.ts.
+const LENDING_CLUB_PARQUET_URL =
+  "https://cdn.jsdelivr.net/gh/dataslope/datasets@main/lending-club-loan-results.parquet";
+
+const LENDING_CLUB_SQL = `
+-- Materialize the remote Parquet file (registered in DuckDB's virtual
+-- filesystem as loans.parquet) into a table so queries stay snappy.
+CREATE TABLE loans AS
+  SELECT * FROM read_parquet('loans.parquet');
+`;
+
+const LENDING_CLUB_TABS: QueryTabSeed[] = [
+  {
+    title: "Default rate by grade",
+    code: `-- Lending Club grades loans A (safest) through G. Default\n-- rates should climb as the grade falls.\nSELECT grade,\n       COUNT(*) AS loans,\n       ROUND(AVG(loan_amnt)) AS avg_loan,\n       ROUND(100 * AVG(did_default::INT), 1) AS default_rate_pct\nFROM loans\nGROUP BY grade\nORDER BY grade;`,
+  },
+  {
+    title: "Borrowing by purpose",
+    code: `-- Why people borrow, with the typical loan size and rate.\nSELECT purpose,\n       COUNT(*) AS loans,\n       ROUND(AVG(loan_amnt)) AS avg_loan,\n       ROUND(AVG(int_rate), 2) AS avg_int_rate\nFROM loans\nGROUP BY purpose\nORDER BY loans DESC;`,
+  },
+  {
+    title: "Profile every column",
+    code: `-- DuckDB's SUMMARIZE profiles the whole table in one shot —\n-- type, min/max, approximate quantiles, null %, and counts.\nSUMMARIZE loans;`,
+  },
+];
+
 export const DUCKDB_SAMPLE_DATABASES: DuckDbSampleDatabase[] = [
   {
     id: "ecommerce",
@@ -256,6 +294,18 @@ export const DUCKDB_SAMPLE_DATABASES: DuckDbSampleDatabase[] = [
       "Inline measurements with examples of read_parquet / read_csv_auto.",
     sql: PARQUET_DEMO_SQL,
     defaultTabs: PARQUET_DEMO_TABS,
+  },
+  {
+    id: "lending_club",
+    label: "Lending Club loans",
+    filename: "lending_club.duckdb",
+    description:
+      "~205k real consumer loans — credit grade, rate, purpose, and default.",
+    remoteFiles: [
+      { path: LENDING_CLUB_PARQUET_URL, registerAs: "loans.parquet" },
+    ],
+    sql: LENDING_CLUB_SQL,
+    defaultTabs: LENDING_CLUB_TABS,
   },
 ];
 
