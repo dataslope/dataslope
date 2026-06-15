@@ -123,6 +123,17 @@ export function MobileMenuSheet({
                   {children}
                 </MobileMenuContext.Provider>
               </div>
+              {/* While a sub-sheet is open the parent menu acts as a
+                  backdrop: a tap anywhere on it just closes the sub-sheet
+                  (rather than opening whatever item was tapped). */}
+              {activeSubmenu !== null && (
+                <button
+                  type="button"
+                  className="mobile-menu-dismiss-catch"
+                  aria-label="Close submenu"
+                  onClick={() => setActiveSubmenu(null)}
+                />
+              )}
             </Drawer.Content>
           </Drawer.Popup>
         </Drawer.Viewport>

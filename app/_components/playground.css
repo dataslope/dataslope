@@ -2285,7 +2285,6 @@ input[type="range"].fs-slider:disabled {
   background: var(--primary-glow);
   color: var(--primary);
   border-radius: 10px;
-  border: 1px solid var(--primary);
 }
 
 .pkg-search-wrap {
@@ -3108,6 +3107,21 @@ input[type="range"].fs-slider:disabled {
 }
 .mobile-menu-db-selector .sql-database-selector {
   border-color: var(--border);
+}
+
+/* Transparent layer over the parent menu while a sub-sheet is open, so a
+   tap anywhere on the parent dismisses the sub-sheet (acting as a
+   backdrop) instead of activating the row underneath. It sits above the
+   menu rows but below the sub-sheet, which renders in its own later
+   portal/viewport. */
+.mobile-menu-dismiss-catch {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: default;
 }
 
 .mobile-menu-drawer-body > button.example-item {
@@ -4215,7 +4229,7 @@ html[data-playground-theme="dark"] .welcome h3 {
 .workspace-manager-body {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 12px;
   /* `.pkg-body` ships 0 horizontal padding; add it back here so the
      buttons and workspace cards line up with the 16px-inset header
      instead of sitting flush against (and touching) the panel walls. */
@@ -4228,7 +4242,7 @@ html[data-playground-theme="dark"] .welcome h3 {
   justify-content: center;
   gap: 8px;
   padding: 10px 14px;
-  background: color-mix(in srgb, var(--primary) 18%, transparent);
+  background: color-mix(in srgb, var(--text) 7%, transparent);
   border: none;
   border-radius: var(--radius);
   color: var(--text);
@@ -4243,21 +4257,13 @@ html[data-playground-theme="dark"] .welcome h3 {
 }
 
 .workspace-manager-new:hover {
-  background: color-mix(in srgb, var(--primary) 28%, transparent);
+  background: color-mix(in srgb, var(--text) 12%, transparent);
 }
 
 .workspace-manager-item {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 10px 12px;
   border-radius: var(--radius);
-}
-
-/* Flat list — separate consecutive items with a bit more breathing room
-   (they no longer carry a card background/border). */
-.workspace-manager-item + .workspace-manager-item {
-  margin-top: 8px;
 }
 
 .workspace-manager-item.active {
@@ -4269,7 +4275,8 @@ html[data-playground-theme="dark"] .welcome h3 {
 .workspace-manager-item-main {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  /* Spacing below the workspace title before its meta line. */
+  gap: 6px;
   min-width: 0;
 }
 
@@ -4323,6 +4330,8 @@ html[data-playground-theme="dark"] .welcome h3 {
   /* No gap — consecutive actions are separated by a subtle divider
      (border-left below) instead of pills with their own borders. */
   gap: 0;
+  /* Spacing above the row of actions. */
+  margin-top: 8px;
 }
 
 .workspace-manager-action {
@@ -4332,16 +4341,20 @@ html[data-playground-theme="dark"] .welcome h3 {
   padding: 4px 10px;
   background: transparent;
   border: none;
-  border-radius: var(--radius);
   color: var(--text);
   font-family: var(--font-ui);
   font-size: 11px;
   cursor: pointer;
 }
 
+/* The first action aligns flush with the content above it. */
+.workspace-manager-action:first-child {
+  padding-left: 0;
+}
+
 /* Subtle divider between consecutive actions (Export · Rename · …). */
 .workspace-manager-action + .workspace-manager-action {
-  border-left: 1px solid var(--border);
+  border-left: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
 }
 
 .workspace-manager-action:hover:not(:disabled) {

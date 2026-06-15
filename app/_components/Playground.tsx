@@ -3433,6 +3433,17 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         <span>Settings</span>
                       </button>
                     </div>
+                    {/* While a sub-sheet is open the parent menu acts as a
+                        backdrop: a tap anywhere on it just closes the open
+                        sub-sheet rather than opening the tapped item. */}
+                    {activeMobileSubmenu !== null && (
+                      <button
+                        type="button"
+                        className="mobile-menu-dismiss-catch"
+                        aria-label="Close submenu"
+                        onClick={() => setActiveMobileSubmenu(null)}
+                      />
+                    )}
                   </Drawer.Content>
                 </Drawer.Popup>
               </Drawer.Viewport>

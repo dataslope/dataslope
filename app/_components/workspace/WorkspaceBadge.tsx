@@ -570,7 +570,6 @@ function WorkspaceManagerDrawer({
                                 : `Switch to ${ws.name}`
                             }
                           >
-                            <Folder size={14} aria-hidden="true" />
                             <span className="workspace-manager-item-name">
                               {ws.name}
                               {active && (
