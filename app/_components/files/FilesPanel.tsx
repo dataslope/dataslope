@@ -20,6 +20,7 @@ import {
   Info,
   Play,
   Copy,
+  Table,
 } from "lucide-react";
 
 export interface VirtualFile {
@@ -57,6 +58,16 @@ interface FilesPanelProps {
   onOpenQuery?: (path: string) => void;
   /** Label for the open-query menu item (defaults to "Query with SELECT"). */
   openQueryLabel?: string;
+  /** Called when the user chooses to create a table from a file. Only
+   *  rendered when provided — use to surface a runtime-specific "import as
+   *  table" action. */
+  onCreateTable?: (path: string) => void;
+  /** Predicate gating the create-table menu item per file (e.g. only for
+   *  extensions the runtime can read). When omitted, the item shows for
+   *  every file as long as `onCreateTable` is provided. */
+  canCreateTable?: (path: string) => boolean;
+  /** Label for the create-table menu item (defaults to "Create Table"). */
+  createTableLabel?: string;
 }
 
 function buildTree(files: VirtualFile[]): TreeNode {
@@ -147,6 +158,9 @@ interface TreeRowProps {
   onRequestInfo: (node: TreeNode) => void;
   onOpenQuery?: (path: string) => void;
   openQueryLabel?: string;
+  onCreateTable?: (path: string) => void;
+  canCreateTable?: (path: string) => boolean;
+  createTableLabel?: string;
   onCopyFileName: (path: string) => void;
   onCopyPath: (path: string) => void;
   onDragStart: (path: string) => void;
@@ -175,6 +189,9 @@ function TreeRow({
   onRequestInfo,
   onOpenQuery,
   openQueryLabel = "Query with SELECT",
+  onCreateTable,
+  canCreateTable,
+  createTableLabel = "Create Table",
   onCopyFileName,
   onCopyPath,
   onDragStart,
@@ -309,6 +326,17 @@ function TreeRow({
                   <div className="ex-title">{openQueryLabel}</div>
                 </ContextMenu.Item>
               )}
+              {!node.isFolder &&
+                onCreateTable &&
+                (!canCreateTable || canCreateTable(node.fullPath)) && (
+                  <ContextMenu.Item
+                    className="example-item"
+                    onClick={() => onCreateTable(node.fullPath)}
+                  >
+                    <Table size={12} aria-hidden="true" />
+                    <div className="ex-title">{createTableLabel}</div>
+                  </ContextMenu.Item>
+                )}
               {!node.isFolder && (
                 <ContextMenu.Item
                   className="example-item"
@@ -386,6 +414,9 @@ function TreeRow({
             onRequestInfo={onRequestInfo}
             onOpenQuery={onOpenQuery}
             openQueryLabel={openQueryLabel}
+            onCreateTable={onCreateTable}
+            canCreateTable={canCreateTable}
+            createTableLabel={createTableLabel}
             onCopyFileName={onCopyFileName}
             onCopyPath={onCopyPath}
             onDragStart={onDragStart}
@@ -412,6 +443,9 @@ export function FilesPanel({
   onMove,
   onOpenQuery,
   openQueryLabel,
+  onCreateTable,
+  canCreateTable,
+  createTableLabel,
 }: FilesPanelProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
@@ -768,6 +802,9 @@ export function FilesPanel({
                     onRequestInfo={handleRequestInfo}
                     onOpenQuery={onOpenQuery}
                     openQueryLabel={openQueryLabel}
+                    onCreateTable={onCreateTable}
+                    canCreateTable={canCreateTable}
+                    createTableLabel={createTableLabel}
                     onCopyFileName={handleCopyFileName}
                     onCopyPath={handleCopyPath}
                     onDragStart={handleInternalDragStart}

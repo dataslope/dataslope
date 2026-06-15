@@ -78,6 +78,39 @@ export function tableNameFromFilename(filename: string): string {
   return base || "imported_table";
 }
 
+/** File extensions DuckDB can read directly through a replacement scan —
+ *  i.e. `SELECT * FROM 'file.ext'` works without an explicit `read_*`
+ *  wrapper. Used by the Files panel to decide whether to offer a
+ *  "Create Table" action for a given file. */
+export const DUCKDB_READABLE_EXTENSIONS = [
+  "csv",
+  "tsv",
+  "json",
+  "jsonl",
+  "ndjson",
+  "parquet",
+] as const;
+
+/** Transparent compression suffixes DuckDB unwraps for its text formats,
+ *  so `data.csv.gz` reads the same as `data.csv`. */
+const DUCKDB_COMPRESSION_SUFFIXES = ["gz", "zst"];
+
+/** True when DuckDB can build a table straight from this file via a
+ *  replacement scan, judged from its (case-insensitive) extension. A
+ *  single `.gz`/`.zst` compression suffix is looked through to the real
+ *  format extension (e.g. `data.csv.gz`). */
+export function isDuckDbReadableFile(path: string): boolean {
+  const name = (path.split("/").pop() ?? path).toLowerCase();
+  const parts = name.split(".");
+  if (parts.length < 2) return false; // no extension at all
+  let ext = parts[parts.length - 1];
+  if (DUCKDB_COMPRESSION_SUFFIXES.includes(ext)) {
+    if (parts.length < 3) return false; // bare ".gz"/".zst", format unknown
+    ext = parts[parts.length - 2];
+  }
+  return (DUCKDB_READABLE_EXTENSIONS as readonly string[]).includes(ext);
+}
+
 /** Read a Parquet file and materialise it into the same column/row
  *  shape parseCsv returns, so callers can hand the result off to a
  *  shared import preview component. */
