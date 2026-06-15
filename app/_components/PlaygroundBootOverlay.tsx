@@ -57,7 +57,7 @@ export function PlaygroundBootOverlay({
       <div className="playground-boot-card">
         {!error && (
           <span className="playground-boot-loader" aria-hidden="true">
-            <DiamondAssembleTurnLoader size={56} label="" />
+            <DiamondAssembleTurnLoader size={104} label="" />
           </span>
         )}
         <div className="playground-boot-text">

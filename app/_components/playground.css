@@ -2510,9 +2510,9 @@ input[type="range"].fs-slider:disabled {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
-  padding: 24px;
-  max-width: min(420px, calc(100vw - 48px));
+  gap: 40px;
+  padding: 32px;
+  width: min(620px, calc(100vw - 48px));
   text-align: center;
 }
 .playground-boot-loader {
@@ -2522,32 +2522,33 @@ input[type="range"].fs-slider:disabled {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 16px;
   width: 100%;
 }
 .playground-boot-title {
   font-family: var(--font-ui);
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--text);
-  line-height: 1.4;
+  line-height: 1.25;
 }
 .playground-boot-hint {
   font-family: var(--font-ui);
-  font-size: 12.5px;
+  font-size: 15px;
   color: var(--text-muted, #9aa4b2);
-  line-height: 1.5;
+  line-height: 1.6;
 }
 .playground-boot-progress {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
   width: 100%;
-  margin-top: 4px;
+  margin-top: 12px;
 }
 .playground-boot-bar {
   flex: 1;
-  height: 6px;
+  height: 10px;
   border-radius: 999px;
   background: var(--bg3);
   overflow: hidden;
@@ -2560,11 +2561,18 @@ input[type="range"].fs-slider:disabled {
 }
 .playground-boot-pct {
   font-family: var(--font-ui);
-  font-size: 12px;
+  font-size: 16px;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   color: var(--text-muted, #9aa4b2);
-  min-width: 34px;
+  min-width: 48px;
   text-align: right;
+}
+
+@media (max-width: 560px) {
+  .playground-boot-title {
+    font-size: 24px;
+  }
 }
 .pyodide-loading.playground-boot-overlay.has-error .playground-boot-title {
   color: var(--red, #e57373);
@@ -4298,7 +4306,7 @@ html[data-playground-theme="dark"] .welcome h3 {
 .workspace-manager-body {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 32px;
   /* `.pkg-body` ships 0 horizontal padding; add it back here so the
      buttons and workspace cards line up with the 16px-inset header
      instead of sitting flush against (and touching) the panel walls. */
@@ -4333,12 +4341,6 @@ html[data-playground-theme="dark"] .welcome h3 {
   display: flex;
   flex-direction: column;
   border-radius: var(--radius);
-}
-
-.workspace-manager-item.active {
-  /* Subtle fill marks the active workspace; the "Active" pill carries the
-     explicit label. No border, to match the flat list. */
-  background: color-mix(in srgb, var(--primary) 8%, transparent);
 }
 
 .workspace-manager-item-main {
