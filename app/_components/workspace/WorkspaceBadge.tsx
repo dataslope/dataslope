@@ -62,6 +62,12 @@ export interface WorkspaceBadgeProps {
   activeWorkspaceId: string | null;
   /** Currently-active workspace display name. */
   activeWorkspaceName: string;
+  /** Optional controlled state for the full workspace-manager drawer.
+   *  Lets a host open the manager directly — e.g. the mobile hamburger
+   *  menu, which hides the badge pill but still needs a way in. When
+   *  omitted the badge manages the manager itself. */
+  managerOpen?: boolean;
+  onManagerOpenChange?: (open: boolean) => void;
 }
 
 function formatBytes(bytes: number): string {
@@ -116,9 +122,21 @@ export function WorkspaceBadge({
   playgroundId,
   activeWorkspaceId,
   activeWorkspaceName,
+  managerOpen: managerOpenProp,
+  onManagerOpenChange,
 }: WorkspaceBadgeProps) {
   const [popoverOpen, setPopoverOpen] = useState(false);
-  const [managerOpen, setManagerOpen] = useState(false);
+  const [internalManagerOpen, setInternalManagerOpen] = useState(false);
+  // Controlled when the host passes `managerOpen`/`onManagerOpenChange`
+  // (the mobile hamburger does), otherwise self-managed.
+  const managerOpen = managerOpenProp ?? internalManagerOpen;
+  const setManagerOpen = useCallback(
+    (open: boolean) => {
+      if (onManagerOpenChange) onManagerOpenChange(open);
+      else setInternalManagerOpen(open);
+    },
+    [onManagerOpenChange],
+  );
   const [registry, setRegistry] = useState<WorkspaceEntry[]>([]);
   // Cached byte-size estimates for the recent workspaces, prefetched
   // whenever the popover opens. State is retained between opens so
@@ -199,7 +217,7 @@ export function WorkspaceBadge({
     refreshRegistry();
     setPopoverOpen(false);
     setManagerOpen(true);
-  }, [refreshRegistry]);
+  }, [refreshRegistry, setManagerOpen]);
 
   return (
     <>
