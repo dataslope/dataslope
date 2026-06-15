@@ -1832,6 +1832,48 @@ function SqlPlaygroundInner() {
     return constraintsByEntity[tableName];
   }, [result, constraintsByEntity]);
 
+  // Defined once and rendered in both the sidebar and the mobile drawer
+  // menu (the latter is an experiment — the sidebar copy may be retired).
+  const databaseSelector = (
+    <DatabaseSelector
+      value={activeDbId}
+      displayFilename={activeSample.filename}
+      samples={SQLITE_SAMPLE_DATABASES}
+      actions={SQLITE_DB_ACTIONS}
+      onChange={(value) => {
+        if (value === "__new_db__") {
+          requestDbSwitch("__blank__");
+          return;
+        }
+        if (value === "__import_database__") {
+          setImportSqliteOpen(true);
+          return;
+        }
+        if (value === "__export_sql_dump__") {
+          exportDatabaseAsSqlDump();
+          return;
+        }
+        if (value === "__rename_db__") {
+          // Pre-populate with current filename (strip extension).
+          const cur = activeSample.filename;
+          const dotIdx = cur.lastIndexOf(".");
+          if (dotIdx > 0) {
+            setRenameDbBaseName(cur.slice(0, dotIdx));
+            const ext = cur.slice(dotIdx);
+            const knownExts = [".sqlite", ".db", ".sqlite3", ".db3"];
+            setRenameDbExt(knownExts.includes(ext) ? ext : ".sqlite");
+          } else {
+            setRenameDbBaseName(cur);
+            setRenameDbExt(".sqlite");
+          }
+          setRenameDbOpen(true);
+          return;
+        }
+        requestDbSwitch(value);
+      }}
+    />
+  );
+
   return (
     <SqlPlaygroundShell
       playgroundId={PLAYGROUND_ID}
@@ -2134,6 +2176,7 @@ function SqlPlaygroundInner() {
       }
       mobileMenu={
         <>
+          <div className="mobile-menu-db-selector">{databaseSelector}</div>
           <MobileMenuAction
             label="Workspace"
             chevron
@@ -3447,52 +3490,7 @@ function SqlPlaygroundInner() {
         <div className="sql-shell" ref={shellRef}>
           <aside className="sql-sidebar" aria-label="Database explorer">
             <div className="sql-db-selector-wrap">
-              <div className="sql-db-selector-row">
-                <DatabaseSelector
-                  value={activeDbId}
-                  displayFilename={activeSample.filename}
-                  samples={SQLITE_SAMPLE_DATABASES}
-                  actions={SQLITE_DB_ACTIONS}
-                  onChange={(value) => {
-                    if (value === "__new_db__") {
-                      requestDbSwitch("__blank__");
-                      return;
-                    }
-                    if (value === "__import_database__") {
-                      setImportSqliteOpen(true);
-                      return;
-                    }
-                    if (value === "__export_sql_dump__") {
-                      exportDatabaseAsSqlDump();
-                      return;
-                    }
-                    if (value === "__rename_db__") {
-                      // Pre-populate with current filename (strip extension).
-                      const cur = activeSample.filename;
-                      const dotIdx = cur.lastIndexOf(".");
-                      if (dotIdx > 0) {
-                        setRenameDbBaseName(cur.slice(0, dotIdx));
-                        const ext = cur.slice(dotIdx);
-                        const knownExts = [
-                          ".sqlite",
-                          ".db",
-                          ".sqlite3",
-                          ".db3",
-                        ];
-                        setRenameDbExt(
-                          knownExts.includes(ext) ? ext : ".sqlite",
-                        );
-                      } else {
-                        setRenameDbBaseName(cur);
-                        setRenameDbExt(".sqlite");
-                      }
-                      setRenameDbOpen(true);
-                      return;
-                    }
-                    requestDbSwitch(value);
-                  }}
-                />
-              </div>
+              <div className="sql-db-selector-row">{databaseSelector}</div>
             </div>
 
             <div className="sql-sidebar-body">

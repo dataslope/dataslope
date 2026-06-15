@@ -46,10 +46,6 @@ export interface DatabaseSelectorProps {
   actions: readonly DatabaseSelectorAction[];
   /** Called with either an `action.id` sentinel or a `sample.id`. */
   onChange: (value: string) => void;
-  /** Extra class names appended to the default `sql-db-selector` on
-   *  the trigger. Used by the Postgres playground for a vestigial
-   *  `sql-database-selector` class. */
-  triggerClassName?: string;
   /** Override for the chevron icon. Defaults to a 10x10 inline SVG
    *  matching the SQLite playground's historical rendering. */
   chevron?: ReactNode;
@@ -72,7 +68,6 @@ export function DatabaseSelector({
   samples,
   actions,
   onChange,
-  triggerClassName,
   chevron = DEFAULT_CHEVRON,
 }: DatabaseSelectorProps) {
   return (
@@ -81,11 +76,7 @@ export function DatabaseSelector({
       onValueChange={(v) => onChange(String(v))}
     >
       <Select.Trigger
-        className={
-          triggerClassName
-            ? `sql-db-selector ${triggerClassName}`
-            : "sql-db-selector"
-        }
+        className="sql-database-selector"
         aria-label="Select sample database"
       >
         <Database

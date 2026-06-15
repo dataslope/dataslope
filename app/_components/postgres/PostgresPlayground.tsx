@@ -3457,6 +3457,42 @@ function PostgresPlaygroundInner() {
     ],
   );
 
+  // Defined once and rendered in both the sidebar and the mobile drawer
+  // menu (the latter is an experiment — the sidebar copy may be retired).
+  const databaseSelector = (
+    <DatabaseSelector
+      value={activeDbId}
+      displayFilename={displayFilename}
+      samples={POSTGRES_SAMPLE_DATABASES}
+      actions={POSTGRES_DB_ACTIONS}
+      chevron={<ChevronDown size={12} />}
+      onChange={(value) => {
+        if (value === "__new_db__") {
+          requestDbSwitch(POSTGRES_BLANK_DATABASE.id);
+          return;
+        }
+        if (value === "__import_sql_dump__") {
+          setImportSqlDumpOpen(true);
+          return;
+        }
+        if (value === "__rename_db__") {
+          const cur = displayFilename;
+          const dotIdx = cur.lastIndexOf(".");
+          if (dotIdx > 0) {
+            setRenameDbName(cur.slice(0, dotIdx));
+            setRenameDbExt(cur.slice(dotIdx));
+          } else {
+            setRenameDbName(cur);
+            setRenameDbExt(".pg");
+          }
+          setRenameDbOpen(true);
+          return;
+        }
+        requestDbSwitch(value);
+      }}
+    />
+  );
+
   return (
     <SqlPlaygroundShell
       playgroundId={PLAYGROUND_ID}
@@ -3723,6 +3759,7 @@ function PostgresPlaygroundInner() {
       }
       mobileMenu={
         <>
+          <div className="mobile-menu-db-selector">{databaseSelector}</div>
           <MobileMenuAction
             label="Workspace"
             chevron
@@ -4467,40 +4504,7 @@ function PostgresPlaygroundInner() {
 
         <div className="sql-shell postgres-shell" ref={shellRef}>
           <aside className="sql-sidebar" aria-label="Database explorer">
-            <div className="sql-db-selector-wrap">
-              <DatabaseSelector
-                value={activeDbId}
-                displayFilename={displayFilename}
-                samples={POSTGRES_SAMPLE_DATABASES}
-                actions={POSTGRES_DB_ACTIONS}
-                triggerClassName="sql-database-selector"
-                chevron={<ChevronDown size={12} />}
-                onChange={(value) => {
-                  if (value === "__new_db__") {
-                    requestDbSwitch(POSTGRES_BLANK_DATABASE.id);
-                    return;
-                  }
-                  if (value === "__import_sql_dump__") {
-                    setImportSqlDumpOpen(true);
-                    return;
-                  }
-                  if (value === "__rename_db__") {
-                    const cur = displayFilename;
-                    const dotIdx = cur.lastIndexOf(".");
-                    if (dotIdx > 0) {
-                      setRenameDbName(cur.slice(0, dotIdx));
-                      setRenameDbExt(cur.slice(dotIdx));
-                    } else {
-                      setRenameDbName(cur);
-                      setRenameDbExt(".pg");
-                    }
-                    setRenameDbOpen(true);
-                    return;
-                  }
-                  requestDbSwitch(value);
-                }}
-              />
-            </div>
+            <div className="sql-db-selector-wrap">{databaseSelector}</div>
             <div className="sql-sidebar-body">
               <SqlIconSidebar
                 buttons={[

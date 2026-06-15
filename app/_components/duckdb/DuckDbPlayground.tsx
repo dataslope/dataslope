@@ -3927,6 +3927,42 @@ function DuckDbPlaygroundInner() {
     ],
   );
 
+  // Defined once and rendered in both the sidebar and the mobile drawer
+  // menu (the latter is an experiment — the sidebar copy may be retired).
+  const databaseSelector = (
+    <DatabaseSelector
+      value={activeDbId}
+      displayFilename={displayFilename}
+      samples={DUCKDB_SAMPLE_DATABASES}
+      actions={DUCKDB_DB_ACTIONS}
+      chevron={<ChevronDown size={12} />}
+      onChange={(value) => {
+        if (value === "__new_db__") {
+          requestDbSwitch(DUCKDB_BLANK_DATABASE.id);
+          return;
+        }
+        if (value === "__import_sql_dump__") {
+          setImportSqlDumpOpen(true);
+          return;
+        }
+        if (value === "__rename_db__") {
+          const cur = displayFilename;
+          const dotIdx = cur.lastIndexOf(".");
+          if (dotIdx > 0) {
+            setRenameDbName(cur.slice(0, dotIdx));
+            setRenameDbExt(cur.slice(dotIdx));
+          } else {
+            setRenameDbName(cur);
+            setRenameDbExt(".duckdb");
+          }
+          setRenameDbOpen(true);
+          return;
+        }
+        requestDbSwitch(value);
+      }}
+    />
+  );
+
   return (
     <SqlPlaygroundShell
       playgroundId={PLAYGROUND_ID}
@@ -4193,6 +4229,7 @@ function DuckDbPlaygroundInner() {
       }
       mobileMenu={
         <>
+          <div className="mobile-menu-db-selector">{databaseSelector}</div>
           <MobileMenuAction
             label="Workspace"
             chevron
@@ -4989,39 +5026,7 @@ function DuckDbPlaygroundInner() {
 
         <div className="sql-shell duckdb-shell" ref={shellRef}>
           <aside className="sql-sidebar" aria-label="Database explorer">
-            <div className="sql-db-selector-wrap">
-              <DatabaseSelector
-                value={activeDbId}
-                displayFilename={displayFilename}
-                samples={DUCKDB_SAMPLE_DATABASES}
-                actions={DUCKDB_DB_ACTIONS}
-                chevron={<ChevronDown size={12} />}
-                onChange={(value) => {
-                  if (value === "__new_db__") {
-                    requestDbSwitch(DUCKDB_BLANK_DATABASE.id);
-                    return;
-                  }
-                  if (value === "__import_sql_dump__") {
-                    setImportSqlDumpOpen(true);
-                    return;
-                  }
-                  if (value === "__rename_db__") {
-                    const cur = displayFilename;
-                    const dotIdx = cur.lastIndexOf(".");
-                    if (dotIdx > 0) {
-                      setRenameDbName(cur.slice(0, dotIdx));
-                      setRenameDbExt(cur.slice(dotIdx));
-                    } else {
-                      setRenameDbName(cur);
-                      setRenameDbExt(".duckdb");
-                    }
-                    setRenameDbOpen(true);
-                    return;
-                  }
-                  requestDbSwitch(value);
-                }}
-              />
-            </div>
+            <div className="sql-db-selector-wrap">{databaseSelector}</div>
             <div className="sql-sidebar-body">
               <SqlIconSidebar
                 buttons={[
