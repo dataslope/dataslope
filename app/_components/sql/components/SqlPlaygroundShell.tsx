@@ -6,6 +6,7 @@ import "../../playground.css";
 import "../../sqlPlayground.css";
 import { SqlPlaygroundSwitcher } from "./SqlPlaygroundSwitcher";
 import { paneForActivatedTab, type SqlMobilePane } from "../utils/mobilePane";
+import { MobileMenuSheet } from "../../MobileMenuSheet";
 
 /**
  * Re-exported from the pure helper module (`../utils/mobilePane`) so existing
@@ -61,6 +62,12 @@ export interface SqlPlaygroundShellProps {
    *  shell renders them directly inside `<header className="playground-header">`
    *  after the logo + separator. */
   headerActions?: ReactNode;
+  /** Contents of the mobile "hamburger" menu (rendered only below the
+   *  mobile breakpoint). The shell owns the sheet's open state and the
+   *  trigger; each dialect supplies the rows (Workspace, Import, Export,
+   *  History, ER Diagram, Information, Settings) via `MobileMenuAction` /
+   *  `MobileMenuSubSheet`. Omit to render no menu. */
+  mobileMenu?: ReactNode;
   /** Main body of the page — typically the top toolbar + sidebar +
    *  editor + results pane structure. Rendered directly inside
    *  `<div className="playground-app">` after the header. */
@@ -92,9 +99,18 @@ export function SqlPlaygroundShell({
   loadingCaption,
   loadingHeroRepeat = 3,
   headerActions,
+  mobileMenu,
   children,
 }: SqlPlaygroundShellProps) {
   const showLoadingOverlay = keepOverlayMounted || !loaded;
+  // Mobile hamburger menu open state (the shell owns it; dialects only
+  // supply the rows via `mobileMenu`).
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // True while the full-screen Settings tab is showing. Used to hide the
+  // bottom Schema/Editor/Results pane switcher, which doesn't apply to
+  // the settings pane. Detected from the DOM (below) so the three
+  // playground bodies stay untouched.
+  const [settingsTabActive, setSettingsTabActive] = useState(false);
 
   // ─── Mobile single-pane navigation ───────────────────────────────────
   // Below the mobile breakpoint the desktop 3-pane IDE collapses to one
@@ -194,6 +210,11 @@ export function SqlPlaygroundShell({
       const nowHasResults = !!pane && !empty;
       setHasResults(nowHasResults);
 
+      // (c) Is the full-screen Settings tab open? Its pane replaces the
+      // editor/results split, so the bottom pane switcher is hidden while
+      // it's up (see the `data-settings-active` rule in sqlPlayground.css).
+      setSettingsTabActive(!!root.querySelector(".sql-settings-tab-pane"));
+
       // (b) Did the active query tab change? React swaps the tab's `.active`
       // class and the results-pane contents in the same commit, so by the time
       // the observer runs we can read the new tab's id *and* its result-state
@@ -229,7 +250,12 @@ export function SqlPlaygroundShell({
   }, []);
 
   return (
-    <div className="playground-root" ref={rootRef} data-mobile-pane={mobilePane}>
+    <div
+      className="playground-root"
+      ref={rootRef}
+      data-mobile-pane={mobilePane}
+      data-settings-active={settingsTabActive || undefined}
+    >
       {showLoadingOverlay && (
         <div
           className={`pyodide-loading${
@@ -260,6 +286,14 @@ export function SqlPlaygroundShell({
           <SqlPlaygroundSwitcher playgroundId={playgroundId} />
           <div className="header-sep" />
           {headerActions}
+          {mobileMenu && (
+            <MobileMenuSheet
+              open={mobileMenuOpen}
+              onOpenChange={setMobileMenuOpen}
+            >
+              {mobileMenu}
+            </MobileMenuSheet>
+          )}
         </header>
         {children}
         <nav

@@ -115,6 +115,7 @@ import {
 } from "../opfs/activeWorkspace";
 import { acquireWorkspaceLock, createWorkspace } from "../opfs/workspace";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
+import { MobileMenuAction, MobileMenuSubSheet } from "../MobileMenuSheet";
 import { type PostgresEngine } from "../runtime/postgres";
 
 const POSTGRES_SAMPLE_DATABASES = postgresAdapter.samples;
@@ -1051,6 +1052,9 @@ function PostgresPlaygroundInner() {
 
   // ─── Dialog state ─────────────────────────────────────────────────────
   const [settingsOpen, setSettingsOpen] = useState(false);
+  // Full workspace-manager drawer, opened from the mobile hamburger menu
+  // (the header badge that normally opens it is hidden on mobile).
+  const [workspaceManagerOpen, setWorkspaceManagerOpen] = useState(false);
   const [confirmRestoreOpen, setConfirmRestoreOpen] = useState(false);
   const [confirmClearStorageOpen, setConfirmClearStorageOpen] = useState(false);
   const [confirmClearAllDataOpen, setConfirmClearAllDataOpen] = useState(false);
@@ -3467,6 +3471,8 @@ function PostgresPlaygroundInner() {
               playgroundId={PLAYGROUND_ID}
               activeWorkspaceId={activeWorkspace.id}
               activeWorkspaceName={activeWorkspace.name}
+              managerOpen={workspaceManagerOpen}
+              onManagerOpenChange={setWorkspaceManagerOpen}
             />
           )}
           <div className="header-actions desktop-only">
@@ -3713,6 +3719,72 @@ function PostgresPlaygroundInner() {
               </Popover.Portal>
             </Popover.Root>
           </div>
+        </>
+      }
+      mobileMenu={
+        <>
+          <MobileMenuAction
+            label="Workspace"
+            chevron
+            onClick={() => setWorkspaceManagerOpen(true)}
+          />
+          <MobileMenuSubSheet label="Import">
+            <MobileMenuAction
+              label="From SQL dump"
+              onClick={() => setImportSqlDumpOpen(true)}
+            />
+            <MobileMenuAction
+              label="From CSV"
+              onClick={() => {
+                setImportCsvState(null);
+                setImportCsvOpen(true);
+              }}
+            />
+            <MobileMenuAction
+              label="From JSON"
+              onClick={() => {
+                setImportJsonState(null);
+                setImportJsonOpen(true);
+              }}
+            />
+            <MobileMenuAction
+              label="From Parquet"
+              onClick={() => {
+                setImportParquetState(null);
+                setImportParquetOpen(true);
+              }}
+            />
+          </MobileMenuSubSheet>
+          {tables.length > 0 && (
+            <MobileMenuSubSheet label="Export DB">
+              <MobileMenuAction
+                label="SQL dump (.sql)"
+                onClick={() => void exportPostgresDatabase()}
+              />
+              <MobileMenuAction
+                label="Excel workbook (.xlsx)"
+                onClick={() => void exportPostgresDatabaseToXlsx()}
+              />
+            </MobileMenuSubSheet>
+          )}
+          <MobileMenuAction
+            label="Query history"
+            chevron
+            onClick={openQueryHistoryTab}
+          />
+          <MobileMenuAction
+            label="ER diagram"
+            chevron
+            onClick={openErDiagramTab}
+          />
+          <MobileMenuSubSheet label="Information" bodyClassName="info-popover">
+            <RuntimeInfoContent info={RUNTIME_INFO} />
+          </MobileMenuSubSheet>
+          <MobileMenuAction
+            label="Settings"
+            chevron
+            onClick={openSettingsTab}
+          />
         </>
       }
     >

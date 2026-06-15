@@ -119,6 +119,7 @@ import {
   writeDataFile as opfsWriteDataFile,
 } from "../files/opfsDataStorage";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
+import { MobileMenuAction, MobileMenuSubSheet } from "../MobileMenuSheet";
 import { type DuckDbEngine, DUCKDB_VERSION } from "../runtime/duckdb";
 
 const DUCKDB_SAMPLE_DATABASES = duckdbAdapter.samples;
@@ -1096,6 +1097,9 @@ function DuckDbPlaygroundInner() {
 
   // ─── Dialog state ─────────────────────────────────────────────────────
   const [settingsOpen, setSettingsOpen] = useState(false);
+  // Full workspace-manager drawer, opened from the mobile hamburger menu
+  // (the header badge that normally opens it is hidden on mobile).
+  const [workspaceManagerOpen, setWorkspaceManagerOpen] = useState(false);
   const [confirmRestoreOpen, setConfirmRestoreOpen] = useState(false);
   const [confirmClearStorageOpen, setConfirmClearStorageOpen] = useState(false);
   const [confirmClearAllDataOpen, setConfirmClearAllDataOpen] = useState(false);
@@ -3937,6 +3941,8 @@ function DuckDbPlaygroundInner() {
               playgroundId={PLAYGROUND_ID}
               activeWorkspaceId={activeWorkspace.id}
               activeWorkspaceName={activeWorkspace.name}
+              managerOpen={workspaceManagerOpen}
+              onManagerOpenChange={setWorkspaceManagerOpen}
             />
           )}
           <div className="header-actions desktop-only">
@@ -4183,6 +4189,72 @@ function DuckDbPlaygroundInner() {
               </Popover.Portal>
             </Popover.Root>
           </div>
+        </>
+      }
+      mobileMenu={
+        <>
+          <MobileMenuAction
+            label="Workspace"
+            chevron
+            onClick={() => setWorkspaceManagerOpen(true)}
+          />
+          <MobileMenuSubSheet label="Import">
+            <MobileMenuAction
+              label="From SQL dump"
+              onClick={() => setImportSqlDumpOpen(true)}
+            />
+            <MobileMenuAction
+              label="From CSV"
+              onClick={() => {
+                setImportCsvState(null);
+                setImportCsvOpen(true);
+              }}
+            />
+            <MobileMenuAction
+              label="From JSON"
+              onClick={() => {
+                setImportJsonState(null);
+                setImportJsonOpen(true);
+              }}
+            />
+            <MobileMenuAction
+              label="From Parquet"
+              onClick={() => {
+                setImportParquetState(null);
+                setImportParquetOpen(true);
+              }}
+            />
+          </MobileMenuSubSheet>
+          {tables.length > 0 && (
+            <MobileMenuSubSheet label="Export DB">
+              <MobileMenuAction
+                label="SQL dump (.sql)"
+                onClick={() => void exportDuckDbDatabase()}
+              />
+              <MobileMenuAction
+                label="Excel workbook (.xlsx)"
+                onClick={() => void exportDuckDbDatabaseToXlsx()}
+              />
+            </MobileMenuSubSheet>
+          )}
+          <MobileMenuAction
+            label="Query history"
+            chevron
+            onClick={openQueryHistoryTab}
+          />
+          <MobileMenuAction
+            label="ER diagram"
+            chevron
+            onClick={openErDiagramTab}
+          />
+          <MobileMenuSubSheet label="Information" bodyClassName="info-popover">
+            <RuntimeInfoContent info={RUNTIME_INFO} />
+          </MobileMenuSubSheet>
+          <MobileMenuAction
+            label="Settings"
+            chevron
+            onClick={openSettingsTab}
+          />
         </>
       }
     >

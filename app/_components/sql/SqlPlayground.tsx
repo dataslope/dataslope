@@ -96,6 +96,7 @@ import { splitSqlStatements, statementAtCursor } from "./utils/sqlAnalysis";
 import { ensureActiveWorkspace, switchActiveWorkspace } from "../opfs/activeWorkspace";
 import { acquireWorkspaceLock, createWorkspace } from "../opfs/workspace";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
+import { MobileMenuAction, MobileMenuSubSheet } from "../MobileMenuSheet";
 import {
   type ColumnConstraintInfo,
   type ForeignKeyInfo,
@@ -697,6 +698,9 @@ function SqlPlaygroundInner() {
   const setRenameDbExt = useDialogStore((s) => s.setRenameDbExt);
   const exportNoTabsHover = useDialogStore((s) => s.exportNoTabsHover);
   const setExportNoTabsHover = useDialogStore((s) => s.setExportNoTabsHover);
+  // Full workspace-manager drawer, opened from the mobile hamburger menu
+  // (the header badge that normally opens it is hidden on mobile).
+  const [workspaceManagerOpen, setWorkspaceManagerOpen] = useState(false);
 
   // ─── Local state (only items not in any store) ───────────────────────
   const [loadingMessage, setLoadingMessage] = useState(
@@ -1847,6 +1851,8 @@ function SqlPlaygroundInner() {
               playgroundId={PLAYGROUND_ID}
               activeWorkspaceId={activeWorkspace.id}
               activeWorkspaceName={activeWorkspace.name}
+              managerOpen={workspaceManagerOpen}
+              onManagerOpenChange={setWorkspaceManagerOpen}
             />
           )}
           <div className="header-actions desktop-only">
@@ -2124,6 +2130,76 @@ function SqlPlaygroundInner() {
               </Popover.Portal>
             </Popover.Root>
           </div>
+        </>
+      }
+      mobileMenu={
+        <>
+          <MobileMenuAction
+            label="Workspace"
+            chevron
+            onClick={() => setWorkspaceManagerOpen(true)}
+          />
+          <MobileMenuSubSheet label="Import">
+            <MobileMenuAction
+              label="From file (.sql / .db / .sqlite)"
+              onClick={() => setImportSqliteOpen(true)}
+            />
+            <MobileMenuAction
+              label="From CSV"
+              onClick={() => {
+                setImportCsvState(null);
+                setImportCsvOpen(true);
+              }}
+            />
+            <MobileMenuAction
+              label="From JSON"
+              onClick={() => {
+                setImportJsonState(null);
+                setImportJsonOpen(true);
+              }}
+            />
+            <MobileMenuAction
+              label="From Parquet"
+              onClick={() => {
+                setImportParquetOpen(true);
+                setImportParquetDragging(false);
+              }}
+            />
+          </MobileMenuSubSheet>
+          {tables.length > 0 && (
+            <MobileMenuSubSheet label="Export DB">
+              <MobileMenuAction
+                label="SQLite file (.sqlite)"
+                onClick={exportDatabase}
+              />
+              <MobileMenuAction
+                label="SQL dump (.sql)"
+                onClick={exportDatabaseAsSqlDump}
+              />
+              <MobileMenuAction
+                label="Excel workbook (.xlsx)"
+                onClick={exportDatabaseToXlsx}
+              />
+            </MobileMenuSubSheet>
+          )}
+          <MobileMenuAction
+            label="Query history"
+            chevron
+            onClick={openQueryHistoryTab}
+          />
+          <MobileMenuAction
+            label="ER diagram"
+            chevron
+            onClick={openErDiagramTab}
+          />
+          <MobileMenuSubSheet label="Information" bodyClassName="info-popover">
+            <RuntimeInfoContent info={RUNTIME_INFO} />
+          </MobileMenuSubSheet>
+          <MobileMenuAction
+            label="Settings"
+            chevron
+            onClick={openSettingsTab}
+          />
         </>
       }
     >

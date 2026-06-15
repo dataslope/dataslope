@@ -4545,6 +4545,13 @@
 .sql-mobile-tabs {
   display: none;
 }
+/* The full-screen Settings tab replaces the editor/results split, so its
+   bottom Schema / Editor / Results pane switcher doesn't apply — hide it
+   while Settings is open. Higher specificity than the mobile rule below,
+   so it wins inside the media query too. */
+.playground-root[data-settings-active] .sql-mobile-tabs {
+  display: none;
+}
 
 /* UX-18: the loading hero stamps the title at up to 180px (`playground.css`),
    which towers over the status caption + progress bar on a desktop monitor.
