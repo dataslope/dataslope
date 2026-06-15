@@ -3,7 +3,12 @@
 import { sanitizeImportColName } from "../sql/utils/importUtils";
 import type { DuckDbEngine } from "../runtime/duckdb";
 
-export { parseCsv, tableNameFromFilename, readParquetFile } from "../sql/utils/importUtils";
+export {
+  parseCsv,
+  tableNameFromFilename,
+  readParquetFile,
+  isDuckDbReadableFile,
+} from "../sql/utils/importUtils";
 
 function quoteIdent(name: string): string {
   return `"${name.replace(/"/g, '""')}"`;

@@ -202,6 +202,7 @@ import {
   parseCsv,
   readParquetFile,
   tableNameFromFilename,
+  isDuckDbReadableFile,
 } from "./duckdbImport";
 import { FK_ACTIONS } from "../sql/constants";
 
@@ -2681,6 +2682,35 @@ function DuckDbPlaygroundInner() {
     [persistTabs, runSqlForTab],
   );
 
+  // Build a new table from a file via DuckDB's replacement scan
+  // (`CREATE TABLE … AS SELECT * FROM 'file'`). The table name is derived
+  // from the file name, suffixed with a counter if that name is already
+  // taken in the active schema so a repeat invocation doesn't error out.
+  const createTableFromFile = useCallback(
+    (path: string) => {
+      const filename = path.split("/").pop() ?? path;
+      const schema = selectedSchemaRef.current;
+      const base = tableNameFromFilename(filename);
+      const taken = new Set(tablesRef.current);
+      let tableName = base;
+      for (let n = 2; taken.has(tableName); n++) {
+        tableName = `${base}_${n}`;
+      }
+      const sql = `CREATE TABLE ${quoteIdent(schema)}.${quoteIdent(tableName)} AS SELECT * FROM "${path}";`;
+      const tab: QueryTab = {
+        id: newTabId(),
+        title: tableName,
+        code: sql,
+        pristineCode: sql,
+      };
+      tabHistoryRef.current = pushTabHistory(tabHistoryRef.current, activeTabIdRef.current, tab.id);
+      persistTabs([...tabsRef.current, tab]);
+      setActiveTabId(tab.id);
+      void runSqlForTab(tab.id, sql, `File: ${filename}`);
+    },
+    [persistTabs, runSqlForTab, selectedSchemaRef],
+  );
+
   // ─── Settings actions ────────────────────────────────────────────────
   const restoreDefaultSettings = useCallback(() => {
     const D = DEFAULT_PLAYGROUND_SETTINGS;
@@ -5053,6 +5083,8 @@ function DuckDbPlaygroundInner() {
                   onCreateFolder={handleFilesCreateFolder}
                   onMove={handleFilesMove}
                   onOpenQuery={queryFileWithSelect}
+                  onCreateTable={createTableFromFile}
+                  canCreateTable={isDuckDbReadableFile}
                 />
               )}
               {sidebarView === "schema" && (
