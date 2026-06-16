@@ -211,6 +211,7 @@ import {
   isDuckDbReadableFile,
 } from "./duckdbImport";
 import { FK_ACTIONS } from "../sql/constants";
+import { computeVisibleTypeGroups } from "../sql/utils/columnTypeSelector";
 
 const PLAYGROUND_ID = duckdbAdapter.playgroundId;
 const STORAGE_PREFIX = duckdbAdapter.storagePrefix;
@@ -506,22 +507,21 @@ function DuckDbTypeSelector({
     }
   }, [value]);
 
-  const query = inputVal.trim().toLowerCase();
-  // When the field is empty or already holds a committed type (i.e. the user
-  // opened the list via the chevron rather than typing a search fragment),
-  // show every group so all types stay discoverable. Only filter once they
-  // type a partial that is not itself a known type.
-  const visibleGroups = useMemo(() => {
-    const showAll =
-      query === "" ||
-      DUCKDB_TYPE_OPTIONS.some((type) => type.toLowerCase() === query);
-    return DUCKDB_TYPE_GROUPS.map((group) => ({
-      ...group,
-      types: showAll
-        ? [...group.types]
-        : group.types.filter((type) => type.toLowerCase().includes(query)),
-    })).filter((group) => group.types.length > 0);
-  }, [query]);
+  // When the field is empty or still holds the column's committed type (i.e.
+  // the user opened the list via the chevron rather than typing a search
+  // fragment), show every group so all types stay discoverable — including
+  // committed types absent from the built-in list such as `DECIMAL(10,2)`.
+  // Only filter once they type a partial that is not itself a known type.
+  const visibleGroups = useMemo(
+    () =>
+      computeVisibleTypeGroups(
+        DUCKDB_TYPE_GROUPS,
+        DUCKDB_TYPE_OPTIONS,
+        inputVal,
+        value,
+      ),
+    [inputVal, value],
+  );
 
   return (
     <Combobox.Root

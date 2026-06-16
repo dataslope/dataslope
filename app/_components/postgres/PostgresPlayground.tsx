@@ -202,6 +202,7 @@ import {
   tableNameFromFilename,
 } from "./postgresImport";
 import { FK_ACTIONS } from "../sql/constants";
+import { computeVisibleTypeGroups } from "../sql/utils/columnTypeSelector";
 
 const PLAYGROUND_ID = postgresAdapter.playgroundId;
 const STORAGE_PREFIX = postgresAdapter.storagePrefix;
@@ -476,22 +477,17 @@ function PgTypeSelector({
     }
   }, [value]);
 
-  const query = inputVal.trim().toLowerCase();
-  // When the field is empty or already holds a committed type (i.e. the user
-  // opened the list via the chevron rather than typing a search fragment),
-  // show every group so all types stay discoverable. Only filter once they
-  // type a partial that is not itself a known type.
-  const visibleGroups = useMemo(() => {
-    const showAll =
-      query === "" ||
-      PG_TYPE_OPTIONS.some((type) => type.toLowerCase() === query);
-    return PG_TYPE_GROUPS.map((group) => ({
-      ...group,
-      types: showAll
-        ? [...group.types]
-        : group.types.filter((type) => type.toLowerCase().includes(query)),
-    })).filter((group) => group.types.length > 0);
-  }, [query]);
+  // When the field is empty or still holds the column's committed type (i.e.
+  // the user opened the list via the chevron rather than typing a search
+  // fragment), show every group so all types stay discoverable — including
+  // committed types absent from the built-in list such as
+  // `character varying(15)`. Only filter once they type a partial that is
+  // not itself a known type.
+  const visibleGroups = useMemo(
+    () =>
+      computeVisibleTypeGroups(PG_TYPE_GROUPS, PG_TYPE_OPTIONS, inputVal, value),
+    [inputVal, value],
+  );
 
   return (
     <Combobox.Root
