@@ -7,7 +7,10 @@ import "../../sqlPlayground.css";
 import { SqlPlaygroundSwitcher } from "./SqlPlaygroundSwitcher";
 import { paneForActivatedTab, type SqlMobilePane } from "../utils/mobilePane";
 import { MobileMenuSheet } from "../../MobileMenuSheet";
-import { PlaygroundBootOverlay } from "../../PlaygroundBootOverlay";
+import {
+  PlaygroundBootOverlay,
+  useBootOverlayVisibility,
+} from "../../PlaygroundBootOverlay";
 import { DiamondMark } from "../../mdx/loadingAnimations";
 import {
   hasRuntimeBootedBefore,
@@ -50,14 +53,6 @@ export interface SqlPlaygroundShellProps {
   /** Current playground status; used by the overlay to render the
    *  red-tinted error state when something goes wrong during boot. */
   statusState: SqlPlaygroundOverlayStatus;
-  /** Optional className appended to the loading overlay (currently
-   *  used by SQLite for its fade-out animation). */
-  loadingOverlayClassName?: string;
-  /** When `true`, the loading overlay stays mounted even after
-   *  `loaded` becomes true (SQLite uses this with `loadingFading` so
-   *  the overlay can animate out). Defaults to `false` (= unmount the
-   *  instant `loaded` becomes `true`, which matches Postgres/DuckDB). */
-  keepOverlayMounted?: boolean;
   /** Body of the loading overlay's caption. Pass a plain status string
    *  for Postgres/DuckDB, or a rotating quip for SQLite. */
   loadingCaption: ReactNode;
@@ -113,8 +108,6 @@ export function SqlPlaygroundShell({
   playgroundTitle,
   loaded,
   statusState,
-  loadingOverlayClassName = "",
-  keepOverlayMounted = false,
   loadingCaption,
   headerActions,
   mobileMenu,
@@ -123,7 +116,12 @@ export function SqlPlaygroundShell({
   onOpenNewWorkspace,
   children,
 }: SqlPlaygroundShellProps) {
-  const showLoadingOverlay = keepOverlayMounted || !loaded;
+  // Loading-overlay lifecycle (show → fade → unmount) with a minimum
+  // on-screen time, shared by all three SQL dialects. A warm revisit
+  // boots the cached engine almost instantly; the floor keeps the overlay
+  // up long enough to read as a deliberate transition rather than a blink.
+  const { mounted: showLoadingOverlay, fading: loadingFading } =
+    useBootOverlayVisibility(loaded);
   // First-ever cold boot vs warm revisit. The engine's WASM payload is
   // served from the browser's HTTP cache after the first boot, so only a
   // genuine first boot in this browser shows the "Downloading … this
@@ -348,7 +346,7 @@ export function SqlPlaygroundShell({
             cold={isColdBoot}
             fraction={overlayFraction}
             error={statusState === "error"}
-            className={loadingOverlayClassName}
+            className={loadingFading ? "hidden" : ""}
           />
         )
       )}

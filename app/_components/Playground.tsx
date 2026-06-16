@@ -104,7 +104,10 @@ import {
   detectIsMac,
 } from "./playgroundShared";
 import { DiamondMark } from "./mdx/loadingAnimations";
-import { PlaygroundBootOverlay } from "./PlaygroundBootOverlay";
+import {
+  PlaygroundBootOverlay,
+  useBootOverlayVisibility,
+} from "./PlaygroundBootOverlay";
 import {
   hasRuntimeBootedBefore,
   markRuntimeBooted,
@@ -741,19 +744,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // until one arrives); smoothed below to drive a determinate loading
   // bar instead of the indeterminate sweep.
   const [bootFraction, setBootFraction] = useState<number | null>(null);
-  // Two-phase teardown for the loading overlay: when `loaded` flips
-  // true we keep the overlay mounted briefly so its CSS opacity
-  // transition can play out (avoids the "blink" effect on languages
-  // that initialise quickly), then unmount it once the fade completes.
-  // `loadingFading` is derived from `loaded` and `showLoadingOverlay`
-  // so we don't have to setState() directly inside an effect.
-  const [showLoadingOverlay, setShowLoadingOverlay] = useState(true);
-  const loadingFading = loaded && showLoadingOverlay;
-  useEffect(() => {
-    if (!loaded) return;
-    const id = window.setTimeout(() => setShowLoadingOverlay(false), 400);
-    return () => window.clearTimeout(id);
-  }, [loaded]);
+  // Loading-overlay lifecycle (show → fade → unmount) with a minimum
+  // on-screen time, so a warm revisit — where the shared runtime is
+  // already booted and `loaded` flips almost immediately — shows a
+  // deliberate loading screen instead of a one-frame "blink". Cold boots
+  // exceed the floor, so they fade the instant boot finishes.
+  const { mounted: showLoadingOverlay, fading: loadingFading } =
+    useBootOverlayVisibility(loaded);
   const [statusState, setStatusState] = useState<
     "loading" | "ready" | "running" | "error"
   >("loading");

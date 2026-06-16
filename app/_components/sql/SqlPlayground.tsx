@@ -727,7 +727,6 @@ function SqlPlaygroundInner() {
   const [loadingMessage, setLoadingMessage] = useState(
     "Loading SQLite engine…",
   );
-  const [showLoadingOverlay, setShowLoadingOverlay] = useState(true);
   const [indexesSectionExpanded, setIndexesSectionExpanded] = useState(false);
   const [triggersSectionExpanded, setTriggersSectionExpanded] = useState(false);
   const [hasEditorSelection, setHasEditorSelection] = useState(false);
@@ -762,7 +761,6 @@ function SqlPlaygroundInner() {
     [activeTab?.code],
   );
   const result = activeTabId ? (resultsByTab[activeTabId] ?? null) : null;
-  const loadingFading = loaded && showLoadingOverlay;
 
   // ─── Refs ────────────────────────────────────────────────────────────
   const engineRef = useRef<SqliteEngine | null>(null);
@@ -1132,13 +1130,6 @@ function SqlPlaygroundInner() {
       setIsFormatting(false);
     }
   }, [showToast]);
-
-  // ─── Loading overlay fade-out ────────────────────────────────────────
-  useEffect(() => {
-    if (!loaded) return;
-    const id = window.setTimeout(() => setShowLoadingOverlay(false), 400);
-    return () => window.clearTimeout(id);
-  }, [loaded]);
 
   // When tabs are closed (or replaced wholesale), drop any result
   // entries whose owning tab no longer exists.
@@ -1910,8 +1901,6 @@ function SqlPlaygroundInner() {
       statusState={statusState}
       workspaceConflict={workspaceConflict}
       onOpenNewWorkspace={handleConflictNewWorkspace}
-      keepOverlayMounted={showLoadingOverlay}
-      loadingOverlayClassName={loadingFading ? "hidden" : ""}
       loadingHeroRepeat={4}
       loadingCaption={
         statusState === "error" ? loadingMessage : LOADING_QUIPS[quipIndex]
