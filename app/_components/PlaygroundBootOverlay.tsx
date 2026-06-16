@@ -42,8 +42,9 @@ export interface PlaygroundBootOverlayProps {
   cold?: boolean;
   /** Approximate cold download size in MB. */
   downloadMB?: number;
-  /** Compiled languages still pay a per-run compile, so promise "faster"
-   *  rather than "instant" later runs. */
+  /** Compiled languages (Java, C, C++, C#). No longer changes the boot
+   *  copy — every runtime now reads "much faster" — but kept so existing
+   *  call sites still type-check. */
   compiled?: boolean;
   /** Smoothed boot fraction in 0..1, or null for no bar. */
   fraction?: number | null;
@@ -58,7 +59,6 @@ export function PlaygroundBootOverlay({
   statusMessage,
   cold = false,
   downloadMB,
-  compiled = false,
   fraction = null,
   error = false,
   className,
@@ -90,7 +90,7 @@ export function PlaygroundBootOverlay({
             <span className="playground-boot-hint">
               Downloading the {title} runtime
               {downloadMB ? ` (~${downloadMB} MB)` : ""} — this happens once;{" "}
-              {compiled ? "later runs are much faster" : "later runs are instant"}.
+              later runs are much faster.
             </span>
           )}
           {!error && pct != null && (

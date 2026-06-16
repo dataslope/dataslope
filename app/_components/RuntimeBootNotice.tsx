@@ -39,9 +39,9 @@ export interface RuntimeBootNoticeProps {
   cold?: boolean;
   /** Approximate cold download size in MB (adapter.coldDownloadMB). */
   downloadMB?: number;
-  /** True for compiled languages (Java, C, C++, C#): the cold hint then
-   *  promises "later runs are much faster" instead of "instant", since
-   *  they still compile on every run once the runtime is warm. */
+  /** Compiled languages (Java, C, C++, C#). No longer changes the boot
+   *  copy — every runtime now reads "much faster" — but kept so existing
+   *  call sites still type-check. */
   compiled?: boolean;
   /** Smoothed boot fraction in 0..1, or null for an indeterminate boot
    *  (loader + copy only, no bar). */
@@ -55,7 +55,6 @@ export function RuntimeBootNotice({
   statusMessage,
   cold = false,
   downloadMB,
-  compiled = false,
   fraction = null,
   testId,
 }: RuntimeBootNoticeProps) {
@@ -79,7 +78,7 @@ export function RuntimeBootNotice({
           <span className={styles.hint}>
             Downloading the {language} runtime
             {downloadMB ? ` (~${downloadMB} MB)` : ""} — this happens once;{" "}
-            {compiled ? "later runs are much faster" : "later runs are instant"}.
+            later runs are much faster.
           </span>
         )}
         {pct != null && (
@@ -457,7 +456,7 @@ function noticeItems(): ShowcaseItem[] {
     {
       title: "Cold start — finishing (compiled language)",
       blurb:
-        "Near the end (the bar never hits 100% — the notice unmounts the moment the runtime is ready). Compiled languages (C#, Java, C, C++) promise faster — not instant — later runs, since they still compile on every run.",
+        "Near the end (the bar never hits 100% — the notice unmounts the moment the runtime is ready). The boot copy promises that later runs are much faster for every runtime.",
       jsx: `<RuntimeBootNotice
   language="C#"
   statusMessage="Loading Roslyn (C# scripting engine)…"
