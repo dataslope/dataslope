@@ -78,6 +78,9 @@ export default async function Home() {
           <Link href="/svg-gallery" className={styles.ctaSecondary}>
             SVG Gallery
           </Link>
+          <Link href="/magicui-demo" className={styles.ctaSecondary}>
+            Magic UI Demo
+          </Link>
           <a
             href="https://github.com/dataslope/dataslope/"
             target="_blank"
