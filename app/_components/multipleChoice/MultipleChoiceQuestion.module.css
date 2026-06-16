@@ -30,9 +30,13 @@
   --mc-font-mono:
     "JetBrains Mono", "Fira Code", ui-monospace, monospace;
   --mc-radius: 8px;
+  /* Neo-brutalist card lift — kept in sync with ChallengeCard's `--ch-shadow`
+     (one hard, blur-less offset; offset thins on mobile, colour flips to a
+     light tint in dark mode). */
+  --mc-shadow-offset: 6px;
+  --mc-shadow-color: color-mix(in srgb, var(--ds-black) 8%, transparent);
   --mc-shadow:
-    0 1px 3px color-mix(in srgb, var(--ds-black) 8%, transparent),
-    0 1px 2px color-mix(in srgb, var(--ds-black) 5%, transparent);
+    var(--mc-shadow-offset) var(--mc-shadow-offset) 0 0 var(--mc-shadow-color);
 
   background: var(--mc-bg);
   border: 1px solid var(--mc-border);
@@ -479,9 +483,10 @@
 /* ─── Dark mode ───────────────────────────────────────────────────── */
 /* Mirror the existing ChallengeCard dark-mode strategy: re-bind the
    semantic --mc-* tokens to darker palette values, leaving the
-   structural rules above untouched. The Fumadocs root toggles
-   `html.dark`, so we scope via :global(html.dark). */
-:global(html.dark) .card {
+   structural rules above untouched. Both dark hooks are honoured —
+   `html.dark` (Fumadocs / next-themes) and `html[data-theme="dark"]`
+   (attribute strategy) — so the card themes outside /learn too. */
+:global(html:is(.dark, [data-theme="dark"])) .card {
   /* Match the Fumadocs page background so the card surface blends with
      the surrounding chrome. Falls back to gray-900 when Fumadocs vars
      are not present (e.g. isolated Storybook / unit-test environments).
@@ -494,91 +499,94 @@
   --mc-border-light: #232323;
   --mc-text: #e0e0e0;
   --mc-text-muted: #808080;
+  /* Faint light tint so the hard offset stays visible on the near-black
+     surface (matches ChallengeCard's dark-mode shadow). */
+  --mc-shadow-color: color-mix(in srgb, var(--ds-white) 10%, transparent);
 }
 
-:global(html.dark) .choice[data-verdict="correct-selected"],
-:global(html.dark) .choice[data-verdict="correct-missed"] {
+:global(html:is(.dark, [data-theme="dark"])) .choice[data-verdict="correct-selected"],
+:global(html:is(.dark, [data-theme="dark"])) .choice[data-verdict="correct-missed"] {
   background: color-mix(in srgb, var(--ds-green) 15%, transparent);
 }
 
-:global(html.dark) .choice[data-verdict="wrong-selected"] {
+:global(html:is(.dark, [data-theme="dark"])) .choice[data-verdict="wrong-selected"] {
   background: color-mix(in srgb, var(--ds-red) 15%, transparent);
 }
 
 /* Verdict banner: step the solid fill down to the 600 shades on dark
    surfaces (matches the challenge card's banner). */
-:global(html.dark) .banner[data-state="pass"] {
+:global(html:is(.dark, [data-theme="dark"])) .banner[data-state="pass"] {
   background: var(--ds-green-600);
 }
 
-:global(html.dark) .banner[data-state="fail"] {
+:global(html:is(.dark, [data-theme="dark"])) .banner[data-state="fail"] {
   background: var(--ds-red-600);
 }
 
-:global(html.dark) .choiceLabel code,
-:global(html.dark) .choiceExplanation code,
-:global(html.dark) .bodyMd code,
-:global(html.dark) .overallBody code {
+:global(html:is(.dark, [data-theme="dark"])) .choiceLabel code,
+:global(html:is(.dark, [data-theme="dark"])) .choiceExplanation code,
+:global(html:is(.dark, [data-theme="dark"])) .bodyMd code,
+:global(html:is(.dark, [data-theme="dark"])) .overallBody code {
   background: #252525;
   color: var(--mc-text);
 }
 
-:global(html.dark) .bodyMd pre,
-:global(html.dark) .choiceLabel pre {
+:global(html:is(.dark, [data-theme="dark"])) .bodyMd pre,
+:global(html:is(.dark, [data-theme="dark"])) .choiceLabel pre {
   background: #1a1a1a;
 }
 
 /* Force code inside pre to be transparent so it doesn't show a lighter
    background (#252525) on top of the pre's #1a1a1a — the higher specificity
    here beats the general dark-mode code background rule. */
-:global(html.dark) .bodyMd pre code,
-:global(html.dark) .choiceLabel pre code {
+:global(html:is(.dark, [data-theme="dark"])) .bodyMd pre code,
+:global(html:is(.dark, [data-theme="dark"])) .choiceLabel pre code {
   background: transparent;
 }
 
 /* Unselected radio: no ring, subtle fill close to the page bg. */
-:global(html.dark) .choiceInput:not(:checked) {
+:global(html:is(.dark, [data-theme="dark"])) .choiceInput:not(:checked) {
   background: rgba(255, 255, 255, 0.05);
 }
 
 /* Choice explanation boxes inside verdict choices use explicit white in
    light mode — override to a translucent tinted dark surface. */
-:global(html.dark) .choice[data-verdict="correct-selected"] .choiceExplanation,
-:global(html.dark) .choice[data-verdict="correct-missed"] .choiceExplanation {
+:global(html:is(.dark, [data-theme="dark"])) .choice[data-verdict="correct-selected"] .choiceExplanation,
+:global(html:is(.dark, [data-theme="dark"])) .choice[data-verdict="correct-missed"] .choiceExplanation {
   background: color-mix(in srgb, var(--ds-green) 8%, transparent);
 }
 
-:global(html.dark) .choice[data-verdict="wrong-selected"] .choiceExplanation {
+:global(html:is(.dark, [data-theme="dark"])) .choice[data-verdict="wrong-selected"] .choiceExplanation {
   background: color-mix(in srgb, var(--ds-red) 8%, transparent);
 }
 
 /* Choice mark icons — replace light green/red fill with translucent dark tints. */
-:global(html.dark) .choice[data-verdict="correct-selected"] .choiceMark,
-:global(html.dark) .choice[data-verdict="correct-missed"] .choiceMark {
+:global(html:is(.dark, [data-theme="dark"])) .choice[data-verdict="correct-selected"] .choiceMark,
+:global(html:is(.dark, [data-theme="dark"])) .choice[data-verdict="correct-missed"] .choiceMark {
   background: color-mix(in srgb, var(--ds-green) 20%, transparent);
   color: var(--ds-green-300);
 }
 
-:global(html.dark) .choice[data-verdict="wrong-selected"] .choiceMark {
+:global(html:is(.dark, [data-theme="dark"])) .choice[data-verdict="wrong-selected"] .choiceMark {
   background: color-mix(in srgb, var(--ds-red) 20%, transparent);
   color: var(--ds-red-300);
 }
 
 /* Retry button uses an explicit white background in light mode. */
-:global(html.dark) .retryBtn {
+:global(html:is(.dark, [data-theme="dark"])) .retryBtn {
   background: var(--mc-bg-subtle);
   border-color: var(--mc-border);
   color: var(--mc-text);
 }
 
-:global(html.dark) .retryBtn:hover {
+:global(html:is(.dark, [data-theme="dark"])) .retryBtn:hover {
   background: var(--mc-bg-hover);
   border-color: #3a3a3a;
 }
 
 /* Choice hover in dark mode — use the dark bg-hover token instead of the
    light gray-50 that the base rule references directly. */
-:global(html.dark) .choice:not([data-locked="true"]):hover {
+:global(html:is(.dark, [data-theme="dark"])) .choice:not([data-locked="true"]):hover {
   background: var(--mc-bg-hover);
 }
 
@@ -587,31 +595,39 @@
    not pick, as well as the tinted green/red verdict backgrounds. Without
    the base (neutral) rule, those distractor explanations kept the
    light-mode gray-700 text and were almost invisible on the dark card. */
-:global(html.dark) .choiceExplanation {
+:global(html:is(.dark, [data-theme="dark"])) .choiceExplanation {
   color: #ffffff;
 }
 
 /* Neutral checked state for the radio input in dark mode. */
-:global(html.dark) .choiceInput:checked {
+:global(html:is(.dark, [data-theme="dark"])) .choiceInput:checked {
   background: radial-gradient(circle, white 30%, #fff6 31%);
   box-shadow: none;
 }
 
 /* Inline code inside verdict choice explanations: use a tinted background
    that blends with the dark green / dark red surface instead of gray. */
-:global(html.dark) .choice[data-verdict="correct-selected"] .choiceExplanation code,
-:global(html.dark) .choice[data-verdict="correct-missed"] .choiceExplanation code {
+:global(html:is(.dark, [data-theme="dark"])) .choice[data-verdict="correct-selected"] .choiceExplanation code,
+:global(html:is(.dark, [data-theme="dark"])) .choice[data-verdict="correct-missed"] .choiceExplanation code {
   background: color-mix(in srgb, var(--ds-green) 30%, transparent);
   color: var(--ds-green-200);
 }
 
-:global(html.dark) .choice[data-verdict="wrong-selected"] .choiceExplanation code {
+:global(html:is(.dark, [data-theme="dark"])) .choice[data-verdict="wrong-selected"] .choiceExplanation code {
   background: color-mix(in srgb, var(--ds-red) 30%, transparent);
   color: var(--ds-red-200);
 }
 
 /* Overall explanation paragraph text is white in dark mode. */
-:global(html.dark) .overallBody {
+:global(html:is(.dark, [data-theme="dark"])) .overallBody {
   color: #ffffff;
+}
+
+/* Slightly thinner hard shadow so the offset doesn't dominate on narrow
+   screens (mirrors ChallengeCard). */
+@media (max-width: 640px) {
+  .card {
+    --mc-shadow-offset: 5px;
+  }
 }
 
