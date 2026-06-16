@@ -93,7 +93,11 @@ import { sqliteAdapter } from "./sqliteAdapter";
 import { DROP_KIND_LABELS, IMPORT_COL_STATUS_LABEL } from "./constants";
 import { computeImportColComparison } from "./utils/importUtils";
 import { splitSqlStatements, statementAtCursor } from "./utils/sqlAnalysis";
-import { ensureActiveWorkspace, switchActiveWorkspace } from "../opfs/activeWorkspace";
+import {
+  ensureActiveWorkspace,
+  saveDraftWorkspace,
+  switchActiveWorkspace,
+} from "../opfs/activeWorkspace";
 import { acquireWorkspaceLock, createWorkspace } from "../opfs/workspace";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
 import { MobileMenuAction, MobileMenuSubSheet } from "../MobileMenuSheet";
@@ -570,6 +574,23 @@ function SqlPlaygroundInner() {
     [setGlobalPageSizeState],
   );
 
+  // True when this workspace is already open (locked) in another tab, so
+  // the shell shows a conflict overlay instead of deadlocking on boot.
+  const [workspaceConflict, setWorkspaceConflict] = useState(false);
+  // From the conflict overlay: create a fresh workspace and switch to it.
+  // No engine is open in the conflict case, so a reload is the simplest
+  // safe path — the new workspace id isn't locked, so it boots normally.
+  const handleConflictNewWorkspace = useCallback(() => {
+    void (async () => {
+      try {
+        const newWs = await createWorkspace("SQLite Workspace", PLAYGROUND_ID);
+        switchActiveWorkspace(PLAYGROUND_ID, newWs.id);
+      } catch {
+        window.location.reload();
+      }
+    })();
+  }, []);
+
   // ─── Engine store ────────────────────────────────────────────────────
   const loaded = useEngineStore((s) => s.loaded);
   const setLoaded = useEngineStore((s) => s.setLoaded);
@@ -706,7 +727,6 @@ function SqlPlaygroundInner() {
   const [loadingMessage, setLoadingMessage] = useState(
     "Loading SQLite engine…",
   );
-  const [showLoadingOverlay, setShowLoadingOverlay] = useState(true);
   const [indexesSectionExpanded, setIndexesSectionExpanded] = useState(false);
   const [triggersSectionExpanded, setTriggersSectionExpanded] = useState(false);
   const [hasEditorSelection, setHasEditorSelection] = useState(false);
@@ -722,6 +742,16 @@ function SqlPlaygroundInner() {
     id: string;
     name: string;
   } | null>(null);
+  // False for the auto-created draft workspace (kept out of the saved list
+  // until the user saves it). Drives the Save affordance in the badge.
+  const [workspaceSaved, setWorkspaceSaved] = useState(true);
+  const handleSaveWorkspace = useCallback(async (name: string) => {
+    const saved = saveDraftWorkspace(PLAYGROUND_ID, name);
+    if (saved) {
+      setWorkspaceSaved(true);
+      setActiveWorkspace({ id: saved.id, name: saved.name });
+    }
+  }, []);
 
   // ─── Derived values ──────────────────────────────────────────────────
   const isSettingsTabActive = activeTabId === SETTINGS_TAB_ID;
@@ -731,7 +761,6 @@ function SqlPlaygroundInner() {
     [activeTab?.code],
   );
   const result = activeTabId ? (resultsByTab[activeTabId] ?? null) : null;
-  const loadingFading = loaded && showLoadingOverlay;
 
   // ─── Refs ────────────────────────────────────────────────────────────
   const engineRef = useRef<SqliteEngine | null>(null);
@@ -1102,13 +1131,6 @@ function SqlPlaygroundInner() {
     }
   }, [showToast]);
 
-  // ─── Loading overlay fade-out ────────────────────────────────────────
-  useEffect(() => {
-    if (!loaded) return;
-    const id = window.setTimeout(() => setShowLoadingOverlay(false), 400);
-    return () => window.clearTimeout(id);
-  }, [loaded]);
-
   // When tabs are closed (or replaced wholesale), drop any result
   // entries whose owning tab no longer exists.
   useEffect(() => {
@@ -1272,27 +1294,24 @@ function SqlPlaygroundInner() {
           const workspace = await ensureActiveWorkspace(PLAYGROUND_ID);
           workspaceId = workspace.id;
           setActiveWorkspace({ id: workspace.id, name: workspace.name });
-          // Tab-isolation notice: warn once per (workspace × session)
-          // when another tab already holds the OPFS lock for this
-          // workspace, so the user knows edits here can conflict.
-          const noticeKey = `playground_ws_warned_${workspace.id}`;
+          setWorkspaceSaved(workspace.saved);
           try {
-            if (window.sessionStorage.getItem(noticeKey) !== "1") {
-              const hasLock = await acquireWorkspaceLock(workspace.id);
-              if (!cancelled && !hasLock) {
-                window.sessionStorage.setItem(noticeKey, "1");
-                showToast(
-                  "This workspace is already open in another tab. Edits here may conflict — switch workspaces via the badge in the header.",
-                  "warn",
-                );
-              }
+            const hasLock = await acquireWorkspaceLock(workspace.id);
+            if (!cancelled && !hasLock) {
+              // The same OPFS-backed workspace can't be opened in two tabs:
+              // SQLite's exclusive OPFS access handle would deadlock the
+              // boot (it hangs at ~90%). Surface a conflict overlay and
+              // skip the boot rather than hang.
+              setWorkspaceConflict(true);
+              return;
             }
           } catch {
-            /* sessionStorage / Locks unavailable — ignore. */
+            /* Web Locks unavailable — proceed without cross-tab exclusivity. */
           }
         } catch {
           // Workspace bootstrap is best-effort — proceed in-memory.
         }
+        if (cancelled) return;
         const engine = await sqliteAdapter.createEngine(
           initialSampleId,
           workspaceId,
@@ -1880,8 +1899,8 @@ function SqlPlaygroundInner() {
       playgroundTitle="SQLite Playground"
       loaded={loaded}
       statusState={statusState}
-      keepOverlayMounted={showLoadingOverlay}
-      loadingOverlayClassName={loadingFading ? "hidden" : ""}
+      workspaceConflict={workspaceConflict}
+      onOpenNewWorkspace={handleConflictNewWorkspace}
       loadingHeroRepeat={4}
       loadingCaption={
         statusState === "error" ? loadingMessage : LOADING_QUIPS[quipIndex]
@@ -1895,6 +1914,11 @@ function SqlPlaygroundInner() {
               activeWorkspaceName={activeWorkspace.name}
               managerOpen={workspaceManagerOpen}
               onManagerOpenChange={setWorkspaceManagerOpen}
+              unsaved={
+                !workspaceSaved &&
+                tabs.some((t) => !t.kind && t.code !== t.pristineCode)
+              }
+              onSave={handleSaveWorkspace}
             />
           )}
           <div className="header-actions desktop-only">

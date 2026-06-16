@@ -150,7 +150,7 @@ async function initPhp(): Promise<void> {
     /* webpackIgnore: true */ /* turbopackIgnore: true */ PHP_WASM_ENTRY
   )) as { PhpWeb: PhpWebClass };
 
-  post({ kind: "loading", message: "Initialising PHP (WebAssembly)…" });
+  post({ kind: "loading", message: "Initialising PHP runtime…" });
   php = new mod.PhpWeb({
     // Return undefined for paths php-wasm handles internally — most
     // importantly `libxml2.so`, which PhpBase suppresses with a data: URL

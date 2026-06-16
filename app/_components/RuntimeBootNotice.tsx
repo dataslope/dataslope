@@ -75,11 +75,15 @@ export function RuntimeBootNotice({
           {title}
         </span>
         {cold && (
-          <span className={styles.hint}>
-            Downloading the {language} runtime
-            {downloadMB ? ` (~${downloadMB} MB)` : ""} — this happens once;{" "}
-            later runs are much faster.
-          </span>
+          <>
+            <span className={styles.hint}>
+              This can take a moment on first load
+            </span>
+            <span className={styles.hint}>
+              {downloadMB ? `Downloading (~${downloadMB} MB) — ` : ""}This
+              happens once. Later runs are much faster.
+            </span>
+          </>
         )}
         {pct != null && (
           <div className={styles.progress}>
@@ -287,10 +291,10 @@ print(by_species.round(1))`;
  *  components feed the notice during a cold Pyodide boot. */
 function SimulatedCodeBlock() {
   const stages: Array<{ at: number; message: string }> = [
-    { at: 0.04, message: "Starting Python worker…" },
-    { at: 0.2, message: "Loading Pyodide…" },
+    { at: 0.04, message: "Starting Python runtime…" },
+    { at: 0.2, message: "Loading Python runtime…" },
     { at: 0.55, message: "Preparing the Python environment…" },
-    { at: 0.82, message: "Installing the data packages…" },
+    { at: 0.82, message: "Installing data packages…" },
   ];
   const [fraction, setFraction] = useState(0.04);
 
@@ -348,7 +352,7 @@ function codeBlockItems(): ShowcaseItem[] {
   language="Python"
   version="3.13.2"
   code={pandasSnippet}
-  statusMessage="Loading Pyodide…"
+  statusMessage="Loading Python runtime…"
   cold
   downloadMB={6}
   fraction={0.42}
@@ -363,7 +367,7 @@ function codeBlockItems(): ShowcaseItem[] {
   language="Python"
   version="3.13.2"
   code={pandasSnippet}
-  statusMessage="Starting Python worker…"
+  statusMessage="Starting Python runtime…"
   cold
   downloadMB={6}
   fraction={0.06}
@@ -374,7 +378,7 @@ function codeBlockItems(): ShowcaseItem[] {
           version="3.13.2"
           langId="python"
           code={SAMPLE_CODE}
-          statusMessage="Starting Python worker…"
+          statusMessage="Starting Python runtime…"
           cold
           downloadMB={6}
           fraction={0.06}
@@ -389,7 +393,7 @@ function codeBlockItems(): ShowcaseItem[] {
   language="Python"
   version="3.13.2"
   code={pandasSnippet}
-  statusMessage="Installing the Python data packages — first run only…"
+  statusMessage="Installing data packages — first run only…"
   cold
   fraction={0.7}
 />`,
@@ -399,7 +403,7 @@ function codeBlockItems(): ShowcaseItem[] {
           version="3.13.2"
           langId="python"
           code={SAMPLE_CODE}
-          statusMessage="Installing the Python data packages — first run only…"
+          statusMessage="Installing data packages — first run only…"
           cold
           fraction={0.7}
         />
@@ -417,7 +421,7 @@ function noticeItems(): ShowcaseItem[] {
         "The first stage floor: the worker has started and the runtime download is about to stream in.",
       jsx: `<RuntimeBootNotice
   language="Python"
-  statusMessage="Starting Python worker…"
+  statusMessage="Starting Python runtime…"
   cold
   downloadMB={6}
   fraction={0.05}
@@ -425,7 +429,7 @@ function noticeItems(): ShowcaseItem[] {
       node: (
         <RuntimeBootNotice
           language="Python"
-          statusMessage="Starting Python worker…"
+          statusMessage="Starting Python runtime…"
           cold
           downloadMB={6}
           fraction={0.05}
@@ -459,7 +463,7 @@ function noticeItems(): ShowcaseItem[] {
         "Near the end (the bar never hits 100% — the notice unmounts the moment the runtime is ready). The boot copy promises that later runs are much faster for every runtime.",
       jsx: `<RuntimeBootNotice
   language="C#"
-  statusMessage="Loading Roslyn (C# scripting engine)…"
+  statusMessage="Preparing C# compiler…"
   cold
   downloadMB={35}
   compiled
@@ -468,7 +472,7 @@ function noticeItems(): ShowcaseItem[] {
       node: (
         <RuntimeBootNotice
           language="C#"
-          statusMessage="Loading Roslyn (C# scripting engine)…"
+          statusMessage="Preparing C# compiler…"
           cold
           downloadMB={35}
           compiled

@@ -111,7 +111,9 @@ import { findPostgresSampleDatabase } from "../runtime/postgresSamples";
 import { postgresAdapter } from "./postgresAdapter";
 import {
   ensureActiveWorkspace,
+  saveDraftWorkspace,
   setActiveWorkspaceId,
+  switchActiveWorkspace,
 } from "../opfs/activeWorkspace";
 import { acquireWorkspaceLock, createWorkspace } from "../opfs/workspace";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
@@ -979,6 +981,9 @@ function PostgresPlaygroundInner() {
     Record<string, QueryRunResult | null>
   >({});
   const [loaded, setLoaded] = useState(false);
+  // True when this workspace is already open (locked) in another tab, so
+  // the shell shows a conflict overlay instead of deadlocking on boot.
+  const [workspaceConflict, setWorkspaceConflict] = useState(false);
   const [statusState, setStatusState] = useState<
     "loading" | "ready" | "running" | "error"
   >("loading");
@@ -989,6 +994,9 @@ function PostgresPlaygroundInner() {
     id: string;
     name: string;
   } | null>(null);
+  // False for the auto-created draft workspace (kept out of the saved list
+  // until the user saves it). Drives the Save affordance in the badge.
+  const [workspaceSaved, setWorkspaceSaved] = useState(true);
   const [indexesExpanded, setIndexesExpanded] = useState(true);
   const [viewsExpanded, setViewsExpanded] = useState(true);
   const [tablesExpanded, setTablesExpanded] = useState(true);
@@ -1837,24 +1845,24 @@ function PostgresPlaygroundInner() {
           const workspace = await ensureActiveWorkspace(PLAYGROUND_ID);
           workspaceId = workspace.id;
           setActiveWorkspace({ id: workspace.id, name: workspace.name });
-          const noticeKey = `playground_ws_warned_${workspace.id}`;
+          setWorkspaceSaved(workspace.saved);
           try {
-            if (window.sessionStorage.getItem(noticeKey) !== "1") {
-              const hasLock = await acquireWorkspaceLock(workspace.id);
-              if (!cancelled && !hasLock) {
-                window.sessionStorage.setItem(noticeKey, "1");
-                showToast(
-                  "This workspace is already open in another tab. Edits here may conflict — switch workspaces via the badge in the header.",
-                  "warn",
-                );
-              }
+            const hasLock = await acquireWorkspaceLock(workspace.id);
+            if (!cancelled && !hasLock) {
+              // The same OPFS-backed workspace can't be opened in two tabs:
+              // PGlite's exclusive OPFS access handle would deadlock the
+              // boot (it hangs at ~90%). Surface a conflict overlay and
+              // skip the boot rather than hang.
+              setWorkspaceConflict(true);
+              return;
             }
           } catch {
-            /* sessionStorage / Locks unavailable — ignore. */
+            /* Web Locks unavailable — proceed without cross-tab exclusivity. */
           }
         } catch {
           /* proceed in-memory */
         }
+        if (cancelled) return;
         const engine = await postgresAdapter.createEngine(
           initialDbId,
           workspaceId,
@@ -2164,6 +2172,31 @@ function PostgresPlaygroundInner() {
     },
     [persistTabs, refreshSchema, refreshSchemas, showToast],
   );
+
+  // From the "open in another tab" conflict overlay: create a fresh
+  // workspace and switch to it. No engine is open in the conflict case
+  // (the boot was skipped), so a reload is the simplest safe path — the
+  // new workspace id isn't locked, so it boots normally.
+  const handleConflictNewWorkspace = useCallback(() => {
+    void (async () => {
+      try {
+        const newWs = await createWorkspace("Postgres Workspace", PLAYGROUND_ID);
+        switchActiveWorkspace(PLAYGROUND_ID, newWs.id);
+      } catch {
+        /* If creation fails, a plain reload at least re-checks the lock. */
+        window.location.reload();
+      }
+    })();
+  }, []);
+
+  // Save (promote) the current draft workspace into the saved list.
+  const handleSaveWorkspace = useCallback(async (name: string) => {
+    const saved = saveDraftWorkspace(PLAYGROUND_ID, name);
+    if (saved) {
+      setWorkspaceSaved(true);
+      setActiveWorkspace({ id: saved.id, name: saved.name });
+    }
+  }, []);
 
   const requestDbSwitch = useCallback(
     (nextId: string) => {
@@ -3500,6 +3533,8 @@ function PostgresPlaygroundInner() {
       loaded={loaded}
       statusState={statusState}
       loadingCaption={loadingMessage}
+      workspaceConflict={workspaceConflict}
+      onOpenNewWorkspace={handleConflictNewWorkspace}
       headerActions={
         <>
           {activeWorkspace && (
@@ -3509,6 +3544,11 @@ function PostgresPlaygroundInner() {
               activeWorkspaceName={activeWorkspace.name}
               managerOpen={workspaceManagerOpen}
               onManagerOpenChange={setWorkspaceManagerOpen}
+              unsaved={
+                !workspaceSaved &&
+                tabs.some((t) => !t.kind && t.code !== t.pristineCode)
+              }
+              onSave={handleSaveWorkspace}
             />
           )}
           <div className="header-actions desktop-only">

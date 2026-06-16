@@ -297,7 +297,7 @@ export const phpAdapter: LanguageAdapter = {
     return format(code, "main.php");
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Loading PHP worker…");
+    setLoadingMessage("Starting PHP runtime…");
     const worker = new Worker(new URL("./php-worker.ts", import.meta.url));
     return new Promise<LanguageRuntime>((resolve, reject) => {
       const onMessage = (ev: MessageEvent<WorkerOutMessage>) => {

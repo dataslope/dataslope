@@ -7,7 +7,15 @@ import "../../sqlPlayground.css";
 import { SqlPlaygroundSwitcher } from "./SqlPlaygroundSwitcher";
 import { paneForActivatedTab, type SqlMobilePane } from "../utils/mobilePane";
 import { MobileMenuSheet } from "../../MobileMenuSheet";
-import { PlaygroundBootOverlay } from "../../PlaygroundBootOverlay";
+import {
+  PlaygroundBootOverlay,
+  useBootOverlayVisibility,
+} from "../../PlaygroundBootOverlay";
+import { DiamondMark } from "../../mdx/loadingAnimations";
+import {
+  hasRuntimeBootedBefore,
+  markRuntimeBooted,
+} from "../../runtime/bootHistory";
 
 /**
  * Re-exported from the pure helper module (`../utils/mobilePane`) so existing
@@ -45,14 +53,6 @@ export interface SqlPlaygroundShellProps {
   /** Current playground status; used by the overlay to render the
    *  red-tinted error state when something goes wrong during boot. */
   statusState: SqlPlaygroundOverlayStatus;
-  /** Optional className appended to the loading overlay (currently
-   *  used by SQLite for its fade-out animation). */
-  loadingOverlayClassName?: string;
-  /** When `true`, the loading overlay stays mounted even after
-   *  `loaded` becomes true (SQLite uses this with `loadingFading` so
-   *  the overlay can animate out). Defaults to `false` (= unmount the
-   *  instant `loaded` becomes `true`, which matches Postgres/DuckDB). */
-  keepOverlayMounted?: boolean;
   /** Body of the loading overlay's caption. Pass a plain status string
    *  for Postgres/DuckDB, or a rotating quip for SQLite. */
   loadingCaption: ReactNode;
@@ -73,6 +73,15 @@ export interface SqlPlaygroundShellProps {
    *  progress (DuckDB). Omit for engines that don't — the shell then
    *  creeps a determinate bar over time instead. */
   bootFraction?: number | null;
+  /** True when the active workspace is already open (locked) in another
+   *  browser tab. The shell then shows a conflict overlay instead of the
+   *  boot overlay — opening the same OPFS-backed database in two tabs would
+   *  otherwise deadlock the engine boot (it hangs at ~90%). */
+  workspaceConflict?: boolean;
+  /** Invoked when the user picks "Open a new workspace" from the conflict
+   *  overlay. The host should create a fresh workspace and switch to it
+   *  (a reload is fine — a new workspace id isn't locked elsewhere). */
+  onOpenNewWorkspace?: () => void;
   /** Main body of the page — typically the top toolbar + sidebar +
    *  editor + results pane structure. Rendered directly inside
    *  `<div className="playground-app">` after the header. */
@@ -99,15 +108,29 @@ export function SqlPlaygroundShell({
   playgroundTitle,
   loaded,
   statusState,
-  loadingOverlayClassName = "",
-  keepOverlayMounted = false,
   loadingCaption,
   headerActions,
   mobileMenu,
   bootFraction,
+  workspaceConflict = false,
+  onOpenNewWorkspace,
   children,
 }: SqlPlaygroundShellProps) {
-  const showLoadingOverlay = keepOverlayMounted || !loaded;
+  // Loading-overlay lifecycle (show → fade → unmount) with a minimum
+  // on-screen time, shared by all three SQL dialects. A warm revisit
+  // boots the cached engine almost instantly; the floor keeps the overlay
+  // up long enough to read as a deliberate transition rather than a blink.
+  const { mounted: showLoadingOverlay, fading: loadingFading } =
+    useBootOverlayVisibility(loaded);
+  // First-ever cold boot vs warm revisit. The engine's WASM payload is
+  // served from the browser's HTTP cache after the first boot, so only a
+  // genuine first boot in this browser shows the "Downloading … this
+  // happens once" copy; later visits just show the status line + bar.
+  // Captured once at mount, before `loaded` flips and we record the boot.
+  const [isColdBoot] = useState(() => !hasRuntimeBootedBefore(playgroundId));
+  useEffect(() => {
+    if (loaded) markRuntimeBooted(playgroundId);
+  }, [loaded, playgroundId]);
   // Mobile hamburger menu open state (the shell owns it; dialects only
   // supply the rows via `mobileMenu`).
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -274,15 +297,58 @@ export function SqlPlaygroundShell({
       data-mobile-pane={mobilePane}
       data-settings-active={settingsTabActive || undefined}
     >
-      {showLoadingOverlay && (
-        <PlaygroundBootOverlay
-          title={playgroundTitle.replace(/\s*Playground$/i, "")}
-          statusMessage={loadingCaption}
-          cold
-          fraction={overlayFraction}
-          error={statusState === "error"}
-          className={loadingOverlayClassName}
-        />
+      {workspaceConflict ? (
+        <div
+          className="pyodide-loading playground-boot-overlay playground-conflict-overlay"
+          role="alertdialog"
+          aria-modal="true"
+        >
+          <div className="playground-boot-card">
+            <span className="playground-boot-loader" aria-hidden="true">
+              <DiamondMark size={88} />
+            </span>
+            <div className="playground-boot-text">
+              <span className="playground-boot-title">
+                This workspace is open in another tab
+              </span>
+              <div className="playground-boot-hints">
+                <span className="playground-boot-hint">
+                  A workspace can run in only one tab at a time. Keep using it
+                  in the original tab, or open a separate workspace here.
+                </span>
+              </div>
+              <div className="playground-conflict-actions">
+                {onOpenNewWorkspace && (
+                  <button
+                    type="button"
+                    className="playground-conflict-btn playground-conflict-btn-primary"
+                    onClick={onOpenNewWorkspace}
+                  >
+                    Open a new workspace
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="playground-conflict-btn"
+                  onClick={() => window.location.reload()}
+                >
+                  Try again
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        showLoadingOverlay && (
+          <PlaygroundBootOverlay
+            title={playgroundTitle.replace(/\s*Playground$/i, "")}
+            statusMessage={loadingCaption}
+            cold={isColdBoot}
+            fraction={overlayFraction}
+            error={statusState === "error"}
+            className={loadingFading ? "hidden" : ""}
+          />
+        )
       )}
       <div className="playground-app">
         <header className="playground-header">

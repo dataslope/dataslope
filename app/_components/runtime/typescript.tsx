@@ -406,7 +406,7 @@ export const typescriptAdapter: LanguageAdapter = {
     return format(code, "script.ts", WEB_FMT_2SPACE);
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Starting TypeScript worker…");
+    setLoadingMessage("Starting TypeScript runtime…");
     // Pre-bundled by `scripts/build-almostnode-workers.mjs`; see
     // javascript.tsx for the rationale (Turbopack's worker bundler
     // chunks almostnode's tree and load-collides on minified

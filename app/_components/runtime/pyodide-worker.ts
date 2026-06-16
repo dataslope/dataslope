@@ -154,7 +154,7 @@ function isPyDisplayOutputs(v: unknown): v is PyDisplayOutput[] {
 }
 
 async function initPyodide(): Promise<void> {
-  post({ kind: "loading", message: "Loading Pyodide…", fraction: 0.06 });
+  post({ kind: "loading", message: "Loading Python runtime…", fraction: 0.06 });
   pyodide = await self.loadPyodide({ indexURL: PYODIDE_INDEX_URL });
 
   post({
@@ -527,7 +527,7 @@ async function runCode(
     post({
       kind: "run-status",
       id,
-      message: "Installing the Python data packages — first run only…",
+      message: "Installing data packages — first run only…",
       preparing: true,
     });
     await ensurePackages();

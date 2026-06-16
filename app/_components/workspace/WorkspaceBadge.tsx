@@ -34,6 +34,7 @@ import {
   HardDrive,
   Pencil,
   Plus,
+  Save,
   Settings2,
   Trash2,
   Upload,
@@ -68,6 +69,14 @@ export interface WorkspaceBadgeProps {
    *  omitted the badge manages the manager itself. */
   managerOpen?: boolean;
   onManagerOpenChange?: (open: boolean) => void;
+  /** True when the active workspace is an unsaved draft that the user has
+   *  changed — surfaces a "Save" button next to the badge. Drafts (the
+   *  auto-created default) stay out of the saved list until saved. */
+  unsaved?: boolean;
+  /** Invoked with the chosen name when the user saves an unsaved draft.
+   *  The host promotes the draft to a saved workspace (see
+   *  `saveDraftWorkspace`). */
+  onSave?: (name: string) => void | Promise<void>;
 }
 
 function formatBytes(bytes: number): string {
@@ -124,8 +133,11 @@ export function WorkspaceBadge({
   activeWorkspaceName,
   managerOpen: managerOpenProp,
   onManagerOpenChange,
+  unsaved = false,
+  onSave,
 }: WorkspaceBadgeProps) {
   const [popoverOpen, setPopoverOpen] = useState(false);
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [internalManagerOpen, setInternalManagerOpen] = useState(false);
   // Controlled when the host passes `managerOpen`/`onManagerOpenChange`
   // (the mobile hamburger does), otherwise self-managed.
@@ -307,6 +319,29 @@ export function WorkspaceBadge({
         </Popover.Portal>
       </Popover.Root>
 
+      {unsaved && onSave && (
+        <button
+          type="button"
+          className="workspace-save-btn"
+          onClick={() => setSaveDialogOpen(true)}
+          title="Save this workspace so it appears in your list"
+        >
+          <Save size={12} aria-hidden="true" />
+          <span>Save</span>
+        </button>
+      )}
+
+      <SaveWorkspaceDialog
+        open={saveDialogOpen}
+        defaultName={defaultWorkspaceName(registry, playgroundId)}
+        onClose={() => setSaveDialogOpen(false)}
+        onConfirm={async (name) => {
+          setSaveDialogOpen(false);
+          await onSave?.(name);
+          refreshRegistry();
+        }}
+      />
+
       <WorkspaceManagerDrawer
         open={managerOpen}
         onOpenChange={setManagerOpen}
@@ -316,6 +351,61 @@ export function WorkspaceBadge({
         onRegistryChange={refreshRegistry}
       />
     </>
+  );
+}
+
+function SaveWorkspaceDialog({
+  open,
+  defaultName,
+  onClose,
+  onConfirm,
+}: {
+  open: boolean;
+  defaultName: string;
+  onClose: () => void;
+  onConfirm: (name: string) => void | Promise<void>;
+}) {
+  const [draft, setDraft] = useState("");
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (open) setDraft(defaultName);
+  }, [open, defaultName]);
+  return (
+    <Dialog.Root open={open} onOpenChange={(o) => !o && onClose()}>
+      <Dialog.Portal>
+        <Dialog.Backdrop className="confirm-backdrop" />
+        <Dialog.Popup className="confirm-popup sql-rename-popup">
+          <Dialog.Title className="confirm-title">Save workspace</Dialog.Title>
+          <Dialog.Description className="confirm-desc">
+            Give this workspace a name to add it to your saved list. Your work
+            stays in this browser.
+          </Dialog.Description>
+          <form
+            className="sql-rename-form"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const name = draft.trim() || defaultName;
+              void onConfirm(name);
+            }}
+          >
+            <input
+              className="sql-rename-input"
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              autoFocus
+            />
+            <div className="confirm-actions">
+              <Dialog.Close className="confirm-btn confirm-btn-secondary">
+                Cancel
+              </Dialog.Close>
+              <button type="submit" className="confirm-btn confirm-btn-primary">
+                Save
+              </button>
+            </div>
+          </form>
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
 

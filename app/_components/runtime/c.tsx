@@ -588,7 +588,7 @@ export const cAdapter: LanguageAdapter = {
     return format(code, "main.c", "LLVM");
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Loading C worker…", 0.02);
+    setLoadingMessage("Starting C runtime…", 0.02);
     const worker = new Worker(
       new URL("./browsercc-worker.ts", import.meta.url),
     );

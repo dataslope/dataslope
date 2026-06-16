@@ -8,8 +8,60 @@
 // determinate progress bar — so a multi-second cold start reads the same
 // everywhere. Styling lives in playground.css (`.playground-boot-*`).
 
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { DiamondAssembleTurnLoader } from "./mdx/loadingAnimations";
+
+/** Boot-overlay opacity fade duration in ms; mirrors the CSS
+ *  `transition: opacity 0.4s` on `.pyodide-loading`. The overlay is kept
+ *  mounted for this long after it begins fading so the animation finishes
+ *  before it unmounts. */
+const BOOT_OVERLAY_FADE_MS = 400;
+
+/** Minimum time (ms) the boot overlay stays fully visible, measured from
+ *  mount, before it is allowed to fade out. On a warm revisit the runtime
+ *  is already booted and `loaded` flips within a frame or two; without this
+ *  floor the overlay would appear for a single frame and vanish — a jarring
+ *  "blink". Holding it briefly makes re-entering a playground read as a
+ *  deliberate transition. Cold boots take far longer than this, so the floor
+ *  is a no-op there (the overlay fades the instant boot finishes). */
+export const MIN_BOOT_OVERLAY_MS = 500;
+
+export interface BootOverlayVisibility {
+  /** Render the overlay while true; it unmounts once the fade finishes. */
+  mounted: boolean;
+  /** Apply the `.hidden` fade-out class while true. */
+  fading: boolean;
+}
+
+/** Drives the boot overlay's show → fade → unmount lifecycle from a single
+ *  `loaded` flag, enforcing {@link MIN_BOOT_OVERLAY_MS} of on-screen time so
+ *  a warm revisit doesn't blink. Shared by the language playgrounds
+ *  (`<Playground>`) and the SQL playgrounds (`<SqlPlaygroundShell>`) so every
+ *  loading screen behaves identically. Returns `{ mounted, fading }`: render
+ *  the overlay while `mounted` and pass `fading` through as the `.hidden`
+ *  class. */
+export function useBootOverlayVisibility(
+  loaded: boolean,
+): BootOverlayVisibility {
+  // Captured once on mount ≈ when the overlay first painted.
+  const [mountedAt] = useState(() => Date.now());
+  const [mounted, setMounted] = useState(true);
+  const [fading, setFading] = useState(false);
+  useEffect(() => {
+    if (!loaded) return;
+    const holdFor = Math.max(0, MIN_BOOT_OVERLAY_MS - (Date.now() - mountedAt));
+    const fadeId = window.setTimeout(() => setFading(true), holdFor);
+    const unmountId = window.setTimeout(
+      () => setMounted(false),
+      holdFor + BOOT_OVERLAY_FADE_MS,
+    );
+    return () => {
+      window.clearTimeout(fadeId);
+      window.clearTimeout(unmountId);
+    };
+  }, [loaded, mountedAt]);
+  return { mounted, fading };
+}
 
 /** Renders a status string with its trailing ellipsis ("…" or "...")
  *  replaced by three dots that cycle one → two → three. Non-string
@@ -34,7 +86,8 @@ function BootTitle({ message }: { message: ReactNode }) {
 }
 
 export interface PlaygroundBootOverlayProps {
-  /** Runtime / language name used in the download hint (e.g. "Python"). */
+  /** Runtime / language name (e.g. "Python"). Retained for call-site
+   *  compatibility — the boot copy no longer names the runtime. */
   title: string;
   /** Current stage line (the playground's loading caption). */
   statusMessage: ReactNode;
@@ -55,7 +108,6 @@ export interface PlaygroundBootOverlayProps {
 }
 
 export function PlaygroundBootOverlay({
-  title,
   statusMessage,
   cold = false,
   downloadMB,
@@ -87,11 +139,15 @@ export function PlaygroundBootOverlay({
             <BootTitle message={statusMessage} />
           </span>
           {!error && cold && (
-            <span className="playground-boot-hint">
-              Downloading the {title} runtime
-              {downloadMB ? ` (~${downloadMB} MB)` : ""} — this happens once;{" "}
-              later runs are much faster.
-            </span>
+            <div className="playground-boot-hints">
+              <span className="playground-boot-hint">
+                This can take a moment on first load
+              </span>
+              <span className="playground-boot-hint playground-boot-hint-sub">
+                {downloadMB ? `Downloading (~${downloadMB} MB) — ` : ""}This
+                happens once. Later runs are much faster.
+              </span>
+            </div>
           )}
           {!error && pct != null && (
             <div className="playground-boot-progress">

@@ -104,7 +104,14 @@ import {
   detectIsMac,
 } from "./playgroundShared";
 import { DiamondMark } from "./mdx/loadingAnimations";
-import { PlaygroundBootOverlay } from "./PlaygroundBootOverlay";
+import {
+  PlaygroundBootOverlay,
+  useBootOverlayVisibility,
+} from "./PlaygroundBootOverlay";
+import {
+  hasRuntimeBootedBefore,
+  markRuntimeBooted,
+} from "./runtime/bootHistory";
 import { TabBar } from "./tabs/TabBar";
 import type { TabContextMenuItem, TabDescriptor } from "./tabs/tabTypes";
 import {
@@ -123,7 +130,12 @@ import {
   readFile as opfsReadFile,
   writeFile as opfsWriteFile,
 } from "./opfs/fileStorage";
-import { ensureActiveWorkspace } from "./opfs/activeWorkspace";
+import {
+  ensureActiveWorkspace,
+  isWorkspaceDirty,
+  markWorkspaceDirty,
+  saveDraftWorkspace,
+} from "./opfs/activeWorkspace";
 import { acquireWorkspaceLock } from "./opfs/workspace";
 import { WorkspaceBadge } from "./workspace/WorkspaceBadge";
 import { FileCode2, Settings } from "lucide-react";
@@ -718,23 +730,27 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     "Initializing runtime…",
   );
   const [loaded, setLoaded] = useState(false);
+  // First-ever cold boot vs warm revisit. The WASM payload is served from
+  // the browser's HTTP cache after the first boot, so only a genuine
+  // first-ever boot in this browser shows the "Downloading … this happens
+  // once" reassurance — later visits just show the status line + bar.
+  const [isColdBoot] = useState(
+    () => adapter.coldDownloadMB != null && !hasRuntimeBootedBefore(adapter.id),
+  );
+  useEffect(() => {
+    if (loaded) markRuntimeBooted(adapter.id);
+  }, [loaded, adapter.id]);
   // Latest stage-floor fraction reported by the adapter's boot (null
   // until one arrives); smoothed below to drive a determinate loading
   // bar instead of the indeterminate sweep.
   const [bootFraction, setBootFraction] = useState<number | null>(null);
-  // Two-phase teardown for the loading overlay: when `loaded` flips
-  // true we keep the overlay mounted briefly so its CSS opacity
-  // transition can play out (avoids the "blink" effect on languages
-  // that initialise quickly), then unmount it once the fade completes.
-  // `loadingFading` is derived from `loaded` and `showLoadingOverlay`
-  // so we don't have to setState() directly inside an effect.
-  const [showLoadingOverlay, setShowLoadingOverlay] = useState(true);
-  const loadingFading = loaded && showLoadingOverlay;
-  useEffect(() => {
-    if (!loaded) return;
-    const id = window.setTimeout(() => setShowLoadingOverlay(false), 400);
-    return () => window.clearTimeout(id);
-  }, [loaded]);
+  // Loading-overlay lifecycle (show → fade → unmount) with a minimum
+  // on-screen time, so a warm revisit — where the shared runtime is
+  // already booted and `loaded` flips almost immediately — shows a
+  // deliberate loading screen instead of a one-frame "blink". Cold boots
+  // exceed the floor, so they fade the instant boot finishes.
+  const { mounted: showLoadingOverlay, fading: loadingFading } =
+    useBootOverlayVisibility(loaded);
   const [statusState, setStatusState] = useState<
     "loading" | "ready" | "running" | "error"
   >("loading");
@@ -784,6 +800,32 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const dirtyBuffersRef = useRef(dirtyBuffers);
   const settingsOpenRef = useRef(false);
   const activeTabIdRef = useRef(activeTabId);
+
+  // ─── Explicit-save state ────────────────────────────────────────────────
+  // `workspaceSaved` is false for the auto-created draft (not yet in the saved
+  // list); `workspaceDirty` latches true once the user changes anything. The
+  // Save affordance shows only when the workspace is an unsaved, changed draft.
+  const [workspaceSaved, setWorkspaceSaved] = useState(true);
+  const [workspaceDirty, setWorkspaceDirty] = useState(false);
+  const dirtyMarkedRef = useRef(false);
+  const markDirty = useCallback(() => {
+    if (dirtyMarkedRef.current) return;
+    dirtyMarkedRef.current = true;
+    const wsId = workspaceIdRef.current;
+    if (wsId) markWorkspaceDirty(wsId);
+    setWorkspaceDirty(true);
+  }, []);
+  const handleSaveWorkspace = useCallback(
+    async (name: string) => {
+      const saved = saveDraftWorkspace(adapter.id, name);
+      if (saved) {
+        setWorkspace(saved.id, saved.name);
+        setWorkspaceSaved(true);
+      }
+    },
+    [adapter.id, setWorkspace],
+  );
+
   useEffect(() => {
     settingsOpenRef.current = settingsOpen;
     // Reset tab position when settings is closed so it starts at the end
@@ -942,6 +984,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       try {
         const ws = await ensureActiveWorkspace(adapter.id);
         if (cancelled) return;
+        setWorkspaceSaved(ws.saved);
+        const wsDirty = isWorkspaceDirty(ws.id);
+        setWorkspaceDirty(wsDirty);
+        dirtyMarkedRef.current = wsDirty;
 
         const manifest = loadManifest(adapter.id, ws.id);
         let files: PlaygroundFile[];
@@ -1321,6 +1367,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             updateDirtyBuffer(fileId, content);
             if (wsId) opfsWriteFile(wsId, fileId, content);
           }
+          // A genuine user edit makes the workspace eligible to be saved.
+          markDirty();
         }
         for (const tr of update.transactions) {
           if (!tr.isUserEvent("input.type")) continue;
@@ -2893,7 +2941,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               ? loadingMessage
               : loadingMessage || LOADING_QUIPS[quipIndex]
           }
-          cold={adapter.coldDownloadMB != null}
+          cold={isColdBoot}
           downloadMB={adapter.coldDownloadMB}
           compiled={adapter.compiled}
           fraction={bootDisplayFraction}
@@ -2987,6 +3035,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               activeWorkspaceName={workspaceName}
               managerOpen={workspaceManagerOpen}
               onManagerOpenChange={setWorkspaceManagerOpen}
+              unsaved={!workspaceSaved && workspaceDirty}
+              onSave={handleSaveWorkspace}
             />
           )}
 

@@ -44,6 +44,10 @@
   --danger: var(--ds-red);
   --ok-accent: var(--ds-green);
   --err-accent: var(--ds-red);
+  /* Very subtle hover tint shared by dropdown / drawer / dialog menu items
+     across the playgrounds — a faint lift that reads consistently on any
+     surface (--bg, --bg2, popups) rather than the heavier --bg3 step. */
+  --menu-item-hover: color-mix(in srgb, var(--text) 6%, transparent);
   --font-mono:
     "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace;
   --font-ui: "Inter", system-ui, -apple-system, sans-serif;
@@ -295,7 +299,7 @@ body.playground-active {
 }
 .bui-select-item[data-highlighted],
 .bui-select-item:hover {
-  background: var(--bg3);
+  background: var(--menu-item-hover);
 }
 .bui-select-item[data-selected] {
   color: var(--primary);
@@ -440,7 +444,7 @@ body.playground-active {
   border-bottom: none;
 }
 .example-item:hover {
-  background: var(--bg3);
+  background: var(--menu-item-hover);
   color: var(--text);
 }
 .example-item .ex-title {
@@ -1046,7 +1050,7 @@ body.playground-active {
 }
 .run-split-item[data-highlighted],
 .run-split-item:hover {
-  background: var(--bg3);
+  background: var(--menu-item-hover);
 }
 .run-split-item-label {
   flex: 1 1 auto;
@@ -1163,7 +1167,7 @@ body.playground-active {
 }
 .playground-run-multi-item[data-highlighted],
 .playground-run-multi-item:hover {
-  background: var(--bg3);
+  background: var(--menu-item-hover);
 }
 .playground-run-multi-item-label {
   flex: 1 1 auto;
@@ -2365,7 +2369,7 @@ input[type="range"].fs-slider:disabled {
   border-radius: 0;
 }
 .pkg-item:hover {
-  background: var(--bg3);
+  background: var(--menu-item-hover);
 }
 .pkg-item:focus-visible {
   outline: none;
@@ -2527,8 +2531,8 @@ input[type="range"].fs-slider:disabled {
 }
 .playground-boot-title {
   font-family: var(--font-ui);
-  font-size: 30px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 500;
   letter-spacing: -0.02em;
   color: var(--text);
   line-height: 1.25;
@@ -2572,11 +2576,56 @@ input[type="range"].fs-slider:disabled {
   }
 }
 
+.playground-boot-hints {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
 .playground-boot-hint {
   font-family: var(--font-ui);
   font-size: 15px;
   color: var(--text-muted, #9aa4b2);
   line-height: 1.6;
+}
+.playground-boot-hint-sub {
+  font-size: 13px;
+  opacity: 0.85;
+}
+/* Workspace-conflict overlay — reuses the boot-overlay chrome but offers
+   actions instead of a progress bar (shown when the workspace is already
+   open in another browser tab). */
+.playground-conflict-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+.playground-conflict-btn {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 9px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+.playground-conflict-btn:hover {
+  background: var(--bg3);
+}
+.playground-conflict-btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+.playground-conflict-btn-primary:hover {
+  background: color-mix(in srgb, var(--primary) 88%, #000);
 }
 .playground-boot-progress {
   display: flex;
@@ -2610,7 +2659,7 @@ input[type="range"].fs-slider:disabled {
 
 @media (max-width: 560px) {
   .playground-boot-title {
-    font-size: 24px;
+    font-size: 16px;
   }
 }
 .pyodide-loading.playground-boot-overlay.has-error .playground-boot-title {
@@ -3047,7 +3096,7 @@ input[type="range"].fs-slider:disabled {
 /* Menu items keep the same example-item / export-item presentation but
    need keyboard-highlight states from Base UI's `data-highlighted`. */
 .example-item[data-highlighted] {
-  background: var(--bg3);
+  background: var(--menu-item-hover);
   color: var(--text);
   outline: none;
 }
@@ -4225,6 +4274,32 @@ html[data-playground-theme="dark"] .welcome h3 {
   white-space: nowrap;
 }
 
+/* Save button — shown next to the badge only when the active workspace is an
+   unsaved draft the user has changed. Accent-filled so it reads as the call to
+   action (the draft isn't in the saved list until it's clicked). */
+.workspace-save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 6px;
+  padding: 4px 10px;
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: 999px;
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 120ms ease,
+    border-color 120ms ease;
+}
+
+.workspace-save-btn:hover {
+  background: color-mix(in srgb, var(--primary) 88%, #000);
+}
+
 .workspace-popover {
   min-width: 260px;
   max-width: 320px;
@@ -4273,7 +4348,7 @@ html[data-playground-theme="dark"] .welcome h3 {
 }
 
 .workspace-popover-item:hover {
-  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  background: var(--menu-item-hover);
 }
 
 .workspace-popover-item.active {
