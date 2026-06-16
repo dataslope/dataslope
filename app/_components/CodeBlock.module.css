@@ -95,7 +95,7 @@
    itself (loader, staged copy, progress bar) is the self-contained
    <RuntimeBootNotice> component; this wrapper only supplies the inset. */
 .bootNoticeWrap {
-  padding: 4px 14px 14px 18px;
+  padding: 14px 14px 14px 18px;
 }
 
 /* ─── Running overlay (sine-wave animation) ──────────────────────────

@@ -2,6 +2,26 @@
     "title": "Functional Programming with TypeScript",
     "description": "A computer-science-flavored course on functional thinking, type-driven design, algebraic modeling, and composable architecture in TypeScript",
     "root": true,
+    "tags": {
+        "language": [
+            "typescript"
+        ],
+        "libraries": [],
+        "domain": [
+            "functional-programming",
+            "software-architecture"
+        ],
+        "skills": [
+            "function-composition",
+            "type-driven-design",
+            "immutability",
+            "algebraic-data-types"
+        ],
+        "tools": [],
+        "level": [
+            "advanced"
+        ]
+    },
     "pages": [
         "index",
         "---",

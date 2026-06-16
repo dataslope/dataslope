@@ -2,6 +2,26 @@
     "title": "Java Collections and Generics Deep Dive",
     "description": "A computer science course on the Java Collections Framework, generic type systems, and collection-oriented software design",
     "root": true,
+    "tags": {
+        "language": [
+            "java"
+        ],
+        "libraries": [],
+        "domain": [
+            "data-structures",
+            "software-design"
+        ],
+        "skills": [
+            "collections",
+            "generics",
+            "data-modeling",
+            "performance-analysis"
+        ],
+        "tools": [],
+        "level": [
+            "intermediate"
+        ]
+    },
     "pages": [
         "index",
         "---",

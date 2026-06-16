@@ -2,6 +2,28 @@
     "title": "SQL for Data Analysis with DuckDB",
     "description": "An analytical-SQL course for people who already know basic SQL. Learn how analysts use SQL to explore, aggregate, and reason about large datasets — hands-on, visual, and powered by DuckDB running entirely in your browser.",
     "root": true,
+    "tags": {
+        "language": [
+            "sql"
+        ],
+        "libraries": [],
+        "domain": [
+            "data-analysis",
+            "databases"
+        ],
+        "skills": [
+            "analytical-queries",
+            "window-functions",
+            "aggregation",
+            "data-exploration"
+        ],
+        "tools": [
+            "duckdb"
+        ],
+        "level": [
+            "intermediate"
+        ]
+    },
     "pages": [
         "index",
         "---",

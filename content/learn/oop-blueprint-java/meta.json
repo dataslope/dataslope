@@ -2,6 +2,25 @@
     "title": "OOP Blueprint with Java",
     "description": "A computer science course on pure object-oriented thinking, modeling, and software design — taught with Java",
     "root": true,
+    "tags": {
+        "language": [
+            "java"
+        ],
+        "libraries": [],
+        "domain": [
+            "software-design",
+            "object-oriented-programming"
+        ],
+        "skills": [
+            "object-oriented-design",
+            "design-patterns",
+            "software-modeling"
+        ],
+        "tools": [],
+        "level": [
+            "intermediate"
+        ]
+    },
     "pages": [
         "index",
         "---",

@@ -2,6 +2,29 @@
     "title": "Practical R for Beginners",
     "description": "A narrative-driven course in data analysis, statistical thinking, and visualization with R — for learners with little or no programming background.",
     "root": true,
+    "tags": {
+        "language": [
+            "r"
+        ],
+        "libraries": [
+            "dplyr",
+            "ggplot2"
+        ],
+        "domain": [
+            "data-analysis",
+            "statistics"
+        ],
+        "skills": [
+            "data-wrangling",
+            "data-visualization",
+            "statistical-thinking",
+            "exploratory-data-analysis"
+        ],
+        "tools": [],
+        "level": [
+            "beginner"
+        ]
+    },
     "pages": [
         "index",
         "---",
