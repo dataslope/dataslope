@@ -2592,6 +2592,41 @@ input[type="range"].fs-slider:disabled {
   font-size: 13px;
   opacity: 0.85;
 }
+/* Workspace-conflict overlay — reuses the boot-overlay chrome but offers
+   actions instead of a progress bar (shown when the workspace is already
+   open in another browser tab). */
+.playground-conflict-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+.playground-conflict-btn {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 9px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+.playground-conflict-btn:hover {
+  background: var(--bg3);
+}
+.playground-conflict-btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+.playground-conflict-btn-primary:hover {
+  background: color-mix(in srgb, var(--primary) 88%, #000);
+}
 .playground-boot-progress {
   display: flex;
   align-items: center;

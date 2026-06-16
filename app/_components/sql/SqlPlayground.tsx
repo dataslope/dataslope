@@ -570,6 +570,23 @@ function SqlPlaygroundInner() {
     [setGlobalPageSizeState],
   );
 
+  // True when this workspace is already open (locked) in another tab, so
+  // the shell shows a conflict overlay instead of deadlocking on boot.
+  const [workspaceConflict, setWorkspaceConflict] = useState(false);
+  // From the conflict overlay: create a fresh workspace and switch to it.
+  // No engine is open in the conflict case, so a reload is the simplest
+  // safe path — the new workspace id isn't locked, so it boots normally.
+  const handleConflictNewWorkspace = useCallback(() => {
+    void (async () => {
+      try {
+        const newWs = await createWorkspace("SQLite Workspace", PLAYGROUND_ID);
+        switchActiveWorkspace(PLAYGROUND_ID, newWs.id);
+      } catch {
+        window.location.reload();
+      }
+    })();
+  }, []);
+
   // ─── Engine store ────────────────────────────────────────────────────
   const loaded = useEngineStore((s) => s.loaded);
   const setLoaded = useEngineStore((s) => s.setLoaded);
@@ -1272,27 +1289,23 @@ function SqlPlaygroundInner() {
           const workspace = await ensureActiveWorkspace(PLAYGROUND_ID);
           workspaceId = workspace.id;
           setActiveWorkspace({ id: workspace.id, name: workspace.name });
-          // Tab-isolation notice: warn once per (workspace × session)
-          // when another tab already holds the OPFS lock for this
-          // workspace, so the user knows edits here can conflict.
-          const noticeKey = `playground_ws_warned_${workspace.id}`;
           try {
-            if (window.sessionStorage.getItem(noticeKey) !== "1") {
-              const hasLock = await acquireWorkspaceLock(workspace.id);
-              if (!cancelled && !hasLock) {
-                window.sessionStorage.setItem(noticeKey, "1");
-                showToast(
-                  "This workspace is already open in another tab. Edits here may conflict — switch workspaces via the badge in the header.",
-                  "warn",
-                );
-              }
+            const hasLock = await acquireWorkspaceLock(workspace.id);
+            if (!cancelled && !hasLock) {
+              // The same OPFS-backed workspace can't be opened in two tabs:
+              // SQLite's exclusive OPFS access handle would deadlock the
+              // boot (it hangs at ~90%). Surface a conflict overlay and
+              // skip the boot rather than hang.
+              setWorkspaceConflict(true);
+              return;
             }
           } catch {
-            /* sessionStorage / Locks unavailable — ignore. */
+            /* Web Locks unavailable — proceed without cross-tab exclusivity. */
           }
         } catch {
           // Workspace bootstrap is best-effort — proceed in-memory.
         }
+        if (cancelled) return;
         const engine = await sqliteAdapter.createEngine(
           initialSampleId,
           workspaceId,
@@ -1880,6 +1893,8 @@ function SqlPlaygroundInner() {
       playgroundTitle="SQLite Playground"
       loaded={loaded}
       statusState={statusState}
+      workspaceConflict={workspaceConflict}
+      onOpenNewWorkspace={handleConflictNewWorkspace}
       keepOverlayMounted={showLoadingOverlay}
       loadingOverlayClassName={loadingFading ? "hidden" : ""}
       loadingHeroRepeat={4}

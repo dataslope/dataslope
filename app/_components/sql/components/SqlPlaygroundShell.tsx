@@ -8,6 +8,7 @@ import { SqlPlaygroundSwitcher } from "./SqlPlaygroundSwitcher";
 import { paneForActivatedTab, type SqlMobilePane } from "../utils/mobilePane";
 import { MobileMenuSheet } from "../../MobileMenuSheet";
 import { PlaygroundBootOverlay } from "../../PlaygroundBootOverlay";
+import { DiamondMark } from "../../mdx/loadingAnimations";
 import {
   hasRuntimeBootedBefore,
   markRuntimeBooted,
@@ -77,6 +78,15 @@ export interface SqlPlaygroundShellProps {
    *  progress (DuckDB). Omit for engines that don't — the shell then
    *  creeps a determinate bar over time instead. */
   bootFraction?: number | null;
+  /** True when the active workspace is already open (locked) in another
+   *  browser tab. The shell then shows a conflict overlay instead of the
+   *  boot overlay — opening the same OPFS-backed database in two tabs would
+   *  otherwise deadlock the engine boot (it hangs at ~90%). */
+  workspaceConflict?: boolean;
+  /** Invoked when the user picks "Open a new workspace" from the conflict
+   *  overlay. The host should create a fresh workspace and switch to it
+   *  (a reload is fine — a new workspace id isn't locked elsewhere). */
+  onOpenNewWorkspace?: () => void;
   /** Main body of the page — typically the top toolbar + sidebar +
    *  editor + results pane structure. Rendered directly inside
    *  `<div className="playground-app">` after the header. */
@@ -109,6 +119,8 @@ export function SqlPlaygroundShell({
   headerActions,
   mobileMenu,
   bootFraction,
+  workspaceConflict = false,
+  onOpenNewWorkspace,
   children,
 }: SqlPlaygroundShellProps) {
   const showLoadingOverlay = keepOverlayMounted || !loaded;
@@ -287,15 +299,58 @@ export function SqlPlaygroundShell({
       data-mobile-pane={mobilePane}
       data-settings-active={settingsTabActive || undefined}
     >
-      {showLoadingOverlay && (
-        <PlaygroundBootOverlay
-          title={playgroundTitle.replace(/\s*Playground$/i, "")}
-          statusMessage={loadingCaption}
-          cold={isColdBoot}
-          fraction={overlayFraction}
-          error={statusState === "error"}
-          className={loadingOverlayClassName}
-        />
+      {workspaceConflict ? (
+        <div
+          className="pyodide-loading playground-boot-overlay playground-conflict-overlay"
+          role="alertdialog"
+          aria-modal="true"
+        >
+          <div className="playground-boot-card">
+            <span className="playground-boot-loader" aria-hidden="true">
+              <DiamondMark size={88} />
+            </span>
+            <div className="playground-boot-text">
+              <span className="playground-boot-title">
+                This workspace is open in another tab
+              </span>
+              <div className="playground-boot-hints">
+                <span className="playground-boot-hint">
+                  A workspace can run in only one tab at a time. Keep using it
+                  in the original tab, or open a separate workspace here.
+                </span>
+              </div>
+              <div className="playground-conflict-actions">
+                {onOpenNewWorkspace && (
+                  <button
+                    type="button"
+                    className="playground-conflict-btn playground-conflict-btn-primary"
+                    onClick={onOpenNewWorkspace}
+                  >
+                    Open a new workspace
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="playground-conflict-btn"
+                  onClick={() => window.location.reload()}
+                >
+                  Try again
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        showLoadingOverlay && (
+          <PlaygroundBootOverlay
+            title={playgroundTitle.replace(/\s*Playground$/i, "")}
+            statusMessage={loadingCaption}
+            cold={isColdBoot}
+            fraction={overlayFraction}
+            error={statusState === "error"}
+            className={loadingOverlayClassName}
+          />
+        )
       )}
       <div className="playground-app">
         <header className="playground-header">
