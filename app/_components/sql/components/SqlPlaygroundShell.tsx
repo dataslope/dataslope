@@ -8,6 +8,10 @@ import { SqlPlaygroundSwitcher } from "./SqlPlaygroundSwitcher";
 import { paneForActivatedTab, type SqlMobilePane } from "../utils/mobilePane";
 import { MobileMenuSheet } from "../../MobileMenuSheet";
 import { PlaygroundBootOverlay } from "../../PlaygroundBootOverlay";
+import {
+  hasRuntimeBootedBefore,
+  markRuntimeBooted,
+} from "../../runtime/bootHistory";
 
 /**
  * Re-exported from the pure helper module (`../utils/mobilePane`) so existing
@@ -108,6 +112,15 @@ export function SqlPlaygroundShell({
   children,
 }: SqlPlaygroundShellProps) {
   const showLoadingOverlay = keepOverlayMounted || !loaded;
+  // First-ever cold boot vs warm revisit. The engine's WASM payload is
+  // served from the browser's HTTP cache after the first boot, so only a
+  // genuine first boot in this browser shows the "Downloading … this
+  // happens once" copy; later visits just show the status line + bar.
+  // Captured once at mount, before `loaded` flips and we record the boot.
+  const [isColdBoot] = useState(() => !hasRuntimeBootedBefore(playgroundId));
+  useEffect(() => {
+    if (loaded) markRuntimeBooted(playgroundId);
+  }, [loaded, playgroundId]);
   // Mobile hamburger menu open state (the shell owns it; dialects only
   // supply the rows via `mobileMenu`).
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -278,7 +291,7 @@ export function SqlPlaygroundShell({
         <PlaygroundBootOverlay
           title={playgroundTitle.replace(/\s*Playground$/i, "")}
           statusMessage={loadingCaption}
-          cold
+          cold={isColdBoot}
           fraction={overlayFraction}
           error={statusState === "error"}
           className={loadingOverlayClassName}
