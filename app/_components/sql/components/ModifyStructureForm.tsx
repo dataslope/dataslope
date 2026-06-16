@@ -32,6 +32,7 @@ import {
 import type { ModifyColumnDraft } from "../types";
 import type { TableColumnInfo, SqliteEngine } from "../../runtime/sqlite";
 import { COLUMN_TYPES, FK_ACTIONS } from "../constants";
+import { withCurrentTypeOption } from "../utils/columnTypeSelector";
 import { DdlViewer } from "./DdlViewer";
 import { GenExprEditor } from "./GenExprEditor";
 import { ColumnHeaderPopover } from "./PragmaSettingsTab";
@@ -170,7 +171,10 @@ export function ModifyColumnRow({
             onChange={(e) => onChange({ type: e.target.value })}
             aria-label="Column type"
           >
-            {COLUMN_TYPES.map((t) => (
+            {/* SQLite columns can declare any type (e.g. `VARCHAR(15)` from an
+                imported schema); surface the current value so the native
+                select doesn't render blank and silently lose it. */}
+            {withCurrentTypeOption(COLUMN_TYPES, col.type).map((t) => (
               <option key={t} value={t}>
                 {t}
               </option>

@@ -186,6 +186,21 @@ function SchemaItemImpl({
       }
     };
   }, []);
+  // Detect when the entity name is visually clipped (CSS ellipsis on
+  // `.sql-tree-item-name`) so the hover tooltip can lead with the full name.
+  // A ResizeObserver catches both window resizes and sidebar drag-resizes
+  // that change the width available to the name.
+  const nameRef = useRef<HTMLSpanElement>(null);
+  const [nameTruncated, setNameTruncated] = useState(false);
+  useEffect(() => {
+    const el = nameRef.current;
+    if (!el) return;
+    const measure = () => setNameTruncated(el.scrollWidth > el.clientWidth);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [name]);
   const handleSingleClick = useCallback(() => {
     if (clickTimerRef.current !== null) {
       window.clearTimeout(clickTimerRef.current);
@@ -202,7 +217,10 @@ function SchemaItemImpl({
     }
     onPreview(name, kind);
   }, [name, kind, onPreview]);
-  const itemHint = `Double-click to preview, click to ${expanded ? "collapse" : "expand"}`;
+  const baseHint = `Double-click to preview, click to ${expanded ? "collapse" : "expand"}`;
+  // When the name is clipped, surface the full name first so it's readable
+  // on hover even though the row only shows a truncated label.
+  const itemHint = nameTruncated ? `${name} — ${baseHint}` : baseHint;
   return (
     <div className="sql-tree-entity">
       <ContextMenu.Root>
@@ -226,7 +244,9 @@ function SchemaItemImpl({
                     )}
                   </span>
                   <EntityIcon size={12} aria-hidden="true" />
-                  <span className="sql-tree-item-name">{name}</span>
+                  <span ref={nameRef} className="sql-tree-item-name">
+                    {name}
+                  </span>
                 </button>
                 <Popover.Root>
                   <Popover.Trigger
