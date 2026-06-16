@@ -44,6 +44,10 @@
   --danger: var(--ds-red);
   --ok-accent: var(--ds-green);
   --err-accent: var(--ds-red);
+  /* Very subtle hover tint shared by dropdown / drawer / dialog menu items
+     across the playgrounds — a faint lift that reads consistently on any
+     surface (--bg, --bg2, popups) rather than the heavier --bg3 step. */
+  --menu-item-hover: color-mix(in srgb, var(--text) 6%, transparent);
   --font-mono:
     "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace;
   --font-ui: "Inter", system-ui, -apple-system, sans-serif;
@@ -295,7 +299,7 @@ body.playground-active {
 }
 .bui-select-item[data-highlighted],
 .bui-select-item:hover {
-  background: var(--bg3);
+  background: var(--menu-item-hover);
 }
 .bui-select-item[data-selected] {
   color: var(--primary);
@@ -440,7 +444,7 @@ body.playground-active {
   border-bottom: none;
 }
 .example-item:hover {
-  background: var(--bg3);
+  background: var(--menu-item-hover);
   color: var(--text);
 }
 .example-item .ex-title {
@@ -1046,7 +1050,7 @@ body.playground-active {
 }
 .run-split-item[data-highlighted],
 .run-split-item:hover {
-  background: var(--bg3);
+  background: var(--menu-item-hover);
 }
 .run-split-item-label {
   flex: 1 1 auto;
@@ -1163,7 +1167,7 @@ body.playground-active {
 }
 .playground-run-multi-item[data-highlighted],
 .playground-run-multi-item:hover {
-  background: var(--bg3);
+  background: var(--menu-item-hover);
 }
 .playground-run-multi-item-label {
   flex: 1 1 auto;
@@ -2365,7 +2369,7 @@ input[type="range"].fs-slider:disabled {
   border-radius: 0;
 }
 .pkg-item:hover {
-  background: var(--bg3);
+  background: var(--menu-item-hover);
 }
 .pkg-item:focus-visible {
   outline: none;
@@ -3057,7 +3061,7 @@ input[type="range"].fs-slider:disabled {
 /* Menu items keep the same example-item / export-item presentation but
    need keyboard-highlight states from Base UI's `data-highlighted`. */
 .example-item[data-highlighted] {
-  background: var(--bg3);
+  background: var(--menu-item-hover);
   color: var(--text);
   outline: none;
 }
@@ -4283,7 +4287,7 @@ html[data-playground-theme="dark"] .welcome h3 {
 }
 
 .workspace-popover-item:hover {
-  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  background: var(--menu-item-hover);
 }
 
 .workspace-popover-item.active {
