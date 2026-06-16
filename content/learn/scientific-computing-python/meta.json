@@ -2,6 +2,30 @@
     "title": "Scientific Computing with Python",
     "description": "A hands-on computational science course covering numerical methods, linear algebra, simulation, optimization, and reproducible scientific workflows in Python",
     "root": true,
+    "tags": {
+        "language": [
+            "python"
+        ],
+        "libraries": [
+            "numpy",
+            "scipy",
+            "matplotlib"
+        ],
+        "domain": [
+            "scientific-computing",
+            "numerical-methods"
+        ],
+        "skills": [
+            "numerical-methods",
+            "linear-algebra",
+            "simulation",
+            "optimization"
+        ],
+        "tools": [],
+        "level": [
+            "intermediate"
+        ]
+    },
     "pages": [
         "index",
         "---",

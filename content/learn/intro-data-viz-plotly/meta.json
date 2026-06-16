@@ -2,6 +2,27 @@
     "title": "Introduction to Data Visualization with Python and Plotly Express",
     "description": "A beginner-friendly, narrative-driven course on visual reasoning, data storytelling, and interactive visualization with Plotly Express — for learners with little or no programming background.",
     "root": true,
+    "tags": {
+        "language": [
+            "python"
+        ],
+        "libraries": [
+            "plotly",
+            "pandas"
+        ],
+        "domain": [
+            "data-visualization"
+        ],
+        "skills": [
+            "data-visualization",
+            "data-storytelling",
+            "exploratory-data-analysis"
+        ],
+        "tools": [],
+        "level": [
+            "beginner"
+        ]
+    },
     "pages": [
         "index",
         "---",

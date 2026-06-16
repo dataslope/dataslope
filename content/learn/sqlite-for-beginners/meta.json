@@ -2,6 +2,27 @@
     "title": "SQLite for Beginners",
     "description": "A zero-prerequisite, visual introduction to databases, SQL, and relational thinking using SQLite — what a database really is, why it exists, and how to read and write real queries with confidence.",
     "root": true,
+    "tags": {
+        "language": [
+            "sql"
+        ],
+        "libraries": [],
+        "domain": [
+            "databases"
+        ],
+        "skills": [
+            "querying",
+            "joins",
+            "aggregation",
+            "data-modeling"
+        ],
+        "tools": [
+            "sqlite"
+        ],
+        "level": [
+            "beginner"
+        ]
+    },
     "pages": [
         "index",
         "---",

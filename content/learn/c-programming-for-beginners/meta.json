@@ -2,6 +2,26 @@
     "title": "C Programming for Beginners",
     "description": "A gentle, story-driven introduction to programming through C — the language that taught the world how computers actually work",
     "root": true,
+    "tags": {
+        "language": [
+            "c"
+        ],
+        "libraries": [],
+        "domain": [
+            "programming-fundamentals",
+            "systems-programming"
+        ],
+        "skills": [
+            "computational-thinking",
+            "memory-management",
+            "pointers",
+            "debugging"
+        ],
+        "tools": [],
+        "level": [
+            "beginner"
+        ]
+    },
     "pages": [
         "index",
         "---",

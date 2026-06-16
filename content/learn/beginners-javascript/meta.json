@@ -2,6 +2,27 @@
   "title": "Beginner's Guide to JavaScript",
   "description": "A from-zero JavaScript course focused on computational thinking, language fundamentals, and building strong programming foundations.",
   "root": true,
+  "tags": {
+    "language": [
+      "javascript"
+    ],
+    "libraries": [],
+    "domain": [
+      "programming-fundamentals",
+      "web-development"
+    ],
+    "skills": [
+      "computational-thinking",
+      "problem-solving",
+      "functions",
+      "asynchronous-programming",
+      "debugging"
+    ],
+    "tools": [],
+    "level": [
+      "beginner"
+    ]
+  },
   "pages": [
     "index",
     "---",

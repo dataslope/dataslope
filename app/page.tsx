@@ -8,16 +8,53 @@ export const metadata = {
   description: "Dataslope — browser-based playgrounds and tooling.",
 };
 
+interface CourseTags {
+  language?: string[];
+  libraries?: string[];
+  domain?: string[];
+  skills?: string[];
+  tools?: string[];
+  level?: string[];
+}
+
 interface CourseMeta {
   title: string;
   root?: boolean;
+  tags?: CourseTags;
 }
 
-async function getCourses(): Promise<{ slug: string; title: string }[]> {
+interface Course {
+  slug: string;
+  title: string;
+  tags: CourseTags;
+}
+
+// Order the categorized tags are flattened into chips for display — the most
+// scannable categories first (difficulty, language), then the specifics.
+const TAG_CATEGORY_ORDER: (keyof CourseTags)[] = [
+  "level",
+  "language",
+  "libraries",
+  "tools",
+  "domain",
+  "skills",
+];
+
+function flattenTags(tags: CourseTags): { category: string; value: string }[] {
+  const chips: { category: string; value: string }[] = [];
+  for (const category of TAG_CATEGORY_ORDER) {
+    for (const value of tags[category] ?? []) {
+      chips.push({ category, value });
+    }
+  }
+  return chips;
+}
+
+async function getCourses(): Promise<Course[]> {
   const learnDir = path.join(process.cwd(), "content", "learn");
   const entries = await readdir(learnDir, { withFileTypes: true });
 
-  const courses: { slug: string; title: string }[] = [];
+  const courses: Course[] = [];
   for (const entry of entries) {
     if (!entry.isDirectory()) continue;
     try {
@@ -27,7 +64,11 @@ async function getCourses(): Promise<{ slug: string; title: string }[]> {
       );
       const meta = JSON.parse(raw) as CourseMeta;
       if (meta.root && meta.title) {
-        courses.push({ slug: entry.name, title: meta.title });
+        courses.push({
+          slug: entry.name,
+          title: meta.title,
+          tags: meta.tags ?? {},
+        });
       }
     } catch {
       // No meta.json or unreadable — skip
@@ -96,18 +137,36 @@ export default async function Home() {
         <section className={styles.courses}>
           <h2 className={styles.coursesHeading}>Courses</h2>
           <div className={styles.courseList}>
-            {courses.map(({ slug, title }) => (
-              <Link
-                key={slug}
-                href={`/learn/${slug}`}
-                className={styles.courseCard}
-              >
-                <span className={styles.courseTitle}>{title}</span>
-                <span className={styles.courseArrow} aria-hidden="true">
-                  →
-                </span>
-              </Link>
-            ))}
+            {courses.map(({ slug, title, tags }) => {
+              const chips = flattenTags(tags);
+              return (
+                <Link
+                  key={slug}
+                  href={`/learn/${slug}`}
+                  className={styles.courseCard}
+                >
+                  <span className={styles.courseMain}>
+                    <span className={styles.courseTitle}>{title}</span>
+                    {chips.length > 0 && (
+                      <span className={styles.courseTags}>
+                        {chips.map(({ category, value }) => (
+                          <span
+                            key={`${category}:${value}`}
+                            className={styles.courseTag}
+                            data-category={category}
+                          >
+                            {value}
+                          </span>
+                        ))}
+                      </span>
+                    )}
+                  </span>
+                  <span className={styles.courseArrow} aria-hidden="true">
+                    →
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         </section>
       </div>

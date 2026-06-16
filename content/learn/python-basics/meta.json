@@ -2,6 +2,24 @@
     "title": "Python Basics",
     "description": "Learn the basics of Python programming",
     "root": true,
+    "tags": {
+        "language": [
+            "python"
+        ],
+        "libraries": [],
+        "domain": [
+            "programming-fundamentals"
+        ],
+        "skills": [
+            "computational-thinking",
+            "object-oriented-programming",
+            "problem-solving"
+        ],
+        "tools": [],
+        "level": [
+            "beginner"
+        ]
+    },
     "pages": [
         "index",
         "---",

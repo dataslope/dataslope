@@ -2,6 +2,28 @@
     "title": "Database Design with PostgreSQL",
     "description": "A conceptual, visual, design-focused course on relational data modeling and PostgreSQL schema design — for learners who can already write basic SQL and want to understand how to design schemas that stay correct, maintainable, and scalable.",
     "root": true,
+    "tags": {
+        "language": [
+            "sql"
+        ],
+        "libraries": [],
+        "domain": [
+            "database-design",
+            "data-modeling"
+        ],
+        "skills": [
+            "schema-design",
+            "normalization",
+            "entity-relationship-modeling",
+            "referential-integrity"
+        ],
+        "tools": [
+            "postgresql"
+        ],
+        "level": [
+            "intermediate"
+        ]
+    },
     "pages": [
         "index",
         "---",

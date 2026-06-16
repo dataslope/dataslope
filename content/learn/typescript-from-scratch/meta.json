@@ -2,6 +2,25 @@
     "title": "TypeScript from Scratch",
     "description": "A computer-science-flavored journey from plain JavaScript to type-driven, statically-analyzed application design",
     "root": true,
+    "tags": {
+        "language": [
+            "typescript"
+        ],
+        "libraries": [],
+        "domain": [
+            "programming-fundamentals",
+            "software-architecture"
+        ],
+        "skills": [
+            "type-driven-design",
+            "static-typing",
+            "software-architecture"
+        ],
+        "tools": [],
+        "level": [
+            "intermediate"
+        ]
+    },
     "pages": [
         "index",
         "---",

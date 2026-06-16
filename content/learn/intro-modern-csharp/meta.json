@@ -2,6 +2,27 @@
     "title": "Introduction to Modern C#",
     "description": "A beginner-friendly course on programming foundations and software engineering fundamentals, taught with modern C# and .NET",
     "root": true,
+    "tags": {
+        "language": [
+            "csharp"
+        ],
+        "libraries": [],
+        "domain": [
+            "programming-fundamentals",
+            "software-engineering"
+        ],
+        "skills": [
+            "object-oriented-programming",
+            "computational-thinking",
+            "debugging"
+        ],
+        "tools": [
+            "dotnet"
+        ],
+        "level": [
+            "beginner"
+        ]
+    },
     "pages": [
         "index",
         "---",

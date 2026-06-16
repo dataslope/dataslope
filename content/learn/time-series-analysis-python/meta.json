@@ -2,6 +2,28 @@
     "title": "Time Series Analysis with Python",
     "description": "An intuition-first course on classical time series analysis and statistical forecasting with pandas and statsmodels — datetime indexing, resampling, rolling windows, missing-data handling, decomposition, stationarity, differencing, ACF/PACF, ARIMA, and rigorous chronological backtesting that prevents data leakage.",
     "root": true,
+    "tags": {
+        "language": [
+            "python"
+        ],
+        "libraries": [
+            "pandas",
+            "statsmodels"
+        ],
+        "domain": [
+            "time-series",
+            "statistics"
+        ],
+        "skills": [
+            "forecasting",
+            "time-series-analysis",
+            "statistical-modeling"
+        ],
+        "tools": [],
+        "level": [
+            "intermediate"
+        ]
+    },
     "pages": [
         "index",
         "---The Time Dimension---",

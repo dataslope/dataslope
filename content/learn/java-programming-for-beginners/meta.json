@@ -2,6 +2,26 @@
     "title": "Java Programming for Beginners",
     "description": "A beginner-friendly journey through programming, software engineering thinking, and the Java language — built for people with little or no prior experience",
     "root": true,
+    "tags": {
+        "language": [
+            "java"
+        ],
+        "libraries": [],
+        "domain": [
+            "programming-fundamentals",
+            "software-engineering"
+        ],
+        "skills": [
+            "object-oriented-programming",
+            "computational-thinking",
+            "problem-solving",
+            "debugging"
+        ],
+        "tools": [],
+        "level": [
+            "beginner"
+        ]
+    },
     "pages": [
         "index",
         "---",

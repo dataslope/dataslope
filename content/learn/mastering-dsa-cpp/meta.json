@@ -2,6 +2,26 @@
     "title": "Mastering DSA in C++",
     "description": "A hands-on course on data structures and algorithms in modern C++",
     "root": true,
+    "tags": {
+        "language": [
+            "cpp"
+        ],
+        "libraries": [],
+        "domain": [
+            "data-structures",
+            "algorithms"
+        ],
+        "skills": [
+            "algorithm-design",
+            "data-structures",
+            "complexity-analysis",
+            "problem-solving"
+        ],
+        "tools": [],
+        "level": [
+            "intermediate"
+        ]
+    },
     "pages": [
         "index",
         "---",

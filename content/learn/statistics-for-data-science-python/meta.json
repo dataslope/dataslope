@@ -2,6 +2,30 @@
     "title": "Statistics for Data Science with Python",
     "description": "A practical, intuition-first statistics course for data scientists who already know Python and Pandas — probability, distributions, sampling, inference, hypothesis testing, confidence intervals, p-values, and effect sizes, all with scipy.stats, NumPy, and Plotly.",
     "root": true,
+    "tags": {
+        "language": [
+            "python"
+        ],
+        "libraries": [
+            "scipy",
+            "numpy",
+            "plotly"
+        ],
+        "domain": [
+            "statistics",
+            "data-science"
+        ],
+        "skills": [
+            "statistical-inference",
+            "hypothesis-testing",
+            "probability",
+            "sampling"
+        ],
+        "tools": [],
+        "level": [
+            "intermediate"
+        ]
+    },
     "pages": [
         "index",
         "---Why Statistics---",
