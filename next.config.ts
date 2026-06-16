@@ -6,8 +6,10 @@ import { CDN_BASE_URL } from "./app/_components/runtime/cdn";
 // jsDelivr CDN (see app/_components/runtime/cdn.ts) so Vercel never
 // handles those large files. PGlite (@electric-sql/pglite) is also
 // served from jsDelivr CDN via dynamic imports (see postgres.ts and
-// postgres-worker.ts). Java's tools.jar lives in public/ since
-// jsDelivr does not support .jar files.
+// postgres-worker.ts). Java's tools.jar is published as the
+// `dataslope-tools-jar` npm package and fetched from unpkg (see
+// TOOLS_JAR_CDN in app/_components/runtime/cdn.ts), since jsDelivr does
+// not serve .jar files.
 //
 // The /_dotnet/ redirect below is no longer required for the C#
 // metadata reference flow — Runner.cs now fetches DLLs directly from

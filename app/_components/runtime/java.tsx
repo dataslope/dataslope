@@ -7,17 +7,17 @@ import type {
   PackageInfo,
   RunOptions,
 } from "../types";
-import { loadCheerpJ, type CheerpJApi } from "./cheerpj";
+import { loadCheerpJ, TOOLS_JAR_VFS_PATH, type CheerpJApi } from "./cheerpj";
 import { getClangFormat } from "./clangFormat";
 
 // Run Java in the browser via CheerpJ
 // (https://cheerpj.com/) — a full OpenJDK runtime + JIT compiled to
-// WebAssembly. CheerpJ does not ship `tools.jar`, so we bundle a
-// Java 8 `tools.jar` in `public/tools.jar` (served by Next.js,
-// mounted by CheerpJ as `/app/tools.jar`); we then drive `javac`
-// (`com.sun.tools.javac.Main`) on user source at runtime and run the
-// compiled main class with `cheerpjRunMain` — the JavaFiddle
-// approach (https://github.com/leaningtech/javafiddle).
+// WebAssembly. CheerpJ does not ship `tools.jar`, so we fetch a Java 8
+// `tools.jar` from a CDN and mount it in CheerpJ's /str/ filesystem at
+// runtime (see cheerpj.ts); we then drive `javac`
+// (`com.sun.tools.javac.Main`) on user source and run the compiled main
+// class with `cheerpjRunMain` — the JavaFiddle approach
+// (https://github.com/leaningtech/javafiddle).
 //
 // This adapter targets Java 8 because that is what the bundled
 // `tools.jar` compiles against. Java 8 is the lingua franca of
@@ -444,12 +444,12 @@ public class Main {
   },
 ];
 
-// CheerpJ's classpath: tools.jar is fetched from /tools.jar (see
-// cheerpj.ts) and pre-mounted in CheerpJ's virtual FS at
-// `/app/tools.jar` — it contains com.sun.tools.javac.Main — and we
-// compile user code into /files/. Both must be on the classpath when
-// running both javac and the user's main class.
-const CLASSPATH = "/app/tools.jar:/files/";
+// CheerpJ's classpath: tools.jar is fetched from the CDN and mounted in
+// CheerpJ's /str/ FS at TOOLS_JAR_VFS_PATH (see cheerpj.ts) — it contains
+// com.sun.tools.javac.Main — and we compile user code into /files/. Both
+// must be on the classpath when running both javac and the user's main
+// class.
+const CLASSPATH = `${TOOLS_JAR_VFS_PATH}:/files/`;
 const SOURCE_DIR = "/str/";
 const OUTPUT_DIR = "/files/";
 
@@ -722,7 +722,7 @@ export const javaAdapter: LanguageAdapter = {
   // CodeMirror's clike mode handles Java syntax. `text/x-java` is the
   // standard MIME alias for Java inside that mode.
   codeMirrorMode: "text/x-java",
-  // CheerpJ runtime from cjrtnc.leaningtech.com plus the bundled
+  // CheerpJ runtime from cjrtnc.leaningtech.com plus the CDN-hosted
   // tools.jar (~18 MB) that provides javac.
   coldDownloadMB: 30,
   // Compiles (javac) on every run, so later runs are faster, not instant.
