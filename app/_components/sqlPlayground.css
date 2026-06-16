@@ -52,12 +52,12 @@
   width: 100%;
 }
 
-.sql-db-selector-row .sql-db-selector {
+.sql-db-selector-row .sql-database-selector {
   flex: 1;
   min-width: 0;
 }
 
-.sql-db-selector {
+.sql-database-selector {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -76,7 +76,7 @@
   text-align: left;
 }
 
-.sql-db-selector:hover {
+.sql-database-selector:hover {
   background: color-mix(in srgb, var(--bg) 80%, var(--bg3) 20%);
 }
 
@@ -92,6 +92,23 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Transparent full-screen backdrop behind the open database dropdown.
+   The SQL playground is a fixed `overflow:hidden` layout whose scrolling
+   lives in inner panes (schema tree, results), not on `body` — so Base
+   UI's modal body-scroll-lock has nothing to lock and the panes behind
+   the dropdown stay touch-scrollable on mobile. Sitting above those panes
+   and one step below the popup, this backdrop swallows touch gestures
+   (`touch-action: none`) so the background can't scroll while the dropdown
+   is open. Kept transparent so it doesn't dim the page. */
+.sql-db-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 499;
+  background: transparent;
+  touch-action: none;
+  overscroll-behavior: contain;
 }
 
 .sql-db-positioner {
@@ -4528,6 +4545,13 @@
 .sql-mobile-tabs {
   display: none;
 }
+/* The full-screen Settings tab replaces the editor/results split, so its
+   bottom Schema / Editor / Results pane switcher doesn't apply — hide it
+   while Settings is open. Higher specificity than the mobile rule below,
+   so it wins inside the media query too. */
+.playground-root[data-settings-active] .sql-mobile-tabs {
+  display: none;
+}
 
 /* UX-18: the loading hero stamps the title at up to 180px (`playground.css`),
    which towers over the status caption + progress bar on a desktop monitor.
@@ -4561,7 +4585,16 @@
     display: none;
   }
   .playground-header .workspace-badge {
-    max-width: 38vw;
+    /* Hidden on mobile — the workspace lives in the hamburger drawer.
+       Higher specificity than playground.css's `.workspace-badge` hide,
+       so this is what actually drops it on the SQL playgrounds. */
+    display: none;
+  }
+
+  /* The database selector moves into the hamburger drawer on mobile, so
+     drop it from the Schema-tab sidebar (the schema selector stays). */
+  .sql-db-selector-wrap {
+    display: none;
   }
 
   /* ── Collapse the 3-column shell to one full-width column. The sidebar

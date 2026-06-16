@@ -76,7 +76,11 @@ interface DuckDbConnection {
 }
 
 interface AsyncDuckDB {
-  instantiate(mainModule: string, pthreadWorker?: string | null): Promise<void>;
+  instantiate(
+    mainModule: string,
+    pthreadWorker?: string | null,
+    progress?: (p: { bytesLoaded: number; bytesTotal: number }) => void,
+  ): Promise<void>;
   connect(): Promise<DuckDbConnection>;
   registerFileBuffer(name: string, buffer: Uint8Array): Promise<void>;
   registerFileText?(name: string, text: string): Promise<void>;
@@ -117,7 +121,9 @@ async function loadDuckDbModule(): Promise<DuckDbModule> {
   return _duckdbModulePromise;
 }
 
-async function instantiateDuckDb(): Promise<{
+async function instantiateDuckDb(
+  onProgress?: (fraction: number) => void,
+): Promise<{
   db: AsyncDuckDB;
   bundle: DuckDbBundle;
 }> {
@@ -134,7 +140,16 @@ async function instantiateDuckDb(): Promise<{
   const worker = new Worker(workerUrl);
   const logger = new duckdb.VoidLogger();
   const db = new duckdb.AsyncDuckDB(logger, worker);
-  await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+  // duckdb-wasm reports real download progress for the .wasm bundle.
+  await db.instantiate(
+    bundle.mainModule,
+    bundle.pthreadWorker,
+    onProgress
+      ? (p) => {
+          if (p.bytesTotal > 0) onProgress(p.bytesLoaded / p.bytesTotal);
+        }
+      : undefined,
+  );
   URL.revokeObjectURL(workerUrl);
   return { db, bundle };
 }
@@ -152,9 +167,13 @@ let _dbPromise: Promise<{ db: AsyncDuckDB; bundle: DuckDbBundle }> | null =
 // responsible for terminating it (see createDuckDbEngine's destroy()).
 function getDuckDbInstance(
   isolated = false,
+  onProgress?: (fraction: number) => void,
 ): Promise<{ db: AsyncDuckDB; bundle: DuckDbBundle }> {
-  if (isolated) return instantiateDuckDb();
-  if (!_dbPromise) _dbPromise = instantiateDuckDb();
+  if (isolated) return instantiateDuckDb(onProgress);
+  // Progress only fires while the singleton is first instantiated — a
+  // later caller that finds the promise already resolved gets no events
+  // (the download is done), which is exactly right.
+  if (!_dbPromise) _dbPromise = instantiateDuckDb(onProgress);
   return _dbPromise;
 }
 
@@ -846,13 +865,14 @@ async function bootstrapDatabase(
 export async function createDuckDbEngine(
   initialSampleId: string,
   workspaceId?: string | null,
+  onProgress?: (fraction: number) => void,
 ): Promise<DuckDbEngine> {
   let sample = findDuckDbSampleDatabase(initialSampleId);
   // Learn blocks (no workspaceId) get an isolated DuckDB instance so they
   // can't clobber each other's catalog; the Playground (workspaceId, OPFS
   // persistence) keeps the page-shared singleton.
   const isolated = !workspaceId;
-  const { db } = await getDuckDbInstance(isolated);
+  const { db } = await getDuckDbInstance(isolated, onProgress);
   let conn = await bootstrapDatabase(sample, db);
   let destroyed = false;
 

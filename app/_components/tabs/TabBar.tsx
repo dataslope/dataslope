@@ -60,8 +60,19 @@ export function TabBar({
   const cls = ["playground-tabbar", className].filter(Boolean).join(" ");
   const sortable = !!onReorderTabs;
 
+  // Keep the active tab visible in the now horizontally-scrollable strip
+  // — e.g. after opening a new tab (the "+" button) or switching tabs
+  // from elsewhere (mobile pane bar, programmatic activation).
+  const stripRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = stripRef.current?.querySelector<HTMLElement>(
+      `[data-tab-id="${(window.CSS?.escape ?? ((s: string) => s))(activeTabId)}"]`,
+    );
+    el?.scrollIntoView({ inline: "nearest", block: "nearest" });
+  }, [activeTabId, tabs.length]);
+
   const strip = (
-    <div className="playground-tabs" role="tablist">
+    <div className="playground-tabs" role="tablist" ref={stripRef}>
       {tabs.map((tab) => (
         <TabItem
           key={tab.id}

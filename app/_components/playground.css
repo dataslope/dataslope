@@ -1998,7 +1998,8 @@ body.playground-active {
     height: 18px;
   }
   .settings-tab[data-active] {
-    border-color: var(--primary);
+    /* No border around the active pill on mobile — the filled background
+       and primary text colour already mark it as selected. */
     background: var(--bg3);
     color: var(--primary);
   }
@@ -2218,7 +2219,7 @@ input[type="range"].fs-slider:disabled {
   z-index: 301;
   width: 380px;
   max-width: 100vw;
-  background: var(--bg2);
+  background: var(--bg);
   border-left: 1px solid var(--border);
   box-shadow: -8px 0 32px #0006;
   display: flex;
@@ -2256,10 +2257,13 @@ input[type="range"].fs-slider:disabled {
   align-items: center;
   justify-content: space-between;
   padding: 8px 16px;
-  border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
 .pkg-drawer-title {
+  /* Same serif-leak guard as .mobile-menu-drawer-title — this Drawer.Title
+     heading is portalled to body and would otherwise pick up the /learn
+     docs' serif `h1–h6` rule. */
+  font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 600;
   color: var(--text);
@@ -2281,7 +2285,6 @@ input[type="range"].fs-slider:disabled {
   background: var(--primary-glow);
   color: var(--primary);
   border-radius: 10px;
-  border: 1px solid var(--primary);
 }
 
 .pkg-search-wrap {
@@ -2496,6 +2499,122 @@ input[type="range"].fs-slider:disabled {
 .pyodide-loading.hidden {
   opacity: 0;
   pointer-events: none;
+}
+
+/* ── Shared boot overlay: the brand diamond + status + progress bar,
+   matching the embedded code-block / challenge-card boot notice. ── */
+.pyodide-loading.playground-boot-overlay {
+  align-items: center;
+}
+.playground-boot-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  padding: 32px;
+  width: min(620px, calc(100vw - 48px));
+  text-align: center;
+}
+.playground-boot-loader {
+  display: inline-flex;
+}
+.playground-boot-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+.playground-boot-title {
+  font-family: var(--font-ui);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.25;
+}
+
+/* Animated trailing ellipsis on the boot status: cycles 1 → 2 → 3 dots.
+   All three dots are always laid out and only their opacity animates, so
+   the centred title never shifts as they appear and disappear. */
+.playground-boot-ellipsis span {
+  opacity: 0;
+}
+.playground-boot-ellipsis span:nth-child(1) {
+  opacity: 1;
+}
+.playground-boot-ellipsis span:nth-child(2) {
+  animation: boot-ellipsis-2 1.5s infinite;
+}
+.playground-boot-ellipsis span:nth-child(3) {
+  animation: boot-ellipsis-3 1.5s infinite;
+}
+@keyframes boot-ellipsis-2 {
+  0%, 33% {
+    opacity: 0;
+  }
+  34%, 100% {
+    opacity: 1;
+  }
+}
+@keyframes boot-ellipsis-3 {
+  0%, 66% {
+    opacity: 0;
+  }
+  67%, 100% {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .playground-boot-ellipsis span {
+    opacity: 1;
+    animation: none;
+  }
+}
+
+.playground-boot-hint {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  color: var(--text-muted, #9aa4b2);
+  line-height: 1.6;
+}
+.playground-boot-progress {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  margin-top: 12px;
+}
+.playground-boot-bar {
+  flex: 1;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--bg3);
+  overflow: hidden;
+}
+.playground-boot-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--primary);
+  transition: width 0.2s ease;
+}
+.playground-boot-pct {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted, #9aa4b2);
+  min-width: 48px;
+  text-align: right;
+}
+
+@media (max-width: 560px) {
+  .playground-boot-title {
+    font-size: 24px;
+  }
+}
+.pyodide-loading.playground-boot-overlay.has-error .playground-boot-title {
+  color: var(--red, #e57373);
 }
 
 /* Big horizontally-moving title text. The track holds 4 copies of the
@@ -2794,6 +2913,17 @@ input[type="range"].fs-slider:disabled {
     background: var(--bg2);
     border-bottom: 1px solid var(--border);
   }
+  /* The Settings tab fills the whole pane, so its own Editor/Output pane
+     switcher is meaningless while it's open — hide it. */
+  .mobile-tabs[data-settings-active] {
+    display: none;
+  }
+
+  /* The workspace badge moves into the hamburger menu on mobile so the
+     header keeps just the logo, language switcher, and menu button. */
+  .workspace-badge {
+    display: none;
+  }
 
   .panes {
     grid-template-columns: 1fr;
@@ -2869,7 +2999,7 @@ input[type="range"].fs-slider:disabled {
    positioner — we use these to drive natural enter/exit animations. */
 .bui-popup {
   outline: none;
-  background: var(--bg2);
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: 0 8px 32px #0008;
@@ -2950,7 +3080,7 @@ input[type="range"].fs-slider:disabled {
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--bg2);
+  background: var(--bg);
   border-top: 1px solid var(--border);
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
@@ -3005,6 +3135,11 @@ input[type="range"].fs-slider:disabled {
   padding: 10px 16px 8px;
 }
 .mobile-menu-drawer-title {
+  /* Drawer.Title renders as a heading; pin the UI font so the docs'
+     `h1–h6 { font-family: var(--font-serif) }` rule (active when the
+     playground is embedded in /learn) can't leak serif into the
+     portalled bottom sheet. */
+  font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 600;
   color: var(--text);
@@ -3075,6 +3210,34 @@ input[type="range"].fs-slider:disabled {
   font-size: 16px;
   line-height: 1;
   transition: transform 0.15s ease;
+}
+
+/* Database selector surfaced at the top of the SQL playgrounds' mobile
+   drawer menu (an experiment alongside the sidebar copy). The trigger is
+   borderless by default and the drawer is now var(--bg), so give it a
+   visible outline and a divider to read as a distinct control. */
+.mobile-menu-db-selector {
+  padding: 2px 2px 10px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+}
+.mobile-menu-db-selector .sql-database-selector {
+  border-color: var(--border);
+}
+
+/* Transparent layer over the parent menu while a sub-sheet is open, so a
+   tap anywhere on the parent dismisses the sub-sheet (acting as a
+   backdrop) instead of activating the row underneath. It sits above the
+   menu rows but below the sub-sheet, which renders in its own later
+   portal/viewport. */
+.mobile-menu-dismiss-catch {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: default;
 }
 
 .mobile-menu-drawer-body > button.example-item {
@@ -3311,6 +3474,10 @@ input[type="range"].fs-slider:disabled {
   opacity: 0;
 }
 .confirm-popup {
+  /* Anchor the whole dialog to the UI font so a serif-scoped host (the
+     /learn docs, where these playgrounds embed) can't leak in via the
+     portal. The title still needs its own rule below to beat `h1–h6`. */
+  font-family: var(--font-ui);
   position: fixed;
   top: 50%;
   left: 50%;
@@ -3336,6 +3503,11 @@ input[type="range"].fs-slider:disabled {
   transform: translate(-50%, -50%) scale(0.94);
 }
 .confirm-title {
+  /* Base UI renders Dialog.Title as an <h2>. This dialog is portalled to
+     document.body, so when a playground is embedded in /learn the docs'
+     `h1–h6 { font-family: var(--font-serif) }` rule lands on it; pin the
+     UI font so the title never falls into serif. */
+  font-family: var(--font-ui);
   font-size: 15px;
   font-weight: 600;
   color: var(--text);
@@ -3414,6 +3586,17 @@ input[type="range"].fs-slider:disabled {
   box-shadow:
     0 0 0 2px var(--bg2),
     0 0 0 4px var(--text-muted);
+}
+/* On narrow screens a row of three workspace-choice buttons ("Cancel",
+   "Open in new workspace", "Overwrite this workspace") no longer fits:
+   the labels wrap to several lines and the buttons stretch to uneven
+   heights. Stack them full-width so each label sits on one line and the
+   spacing reads evenly. Opt-in via .confirm-actions-stack so two-button
+   confirms keep their compact row. */
+@media (max-width: 768px) {
+  .confirm-actions-stack {
+    flex-direction: column;
+  }
 }
 
 /* ─── Tab rename dialog (used by the generic TabBar across every
@@ -3868,8 +4051,27 @@ html[data-playground-theme="dark"] .welcome h3 {
   align-items: stretch;
   flex: 0 1 auto;
   min-width: 0;
-  overflow: hidden;
+  /* Scroll horizontally when there are more tabs than fit, rather than
+     shrinking every tab into an unreadable sliver. A thin, unobtrusive
+     scrollbar hints that more tabs are off-screen; touch devices get
+     native momentum scrolling. The active tab is scrolled into view from
+     TabBar.tsx. */
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+  -webkit-overflow-scrolling: touch;
   gap: 2px;
+}
+.playground-tabs::-webkit-scrollbar {
+  height: 6px;
+}
+.playground-tabs::-webkit-scrollbar-track {
+  background: transparent;
+}
+.playground-tabs::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
 }
 
 .playground-tab {
@@ -3885,7 +4087,8 @@ html[data-playground-theme="dark"] .welcome h3 {
   font-size: 12px;
   cursor: pointer;
   position: relative;
-  flex: 0 1 auto;
+  /* Don't shrink — keep each tab readable and let the strip scroll. */
+  flex: 0 0 auto;
   min-width: 60px;
   max-width: 240px;
   overflow: hidden;
@@ -4142,7 +4345,7 @@ html[data-playground-theme="dark"] .welcome h3 {
 .workspace-manager-body {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 32px;
   /* `.pkg-body` ships 0 horizontal padding; add it back here so the
      buttons and workspace cards line up with the 16px-inset header
      instead of sitting flush against (and touching) the panel walls. */
@@ -4155,9 +4358,8 @@ html[data-playground-theme="dark"] .welcome h3 {
   justify-content: center;
   gap: 8px;
   padding: 10px 14px;
-  background: color-mix(in srgb, var(--primary) 18%, transparent);
-  border: 1px dashed
-    color-mix(in srgb, var(--primary) 50%, var(--border));
+  background: color-mix(in srgb, var(--text) 7%, transparent);
+  border: none;
   border-radius: var(--radius);
   color: var(--text);
   font-family: var(--font-ui);
@@ -4171,28 +4373,20 @@ html[data-playground-theme="dark"] .welcome h3 {
 }
 
 .workspace-manager-new:hover {
-  background: color-mix(in srgb, var(--primary) 28%, transparent);
+  background: color-mix(in srgb, var(--text) 12%, transparent);
 }
 
 .workspace-manager-item {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: color-mix(in srgb, var(--bg) 85%, transparent);
-}
-
-.workspace-manager-item.active {
-  border-color: color-mix(in srgb, var(--primary) 55%, var(--border));
-  background: color-mix(in srgb, var(--primary) 8%, transparent);
 }
 
 .workspace-manager-item-main {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  /* Spacing below the workspace title before its meta line. */
+  gap: 6px;
   min-width: 0;
 }
 
@@ -4243,26 +4437,38 @@ html[data-playground-theme="dark"] .welcome h3 {
 .workspace-manager-item-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  /* No gap — consecutive actions are separated by a subtle divider
+     (border-left below) instead of pills with their own borders. */
+  gap: 0;
+  /* Spacing above the row of actions. */
+  margin-top: 8px;
 }
 
 .workspace-manager-action {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 8px;
-  background: color-mix(in srgb, var(--bg) 75%, transparent);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  padding: 4px 10px;
+  background: transparent;
+  border: none;
   color: var(--text);
   font-family: var(--font-ui);
   font-size: 11px;
   cursor: pointer;
 }
 
+/* The first action aligns flush with the content above it. */
+.workspace-manager-action:first-child {
+  padding-left: 0;
+}
+
+/* Subtle divider between consecutive actions (Export · Rename · …). */
+.workspace-manager-action + .workspace-manager-action {
+  border-left: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+}
+
 .workspace-manager-action:hover:not(:disabled) {
-  background: var(--bg);
-  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+  background: color-mix(in srgb, var(--text) 8%, transparent);
 }
 
 .workspace-manager-action.danger {
@@ -4271,7 +4477,6 @@ html[data-playground-theme="dark"] .welcome h3 {
 
 .workspace-manager-action.danger:hover:not(:disabled) {
   background: color-mix(in srgb, var(--danger, #e57373) 14%, transparent);
-  border-color: color-mix(in srgb, var(--danger, #e57373) 50%, var(--border));
 }
 
 .workspace-manager-action:disabled {

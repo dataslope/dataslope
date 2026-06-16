@@ -96,6 +96,7 @@ import { splitSqlStatements, statementAtCursor } from "./utils/sqlAnalysis";
 import { ensureActiveWorkspace, switchActiveWorkspace } from "../opfs/activeWorkspace";
 import { acquireWorkspaceLock, createWorkspace } from "../opfs/workspace";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
+import { MobileMenuAction, MobileMenuSubSheet } from "../MobileMenuSheet";
 import {
   type ColumnConstraintInfo,
   type ForeignKeyInfo,
@@ -697,6 +698,9 @@ function SqlPlaygroundInner() {
   const setRenameDbExt = useDialogStore((s) => s.setRenameDbExt);
   const exportNoTabsHover = useDialogStore((s) => s.exportNoTabsHover);
   const setExportNoTabsHover = useDialogStore((s) => s.setExportNoTabsHover);
+  // Full workspace-manager drawer, opened from the mobile hamburger menu
+  // (the header badge that normally opens it is hidden on mobile).
+  const [workspaceManagerOpen, setWorkspaceManagerOpen] = useState(false);
 
   // ─── Local state (only items not in any store) ───────────────────────
   const [loadingMessage, setLoadingMessage] = useState(
@@ -1828,6 +1832,48 @@ function SqlPlaygroundInner() {
     return constraintsByEntity[tableName];
   }, [result, constraintsByEntity]);
 
+  // Defined once and rendered in both the sidebar and the mobile drawer
+  // menu (the latter is an experiment — the sidebar copy may be retired).
+  const databaseSelector = (
+    <DatabaseSelector
+      value={activeDbId}
+      displayFilename={activeSample.filename}
+      samples={SQLITE_SAMPLE_DATABASES}
+      actions={SQLITE_DB_ACTIONS}
+      onChange={(value) => {
+        if (value === "__new_db__") {
+          requestDbSwitch("__blank__");
+          return;
+        }
+        if (value === "__import_database__") {
+          setImportSqliteOpen(true);
+          return;
+        }
+        if (value === "__export_sql_dump__") {
+          exportDatabaseAsSqlDump();
+          return;
+        }
+        if (value === "__rename_db__") {
+          // Pre-populate with current filename (strip extension).
+          const cur = activeSample.filename;
+          const dotIdx = cur.lastIndexOf(".");
+          if (dotIdx > 0) {
+            setRenameDbBaseName(cur.slice(0, dotIdx));
+            const ext = cur.slice(dotIdx);
+            const knownExts = [".sqlite", ".db", ".sqlite3", ".db3"];
+            setRenameDbExt(knownExts.includes(ext) ? ext : ".sqlite");
+          } else {
+            setRenameDbBaseName(cur);
+            setRenameDbExt(".sqlite");
+          }
+          setRenameDbOpen(true);
+          return;
+        }
+        requestDbSwitch(value);
+      }}
+    />
+  );
+
   return (
     <SqlPlaygroundShell
       playgroundId={PLAYGROUND_ID}
@@ -1847,6 +1893,8 @@ function SqlPlaygroundInner() {
               playgroundId={PLAYGROUND_ID}
               activeWorkspaceId={activeWorkspace.id}
               activeWorkspaceName={activeWorkspace.name}
+              managerOpen={workspaceManagerOpen}
+              onManagerOpenChange={setWorkspaceManagerOpen}
             />
           )}
           <div className="header-actions desktop-only">
@@ -2124,6 +2172,77 @@ function SqlPlaygroundInner() {
               </Popover.Portal>
             </Popover.Root>
           </div>
+        </>
+      }
+      mobileMenu={
+        <>
+          <div className="mobile-menu-db-selector">{databaseSelector}</div>
+          <MobileMenuAction
+            label="Workspace"
+            chevron
+            onClick={() => setWorkspaceManagerOpen(true)}
+          />
+          <MobileMenuSubSheet label="Import">
+            <MobileMenuAction
+              label="From file (.sql / .db / .sqlite)"
+              onClick={() => setImportSqliteOpen(true)}
+            />
+            <MobileMenuAction
+              label="From CSV"
+              onClick={() => {
+                setImportCsvState(null);
+                setImportCsvOpen(true);
+              }}
+            />
+            <MobileMenuAction
+              label="From JSON"
+              onClick={() => {
+                setImportJsonState(null);
+                setImportJsonOpen(true);
+              }}
+            />
+            <MobileMenuAction
+              label="From Parquet"
+              onClick={() => {
+                setImportParquetOpen(true);
+                setImportParquetDragging(false);
+              }}
+            />
+          </MobileMenuSubSheet>
+          {tables.length > 0 && (
+            <MobileMenuSubSheet label="Export DB">
+              <MobileMenuAction
+                label="SQLite file (.sqlite)"
+                onClick={exportDatabase}
+              />
+              <MobileMenuAction
+                label="SQL dump (.sql)"
+                onClick={exportDatabaseAsSqlDump}
+              />
+              <MobileMenuAction
+                label="Excel workbook (.xlsx)"
+                onClick={exportDatabaseToXlsx}
+              />
+            </MobileMenuSubSheet>
+          )}
+          <MobileMenuAction
+            label="Query history"
+            chevron
+            onClick={openQueryHistoryTab}
+          />
+          <MobileMenuAction
+            label="ER diagram"
+            chevron
+            onClick={openErDiagramTab}
+          />
+          <MobileMenuSubSheet label="Information" bodyClassName="info-popover">
+            <RuntimeInfoContent info={RUNTIME_INFO} />
+          </MobileMenuSubSheet>
+          <MobileMenuAction
+            label="Settings"
+            chevron
+            onClick={openSettingsTab}
+          />
         </>
       }
     >
@@ -3371,52 +3490,7 @@ function SqlPlaygroundInner() {
         <div className="sql-shell" ref={shellRef}>
           <aside className="sql-sidebar" aria-label="Database explorer">
             <div className="sql-db-selector-wrap">
-              <div className="sql-db-selector-row">
-                <DatabaseSelector
-                  value={activeDbId}
-                  displayFilename={activeSample.filename}
-                  samples={SQLITE_SAMPLE_DATABASES}
-                  actions={SQLITE_DB_ACTIONS}
-                  onChange={(value) => {
-                    if (value === "__new_db__") {
-                      requestDbSwitch("__blank__");
-                      return;
-                    }
-                    if (value === "__import_database__") {
-                      setImportSqliteOpen(true);
-                      return;
-                    }
-                    if (value === "__export_sql_dump__") {
-                      exportDatabaseAsSqlDump();
-                      return;
-                    }
-                    if (value === "__rename_db__") {
-                      // Pre-populate with current filename (strip extension).
-                      const cur = activeSample.filename;
-                      const dotIdx = cur.lastIndexOf(".");
-                      if (dotIdx > 0) {
-                        setRenameDbBaseName(cur.slice(0, dotIdx));
-                        const ext = cur.slice(dotIdx);
-                        const knownExts = [
-                          ".sqlite",
-                          ".db",
-                          ".sqlite3",
-                          ".db3",
-                        ];
-                        setRenameDbExt(
-                          knownExts.includes(ext) ? ext : ".sqlite",
-                        );
-                      } else {
-                        setRenameDbBaseName(cur);
-                        setRenameDbExt(".sqlite");
-                      }
-                      setRenameDbOpen(true);
-                      return;
-                    }
-                    requestDbSwitch(value);
-                  }}
-                />
-              </div>
+              <div className="sql-db-selector-row">{databaseSelector}</div>
             </div>
 
             <div className="sql-sidebar-body">

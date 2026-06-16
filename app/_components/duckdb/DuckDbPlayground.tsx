@@ -119,6 +119,8 @@ import {
   writeDataFile as opfsWriteDataFile,
 } from "../files/opfsDataStorage";
 import { WorkspaceBadge } from "../workspace/WorkspaceBadge";
+import { MobileMenuAction, MobileMenuSubSheet } from "../MobileMenuSheet";
+import { useCreepingBootFraction } from "../challengeShared";
 import { type DuckDbEngine, DUCKDB_VERSION } from "../runtime/duckdb";
 
 const DUCKDB_SAMPLE_DATABASES = duckdbAdapter.samples;
@@ -1007,6 +1009,10 @@ function DuckDbPlaygroundInner() {
     Record<string, QueryRunResult | null>
   >({});
   const [loaded, setLoaded] = useState(false);
+  // Real DuckDB-wasm download progress (0..1), smoothed for the boot
+  // overlay's progress bar.
+  const [bootRawFraction, setBootRawFraction] = useState<number | null>(null);
+  const bootDisplayFraction = useCreepingBootFraction(bootRawFraction, !loaded);
   const [statusState, setStatusState] = useState<
     "loading" | "ready" | "running" | "error"
   >("loading");
@@ -1096,6 +1102,9 @@ function DuckDbPlaygroundInner() {
 
   // ─── Dialog state ─────────────────────────────────────────────────────
   const [settingsOpen, setSettingsOpen] = useState(false);
+  // Full workspace-manager drawer, opened from the mobile hamburger menu
+  // (the header badge that normally opens it is hidden on mobile).
+  const [workspaceManagerOpen, setWorkspaceManagerOpen] = useState(false);
   const [confirmRestoreOpen, setConfirmRestoreOpen] = useState(false);
   const [confirmClearStorageOpen, setConfirmClearStorageOpen] = useState(false);
   const [confirmClearAllDataOpen, setConfirmClearAllDataOpen] = useState(false);
@@ -1913,6 +1922,7 @@ function DuckDbPlaygroundInner() {
         const engine = await duckdbAdapter.createEngine(
           initialDbId,
           workspaceId,
+          setBootRawFraction,
         );
         if (cancelled) {
           // The component already unmounted while bootstrap was in flight.
@@ -3923,11 +3933,48 @@ function DuckDbPlaygroundInner() {
     ],
   );
 
+  // Defined once and rendered in both the sidebar and the mobile drawer
+  // menu (the latter is an experiment — the sidebar copy may be retired).
+  const databaseSelector = (
+    <DatabaseSelector
+      value={activeDbId}
+      displayFilename={displayFilename}
+      samples={DUCKDB_SAMPLE_DATABASES}
+      actions={DUCKDB_DB_ACTIONS}
+      chevron={<ChevronDown size={12} />}
+      onChange={(value) => {
+        if (value === "__new_db__") {
+          requestDbSwitch(DUCKDB_BLANK_DATABASE.id);
+          return;
+        }
+        if (value === "__import_sql_dump__") {
+          setImportSqlDumpOpen(true);
+          return;
+        }
+        if (value === "__rename_db__") {
+          const cur = displayFilename;
+          const dotIdx = cur.lastIndexOf(".");
+          if (dotIdx > 0) {
+            setRenameDbName(cur.slice(0, dotIdx));
+            setRenameDbExt(cur.slice(dotIdx));
+          } else {
+            setRenameDbName(cur);
+            setRenameDbExt(".duckdb");
+          }
+          setRenameDbOpen(true);
+          return;
+        }
+        requestDbSwitch(value);
+      }}
+    />
+  );
+
   return (
     <SqlPlaygroundShell
       playgroundId={PLAYGROUND_ID}
       playgroundTitle="DuckDB Playground"
       loaded={loaded}
+      bootFraction={bootDisplayFraction}
       statusState={statusState}
       loadingCaption={loadingMessage}
       headerActions={
@@ -3937,6 +3984,8 @@ function DuckDbPlaygroundInner() {
               playgroundId={PLAYGROUND_ID}
               activeWorkspaceId={activeWorkspace.id}
               activeWorkspaceName={activeWorkspace.name}
+              managerOpen={workspaceManagerOpen}
+              onManagerOpenChange={setWorkspaceManagerOpen}
             />
           )}
           <div className="header-actions desktop-only">
@@ -4183,6 +4232,73 @@ function DuckDbPlaygroundInner() {
               </Popover.Portal>
             </Popover.Root>
           </div>
+        </>
+      }
+      mobileMenu={
+        <>
+          <div className="mobile-menu-db-selector">{databaseSelector}</div>
+          <MobileMenuAction
+            label="Workspace"
+            chevron
+            onClick={() => setWorkspaceManagerOpen(true)}
+          />
+          <MobileMenuSubSheet label="Import">
+            <MobileMenuAction
+              label="From SQL dump"
+              onClick={() => setImportSqlDumpOpen(true)}
+            />
+            <MobileMenuAction
+              label="From CSV"
+              onClick={() => {
+                setImportCsvState(null);
+                setImportCsvOpen(true);
+              }}
+            />
+            <MobileMenuAction
+              label="From JSON"
+              onClick={() => {
+                setImportJsonState(null);
+                setImportJsonOpen(true);
+              }}
+            />
+            <MobileMenuAction
+              label="From Parquet"
+              onClick={() => {
+                setImportParquetState(null);
+                setImportParquetOpen(true);
+              }}
+            />
+          </MobileMenuSubSheet>
+          {tables.length > 0 && (
+            <MobileMenuSubSheet label="Export DB">
+              <MobileMenuAction
+                label="SQL dump (.sql)"
+                onClick={() => void exportDuckDbDatabase()}
+              />
+              <MobileMenuAction
+                label="Excel workbook (.xlsx)"
+                onClick={() => void exportDuckDbDatabaseToXlsx()}
+              />
+            </MobileMenuSubSheet>
+          )}
+          <MobileMenuAction
+            label="Query history"
+            chevron
+            onClick={openQueryHistoryTab}
+          />
+          <MobileMenuAction
+            label="ER diagram"
+            chevron
+            onClick={openErDiagramTab}
+          />
+          <MobileMenuSubSheet label="Information" bodyClassName="info-popover">
+            <RuntimeInfoContent info={RUNTIME_INFO} />
+          </MobileMenuSubSheet>
+          <MobileMenuAction
+            label="Settings"
+            chevron
+            onClick={openSettingsTab}
+          />
         </>
       }
     >
@@ -4917,39 +5033,7 @@ function DuckDbPlaygroundInner() {
 
         <div className="sql-shell duckdb-shell" ref={shellRef}>
           <aside className="sql-sidebar" aria-label="Database explorer">
-            <div className="sql-db-selector-wrap">
-              <DatabaseSelector
-                value={activeDbId}
-                displayFilename={displayFilename}
-                samples={DUCKDB_SAMPLE_DATABASES}
-                actions={DUCKDB_DB_ACTIONS}
-                chevron={<ChevronDown size={12} />}
-                onChange={(value) => {
-                  if (value === "__new_db__") {
-                    requestDbSwitch(DUCKDB_BLANK_DATABASE.id);
-                    return;
-                  }
-                  if (value === "__import_sql_dump__") {
-                    setImportSqlDumpOpen(true);
-                    return;
-                  }
-                  if (value === "__rename_db__") {
-                    const cur = displayFilename;
-                    const dotIdx = cur.lastIndexOf(".");
-                    if (dotIdx > 0) {
-                      setRenameDbName(cur.slice(0, dotIdx));
-                      setRenameDbExt(cur.slice(dotIdx));
-                    } else {
-                      setRenameDbName(cur);
-                      setRenameDbExt(".duckdb");
-                    }
-                    setRenameDbOpen(true);
-                    return;
-                  }
-                  requestDbSwitch(value);
-                }}
-              />
-            </div>
+            <div className="sql-db-selector-wrap">{databaseSelector}</div>
             <div className="sql-sidebar-body">
               <SqlIconSidebar
                 buttons={[
@@ -4986,7 +5070,7 @@ function DuckDbPlaygroundInner() {
                 >
                   <Select.Trigger
                     ref={schemaSelectorTriggerRef}
-                    className="sql-db-selector sql-schema-selector"
+                    className="sql-database-selector sql-schema-selector"
                     aria-label="Select schema"
                   >
                     <Layers

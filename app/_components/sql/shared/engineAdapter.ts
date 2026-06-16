@@ -57,8 +57,14 @@ export interface SqlEngineAdapter<
   storagePrefix: SqlPlaygroundStoragePrefix;
   /** Construct a fresh engine bound to a given sample database id.
    *  `workspaceId` optionally targets a persistent OPFS-backed
-   *  workspace; engines that don't support persistence may ignore it. */
-  createEngine(sampleId: string, workspaceId?: string | null): Promise<TEngine>;
+   *  workspace; engines that don't support persistence may ignore it.
+   *  `onProgress` (0..1) reports the engine's WASM download progress when
+   *  the runtime exposes it (DuckDB); engines without it may ignore it. */
+  createEngine(
+    sampleId: string,
+    workspaceId?: string | null,
+    onProgress?: (fraction: number) => void,
+  ): Promise<TEngine>;
   /** Catalogue of sample databases the database-selector renders. */
   samples: readonly TSample[];
   /** Optional "empty" / "blank" entry. Postgres and DuckDB expose

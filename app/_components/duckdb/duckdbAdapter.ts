@@ -20,7 +20,8 @@ export const duckdbAdapter: SqlEngineAdapter<
   dialect: "duckdb",
   playgroundId: "duckdb",
   storagePrefix: "duckdb_",
-  createEngine: (sampleId, workspaceId) => createDuckDbEngine(sampleId, workspaceId),
+  createEngine: (sampleId, workspaceId, onProgress) =>
+    createDuckDbEngine(sampleId, workspaceId, onProgress),
   samples: DUCKDB_SAMPLE_DATABASES,
   blankSample: DUCKDB_BLANK_DATABASE,
   defaultTabsFor: (sample) => sample.defaultTabs,

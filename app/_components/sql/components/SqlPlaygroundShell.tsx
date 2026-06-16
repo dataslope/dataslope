@@ -6,6 +6,8 @@ import "../../playground.css";
 import "../../sqlPlayground.css";
 import { SqlPlaygroundSwitcher } from "./SqlPlaygroundSwitcher";
 import { paneForActivatedTab, type SqlMobilePane } from "../utils/mobilePane";
+import { MobileMenuSheet } from "../../MobileMenuSheet";
+import { PlaygroundBootOverlay } from "../../PlaygroundBootOverlay";
 
 /**
  * Re-exported from the pure helper module (`../utils/mobilePane`) so existing
@@ -61,6 +63,16 @@ export interface SqlPlaygroundShellProps {
    *  shell renders them directly inside `<header className="playground-header">`
    *  after the logo + separator. */
   headerActions?: ReactNode;
+  /** Contents of the mobile "hamburger" menu (rendered only below the
+   *  mobile breakpoint). The shell owns the sheet's open state and the
+   *  trigger; each dialect supplies the rows (Workspace, Import, Export,
+   *  History, ER Diagram, Information, Settings) via `MobileMenuAction` /
+   *  `MobileMenuSubSheet`. Omit to render no menu. */
+  mobileMenu?: ReactNode;
+  /** Real, smoothed boot fraction (0..1) when the engine reports download
+   *  progress (DuckDB). Omit for engines that don't — the shell then
+   *  creeps a determinate bar over time instead. */
+  bootFraction?: number | null;
   /** Main body of the page — typically the top toolbar + sidebar +
    *  editor + results pane structure. Rendered directly inside
    *  `<div className="playground-app">` after the header. */
@@ -90,11 +102,33 @@ export function SqlPlaygroundShell({
   loadingOverlayClassName = "",
   keepOverlayMounted = false,
   loadingCaption,
-  loadingHeroRepeat = 3,
   headerActions,
+  mobileMenu,
+  bootFraction,
   children,
 }: SqlPlaygroundShellProps) {
   const showLoadingOverlay = keepOverlayMounted || !loaded;
+  // Mobile hamburger menu open state (the shell owns it; dialects only
+  // supply the rows via `mobileMenu`).
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // True while the full-screen Settings tab is showing. Used to hide the
+  // bottom Schema/Editor/Results pane switcher, which doesn't apply to
+  // the settings pane. Detected from the DOM (below) so the three
+  // playground bodies stay untouched.
+  const [settingsTabActive, setSettingsTabActive] = useState(false);
+  // Fallback for engines that don't report real download progress
+  // (Postgres, SQLite): creep a determinate bar toward ~90% while booting.
+  // Skipped when the dialect supplies a real `bootFraction` (DuckDB).
+  const [creepFraction, setCreepFraction] = useState(0.05);
+  useEffect(() => {
+    if (loaded || bootFraction !== undefined) return;
+    const id = window.setInterval(() => {
+      setCreepFraction((f) => Math.min(0.9, f + (0.9 - f) * 0.05));
+    }, 200);
+    return () => window.clearInterval(id);
+  }, [loaded, bootFraction]);
+  const overlayFraction =
+    bootFraction !== undefined ? bootFraction : creepFraction;
 
   // ─── Mobile single-pane navigation ───────────────────────────────────
   // Below the mobile breakpoint the desktop 3-pane IDE collapses to one
@@ -194,6 +228,11 @@ export function SqlPlaygroundShell({
       const nowHasResults = !!pane && !empty;
       setHasResults(nowHasResults);
 
+      // (c) Is the full-screen Settings tab open? Its pane replaces the
+      // editor/results split, so the bottom pane switcher is hidden while
+      // it's up (see the `data-settings-active` rule in sqlPlayground.css).
+      setSettingsTabActive(!!root.querySelector(".sql-settings-tab-pane"));
+
       // (b) Did the active query tab change? React swaps the tab's `.active`
       // class and the results-pane contents in the same commit, so by the time
       // the observer runs we can read the new tab's id *and* its result-state
@@ -229,37 +268,35 @@ export function SqlPlaygroundShell({
   }, []);
 
   return (
-    <div className="playground-root" ref={rootRef} data-mobile-pane={mobilePane}>
+    <div
+      className="playground-root"
+      ref={rootRef}
+      data-mobile-pane={mobilePane}
+      data-settings-active={settingsTabActive || undefined}
+    >
       {showLoadingOverlay && (
-        <div
-          className={`pyodide-loading${
-            statusState === "error" ? " has-error" : ""
-          }${loadingOverlayClassName ? ` ${loadingOverlayClassName}` : ""}`}
-          role="status"
-          aria-live="polite"
-        >
-          <div className="loading-hero" aria-hidden="true">
-            <div className="loading-hero-track">
-              {Array.from({ length: loadingHeroRepeat }).map((_, i) => (
-                <span key={i} className="loading-hero-text">
-                  {playgroundTitle}
-                </span>
-              ))}
-            </div>
-          </div>
-          <div className="loading-bottom">
-            <div className="loading-quip">{loadingCaption}</div>
-            <div className="loading-bar-wrap">
-              <div className="loading-bar" />
-            </div>
-          </div>
-        </div>
+        <PlaygroundBootOverlay
+          title={playgroundTitle.replace(/\s*Playground$/i, "")}
+          statusMessage={loadingCaption}
+          cold
+          fraction={overlayFraction}
+          error={statusState === "error"}
+          className={loadingOverlayClassName}
+        />
       )}
       <div className="playground-app">
         <header className="playground-header">
           <SqlPlaygroundSwitcher playgroundId={playgroundId} />
           <div className="header-sep" />
           {headerActions}
+          {mobileMenu && (
+            <MobileMenuSheet
+              open={mobileMenuOpen}
+              onOpenChange={setMobileMenuOpen}
+            >
+              {mobileMenu}
+            </MobileMenuSheet>
+          )}
         </header>
         {children}
         <nav

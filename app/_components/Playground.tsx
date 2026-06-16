@@ -104,6 +104,7 @@ import {
   detectIsMac,
 } from "./playgroundShared";
 import { DiamondMark } from "./mdx/loadingAnimations";
+import { PlaygroundBootOverlay } from "./PlaygroundBootOverlay";
 import { TabBar } from "./tabs/TabBar";
 import type { TabContextMenuItem, TabDescriptor } from "./tabs/tabTypes";
 import {
@@ -653,6 +654,22 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   // sheet) instead of a Menu so its inline sub-sections (Examples,
   // Information, …) can't be cut off the side of a narrow viewport.
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // Full workspace-manager drawer, opened from the mobile hamburger menu
+  // (the header badge that normally opens it is hidden on mobile).
+  const [workspaceManagerOpen, setWorkspaceManagerOpen] = useState(false);
+  // Mutually-exclusive mobile menu sub-sheets (Files / Examples / Export /
+  // Information): opening one closes any other, so selecting a different
+  // item never leaves a stale sub-sheet open behind it.
+  const [activeMobileSubmenu, setActiveMobileSubmenu] = useState<string | null>(
+    null,
+  );
+  // Forget the open sub-sheet whenever the whole menu closes, so a flat
+  // action that dismisses the menu doesn't leave a nested sheet orphaned
+  // (and it reopens from the top next time).
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (!mobileMenuOpen) setActiveMobileSubmenu(null);
+  }, [mobileMenuOpen]);
   // Confirm dialog shown when picking an example would discard editor
   // contents the user has already typed.
   const [pendingExample, setPendingExample] = useState<ExampleSnippet | null>(
@@ -2869,59 +2886,20 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   return (
     <div className="playground-root">
       {showLoadingOverlay && (
-        <div
-          className={`pyodide-loading${
-            statusState === "error" ? " has-error" : ""
-          }${loadingFading ? " hidden" : ""}`}
-          role="status"
-          aria-live="polite"
-        >
-          {/* Hero — gigantic horizontally-moving title with faded
-              left/right edges. The text repeats so there is always
-              something visible mid-translate, and the surrounding mask
-              fades the strip into the background at both ends. */}
-          <div className="loading-hero" aria-hidden="true">
-            <div className="loading-hero-track">
-              <span className="loading-hero-text">
-                {adapter.displayName}
-              </span>
-              <span className="loading-hero-text">
-                {adapter.displayName}
-              </span>
-              <span className="loading-hero-text">
-                {adapter.displayName}
-              </span>
-              <span className="loading-hero-text">
-                {adapter.displayName}
-              </span>
-            </div>
-          </div>
-
-          {/* Witty quip + indeterminate progress bar pinned to the
-              bottom of the viewport. On error we surface the failure
-              message instead of the rotating quip. */}
-          <div className="loading-bottom">
-            <div className="loading-quip">
-              {statusState === "error"
-                ? loadingMessage
-                : LOADING_QUIPS[quipIndex]}
-            </div>
-            <div className="loading-bar-wrap">
-              {/* Determinate once the adapter reports boot fractions;
-                  indeterminate sweep until then. */}
-              <div
-                className={`loading-bar${
-                  bootDisplayFraction != null ? " determinate" : ""
-                }`}
-                style={
-                  bootDisplayFraction != null
-                    ? { width: `${Math.round(bootDisplayFraction * 1000) / 10}%` }
-                    : undefined
-                }
-              />
-            </div>
-          </div>
-        </div>
+        <PlaygroundBootOverlay
+          title={adapter.displayName.replace(/\s*Playground$/i, "")}
+          statusMessage={
+            statusState === "error"
+              ? loadingMessage
+              : loadingMessage || LOADING_QUIPS[quipIndex]
+          }
+          cold={adapter.coldDownloadMB != null}
+          downloadMB={adapter.coldDownloadMB}
+          compiled={adapter.compiled}
+          fraction={bootDisplayFraction}
+          error={statusState === "error"}
+          className={loadingFading ? "hidden" : ""}
+        />
       )}
 
       <div className="playground-app">
@@ -3007,6 +2985,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
               playgroundId={adapter.id}
               activeWorkspaceId={workspaceId}
               activeWorkspaceName={workspaceName}
+              managerOpen={workspaceManagerOpen}
+              onManagerOpenChange={setWorkspaceManagerOpen}
             />
           )}
 
@@ -3158,10 +3138,33 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                       </Drawer.Close>
                     </div>
                     <div className="mobile-menu-drawer-body">
+                      {/* Workspace — the header badge is hidden on mobile,
+                          so open the full workspace manager from here. */}
+                      {workspaceReady && (
+                        <button
+                          type="button"
+                          className="mobile-menu-action"
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            setWorkspaceManagerOpen(true);
+                          }}
+                        >
+                          <span>Workspace</span>
+                          <span className="mobile-menu-chev" aria-hidden="true">
+                            ›
+                          </span>
+                        </button>
+                      )}
                       {/* Files — the desktop icon rail (which toggles the
                           file panel) is hidden on mobile, so surface file
                           management here as a bottom-sheet instead. */}
-                      <Drawer.Root swipeDirection="down">
+                      <Drawer.Root
+                        swipeDirection="down"
+                        open={activeMobileSubmenu === "files"}
+                        onOpenChange={(o) =>
+                          setActiveMobileSubmenu(o ? "files" : null)
+                        }
+                      >
                         <Drawer.Trigger className="mobile-menu-action">
                           <span>Files</span>
                           <span className="mobile-menu-chev" aria-hidden="true">
@@ -3200,7 +3203,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         </Drawer.Portal>
                       </Drawer.Root>
 
-                      <Drawer.Root swipeDirection="down">
+                      <Drawer.Root
+                        swipeDirection="down"
+                        open={activeMobileSubmenu === "examples"}
+                        onOpenChange={(o) =>
+                          setActiveMobileSubmenu(o ? "examples" : null)
+                        }
+                      >
                         <Drawer.Trigger className="mobile-menu-action">
                           <span>Examples</span>
                           <span className="mobile-menu-chev" aria-hidden="true">
@@ -3252,7 +3261,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         </Drawer.Portal>
                       </Drawer.Root>
 
-                      <Drawer.Root swipeDirection="down">
+                      <Drawer.Root
+                        swipeDirection="down"
+                        open={activeMobileSubmenu === "export"}
+                        onOpenChange={(o) =>
+                          setActiveMobileSubmenu(o ? "export" : null)
+                        }
+                      >
                         <Drawer.Trigger className="mobile-menu-action">
                           <span>Export</span>
                           <span className="mobile-menu-chev" aria-hidden="true">
@@ -3324,7 +3339,13 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         </button>
                       )}
 
-                      <Drawer.Root swipeDirection="down">
+                      <Drawer.Root
+                        swipeDirection="down"
+                        open={activeMobileSubmenu === "information"}
+                        onOpenChange={(o) =>
+                          setActiveMobileSubmenu(o ? "information" : null)
+                        }
+                      >
                         <Drawer.Trigger className="mobile-menu-action">
                           <span>Information</span>
                           <span className="mobile-menu-chev" aria-hidden="true">
@@ -3374,6 +3395,17 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                         <span>Settings</span>
                       </button>
                     </div>
+                    {/* While a sub-sheet is open the parent menu acts as a
+                        backdrop: a tap anywhere on it just closes the open
+                        sub-sheet rather than opening the tapped item. */}
+                    {activeMobileSubmenu !== null && (
+                      <button
+                        type="button"
+                        className="mobile-menu-dismiss-catch"
+                        aria-label="Close submenu"
+                        onClick={() => setActiveMobileSubmenu(null)}
+                      />
+                    )}
                   </Drawer.Content>
                 </Drawer.Popup>
               </Drawer.Viewport>
@@ -3637,7 +3669,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
             className="playground-file-tabbar"
           />
         )}
-        <div className="mobile-tabs" role="tablist" aria-label="Pane">
+        <div
+          className="mobile-tabs"
+          role="tablist"
+          aria-label="Pane"
+          data-settings-active={activeTabId === SETTINGS_TAB_ID || undefined}
+        >
           <button
             type="button"
             role="tab"
