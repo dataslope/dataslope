@@ -359,7 +359,7 @@ export const javascriptAdapter: LanguageAdapter = {
     return format(code, "script.js", WEB_FMT_2SPACE);
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Starting almostnode runtime…");
+    setLoadingMessage("Starting JavaScript runtime…");
     // The worker is pre-bundled by `scripts/build-almostnode-workers
     // .mjs` to `public/_workers/javascript-worker.js`. We point the
     // Worker constructor at the resulting static URL (not at

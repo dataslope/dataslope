@@ -776,7 +776,7 @@ export const javaAdapter: LanguageAdapter = {
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
     setLoadingMessage(
-      "Loading CheerpJ (OpenJDK + javac in WebAssembly — this can take a moment on first load)…",
+      "Loading Java runtime…",
       0.08,
     );
     const api = await loadCheerpJ();

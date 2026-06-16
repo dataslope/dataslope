@@ -615,8 +615,10 @@ export default function LoadingAnimationsGallery({
               Setting up the Python runtime…
             </span>
             <span className={styles.bootHint}>
-              Downloading the Python runtime — this happens once; later runs
-              are much faster.
+              This can take a moment on first load
+            </span>
+            <span className={styles.bootHint}>
+              This happens once. Later runs are much faster.
             </span>
           </span>
         </div>

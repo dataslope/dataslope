@@ -119,7 +119,7 @@ let initPromise: Promise<void> | null = null;
 async function initRuntime(): Promise<void> {
   post({
     kind: "loading",
-    message: "Loading browsercc clang toolchain (this can take a moment on first load)…",
+    message: "Loading the compiler…",
   });
   const [api, shim] = await Promise.all([
     dynamicImport(BROWSERCC_URL) as Promise<BrowserccApi>,

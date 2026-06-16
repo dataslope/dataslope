@@ -34,7 +34,8 @@ function BootTitle({ message }: { message: ReactNode }) {
 }
 
 export interface PlaygroundBootOverlayProps {
-  /** Runtime / language name used in the download hint (e.g. "Python"). */
+  /** Runtime / language name (e.g. "Python"). Retained for call-site
+   *  compatibility — the boot copy no longer names the runtime. */
   title: string;
   /** Current stage line (the playground's loading caption). */
   statusMessage: ReactNode;
@@ -55,7 +56,6 @@ export interface PlaygroundBootOverlayProps {
 }
 
 export function PlaygroundBootOverlay({
-  title,
   statusMessage,
   cold = false,
   downloadMB,
@@ -87,11 +87,15 @@ export function PlaygroundBootOverlay({
             <BootTitle message={statusMessage} />
           </span>
           {!error && cold && (
-            <span className="playground-boot-hint">
-              Downloading the {title} runtime
-              {downloadMB ? ` (~${downloadMB} MB)` : ""} — this happens once;{" "}
-              later runs are much faster.
-            </span>
+            <div className="playground-boot-hints">
+              <span className="playground-boot-hint">
+                This can take a moment on first load
+              </span>
+              <span className="playground-boot-hint playground-boot-hint-sub">
+                {downloadMB ? `Downloading (~${downloadMB} MB) — ` : ""}This
+                happens once. Later runs are much faster.
+              </span>
+            </div>
           )}
           {!error && pct != null && (
             <div className="playground-boot-progress">

@@ -840,7 +840,7 @@ export const pythonAdapter: LanguageAdapter = {
     return format(code, "main.py");
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Starting Python worker…", 0.02);
+    setLoadingMessage("Starting Python runtime…", 0.02);
     // Standard Web Worker construction pattern that Next.js / Turbopack
     // recognises: it bundles the worker as a separate chunk. The worker
     // itself avoids the bundler's dynamic-import handling by loading

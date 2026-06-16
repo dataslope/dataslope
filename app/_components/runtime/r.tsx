@@ -1282,7 +1282,7 @@ export const rAdapter: LanguageAdapter = {
     return formatRWithStyler(code);
   },
   async init(setLoadingMessage): Promise<LanguageRuntime> {
-    setLoadingMessage("Loading WebR…", 0.03);
+    setLoadingMessage("Loading R runtime…", 0.03);
     // @ts-expect-error -- webr ships without bundled type declarations
     const { WebR } = (await import("webr")) as { WebR: new () => WebRInstance };
 
