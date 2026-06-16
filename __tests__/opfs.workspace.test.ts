@@ -259,6 +259,53 @@ describe("deleteWorkspace", () => {
 // acquireWorkspaceLock
 // ---------------------------------------------------------------------------
 
+/**
+ * Minimal in-memory Web Locks stub modelling exclusive, *queued* requests.
+ * A request for a free name is granted immediately; a request for a held name
+ * waits until the holder releases (its callback's promise settles) — or
+ * rejects if the request's `AbortSignal` fires first, which is how the real
+ * API surfaces both our grace-window timeout and caller-unmount cancellation.
+ */
+function makeLocksStub() {
+  const held = new Set<string>();
+  const waiters = new Map<string, Array<() => void>>();
+
+  function request(
+    name: string,
+    opts: { signal?: AbortSignal },
+    cb: (lock: unknown) => Promise<unknown> | unknown,
+  ): Promise<unknown> {
+    const grant = (): Promise<unknown> => {
+      held.add(name);
+      return Promise.resolve(cb({})).finally(() => {
+        held.delete(name);
+        waiters.get(name)?.shift()?.();
+      });
+    };
+    if (!held.has(name)) return grant();
+    // Held: queue until release, or reject if this request aborts first.
+    return new Promise((resolve, reject) => {
+      const onGrant = () => {
+        opts.signal?.removeEventListener("abort", onAbort);
+        resolve(grant());
+      };
+      const onAbort = () => {
+        const queue = waiters.get(name);
+        const i = queue?.indexOf(onGrant) ?? -1;
+        if (queue && i >= 0) queue.splice(i, 1);
+        reject(new Error("AbortError"));
+      };
+      if (opts.signal?.aborted) return onAbort();
+      opts.signal?.addEventListener("abort", onAbort);
+      const queue = waiters.get(name) ?? [];
+      queue.push(onGrant);
+      waiters.set(name, queue);
+    });
+  }
+
+  return { request };
+}
+
 describe("acquireWorkspaceLock", () => {
   it("returns true when Web Locks API is unavailable", async () => {
     vi.stubGlobal("navigator", {
@@ -271,19 +318,10 @@ describe("acquireWorkspaceLock", () => {
     expect(await acquireWorkspaceLock("ws_test")).toBe(true);
   });
 
-  it("returns true when lock is granted", async () => {
+  it("returns true when the lock is free", async () => {
     vi.stubGlobal("navigator", {
       storage: { getDirectory: () => Promise.resolve(makeOpfsRoot()) },
-      locks: {
-        request: (
-          _name: string,
-          _opts: object,
-          cb: (lock: object) => Promise<void>,
-        ) => {
-          // Simulate granting the lock (lock object is truthy)
-          void cb({});
-        },
-      },
+      locks: makeLocksStub(),
     });
     const { acquireWorkspaceLock } = await import(
       "../app/_components/opfs/workspace"
@@ -291,23 +329,49 @@ describe("acquireWorkspaceLock", () => {
     expect(await acquireWorkspaceLock("ws_test")).toBe(true);
   });
 
-  it("returns false when lock is already held by another tab", async () => {
+  it("returns false when another live tab holds the lock past the grace window", async () => {
+    const locks = makeLocksStub();
+    // Another tab holds the lock indefinitely (its callback never settles).
+    void locks.request(
+      "playground_workspace_ws_test",
+      {},
+      () => new Promise<void>(() => {}),
+    );
     vi.stubGlobal("navigator", {
       storage: { getDirectory: () => Promise.resolve(makeOpfsRoot()) },
-      locks: {
-        request: (
-          _name: string,
-          _opts: object,
-          cb: (lock: null) => Promise<void>,
-        ) => {
-          // Simulate lock being unavailable (lock is null)
-          void cb(null);
-        },
-      },
+      locks,
     });
     const { acquireWorkspaceLock } = await import(
       "../app/_components/opfs/workspace"
     );
-    expect(await acquireWorkspaceLock("ws_test")).toBe(false);
+    expect(await acquireWorkspaceLock("ws_test", { graceMs: 25 })).toBe(false);
+  });
+
+  it("releases the lock when the caller aborts, so a remount can re-acquire", async () => {
+    // Regression test for the back/forward false-conflict: the first mount must
+    // hand the lock off to the next mount instead of holding it for the life of
+    // the document.
+    vi.stubGlobal("navigator", {
+      storage: { getDirectory: () => Promise.resolve(makeOpfsRoot()) },
+      locks: makeLocksStub(),
+    });
+    const { acquireWorkspaceLock } = await import(
+      "../app/_components/opfs/workspace"
+    );
+
+    // First mount acquires and holds the lock.
+    const first = new AbortController();
+    expect(
+      await acquireWorkspaceLock("ws_test", { signal: first.signal }),
+    ).toBe(true);
+
+    // Second mount queues behind it; releasing the first (unmount) grants it.
+    const second = new AbortController();
+    const secondResult = acquireWorkspaceLock("ws_test", {
+      signal: second.signal,
+      graceMs: 1000,
+    });
+    first.abort();
+    expect(await secondResult).toBe(true);
   });
 });

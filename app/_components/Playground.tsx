@@ -980,6 +980,12 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   useEffect(() => {
     if (typeof window === "undefined") return;
     let cancelled = false;
+    // Releases the workspace lock when this effect tears down (unmount /
+    // client-side navigation away) so a later remount — e.g. a browser
+    // back-then-forward return to the playground — can re-acquire it instead
+    // of colliding with this document's own stale lock and showing a spurious
+    // "already open in another tab" warning.
+    const lockController = new AbortController();
     (async () => {
       try {
         const ws = await ensureActiveWorkspace(adapter.id);
@@ -1045,7 +1051,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
         const noticeKey = `playground_ws_warned_${ws.id}`;
         try {
           if (window.sessionStorage.getItem(noticeKey) !== "1") {
-            const hasLock = await acquireWorkspaceLock(ws.id);
+            const hasLock = await acquireWorkspaceLock(ws.id, {
+              signal: lockController.signal,
+            });
             if (!cancelled && !hasLock) {
               window.sessionStorage.setItem(noticeKey, "1");
               showToast(
@@ -1080,6 +1088,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     })();
     return () => {
       cancelled = true;
+      // Release the workspace lock so the next mount can re-acquire it.
+      lockController.abort();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [adapter.id]);

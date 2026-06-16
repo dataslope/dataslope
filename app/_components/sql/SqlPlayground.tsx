@@ -1236,6 +1236,11 @@ function SqlPlaygroundInner() {
   // ─── Boot the engine and CodeMirror ──────────────────────────────────
   useEffect(() => {
     let cancelled = false;
+    // Releases the workspace lock when this effect tears down (unmount /
+    // client-side navigation away) so a later remount — e.g. a browser
+    // back-then-forward return to the playground — can re-acquire it instead
+    // of colliding with this document's own stale lock.
+    const lockController = new AbortController();
 
     if (editorHostRef.current && !editorRef.current) {
       const initialTheme =
@@ -1296,7 +1301,9 @@ function SqlPlaygroundInner() {
           setActiveWorkspace({ id: workspace.id, name: workspace.name });
           setWorkspaceSaved(workspace.saved);
           try {
-            const hasLock = await acquireWorkspaceLock(workspace.id);
+            const hasLock = await acquireWorkspaceLock(workspace.id, {
+              signal: lockController.signal,
+            });
             if (!cancelled && !hasLock) {
               // The same OPFS-backed workspace can't be opened in two tabs:
               // SQLite's exclusive OPFS access handle would deadlock the
@@ -1364,6 +1371,8 @@ function SqlPlaygroundInner() {
     })();
     return () => {
       cancelled = true;
+      // Release the workspace lock so the next mount can re-acquire it.
+      lockController.abort();
       // Terminate the engine worker so its OPFS access handles are
       // released — a zombie worker would otherwise keep the workspace's
       // opfs-sahpool locked across StrictMode remounts and client-side
