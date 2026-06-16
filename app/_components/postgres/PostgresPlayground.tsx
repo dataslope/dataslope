@@ -111,6 +111,7 @@ import { findPostgresSampleDatabase } from "../runtime/postgresSamples";
 import { postgresAdapter } from "./postgresAdapter";
 import {
   ensureActiveWorkspace,
+  saveDraftWorkspace,
   setActiveWorkspaceId,
   switchActiveWorkspace,
 } from "../opfs/activeWorkspace";
@@ -993,6 +994,9 @@ function PostgresPlaygroundInner() {
     id: string;
     name: string;
   } | null>(null);
+  // False for the auto-created draft workspace (kept out of the saved list
+  // until the user saves it). Drives the Save affordance in the badge.
+  const [workspaceSaved, setWorkspaceSaved] = useState(true);
   const [indexesExpanded, setIndexesExpanded] = useState(true);
   const [viewsExpanded, setViewsExpanded] = useState(true);
   const [tablesExpanded, setTablesExpanded] = useState(true);
@@ -1841,6 +1845,7 @@ function PostgresPlaygroundInner() {
           const workspace = await ensureActiveWorkspace(PLAYGROUND_ID);
           workspaceId = workspace.id;
           setActiveWorkspace({ id: workspace.id, name: workspace.name });
+          setWorkspaceSaved(workspace.saved);
           try {
             const hasLock = await acquireWorkspaceLock(workspace.id);
             if (!cancelled && !hasLock) {
@@ -2182,6 +2187,15 @@ function PostgresPlaygroundInner() {
         window.location.reload();
       }
     })();
+  }, []);
+
+  // Save (promote) the current draft workspace into the saved list.
+  const handleSaveWorkspace = useCallback(async (name: string) => {
+    const saved = saveDraftWorkspace(PLAYGROUND_ID, name);
+    if (saved) {
+      setWorkspaceSaved(true);
+      setActiveWorkspace({ id: saved.id, name: saved.name });
+    }
   }, []);
 
   const requestDbSwitch = useCallback(
@@ -3530,6 +3544,11 @@ function PostgresPlaygroundInner() {
               activeWorkspaceName={activeWorkspace.name}
               managerOpen={workspaceManagerOpen}
               onManagerOpenChange={setWorkspaceManagerOpen}
+              unsaved={
+                !workspaceSaved &&
+                tabs.some((t) => !t.kind && t.code !== t.pristineCode)
+              }
+              onSave={handleSaveWorkspace}
             />
           )}
           <div className="header-actions desktop-only">

@@ -108,7 +108,11 @@ import { RenameDatabaseDialog } from "../sql/components/RenameDatabaseDialog";
 import { SqlEditorToolbar } from "../sql/components/SqlEditorToolbar";
 import { findDuckDbSampleDatabase } from "../runtime/duckdbSamples";
 import { duckdbAdapter } from "./duckdbAdapter";
-import { ensureActiveWorkspace, switchActiveWorkspace } from "../opfs/activeWorkspace";
+import {
+  ensureActiveWorkspace,
+  saveDraftWorkspace,
+  switchActiveWorkspace,
+} from "../opfs/activeWorkspace";
 import { acquireWorkspaceLock, createWorkspace } from "../opfs/workspace";
 import {
   deleteDataEntry as opfsDeleteDataEntry,
@@ -1023,6 +1027,16 @@ function DuckDbPlaygroundInner() {
     id: string;
     name: string;
   } | null>(null);
+  // False for the auto-created draft workspace (kept out of the saved list
+  // until the user saves it). Drives the Save affordance in the badge.
+  const [workspaceSaved, setWorkspaceSaved] = useState(true);
+  const handleSaveWorkspace = useCallback(async (name: string) => {
+    const saved = saveDraftWorkspace(PLAYGROUND_ID, name);
+    if (saved) {
+      setWorkspaceSaved(true);
+      setActiveWorkspace({ id: saved.id, name: saved.name });
+    }
+  }, []);
   // Mirror activeWorkspace.id in a ref so the file-pane handlers can
   // read the current workspace synchronously without participating in
   // useCallback dep arrays (which would force them to rebuild every
@@ -1901,6 +1915,7 @@ function DuckDbPlaygroundInner() {
           const workspace = await ensureActiveWorkspace(PLAYGROUND_ID);
           workspaceId = workspace.id;
           setActiveWorkspace({ id: workspace.id, name: workspace.name });
+          setWorkspaceSaved(workspace.saved);
           const noticeKey = `playground_ws_warned_${workspace.id}`;
           try {
             if (window.sessionStorage.getItem(noticeKey) !== "1") {
@@ -3986,6 +4001,11 @@ function DuckDbPlaygroundInner() {
               activeWorkspaceName={activeWorkspace.name}
               managerOpen={workspaceManagerOpen}
               onManagerOpenChange={setWorkspaceManagerOpen}
+              unsaved={
+                !workspaceSaved &&
+                tabs.some((t) => !t.kind && t.code !== t.pristineCode)
+              }
+              onSave={handleSaveWorkspace}
             />
           )}
           <div className="header-actions desktop-only">

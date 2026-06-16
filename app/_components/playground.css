@@ -4274,6 +4274,32 @@ html[data-playground-theme="dark"] .welcome h3 {
   white-space: nowrap;
 }
 
+/* Save button — shown next to the badge only when the active workspace is an
+   unsaved draft the user has changed. Accent-filled so it reads as the call to
+   action (the draft isn't in the saved list until it's clicked). */
+.workspace-save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 6px;
+  padding: 4px 10px;
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: 999px;
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 120ms ease,
+    border-color 120ms ease;
+}
+
+.workspace-save-btn:hover {
+  background: color-mix(in srgb, var(--primary) 88%, #000);
+}
+
 .workspace-popover {
   min-width: 260px;
   max-width: 320px;

@@ -144,16 +144,25 @@ async function getWorkspaceDir(
 
 /**
  * Creates a new workspace: allocates a workspace ID, writes `meta.json` to
- * OPFS, creates the `files/` and `db/` sub-directories, and adds an entry to
- * the registry in localStorage.
+ * OPFS, creates the `files/` and `db/` sub-directories, and (by default) adds
+ * an entry to the registry in localStorage.
  *
- * If OPFS is unavailable the workspace entry is still added to the registry
- * (with no OPFS backing) so callers can fall back to localStorage-only mode.
+ * Pass `{ register: false }` to create a "draft" workspace — its OPFS backing
+ * is created so the engine can persist into it, but it is NOT added to the
+ * saved-workspaces registry. This backs the explicit-save model: the
+ * auto-created default workspace stays a draft (it never clutters the
+ * workspace list) until the user makes a change and clicks Save, at which
+ * point it is promoted via `registerWorkspace`.
+ *
+ * If OPFS is unavailable the workspace entry is still returned (with no OPFS
+ * backing) so callers can fall back to localStorage-only mode.
  */
 export async function createWorkspace(
   name: string,
   playground: string,
+  opts: { register?: boolean } = {},
 ): Promise<WorkspaceEntry> {
+  const { register = true } = opts;
   const id = newWorkspaceId();
   const now = Date.now();
   const entry: WorkspaceEntry = {
@@ -180,10 +189,35 @@ export async function createWorkspace(
     }
   }
 
-  const registry = getWorkspaceRegistry();
-  registry.push(entry);
-  updateWorkspaceRegistry(registry);
+  if (register) {
+    const registry = getWorkspaceRegistry();
+    registry.push(entry);
+    updateWorkspaceRegistry(registry);
+  }
   return entry;
+}
+
+/**
+ * Adds a workspace entry to the registry (promoting a draft created with
+ * `{ register: false }` to a saved workspace). Idempotent: if an entry with
+ * the same id already exists it is updated in place. Returns the saved entry,
+ * with `name` overridden when a new name is supplied.
+ */
+export function registerWorkspace(
+  entry: WorkspaceEntry,
+  name?: string,
+): WorkspaceEntry {
+  const saved: WorkspaceEntry = {
+    ...entry,
+    name: name ?? entry.name,
+    lastUsedAt: Date.now(),
+  };
+  const registry = getWorkspaceRegistry();
+  const idx = registry.findIndex((e) => e.id === saved.id);
+  if (idx === -1) registry.push(saved);
+  else registry[idx] = saved;
+  updateWorkspaceRegistry(registry);
+  return saved;
 }
 
 /**
