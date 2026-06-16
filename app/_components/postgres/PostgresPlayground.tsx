@@ -1796,6 +1796,11 @@ function PostgresPlaygroundInner() {
   // ─── Editor + engine init ────────────────────────────────────────────
   useEffect(() => {
     let cancelled = false;
+    // Releases the workspace lock when this effect tears down (unmount /
+    // client-side navigation away) so a later remount — e.g. a browser
+    // back-then-forward return to the playground — can re-acquire it instead
+    // of colliding with this document's own stale lock.
+    const lockController = new AbortController();
     if (editorHostRef.current && !editorRef.current) {
       const compartments = makeSqlEditorCompartments();
       const initialTheme =
@@ -1847,7 +1852,9 @@ function PostgresPlaygroundInner() {
           setActiveWorkspace({ id: workspace.id, name: workspace.name });
           setWorkspaceSaved(workspace.saved);
           try {
-            const hasLock = await acquireWorkspaceLock(workspace.id);
+            const hasLock = await acquireWorkspaceLock(workspace.id, {
+              signal: lockController.signal,
+            });
             if (!cancelled && !hasLock) {
               // The same OPFS-backed workspace can't be opened in two tabs:
               // PGlite's exclusive OPFS access handle would deadlock the
@@ -1890,6 +1897,8 @@ function PostgresPlaygroundInner() {
     })();
     return () => {
       cancelled = true;
+      // Release the workspace lock so the next mount can re-acquire it.
+      lockController.abort();
       editorRef.current?.destroy();
       editorRef.current = null;
       langCompRef.current = null;

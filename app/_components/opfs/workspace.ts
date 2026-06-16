@@ -368,43 +368,97 @@ async function copyDirectoryHandle(
 interface LockManager {
   request: (
     name: string,
-    options: { ifAvailable: boolean },
-    callback: (lock: unknown) => Promise<void>,
-  ) => void;
+    options: { mode?: "exclusive" | "shared"; signal?: AbortSignal },
+    callback: (lock: unknown) => Promise<unknown> | unknown,
+  ) => Promise<unknown>;
+}
+
+/** Options for {@link acquireWorkspaceLock}. */
+export interface WorkspaceLockOptions {
+  /**
+   * Aborting this signal releases the held lock. Pass the signal from the
+   * acquiring effect's cleanup so the lock is released when the playground
+   * unmounts (e.g. a client-side navigation away).
+   *
+   * Without it the lock leaks for the whole lifetime of the document, and a
+   * later remount in the *same* document — most visibly a browser
+   * back-then-forward return to the playground — re-runs this acquisition and
+   * collides with the document's own stale lock, reporting a spurious
+   * "workspace is open in another tab" conflict.
+   */
+  signal?: AbortSignal;
+  /**
+   * How long to wait for the lock before declaring a conflict, in ms
+   * (default 1500). The wait lets a just-unmounted predecessor in this
+   * document — or another tab/page still tearing down — release the lock and
+   * hand it over, instead of racing to a false conflict. A genuinely
+   * concurrent live tab holds the lock for its whole lifetime, so the wait
+   * elapses and a real conflict is still reported.
+   */
+  graceMs?: number;
 }
 
 /**
  * Attempts to acquire an exclusive lock for `workspaceId` using the Web Locks
- * API. The lock is held for the lifetime of the browser tab (automatically
- * released when the tab is closed or crashes).
+ * API, holding it until `opts.signal` aborts (caller unmount) or the tab is
+ * closed.
  *
  * Returns `true` if the lock was acquired (this tab may use the workspace).
- * Returns `false` if another tab already holds the lock.
+ * Returns `false` if another live tab still holds the lock after the grace
+ * window.
  * Returns `true` unconditionally when the Web Locks API is unavailable (no
  * enforcement possible — callers should proceed with a warning).
  */
 export async function acquireWorkspaceLock(
   workspaceId: string,
+  opts: WorkspaceLockOptions = {},
 ): Promise<boolean> {
   if (!hasWebLocks()) return true;
+  const { signal: releaseSignal, graceMs = 1500 } = opts;
+  if (releaseSignal?.aborted) return false;
+
+  const locks = (navigator as unknown as { locks: LockManager }).locks;
+  const lockName = `playground_workspace_${workspaceId}`;
 
   return new Promise<boolean>((resolve) => {
-    const locks = (navigator as unknown as { locks: LockManager }).locks;
+    // The *wait* is aborted when the grace window elapses or the caller
+    // unmounts before the lock is ever granted. (Once granted, the lock is
+    // instead held until `releaseSignal` aborts — see the callback below.) A
+    // queued request — rather than `ifAvailable`, which fails instantly — lets
+    // a predecessor that is mid-release hand the lock over within the window.
+    const waitController = new AbortController();
+    const timer = setTimeout(() => waitController.abort(), graceMs);
+    const onCallerAbort = () => waitController.abort();
+    releaseSignal?.addEventListener("abort", onCallerAbort, { once: true });
+    const endWait = () => {
+      clearTimeout(timer);
+      releaseSignal?.removeEventListener("abort", onCallerAbort);
+    };
 
-    locks.request(
-      `playground_workspace_${workspaceId}`,
-      { ifAvailable: true },
-      (lock: unknown) => {
-        if (!lock) {
-          resolve(false);
-          // Return a never-settling promise so the lock request is also
-          // never settled (keeping the "busy" signal alive).
-          return new Promise<void>(() => {});
-        }
+    let granted = false;
+    locks
+      .request(lockName, { signal: waitController.signal }, () => {
+        granted = true;
+        endWait();
         resolve(true);
-        // Hold the lock indefinitely until the tab is closed.
-        return new Promise<void>(() => {});
-      },
-    );
+        // Hold the lock until the caller releases it (effect cleanup) or the
+        // tab is destroyed, then settle so the browser frees it for the next
+        // waiter — e.g. this same document's next mount after a back/forward.
+        return new Promise<void>((release) => {
+          if (!releaseSignal) return; // hold until the tab is closed
+          if (releaseSignal.aborted) release();
+          else
+            releaseSignal.addEventListener("abort", () => release(), {
+              once: true,
+            });
+        });
+      })
+      .catch(() => {
+        // The wait aborted before the lock was granted: the grace window
+        // elapsed (another live tab genuinely holds it) or the caller
+        // unmounted mid-wait. Either way this tab did not acquire the lock.
+        endWait();
+        if (!granted) resolve(false);
+      });
   });
 }
