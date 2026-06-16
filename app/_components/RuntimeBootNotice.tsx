@@ -160,6 +160,7 @@ export function CodeBlockLoadingPreview({
 }: CodeBlockLoadingPreviewProps) {
   const lines = code.replace(/\n$/, "").split("\n");
   return (
+    <div className={challengeStyles.cardShell}>
     <div
       className={`${challengeStyles.card} ${codeBlockStyles.outputScope}`}
       aria-label={`${language} code block (loading preview)`}
@@ -263,6 +264,7 @@ export function CodeBlockLoadingPreview({
           />
         </div>
       </div>
+    </div>
     </div>
   );
 }

@@ -114,6 +114,7 @@ export default function MultipleChoiceQuestion({
   const groupName = useId();
 
   return (
+    <div className={styles.cardShell}>
     <section className={styles.card} aria-label="Multiple choice question">
       <header className={styles.header}>
         <span className={styles.badge}>
@@ -242,5 +243,6 @@ export default function MultipleChoiceQuestion({
         </div>
       ) : null}
     </section>
+    </div>
   );
 }

@@ -1148,6 +1148,7 @@ function CodeBlockInner({
 
   // ─── Render ────────────────────────────────────────────────────────────
   return (
+    <div className={challengeStyles.cardShell}>
     <div
       ref={cardRef}
       className={`${challengeStyles.card} ${styles.outputScope}`}
@@ -1511,6 +1512,7 @@ function CodeBlockInner({
           <RunOverlay active={isBusy} />
         </div>
       )}
+    </div>
     </div>
   );
 }

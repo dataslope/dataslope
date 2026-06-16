@@ -30,25 +30,46 @@
   --mc-font-mono:
     "JetBrains Mono", "Fira Code", ui-monospace, monospace;
   --mc-radius: 8px;
-  /* Neo-brutalist card lift — kept in sync with ChallengeCard's `--ch-shadow`
-     (one hard, blur-less offset; offset thins on mobile, colour flips to a
-     light tint in dark mode). */
-  --mc-shadow-offset: 6px;
-  --mc-shadow-color: color-mix(in srgb, var(--ds-black) 8%, transparent);
-  --mc-shadow:
-    var(--mc-shadow-offset) var(--mc-shadow-offset) 0 0 var(--mc-shadow-color);
 
   background: var(--mc-bg);
   border: 1px solid var(--mc-border);
   border-radius: var(--mc-radius);
-  box-shadow: var(--mc-shadow);
+  /* Elevation comes from the striped `.cardShell::after` (below), not a
+     box-shadow. `overflow: hidden` clips the card's rounded-corner content,
+     so the offset stripe layer lives on the shell to escape that clip. */
   overflow: hidden;
   font-family: var(--mc-font-ui);
   color: var(--mc-text);
   font-size: 14px;
   line-height: 1.5;
-  margin: 1rem 0;
   position: relative;
+}
+
+/* ── Striped hard-offset elevation (mirrors ChallengeCard's .cardShell) ── */
+.cardShell {
+  position: relative;
+  isolation: isolate;
+  margin: 1rem 0;
+  --mc-shadow-offset: 6px;
+  --mc-shadow-color: color-mix(in srgb, var(--ds-black) 8%, transparent);
+  --mc-shadow-stripe: 2px;
+  --mc-shadow-period: 6px;
+}
+.cardShell::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: var(--mc-shadow-offset) calc(-1 * var(--mc-shadow-offset))
+    calc(-1 * var(--mc-shadow-offset)) var(--mc-shadow-offset);
+  border-radius: 8px; /* matches --mc-radius */
+  background: repeating-linear-gradient(
+    45deg,
+    var(--mc-shadow-color) 0,
+    var(--mc-shadow-color) var(--mc-shadow-stripe),
+    transparent var(--mc-shadow-stripe),
+    transparent var(--mc-shadow-period)
+  );
+  pointer-events: none;
 }
 
 /* ─── Header ──────────────────────────────────────────────────────── */
@@ -499,8 +520,10 @@
   --mc-border-light: #232323;
   --mc-text: #e0e0e0;
   --mc-text-muted: #808080;
-  /* Faint light tint so the hard offset stays visible on the near-black
-     surface (matches ChallengeCard's dark-mode shadow). */
+}
+
+/* Dark-mode stripe tint (set on the shell, which owns the elevation). */
+:global(html:is(.dark, [data-theme="dark"])) .cardShell {
   --mc-shadow-color: color-mix(in srgb, var(--ds-white) 10%, transparent);
 }
 
@@ -626,7 +649,7 @@
 /* Slightly thinner hard shadow so the offset doesn't dominate on narrow
    screens (mirrors ChallengeCard). */
 @media (max-width: 640px) {
-  .card {
+  .cardShell {
     --mc-shadow-offset: 5px;
   }
 }

@@ -1846,6 +1846,7 @@ export default function SqlChallengeCard({
         : "pending";
 
   return (
+    <div className={styles.cardShell}>
     <div
       className={styles.card}
       data-flavor="sql"
@@ -2235,6 +2236,7 @@ export default function SqlChallengeCard({
         />
       )}
 
+    </div>
     </div>
   );
 }

@@ -62,27 +62,55 @@
   --ch-font-mono:
     "JetBrains Mono", "Fira Code", ui-monospace, monospace;
   --ch-radius: 8px;
-  /* Neo-brutalist card lift: one hard, blur-less offset (no spread) instead
-     of a soft ambient shadow. Offset and colour are split into their own
-     tokens so the offset can thin on mobile (media query below) and the
-     colour can flip to a faint light tint in dark mode — the cards sit on a
-     near-black surface there, where a black offset would be invisible. */
-  --ch-shadow-offset: 6px;
-  --ch-shadow-color: color-mix(in srgb, var(--ds-black) 8%, transparent);
-  --ch-shadow:
-    var(--ch-shadow-offset) var(--ch-shadow-offset) 0 0 var(--ch-shadow-color);
 
   background: var(--ch-bg);
   border: 1px solid var(--ch-border);
   border-radius: var(--ch-radius);
-  box-shadow: var(--ch-shadow);
+  /* Elevation is painted by the striped `.cardShell::after` (below), not a
+     box-shadow, so the two never stack. `overflow: hidden` clips the card's
+     own rounded-corner content (header/editor/banner backgrounds) — which is
+     exactly why the offset stripe layer has to live on the shell instead, so
+     it can escape this clip. */
   overflow: hidden;
   font-family: var(--ch-font-ui);
   color: var(--ch-text);
   font-size: 14px;
   line-height: 1.5;
-  margin: 1rem 0;
   position: relative;
+}
+
+/* ── Striped hard-offset elevation ──────────────────────────────────────
+   Replaces the solid drop shadow with a diagonal-stripe texture painted in
+   the down-right offset gap — a "designed" elevation rather than a plain
+   shadow, while keeping the same hard-offset lift. The opaque `.card` sits
+   on top of this shell (negative z-index layer) and covers everything but
+   the offset sliver. Offset + colour reuse the prior shadow tokens so the
+   dark-mode tint and mobile thinning still apply; stripe width/period are
+   their own tokens for easy tuning. */
+.cardShell {
+  position: relative;
+  isolation: isolate; /* contain the z-index:-1 stripe layer to this subtree */
+  margin: 1rem 0;
+  --ch-shadow-offset: 6px;
+  --ch-shadow-color: color-mix(in srgb, var(--ds-black) 8%, transparent);
+  --ch-shadow-stripe: 2px; /* painted band width */
+  --ch-shadow-period: 6px; /* band + gap */
+}
+.cardShell::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: var(--ch-shadow-offset) calc(-1 * var(--ch-shadow-offset))
+    calc(-1 * var(--ch-shadow-offset)) var(--ch-shadow-offset);
+  border-radius: 8px; /* matches --ch-radius */
+  background: repeating-linear-gradient(
+    45deg,
+    var(--ch-shadow-color) 0,
+    var(--ch-shadow-color) var(--ch-shadow-stripe),
+    transparent var(--ch-shadow-stripe),
+    transparent var(--ch-shadow-period)
+  );
+  pointer-events: none;
 }
 
 /* ─── Header ──────────────────────────────────────────────────────── */
@@ -1312,9 +1340,9 @@
   .btnKbd {
     display: none;
   }
-  /* Slightly thinner hard shadow so the offset doesn't dominate the layout
-     on narrow screens. */
-  .card {
+  /* Slightly thinner offset so the striped elevation doesn't dominate on
+     narrow screens. */
+  .cardShell {
     --ch-shadow-offset: 5px;
   }
 }
@@ -2227,8 +2255,11 @@
   /* Badge inherits the dark-mode accent (the var() declared above
      auto-tracks --ch-accent), but bg/border need explicit dark tints. */
   --ch-overlay: color-mix(in srgb, var(--ds-black) 65%, transparent);
-  /* Flip the hard offset to a faint light tint so it stays visible against
-     the near-black card surface (a black offset would vanish here). */
+}
+
+/* Dark-mode stripe tint: light on the near-black surface (a black offset
+   would vanish). Set on the shell, which owns the striped elevation. */
+:global(html:is(.dark, [data-theme="dark"])) .cardShell {
   --ch-shadow-color: color-mix(in srgb, var(--ds-white) 10%, transparent);
 }
 
