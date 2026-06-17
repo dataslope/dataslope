@@ -491,6 +491,7 @@ export default function SqlCodeBlock({
     : null;
 
   return (
+    <div className={styles.cardShell}>
     <div
       className={styles.card}
       data-flavor="sql"
@@ -639,6 +640,7 @@ export default function SqlCodeBlock({
         />
       </div>
 
+    </div>
     </div>
   );
 }

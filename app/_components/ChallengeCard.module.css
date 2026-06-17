@@ -62,21 +62,57 @@
   --ch-font-mono:
     "JetBrains Mono", "Fira Code", ui-monospace, monospace;
   --ch-radius: 8px;
-  --ch-shadow:
-    0 1px 3px color-mix(in srgb, var(--ds-black) 8%, transparent),
-    0 1px 2px color-mix(in srgb, var(--ds-black) 5%, transparent);
 
   background: var(--ch-bg);
   border: 1px solid var(--ch-border);
   border-radius: var(--ch-radius);
-  box-shadow: var(--ch-shadow);
+  /* Elevation is painted by the striped `.cardShell::after` (below), not a
+     box-shadow, so the two never stack. `overflow: hidden` clips the card's
+     own rounded-corner content (header/editor/banner backgrounds) — which is
+     exactly why the offset stripe layer has to live on the shell instead, so
+     it can escape this clip. */
   overflow: hidden;
   font-family: var(--ch-font-ui);
   color: var(--ch-text);
   font-size: 14px;
   line-height: 1.5;
-  margin: 1rem 0;
   position: relative;
+}
+
+/* ── Striped hard-offset elevation ──────────────────────────────────────
+   Replaces the solid drop shadow with a diagonal-stripe texture painted in
+   the down-right offset gap — a "designed" elevation rather than a plain
+   shadow, while keeping the same hard-offset lift. The opaque `.card` sits
+   on top of this shell (negative z-index layer) and covers everything but
+   the offset sliver. Offset + colour reuse the prior shadow tokens so the
+   dark-mode tint and mobile thinning still apply; stripe width/period are
+   their own tokens for easy tuning. */
+.cardShell {
+  position: relative;
+  isolation: isolate; /* contain the z-index:-1 stripe layer to this subtree */
+  margin: 1rem 0;
+  --ch-shadow-offset: 6px;
+  --ch-shadow-color: color-mix(in srgb, var(--ds-black) 6%, transparent);
+  --ch-shadow-stripe: 1px; /* painted band width */
+  --ch-shadow-period: 4px; /* band + gap */
+  --ch-shadow-border-color: var(--ds-gray-200); /* matches --ch-border */
+}
+.cardShell::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: var(--ch-shadow-offset) calc(-1 * var(--ch-shadow-offset))
+    calc(-1 * var(--ch-shadow-offset)) var(--ch-shadow-offset);
+  border: 1px solid var(--ch-shadow-border-color);
+  border-radius: 8px; /* matches --ch-radius */
+  background: repeating-linear-gradient(
+    45deg,
+    var(--ch-shadow-color) 0,
+    var(--ch-shadow-color) var(--ch-shadow-stripe),
+    transparent var(--ch-shadow-stripe),
+    transparent var(--ch-shadow-period)
+  );
+  pointer-events: none;
 }
 
 /* ─── Header ──────────────────────────────────────────────────────── */
@@ -198,6 +234,12 @@
   margin: 0;
   display: flex;
   flex-direction: column;
+  /* A floating dialog keeps a soft, elevated drop shadow rather than the
+     inline cards' hard neo-brutalist offset (it sits over a dimmed backdrop,
+     not the page surface). */
+  box-shadow:
+    0 10px 30px color-mix(in srgb, var(--ds-black) 22%, transparent),
+    0 2px 8px color-mix(in srgb, var(--ds-black) 12%, transparent);
 }
 
 .modalHeader {
@@ -1002,7 +1044,7 @@
 }
 
 /* Light mode: match the dark-gray Submit button */
-:global(html:not(.dark)) .runBtnChevron {
+:global(html:not(.dark):not([data-theme="dark"])) .runBtnChevron {
   background: #1a1a1a;
 }
 
@@ -1010,7 +1052,7 @@
   background: var(--ch-accent-hover);
 }
 
-:global(html:not(.dark)) .runBtnChevron:hover:not(:disabled) {
+:global(html:not(.dark):not([data-theme="dark"])) .runBtnChevron:hover:not(:disabled) {
   background: #111111;
 }
 
@@ -1019,7 +1061,7 @@
   cursor: not-allowed;
 }
 
-:global(html:not(.dark)) .runBtnChevron:disabled {
+:global(html:not(.dark):not([data-theme="dark"])) .runBtnChevron:disabled {
   background: #8a8a8a;
 }
 
@@ -1027,7 +1069,7 @@
   background: var(--ch-accent-hover);
 }
 
-:global(html:not(.dark)) .runBtnChevron[data-popup-open] {
+:global(html:not(.dark):not([data-theme="dark"])) .runBtnChevron[data-popup-open] {
   background: #111111;
 }
 
@@ -1299,6 +1341,11 @@
 @media (max-width: 640px) {
   .btnKbd {
     display: none;
+  }
+  /* Slightly thinner offset so the striped elevation doesn't dominate on
+     narrow screens. */
+  .cardShell {
+    --ch-shadow-offset: 5px;
   }
 }
 
@@ -1907,7 +1954,7 @@
   font-family: var(--ch-font-ui);
 }
 
-:global(html.dark) .testPopover {
+:global(html:is(.dark, [data-theme="dark"])) .testPopover {
   --ch-bg: var(--color-fd-background, #121212);
   --ch-bg-subtle: color-mix(in srgb, var(--color-fd-background, #121212) 85%, #000000);
   --ch-border-light: #232323;
@@ -2165,11 +2212,16 @@
 }
 
 /* ─── Dark mode ───────────────────────────────────────────────────────
-   Fumadocs toggles a `.dark` class on `<html>`. We rebind the card's
-   CSS variables so the same selectors keep working — no extra rules
-   per element needed. Background matches `var(--color-fd-background)`
-   so the card surface blends with the surrounding learn-page chrome. */
-:global(html.dark) .card {
+   Two dark hooks are honoured so these cards theme correctly wherever
+   they're embedded, not just on /learn: `html.dark` (Fumadocs / next-themes,
+   the class strategy) and `html[data-theme="dark"]` (the attribute strategy
+   used by /playground — and whatever the home page's planned light/dark
+   toggle settles on). We rebind the card's CSS variables so the same
+   selectors keep working — no extra rules per element needed. Background
+   matches `var(--color-fd-background)` so the card surface blends with the
+   surrounding learn-page chrome (falling back to a neutral dark when those
+   Fumadocs vars aren't present, e.g. on the home page). */
+:global(html:is(.dark, [data-theme="dark"])) .card {
   /* Dark-theme additions to the Tailwind palette (the light tokens
      above are still available). All values come from the Tailwind
      palette so a future colour audit only has to look at these
@@ -2205,61 +2257,65 @@
   /* Badge inherits the dark-mode accent (the var() declared above
      auto-tracks --ch-accent), but bg/border need explicit dark tints. */
   --ch-overlay: color-mix(in srgb, var(--ds-black) 65%, transparent);
-  --ch-shadow:
-    0 1px 2px color-mix(in srgb, var(--ds-black) 50%, transparent),
-    0 1px 3px color-mix(in srgb, var(--ds-black) 40%, transparent);
+}
+
+/* Dark-mode stripe tint: light on the near-black surface (a black offset
+   would vanish). Set on the shell, which owns the striped elevation. */
+:global(html:is(.dark, [data-theme="dark"])) .cardShell {
+  --ch-shadow-color: color-mix(in srgb, var(--ds-white) 10%, transparent);
+  --ch-shadow-border-color: #2e2e2e; /* matches dark --ch-border */
 }
 
 /* Match CodeMirror editor background to page background in dark mode —
    the default dark theme sets #0d1117 which doesn't match #121212. */
-:global(html.dark) .editor :global(.cm-editor),
-:global(html.dark) .editor :global(.cm-scroller),
-:global(html.dark) .initEditor :global(.cm-editor),
-:global(html.dark) .initEditor :global(.cm-scroller),
-:global(html.dark) .modalEditor :global(.cm-editor),
-:global(html.dark) .modalEditor :global(.cm-scroller) {
+:global(html:is(.dark, [data-theme="dark"])) .editor :global(.cm-editor),
+:global(html:is(.dark, [data-theme="dark"])) .editor :global(.cm-scroller),
+:global(html:is(.dark, [data-theme="dark"])) .initEditor :global(.cm-editor),
+:global(html:is(.dark, [data-theme="dark"])) .initEditor :global(.cm-scroller),
+:global(html:is(.dark, [data-theme="dark"])) .modalEditor :global(.cm-editor),
+:global(html:is(.dark, [data-theme="dark"])) .modalEditor :global(.cm-scroller) {
   background-color: var(--ch-bg) !important;
 }
 
-:global(html.dark) .headerRuntimeLabel svg {
+:global(html:is(.dark, [data-theme="dark"])) .headerRuntimeLabel svg {
   color: #ffffff;
 }
 
-:global(html.dark) .instructionsBody code {
+:global(html:is(.dark, [data-theme="dark"])) .instructionsBody code {
   background: #252525;
   color: var(--ch-text);
 }
 
-:global(html.dark) .initToggle,
-:global(html.dark) .initHeaderStatic {
+:global(html:is(.dark, [data-theme="dark"])) .initToggle,
+:global(html:is(.dark, [data-theme="dark"])) .initHeaderStatic {
   color: var(--ds-gray-300);
 }
 
-:global(html.dark) .initToggle:hover {
+:global(html:is(.dark, [data-theme="dark"])) .initToggle:hover {
   color: #ffffff;
   background: var(--ch-bg-hover);
 }
 
-:global(html.dark) .initLabel {
+:global(html:is(.dark, [data-theme="dark"])) .initLabel {
   color: var(--ds-gray-300);
 }
 
-:global(html.dark) .initCollapseBtn {
+:global(html:is(.dark, [data-theme="dark"])) .initCollapseBtn {
   color: var(--ds-gray-300);
 }
 
-:global(html.dark) .initCollapseBtn:hover {
+:global(html:is(.dark, [data-theme="dark"])) .initCollapseBtn:hover {
   color: #ffffff;
   background: var(--ch-bg-hover);
 }
 
-:global(html.dark) .utilBtn:hover:not(:disabled),
-:global(html.dark) .copyBtn:hover {
+:global(html:is(.dark, [data-theme="dark"])) .utilBtn:hover:not(:disabled),
+:global(html:is(.dark, [data-theme="dark"])) .copyBtn:hover {
   background: var(--ch-bg-hover);
   color: var(--ch-text);
 }
 
-:global(html.dark) .kbd {
+:global(html:is(.dark, [data-theme="dark"])) .kbd {
   background: #252525;
   color: #b8b8b8;
   box-shadow: 0 1px 0 #0d0d0d;
@@ -2267,7 +2323,7 @@
 
 /* Keep the dropdown menu's kbd chips readable on the blue popup background
    in dark mode. */
-:global(html.dark) .runMenuKbd .kbd {
+:global(html:is(.dark, [data-theme="dark"])) .runMenuKbd .kbd {
   background: color-mix(in srgb, #ffffff 16%, transparent);
   border-color: color-mix(in srgb, #ffffff 28%, transparent);
   color: color-mix(in srgb, #ffffff 88%, transparent);
@@ -2277,20 +2333,20 @@
 /* Restore original blue accent for Run/Submit buttons in dark mode.
    The base style uses #1a1a1a for light-mode contrast; dark mode reverts
    to the standard accent (blue) so the button reads as a primary action. */
-:global(html.dark) .runBtn {
+:global(html:is(.dark, [data-theme="dark"])) .runBtn {
   background: var(--ds-blue-600);
 }
 
-:global(html.dark) .runBtn:hover:not(:disabled) {
+:global(html:is(.dark, [data-theme="dark"])) .runBtn:hover:not(:disabled) {
   background: var(--ds-blue-700);
 }
 
-:global(html.dark) .runBtn:disabled {
+:global(html:is(.dark, [data-theme="dark"])) .runBtn:disabled {
   background: var(--ds-blue-300);
 }
 
 
-:global(html.dark) .testPanelHeader:hover {
+:global(html:is(.dark, [data-theme="dark"])) .testPanelHeader:hover {
   background: #222222;
 }
 
@@ -2299,23 +2355,23 @@
    down to the 600 shades below so the fills sit more comfortably on
    dark surfaces. (The status banner is transparent with verdict-coloured
    text, so it adapts via the --ch-* tokens and needs nothing here.) */
-:global(html.dark) .testPill[data-state="pass"] {
+:global(html:is(.dark, [data-theme="dark"])) .testPill[data-state="pass"] {
   background: var(--ds-green-600);
 }
 
-:global(html.dark) .testPill[data-state="fail"] {
+:global(html:is(.dark, [data-theme="dark"])) .testPill[data-state="fail"] {
   background: var(--ds-red-600);
 }
 
-:global(html.dark) .testRailNode[data-state="pass"],
-:global(html.dark) .testRailSeg[data-state="pass"],
-:global(html.dark) .testPopoverStateDot[data-state="pass"] {
+:global(html:is(.dark, [data-theme="dark"])) .testRailNode[data-state="pass"],
+:global(html:is(.dark, [data-theme="dark"])) .testRailSeg[data-state="pass"],
+:global(html:is(.dark, [data-theme="dark"])) .testPopoverStateDot[data-state="pass"] {
   background: var(--ds-green-600);
 }
 
-:global(html.dark) .testRailNode[data-state="fail"],
-:global(html.dark) .testRailSeg[data-state="fail"],
-:global(html.dark) .testPopoverStateDot[data-state="fail"] {
+:global(html:is(.dark, [data-theme="dark"])) .testRailNode[data-state="fail"],
+:global(html:is(.dark, [data-theme="dark"])) .testRailSeg[data-state="fail"],
+:global(html:is(.dark, [data-theme="dark"])) .testPopoverStateDot[data-state="fail"] {
   background: var(--ds-red-600);
 }
 
@@ -2557,7 +2613,7 @@
   color: var(--ds-gray-900);
 }
 
-:global(html.dark) .tableViewerEmpty code {
+:global(html:is(.dark, [data-theme="dark"])) .tableViewerEmpty code {
   background: #252525;
   color: #e0e0e0;
 }

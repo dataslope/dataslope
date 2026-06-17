@@ -1593,6 +1593,7 @@ export default function ChallengeCard({
   }, [solutionFiles]);
 
   return (
+    <div className={styles.cardShell}>
     <div
       ref={cardRef}
       className={styles.card}
@@ -2168,6 +2169,7 @@ export default function ChallengeCard({
         />
       )}
 
+    </div>
     </div>
   );
 }
