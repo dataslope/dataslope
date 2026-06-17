@@ -568,7 +568,7 @@ target column \`passed\`. The features are already separated for you into
 3. Fit \`pipe\` on \`X_train\`, \`y_train\` (the split is done for you).
 4. Store the pipeline's test accuracy (via \`.score\`) in \`test_acc\`.
 
-The hidden tests check that \`pipe\` is a fitted \`Pipeline\` whose final step
+The tests check that \`pipe\` is a fitted \`Pipeline\` whose final step
 is a \`LogisticRegression\`, that its preprocessing step is a
 \`ColumnTransformer\`, that the transformer outputs the right number of columns
 (2 scaled numeric + one column per distinct subject), and that \`test_acc\` is

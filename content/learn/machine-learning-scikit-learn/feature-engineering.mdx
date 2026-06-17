@@ -436,7 +436,7 @@ room**, which is not any single raw column.
 3. For comparison, store the correlation between raw \`total_sqft\` and
    \`price\` in \`corr_raw\` (use \`df["total_sqft"].corr(df["price"])\`).
 
-The hidden tests check that \`sqft_per_room\` was computed correctly for
+The tests check that \`sqft_per_room\` was computed correctly for
 every row, that it is a new column in \`df\`, and that the engineered feature
 correlates with price more strongly than raw \`total_sqft\` does (showing the
 ratio exposes the signal better).`}

@@ -472,7 +472,7 @@ so unscaled KNN does poorly — and scaling fixes it. Show both.
    KNeighborsClassifier(n_neighbors=5))\`, fit it on the training data, and
    store its test accuracy in \`scaled_acc\`. Name the pipeline \`pipe\`.
 
-The hidden tests check that \`pipe\` really contains a \`StandardScaler\`,
+The tests check that \`pipe\` really contains a \`StandardScaler\`,
 that the scaled accuracy is high (above 0.92), and — the key lesson — that
 scaling improved the test accuracy (\`scaled_acc > raw_acc\`).`}
   files={[
