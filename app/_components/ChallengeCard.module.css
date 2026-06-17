@@ -92,9 +92,10 @@
   isolation: isolate; /* contain the z-index:-1 stripe layer to this subtree */
   margin: 1rem 0;
   --ch-shadow-offset: 6px;
-  --ch-shadow-color: color-mix(in srgb, var(--ds-black) 8%, transparent);
-  --ch-shadow-stripe: 2px; /* painted band width */
-  --ch-shadow-period: 6px; /* band + gap */
+  --ch-shadow-color: color-mix(in srgb, var(--ds-black) 6%, transparent);
+  --ch-shadow-stripe: 1px; /* painted band width */
+  --ch-shadow-period: 4px; /* band + gap */
+  --ch-shadow-border-color: var(--ds-gray-200); /* matches --ch-border */
 }
 .cardShell::after {
   content: "";
@@ -102,9 +103,10 @@
   z-index: -1;
   inset: var(--ch-shadow-offset) calc(-1 * var(--ch-shadow-offset))
     calc(-1 * var(--ch-shadow-offset)) var(--ch-shadow-offset);
+  border: 1px solid var(--ch-shadow-border-color);
   border-radius: 8px; /* matches --ch-radius */
   background: repeating-linear-gradient(
-    45deg,
+    90deg,
     var(--ch-shadow-color) 0,
     var(--ch-shadow-color) var(--ch-shadow-stripe),
     transparent var(--ch-shadow-stripe),
@@ -2261,6 +2263,7 @@
    would vanish). Set on the shell, which owns the striped elevation. */
 :global(html:is(.dark, [data-theme="dark"])) .cardShell {
   --ch-shadow-color: color-mix(in srgb, var(--ds-white) 10%, transparent);
+  --ch-shadow-border-color: #2e2e2e; /* matches dark --ch-border */
 }
 
 /* Match CodeMirror editor background to page background in dark mode —

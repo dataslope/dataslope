@@ -51,9 +51,10 @@
   isolation: isolate;
   margin: 1rem 0;
   --mc-shadow-offset: 6px;
-  --mc-shadow-color: color-mix(in srgb, var(--ds-black) 8%, transparent);
-  --mc-shadow-stripe: 2px;
-  --mc-shadow-period: 6px;
+  --mc-shadow-color: color-mix(in srgb, var(--ds-black) 6%, transparent);
+  --mc-shadow-stripe: 1px;
+  --mc-shadow-period: 4px;
+  --mc-shadow-border-color: var(--ds-gray-200); /* matches --mc-border */
 }
 .cardShell::after {
   content: "";
@@ -61,9 +62,10 @@
   z-index: -1;
   inset: var(--mc-shadow-offset) calc(-1 * var(--mc-shadow-offset))
     calc(-1 * var(--mc-shadow-offset)) var(--mc-shadow-offset);
+  border: 1px solid var(--mc-shadow-border-color);
   border-radius: 8px; /* matches --mc-radius */
   background: repeating-linear-gradient(
-    45deg,
+    90deg,
     var(--mc-shadow-color) 0,
     var(--mc-shadow-color) var(--mc-shadow-stripe),
     transparent var(--mc-shadow-stripe),
@@ -525,6 +527,7 @@
 /* Dark-mode stripe tint (set on the shell, which owns the elevation). */
 :global(html:is(.dark, [data-theme="dark"])) .cardShell {
   --mc-shadow-color: color-mix(in srgb, var(--ds-white) 10%, transparent);
+  --mc-shadow-border-color: #2e2e2e; /* matches dark --mc-border */
 }
 
 :global(html:is(.dark, [data-theme="dark"])) .choice[data-verdict="correct-selected"],
