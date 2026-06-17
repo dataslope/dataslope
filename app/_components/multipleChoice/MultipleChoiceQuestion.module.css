@@ -65,7 +65,7 @@
   border: 1px solid var(--mc-shadow-border-color);
   border-radius: 8px; /* matches --mc-radius */
   background: repeating-linear-gradient(
-    135deg,
+    45deg,
     var(--mc-shadow-color) 0,
     var(--mc-shadow-color) var(--mc-shadow-stripe),
     transparent var(--mc-shadow-stripe),
