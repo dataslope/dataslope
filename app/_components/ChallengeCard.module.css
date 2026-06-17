@@ -106,7 +106,7 @@
   border: 1px solid var(--ch-shadow-border-color);
   border-radius: 8px; /* matches --ch-radius */
   background: repeating-linear-gradient(
-    90deg,
+    135deg,
     var(--ch-shadow-color) 0,
     var(--ch-shadow-color) var(--ch-shadow-stripe),
     transparent var(--ch-shadow-stripe),
