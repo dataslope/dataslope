@@ -2595,6 +2595,87 @@
   100% { opacity: 0; }
 }
 
+/* ─── "Result is above the editor" arrow hint ─────────────────────────
+   Shown only while the Result tab is active. SQL blocks surface run
+   output as a tab in the table view ABOVE the editor (unlike the non-SQL
+   code blocks, whose output sits below it), which a learner new to the UI
+   can miss. This curved arrow sweeps from the editor's top-right up to the
+   result table's bottom-right to point that out.
+
+   `.editorArrowAnchor` is the positioning context: it wraps the CodeMirror
+   host so the arrow can be anchored to the editor's top edge without being
+   a child of CodeMirror's scroller — hence scrolling the query never moves
+   it. The arrow extends upward past the editor's top edge (negative `top`)
+   to overlap the result panel; the card's own `overflow: hidden` keeps it
+   within the card. Decorative + click-through so it never blocks editing
+   or the result table's scrollbar. */
+.editorArrowAnchor {
+  position: relative;
+}
+
+.resultLocationArrow {
+  position: absolute;
+  top: -56px;
+  right: 14px;
+  width: 54px;
+  height: 108px;
+  /* Sit above the result panel (static) and the editor (sibling) below. */
+  z-index: 3;
+  color: var(--ch-accent);
+  pointer-events: none;
+  animation: ch-result-arrow-in 0.32s ease-out both;
+}
+
+.resultLocationArrowSvg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  /* Gentle bob to draw the eye upward toward the result; the fade-in on
+     the container runs first, then this loops. */
+  animation: ch-result-arrow-bob 1.9s ease-in-out 0.32s infinite;
+  filter: drop-shadow(
+    0 1px 1.5px color-mix(in srgb, var(--ds-black) 22%, transparent)
+  );
+}
+
+.resultLocationArrowShaft,
+.resultLocationArrowHead {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 4.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@keyframes ch-result-arrow-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ch-result-arrow-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resultLocationArrow,
+  .resultLocationArrowSvg {
+    animation: none;
+  }
+}
+
 .tableViewerEmpty {
   margin: 0 14px 12px;
   padding: 10px 12px;

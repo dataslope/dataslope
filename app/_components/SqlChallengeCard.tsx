@@ -1110,6 +1110,9 @@ export default function SqlChallengeCard({
   const [bannerState, setBannerState] = useState<"pass" | "fail" | null>(null);
   const [isFormatting, setIsFormatting] = useState(false);
   const [resultRunSeq, setResultRunSeq] = useState(0);
+  // True while the Result tab is the active view, driving the arrow hint
+  // that points from the editor up to the result panel above it.
+  const [showResultArrow, setShowResultArrow] = useState(false);
   const toasts = useChallengeToasts();
 
   const isMac = useSyncExternalStore(
@@ -1919,15 +1922,22 @@ export default function SqlChallengeCard({
           onLoadMore={loadMoreActiveTable}
           resultTabData={resultTabDataProp}
           bootState={bootState}
+          onResultActiveChange={setShowResultArrow}
         />
       )}
 
       {/* ── Editor ── */}
-      <div
-        className={styles.editor}
-        ref={editorHostRef}
-        aria-label="SQL solution editor"
-      />
+      {/* Anchor wraps the CodeMirror host so the result-location arrow can
+          be positioned against the editor's top-right without being a child
+          of the host element CodeMirror mounts into. */}
+      <div className={styles.editorArrowAnchor}>
+        <div
+          className={styles.editor}
+          ref={editorHostRef}
+          aria-label="SQL solution editor"
+        />
+        {showResultArrow && <ResultLocationArrow />}
+      </div>
 
       {/* ── Action bar ── */}
       <div className={styles.actionBar} role="toolbar" aria-label="Challenge controls">
@@ -2615,6 +2625,46 @@ export function TableViewerSkeleton() {
   );
 }
 
+/**
+ * Curved "look up here" arrow shown only while the Result tab is active.
+ *
+ * SQL blocks render the run output as a *tab in the table view above* the
+ * editor — unlike the non-SQL code blocks, whose output sits below the
+ * editor. A learner new to the UI can miss that, so this hint sweeps from
+ * the editor's top-right up to the result table's bottom-right.
+ *
+ * It's purely decorative (`aria-hidden`, `pointer-events: none`) and is
+ * positioned absolutely against the editor wrapper — never inside
+ * CodeMirror's own scroller — so scrolling the query doesn't move it.
+ */
+export function ResultLocationArrow() {
+  return (
+    <span
+      className={styles.resultLocationArrow}
+      data-testid="result-location-arrow"
+      aria-hidden="true"
+    >
+      <svg
+        viewBox="0 0 64 128"
+        className={styles.resultLocationArrowSvg}
+        fill="none"
+      >
+        {/* Shaft: sweeps up from the editor (bottom) with a gentle leftward
+            belly, ending at the arrowhead tip pointing up toward the result. */}
+        <path
+          className={styles.resultLocationArrowShaft}
+          d="M46 118 C20 96, 24 40, 48 10"
+        />
+        {/* Arrowhead at the tip (48,10), barbs trailing down toward the editor. */}
+        <path
+          className={styles.resultLocationArrowHead}
+          d="M34 16 L48 10 L45 25"
+        />
+      </svg>
+    </span>
+  );
+}
+
 /** The always-visible "Tables" panel shared by `<SqlChallengeCard>` and
  *  `<SqlCodeBlock>`. Shows a loading skeleton until the first table
  *  list is fetched, then a tab bar (styled to match the non-SQL code
@@ -2629,6 +2679,7 @@ export function TableViewer({
   onLoadMore,
   resultTabData,
   bootState,
+  onResultActiveChange,
 }: {
   dialect: SqlDialect;
   entries: TableViewerEntry[];
@@ -2642,6 +2693,12 @@ export function TableViewer({
    *  in the result area for table-less blocks) so SQL matches the other
    *  runtimes' first-run loading affordance. */
   bootState?: SqlEngineBootState | null;
+  /** Notified whenever the Result tab becomes the active, visible view
+   *  (vs. one of the table tabs, or dismissed). Lets the parent render
+   *  the "result is above the editor" arrow hint only while the Result
+   *  tab is showing — the parent owns the editor element the arrow is
+   *  anchored to, which lives outside this component. */
+  onResultActiveChange?: (active: boolean) => void;
 }) {
   const [resultTabDismissed, setResultTabDismissed] = useState(false);
   const [resultIsActive, setResultIsActive] = useState(false);
@@ -2664,6 +2721,19 @@ export function TableViewer({
   }, [resultTabData]);
 
   const resultTabVisible = resultTabData != null && !resultTabDismissed;
+  // Whether the Result tab is the currently-shown view. Surfaced to the
+  // parent so it can render the arrow hint pointing from the editor up to
+  // this result panel — and only while that panel is actually visible.
+  const resultArrowActive = resultIsActive && resultTabVisible;
+  useEffect(() => {
+    onResultActiveChange?.(resultArrowActive);
+  }, [resultArrowActive, onResultActiveChange]);
+  // Reset the hint on unmount so a parent that keeps the flag in state
+  // doesn't leave a stale arrow behind when the viewer goes away.
+  useEffect(
+    () => () => onResultActiveChange?.(false),
+    [onResultActiveChange],
+  );
   // While the engine cold-boots there are no tables (and any result tab
   // is only showing "Running…"), so the boot loader takes the panel —
   // mirroring how the non-SQL blocks show the notice before first output.

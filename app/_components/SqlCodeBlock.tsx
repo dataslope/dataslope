@@ -57,6 +57,7 @@ import {
 import styles from "./ChallengeCard.module.css";
 import {
   DialectGlyph,
+  ResultLocationArrow,
   sqlFormatterLanguage,
   TableViewer,
   useSqlEngineBoot,
@@ -151,6 +152,9 @@ export default function SqlCodeBlock({
   const [elapsed, setElapsed] = useState<string>("");
   const [isFormatting, setIsFormatting] = useState(false);
   const [resultRunSeq, setResultRunSeq] = useState(0);
+  // True while the Result tab is the active view, driving the arrow hint
+  // that points from the editor up to the result panel above it.
+  const [showResultArrow, setShowResultArrow] = useState(false);
   const toasts = useChallengeToasts();
 
   const isMac = useSyncExternalStore(
@@ -531,15 +535,22 @@ export default function SqlCodeBlock({
           onLoadMore={loadMoreActiveTable}
           resultTabData={resultTabDataProp}
           bootState={bootState}
+          onResultActiveChange={setShowResultArrow}
         />
       )}
 
       {/* ── Editor ── */}
-      <div
-        className={styles.editor}
-        ref={editorHostRef}
-        aria-label="SQL editor"
-      />
+      {/* Anchor wraps the CodeMirror host so the result-location arrow can
+          be positioned against the editor's top-right without being a child
+          of the host element CodeMirror mounts into. */}
+      <div className={styles.editorArrowAnchor}>
+        <div
+          className={styles.editor}
+          ref={editorHostRef}
+          aria-label="SQL editor"
+        />
+        {showResultArrow && <ResultLocationArrow />}
+      </div>
 
       {/* ── Action bar ── */}
       <div className={styles.actionBar} role="toolbar" aria-label="SQL controls">
