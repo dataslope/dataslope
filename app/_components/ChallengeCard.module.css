@@ -2595,6 +2595,83 @@
   100% { opacity: 0; }
 }
 
+/* ─── Result table border beam ──────────────────────────────────────────
+   An animated beam of light that travels around the result table's border
+   so it reads as distinct from the seeded database tables next to it.
+   Reproduces the Magic UI "Border Beam" effect — a gradient ray riding an
+   `offset-path` rectangle, revealed only over a transparent border via an
+   intersect mask — in plain CSS so it works on the Tailwind-free `/learn`
+   route. Brand coloured (blue ⇄ teal) so the highlight stays on palette.
+   `.resultPane` is `position: relative; overflow: hidden`, which contains
+   and clips the beam. */
+.resultBeam {
+  --beam-width: 1.5px;
+  --beam-size: 120px;
+  --beam-duration: 7s;
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  border: var(--beam-width) solid transparent;
+  /* Paint only the (transparent) border ring: a fully transparent
+     padding-box mask layer intersected with an opaque border-box layer
+     leaves just the border band of this element — and its rays — visible. */
+  -webkit-mask-image: linear-gradient(transparent, transparent),
+    linear-gradient(#000, #000);
+  -webkit-mask-clip: padding-box, border-box;
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(transparent, transparent),
+    linear-gradient(#000, #000);
+  mask-clip: padding-box, border-box;
+  mask-composite: intersect;
+}
+
+.resultBeamRay {
+  position: absolute;
+  aspect-ratio: 1 / 1;
+  width: var(--beam-size);
+  /* Comet tail: solid brand colour at the head, fading to transparent. */
+  background: linear-gradient(
+    to left,
+    var(--ds-blue),
+    var(--ds-teal),
+    transparent
+  );
+  offset-path: rect(0 auto auto 0 round var(--beam-size));
+  animation: result-beam-travel var(--beam-duration) linear infinite;
+}
+
+/* A second ray of the opposite hue, offset half a lap, so the border keeps
+   a highlight somewhere along its run rather than going dark between passes. */
+.resultBeamRayAlt {
+  background: linear-gradient(
+    to left,
+    var(--ds-teal),
+    var(--ds-blue),
+    transparent
+  );
+  animation-delay: calc(var(--beam-duration) / -2);
+}
+
+@keyframes result-beam-travel {
+  from {
+    offset-distance: 0%;
+  }
+  to {
+    offset-distance: 100%;
+  }
+}
+
+/* Respect reduced-motion: drop the travelling rays entirely (a frozen comet
+   parked in one corner would just read as a stray blob). The Result tab is
+   still labelled, so nothing is lost. */
+@media (prefers-reduced-motion: reduce) {
+  .resultBeamRay {
+    display: none;
+  }
+}
+
 .tableViewerEmpty {
   margin: 0 14px 12px;
   padding: 10px 12px;

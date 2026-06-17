@@ -2758,6 +2758,14 @@ export function TableViewer({
               className={`${styles.resultPane}${resultTabData.loading ? ` ${styles.resultPaneBusy}` : ""}`}
               style={{ position: "relative" }}
             >
+              {/* Brand-coloured border beam — distinguishes the result
+                  table from the seeded database tables. See `.resultBeam`. */}
+              <div className={styles.resultBeam} aria-hidden="true">
+                <span className={styles.resultBeamRay} />
+                <span
+                  className={`${styles.resultBeamRay} ${styles.resultBeamRayAlt}`}
+                />
+              </div>
               {flashKey > 0 && (
                 <div key={flashKey} className={styles.resultFlashOverlay} aria-hidden />
               )}
