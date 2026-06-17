@@ -1552,8 +1552,16 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     // switch, new-file, duplicate, or close-all action. The Settings
     // tab is handled above (early return), so we never steal focus
     // from the settings form here.
+    //
+    // Hold off while the boot overlay still covers the screen: on mobile,
+    // focusing CodeMirror pops the on-screen keyboard, which would slide up
+    // over the loading screen for no use. `showLoadingOverlay` is in the
+    // deps so that once the overlay unmounts this effect re-runs and the
+    // editor takes focus — the keyboard appears only after the loading
+    // screen is gone.
+    if (showLoadingOverlay) return;
     view.focus();
-  }, [activeFileId, activeTabId, workspaceReady]);
+  }, [activeFileId, activeTabId, workspaceReady, showLoadingOverlay]);
 
   // Push word-wrap changes into CodeMirror after init.
   useEffect(() => {

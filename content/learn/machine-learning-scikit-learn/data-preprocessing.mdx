@@ -481,7 +481,7 @@ scales. Scale them **without leaking the test set**.
    scaler to both — do not fit it again on the test set.
 4. Store the mean of \`X_train_scaled\` in \`train_mean\`.
 
-The hidden tests check that the scaler was fit on the training set (so the
+The tests check that the scaler was fit on the training set (so the
 training mean is ~0), that the test set was transformed with the *same*
 scaler (so its mean is close to but not exactly 0), and that the shapes are
 unchanged.`}

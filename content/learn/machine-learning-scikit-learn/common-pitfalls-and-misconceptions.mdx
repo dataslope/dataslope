@@ -493,7 +493,7 @@ the right way.
    \`cross_val_score(...).mean()\`).
 
 By scaling **inside** the pipeline, each fold is scaled using only its own
-training portion — no leakage. The hidden tests check that \`pipe\` is a
+training portion — no leakage. The tests check that \`pipe\` is a
 proper two-step pipeline (so scaling happens inside cross-validation) and
 that \`correct_cv\` is a believable accuracy.`}
   files={[
@@ -569,7 +569,7 @@ predictions are in \`pred\`.
 
 You should find a high \`acc\` next to a \`rare_recall\` of 0.0 — the model
 looks great on accuracy yet catches none of the cases that matter. The
-hidden tests check that \`acc\` is high (above 0.9) while \`rare_recall\`
+tests check that \`acc\` is high (above 0.9) while \`rare_recall\`
 is exactly 0.0, demonstrating the trap.`}
   files={[
     {

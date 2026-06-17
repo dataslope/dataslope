@@ -486,7 +486,7 @@ not assert relationships the world does not contain.
 3. Store the encoder's output column names (from
    \`get_feature_names_out()\`) in \`columns\` (as a list).
 
-The hidden tests check that \`encoded\` has one row per original row, that
+The tests check that \`encoded\` has one row per original row, that
 the total number of one-hot columns equals the number of distinct categories
 across both features, that the encoded values are only 0s and 1s, and that
 each row sums to exactly 2 (one '1' for fruit, one '1' for country).`}
