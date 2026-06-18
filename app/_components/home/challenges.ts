@@ -17,6 +17,8 @@ export interface HomeCodeChallenge {
   title: string;
   instructions: string;
   files: ChallengeFile[];
+  /** Entry file for multi-file workspaces (the one with `main`). */
+  entryFilename?: string;
   tests: ChallengeTest[];
 }
 
@@ -37,10 +39,19 @@ function greetInstructions(printPhrase: string): string {
 Don't hardcode the whole string — a variable \`name\` is already set to \`"Grace"\`. Build the greeting from it using ${printPhrase}.`;
 }
 
+function greetMultiFile(file: string, callPhrase: string): string {
+  return `Open \`${file}\` and implement \`greet\` so the program prints exactly:
+
+\`Hello, Grace!\`
+
+\`Main\` is provided — it ${callPhrase} and prints the result.`;
+}
+
 /**
- * The non-SQL code challenges, keyed by adapter id. Every challenge is the
- * same tiny "greet a name" task so the dropdown stays a quick taster; each
- * is graded purely on stdout, so it works across every runtime.
+ * The non-SQL code challenges, in dropdown order. The single-file languages
+ * share the same "greet a name" task (graded on stdout, so it works on every
+ * runtime); Java and C# use a small two-file workspace to show multi-file
+ * support.
  */
 export const CODE_CHALLENGES: HomeCodeChallenge[] = [
   {
@@ -53,6 +64,20 @@ export const CODE_CHALLENGES: HomeCodeChallenge[] = [
         filename: "main.py",
         starterCode: 'name = "Grace"\n# your code here\n',
         solutionCode: 'name = "Grace"\nprint(f"Hello, {name}!")\n',
+      },
+    ],
+    tests: GREETING_TESTS,
+  },
+  {
+    adapter: "r",
+    label: "R",
+    title: "Greet a name",
+    instructions: greetInstructions("`paste0()` / `sprintf()` with `cat()`"),
+    files: [
+      {
+        filename: "main.R",
+        starterCode: 'name <- "Grace"\n# your code here\n',
+        solutionCode: 'name <- "Grace"\ncat(sprintf("Hello, %s!\\n", name))\n',
       },
     ],
     tests: GREETING_TESTS,
@@ -87,31 +112,15 @@ export const CODE_CHALLENGES: HomeCodeChallenge[] = [
     tests: GREETING_TESTS,
   },
   {
-    adapter: "r",
-    label: "R",
+    adapter: "php",
+    label: "PHP",
     title: "Greet a name",
-    instructions: greetInstructions("`paste0()` / `sprintf()` with `cat()`"),
+    instructions: greetInstructions("`echo` with string interpolation"),
     files: [
       {
-        filename: "main.R",
-        starterCode: 'name <- "Grace"\n# your code here\n',
-        solutionCode: 'name <- "Grace"\ncat(sprintf("Hello, %s!\\n", name))\n',
-      },
-    ],
-    tests: GREETING_TESTS,
-  },
-  {
-    adapter: "cpp",
-    label: "C++",
-    title: "Greet a name",
-    instructions: greetInstructions("`std::cout` and the `<<` operator"),
-    files: [
-      {
-        filename: "main.cpp",
-        starterCode:
-          '#include <iostream>\n#include <string>\n\nint main() {\n    std::string name = "Grace";\n    // your code here\n    return 0;\n}\n',
-        solutionCode:
-          '#include <iostream>\n#include <string>\n\nint main() {\n    std::string name = "Grace";\n    std::cout << "Hello, " << name << "!" << std::endl;\n    return 0;\n}\n',
+        filename: "main.php",
+        starterCode: '<?php\n$name = "Grace";\n// your code here\n',
+        solutionCode: '<?php\n$name = "Grace";\necho "Hello, $name!\\n";\n',
       },
     ],
     tests: GREETING_TESTS,
@@ -133,15 +142,61 @@ export const CODE_CHALLENGES: HomeCodeChallenge[] = [
     tests: GREETING_TESTS,
   },
   {
-    adapter: "php",
-    label: "PHP",
+    adapter: "cpp",
+    label: "C++",
     title: "Greet a name",
-    instructions: greetInstructions("`echo` with string interpolation"),
+    instructions: greetInstructions("`std::cout` and the `<<` operator"),
     files: [
       {
-        filename: "main.php",
-        starterCode: '<?php\n$name = "Grace";\n// your code here\n',
-        solutionCode: '<?php\n$name = "Grace";\necho "Hello, $name!\\n";\n',
+        filename: "main.cpp",
+        starterCode:
+          '#include <iostream>\n#include <string>\n\nint main() {\n    std::string name = "Grace";\n    // your code here\n    return 0;\n}\n',
+        solutionCode:
+          '#include <iostream>\n#include <string>\n\nint main() {\n    std::string name = "Grace";\n    std::cout << "Hello, " << name << "!" << std::endl;\n    return 0;\n}\n',
+      },
+    ],
+    tests: GREETING_TESTS,
+  },
+  {
+    adapter: "java",
+    label: "Java",
+    title: "Greet a name",
+    instructions: greetMultiFile("Greeter.java", "constructs a `Greeter`"),
+    entryFilename: "Main.java",
+    files: [
+      {
+        filename: "Main.java",
+        starterCode:
+          'public class Main {\n  public static void main(String[] args) {\n    Greeter greeter = new Greeter();\n    System.out.println(greeter.greet("Grace"));\n  }\n}\n',
+      },
+      {
+        filename: "Greeter.java",
+        starterCode:
+          'public class Greeter {\n  public String greet(String name) {\n    // your code here\n    return "";\n  }\n}\n',
+        solutionCode:
+          'public class Greeter {\n  public String greet(String name) {\n    return "Hello, " + name + "!";\n  }\n}\n',
+      },
+    ],
+    tests: GREETING_TESTS,
+  },
+  {
+    adapter: "csharp",
+    label: "C#",
+    title: "Greet a name",
+    instructions: greetMultiFile("Greeter.cs", "constructs a `Greeter`"),
+    entryFilename: "Main.cs",
+    files: [
+      {
+        filename: "Main.cs",
+        starterCode:
+          'var greeter = new Greeter();\nSystem.Console.WriteLine(greeter.Greet("Grace"));\n',
+      },
+      {
+        filename: "Greeter.cs",
+        starterCode:
+          'public class Greeter\n{\n    public string Greet(string name)\n    {\n        // your code here\n        return "";\n    }\n}\n',
+        solutionCode:
+          'public class Greeter\n{\n    public string Greet(string name)\n    {\n        return $"Hello, {name}!";\n    }\n}\n',
       },
     ],
     tests: GREETING_TESTS,
@@ -221,8 +276,8 @@ function employeesChallenge(
 }
 
 export const SQL_CHALLENGES: HomeSqlChallenge[] = [
-  employeesChallenge("postgres", "PostgreSQL"),
   employeesChallenge("sqlite", "SQLite"),
+  employeesChallenge("postgres", "PostgreSQL"),
   employeesChallenge("duckdb", "DuckDB"),
 ];
 

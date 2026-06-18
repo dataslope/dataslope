@@ -95,6 +95,7 @@ import {
   getStoredEditorTheme,
   setStoredEditorTheme,
 } from "./playgroundTheme";
+import { usePlaygroundThemeSync } from "./playgroundThemeSync";
 import {
   DEFAULT_PLAYGROUND_SETTINGS,
   DataslopeRunOverlay,
@@ -1628,6 +1629,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [adapter.id],
   );
+  // Follow the site-wide light/dark choice (shared with the home page + /learn).
+  usePlaygroundThemeSync(setEditorTheme);
 
   const setWordWrap = useCallback(
     (b: boolean) => {
@@ -3000,7 +3003,10 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                     </span>
                   ) : null;
                 })()}
-                <Select.Value />
+                <Select.Value>
+                  {PLAYGROUNDS.find((p) => p.id === adapter.id)?.label ??
+                    adapter.id}
+                </Select.Value>
                 <Select.Icon className="playground-switcher-icon">
                   <svg viewBox="0 0 12 12" width={10} height={10}>
                     <polyline

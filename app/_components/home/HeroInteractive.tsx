@@ -83,7 +83,11 @@ function PickerSelect({
       >
         <Select.Trigger className="inline-flex min-w-40 items-center gap-2 rounded-lg border border-[var(--ds-gray-200)] bg-white px-3 py-1.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:border-[var(--ds-blue-300)] focus-visible:border-[var(--ds-blue-500)] focus-visible:outline-none dark:border-white/15 dark:bg-white/5 dark:text-[var(--ds-gray-100)]">
           {active && <OptionIcon id={active.iconId} />}
-          <Select.Value className="flex-1 text-left" />
+          {/* Render the label explicitly — a bare <Select.Value/> shows the
+              raw (lowercased) value instead of the option's label. */}
+          <Select.Value className="flex-1 truncate text-left">
+            {active?.label ?? value}
+          </Select.Value>
           <Select.Icon className="text-[var(--ds-gray-400)]">
             <ChevronDown size={14} />
           </Select.Icon>
@@ -135,6 +139,7 @@ function CodeChallengePanel() {
         title={challenge.title}
         instructions={challenge.instructions}
         files={challenge.files}
+        entryFilename={challenge.entryFilename}
         tests={challenge.tests}
       />
     </div>

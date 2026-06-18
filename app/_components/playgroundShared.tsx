@@ -13,18 +13,15 @@ import { Tabs } from "@base-ui-components/react/tabs";
 import {
   ALargeSmall,
   Eraser,
-  Palette,
+  Moon,
   RotateCcw,
   Sliders,
   Trash2,
   WrapText,
   X,
 } from "lucide-react";
-import {
-  ALL_THEMES,
-  THEME_PALETTES,
-  type ThemePalette,
-} from "./playgroundTheme";
+import type { ThemePalette } from "./playgroundTheme";
+import { setSiteTheme } from "./siteTheme";
 import type { RuntimeInfo } from "./types";
 
 /** Built-in defaults for the per-language playground settings. Used
@@ -360,12 +357,10 @@ export function SettingsPanelContent({
   outputFontSize,
   setOutputFontSize,
   editorTheme,
-  setEditorTheme,
   wordWrap,
   setWordWrap,
   clearBeforeRun,
   setClearBeforeRun,
-  language,
   outputFontSizeLabel,
   showOutputFontSizeControls = true,
   clearBeforeRunLabel,
@@ -409,10 +404,6 @@ export function SettingsPanelContent({
         <Tabs.Tab value="general" className="settings-tab">
           <Sliders size={14} aria-hidden="true" />
           <span className="settings-tab-label">General</span>
-        </Tabs.Tab>
-        <Tabs.Tab value="themes" className="settings-tab">
-          <Palette size={14} aria-hidden="true" />
-          <span className="settings-tab-label">Themes</span>
         </Tabs.Tab>
         {extraTabs?.map((t) => (
           <Tabs.Tab key={t.value} value={t.value} className="settings-tab">
@@ -526,6 +517,24 @@ export function SettingsPanelContent({
             </div>
           )}
 
+          <div className="setting-row">
+            <label className="setting-switch-row">
+              <span className="setting-switch-label">
+                <Moon size={14} aria-hidden="true" />
+                <span>Dark Theme</span>
+              </span>
+              <Switch.Root
+                checked={editorTheme === "github-dark"}
+                onCheckedChange={(checked) =>
+                  setSiteTheme(checked ? "dark" : "light")
+                }
+                className="bui-switch"
+              >
+                <Switch.Thumb className="bui-switch-thumb" />
+              </Switch.Root>
+            </label>
+          </div>
+
           {extraGeneralRows}
 
           <div className="settings-actions">
@@ -576,63 +585,6 @@ export function SettingsPanelContent({
         </div>
       </Tabs.Panel>
 
-      <Tabs.Panel value="themes" className="settings-panel-pane">
-        <div className="settings-body settings-body-themes">
-          <div
-            className="theme-grid"
-            role="radiogroup"
-            aria-label="Editor theme"
-          >
-            {ALL_THEMES.map((t) => {
-              const palette =
-                THEME_PALETTES[t.value] ?? THEME_PALETTES.dracula;
-              const selected = editorTheme === t.value;
-              return (
-                <button
-                  key={t.value}
-                  type="button"
-                  role="radio"
-                  aria-checked={selected}
-                  className={`theme-card${selected ? " selected" : ""}`}
-                  onClick={() => setEditorTheme(t.value)}
-                >
-                  <div
-                    className="theme-card-preview"
-                    style={{
-                      background: palette.bg,
-                      color: palette.text,
-                      borderColor: palette.border,
-                    }}
-                  >
-                    <ThemePreviewSnippet
-                      palette={palette}
-                      language={language}
-                    />
-                  </div>
-                  <div className="theme-card-label">
-                    <span className="theme-card-name">
-                      {t.label}
-                      {t.value === "lucario" && (
-                        <span className="theme-card-default-badge">
-                          Default
-                        </span>
-                      )}
-                    </span>
-                    {selected && (
-                      <span
-                        className="theme-card-check"
-                        aria-hidden="true"
-                      >
-                        ✓
-                      </span>
-                    )}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </Tabs.Panel>
       {extraTabs?.map((t) => (
         <Tabs.Panel key={t.value} value={t.value} className="settings-panel-pane">
           {t.panel}

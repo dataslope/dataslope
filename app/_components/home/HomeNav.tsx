@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Menu } from "@base-ui-components/react/menu";
 import { Dialog } from "@base-ui-components/react/dialog";
 import { ChevronDown, Menu as Hamburger, Moon, Sun, X } from "lucide-react";
@@ -199,9 +200,33 @@ function MobileDrawer() {
 }
 
 export function HomeNav() {
+  // Shrink-on-scroll: the header is taller at the top of the page and
+  // compacts (with a soft shadow instead of a border) once scrolled.
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    // Defer the initial read out of the effect body (handles back-nav into a
+    // scrolled position without a synchronous setState).
+    const raf = requestAnimationFrame(onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--ds-gray-200)] bg-white/80 backdrop-blur-md dark:border-white/10 dark:bg-[#121212]/80">
-      <nav className="mx-auto grid h-14 max-w-6xl grid-cols-[1fr_auto] items-center gap-3 px-4 sm:px-6 md:h-16 md:grid-cols-[1fr_auto_1fr]">
+    <header
+      className={`sticky top-0 z-40 bg-white/80 backdrop-blur-md transition-shadow duration-200 dark:bg-[#121212]/80 ${
+        scrolled
+          ? "shadow-[0_6px_24px_-16px_rgba(0,0,0,0.45)] dark:shadow-[0_6px_24px_-12px_rgba(0,0,0,0.7)]"
+          : ""
+      }`}
+    >
+      <nav
+        className={`mx-auto grid max-w-6xl grid-cols-[1fr_auto] items-center gap-3 px-4 transition-[height] duration-200 sm:px-6 md:grid-cols-[1fr_auto_1fr] ${
+          scrolled ? "h-11 md:h-12" : "h-14 md:h-16"
+        }`}
+      >
         {/* Left: brand */}
         <div className="flex items-center">
           <BrandLogo />

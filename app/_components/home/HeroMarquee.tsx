@@ -1,6 +1,5 @@
 "use client";
 
-import { Database } from "lucide-react";
 import type { IconType } from "react-icons";
 import { Marquee } from "@/components/ui/marquee";
 import {
@@ -9,26 +8,28 @@ import {
 } from "../languageIcons";
 
 interface HeroItem {
-  /** languageIcons id, or "sql" for the generic database glyph. */
+  /** languageIcons id. */
   id: string;
   name: string;
 }
 
-// The scrolling "Learn … " roster. SQL uses a generic database icon (not a
-// single dialect logo); the rest use their language marks.
+// The scrolling "Learn … " roster — every language the platform supports.
 const HERO_ITEMS: HeroItem[] = [
   { id: "python", name: "Python" },
-  { id: "sql", name: "SQL" },
-  { id: "cpp", name: "C++" },
   { id: "r", name: "R" },
+  { id: "javascript", name: "JavaScript" },
+  { id: "typescript", name: "TypeScript" },
+  { id: "php", name: "PHP" },
+  { id: "c", name: "C" },
+  { id: "cpp", name: "C++" },
   { id: "java", name: "Java" },
+  { id: "csharp", name: "C#" },
+  { id: "sqlite", name: "SQLite" },
   { id: "postgres", name: "PostgreSQL" },
   { id: "duckdb", name: "DuckDB" },
-  { id: "php", name: "PHP" },
 ];
 
-// First-line icons use only the three primary brand 500s, cycled across the
-// roster.
+// Icons use only the three primary brand 500s, cycled across the roster.
 const BRAND_CYCLE = [
   "var(--ds-blue-500)",
   "var(--ds-green-500)",
@@ -36,15 +37,6 @@ const BRAND_CYCLE = [
 ];
 
 function HeroGlyph({ id, color }: { id: string; color: string }) {
-  if (id === "sql") {
-    return (
-      <Database
-        className="size-[0.85em] shrink-0"
-        style={{ color }}
-        aria-hidden="true"
-      />
-    );
-  }
   const Icon: IconType | undefined = LANGUAGE_ICONS[id];
   if (!Icon) return null;
   const factor = LANGUAGE_ICON_SIZE_FACTOR[id] ?? 1;
@@ -59,8 +51,8 @@ function HeroGlyph({ id, color }: { id: string; color: string }) {
   );
 }
 
-/** One full "Learn 🐍 Python 🗄 SQL …" segment. The Marquee duplicates it,
- *  so "Learn" recurs as a natural refrain between roster loops. */
+/** One full "Learn 🐍 Python …" segment. The Marquee duplicates it, so
+ *  "Learn" recurs as a natural refrain between roster loops. */
 function RosterSegment() {
   return (
     <span className="mx-6 inline-flex items-center gap-6">
@@ -82,7 +74,7 @@ export function HeroMarquee() {
     <div className="relative mx-auto w-full max-w-3xl select-none overflow-hidden py-2">
       {/* Both lines share one font-size scale so they read as a matched pair. */}
       {/* Line 1 — the language roster, scrolling left. */}
-      <Marquee className="py-1 text-5xl font-bold tracking-tight [--duration:34s] [--gap:0px] sm:text-6xl lg:text-7xl">
+      <Marquee className="py-1 text-5xl font-bold tracking-tight [--duration:42s] [--gap:0px] sm:text-6xl lg:text-7xl">
         <RosterSegment />
       </Marquee>
 

@@ -73,6 +73,7 @@ import {
   LIGHT_THEMES,
   setStoredEditorTheme,
 } from "../playgroundTheme";
+import { usePlaygroundThemeSync } from "../playgroundThemeSync";
 import {
   DEFAULT_PLAYGROUND_SETTINGS,
   DataslopeRunOverlay,
@@ -1018,6 +1019,8 @@ function SqlPlaygroundInner() {
     },
     [setEditorThemeState],
   );
+  // Follow the site-wide light/dark choice (shared with the home page + /learn).
+  usePlaygroundThemeSync(setEditorTheme);
   const setWordWrap = useCallback(
     (b: boolean) => {
       setWordWrapState(b);

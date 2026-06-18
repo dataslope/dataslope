@@ -65,7 +65,10 @@ export function SqlPlaygroundSwitcher({
               </span>
             ) : null;
           })()}
-          <Select.Value />
+          <Select.Value>
+            {PLAYGROUNDS.find((p) => p.id === playgroundId)?.label ??
+              playgroundId}
+          </Select.Value>
           <Select.Icon className="playground-switcher-icon">
             <ChevronDown size={12} />
           </Select.Icon>

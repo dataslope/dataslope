@@ -1,6 +1,7 @@
 "use client";
 
-import { forwardRef, useRef } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import type { IconType } from "react-icons";
 import { AnimatedBeam } from "@/components/ui/animated-beam";
 import { cn } from "@/lib/utils";
@@ -35,13 +36,60 @@ function MonoIcon({ id, size = 22 }: { id: string; size?: number }) {
   return <Icon size={Math.round(size * factor)} aria-hidden="true" />;
 }
 
+/** Cross-fades between the given language icons on an interval. A single-id
+ *  list just renders that icon (no animation). */
+function AlternatingIcon({
+  ids,
+  delay = 0,
+  interval = 2800,
+}: {
+  ids: string[];
+  delay?: number;
+  interval?: number;
+}) {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (ids.length < 2) return;
+    let timer: number | undefined;
+    const start = window.setTimeout(() => {
+      timer = window.setInterval(
+        () => setIndex((p) => (p + 1) % ids.length),
+        interval,
+      );
+    }, delay);
+    return () => {
+      window.clearTimeout(start);
+      if (timer) window.clearInterval(timer);
+    };
+  }, [ids.length, delay, interval]);
+
+  const id = ids[index % ids.length];
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.span
+        key={id}
+        className="inline-flex items-center justify-center"
+        initial={{ opacity: 0, y: 6, scale: 0.8 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: -6, scale: 0.8 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
+      >
+        <MonoIcon id={id} />
+      </motion.span>
+    </AnimatePresence>
+  );
+}
+
 export function BeamSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const centerRef = useRef<HTMLDivElement>(null);
+  // Left column (top → bottom): Python/R, JS/TS, PHP, C/C++.
   const left1 = useRef<HTMLDivElement>(null);
   const left2 = useRef<HTMLDivElement>(null);
   const left3 = useRef<HTMLDivElement>(null);
   const left4 = useRef<HTMLDivElement>(null);
+  // Right column (top → bottom): Java/C#, SQLite, Postgres, DuckDB.
   const right1 = useRef<HTMLDivElement>(null);
   const right2 = useRef<HTMLDivElement>(null);
   const right3 = useRef<HTMLDivElement>(null);
@@ -52,19 +100,19 @@ export function BeamSection() {
       ref={containerRef}
       className="relative mx-auto flex h-[24rem] w-full max-w-2xl items-center justify-between overflow-hidden px-6 sm:px-10"
     >
-      {/* Left column — programming languages */}
+      {/* Left column */}
       <div className="flex flex-col justify-center gap-6">
-        <Circle ref={left1} label="Python">
-          <MonoIcon id="python" />
+        <Circle ref={left1} label="Python and R">
+          <AlternatingIcon ids={["python", "r"]} delay={0} />
         </Circle>
-        <Circle ref={left2} label="R">
-          <MonoIcon id="r" />
+        <Circle ref={left2} label="JavaScript and TypeScript">
+          <AlternatingIcon ids={["javascript", "typescript"]} delay={700} />
         </Circle>
-        <Circle ref={left3} label="C++">
-          <MonoIcon id="cpp" />
+        <Circle ref={left3} label="PHP">
+          <AlternatingIcon ids={["php"]} />
         </Circle>
-        <Circle ref={left4} label="JavaScript">
-          <MonoIcon id="javascript" />
+        <Circle ref={left4} label="C and C++">
+          <AlternatingIcon ids={["c", "cpp"]} delay={1400} />
         </Circle>
       </div>
 
@@ -89,109 +137,33 @@ export function BeamSection() {
         />
       </Circle>
 
-      {/* Right column — SQL / data engines */}
+      {/* Right column */}
       <div className="flex flex-col justify-center gap-6">
-        <Circle ref={right1} label="Java">
-          <MonoIcon id="java" />
+        <Circle ref={right1} label="Java and C#">
+          <AlternatingIcon ids={["java", "csharp"]} delay={350} />
         </Circle>
-        <Circle ref={right2} label="PostgreSQL">
-          <MonoIcon id="postgres" />
+        <Circle ref={right2} label="SQLite">
+          <AlternatingIcon ids={["sqlite"]} />
         </Circle>
-        <Circle ref={right3} label="DuckDB">
-          <MonoIcon id="duckdb" />
+        <Circle ref={right3} label="PostgreSQL">
+          <AlternatingIcon ids={["postgres"]} />
         </Circle>
-        <Circle ref={right4} label="SQLite">
-          <MonoIcon id="sqlite" />
+        <Circle ref={right4} label="DuckDB">
+          <AlternatingIcon ids={["duckdb"]} />
         </Circle>
       </div>
 
-      {/* Every beam flows from a language node INTO the center. The right-side
-          beams are reversed so their pulse still travels node → center (the
-          gradient sweeps right-to-left). curvature 0 keeps them from crossing,
-          matching the Magic UI multiple-inputs example. */}
-      <AnimatedBeam
-        containerRef={containerRef}
-        fromRef={left1}
-        toRef={centerRef}
-        gradientStartColor={BEAM_START}
-        gradientStopColor={BEAM_STOP}
-        pathColor={BEAM_PATH}
-        duration={4}
-      />
-      <AnimatedBeam
-        containerRef={containerRef}
-        fromRef={left2}
-        toRef={centerRef}
-        gradientStartColor={BEAM_START}
-        gradientStopColor={BEAM_STOP}
-        pathColor={BEAM_PATH}
-        delay={0.3}
-        duration={4}
-      />
-      <AnimatedBeam
-        containerRef={containerRef}
-        fromRef={left3}
-        toRef={centerRef}
-        gradientStartColor={BEAM_START}
-        gradientStopColor={BEAM_STOP}
-        pathColor={BEAM_PATH}
-        delay={0.6}
-        duration={4}
-      />
-      <AnimatedBeam
-        containerRef={containerRef}
-        fromRef={left4}
-        toRef={centerRef}
-        gradientStartColor={BEAM_START}
-        gradientStopColor={BEAM_STOP}
-        pathColor={BEAM_PATH}
-        delay={0.9}
-        duration={4}
-      />
-      <AnimatedBeam
-        containerRef={containerRef}
-        fromRef={right1}
-        toRef={centerRef}
-        reverse
-        gradientStartColor={BEAM_START}
-        gradientStopColor={BEAM_STOP}
-        pathColor={BEAM_PATH}
-        delay={0.15}
-        duration={4}
-      />
-      <AnimatedBeam
-        containerRef={containerRef}
-        fromRef={right2}
-        toRef={centerRef}
-        reverse
-        gradientStartColor={BEAM_START}
-        gradientStopColor={BEAM_STOP}
-        pathColor={BEAM_PATH}
-        delay={0.45}
-        duration={4}
-      />
-      <AnimatedBeam
-        containerRef={containerRef}
-        fromRef={right3}
-        toRef={centerRef}
-        reverse
-        gradientStartColor={BEAM_START}
-        gradientStopColor={BEAM_STOP}
-        pathColor={BEAM_PATH}
-        delay={0.75}
-        duration={4}
-      />
-      <AnimatedBeam
-        containerRef={containerRef}
-        fromRef={right4}
-        toRef={centerRef}
-        reverse
-        gradientStartColor={BEAM_START}
-        gradientStopColor={BEAM_STOP}
-        pathColor={BEAM_PATH}
-        delay={1.05}
-        duration={4}
-      />
+      {/* Every beam flows from a language node INTO the center. Right-side
+          beams are reversed so their pulse still travels node → center.
+          curvature 0 keeps them from crossing. */}
+      <AnimatedBeam containerRef={containerRef} fromRef={left1} toRef={centerRef} gradientStartColor={BEAM_START} gradientStopColor={BEAM_STOP} pathColor={BEAM_PATH} duration={4} />
+      <AnimatedBeam containerRef={containerRef} fromRef={left2} toRef={centerRef} gradientStartColor={BEAM_START} gradientStopColor={BEAM_STOP} pathColor={BEAM_PATH} delay={0.3} duration={4} />
+      <AnimatedBeam containerRef={containerRef} fromRef={left3} toRef={centerRef} gradientStartColor={BEAM_START} gradientStopColor={BEAM_STOP} pathColor={BEAM_PATH} delay={0.6} duration={4} />
+      <AnimatedBeam containerRef={containerRef} fromRef={left4} toRef={centerRef} gradientStartColor={BEAM_START} gradientStopColor={BEAM_STOP} pathColor={BEAM_PATH} delay={0.9} duration={4} />
+      <AnimatedBeam containerRef={containerRef} fromRef={right1} toRef={centerRef} reverse gradientStartColor={BEAM_START} gradientStopColor={BEAM_STOP} pathColor={BEAM_PATH} delay={0.15} duration={4} />
+      <AnimatedBeam containerRef={containerRef} fromRef={right2} toRef={centerRef} reverse gradientStartColor={BEAM_START} gradientStopColor={BEAM_STOP} pathColor={BEAM_PATH} delay={0.45} duration={4} />
+      <AnimatedBeam containerRef={containerRef} fromRef={right3} toRef={centerRef} reverse gradientStartColor={BEAM_START} gradientStopColor={BEAM_STOP} pathColor={BEAM_PATH} delay={0.75} duration={4} />
+      <AnimatedBeam containerRef={containerRef} fromRef={right4} toRef={centerRef} reverse gradientStartColor={BEAM_START} gradientStopColor={BEAM_STOP} pathColor={BEAM_PATH} delay={1.05} duration={4} />
     </div>
   );
 }

@@ -6,7 +6,8 @@ import { HeroMarquee } from "./HeroMarquee";
 import { HeroInteractive } from "./HeroInteractive";
 import { BeamSection } from "./BeamSection";
 import { CoursesSection, type Course } from "./CoursesSection";
-import { EmbeddedPlayground } from "./EmbeddedPlayground";
+import { PlaygroundShowcase } from "./PlaygroundShowcase";
+import { Faq } from "./Faq";
 import { HomeFooter } from "./HomeFooter";
 
 function SectionHeading({
@@ -54,8 +55,8 @@ export function HomeClient({ courses }: { courses: Course[] }) {
           {/* ── Animated beam ── */}
           <section className="px-4 py-16 sm:px-6">
             <SectionHeading
-              title="Every language, one browser tab"
-              subtitle="Python, R, C++, Java, PostgreSQL, DuckDB and more — no install, all running on WebAssembly."
+              title="11 languages, one browser tab"
+              subtitle="Python, R, Javascript, Typescript, PHP, C, C++, Java, C#, SQLite, Postgres, and DuckDB — free, no install, no sign-ins, no paywall, all running in the browser."
             />
             <BeamSection />
           </section>
@@ -65,15 +66,15 @@ export function HomeClient({ courses }: { courses: Course[] }) {
             <CoursesSection courses={courses} />
           </section>
 
-          {/* ── Embedded playground ── */}
-          <section className="px-4 py-12 sm:px-6">
-            <SectionHeading
-              title="Try the playground"
-              subtitle="A full in-browser SQL workbench. Switch to any language from the switcher in the top-left."
-            />
-            <div className="mx-auto max-w-7xl">
-              <EmbeddedPlayground />
-            </div>
+          {/* ── Embedded playground showcase (heading/link follow the
+              selected language) ── */}
+          <section className="py-12">
+            <PlaygroundShowcase />
+          </section>
+
+          {/* ── FAQ ── */}
+          <section className="py-12">
+            <Faq />
           </section>
         </main>
 

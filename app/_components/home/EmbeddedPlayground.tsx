@@ -13,11 +13,21 @@ import { useEffect, useRef, useState } from "react";
  * still giving visitors the live editor, schema browser, and — top-left —
  * the playground switcher to jump to any other language.
  *
+ * Because the frame is same-origin, we read its pathname on every load to
+ * report which playground is showing (the switcher navigates within the
+ * frame), so the surrounding copy + the "open full playground" link can
+ * follow along.
+ *
  * The iframe `src` is only set once the card scrolls near the viewport so
  * the (heavy) playground bundle and PGlite boot don't tax the initial load.
  */
-export function EmbeddedPlayground() {
+export function EmbeddedPlayground({
+  onPlaygroundChange,
+}: {
+  onPlaygroundChange?: (id: string) => void;
+}) {
   const ref = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const [src, setSrc] = useState<string | null>(null);
 
   useEffect(() => {
@@ -25,8 +35,6 @@ export function EmbeddedPlayground() {
     const el = ref.current;
     if (!el) return;
     if (typeof IntersectionObserver === "undefined") {
-      // No IntersectionObserver (very old browsers): load it anyway, but defer
-      // out of the effect body so we're not setting state synchronously.
       const timer = window.setTimeout(() => setSrc("/playground/postgres"), 0);
       return () => window.clearTimeout(timer);
     }
@@ -43,6 +51,27 @@ export function EmbeddedPlayground() {
     return () => io.disconnect();
   }, [src]);
 
+  // The in-frame switcher navigates client-side (no iframe `load` event), so
+  // poll the same-origin frame's path to report which playground is showing.
+  useEffect(() => {
+    if (!src || !onPlaygroundChange) return;
+    let last = "";
+    const read = () => {
+      try {
+        const path = iframeRef.current?.contentWindow?.location?.pathname ?? "";
+        const match = path.match(/\/playground\/([^/]+)/);
+        if (match && match[1] !== last) {
+          last = match[1];
+          onPlaygroundChange(match[1]);
+        }
+      } catch {
+        /* transient during navigation / cross-origin — ignore */
+      }
+    };
+    const id = window.setInterval(read, 500);
+    return () => window.clearInterval(id);
+  }, [src, onPlaygroundChange]);
+
   return (
     <div
       ref={ref}
@@ -52,12 +81,11 @@ export function EmbeddedPlayground() {
     >
       {src ? (
         <iframe
+          ref={iframeRef}
           src={src}
-          title="Dataslope PostgreSQL playground"
+          title="Dataslope playground"
           loading="lazy"
           className="size-full border-0"
-          // Same-origin, so navigation between playgrounds via the in-frame
-          // switcher works; allow downloads (CSV/Parquet export) and clipboard.
           allow="clipboard-read; clipboard-write"
         />
       ) : (

@@ -386,6 +386,10 @@ export function useSqlEngineBoot({
   const [bootMessage, setBootMessage] = useState<string>(
     () => `Starting the ${sqlDialectDisplayName(dialect)} engine…`,
   );
+  // True once the engine has downloaded and we're running the (tiny) seed
+  // SQL. The cold-download size is the engine wasm — not the data — so it's
+  // suppressed in this phase to avoid implying the few sample rows are MBs.
+  const [bootSeeding, setBootSeeding] = useState(false);
 
   const ensureEngine = useCallback(async (): Promise<SqlEngineLike> => {
     if (!enginePromiseRef.current) {
@@ -393,6 +397,7 @@ export function useSqlEngineBoot({
       setBootFailed(false);
       setBootCold(!bootedSqlDialects.has(dialect));
       setBootMessage(`Starting the ${sqlDialectDisplayName(dialect)} engine…`);
+      setBootSeeding(false);
       enginePromiseRef.current = (async () => {
         // Start the dataset download while the engine boots — the two
         // are independent and the WASM fetch usually dominates. The
@@ -407,6 +412,7 @@ export function useSqlEngineBoot({
         bootedSqlDialects.add(dialect);
         if (remoteSqlPromise || (initSql && initSql.trim())) {
           setBootMessage("Loading sample data…");
+          setBootSeeding(true);
         }
         if (remoteSqlPromise) {
           await engine.exec(await remoteSqlPromise);
@@ -462,7 +468,9 @@ export function useSqlEngineBoot({
           cold: bootCold,
           message: bootMessage,
           dialect,
-          downloadMB: sqlDialectColdMB(dialect),
+          // 0 once seeding (engine already downloaded) → the notice hides the
+          // size, since the seed data is tiny.
+          downloadMB: bootSeeding ? 0 : sqlDialectColdMB(dialect),
         }
       : null;
 
