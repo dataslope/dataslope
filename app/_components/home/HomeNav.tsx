@@ -201,7 +201,7 @@ function MobileDrawer() {
 export function HomeNav() {
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--ds-gray-200)] bg-white/80 backdrop-blur-md dark:border-white/10 dark:bg-[#121212]/80">
-      <nav className="mx-auto grid h-16 max-w-6xl grid-cols-[1fr_auto] items-center gap-3 px-4 sm:px-6 md:grid-cols-[1fr_auto_1fr]">
+      <nav className="mx-auto grid h-14 max-w-6xl grid-cols-[1fr_auto] items-center gap-3 px-4 sm:px-6 md:h-16 md:grid-cols-[1fr_auto_1fr]">
         {/* Left: brand */}
         <div className="flex items-center">
           <BrandLogo />

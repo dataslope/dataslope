@@ -80,6 +80,7 @@ function RosterSegment() {
 export function HeroMarquee() {
   return (
     <div className="relative mx-auto w-full max-w-3xl select-none overflow-hidden py-2">
+      {/* Both lines share one font-size scale so they read as a matched pair. */}
       {/* Line 1 — the language roster, scrolling left. */}
       <Marquee className="py-1 text-5xl font-bold tracking-tight [--duration:34s] [--gap:0px] sm:text-6xl lg:text-7xl">
         <RosterSegment />
@@ -88,7 +89,7 @@ export function HeroMarquee() {
       {/* Line 2 — the tagline, scrolling the other way, in blue-gray-100. */}
       <Marquee
         reverse
-        className="py-1 text-4xl font-bold tracking-tight [--duration:30s] [--gap:0px] sm:text-5xl lg:text-6xl"
+        className="py-1 text-5xl font-bold tracking-tight [--duration:30s] [--gap:0px] sm:text-6xl lg:text-7xl"
       >
         <span className="mx-8 text-[#CED7DB]">
           Interactive, No sign-up, Free
