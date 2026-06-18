@@ -15,11 +15,13 @@ export const metadata = {
     "Interactive, no sign-up, free. Browser-based playgrounds and courses for Python, SQL, C++, and more — all running on WebAssembly.",
 };
 
-// Applies the persisted theme (the `theme` localStorage key + `.dark` class,
-// shared with the Fumadocs-powered /learn route) before first paint, so a
-// returning dark-mode visitor never sees a light flash. A missing/"light"
-// value leaves the page in its light default.
-const THEME_BOOTSTRAP = `(function(){try{document.documentElement.classList.toggle('dark', localStorage.getItem('theme')==='dark');}catch(e){}})();`;
+// Applies the persisted theme (the `theme` localStorage key + an explicit
+// `dark`/`light` class on <html>, shared with the Fumadocs-powered /learn
+// route) before first paint, so a returning dark-mode visitor never sees a
+// light flash. The explicit `light` class also stops scheme-detecting
+// components (e.g. the challenge-card editor) from falling back to the OS
+// preference. A missing/"light" value leaves the page in its light default.
+const THEME_BOOTSTRAP = `(function(){try{var d=localStorage.getItem('theme')==='dark';var r=document.documentElement;r.classList.toggle('dark',d);r.classList.toggle('light',!d);}catch(e){}})();`;
 
 interface CourseMeta {
   title: string;

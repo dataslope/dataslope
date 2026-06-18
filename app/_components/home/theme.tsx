@@ -47,7 +47,14 @@ function readStoredTheme(): Theme {
 
 function applyTheme(theme: Theme) {
   if (typeof document === "undefined") return;
-  document.documentElement.classList.toggle("dark", theme === "dark");
+  // Set an EXPLICIT class for the active theme (both `dark` and `light`),
+  // mirroring next-themes. Components that detect the scheme (e.g. the
+  // challenge card's CodeMirror theme picker) treat a missing class as "ask
+  // the OS" — so without an explicit `light` class, a light page on a
+  // dark-OS device would render its editors dark.
+  const root = document.documentElement;
+  root.classList.toggle("dark", theme === "dark");
+  root.classList.toggle("light", theme === "light");
 }
 
 function subscribe(onChange: () => void): () => void {

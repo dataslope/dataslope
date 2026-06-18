@@ -96,9 +96,9 @@ export function HeroMarquee() {
       </Marquee>
 
       {/* Soft edge fades so the scroll dissolves into the page background
-          (kept in sync with HomeClient's bg: white / #0f1117). */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white to-transparent dark:from-[#0f1117]" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white to-transparent dark:from-[#0f1117]" />
+          (kept in sync with HomeClient's bg: white / #121212). */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white to-transparent dark:from-[#121212]" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white to-transparent dark:from-[#121212]" />
     </div>
   );
 }

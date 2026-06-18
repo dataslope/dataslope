@@ -19,7 +19,7 @@ const Circle = forwardRef<
     ref={ref}
     aria-label={label}
     className={cn(
-      "z-10 flex size-12 items-center justify-center rounded-full border border-[var(--ds-gray-200)] bg-white text-[var(--ds-gray-700)] shadow-[0_4px_18px_-6px_rgba(0,0,0,0.25)] dark:border-white/10 dark:bg-[var(--ds-gray-800)] dark:text-[var(--ds-gray-100)]",
+      "z-10 flex size-12 items-center justify-center rounded-full border border-[var(--ds-gray-200)] bg-white text-[var(--ds-gray-700)] shadow-[0_4px_18px_-6px_rgba(0,0,0,0.25)] dark:border-white/10 dark:bg-[#1e1e1e] dark:text-[var(--ds-gray-100)]",
       className,
     )}
   >
@@ -72,20 +72,20 @@ export function BeamSection() {
       <Circle
         ref={centerRef}
         label="Dataslope"
-        className="size-16 border-2 shadow-[0_8px_30px_-8px_rgba(20,140,255,0.45)]"
+        className="size-14 border-2 shadow-[0_8px_30px_-8px_rgba(20,140,255,0.45)]"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/logo-files/SVG/dataslope-logo-black.svg"
           alt="Dataslope"
-          className="block h-6 w-auto dark:hidden"
+          className="block h-4 w-auto dark:hidden"
         />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/logo-files/SVG/dataslope-logo-white.svg"
           alt=""
           aria-hidden="true"
-          className="hidden h-6 w-auto dark:block"
+          className="hidden h-4 w-auto dark:block"
         />
       </Circle>
 

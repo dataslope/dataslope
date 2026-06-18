@@ -28,6 +28,20 @@
   font-variation-settings: normal;
 }
 
+/* The embedded challenge cards, code blocks, and MCQ are authored for the
+ * /learn route: in dark mode their surface background reads
+ * `var(--color-fd-background, <fallback>)`. That Fumadocs token doesn't exist
+ * outside /learn, so they fall back to hardcoded values — some of which are
+ * blue-slate (#111827, --ch-slate-900). Define the token here (white in light,
+ * Fumadocs's neutral near-black #121212 in dark) so those surfaces stay neutral
+ * and match the rest of the page. */
+.ds-home {
+  --color-fd-background: #ffffff;
+}
+html.dark .ds-home {
+  --color-fd-background: #121212;
+}
+
 /* Center nav menu: hidden below md, flex from md up. Replaces `hidden md:flex`
  * so a leaked `.hidden` can't keep it collapsed on desktop. */
 .ds-home .ds-nav-menu {

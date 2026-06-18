@@ -82,11 +82,11 @@ function PlaygroundMenu() {
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner sideOffset={8} align="center" className="z-50">
-          <Menu.Popup className="max-h-[70vh] min-w-56 overflow-y-auto rounded-xl border border-[var(--ds-gray-200)] bg-white p-1.5 shadow-xl shadow-black/5 outline-none transition-[opacity,transform] data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 dark:border-white/10 dark:bg-[var(--ds-gray-900)] dark:shadow-black/40">
+          <Menu.Popup className="max-h-[70vh] min-w-56 overflow-y-auto rounded-xl border border-[var(--ds-gray-200)] bg-white p-1.5 shadow-xl shadow-black/5 outline-none transition-[opacity,transform] data-[starting-style]:scale-95 data-[starting-style]:opacity-0 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 dark:border-white/10 dark:bg-[#1a1a1a] dark:shadow-black/40">
             {PLAYGROUNDS.map((p) => (
               <Menu.Item
                 key={p.id}
-                className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[var(--ds-gray-700)] outline-none transition-colors data-[highlighted]:bg-[var(--ds-blue-50)] data-[highlighted]:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-200)] dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white"
+                className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[var(--ds-gray-700)] outline-none transition-colors data-[highlighted]:bg-[var(--ds-gray-100)] data-[highlighted]:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-200)] dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white"
                 render={<Link href={p.href} prefetch={false} />}
               >
                 <LangIcon id={p.id} />
@@ -136,7 +136,7 @@ function MobileDrawer() {
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity duration-200 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0" />
-        <Dialog.Popup className="fixed inset-y-0 right-0 z-50 flex h-dvh w-[min(82vw,320px)] flex-col gap-1 border-l border-[var(--ds-gray-200)] bg-white p-4 shadow-2xl transition-transform duration-200 data-[ending-style]:translate-x-full data-[starting-style]:translate-x-full dark:border-white/10 dark:bg-[var(--ds-gray-900)]">
+        <Dialog.Popup className="fixed inset-y-0 right-0 z-50 flex h-dvh w-[min(82vw,320px)] flex-col gap-1 border-l border-[var(--ds-gray-200)] bg-white p-4 shadow-2xl transition-transform duration-200 data-[ending-style]:translate-x-full data-[starting-style]:translate-x-full dark:border-white/10 dark:bg-[#1a1a1a]">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-semibold uppercase tracking-wide text-[var(--ds-gray-500)]">
               Menu
@@ -151,7 +151,7 @@ function MobileDrawer() {
 
           <Dialog.Close
             render={<Link href="/learn" prefetch={false} />}
-            className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-blue-50)] hover:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10"
+            className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10"
           >
             Courses
           </Dialog.Close>
@@ -164,7 +164,7 @@ function MobileDrawer() {
               <Dialog.Close
                 key={p.id}
                 render={<Link href={p.href} prefetch={false} />}
-                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-blue-50)] hover:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-200)] dark:hover:bg-white/10"
+                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-200)] dark:hover:bg-white/10"
               >
                 <LangIcon id={p.id} />
                 {languageLabel(p.label)}
@@ -200,7 +200,7 @@ function MobileDrawer() {
 
 export function HomeNav() {
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--ds-gray-200)] bg-white/80 backdrop-blur-md dark:border-white/10 dark:bg-[var(--ds-gray-900)]/80">
+    <header className="sticky top-0 z-40 border-b border-[var(--ds-gray-200)] bg-white/80 backdrop-blur-md dark:border-white/10 dark:bg-[#121212]/80">
       <nav className="mx-auto grid h-16 max-w-6xl grid-cols-[1fr_auto] items-center gap-3 px-4 sm:px-6 md:grid-cols-[1fr_auto_1fr]">
         {/* Left: brand */}
         <div className="flex items-center">

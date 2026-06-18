@@ -69,7 +69,7 @@ export function CoursesSection({ courses }: { courses: Course[] }) {
             <Link
               key={slug}
               href={`/learn/${slug}`}
-              className="group flex items-center justify-between gap-4 rounded-xl border border-[var(--ds-gray-200)] bg-white p-5 transition-colors hover:border-[var(--ds-blue-300)] hover:bg-[var(--ds-blue-50)]/40 dark:border-white/10 dark:bg-white/5 dark:hover:border-[var(--ds-blue-500)]/40 dark:hover:bg-white/[0.07]"
+              className="group flex items-center justify-between gap-4 rounded-xl border border-[var(--ds-gray-200)] bg-white p-5 transition-colors hover:border-[var(--ds-blue-300)] hover:bg-[var(--ds-gray-50)] dark:border-white/10 dark:bg-white/5 dark:hover:border-white/20 dark:hover:bg-white/[0.07]"
             >
               <span className="flex min-w-0 flex-col gap-2.5">
                 <span className="font-semibold text-[var(--ds-gray-900)] dark:text-white">
