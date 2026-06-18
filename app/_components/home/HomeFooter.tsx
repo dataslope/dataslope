@@ -20,7 +20,7 @@ export function HomeFooter() {
             <img
               src="/dataslope-logo-blue.svg"
               alt=""
-              className="h-5 w-auto"
+              className="h-4 w-auto"
               aria-hidden="true"
             />
             <span className="text-base font-semibold tracking-tight text-[var(--ds-gray-900)] dark:text-white">

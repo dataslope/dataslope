@@ -5,7 +5,6 @@ import type { IconType } from "react-icons";
 import { Marquee } from "@/components/ui/marquee";
 import {
   LANGUAGE_ICONS,
-  LANGUAGE_ICON_COLORS,
   LANGUAGE_ICON_SIZE_FACTOR,
 } from "../languageIcons";
 
@@ -28,11 +27,20 @@ const HERO_ITEMS: HeroItem[] = [
   { id: "php", name: "PHP" },
 ];
 
-function HeroGlyph({ id }: { id: string }) {
+// First-line icons use only the three primary brand 500s, cycled across the
+// roster.
+const BRAND_CYCLE = [
+  "var(--ds-blue-500)",
+  "var(--ds-green-500)",
+  "var(--ds-red-500)",
+];
+
+function HeroGlyph({ id, color }: { id: string; color: string }) {
   if (id === "sql") {
     return (
       <Database
-        className="size-[0.85em] shrink-0 text-[var(--ds-blue-500)]"
+        className="size-[0.85em] shrink-0"
+        style={{ color }}
         aria-hidden="true"
       />
     );
@@ -43,7 +51,7 @@ function HeroGlyph({ id }: { id: string }) {
   return (
     <span
       className="inline-flex shrink-0 items-center"
-      style={{ color: LANGUAGE_ICON_COLORS[id], fontSize: `${factor}em` }}
+      style={{ color, fontSize: `${factor}em` }}
       aria-hidden="true"
     >
       <Icon size="0.85em" />
@@ -57,9 +65,9 @@ function RosterSegment() {
   return (
     <span className="mx-6 inline-flex items-center gap-6">
       <span className="text-[var(--ds-gray-900)] dark:text-white">Learn</span>
-      {HERO_ITEMS.map((item) => (
+      {HERO_ITEMS.map((item, i) => (
         <span key={item.name} className="inline-flex items-center gap-3">
-          <HeroGlyph id={item.id} />
+          <HeroGlyph id={item.id} color={BRAND_CYCLE[i % BRAND_CYCLE.length]} />
           <span className="text-[var(--ds-gray-900)] dark:text-white">
             {item.name}
           </span>
@@ -71,7 +79,7 @@ function RosterSegment() {
 
 export function HeroMarquee() {
   return (
-    <div className="relative w-full select-none overflow-hidden py-2">
+    <div className="relative mx-auto w-full max-w-3xl select-none overflow-hidden py-2">
       {/* Line 1 — the language roster, scrolling left. */}
       <Marquee className="py-1 text-5xl font-bold tracking-tight [--duration:34s] [--gap:0px] sm:text-6xl lg:text-7xl">
         <RosterSegment />

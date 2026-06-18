@@ -34,7 +34,7 @@ export function HomeClient({ courses }: { courses: Course[] }) {
        bring their own type via their CSS modules and override this. */
     <div
       style={{ fontFamily: "var(--font-sans, Inter, system-ui, sans-serif)" }}
-      className="min-h-screen bg-white text-[var(--ds-gray-800)] dark:bg-[#0f1117] dark:text-[var(--ds-gray-100)]"
+      className="ds-home min-h-screen bg-white text-[var(--ds-gray-800)] dark:bg-[#0f1117] dark:text-[var(--ds-gray-100)]"
     >
       <HomeNav />
 
@@ -71,7 +71,7 @@ export function HomeClient({ courses }: { courses: Course[] }) {
               title="Try the playground"
               subtitle="A full in-browser SQL workbench. Switch to any language from the switcher in the top-left."
             />
-            <div className="mx-auto max-w-6xl">
+            <div className="mx-auto max-w-7xl">
               <EmbeddedPlayground />
             </div>
           </section>

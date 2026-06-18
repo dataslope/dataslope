@@ -19,7 +19,7 @@ const Circle = forwardRef<
     ref={ref}
     aria-label={label}
     className={cn(
-      "z-10 flex size-14 items-center justify-center rounded-full border border-[var(--ds-gray-200)] bg-white text-[var(--ds-gray-700)] shadow-[0_4px_18px_-6px_rgba(0,0,0,0.25)] dark:border-white/10 dark:bg-[var(--ds-gray-800)] dark:text-[var(--ds-gray-100)]",
+      "z-10 flex size-12 items-center justify-center rounded-full border border-[var(--ds-gray-200)] bg-white text-[var(--ds-gray-700)] shadow-[0_4px_18px_-6px_rgba(0,0,0,0.25)] dark:border-white/10 dark:bg-[var(--ds-gray-800)] dark:text-[var(--ds-gray-100)]",
       className,
     )}
   >
@@ -28,7 +28,7 @@ const Circle = forwardRef<
 ));
 Circle.displayName = "Circle";
 
-function MonoIcon({ id, size = 26 }: { id: string; size?: number }) {
+function MonoIcon({ id, size = 22 }: { id: string; size?: number }) {
   const Icon: IconType | undefined = LANGUAGE_ICONS[id];
   if (!Icon) return null;
   const factor = LANGUAGE_ICON_SIZE_FACTOR[id] ?? 1;
@@ -41,17 +41,19 @@ export function BeamSection() {
   const left1 = useRef<HTMLDivElement>(null);
   const left2 = useRef<HTMLDivElement>(null);
   const left3 = useRef<HTMLDivElement>(null);
+  const left4 = useRef<HTMLDivElement>(null);
   const right1 = useRef<HTMLDivElement>(null);
   const right2 = useRef<HTMLDivElement>(null);
   const right3 = useRef<HTMLDivElement>(null);
+  const right4 = useRef<HTMLDivElement>(null);
 
   return (
     <div
       ref={containerRef}
-      className="relative mx-auto flex h-[22rem] w-full max-w-2xl items-center justify-between overflow-hidden px-6 sm:px-12"
+      className="relative mx-auto flex h-[24rem] w-full max-w-2xl items-center justify-between overflow-hidden px-6 sm:px-10"
     >
-      {/* Left column */}
-      <div className="flex flex-col justify-center gap-7">
+      {/* Left column — programming languages */}
+      <div className="flex flex-col justify-center gap-6">
         <Circle ref={left1} label="Python">
           <MonoIcon id="python" />
         </Circle>
@@ -61,31 +63,34 @@ export function BeamSection() {
         <Circle ref={left3} label="C++">
           <MonoIcon id="cpp" />
         </Circle>
+        <Circle ref={left4} label="JavaScript">
+          <MonoIcon id="javascript" />
+        </Circle>
       </div>
 
       {/* Center logo */}
       <Circle
         ref={centerRef}
         label="Dataslope"
-        className="size-20 border-2 shadow-[0_8px_30px_-8px_rgba(20,140,255,0.45)]"
+        className="size-16 border-2 shadow-[0_8px_30px_-8px_rgba(20,140,255,0.45)]"
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/logo-files/SVG/dataslope-logo-black.svg"
           alt="Dataslope"
-          className="block h-9 w-auto dark:hidden"
+          className="block h-6 w-auto dark:hidden"
         />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/logo-files/SVG/dataslope-logo-white.svg"
           alt=""
           aria-hidden="true"
-          className="hidden h-9 w-auto dark:block"
+          className="hidden h-6 w-auto dark:block"
         />
       </Circle>
 
-      {/* Right column */}
-      <div className="flex flex-col justify-center gap-7">
+      {/* Right column — SQL / data engines */}
+      <div className="flex flex-col justify-center gap-6">
         <Circle ref={right1} label="Java">
           <MonoIcon id="java" />
         </Circle>
@@ -95,14 +100,19 @@ export function BeamSection() {
         <Circle ref={right3} label="DuckDB">
           <MonoIcon id="duckdb" />
         </Circle>
+        <Circle ref={right4} label="SQLite">
+          <MonoIcon id="sqlite" />
+        </Circle>
       </div>
 
-      {/* Beams: each left node → center, then center → each right node. */}
+      {/* Every beam flows from a language node INTO the center. The right-side
+          beams are reversed so their pulse still travels node → center (the
+          gradient sweeps right-to-left). curvature 0 keeps them from crossing,
+          matching the Magic UI multiple-inputs example. */}
       <AnimatedBeam
         containerRef={containerRef}
         fromRef={left1}
         toRef={centerRef}
-        curvature={-55}
         gradientStartColor={BEAM_START}
         gradientStopColor={BEAM_STOP}
         pathColor={BEAM_PATH}
@@ -115,35 +125,13 @@ export function BeamSection() {
         gradientStartColor={BEAM_START}
         gradientStopColor={BEAM_STOP}
         pathColor={BEAM_PATH}
-        delay={0.4}
+        delay={0.3}
         duration={4}
       />
       <AnimatedBeam
         containerRef={containerRef}
         fromRef={left3}
         toRef={centerRef}
-        curvature={55}
-        gradientStartColor={BEAM_START}
-        gradientStopColor={BEAM_STOP}
-        pathColor={BEAM_PATH}
-        delay={0.8}
-        duration={4}
-      />
-      <AnimatedBeam
-        containerRef={containerRef}
-        fromRef={centerRef}
-        toRef={right1}
-        curvature={-55}
-        gradientStartColor={BEAM_START}
-        gradientStopColor={BEAM_STOP}
-        pathColor={BEAM_PATH}
-        delay={0.2}
-        duration={4}
-      />
-      <AnimatedBeam
-        containerRef={containerRef}
-        fromRef={centerRef}
-        toRef={right2}
         gradientStartColor={BEAM_START}
         gradientStopColor={BEAM_STOP}
         pathColor={BEAM_PATH}
@@ -152,13 +140,56 @@ export function BeamSection() {
       />
       <AnimatedBeam
         containerRef={containerRef}
-        fromRef={centerRef}
-        toRef={right3}
-        curvature={55}
+        fromRef={left4}
+        toRef={centerRef}
         gradientStartColor={BEAM_START}
         gradientStopColor={BEAM_STOP}
         pathColor={BEAM_PATH}
-        delay={1}
+        delay={0.9}
+        duration={4}
+      />
+      <AnimatedBeam
+        containerRef={containerRef}
+        fromRef={right1}
+        toRef={centerRef}
+        reverse
+        gradientStartColor={BEAM_START}
+        gradientStopColor={BEAM_STOP}
+        pathColor={BEAM_PATH}
+        delay={0.15}
+        duration={4}
+      />
+      <AnimatedBeam
+        containerRef={containerRef}
+        fromRef={right2}
+        toRef={centerRef}
+        reverse
+        gradientStartColor={BEAM_START}
+        gradientStopColor={BEAM_STOP}
+        pathColor={BEAM_PATH}
+        delay={0.45}
+        duration={4}
+      />
+      <AnimatedBeam
+        containerRef={containerRef}
+        fromRef={right3}
+        toRef={centerRef}
+        reverse
+        gradientStartColor={BEAM_START}
+        gradientStopColor={BEAM_STOP}
+        pathColor={BEAM_PATH}
+        delay={0.75}
+        duration={4}
+      />
+      <AnimatedBeam
+        containerRef={containerRef}
+        fromRef={right4}
+        toRef={centerRef}
+        reverse
+        gradientStartColor={BEAM_START}
+        gradientStopColor={BEAM_STOP}
+        pathColor={BEAM_PATH}
+        delay={1.05}
         duration={4}
       />
     </div>

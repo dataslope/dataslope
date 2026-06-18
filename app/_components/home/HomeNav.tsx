@@ -111,7 +111,7 @@ function BrandLogo() {
       <img
         src="/dataslope-logo-blue.svg"
         alt=""
-        className="h-5 w-auto"
+        className="h-4 w-auto"
         aria-hidden="true"
       />
       <span className="text-lg font-semibold tracking-tight text-[var(--ds-gray-900)] dark:text-white">
@@ -130,7 +130,7 @@ function MobileDrawer() {
       <Dialog.Trigger
         aria-label="Open menu"
         title="Menu"
-        className="inline-flex size-9 items-center justify-center rounded-lg text-[var(--ds-gray-600)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] md:hidden dark:text-[var(--ds-gray-300)] dark:hover:bg-white/10 dark:hover:text-white"
+        className="ds-mobile-trigger size-9 items-center justify-center rounded-lg text-[var(--ds-gray-600)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-300)] dark:hover:bg-white/10 dark:hover:text-white"
       >
         <Hamburger size={18} />
       </Dialog.Trigger>
@@ -207,8 +207,10 @@ export function HomeNav() {
           <BrandLogo />
         </div>
 
-        {/* Center: primary menu (desktop only) */}
-        <div className="hidden items-center justify-center gap-1 md:flex">
+        {/* Center: primary menu (desktop only — visibility handled by the
+            hardened `.ds-nav-menu` rule in home.css so a leaked `.hidden`
+            from /learn can't keep it collapsed after a back-navigation). */}
+        <div className="ds-nav-menu items-center justify-center gap-1">
           <Link
             href="/learn"
             prefetch

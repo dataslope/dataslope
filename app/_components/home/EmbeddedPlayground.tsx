@@ -46,7 +46,9 @@ export function EmbeddedPlayground() {
   return (
     <div
       ref={ref}
-      className="relative h-[600px] w-full overflow-hidden rounded-2xl border border-[var(--ds-gray-200)] bg-[var(--ds-gray-50)] shadow-sm dark:border-white/10 dark:bg-white/5"
+      // Height tracks width (aspect-ratio), clamped so it stays usable on
+      // phones and doesn't get unwieldy on very wide screens.
+      className="relative aspect-[16/10] max-h-[820px] min-h-[480px] w-full overflow-hidden rounded-2xl border border-[var(--ds-gray-200)] bg-[var(--ds-gray-50)] shadow-sm dark:border-white/10 dark:bg-white/5"
     >
       {src ? (
         <iframe

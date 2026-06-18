@@ -3,6 +3,9 @@ import path from "node:path";
 // Opt the home route into Tailwind + the Magic UI components. Importing the
 // shared stylesheet here scopes it to the home page bundle (see app/magicui.css).
 import "@/app/magicui.css";
+// Home-only hardening against /learn's global styles leaking in after a
+// client-side back-navigation (see app/home.css).
+import "@/app/home.css";
 import { HomeClient } from "./_components/home/HomeClient";
 import type { Course, CourseTags } from "./_components/home/CoursesSection";
 
