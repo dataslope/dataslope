@@ -297,7 +297,7 @@ export function themeFor(name: string): Extension {
   if (name === "github-light") return githubLightCustom;
   const cached = themeCache.get(name);
   if (cached) return cached;
-  const palette = THEME_PALETTES[name] ?? THEME_PALETTES.lucario;
+  const palette = THEME_PALETTES[name] ?? THEME_PALETTES["github-light"];
   const ext = buildTheme(name, palette, LIGHT_THEMES.has(name));
   themeCache.set(name, ext);
   return ext;

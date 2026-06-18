@@ -96,6 +96,7 @@ import {
   setStoredEditorTheme,
 } from "./playgroundTheme";
 import { usePlaygroundThemeSync } from "./playgroundThemeSync";
+import { useIsFramed } from "./useIsFramed";
 import {
   DEFAULT_PLAYGROUND_SETTINGS,
   DataslopeRunOverlay,
@@ -652,7 +653,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   const [outputFontSizeEnabled, setOutputFontSizeEnabledState] =
     useState<boolean>(false);
   const [outputFontSize, setOutputFontSizeState] = useState<number>(13);
-  const [editorTheme, setEditorThemeState] = useState<string>("lucario");
+  const [editorTheme, setEditorThemeState] = useState<string>("github-light");
   const [wordWrap, setWordWrapState] = useState<boolean>(true);
   const [clearBeforeRun, setClearBeforeRunState] = useState<boolean>(false);
 
@@ -1329,7 +1330,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       // editor would briefly render with default theme/wrapping and then
       // flip to the saved values on the next effect.
       const initialTheme =
-        getStoredEditorTheme(storageKey("editortheme")) ?? "lucario";
+        getStoredEditorTheme(storageKey("editortheme")) ?? "github-light";
       const initialWordWrap =
         localStorage.getItem(storageKey("wordwrap")) !== "false";
 
@@ -1631,6 +1632,8 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
   );
   // Follow the site-wide light/dark choice (shared with the home page + /learn).
   usePlaygroundThemeSync(setEditorTheme);
+  // Hide the brand logo + wordmark when embedded (the home page's iframe).
+  const embedded = useIsFramed();
 
   const setWordWrap = useCallback(
     (b: boolean) => {
@@ -2974,11 +2977,15 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
       <div className="playground-app">
         <header className="playground-header">
           <div className="logo">
-            <Link href="/" aria-label="Dataslope home">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/dataslope-logo-blue.svg" alt="Dataslope logo" className="brand-logo" />
-            </Link>
-            <Link href="/" className="brand-name">Dataslope</Link>
+            {!embedded && (
+              <>
+                <Link href="/" aria-label="Dataslope home">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/dataslope-logo-blue.svg" alt="Dataslope logo" className="brand-logo" />
+                </Link>
+                <Link href="/" className="brand-name">Dataslope</Link>
+              </>
+            )}
             <Select.Root
               value={adapter.id}
               onValueChange={(value) => {

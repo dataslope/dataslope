@@ -63,3 +63,17 @@ html.dark .ds-home {
     display: none;
   }
 }
+
+/* Footer: one column on mobile, three from sm up. Driven by a scoped rule
+ * (rather than Tailwind grid utilities) so a leaked `.grid`/`grid-cols-*`
+ * from /learn can't collapse it back to the wrong column count. */
+.ds-home .ds-footer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2.5rem;
+}
+@media (min-width: 640px) {
+  .ds-home .ds-footer-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
