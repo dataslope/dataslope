@@ -40,7 +40,9 @@ export function HomeClient({ courses }: { courses: Course[] }) {
     >
       <HomeNav />
 
-        <main>
+        {/* overflow-x-clip catches any horizontal overflow (e.g. decorative
+            backgrounds) without breaking the sticky nav, which is a sibling. */}
+        <main className="overflow-x-clip">
           {/* ── Hero: marquee + interactive "try it" panel ── */}
           <section className="px-4 pb-12 pt-10 sm:px-6 sm:pt-14">
             <BlurFade delay={0.05}>

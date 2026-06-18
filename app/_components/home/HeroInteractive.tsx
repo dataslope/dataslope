@@ -182,8 +182,9 @@ export function HeroInteractive() {
   const [tab, setTab] = useState<TabId>("code");
   return (
     <div className="relative mx-auto w-full max-w-3xl">
-      {/* Magic UI Ripple behind the preview card. */}
-      <Ripple mainCircleOpacity={0.16} />
+      {/* Magic UI Ripple behind the preview card. overflow-hidden clips its
+          oversized circles to the panel so they can't widen the page. */}
+      <Ripple className="overflow-hidden" mainCircleOpacity={0.16} />
       {/* Tab bar */}
       <div className="relative z-10 mb-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
         {TABS.map((t) => {
