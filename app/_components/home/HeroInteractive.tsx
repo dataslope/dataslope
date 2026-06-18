@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useState } from "react";
 import { Select } from "@base-ui-components/react/select";
 import { ChevronDown } from "lucide-react";
+import { Ripple } from "@/components/ui/ripple";
 import type { IconType } from "react-icons";
 import {
   LANGUAGE_ICONS,
@@ -122,7 +123,7 @@ function CodeChallengePanel() {
   const challenge =
     CODE_CHALLENGES.find((c) => c.adapter === adapterId) ?? CODE_CHALLENGES[0];
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-2">
       <PickerSelect
         label="Language"
         value={adapterId}
@@ -151,7 +152,7 @@ function SqlChallengePanel() {
   const challenge =
     SQL_CHALLENGES.find((c) => c.dialect === dialect) ?? SQL_CHALLENGES[0];
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-2">
       <PickerSelect
         label="Dialect"
         value={dialect}
@@ -180,9 +181,11 @@ function SqlChallengePanel() {
 export function HeroInteractive() {
   const [tab, setTab] = useState<TabId>("code");
   return (
-    <div className="mx-auto w-full max-w-3xl">
+    <div className="relative mx-auto w-full max-w-3xl">
+      {/* Magic UI Ripple behind the preview card. */}
+      <Ripple mainCircleOpacity={0.16} />
       {/* Tab bar */}
-      <div className="mb-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+      <div className="relative z-10 mb-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
         {TABS.map((t) => {
           const active = t.id === tab;
           return (
@@ -206,14 +209,16 @@ export function HeroInteractive() {
       </div>
 
       {/* Active panel */}
-      {tab === "code" && <CodeChallengePanel />}
-      {tab === "sql" && <SqlChallengePanel />}
-      {tab === "mcq" && (
-        <MultipleChoiceQuestion
-          markdown={CONCEPT_QUESTION}
-          badge="Concept Check"
-        />
-      )}
+      <div className="relative z-10">
+        {tab === "code" && <CodeChallengePanel />}
+        {tab === "sql" && <SqlChallengePanel />}
+        {tab === "mcq" && (
+          <MultipleChoiceQuestion
+            markdown={CONCEPT_QUESTION}
+            badge="Concept Check"
+          />
+        )}
+      </div>
     </div>
   );
 }

@@ -112,6 +112,7 @@
   --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
   --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite alternate;
   --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
+  --animate-ripple: ripple var(--duration, 2s) ease infinite;
 }
 
 /* Keyframes for the Magic UI animations declared above. Each Magic UI
@@ -152,5 +153,14 @@
   }
   100% {
     transform: translateZ(0) rotate(360deg);
+  }
+}
+@keyframes ripple {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(0.9);
   }
 }

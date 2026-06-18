@@ -1,6 +1,7 @@
 "use client";
 
 import { BlurFade } from "@/components/ui/blur-fade";
+import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { HomeNav } from "./HomeNav";
 import { HeroMarquee } from "./HeroMarquee";
 import { HeroInteractive } from "./HeroInteractive";
@@ -18,11 +19,11 @@ function SectionHeading({
   subtitle: string;
 }) {
   return (
-    <div className="mx-auto mb-8 max-w-2xl text-center">
-      <h2 className="text-2xl font-bold tracking-tight text-[var(--ds-gray-900)] sm:text-3xl dark:text-white">
+    <div className="mx-auto mb-10 max-w-2xl text-center">
+      <h2 className="text-3xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-4xl dark:text-white">
         {title}
       </h2>
-      <p className="mt-2 text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+      <p className="mt-4 text-base text-[var(--ds-gray-500)] sm:text-lg dark:text-[var(--ds-gray-400)]">
         {subtitle}
       </p>
     </div>
@@ -58,7 +59,20 @@ export function HomeClient({ courses }: { courses: Course[] }) {
               title="11 languages, one browser tab"
               subtitle="Python, R, Javascript, Typescript, PHP, C, C++, Java, C#, SQLite, Postgres, and DuckDB — free, no install, no sign-ins, no paywall, all running in the browser."
             />
-            <BeamSection />
+            <div className="relative mx-auto max-w-2xl">
+              {/* Magic UI Flickering Grid backdrop. */}
+              <FlickeringGrid
+                className="absolute inset-0 z-0 [mask-image:radial-gradient(ellipse_at_center,white,transparent_75%)]"
+                squareSize={3}
+                gridGap={6}
+                color="#148CFF"
+                maxOpacity={0.18}
+                flickerChance={0.22}
+              />
+              <div className="relative z-10">
+                <BeamSection />
+              </div>
+            </div>
           </section>
 
           {/* ── Courses ── */}

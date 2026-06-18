@@ -53,11 +53,11 @@ export function CoursesSection({ courses }: { courses: Course[] }) {
   if (courses.length === 0) return null;
   return (
     <section id="courses" className="mx-auto w-full max-w-5xl px-4 sm:px-6">
-      <div className="mb-8 text-center">
-        <h2 className="text-3xl font-bold tracking-tight text-[var(--ds-gray-900)] dark:text-white">
+      <div className="mb-10 text-center">
+        <h2 className="text-3xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-4xl dark:text-white">
           Courses
         </h2>
-        <p className="mt-2 text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+        <p className="mt-4 text-base text-[var(--ds-gray-500)] sm:text-lg dark:text-[var(--ds-gray-400)]">
           Hands-on, browser-based tracks across data and engineering.
         </p>
       </div>

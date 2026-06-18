@@ -32,10 +32,10 @@ export function PlaygroundShowcase() {
   return (
     <div className="px-4 sm:px-6">
       <div className="mx-auto mb-8 max-w-2xl text-center">
-        <h2 className="text-2xl font-bold tracking-tight text-[var(--ds-gray-900)] sm:text-3xl dark:text-white">
+        <h2 className="text-3xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-4xl dark:text-white">
           Try the playground
         </h2>
-        <p className="mt-2 text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+        <p className="mt-4 text-base text-[var(--ds-gray-500)] sm:text-lg dark:text-[var(--ds-gray-400)]">
           {subtitle}
         </p>
       </div>
@@ -51,7 +51,7 @@ export function PlaygroundShowcase() {
         >
           <span>
             Open the{" "}
-            <Highlighter action="highlight" color="#AED3FF" isView>
+            <Highlighter action="highlight" color="#FFDD6C" isView>
               {name}
             </Highlighter>{" "}
             playground

@@ -31,7 +31,7 @@ const RESOURCE_LINKS = [
 ];
 
 const linkClass =
-  "text-[var(--ds-gray-600)] transition-colors hover:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-400)] dark:hover:text-[var(--ds-blue-400)]";
+  "text-sm text-[var(--ds-gray-600)] transition-colors hover:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-400)] dark:hover:text-[var(--ds-blue-400)]";
 
 function FooterLink({
   href,

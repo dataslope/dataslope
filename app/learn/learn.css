@@ -537,31 +537,23 @@ code.hljs {
   letter-spacing: 0;
 }
 
-/* ── Source Serif for MCQ and challenge card body text ──────────────────
+/* ── Inter for MCQ and challenge card body text ─────────────────────────
    The .prose rule above excludes these components so its prose font-size
-   (1.125 rem) doesn't bleed in. We apply Source Serif here directly at a
-   smaller opsz that suits the ~14–15 px text used inside the cards.
-
-   Neither component's header uses <p> or <li> — the badge, mode label,
-   title, and status labels are all rendered as <span> or <div> — so no
-   extra header exclusion is needed: they naturally stay in Inter (their
-   CSS module sets font-family on the .card container, which those spans
-   inherit).
-
-   <code>, <pre>, and elements with explicit font-family in their CSS
-   module (e.g. .submitBtn, .sqlResultTable) are unaffected because those
-   rules directly target those selectors with higher specificity or
-   explicit values that beat inheritance.
-   ─────────────────────────────────────────────────────────────────────── */
+   (1.125 rem) doesn't bleed in. Their CSS modules already set Inter on the
+   .card container; the modules' own text inherits that, but the global
+   `body` letter-spacing (−0.011em) and any ambient tweaks would otherwise
+   linger, so we pin Inter explicitly on the instruction / question /
+   option / explanation text (<p>, <li>) here. <code>/<pre> keep their
+   monospace via the dedicated code rule above. */
 [data-flavor] p,
 [data-flavor] li,
 [data-testid="challenge-card"] p,
 [data-testid="challenge-card"] li,
 [aria-label="Multiple choice question"] p,
 [aria-label="Multiple choice question"] li {
-  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
-  font-variation-settings: "opsz" 14;
-  letter-spacing: 0;
+  font-family: var(--font-sans);
+  font-variation-settings: normal;
+  letter-spacing: normal;
 }
 
 /* Restore sans-serif on <td> and <th> inside challenge/quiz cards.

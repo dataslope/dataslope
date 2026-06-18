@@ -33,7 +33,7 @@ const FAQS: { q: string; a: string }[] = [
 export function Faq() {
   return (
     <section className="mx-auto w-full max-w-3xl px-4 sm:px-6">
-      <h2 className="mb-8 text-center text-2xl font-bold tracking-tight text-[var(--ds-gray-900)] sm:text-3xl dark:text-white">
+      <h2 className="mb-10 text-center text-3xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-4xl dark:text-white">
         Frequently asked questions
       </h2>
       <Accordion.Root className="border-t border-[var(--ds-gray-200)] dark:border-white/10">
