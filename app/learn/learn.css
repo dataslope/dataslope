@@ -180,14 +180,12 @@ samp {
 }
 
 /* Sidebar navigation links, folder-trigger buttons, and separator labels
-   ("Dataslope" logo link included) → Source Serif. The opsz axis is set
-   to 14 for text at ~13–15 px to get the optical balance right at small
-   sizes. Letter-spacing resets to 0 to undo the tight `body` tracking. */
+   ("Dataslope" logo link included) → Inter (the same sans the rest of the
+   app uses). Letter-spacing resets to 0 to undo the tight `body` tracking. */
 #nd-sidebar a,
 #nd-sidebar button,
 #nd-sidebar p {
-  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
-  font-variation-settings: "opsz" 14;
+  font-family: var(--font-sans);
   letter-spacing: 0;
 }
 

@@ -4,7 +4,6 @@ import { useLayoutEffect, useRef } from "react";
 import type React from "react";
 import { useInView } from "motion/react";
 import { annotate } from "rough-notation";
-import { type RoughAnnotation } from "rough-notation/lib/model";
 
 type AnnotationAction =
   | "highlight"
@@ -50,48 +49,72 @@ export function Highlighter({
 
   useLayoutEffect(() => {
     const element = elementRef.current;
-    let annotation: RoughAnnotation | null = null;
-    let resizeObserver: ResizeObserver | null = null;
+    if (!shouldShow || !element) return;
 
-    if (shouldShow && element) {
-      const annotationConfig = {
-        type: action,
-        color,
-        strokeWidth,
-        animationDuration,
-        iterations,
-        padding,
-        multiline,
-      };
+    const annotation = annotate(element, {
+      type: action,
+      color,
+      strokeWidth,
+      animationDuration,
+      iterations,
+      padding,
+      multiline,
+    });
+    annotation.show();
 
-      const currentAnnotation = annotate(element, annotationConfig);
-      annotation = currentAnnotation;
-      currentAnnotation.show();
+    // rough-notation draws the annotation to fit the element's current
+    // document-space box. It does NOT follow the element when later reflows
+    // (font loads, wrapping changes, window resizes) move or resize it — the
+    // drawing is left stranded in its old spot. So we re-draw whenever the
+    // element's own geometry actually changes.
+    //
+    // Geometry is measured in DOCUMENT space (rect + scroll offset), which
+    // means: (a) scrolling alone never triggers a re-draw — rough-notation is
+    // already positioned in document space, so it tracks scroll for free — and
+    // (b) unrelated layout changes that don't move this element (e.g. an FAQ
+    // accordion opening further down the page) are correctly ignored.
+    const geometry = () => {
+      const r = element.getBoundingClientRect();
+      return [
+        Math.round(r.left + window.scrollX),
+        Math.round(r.top + window.scrollY),
+        Math.round(r.width),
+        Math.round(r.height),
+      ].join(",");
+    };
 
-      // The annotation is drawn to fit the element's width, so it only needs
-      // to be redrawn when that width actually changes (e.g. a reflow that
-      // re-wraps the text). Observing document.body otherwise fires on every
-      // unrelated layout change — like an FAQ accordion expanding further down
-      // the page — which made the highlight needlessly re-render. Guarding on
-      // width prevents that churn.
-      let lastWidth = element.getBoundingClientRect().width;
-      resizeObserver = new ResizeObserver(() => {
-        const nextWidth = element.getBoundingClientRect().width;
-        if (nextWidth === lastWidth) return;
-        lastWidth = nextWidth;
-        currentAnnotation.hide();
-        currentAnnotation.show();
+    let cancelled = false;
+    let frame = 0;
+    let last = geometry();
+    const redraw = () => {
+      cancelAnimationFrame(frame);
+      // Coalesce bursts (e.g. continuous resize) into a single re-draw.
+      frame = requestAnimationFrame(() => {
+        if (cancelled) return;
+        const next = geometry();
+        if (next === last) return;
+        last = next;
+        annotation.hide();
+        annotation.show();
       });
+    };
 
-      resizeObserver.observe(element);
-      resizeObserver.observe(document.body);
-    }
+    const resizeObserver = new ResizeObserver(redraw);
+    resizeObserver.observe(element);
+    // Catch reflows that move the element without resizing it (the geometry
+    // guard above keeps this from causing needless re-draws).
+    resizeObserver.observe(document.body);
+    window.addEventListener("resize", redraw);
+    // Web fonts can load after first paint and shift the text; reposition once
+    // they're ready.
+    document.fonts?.ready.then(redraw).catch(() => {});
 
     return () => {
-      annotation?.remove();
-      if (resizeObserver) {
-        resizeObserver.disconnect();
-      }
+      cancelled = true;
+      cancelAnimationFrame(frame);
+      window.removeEventListener("resize", redraw);
+      resizeObserver.disconnect();
+      annotation.remove();
     };
   }, [
     shouldShow,

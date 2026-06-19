@@ -133,6 +133,62 @@ function PickerSelect({
   );
 }
 
+/**
+ * Wraps a preview card with a Magic UI Ripple that is centered on the card
+ * (both axes) and sized so its largest circle reaches beyond every edge. The
+ * card renders on top (opaque), so the ripple reads as concentric rings
+ * haloing the card. The ripple re-sizes itself as the card's measured box
+ * changes (e.g. when the runtime loads or the viewport resizes).
+ */
+function RippleFrame({ children }: { children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [box, setBox] = useState({ w: 0, h: 0 });
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const measure = () => setBox({ w: el.offsetWidth, h: el.offsetHeight });
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // Largest circle = 1.35× the card's larger dimension so it clears every
+  // edge; the circles run down to a still-large innermost ring. Fall back to a
+  // sensible size until the card is measured.
+  const NUM_CIRCLES = 7;
+  const base = Math.max(box.w, box.h) || 480;
+  const maxCircle = Math.round(base * 1.35);
+  const mainCircleSize = Math.round(maxCircle * 0.42);
+  const circleGap = Math.round((maxCircle - mainCircleSize) / (NUM_CIRCLES - 1));
+
+  return (
+    <div ref={ref} className="relative">
+      {/* Box is the size of the largest circle and centered on the card, so a
+          radial mask can fade the rings out smoothly before the box edge. No
+          overflow clip — the rings are meant to spill past the card; the page
+          itself is kept from widening by <main>'s overflow-x-clip. */}
+      <div
+        className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2"
+        style={{ width: maxCircle, height: maxCircle }}
+      >
+        {/* No mask: the Ripple ships a built-in solid→transparent fade that
+            would hide the rings — drop it so the ripple stays fully visible.
+            The rings fade naturally via their own decreasing opacity. */}
+        <Ripple
+          className="[mask-image:none]"
+          mainCircleOpacity={0.26}
+          mainCircleSize={mainCircleSize}
+          circleGap={circleGap}
+          numCircles={NUM_CIRCLES}
+        />
+      </div>
+      <div className="relative z-10">{children}</div>
+    </div>
+  );
+}
+
 function CodeChallengePanel() {
   const [adapterId, setAdapterId] = useState<string>("python");
   const challenge =
@@ -149,15 +205,17 @@ function CodeChallengePanel() {
           iconId: c.adapter,
         }))}
       />
-      <MdxChallengeCard
-        key={challenge.adapter}
-        adapter={challenge.adapter}
-        title={challenge.title}
-        instructions={challenge.instructions}
-        files={challenge.files}
-        entryFilename={challenge.entryFilename}
-        tests={challenge.tests}
-      />
+      <RippleFrame>
+        <MdxChallengeCard
+          key={challenge.adapter}
+          adapter={challenge.adapter}
+          title={challenge.title}
+          instructions={challenge.instructions}
+          files={challenge.files}
+          entryFilename={challenge.entryFilename}
+          tests={challenge.tests}
+        />
+      </RippleFrame>
     </div>
   );
 }
@@ -178,48 +236,25 @@ function SqlChallengePanel() {
           iconId: c.dialect,
         }))}
       />
-      <SqlChallengeCard
-        key={challenge.dialect}
-        dialect={challenge.dialect}
-        title={challenge.title}
-        instructions={challenge.instructions}
-        initSql={challenge.initSql}
-        starterCode={challenge.starterCode}
-        solutionSql={challenge.solutionSql}
-        tables={challenge.tables}
-        tests={challenge.tests}
-      />
+      <RippleFrame>
+        <SqlChallengeCard
+          key={challenge.dialect}
+          dialect={challenge.dialect}
+          title={challenge.title}
+          instructions={challenge.instructions}
+          initSql={challenge.initSql}
+          starterCode={challenge.starterCode}
+          solutionSql={challenge.solutionSql}
+          tables={challenge.tables}
+          tests={challenge.tests}
+        />
+      </RippleFrame>
     </div>
   );
 }
 
 export function HeroInteractive() {
   const [tab, setTab] = useState<TabId>("code");
-
-  // Size the ripple from the actual preview (challenge card) width so its
-  // largest circle is always a bit wider than the card and the whole ripple
-  // scales sensibly from mobile to desktop.
-  const previewRef = useRef<HTMLDivElement>(null);
-  const [previewWidth, setPreviewWidth] = useState(0);
-  useEffect(() => {
-    const el = previewRef.current;
-    if (!el) return;
-    const measure = () => setPreviewWidth(el.getBoundingClientRect().width);
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
-  // Fall back to ~max-w-2xl until measured. The outermost circle is 1.2× the
-  // card width (larger than the card); the innermost is a generous 0.55× so
-  // the main circle reads large, with the remaining circles evenly spaced.
-  const RIPPLE_CIRCLES = 8;
-  const cardWidth = previewWidth || 672;
-  const rippleMainSize = Math.round(cardWidth * 0.55);
-  const rippleGap = Math.round(
-    (cardWidth * 1.2 - rippleMainSize) / (RIPPLE_CIRCLES - 1),
-  );
 
   return (
     <div className="relative mx-auto w-full max-w-3xl">
@@ -247,35 +282,20 @@ export function HeroInteractive() {
         })}
       </div>
 
-      {/* Active panel. The Ripple is anchored to the TOP of this panel so it
-          always begins just above the language/dialect picker (the panel's
-          first row), independent of how tall the preview below grows. */}
-      <div className="relative">
-        {/* Full-bleed box centered on the preview (which is itself centered in
-            the viewport via mx-auto), so the ripple's circles are centered on
-            the card and can extend past its edges without being clipped to the
-            padded column. overflow-hidden clips them to this box (full width ×
-            fixed height); the mask fades them in just above the picker and out
-            toward the bottom so the clipped edges never show as a hard line. */}
-        <div className="pointer-events-none absolute left-1/2 top-[-1.25rem] z-0 h-[14rem] w-screen -translate-x-1/2">
-          <Ripple
-            className="overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,white_10%,white_72%,transparent)]"
-            mainCircleOpacity={0.16}
-            mainCircleSize={rippleMainSize}
-            circleGap={rippleGap}
-            numCircles={RIPPLE_CIRCLES}
-          />
-        </div>
-        <div ref={previewRef} className="relative z-10">
-          {tab === "code" && <CodeChallengePanel />}
-          {tab === "sql" && <SqlChallengePanel />}
-          {tab === "mcq" && (
+      {/* Active panel. Each preview wraps its card in a <RippleFrame>, which
+          centers the ripple on the card (both axes) and sizes it to reach
+          beyond every edge. */}
+      <div>
+        {tab === "code" && <CodeChallengePanel />}
+        {tab === "sql" && <SqlChallengePanel />}
+        {tab === "mcq" && (
+          <RippleFrame>
             <MultipleChoiceQuestion
               markdown={CONCEPT_QUESTION}
               badge="Concept Check"
             />
-          )}
-        </div>
+          </RippleFrame>
+        )}
       </div>
     </div>
   );
