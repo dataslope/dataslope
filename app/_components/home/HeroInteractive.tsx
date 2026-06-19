@@ -196,18 +196,6 @@ export function HeroInteractive() {
   const [tab, setTab] = useState<TabId>("code");
   return (
     <div className="relative mx-auto w-full max-w-3xl">
-      {/* Magic UI Ripple, anchored to the tab row rather than the whole panel:
-          a fixed-height box pinned just above the tab labels keeps the ripple
-          in the same spot and always visible no matter how tall the active
-          preview below it grows. overflow-hidden clips the oversized circles so
-          they can't widen the page; the mask fades them in/out top *and* bottom
-          so the clipped edges never show as a hard, chopped-off line. */}
-      <div className="pointer-events-none absolute inset-x-0 -top-6 z-0 h-[24rem]">
-        <Ripple
-          className="overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,white_20%,white_70%,transparent)]"
-          mainCircleOpacity={0.16}
-        />
-      </div>
       {/* Tab bar */}
       <div className="relative z-10 mb-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
         {TABS.map((t) => {
@@ -232,16 +220,32 @@ export function HeroInteractive() {
         })}
       </div>
 
-      {/* Active panel */}
-      <div className="relative z-10">
-        {tab === "code" && <CodeChallengePanel />}
-        {tab === "sql" && <SqlChallengePanel />}
-        {tab === "mcq" && (
-          <MultipleChoiceQuestion
-            markdown={CONCEPT_QUESTION}
-            badge="Concept Check"
+      {/* Active panel. The Ripple is anchored to the TOP of this panel so it
+          always begins just above the language/dialect picker (the panel's
+          first row), independent of how tall the preview below grows. */}
+      <div className="relative">
+        {/* Full-bleed Ripple: w-screen + left-1/2 centering lets the circles
+            use the entire viewport width on mobile instead of being clipped to
+            the padded column. overflow-hidden clips them to this box (full
+            width × fixed height); the mask fades them in just above the picker
+            and out toward the bottom so the clipped edges never show as a hard
+            line. */}
+        <div className="pointer-events-none absolute left-1/2 top-[-1.25rem] z-0 h-[14rem] w-screen -translate-x-1/2">
+          <Ripple
+            className="overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,white_10%,white_72%,transparent)]"
+            mainCircleOpacity={0.16}
           />
-        )}
+        </div>
+        <div className="relative z-10">
+          {tab === "code" && <CodeChallengePanel />}
+          {tab === "sql" && <SqlChallengePanel />}
+          {tab === "mcq" && (
+            <MultipleChoiceQuestion
+              markdown={CONCEPT_QUESTION}
+              badge="Concept Check"
+            />
+          )}
+        </div>
       </div>
     </div>
   );
