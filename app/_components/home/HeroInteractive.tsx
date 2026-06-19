@@ -1,10 +1,11 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Select } from "@base-ui-components/react/select";
 import { ChevronDown } from "lucide-react";
 import { Ripple } from "@/components/ui/ripple";
+import { ShimmerButton } from "@/components/ui/shimmer-button";
 import type { IconType } from "react-icons";
 import {
   LANGUAGE_ICONS,
@@ -82,17 +83,31 @@ function PickerSelect({
           if (next != null) onValueChange(next);
         }}
       >
-        <Select.Trigger className="inline-flex min-w-40 items-center gap-2 rounded-lg border border-[var(--ds-gray-200)] bg-white px-3 py-1.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:border-[var(--ds-blue-300)] focus-visible:border-[var(--ds-blue-500)] focus-visible:outline-none dark:border-white/15 dark:bg-white/5 dark:text-[var(--ds-gray-100)]">
-          {active && <OptionIcon id={active.iconId} />}
-          {/* Render the label explicitly — a bare <Select.Value/> shows the
-              raw (lowercased) value instead of the option's label. */}
-          <Select.Value className="flex-1 truncate text-left">
-            {active?.label ?? value}
-          </Select.Value>
-          <Select.Icon className="text-[var(--ds-gray-400)]">
-            <ChevronDown size={14} />
-          </Select.Icon>
-        </Select.Trigger>
+        {/* Magic UI ShimmerButton as the select trigger. --ds-gray-900 is a
+            fixed near-black in both themes, so white text + the blue shimmer
+            read well in light and dark mode alike. */}
+        <Select.Trigger
+          render={(triggerProps) => (
+            <ShimmerButton
+              {...triggerProps}
+              background="var(--ds-gray-900)"
+              shimmerColor="#148CFF"
+              shimmerSize="0.15em"
+              borderRadius="0.625rem"
+              className="min-w-40 justify-between gap-2 px-3.5 py-1.5 text-sm font-medium focus-visible:outline-none"
+            >
+              {active && <OptionIcon id={active.iconId} />}
+              {/* Render the label explicitly — a bare <Select.Value/> shows the
+                  raw (lowercased) value instead of the option's label. */}
+              <Select.Value className="flex-1 truncate text-left">
+                {active?.label ?? value}
+              </Select.Value>
+              <Select.Icon className="text-white/70">
+                <ChevronDown size={14} />
+              </Select.Icon>
+            </ShimmerButton>
+          )}
+        />
         <Select.Portal>
           <Select.Positioner
             sideOffset={6}
@@ -118,6 +133,63 @@ function PickerSelect({
   );
 }
 
+/**
+ * Wraps a preview card with a Magic UI Ripple that is centered on the card
+ * (both axes) and sized from the card's shorter edge, so its largest circle
+ * reaches just slightly beyond that edge — a subtle halo rather than a ring
+ * spanning the whole card. The card renders on top (opaque), so the rings read
+ * as a halo around it. The ripple re-sizes itself as the card's measured box
+ * changes (e.g. when the runtime loads or the viewport resizes).
+ */
+function RippleFrame({ children }: { children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [box, setBox] = useState({ w: 0, h: 0 });
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const measure = () => setBox({ w: el.offsetWidth, h: el.offsetHeight });
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // Size the ripple from the card's SHORTER edge so it stays subtle — the
+  // largest circle reaches just slightly beyond that edge and the rings never
+  // spread the full width/height of the card. Fall back to a sensible size
+  // until the card is measured.
+  const NUM_CIRCLES = 7;
+  const shortEdge = Math.min(box.w, box.h) || 360;
+  const maxCircle = Math.round(shortEdge * 1.1);
+  const mainCircleSize = Math.round(maxCircle * 0.42);
+  const circleGap = Math.round((maxCircle - mainCircleSize) / (NUM_CIRCLES - 1));
+
+  return (
+    <div ref={ref} className="relative">
+      {/* Box is the size of the largest circle, centered on the card. No
+          overflow clip — the rings are meant to spill slightly past the card;
+          the page itself is kept from widening by <main>'s overflow-x-clip. */}
+      <div
+        className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2"
+        style={{ width: maxCircle, height: maxCircle }}
+      >
+        {/* No mask: the Ripple ships a built-in solid→transparent fade that
+            would hide the rings — drop it so the ripple stays fully visible.
+            The rings fade naturally via their own decreasing opacity. */}
+        <Ripple
+          className="[mask-image:none]"
+          mainCircleOpacity={0.26}
+          mainCircleSize={mainCircleSize}
+          circleGap={circleGap}
+          numCircles={NUM_CIRCLES}
+        />
+      </div>
+      <div className="relative z-10">{children}</div>
+    </div>
+  );
+}
+
 function CodeChallengePanel() {
   const [adapterId, setAdapterId] = useState<string>("python");
   const challenge =
@@ -134,15 +206,17 @@ function CodeChallengePanel() {
           iconId: c.adapter,
         }))}
       />
-      <MdxChallengeCard
-        key={challenge.adapter}
-        adapter={challenge.adapter}
-        title={challenge.title}
-        instructions={challenge.instructions}
-        files={challenge.files}
-        entryFilename={challenge.entryFilename}
-        tests={challenge.tests}
-      />
+      <RippleFrame>
+        <MdxChallengeCard
+          key={challenge.adapter}
+          adapter={challenge.adapter}
+          title={challenge.title}
+          instructions={challenge.instructions}
+          files={challenge.files}
+          entryFilename={challenge.entryFilename}
+          tests={challenge.tests}
+        />
+      </RippleFrame>
     </div>
   );
 }
@@ -163,28 +237,28 @@ function SqlChallengePanel() {
           iconId: c.dialect,
         }))}
       />
-      <SqlChallengeCard
-        key={challenge.dialect}
-        dialect={challenge.dialect}
-        title={challenge.title}
-        instructions={challenge.instructions}
-        initSql={challenge.initSql}
-        starterCode={challenge.starterCode}
-        solutionSql={challenge.solutionSql}
-        tables={challenge.tables}
-        tests={challenge.tests}
-      />
+      <RippleFrame>
+        <SqlChallengeCard
+          key={challenge.dialect}
+          dialect={challenge.dialect}
+          title={challenge.title}
+          instructions={challenge.instructions}
+          initSql={challenge.initSql}
+          starterCode={challenge.starterCode}
+          solutionSql={challenge.solutionSql}
+          tables={challenge.tables}
+          tests={challenge.tests}
+        />
+      </RippleFrame>
     </div>
   );
 }
 
 export function HeroInteractive() {
   const [tab, setTab] = useState<TabId>("code");
+
   return (
     <div className="relative mx-auto w-full max-w-3xl">
-      {/* Magic UI Ripple behind the preview card. overflow-hidden clips its
-          oversized circles to the panel so they can't widen the page. */}
-      <Ripple className="overflow-hidden" mainCircleOpacity={0.16} />
       {/* Tab bar */}
       <div className="relative z-10 mb-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
         {TABS.map((t) => {
@@ -209,15 +283,19 @@ export function HeroInteractive() {
         })}
       </div>
 
-      {/* Active panel */}
-      <div className="relative z-10">
+      {/* Active panel. Each preview wraps its card in a <RippleFrame>, which
+          centers the ripple on the card (both axes) and sizes it to reach
+          beyond every edge. */}
+      <div>
         {tab === "code" && <CodeChallengePanel />}
         {tab === "sql" && <SqlChallengePanel />}
         {tab === "mcq" && (
-          <MultipleChoiceQuestion
-            markdown={CONCEPT_QUESTION}
-            badge="Concept Check"
-          />
+          <RippleFrame>
+            <MultipleChoiceQuestion
+              markdown={CONCEPT_QUESTION}
+              badge="Concept Check"
+            />
+          </RippleFrame>
         )}
       </div>
     </div>

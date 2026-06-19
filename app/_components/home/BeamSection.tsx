@@ -36,25 +36,18 @@ function MonoIcon({ id, size = 22 }: { id: string; size?: number }) {
   return <Icon size={Math.round(size * factor)} aria-hidden="true" />;
 }
 
-/** Cross-fades between the given language icons on an interval. A single-id
- *  list just renders that icon (no animation). */
-function AlternatingIcon({
-  ids,
-  delay = 0,
-  interval = 2800,
-}: {
-  ids: string[];
-  delay?: number;
-  interval?: number;
-}) {
+/** Steps through `count` on an interval, after an initial `delay`. A count of
+ *  1 stays put (no animation). Shared by the rotating icon and its label so
+ *  they always show the same language. */
+function useRotatingIndex(count: number, delay = 0, interval = 2800): number {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    if (ids.length < 2) return;
+    if (count < 2) return;
     let timer: number | undefined;
     const start = window.setTimeout(() => {
       timer = window.setInterval(
-        () => setIndex((p) => (p + 1) % ids.length),
+        () => setIndex((p) => (p + 1) % count),
         interval,
       );
     }, delay);
@@ -62,9 +55,13 @@ function AlternatingIcon({
       window.clearTimeout(start);
       if (timer) window.clearInterval(timer);
     };
-  }, [ids.length, delay, interval]);
+  }, [count, delay, interval]);
 
-  const id = ids[index % ids.length];
+  return index % count;
+}
+
+/** Cross-fades the glyph whenever the active `id` changes. */
+function SwapIcon({ id }: { id: string }) {
   return (
     <AnimatePresence mode="wait" initial={false}>
       <motion.span
@@ -80,6 +77,77 @@ function AlternatingIcon({
     </AnimatePresence>
   );
 }
+
+/** Cross-fades the label text in lock-step with its icon. */
+function SwapLabel({ name, align }: { name: string; align: "left" | "right" }) {
+  return (
+    <span
+      // Desktop only — on mobile the names are hidden to keep the diagram
+      // tight. The fixed width keeps each circle's position constant as the
+      // label cross-fades between names of different lengths, so the beams
+      // (which are only recomputed on container resize) stay aligned.
+      className={cn(
+        "hidden w-28 whitespace-nowrap text-sm font-medium text-[var(--ds-gray-600)] sm:block dark:text-[var(--ds-gray-300)]",
+        align === "right" ? "text-right" : "text-left",
+      )}
+    >
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.span
+          key={name}
+          className="block"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.35, ease: "easeOut" }}
+        >
+          {name}
+        </motion.span>
+      </AnimatePresence>
+    </span>
+  );
+}
+
+interface NodeItem {
+  id: string;
+  name: string;
+}
+
+/** A language node: its circle plus a rotating label. `side` decides which
+ *  edge of the diagram it lives on — left-column labels sit to the left of the
+ *  circle (right-aligned), right-column labels to the right (left-aligned). */
+const BeamNode = forwardRef<
+  HTMLDivElement,
+  { items: NodeItem[]; side: "left" | "right"; delay?: number; label: string }
+>(({ items, side, delay = 0, label }, ref) => {
+  const index = useRotatingIndex(items.length, delay);
+  const current = items[index];
+
+  const circle = (
+    <Circle ref={ref} label={label}>
+      <SwapIcon id={current.id} />
+    </Circle>
+  );
+  const text = (
+    <SwapLabel name={current.name} align={side === "left" ? "right" : "left"} />
+  );
+
+  return (
+    <div className="flex items-center gap-3">
+      {side === "left" ? (
+        <>
+          {text}
+          {circle}
+        </>
+      ) : (
+        <>
+          {circle}
+          {text}
+        </>
+      )}
+    </div>
+  );
+});
+BeamNode.displayName = "BeamNode";
 
 export function BeamSection() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -100,20 +168,12 @@ export function BeamSection() {
       ref={containerRef}
       className="relative mx-auto flex h-[24rem] w-full max-w-2xl items-center justify-between overflow-hidden px-6 sm:px-10"
     >
-      {/* Left column */}
-      <div className="flex flex-col justify-center gap-6">
-        <Circle ref={left1} label="Python and R">
-          <AlternatingIcon ids={["python", "r"]} delay={0} />
-        </Circle>
-        <Circle ref={left2} label="JavaScript and TypeScript">
-          <AlternatingIcon ids={["javascript", "typescript"]} delay={700} />
-        </Circle>
-        <Circle ref={left3} label="PHP">
-          <AlternatingIcon ids={["php"]} />
-        </Circle>
-        <Circle ref={left4} label="C and C++">
-          <AlternatingIcon ids={["c", "cpp"]} delay={1400} />
-        </Circle>
+      {/* Left column — labels hug the right edge so they sit beside the circle. */}
+      <div className="flex flex-col items-end justify-center gap-6">
+        <BeamNode ref={left1} side="left" label="Python and R" delay={0} items={[{ id: "python", name: "Python" }, { id: "r", name: "R" }]} />
+        <BeamNode ref={left2} side="left" label="JavaScript and TypeScript" delay={700} items={[{ id: "javascript", name: "JavaScript" }, { id: "typescript", name: "TypeScript" }]} />
+        <BeamNode ref={left3} side="left" label="PHP" items={[{ id: "php", name: "PHP" }]} />
+        <BeamNode ref={left4} side="left" label="C and C++" delay={1400} items={[{ id: "c", name: "C" }, { id: "cpp", name: "C++" }]} />
       </div>
 
       {/* Center logo */}
@@ -137,20 +197,12 @@ export function BeamSection() {
         />
       </Circle>
 
-      {/* Right column */}
-      <div className="flex flex-col justify-center gap-6">
-        <Circle ref={right1} label="Java and C#">
-          <AlternatingIcon ids={["java", "csharp"]} delay={350} />
-        </Circle>
-        <Circle ref={right2} label="SQLite">
-          <AlternatingIcon ids={["sqlite"]} />
-        </Circle>
-        <Circle ref={right3} label="PostgreSQL">
-          <AlternatingIcon ids={["postgres"]} />
-        </Circle>
-        <Circle ref={right4} label="DuckDB">
-          <AlternatingIcon ids={["duckdb"]} />
-        </Circle>
+      {/* Right column — labels hug the left edge, beside the circle. */}
+      <div className="flex flex-col items-start justify-center gap-6">
+        <BeamNode ref={right1} side="right" label="Java and C#" delay={350} items={[{ id: "java", name: "Java" }, { id: "csharp", name: "C#" }]} />
+        <BeamNode ref={right2} side="right" label="SQLite" items={[{ id: "sqlite", name: "SQLite" }]} />
+        <BeamNode ref={right3} side="right" label="PostgreSQL" items={[{ id: "postgres", name: "PostgreSQL" }]} />
+        <BeamNode ref={right4} side="right" label="DuckDB" items={[{ id: "duckdb", name: "DuckDB" }]} />
       </div>
 
       {/* Every beam flows from a language node INTO the center. Right-side

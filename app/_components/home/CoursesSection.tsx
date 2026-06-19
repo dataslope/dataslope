@@ -39,6 +39,53 @@ const CHIP_CLASSES: Record<string, string> = {
     "border-[var(--ds-gray-200)] bg-[var(--ds-gray-50)] text-[var(--ds-gray-600)] dark:border-white/10 dark:bg-white/5 dark:text-[var(--ds-gray-300)]",
 };
 
+// Proper display labels for tag slugs whose casing isn't just "capitalize each
+// word" — languages, tools, and libraries with established names. Anything not
+// listed falls back to title-casing the hyphenated slug (e.g.
+// "exploratory-data-analysis" → "Exploratory Data Analysis").
+const TAG_LABELS: Record<string, string> = {
+  // Languages
+  c: "C",
+  cpp: "C++",
+  csharp: "C#",
+  java: "Java",
+  javascript: "JavaScript",
+  python: "Python",
+  r: "R",
+  sql: "SQL",
+  typescript: "TypeScript",
+  // Tools / databases
+  dotnet: ".NET",
+  duckdb: "DuckDB",
+  postgresql: "PostgreSQL",
+  sqlite: "SQLite",
+  // Libraries (kept at their canonical casing)
+  dplyr: "dplyr",
+  ggplot2: "ggplot2",
+  linq: "LINQ",
+  matplotlib: "Matplotlib",
+  nltk: "NLTK",
+  numpy: "NumPy",
+  pandas: "pandas",
+  plotly: "Plotly",
+  "scikit-learn": "scikit-learn",
+  scipy: "SciPy",
+  seaborn: "seaborn",
+  statsmodels: "statsmodels",
+};
+
+/** Turn a tag slug into a badge label: a known proper name, or the slug
+ *  title-cased with hyphens replaced by spaces. */
+function formatTagLabel(value: string): string {
+  return (
+    TAG_LABELS[value] ??
+    value
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ")
+  );
+}
+
 function flattenTags(tags: CourseTags): { category: string; value: string }[] {
   const chips: { category: string; value: string }[] = [];
   for (const category of TAG_CATEGORY_ORDER) {
@@ -54,10 +101,10 @@ export function CoursesSection({ courses }: { courses: Course[] }) {
   return (
     <section id="courses" className="mx-auto w-full max-w-5xl px-4 sm:px-6">
       <div className="mb-10 text-center">
-        <h2 className="text-3xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-4xl dark:text-white">
+        <h2 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
           Courses
         </h2>
-        <p className="mt-4 text-base text-[var(--ds-gray-500)] sm:text-lg dark:text-[var(--ds-gray-400)]">
+        <p className="mt-8 text-base text-[var(--ds-gray-900)] sm:text-lg dark:text-white">
           Hands-on, browser-based tracks across data and engineering.
         </p>
       </div>
@@ -84,7 +131,7 @@ export function CoursesSection({ courses }: { courses: Course[] }) {
                           CHIP_CLASSES[category] ?? CHIP_CLASSES.default
                         }`}
                       >
-                        {value}
+                        {formatTagLabel(value)}
                       </span>
                     ))}
                   </span>

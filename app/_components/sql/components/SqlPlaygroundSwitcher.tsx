@@ -49,6 +49,9 @@ export function SqlPlaygroundSwitcher({
           </Link>
         </>
       )}
+      {/* Hidden when embedded (home page iframe): switching is done by the
+          page's own switcher. */}
+      {!embedded && (
       <Select.Root
         value={playgroundId}
         onValueChange={(value) => {
@@ -114,6 +117,7 @@ export function SqlPlaygroundSwitcher({
           </Select.Positioner>
         </Select.Portal>
       </Select.Root>
+      )}
     </div>
   );
 }

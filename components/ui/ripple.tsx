@@ -6,12 +6,15 @@ interface RippleProps extends ComponentPropsWithoutRef<"div"> {
   mainCircleSize?: number;
   mainCircleOpacity?: number;
   numCircles?: number;
+  /** Pixel gap added to each successive circle's diameter. */
+  circleGap?: number;
 }
 
 export const Ripple = React.memo(function Ripple({
   mainCircleSize = 210,
   mainCircleOpacity = 0.24,
   numCircles = 8,
+  circleGap = 70,
   className,
   ...props
 }: RippleProps) {
@@ -24,7 +27,7 @@ export const Ripple = React.memo(function Ripple({
       {...props}
     >
       {Array.from({ length: numCircles }, (_, i) => {
-        const size = mainCircleSize + i * 70;
+        const size = mainCircleSize + i * circleGap;
         const opacity = mainCircleOpacity - i * 0.03;
         const animationDelay = `${i * 0.06}s`;
         const borderStyle = "solid";
