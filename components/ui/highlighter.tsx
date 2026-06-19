@@ -68,7 +68,17 @@ export function Highlighter({
       annotation = currentAnnotation;
       currentAnnotation.show();
 
+      // The annotation is drawn to fit the element's width, so it only needs
+      // to be redrawn when that width actually changes (e.g. a reflow that
+      // re-wraps the text). Observing document.body otherwise fires on every
+      // unrelated layout change — like an FAQ accordion expanding further down
+      // the page — which made the highlight needlessly re-render. Guarding on
+      // width prevents that churn.
+      let lastWidth = element.getBoundingClientRect().width;
       resizeObserver = new ResizeObserver(() => {
+        const nextWidth = element.getBoundingClientRect().width;
+        if (nextWidth === lastWidth) return;
+        lastWidth = nextWidth;
         currentAnnotation.hide();
         currentAnnotation.show();
       });

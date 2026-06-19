@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Select } from "@base-ui-components/react/select";
 import { ChevronDown } from "lucide-react";
 import { Ripple } from "@/components/ui/ripple";
+import { ShimmerButton } from "@/components/ui/shimmer-button";
 import type { IconType } from "react-icons";
 import {
   LANGUAGE_ICONS,
@@ -82,17 +83,30 @@ function PickerSelect({
           if (next != null) onValueChange(next);
         }}
       >
-        <Select.Trigger className="inline-flex min-w-40 items-center gap-2 rounded-lg border border-[var(--ds-gray-200)] bg-white px-3 py-1.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:border-[var(--ds-blue-300)] focus-visible:border-[var(--ds-blue-500)] focus-visible:outline-none dark:border-white/15 dark:bg-white/5 dark:text-[var(--ds-gray-100)]">
-          {active && <OptionIcon id={active.iconId} />}
-          {/* Render the label explicitly — a bare <Select.Value/> shows the
-              raw (lowercased) value instead of the option's label. */}
-          <Select.Value className="flex-1 truncate text-left">
-            {active?.label ?? value}
-          </Select.Value>
-          <Select.Icon className="text-[var(--ds-gray-400)]">
-            <ChevronDown size={14} />
-          </Select.Icon>
-        </Select.Trigger>
+        {/* Magic UI ShimmerButton as the select trigger. --ds-gray-900 is a
+            fixed near-black in both themes, so white text + the blue shimmer
+            read well in light and dark mode alike. */}
+        <Select.Trigger
+          render={(triggerProps) => (
+            <ShimmerButton
+              {...triggerProps}
+              background="var(--ds-gray-900)"
+              shimmerColor="#148CFF"
+              borderRadius="0.625rem"
+              className="min-w-40 justify-between gap-2 px-3.5 py-1.5 text-sm font-medium focus-visible:outline-none"
+            >
+              {active && <OptionIcon id={active.iconId} />}
+              {/* Render the label explicitly — a bare <Select.Value/> shows the
+                  raw (lowercased) value instead of the option's label. */}
+              <Select.Value className="flex-1 truncate text-left">
+                {active?.label ?? value}
+              </Select.Value>
+              <Select.Icon className="text-white/70">
+                <ChevronDown size={14} />
+              </Select.Icon>
+            </ShimmerButton>
+          )}
+        />
         <Select.Portal>
           <Select.Positioner
             sideOffset={6}
@@ -183,8 +197,14 @@ export function HeroInteractive() {
   return (
     <div className="relative mx-auto w-full max-w-3xl">
       {/* Magic UI Ripple behind the preview card. overflow-hidden clips its
-          oversized circles to the panel so they can't widen the page. */}
-      <Ripple className="overflow-hidden" mainCircleOpacity={0.16} />
+          oversized circles to the panel so they can't widen the page; the
+          override mask fades the circles out top *and* bottom so they dissolve
+          into the page instead of meeting the white background at a hard,
+          chopped-off edge. */}
+      <Ripple
+        className="overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,white_28%,white_72%,transparent)]"
+        mainCircleOpacity={0.16}
+      />
       {/* Tab bar */}
       <div className="relative z-10 mb-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
         {TABS.map((t) => {
