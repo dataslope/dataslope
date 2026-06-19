@@ -136,7 +136,7 @@ function PickerSelect({
 /**
  * Wraps a preview card with a Magic UI Ripple that is centered on the card
  * (both axes) and sized from the card's shorter edge, so its largest circle
- * reaches just slightly beyond that edge — a subtle halo rather than a ring
+ * reaches a bit beyond that edge — a soft halo rather than a ring
  * spanning the whole card. The card renders on top (opaque), so the rings read
  * as a halo around it. The ripple re-sizes itself as the card's measured box
  * changes (e.g. when the runtime loads or the viewport resizes).
@@ -156,12 +156,12 @@ function RippleFrame({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Size the ripple from the card's SHORTER edge so it stays subtle — the
-  // largest circle reaches just slightly beyond that edge and the rings never
-  // spread the full width/height of the card. Fall back to a sensible size
+  // largest circle reaches a bit beyond that edge for a soft halo without
+  // spreading the full width of the card. Fall back to a sensible size
   // until the card is measured.
   const NUM_CIRCLES = 7;
   const shortEdge = Math.min(box.w, box.h) || 360;
-  const maxCircle = Math.round(shortEdge * 1.1);
+  const maxCircle = Math.round(shortEdge * 1.25);
   const mainCircleSize = Math.round(maxCircle * 0.42);
   const circleGap = Math.round((maxCircle - mainCircleSize) / (NUM_CIRCLES - 1));
 

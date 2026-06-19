@@ -11,7 +11,6 @@ import { CoursesSection, type Course } from "./CoursesSection";
 import { PlaygroundShowcase } from "./PlaygroundShowcase";
 import { Faq } from "./Faq";
 import { HomeFooter } from "./HomeFooter";
-import { useTheme } from "./theme";
 
 function SectionHeading({
   title,
@@ -34,10 +33,9 @@ function SectionHeading({
 
 
 export function HomeClient({ courses }: { courses: Course[] }) {
-  const { theme } = useTheme();
-  // Marker-style highlight: yellow reads well behind the gray subtitle text in
-  // light mode but washes out on the dark page, so use brand blue there.
-  const highlightColor = theme === "dark" ? "#148CFF" : "#FFDD6C";
+  // Brand blue (--ds-blue-500) underline under the gray subtitle text, in both
+  // light and dark mode.
+  const underlineColor = "#148CFF";
   return (
     /* Inter everywhere on the home page; the embedded challenge cards and MCQ
        bring their own type via their CSS modules and override this. */
@@ -70,19 +68,19 @@ export function HomeClient({ courses }: { courses: Course[] }) {
                 <>
                   Python, R, Javascript, Typescript, PHP, C, C++, Java, C#,
                   SQLite, Postgres, and DuckDB —{" "}
-                  <Highlighter action="highlight" color={highlightColor} isView>
+                  <Highlighter action="underline" color={underlineColor} isView>
                     free
                   </Highlighter>
                   ,{" "}
-                  <Highlighter action="highlight" color={highlightColor} isView>
+                  <Highlighter action="underline" color={underlineColor} isView>
                     no install
                   </Highlighter>
                   ,{" "}
-                  <Highlighter action="highlight" color={highlightColor} isView>
+                  <Highlighter action="underline" color={underlineColor} isView>
                     no sign-ins
                   </Highlighter>
                   ,{" "}
-                  <Highlighter action="highlight" color={highlightColor} isView>
+                  <Highlighter action="underline" color={underlineColor} isView>
                     no paywall
                   </Highlighter>
                   , all running in the browser.
