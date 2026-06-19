@@ -265,16 +265,16 @@ export const noActiveLine: Extension = EditorView.theme({
 // GitHub Dark with editor/gutter backgrounds overridden to match the
 // Fumadocs page background (`--color-fd-background`). We apply this as
 // a secondary EditorView.theme after githubDark so it wins via ordering
-// (last theme wins when specificity ties). The fallback `#0d1117` is
-// GitHub's native dark background, used outside the /learn route where
-// the Fumadocs token isn't defined.
+// (last theme wins when specificity ties). The fallback `#121212` is the
+// site's neutral near-black, used outside the /learn route where the
+// Fumadocs token isn't defined (it replaces GitHub's blue-tinted #0d1117).
 const githubDarkPageBgOverride = EditorView.theme(
   {
     "&": {
-      backgroundColor: "var(--color-fd-background, #0d1117)",
+      backgroundColor: "var(--color-fd-background, #121212)",
     },
     ".cm-gutters": {
-      backgroundColor: "var(--color-fd-background, #0d1117)",
+      backgroundColor: "var(--color-fd-background, #121212)",
     },
   },
   { dark: true },
@@ -297,7 +297,7 @@ export function themeFor(name: string): Extension {
   if (name === "github-light") return githubLightCustom;
   const cached = themeCache.get(name);
   if (cached) return cached;
-  const palette = THEME_PALETTES[name] ?? THEME_PALETTES.lucario;
+  const palette = THEME_PALETTES[name] ?? THEME_PALETTES["github-light"];
   const ext = buildTheme(name, palette, LIGHT_THEMES.has(name));
   themeCache.set(name, ext);
   return ext;

@@ -14,41 +14,38 @@ export const metadata: Metadata = {
   description: "Browser-based language playgrounds.",
 };
 
-// Runs before React hydrates. Reads the persisted editor theme from
-// localStorage and applies the matching UI palette + data-theme attribute
-// to <html> synchronously, so the rest of the UI never paints in the
-// "wrong" (default dracula/dark) palette while the editor loads with a
-// different one.
+// Runs before React hydrates. On /playground routes it applies the SITE
+// light/dark choice (the shared `theme` localStorage key + `.dark`/`.light`
+// class, the same one /learn and the home page use) to the playground's CSS
+// custom properties + `data-playground-theme`, so the chrome never paints in
+// the wrong palette before the React app (and usePlaygroundThemeSync) takes
+// over. The two GitHub palettes mirror THEME_PALETTES in playgroundTheme.ts.
 const themeBootstrapScript = `
 (function () {
   try {
-    // --text-dim and --text-muted are hardcoded in playground.css and stay constant.
-    var palettes = {
-      "dracula":         {bg:"#282a36",bg2:"#21222c",bg3:"#343746",border:"#44475a",text:"#f8f8f2",accent1:"#ff79c6",accent2:"#50fa7b"},
-      "monokai":         {bg:"#272822",bg2:"#1e1f1c",bg3:"#3e3d32",border:"#49483e",text:"#f8f8f2",accent1:"#f92672",accent2:"#a6e22e"},
-      "material-darker": {bg:"#212121",bg2:"#1a1a1a",bg3:"#2d2d2d",border:"#3d3d3d",text:"#eeffff",accent1:"#c792ea",accent2:"#82aaff"},
-      "nord":            {bg:"#2e3440",bg2:"#272c36",bg3:"#3b4252",border:"#434c5e",text:"#d8dee9",accent1:"#81a1c1",accent2:"#88c0d0"},
-      "tomorrow-night-eighties":{bg:"#2d2d2d",bg2:"#252525",bg3:"#393939",border:"#515151",text:"#cccccc",accent1:"#cc99cc",accent2:"#6699cc"},
-      "solarized dark":  {bg:"#002b36",bg2:"#00212b",bg3:"#073642",border:"#094b5a",text:"#839496",accent1:"#859900",accent2:"#268bd2"},
-      "solarized light": {bg:"#fdf6e3",bg2:"#eee8d5",bg3:"#f5efdc",border:"#ddd6c0",text:"#657b83",accent1:"#859900",accent2:"#268bd2"},
-      "eclipse":         {bg:"#ffffff",bg2:"#f5f5f5",bg3:"#ebebeb",border:"#d8d8d8",text:"#1a1a1a",accent1:"#7f0055",accent2:"#0000c0"},
-      "mdn-like":        {bg:"#ffffff",bg2:"#f9f9fb",bg3:"#f0f0f4",border:"#dcdce0",text:"#333333",accent1:"#a71d5d",accent2:"#005cc5"}
-    };
-    var lightThemes = {"eclipse":1,"mdn-like":1,"solarized light":1};
-    if (!/^\\/playground(?:\\/|$)/.test(location.pathname)) return;
-    var theme = localStorage.getItem("playground_editor_theme");
-    if (!theme || !palettes[theme]) return;
-    var p = palettes[theme];
+    if (location.pathname.indexOf("/playground") !== 0) return;
+    var stored = null;
+    try { stored = localStorage.getItem("theme"); } catch (e) {}
+    var dark = stored === "dark" ||
+      (stored !== "light" && document.documentElement.classList.contains("dark"));
+    var p = dark
+      ? {bg:"#121212",bg2:"#0a0a0a",bg3:"#1c1c1c",border:"#2a2a2a",text:"#c9d1d9",dim:"#8b949e",muted:"#79c0ff",fn:"#d2a8ff",kw:"#ff7b72",a1:"#d2a8ff",a2:"#79c0ff"}
+      : {bg:"#ffffff",bg2:"#f6f8fa",bg3:"#eaeef2",border:"#d0d7de",text:"#24292f",dim:"#6e7781",muted:"#0550ae",fn:"#8250df",kw:"#cf222e",a1:"#8250df",a2:"#0550ae"};
     var r = document.documentElement;
+    r.classList.toggle("dark", dark);
+    r.classList.toggle("light", !dark);
     r.style.setProperty("--bg", p.bg);
     r.style.setProperty("--bg2", p.bg2);
     r.style.setProperty("--bg3", p.bg3);
     r.style.setProperty("--border", p.border);
     r.style.setProperty("--text", p.text);
-    r.style.setProperty("--text-complementary", p.accent2);
-    r.style.setProperty("--accent1", p.accent1);
-    r.style.setProperty("--accent2", p.accent2);
-    r.setAttribute("data-theme", lightThemes[theme] ? "light" : "dark");
+    r.style.setProperty("--text-dim", p.dim);
+    r.style.setProperty("--text-muted", p.muted);
+    r.style.setProperty("--text-complementary", p.fn);
+    r.style.setProperty("--theme-primary", p.kw);
+    r.style.setProperty("--accent1", p.a1);
+    r.style.setProperty("--accent2", p.a2);
+    r.setAttribute("data-playground-theme", dark ? "dark" : "light");
   } catch (e) { /* localStorage unavailable — fall back to default theme */ }
 })();
 `;

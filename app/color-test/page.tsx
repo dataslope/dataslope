@@ -88,13 +88,13 @@ function resolveCssVarToHex(varName: string): string {
 
 
 export default function ColorTestPage() {
-  const [activeTheme, setActiveTheme] = useState("lucario");
+  const [activeTheme, setActiveTheme] = useState("github-light");
   const [resolvedHex, setResolvedHex] = useState<Record<string, string>>({});
   const [copiedVar, setCopiedVar] = useState<string | null>(null);
 
   useEffect(() => {
     const stored = getStoredEditorTheme();
-    const theme = stored ?? "lucario";
+    const theme = stored ?? "github-light";
     /* eslint-disable-next-line react-hooks/set-state-in-effect */
     setActiveTheme(theme);
     applyThemePalette(theme);

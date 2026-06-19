@@ -83,6 +83,7 @@ import {
   getStoredEditorTheme,
   setStoredEditorTheme,
 } from "../playgroundTheme";
+import { usePlaygroundThemeSync } from "../playgroundThemeSync";
 import {
   DataslopeRunOverlay,
   DEFAULT_PLAYGROUND_SETTINGS,
@@ -947,6 +948,8 @@ function PostgresPlaygroundInner() {
     },
     [setEditorThemeState],
   );
+  // Follow the site-wide light/dark choice (shared with the home page + /learn).
+  usePlaygroundThemeSync(setEditorTheme);
   const setWordWrap = useCallback(
     (b: boolean) => {
       setWordWrapState(b);

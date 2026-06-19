@@ -1,0 +1,79 @@
+/* ============================================================================
+ * home.css — hardening for the home route ("/").
+ * ----------------------------------------------------------------------------
+ * The /learn route's stylesheet (app/learn/learn.css) defines GLOBAL element
+ * typography — `body { font-family: Inter }` and `h1..h6 { font-family: serif }`
+ * — and imports Tailwind's preflight, whose `.hidden` utility competes with our
+ * responsive `md:*` display utilities. Next.js can leave that stylesheet
+ * applied after a *client-side* back-navigation from /learn, so its rules bleed
+ * onto this page: headings turn serif, and the nav menu (`hidden md:flex`) gets
+ * stuck collapsed because the leaked `.hidden` outranks `md:flex`.
+ *
+ * Scoping these rules under `.ds-home` gives them higher specificity than
+ * learn.css's element/single-class selectors, so they win regardless of which
+ * stylesheet the browser ordered last. They only match on the home route, so
+ * they never affect /learn itself.
+ * ========================================================================== */
+
+/* Keep the whole page — and every heading in it — on Inter, immune to
+ * learn.css's global serif `h1..h6` rule. */
+.ds-home,
+.ds-home h1,
+.ds-home h2,
+.ds-home h3,
+.ds-home h4,
+.ds-home h5,
+.ds-home h6 {
+  font-family: var(--font-sans, "Inter", system-ui, sans-serif);
+  font-variation-settings: normal;
+}
+
+/* The embedded challenge cards, code blocks, and MCQ are authored for the
+ * /learn route: in dark mode their surface background reads
+ * `var(--color-fd-background, <fallback>)`. That Fumadocs token doesn't exist
+ * outside /learn, so they fall back to hardcoded values — some of which are
+ * blue-slate (#111827, --ch-slate-900). Define the token here (white in light,
+ * Fumadocs's neutral near-black #121212 in dark) so those surfaces stay neutral
+ * and match the rest of the page. */
+.ds-home {
+  --color-fd-background: #ffffff;
+}
+html.dark .ds-home {
+  --color-fd-background: #121212;
+}
+
+/* Center nav menu: hidden below md, flex from md up. Replaces `hidden md:flex`
+ * so a leaked `.hidden` can't keep it collapsed on desktop. */
+.ds-home .ds-nav-menu {
+  display: none;
+}
+@media (min-width: 768px) {
+  .ds-home .ds-nav-menu {
+    display: flex;
+  }
+}
+
+/* Mobile hamburger: shown below md, hidden from md up. Replaces `md:hidden`
+ * so a leaked `.inline-flex` can't force it visible on desktop. */
+.ds-home .ds-mobile-trigger {
+  display: inline-flex;
+}
+@media (min-width: 768px) {
+  .ds-home .ds-mobile-trigger {
+    display: none;
+  }
+}
+
+/* Footer: one column on mobile, three from sm up. Driven by a scoped rule
+ * (rather than Tailwind grid utilities) so a leaked `.grid`/`grid-cols-*`
+ * from /learn can't collapse it back to the wrong column count. */
+.ds-home .ds-footer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2.5rem;
+}
+@media (min-width: 640px) {
+  .ds-home .ds-footer-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

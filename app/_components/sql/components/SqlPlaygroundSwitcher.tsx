@@ -9,6 +9,7 @@ import {
   LANGUAGE_ICON_SIZE_FACTOR as PLAYGROUND_ICON_SIZE_FACTOR,
 } from "../../languageIcons";
 import { PLAYGROUNDS } from "../../playgrounds";
+import { useIsFramed } from "../../useIsFramed";
 
 /**
  * Shared "Dataslope" brand logo + brand name + playground switcher
@@ -28,19 +29,26 @@ export function SqlPlaygroundSwitcher({
   playgroundId,
 }: SqlPlaygroundSwitcherProps) {
   const router = useRouter();
+  // Hide the brand logo + wordmark when embedded (the home page's iframe);
+  // keep them on the standalone playground pages.
+  const embedded = useIsFramed();
   return (
     <div className="logo">
-      <Link href="/" aria-label="Dataslope home">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/dataslope-logo-blue.svg"
-          alt="Dataslope logo"
-          className="brand-logo"
-        />
-      </Link>
-      <Link href="/" className="brand-name">
-        Dataslope
-      </Link>
+      {!embedded && (
+        <>
+          <Link href="/" aria-label="Dataslope home">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/dataslope-logo-blue.svg"
+              alt="Dataslope logo"
+              className="brand-logo"
+            />
+          </Link>
+          <Link href="/" className="brand-name">
+            Dataslope
+          </Link>
+        </>
+      )}
       <Select.Root
         value={playgroundId}
         onValueChange={(value) => {
@@ -65,7 +73,10 @@ export function SqlPlaygroundSwitcher({
               </span>
             ) : null;
           })()}
-          <Select.Value />
+          <Select.Value>
+            {PLAYGROUNDS.find((p) => p.id === playgroundId)?.label ??
+              playgroundId}
+          </Select.Value>
           <Select.Icon className="playground-switcher-icon">
             <ChevronDown size={12} />
           </Select.Icon>
