@@ -35,7 +35,7 @@ function SectionHeading({
 
 export function HomeClient({ courses }: { courses: Course[] }) {
   const { theme } = useTheme();
-  // Marker-style highlight: yellow reads well behind the gray subtitle text in
+  // Marker-style underline: yellow reads well under the gray subtitle text in
   // light mode but washes out on the dark page, so use brand blue there.
   const highlightColor = theme === "dark" ? "#148CFF" : "#FFDD6C";
   return (
@@ -70,19 +70,19 @@ export function HomeClient({ courses }: { courses: Course[] }) {
                 <>
                   Python, R, Javascript, Typescript, PHP, C, C++, Java, C#,
                   SQLite, Postgres, and DuckDB —{" "}
-                  <Highlighter action="highlight" color={highlightColor} isView>
+                  <Highlighter action="underline" color={highlightColor} isView>
                     free
                   </Highlighter>
                   ,{" "}
-                  <Highlighter action="highlight" color={highlightColor} isView>
+                  <Highlighter action="underline" color={highlightColor} isView>
                     no install
                   </Highlighter>
                   ,{" "}
-                  <Highlighter action="highlight" color={highlightColor} isView>
+                  <Highlighter action="underline" color={highlightColor} isView>
                     no sign-ins
                   </Highlighter>
                   ,{" "}
-                  <Highlighter action="highlight" color={highlightColor} isView>
+                  <Highlighter action="underline" color={highlightColor} isView>
                     no paywall
                   </Highlighter>
                   , all running in the browser.
