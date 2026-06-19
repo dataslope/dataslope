@@ -10,7 +10,7 @@ const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Is it really free?",
-    a: "Yes. Every course, playground, and quiz is free to use, with no paywall and no upsell.",
+    a: "Yes — all the courses, playgrounds, and quizzes are completely free and fully accessible, with no paywall on any of the content.",
   },
   {
     q: "How does code run without a server?",

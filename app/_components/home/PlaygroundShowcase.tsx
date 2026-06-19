@@ -6,6 +6,7 @@ import { Highlighter } from "@/components/ui/highlighter";
 import Link from "../Link";
 import { PLAYGROUNDS } from "../playgrounds";
 import { EmbeddedPlayground } from "./EmbeddedPlayground";
+import { useTheme } from "./theme";
 
 const SQL_IDS = new Set(["postgres", "sqlite", "duckdb"]);
 
@@ -22,8 +23,12 @@ function playgroundHref(id: string): string {
  *  whichever language is currently showing, and a link to its full page. */
 export function PlaygroundShowcase() {
   const [playgroundId, setPlaygroundId] = useState("postgres");
+  const { theme } = useTheme();
   const name = languageName(playgroundId);
   const isSql = SQL_IDS.has(playgroundId);
+  // Yellow reads well behind dark text in light mode but washes out behind
+  // the light link text in dark mode, so use brand blue there.
+  const highlightColor = theme === "dark" ? "#148CFF" : "#FFDD6C";
 
   const subtitle = isSql
     ? `A full in-browser SQL workbench — query, edit schemas, and explore sample databases. Switch to any language from the switcher in the top-left.`
@@ -51,7 +56,7 @@ export function PlaygroundShowcase() {
         >
           <span>
             Open the{" "}
-            <Highlighter action="highlight" color="#FFDD6C" isView>
+            <Highlighter action="highlight" color={highlightColor} isView>
               {name}
             </Highlighter>{" "}
             playground

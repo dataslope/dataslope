@@ -16,12 +16,6 @@ import { useTheme } from "./theme";
 
 const GITHUB_URL = "https://github.com/dataslope/dataslope/";
 
-/** Trim the trailing " Playground" so the dropdown reads as a list of
- *  languages (e.g. "Python Playground" → "Python"). */
-function languageLabel(label: string): string {
-  return label.replace(/\s+Playground$/, "");
-}
-
 function LangIcon({ id, size = 16 }: { id: string; size?: number }) {
   const Icon: IconType | undefined = LANGUAGE_ICONS[id];
   if (!Icon) return null;
@@ -91,7 +85,7 @@ function PlaygroundMenu() {
                 render={<Link href={p.href} prefetch={false} />}
               >
                 <LangIcon id={p.id} />
-                {languageLabel(p.label)}
+                {p.label}
               </Menu.Item>
             ))}
           </Menu.Popup>
@@ -168,7 +162,7 @@ function MobileDrawer() {
                 className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-200)] dark:hover:bg-white/10"
               >
                 <LangIcon id={p.id} />
-                {languageLabel(p.label)}
+                {p.label}
               </Dialog.Close>
             ))}
           </div>

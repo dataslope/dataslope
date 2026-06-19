@@ -20,7 +20,6 @@ import {
   WrapText,
   X,
 } from "lucide-react";
-import type { ThemePalette } from "./playgroundTheme";
 import { setSiteTheme } from "./siteTheme";
 import type { RuntimeInfo } from "./types";
 
@@ -191,102 +190,6 @@ export function RuntimeInfoContent({ info }: { info: RuntimeInfo }) {
       {info.notes && <div className="info-popover-notes">{info.notes}</div>}
     </>
   );
-}
-
-/** Build the language-specific syntax-highlighted snippet shown inside
- *  each editor-theme preview card, so the preview is representative of
- *  what *this* playground's editor will look like — not a generic Python
- *  snippet for every language. */
-function ThemePreviewSnippet({
-  palette,
-  language,
-}: {
-  palette: ThemePalette;
-  language: string;
-}) {
-  const kw = (t: ReactNode) => <span style={{ color: palette.kw }}>{t}</span>;
-  const fn = (t: ReactNode) => <span style={{ color: palette.fn }}>{t}</span>;
-  const arg = (t: ReactNode) => <span style={{ color: palette.arg }}>{t}</span>;
-  const str = (t: ReactNode) => <span style={{ color: palette.str }}>{t}</span>;
-
-  switch (language) {
-    case "sqlite":
-    case "sql":
-      return (
-        <>
-          {kw("SELECT")} {arg("name")}, {fn("COUNT")}({kw("*")}){"\n"}
-          {kw("FROM")} users{"\n"}
-          {kw("WHERE")} city {kw("=")} {str("'Seattle'")};
-        </>
-      );
-    case "r":
-      return (
-        <>
-          {fn("greet")} {kw("<-")} {kw("function")}({arg("name")}) {"{"}
-          {"\n  "}
-          {fn("paste0")}({str('"Hello, "')}, name, {str('"!"')}){"\n}"}
-        </>
-      );
-    case "javascript":
-      return (
-        <>
-          {kw("const")} {fn("greet")} = ({arg("name")}) {kw("=>")}
-          {"\n  "}
-          {str("`Hello, ${name}!`")};
-        </>
-      );
-    case "typescript":
-      return (
-        <>
-          {kw("const")} {fn("greet")} = ({arg("name")}: {kw("string")}) {kw("=>")}
-          {"\n  "}
-          {str("`Hello, ${name}!`")};
-        </>
-      );
-    case "php":
-      return (
-        <>
-          {kw("function")} {fn("greet")}({arg("$name")}) {"{"}
-          {"\n  "}
-          {kw("return")} {str('"Hello, $name!"')};{"\n}"}
-        </>
-      );
-    case "c":
-      return (
-        <>
-          {fn("printf")}({str('"Hello, %s!\\n"')},{"\n  "}name);
-        </>
-      );
-    case "cpp":
-      return (
-        <>
-          {fn("std::cout")} {kw("<<")} {str('"Hello, "')}
-          {"\n  "}
-          {kw("<<")} name {kw("<<")} {str('"!\\n"')};
-        </>
-      );
-    case "java":
-      return (
-        <>
-          {fn("System.out")}.{fn("println")}({"\n  "}
-          {str('"Hello, "')} + name);
-        </>
-      );
-    case "csharp":
-      return (
-        <>
-          {fn("Console")}.{fn("WriteLine")}({"\n  "}
-          {str('$"Hello, {name}!"')});
-        </>
-      );
-    default:
-      return (
-        <>
-          {kw("def")} {fn("greet")}({arg("name")}):{"\n  "}
-          {kw("return")} {str('f"Hello, {name}!"')}
-        </>
-      );
-  }
 }
 
 export interface SettingsPanelProps {
