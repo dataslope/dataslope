@@ -25,7 +25,7 @@ function SectionHeading({
       <h2 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
         {title}
       </h2>
-      <p className="mt-6 text-base text-[var(--ds-gray-500)] sm:text-lg dark:text-[var(--ds-gray-400)]">
+      <p className="mt-8 text-base text-[var(--ds-gray-900)] sm:text-lg dark:text-white">
         {subtitle}
       </p>
     </div>

@@ -135,9 +135,10 @@ function PickerSelect({
 
 /**
  * Wraps a preview card with a Magic UI Ripple that is centered on the card
- * (both axes) and sized so its largest circle reaches beyond every edge. The
- * card renders on top (opaque), so the ripple reads as concentric rings
- * haloing the card. The ripple re-sizes itself as the card's measured box
+ * (both axes) and sized from the card's shorter edge, so its largest circle
+ * reaches just slightly beyond that edge — a subtle halo rather than a ring
+ * spanning the whole card. The card renders on top (opaque), so the rings read
+ * as a halo around it. The ripple re-sizes itself as the card's measured box
  * changes (e.g. when the runtime loads or the viewport resizes).
  */
 function RippleFrame({ children }: { children: React.ReactNode }) {
@@ -154,21 +155,21 @@ function RippleFrame({ children }: { children: React.ReactNode }) {
     return () => ro.disconnect();
   }, []);
 
-  // Largest circle = 1.35× the card's larger dimension so it clears every
-  // edge; the circles run down to a still-large innermost ring. Fall back to a
-  // sensible size until the card is measured.
+  // Size the ripple from the card's SHORTER edge so it stays subtle — the
+  // largest circle reaches just slightly beyond that edge and the rings never
+  // spread the full width/height of the card. Fall back to a sensible size
+  // until the card is measured.
   const NUM_CIRCLES = 7;
-  const base = Math.max(box.w, box.h) || 480;
-  const maxCircle = Math.round(base * 1.35);
+  const shortEdge = Math.min(box.w, box.h) || 360;
+  const maxCircle = Math.round(shortEdge * 1.1);
   const mainCircleSize = Math.round(maxCircle * 0.42);
   const circleGap = Math.round((maxCircle - mainCircleSize) / (NUM_CIRCLES - 1));
 
   return (
     <div ref={ref} className="relative">
-      {/* Box is the size of the largest circle and centered on the card, so a
-          radial mask can fade the rings out smoothly before the box edge. No
-          overflow clip — the rings are meant to spill past the card; the page
-          itself is kept from widening by <main>'s overflow-x-clip. */}
+      {/* Box is the size of the largest circle, centered on the card. No
+          overflow clip — the rings are meant to spill slightly past the card;
+          the page itself is kept from widening by <main>'s overflow-x-clip. */}
       <div
         className="pointer-events-none absolute left-1/2 top-1/2 z-0 -translate-x-1/2 -translate-y-1/2"
         style={{ width: maxCircle, height: maxCircle }}

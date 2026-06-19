@@ -3,45 +3,40 @@
 import { useEffect, useRef, useState } from "react";
 
 /**
- * Showcase embed of the real playground, defaulting to PostgreSQL.
+ * Showcase embed of the real playground, driven by `playgroundId` from the
+ * page's external switcher.
  *
- * We render it in a same-origin <iframe> rather than mounting
- * `<PostgresPlayground>` inline: the playground takes over the host
- * document on mount (adds `body.playground-active` → full-bleed dark
- * background + `overflow:hidden`, and writes editor-theme palette vars onto
- * `<html>`). An iframe fully isolates that from the marketing page while
- * still giving visitors the live editor, schema browser, and — top-left —
- * the playground switcher to jump to any other language.
+ * We render it in a same-origin <iframe> rather than mounting the playground
+ * inline: the playground takes over the host document on mount (adds
+ * `body.playground-active` → full-bleed dark background + `overflow:hidden`,
+ * and writes editor-theme palette vars onto `<html>`). An iframe fully
+ * isolates that from the marketing page while still giving visitors the live
+ * editor and schema browser.
  *
- * Because the frame is same-origin, we read its pathname on every load to
- * report which playground is showing (the switcher navigates within the
- * frame), so the surrounding copy + the "open full playground" link can
- * follow along.
+ * The playground's own in-header switcher is hidden when it detects it's
+ * framed (see `useIsFramed`); switching languages here is done by the page's
+ * switcher, which changes `playgroundId` and points the iframe at the new
+ * playground route.
  *
- * The iframe `src` is only set once the card scrolls near the viewport so
- * the (heavy) playground bundle and PGlite boot don't tax the initial load.
+ * The iframe `src` is only set once the card scrolls near the viewport so the
+ * (heavy) playground bundle and runtime boot don't tax the initial load.
  */
-export function EmbeddedPlayground({
-  onPlaygroundChange,
-}: {
-  onPlaygroundChange?: (id: string) => void;
-}) {
+export function EmbeddedPlayground({ playgroundId }: { playgroundId: string }) {
   const ref = useRef<HTMLDivElement>(null);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [src, setSrc] = useState<string | null>(null);
+  const [inView, setInView] = useState(false);
 
   useEffect(() => {
-    if (src) return;
+    if (inView) return;
     const el = ref.current;
     if (!el) return;
     if (typeof IntersectionObserver === "undefined") {
-      const timer = window.setTimeout(() => setSrc("/playground/postgres"), 0);
+      const timer = window.setTimeout(() => setInView(true), 0);
       return () => window.clearTimeout(timer);
     }
     const io = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) {
-          setSrc("/playground/postgres");
+          setInView(true);
           io.disconnect();
         }
       },
@@ -49,28 +44,9 @@ export function EmbeddedPlayground({
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [src]);
+  }, [inView]);
 
-  // The in-frame switcher navigates client-side (no iframe `load` event), so
-  // poll the same-origin frame's path to report which playground is showing.
-  useEffect(() => {
-    if (!src || !onPlaygroundChange) return;
-    let last = "";
-    const read = () => {
-      try {
-        const path = iframeRef.current?.contentWindow?.location?.pathname ?? "";
-        const match = path.match(/\/playground\/([^/]+)/);
-        if (match && match[1] !== last) {
-          last = match[1];
-          onPlaygroundChange(match[1]);
-        }
-      } catch {
-        /* transient during navigation / cross-origin — ignore */
-      }
-    };
-    const id = window.setInterval(read, 500);
-    return () => window.clearInterval(id);
-  }, [src, onPlaygroundChange]);
+  const src = inView ? `/playground/${playgroundId}` : null;
 
   return (
     <div
@@ -80,8 +56,9 @@ export function EmbeddedPlayground({
       className="relative aspect-[16/10] max-h-[820px] min-h-[480px] w-full overflow-hidden rounded-2xl border border-[var(--ds-gray-200)] bg-[var(--ds-gray-50)] shadow-sm dark:border-white/10 dark:bg-white/5"
     >
       {src ? (
+        // key on src so switching languages cleanly reloads the iframe.
         <iframe
-          ref={iframeRef}
+          key={src}
           src={src}
           title="Dataslope playground"
           loading="lazy"

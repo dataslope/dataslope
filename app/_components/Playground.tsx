@@ -2986,6 +2986,9 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 <Link href="/" className="brand-name">Dataslope</Link>
               </>
             )}
+            {/* Hidden when embedded (home page iframe): switching is done by
+                the page's own switcher. */}
+            {!embedded && (
             <Select.Root
               value={adapter.id}
               onValueChange={(value) => {
@@ -3053,6 +3056,7 @@ function PlaygroundInner({ adapter }: PlaygroundProps) {
                 </Select.Positioner>
               </Select.Portal>
             </Select.Root>
+            )}
           </div>
           <div className="header-sep" />
 
