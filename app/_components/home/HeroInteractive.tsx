@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Select } from "@base-ui-components/react/select";
 import { ChevronDown } from "lucide-react";
 import { Ripple } from "@/components/ui/ripple";
@@ -92,6 +92,7 @@ function PickerSelect({
               {...triggerProps}
               background="var(--ds-gray-900)"
               shimmerColor="#148CFF"
+              shimmerSize="0.15em"
               borderRadius="0.625rem"
               className="min-w-40 justify-between gap-2 px-3.5 py-1.5 text-sm font-medium focus-visible:outline-none"
             >
@@ -194,6 +195,32 @@ function SqlChallengePanel() {
 
 export function HeroInteractive() {
   const [tab, setTab] = useState<TabId>("code");
+
+  // Size the ripple from the actual preview (challenge card) width so its
+  // largest circle is always a bit wider than the card and the whole ripple
+  // scales sensibly from mobile to desktop.
+  const previewRef = useRef<HTMLDivElement>(null);
+  const [previewWidth, setPreviewWidth] = useState(0);
+  useEffect(() => {
+    const el = previewRef.current;
+    if (!el) return;
+    const measure = () => setPreviewWidth(el.getBoundingClientRect().width);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // Fall back to ~max-w-2xl until measured. The outermost circle is 1.2× the
+  // card width (larger than the card); the innermost is a generous 0.55× so
+  // the main circle reads large, with the remaining circles evenly spaced.
+  const RIPPLE_CIRCLES = 8;
+  const cardWidth = previewWidth || 672;
+  const rippleMainSize = Math.round(cardWidth * 0.55);
+  const rippleGap = Math.round(
+    (cardWidth * 1.2 - rippleMainSize) / (RIPPLE_CIRCLES - 1),
+  );
+
   return (
     <div className="relative mx-auto w-full max-w-3xl">
       {/* Tab bar */}
@@ -224,19 +251,22 @@ export function HeroInteractive() {
           always begins just above the language/dialect picker (the panel's
           first row), independent of how tall the preview below grows. */}
       <div className="relative">
-        {/* Full-bleed Ripple: w-screen + left-1/2 centering lets the circles
-            use the entire viewport width on mobile instead of being clipped to
-            the padded column. overflow-hidden clips them to this box (full
-            width × fixed height); the mask fades them in just above the picker
-            and out toward the bottom so the clipped edges never show as a hard
-            line. */}
+        {/* Full-bleed box centered on the preview (which is itself centered in
+            the viewport via mx-auto), so the ripple's circles are centered on
+            the card and can extend past its edges without being clipped to the
+            padded column. overflow-hidden clips them to this box (full width ×
+            fixed height); the mask fades them in just above the picker and out
+            toward the bottom so the clipped edges never show as a hard line. */}
         <div className="pointer-events-none absolute left-1/2 top-[-1.25rem] z-0 h-[14rem] w-screen -translate-x-1/2">
           <Ripple
             className="overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,white_10%,white_72%,transparent)]"
             mainCircleOpacity={0.16}
+            mainCircleSize={rippleMainSize}
+            circleGap={rippleGap}
+            numCircles={RIPPLE_CIRCLES}
           />
         </div>
-        <div className="relative z-10">
+        <div ref={previewRef} className="relative z-10">
           {tab === "code" && <CodeChallengePanel />}
           {tab === "sql" && <SqlChallengePanel />}
           {tab === "mcq" && (
