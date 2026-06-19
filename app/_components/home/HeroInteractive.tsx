@@ -196,15 +196,18 @@ export function HeroInteractive() {
   const [tab, setTab] = useState<TabId>("code");
   return (
     <div className="relative mx-auto w-full max-w-3xl">
-      {/* Magic UI Ripple behind the preview card. overflow-hidden clips its
-          oversized circles to the panel so they can't widen the page; the
-          override mask fades the circles out top *and* bottom so they dissolve
-          into the page instead of meeting the white background at a hard,
-          chopped-off edge. */}
-      <Ripple
-        className="overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,white_28%,white_72%,transparent)]"
-        mainCircleOpacity={0.16}
-      />
+      {/* Magic UI Ripple, anchored to the tab row rather than the whole panel:
+          a fixed-height box pinned just above the tab labels keeps the ripple
+          in the same spot and always visible no matter how tall the active
+          preview below it grows. overflow-hidden clips the oversized circles so
+          they can't widen the page; the mask fades them in/out top *and* bottom
+          so the clipped edges never show as a hard, chopped-off line. */}
+      <div className="pointer-events-none absolute inset-x-0 -top-6 z-0 h-[24rem]">
+        <Ripple
+          className="overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,white_20%,white_70%,transparent)]"
+          mainCircleOpacity={0.16}
+        />
+      </div>
       {/* Tab bar */}
       <div className="relative z-10 mb-12 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
         {TABS.map((t) => {
