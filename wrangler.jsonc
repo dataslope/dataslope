@@ -9,7 +9,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "main": ".open-next/worker.js",
   "name": "dataslope",
-  "compatibility_date": "2024-12-30",
+  "compatibility_date": "2025-05-19",
   // `nodejs_compat` is required by OpenNext (Fumadocs/Orama search and the
   // build-time node:fs reads expect Node APIs). `global_fetch_strictly_public`
   // makes the worker's own fetch() calls go out over the public internet

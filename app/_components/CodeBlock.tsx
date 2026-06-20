@@ -56,6 +56,7 @@ import {
   type DatasetStageSpec,
 } from "./runtime/remoteDatasets";
 import { warmRuntimeOnRouteLand } from "./runtime/warmup";
+import { PLOTLY_CDN } from "./runtime/cdn";
 import {
   clearPersistedCode,
   loadPersistedCode,
@@ -1615,9 +1616,12 @@ function PlotlyChart({ figure }: { figure: PlotlyFigure }) {
     if (!el) return;
     let cancelled = false;
     void (async () => {
-      // Plotly is heavy and only needed when a chart actually renders —
-      // lazy-import the npm package on demand.
-      const mod = await import("plotly.js-dist-min");
+      // Plotly is heavy and only needed when a chart actually renders, so we
+      // lazy-load it from jsDelivr on demand — keeping it out of the client
+      // bundle and the OpenNext Worker bundle (see PLOTLY_CDN in runtime/cdn).
+      const mod = await import(
+        /* webpackIgnore: true */ /* turbopackIgnore: true */ PLOTLY_CDN
+      );
       if (cancelled || !ref.current) return;
       const Plotly = (mod.default ?? mod) as unknown as PlotlyAPI;
       // The Python runtime bakes the theme-appropriate template (plotly_dark in
