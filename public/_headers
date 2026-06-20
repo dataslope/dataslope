@@ -1,0 +1,8 @@
+# Cloudflare static-asset headers (https://developers.cloudflare.com/pages/configuration/headers/).
+#
+# Next.js fingerprints everything under /_next/static/ with a content hash, so
+# those files are safe to cache forever — a new deploy emits new filenames.
+# This is the Cloudflare equivalent of the immutable caching Next/Vercel apply
+# automatically, and keeps repeat asset requests on the CDN edge.
+/_next/static/*
+  Cache-Control: public,max-age=31536000,immutable

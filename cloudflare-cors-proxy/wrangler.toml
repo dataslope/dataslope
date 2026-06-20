@@ -13,5 +13,12 @@ compatibility_flags = ["nodejs_compat"]
 # team scope suffix. The scope suffix is what keeps this safe: only the
 # project owner can deploy under "*-ye-joo-parks-projects.vercel.app", so an
 # attacker cannot register a project that produces a matching preview host.
-ALLOWED_ORIGINS = "http://localhost:3000,https://dataslope.com,https://www.dataslope.com,https://dataslope.vercel.app,https://dataslope-*-ye-joo-parks-projects.vercel.app"
+# Cloudflare Workers (OpenNext) app host: the production workers.dev URL plus
+# version/alias preview URLs, which Cloudflare formats as
+# `<version-or-alias>-<worker-name>.<subdomain>.workers.dev` (the variable part
+# is a PREFIX, unlike Vercel's suffix style). The `subwaymatch.workers.dev`
+# subdomain is owner-controlled, so the `*` prefix can't match a foreign domain.
+# The trailing Vercel entries are kept for the in-progress migration and can be
+# removed once DNS is fully cut over to Cloudflare.
+ALLOWED_ORIGINS = "http://localhost:3000,https://dataslope.com,https://www.dataslope.com,https://dataslope.subwaymatch.workers.dev,https://*-dataslope.subwaymatch.workers.dev,https://dataslope.vercel.app,https://dataslope-*-ye-joo-parks-projects.vercel.app"
 

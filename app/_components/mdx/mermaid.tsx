@@ -13,6 +13,7 @@ import { useTheme } from "next-themes";
 import { Maximize2, Minus, Plus, RotateCcw, X } from "lucide-react";
 import styles from "./mermaid.module.css";
 import { Timeline } from "./timeline";
+import { MERMAID_CDN } from "../runtime/cdn";
 
 export function Mermaid({ chart }: { chart: string }) {
   // Mermaid lays `timeline` diagrams out horizontally, so a chart with many
@@ -553,7 +554,16 @@ function adaptNodes(root: Element | null, isDark: boolean): void {
 function MermaidContent({ chart }: { chart: string }) {
   const id = useId();
   const { resolvedTheme } = useTheme();
-  const { default: mermaid } = use(cachePromise("mermaid", () => import("mermaid")));
+  // Mermaid is loaded from jsDelivr on demand (see MERMAID_CDN in runtime/cdn)
+  // so it stays out of the client bundle and the OpenNext Worker bundle, like
+  // the other heavy runtimes. It lazy-loads its per-diagram chunks from the
+  // same CDN base at render time.
+  const { default: mermaid } = use(
+    cachePromise(
+      "mermaid",
+      () => import(/* webpackIgnore: true */ /* turbopackIgnore: true */ MERMAID_CDN),
+    ),
+  );
 
   mermaid.initialize({
     startOnLoad: false,
