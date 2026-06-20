@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
 import { createMDX } from "fumadocs-mdx/next";
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 import { CDN_BASE_URL } from "./app/_components/runtime/cdn";
+
+// Give `next dev` access to the Cloudflare bindings/env declared in
+// wrangler.jsonc when developing against the OpenNext adapter. It's a no-op
+// during the production build and on non-Cloudflare hosts, so it's safe to
+// leave in regardless of where the app is deployed.
+initOpenNextCloudflareForDev();
 
 // The C# .NET runtime bundle (cdn-assets/_dotnet/) is served from
 // jsDelivr CDN (see app/_components/runtime/cdn.ts) so Vercel never

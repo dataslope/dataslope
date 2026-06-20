@@ -1,0 +1,30 @@
+{
+  // Cloudflare Workers configuration for the DataSlope Next.js app, deployed
+  // via the OpenNext adapter (@opennextjs/cloudflare). `npm run cf:deploy`
+  // builds `.open-next/` (which runs the full `npm run build` chain) and then
+  // `wrangler deploy` ships the worker + static assets described here.
+  //
+  // This is the APP worker. The standalone CORS proxy worker has its own
+  // config under cloudflare-cors-proxy/wrangler.toml — don't conflate them.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "main": ".open-next/worker.js",
+  "name": "dataslope",
+  "compatibility_date": "2024-12-30",
+  // `nodejs_compat` is required by OpenNext (Fumadocs/Orama search and the
+  // build-time node:fs reads expect Node APIs). `global_fetch_strictly_public`
+  // makes the worker's own fetch() calls go out over the public internet
+  // rather than looping back into the worker — the OpenNext-recommended flag.
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  // Prerendered pages and /_next/static/* are uploaded as free static assets
+  // (unlimited bandwidth, no per-request meter) and served before the worker
+  // ever runs. This is what removes the Vercel ISR-read meter.
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  // Lets the worker invoke itself (used by OpenNext for cache/revalidation
+  // plumbing). Must match "name" above.
+  "services": [
+    { "binding": "WORKER_SELF_REFERENCE", "service": "dataslope" }
+  ]
+}

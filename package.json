@@ -10,6 +10,9 @@
     "publish:tools-jar": "npm publish ./tools-jar",
     "postinstall": "fumadocs-mdx && node scripts/patch-almostnode.mjs && node scripts/build-almostnode-workers.mjs",
     "start": "next start",
+    "cf:preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "cf:deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "lint": "eslint .",
     "check:mcq": "node scripts/check-mcq.mjs",
     "test": "vitest run",
@@ -40,6 +43,7 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@electric-sql/pglite": "^0.4.5",
+    "@opennextjs/cloudflare": "^1.19.11",
     "@sqlite.org/sqlite-wasm": "3.53.0-build1",
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/react-virtual": "^3.13.24",
@@ -95,6 +99,7 @@
     "playwright": "^1.59.1",
     "tailwindcss": "^4.2.4",
     "typescript": "5.7.3",
-    "vitest": "^4.1.5"
+    "vitest": "^4.1.5",
+    "wrangler": "^4.103.0"
   }
 }
