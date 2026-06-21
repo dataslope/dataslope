@@ -32,3 +32,22 @@ Structured courses and guides covering Data Science and Computer Science topics.
 
 Exercises are woven directly into the learning content. Run, tweak, and re-run code inline to build real intuition, not just reading comprehension.
 
+## Deployment
+
+DataSlope is deployed to Cloudflare Workers via the [OpenNext](https://opennext.js.org/cloudflare) adapter.
+
+```bash
+npm run cf:preview   # build + preview in the local Workers runtime
+npm run cf:deploy    # build + deploy to Cloudflare
+```
+
+### One-time setup: incremental cache bucket
+
+OpenNext serves the prerendered home page and `/learn/*` lessons from an R2-backed incremental cache (see `open-next.config.ts`). Without it the Worker re-renders those pages on demand and hits `node:fs`, which doesn't exist in the Workers runtime — returning a 500 (this is what caused `*.workers.dev` preview URLs to fail). Create the bucket once before the first deploy:
+
+```bash
+npx wrangler r2 bucket create dataslope-inc-cache
+```
+
+The bucket is bound as `NEXT_INC_CACHE_R2_BUCKET` in `wrangler.jsonc`. It is **populated at deploy time**, so the deploy command must run `opennextjs-cloudflare deploy` (which `npm run cf:deploy` does) — a bare `wrangler deploy` skips the populate step and leaves the cache empty. If you deploy via Cloudflare Workers Builds, set its deploy command to `npx opennextjs-cloudflare deploy`.
+
