@@ -22,6 +22,17 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  // Backing store for OpenNext's incremental cache (see open-next.config.ts).
+  // The prerendered home page and ~800 `/learn/*` lessons are written here at
+  // deploy time (the `opennextjs-cloudflare deploy`/`preview` populate step)
+  // and served from here at request time, so the Worker never re-renders them
+  // and never touches `node:fs`. Unlike the static-assets cache this resolves
+  // on preview deployments too, so Workers Builds preview URLs stop 500ing.
+  // Binding name is fixed by OpenNext: `NEXT_INC_CACHE_R2_BUCKET`. Create the
+  // bucket once with: `npx wrangler r2 bucket create dataslope-inc-cache`.
+  "r2_buckets": [
+    { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "dataslope-inc-cache" }
+  ],
   // Lets the worker invoke itself (used by OpenNext for cache/revalidation
   // plumbing). Must match "name" above.
   "services": [
