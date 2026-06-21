@@ -53,25 +53,32 @@ const response = await fetch(`${proxyBase}/?url=${encodeURIComponent(targetUrl)}
 
 ### Allowed Origins
 
-The following origins are whitelisted by default:
+The following origins are whitelisted by default (see `ALLOWED_ORIGINS` in `wrangler.toml`):
 
 | Origin | Purpose |
 |---|---|
 | `http://localhost:3000` | Local development |
 | `https://dataslope.com` | Production site |
 | `https://www.dataslope.com` | Production site (www) |
-| `https://dataslope.vercel.app` | Vercel preview/staging |
-| `https://dataslope-*-ye-joo-parks-projects.vercel.app` | Vercel branch/commit preview deployments |
+| `https://dataslope.subwaymatch.workers.dev` | Cloudflare Workers production host (the Next.js app) |
+| `https://*-dataslope.subwaymatch.workers.dev` | Cloudflare Workers version/alias preview URLs |
 
 Any `localhost` port is also allowed automatically during local development (`wrangler dev`).
 
-#### Wildcard entries (Vercel previews)
+> The Next.js app moved from Vercel to Cloudflare Workers (via OpenNext), so the
+> allowed origins are now the app's `*.workers.dev` hosts rather than the old
+> `*.vercel.app` ones.
 
-Vercel generates a unique hostname for every branch and commit deployment, e.g.
+#### Wildcard entries (Workers version/alias previews)
+
+Cloudflare serves non-production deployments of the app worker from a per-version
+or per-alias hostname formatted as
+`<version-or-alias>-<worker-name>.<subdomain>.workers.dev`. For the `dataslope`
+app worker on the `subwaymatch` subdomain that looks like:
 
 ```
-https://dataslope-git-claude-focused-barde-c4a546-ye-joo-parks-projects.vercel.app
-https://dataslope-git-claude-vigilant-feyn-a92c1c-ye-joo-parks-projects.vercel.app
+https://6f1c2a3b-dataslope.subwaymatch.workers.dev   (a specific version)
+https://staging-dataslope.subwaymatch.workers.dev    (a named alias)
 ```
 
 Listing each one is impractical, so an `ALLOWED_ORIGINS` entry may contain a `*`
@@ -79,13 +86,15 @@ wildcard. The `*` matches **one hostname label** — one or more characters that
 are not a `.` or `/` — so it stays scoped to a single host and can never match a
 different registrable domain.
 
-The default entry `https://dataslope-*-ye-joo-parks-projects.vercel.app` matches
-both examples above. Note the team-scope suffix (`-ye-joo-parks-projects`) is
-deliberately part of the pattern: only the project owner can deploy under that
-scope, so an attacker cannot register a `dataslope`-named project elsewhere and
-get a matching preview host. Avoid an over-broad pattern such as
-`https://dataslope-*.vercel.app`, which *would* match an attacker-controlled
-`dataslope-xyz-evil-team.vercel.app`.
+The default entry `https://*-dataslope.subwaymatch.workers.dev` matches both
+examples above. Its safety rests on the fixed `-dataslope.subwaymatch.workers.dev`
+suffix: the `subwaymatch.workers.dev` subdomain is owner-controlled, so only the
+project owner can deploy a host that matches and an attacker cannot register one.
+(This is the mirror image of Vercel's old layout, where the variable part was a
+*suffix*; on Cloudflare it's a *prefix*.) Keep the `-dataslope` worker-name
+segment in the pattern so it matches only the app's previews — an over-broad entry
+such as `https://*.subwaymatch.workers.dev` would also match every other worker on
+the subdomain.
 
 To change the allowlist, edit `ALLOWED_ORIGINS` in `wrangler.toml` (for non-sensitive values) or set it as a Cloudflare secret for production (see [Configuration](#configuration)).
 
@@ -165,7 +174,7 @@ For production, set the allowed origins as a [Cloudflare secret](https://develop
 ```bash
 npx wrangler secret put ALLOWED_ORIGINS -c wrangler.toml
 # Paste the comma-separated list when prompted:
-# https://dataslope.com,https://www.dataslope.com,https://dataslope.vercel.app
+# https://dataslope.com,https://www.dataslope.com,https://dataslope.subwaymatch.workers.dev
 ```
 
 Secrets take precedence over `[vars]` in `wrangler.toml`.
