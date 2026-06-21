@@ -219,12 +219,23 @@
 .modalBackdrop {
   position: fixed;
   inset: 0;
+  /* The dialog is portaled to <body> (see ChallengeCard / SqlChallengeCard) so
+     a transformed ancestor — e.g. the home hero's BlurFade, whose lingering
+     `filter` turns it into the containing block — can't trap this fixed layer
+     and shrink the backdrop to the card. Portaling drops it outside any `.card`,
+     so the overlay tint is re-declared here (it can no longer inherit
+     --ch-overlay / the --ch-slate-900 it derives from). */
+  --ch-overlay: color-mix(in srgb, #0f172a 55%, transparent);
   background: var(--ch-overlay);
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
+}
+
+:global(html:is(.dark, [data-theme="dark"])) .modalBackdrop {
+  --ch-overlay: color-mix(in srgb, var(--ds-black) 65%, transparent);
 }
 
 .modalCard {
@@ -2233,7 +2244,11 @@
      card surface matches the surrounding learn-page chrome exactly.
      The `var(--color-fd-background, …)` fallback keeps the component
      usable when Fumadocs is not present (e.g. Storybook / unit tests). */
-  --ch-bg: var(--color-fd-background, var(--ch-slate-900));
+  /* Neutral near-black fallback (matches the home route's #121212) for the
+     no-token case — Storybook/tests, and the solution dialog once it's portaled
+     to <body>, outside the .ds-home scope that supplies --color-fd-background.
+     Avoids the blue-slate --ch-slate-900 tint the surrounding chrome dropped. */
+  --ch-bg: var(--color-fd-background, #121212);
   --ch-bg-muted: color-mix(in srgb, var(--color-fd-background, #111827) 70%, #000000);
   --ch-bg-subtle: color-mix(in srgb, var(--color-fd-background, #111827) 85%, #000000);
   --ch-bg-hover: #222222;
@@ -2378,8 +2393,15 @@
 /* ─── Table viewer (SQL) ────────────────────────────────────────────── */
 
 .tableViewer {
-  background: var(--ch-bg-muted);
+  /* White (the card surface) in light mode so the result/table preview reads as
+     a clean white table rather than a muted gray panel. Dark mode keeps the
+     subtly-darker --ch-bg-muted tint for panel separation (see below). */
+  background: var(--ch-bg);
   border-bottom: 1px solid var(--ch-border-light);
+}
+
+:global(html:is(.dark, [data-theme="dark"])) .tableViewer {
+  background: var(--ch-bg-muted);
 }
 
 /* Static label row — the panel is no longer collapsible, so this is a
@@ -2596,7 +2618,9 @@
 }
 
 .tableViewerEmpty {
-  margin: 0 14px 12px;
+  /* Symmetric top/bottom margin so the message sits evenly inside the panel
+     rather than flush against the tab bar above it. */
+  margin: 12px 14px;
   padding: 10px 12px;
   background: var(--ch-bg);
   border: 1px solid var(--ch-border-light);

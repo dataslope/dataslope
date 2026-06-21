@@ -83,18 +83,21 @@ function PickerSelect({
           if (next != null) onValueChange(next);
         }}
       >
-        {/* Magic UI ShimmerButton as the select trigger. --ds-gray-900 is a
-            fixed near-black in both themes, so white text + the blue shimmer
-            read well in light and dark mode alike. */}
+        {/* Magic UI ShimmerButton as the select trigger. The background tracks
+            the page surface (--color-fd-background: white in light, #121212 in
+            dark — see app/home.css) so the trigger reads as part of the page
+            rather than a floating dark pill; text/border/chevron flip per theme
+            so they stay legible on either surface, with the blue shimmer as the
+            accent edge. */}
         <Select.Trigger
           render={(triggerProps) => (
             <ShimmerButton
               {...triggerProps}
-              background="var(--ds-gray-900)"
+              background="var(--color-fd-background)"
               shimmerColor="#148CFF"
               shimmerSize="0.15em"
               borderRadius="0.625rem"
-              className="min-w-40 justify-between gap-2 px-3.5 py-1.5 text-sm font-medium focus-visible:outline-none"
+              className="min-w-40 justify-between gap-2 border-[color:var(--ds-gray-200)] px-3.5 py-1.5 text-sm font-medium text-[color:var(--ds-gray-900)] focus-visible:outline-none dark:border-white/10 dark:text-white"
             >
               {active && <OptionIcon id={active.iconId} />}
               {/* Render the label explicitly — a bare <Select.Value/> shows the
@@ -102,7 +105,7 @@ function PickerSelect({
               <Select.Value className="flex-1 truncate text-left">
                 {active?.label ?? value}
               </Select.Value>
-              <Select.Icon className="text-white/70">
+              <Select.Icon className="text-[var(--ds-gray-500)] dark:text-white/70">
                 <ChevronDown size={14} />
               </Select.Icon>
             </ShimmerButton>
