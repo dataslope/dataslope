@@ -20,5 +20,5 @@ compatibility_flags = ["nodejs_compat"]
 # subdomain is owner-controlled, so the `*` prefix can't match a foreign domain.
 # The trailing Vercel entries are kept for the in-progress migration and can be
 # removed once DNS is fully cut over to Cloudflare.
-ALLOWED_ORIGINS = "http://localhost:3000,https://dataslope.com,https://www.dataslope.com,https://dataslope.subwaymatch.workers.dev,https://*-dataslope.subwaymatch.workers.dev,https://dataslope.vercel.app,https://dataslope-*-ye-joo-parks-projects.vercel.app"
+ALLOWED_ORIGINS = "http://localhost:3000,https://dataslope.com,https://www.dataslope.com,https://dataslope.subwaymatch.workers.dev,https://*-dataslope.subwaymatch.workers.dev"
 
