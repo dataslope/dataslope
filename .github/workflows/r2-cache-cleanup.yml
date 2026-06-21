@@ -1,0 +1,126 @@
+name: R2 incremental-cache cleanup
+
+# Prunes stale OpenNext incremental-cache build folders from the R2 bucket.
+#
+# Why this exists: the R2 cache keys every object as
+# `incremental-cache/<buildId>/<hash>.cache`. Each deploy — production AND every
+# Cloudflare preview — writes a fresh ~0.6 GB folder under a new build ID, and
+# OpenNext never deletes old ones. Left alone, the bucket grows ~0.6 GB per
+# deploy forever.
+#
+# What it does: deletes every build folder that is BOTH (a) not the live
+# production build and (b) older than THRESHOLD_DAYS. The live production build
+# is preserved regardless of age, so a site that sits unchanged for months never
+# loses its cache (which would 500 the home page and /learn/* — see
+# open-next.config.ts). Superseded production builds and merged-PR previews age
+# out THRESHOLD_DAYS after their last deploy.
+#
+# Safety: the job aborts WITHOUT deleting anything if it cannot positively
+# identify the live production build folder, so a transient error can never wipe
+# the bucket. Run manually with dry_run=true to preview deletions.
+#
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   CF_ACCOUNT_ID         Cloudflare account ID (the R2 S3 endpoint host)
+#   R2_ACCESS_KEY_ID      R2 API token access key id (Object Read & Write)
+#   R2_SECRET_ACCESS_KEY  R2 API token secret access key
+
+on:
+  schedule:
+    # Daily at 04:17 UTC (off the top of the hour to avoid scheduler congestion).
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "List what would be deleted without deleting"
+        type: boolean
+        default: true
+
+concurrency:
+  group: r2-cache-cleanup
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    env:
+      BUCKET: dataslope-inc-cache
+      PREFIX: incremental-cache/
+      BUILD_ID_URL: https://dataslope.com/api/cache-build-id
+      THRESHOLD_DAYS: "3"
+      # Scheduled runs delete for real; manual runs honor the dry_run input
+      # (default true).
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+      AWS_EC2_METADATA_DISABLED: "true"
+      ENDPOINT: https://${{ secrets.CF_ACCOUNT_ID }}.r2.cloudflarestorage.com
+    steps:
+      - name: Prune stale build folders
+        shell: bash
+        run: |
+          set -euo pipefail
+          aws() { command aws --endpoint-url "$ENDPOINT" "$@"; }
+
+          # 1) Ask the live production Worker which build it is serving from.
+          prod_id="$(curl -fsS --max-time 30 "$BUILD_ID_URL" || true)"
+          prod_id="$(printf '%s' "$prod_id" | tr -d '[:space:]')"
+          if [[ ! "$prod_id" =~ ^[A-Za-z0-9_-]{6,}$ ]]; then
+            echo "::error::Could not read a valid production build ID from $BUILD_ID_URL (got '${prod_id}'). Aborting without deleting."
+            exit 1
+          fi
+          prod_folder="${PREFIX}${prod_id}/"
+          echo "Live production build: $prod_id"
+
+          # 2) Enumerate the build folders in the bucket.
+          mapfile -t folders < <(
+            aws s3api list-objects-v2 \
+              --bucket "$BUCKET" --prefix "$PREFIX" --delimiter "/" \
+              --query 'CommonPrefixes[].Prefix' --output text \
+              | tr '\t' '\n' | sed '/^$/d' | grep -vx 'None' || true
+          )
+          if [[ ${#folders[@]} -eq 0 ]]; then
+            echo "No build folders under $PREFIX — nothing to do."
+            exit 0
+          fi
+
+          # 3) Safety: refuse to proceed unless the production folder is present.
+          #    (Guards against a prefix/bucket mismatch deleting everything.)
+          if ! printf '%s\n' "${folders[@]}" | grep -qxF "$prod_folder"; then
+            echo "::error::Production folder '$prod_folder' not found in bucket. Aborting without deleting."
+            exit 1
+          fi
+
+          cutoff=$(( $(date -u +%s) - THRESHOLD_DAYS * 86400 ))
+          echo "Threshold: ${THRESHOLD_DAYS}d (delete folders last written before $(date -u -d "@$cutoff" '+%Y-%m-%d %H:%M:%SZ'))"
+          echo "Dry run: $DRY_RUN"
+
+          deleted=0; kept=0
+          for folder in "${folders[@]}"; do
+            if [[ "$folder" == "$prod_folder" ]]; then
+              echo "KEEP  $folder (live production)"
+              kept=$((kept+1)); continue
+            fi
+
+            # Newest object in the folder (all written together at deploy time).
+            newest="$(aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$folder" \
+              --query 'sort_by(Contents, &LastModified)[-1].LastModified' --output text 2>/dev/null || true)"
+            if [[ -z "$newest" || "$newest" == "None" ]]; then
+              echo "skip  $folder (empty)"; continue
+            fi
+            ts=$(date -u -d "$newest" +%s)
+
+            if (( ts < cutoff )); then
+              echo "DELETE $folder (last written $newest)"
+              if [[ "$DRY_RUN" != "true" ]]; then
+                aws s3 rm "s3://${BUCKET}/${folder}" --recursive --only-show-errors
+              fi
+              deleted=$((deleted+1))
+            else
+              echo "KEEP  $folder (last written $newest, within threshold)"
+              kept=$((kept+1))
+            fi
+          done
+
+          echo "---"
+          echo "Folders kept: $kept | folders ${DRY_RUN/true/would be }deleted: $deleted"
