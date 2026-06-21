@@ -53,25 +53,32 @@ const response = await fetch(`${proxyBase}/?url=${encodeURIComponent(targetUrl)}
 
 ### Allowed Origins
 
-The following origins are whitelisted by default:
+The following origins are whitelisted by default (see `ALLOWED_ORIGINS` in `wrangler.toml`):
 
 | Origin | Purpose |
 |---|---|
 | `http://localhost:3000` | Local development |
 | `https://dataslope.com` | Production site |
 | `https://www.dataslope.com` | Production site (www) |
-| `https://dataslope.vercel.app` | Vercel preview/staging |
-| `https://dataslope-*-ye-joo-parks-projects.vercel.app` | Vercel branch/commit preview deployments |
+| `https://dataslope.subwaymatch.workers.dev` | Cloudflare Workers production host (the Next.js app) |
+| `https://*-dataslope.subwaymatch.workers.dev` | Cloudflare Workers version/alias preview URLs |
 
 Any `localhost` port is also allowed automatically during local development (`wrangler dev`).
 
-#### Wildcard entries (Vercel previews)
+> The Next.js app moved from Vercel to Cloudflare Workers (via OpenNext), so the
+> allowed origins are now the app's `*.workers.dev` hosts rather than the old
+> `*.vercel.app` ones.
 
-Vercel generates a unique hostname for every branch and commit deployment, e.g.
+#### Wildcard entries (Workers version/alias previews)
+
+Cloudflare serves non-production deployments of the app worker from a per-version
+or per-alias hostname formatted as
+`<version-or-alias>-<worker-name>.<subdomain>.workers.dev`. For the `dataslope`
+app worker on the `subwaymatch` subdomain that looks like:
 
 ```
-https://dataslope-git-claude-focused-barde-c4a546-ye-joo-parks-projects.vercel.app
-https://dataslope-git-claude-vigilant-feyn-a92c1c-ye-joo-parks-projects.vercel.app
+https://6f1c2a3b-dataslope.subwaymatch.workers.dev   (a specific version)
+https://staging-dataslope.subwaymatch.workers.dev    (a named alias)
 ```
 
 Listing each one is impractical, so an `ALLOWED_ORIGINS` entry may contain a `*`
@@ -79,13 +86,15 @@ wildcard. The `*` matches **one hostname label** — one or more characters that
 are not a `.` or `/` — so it stays scoped to a single host and can never match a
 different registrable domain.
 
-The default entry `https://dataslope-*-ye-joo-parks-projects.vercel.app` matches
-both examples above. Note the team-scope suffix (`-ye-joo-parks-projects`) is
-deliberately part of the pattern: only the project owner can deploy under that
-scope, so an attacker cannot register a `dataslope`-named project elsewhere and
-get a matching preview host. Avoid an over-broad pattern such as
-`https://dataslope-*.vercel.app`, which *would* match an attacker-controlled
-`dataslope-xyz-evil-team.vercel.app`.
+The default entry `https://*-dataslope.subwaymatch.workers.dev` matches both
+examples above. Its safety rests on the fixed `-dataslope.subwaymatch.workers.dev`
+suffix: the `subwaymatch.workers.dev` subdomain is owner-controlled, so only the
+project owner can deploy a host that matches and an attacker cannot register one.
+(This is the mirror image of Vercel's old layout, where the variable part was a
+*suffix*; on Cloudflare it's a *prefix*.) Keep the `-dataslope` worker-name
+segment in the pattern so it matches only the app's previews — an over-broad entry
+such as `https://*.subwaymatch.workers.dev` would also match every other worker on
+the subdomain.
 
 To change the allowlist, edit `ALLOWED_ORIGINS` in `wrangler.toml` (for non-sensitive values) or set it as a Cloudflare secret for production (see [Configuration](#configuration)).
 
@@ -96,6 +105,16 @@ To change the allowlist, edit `ALLOWED_ORIGINS` in `wrangler.toml` (for non-sens
 - [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/) (installed as a dev dependency — no global install needed)
 
 ## Setup
+
+> **Note — always run Wrangler with `-c wrangler.toml` here.**
+> This proxy lives inside the `dataslope` repo, whose root is now also a
+> Cloudflare Workers project (the Next.js app, deployed via OpenNext). When
+> Wrangler is invoked without an explicit config it resolves the **repo-root**
+> `wrangler.jsonc` (whose entry point is `.open-next/worker.js`) instead of this
+> folder's `wrangler.toml`, producing an error like
+> `The entry-point file at ".open-next/worker.js" was not found.`
+> The `npm run` scripts below already pass `-c wrangler.toml`, so prefer them; if
+> you call `npx wrangler …` directly, add `-c wrangler.toml` yourself.
 
 ### 1. Install dependencies
 
@@ -116,7 +135,7 @@ This opens a browser window to authorise the CLI. Your credentials are stored lo
 
 ```bash
 npm run dev
-# or: npx wrangler dev
+# or: npx wrangler dev -c wrangler.toml
 ```
 
 The worker starts at `http://localhost:8787`. Test it:
@@ -129,7 +148,7 @@ curl "http://localhost:8787/?url=https%3A%2F%2Fhttpbin.org%2Fget"
 
 ```bash
 npm run deploy
-# or: npx wrangler deploy
+# or: npx wrangler deploy -c wrangler.toml
 ```
 
 Wrangler prints the deployed URL, e.g.:
@@ -153,9 +172,9 @@ https://dataslope-cors-proxy.<your-subdomain>.workers.dev
 For production, set the allowed origins as a [Cloudflare secret](https://developers.cloudflare.com/workers/configuration/secrets/) so the value isn't committed to source control:
 
 ```bash
-npx wrangler secret put ALLOWED_ORIGINS
+npx wrangler secret put ALLOWED_ORIGINS -c wrangler.toml
 # Paste the comma-separated list when prompted:
-# https://dataslope.com,https://www.dataslope.com,https://dataslope.vercel.app
+# https://dataslope.com,https://www.dataslope.com,https://dataslope.subwaymatch.workers.dev
 ```
 
 Secrets take precedence over `[vars]` in `wrangler.toml`.
@@ -210,7 +229,7 @@ After deploying or making changes to `wrangler.toml` bindings, regenerate the `E
 
 ```bash
 npm run cf-typegen
-# or: npx wrangler types
+# or: npx wrangler types -c wrangler.toml
 ```
 
 ## Updating Wrangler
