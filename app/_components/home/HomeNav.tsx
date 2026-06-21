@@ -40,7 +40,7 @@ function ThemeToggle() {
       onClick={toggle}
       aria-label="Toggle color theme"
       title="Toggle color theme"
-      className="inline-flex size-9 items-center justify-center rounded-lg text-[var(--ds-gray-600)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-300)] dark:hover:bg-white/10 dark:hover:text-white"
+      className="inline-flex size-9 items-center justify-center rounded-lg text-[#121212] transition-colors hover:bg-[var(--ds-gray-100)] dark:text-white dark:hover:bg-white/10"
     >
       <Sun size={18} className="hidden dark:block" />
       <Moon size={18} className="block dark:hidden" />
@@ -56,7 +56,7 @@ function GitHubLink() {
       rel="noopener noreferrer"
       aria-label="View source on GitHub"
       title="GitHub"
-      className="inline-flex size-9 items-center justify-center rounded-lg text-[var(--ds-gray-600)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-300)] dark:hover:bg-white/10 dark:hover:text-white"
+      className="inline-flex size-9 items-center justify-center rounded-lg text-[#121212] transition-colors hover:bg-[var(--ds-gray-100)] dark:text-white dark:hover:bg-white/10"
     >
       <GitHubIcon size={18} />
     </a>
@@ -68,7 +68,7 @@ function GitHubLink() {
 function PlaygroundMenu() {
   return (
     <Menu.Root>
-      <Menu.Trigger className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-[var(--ds-gray-700)] transition-colors hover:text-[var(--ds-blue-700)] data-[popup-open]:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-200)] dark:hover:text-[var(--ds-blue-400)] dark:data-[popup-open]:text-[var(--ds-blue-400)]">
+      <Menu.Trigger className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-[#121212] transition-colors hover:text-[var(--ds-blue-700)] data-[popup-open]:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)] dark:data-[popup-open]:text-[var(--ds-blue-400)]">
         Playground
         <ChevronDown
           size={14}
@@ -109,7 +109,7 @@ function BrandLogo() {
         className="h-4 w-auto"
         aria-hidden="true"
       />
-      <span className="text-lg font-semibold tracking-tight text-[var(--ds-gray-900)] dark:text-white">
+      <span className="text-lg font-semibold tracking-tight text-[#121212] dark:text-white">
         Dataslope
       </span>
     </Link>
@@ -125,7 +125,7 @@ function MobileDrawer() {
       <Dialog.Trigger
         aria-label="Open menu"
         title="Menu"
-        className="ds-mobile-trigger size-9 items-center justify-center rounded-lg text-[var(--ds-gray-600)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-300)] dark:hover:bg-white/10 dark:hover:text-white"
+        className="ds-mobile-trigger size-9 items-center justify-center rounded-lg text-[#121212] transition-colors hover:bg-[var(--ds-gray-100)] dark:text-white dark:hover:bg-white/10"
       >
         <Hamburger size={18} />
       </Dialog.Trigger>
@@ -195,7 +195,8 @@ function MobileDrawer() {
 
 export function HomeNav() {
   // Shrink-on-scroll: the header is taller at the top of the page and
-  // compacts (with a soft shadow instead of a border) once scrolled.
+  // compacts to its sticky height once scrolled. The background stays a
+  // solid white/#121212 (no backdrop blur, shadow, or opacity).
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -209,16 +210,10 @@ export function HomeNav() {
     };
   }, []);
   return (
-    <header
-      className={`sticky top-0 z-40 bg-white/80 backdrop-blur-md transition-shadow duration-200 dark:bg-[#121212]/80 ${
-        scrolled
-          ? "shadow-[0_6px_24px_-16px_rgba(0,0,0,0.45)] dark:shadow-[0_6px_24px_-12px_rgba(0,0,0,0.7)]"
-          : ""
-      }`}
-    >
+    <header className="sticky top-0 z-40 bg-white dark:bg-[#121212]">
       <nav
         className={`mx-auto grid max-w-6xl grid-cols-[1fr_auto] items-center gap-3 px-4 transition-[height] duration-200 sm:px-6 md:grid-cols-[1fr_auto_1fr] ${
-          scrolled ? "h-11 md:h-12" : "h-14 md:h-16"
+          scrolled ? "h-11 md:h-12" : "h-16 md:h-20"
         }`}
       >
         {/* Left: brand */}
@@ -233,7 +228,7 @@ export function HomeNav() {
           <Link
             href="/learn"
             prefetch
-            className="rounded-lg px-3 py-2 text-sm font-medium text-[var(--ds-gray-700)] transition-colors hover:text-[var(--ds-blue-700)] dark:text-[var(--ds-gray-200)] dark:hover:text-[var(--ds-blue-400)]"
+            className="rounded-lg px-3 py-2 text-sm font-medium text-[#121212] transition-colors hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]"
           >
             Courses
           </Link>
