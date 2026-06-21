@@ -97,6 +97,16 @@ To change the allowlist, edit `ALLOWED_ORIGINS` in `wrangler.toml` (for non-sens
 
 ## Setup
 
+> **Note — always run Wrangler with `-c wrangler.toml` here.**
+> This proxy lives inside the `dataslope` repo, whose root is now also a
+> Cloudflare Workers project (the Next.js app, deployed via OpenNext). When
+> Wrangler is invoked without an explicit config it resolves the **repo-root**
+> `wrangler.jsonc` (whose entry point is `.open-next/worker.js`) instead of this
+> folder's `wrangler.toml`, producing an error like
+> `The entry-point file at ".open-next/worker.js" was not found.`
+> The `npm run` scripts below already pass `-c wrangler.toml`, so prefer them; if
+> you call `npx wrangler …` directly, add `-c wrangler.toml` yourself.
+
 ### 1. Install dependencies
 
 ```bash
@@ -116,7 +126,7 @@ This opens a browser window to authorise the CLI. Your credentials are stored lo
 
 ```bash
 npm run dev
-# or: npx wrangler dev
+# or: npx wrangler dev -c wrangler.toml
 ```
 
 The worker starts at `http://localhost:8787`. Test it:
@@ -129,7 +139,7 @@ curl "http://localhost:8787/?url=https%3A%2F%2Fhttpbin.org%2Fget"
 
 ```bash
 npm run deploy
-# or: npx wrangler deploy
+# or: npx wrangler deploy -c wrangler.toml
 ```
 
 Wrangler prints the deployed URL, e.g.:
@@ -153,7 +163,7 @@ https://dataslope-cors-proxy.<your-subdomain>.workers.dev
 For production, set the allowed origins as a [Cloudflare secret](https://developers.cloudflare.com/workers/configuration/secrets/) so the value isn't committed to source control:
 
 ```bash
-npx wrangler secret put ALLOWED_ORIGINS
+npx wrangler secret put ALLOWED_ORIGINS -c wrangler.toml
 # Paste the comma-separated list when prompted:
 # https://dataslope.com,https://www.dataslope.com,https://dataslope.vercel.app
 ```
@@ -210,7 +220,7 @@ After deploying or making changes to `wrangler.toml` bindings, regenerate the `E
 
 ```bash
 npm run cf-typegen
-# or: npx wrangler types
+# or: npx wrangler types -c wrangler.toml
 ```
 
 ## Updating Wrangler
