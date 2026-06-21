@@ -37,5 +37,14 @@
   // plumbing). Must match "name" above.
   "services": [
     { "binding": "WORKER_SELF_REFERENCE", "service": "dataslope" }
-  ]
+  ],
+  // Workers Logs: persists console/log output and request metadata for this
+  // worker so it's queryable in the Cloudflare dashboard (Observability).
+  // `invocation_logs` adds a summary log line per request invocation.
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true
+    }
+  }
 }
