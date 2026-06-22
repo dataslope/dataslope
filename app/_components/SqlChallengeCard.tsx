@@ -35,6 +35,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
+import { createPortal } from "react-dom";
 import { RotateCcw, Check, CheckCheck, ListChecks, ListX, X, ChevronDown, Eye, Play, Database, Table, List, FileInput } from "lucide-react";
 import { Menu } from "@base-ui-components/react/menu";
 import {
@@ -2296,7 +2297,7 @@ function SolutionModal({
     }
   }, [source]);
 
-  return (
+  const modal = (
     <div
       role="dialog"
       aria-modal="true"
@@ -2374,6 +2375,14 @@ function SolutionModal({
       </div>
     </div>
   );
+
+  // Portal to <body> so the backdrop's `position: fixed` is sized to the
+  // viewport. Left inline, an ancestor with a transform/filter (e.g. the home
+  // hero's BlurFade) becomes the containing block and the backdrop shrinks to
+  // that ancestor — see app/_components/ChallengeCard.module.css (.modalBackdrop).
+  return typeof document === "undefined"
+    ? modal
+    : createPortal(modal, document.body);
 }
 
 /** Human-readable form of a cell value, used both for the visible text
