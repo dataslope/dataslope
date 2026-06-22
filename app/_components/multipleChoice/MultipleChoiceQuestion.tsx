@@ -15,20 +15,41 @@
  *     attempts" UX of the existing `<ChallengeCard>` Check-Answer flow).
  *   - All learner-visible Markdown — body, choice labels, per-choice
  *     explanations, overall explanation — is rendered through
- *     react-markdown with GFM + KaTeX + rehype-highlight so authors
- *     can mix prose, lists, code (with syntax colouring), tables, and
- *     math equations.
+ *     react-markdown with GFM + KaTeX so authors can mix prose, lists,
+ *     code, tables, and math equations. Code blocks are syntax-highlighted
+ *     after render with highlight.js, which is loaded from jsDelivr on
+ *     demand (see HLJS_CDN) rather than bundled — keeping it out of the
+ *     client chunks and the OpenNext Worker bundle, like Plotly/Mermaid.
  */
 
-import { useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
-import rehypeHighlight from "rehype-highlight";
 import { Check, X, RotateCcw, MousePointerClick, ScrollText } from "lucide-react";
 import { parseQuestion, type ParsedChoice } from "./parseQuestion";
+import { HLJS_CDN } from "../runtime/cdn";
 import styles from "./MultipleChoiceQuestion.module.css";
+
+// highlight.js is fetched from jsDelivr on demand (see HLJS_CDN in runtime/cdn)
+// and applied to the card's rendered code blocks, keeping it out of both the
+// client bundle and the OpenNext Worker bundle — the same offload used for
+// Plotly and Mermaid. The import is cached at module scope so every quiz card
+// on a page shares a single fetch. `webpackIgnore`/`turbopackIgnore` stop the
+// bundlers from trying to resolve the CDN URL at build time.
+interface Hljs {
+  highlightElement: (el: HTMLElement) => void;
+}
+let hljsPromise: Promise<Hljs> | null = null;
+function loadHljs(): Promise<Hljs> {
+  if (!hljsPromise) {
+    hljsPromise = import(
+      /* webpackIgnore: true */ /* turbopackIgnore: true */ HLJS_CDN
+    ).then((m) => (m.default ?? m) as Hljs);
+  }
+  return hljsPromise;
+}
 
 /** Choice verdict assigned after the learner picks an answer. Drives the
  *  per-choice colour ring + glyph and is read off `data-verdict` in the
@@ -59,7 +80,7 @@ function MarkdownInline({ source }: { source: string }) {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm, remarkMath]}
-      rehypePlugins={[rehypeKatex, rehypeHighlight]}
+      rehypePlugins={[rehypeKatex]}
     >
       {source}
     </ReactMarkdown>
@@ -113,8 +134,35 @@ export default function MultipleChoiceQuestion({
     : null;
   const groupName = useId();
 
+  // Syntax-highlight the card's code blocks with highlight.js pulled from
+  // jsDelivr. Runs after mount and after any state change that can reveal new
+  // code (submitting an answer surfaces the per-choice and overall
+  // explanations). highlight.js stamps each block it processes with
+  // `data-highlighted`, so re-runs only touch the newly revealed blocks — the
+  // `:not([data-highlighted])` filter also sidesteps its "already highlighted"
+  // console warning.
+  const cardRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const root = cardRef.current;
+    if (!root) return;
+    const blocks = root.querySelectorAll<HTMLElement>(
+      "pre code:not([data-highlighted])",
+    );
+    if (blocks.length === 0) return;
+    let cancelled = false;
+    void loadHljs().then((hljs) => {
+      if (cancelled) return;
+      blocks.forEach((el) => {
+        if (!el.dataset.highlighted) hljs.highlightElement(el);
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [parsed, submitted, selectedId]);
+
   return (
-    <div className={styles.cardShell}>
+    <div className={styles.cardShell} ref={cardRef}>
     <section className={styles.card} aria-label="Multiple choice question">
       <header className={styles.header}>
         <span className={styles.badge}>

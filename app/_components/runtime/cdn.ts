@@ -57,3 +57,14 @@ export const PLOTLY_CDN = `https://cdn.jsdelivr.net/npm/plotly.js-dist-min@${PLO
 // CDN base at runtime. Keep MERMAID_VERSION in sync with package.json.
 export const MERMAID_VERSION = "11.15.0";
 export const MERMAID_CDN = `https://cdn.jsdelivr.net/npm/mermaid@${MERMAID_VERSION}/+esm`;
+
+// highlight.js (syntax highlighting for the code blocks inside Multiple-Choice
+// quiz cards) is loaded from jsDelivr in the browser rather than bundled. The
+// quiz card renders client-side only (see MdxMultipleChoiceQuestion's
+// `ssr: false`) and colors its <code> blocks on demand after render, so
+// highlight.js never lands in the client chunks or the OpenNext Worker bundle.
+// Lessons' normal code fences are highlighted at build time by Fumadocs's Shiki
+// pipeline instead, so the quiz card is the only highlight.js consumer. Keep
+// HLJS_VERSION in sync with the highlight.js version in package.json.
+export const HLJS_VERSION = "11.11.1";
+export const HLJS_CDN = `https://cdn.jsdelivr.net/npm/highlight.js@${HLJS_VERSION}/+esm`;

@@ -26,9 +26,23 @@
  * ```
  */
 
-import MultipleChoiceQuestion, {
-  type MultipleChoiceQuestionProps,
-} from "./MultipleChoiceQuestion";
+import dynamic from "next/dynamic";
+import type { MultipleChoiceQuestionProps } from "./MultipleChoiceQuestion";
+
+// Load the quiz card client-side only. It renders entirely in the browser —
+// react-markdown + remark/rehype (KaTeX) plus the jsDelivr-loaded highlight.js
+// — and none of that needs to run during SSR, so `ssr: false` keeps the whole
+// markdown stack out of the OpenNext Worker bundle's render path. (The home
+// page hero loads the same component the same way; see HeroInteractive.) The
+// placeholder reserves vertical space to limit layout shift while the chunk and
+// its CDN dependencies load.
+const MultipleChoiceQuestion = dynamic(
+  () => import("./MultipleChoiceQuestion"),
+  {
+    ssr: false,
+    loading: () => <div aria-hidden style={{ minHeight: 180 }} />,
+  },
+);
 
 export default function MdxMultipleChoiceQuestion(
   props: MultipleChoiceQuestionProps,
