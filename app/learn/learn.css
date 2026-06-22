@@ -33,6 +33,39 @@
 @import "fumadocs-ui/css/preset.css";
 @import "katex/dist/katex.min.css";
 
+/* ── Tailwind v4 border-color default hardening (intermittent black borders) ──
+   Tailwind v4's preflight resets every element to `border: 0 solid`, which
+   leaves the default border *color* at `currentColor` (the near-black text
+   color) — it dropped v3's gray default. Fumadocs restores a sensible gray
+   default in its own `@layer base` (`* { border-color: var(--color-fd-border) }`),
+   and on a normal page load that rule wins because it's imported after Tailwind
+   above.
+
+   But this stylesheet is scoped to the /learn segment, and the Next.js App
+   Router does not order segment CSS deterministically on a *client-side*
+   navigation into /learn. When the preflight's `@layer base` rule ends up
+   applied after Fumadocs's (same layer → later source order wins), the
+   `border: 0 solid` shorthand resets border-color back to `currentColor` and
+   every border relying on the default paints black — until a hard refresh
+   restores the server cascade. That's the "refreshing fixes it" symptom.
+
+   Re-declaring the default in `@layer base` wouldn't help: it shares the same
+   layer and is equally vulnerable to the reorder. Instead we pin the default
+   one layer up, in `@layer components`. Layer precedence (components > base) is
+   independent of stylesheet/chunk order, so this always beats the base-layer
+   preflight no matter how the App Router orders the chunks — while still losing
+   to Tailwind/Fumadocs border-color *utilities* (`@layer utilities`), so
+   intentional colored borders (callouts, focus rings, …) are unaffected. */
+@layer components {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-fd-border, currentColor);
+  }
+}
+
 /* Override Fumadocs's default sans stack inside the /learn route with
    Inter and apply slightly tight letter-spacing for a more polished
    editorial feel. We scope to `body` (which is shared, but layout-CSS
