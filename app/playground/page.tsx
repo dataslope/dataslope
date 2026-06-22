@@ -1,14 +1,34 @@
+import type { Metadata } from "next";
 import Link from "../_components/Link";
 import {
   LANGUAGE_ICONS,
   LANGUAGE_ICON_COLORS,
   LANGUAGE_ICON_SIZE_FACTOR,
 } from "../_components/languageIcons";
+import { OG_IMAGE } from "@/lib/site";
 import styles from "./home.module.css";
 
-export const metadata = {
-  title: "Playground",
-  description: "Browser-based language playgrounds.",
+const PLAYGROUND_DESCRIPTION =
+  "Free online coding playgrounds that run entirely in your browser — Python, R, SQL, JavaScript, TypeScript, PHP, C, C++, Java, and C#. No sign-up, no install, powered by WebAssembly.";
+
+export const metadata: Metadata = {
+  title: "Online Coding Playgrounds",
+  description: PLAYGROUND_DESCRIPTION,
+  alternates: { canonical: "/playground" },
+  openGraph: {
+    type: "website",
+    url: "/playground",
+    siteName: "DataSlope",
+    title: "Online Coding Playgrounds · DataSlope",
+    description: PLAYGROUND_DESCRIPTION,
+    images: [OG_IMAGE],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Online Coding Playgrounds · DataSlope",
+    description: PLAYGROUND_DESCRIPTION,
+    images: [OG_IMAGE],
+  },
 };
 
 // One row per playground card. Icons + brand colours are looked up

@@ -17,7 +17,7 @@
 | --- | --- | --- |
 | **Q1** | Auth on Cloudflare | **Better Auth + D1** is the most Cloudflare-native path (self-hosted, free, D1 is first-class). Clerk if you want to ship in a day and migrate later. Use **OAuth social login first**. One caveat: keep auth out of `middleware.ts` on OpenNext. Gate *only* Save/AI — never content. |
 | **Q2** | Interview Prep section | **Strong yes.** Reuses your Fumadocs + playground infra almost verbatim (a second `defineDocs` collection), is your single best **SEO** lever (high-intent long-tail search), and feeds the paid-AI funnel. Keep it interactive-first to avoid being a LeetCode clone. |
-| **Q3** | SEO | You have great fundamentals (≈800 fast static pages) but were missing the basics. **✅ Phases 1 & 2 are now implemented on this branch:** sitemap, `metadataBase`, title template, canonical + OG/Twitter, a 1200×630 OG image, and JSON-LD (Organization/WebSite + BreadcrumbList + Course) — see §3.4–3.5. Next: content hygiene + `FAQPage` once Interview Prep lands. Keep pages static — SEO and your cost model want the same thing. |
+| **Q3** | SEO | You have great fundamentals (≈800 fast static pages) but were missing the basics. **✅ Phases 1–3 are now implemented on this branch:** sitemap, `metadataBase`, title template, canonical + OG/Twitter, a 1200×630 OG image, JSON-LD (Organization/WebSite + BreadcrumbList + Course), indexable playground landing pages, and a frontmatter audit — see §3.4–3.6. The corpus is clean (0 missing/duplicate descriptions); only snippet-length polish remains (editorial). Next (Phase 4): `llms.txt`, Search Console. Keep pages static — SEO and your cost model want the same thing. |
 | **Q4** | Paid AI, all content free | **Sound strategy** — you're charging for the one thing that has real marginal cost (inference) while serving zero-marginal-cost content free. The risk is *perception*, solved by **messaging + a genuinely useful free allowance + never gating anything educational**, not by changing the model. |
 | **Q5** | Save non-SQL playgrounds to D1 | **Yes, ideal.** Code workspaces are tiny text files (`files: PlaygroundFile[]`). Mind D1's **2 MB per-row cap** (irrelevant for code). Tiers via an `expires_at` column + a Cron sweep. Debounce writes (you already do this for OPFS). Sharing = a `share_id` → public read route. |
 | **Q6** | Save SQL playgrounds cheaply | **Don't put DB binaries in D1** (they blow the 2 MB row cap). Two tiers: **(1) store only the SQL + seed reference and replay to rebuild** (effectively free — the default), **(2) snapshot the binary to R2** for non-reproducible DBs (10 GB free, **zero egress**). Gate binaries + long retention behind paid. |
@@ -120,10 +120,10 @@ You're starting from a **strong technical base** (≈800 fast, prerendered, stat
 - ✅ A dedicated **1200×630 OpenGraph image** (`public/og-default.png`), generated on-brand from the logo + a "data slope" motif and now the site-wide share card.
 - ⏳ **`FAQPage` JSON-LD on the interview Q&A pages (Q2)** — deferred until the Interview Prep section exists; that's how you win the "interview questions" SERP features.
 
-**Phase 3 — Content & IA hygiene.**
-- Audit lesson frontmatter so **every page has a unique, descriptive `title` + `description`** (these become the SERP snippet). Many lessons likely inherit thin descriptions.
-- Strengthen internal linking: course index pages as topic hubs; cross-link interview ↔ lessons.
-- Reconsider the blanket `disallow: "/playground"` in `robots.ts`: the **playground landing pages** ("Online Python Playground," "Online SQL Editor") are legitimately indexable, high-intent content. Consider allowing the language landing pages while keeping the heavy app states out. (Keep `*.md` and `/llms/` disallowed — that's correct.)
+**Phase 3 — Content & IA hygiene.** ✅ **Implemented on this branch — details in §3.6.**
+- ✅ Audited lesson frontmatter (script + report). Good news: **all 759 lessons have a unique title + description (0 missing, 0 duplicates)** — the corpus is healthier than expected. The actionable residue is *length*: 119 descriptions truncate (>160 chars), 68 read thin (<70), 12 titles truncate. Those are editorial polish, not a code fix — the audit lists every one.
+- ✅ **Made the playground landing pages indexable** (`robots.ts` no longer blanket-disallows `/playground`; the hub + per-language pages are in the sitemap; the hub got keyword-rich metadata). The old block existed only for Vercel ISR cost, which is gone on Cloudflare.
+- ⏳ Strengthen internal linking (course index pages as topic hubs; cross-link interview ↔ lessons) — a content/design task, left as guidance.
 
 **Phase 4 — Measurement & AI discoverability.**
 - Verify in **Google Search Console** + **Bing Webmaster Tools**; submit the sitemap; watch impressions/CTR/coverage.
@@ -166,6 +166,36 @@ JSON-LD structured data and a real OpenGraph image. Still no rendering-mode chan
 **Verification:** `tsc --noEmit` ✅ and `eslint` ✅ clean; production `next build` ✅ with the JSON-LD present in prerendered HTML (Organization/WebSite on home; BreadcrumbList + Course on a course page; BreadcrumbList on a lesson). The PNG was visually checked (1200×630, logo + text render correctly).
 
 **Deferred to Phase 3+:** per-course OG images; `FAQPage` JSON-LD once the interview section exists; richer `Course` fields (`hasCourseInstance`, workload) if you pursue the Course rich result aggressively.
+
+### 3.6 Phase 3 — implementation status (shipped on this branch)
+
+Content/IA hygiene + making the playground landing pages indexable. Two parts: a code change (indexability) and an audit (no content was auto-rewritten — snippet copy is an editorial call).
+
+**Frontmatter audit — the corpus is in good shape.** A new script (`scripts/audit/seo-frontmatter.mjs`, `node … --report <file>`) scanned all **759** lessons:
+
+| Check | Count |
+| --- | --- |
+| Missing `title` / `description` | **0 / 0** |
+| Duplicate `description` | **0** |
+| `description` > 160 chars (truncates in SERP) | 119 |
+| `description` < 70 chars (thin) | 68 |
+| `title` > 55 chars (truncates after the `· DataSlope` suffix) | 12 |
+
+The full per-page list is in **`agent-outputs/20260622-0522-seo-frontmatter-audit.md`**. There's no systemic problem (no missing/dup metadata) — only length polish, which I deliberately did **not** auto-edit (truncating a description by script risks cutting mid-thought). Re-run the script anytime to track progress.
+
+**Playground pages made indexable:**
+
+| Change | File(s) | What it does |
+| --- | --- | --- |
+| Allow `/playground` | **`app/robots.ts`** | Drops the blanket `/playground` disallow (it existed only for Vercel ISR cost — gone on Cloudflare, where these are free static assets). Also adds `/magicui-demo` to the demo-route blocks. `*.md` + `/llms/` stay disallowed. |
+| Sitemap coverage | **`app/sitemap.ts`** + **`lib/playgrounds.ts`** (new) | Adds the hub + every `/playground/<lang>` (enumerated from the route tree, so new playgrounds are picked up automatically). |
+| Hub metadata | **`app/playground/page.tsx`** | Thin `title: "Playground"` → "Online Coding Playgrounds" + a keyword-rich description, canonical, and OG/Twitter card. (The per-language pages are `"use client"` app shells; their server-rendered `title`/`description` carry the "online &lt;lang&gt; playground" intent — sufficient for landing pages.) |
+
+**Verification:** `tsc --noEmit` ✅, `eslint` ✅, production `next build` ✅ — the sitemap now includes the playground routes and `/robots.txt` no longer disallows `/playground`.
+
+**Judgment call to confirm:** indexing the per-language playground app-shell pages is a reversible strategy choice (they're thin on server HTML). If you'd rather index only the content-rich hub and keep the language apps out, it's a one-line tweak — tell me and I'll scope it down.
+
+**Deferred (Phase 4):** an `llms.txt` index (you already expose `/learn/*.md` + "Open in ChatGPT/Claude", so AI-crawler discoverability is low-hanging); Search Console/Bing verification; internal-linking hubs.
 
 ---
 
