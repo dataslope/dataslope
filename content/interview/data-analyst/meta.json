@@ -1,6 +1,10 @@
 {
   "title": "Data Analyst",
   "description": "Interview prep for Data Analyst roles: SQL, pandas, statistics, and communicating insight.",
-  "root": true,
-  "pages": ["index", "sql", "pandas", "statistics-and-communication"]
+  "pages": [
+    "index",
+    "sql",
+    "pandas",
+    "statistics-and-communication"
+  ]
 }

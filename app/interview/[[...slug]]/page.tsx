@@ -40,27 +40,33 @@ export default async function InterviewPage(props: InterviewPageProps) {
   const { body: MDX, toc } = await page.data.load();
 
   // --- JSON-LD: breadcrumb everywhere, Course on each role landing page. ---
-  // The first slug segment is the role folder; its meta.json carries the human
-  // role name + `root` flag.
+  // The role folders are NOT Fumadocs roots (so the whole /interview tree is one
+  // navigable sidebar), so we derive position from the slug depth instead:
+  //   []                       → the /interview landing page
+  //   ["<role>"]               → a role landing page
+  //   ["<role>", "<topic>"]    → a topic page
+  // The first segment's meta.json carries the human role name.
   const slugs = page.slugs;
   const roleSlug = slugs[0];
   const roleMeta = roleSlug
     ? await getCourseMeta(roleSlug, "interview")
     : null;
-  const isRoleRoot = slugs.length === 1 && roleMeta?.root === true;
+  const isRoleIndex = slugs.length === 1;
 
   const crumbs: BreadcrumbItem[] = [
     { name: "Interview Prep", url: absUrl("/interview") },
   ];
-  if (roleMeta?.root) {
+  // Inside a role but past its landing page → add the role crumb.
+  if (roleMeta && !isRoleIndex) {
     crumbs.push({ name: roleMeta.title, url: absUrl(`/interview/${roleSlug}`) });
   }
-  if (!isRoleRoot) {
+  // The page itself (skip on the /interview landing, which is crumb 1 already).
+  if (slugs.length >= 1) {
     crumbs.push({ name: page.data.title, url: absUrl(page.url) });
   }
 
   const structuredData: object[] = [breadcrumbLd(crumbs)];
-  if (isRoleRoot && roleMeta) {
+  if (isRoleIndex && roleMeta) {
     structuredData.push(
       courseLd({
         name: `${roleMeta.title} Interview Prep`,

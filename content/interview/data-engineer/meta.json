@@ -1,6 +1,10 @@
 {
   "title": "Data Engineer",
   "description": "Interview prep for Data Engineer roles: advanced SQL, data modeling, and pipelines.",
-  "root": true,
-  "pages": ["index", "sql", "data-modeling", "pipelines"]
+  "pages": [
+    "index",
+    "sql",
+    "data-modeling",
+    "pipelines"
+  ]
 }
