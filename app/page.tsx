@@ -6,13 +6,35 @@ import "@/app/magicui.css";
 // Home-only hardening against /learn's global styles leaking in after a
 // client-side back-navigation (see app/home.css).
 import "@/app/home.css";
+import type { Metadata } from "next";
 import { HomeClient } from "./_components/home/HomeClient";
 import type { Course, CourseTags } from "./_components/home/CoursesSection";
+import { OG_IMAGE, SITE_URL } from "@/lib/site";
 
-export const metadata = {
-  title: "Dataslope — Learn Python, SQL, C++ in your browser",
-  description:
-    "Interactive, no sign-up, free. Browser-based playgrounds and courses for Python, SQL, C++, and more — all running on WebAssembly.",
+const HOME_TITLE = "Dataslope — Learn Python, SQL, C++ in your browser";
+const HOME_DESCRIPTION =
+  "Interactive, no sign-up, free. Browser-based playgrounds and courses for Python, SQL, C++, and more — all running on WebAssembly.";
+
+export const metadata: Metadata = {
+  // `absolute` opts out of the root layout's "%s · DataSlope" template so the
+  // home title isn't suffixed with a redundant second "Dataslope".
+  title: { absolute: HOME_TITLE },
+  description: HOME_DESCRIPTION,
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    url: SITE_URL,
+    siteName: "DataSlope",
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
+    images: [OG_IMAGE],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
+    images: [OG_IMAGE],
+  },
 };
 
 // Applies the persisted theme (the `theme` localStorage key + an explicit

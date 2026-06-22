@@ -17,7 +17,7 @@
 | --- | --- | --- |
 | **Q1** | Auth on Cloudflare | **Better Auth + D1** is the most Cloudflare-native path (self-hosted, free, D1 is first-class). Clerk if you want to ship in a day and migrate later. Use **OAuth social login first**. One caveat: keep auth out of `middleware.ts` on OpenNext. Gate *only* Save/AI — never content. |
 | **Q2** | Interview Prep section | **Strong yes.** Reuses your Fumadocs + playground infra almost verbatim (a second `defineDocs` collection), is your single best **SEO** lever (high-intent long-tail search), and feeds the paid-AI funnel. Keep it interactive-first to avoid being a LeetCode clone. |
-| **Q3** | SEO | You have great fundamentals (≈800 fast static pages) but are missing the basics: **no `sitemap.ts`, no `metadataBase`, no canonical/OpenGraph/Twitter, no JSON-LD.** Add those first; then structured data + content hygiene. Keep pages static — SEO and your cost model want the same thing. |
+| **Q3** | SEO | You have great fundamentals (≈800 fast static pages) but were missing the basics: no sitemap, no `metadataBase`, no canonical/OpenGraph/Twitter, no JSON-LD. **✅ Phase 1 is now implemented on this branch** (sitemap, `metadataBase`, title template, canonical + OG/Twitter on home + every lesson, sitemap wired into robots) — see §3.4. Next: structured data + content hygiene. Keep pages static — SEO and your cost model want the same thing. |
 | **Q4** | Paid AI, all content free | **Sound strategy** — you're charging for the one thing that has real marginal cost (inference) while serving zero-marginal-cost content free. The risk is *perception*, solved by **messaging + a genuinely useful free allowance + never gating anything educational**, not by changing the model. |
 | **Q5** | Save non-SQL playgrounds to D1 | **Yes, ideal.** Code workspaces are tiny text files (`files: PlaygroundFile[]`). Mind D1's **2 MB per-row cap** (irrelevant for code). Tiers via an `expires_at` column + a Cron sweep. Debounce writes (you already do this for OPFS). Sharing = a `share_id` → public read route. |
 | **Q6** | Save SQL playgrounds cheaply | **Don't put DB binaries in D1** (they blow the 2 MB row cap). Two tiers: **(1) store only the SQL + seed reference and replay to rebuild** (effectively free — the default), **(2) snapshot the binary to R2** for non-reproducible DBs (10 GB free, **zero egress**). Gate binaries + long retention behind paid. |
@@ -108,12 +108,12 @@ You're starting from a **strong technical base** (≈800 fast, prerendered, stat
 
 ### 3.2 Prioritized roadmap
 
-**Phase 1 — Foundations (highest impact ÷ effort; do this first).**
-1. **`app/sitemap.ts`** generating an entry per page from `source.getPages()` (and the interview collection when it lands). This is the biggest single gap — ~800 pages with no sitemap means slow/incomplete indexing.
-2. **`metadataBase`** in `app/layout.tsx` (`new URL("https://dataslope.com")`) so all relative OG/canonical URLs resolve.
-3. **Enrich `generateMetadata`** on lessons: add `alternates.canonical`, `openGraph` (title/description/type/url), and `twitter` card. Fumadocs exposes helpers for this; it's a ~15-line change in one file that fixes every lesson.
-4. **A default OG image** (static, or per-course generated) — dramatically improves social/Slack/Discord click-through.
-5. **Fix the home/playground metadata** — `app/layout.tsx`'s root metadata is still `title: "Playground"`; give the root a real default title template (e.g. `%s · DataSlope`).
+**Phase 1 — Foundations (highest impact ÷ effort).** ✅ **Implemented on this branch — details in §3.4.**
+1. ✅ **`app/sitemap.ts`** generating an entry per page from `source.getPages()` (and the interview collection when it lands). This was the biggest single gap — ~800 pages with no sitemap means slow/incomplete indexing.
+2. ✅ **`metadataBase`** in `app/layout.tsx` (`new URL(SITE_URL)`) so all relative OG/canonical URLs resolve.
+3. ✅ **Enrich `generateMetadata`** on lessons: add `alternates.canonical`, `openGraph` (title/description/type/url), and `twitter` card — a small change in one file that fixes every lesson.
+4. ✅ **A default OG image** — wired site-wide via `lib/site.ts`. (A dedicated 1200×630 social card + per-course images remain a polish follow-up; the current default reuses an existing brand asset.)
+5. ✅ **Fix the home/root metadata** — `app/layout.tsx`'s root metadata was `title: "Playground"`; now a real default + `%s · DataSlope` title template, and the home title opts out of the template via `absolute`.
 
 **Phase 2 — Structured data (rich results).**
 - `Course` / `LearningResource` JSON-LD on course indexes and lessons.
@@ -132,6 +132,23 @@ You're starting from a **strong technical base** (≈800 fast, prerendered, stat
 ### 3.3 The cost/SEO alignment
 
 Your migration report's whole thesis — *keep content static, served as free assets* — is also the #1 SEO requirement (fast, cacheable, crawlable). They reinforce each other. The one trap to avoid (restating Q1): **don't let accounts/personalization push lesson pages into dynamic rendering.** Personalize client-side; keep the crawlable HTML static.
+
+### 3.4 Phase 1 — implementation status (shipped on this branch)
+
+Phase 1 is implemented and committed on `claude/clever-tesla-16t45x`. It's metadata-only — no content, runtime, or rendering-mode changes, so the static-asset cost model is untouched.
+
+| Change | File(s) | What it does |
+| --- | --- | --- |
+| Shared site constants | **`lib/site.ts`** (new) | Exports `SITE_URL` (`https://dataslope.com`, overridable via `NEXT_PUBLIC_SITE_URL`) and the default `OG_IMAGE`, so layout/pages/sitemap/robots never drift. |
+| `metadataBase` + title template + default OG/Twitter | **`app/layout.tsx`** | Sets `metadataBase` (relative OG/canonical URLs now resolve to absolute), replaces the weak `title: "Playground"` default with `default` + `template: "%s · DataSlope"`, and adds a site-level OpenGraph + Twitter card. Routes without their own social tags (playground layouts, `/terms`, `/privacy`) now inherit a shareable card. |
+| Home metadata | **`app/page.tsx`** | Adds `alternates.canonical: "/"`, OpenGraph, and Twitter; uses `title: { absolute }` so the template doesn't append a redundant second "Dataslope". |
+| Per-lesson metadata | **`app/learn/[[...slug]]/page.tsx`** | `generateMetadata` now returns `alternates.canonical` (the lesson's `page.url`), `openGraph` (`type: "article"`, url, title, description, image), and a `twitter` card — applied to all ~800 lessons. |
+| Sitemap | **`app/sitemap.ts`** (new) | Emits `/sitemap.xml` from `source.getPages()` (home + `/learn` index + every lesson), deduped, built statically. The single biggest indexing win. `/playground` and `*.md` omitted to stay consistent with robots. |
+| Robots → sitemap | **`app/robots.ts`** | Adds the `sitemap:` directive pointing at `/sitemap.xml`. Disallow rules unchanged. |
+
+**Verification:** `npx tsc --noEmit` and `eslint` on the changed files both pass clean; the production `next build` was run to confirm the sitemap route and `generateMetadata` render. **Not yet done (deliberately):** the title casing inconsistency ("Dataslope" on the home page vs "DataSlope" elsewhere) is left as-is to avoid changing brand copy unilaterally; a dedicated 1200×630 OG image and JSON-LD are Phase 2.
+
+**Post-merge follow-ups for you:** point Google Search Console + Bing Webmaster Tools at the deployed `/sitemap.xml`; if the production origin ever differs from `https://dataslope.com`, set `NEXT_PUBLIC_SITE_URL`.
 
 ---
 

@@ -6,6 +6,7 @@
  * `content/learn/` becomes a pre-rendered page at build time. Calling
  * `notFound()` for unknown slugs lets Next.js render its standard 404.
  */
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   DocsBody,
@@ -19,6 +20,7 @@ import {
 } from "fumadocs-ui/layouts/docs/page";
 import { source } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
+import { OG_IMAGE } from "@/lib/site";
 
 // Lessons live at `content/learn/<page.path>` on the default branch, so the
 // "Open in GitHub" action links straight to the page source.
@@ -90,12 +92,35 @@ export async function generateStaticParams() {
   return source.generateParams();
 }
 
-export async function generateMetadata(props: LearnPageProps) {
+export async function generateMetadata(
+  props: LearnPageProps,
+): Promise<Metadata> {
   const params = await props.params;
   const page = source.getPage(params.slug);
   if (!page) return {};
+
+  const { title, description } = page.data;
+  // `page.url` is the lesson's canonical path (e.g. /learn/python-basics/loops).
+  // Relative here — Next resolves it against `metadataBase` (app/layout.tsx).
+  const url = page.url;
+
   return {
-    title: page.data.title,
-    description: page.data.description,
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "article",
+      url,
+      siteName: "DataSlope",
+      title,
+      description,
+      images: [OG_IMAGE],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [OG_IMAGE],
+    },
   };
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./brand.css";
 import "./globals.css";
+import { OG_IMAGE, SITE_URL } from "@/lib/site";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -9,9 +10,37 @@ const inter = Inter({
   display: "swap",
 });
 
+const SITE_DESCRIPTION =
+  "Free, interactive, no sign-up. Browser-based playgrounds and courses for Python, SQL, C++, and more — all running on WebAssembly.";
+
+// `metadataBase` makes every relative OpenGraph/canonical URL resolve to an
+// absolute production URL. The `title.template` appends "· DataSlope" to each
+// page's own title (e.g. "SQLite Playground" → "SQLite Playground · DataSlope")
+// while `default` covers routes that set no title of their own. Routes without
+// their own `openGraph`/`twitter` (the playground layouts, /terms, /privacy)
+// inherit this site-level card + share image, so every page is shareable.
 export const metadata: Metadata = {
-  title: "Playground",
-  description: "Browser-based language playgrounds.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "DataSlope — Learn Python, SQL, C++ in your browser",
+    template: "%s · DataSlope",
+  },
+  description: SITE_DESCRIPTION,
+  applicationName: "DataSlope",
+  openGraph: {
+    type: "website",
+    siteName: "DataSlope",
+    url: SITE_URL,
+    title: "DataSlope — Learn Python, SQL, C++ in your browser",
+    description: SITE_DESCRIPTION,
+    images: [OG_IMAGE],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DataSlope — Learn Python, SQL, C++ in your browser",
+    description: SITE_DESCRIPTION,
+    images: [OG_IMAGE],
+  },
 };
 
 // Runs before React hydrates. On /playground routes it applies the SITE
