@@ -1,0 +1,9 @@
+{
+  "title": "Data Analyst",
+  "description": "Interview prep for Data Analyst roles: SQL fluency, aggregation, and communicating insight.",
+  "root": true,
+  "pages": [
+    "index",
+    "sql-aggregations"
+  ]
+}

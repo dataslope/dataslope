@@ -1,0 +1,8 @@
+{
+  "title": "Data Scientist",
+  "description": "Interview prep for Data Scientist roles: statistics, modeling, experimentation, and communication.",
+  "root": true,
+  "pages": [
+    "index"
+  ]
+}

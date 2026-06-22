@@ -1,0 +1,13 @@
+{
+  "title": "Interview Prep",
+  "pages": [
+    "index",
+    "---",
+    "data-analyst",
+    "data-scientist",
+    "data-engineer",
+    "analytics-engineer",
+    "machine-learning-engineer",
+    "backend-engineer"
+  ]
+}

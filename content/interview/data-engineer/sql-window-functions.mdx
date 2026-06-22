@@ -1,0 +1,71 @@
+---
+title: "SQL: Window Functions"
+description: A runnable window-function interview question (ranking within a partition), plus a concept check on RANK vs ROW_NUMBER.
+---
+
+Window functions separate analysts from engineers in SQL screens. The
+classic question: **rank rows within a group**. Solve it below against a
+live DuckDB database.
+
+## Challenge: rank orders within each region
+
+<SqlChallengeCard
+  dialect="duckdb"
+  title="Rank orders by amount within region"
+  instructions={`The table \`orders\` has columns \`id\`, \`region\`, and \`amount\`. For every row, add a column \`rnk\` giving its rank **within its region** by \`amount\` descending (largest amount = rank 1). Return \`id\`, \`region\`, \`amount\`, \`rnk\`. Sort by \`region\`, then \`rnk\`.`}
+  initSql={`CREATE TABLE orders AS
+SELECT * FROM (VALUES
+  (1, 'North', 120.00),
+  (2, 'North',  60.00),
+  (3, 'North',  75.50),
+  (4, 'South',  80.50),
+  (5, 'South',  90.00),
+  (6, 'South',  65.00),
+  (7, 'East',  200.00),
+  (8, 'East',  140.00)
+) AS t(id, region, amount);`}
+  starterCode={`-- Use a window function partitioned by region.
+SELECT
+  id,
+  region,
+  amount
+  -- , <window function> AS rnk
+FROM orders
+-- order by region, rnk;`}
+  solutionSql={`SELECT
+  id,
+  region,
+  amount,
+  RANK() OVER (PARTITION BY region ORDER BY amount DESC) AS rnk
+FROM orders
+ORDER BY region, rnk;`}
+  tests={[
+    {
+      id: "row_count",
+      name: "All rows are returned",
+      description: "A window function keeps every input row (8 here)",
+      expectedRowCount: 8,
+    },
+    {
+      id: "columns",
+      name: "Has the required columns",
+      description: "id, region, amount, rnk",
+      expectedColumnsInclude: ["id", "region", "amount", "rnk"],
+    },
+  ]}
+/>
+
+## Concept check
+
+<MultipleChoice
+  markdown={`Two orders in the same region are tied on \`amount\`. You need both to get the **same** rank, and the next distinct amount to skip a number (1, 2, 2, 4). Which function do you want?
+
+- \`ROW_NUMBER()\`
+  > \`ROW_NUMBER()\` assigns a distinct number to every row even on ties (1, 2, 3, 4), breaking ties arbitrarily — it never repeats a value.
+- [o] \`RANK()\`
+  > \`RANK()\` gives tied rows the same rank and then skips, producing 1, 2, 2, 4 — exactly the pattern described.
+- \`DENSE_RANK()\`
+  > \`DENSE_RANK()\` also ties rows together but does *not* skip — it yields 1, 2, 2, 3.
+- \`NTILE(4)\`
+  > \`NTILE\` buckets rows into a fixed number of groups; it isn't a tie-aware ranking.`}
+/>

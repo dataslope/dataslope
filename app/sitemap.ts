@@ -15,7 +15,7 @@
  * stay consistent with `app/robots.ts`, which disallows them.
  */
 import type { MetadataRoute } from "next";
-import { source } from "@/lib/source";
+import { source, interviewSource } from "@/lib/source";
 import { SITE_URL } from "@/lib/site";
 import { getPlaygroundPaths } from "@/lib/playgrounds";
 
@@ -35,6 +35,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
   for (const page of source.getPages()) {
     const url = abs(page.url);
     const isIndex = page.url === "/learn";
+    entries.set(url, {
+      url,
+      changeFrequency: "monthly",
+      priority: isIndex ? 0.9 : 0.7,
+    });
+  }
+
+  // Interview Prep collection (content/interview → /interview).
+  for (const page of interviewSource.getPages()) {
+    const url = abs(page.url);
+    const isIndex = page.url === "/interview";
     entries.set(url, {
       url,
       changeFrequency: "monthly",

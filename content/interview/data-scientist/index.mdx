@@ -1,0 +1,38 @@
+---
+title: Data Scientist
+description: What Data Scientist interviews test — statistics, modeling, experiment design, and communicating results — with a concept check.
+---
+
+Data Scientist interviews blend **statistics**, **modeling**, and
+**experimentation** with coding and communication. Expect probability
+and stats questions, a modeling case ("how would you predict X?"), an
+A/B-test design discussion, and usually a Python/pandas or SQL screen.
+
+## What interviewers probe
+
+- **Statistics & probability** — distributions, hypothesis testing, p-values, confidence intervals, Bayes.
+- **Modeling** — bias–variance trade-off, regularization, cross-validation, feature engineering, metric choice.
+- **Experimentation** — A/B test design, power, sample size, novelty effects, pitfalls.
+- **Coding** — pandas/NumPy data wrangling and SQL.
+- **Communication** — explaining a model and its caveats to a non-technical stakeholder.
+
+## Concept check
+
+<MultipleChoice
+  markdown={`A model scores 99% accuracy on the training set but 72% on held-out data. What is the most likely diagnosis?
+
+- Underfitting (high bias).
+  > Underfitting shows up as *poor* performance on the training set too — here training accuracy is very high, so bias isn't the problem.
+- [o] Overfitting (high variance) — the model memorized the training data and generalizes poorly.
+  > A large train-vs-test gap is the signature of overfitting. Remedies: more data, regularization, a simpler model, or better cross-validation.
+- The test set is simply easier than the training set.
+  > That would make test accuracy *higher*, not lower — the opposite of what's observed.
+- Nothing is wrong; 99% training accuracy means the model is excellent.
+  > Training accuracy alone is misleading; generalization to unseen data is what matters, and the gap here signals a problem.`}
+/>
+
+## Go deeper
+
+- [Statistics for Data Science with Python](/learn/statistics-for-data-science-python)
+- [Machine Learning with scikit-learn](/learn/machine-learning-scikit-learn)
+- [Data Analysis with Python & Pandas](/learn/data-analysis-python-pandas)

@@ -1,0 +1,70 @@
+---
+title: "SQL: Aggregation & Grouping"
+description: A runnable SQL interview question on GROUP BY aggregation, plus a WHERE-vs-HAVING concept check.
+---
+
+Aggregation is the bread and butter of analyst SQL screens. The query
+below runs against a real in-browser DuckDB database — write it, run it,
+and the tests check your result.
+
+## Challenge: revenue by region
+
+<SqlChallengeCard
+  dialect="duckdb"
+  title="Total revenue per region"
+  instructions={`The table \`orders\` has columns \`id\`, \`region\`, \`category\`, and \`amount\`. Return the **total revenue per region**: two columns, \`region\` and \`revenue\` (the summed \`amount\`), sorted by \`revenue\` descending.`}
+  initSql={`CREATE TABLE orders AS
+SELECT * FROM (VALUES
+  (1,  'North', 'A', 120.00),
+  (2,  'South', 'B',  80.50),
+  (3,  'East',  'A', 200.00),
+  (4,  'West',  'C',  50.25),
+  (5,  'North', 'B',  60.00),
+  (6,  'South', 'A',  90.00),
+  (7,  'East',  'C', 140.00),
+  (8,  'West',  'B', 110.00),
+  (9,  'North', 'C',  75.50),
+  (10, 'South', 'B',  65.00)
+) AS t(id, region, category, amount);`}
+  starterCode={`-- Sum amount per region, highest first.
+SELECT
+  region,
+  -- your aggregate here AS revenue
+FROM orders
+-- group + order here;`}
+  solutionSql={`SELECT
+  region,
+  SUM(amount) AS revenue
+FROM orders
+GROUP BY region
+ORDER BY revenue DESC;`}
+  tests={[
+    {
+      id: "row_count",
+      name: "One row per region",
+      description: "Four regions in the data → four rows",
+      expectedRowCount: 4,
+    },
+    {
+      id: "columns",
+      name: "Has the required columns",
+      description: "region and revenue",
+      expectedColumnsInclude: ["region", "revenue"],
+    },
+  ]}
+/>
+
+## Concept check
+
+<MultipleChoice
+  markdown={`You only want the regions whose **total** revenue exceeds 250. Which clause filters on that aggregated total?
+
+- A \`WHERE revenue > 250\` clause.
+  > \`WHERE\` filters individual rows *before* aggregation, so it can't reference the per-group \`SUM\` — and the alias \`revenue\` doesn't exist yet at that stage.
+- [o] A \`HAVING SUM(amount) > 250\` clause.
+  > \`HAVING\` is evaluated *after* \`GROUP BY\`, so it can filter on aggregates like \`SUM(amount)\`.
+- Either one works; they're interchangeable.
+  > They run at different stages: \`WHERE\` before grouping (row-level), \`HAVING\` after (group-level). Filtering an aggregate belongs in \`HAVING\`.
+- Neither; you must wrap the query in a subquery first.
+  > A subquery works but isn't required — \`HAVING\` filters grouped results directly.`}
+/>

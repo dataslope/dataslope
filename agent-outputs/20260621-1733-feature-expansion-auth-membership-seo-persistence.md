@@ -16,7 +16,7 @@
 | # | Question | Short answer |
 | --- | --- | --- |
 | **Q1** | Auth on Cloudflare | **Better Auth + D1** is the most Cloudflare-native path (self-hosted, free, D1 is first-class). Clerk if you want to ship in a day and migrate later. Use **OAuth social login first**. One caveat: keep auth out of `middleware.ts` on OpenNext. Gate *only* Save/AI — never content. |
-| **Q2** | Interview Prep section | **Strong yes.** Reuses your Fumadocs + playground infra almost verbatim (a second `defineDocs` collection), is your single best **SEO** lever (high-intent long-tail search), and feeds the paid-AI funnel. Keep it interactive-first to avoid being a LeetCode clone. |
+| **Q2** | Interview Prep section | **Strong yes — and ✅ now scaffolded on this branch** at `/interview`: a second `defineDocs` collection reusing the playground/MDX components, with six role tracks (Data Analyst/Scientist/Engineer, Analytics Eng, ML Eng, Backend) and runnable seed questions (SQL + Python + MCQs). See §2.4. Your single best **SEO** lever and a natural paid-AI funnel. |
 | **Q3** | SEO | You have great fundamentals (≈800 fast static pages) but were missing the basics. **✅ Phases 1–3 are now implemented on this branch:** sitemap, `metadataBase`, title template, canonical + OG/Twitter, a 1200×630 OG image, JSON-LD (Organization/WebSite + BreadcrumbList + Course), indexable playground landing pages, and a frontmatter audit — see §3.4–3.6. The corpus is clean (0 missing/duplicate descriptions); only snippet-length polish remains (editorial). Next (Phase 4): `llms.txt`, Search Console. Keep pages static — SEO and your cost model want the same thing. |
 | **Q4** | Paid AI, all content free | **Sound strategy** — you're charging for the one thing that has real marginal cost (inference) while serving zero-marginal-cost content free. The risk is *perception*, solved by **messaging + a genuinely useful free allowance + never gating anything educational**, not by changing the model. |
 | **Q5** | Save non-SQL playgrounds to D1 | **Yes, ideal.** Code workspaces are tiny text files (`files: PlaygroundFile[]`). Mind D1's **2 MB per-row cap** (irrelevant for code). Tiers via an `expires_at` column + a Cron sweep. Debounce writes (you already do this for OPFS). Sharing = a `share_id` → public read route. |
@@ -84,6 +84,23 @@ Each question = a `ChallengeCard` (runnable) or a `MultipleChoice` (concept chec
 - **Brand coherence:** keep it under the same nav/theme so it reads as "DataSlope also preps you for the interview," not a bolt-on.
 
 > Note the `AGENTS.md` rule about `<MultipleChoice>` explanations (never start with "Correct!"/"Right!") — it applies to interview MCQs too, since explanations are shown to all submitters.
+
+### 2.4 Scaffold — implemented on this branch
+
+The full section is stood up at **`/interview`** as a second Fumadocs collection, reusing the existing components, runtimes, and styles end-to-end.
+
+| Piece | File(s) |
+| --- | --- |
+| Second collection | `source.config.ts` (`export const interview = defineDocs({ dir: "content/interview", … })`) — fumadocs-mdx names the collection after the export, so it gets its own `?collection=interview` entries and never collides with `docs`. |
+| Loader | `lib/source.ts` → `interviewSource = loader({ baseUrl: "/interview", … })`. |
+| Route + layout | `app/interview/[[...slug]]/page.tsx` (mirrors the learn page: `dynamic` body load, prerendered via `generateStaticParams`, canonical/OG metadata, BreadcrumbList + Course JSON-LD) and `app/interview/layout.tsx` (Fumadocs `DocsLayout`, reusing `app/learn/learn.css`). |
+| SEO | `app/sitemap.ts` now also emits `interviewSource.getPages()`; `lib/courseMeta.ts` generalized to read either section. |
+| Content | `content/interview/`: a landing page + **six role tracks** — Data Analyst, Data Scientist, Data Engineer, Analytics Engineer, ML Engineer, Backend/SWE — each with an overview, an outline of what's probed, and links into the relevant `/learn` courses. |
+| Interactive seed questions | Data Analyst → a runnable `SqlChallengeCard` (GROUP BY) + MCQ; Data Engineer → window-function `SqlChallengeCard` + MCQ; Backend → a Python `ChallengeCard` (Two Sum, with tests) + MCQ; the other three roles carry a concept-check MCQ each. |
+
+**Verification:** `tsc --noEmit` ✅, `eslint` ✅, MCQ linter ✅ (all 6 MCQ files pass: one correct answer, ≥2 choices, neutral explanations), production `next build` ✅. The section is intentionally a *scaffold* — the structure, infra, and one or two questions per format are in place; filling each role with depth is the (editorial) follow-on.
+
+**Possible follow-ups:** a top-nav link between `/learn` and `/interview`; per-question difficulty/role tags; `FAQPage` JSON-LD on Q&A pages (the Q3-Phase-2 deferral); an "Ask AI to explain this answer" hook once Q4 lands.
 
 ---
 

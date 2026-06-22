@@ -50,6 +50,18 @@ export const docs = defineDocs({
   },
 });
 
+// Interview Prep — a second docs collection under `content/interview/`,
+// surfaced at `/interview` (see `lib/source.ts`). Same `dynamic` rationale as
+// the learn collection above. fumadocs-mdx names the collection after this
+// export (`interview`), so it gets its own `?collection=interview` entries in
+// the generated `.source` and never collides with `docs`.
+export const interview = defineDocs({
+  dir: "content/interview",
+  docs: {
+    dynamic: true,
+  },
+});
+
 export default defineConfig({
   mdxOptions: {
     // `remarkPreserveCodeIndent` MUST run for code blocks/challenge cards to

@@ -1,0 +1,36 @@
+---
+title: Analytics Engineer
+description: What Analytics Engineer interviews test — dbt, dimensional modeling, SQL, and the transformation layer between data engineering and analytics.
+---
+
+Analytics Engineer sits between data engineering and analytics: you own
+the **transformation layer** — turning raw warehouse tables into clean,
+tested, documented models (usually with **dbt**). Interviews test SQL,
+dimensional modeling, and software practices applied to analytics.
+
+## What interviewers probe
+
+- **SQL & modeling** — dimensional modeling (facts & dimensions), star schemas, grain, and slowly-changing dimensions.
+- **dbt** — models, refs, sources, tests, materializations (view / table / incremental), and documentation.
+- **Software practice** — version control, CI, modularity (staging → intermediate → marts), and DRY SQL.
+- **Trade-offs** — when to materialize as a table vs view vs incremental model, and cost/freshness balance.
+
+## Concept check
+
+<MultipleChoice
+  markdown={`In a star schema, a table storing the **measurable events** (e.g. one row per order line, with quantities and amounts) is called what?
+
+- A dimension table.
+  > Dimension tables hold descriptive context (customer, product, date) that you filter and group *by* — not the measurements themselves.
+- [o] A fact table.
+  > Fact tables store the measurable events at a defined grain, with numeric measures and foreign keys out to the dimensions.
+- A staging model.
+  > "Staging" describes a dbt layer (lightly cleaned source data), not a star-schema table role.
+- A surrogate key.
+  > A surrogate key is a synthetic identifier column, not a kind of table.`}
+/>
+
+## Go deeper
+
+- [Database Design with PostgreSQL](/learn/database-design-postgresql)
+- [SQL Analytics with DuckDB](/learn/sql-analytics-duckdb)

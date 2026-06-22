@@ -1,12 +1,13 @@
 /**
- * Reads a course folder's `meta.json` (the Fumadocs folder config under
- * `content/learn/<course>/`). Used at build time to resolve the human course
- * name + description for breadcrumbs and Course JSON-LD — values that live in
- * `meta.json`, not in the page's own MDX frontmatter (the course index page's
- * frontmatter title is typically "Welcome", not the course name).
+ * Reads a section folder's `meta.json` (the Fumadocs folder config under
+ * `content/<section>/<folder>/`). Used at build time to resolve the human
+ * course/role name + description for breadcrumbs and Course JSON-LD — values
+ * that live in `meta.json`, not in the page's own MDX frontmatter (the index
+ * page's frontmatter title is typically "Welcome"/"Overview", not the name).
  *
- * Returns `null` for slugs that aren't course roots (e.g. loose demo pages
- * directly under `content/learn/` have no `meta.json`).
+ * `section` defaults to `"learn"` (the courses); pass `"interview"` for the
+ * interview-prep roles. Returns `null` for slugs that aren't section roots
+ * (e.g. loose demo pages directly under the section have no `meta.json`).
  */
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -19,10 +20,11 @@ export interface CourseMeta {
 
 export async function getCourseMeta(
   courseSlug: string,
+  section = "learn",
 ): Promise<CourseMeta | null> {
   try {
     const raw = await readFile(
-      path.join(process.cwd(), "content", "learn", courseSlug, "meta.json"),
+      path.join(process.cwd(), "content", section, courseSlug, "meta.json"),
       "utf-8",
     );
     const meta = JSON.parse(raw) as {

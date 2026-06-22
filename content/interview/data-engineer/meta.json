@@ -1,0 +1,9 @@
+{
+  "title": "Data Engineer",
+  "description": "Interview prep for Data Engineer roles: advanced SQL, window functions, data modeling, and pipelines.",
+  "root": true,
+  "pages": [
+    "index",
+    "sql-window-functions"
+  ]
+}
