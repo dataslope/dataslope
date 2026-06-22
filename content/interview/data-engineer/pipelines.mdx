@@ -47,6 +47,112 @@ they need (less I/O), compression is far better (typed columns), and it
 carries a schema + statistics enabling predicate pushdown. CSV is
 row-oriented, untyped, and must be fully scanned.
 
+### What is the small files problem and how do you fix it?
+
+Writing many tiny files (e.g., one Parquet file per minute instead of one per day) creates massive metadata overhead — the engine spends more time listing and opening files than reading data. Fixes include **compaction jobs** (periodic rewrites that merge small files into fewer large ones), adjusting partition granularity, and using table formats like Delta Lake or Apache Iceberg that manage file manifests efficiently.
+
+### What is exactly-once vs at-least-once delivery semantics?
+
+**At-least-once** guarantees every message is delivered, but duplicates are possible on retry. **Exactly-once** guarantees each message is processed precisely once — no duplicates, no loss. Exactly-once is harder to achieve (requires coordination between producer, broker, and consumer) and carries higher latency/overhead. Many production systems accept at-least-once delivery and make the consumer **idempotent** rather than paying the cost of true exactly-once.
+
+### What is Change Data Capture (CDC) and when do you use it?
+
+CDC tracks row-level changes (inserts, updates, deletes) in a source database — typically by reading the database's write-ahead log (WAL) — and propagates them downstream in near real time. Use it when you need low-latency replication of transactional data to a warehouse or lake without polling the source table, and when you must capture deletes (which a simple `WHERE updated_at > last_run` query misses).
+
+### What is a watermark in a streaming pipeline?
+
+A **watermark** is a signal that tells the streaming engine "all events with timestamp before T have arrived." It allows the engine to close and finalize windows without waiting forever. Watermarks are set as `event_time - some_allowed_lateness_margin`. Events that arrive after the watermark has passed are called **late data** and are either dropped, routed to a side output, or used to update (recompute) the window result depending on the system's configuration.
+
+### How do you handle late-arriving data in streaming?
+
+Common strategies: (1) set a generous **allowed lateness window** so the engine holds state longer before finalizing; (2) emit **early, on-time, and late** triggers and update downstream results when late events arrive; (3) use an **upsert/merge** in the sink so late arrivals correct prior results rather than duplicating them. The right choice depends on how late data can be and how important its inclusion is to correctness.
+
+### What is a backfill and how do you design for it?
+
+A **backfill** reprocesses historical data through a pipeline, usually to populate a new table, fix a bug, or apply a schema change. Design for it by making pipelines **parameterized by date range** and **idempotent** (safe to run multiple times). In Airflow, set `catchup=True` and choose a sensible `start_date`; in Dagster, use partitioned assets. Backfills of years of data may require throttling to avoid overwhelming source systems.
+
+### What is ETL vs ELT?
+
+**ETL (Extract, Transform, Load)** transforms data before loading it into the target — common when the target system has limited compute or strict schema requirements. **ELT (Extract, Load, Transform)** loads raw data first, then transforms it inside the warehouse — the modern default because cloud warehouses have abundant compute and SQL transformations (dbt) run fast in-place. ELT makes raw data available for re-transformation without re-extraction.
+
+### What is a lakehouse and how does it differ from a data warehouse?
+
+A **data warehouse** stores structured, processed data in a proprietary format optimized for SQL queries (e.g., Snowflake, BigQuery, Redshift). A **data lake** stores raw data in open formats (Parquet, ORC, Avro) on cheap object storage. A **lakehouse** adds a transactional metadata layer (Delta Lake, Apache Iceberg, Apache Hudi) on top of lake storage, giving you ACID transactions, schema enforcement, time travel, and efficient updates — warehouse-like reliability on lake-like open storage at lower cost.
+
+### What is Apache Avro and when is it preferred over Parquet?
+
+Avro is a **row-based**, schema-embedded binary format. It excels at **streaming and serialization** (each record is self-describing) and is the standard format for Kafka messages. Parquet is columnar and better for analytical batch reads. Avro is preferred when you need efficient row-level writes, full-record serialization for message queues, or schema evolution support via a schema registry.
+
+### What is ORC and how does it compare to Parquet?
+
+ORC (Optimized Row Columnar) is another columnar format — like Parquet it supports compression and predicate pushdown, and it originated in the Hive/Hadoop ecosystem. ORC has historically had slightly better compression for string-heavy data and stronger native support in Hive/Presto; Parquet has broader ecosystem support (Spark, Pandas, BigQuery, Snowflake). In practice, Parquet is the more portable choice for modern stacks.
+
+### What is schema evolution, and how do Parquet and Avro handle it?
+
+Schema evolution is the ability to change a schema (add, rename, remove, or change-type columns) without breaking existing readers or rewriting existing data. Parquet supports adding and dropping columns safely; changing types or renaming columns may break older readers. Avro handles evolution more formally via compatibility rules (backward, forward, full) enforced by a **schema registry**, making it the better choice when many independent services must agree on a schema.
+
+### What is a DAG in Airflow, and what are common anti-patterns?
+
+A **DAG (Directed Acyclic Graph)** defines the set of tasks and their dependencies for a workflow. Common anti-patterns: (1) **dynamic DAGs generated at parse time** with expensive API calls — they slow the scheduler; (2) **tasks that do too much** — large monolithic tasks make retries expensive; (3) **no idempotency** — tasks that fail partway through corrupt state; (4) **passing large data through XComs** — XComs are for small metadata, not DataFrames; use external storage.
+
+### What is a task vs a sensor in Airflow?
+
+A **task** performs an action (run SQL, call an API, submit a Spark job). A **sensor** is a special task that polls a condition (does this S3 file exist? has the upstream DAG succeeded?) and blocks until it is true or times out. Sensors hold a worker slot while polling; for long-waiting sensors, use `mode='reschedule'` so the slot is freed between polls.
+
+### How does Dagster model pipelines differently from Airflow?
+
+Dagster uses **software-defined assets** as the primary abstraction: you declare the data assets a function produces (a table, a file) and Dagster infers the dependency graph from asset lineage rather than explicit task wiring. This makes lineage and freshness tracking first-class. Airflow is more task-centric (what to run and when); Dagster is more asset-centric (what data exists and how it was produced). Dagster also has stronger typing and testing primitives.
+
+### What is data quality testing in a pipeline context?
+
+Data quality tests validate that data meets expectations before it flows downstream. Common checks: row count thresholds, null rate limits, referential integrity (all foreign keys exist), value range checks, schema conformance, and freshness (data is not too stale). Tools like dbt tests, Great Expectations, and Soda run these checks as pipeline steps and fail the job or alert on violations, preventing bad data from reaching consumers.
+
+### What is dbt and where does it fit in an ELT pipeline?
+
+**dbt (data build tool)** is a transformation framework that runs SQL `SELECT` statements against a warehouse and materializes the results as tables or views. It handles dependency ordering (via `ref()` calls), incremental models, testing, documentation, and lineage. It occupies the "T" in ELT — after raw data is loaded into the warehouse, dbt transforms it into clean, modeled tables for analytics.
+
+### What is a Medallion architecture (Bronze/Silver/Gold)?
+
+A layered data lake or lakehouse design:
+
+- **Bronze** — raw, unmodified source data, preserved as-is for reprocessing.
+- **Silver** — cleaned, deduplicated, conformed data; joins applied; a reliable "single source of truth."
+- **Gold** — business-level aggregates and denormalized tables optimized for specific BI or ML use cases.
+
+Each layer is idempotent — gold can always be rebuilt from silver, silver from bronze.
+
+### What is a Lambda vs Kappa architecture?
+
+**Lambda** runs two parallel paths: a **batch layer** for accurate historical processing and a **speed layer** for low-latency streaming results, with a **serving layer** merging both. It is complex to maintain because logic must be written twice. **Kappa** uses a **single streaming path** for all data — historical reprocessing is done by replaying the event log (e.g., Kafka). Kappa is simpler when the streaming framework can handle batch semantics; Lambda is a fallback when streaming accuracy or replay isn't feasible.
+
+### What are common cost optimization strategies for cloud data pipelines?
+
+Key levers: (1) **partition pruning and predicate pushdown** — read less data; (2) **right-sizing compute** — auto-scaling clusters, spot/preemptible instances for batch; (3) **columnar compressed formats** (Parquet/ORC) over CSV; (4) **incremental processing** instead of full reloads; (5) **caching** intermediate results that are queried repeatedly; (6) **storage tiering** — move cold data to cheaper storage classes; (7) **query result caching** at the warehouse layer; (8) minimizing data shuffles in distributed engines (Spark/Flink).
+
+### What is the "fan-out" problem in pipelines?
+
+Fan-out occurs when a single upstream change triggers many downstream recomputations — for example, a correction to a dimension table invalidating thousands of downstream aggregations. Manage it with **selective invalidation** (only recompute affected partitions), **dependency graphs** that identify minimal recomputation scope, and **change data capture** that propagates only delta changes rather than full refreshes.
+
+### How do you handle schema changes from source systems without breaking downstream?
+
+Strategies: (1) **land raw data in a schema-on-read layer** (Bronze) so changes don't break ingestion; (2) use a **schema registry** (Confluent, AWS Glue) with enforced compatibility rules for streaming sources; (3) add **schema validation steps** at ingestion that alert and halt on breaking changes; (4) write downstream transformations to be **column-selective** (avoid `SELECT *`) so extra source columns are ignored.
+
+### What is a circuit breaker pattern in data engineering?
+
+A **circuit breaker** stops a pipeline from propagating bad data downstream when a quality check fails — analogous to an electrical circuit breaker. The pipeline fails fast, alerts the team, and halts further processing rather than letting corrupt or anomalous data silently pollute dependent tables and dashboards. It is implemented as a quality gate task that the DAG must pass before proceeding.
+
+### What is data lineage and why does it matter?
+
+**Data lineage** tracks the origin, movement, and transformation of data from source to final table — which source systems feed which raw tables, which transformations produce which downstream assets, and which dashboards consume them. It matters for debugging ("why did this metric change?"), impact analysis ("if I drop this column, what breaks?"), regulatory compliance (GDPR data provenance), and onboarding new engineers who need to understand the data flow.
+
+### What is an SLA in a data pipeline, and how do you enforce it?
+
+An **SLA (Service Level Agreement)** in pipeline context is a commitment that a table or dataset will be ready by a certain time (e.g., "the daily_orders table is ready by 06:00 UTC"). Enforce it by: setting **SLA callbacks** in Airflow that trigger alerts when a task misses its deadline; monitoring **data freshness** in the warehouse (e.g., `MAX(updated_at)` checks); and using **priority queues** to ensure critical pipelines get compute resources ahead of lower-priority jobs.
+
+### What is event time vs processing time in streaming?
+
+**Event time** is when the event actually occurred in the real world (recorded in the event payload). **Processing time** is when the event is processed by the streaming engine. They diverge because of network delays, mobile offline events, and batched uploads. Correct window aggregations (e.g., "clicks per minute") must use event time; processing time is simpler but gives misleading results for out-of-order or late data.
+
 ## Concept checks
 
 <MultipleChoice

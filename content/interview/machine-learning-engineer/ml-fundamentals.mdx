@@ -43,6 +43,242 @@ or using a feature that's a proxy for the label. It inflates offline
 metrics and collapses in production. Prevent it by fitting all transforms
 on the **training split only** and auditing features for target leakage.
 
+### What is k-fold cross-validation and when do you use it?
+
+The dataset is split into **k** equal folds; the model trains on k-1 folds
+and validates on the remaining fold, rotating until every fold has served
+as the validation set once. The k scores are averaged for a lower-variance
+estimate of generalization performance. Use it when data is too limited to
+hold out a dedicated validation set, or when you need reliable model
+selection without sacrificing training data.
+
+### What is dropout and how does it regularize a neural network?
+
+During training, each neuron is independently zeroed with probability p
+(commonly 0.2–0.5). This prevents co-adaptation: no single unit can rely
+on specific others, so the network learns more redundant, robust
+representations. At inference, dropout is disabled and weights are scaled
+by `(1 - p)` (or equivalently, inverted dropout scales during training).
+
+### Explain early stopping.
+
+Training is halted when validation loss stops improving for a set number
+of epochs (the patience). The model weights from the best validation epoch
+are restored. This is a simple, cheap regularizer: it implicitly limits
+model complexity without adding a penalty term to the loss.
+
+### What is overfitting and how do you combat it?
+
+Overfitting occurs when a model memorizes training data — low training
+error, high validation error. Remedies include: getting more data,
+reducing model capacity, adding L1/L2 regularization, using dropout or
+batch normalization, applying data augmentation, and using early stopping.
+
+### What is underfitting?
+
+Underfitting is when a model is too simple to capture the underlying
+pattern — both training and validation errors are high. Remedies include
+increasing model capacity, training longer, reducing regularization
+strength, and engineering better features.
+
+### How does gradient descent work?
+
+Gradient descent minimizes a loss function by iteratively updating
+parameters in the direction opposite to the gradient of the loss with
+respect to those parameters. The step size is controlled by the
+**learning rate**. Batch GD uses all training examples per update; SGD
+uses one; mini-batch GD uses a small subset (the typical default).
+
+### What is the difference between batch gradient descent, SGD, and mini-batch GD?
+
+**Batch GD** computes the exact gradient over all examples — stable but
+slow and memory-intensive. **SGD** uses one example — fast and noisy,
+which can help escape local minima, but variance is high. **Mini-batch GD**
+averages gradients over a small batch (e.g., 32–512 examples) — the
+practical default that balances noise, speed, and hardware utilization.
+
+### How do you choose the learning rate?
+
+A learning rate too large causes divergence; too small causes slow
+convergence. Common strategies: learning rate schedules (step decay,
+cosine annealing), warm-up followed by decay, and adaptive optimizers
+(Adam, RMSProp) that adjust per-parameter rates. Learning rate range
+tests (plotting loss vs. log LR) help find a good starting value.
+
+### What are precision, recall, and F1-score?
+
+**Precision** = TP / (TP + FP): of all predicted positives, how many are
+correct. **Recall** = TP / (TP + FN): of all actual positives, how many
+did we catch. **F1** is the harmonic mean of precision and recall —
+useful when you want a single metric that balances both. Choose precision
+when false positives are costly; choose recall when false negatives are.
+
+### What is ROC-AUC and when does PR-AUC matter more?
+
+The ROC curve plots TPR vs. FPR at every threshold; AUC summarizes it as
+the probability that the model ranks a random positive above a random
+negative. ROC-AUC can be misleadingly optimistic on **class-imbalanced**
+datasets because FPR stays low even with many false positives. The
+Precision-Recall curve focuses only on positives, so **PR-AUC** is the
+preferred metric when the positive class is rare (fraud, rare disease).
+
+### What is the difference between RMSE, MAE, and R²?
+
+**RMSE** (root mean squared error) penalizes large errors heavily —
+sensitive to outliers. **MAE** (mean absolute error) treats all errors
+equally — more robust to outliers. **R²** (coefficient of determination)
+measures the fraction of variance explained by the model; 1.0 is perfect,
+0.0 means the model is no better than predicting the mean.
+
+### What is class imbalance and how do you handle it?
+
+When one class is far more frequent (e.g., 99% negative), a model that
+predicts the majority class always achieves high accuracy but is useless.
+Remedies: use precision/recall/F1 or PR-AUC instead of accuracy; oversample
+the minority (SMOTE) or undersample the majority; apply class weights in
+the loss function; or use anomaly detection framing for extreme imbalance.
+
+### What is feature scaling and why does it matter?
+
+Feature scaling (standardization or min-max normalization) brings
+features onto comparable scales. It is critical for distance-based models
+(kNN, SVM, k-means), regularized models (ridge, lasso), and gradient-based
+optimizers (which converge faster with similar feature magnitudes).
+Tree-based models are scale-invariant and do not require it.
+
+### What is one-hot encoding?
+
+One-hot encoding converts a categorical feature with k unique values into
+k binary columns, one per category. It avoids imposing an ordinal ordering
+on the categories. For high-cardinality features it can be expensive;
+alternatives include target encoding, embedding lookups, or feature hashing.
+
+### What is feature engineering?
+
+Feature engineering is the process of transforming raw data into
+informative representations for a model. Examples include: creating
+interaction terms, extracting date-part features (day-of-week, hour),
+log-transforming skewed values, binning continuous variables, and
+aggregating time-series features. Good features often matter more than
+choice of algorithm.
+
+### What are ensembles? Explain bagging and boosting.
+
+Ensembles combine multiple models to reduce error. **Bagging** (e.g.,
+Random Forest) trains each model on a bootstrap sample independently and
+averages predictions — primarily reduces variance. **Boosting** (e.g.,
+Gradient Boosting, XGBoost) trains models sequentially, each correcting
+the errors of the previous one — primarily reduces bias, but can overfit
+if not regularized.
+
+### How does a Random Forest differ from a single decision tree?
+
+Random Forest builds many decision trees on bootstrap samples of the data,
+and at each split considers only a random subset of features. Predictions
+are averaged (regression) or majority-voted (classification). The
+randomness decorrelates the trees so the ensemble has lower variance than
+any individual tree, while keeping bias comparable.
+
+### What is gradient boosting?
+
+Gradient boosting builds an additive ensemble of weak learners (usually
+shallow trees) by fitting each new tree to the **negative gradient** (pseudo-
+residuals) of the loss function. Modern implementations (XGBoost, LightGBM,
+CatBoost) add column subsampling, row subsampling, L1/L2 regularization,
+and efficient histogram-based splitting for speed and regularization.
+
+### How does logistic regression work?
+
+Logistic regression models the log-odds of the positive class as a linear
+combination of features, then applies the sigmoid function to produce a
+probability in `(0, 1)`. It is trained by minimizing binary cross-entropy
+(log loss). Despite its name it is a **classification** model. It is
+interpretable, fast, and a strong baseline.
+
+### What is the difference between a parametric and a non-parametric model?
+
+**Parametric** models (linear regression, logistic regression, neural
+networks) learn a fixed-size set of parameters during training; prediction
+is then parameter-only. **Non-parametric** models (kNN, kernel SVM) store
+or use training data at prediction time and grow with the dataset. Parametric
+models are faster at inference; non-parametric ones can be more flexible.
+
+### How does k-nearest neighbours (kNN) work?
+
+To predict for a new point, kNN finds the k training examples closest in
+feature space (by a distance metric, usually Euclidean) and returns their
+majority class (classification) or mean (regression). It is instance-based
+and non-parametric — no explicit training step. Performance degrades in
+high dimensions (curse of dimensionality) and scales poorly at inference.
+
+### What is k-means clustering?
+
+k-means partitions unlabeled data into k clusters by iterating two steps:
+(1) assign each point to the nearest centroid; (2) recompute each centroid
+as the mean of its assigned points. It converges to a local minimum. You
+choose k via the elbow method or silhouette score; the algorithm assumes
+spherical, equally-sized clusters.
+
+### What is PCA and what does it do?
+
+Principal Component Analysis finds the directions (principal components)
+of maximum variance in the data and projects it onto a lower-dimensional
+subspace. It is used for dimensionality reduction, visualization (2D/3D),
+and decorrelating features before feeding them to a downstream model. The
+components are orthogonal and are ordered by explained variance.
+
+### Name common activation functions and their trade-offs.
+
+**Sigmoid** squashes to `(0, 1)` but saturates — prone to vanishing
+gradients. **Tanh** squashes to `(-1, 1)`, zero-centred but still
+saturates. **ReLU** (`max(0, x)`) is fast and avoids saturation for
+positive inputs but "dies" at zero for negative inputs. **Leaky ReLU**
+and **ELU** fix the dying-neuron problem. **Softmax** normalizes a vector
+to a probability distribution — used in the output layer for
+multi-class classification.
+
+### What is the vanishing gradient problem?
+
+When gradients are back-propagated through many layers, repeated
+multiplication by values less than 1 (e.g., sigmoid/tanh derivatives)
+shrinks them toward zero, making early layers learn extremely slowly.
+Solutions include: ReLU activations, residual (skip) connections, batch
+normalization, and careful weight initialization (He, Xavier).
+
+### What are embeddings?
+
+Embeddings are dense, low-dimensional vector representations of
+discrete entities (words, users, items, categories). They are learned —
+either as a dedicated layer or as part of a larger model — so that similar
+entities map to nearby vectors. Word2Vec, GloVe, and transformer-based
+embeddings are common; collaborative filtering also learns user/item
+embeddings for recommendation.
+
+### What loss functions are used for regression vs classification?
+
+**Regression**: MSE (penalizes large errors quadratically), MAE (robust
+to outliers), Huber loss (combines both). **Binary classification**:
+binary cross-entropy (log loss). **Multi-class**: categorical cross-entropy
+with softmax. **Ordinal / ranking**: hinge loss, contrastive loss, or
+triplet loss depending on the task structure.
+
+### What is cross-entropy loss and why is it preferred over MSE for classification?
+
+Cross-entropy measures the dissimilarity between the predicted probability
+distribution and the true label distribution. For classification, MSE
+treats label differences as distances, while cross-entropy directly
+penalizes confident wrong predictions much harder — giving larger gradients
+when the model is wrong and confident, leading to faster convergence.
+
+### How does a support vector machine (SVM) work?
+
+An SVM finds the hyperplane that maximizes the margin between classes.
+Support vectors are the training points closest to the boundary. The
+**kernel trick** implicitly maps inputs to a higher-dimensional space
+(RBF, polynomial), enabling non-linear decision boundaries without
+explicit feature expansion. SVMs are effective in high dimensions but
+slow on large datasets.
+
 ## Concept checks
 
 <MultipleChoice

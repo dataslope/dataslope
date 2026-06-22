@@ -64,6 +64,299 @@ expensive sort/hash); `UNION ALL` keeps everything, including duplicates.
 Prefer `UNION ALL` unless you specifically need dedup — it skips the
 distinct step.
 
+### How do LAG and LEAD work?
+
+`LAG(col, n)` returns the value of `col` from `n` rows **before** the current row within the partition; `LEAD(col, n)` looks `n` rows **ahead**. Both accept an optional default for when the offset falls outside the partition. They are commonly used to compute period-over-period differences without a self-join.
+
+```sql
+SELECT
+  order_date,
+  revenue,
+  LAG(revenue, 1, 0) OVER (ORDER BY order_date) AS prev_revenue,
+  revenue - LAG(revenue, 1, 0) OVER (ORDER BY order_date) AS delta
+FROM daily_revenue;
+```
+
+### How do you compute a running total with a window function?
+
+Use `SUM` with a window frame that starts at the beginning of the partition and ends at the current row:
+
+```sql
+SELECT
+  order_date,
+  amount,
+  SUM(amount) OVER (
+    PARTITION BY user_id
+    ORDER BY order_date
+    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+  ) AS running_total
+FROM orders;
+```
+
+`ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` is the default frame for ordered windows, so `ORDER BY` alone is sufficient in most dialects.
+
+### How do you compute a 7-day moving average?
+
+Use a bounded window frame covering the 6 preceding rows plus the current one:
+
+```sql
+SELECT
+  event_date,
+  daily_value,
+  AVG(daily_value) OVER (
+    ORDER BY event_date
+    ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+  ) AS moving_avg_7d
+FROM daily_metrics;
+```
+
+`ROWS` counts physical rows; use `RANGE` when the ordering column can have ties you want treated as a group.
+
+### What is QUALIFY, and which engines support it?
+
+`QUALIFY` is a clause that filters on **window function results** after they are computed, similar to how `HAVING` filters aggregate results. It avoids the need for a wrapping subquery. It is natively supported in BigQuery, Snowflake, DuckDB, and Databricks SQL; Postgres and MySQL require a subquery workaround.
+
+```sql
+-- Keep top-2 products per category
+SELECT product_id, category, revenue
+FROM products
+QUALIFY RANK() OVER (PARTITION BY category ORDER BY revenue DESC) <= 2;
+```
+
+### How do you write a recursive CTE?
+
+A recursive CTE has an **anchor** member (the base case) and a **recursive** member that references the CTE itself, joined with `UNION ALL`. The engine iterates until the recursive member returns no rows.
+
+```sql
+WITH RECURSIVE org_tree AS (
+  -- anchor: top-level manager
+  SELECT id, name, manager_id, 1 AS depth
+  FROM employees
+  WHERE manager_id IS NULL
+
+  UNION ALL
+
+  -- recursive: direct reports of rows already in the result
+  SELECT e.id, e.name, e.manager_id, t.depth + 1
+  FROM employees e
+  JOIN org_tree t ON e.manager_id = t.id
+)
+SELECT * FROM org_tree;
+```
+
+Common uses: org hierarchies, bill-of-materials, date-series generation.
+
+### How would you pivot rows into columns in SQL?
+
+Use conditional aggregation with `CASE` (works everywhere) or a `PIVOT` clause where the dialect supports it:
+
+```sql
+-- Conditional aggregation (portable)
+SELECT
+  user_id,
+  SUM(CASE WHEN channel = 'email'  THEN revenue END) AS email_rev,
+  SUM(CASE WHEN channel = 'search' THEN revenue END) AS search_rev,
+  SUM(CASE WHEN channel = 'social' THEN revenue END) AS social_rev
+FROM conversions
+GROUP BY user_id;
+```
+
+When the set of pivot values is not known in advance you need dynamic SQL or application-layer post-processing.
+
+### How do you detect and fill gaps in a time series?
+
+Generate a complete spine of dates/periods with a series or a calendar table, then `LEFT JOIN` the actual data and use `COALESCE` to fill missing values:
+
+```sql
+WITH spine AS (
+  SELECT generate_series(
+    DATE '2024-01-01', DATE '2024-01-31', INTERVAL '1 day'
+  )::date AS day
+)
+SELECT
+  s.day,
+  COALESCE(m.revenue, 0) AS revenue
+FROM spine s
+LEFT JOIN daily_metrics m ON m.event_date = s.day
+ORDER BY s.day;
+```
+
+### What is the gaps-and-islands problem?
+
+It describes finding **consecutive runs** (islands) of rows separated by missing values or breaks (gaps). The classic approach subtracts a sequential row number from the ordered value so that rows in the same island share an identical "group key":
+
+```sql
+SELECT
+  user_id,
+  MIN(login_date) AS island_start,
+  MAX(login_date) AS island_end,
+  COUNT(*)        AS streak_days
+FROM (
+  SELECT
+    user_id,
+    login_date,
+    login_date - ROW_NUMBER() OVER (
+      PARTITION BY user_id ORDER BY login_date
+    ) * INTERVAL '1 day' AS grp
+  FROM daily_logins
+) t
+GROUP BY user_id, grp;
+```
+
+### What is the logical order of SQL clause execution?
+
+The engine conceptually processes clauses in this order, which determines what each clause can reference:
+
+1. `FROM` / `JOIN`
+2. `WHERE`
+3. `GROUP BY`
+4. `HAVING`
+5. `SELECT` (including window functions)
+6. `DISTINCT`
+7. `ORDER BY`
+8. `LIMIT` / `OFFSET`
+
+This is why you cannot reference a `SELECT` alias in `WHERE` (alias does not exist yet), but can in `ORDER BY`.
+
+### What is the difference between WHERE and HAVING?
+
+`WHERE` filters **individual rows before** grouping; `HAVING` filters **groups after** aggregation. Use `WHERE` to reduce the row count early (more efficient); use `HAVING` only when the filter condition references an aggregate.
+
+```sql
+SELECT department, AVG(salary) AS avg_sal
+FROM employees
+WHERE status = 'active'           -- row-level filter, applied first
+GROUP BY department
+HAVING AVG(salary) > 80000;       -- group-level filter
+```
+
+### How do you find duplicate rows?
+
+Group by the columns that define uniqueness and keep groups with a count greater than 1:
+
+```sql
+SELECT email, COUNT(*) AS cnt
+FROM users
+GROUP BY email
+HAVING COUNT(*) > 1;
+```
+
+To retrieve the full duplicate rows, join back to the original table or use `ROW_NUMBER` and keep rows where `rn > 1`.
+
+### What is an index, and when does it help (or hurt)?
+
+An index is a data structure (B-tree by default in most RDBMS) that lets the engine find rows matching a predicate without scanning the full table. Indexes help when queries are **selective** (returning a small fraction of rows) on the indexed columns. They hurt for bulk writes (each insert/update must also update the index) and for low-cardinality columns where a full scan beats index + random I/O.
+
+### What is a covering index?
+
+A covering index includes **all columns** a query needs — both the filter columns and the `SELECT` columns — so the engine can satisfy the query entirely from the index without touching the base table. This eliminates the "table lookup" step and is a major optimization for read-heavy queries.
+
+### What is partition pruning?
+
+When a table is partitioned (e.g., by `event_date`) and a query filters on that key, the engine skips partitions that cannot match and reads only relevant files. This turns an O(N) full-table scan into a fraction of the work. Pruning works only when the filter column matches the partition key; applying a function to the column (e.g., `YEAR(event_date) = 2024`) often defeats pruning.
+
+### What are INNER, LEFT, RIGHT, and FULL OUTER JOINs?
+
+- **`INNER JOIN`** — returns only rows with a match in **both** tables.
+- **`LEFT JOIN`** — all rows from the left table; nulls on the right for non-matches.
+- **`RIGHT JOIN`** — all rows from the right table; nulls on the left.
+- **`FULL OUTER JOIN`** — all rows from both; nulls where either side has no match.
+
+### How do you join two large tables efficiently at scale?
+
+The two main strategies are **sort-merge join** (both tables sorted on the join key, then merged linearly — great for already-sorted data) and **hash join** (smaller table hashed into memory, larger table probed — common default in column-store engines). At scale, co-locating/bucketing both tables on the same key avoids expensive shuffle, and broadcasting a small dimension table to every partition avoids a distributed join entirely.
+
+### What are transaction isolation levels?
+
+SQL defines four standard levels that trade consistency for concurrency:
+
+1. **Read Uncommitted** — can read uncommitted ("dirty") data from other transactions.
+2. **Read Committed** — only reads committed data; default in most RDBMS.
+3. **Repeatable Read** — same row read twice in a transaction returns the same value.
+4. **Serializable** — full isolation; transactions behave as if run one at a time.
+
+Higher isolation prevents more anomalies (dirty reads, non-repeatable reads, phantom reads) but reduces throughput.
+
+### What is a window frame, and what is the difference between ROWS and RANGE?
+
+A **window frame** restricts which rows within the current window partition are included in the calculation. `ROWS` counts **physical rows** before/after the current row. `RANGE` counts rows whose **ordering column value** falls within a logical offset of the current row's value. `ROWS` is more predictable; `RANGE` is useful when you want all rows with the same value treated as a group.
+
+### How do you read an EXPLAIN plan?
+
+Look at (1) **node types** — sequential scan vs index scan vs hash join vs sort — and their cost estimates; (2) **row estimates** — large underestimates lead the planner to choose bad strategies; (3) **actual vs estimated rows** (in `EXPLAIN ANALYZE`) to spot where statistics are stale; (4) **sort/hash spills** that indicate memory pressure. Fix by updating statistics, adding indexes, rewriting correlated subqueries, or pushing filters earlier.
+
+### What is a correlated subquery, and why can it be slow?
+
+A **correlated subquery** references a column from the outer query. The engine re-executes the subquery for each outer row, making it O(N * M). Rewrite as a `JOIN` or a window function when performance matters.
+
+```sql
+-- Slow correlated subquery
+SELECT e.name,
+  (SELECT AVG(salary) FROM employees e2 WHERE e2.department = e.department) AS dept_avg
+FROM employees e;
+
+-- Better: pre-aggregate in a CTE
+WITH dept_avgs AS (
+  SELECT department, AVG(salary) AS dept_avg FROM employees GROUP BY department
+)
+SELECT e.name, d.dept_avg
+FROM employees e
+JOIN dept_avgs d ON d.department = e.department;
+```
+
+### What is the difference between a clustered and a non-clustered index?
+
+A **clustered index** physically orders the table's rows on disk in the index's key order — there can only be one per table. A **non-clustered index** is a separate structure that stores pointers back to the table rows. In BigQuery/Snowflake parlance, `CLUSTER BY` / `ORDER BY` on a table serves a similar purpose to a clustered index.
+
+### How do you write a query that returns only rows that exist in one table but not another?
+
+Use `LEFT JOIN ... WHERE right_key IS NULL`, `NOT EXISTS`, or `EXCEPT`:
+
+```sql
+-- Option 1: LEFT JOIN anti-join
+SELECT a.id FROM table_a a
+LEFT JOIN table_b b ON a.id = b.id
+WHERE b.id IS NULL;
+
+-- Option 2: EXCEPT
+SELECT id FROM table_a
+EXCEPT
+SELECT id FROM table_b;
+```
+
+### What is NTILE and when would you use it?
+
+`NTILE(n)` divides the partition into `n` roughly equal buckets and assigns each row its bucket number (1 through n). Common uses: percentile banding (e.g., quartiles), splitting a user population into equal test groups, or computing approximate percentile labels without a full `PERCENT_RANK`.
+
+```sql
+SELECT user_id, revenue,
+  NTILE(4) OVER (ORDER BY revenue DESC) AS quartile
+FROM user_revenue;
+```
+
+### What is the difference between PERCENT_RANK and CUME_DIST?
+
+Both express a row's relative position in a window as a value between 0 and 1. `PERCENT_RANK` = (rank - 1) / (total rows - 1) — the fraction of rows **ranked below** the current row. `CUME_DIST` = rank / total rows — the fraction of rows with a value **less than or equal to** the current row. `CUME_DIST` is always >= `PERCENT_RANK` and the last row always has `CUME_DIST = 1`.
+
+### What is a materialized view, and when would you use one?
+
+A **materialized view** stores the pre-computed result of a query on disk rather than re-running it on every access. It trades staleness for speed: reads are fast, but the view must be refreshed (manually or on a schedule) when base data changes. Use it for expensive aggregations queried frequently, especially when some latency is acceptable.
+
+### What does COALESCE do?
+
+`COALESCE(a, b, c, ...)` returns the **first non-NULL** argument. It is the standard way to substitute a default for NULL values:
+
+```sql
+SELECT COALESCE(phone, email, 'no contact') AS contact
+FROM users;
+```
+
+`NULLIF(a, b)` is the inverse — it returns NULL when `a = b`, useful to avoid division-by-zero: `revenue / NULLIF(units, 0)`.
+
+### What is CROSS JOIN and when is it appropriate?
+
+A `CROSS JOIN` produces the **Cartesian product** of two tables (every row from the left paired with every row from the right). It is appropriate when you intentionally want every combination — for example, pairing every product with every store region in a planning matrix, or generating a full date-by-segment spine before left-joining actual data.
+
 ## Concept checks
 
 <MultipleChoice

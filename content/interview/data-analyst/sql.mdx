@@ -71,6 +71,360 @@ modern engines). `COUNT(col)` counts only rows where `col` **is not
 NULL** — so it can return a smaller number. `COUNT(DISTINCT col)` counts
 distinct non-NULL values.
 
+### What is a self join and when would you use one?
+
+A self join joins a table to **itself** using a table alias. It is used
+whenever rows within the same table have a relationship to each other,
+such as an employee-manager hierarchy or comparing a row to other rows in
+the same dataset.
+
+```sql
+SELECT e.name AS employee, m.name AS manager
+FROM employees e
+LEFT JOIN employees m ON e.manager_id = m.id;
+```
+
+### How do you find rows in one table that have no match in another (anti-join)?
+
+The two idiomatic patterns are `LEFT JOIN ... WHERE right.key IS NULL` and
+`NOT EXISTS`. Both produce an anti-join: rows in the left table with no
+corresponding row in the right.
+
+```sql
+-- Pattern 1: LEFT JOIN
+SELECT c.id, c.name
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.id
+WHERE o.customer_id IS NULL;
+
+-- Pattern 2: NOT EXISTS
+SELECT c.id, c.name
+FROM customers c
+WHERE NOT EXISTS (
+  SELECT 1 FROM orders o WHERE o.customer_id = c.id
+);
+```
+
+### What is the difference between UNION and UNION ALL?
+
+`UNION` removes duplicate rows across the two result sets; `UNION ALL`
+keeps every row. `UNION ALL` is faster because it skips the deduplication
+sort. Use `UNION` only when you genuinely need to eliminate duplicates.
+
+```sql
+SELECT city FROM store_a
+UNION
+SELECT city FROM store_b;      -- distinct cities only
+
+SELECT city FROM store_a
+UNION ALL
+SELECT city FROM store_b;      -- every row, may have duplicates
+```
+
+### What does EXCEPT (or MINUS) do?
+
+`EXCEPT` returns rows from the first query that do **not** appear in the
+second query, after removing duplicates. It is the set-operation
+equivalent of an anti-join on all columns and is useful for quick
+discrepancy checks between two result sets.
+
+```sql
+SELECT product_id FROM expected_products
+EXCEPT
+SELECT product_id FROM received_products;
+```
+
+### What is a CTE and how does it differ from a subquery?
+
+A Common Table Expression (CTE) is a named, temporary result set defined
+with `WITH` before the main query. Both CTEs and subqueries let you build
+layered queries, but CTEs are written once and can be **referenced
+multiple times**, making complex logic easier to read and debug. Recursive
+CTEs (with `RECURSIVE`) can also traverse hierarchical data, which
+subqueries cannot.
+
+```sql
+WITH active_users AS (
+  SELECT id, name FROM users WHERE status = 'active'
+)
+SELECT * FROM active_users WHERE name LIKE 'A%';
+```
+
+### How do window functions differ from GROUP BY aggregates?
+
+`GROUP BY` collapses multiple rows into one per group. Window functions
+compute a value **for each row** while still considering a set of related
+rows (the "window"), so the original row count is preserved. They use the
+`OVER(...)` clause.
+
+```sql
+SELECT
+  name,
+  department,
+  salary,
+  AVG(salary) OVER (PARTITION BY department) AS dept_avg
+FROM employees;
+-- Every employee row is kept; dept_avg is the average for their dept.
+```
+
+### What does PARTITION BY do inside a window function?
+
+`PARTITION BY` divides rows into independent sub-windows, resetting the
+window calculation for each partition. It is analogous to `GROUP BY` for
+the window frame: rows in different partitions are computed independently.
+Omitting `PARTITION BY` makes the entire result set one window.
+
+### How do ROW_NUMBER, RANK, and DENSE_RANK differ?
+
+All three assign a position within a window ordered by some column, but
+they handle ties differently:
+
+- `ROW_NUMBER` — always unique, ties get arbitrary sequential numbers.
+- `RANK` — ties share the same rank; the next rank **skips** numbers (1, 2, 2, 4).
+- `DENSE_RANK` — ties share the same rank; the next rank does **not** skip (1, 2, 2, 3).
+
+```sql
+SELECT name, score,
+  ROW_NUMBER()  OVER (ORDER BY score DESC) AS rn,
+  RANK()        OVER (ORDER BY score DESC) AS rnk,
+  DENSE_RANK()  OVER (ORDER BY score DESC) AS drnk
+FROM results;
+```
+
+### How do you return the top N rows per group?
+
+Use a window function (`ROW_NUMBER`) in a CTE or subquery, then filter
+where the row number is at most N in the outer query.
+
+```sql
+WITH ranked AS (
+  SELECT *,
+    ROW_NUMBER() OVER (PARTITION BY category ORDER BY revenue DESC) AS rn
+  FROM products
+)
+SELECT * FROM ranked WHERE rn <= 3;
+```
+
+### What is the logical order of SQL clause execution?
+
+The query is written in a different order than it is evaluated. The
+logical execution order is:
+
+1. `FROM` / `JOIN`
+2. `WHERE`
+3. `GROUP BY`
+4. `HAVING`
+5. `SELECT` (including window functions)
+6. `DISTINCT`
+7. `ORDER BY`
+8. `LIMIT` / `OFFSET`
+
+This is why you cannot reference a `SELECT` alias in a `WHERE` clause
+but can reference it in `ORDER BY` (most engines allow it as a shortcut).
+
+### What does DISTINCT do, and when should you be careful with it?
+
+`DISTINCT` removes duplicate rows from the result set. It is useful for
+deduplication, but using it to "fix" unexpectedly high row counts often
+masks a bad join or missing filter. Always understand **why** duplicates
+appear before reaching for `DISTINCT`.
+
+### How do you write a CASE expression?
+
+`CASE` is SQL's conditional expression. The searched form evaluates each
+`WHEN` condition in order and returns the first match.
+
+```sql
+SELECT
+  order_id,
+  amount,
+  CASE
+    WHEN amount >= 500 THEN 'Large'
+    WHEN amount >= 100 THEN 'Medium'
+    ELSE 'Small'
+  END AS order_size
+FROM orders;
+```
+
+### How do you handle NULL in a CASE or comparison?
+
+`NULL` is not equal to anything, including itself, so `WHEN col = NULL`
+never matches. Use `WHEN col IS NULL` to catch nulls explicitly, or place
+the `IS NULL` branch first since `CASE` short-circuits.
+
+```sql
+SELECT
+  CASE
+    WHEN score IS NULL THEN 'Unknown'
+    WHEN score >= 90   THEN 'A'
+    ELSE 'Below A'
+  END AS grade
+FROM tests;
+```
+
+### What is COALESCE and how does it differ from NULLIF?
+
+`COALESCE(a, b, c)` returns the **first non-NULL** argument — handy for
+providing a default. `NULLIF(a, b)` returns `NULL` if `a` equals `b`,
+otherwise returns `a` — useful to avoid division-by-zero by turning zero
+denominators into `NULL`.
+
+```sql
+SELECT COALESCE(discount, 0)          AS safe_discount,
+       revenue / NULLIF(sessions, 0)  AS revenue_per_session
+FROM traffic;
+```
+
+### How do common date/time functions work in SQL?
+
+Functions vary by engine, but the concepts are universal:
+- Extract a part: `EXTRACT(YEAR FROM order_date)` or `DATE_PART('month', ts)`.
+- Truncate to a period: `DATE_TRUNC('month', ts)` (PostgreSQL/DuckDB).
+- Arithmetic: add intervals with `+ INTERVAL '7 days'` or `DATEADD(day, 7, date)` (SQL Server).
+- Current time: `CURRENT_DATE`, `NOW()`, or `GETDATE()`.
+
+### What are some common string functions?
+
+Key ones across most SQL dialects:
+- `LENGTH(s)` / `LEN(s)` — character count.
+- `UPPER(s)` / `LOWER(s)` — case conversion.
+- `TRIM(s)` / `LTRIM` / `RTRIM` — remove whitespace.
+- `SUBSTRING(s, start, len)` — extract a portion.
+- `CONCAT(a, b)` or `a || b` — concatenate.
+- `LIKE` with `%` (any chars) and `_` (one char) — pattern matching.
+
+### What is the difference between a clustered and non-clustered index?
+
+A **clustered index** determines the physical order of rows on disk; a
+table can have only one. A **non-clustered index** is a separate structure
+pointing back to the data rows; a table can have many. Clustered indexes
+speed up range scans on the key column; non-clustered indexes accelerate
+lookups and joins on non-key columns. As an analyst you mainly need to
+know: filtering or joining on un-indexed columns causes full table scans,
+which are slow on large tables.
+
+### When does adding an index slow things down?
+
+Indexes speed up reads but slow down **writes** (INSERT, UPDATE, DELETE)
+because each write must also update every index. Indexes also consume
+storage. Over-indexing a heavily written table degrades write throughput.
+
+### What is a subquery and when would you use one vs a CTE?
+
+A **subquery** is a query nested inside another query. Use subqueries for
+simple, one-off inline logic. Use CTEs when the same derived result is
+needed more than once, when you want named, readable steps, or when
+chaining several transformations. CTEs also support recursion.
+
+### How do you pivot rows into columns in SQL?
+
+Standard SQL lacks a `PIVOT` keyword. The common approach is conditional
+aggregation with `CASE` inside `SUM` or `MAX`.
+
+```sql
+SELECT
+  region,
+  SUM(CASE WHEN category = 'A' THEN amount ELSE 0 END) AS cat_a,
+  SUM(CASE WHEN category = 'B' THEN amount ELSE 0 END) AS cat_b
+FROM orders
+GROUP BY region;
+```
+
+Some engines (SQL Server, BigQuery, DuckDB) offer a native `PIVOT` syntax.
+
+### What does GROUP BY ALL or GROUP BY with ROLLUP do?
+
+`ROLLUP` generates **subtotals** at each level of a hierarchy plus a
+grand total. For example, `GROUP BY ROLLUP(region, category)` produces
+rows for every (region, category) pair, then subtotals per region, then a
+grand total row where grouping columns are `NULL`.
+
+```sql
+SELECT region, category, SUM(amount) AS revenue
+FROM orders
+GROUP BY ROLLUP(region, category);
+```
+
+### How do you find duplicate rows in a table?
+
+Group by the columns that should be unique and filter for groups with a
+count greater than 1.
+
+```sql
+SELECT email, COUNT(*) AS cnt
+FROM users
+GROUP BY email
+HAVING COUNT(*) > 1;
+```
+
+### How do you delete duplicate rows while keeping one copy?
+
+Use a CTE with `ROW_NUMBER()` partitioned by the duplicate key, then
+delete rows where the row number is greater than 1.
+
+```sql
+WITH dupes AS (
+  SELECT id,
+    ROW_NUMBER() OVER (PARTITION BY email ORDER BY id) AS rn
+  FROM users
+)
+DELETE FROM users WHERE id IN (SELECT id FROM dupes WHERE rn > 1);
+```
+
+### What is the difference between a correlated and a non-correlated subquery?
+
+A **non-correlated** subquery runs once and its result is used by the
+outer query. A **correlated** subquery references columns from the outer
+query, so it re-executes for every row of the outer query — which can be
+slow on large tables.
+
+```sql
+-- Correlated: finds orders above that customer's own average
+SELECT order_id, customer_id, amount
+FROM orders o
+WHERE amount > (
+  SELECT AVG(amount)
+  FROM orders
+  WHERE customer_id = o.customer_id
+);
+```
+
+### What does LAG or LEAD do?
+
+`LAG(col, n)` returns the value of `col` from `n` rows **before** the
+current row in the window order; `LEAD(col, n)` looks `n` rows **ahead**.
+They are useful for period-over-period comparisons without a self-join.
+
+```sql
+SELECT
+  date,
+  revenue,
+  LAG(revenue, 1) OVER (ORDER BY date) AS prev_revenue,
+  revenue - LAG(revenue, 1) OVER (ORDER BY date) AS change
+FROM daily_sales;
+```
+
+### What is a CROSS JOIN?
+
+A `CROSS JOIN` produces the Cartesian product of two tables — every row
+of the left table paired with every row of the right. It has no `ON`
+condition. Useful for generating combinations (e.g., pairing every
+product with every region), but be careful: two 1 000-row tables yield
+1 000 000 rows.
+
+### How do you calculate a running total in SQL?
+
+Use `SUM` as a window function with `ORDER BY` inside `OVER`. By default
+the frame is `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`.
+
+```sql
+SELECT
+  date,
+  amount,
+  SUM(amount) OVER (ORDER BY date) AS running_total
+FROM transactions;
+```
+
 ## Concept checks
 
 <MultipleChoice

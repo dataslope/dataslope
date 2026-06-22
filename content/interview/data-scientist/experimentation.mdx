@@ -47,6 +47,173 @@ effect at your power. Report the confidence interval: a tight CI around
 zero supports "no meaningful effect," while a wide CI means the test was
 underpowered and inconclusive.
 
+### What is randomization unit and why does it matter?
+
+The **randomization unit** is the entity that is independently assigned to control or treatment (typically user, session, or device).
+If the unit is too granular (e.g., request-level) for a feature users see repeatedly, the same user can land in both groups, causing **contamination** that dilutes the measured effect.
+The analysis unit must match or be nested within the randomization unit to keep variance estimates valid.
+
+### How do you calculate sample size for an A/B test?
+
+You need four inputs: baseline conversion rate, minimum detectable effect (MDE), `alpha` (commonly 0.05), and desired power (commonly 0.8).
+The formula for a two-proportion z-test is derived from the pooled standard error; most practitioners use a sample size calculator.
+Sample size scales inversely with the square of the MDE: halving the MDE you want to detect quadruples the required sample.
+
+```python
+import math
+from scipy.stats import norm
+
+def sample_size_per_variant(p1, mde, alpha=0.05, power=0.8):
+    p2 = p1 + mde
+    p_pool = (p1 + p2) / 2
+    z_alpha = norm.ppf(1 - alpha / 2)
+    z_beta = norm.ppf(power)
+    n = (z_alpha + z_beta)**2 * 2 * p_pool * (1 - p_pool) / mde**2
+    return math.ceil(n)
+```
+
+### What is a sample ratio mismatch and what causes it?
+
+A **sample ratio mismatch (SRM)** occurs when the observed split between control and treatment differs significantly from the intended ratio (e.g., you expected 50/50 but got 48/52).
+Causes: bot traffic filtering differently across variants, logging bugs, caching that prevents re-assignment, and redirect latency biasing which users complete page load.
+An SRM invalidates the experiment; the data cannot be trusted until the root cause is found and fixed.
+
+### What is Simpson's paradox in the context of experimentation?
+
+Simpson's paradox is when a result that holds within each subgroup reverses in the aggregate, because a confounder is unevenly distributed.
+In A/B testing this can appear if a new feature is rolled out unevenly across platforms (e.g., mobile vs desktop) and the platforms have different baseline rates.
+Always segment results by key dimensions and check whether the aggregate effect is consistent with subgroup effects.
+
+### What are novelty and primacy effects, and how do you handle them?
+
+A **novelty effect** is a temporary boost in engagement just because something is new; it fades once users adapt.
+A **primacy effect** is the opposite: users initially resist change (e.g., a redesign), but usage recovers once they learn the new UI.
+Both cause the early experiment period to be unrepresentative. Run experiments for full business cycles and use longer holdback periods; for major UI changes, consider focusing on new users only.
+
+### What is the multiple comparisons problem in A/B testing?
+
+When you test many metrics or run many experiments simultaneously, some will appear significant by chance alone (at `alpha = 0.05`, one in 20 true nulls will produce a false positive).
+Corrections include **Bonferroni** (divide `alpha` by number of tests) or **Benjamini-Hochberg** (control the false discovery rate).
+Best practice: define one primary metric before the test and treat secondary metrics as directional signals.
+
+### What is CUPED and how does it reduce variance?
+
+**CUPED** (Controlled-experiment Using Pre-Experiment Data) reduces variance in the outcome metric by regressing out a pre-experiment covariate that is correlated with the outcome (e.g., the user's metric value in the week before the experiment).
+The adjusted metric `Y_adj = Y - theta * (X - E[X])` has lower variance, giving the same statistical power with fewer users or detecting smaller effects.
+It does not change the expectation of the estimator, only its variance.
+
+### What is a guardrail metric?
+
+A **guardrail metric** is a metric you must not degrade, even if the primary metric improves.
+Examples: page latency, crash rate, or revenue per user when testing a non-revenue feature.
+Shipping a treatment that wins on the primary metric but breaks a guardrail is a harmful outcome; guardrails act as hard constraints.
+
+### What is a non-inferiority test?
+
+A **non-inferiority test** asks whether a new treatment is not worse than the existing one by more than a pre-specified margin `delta`.
+The null hypothesis is `H0: treatment is worse by more than delta`; you reject it to conclude non-inferiority.
+This is appropriate when you want to launch a cheaper or simpler variant that merely needs to preserve the current experience.
+
+### What are network effects and interference in experiments?
+
+**Network effects** or **interference** occur when the treatment applied to one user affects other users' outcomes (e.g., social features, marketplaces, communication products).
+This violates the **Stable Unit Treatment Value Assumption (SUTVA)**, which underpins standard A/B test analysis.
+Remedies include **cluster randomization** (randomize on social graph clusters or geographic regions) and **switchback experiments** (alternate treatment over time periods).
+
+### What is a quasi-experiment and difference-in-differences?
+
+A **quasi-experiment** lacks true randomization but uses natural variation to approximate it (e.g., a policy rollout, a geographic boundary).
+**Difference-in-differences (DiD)** compares the change in outcome for a treated group vs a control group over time, removing time trends and group-level fixed effects.
+DiD assumes the **parallel trends** assumption: in the absence of treatment, treated and control groups would have followed parallel outcome trends.
+
+### What is the difference between a one-sided and two-sided A/B test?
+
+A **two-sided test** detects an effect in either direction (treatment better or worse); significance requires the p-value to be below `alpha/2` in each tail.
+A **one-sided test** tests only the direction stated in advance (treatment is better); it has more power in that direction but misses regressions.
+For product experiments, two-sided tests are generally preferred because you care about detecting both improvements and regressions.
+
+### How do you handle long-running experiments?
+
+Long experiments risk **novelty/primacy effects** washing out, **seasonal confounding**, and **experiment pollution** from product changes during the run.
+Best practices: freeze the experiment scope, avoid overlapping experiments on the same users unless orthogonalized, run for at least one full business cycle (often one to two weeks), and set a maximum duration in advance.
+
+### What is a holdback experiment?
+
+A **holdback** keeps a small percentage of users on the old experience after a feature ships, allowing long-term measurement of the effect over weeks or months.
+It answers "does the day-1 win persist?" and separates novelty effects from durable impact.
+The holdback group should be kept small (e.g., 5–10%) to limit the cost of withholding a beneficial feature.
+
+### What is an A/A test and when do you run one?
+
+An **A/A test** assigns users to two groups that receive identical experiences.
+Because there is no real effect, significant results indicate a problem with the testing infrastructure (randomization bugs, logging errors, pre-existing imbalance).
+A/A tests should produce about `alpha` false-positive rate across many runs; running them regularly validates your experimentation platform.
+
+### How do you choose a primary metric for an experiment?
+
+The primary metric should be **directly linked** to the user behavior or business outcome the feature is intended to improve, **sensitive** enough to move with the expected effect size, and **measurable** within the experiment window.
+Avoid using proxy metrics that are easily gamed (e.g., raw clicks rather than meaningful engagement).
+Align on the metric before the experiment so there is no post-hoc switching.
+
+### What is a stratified randomization?
+
+**Stratified randomization** ensures that key subgroups (e.g., country, device type, user tenure) are proportionally represented in both treatment and control.
+It reduces variance when strata differ substantially in their baseline outcomes and guards against unlucky imbalances across groups.
+It is especially important for small experiments where chance imbalances can skew results.
+
+### What is a Switchback experiment?
+
+A **switchback experiment** (also called a time-series or interleaved design) alternates the treatment and control conditions over time periods rather than across users simultaneously.
+It is used when user-level randomization is infeasible (e.g., marketplace experiments where supply and demand are coupled).
+Analysis must account for carryover effects between periods.
+
+### What is a Bayesian A/B test and how does it differ from frequentist?
+
+A **Bayesian A/B test** places a prior on the conversion rates of each variant and updates to a posterior distribution after observing data.
+Instead of a p-value, you report the **probability that treatment is better than control** or the expected lift.
+It allows intuitive probability statements and can incorporate prior knowledge, but conclusions depend on the prior choice.
+Frequentist tests offer guaranteed error-rate control; Bayesian tests are more flexible but require careful prior specification.
+
+### What is the difference between a Type I and Type II error in experiment design?
+
+A **Type I error** (false positive) declares a winner when the treatment has no real effect; controlled by `alpha`.
+A **Type II error** (false negative) fails to detect a real effect; its rate is `beta` and power is `1 - beta`.
+In product experimentation, false positives ship ineffective features; false negatives cause you to abandon good ones.
+Size experiments to control both: typical targets are `alpha = 0.05` and power of 0.8.
+
+### What does it mean for an experiment metric to be sensitive vs robust?
+
+A **sensitive** metric moves reliably in response to the treatment and can detect small effects, which reduces the required sample size.
+A **robust** metric is not easily gamed or corrupted by outliers and noise.
+Long-tailed metrics (revenue per user) are often insensitive and noisy; capping or using median, or applying variance reduction (CUPED) improves sensitivity.
+You often need both sensitivity (to detect effects) and robustness (to trust the signal).
+
+### What is a meta-analysis and when is it used in experimentation?
+
+A **meta-analysis** combines results from multiple experiments (e.g., across regions, time periods, or replications) to produce a pooled estimate with higher precision.
+It is used when individual experiments are too small to be conclusive but consistent directional evidence accumulates.
+Fixed-effects meta-analysis assumes a single true effect; random-effects allows the true effect to vary across experiments.
+
+### What is a sequential probability ratio test (SPRT)?
+
+The **SPRT** is a method for continuous monitoring that maintains a valid `alpha` and power guarantee at any stopping time.
+Unlike peeking at a fixed `alpha` threshold, SPRT computes a likelihood ratio that crosses boundaries only when there is strong evidence for either hypothesis.
+It allows early stopping when an effect is large and clear, while controlling Type I error, making it suitable for high-velocity experimentation platforms.
+
+### How do you detect interference between concurrently running experiments?
+
+Interference can arise when two experiments share users and treatments interact (e.g., a pricing experiment and a recommendation experiment).
+Use **experiment interaction analysis**: compare metrics in the overlap group (users in both experiments) vs each experiment's exclusive group.
+Alternatively, use **factorial designs** that explicitly model the joint assignment.
+If interactions are detected, experiments should be serialized or their user pools separated.
+
+### What is the difference between average treatment effect (ATE) and average treatment effect on the treated (ATT)?
+
+**ATE** is the expected causal effect of treatment averaged over the entire population.
+**ATT** is the expected effect averaged only over units that actually received treatment.
+In randomized experiments both are typically equal, but in observational studies they can differ substantially.
+ATT is appropriate when you only care about the effect on the group that would actually use the feature.
+
 ## Concept checks
 
 <MultipleChoice

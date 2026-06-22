@@ -46,6 +46,142 @@ identifiers.
 
 This layering keeps transformations modular, testable, and DRY.
 
+### What are the three types of fact tables?
+
+- **Transaction fact** — one row per discrete event (order placed, click, payment). The most common type; naturally append-only.
+- **Periodic snapshot** — one row per entity per time period (account balance on the last day of each month). Captures state at regular intervals even when nothing changed.
+- **Accumulating snapshot** — one row per business process instance (one row per order), updated in-place as the instance moves through milestones. Multiple date FKs mark each stage.
+
+### What is the difference between additive, semi-additive, and non-additive measures?
+
+**Additive** measures (revenue, quantity) can be summed across all dimensions. **Semi-additive** measures (account balance, inventory level) can be summed across some dimensions (products, stores) but not time — summing balances across months gives a meaningless number. **Non-additive** measures (ratios, percentages, distinct counts) cannot be summed across any dimension and must be recalculated from grain-level rows.
+
+### What is SCD Type 1, and when should you use it?
+
+SCD Type 1 **overwrites** the old attribute value with the new one, preserving no history. Use it when historical accuracy doesn't matter — correcting a typo in a name, for example — or when the business explicitly only cares about the current state.
+
+### What is SCD Type 2, and how is it implemented?
+
+SCD Type 2 adds a **new row** for each attribute change, preserving the full history. Each row gets its own surrogate key plus `valid_from`, `valid_to`, and `is_current` columns. Fact rows joined to their surrogate key automatically reflect the attribute values that were true at event time.
+
+```sql
+-- Example dim_customer with SCD2 columns
+SELECT
+    customer_sk,      -- surrogate key
+    customer_id,      -- natural key
+    customer_name,
+    region,
+    valid_from,
+    valid_to,
+    is_current
+FROM dim_customer
+WHERE is_current = TRUE;
+```
+
+### What is SCD Type 3, and what is its main limitation?
+
+SCD Type 3 adds a **second column** to track the previous value (e.g., `region` and `prev_region`). It lets you compare current vs. one prior state without joining to history rows, but it only stores one level of history and becomes awkward if you need to track more than one change.
+
+### What is SCD Type 0?
+
+SCD Type 0 means the attribute **never changes** — the original value is kept forever and no update mechanism exists. Natural keys, date-of-birth, or original channel attribution are typical examples.
+
+### What is a conformed dimension?
+
+A conformed dimension is shared across **multiple fact tables or subject areas** with the same keys and attribute definitions. `dim_date` and `dim_customer` are classic examples. Conformed dimensions allow you to drill across facts (combining metrics from different processes in one query) without distorting comparisons.
+
+### What is a degenerate dimension?
+
+A degenerate dimension is a dimensional attribute stored directly in the fact table rather than in a separate dimension table, because it has no descriptive attributes of its own. An order number or invoice number is the canonical example — it provides grouping ability but carries no extra columns worth their own table.
+
+### What is a role-playing dimension?
+
+A role-playing dimension is a single physical dimension table used **multiple times** in the same fact table under different aliases. A `dim_date` table might be joined three times to `fact_orders` as `order_date`, `ship_date`, and `delivery_date`, each a "role."
+
+```sql
+SELECT
+    o.order_id,
+    od.full_date   AS order_date,
+    sd.full_date   AS ship_date,
+    dd.full_date   AS delivery_date
+FROM fact_orders o
+JOIN dim_date od ON od.date_sk = o.order_date_sk
+JOIN dim_date sd ON sd.date_sk = o.ship_date_sk
+JOIN dim_date dd ON dd.date_sk = o.delivery_date_sk;
+```
+
+### What is a junk dimension?
+
+A junk dimension bundles **miscellaneous low-cardinality flags and indicators** that don't belong to any natural dimension into a single table. Instead of cluttering the fact with many boolean columns (is_promo, is_gift_wrap, is_expedited), you create all combinations as rows in a junk dimension and store only its foreign key in the fact.
+
+### What is a factless fact table?
+
+A factless fact table records **events or coverage** with no numeric measure — just foreign keys. Examples: student course enrollments (the fact is attendance, not a count), or a coverage fact listing which products are on promotion in which stores on which days. You derive counts by querying "how many rows match this criteria."
+
+### What is a bridge table, and when do you need one?
+
+A bridge table resolves **many-to-many relationships** between a fact and a dimension. For example, an order can have multiple promotions, and a promotion can apply to multiple orders. The bridge table contains (order_sk, promotion_sk) pairs with an optional weighting factor. It avoids row multiplication in the fact while still allowing drill-down to all related dimension members.
+
+### How does Kimball's approach differ from Inmon's?
+
+**Kimball** is bottom-up: build dimensional models (star schemas) directly for each business process; marts can be built independently and conformed together. **Inmon** is top-down: first build a normalized enterprise data warehouse (3NF), then derive departmental data marts from it. Kimball delivers value faster; Inmon produces a single consistent source of truth but requires more upfront effort.
+
+### What is normalization in 3NF, and why does dimensional modeling deliberately avoid it for dimensions?
+
+Third Normal Form (3NF) eliminates all non-key dependencies and redundancy to optimize for write performance and consistency. Dimensional modeling denormalizes dimensions intentionally — collapsing hierarchies into one wide table — to minimize joins, simplify BI tool queries, and improve query readability at the cost of some redundancy.
+
+### What is a wide (one-big-table) approach, and when is it appropriate?
+
+A wide table (OBT) pre-joins dimensions into the fact, producing a single flat table with all attributes. It maximizes query speed and simplifies BI tooling, but loses the flexibility of separate dimension tables and makes maintenance harder. It is appropriate for highly performance-sensitive use cases or for serving tools that struggle with joins.
+
+### How do you handle late-arriving dimension records?
+
+When a fact row arrives before its matching dimension row exists, you either use a **placeholder/default dimension row** (unknown member) and later run a correction job to update fact rows once the dimension record lands, or you hold (buffer) the fact rows until the dimension catches up. The important thing is never to drop the fact row, because the event happened.
+
+### How do you handle late-arriving facts?
+
+Late-arriving facts should still be loaded at their correct event time using their correct dimension keys (pointing to whatever the dimension's state was at that time in SCD2). Periodic snapshot facts may need to be regenerated for the affected period; accumulating snapshots are simply updated in place.
+
+### What is a mini-dimension?
+
+A mini-dimension extracts **rapidly changing attributes** from a large dimension into a separate smaller table with its own surrogate key. For example, customer demographics (age band, income band) might change frequently, while name and address stay stable. The mini-dimension is stored separately and pointed to by the fact, avoiding constant SCD2 row proliferation in the main customer dimension.
+
+### How would you model a many-to-many relationship between customers and accounts in a bank data warehouse?
+
+Use a **bridge table** — `bridge_customer_account(account_sk, customer_sk, ownership_pct)` — between `dim_customer` and `fact_account_balance`. Each account can belong to multiple customers and vice versa. The optional weighting column allows metrics to be allocated proportionally across co-owners.
+
+### What is the purpose of a date dimension, and what columns does it typically include?
+
+`dim_date` pre-calculates every calendar attribute for each date so queries avoid repetitive `EXTRACT` or `DATE_TRUNC` calls. Typical columns: `date_sk`, `full_date`, `year`, `quarter`, `month`, `month_name`, `week_of_year`, `day_of_week`, `day_name`, `is_weekend`, `is_holiday`, `fiscal_year`, `fiscal_quarter`. Having it allows simple filtering like `WHERE dim_date.is_holiday = TRUE`.
+
+### When would you choose a periodic snapshot over a transaction fact?
+
+Choose a periodic snapshot when you need to **track status at regular intervals** regardless of whether a transaction occurred. Bank account balances, inventory levels, and subscription statuses are classic cases — you need the value at month-end even if no transaction happened that month. The transaction fact tells you what changed; the periodic snapshot tells you what the state was.
+
+### What does "drilling across" mean in dimensional modeling?
+
+Drilling across means **combining metrics from two or more fact tables** in a single report. It works by querying each fact independently using conformed dimensions (same keys, same grain for the shared dimension), then outer-joining the result sets on the conformed dimension keys. Because dimensions are conformed, the join is valid and the metrics are comparable.
+
+### How do you handle a slowly changing measure in a fact table?
+
+Measures in fact tables are generally fixed at event time and should not change. If a value must be corrected, prefer inserting a reversing row (negative adjustment) plus the corrected row rather than updating in place. For true restated history (e.g., revenue re-recognized under new rules), version the fact or store the restatement as a separate measure column.
+
+### What are the trade-offs of using a hash surrogate key vs. a sequence integer?
+
+**Hash surrogates** (e.g., `MD5(natural_key)`) are deterministic — you can compute the same key in any environment without a central sequence, which helps distributed/incremental builds. **Integer sequences** are more compact, faster for joins, and easier to debug, but require a coordination mechanism. Hashes can collide (rare but possible) and are larger in storage. Most modern data warehouses use either approach; hashes are common in dbt pipelines.
+
+### What is the difference between a fact's grain and its level of aggregation?
+
+**Grain** is the finest level of detail stored in the fact table (one row per order line). **Aggregation level** refers to how high you've rolled up the data for a particular query or mart. A mart can aggregate the grain-level fact to the category-day level, but the underlying fact retains order-line grain. Confusing the two leads to double-counting when joining at the wrong level.
+
+### Why should you avoid storing percentages or ratios directly in fact tables?
+
+Percentages and ratios are **non-additive** — summing a margin percentage across orders gives a meaningless number. Instead, store the additive components (gross_revenue, cost_of_goods_sold) and let the BI layer or mart compute the ratio. This preserves flexibility and correctness across any grouping.
+
+### What is the difference between a confirmed vs. a conformed dimension?
+
+This is a vocabulary check: the correct term is **conformed** dimension (consistent definition and keys shared across facts/subject areas). "Confirmed" is not a standard dimensional modeling term. A conformed dimension like `dim_date` means the same thing in every mart, so metrics from different facts can be joined on it.
+
 ## Concept checks
 
 <MultipleChoice

@@ -29,7 +29,7 @@ are the default for BI; snowflake when dimensions are large or shared.
 A **fact** table stores measurable **events** at a defined grain (one row
 per order line), with numeric **measures** (quantity, amount) and foreign
 keys to dimensions. **Dimension** tables hold the descriptive context you
-filter and group *by* (customer, product, date).
+filter and group by (customer, product, date).
 
 ### What is the "grain" of a table, and why define it first?
 
@@ -47,6 +47,110 @@ Use a **slowly-changing dimension**:
 - **Type 3** — keep a "previous value" column (limited history).
 
 Type 2 is the standard when point-in-time accuracy matters.
+
+### What is 1NF, 2NF, and 3NF?
+
+**First Normal Form (1NF):** each column holds a single atomic value; no repeating groups or arrays in a column. **Second Normal Form (2NF):** 1NF plus every non-key column depends on the **entire** primary key (eliminates partial dependencies — relevant when the key is composite). **Third Normal Form (3NF):** 2NF plus no non-key column depends on another non-key column (eliminates transitive dependencies). OLTP schemas are typically designed to 3NF; analytical schemas often intentionally violate higher normal forms for query performance.
+
+### What are the three types of fact tables?
+
+1. **Transaction fact** — one row per discrete event (an order, a click). The most common type.
+2. **Periodic snapshot** — one row per entity per time period (account balance at end of each month), capturing state at regular intervals.
+3. **Accumulating snapshot** — one row per business process instance (a loan application) with multiple date stamps updated as the process advances through stages.
+
+### What is a surrogate key, and why prefer it over a natural key?
+
+A **surrogate key** is a system-generated identifier (auto-increment integer or UUID) with no business meaning. It is preferred because natural keys (customer email, product code) can change, be reused, or be long strings that make joins expensive. Surrogate keys are stable, compact, and immune to upstream business logic changes, which is especially important for SCD Type 2 where multiple rows represent the same entity.
+
+### What is a conformed dimension?
+
+A dimension shared — with identical structure and values — across multiple fact tables and data marts. For example, a `dim_date` used by both `fact_sales` and `fact_inventory` allows users to drill across both subjects consistently. Conformed dimensions are the foundation of an enterprise data warehouse "bus architecture."
+
+### What is the difference between additive, semi-additive, and non-additive measures?
+
+- **Additive:** can be summed across any dimension (e.g., revenue, units sold).
+- **Semi-additive:** can be summed across some dimensions but not all — typically not time (e.g., account balance can be summed across accounts but averaging or taking a point-in-time snapshot is correct across time).
+- **Non-additive:** cannot be meaningfully summed across any dimension (e.g., ratios, percentages, distinct counts). Store the numerator and denominator separately and compute the ratio in the query.
+
+### What is OLTP vs OLAP, and how does schema design differ?
+
+**OLTP (Online Transaction Processing)** serves many concurrent short read/write transactions — normalized (3NF) to minimize redundancy and lock contention. **OLAP (Online Analytical Processing)** serves complex analytical queries over large data volumes — typically denormalized (star/snowflake) to minimize joins and maximize columnar scan efficiency. OLTP rows are narrow and updated frequently; OLAP tables are wide and mostly append-only.
+
+### What is SCD Type 0?
+
+**Type 0** means the attribute **never changes** — it is fixed at the time the dimension row is created and any upstream changes are ignored. Useful for attributes that are definitionally immutable, such as a customer's original sign-up date or a product's first release year. No special logic is needed; a simple insert-once strategy suffices.
+
+### How does SCD Type 2 work in practice?
+
+When an attribute changes, you close the existing row by setting its `valid_to` date (or `is_current = false`) and insert a new row with the updated value and a new `valid_from` date. Facts that occurred before the change still join to the old dimension row via the surrogate key, preserving point-in-time accuracy. Queries for the current state filter `WHERE is_current = true`.
+
+### What is a degenerate dimension?
+
+A dimension attribute stored **directly on the fact table** rather than in a separate dimension table, because it has no other attributes worth modeling (e.g., an order number or invoice number). It is a dimension for slicing data but too simple to warrant its own table.
+
+### What is a junk dimension?
+
+A single dimension table that consolidates multiple low-cardinality flag or indicator columns that would otherwise clutter the fact table (e.g., payment method, is_gift, is_first_order, channel). Combining them avoids adding many foreign keys to the fact table and keeps the model clean.
+
+### What is a role-playing dimension?
+
+A single physical dimension table used multiple times in the same schema under different logical names. A common example is `dim_date` used as `order_date_key`, `ship_date_key`, and `delivery_date_key` in the same fact table. Each role is typically exposed as a separate view or alias in the BI layer.
+
+### What is a bridge table and when do you need one?
+
+A **bridge table** (also called an association table) resolves **many-to-many** relationships between a fact table and a dimension — for example, an order that belongs to multiple promotions simultaneously. The bridge table has a surrogate key, the fact foreign key, and the dimension foreign key. Without it you would either fan out fact rows (inflating counts) or store comma-separated lists (violating 1NF).
+
+### What is the difference between a wide table and a narrow table approach in analytics?
+
+A **wide table** (one row per entity, many columns) is fully denormalized — fast to query, easy to understand in a BI tool, but adds columns for every new attribute and can become unwieldy. A **narrow table** keeps fewer columns per row and uses keys to join to attribute tables, more normalized and flexible but requiring more joins. Modern cloud warehouses with columnar storage and cheap compute tolerate wide tables well; the trade-off is schema evolution vs query simplicity.
+
+### What is a data vault, and when would you choose it over a star schema?
+
+A **data vault** separates hubs (business keys), links (relationships), and satellites (descriptive attributes with full history). It is optimized for auditable, historized ingestion from many source systems and for incremental loading without touching historical data. Choose it when auditability, source traceability, and parallel team development across many sources matter more than query simplicity. Star schemas are simpler to query and preferred when the modeled domain is stable and BI self-service is the primary goal.
+
+### What does "grain mismatch" mean, and how do you fix it?
+
+A grain mismatch occurs when you join two fact tables at different grains — for example, a daily budget table joined to a transaction-level sales table — causing double-counting or incorrect aggregations. Fix it by aggregating the finer-grain table to match the coarser grain before joining, or by storing both at a common grain in a separate bridging step.
+
+### What are slowly-changing dimension types 4 and 6?
+
+**Type 4** offloads historical values to a separate "mini-dimension" or history table, while the main dimension keeps only current values — used when historical attributes are large or queried infrequently. **Type 6** ("hybrid") combines Types 1, 2, and 3: it versions rows like Type 2 but also carries a current-value column on every row (like Type 1) so the latest attribute is always available without an extra join for users who only need current state.
+
+### How do you handle late-arriving dimension members?
+
+Create a **dummy or unknown dimension row** (e.g., surrogate key = -1) to stand in for the missing member. Facts that arrive before the dimension record is available reference this placeholder. Once the true dimension row is inserted, you can optionally update the fact table's foreign key in a reconciliation step — or accept the unknown row as the historical truth if strict point-in-time accuracy is required.
+
+### What is a factless fact table?
+
+A fact table with **no numeric measures** — it records only that an event happened (e.g., a student attending a class, a promotion being applied to a product). It is used for coverage or eligibility analysis: which products were covered by a promotion? which students attended which sessions?
+
+### What is a mini-dimension?
+
+A mini-dimension extracts **rapidly changing attributes** from a large, slow-moving dimension into a smaller, separate dimension. This avoids exploding the main dimension with Type 2 rows on every attribute change. For example, customer age band and income tier might change frequently, so they are placed in a mini-dimension with its own surrogate key on the fact table.
+
+### What is a snapshot vs insert-only fact table strategy?
+
+An **insert-only** strategy appends a new row for every state change, preserving full history at the cost of storage and requiring aggregation to get current state. A **snapshot** strategy keeps one row per entity (overwriting or appending periodic rows) for easy current-state queries but discards intermediate changes. The right choice depends on whether you need auditable change history or only current/periodic state.
+
+### What is the difference between a bus matrix and a data mart?
+
+A **bus matrix** (or enterprise bus matrix) is a planning artifact that maps business processes (rows) against conformed dimensions (columns), documenting which dimensions are shared across which subject areas. A **data mart** is the physical implementation — a subset of the warehouse focused on one business domain (e.g., sales, finance). Conformed dimensions in the bus matrix allow data marts to be combined ("drilled across") without double-counting.
+
+### Why use a date dimension table instead of date functions?
+
+A `dim_date` table pre-computes every calendar attribute — fiscal week, quarter, holiday flag, day-of-week name — so analysts can filter and group by any combination without writing date-arithmetic functions inline. It also lets the business encode custom fiscal calendars, retail weeks, or regional holidays once and share them universally, rather than scattering business-specific date logic across every query.
+
+### What is the difference between a measure and a metric?
+
+A **measure** is a raw numeric column on a fact table (e.g., `revenue`, `quantity`). A **metric** is a derived, business-defined calculation built from one or more measures (e.g., "average order value = revenue / orders"). Measures live in the physical model; metrics live in the semantic/BI layer or in documented SQL logic. Confusing the two leads to inconsistent definitions across teams.
+
+### What is the purpose of a surrogate key sequence vs a UUID?
+
+An **auto-increment integer** surrogate key is compact, fast to join, and naturally ordered — ideal for dimension tables in a warehouse. A **UUID** (128-bit) is globally unique across systems and generated client-side without a sequence, making it better for distributed systems where multiple sources insert concurrently. The trade-off: UUIDs are larger, slower to join, and fragment indexes more than integers.
+
+### How do you model a many-to-many relationship between facts and dimensions?
+
+Use a **bridge table**: a separate table with one row per (fact, dimension) combination. For example, if an order can be associated with multiple promotions, the bridge table `order_promotion_bridge` holds `(order_key, promo_key)` pairs. The fact table joins to the bridge, which joins to the promotion dimension. A **weighting factor** column on the bridge can distribute additive measures proportionally across the associated dimension members.
 
 ## Concept checks
 

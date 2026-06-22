@@ -47,6 +47,332 @@ overflow (Python's default limit is ~1000). Iteration (often with an
 explicit stack/queue) avoids that and is usually faster by a constant
 factor. Convert recursion to iteration when depth can be large.
 
+### What is amortized O(1) and when does it apply?
+
+Amortized analysis spreads the cost of occasional expensive operations
+across many cheap ones. A dynamic array (Python `list`) appends in
+amortized O(1): most appends are O(1), but every doubling resize is O(n).
+Because doublings become exponentially rare, the average per-operation
+cost stays O(1). Similarly, a hash table rehash is amortized O(1) per
+insert.
+
+### What are the time complexities of heap operations?
+
+A binary heap supports `insert` in `O(log n)` (bubble up), `extract-min`
+or `extract-max` in `O(log n)` (sift down), and `peek` in O(1). Building
+a heap from n elements is O(n) via heapify — not `O(n log n)` — because
+most nodes are near the leaves and travel very little. Python's `heapq`
+module is a min-heap.
+
+```python
+import heapq
+h = [5, 3, 8, 1]
+heapq.heapify(h)       # O(n) in-place
+heapq.heappush(h, 2)   # O(log n)
+print(heapq.heappop(h))  # 1  — O(log n)
+```
+
+### How does a priority queue differ from a regular queue?
+
+A queue is FIFO — elements leave in insertion order. A priority queue
+always removes the element with the highest (or lowest) priority, regardless
+of insertion order. It is commonly implemented with a heap, giving
+`O(log n)` push and pop. Use it for Dijkstra's algorithm, task schedulers,
+and merge-k-sorted-lists.
+
+### What is a deque, and when should you prefer it over a list?
+
+A deque (double-ended queue) supports O(1) append and pop from **both**
+ends. Python's `collections.deque` is implemented as a doubly-linked list
+of fixed-size blocks. Use it when you need a sliding-window buffer, a BFS
+queue, or any "add to one end, remove from other end" pattern. `list.pop(0)`
+is O(n) and should be replaced with `deque.popleft()`.
+
+### Walk me through BFS vs DFS — when do you choose each?
+
+BFS (breadth-first search) uses a queue and explores level by level,
+guaranteeing the **shortest path** in an unweighted graph. DFS uses a
+stack (or recursion) and dives deep first — natural for cycle detection,
+topological sort, connected components, and backtracking. BFS memory usage
+can be O(n) at the widest level; DFS memory is proportional to depth.
+
+```python
+from collections import deque
+
+def bfs(graph, start):
+    visited, q = {start}, deque([start])
+    while q:
+        node = q.popleft()
+        for nb in graph[node]:
+            if nb not in visited:
+                visited.add(nb)
+                q.append(nb)
+```
+
+### How do you detect a cycle in a directed graph?
+
+Use DFS with a **three-color** (or two-set) approach: track nodes as
+unvisited, in the current recursion stack, or fully visited. A back edge —
+an edge to a node already on the current stack — means a cycle exists.
+Alternatively, run Kahn's topological-sort algorithm; if the output
+contains fewer than n nodes, there is a cycle.
+
+### What is topological sort, and when is it applicable?
+
+Topological sort orders the nodes of a **directed acyclic graph** (DAG)
+so every edge goes from earlier to later. It's used for build-dependency
+resolution, course prerequisites, and task scheduling. Kahn's algorithm
+(iteratively remove nodes with in-degree 0) or DFS post-order both work
+in `O(V + E)`.
+
+### Explain Dijkstra's algorithm and its complexity.
+
+Dijkstra finds the shortest path from a source to all other nodes in a
+graph with **non-negative** edge weights. It uses a min-heap of
+`(distance, node)` pairs. Each node is processed once; each edge relaxation
+costs `O(log V)` for the heap update. Total: `O((V + E) log V)`. It
+fails with negative weights — use Bellman-Ford there.
+
+### What is a BST and what are its operation complexities?
+
+A binary search tree stores keys so that every left subtree node is
+smaller and every right subtree node is larger. Search, insert, and delete
+are all `O(h)` where h is the tree height. For a balanced tree h = `O(log n)`;
+a degenerate (sorted-input) tree has h = O(n). Balanced BST variants like
+AVL trees and red-black trees guarantee `O(log n)`.
+
+### What are the three DFS tree traversals?
+
+In-order (left → root → right) visits BST nodes in **sorted** order.
+Pre-order (root → left → right) is useful for serializing a tree.
+Post-order (left → right → root) is useful for deletion or evaluating
+expression trees. All three are `O(n)`.
+
+```python
+def inorder(node):
+    if node:
+        inorder(node.left)
+        print(node.val)
+        inorder(node.right)
+```
+
+### What is a trie, and what problems is it suited for?
+
+A trie (prefix tree) stores strings character by character in a tree.
+Lookup, insert, and prefix search are all `O(L)` where L is the key
+length — independent of how many keys are stored. It excels at
+autocomplete, spell-check, and IP routing tables. The trade-off is higher
+memory than a hash map for sparse key sets.
+
+### Binary search — prerequisites and common mistakes?
+
+Binary search requires a **sorted, random-access** collection. The classic
+mistake is the off-by-one error in the loop bounds (`lo < hi` vs `lo <= hi`)
+and the midpoint overflow: use `mid = lo + (hi - lo) // 2` rather than
+`(lo + hi) // 2` (matters in languages with fixed-width integers). Variants
+find the leftmost or rightmost insertion point.
+
+```python
+def binary_search(arr, target):
+    lo, hi = 0, len(arr) - 1
+    while lo <= hi:
+        mid = lo + (hi - lo) // 2
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            lo = mid + 1
+        else:
+            hi = mid - 1
+    return -1
+```
+
+### Explain the two-pointer technique and give an example.
+
+Two pointers start at opposite ends (or both at the start) and converge
+to avoid a nested loop. For "find pair summing to target in a sorted
+array," one pointer at the left and one at the right narrows the window
+in O(n) instead of O(n²). The same idea works for removing duplicates,
+palindrome checks, and merging sorted arrays.
+
+### What is the sliding-window technique?
+
+A sliding window maintains a contiguous subarray (or substring) of
+variable or fixed size, expanding and shrinking it rather than recomputing
+from scratch. It reduces many O(n²) substring problems to O(n). For
+example, "longest substring without repeating characters" expands the
+right pointer and shrinks the left when a duplicate enters the window.
+
+### Explain merge sort and its complexity.
+
+Merge sort divides the array in half, recursively sorts each half, then
+merges the two sorted halves in O(n). The recurrence `T(n) = 2T(n/2) + O(n)`
+solves to `O(n log n)` by the Master Theorem. It is **stable** and
+performs well on linked lists, but requires O(n) extra space for the merge
+step. It is the basis for Python's Timsort.
+
+### How does quicksort work, and what is its worst-case?
+
+Quicksort picks a pivot, partitions elements into smaller and larger
+groups, and recurses. Average case is `O(n log n)`, but worst case is
+O(n²) when the pivot is always the smallest or largest element (e.g.,
+sorted input with a naive "pick last" pivot). Randomized pivot selection
+makes worst case extremely unlikely in practice. Quicksort is in-place
+(O(log n) stack space) unlike merge sort.
+
+### When is heapsort preferable?
+
+Heapsort is `O(n log n)` worst-case and O(1) extra space — no recursion,
+no merge buffer. It is less cache-friendly than quicksort in practice, so
+real libraries rarely use it alone. Its main advantage is the guaranteed
+`O(n log n)` with constant space, useful for embedded or memory-constrained
+systems.
+
+### What makes a sort "stable," and why does it matter?
+
+A stable sort preserves the relative order of elements that compare as
+equal. It matters when sorting by multiple keys sequentially — e.g., sort
+by last name first, then by first name: a stable sort on first name
+preserves the last-name ordering among ties. Python's built-in sort
+(Timsort) is stable; heapsort is not.
+
+### Explain memoization vs tabulation in dynamic programming.
+
+**Memoization** is top-down DP: recursively solve sub-problems and cache
+results so each is computed once. **Tabulation** is bottom-up: fill a
+table iteratively in dependency order. Memoization is often easier to
+write (matches the recursive definition) but has call-stack overhead.
+Tabulation avoids that and can be optimized to use O(1) space when only
+the last row is needed.
+
+```python
+# Memoization — Fibonacci
+from functools import lru_cache
+
+@lru_cache(maxsize=None)
+def fib(n):
+    if n < 2:
+        return n
+    return fib(n - 1) + fib(n - 2)
+
+# Tabulation — Fibonacci
+def fib_tab(n):
+    a, b = 0, 1
+    for _ in range(n):
+        a, b = b, a + b
+    return a
+```
+
+### What are classic DP problems you should know?
+
+The canonical list: Fibonacci, Climbing Stairs, Coin Change (min coins),
+Longest Common Subsequence, Longest Increasing Subsequence, 0/1 Knapsack,
+Edit Distance, Word Break, and Matrix Chain Multiplication. Each teaches
+a different DP state design pattern.
+
+### What is a greedy algorithm and when is it safe to use?
+
+A greedy algorithm always picks the locally optimal choice at each step.
+It is safe when the problem has the **greedy-choice property** (a local
+optimum leads to a global optimum) and **optimal substructure**. Classic
+examples: Activity Selection, Huffman Coding, Dijkstra, and making change
+with canonical coin systems. When greedy is not provably correct, DP or
+backtracking is needed.
+
+### Explain backtracking and give a use case.
+
+Backtracking is systematic trial-and-error: build candidates incrementally
+and abandon ("prune") a branch as soon as it cannot lead to a valid
+solution. It is used for N-Queens, Sudoku solver, permutations,
+combinations, and subset generation. The worst-case time is exponential,
+but pruning makes practical performance far better.
+
+```python
+def permutations(nums):
+    res = []
+    def bt(path, remaining):
+        if not remaining:
+            res.append(path[:])
+            return
+        for i, n in enumerate(remaining):
+            path.append(n)
+            bt(path, remaining[:i] + remaining[i+1:])
+            path.pop()
+    bt([], nums)
+    return res
+```
+
+### What is divide and conquer, and how does it differ from DP?
+
+Divide and conquer splits the problem into independent sub-problems, solves
+them recursively, and combines the results. Sub-problems **do not overlap**,
+so no caching is needed. Dynamic programming is for problems where
+sub-problems **do overlap** and solutions are reused. Merge sort and binary
+search are divide and conquer; Fibonacci and Knapsack are DP.
+
+### How do bit manipulation tricks speed up algorithms?
+
+Bit ops (AND, OR, XOR, shifts) are single CPU instructions. Useful tricks:
+`n & (n - 1)` clears the lowest set bit (test if power of two: `n & (n-1) == 0`),
+`x ^ x == 0` cancels pairs (find the single non-duplicate in O(n) time and
+O(1) space), and left-shifting by k multiplies by `2^k`. Bit sets can
+represent subsets in O(1) space per subset.
+
+```python
+# Find single non-duplicate element
+def single_number(nums):
+    result = 0
+    for n in nums:
+        result ^= n
+    return result
+```
+
+### What is the time and space complexity of a hash set?
+
+Average-case: O(1) insert, delete, and lookup; O(n) space. Worst-case
+(all keys collide) degrades to O(n) per operation. Python's `set` uses
+open addressing with pseudo-random probing and resizes when the load
+factor exceeds ~2/3, maintaining near-O(1) average performance.
+
+### How does a balanced BST differ from a heap?
+
+Both are tree-based, but a balanced BST (AVL, red-black) maintains a
+sorted order across the entire tree, giving O(log n) for predecessor,
+successor, and range queries. A heap only guarantees the parent-child
+relationship (min or max at root), so it cannot answer "all elements
+between a and b" efficiently. Use a heap when you only need the min/max;
+use a balanced BST for ordered iteration or range queries.
+
+### What is the Master Theorem?
+
+The Master Theorem solves recurrences of the form `T(n) = aT(n/b) + O(n^d)`.
+If `d > log_b(a)`: `O(n^d)`. If `d == log_b(a)`: `O(n^d log n)`.
+If `d < log_b(a)`: `O(n^(log_b a))`. For merge sort `a=2, b=2, d=1`:
+`d == log_2(2) = 1`, so `O(n log n)`.
+
+### Explain the difference between in-place and out-of-place algorithms.
+
+An in-place algorithm uses only O(1) (or O(log n) for call stack) extra
+memory beyond the input. Out-of-place algorithms allocate auxiliary
+structures proportional to input size. Quicksort is in-place; merge sort
+is out-of-place. The trade-off is memory overhead vs simplicity and
+sometimes performance (cache effects).
+
+### What graph representation should you use — adjacency list vs matrix?
+
+An adjacency **list** uses `O(V + E)` space and is efficient for sparse
+graphs; iterating over neighbors is O(degree). An adjacency **matrix**
+uses `O(V²)` space but gives O(1) edge-existence checks. For most
+interview problems (sparse graphs), an adjacency list (dict of lists) is
+preferred.
+
+### What is Kahn's algorithm and what does it detect?
+
+Kahn's algorithm iteratively removes nodes with in-degree 0 from a DAG,
+appending them to the topological order. It runs in `O(V + E)`. If the
+final order contains fewer than V nodes, at least one cycle exists and a
+full topological sort is impossible. It is an alternative to DFS-based
+topological sort and naturally detects cycles.
+
 ## Concept checks
 
 <MultipleChoice

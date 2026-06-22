@@ -47,6 +47,167 @@ are costly (disease screening, fraud); favor **precision** when false
 alarms are costly (spam filters flagging real mail). **F1** balances the
 two.
 
+### What is ROC-AUC and when is PR-AUC preferred?
+
+**ROC-AUC** is the area under the Receiver Operating Characteristic curve (TPR vs FPR across thresholds).
+An AUC of 0.5 is random; 1.0 is perfect.
+On highly imbalanced datasets, ROC-AUC can be optimistic because it includes many true negatives in the FPR denominator.
+**PR-AUC** (precision-recall AUC) focuses only on the positive class and better reflects performance when positives are rare.
+
+### What is gradient descent and how does learning rate affect it?
+
+**Gradient descent** minimizes a loss function by iteratively stepping in the direction of the negative gradient.
+**Learning rate** controls step size: too large and it overshoots or diverges; too small and training is slow.
+**SGD** uses one example per step (noisy but fast per iteration); **mini-batch SGD** uses small batches; **Adam** adapts the learning rate per parameter using momentum and RMS scaling.
+
+### What is the difference between bagging and boosting?
+
+**Bagging** trains multiple models in parallel on bootstrap samples and averages their predictions (reduces variance). Random Forest is the canonical example.
+**Boosting** trains models sequentially, with each model focusing on the errors of the previous one (reduces bias). Gradient Boosted Trees (GBM, XGBoost, LightGBM) are the most popular implementations.
+Bagging is more robust to noise; boosting often achieves higher accuracy but is prone to overfitting on noisy data.
+
+### How does a Random Forest work?
+
+Random Forest builds many decision trees on bootstrap samples of the training data.
+At each split it considers only a random subset of features (`sqrt(p)` for classification, `p/3` for regression by default), which decorrelates the trees.
+Final predictions are made by majority vote (classification) or averaging (regression).
+The combination of row sampling and feature sampling reduces variance without greatly increasing bias.
+
+### What are RMSE, MAE, and R-squared, and when do you use each?
+
+**RMSE** (Root Mean Squared Error) penalizes large errors quadratically; sensitive to outliers. Use when large errors are especially costly.
+**MAE** (Mean Absolute Error) is more robust to outliers and interpretable in the same units as the target.
+**R-squared** measures the fraction of variance in the target explained by the model (1 is perfect; 0 means no better than the mean). It is scale-free, making it useful for comparing across datasets.
+
+### What is feature scaling and when is it necessary?
+
+Feature scaling (standardization or min-max normalization) puts features on a comparable scale.
+It is **necessary** for distance-based models (kNN, SVM, k-means) and gradient descent-based models (logistic/linear regression, neural nets) because unscaled features bias distances and gradient steps.
+Tree-based models (decision trees, random forests, GBMs) are **invariant** to monotonic feature transforms and do not require scaling.
+
+### How do you handle class imbalance?
+
+Common strategies:
+- **Resampling**: oversample the minority class (SMOTE, random oversampling) or undersample the majority.
+- **Class weights**: pass `class_weight='balanced'` to penalize misclassifying the minority class more.
+- **Threshold tuning**: lower the decision threshold to increase recall for the minority class.
+- **Evaluation**: use PR-AUC or F1 on the minority class rather than accuracy.
+
+### How do you encode categorical variables?
+
+**One-hot encoding** creates a binary column for each category; suitable for nominal variables with few levels.
+**Ordinal encoding** maps categories to integers; suitable when natural order exists.
+**Target encoding** replaces a category with the mean target value within that category; powerful but risks leakage without careful cross-validation.
+High-cardinality categoricals can also be handled with embeddings in neural nets or frequency encoding.
+
+### What is PCA and what does it do?
+
+**Principal Component Analysis** finds orthogonal directions (principal components) of maximum variance in the data and projects data onto a lower-dimensional subspace.
+It reduces dimensionality while preserving as much variance as possible, useful for visualization, noise reduction, and removing multicollinearity.
+PCA requires centered (and usually scaled) data and assumes linear structure.
+
+### What is the curse of dimensionality?
+
+As dimensionality grows, data becomes increasingly sparse: the volume of the space grows exponentially and the nearest neighbor becomes almost as far as the farthest neighbor.
+This hurts distance-based methods (kNN, SVM with RBF kernel, k-means) and increases the sample size needed to learn accurate models.
+Remedies include dimensionality reduction (PCA, autoencoders), feature selection, and regularization.
+
+### What is logistic regression and how does it output probabilities?
+
+Logistic regression models the log-odds of the positive class as a linear combination of features, then passes it through the **sigmoid** function `sigma(z) = 1 / (1 + exp(-z))` to produce a probability between 0 and 1.
+It is trained by maximizing log-likelihood (equivalent to minimizing binary cross-entropy).
+Despite its name it is a classification model; it is interpretable, fast, and often a strong baseline.
+
+### What is the difference between a generative and a discriminative model?
+
+A **discriminative model** learns `P(y|x)` directly — the conditional probability of the label given input (logistic regression, SVM, neural nets).
+A **generative model** learns the joint `P(x, y)` or the data distribution per class (Naive Bayes, GMM), then applies Bayes' theorem to classify.
+Generative models can generate new data and work better with limited labeled data; discriminative models typically achieve higher classification accuracy with enough labeled data.
+
+### How does a decision tree split?
+
+A decision tree greedily selects the feature and threshold at each node that maximizes a purity measure: **Gini impurity** or **information gain (entropy)** for classification; **variance reduction** for regression.
+Splits continue until a stopping criterion is met (max depth, min samples per leaf, minimum impurity decrease).
+Trees are interpretable but high-variance; ensembles (random forest, GBM) fix the variance.
+
+### How does k-Nearest Neighbors (kNN) make predictions?
+
+kNN stores all training examples and, at inference, finds the `k` closest examples by a distance metric (usually Euclidean).
+For classification, it returns the majority class among the k neighbors; for regression, it returns their mean.
+It has no explicit training phase but is slow at prediction for large datasets.
+Choosing k involves a bias-variance trade-off: small k is low-bias/high-variance; large k is high-bias/low-variance.
+
+### What is k-means clustering?
+
+k-means partitions data into `k` clusters by alternating between (1) assigning each point to the nearest centroid and (2) recomputing centroids as cluster means, until convergence.
+It minimizes within-cluster sum of squared distances.
+Limitations: requires specifying k, sensitive to initialization (use k-means++ to mitigate), assumes spherical clusters, and is sensitive to outliers.
+Use the elbow method or silhouette score to choose k.
+
+### What is elastic net regularization?
+
+**Elastic net** combines L1 (lasso) and L2 (ridge) penalties: `alpha * L1 + (1 - alpha) * L2`.
+It inherits lasso's sparsity (feature selection) and ridge's stability when features are highly correlated.
+It is useful when you have many correlated features and want a sparse but stable solution.
+
+### What is feature selection and what methods exist?
+
+Feature selection reduces the number of input features to decrease overfitting, training time, and model complexity.
+**Filter methods** score features independently of the model (correlation, mutual information, chi-square).
+**Wrapper methods** train a model on feature subsets (recursive feature elimination, RFE).
+**Embedded methods** perform selection during training (L1 regularization, tree feature importances).
+
+### How does cross-entropy loss differ from MSE for classification?
+
+For binary classification, **cross-entropy** loss is `-(y * log(p) + (1-y) * log(1-p))`.
+It penalizes confident wrong predictions very heavily (log goes to infinity near 0), which drives the model to produce well-calibrated probabilities.
+MSE on probabilities has a flatter gradient near saturation, causing slow learning; cross-entropy is the correct choice for classification with sigmoid/softmax outputs.
+
+### What is model calibration?
+
+A **calibrated** model produces probability estimates that match observed frequencies: if it predicts 70% probability for 100 examples, roughly 70 should be positive.
+Calibration is assessed with reliability diagrams or Brier score.
+Common calibration methods: Platt scaling (logistic regression on outputs) and isotonic regression.
+Calibration matters whenever model probabilities are used for downstream decisions (e.g., expected value calculations).
+
+### How would you select between two models?
+
+Compare on a held-out test set (never tuned on) using the metric aligned with the business goal.
+Use cross-validation estimates to avoid lucky splits; check whether the difference is statistically significant (paired t-test on fold scores).
+Also consider: inference latency, interpretability requirements, training cost, and performance on important slices.
+Simpler models that perform comparably should be preferred.
+
+### What is the difference between linear and logistic regression for a binary target?
+
+**Linear regression** predicts a continuous output and is unbounded; it can produce predictions outside `[0, 1]` and its residuals are heteroscedastic for binary targets, violating OLS assumptions.
+**Logistic regression** maps a linear combination of features through the sigmoid to a probability in `[0, 1]` and is trained with maximum likelihood / cross-entropy, which is appropriate for binary outcomes.
+
+### What is gradient boosting and how does it differ from AdaBoost?
+
+**Gradient boosting** fits each successive tree to the **negative gradient of the loss function** (pseudo-residuals), generalizing boosting to arbitrary differentiable losses (log-loss, Huber, etc.).
+**AdaBoost** fits weak classifiers to re-weighted data, where misclassified examples get higher weight; it is equivalent to gradient boosting with exponential loss.
+Modern implementations (XGBoost, LightGBM, CatBoost) add regularization, leaf-wise growth, and efficient histogram-based splitting.
+
+### What is the train/validation/test split discipline?
+
+**Training set** is used to fit model parameters.
+**Validation set** (or CV) is used to tune hyperparameters and select among models.
+**Test set** is used exactly once to report final unbiased performance.
+Letting any hyperparameter choice or architecture decision be informed by the test set leads to **test-set overfitting** and optimistic generalization estimates.
+
+### What is learning curve analysis?
+
+A **learning curve** plots training and validation performance as a function of training set size.
+If both curves plateau at a high error, the model has high bias (add features, use a more flexible model).
+If there is a large gap between train and validation, the model has high variance (add data, regularize).
+Learning curves guide whether more data or a better model is the right next step.
+
+### What is the difference between bagged feature importance and SHAP values?
+
+**Bagged (mean decrease impurity) feature importance** from random forests counts how much each feature reduces node impurity across all trees; it is fast but biased toward high-cardinality features.
+**SHAP (SHapley Additive exPlanations)** values fairly distribute the model's prediction among features based on cooperative game theory, giving consistent, locally faithful explanations.
+SHAP is preferred for model explanation; tree impurity importance is fine for a quick relative ranking.
+
 ## Concept checks
 
 <MultipleChoice
