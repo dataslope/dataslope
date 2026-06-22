@@ -1,0 +1,79 @@
+---
+title: Model Evaluation
+description: A runnable precision/recall implementation question plus a concept check on when accuracy misleads.
+---
+
+Picking and computing the right metric is a core Data Scientist skill —
+especially understanding **precision vs recall** and why accuracy lies on
+imbalanced data. Implement the metrics below, then check the concept.
+
+## Challenge: precision and recall from scratch
+
+<ChallengeCard
+  adapter="python"
+  title="Precision & Recall"
+  instructions={`Implement \`precision_recall(y_true, y_pred)\`. Both arguments are equal-length lists of \`0\`/\`1\` labels (1 = positive). Return a tuple \`(precision, recall)\` as floats:
+
+- **precision** = TP / (TP + FP) — of the items you predicted positive, how many were?
+- **recall** = TP / (TP + FN) — of the actual positives, how many did you catch?
+
+If a denominator is 0, return \`0.0\` for that metric.`}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def precision_recall(y_true, y_pred):
+    # Return (precision, recall) as floats.
+    pass`,
+      solutionCode: `def precision_recall(y_true, y_pred):
+    tp = sum(1 for t, p in zip(y_true, y_pred) if t == 1 and p == 1)
+    fp = sum(1 for t, p in zip(y_true, y_pred) if t == 0 and p == 1)
+    fn = sum(1 for t, p in zip(y_true, y_pred) if t == 1 and p == 0)
+    precision = tp / (tp + fp) if (tp + fp) else 0.0
+    recall = tp / (tp + fn) if (tp + fn) else 0.0
+    return (precision, recall)`,
+    },
+  ]}
+  tests={[
+    {
+      id: "known",
+      name: "Known confusion matrix",
+      description: "TP=2, FP=1, FN=1 → precision = recall = 2/3",
+      code: `p, r = precision_recall([1, 1, 1, 0, 0], [1, 0, 1, 1, 0])
+assert abs(p - 2/3) < 1e-9, f"precision {p}"
+assert abs(r - 2/3) < 1e-9, f"recall {r}"`,
+    },
+    {
+      id: "perfect",
+      name: "Perfect predictions",
+      description: "Everything right → 1.0, 1.0",
+      code: `p, r = precision_recall([1, 0, 1, 0], [1, 0, 1, 0])
+assert p == 1.0 and r == 1.0`,
+    },
+    {
+      id: "zero_denominator",
+      name: "No positives predicted or present",
+      description: "Avoid divide-by-zero → 0.0, 0.0",
+      code: `p, r = precision_recall([0, 0, 0], [0, 0, 0])
+assert p == 0.0 and r == 0.0`,
+    },
+  ]}
+/>
+
+## Concept check
+
+<MultipleChoice
+  markdown={`A fraud classifier sees 1% fraud. A lazy model predicts "not fraud" for **everything** and scores 99% accuracy. What does this illustrate?
+
+- The model is excellent — 99% accuracy is hard to beat.
+  > It catches zero fraud; accuracy is high only because the classes are wildly imbalanced.
+- [o] Accuracy is misleading on imbalanced data; precision/recall (or a metric like F1 / PR-AUC) better reflect performance on the rare class.
+  > With 1% positives, predicting all-negative is 99% accurate yet useless — which is why you track recall on the positive class here.
+- Precision and recall would also both be high here.
+  > Recall on fraud is 0 (it catches none), and precision is undefined/0 — both expose the failure that accuracy hides.
+- The fix is to collect less data.
+  > Less data doesn't address class imbalance; changing the metric (and possibly resampling/thresholding) does.`}
+/>
+
+## Go deeper
+
+- [Machine Learning with scikit-learn](/learn/machine-learning-scikit-learn)

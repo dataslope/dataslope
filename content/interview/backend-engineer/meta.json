@@ -4,6 +4,8 @@
   "root": true,
   "pages": [
     "index",
-    "python-coding"
+    "python-coding",
+    "strings-and-hashing",
+    "stacks-and-parsing"
   ]
 }

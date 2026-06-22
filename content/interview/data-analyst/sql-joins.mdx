@@ -1,0 +1,73 @@
+---
+title: "SQL: Joins"
+description: A runnable LEFT JOIN interview question (totals per customer, including those with none), plus an INNER-vs-LEFT concept check.
+---
+
+Joins are where SQL screens separate "can write a SELECT" from "can
+actually report on data." The classic trap: include rows that have **no
+match** on the other side. Solve it below against a live DuckDB database.
+
+## Challenge: total spend per customer (including non-buyers)
+
+<SqlChallengeCard
+  dialect="duckdb"
+  title="Total spend per customer, including zero"
+  instructions={`Two tables are loaded: \`customers\` (\`id\`, \`name\`, \`region\`) and \`orders\` (\`id\`, \`customer_id\`, \`amount\`). Return **every** customer with their total order \`amount\` — including customers who have placed **no** orders, which should show \`0\`. Columns: \`name\`, \`total\`. Sort by \`total\` descending.`}
+  initSql={`CREATE TABLE customers AS SELECT * FROM (VALUES
+  (1, 'Ava', 'North'),
+  (2, 'Ben', 'South'),
+  (3, 'Cy',  'East'),
+  (4, 'Di',  'West')
+) AS t(id, name, region);
+
+CREATE TABLE orders AS SELECT * FROM (VALUES
+  (101, 1, 120.00),
+  (102, 1,  40.00),
+  (103, 2,  80.00),
+  (104, 3,  55.00),
+  (105, 3,  45.00),
+  (106, 2,  30.00)
+) AS t(id, customer_id, amount);`}
+  starterCode={`-- Every customer, even those with no orders (total 0).
+SELECT
+  c.name
+  -- , total here
+FROM customers c
+-- join orders, then group + order;`}
+  solutionSql={`SELECT
+  c.name,
+  COALESCE(SUM(o.amount), 0) AS total
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.id
+GROUP BY c.name
+ORDER BY total DESC;`}
+  tests={[
+    {
+      id: "row_count",
+      name: "Every customer appears",
+      description: "Four customers → four rows (including the non-buyer)",
+      expectedRowCount: 4,
+    },
+    {
+      id: "columns",
+      name: "Has the required columns",
+      description: "name and total",
+      expectedColumnsInclude: ["name", "total"],
+    },
+  ]}
+/>
+
+## Concept check
+
+<MultipleChoice
+  markdown={`In the data above, customer **Di** has placed no orders. With an ordinary \`INNER JOIN\` between \`customers\` and \`orders\`, what happens to Di?
+
+- Di appears with a \`total\` of \`0\`.
+  > That's the \`LEFT JOIN\` (+ \`COALESCE\`) behavior. An \`INNER JOIN\` returns only rows with a match on both sides.
+- [o] Di disappears from the result entirely.
+  > \`INNER JOIN\` keeps only customers that have at least one matching order, so a customer with none is dropped — which is exactly why this question needs a \`LEFT JOIN\`.
+- Di appears with a \`total\` of \`NULL\` and the query errors.
+  > \`INNER JOIN\` doesn't produce a NULL row for Di — it omits Di. (Under a \`LEFT JOIN\`, the sum would be \`NULL\` until you wrap it in \`COALESCE\`.)
+- The query returns a duplicate row for every other customer.
+  > Join type doesn't duplicate unmatched rows; it only controls whether unmatched left-side rows are kept.`}
+/>

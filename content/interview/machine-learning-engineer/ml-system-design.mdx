@@ -1,0 +1,53 @@
+---
+title: ML System Design
+description: Concept checks on batch vs online inference, training–serving skew, and model/data drift — the production side of ML interviews.
+---
+
+The round that most distinguishes an ML *Engineer* from a data scientist
+is **ML system design** — getting models into production and keeping
+them healthy. These concept checks cover recurring themes.
+
+## Batch vs online inference
+
+<MultipleChoice
+  markdown={`A product-recommendation model must respond within ~50 ms to a live web request. Which serving pattern fits, and what's the trade-off?
+
+- Batch inference: precompute nothing and recompute per request offline.
+  > "Batch" means precomputing predictions on a schedule — it can't answer a live 50 ms request on fresh inputs by itself.
+- [o] Online (real-time) inference behind a low-latency service; the trade-off is operational complexity (scaling, latency budgets, monitoring) versus batch's simplicity.
+  > Sub-second, per-request predictions require an online service; you take on latency/availability/scaling concerns that a nightly batch job avoids.
+- It doesn't matter; latency is never a modeling concern.
+  > Latency budgets directly shape architecture, feature availability, and even model choice.
+- Always precompute every possible recommendation in advance.
+  > Feasible only for tiny input spaces; for large/contextual inputs you need online inference (often plus cached/batch features).`}
+/>
+
+## Training–serving skew
+
+<MultipleChoice
+  markdown={`A model evaluates well offline but underperforms in production. You discover a feature is computed one way in the training pipeline and a different way in the serving path. What is this called, and the usual fix?
+
+- Concept drift; fix by retraining more often.
+  > Drift is the world changing over time. Here the world didn't change — the *feature computation* differs between train and serve.
+- [o] Training–serving skew; fix by sharing one feature-computation path (e.g., a feature store / shared transform) so train and serve match.
+  > Identical features at train and serve time is the goal; a shared transformation or feature store eliminates the discrepancy.
+- Overfitting; fix with more regularization.
+  > Overfitting shows as a train/validation gap offline, not as a train-vs-serve mismatch.
+- Label leakage; fix by removing the label.
+  > Leakage is using future/target info as a feature; that's a different failure from inconsistent feature code paths.`}
+/>
+
+## Drift & monitoring
+
+<MultipleChoice
+  markdown={`Months after deployment, a model's accuracy slowly degrades even though the code never changed. What's the most likely cause, and what should the system do?
+
+- The model file became corrupted; redeploy the same model.
+  > Static artifacts don't rot; redeploying the same model won't help if the input distribution has shifted.
+- [o] Data/concept drift — the input distribution or input→label relationship shifted; monitor for drift and retrain on recent data.
+  > Real-world distributions change over time, so a once-good model decays. Production ML monitors inputs/predictions and retrains or alerts when drift is detected.
+- Nothing is wrong; model metrics never change in production.
+  > Silent degradation from drift is one of the most common production ML failures.
+- The serving hardware is too slow.
+  > Latency affects speed, not predictive accuracy.`}
+/>

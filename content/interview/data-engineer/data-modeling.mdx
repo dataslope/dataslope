@@ -1,0 +1,57 @@
+---
+title: Data Modeling & Pipelines
+description: Concept checks on normalization, star schemas, slowly-changing dimensions, and idempotent pipelines.
+---
+
+Beyond SQL syntax, data-engineering interviews test how you **model**
+data and **design pipelines**. These concept checks cover the ideas that
+come up most.
+
+## Normalization vs. denormalization
+
+<MultipleChoice
+  markdown={`An analytics warehouse table repeats the full customer name and address on **every** order row. A reviewer calls it "denormalized." What's the main *trade-off* being made?
+
+- It saves storage at the cost of correctness.
+  > Denormalization generally *increases* storage (repeated data) — it isn't a storage win.
+- [o] Faster reads (no join needed) at the cost of redundancy and update anomalies.
+  > Denormalizing trades write-time/consistency concerns for read performance — common and often correct in analytics, where data is append-mostly.
+- It guarantees the data is always consistent.
+  > The opposite: repeating data introduces the risk of the copies disagreeing (update anomalies).
+- It only matters for OLTP systems, never analytics.
+  > Denormalization is *especially* common in analytics/warehouse modeling; the trade-off applies there directly.`}
+/>
+
+## Slowly-changing dimensions
+
+<MultipleChoice
+  markdown={`A customer moves to a new city. You must keep historical orders attributed to the city they lived in **at the time**, while new orders use the new city. Which approach fits?
+
+- SCD Type 1 (overwrite the old value).
+  > Type 1 overwrites history, so past orders would all show the new city — losing the point-in-time truth you need.
+- [o] SCD Type 2 (add a new dimension row with effective-date ranges and a current flag).
+  > Type 2 versions the dimension so each fact can join to the row that was current when it occurred — the standard way to preserve history.
+- Delete the customer and re-insert them.
+  > That breaks referential integrity with historical facts and still loses the time context.
+- Store the city only on the fact table and drop the dimension.
+  > That denormalizes away the dimension and doesn't itself give you versioned history or a clean current view.`}
+/>
+
+## Idempotent pipelines
+
+<MultipleChoice
+  markdown={`A nightly job sometimes gets re-run after a partial failure. Why is making it **idempotent** (e.g., delete-then-insert or \`MERGE\` for the target partition) important?
+
+- It makes the job run faster.
+  > Idempotency is about correctness on re-runs, not speed.
+- [o] Re-running it produces the same final result instead of duplicating or double-counting rows.
+  > An idempotent write (overwrite the partition / upsert by key) means a retry converges to the correct state rather than appending duplicates.
+- It removes the need for any scheduling.
+  > You still schedule it; idempotency just makes retries and backfills safe.
+- It guarantees the upstream data is correct.
+  > It only controls *your* write behavior on re-run; upstream quality is a separate concern.`}
+/>
+
+## Go deeper
+
+- [Database Design with PostgreSQL](/learn/database-design-postgresql)

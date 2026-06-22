@@ -95,12 +95,12 @@ The full section is stood up at **`/interview`** as a second Fumadocs collection
 | Loader | `lib/source.ts` → `interviewSource = loader({ baseUrl: "/interview", … })`. |
 | Route + layout | `app/interview/[[...slug]]/page.tsx` (mirrors the learn page: `dynamic` body load, prerendered via `generateStaticParams`, canonical/OG metadata, BreadcrumbList + Course JSON-LD) and `app/interview/layout.tsx` (Fumadocs `DocsLayout`, reusing `app/learn/learn.css`). |
 | SEO | `app/sitemap.ts` now also emits `interviewSource.getPages()`; `lib/courseMeta.ts` generalized to read either section. |
-| Content | `content/interview/`: a landing page + **six role tracks** — Data Analyst, Data Scientist, Data Engineer, Analytics Engineer, ML Engineer, Backend/SWE — each with an overview, an outline of what's probed, and links into the relevant `/learn` courses. |
-| Interactive seed questions | Data Analyst → a runnable `SqlChallengeCard` (GROUP BY) + MCQ; Data Engineer → window-function `SqlChallengeCard` + MCQ; Backend → a Python `ChallengeCard` (Two Sum, with tests) + MCQ; the other three roles carry a concept-check MCQ each. |
+| Content | `content/interview/`: a landing page + **six role tracks** — Data Analyst, Data Scientist, Data Engineer, Analytics Engineer, ML Engineer, Backend/SWE — each with an overview, an outline of what's probed, **2–3 question pages**, and links into the relevant `/learn` courses (~21 pages total). |
+| Interactive questions (all solutions validated) | **SQL** (`SqlChallengeCard`, DuckDB): aggregation, joins (LEFT JOIN + COALESCE), window-function ranking, deduplication (`ROW_NUMBER`), fact×dimension mart. **Python** (`ChallengeCard` w/ tests + reference `solutionCode`): Two Sum, Valid Anagram, Valid Parentheses, precision/recall, accuracy. **pandas**: `groupby` aggregation. Plus concept-check **MCQs** on every page (stats, bias–variance, regularization, dimensional modeling, dbt, ML system design, …). |
 
-**Verification:** `tsc --noEmit` ✅, `eslint` ✅, MCQ linter ✅ (all 6 MCQ files pass: one correct answer, ≥2 choices, neutral explanations), production `next build` ✅. The section is intentionally a *scaffold* — the structure, infra, and one or two questions per format are in place; filling each role with depth is the (editorial) follow-on.
+**Verification:** `tsc --noEmit` ✅, `eslint` ✅, MCQ linter ✅ (**18 MCQ files**: one correct answer, ≥2 choices, neutral explanations per `AGENTS.md`), production `next build` ✅. **Every interactive solution was executed locally before embedding** — Python/pandas via `python3`, SQL via `duckdb` — so each reference solution provably passes its own tests (the browser e2e in `e2e/challenge-solutions.spec.ts` covers `/learn`; it doesn't sweep `/interview` by default, hence the local validation).
 
-**Possible follow-ups:** a top-nav link between `/learn` and `/interview`; per-question difficulty/role tags; `FAQPage` JSON-LD on Q&A pages (the Q3-Phase-2 deferral); an "Ask AI to explain this answer" hook once Q4 lands.
+**Possible follow-ups:** more questions per role + difficulty/role tags; a top-nav link between `/learn` and `/interview`; extend the solution e2e to sweep `/interview`; `FAQPage` JSON-LD on Q&A pages; an "Ask AI to explain this answer" hook once Q4 lands.
 
 ---
 

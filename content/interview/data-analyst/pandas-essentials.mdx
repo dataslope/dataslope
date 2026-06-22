@@ -1,0 +1,70 @@
+---
+title: "Pandas: Group & Aggregate"
+description: A runnable pandas groupby interview question plus a concept check on what groupby returns.
+---
+
+Analyst screens that aren't SQL are usually **pandas**. The single most
+common task: group rows and aggregate. Solve it below — it runs in your
+browser via Pyodide.
+
+## Challenge: total amount per region
+
+<ChallengeCard
+  adapter="python"
+  title="Sum amount by region"
+  instructions={`A DataFrame \`df\` is provided with columns \`region\` and \`amount\`. Create a variable **\`by_region\`** holding a pandas **Series** of the total \`amount\` per \`region\` (the region as the index). The grouping order doesn't matter.`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "North", "East", "South", "North"],
+    "amount": [100, 80, 80, 50, 70, 60],
+})`,
+      starterCode: `# Create a Series of total amount per region.
+by_region = None
+print(by_region)`,
+      solutionCode: `by_region = df.groupby("region")["amount"].sum()
+print(by_region)`,
+    },
+  ]}
+  tests={[
+    {
+      id: "is_series",
+      name: "by_region is a Series",
+      description: "Grouping one column and summing yields a Series",
+      code: `import pandas as pd
+assert isinstance(by_region, pd.Series), "Expected a pandas Series"`,
+    },
+    {
+      id: "three_groups",
+      name: "One entry per region",
+      description: "Three distinct regions",
+      code: `assert len(by_region) == 3, f"Expected 3 groups, got {len(by_region)}"`,
+    },
+    {
+      id: "totals",
+      name: "Totals are correct",
+      description: "North=240, South=150, East=50",
+      code: `assert int(by_region["North"]) == 240
+assert int(by_region["South"]) == 150
+assert int(by_region["East"]) == 50`,
+    },
+  ]}
+/>
+
+## Concept check
+
+<MultipleChoice
+  markdown={`In \`df.groupby("region")["amount"].sum()\`, what is the **index** of the resulting Series?
+
+- The original DataFrame's row numbers (0, 1, 2, …).
+  > Aggregating collapses each group to one value; the original row positions are gone.
+- [o] The distinct \`region\` values (the grouping keys).
+  > \`groupby\` uses the group keys as the index of the aggregated result — here, one entry per region.
+- A default \`RangeIndex\` with no labels.
+  > Only if you call \`.reset_index()\`; the grouped result is labeled by the group keys by default.
+- The \`amount\` values.
+  > \`amount\` becomes the Series *values* (the per-group sums), not the index.`}
+/>

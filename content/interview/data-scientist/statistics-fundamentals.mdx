@@ -1,0 +1,56 @@
+---
+title: Statistics Fundamentals
+description: Concept checks on p-values, Type I/II errors, and the Central Limit Theorem — the stats questions DS interviews lean on.
+---
+
+Statistics is the part of a Data Scientist interview most candidates are
+rusty on. These concept checks target the ideas interviewers probe most.
+
+## p-values
+
+<MultipleChoice
+  markdown={`A test returns \`p = 0.03\` at significance level \`α = 0.05\`. Which statement is correct?
+
+- There is a 3% probability that the null hypothesis is true.
+  > A p-value is **not** the probability the null is true. It's computed *assuming* the null holds.
+- [o] If the null hypothesis were true, there's a 3% chance of seeing data this extreme (or more) — so at α = 0.05 you reject the null.
+  > That's the definition: the probability of a result at least this extreme under the null. Since 0.03 < 0.05, you reject.
+- There is a 97% probability the effect is real and important.
+  > Statistical significance isn't the probability the effect is real, and says nothing about effect *size* or importance.
+- The result is guaranteed not to be a fluke.
+  > A small p-value reduces but never eliminates the chance of a false positive (that's exactly the Type I error rate).`}
+/>
+
+## Type I vs Type II error
+
+<MultipleChoice
+  markdown={`Your A/B test concludes the new button "works" and you ship it — but in reality it has **no** effect. What kind of error is this?
+
+- [o] A Type I error (false positive) — rejecting a true null hypothesis.
+  > Declaring an effect that isn't real is a false positive; its rate is controlled by α.
+- A Type II error (false negative) — failing to detect a real effect.
+  > That's the opposite: missing an effect that *is* real.
+- Selection bias.
+  > Selection bias is about how the sample was drawn, not about which hypothesis-test error occurred.
+- No error — shipping is always safe.
+  > Shipping a change that does nothing (and possibly costs effort or hurts elsewhere) is precisely the cost of a Type I error.`}
+/>
+
+## The Central Limit Theorem
+
+<MultipleChoice
+  markdown={`Why does the Central Limit Theorem matter when you compute a confidence interval for a **mean**?
+
+- It guarantees the underlying data is normally distributed.
+  > The CLT says nothing about the population's shape — that can be skewed.
+- [o] For a large enough sample, the distribution of the **sample mean** is approximately normal even if the data isn't — which justifies the usual interval.
+  > The CLT is about the sampling distribution of the mean, enabling normal-based intervals regardless of the population's shape (given enough data).
+- It only applies when the sample size is below 30.
+  > It's the reverse — the approximation improves as n grows; "n ≥ 30" is a rough rule of thumb for *adequacy*.
+- It lets you skip estimating the standard error.
+  > You still need the standard error; the CLT tells you the *shape* to use, not that you can ignore variability.`}
+/>
+
+## Go deeper
+
+- [Statistics for Data Science with Python](/learn/statistics-for-data-science-python)

@@ -1,0 +1,85 @@
+---
+title: ML Fundamentals
+description: A runnable accuracy implementation plus concept checks on the bias–variance trade-off and L1 vs L2 regularization.
+---
+
+ML Engineer screens pair coding with ML theory. Implement a basic metric
+below, then work the concept checks on the ideas interviewers reach for
+most.
+
+## Challenge: accuracy from scratch
+
+<ChallengeCard
+  adapter="python"
+  title="Classification accuracy"
+  instructions={`Implement \`accuracy(y_true, y_pred)\`. Both are equal-length lists of labels. Return the fraction of positions where they match, as a float in \`[0, 1]\`. For two empty lists, return \`0.0\`.
+
+Example: \`accuracy([1, 0, 1, 1], [1, 0, 0, 1])\` is \`0.75\`.`}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def accuracy(y_true, y_pred):
+    # Fraction of matching positions.
+    pass`,
+      solutionCode: `def accuracy(y_true, y_pred):
+    if not y_true:
+        return 0.0
+    correct = sum(1 for t, p in zip(y_true, y_pred) if t == p)
+    return correct / len(y_true)`,
+    },
+  ]}
+  tests={[
+    {
+      id: "basic",
+      name: "Three of four correct",
+      description: "→ 0.75",
+      code: `assert accuracy([1, 0, 1, 1], [1, 0, 0, 1]) == 0.75`,
+    },
+    {
+      id: "perfect",
+      name: "All correct",
+      description: "→ 1.0",
+      code: `assert accuracy([1, 1, 1], [1, 1, 1]) == 1.0`,
+    },
+    {
+      id: "none",
+      name: "All wrong",
+      description: "→ 0.0",
+      code: `assert accuracy([0, 0], [1, 1]) == 0.0`,
+    },
+  ]}
+/>
+
+## Bias–variance
+
+<MultipleChoice
+  markdown={`You replace a linear model with a very deep decision tree. Training error drops to near zero but validation error rises. In bias–variance terms, what happened?
+
+- You increased bias.
+  > A more flexible model has *lower* bias, not higher — the symptom here (near-zero train error) reflects low bias.
+- [o] You decreased bias but increased variance — the flexible model now overfits.
+  > More capacity reduces bias but raises variance; the widening train/validation gap is the variance cost.
+- Both bias and variance decreased.
+  > If both fell, validation error would improve, not rise.
+- Bias and variance are unrelated to model flexibility.
+  > Model flexibility is precisely the knob that trades one for the other.`}
+/>
+
+## Regularization
+
+<MultipleChoice
+  markdown={`You want regularization that can drive some coefficients exactly to **zero**, effectively selecting features. Which penalty does that?
+
+- L2 (ridge).
+  > L2 shrinks coefficients toward zero but rarely sets them exactly to zero.
+- [o] L1 (lasso).
+  > The L1 penalty's geometry produces sparse solutions — some coefficients become exactly zero, which performs feature selection.
+- Neither can zero out coefficients.
+  > L1 specifically can; that's its defining property versus L2.
+- Both zero out coefficients equally.
+  > Only L1 reliably produces exact zeros; L2 keeps them small but nonzero.`}
+/>
+
+## Go deeper
+
+- [Machine Learning with scikit-learn](/learn/machine-learning-scikit-learn)

@@ -1,8 +1,10 @@
 {
   "title": "Data Scientist",
-  "description": "Interview prep for Data Scientist roles: statistics, modeling, experimentation, and communication.",
+  "description": "Interview prep for Data Scientist roles: statistics, probability, modeling, evaluation, and experimentation.",
   "root": true,
   "pages": [
-    "index"
+    "index",
+    "statistics-fundamentals",
+    "model-evaluation"
   ]
 }
