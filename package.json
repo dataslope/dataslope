@@ -8,6 +8,7 @@
     "build:workers": "node scripts/build-almostnode-workers.mjs",
     "build:svg-gallery": "node scripts/build-svg-gallery-data.mjs",
     "build:search-index": "node scripts/build-search-index.mjs",
+    "build:og-image": "node scripts/build-og-image.mjs",
     "publish:tools-jar": "npm publish ./tools-jar",
     "postinstall": "fumadocs-mdx && node scripts/patch-almostnode.mjs && node scripts/build-almostnode-workers.mjs && node scripts/build-search-index.mjs",
     "start": "next start",
@@ -90,6 +91,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",
+    "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/postcss": "^4.2.4",
     "@types/mdx": "^2.0.13",
     "@types/node": "^22.12.0",

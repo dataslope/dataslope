@@ -17,7 +17,7 @@
 | --- | --- | --- |
 | **Q1** | Auth on Cloudflare | **Better Auth + D1** is the most Cloudflare-native path (self-hosted, free, D1 is first-class). Clerk if you want to ship in a day and migrate later. Use **OAuth social login first**. One caveat: keep auth out of `middleware.ts` on OpenNext. Gate *only* Save/AI — never content. |
 | **Q2** | Interview Prep section | **Strong yes.** Reuses your Fumadocs + playground infra almost verbatim (a second `defineDocs` collection), is your single best **SEO** lever (high-intent long-tail search), and feeds the paid-AI funnel. Keep it interactive-first to avoid being a LeetCode clone. |
-| **Q3** | SEO | You have great fundamentals (≈800 fast static pages) but were missing the basics: no sitemap, no `metadataBase`, no canonical/OpenGraph/Twitter, no JSON-LD. **✅ Phase 1 is now implemented on this branch** (sitemap, `metadataBase`, title template, canonical + OG/Twitter on home + every lesson, sitemap wired into robots) — see §3.4. Next: structured data + content hygiene. Keep pages static — SEO and your cost model want the same thing. |
+| **Q3** | SEO | You have great fundamentals (≈800 fast static pages) but were missing the basics. **✅ Phases 1 & 2 are now implemented on this branch:** sitemap, `metadataBase`, title template, canonical + OG/Twitter, a 1200×630 OG image, and JSON-LD (Organization/WebSite + BreadcrumbList + Course) — see §3.4–3.5. Next: content hygiene + `FAQPage` once Interview Prep lands. Keep pages static — SEO and your cost model want the same thing. |
 | **Q4** | Paid AI, all content free | **Sound strategy** — you're charging for the one thing that has real marginal cost (inference) while serving zero-marginal-cost content free. The risk is *perception*, solved by **messaging + a genuinely useful free allowance + never gating anything educational**, not by changing the model. |
 | **Q5** | Save non-SQL playgrounds to D1 | **Yes, ideal.** Code workspaces are tiny text files (`files: PlaygroundFile[]`). Mind D1's **2 MB per-row cap** (irrelevant for code). Tiers via an `expires_at` column + a Cron sweep. Debounce writes (you already do this for OPFS). Sharing = a `share_id` → public read route. |
 | **Q6** | Save SQL playgrounds cheaply | **Don't put DB binaries in D1** (they blow the 2 MB row cap). Two tiers: **(1) store only the SQL + seed reference and replay to rebuild** (effectively free — the default), **(2) snapshot the binary to R2** for non-reproducible DBs (10 GB free, **zero egress**). Gate binaries + long retention behind paid. |
@@ -115,10 +115,10 @@ You're starting from a **strong technical base** (≈800 fast, prerendered, stat
 4. ✅ **A default OG image** — wired site-wide via `lib/site.ts`. (A dedicated 1200×630 social card + per-course images remain a polish follow-up; the current default reuses an existing brand asset.)
 5. ✅ **Fix the home/root metadata** — `app/layout.tsx`'s root metadata was `title: "Playground"`; now a real default + `%s · DataSlope` title template, and the home title opts out of the template via `absolute`.
 
-**Phase 2 — Structured data (rich results).**
-- `Course` / `LearningResource` JSON-LD on course indexes and lessons.
-- `BreadcrumbList` JSON-LD (you already render breadcrumbs).
-- **`FAQPage` JSON-LD on the interview Q&A pages (Q2)** — this is how you win the "interview questions" SERP features.
+**Phase 2 — Structured data (rich results) + a real OG image.** ✅ **Implemented on this branch — details in §3.5.**
+- ✅ `Course` JSON-LD on course landing pages (marked free), `BreadcrumbList` on every `/learn` page, `Organization` + `WebSite` on the home page.
+- ✅ A dedicated **1200×630 OpenGraph image** (`public/og-default.png`), generated on-brand from the logo + a "data slope" motif and now the site-wide share card.
+- ⏳ **`FAQPage` JSON-LD on the interview Q&A pages (Q2)** — deferred until the Interview Prep section exists; that's how you win the "interview questions" SERP features.
 
 **Phase 3 — Content & IA hygiene.**
 - Audit lesson frontmatter so **every page has a unique, descriptive `title` + `description`** (these become the SERP snippet). Many lessons likely inherit thin descriptions.
@@ -146,9 +146,26 @@ Phase 1 is implemented and committed on `claude/clever-tesla-16t45x`. It's metad
 | Sitemap | **`app/sitemap.ts`** (new) | Emits `/sitemap.xml` from `source.getPages()` (home + `/learn` index + every lesson), deduped, built statically. The single biggest indexing win. `/playground` and `*.md` omitted to stay consistent with robots. |
 | Robots → sitemap | **`app/robots.ts`** | Adds the `sitemap:` directive pointing at `/sitemap.xml`. Disallow rules unchanged. |
 
-**Verification:** `npx tsc --noEmit` and `eslint` on the changed files both pass clean; the production `next build` was run to confirm the sitemap route and `generateMetadata` render. **Not yet done (deliberately):** the title casing inconsistency ("Dataslope" on the home page vs "DataSlope" elsewhere) is left as-is to avoid changing brand copy unilaterally; a dedicated 1200×630 OG image and JSON-LD are Phase 2.
+**Verification:** `npx tsc --noEmit` and `eslint` on the changed files both pass clean; the production `next build` was run to confirm the sitemap route and `generateMetadata` render. **Left as-is (deliberately):** the title casing inconsistency ("Dataslope" on the home page vs "DataSlope" elsewhere) — to avoid changing brand copy unilaterally.
 
 **Post-merge follow-ups for you:** point Google Search Console + Bing Webmaster Tools at the deployed `/sitemap.xml`; if the production origin ever differs from `https://dataslope.com`, set `NEXT_PUBLIC_SITE_URL`.
+
+### 3.5 Phase 2 — implementation status (shipped on this branch)
+
+JSON-LD structured data and a real OpenGraph image. Still no rendering-mode change — the JSON-LD is emitted into the already-prerendered HTML, and the OG image is a committed static PNG (no runtime `next/og`), so the cost model is untouched.
+
+| Change | File(s) | What it does |
+| --- | --- | --- |
+| JSON-LD builders | **`lib/structuredData.ts`** (new) | `organizationLd`, `websiteLd`, `breadcrumbLd`, `courseLd` (all absolute-URL'd against `SITE_URL`; `Course` carries `isAccessibleForFree` + a free `Offer`). |
+| JSON-LD renderer | **`app/_components/JsonLd.tsx`** (new) | Server component that emits `<script type="application/ld+json">`, with the `<` → escape guard against `</script>` breakout. |
+| Course-name resolver | **`lib/courseMeta.ts`** (new) | Reads a course folder's `meta.json` for the human course name/description (the index page's frontmatter title is "Welcome", not the course name). |
+| Home structured data | **`app/page.tsx`** | Renders `Organization` + `WebSite`. |
+| Lesson structured data | **`app/learn/[[...slug]]/page.tsx`** | `BreadcrumbList` on every page (Learn → Course → Lesson) and `Course` on course landing pages. |
+| OG image | **`public/og-default.png`** (new, 1200×630) + **`scripts/build-og-image.mjs`** (new) + `build:og-image` script + `@resvg/resvg-js` devDep | On-brand social card (real logo + "data slope" motif + headline + language chips), rendered SVG→PNG with system fonts. Standalone script (not in the build chain — the card changes ~as often as the logo). `lib/site.ts`'s `OG_IMAGE` now points at it. |
+
+**Verification:** `tsc --noEmit` ✅ and `eslint` ✅ clean; production `next build` ✅ with the JSON-LD present in prerendered HTML (Organization/WebSite on home; BreadcrumbList + Course on a course page; BreadcrumbList on a lesson). The PNG was visually checked (1200×630, logo + text render correctly).
+
+**Deferred to Phase 3+:** per-course OG images; `FAQPage` JSON-LD once the interview section exists; richer `Course` fields (`hasCourseInstance`, workload) if you pursue the Course rich result aggressively.
 
 ---
 

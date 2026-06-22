@@ -9,7 +9,9 @@ import "@/app/home.css";
 import type { Metadata } from "next";
 import { HomeClient } from "./_components/home/HomeClient";
 import type { Course, CourseTags } from "./_components/home/CoursesSection";
+import { JsonLd } from "./_components/JsonLd";
 import { OG_IMAGE, SITE_URL } from "@/lib/site";
+import { organizationLd, websiteLd } from "@/lib/structuredData";
 
 const HOME_TITLE = "Dataslope — Learn Python, SQL, C++ in your browser";
 const HOME_DESCRIPTION =
@@ -84,6 +86,7 @@ export default async function Home() {
   return (
     <>
       <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
+      <JsonLd data={[organizationLd(), websiteLd()]} />
       <HomeClient courses={courses} />
     </>
   );

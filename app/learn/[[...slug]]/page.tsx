@@ -21,6 +21,14 @@ import {
 import { source } from "@/lib/source";
 import { getMDXComponents } from "@/mdx-components";
 import { OG_IMAGE } from "@/lib/site";
+import { getCourseMeta } from "@/lib/courseMeta";
+import { JsonLd } from "@/app/_components/JsonLd";
+import {
+  absUrl,
+  breadcrumbLd,
+  courseLd,
+  type BreadcrumbItem,
+} from "@/lib/structuredData";
 
 // Lessons live at `content/learn/<page.path>` on the default branch, so the
 // "Open in GitHub" action links straight to the page source.
@@ -50,6 +58,39 @@ export default async function LearnPage(props: LearnPageProps) {
   const markdownUrl = `${page.url}.md`;
   const githubUrl = `${GITHUB_BLOB_BASE}/${page.path}`;
 
+  // --- JSON-LD: breadcrumb on every lesson, Course on course landing pages ---
+  // The first slug segment is the course folder; its meta.json carries the
+  // human course name + `root` flag (the index page's own frontmatter title is
+  // usually "Welcome", not the course name).
+  const slugs = page.slugs;
+  const courseSlug = slugs[0];
+  const courseMeta = courseSlug ? await getCourseMeta(courseSlug) : null;
+  const isCourseRoot = slugs.length === 1 && courseMeta?.root === true;
+
+  const crumbs: BreadcrumbItem[] = [{ name: "Learn", url: absUrl("/learn") }];
+  if (courseMeta?.root) {
+    crumbs.push({
+      name: courseMeta.title,
+      url: absUrl(`/learn/${courseSlug}`),
+    });
+  }
+  // The course-root crumb above already represents the page itself; only add a
+  // leaf crumb for actual lessons (and loose demo pages).
+  if (!isCourseRoot) {
+    crumbs.push({ name: page.data.title, url: absUrl(page.url) });
+  }
+
+  const structuredData: object[] = [breadcrumbLd(crumbs)];
+  if (isCourseRoot && courseMeta) {
+    structuredData.push(
+      courseLd({
+        name: courseMeta.title,
+        description: courseMeta.description ?? page.data.description,
+        url: absUrl(page.url),
+      }),
+    );
+  }
+
   return (
     // Each course folder's meta.json sets `root: true`, so Fumadocs scopes the
     // sidebar and breadcrumb tree to that course (the root folder's title is the
@@ -60,6 +101,7 @@ export default async function LearnPage(props: LearnPageProps) {
     // Loose/demo pages under `content/learn` aren't inside a `root` folder, so
     // they simply get no breadcrumb.
     <DocsPage toc={toc} full={page.data.full} breadcrumb={{ includeRoot: true }}>
+      <JsonLd data={structuredData} />
       <DocsTitle>{page.data.title}</DocsTitle>
       {page.data.description ? (
         <DocsDescription>{page.data.description}</DocsDescription>
