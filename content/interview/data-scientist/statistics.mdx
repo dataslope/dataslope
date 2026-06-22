@@ -1,0 +1,91 @@
+---
+title: Statistics
+description: Data Scientist interview questions on p-values, hypothesis testing, Type I/II errors, confidence intervals, and the Central Limit Theorem.
+---
+
+Statistics is the part of a DS interview most candidates are rustiest on.
+Review the Q&A, then the concept checks.
+
+## Q&A
+
+### What exactly is a p-value?
+
+The probability of observing data **at least as extreme** as yours
+**assuming the null hypothesis is true**. It is *not* the probability the
+null is true, nor the probability your result is a fluke. Small p → the
+data would be surprising under the null, so you reject it at your chosen
+α.
+
+### Type I vs Type II error?
+
+- **Type I (false positive)** — rejecting a true null (claiming an effect that isn't real); its rate is **α**.
+- **Type II (false negative)** — failing to detect a real effect; its rate is **β**, and **power = 1 − β**.
+
+Lowering α (stricter) reduces false positives but raises false negatives,
+all else equal.
+
+### What does a 95% confidence interval actually mean?
+
+It's a procedure: if you repeated the experiment many times and built an
+interval each time, ~95% of those intervals would contain the true
+parameter. It is **not** "95% probability the parameter is in *this*
+interval" (the parameter is fixed; the interval is random).
+
+### Why does the Central Limit Theorem matter?
+
+For a large enough sample, the distribution of the **sample mean** is
+approximately normal **regardless of the population's shape**. That's
+what justifies normal-based confidence intervals and z/t-tests for means
+even when the underlying data is skewed.
+
+### What's the difference between a parameter and a statistic?
+
+A **parameter** describes the population (true mean μ) and is usually
+unknown; a **statistic** is computed from a sample (sample mean x̄) and
+estimates the parameter. Inference is the bridge from statistic to
+parameter, with quantified uncertainty.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`A test returns \`p = 0.03\` at significance level \`α = 0.05\`. Which statement is correct?
+
+- There is a 3% probability that the null hypothesis is true.
+  > A p-value is **not** the probability the null is true. It's computed *assuming* the null holds.
+- [o] If the null were true, there's a 3% chance of data this extreme (or more) — so at α = 0.05 you reject the null.
+  > That's the definition; since 0.03 < 0.05, you reject.
+- There is a 97% probability the effect is real and important.
+  > Significance isn't the probability the effect is real, and says nothing about effect size.
+- The result is guaranteed not to be a fluke.
+  > A small p reduces but never eliminates the chance of a false positive (the Type I error rate).`}
+/>
+
+<MultipleChoice
+  markdown={`Your A/B test concludes the new button "works" and you ship it — but in reality it has **no** effect. What kind of error is this?
+
+- [o] A Type I error (false positive) — rejecting a true null hypothesis.
+  > Declaring an effect that isn't real is a false positive; its rate is controlled by α.
+- A Type II error (false negative) — failing to detect a real effect.
+  > That's the opposite: missing an effect that *is* real.
+- Selection bias.
+  > Selection bias is about how the sample was drawn, not which hypothesis-test error occurred.
+- No error — shipping is always safe.
+  > Shipping a change that does nothing is precisely the cost of a Type I error.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does the Central Limit Theorem matter when you compute a confidence interval for a **mean**?
+
+- It guarantees the underlying data is normally distributed.
+  > The CLT says nothing about the population's shape — that can be skewed.
+- [o] For a large enough sample, the distribution of the **sample mean** is approximately normal even if the data isn't.
+  > That's what enables normal-based intervals regardless of the population's shape.
+- It only applies when the sample size is below 30.
+  > It's the reverse — the approximation improves as n grows; "n ≥ 30" is a rough adequacy rule of thumb.
+- It lets you skip estimating the standard error.
+  > You still need the standard error; the CLT tells you the *shape* to use, not that you can ignore variability.`}
+/>
+
+## Go deeper
+
+- [Statistics for Data Science with Python](/learn/statistics-for-data-science-python)

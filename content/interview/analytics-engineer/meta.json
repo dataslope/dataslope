@@ -1,10 +1,6 @@
 {
   "title": "Analytics Engineer",
-  "description": "Interview prep for Analytics Engineer roles: dimensional modeling, building marts, dbt, and SQL.",
+  "description": "Interview prep for Analytics Engineer roles: dimensional modeling and dbt.",
   "root": true,
-  "pages": [
-    "index",
-    "building-a-mart",
-    "dbt-fundamentals"
-  ]
+  "pages": ["index", "dimensional-modeling", "dbt"]
 }

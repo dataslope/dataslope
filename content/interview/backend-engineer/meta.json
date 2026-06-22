@@ -1,11 +1,6 @@
 {
   "title": "Backend / Software Engineer",
-  "description": "Interview prep for backend and software engineering roles: data structures, algorithms, complexity, and language fundamentals.",
+  "description": "Interview prep for backend and software engineering roles: data structures & algorithms and Python fundamentals.",
   "root": true,
-  "pages": [
-    "index",
-    "python-coding",
-    "strings-and-hashing",
-    "stacks-and-parsing"
-  ]
+  "pages": ["index", "algorithms", "python"]
 }

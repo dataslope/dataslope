@@ -1,0 +1,113 @@
+---
+title: Pandas
+description: Data Analyst pandas interview questions — selection, groupby, merging, and missing data — with answers, a concept check, and a runnable challenge.
+---
+
+When the analyst screen isn't SQL, it's usually **pandas**. Review the
+Q&A, then run the challenge in your browser.
+
+## Q&A
+
+### What's the difference between `loc` and `iloc`?
+
+`loc` selects by **label** (index/column names); `iloc` selects by
+**integer position**.
+
+```python
+df.loc[3, "amount"]    # row with index label 3, column "amount"
+df.iloc[3, 1]          # 4th row, 2nd column, regardless of labels
+df.loc[df.region == "North"]   # boolean mask (label-based)
+```
+
+A common gotcha: after filtering, the index labels no longer match
+positions, so `loc[0]` may raise while `iloc[0]` still works.
+
+### What does `groupby` return, and what is the "split-apply-combine" pattern?
+
+`groupby` **splits** rows into groups by key, lets you **apply** an
+aggregation/transform per group, then **combines** the results. Grouping
+one column and aggregating returns a **Series** indexed by the group
+keys; aggregating several returns a **DataFrame**.
+
+```python
+df.groupby("region")["amount"].sum()              # Series
+df.groupby("region").agg(total=("amount", "sum"),
+                         n=("amount", "size"))     # DataFrame
+```
+
+### When do you use `merge` vs `concat` vs `join`?
+
+- **`merge`** — SQL-style joins on key columns (`how="inner"|"left"|...`).
+- **`concat`** — stack DataFrames vertically (more rows) or horizontally (more columns), aligning on the index.
+- **`join`** — convenience for merging on the **index**.
+
+Reach for `merge` for "combine on a key," `concat` for "stack these together."
+
+### How do you handle missing data?
+
+Detect with `isna()`/`notna()`; then **drop** (`dropna()`) or **fill**
+(`fillna(value)`, forward/backward fill). Choose based on why it's
+missing and how much: dropping a few rows is fine; dropping a column
+that's 60% null often isn't. Beware that `NaN != NaN`, so compare with
+`isna()`, not `== NaN`.
+
+### Why can `SettingWithCopyWarning` appear, and how do you avoid it?
+
+It warns that you may be assigning to a **view** (a slice) rather than
+the original frame, so the write might not "stick." Avoid it by doing the
+assignment in one `loc` call on the original:
+
+```python
+df.loc[df.region == "North", "amount"] = 0   # clear, in-place
+```
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`In \`df.groupby("region")["amount"].sum()\`, what is the **index** of the resulting Series?
+
+- The original DataFrame's row numbers (0, 1, 2, …).
+  > Aggregating collapses each group to one value; the original row positions are gone.
+- [o] The distinct \`region\` values (the grouping keys).
+  > \`groupby\` uses the group keys as the index of the aggregated result — here, one entry per region.
+- A default \`RangeIndex\` with no labels.
+  > Only if you call \`.reset_index()\`; the grouped result is labeled by the group keys by default.
+- The \`amount\` values.
+  > \`amount\` becomes the Series *values* (the per-group sums), not the index.`}
+/>
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Sum amount by region"
+  instructions={`A DataFrame \`df\` is provided with columns \`region\` and \`amount\`. Create a variable **\`by_region\`** holding a pandas **Series** of the total \`amount\` per \`region\` (the region as the index). The grouping order doesn't matter.`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "North", "East", "South", "North"],
+    "amount": [100, 80, 80, 50, 70, 60],
+})`,
+      starterCode: `# Create a Series of total amount per region.
+by_region = None
+print(by_region)`,
+      solutionCode: `by_region = df.groupby("region")["amount"].sum()
+print(by_region)`,
+    },
+  ]}
+  tests={[
+    { id: "is_series", name: "by_region is a Series", description: "Grouping one column and summing yields a Series", code: `import pandas as pd
+assert isinstance(by_region, pd.Series), "Expected a pandas Series"` },
+    { id: "three_groups", name: "One entry per region", description: "Three distinct regions", code: `assert len(by_region) == 3, f"Expected 3 groups, got {len(by_region)}"` },
+    { id: "totals", name: "Totals are correct", description: "North=240, South=150, East=50", code: `assert int(by_region["North"]) == 240
+assert int(by_region["South"]) == 150
+assert int(by_region["East"]) == 50` },
+  ]}
+/>
+
+## Go deeper
+
+- [Data Analysis with Python & Pandas](/learn/data-analysis-python-pandas)

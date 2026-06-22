@@ -1,10 +1,6 @@
 {
   "title": "Machine Learning Engineer",
-  "description": "Interview prep for ML Engineer roles: ML fundamentals, evaluation, coding, and ML system design (MLOps).",
+  "description": "Interview prep for ML Engineer roles: ML fundamentals and ML system design.",
   "root": true,
-  "pages": [
-    "index",
-    "ml-fundamentals",
-    "ml-system-design"
-  ]
+  "pages": ["index", "ml-fundamentals", "ml-system-design"]
 }

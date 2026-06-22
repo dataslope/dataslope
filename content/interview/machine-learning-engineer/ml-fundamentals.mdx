@@ -1,13 +1,77 @@
 ---
 title: ML Fundamentals
-description: A runnable accuracy implementation plus concept checks on the bias–variance trade-off and L1 vs L2 regularization.
+description: ML Engineer interview questions on supervised vs unsupervised learning, bias–variance, regularization, and data splits — with a runnable metric challenge.
 ---
 
-ML Engineer screens pair coding with ML theory. Implement a basic metric
-below, then work the concept checks on the ideas interviewers reach for
-most.
+ML Engineer screens pair coding with ML theory. Review the Q&A, take the
+concept checks, then implement the metric.
 
-## Challenge: accuracy from scratch
+## Q&A
+
+### Supervised vs unsupervised vs reinforcement learning?
+
+- **Supervised** — learn a mapping from inputs to **labeled** outputs (classification, regression).
+- **Unsupervised** — find structure in **unlabeled** data (clustering, dimensionality reduction).
+- **Reinforcement** — an agent learns a policy by maximizing **reward** through trial-and-error interaction.
+
+### Explain the bias–variance trade-off.
+
+**Bias** is error from oversimplifying (underfitting); **variance** is
+error from over-sensitivity to training data (overfitting). More model
+capacity lowers bias but raises variance. You tune complexity,
+regularization, and data volume to minimize total error on unseen data.
+
+### Why split data into train / validation / test?
+
+**Train** fits parameters; **validation** tunes hyperparameters and
+guides model selection; **test** is touched **once** for a final, honest
+estimate. If you tune on the test set, your reported performance is
+optimistic and won't hold in production.
+
+### L1 vs L2 regularization?
+
+Both penalize large weights to reduce overfitting. **L1 (lasso)** can
+zero out coefficients → sparse models / feature selection. **L2 (ridge)**
+shrinks weights smoothly toward (but not to) zero. Elastic net mixes
+both.
+
+### What is data leakage, and how do you prevent it?
+
+Leakage is when information unavailable at prediction time sneaks into
+training — e.g. fitting a scaler on the **full** dataset before splitting,
+or using a feature that's a proxy for the label. It inflates offline
+metrics and collapses in production. Prevent it by fitting all transforms
+on the **training split only** and auditing features for target leakage.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`You replace a linear model with a very deep decision tree. Training error drops to near zero but validation error rises. In bias–variance terms, what happened?
+
+- You increased bias.
+  > A more flexible model has *lower* bias; near-zero train error reflects low bias.
+- [o] You decreased bias but increased variance — the flexible model now overfits.
+  > More capacity reduces bias but raises variance; the widening train/validation gap is the variance cost.
+- Both bias and variance decreased.
+  > If both fell, validation error would improve, not rise.
+- Bias and variance are unrelated to model flexibility.
+  > Model flexibility is precisely the knob that trades one for the other.`}
+/>
+
+<MultipleChoice
+  markdown={`You want regularization that can drive some coefficients exactly to **zero**, effectively selecting features. Which penalty does that?
+
+- L2 (ridge).
+  > L2 shrinks coefficients toward zero but rarely exactly to zero.
+- [o] L1 (lasso).
+  > The L1 penalty's geometry produces sparse solutions — some coefficients become exactly zero (feature selection).
+- Neither can zero out coefficients.
+  > L1 specifically can; that's its defining property versus L2.
+- Both zero out coefficients equally.
+  > Only L1 reliably produces exact zeros; L2 keeps them small but nonzero.`}
+/>
+
+## Challenges
 
 <ChallengeCard
   adapter="python"
@@ -29,55 +93,10 @@ Example: \`accuracy([1, 0, 1, 1], [1, 0, 0, 1])\` is \`0.75\`.`}
     },
   ]}
   tests={[
-    {
-      id: "basic",
-      name: "Three of four correct",
-      description: "→ 0.75",
-      code: `assert accuracy([1, 0, 1, 1], [1, 0, 0, 1]) == 0.75`,
-    },
-    {
-      id: "perfect",
-      name: "All correct",
-      description: "→ 1.0",
-      code: `assert accuracy([1, 1, 1], [1, 1, 1]) == 1.0`,
-    },
-    {
-      id: "none",
-      name: "All wrong",
-      description: "→ 0.0",
-      code: `assert accuracy([0, 0], [1, 1]) == 0.0`,
-    },
+    { id: "basic", name: "Three of four correct", description: "→ 0.75", code: `assert accuracy([1, 0, 1, 1], [1, 0, 0, 1]) == 0.75` },
+    { id: "perfect", name: "All correct", description: "→ 1.0", code: `assert accuracy([1, 1, 1], [1, 1, 1]) == 1.0` },
+    { id: "none", name: "All wrong", description: "→ 0.0", code: `assert accuracy([0, 0], [1, 1]) == 0.0` },
   ]}
-/>
-
-## Bias–variance
-
-<MultipleChoice
-  markdown={`You replace a linear model with a very deep decision tree. Training error drops to near zero but validation error rises. In bias–variance terms, what happened?
-
-- You increased bias.
-  > A more flexible model has *lower* bias, not higher — the symptom here (near-zero train error) reflects low bias.
-- [o] You decreased bias but increased variance — the flexible model now overfits.
-  > More capacity reduces bias but raises variance; the widening train/validation gap is the variance cost.
-- Both bias and variance decreased.
-  > If both fell, validation error would improve, not rise.
-- Bias and variance are unrelated to model flexibility.
-  > Model flexibility is precisely the knob that trades one for the other.`}
-/>
-
-## Regularization
-
-<MultipleChoice
-  markdown={`You want regularization that can drive some coefficients exactly to **zero**, effectively selecting features. Which penalty does that?
-
-- L2 (ridge).
-  > L2 shrinks coefficients toward zero but rarely sets them exactly to zero.
-- [o] L1 (lasso).
-  > The L1 penalty's geometry produces sparse solutions — some coefficients become exactly zero, which performs feature selection.
-- Neither can zero out coefficients.
-  > L1 specifically can; that's its defining property versus L2.
-- Both zero out coefficients equally.
-  > Only L1 reliably produces exact zeros; L2 keeps them small but nonzero.`}
 />
 
 ## Go deeper

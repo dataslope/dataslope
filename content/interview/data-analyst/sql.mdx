@@ -1,0 +1,180 @@
+---
+title: SQL
+description: Data Analyst SQL interview questions — aggregation, joins, filtering, and NULLs — with written answers, concept checks, and runnable challenges.
+---
+
+SQL is the core of almost every Data Analyst screen. This page is a
+question bank: short **Q&A** to review the ideas, **concept checks**, and
+**runnable challenges** that execute against a real in-browser database.
+
+## Q&A
+
+### What's the difference between WHERE and HAVING?
+
+`WHERE` filters individual rows **before** aggregation; `HAVING` filters
+groups **after** `GROUP BY`. An aggregate condition (like `SUM(...) > 250`)
+must go in `HAVING`, because the aggregate doesn't exist yet when `WHERE`
+runs.
+
+```sql
+SELECT region, SUM(amount) AS revenue
+FROM orders
+WHERE amount > 0            -- row-level, before grouping
+GROUP BY region
+HAVING SUM(amount) > 250    -- group-level, after aggregation
+ORDER BY revenue DESC;
+```
+
+### Explain the difference between INNER, LEFT, RIGHT, and FULL JOIN.
+
+All combine rows from two tables on a condition; they differ in which
+**unmatched** rows survive:
+
+- **INNER** — only rows with a match in *both* tables.
+- **LEFT** — all rows from the left table; `NULL`s where the right has no match.
+- **RIGHT** — all rows from the right table; `NULL`s on the left.
+- **FULL** — all rows from both; `NULL`s wherever either side is missing.
+
+"List all customers and their orders, *including customers who never
+ordered*" is the classic tell for a `LEFT JOIN`.
+
+### Why can a JOIN make a SUM too large, and how do you avoid it?
+
+Joining to a table with **multiple matching rows** duplicates the left
+row once per match — so summing a left-side column double-counts it. Fix
+it by aggregating the one-to-many side **first** (in a subquery/CTE) to
+the right grain, then joining:
+
+```sql
+WITH order_totals AS (
+  SELECT customer_id, SUM(amount) AS total
+  FROM orders
+  GROUP BY customer_id
+)
+SELECT c.name, t.total
+FROM customers c
+JOIN order_totals t ON t.customer_id = c.id;
+```
+
+### How do NULLs behave in comparisons and aggregates?
+
+`NULL` means "unknown," so any comparison with it yields `NULL` (not
+true) — use `IS NULL` / `IS NOT NULL`, never `= NULL`. Aggregates like
+`SUM`/`AVG` **skip** `NULL`s, but `COUNT(*)` counts every row while
+`COUNT(col)` counts only non-`NULL` values. Use `COALESCE(x, 0)` to
+substitute a default.
+
+### What's the difference between COUNT(*), COUNT(1), and COUNT(col)?
+
+`COUNT(*)` and `COUNT(1)` both count **rows** (identical performance in
+modern engines). `COUNT(col)` counts only rows where `col` **is not
+NULL** — so it can return a smaller number. `COUNT(DISTINCT col)` counts
+distinct non-NULL values.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`You only want the regions whose **total** revenue exceeds 250. Which clause filters on that aggregated total?
+
+- A \`WHERE revenue > 250\` clause.
+  > \`WHERE\` filters individual rows *before* aggregation, so it can't reference the per-group \`SUM\` — and the alias \`revenue\` doesn't exist yet at that stage.
+- [o] A \`HAVING SUM(amount) > 250\` clause.
+  > \`HAVING\` is evaluated *after* \`GROUP BY\`, so it can filter on aggregates like \`SUM(amount)\`.
+- Either one works; they're interchangeable.
+  > They run at different stages: \`WHERE\` before grouping (row-level), \`HAVING\` after (group-level). Filtering an aggregate belongs in \`HAVING\`.
+- Neither; you must wrap the query in a subquery first.
+  > A subquery works but isn't required — \`HAVING\` filters grouped results directly.`}
+/>
+
+<MultipleChoice
+  markdown={`A customer has placed no orders. With an ordinary \`INNER JOIN\` between \`customers\` and \`orders\`, what happens to that customer?
+
+- They appear with a \`total\` of \`0\`.
+  > That's \`LEFT JOIN\` (+ \`COALESCE\`) behavior. \`INNER JOIN\` returns only rows with a match on both sides.
+- [o] They disappear from the result entirely.
+  > \`INNER JOIN\` keeps only customers with at least one matching order, so a customer with none is dropped — which is why "include non-buyers" needs a \`LEFT JOIN\`.
+- They appear with a \`total\` of \`NULL\` and the query errors.
+  > \`INNER JOIN\` omits them rather than erroring. (Under \`LEFT JOIN\`, the sum is \`NULL\` until you wrap it in \`COALESCE\`.)
+- Every other customer's row is duplicated.
+  > Join type doesn't duplicate unmatched rows; it controls whether unmatched left-side rows are kept.`}
+/>
+
+## Challenges
+
+<SqlChallengeCard
+  dialect="duckdb"
+  title="Total revenue per region"
+  instructions={`The table \`orders\` has columns \`id\`, \`region\`, \`category\`, and \`amount\`. Return the **total revenue per region**: two columns, \`region\` and \`revenue\` (the summed \`amount\`), sorted by \`revenue\` descending.`}
+  initSql={`CREATE TABLE orders AS
+SELECT * FROM (VALUES
+  (1,  'North', 'A', 120.00),
+  (2,  'South', 'B',  80.50),
+  (3,  'East',  'A', 200.00),
+  (4,  'West',  'C',  50.25),
+  (5,  'North', 'B',  60.00),
+  (6,  'South', 'A',  90.00),
+  (7,  'East',  'C', 140.00),
+  (8,  'West',  'B', 110.00),
+  (9,  'North', 'C',  75.50),
+  (10, 'South', 'B',  65.00)
+) AS t(id, region, category, amount);`}
+  starterCode={`-- Sum amount per region, highest first.
+SELECT
+  region,
+  -- your aggregate here AS revenue
+FROM orders
+-- group + order here;`}
+  solutionSql={`SELECT
+  region,
+  SUM(amount) AS revenue
+FROM orders
+GROUP BY region
+ORDER BY revenue DESC;`}
+  tests={[
+    { id: "row_count", name: "One row per region", description: "Four regions → four rows", expectedRowCount: 4 },
+    { id: "columns", name: "Has the required columns", description: "region and revenue", expectedColumnsInclude: ["region", "revenue"] },
+  ]}
+/>
+
+<SqlChallengeCard
+  dialect="duckdb"
+  title="Total spend per customer, including zero"
+  instructions={`Two tables are loaded: \`customers\` (\`id\`, \`name\`, \`region\`) and \`orders\` (\`id\`, \`customer_id\`, \`amount\`). Return **every** customer with their total order \`amount\` — including customers who placed **no** orders, which should show \`0\`. Columns: \`name\`, \`total\`. Sort by \`total\` descending.`}
+  initSql={`CREATE TABLE customers AS SELECT * FROM (VALUES
+  (1, 'Ava', 'North'),
+  (2, 'Ben', 'South'),
+  (3, 'Cy',  'East'),
+  (4, 'Di',  'West')
+) AS t(id, name, region);
+
+CREATE TABLE orders AS SELECT * FROM (VALUES
+  (101, 1, 120.00),
+  (102, 1,  40.00),
+  (103, 2,  80.00),
+  (104, 3,  55.00),
+  (105, 3,  45.00),
+  (106, 2,  30.00)
+) AS t(id, customer_id, amount);`}
+  starterCode={`-- Every customer, even those with no orders (total 0).
+SELECT
+  c.name
+  -- , total here
+FROM customers c
+-- join orders, then group + order;`}
+  solutionSql={`SELECT
+  c.name,
+  COALESCE(SUM(o.amount), 0) AS total
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.id
+GROUP BY c.name
+ORDER BY total DESC;`}
+  tests={[
+    { id: "row_count", name: "Every customer appears", description: "Four customers → four rows", expectedRowCount: 4 },
+    { id: "columns", name: "Has the required columns", description: "name and total", expectedColumnsInclude: ["name", "total"] },
+  ]}
+/>
+
+## Go deeper
+
+- [Intro to SQL with Postgres](/learn/intro-sql-postgres)
+- [SQL Analytics with DuckDB](/learn/sql-analytics-duckdb)

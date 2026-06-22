@@ -1,0 +1,111 @@
+---
+title: Python Fundamentals
+description: Backend interview questions on Python's mutability, identity vs equality, generators, *args/**kwargs, and the GIL.
+---
+
+Language-fundamentals questions check that you know Python's sharp edges,
+not just syntax. Review the Q&A, then the concept checks.
+
+## Q&A
+
+### Mutable vs immutable types — why does it matter?
+
+Immutable values (`int`, `str`, `tuple`, `frozenset`) can't change after
+creation; mutable ones (`list`, `dict`, `set`) can. It matters for
+**aliasing** (two names referencing the same list see each other's
+edits), for **dict/set keys** (must be hashable → immutable), and for
+**function arguments** (a function can mutate a list you passed in).
+
+### `is` vs `==`?
+
+`==` compares **values**; `is` compares **identity** (same object in
+memory). Use `==` for "are these equal," and reserve `is` for singletons
+like `None` (`if x is None`). They can disagree: two equal lists are
+`==` but not `is`.
+
+### What's the mutable-default-argument trap?
+
+A default argument is evaluated **once**, at definition time — so a
+`def f(x, acc=[])` shares one list across all calls:
+
+```python
+def add(x, acc=[]):   # BUG: one shared list
+    acc.append(x)
+    return acc
+
+add(1)   # [1]
+add(2)   # [1, 2]  ← not [2]!
+```
+
+Fix it with a `None` sentinel:
+
+```python
+def add(x, acc=None):
+    if acc is None:
+        acc = []
+    acc.append(x)
+    return acc
+```
+
+### Generators vs lists?
+
+A list builds and holds **all** items in memory; a generator (`yield`, or
+a generator expression) produces items **lazily**, one at a time. Use a
+generator for large or streaming sequences to keep memory flat — `sum(x*x
+for x in range(10_000_000))` never materializes the squares.
+
+### What are `*args` and `**kwargs`?
+
+`*args` captures extra **positional** arguments as a tuple; `**kwargs`
+captures extra **keyword** arguments as a dict. They let a function
+accept a variable number of arguments and forward them:
+`wrapper(*args, **kwargs) → fn(*args, **kwargs)`.
+
+### What is the GIL, and when does it bite?
+
+CPython's **Global Interpreter Lock** lets only one thread execute Python
+bytecode at a time. So threads don't speed up **CPU-bound** work — use
+`multiprocessing` (separate processes) for that. Threads still help
+**I/O-bound** work (network, disk), where they wait, not compute; `async`
+is another I/O-bound option.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`What does this print?
+
+\`\`\`python
+def add(x, acc=[]):
+    acc.append(x)
+    return acc
+
+print(add(1))
+print(add(2))
+\`\`\`
+
+- \`[1]\` then \`[2]\`
+  > That's what you'd get with a fresh list each call — but a default argument is created only once.
+- [o] \`[1]\` then \`[1, 2]\`
+  > The default list is evaluated once at definition time and **shared** across calls, so the second call appends to the same list.
+- \`[1]\` then \`[1]\`
+  > The list persists *and* keeps growing across calls; the second call sees the first call's element.
+- It raises an error on the second call.
+  > It runs fine — that's exactly why the shared-state bug is so easy to miss.`}
+/>
+
+<MultipleChoice
+  markdown={`When should you use \`is\` instead of \`==\`?
+
+- Always — \`is\` is just a faster \`==\`.
+  > They mean different things: \`is\` tests object **identity**, not value equality, so swapping them changes behavior.
+- [o] For comparing against singletons like \`None\` (\`if x is None\`).
+  > \`is\` checks identity, which is exactly right for the unique \`None\` object; value comparisons should use \`==\`.
+- For comparing two strings' contents.
+  > Use \`==\` for content; \`is\` may appear to work due to interning but isn't guaranteed.
+- For comparing two lists' contents.
+  > Two distinct lists with equal contents are \`==\` but never \`is\`; use \`==\`.`}
+/>
+
+## Go deeper
+
+- [Python Basics](/learn/python-basics)

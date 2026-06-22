@@ -1,0 +1,171 @@
+---
+title: SQL
+description: Data Engineer SQL interview questions — window functions, CTEs, deduplication, and optimization — with answers, concept checks, and runnable challenges.
+---
+
+Engineering SQL screens go deeper than analyst ones: window functions,
+deduplication, and reasoning about performance. Review the Q&A, then run
+the challenges.
+
+## Q&A
+
+### What's the difference between RANK, DENSE_RANK, and ROW_NUMBER?
+
+All number rows within a partition; they differ on **ties**:
+
+- **`ROW_NUMBER`** — always distinct (1, 2, 3, 4), ties broken arbitrarily.
+- **`RANK`** — ties share a rank, then it **skips** (1, 2, 2, 4).
+- **`DENSE_RANK`** — ties share a rank, **no skip** (1, 2, 2, 3).
+
+```sql
+SELECT name, score,
+  ROW_NUMBER() OVER (ORDER BY score DESC) AS rn,
+  RANK()       OVER (ORDER BY score DESC) AS rnk,
+  DENSE_RANK() OVER (ORDER BY score DESC) AS dr
+FROM players;
+```
+
+### How do you keep only the latest row per key (deduplication)?
+
+Number rows within each key by recency, then keep number 1:
+
+```sql
+SELECT *
+FROM events
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY user_id ORDER BY event_time DESC
+) = 1;
+```
+
+Use `ROW_NUMBER` (not `RANK`) so exact-tie timestamps still collapse to
+one row. Without `QUALIFY` (e.g. Postgres), wrap it in a subquery and
+filter `WHERE rn = 1`.
+
+### What's the difference between a CTE and a subquery? When is a CTE worth it?
+
+Both produce an intermediate result. A **CTE** (`WITH … AS`) is named and
+can be referenced multiple times and read top-to-bottom, which makes
+multi-step transformations far more readable. A correlated **subquery**
+runs per outer row and can be a performance trap. CTEs shine for staging
+steps and recursive queries.
+
+### A query is slow. What do you check first?
+
+Read the **query plan** (`EXPLAIN`). Look for full scans where an index
+should help, the join order/strategy, and the row estimates (bad
+estimates → bad plans, often from stale statistics). Common wins: filter
+early, avoid `SELECT *`, ensure join/filter columns are indexed,
+pre-aggregate before joining, and partition/prune large tables.
+
+### What's the difference between UNION and UNION ALL?
+
+`UNION` concatenates two result sets **and removes duplicates** (an
+expensive sort/hash); `UNION ALL` keeps everything, including duplicates.
+Prefer `UNION ALL` unless you specifically need dedup — it skips the
+distinct step.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`Two orders in the same region are tied on \`amount\`. You need both to get the **same** rank, and the next distinct amount to skip a number (1, 2, 2, 4). Which function do you want?
+
+- \`ROW_NUMBER()\`
+  > \`ROW_NUMBER()\` assigns a distinct number to every row even on ties (1, 2, 3, 4), breaking ties arbitrarily — it never repeats a value.
+- [o] \`RANK()\`
+  > \`RANK()\` gives tied rows the same rank and then skips, producing 1, 2, 2, 4 — exactly the pattern described.
+- \`DENSE_RANK()\`
+  > \`DENSE_RANK()\` also ties rows together but does *not* skip — it yields 1, 2, 2, 3.
+- \`NTILE(4)\`
+  > \`NTILE\` buckets rows into a fixed number of groups; it isn't a tie-aware ranking.`}
+/>
+
+<MultipleChoice
+  markdown={`Why \`ROW_NUMBER()\` rather than \`RANK()\` for "keep one row per user"?
+
+- They're interchangeable for deduplication.
+  > They differ on ties: two rows with the *same* \`event_time\` would both get rank 1 under \`RANK\`, so you'd keep both.
+- [o] \`ROW_NUMBER()\` guarantees a single row per partition even on ties, so filtering to \`= 1\` keeps exactly one.
+  > It assigns distinct numbers within each partition no matter what — exactly what "one row per user" needs.
+- \`RANK()\` can't be used in a window at all.
+  > \`RANK()\` is a valid window function; it's just the wrong tie behavior for dedup.
+- \`ROW_NUMBER()\` sorts the whole table, which is required.
+  > Ordering happens within each partition for ranking, not as a global sort requirement.`}
+/>
+
+## Challenges
+
+<SqlChallengeCard
+  dialect="duckdb"
+  title="Rank orders by amount within region"
+  instructions={`The table \`orders\` has columns \`id\`, \`region\`, and \`amount\`. For every row, add a column \`rnk\` giving its rank **within its region** by \`amount\` descending (largest = rank 1). Return \`id\`, \`region\`, \`amount\`, \`rnk\`. Sort by \`region\`, then \`rnk\`.`}
+  initSql={`CREATE TABLE orders AS
+SELECT * FROM (VALUES
+  (1, 'North', 120.00),
+  (2, 'North',  60.00),
+  (3, 'North',  75.50),
+  (4, 'South',  80.50),
+  (5, 'South',  90.00),
+  (6, 'South',  65.00),
+  (7, 'East',  200.00),
+  (8, 'East',  140.00)
+) AS t(id, region, amount);`}
+  starterCode={`-- Use a window function partitioned by region.
+SELECT
+  id,
+  region,
+  amount
+  -- , <window function> AS rnk
+FROM orders
+-- order by region, rnk;`}
+  solutionSql={`SELECT
+  id,
+  region,
+  amount,
+  RANK() OVER (PARTITION BY region ORDER BY amount DESC) AS rnk
+FROM orders
+ORDER BY region, rnk;`}
+  tests={[
+    { id: "row_count", name: "All rows are returned", description: "A window function keeps every input row (8 here)", expectedRowCount: 8 },
+    { id: "columns", name: "Has the required columns", description: "id, region, amount, rnk", expectedColumnsInclude: ["id", "region", "amount", "rnk"] },
+  ]}
+/>
+
+<SqlChallengeCard
+  dialect="duckdb"
+  title="Most recent event per user"
+  instructions={`The table \`events\` has columns \`user_id\`, \`event_time\`, and \`status\`, with several rows per user. Return exactly **one row per user** — the row with the most recent \`event_time\`. Columns: \`user_id\`, \`event_time\`, \`status\`.`}
+  initSql={`CREATE TABLE events AS SELECT * FROM (VALUES
+  (1, TIMESTAMP '2024-01-01 10:00', 'signup'),
+  (1, TIMESTAMP '2024-01-03 09:00', 'active'),
+  (2, TIMESTAMP '2024-01-02 12:00', 'signup'),
+  (2, TIMESTAMP '2024-01-05 08:00', 'churn'),
+  (2, TIMESTAMP '2024-01-04 15:00', 'active'),
+  (3, TIMESTAMP '2024-01-01 11:00', 'signup')
+) AS t(user_id, event_time, status);`}
+  starterCode={`-- Keep only the most recent row per user_id.
+SELECT
+  user_id,
+  event_time,
+  status
+FROM events
+-- use a window function to rank within each user, then keep rank 1;`}
+  solutionSql={`SELECT
+  user_id,
+  event_time,
+  status
+FROM events
+QUALIFY ROW_NUMBER() OVER (
+  PARTITION BY user_id
+  ORDER BY event_time DESC
+) = 1
+ORDER BY user_id;`}
+  tests={[
+    { id: "row_count", name: "One row per user", description: "Three users → three rows", expectedRowCount: 3 },
+    { id: "columns", name: "Has the required columns", description: "user_id, event_time, status", expectedColumnsInclude: ["user_id", "event_time", "status"] },
+  ]}
+/>
+
+## Go deeper
+
+- [SQL Analytics with DuckDB](/learn/sql-analytics-duckdb)
+- [Database Design with PostgreSQL](/learn/database-design-postgresql)

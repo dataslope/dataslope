@@ -1,0 +1,170 @@
+---
+title: Data Structures & Algorithms
+description: Backend interview questions on Big-O, hashing, and stacks — with answers, concept checks, and three runnable coding challenges (Two Sum, Valid Anagram, Valid Parentheses).
+---
+
+The core of a coding interview. Review the Q&A, take the concept checks,
+then solve the three challenges — they run against a test suite in your
+browser.
+
+## Q&A
+
+### What is Big-O notation, and why do interviewers care?
+
+Big-O describes how an algorithm's time or space grows with input size
+**n**, ignoring constants — O(1), O(log n), O(n), O(n log n), O(n²), …
+Interviewers care because it predicts whether a solution scales: an O(n²)
+double loop that's fine for 100 items melts at 1,000,000. The usual game
+is "make this brute-force O(n²) into O(n) with the right data structure."
+
+### When do you reach for a hash map?
+
+When you need **O(1) average lookup/insert by key** — membership tests,
+counting frequencies, grouping, or "have I seen this before?" It's what
+turns many O(n²) "compare all pairs" problems into a single O(n) pass
+(see Two Sum below).
+
+### Array vs linked list — trade-offs?
+
+**Arrays**: O(1) random access by index, cache-friendly, but O(n) insert
+/delete in the middle. **Linked lists**: O(1) insert/delete given the
+node, but O(n) access and poor cache locality. Most day-to-day code
+favors dynamic arrays; linked lists shine for frequent splice operations
+or as building blocks (queues, LRU caches).
+
+### When is a stack the right structure?
+
+When the problem is about the **most recently seen** item — matching/
+nesting (parentheses), undo, backtracking, or DFS. Its LIFO order encodes
+"close the thing you opened last," which a counter can't (see Valid
+Parentheses).
+
+### Recursion vs iteration?
+
+Recursion expresses naturally-recursive structure (trees, divide and
+conquer) clearly, but each call uses stack frames — deep recursion can
+overflow (Python's default limit is ~1000). Iteration (often with an
+explicit stack/queue) avoids that and is usually faster by a constant
+factor. Convert recursion to iteration when depth can be large.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`Your first Two Sum solution uses two nested loops — O(n²). How does a single pass with a hash map bring it to O(n)?
+
+- It can't; comparing all pairs is fundamentally O(n²).
+  > A hash map avoids comparing all pairs by checking each number once against what you've already seen.
+- [o] As you scan, store each value's index in a dict and check whether \`target - num\` is already in it.
+  > Each lookup/insert is O(1) average, so one pass over n elements is O(n) time (O(n) space) — the standard optimal Two Sum.
+- Sort the array first, then binary search for each complement.
+  > Sorting is O(n log n) and loses the original indices the question asks for — slower and more bookkeeping.
+- Use recursion to divide the array in half.
+  > Divide-and-conquer doesn't apply cleanly and wouldn't beat the O(n) hash-map scan.`}
+/>
+
+<MultipleChoice
+  markdown={`Why is a **stack** the right structure for Valid Parentheses, rather than counting brackets?
+
+- Counting is fine; the bracket counts just have to be equal.
+  > Equal counts aren't enough: \`"([)]"\` has matching counts but is invalid because the nesting order is wrong.
+- [o] A stack enforces ordering — each closer must match the **most recently opened** bracket (LIFO).
+  > LIFO matching catches interleaved brackets like \`"([)]"\` that a counter would wrongly accept.
+- A queue (FIFO) would work just as well.
+  > FIFO matches the *oldest* open bracket — the opposite of nesting; \`"([)]"\` would be accepted incorrectly.
+- You need a hash map, not a stack.
+  > A map helps look up the matching pair, but the stack enforces correct nesting order.`}
+/>
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Two Sum"
+  instructions={`Implement \`two_sum(nums, target)\`. Return the **indices** of the two numbers that add up to \`target\`, as a list of two ints. Exactly one valid answer exists; either order is fine.
+
+Example: \`two_sum([2, 7, 11, 15], 9)\` → \`[0, 1]\`.`}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def two_sum(nums, target):
+    # Return the indices of the two numbers that add up to target.
+    pass`,
+      solutionCode: `def two_sum(nums, target):
+    seen = {}
+    for i, n in enumerate(nums):
+        if target - n in seen:
+            return [seen[target - n], i]
+        seen[n] = i
+    return []`,
+    },
+  ]}
+  tests={[
+    { id: "returns_pair", name: "Returns a pair of indices", description: "two_sum returns two indices", code: `r = two_sum([2, 7, 11, 15], 9)
+assert r is not None, "Function returned None"
+assert len(r) == 2, f"Expected 2 indices, got {len(r)}"` },
+    { id: "basic", name: "Finds 2 + 7 = 9", description: "indices 0 and 1", code: `assert sorted(two_sum([2, 7, 11, 15], 9)) == [0, 1]` },
+    { id: "middle", name: "A pair not at the start", description: "indices 1 and 2", code: `assert sorted(two_sum([3, 2, 4], 6)) == [1, 2]` },
+    { id: "duplicates", name: "Handles duplicate values", description: "indices 0 and 1", code: `assert sorted(two_sum([3, 3], 6)) == [0, 1]` },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Valid Anagram"
+  instructions={`Implement \`is_anagram(s, t)\`. Return \`True\` if \`t\` is an anagram of \`s\` (same characters with the same counts, any order), else \`False\`. Two empty strings are anagrams.`}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def is_anagram(s, t):
+    # Return True if t is an anagram of s.
+    pass`,
+      solutionCode: `from collections import Counter
+
+def is_anagram(s, t):
+    return Counter(s) == Counter(t)`,
+    },
+  ]}
+  tests={[
+    { id: "basic_true", name: "listen / silent", description: "Same letters reordered → True", code: `assert is_anagram("listen", "silent") is True` },
+    { id: "basic_false", name: "rat / car", description: "Different letters → False", code: `assert is_anagram("rat", "car") is False` },
+    { id: "length_mismatch", name: "Different lengths → False", description: "An extra character can't be an anagram", code: `assert is_anagram("a", "ab") is False` },
+    { id: "empty", name: "Two empty strings", description: "Edge case → True", code: `assert is_anagram("", "") is True` },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Valid Parentheses"
+  instructions={`Implement \`is_valid(s)\` for a string of only \`()\`, \`[]\`, \`{}\`. Return \`True\` if every opener is closed by the matching type in the correct order, else \`False\`. Empty is valid.`}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def is_valid(s):
+    # Return True if the brackets are balanced and correctly nested.
+    pass`,
+      solutionCode: `def is_valid(s):
+    pairs = {")": "(", "]": "[", "}": "{"}
+    stack = []
+    for ch in s:
+        if ch in "([{":
+            stack.append(ch)
+        elif ch in pairs:
+            if not stack or stack.pop() != pairs[ch]:
+                return False
+    return len(stack) == 0`,
+    },
+  ]}
+  tests={[
+    { id: "simple", name: "Simple pair", description: '"()" → True', code: `assert is_valid("()") is True` },
+    { id: "all_types", name: "All three types", description: '"()[]{}" → True', code: `assert is_valid("()[]{}") is True` },
+    { id: "wrong_close", name: "Mismatched close", description: '"(]" → False', code: `assert is_valid("(]") is False` },
+    { id: "interleaved", name: "Bad nesting", description: '"([)]" → False', code: `assert is_valid("([)]") is False` },
+    { id: "nested", name: "Correct nesting", description: '"{[]}" → True', code: `assert is_valid("{[]}") is True` },
+    { id: "empty", name: "Empty string", description: "→ True", code: `assert is_valid("") is True` },
+  ]}
+/>
+
+## Go deeper
+
+- [Python Basics](/learn/python-basics)
+- [Mastering DSA in C++](/learn/mastering-dsa-cpp)

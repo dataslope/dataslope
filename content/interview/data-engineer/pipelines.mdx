@@ -1,0 +1,80 @@
+---
+title: Pipelines & Systems
+description: Data Engineer interview questions on batch vs streaming, idempotency, partitioning, orchestration, and file formats.
+---
+
+The systems half of a DE interview: moving data reliably and cheaply at
+scale. These are the recurring "how would you build it?" themes.
+
+## Q&A
+
+### Batch vs streaming — how do you choose?
+
+**Batch** processes bounded chunks on a schedule — simple, cheap,
+easy to reprocess; latency is minutes-to-hours. **Streaming** processes
+events continuously — low latency, but more operationally complex
+(state, ordering, exactly-once). Choose by the **latency requirement**:
+dashboards refreshed hourly → batch; fraud/alerting that needs seconds →
+streaming. Many systems do both (lambda/kappa).
+
+### What does it mean for a pipeline to be idempotent, and why does it matter?
+
+Running it twice produces the **same** final state as running it once.
+This makes retries and backfills safe after partial failures. Achieve it
+by **overwriting** a target partition or **upserting** by key
+(`MERGE`/delete-then-insert) instead of blind `INSERT` (which would
+duplicate rows on a re-run).
+
+### Why partition large tables, and what makes a good partition key?
+
+Partitioning lets the engine **prune** — skip files/partitions that can't
+match a query — cutting scan cost dramatically. A good key is one queries
+**filter on** (usually a date like `event_date`) with even, not-too-small
+partitions. Too-granular partitioning creates many tiny files (the
+"small files problem") and hurts performance.
+
+### What does an orchestrator (Airflow/Dagster) give you over cron?
+
+A **DAG** of tasks with explicit dependencies, so steps run in the right
+order and only after upstreams succeed; plus retries, backfills,
+scheduling, monitoring, and lineage. Cron just fires a command at a time
+with no dependency awareness or recovery.
+
+### Why is Parquet preferred over CSV for analytics?
+
+Parquet is **columnar** and compressed: queries read only the columns
+they need (less I/O), compression is far better (typed columns), and it
+carries a schema + statistics enabling predicate pushdown. CSV is
+row-oriented, untyped, and must be fully scanned.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`A nightly job sometimes gets re-run after a partial failure. Why make it **idempotent** (e.g. overwrite the partition / \`MERGE\` by key)?
+
+- It makes the job run faster.
+  > Idempotency is about correctness on re-runs, not speed.
+- [o] Re-running produces the same final result instead of duplicating or double-counting rows.
+  > An idempotent write means a retry converges to the correct state rather than appending duplicates.
+- It removes the need for any scheduling.
+  > You still schedule it; idempotency just makes retries and backfills safe.
+- It guarantees the upstream data is correct.
+  > It only controls *your* write behavior on re-run; upstream quality is separate.`}
+/>
+
+<MultipleChoice
+  markdown={`A 2 TB events table is almost always queried with \`WHERE event_date = '…'\`. What's the highest-impact change?
+
+- Convert it to CSV for portability.
+  > CSV is row-oriented and untyped — it would *increase* scan cost, the opposite of what's needed.
+- [o] Partition (and/or order) the table by \`event_date\` so queries prune to one day's files.
+  > Partitioning on the common filter lets the engine skip the other ~99.9% of data — a massive I/O win.
+- Add every column to a single composite index.
+  > Warehouse scan cost is dominated by data read; partition pruning + columnar format matter far more than a wide index.
+- Store it as one giant file.
+  > A single file prevents pruning and parallelism; you want partitioned, reasonably-sized files.`}
+/>
+
+## Go deeper
+
+- [SQL Analytics with DuckDB](/learn/sql-analytics-duckdb) — querying Parquet directly.

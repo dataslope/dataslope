@@ -1,0 +1,90 @@
+---
+title: dbt
+description: Analytics Engineer interview questions on dbt models, ref/source, materializations, tests, and incremental builds.
+---
+
+dbt is the tool AE interviews assume. Review the Q&A, then the concept
+checks.
+
+## Q&A
+
+### What is dbt, and what does it actually do?
+
+dbt is the **T** in ELT: you write transformations as `SELECT` statements
+("models"), and dbt handles building them **in order** in your warehouse,
+managing dependencies, materializations, tests, and docs. It brings
+software practices — version control, modularity, testing, CI — to SQL
+analytics. It transforms data already in the warehouse; it doesn't move
+data (that's EL tools).
+
+### What do `ref()` and `source()` do?
+
+`{{ ref('stg_orders') }}` references another **model**; `{{ source(...) }}`
+references a declared raw **source** table. Both let dbt build the
+**dependency graph (DAG)** — so it knows build order and can swap
+schemas between dev and prod. Hardcoding table names breaks lineage and
+environment handling.
+
+### Compare the materializations: view, table, incremental, ephemeral.
+
+- **view** — re-runs the SQL on every query; cheap to build, slower reads.
+- **table** — built once per run; fast reads, recomputed fully each run.
+- **incremental** — only processes **new/changed** rows on each run; essential for large append-mostly tables.
+- **ephemeral** — inlined as a CTE into downstream models; not materialized or queryable on its own.
+
+### How do dbt tests work?
+
+Tests **assert** conditions and fail the run when violated — they don't
+modify data. Built-in **schema tests** (`unique`, `not_null`,
+`accepted_values`, `relationships`) guard keys and referential integrity;
+**singular tests** are custom SQL that should return zero rows. They
+encode your assumptions so bad data fails loudly.
+
+### When do you use an incremental model, and what's the catch?
+
+Use it when a table is large and mostly **appends** (events, logs), so
+full rebuilds are too slow/expensive. The catch: you need a reliable way
+to identify new rows (a timestamp/id via `is_incremental()`), correct
+handling of late-arriving/updated rows, and an occasional **full
+refresh** to repair drift.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`A dbt model is queried constantly by dashboards and is expensive to compute, but its source updates only nightly. Best default materialization?
+
+- \`view\`
+  > A view re-runs the SQL on every query, pushing the expensive computation onto every dashboard load.
+- [o] \`table\`
+  > Compute once per nightly run, serve fast reads all day — the right trade-off for an expensive, frequently-read, slowly-changing model.
+- \`ephemeral\`
+  > Ephemeral models are inlined as CTEs and aren't queryable on their own, so dashboards can't read them.
+- It doesn't matter; they perform identically.
+  > Materializations have very different read/compute trade-offs.`}
+/>
+
+<MultipleChoice
+  markdown={`Why reference an upstream model with \`{{ ref('stg_orders') }}\` instead of a hardcoded \`analytics.stg_orders\`?
+
+- It runs the query faster.
+  > \`ref\` doesn't change runtime performance; it changes how dbt builds the project.
+- [o] dbt builds the dependency graph from \`ref\`/\`source\`, so it knows build order and can manage dev/prod environments.
+  > \`ref\` is how dbt learns dependencies, enabling correct run ordering, lineage, and schema swapping.
+- It lets you skip writing tests.
+  > Testing is orthogonal to \`ref\`.
+- It converts the model to a view automatically.
+  > \`ref\` has nothing to do with materialization choice.`}
+/>
+
+<MultipleChoice
+  markdown={`A \`unique\` + \`not_null\` test on a model's \`id\` column gives you what?
+
+- It deduplicates the column automatically during the run.
+  > dbt tests **assert**; they don't modify data. A failure surfaces the problem to fix upstream.
+- [o] A check that fails the run if \`id\` has duplicates or nulls — guarding the model's grain and key integrity.
+  > These schema tests validate that \`id\` is a valid primary key and fail loudly when violated.
+- A guarantee the source system can never produce bad data.
+  > Tests catch bad data after the fact; they can't constrain the source.
+- A performance index on \`id\`.
+  > Tests aren't indexes; they don't change physical storage.`}
+/>

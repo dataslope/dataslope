@@ -1,53 +1,98 @@
 ---
 title: ML System Design
-description: Concept checks on batch vs online inference, training–serving skew, and model/data drift — the production side of ML interviews.
+description: ML Engineer interview questions on batch vs online inference, feature stores, training–serving skew, and model/data drift.
 ---
 
-The round that most distinguishes an ML *Engineer* from a data scientist
-is **ML system design** — getting models into production and keeping
-them healthy. These concept checks cover recurring themes.
+The round that most distinguishes an ML *Engineer* is getting models
+into production and keeping them healthy. Review the Q&A, then the
+concept checks.
 
-## Batch vs online inference
+## Q&A
+
+### Batch vs online (real-time) inference?
+
+**Batch** precomputes predictions on a schedule and stores them — simple,
+cheap, high-throughput, but stale and unable to use request-time
+features. **Online** serves predictions per request behind a low-latency
+service — fresh and contextual, but you own latency budgets, scaling, and
+availability. Choose by the latency and freshness the product needs;
+hybrids (cached batch features + online scoring) are common.
+
+### What is a feature store and why use one?
+
+A central system for **defining, storing, and serving features**
+consistently for both training and serving. It solves two problems:
+reuse (teams share vetted features) and **train/serve consistency** (the
+same transformation backs both paths), which prevents skew.
+
+### What is training–serving skew?
+
+When a feature is computed **differently** at training time than at
+serving time (different code, data, or timing), so the model sees inputs
+in production it never saw in training. Offline metrics look fine;
+production underperforms. Fix it by sharing one feature-computation path
+(feature store / shared transforms).
+
+### How do you monitor a model in production?
+
+Track **operational** health (latency, error rate, throughput) and
+**model** health: input feature distributions (data drift), prediction
+distribution, and — when labels arrive — live accuracy/precision. Alert
+on drift and degradation, log inputs/predictions for debugging, and have
+a retraining + rollback path.
+
+### What is drift, and what do you do about it?
+
+**Data drift** = input distribution shifts; **concept drift** = the
+input→label relationship shifts. Either degrades a once-good model over
+time even with unchanged code. Detect via distribution monitoring;
+respond by retraining on recent data (often automated) and, where
+needed, redesigning features.
+
+### How do you roll out a new model version safely?
+
+**Shadow** it first (serve live traffic, log predictions, don't act on
+them) to compare against the incumbent; then **canary** to a small
+percentage, watch guardrails, and ramp up. Keep the previous version
+ready for instant **rollback**.
+
+## Concept checks
 
 <MultipleChoice
-  markdown={`A product-recommendation model must respond within ~50 ms to a live web request. Which serving pattern fits, and what's the trade-off?
+  markdown={`A product-recommendation model must respond within ~50 ms to a live web request. Which serving pattern fits, and the trade-off?
 
 - Batch inference: precompute nothing and recompute per request offline.
-  > "Batch" means precomputing predictions on a schedule — it can't answer a live 50 ms request on fresh inputs by itself.
-- [o] Online (real-time) inference behind a low-latency service; the trade-off is operational complexity (scaling, latency budgets, monitoring) versus batch's simplicity.
-  > Sub-second, per-request predictions require an online service; you take on latency/availability/scaling concerns that a nightly batch job avoids.
+  > "Batch" means precomputing on a schedule — it can't answer a live 50 ms request on fresh inputs by itself.
+- [o] Online (real-time) inference behind a low-latency service; the trade-off is operational complexity vs batch's simplicity.
+  > Sub-second per-request predictions require an online service, taking on latency/availability/scaling concerns.
 - It doesn't matter; latency is never a modeling concern.
-  > Latency budgets directly shape architecture, feature availability, and even model choice.
+  > Latency budgets directly shape architecture, feature availability, and model choice.
 - Always precompute every possible recommendation in advance.
-  > Feasible only for tiny input spaces; for large/contextual inputs you need online inference (often plus cached/batch features).`}
+  > Feasible only for tiny input spaces; large/contextual inputs need online inference.`}
 />
 
-## Training–serving skew
-
 <MultipleChoice
-  markdown={`A model evaluates well offline but underperforms in production. You discover a feature is computed one way in the training pipeline and a different way in the serving path. What is this called, and the usual fix?
+  markdown={`A model evaluates well offline but underperforms in production. A feature is computed one way in training and another way in serving. What is this, and the fix?
 
 - Concept drift; fix by retraining more often.
-  > Drift is the world changing over time. Here the world didn't change — the *feature computation* differs between train and serve.
-- [o] Training–serving skew; fix by sharing one feature-computation path (e.g., a feature store / shared transform) so train and serve match.
-  > Identical features at train and serve time is the goal; a shared transformation or feature store eliminates the discrepancy.
+  > Drift is the world changing over time. Here the *feature computation* differs between train and serve.
+- [o] Training–serving skew; fix by sharing one feature-computation path (e.g. a feature store).
+  > Identical features at train and serve time is the goal; a shared transform eliminates the discrepancy.
 - Overfitting; fix with more regularization.
-  > Overfitting shows as a train/validation gap offline, not as a train-vs-serve mismatch.
+  > Overfitting shows as a train/validation gap offline, not a train-vs-serve mismatch.
 - Label leakage; fix by removing the label.
-  > Leakage is using future/target info as a feature; that's a different failure from inconsistent feature code paths.`}
+  > Leakage is using future/target info as a feature — a different failure.`}
 />
 
-## Drift & monitoring
-
 <MultipleChoice
-  markdown={`Months after deployment, a model's accuracy slowly degrades even though the code never changed. What's the most likely cause, and what should the system do?
+  markdown={`Months after deployment a model's accuracy slowly degrades though the code never changed. Most likely cause and response?
 
 - The model file became corrupted; redeploy the same model.
-  > Static artifacts don't rot; redeploying the same model won't help if the input distribution has shifted.
-- [o] Data/concept drift — the input distribution or input→label relationship shifted; monitor for drift and retrain on recent data.
-  > Real-world distributions change over time, so a once-good model decays. Production ML monitors inputs/predictions and retrains or alerts when drift is detected.
+  > Static artifacts don't rot; redeploying won't help if the input distribution shifted.
+- [o] Data/concept drift — the input distribution or input→label relationship shifted; monitor and retrain on recent data.
+  > Real-world distributions change, so a once-good model decays; production ML monitors and retrains/alerts on drift.
 - Nothing is wrong; model metrics never change in production.
-  > Silent degradation from drift is one of the most common production ML failures.
+  > Silent degradation from drift is one of the most common production failures.
 - The serving hardware is too slow.
   > Latency affects speed, not predictive accuracy.`}
 />

@@ -1,11 +1,6 @@
 {
   "title": "Data Analyst",
-  "description": "Interview prep for Data Analyst roles: SQL fluency, aggregation, joins, pandas, and communicating insight.",
+  "description": "Interview prep for Data Analyst roles: SQL, pandas, statistics, and communicating insight.",
   "root": true,
-  "pages": [
-    "index",
-    "sql-aggregations",
-    "sql-joins",
-    "pandas-essentials"
-  ]
+  "pages": ["index", "sql", "pandas", "statistics-and-communication"]
 }

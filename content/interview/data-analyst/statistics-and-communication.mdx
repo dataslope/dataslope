@@ -1,0 +1,81 @@
+---
+title: Statistics & Communication
+description: Data Analyst interview questions on descriptive statistics, correlation vs causation, sampling bias, and communicating findings.
+---
+
+Analysts are judged as much on **judgment and communication** as on
+query syntax. These come up in the "how would you analyze…?" portion of
+the interview.
+
+## Q&A
+
+### When would you report the median instead of the mean?
+
+When the distribution is **skewed** or has outliers. Income, house
+prices, and session durations are right-skewed: a few huge values drag
+the mean up, so the median ("typical" value) is more representative.
+Report both when the gap between them is itself informative.
+
+### Explain "correlation does not imply causation" with an example.
+
+Two variables can move together because of a **confounder** or
+coincidence, not because one causes the other. Ice-cream sales correlate
+with drownings — both are driven by hot weather (the confounder), not by
+each other. To argue causation you need a controlled experiment (A/B
+test) or a careful causal-inference design.
+
+### What is sampling bias, and how can it distort results?
+
+When the sample isn't representative of the population, conclusions don't
+generalize. Surveying only app users about a feature ignores people who
+churned because of it (**survivorship bias**); a web poll captures only
+the engaged (**self-selection**). The fix is sampling design — random or
+stratified sampling — not more data.
+
+### A metric went up 20% week-over-week. How do you investigate?
+
+State assumptions, then decompose: (1) is it real or an artifact
+(tracking change, bot traffic, a deploy)? (2) segment it — which
+region/platform/cohort drove it? (3) check seasonality / day-of-week and
+compare to the same period last year; (4) look for a denominator change
+(did traffic drop, inflating a rate?). Conclude with the most likely
+driver **and** what you'd verify next.
+
+### How do you present a finding to a non-technical stakeholder?
+
+Lead with the **answer and its business impact**, not the method. One
+clear chart over a table; label the axes and the takeaway. State
+assumptions and caveats plainly ("this excludes refunds"), and end with a
+recommended action. Save methodology for an appendix or backup slide.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`A dataset of household incomes is strongly right-skewed (a few very high earners). Which single number best summarizes the "typical" household?
+
+- The mean, because it uses every value.
+  > The mean is pulled upward by the high earners, so it overstates the typical household in a right-skewed distribution.
+- [o] The median, because it's robust to the skew/outliers.
+  > The median (50th percentile) reflects the middle household and isn't dragged by extreme values — the better "typical" summary here.
+- The maximum, because it shows the range.
+  > The max describes an extreme, not a typical value.
+- The mode, because it's always the best center.
+  > The mode is the most frequent value and is often unstable for continuous data like income; it isn't a general "typical value" choice.`}
+/>
+
+<MultipleChoice
+  markdown={`Cities with more firefighters per capita have more fire damage. A colleague concludes "firefighters cause fire damage." What's the flaw?
+
+- The data must be wrong.
+  > The correlation can be perfectly real; the *causal interpretation* is what's flawed.
+- [o] A confounder — bigger cities have both more fires (hence more damage) and more firefighters — drives both variables.
+  > City size is a lurking variable correlated with both; correlation doesn't establish that one variable causes the other.
+- Firefighters genuinely cause damage; the data proves it.
+  > Observational correlation can't establish causation, especially with an obvious confounder present.
+- You should add more cities to the dataset.
+  > More data won't fix a confounding problem; a controlled comparison or causal design would.`}
+/>
+
+## Go deeper
+
+- [Statistics for Data Science with Python](/learn/statistics-for-data-science-python)

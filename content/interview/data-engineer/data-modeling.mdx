@@ -1,55 +1,79 @@
 ---
-title: Data Modeling & Pipelines
-description: Concept checks on normalization, star schemas, slowly-changing dimensions, and idempotent pipelines.
+title: Data Modeling
+description: Data Engineer interview questions on normalization, star vs snowflake schemas, fact/dimension tables, grain, and slowly-changing dimensions.
 ---
 
-Beyond SQL syntax, data-engineering interviews test how you **model**
-data and **design pipelines**. These concept checks cover the ideas that
-come up most.
+How you **model** data is tested as heavily as SQL syntax. These cover
+the warehouse-modeling vocabulary interviewers expect.
 
-## Normalization vs. denormalization
+## Q&A
+
+### Normalization vs denormalization — what's the trade-off?
+
+**Normalization** removes redundancy by splitting data into related
+tables (each fact stored once) — great for OLTP write integrity.
+**Denormalization** repeats data to avoid joins — common in analytics,
+where reads dominate. The trade-off: denormalizing buys read speed at the
+cost of storage and the risk of copies disagreeing (update anomalies).
+
+### Star vs snowflake schema?
+
+A **star** schema has a central fact table joined directly to
+**denormalized** dimension tables — simple, fast, fewer joins. A
+**snowflake** further **normalizes** dimensions into sub-tables (e.g.
+product → category → department) — less redundancy but more joins. Stars
+are the default for BI; snowflake when dimensions are large or shared.
+
+### What are fact and dimension tables?
+
+A **fact** table stores measurable **events** at a defined grain (one row
+per order line), with numeric **measures** (quantity, amount) and foreign
+keys to dimensions. **Dimension** tables hold the descriptive context you
+filter and group *by* (customer, product, date).
+
+### What is the "grain" of a table, and why define it first?
+
+The grain is **what one row represents** (one order? one order line? one
+customer-day?). Defining it first prevents double-counting and ambiguous
+aggregations — every measure and foreign key must make sense at that
+grain.
+
+### How do you preserve history when a dimension attribute changes (SCD)?
+
+Use a **slowly-changing dimension**:
+
+- **Type 1** — overwrite (no history).
+- **Type 2** — add a new row with effective-date ranges + a "current" flag (full history; facts join to the version that was current at the time).
+- **Type 3** — keep a "previous value" column (limited history).
+
+Type 2 is the standard when point-in-time accuracy matters.
+
+## Concept checks
 
 <MultipleChoice
-  markdown={`An analytics warehouse table repeats the full customer name and address on **every** order row. A reviewer calls it "denormalized." What's the main *trade-off* being made?
+  markdown={`An analytics table repeats the full customer name and address on **every** order row ("denormalized"). What's the main trade-off?
 
 - It saves storage at the cost of correctness.
   > Denormalization generally *increases* storage (repeated data) — it isn't a storage win.
 - [o] Faster reads (no join needed) at the cost of redundancy and update anomalies.
-  > Denormalizing trades write-time/consistency concerns for read performance — common and often correct in analytics, where data is append-mostly.
+  > It trades write-time/consistency concerns for read performance — common and often correct in analytics.
 - It guarantees the data is always consistent.
-  > The opposite: repeating data introduces the risk of the copies disagreeing (update anomalies).
+  > The opposite: repeating data risks the copies disagreeing (update anomalies).
 - It only matters for OLTP systems, never analytics.
-  > Denormalization is *especially* common in analytics/warehouse modeling; the trade-off applies there directly.`}
+  > Denormalization is *especially* common in analytics/warehouse modeling.`}
 />
-
-## Slowly-changing dimensions
 
 <MultipleChoice
   markdown={`A customer moves to a new city. You must keep historical orders attributed to the city they lived in **at the time**, while new orders use the new city. Which approach fits?
 
 - SCD Type 1 (overwrite the old value).
-  > Type 1 overwrites history, so past orders would all show the new city — losing the point-in-time truth you need.
-- [o] SCD Type 2 (add a new dimension row with effective-date ranges and a current flag).
-  > Type 2 versions the dimension so each fact can join to the row that was current when it occurred — the standard way to preserve history.
+  > Type 1 overwrites history, so past orders would all show the new city — losing the point-in-time truth.
+- [o] SCD Type 2 (new dimension row with effective-date ranges and a current flag).
+  > Type 2 versions the dimension so each fact joins to the row current when it occurred — the standard way to preserve history.
 - Delete the customer and re-insert them.
   > That breaks referential integrity with historical facts and still loses the time context.
 - Store the city only on the fact table and drop the dimension.
-  > That denormalizes away the dimension and doesn't itself give you versioned history or a clean current view.`}
-/>
-
-## Idempotent pipelines
-
-<MultipleChoice
-  markdown={`A nightly job sometimes gets re-run after a partial failure. Why is making it **idempotent** (e.g., delete-then-insert or \`MERGE\` for the target partition) important?
-
-- It makes the job run faster.
-  > Idempotency is about correctness on re-runs, not speed.
-- [o] Re-running it produces the same final result instead of duplicating or double-counting rows.
-  > An idempotent write (overwrite the partition / upsert by key) means a retry converges to the correct state rather than appending duplicates.
-- It removes the need for any scheduling.
-  > You still schedule it; idempotency just makes retries and backfills safe.
-- It guarantees the upstream data is correct.
-  > It only controls *your* write behavior on re-run; upstream quality is a separate concern.`}
+  > That denormalizes away the dimension and doesn't give you versioned history or a clean current view.`}
 />
 
 ## Go deeper

@@ -1,11 +1,6 @@
 {
   "title": "Data Engineer",
-  "description": "Interview prep for Data Engineer roles: advanced SQL, window functions, deduplication, data modeling, and pipelines.",
+  "description": "Interview prep for Data Engineer roles: advanced SQL, data modeling, and pipelines.",
   "root": true,
-  "pages": [
-    "index",
-    "sql-window-functions",
-    "sql-deduplication",
-    "data-modeling"
-  ]
+  "pages": ["index", "sql", "data-modeling", "pipelines"]
 }

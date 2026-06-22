@@ -1,0 +1,107 @@
+---
+title: Dimensional Modeling
+description: Analytics Engineer interview questions on facts, dimensions, grain, and star schemas — with answers, a concept check, and a runnable mart challenge.
+---
+
+The AE craft is turning raw tables into clean, well-grained dimensional
+models. Review the Q&A, then build a mart.
+
+## Q&A
+
+### What are fact and dimension tables?
+
+A **fact** table records measurable **events** at a defined grain (one
+row per order line) with numeric **measures** and foreign keys.
+**Dimension** tables hold the descriptive attributes you slice by
+(customer, product, date). Facts answer "how much/how many"; dimensions
+answer "by what."
+
+### What is the grain, and why pin it down first?
+
+The grain is what **one row represents**. Declaring it ("one row per
+order line item") up front keeps measures additive and prevents
+double-counting. Every column then either describes that grain or is a
+measure at that grain.
+
+### Star vs snowflake?
+
+**Star** keeps dimensions denormalized (one table each) for simple, fast
+joins — the BI default. **Snowflake** normalizes dimensions into
+sub-tables, reducing redundancy at the cost of more joins. Prefer star
+unless a dimension is huge or genuinely shared.
+
+### What is a surrogate key, and why prefer it over a natural key?
+
+A **surrogate key** is a synthetic, meaningless identifier (an integer or
+hash) for a dimension row, independent of the source's **natural key**.
+It's stable across source changes, enables SCD Type 2 (each version gets
+its own surrogate), and keeps fact joins fast and decoupled from business
+identifiers.
+
+### How do staging, intermediate, and mart layers differ?
+
+- **Staging** — one model per source table; light cleaning/renaming/typing, no business logic.
+- **Intermediate** — reusable business logic, joins, and reshaping.
+- **Marts** — final, consumable tables (facts + dimensions) for BI.
+
+This layering keeps transformations modular, testable, and DRY.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`A mart has **one row per category** (revenue per category). In dimensional terms, what's the "grain" of this table?
+
+- One row per order.
+  > That's the grain of the *source* fact table; the mart aggregates orders away.
+- [o] One row per category.
+  > Grain is the level of detail one row represents. After \`GROUP BY category\`, each row is exactly one category.
+- One row per product.
+  > Products are rolled up into categories here, so product isn't the grain.
+- Grain doesn't apply to aggregated tables.
+  > Every table has a grain — defining it (here, per category) is the first modeling step.`}
+/>
+
+## Challenges
+
+<SqlChallengeCard
+  dialect="duckdb"
+  title="Revenue by category"
+  instructions={`Two tables are loaded: \`fact_orders\` (\`order_id\`, \`product_id\`, \`amount\`) and \`dim_product\` (\`product_id\`, \`category\`). Build a mart of **total revenue per category**: join the fact to the dimension and sum \`amount\`. Columns: \`category\`, \`revenue\`. Sort by \`revenue\` descending.`}
+  initSql={`CREATE TABLE dim_product AS SELECT * FROM (VALUES
+  (1, 'Books'),
+  (2, 'Books'),
+  (3, 'Electronics'),
+  (4, 'Home')
+) AS t(product_id, category);
+
+CREATE TABLE fact_orders AS SELECT * FROM (VALUES
+  (1001, 1,  20.00),
+  (1002, 2,  15.00),
+  (1003, 3, 200.00),
+  (1004, 3, 150.00),
+  (1005, 4,  60.00),
+  (1006, 1,  25.00)
+) AS t(order_id, product_id, amount);`}
+  starterCode={`-- Join the fact to the dimension, then aggregate by category.
+SELECT
+  p.category
+  -- , revenue here
+FROM fact_orders f
+-- join dim_product, group, order;`}
+  solutionSql={`SELECT
+  p.category,
+  SUM(f.amount) AS revenue
+FROM fact_orders f
+JOIN dim_product p ON p.product_id = f.product_id
+GROUP BY p.category
+ORDER BY revenue DESC;`}
+  tests={[
+    { id: "row_count", name: "One row per category", description: "Three categories → three rows", expectedRowCount: 3 },
+    { id: "columns", name: "Has the required columns", description: "category and revenue", expectedColumnsInclude: ["category", "revenue"] },
+  ]}
+/>
+
+## Go deeper
+
+- [Database Design with PostgreSQL](/learn/database-design-postgresql)
+- [SQL Analytics with DuckDB](/learn/sql-analytics-duckdb)
