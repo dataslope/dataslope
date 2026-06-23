@@ -64,20 +64,39 @@ Use a **slowly-changing dimension**:
 
 Type 2 is the standard when point-in-time accuracy matters.
 
-```sql
--- SCD Type 2 dim_customer row structure
--- customer_key  | customer_id | city       | valid_from | valid_to   | is_current
--- 1001          | 42          | Boston     | 2022-01-01 | 2024-03-14 | false
--- 1087          | 42          | Austin     | 2024-03-15 | 9999-12-31 | true
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE dim_customer (
+  customer_key INTEGER,
+  customer_id  INTEGER,
+  city         VARCHAR,
+  valid_from   DATE,
+  valid_to     DATE,
+  is_current   BOOLEAN
+);
+INSERT INTO dim_customer VALUES
+  (1001, 42, 'Boston', DATE '2022-01-01', DATE '2024-03-14', false),
+  (1087, 42, 'Austin', DATE '2024-03-15', DATE '9999-12-31', true),
+  (2001, 99, 'Denver', DATE '2023-06-01', DATE '9999-12-31', true);
 
--- Point-in-time join: fact joins to the dimension row current when the
--- order was placed, not necessarily the customer's city today.
-SELECT f.order_id, d.city, f.amount
+CREATE TABLE fact_orders (
+  order_id    INTEGER,
+  customer_id INTEGER,
+  order_date  DATE,
+  amount      DECIMAL(10,2)
+);
+INSERT INTO fact_orders VALUES
+  (101, 42, DATE '2023-05-10', 350.00),
+  (102, 42, DATE '2024-06-01', 200.00),
+  (103, 99, DATE '2024-01-15', 500.00);`}
+  starterCode={`-- Point-in-time join: each order sees the city that was current when placed.
+SELECT f.order_id, f.order_date, d.city, f.amount
 FROM fact_orders f
 JOIN dim_customer d
-  ON  d.customer_id  = f.customer_id
-  AND f.order_date BETWEEN d.valid_from AND d.valid_to;
-```
+  ON  d.customer_id = f.customer_id
+  AND f.order_date BETWEEN d.valid_from AND d.valid_to
+ORDER BY f.order_id;`}
+/>
 
 ### What is 1NF, 2NF, and 3NF?
 
@@ -179,11 +198,31 @@ A **data vault** separates hubs (business keys), links (relationships), and sate
 
 A grain mismatch occurs when you join two fact tables at different grains — for example, a daily budget table joined to a transaction-level sales table — causing double-counting or incorrect aggregations. Fix it by aggregating the finer-grain table to match the coarser grain before joining, or by storing both at a common grain in a separate bridging step.
 
-```sql
--- Wrong: joining transaction-grain sales to daily-grain budget fans out
--- budget rows, double-counting them once per transaction.
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE fact_sales (
+  sale_date DATE,
+  region    VARCHAR,
+  amount    DECIMAL(10,2)
+);
+INSERT INTO fact_sales VALUES
+  (DATE '2024-01-01', 'North', 120.00),
+  (DATE '2024-01-01', 'North',  80.00),
+  (DATE '2024-01-01', 'South', 200.00),
+  (DATE '2024-01-02', 'North', 150.00),
+  (DATE '2024-01-02', 'South',  90.00);
 
--- Correct: pre-aggregate sales to the same daily grain, then join.
+CREATE TABLE fact_budget (
+  sale_date DATE,
+  region    VARCHAR,
+  budget    DECIMAL(10,2)
+);
+INSERT INTO fact_budget VALUES
+  (DATE '2024-01-01', 'North', 250.00),
+  (DATE '2024-01-01', 'South', 180.00),
+  (DATE '2024-01-02', 'North', 160.00),
+  (DATE '2024-01-02', 'South', 100.00);`}
+  starterCode={`-- Correct: pre-aggregate sales to the same daily grain, then join.
 WITH daily_sales AS (
   SELECT sale_date, region, SUM(amount) AS total_sales
   FROM fact_sales
@@ -192,8 +231,9 @@ WITH daily_sales AS (
 SELECT b.sale_date, b.region, b.budget, ds.total_sales
 FROM fact_budget b
 JOIN daily_sales ds
-  ON ds.sale_date = b.sale_date AND ds.region = b.region;
-```
+  ON ds.sale_date = b.sale_date AND ds.region = b.region
+ORDER BY b.sale_date, b.region;`}
+/>
 
 ### What are slowly-changing dimension types 4 and 6?
 
@@ -223,17 +263,40 @@ A **bus matrix** (or enterprise bus matrix) is a planning artifact that maps bus
 
 A `dim_date` table pre-computes every calendar attribute — fiscal week, quarter, holiday flag, day-of-week name — so analysts can filter and group by any combination without writing date-arithmetic functions inline. It also lets the business encode custom fiscal calendars, retail weeks, or regional holidays once and share them universally, rather than scattering business-specific date logic across every query.
 
-```sql
--- dim_date has one row per calendar day with pre-computed attributes:
--- date_key | calendar_date | fiscal_quarter | is_holiday | day_of_week_name
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE dim_date (
+  date_key        INTEGER,
+  calendar_date   DATE,
+  fiscal_quarter  VARCHAR,
+  is_holiday      BOOLEAN,
+  day_of_week_name VARCHAR
+);
+INSERT INTO dim_date VALUES
+  (20240101, DATE '2024-01-01', 'Q1', true,  'Monday'),
+  (20240102, DATE '2024-01-02', 'Q1', false, 'Tuesday'),
+  (20240115, DATE '2024-01-15', 'Q1', false, 'Monday'),
+  (20240401, DATE '2024-04-01', 'Q2', false, 'Monday'),
+  (20240415, DATE '2024-04-15', 'Q2', false, 'Monday');
 
-SELECT d.fiscal_quarter, SUM(f.amount) AS revenue
+CREATE TABLE fact_orders (
+  order_id       INTEGER,
+  order_date_key INTEGER,
+  amount         DECIMAL(10,2)
+);
+INSERT INTO fact_orders VALUES
+  (1, 20240101,  50.00),
+  (2, 20240102, 200.00),
+  (3, 20240115, 175.00),
+  (4, 20240401, 300.00),
+  (5, 20240415,  90.00);`}
+  starterCode={`SELECT d.fiscal_quarter, SUM(f.amount) AS revenue
 FROM fact_orders f
 JOIN dim_date d ON d.date_key = f.order_date_key
 WHERE d.is_holiday = false
 GROUP BY d.fiscal_quarter
-ORDER BY d.fiscal_quarter;
-```
+ORDER BY d.fiscal_quarter;`}
+/>
 
 ### What is the difference between a measure and a metric?
 

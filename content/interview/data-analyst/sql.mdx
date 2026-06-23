@@ -18,14 +18,21 @@ groups **after** `GROUP BY`. An aggregate condition (like `SUM(...) > 250`)
 must go in `HAVING`, because the aggregate doesn't exist yet when `WHERE`
 runs.
 
-```sql
-SELECT region, SUM(amount) AS revenue
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE orders (region TEXT, amount DECIMAL(8,2));
+INSERT INTO orders VALUES
+  ('North', 120.00), ('South', 80.50), ('East', 200.00),
+  ('West', 50.25),   ('North', 60.00), ('South', 90.00),
+  ('East', 140.00),  ('West', 110.00), ('North', 75.50),
+  ('South', 65.00);`}
+  starterCode={`SELECT region, SUM(amount) AS revenue
 FROM orders
 WHERE amount > 0            -- row-level, before grouping
 GROUP BY region
 HAVING SUM(amount) > 250    -- group-level, after aggregation
-ORDER BY revenue DESC;
-```
+ORDER BY revenue DESC;`}
+/>
 
 ### Explain the difference between INNER, LEFT, RIGHT, and FULL JOIN.
 
@@ -159,15 +166,21 @@ compute a value **for each row** while still considering a set of related
 rows (the "window"), so the original row count is preserved. They use the
 `OVER(...)` clause.
 
-```sql
-SELECT
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE employees (name TEXT, department TEXT, salary INTEGER);
+INSERT INTO employees VALUES
+  ('Alice', 'Engineering', 95000), ('Bob', 'Engineering', 105000),
+  ('Carol', 'Marketing',   72000), ('Dave', 'Marketing',   68000),
+  ('Eve',   'Engineering', 98000), ('Frank','Marketing',   75000);`}
+  starterCode={`SELECT
   name,
   department,
   salary,
   AVG(salary) OVER (PARTITION BY department) AS dept_avg
 FROM employees;
--- Every employee row is kept; dept_avg is the average for their dept.
-```
+-- Every employee row is kept; dept_avg is the average for their dept.`}
+/>
 
 ### What does PARTITION BY do inside a window function?
 
@@ -195,13 +208,17 @@ they handle ties differently:
 - `RANK` — ties share the same rank; the next rank **skips** numbers (1, 2, 2, 4).
 - `DENSE_RANK` — ties share the same rank; the next rank does **not** skip (1, 2, 2, 3).
 
-```sql
-SELECT name, score,
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE results (name TEXT, score INTEGER);
+INSERT INTO results VALUES
+  ('Alice', 90), ('Bob', 85), ('Carol', 85), ('Dave', 80);`}
+  starterCode={`SELECT name, score,
   ROW_NUMBER()  OVER (ORDER BY score DESC) AS rn,
   RANK()        OVER (ORDER BY score DESC) AS rnk,
   DENSE_RANK()  OVER (ORDER BY score DESC) AS drnk
-FROM results;
-```
+FROM results;`}
+/>
 
 ### How do you return the top N rows per group?
 
@@ -482,13 +499,19 @@ CROSS JOIN regions r;
 Use `SUM` as a window function with `ORDER BY` inside `OVER`. By default
 the frame is `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`.
 
-```sql
-SELECT
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE transactions (date DATE, amount DECIMAL(8,2));
+INSERT INTO transactions VALUES
+  ('2024-01-01', 100.00), ('2024-01-02', 250.00),
+  ('2024-01-03', 75.00),  ('2024-01-04', 180.00),
+  ('2024-01-05', 320.00);`}
+  starterCode={`SELECT
   date,
   amount,
   SUM(amount) OVER (ORDER BY date) AS running_total
-FROM transactions;
-```
+FROM transactions;`}
+/>
 
 ## Concept checks
 

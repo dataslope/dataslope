@@ -19,25 +19,41 @@ All number rows within a partition; they differ on **ties**:
 - **`RANK`** — ties share a rank, then it **skips** (1, 2, 2, 4).
 - **`DENSE_RANK`** — ties share a rank, **no skip** (1, 2, 2, 3).
 
-```sql
-SELECT name, score,
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE players (name VARCHAR, score INTEGER);
+INSERT INTO players VALUES
+  ('Alice', 95),
+  ('Bob',   80),
+  ('Carol', 80),
+  ('Dave',  70);`}
+  starterCode={`SELECT name, score,
   ROW_NUMBER() OVER (ORDER BY score DESC) AS rn,
   RANK()       OVER (ORDER BY score DESC) AS rnk,
   DENSE_RANK() OVER (ORDER BY score DESC) AS dr
-FROM players;
-```
+FROM players;`}
+/>
 
 ### How do you keep only the latest row per key (deduplication)?
 
 Number rows within each key by recency, then keep number 1:
 
-```sql
-SELECT *
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE events (user_id INTEGER, event_time TIMESTAMP, status VARCHAR);
+INSERT INTO events VALUES
+  (1, TIMESTAMP '2024-01-01 10:00', 'signup'),
+  (1, TIMESTAMP '2024-01-03 09:00', 'active'),
+  (2, TIMESTAMP '2024-01-02 12:00', 'signup'),
+  (2, TIMESTAMP '2024-01-05 08:00', 'churn'),
+  (2, TIMESTAMP '2024-01-04 15:00', 'active'),
+  (3, TIMESTAMP '2024-01-01 11:00', 'signup');`}
+  starterCode={`SELECT *
 FROM events
 QUALIFY ROW_NUMBER() OVER (
   PARTITION BY user_id ORDER BY event_time DESC
-) = 1;
-```
+) = 1;`}
+/>
 
 Use `ROW_NUMBER` (not `RANK`) so exact-tie timestamps still collapse to
 one row. Without `QUALIFY` (e.g. Postgres), wrap it in a subquery and
@@ -108,8 +124,17 @@ FROM daily_revenue;
 
 Use `SUM` with a window frame that starts at the beginning of the partition and ends at the current row:
 
-```sql
-SELECT
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE orders (user_id INTEGER, order_date DATE, amount DECIMAL(10,2));
+INSERT INTO orders VALUES
+  (1, DATE '2024-01-01', 100.00),
+  (1, DATE '2024-01-05', 250.00),
+  (1, DATE '2024-01-12', 75.50),
+  (2, DATE '2024-01-03', 200.00),
+  (2, DATE '2024-01-08', 150.00);`}
+  starterCode={`SELECT
+  user_id,
   order_date,
   amount,
   SUM(amount) OVER (
@@ -117,8 +142,9 @@ SELECT
     ORDER BY order_date
     ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
   ) AS running_total
-FROM orders;
-```
+FROM orders
+ORDER BY user_id, order_date;`}
+/>
 
 `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW` is the default frame for ordered windows, so `ORDER BY` alone is sufficient in most dialects.
 
@@ -212,8 +238,19 @@ ORDER BY s.day;
 
 It describes finding **consecutive runs** (islands) of rows separated by missing values or breaks (gaps). The classic approach subtracts a sequential row number from the ordered value so that rows in the same island share an identical "group key":
 
-```sql
-SELECT
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE daily_logins (user_id INTEGER, login_date DATE);
+INSERT INTO daily_logins VALUES
+  (1, DATE '2024-01-01'),
+  (1, DATE '2024-01-02'),
+  (1, DATE '2024-01-03'),
+  (1, DATE '2024-01-05'),
+  (1, DATE '2024-01-06'),
+  (2, DATE '2024-01-01'),
+  (2, DATE '2024-01-04'),
+  (2, DATE '2024-01-05');`}
+  starterCode={`SELECT
   user_id,
   MIN(login_date) AS island_start,
   MAX(login_date) AS island_end,
@@ -227,8 +264,9 @@ FROM (
     ) * INTERVAL '1 day' AS grp
   FROM daily_logins
 ) t
-GROUP BY user_id, grp;
-```
+GROUP BY user_id, grp
+ORDER BY user_id, island_start;`}
+/>
 
 ### What is the logical order of SQL clause execution?
 

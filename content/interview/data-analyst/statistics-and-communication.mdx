@@ -57,13 +57,19 @@ points are more dispersed around the mean. Standard deviation is easier
 to interpret because it shares units with the data (e.g., dollars, not
 dollars-squared).
 
-```python
-import pandas as pd
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
 
 s = pd.Series([10, 20, 30, 40, 50])
 print(s.var())   # sample variance (ddof=1 by default)
-print(s.std())   # sample standard deviation
-```
+print(s.std())   # sample standard deviation`,
+    },
+  ]}
+/>
 
 ### What is the mode, and when is it the most useful measure of center?
 
@@ -96,12 +102,21 @@ that point. **Quartiles** divide data into four equal parts: Q1 (25th),
 Q2 (50th = median), Q3 (75th). The interquartile range (IQR = Q3 - Q1)
 is a robust measure of spread.
 
-```python
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
+
+s = pd.Series([10, 20, 30, 40, 50])
 q1, q3 = s.quantile(0.25), s.quantile(0.75)
 iqr = q3 - q1
 p90 = s.quantile(0.90)
-print(f"Q1={q1}, Q3={q3}, IQR={iqr}, 90th pct={p90}")
-```
+print(f"Q1={q1}, Q3={q3}, IQR={iqr}, 90th pct={p90}")`,
+    },
+  ]}
+/>
 
 ### How do you identify outliers?
 
@@ -113,15 +128,28 @@ Common methods:
 Always investigate outliers before removing them — they may be data
 errors or genuinely important observations.
 
-```python
-q1, q3 = df["amount"].quantile([0.25, 0.75])
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "amount": [10, 12, 11, 13, 9, 14, 10, 12, 200, 8, 11, 13, 190]
+})`,
+      starterCode: `q1, q3 = df["amount"].quantile([0.25, 0.75])
 iqr = q3 - q1
 outliers_iqr = df[(df["amount"] < q1 - 1.5 * iqr) |
                   (df["amount"] > q3 + 1.5 * iqr)]
+print("IQR outliers:", outliers_iqr["amount"].tolist())
 
 z_scores = (df["amount"] - df["amount"].mean()) / df["amount"].std()
-outliers_z = df[z_scores.abs() > 3]
-```
+outliers_z = df[z_scores.abs() > 2]
+print("Z-score outliers:", outliers_z["amount"].tolist())`,
+    },
+  ]}
+/>
 
 ### What is the purpose of an A/B test?
 
@@ -171,13 +199,19 @@ desired power (commonly 80%), and the significance level (commonly 5%).
 Online calculators and Python's `statsmodels` can compute this before
 running the test.
 
-```python
-from statsmodels.stats.power import NormalIndPower
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from statsmodels.stats.power import NormalIndPower
 
 analysis = NormalIndPower()
 n = analysis.solve_power(effect_size=0.1, power=0.8, alpha=0.05)
-print(f"Required n per group: {n:.0f}")
-```
+print(f"Required n per group: {n:.0f}")`,
+    },
+  ]}
+/>
 
 ### What is the difference between correlation and the correlation coefficient?
 
@@ -187,16 +221,32 @@ variables. The **Pearson correlation coefficient** (r) quantifies it from
 relationship. Spearman rank correlation is used when the relationship is
 monotonic but not linear, or when data is ordinal.
 
-```python
-# Pearson r between two columns
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "price":    [10, 20, 30, 40, 50],
+    "sales":    [200, 160, 120, 80, 60],
+    "ad_spend": [5, 8, 15, 22, 30],
+})`,
+      starterCode: `# Pearson r between two columns
 r = df["price"].corr(df["sales"])
+print(f"Pearson r: {r:.3f}")
 
 # Full correlation matrix
 corr_matrix = df[["price", "sales", "ad_spend"]].corr()
+print(corr_matrix.round(3))
 
 # Spearman (rank-based)
 r_spearman = df["price"].corr(df["sales"], method="spearman")
-```
+print(f"Spearman r: {r_spearman:.3f}")`,
+    },
+  ]}
+/>
 
 ### What chart type would you choose for each scenario?
 

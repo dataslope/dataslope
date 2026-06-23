@@ -13,11 +13,23 @@ Q&A, then run the challenge in your browser.
 `loc` selects by **label** (index/column names); `iloc` selects by
 **integer position**.
 
-```python
-df.loc[3, "amount"]    # row with index label 3, column "amount"
-df.iloc[3, 1]          # 4th row, 2nd column, regardless of labels
-df.loc[df.region == "North"]   # boolean mask (label-based)
-```
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["South", "East", "North", "West", "North"],
+    "amount": [80, 200, 120, 50, 60],
+})`,
+      starterCode: `print(df.loc[3, "amount"])       # row with index label 3, column "amount"
+print(df.iloc[3, 1])            # 4th row, 2nd column, regardless of labels
+print(df.loc[df.region == "North"])  # boolean mask (label-based)`,
+    },
+  ]}
+/>
 
 A common gotcha: after filtering, the index labels no longer match
 positions, so `loc[0]` may raise while `iloc[0]` still works.
@@ -29,11 +41,25 @@ aggregation/transform per group, then **combines** the results. Grouping
 one column and aggregating returns a **Series** indexed by the group
 keys; aggregating several returns a **DataFrame**.
 
-```python
-df.groupby("region")["amount"].sum()              # Series
-df.groupby("region").agg(total=("amount", "sum"),
-                         n=("amount", "size"))     # DataFrame
-```
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "North", "East", "South", "North"],
+    "amount": [100, 80, 80, 50, 70, 60],
+})`,
+      starterCode: `print(df.groupby("region")["amount"].sum())   # Series
+
+result = df.groupby("region").agg(total=("amount", "sum"),
+                                  n=("amount", "size"))
+print(result)   # DataFrame`,
+    },
+  ]}
+/>
 
 ### When do you use `merge` vs `concat` vs `join`?
 
@@ -59,11 +85,25 @@ missing and how much: dropping a few rows is fine; dropping a column
 that's 60% null often isn't. Beware that `NaN != NaN`, so compare with
 `isna()`, not `== NaN`.
 
-```python
-df.isna().sum()                    # count NaNs per column
-df.dropna(subset=["amount"])       # drop rows where amount is NaN
-df["amount"].fillna(0, inplace=True)  # fill NaN with 0
-```
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({
+    "region": ["North", "South", None, "East"],
+    "amount": [100.0, np.nan, 80.0, np.nan],
+})`,
+      starterCode: `print(df.isna().sum())              # count NaNs per column
+print(df.dropna(subset=["amount"])) # drop rows where amount is NaN
+df["amount"] = df["amount"].fillna(0)
+print(df)                           # NaN replaced with 0`,
+    },
+  ]}
+/>
 
 ### Why can `SettingWithCopyWarning` appear, and how do you avoid it?
 
@@ -82,10 +122,23 @@ pass it inside `df[...]` or `df.loc[...]`. Combine conditions with `&`
 (and), `|` (or), and `~` (not), and always wrap each condition in
 parentheses because of Python operator precedence.
 
-```python
-mask = (df["amount"] > 100) & (df["region"] == "North")
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "North", "East", "North"],
+    "amount": [120, 80, 60, 200, 150],
+})`,
+      starterCode: `mask = (df["amount"] > 100) & (df["region"] == "North")
 result = df.loc[mask]
-```
+print(result)`,
+    },
+  ]}
+/>
 
 ### What is the difference between `transform` and `agg` in a groupby?
 
@@ -94,9 +147,22 @@ Series of the **same length as the original DataFrame**, broadcasting the
 group result back to every row. `transform` is useful for creating
 group-level features without losing the original index.
 
-```python
-df["group_mean"] = df.groupby("region")["amount"].transform("mean")
-```
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "North", "East", "South", "North"],
+    "amount": [100, 80, 80, 50, 70, 60],
+})`,
+      starterCode: `df["group_mean"] = df.groupby("region")["amount"].transform("mean")
+print(df)`,
+    },
+  ]}
+/>
 
 ### How do you reshape data from wide to long format?
 
@@ -137,11 +203,23 @@ stores integer codes internally instead of repeated strings, saving memory
 and speeding up `groupby` and sorting. Use `df["col"].astype("category")`.
 Ordered categoricals also allow meaningful comparisons like `small < medium < large`.
 
-```python
-df["region"] = df["region"].astype("category")
-print(df["region"].cat.categories)   # Index(['East', 'North', 'South', 'West'])
-print(df.memory_usage(deep=True))    # noticeably smaller than object dtype
-```
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "East", "West", "North", "South"] * 50,
+    "amount": list(range(300)),
+})`,
+      starterCode: `df["region"] = df["region"].astype("category")
+print(df["region"].cat.categories)
+print(df.memory_usage(deep=True))`,
+    },
+  ]}
+/>
 
 ### How do you sort a DataFrame and rank values?
 
@@ -149,10 +227,24 @@ print(df.memory_usage(deep=True))    # noticeably smaller than object dtype
 assigns ranks, with `method="dense"` for no gaps and `pct=True` for
 percentile ranks.
 
-```python
-df_sorted = df.sort_values(by="amount", ascending=False)
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "East", "West"],
+    "amount": [120, 80, 200, 50],
+})`,
+      starterCode: `df_sorted = df.sort_values(by="amount", ascending=False)
+print(df_sorted)
 df["rank"] = df["amount"].rank(method="dense", ascending=False)
-```
+print(df)`,
+    },
+  ]}
+/>
 
 ### What does `value_counts` do?
 
@@ -160,9 +252,20 @@ df["rank"] = df["amount"].rank(method="dense", ascending=False)
 counts, sorted by count descending. Pass `normalize=True` to get
 proportions, `dropna=False` to include NaN counts.
 
-```python
-df["region"].value_counts(normalize=True)
-```
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "North", "East", "South", "North"],
+})`,
+      starterCode: `print(df["region"].value_counts(normalize=True))`,
+    },
+  ]}
+/>
 
 ### How do you work with datetime data in pandas?
 
@@ -196,8 +299,18 @@ Method chaining applies multiple DataFrame operations in a single
 expression, reading top-to-bottom. It avoids intermediate variables,
 keeps intent clear, and is easy to read when formatted with parentheses.
 
-```python
-result = (
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "North", "East", "South"],
+    "amount": [100, -20, 80, 50, 70],
+})`,
+      starterCode: `result = (
     df
     .query("amount > 0")
     .assign(tax=lambda x: x["amount"] * 0.08)
@@ -206,7 +319,10 @@ result = (
     .reset_index()
     .rename(columns={"tax": "total_tax"})
 )
-```
+print(result)`,
+    },
+  ]}
+/>
 
 ### What is the difference between a view and a copy in pandas?
 
@@ -215,10 +331,24 @@ change the original. A **copy** is independent. Slicing with `[]` may
 return either depending on the operation. Use `.copy()` explicitly when
 you need an independent copy to avoid `SettingWithCopyWarning`.
 
-```python
-subset = df[df["region"] == "North"].copy()
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "North", "East"],
+    "amount": [100, 80, 120, 50],
+})`,
+      starterCode: `subset = df[df["region"] == "North"].copy()
 subset["amount"] = 0   # safe — won't touch df
-```
+print("subset:", subset["amount"].tolist())
+print("df unchanged:", df["amount"].tolist())`,
+    },
+  ]}
+/>
 
 ### How do you apply a custom function to each row or column?
 
@@ -226,9 +356,19 @@ subset["amount"] = 0   # safe — won't touch df
 `axis=1` applies per row. For element-wise operations on a single Series,
 `map` (or the older `applymap` / new `map` on DataFrames) is available.
 
-```python
-df["discounted"] = df["amount"].apply(lambda x: x * 0.9 if x > 100 else x)
-```
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({"amount": [80, 120, 50, 200, 90]})`,
+      starterCode: `df["discounted"] = df["amount"].apply(lambda x: x * 0.9 if x > 100 else x)
+print(df)`,
+    },
+  ]}
+/>
 
 ### Why is vectorization preferred over `apply` with a lambda?
 
@@ -237,13 +377,24 @@ all elements in one call — typically 10-100x faster than a Python-level
 loop inside `apply`. Use `apply` only when no vectorized equivalent
 exists.
 
-```python
-# Vectorized (fast)
-df["discounted"] = df["amount"] * 0.9
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({"amount": [80, 120, 50, 200, 90]})`,
+      starterCode: `# Vectorized (fast)
+df["discounted_vec"] = df["amount"] * 0.9
 
 # apply (slow on large frames)
-df["discounted"] = df["amount"].apply(lambda x: x * 0.9)
-```
+df["discounted_apply"] = df["amount"].apply(lambda x: x * 0.9)
+
+print(df)`,
+    },
+  ]}
+/>
 
 ### How do you detect and drop duplicate rows?
 
@@ -251,28 +402,65 @@ df["discounted"] = df["amount"].apply(lambda x: x * 0.9)
 them. Pass `subset` to check only specific columns, and `keep="last"` to
 keep the last occurrence instead of the first.
 
-```python
-df.duplicated(subset=["email"]).sum()        # count dupes
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "email": ["a@x.com", "b@x.com", "a@x.com", "c@x.com", "b@x.com"],
+    "name":  ["Alice", "Bob", "Alice2", "Carol", "Bob2"],
+})`,
+      starterCode: `print(df.duplicated(subset=["email"]).sum())        # count dupes
 df_clean = df.drop_duplicates(subset=["email"], keep="first")
-```
+print(df_clean)`,
+    },
+  ]}
+/>
 
 ### How do you rename columns in pandas?
 
 Use `df.rename(columns={"old": "new"})` for targeted renames, or assign
 to `df.columns` directly to replace all names at once.
 
-```python
-df = df.rename(columns={"cust_id": "customer_id", "amt": "amount"})
-```
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({"cust_id": [1, 2, 3], "amt": [100, 200, 300]})`,
+      starterCode: `df = df.rename(columns={"cust_id": "customer_id", "amt": "amount"})
+print(df.columns.tolist())`,
+    },
+  ]}
+/>
 
 ### How do you select columns by dtype?
 
 Use `df.select_dtypes(include=...)` or `df.select_dtypes(exclude=...)`.
 Common dtype strings: `"number"`, `"object"`, `"datetime64"`, `"category"`.
 
-```python
-numeric_cols = df.select_dtypes(include="number")
-```
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South"],
+    "amount": [100, 200],
+    "score":  [0.8, 0.9],
+})`,
+      starterCode: `numeric_cols = df.select_dtypes(include="number")
+print(numeric_cols.columns.tolist())`,
+    },
+  ]}
+/>
 
 ### What does `fillna` with `ffill` or `bfill` do?
 
@@ -290,15 +478,24 @@ df["price"] = df["price"].ffill()
 Use `numpy.where` for a single condition or `numpy.select` for multiple
 conditions — both are vectorized.
 
-```python
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 import numpy as np
 
-df["size"] = np.where(df["amount"] >= 500, "Large", "Small")
+df = pd.DataFrame({"amount": [50, 120, 600, 80, 550]})`,
+      starterCode: `df["size_binary"] = np.where(df["amount"] >= 500, "Large", "Small")
 
 conditions = [df["amount"] >= 500, df["amount"] >= 100]
 choices    = ["Large", "Medium"]
 df["size"] = np.select(conditions, choices, default="Small")
-```
+print(df)`,
+    },
+  ]}
+/>
 
 ### How do you merge DataFrames on multiple keys?
 
@@ -318,11 +515,24 @@ result = pd.merge(
 
 Use `transform` to broadcast the group total back to each row, then divide.
 
-```python
-df["pct_of_region"] = (
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "North", "South", "South", "East"],
+    "amount": [100, 60, 80, 120, 50],
+})`,
+      starterCode: `df["pct_of_region"] = (
     df["amount"] / df.groupby("region")["amount"].transform("sum") * 100
 )
-```
+print(df)`,
+    },
+  ]}
+/>
 
 ### How do you read and write CSV and Excel files?
 
@@ -355,12 +565,25 @@ df.query("amount > @threshold")
 `df.info()` prints both plus non-null counts and approximate memory usage
 in one call. For precise memory, use `df.memory_usage(deep=True).sum()`.
 
-```python
-print(df.shape)                          # (1000, 5)
-print(df.dtypes)                         # per-column dtype
-df.info()                                # summary: shape + nulls + memory
-print(df.memory_usage(deep=True).sum())  # exact bytes
-```
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "East", "West"],
+    "amount": [100, 80, 200, 50],
+    "flag":   [True, False, True, False],
+})`,
+      starterCode: `print(df.shape)
+print(df.dtypes)
+df.info()
+print(df.memory_usage(deep=True).sum())`,
+    },
+  ]}
+/>
 
 ### How do you concatenate DataFrames vertically and reset the index?
 
@@ -382,16 +605,30 @@ Use `Series.map` for single-column lookups or value substitution, `apply` for
 row or column-level logic, and `DataFrame.map` for element-wise
 transformations across all cells.
 
-```python
-# Series.map: value substitution
-df["region_code"] = df["region"].map({"North": "N", "South": "S"})
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
 
-# DataFrame.apply: column-wise summary
-df.apply(lambda col: col.max() - col.min(), axis=0)
+df = pd.DataFrame({
+    "region": ["North", "South", "East"],
+    "q1": [100.555, 80.123, 50.789],
+    "q2": [120.111, 90.456, 60.321],
+})`,
+      starterCode: `# Series.map: value substitution
+df["region_code"] = df["region"].map({"North": "N", "South": "S", "East": "E"})
+print(df["region_code"].tolist())
 
-# DataFrame.map: element-wise transformation across the whole frame
-df[["q1", "q2"]].map(lambda x: round(x, 2))
-```
+# DataFrame.apply: column-wise range
+print(df[["q1", "q2"]].apply(lambda col: col.max() - col.min(), axis=0))
+
+# DataFrame.map: element-wise rounding
+print(df[["q1", "q2"]].map(lambda x: round(x, 2)))`,
+    },
+  ]}
+/>
 
 ## Concept checks
 

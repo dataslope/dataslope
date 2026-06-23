@@ -64,13 +64,19 @@ a heap from n elements is O(n) via heapify — not `O(n log n)` — because
 most nodes are near the leaves and travel very little. Python's `heapq`
 module is a min-heap.
 
-```python
-import heapq
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import heapq
 h = [5, 3, 8, 1]
 heapq.heapify(h)       # O(n) in-place
 heapq.heappush(h, 2)   # O(log n)
-print(heapq.heappop(h))  # 1  — O(log n)
-```
+print(heapq.heappop(h))  # 1  — O(log n)`,
+    },
+  ]}
+/>
 
 ### How does a priority queue differ from a regular queue?
 
@@ -96,18 +102,30 @@ stack (or recursion) and dives deep first — natural for cycle detection,
 topological sort, connected components, and backtracking. BFS memory usage
 can be O(n) at the widest level; DFS memory is proportional to depth.
 
-```python
-from collections import deque
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from collections import deque
 
 def bfs(graph, start):
     visited, q = {start}, deque([start])
+    order = []
     while q:
         node = q.popleft()
+        order.append(node)
         for nb in graph[node]:
             if nb not in visited:
                 visited.add(nb)
                 q.append(nb)
-```
+    return order
+
+graph = {"A": ["B", "C"], "B": ["D"], "C": ["D"], "D": []}
+print(bfs(graph, "A"))  # ['A', 'B', 'C', 'D']`,
+    },
+  ]}
+/>
 
 ### How do you detect a cycle in a directed graph?
 
@@ -117,8 +135,12 @@ an edge to a node already on the current stack — means a cycle exists.
 Alternatively, run Kahn's topological-sort algorithm; if the output
 contains fewer than n nodes, there is a cycle.
 
-```python
-def has_cycle(graph):
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def has_cycle(graph):
     WHITE, GRAY, BLACK = 0, 1, 2
     color = {n: WHITE for n in graph}
 
@@ -133,7 +155,14 @@ def has_cycle(graph):
         return False
 
     return any(dfs(n) for n in graph if color[n] == WHITE)
-```
+
+acyclic = {"A": ["B"], "B": ["C"], "C": []}
+cyclic  = {"A": ["B"], "B": ["C"], "C": ["A"]}
+print(has_cycle(acyclic))  # False
+print(has_cycle(cyclic))   # True`,
+    },
+  ]}
+/>
 
 ### What is topological sort, and when is it applicable?
 
@@ -143,8 +172,12 @@ resolution, course prerequisites, and task scheduling. Kahn's algorithm
 (iteratively remove nodes with in-degree 0) or DFS post-order both work
 in `O(V + E)`.
 
-```python
-from collections import deque
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from collections import deque
 
 def topo_sort(graph):            # graph: {node: [neighbors]}
     in_degree = {n: 0 for n in graph}
@@ -162,7 +195,13 @@ def topo_sort(graph):            # graph: {node: [neighbors]}
             if in_degree[nb] == 0:
                 queue.append(nb)
     return order  # len < V → cycle exists
-```
+
+# Task dependencies: A→C, B→C, C→D
+graph = {"A": ["C"], "B": ["C"], "C": ["D"], "D": []}
+print(topo_sort(graph))  # e.g. ['A', 'B', 'C', 'D']`,
+    },
+  ]}
+/>
 
 ### Explain Dijkstra's algorithm and its complexity.
 
@@ -172,8 +211,12 @@ graph with **non-negative** edge weights. It uses a min-heap of
 costs `O(log V)` for the heap update. Total: `O((V + E) log V)`. It
 fails with negative weights — use Bellman-Ford there.
 
-```python
-import heapq
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import heapq
 
 def dijkstra(graph, src):
     # graph: {node: [(neighbor, weight), ...]}
@@ -189,7 +232,17 @@ def dijkstra(graph, src):
                 dist[v] = nd
                 heapq.heappush(heap, (nd, v))
     return dist
-```
+
+graph = {
+    "A": [("B", 1), ("C", 4)],
+    "B": [("C", 2), ("D", 5)],
+    "C": [("D", 1)],
+    "D": [],
+}
+print(dijkstra(graph, "A"))  # {'A': 0, 'B': 1, 'C': 3, 'D': 4}`,
+    },
+  ]}
+/>
 
 ### What is a BST and what are its operation complexities?
 
@@ -199,8 +252,12 @@ are all `O(h)` where h is the tree height. For a balanced tree h = `O(log n)`;
 a degenerate (sorted-input) tree has h = O(n). Balanced BST variants like
 AVL trees and red-black trees guarantee `O(log n)`.
 
-```python
-class BSTNode:
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class BSTNode:
     def __init__(self, val):
         self.val, self.left, self.right = val, None, None
 
@@ -217,7 +274,17 @@ def bst_search(root, val):
     if root is None or root.val == val:
         return root
     return bst_search(root.left if val < root.val else root.right, val)
-```
+
+root = None
+for v in [5, 3, 7, 1, 4]:
+    root = bst_insert(root, v)
+
+found = bst_search(root, 4)
+print(found.val if found else None)   # 4
+print(bst_search(root, 9))            # None`,
+    },
+  ]}
+/>
 
 ### What are the three DFS tree traversals?
 
@@ -226,13 +293,38 @@ Pre-order (root → left → right) is useful for serializing a tree.
 Post-order (left → right → root) is useful for deletion or evaluating
 expression trees. All three are `O(n)`.
 
-```python
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class BSTNode:
+    def __init__(self, val):
+        self.val, self.left, self.right = val, None, None
+
+def bst_insert(root, val):
+    if root is None:
+        return BSTNode(val)
+    if val < root.val:
+        root.left = bst_insert(root.left, val)
+    else:
+        root.right = bst_insert(root.right, val)
+    return root
+
 def inorder(node):
     if node:
         inorder(node.left)
         print(node.val)
         inorder(node.right)
-```
+
+root = None
+for v in [5, 3, 7, 1, 4]:
+    root = bst_insert(root, v)
+
+inorder(root)  # prints 1 3 4 5 7 in sorted order`,
+    },
+  ]}
+/>
 
 ### What is a trie, and what problems is it suited for?
 
@@ -250,8 +342,12 @@ and the midpoint overflow: use `mid = lo + (hi - lo) // 2` rather than
 `(lo + hi) // 2` (matters in languages with fixed-width integers). Variants
 find the leftmost or rightmost insertion point.
 
-```python
-def binary_search(arr, target):
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def binary_search(arr, target):
     lo, hi = 0, len(arr) - 1
     while lo <= hi:
         mid = lo + (hi - lo) // 2
@@ -262,7 +358,13 @@ def binary_search(arr, target):
         else:
             hi = mid - 1
     return -1
-```
+
+arr = [1, 3, 5, 7, 9, 11]
+print(binary_search(arr, 7))   # 3
+print(binary_search(arr, 6))   # -1`,
+    },
+  ]}
+/>
 
 ### Explain the two-pointer technique and give an example.
 
@@ -272,8 +374,12 @@ array," one pointer at the left and one at the right narrows the window
 in O(n) instead of `O(n^2)`. The same idea works for removing duplicates,
 palindrome checks, and merging sorted arrays.
 
-```python
-def two_sum_sorted(nums, target):
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def two_sum_sorted(nums, target):
     lo, hi = 0, len(nums) - 1
     while lo < hi:
         s = nums[lo] + nums[hi]
@@ -284,7 +390,12 @@ def two_sum_sorted(nums, target):
         else:
             hi -= 1
     return None
-```
+
+print(two_sum_sorted([1, 2, 3, 4, 6], 6))   # (1, 3)
+print(two_sum_sorted([1, 2, 3, 4, 6], 10))  # None`,
+    },
+  ]}
+/>
 
 ### What is the sliding-window technique?
 
@@ -294,8 +405,12 @@ from scratch. It reduces many `O(n^2)` substring problems to O(n). For
 example, "longest substring without repeating characters" expands the
 right pointer and shrinks the left when a duplicate enters the window.
 
-```python
-def length_of_longest_substring(s):
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def length_of_longest_substring(s):
     seen = {}
     left = best = 0
     for right, ch in enumerate(s):
@@ -304,7 +419,13 @@ def length_of_longest_substring(s):
         seen[ch] = right
         best = max(best, right - left + 1)
     return best
-```
+
+print(length_of_longest_substring("abcabcbb"))  # 3 ("abc")
+print(length_of_longest_substring("bbbbb"))     # 1 ("b")
+print(length_of_longest_substring("pwwkew"))    # 3 ("wke")`,
+    },
+  ]}
+/>
 
 ### Explain merge sort and its complexity.
 
@@ -314,8 +435,12 @@ solves to `O(n log n)` by the Master Theorem. It is **stable** and
 performs well on linked lists, but requires O(n) extra space for the merge
 step. It is the basis for Python's Timsort.
 
-```python
-def merge_sort(arr):
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def merge_sort(arr):
     if len(arr) <= 1:
         return arr
     mid = len(arr) // 2
@@ -328,7 +453,11 @@ def merge_sort(arr):
         else:
             result.append(right[j]); j += 1
     return result + left[i:] + right[j:]
-```
+
+print(merge_sort([38, 27, 43, 3, 9, 82, 10]))  # [3, 9, 10, 27, 38, 43, 82]`,
+    },
+  ]}
+/>
 
 ### How does quicksort work, and what is its worst-case?
 
@@ -339,8 +468,12 @@ sorted input with a naive "pick last" pivot). Randomized pivot selection
 makes worst case extremely unlikely in practice. Quicksort is in-place
 (O(log n) stack space) unlike merge sort.
 
-```python
-import random
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import random
 
 def quicksort(arr):
     if len(arr) <= 1:
@@ -350,7 +483,12 @@ def quicksort(arr):
     mid = [x for x in arr if x == pivot]
     hi = [x for x in arr if x > pivot]
     return quicksort(lo) + mid + quicksort(hi)
-```
+
+random.seed(42)
+print(quicksort([3, 6, 8, 10, 1, 2, 1]))  # [1, 1, 2, 3, 6, 8, 10]`,
+    },
+  ]}
+/>
 
 ### When is heapsort preferable?
 
@@ -377,8 +515,12 @@ write (matches the recursive definition) but has call-stack overhead.
 Tabulation avoids that and can be optimized to use O(1) space when only
 the last row is needed.
 
-```python
-# Memoization — Fibonacci
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Memoization — Fibonacci
 from functools import lru_cache
 
 @lru_cache(maxsize=None)
@@ -393,7 +535,12 @@ def fib_tab(n):
     for _ in range(n):
         a, b = b, a + b
     return a
-```
+
+print(fib(10))      # 55
+print(fib_tab(10))  # 55`,
+    },
+  ]}
+/>
 
 ### What are classic DP problems you should know?
 
@@ -419,8 +566,12 @@ solution. It is used for N-Queens, Sudoku solver, permutations,
 combinations, and subset generation. The worst-case time is exponential,
 but pruning makes practical performance far better.
 
-```python
-def permutations(nums):
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def permutations(nums):
     res = []
     def bt(path, remaining):
         if not remaining:
@@ -432,7 +583,12 @@ def permutations(nums):
             path.pop()
     bt([], nums)
     return res
-```
+
+print(permutations([1, 2, 3]))
+# [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]`,
+    },
+  ]}
+/>
 
 ### What is divide and conquer, and how does it differ from DP?
 
@@ -450,14 +606,23 @@ Bit ops (AND, OR, XOR, shifts) are single CPU instructions. Useful tricks:
 O(1) space), and left-shifting by k multiplies by `2^k`. Bit sets can
 represent subsets in O(1) space per subset.
 
-```python
-# Find single non-duplicate element
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Find single non-duplicate element
 def single_number(nums):
     result = 0
     for n in nums:
         result ^= n
     return result
-```
+
+print(single_number([4, 1, 2, 1, 2]))  # 4
+print(single_number([2, 2, 1]))         # 1`,
+    },
+  ]}
+/>
 
 ### What is the time and space complexity of a hash set?
 
@@ -506,8 +671,12 @@ final order contains fewer than V nodes, at least one cycle exists and a
 full topological sort is impossible. It is an alternative to DFS-based
 topological sort and naturally detects cycles.
 
-```python
-from collections import deque
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from collections import deque
 
 def kahns(num_nodes, edges):
     in_deg = [0] * num_nodes
@@ -525,7 +694,15 @@ def kahns(num_nodes, edges):
             if in_deg[v] == 0:
                 q.append(v)
     return order  # len < num_nodes → cycle detected
-```
+
+# 4 nodes: 0→2, 1→2, 2→3
+edges = [(0, 2), (1, 2), (2, 3)]
+order = kahns(4, edges)
+print(order)                          # e.g. [0, 1, 2, 3]
+print("cycle?" , len(order) < 4)     # False`,
+    },
+  ]}
+/>
 
 ## Concept checks
 

@@ -48,17 +48,30 @@ match a query — cutting scan cost dramatically. A good key is one queries
 partitions. Too-granular partitioning creates many tiny files (the
 "small files problem") and hurts performance.
 
-```sql
--- Partition-pruned query: the engine reads only the 2024-06-01 partition,
--- skipping every other day's files entirely.
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE events (
+  event_date  DATE,
+  user_id     INTEGER,
+  event_type  VARCHAR
+);
+INSERT INTO events VALUES
+  (DATE '2024-06-01', 1, 'click'),
+  (DATE '2024-06-01', 1, 'click'),
+  (DATE '2024-06-01', 2, 'view'),
+  (DATE '2024-06-02', 1, 'purchase'),
+  (DATE '2024-06-02', 3, 'click'),
+  (DATE '2024-06-03', 2, 'click');`}
+  starterCode={`-- Only the 2024-06-01 "partition" is read; other dates are skipped.
 SELECT user_id, event_type, COUNT(*) AS cnt
 FROM events
-WHERE event_date = '2024-06-01'   -- matches the partition key
-GROUP BY user_id, event_type;
+WHERE event_date = '2024-06-01'
+GROUP BY user_id, event_type
+ORDER BY user_id, event_type;
 
 -- Pruning DEFEAT: wrapping the column in a function prevents pruning.
--- WHERE YEAR(event_date) = 2024   -- avoid this pattern
-```
+-- WHERE YEAR(event_date) = 2024   -- avoid this pattern`}
+/>
 
 ### What does an orchestrator (Airflow/Dagster) give you over cron?
 
