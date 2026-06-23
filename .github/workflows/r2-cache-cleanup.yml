@@ -103,9 +103,16 @@ jobs:
             fi
 
             # Newest object in the folder (all written together at deploy time).
+            # The CLI auto-paginates above 1000 objects and applies --query to
+            # each page separately, so a large build folder returns one max
+            # timestamp PER PAGE (multiple lines). Collapse to the overall max —
+            # R2 reports LastModified in a uniform UTC ISO-8601 layout, so a
+            # lexical sort orders them chronologically — and drop the "None" a
+            # genuinely empty page emits, leaving `date` a single value to parse.
             newest="$(aws s3api list-objects-v2 --bucket "$BUCKET" --prefix "$folder" \
-              --query 'sort_by(Contents, &LastModified)[-1].LastModified' --output text 2>/dev/null || true)"
-            if [[ -z "$newest" || "$newest" == "None" ]]; then
+              --query 'sort_by(Contents, &LastModified)[-1].LastModified' --output text 2>/dev/null \
+              | grep -vxF 'None' | sort | tail -n1 || true)"
+            if [[ -z "$newest" ]]; then
               echo "skip  $folder (empty)"; continue
             fi
             ts=$(date -u -d "$newest" +%s)
