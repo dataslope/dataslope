@@ -16,6 +16,22 @@ tables (each fact stored once) — great for OLTP write integrity.
 where reads dominate. The trade-off: denormalizing buys read speed at the
 cost of storage and the risk of copies disagreeing (update anomalies).
 
+```sql
+-- Normalized (3NF): customer stored once, referenced by foreign key
+-- customers(customer_id, name, city)
+-- orders(order_id, customer_id, amount)
+
+-- Denormalized: customer attributes repeated on every order row
+-- orders_wide(order_id, customer_name, customer_city, amount)
+
+-- The normalized version requires a join to get the name; the
+-- denormalized version reads faster but risks stale copies if the
+-- customer's city changes.
+SELECT o.order_id, c.name, c.city, o.amount
+FROM orders o
+JOIN customers c ON c.customer_id = o.customer_id;
+```
+
 ### Star vs snowflake schema?
 
 A **star** schema has a central fact table joined directly to
@@ -48,6 +64,21 @@ Use a **slowly-changing dimension**:
 
 Type 2 is the standard when point-in-time accuracy matters.
 
+```sql
+-- SCD Type 2 dim_customer row structure
+-- customer_key  | customer_id | city       | valid_from | valid_to   | is_current
+-- 1001          | 42          | Boston     | 2022-01-01 | 2024-03-14 | false
+-- 1087          | 42          | Austin     | 2024-03-15 | 9999-12-31 | true
+
+-- Point-in-time join: fact joins to the dimension row current when the
+-- order was placed, not necessarily the customer's city today.
+SELECT f.order_id, d.city, f.amount
+FROM fact_orders f
+JOIN dim_customer d
+  ON  d.customer_id  = f.customer_id
+  AND f.order_date BETWEEN d.valid_from AND d.valid_to;
+```
+
 ### What is 1NF, 2NF, and 3NF?
 
 **First Normal Form (1NF):** each column holds a single atomic value; no repeating groups or arrays in a column. **Second Normal Form (2NF):** 1NF plus every non-key column depends on the **entire** primary key (eliminates partial dependencies — relevant when the key is composite). **Third Normal Form (3NF):** 2NF plus no non-key column depends on another non-key column (eliminates transitive dependencies). OLTP schemas are typically designed to 3NF; analytical schemas often intentionally violate higher normal forms for query performance.
@@ -61,6 +92,16 @@ Type 2 is the standard when point-in-time accuracy matters.
 ### What is a surrogate key, and why prefer it over a natural key?
 
 A **surrogate key** is a system-generated identifier (auto-increment integer or UUID) with no business meaning. It is preferred because natural keys (customer email, product code) can change, be reused, or be long strings that make joins expensive. Surrogate keys are stable, compact, and immune to upstream business logic changes, which is especially important for SCD Type 2 where multiple rows represent the same entity.
+
+```sql
+-- Surrogate key join: fact holds a compact integer key pointing to the
+-- exact dimension version that was current at the time of the event.
+SELECT f.order_id, f.amount, p.product_name, p.category
+FROM fact_orders f
+JOIN dim_product p ON p.product_key = f.product_key;
+-- product_key is the surrogate (e.g. 8821), not the natural product_code
+-- ('SKU-XYZ'), which may have been reassigned or renamed over time.
+```
 
 ### What is a conformed dimension?
 
@@ -84,6 +125,20 @@ A dimension shared — with identical structure and values — across multiple f
 
 When an attribute changes, you close the existing row by setting its `valid_to` date (or `is_current = false`) and insert a new row with the updated value and a new `valid_from` date. Facts that occurred before the change still join to the old dimension row via the surrogate key, preserving point-in-time accuracy. Queries for the current state filter `WHERE is_current = true`.
 
+```sql
+-- Step 1: close the existing row
+UPDATE dim_customer
+SET valid_to = CURRENT_DATE - INTERVAL '1 day',
+    is_current = false
+WHERE customer_id = 42 AND is_current = true;
+
+-- Step 2: insert the new version
+INSERT INTO dim_customer
+  (customer_id, city, valid_from, valid_to, is_current)
+VALUES
+  (42, 'Austin', CURRENT_DATE, DATE '9999-12-31', true);
+```
+
 ### What is a degenerate dimension?
 
 A dimension attribute stored **directly on the fact table** rather than in a separate dimension table, because it has no other attributes worth modeling (e.g., an order number or invoice number). It is a dimension for slicing data but too simple to warrant its own table.
@@ -100,6 +155,18 @@ A single physical dimension table used multiple times in the same schema under d
 
 A **bridge table** (also called an association table) resolves **many-to-many** relationships between a fact table and a dimension — for example, an order that belongs to multiple promotions simultaneously. The bridge table has a surrogate key, the fact foreign key, and the dimension foreign key. Without it you would either fan out fact rows (inflating counts) or store comma-separated lists (violating 1NF).
 
+```sql
+-- Bridge table: one row per (order, promotion) pair
+-- order_promotion_bridge(order_key, promo_key)
+
+SELECT f.order_id, p.promo_name, f.amount
+FROM fact_orders f
+JOIN order_promotion_bridge b ON b.order_key = f.order_key
+JOIN dim_promotion p          ON p.promo_key  = b.promo_key;
+-- An order with 3 promotions produces 3 rows here;
+-- use a weighting factor on the bridge to distribute amounts if needed.
+```
+
 ### What is the difference between a wide table and a narrow table approach in analytics?
 
 A **wide table** (one row per entity, many columns) is fully denormalized — fast to query, easy to understand in a BI tool, but adds columns for every new attribute and can become unwieldy. A **narrow table** keeps fewer columns per row and uses keys to join to attribute tables, more normalized and flexible but requiring more joins. Modern cloud warehouses with columnar storage and cheap compute tolerate wide tables well; the trade-off is schema evolution vs query simplicity.
@@ -111,6 +178,22 @@ A **data vault** separates hubs (business keys), links (relationships), and sate
 ### What does "grain mismatch" mean, and how do you fix it?
 
 A grain mismatch occurs when you join two fact tables at different grains — for example, a daily budget table joined to a transaction-level sales table — causing double-counting or incorrect aggregations. Fix it by aggregating the finer-grain table to match the coarser grain before joining, or by storing both at a common grain in a separate bridging step.
+
+```sql
+-- Wrong: joining transaction-grain sales to daily-grain budget fans out
+-- budget rows, double-counting them once per transaction.
+
+-- Correct: pre-aggregate sales to the same daily grain, then join.
+WITH daily_sales AS (
+  SELECT sale_date, region, SUM(amount) AS total_sales
+  FROM fact_sales
+  GROUP BY sale_date, region
+)
+SELECT b.sale_date, b.region, b.budget, ds.total_sales
+FROM fact_budget b
+JOIN daily_sales ds
+  ON ds.sale_date = b.sale_date AND ds.region = b.region;
+```
 
 ### What are slowly-changing dimension types 4 and 6?
 
@@ -140,6 +223,18 @@ A **bus matrix** (or enterprise bus matrix) is a planning artifact that maps bus
 
 A `dim_date` table pre-computes every calendar attribute — fiscal week, quarter, holiday flag, day-of-week name — so analysts can filter and group by any combination without writing date-arithmetic functions inline. It also lets the business encode custom fiscal calendars, retail weeks, or regional holidays once and share them universally, rather than scattering business-specific date logic across every query.
 
+```sql
+-- dim_date has one row per calendar day with pre-computed attributes:
+-- date_key | calendar_date | fiscal_quarter | is_holiday | day_of_week_name
+
+SELECT d.fiscal_quarter, SUM(f.amount) AS revenue
+FROM fact_orders f
+JOIN dim_date d ON d.date_key = f.order_date_key
+WHERE d.is_holiday = false
+GROUP BY d.fiscal_quarter
+ORDER BY d.fiscal_quarter;
+```
+
 ### What is the difference between a measure and a metric?
 
 A **measure** is a raw numeric column on a fact table (e.g., `revenue`, `quantity`). A **metric** is a derived, business-defined calculation built from one or more measures (e.g., "average order value = revenue / orders"). Measures live in the physical model; metrics live in the semantic/BI layer or in documented SQL logic. Confusing the two leads to inconsistent definitions across teams.
@@ -151,6 +246,18 @@ An **auto-increment integer** surrogate key is compact, fast to join, and natura
 ### How do you model a many-to-many relationship between facts and dimensions?
 
 Use a **bridge table**: a separate table with one row per (fact, dimension) combination. For example, if an order can be associated with multiple promotions, the bridge table `order_promotion_bridge` holds `(order_key, promo_key)` pairs. The fact table joins to the bridge, which joins to the promotion dimension. A **weighting factor** column on the bridge can distribute additive measures proportionally across the associated dimension members.
+
+```sql
+-- Bridge table with optional weighting factor (sums to 1.0 per order)
+-- order_promotion_bridge(order_key, promo_key, weight)
+
+SELECT p.promo_name,
+       SUM(f.amount * b.weight) AS attributed_revenue
+FROM fact_orders f
+JOIN order_promotion_bridge b ON b.order_key = f.order_key
+JOIN dim_promotion p          ON p.promo_key  = b.promo_key
+GROUP BY p.promo_name;
+```
 
 ## Concept checks
 

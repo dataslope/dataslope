@@ -43,6 +43,14 @@ df.groupby("region").agg(total=("amount", "sum"),
 
 Reach for `merge` for "combine on a key," `concat` for "stack these together."
 
+```python
+# merge: join on a key column
+combined = pd.merge(orders, customers, on="customer_id", how="left")
+
+# concat: stack two frames with the same columns
+all_orders = pd.concat([orders_jan, orders_feb], ignore_index=True)
+```
+
 ### How do you handle missing data?
 
 Detect with `isna()`/`notna()`; then **drop** (`dropna()`) or **fill**
@@ -50,6 +58,12 @@ Detect with `isna()`/`notna()`; then **drop** (`dropna()`) or **fill**
 missing and how much: dropping a few rows is fine; dropping a column
 that's 60% null often isn't. Beware that `NaN != NaN`, so compare with
 `isna()`, not `== NaN`.
+
+```python
+df.isna().sum()                    # count NaNs per column
+df.dropna(subset=["amount"])       # drop rows where amount is NaN
+df["amount"].fillna(0, inplace=True)  # fill NaN with 0
+```
 
 ### Why can `SettingWithCopyWarning` appear, and how do you avoid it?
 
@@ -123,6 +137,12 @@ stores integer codes internally instead of repeated strings, saving memory
 and speeding up `groupby` and sorting. Use `df["col"].astype("category")`.
 Ordered categoricals also allow meaningful comparisons like `small < medium < large`.
 
+```python
+df["region"] = df["region"].astype("category")
+print(df["region"].cat.categories)   # Index(['East', 'North', 'South', 'West'])
+print(df.memory_usage(deep=True))    # noticeably smaller than object dtype
+```
+
 ### How do you sort a DataFrame and rank values?
 
 `sort_values(by="col", ascending=False)` sorts rows. `df["col"].rank()`
@@ -163,6 +183,12 @@ monthly = df.set_index("date").resample("ME")["amount"].sum()
 time periods (e.g., `"D"` for daily, `"ME"` for month-end, `"YE"` for
 year-end) and applies an aggregation. The DataFrame index must be a
 `DatetimeIndex`.
+
+```python
+df = df.set_index(pd.to_datetime(df["date"]))
+weekly_revenue = df["amount"].resample("W").sum()
+monthly_avg    = df["amount"].resample("ME").mean()
+```
 
 ### What is method chaining and why is it useful?
 
@@ -304,6 +330,14 @@ df["pct_of_region"] = (
 CSV. `pd.read_excel("file.xlsx", sheet_name="Sheet1")` and
 `df.to_excel("out.xlsx", index=False)` for Excel (requires `openpyxl`).
 
+```python
+df = pd.read_csv("sales.csv", parse_dates=["order_date"])
+df.to_csv("sales_clean.csv", index=False)
+
+df_xl = pd.read_excel("report.xlsx", sheet_name="Q1")
+df_xl.to_excel("report_out.xlsx", index=False)
+```
+
 ### What is the `query` method?
 
 `df.query("amount > 100 and region == 'North'")` filters rows using a
@@ -320,6 +354,13 @@ df.query("amount > @threshold")
 `df.shape` returns `(rows, cols)`. `df.dtypes` lists each column's dtype.
 `df.info()` prints both plus non-null counts and approximate memory usage
 in one call. For precise memory, use `df.memory_usage(deep=True).sum()`.
+
+```python
+print(df.shape)                          # (1000, 5)
+print(df.dtypes)                         # per-column dtype
+df.info()                                # summary: shape + nulls + memory
+print(df.memory_usage(deep=True).sum())  # exact bytes
+```
 
 ### How do you concatenate DataFrames vertically and reset the index?
 
@@ -340,6 +381,17 @@ combined = pd.concat([df_jan, df_feb, df_mar], ignore_index=True)
 Use `Series.map` for single-column lookups or value substitution, `apply` for
 row or column-level logic, and `DataFrame.map` for element-wise
 transformations across all cells.
+
+```python
+# Series.map: value substitution
+df["region_code"] = df["region"].map({"North": "N", "South": "S"})
+
+# DataFrame.apply: column-wise summary
+df.apply(lambda col: col.max() - col.min(), axis=0)
+
+# DataFrame.map: element-wise transformation across the whole frame
+df[["q1", "q2"]].map(lambda x: round(x, 2))
+```
 
 ## Concept checks
 

@@ -6,6 +6,8 @@ description: Analytics Engineer interview questions on facts, dimensions, grain,
 The AE craft is turning raw tables into clean, well-grained dimensional
 models. Review the Q&A, then build a mart.
 
+> **SQL dialect:** the runnable challenge on this page executes in your browser on **DuckDB**, so the SQL below targets DuckDB. It is standard SQL except where noted.
+
 ## Q&A
 
 ### What are fact and dimension tables?
@@ -30,6 +32,18 @@ joins — the BI default. **Snowflake** normalizes dimensions into
 sub-tables, reducing redundancy at the cost of more joins. Prefer star
 unless a dimension is huge or genuinely shared.
 
+```sql
+-- Classic star-schema join: fact + two dimensions
+SELECT
+    d.full_date,
+    p.category,
+    SUM(f.amount) AS revenue
+FROM fact_orders f
+JOIN dim_date    d ON d.date_sk    = f.order_date_sk
+JOIN dim_product p ON p.product_sk = f.product_sk
+GROUP BY d.full_date, p.category;
+```
+
 ### What is a surrogate key, and why prefer it over a natural key?
 
 A **surrogate key** is a synthetic, meaningless identifier (an integer or
@@ -37,6 +51,16 @@ hash) for a dimension row, independent of the source's **natural key**.
 It's stable across source changes, enables SCD Type 2 (each version gets
 its own surrogate), and keeps fact joins fast and decoupled from business
 identifiers.
+
+```sql
+-- Hash-based surrogate key (DuckDB: md5 returns a hex string)
+SELECT
+    md5(customer_id::TEXT)  AS customer_sk,  -- surrogate
+    customer_id,                              -- natural key
+    customer_name,
+    region
+FROM stg_customers;
+```
 
 ### How do staging, intermediate, and mart layers differ?
 
@@ -63,6 +87,23 @@ SCD Type 1 **overwrites** the old attribute value with the new one, preserving n
 ### What is SCD Type 2, and how is it implemented?
 
 SCD Type 2 adds a **new row** for each attribute change, preserving the full history. Each row gets its own surrogate key plus `valid_from`, `valid_to`, and `is_current` columns. Fact rows joined to their surrogate key automatically reflect the attribute values that were true at event time.
+
+```sql
+-- SCD Type 2 row layout: customer moved from East to West
+-- customer_sk  customer_id  region  valid_from    valid_to      is_current
+--  1001         42           East    2020-01-01    2023-06-14    FALSE
+--  1002         42           West    2023-06-15    9999-12-31    TRUE
+
+-- Join a fact to the historically-correct dimension row
+SELECT
+    f.order_id,
+    c.region       AS region_at_order_time,
+    f.amount
+FROM fact_orders f
+JOIN dim_customer c
+    ON  c.customer_id = f.customer_id
+    AND f.order_date BETWEEN c.valid_from AND c.valid_to;
+```
 
 ```sql
 -- Example dim_customer with SCD2 columns
@@ -94,6 +135,16 @@ A conformed dimension is shared across **multiple fact tables or subject areas**
 
 A degenerate dimension is a dimensional attribute stored directly in the fact table rather than in a separate dimension table, because it has no descriptive attributes of its own. An order number or invoice number is the canonical example — it provides grouping ability but carries no extra columns worth their own table.
 
+```sql
+-- order_number lives in the fact table (degenerate dimension)
+-- No separate dim_order table exists
+SELECT
+    order_number,               -- degenerate dimension — grouping only
+    SUM(line_amount) AS total
+FROM fact_order_lines
+GROUP BY order_number;
+```
+
 ### What is a role-playing dimension?
 
 A role-playing dimension is a single physical dimension table used **multiple times** in the same fact table under different aliases. A `dim_date` table might be joined three times to `fact_orders` as `order_date`, `ship_date`, and `delivery_date`, each a "role."
@@ -118,9 +169,32 @@ A junk dimension bundles **miscellaneous low-cardinality flags and indicators** 
 
 A factless fact table records **events or coverage** with no numeric measure — just foreign keys. Examples: student course enrollments (the fact is attendance, not a count), or a coverage fact listing which products are on promotion in which stores on which days. You derive counts by querying "how many rows match this criteria."
 
+```sql
+-- Factless fact: which products were on promotion per store per day
+-- fact_promotion_coverage(date_sk, store_sk, product_sk) — no measures
+
+-- "How many distinct products were promoted in store 5 last week?"
+SELECT COUNT(*) AS promoted_products
+FROM fact_promotion_coverage pc
+JOIN dim_date d ON d.date_sk = pc.date_sk
+WHERE pc.store_sk = 5
+  AND d.full_date BETWEEN '2024-01-01' AND '2024-01-07';
+```
+
 ### What is a bridge table, and when do you need one?
 
 A bridge table resolves **many-to-many relationships** between a fact and a dimension. For example, an order can have multiple promotions, and a promotion can apply to multiple orders. The bridge table contains (order_sk, promotion_sk) pairs with an optional weighting factor. It avoids row multiplication in the fact while still allowing drill-down to all related dimension members.
+
+```sql
+-- Bridge table join: list each order with all applied promotions
+SELECT
+    f.order_id,
+    p.promotion_name,
+    f.amount * b.weight_factor AS allocated_amount
+FROM fact_orders f
+JOIN bridge_order_promotion b  ON b.order_sk     = f.order_sk
+JOIN dim_promotion          p  ON p.promotion_sk  = b.promotion_sk;
+```
 
 ### How does Kimball's approach differ from Inmon's?
 
@@ -169,6 +243,17 @@ Measures in fact tables are generally fixed at event time and should not change.
 ### What are the trade-offs of using a hash surrogate key vs. a sequence integer?
 
 **Hash surrogates** (e.g., `MD5(natural_key)`) are deterministic — you can compute the same key in any environment without a central sequence, which helps distributed/incremental builds. **Integer sequences** are more compact, faster for joins, and easier to debug, but require a coordination mechanism. Hashes can collide (rare but possible) and are larger in storage. Most modern data warehouses use either approach; hashes are common in dbt pipelines.
+
+```sql
+-- Hash surrogate (DuckDB): deterministic, no sequence needed
+SELECT md5(customer_id::TEXT) AS customer_sk, customer_id, customer_name
+FROM stg_customers;
+
+-- Integer surrogate (DuckDB): compact, human-readable
+SELECT row_number() OVER (ORDER BY customer_id) AS customer_sk,
+       customer_id, customer_name
+FROM stg_customers;
+```
 
 ### What is the difference between a fact's grain and its level of aggregation?
 

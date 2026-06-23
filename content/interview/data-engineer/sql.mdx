@@ -7,6 +7,8 @@ Engineering SQL screens go deeper than analyst ones: window functions,
 deduplication, and reasoning about performance. Review the Q&A, then run
 the challenges.
 
+> **SQL dialect:** the runnable challenges on Dataslope execute in your browser on **DuckDB**, so the SQL below targets DuckDB. It is standard SQL except where noted — most of it runs unchanged on Postgres, MySQL, BigQuery, or Snowflake.
+
 ## Q&A
 
 ### What's the difference between RANK, DENSE_RANK, and ROW_NUMBER?
@@ -49,6 +51,19 @@ multi-step transformations far more readable. A correlated **subquery**
 runs per outer row and can be a performance trap. CTEs shine for staging
 steps and recursive queries.
 
+```sql
+-- Subquery: nested and harder to read; calculated inline each time
+SELECT user_id, total
+FROM (SELECT user_id, SUM(amount) AS total FROM orders GROUP BY user_id) t
+WHERE t.total > 1000;
+
+-- CTE: named, readable, reusable within the query
+WITH user_totals AS (
+  SELECT user_id, SUM(amount) AS total FROM orders GROUP BY user_id
+)
+SELECT user_id, total FROM user_totals WHERE total > 1000;
+```
+
 ### A query is slow. What do you check first?
 
 Read the **query plan** (`EXPLAIN`). Look for full scans where an index
@@ -63,6 +78,18 @@ pre-aggregate before joining, and partition/prune large tables.
 expensive sort/hash); `UNION ALL` keeps everything, including duplicates.
 Prefer `UNION ALL` unless you specifically need dedup — it skips the
 distinct step.
+
+```sql
+-- UNION ALL: fast, keeps every row including duplicates
+SELECT user_id FROM app_users
+UNION ALL
+SELECT user_id FROM legacy_users;
+
+-- UNION: deduplicates the combined set (slower due to hashing)
+SELECT user_id FROM app_users
+UNION
+SELECT user_id FROM legacy_users;
+```
 
 ### How do LAG and LEAD work?
 
@@ -261,6 +288,14 @@ When a table is partitioned (e.g., by `event_date`) and a query filters on that 
 - **`LEFT JOIN`** — all rows from the left table; nulls on the right for non-matches.
 - **`RIGHT JOIN`** — all rows from the right table; nulls on the left.
 - **`FULL OUTER JOIN`** — all rows from both; nulls where either side has no match.
+
+```sql
+-- LEFT JOIN: all customers returned; order columns are NULL for customers
+-- with no orders (useful to find customers who never ordered).
+SELECT c.customer_id, c.name, o.order_id
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.customer_id;
+```
 
 ### How do you join two large tables efficiently at scale?
 

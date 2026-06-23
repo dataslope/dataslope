@@ -6,6 +6,8 @@ description: Analytics Engineer interview questions on dbt models, ref/source, m
 dbt is the tool AE interviews assume. Review the Q&A, then the concept
 checks.
 
+> **Note:** dbt compiles these models to your warehouse's SQL dialect, so the SQL below is illustrative. Dataslope's runnable SQL playground uses **DuckDB**.
+
 ## Q&A
 
 ### What is dbt, and what does it actually do?
@@ -24,6 +26,21 @@ references a declared raw **source** table. Both let dbt build the
 **dependency graph (DAG)** — so it knows build order and can swap
 schemas between dev and prod. Hardcoding table names breaks lineage and
 environment handling.
+
+```sql
+-- models/marts/fct_orders.sql
+SELECT
+    o.order_id,
+    o.ordered_at,
+    c.customer_name
+FROM {{ ref('stg_orders') }}    AS o   -- references another model
+JOIN {{ ref('stg_customers') }} AS c   ON c.customer_id = o.customer_id;
+```
+
+```sql
+-- Referencing a raw source table
+SELECT * FROM {{ source('raw', 'orders') }}
+```
 
 ### Compare the materializations: view, table, incremental, ephemeral.
 
@@ -99,6 +116,33 @@ Seeds are **CSV files** checked into the repository and loaded into the warehous
 ### What are generic (schema) tests vs. singular tests?
 
 **Generic tests** (`unique`, `not_null`, `accepted_values`, `relationships`) are configured in YAML and applied to columns across many models. **Singular tests** are standalone `.sql` files that return rows when the test fails. Use singular tests for complex, business-specific assertions that don't fit a generic pattern.
+
+```yaml
+# models/schema.yml — generic tests on fct_orders
+models:
+  - name: fct_orders
+    columns:
+      - name: order_id
+        tests:
+          - unique
+          - not_null
+      - name: status
+        tests:
+          - accepted_values:
+              values: ['placed', 'shipped', 'delivered', 'cancelled']
+      - name: customer_id
+        tests:
+          - relationships:
+              to: ref('dim_customer')
+              field: customer_id
+```
+
+```sql
+-- tests/assert_no_negative_amounts.sql — singular test (returns rows on failure)
+SELECT order_id, amount
+FROM {{ ref('fct_orders') }}
+WHERE amount < 0
+```
 
 ### How do macros work in dbt?
 
@@ -186,6 +230,23 @@ dbt run --select tag:nightly
 
 `unique_key` tells dbt how to **handle duplicate rows** when merging new data into an incremental model. If a new row's key already exists in the target table, dbt will `MERGE`/`UPDATE` (upsert) rather than inserting a duplicate. Without `unique_key`, dbt only appends; with it, dbt uses a MERGE strategy (or DELETE+INSERT on warehouses that lack MERGE).
 
+```sql
+-- models/fct_events.sql — incremental with upsert on event_id
+{{
+  config(
+    materialized='incremental',
+    unique_key='event_id'
+  )
+}}
+
+SELECT event_id, user_id, event_at, event_type
+FROM {{ source('raw', 'events') }}
+
+{% if is_incremental() %}
+  WHERE event_at > (SELECT MAX(event_at) FROM {{ this }})
+{% endif %}
+```
+
 ### What is a dbt model contract?
 
 A **model contract** enforces that a model's output schema (column names, data types, and constraints) matches a declared specification. If the model's SQL produces a different shape, the run fails. Contracts are defined in YAML with `contract: {enforced: true}` and column-level `data_type` declarations. They are useful for models with downstream consumers who depend on a stable interface.
@@ -216,6 +277,18 @@ On a pull request, CI runs `dbt build --select state:modified+` — building and
 ### What is an ephemeral model, and when should you use it?
 
 An ephemeral model is **not materialized** — it is compiled as a CTE and injected into any model that references it. Use ephemeral models for intermediate logic that is referenced only once or twice and does not need to be queryable directly. Avoid them when the same logic is referenced by many downstream models (the CTE is duplicated each time) or when you need to test the intermediate result directly.
+
+```sql
+-- models/intermediate/int_orders_cleaned.sql
+{{ config(materialized='ephemeral') }}
+
+SELECT
+    order_id,
+    customer_id,
+    amount_cents / 100.0 AS amount_usd
+FROM {{ source('raw', 'orders') }}
+WHERE amount_cents > 0
+```
 
 ### How do you pass variables into dbt models?
 

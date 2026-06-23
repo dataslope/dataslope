@@ -25,6 +25,21 @@ by **overwriting** a target partition or **upserting** by key
 (`MERGE`/delete-then-insert) instead of blind `INSERT` (which would
 duplicate rows on a re-run).
 
+```sql
+-- Idempotent upsert: re-running with the same source data is safe.
+INSERT INTO orders (order_id, status, updated_at)
+SELECT order_id, status, updated_at
+FROM orders_stage
+ON CONFLICT (order_id)
+DO UPDATE SET
+  status     = EXCLUDED.status,
+  updated_at = EXCLUDED.updated_at;
+
+-- DuckDB / partition-overwrite pattern: delete the partition, re-insert.
+DELETE FROM events WHERE event_date = '2024-06-01';
+INSERT INTO events SELECT * FROM events_stage WHERE event_date = '2024-06-01';
+```
+
 ### Why partition large tables, and what makes a good partition key?
 
 Partitioning lets the engine **prune** — skip files/partitions that can't
@@ -33,12 +48,44 @@ match a query — cutting scan cost dramatically. A good key is one queries
 partitions. Too-granular partitioning creates many tiny files (the
 "small files problem") and hurts performance.
 
+```sql
+-- Partition-pruned query: the engine reads only the 2024-06-01 partition,
+-- skipping every other day's files entirely.
+SELECT user_id, event_type, COUNT(*) AS cnt
+FROM events
+WHERE event_date = '2024-06-01'   -- matches the partition key
+GROUP BY user_id, event_type;
+
+-- Pruning DEFEAT: wrapping the column in a function prevents pruning.
+-- WHERE YEAR(event_date) = 2024   -- avoid this pattern
+```
+
 ### What does an orchestrator (Airflow/Dagster) give you over cron?
 
 A **DAG** of tasks with explicit dependencies, so steps run in the right
 order and only after upstreams succeed; plus retries, backfills,
 scheduling, monitoring, and lineage. Cron just fires a command at a time
 with no dependency awareness or recovery.
+
+```python
+from airflow.decorators import dag, task
+from datetime import datetime
+
+@dag(schedule="@daily", start_date=datetime(2024, 1, 1), catchup=False)
+def orders_pipeline():
+    @task
+    def extract(): ...
+
+    @task
+    def transform(raw): ...
+
+    @task
+    def load(clean): ...
+
+    load(transform(extract()))  # explicit dependency chain
+
+orders_pipeline()
+```
 
 ### Why is Parquet preferred over CSV for analytics?
 
@@ -59,6 +106,19 @@ Writing many tiny files (e.g., one Parquet file per minute instead of one per da
 
 CDC tracks row-level changes (inserts, updates, deletes) in a source database — typically by reading the database's write-ahead log (WAL) — and propagates them downstream in near real time. Use it when you need low-latency replication of transactional data to a warehouse or lake without polling the source table, and when you must capture deletes (which a simple `WHERE updated_at > last_run` query misses).
 
+```yaml
+# Debezium connector config (Kafka Connect) — streams Postgres WAL events
+# to a Kafka topic as JSON change events with op: "c" / "u" / "d"
+name: postgres-source
+config:
+  connector.class: io.debezium.connector.postgresql.PostgresConnector
+  database.hostname: db.example.com
+  database.dbname: app_db
+  table.include.list: public.orders
+  plugin.name: pgoutput
+  topic.prefix: cdc
+```
+
 ### What is a watermark in a streaming pipeline?
 
 A **watermark** is a signal that tells the streaming engine "all events with timestamp before T have arrived." It allows the engine to close and finalize windows without waiting forever. Watermarks are set as `event_time - some_allowed_lateness_margin`. Events that arrive after the watermark has passed are called **late data** and are either dropped, routed to a side output, or used to update (recompute) the window result depending on the system's configuration.
@@ -70,6 +130,18 @@ Common strategies: (1) set a generous **allowed lateness window** so the engine 
 ### What is a backfill and how do you design for it?
 
 A **backfill** reprocesses historical data through a pipeline, usually to populate a new table, fix a bug, or apply a schema change. Design for it by making pipelines **parameterized by date range** and **idempotent** (safe to run multiple times). In Airflow, set `catchup=True` and choose a sensible `start_date`; in Dagster, use partitioned assets. Backfills of years of data may require throttling to avoid overwhelming source systems.
+
+```python
+# Parameterize the pipeline by logical date so each run is independent
+# and the same date can be re-run safely (idempotent).
+@task
+def process_partition(ds: str):  # ds = "2024-06-01" injected by Airflow
+    run_sql(f"""
+        DELETE FROM events_clean WHERE event_date = '{ds}';
+        INSERT INTO events_clean
+        SELECT * FROM events_raw WHERE event_date = '{ds}';
+    """)
+```
 
 ### What is ETL vs ELT?
 
@@ -95,9 +167,36 @@ Schema evolution is the ability to change a schema (add, rename, remove, or chan
 
 A **DAG (Directed Acyclic Graph)** defines the set of tasks and their dependencies for a workflow. Common anti-patterns: (1) **dynamic DAGs generated at parse time** with expensive API calls — they slow the scheduler; (2) **tasks that do too much** — large monolithic tasks make retries expensive; (3) **no idempotency** — tasks that fail partway through corrupt state; (4) **passing large data through XComs** — XComs are for small metadata, not DataFrames; use external storage.
 
+```python
+# Anti-pattern: XCom used to pass a large result set
+@task
+def extract():
+    return fetch_million_rows()   # serialized into XCom DB — avoid
+
+# Better: write to S3/GCS and pass only the path
+@task
+def extract():
+    path = "s3://bucket/staging/run_id.parquet"
+    write_parquet(fetch_million_rows(), path)
+    return path                   # tiny string in XCom — fine
+```
+
 ### What is a task vs a sensor in Airflow?
 
 A **task** performs an action (run SQL, call an API, submit a Spark job). A **sensor** is a special task that polls a condition (does this S3 file exist? has the upstream DAG succeeded?) and blocks until it is true or times out. Sensors hold a worker slot while polling; for long-waiting sensors, use `mode='reschedule'` so the slot is freed between polls.
+
+```python
+from airflow.sensors.s3_key_sensor import S3KeySensor
+
+wait_for_file = S3KeySensor(
+    task_id="wait_for_daily_export",
+    bucket_name="data-lake",
+    bucket_key="exports/{{ ds }}/orders.parquet",
+    mode="reschedule",   # frees the worker slot between poke intervals
+    poke_interval=300,   # check every 5 minutes
+    timeout=7200,        # fail after 2 hours
+)
+```
 
 ### How does Dagster model pipelines differently from Airflow?
 
@@ -110,6 +209,19 @@ Data quality tests validate that data meets expectations before it flows downstr
 ### What is dbt and where does it fit in an ELT pipeline?
 
 **dbt (data build tool)** is a transformation framework that runs SQL `SELECT` statements against a warehouse and materializes the results as tables or views. It handles dependency ordering (via `ref()` calls), incremental models, testing, documentation, and lineage. It occupies the "T" in ELT — after raw data is loaded into the warehouse, dbt transforms it into clean, modeled tables for analytics.
+
+```sql
+-- models/marts/fct_orders.sql
+-- dbt materializes this SELECT as a table; ref() wires the dependency graph.
+SELECT
+  o.order_id,
+  o.amount,
+  c.customer_name,
+  d.fiscal_quarter
+FROM {{ ref('stg_orders') }} o
+JOIN {{ ref('dim_customer') }} c ON c.customer_id = o.customer_id
+JOIN {{ ref('dim_date') }}    d ON d.date_key     = o.order_date_key
+```
 
 ### What is a Medallion architecture (Bronze/Silver/Gold)?
 

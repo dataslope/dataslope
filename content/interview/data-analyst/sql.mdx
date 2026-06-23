@@ -7,6 +7,8 @@ SQL is the core of almost every Data Analyst screen. This page is a
 question bank: short **Q&A** to review the ideas, **concept checks**, and
 **runnable challenges** that execute against a real in-browser database.
 
+> **SQL dialect:** the runnable challenges on Dataslope execute in your browser on **DuckDB**, so the SQL below targets DuckDB. It is standard SQL except where noted — most of it runs unchanged on Postgres, MySQL, BigQuery, or Snowflake.
+
 ## Q&A
 
 ### What's the difference between WHERE and HAVING?
@@ -174,6 +176,16 @@ window calculation for each partition. It is analogous to `GROUP BY` for
 the window frame: rows in different partitions are computed independently.
 Omitting `PARTITION BY` makes the entire result set one window.
 
+```sql
+SELECT
+  name,
+  department,
+  salary,
+  RANK() OVER (PARTITION BY department ORDER BY salary DESC) AS dept_rank
+FROM employees;
+-- dept_rank resets to 1 at the start of each department.
+```
+
 ### How do ROW_NUMBER, RANK, and DENSE_RANK differ?
 
 All three assign a position within a window ordered by some column, but
@@ -222,12 +234,27 @@ logical execution order is:
 This is why you cannot reference a `SELECT` alias in a `WHERE` clause
 but can reference it in `ORDER BY` (most engines allow it as a shortcut).
 
+```sql
+-- WHERE uses the raw column; ORDER BY can reference the alias.
+SELECT region, SUM(amount) AS revenue
+FROM orders
+WHERE amount > 0
+GROUP BY region
+HAVING SUM(amount) > 100
+ORDER BY revenue DESC
+LIMIT 5;
+```
+
 ### What does DISTINCT do, and when should you be careful with it?
 
 `DISTINCT` removes duplicate rows from the result set. It is useful for
 deduplication, but using it to "fix" unexpectedly high row counts often
 masks a bad join or missing filter. Always understand **why** duplicates
 appear before reaching for `DISTINCT`.
+
+```sql
+SELECT DISTINCT region FROM orders;   -- unique regions only
+```
 
 ### How do you write a CASE expression?
 
@@ -283,6 +310,15 @@ Functions vary by engine, but the concepts are universal:
 - Arithmetic: add intervals with `+ INTERVAL '7 days'` or `DATEADD(day, 7, date)` (SQL Server).
 - Current time: `CURRENT_DATE`, `NOW()`, or `GETDATE()`.
 
+```sql
+SELECT
+  order_date,
+  EXTRACT(YEAR FROM order_date)      AS order_year,
+  DATE_TRUNC('month', order_date)    AS order_month,
+  order_date + INTERVAL '7 days'     AS due_date
+FROM orders;
+```
+
 ### What are some common string functions?
 
 Key ones across most SQL dialects:
@@ -292,6 +328,16 @@ Key ones across most SQL dialects:
 - `SUBSTRING(s, start, len)` — extract a portion.
 - `CONCAT(a, b)` or `a || b` — concatenate.
 - `LIKE` with `%` (any chars) and `_` (one char) — pattern matching.
+
+```sql
+SELECT
+  UPPER(TRIM(name))              AS clean_name,
+  LENGTH(email)                  AS email_len,
+  SUBSTRING(email, 1, 5)        AS email_prefix,
+  first_name || ' ' || last_name AS full_name
+FROM users
+WHERE email LIKE '%@example.com';
+```
 
 ### What is the difference between a clustered and non-clustered index?
 
@@ -315,6 +361,18 @@ A **subquery** is a query nested inside another query. Use subqueries for
 simple, one-off inline logic. Use CTEs when the same derived result is
 needed more than once, when you want named, readable steps, or when
 chaining several transformations. CTEs also support recursion.
+
+```sql
+-- Subquery (inline, one-off)
+SELECT name FROM users
+WHERE id IN (SELECT user_id FROM orders WHERE amount > 500);
+
+-- CTE (named, reusable)
+WITH big_spenders AS (
+  SELECT user_id FROM orders WHERE amount > 500
+)
+SELECT name FROM users WHERE id IN (SELECT user_id FROM big_spenders);
+```
 
 ### How do you pivot rows into columns in SQL?
 
@@ -411,6 +469,13 @@ of the left table paired with every row of the right. It has no `ON`
 condition. Useful for generating combinations (e.g., pairing every
 product with every region), but be careful: two 1 000-row tables yield
 1 000 000 rows.
+
+```sql
+SELECT p.product_name, r.region
+FROM products p
+CROSS JOIN regions r;
+-- Every product paired with every region.
+```
 
 ### How do you calculate a running total in SQL?
 

@@ -117,6 +117,24 @@ an edge to a node already on the current stack — means a cycle exists.
 Alternatively, run Kahn's topological-sort algorithm; if the output
 contains fewer than n nodes, there is a cycle.
 
+```python
+def has_cycle(graph):
+    WHITE, GRAY, BLACK = 0, 1, 2
+    color = {n: WHITE for n in graph}
+
+    def dfs(node):
+        color[node] = GRAY
+        for nb in graph[node]:
+            if color[nb] == GRAY:   # back edge → cycle
+                return True
+            if color[nb] == WHITE and dfs(nb):
+                return True
+        color[node] = BLACK
+        return False
+
+    return any(dfs(n) for n in graph if color[n] == WHITE)
+```
+
 ### What is topological sort, and when is it applicable?
 
 Topological sort orders the nodes of a **directed acyclic graph** (DAG)
@@ -124,6 +142,27 @@ so every edge goes from earlier to later. It's used for build-dependency
 resolution, course prerequisites, and task scheduling. Kahn's algorithm
 (iteratively remove nodes with in-degree 0) or DFS post-order both work
 in `O(V + E)`.
+
+```python
+from collections import deque
+
+def topo_sort(graph):            # graph: {node: [neighbors]}
+    in_degree = {n: 0 for n in graph}
+    for neighbors in graph.values():
+        for nb in neighbors:
+            in_degree[nb] += 1
+
+    queue = deque(n for n, d in in_degree.items() if d == 0)
+    order = []
+    while queue:
+        node = queue.popleft()
+        order.append(node)
+        for nb in graph[node]:
+            in_degree[nb] -= 1
+            if in_degree[nb] == 0:
+                queue.append(nb)
+    return order  # len < V → cycle exists
+```
 
 ### Explain Dijkstra's algorithm and its complexity.
 
@@ -133,6 +172,25 @@ graph with **non-negative** edge weights. It uses a min-heap of
 costs `O(log V)` for the heap update. Total: `O((V + E) log V)`. It
 fails with negative weights — use Bellman-Ford there.
 
+```python
+import heapq
+
+def dijkstra(graph, src):
+    # graph: {node: [(neighbor, weight), ...]}
+    dist = {src: 0}
+    heap = [(0, src)]
+    while heap:
+        d, u = heapq.heappop(heap)
+        if d > dist.get(u, float("inf")):
+            continue
+        for v, w in graph.get(u, []):
+            nd = d + w
+            if nd < dist.get(v, float("inf")):
+                dist[v] = nd
+                heapq.heappush(heap, (nd, v))
+    return dist
+```
+
 ### What is a BST and what are its operation complexities?
 
 A binary search tree stores keys so that every left subtree node is
@@ -140,6 +198,26 @@ smaller and every right subtree node is larger. Search, insert, and delete
 are all `O(h)` where h is the tree height. For a balanced tree h = `O(log n)`;
 a degenerate (sorted-input) tree has h = O(n). Balanced BST variants like
 AVL trees and red-black trees guarantee `O(log n)`.
+
+```python
+class BSTNode:
+    def __init__(self, val):
+        self.val, self.left, self.right = val, None, None
+
+def bst_insert(root, val):
+    if root is None:
+        return BSTNode(val)
+    if val < root.val:
+        root.left = bst_insert(root.left, val)
+    elif val > root.val:
+        root.right = bst_insert(root.right, val)
+    return root
+
+def bst_search(root, val):
+    if root is None or root.val == val:
+        return root
+    return bst_search(root.left if val < root.val else root.right, val)
+```
 
 ### What are the three DFS tree traversals?
 
@@ -191,16 +269,42 @@ def binary_search(arr, target):
 Two pointers start at opposite ends (or both at the start) and converge
 to avoid a nested loop. For "find pair summing to target in a sorted
 array," one pointer at the left and one at the right narrows the window
-in O(n) instead of O(n²). The same idea works for removing duplicates,
+in O(n) instead of `O(n^2)`. The same idea works for removing duplicates,
 palindrome checks, and merging sorted arrays.
+
+```python
+def two_sum_sorted(nums, target):
+    lo, hi = 0, len(nums) - 1
+    while lo < hi:
+        s = nums[lo] + nums[hi]
+        if s == target:
+            return (lo, hi)
+        elif s < target:
+            lo += 1
+        else:
+            hi -= 1
+    return None
+```
 
 ### What is the sliding-window technique?
 
 A sliding window maintains a contiguous subarray (or substring) of
 variable or fixed size, expanding and shrinking it rather than recomputing
-from scratch. It reduces many O(n²) substring problems to O(n). For
+from scratch. It reduces many `O(n^2)` substring problems to O(n). For
 example, "longest substring without repeating characters" expands the
 right pointer and shrinks the left when a duplicate enters the window.
+
+```python
+def length_of_longest_substring(s):
+    seen = {}
+    left = best = 0
+    for right, ch in enumerate(s):
+        if ch in seen and seen[ch] >= left:
+            left = seen[ch] + 1   # shrink window past the duplicate
+        seen[ch] = right
+        best = max(best, right - left + 1)
+    return best
+```
 
 ### Explain merge sort and its complexity.
 
@@ -210,14 +314,43 @@ solves to `O(n log n)` by the Master Theorem. It is **stable** and
 performs well on linked lists, but requires O(n) extra space for the merge
 step. It is the basis for Python's Timsort.
 
+```python
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+    result, i, j = [], 0, 0
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            result.append(left[i]); i += 1
+        else:
+            result.append(right[j]); j += 1
+    return result + left[i:] + right[j:]
+```
+
 ### How does quicksort work, and what is its worst-case?
 
 Quicksort picks a pivot, partitions elements into smaller and larger
 groups, and recurses. Average case is `O(n log n)`, but worst case is
-O(n²) when the pivot is always the smallest or largest element (e.g.,
+`O(n^2)` when the pivot is always the smallest or largest element (e.g.,
 sorted input with a naive "pick last" pivot). Randomized pivot selection
 makes worst case extremely unlikely in practice. Quicksort is in-place
 (O(log n) stack space) unlike merge sort.
+
+```python
+import random
+
+def quicksort(arr):
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[random.randint(0, len(arr) - 1)]
+    lo = [x for x in arr if x < pivot]
+    mid = [x for x in arr if x == pivot]
+    hi = [x for x in arr if x > pivot]
+    return quicksort(lo) + mid + quicksort(hi)
+```
 
 ### When is heapsort preferable?
 
@@ -372,6 +505,27 @@ appending them to the topological order. It runs in `O(V + E)`. If the
 final order contains fewer than V nodes, at least one cycle exists and a
 full topological sort is impossible. It is an alternative to DFS-based
 topological sort and naturally detects cycles.
+
+```python
+from collections import deque
+
+def kahns(num_nodes, edges):
+    in_deg = [0] * num_nodes
+    adj = [[] for _ in range(num_nodes)]
+    for u, v in edges:
+        adj[u].append(v)
+        in_deg[v] += 1
+    q = deque(i for i in range(num_nodes) if in_deg[i] == 0)
+    order = []
+    while q:
+        u = q.popleft()
+        order.append(u)
+        for v in adj[u]:
+            in_deg[v] -= 1
+            if in_deg[v] == 0:
+                q.append(v)
+    return order  # len < num_nodes → cycle detected
+```
 
 ## Concept checks
 

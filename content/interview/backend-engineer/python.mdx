@@ -54,12 +54,36 @@ a generator expression) produces items **lazily**, one at a time. Use a
 generator for large or streaming sequences to keep memory flat — `sum(x*x
 for x in range(10_000_000))` never materializes the squares.
 
+```python
+def fibonacci():
+    a, b = 0, 1
+    while True:          # infinite sequence — safe because it's lazy
+        yield a
+        a, b = b, a + b
+
+gen = fibonacci()
+print([next(gen) for _ in range(8)])  # [0, 1, 1, 2, 3, 5, 8, 13]
+```
+
 ### What are `*args` and `**kwargs`?
 
 `*args` captures extra **positional** arguments as a tuple; `**kwargs`
 captures extra **keyword** arguments as a dict. They let a function
 accept a variable number of arguments and forward them:
 `wrapper(*args, **kwargs) → fn(*args, **kwargs)`.
+
+```python
+def log(level, *args, **kwargs):
+    prefix = kwargs.get("prefix", "")
+    print(f"[{level}] {prefix}" + " ".join(str(a) for a in args))
+
+log("INFO", "server", "started", prefix=">>")  # [INFO] >>server started
+
+def passthrough(fn, *args, **kwargs):
+    return fn(*args, **kwargs)
+
+passthrough(sorted, [3, 1, 2], reverse=True)   # [3, 2, 1]
+```
 
 ### What is the GIL, and when does it bite?
 
@@ -397,6 +421,23 @@ should inherit from `Exception`. `KeyboardInterrupt` and `SystemExit`
 inherit from `BaseException` directly so a bare `except Exception` doesn't
 catch them. The `raise` statement re-raises the current exception; `raise
 ExceptionType from original` chains exceptions, preserving context.
+
+```python
+class AppError(Exception):
+    """Base for application errors."""
+
+try:
+    result = 1 / 0
+except ZeroDivisionError as e:
+    print(f"caught: {e}")
+    raise AppError("division failed") from e
+except (TypeError, ValueError):
+    pass
+else:
+    print("no exception — runs only on success")
+finally:
+    print("always runs")
+```
 
 ### What is `property` and why use it?
 

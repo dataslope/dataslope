@@ -31,6 +31,18 @@ drive coefficients to **exactly zero**, performing feature selection
 (sparse models). **L2 (ridge)** shrinks them toward zero but rarely to
 zero. Elastic net combines both.
 
+```python
+from sklearn.linear_model import Ridge, Lasso
+
+X = [[1, 2], [3, 4], [5, 6], [7, 8]]
+y = [1.5, 3.5, 5.5, 7.5]
+
+ridge = Ridge(alpha=1.0).fit(X, y)
+lasso = Lasso(alpha=0.1).fit(X, y)
+print("Ridge coefs:", ridge.coef_)
+print("Lasso coefs:", lasso.coef_)  # some may be exactly 0
+```
+
 ### What is cross-validation and why use it?
 
 Instead of one train/test split, **k-fold CV** rotates which fold is the
@@ -38,6 +50,16 @@ validation set and averages the score — a less noisy, less luck-dependent
 estimate of generalization that also uses all data for both training and
 validation across folds. For time series, use a **forward-chaining**
 split (never validate on the past).
+
+```python
+from sklearn.datasets import load_iris
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import cross_val_score
+
+X, y = load_iris(return_X_y=True)
+scores = cross_val_score(LogisticRegression(max_iter=200), X, y, cv=5)
+print(f"CV accuracy: {scores.mean():.3f} ± {scores.std():.3f}")
+```
 
 ### Precision vs recall — when do you favor each?
 
@@ -47,12 +69,31 @@ are costly (disease screening, fraud); favor **precision** when false
 alarms are costly (spam filters flagging real mail). **F1** balances the
 two.
 
+```python
+from sklearn.metrics import precision_score, recall_score, f1_score
+
+y_true = [1, 1, 0, 1, 0, 0, 1, 0]
+y_pred = [1, 0, 0, 1, 0, 1, 1, 0]
+print(f"Precision: {precision_score(y_true, y_pred):.2f}")
+print(f"Recall:    {recall_score(y_true, y_pred):.2f}")
+print(f"F1:        {f1_score(y_true, y_pred):.2f}")
+```
+
 ### What is ROC-AUC and when is PR-AUC preferred?
 
 **ROC-AUC** is the area under the Receiver Operating Characteristic curve (TPR vs FPR across thresholds).
 An AUC of 0.5 is random; 1.0 is perfect.
 On highly imbalanced datasets, ROC-AUC can be optimistic because it includes many true negatives in the FPR denominator.
 **PR-AUC** (precision-recall AUC) focuses only on the positive class and better reflects performance when positives are rare.
+
+```python
+from sklearn.metrics import roc_auc_score, average_precision_score
+
+y_true  = [0, 0, 1, 1, 0, 1, 0, 1]
+y_score = [0.1, 0.4, 0.35, 0.8, 0.2, 0.9, 0.05, 0.7]
+print(f"ROC-AUC: {roc_auc_score(y_true, y_score):.3f}")
+print(f"PR-AUC:  {average_precision_score(y_true, y_score):.3f}")
+```
 
 ### What is gradient descent and how does learning rate affect it?
 
@@ -73,17 +114,50 @@ At each split it considers only a random subset of features (`sqrt(p)` for class
 Final predictions are made by majority vote (classification) or averaging (regression).
 The combination of row sampling and feature sampling reduces variance without greatly increasing bias.
 
+```python
+from sklearn.datasets import load_breast_cancer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import roc_auc_score
+
+X, y = load_breast_cancer(return_X_y=True)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+rf = RandomForestClassifier(n_estimators=100, random_state=42).fit(X_train, y_train)
+print(f"ROC-AUC: {roc_auc_score(y_test, rf.predict_proba(X_test)[:, 1]):.3f}")
+```
+
 ### What are RMSE, MAE, and R-squared, and when do you use each?
 
 **RMSE** (Root Mean Squared Error) penalizes large errors quadratically; sensitive to outliers. Use when large errors are especially costly.
 **MAE** (Mean Absolute Error) is more robust to outliers and interpretable in the same units as the target.
 **R-squared** measures the fraction of variance in the target explained by the model (1 is perfect; 0 means no better than the mean). It is scale-free, making it useful for comparing across datasets.
 
+```python
+import numpy as np
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+
+y_true = np.array([3.0, 5.0, 2.5, 7.0, 4.0])
+y_pred = np.array([2.8, 5.2, 3.0, 6.5, 4.1])
+print(f"RMSE: {mean_squared_error(y_true, y_pred, squared=False):.3f}")
+print(f"MAE:  {mean_absolute_error(y_true, y_pred):.3f}")
+print(f"R²:   {r2_score(y_true, y_pred):.3f}")
+```
+
 ### What is feature scaling and when is it necessary?
 
 Feature scaling (standardization or min-max normalization) puts features on a comparable scale.
 It is **necessary** for distance-based models (kNN, SVM, k-means) and gradient descent-based models (logistic/linear regression, neural nets) because unscaled features bias distances and gradient steps.
 Tree-based models (decision trees, random forests, GBMs) are **invariant** to monotonic feature transforms and do not require scaling.
+
+```python
+from sklearn.preprocessing import StandardScaler
+import numpy as np
+
+X = np.array([[1000, 0.5], [2000, 1.0], [1500, 0.8]])
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+print(X_scaled)  # each column now has mean≈0, std≈1
+```
 
 ### How do you handle class imbalance?
 
@@ -100,11 +174,34 @@ Common strategies:
 **Target encoding** replaces a category with the mean target value within that category; powerful but risks leakage without careful cross-validation.
 High-cardinality categoricals can also be handled with embeddings in neural nets or frequency encoding.
 
+```python
+import pandas as pd
+from sklearn.preprocessing import OneHotEncoder
+
+df = pd.DataFrame({"color": ["red", "blue", "green", "blue"]})
+enc = OneHotEncoder(sparse_output=False)
+encoded = enc.fit_transform(df[["color"]])
+print(enc.get_feature_names_out())  # ['color_blue' 'color_green' 'color_red']
+print(encoded)
+```
+
 ### What is PCA and what does it do?
 
 **Principal Component Analysis** finds orthogonal directions (principal components) of maximum variance in the data and projects data onto a lower-dimensional subspace.
 It reduces dimensionality while preserving as much variance as possible, useful for visualization, noise reduction, and removing multicollinearity.
 PCA requires centered (and usually scaled) data and assumes linear structure.
+
+```python
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+from sklearn.datasets import load_iris
+
+X, _ = load_iris(return_X_y=True)
+X_scaled = StandardScaler().fit_transform(X)
+pca = PCA(n_components=2)
+X_2d = pca.fit_transform(X_scaled)
+print("Explained variance ratio:", pca.explained_variance_ratio_.round(3))
+```
 
 ### What is the curse of dimensionality?
 
@@ -117,6 +214,18 @@ Remedies include dimensionality reduction (PCA, autoencoders), feature selection
 Logistic regression models the log-odds of the positive class as a linear combination of features, then passes it through the **sigmoid** function `sigma(z) = 1 / (1 + exp(-z))` to produce a probability between 0 and 1.
 It is trained by maximizing log-likelihood (equivalent to minimizing binary cross-entropy).
 Despite its name it is a classification model; it is interpretable, fast, and often a strong baseline.
+
+```python
+from sklearn.linear_model import LogisticRegression
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+
+X, y = load_breast_cancer(return_X_y=True)
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+model = LogisticRegression(max_iter=10_000).fit(X_train, y_train)
+proba = model.predict_proba(X_test[:3])  # probabilities for each class
+print(proba.round(3))
+```
 
 ### What is the difference between a generative and a discriminative model?
 
@@ -144,6 +253,17 @@ It minimizes within-cluster sum of squared distances.
 Limitations: requires specifying k, sensitive to initialization (use k-means++ to mitigate), assumes spherical clusters, and is sensitive to outliers.
 Use the elbow method or silhouette score to choose k.
 
+```python
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+from sklearn.datasets import make_blobs
+
+X, _ = make_blobs(n_samples=300, centers=3, random_state=42)
+km = KMeans(n_clusters=3, random_state=42, n_init="auto").fit(X)
+print("Inertia:", km.inertia_)
+print("Silhouette:", silhouette_score(X, km.labels_).round(3))
+```
+
 ### What is elastic net regularization?
 
 **Elastic net** combines L1 (lasso) and L2 (ridge) penalties: `alpha * L1 + (1 - alpha) * L2`.
@@ -156,6 +276,17 @@ Feature selection reduces the number of input features to decrease overfitting, 
 **Filter methods** score features independently of the model (correlation, mutual information, chi-square).
 **Wrapper methods** train a model on feature subsets (recursive feature elimination, RFE).
 **Embedded methods** perform selection during training (L1 regularization, tree feature importances).
+
+```python
+from sklearn.feature_selection import RFE
+from sklearn.linear_model import LogisticRegression
+from sklearn.datasets import load_breast_cancer
+
+X, y = load_breast_cancer(return_X_y=True)
+selector = RFE(LogisticRegression(max_iter=5000), n_features_to_select=5)
+selector.fit(X, y)
+print("Selected feature indices:", selector.get_support(indices=True))
+```
 
 ### How does cross-entropy loss differ from MSE for classification?
 
