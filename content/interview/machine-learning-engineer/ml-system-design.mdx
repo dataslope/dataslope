@@ -1,0 +1,353 @@
+---
+title: ML System Design
+description: ML Engineer interview questions on batch vs online inference, feature stores, training–serving skew, and model/data drift.
+---
+
+The round that most distinguishes an ML *Engineer* is getting models
+into production and keeping them healthy. Review the Q&A, then the
+concept checks.
+
+## Q&A
+
+### Batch vs online (real-time) inference?
+
+**Batch** precomputes predictions on a schedule and stores them — simple,
+cheap, high-throughput, but stale and unable to use request-time
+features. **Online** serves predictions per request behind a low-latency
+service — fresh and contextual, but you own latency budgets, scaling, and
+availability. Choose by the latency and freshness the product needs;
+hybrids (cached batch features + online scoring) are common.
+
+### What is a feature store and why use one?
+
+A central system for **defining, storing, and serving features**
+consistently for both training and serving. It solves two problems:
+reuse (teams share vetted features) and **train/serve consistency** (the
+same transformation backs both paths), which prevents skew.
+
+### What is training–serving skew?
+
+When a feature is computed **differently** at training time than at
+serving time (different code, data, or timing), so the model sees inputs
+in production it never saw in training. Offline metrics look fine;
+production underperforms. Fix it by sharing one feature-computation path
+(feature store / shared transforms).
+
+### How do you monitor a model in production?
+
+Track **operational** health (latency, error rate, throughput) and
+**model** health: input feature distributions (data drift), prediction
+distribution, and — when labels arrive — live accuracy/precision. Alert
+on drift and degradation, log inputs/predictions for debugging, and have
+a retraining + rollback path.
+
+### What is drift, and what do you do about it?
+
+**Data drift** = input distribution shifts; **concept drift** = the
+input→label relationship shifts. Either degrades a once-good model over
+time even with unchanged code. Detect via distribution monitoring;
+respond by retraining on recent data (often automated) and, where
+needed, redesigning features.
+
+### How do you roll out a new model version safely?
+
+**Shadow** it first (serve live traffic, log predictions, don't act on
+them) to compare against the incumbent; then **canary** to a small
+percentage, watch guardrails, and ramp up. Keep the previous version
+ready for instant **rollback**.
+
+### What is A/B testing for models and how does it differ from shadow testing?
+
+In **A/B testing** real users receive predictions from one of two (or
+more) model variants, and business metrics (click-through, conversion)
+are compared. In **shadow testing** the challenger runs silently in
+parallel — users only see the champion's predictions. A/B tests measure
+real impact; shadow tests verify parity in outputs and latency before any
+user exposure.
+
+### How do you trigger model retraining?
+
+Common triggers: (1) **schedule** — retrain weekly/monthly regardless;
+(2) **drift alert** — statistical test on input or output distribution
+exceeds a threshold; (3) **performance degradation** — live accuracy or
+a proxy metric drops below a threshold; (4) **data volume** — enough new
+labeled examples have accumulated. Automated pipelines combine monitoring
+with training orchestration (Airflow, Kubeflow, SageMaker Pipelines).
+
+### What is a model registry?
+
+A model registry is a centralized store that versions trained model
+artifacts alongside metadata: training data version, hyperparameters,
+evaluation metrics, and deployment history. It enforces a promotion
+workflow (staging → production) and provides auditability and rollback.
+Examples: MLflow Model Registry, SageMaker Model Registry, Vertex AI
+Model Registry.
+
+### How do you handle the cold-start problem in a recommendation system?
+
+**Cold start** occurs when a new user or item has no interaction history,
+so collaborative filtering cannot produce an embedding. Mitigations:
+fall back to content-based features (item metadata, user demographics),
+use popularity-based defaults, prompt new users for explicit preferences
+onboarding, or use a hybrid model that blends collaborative and
+content-based signals with learned weights.
+
+### What is a feature store's offline vs online store?
+
+The **offline store** (e.g., a data warehouse or Parquet lake) holds the
+full historical feature values used to create training datasets. The
+**online store** (e.g., Redis, DynamoDB) holds only the latest feature
+values and serves them at low latency during inference. Writes flow from
+the pipeline into both stores to keep them consistent.
+
+### How do you ensure reproducibility of ML experiments?
+
+Pin library versions (requirements.txt or lock files), version training
+data (DVC, Delta Lake snapshots), log all hyperparameters and random seeds
+(MLflow, W&B), and version model code in git with a tag linked to the
+experiment run. Container images (Docker) capture the full environment.
+A reproducible run should regenerate the same model artifact from the same
+code, data, and config.
+
+### What is data validation and why does it matter before training?
+
+Data validation checks that incoming data matches expected schema, ranges,
+distributions, and completeness before it enters a pipeline. Without it,
+silent schema changes (a new null column, a unit change in a sensor) train
+a model on corrupt data that silently underperforms. Tools like Great
+Expectations, TFX Data Validation, and Pandera encode and enforce these
+expectations automatically.
+
+### What is label collection and how do feedback loops work?
+
+After deployment, you collect labels by observing the outcome triggered by
+the model's prediction (click, purchase, fraud confirmed). This closes the
+feedback loop. Risks include: **delayed labels** (purchase happens days
+later), **survivorship bias** (you only see outcomes for requests the model
+acted on), and **label shift** (the model's actions change future
+distribution). Careful logging and held-out exploration help mitigate these.
+
+### How do you reduce model serving latency?
+
+Techniques: (1) **model compression** — pruning, knowledge distillation,
+quantization; (2) **batching requests** at the server to amortize overhead;
+(3) **caching** repeated inputs (hashing the feature vector); (4)
+**hardware** — GPU/TPU for neural models, specialized inference runtimes
+(TensorRT, ONNX Runtime); (5) **co-locating** the model with calling
+services to cut network hops; (6) using simpler, smaller models for
+latency-sensitive paths.
+
+### When should you use GPU vs CPU for model serving?
+
+GPUs excel at high-throughput, parallelizable workloads — large batch
+neural inference, transformer models, image/video processing. CPUs are
+better for low-latency single-request serving of lightweight models
+(tree ensembles, logistic regression, small embeddings), where the GPU
+kernel-launch overhead would dominate. Many systems use CPUs for simple
+models and reserve GPUs for deep learning inference at scale.
+
+### What is model quantization?
+
+Quantization reduces the numerical precision of model weights (and
+sometimes activations) from 32-bit float to 8-bit int (INT8) or even
+4-bit. This shrinks model size, reduces memory bandwidth, and speeds up
+inference with minimal accuracy loss on most tasks. Post-training
+quantization is simple; quantization-aware training recovers more
+accuracy for aggressive compression.
+
+### What is knowledge distillation?
+
+A smaller **student** model is trained to mimic the soft output
+probabilities (or intermediate representations) of a larger **teacher**
+model, rather than just the hard labels. The soft targets carry
+inter-class similarity information that helps the student generalize
+better than training on labels alone. Widely used to deploy compact
+models in production while retaining accuracy close to a large teacher.
+
+### How do you design a CI/CD pipeline for ML?
+
+An ML CI/CD pipeline typically includes: (1) **data validation** on new
+data; (2) **unit and integration tests** for feature transforms and
+preprocessing code; (3) **training run** on a versioned dataset; (4)
+**evaluation gate** — the new model must beat the incumbent on a holdout
+set; (5) **model registry promotion**; (6) **staged rollout** (canary,
+then full). Infrastructure-as-code (Terraform, CDK) provisions training
+and serving environments reproducibly.
+
+### What is throughput vs latency in model serving?
+
+**Latency** is the time to serve a single request (p50/p95/p99
+percentiles matter). **Throughput** is the number of requests handled
+per second across the system. They trade off: larger batches improve
+throughput but increase per-request latency. Horizontal scaling (more
+replicas) increases throughput without hurting per-replica latency, so
+it is the primary lever when throughput is the bottleneck.
+
+### How does request batching improve GPU throughput?
+
+GPUs achieve peak utilization by processing many operations in parallel.
+A single inference request leaves most GPU cores idle. By queuing
+incoming requests and forwarding a batch to the GPU, you saturate the
+hardware and amortize fixed overhead. Dynamic batching (waiting up to a
+few milliseconds to fill a batch) is standard in serving frameworks like
+Triton Inference Server and TorchServe.
+
+### What is shadow deployment?
+
+A shadow (or mirror) deployment routes live production traffic to both
+the current model and a new challenger simultaneously. The challenger's
+predictions are logged but **never returned to users**. This lets you
+compare output distributions, latency, and error rates under real traffic
+before any user exposure, making it the lowest-risk pre-release validation
+step.
+
+### What is a canary deployment?
+
+A canary routes a small fraction of traffic (1–5%) to the new model
+version while the rest goes to the incumbent. Business and model health
+metrics are monitored; if guardrails hold, traffic is gradually shifted.
+If metrics degrade, traffic is immediately redirected back to the
+incumbent (rollback). It is the standard step after shadow validation.
+
+### How do you do rollback for a model?
+
+Keep the previous model artifact in the registry with its serving
+configuration. Most serving platforms (SageMaker, Vertex, Kubernetes +
+Seldon) support blue/green or weighted traffic switching — flipping back
+to the old version is a configuration change, not a re-deployment. Ensure
+that any downstream state (feature store writes, A/B assignment logs) is
+accounted for when rolling back.
+
+### How do you version training data?
+
+Tools like **DVC** (Data Version Control) track dataset snapshots
+alongside git commits. Data warehouses with time-travel (Delta Lake,
+Iceberg) let you query data as-of a past timestamp. S3/GCS paths with
+immutable prefixes (date-partitioned or UUID-keyed) provide simple
+versioning. The goal is to reproduce the exact training set for any past
+model version.
+
+### Sketch a fraud detection ML system.
+
+Key components: (1) **feature engineering** — transaction amount,
+merchant category, time-since-last-transaction, velocity features (number
+of transactions in last 1 h / 24 h), device and location signals;
+(2) **model** — gradient boosting for tabular data or a neural network
+for sequence modeling; (3) **serving** — low-latency online inference
+(sub-100 ms at authorization time); (4) **labels** — confirmed fraud
+from chargebacks (delayed); (5) **monitoring** — precision/recall with
+a delayed label pipeline, distribution drift on velocity features.
+
+### Sketch a recommendation / ranking system.
+
+The standard two-stage design: (1) **retrieval** — a lightweight model
+(embedding nearest-neighbour search) narrows millions of items to
+hundreds of candidates; (2) **ranking** — a heavier model (gradient
+boosting or neural network) scores each candidate on click/purchase
+probability using rich cross features; (3) **re-ranking** — business
+rules (diversity, freshness, promotions); (4) **feature store** for
+real-time user and item features; (5) A/B testing on ranking model
+variants tied to business metrics (revenue, engagement).
+
+### What is the difference between online and offline feature computation?
+
+**Offline** features are computed in batch jobs over historical data
+(Spark, BigQuery) and stored in the offline store for training. **Online**
+features are computed in real time at request time — either looked up from
+the online store (pre-computed and refreshed) or computed on-the-fly from
+request context (e.g., session recency). Consistency between offline
+training features and online serving features is the core challenge.
+
+### How do you detect and respond to concept drift?
+
+Monitor the relationship between model inputs and outputs over time.
+Proxy signals (when true labels are delayed): prediction distribution
+shift, input feature distribution shift (PSI, KL divergence, Kolmogorov-
+Smirnov tests). When true labels become available: track live accuracy,
+precision, recall. Responses range from alerting to automated retraining
+to feature redesign if the drift is structural.
+
+### What is population stability index (PSI)?
+
+PSI quantifies the shift between a reference distribution (training) and
+a current distribution (production) for a single feature. Buckets are
+defined on the reference; the fraction of examples per bucket is compared
+between reference and current using a symmetric KL-divergence-like formula.
+PSI below 0.1 is stable; 0.1–0.2 warrants monitoring; above 0.2 signals
+significant shift requiring action.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+
+rng = np.random.default_rng(42)
+reference = rng.normal(loc=0.0, scale=1.0, size=1000)   # training distribution
+stable    = rng.normal(loc=0.1, scale=1.0, size=1000)   # slight shift  → PSI < 0.1
+drifted   = rng.normal(loc=1.5, scale=1.5, size=1000)   # large shift   → PSI > 0.2`,
+      starterCode: `def compute_psi(reference, current, n_bins=10, eps=1e-8):
+    breakpoints = np.percentile(reference, np.linspace(0, 100, n_bins + 1))
+    ref_counts = np.histogram(reference, bins=breakpoints)[0] + eps
+    cur_counts = np.histogram(current,   bins=breakpoints)[0] + eps
+    ref_pct = ref_counts / ref_counts.sum()
+    cur_pct = cur_counts / cur_counts.sum()
+    return np.sum((cur_pct - ref_pct) * np.log(cur_pct / ref_pct))
+
+print(f"PSI (stable):  {compute_psi(reference, stable):.4f}   # < 0.1 → OK")
+print(f"PSI (drifted): {compute_psi(reference, drifted):.4f}  # > 0.2 → action needed")
+`,
+    },
+  ]}
+/>
+
+### How do you scale a model serving endpoint under variable load?
+
+Use auto-scaling based on GPU/CPU utilization or request queue depth.
+Horizontal pod autoscaler (Kubernetes) adds replicas when utilization
+exceeds a target. Managed services (SageMaker Autoscaling, Vertex AI,
+Azure ML) handle this natively. For bursty traffic, combine with a
+request queue (SQS, Kafka) so spikes don't drop requests while new
+replicas warm up.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`A product-recommendation model must respond within ~50 ms to a live web request. Which serving pattern fits, and the trade-off?
+
+- Batch inference: precompute nothing and recompute per request offline.
+  > "Batch" means precomputing on a schedule — it can't answer a live 50 ms request on fresh inputs by itself.
+- [o] Online (real-time) inference behind a low-latency service; the trade-off is operational complexity vs batch's simplicity.
+  > Sub-second per-request predictions require an online service, taking on latency/availability/scaling concerns.
+- It doesn't matter; latency is never a modeling concern.
+  > Latency budgets directly shape architecture, feature availability, and model choice.
+- Always precompute every possible recommendation in advance.
+  > Feasible only for tiny input spaces; large/contextual inputs need online inference.`}
+/>
+
+<MultipleChoice
+  markdown={`A model evaluates well offline but underperforms in production. A feature is computed one way in training and another way in serving. What is this, and the fix?
+
+- Concept drift; fix by retraining more often.
+  > Drift is the world changing over time. Here the *feature computation* differs between train and serve.
+- [o] Training–serving skew; fix by sharing one feature-computation path (e.g. a feature store).
+  > Identical features at train and serve time is the goal; a shared transform eliminates the discrepancy.
+- Overfitting; fix with more regularization.
+  > Overfitting shows as a train/validation gap offline, not a train-vs-serve mismatch.
+- Label leakage; fix by removing the label.
+  > Leakage is using future/target info as a feature — a different failure.`}
+/>
+
+<MultipleChoice
+  markdown={`Months after deployment a model's accuracy slowly degrades though the code never changed. Most likely cause and response?
+
+- The model file became corrupted; redeploy the same model.
+  > Static artifacts don't rot; redeploying won't help if the input distribution shifted.
+- [o] Data/concept drift — the input distribution or input→label relationship shifted; monitor and retrain on recent data.
+  > Real-world distributions change, so a once-good model decays; production ML monitors and retrains/alerts on drift.
+- Nothing is wrong; model metrics never change in production.
+  > Silent degradation from drift is one of the most common production failures.
+- The serving hardware is too slow.
+  > Latency affects speed, not predictive accuracy.`}
+/>

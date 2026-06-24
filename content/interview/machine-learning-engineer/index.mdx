@@ -1,0 +1,46 @@
+---
+title: Machine Learning Engineer
+description: What ML Engineer interviews test — ML fundamentals, coding/DSA, system design for ML, and productionizing models (MLOps).
+---
+
+ML Engineer interviews combine **software engineering** with **ML
+fundamentals** and **productionization**. Expect a coding/DSA round, an
+ML-concepts round, and an ML system design round ("design a
+recommendation / fraud / ranking system").
+
+## What interviewers probe
+
+- **ML fundamentals** — supervised vs unsupervised, over/underfitting, regularization, evaluation metrics, data leakage.
+- **Coding** — data structures & algorithms (see the [Backend track](/interview/backend-engineer)), plus NumPy/pandas.
+- **ML system design** — training/serving pipelines, feature stores, batch vs online inference, monitoring & drift.
+- **MLOps** — reproducibility, versioning data & models, CI/CD, latency and cost trade-offs.
+
+## Topics
+
+Each topic page mixes **Q&A**, **concept-check MCQs**, and (where it fits) **runnable challenges**.
+
+- **[ML fundamentals](/interview/machine-learning-engineer/ml-fundamentals)** — supervised/unsupervised, bias–variance, regularization, data splits, and leakage (with a runnable accuracy challenge).
+- **[ML system design](/interview/machine-learning-engineer/ml-system-design)** — batch vs online inference, feature stores, training–serving skew, and drift.
+
+For the coding/DSA round, see the **[Backend track](/interview/backend-engineer)**.
+
+## Sample concept check
+
+<MultipleChoice
+  markdown={`You scale features using statistics computed over the **entire** dataset, then split into train and test sets. Why is this a problem?
+
+- It isn't a problem — scaling before splitting is the recommended order.
+  > It's the reverse: fitting any transformation on all the data before splitting leaks information from test into training.
+- [o] It causes data leakage: the scaler "saw" the test set, so test performance is optimistically biased.
+  > Fit transformations (scalers, encoders, imputers) on the **training** split only, then apply them to the test split — otherwise test estimates are inflated.
+- It makes training slower but doesn't affect correctness.
+  > The issue is correctness of your evaluation, not speed — your reported metrics become untrustworthy.
+- Scaling is never needed, so the order is irrelevant.
+  > Many models (SVMs, k-NN, neural nets, regularized linear models) genuinely need scaling; the order relative to the split is what matters.`}
+/>
+
+## Go deeper
+
+- [Machine Learning with scikit-learn](/learn/machine-learning-scikit-learn)
+- [Scientific Computing with Python](/learn/scientific-computing-python)
+- [Statistics for Data Science with Python](/learn/statistics-for-data-science-python)

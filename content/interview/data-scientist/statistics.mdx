@@ -1,0 +1,420 @@
+---
+title: Statistics
+description: Data Scientist interview questions on p-values, hypothesis testing, Type I/II errors, confidence intervals, and the Central Limit Theorem.
+---
+
+Statistics is the part of a DS interview most candidates are rustiest on.
+Review the Q&A, then the concept checks.
+
+## Q&A
+
+### What exactly is a p-value?
+
+The probability of observing data **at least as extreme** as yours
+**assuming the null hypothesis is true**. It is *not* the probability the
+null is true, nor the probability your result is a fluke. Small p → the
+data would be surprising under the null, so you reject it at your chosen
+α.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from scipy import stats
+
+# Two-sample t-test: compute t-statistic and p-value
+group_a = [12, 15, 14, 10, 13]
+group_b = [18, 20, 17, 22, 19]
+t_stat, p_value = stats.ttest_ind(group_a, group_b)
+print(f"t={t_stat:.3f}, p={p_value:.4f}")
+# p < 0.05 → reject the null that the means are equal
+`,
+    },
+  ]}
+/>
+
+### Type I vs Type II error?
+
+- **Type I (false positive)** — rejecting a true null (claiming an effect that isn't real); its rate is **α**.
+- **Type II (false negative)** — failing to detect a real effect; its rate is **β**, and **power = 1 − β**.
+
+Lowering α (stricter) reduces false positives but raises false negatives,
+all else equal.
+
+### What does a 95% confidence interval actually mean?
+
+It's a procedure: if you repeated the experiment many times and built an
+interval each time, ~95% of those intervals would contain the true
+parameter. It is **not** "95% probability the parameter is in *this*
+interval" (the parameter is fixed; the interval is random).
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+from scipy import stats
+
+data = np.array([12, 15, 14, 10, 13, 16, 11, 14])
+n = len(data)
+mean = data.mean()
+se = stats.sem(data)  # SE = std / sqrt(n)
+ci_low, ci_high = stats.t.interval(0.95, df=n - 1, loc=mean, scale=se)
+print(f"95% CI: ({ci_low:.2f}, {ci_high:.2f})")
+`,
+    },
+  ]}
+/>
+
+### Why does the Central Limit Theorem matter?
+
+For a large enough sample, the distribution of the **sample mean** is
+approximately normal **regardless of the population's shape**. That's
+what justifies normal-based confidence intervals and z/t-tests for means
+even when the underlying data is skewed.
+
+### What's the difference between a parameter and a statistic?
+
+A **parameter** describes the population (true mean μ) and is usually
+unknown; a **statistic** is computed from a sample (sample mean x̄) and
+estimates the parameter. Inference is the bridge from statistic to
+parameter, with quantified uncertainty.
+
+### State the null and alternative hypotheses for an A/B test on click-through rate.
+
+The **null hypothesis** `H0` is that the two CTRs are equal (no effect).
+The **alternative hypothesis** `H1` is that the treatment CTR differs from control (two-sided) or is greater/less (one-sided).
+You choose the alternative before seeing data. A two-sided test is safer because it catches effects in either direction without inflating one-sided power.
+
+### What is statistical power?
+
+Power is `1 - beta`, where `beta` is the probability of a Type II error (false negative).
+It is the probability of correctly rejecting the null when the alternative is true.
+A power of 0.8 means you have an 80% chance of detecting the true effect if one exists.
+Power rises with larger sample size, larger effect size, lower variance, and a higher `alpha`.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from statsmodels.stats.power import TTestIndPower
+
+analysis = TTestIndPower()
+# Compute power given effect size (Cohen's d), sample size, and alpha
+power = analysis.solve_power(effect_size=0.5, nobs1=50, alpha=0.05)
+print(f"Power: {power:.3f}")
+`,
+    },
+  ]}
+/>
+
+### When do you use a z-test vs a t-test?
+
+Use a **z-test** when the population variance is known or the sample is large enough (roughly `n >= 30`) that the sample standard deviation is a reliable estimate.
+Use a **t-test** for small samples where you must estimate the variance; the t-distribution has heavier tails to account for that extra uncertainty.
+In practice, software always uses t, which converges to z as n grows.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from scipy import stats
+
+# One-sample t-test: is the mean significantly different from 10?
+sample = [9.2, 10.5, 11.1, 8.7, 10.0, 9.8]
+t_stat, p_value = stats.ttest_1samp(sample, popmean=10)
+print(f"t={t_stat:.3f}, p={p_value:.4f}")
+`,
+    },
+  ]}
+/>
+
+### What is the chi-square test used for?
+
+The chi-square test checks whether observed counts in categories differ from expected counts (goodness-of-fit), or whether two categorical variables are independent (test of independence).
+The test statistic sums `(observed - expected)^2 / expected` over all cells; large values indicate the null is implausible.
+It requires expected cell counts of at least 5 in most cells.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from scipy.stats import chi2_contingency
+
+# Contingency table: rows = variant (A/B), cols = converted/not
+observed = [[120, 880],   # control: 120 converted, 880 did not
+            [150, 850]]   # treatment
+chi2, p, dof, expected = chi2_contingency(observed)
+print(f"chi2={chi2:.3f}, p={p:.4f}, dof={dof}")
+`,
+    },
+  ]}
+/>
+
+### What is ANOVA and when do you use it?
+
+**ANOVA** (Analysis of Variance) tests whether the means of three or more groups are equal.
+It compares within-group variance to between-group variance via an F-statistic.
+A significant F only tells you at least one group differs; post-hoc tests (Tukey, Bonferroni) identify which pairs differ.
+Use it instead of running multiple t-tests, which would inflate the Type I error rate.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from scipy.stats import f_oneway
+
+group_a = [5.1, 5.5, 4.9, 5.3]
+group_b = [6.2, 6.5, 6.0, 6.3]
+group_c = [5.0, 4.8, 5.2, 5.1]
+f_stat, p_value = f_oneway(group_a, group_b, group_c)
+print(f"F={f_stat:.3f}, p={p_value:.4f}")
+`,
+    },
+  ]}
+/>
+
+### What is the difference between correlation and causation?
+
+Correlation measures the linear association between two variables (Pearson's r ranges from -1 to 1).
+Causation means one variable directly produces a change in another.
+Correlation does not imply causation: a lurking third variable (confounder) can drive both, or the relationship may be coincidental.
+Establishing causation requires controlled experiments or causal inference methods.
+
+### What is Bayes' theorem?
+
+Bayes' theorem updates a prior belief given new evidence: `P(A|B) = P(B|A) * P(A) / P(B)`.
+In data science it is used in spam filters, medical diagnosis, and Bayesian inference where you update a prior distribution over parameters to a posterior after observing data.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `# Medical test example: P(disease | positive test)
+p_disease = 0.01          # prior prevalence
+p_pos_given_disease = 0.99  # sensitivity
+p_pos_given_no_disease = 0.05  # 1 - specificity
+
+p_pos = p_pos_given_disease * p_disease + p_pos_given_no_disease * (1 - p_disease)
+p_disease_given_pos = p_pos_given_disease * p_disease / p_pos
+print(f"P(disease | positive) = {p_disease_given_pos:.3f}")
+`,
+    },
+  ]}
+/>
+
+### What is conditional probability?
+
+`P(A|B)` is the probability of event A given that B has already occurred.
+It equals `P(A and B) / P(B)`.
+A and B are independent if `P(A|B) = P(A)`, meaning knowing B tells you nothing about A.
+
+### What is Maximum Likelihood Estimation?
+
+**MLE** finds the parameter values that maximize the probability (likelihood) of observing the data under a given model.
+For a normal distribution, the MLE of the mean is the sample mean; for logistic regression it maximizes the log-likelihood of the observed labels.
+MLE is consistent and asymptotically efficient but can overfit small samples.
+
+### What are properties of an unbiased estimator?
+
+An estimator is **unbiased** if its expected value equals the true parameter.
+The sample mean is an unbiased estimator of the population mean.
+The sample variance with denominator `n - 1` (Bessel's correction) is unbiased; dividing by `n` gives a biased (but lower-variance) estimator.
+Bias and variance together determine MSE: `MSE = bias^2 + variance`.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+data = np.array([4.0, 7.0, 13.0, 2.0, 1.0])
+# ddof=1 → Bessel's correction (unbiased); ddof=0 → biased MLE
+unbiased_var = np.var(data, ddof=1)
+biased_var   = np.var(data, ddof=0)
+print(f"Unbiased variance (n-1): {unbiased_var:.2f}")
+print(f"Biased variance (n):     {biased_var:.2f}")
+`,
+    },
+  ]}
+/>
+
+### What is the Law of Large Numbers?
+
+The LLN states that as sample size grows, the sample mean converges in probability to the population mean.
+This justifies using large samples to estimate population parameters and is why more data improves estimates.
+The **weak** LLN gives convergence in probability; the **strong** LLN gives almost-sure convergence.
+
+### Describe the normal distribution and its key properties.
+
+The normal (Gaussian) distribution is symmetric and bell-shaped, parameterized by mean `mu` and variance `sigma^2`.
+About 68%, 95%, and 99.7% of the data falls within 1, 2, and 3 standard deviations of the mean (the empirical rule).
+It arises naturally via the CLT and is the foundation for many statistical tests.
+
+### What is a Poisson distribution?
+
+The Poisson distribution models the number of events in a fixed interval when events occur independently at a constant average rate `lambda`.
+Its mean and variance are both `lambda`.
+Common uses: number of customer arrivals per hour, defects per unit, or server requests per second.
+
+### What is a binomial distribution?
+
+The binomial distribution counts the number of successes in `n` independent Bernoulli trials, each with success probability `p`.
+Its mean is `n * p` and variance is `n * p * (1 - p)`.
+It is used for click rates, conversion rates, and quality control.
+
+### What is p-hacking and why is it dangerous?
+
+P-hacking is the practice of trying many analyses, subgroups, or metrics until a significant result appears, then reporting only that result.
+It exploits the fact that with enough comparisons, some will be significant by chance (Type I error inflation).
+It leads to irreproducible findings and is a major driver of the replication crisis.
+Remedies: pre-registration, Bonferroni or FDR correction, and separating exploratory from confirmatory analysis.
+
+### What is the difference between one-tailed and two-tailed tests?
+
+A **two-tailed test** detects effects in either direction (greater or less than the null value) and splits `alpha` between both tails.
+A **one-tailed test** focuses on one direction, giving more power there but missing effects in the other direction.
+Use two-tailed tests by default unless you have a strong directional hypothesis stated before seeing data.
+
+### What is effect size and why does it matter alongside p-values?
+
+**Effect size** quantifies the magnitude of a difference (e.g., Cohen's d for means, odds ratio, r for correlations).
+A result can be statistically significant but practically negligible (large n, tiny effect), or practically large but not significant (small n).
+Always report effect sizes and confidence intervals alongside p-values.
+
+### How do you correct for multiple comparisons?
+
+The **Bonferroni correction** divides `alpha` by the number of tests, making each individual test stricter.
+The **Benjamini-Hochberg procedure** controls the false discovery rate (FDR) rather than the family-wise error rate, giving more power when many tests are run.
+Choose the correction based on whether you can tolerate any false positives (use Bonferroni) or a controlled proportion of them (use FDR).
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from statsmodels.stats.multitest import multipletests
+
+p_values = [0.01, 0.04, 0.20, 0.03, 0.50]
+# Benjamini-Hochberg FDR correction
+reject, p_corrected, _, _ = multipletests(p_values, alpha=0.05, method="fdr_bh")
+print("Reject:", reject)
+print("Corrected p-values:", [f"{p:.3f}" for p in p_corrected])
+`,
+    },
+  ]}
+/>
+
+### What is the difference between frequentist and Bayesian statistics?
+
+**Frequentist** statistics treats probability as long-run frequency: parameters are fixed (unknown) constants and you draw conclusions from data alone via p-values and CIs.
+**Bayesian** statistics treats parameters as random variables with a prior distribution that is updated by data to form a posterior.
+Bayesian inference allows direct probability statements about parameters and naturally incorporates prior knowledge, but requires specifying priors.
+
+### What is a sampling distribution?
+
+A **sampling distribution** is the probability distribution of a statistic (like the sample mean) over all possible samples of the same size from a population.
+The standard deviation of the sampling distribution of the mean is the **standard error**: `SE = sigma / sqrt(n)`.
+The CLT tells us this distribution approaches normal for large n.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+rng = np.random.default_rng(42)
+population = rng.exponential(scale=5, size=100_000)  # skewed population
+sample_means = [rng.choice(population, 50).mean() for _ in range(2000)]
+print(f"SE (formula): {population.std() / 50**0.5:.3f}")
+print(f"SE (simulated): {np.std(sample_means):.3f}")
+# Both should be close — CLT at work
+`,
+    },
+  ]}
+/>
+
+### What does it mean for two events to be mutually exclusive vs independent?
+
+**Mutually exclusive** events cannot both occur: `P(A and B) = 0`.
+**Independent** events have no influence on each other: `P(A and B) = P(A) * P(B)`.
+Mutually exclusive events with non-zero probability are never independent (knowing one occurred rules out the other).
+
+### What is the standard error and how does it differ from standard deviation?
+
+**Standard deviation** measures variability of individual observations around the mean.
+**Standard error** measures variability of a sample statistic (like the mean) around the true parameter; `SE = SD / sqrt(n)`.
+SE shrinks with larger samples; SD does not (it estimates a population property that doesn't depend on n).
+
+### What is the difference between parametric and non-parametric tests?
+
+**Parametric tests** assume data follows a specific distribution (usually normal) and test parameters of that distribution.
+**Non-parametric tests** make fewer distributional assumptions and work on ranks (Wilcoxon, Mann-Whitney, Kruskal-Wallis).
+Non-parametric tests are preferred for small samples, ordinal data, or when normality is clearly violated.
+
+### What is Simpson's paradox?
+
+Simpson's paradox occurs when a trend that appears in several groups reverses (or disappears) when the groups are combined.
+It arises because a lurking confounding variable drives the aggregated result.
+The classic example: a treatment looks worse overall but is better within every patient subgroup because sicker patients were routed to treatment.
+Resolution requires analyzing data at the right stratification level and understanding causal structure.
+
+### What is hypothesis testing and what are its four key steps?
+
+**Hypothesis testing** is a formal procedure for deciding whether data provide sufficient evidence against a null hypothesis.
+The four steps are: (1) state `H0` and `H1`; (2) choose `alpha` and compute the required sample size; (3) collect data and compute the test statistic and p-value; (4) reject `H0` if `p < alpha` and interpret in context.
+Always state the hypothesis and fix `alpha` before collecting data to avoid bias.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`A test returns \`p = 0.03\` at significance level \`α = 0.05\`. Which statement is correct?
+
+- There is a 3% probability that the null hypothesis is true.
+  > A p-value is **not** the probability the null is true. It's computed *assuming* the null holds.
+- [o] If the null were true, there's a 3% chance of data this extreme (or more) — so at α = 0.05 you reject the null.
+  > That's the definition; since 0.03 < 0.05, you reject.
+- There is a 97% probability the effect is real and important.
+  > Significance isn't the probability the effect is real, and says nothing about effect size.
+- The result is guaranteed not to be a fluke.
+  > A small p reduces but never eliminates the chance of a false positive (the Type I error rate).`}
+/>
+
+<MultipleChoice
+  markdown={`Your A/B test concludes the new button "works" and you ship it — but in reality it has **no** effect. What kind of error is this?
+
+- [o] A Type I error (false positive) — rejecting a true null hypothesis.
+  > Declaring an effect that isn't real is a false positive; its rate is controlled by α.
+- A Type II error (false negative) — failing to detect a real effect.
+  > That's the opposite: missing an effect that *is* real.
+- Selection bias.
+  > Selection bias is about how the sample was drawn, not which hypothesis-test error occurred.
+- No error — shipping is always safe.
+  > Shipping a change that does nothing is precisely the cost of a Type I error.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does the Central Limit Theorem matter when you compute a confidence interval for a **mean**?
+
+- It guarantees the underlying data is normally distributed.
+  > The CLT says nothing about the population's shape — that can be skewed.
+- [o] For a large enough sample, the distribution of the **sample mean** is approximately normal even if the data isn't.
+  > That's what enables normal-based intervals regardless of the population's shape.
+- It only applies when the sample size is below 30.
+  > It's the reverse — the approximation improves as n grows; "n ≥ 30" is a rough adequacy rule of thumb.
+- It lets you skip estimating the standard error.
+  > You still need the standard error; the CLT tells you the *shape* to use, not that you can ignore variability.`}
+/>
+
+## Go deeper
+
+- [Statistics for Data Science with Python](/learn/statistics-for-data-science-python)

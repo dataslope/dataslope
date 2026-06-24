@@ -1,0 +1,9 @@
+{
+  "title": "Analytics Engineer",
+  "description": "Interview prep for Analytics Engineer roles: dimensional modeling and dbt.",
+  "pages": [
+    "index",
+    "dimensional-modeling",
+    "dbt"
+  ]
+}

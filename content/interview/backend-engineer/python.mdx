@@ -1,0 +1,630 @@
+---
+title: Python Fundamentals
+description: Backend interview questions on Python's mutability, identity vs equality, generators, *args/**kwargs, and the GIL.
+---
+
+Language-fundamentals questions check that you know Python's sharp edges,
+not just syntax. Review the Q&A, then the concept checks.
+
+## Q&A
+
+### Mutable vs immutable types — why does it matter?
+
+Immutable values (`int`, `str`, `tuple`, `frozenset`) can't change after
+creation; mutable ones (`list`, `dict`, `set`) can. It matters for
+**aliasing** (two names referencing the same list see each other's
+edits), for **dict/set keys** (must be hashable → immutable), and for
+**function arguments** (a function can mutate a list you passed in).
+
+### `is` vs `==`?
+
+`==` compares **values**; `is` compares **identity** (same object in
+memory). Use `==` for "are these equal," and reserve `is` for singletons
+like `None` (`if x is None`). They can disagree: two equal lists are
+`==` but not `is`.
+
+### What's the mutable-default-argument trap?
+
+A default argument is evaluated **once**, at definition time — so a
+`def f(x, acc=[])` shares one list across all calls:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def add(x, acc=[]):   # BUG: one shared list
+    acc.append(x)
+    return acc
+
+print(add(1))   # [1]
+print(add(2))   # [1, 2]  <- not [2]!`,
+    },
+  ]}
+/>
+
+Fix it with a `None` sentinel:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def add(x, acc=None):
+    if acc is None:
+        acc = []
+    acc.append(x)
+    return acc
+
+print(add(1))   # [1]
+print(add(2))   # [2]  <- fresh list each call`,
+    },
+  ]}
+/>
+
+### Generators vs lists?
+
+A list builds and holds **all** items in memory; a generator (`yield`, or
+a generator expression) produces items **lazily**, one at a time. Use a
+generator for large or streaming sequences to keep memory flat — `sum(x*x
+for x in range(10_000_000))` never materializes the squares.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def fibonacci():
+    a, b = 0, 1
+    while True:          # infinite sequence — safe because it's lazy
+        yield a
+        a, b = b, a + b
+
+gen = fibonacci()
+print([next(gen) for _ in range(8)])  # [0, 1, 1, 2, 3, 5, 8, 13]`,
+    },
+  ]}
+/>
+
+### What are `*args` and `**kwargs`?
+
+`*args` captures extra **positional** arguments as a tuple; `**kwargs`
+captures extra **keyword** arguments as a dict. They let a function
+accept a variable number of arguments and forward them:
+`wrapper(*args, **kwargs) → fn(*args, **kwargs)`.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def log(level, *args, **kwargs):
+    prefix = kwargs.get("prefix", "")
+    print(f"[{level}] {prefix}" + " ".join(str(a) for a in args))
+
+log("INFO", "server", "started", prefix=">>")  # [INFO] >>server started
+
+def passthrough(fn, *args, **kwargs):
+    return fn(*args, **kwargs)
+
+print(passthrough(sorted, [3, 1, 2], reverse=True))   # [3, 2, 1]`,
+    },
+  ]}
+/>
+
+### What is the GIL, and when does it bite?
+
+CPython's **Global Interpreter Lock** lets only one thread execute Python
+bytecode at a time. So threads don't speed up **CPU-bound** work — use
+`multiprocessing` (separate processes) for that. Threads still help
+**I/O-bound** work (network, disk), where they wait, not compute; `async`
+is another I/O-bound option.
+
+### What are Python's dunder (magic) methods?
+
+Dunder methods are special methods surrounded by double underscores that
+Python calls implicitly. `__init__` constructs an object, `__repr__`
+provides a developer-readable string, `__str__` the user-facing string,
+`__len__` makes `len(obj)` work, `__eq__` powers `==`, and `__lt__` /
+`__le__` enable sorting. Implementing `__enter__` and `__exit__` makes a
+class a context manager.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class Vector:
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+
+    def __add__(self, other):
+        return Vector(self.x + other.x, self.y + other.y)
+
+    def __repr__(self):
+        return f"Vector({self.x}, {self.y})"
+
+a = Vector(1, 2)
+b = Vector(3, 4)
+print(a + b)   # Vector(4, 6)`,
+    },
+  ]}
+/>
+
+### How does Python's data model let you overload operators?
+
+Python routes operators to dunder methods: `+` calls `__add__`, `[]`
+calls `__getitem__`, `in` calls `__contains__`, and `for` calls
+`__iter__`. By implementing these, any class integrates naturally with
+Python syntax and built-ins, without inheritance from a special base class.
+
+### What is a decorator and how do you write one?
+
+A decorator is a callable that wraps another function, adding behavior
+before and/or after the call. It is syntactic sugar for
+`fn = decorator(fn)`. A correct decorator preserves the wrapped
+function's metadata using `functools.wraps`.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import functools
+
+def timer(fn):
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        import time
+        start = time.perf_counter()
+        result = fn(*args, **kwargs)
+        print(f"{fn.__name__} took {time.perf_counter() - start:.4f}s")
+        return result
+    return wrapper
+
+@timer
+def slow():
+    import time; time.sleep(0.1)
+
+slow()  # slow took 0.1000s (approx)`,
+    },
+  ]}
+/>
+
+### Explain closures and the LEGB scope rule.
+
+Python resolves names in four scopes in order: **L**ocal (inside the
+current function), **E**nclosing (outer function for nested functions),
+**G**lobal (module level), **B**uilt-in. A closure is a nested function
+that captures variables from its enclosing scope — those variables survive
+even after the outer function returns.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def make_counter():
+    count = 0
+    def increment():
+        nonlocal count
+        count += 1
+        return count
+    return increment
+
+c = make_counter()
+print(c(), c())  # 1 2`,
+    },
+  ]}
+/>
+
+### What does `nonlocal` do and when do you need it?
+
+`nonlocal` lets an inner function **rebind** a name in its enclosing
+(non-global) scope. Without it, an assignment inside the inner function
+creates a new local variable instead of updating the enclosing one.
+You only need `nonlocal` for assignment; reading an enclosing variable
+works automatically.
+
+### How does threading differ from multiprocessing in Python?
+
+Threads share the same process memory and are lightweight, but the GIL
+prevents true parallel CPU execution. `multiprocessing` spawns separate
+processes with their own memory space, bypassing the GIL and achieving
+real parallelism for CPU-bound work — at the cost of inter-process
+communication overhead and higher memory usage. `asyncio` is a third
+option: single-threaded cooperative concurrency for I/O-bound async code.
+
+### What is `asyncio` and when should you use it?
+
+`asyncio` provides an event loop and `async`/`await` syntax for
+**cooperative multitasking** in a single thread. When a coroutine `await`s
+an I/O operation, the event loop runs another coroutine instead of
+blocking. Use it for high-concurrency network servers (web APIs, websockets)
+where most time is spent waiting on I/O. Avoid it for CPU-bound code.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import asyncio
+
+async def fetch(url):
+    # await an async HTTP call here
+    await asyncio.sleep(0)  # simulates I/O yield
+    return url
+
+async def main():
+    results = await asyncio.gather(fetch("a"), fetch("b"))
+    print(results)
+
+asyncio.run(main())`,
+    },
+  ]}
+/>
+
+### How do context managers work, and how do you write one?
+
+A context manager implements `__enter__` (run on entry) and `__exit__`
+(run on exit, even if an exception occurs). The `with` statement calls
+these automatically, ensuring cleanup. The `contextlib.contextmanager`
+decorator lets you write one as a generator with a single `yield`.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from contextlib import contextmanager
+
+@contextmanager
+def managed_resource():
+    print("acquire")
+    try:
+        yield "resource"
+    finally:
+        print("release")
+
+with managed_resource() as r:
+    print(r)`,
+    },
+  ]}
+/>
+
+### What is the difference between shallow copy and deep copy?
+
+A **shallow copy** (e.g., `list.copy()`, `dict.copy()`, or `copy.copy()`)
+creates a new container but shares references to the same inner objects.
+Mutating a nested list in the copy affects the original. A **deep copy**
+(`copy.deepcopy()`) recursively copies all nested objects, fully
+independent of the original.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import copy
+original = [[1, 2], [3, 4]]
+shallow = copy.copy(original)
+deep = copy.deepcopy(original)
+shallow[0].append(99)  # also changes original[0]
+deep[1].append(99)     # original[1] unchanged
+print("original:", original)  # [[1, 2, 99], [3, 4]]
+print("shallow :", shallow)   # [[1, 2, 99], [3, 4]]
+print("deep    :", deep)      # [[1, 2], [3, 4, 99]]`,
+    },
+  ]}
+/>
+
+### How does Python's list work internally?
+
+`list` is a dynamic array backed by a C array of object pointers. Indexed
+access is O(1). Appending is amortized O(1) due to over-allocation
+(capacity roughly doubles on resize). Inserting or deleting at an
+arbitrary position is O(n) because all subsequent pointers shift. Slicing
+creates a new list in O(k) where k is the slice length.
+
+### What are the time complexities of dict operations?
+
+Python's `dict` uses open addressing with a hash table. Average-case
+get, set, and delete are all O(1). Worst-case (many hash collisions) is
+O(n), but CPython's perturbation-based probing makes this extremely rare.
+Iterating over all keys is O(n). Since Python 3.7 dict preserves
+insertion order.
+
+### What is a set, and when do you use it over a list?
+
+A `set` is an unordered collection of unique, hashable elements backed by
+a hash table. Membership test (`in`) is O(1) versus O(n) for a list. Use
+a set when you need fast "have I seen this element?" checks, deduplication,
+or set operations (union, intersection, difference) — all O(n) or better.
+
+### What is name mangling in Python?
+
+A class attribute with a double-underscore prefix (but no trailing double
+underscore), like `__secret`, is name-mangled by Python to
+`_ClassName__secret`. This makes accidental overriding in subclasses less
+likely. It is **not** private — it is still accessible by the mangled
+name — but it signals strong internal use.
+
+### What are `__slots__` and when should you use them?
+
+By default, Python stores instance attributes in a per-instance `__dict__`,
+which is flexible but memory-heavy. Declaring `__slots__` replaces that
+dict with a fixed-size array, reducing memory per instance by 30–50% and
+slightly speeding up attribute access. Use slots for classes that create
+millions of instances.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class Point:
+    __slots__ = ("x", "y")
+
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+
+p = Point(3, 4)
+print(p.x, p.y)  # 3 4`,
+    },
+  ]}
+/>
+
+### How does Python's garbage collector work?
+
+CPython uses **reference counting** as the primary mechanism: when an
+object's reference count drops to zero it is freed immediately. A cyclic
+garbage collector (the `gc` module) runs periodically to detect and break
+**reference cycles** (e.g., two objects pointing to each other). PyPy and
+other implementations use different GC strategies.
+
+### What are type hints, and do they affect runtime behavior?
+
+Type hints (introduced in PEP 484) annotate variable, parameter, and
+return types using syntax like `def greet(name: str) -> str`. They are
+**not enforced at runtime** by default — Python remains dynamically typed.
+Their value is for static analysis tools (mypy, pyright), IDE completion,
+and documentation. `from __future__ import annotations` defers evaluation
+of annotations.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `def add(a: int, b: int) -> int:
+    return a + b
+
+print(add(3, 4))  # 7`,
+    },
+  ]}
+/>
+
+### How do list, dict, and set comprehensions compare to `map`/`filter`?
+
+Comprehensions are generally preferred for readability and are at least
+as fast as equivalent `map`/`filter` calls. A list comprehension
+`[f(x) for x in iterable if cond(x)]` replaces `list(filter(cond, map(f, iterable)))`.
+Generator expressions (parentheses instead of brackets) are lazy and
+memory-efficient, suitable as arguments to functions like `sum` or `max`.
+
+### What does `finally` guarantee?
+
+The `finally` block of a `try`/`except`/`finally` statement runs
+**always** — whether an exception is raised, caught, or not raised at all,
+and even if there is a `return` statement in `try` or `except`. It is
+used for cleanup (closing files, releasing locks) that must happen
+regardless of outcome. It does not suppress exceptions.
+
+```python
+def read_file(path):
+    f = open(path)
+    try:
+        return f.read()
+    finally:
+        f.close()  # always runs
+```
+
+### How does Python sort with a key function?
+
+`list.sort()` and `sorted()` accept a `key` callable that is applied to
+each element once; elements are then compared by their key values. This
+enables case-insensitive sort (`key=str.lower`), sorting by attribute
+(`key=lambda x: x.age`), or multi-key sort (`key=lambda x: (x.last, x.first)`).
+The sort is stable — equal keys preserve the original relative order.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `words = ["Banana", "apple", "cherry"]
+words.sort(key=str.lower)
+print(words)  # ['apple', 'Banana', 'cherry']`,
+    },
+  ]}
+/>
+
+### What is an iterator and how does the iterator protocol work?
+
+An **iterable** implements `__iter__()`, which returns an **iterator**.
+An iterator implements both `__iter__()` (returns itself) and `__next__()`,
+which returns the next value or raises `StopIteration`. The `for` loop
+calls `iter(obj)` once, then repeatedly calls `next()` until
+`StopIteration`. Generators implement this protocol automatically.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class Range3:
+    def __iter__(self):
+        self.n = 0
+        return self
+
+    def __next__(self):
+        if self.n >= 3:
+            raise StopIteration
+        self.n += 1
+        return self.n
+
+print(list(Range3()))  # [1, 2, 3]`,
+    },
+  ]}
+/>
+
+### Explain f-strings and their performance advantage.
+
+F-strings (formatted string literals, PEP 498) embed expressions directly
+in string literals: `f"Hello, {name}!"`. They are evaluated at parse time
+into efficient bytecode — faster than `%`-formatting and `str.format()` —
+and support arbitrary expressions, method calls, and format specs
+(`f"{value:.2f}"`). They are the preferred formatting method in modern
+Python.
+
+### What does `@staticmethod` vs `@classmethod` mean?
+
+A `@staticmethod` receives no implicit first argument; it is essentially
+a regular function namespaced inside the class. A `@classmethod` receives
+the class itself as `cls` as its first argument, enabling factory methods
+and subclass-aware behavior. Neither receives the instance.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class Date:
+    def __init__(self, y, m, d):
+        self.y, self.m, self.d = y, m, d
+
+    @classmethod
+    def from_string(cls, s):
+        y, m, d = map(int, s.split("-"))
+        return cls(y, m, d)
+
+    @staticmethod
+    def is_leap(year):
+        return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
+
+d = Date.from_string("2024-03-15")
+print(d.y, d.m, d.d)          # 2024 3 15
+print(Date.is_leap(2024))      # True
+print(Date.is_leap(2023))      # False`,
+    },
+  ]}
+/>
+
+### What is the difference between `__repr__` and `__str__`?
+
+`__repr__` is meant for **developers** — it should return an unambiguous
+string, ideally one that could be passed to `eval()` to recreate the
+object. `__str__` is for **end users** — a readable, human-friendly
+representation. `repr()` falls back to `__repr__` if `__str__` is
+missing. In an interactive REPL, the result of `repr()` is displayed.
+
+### How does Python handle exceptions — what is the exception hierarchy?
+
+All exceptions inherit from `BaseException`. User-defined exceptions
+should inherit from `Exception`. `KeyboardInterrupt` and `SystemExit`
+inherit from `BaseException` directly so a bare `except Exception` doesn't
+catch them. The `raise` statement re-raises the current exception; `raise
+ExceptionType from original` chains exceptions, preserving context.
+
+```python
+class AppError(Exception):
+    """Base for application errors."""
+
+try:
+    result = 1 / 0
+except ZeroDivisionError as e:
+    print(f"caught: {e}")
+    raise AppError("division failed") from e
+except (TypeError, ValueError):
+    pass
+else:
+    print("no exception — runs only on success")
+finally:
+    print("always runs")
+```
+
+### What is `property` and why use it?
+
+`@property` turns a method into an attribute-style accessor, letting you
+add validation or computed behavior without changing the public API.
+A matching `@name.setter` handles assignment. This follows the principle
+that you can start with a plain attribute and upgrade to a property later
+without breaking callers.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `class Circle:
+    def __init__(self, radius):
+        self._radius = radius
+
+    @property
+    def radius(self):
+        return self._radius
+
+    @radius.setter
+    def radius(self, value):
+        if value < 0:
+            raise ValueError("radius must be non-negative")
+        self._radius = value
+
+c = Circle(5)
+print(c.radius)   # 5
+c.radius = 10
+print(c.radius)   # 10`,
+    },
+  ]}
+/>
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`What does this print?
+
+\`\`\`python
+def add(x, acc=[]):
+    acc.append(x)
+    return acc
+
+print(add(1))
+print(add(2))
+\`\`\`
+
+- \`[1]\` then \`[2]\`
+  > That's what you'd get with a fresh list each call — but a default argument is created only once.
+- [o] \`[1]\` then \`[1, 2]\`
+  > The default list is evaluated once at definition time and **shared** across calls, so the second call appends to the same list.
+- \`[1]\` then \`[1]\`
+  > The list persists *and* keeps growing across calls; the second call sees the first call's element.
+- It raises an error on the second call.
+  > It runs fine — that's exactly why the shared-state bug is so easy to miss.`}
+/>
+
+<MultipleChoice
+  markdown={`When should you use \`is\` instead of \`==\`?
+
+- Always — \`is\` is just a faster \`==\`.
+  > They mean different things: \`is\` tests object **identity**, not value equality, so swapping them changes behavior.
+- [o] For comparing against singletons like \`None\` (\`if x is None\`).
+  > \`is\` checks identity, which is exactly right for the unique \`None\` object; value comparisons should use \`==\`.
+- For comparing two strings' contents.
+  > Use \`==\` for content; \`is\` may appear to work due to interning but isn't guaranteed.
+- For comparing two lists' contents.
+  > Two distinct lists with equal contents are \`==\` but never \`is\`; use \`==\`.`}
+/>
+
+## Go deeper
+
+- [Python Basics](/learn/python-basics)

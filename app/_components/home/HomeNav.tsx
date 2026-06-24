@@ -151,6 +151,13 @@ function MobileDrawer() {
             Courses
           </Dialog.Close>
 
+          <Dialog.Close
+            render={<Link href="/interview" prefetch={false} />}
+            className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10"
+          >
+            Interview Prep
+          </Dialog.Close>
+
           <div className="mt-2 px-3 text-xs font-semibold uppercase tracking-wide text-[var(--ds-gray-400)]">
             Playground
           </div>
@@ -231,6 +238,13 @@ export function HomeNav() {
             className="rounded-lg px-3 py-2 text-sm font-medium text-[#121212] transition-colors hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]"
           >
             Courses
+          </Link>
+          <Link
+            href="/interview"
+            prefetch={false}
+            className="rounded-lg px-3 py-2 text-sm font-medium text-[#121212] transition-colors hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]"
+          >
+            Interview Prep
           </Link>
           <PlaygroundMenu />
         </div>

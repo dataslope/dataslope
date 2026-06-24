@@ -1,0 +1,682 @@
+---
+title: Pandas
+description: Data Analyst pandas interview questions — selection, groupby, merging, and missing data — with answers, a concept check, and a runnable challenge.
+---
+
+When the analyst screen isn't SQL, it's usually **pandas**. Review the
+Q&A, then run the challenge in your browser.
+
+## Q&A
+
+### What's the difference between `loc` and `iloc`?
+
+`loc` selects by **label** (index/column names); `iloc` selects by
+**integer position**.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["South", "East", "North", "West", "North"],
+    "amount": [80, 200, 120, 50, 60],
+})`,
+      starterCode: `print(df.loc[3, "amount"])       # row with index label 3, column "amount"
+print(df.iloc[3, 1])            # 4th row, 2nd column, regardless of labels
+print(df.loc[df.region == "North"])  # boolean mask (label-based)`,
+    },
+  ]}
+/>
+
+A common gotcha: after filtering, the index labels no longer match
+positions, so `loc[0]` may raise while `iloc[0]` still works.
+
+### What does `groupby` return, and what is the "split-apply-combine" pattern?
+
+`groupby` **splits** rows into groups by key, lets you **apply** an
+aggregation/transform per group, then **combines** the results. Grouping
+one column and aggregating returns a **Series** indexed by the group
+keys; aggregating several returns a **DataFrame**.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "North", "East", "South", "North"],
+    "amount": [100, 80, 80, 50, 70, 60],
+})`,
+      starterCode: `print(df.groupby("region")["amount"].sum())   # Series
+
+result = df.groupby("region").agg(total=("amount", "sum"),
+                                  n=("amount", "size"))
+print(result)   # DataFrame`,
+    },
+  ]}
+/>
+
+### When do you use `merge` vs `concat` vs `join`?
+
+- **`merge`** — SQL-style joins on key columns (`how="inner"|"left"|...`).
+- **`concat`** — stack DataFrames vertically (more rows) or horizontally (more columns), aligning on the index.
+- **`join`** — convenience for merging on the **index**.
+
+Reach for `merge` for "combine on a key," `concat` for "stack these together."
+
+```python
+# merge: join on a key column
+combined = pd.merge(orders, customers, on="customer_id", how="left")
+
+# concat: stack two frames with the same columns
+all_orders = pd.concat([orders_jan, orders_feb], ignore_index=True)
+```
+
+### How do you handle missing data?
+
+Detect with `isna()`/`notna()`; then **drop** (`dropna()`) or **fill**
+(`fillna(value)`, forward/backward fill). Choose based on why it's
+missing and how much: dropping a few rows is fine; dropping a column
+that's 60% null often isn't. Beware that `NaN != NaN`, so compare with
+`isna()`, not `== NaN`.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({
+    "region": ["North", "South", None, "East"],
+    "amount": [100.0, np.nan, 80.0, np.nan],
+})`,
+      starterCode: `print(df.isna().sum())              # count NaNs per column
+print(df.dropna(subset=["amount"])) # drop rows where amount is NaN
+df["amount"] = df["amount"].fillna(0)
+print(df)                           # NaN replaced with 0`,
+    },
+  ]}
+/>
+
+### Why can `SettingWithCopyWarning` appear, and how do you avoid it?
+
+It warns that you may be assigning to a **view** (a slice) rather than
+the original frame, so the write might not "stick." Avoid it by doing the
+assignment in one `loc` call on the original:
+
+```python
+df.loc[df.region == "North", "amount"] = 0   # clear, in-place
+```
+
+### How does boolean filtering work in pandas?
+
+You create a boolean Series by applying a comparison to a column, then
+pass it inside `df[...]` or `df.loc[...]`. Combine conditions with `&`
+(and), `|` (or), and `~` (not), and always wrap each condition in
+parentheses because of Python operator precedence.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "North", "East", "North"],
+    "amount": [120, 80, 60, 200, 150],
+})`,
+      starterCode: `mask = (df["amount"] > 100) & (df["region"] == "North")
+result = df.loc[mask]
+print(result)`,
+    },
+  ]}
+/>
+
+### What is the difference between `transform` and `agg` in a groupby?
+
+`agg` reduces each group to a scalar (fewer rows); `transform` returns a
+Series of the **same length as the original DataFrame**, broadcasting the
+group result back to every row. `transform` is useful for creating
+group-level features without losing the original index.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "North", "East", "South", "North"],
+    "amount": [100, 80, 80, 50, 70, 60],
+})`,
+      starterCode: `df["group_mean"] = df.groupby("region")["amount"].transform("mean")
+print(df)`,
+    },
+  ]}
+/>
+
+### How do you reshape data from wide to long format?
+
+Use `melt`. It unpivots specified value columns into two columns: one for
+the variable name and one for the value. The opposite (long to wide) is
+`pivot` or `pivot_table`.
+
+```python
+df_long = df.melt(
+    id_vars=["customer_id"],
+    value_vars=["q1_sales", "q2_sales"],
+    var_name="quarter",
+    value_name="sales",
+)
+```
+
+### What is `pivot_table` and how does it differ from `pivot`?
+
+`pivot_table` is like a spreadsheet pivot: it groups by index and columns
+and applies an aggregation function (default `mean`). `pivot` is a
+simpler reshape with no aggregation — it requires unique (index, columns)
+combinations or it raises an error.
+
+```python
+pt = df.pivot_table(
+    index="region",
+    columns="category",
+    values="amount",
+    aggfunc="sum",
+    fill_value=0,
+)
+```
+
+### What is a categorical dtype and why use it?
+
+Converting a string column with low cardinality to `category` dtype
+stores integer codes internally instead of repeated strings, saving memory
+and speeding up `groupby` and sorting. Use `df["col"].astype("category")`.
+Ordered categoricals also allow meaningful comparisons like `small < medium < large`.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "East", "West", "North", "South"] * 50,
+    "amount": list(range(300)),
+})`,
+      starterCode: `df["region"] = df["region"].astype("category")
+print(df["region"].cat.categories)
+print(df.memory_usage(deep=True))`,
+    },
+  ]}
+/>
+
+### How do you sort a DataFrame and rank values?
+
+`sort_values(by="col", ascending=False)` sorts rows. `df["col"].rank()`
+assigns ranks, with `method="dense"` for no gaps and `pct=True` for
+percentile ranks.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "East", "West"],
+    "amount": [120, 80, 200, 50],
+})`,
+      starterCode: `df_sorted = df.sort_values(by="amount", ascending=False)
+print(df_sorted)
+df["rank"] = df["amount"].rank(method="dense", ascending=False)
+print(df)`,
+    },
+  ]}
+/>
+
+### What does `value_counts` do?
+
+`Series.value_counts()` returns a Series of unique values and their
+counts, sorted by count descending. Pass `normalize=True` to get
+proportions, `dropna=False` to include NaN counts.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "North", "East", "South", "North"],
+})`,
+      starterCode: `print(df["region"].value_counts(normalize=True))`,
+    },
+  ]}
+/>
+
+### How do you work with datetime data in pandas?
+
+Parse with `pd.to_datetime(df["col"])`, then access components via the
+`.dt` accessor: `.dt.year`, `.dt.month`, `.dt.day_of_week`, etc.
+`resample("ME")` down-samples a DatetimeIndex to monthly periods for
+time-series aggregations.
+
+```python
+df["date"] = pd.to_datetime(df["date"])
+df["month"] = df["date"].dt.to_period("M")
+monthly = df.set_index("date").resample("ME")["amount"].sum()
+```
+
+### What does `resample` do and when do you use it?
+
+`resample` is the time-series equivalent of `groupby`: it bins rows into
+time periods (e.g., `"D"` for daily, `"ME"` for month-end, `"YE"` for
+year-end) and applies an aggregation. The DataFrame index must be a
+`DatetimeIndex`.
+
+```python
+df = df.set_index(pd.to_datetime(df["date"]))
+weekly_revenue = df["amount"].resample("W").sum()
+monthly_avg    = df["amount"].resample("ME").mean()
+```
+
+### What is method chaining and why is it useful?
+
+Method chaining applies multiple DataFrame operations in a single
+expression, reading top-to-bottom. It avoids intermediate variables,
+keeps intent clear, and is easy to read when formatted with parentheses.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "North", "East", "South"],
+    "amount": [100, -20, 80, 50, 70],
+})`,
+      starterCode: `result = (
+    df
+    .query("amount > 0")
+    .assign(tax=lambda x: x["amount"] * 0.08)
+    .groupby("region")["tax"]
+    .sum()
+    .reset_index()
+    .rename(columns={"tax": "total_tax"})
+)
+print(result)`,
+    },
+  ]}
+/>
+
+### What is the difference between a view and a copy in pandas?
+
+A **view** shares memory with the original DataFrame; modifying it can
+change the original. A **copy** is independent. Slicing with `[]` may
+return either depending on the operation. Use `.copy()` explicitly when
+you need an independent copy to avoid `SettingWithCopyWarning`.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "North", "East"],
+    "amount": [100, 80, 120, 50],
+})`,
+      starterCode: `subset = df[df["region"] == "North"].copy()
+subset["amount"] = 0   # safe — won't touch df
+print("subset:", subset["amount"].tolist())
+print("df unchanged:", df["amount"].tolist())`,
+    },
+  ]}
+/>
+
+### How do you apply a custom function to each row or column?
+
+`apply` runs a function along an axis. `axis=0` applies per column;
+`axis=1` applies per row. For element-wise operations on a single Series,
+`map` (or the older `applymap` / new `map` on DataFrames) is available.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({"amount": [80, 120, 50, 200, 90]})`,
+      starterCode: `df["discounted"] = df["amount"].apply(lambda x: x * 0.9 if x > 100 else x)
+print(df)`,
+    },
+  ]}
+/>
+
+### Why is vectorization preferred over `apply` with a lambda?
+
+Pandas and NumPy vectorized operations run in compiled C code and process
+all elements in one call — typically 10-100x faster than a Python-level
+loop inside `apply`. Use `apply` only when no vectorized equivalent
+exists.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({"amount": [80, 120, 50, 200, 90]})`,
+      starterCode: `# Vectorized (fast)
+df["discounted_vec"] = df["amount"] * 0.9
+
+# apply (slow on large frames)
+df["discounted_apply"] = df["amount"].apply(lambda x: x * 0.9)
+
+print(df)`,
+    },
+  ]}
+/>
+
+### How do you detect and drop duplicate rows?
+
+`duplicated()` returns a boolean Series; `drop_duplicates()` removes
+them. Pass `subset` to check only specific columns, and `keep="last"` to
+keep the last occurrence instead of the first.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "email": ["a@x.com", "b@x.com", "a@x.com", "c@x.com", "b@x.com"],
+    "name":  ["Alice", "Bob", "Alice2", "Carol", "Bob2"],
+})`,
+      starterCode: `print(df.duplicated(subset=["email"]).sum())        # count dupes
+df_clean = df.drop_duplicates(subset=["email"], keep="first")
+print(df_clean)`,
+    },
+  ]}
+/>
+
+### How do you rename columns in pandas?
+
+Use `df.rename(columns={"old": "new"})` for targeted renames, or assign
+to `df.columns` directly to replace all names at once.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({"cust_id": [1, 2, 3], "amt": [100, 200, 300]})`,
+      starterCode: `df = df.rename(columns={"cust_id": "customer_id", "amt": "amount"})
+print(df.columns.tolist())`,
+    },
+  ]}
+/>
+
+### How do you select columns by dtype?
+
+Use `df.select_dtypes(include=...)` or `df.select_dtypes(exclude=...)`.
+Common dtype strings: `"number"`, `"object"`, `"datetime64"`, `"category"`.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South"],
+    "amount": [100, 200],
+    "score":  [0.8, 0.9],
+})`,
+      starterCode: `numeric_cols = df.select_dtypes(include="number")
+print(numeric_cols.columns.tolist())`,
+    },
+  ]}
+/>
+
+### What does `fillna` with `ffill` or `bfill` do?
+
+`ffill` (forward fill) propagates the last valid value forward in the
+index; `bfill` (backward fill) uses the next valid value. Both are
+common for time-series data where a missing reading should inherit the
+nearest observed value.
+
+```python
+df["price"] = df["price"].ffill()
+```
+
+### How do you perform a conditional column assignment similar to SQL CASE?
+
+Use `numpy.where` for a single condition or `numpy.select` for multiple
+conditions — both are vectorized.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({"amount": [50, 120, 600, 80, 550]})`,
+      starterCode: `df["size_binary"] = np.where(df["amount"] >= 500, "Large", "Small")
+
+conditions = [df["amount"] >= 500, df["amount"] >= 100]
+choices    = ["Large", "Medium"]
+df["size"] = np.select(conditions, choices, default="Small")
+print(df)`,
+    },
+  ]}
+/>
+
+### How do you merge DataFrames on multiple keys?
+
+Pass a list to the `on` parameter (if the key names are identical in both
+frames) or use `left_on` and `right_on` lists.
+
+```python
+result = pd.merge(
+    orders, products,
+    left_on=["product_id", "warehouse_id"],
+    right_on=["id", "warehouse_id"],
+    how="left",
+)
+```
+
+### How do you compute a percentage of total within a group?
+
+Use `transform` to broadcast the group total back to each row, then divide.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "North", "South", "South", "East"],
+    "amount": [100, 60, 80, 120, 50],
+})`,
+      starterCode: `df["pct_of_region"] = (
+    df["amount"] / df.groupby("region")["amount"].transform("sum") * 100
+)
+print(df)`,
+    },
+  ]}
+/>
+
+### How do you read and write CSV and Excel files?
+
+`pd.read_csv("file.csv")` and `df.to_csv("out.csv", index=False)` for
+CSV. `pd.read_excel("file.xlsx", sheet_name="Sheet1")` and
+`df.to_excel("out.xlsx", index=False)` for Excel (requires `openpyxl`).
+
+```python
+df = pd.read_csv("sales.csv", parse_dates=["order_date"])
+df.to_csv("sales_clean.csv", index=False)
+
+df_xl = pd.read_excel("report.xlsx", sheet_name="Q1")
+df_xl.to_excel("report_out.xlsx", index=False)
+```
+
+### What is the `query` method?
+
+`df.query("amount > 100 and region == 'North'")` filters rows using a
+string expression. It is readable for simple filters and supports
+referencing external variables with the `@` prefix.
+
+```python
+threshold = 100
+df.query("amount > @threshold")
+```
+
+### How do you check the shape, dtypes, and memory usage of a DataFrame?
+
+`df.shape` returns `(rows, cols)`. `df.dtypes` lists each column's dtype.
+`df.info()` prints both plus non-null counts and approximate memory usage
+in one call. For precise memory, use `df.memory_usage(deep=True).sum()`.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "East", "West"],
+    "amount": [100, 80, 200, 50],
+    "flag":   [True, False, True, False],
+})`,
+      starterCode: `print(df.shape)
+print(df.dtypes)
+df.info()
+print(df.memory_usage(deep=True).sum())`,
+    },
+  ]}
+/>
+
+### How do you concatenate DataFrames vertically and reset the index?
+
+Pass a list of DataFrames to `pd.concat` with `axis=0` (the default).
+Add `ignore_index=True` to reset the index to a clean `RangeIndex` after
+stacking, preventing duplicate index labels.
+
+```python
+combined = pd.concat([df_jan, df_feb, df_mar], ignore_index=True)
+```
+
+### What is the difference between `map`, `apply`, and `DataFrame.map`?
+
+- `Series.map(func)` — applies a function or lookup element-by-element on a single Series.
+- `DataFrame.apply(func, axis=0|1)` — applies a function along an axis (column-wise or row-wise).
+- `DataFrame.map(func)` (pandas 2.1+, formerly `applymap`) — applies element-by-element across an entire DataFrame.
+
+Use `Series.map` for single-column lookups or value substitution, `apply` for
+row or column-level logic, and `DataFrame.map` for element-wise
+transformations across all cells.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "East"],
+    "q1": [100.555, 80.123, 50.789],
+    "q2": [120.111, 90.456, 60.321],
+})`,
+      starterCode: `# Series.map: value substitution
+df["region_code"] = df["region"].map({"North": "N", "South": "S", "East": "E"})
+print(df["region_code"].tolist())
+
+# DataFrame.apply: column-wise range
+print(df[["q1", "q2"]].apply(lambda col: col.max() - col.min(), axis=0))
+
+# DataFrame.map: element-wise rounding
+print(df[["q1", "q2"]].map(lambda x: round(x, 2)))`,
+    },
+  ]}
+/>
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`In \`df.groupby("region")["amount"].sum()\`, what is the **index** of the resulting Series?
+
+- The original DataFrame's row numbers (0, 1, 2, …).
+  > Aggregating collapses each group to one value; the original row positions are gone.
+- [o] The distinct \`region\` values (the grouping keys).
+  > \`groupby\` uses the group keys as the index of the aggregated result — here, one entry per region.
+- A default \`RangeIndex\` with no labels.
+  > Only if you call \`.reset_index()\`; the grouped result is labeled by the group keys by default.
+- The \`amount\` values.
+  > \`amount\` becomes the Series *values* (the per-group sums), not the index.`}
+/>
+
+## Challenges
+
+<ChallengeCard
+  adapter="python"
+  title="Sum amount by region"
+  instructions={`A DataFrame \`df\` is provided with columns \`region\` and \`amount\`. Create a variable **\`by_region\`** holding a pandas **Series** of the total \`amount\` per \`region\` (the region as the index). The grouping order doesn't matter.`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "region": ["North", "South", "North", "East", "South", "North"],
+    "amount": [100, 80, 80, 50, 70, 60],
+})`,
+      starterCode: `# Create a Series of total amount per region.
+by_region = None
+print(by_region)`,
+      solutionCode: `by_region = df.groupby("region")["amount"].sum()
+print(by_region)`,
+    },
+  ]}
+  tests={[
+    { id: "is_series", name: "by_region is a Series", description: "Grouping one column and summing yields a Series", code: `import pandas as pd
+assert isinstance(by_region, pd.Series), "Expected a pandas Series"` },
+    { id: "three_groups", name: "One entry per region", description: "Three distinct regions", code: `assert len(by_region) == 3, f"Expected 3 groups, got {len(by_region)}"` },
+    { id: "totals", name: "Totals are correct", description: "North=240, South=150, East=50", code: `assert int(by_region["North"]) == 240
+assert int(by_region["South"]) == 150
+assert int(by_region["East"]) == 50` },
+  ]}
+/>
+
+## Go deeper
+
+- [Data Analysis with Python & Pandas](/learn/data-analysis-python-pandas)

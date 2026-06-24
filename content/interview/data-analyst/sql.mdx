@@ -1,0 +1,622 @@
+---
+title: SQL
+description: Data Analyst SQL interview questions — aggregation, joins, filtering, and NULLs — with written answers, concept checks, and runnable challenges.
+---
+
+SQL is the core of almost every Data Analyst screen. This page is a
+question bank: short **Q&A** to review the ideas, **concept checks**, and
+**runnable challenges** that execute against a real in-browser database.
+
+> **SQL dialect:** the runnable challenges on Dataslope execute in your browser on **DuckDB**, so the SQL below targets DuckDB. It is standard SQL except where noted — most of it runs unchanged on Postgres, MySQL, BigQuery, or Snowflake.
+
+## Q&A
+
+### What's the difference between WHERE and HAVING?
+
+`WHERE` filters individual rows **before** aggregation; `HAVING` filters
+groups **after** `GROUP BY`. An aggregate condition (like `SUM(...) > 250`)
+must go in `HAVING`, because the aggregate doesn't exist yet when `WHERE`
+runs.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE orders (region TEXT, amount DECIMAL(8,2));
+INSERT INTO orders VALUES
+  ('North', 120.00), ('South', 80.50), ('East', 200.00),
+  ('West', 50.25),   ('North', 60.00), ('South', 90.00),
+  ('East', 140.00),  ('West', 110.00), ('North', 75.50),
+  ('South', 65.00);`}
+  starterCode={`SELECT region, SUM(amount) AS revenue
+FROM orders
+WHERE amount > 0            -- row-level, before grouping
+GROUP BY region
+HAVING SUM(amount) > 250    -- group-level, after aggregation
+ORDER BY revenue DESC;`}
+/>
+
+### Explain the difference between INNER, LEFT, RIGHT, and FULL JOIN.
+
+All combine rows from two tables on a condition; they differ in which
+**unmatched** rows survive:
+
+- **INNER** — only rows with a match in *both* tables.
+- **LEFT** — all rows from the left table; `NULL`s where the right has no match.
+- **RIGHT** — all rows from the right table; `NULL`s on the left.
+- **FULL** — all rows from both; `NULL`s wherever either side is missing.
+
+"List all customers and their orders, *including customers who never
+ordered*" is the classic tell for a `LEFT JOIN`.
+
+### Why can a JOIN make a SUM too large, and how do you avoid it?
+
+Joining to a table with **multiple matching rows** duplicates the left
+row once per match — so summing a left-side column double-counts it. Fix
+it by aggregating the one-to-many side **first** (in a subquery/CTE) to
+the right grain, then joining:
+
+```sql
+WITH order_totals AS (
+  SELECT customer_id, SUM(amount) AS total
+  FROM orders
+  GROUP BY customer_id
+)
+SELECT c.name, t.total
+FROM customers c
+JOIN order_totals t ON t.customer_id = c.id;
+```
+
+### How do NULLs behave in comparisons and aggregates?
+
+`NULL` means "unknown," so any comparison with it yields `NULL` (not
+true) — use `IS NULL` / `IS NOT NULL`, never `= NULL`. Aggregates like
+`SUM`/`AVG` **skip** `NULL`s, but `COUNT(*)` counts every row while
+`COUNT(col)` counts only non-`NULL` values. Use `COALESCE(x, 0)` to
+substitute a default.
+
+### What's the difference between COUNT(*), COUNT(1), and COUNT(col)?
+
+`COUNT(*)` and `COUNT(1)` both count **rows** (identical performance in
+modern engines). `COUNT(col)` counts only rows where `col` **is not
+NULL** — so it can return a smaller number. `COUNT(DISTINCT col)` counts
+distinct non-NULL values.
+
+### What is a self join and when would you use one?
+
+A self join joins a table to **itself** using a table alias. It is used
+whenever rows within the same table have a relationship to each other,
+such as an employee-manager hierarchy or comparing a row to other rows in
+the same dataset.
+
+```sql
+SELECT e.name AS employee, m.name AS manager
+FROM employees e
+LEFT JOIN employees m ON e.manager_id = m.id;
+```
+
+### How do you find rows in one table that have no match in another (anti-join)?
+
+The two idiomatic patterns are `LEFT JOIN ... WHERE right.key IS NULL` and
+`NOT EXISTS`. Both produce an anti-join: rows in the left table with no
+corresponding row in the right.
+
+```sql
+-- Pattern 1: LEFT JOIN
+SELECT c.id, c.name
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.id
+WHERE o.customer_id IS NULL;
+
+-- Pattern 2: NOT EXISTS
+SELECT c.id, c.name
+FROM customers c
+WHERE NOT EXISTS (
+  SELECT 1 FROM orders o WHERE o.customer_id = c.id
+);
+```
+
+### What is the difference between UNION and UNION ALL?
+
+`UNION` removes duplicate rows across the two result sets; `UNION ALL`
+keeps every row. `UNION ALL` is faster because it skips the deduplication
+sort. Use `UNION` only when you genuinely need to eliminate duplicates.
+
+```sql
+SELECT city FROM store_a
+UNION
+SELECT city FROM store_b;      -- distinct cities only
+
+SELECT city FROM store_a
+UNION ALL
+SELECT city FROM store_b;      -- every row, may have duplicates
+```
+
+### What does EXCEPT (or MINUS) do?
+
+`EXCEPT` returns rows from the first query that do **not** appear in the
+second query, after removing duplicates. It is the set-operation
+equivalent of an anti-join on all columns and is useful for quick
+discrepancy checks between two result sets.
+
+```sql
+SELECT product_id FROM expected_products
+EXCEPT
+SELECT product_id FROM received_products;
+```
+
+### What is a CTE and how does it differ from a subquery?
+
+A Common Table Expression (CTE) is a named, temporary result set defined
+with `WITH` before the main query. Both CTEs and subqueries let you build
+layered queries, but CTEs are written once and can be **referenced
+multiple times**, making complex logic easier to read and debug. Recursive
+CTEs (with `RECURSIVE`) can also traverse hierarchical data, which
+subqueries cannot.
+
+```sql
+WITH active_users AS (
+  SELECT id, name FROM users WHERE status = 'active'
+)
+SELECT * FROM active_users WHERE name LIKE 'A%';
+```
+
+### How do window functions differ from GROUP BY aggregates?
+
+`GROUP BY` collapses multiple rows into one per group. Window functions
+compute a value **for each row** while still considering a set of related
+rows (the "window"), so the original row count is preserved. They use the
+`OVER(...)` clause.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE employees (name TEXT, department TEXT, salary INTEGER);
+INSERT INTO employees VALUES
+  ('Alice', 'Engineering', 95000), ('Bob', 'Engineering', 105000),
+  ('Carol', 'Marketing',   72000), ('Dave', 'Marketing',   68000),
+  ('Eve',   'Engineering', 98000), ('Frank','Marketing',   75000);`}
+  starterCode={`SELECT
+  name,
+  department,
+  salary,
+  AVG(salary) OVER (PARTITION BY department) AS dept_avg
+FROM employees;
+-- Every employee row is kept; dept_avg is the average for their dept.`}
+/>
+
+### What does PARTITION BY do inside a window function?
+
+`PARTITION BY` divides rows into independent sub-windows, resetting the
+window calculation for each partition. It is analogous to `GROUP BY` for
+the window frame: rows in different partitions are computed independently.
+Omitting `PARTITION BY` makes the entire result set one window.
+
+```sql
+SELECT
+  name,
+  department,
+  salary,
+  RANK() OVER (PARTITION BY department ORDER BY salary DESC) AS dept_rank
+FROM employees;
+-- dept_rank resets to 1 at the start of each department.
+```
+
+### How do ROW_NUMBER, RANK, and DENSE_RANK differ?
+
+All three assign a position within a window ordered by some column, but
+they handle ties differently:
+
+- `ROW_NUMBER` — always unique, ties get arbitrary sequential numbers.
+- `RANK` — ties share the same rank; the next rank **skips** numbers (1, 2, 2, 4).
+- `DENSE_RANK` — ties share the same rank; the next rank does **not** skip (1, 2, 2, 3).
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE results (name TEXT, score INTEGER);
+INSERT INTO results VALUES
+  ('Alice', 90), ('Bob', 85), ('Carol', 85), ('Dave', 80);`}
+  starterCode={`SELECT name, score,
+  ROW_NUMBER()  OVER (ORDER BY score DESC) AS rn,
+  RANK()        OVER (ORDER BY score DESC) AS rnk,
+  DENSE_RANK()  OVER (ORDER BY score DESC) AS drnk
+FROM results;`}
+/>
+
+### How do you return the top N rows per group?
+
+Use a window function (`ROW_NUMBER`) in a CTE or subquery, then filter
+where the row number is at most N in the outer query.
+
+```sql
+WITH ranked AS (
+  SELECT *,
+    ROW_NUMBER() OVER (PARTITION BY category ORDER BY revenue DESC) AS rn
+  FROM products
+)
+SELECT * FROM ranked WHERE rn <= 3;
+```
+
+### What is the logical order of SQL clause execution?
+
+The query is written in a different order than it is evaluated. The
+logical execution order is:
+
+1. `FROM` / `JOIN`
+2. `WHERE`
+3. `GROUP BY`
+4. `HAVING`
+5. `SELECT` (including window functions)
+6. `DISTINCT`
+7. `ORDER BY`
+8. `LIMIT` / `OFFSET`
+
+This is why you cannot reference a `SELECT` alias in a `WHERE` clause
+but can reference it in `ORDER BY` (most engines allow it as a shortcut).
+
+```sql
+-- WHERE uses the raw column; ORDER BY can reference the alias.
+SELECT region, SUM(amount) AS revenue
+FROM orders
+WHERE amount > 0
+GROUP BY region
+HAVING SUM(amount) > 100
+ORDER BY revenue DESC
+LIMIT 5;
+```
+
+### What does DISTINCT do, and when should you be careful with it?
+
+`DISTINCT` removes duplicate rows from the result set. It is useful for
+deduplication, but using it to "fix" unexpectedly high row counts often
+masks a bad join or missing filter. Always understand **why** duplicates
+appear before reaching for `DISTINCT`.
+
+```sql
+SELECT DISTINCT region FROM orders;   -- unique regions only
+```
+
+### How do you write a CASE expression?
+
+`CASE` is SQL's conditional expression. The searched form evaluates each
+`WHEN` condition in order and returns the first match.
+
+```sql
+SELECT
+  order_id,
+  amount,
+  CASE
+    WHEN amount >= 500 THEN 'Large'
+    WHEN amount >= 100 THEN 'Medium'
+    ELSE 'Small'
+  END AS order_size
+FROM orders;
+```
+
+### How do you handle NULL in a CASE or comparison?
+
+`NULL` is not equal to anything, including itself, so `WHEN col = NULL`
+never matches. Use `WHEN col IS NULL` to catch nulls explicitly, or place
+the `IS NULL` branch first since `CASE` short-circuits.
+
+```sql
+SELECT
+  CASE
+    WHEN score IS NULL THEN 'Unknown'
+    WHEN score >= 90   THEN 'A'
+    ELSE 'Below A'
+  END AS grade
+FROM tests;
+```
+
+### What is COALESCE and how does it differ from NULLIF?
+
+`COALESCE(a, b, c)` returns the **first non-NULL** argument — handy for
+providing a default. `NULLIF(a, b)` returns `NULL` if `a` equals `b`,
+otherwise returns `a` — useful to avoid division-by-zero by turning zero
+denominators into `NULL`.
+
+```sql
+SELECT COALESCE(discount, 0)          AS safe_discount,
+       revenue / NULLIF(sessions, 0)  AS revenue_per_session
+FROM traffic;
+```
+
+### How do common date/time functions work in SQL?
+
+Functions vary by engine, but the concepts are universal:
+- Extract a part: `EXTRACT(YEAR FROM order_date)` or `DATE_PART('month', ts)`.
+- Truncate to a period: `DATE_TRUNC('month', ts)` (PostgreSQL/DuckDB).
+- Arithmetic: add intervals with `+ INTERVAL '7 days'` or `DATEADD(day, 7, date)` (SQL Server).
+- Current time: `CURRENT_DATE`, `NOW()`, or `GETDATE()`.
+
+```sql
+SELECT
+  order_date,
+  EXTRACT(YEAR FROM order_date)      AS order_year,
+  DATE_TRUNC('month', order_date)    AS order_month,
+  order_date + INTERVAL '7 days'     AS due_date
+FROM orders;
+```
+
+### What are some common string functions?
+
+Key ones across most SQL dialects:
+- `LENGTH(s)` / `LEN(s)` — character count.
+- `UPPER(s)` / `LOWER(s)` — case conversion.
+- `TRIM(s)` / `LTRIM` / `RTRIM` — remove whitespace.
+- `SUBSTRING(s, start, len)` — extract a portion.
+- `CONCAT(a, b)` or `a || b` — concatenate.
+- `LIKE` with `%` (any chars) and `_` (one char) — pattern matching.
+
+```sql
+SELECT
+  UPPER(TRIM(name))              AS clean_name,
+  LENGTH(email)                  AS email_len,
+  SUBSTRING(email, 1, 5)        AS email_prefix,
+  first_name || ' ' || last_name AS full_name
+FROM users
+WHERE email LIKE '%@example.com';
+```
+
+### What is the difference between a clustered and non-clustered index?
+
+A **clustered index** determines the physical order of rows on disk; a
+table can have only one. A **non-clustered index** is a separate structure
+pointing back to the data rows; a table can have many. Clustered indexes
+speed up range scans on the key column; non-clustered indexes accelerate
+lookups and joins on non-key columns. As an analyst you mainly need to
+know: filtering or joining on un-indexed columns causes full table scans,
+which are slow on large tables.
+
+### When does adding an index slow things down?
+
+Indexes speed up reads but slow down **writes** (INSERT, UPDATE, DELETE)
+because each write must also update every index. Indexes also consume
+storage. Over-indexing a heavily written table degrades write throughput.
+
+### What is a subquery and when would you use one vs a CTE?
+
+A **subquery** is a query nested inside another query. Use subqueries for
+simple, one-off inline logic. Use CTEs when the same derived result is
+needed more than once, when you want named, readable steps, or when
+chaining several transformations. CTEs also support recursion.
+
+```sql
+-- Subquery (inline, one-off)
+SELECT name FROM users
+WHERE id IN (SELECT user_id FROM orders WHERE amount > 500);
+
+-- CTE (named, reusable)
+WITH big_spenders AS (
+  SELECT user_id FROM orders WHERE amount > 500
+)
+SELECT name FROM users WHERE id IN (SELECT user_id FROM big_spenders);
+```
+
+### How do you pivot rows into columns in SQL?
+
+Standard SQL lacks a `PIVOT` keyword. The common approach is conditional
+aggregation with `CASE` inside `SUM` or `MAX`.
+
+```sql
+SELECT
+  region,
+  SUM(CASE WHEN category = 'A' THEN amount ELSE 0 END) AS cat_a,
+  SUM(CASE WHEN category = 'B' THEN amount ELSE 0 END) AS cat_b
+FROM orders
+GROUP BY region;
+```
+
+Some engines (SQL Server, BigQuery, DuckDB) offer a native `PIVOT` syntax.
+
+### What does GROUP BY ALL or GROUP BY with ROLLUP do?
+
+`ROLLUP` generates **subtotals** at each level of a hierarchy plus a
+grand total. For example, `GROUP BY ROLLUP(region, category)` produces
+rows for every (region, category) pair, then subtotals per region, then a
+grand total row where grouping columns are `NULL`.
+
+```sql
+SELECT region, category, SUM(amount) AS revenue
+FROM orders
+GROUP BY ROLLUP(region, category);
+```
+
+### How do you find duplicate rows in a table?
+
+Group by the columns that should be unique and filter for groups with a
+count greater than 1.
+
+```sql
+SELECT email, COUNT(*) AS cnt
+FROM users
+GROUP BY email
+HAVING COUNT(*) > 1;
+```
+
+### How do you delete duplicate rows while keeping one copy?
+
+Use a CTE with `ROW_NUMBER()` partitioned by the duplicate key, then
+delete rows where the row number is greater than 1.
+
+```sql
+WITH dupes AS (
+  SELECT id,
+    ROW_NUMBER() OVER (PARTITION BY email ORDER BY id) AS rn
+  FROM users
+)
+DELETE FROM users WHERE id IN (SELECT id FROM dupes WHERE rn > 1);
+```
+
+### What is the difference between a correlated and a non-correlated subquery?
+
+A **non-correlated** subquery runs once and its result is used by the
+outer query. A **correlated** subquery references columns from the outer
+query, so it re-executes for every row of the outer query — which can be
+slow on large tables.
+
+```sql
+-- Correlated: finds orders above that customer's own average
+SELECT order_id, customer_id, amount
+FROM orders o
+WHERE amount > (
+  SELECT AVG(amount)
+  FROM orders
+  WHERE customer_id = o.customer_id
+);
+```
+
+### What does LAG or LEAD do?
+
+`LAG(col, n)` returns the value of `col` from `n` rows **before** the
+current row in the window order; `LEAD(col, n)` looks `n` rows **ahead**.
+They are useful for period-over-period comparisons without a self-join.
+
+```sql
+SELECT
+  date,
+  revenue,
+  LAG(revenue, 1) OVER (ORDER BY date) AS prev_revenue,
+  revenue - LAG(revenue, 1) OVER (ORDER BY date) AS change
+FROM daily_sales;
+```
+
+### What is a CROSS JOIN?
+
+A `CROSS JOIN` produces the Cartesian product of two tables — every row
+of the left table paired with every row of the right. It has no `ON`
+condition. Useful for generating combinations (e.g., pairing every
+product with every region), but be careful: two 1 000-row tables yield
+1 000 000 rows.
+
+```sql
+SELECT p.product_name, r.region
+FROM products p
+CROSS JOIN regions r;
+-- Every product paired with every region.
+```
+
+### How do you calculate a running total in SQL?
+
+Use `SUM` as a window function with `ORDER BY` inside `OVER`. By default
+the frame is `ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW`.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  initSql={`CREATE TABLE transactions (date DATE, amount DECIMAL(8,2));
+INSERT INTO transactions VALUES
+  ('2024-01-01', 100.00), ('2024-01-02', 250.00),
+  ('2024-01-03', 75.00),  ('2024-01-04', 180.00),
+  ('2024-01-05', 320.00);`}
+  starterCode={`SELECT
+  date,
+  amount,
+  SUM(amount) OVER (ORDER BY date) AS running_total
+FROM transactions;`}
+/>
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`You only want the regions whose **total** revenue exceeds 250. Which clause filters on that aggregated total?
+
+- A \`WHERE revenue > 250\` clause.
+  > \`WHERE\` filters individual rows *before* aggregation, so it can't reference the per-group \`SUM\` — and the alias \`revenue\` doesn't exist yet at that stage.
+- [o] A \`HAVING SUM(amount) > 250\` clause.
+  > \`HAVING\` is evaluated *after* \`GROUP BY\`, so it can filter on aggregates like \`SUM(amount)\`.
+- Either one works; they're interchangeable.
+  > They run at different stages: \`WHERE\` before grouping (row-level), \`HAVING\` after (group-level). Filtering an aggregate belongs in \`HAVING\`.
+- Neither; you must wrap the query in a subquery first.
+  > A subquery works but isn't required — \`HAVING\` filters grouped results directly.`}
+/>
+
+<MultipleChoice
+  markdown={`A customer has placed no orders. With an ordinary \`INNER JOIN\` between \`customers\` and \`orders\`, what happens to that customer?
+
+- They appear with a \`total\` of \`0\`.
+  > That's \`LEFT JOIN\` (+ \`COALESCE\`) behavior. \`INNER JOIN\` returns only rows with a match on both sides.
+- [o] They disappear from the result entirely.
+  > \`INNER JOIN\` keeps only customers with at least one matching order, so a customer with none is dropped — which is why "include non-buyers" needs a \`LEFT JOIN\`.
+- They appear with a \`total\` of \`NULL\` and the query errors.
+  > \`INNER JOIN\` omits them rather than erroring. (Under \`LEFT JOIN\`, the sum is \`NULL\` until you wrap it in \`COALESCE\`.)
+- Every other customer's row is duplicated.
+  > Join type doesn't duplicate unmatched rows; it controls whether unmatched left-side rows are kept.`}
+/>
+
+## Challenges
+
+<SqlChallengeCard
+  dialect="duckdb"
+  title="Total revenue per region"
+  instructions={`The table \`orders\` has columns \`id\`, \`region\`, \`category\`, and \`amount\`. Return the **total revenue per region**: two columns, \`region\` and \`revenue\` (the summed \`amount\`), sorted by \`revenue\` descending.`}
+  initSql={`CREATE TABLE orders AS
+SELECT * FROM (VALUES
+  (1,  'North', 'A', 120.00),
+  (2,  'South', 'B',  80.50),
+  (3,  'East',  'A', 200.00),
+  (4,  'West',  'C',  50.25),
+  (5,  'North', 'B',  60.00),
+  (6,  'South', 'A',  90.00),
+  (7,  'East',  'C', 140.00),
+  (8,  'West',  'B', 110.00),
+  (9,  'North', 'C',  75.50),
+  (10, 'South', 'B',  65.00)
+) AS t(id, region, category, amount);`}
+  starterCode={`-- Sum amount per region, highest first.
+SELECT
+  region,
+  -- your aggregate here AS revenue
+FROM orders
+-- group + order here;`}
+  solutionSql={`SELECT
+  region,
+  SUM(amount) AS revenue
+FROM orders
+GROUP BY region
+ORDER BY revenue DESC;`}
+  tests={[
+    { id: "row_count", name: "One row per region", description: "Four regions → four rows", expectedRowCount: 4 },
+    { id: "columns", name: "Has the required columns", description: "region and revenue", expectedColumnsInclude: ["region", "revenue"] },
+  ]}
+/>
+
+<SqlChallengeCard
+  dialect="duckdb"
+  title="Total spend per customer, including zero"
+  instructions={`Two tables are loaded: \`customers\` (\`id\`, \`name\`, \`region\`) and \`orders\` (\`id\`, \`customer_id\`, \`amount\`). Return **every** customer with their total order \`amount\` — including customers who placed **no** orders, which should show \`0\`. Columns: \`name\`, \`total\`. Sort by \`total\` descending.`}
+  initSql={`CREATE TABLE customers AS SELECT * FROM (VALUES
+  (1, 'Ava', 'North'),
+  (2, 'Ben', 'South'),
+  (3, 'Cy',  'East'),
+  (4, 'Di',  'West')
+) AS t(id, name, region);
+
+CREATE TABLE orders AS SELECT * FROM (VALUES
+  (101, 1, 120.00),
+  (102, 1,  40.00),
+  (103, 2,  80.00),
+  (104, 3,  55.00),
+  (105, 3,  45.00),
+  (106, 2,  30.00)
+) AS t(id, customer_id, amount);`}
+  starterCode={`-- Every customer, even those with no orders (total 0).
+SELECT
+  c.name
+  -- , total here
+FROM customers c
+-- join orders, then group + order;`}
+  solutionSql={`SELECT
+  c.name,
+  COALESCE(SUM(o.amount), 0) AS total
+FROM customers c
+LEFT JOIN orders o ON o.customer_id = c.id
+GROUP BY c.name
+ORDER BY total DESC;`}
+  tests={[
+    { id: "row_count", name: "Every customer appears", description: "Four customers → four rows", expectedRowCount: 4 },
+    { id: "columns", name: "Has the required columns", description: "name and total", expectedColumnsInclude: ["name", "total"] },
+  ]}
+/>
+
+## Go deeper
+
+- [Intro to SQL with Postgres](/learn/intro-sql-postgres)
+- [SQL Analytics with DuckDB](/learn/sql-analytics-duckdb)

@@ -1,0 +1,10 @@
+{
+  "title": "Data Engineer",
+  "description": "Interview prep for Data Engineer roles: advanced SQL, data modeling, and pipelines.",
+  "pages": [
+    "index",
+    "sql",
+    "data-modeling",
+    "pipelines"
+  ]
+}

@@ -1,0 +1,387 @@
+---
+title: Statistics & Communication
+description: Data Analyst interview questions on descriptive statistics, correlation vs causation, sampling bias, and communicating findings.
+---
+
+Analysts are judged as much on **judgment and communication** as on
+query syntax. These come up in the "how would you analyze…?" portion of
+the interview.
+
+## Q&A
+
+### When would you report the median instead of the mean?
+
+When the distribution is **skewed** or has outliers. Income, house
+prices, and session durations are right-skewed: a few huge values drag
+the mean up, so the median ("typical" value) is more representative.
+Report both when the gap between them is itself informative.
+
+### Explain "correlation does not imply causation" with an example.
+
+Two variables can move together because of a **confounder** or
+coincidence, not because one causes the other. Ice-cream sales correlate
+with drownings — both are driven by hot weather (the confounder), not by
+each other. To argue causation you need a controlled experiment (A/B
+test) or a careful causal-inference design.
+
+### What is sampling bias, and how can it distort results?
+
+When the sample isn't representative of the population, conclusions don't
+generalize. Surveying only app users about a feature ignores people who
+churned because of it (**survivorship bias**); a web poll captures only
+the engaged (**self-selection**). The fix is sampling design — random or
+stratified sampling — not more data.
+
+### A metric went up 20% week-over-week. How do you investigate?
+
+State assumptions, then decompose: (1) is it real or an artifact
+(tracking change, bot traffic, a deploy)? (2) segment it — which
+region/platform/cohort drove it? (3) check seasonality / day-of-week and
+compare to the same period last year; (4) look for a denominator change
+(did traffic drop, inflating a rate?). Conclude with the most likely
+driver **and** what you'd verify next.
+
+### How do you present a finding to a non-technical stakeholder?
+
+Lead with the **answer and its business impact**, not the method. One
+clear chart over a table; label the axes and the takeaway. State
+assumptions and caveats plainly ("this excludes refunds"), and end with a
+recommended action. Save methodology for an appendix or backup slide.
+
+### What are variance and standard deviation, and what do they measure?
+
+**Variance** is the average squared deviation from the mean. **Standard
+deviation** is its square root, returned to the original units. Both
+measure the **spread** of a distribution: a higher value means data
+points are more dispersed around the mean. Standard deviation is easier
+to interpret because it shares units with the data (e.g., dollars, not
+dollars-squared).
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
+
+s = pd.Series([10, 20, 30, 40, 50])
+print(s.var())   # sample variance (ddof=1 by default)
+print(s.std())   # sample standard deviation`,
+    },
+  ]}
+/>
+
+### What is the mode, and when is it the most useful measure of center?
+
+The **mode** is the most frequently occurring value. It is most useful
+for **categorical** or discrete data (e.g., the most common product
+category purchased, the most frequent support ticket type) where mean
+and median have no clear meaning.
+
+### What is a normal distribution and why does it matter for analysts?
+
+A normal (Gaussian) distribution is bell-shaped and symmetric, fully
+described by its mean and standard deviation. Many natural phenomena
+approximate it, and it underpins common statistical tests. In practice,
+analysts care because departures from normality (heavy tails, skew) can
+invalidate assumptions of parametric tests.
+
+### What is the difference between a population and a sample?
+
+The **population** is the full set of observations you care about (e.g.,
+all customers). A **sample** is a subset drawn from it. We analyze
+samples because measuring the full population is usually impractical.
+Sample statistics (mean, proportion) are **estimates** of the true
+population parameters, subject to sampling error.
+
+### What are percentiles and quartiles?
+
+A **percentile** is the value below which a given percentage of
+observations fall: the 90th percentile means 90% of values are below
+that point. **Quartiles** divide data into four equal parts: Q1 (25th),
+Q2 (50th = median), Q3 (75th). The interquartile range (IQR = Q3 - Q1)
+is a robust measure of spread.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import pandas as pd
+
+s = pd.Series([10, 20, 30, 40, 50])
+q1, q3 = s.quantile(0.25), s.quantile(0.75)
+iqr = q3 - q1
+p90 = s.quantile(0.90)
+print(f"Q1={q1}, Q3={q3}, IQR={iqr}, 90th pct={p90}")`,
+    },
+  ]}
+/>
+
+### How do you identify outliers?
+
+Common methods:
+- **IQR rule**: values below `Q1 - 1.5 * IQR` or above `Q3 + 1.5 * IQR` are flagged as outliers.
+- **Z-score**: values more than 2-3 standard deviations from the mean.
+- **Visual**: box plots or scatter plots reveal extreme points quickly.
+
+Always investigate outliers before removing them — they may be data
+errors or genuinely important observations.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "amount": [10, 12, 11, 13, 9, 14, 10, 12, 200, 8, 11, 13, 190]
+})`,
+      starterCode: `q1, q3 = df["amount"].quantile([0.25, 0.75])
+iqr = q3 - q1
+outliers_iqr = df[(df["amount"] < q1 - 1.5 * iqr) |
+                  (df["amount"] > q3 + 1.5 * iqr)]
+print("IQR outliers:", outliers_iqr["amount"].tolist())
+
+z_scores = (df["amount"] - df["amount"].mean()) / df["amount"].std()
+outliers_z = df[z_scores.abs() > 2]
+print("Z-score outliers:", outliers_z["amount"].tolist())`,
+    },
+  ]}
+/>
+
+### What is the purpose of an A/B test?
+
+An A/B test is a **controlled experiment** that randomly assigns users to
+a control group (A) and a treatment group (B) to measure the causal
+effect of a change (e.g., a new button color) on a metric. Randomization
+ensures the groups are comparable, so any difference in outcomes can be
+attributed to the treatment.
+
+### What is a p-value in the context of an A/B test?
+
+The p-value is the probability of observing a result at least as extreme
+as the one measured, **if the null hypothesis (no difference) were true**.
+A small p-value (commonly below 0.05) suggests the result is unlikely
+under the null, providing evidence to reject it. It does **not** measure
+the probability that the null is true or the effect's practical size.
+
+### What is statistical significance vs. practical significance?
+
+**Statistical significance** means the observed effect is unlikely to be
+due to chance (low p-value). **Practical significance** means the effect
+is large enough to matter in the real world. A very large sample can make
+a tiny, meaningless difference statistically significant. Always report
+effect size alongside p-values.
+
+### What is a Type I and a Type II error?
+
+- **Type I error (false positive)**: you reject the null hypothesis when
+  it is actually true — concluding the treatment works when it doesn't.
+  Controlled by the significance level (alpha, often 0.05).
+- **Type II error (false negative)**: you fail to reject the null when it
+  is actually false — missing a real effect. Controlled by statistical
+  power (typically 80%).
+
+### What is statistical power?
+
+Power is the probability of correctly detecting a real effect (rejecting
+the null when it is false). Power increases with larger sample sizes,
+larger effect sizes, and higher significance levels. A common target is
+80% power. Low-powered tests risk missing real improvements.
+
+### How do you choose the right sample size for an A/B test?
+
+Use a power calculation based on: the minimum detectable effect (the
+smallest change worth caring about), the baseline metric value, the
+desired power (commonly 80%), and the significance level (commonly 5%).
+Online calculators and Python's `statsmodels` can compute this before
+running the test.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from statsmodels.stats.power import NormalIndPower
+
+analysis = NormalIndPower()
+n = analysis.solve_power(effect_size=0.1, power=0.8, alpha=0.05)
+print(f"Required n per group: {n:.0f}")`,
+    },
+  ]}
+/>
+
+### What is the difference between correlation and the correlation coefficient?
+
+**Correlation** is a general term for the linear association between two
+variables. The **Pearson correlation coefficient** (r) quantifies it from
+-1 (perfect negative) to +1 (perfect positive), with 0 meaning no linear
+relationship. Spearman rank correlation is used when the relationship is
+monotonic but not linear, or when data is ordinal.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+
+df = pd.DataFrame({
+    "price":    [10, 20, 30, 40, 50],
+    "sales":    [200, 160, 120, 80, 60],
+    "ad_spend": [5, 8, 15, 22, 30],
+})`,
+      starterCode: `# Pearson r between two columns
+r = df["price"].corr(df["sales"])
+print(f"Pearson r: {r:.3f}")
+
+# Full correlation matrix
+corr_matrix = df[["price", "sales", "ad_spend"]].corr()
+print(corr_matrix.round(3))
+
+# Spearman (rank-based)
+r_spearman = df["price"].corr(df["sales"], method="spearman")
+print(f"Spearman r: {r_spearman:.3f}")`,
+    },
+  ]}
+/>
+
+### What chart type would you choose for each scenario?
+
+- **Trend over time** — line chart.
+- **Comparing categories** — bar chart (or horizontal bar for many categories).
+- **Part-of-whole** — stacked bar chart; pie chart only for 2-4 slices.
+- **Distribution of a continuous variable** — histogram or box plot.
+- **Relationship between two continuous variables** — scatter plot.
+- **Heatmap** — correlation matrix or pivot-style table with color encoding.
+
+### How do you choose which metric to track for a product change?
+
+Define a **primary metric** that directly captures the goal (e.g.,
+conversion rate for a checkout change), plus **guardrail metrics** that
+must not degrade (e.g., refund rate, session duration). Avoid vanity
+metrics that look good but don't tie to business outcomes. Make sure the
+metric is measurable, attributable to the change, and sensitive enough to
+detect the expected effect size.
+
+### What is the difference between a dashboard and a report?
+
+A **dashboard** is a living view updated continuously (or on a schedule)
+for ongoing monitoring — it answers "what is happening now?" A **report**
+is typically a one-time or periodic document that answers a specific
+question, includes context and narrative, and is consumed linearly.
+Dashboards are for operational decisions; reports are for deeper analysis
+and stakeholder communication.
+
+### What makes a dashboard effective?
+
+Keep it to the key metrics decision-makers act on. Group related KPIs.
+Use consistent scales and color conventions. Add clear titles and data
+freshness labels. Avoid clutter: every element should earn its place.
+Design for the audience — an executive view differs from an ops team view.
+
+### How do you explain a complex statistical finding in plain language?
+
+Anchor to a concrete, relatable number ("customers who saw the new
+design were 12% more likely to purchase"). Avoid jargon; replace "95%
+confidence interval" with "we're highly confident the true lift is between
+8% and 16%." Use a visual. Tie it explicitly to the business decision it
+informs.
+
+### What is a pivot table in a spreadsheet and when do you use it?
+
+A pivot table summarizes a flat data table by grouping rows into
+categories and applying aggregations (sum, count, average) — the
+spreadsheet equivalent of `GROUP BY`. Use it for quick exploratory
+aggregation, cross-tabs, and reporting without writing code.
+
+### What is VLOOKUP and what are its limitations?
+
+`VLOOKUP(lookup_value, table_array, col_index, FALSE)` finds a value in
+the first column of a range and returns the value from a specified column
+in the same row. Limitations: it only looks **left-to-right**, is
+fragile when columns are inserted, and is slower than index-match on
+large datasets. `XLOOKUP` (modern Excel) removes most of these
+restrictions.
+
+### What does XLOOKUP improve over VLOOKUP?
+
+`XLOOKUP` separates the lookup array from the return array, so it can
+look in any direction (not just left-to-right), handles missing matches
+with a built-in `if_not_found` argument, and is generally more readable.
+It is available in Excel 365 and Excel 2021+.
+
+### What is the difference between absolute and relative cell references in spreadsheets?
+
+A **relative** reference (e.g., `A1`) adjusts when you copy a formula to
+another cell. An **absolute** reference (e.g., `$A$1`) stays fixed.
+Mixed references fix only the row (`A$1`) or only the column (`$A1`).
+Use absolute references for constants like a tax rate that should not
+shift when the formula is copied down a column.
+
+### How do you communicate uncertainty in a data finding?
+
+State your confidence explicitly ("based on the last 90 days of data"),
+report ranges not just point estimates, name the main assumptions, and
+quantify how sensitive the conclusion is to those assumptions. Avoid
+false precision — rounding "12.37% lift" to "about 12%" is often more
+honest when the confidence interval is wide.
+
+### What is the difference between a histogram and a bar chart?
+
+A **bar chart** compares discrete categories (each bar is one category).
+A **histogram** shows the distribution of a **continuous** variable by
+dividing the range into bins and counting how many observations fall in
+each bin. The x-axis of a histogram is numeric and ordered; bar chart
+categories can be in any order.
+
+### What is Simpson's Paradox?
+
+Simpson's Paradox occurs when a trend that appears in aggregate data
+**reverses** or disappears when the data is broken into subgroups. For
+example, a drug may appear less effective overall but be more effective
+in every demographic subgroup, because sicker (harder-to-treat) patients
+were disproportionately assigned to the treatment group. It is a reminder
+to always segment data before drawing conclusions.
+
+### What is a cohort analysis?
+
+A cohort analysis tracks a group of users who share a common starting
+event (e.g., sign-up date) over time. It isolates behavioral patterns
+from the changing composition of the user base, making it the standard
+tool for measuring retention, churn, and lifetime value by acquisition
+cohort.
+
+## Concept checks
+
+<MultipleChoice
+  markdown={`A dataset of household incomes is strongly right-skewed (a few very high earners). Which single number best summarizes the "typical" household?
+
+- The mean, because it uses every value.
+  > The mean is pulled upward by the high earners, so it overstates the typical household in a right-skewed distribution.
+- [o] The median, because it's robust to the skew/outliers.
+  > The median (50th percentile) reflects the middle household and isn't dragged by extreme values — the better "typical" summary here.
+- The maximum, because it shows the range.
+  > The max describes an extreme, not a typical value.
+- The mode, because it's always the best center.
+  > The mode is the most frequent value and is often unstable for continuous data like income; it isn't a general "typical value" choice.`}
+/>
+
+<MultipleChoice
+  markdown={`Cities with more firefighters per capita have more fire damage. A colleague concludes "firefighters cause fire damage." What's the flaw?
+
+- The data must be wrong.
+  > The correlation can be perfectly real; the *causal interpretation* is what's flawed.
+- [o] A confounder — bigger cities have both more fires (hence more damage) and more firefighters — drives both variables.
+  > City size is a lurking variable correlated with both; correlation doesn't establish that one variable causes the other.
+- Firefighters genuinely cause damage; the data proves it.
+  > Observational correlation can't establish causation, especially with an obvious confounder present.
+- You should add more cities to the dataset.
+  > More data won't fix a confounding problem; a controlled comparison or causal design would.`}
+/>
+
+## Go deeper
+
+- [Statistics for Data Science with Python](/learn/statistics-for-data-science-python)
