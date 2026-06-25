@@ -3,8 +3,8 @@ title: Dimensional Modeling
 description: Analytics Engineer interview questions on facts, dimensions, grain, and star schemas — with answers, a concept check, and a runnable mart challenge.
 ---
 
-The AE craft is turning raw tables into clean, well-grained dimensional
-models. Review the Q&A, then build a mart.
+The Analytics Engineer's craft is turning raw tables into clean,
+well-grained dimensional models. Review the Q&A, then build a mart.
 
 > **SQL dialect:** the runnable challenge on this page executes in your browser on **DuckDB**, so the SQL below targets DuckDB. It is standard SQL except where noted.
 
@@ -25,12 +25,35 @@ order line item") up front keeps measures additive and prevents
 double-counting. Every column then either describes that grain or is a
 measure at that grain.
 
+<Callout type="tip" title="Interview tip">
+State the grain in a single sentence ("one row per order line item")
+before you talk about measures or keys. Interviewers read a clearly
+declared grain as the signal that you can model dimensionally.
+</Callout>
+
 ### Star vs snowflake?
 
 **Star** keeps dimensions denormalized (one table each) for simple, fast
-joins — the BI default. **Snowflake** normalizes dimensions into
-sub-tables, reducing redundancy at the cost of more joins. Prefer star
-unless a dimension is huge or genuinely shared.
+joins — the Business Intelligence (BI) default. **Snowflake** normalizes
+dimensions into sub-tables, reducing redundancy at the cost of more joins.
+Prefer star unless a dimension is huge or genuinely shared.
+
+A star schema is exactly that shape — one central fact table surrounded by
+single-table dimensions:
+
+```mermaid
+flowchart TB
+  d["dim_date"] --> f["fact_orders"]
+  p["dim_product"] --> f
+  c["dim_customer"] --> f
+```
+
+The query below is a textbook star-schema read: the central `fact_orders`
+table joins directly to two single-table dimensions (`dim_date` and
+`dim_product`) on their surrogate keys, then sums revenue grouped by the
+descriptive attributes those dimensions provide. Because each dimension is
+one flat table, there are no extra hops — exactly the simplicity that makes
+the star the default shape.
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -69,9 +92,14 @@ ORDER BY d.full_date, p.category;`}
 
 A **surrogate key** is a synthetic, meaningless identifier (an integer or
 hash) for a dimension row, independent of the source's **natural key**.
-It's stable across source changes, enables SCD Type 2 (each version gets
-its own surrogate), and keeps fact joins fast and decoupled from business
-identifiers.
+It's stable across source changes, enables Slowly Changing Dimension (SCD)
+Type 2 (each version gets its own surrogate), and keeps fact joins fast and
+decoupled from business identifiers.
+
+The query below derives a surrogate key by hashing the natural key
+(`customer_id`) and carries the natural key alongside it, so downstream
+facts can join on the stable `customer_sk` while you can still trace back
+to the source identifier:
 
 ```sql
 -- Hash-based surrogate key (DuckDB: md5 returns a hex string)
@@ -109,6 +137,16 @@ SCD Type 1 **overwrites** the old attribute value with the new one, preserving n
 
 SCD Type 2 adds a **new row** for each attribute change, preserving the full history. Each row gets its own surrogate key plus `valid_from`, `valid_to`, and `is_current` columns. Fact rows joined to their surrogate key automatically reflect the attribute values that were true at event time.
 
+The runnable example below makes this tangible. The `initSql` setup seeds a
+`dim_customer` in which customer 42 has **two** versions — an `East` row
+valid through 2023-06-14 and a `West` row valid afterward — and the comment
+header above it shows that row layout at a glance. The query then joins
+each order to the version that was current on its `order_date`, using the
+predicate `f.order_date BETWEEN c.valid_from AND c.valid_to`. The output
+attributes the 2022 order to `East` and the 2024 order to `West`: that
+`BETWEEN` against the validity window is exactly the mechanism that makes
+Type 2 history queryable point-in-time.
+
 <SqlCodeBlock
   dialect="duckdb"
   initSql={`-- SCD Type 2 row layout: customer moved from East to West
@@ -138,8 +176,13 @@ JOIN dim_customer c
 ORDER BY f.order_id;`}
 />
 
+When you instead want only the **current** state of each customer — not the
+full history — you filter on the `is_current` flag, which is `TRUE` for
+exactly one row per entity. That turns the versioned dimension back into a
+simple "latest value" lookup:
+
 ```sql
--- Example dim_customer with SCD2 columns
+-- Read only the present state of each customer (one row per entity)
 SELECT
     customer_sk,      -- surrogate key
     customer_id,      -- natural key
@@ -168,6 +211,8 @@ A conformed dimension is shared across **multiple fact tables or subject areas**
 
 A degenerate dimension is a dimensional attribute stored directly in the fact table rather than in a separate dimension table, because it has no descriptive attributes of its own. An order number or invoice number is the canonical example — it provides grouping ability but carries no extra columns worth their own table.
 
+The query below groups by `order_number` straight off the fact table — there is no `dim_order` to join — showing how a degenerate dimension still supports grouping even though it lives on the fact:
+
 ```sql
 -- order_number lives in the fact table (degenerate dimension)
 -- No separate dim_order table exists
@@ -181,6 +226,8 @@ GROUP BY order_number;
 ### What is a role-playing dimension?
 
 A role-playing dimension is a single physical dimension table used **multiple times** in the same fact table under different aliases. A `dim_date` table might be joined three times to `fact_orders` as `order_date`, `ship_date`, and `delivery_date`, each a "role."
+
+In the query below, `dim_date` is joined to `fact_orders` three separate times under three aliases (`od`, `sd`, `dd`), each turning a different date key into a readable date. One physical table plays three roles in a single result:
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -219,6 +266,8 @@ A junk dimension bundles **miscellaneous low-cardinality flags and indicators** 
 
 A factless fact table records **events or coverage** with no numeric measure — just foreign keys. Examples: student course enrollments (the fact is attendance, not a count), or a coverage fact listing which products are on promotion in which stores on which days. You derive counts by querying "how many rows match this criteria."
 
+Because there is no measure to sum, you answer questions by **counting rows**. The query below counts how many distinct products were on promotion in one store over a week — the kind of coverage question a factless fact exists to answer:
+
 ```sql
 -- Factless fact: which products were on promotion per store per day
 -- fact_promotion_coverage(date_sk, store_sk, product_sk) — no measures
@@ -234,6 +283,8 @@ WHERE pc.store_sk = 5
 ### What is a bridge table, and when do you need one?
 
 A bridge table resolves **many-to-many relationships** between a fact and a dimension. For example, an order can have multiple promotions, and a promotion can apply to multiple orders. The bridge table contains (order_sk, promotion_sk) pairs with an optional weighting factor. It avoids row multiplication in the fact while still allowing drill-down to all related dimension members.
+
+The query below joins `fact_orders` to `dim_promotion` *through* the `bridge_order_promotion` table and multiplies each order's amount by the bridge's `weight_factor`. That weighting splits one order's value across its promotions (0.6 / 0.4 for order 201) instead of double-counting the full amount once per promotion:
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -276,7 +327,7 @@ Third Normal Form (3NF) eliminates all non-key dependencies and redundancy to op
 
 ### What is a wide (one-big-table) approach, and when is it appropriate?
 
-A wide table (OBT) pre-joins dimensions into the fact, producing a single flat table with all attributes. It maximizes query speed and simplifies BI tooling, but loses the flexibility of separate dimension tables and makes maintenance harder. It is appropriate for highly performance-sensitive use cases or for serving tools that struggle with joins.
+A wide table (one big table) pre-joins dimensions into the fact, producing a single flat table with all attributes. It maximizes query speed and simplifies BI tooling, but loses the flexibility of separate dimension tables and makes maintenance harder. It is appropriate for highly performance-sensitive use cases or for serving tools that struggle with joins.
 
 ### How do you handle late-arriving dimension records?
 
@@ -313,6 +364,8 @@ Measures in fact tables are generally fixed at event time and should not change.
 ### What are the trade-offs of using a hash surrogate key vs. a sequence integer?
 
 **Hash surrogates** (e.g., `MD5(natural_key)`) are deterministic — you can compute the same key in any environment without a central sequence, which helps distributed/incremental builds. **Integer sequences** are more compact, faster for joins, and easier to debug, but require a coordination mechanism. Hashes can collide (rare but possible) and are larger in storage. Most modern data warehouses use either approach; hashes are common in dbt pipelines.
+
+The two queries below contrast the approaches: the first hashes the natural key (computable anywhere, no central counter), while the second assigns a sequential integer with `row_number()` (compact and human-readable, but dependent on a single ordering pass):
 
 ```sql
 -- Hash surrogate (DuckDB): deterministic, no sequence needed

@@ -19,6 +19,10 @@ All number rows within a partition; they differ on **ties**:
 - **`RANK`** — ties share a rank, then it **skips** (1, 2, 2, 4).
 - **`DENSE_RANK`** — ties share a rank, **no skip** (1, 2, 2, 3).
 
+The query below runs all three over the same `players` table ordered by
+`score` so you can compare `rn`, `rnk`, and `dr` side by side on the
+tied 80-point scores.
+
 <SqlCodeBlock
   dialect="duckdb"
   initSql={`CREATE TABLE players (name VARCHAR, score INTEGER);
@@ -61,11 +65,15 @@ filter `WHERE rn = 1`.
 
 ### What's the difference between a CTE and a subquery? When is a CTE worth it?
 
-Both produce an intermediate result. A **CTE** (`WITH … AS`) is named and
-can be referenced multiple times and read top-to-bottom, which makes
-multi-step transformations far more readable. A correlated **subquery**
+Both produce an intermediate result. A **Common Table Expression (CTE)**
+(`WITH … AS`) is named and can be referenced multiple times and read
+top-to-bottom, which makes multi-step transformations far more readable. A correlated **subquery**
 runs per outer row and can be a performance trap. CTEs shine for staging
 steps and recursive queries.
+
+The block below computes the same per-`user_id` `SUM(amount)` two ways —
+once as a nested subquery and once as a named `user_totals` CTE — to
+contrast readability for the same `total > 1000` filter.
 
 ```sql
 -- Subquery: nested and harder to read; calculated inline each time
@@ -95,6 +103,10 @@ expensive sort/hash); `UNION ALL` keeps everything, including duplicates.
 Prefer `UNION ALL` unless you specifically need dedup — it skips the
 distinct step.
 
+The block below combines `user_id` from `app_users` and `legacy_users`
+both ways, showing where `UNION ALL` keeps duplicate ids and `UNION`
+collapses them.
+
 ```sql
 -- UNION ALL: fast, keeps every row including duplicates
 SELECT user_id FROM app_users
@@ -110,6 +122,9 @@ SELECT user_id FROM legacy_users;
 ### How do LAG and LEAD work?
 
 `LAG(col, n)` returns the value of `col` from `n` rows **before** the current row within the partition; `LEAD(col, n)` looks `n` rows **ahead**. Both accept an optional default for when the offset falls outside the partition. They are commonly used to compute period-over-period differences without a self-join.
+
+The query below pulls the prior day's `revenue` from `daily_revenue` with
+`LAG(revenue, 1, 0)` and subtracts it to produce a `delta` column.
 
 ```sql
 SELECT
@@ -169,6 +184,10 @@ FROM daily_metrics;
 
 `QUALIFY` is a clause that filters on **window function results** after they are computed, similar to how `HAVING` filters aggregate results. It avoids the need for a wrapping subquery. It is natively supported in BigQuery, Snowflake, DuckDB, and Databricks SQL; Postgres and MySQL require a subquery workaround.
 
+The query below uses `QUALIFY` to keep only the top two `products` per
+`category` by `revenue`, filtering on the `RANK()` result without a
+wrapping subquery.
+
 ```sql
 -- Keep top-2 products per category
 SELECT product_id, category, revenue
@@ -179,6 +198,10 @@ QUALIFY RANK() OVER (PARTITION BY category ORDER BY revenue DESC) <= 2;
 ### How do you write a recursive CTE?
 
 A recursive CTE has an **anchor** member (the base case) and a **recursive** member that references the CTE itself, joined with `UNION ALL`. The engine iterates until the recursive member returns no rows.
+
+The `org_tree` example below walks an `employees` self-reference: the
+anchor selects top-level managers, and the recursive member joins each
+employee to rows already in `org_tree` to compute a `depth` level.
 
 ```sql
 WITH RECURSIVE org_tree AS (
@@ -287,6 +310,10 @@ This is why you cannot reference a `SELECT` alias in `WHERE` (alias does not exi
 
 `WHERE` filters **individual rows before** grouping; `HAVING` filters **groups after** aggregation. Use `WHERE` to reduce the row count early (more efficient); use `HAVING` only when the filter condition references an aggregate.
 
+The query below filters individual rows with `WHERE status = 'active'`
+before grouping by `department`, then drops whole groups with `HAVING
+AVG(salary) > 80000`.
+
 ```sql
 SELECT department, AVG(salary) AS avg_sal
 FROM employees
@@ -310,7 +337,7 @@ To retrieve the full duplicate rows, join back to the original table or use `ROW
 
 ### What is an index, and when does it help (or hurt)?
 
-An index is a data structure (B-tree by default in most RDBMS) that lets the engine find rows matching a predicate without scanning the full table. Indexes help when queries are **selective** (returning a small fraction of rows) on the indexed columns. They hurt for bulk writes (each insert/update must also update the index) and for low-cardinality columns where a full scan beats index + random I/O.
+An index is a data structure (B-tree by default in most relational database management systems (RDBMS)) that lets the engine find rows matching a predicate without scanning the full table. Indexes help when queries are **selective** (returning a small fraction of rows) on the indexed columns. They hurt for bulk writes (each insert/update must also update the index) and for low-cardinality columns where a full scan beats index + random I/O.
 
 ### What is a covering index?
 
@@ -362,6 +389,10 @@ Look at (1) **node types** — sequential scan vs index scan vs hash join vs sor
 
 A **correlated subquery** references a column from the outer query. The engine re-executes the subquery for each outer row, making it O(N * M). Rewrite as a `JOIN` or a window function when performance matters.
 
+The block below computes each employee's `dept_avg` salary first as a
+correlated subquery (re-run per row) and then as a `dept_avgs` CTE joined
+once — the same result with far less repeated work.
+
 ```sql
 -- Slow correlated subquery
 SELECT e.name,
@@ -409,7 +440,7 @@ FROM user_revenue;
 
 ### What is the difference between PERCENT_RANK and CUME_DIST?
 
-Both express a row's relative position in a window as a value between 0 and 1. `PERCENT_RANK` = (rank - 1) / (total rows - 1) — the fraction of rows **ranked below** the current row. `CUME_DIST` = rank / total rows — the fraction of rows with a value **less than or equal to** the current row. `CUME_DIST` is always >= `PERCENT_RANK` and the last row always has `CUME_DIST = 1`.
+Both express a row's relative position in a window as a value between 0 and 1. `PERCENT_RANK` is $\text{PERCENT\_RANK} = \dfrac{\text{rank} - 1}{N - 1}$ — the fraction of rows **ranked below** the current row. `CUME_DIST` is $\text{CUME\_DIST} = \dfrac{\text{rank}}{N}$ — the fraction of rows with a value **less than or equal to** the current row, where $N$ is the total number of rows. `CUME_DIST` is always $\geq$ `PERCENT_RANK` and the last row always has $\text{CUME\_DIST} = 1$.
 
 ### What is a materialized view, and when would you use one?
 

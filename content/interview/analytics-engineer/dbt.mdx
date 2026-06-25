@@ -3,8 +3,8 @@ title: dbt
 description: Analytics Engineer interview questions on dbt models, ref/source, materializations, tests, and incremental builds.
 ---
 
-dbt is the tool AE interviews assume. Review the Q&A, then the concept
-checks.
+dbt is the tool Analytics Engineer interviews assume. Review the Q&A,
+then the concept checks.
 
 > **Note:** dbt compiles these models to your warehouse's SQL dialect, so the SQL below is illustrative. Dataslope's runnable SQL playground uses **DuckDB**.
 
@@ -12,20 +12,24 @@ checks.
 
 ### What is dbt, and what does it actually do?
 
-dbt is the **T** in ELT: you write transformations as `SELECT` statements
-("models"), and dbt handles building them **in order** in your warehouse,
-managing dependencies, materializations, tests, and docs. It brings
-software practices — version control, modularity, testing, CI — to SQL
-analytics. It transforms data already in the warehouse; it doesn't move
-data (that's EL tools).
+dbt is the **T** in extract, load, transform (ELT): you write
+transformations as `SELECT` statements ("models"), and dbt handles
+building them **in order** in your warehouse, managing dependencies,
+materializations, tests, and docs. It brings software practices —
+version control, modularity, testing, continuous integration (CI) — to
+SQL analytics. It transforms data already in the warehouse; it doesn't
+move data (that's EL tools).
 
 ### What do `ref()` and `source()` do?
 
 `ref('stg_orders')` references another **model**; `source('raw', 'orders')`
 references a declared raw **source** table. Both let dbt build the
-**dependency graph (DAG)** — so it knows build order and can swap
-schemas between dev and prod. Hardcoding table names breaks lineage and
-environment handling.
+dependency graph — a **Directed Acyclic Graph (DAG)** — so it knows
+build order and can swap schemas between dev and prod. Hardcoding table
+names breaks lineage and environment handling.
+
+Here `fct_orders` builds from two upstream models via `ref()`, so dbt
+adds edges from `stg_orders` and `stg_customers` and runs them first:
 
 ```sql
 -- models/marts/fct_orders.sql
@@ -36,6 +40,9 @@ SELECT
 FROM {{ ref('stg_orders') }}    AS o   -- references another model
 JOIN {{ ref('stg_customers') }} AS c   ON c.customer_id = o.customer_id;
 ```
+
+By contrast, `source('raw', 'orders')` points at a declared raw table
+(the `raw` source, `orders` table) rather than a dbt-built model:
 
 ```sql
 -- Referencing a raw source table
@@ -69,6 +76,10 @@ refresh** to repair drift.
 
 The `is_incremental()` macro returns `true` only when the model already exists in the warehouse and the run is not a full refresh. You use it in a `WHERE` clause to limit rows to those newer than the max value already loaded.
 
+Below, the `config()` marks the model `incremental`, and the
+`is_incremental()` guard keeps only `events` rows whose `event_at`
+exceeds the max already loaded:
+
 ```sql
 -- models/fct_events.sql
 {{
@@ -87,7 +98,11 @@ FROM {{ source('raw', 'events') }}
 
 ### What is `dbt snapshot`, and what SCD type does it implement?
 
-`dbt snapshot` implements **SCD Type 2**: it checks a source table for changed rows on each run and inserts new history rows with `dbt_valid_from` and `dbt_valid_to` timestamps rather than overwriting. You configure it with a `strategy` — `timestamp` (compares an `updated_at` column) or `check` (compares a list of columns). Snapshots are defined in `.sql` files under the `snapshots/` directory.
+`dbt snapshot` implements **Slowly Changing Dimension (SCD) Type 2**: it checks a source table for changed rows on each run and inserts new history rows with `dbt_valid_from` and `dbt_valid_to` timestamps rather than overwriting. You configure it with a `strategy` — `timestamp` (compares an `updated_at` column) or `check` (compares a list of columns). Snapshots are defined in `.sql` files under the `snapshots/` directory.
+
+This `snap_customers` snapshot uses the `timestamp` strategy on the
+`updated_at` column, keyed by `customer_id`, to record history of the
+raw `customers` source:
 
 ```sql
 {% snapshot snap_customers %}
@@ -117,6 +132,10 @@ Seeds are **CSV files** checked into the repository and loaded into the warehous
 
 **Generic tests** (`unique`, `not_null`, `accepted_values`, `relationships`) are configured in YAML and applied to columns across many models. **Singular tests** are standalone `.sql` files that return rows when the test fails. Use singular tests for complex, business-specific assertions that don't fit a generic pattern.
 
+This YAML attaches generic tests to `fct_orders`: `unique` and
+`not_null` on `order_id`, an `accepted_values` allowlist on `status`,
+and a `relationships` check tying `customer_id` back to `dim_customer`:
+
 ```yaml
 # models/schema.yml — generic tests on fct_orders
 models:
@@ -137,6 +156,9 @@ models:
               field: customer_id
 ```
 
+The singular test below is just a query: any `fct_orders` row with a
+negative `amount` is returned, so a non-empty result fails the run:
+
 ```sql
 -- tests/assert_no_negative_amounts.sql — singular test (returns rows on failure)
 SELECT order_id, amount
@@ -146,7 +168,11 @@ WHERE amount < 0
 
 ### How do macros work in dbt?
 
-Macros are **reusable Jinja functions** defined in `.sql` files under the `macros/` directory. They generate SQL dynamically, accept arguments, and can be called from models, other macros, or schema tests. They enable DRY SQL — for example, a macro that generates a `CASE WHEN` block for currency conversion.
+Macros are **reusable Jinja functions** defined in `.sql` files under the `macros/` directory. They generate SQL dynamically, accept arguments, and can be called from models, other macros, or schema tests. They enable don't repeat yourself (DRY) SQL — for example, a macro that generates a `CASE WHEN` block for currency conversion.
+
+The `cents_to_dollars` macro takes a `column_name` argument and emits
+the division expression, so models call it instead of repeating the
+`/ 100.0` arithmetic:
 
 ```sql
 -- macros/cents_to_dollars.sql
@@ -162,6 +188,9 @@ Macros are **reusable Jinja functions** defined in `.sql` files under the `macro
 
 Packages are **shared dbt projects** (macros, models, tests) installed from the dbt Hub or a Git repo. You declare them in `packages.yml` and run `dbt deps` to install. The most common package is `dbt_utils`, which provides macros like `surrogate_key`, `pivot`, and `date_spine`.
 
+This `packages.yml` pins `dbt-labs/dbt_utils` to version `1.1.1`; `dbt
+deps` then fetches that exact release into the project:
+
 ```yaml
 # packages.yml
 packages:
@@ -172,6 +201,9 @@ packages:
 ### What is source freshness, and how do you configure it?
 
 Source freshness checks whether a raw source table has been updated recently enough. You declare a `loaded_at_field` (timestamp column) and `freshness` thresholds (`warn_after`, `error_after`) in `sources.yml`, then run `dbt source freshness`. It alerts you when upstream data pipelines are late before bad data propagates through your models.
+
+Here the `orders` source measures lag from its `_loaded_at` column,
+warning after 6 hours and erroring after 12:
 
 ```yaml
 sources:
@@ -186,7 +218,11 @@ sources:
 
 ### What are exposures in dbt?
 
-Exposures declare **downstream consumers** of your dbt models — dashboards, ML models, reverse ETL pipelines — in YAML. They appear in the lineage DAG so you can see which models feed which business artifacts, assess the impact of changes, and communicate dependencies to stakeholders.
+Exposures declare **downstream consumers** of your dbt models — dashboards, machine learning (ML) models, reverse extract, transform, load (ETL) pipelines — in YAML. They appear in the lineage DAG so you can see which models feed which business artifacts, assess the impact of changes, and communicate dependencies to stakeholders.
+
+This exposure registers a `weekly_revenue_dashboard` that `depends_on`
+`fct_orders` and `dim_customer`, so those models show an edge to the
+dashboard in lineage:
 
 ```yaml
 exposures:
@@ -201,7 +237,7 @@ exposures:
 
 ### How does dbt manage documentation and lineage?
 
-dbt generates a **documentation site** (`dbt docs generate` + `dbt docs serve`) from YAML descriptions on models and columns, plus markdown doc blocks. The site includes an **interactive DAG** showing all model dependencies derived from `ref()` and `source()` calls — giving you lineage from raw source to BI exposure automatically.
+dbt generates a **documentation site** (`dbt docs generate` + `dbt docs serve`) from YAML descriptions on models and columns, plus markdown doc blocks. The site includes an **interactive DAG** showing all model dependencies derived from `ref()` and `source()` calls — giving you lineage from raw source to business intelligence (BI) exposure automatically.
 
 ### What are environments and targets in dbt?
 
@@ -214,6 +250,10 @@ A **target** is a named warehouse connection configuration (database, schema, cr
 ### How do you run only a subset of models in dbt?
 
 Use **node selection syntax** with `dbt run --select`. You can select by model name, directory, tag, or graph operators. The `+` operator selects upstream or downstream nodes.
+
+These three invocations show the common selectors: the `+fct_orders`
+graph operator, the `marts` directory path, and the `tag:nightly`
+tag selector:
 
 ```bash
 # Run one model and all its upstream dependencies
@@ -229,6 +269,10 @@ dbt run --select tag:nightly
 ### What is the `unique_key` config on an incremental model, and what does it control?
 
 `unique_key` tells dbt how to **handle duplicate rows** when merging new data into an incremental model. If a new row's key already exists in the target table, dbt will `MERGE`/`UPDATE` (upsert) rather than inserting a duplicate. Without `unique_key`, dbt only appends; with it, dbt uses a MERGE strategy (or DELETE+INSERT on warehouses that lack MERGE).
+
+Setting `unique_key='event_id'` in the `config()` below means a
+re-loaded `event_id` upserts in place instead of appending a duplicate
+to `fct_events`:
 
 ```sql
 -- models/fct_events.sql — incremental with upsert on event_id
@@ -250,6 +294,9 @@ FROM {{ source('raw', 'events') }}
 ### What is a dbt model contract?
 
 A **model contract** enforces that a model's output schema (column names, data types, and constraints) matches a declared specification. If the model's SQL produces a different shape, the run fails. Contracts are defined in YAML with `contract: {enforced: true}` and column-level `data_type` declarations. They are useful for models with downstream consumers who depend on a stable interface.
+
+With `enforced: true`, dbt fails the run unless `fct_orders` emits
+`order_id` as `bigint` (and `not_null`) and `amount_usd` as `numeric`:
 
 ```yaml
 models:
@@ -278,6 +325,10 @@ On a pull request, CI runs `dbt build --select state:modified+` — building and
 
 An ephemeral model is **not materialized** — it is compiled as a CTE and injected into any model that references it. Use ephemeral models for intermediate logic that is referenced only once or twice and does not need to be queryable directly. Avoid them when the same logic is referenced by many downstream models (the CTE is duplicated each time) or when you need to test the intermediate result directly.
 
+The `materialized='ephemeral'` config means `int_orders_cleaned` is
+never built as its own object; this cleanup SELECT is inlined as a CTE
+wherever a downstream model `ref()`s it:
+
 ```sql
 -- models/intermediate/int_orders_cleaned.sql
 {{ config(materialized='ephemeral') }}
@@ -294,10 +345,16 @@ WHERE amount_cents > 0
 
 Use `var()` in Jinja to reference variables defined in `dbt_project.yml` under `vars:` or passed on the CLI with `--vars`. This enables environment-aware logic without code changes.
 
+In the model, `var("start_date")` injects the variable's value into the
+`WHERE` filter at compile time:
+
 ```sql
 -- In a model
 WHERE order_date >= '{{ var("start_date") }}'
 ```
+
+At run time, `--vars` supplies that `start_date` value as JSON,
+overriding any default set in `dbt_project.yml`:
 
 ```bash
 # Override on the CLI
@@ -319,6 +376,17 @@ dbt supports **model versioning** natively (v1.5+): you declare multiple version
 ### What is the dbt lineage DAG, and how is it built?
 
 The DAG (Directed Acyclic Graph) is constructed automatically by parsing every `ref()` and `source()` call across all model files. Each call creates a directed edge from the referenced model to the current model. dbt uses the DAG to determine execution order, parallelize independent branches, and power the documentation lineage view.
+
+A typical slice of that graph — raw sources flowing through staging models into marts — looks like this:
+
+```mermaid
+flowchart LR
+  s1["source: raw.orders"] --> stg1["stg_orders"]
+  s2["source: raw.customers"] --> stg2["stg_customers"]
+  stg1 --> fct["fct_orders"]
+  stg2 --> dim["dim_customer"]
+  dim --> fct
+```
 
 ### How do you handle environment-specific schemas in dbt?
 

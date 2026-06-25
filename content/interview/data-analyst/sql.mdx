@@ -51,8 +51,8 @@ ordered*" is the classic tell for a `LEFT JOIN`.
 
 Joining to a table with **multiple matching rows** duplicates the left
 row once per match — so summing a left-side column double-counts it. Fix
-it by aggregating the one-to-many side **first** (in a subquery/CTE) to
-the right grain, then joining:
+it by aggregating the one-to-many side **first** (in a subquery or Common
+Table Expression, CTE) to the right grain, then joining:
 
 ```sql
 WITH order_totals AS (
@@ -92,6 +92,9 @@ SELECT e.name AS employee, m.name AS manager
 FROM employees e
 LEFT JOIN employees m ON e.manager_id = m.id;
 ```
+
+Aliasing `employees` as both `e` and `m` lets one row reference another;
+the `LEFT JOIN` keeps top-level employees whose `manager_id` is `NULL`.
 
 ### How do you find rows in one table that have no match in another (anti-join)?
 
@@ -362,8 +365,8 @@ A **clustered index** determines the physical order of rows on disk; a
 table can have only one. A **non-clustered index** is a separate structure
 pointing back to the data rows; a table can have many. Clustered indexes
 speed up range scans on the key column; non-clustered indexes accelerate
-lookups and joins on non-key columns. As an analyst you mainly need to
-know: filtering or joining on un-indexed columns causes full table scans,
+lookups and joins on non-key columns. As a Data Analyst you mainly need
+to know: filtering or joining on un-indexed columns causes full table scans,
 which are slow on large tables.
 
 ### When does adding an index slow things down?

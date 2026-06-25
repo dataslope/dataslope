@@ -3,8 +3,9 @@ title: Pipelines & Systems
 description: Data Engineer interview questions on batch vs streaming, idempotency, partitioning, orchestration, and file formats.
 ---
 
-The systems half of a DE interview: moving data reliably and cheaply at
-scale. These are the recurring "how would you build it?" themes.
+The systems half of a Data Engineer interview: moving data reliably and
+cheaply at scale. These are the recurring "how would you build it?"
+themes.
 
 ## Q&A
 
@@ -24,6 +25,10 @@ This makes retries and backfills safe after partial failures. Achieve it
 by **overwriting** a target partition or **upserting** by key
 (`MERGE`/delete-then-insert) instead of blind `INSERT` (which would
 duplicate rows on a re-run).
+
+The block below shows both patterns: an `ON CONFLICT (order_id)` upsert
+into `orders`, and a delete-then-insert that replaces a single
+`event_date` partition of `events` from `events_stage`.
 
 ```sql
 -- Idempotent upsert: re-running with the same source data is safe.
@@ -47,6 +52,10 @@ match a query — cutting scan cost dramatically. A good key is one queries
 **filter on** (usually a date like `event_date`) with even, not-too-small
 partitions. Too-granular partitioning creates many tiny files (the
 "small files problem") and hurts performance.
+
+The query below filters `events` on `event_date = '2024-06-01'` so only
+that day's rows are scanned, and the trailing comment shows how wrapping
+`event_date` in `YEAR(...)` would defeat pruning.
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -75,10 +84,14 @@ ORDER BY user_id, event_type;
 
 ### What does an orchestrator (Airflow/Dagster) give you over cron?
 
-A **DAG** of tasks with explicit dependencies, so steps run in the right
-order and only after upstreams succeed; plus retries, backfills,
-scheduling, monitoring, and lineage. Cron just fires a command at a time
-with no dependency awareness or recovery.
+A **Directed Acyclic Graph (DAG)** of tasks with explicit dependencies,
+so steps run in the right order and only after upstreams succeed; plus
+retries, backfills, scheduling, monitoring, and lineage. Cron just fires
+a command at a time with no dependency awareness or recovery.
+
+The Airflow example below declares `extract`, `transform`, and `load`
+tasks and wires them with `load(transform(extract()))`, so the scheduler
+derives the dependency order from that call rather than from cron timing.
 
 ```python
 from airflow.decorators import dag, task
@@ -119,6 +132,10 @@ Writing many tiny files (e.g., one Parquet file per minute instead of one per da
 
 CDC tracks row-level changes (inserts, updates, deletes) in a source database — typically by reading the database's write-ahead log (WAL) — and propagates them downstream in near real time. Use it when you need low-latency replication of transactional data to a warehouse or lake without polling the source table, and when you must capture deletes (which a simple `WHERE updated_at > last_run` query misses).
 
+The config below sets up a Debezium Postgres connector that reads the WAL
+(`plugin.name: pgoutput`) for the `public.orders` table and publishes
+change events to Kafka topics under the `cdc` prefix.
+
 ```yaml
 # Debezium connector config (Kafka Connect) — streams Postgres WAL events
 # to a Kafka topic as JSON change events with op: "c" / "u" / "d"
@@ -144,6 +161,10 @@ Common strategies: (1) set a generous **allowed lateness window** so the engine 
 
 A **backfill** reprocesses historical data through a pipeline, usually to populate a new table, fix a bug, or apply a schema change. Design for it by making pipelines **parameterized by date range** and **idempotent** (safe to run multiple times). In Airflow, set `catchup=True` and choose a sensible `start_date`; in Dagster, use partitioned assets. Backfills of years of data may require throttling to avoid overwhelming source systems.
 
+The `process_partition` task below takes the run's logical date `ds` and
+deletes-then-reinserts only that `event_date` slice of `events_clean`, so
+re-running any single day is safe (idempotent).
+
 ```python
 # Parameterize the pipeline by logical date so each run is independent
 # and the same date can be re-run safely (idempotent).
@@ -162,7 +183,7 @@ def process_partition(ds: str):  # ds = "2024-06-01" injected by Airflow
 
 ### What is a lakehouse and how does it differ from a data warehouse?
 
-A **data warehouse** stores structured, processed data in a proprietary format optimized for SQL queries (e.g., Snowflake, BigQuery, Redshift). A **data lake** stores raw data in open formats (Parquet, ORC, Avro) on cheap object storage. A **lakehouse** adds a transactional metadata layer (Delta Lake, Apache Iceberg, Apache Hudi) on top of lake storage, giving you ACID transactions, schema enforcement, time travel, and efficient updates — warehouse-like reliability on lake-like open storage at lower cost.
+A **data warehouse** stores structured, processed data in a proprietary format optimized for SQL queries (e.g., Snowflake, BigQuery, Redshift). A **data lake** stores raw data in open formats (Parquet, Optimized Row Columnar (ORC), Avro) on cheap object storage. A **lakehouse** adds a transactional metadata layer (Delta Lake, Apache Iceberg, Apache Hudi) on top of lake storage, giving you ACID transactions, schema enforcement, time travel, and efficient updates — warehouse-like reliability on lake-like open storage at lower cost.
 
 ### What is Apache Avro and when is it preferred over Parquet?
 
@@ -170,7 +191,7 @@ Avro is a **row-based**, schema-embedded binary format. It excels at **streaming
 
 ### What is ORC and how does it compare to Parquet?
 
-ORC (Optimized Row Columnar) is another columnar format — like Parquet it supports compression and predicate pushdown, and it originated in the Hive/Hadoop ecosystem. ORC has historically had slightly better compression for string-heavy data and stronger native support in Hive/Presto; Parquet has broader ecosystem support (Spark, Pandas, BigQuery, Snowflake). In practice, Parquet is the more portable choice for modern stacks.
+ORC is another columnar format — like Parquet it supports compression and predicate pushdown, and it originated in the Hive/Hadoop ecosystem. ORC has historically had slightly better compression for string-heavy data and stronger native support in Hive/Presto; Parquet has broader ecosystem support (Spark, Pandas, BigQuery, Snowflake). In practice, Parquet is the more portable choice for modern stacks.
 
 ### What is schema evolution, and how do Parquet and Avro handle it?
 
@@ -178,7 +199,11 @@ Schema evolution is the ability to change a schema (add, rename, remove, or chan
 
 ### What is a DAG in Airflow, and what are common anti-patterns?
 
-A **DAG (Directed Acyclic Graph)** defines the set of tasks and their dependencies for a workflow. Common anti-patterns: (1) **dynamic DAGs generated at parse time** with expensive API calls — they slow the scheduler; (2) **tasks that do too much** — large monolithic tasks make retries expensive; (3) **no idempotency** — tasks that fail partway through corrupt state; (4) **passing large data through XComs** — XComs are for small metadata, not DataFrames; use external storage.
+A **DAG** defines the set of tasks and their dependencies for a workflow. Common anti-patterns: (1) **dynamic DAGs generated at parse time** with expensive API calls — they slow the scheduler; (2) **tasks that do too much** — large monolithic tasks make retries expensive; (3) **no idempotency** — tasks that fail partway through corrupt state; (4) **passing large data through XComs** — XComs are for small metadata, not DataFrames; use external storage.
+
+The two `extract` versions below contrast returning a million rows
+directly into the XCom database against writing them to S3 and returning
+only the `path` string — keeping the XCom payload tiny.
 
 ```python
 # Anti-pattern: XCom used to pass a large result set
@@ -197,6 +222,10 @@ def extract():
 ### What is a task vs a sensor in Airflow?
 
 A **task** performs an action (run SQL, call an API, submit a Spark job). A **sensor** is a special task that polls a condition (does this S3 file exist? has the upstream DAG succeeded?) and blocks until it is true or times out. Sensors hold a worker slot while polling; for long-waiting sensors, use `mode='reschedule'` so the slot is freed between polls.
+
+The `S3KeySensor` below blocks until the daily `orders.parquet` export
+lands in the `data-lake` bucket, polling every 5 minutes in
+`reschedule` mode and failing after a 2-hour `timeout`.
 
 ```python
 from airflow.sensors.s3_key_sensor import S3KeySensor
@@ -223,6 +252,10 @@ Data quality tests validate that data meets expectations before it flows downstr
 
 **dbt (data build tool)** is a transformation framework that runs SQL `SELECT` statements against a warehouse and materializes the results as tables or views. It handles dependency ordering (via `ref()` calls), incremental models, testing, documentation, and lineage. It occupies the "T" in ELT — after raw data is loaded into the warehouse, dbt transforms it into clean, modeled tables for analytics.
 
+The model below builds `fct_orders` by joining `stg_orders` to the
+`dim_customer` and `dim_date` models through `ref()` calls, which is how
+dbt infers the build order across these models.
+
 ```sql
 -- models/marts/fct_orders.sql
 -- dbt materializes this SELECT as a table; ref() wires the dependency graph.
@@ -244,7 +277,14 @@ A layered data lake or lakehouse design:
 - **Silver** — cleaned, deduplicated, conformed data; joins applied; a reliable "single source of truth."
 - **Gold** — business-level aggregates and denormalized tables optimized for specific BI or ML use cases.
 
-Each layer is idempotent — gold can always be rebuilt from silver, silver from bronze.
+Each layer is idempotent — gold can always be rebuilt from silver, silver from bronze:
+
+```mermaid
+flowchart LR
+  src["source systems"] --> bronze["Bronze: raw, as-is"]
+  bronze --> silver["Silver: cleaned, conformed"]
+  silver --> gold["Gold: business aggregates"]
+```
 
 ### What is a Lambda vs Kappa architecture?
 

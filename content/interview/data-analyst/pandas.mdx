@@ -3,8 +3,8 @@ title: Pandas
 description: Data Analyst pandas interview questions — selection, groupby, merging, and missing data — with answers, a concept check, and a runnable challenge.
 ---
 
-When the analyst screen isn't SQL, it's usually **pandas**. Review the
-Q&A, then run the challenge in your browser.
+When the Data Analyst screen isn't SQL, it's usually **pandas**. Review
+the Q&A, then run the challenge in your browser.
 
 ## Q&A
 
@@ -323,6 +323,10 @@ print(result)`,
     },
   ]}
 />
+
+Here the chain filters with `query`, adds a `tax` column via `assign`,
+aggregates it per `region` with `groupby(...).sum()`, then flattens and
+renames the result with `reset_index` and `rename`.
 
 ### What is the difference between a view and a copy in pandas?
 
