@@ -72,7 +72,7 @@ The bracket on a data frame takes two arguments separated by a
 comma: which rows, which columns. An empty slot means *all*.
 
 ```mermaid
-flowchart LR
+flowchart TD
   df["data frame"] -->|"[rows, cols]"| sub["subset"]
   rows["rows: numeric, logical, or character"] --> df
   cols["cols: numeric, logical, character, or empty"] --> df

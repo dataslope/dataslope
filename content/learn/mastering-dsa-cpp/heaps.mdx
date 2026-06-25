@@ -71,7 +71,7 @@ flowchart TD
 ```
 
 ```mermaid
-flowchart LR
+flowchart TD
     I0["0:50"] --> I1["1:30"] --> I2["2:40"] --> I3["3:10"] --> I4["4:20"] --> I5["5:35"]
 ```
 
@@ -105,7 +105,7 @@ int main() {
 Both heap operations follow the same playbook: *restore completeness first, then repair the one broken promise.* To push, append the new value at the end of the array — the only spot that keeps the tree complete. The shape is now right, but the newcomer may outrank its parent, so it bubbles upward, swapping with its parent until the heap property holds. The path from any node to the root is at most log n long, so a push is O(log n).
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["append new value"] --> B{"larger than parent?"}
     B -- "yes" --> C["swap with parent"] --> B
     B -- "no" --> D["done"]

@@ -239,7 +239,7 @@ ORDER BY
 You can chain inner joins. Each `JOIN ... ON ...` adds another table and another matching rule.
 
 ```mermaid
-flowchart LR
+flowchart TD
     C["<code>customers</code>"] -->|"c.id = o.<code>customer_id</code>"| O["<code>orders</code>"]
     O -->|"o.<code>product_id</code> = p.id"| P["<code>products</code>"]
     P --> R["customer + product result"]

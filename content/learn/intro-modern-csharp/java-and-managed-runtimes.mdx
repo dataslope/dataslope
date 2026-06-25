@@ -139,7 +139,7 @@ For most software, this trade — slight runtime overhead for
 ## The "Write Once, Run Anywhere" promise
 
 ```mermaid
-flowchart LR
+flowchart TD
     S["<code>MyApp.java</code>"] --> C["javac"] --> B["<code>MyApp.class</code><br/>(bytecode)"]
     B --> JVMW["JVM on Windows"]
     B --> JVML["JVM on Linux"]
@@ -172,7 +172,7 @@ multi-year lawsuit. Microsoft eventually settled, and effectively
 withdrew from the Java world.
 
 ```mermaid
-flowchart LR
+flowchart TD
     J["Sun owns Java<br/>(neutral, cross-platform)"] -->|threatens| W["Windows dominance"]
     L["Lawsuit blocks<br/>Microsoft from<br/>shaping Java"] --> N["Microsoft must build<br/>its own answer"]
     N --> NET[".NET + C#"]

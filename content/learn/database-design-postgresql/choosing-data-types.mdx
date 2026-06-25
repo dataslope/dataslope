@@ -52,7 +52,7 @@ A **domain** is the set of values a column is allowed to hold. Choosing a
 type chooses the broad domain before any other constraint narrows it.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Type["Column type"] --> Domain["Allowed domain<br/>what values can exist"]
     Domain --> Integrity["Fewer impossible<br/>rows"]
 ```
@@ -245,7 +245,7 @@ flowchart TB
 Types are broad constraints. Other constraints narrow the rule.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Broad["NUMERIC<br/>any exact number"] --> Narrow["CHECK (<code>price &gt;= 0</code>)<br/>valid price"]
     Narrow --> Required["NOT NULL<br/>required valid price"]
 ```

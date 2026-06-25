@@ -180,7 +180,7 @@ It repeats a fact on purpose because order history must not change
 when a product's current price changes.
 
 ```mermaid
-flowchart LR
+flowchart TD
     ProductPrice["Product current price changes"] --> Catalog["Catalog updates"]
     ProductPrice -->|must not change| PastOrder["Past order total"]
     PastOrder --> LinePrice["Stored <code>unit_price</code>"]

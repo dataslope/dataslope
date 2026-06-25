@@ -94,7 +94,7 @@ int main() {
 A picture of what happened:
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph Stack
         P["p: int*<br/><code>0x6020a0</code>"]
     end
@@ -160,7 +160,7 @@ void leaker() {
 ```
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[new] -->|allocates| H[Heap block]
     H -.->|never reached again| L[(LEAKED)]
 ```

@@ -49,7 +49,7 @@ A star keeps each dimension in one table (the solid edge); a snowflake
 splits that dimension further into a normalized chain (the dotted edges):
 
 ```mermaid
-flowchart LR
+flowchart TD
   f["fact"] --> p["dim_product"]
   p -. normalize .-> c["dim_category"]
   c -. normalize .-> d["dim_department"]

@@ -58,7 +58,7 @@ is true, the row stays in the result. If the test is false, the row is
 left out.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["all rows<br/>in books"] --> W{"WHERE condition<br/>is true?"}
     W -->|"true"| K["keep row<br/>in result"]
     W -->|"false"| D["drop row<br/>from result"]

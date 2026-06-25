@@ -57,7 +57,7 @@ Common warning signs:
 - a cell that must be split apart before you can query it
 
 ```mermaid
-flowchart LR
+flowchart TD
     B["Before<br/><code>order_id</code>: 10<br/>items: Book, Pen"] --> A["After<br/><code>order_id</code>: 10 item: Book<br/><code>order_id</code>: 10 item: Pen"]
 ```
 
@@ -204,7 +204,7 @@ products, but that does not mean the order row should contain a product
 list.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Bad["orders<br/>id | customer | items<br/>10 | Ada | Book, Pen"] --> Good["<code>order_items</code><br/><code>order_id</code> | product<br/>10 | Book<br/>10 | Pen"]
 ```
 
@@ -218,7 +218,7 @@ Reaching 1NF does not mean the design is fully normalized. It only means
 the table no longer has repeating groups or multi-value cells.
 
 ```mermaid
-flowchart LR
+flowchart TD
     UNF["UNF<br/>lists and repeating groups"] --> NF1["1NF<br/>atomic cells"]
     NF1 --> NF2["2NF<br/>whole composite key"]
     NF2 --> NF3["3NF<br/>nothing but the key"]

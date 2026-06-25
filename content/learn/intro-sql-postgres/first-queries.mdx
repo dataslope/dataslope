@@ -86,7 +86,7 @@ Here is the basic shape you will type thousands of times, with the
 parts named:
 
 ```mermaid
-flowchart LR
+flowchart TD
     K["<code>SELECT</code>"] --> C["which columns<br/>or values you want"]
     C --> F["<code>FROM</code>"]
     F --> T["which table<br/>to read from"]
@@ -114,7 +114,7 @@ it becomes essential when you run several statements together — so we
 will always include it as a good habit.
 
 ```mermaid
-flowchart LR
+flowchart TD
     S1["<code>SELECT 1;</code>"] --> S2["<code>SELECT 2;</code>"] --> S3["<code>SELECT 3;</code>"]
 ```
 

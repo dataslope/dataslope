@@ -152,7 +152,7 @@ When you allocate on the heap, the *pointer* (typically 8 bytes on
 64-bit systems) lives on the stack. The *object* lives on the heap.
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph Stack
         P[p : int*<br/>holds heap address]
     end
@@ -230,7 +230,7 @@ We'll meet `std::unique_ptr` and friends in a couple chapters.
 does its data live?
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph Stack
         V["v : <code>std::vector</code>&lt;int&gt;<br/>holds a pointer, a size,<br/>and a capacity"]
     end

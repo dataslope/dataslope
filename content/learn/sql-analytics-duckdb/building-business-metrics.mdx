@@ -69,7 +69,7 @@ from which step to which, counted by users or by sessions? Most metric
 disputes are definition disputes, not SQL bugs.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Q["Vague question:<br/>how is conversion?"] --> D["Precise definition:<br/>distinct users who purchased<br/>/ distinct users who visited"]
     D --> SQL["SQL that<br/>implements the definition"]
     SQL --> M["A metric you<br/>can defend"]
@@ -322,7 +322,7 @@ A few habits that separate trustworthy metrics from misleading ones:
   data can hide the zeros (recall the date-spine fix).
 
 ```mermaid
-flowchart LR
+flowchart TD
     Raw[("Raw rows")] --> Def["Clear definition"]
     Def --> Unit["Right unit<br/>(users vs events)"]
     Unit --> Guard["Guard NULLs<br/>and gaps"]

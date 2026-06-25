@@ -144,7 +144,7 @@ This is the heart of how data analysts think: you have
 *parallel columns*, and you operate on them as wholes.
 
 ```mermaid
-flowchart LR
+flowchart TD
   q["quantities: [2, 1, 3, 4]"] --> mul
   p["<code>unit_prices: [9.99, 14.50, 24.00, 5.75]</code>"] --> mul
   mul["element-wise * "] --> r["totals: [19.98, 14.50, 72.00, 23.00]"]

@@ -282,7 +282,7 @@ into an XML config file, build a SQL string by hand for the
 database, and call a SOAP service that returned yet another shape.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Your C# code] -->|"for/foreach"| B[Objects]
     A -->|XPath strings| C[XML]
     A -->|"SQL strings"| D[Database]

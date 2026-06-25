@@ -202,7 +202,7 @@ season earlier: `y(t) - y(t-m)`. For monthly data with a yearly cycle that's
 pattern cancels against its own copy.
 
 ```mermaid
-flowchart LR
+flowchart TD
     L["Level series y(t)<br/>trend + yearly season"] -->|"first difference: y(t) - y(t-1)"| D1["Changes series<br/>(trend removed, season remains)"]
     D1 -->|"seasonal difference: y(t) - y(t-12)"| D2["Stationary-looking<br/>(trend AND season removed)"]
 ```

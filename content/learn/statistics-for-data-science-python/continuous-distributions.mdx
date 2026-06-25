@@ -254,7 +254,7 @@ reverse: *probability → value*. "What wait time are 90% of waits below?"
 percentile. It's the tool for setting thresholds, SLAs, and cutoffs.
 
 ```mermaid
-flowchart LR
+flowchart TD
   A["a value x"] -->|"cdf: P(X <= x)"| B["a probability"]
   B -->|"ppf: inverse"| A
   C["<code>ppf(0.9)</code> = the value below<br/>which 90% of outcomes fall"]

@@ -86,7 +86,7 @@ buffer of `Object` — contiguous memory, no node allocation per
 element, very fast.
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph Buffer["circular buffer (<code>capacity = 8</code>)"]
       direction LR
       S0["[_]"] --- S1["[_]"] --- S2["[a]"] --- S3["[b]"] --- S4["[c]"] --- S5["[d]"] --- S6["[_]"] --- S7["[_]"]

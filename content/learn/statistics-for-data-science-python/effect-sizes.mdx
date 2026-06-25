@@ -59,7 +59,7 @@ certain sample size, is almost guaranteed — so it stops carrying
 information about whether you should care.
 
 ```mermaid
-flowchart LR
+flowchart TD
   A["Effect exists?"] -->|"p-value answers this"| B["Yes / can't tell"]
   C["How big is it?"] -->|"effect size answers this"| D["<code>d = 0.05</code>? <code>r = 0.6</code>?<br/>+8% revenue?"]
   B --> E{"Ship decision<br/>needs BOTH"}
@@ -245,7 +245,7 @@ data:
   makes it *more precise*, not bigger or smaller.
 
 ```mermaid
-flowchart LR
+flowchart TD
   A["Collect more data"] --> B["p-value shrinks<br/>toward 0"]
   A --> C["Effect size estimate<br/>gets more precise<br/>(not larger)"]
   B --> D["Significance becomes<br/>almost guaranteed"]

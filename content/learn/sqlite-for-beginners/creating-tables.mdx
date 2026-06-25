@@ -75,7 +75,7 @@ flowchart TB
 The table definition becomes an empty grid. The columns are ready; rows come later with `INSERT`.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["<code>CREATE TABLE books<br/>id, title, author, year</code>"] --> B["books grid"]
     B --> C["columns exist<br/>rows are empty"]
 ```
@@ -165,7 +165,7 @@ ORDER BY
 Notice that the `INSERT` statement did not provide `id` values. SQLite filled them in because `id` is an `INTEGER PRIMARY KEY`.
 
 ```mermaid
-flowchart LR
+flowchart TD
     I["<code>INSERT</code> title and author"] --> S["SQLite assigns id"]
     S --> R["stored row<br/>id, title, author"]
 ```

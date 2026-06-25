@@ -205,7 +205,7 @@ the file offers*: function signatures, struct definitions, important
 constants. It says nothing about *how* those things are implemented.
 
 ```mermaid
-flowchart LR
+flowchart TD
     M["<code>main.c</code><br/>#include <code>parser.h</code><br/>#include <code>evaluator.h</code>"] -.uses.-> PH["<code>parser.h</code>"]
     M -.uses.-> EH["<code>evaluator.h</code>"]
     PH --- P["<code>parser.c</code>"]

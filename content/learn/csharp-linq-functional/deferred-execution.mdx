@@ -123,7 +123,7 @@ A pipeline can describe a transformation over a million-element
 sequence without ever holding all million elements in memory.
 
 ```mermaid
-flowchart LR
+flowchart TD
     F[1 million-row file] --> W[Where] --> S[Select] --> T[Take 10]
     T --> R[10 results]
 ```
@@ -291,7 +291,7 @@ recipe. It is the *promise* of a result. The first time a consumer
 walks it (or asks for `.Count()`, etc.), the recipe is executed.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Q[Pipeline = recipe] -.Built lazily.-> Q
     Q -->|"ToList / Count / foreach"| E[Execution]
     E --> R[Result]

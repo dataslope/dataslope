@@ -113,7 +113,7 @@ handles every line that starts with `#`:
   blocks based on whether a name is defined.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["<code>your.cpp</code><br/>#include &lt;iostream&gt;"] --> P[Preprocessor]
     B[iostream<br/>thousands of lines] --> P
     P --> X["<code>your.cpp.i</code><br/>tens of thousands of<br/>lines, all C++ text"]
@@ -188,7 +188,7 @@ The **assembler** translates assembly text into actual binary
 This step is essentially a one-to-one translation table.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["<code>file.s</code><br/>'mov eax, 42'"] --> AS[Assembler]
     AS --> B["<code>file.o</code><br/>binary bytes:<br/>B8 2A 00 00 00 ..."]
 ```

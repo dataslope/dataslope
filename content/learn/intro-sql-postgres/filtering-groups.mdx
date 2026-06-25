@@ -55,7 +55,7 @@ therefore their `COUNT`s and `SUM`s — **do not exist yet.** Asking
 has been added up.
 
 ```mermaid
-flowchart LR
+flowchart TD
     T[("rows")] --> W["<code>WHERE</code><br/>(per-row filter)<br/>no totals exist yet"]
     W --> G["<code>GROUP BY</code><br/>totals computed here"]
     G --> H["<code>HAVING</code><br/>(per-group filter)<br/>can see the totals"]

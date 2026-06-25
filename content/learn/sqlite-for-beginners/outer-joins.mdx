@@ -125,7 +125,7 @@ A left join preserves the left side even when the right side has no match.`}
 When SQLite cannot find a matching right-side row, it cannot show a real `orders.id` or `orders.amount`. So it shows `NULL`.
 
 ```mermaid
-flowchart LR
+flowchart TD
     C["customer<br/>Linus"] -->|"no matching order"| N["<code>order_id</code> = NULL<br/>amount = NULL"]
 ```
 
@@ -245,7 +245,7 @@ Linus gets `0` because there are no non-NULL order ids to count.
 For beginners, `LEFT JOIN` is the most important outer join. Recent SQLite versions also support `RIGHT JOIN` and `FULL OUTER JOIN`, but you can usually make your query clearer by arranging the table you want to preserve on the left and using `LEFT JOIN`.
 
 ```mermaid
-flowchart LR
+flowchart TD
     I["<code>INNER JOIN</code><br/>only matches"] --- L["<code>LEFT JOIN</code><br/>all left rows"]
     L --- R["<code>RIGHT JOIN</code><br/>all right rows"]
     R --- F["<code>FULL OUTER JOIN</code><br/>all rows from both sides"]

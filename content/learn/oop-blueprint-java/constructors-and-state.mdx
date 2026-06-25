@@ -195,7 +195,7 @@ shorter one that fills in defaults by calling the real one with
 `this(...)`.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["new Point()"] -->|delegates| C["new Point(0,0)"]
     B["new Point(5)"] -->|delegates| C
     C --> S["sets <code>this.x</code> and <code>this.y</code>"]

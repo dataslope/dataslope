@@ -76,7 +76,7 @@ In that world, a program takes **rules** (the code you wrote) and **data**
 (the input) and produces **answers** (the output).
 
 ```mermaid
-flowchart LR
+flowchart TD
     R1["Rules<br/>(the code you write)"] --> P1["Program"]
     D1["Data<br/>(the input)"] --> P1
     P1 --> A1["Answers<br/>(the output)"]
@@ -105,7 +105,7 @@ Instead you provide **data** *paired with* the **answers** you want, and the
 algorithm produces the **rules** — a thing we call a **model**.
 
 ```mermaid
-flowchart LR
+flowchart TD
     D2["Data<br/>(example inputs)"] --> M["Learning<br/>algorithm"]
     A2["Answers<br/>(the labels)"] --> M
     M --> R2["Model<br/>(the learned rules)"]
@@ -168,7 +168,7 @@ inputs to get answers. In scikit-learn this is `model.predict(X_new)`. The
 model never sees the true answers here — producing them is its job.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Training data<br/>(X and y)"] -->|"fit"| B["Trained model"]
     C["New data<br/>(X only)"] -->|"predict"| B
     B --> D["Predictions"]

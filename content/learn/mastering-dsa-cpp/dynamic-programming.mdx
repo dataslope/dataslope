@@ -201,7 +201,7 @@ int main() {
 Now the same mathematics in a costume. You climb a staircase of n steps, taking 1 or 2 steps at a time — how many distinct ways up? The DP habit is to interrogate the *last move*: every route to step n arrived either from step n−1 (final hop of 1) or from step n−2 (final hop of 2), and those two groups overlap nowhere. So `f(n) = f(n-1) + f(n-2)` — Fibonacci wearing a tracksuit. Spotting a known recurrence under an unfamiliar story is half the DP skill.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["step n-2"] --> C["+2"] --> N["step n"]
     B["step n-1"] --> D["+1"] --> N
 ```

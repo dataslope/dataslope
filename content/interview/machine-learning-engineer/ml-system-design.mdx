@@ -255,7 +255,7 @@ The funnel narrows the candidate set at each stage so the expensive model
 only scores a few hundred items, not millions:
 
 ```mermaid
-flowchart LR
+flowchart TD
   c["millions of items"] --> r["Retrieval: nearest-neighbour search"]
   r --> k["hundreds of candidates"]
   k --> g["Ranking: gradient boosting / neural net"]

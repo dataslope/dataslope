@@ -106,7 +106,7 @@ malloc" as a suggested project; after this page you will know enough
 to try.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Program] -->|"<code>malloc(n)</code>"| B[Allocator]
     B -->|"void *"| A
     A -->|"writes / reads"| C["Heap block<br/>(n bytes)"]

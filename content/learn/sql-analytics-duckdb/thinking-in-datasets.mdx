@@ -89,7 +89,7 @@ Each answer is a single number or a short list. Stacked together, they
 form a **mental picture** of a dataset you will never see row-by-row.
 
 ```mermaid
-flowchart LR
+flowchart TD
     D[("Millions of rows<br/>(too big to see)")] --> Q["Summarizing<br/>questions"]
     Q --> P["A handful of numbers<br/>you can hold in your head"]
     P --> U["A mental model<br/>of the data"]
@@ -105,7 +105,7 @@ Analysis is rarely a straight line from question to answer. It is a
 and the result almost always suggests a sharper question.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Ask a<br/>question"] --> B["Write a<br/>query"]
     B --> C["Look at the<br/>result"]
     C --> D["Notice something<br/>surprising"]

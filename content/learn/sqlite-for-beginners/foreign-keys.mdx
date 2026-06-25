@@ -26,7 +26,7 @@ erDiagram
 In this picture, order `101` does not copy Ada's whole customer record. It stores `customer_id = 1`, which points to `customers.id = 1`.
 
 ```mermaid
-flowchart LR
+flowchart TD
     O["orders row<br/>id = 101<br/><code>customer_id</code> = 1"] -->|"points to"| C["customers row<br/><code>id = 1</code><br/>name = Ada"]
 ```
 

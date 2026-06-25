@@ -312,7 +312,7 @@ peer through the noise and estimate the signal — while being honest
 that you can never fully separate them from a single sample.
 
 ```mermaid
-flowchart LR
+flowchart TD
     DGP["Data-generating process<br/>(the real mechanism)"] -->|"emits noisy output"| S["Your sample<br/>(what you actually have)"]
     S -->|"compute a summary"| T["A statistic<br/>(mean, rate, gap)"]
     T -->|"reason backward"| I["Inference about<br/>the process"]

@@ -77,7 +77,7 @@ Start with sentences. Circle the nouns and verbs. Draw an ER diagram.
 Then write the tables.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Familiar["System you know"] --> Sentences["Requirement sentences"]
     Sentences --> Diagram["ER diagram"]
     Diagram --> Tables["PostgreSQL tables"]
@@ -117,7 +117,7 @@ It covers the SQL skills you will use to explore the schemas you
 design.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Design["Design tables"] --> Query["Query relationships"]
     Query --> Notice["Notice design issues"]
     Notice --> Improve["Improve the schema"]

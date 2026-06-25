@@ -229,7 +229,7 @@ collapses, that feature was important; if the score barely moves, the model
 was not really relying on it. Repeat for every feature.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Trained model"] --> B["Score on clean data"]
     A --> C["Shuffle feature j,<br/>re-score"]
     B --> D["Drop in score =<br/>importance of feature j"]

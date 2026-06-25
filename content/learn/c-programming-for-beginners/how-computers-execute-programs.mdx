@@ -52,7 +52,7 @@ This chapter builds that picture.
 For our purposes, every computer is made of two cooperating parts:
 
 ```mermaid
-flowchart LR
+flowchart TD
     CPU[CPU<br/>follows instructions]
     MEM[Memory<br/>holds data and instructions]
     CPU <-->|reads / writes| MEM
@@ -101,7 +101,7 @@ addresses.
 The CPU works in a tight loop, billions of times per second:
 
 ```mermaid
-flowchart LR
+flowchart TD
     F[Fetch:<br/>read the next<br/>instruction from<br/>memory] --> D[Decode:<br/>figure out<br/>what it means]
     D --> E[Execute:<br/>do it]
     E --> F

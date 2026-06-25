@@ -120,7 +120,7 @@ generate, every wafer the machine could ever produce. The **sample** is
 the subset you managed to observe and put in a DataFrame.
 
 ```mermaid
-flowchart LR
+flowchart TD
     P["Population<br/>(everyone/everything you care about)"] -->|"draw a subset"| S["Sample<br/>(what you observed)"]
     S -->|"compute a summary"| ST["Statistic<br/>(x-bar, s, p-hat)"]
     ST -. "estimate / infer" .-> PA["Parameter<br/>(mu, sigma, p)"]

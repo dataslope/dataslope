@@ -66,7 +66,7 @@ Anywhere you can select a column, you can also write a calculation.
 SQLite evaluates that calculation for each row in the result.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["one row<br/>price 12.99<br/>quantity 2"] --> B["expression<br/>price * quantity"]
     B --> C["new result column<br/><code>line_total</code> 25.98"]
 ```
@@ -179,7 +179,7 @@ The two computed values are the same. The aliased one is easier to read.
 This course uses `AS` because it makes your intent obvious.
 
 ```mermaid
-flowchart LR
+flowchart TD
     E["price * quantity"] --> N["AS <code>line_total</code>"]
     N --> R["clear result heading"]
 ```

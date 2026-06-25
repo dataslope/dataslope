@@ -131,7 +131,7 @@ The CPU does *exactly one thing*, over and over, billions of times
 per second. It is called the **fetch–decode–execute loop**:
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Fetch:<br/>read the next<br/>instruction from<br/>memory"] --> B["Decode:<br/>figure out what<br/>this instruction<br/>means"]
     B --> C["Execute:<br/>do it, read or<br/>write memory,<br/>do math, jump"]
     C --> A
@@ -150,7 +150,7 @@ numbers means: copy them into registers, add the registers, copy
 the result back to memory.
 
 ```mermaid
-flowchart LR
+flowchart TD
     M[("Main memory<br/>billions of bytes<br/>slow-ish")] -->|load| R["CPU registers<br/>~32 slots<br/>blazing fast"]
     R -->|store| M
     R --> ALU["Arithmetic/Logic Unit:<br/>add, sub, and, or, ..."]

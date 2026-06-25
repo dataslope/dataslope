@@ -65,7 +65,7 @@ of peaks. Once you can see a signal in frequency space, filtering
 and analysis become almost trivial.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Time["signal x(t)"] -- FFT --> Freq["spectrum X(f)"]
     Freq -- "filter / analyze" --> Freq2["modified X̃(f)"]
     Freq2 -- IFFT --> Time2["modified x̃(t)"]

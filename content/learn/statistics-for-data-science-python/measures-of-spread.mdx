@@ -301,7 +301,7 @@ outlier-prone data, and it's the engine behind box plots and the
 `1.5×IQR` outlier rule we'll meet in *Shape and Outliers*.
 
 ```mermaid
-flowchart LR
+flowchart TD
   A["Q1<br/>25th percentile"] --- B["median<br/>50th percentile"]
   B --- C["Q3<br/>75th percentile"]
   A -. "IQR = Q3 - Q1<br/>(middle 50%)" .-> C

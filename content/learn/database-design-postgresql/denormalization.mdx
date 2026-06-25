@@ -76,7 +76,7 @@ These are not random copies. They are **derived facts** stored because a
 particular read path benefits from having them ready.
 
 ```mermaid
-flowchart LR
+flowchart TD
     N["Normalized tables<br/>customers, orders,<br/><code>order_items</code>, products"] --> R["Derived read table<br/><code>daily_sales_summary</code>"]
     N --> C["Cached value<br/><code>comment_count</code>"]
     R --> Benefit["Simpler reads"]
@@ -91,7 +91,7 @@ be easier to read, but now duplicated or derived data must be kept in
 sync.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Normal["Normalized<br/>one source of truth"] -->|"add derived copies"| Denormal["Denormalized<br/>faster or simpler reads"]
     Denormal -->|"sync carefully"| Normal
     Normal --> Correct["Correctness is easier"]

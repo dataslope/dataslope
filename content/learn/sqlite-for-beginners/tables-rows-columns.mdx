@@ -244,7 +244,7 @@ A table is not a numbered list. SQLite may return rows in any
 order unless you ask for an order.
 
 ```mermaid
-flowchart LR
+flowchart TD
     TABLE["Table rows<br/>stored without a promised order"] --> QUERY["Need a sorted result?"]
     QUERY --> ORDER["Use ORDER BY"]
 ```

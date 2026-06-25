@@ -59,7 +59,7 @@ are aggregate questions, and they are the heart of reporting.
 ## From many rows to one number
 
 ```mermaid
-flowchart LR
+flowchart TD
     R["Many rows<br/>(5 salaries)"] --> A["An aggregate<br/>function"]
     A --> One["One summary value<br/>(e.g. the average)"]
 ```
@@ -175,7 +175,7 @@ WHERE
 />
 
 ```mermaid
-flowchart LR
+flowchart TD
     T[("<code>employees</code>")] --> W["WHERE<br/><code>dept = 'Engineering'</code>"]
     W --> A["AVG(salary)"]
     A --> R["one number"]

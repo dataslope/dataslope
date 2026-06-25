@@ -63,7 +63,7 @@ After the second line, two variables exist:
   `n`.
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph Stack
         N["n: int<br/>value 42<br/>at <code>0x7fff_4cf0</code>"]
         P["p: int*<br/>value <code>0x7fff_4cf0</code><br/>at <code>0x7fff_4cf8</code>"]
@@ -167,7 +167,7 @@ std::cout << n;  // prints 100
 ```
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph Stack
         N["n: int<br/>value 100"]
         R["r: int& <br/>alias for n"]
@@ -232,7 +232,7 @@ Arrays in C++ live in *contiguous* memory. You can do arithmetic on
 pointers to step through them.
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph "int a[5] in memory"
         A0[10] --- A1[20] --- A2[30] --- A3[40] --- A4[50]
     end

@@ -75,7 +75,7 @@ going across. `SELECT` names the columns you want to see, and `FROM`
 names the table that holds them.
 
 ```mermaid
-flowchart LR
+flowchart TD
     T[("books table<br/>stored data")] --> C["<code>SELECT title, author</code><br/>choose columns"]
     C --> R["result table<br/>title + author"]
     T -.-> T

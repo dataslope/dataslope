@@ -106,7 +106,7 @@ std::unique_ptr<Widget> c = std::move(a);   // OK: ownership transferred
 ```
 
 ```mermaid
-flowchart LR
+flowchart TD
     Before["<code>a -&gt; Widget</code><br/><code>b = nullptr</code>"]
     After["<code>a = nullptr</code><br/><code>c -&gt; Widget</code>"]
     Before -- std::move --> After
@@ -167,7 +167,7 @@ to the other. Neither's count ever hits zero, so neither is
 destroyed — a **cycle leak**.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["A<br/><code>shared_ptr</code> to B"] --> B["B<br/><code>shared_ptr</code> to A"]
     B --> A
 ```

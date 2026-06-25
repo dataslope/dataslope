@@ -52,7 +52,7 @@ This pairing mirrors the stat/geom split from earlier. One component
 describes intent; the other carries it out:
 
 ```mermaid
-flowchart LR
+flowchart TD
     COL["Data column<br/><code>displ = 1.6</code> ... 7.0"] --> MAP["Mapping<br/><code>aes(x = displ)</code>"]
     MAP --> SCALE["Scale<br/><code>scale_x_continuous</code>"]
     SCALE --> PIX["Visual value<br/>pixel x-position"]

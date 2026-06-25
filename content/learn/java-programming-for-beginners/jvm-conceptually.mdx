@@ -87,7 +87,7 @@ services to your program:
    `java.util`, `java.io`, etc. that ship with every JVM.
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph J[Java Virtual Machine]
       CL[Class Loader]
       MM[Memory Manager + GC]
@@ -171,7 +171,7 @@ references?" Anything not reachable is dead, and its memory is
 reclaimed.
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph Roots
         L[Local variable account]
     end

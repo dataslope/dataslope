@@ -66,7 +66,7 @@ write `Dog d = new Dog(...)`, two things happen:
    address) pointing to that heap object.
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph S["Stack (current method)"]
         V1["d : Dog ref ──┐"]
     end
@@ -181,7 +181,7 @@ Java gives it the special value `null`. A reference variable is
 either an arrow into the heap, or it is `null`.
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph Stack
         N["d : Dog <code>ref = null</code>"]
     end
@@ -347,7 +347,7 @@ and a list of `LineItem`s. The whole point of OOP is that the heap
 ends up looking like a small map of your problem domain.
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph Heap
       P["Person<br/><code>name='Ada'</code>"]
       A["Address<br/><code>city='Oslo'</code>"]

@@ -87,7 +87,7 @@ The many-to-many relationship between posts and tags needs a fifth
 table: `post_tags`.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Users["<code>users</code>"] --> Posts["<code>posts</code>"]
     Users --> Comments["<code>comments</code>"]
     Posts --> Comments
@@ -293,7 +293,7 @@ The design choices come from the rules:
   attached to the same post twice.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Rule["One tag per post only once"] --> Key["PRIMARY KEY on <code>post_id</code> and <code>tag_id</code>"]
     Key --> Reject["Duplicate pair is rejected"]
 ```

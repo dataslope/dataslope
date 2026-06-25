@@ -86,7 +86,7 @@ conflating them is how analyses go wrong.
   confidence interval.*
 
 ```mermaid
-flowchart LR
+flowchart TD
   subgraph EXP["Exploratory (generate)"]
     A["Look broadly:<br/>distributions, relationships,<br/>missingness, outliers"] --> B["Form candidate<br/>hypotheses"]
   end
@@ -516,7 +516,7 @@ ANOVA, or a chi-square from the *Hypothesis Testing* section — run
 leads, full stop.
 
 ```mermaid
-flowchart LR
+flowchart TD
   A["EDA surfaced:<br/>'big parties tip less %'"] --> B{"How to confirm<br/>honestly?"}
   B -->|"new data"| C["Collect more receipts,<br/>test there"]
   B -->|"held-out split"| D["Test on the locked-away<br/>30% slice"]

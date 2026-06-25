@@ -280,7 +280,7 @@ A layered data lake or lakehouse design:
 Each layer is idempotent — gold can always be rebuilt from silver, silver from bronze:
 
 ```mermaid
-flowchart LR
+flowchart TD
   src["source systems"] --> bronze["Bronze: raw, as-is"]
   bronze --> silver["Silver: cleaned, conformed"]
   silver --> gold["Gold: business aggregates"]

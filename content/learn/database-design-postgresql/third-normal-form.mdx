@@ -67,7 +67,7 @@ the order. But `customer_name` and `customer_city` are not facts about
 the order itself. They are facts about the customer.
 
 ```mermaid
-flowchart LR
+flowchart TD
     K["<code>order_id</code><br/>primary key"] --> C["<code>customer_id</code><br/>non-key column"]
     C --> City["<code>customer_city</code><br/>non-key column"]
     C --> Name["<code>customer_name</code><br/>non-key column"]
@@ -255,7 +255,7 @@ For the bad orders table:
 mistakes.
 
 ```mermaid
-flowchart LR
+flowchart TD
     NF1["1NF<br/>atomic cells"] --> NF2["2NF<br/>no partial dependency<br/>on part of a composite key"]
     NF2 --> NF3["3NF<br/>no transitive dependency<br/>through a non-key column"]
 ```

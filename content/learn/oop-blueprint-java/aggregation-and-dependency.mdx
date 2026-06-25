@@ -47,7 +47,7 @@ happens when one object goes away*.
 ## A spectrum of relationships
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Dependency<br/>(uses-a)<br/>method-scope"] --> B["Aggregation<br/>(weak has-a)<br/>references something<br/>that lives independently"]
     B --> C["Composition<br/>(strong has-a)<br/>owns lifetime"]
     style A fill:#eef

@@ -177,7 +177,7 @@ Two subtleties that quietly trip up analysts:
   which matters for analysis you intend to repeat.
 
 ```mermaid
-flowchart LR
+flowchart TD
     R[("Rows")] --> O["<code>ORDER BY amount DESC,<br/>id ASC (tiebreaker)</code>"]
     O --> S["Stable, reproducible<br/>ordering"]
     S --> L["<code>LIMIT N</code>"]

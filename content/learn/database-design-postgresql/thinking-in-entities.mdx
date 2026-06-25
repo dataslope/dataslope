@@ -61,7 +61,7 @@ One entity type usually becomes **one table**. One real thing of that
 type becomes **one row**.
 
 ```mermaid
-flowchart LR
+flowchart TD
     E["Entity type<br/><code>customer</code>"] --> T["Table<br/><code>customers</code>"]
     R["One real customer<br/>Ada Lovelace"] --> Row["One row<br/><code>id = 1</code>"]
     T --> Row
@@ -192,7 +192,7 @@ A helpful question is: *can I imagine many rows of this kind?* If yes,
 you may have an entity type.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Q{"Can there be many of these?"} -->|"yes"| T["Likely table"]
     Q -->|"no"| A["Maybe an attribute<br/>or setting"]
     T --> R["One real thing<br/>per row"]

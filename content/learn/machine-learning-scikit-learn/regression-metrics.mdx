@@ -48,7 +48,7 @@ Every regression metric is built from **residuals** — the differences
 between actual and predicted values, one per example.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Actual y"] --> R["Residual = actual - predicted"]
     P["Predicted y-hat"] --> R
     R --> M["Summarize all residuals<br/>into one number (the metric)"]

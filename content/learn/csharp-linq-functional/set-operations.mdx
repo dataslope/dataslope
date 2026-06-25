@@ -113,7 +113,7 @@ Console.WriteLine($"Except b-a: [{string.Join(",", b.Except(a))}]");
 />
 
 ```mermaid
-flowchart LR
+flowchart TD
     A((a: 1,2,3,4,5)) --- I((4,5)) --- B((b: 4,5,6,7,8))
     A -. "Except a-b → 1,2,3" .- B
     A -. "Union → 1..8" .- B

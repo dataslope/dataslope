@@ -165,7 +165,7 @@ Normalization keeps each fact in the right place. That prevents one
 fact from disagreeing with itself.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Duplicate["Customer email repeated in orders"] --> Disagree["Rows can disagree"]
     Disagree --> Normalize["Store customer once"]
     Normalize --> Reference["Orders reference customer"]

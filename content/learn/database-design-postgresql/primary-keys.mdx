@@ -88,7 +88,7 @@ Those two rules are a design promise: every row can be pointed at, and
 no pointer has to mean "maybe this row, maybe that one."
 
 ```mermaid
-flowchart LR
+flowchart TD
     PK["Primary key"] --> U["Unique<br/>no duplicates"]
     PK --> N["Not null<br/>never missing"]
     U --> I["Stable row identity"]

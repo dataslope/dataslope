@@ -95,7 +95,7 @@ related row. In a one-to-many relationship, that foreign key belongs on
 the **many** side.
 
 ```mermaid
-flowchart LR
+flowchart TD
     C["<code>customers.id = 1</code><br/>Ada"] --> O1["<code>orders.id = 101<br/>customer_id = 1</code>"]
     C --> O2["<code>orders.id = 102<br/>customer_id = 1</code>"]
     C --> O3["<code>orders.id = 103<br/>customer_id = 1</code>"]
@@ -187,7 +187,7 @@ Designers often call the one side the **parent** and the many side the
 **child**. The child depends on the parent for meaning.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Parent["Parent row<br/><code>customers.id = 1</code>"] --> ChildA["Child row<br/>order 101"]
     Parent --> ChildB["Child row<br/>order 102"]
     Parent --> ChildC["Child row<br/>order 103"]

@@ -152,7 +152,7 @@ to the top. "Longest trips", "biggest spenders", "slowest pages": every
 one is an `ORDER BY` followed by a glance at the head of the result.
 
 ```mermaid
-flowchart LR
+flowchart TD
     T[("All rows")] --> W["<code>WHERE</code><br/>(choose a slice)"]
     W --> O["<code>ORDER BY</code><br/>(surface extremes)"]
     O --> L["<code>LIMIT</code><br/>(look at the top)"]

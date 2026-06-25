@@ -59,7 +59,7 @@ relationship itself has many instances. A junction table gives each
 instance its own row.
 
 ```mermaid
-flowchart LR
+flowchart TD
     MN["Many-to-many<br/>students and courses"] --> J["enrollments<br/>one row per pairing"]
     J --> A["One student<br/>many enrollments"]
     J --> B["One course<br/>many enrollments"]
@@ -140,7 +140,7 @@ For an enrollment:
 - `role` might distinguish learner, assistant, or auditor.
 
 ```mermaid
-flowchart LR
+flowchart TD
     S["Student: Ada"] --> E["Enrollment:<br/><code>enrolled_on</code> = 2025-01-15<br/>grade = A"]
     C["Course: Math"] --> E
     E --> Meaning["Facts about this pairing"]

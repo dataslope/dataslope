@@ -56,7 +56,7 @@ database checks it against every row and keeps only the rows where
 the test comes out **true**.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["All rows"] --> T{"<code>WHERE</code><br/>condition true?"}
     T -->|"true"| K["Kept in result"]
     T -->|"false"| D["Dropped"]
@@ -195,7 +195,7 @@ which rows pass `WHERE`, *then* picks the `SELECT` columns from those
 surviving rows.
 
 ```mermaid
-flowchart LR
+flowchart TD
     T[("table")] --> W["<code>WHERE</code><br/>keep matching rows"]
     W --> S["<code>SELECT</code><br/>pick columns"]
     S --> R["Result"]

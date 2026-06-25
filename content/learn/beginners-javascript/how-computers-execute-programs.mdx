@@ -237,7 +237,7 @@ that array itself lives "on the heap", with `list` holding a kind
 of address pointing to it.
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph Stack["Stack (per running function)"]
         S1["<code>x = 5</code>"]
         S2["list = (pointer)"]

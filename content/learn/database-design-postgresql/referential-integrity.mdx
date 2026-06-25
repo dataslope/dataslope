@@ -61,7 +61,7 @@ An **orphan row** is a child row that points to a parent row that does
 not exist.
 
 ```mermaid
-flowchart LR
+flowchart TD
     O["orders<br/><code>order_id</code> = 101<br/><code>customer_id</code> = 7"] --> C["customers<br/><code>customer_id</code> = 7"]
     X["orders<br/><code>order_id</code> = 102<br/><code>customer_id</code> = 99"] --> M["missing customer 99"]:::bad
     M --> P["Orphan row"]:::bad
@@ -136,7 +136,7 @@ Examples: orders that must keep their customer, invoice lines that must
 keep their invoice, payments that must keep their account.
 
 ```mermaid
-flowchart LR
+flowchart TD
     C["Customer"] --> O["Orders exist"]
     O --> R["Delete is blocked"]:::warn
     classDef warn fill:#fef3c7,stroke:#b45309
@@ -152,7 +152,7 @@ Examples: comments on a deleted draft, line items in a temporary cart,
 settings owned by a removed profile.
 
 ```mermaid
-flowchart LR
+flowchart TD
     P["Delete project"] --> T["Delete project tasks"] --> D["No leftovers"]:::good
     classDef good fill:#dcfce7,stroke:#15803d
 ```
@@ -166,7 +166,7 @@ Examples: a support ticket whose assigned employee left, or a blog post
 whose optional editor was removed.
 
 ```mermaid
-flowchart LR
+flowchart TD
     E["Delete employee"] --> T["ticket.<code>assigned_employee_id</code> = NULL"]
     T --> K["Ticket stays open"]
 ```

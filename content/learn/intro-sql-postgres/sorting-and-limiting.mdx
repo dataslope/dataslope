@@ -103,7 +103,7 @@ department, sorted by salary high to low. The order of the columns
 in `ORDER BY` is the order of priority.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Sort by<br/>dept (A→Z)"] --> B["Ties broken by<br/>salary (high→low)"]
 ```
 
@@ -178,7 +178,7 @@ the web.
 So far you have met four clauses. They must appear in this order:
 
 ```mermaid
-flowchart LR
+flowchart TD
     S["<code>SELECT</code><br/>columns"] --> F["<code>FROM<br/>table</code>"]
     F --> W["<code>WHERE</code><br/>filter rows"]
     W --> O["<code>ORDER BY</code><br/>sort"]

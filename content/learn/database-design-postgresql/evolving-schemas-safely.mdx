@@ -61,7 +61,7 @@ Good migrations are:
 - tested against existing data
 
 ```mermaid
-flowchart LR
+flowchart TD
     Design["Design decision"] --> Migration["Migration steps"]
     Migration --> Schema["New schema shape"]
     Schema --> Data["Data still makes sense"]
@@ -174,7 +174,7 @@ A **backfill** fills new structure using existing data or a chosen
 default. The design question is: what value should old rows mean?
 
 ```mermaid
-flowchart LR
+flowchart TD
     OldRows["Existing rows"] --> Rule["Backfill rule"]
     Rule --> NewValues["New column values"]
     NewValues --> Constraint["Constraint can be tightened"]
@@ -208,7 +208,7 @@ you move data and code toward the new shape. Finally, after the old
 shape is no longer needed, you contract by removing it.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Old["Old schema"] --> Expand["Expand: add new structure"]
     Expand --> Parallel["Both shapes work"]
     Parallel --> Move["Move reads and writes"]

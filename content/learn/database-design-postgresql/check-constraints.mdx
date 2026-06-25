@@ -52,7 +52,7 @@ A CHECK constraint is a boolean expression that must be true for every
 row. If the expression is false, PostgreSQL rejects the write.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Row["Incoming row"] --> Check{"CHECK expression<br/>is true?"}
     Check -->|yes| Store["Store row"]
     Check -->|no| Reject["Reject row"]
@@ -136,7 +136,7 @@ CHECK constraints can compare columns in the same row. For an event,
 `end_date` should come after `start_date`.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Start["<code>start_date</code>"] --> Rule{"<code>end_date &gt; start_date</code>"}
     End["end_date"] --> Rule
     Rule -->|true| Valid["Valid event"]
@@ -217,7 +217,7 @@ NULL expression may be unknown rather than false. If the column must be
 present, say that directly with `NOT NULL`.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Required["Required domain value"] --> NN["NOT NULL"]
     Required --> CH["CHECK rule"]
     NN --> Safe["Present and valid"]

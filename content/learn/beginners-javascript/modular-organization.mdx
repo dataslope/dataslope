@@ -264,7 +264,7 @@ Modules should form a **directed acyclic graph** — A may depend
 on B, B may depend on C, but C must not depend on A.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["<code>index.js</code>"] --> B["<code>users.js</code>"]
     A --> C["<code>orders.js</code>"]
     C --> D["shared/<code>http.js</code>"]
