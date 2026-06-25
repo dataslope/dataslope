@@ -2206,6 +2206,33 @@ input[type="range"].fs-slider:disabled {
   cursor: not-allowed;
 }
 
+/* ─── Appearance (light/dark) toggle ─── */
+/* The Appearance row carries its sun/moon glyphs beside the toggle rather
+   than a single leading icon. Pad the label so it still lines up with the
+   icon'd rows above it (14px icon + 6px gap). */
+.setting-switch-label.is-iconless {
+  padding-left: 20px;
+}
+/* Sun + switch + moon, sitting together on the right of the row. The icon
+   for the active scheme is highlighted; the other is dimmed. */
+.theme-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.theme-switch-icon {
+  color: var(--text-dim);
+  opacity: 0.4;
+  flex-shrink: 0;
+  transition:
+    color 0.15s,
+    opacity 0.15s;
+}
+.theme-switch-icon.is-active {
+  color: var(--text);
+  opacity: 1;
+}
+
 /* ─── Packages drawer ─── */
 .pkg-overlay {
   position: fixed;
