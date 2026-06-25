@@ -130,4 +130,11 @@ jobs:
           done
 
           echo "---"
-          echo "Folders kept: $kept | folders ${DRY_RUN/true/would be }deleted: $deleted"
+          # DRY_RUN is always exactly "true" or "false"; choose the verb to match.
+          # (A ${DRY_RUN/true/would be } substitution used to leak a literal
+          # "false" into the summary on real runs — "folders falsedeleted".)
+          if [[ "$DRY_RUN" == "true" ]]; then
+            echo "Folders kept: $kept | folders would be deleted: $deleted"
+          else
+            echo "Folders kept: $kept | folders deleted: $deleted"
+          fi
