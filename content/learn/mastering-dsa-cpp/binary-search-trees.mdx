@@ -105,7 +105,7 @@ int main() {
 Insertion follows the same path as search, then attaches the new node at the first empty child position.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["compare with root"] --> B{"smaller?"}
     B -- "yes" --> C["go left"]
     B -- "no" --> D["go right"]

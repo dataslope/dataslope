@@ -125,7 +125,7 @@ int main() {
 The first fix is gloriously lazy. Since `find(x)` has to walk all the way to the root anyway, why not make every node it passes point *directly* to the root on the way back? That is **path compression**: one recursive line, and every future `find` through those nodes is a single hop. The tree flattens itself as a side effect of being used.
 
 ```mermaid
-graph LR
+graph TD
     A["before: 4 -> 3 -> 2 -> 1 -> 0"] --> B["<code>find(4)</code>"] --> C["after: 4,3,2,1 all point to 0"]
 ```
 
@@ -360,7 +360,7 @@ Kruskal(edges, n):
 ```
 
 ```mermaid
-graph LR
+graph TD
     S["sort edges"] --> C["consider cheapest edge"]
     C --> U{"endpoints already connected?"}
     U -- "yes" --> X["skip to avoid cycle"]

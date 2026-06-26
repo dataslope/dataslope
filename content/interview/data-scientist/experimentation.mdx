@@ -3,8 +3,8 @@ title: Experimentation
 description: Data Scientist interview questions on A/B test design, statistical power, sample size, and common experimentation pitfalls.
 ---
 
-"Design an experiment to test X" is a staple DS round. These cover the
-design choices and traps interviewers look for.
+"Design an experiment to test X" is a staple Data Scientist round. These
+cover the design choices and traps interviewers look for.
 
 ## Q&A
 
@@ -19,11 +19,15 @@ cycles, then test for a significant difference and check guardrails.
 
 ### What is statistical power, and what drives it?
 
-Power = probability of detecting a real effect (1 − β). It rises with
-**larger sample size**, **larger true effect**, **lower variance**, and a
-**higher α**. Underpowered tests waste traffic and miss real effects, so
-you size the experiment to hit a target power for the smallest effect
-worth detecting.
+Power = probability of detecting a real effect ($1 - \beta$). It rises
+with **larger sample size**, **larger true effect**, **lower variance**,
+and a **higher α**. Underpowered tests waste traffic and miss real
+effects, so you size the experiment to hit a target power for the smallest
+effect worth detecting.
+
+The code uses `NormalIndPower.solve_power` to back out the per-variant
+sample size needed for a given `effect_size`, `alpha`, and `power`,
+demonstrating how the three inputs determine n.
 
 <CodeBlock
   adapter="python"
@@ -47,6 +51,13 @@ Repeatedly checking and stopping as soon as p < 0.05 (**peeking**)
 massively inflates the false-positive rate — you'll eventually cross the
 threshold by chance. Either fix n up front, or use methods designed for
 continuous monitoring (sequential testing / always-valid p-values).
+
+<Callout type="warning" title="Peeking inflates false positives">
+Every extra look at a running test is another chance to cross
+$p < 0.05$ by luck. At a fixed $\alpha = 0.05$, continuously peeking and
+stopping on the first significant result can push the real false-positive
+rate well above 30%. Commit to the sample size before you start.
+</Callout>
 
 ### What are common A/B testing pitfalls?
 
@@ -73,7 +84,11 @@ The analysis unit must match or be nested within the randomization unit to keep 
 
 You need four inputs: baseline conversion rate, minimum detectable effect (MDE), `alpha` (commonly 0.05), and desired power (commonly 0.8).
 The formula for a two-proportion z-test is derived from the pooled standard error; most practitioners use a sample size calculator.
-Sample size scales inversely with the square of the MDE: halving the MDE you want to detect quadruples the required sample.
+Sample size scales inversely with the square of the MDE, $n \propto \dfrac{1}{\text{MDE}^2}$: halving the MDE you want to detect quadruples the required sample.
+
+The code implements that formula in `sample_size_per_variant`, combining
+`z_alpha`, `z_beta`, and the pooled variance to return the rounded-up n for
+a 10% baseline and a 2-point MDE.
 
 <CodeBlock
   adapter="python"
@@ -104,6 +119,10 @@ print(f"Sample size per variant: {n}")
 A **sample ratio mismatch (SRM)** occurs when the observed split between control and treatment differs significantly from the intended ratio (e.g., you expected 50/50 but got 48/52).
 Causes: bot traffic filtering differently across variants, logging bugs, caching that prevents re-assignment, and redirect latency biasing which users complete page load.
 An SRM invalidates the experiment; the data cannot be trusted until the root cause is found and fixed.
+
+The code runs a `chisquare` goodness-of-fit test of the observed
+per-variant counts against the intended 50/50 split, where a small p-value
+flags an SRM.
 
 <CodeBlock
   adapter="python"
@@ -143,8 +162,12 @@ Best practice: define one primary metric before the test and treat secondary met
 ### What is CUPED and how does it reduce variance?
 
 **CUPED** (Controlled-experiment Using Pre-Experiment Data) reduces variance in the outcome metric by regressing out a pre-experiment covariate that is correlated with the outcome (e.g., the user's metric value in the week before the experiment).
-The adjusted metric `Y_adj = Y - theta * (X - E[X])` has lower variance, giving the same statistical power with fewer users or detecting smaller effects.
+The adjusted metric $Y_{\text{adj}} = Y - \theta\,(X - \mathbb{E}[X])$ has lower variance, giving the same statistical power with fewer users or detecting smaller effects.
 It does not change the expectation of the estimator, only its variance.
+
+The code estimates `theta` from the covariance of `Y` and `X`, forms
+`Y_adj`, and prints the original versus CUPED variance to show the
+reduction firsthand.
 
 <CodeBlock
   adapter="python"
@@ -214,6 +237,10 @@ An **A/A test** assigns users to two groups that receive identical experiences.
 Because there is no real effect, significant results indicate a problem with the testing infrastructure (randomization bugs, logging errors, pre-existing imbalance).
 A/A tests should produce about `alpha` false-positive rate across many runs; running them regularly validates your experimentation platform.
 
+The code simulates 1,000 A/A tests with `ttest_ind` on two samples drawn
+from the same distribution and reports the share with p < 0.05, which
+should land near 0.05 on a healthy platform.
+
 <CodeBlock
   adapter="python"
   files={[
@@ -259,6 +286,10 @@ Instead of a p-value, you report the **probability that treatment is better than
 It allows intuitive probability statements and can incorporate prior knowledge, but conclusions depend on the prior choice.
 Frequentist tests offer guaranteed error-rate control; Bayesian tests are more flexible but require careful prior specification.
 
+The code draws posterior samples from `Beta(1,1)` priors updated with each
+variant's conversions, then estimates `P(treatment > control)` as the
+fraction of draws where treatment's rate exceeds control's.
+
 <CodeBlock
   adapter="python"
   files={[
@@ -283,7 +314,7 @@ print(f"P(treatment > control) = {p_treatment_wins:.3f}")
 ### What is the difference between a Type I and Type II error in experiment design?
 
 A **Type I error** (false positive) declares a winner when the treatment has no real effect; controlled by `alpha`.
-A **Type II error** (false negative) fails to detect a real effect; its rate is `beta` and power is `1 - beta`.
+A **Type II error** (false negative) fails to detect a real effect; its rate is $\beta$ and power is $1 - \beta$.
 In product experimentation, false positives ship ineffective features; false negatives cause you to abandon good ones.
 Size experiments to control both: typical targets are `alpha = 0.05` and power of 0.8.
 

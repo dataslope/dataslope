@@ -80,7 +80,7 @@ column. PostgreSQL rejects any insert or update that would leave the
 column empty.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Fact["Column fact"] --> Q{"Must every row<br/>know this?"}
     Q -->|yes| Req["Use NOT NULL"]
     Q -->|no| Opt["Allow NULL"]
@@ -258,7 +258,7 @@ whether some orders have no date. If every product has `name NOT NULL`,
 interfaces can show product names without inventing placeholders.
 
 ```mermaid
-flowchart LR
+flowchart TD
     NN["NOT NULL"] --> Promise["Every row has<br/>the value"]
     Promise --> Trust["Queries and apps<br/>can rely on it"]
 ```

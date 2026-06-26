@@ -388,7 +388,7 @@ A classic shorthand:
 > you can do something with the data yourself.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Bad["<code>account.getBalance()</code> > 100<br/>→ ... do stuff externally"]
     Good["<code>account.tryWithdraw(100)</code>"]
     Bad -. refactor .-> Good

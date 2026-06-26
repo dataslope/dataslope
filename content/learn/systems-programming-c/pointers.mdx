@@ -138,7 +138,7 @@ Two operators move between values and addresses:
 | `*p` | "value at `p`" | the thing it points to (dereference) |
 
 ```mermaid
-flowchart LR
+flowchart TD
     P["pointer p<br/>(its value is<br/><code>0x7ffc1234</code>)"] -->|*p reads /<br/>writes there| V["int value 42<br/>at <code>0x7ffc1234</code>"]
     V -->|&x gives| P
 ```

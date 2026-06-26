@@ -50,12 +50,17 @@ recommended action. Save methodology for an appendix or backup slide.
 
 ### What are variance and standard deviation, and what do they measure?
 
-**Variance** is the average squared deviation from the mean. **Standard
-deviation** is its square root, returned to the original units. Both
-measure the **spread** of a distribution: a higher value means data
-points are more dispersed around the mean. Standard deviation is easier
-to interpret because it shares units with the data (e.g., dollars, not
-dollars-squared).
+**Variance** is the average squared deviation from the mean,
+$\sigma^2 = \frac{1}{n}\sum_{i=1}^{n}(x_i - \bar{x})^2$. **Standard
+deviation** is its square root, $\sigma = \sqrt{\sigma^2}$, returned to
+the original units. Both measure the **spread** of a distribution: a
+higher value means data points are more dispersed around the mean.
+Standard deviation is easier to interpret because it shares units with
+the data (e.g., dollars, not dollars-squared).
+
+The snippet below builds a `pd.Series` and calls `.var()` and `.std()`,
+which return the **sample** variance and standard deviation (`ddof=1`)
+that divide by $n - 1$ rather than $n$.
 
 <CodeBlock
   adapter="python"
@@ -98,9 +103,13 @@ population parameters, subject to sampling error.
 
 A **percentile** is the value below which a given percentage of
 observations fall: the 90th percentile means 90% of values are below
-that point. **Quartiles** divide data into four equal parts: Q1 (25th),
-Q2 (50th = median), Q3 (75th). The interquartile range (IQR = Q3 - Q1)
-is a robust measure of spread.
+that point. **Quartiles** divide data into four equal parts: $Q_1$
+(25th), $Q_2$ (50th = median), $Q_3$ (75th). The interquartile range
+($\text{IQR} = Q_3 - Q_1$) is a robust measure of spread.
+
+The snippet below uses `Series.quantile` to pull $Q_1$ and $Q_3$,
+derives the IQR as their difference, and also reads off the 90th
+percentile.
 
 <CodeBlock
   adapter="python"
@@ -121,12 +130,16 @@ print(f"Q1={q1}, Q3={q3}, IQR={iqr}, 90th pct={p90}")`,
 ### How do you identify outliers?
 
 Common methods:
-- **IQR rule**: values below `Q1 - 1.5 * IQR` or above `Q3 + 1.5 * IQR` are flagged as outliers.
-- **Z-score**: values more than 2-3 standard deviations from the mean.
+- **IQR rule**: values below $Q_1 - 1.5\times\text{IQR}$ or above $Q_3 + 1.5\times\text{IQR}$ are flagged as outliers.
+- **Z-score**: values whose $z = \frac{x - \bar{x}}{s}$ exceeds 2-3 in absolute value, i.e. more than 2-3 standard deviations from the mean.
 - **Visual**: box plots or scatter plots reveal extreme points quickly.
 
 Always investigate outliers before removing them — they may be data
 errors or genuinely important observations.
+
+The snippet below applies both rules to the `amount` column: it builds
+the IQR fences to flag `outliers_iqr`, then computes a z-score per row
+and flags `outliers_z` where the absolute z-score exceeds 2.
 
 <CodeBlock
   adapter="python"
@@ -184,20 +197,32 @@ effect size alongside p-values.
   is actually false — missing a real effect. Controlled by statistical
   power (typically 80%).
 
+|                          | $H_0$ is true                                | $H_0$ is false                              |
+| ------------------------ | -------------------------------------------- | ------------------------------------------- |
+| **Reject $H_0$**         | Type I error (false positive) — rate $\alpha$ | Correct decision — power $= 1 - \beta$       |
+| **Fail to reject $H_0$** | Correct decision — rate $1 - \alpha$          | Type II error (false negative) — rate $\beta$ |
+
 ### What is statistical power?
 
 Power is the probability of correctly detecting a real effect (rejecting
-the null when it is false). Power increases with larger sample sizes,
-larger effect sizes, and higher significance levels. A common target is
-80% power. Low-powered tests risk missing real improvements.
+the null when it is false), defined as $1 - \beta$ where $\beta$ is the
+Type II error rate. Power increases with larger sample sizes, larger
+effect sizes, and higher significance levels. A common target is 80%
+power. Low-powered tests risk missing real improvements.
 
 ### How do you choose the right sample size for an A/B test?
 
 Use a power calculation based on: the minimum detectable effect (the
 smallest change worth caring about), the baseline metric value, the
 desired power (commonly 80%), and the significance level (commonly 5%).
-Online calculators and Python's `statsmodels` can compute this before
-running the test.
+Larger samples shrink the standard error of the estimate,
+$SE = \frac{\sigma}{\sqrt{n}}$, which is what makes a given effect easier
+to detect. Online calculators and Python's `statsmodels` can compute the
+required size before running the test.
+
+The snippet below uses `statsmodels`' `NormalIndPower` and its
+`solve_power` method to back out the required sample size per group for a
+0.1 effect size at 80% power and a 5% significance level.
 
 <CodeBlock
   adapter="python"
@@ -216,10 +241,15 @@ print(f"Required n per group: {n:.0f}")`,
 ### What is the difference between correlation and the correlation coefficient?
 
 **Correlation** is a general term for the linear association between two
-variables. The **Pearson correlation coefficient** (r) quantifies it from
--1 (perfect negative) to +1 (perfect positive), with 0 meaning no linear
-relationship. Spearman rank correlation is used when the relationship is
-monotonic but not linear, or when data is ordinal.
+variables. The **Pearson correlation coefficient** ($r$) quantifies it on
+the range $-1 \le r \le 1$ — from $-1$ (perfect negative) to $+1$
+(perfect positive), with 0 meaning no linear relationship. Spearman rank
+correlation is used when the relationship is monotonic but not linear, or
+when data is ordinal.
+
+The snippet below calls `Series.corr` to get the Pearson $r$ between
+`price` and `sales`, builds a full `corr()` matrix over three columns,
+and then switches to `method="spearman"` for the rank-based coefficient.
 
 <CodeBlock
   adapter="python"
@@ -277,7 +307,8 @@ and stakeholder communication.
 
 ### What makes a dashboard effective?
 
-Keep it to the key metrics decision-makers act on. Group related KPIs.
+Keep it to the key metrics decision-makers act on. Group related key
+performance indicators (KPIs).
 Use consistent scales and color conventions. Add clear titles and data
 freshness labels. Avoid clutter: every element should earn its place.
 Design for the audience — an executive view differs from an ops team view.

@@ -99,7 +99,7 @@ printPoint(v); // ❌ Compile error: incompatible types
 Even though `Point` and `Vector` have identical fields, Java rejects the call because the *names* differ. TypeScript doesn't care about names — only structure.
 
 ```mermaid
-graph LR
+graph TD
     A["Type A: <code>{ x: number; y: number }</code>"]
     B["Type B: <code>{ x: number; y: number }</code>"]
     C["Type C: <code>{ x: number; y: number; z: number }</code>"]

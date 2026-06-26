@@ -95,7 +95,7 @@ ORDER BY
 />
 
 ```mermaid
-flowchart LR
+flowchart TD
     D1["2024-03-04"] --> M["<code>date_trunc('month')</code>"]
     D2["2024-03-18"] --> M
     D3["2024-03-29"] --> M
@@ -248,7 +248,7 @@ correct, gap-free series ready to chart. Skipping this step is one of the
 most common ways an analyst's trend chart misleads.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Spine["Generated date spine<br/>(every day)"] --> J["<code>LEFT JOIN orders</code>"]
     J --> S["Days with no orders<br/>become 0, not missing"]
 ```

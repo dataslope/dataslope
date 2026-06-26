@@ -476,7 +476,7 @@ genuinely new data stalls or even drops. You have **overfit the
 validation set**.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Try many, many settings"] --> B["Validation score keeps rising"]
     B --> C["But you are now fitting<br/>validation-set noise"]
     C --> D["True new-data performance<br/>flattens or falls"]

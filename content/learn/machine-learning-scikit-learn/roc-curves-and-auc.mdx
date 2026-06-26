@@ -83,7 +83,7 @@ threshold sweeps from very strict to very lenient. Each threshold is one
 point on the curve.
 
 ```mermaid
-flowchart LR
+flowchart TD
     P["Predicted probabilities"] --> S["Sweep the threshold<br/>from 1.0 down to 0.0"]
     S --> M["At each threshold,<br/>compute TPR and FPR"]
     M --> C["Plot TPR vs FPR<br/>= the ROC curve"]

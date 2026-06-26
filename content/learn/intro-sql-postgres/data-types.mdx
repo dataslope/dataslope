@@ -52,7 +52,7 @@ number, and the database will refuse the text `"banana"`. Declare it
 as a date, and `"someday"` is rejected.
 
 ```mermaid
-flowchart LR
+flowchart TD
     V["A value you<br/>try to store"] --> T{"Does it match<br/>the column's type?"}
     T -->|"yes"| OK["Stored"]
     T -->|"no"| NO["Rejected — caught early"]

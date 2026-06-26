@@ -67,7 +67,7 @@ But many everyday questions are not detail questions. They are summary questions
 Think of an aggregate as a tiny summarizing machine. Many rows go in. One value comes out.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Rows["Many rows<br/>five order amounts"] --> Agg["Aggregate function<br/>SUM, AVG, COUNT"]
     Agg --> One["One summary value<br/>total, average, or count"]
 ```
@@ -298,7 +298,7 @@ WHERE
 Read this as: "Keep only Ada's rows, then add their amounts."
 
 ```mermaid
-flowchart LR
+flowchart TD
     T[("orders table")] --> W["WHERE <code>customer = 'Ada'</code>"]
     W --> S["SUM(amount)"]
     S --> R["one total"]

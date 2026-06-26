@@ -68,7 +68,7 @@ it. ER diagrams let you discuss questions like:
 - Is the relationship one-to-many, many-to-many, or something else?
 
 ```mermaid
-flowchart LR
+flowchart TD
     Idea["Real system"] --> Diagram["ER diagram"]
     Diagram --> Review["Discuss meaning<br/>and rules"]
     Review --> Tables["PostgreSQL tables"]
@@ -115,7 +115,7 @@ Crow's-foot puts symbols at both ends of the relationship line, and
 the symbols tell you how many rows may connect on each side.
 
 ```mermaid
-flowchart LR
+flowchart TD
     One["||<br/>exactly one"] --> Line["relationship line"]
     Many["o{<br/>zero or many"] --> Line
     Line --> Sentence["One customer<br/>places many orders"]

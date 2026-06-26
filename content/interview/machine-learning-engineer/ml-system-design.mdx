@@ -1,11 +1,11 @@
 ---
 title: ML System Design
-description: ML Engineer interview questions on batch vs online inference, feature stores, training–serving skew, and model/data drift.
+description: Machine Learning Engineer interview questions on batch vs online inference, feature stores, training–serving skew, and model/data drift.
 ---
 
-The round that most distinguishes an ML *Engineer* is getting models
-into production and keeping them healthy. Review the Q&A, then the
-concept checks.
+The round that most distinguishes a Machine Learning *Engineer* is
+getting models into production and keeping them healthy. Review the Q&A,
+then the concept checks.
 
 ## Q&A
 
@@ -103,9 +103,10 @@ the pipeline into both stores to keep them consistent.
 ### How do you ensure reproducibility of ML experiments?
 
 Pin library versions (requirements.txt or lock files), version training
-data (DVC, Delta Lake snapshots), log all hyperparameters and random seeds
-(MLflow, W&B), and version model code in git with a tag linked to the
-experiment run. Container images (Docker) capture the full environment.
+data (Data Version Control (DVC), Delta Lake snapshots), log all
+hyperparameters and random seeds (MLflow, W&B), and version model code in
+git with a tag linked to the experiment run. Container images (Docker)
+capture the full environment.
 A reproducible run should regenerate the same model artifact from the same
 code, data, and config.
 
@@ -166,13 +167,14 @@ models in production while retaining accuracy close to a large teacher.
 
 ### How do you design a CI/CD pipeline for ML?
 
-An ML CI/CD pipeline typically includes: (1) **data validation** on new
-data; (2) **unit and integration tests** for feature transforms and
-preprocessing code; (3) **training run** on a versioned dataset; (4)
-**evaluation gate** — the new model must beat the incumbent on a holdout
-set; (5) **model registry promotion**; (6) **staged rollout** (canary,
-then full). Infrastructure-as-code (Terraform, CDK) provisions training
-and serving environments reproducibly.
+An ML continuous integration and continuous delivery (CI/CD) pipeline
+typically includes: (1) **data validation** on new data; (2) **unit and
+integration tests** for feature transforms and preprocessing code; (3)
+**training run** on a versioned dataset; (4) **evaluation gate** — the new
+model must beat the incumbent on a holdout set; (5) **model registry
+promotion**; (6) **staged rollout** (canary, then full).
+Infrastructure-as-code (Terraform, CDK) provisions training and serving
+environments reproducibly.
 
 ### What is throughput vs latency in model serving?
 
@@ -249,6 +251,18 @@ rules (diversity, freshness, promotions); (4) **feature store** for
 real-time user and item features; (5) A/B testing on ranking model
 variants tied to business metrics (revenue, engagement).
 
+The funnel narrows the candidate set at each stage so the expensive model
+only scores a few hundred items, not millions:
+
+```mermaid
+flowchart TD
+  c["millions of items"] --> r["Retrieval: nearest-neighbour search"]
+  r --> k["hundreds of candidates"]
+  k --> g["Ranking: gradient boosting / neural net"]
+  g --> rr["Re-ranking: diversity, freshness, rules"]
+  rr --> out["final ranked list"]
+```
+
 ### What is the difference between online and offline feature computation?
 
 **Offline** features are computed in batch jobs over historical data
@@ -262,10 +276,11 @@ training features and online serving features is the core challenge.
 
 Monitor the relationship between model inputs and outputs over time.
 Proxy signals (when true labels are delayed): prediction distribution
-shift, input feature distribution shift (PSI, KL divergence, Kolmogorov-
-Smirnov tests). When true labels become available: track live accuracy,
-precision, recall. Responses range from alerting to automated retraining
-to feature redesign if the drift is structural.
+shift, input feature distribution shift (population stability index (PSI),
+Kullback–Leibler (KL) divergence, Kolmogorov–Smirnov test). When true
+labels become available: track live accuracy, precision, recall.
+Responses range from alerting to automated retraining to feature redesign
+if the drift is structural.
 
 ### What is population stability index (PSI)?
 
@@ -274,7 +289,15 @@ a current distribution (production) for a single feature. Buckets are
 defined on the reference; the fraction of examples per bucket is compared
 between reference and current using a symmetric KL-divergence-like formula.
 PSI below 0.1 is stable; 0.1–0.2 warrants monitoring; above 0.2 signals
-significant shift requiring action.
+significant shift requiring action. Formally, summing over the buckets:
+
+$$\text{PSI} = \sum_i (\text{cur}_i - \text{ref}_i)\,\ln\frac{\text{cur}_i}{\text{ref}_i}$$
+
+The `compute_psi` function below implements exactly this: it bins the
+reference (training) distribution into deciles via `np.percentile`,
+compares the fraction of examples per bucket between `reference` and
+`current`, and returns the summed PSI value — the demo prints a `stable`
+case under 0.1 and a `drifted` case above 0.2.
 
 <CodeBlock
   adapter="python"

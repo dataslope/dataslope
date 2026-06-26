@@ -91,7 +91,7 @@ by convention, `0` means success and any other value means a
 particular kind of failure.
 
 ```mermaid
-flowchart LR
+flowchart TD
     OS[Operating system] -->|calls| M[main]
     M -->|returns int| OS
     OS -->|exit code| S[Shell / parent process]

@@ -215,7 +215,7 @@ tracking?* In this example, there are customers, products, and orders.
 Those are different kinds of facts, so they deserve different homes.
 
 ```mermaid
-flowchart LR
+flowchart TD
     F["Flat order rows<br/>customers and products repeated"] --> C["customers<br/>one row per customer"]
     F --> P["products<br/>one row per product"]
     F --> O["orders<br/>one row per order"]
@@ -259,7 +259,7 @@ The normal forms are a step-by-step path away from messy, duplicated
 storage and toward single-source-of-truth tables.
 
 ```mermaid
-flowchart LR
+flowchart TD
     UNF["UNF<br/>repeating groups<br/>and mixed facts"] --> NF1["1NF<br/>one value per cell"]
     NF1 --> NF2["2NF<br/>whole composite key"]
     NF2 --> NF3["3NF<br/>nothing but the key"]

@@ -72,7 +72,7 @@ Read that again slowly. There are four verbs hiding in it, and they
 are the whole reason databases exist:
 
 ```mermaid
-flowchart LR
+flowchart TD
     S["Store<br/>(keep data safely)"] --> F["Find<br/>(answer questions)"]
     F --> C["Change<br/>(add, edit, delete)"]
     C --> P["Protect<br/>(stay correct and safe)"]
@@ -307,7 +307,7 @@ sends the database a request written in SQL. That request is called
 a **query**.
 
 ```mermaid
-flowchart LR
+flowchart TD
     User["You<br/>(tap, type, click)"] --> App["Application<br/>(screens & logic)"]
     App -->|"a query: please give me X"| DB[("Database")]
     DB -->|"the rows that match"| App
@@ -330,7 +330,7 @@ For the rest of this course, hold this picture in your head: a
 database is a **trustworthy librarian** for your data.
 
 ```mermaid
-flowchart LR
+flowchart TD
     U["You / an app"] -->|"a request"| L["Database<br/>(the librarian)"]
     L -->|"exactly the right data"| U
     L --- D[("Stored data")]

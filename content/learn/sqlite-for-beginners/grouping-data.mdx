@@ -126,7 +126,7 @@ Read the query out loud like this:
 The `dept` column appears in the result because it labels each group. Without it, you would see numbers but not know which department they describe.
 
 ```mermaid
-flowchart LR
+flowchart TD
     F["<code>FROM employees</code>"] --> G["<code>GROUP BY dept</code>"]
     G --> S["<code>SELECT dept,<br/>COUNT(*), AVG(salary)</code>"]
     S --> O["<code>ORDER BY dept</code>"]
@@ -352,7 +352,7 @@ ORDER BY
 The intern row is removed first. Then SQLite groups the remaining rows by department.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Raw["Raw employee rows"] --> Where["WHERE <code>is_intern</code> = 0<br/>keep full-time rows"]
     Where --> Group["<code>GROUP BY dept</code><br/>make department groups"]
     Group --> Avg["AVG(salary)<br/>inside each group"]

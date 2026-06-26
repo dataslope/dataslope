@@ -339,7 +339,7 @@ tension that sounds paradoxical at first — how can code be extendable
 *and* untouchable at the same time? Polymorphism is the answer.
 
 ```mermaid
-flowchart LR
+flowchart TD
     R["Existing code<br/>(Renderer, Cashier,<br/>OrderProcessor...)"]
     N["New behavior<br/>(new Shape subclass,<br/>new PaymentProcessor,<br/>new Notification kind)"]
     N -->|plug in| R

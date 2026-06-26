@@ -47,7 +47,7 @@ verbs: a customer **places** an order, a book **belongs to** an author,
 a student **enrolls in** a course.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Customer["<code>Customer</code>"] -->|places| Order["<code>Order</code>"]
     Order -->|contains| Product["<code>Product</code>"]
 ```
@@ -77,7 +77,7 @@ has a **primary key**. Another table stores a **foreign key** that
 points to it.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Real["Real world:<br/>Ada placed order 101"] --> Model["Model:<br/>customer relates to order"]
     Model --> Schema["Schema:<br/>orders.<code>customer_id</code> points to customers.id"]
 ```

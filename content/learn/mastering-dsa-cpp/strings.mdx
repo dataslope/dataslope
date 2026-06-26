@@ -230,7 +230,7 @@ int main() {
 />
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["<code>std::string</code> owns characters"] --> B["dynamic storage"]
     C["<code>std::string_view</code>"] --> D["pointer + length"]
     D --> E["does not own data"]

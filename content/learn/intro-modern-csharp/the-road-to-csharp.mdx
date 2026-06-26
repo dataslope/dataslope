@@ -69,7 +69,7 @@ those numbers human-readable names: instead of `B8 04`, you wrote
 back.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Assembly source<br/>MOV EAX, 4<br/>MOV EBX, 2<br/>ADD EAX, EBX"]
       --> B[Assembler]
     B --> C["Machine code<br/>B8 04 00 00 00<br/>BB 02 00 00 00<br/>01 D8"]

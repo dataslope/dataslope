@@ -166,7 +166,7 @@ rows*. `HAVING` (step 4) runs **after** grouping, so it filters
 *whole groups*:
 
 ```mermaid
-flowchart LR
+flowchart TD
     R["rows"] --> W["<code>WHERE</code><br/>filter rows<br/>(before grouping)"]
     W --> G["<code>GROUP BY</code><br/>form groups"]
     G --> H["<code>HAVING</code><br/>filter groups<br/>(after grouping)"]

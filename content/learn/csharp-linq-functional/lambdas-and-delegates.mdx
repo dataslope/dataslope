@@ -267,7 +267,7 @@ your lambda; they walk its tree and *translate* it into another
 language (SQL, BSON, an HTTP query).
 
 ```mermaid
-flowchart LR
+flowchart TD
     L["<code>x =&gt; x.Age &gt; 30</code>"] -->|"compiled as Func"| D[Delegate: callable in C#]
     L -->|"compiled as Expression"| T[Tree of nodes: translatable]
     T --> S["<code>SELECT * FROM ... WHERE Age &gt; 30</code>"]

@@ -426,7 +426,7 @@ These two methods are the classic pairing in introductory clustering, and
 knowing when to pick which is a practical skill.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Q["You have unlabeled<br/>numeric data to cluster"] --> A{"Do you know<br/>how many<br/>clusters?"}
     A -->|"yes, and groups<br/>look round"| KM["K-means<br/>(fast, scales big)"]
     A -->|"not sure, or want<br/>to see structure"| HC["Hierarchical<br/>(one tree, any cut)"]

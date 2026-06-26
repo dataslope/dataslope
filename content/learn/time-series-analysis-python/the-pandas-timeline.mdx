@@ -480,7 +480,7 @@ April-to-April — even if they're in different orders or have different
 lengths. Where a label is missing on one side, the result is `NaN`.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Series A<br/>Jan-01, Jan-02, Jan-03"] --> U["Align on the union<br/>of the two indices"]
     B["Series B<br/>Jan-02, Jan-03, Jan-04"] --> U
     U --> R["Jan-01 = NaN<br/>Jan-02 = A+B<br/>Jan-03 = A+B<br/>Jan-04 = NaN"]

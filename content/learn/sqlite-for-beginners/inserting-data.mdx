@@ -65,7 +65,7 @@ The SQL statement for adding rows is `INSERT INTO`.
 An `INSERT` statement names the table, names the columns you are filling, and supplies matching values.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["<code>INSERT INTO</code>"] --> B["which table"]
     B --> C["which columns"]
     C --> D["<code>VALUES</code>"]
@@ -127,7 +127,7 @@ ORDER BY
 The insert only gave `title`. SQLite supplied `id`, and `DEFAULT 0` supplied `done`.
 
 ```mermaid
-flowchart LR
+flowchart TD
     V["<code>VALUES<br/>'Water plants'</code>"] --> T["tasks table"]
     T --> R["id assigned<br/>done defaults to 0"]
 ```

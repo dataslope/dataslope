@@ -66,7 +66,7 @@ The keyword `SELECT` means: *compute something and show me the result.* You can 
 The result is a tiny table: one row and one column. The value is text, so it is wrapped in single quotes.
 
 ```mermaid
-flowchart LR
+flowchart TD
     E["Editor<br/>your SQL"] -->|"send statement"| S["SQLite engine"]
     S -->|"returns"| R["Result table"]
 ```
@@ -155,7 +155,7 @@ FROM
 Read the final query like a sentence: *select the `name` and `species` columns from the `pets` table.*
 
 ```mermaid
-flowchart LR
+flowchart TD
     Q["<code>SELECT name, species<br/>FROM pets;</code>"] --> T["pets table"]
     T --> R["name column<br/>species column"]
 ```

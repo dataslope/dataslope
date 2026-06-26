@@ -128,7 +128,7 @@ them all into a single sequence.
 ## Visual mental model
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Departments: [Eng, Sales, Finance]"] --> S["<code>Select(d ⇒ d.Employees)</code>"]
     S --> N["[[Ada, Bilal], [Chiara, Dmitri, Esther], [Farah]]"]
     A --> M["<code>SelectMany(d ⇒ d.Employees)</code>"]

@@ -98,7 +98,7 @@ but the intent is clearer and the query is harder to get wrong. This is
 one of the small ergonomics that make DuckDB pleasant for fast analysis.
 
 ```mermaid
-flowchart LR
+flowchart TD
     S["<code>SELECT region, product,<br/>channel, SUM(amount)</code>"] --> A["<code>GROUP BY ALL</code>"]
     A --> G["Groups by the three<br/>non-aggregated columns"]
 ```

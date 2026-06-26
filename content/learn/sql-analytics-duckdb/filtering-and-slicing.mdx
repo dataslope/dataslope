@@ -53,7 +53,7 @@ Every business question hides a filter. "How are sales in the West?" means
 Learning to *hear* the filter inside a question is half of analytical SQL.
 
 ```mermaid
-flowchart LR
+flowchart TD
     All[("Whole dataset")] --> F["<code>WHERE</code><br/>(the slice)"]
     F --> Sub[("Just the rows<br/>the question is about")]
     Sub --> A["Summarize / inspect"]
@@ -252,7 +252,7 @@ Filtering early is both a performance habit and a clarity habit:
   easier to think about.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Big[("10M rows")] --> W["WHERE early"]
     W --> Small[("10K relevant rows")]
     Small --> Cheap["Cheap, clear<br/>analysis"]

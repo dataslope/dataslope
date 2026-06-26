@@ -62,7 +62,7 @@ You cannot escape both at once. The minimum total error is the
 **sweet spot**, and finding it is a recurring design problem.
 
 ```mermaid
-flowchart LR
+flowchart TD
     L[Large h] -->|truncation dominates| M[Optimal h]
     S[Small h] -->|round-off dominates| M
     M --> A[Minimum total error]

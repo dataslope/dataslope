@@ -298,7 +298,7 @@ word "database" for two related things:
   surviving crashes.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Your app"] -->|"sends SQL"| C["SQLite<br/>the DBMS"]
     C -->|"manages"| B[("Database file<br/>the data")]
 ```

@@ -1,6 +1,6 @@
 ---
 title: Machine Learning
-description: Data Scientist ML interview questions — bias–variance, regularization, cross-validation, metrics — with answers, concept checks, and a runnable metrics challenge.
+description: Data Scientist Machine Learning interview questions — bias–variance, regularization, cross-validation, metrics — with answers, concept checks, and a runnable metrics challenge.
 ---
 
 Modeling questions probe whether you understand generalization, not just
@@ -31,6 +31,10 @@ drive coefficients to **exactly zero**, performing feature selection
 (sparse models). **L2 (ridge)** shrinks them toward zero but rarely to
 zero. Elastic net combines both.
 
+The code fits both penalties on the same data and prints `ridge.coef_`
+versus `lasso.coef_`, so you can see lasso zero out a coefficient while
+ridge only shrinks it.
+
 <CodeBlock
   adapter="python"
   files={[
@@ -58,6 +62,10 @@ estimate of generalization that also uses all data for both training and
 validation across folds. For time series, use a **forward-chaining**
 split (never validate on the past).
 
+Here `cross_val_score` runs a `LogisticRegression` across 5 folds on the
+iris data and reports the mean accuracy with its standard deviation, so
+the spread tells you how stable the estimate is.
+
 <CodeBlock
   adapter="python"
   files={[
@@ -83,6 +91,19 @@ are costly (disease screening, fraud); favor **precision** when false
 alarms are costly (spam filters flagging real mail). **F1** balances the
 two.
 
+| | Predicted positive | Predicted negative |
+| --- | --- | --- |
+| **Actually positive** | True Positive (TP) | False Negative (FN) |
+| **Actually negative** | False Positive (FP) | True Negative (TN) |
+
+$$\text{Precision} = \frac{TP}{TP + FP} \qquad \text{Recall} = \frac{TP}{TP + FN}$$
+
+$$F_1 = 2 \cdot \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}$$
+
+The code computes `precision_score`, `recall_score`, and `f1_score` on the
+same `y_true`/`y_pred` pair so you can map each number back to the table
+above.
+
 <CodeBlock
   adapter="python"
   files={[
@@ -102,10 +123,14 @@ print(f"F1:        {f1_score(y_true, y_pred):.2f}")
 
 ### What is ROC-AUC and when is PR-AUC preferred?
 
-**ROC-AUC** is the area under the Receiver Operating Characteristic curve (TPR vs FPR across thresholds).
-An AUC of 0.5 is random; 1.0 is perfect.
+**ROC-AUC** is the area under the Receiver Operating Characteristic curve (true positive rate, TPR, vs false positive rate, FPR, across thresholds).
+An AUC of $0.5$ is random; $1.0$ is perfect.
 On highly imbalanced datasets, ROC-AUC can be optimistic because it includes many true negatives in the FPR denominator.
 **PR-AUC** (precision-recall AUC) focuses only on the positive class and better reflects performance when positives are rare.
+
+The code scores the same predictions with `roc_auc_score` and
+`average_precision_score`, letting you compare ROC-AUC against PR-AUC on
+one set of probabilities.
 
 <CodeBlock
   adapter="python"
@@ -127,7 +152,7 @@ print(f"PR-AUC:  {average_precision_score(y_true, y_score):.3f}")
 
 **Gradient descent** minimizes a loss function by iteratively stepping in the direction of the negative gradient.
 **Learning rate** controls step size: too large and it overshoots or diverges; too small and training is slow.
-**SGD** uses one example per step (noisy but fast per iteration); **mini-batch SGD** uses small batches; **Adam** adapts the learning rate per parameter using momentum and RMS scaling.
+**Stochastic gradient descent (SGD)** uses one example per step (noisy but fast per iteration); **mini-batch SGD** uses small batches; **Adam** adapts the learning rate per parameter using momentum and root-mean-square scaling.
 
 ### What is the difference between bagging and boosting?
 
@@ -138,9 +163,13 @@ Bagging is more robust to noise; boosting often achieves higher accuracy but is 
 ### How does a Random Forest work?
 
 Random Forest builds many decision trees on bootstrap samples of the training data.
-At each split it considers only a random subset of features (`sqrt(p)` for classification, `p/3` for regression by default), which decorrelates the trees.
+At each split it considers only a random subset of features ($\sqrt{p}$ for classification, $p/3$ for regression by default), which decorrelates the trees.
 Final predictions are made by majority vote (classification) or averaging (regression).
 The combination of row sampling and feature sampling reduces variance without greatly increasing bias.
+
+The code trains a `RandomForestClassifier` on a synthetic dataset and
+reports test `roc_auc_score` from `predict_proba`, showing the ensemble in
+end-to-end use.
 
 <CodeBlock
   adapter="python"
@@ -165,7 +194,13 @@ print(f"ROC-AUC: {roc_auc_score(y_test, rf.predict_proba(X_test)[:, 1]):.3f}")
 
 **RMSE** (Root Mean Squared Error) penalizes large errors quadratically; sensitive to outliers. Use when large errors are especially costly.
 **MAE** (Mean Absolute Error) is more robust to outliers and interpretable in the same units as the target.
-**R-squared** measures the fraction of variance in the target explained by the model (1 is perfect; 0 means no better than the mean). It is scale-free, making it useful for comparing across datasets.
+**R-squared** ($R^2$) measures the fraction of variance in the target explained by the model (1 is perfect; 0 means no better than the mean). It is scale-free, making it useful for comparing across datasets.
+
+The root mean squared error is $\text{RMSE} = \sqrt{\frac{1}{n}\sum (y_i - \hat{y}_i)^2}$.
+
+The code evaluates the same `y_true`/`y_pred` arrays with
+`mean_squared_error` (wrapped in `np.sqrt` for RMSE), `mean_absolute_error`,
+and `r2_score` so you can contrast all three on identical predictions.
 
 <CodeBlock
   adapter="python"
@@ -188,8 +223,12 @@ print(f"R²:   {r2_score(y_true, y_pred):.3f}")
 ### What is feature scaling and when is it necessary?
 
 Feature scaling (standardization or min-max normalization) puts features on a comparable scale.
-It is **necessary** for distance-based models (kNN, SVM, k-means) and gradient descent-based models (logistic/linear regression, neural nets) because unscaled features bias distances and gradient steps.
+It is **necessary** for distance-based models — k-Nearest Neighbors (kNN), support vector machines (SVM), k-means — and gradient descent-based models (logistic/linear regression, neural nets) because unscaled features bias distances and gradient steps.
 Tree-based models (decision trees, random forests, GBMs) are **invariant** to monotonic feature transforms and do not require scaling.
+
+The code applies `StandardScaler` to a matrix whose two columns live on
+very different scales, and prints the result with mean near 0 and standard
+deviation near 1.
 
 <CodeBlock
   adapter="python"
@@ -224,6 +263,10 @@ Common strategies:
 **Target encoding** replaces a category with the mean target value within that category; powerful but risks leakage without careful cross-validation.
 High-cardinality categoricals can also be handled with embeddings in neural nets or frequency encoding.
 
+The code runs `OneHotEncoder` on a single `color` column and prints
+`get_feature_names_out()` alongside the encoded matrix, one binary column
+per category.
+
 <CodeBlock
   adapter="python"
   files={[
@@ -248,6 +291,10 @@ print(encoded)
 It reduces dimensionality while preserving as much variance as possible, useful for visualization, noise reduction, and removing multicollinearity.
 PCA requires centered (and usually scaled) data and assumes linear structure.
 
+The code scales the iris features, fits `PCA(n_components=2)`, and prints
+`explained_variance_ratio_` so you can see how much variance the first two
+components retain.
+
 <CodeBlock
   adapter="python"
   files={[
@@ -270,14 +317,18 @@ print("Explained variance ratio:", pca.explained_variance_ratio_.round(3))
 ### What is the curse of dimensionality?
 
 As dimensionality grows, data becomes increasingly sparse: the volume of the space grows exponentially and the nearest neighbor becomes almost as far as the farthest neighbor.
-This hurts distance-based methods (kNN, SVM with RBF kernel, k-means) and increases the sample size needed to learn accurate models.
+This hurts distance-based methods — kNN, SVM with a radial basis function (RBF) kernel, k-means — and increases the sample size needed to learn accurate models.
 Remedies include dimensionality reduction (PCA, autoencoders), feature selection, and regularization.
 
 ### What is logistic regression and how does it output probabilities?
 
-Logistic regression models the log-odds of the positive class as a linear combination of features, then passes it through the **sigmoid** function `sigma(z) = 1 / (1 + exp(-z))` to produce a probability between 0 and 1.
+Logistic regression models the log-odds of the positive class as a linear combination of features, then passes it through the **sigmoid** function $\sigma(z) = \frac{1}{1 + e^{-z}}$ to produce a probability between 0 and 1.
 It is trained by maximizing log-likelihood (equivalent to minimizing binary cross-entropy).
 Despite its name it is a classification model; it is interpretable, fast, and often a strong baseline.
+
+The code fits `LogisticRegression` and calls `predict_proba` on the first
+three test rows, printing per-class probabilities to show the sigmoid
+output in action.
 
 <CodeBlock
   adapter="python"
@@ -303,7 +354,7 @@ print(f"Test accuracy: {accuracy_score(y_test, model.predict(X_test)):.3f}")
 ### What is the difference between a generative and a discriminative model?
 
 A **discriminative model** learns `P(y|x)` directly — the conditional probability of the label given input (logistic regression, SVM, neural nets).
-A **generative model** learns the joint `P(x, y)` or the data distribution per class (Naive Bayes, GMM), then applies Bayes' theorem to classify.
+A **generative model** learns the joint `P(x, y)` or the data distribution per class — Naive Bayes, Gaussian mixture model (GMM) — then applies Bayes' theorem to classify.
 Generative models can generate new data and work better with limited labeled data; discriminative models typically achieve higher classification accuracy with enough labeled data.
 
 ### How does a decision tree split?
@@ -326,6 +377,10 @@ It minimizes within-cluster sum of squared distances.
 Limitations: requires specifying k, sensitive to initialization (use k-means++ to mitigate), assumes spherical clusters, and is sensitive to outliers.
 Use the elbow method or silhouette score to choose k.
 
+The code fits `KMeans` on three blobs and prints both `inertia_`
+(within-cluster sum of squares) and `silhouette_score`, the two numbers you
+would compare across candidate values of k.
+
 <CodeBlock
   adapter="python"
   files={[
@@ -346,7 +401,7 @@ print("Silhouette:", round(silhouette_score(X, km.labels_), 3))
 
 ### What is elastic net regularization?
 
-**Elastic net** combines L1 (lasso) and L2 (ridge) penalties: `alpha * L1 + (1 - alpha) * L2`.
+**Elastic net** combines L1 (lasso) and L2 (ridge) penalties: $\alpha \cdot \text{L1} + (1-\alpha)\cdot \text{L2}$.
 It inherits lasso's sparsity (feature selection) and ridge's stability when features are highly correlated.
 It is useful when you have many correlated features and want a sparse but stable solution.
 
@@ -356,6 +411,10 @@ Feature selection reduces the number of input features to decrease overfitting, 
 **Filter methods** score features independently of the model (correlation, mutual information, chi-square).
 **Wrapper methods** train a model on feature subsets (recursive feature elimination, RFE).
 **Embedded methods** perform selection during training (L1 regularization, tree feature importances).
+
+The code wraps `LogisticRegression` in `RFE` to keep the five strongest
+features of the breast-cancer dataset and prints their indices via
+`get_support`.
 
 <CodeBlock
   adapter="python"
@@ -377,7 +436,7 @@ print("Selected feature indices:", selector.get_support(indices=True))
 
 ### How does cross-entropy loss differ from MSE for classification?
 
-For binary classification, **cross-entropy** loss is `-(y * log(p) + (1-y) * log(1-p))`.
+For binary classification, **cross-entropy** loss is $-\bigl(y\log p + (1-y)\log(1-p)\bigr)$.
 It penalizes confident wrong predictions very heavily (log goes to infinity near 0), which drives the model to produce well-calibrated probabilities.
 MSE on probabilities has a flatter gradient near saturation, causing slow learning; cross-entropy is the correct choice for classification with sigmoid/softmax outputs.
 
@@ -397,7 +456,7 @@ Simpler models that perform comparably should be preferred.
 
 ### What is the difference between linear and logistic regression for a binary target?
 
-**Linear regression** predicts a continuous output and is unbounded; it can produce predictions outside `[0, 1]` and its residuals are heteroscedastic for binary targets, violating OLS assumptions.
+**Linear regression** predicts a continuous output and is unbounded; it can produce predictions outside `[0, 1]` and its residuals are heteroscedastic for binary targets, violating ordinary least squares (OLS) assumptions.
 **Logistic regression** maps a linear combination of features through the sigmoid to a probability in `[0, 1]` and is trained with maximum likelihood / cross-entropy, which is appropriate for binary outcomes.
 
 ### What is gradient boosting and how does it differ from AdaBoost?

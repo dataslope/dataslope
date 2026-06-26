@@ -77,7 +77,7 @@ well-clustered if it is **close to its own cluster** and **far from the
 nearest other cluster**. For each point `i`:
 
 ```mermaid
-flowchart LR
+flowchart TD
     P["A point i in cluster C"] --> A["a(i) = mean distance to the<br/>other points in C (cohesion)"]
     P --> B["b(i) = mean distance to points in the<br/>nearest other cluster (separation)"]
     A --> S["silhouette s(i) = (b - a) / <code>max(a, b)</code>"]

@@ -138,7 +138,7 @@ says what it is. This is how analysts write queries they can revisit a
 month later and still understand.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["WITH paid<br/>(filter)"] --> B["<code>per_region</code><br/>(aggregate)"]
     B --> C["final SELECT<br/>(filter + sort)"]
 ```

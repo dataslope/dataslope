@@ -63,7 +63,7 @@ reconstruct the ratio from two separate columns and you have made its job
 harder for no reason.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["raw columns<br/>rooms, people, date, ..."] --> B["feature engineering<br/>ratios, bins, date parts, interactions"]
     B --> C["engineered features<br/>signal made visible"]
     C --> D["model<br/>learns the pattern easily"]

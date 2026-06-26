@@ -12,32 +12,33 @@ browser.
 ### What is Big-O notation, and why do interviewers care?
 
 Big-O describes how an algorithm's time or space grows with input size
-**n**, ignoring constants — O(1), O(log n), O(n), O(n log n), O(n²), …
-Interviewers care because it predicts whether a solution scales: an O(n²)
-double loop that's fine for 100 items melts at 1,000,000. The usual game
-is "make this brute-force O(n²) into O(n) with the right data structure."
+**n**, ignoring constants — $O(1)$, $O(\log n)$, $O(n)$, $O(n \log n)$,
+$O(n^2)$, … Interviewers care because it predicts whether a solution
+scales: an $O(n^2)$ double loop that's fine for 100 items melts at
+1,000,000. The usual game is "make this brute-force $O(n^2)$ into $O(n)$
+with the right data structure."
 
 ### When do you reach for a hash map?
 
-When you need **O(1) average lookup/insert by key** — membership tests,
+When you need **$O(1)$ average lookup/insert by key** — membership tests,
 counting frequencies, grouping, or "have I seen this before?" It's what
-turns many O(n²) "compare all pairs" problems into a single O(n) pass
+turns many $O(n^2)$ "compare all pairs" problems into a single $O(n)$ pass
 (see Two Sum below).
 
 ### Array vs linked list — trade-offs?
 
-**Arrays**: O(1) random access by index, cache-friendly, but O(n) insert
-/delete in the middle. **Linked lists**: O(1) insert/delete given the
-node, but O(n) access and poor cache locality. Most day-to-day code
+**Arrays**: $O(1)$ random access by index, cache-friendly, but $O(n)$
+insert/delete in the middle. **Linked lists**: $O(1)$ insert/delete given
+the node, but $O(n)$ access and poor cache locality. Most day-to-day code
 favors dynamic arrays; linked lists shine for frequent splice operations
-or as building blocks (queues, LRU caches).
+or as building blocks (queues, least-recently-used (LRU) caches).
 
 ### When is a stack the right structure?
 
 When the problem is about the **most recently seen** item — matching/
-nesting (parentheses), undo, backtracking, or DFS. Its LIFO order encodes
-"close the thing you opened last," which a counter can't (see Valid
-Parentheses).
+nesting (parentheses), undo, backtracking, or depth-first search (DFS).
+Its last-in-first-out (LIFO) order encodes "close the thing you opened
+last," which a counter can't (see Valid Parentheses).
 
 ### Recursion vs iteration?
 
@@ -51,18 +52,20 @@ factor. Convert recursion to iteration when depth can be large.
 
 Amortized analysis spreads the cost of occasional expensive operations
 across many cheap ones. A dynamic array (Python `list`) appends in
-amortized O(1): most appends are O(1), but every doubling resize is O(n).
-Because doublings become exponentially rare, the average per-operation
-cost stays O(1). Similarly, a hash table rehash is amortized O(1) per
-insert.
+amortized $O(1)$: most appends are $O(1)$, but every doubling resize is
+$O(n)$. Because doublings become exponentially rare, the average
+per-operation cost stays $O(1)$. Similarly, a hash table rehash is
+amortized $O(1)$ per insert.
 
 ### What are the time complexities of heap operations?
 
-A binary heap supports `insert` in `O(log n)` (bubble up), `extract-min`
-or `extract-max` in `O(log n)` (sift down), and `peek` in O(1). Building
-a heap from n elements is O(n) via heapify — not `O(n log n)` — because
-most nodes are near the leaves and travel very little. Python's `heapq`
-module is a min-heap.
+A binary heap supports `insert` in $O(\log n)$ (bubble up), `extract-min`
+or `extract-max` in $O(\log n)$ (sift down), and `peek` in $O(1)$.
+Building a heap from n elements is $O(n)$ via heapify — not
+$O(n \log n)$ — because most nodes are near the leaves and travel very
+little. Python's `heapq` module is a min-heap. The snippet below uses
+`heapify` to build the heap in place, then `heappush` and `heappop` to
+add and remove the smallest element.
 
 <CodeBlock
   adapter="python"
@@ -80,27 +83,42 @@ print(heapq.heappop(h))  # 1  — O(log n)`,
 
 ### How does a priority queue differ from a regular queue?
 
-A queue is FIFO — elements leave in insertion order. A priority queue
-always removes the element with the highest (or lowest) priority, regardless
-of insertion order. It is commonly implemented with a heap, giving
-`O(log n)` push and pop. Use it for Dijkstra's algorithm, task schedulers,
-and merge-k-sorted-lists.
+A queue is first-in-first-out (FIFO) — elements leave in insertion order.
+A priority queue always removes the element with the highest (or lowest)
+priority, regardless of insertion order. It is commonly implemented with a
+heap, giving $O(\log n)$ push and pop. Use it for Dijkstra's algorithm,
+task schedulers, and merge-k-sorted-lists.
 
 ### What is a deque, and when should you prefer it over a list?
 
-A deque (double-ended queue) supports O(1) append and pop from **both**
+A deque (double-ended queue) supports $O(1)$ append and pop from **both**
 ends. Python's `collections.deque` is implemented as a doubly-linked list
-of fixed-size blocks. Use it when you need a sliding-window buffer, a BFS
-queue, or any "add to one end, remove from other end" pattern. `list.pop(0)`
-is O(n) and should be replaced with `deque.popleft()`.
+of fixed-size blocks. Use it when you need a sliding-window buffer, a
+breadth-first search (BFS) queue, or any "add to one end, remove from
+other end" pattern. `list.pop(0)` is $O(n)$ and should be replaced with
+`deque.popleft()`.
 
 ### Walk me through BFS vs DFS — when do you choose each?
 
-BFS (breadth-first search) uses a queue and explores level by level,
-guaranteeing the **shortest path** in an unweighted graph. DFS uses a
-stack (or recursion) and dives deep first — natural for cycle detection,
-topological sort, connected components, and backtracking. BFS memory usage
-can be O(n) at the widest level; DFS memory is proportional to depth.
+BFS uses a queue and explores level by level, guaranteeing the
+**shortest path** in an unweighted graph. DFS uses a stack (or recursion)
+and dives deep first — natural for cycle detection, topological sort,
+connected components, and backtracking. BFS memory usage can be $O(n)$ at
+the widest level; DFS memory is proportional to depth.
+
+The example graph below has `A` branching to `B` and `C`, which both lead
+to `D`; breadth-first search visits it level by level as `A, B, C, D`:
+
+```mermaid
+flowchart TD
+  A --> B
+  A --> C
+  B --> D
+  C --> D
+```
+
+The `bfs` function below uses a `deque` as the queue and a `visited` set so
+each node is enqueued at most once.
 
 <CodeBlock
   adapter="python"
@@ -166,11 +184,13 @@ print(has_cycle(cyclic))   # True`,
 
 ### What is topological sort, and when is it applicable?
 
-Topological sort orders the nodes of a **directed acyclic graph** (DAG)
+Topological sort orders the nodes of a **directed acyclic graph (DAG)**
 so every edge goes from earlier to later. It's used for build-dependency
 resolution, course prerequisites, and task scheduling. Kahn's algorithm
 (iteratively remove nodes with in-degree 0) or DFS post-order both work
-in `O(V + E)`.
+in $O(V + E)$. The `topo_sort` function below implements the Kahn variant:
+it builds an `in_degree` map, seeds a queue with the zero-in-degree nodes,
+then peels them off one layer at a time.
 
 <CodeBlock
   adapter="python"
@@ -207,9 +227,12 @@ print(topo_sort(graph))  # e.g. ['A', 'B', 'C', 'D']`,
 
 Dijkstra finds the shortest path from a source to all other nodes in a
 graph with **non-negative** edge weights. It uses a min-heap of
-`(distance, node)` pairs. Each node is processed once; each edge relaxation
-costs `O(log V)` for the heap update. Total: `O((V + E) log V)`. It
-fails with negative weights — use Bellman-Ford there.
+`(distance, node)` pairs. Each node is processed once; each edge
+relaxation costs $O(\log V)$ for the heap update. Total:
+$O((V + E)\log V)$. It fails with negative weights — use Bellman-Ford
+there. In the `dijkstra` function below, the `dist` dict holds the best
+known distance and the stale-entry check (`if d > dist.get(u, ...)`) skips
+heap entries that have already been improved.
 
 <CodeBlock
   adapter="python"
@@ -246,11 +269,14 @@ print(dijkstra(graph, "A"))  # {'A': 0, 'B': 1, 'C': 3, 'D': 4}`,
 
 ### What is a BST and what are its operation complexities?
 
-A binary search tree stores keys so that every left subtree node is
+A binary search tree (BST) stores keys so that every left subtree node is
 smaller and every right subtree node is larger. Search, insert, and delete
-are all `O(h)` where h is the tree height. For a balanced tree h = `O(log n)`;
-a degenerate (sorted-input) tree has h = O(n). Balanced BST variants like
-AVL trees and red-black trees guarantee `O(log n)`.
+are all $O(h)$ where h is the tree height. For a balanced tree
+h = $O(\log n)$; a degenerate (sorted-input) tree has h = $O(n)$. Balanced
+BST variants like AVL trees and red-black trees guarantee $O(\log n)$. The
+`bst_insert` function below walks left or right by comparison until it
+finds an empty slot, and `bst_search` follows the same path to locate a
+key.
 
 <CodeBlock
   adapter="python"
@@ -291,7 +317,9 @@ print(bst_search(root, 9))            # None`,
 In-order (left → root → right) visits BST nodes in **sorted** order.
 Pre-order (root → left → right) is useful for serializing a tree.
 Post-order (left → right → root) is useful for deletion or evaluating
-expression trees. All three are `O(n)`.
+expression trees. All three are $O(n)$. The `inorder` function below
+recurses left, prints the current node, then recurses right — yielding the
+keys in ascending order.
 
 <CodeBlock
   adapter="python"
@@ -329,7 +357,7 @@ inorder(root)  # prints 1 3 4 5 7 in sorted order`,
 ### What is a trie, and what problems is it suited for?
 
 A trie (prefix tree) stores strings character by character in a tree.
-Lookup, insert, and prefix search are all `O(L)` where L is the key
+Lookup, insert, and prefix search are all $O(L)$ where L is the key
 length — independent of how many keys are stored. It excels at
 autocomplete, spell-check, and IP routing tables. The trade-off is higher
 memory than a hash map for sparse key sets.
@@ -340,7 +368,9 @@ Binary search requires a **sorted, random-access** collection. The classic
 mistake is the off-by-one error in the loop bounds (`lo < hi` vs `lo <= hi`)
 and the midpoint overflow: use `mid = lo + (hi - lo) // 2` rather than
 `(lo + hi) // 2` (matters in languages with fixed-width integers). Variants
-find the leftmost or rightmost insertion point.
+find the leftmost or rightmost insertion point. The `binary_search`
+function below uses the `lo <= hi` convention and halves the search range
+each iteration, returning the index or `-1`.
 
 <CodeBlock
   adapter="python"
@@ -371,8 +401,10 @@ print(binary_search(arr, 6))   # -1`,
 Two pointers start at opposite ends (or both at the start) and converge
 to avoid a nested loop. For "find pair summing to target in a sorted
 array," one pointer at the left and one at the right narrows the window
-in O(n) instead of `O(n^2)`. The same idea works for removing duplicates,
-palindrome checks, and merging sorted arrays.
+in $O(n)$ instead of $O(n^2)$. The same idea works for removing
+duplicates, palindrome checks, and merging sorted arrays. The
+`two_sum_sorted` function below moves `lo` up when the sum is too small
+and `hi` down when it is too large.
 
 <CodeBlock
   adapter="python"
@@ -401,9 +433,11 @@ print(two_sum_sorted([1, 2, 3, 4, 6], 10))  # None`,
 
 A sliding window maintains a contiguous subarray (or substring) of
 variable or fixed size, expanding and shrinking it rather than recomputing
-from scratch. It reduces many `O(n^2)` substring problems to O(n). For
+from scratch. It reduces many $O(n^2)$ substring problems to $O(n)$. For
 example, "longest substring without repeating characters" expands the
-right pointer and shrinks the left when a duplicate enters the window.
+right pointer and shrinks the left when a duplicate enters the window —
+exactly what `length_of_longest_substring` does below using the `seen`
+map of last-seen indices.
 
 <CodeBlock
   adapter="python"
@@ -430,10 +464,12 @@ print(length_of_longest_substring("pwwkew"))    # 3 ("wke")`,
 ### Explain merge sort and its complexity.
 
 Merge sort divides the array in half, recursively sorts each half, then
-merges the two sorted halves in O(n). The recurrence `T(n) = 2T(n/2) + O(n)`
-solves to `O(n log n)` by the Master Theorem. It is **stable** and
-performs well on linked lists, but requires O(n) extra space for the merge
-step. It is the basis for Python's Timsort.
+merges the two sorted halves in $O(n)$. The recurrence
+$T(n) = 2\,T(n/2) + O(n)$ solves to $O(n \log n)$ by the Master Theorem.
+It is **stable** and performs well on linked lists, but requires $O(n)$
+extra space for the merge step. It is the basis for Python's Timsort. The
+`merge_sort` function below recurses on `arr[:mid]` and `arr[mid:]`, then
+the while-loop interleaves the two sorted halves into `result`.
 
 <CodeBlock
   adapter="python"
@@ -462,11 +498,13 @@ print(merge_sort([38, 27, 43, 3, 9, 82, 10]))  # [3, 9, 10, 27, 38, 43, 82]`,
 ### How does quicksort work, and what is its worst-case?
 
 Quicksort picks a pivot, partitions elements into smaller and larger
-groups, and recurses. Average case is `O(n log n)`, but worst case is
-`O(n^2)` when the pivot is always the smallest or largest element (e.g.,
+groups, and recurses. Average case is $O(n \log n)$, but worst case is
+$O(n^2)$ when the pivot is always the smallest or largest element (e.g.,
 sorted input with a naive "pick last" pivot). Randomized pivot selection
 makes worst case extremely unlikely in practice. Quicksort is in-place
-(O(log n) stack space) unlike merge sort.
+($O(\log n)$ stack space) unlike merge sort. The `quicksort` function
+below chooses a random `pivot` and recurses on the `lo` and `hi`
+partitions around it.
 
 <CodeBlock
   adapter="python"
@@ -492,11 +530,11 @@ print(quicksort([3, 6, 8, 10, 1, 2, 1]))  # [1, 1, 2, 3, 6, 8, 10]`,
 
 ### When is heapsort preferable?
 
-Heapsort is `O(n log n)` worst-case and O(1) extra space — no recursion,
-no merge buffer. It is less cache-friendly than quicksort in practice, so
-real libraries rarely use it alone. Its main advantage is the guaranteed
-`O(n log n)` with constant space, useful for embedded or memory-constrained
-systems.
+Heapsort is $O(n \log n)$ worst-case and $O(1)$ extra space — no
+recursion, no merge buffer. It is less cache-friendly than quicksort in
+practice, so real libraries rarely use it alone. Its main advantage is the
+guaranteed $O(n \log n)$ with constant space, useful for embedded or
+memory-constrained systems.
 
 ### What makes a sort "stable," and why does it matter?
 
@@ -508,12 +546,14 @@ preserves the last-name ordering among ties. Python's built-in sort
 
 ### Explain memoization vs tabulation in dynamic programming.
 
-**Memoization** is top-down DP: recursively solve sub-problems and cache
-results so each is computed once. **Tabulation** is bottom-up: fill a
-table iteratively in dependency order. Memoization is often easier to
-write (matches the recursive definition) but has call-stack overhead.
-Tabulation avoids that and can be optimized to use O(1) space when only
-the last row is needed.
+**Memoization** is top-down dynamic programming (DP): recursively solve
+sub-problems and cache results so each is computed once. **Tabulation** is
+bottom-up: fill a table iteratively in dependency order. Memoization is
+often easier to write (matches the recursive definition) but has
+call-stack overhead. Tabulation avoids that and can be optimized to use
+$O(1)$ space when only the last row is needed. Below, `fib` uses
+`@lru_cache` to memoize, while `fib_tab` rolls two variables `a, b`
+bottom-up with no recursion.
 
 <CodeBlock
   adapter="python"
@@ -564,7 +604,9 @@ Backtracking is systematic trial-and-error: build candidates incrementally
 and abandon ("prune") a branch as soon as it cannot lead to a valid
 solution. It is used for N-Queens, Sudoku solver, permutations,
 combinations, and subset generation. The worst-case time is exponential,
-but pruning makes practical performance far better.
+but pruning makes practical performance far better. The `permutations`
+function below grows `path` one element at a time and calls `path.pop()`
+to undo each choice before trying the next.
 
 <CodeBlock
   adapter="python"
@@ -602,9 +644,11 @@ search are divide and conquer; Fibonacci and Knapsack are DP.
 
 Bit ops (AND, OR, XOR, shifts) are single CPU instructions. Useful tricks:
 `n & (n - 1)` clears the lowest set bit (test if power of two: `n & (n-1) == 0`),
-`x ^ x == 0` cancels pairs (find the single non-duplicate in O(n) time and
-O(1) space), and left-shifting by k multiplies by `2^k`. Bit sets can
-represent subsets in O(1) space per subset.
+`x ^ x == 0` cancels pairs (find the single non-duplicate in $O(n)$ time
+and $O(1)$ space), and left-shifting by k multiplies by $2^k$. Bit sets
+can represent subsets in $O(1)$ space per subset. The `single_number`
+function below XORs every element together so the duplicates cancel and
+the lone value remains.
 
 <CodeBlock
   adapter="python"
@@ -626,15 +670,15 @@ print(single_number([2, 2, 1]))         # 1`,
 
 ### What is the time and space complexity of a hash set?
 
-Average-case: O(1) insert, delete, and lookup; O(n) space. Worst-case
-(all keys collide) degrades to O(n) per operation. Python's `set` uses
+Average-case: $O(1)$ insert, delete, and lookup; $O(n)$ space. Worst-case
+(all keys collide) degrades to $O(n)$ per operation. Python's `set` uses
 open addressing with pseudo-random probing and resizes when the load
-factor exceeds ~2/3, maintaining near-O(1) average performance.
+factor exceeds ~2/3, maintaining near-$O(1)$ average performance.
 
 ### How does a balanced BST differ from a heap?
 
 Both are tree-based, but a balanced BST (AVL, red-black) maintains a
-sorted order across the entire tree, giving O(log n) for predecessor,
+sorted order across the entire tree, giving $O(\log n)$ for predecessor,
 successor, and range queries. A heap only guarantees the parent-child
 relationship (min or max at root), so it cannot answer "all elements
 between a and b" efficiently. Use a heap when you only need the min/max;
@@ -642,34 +686,45 @@ use a balanced BST for ordered iteration or range queries.
 
 ### What is the Master Theorem?
 
-The Master Theorem solves recurrences of the form `T(n) = aT(n/b) + O(n^d)`.
-If `d > log_b(a)`: `O(n^d)`. If `d == log_b(a)`: `O(n^d log n)`.
-If `d < log_b(a)`: `O(n^(log_b a))`. For merge sort `a=2, b=2, d=1`:
-`d == log_2(2) = 1`, so `O(n log n)`.
+The Master Theorem solves recurrences of the form
+
+$$T(n) = a\,T(n/b) + O(n^d)$$
+
+by comparing $d$ against $\log_b a$ across three cases:
+
+- $d > \log_b a \Rightarrow O(n^d)$
+- $d = \log_b a \Rightarrow O(n^d \log n)$
+- $d < \log_b a \Rightarrow O(n^{\log_b a})$
+
+For merge sort $a = 2$, $b = 2$, $d = 1$: since $d = \log_2 2 = 1$, we are
+in the middle case, so $O(n \log n)$.
 
 ### Explain the difference between in-place and out-of-place algorithms.
 
-An in-place algorithm uses only O(1) (or O(log n) for call stack) extra
-memory beyond the input. Out-of-place algorithms allocate auxiliary
+An in-place algorithm uses only $O(1)$ (or $O(\log n)$ for call stack)
+extra memory beyond the input. Out-of-place algorithms allocate auxiliary
 structures proportional to input size. Quicksort is in-place; merge sort
 is out-of-place. The trade-off is memory overhead vs simplicity and
 sometimes performance (cache effects).
 
 ### What graph representation should you use — adjacency list vs matrix?
 
-An adjacency **list** uses `O(V + E)` space and is efficient for sparse
-graphs; iterating over neighbors is O(degree). An adjacency **matrix**
-uses `O(V²)` space but gives O(1) edge-existence checks. For most
-interview problems (sparse graphs), an adjacency list (dict of lists) is
-preferred.
+An adjacency **list** uses $O(V + E)$ space and is efficient for sparse
+graphs; iterating over neighbors is $O(\text{degree})$. An adjacency
+**matrix** uses $O(V^2)$ space but gives $O(1)$ edge-existence checks. For
+most interview problems (sparse graphs), an adjacency list (dict of lists)
+is preferred.
 
 ### What is Kahn's algorithm and what does it detect?
 
 Kahn's algorithm iteratively removes nodes with in-degree 0 from a DAG,
-appending them to the topological order. It runs in `O(V + E)`. If the
+appending them to the topological order. It runs in $O(V + E)$. If the
 final order contains fewer than V nodes, at least one cycle exists and a
 full topological sort is impossible. It is an alternative to DFS-based
-topological sort and naturally detects cycles.
+topological sort and naturally detects cycles. The `kahns` function below
+takes an edge list, computes each node's `in_deg`, and drains the
+zero-in-degree queue — comparing `len(order)` against `num_nodes` to
+report a cycle.
 
 <CodeBlock
   adapter="python"

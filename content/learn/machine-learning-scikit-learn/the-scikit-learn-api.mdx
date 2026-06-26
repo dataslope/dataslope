@@ -83,7 +83,7 @@ The rhythm is almost always the same two beats: **fit, then use.** You `fit`
 on training data, then `predict` (or `transform`, or `score`) on new data.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Raw training data<br/>(<code>X_train</code>, <code>y_train</code>)"] -->|"<code>fit(X_train, y_train)</code>"| B["Fitted estimator<br/>(holds what it learned)"]
     C["New data<br/>(<code>X_new</code>)"] -->|"<code>predict(X_new)</code>"| B
     B --> D["Predictions<br/>(numbers, labels, or groups)"]

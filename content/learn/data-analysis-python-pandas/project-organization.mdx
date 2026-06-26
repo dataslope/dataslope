@@ -112,7 +112,7 @@ new step easy — `02.5-fix-encoding.ipynb` if you must.
 ## When to graduate to scripts
 
 ```mermaid
-flowchart LR
+flowchart TD
   N["Exploratory notebook<br/>(one-off, narrative)"] --> P{"Is it<br/>re-run regularly?"}
   P -- "No" --> N
   P -- "Yes" --> S["Promote to .py script<br/>or import shared logic from src/"]

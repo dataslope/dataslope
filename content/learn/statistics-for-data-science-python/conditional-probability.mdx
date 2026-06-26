@@ -129,7 +129,7 @@ is information you can exploit.
   shifts your beliefs about the other.
 
 ```mermaid
-flowchart LR
+flowchart TD
   A["Does knowing B change<br/>P of A?"] --> B{"P(A given B) = P(A)?"}
   B -->|"yes, unchanged"| C["INDEPENDENT<br/>(B is uninformative about A)"]
   B -->|"no, it shifts"| D["DEPENDENT<br/>(B carries information about A)"]

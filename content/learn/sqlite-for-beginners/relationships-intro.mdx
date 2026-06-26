@@ -73,7 +73,7 @@ Ada's phone number is copied in multiple rows. If it changes, you must find and 
 The relational solution is to store each fact once.
 
 ```mermaid
-flowchart LR
+flowchart TD
     BAD["Repeated customer details<br/>inside order rows"] --> GOOD["Separate tables"]
     GOOD --> C["customers<br/>customer details once"]
     GOOD --> O["orders<br/>order facts only"]
@@ -85,7 +85,7 @@ flowchart LR
 The customer table has a primary key: `customers.id`. The orders table stores a matching value: `orders.customer_id`.
 
 ```mermaid
-flowchart LR
+flowchart TD
     C["<code>customers.id</code><br/>primary key"]:::pk --> O["orders.<code>customer_id</code><br/>points to customer"]:::fk
     classDef pk fill:#fde68a,stroke:#b45309
     classDef fk fill:#dcfce7,stroke:#15803d
@@ -163,7 +163,7 @@ erDiagram
 ```
 
 ```mermaid
-flowchart LR
+flowchart TD
     P["Person row<br/>Maya"] --> PASS["Passport row<br/>Maya's passport"]
 ```
 

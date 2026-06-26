@@ -241,7 +241,7 @@ expected are close, no association; if they diverge a lot, the variables
 are linked.
 
 ```mermaid
-flowchart LR
+flowchart TD
   A["Two categorical columns<br/>(e.g. device, churned)"] --> B["pandas crosstab<br/>(contingency table of COUNTS)"]
   B --> C["<code>chi2_contingency</code><br/>compares observed vs expected"]
   C --> D{"<code>p &lt;= alpha</code>?"}

@@ -288,7 +288,7 @@ That separation is the heart of functional effect management.
 ## A diagram of the boundary
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Pure core<br/>builds IO/Task/Effect values] --> B[Edge<br/>interpreter / runtime]
     B --> C[(World)]
     C --> B

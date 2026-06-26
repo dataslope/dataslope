@@ -66,7 +66,7 @@ authoritative, *wrong* answers.
 </svg>
 
 ```mermaid
-flowchart LR
+flowchart TD
   A["Real data"] --> B["Fit a distribution<br/>(.fit -> parameters)"]
   B --> C["Sanity-check the fit<br/>(histogram overlay, Q-Q plot)"]
   C -->|"looks good"| D["Use the model:<br/>probabilities, thresholds, sims"]
@@ -287,7 +287,7 @@ A **Q–Q (quantile–quantile) plot** is the sharper check. The idea:
   means the model misses the data's shape there.
 
 ```mermaid
-flowchart LR
+flowchart TD
   A["Sample quantiles<br/>(sorted data)"] --> C["Scatter:<br/>sample vs theoretical"]
   B["Theoretical quantiles<br/>(from fitted model)"] --> C
   C --> D{"Points on a<br/>straight line?"}

@@ -261,7 +261,7 @@ The compiler is happy with just declarations. The linker demands at
 least one definition per used symbol — no more, no less.
 
 ```mermaid
-flowchart LR
+flowchart TD
     H["greetings.h<br/>void <code>say_hello(...)</code>"] -->|included by| M["<code>main.c</code>"]
     H -->|included by| G["<code>greetings.c</code>"]
     G -->|defines| BODY["body of<br/><code>say_hello</code>"]

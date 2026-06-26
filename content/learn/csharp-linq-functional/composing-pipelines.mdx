@@ -107,7 +107,7 @@ You're not limited to combining existing operators. `yield return`
 lets you implement entirely new ones, and they remain lazy.
 
 ```mermaid
-flowchart LR
+flowchart TD
     S[Source] --> O["Custom operator<br/>yield return"] --> N[Next stage]
     note["Each yield = one element, on demand"]
 ```
@@ -160,7 +160,7 @@ costs no extra memory.
 A well-composed pipeline tends to have four phases:
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Source] --> B[Filter] --> C[Shape] --> D[Aggregate / Materialize]
 ```
 

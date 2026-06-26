@@ -182,7 +182,7 @@ A small, classic distinction that helps you design methods:
   state. Example: `lamp.brightness()`, `account.balance()`.
 
 ```mermaid
-flowchart LR
+flowchart TD
     M["A method"] --> Q{Changes<br/>state?}
     Q -->|Yes| C["Command<br/>(usually void)"]
     Q -->|No| Y["Query<br/>(returns a value)"]

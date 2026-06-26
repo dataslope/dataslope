@@ -98,7 +98,7 @@ and it concentrates attention on **content words** (nouns, verbs, adjectives)
 that actually signal the topic.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Tokens:<br/>the, movie, was, great"] --> F{"In stopword list?"}
     F -->|"yes"| D["Dropped:<br/>the, was"]
     F -->|"no"| K["Kept (content words):<br/>movie, great"]

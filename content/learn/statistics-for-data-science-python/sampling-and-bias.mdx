@@ -100,7 +100,7 @@ contract that connects the sample you have to the population you care
 about.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Target population<br/>(who you want to describe)"] --> B{"How is the<br/>sample chosen?"}
     B -->|"random mechanism"| C["Representative sample<br/>(inference is licensed)"]
     B -->|"convenience / self-selection"| D["Biased sample<br/>(systematically off)"]
@@ -488,7 +488,7 @@ planes hit in the engines and cockpit weren't in the dataset — they
 when hit, were fatal.
 
 ```mermaid
-flowchart LR
+flowchart TD
     ALL["All planes sent out"] --> RET["Planes that RETURNED<br/>(the data you see)"]
     ALL --> LOST["Planes that were LOST<br/>(missing from the data)"]
     RET -->|"holes here = survivable"| WRONG["Armor the holes?<br/>(wrong)"]

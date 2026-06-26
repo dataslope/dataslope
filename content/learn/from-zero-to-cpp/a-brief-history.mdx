@@ -261,7 +261,7 @@ call `malloc` or `free` directly — you use `std::vector`,
 under the hood, but you rarely touch them.
 
 ```mermaid
-flowchart LR
+flowchart TD
     C[C: small + raw] --> CXX[C++: large + abstract]
     CXX --> M[Modern C++<br/>RAII, smart pointers,<br/>algorithms, ranges]
 ```

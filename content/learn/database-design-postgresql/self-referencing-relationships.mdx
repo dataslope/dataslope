@@ -78,7 +78,7 @@ A self-reference is still just a foreign key. The referenced table
 happens to be the same table.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Child["employees.<code>manager_id</code> = 2<br/>Mina's row"] -->|"FK -> PK"| Parent["<code>employees.id = 2</code><br/>Grace's row"]
 ```
 
@@ -201,7 +201,7 @@ as A parent of B, B parent of C, and C parent of A. It also does not
 stop a row from pointing to itself unless you add a check.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Good["Foreign key guarantees:<br/>parent row exists"] --> Not["Does not automatically guarantee:<br/>no cycles"]
     Not --> Extra["Extra rules may be needed<br/>for strict trees"]
 ```

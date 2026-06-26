@@ -57,7 +57,7 @@ roughly independent contributions, its distribution drifts toward a bell
 curve — *regardless* of what the individual pieces look like.
 
 ```mermaid
-flowchart LR
+flowchart TD
   A["Many small,<br/>independent effects"] --> B["They add up"]
   B --> C["The sum looks<br/>bell-shaped"]
   C --> D["Normal distribution<br/>(emerges naturally)"]
@@ -236,7 +236,7 @@ a temperature on equal footing. The distribution of z-scores is the
 arguments.
 
 ```mermaid
-flowchart LR
+flowchart TD
   A["raw value x<br/>(score, height, ...)"] -->|"z = (x − mu) / sigma"| B["z-score<br/>(SDs from the mean)"]
   B -->|"<code>norm.cdf(z)</code>"| C["percentile<br/>(fraction below)"]
   C -->|"<code>norm.ppf(p)</code>"| B

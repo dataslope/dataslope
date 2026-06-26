@@ -162,7 +162,7 @@ one student has many enrollment rows, and one course has many
 enrollment rows.
 
 ```mermaid
-flowchart LR
+flowchart TD
     MN["Conceptual M:N<br/>students to courses"] --> J["Add enrollments<br/>one row per pairing"]
     J --> L["students 1:N enrollments"]
     J --> R["courses 1:N enrollments"]

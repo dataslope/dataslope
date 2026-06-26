@@ -213,7 +213,7 @@ if orders ship to saved addresses, or if addresses need their own
 validation and history.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Customer["Customer"] --> Simple["email<br/>single value"]
     Customer --> Complex["addresses<br/>many saved places"]
     Complex --> AddressEntity["Address entity"]

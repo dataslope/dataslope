@@ -201,7 +201,7 @@ behavior is the price of that honesty — and `IS NULL` plus
 `COALESCE` make it manageable.
 
 ```mermaid
-flowchart LR
+flowchart TD
     M["Missing real data"] --> N["Store NULL<br/>(honest 'unknown')"]
     N --> T1["Test with IS NULL"]
     N --> T2["Display with COALESCE"]

@@ -107,7 +107,7 @@ due_date: 2026-04-15
 SQLite stores those facts as a row in a table.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["To-do app"] --> B["Save task"]
     B --> C["tasks table"]
     C --> D[("SQLite database file")]
@@ -204,7 +204,7 @@ The application owns the buttons, forms, pages, images, and interactions.
 The database owns the stored facts.
 
 ```mermaid
-flowchart LR
+flowchart TD
     U["User"] --> A["Application screen"]
     A --> S["SQLite"]
     S --> D[("Database file")]
@@ -258,7 +258,7 @@ Examples:
 - "Find products under $50."
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[("Many saved rows")] --> B["SQL question"]
     B --> C["Small useful answer"]
 ```

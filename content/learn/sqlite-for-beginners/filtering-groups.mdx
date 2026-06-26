@@ -70,7 +70,7 @@ These are not row-by-row conditions. They are conditions about **groups after ag
 `WHERE` runs before grouping. At that moment, there are only individual rows. There are no group totals yet, so `WHERE COUNT(*) > 2` does not make sense.
 
 ```mermaid
-flowchart LR
+flowchart TD
     From["<code>FROM</code><br/>read rows"] --> Where["<code>WHERE</code><br/>filter individual rows"]
     Where --> Group["<code>GROUP BY</code><br/>form groups"]
     Group --> Having["<code>HAVING</code><br/>filter groups"]

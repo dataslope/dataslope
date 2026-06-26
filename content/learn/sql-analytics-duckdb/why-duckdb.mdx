@@ -82,7 +82,7 @@ For a single analyst poking at a few gigabytes on a laptop, both are
 overkill. DuckDB fills exactly that gap.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Transactional DB<br/>(row store, needs a server)"] -- "too slow for<br/>big scans" --> Gap["The analyst's gap"]
     B["Cloud warehouse<br/>(heavy, needs setup and cost)"] -- "too much overhead<br/>for quick analysis" --> Gap
     Gap --> D["DuckDB<br/>(fast, in-process,<br/>zero setup)"]
@@ -140,7 +140,7 @@ DuckDB rarely replaces the cloud warehouse or the app's database. It sits
   transformation steps.
 
 ```mermaid
-flowchart LR
+flowchart TD
     W[("Warehouse /<br/>app database")] -- "export sample" --> F["CSV / Parquet<br/>file"]
     F --> Duck["DuckDB<br/>(local exploration)"]
     Duck --> Insight["Charts, reports,<br/>decisions"]

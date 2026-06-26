@@ -72,7 +72,7 @@ the bridge between **data too big to read** and **knowledge small enough
 to act on**.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Many[("Many rows<br/>(5 salaries)")] --> Agg["Aggregate<br/>function"]
     Agg --> One["One summary value<br/>(e.g. the average)"]
 ```
@@ -261,7 +261,7 @@ WHERE
 />
 
 ```mermaid
-flowchart LR
+flowchart TD
     T[("orders")] --> W["<code>WHERE amount &gt; 50</code>"]
     W --> A["AVG(amount),<br/>COUNT(*)"]
     A --> R["summary of the<br/>filtered slice"]

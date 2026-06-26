@@ -87,7 +87,7 @@ the declared type. For this course, we work with ordinary flexible
 tables, because understanding them is understanding SQLite.
 
 ```mermaid
-flowchart LR
+flowchart TD
     V["Value to store"] --> C["Column affinity<br/>preferred kind"]
     C --> T{"Can SQLite convert it<br/>without losing the idea?"}
     T -->|"yes"| CONVERT["Store converted value"]

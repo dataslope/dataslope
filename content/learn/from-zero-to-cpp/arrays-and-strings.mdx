@@ -61,7 +61,7 @@ This puts five `int`s in **contiguous** memory. The size is part of
 the type (`int[5]`) and is fixed at compile time.
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph "scores[5]"
         S0[90] --- S1[85] --- S2[72] --- S3[95] --- S4[88]
     end
@@ -162,7 +162,7 @@ int main() {
 Under the hood:
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph Stack
         V["v: <code>std::vector&lt;int&gt;</code><br/>size=3, capacity=4<br/>data: 0x6020a0"]
     end

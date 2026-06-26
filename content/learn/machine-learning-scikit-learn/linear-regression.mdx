@@ -110,7 +110,7 @@ smallest possible total. That criterion has a name — **least squares** — and
 it is what `LinearRegression` solves for you.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Cloud of points<br/>(feature x, target y)"] --> B["Try a straight line<br/>y = intercept + slope * x"]
     B --> C["Measure residuals<br/>(vertical gaps to the line)"]
     C --> D["Square them and add up<br/>(total squared error)"]

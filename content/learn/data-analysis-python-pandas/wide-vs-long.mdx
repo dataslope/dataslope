@@ -112,7 +112,7 @@ variable (year) — but they are sitting in column names. That's
 the tell-tale sign of "untidy" data.
 
 ```mermaid
-flowchart LR
+flowchart TD
   W["WIDE<br/>Columns = years"] -->|melt| L["LONG<br/>One row per person-year"]
   L -->|pivot| W
 ```

@@ -163,7 +163,7 @@ export type User = {
 Both `service.ts` and `client.ts` import from `types.ts`. If you add a field to `User`, both sides see it immediately. If the service forgets to include it, the compiler complains.
 
 ```mermaid
-graph LR
+graph TD
     A["<code>types.ts</code><br/>Shared Contract"] --> B["<code>service.ts</code><br/>Producer"]
     A --> C["<code>client.ts</code><br/>Consumer"]
     B --> D[Runtime]

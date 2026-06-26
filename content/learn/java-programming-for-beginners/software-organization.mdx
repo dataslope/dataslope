@@ -126,7 +126,7 @@ We met this idea in the interfaces chapter; here we see why it
 matters at the system level.
 
 ```mermaid
-flowchart LR
+flowchart TD
     S["Service: OrderProcessor"] --> I[OrderRepository<br/>interface]
     I -.->|implemented by| H1[InMemoryRepo<br/>for tests]
     I -.->|implemented by| H2[PostgresRepo<br/>for production]

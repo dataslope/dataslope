@@ -97,7 +97,7 @@ WASI). That is what we mean by "contiguous": no gaps, no indirection,
 no per-element header.
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph Mem["Memory"]
         A0["<code>nums[0]<br/>10</code>"] --> A1["<code>nums[1]<br/>20</code>"] --> A2["<code>nums[2]<br/>30</code>"] --> A3["<code>nums[3]<br/>40</code>"] --> A4["<code>nums[4]<br/>50</code>"]
     end

@@ -119,7 +119,7 @@ ORDER BY
 />
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["unsorted result rows"] --> B["<code>ORDER BY price DESC</code><br/>sort high to low"]
     B --> C["ordered result rows"]
 ```
@@ -241,7 +241,7 @@ cheapest three, newest three, or first three alphabetically, sort first.
 with `LIMIT`, it is how websites make pages of results.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["all matching rows"] --> S["<code>ORDER BY</code><br/>sort rows"]
     S --> O["<code>OFFSET 2</code><br/>skip two"]
     O --> L["<code>LIMIT 2</code><br/>take two"]
@@ -286,7 +286,7 @@ next two.
 When these clauses appear together, write them in this order:
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["<code>SELECT</code><br/>columns"] --> B["<code>FROM<br/>table</code>"]
     B --> C["<code>WHERE</code><br/>filter rows"]
     C --> D["<code>ORDER BY</code><br/>sort rows"]

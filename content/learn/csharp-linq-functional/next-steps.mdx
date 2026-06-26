@@ -132,7 +132,7 @@ operators for `IAsyncEnumerable<T>`. Async iterators (`async` methods
 that `yield return`) make defining sources delightful.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["<code>IAsyncEnumerable&lt;T&gt;</code>"] --> W["<code>WhereAwait / WhereAsync</code>"]
       --> S["<code>SelectAwait / SelectAsync</code>"]
       --> AF["await foreach"]

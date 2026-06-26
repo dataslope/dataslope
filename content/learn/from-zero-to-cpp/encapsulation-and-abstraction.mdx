@@ -71,7 +71,7 @@ to it. Making it `private` and offering controlled methods is how
 you defend the invariant.
 
 ```mermaid
-flowchart LR
+flowchart TD
     O[Outside code] -->|deposit / withdraw| API[Public methods]
     API -->|enforce rules| F[Private fields]
     O -.cannot reach.-x F

@@ -85,7 +85,7 @@ really **two separate things** working together:
    everything.
 
 ```mermaid
-flowchart LR
+flowchart TD
     User["You<br/>(tap, type, click)"] --> App["Application<br/>(screens & logic)"]
     App -->|"a query: please give me X"| DB[("Database")]
     DB -->|"the rows that match"| App

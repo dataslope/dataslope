@@ -1,6 +1,6 @@
 ---
 title: Python Fundamentals
-description: Backend interview questions on Python's mutability, identity vs equality, generators, *args/**kwargs, and the GIL.
+description: Backend interview questions on Python's mutability, identity vs equality, generators, *args/**kwargs, and the Global Interpreter Lock (GIL).
 ---
 
 Language-fundamentals questions check that you know Python's sharp edges,
@@ -67,7 +67,9 @@ print(add(2))   # [2]  <- fresh list each call`,
 A list builds and holds **all** items in memory; a generator (`yield`, or
 a generator expression) produces items **lazily**, one at a time. Use a
 generator for large or streaming sequences to keep memory flat — `sum(x*x
-for x in range(10_000_000))` never materializes the squares.
+for x in range(10_000_000))` never materializes the squares. The
+`fibonacci` generator below uses `yield` in an infinite loop, which is
+safe precisely because `next` pulls only as many values as you ask for.
 
 <CodeBlock
   adapter="python"
@@ -91,7 +93,9 @@ print([next(gen) for _ in range(8)])  # [0, 1, 1, 2, 3, 5, 8, 13]`,
 `*args` captures extra **positional** arguments as a tuple; `**kwargs`
 captures extra **keyword** arguments as a dict. They let a function
 accept a variable number of arguments and forward them:
-`wrapper(*args, **kwargs) → fn(*args, **kwargs)`.
+`wrapper(*args, **kwargs) → fn(*args, **kwargs)`. Below, `log` collects
+its message parts in `args` and reads options from `kwargs`, while
+`passthrough` forwards both straight through to `fn`.
 
 <CodeBlock
   adapter="python"
@@ -114,8 +118,9 @@ print(passthrough(sorted, [3, 1, 2], reverse=True))   # [3, 2, 1]`,
 
 ### What is the GIL, and when does it bite?
 
-CPython's **Global Interpreter Lock** lets only one thread execute Python
-bytecode at a time. So threads don't speed up **CPU-bound** work — use
+CPython's **Global Interpreter Lock (GIL)** lets only one thread execute
+Python bytecode at a time. So threads don't speed up **CPU-bound** work —
+use
 `multiprocessing` (separate processes) for that. Threads still help
 **I/O-bound** work (network, disk), where they wait, not compute; `async`
 is another I/O-bound option.
@@ -127,7 +132,9 @@ Python calls implicitly. `__init__` constructs an object, `__repr__`
 provides a developer-readable string, `__str__` the user-facing string,
 `__len__` makes `len(obj)` work, `__eq__` powers `==`, and `__lt__` /
 `__le__` enable sorting. Implementing `__enter__` and `__exit__` makes a
-class a context manager.
+class a context manager. The `Vector` class below defines `__add__` so the
+`+` operator returns a new `Vector`, and `__repr__` so printing shows
+readable coordinates.
 
 <CodeBlock
   adapter="python"
@@ -163,7 +170,9 @@ Python syntax and built-ins, without inheritance from a special base class.
 A decorator is a callable that wraps another function, adding behavior
 before and/or after the call. It is syntactic sugar for
 `fn = decorator(fn)`. A correct decorator preserves the wrapped
-function's metadata using `functools.wraps`.
+function's metadata using `functools.wraps`. The `timer` decorator below
+wraps `fn`, records the elapsed time around the call, and returns the
+original result unchanged.
 
 <CodeBlock
   adapter="python"
@@ -197,7 +206,9 @@ Python resolves names in four scopes in order: **L**ocal (inside the
 current function), **E**nclosing (outer function for nested functions),
 **G**lobal (module level), **B**uilt-in. A closure is a nested function
 that captures variables from its enclosing scope — those variables survive
-even after the outer function returns.
+even after the outer function returns. Below, `increment` closes over
+`count` from `make_counter` and uses `nonlocal` to keep updating that same
+captured variable across calls.
 
 <CodeBlock
   adapter="python"
@@ -242,6 +253,8 @@ option: single-threaded cooperative concurrency for I/O-bound async code.
 an I/O operation, the event loop runs another coroutine instead of
 blocking. Use it for high-concurrency network servers (web APIs, websockets)
 where most time is spent waiting on I/O. Avoid it for CPU-bound code.
+Below, `asyncio.gather` runs both `fetch` coroutines concurrently and
+`asyncio.run` drives the `main` coroutine on the event loop.
 
 <CodeBlock
   adapter="python"
@@ -269,7 +282,9 @@ asyncio.run(main())`,
 A context manager implements `__enter__` (run on entry) and `__exit__`
 (run on exit, even if an exception occurs). The `with` statement calls
 these automatically, ensuring cleanup. The `contextlib.contextmanager`
-decorator lets you write one as a generator with a single `yield`.
+decorator lets you write one as a generator with a single `yield`. In
+`managed_resource` below, code before the `yield` is the setup and the
+`finally` block is the guaranteed teardown.
 
 <CodeBlock
   adapter="python"
@@ -355,7 +370,9 @@ By default, Python stores instance attributes in a per-instance `__dict__`,
 which is flexible but memory-heavy. Declaring `__slots__` replaces that
 dict with a fixed-size array, reducing memory per instance by 30–50% and
 slightly speeding up attribute access. Use slots for classes that create
-millions of instances.
+millions of instances. The `Point` class below declares
+`__slots__ = ("x", "y")`, so each instance stores only those two
+attributes and has no `__dict__`.
 
 <CodeBlock
   adapter="python"
@@ -418,7 +435,9 @@ The `finally` block of a `try`/`except`/`finally` statement runs
 **always** — whether an exception is raised, caught, or not raised at all,
 and even if there is a `return` statement in `try` or `except`. It is
 used for cleanup (closing files, releasing locks) that must happen
-regardless of outcome. It does not suppress exceptions.
+regardless of outcome. It does not suppress exceptions. In `read_file`
+below, the `return f.read()` still hands back the contents, yet `f.close()`
+in the `finally` block runs first on the way out.
 
 ```python
 def read_file(path):
@@ -455,7 +474,9 @@ An **iterable** implements `__iter__()`, which returns an **iterator**.
 An iterator implements both `__iter__()` (returns itself) and `__next__()`,
 which returns the next value or raises `StopIteration`. The `for` loop
 calls `iter(obj)` once, then repeatedly calls `next()` until
-`StopIteration`. Generators implement this protocol automatically.
+`StopIteration`. Generators implement this protocol automatically. The
+`Range3` class below implements both methods directly, counting up in
+`__next__` and raising `StopIteration` once it reaches 3.
 
 <CodeBlock
   adapter="python"
@@ -492,7 +513,10 @@ Python.
 A `@staticmethod` receives no implicit first argument; it is essentially
 a regular function namespaced inside the class. A `@classmethod` receives
 the class itself as `cls` as its first argument, enabling factory methods
-and subclass-aware behavior. Neither receives the instance.
+and subclass-aware behavior. Neither receives the instance. Below,
+`Date.from_string` is a `@classmethod` factory that parses a string and
+calls `cls(...)`, while `Date.is_leap` is a `@staticmethod` helper that
+needs neither the class nor an instance.
 
 <CodeBlock
   adapter="python"
@@ -534,7 +558,9 @@ All exceptions inherit from `BaseException`. User-defined exceptions
 should inherit from `Exception`. `KeyboardInterrupt` and `SystemExit`
 inherit from `BaseException` directly so a bare `except Exception` doesn't
 catch them. The `raise` statement re-raises the current exception; `raise
-ExceptionType from original` chains exceptions, preserving context.
+ExceptionType from original` chains exceptions, preserving context. The
+example below defines a custom `AppError`, catches `ZeroDivisionError`, and
+re-raises it as `AppError` with `from e` so the original cause is kept.
 
 ```python
 class AppError(Exception):
@@ -559,7 +585,8 @@ finally:
 add validation or computed behavior without changing the public API.
 A matching `@name.setter` handles assignment. This follows the principle
 that you can start with a plain attribute and upgrade to a property later
-without breaking callers.
+without breaking callers. The `Circle` class below exposes `radius` as a
+property, and its setter rejects negative values with a `ValueError`.
 
 <CodeBlock
   adapter="python"

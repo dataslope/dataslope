@@ -137,7 +137,7 @@ Use `operator[]` when you know the index is valid. Use `.at()` when you want bou
 A vector keeps values next to each other in memory, and modern hardware rewards that handsomely. When the CPU needs one value from main memory, it does not fetch four bytes — it fetches a whole *cache line*, typically 64 bytes, on the bet that you will want the neighbors next. With a vector of `int`s, that bet pays off sixteen to one: one slow memory trip delivers the next fifteen elements for free. A linked structure scattered across the heap loses the bet on almost every step.
 
 ```mermaid
-flowchart LR
+flowchart TD
     I0["index 0"] --> I1["index 1"] --> I2["index 2"] --> I3["index 3"]
     V0["10"] --> V1["20"] --> V2["30"] --> V3["40"]
     I0 -. points to .-> V0

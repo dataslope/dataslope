@@ -99,7 +99,7 @@ is enforced by construction — you cannot accidentally fit a step on the test
 set, because you never touch the steps individually.
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph Training ["Training: pipeline.fit(X_train, y_train)"]
         A["<code>X_train</code>"] --> B["StandardScaler<br/>fit + transform"]
         B --> C["LogisticRegression<br/>fit"]
@@ -108,7 +108,7 @@ flowchart LR
 ```
 
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph Prediction ["Prediction: pipeline.predict(X_new)"]
         E["<code>X_new</code>"] --> F["StandardScaler<br/>transform only"]
         F --> G["LogisticRegression<br/>predict"]

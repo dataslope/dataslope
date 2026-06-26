@@ -55,7 +55,7 @@ A *static* type system answers all three at *compile time*. Bugs
 caught by the compiler are bugs your users never see.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[You write code] --> B[Compiler checks<br/>types]
     B -->|consistent| C[Program builds]
     B -->|inconsistent| D[Error message<br/>BEFORE the program ever runs]

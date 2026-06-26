@@ -64,7 +64,7 @@ The `orders.customer_id` column points at `customers.customer_id`. One
 customer can have many orders, and each order belongs to one customer.
 
 ```mermaid
-flowchart LR
+flowchart TD
     O["orders.<code>customer_id</code> = 7"] -->|"FK -> PK"| C["customers.<code>customer_id</code> = 7<br/>Mina Patel"]
 ```
 
@@ -167,7 +167,7 @@ The rejected insert prevents an **orphan row**: a child row whose parent
 row does not exist.
 
 ```mermaid
-flowchart LR
+flowchart TD
     O["Order 102<br/><code>customer_id</code> = 99"] --> M["Missing customer 99"]:::bad
     M --> R["Rejected by FK constraint"]:::good
     classDef bad fill:#fee2e2,stroke:#b91c1c

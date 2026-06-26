@@ -193,7 +193,7 @@ ORDER BY
 The primary key is the pair `(student_id, course_id)`. That means the same student cannot be enrolled in the same course twice.
 
 ```mermaid
-flowchart LR
+flowchart TD
     S["<code>students</code>"] -->|"<code>student_id</code>"| E["enrollments<br/>one row per link"]
     E -->|"<code>course_id</code>"| C["<code>courses</code>"]
 ```

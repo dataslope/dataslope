@@ -229,7 +229,7 @@ your task.** This is called an **ablation**: hold everything else fixed, toggle
 one step, and compare results on a metric you care about.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["Pick a metric<br/>tied to your task"] --> B["Run WITH the step"]
     A --> C["Run WITHOUT the step"]
     B --> D{"Which scores better<br/>on your data?"}

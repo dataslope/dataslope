@@ -126,7 +126,7 @@ refuses. The column must either *define* the group (`region`) or be
 *summarized* across it (`SUM(amount)`).
 
 ```mermaid
-flowchart LR
+flowchart TD
     Q["<code>SELECT region, id, SUM(amount)</code>"] --> X["id is neither grouped<br/>nor aggregated"]
     X --> Err["Ambiguous:<br/>which row's id?"]
 ```
@@ -251,7 +251,7 @@ It helps to picture the order of operations: filter, then group, then
 aggregate, then sort.
 
 ```mermaid
-flowchart LR
+flowchart TD
     F["FROM rows"] --> W["<code>WHERE</code><br/>(filter rows)"]
     W --> G["<code>GROUP BY</code><br/>(form bins)"]
     G --> A["aggregate<br/>(one value per bin)"]

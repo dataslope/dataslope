@@ -95,7 +95,7 @@ Here is the move you will make over and over: reshape a **wide** table into
 a **long/tidy** one so Seaborn can map its columns to visual roles.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["WIDE table<br/>one column per group<br/>(easy to read)"] -->|"melt to long"| B["TIDY / LONG table<br/>one row per observation<br/>(easy to plot)"]
     B --> C["Map columns to roles<br/>x, y, hue, col, ..."]
     C --> D["Seaborn groups, aggregates,<br/>and colors automatically"]

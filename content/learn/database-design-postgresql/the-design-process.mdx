@@ -135,7 +135,7 @@ In those sentences, **nouns** hint at things and **verbs** hint at
 relationships.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Sentences["Requirement sentences"] --> Nouns["Nouns: organizer, event, venue, attendee"]
     Sentences --> Verbs["Verbs: creates, hosts, registers"]
     Nouns --> Candidates["Candidate entities"]
@@ -283,7 +283,7 @@ Common constraints include:
 - `REFERENCES` for valid relationships
 
 ```mermaid
-flowchart LR
+flowchart TD
     Rule["Design rule"] --> Constraint["Database constraint"]
     Constraint --> Reject["Rejects invalid rows"]
     Reject --> Trust["More trustworthy data"]
@@ -364,7 +364,7 @@ Review the design by walking through real scenarios:
 - Delete or archive old data.
 
 ```mermaid
-flowchart LR
+flowchart TD
     Example["Real example"] --> TryInsert["Try the rows"]
     TryInsert --> FindRule["Find missing rule"]
     FindRule --> Adjust["Adjust schema"]

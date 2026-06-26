@@ -79,7 +79,7 @@ same mutable object, and one of them quietly changes what the other
 is reading.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Caller] -->|"passes List&lt;decimal&gt;"| F[Total]
     F -->|"mutates the same list"| A
 ```

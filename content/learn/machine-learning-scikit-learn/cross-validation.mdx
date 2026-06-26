@@ -235,7 +235,7 @@ contest with some luck in it. A final, untouched test set gives you one
 clean number after all the choosing is done.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A["All data"] --> B["Hold out a final test set"]
     B --> C["Cross-validate on the rest<br/>to choose model and settings"]
     C --> D["Refit the chosen model<br/>on all non-test data"]

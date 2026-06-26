@@ -152,7 +152,7 @@ ones. Each small one is well-encapsulated, easy to reason about, and
 easy to test. The big one just orchestrates.
 
 ```mermaid
-flowchart LR
+flowchart TD
     L[Library] -->|has many| B[Book]
     L -->|has many| M[Member]
     L -->|has| C[Catalog]

@@ -126,7 +126,7 @@ little table — and hands that back to you. The stored data sits
 untouched, ready for the next question.
 
 ```mermaid
-flowchart LR
+flowchart TD
     T[("employees<br/>(stored table)")] -->|"<code>SELECT name, salary</code>"| R["Result set<br/>name + salary<br/>(a new table)"]
     T -.->|"unchanged"| T
 ```

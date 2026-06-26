@@ -16,6 +16,10 @@ tables (each fact stored once) — great for OLTP write integrity.
 where reads dominate. The trade-off: denormalizing buys read speed at the
 cost of storage and the risk of copies disagreeing (update anomalies).
 
+The block below contrasts a normalized `customers`/`orders` design with a
+denormalized `orders_wide`, then shows the `JOIN` the normalized layout
+requires to recover the customer `name` and `city`.
+
 ```sql
 -- Normalized (3NF): customer stored once, referenced by foreign key
 -- customers(customer_id, name, city)
@@ -38,7 +42,18 @@ A **star** schema has a central fact table joined directly to
 **denormalized** dimension tables — simple, fast, fewer joins. A
 **snowflake** further **normalizes** dimensions into sub-tables (e.g.
 product → category → department) — less redundancy but more joins. Stars
-are the default for BI; snowflake when dimensions are large or shared.
+are the default for **Business Intelligence (BI)**; snowflake when
+dimensions are large or shared.
+
+A star keeps each dimension in one table (the solid edge); a snowflake
+splits that dimension further into a normalized chain (the dotted edges):
+
+```mermaid
+flowchart TD
+  f["fact"] --> p["dim_product"]
+  p -. normalize .-> c["dim_category"]
+  c -. normalize .-> d["dim_department"]
+```
 
 ### What are fact and dimension tables?
 
@@ -56,13 +71,18 @@ grain.
 
 ### How do you preserve history when a dimension attribute changes (SCD)?
 
-Use a **slowly-changing dimension**:
+Use a **Slowly Changing Dimension (SCD)**:
 
 - **Type 1** — overwrite (no history).
 - **Type 2** — add a new row with effective-date ranges + a "current" flag (full history; facts join to the version that was current at the time).
 - **Type 3** — keep a "previous value" column (limited history).
 
 Type 2 is the standard when point-in-time accuracy matters.
+
+The example below builds a Type 2 `dim_customer` (with `valid_from`,
+`valid_to`, and `is_current`) and joins `fact_orders` to it on the date
+range, so each order resolves to the `city` that was current when it was
+placed.
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -112,6 +132,10 @@ ORDER BY f.order_id;`}
 
 A **surrogate key** is a system-generated identifier (auto-increment integer or UUID) with no business meaning. It is preferred because natural keys (customer email, product code) can change, be reused, or be long strings that make joins expensive. Surrogate keys are stable, compact, and immune to upstream business logic changes, which is especially important for SCD Type 2 where multiple rows represent the same entity.
 
+The query below joins `fact_orders` to `dim_product` on the surrogate
+`product_key` rather than the natural `product_code`, illustrating why the
+integer key keeps the join stable even when the business code changes.
+
 ```sql
 -- Surrogate key join: fact holds a compact integer key pointing to the
 -- exact dimension version that was current at the time of the event.
@@ -144,6 +168,10 @@ A dimension shared — with identical structure and values — across multiple f
 
 When an attribute changes, you close the existing row by setting its `valid_to` date (or `is_current = false`) and insert a new row with the updated value and a new `valid_from` date. Facts that occurred before the change still join to the old dimension row via the surrogate key, preserving point-in-time accuracy. Queries for the current state filter `WHERE is_current = true`.
 
+The two statements below implement that change for `customer_id = 42`: an
+`UPDATE` closes the current row by setting `valid_to` and `is_current =
+false`, then an `INSERT` adds the new `Austin` version as the current row.
+
 ```sql
 -- Step 1: close the existing row
 UPDATE dim_customer
@@ -174,6 +202,10 @@ A single physical dimension table used multiple times in the same schema under d
 
 A **bridge table** (also called an association table) resolves **many-to-many** relationships between a fact table and a dimension — for example, an order that belongs to multiple promotions simultaneously. The bridge table has a surrogate key, the fact foreign key, and the dimension foreign key. Without it you would either fan out fact rows (inflating counts) or store comma-separated lists (violating 1NF).
 
+The query below joins `fact_orders` through `order_promotion_bridge` to
+`dim_promotion`, showing how an order tied to multiple promotions fans out
+into one row per promotion.
+
 ```sql
 -- Bridge table: one row per (order, promotion) pair
 -- order_promotion_bridge(order_key, promo_key)
@@ -197,6 +229,11 @@ A **data vault** separates hubs (business keys), links (relationships), and sate
 ### What does "grain mismatch" mean, and how do you fix it?
 
 A grain mismatch occurs when you join two fact tables at different grains — for example, a daily budget table joined to a transaction-level sales table — causing double-counting or incorrect aggregations. Fix it by aggregating the finer-grain table to match the coarser grain before joining, or by storing both at a common grain in a separate bridging step.
+
+The example below has transaction-grain `fact_sales` and daily-grain
+`fact_budget`; the query rolls `fact_sales` up to one row per
+`sale_date`/`region` in a Common Table Expression first, so the join to
+`fact_budget` compares like grains instead of double-counting budget rows.
 
 <SqlCodeBlock
   dialect="duckdb"
@@ -263,6 +300,10 @@ A **bus matrix** (or enterprise bus matrix) is a planning artifact that maps bus
 
 A `dim_date` table pre-computes every calendar attribute — fiscal week, quarter, holiday flag, day-of-week name — so analysts can filter and group by any combination without writing date-arithmetic functions inline. It also lets the business encode custom fiscal calendars, retail weeks, or regional holidays once and share them universally, rather than scattering business-specific date logic across every query.
 
+The query below joins `fact_orders` to `dim_date` and groups by the
+pre-computed `fiscal_quarter` while filtering out holidays with
+`is_holiday = false` — no inline date arithmetic required.
+
 <SqlCodeBlock
   dialect="duckdb"
   initSql={`CREATE TABLE dim_date (
@@ -309,6 +350,10 @@ An **auto-increment integer** surrogate key is compact, fast to join, and natura
 ### How do you model a many-to-many relationship between facts and dimensions?
 
 Use a **bridge table**: a separate table with one row per (fact, dimension) combination. For example, if an order can be associated with multiple promotions, the bridge table `order_promotion_bridge` holds `(order_key, promo_key)` pairs. The fact table joins to the bridge, which joins to the promotion dimension. A **weighting factor** column on the bridge can distribute additive measures proportionally across the associated dimension members.
+
+The query below multiplies `f.amount` by the bridge's `weight` before
+summing, so each promotion in `dim_promotion` receives only its
+proportional share of revenue rather than the full order amount.
 
 ```sql
 -- Bridge table with optional weighting factor (sums to 1.0 per order)
