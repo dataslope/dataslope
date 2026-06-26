@@ -118,7 +118,10 @@ export function HomeClient({
           {/* ── At-a-glance stats (Magic UI bento grid) ── */}
           <section className="py-12">
             <BlurFade inView>
-              <StatsBento stats={stats} />
+              <StatsBento
+                stats={stats}
+                courseTitles={courses.map((c) => c.title)}
+              />
             </BlurFade>
           </section>
 

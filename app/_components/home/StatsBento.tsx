@@ -6,6 +6,12 @@ import {
 } from "lucide-react";
 
 import { BentoCard, BentoGrid } from "@/components/ui/bento-grid";
+import {
+  DiamondBackground,
+  TestRailBackground,
+  TypingBackground,
+  CoursesListBackground,
+} from "./statsBentoBackgrounds";
 
 export interface HomeStats {
   /** Runnable `<CodeBlock>` + `<SqlCodeBlock>` blocks across all content. */
@@ -18,29 +24,13 @@ export interface HomeStats {
   courses: number;
 }
 
-/** Big faded watermark number sitting behind each bento card's copy — it puts
- *  the headline figure front and centre, which is the whole point of the grid. */
-function StatBackground({ label, color }: { label: string; color: string }) {
-  return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none absolute -top-6 right-2 select-none text-[7rem] font-bold leading-none tracking-tighter opacity-[0.08] transition-all duration-300 group-hover:opacity-[0.14] sm:text-[8rem]"
-      style={{
-        color,
-        maskImage: "linear-gradient(to bottom, #000 30%, transparent 95%)",
-        WebkitMaskImage: "linear-gradient(to bottom, #000 30%, transparent 95%)",
-      }}
-    >
-      {label}
-    </div>
-  );
-}
-
-export function StatsBento({ stats }: { stats: HomeStats }) {
-  const blue = "var(--ds-blue-500)";
-  const green = "var(--ds-green-500)";
-  const red = "var(--ds-red-500)";
-
+export function StatsBento({
+  stats,
+  courseTitles,
+}: {
+  stats: HomeStats;
+  courseTitles: string[];
+}) {
   const features = [
     {
       Icon: SquareTerminal,
@@ -50,12 +40,7 @@ export function StatsBento({ stats }: { stats: HomeStats }) {
       href: "/playground",
       cta: "Open a playground",
       className: "col-span-3 lg:col-span-2",
-      background: (
-        <StatBackground
-          label={`${stats.runnableCodeBlocks.toLocaleString()}+`}
-          color={blue}
-        />
-      ),
+      background: <DiamondBackground />,
     },
     {
       Icon: Trophy,
@@ -65,12 +50,7 @@ export function StatsBento({ stats }: { stats: HomeStats }) {
       href: "/learn",
       cta: "Take a challenge",
       className: "col-span-3 lg:col-span-1",
-      background: (
-        <StatBackground
-          label={`${stats.codeChallenges.toLocaleString()}+`}
-          color={green}
-        />
-      ),
+      background: <TestRailBackground />,
     },
     {
       Icon: Briefcase,
@@ -79,9 +59,7 @@ export function StatsBento({ stats }: { stats: HomeStats }) {
       href: "/interview",
       cta: "Start prepping",
       className: "col-span-3 lg:col-span-1",
-      background: (
-        <StatBackground label={`${stats.interviewRoles}`} color={red} />
-      ),
+      background: <TypingBackground />,
     },
     {
       Icon: GraduationCap,
@@ -91,9 +69,7 @@ export function StatsBento({ stats }: { stats: HomeStats }) {
       href: "/learn",
       cta: "Browse courses",
       className: "col-span-3 lg:col-span-2",
-      background: (
-        <StatBackground label={`${stats.courses}`} color={blue} />
-      ),
+      background: <CoursesListBackground titles={courseTitles} />,
     },
   ];
 
