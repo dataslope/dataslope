@@ -62,6 +62,9 @@ const BentoCard = ({
     {...props}
   >
     <div>{background}</div>
+    {/* Page-coloured scrim so the animated background reads softly behind the
+        card copy (white in light mode, #121212 in dark). */}
+    <div className="pointer-events-none absolute inset-0 bg-white/60 dark:bg-[#121212]/60" />
     <div className="p-6">
       <div className="pointer-events-none z-10 flex transform-gpu flex-col gap-1 transition-all duration-300 lg:group-hover:-translate-y-10">
         <Icon className="mb-3 h-12 w-12 origin-left transform-gpu text-neutral-700 transition-all duration-300 ease-in-out group-hover:scale-75 dark:text-neutral-300" />

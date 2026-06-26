@@ -7,22 +7,39 @@
  * stat that card reports:
  *
  *  1. Runnable code blocks → the brand "diamond assemble + quarter-turn"
- *     loader, blown up large for impact.
+ *     loader, large and pinned to the right, recoloured black/white.
  *  2. Code challenges → a recreation of the challenge cards' test-results
  *     rail that cycles from a mixed pass/fail run to an all-green run.
  *  3. Interview prep → Magic UI's typing animation cycling through roles and
- *     topics.
- *  4. Free courses → Magic UI's animated list streaming course titles.
+ *     topics, in a neutral grey.
+ *  4. Free courses → an infinite Magic UI animated-list feed of course titles,
+ *     each with a topic-appropriate icon.
  */
 
-import { useEffect, useState } from "react";
-import { Check, X } from "lucide-react";
+import { useEffect, useRef, useState, type ElementType } from "react";
+import { AnimatePresence } from "motion/react";
+import {
+  BarChart3,
+  Binary,
+  Braces,
+  Brain,
+  ChartColumn,
+  Check,
+  Code2,
+  Coffee,
+  Cpu,
+  Database,
+  Hash,
+  Sigma,
+  TrendingUp,
+  X,
+} from "lucide-react";
 
 import { DiamondAssembleTurnLoader } from "@/app/_components/mdx/loadingAnimations";
 import { TypingAnimation } from "@/components/ui/typing-animation";
-import { AnimatedList } from "@/components/ui/animated-list";
+import { AnimatedListItem } from "@/components/ui/animated-list";
 
-/** Respect the user's reduced-motion preference for the JS-driven rail. */
+/** Respect the user's reduced-motion preference for the JS-driven animations. */
 function usePrefersReducedMotion(): boolean {
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
@@ -35,13 +52,15 @@ function usePrefersReducedMotion(): boolean {
   return reduced;
 }
 
-// ─── Card 1: large brand loader ──────────────────────────────────────────
+// ─── Card 1: large brand loader (right-aligned, black/white) ──────────────
 
 export function DiamondBackground() {
   return (
-    <div className="pointer-events-none absolute inset-0 flex items-start justify-center overflow-hidden">
-      <div className="-mt-6 opacity-90 [mask-image:linear-gradient(to_bottom,#000_55%,transparent_92%)] transition-transform duration-300 ease-out group-hover:scale-105">
-        <DiamondAssembleTurnLoader size={260} label="" />
+    <div className="pointer-events-none absolute inset-0 flex items-center justify-end overflow-hidden pr-8 [mask-image:linear-gradient(to_left,#000_45%,transparent_100%)]">
+      {/* The loader draws with currentColor; recolour the SVG to black in
+          light mode and white in dark mode (overriding its brand-blue tint). */}
+      <div className="opacity-90 transition-transform duration-300 ease-out group-hover:scale-105 [&_svg]:text-black dark:[&_svg]:text-white">
+        <DiamondAssembleTurnLoader size={240} label="" />
       </div>
     </div>
   );
@@ -98,9 +117,10 @@ export function TestRailBackground() {
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_top,transparent_22%,#000_78%)]">
-      {/* pass-count badge, echoing the challenge card's results header */}
+      {/* pass-count badge, echoing the challenge card's results header.
+          Pinned top-left so it clears the rail (now on the right). */}
       <div
-        className="absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums transition-colors duration-300"
+        className="absolute left-5 top-4 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums transition-colors duration-300"
         style={{
           background: allPass ? "var(--ds-green-500)" : "var(--ds-gray-100)",
           color: allPass ? "#fff" : "var(--ds-gray-600)",
@@ -110,7 +130,8 @@ export function TestRailBackground() {
         {passed}/{total}
       </div>
 
-      <div className="absolute left-5 right-4 top-5 flex flex-col">
+      {/* Rail pinned to the right so it doesn't sit over the trophy icon. */}
+      <div className="absolute right-4 top-5 flex w-[15rem] flex-col">
         {RAIL_LABELS.map((label, i) => {
           const state = states[i];
           return (
@@ -128,11 +149,7 @@ export function TestRailBackground() {
                     color: state === "pending" ? "var(--ds-gray-400)" : "#fff",
                   }}
                 >
-                  {state === "fail" ? (
-                    <X size={18} strokeWidth={3.5} />
-                  ) : (
-                    i + 1
-                  )}
+                  {state === "fail" ? <X size={18} strokeWidth={3.5} /> : i + 1}
                 </span>
                 {i < RAIL_LABELS.length - 1 && (
                   <span
@@ -166,7 +183,7 @@ export function TestRailBackground() {
   );
 }
 
-// ─── Card 3: typing animation ────────────────────────────────────────────
+// ─── Card 3: typing animation (neutral grey) ─────────────────────────────
 
 const INTERVIEW_KEYWORDS = [
   "Data Analyst",
@@ -182,7 +199,7 @@ const INTERVIEW_KEYWORDS = [
 export function TypingBackground() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_top,transparent_22%,#000_78%)]">
-      <div className="absolute left-6 right-4 top-7 font-mono text-2xl font-semibold text-[var(--ds-blue-500)] dark:text-[var(--ds-blue-300)]">
+      <div className="absolute left-6 right-4 top-7 font-mono text-2xl font-semibold text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
         <TypingAnimation
           words={INTERVIEW_KEYWORDS}
           loop
@@ -197,7 +214,7 @@ export function TypingBackground() {
   );
 }
 
-// ─── Card 4: animated list of course titles ──────────────────────────────
+// ─── Card 4: infinite animated list of course titles ─────────────────────
 
 /** Shorten verbose course titles so each list pill stays on one line. Known
  *  long titles get a hand-picked short form; anything else drops a leading
@@ -232,18 +249,75 @@ function simplifyCourseTitle(title: string): string {
   return s.length > 26 ? `${s.slice(0, 25).trimEnd()}…` : s;
 }
 
-function CoursePill({ title }: { title: string }) {
+/** Topic-appropriate icon for a course (reused across related courses). */
+function iconForCourse(title: string): ElementType {
+  const t = title.toLowerCase();
+  if (/sql|postgres|duckdb|sqlite|database/.test(t)) return Database;
+  if (/machine learning|scikit|nlp|natural language/.test(t)) return Brain;
+  if (/statistic/.test(t)) return Sigma;
+  if (/visualization|plotly|ggplot|seaborn/.test(t)) return ChartColumn;
+  if (/time series/.test(t)) return TrendingUp;
+  if (/pandas|data analysis|scientific computing|practical r/.test(t))
+    return BarChart3;
+  if (/javascript|typescript/.test(t)) return Braces;
+  if (/java\b|object-oriented/.test(t)) return Coffee;
+  if (/c#|csharp|linq|modern c#/.test(t)) return Hash;
+  if (/c\+\+|data structures|algorithms/.test(t)) return Binary;
+  if (/systems programming|c programming/.test(t)) return Cpu;
+  return Code2;
+}
+
+// Likely-popular tracks first, then beginner-friendly, then everything else.
+const POPULAR_FIRST = [
+  "Introduction to SQL and Relational Databases with PostgreSQL",
+  "Data Analysis with Python Pandas",
+  "Machine Learning with scikit-learn",
+  "SQL for Data Analysis with DuckDB",
+  "Statistics for Data Science with Python",
+];
+const BEGINNER_NEXT = [
+  "Python Basics",
+  "Beginner's Guide to JavaScript",
+  "SQLite for Beginners",
+  "C Programming for Beginners",
+  "Java Programming for Beginners",
+  "Practical R for Beginners",
+  "TypeScript from Scratch",
+  "From Zero to C++ Programming",
+  "Introduction to Modern C#",
+];
+
+function reorderCourses(titles: string[]): string[] {
+  const present = new Set(titles);
+  const used = new Set<string>();
+  const ordered: string[] = [];
+  for (const t of [...POPULAR_FIRST, ...BEGINNER_NEXT]) {
+    if (present.has(t) && !used.has(t)) {
+      ordered.push(t);
+      used.add(t);
+    }
+  }
+  for (const t of titles) {
+    if (!used.has(t)) {
+      ordered.push(t);
+      used.add(t);
+    }
+  }
+  return ordered;
+}
+
+function CoursePill({ title, Icon }: { title: string; Icon: ElementType }) {
   return (
     <figure className="flex w-full items-center gap-3 rounded-xl border border-[var(--ds-gray-200)] bg-white/90 px-3.5 py-2.5 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/[0.08]">
       <span
         aria-hidden
-        className="grid size-8 flex-shrink-0 place-items-center rounded-lg text-[0.8rem] font-bold"
+        className="grid size-8 flex-shrink-0 place-items-center rounded-lg"
         style={{
           background: "var(--ds-blue-50)",
           color: "var(--ds-blue-600)",
         }}
       >
-        {"</>"}
+        <Icon size={16} />
       </span>
       <figcaption className="truncate text-sm font-medium text-[var(--ds-gray-900)] dark:text-white">
         {title}
@@ -252,19 +326,65 @@ function CoursePill({ title }: { title: string }) {
   );
 }
 
+interface CourseItem {
+  title: string;
+  Icon: ElementType;
+}
+
+/** An endless feed built on Magic UI's <AnimatedListItem>: a new pill springs
+ *  in at the top each tick, older ones flow down, and the oldest exits once the
+ *  visible window is full — cycling through the course list forever. */
+function InfiniteCourseList({ courses }: { courses: CourseItem[] }) {
+  const reduced = usePrefersReducedMotion();
+  const VISIBLE = 5;
+  const DELAY = 1600;
+
+  const [queue, setQueue] = useState<(CourseItem & { key: number })[]>(() =>
+    courses.length ? [{ ...courses[0], key: 0 }] : [],
+  );
+  const nextIndex = useRef(1);
+
+  useEffect(() => {
+    if (reduced || courses.length === 0) return;
+    const id = setInterval(() => {
+      setQueue((prev) => {
+        const course = courses[nextIndex.current % courses.length];
+        const item = { ...course, key: nextIndex.current };
+        nextIndex.current += 1;
+        return [item, ...prev].slice(0, VISIBLE);
+      });
+    }, DELAY);
+    return () => clearInterval(id);
+  }, [courses, reduced]);
+
+  // Reduced motion: render a static stack instead of the animated feed.
+  const items = reduced
+    ? courses.slice(0, VISIBLE).map((c, i) => ({ ...c, key: i }))
+    : queue;
+
+  return (
+    <div className="flex w-full flex-col items-center gap-2.5">
+      <AnimatePresence>
+        {items.map((item) => (
+          <AnimatedListItem key={item.key}>
+            <CoursePill title={item.title} Icon={item.Icon} />
+          </AnimatedListItem>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 export function CoursesListBackground({ titles }: { titles: string[] }) {
-  // Repeat the (simplified) list so the reveal keeps streaming for a while.
-  const items = [...titles, ...titles].map(simplifyCourseTitle);
+  const courses: CourseItem[] = reorderCourses(titles).map((t) => ({
+    title: simplifyCourseTitle(t),
+    Icon: iconForCourse(t),
+  }));
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_top,transparent_18%,#000_70%)]">
-      <AnimatedList
-        delay={1500}
-        className="absolute right-5 top-5 w-[min(20rem,78%)] gap-2.5"
-      >
-        {items.map((title, i) => (
-          <CoursePill key={`${title}-${i}`} title={title} />
-        ))}
-      </AnimatedList>
+      <div className="absolute right-5 top-5 w-[min(20rem,78%)]">
+        <InfiniteCourseList courses={courses} />
+      </div>
     </div>
   );
 }
