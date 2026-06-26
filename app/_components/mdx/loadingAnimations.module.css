@@ -115,29 +115,37 @@
 }
 
 /* ── Diamond assemble + quarter-turn (one combined timeline) ───────────
-   Two keyframe sets with EQUAL durations drive one sequence of TWO
-   assemble-and-turn steps. The diamond is only 2-fold symmetric, so a
-   90° step can't loop on its own — two steps (180° total) land back on
-   an identical pose. Because the halves always part along the
-   diamond's LOCAL vertical axis, the drift reads vertical at 0° and
-   horizontal at 90°:
-     0–15%   halves drift together (vertically, on screen)
-     15–20%  rest, assembled
-     20–35%  eased quarter turn to 90°
-     35–38%  rest
-     38–50%  halves part (now horizontally, on screen)
-     50–100% the same step again: snap, turn to 180°, part
-   Translation lives on the inner half groups; rotation lives on the
-   <svg>, whose assemble viewBox is vertically symmetric around the
-   diamond's centre, so the element centre is the rotation centre. */
+   Two keyframe sets with EQUAL durations drive a sequence of FOUR
+   assemble-and-turn steps that make ONE full revolution (4 × 90° = 360°).
+   A full turn is what keeps the loop seamless: the two logo halves carry
+   different radial gradients, so a half-revolution (180°) would land on a
+   geometrically identical but differently-shaded pose, and the loop seam
+   would visibly "flip" left/right. Going all the way around returns to the
+   exact same shading, so 100% ≡ 0%.
+   Each 25% segment is one step: the halves snap together, the diamond makes
+   an eased quarter turn while assembled, then the halves part again. Because
+   they always part along the diamond's LOCAL vertical axis, the drift reads
+   vertical at 0°/180° and horizontal at 90°/270°.
+   Translation lives on the inner half groups; rotation lives on the <svg>,
+   whose assemble viewBox is vertically symmetric around the diamond's centre,
+   so the element centre is the rotation centre. */
 
 @keyframes comboHalf {
   0% {
     transform: translateY(-170px);
     opacity: 0.45;
   }
-  15%,
-  38% {
+  7.5%,
+  19% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+  25% {
+    transform: translateY(-170px);
+    opacity: 0.45;
+  }
+  32.5%,
+  44% {
     transform: translateY(0px);
     opacity: 1;
   }
@@ -145,8 +153,17 @@
     transform: translateY(-170px);
     opacity: 0.45;
   }
-  65%,
-  88% {
+  57.5%,
+  69% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+  75% {
+    transform: translateY(-170px);
+    opacity: 0.45;
+  }
+  82.5%,
+  94% {
     transform: translateY(0px);
     opacity: 1;
   }
@@ -158,25 +175,33 @@
 
 @keyframes comboTurn {
   0%,
-  20% {
+  10% {
     transform: rotate(0deg);
   }
-  35%,
-  70% {
+  17.5%,
+  35% {
     transform: rotate(90deg);
   }
-  85%,
-  100% {
+  42.5%,
+  60% {
     transform: rotate(180deg);
+  }
+  67.5%,
+  85% {
+    transform: rotate(270deg);
+  }
+  92.5%,
+  100% {
+    transform: rotate(360deg);
   }
 }
 
 .comboRotor {
-  animation: comboTurn 3.2s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+  animation: comboTurn 4.8s cubic-bezier(0.45, 0, 0.2, 1) infinite;
 }
 
 .comboHalf {
-  animation: comboHalf 3.2s ease-in-out infinite;
+  animation: comboHalf 4.8s ease-in-out infinite;
 }
 
 /* ── Logo hop (three marks hopping in sequence) ────────────────────── */

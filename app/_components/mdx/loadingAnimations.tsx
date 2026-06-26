@@ -320,14 +320,15 @@ export function DiamondRippleLoader({
 /** Combined sequence: the halves drift together (assemble), the
  *  assembled diamond makes an eased QUARTER turn, the halves part
  *  again — and because they always part along the diamond's local
- *  vertical axis, the drift alternates between vertical (at 0°) and
- *  horizontal (at 90°) on screen. The diamond is only 2-fold
- *  symmetric, so one CSS loop contains two assemble-and-turn steps
- *  (180° total) to land back on an identical pose. Rotation lives on
- *  the <svg> (whose viewBox is vertically symmetric around the
+ *  vertical axis, the drift alternates between vertical (at 0°/180°)
+ *  and horizontal (at 90°/270°) on screen. One CSS loop contains FOUR
+ *  such steps — a full 360° revolution — so it lands back on the exact
+ *  same pose AND shading; a half turn would swap the two differently-
+ *  gradiented logo halves and the loop would visibly flip. Rotation
+ *  lives on the <svg> (whose viewBox is vertically symmetric around the
  *  diamond's centre, so the element centre is the rotation centre)
  *  while the translation lives on the inner half groups — the two
- *  keyframe sets share one 3.2s timeline in the CSS. */
+ *  keyframe sets share one 4.8s timeline in the CSS. */
 export function DiamondAssembleTurnLoader({
   size = 64,
   label = "Loading…",

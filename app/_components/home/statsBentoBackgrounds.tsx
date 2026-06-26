@@ -38,6 +38,8 @@ import {
 import { DiamondAssembleTurnLoader } from "@/app/_components/mdx/loadingAnimations";
 import { TypingAnimation } from "@/components/ui/typing-animation";
 import { AnimatedListItem } from "@/components/ui/animated-list";
+// Loads JetBrains Mono for the typing card (see TypingBackground).
+import "./typingFont.css";
 
 /** Respect the user's reduced-motion preference for the JS-driven animations. */
 function usePrefersReducedMotion(): boolean {
@@ -56,11 +58,11 @@ function usePrefersReducedMotion(): boolean {
 
 export function DiamondBackground() {
   return (
-    <div className="pointer-events-none absolute inset-0 flex items-center justify-end overflow-hidden pr-8 [mask-image:linear-gradient(to_left,#000_45%,transparent_100%)]">
+    <div className="pointer-events-none absolute inset-0 flex items-start justify-end overflow-hidden pr-3 pt-3 [mask-image:linear-gradient(to_bottom_left,#000_38%,transparent_85%)]">
       {/* The loader draws with currentColor; recolour the SVG to black in
           light mode and white in dark mode (overriding its brand-blue tint). */}
       <div className="opacity-90 transition-transform duration-300 ease-out group-hover:scale-105 [&_svg]:text-black dark:[&_svg]:text-white">
-        <DiamondAssembleTurnLoader size={240} label="" />
+        <DiamondAssembleTurnLoader size={300} label="" />
       </div>
     </div>
   );
@@ -117,22 +119,24 @@ export function TestRailBackground() {
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_top,transparent_22%,#000_78%)]">
-      {/* pass-count badge, echoing the challenge card's results header.
-          Pinned top-left so it clears the rail (now on the right). */}
-      <div
-        className="absolute left-5 top-4 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums transition-colors duration-300"
-        style={{
-          background: allPass ? "var(--ds-green-500)" : "var(--ds-gray-100)",
-          color: allPass ? "#fff" : "var(--ds-gray-600)",
-        }}
-      >
-        <Check size={13} strokeWidth={3} />
-        {passed}/{total}
-      </div>
+      {/* Rail pinned to the right so it doesn't sit over the trophy icon; the
+          pass-count badge is a header row above the rail so the two never
+          overlap. */}
+      <div className="absolute right-4 top-4 flex w-[15rem] flex-col gap-3">
+        {/* pass-count badge, echoing the challenge card's results header */}
+        <div
+          className="inline-flex items-center gap-1.5 self-start rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums transition-colors duration-300"
+          style={{
+            background: allPass ? "var(--ds-green-500)" : "var(--ds-gray-100)",
+            color: allPass ? "#fff" : "var(--ds-gray-600)",
+          }}
+        >
+          <Check size={13} strokeWidth={3} />
+          {passed}/{total}
+        </div>
 
-      {/* Rail pinned to the right so it doesn't sit over the trophy icon. */}
-      <div className="absolute right-4 top-5 flex w-[15rem] flex-col">
-        {RAIL_LABELS.map((label, i) => {
+        <div className="flex flex-col">
+          {RAIL_LABELS.map((label, i) => {
           const state = states[i];
           return (
             <div key={label} className="flex items-stretch gap-3.5">
@@ -177,7 +181,8 @@ export function TestRailBackground() {
               </span>
             </div>
           );
-        })}
+          })}
+        </div>
       </div>
     </div>
   );
@@ -199,7 +204,13 @@ const INTERVIEW_KEYWORDS = [
 export function TypingBackground() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_top,transparent_22%,#000_78%)]">
-      <div className="absolute left-6 right-4 top-7 font-mono text-2xl font-semibold text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+      <div
+        className="absolute left-6 right-4 top-7 text-2xl font-normal"
+        style={{
+          fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
+          color: "var(--ds-green)",
+        }}
+      >
         <TypingAnimation
           words={INTERVIEW_KEYWORDS}
           loop

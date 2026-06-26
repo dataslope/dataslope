@@ -1,0 +1,5 @@
+/* JetBrains Mono for the interview-prep card's typing animation. A plain
+   (non-Tailwind) stylesheet so the remote @import stays at the top of the file
+   — the same Google Fonts URL the challenge cards import, so the browser
+   dedupes the request. */
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400..700&display=swap");
