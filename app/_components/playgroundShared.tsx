@@ -16,6 +16,7 @@ import {
   Moon,
   RotateCcw,
   Sliders,
+  Sun,
   Trash2,
   WrapText,
   X,
@@ -294,6 +295,8 @@ export function SettingsPanelContent({
     }
   }, []);
 
+  const isDark = editorTheme === "github-dark";
+
   return (
     <Tabs.Root
       value={tab}
@@ -422,19 +425,30 @@ export function SettingsPanelContent({
 
           <div className="setting-row">
             <label className="setting-switch-row">
-              <span className="setting-switch-label">
-                <Moon size={14} aria-hidden="true" />
-                <span>Dark Theme</span>
+              <span className="setting-switch-label is-iconless">
+                <span>Appearance</span>
               </span>
-              <Switch.Root
-                checked={editorTheme === "github-dark"}
-                onCheckedChange={(checked) =>
-                  setSiteTheme(checked ? "dark" : "light")
-                }
-                className="bui-switch"
-              >
-                <Switch.Thumb className="bui-switch-thumb" />
-              </Switch.Root>
+              <span className="theme-switch">
+                <Sun
+                  size={14}
+                  aria-hidden="true"
+                  className={`theme-switch-icon${isDark ? "" : " is-active"}`}
+                />
+                <Switch.Root
+                  checked={isDark}
+                  onCheckedChange={(checked) =>
+                    setSiteTheme(checked ? "dark" : "light")
+                  }
+                  className="bui-switch"
+                >
+                  <Switch.Thumb className="bui-switch-thumb" />
+                </Switch.Root>
+                <Moon
+                  size={14}
+                  aria-hidden="true"
+                  className={`theme-switch-icon${isDark ? " is-active" : ""}`}
+                />
+              </span>
             </label>
           </div>
 
