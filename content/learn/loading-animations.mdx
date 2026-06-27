@@ -1,14 +1,13 @@
 ---
 title: Loading Animations
-description: Brand loading animations built from the Dataslope logo — diamond spinners and a rolling logo wave.
+description: Brand loading animations built from the Dataslope logo — diamond spinners in several styles and colour variants.
 ---
 
 ## Overview
 
-Every animation on this page is built from the Dataslope logo mark (`public/dataslope-logo-blue.svg`) and two facts about its geometry:
+Every animation on this page is built from the Dataslope logo mark (`public/dataslope-logo-blue.svg`) and one fact about its geometry:
 
 - **Diamond.** Stacking the mark on a vertically mirrored copy makes both copies' rounded foot caps coincide, forming a 4-point star whose centre opens into a small **hollow diamond**. The shapes keep the logo's translucent radial gradients, so the four overlapping swooshes show through as lighter petals around that hollow.
-- **Wave.** The two foot caps sit 815.81 logo units apart. Repeating the gradient mark horizontally at that step makes adjacent feet coincide, and the translucent overlaps show as darker blob accents at each trough — a **continuous rolling wave** that scrolls seamlessly.
 
 All variants draw with `currentColor` (brand blue by default, light/dark aware) and honour `prefers-reduced-motion` by replacing motion with a gentle opacity pulse.
 
@@ -16,11 +15,11 @@ All variants draw with `currentColor` (brand blue by default, light/dark aware) 
 
 <LoadingAnimationsGallery section="spinners" />
 
-## Wave
+## Color variants
 
-The rolling-logo wave with a traveling light, in two edge treatments:
+Every loader accepts a `color` prop, so the mark can be tinted to any CSS colour — use the Dataslope palette (`var(--ds-green-500)`, `var(--ds-red-500)`, …) or plain black/white for overlays. Shown on the "Diamond assemble + quarter-turn" loader:
 
-<LoadingAnimationsGallery section="wave" />
+<LoadingAnimationsGallery section="variants" />
 
 ## Using the components
 
@@ -34,7 +33,6 @@ import {
   DiamondAssembleTurnLoader,
   DiamondRippleLoader,
   LogoHopLoader,
-  LogoWave,
 } from "@/app/_components/mdx/loadingAnimations";
 
 // Small inline spinner (e.g. beside a status message)
@@ -43,10 +41,8 @@ import {
 // Assemble + quarter-turn sequence for longer "preparing…" waits
 <DiamondAssembleTurnLoader size={72} />
 
-// Full-width rolling wave band for empty states and panel loading.
-// edges: "soft" (default) | "blend" (long fades so the band melts
-// into any background)
-<LogoWave edges="blend" height={96} duration={4.8} />
+// Tinted with a brand-palette colour
+<DiamondAssembleTurnLoader size={72} color="var(--ds-green-500)" />
 ```
 
-Every component accepts a `label` prop for its accessible name (default `"Loading…"`); the spinner accepts `duration` (seconds per revolution) and the wave accepts `edges`, `height` (the band renders aspect-true, so height also sets the crest spacing), and `duration` (snapped slightly so the traveling light loops seamlessly).
+Every component accepts a `label` prop for its accessible name (default `"Loading…"`) and a `color` prop to override the brand-blue tint; the continuous spinner also accepts `duration` (seconds per revolution).

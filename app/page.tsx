@@ -9,6 +9,7 @@ import "@/app/home.css";
 import type { Metadata } from "next";
 import { HomeClient } from "./_components/home/HomeClient";
 import type { Course, CourseTags } from "./_components/home/CoursesSection";
+import type { HomeStats } from "./_components/home/StatsBento";
 import { JsonLd } from "./_components/JsonLd";
 import { OG_IMAGE, SITE_URL } from "@/lib/site";
 import { organizationLd, websiteLd } from "@/lib/structuredData";
@@ -81,13 +82,77 @@ async function getCourses(): Promise<Course[]> {
   return courses.sort((a, b) => a.title.localeCompare(b.title));
 }
 
+// Recursively read every MDX lesson under a content directory so the home
+// page's stats reflect the live corpus instead of a hand-maintained number.
+async function readMdxFiles(dir: string): Promise<string[]> {
+  const entries = await readdir(dir, { withFileTypes: true });
+  const out: string[] = [];
+  for (const entry of entries) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      out.push(...(await readMdxFiles(full)));
+    } else if (entry.name.endsWith(".mdx")) {
+      out.push(await readFile(full, "utf-8"));
+    }
+  }
+  return out;
+}
+
+function countMatches(haystacks: string[], pattern: RegExp): number {
+  return haystacks.reduce(
+    (total, text) => total + (text.match(pattern)?.length ?? 0),
+    0,
+  );
+}
+
+// Build-time figures shown in the home page's Magic UI bento grid. Computed by
+// scanning the MDX corpus so they never drift from reality, then floored to a
+// round number for display (the grid renders them with a trailing "+").
+async function getHomeStats(courses: Course[]): Promise<HomeStats> {
+  const contentDir = path.join(process.cwd(), "content");
+  const [learnMdx, interviewMdx] = await Promise.all([
+    readMdxFiles(path.join(contentDir, "learn")),
+    readMdxFiles(path.join(contentDir, "interview")),
+  ]);
+  const allMdx = [...learnMdx, ...interviewMdx];
+
+  // Runnable blocks: executable `<CodeBlock>` (non-SQL) + `<SqlCodeBlock>`.
+  const runnableCodeBlocks =
+    countMatches(allMdx, /<CodeBlock[\s/>]/g) +
+    countMatches(allMdx, /<SqlCodeBlock[\s/>]/g);
+  // Auto-graded challenges: `<ChallengeCard>` (non-SQL) + `<SqlChallengeCard>`.
+  const codeChallenges =
+    countMatches(allMdx, /<ChallengeCard[\s/>]/g) +
+    countMatches(allMdx, /<SqlChallengeCard[\s/>]/g);
+
+  // Interview-prep role tracks: top-level directories under content/interview.
+  const interviewEntries = await readdir(path.join(contentDir, "interview"), {
+    withFileTypes: true,
+  });
+  const interviewRoles = interviewEntries.filter((e) =>
+    e.isDirectory(),
+  ).length;
+
+  // Floor to a tidy round number; the grid appends "+" so the figure stays
+  // honest as the corpus grows between builds.
+  const floorTo = (n: number, step: number) => Math.floor(n / step) * step;
+
+  return {
+    runnableCodeBlocks: floorTo(runnableCodeBlocks, 100),
+    codeChallenges: floorTo(codeChallenges, 50),
+    interviewRoles,
+    courses: courses.length,
+  };
+}
+
 export default async function Home() {
   const courses = await getCourses();
+  const stats = await getHomeStats(courses);
   return (
     <>
       <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
       <JsonLd data={[organizationLd(), websiteLd()]} />
-      <HomeClient courses={courses} />
+      <HomeClient courses={courses} stats={stats} />
     </>
   );
 }

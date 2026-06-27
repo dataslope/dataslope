@@ -220,7 +220,7 @@ export function HomeNav() {
     <header className="sticky top-0 z-40 bg-white dark:bg-[#121212]">
       <nav
         className={`mx-auto grid max-w-6xl grid-cols-[1fr_auto] items-center gap-3 px-4 transition-[height] duration-200 sm:px-6 md:grid-cols-[1fr_auto_1fr] ${
-          scrolled ? "h-11 md:h-12" : "h-16 md:h-20"
+          scrolled ? "h-11 md:h-12" : "h-14 md:h-16"
         }`}
       >
         {/* Left: brand */}

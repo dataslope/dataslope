@@ -8,6 +8,7 @@ import { HeroMarquee } from "./HeroMarquee";
 import { HeroInteractive } from "./HeroInteractive";
 import { BeamSection } from "./BeamSection";
 import { CoursesSection, type Course } from "./CoursesSection";
+import { StatsBento, type HomeStats } from "./StatsBento";
 import { PlaygroundShowcase } from "./PlaygroundShowcase";
 import { Faq } from "./Faq";
 import { HomeFooter } from "./HomeFooter";
@@ -32,7 +33,13 @@ function SectionHeading({
 }
 
 
-export function HomeClient({ courses }: { courses: Course[] }) {
+export function HomeClient({
+  courses,
+  stats,
+}: {
+  courses: Course[];
+  stats: HomeStats;
+}) {
   // Brand blue (--ds-blue-500) underline under the gray subtitle text, in both
   // light and dark mode.
   const underlineColor = "#148CFF";
@@ -106,6 +113,16 @@ export function HomeClient({ courses }: { courses: Course[] }) {
           {/* ── Courses ── */}
           <section className="py-12">
             <CoursesSection courses={courses} />
+          </section>
+
+          {/* ── At-a-glance stats (Magic UI bento grid) ── */}
+          <section className="py-12">
+            <BlurFade inView>
+              <StatsBento
+                stats={stats}
+                courseTitles={courses.map((c) => c.title)}
+              />
+            </BlurFade>
           </section>
 
           {/* ── Embedded playground showcase (heading/link follow the

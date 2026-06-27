@@ -15,23 +15,17 @@
  *    Rendered with the logo's own translucent radial gradients, the
  *    four overlapping swooshes show through as lighter petals around
  *    that hollow — this is the brand spinner shape.
- *  - Tiling gradient copies horizontally every 815.81 units (the
- *    distance between the two foot-cap centres) makes adjacent feet
- *    coincide; the translucent overlaps show as darker blob accents at
- *    each trough, producing a rolling wave that scrolls seamlessly.
- *    On top of the scroll, a traveling-light pulse (per-tile phased
- *    opacity) rolls along the crests; an optional blended-ends mode
- *    fades both ends out so the band melts into any background.
  *
  * All shapes render with `currentColor`; the CSS module sets the brand
- * blue (light/dark aware) on each wrapper, and honours
- * `prefers-reduced-motion` by swapping motion for an opacity pulse.
+ * blue (light/dark aware) on each wrapper unless a `color` prop overrides
+ * it, and honours `prefers-reduced-motion` by swapping motion for an
+ * opacity pulse.
  *
  * Exported pieces:
  *  - <DiamondMark /> — the hollow diamond as a static (non-animated) mark
  *  - <DiamondSpinner />, <DiamondTurnSpinner />, <DiamondAssembleLoader />,
  *    <DiamondAssembleTurnLoader />, <DiamondRippleLoader />, <LogoHopLoader />
- *  - <LogoWave />
+ *    (each takes an optional `color` to override the brand-blue tint)
  *  - <LoadingAnimationsGallery section=… /> — the /learn demo grid.
  */
 
@@ -46,22 +40,15 @@ import styles from "./loadingAnimations.module.css";
 const LOGO_W = 1087.59;
 const LOGO_H = 682.55;
 
-/** y of the foot-cap centres — the mirror axis for the diamond and the
- *  wave tiles. */
+/** y of the foot-cap centres — the mirror axis for the diamond. */
 const FOOT_Y = 546.66;
-/** Exact-mirror stack height (foot caps coinciding): the diamond's
- *  height, and the sine wave tiles' band height. The stack reads as a
- *  4-point star whose centre opens into a small hollow diamond — the
- *  translucent gradients let the overlapping swooshes show through as
- *  petals around that hollow. */
+/** Exact-mirror stack height (foot caps coinciding): the diamond's height.
+ *  The stack reads as a 4-point star whose centre opens into a small hollow
+ *  diamond — the translucent gradients let the overlapping swooshes show
+ *  through as petals around that hollow. */
 const MIRROR_H = FOOT_Y * 2; // 1093.32
 /** Stacked hollow-diamond height (alias for readability at use sites). */
 const DIAMOND_H = MIRROR_H;
-/** x distance between the left and right foot-cap centres
- *  (951.70 − 135.89). Tiling at this step makes adjacent feet coincide. */
-const TILE_STEP = 815.81;
-/** One full wave pattern: an upright tile plus a mirrored tile. */
-const WAVE_PERIOD = TILE_STEP * 2; // 1631.62 — must match waveScroll in the CSS
 
 const LEFT_D =
   "M679.63,139.57c.05-1.45.06-2.21.06-3.67C679.69,60.84,618.85,0,543.79,0s-132.49,57.51-135.75,129.67h0s-2.99,129.29-85.67,205.52c-73.47,67.75-167.89,74.85-188,75.59-1.2.01-2.39.04-3.58.09-.2,0-.3,0-.3,0h0C57.94,413.72,0,473.42,0,546.66s60.84,135.89,135.89,135.89c3.22,0,6.41-.12,9.57-.34h0s278.11,3.51,437.31-237.01c100.12-151.26,96.85-304.24,96.85-304.24v-1.4Z";
@@ -194,6 +181,10 @@ export interface SpinnerProps {
   duration?: number;
   /** Accessible label. */
   label?: string;
+  /** Override the brand-blue tint. Any CSS colour — e.g. `"#fff"`,
+   *  `"var(--ds-green-500)"`. The mark draws with `currentColor`, so this
+   *  sets the colour on the loader wrapper. */
+  color?: string;
 }
 
 /** Animation 1 (requested): the hollow diamond rotating continuously. */
@@ -201,10 +192,16 @@ export function DiamondSpinner({
   size = 44,
   duration = 1.5,
   label = "Loading…",
+  color,
 }: SpinnerProps) {
   const gradId = useSafeId("ds-dia");
   return (
-    <span className={styles.loader} role="img" aria-label={label}>
+    <span
+      className={styles.loader}
+      role="img"
+      aria-label={label}
+      style={color ? { color } : undefined}
+    >
       <svg
         viewBox={`0 0 ${LOGO_W} ${DIAMOND_H}`}
         width={size}
@@ -225,10 +222,16 @@ export function DiamondSpinner({
 export function DiamondTurnSpinner({
   size = 44,
   label = "Loading…",
+  color,
 }: Omit<SpinnerProps, "duration">) {
   const gradId = useSafeId("ds-turn");
   return (
-    <span className={styles.loader} role="img" aria-label={label}>
+    <span
+      className={styles.loader}
+      role="img"
+      aria-label={label}
+      style={color ? { color } : undefined}
+    >
       <svg
         viewBox={`0 0 ${LOGO_W} ${DIAMOND_H}`}
         width={size}
@@ -253,12 +256,18 @@ const ASSEMBLE_GAP = 170;
 export function DiamondAssembleLoader({
   size = 64,
   label = "Loading…",
+  color,
 }: Omit<SpinnerProps, "duration">) {
   const gradId = useSafeId("ds-asm");
   const viewH = DIAMOND_H + ASSEMBLE_GAP * 2;
   const height = Math.round(size * (viewH / LOGO_W));
   return (
-    <span className={styles.loader} role="img" aria-label={label}>
+    <span
+      className={styles.loader}
+      role="img"
+      aria-label={label}
+      style={color ? { color } : undefined}
+    >
       <svg
         viewBox={`0 ${-ASSEMBLE_GAP} ${LOGO_W} ${viewH}`}
         width={size}
@@ -286,9 +295,15 @@ export function DiamondAssembleLoader({
 export function DiamondRippleLoader({
   size = 72,
   label = "Loading…",
+  color,
 }: Omit<SpinnerProps, "duration">) {
   return (
-    <span className={styles.loader} role="img" aria-label={label}>
+    <span
+      className={styles.loader}
+      role="img"
+      aria-label={label}
+      style={color ? { color } : undefined}
+    >
       <svg
         viewBox={`0 0 ${LOGO_W} ${DIAMOND_H}`}
         width={size}
@@ -320,22 +335,29 @@ export function DiamondRippleLoader({
 /** Combined sequence: the halves drift together (assemble), the
  *  assembled diamond makes an eased QUARTER turn, the halves part
  *  again — and because they always part along the diamond's local
- *  vertical axis, the drift alternates between vertical (at 0°) and
- *  horizontal (at 90°) on screen. The diamond is only 2-fold
- *  symmetric, so one CSS loop contains two assemble-and-turn steps
- *  (180° total) to land back on an identical pose. Rotation lives on
- *  the <svg> (whose viewBox is vertically symmetric around the
+ *  vertical axis, the drift alternates between vertical (at 0°/180°)
+ *  and horizontal (at 90°/270°) on screen. One CSS loop contains FOUR
+ *  such steps — a full 360° revolution — so it lands back on the exact
+ *  same pose AND shading; a half turn would swap the two differently-
+ *  gradiented logo halves and the loop would visibly flip. Rotation
+ *  lives on the <svg> (whose viewBox is vertically symmetric around the
  *  diamond's centre, so the element centre is the rotation centre)
  *  while the translation lives on the inner half groups — the two
- *  keyframe sets share one 3.2s timeline in the CSS. */
+ *  keyframe sets share one 4.8s timeline in the CSS. */
 export function DiamondAssembleTurnLoader({
   size = 64,
   label = "Loading…",
+  color,
 }: Omit<SpinnerProps, "duration">) {
   const gradId = useSafeId("ds-asmturn");
   const viewH = DIAMOND_H + ASSEMBLE_GAP * 2;
   return (
-    <span className={styles.loader} role="img" aria-label={label}>
+    <span
+      className={styles.loader}
+      role="img"
+      aria-label={label}
+      style={color ? { color } : undefined}
+    >
       <svg
         viewBox={`0 ${-ASSEMBLE_GAP} ${LOGO_W} ${viewH}`}
         width={size}
@@ -361,6 +383,7 @@ export function DiamondAssembleTurnLoader({
 export function LogoHopLoader({
   size = 26,
   label = "Loading…",
+  color,
 }: Omit<SpinnerProps, "duration">) {
   const height = Math.round(size * (LOGO_H / LOGO_W));
   return (
@@ -368,6 +391,7 @@ export function LogoHopLoader({
       className={`${styles.loader} ${styles.hopRow}`}
       role="img"
       aria-label={label}
+      style={color ? { color } : undefined}
     >
       {[0, 1, 2].map((i) => (
         <span
@@ -389,116 +413,6 @@ export function LogoHopLoader({
   );
 }
 
-// ─── Wave ──────────────────────────────────────────────────────────────
-
-/** Widest container (in px) the pre-tiled wave must be able to fill.
- *  The tile count is derived from this so the band covers any
- *  realistic surface without runtime measurement. */
-const MAX_WAVE_BAND_PX = 4000;
-
-/** Per-tile phase offset and period (seconds) of the traveling-light
- *  pulse. The period must match `tileGlow` in the CSS module. */
-const PULSE_STEP_S = 0.3;
-const PULSE_PERIOD_S = 1.8;
-
-/** Snap a scroll duration so the traveling light stays seamless across
- *  the scroll loop: after one loop the track jumps back by two tiles,
- *  so the scene only repeats exactly when
- *  duration ≡ −2·PULSE_STEP (mod PULSE_PERIOD). Returns the nearest
- *  duration satisfying that. */
-function snapGlowDuration(duration: number): number {
-  const target =
-    (((-2 * PULSE_STEP_S) % PULSE_PERIOD_S) + PULSE_PERIOD_S) % PULSE_PERIOD_S;
-  const rem =
-    ((duration % PULSE_PERIOD_S) + PULSE_PERIOD_S) % PULSE_PERIOD_S;
-  let delta = target - rem;
-  if (delta > PULSE_PERIOD_S / 2) delta -= PULSE_PERIOD_S;
-  if (delta < -PULSE_PERIOD_S / 2) delta += PULSE_PERIOD_S;
-  return Math.max(PULSE_PERIOD_S, duration + delta);
-}
-
-export interface LogoWaveProps {
-  /** Edge treatment: "soft" keeps a narrow fade where the band is
-   *  clipped; "blend" fades the ends out over a long run on both
-   *  sides, so the wave dissolves into whatever background it sits
-   *  on. */
-  edges?: "soft" | "blend";
-  /** Band height in px. The wave renders aspect-true (no stretching),
-   *  so this also sets the crest-to-crest spacing. */
-  height?: number;
-  /** Seconds per scroll loop (two crests) — lower is faster. The value
-   *  is snapped (±0.9s) so the traveling light stays seamless across
-   *  the scroll loop. */
-  duration?: number;
-  label?: string;
-}
-
-/** Animation 2 (requested): the gradient mark repeated horizontally
- *  into a rolling wave with a traveling light. Tiles step by TILE_STEP
- *  so adjacent foot caps coincide, and because the fills keep the
- *  logo's translucent radial gradients, the doubled foot regions show
- *  through as darker blob accents at each trough — the stitched-logo
- *  look. Each tile's opacity oscillates with a per-tile phase offset,
- *  so a brightness pulse rolls along the crests. The svg is sized in
- *  px (aspect-true) wider than any container and cropped by the band,
- *  so the blobs stay circular; the track scrolls by exactly two tile
- *  steps per loop (matching waveScroll in the CSS). */
-export function LogoWave({
-  edges = "soft",
-  height = 96,
-  duration = 4.8,
-  label = "Loading…",
-}: LogoWaveProps) {
-  const gradId = useSafeId("ds-wave");
-  const tileId = `${gradId}-tile`;
-  const scrollDur = snapGlowDuration(duration);
-  const pxPerUnit = height / LOGO_H;
-  // Cover MAX_WAVE_BAND_PX plus one scroll loop of slack.
-  const neededUnits = MAX_WAVE_BAND_PX / pxPerUnit + WAVE_PERIOD;
-  const tileCount = Math.ceil((neededUnits - LOGO_W) / TILE_STEP) + 1;
-  const viewW = (tileCount - 1) * TILE_STEP + LOGO_W;
-
-  return (
-    <span
-      className={`${styles.waveBand}${
-        edges === "blend" ? ` ${styles.waveBandBlend}` : ""
-      }`}
-      style={{ height }}
-      role="img"
-      aria-label={label}
-    >
-      <svg
-        className={styles.waveSvg}
-        viewBox={`0 0 ${viewW} ${LOGO_H}`}
-        width={Math.ceil(viewW * pxPerUnit)}
-        height={height}
-        aria-hidden
-      >
-        <MarkGradientDefs idPrefix={gradId} />
-        <defs>
-          <g id={tileId}>
-            <GradientMarkPaths idPrefix={gradId} />
-          </g>
-        </defs>
-        <g
-          className={styles.waveTrack}
-          style={{ "--wave-dur": `${scrollDur}s` } as CSSProperties}
-        >
-          {Array.from({ length: tileCount }, (_, k) => (
-            <use
-              key={k}
-              href={`#${tileId}`}
-              x={k * TILE_STEP}
-              className={styles.waveTilePulse}
-              style={{ animationDelay: `${(-k * PULSE_STEP_S).toFixed(2)}s` }}
-            />
-          ))}
-        </g>
-      </svg>
-    </span>
-  );
-}
-
 // ─── Demo gallery (the /learn/loading-animations page) ────────────────
 
 function DemoCard({
@@ -506,18 +420,21 @@ function DemoCard({
   blurb,
   wide = false,
   fill = false,
+  dark = false,
   children,
 }: {
   title: string;
   blurb: string;
   wide?: boolean;
   fill?: boolean;
+  /** Dark preview backdrop — needed so a white loader variant is visible. */
+  dark?: boolean;
   children: ReactNode;
 }) {
   return (
     <section className={`${styles.card}${wide ? ` ${styles.cardWide}` : ""}`}>
       <div
-        className={`${styles.cardPreview}${fill ? ` ${styles.cardPreviewFill}` : ""}`}
+        className={`${styles.cardPreview}${fill ? ` ${styles.cardPreviewFill}` : ""}${dark ? ` ${styles.cardPreviewDark}` : ""}`}
       >
         {children}
       </div>
@@ -529,7 +446,38 @@ function DemoCard({
   );
 }
 
-export type GallerySection = "spinners" | "wave";
+export type GallerySection = "spinners" | "variants";
+
+/** Brand-palette colour variants. The mark draws with `currentColor`, so each
+ *  loader just takes a `color`. White needs a dark backdrop to be visible. */
+const COLOR_VARIANTS: {
+  title: string;
+  color: string;
+  dark?: boolean;
+  blurb: string;
+}[] = [
+  {
+    title: "White",
+    color: "#ffffff",
+    dark: true,
+    blurb: "For dark surfaces and overlays. Shown here on a dark backdrop.",
+  },
+  {
+    title: "Black",
+    color: "var(--ds-gray-900)",
+    blurb: "Neutral mark for light surfaces where brand blue is too loud.",
+  },
+  {
+    title: "Green",
+    color: "var(--ds-green-500)",
+    blurb: "Brand green (var(--ds-green-500)) — success and “ready” states.",
+  },
+  {
+    title: "Red",
+    color: "var(--ds-red-500)",
+    blurb: "Brand red (var(--ds-red-500)) — errors and destructive waits.",
+  },
+];
 
 /** The /learn demo grid. Rendered per section so the MDX page can put
  *  its own (TOC-visible) headings between groups. */
@@ -538,25 +486,19 @@ export default function LoadingAnimationsGallery({
 }: {
   section?: GallerySection;
 }) {
-  if (section === "wave") {
+  if (section === "variants") {
     return (
       <div className={`not-prose ${styles.gallery}`}>
-        <DemoCard
-          wide
-          fill
-          title="Wave — traveling light"
-          blurb="The gradient mark repeated horizontally with a brightness pulse rolling along the crests: each tile's opacity oscillates with a per-tile phase offset, reading as a light source sweeping along the wave while it scrolls."
-        >
-          <LogoWave height={96} duration={4.8} />
-        </DemoCard>
-        <DemoCard
-          wide
-          fill
-          title="Wave — blended ends"
-          blurb="The same wave with both ends faded out over a long run, so the band dissolves into whatever background it sits on."
-        >
-          <LogoWave edges="blend" height={96} duration={4.8} />
-        </DemoCard>
+        {COLOR_VARIANTS.map((v) => (
+          <DemoCard
+            key={v.title}
+            dark={v.dark}
+            title={`Diamond — ${v.title}`}
+            blurb={v.blurb}
+          >
+            <DiamondAssembleTurnLoader size={72} color={v.color} label="" />
+          </DemoCard>
+        ))}
       </div>
     );
   }
