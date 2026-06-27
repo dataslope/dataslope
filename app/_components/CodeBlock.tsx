@@ -1550,7 +1550,7 @@ function OutputSegment({ cell }: { cell: OutputCell }) {
     // Same trust assumption as the main playground: HTML cells are
     // produced by the embedded runtime executing code the user
     // themselves typed in this very widget. `not-prose` keeps the
-    // docs' prose typography (serif, table margins) from restyling
+    // docs' prose typography (enlarged Inter, table margins) from restyling
     // the dataframe markup when the block sits inside MDX content.
     return (
       <div

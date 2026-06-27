@@ -506,7 +506,7 @@ code.hljs {
    with tight tracking instead of the larger prose Inter that the `.prose`
    paragraph rule applies. Each step is authored as a bold title paragraph
    (`<p><strong>…</strong></p>`) followed by one description paragraph.
-   These selectors outrank the `.prose :where(p, …)` serif rule on
+   These selectors outrank the `.prose :where(p, …)` prose rule on
    specificity, so they win without !important.
    ─────────────────────────────────────────────────────────────────────── */
 .prose .fd-step > p {
