@@ -238,19 +238,18 @@ body {
   letter-spacing: -0.011em;
 }
 
-/* Source Serif 4 for headings — the opsz axis is bumped to 20 so the
-   typeface self-optimises at display sizes (wider apertures, adjusted
-   contrast). Letter-spacing resets to 0 to undo the tight Inter value
-   set on `body` above. */
+/* Inter for headings, with tightened tracking for a polished display
+   feel. The bundled Inter is a static (non-variable) webfont, so
+   font-variation-settings is cleared rather than driving an opsz axis. */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
-  font-variation-settings: "opsz" 20;
-  letter-spacing: 0;
+  font-family: var(--font-sans);
+  font-variation-settings: normal;
+  letter-spacing: -0.02em;
 }
 
 /* ── Syntax highlighting (highlight.js, GitHub theme) ────────────────
@@ -442,7 +441,7 @@ code.hljs {
   background: transparent;
 }
 
-/* ── Source Serif 4 for prose content ───────────────────────────────────
+/* ── Inter for prose content ────────────────────────────────────────────
    Applied to paragraphs, list items, and table cells inside Fumadocs
    prose regions. Explicitly excluded:
    - [data-flavor]                    SQL/non-SQL challenge cards & code blocks
@@ -457,11 +456,9 @@ code.hljs {
                                       overrides Mermaid's own font-size and the
                                       text overflows its measured node boxes
    - h1–h6                            headings (handled separately)
-   Optical size axis (opsz) is enabled via font-variation-settings so the
-   typeface self-optimises at body text sizes. Letter-spacing is pulled in
-   slightly (−0.006em) for a tighter, more polished editorial colour — a
-   gentler value than the −0.011em Inter tracking on `body`, since Source
-   Serif sets a touch looser than Inter at the same measure.
+   The bundled Inter is a static webfont, so font-variation-settings is
+   cleared. Letter-spacing is pulled in to −0.011em, matching the tight
+   Inter tracking set on `body`, for a polished editorial colour.
    ─────────────────────────────────────────────────────────────────────── */
 .prose :where(p, li, td, th):not(
   :where([class~="not-prose"], [class~="not-prose"] *),
@@ -473,16 +470,16 @@ code.hljs {
   :where([data-callout] *, .callout *),
   :where(svg *)
 ) {
-  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+  font-family: var(--font-sans);
   font-size: 1.125rem;
   line-height: 1.75;
-  font-variation-settings: "opsz" 16;
-  letter-spacing: -0.006em;
+  font-variation-settings: normal;
+  letter-spacing: -0.011em;
 }
 
 /* ── Table and callout font-size override ────────────────────────────────
    Tables and callouts are compact, information-dense contexts — scale
-   their Source Serif text back to 1rem (16px) with tighter leading.
+   their prose text back to 1rem (16px) with tighter leading.
 
    Fumadocs v16 callouts don't use [data-callout] or .callout — the
    CalloutContainer renders a plain <div> with an inline CSS custom
@@ -506,7 +503,7 @@ code.hljs {
 
 /* ── Steps component (Fumadocs docs styling) ─────────────────────────────
    Match the Fumadocs docs look for <Steps>/<Step>: compact Inter (sans)
-   with tight tracking instead of the large Source Serif that the `.prose`
+   with tight tracking instead of the larger prose Inter that the `.prose`
    paragraph rule applies. Each step is authored as a bold title paragraph
    (`<p><strong>…</strong></p>`) followed by one description paragraph.
    These selectors outrank the `.prose :where(p, …)` serif rule on
@@ -546,14 +543,14 @@ code.hljs {
 /* ── TOC navigation ──────────────────────────────────────────────────────
    Each TOC item is an <a> inside #nd-toc (desktop) or inside the mobile
    popover ([data-toc-popover-content]). The panel title is an <h3>.
-   opsz 14 is appropriate for the small (~13–14 px) text used here.
+   Inter with the standard tightened body tracking for these small links.
    ─────────────────────────────────────────────────────────────────────── */
 #nd-toc a,
 #nd-toc h3,
 [data-toc-popover-content] a {
-  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
-  font-variation-settings: "opsz" 14;
-  letter-spacing: 0;
+  font-family: var(--font-sans);
+  font-variation-settings: normal;
+  letter-spacing: -0.011em;
 }
 
 /* ── Page-footer navigation (prev / next) ────────────────────────────────
@@ -563,9 +560,9 @@ code.hljs {
    avoids touching breadcrumb links (which use <span>, not <p>).
    ─────────────────────────────────────────────────────────────────────── */
 #nd-page > div a p {
-  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
-  font-variation-settings: "opsz" 14;
-  letter-spacing: 0;
+  font-family: var(--font-sans);
+  font-variation-settings: normal;
+  letter-spacing: -0.011em;
 }
 
 /* ── Inter for MCQ and challenge card body text ─────────────────────────
@@ -590,8 +587,8 @@ code.hljs {
 /* Restore sans-serif on <td> and <th> inside challenge/quiz cards.
    These cover SQL result tables (.sqlResultTable) and markdown tables in
    instructions. The CSS module sets font-family: mono on .sqlResultTable
-   itself (inherited by td/th), so forcing sans-serif here avoids the
-   Source Serif rule overriding that inherited mono value. */
+   itself (inherited by td/th), so forcing sans-serif here keeps the
+   prose Inter rule from overriding that inherited mono value. */
 [data-flavor] td,
 [data-flavor] th,
 [data-testid="challenge-card"] td,
