@@ -21,8 +21,8 @@ interface BentoCardProps extends ComponentPropsWithoutRef<"div"> {
   background: ReactNode;
   Icon: React.ElementType;
   description: string;
-  /** Optional CTA link. When `href`/`cta` are omitted the card has no link
-   *  (and the copy no longer slides up on hover to reveal one). */
+  /** Optional CTA link, rendered (always visible) beneath the copy. When
+   *  `href`/`cta` are omitted the card simply has no link. */
   href?: string;
   cta?: string;
   /** Override the icon's size/spacing classes (e.g. a smaller icon on
@@ -72,55 +72,38 @@ const BentoCard = ({
       <div>{background}</div>
       {/* Page-coloured scrim so the animated background reads softly behind the
           card copy (white in light mode, #121212 in dark). */}
-      <div className="pointer-events-none absolute inset-0 bg-white/80 dark:bg-[#121212]/80" />
+      <div className="pointer-events-none absolute inset-0 bg-white/60 dark:bg-[#121212]/60" />
       <div className="p-6">
-        <div
-          className={cn(
-            "pointer-events-none z-10 flex transform-gpu flex-col gap-1 transition-all duration-300",
-            hasCta && "lg:group-hover:-translate-y-10",
-          )}
-        >
+        <div className="pointer-events-none z-10 flex flex-col gap-1">
+          {/* Icon size/position pinned to the former hover state (scale-75,
+              shrinking from its left edge) so it no longer resizes on hover. */}
           <Icon
             className={cn(
-              "mb-3 h-12 w-12 origin-left transform-gpu text-neutral-700 transition-all duration-300 ease-in-out group-hover:scale-75 dark:text-neutral-300",
+              "mb-3 h-12 w-12 origin-left scale-75 transform-gpu text-[var(--ds-gray-900)] dark:text-white",
               iconClassName,
             )}
           />
-          <h3 className="text-xl font-semibold text-neutral-700 dark:text-neutral-300">
+          {/* Icon, heading, and paragraph all share the body font colour. */}
+          <h3 className="text-xl font-semibold text-[var(--ds-gray-900)] dark:text-white">
             {name}
           </h3>
-          {/* Paragraph shares the heading's colour. */}
-          <p className="max-w-lg text-neutral-700 dark:text-neutral-300">
+          <p className="max-w-lg text-[var(--ds-gray-900)] dark:text-white">
             {description}
           </p>
         </div>
 
-        {/* Always-visible CTA on touch/small screens (no hover to reveal it). */}
+        {/* CTA is always shown (no hover reveal), tinted brand green, and
+            inherits the paragraph's font size (arrow sized to match via em). */}
         {hasCta && (
-          <div className="pointer-events-none mt-3 flex w-full transform-gpu flex-row items-center transition-all duration-300 lg:hidden">
-            <a
-              href={href}
-              className="pointer-events-auto inline-flex items-center text-sm font-medium text-[var(--ds-blue-600)] dark:text-[var(--ds-blue-300)]"
-            >
-              {cta}
-              <ArrowRightIcon className="ms-2 h-4 w-4 rtl:rotate-180" />
-            </a>
-          </div>
-        )}
-      </div>
-
-      {/* Hover-revealed CTA on large screens. */}
-      {hasCta && (
-        <div className="pointer-events-none absolute bottom-0 hidden w-full translate-y-10 transform-gpu flex-row items-center p-6 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 lg:flex">
           <a
             href={href}
-            className="pointer-events-auto inline-flex items-center text-sm font-medium text-[var(--ds-blue-600)] dark:text-[var(--ds-blue-300)]"
+            className="pointer-events-auto mt-3 inline-flex items-center font-medium text-[var(--ds-green-500)] dark:text-[var(--ds-green-400)]"
           >
             {cta}
-            <ArrowRightIcon className="ms-2 h-4 w-4 rtl:rotate-180" />
+            <ArrowRightIcon className="ms-2 size-[1em] rtl:rotate-180" />
           </a>
-        </div>
-      )}
+        )}
+      </div>
 
       <div className="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/[.03] group-hover:dark:bg-neutral-800/10" />
     </div>
