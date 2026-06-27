@@ -229,95 +229,6 @@
   animation: hop 1.15s ease-in-out infinite;
 }
 
-/* ── Wave (gradient mark tiled into a rolling wave) ─────────────────────
-   Tiles repeat every 815.81 user units (adjacent foot caps coincide);
-   the translucent gradients let the overlapping feet show through as
-   darker blob accents at each trough. The track scrolls by exactly two
-   tile steps (1631.62 user units — a whole number of periods) so the
-   loop is seamless. On SVG elements, CSS `px` equals user units. */
-
-@keyframes waveScroll {
-  to {
-    transform: translateX(-1631.62px);
-  }
-}
-
-.waveTrack {
-  animation: waveScroll var(--wave-dur, 10s) linear infinite;
-}
-
-/* Traveling light: each tile's opacity oscillates, phase-shifted per
-   tile via a negative inline animation-delay, so a brightness pulse
-   rolls along the crests (the "moving light source" effect). The
-   component snaps the scroll duration so the pulse phase also lines up
-   across the scroll seam — see snapGlowDuration in
-   loadingAnimations.tsx, which must stay in sync with this period. */
-@keyframes tileGlow {
-  0%,
-  100% {
-    opacity: 0.45;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.waveTilePulse {
-  animation: tileGlow 1.8s ease-in-out infinite;
-}
-
-/* The wave svg is sized in px by the component (aspect-true, wider than
-   any container) and cropped by the band, so the foot blobs stay
-   circular instead of stretching. */
-.waveSvg {
-  display: block;
-}
-
-.waveBand {
-  display: block;
-  width: 100%;
-  overflow: hidden;
-  color: var(--ds-blue, #148cff);
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent,
-    #000 8%,
-    #000 92%,
-    transparent
-  );
-  mask-image: linear-gradient(
-    to right,
-    transparent,
-    #000 8%,
-    #000 92%,
-    transparent
-  );
-}
-
-:global(.dark) .waveBand {
-  color: var(--ds-blue-400, #5ba7ff);
-}
-
-/* Blended ends: the fade runs deep into the band from both sides, so
-   only the middle stays at full strength and the wave dissolves into
-   whatever background it sits on. */
-.waveBandBlend {
-  -webkit-mask-image: linear-gradient(
-    to right,
-    transparent,
-    #000 32%,
-    #000 68%,
-    transparent
-  );
-  mask-image: linear-gradient(
-    to right,
-    transparent,
-    #000 32%,
-    #000 68%,
-    transparent
-  );
-}
-
 /* ── Inline boot notice demo (CodeBlock-style row) ─────────────────── */
 
 .bootDemo {
@@ -386,6 +297,11 @@
   padding: 0;
 }
 
+/* Dark backdrop so a white loader variant is visible in its preview. */
+.cardPreviewDark {
+  background: #18181b;
+}
+
 .cardMeta {
   padding: 10px 14px 12px;
   border-top: 1px solid var(--color-fd-border, #e3e6ea);
@@ -435,14 +351,11 @@
   .comboRotor,
   .comboHalf,
   .rippleCopy,
-  .hopGlyph,
-  .waveTrack,
-  .waveTilePulse {
+  .hopGlyph {
     animation: none;
   }
 
-  .loader,
-  .waveBand {
+  .loader {
     animation: rmPulse 2.5s ease-in-out infinite;
   }
 }

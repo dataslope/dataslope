@@ -61,8 +61,12 @@ export function DiamondBackground() {
     <div className="pointer-events-none absolute inset-0 flex items-start justify-end overflow-hidden pr-3 pt-3 [mask-image:linear-gradient(to_bottom_left,#000_38%,transparent_85%)]">
       {/* The loader draws with currentColor; recolour the SVG to black in
           light mode and white in dark mode (overriding its brand-blue tint). */}
-      <div className="opacity-90 transition-transform duration-300 ease-out group-hover:scale-105 [&_svg]:text-black dark:[&_svg]:text-white">
-        <DiamondAssembleTurnLoader size={300} label="" />
+      <div className="opacity-90 transition-transform duration-300 ease-out group-hover:scale-105">
+        <DiamondAssembleTurnLoader
+          size={300}
+          label=""
+          color="var(--ds-green-500)"
+        />
       </div>
     </div>
   );
@@ -205,7 +209,7 @@ export function TypingBackground() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden [mask-image:linear-gradient(to_top,transparent_22%,#000_78%)]">
       <div
-        className="absolute left-6 right-4 top-7 text-2xl font-normal"
+        className="absolute left-6 right-4 top-7 text-right text-2xl font-normal"
         style={{
           fontFamily: '"JetBrains Mono", "Fira Code", ui-monospace, monospace',
           color: "var(--ds-green)",
@@ -324,8 +328,8 @@ function CoursePill({ title, Icon }: { title: string; Icon: ElementType }) {
         aria-hidden
         className="grid size-8 flex-shrink-0 place-items-center rounded-lg"
         style={{
-          background: "var(--ds-blue-50)",
-          color: "var(--ds-blue-600)",
+          background: "var(--ds-green-50)",
+          color: "var(--ds-green-600)",
         }}
       >
         <Icon size={16} />

@@ -21,8 +21,13 @@ interface BentoCardProps extends ComponentPropsWithoutRef<"div"> {
   background: ReactNode;
   Icon: React.ElementType;
   description: string;
-  href: string;
-  cta: string;
+  /** Optional CTA link. When `href`/`cta` are omitted the card has no link
+   *  (and the copy no longer slides up on hover to reveal one). */
+  href?: string;
+  cta?: string;
+  /** Override the icon's size/spacing classes (e.g. a smaller icon on
+   *  link-less cards). Merged after the defaults so it wins. */
+  iconClassName?: string;
 }
 
 const BentoGrid = ({ children, className, ...props }: BentoGridProps) => {
@@ -47,62 +52,79 @@ const BentoCard = ({
   description,
   href,
   cta,
+  iconClassName,
   ...props
-}: BentoCardProps) => (
-  <div
-    key={name}
-    className={cn(
-      "group relative col-span-3 flex flex-col justify-between overflow-hidden rounded-xl",
-      // light styles
-      "bg-background [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]",
-      // dark styles
-      "transform-gpu dark:bg-background dark:[border:1px_solid_rgba(255,255,255,.1)] dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset]",
-      className,
-    )}
-    {...props}
-  >
-    <div>{background}</div>
-    {/* Page-coloured scrim so the animated background reads softly behind the
-        card copy (white in light mode, #121212 in dark). */}
-    <div className="pointer-events-none absolute inset-0 bg-white/80 dark:bg-[#121212]/80" />
-    <div className="p-6">
-      <div className="pointer-events-none z-10 flex transform-gpu flex-col gap-1 transition-all duration-300 lg:group-hover:-translate-y-10">
-        <Icon className="mb-3 h-12 w-12 origin-left transform-gpu text-neutral-700 transition-all duration-300 ease-in-out group-hover:scale-75 dark:text-neutral-300" />
-        <h3 className="text-xl font-semibold text-neutral-700 dark:text-neutral-300">
-          {name}
-        </h3>
-        <p className="max-w-lg text-neutral-400">{description}</p>
-      </div>
-
-      {/* Always-visible CTA on touch/small screens (no hover to reveal it). */}
-      <div className="pointer-events-none mt-3 flex w-full transform-gpu flex-row items-center transition-all duration-300 lg:hidden">
-        <a
-          href={href}
-          className="pointer-events-auto inline-flex items-center text-sm font-medium text-[var(--ds-blue-600)] dark:text-[var(--ds-blue-300)]"
-        >
-          {cta}
-          <ArrowRightIcon className="ms-2 h-4 w-4 rtl:rotate-180" />
-        </a>
-      </div>
-    </div>
-
-    {/* Hover-revealed CTA on large screens. */}
+}: BentoCardProps) => {
+  const hasCta = Boolean(href && cta);
+  return (
     <div
+      key={name}
       className={cn(
-        "pointer-events-none absolute bottom-0 hidden w-full translate-y-10 transform-gpu flex-row items-center p-6 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 lg:flex",
+        "group relative col-span-3 flex flex-col justify-between overflow-hidden rounded-xl",
+        // light styles
+        "bg-background [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]",
+        // dark styles
+        "transform-gpu dark:bg-background dark:[border:1px_solid_rgba(255,255,255,.1)] dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset]",
+        className,
       )}
+      {...props}
     >
-      <a
-        href={href}
-        className="pointer-events-auto inline-flex items-center text-sm font-medium text-[var(--ds-blue-600)] dark:text-[var(--ds-blue-300)]"
-      >
-        {cta}
-        <ArrowRightIcon className="ms-2 h-4 w-4 rtl:rotate-180" />
-      </a>
-    </div>
+      <div>{background}</div>
+      {/* Page-coloured scrim so the animated background reads softly behind the
+          card copy (white in light mode, #121212 in dark). */}
+      <div className="pointer-events-none absolute inset-0 bg-white/80 dark:bg-[#121212]/80" />
+      <div className="p-6">
+        <div
+          className={cn(
+            "pointer-events-none z-10 flex transform-gpu flex-col gap-1 transition-all duration-300",
+            hasCta && "lg:group-hover:-translate-y-10",
+          )}
+        >
+          <Icon
+            className={cn(
+              "mb-3 h-12 w-12 origin-left transform-gpu text-neutral-700 transition-all duration-300 ease-in-out group-hover:scale-75 dark:text-neutral-300",
+              iconClassName,
+            )}
+          />
+          <h3 className="text-xl font-semibold text-neutral-700 dark:text-neutral-300">
+            {name}
+          </h3>
+          {/* Paragraph shares the heading's colour. */}
+          <p className="max-w-lg text-neutral-700 dark:text-neutral-300">
+            {description}
+          </p>
+        </div>
 
-    <div className="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/[.03] group-hover:dark:bg-neutral-800/10" />
-  </div>
-);
+        {/* Always-visible CTA on touch/small screens (no hover to reveal it). */}
+        {hasCta && (
+          <div className="pointer-events-none mt-3 flex w-full transform-gpu flex-row items-center transition-all duration-300 lg:hidden">
+            <a
+              href={href}
+              className="pointer-events-auto inline-flex items-center text-sm font-medium text-[var(--ds-blue-600)] dark:text-[var(--ds-blue-300)]"
+            >
+              {cta}
+              <ArrowRightIcon className="ms-2 h-4 w-4 rtl:rotate-180" />
+            </a>
+          </div>
+        )}
+      </div>
+
+      {/* Hover-revealed CTA on large screens. */}
+      {hasCta && (
+        <div className="pointer-events-none absolute bottom-0 hidden w-full translate-y-10 transform-gpu flex-row items-center p-6 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 lg:flex">
+          <a
+            href={href}
+            className="pointer-events-auto inline-flex items-center text-sm font-medium text-[var(--ds-blue-600)] dark:text-[var(--ds-blue-300)]"
+          >
+            {cta}
+            <ArrowRightIcon className="ms-2 h-4 w-4 rtl:rotate-180" />
+          </a>
+        </div>
+      )}
+
+      <div className="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/[.03] group-hover:dark:bg-neutral-800/10" />
+    </div>
+  );
+};
 
 export { BentoCard, BentoGrid };
