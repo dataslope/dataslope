@@ -2,12 +2,13 @@
  * home.css — hardening for the home route ("/").
  * ----------------------------------------------------------------------------
  * The /learn route's stylesheet (app/learn/learn.css) defines GLOBAL element
- * typography — `body { font-family: Inter }` and `h1..h6 { font-family: serif }`
- * — and imports Tailwind's preflight, whose `.hidden` utility competes with our
- * responsive `md:*` display utilities. Next.js can leave that stylesheet
- * applied after a *client-side* back-navigation from /learn, so its rules bleed
- * onto this page: headings turn serif, and the nav menu (`hidden md:flex`) gets
- * stuck collapsed because the leaked `.hidden` outranks `md:flex`.
+ * typography — `body { font-family: Inter }` and `h1..h6 { font-family: Inter }`
+ * with tightened display tracking — and imports Tailwind's preflight, whose
+ * `.hidden` utility competes with our responsive `md:*` display utilities.
+ * Next.js can leave that stylesheet applied after a *client-side*
+ * back-navigation from /learn, so its rules bleed onto this page: headings pick
+ * up the docs' tightened heading tracking, and the nav menu (`hidden md:flex`)
+ * gets stuck collapsed because the leaked `.hidden` outranks `md:flex`.
  *
  * Scoping these rules under `.ds-home` gives them higher specificity than
  * learn.css's element/single-class selectors, so they win regardless of which
@@ -15,8 +16,8 @@
  * they never affect /learn itself.
  * ========================================================================== */
 
-/* Keep the whole page — and every heading in it — on Inter, immune to
- * learn.css's global serif `h1..h6` rule. */
+/* Keep the whole page — and every heading in it — on the home page's own
+ * Inter styling, immune to learn.css's global `h1..h6` heading rule. */
 .ds-home,
 .ds-home h1,
 .ds-home h2,

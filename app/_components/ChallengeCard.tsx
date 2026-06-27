@@ -2397,7 +2397,7 @@ function OutputCellView({ cell }: { cell: OutputCell }) {
   if (cell.type === "html") {
     return (
       <div
-        // `not-prose` keeps the docs' prose typography (serif font,
+        // `not-prose` keeps the docs' prose typography (enlarged Inter,
         // table margins) from restyling the dataframe markup when the
         // card sits inside MDX content.
         className={`${styles.outCellHtml} not-prose`}

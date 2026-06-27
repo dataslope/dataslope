@@ -1329,8 +1329,8 @@ body.playground-active {
   color: var(--text);
   /* Pin the empty-state text to Inter. Without this the heading/body simply
      inherit the document font, which is fine on the standalone playground but
-     lets a serif stack leak in wherever the playground is mounted inside a
-     serif-scoped context (the heading especially — see `.welcome h3`). */
+     lets a host's typography leak in wherever the playground is mounted inside
+     another styled context (the heading especially — see `.welcome h3`). */
   font-family: var(--font-ui);
   text-align: center;
   padding: 32px;
@@ -1346,7 +1346,7 @@ body.playground-active {
 }
 .welcome h3 {
   /* "Run a query to see results" is an <h3>. A bare `h3` selector (e.g. the
-     /learn docs' `h1–h6 { font-family: var(--font-serif) }`) would otherwise
+     /learn docs' `h1–h6 { font-family: var(--font-sans) }`) would otherwise
      win over the inherited value above, so pin Inter directly here — the
      `.welcome h3` selector outranks a lone element selector. */
   font-family: var(--font-ui);
@@ -2291,9 +2291,9 @@ input[type="range"].fs-slider:disabled {
   flex-shrink: 0;
 }
 .pkg-drawer-title {
-  /* Same serif-leak guard as .mobile-menu-drawer-title — this Drawer.Title
+  /* Same heading-leak guard as .mobile-menu-drawer-title — this Drawer.Title
      heading is portalled to body and would otherwise pick up the /learn
-     docs' serif `h1–h6` rule. */
+     docs' `h1–h6` rule (Inter with tightened display tracking). */
   font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 600;
@@ -3212,9 +3212,9 @@ input[type="range"].fs-slider:disabled {
 }
 .mobile-menu-drawer-title {
   /* Drawer.Title renders as a heading; pin the UI font so the docs'
-     `h1–h6 { font-family: var(--font-serif) }` rule (active when the
-     playground is embedded in /learn) can't leak serif into the
-     portalled bottom sheet. */
+     `h1–h6 { font-family: var(--font-sans) }` rule (active when the
+     playground is embedded in /learn) can't override the portalled bottom
+     sheet's title with the docs' heading tracking. */
   font-family: var(--font-ui);
   font-size: 13px;
   font-weight: 600;
@@ -3550,7 +3550,7 @@ input[type="range"].fs-slider:disabled {
   opacity: 0;
 }
 .confirm-popup {
-  /* Anchor the whole dialog to the UI font so a serif-scoped host (the
+  /* Anchor the whole dialog to the UI font so a styled host (the
      /learn docs, where these playgrounds embed) can't leak in via the
      portal. The title still needs its own rule below to beat `h1–h6`. */
   font-family: var(--font-ui);
@@ -3581,8 +3581,8 @@ input[type="range"].fs-slider:disabled {
 .confirm-title {
   /* Base UI renders Dialog.Title as an <h2>. This dialog is portalled to
      document.body, so when a playground is embedded in /learn the docs'
-     `h1–h6 { font-family: var(--font-serif) }` rule lands on it; pin the
-     UI font so the title never falls into serif. */
+     `h1–h6 { font-family: var(--font-sans) }` rule lands on it; pin the
+     UI font so the title keeps its intended weight and tracking. */
   font-family: var(--font-ui);
   font-size: 15px;
   font-weight: 600;
@@ -3841,8 +3841,8 @@ html[data-playground-theme="light"] .toast {
 
 .toast-title {
   /* `Toast.Title` renders an <h2>. Pin Inter directly (rather than relying on
-     the `.toast` parent's font-family) so a bare `h1–h6` rule from a
-     serif-scoped host context can't override the inherited value. */
+     the `.toast` parent's font-family) so a bare `h1–h6` rule from a styled
+     host context can't override the inherited value. */
   font-family: var(--font-ui);
   font-weight: 600;
   font-size: 12.5px;
