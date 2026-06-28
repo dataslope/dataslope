@@ -106,28 +106,24 @@ size are weaker but let you pack *more variables* into one chart. A
 2-D scatter shows two variables through position; map color and size
 too and you are showing four variables at once.
 
-<CodeBlock
-  adapter="r"
-  files={[
-    {
-      filename: "main.r",
-      starterCode: `library(ggplot2)
-
-# Four variables in one plot, each through its own aesthetic channel.
-ggplot(mpg, aes(
-  x = displ, y = hwy,
-  color = class, size = cty
+<CodeBlock adapter="r"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[{ filename: "main.r",
+    initCode: `library(ggplot2)\npenguins <- read.csv("penguins.csv")\npenguins <- na.omit(penguins)`,
+    starterCode: `# Four variables in one plot, each through its own aesthetic channel.
+ggplot(penguins, aes(
+  x = flipper_length_mm, y = body_mass_g,
+  color = species, size = bill_length_mm
 )) +
   geom_point(alpha = 0.7)
-`,
-    },
-  ]}
-/>
+` }]} />
 
-Read the channels: x = engine size, y = highway MPG, color = vehicle
-class, size = city MPG. Four columns, four aesthetics, one chart. Each
+Read the channels: x = flipper length, y = body mass, color = species,
+size = bill length. Four columns, four aesthetics, one chart. Each
 mapping also produced its own **guide** (the axes, the color legend,
-the size legend) automatically.
+the size legend) automatically. Notice how the three species pull apart
+into clusters — the penguins are a favorite teaching set precisely
+because so many of their variables separate the groups cleanly.
 
 <Callout type="warn" title="Channels have a budget">
 Just because you *can* map many aesthetics does not mean you *should*.

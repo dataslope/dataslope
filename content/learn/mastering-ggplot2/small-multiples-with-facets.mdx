@@ -121,22 +121,18 @@ held constant across panels.
 ## facet_wrap: one variable, wrapped into a grid
 
 `facet_wrap(~ var)` lays panels out in rows and columns that "wrap"
-like text. Control the shape with `nrow` or `ncol`:
+like text. Control the shape with `nrow` or `ncol`. Here one panel per
+penguin species makes each species' flipper-to-mass relationship easy
+to compare on shared axes:
 
-<CodeBlock
-  adapter="r"
-  files={[
-    {
-      filename: "main.r",
-      starterCode: `library(ggplot2)
-
-ggplot(mpg, aes(displ, hwy)) +
-  geom_point() +
-  facet_wrap(~class, nrow = 2)
-`,
-    },
-  ]}
-/>
+<CodeBlock adapter="r"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[{ filename: "main.r",
+    initCode: `library(ggplot2)\npenguins <- read.csv("penguins.csv")\npenguins <- na.omit(penguins)`,
+    starterCode: `ggplot(penguins, aes(flipper_length_mm, body_mass_g)) +
+  geom_point(alpha = 0.6) +
+  facet_wrap(~species, nrow = 1)
+` }]} />
 
 ## facet_grid: a 2-D matrix of two variables
 

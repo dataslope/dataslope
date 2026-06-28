@@ -5,20 +5,48 @@ description: A deep, intuition-first tour of ggplot2 and the Grammar of Graphics
 
 Welcome to **Mastering ggplot2: The Grammar of Graphics in R**.
 
-You have almost certainly made a chart before. Maybe in Excel or
-Google Sheets, maybe in Tableau or Power BI, maybe with `matplotlib`,
-`seaborn`, Plotly, or base R's `plot()`. You know what a scatter plot
-is. You know a bar chart from a histogram. You are *not* a beginner at
-visualization.
+Before a single word of theory, let us make a chart. The block below is
+**live** — it is running R in your browser right now, through a
+WebAssembly build called WebR. Click **Run** and a plot appears.
 
-So why a whole course on one R package?
+<CodeBlock adapter="r"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[{ filename: "main.r",
+    initCode: `library(ggplot2)\npenguins <- read.csv("penguins.csv")\npenguins <- na.omit(penguins)`,
+    starterCode: `ggplot(penguins, aes(flipper_length_mm, body_mass_g, color = species)) +
+  geom_point()` }]} />
+
+Three species of Antarctic penguin, each a different color, heavier
+birds toward the top, longer-flippered birds toward the right — and the
+legend appeared on its own. **Now make it yours.** Change `color = species`
+to `color = island`, or `color = sex`, and re-run. One word changes, and
+the whole chart re-poses to answer a new question. That single edit is
+the entire idea of this course in miniature.
+
+<Callout type="info" title="This whole course runs in your browser">
+Every R code block on these pages executes through
+[WebR](https://docs.r-wasm.org/webr/latest/) — a full build of R
+compiled to WebAssembly. `ggplot2` is already loaded; there is nothing
+to install and nothing to download but the page itself. Edit any
+snippet, click **Run**, and the plot (or table) renders inline. Break
+things on purpose. It is the fastest way to learn.
+</Callout>
+
+## Why a whole course on one R package?
+
+You have almost certainly made a chart before — in Excel or Google
+Sheets, in Tableau or Power BI, with `matplotlib`, `seaborn`, Plotly,
+or base R's `plot()`. You know a scatter plot from a bar chart. You are
+*not* a beginner at visualization.
+
+So why study one package in depth?
 
 Because `ggplot2` is not "another charting library." It is the
-practical embodiment of a **theory** — the *Grammar of Graphics* —
-that quietly reorganizes how you think about every chart you will ever
-make. Once it clicks, you stop asking *"which function draws the chart
-I want?"* and start asking *"which **components** does my chart
-need?"* That shift is the entire point of this course.
+practical embodiment of a **theory** — the *Grammar of Graphics* — that
+quietly reorganizes how you think about every chart you will ever make.
+Once it clicks, you stop asking *"which function draws the chart I
+want?"* and start asking *"which **components** does my chart need?"*
+That shift is the entire point of this course.
 
 <svg
   viewBox="0 0 640 260"
@@ -128,23 +156,17 @@ This course is **not** about:
 
 We will use other ideas only when they help explain ggplot2.
 
-## How the interactive pages work
+## The widgets you will meet
 
-Every R code block on these pages runs **in your browser** through
-[WebR](https://docs.r-wasm.org/webr/latest/) — a full build of R
-compiled to WebAssembly. `ggplot2` is already available; there is
-nothing to install. Edit any snippet and click **Run**; plots render
-inline as images.
+You will work with three kinds of interactive element:
 
-You will meet three kinds of widgets:
-
-1. **Executable R code blocks.** Change them, run them, break them,
-   fix them.
-2. **Multiple-choice questions.** Quick conceptual checks. The harder
-   or more foundational a page is, the more of these you will find —
+1. **Executable R code blocks** like the one above. Change them, run
+   them, break them, fix them.
+2. **Challenge cards** — short tasks that check your code against
+   hidden tests, so you know when you have it right.
+3. **Multiple-choice questions** — quick conceptual checks. The harder
+   or more foundational a page is, the more of these you will find;
    getting the mental model right early saves hours later.
-3. **Callouts** for tips, warnings, and "why does this matter?"
-   moments.
 
 <Callout type="info" title="Each block is isolated">
 Variables defined in one `<CodeBlock>` are **not** visible in the
@@ -186,4 +208,5 @@ ggplot(mpg, aes(x = displ, y = hwy, color = drv)) +
 
 Do not worry about understanding it yet. Notice only this: the plot is
 *added together*, one component at a time, with `+`. That is the
-grammar at work.
+grammar at work — and by the final chapter you will dissect this exact
+figure line by line.

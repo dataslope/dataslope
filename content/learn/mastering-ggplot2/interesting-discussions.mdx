@@ -1,0 +1,191 @@
+---
+title: Interesting Discussions
+description: Optional asides for the curious — where R came from, why ggplot2 has a "2", the story behind the penguins, and Anscombe's quartet, the single best argument for plotting at all.
+---
+
+The main course is about the grammar. This page is for the curious:
+true stories and asides that did not need to interrupt the lessons, but
+are worth knowing. Read it in any order, skip it freely.
+
+<svg
+  viewBox="0 0 640 180"
+  role="img"
+  aria-label="Four small framed vignettes connected by a dotted thread — a language tree, a numbered tag, a small penguin silhouette, and four tiny identical-looking charts"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor">
+    <rect x="40" y="40" width="120" height="96" rx="10" opacity="0.07" />
+    <rect x="195" y="40" width="120" height="96" rx="10" opacity="0.07" />
+    <rect x="350" y="40" width="120" height="96" rx="10" opacity="0.07" />
+    <rect x="505" y="40" width="95" height="96" rx="10" opacity="0.07" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="98" y="100" width="4" height="22" rx="2" />
+    <circle cx="100" cy="70" r="8" />
+    <circle cx="82" cy="92" r="5" fillOpacity="0.6" />
+    <circle cx="118" cy="92" r="5" fillOpacity="0.6" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <text x="255" y="100" textAnchor="middle" fontFamily="var(--font-mono), ui-monospace, monospace" fontSize="40" fontWeight="bold">{"2"}</text>
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <ellipse cx="410" cy="92" rx="20" ry="28" />
+    <circle cx="410" cy="58" r="13" />
+    <circle cx="406" cy="55" r="2.5" fillOpacity="0.4" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="516" y="52" width="34" height="34" rx="4" fillOpacity="0.18" />
+    <rect x="556" y="52" width="34" height="34" rx="4" fillOpacity="0.18" />
+    <rect x="516" y="92" width="34" height="34" rx="4" fillOpacity="0.18" />
+    <rect x="556" y="92" width="34" height="34" rx="4" fillOpacity="0.18" />
+    <circle cx="525" cy="78" r="2" />
+    <circle cx="533" cy="72" r="2" />
+    <circle cx="541" cy="66" r="2" />
+    <circle cx="566" cy="76" r="2" />
+    <circle cx="574" cy="70" r="2" />
+    <circle cx="582" cy="64" r="2" />
+  </g>
+</svg>
+
+## Where R came from
+
+ggplot2 is an R package, so it inherits a history. **R** was begun in
+the early 1990s by **Ross Ihaka** and **Robert Gentleman** at the
+University of Auckland, New Zealand. The name is a small double joke: it
+plays on their shared initial "**R**," and it nods one letter back from
+**S**, the statistical language created by **John Chambers** at Bell
+Labs that R was designed to be compatible with. R was released as free
+software and grew into the lingua franca of academic statistics — fertile
+ground for an ambitious idea like a grammar of graphics to take root.
+
+## A little more on the "2"
+
+The course page told you that **ggplot2** means *grammar of graphics,
+version 2*. The detail worth adding: the original `ggplot` (2005) and
+ggplot2 (2007) are genuinely *different* implementations, not a version
+bump. Wickham found the first design awkward and rewrote it from
+scratch with the layered `+` syntax you use today. The original
+`ggplot` is long retired; nobody installs it. When people say "ggplot"
+in conversation, they almost always mean ggplot2 — the "2" has faded
+into a quirk of the name.
+
+## The penguins you have been plotting
+
+Several examples in this course use the **Palmer Penguins** data set —
+body measurements for three penguin species in Antarctica. It is worth
+knowing where it comes from. The measurements were collected by
+**Dr. Kristen Gorman** at the **Palmer Station** Long-Term Ecological
+Research site in Antarctica. They were packaged into a friendly R data
+set by **Allison Horst** as a deliberate, ethically-clean alternative
+to *Fisher's iris* — a flower data set long used for teaching, but tied
+to its author's promotion of eugenics. Penguins do the same teaching
+job (three groups, several numeric measurements that separate them) with
+a far better backstory, which is why the visualization community
+adopted them so quickly.
+
+<CodeBlock adapter="r"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[{ filename: "main.r",
+    initCode: `library(ggplot2)\npenguins <- read.csv("penguins.csv")\npenguins <- na.omit(penguins)`,
+    starterCode: `# Bill shape alone almost separates the three species.
+ggplot(penguins, aes(bill_length_mm, bill_depth_mm, color = species)) +
+  geom_point(size = 2)
+` }]} />
+
+## Anscombe's quartet: the case for plotting at all
+
+Of every story in this course, this is the one to remember. In 1973 the
+statistician **Francis Anscombe** published four small data sets — now
+called **Anscombe's quartet** — engineered to share nearly identical
+summary statistics. Each of the four has the *same* mean of x, mean of
+y, variance, correlation, and best-fit regression line, to two decimal
+places. By the numbers, they are indistinguishable.
+
+Plot them, and they could not be more different.
+
+<CodeBlock
+  adapter="r"
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# 'anscombe' ships with base R. First, the summaries:
+# every set has ~the same mean x, mean y, and correlation.
+sapply(1:4, function(i) {
+  x <- anscombe[[paste0("x", i)]]
+  y <- anscombe[[paste0("y", i)]]
+  c(mean_x = mean(x), mean_y = round(mean(y), 2),
+    cor = round(cor(x, y), 2))
+})
+`,
+    },
+  ]}
+/>
+
+The three rows are essentially constant across all four sets. Now look
+at the pictures:
+
+<CodeBlock
+  adapter="r"
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `library(ggplot2)
+
+# Reshape the four x/y pairs into long form, then facet.
+long <- do.call(rbind, lapply(1:4, function(i) {
+  data.frame(
+    set = paste("Set", i),
+    x   = anscombe[[paste0("x", i)]],
+    y   = anscombe[[paste0("y", i)]]
+  )
+}))
+
+ggplot(long, aes(x, y)) +
+  geom_smooth(method = "lm", se = FALSE, color = "grey70") +
+  geom_point(color = "steelblue", size = 2) +
+  facet_wrap(~set)
+`,
+    },
+  ]}
+/>
+
+Same regression line in every panel — yet one set is a clean linear
+trend, one is a curve, one is a perfect line dragged off by a single
+outlier, and one is a vertical stack with one far-right point. The
+numbers hid all of that. **The plot revealed it instantly.**
+
+<Callout type="info" title="Why this belongs in a ggplot2 course">
+Anscombe built his quartet by hand, decades before ggplot2, to make a
+single argument: *look at your data.* Summary statistics compress, and
+compression discards. A good chart is the cheapest insurance you can buy
+against being fooled by an average. Everything you learn here is in
+service of that one habit.
+</Callout>
+
+## ggplot2 and the tidyverse
+
+ggplot2 is part of the **tidyverse**, a family of R packages — `dplyr`,
+`tidyr`, `readr`, and others — that share conventions and a common
+philosophy about "tidy" data (one variable per column, one observation
+per row). This course keeps such detours minimal; our subject is
+ggplot2 itself. But in real projects you will usually see data prepared
+with `dplyr`/`tidyr` and then piped straight into `ggplot()`, and the
+[Next Steps](/learn/mastering-ggplot2/next-steps) page shows that
+pattern.
+
+<MultipleChoice
+  markdown={`What is the main lesson of Anscombe's quartet?
+
+- Correlation is always a useless statistic.
+  > Correlation is useful; the lesson is that summaries alone can mislead, not that they are worthless.
+- Four data sets can never share the same mean.
+  > They can — that is the whole construction; the quartet was *engineered* to share summaries.
+- [o] Data sets with nearly identical summary statistics can have completely different shapes, so you should plot the data and not rely on summaries alone.
+  > Identical numbers, four different pictures — the case for looking at your data.
+- Regression lines are unreliable and should be avoided.
+  > Regression is fine; the point is to pair it with a plot so you can see whether it fits.
+
+Identical summaries, four very different pictures: the quartet is the
+classic argument for visualizing data rather than trusting numbers
+alone.`}
+/>

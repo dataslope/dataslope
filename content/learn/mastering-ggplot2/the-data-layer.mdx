@@ -246,6 +246,69 @@ Whether a column is continuous or discrete drives the scale, the
 legend, and the palette — a core reason \`factor()\` appears so often.`}
 />
 
+## Quick challenge: make it tidy
+
+The wide table below hides `year` in its column *names*. Reshape it into
+a **long** data frame called `tidy` with three columns — `region`,
+`year`, and `sales` — so that `year` becomes something you could map.
+Six rows in total (two regions × three years).
+
+<ChallengeCard
+  adapter="r"
+  title="Reshape wide data to long"
+  instructions={`Build a long data frame called \`tidy\` with columns \`region\`, \`year\`, and \`sales\`, one row per region-year. It should have 6 rows. The wide source \`wide\` is provided.`}
+  files={[
+    {
+      filename: "main.r",
+      initCode: `wide <- data.frame(
+  region = c("North", "South"),
+  y2019  = c(100, 80),
+  y2020  = c(120, 95),
+  y2021  = c(150, 110),
+  stringsAsFactors = FALSE
+)`,
+      starterCode: `tidy <- NULL # TODO: a 6-row data frame with region, year, sales
+
+print(tidy)
+`,
+      solutionCode: `tidy <- data.frame(
+  region = rep(wide$region, times = 3),
+  year   = rep(c(2019, 2020, 2021), each = 2),
+  sales  = c(wide$y2019, wide$y2020, wide$y2021)
+)
+
+print(tidy)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "is_df",
+      name: "tidy is a data frame",
+      description: "Should be a data.frame instance",
+      code: `if (!is.data.frame(tidy)) stop("tidy must be a data.frame")`,
+    },
+    {
+      id: "rows",
+      name: "Six rows",
+      description: "2 regions × 3 years",
+      code: `if (nrow(tidy) != 6) stop(sprintf("expected 6 rows, got %d", nrow(tidy)))`,
+    },
+    {
+      id: "cols",
+      name: "Has region, year, sales",
+      description: "year is now a column, not a header",
+      code: `if (!all(c("region", "year", "sales") %in% names(tidy))) stop("need columns region, year, sales")`,
+    },
+    {
+      id: "total",
+      name: "Sales total is preserved",
+      description: "All six values carried over",
+      code: `if (sum(tidy$sales) != 655) stop(sprintf("expected sales to sum to 655, got %s", sum(tidy$sales)))`,
+    },
+  ]}
+/>
+
 ## Key takeaways
 
 - ggplot2 plots **data frames**: rows are observations, columns are

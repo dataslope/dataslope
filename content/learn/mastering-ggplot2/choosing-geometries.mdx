@@ -259,6 +259,59 @@ Counting and classifying your variables (one categorical + one
 continuous) points directly to boxplots or violins.`}
 />
 
+## Quick challenge: bar vs. col
+
+The data frame `sales` already has the heights you want (`revenue`), one
+row per `product`. Build a ggplot object called `p` that draws a bar
+chart with `product` on x and bar heights equal to `revenue`. Pick the
+geom that uses *supplied* heights — not the one that counts rows.
+
+<ChallengeCard
+  adapter="r"
+  title="Bars from supplied heights"
+  instructions={`Assign to \`p\` a ggplot of \`sales\` with \`product\` on x and bars whose height is \`revenue\`. Use the geom that takes y-values you already have (so each product gets one bar of its own height, not a bar of height 1).`}
+  files={[
+    {
+      filename: "main.r",
+      initCode: `library(ggplot2)
+sales <- data.frame(
+  product = c("A", "B", "C"),
+  revenue = c(120, 85, 47),
+  stringsAsFactors = FALSE
+)`,
+      starterCode: `p <- NULL # TODO: a bar chart using the supplied revenue as height
+
+print(p)
+`,
+      solutionCode: `p <- ggplot(sales, aes(x = product, y = revenue)) +
+  geom_col()
+
+print(p)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "is_ggplot",
+      name: "p is a ggplot",
+      description: "Should be a ggplot object",
+      code: `if (!inherits(p, "ggplot")) stop("p must be a ggplot object")`,
+    },
+    {
+      id: "one_layer",
+      name: "Has exactly one layer",
+      description: "A single bar layer",
+      code: `if (length(p$layers) != 1) stop(sprintf("expected 1 layer, got %d", length(p$layers)))`,
+    },
+    {
+      id: "uses_identity_stat",
+      name: "Heights are supplied, not counted",
+      description: "The layer uses StatIdentity (geom_col), not StatCount (geom_bar)",
+      code: `if (!inherits(p$layers[[1]]$stat, "StatIdentity")) stop("use geom_col so heights come from revenue, not counts")`,
+    },
+  ]}
+/>
+
 ## Key takeaways
 
 - Pick a geom by **counting and typing your variables**: 1 continuous →

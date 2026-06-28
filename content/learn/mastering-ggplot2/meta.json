@@ -27,7 +27,6 @@
         "---",
         "plotting-systems-that-dont-scale",
         "origins-of-the-grammar",
-        "the-birth-of-ggplot2",
         "---",
         "the-seven-components",
         "your-first-ggplot",
@@ -59,6 +58,8 @@
         "---",
         "anatomy-of-a-complete-plot",
         "a-complete-workflow",
+        "---",
+        "interesting-discussions",
         "next-steps"
     ]
 }
