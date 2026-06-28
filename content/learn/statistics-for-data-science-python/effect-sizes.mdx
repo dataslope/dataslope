@@ -176,6 +176,46 @@ ranking), a `d` of 0.05 can be worth a fortune. In a medical trial, a
 override domain knowledge about what magnitude *matters here*.
 </Callout>
 
+### A real, genuinely large effect
+
+In *T-Tests* we found that Adelie and Gentoo penguins have significantly
+different flipper lengths (the p-value was vanishingly small). But "how
+*different*?" is the effect-size question. Run Cohen's d on the same two
+groups from the **Palmer penguins** dataset:
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+import pandas as pd
+penguins = pd.read_csv("penguins.csv")
+
+def cohens_d(a, b):
+    na, nb = len(a), len(b)
+    s_pooled = np.sqrt(((na - 1) * a.var(ddof=1) + (nb - 1) * b.var(ddof=1)) / (na + nb - 2))
+    return (a.mean() - b.mean()) / s_pooled`,
+      starterCode: `adelie = penguins.loc[penguins["species"] == "Adelie", "flipper_length_mm"].dropna()
+gentoo = penguins.loc[penguins["species"] == "Gentoo", "flipper_length_mm"].dropna()
+
+print(f"Raw difference : {gentoo.mean() - adelie.mean():+.1f} mm")
+print(f"Cohen's d      : {cohens_d(gentoo, adelie):.2f}")
+print()
+print("d > 4: the two species barely overlap on flipper length.")
+print("This is what a genuinely huge real-world effect looks like —")
+print("far beyond the '0.8 = large' guidepost.")
+`,
+    },
+  ]}
+/>
+
+A Cohen's d above 4 is off the end of the usual table — the distributions
+are almost completely separated. Biology hands you effects this clean;
+product experiments almost never do, which is the whole reason the next
+section matters.
+
 ## Demonstrating significance ≠ importance
 
 Time to prove the central claim with code. We'll take a difference so

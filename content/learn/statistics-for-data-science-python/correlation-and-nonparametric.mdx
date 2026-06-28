@@ -121,6 +121,33 @@ association is distinguishable from "no relationship." Report **both**:
 the coefficient for *how strong*, the p-value for *how sure it's not
 zero*.
 
+The synthetic example was engineered to be linear; real data isn't always
+so obliging, but sometimes it is. In the **Palmer penguins** dataset,
+flipper length and body mass move together for an obvious reason — bigger
+penguins have bigger everything. Run it and you'll find a strong, clean
+positive correlation.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+from scipy import stats
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `# Drop rows missing either measurement, then correlate.
+clean = penguins[["flipper_length_mm", "body_mass_g"]].dropna()
+r, p = stats.pearsonr(clean["flipper_length_mm"], clean["body_mass_g"])
+
+print(f"Pearson r = {r:.3f}   (p = {p:.2e})")
+print("A strong positive link: longer flippers go with heavier birds.")
+print("But remember — this is association, not proof one CAUSES the other.")
+`,
+    },
+  ]}
+/>
+
 ### When Pearson and Spearman disagree
 
 The clearest way to feel the difference: a relationship that is perfectly
@@ -198,6 +225,72 @@ print("This is exactly why you plot the data before trusting a number.")
     },
   ]}
 />
+
+### The same r, four different stories: Anscombe's quartet
+
+The U-shape above shows one way correlation can mislead. The most famous
+demonstration shows four ways at once. In 1973 Francis Anscombe
+published four tiny datasets — the **Anscombe quartet** — engineered to
+share the *same* Pearson correlation (about **0.82**) along with the
+same means and standard deviations. Run this on the real data and read
+the `corr_xy` column: four datasets, one correlation.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "anscombes_quartet.csv", stageAs: "anscombe.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+from scipy import stats
+aq = pd.read_csv("anscombe.csv")`,
+      starterCode: `for name, g in aq.groupby("dataset"):
+    r, _ = stats.pearsonr(g["x"], g["y"])
+    print(f"dataset {name}: Pearson r = {r:.3f}")
+
+print()
+print("All four have r ~ 0.82. The correlation cannot tell them apart.")
+`,
+    },
+  ]}
+/>
+
+A correlation of 0.82 sounds like a clean linear relationship — and for
+dataset `I` it is. But `II` is a perfect curve (Pearson, demanding a
+straight line, undersells it), `III` is a perfect line dragged off by a
+single outlier, and `IV` is a vertical stack whose entire correlation
+comes from one stray point. Plot them and the differences are obvious;
+the coefficient hides all of it.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "anscombes_quartet.csv", stageAs: "anscombe.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+import plotly.express as px
+import statsmodels.api as sm  # enables trendline="ols"
+aq = pd.read_csv("anscombe.csv")`,
+      starterCode: `# Same r = 0.82 in every panel. The shapes could not be more different.
+fig = px.scatter(
+    aq, x="x", y="y", facet_col="dataset", facet_col_wrap=2,
+    trendline="ols", title="Anscombe's quartet — identical correlation, four pictures",
+)
+fig.show()
+`,
+    },
+  ]}
+/>
+
+<Callout type="tip" title="The reflex Anscombe is teaching">
+A single number — correlation, mean, slope — is a *lossy compression* of
+your data. Before you trust one, scatter the two variables. The cost is
+one line of code, the payoff is catching curves, outliers, and leverage
+points that no coefficient will ever warn you about. The *Datasaurus
+Dozen* (which you'll meet in *Statistical Fallacies*) takes this same
+joke to thirteen datasets that even draw a dinosaur.
+</Callout>
 
 ### The single most important caveat: correlation is not causation
 

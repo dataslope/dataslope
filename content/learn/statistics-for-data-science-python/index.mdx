@@ -140,9 +140,11 @@ four ideas click, everything else is application.
 
 ## The tools we use
 
-Every code block on every page is runnable. Edit it, click **Run**,
-and the output appears underneath. We lean on four libraries you'll
-use constantly as a working data scientist:
+Every code block on every page is runnable. **This whole course runs
+in your browser** — there's nothing to install. Edit any block, click
+**Run**, and the output appears underneath, computed by a real Python
+interpreter (Pyodide) loaded into this page. We lean on four libraries
+you'll use constantly as a working data scientist:
 
 | Library | What we use it for |
 | --- | --- |
@@ -151,41 +153,85 @@ use constantly as a working data scientist:
 | **scipy.stats** | Distributions, hypothesis tests, confidence intervals |
 | **Plotly Express** | Visualizing distributions, sampling, and results |
 
-Here's a taste. This snippet simulates an A/B test where the two
-groups are *truly identical*, then asks `scipy.stats` whether it can
-tell them apart. Run it a few times in your head — sometimes the
-"difference" looks convincing even though there's nothing there.
+## Try it now: the most famous warning in statistics
+
+In 1973 the statistician Francis Anscombe published four small
+datasets in a paper called *Graphs in Statistical Analysis*. They have
+become legendary, because they share almost the *exact same* summary
+statistics — same mean of `x`, same mean of `y`, same standard
+deviations, same correlation, even the same fitted regression line —
+yet they could hardly be more different.
+
+The block below loads **Anscombe's quartet** (`I`, `II`, `III`, `IV`)
+and computes those summaries for all four. Run it. Notice how
+suspiciously identical every row is — to two decimal places, they're
+the same dataset.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "anscombes_quartet.csv", stageAs: "anscombe.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import numpy as np
-from scipy import stats
+      initCode: `import pandas as pd
+aq = pd.read_csv("anscombe.csv")`,
+      starterCode: `# Four datasets, side by side. Look how identical the summaries are.
+summary = aq.groupby("dataset").agg(
+    mean_x=("x", "mean"),
+    mean_y=("y", "mean"),
+    std_x=("x", "std"),
+    std_y=("y", "std"),
+).round(2)
 
-rng = np.random.default_rng(7)
+# Correlation between x and y, computed separately for each dataset.
+summary["corr_xy"] = aq.groupby("dataset").apply(
+    lambda g: g["x"].corr(g["y"])
+).round(3)
 
-# Two groups drawn from the EXACT same process — no real difference.
-control = rng.normal(loc=100, scale=15, size=50)
-treatment = rng.normal(loc=100, scale=15, size=50)
-
-diff = treatment.mean() - control.mean()
-t, p = stats.ttest_ind(control, treatment)
-
-print(f"Observed difference in means: {diff:+.2f}")
-print(f"p-value from a t-test:        {p:.3f}")
+print(summary)
 print()
-print("Even with NO real effect, random samples differ.")
-print("Statistics is how we decide whether a difference is believable.")
+print("Same means. Same spreads. Same correlation (~0.82).")
+print("So the four datasets are basically the same... right?")
 `,
     },
   ]}
 />
 
-By the end of the course, every line of that snippet — `normal`,
-`ttest_ind`, the p-value, and especially how to *interpret* it — will
-be second nature.
+Now the twist. The summaries are nearly identical, but the *data* is
+not. **Plot the four groups** and they look completely different: one
+is a tidy line, one is a smooth curve, one is a perfect line wrecked by
+a single outlier, and one is a vertical stack rescued by one stray
+point. Try it — replace the code above with this and run it:
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "anscombes_quartet.csv", stageAs: "anscombe.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+import plotly.express as px
+import statsmodels.api as sm  # enables trendline="ols"
+aq = pd.read_csv("anscombe.csv")`,
+      starterCode: `# Identical summaries, four completely different pictures.
+fig = px.scatter(
+    aq, x="x", y="y", facet_col="dataset", facet_col_wrap=2,
+    trendline="ols", title="Anscombe's quartet — same stats, different data",
+)
+fig.show()
+`,
+    },
+  ]}
+/>
+
+That single comparison is the whole argument for this course in one
+screen. A data scientist who trusts the summary numbers alone calls all
+four datasets the same and is wrong four times over. The fix is not
+more math — it's the discipline to *look*, to quantify uncertainty, and
+to know which statistic answers which question. By the end of the
+course, every tool in that exercise — correlation, regression lines,
+`scipy.stats` tests, and especially how to *interpret* them — will be
+second nature.
 
 ## How the interactive widgets work
 

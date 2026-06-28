@@ -318,6 +318,39 @@ average tip downward. Always ask *why* a value is missing before
 deciding how to handle it — the mechanism matters more than the count.
 </Callout>
 
+We injected those gaps to make a point, but real datasets arrive with
+their own holes. The **Palmer penguins** dataset is a clean example:
+two penguins are missing every body measurement (they were never fully
+recorded), and eleven are missing `sex`. The same `isna()` checks read
+that out directly — no simulation needed.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `missing = penguins.isna().sum()
+print("Missing values per column:")
+print(missing[missing > 0])
+
+rows_with_holes = penguins.isna().any(axis=1).sum()
+print(f"\\nRows with at least one missing value: {rows_with_holes} of {len(penguins)}")
+print("The 2 penguins missing every measurement are a clue, not noise —")
+print("ask WHY before you drop them.")
+`,
+    },
+  ]}
+/>
+
+The 11 missing `sex` values outnumber the 2 missing measurements, which
+is itself a finding: sex was harder to record than size. Whether you
+drop, impute, or keep those rows depends entirely on the question you're
+asking — but you can only make that call after you've *looked* at the
+pattern.
+
 <svg
   viewBox="0 0 640 190"
   role="img"

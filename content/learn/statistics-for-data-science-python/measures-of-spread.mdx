@@ -505,6 +505,34 @@ print("Report median + IQR for skewed data like this.")
   ]}
 />
 
+The same summary on real data tells a story about the world. The
+**Palmer penguins** dataset measures body mass for three species. Group
+by species and compare the spreads: do all three vary by the same
+amount, or is one species far more uniform than another?
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+from scipy import stats
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `for species, group in penguins.groupby("species"):
+    mass = group["body_mass_g"].dropna()
+    print(
+        f"{species:<10} mean={mass.mean():6.0f}g  "
+        f"std={mass.std():5.0f}g  iqr={stats.iqr(mass):5.0f}g"
+    )
+
+print("\\nGentoo penguins are both heavier AND more spread out.")
+print("A center alone ('Gentoo are bigger') would hide that.")
+`,
+    },
+  ]}
+/>
+
 <ChallengeCard
   adapter="python"
   title="Compute and compare spread for two groups"

@@ -474,6 +474,20 @@ significant result you ask "how big?"; after a non-significant one you ask
 "did I have the power to see it?". The p-value opens the conversation; it
 does not close it.
 
+<Callout type="info" title="Where did 0.05 come from? (a true story)">
+The famous 0.05 threshold is not a law of nature — it's a convention that
+hardened into a rule. **R.A. Fisher** suggested it in the 1920s as a
+convenient cutoff, calling it a reasonable line for deciding a result
+"deserves a second look," and openly noting the choice was somewhat
+arbitrary. The field then ossified it into a pass/fail gate, with
+enormous downstream consequences for what gets published and believed. In
+2016 the **American Statistical Association** took the rare step of
+issuing a formal statement warning against exactly this misuse —
+treating `p < 0.05` as a bright line for truth, ignoring effect sizes,
+and the p-hacking we're about to cover. Treat 0.05 as a default worth
+questioning, not a verdict.
+</Callout>
+
 ## The danger of looking many times: p-hacking
 
 Here is the practical reason all of this matters. If H₀ is true, a
@@ -481,6 +495,19 @@ p-value is essentially a uniform random number between 0 and 1. So if you
 test **20 independent things** that are all truly null, you *expect* one
 of them to come up "significant" at α = 0.05 — by pure luck. Hunt
 through enough comparisons and you will always find a "discovery."
+
+<Callout type="info" title="The green jelly beans">
+The canonical illustration of this is the webcomic *xkcd* #882,
+"Significant." Scientists test whether jelly beans cause acne and find
+nothing (p > 0.05). A bystander insists it must be a *specific color*, so
+they test all 20 colors one by one. Nineteen come back null; the green
+ones hit p < 0.05. The next panel is a newspaper headline: "GREEN JELLY
+BEANS LINKED TO ACNE!" — with the "only 5% chance of coincidence!"
+caption that ignores the 19 other tests. One significant result out of 20
+null tests is exactly what chance predicts. This is the multiple-comparisons
+problem in a single comic, and you will see real analyses make the same
+mistake without the punchline.
+</Callout>
 
 <svg
   viewBox="0 0 640 190"

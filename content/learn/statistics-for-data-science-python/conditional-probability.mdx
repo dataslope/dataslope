@@ -476,6 +476,56 @@ prevents a huge fraction of real-world misjudgments in fraud, security,
 medicine, and analytics.
 </Callout>
 
+## The Monty Hall problem: conditioning that fooled the experts
+
+Conditional probability is so counterintuitive that it once triggered a
+public uproar. In 1990, the columnist Marilyn vos Savant answered a
+reader's question in *Parade* magazine about the game show *Let's Make a
+Deal*. The setup: three doors, a car behind one and goats behind the
+other two. You pick a door. The host — who **knows** where the car is —
+opens a *different* door to reveal a goat, then asks: do you want to
+switch to the remaining door?
+
+Vos Savant said switching wins **2/3 of the time**. Thousands of readers
+wrote in to say she was wrong, including people with advanced degrees in
+mathematics. She was right. The key is that the host's choice is *not*
+random — it's conditioned on knowing where the car is, which leaks
+information to the remaining door. Don't take anyone's word for it; run
+it 100,000 times and count.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+rng = np.random.default_rng(0)`,
+      starterCode: `trials = 100_000
+car = rng.integers(0, 3, size=trials)       # door hiding the car
+pick = rng.integers(0, 3, size=trials)      # your initial guess
+
+# If you STAY, you win exactly when your first pick was the car.
+stay_wins = (pick == car).mean()
+
+# If you SWITCH, you win exactly when your first pick was WRONG,
+# because the host then clears the only other goat for you.
+switch_wins = (pick != car).mean()
+
+print(f"Win rate if you STAY   : {stay_wins:.3f}  (~1/3)")
+print(f"Win rate if you SWITCH : {switch_wins:.3f}  (~2/3)")
+print()
+print("Switching doubles your odds. The host's knowledge is the catch.")
+`,
+    },
+  ]}
+/>
+
+The simulation needs no clever Bayes algebra — the win conditions fall
+straight out of *what the host's move tells you*. That's conditional
+probability doing exactly what the disease-test example did: a piece of
+information (the opened goat door) reshapes a probability you thought was
+settled.
+
 ## Practice
 
 <ChallengeCard
