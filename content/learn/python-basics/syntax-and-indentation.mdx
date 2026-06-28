@@ -3,10 +3,14 @@ title: Syntax and Indentation
 description: How Python uses whitespace, PEP 8 style, and the tabs vs spaces convention
 ---
 
-The previous page noted that Python uses indentation to delimit blocks
-of code. This page goes into detail: what counts as a block, what
-PEP 8 has to say about style, how to keep your editor honest, and why
-this choice sparked one of programming's most famous debates.
+On the last page we met the Zen of Python — "Readability counts." This page
+is where that aphorism becomes a law of the language. Python uses **indentation
+itself** to delimit blocks of code, which means whitespace is not cosmetic in
+Python; it is syntax. Here we cover what counts as a block, what PEP 8 has to
+say about style, and how to keep your editor honest. (The deeper story — why
+Guido van Rossum made this divisive choice, and the legendary tabs-versus-spaces
+war it touched off — waits for you in *The Story of Python* near the end of the
+course.)
 
 <svg
   viewBox="0 0 640 220"
@@ -140,60 +144,21 @@ Tools that enforce this for you:
   rolls up most of the older tools (`flake8`, `isort`, `pyupgrade`).
 - Most editors (VS Code, PyCharm, Vim, Emacs) can run these on save.
 
-## The tabs vs spaces debate
+### The one-line answer to tabs vs spaces
 
-We touched on this on the *Python History* page. The debate is older
-than Python itself and predates programming languages: it started with
-typewriters and word processors. The arguments in favor of each:
+You may have heard that tabs versus spaces is a holy war among programmers.
+For Python the practical answer is short: **use four spaces, and let your editor
+insert them when you press Tab.** PEP 8 is explicit about it —
 
-| Argument | Tabs | Spaces |
-| --- | --- | --- |
-| Each developer picks their own width | ✅ Yes | ❌ No |
-| Renders identically everywhere | ❌ No | ✅ Yes |
-| Easier to align continuation lines | ❌ No | ✅ Yes |
-| Default in PEP 8, `black`, `ruff` | ❌ No | ✅ Yes |
-| Allowed in Python 3 source | ✅ Yes (alone) | ✅ Yes (alone) |
-| Accessibility: screen readers / low vision | ✅ Better | ❌ Worse |
+> Spaces are the preferred indentation method. Tabs should be used solely to
+> remain consistent with code that is already indented with tabs.
 
-### The strongest argument for tabs
-
-The accessibility argument is real: a developer with low vision can
-configure their editor to display a tab as 8 spaces for easier reading,
-while a sighted colleague can set it to 2 spaces to fit more code on
-screen. With spaces, everyone is locked into the same visual width.
-
-### The strongest argument for spaces
-
-Tabs break alignment of continuation lines. Consider:
-
-```python
-result = some_function(arg1, arg2,
-                       arg3, arg4)
-```
-
-If the file uses tabs, the alignment of `arg3` depends on the tab width
-of your editor. On one machine it looks perfect; on another it is
-misaligned. Spaces render identically everywhere.
-
-### The community consensus
-
-The community has effectively settled on **four spaces**. PEP 8 states:
-
-> **Spaces are the preferred indentation method. Tabs should be used
-> solely to remain consistent with code that is already indented with
-> tabs.**
-
-For brand-new code, **use four spaces**. If you join a project that
-already uses tabs, stay consistent with what is there. Either way,
-configure your editor to insert *one or the other* automatically so
-you never produce mixed indentation.
-
-<Callout type="error" title="The Silicon Valley incident">
-In the TV show *Silicon Valley*, an engineer quits over a tabs-vs-spaces
-argument. The scene is a joke, but it is rooted in reality: this debate
-has genuinely derailed code reviews and project contributions. Do not
-let it derail yours. Pick four spaces and move on.
-</Callout>
+So write new code with four spaces; if you join a project that already uses
+tabs, match it. Either way, configure your editor to insert one or the other
+automatically and you will never produce the mixed indentation that triggers a
+`TabError`. The longer, surprisingly heated history of *why* this argument
+exists at all is one of the deep-dives in *The Story of Python* later on — it is
+genuinely entertaining, but it should never slow down your actual work.
 
 ## Continuation lines
 

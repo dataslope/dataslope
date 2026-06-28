@@ -399,6 +399,70 @@ with open("data.csv") as f:
 On Windows, the default text mode translates `\n` to `\r\n`, which doubles the line endings in CSV files. Pass `newline=""` to `open()` to disable this translation. The CSV module handles line endings correctly when you do.
 </Callout>
 
+### Reading a real CSV file
+
+Writing your own three-row CSV is one thing. Most of the time, though, the file
+already exists — someone else exported it, and your job is to read it. The block
+below does exactly that with a real dataset: **344 records of Antarctic penguins**
+from the Palmer Station research program in Antarctica. The `datasets` setting
+hands the file to your program as `penguins.csv`, so your code just opens it like
+any local file.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import csv
+
+with open("penguins.csv", newline="") as f:
+    reader = csv.DictReader(f)
+    rows = list(reader)
+
+print("Total penguins:", len(rows))
+print("Columns:", reader.fieldnames)
+print("First row:", rows[0]["species"], "on", rows[0]["island"])
+`,
+    },
+  ]}
+/>
+
+Notice that every value `csv` hands back is a **string** — even the numeric
+columns like `body_mass_g`. That is true of CSV everywhere: a CSV file is just
+text, so converting fields to numbers is your responsibility. Here we read the
+body-mass column, skip the blank cells that real data always contains, and
+average what's left:
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import csv
+
+masses = []
+with open("penguins.csv", newline="") as f:
+    for row in csv.DictReader(f):
+        value = row["body_mass_g"]
+        if value:                      # skip empty cells
+            masses.append(float(value))
+
+print("Penguins with a known mass:", len(masses))
+print("Average body mass (g):", round(sum(masses) / len(masses), 1))
+`,
+    },
+  ]}
+/>
+
+<Callout type="info" title="When the file is really tabular, reach for pandas">
+The `csv` module is perfect for simple, row-by-row work and ships with Python.
+Once you start filtering, grouping, and aggregating tabular data, the
+[pandas](https://pandas.pydata.org/) library (`pd.read_csv("penguins.csv")`) does
+all of this in a line or two. You will meet it on the *Next Steps* page.
+</Callout>
+
 ## Binary mode
 
 Use `"rb"` or `"wb"` for binary files (images, executables, pickle files, etc.). Binary mode gives you `bytes` instead of `str`.

@@ -54,6 +54,38 @@ Without a virtual environment, \`pip install\` modifies your global Python insta
 
 This page is reference material; the commands below are intended to be run in your terminal on your local machine, not in the interactive code blocks.
 
+## First, installing Python locally
+
+Everything you have done so far ran in the browser, with no install at all. The
+moment you want to run scripts on your own machine, install third-party
+libraries, and connect Python to your editor, you need a local Python. Install
+the **latest stable Python 3** (3.13 at the time of writing) unless a specific
+project pins you to an older version — and never use the Python 2 you might find
+lurking on an older system, which reached end-of-life in 2020.
+
+How you install depends on your operating system:
+
+- **macOS** — Use [Homebrew](https://brew.sh/) (`brew install python`) or the
+  installer from [python.org/downloads](https://www.python.org/downloads/). Do
+  not touch the system Python that ships with macOS; it is there for the OS, not
+  for you.
+- **Windows** — Run the installer from
+  [python.org/downloads](https://www.python.org/downloads/) and, on the very
+  first screen, **check "Add python.exe to PATH."** Forgetting that box is the
+  single most common Windows gotcha — without it, the `python` command will not
+  be found in your terminal. The Microsoft Store package is a fine alternative
+  that handles PATH for you.
+- **Linux** — Your package manager already has a recent Python:
+  `sudo apt install python3 python3-pip python3-venv` on Debian/Ubuntu,
+  `sudo dnf install python3 python3-pip` on Fedora.
+
+If you routinely juggle several Python versions, [`pyenv`](https://github.com/pyenv/pyenv)
+(or the modern `uv`, below) installs them side by side and switches between them
+per project. Verify any install with `python3 --version` (just `python` on
+Windows). Running `python3` with no arguments drops you into the **REPL** — read,
+eval, print, loop — an interactive prompt perfect for testing one-liners, much
+like the code blocks throughout this course.
+
 ## Why virtual environments?
 
 Imagine you have two projects:
@@ -373,4 +405,7 @@ The `.venv/` directory is never committed. Your teammates and CI systems recreat
   > \`virtualenv\` predates \`venv\` and still exists, but \`venv\` (built into Python) is now standard. \`uv\` is faster than both.`}
 />
 
-You now have everything you need to start writing real Python projects. The final page surveys what to learn next.
+You now have everything you need to start writing real Python projects. Before the
+final roadmap, the next page is an optional deep-dive — *The Story of Python* —
+for anyone curious about where the language came from and why it makes whitespace
+matter. After that, *Next Steps* surveys what to learn next.

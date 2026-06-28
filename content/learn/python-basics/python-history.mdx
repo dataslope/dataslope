@@ -1,14 +1,16 @@
 ---
-title: Python History
-description: Where Python came from, why it looks the way it does, and the debates that shaped it
+title: "Interesting discussions: The Story of Python"
+description: An optional deep-dive into where Python came from, why it makes whitespace matter, and the debates that shaped it
 ---
 
-Python is a high-level, interpreted programming language created by
-**Guido van Rossum** and first released in **February 1991**. Guido was
-working at CWI (Centrum Wiskunde & Informatica) in the Netherlands and
-started Python as a hobby project over the 1989 Christmas holidays,
-aiming to create a successor to the ABC teaching language he had helped
-develop.
+You have finished the working parts of the course — you can write functions,
+build classes, and reason about scope and generators. This page is different.
+It is optional, and there is no code to run and no challenge to pass. It is here
+for the curious reader who, having learned *how* Python works, now wants the
+larger story of *why* it works that way.
+
+Almost every design decision in Python has a person and a reason behind it. Once
+you know them, the language stops feeling arbitrary.
 
 <svg
   viewBox="0 0 640 220"
@@ -48,157 +50,193 @@ develop.
   </g>
 </svg>
 
-<Callout type="info" title="Why 'Python'?">
-The name has nothing to do with snakes. Guido was reading scripts from
-*Monty Python's Flying Circus* at the time and wanted a name that was
-"short, unique, and slightly mysterious." The community has run with the
-snake imagery ever since.
-</Callout>
+## A holiday project
 
-## A visual timeline
+In late December 1989, a programmer named **Guido van Rossum** found himself
+with a quiet week. His office at CWI — the Centrum Wiskunde & Informatica, a
+national research institute in the Netherlands — was closed for the Christmas
+holidays, and he was looking for a project to occupy the time. He had recently
+worked on a teaching language called **ABC**, and while he admired its ideas, he
+had a long list of things he would have done differently. So over that holiday
+he began building a successor.
+
+He needed a name. He was, at the time, reading the published scripts of *Monty
+Python's Flying Circus*, the British comedy series, and he wanted something
+"short, unique, and slightly mysterious." He called it **Python**. The snake
+imagery came later, supplied by the community and by book publishers; the name
+itself is a comedy reference, not a reptile one.
+
+The first public release, **Python 0.9.0**, went out to the `alt.sources`
+Usenet newsgroup in **February 1991**. It already had functions, exceptions, and
+the core data types — lists, dictionaries, strings — that you have spent this
+course learning. The language has grown enormously since, but its character was
+set in that first holiday.
 
 ```mermaid
 timeline
-    title Key Milestones in Python History
-    1989 : Guido starts Python project at CWI
+    title Key milestones in Python history
+    1989 : Guido starts Python over the Christmas holidays at CWI
     1991 : Python 0.9.0 released on alt.sources
     1994 : Python 1.0 ships lambda, map, filter, reduce
-    2000 : Python 2.0 adds list comprehensions and GC
-    2008 : Python 3.0 breaks backward compatibility
-    2018 : Guido steps down as BDFL
-    2019 : Steering Council governance begins
-    2020 : Python 2 officially end-of-life
-    2023 : Python 3.12 ships per-interpreter GIL groundwork
-    2024 : Python 3.13 experimental free-threaded build
+    2000 : Python 2.0 adds list comprehensions
+    2008 : Python 3.0 breaks backward compatibility on purpose
+    2018 : Guido steps down as BDFL after the walrus debate
+    2020 : Python 2 reaches official end-of-life
+    2024 : Python 3.13 ships an experimental free-threaded build
 ```
 
-## Design philosophy
+## The most divisive decision: whitespace as syntax
 
-Python's design is deeply influenced by **ABC**, an earlier teaching
-language Guido helped build at CWI. The guiding ideas are captured in
-*The Zen of Python* (PEP 20), which you can read at any time by running
-`import this`.
+By the time Python appeared, nearly every mainstream language marked blocks of
+code with explicit delimiters — curly braces `{ ... }` in C, JavaScript, and
+Java, or keywords like `begin ... end` in Pascal. Guido made a different choice,
+and it is the one that still defines how Python *looks*: blocks are marked by
+**indentation itself**.
 
-<CodeBlock
-  adapter="python"
-  files={[
-    {
-      filename: "main.py",
-      starterCode: `import this
-`,
-    },
-  ]}
-/>
+His reasoning was almost mischievously simple. Programmers already indent their
+code to show structure to other humans. The indentation is right there, doing
+its job for the reader — so why should the compiler ignore it and demand a
+*second*, redundant set of braces? Let the indentation be the structure. The
+consequence is that badly indented Python does not merely look messy; it refuses
+to run. There is no "silently wrong" indentation, and there is no decades-long
+argument about whether the opening brace goes on the same line or the next.
 
-The Zen prizes **readability**, **explicitness**, and **one obvious
-way** to do something. These values explain a lot of Python's choices,
-including its most famous one: significant whitespace.
+People feel strongly about this in both directions. Some find it liberating —
+one whole category of style bikeshedding simply vanishes. Others miss the
+explicit delimiters of C-like languages and find the reliance on invisible
+characters unnerving. Either way, it is non-negotiable in Python, and it is the
+single feature most likely to surprise a newcomer arriving from another
+language.
 
-## Why indentation is part of the syntax
+## The tabs-versus-spaces war
 
-Most languages use braces or `begin`/`end` keywords for blocks; Python
-uses indentation. Guido's reasoning was that programmers indent code
-to communicate structure to humans anyway, so the compiler may as well
-trust that indentation rather than ignore it. The result is that
-**badly indented code simply will not run**, which keeps every Python
-codebase visually consistent.
+Significant whitespace had a side effect Guido may not have fully anticipated:
+it took an old, low-grade argument and poured gasoline on it. If whitespace is
+*syntax*, then the choice between indenting with **tab characters** and
+indenting with **spaces** is no longer purely cosmetic — it can change whether a
+program even parses.
 
-<CodeBlock
-  adapter="python"
-  files={[
-    {
-      filename: "main.py",
-      starterCode: `# Try changing the indentation below and re-run.
-for i in range(3):
-    if i % 2 == 0:
-        print(i, "is even")
-    else:
-        print(i, "is odd")
-`,
-    },
-  ]}
-/>
+The debate itself is older than Python, older than programming; it goes back to
+typewriters and word processors, where a "tab" was a physical jump to the next
+stop. In code, each side has a genuine point:
 
-## The Python 2 to 3 transition
+- **The case for tabs.** A tab is one character that each developer can *display*
+  at whatever width they like — two spaces to fit more on screen, eight for
+  easier reading. That flexibility is a real accessibility win: a developer with
+  low vision can widen the indentation without touching the file. With spaces,
+  everyone is locked to the same visual width.
+- **The case for spaces.** A tab's width is unpredictable, so any alignment that
+  depends on it breaks when the file moves between editors. Spaces render
+  identically everywhere, every time. This is why PEP 8, and the formatters that
+  enforce it, land on spaces.
 
-Python 3 was released in December 2008 and intentionally broke
-backward compatibility to fix long-standing language warts. The
-biggest changes were:
+The community settled the question for Python long ago. PEP 8 states it plainly:
+"Spaces are the preferred indentation method," with tabs reserved only for
+staying consistent with code that already uses them. **Four spaces** is the
+answer. Python 3 even removed the old escape hatch: mix tabs and spaces in one
+block and you get a hard `TabError`, where Python 2 would silently guess.
 
-- `print` became a function: `print("hi")` instead of `print "hi"`.
-- All strings are Unicode by default; `bytes` is a separate type.
-- Integer division uses `//`; `/` always returns a float.
-- `dict.keys()`, `range()`, `map()`, and friends return views/
-  iterators instead of lists.
-
-<Callout type="warn" title="The decade-long migration">
-The transition took over a decade. Many libraries maintained dual
-Python 2/3 codebases using the `six` compatibility library or `2to3`
-converter. Python 2 was officially sunset on January 1, 2020. **In 2025
-there is no reason to write new code in Python 2.** Every example in
-this course assumes Python 3.
+<Callout type="info" title="A debate famous enough to be a TV joke">
+The tabs-versus-spaces argument is well-known enough that the HBO comedy
+*Silicon Valley* built an entire relationship-ending fight around it: a
+character cannot abide his partner using spaces. It is played for laughs, but
+the writers were drawing on something real — this genuinely is the kind of thing
+that can stall a code review. The lesson is the lesson of the Zen of Python:
+pick the obvious convention (four spaces) and spend your energy on the actual
+problem.
 </Callout>
+
+## The Zen, ABC, and "one obvious way"
+
+Python's deeper personality comes straight from ABC, the teaching language Guido
+worked on before it. ABC was designed to be learnable, readable, and forgiving,
+and Python inherited those instincts. They were eventually distilled into *The
+Zen of Python* (PEP 20), the 19 aphorisms by **Tim Peters** that you can still
+print by running `import this`. Lines like "Readability counts" and "There
+should be one — and preferably only one — obvious way to do it" are not
+decoration; they are the criteria by which Python features are accepted or
+rejected to this day.
+
+## Python 2 to 3: the decade-long migration
+
+In December 2008, Python 3.0 was released, and it deliberately **broke backward
+compatibility**. This was a hard, controversial decision: existing Python 2 code
+would not simply run on Python 3. But it allowed the language to fix a set of
+long-standing warts all at once. The most visible changes:
+
+- `print` became a *function*: `print("hi")`, where Python 2 wrote `print "hi"`
+  as a statement.
+- All strings became Unicode by default, with `bytes` as a separate type — a
+  genuine relief for anyone who had ever wrangled non-English text.
+- Integer division split in two: `/` always returns a float, and `//` does floor
+  division. In Python 2, `5 / 2` quietly gave `2`.
+- `range()`, `dict.keys()`, `map()`, and friends started returning lazy
+  views/iterators instead of building whole lists.
+
+The catch was migration. Because the break was real, the ecosystem took roughly
+a decade to move. Libraries maintained dual Python 2/3 codebases, leaned on the
+`six` compatibility library, or ran the `2to3` converter. The Python core team
+eventually set a hard deadline, and on **January 1, 2020**, Python 2 reached
+official end-of-life: no more security patches, no more fixes. Today there is no
+reason to write new code in Python 2, and every example in this course assumes
+Python 3.
 
 ## From BDFL to Steering Council
 
-Guido held the title of **BDFL** (Benevolent Dictator For Life) from
-Python's inception until July 2018, when he stepped down after a
-contentious debate over PEP 572 (the walrus operator `:=`). The
-community then adopted a governance model with a five-person **Steering
-Council**, elected annually by core developers. The council makes final
-decisions on Python Enhancement Proposals (PEPs) and oversees the
-direction of the language.
+For most of its life, Python had an unusual form of government. Guido held the
+half-joking title of **BDFL** — Benevolent Dictator For Life — meaning that on
+the rare occasions the community could not reach consensus, he made the final
+call. It worked for nearly three decades.
 
-<Callout type="info">
-You can see the current Steering Council and all past members at
-[python.org/dev/steering-council](https://www.python.org/dev/steering-council/).
-</Callout>
+It ended over a small piece of syntax. **PEP 572** proposed the *walrus
+operator* `:=`, which lets you assign a value as part of a larger expression.
+The proposal was unusually contentious, and the strain of shepherding it through
+a divided community was part of what led Guido to **step down as BDFL in July
+2018**. In his place the community designed a new governance model: an elected
+five-person **Steering Council**, chosen annually by the core developers, which
+now makes the final decisions on Python Enhancement Proposals. Python had grown
+too large for a single benevolent dictator — a sign of success more than
+failure.
 
-## CPython and alternative implementations
+## CPython and its cousins
 
-The reference implementation of Python is **CPython**, written in C.
-When people say "Python", they almost always mean CPython. A few
-alternative implementations exist:
+When people say "Python," they almost always mean **CPython**, the reference
+implementation written in C. It is the one you have been running this whole
+course. But it is not the only one:
 
-- **PyPy** uses a just-in-time compiler and can be much faster on
-  pure-Python workloads.
-- **Jython** runs on the JVM and can call Java libraries directly.
+- **PyPy** uses a just-in-time compiler and can run pure-Python code far faster.
+- **Jython** runs on the Java Virtual Machine and can call Java libraries.
 - **IronPython** targets the .NET runtime.
-- **MicroPython** is a slim implementation for microcontrollers.
-- **WebAssembly builds** let CPython run directly in the browser, which
-  is how the interactive code blocks on this site work — no install
-  required.
+- **MicroPython** is a slim build for microcontrollers with kilobytes of memory.
+- **WebAssembly builds** let CPython run directly inside a web browser — which is
+  precisely how every code block in this course executes, with no install at all.
 
-## The GIL and free-threading work
+## The GIL: Python's longest-running debate
 
-Python's **Global Interpreter Lock (GIL)** prevents multiple threads
-from executing Python bytecode simultaneously, which simplifies
-memory management but limits multi-core parallelism. Python 3.13
-introduced an experimental **free-threaded build** (compile-time flag
-`--disable-gil`) that removes the GIL, allowing true parallel
-execution. This is groundbreaking work led by Sam Gross and will evolve
-over several releases.
+Finally, the design argument that has outlasted all the others. CPython has a
+**Global Interpreter Lock**, the GIL — a single lock that ensures only one
+thread runs Python bytecode at a time. The GIL makes CPython's memory management
+simpler and single-threaded code faster, and for I/O-bound work (waiting on a
+network or a disk) it rarely matters. But it has one famous consequence: spinning
+up multiple threads will *not* speed up CPU-bound Python, because the threads
+cannot truly run in parallel.
+
+Removing the GIL has been discussed, attempted, and debated for decades; every
+serious attempt traded away single-threaded speed, and so was rejected. The most
+promising effort yet, led by **Sam Gross**, finally shipped as an experimental
+**free-threaded build** in Python 3.13 (PEP 703). It is opt-in and still
+maturing, but for the first time true multi-core Python looks plausible. It is a
+space worth watching — and a fitting note to end on, because it shows that even
+after 35 years, the most fundamental questions about Python are still being
+worked out in the open.
 
 ## Test your knowledge
-
-<MultipleChoice
-  markdown={`Who created Python?
-
-- Linus Torvalds
-  > Linus created Linux and git, not Python.
-- [o] Guido van Rossum
-  > Guido started Python as a hobby project in December 1989.
-- Dennis Ritchie
-  > Dennis created the C programming language in the 1970s.
-- James Gosling
-  > James created Java in the 1990s.`}
-/>
 
 <MultipleChoice
   markdown={`What is the origin of the name "Python"?
 
 - Named after the snake species
-  > A common misconception! Guido was reading comedy scripts, not reptile books.
+  > A common misconception. Guido was reading comedy scripts, not reptile books.
 - Named after the Greek oracle at Delphi
   > That would be a different story entirely.
 - [o] Named after *Monty Python's Flying Circus*
@@ -211,7 +249,7 @@ over several releases.
   markdown={`Which of the following is a breaking change introduced in Python 3?
 
 - List comprehensions were added
-  > List comprehensions appeared in Python 2.0 (year 2000).
+  > List comprehensions appeared in Python 2.0, back in the year 2000.
 - [o] \`print\` became a function instead of a statement
   > Python 2 used \`print "hi"\` while Python 3 requires \`print("hi")\`.
 - The \`def\` keyword was introduced
@@ -220,38 +258,18 @@ over several releases.
   > Significant indentation has been a core feature of Python from the very beginning.`}
 />
 
-## A small Python 3 challenge
+<MultipleChoice
+  markdown={`What does the GIL (Global Interpreter Lock) do in CPython?
 
-One of the defining changes in Python 3 is that division `/` always
-returns a float, even when both operands are integers. In Python 2,
-`5 / 2` would return `2` (integer division). Let's verify the Python 3
-behavior.
-
-<ChallengeCard
-  adapter="python"
-  title="Verify Python 3 division"
-  instructions={`Compute \`5 / 2\` and assign the result to a variable named \`result\`. The test will check that \`result\` is \`2.5\` (a float).`}
-  files={[
-    {
-      filename: "main.py",
-      starterCode: `# your code here
-result = None
-print("5 / 2 =", result)
-`,
-      solutionCode: `result = 5 / 2
-print("5 / 2 =", result)
-`,
-    },
-  ]}
-  tests={[
-    {
-      id: "division_returns_float",
-      name: "5 / 2 equals 2.5",
-      description: "Python 3 division always returns a float",
-      code: `assert result == 2.5, f"Expected 2.5, got {result}"`,
-    },
-  ]}
+- It encrypts Python bytecode to prevent reverse engineering
+  > The GIL has nothing to do with security or encryption.
+- [o] It allows only one thread to execute Python bytecode at a time
+  > This is why threads do not speed up CPU-bound Python — and why removing the GIL has been debated for years.
+- It locks the global namespace so variables cannot be reassigned
+  > The GIL is about threads and bytecode execution, not variable assignment.
+- It compiles Python to a single global executable
+  > The GIL is a runtime lock, not a compilation step.`}
 />
 
-In the next page we will look at how to install Python locally and
-get a REPL up and running.
+That is the story behind the syntax. If it left you wanting more, the *Next
+Steps* page points to where the language is heading and what to learn next.
