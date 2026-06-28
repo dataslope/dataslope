@@ -2,13 +2,19 @@
 
 **Date:** 2026-06-27
 **Scope:** `content/learn/*` courses (27 total)
-**Result:** 18 reviewed · 9 not yet reviewed
+**Result:** 24 reviewed · 3 not yet reviewed
 
-> **Update 2026-06-28 (PR #537):** ran the editorial pass on three more
-> courses — `data-analysis-python-pandas`, `time-series-analysis-python`,
-> and `statistics-for-data-science-python` — and wired them onto real
-> datasets from the companion `dataslope/datasets` repo. Tables and the
-> per-PR log below reflect this.
+> **Update 2026-06-28 (PR #537):** ran the editorial pass on nine more
+> courses — the entire Python data-science / R / data-viz / DuckDB-analytics
+> track — and wired them onto real datasets from the companion
+> `dataslope/datasets` repo (the runtime pin was bumped to a commit carrying
+> the new CSV/Parquet files). First batch: `data-analysis-python-pandas`,
+> `time-series-analysis-python`, `statistics-for-data-science-python`. Second
+> batch: `machine-learning-scikit-learn`, `seaborn-foundations`,
+> `intro-data-viz-plotly`, `mastering-ggplot2`, `scientific-computing-python`,
+> `sql-analytics-duckdb`. Only `python-basics`, `practical-r-for-beginners`,
+> and `natural-language-processing-python` remain. Tables and the per-PR log
+> below reflect this.
 
 ## Background
 
@@ -30,7 +36,7 @@ The five editorial PRs all landed on 2026-06-12.
 
 ## Status by course
 
-### ✅ Editorial pass complete (18)
+### ✅ Editorial pass complete (24)
 
 | Course | PR |
 |--------|----|
@@ -52,24 +58,26 @@ The five editorial PRs all landed on 2026-06-12.
 | data-analysis-python-pandas | #537 |
 | time-series-analysis-python | #537 |
 | statistics-for-data-science-python | #537 |
+| machine-learning-scikit-learn | #537 |
+| seaborn-foundations | #537 |
+| intro-data-viz-plotly | #537 |
+| mastering-ggplot2 | #537 |
+| scientific-computing-python | #537 |
+| sql-analytics-duckdb | #537 |
 
-### ⬜ Not yet reviewed (9)
+### ⬜ Not yet reviewed (3)
 
 | Course |
 |--------|
-| intro-data-viz-plotly |
-| machine-learning-scikit-learn |
-| mastering-ggplot2 |
-| natural-language-processing-python |
-| practical-r-for-beginners |
 | python-basics |
-| scientific-computing-python |
-| seaborn-foundations |
-| sql-analytics-duckdb |
+| practical-r-for-beginners |
+| natural-language-processing-python |
 
-These 9 have only been touched by project-wide cosmetic/infra commits (SVG font
+These 3 have only been touched by project-wide cosmetic/infra commits (SVG font
 & contrast fixes, course-tag metadata, "hidden test" wording removal, mermaid
-fixes) — never an editorial content pass.
+fixes) — never an editorial content pass. They are the two general
+programming-fundamentals courses (Python, R) plus the text-corpus NLP course,
+where the tabular `dataslope/datasets` files fit least.
 
 **Pattern:** the completed set is the general programming-language track (JS, C,
 C++, C#, TypeScript, Java) plus the relational-SQL courses (Postgres, SQLite, DB
@@ -142,12 +150,16 @@ not a course edit.)*
   (arrays → strings → lists → stacks/queues → recursion → searching/sorting →
   hashing/trees/heaps/tries → graphs → DP/greedy/backtracking); Mermaid fixes.
 
-### PR #537 — Data Analysis (pandas) · Time Series · Statistics
-First pass over the Python data-science track. Also bumped `DATASETS_REF`
+### PR #537 — Python data-science / R / data-viz / DuckDB track (nine courses)
+Editorial pass over the entire remaining data track. Bumped `DATASETS_REF`
 in `app/_components/runtime/remoteDatasets.ts` to the `dataslope/datasets`
-HEAD that carries the new CSVs, so these courses pull real data
+HEAD that carries the new CSV/Parquet files, so these courses pull real data
 (penguins, diamonds, california_housing, anscombe, datasaurus, NOAA Mauna
-Loa CO₂) by repo-relative path through the `datasets` staging prop.
+Loa CO₂, lending-club) by repo-relative path through the `datasets` staging
+prop — or, for DuckDB, by direct `read_parquet`/`read_csv_auto` on the
+pinned remote URLs.
+
+**First batch (pandas · time series · statistics):**
 - **data-analysis-python-pandas:** collapsed a six-page history opener into
   two pages and added an "Interesting discussions" section (data disasters
   + a deep-history director's cut); interactive penguins welcome; migrated
@@ -164,6 +176,37 @@ Loa CO₂) by repo-relative path through the `datasets` staging prop.
   Datasaurus dozen, and Palmer penguins into 16 code blocks across eight
   pages; added verifiable stories (German tank problem, Monty Hall sim,
   Lady Tasting Tea, the ASA 2016 p-value statement, xkcd #882, Galton).
+
+**Second batch (ML · seaborn · plotly · ggplot2 · scientific computing · DuckDB):**
+- **machine-learning-scikit-learn:** interactive Palmer-Penguins KNN welcome;
+  nine labeled separators → plain `---`; migrated the whole course off
+  sklearn's toy datasets onto real data matched to each task — penguins
+  (classification), diamonds (regression, target = price), california_housing
+  (unsupervised/scaling), lending-club (imbalanced classification) — keeping
+  synthetic generators only where a known true function is required;
+  re-derived every challenge card with relational asserts; stories
+  (Legendre/Gauss least squares, Breiman, perceptron/AI winter, Google Flu).
+- **seaborn-foundations:** runnable penguins welcome; migrated penguins/
+  diamonds/anscombe usage from `sns.load_dataset` onto staged dataslope CSVs
+  (kept tips/fmri/flights, not in the repo); built out the Datasaurus dozen;
+  stories (matplotlib/Hunter, the "Sam Seaborn" name, grammar of graphics).
+- **intro-data-viz-plotly:** collapsed a seven-page history opener into two
+  chapters (keeping Florence Nightingale, plus Snow/Minard/Playfair) with an
+  "Interesting discussions" overflow; replaced `px.data.iris` with penguins;
+  added an "always look at the data" Anscombe/Datasaurus chapter.
+- **mastering-ggplot2 (R/WebR):** runnable penguins ggplot welcome; merged the
+  grammar-history pages; staged palmer-penguins via `read.csv` while keeping
+  ggplot2's idiomatic built-in `mpg`/`diamonds`; stories (Wilkinson, Wickham,
+  R's Ihaka/Gentleman origins).
+- **scientific-computing-python:** loop-vs-vectorized welcome; collapsed a
+  four-page history opener; wired the Keeling CO₂ series (curve_fit + an FFT
+  peak at exactly 1 cycle/year) and california_housing (least squares /
+  conditioning); stories (Backus/FORTRAN, Moler/MATLAB, Kahan/IEEE 754, the
+  Patriot, Pentium FDIV, and Ariane 5 floating-point disasters).
+- **sql-analytics-duckdb:** welcome that queries a remote `diamonds.parquet`
+  with no download (DuckDB's signature move); merged the OLAP/OLTP opener;
+  wired dataslope Parquet/CSV via `read_parquet`/`read_csv_auto` on pinned
+  URLs; stories (DuckDB's CWI origins and the duck Wilbur, MonetDB/C-Store).
 
 ## How this was determined
 
