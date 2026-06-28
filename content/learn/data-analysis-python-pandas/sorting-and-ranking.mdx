@@ -161,24 +161,21 @@ direct and slightly faster.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import pandas as pd
-
-df = pd.read_csv(
-    "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
-)
-
-# Top 5 by monthly income
+      initCode: `import pandas as pd
+diamonds = pd.read_csv("diamonds.csv")`,
+      starterCode: `# Top 5 most expensive diamonds
 print(
-    df.nlargest(5, "MonthlyIncome")[["Age", "JobRole", "Department", "MonthlyIncome"]]
+    diamonds.nlargest(5, "price")[["carat", "cut", "color", "price"]]
 )
 print()
 
-# Bottom 5 by income
+# 5 cheapest diamonds
 print(
-    df.nsmallest(5, "MonthlyIncome")[["Age", "JobRole", "Department", "MonthlyIncome"]]
+    diamonds.nsmallest(5, "price")[["carat", "cut", "color", "price"]]
 )
 `,
     },
@@ -263,26 +260,23 @@ for method in ["average", "min", "dense", "first"]:
 
 ## Rank within groups
 
-A common business question: *"Within each department, who are
-the top 3 earners?"* That is a sort + group + head problem.
+A common business question: *"Within each cut grade, what are the
+3 most expensive diamonds?"* That is a sort + group + head problem.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import pandas as pd
-
-df = pd.read_csv(
-    "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
+      initCode: `import pandas as pd
+diamonds = pd.read_csv("diamonds.csv")`,
+      starterCode: `top3 = (
+    diamonds.sort_values("price", ascending=False)
+    .groupby("cut")
+    .head(3)[["cut", "carat", "color", "price"]]
 )
-
-top3 = (
-    df.sort_values("MonthlyIncome", ascending=False)
-    .groupby("Department")
-    .head(3)[["Department", "JobRole", "MonthlyIncome"]]
-)
-print(top3.sort_values("Department"))
+print(top3.sort_values("cut"))
 `,
     },
   ]}
@@ -290,12 +284,12 @@ print(top3.sort_values("Department"))
 
 Reading this line by line:
 
-1. Sort everyone by income, descending.
-2. Group by department.
+1. Sort every diamond by price, descending.
+2. Group by cut.
 3. From each group, take the first 3 rows (which are now the
    top 3 because of the sort).
 4. Project to the columns we care about.
-5. Sort by department for a tidy display.
+5. Sort by cut for a tidy display.
 
 This is a great example of how a few Pandas building blocks
 compose into something powerful.

@@ -119,23 +119,20 @@ is it?*
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import pandas as pd
-
-df = pd.read_csv(
-    "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
-)
-
-print("Shape (rows, columns):", df.shape)
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `print("Shape (rows, columns):", penguins.shape)
 print()
 print("Column names:")
-for col in df.columns:
+for col in penguins.columns:
     print(" -", col)
 print()
 print("First 5 rows:")
-df.head()
+penguins.head()
 `,
     },
   ]}
@@ -143,14 +140,15 @@ df.head()
 
 What you are looking for:
 
-- **Reasonable row count.** Does 1,470 employees match what
-  someone told you to expect? If you expected a million and got
-  a thousand, something was filtered.
-- **All the columns you expected.** If you were promised
-  `manager_id` and there is no such column, ask.
-- **Sample values that make sense.** If `Age` shows `None`,
-  `"N/A"`, or a wildly out-of-range value, you know cleaning is
-  in your future.
+- **Reasonable row count.** Does 344 penguins match what someone
+  told you to expect? If you expected ten thousand and got a few
+  hundred, something was filtered.
+- **All the columns you expected.** If you were promised a
+  `nest_id` and there is no such column, ask.
+- **Sample values that make sense.** If `body_mass_g` shows `None`,
+  `"N/A"`, or a wildly out-of-range value, you know cleaning is in
+  your future. (Look closely at row index 3 in the output — it is
+  almost all `NaN`.)
 
 ## Step 2 — Dtypes and memory
 
@@ -159,30 +157,34 @@ and is the dataset going to fit in memory?*
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
-      starterCode: `print(df.dtypes)
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `print(penguins.dtypes)
 print()
-df.info(memory_usage="deep")
+penguins.info(memory_usage="deep")
 `,
     },
   ]}
 />
 
-`df.info(memory_usage="deep")` prints a summary including
-estimated memory in bytes (the `"deep"` flag inspects each
-string instead of guessing).
+`info(memory_usage="deep")` prints a summary including estimated
+memory in bytes (the `"deep"` flag inspects each string instead of
+guessing). Notice that `body_mass_g` is `float64` even though body
+mass is conceptually a whole number of grams — that is Pandas
+telling you the column contains missing values, since `NaN` only
+lives in float columns.
 
 Look for:
 
-- **Strings that should be numbers** (e.g. `"5,000"` with a
-  comma comes in as `object`).
+- **Strings that should be numbers** (e.g. `"5,000"` with a comma
+  comes in as `object`).
 - **Numbers that should be strings** (ZIP codes, phone numbers).
-- **Object columns that should be categorical** (a small,
-  repeating vocabulary like `Department`).
+- **Object columns that should be categorical** (a small, repeating
+  vocabulary like `species` or `island`).
 - **`object` columns that contain dates** — they need
   `pd.to_datetime`.
 
@@ -194,16 +196,17 @@ also describe text/categorical columns.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+penguins = pd.read_csv("penguins.csv")`,
       starterCode: `print("Numeric columns:")
-print(df.describe().round(1))
+print(penguins.describe().round(1))
 print()
 print("Categorical / object columns:")
-print(df.describe(include=["object"]))
+print(penguins.describe(include=["object"]))
 `,
     },
   ]}
@@ -232,14 +235,15 @@ The fourth question: *where is data missing?*
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+penguins = pd.read_csv("penguins.csv")`,
       starterCode: `# Count missing values per column
-missing = df.isna().sum()
-missing_pct = (df.isna().mean() * 100).round(1)
+missing = penguins.isna().sum()
+missing_pct = (penguins.isna().mean() * 100).round(1)
 
 summary = pd.DataFrame({"missing": missing, "pct": missing_pct})
 print(summary[summary["missing"] > 0].sort_values("missing", ascending=False))
@@ -250,9 +254,12 @@ print("Columns with no missing values:", (missing == 0).sum())
   ]}
 />
 
-The HR dataset is unusually clean — you may see zero missing.
-Most real datasets have several columns with some missingness.
-The pattern matters:
+The penguins dataset has a small but instructive amount of
+missingness: `sex` is missing for 11 penguins, and the four body
+measurements are each missing for 2. That is not random noise — two
+penguins are missing *every* measurement (the observer never got a
+full reading), while the other 9 are missing only `sex` (which can
+be harder to determine in the field). The pattern matters:
 
 - **Random missingness** can often be ignored or imputed.
 - **Structural missingness** (a column that is only populated
@@ -269,14 +276,15 @@ For every text-like column, look at the values:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
-      starterCode: `for col in df.select_dtypes(include="object").columns:
-    counts = df[col].value_counts(dropna=False)
-    n_unique = df[col].nunique()
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `for col in penguins.select_dtypes(include="object").columns:
+    counts = penguins[col].value_counts(dropna=False)
+    n_unique = penguins[col].nunique()
     print(f"--- {col} ({n_unique} unique) ---")
     print(counts.head(8))
     print()
@@ -302,35 +310,33 @@ After the five-minute ritual, do a few quick cross-tabulations.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
-      starterCode: `# Attrition rate by department — already gives you a feel for the data
-print("Attrition by department:")
-ct = pd.crosstab(df["Department"], df["Attrition"])
-ct["pct_left"] = (ct["Yes"] / (ct["Yes"] + ct["No"]) * 100).round(1)
-print(ct)
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `# Which species live on which island?
+print("Species x island counts:")
+print(pd.crosstab(penguins["species"], penguins["island"]))
 print()
 
-# Department × JobRole — does each role belong to one department?
-print("Departments per JobRole:")
-print(
-    df.groupby("JobRole", observed=True)["Department"]
-    .nunique()
-    .sort_values(ascending=False)
-    .head(10)
-)
+# How many distinct islands does each species appear on?
+print("Islands per species:")
+print(penguins.groupby("species")["island"].nunique())
 `,
     },
   ]}
 />
 
-These take a minute and often reveal the structure of the
-dataset (e.g., "Each JobRole belongs to exactly one department —
-so they're a hierarchy"). That kind of insight changes how you
-think about all subsequent analysis.
+These take a minute and often reveal the *structure* of the
+dataset. Here the crosstab tells a real ecological story: Gentoos
+appear only on Biscoe, Chinstraps only on Dream, while Adelies live
+on all three islands. That means **species and island are not
+independent** — a fact you must remember before claiming, say, that
+"Biscoe penguins are heavier" (they are mostly Gentoos, which are
+heavier *everywhere*). That kind of insight changes how you think
+about every later analysis.
 
 ## Document what you find
 
@@ -338,11 +344,12 @@ A common professional habit: keep a short Markdown note (in the
 notebook itself or in a separate file) capturing your findings
 from the five-minute ritual.
 
-> *Dataset: HR-dataset-v14.csv. 1,470 rows × 35 cols. Each row is
-> one employee. No missing values. `Department` has 3 values
-> (R&D, Sales, HR). `JobRole` (9 values) is nested within
-> `Department`. `Attrition` is `"Yes"` / `"No"`, ~16% attrition
-> overall.*
+> *Dataset: palmer-penguins.csv. 344 rows × 8 cols. Each row is one
+> penguin. `sex` missing for 11; all four measurements missing for
+> 2 penguins. `species` has 3 values (Adelie 152, Gentoo 124,
+> Chinstrap 68). Species and island are linked — Gentoo only on
+> Biscoe, Chinstrap only on Dream, Adelie on all three. Years
+> 2007–2009.*
 
 The next person who picks up your notebook will thank you. The
 next person is often *you* in three months.
@@ -359,74 +366,63 @@ The technical skills come naturally with practice; the habit of
 <ChallengeCard
   adapter="python"
   title="First-look summary"
-  instructions={`Load this HR dataset:
+  instructions={`The penguins file is staged as \`penguins.csv\` and already loaded into \`penguins\` for you. Compute four values and assign them to these variables:
 
-\`https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv\`
-
-Then compute four values and assign them to specific variables:
-
-1. \`n_rows\`  — total number of employees
-2. \`n_cols\`  — total number of columns
-3. \`n_missing_total\` — total count of NaN cells across the whole DataFrame (sum over all columns)
-4. \`departments\` — a sorted list of unique values in the \`Department\` column
+1. \`n_rows\` — total number of penguins
+2. \`n_cols\` — total number of columns
+3. \`n_missing_total\` — total count of NaN cells across the whole DataFrame (sum over all columns), as a Python \`int\`
+4. \`species_list\` — a sorted list of the unique values in the \`species\` column
 
 Use Pandas, not hard-coded numbers.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import pandas as pd
-
-URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
-df = pd.read_csv(URL)
-
-n_rows = None
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `n_rows = None
 n_cols = None
 n_missing_total = None
-departments = None
+species_list = None
 
-print(n_rows, n_cols, n_missing_total, departments)
+print(n_rows, n_cols, n_missing_total, species_list)
 `,
-      solutionCode: `import pandas as pd
+      solutionCode: `n_rows = penguins.shape[0]
+n_cols = penguins.shape[1]
+n_missing_total = int(penguins.isna().sum().sum())
+species_list = sorted(penguins["species"].unique().tolist())
 
-URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
-df = pd.read_csv(URL)
-
-n_rows = df.shape[0]
-n_cols = df.shape[1]
-n_missing_total = int(df.isna().sum().sum())
-departments = sorted(df["Department"].unique().tolist())
-
-print(n_rows, n_cols, n_missing_total, departments)
+print(n_rows, n_cols, n_missing_total, species_list)
 `,
     },
   ]}
   tests={[
     {
       id: "n_rows",
-      name: "n_rows == 1470",
-      description: "The HR dataset has 1470 employees",
-      code: `assert n_rows == 1470, f"Got n_rows = {n_rows}"`,
+      name: "n_rows == 344",
+      description: "The penguins dataset has 344 rows",
+      code: `assert n_rows == 344, f"Got n_rows = {n_rows}"`,
     },
     {
       id: "n_cols",
-      name: "n_cols == 35",
-      description: "The dataset has 35 columns",
-      code: `assert n_cols == 35, f"Got n_cols = {n_cols}"`,
+      name: "n_cols == 8",
+      description: "The dataset has 8 columns",
+      code: `assert n_cols == 8, f"Got n_cols = {n_cols}"`,
     },
     {
       id: "missing",
-      name: "n_missing_total is a non-negative integer",
-      description: "Use df.isna().sum().sum()",
+      name: "n_missing_total counts every NaN cell",
+      description: "Use penguins.isna().sum().sum()",
       code: `assert isinstance(n_missing_total, int), "n_missing_total should be a Python int"
-assert n_missing_total >= 0`,
+assert n_missing_total == 19, f"Expected 19 missing cells, got {n_missing_total}"`,
     },
     {
-      id: "departments",
-      name: "departments is a sorted list of unique departments",
-      description: "Sorted list of unique Department values",
-      code: `assert isinstance(departments, list), "departments must be a list"
-assert departments == sorted(set(departments)), "departments must be sorted and unique"
-assert len(departments) == 3, f"Expected 3 departments, got {len(departments)}"`,
+      id: "species_list",
+      name: "species_list is a sorted list of unique species",
+      description: "Sorted list of unique species values",
+      code: `assert isinstance(species_list, list), "species_list must be a list"
+assert species_list == sorted(set(species_list)), "species_list must be sorted and unique"
+assert species_list == ["Adelie", "Chinstrap", "Gentoo"], f"Got {species_list}"`,
     },
   ]}
 />
@@ -464,18 +460,18 @@ Same headline count of NaNs can mean very different things depending on distribu
 />
 
 <MultipleChoice
-  markdown={`A column with 1,470 rows shows 1,470 unique values when you call \`.value_counts()\`. What is it most likely to be?
+  markdown={`A 344-row table has a column whose \`.value_counts()\` shows 344 distinct values — one per row. What is it most likely to be?
 
 - A categorical variable
   > A categorical column has a small, repeating set of values, not a unique value for every row.
 - A boolean column
-  > A boolean column has at most two distinct values (\`True\`/\`False\`), not 1,470 unique ones.
-- [o] An identifier column (like an employee ID or name) — every row has a different value, so it is unique per row
+  > A boolean column has at most two distinct values (\`True\`/\`False\`), not 344 unique ones.
+- [o] An identifier column (like a tag number or record ID) — every row has a different value, so it is unique per row
   > Such columns are useful as keys (for joins) but not for grouping or counting.
 - A date column
-  > A date column can have many unique values, but 1,470 unique values in 1,470 rows more strongly signals an identifier column than a date series, which typically has fewer distinct values.
+  > A date column can have many unique values, but one distinct value per row more strongly signals an identifier column than a date series, which usually repeats.
 
-Recognizing "this is an ID, not a category" early stops you from making meaningless \`groupby("name")\` calls.`}
+Recognizing "this is an ID, not a category" early stops you from making meaningless \`groupby(id_column)\` calls.`}
 />
 
 <MultipleChoice

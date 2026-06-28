@@ -182,11 +182,11 @@ is a fork in the road that you (not the data) will have to pick.
 
 ## An end-to-end example, slowly
 
-Let us run the loop once at a relaxed pace. Question:
+Let us run the loop once at a relaxed pace, on the penguin dataset
+you met on the welcome page. Question:
 
-> Among employees in our HR dataset, does **monthly income**
-> differ between people who stayed versus people who left the
-> company?
+> Among our Antarctic penguins, does **body mass** differ between
+> **Adelie** and **Gentoo** penguins?
 
 Here is the full process explicitly — the same six-step loop you will repeat
 on almost every question:
@@ -241,31 +241,28 @@ Write an honest, hedged summary a stakeholder can act on.
 
 Define the comparison:
 
-- "Monthly income" = the `MonthlyIncome` column.
-- "Stayed" = `Attrition == "No"`.
-- "Left" = `Attrition == "Yes"`.
+- "Body mass" = the `body_mass_g` column (grams).
+- "Adelie" = rows where `species == "Adelie"`.
+- "Gentoo" = rows where `species == "Gentoo"`.
 - "Differ" = compare the *median* (less sensitive to outliers
-  than the mean), and the *25th and 75th percentile* (to see
+  than the mean) and the *25th and 75th percentiles* (to see
   spread).
 
 ### Step 2: Acquire
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import pandas as pd
-
-df = pd.read_csv(
-    "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
-)
-
-print("Rows:", len(df))
-print("Has MonthlyIncome?", "MonthlyIncome" in df.columns)
-print("Has Attrition?", "Attrition" in df.columns)
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `print("Rows:", len(penguins))
+print("Has body_mass_g?", "body_mass_g" in penguins.columns)
+print("Has species?", "species" in penguins.columns)
 print()
-print(df[["MonthlyIncome", "Attrition"]].head())
+print(penguins[["species", "body_mass_g"]].head())
 `,
     },
   ]}
@@ -273,38 +270,42 @@ print(df[["MonthlyIncome", "Attrition"]].head())
 
 ### Step 3: Clean
 
-Quick check: are there any missing values in the two columns we
-need?
+Quick check: are there missing values in the two columns we need,
+and what species actually appear?
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
-      starterCode: `print("Missing MonthlyIncome:", df["MonthlyIncome"].isna().sum())
-print("Missing Attrition:    ", df["Attrition"].isna().sum())
-print("Unique Attrition values:", df["Attrition"].unique())
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `print("Missing body_mass_g:", penguins["body_mass_g"].isna().sum())
+print("Missing species:   ", penguins["species"].isna().sum())
+print("Species present:", penguins["species"].unique())
 `,
     },
   ]}
 />
 
-If both are zero and `Attrition` only contains `Yes`/`No`, we
-are in good shape.
+There are two penguins with no body-mass measurement at all — a
+real reminder that even a tidy teaching dataset has gaps. Pandas
+will skip those automatically when it computes the medians below.
 
 ### Step 4: Explore
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
-      starterCode: `summary = (
-    df.groupby("Attrition")["MonthlyIncome"]
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `two = penguins[penguins["species"].isin(["Adelie", "Gentoo"])]
+summary = (
+    two.groupby("species")["body_mass_g"]
     .describe()[["count", "25%", "50%", "75%"]]
     .round(0)
 )
@@ -314,35 +315,38 @@ print(summary)
   ]}
 />
 
-You can see the quartiles for each group at a glance.
+You can read the quartiles for each species at a glance.
 
 ### Step 5: Interpret
 
-You will probably notice that the median income of people who
-stayed is *higher* than those who left. Does that mean low pay
-causes attrition? Not necessarily. It could mean:
+You will notice that Gentoo penguins are *substantially* heavier
+than Adelie penguins — their median body mass is well over a
+kilogram greater (about 5,000 g versus 3,700 g). The difference is
+large and consistent, so it is unlikely to be noise. But "Gentoos are heavier" is a *description*, not an
+explanation. A careful analyst immediately asks follow-ups:
 
-- Lower-paid employees are also younger and more mobile.
-- Lower-paid roles are in departments with higher turnover for
-  *other* reasons.
-- The company is shedding underperformers who happened to be
-  lower-paid.
+- Is the gap the same for males and females, or driven mostly by
+  one sex?
+- Could it be confounded by *island*? Gentoos live only on one
+  island in this dataset.
+- Is body mass even the right measure of "size," or would flipper
+  length tell a different story?
 
 A descriptive comparison is a *starting point*, not a conclusion.
 This is why diagnostic analysis usually follows.
 
 ### Step 6: Communicate
 
-You would summarize this to a stakeholder as a short note:
+You would summarize this to a stakeholder as a short, honest note:
 
-> *Among the 1,470 employees in our dataset, the median monthly
-> income of those who left was about $4,500, versus $5,300 for
-> those who stayed — a ~15% gap. This is a correlation, not a
-> proven cause; further analysis by department and job level is
-> needed before recommending a pay-based retention program.*
+> *Among the penguins in this dataset, Gentoos have a median body
+> mass about 1,300 g greater than Adelies (≈5,000 g vs ≈3,700 g),
+> with little overlap between the two distributions. This is a clear
+> descriptive difference; before attributing it to any single factor
+> we should check whether sex and island explain part of the gap.*
 
-Notice how the language is hedged. Good analysts are honest
-about what their numbers can and cannot prove.
+Notice how the language is hedged. Good analysts are honest about
+what their numbers can and cannot prove.
 
 ## What data analysis is *not*
 
@@ -410,16 +414,16 @@ Spending time sharpening the question before writing code is almost always a goo
 />
 
 <MultipleChoice
-  markdown={`In the income-vs-attrition example, the chapter cautioned that the observed gap is "a correlation, not a proven cause." What is the closest reason given?
+  markdown={`In the penguin body-mass example, the chapter stops at "Gentoos are heavier" and refuses to explain *why*. What is the closest reason given?
 
-- The dataset is too small
-  > The chapter does not cite dataset size as the caution; 1,470 employees is a reasonable sample. The concern is confounding variables, not sample size.
-- Pandas cannot compute causes
-  > The caution is analytical — about the limits of observational data — not a Pandas limitation.
-- [o] The income gap could be explained by many other factors (age, department, role), so a simple comparison cannot prove that pay drives attrition
-  > This is the classic "correlation is not causation" warning, applied carefully. Honest analysts state the limits of their evidence.
-- Attrition is a categorical variable
-  > Attrition's variable type (categorical Yes/No) is not the reason for the caution; many valid causal analyses involve categorical outcomes.
+- The dataset is too small to trust
+  > The chapter does not cite sample size as the issue; the gap is large and consistent. The concern is that a description is not yet an explanation.
+- Pandas cannot compute body mass
+  > Pandas computed the medians correctly; the caution is analytical, not a tool limitation.
+- [o] The size gap could be entangled with other factors (sex, island), so a simple two-group comparison describes the difference but does not explain its cause
+  > This is the "describe before you explain" discipline. The honest next step is to check whether sex and island account for part of the gap.
+- Body mass is a numeric variable
+  > The variable's type is not the reason for caution; numeric comparisons are perfectly valid descriptively.
 
-Hedging language ("appears to be associated with") is the analyst's friend; overstated causal claims are a frequent source of bad decisions.`}
+Hedged, descriptive language is the analyst's friend; jumping from "differs" to "because of X" is a frequent source of bad conclusions.`}
 />

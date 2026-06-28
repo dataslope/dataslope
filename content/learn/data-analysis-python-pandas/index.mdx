@@ -64,6 +64,41 @@ open, no virtual environment to configure. Click *Run* and watch
 the output appear underneath the editor.
 </Callout>
 
+## Try it right now
+
+Here is the surprising part: **this whole course runs in your
+browser.** The block below is real Python with real data — 344
+penguins measured in Antarctica. Click *Run* and watch the average
+body mass of each species appear underneath.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `# Average body mass (grams) for each penguin species:
+penguins.groupby("species")["body_mass_g"].mean().round(0)
+`,
+    },
+  ]}
+/>
+
+That single line is a real analysis: it split 344 penguins into
+three species, then averaged the body mass of each group. You will
+spend several chapters learning to read and write lines exactly
+like it.
+
+Now make it your own. Change `"body_mass_g"` to
+`"flipper_length_mm"` and run again — you have just measured each
+species by a different attribute. Change `"species"` to `"island"`
+and you are grouping by *where* the penguins live instead of
+*what* they are. Nothing broke, nothing had to be reinstalled, and
+you did not leave this page. That is the loop the rest of the
+course lives inside: ask a question, change a line, run, look.
+
 ## Who this course is for
 
 You will fit right in if any of these sound like you:
@@ -102,15 +137,18 @@ By the end of the course you will be able to:
 
 ## How the course is organized
 
-We start with **a story**, not with syntax. The first chapters walk
-through where data came from, how spreadsheets shaped business
-analysis, and why a young economist named Wes McKinney decided to
-build the library that would become Pandas.
+We open with **a short story** — where tabular data came from, why
+spreadsheets ran the business world for thirty years, and why a
+hedge-fund researcher named Wes McKinney built the library that
+became Pandas. It is two pages, not a lecture, and you are running
+analysis code within the first few chapters.
 
-Only after you understand *why* Pandas exists do we start typing
-real code. From there each chapter builds on the previous one — by
-the time we get to GroupBy and merges, you will already understand
-the questions those tools are designed to answer.
+From there each chapter builds on the previous one. By the time we
+reach GroupBy and merges, you will already understand the questions
+those tools were designed to answer. (A few longer digressions —
+the deep history, the famous spreadsheet disasters — wait for you
+in an **Interesting discussions** section near the end, once you
+have the context to enjoy them.)
 
 ## How the interactive widgets work
 
@@ -132,38 +170,26 @@ If you want a long-lived workspace to experiment in across blocks,
 open the [Python Playground](/playground/python) in a new tab.
 </Callout>
 
-## A taste of what is coming
+## The datasets you will work with
 
-By the end of the course, this little snippet will feel completely
-natural. For now, just click *Run* and notice that data lives on
-the internet, comes into Python in two lines, and you immediately
-have something to look at.
+This course uses a small cast of real, public datasets so you can
+get to know them well rather than meeting a new file every page:
 
-<CodeBlock
-  adapter="python"
-  files={[
-    {
-      filename: "main.py",
-      starterCode: `import pandas as pd
+- **Palmer Penguins** — 344 penguins with their species, island,
+  body measurements, and sex. Friendly, small, and (importantly)
+  with a few genuinely missing values, so it is perfect for
+  learning to clean data. You just used it.
+- **Diamonds** — 53,940 diamonds with their cut, color, clarity,
+  and price. When we need *scale* and rich categories — for
+  grouping, pivoting, and "what does this look like at 50,000
+  rows?" — this is the one.
+- **California Housing** — about 20,640 California districts, all
+  numeric, ideal for summary statistics and correlations.
 
-df = pd.read_csv(
-    "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
-)
-
-print("Rows, columns:", df.shape)
-print("First few employees:")
-df.head()
-`,
-    },
-  ]}
-/>
-
-That is a real HR dataset with about 1,470 employees and 35
-columns. In a few chapters you will be slicing it by department,
-comparing salaries, flagging employees at risk of leaving, and
-building charts that explain what you found — all in code that
-you can re-run tomorrow on next month's data without changing a
-single line.
+By the end of the course you will be slicing these by category,
+comparing groups, flagging unusual rows, and building charts that
+explain what you found — all in code you can re-run tomorrow on a
+new file without changing the logic.
 
 ## A note on philosophy
 

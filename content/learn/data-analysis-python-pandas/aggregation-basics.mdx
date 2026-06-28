@@ -265,27 +265,24 @@ distinct values *and* their counts.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import pandas as pd
-
-df = pd.read_csv(
-    "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
-)
-
-print("Counts by department:")
-print(df["Department"].value_counts())
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `print("Counts by species:")
+print(penguins["species"].value_counts())
 print()
 print("Same, but as fractions:")
-print(df["Department"].value_counts(normalize=True).round(3))
+print(penguins["species"].value_counts(normalize=True).round(3))
 `,
     },
   ]}
 />
 
-`normalize=True` converts counts to proportions — the fastest
-way to compute category shares.
+`normalize=True` converts counts to proportions — the fastest way
+to compute category shares.
 
 ## Counting nulls and uniques
 
@@ -293,15 +290,16 @@ Two cheap and useful one-liners:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
-      starterCode: `print("Distinct job roles:", df["JobRole"].nunique())
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `print("Distinct islands:", penguins["island"].nunique())
 print()
 print("Missing values per column:")
-print(df.isna().sum())
+print(penguins.isna().sum())
 `,
     },
   ]}

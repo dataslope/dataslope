@@ -268,33 +268,30 @@ choice. Most codebases use masks; `query` shows up in notebooks.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import pandas as pd
-
-df = pd.read_csv(
-    "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
-)
-
-# Recent hires (less than 3 years) in Sales who have left
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `# Large Gentoo penguins on Biscoe island (over 5 kg)
 mask = (
-    (df["YearsAtCompany"] < 3)
-    & (df["Department"] == "Sales")
-    & (df["Attrition"] == "Yes")
+    (penguins["species"] == "Gentoo")
+    & (penguins["island"] == "Biscoe")
+    & (penguins["body_mass_g"] > 5000)
 )
 
-leavers = df[mask]
-print(f"{len(leavers)} early-tenure Sales leavers")
-print(leavers[["Age", "YearsAtCompany", "MonthlyIncome", "JobRole"]].head())
+big_gentoos = penguins[mask]
+print(f"{len(big_gentoos)} large Gentoos found")
+print(big_gentoos[["species", "island", "body_mass_g", "sex"]].head())
 `,
     },
   ]}
 />
 
-You will write filters like this all day, every day, as an
-analyst. Cosmetic note: breaking each condition onto its own
-line and aligning the `&`s makes complex filters readable.
+You will write filters like this all day, every day, as an analyst.
+Cosmetic note: breaking each condition onto its own line and
+aligning the `&`s makes complex filters readable.
 
 ## Filter, then assign
 
@@ -330,74 +327,65 @@ print(df)
 
 <ChallengeCard
   adapter="python"
-  title="Filter the HR dataset"
-  instructions={`Load:
+  title="Filter the penguins dataset"
+  instructions={`The penguins file is staged as \`penguins.csv\` and loaded into \`penguins\` for you. Build a DataFrame called \`light_females\` containing **only** penguins that are:
 
-\`https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv\`
-
-Then build a DataFrame called \`young_low_pay\` containing **only** employees who:
-
-- Are younger than 30 (\`Age < 30\`), AND
-- Earn less than \`MonthlyIncome\` of 3000, AND
-- Did **not** leave the company (\`Attrition == "No"\`).
+- of species \`Adelie\`, AND
+- of \`sex\` equal to \`"female"\`, AND
+- lighter than 3500 grams (\`body_mass_g < 3500\`).
 
 Keep all columns.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import pandas as pd
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `light_females = None  # TODO
 
-URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
-df = pd.read_csv(URL)
-
-young_low_pay = None  # TODO
-
-print(len(young_low_pay) if young_low_pay is not None else "still None")
+print(len(light_females) if light_females is not None else "still None")
 `,
-      solutionCode: `import pandas as pd
-
-URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
-df = pd.read_csv(URL)
-
-young_low_pay = df[
-    (df["Age"] < 30) & (df["MonthlyIncome"] < 3000) & (df["Attrition"] == "No")
+      solutionCode: `light_females = penguins[
+    (penguins["species"] == "Adelie")
+    & (penguins["sex"] == "female")
+    & (penguins["body_mass_g"] < 3500)
 ]
 
-print(len(young_low_pay))
+print(len(light_females))
 `,
     },
   ]}
   tests={[
     {
       id: "is_df",
-      name: "young_low_pay is a DataFrame",
+      name: "light_females is a DataFrame",
       description: "Result type check",
       code: `import pandas as pd
-assert isinstance(young_low_pay, pd.DataFrame)`,
+assert isinstance(light_females, pd.DataFrame)`,
     },
     {
-      id: "age",
-      name: "All ages < 30",
-      description: "No one 30 or older",
-      code: `assert (young_low_pay["Age"] < 30).all()`,
+      id: "species",
+      name: "All are Adelie",
+      description: "Only Adelie penguins",
+      code: `assert (light_females["species"] == "Adelie").all()`,
     },
     {
-      id: "income",
-      name: "All MonthlyIncome < 3000",
-      description: "No one earning >= 3000",
-      code: `assert (young_low_pay["MonthlyIncome"] < 3000).all()`,
+      id: "sex",
+      name: "All are female",
+      description: "Only females",
+      code: `assert (light_females["sex"] == "female").all()`,
     },
     {
-      id: "attrition",
-      name: "All Attrition == 'No'",
-      description: "Everyone stayed",
-      code: `assert (young_low_pay["Attrition"] == "No").all()`,
+      id: "mass",
+      name: "All under 3500 g",
+      description: "No penguin 3500 g or heavier",
+      code: `assert (light_females["body_mass_g"] < 3500).all()`,
     },
     {
       id: "count",
       name: "Reasonable row count",
       description: "Should be > 0 and < total",
-      code: `assert 0 < len(young_low_pay) < 1470`,
+      code: `assert 0 < len(light_females) < 344`,
     },
   ]}
 />

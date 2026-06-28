@@ -27,10 +27,6 @@
         "index",
         "---",
         "history-of-data",
-        "spreadsheets-and-business",
-        "rise-of-digital-datasets",
-        "birth-of-data-science",
-        "python-and-pandas-story",
         "spreadsheets-vs-code",
         "---",
         "what-is-data-analysis",
@@ -79,6 +75,9 @@
         "debugging-analysis-code",
         "exporting-cleaned-data",
         "project-organization",
+        "---",
+        "data-disasters",
+        "deep-history-of-data",
         "---",
         "next-steps"
     ]

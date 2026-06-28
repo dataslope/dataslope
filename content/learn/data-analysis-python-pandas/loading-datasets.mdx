@@ -82,13 +82,26 @@ Honorable mentions:
 - `pd.read_parquet` — Parquet files (a fast columnar format).
 - `pd.read_sql` — query results from a SQL database.
 
-For the rest of the course we will lean on `read_csv` because
-the data we will use lives on the public internet as CSVs.
+For the rest of the course we will lean on `read_csv` because the
+data we will use lives on the public internet as CSVs.
+
+## Meet the penguins
+
+Our main companion dataset for the course is **Palmer Penguins**:
+344 penguins observed near Palmer Station in Antarctica. It was
+collected by Dr. Kristen Gorman at the Palmer Station Long-Term
+Ecological Research site, and packaged by Allison Horst and
+colleagues as a friendly, ethically-uncomplicated alternative to
+the famous old iris flower dataset. It is small, it is real, and —
+crucially for a course that takes data cleaning seriously — it has a
+few genuinely missing values. We will get to know it well.
 
 ## Reading from a URL
 
-`pd.read_csv` accepts a URL exactly like a file path. The bytes
-are fetched over HTTPS in the background and parsed.
+`pd.read_csv` accepts a URL exactly like a file path. The bytes are
+fetched over HTTPS in the background and parsed. This is the one
+place in the course where we will read straight from a URL, so you
+can see how it works:
 
 <CodeBlock
   adapter="python"
@@ -98,13 +111,13 @@ are fetched over HTTPS in the background and parsed.
       starterCode: `import pandas as pd
 
 # Direct URL — works because raw.githubusercontent.com supports CORS
-df = pd.read_csv(
-    "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
+penguins = pd.read_csv(
+    "https://raw.githubusercontent.com/dataslope/datasets/main/palmer-penguins.csv"
 )
 
-print("Shape:", df.shape)
+print("Shape:", penguins.shape)
 print("First 3 rows:")
-df.head(3)
+penguins.head(3)
 `,
     },
   ]}
@@ -112,13 +125,18 @@ df.head(3)
 
 Two notes:
 
-1. **Use the raw URL.** Browsers will show GitHub HTML pages at
-   `github.com/.../file.csv` — that is not the file itself. The
-   raw version starts with `raw.githubusercontent.com` and
-   returns the actual bytes.
-2. **Some hosts don't allow direct browser fetches.** For those
-   you can route through Dataslope's CORS proxy. We will see
-   that further down.
+1. **Use the raw URL.** Browsers show GitHub *HTML pages* at
+   `github.com/.../file.csv` — that is not the file itself. The raw
+   version starts with `raw.githubusercontent.com` and returns the
+   actual bytes.
+2. **Some hosts don't allow direct browser fetches.** For those you
+   can route through a CORS proxy.
+
+For the rest of the course, instead of hardcoding URLs we will
+*stage* the file as a local `penguins.csv` (you will see it loaded
+with `pd.read_csv("penguins.csv")`). That keeps the lesson code
+clean and is closer to how you will work on your own machine —
+where the data is a file on disk, not a URL.
 
 ## Common `read_csv` options
 
@@ -138,24 +156,26 @@ handful in real life:
 | `nrows`          | Only read N rows (for sampling huge files).           |
 | `encoding`       | Text encoding (`"utf-8"`, `"latin-1"`, ...).          |
 
-Let us try a real example with several of these.
+Let us try a real example with several of these, staging the
+penguins file as a local `penguins.csv`.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
       starterCode: `import pandas as pd
 
-df = pd.read_csv(
-    "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv",
-    usecols=["Age", "Department", "MonthlyIncome", "JobRole", "Attrition"],
-    dtype={"Department": "category", "JobRole": "category", "Attrition": "category"},
+penguins = pd.read_csv(
+    "penguins.csv",
+    usecols=["species", "island", "body_mass_g", "flipper_length_mm", "sex"],
+    dtype={"species": "category", "island": "category", "sex": "category"},
 )
 
-print(df.dtypes)
+print(penguins.dtypes)
 print()
-print(df.head())
+print(penguins.head())
 `,
     },
   ]}
@@ -164,8 +184,10 @@ print(df.head())
 Two things to notice:
 
 - `usecols` saves memory by skipping columns we do not need.
-- `dtype` with `"category"` for repeated string columns saves
-  significant memory and speeds up groupings.
+- `dtype` with `"category"` for repeated string columns (`species`,
+  `island`, `sex`) saves memory and speeds up later groupings —
+  there are only a handful of distinct values across hundreds of
+  rows.
 
 ## The first three things to do after `read_csv`
 
@@ -174,25 +196,22 @@ Whenever you load a new dataset, run these three commands
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import pandas as pd
-
-df = pd.read_csv(
-    "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
-)
-
-# 1. Shape — do you have the rows you expected?
-print("Shape:", df.shape)
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `# 1. Shape — do you have the rows you expected?
+print("Shape:", penguins.shape)
 print()
 
 # 2. Head — does each column look sensible?
-print(df.head())
+print(penguins.head())
 print()
 
 # 3. Dtypes — are the types right?
-print(df.dtypes)
+print(penguins.dtypes)
 `,
     },
   ]}
@@ -202,33 +221,31 @@ If any of those three looks wrong — surprising row count,
 garbled values, wrong types — fix it now. The cost of fixing a
 loading bug is much lower at this moment than three steps later.
 
-## Loading from a non-CORS-friendly URL
+## When a URL won't load directly
 
-Some hosts (including GitHub itself outside `raw.githubusercontent
-.com`, plus many private servers) do not include the HTTP
-headers that allow a browser to fetch them. Dataslope provides a
-CORS proxy you can route through:
+Reading from a URL only works when the host returns the right
+permission headers (the technical name is **CORS** — cross-origin
+resource sharing). `raw.githubusercontent.com` does;
+`github.com/.../file.csv` (the HTML page) does not, and neither do
+many private servers. When a browser-side fetch is blocked, the
+usual fix is to route the request through a small **CORS proxy** — a
+relay that adds the missing headers — by URL-encoding the real
+address into a `?url=...` parameter:
 
-<CodeBlock
-  adapter="python"
-  files={[
-    {
-      filename: "main.py",
-      starterCode: `import pandas as pd
+```python
+import pandas as pd
 
-# Going through the proxy. The original URL is URL-encoded into ?url=...
-url = "https://dataslope-cors-proxy.subwaymatch.workers.dev/?url=https%3A%2F%2Fgithub.com%2Fbdi475%2Fdatasets%2Fraw%2Frefs%2Fheads%2Fmain%2FHR-dataset-v14.csv"
+# The original URL is URL-encoded into the ?url=... parameter
+proxy = "https://your-cors-proxy.example.com/?url="
+real = "https%3A%2F%2Fexample.com%2Fdata.csv"
+df = pd.read_csv(proxy + real)
+```
 
-df = pd.read_csv(url)
-print("Shape:", df.shape)
-df.head()
-`,
-    },
-  ]}
-/>
-
-When you have a choice, **prefer the direct `raw.githubuser
-content.com` URL**. The proxy is for cases where you do not.
+When you have a choice, **prefer the direct
+`raw.githubusercontent.com` URL** (or, as in this course, a staged
+local file). A proxy is a workaround for the cases where you do
+not. On your own laptop the problem usually disappears entirely —
+local Python is not a browser and is not bound by CORS at all.
 
 ## Reading Excel files
 
@@ -333,36 +350,29 @@ Inspect, design your real load, then run it.
 
 <ChallengeCard
   adapter="python"
-  title="Load and trim an HR dataset"
-  instructions={`Load the HR dataset from this URL:
+  title="Load and trim the penguins dataset"
+  instructions={`The penguins file is staged for you as \`penguins.csv\`. Load it, but:
 
-\`https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv\`
-
-But:
-
-- Only load the columns: \`Age\`, \`Department\`, \`MonthlyIncome\`, \`JobSatisfaction\`, \`Attrition\`.
-- Convert \`Department\` and \`Attrition\` to the \`category\` dtype as you load.
+- Only load the columns \`species\`, \`island\`, \`body_mass_g\`, \`flipper_length_mm\`, and \`sex\`.
+- Convert \`species\` and \`island\` to the \`category\` dtype as you load.
 
 Store the result in a DataFrame called \`df\`.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
       starterCode: `import pandas as pd
 
-URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
-
-df = None  # TODO
+df = None  # TODO: read penguins.csv with usecols and dtype
 
 print(df.head() if df is not None else "df is still None")
 `,
       solutionCode: `import pandas as pd
 
-URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
-
 df = pd.read_csv(
-    URL,
-    usecols=["Age", "Department", "MonthlyIncome", "JobSatisfaction", "Attrition"],
-    dtype={"Department": "category", "Attrition": "category"},
+    "penguins.csv",
+    usecols=["species", "island", "body_mass_g", "flipper_length_mm", "sex"],
+    dtype={"species": "category", "island": "category"},
 )
 
 print(df.head())
@@ -380,24 +390,24 @@ assert isinstance(df, pd.DataFrame), "df should be a DataFrame"`,
     {
       id: "correct_columns",
       name: "Has exactly the requested columns",
-      description: "Age, Department, MonthlyIncome, JobSatisfaction, Attrition",
-      code: `expected = {"Age", "Department", "MonthlyIncome", "JobSatisfaction", "Attrition"}
+      description: "species, island, body_mass_g, flipper_length_mm, sex",
+      code: `expected = {"species", "island", "body_mass_g", "flipper_length_mm", "sex"}
 actual = set(df.columns)
 assert actual == expected, f"Got {sorted(actual)}, expected {sorted(expected)}"`,
     },
     {
       id: "row_count",
-      name: "Loaded all 1470 rows",
-      description: "The full HR dataset has 1470 rows",
-      code: `assert len(df) == 1470, f"Expected 1470 rows, got {len(df)}"`,
+      name: "Loaded all 344 rows",
+      description: "The penguins dataset has 344 rows",
+      code: `assert len(df) == 344, f"Expected 344 rows, got {len(df)}"`,
     },
     {
       id: "category_dtypes",
-      name: "Department and Attrition are categorical",
+      name: "species and island are categorical",
       description: "Both columns should have dtype 'category'",
       code: `import pandas as pd
-assert isinstance(df["Department"].dtype, pd.CategoricalDtype)
-assert isinstance(df["Attrition"].dtype, pd.CategoricalDtype)`,
+assert isinstance(df["species"].dtype, pd.CategoricalDtype)
+assert isinstance(df["island"].dtype, pd.CategoricalDtype)`,
     },
   ]}
 />
@@ -420,7 +430,7 @@ You will hit this distinction the very first time you try to load data from a Gi
 />
 
 <MultipleChoice
-  markdown={`Why use the \`category\` dtype on a column like \`Department\`?
+  markdown={`Why use the \`category\` dtype on a column like \`species\`?
 
 - It looks prettier
   > The \`category\` dtype does not change how values are displayed; the visual output of a \`print\` or \`head\` call looks the same as a regular string column.

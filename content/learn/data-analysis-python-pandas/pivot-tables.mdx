@@ -279,20 +279,19 @@ CSV with no weird header rows.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
-
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")
-`,
-      starterCode: `# Average monthly hours by department × salary bracket
-summary = df.pivot_table(
-    index="Department",
-    columns="salary",
-    values="average_montly_hours",
+diamonds = pd.read_csv("diamonds.csv")`,
+      starterCode: `# Average price for every cut x color combination
+summary = diamonds.pivot_table(
+    index="cut",
+    columns="color",
+    values="price",
     aggfunc="mean",
-).round(1)
+).round(0)
 
 print(summary)
 `,
@@ -300,7 +299,11 @@ print(summary)
   ]}
 />
 
-A single call replaces a multi-step `groupby + unstack`.
+A single call replaces a multi-step `groupby + unstack` and turns
+53,940 rows into a compact cut-by-color grid. (Read it carefully and
+you will see the same skew from the GroupBy chapter — the "best"
+combinations are not always the priciest, because carat varies
+across the cells.)
 
 ## Mini challenge
 

@@ -103,14 +103,15 @@ A single function call:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
 import plotly.express as px
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+penguins = pd.read_csv("penguins.csv")`,
       starterCode: `fig = px.histogram(
-    df, x="satisfaction_level", nbins=30, title="Distribution of employee satisfaction"
+    penguins, x="body_mass_g", nbins=30, title="Distribution of penguin body mass"
 )
 fig.show()
 `,
@@ -130,14 +131,15 @@ for:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
 import plotly.express as px
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+penguins = pd.read_csv("penguins.csv")`,
       starterCode: `fig = px.box(
-    df, x="salary", y="satisfaction_level", title="Satisfaction by salary bracket"
+    penguins, x="species", y="body_mass_g", title="Body mass by species"
 )
 fig.show()
 `,
@@ -152,19 +154,20 @@ glance. Use it to compare a numeric column across categories.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
 import plotly.express as px
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+penguins = pd.read_csv("penguins.csv")`,
       starterCode: `fig = px.scatter(
-    df,
-    x="average_montly_hours",
-    y="satisfaction_level",
-    color="salary",
-    opacity=0.5,
-    title="Hours worked vs satisfaction, by salary",
+    penguins,
+    x="flipper_length_mm",
+    y="body_mass_g",
+    color="species",
+    opacity=0.7,
+    title="Flipper length vs body mass, by species",
 )
 fig.show()
 `,
@@ -172,7 +175,12 @@ fig.show()
   ]}
 />
 
-Opacity is your friend when many points overlap.
+Run it and notice how cleanly the three species separate into
+three clouds — heavier penguins have longer flippers, and Gentoos
+sit clearly apart in the upper-right. This penguin scatter is a
+small classic of data teaching precisely because the structure
+leaps out of the picture in a way no table of numbers ever could.
+Opacity (`opacity=0.7`) keeps overlapping points readable.
 
 ## Line — trends over time
 
@@ -213,18 +221,19 @@ A few line-chart rules:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
 import plotly.express as px
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+penguins = pd.read_csv("penguins.csv")`,
       starterCode: `fig = px.histogram(
-    df,
-    x="satisfaction_level",
-    facet_col="salary",
+    penguins,
+    x="body_mass_g",
+    facet_col="species",
     nbins=30,
-    title="Satisfaction by salary bracket",
+    title="Body mass distribution by species",
 )
 fig.show()
 `,

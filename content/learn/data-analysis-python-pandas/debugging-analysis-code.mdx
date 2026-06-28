@@ -135,21 +135,24 @@ after the chart is in your boss's deck.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
-      starterCode: `print("Shape:", df.shape)
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `print("Shape:", penguins.shape)
 print()
-df.info()
+penguins.info()
 `,
     },
   ]}
 />
 
 A 30-second `.info()` after loading catches almost every "wait,
-that column is the wrong type" bug.
+that column is the wrong type" bug. Here it also quietly reveals
+the missing data: the measurement columns report fewer non-null
+values than the 344 total rows.
 
 ## Habit 5 — Pin down weird rows
 
