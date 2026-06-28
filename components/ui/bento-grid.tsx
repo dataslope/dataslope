@@ -73,8 +73,10 @@ const BentoCard = ({
       {/* Page-coloured scrim so the animated background reads softly behind the
           card copy (white in light mode, #121212 in dark). */}
       <div className="pointer-events-none absolute inset-0 bg-white/60 dark:bg-[#121212]/60" />
-      <div className="p-6">
-        <div className="pointer-events-none z-10 flex flex-col gap-1">
+      {/* `relative z-10` lifts the copy (and CTA) above the absolute scrim and
+          hover-tint overlays — a bare `z-10` on a static element has no effect. */}
+      <div className="relative z-10 p-6">
+        <div className="pointer-events-none flex flex-col gap-1">
           {/* Icon size/position pinned to the former hover state (scale-75,
               shrinking from its left edge) so it no longer resizes on hover. */}
           <Icon

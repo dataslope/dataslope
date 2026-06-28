@@ -16,13 +16,22 @@ import { useTheme } from "./theme";
 
 const GITHUB_URL = "https://github.com/dataslope/dataslope/";
 
-function LangIcon({ id, size = 16 }: { id: string; size?: number }) {
+function LangIcon({
+  id,
+  size = 16,
+  className = "text-[var(--ds-gray-600)] dark:text-[var(--ds-gray-300)]",
+}: {
+  id: string;
+  size?: number;
+  /** Tailwind colour classes for the (currentColor) glyph. */
+  className?: string;
+}) {
   const Icon: IconType | undefined = LANGUAGE_ICONS[id];
   if (!Icon) return null;
   const factor = LANGUAGE_ICON_SIZE_FACTOR[id] ?? 1;
   return (
     <span
-      className="inline-flex shrink-0 items-center justify-center text-[var(--ds-gray-600)] dark:text-[var(--ds-gray-300)]"
+      className={`inline-flex shrink-0 items-center justify-center ${className}`}
       aria-hidden="true"
     >
       <Icon size={Math.round(size * factor)} />
@@ -81,10 +90,13 @@ function PlaygroundMenu() {
             {PLAYGROUNDS.map((p) => (
               <Menu.Item
                 key={p.id}
-                className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[var(--ds-gray-700)] outline-none transition-colors data-[highlighted]:bg-[var(--ds-gray-100)] data-[highlighted]:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-200)] dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white"
+                className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[var(--ds-gray-900)] outline-none transition-colors data-[highlighted]:bg-[var(--ds-gray-100)] data-[highlighted]:text-[var(--ds-gray-900)] dark:text-white dark:data-[highlighted]:bg-white/10 dark:data-[highlighted]:text-white"
                 render={<Link href={p.href} prefetch={false} />}
               >
-                <LangIcon id={p.id} />
+                <LangIcon
+                  id={p.id}
+                  className="text-[var(--ds-gray-900)] dark:text-white"
+                />
                 {p.label}
               </Menu.Item>
             ))}

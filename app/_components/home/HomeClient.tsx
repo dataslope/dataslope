@@ -10,6 +10,7 @@ import { BeamSection } from "./BeamSection";
 import { CoursesSection, type Course } from "./CoursesSection";
 import { StatsBento, type HomeStats } from "./StatsBento";
 import { PlaygroundShowcase } from "./PlaygroundShowcase";
+import { PricingSection } from "./PricingSection";
 import { Faq } from "./Faq";
 import { HomeFooter } from "./HomeFooter";
 
@@ -129,6 +130,13 @@ export function HomeClient({
               selected language) ── */}
           <section className="py-12">
             <PlaygroundShowcase />
+          </section>
+
+          {/* ── Pricing ── */}
+          <section className="py-12">
+            <BlurFade inView>
+              <PricingSection />
+            </BlurFade>
           </section>
 
           {/* ── FAQ ── */}
