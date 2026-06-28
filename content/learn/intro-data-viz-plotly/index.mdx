@@ -15,6 +15,45 @@ What you *will* do is learn to **see data**. By the end of this
 course, when you look at a table of numbers you will instinctively
 reach for a chart, and you will know which chart to reach for.
 
+And you can start *right now*. **This whole course runs in your
+browser** — there is nothing to install. The code block below is
+live: press **Run** and a few hundred Antarctic penguins will sort
+themselves into three species, each an interactive chart you can
+hover and zoom.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+import plotly.express as px
+
+# A small, famous dataset of 344 Antarctic penguins.
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `fig = px.scatter(
+    penguins,
+    x="flipper_length_mm",
+    y="body_mass_g",
+    color="species",
+    template="simple_white",
+    title="Penguins: flipper length vs body mass",
+)
+fig.show()
+`,
+    },
+  ]}
+/>
+
+Notice what you did *not* have to do: no loop over species, no manual
+colors, no legend code. You named the columns and the *roles* they
+play — `x`, `y`, `color` — and Plotly did the rest. Now **change one
+thing and re-run**: replace `y="body_mass_g"` with
+`y="bill_length_mm"`, or recolor by `color="island"`. Each tiny edit
+asks a different question, and the picture answers instantly. That
+loop — *tweak, run, look* — is the rhythm of the whole course.
+
 <svg
   viewBox="0 0 640 210"
   role="img"
@@ -113,10 +152,12 @@ The course is organized as a journey:
 
 ## How the interactive pages work
 
-Every Python code block on these pages runs **in your browser** via
-[Pyodide](https://pyodide.org) — a full CPython 3.13 build compiled
-to WebAssembly. There is nothing to install. Plotly, Pandas, NumPy,
-and the sample datasets all ship with the runtime.
+You already ran one chart above. Every Python code block on these
+pages works the same way: it runs **in your browser** via
+[Pyodide](https://pyodide.org), a full CPython 3.13 build compiled to
+WebAssembly. Plotly, Pandas, and NumPy all ship with the runtime, and
+larger datasets (penguins, diamonds, and a few others) are loaded for
+you when a page needs them.
 
 You will see three kinds of widgets:
 
@@ -138,30 +179,35 @@ contained. If you want a long-lived workspace, open the
 
 ## A taste of what is coming
 
-Here is a complete interactive visualization you will be able to
-write — and *understand deeply* — by the end of this course.
+Here is a more ambitious visualization you will be able to write —
+and *understand deeply* — by the end of the course. It is Hans
+Rosling's famous animation of 50 years of global development, in one
+Plotly Express call. Press the **play button** below the chart.
 
 <CodeBlock
   adapter="python"
   files={[
     {
       filename: "main.py",
-      starterCode: `import plotly.express as px
+      initCode: `import plotly.express as px
 
-# A built-in dataset of life expectancy & GDP for 142 countries.
-df = px.data.gapminder().query("year == 2007")
-
-fig = px.scatter(
+# A built-in dataset of life expectancy, GDP & population over time.
+df = px.data.gapminder()`,
+      starterCode: `fig = px.scatter(
     df,
     x="gdpPercap",
     y="lifeExp",
     size="pop",
     color="continent",
     hover_name="country",
+    animation_frame="year",
+    animation_group="country",
     log_x=True,
     size_max=55,
+    range_x=[100, 100000],
+    range_y=[25, 90],
     template="simple_white",
-    title="Life expectancy vs GDP per capita (2007)",
+    title="50 years of global development, animated",
     labels={
         "gdpPercap": "GDP per capita (USD, log scale)",
         "lifeExp": "Life expectancy (years)",

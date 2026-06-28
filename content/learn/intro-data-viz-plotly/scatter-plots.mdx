@@ -59,22 +59,29 @@ If you forget every other chart, remember the scatter plot.
 
 ## The minimum
 
+We'll use the **Palmer Penguins** dataset — 344 Antarctic penguins
+with bill, flipper, and body-mass measurements. It is the field's
+favored friendly stand-in for the old "iris" flower dataset, whose
+author, R.A. Fisher, was a prominent eugenicist; penguins teach the
+same lessons without that baggage.
+
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import plotly.express as px
+      initCode: `import pandas as pd
+import plotly.express as px
 
-df = px.data.iris()
-
-fig = px.scatter(
-    df,
-    x="sepal_width",
-    y="sepal_length",
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `fig = px.scatter(
+    penguins,
+    x="bill_depth_mm",
+    y="bill_length_mm",
     template="simple_white",
-    title="Iris: sepal width vs length",
-    labels={"sepal_width": "Sepal width (cm)", "sepal_length": "Sepal length (cm)"},
+    title="Penguins: bill depth vs bill length",
+    labels={"bill_depth_mm": "Bill depth (mm)", "bill_length_mm": "Bill length (mm)"},
 )
 fig.show()
 `,
@@ -87,26 +94,27 @@ about half a second.
 
 ## Adding categorical color
 
-Color reveals *groups*. The classic iris example becomes much
-richer once we color by species:
+Color reveals *groups*. The penguin scatter becomes much richer once
+we color by species:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import plotly.express as px
+      initCode: `import pandas as pd
+import plotly.express as px
 
-df = px.data.iris()
-
-fig = px.scatter(
-    df,
-    x="sepal_width",
-    y="sepal_length",
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `fig = px.scatter(
+    penguins,
+    x="bill_depth_mm",
+    y="bill_length_mm",
     color="species",
     template="simple_white",
-    title="Iris by species",
-    labels={"sepal_width": "Sepal width (cm)", "sepal_length": "Sepal length (cm)"},
+    title="Penguins by species",
+    labels={"bill_depth_mm": "Bill depth (mm)", "bill_length_mm": "Bill length (mm)"},
 )
 fig.show()
 `,
@@ -115,8 +123,10 @@ fig.show()
 />
 
 Suddenly the structure becomes obvious: the three species occupy
-different regions of the chart. *That's the magic of adding the
-third variable.*
+different regions of the chart. (There's even a hint of **Simpson's
+paradox** here — bill depth and length look negatively related
+overall but positively related *within* each species.) *That's the
+magic of adding the third variable.*
 
 ## Adding size for a fourth variable
 
@@ -126,22 +136,26 @@ whole page to it later):
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import plotly.express as px
+      initCode: `import pandas as pd
+import plotly.express as px
 
-df = px.data.iris()
-
-fig = px.scatter(
-    df,
-    x="sepal_width",
-    y="sepal_length",
+# size= can't handle missing values, so drop rows with gaps.
+penguins = pd.read_csv("penguins.csv").dropna(
+    subset=["bill_depth_mm", "bill_length_mm", "body_mass_g"]
+)`,
+      starterCode: `fig = px.scatter(
+    penguins,
+    x="bill_depth_mm",
+    y="bill_length_mm",
     color="species",
-    size="petal_length",
+    size="body_mass_g",
     template="simple_white",
-    title="Iris with size encoding petal length",
-    labels={"sepal_width": "Sepal width (cm)", "sepal_length": "Sepal length (cm)"},
+    title="Penguins with size encoding body mass",
+    labels={"bill_depth_mm": "Bill depth (mm)", "bill_length_mm": "Bill length (mm)"},
 )
 fig.show()
 `,
@@ -194,24 +208,29 @@ look equally black. Two fixes:
 
 ### Opacity
 
+The **diamonds** dataset — 53,940 rows of carat, cut, and price — is a
+realistic stress test. At full opacity the cloud is a solid blob; at
+`opacity=0.2` the dense regions reveal themselves as darker.
+
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import plotly.express as px
+      initCode: `import pandas as pd
+import plotly.express as px
 
-df = px.data.gapminder()
-
-fig = px.scatter(
-    df,
-    x="gdpPercap",
-    y="lifeExp",
-    log_x=True,
-    opacity=0.3,
+# 53,940 diamonds — far more points than a scatter can show as dots.
+diamonds = pd.read_csv("diamonds.csv")`,
+      starterCode: `fig = px.scatter(
+    diamonds,
+    x="carat",
+    y="price",
+    opacity=0.2,
     template="simple_white",
-    title="Gapminder (all years), opacity=0.3",
-    labels={"gdpPercap": "GDP per capita (USD, log)", "lifeExp": "Life expectancy"},
+    title="Diamonds: carat vs price (53,940 points, opacity=0.2)",
+    labels={"carat": "Carat", "price": "Price (USD)"},
 )
 fig.show()
 `,
@@ -220,7 +239,7 @@ fig.show()
 />
 
 Each dot is now semi-transparent, so dense regions become visibly
-*darker*.
+*darker* — the bands where most diamonds cluster jump out.
 
 ### Density heatmap
 
@@ -235,6 +254,70 @@ what you want — it produces tall stacks of dots above each category
 label. Use a **strip plot** (`px.strip`), **violin plot**
 (`px.violin`), or **box plot** (`px.box`) instead — we'll cover
 boxes next.
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  title="Scatter flipper length vs body mass"
+  instructions={`The \`penguins\` DataFrame is loaded. Make a scatter plot that shows the relationship between flipper length and body mass, colored by species.
+
+1. Use \`px.scatter\` with \`x="flipper_length_mm"\` and \`y="body_mass_g"\`.
+2. Color the points by \`species\`.
+3. Use \`template="simple_white"\`.
+
+Store the figure in \`fig\`. (You should see a clear positive relationship — bigger flippers, heavier penguins.)`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+import plotly.express as px
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `# Scatter: flipper length (x) vs body mass (y), colored by species.
+fig = None
+`,
+      solutionCode: `fig = px.scatter(
+    penguins,
+    x="flipper_length_mm",
+    y="body_mass_g",
+    color="species",
+    template="simple_white",
+    title="Flipper length vs body mass, by species",
+    labels={
+        "flipper_length_mm": "Flipper length (mm)",
+        "body_mass_g": "Body mass (g)",
+    },
+)
+fig.show()
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "is-scatter",
+      name: "fig is a scatter plot",
+      description: "A scatter figure was built",
+      code: `import plotly.graph_objects as go
+assert isinstance(fig, go.Figure)
+assert len(fig.data) >= 1
+assert all(t.type == "scatter" and (t.mode is None or "markers" in t.mode) for t in fig.data)`,
+    },
+    {
+      id: "by-species",
+      name: "one trace per species",
+      description: "color=species splits into three traces",
+      code: `assert len(fig.data) == penguins["species"].nunique()`,
+    },
+    {
+      id: "axes",
+      name: "axes are flipper length and body mass",
+      description: "x and y map to the right columns",
+      code: `assert "flipper" in (fig.layout.xaxis.title.text or "").lower()
+assert "mass" in (fig.layout.yaxis.title.text or "").lower() or "body" in (fig.layout.yaxis.title.text or "").lower()`,
+    },
+  ]}
+/>
 
 ## Check your understanding
 

@@ -135,6 +135,43 @@ Now you can compare *eight* distributions at once: 4 days × 2
 sexes. Try this with histograms and you'd need eight separate
 subplot panels.
 
+## Box plots shine on big data
+
+Compactness matters most when the data is *large*. The **diamonds**
+dataset has 53,940 rows across five cut grades — a histogram-per-cut
+would be a wall of panels, but five boxes fit on one chart and the
+price differences read instantly. Notice the long upper whiskers and
+outlier dots: diamond prices are heavily right-skewed.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+import plotly.express as px
+
+diamonds = pd.read_csv("diamonds.csv")`,
+      starterCode: `fig = px.box(
+    diamonds,
+    x="cut",
+    y="price",
+    template="simple_white",
+    category_orders={"cut": ["Fair", "Good", "Very Good", "Premium", "Ideal"]},
+    title="Diamond price by cut grade (53,940 diamonds)",
+    labels={"cut": "Cut", "price": "Price (USD)"},
+)
+fig.show()
+`,
+    },
+  ]}
+/>
+
+A surprising read: "Ideal" cut diamonds are not the most expensive on
+average. (Why? Ideal-cut stones tend to be *smaller* in carat — a
+confound worth a follow-up scatter.)
+
 ## Show every point with `points="all"`
 
 When sample sizes are small, the summary may hide too much. Add

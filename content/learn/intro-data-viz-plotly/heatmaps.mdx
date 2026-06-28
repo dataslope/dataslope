@@ -76,24 +76,30 @@ Use a heatmap when:
 Plotly Express offers `px.imshow` (for image-like 2-D matrices) and
 `px.density_heatmap` (which bins two continuous variables on the fly).
 
+This is exactly the tool for big, overplotted data. The **diamonds**
+dataset has 53,940 rows — far too many for a scatter — so we bin them
+into a grid and color by count instead.
+
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import plotly.express as px
+      initCode: `import pandas as pd
+import plotly.express as px
 
-df = px.data.tips()
-
-fig = px.density_heatmap(
-    df,
-    x="total_bill",
-    y="tip",
-    nbinsx=20,
-    nbinsy=20,
+diamonds = pd.read_csv("diamonds.csv")`,
+      starterCode: `fig = px.density_heatmap(
+    diamonds,
+    x="carat",
+    y="price",
+    nbinsx=40,
+    nbinsy=40,
+    color_continuous_scale="Viridis",
     template="simple_white",
-    title="2-D density: tip vs total bill",
-    labels={"total_bill": "Total bill (USD)", "tip": "Tip (USD)"},
+    title="2-D density: diamond carat vs price (53,940 rows)",
+    labels={"carat": "Carat", "price": "Price (USD)"},
 )
 fig.show()
 `,
@@ -101,9 +107,9 @@ fig.show()
   ]}
 />
 
-Where the scatter plot showed *every dot*, this shows *cell counts*.
-The hot cells (yellow) are where most diners fall — small-to-medium
-bill, small tip.
+Where a scatter plot would show *every dot* (and collapse into a
+blob), this shows *cell counts*. The hot cells are where most
+diamonds fall — small carat, low price.
 
 ## A correlation matrix heatmap
 
@@ -112,13 +118,16 @@ correlated against every other.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import plotly.express as px
+      initCode: `import pandas as pd
+import plotly.express as px
 
-df = px.data.iris().select_dtypes("number")
-corr = df.corr().round(2)
+cols = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `corr = penguins[cols].corr().round(2)
 
 fig = px.imshow(
     corr,
@@ -126,7 +135,7 @@ fig = px.imshow(
     color_continuous_scale="RdBu_r",
     color_continuous_midpoint=0,
     template="simple_white",
-    title="Correlation matrix (iris)",
+    title="Correlation matrix (Palmer Penguins)",
 )
 fig.show()
 `,

@@ -1,0 +1,279 @@
+---
+title: Always Look at the Data
+description: Summary statistics can describe wildly different datasets identically. The only cure is to plot the data and look.
+---
+
+There is one habit that separates careful analysts from the rest, and
+it is almost embarrassingly simple: **before you trust a summary
+statistic, plot the data and look at it.** This page makes the case
+in the most vivid way the field has ever found — two datasets where
+the numbers agree perfectly and the *pictures* could not be more
+different.
+
+<svg
+  viewBox="0 0 640 230"
+  role="img"
+  aria-label="Two panels share the same dotted trend line, but the left is a tidy upward cloud while the right hides a dinosaur shape — identical statistics, different pictures"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.07">
+    <rect x="60" y="40" width="240" height="160" rx="10" />
+    <rect x="340" y="40" width="240" height="160" rx="10" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <rect x="78" y="170" width="200" height="3" rx="1.5" transform="rotate(-14 78 170)" />
+    <rect x="358" y="170" width="200" height="3" rx="1.5" transform="rotate(-14 358 170)" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor" fillOpacity="0.8">
+    <circle cx="92" cy="168" r="4" />
+    <circle cx="120" cy="158" r="4" />
+    <circle cx="150" cy="150" r="4" />
+    <circle cx="178" cy="132" r="4" />
+    <circle cx="208" cy="120" r="4" />
+    <circle cx="240" cy="104" r="4" />
+    <circle cx="268" cy="92" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor" fillOpacity="0.85">
+    <circle cx="430" cy="80" r="4" />
+    <circle cx="445" cy="72" r="4" />
+    <circle cx="462" cy="70" r="4" />
+    <circle cx="470" cy="86" r="4" />
+    <circle cx="455" cy="100" r="4" />
+    <circle cx="438" cy="110" r="4" />
+    <circle cx="430" cy="130" r="4" />
+    <circle cx="448" cy="150" r="4" />
+    <circle cx="470" cy="158" r="4" />
+    <circle cx="492" cy="150" r="4" />
+    <circle cx="500" cy="128" r="4" />
+    <circle cx="488" cy="106" r="4" />
+    <circle cx="478" cy="64" r="3" />
+  </g>
+</svg>
+
+## Anscombe's quartet (1973)
+
+In 1973, the statistician **Francis Anscombe** built four small
+datasets specifically to make a point. All four share — to two
+decimal places — the same mean of x, the same mean of y, the same
+variance, the same correlation, and the *same* fitted regression
+line. By every standard summary number, they are identical.
+
+Let's confirm that with the real data. Each `dataset` (I, II, III,
+IV) has the same Pearson correlation.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "anscombes_quartet.csv", stageAs: "anscombe.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+aq = pd.read_csv("anscombe.csv")`,
+      starterCode: `summary = aq.groupby("dataset").agg(
+    mean_x=("x", "mean"),
+    mean_y=("y", "mean"),
+    std_x=("x", "std"),
+    std_y=("y", "std"),
+).round(2)
+summary["corr"] = aq.groupby("dataset").apply(
+    lambda g: g["x"].corr(g["y"])
+).round(2)
+
+print(summary)
+print("\\nFour datasets. The summary statistics are essentially identical.")
+`,
+    },
+  ]}
+/>
+
+The means line up, the spreads line up, the correlation is about 0.82
+for all four. A model would treat them as the same data. Now **plot
+them** — one panel each — and the illusion collapses.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "anscombes_quartet.csv", stageAs: "anscombe.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+import plotly.express as px
+aq = pd.read_csv("anscombe.csv")`,
+      starterCode: `fig = px.scatter(
+    aq,
+    x="x",
+    y="y",
+    facet_col="dataset",
+    facet_col_wrap=2,
+    template="simple_white",
+    title="Anscombe's quartet — same statistics, four different shapes",
+)
+fig.show()
+`,
+    },
+  ]}
+/>
+
+Look at what the numbers hid: dataset **I** is a genuine linear
+cloud; **II** is a smooth curve (a straight-line model is the wrong
+model entirely); **III** is a perfect line dragged off course by a
+single outlier; **IV** is a vertical stack whose entire correlation
+comes from one stray point. The correlation coefficient — 0.82 for
+all of them — sees none of this.
+
+## The Datasaurus Dozen (2017)
+
+Anscombe's point was so good that, in **2017**, Justin Matejka and
+George Fitzmaurice at Autodesk pushed it to its logical extreme.
+Starting from Alberto Cairo's "Datasaurus" — a scatter of points that
+forms a cartoon **dinosaur** yet has unremarkable summary statistics
+— they generated *twelve more* datasets that share the same mean,
+standard deviation, and correlation to two decimal places while
+looking like stars, lines, circles, and slanted clouds.
+
+First, confirm the statistics are (almost) identical across all
+thirteen:
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "datasaurus_dozen.csv", stageAs: "datasaurus.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+dd = pd.read_csv("datasaurus.csv")`,
+      starterCode: `summary = dd.groupby("dataset").agg(
+    mean_x=("x", "mean"),
+    mean_y=("y", "mean"),
+    std_x=("x", "std"),
+    std_y=("y", "std"),
+).round(1)
+summary["corr"] = dd.groupby("dataset").apply(
+    lambda g: g["x"].corr(g["y"])
+).round(2)
+
+print(summary)
+print("\\n13 datasets. The summaries are essentially the same row, repeated.")
+`,
+    },
+  ]}
+/>
+
+The means hover around 54 and 48, the standard deviations around 17
+and 26, the correlation near −0.06 — for every single one, *including*
+the dinosaur. Now plot them and find the dino:
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "datasaurus_dozen.csv", stageAs: "datasaurus.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+import plotly.express as px
+dd = pd.read_csv("datasaurus.csv")`,
+      starterCode: `fig = px.scatter(
+    dd,
+    x="x",
+    y="y",
+    facet_col="dataset",
+    facet_col_wrap=4,
+    height=700,
+    template="simple_white",
+    title="The Datasaurus Dozen — identical statistics, wildly different shapes",
+)
+fig.update_xaxes(matches=None, showticklabels=False)
+fig.update_yaxes(matches=None, showticklabels=False)
+fig.show()
+`,
+    },
+  ]}
+/>
+
+There it is — a dinosaur, a star, two parallel lines, a bullseye —
+all sharing one row of summary statistics. If you had only the
+numbers, you would never know.
+
+<Callout type="warn" title="The cheapest insight in this whole course">
+Mean, standard deviation, and correlation are a three-number summary
+of a cloud that may contain a dinosaur. The shapes they miss —
+curves, clusters, outliers, two populations mixed together — are
+*exactly* the ones that change the conclusion. Before you summarize,
+before you model, before you trust a single statistic: **scatter the
+data and look at it.** It costs one line of code.
+</Callout>
+
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  datasets={[{ path: "anscombes_quartet.csv", stageAs: "anscombe.csv" }]}
+  title="Prove the statistics match, then find the difference"
+  instructions={`The Anscombe quartet is loaded as the DataFrame \`aq\` with columns \`dataset\` (values \`"I"\`, \`"II"\`, \`"III"\`, \`"IV"\`), \`x\`, and \`y\`.
+
+Show that summary statistics can't tell the four datasets apart, then show that the *shapes* differ.
+
+1. Build a variable \`mean_y\` = the mean of column \`y\` across the **whole** DataFrame, rounded to 2 decimals. (All four datasets share the same mean y, so this equals each group's mean y.)
+2. Build a Plotly figure \`fig\` that draws a **scatter plot faceted by \`dataset\`** — one panel per dataset — using \`px.scatter\` with \`facet_col="dataset"\`.
+
+The point: one number summarizes all four, but the four pictures are different.`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+import plotly.express as px
+aq = pd.read_csv("anscombe.csv")`,
+      starterCode: `# 1. The shared mean of y (round to 2 decimals)
+mean_y = None
+
+# 2. A scatter plot faceted by dataset
+fig = None
+`,
+      solutionCode: `# 1. The shared mean of y (round to 2 decimals)
+mean_y = round(aq["y"].mean(), 2)
+print("Mean y (all datasets):", mean_y)
+
+# 2. A scatter plot faceted by dataset
+fig = px.scatter(
+    aq,
+    x="x",
+    y="y",
+    facet_col="dataset",
+    facet_col_wrap=2,
+    template="simple_white",
+    title="Anscombe's quartet",
+)
+fig.show()
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "mean",
+      name: "mean_y is the shared mean, rounded",
+      description: "mean_y equals the overall mean of y to 2 decimals",
+      code: `assert abs(mean_y - round(aq["y"].mean(), 2)) < 1e-9`,
+    },
+    {
+      id: "is-figure",
+      name: "fig is a Plotly figure with data",
+      description: "A scatter figure was built",
+      code: `import plotly.graph_objects as go
+assert isinstance(fig, go.Figure)
+assert len(fig.data) >= 1`,
+    },
+    {
+      id: "scatter",
+      name: "the figure uses scatter markers",
+      description: "Traces are scatter type",
+      code: `assert all(t.type == "scatter" for t in fig.data)`,
+    },
+    {
+      id: "faceted",
+      name: "the chart is faceted into four panels",
+      description: "One panel per dataset means multiple subplot axes",
+      code: `anchors = set(t.xaxis or "x" for t in fig.data)
+assert len(anchors) >= 4, "expected one panel per dataset (facet_col='dataset')"`,
+    },
+  ]}
+/>

@@ -270,6 +270,85 @@ comparison is the main point, use grouped bars instead.
 - **Drawing 50 bars on one chart** when a horizontal layout, a
   filter, or a "top 10" would be more useful.
 
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  title="Count penguins per island"
+  instructions={`The \`penguins\` DataFrame is loaded. Build a bar chart of how many penguins live on each island.
+
+1. Count the penguins per \`island\` and put the result in a DataFrame \`counts\` with two columns: \`island\` and \`n\`. (Hint: \`penguins["island"].value_counts()\` then \`.reset_index()\`, or a \`groupby\`.)
+2. Build a bar chart \`fig\` with \`px.bar\`, \`x="island"\` and \`y="n"\`, using \`template="simple_white"\`.
+
+The default y-axis already starts at zero — leave it there.`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+import plotly.express as px
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `# 1. Count penguins per island into a DataFrame counts (columns: island, n)
+counts = None
+
+# 2. Bar chart of counts per island
+fig = None
+`,
+      solutionCode: `# 1. Count penguins per island
+counts = (
+    penguins["island"]
+    .value_counts()
+    .rename_axis("island")
+    .reset_index(name="n")
+)
+print(counts)
+
+# 2. Bar chart of counts per island
+fig = px.bar(
+    counts,
+    x="island",
+    y="n",
+    template="simple_white",
+    title="Penguins per island",
+    labels={"island": "Island", "n": "Number of penguins"},
+)
+fig.show()
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "counts-cols",
+      name: "counts has island and n columns",
+      description: "A per-island count table was built",
+      code: `assert set(["island", "n"]).issubset(set(counts.columns))
+assert len(counts) == penguins["island"].nunique()`,
+    },
+    {
+      id: "counts-total",
+      name: "the counts sum to the number of penguins",
+      description: "Every penguin is counted once",
+      code: `assert int(counts["n"].sum()) == len(penguins)`,
+    },
+    {
+      id: "is-bar",
+      name: "fig is a bar chart",
+      description: "A bar figure was built",
+      code: `import plotly.graph_objects as go
+assert isinstance(fig, go.Figure)
+assert len(fig.data) >= 1
+assert fig.data[0].type == "bar"`,
+    },
+    {
+      id: "zero-baseline",
+      name: "the y-axis is not truncated",
+      description: "Bar charts should keep a zero baseline",
+      code: `rng = fig.layout.yaxis.range
+assert rng is None or rng[0] <= 0, "leave the bar y-axis starting at zero"`,
+    },
+  ]}
+/>
+
 ## Check your understanding
 
 <MultipleChoice

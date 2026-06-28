@@ -107,7 +107,6 @@ For this course, you'll see data arrive in three ways:
 
    ```python
    df = px.data.gapminder()    # life-expectancy & GDP
-   df = px.data.iris()         # flower measurements
    df = px.data.tips()         # restaurant tipping
    df = px.data.stocks()       # daily stock prices
    ```
@@ -119,16 +118,35 @@ For this course, you'll see data arrive in three ways:
    df = pd.DataFrame({"x": [1, 2, 3], "y": [4, 5, 6]})
    ```
 
-3. **A CSV (or Excel) file.** The real-world case:
+3. **A CSV file.** The real-world case, and the one you'll use most
+   in your own work:
 
    ```python
-   df = pd.read_csv("sales.csv")
+   df = pd.read_csv("penguins.csv")
    ```
 
-   In your own work this is the most common pattern.
+This course uses all three. On pages that need a friendlier dataset
+than the built-ins offer — **Palmer Penguins** or **diamonds**, say —
+the CSV is loaded for you and you read it with `pd.read_csv(...)`,
+exactly as you would on your own machine.
 
-For *this course*, we'll mostly use options 1 and 2, because no
-file uploads are needed in the browser runtime.
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd`,
+      starterCode: `# Read a real CSV, just like in your own work.
+penguins = pd.read_csv("penguins.csv")
+
+print(penguins.head())
+print("Shape:", penguins.shape)
+print("Columns:", list(penguins.columns))
+`,
+    },
+  ]}
+/>
 
 ## Peeking at a DataFrame
 

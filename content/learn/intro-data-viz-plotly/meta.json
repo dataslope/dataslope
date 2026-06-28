@@ -26,13 +26,8 @@
     "pages": [
         "index",
         "---",
-        "history-of-visual-communication",
-        "florence-nightingale",
-        "rise-of-business-intelligence",
-        "spreadsheets-to-interactive",
-        "python-for-analytics",
-        "the-rise-of-plotly",
-        "why-interactivity-changed-everything",
+        "a-brief-history-of-data-pictures",
+        "why-plotly-express",
         "---",
         "what-is-data-visualization",
         "why-charts-exist",
@@ -62,6 +57,7 @@
         "time-series-visualization",
         "geographic-visualization",
         "filtering-before-plotting",
+        "always-look-at-the-data",
         "exploratory-workflow",
         "---",
         "dashboard-intuition",
@@ -69,6 +65,8 @@
         "ethics-and-accessibility",
         "debugging-visualizations",
         "best-practices",
+        "---",
+        "interesting-discussions",
         "next-steps"
     ]
 }

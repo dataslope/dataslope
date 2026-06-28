@@ -82,21 +82,22 @@ You can see them in action by changing the `template=` argument.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import plotly.express as px
+      initCode: `import pandas as pd
+import plotly.express as px
 
-df = px.data.iris()
-
-# Try changing the template name in the next line!
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `# Try changing the template name in the next line!
 fig = px.scatter(
-    df,
-    x="sepal_width",
-    y="sepal_length",
+    penguins,
+    x="bill_depth_mm",
+    y="bill_length_mm",
     color="species",
     template="simple_white",
-    title="Iris — change the template above to see other styles",
+    title="Penguins — change the template above to see other styles",
 )
 fig.show()
 `,
