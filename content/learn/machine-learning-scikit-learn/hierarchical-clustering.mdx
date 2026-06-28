@@ -420,6 +420,59 @@ plt.show()
 Now you can get scikit-learn's labels for any `k` and visualize the same
 tree they came from — the best of both libraries.
 
+## On real data: grouping California districts
+
+Synthetic blobs make the dendrogram legible, but the method is the same on
+real features. Here we cluster California census districts using only their
+numeric attributes — no target, just structure. Two real-world details show
+up immediately. First, the features live on wildly different scales
+(`Population` is in the thousands, `AveRooms` is a single digit), so without
+`StandardScaler` the largest-magnitude column would dominate every distance.
+Second, agglomerative clustering is roughly *O(n²)*, so we draw a **random
+sample of 400 districts** rather than all ~20,000 — large enough to find
+structure, small enough to stay fast. We fix `random_state` on `.sample` so
+the draw is reproducible; the clustering itself needs no seed.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "california_housing.csv", stageAs: "housing.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+housing = pd.read_csv("housing.csv")`,
+      starterCode: `import numpy as np
+from sklearn.cluster import AgglomerativeClustering
+from sklearn.preprocessing import StandardScaler
+
+# Hierarchical clustering is O(n^2), so sample a manageable subset.
+# (Clustering is deterministic; the seed here only fixes WHICH rows we draw.)
+sample = housing.sample(n=400, random_state=0)
+
+# Features only — clustering is unsupervised. Scale so no column dominates.
+X_scaled = StandardScaler().fit_transform(sample)
+
+# No random_state on the model itself: agglomerative clustering is deterministic.
+agg = AgglomerativeClustering(n_clusters=3)
+labels = agg.fit_predict(X_scaled)
+
+values, counts = np.unique(labels, return_counts=True)
+print("Districts sampled:   ", len(sample))
+print("Cluster labels found:", values)
+print("Districts per cluster:", counts)
+`,
+    },
+  ]}
+/>
+
+You get three groups of districts with no labels to check against — that is
+clustering. The clusters tend to track things like income and location, but
+the point here is mechanical: the exact same `fit_predict` you ran on blobs
+works on real, unscaled, differently-sized features, *once you standardize*.
+On a sample this size the tree builds instantly; push the sample toward tens
+of thousands and you would feel the quadratic cost the next section warns
+about.
+
 ## Hierarchical vs k-means: a direct comparison
 
 These two methods are the classic pairing in introductory clustering, and
@@ -584,10 +637,10 @@ print("largest cluster size:", largest_cluster)
     {
       id: "scaled_shape",
       name: "X_scaled has the right shape",
-      description: "Scaling preserves the 150x2 shape",
+      description: "Scaling preserves the shape of X",
       code: `import numpy as np
 assert X_scaled is not None, "X_scaled is still None"
-assert np.asarray(X_scaled).shape == (150, 2), f"Expected (150, 2), got {np.asarray(X_scaled).shape}"`,
+assert np.asarray(X_scaled).shape == X.shape, f"Expected {X.shape}, got {np.asarray(X_scaled).shape}"`,
     },
     {
       id: "is_standardized",
@@ -611,7 +664,7 @@ assert np.allclose(s, 1, atol=1e-6), f"Column stds not ~1: {s}"`,
       description: "labels has one entry per point",
       code: `import numpy as np
 assert labels is not None, "labels is still None"
-assert len(labels) == 150, f"Expected 150 labels, got {len(labels)}"`,
+assert len(labels) == len(X), f"Expected {len(X)} labels, got {len(labels)}"`,
     },
     {
       id: "largest_size",
@@ -620,7 +673,7 @@ assert len(labels) == 150, f"Expected 150 labels, got {len(labels)}"`,
       code: `import numpy as np
 expected = int(np.bincount(labels).max())
 assert largest_cluster == expected, f"Expected largest cluster {expected}, got {largest_cluster}"
-assert 0 < largest_cluster <= 150, f"Largest cluster out of range: {largest_cluster}"`,
+assert 0 < largest_cluster <= len(X), f"Largest cluster out of range: {largest_cluster}"`,
     },
   ]}
 />

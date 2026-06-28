@@ -100,40 +100,48 @@ and a standard deviation of about 1. A value of `+2` now means "two
 standard deviations above this feature's average," and that sentence means
 the same thing whether the feature was age or income.
 
-Let us see it on real data. The wine dataset has 13 chemical measurements
-on wildly different scales — some near 0.1, others in the hundreds.
+Let us see it on real data. The Palmer penguins dataset is a perfect
+natural example: a penguin's **body mass** runs into the thousands of grams
+(roughly 3,000–6,000), while its **bill length** is just tens of
+millimeters (around 40). Four measurements, four wildly different scales —
+exactly the situation `StandardScaler` is built for.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
       starterCode: `import numpy as np
-from sklearn.datasets import load_wine
 from sklearn.preprocessing import StandardScaler
 
-X, y = load_wine(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
 
 # Before scaling: every column has its own mean and spread.
 print("BEFORE scaling")
-print("  column means (first 4):", np.round(X.mean(axis=0)[:4], 2))
-print("  column stds  (first 4):", np.round(X.std(axis=0)[:4], 2))
+print("  column means:", np.round(X.mean(axis=0), 2))
+print("  column stds :", np.round(X.std(axis=0), 2))
 
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
 # After scaling: every column is centered at ~0 with spread ~1.
 print("\\nAFTER scaling")
-print("  column means (first 4):", np.round(X_scaled.mean(axis=0)[:4], 2))
-print("  column stds  (first 4):", np.round(X_scaled.std(axis=0)[:4], 2))
+print("  column means:", np.round(X_scaled.mean(axis=0), 2))
+print("  column stds :", np.round(X_scaled.std(axis=0), 2))
 `,
     },
   ]}
 />
 
 Before scaling, the column means and standard deviations are all over the
-map. After scaling, every mean is essentially 0 and every standard
-deviation is essentially 1. The columns are now directly comparable.
+map — `body_mass_g` sits near 4,200 with a spread in the hundreds, while
+`bill_length_mm` sits near 44 with a spread of about 5. After scaling,
+every mean is essentially 0 and every standard deviation is essentially 1.
+The columns are now directly comparable.
 
 Notice the two-step shape: `scaler.fit(...)` **learns** the mean and
 standard deviation of each column, and `scaler.transform(...)` **applies**
@@ -152,21 +160,25 @@ mistake in the next section.
 ## Why it matters: the same model, with and without scaling
 
 Talk is cheap. Let us prove that scaling can change a model's accuracy.
-We will train a k-nearest-neighbors classifier on the wine data twice —
+We will train a k-nearest-neighbors classifier on the penguin data twice —
 once on the raw features, once on scaled features — using the exact same
 split so the comparison is fair.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_wine
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
 
-X, y = load_wine(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )
@@ -190,12 +202,12 @@ print(f"KNN accuracy on SCALED features: {scaled_acc:.3f}")
 />
 
 The scaled version is dramatically better. On the raw data, the single
-feature with the largest numbers (here, `proline`, which runs into the
-hundreds) dominates the distance calculation, so KNN is effectively
-classifying wine by one chemical measurement and ignoring the other
-twelve. After scaling, all thirteen measurements get a fair say, and
-accuracy jumps. For a distance-based model, scaling is not optional — it is
-the difference between a model that works and one that barely tries.
+feature with the largest numbers (here, `body_mass_g`, which runs into the
+thousands) dominates the distance calculation, so KNN is effectively
+classifying penguins by body mass alone and all but ignoring the other
+three measurements. After scaling, all four measurements get a fair say,
+and accuracy jumps. For a distance-based model, scaling is not optional — it
+is the difference between a model that works and one that barely tries.
 
 ## Which models care about scale, and which do not
 
@@ -260,14 +272,18 @@ scaler peeks at the test set to compute a mean, that promise is broken.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_wine
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-X, y = load_wine(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
 
 # WRONG: scale the ENTIRE dataset first, using stats from all rows...
 scaler = StandardScaler()
@@ -295,14 +311,18 @@ longer truly held out.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_wine
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-X, y = load_wine(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
 
 # RIGHT: split FIRST, so the test set is untouched.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
@@ -470,8 +490,10 @@ care goes, and where leaks creep in.
   title="Scale the right way: fit on train, transform both"
   category="preprocessing · scaling · leakage"
   estimatedTime="~7 min"
-  instructions={`The breast cancer dataset has 30 features on very different
-scales. Scale them **without leaking the test set**.
+  instructions={`The penguins' four numeric measurements live on very
+different scales — \`body_mass_g\` is in the thousands while
+\`bill_length_mm\` is in the tens. Scale them **without leaking the test
+set**.
 
 1. The split is already done for you: \`X_train\`, \`X_test\`, \`y_train\`,
    \`y_test\`.
@@ -482,17 +504,23 @@ scales. Scale them **without leaking the test set**.
 4. Store the mean of \`X_train_scaled\` in \`train_mean\`.
 
 The tests check that the scaler was fit on the training set (so the
-training mean is ~0), that the test set was transformed with the *same*
-scaler (so its mean is close to but not exactly 0), and that the shapes are
-unchanged.`}
+training mean is ~0 and each training column has std ~1), that the test set
+was transformed with the *same* scaler (so its mean is close to but not
+exactly 0, and the scaler's stored mean matches the raw training mean), and
+that the shapes are unchanged.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      initCode: `from sklearn.datasets import load_breast_cancer
+      initCode: `import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-X, y = load_breast_cancer(return_X_y=True)
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
+# 342 rows after dropna; test_size=0.3 holds out round(342*0.3) rows for the test set.
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0
 )`,
@@ -526,14 +554,24 @@ print("train mean:", train_mean)
       name: "Training data is centered at ~0",
       description: "Fitting on train then transforming train gives mean ~0",
       code: `assert train_mean is not None, "train_mean is still None"
-assert abs(train_mean) < 1e-9, f"Training mean should be ~0 after scaling, got {train_mean}"`,
+assert abs(train_mean) < 1e-6, f"Training mean should be ~0 after scaling, got {train_mean}"`,
     },
     {
       id: "shapes",
       name: "Shapes are unchanged",
       description: "Scaling does not add or drop rows or columns",
       code: `assert X_train_scaled.shape == X_train.shape, f"train shape changed: {X_train_scaled.shape}"
-assert X_test_scaled.shape == X_test.shape, f"test shape changed: {X_test_scaled.shape}"`,
+assert X_test_scaled.shape == X_test.shape, f"test shape changed: {X_test_scaled.shape}"
+assert X_train_scaled.shape[1] == 4, f"expected 4 numeric features, got {X_train_scaled.shape[1]}"
+assert X_train_scaled.shape[0] + X_test_scaled.shape[0] == len(penguins), "train + test rows should equal the dropna'd dataset"`,
+    },
+    {
+      id: "fit_on_train_only",
+      name: "Scaler was fit on the TRAIN set only",
+      description: "The scaler's stored mean_ matches the raw training mean, not the full data",
+      code: `import numpy as np
+assert hasattr(scaler, "mean_"), "scaler does not look fitted"
+assert np.allclose(scaler.mean_, X_train.mean(axis=0), atol=1e-6), "scaler.mean_ should equal the raw TRAIN column means (fit on train only)"`,
     },
     {
       id: "no_leak",

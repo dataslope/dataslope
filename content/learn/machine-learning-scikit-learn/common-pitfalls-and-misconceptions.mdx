@@ -79,17 +79,20 @@ difference.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import numpy as np
-from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import train_test_split, cross_val_score
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 
-X, y = load_breast_cancer(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]
 
 # LEAKY: scale using the WHOLE dataset, then cross-validate.
 # Every fold's scaler has already seen statistics from its validation rows.
@@ -148,14 +151,18 @@ about: "how well does the model recall what it has already seen?"
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_wine
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
-X, y = load_wine(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )
@@ -184,30 +191,37 @@ accuracy while the model quietly ignores the rare class entirely — which is
 often the *only* class you care about.
 
 **Why it fools people.** Accuracy is intuitive and usually trustworthy, so
-people reach for it reflexively. But when 99% of cases are class 0, a model
-that *always* predicts class 0 — learning nothing — scores 99% accuracy.
-The number looks superb and the model is useless.
+people reach for it reflexively. But when most cases share one label, a model
+that *always* predicts that majority label — learning nothing — scores high
+accuracy by default. Real lending data makes the trap concrete: most loans are
+repaid, so defaults are the rare class — and the only class a lender truly
+cares about catching.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "lending-club-loan-results.csv", stageAs: "loans.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+loans = pd.read_csv("loans.csv")`,
       starterCode: `import numpy as np
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import accuracy_score, recall_score, confusion_matrix
 
-# 99% class 0, 1% class 1 (the rare, important class).
-y = np.array([0] * 990 + [1] * 10)
-X = np.zeros((1000, 1))
+# Sample 5,000 loans for speed; did_default is genuinely imbalanced.
+sample = loans.sample(n=5000, random_state=0)
+y = sample["did_default"]            # True = the loan defaulted (the rare, costly class)
+X = np.zeros((len(y), 1))
+print(f"Share that actually defaulted: {y.mean():.3f}")
 
-# A model that does NOTHING but predict the majority class.
+# A model that does NOTHING but predict the majority class ("no default").
 model = DummyClassifier(strategy="most_frequent").fit(X, y)
 pred = model.predict(X)
 
-print(f"Accuracy: {accuracy_score(y, pred):.3f}   <- looks fantastic!")
+print(f"Accuracy: {accuracy_score(y, pred):.3f}   <- looks respectable!")
 print(
-    f"Recall on the rare class: {recall_score(y, pred, pos_label=1):.3f}   <- it caught ZERO of them"
+    f"Recall on defaults: {recall_score(y, pred, pos_label=True):.3f}   <- it caught ZERO of them"
 )
 print("Confusion matrix:")
 print(confusion_matrix(y, pred))
@@ -216,7 +230,7 @@ print(confusion_matrix(y, pred))
   ]}
 />
 
-A 99% accuracy and a 0% catch rate on the cases that matter. **The fix:**
+Roughly 79% accuracy and a 0% catch rate on the loans that lose money. **The fix:**
 on imbalanced problems, look past accuracy to **precision, recall, the
 confusion matrix, and ROC-AUC** (from the classification chapters). Use
 `stratify` when splitting so the rare class is represented in both halves,
@@ -270,14 +284,18 @@ that have nothing to do with the thing you changed.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_wine
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
-X, y = load_wine(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]
 
 # No random_state: the split (and thus the score) changes every run.
 scores = []
@@ -286,7 +304,7 @@ for seed_free_run in range(5):
     tree = DecisionTreeClassifier(random_state=0).fit(Xtr, ytr)
     scores.append(round(tree.score(Xte, yte), 3))
 
-print("Five unseeded runs, five different scores:", scores)
+print("Five unseeded runs, different scores each time:", scores)
 print("Which one do you report? With a fixed random_state, there is one answer.")
 `,
     },
@@ -338,39 +356,47 @@ constant, because it can never output a value beyond what it saw in training.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+diamonds = pd.read_csv("diamonds.csv")`,
       starterCode: `import numpy as np
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 
-# Train on x in [0, 10], target y = 2x.
-rng = np.random.default_rng(0)
-X_train = np.linspace(0, 10, 50).reshape(-1, 1)
-y_train = 2 * X_train.ravel()
+# Train ONLY on small diamonds (carat <= 0.7) -- the most a model here has
+# ever seen is a roughly $6,600 stone. Then ask it about much bigger ones.
+small = diamonds[diamonds["carat"] <= 0.7]
+X_train = small[["carat"]]
+y_train = small["price"]
+print(f"Training price range: \${y_train.min():.0f} - \${y_train.max():.0f}")
 
 lin = LinearRegression().fit(X_train, y_train)
 forest = RandomForestRegressor(n_estimators=100, random_state=0).fit(X_train, y_train)
 
-# Predict FAR outside the training range, at x = 100 (true answer: 200).
-far = np.array([[100.0]])
-print(f"True value at x=100: 200")
+# Predict FAR outside the training carat range. Real ~3-carat diamonds cost
+# around $14,000-15,000 -- far above anything in the training set.
+far = pd.DataFrame({"carat": [2.0, 3.0]})
+print("True price of a ~2-3 carat diamond is roughly $14,000-15,000.")
 print(
-    f"Linear model predicts:        {lin.predict(far)[0]:.1f}  (extrapolates the line)"
+    f"Linear model predicts:  {lin.predict(far).round(0)}  (marches the line upward)"
 )
 print(
-    f"Random forest predicts:       {forest.predict(far)[0]:.1f}  (flat -- cannot exceed training range)"
+    f"Random forest predicts: {forest.predict(far).round(0)}  (flat -- a constant near the top of what it saw)"
 )
 `,
     },
   ]}
 />
 
-The forest cannot predict anything near 200 — it never saw a target that
-large and physically cannot output one. The linear model nails *this*
-particular case only because the true relationship really is a line, which
-you would not know in advance. **The fix:** know your training range, be
+The forest's two predictions are *identical* and stuck far below the true
+price: a tree-based model predicts by averaging training targets, so once you
+leave the range it saw, it just returns a constant near the edge — it cannot
+invent a value larger than anything in its training set. The linear model at
+least keeps climbing, but it is extrapolating a straight line you would have
+no reason to trust outside the data. **The fix:** know your training range, be
 deeply skeptical of predictions outside it, and never assume a pattern
 learned in one region holds in another.
 
@@ -415,20 +441,24 @@ still has never seen.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
       starterCode: `import numpy as np
-from sklearn.datasets import load_wine
 from sklearn.model_selection import cross_val_score
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
 
-X, y = load_wine(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
 rng = np.random.default_rng(0)
 
-# Add 200 columns of pure noise to the 13 real features.
+# Add 200 columns of pure noise to the 4 real features.
 noise = rng.normal(size=(X.shape[0], 200))
 X_noisy = np.hstack([X, noise])
 
@@ -439,7 +469,7 @@ score_noisy = cross_val_score(
     make_pipeline(StandardScaler(), KNeighborsClassifier()), X_noisy, y, cv=5
 ).mean()
 
-print(f"CV accuracy with 13 real features:        {score_clean:.3f}")
+print(f"CV accuracy with 4 real features:         {score_clean:.3f}")
 print(f"CV accuracy after adding 200 noise cols:  {score_noisy:.3f}")
 print("More columns made the model WORSE -- the noise drowned the signal.")
 `,
@@ -469,9 +499,12 @@ because a feature leaked the very diagnosis it was meant to predict. A fraud
 system praised for 99.9% accuracy that never caught a single fraud, because
 fraud was 0.1% of cases. A business "insight" that changing a predictive
 feature would move an outcome, acted on at great cost, when the feature was
-a mere symptom. Every one was preventable by a habit on this page. Learning
-to *expect* these traps is a large part of what separates a practitioner who
-can be trusted from one who merely gets good-looking numbers.
+a mere symptom. Google Flu Trends, launched in 2008, famously over-predicted
+flu cases for years as the patterns it had latched onto drifted — a 2014
+*Science* paper dubbed it "the parable of Google Flu." Every one was
+preventable by a habit on this page. Learning to *expect* these traps is a
+large part of what separates a practitioner who can be trusted from one who
+merely gets good-looking numbers.
 
 ## Your turn
 
@@ -480,6 +513,7 @@ can be trusted from one who merely gets good-looking numbers.
   title="Fix a leaky workflow"
   category="pitfalls · data leakage"
   estimatedTime="~8 min"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   instructions={`The starter code contains a **leaky** evaluation: it scales the
 entire dataset with \`StandardScaler\` *before* cross-validating, so each
 fold's scaler has already seen its validation rows. Your job is to fix it
@@ -499,13 +533,16 @@ that \`correct_cv\` is a believable accuracy.`}
   files={[
     {
       filename: "main.py",
-      initCode: `from sklearn.datasets import load_breast_cancer
+      initCode: `import pandas as pd
 from sklearn.model_selection import cross_val_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 
-X, y = load_breast_cancer(return_X_y=True)`,
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]`,
       starterCode: `# LEAKY starter (for reference): scales the whole dataset before CV.
 # X_leaked = StandardScaler().fit_transform(X)
 # leaky_cv = cross_val_score(LogisticRegression(max_iter=5000), X_leaked, y, cv=5).mean()
@@ -557,48 +594,53 @@ assert isinstance(pipe.named_steps["scaler"], StandardScaler), "The 'scaler' ste
   title="Expose an imbalance trap with the right metric"
   category="pitfalls · class imbalance"
   estimatedTime="~7 min"
-  instructions={`A dataset is wildly imbalanced: 950 of class 0 and 50 of
-class 1 (the rare class you care about). A \`DummyClassifier\` that always
-predicts the majority class is already fitted for you as \`model\`, and its
-predictions are in \`pred\`.
+  datasets={[{ path: "lending-club-loan-results.csv", stageAs: "loans.csv" }]}
+  instructions={`A real lending dataset is imbalanced: most loans are repaid, so
+defaults (\`did_default == True\`) are the rare class you care about. A
+\`DummyClassifier\` that always predicts the majority class ("no default")
+is already fitted for you as \`model\`, and its predictions are in
+\`pred\`. The labels are in \`y\`.
 
 1. Compute the plain accuracy of \`pred\` against \`y\` and store it in
    \`acc\` (use \`accuracy_score\`).
-2. Compute the **recall on the rare class** (class 1) and store it in
-   \`rare_recall\` (use \`recall_score(y, pred, pos_label=1)\`).
+2. Compute the **recall on defaults** (the \`True\` class) and store it in
+   \`rare_recall\` (use \`recall_score(y, pred, pos_label=True)\`).
 
-You should find a high \`acc\` next to a \`rare_recall\` of 0.0 — the model
-looks great on accuracy yet catches none of the cases that matter. The
-tests check that \`acc\` is high (above 0.9) while \`rare_recall\`
-is exactly 0.0, demonstrating the trap.`}
+You should find a respectable \`acc\` next to a \`rare_recall\` of 0.0 — the
+model looks fine on accuracy yet catches none of the loans that lose money.
+The tests check that \`acc\` is high (above 0.75) while \`rare_recall\` is
+exactly 0.0, demonstrating the trap.`}
   files={[
     {
       filename: "main.py",
       initCode: `import numpy as np
+import pandas as pd
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import accuracy_score, recall_score
 
-y = np.array([0] * 950 + [1] * 50)
-X = np.zeros((1000, 1))
+# Sample 5,000 loans (random_state=0) so the numbers are reproducible.
+loans = pd.read_csv("loans.csv").sample(n=5000, random_state=0)
+y = loans["did_default"]
+X = np.zeros((len(y), 1))
 model = DummyClassifier(strategy="most_frequent").fit(X, y)
 pred = model.predict(X)`,
       starterCode: `# 1. Plain accuracy of the majority-class predictor
 acc = None
 
-# 2. Recall on the rare class (class 1)
+# 2. Recall on the rare class (defaults, i.e. did_default == True)
 rare_recall = None
 
 print("accuracy:", acc)
-print("recall on rare class:", rare_recall)
+print("recall on defaults:", rare_recall)
 `,
       solutionCode: `# 1. Plain accuracy of the majority-class predictor
 acc = accuracy_score(y, pred)
 
-# 2. Recall on the rare class (class 1)
-rare_recall = recall_score(y, pred, pos_label=1)
+# 2. Recall on the rare class (defaults, i.e. did_default == True)
+rare_recall = recall_score(y, pred, pos_label=True)
 
 print("accuracy:", acc)
-print("recall on rare class:", rare_recall)
+print("recall on defaults:", rare_recall)
 `,
     },
   ]}
@@ -606,8 +648,8 @@ print("recall on rare class:", rare_recall)
     {
       id: "high_accuracy",
       name: "Accuracy looks great",
-      description: "Majority-class predictor scores above 0.9 accuracy",
-      code: `assert acc is not None and acc > 0.9, f"Expected accuracy above 0.9, got {acc}"`,
+      description: "Majority-class predictor scores above 0.75 accuracy",
+      code: `assert acc is not None and acc > 0.75, f"Expected accuracy above 0.75, got {acc}"`,
     },
     {
       id: "zero_recall",
@@ -696,9 +738,9 @@ Decisions belong to cross-validation or a validation set; the test set is opened
 />
 
 <MultipleChoice
-  markdown={`A random forest is trained on inputs \`x\` in the range 0 to 10. You ask it to predict at \`x = 100\`. What should you expect?
+  markdown={`A random forest is trained only on small diamonds (carat up to 0.7). You ask it to predict the price of a 3-carat stone. What should you expect?
 
-- It will accurately extrapolate the trend out to x = 100
+- It will accurately extrapolate the trend out to 3 carats
   > Tree-based models cannot output values beyond the targets seen in training, so they do not extrapolate a trend the way a line would.
 - It will raise an error because the input is out of range
   > The model accepts the input without error; it simply produces an unreliable prediction.

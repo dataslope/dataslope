@@ -178,6 +178,40 @@ Unlike the elbow method (which eyeballs a bend in the inertia curve), the
 silhouette gives a concrete number to compare, so the choice is less
 subjective.
 
+Synthetic blobs make the peak obvious. Real data rarely cooperates. Below we
+sweep `k` over the California housing districts (features only — no price,
+this is pure clustering) after standardizing, since the silhouette compares
+distances and unscaled columns like `Population` would otherwise dominate.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "california_housing.csv", stageAs: "housing.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+housing = pd.read_csv("housing.csv")`,
+      starterCode: `from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+
+# silhouette_score is O(n^2), so sample before scoring on 20k+ districts.
+sample = housing.sample(n=2000, random_state=0)
+X = StandardScaler().fit_transform(sample)
+
+for k in range(2, 7):
+    labels = KMeans(n_clusters=k, n_init=10, random_state=0).fit_predict(X)
+    print(f"k={k}  silhouette={silhouette_score(X, labels):.3f}")
+`,
+    },
+  ]}
+/>
+
+The scores hover in a modest band and the "peak" is shallow — there is no
+crisp natural number of clusters, just a few defensible choices. That is the
+normal experience on real data, and exactly why the silhouette is a guide to
+weigh against domain sense, not an oracle that hands you the answer.
+
 ## The per-point silhouette plot
 
 Averaging hides detail. The classic **silhouette plot** shows every point's

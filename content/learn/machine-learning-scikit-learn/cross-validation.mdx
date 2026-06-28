@@ -53,22 +53,26 @@ Let us prove the wobble is real. We will evaluate the *same* model on the
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
       starterCode: `import numpy as np
-from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
 
-X, y = load_wine(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
 
 scores = []
 for seed in range(20):
     X_tr, X_te, y_tr, y_te = train_test_split(
         X, y, test_size=0.3, random_state=seed, stratify=y
     )
-    model = LogisticRegression(max_iter=5000)
+    model = KNeighborsClassifier(n_neighbors=5)
     model.fit(X_tr, y_tr)
     scores.append(model.score(X_te, y_te))
 
@@ -82,12 +86,12 @@ print(f"Std deviation:         {scores.std():.3f}")
   ]}
 />
 
-Nothing changed but the luck of the draw, yet the accuracy swings by several
-percentage points. If you had run *one* split and reported its number as
-"the" accuracy, you might have been several points too optimistic or too
-pessimistic — and you would never have known. Which split is the "true"
-one? None of them. The truth is somewhere in the middle, and a single split
-cannot tell you where.
+Nothing changed but the luck of the draw, yet the accuracy swings by more
+than ten percentage points from the unluckiest split to the luckiest. If you
+had run *one* split and reported its number as "the" accuracy, you might
+have been several points too optimistic or too pessimistic — and you would
+never have known. Which split is the "true" one? None of them. The truth is
+somewhere in the middle, and a single split cannot tell you where.
 
 <Callout type="warn" title="A single split hides its own uncertainty">
 One train/test split gives you a point estimate with no error bars. With a
@@ -128,16 +132,20 @@ scikit-learn wraps the whole procedure in a single function.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
       starterCode: `import numpy as np
-from sklearn.datasets import load_wine
-from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import cross_val_score
 
-X, y = load_wine(return_X_y=True)
-model = LogisticRegression(max_iter=5000)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
+model = KNeighborsClassifier(n_neighbors=5)
 
 scores = cross_val_score(model, X, y, cv=5)
 
@@ -188,17 +196,21 @@ data. A `Pipeline` does this automatically.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
       starterCode: `import numpy as np
-from sklearn.datasets import load_breast_cancer
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import make_pipeline
 from sklearn.model_selection import cross_val_score
 
-X, y = load_breast_cancer(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
 
 # Bundle scaling + model so scaling is re-fit on each fold's training rows.
 pipe = make_pipeline(StandardScaler(), KNeighborsClassifier(n_neighbors=5))
@@ -292,7 +304,8 @@ hundred rows yield a trustworthy estimate.
   title="Cross-validate a pipeline"
   category="model evaluation · cross-validation"
   estimatedTime="~6 min"
-  instructions={`Using the breast cancer dataset (\`X\`, \`y\` provided):
+  instructions={`We have filtered the penguins down to the two most separable species,
+**Adelie** and **Gentoo** (\`X\`, \`y\` provided).
 
 1. Build a pipeline \`pipe\` with \`make_pipeline(StandardScaler(),
    LogisticRegression(max_iter=5000))\`.
@@ -303,17 +316,22 @@ hundred rows yield a trustworthy estimate.
 
 The tests check that \`cv_scores\` has 10 entries, that \`mean_score\`
 matches \`cv_scores.mean()\`, and that the mean is a strong accuracy
-(above 0.9) — which it should be for this dataset.`}
+(above 0.9) — which it should be for this very separable pair.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      initCode: `from sklearn.datasets import load_breast_cancer
+      initCode: `import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline
 from sklearn.model_selection import cross_val_score
 
-X, y = load_breast_cancer(return_X_y=True)`,
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])
+two = penguins[penguins["species"].isin(["Adelie", "Gentoo"])]
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = two[features].values
+y = two["species"].values`,
       starterCode: `pipe = None
 cv_scores = None
 mean_score = None
@@ -349,7 +367,7 @@ assert abs(mean_score - cv_scores.mean()) < 1e-9`,
     {
       id: "strong",
       name: "Mean accuracy is above 0.90",
-      description: "A scaled logistic model does well here",
+      description: "A scaled logistic model separates Adelie from Gentoo cleanly",
       code: `assert mean_score > 0.90, f"Mean was only {mean_score:.3f}"`,
     },
   ]}

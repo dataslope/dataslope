@@ -100,6 +100,11 @@ noise, and then fit polynomials of increasing flexibility. A degree-1
 polynomial is a straight line (very rigid). A degree-15 polynomial can bend
 almost anywhere (very flexible).
 
+We use *synthetic* data here on purpose: overfitting is defined as fitting
+noise instead of the true pattern, and the only way to point at that
+distinction is to know the true pattern exactly. With real data the truth is
+hidden, so we generate it ourselves and then watch which models recover it.
+
 <CodeBlock
   adapter="python"
   files={[
@@ -242,15 +247,19 @@ emerge.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
       starterCode: `import matplotlib.pyplot as plt
-from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
-X, y = load_breast_cancer(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )
@@ -344,6 +353,14 @@ memorizes the quirks of one hospital's scanner will fail at the hospital
 across town. A demand forecaster that underfits will miss every seasonal
 swing. Teams that win in production are the ones that obsessively measure
 the train–test gap before shipping.
+
+A famous cautionary tale is **Google Flu Trends**, launched in 2008 to
+predict flu outbreaks from search queries. It worked impressively at first,
+then drifted badly — by some seasons it overshot real flu rates by roughly
+double. A 2014 *Science* analysis ("The Parable of Google Flu") argued the
+model had latched onto search patterns that did not generalize as behavior
+and the world shifted under it. A model that does not keep generalizing is a
+model that quietly stops working.
 
 ## Your turn
 

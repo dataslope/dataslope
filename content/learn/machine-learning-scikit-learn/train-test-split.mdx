@@ -96,13 +96,17 @@ them into two groups.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 
-X, y = load_iris(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
 print("Whole dataset:", X.shape, "->", len(y), "labels")
 
 X_train, X_test, y_train, y_test = train_test_split(
@@ -137,14 +141,18 @@ it memorized, and on the held-out test data. Watch the gap.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
-X, y = load_breast_cancer(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
 # A tree with no depth limit will grow until it fits the training data
@@ -291,27 +299,31 @@ lives.
   title="Split, train, and expose the gap"
   category="model evaluation · train/test split"
   estimatedTime="~6 min"
-  instructions={`The wine dataset has 178 samples in 3 classes.
+  instructions={`The penguins dataset has 342 rows (after dropping rows with missing
+measurements) across 3 species. \`X\` and \`y\` are already prepared for you.
 
-1. Load it with \`load_wine(return_X_y=True)\` into \`X\` and \`y\`.
-2. Split into train/test with **30%** in the test set, \`random_state=42\`,
+1. Split into train/test with **30%** in the test set, \`random_state=42\`,
    and **stratified** on \`y\`.
-3. Train a \`DecisionTreeClassifier(random_state=42)\` on the training set.
-4. Store its training accuracy in \`train_acc\` and its test accuracy in
+2. Train a \`DecisionTreeClassifier(random_state=42)\` on the training set.
+3. Store its training accuracy in \`train_acc\` and its test accuracy in
    \`test_acc\` (both via \`.score(...)\`).
 
 The tests check that the split is the right size, that it is
 stratified, and that \`train_acc\` is higher than \`test_acc\` (the
 overfitting gap).`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      initCode: `from sklearn.datasets import load_wine
+      initCode: `import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier`,
-      starterCode: `X, y = load_wine(return_X_y=True)
+from sklearn.tree import DecisionTreeClassifier
 
-# 1. Split (30% test, random_state=42, stratified on y)
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values`,
+      starterCode: `# 1. Split (30% test, random_state=42, stratified on y)
 X_train, X_test, y_train, y_test = None, None, None, None
 
 # 2. Train a decision tree
@@ -322,9 +334,7 @@ test_acc = None
 
 print("train:", train_acc, "test:", test_acc)
 `,
-      solutionCode: `X, y = load_wine(return_X_y=True)
-
-X_train, X_test, y_train, y_test = train_test_split(
+      solutionCode: `X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=42, stratify=y
 )
 
@@ -342,23 +352,28 @@ print("train:", train_acc, "test:", test_acc)
     {
       id: "test_size",
       name: "Test set is 30% of the data",
-      description: "54 of 178 rows held out",
-      code: `assert X_test.shape[0] == 54, f"Expected 54 test rows, got {X_test.shape[0]}"`,
+      description: "Held-out rows match a 30% split",
+      code: `import math
+expected = math.ceil(len(X) * 0.3)
+assert X_test.shape[0] == expected, f"Expected {expected} test rows, got {X_test.shape[0]}"`,
     },
     {
       id: "train_size",
       name: "Training set is the other 70%",
-      description: "124 rows used for training",
-      code: `assert X_train.shape[0] == 124, f"Expected 124 train rows, got {X_train.shape[0]}"`,
+      description: "Train and test together account for every row",
+      code: `assert X_train.shape[0] + X_test.shape[0] == len(X), "Train + test should cover all rows"
+assert X_train.shape[0] == len(X) - X_test.shape[0], f"Got {X_train.shape[0]} train rows"`,
     },
     {
       id: "stratified",
       name: "Split is stratified on y",
       description: "Class proportions preserved in the test set",
       code: `import numpy as np
-_, counts = np.unique(y_test, return_counts=True)
-# Stratified 30% of class counts [59, 71, 48] -> [18, 21, 15]
-assert sorted(counts.tolist()) == [15, 18, 21], f"Got class counts {sorted(counts.tolist())}"`,
+full = {c: (y == c).mean() for c in np.unique(y)}
+test = {c: (y_test == c).mean() for c in np.unique(y_test)}
+assert set(full) == set(test), "A class went missing from the test set"
+for c in full:
+    assert abs(full[c] - test[c]) < 0.03, f"Class {c} proportion drifted: {full[c]:.3f} vs {test[c]:.3f}"`,
     },
     {
       id: "gap",

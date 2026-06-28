@@ -251,8 +251,10 @@ test set. Nothing here should be mysterious anymore.
   title="Capstone: the full honest workflow, end to end"
   category="capstone · full workflow"
   estimatedTime="~10 min"
-  instructions={`Pull together everything the course taught. The wine data is
-loaded as \`X\`, \`y\`.
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  instructions={`Pull together everything the course taught. The penguins data
+is loaded as a DataFrame \`penguins\`; the four numeric measurements are in
+\`X\` and the species label is in \`y\`.
 
 1. **Split first** for an honest final estimate: 25% test,
    \`random_state=0\`, stratified on \`y\`, into \`X_train\`, \`X_test\`,
@@ -272,13 +274,16 @@ pipeline, that \`cv_mean\` is a strong cross-validated accuracy, and that
   files={[
     {
       filename: "main.py",
-      initCode: `from sklearn.datasets import load_wine
+      initCode: `import pandas as pd
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 
-X, y = load_wine(return_X_y=True)`,
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]`,
       starterCode: `# 1. Split FIRST (25% test, random_state=0, stratified on y)
 X_train, X_test, y_train, y_test = None, None, None, None
 
@@ -323,9 +328,11 @@ print("Final test score:", test_score)
     {
       id: "split_sizes",
       name: "Split is 25% test, stratified",
-      description: "133 train rows and 45 test rows for 178 wine samples",
-      code: `assert X_train.shape[0] == 133, f"Expected 133 train rows, got {X_train.shape[0]}"
-assert X_test.shape[0] == 45, f"Expected 45 test rows, got {X_test.shape[0]}"`,
+      description: "Train and test sizes are consistent with a 25% held-out split",
+      code: `n = len(X)
+assert X_train.shape[0] + X_test.shape[0] == n, f"Split should cover all {n} rows, got {X_train.shape[0]} + {X_test.shape[0]}"
+assert X_test.shape[0] == round(n * 0.25), f"Expected {round(n * 0.25)} test rows, got {X_test.shape[0]}"
+assert y_train.shape[0] == X_train.shape[0] and y_test.shape[0] == X_test.shape[0], "X and y splits should align"`,
     },
     {
       id: "pipeline_shape",
@@ -344,13 +351,14 @@ assert isinstance(pipe.named_steps["model"], RandomForestClassifier), "Step 'mod
       id: "cv_strong",
       name: "cv_mean is a strong cross-validated accuracy",
       description: "Cross-validated accuracy is high and in [0, 1]",
-      code: `assert cv_mean is not None and 0.8 <= cv_mean <= 1.0, f"cv_mean {cv_mean} is not a believable accuracy"`,
+      code: `assert cv_mean is not None and 0.9 <= cv_mean <= 1.0, f"cv_mean {cv_mean} is not a believably strong accuracy"`,
     },
     {
       id: "test_valid",
       name: "test_score is a valid held-out accuracy",
-      description: "Final test accuracy is in [0, 1]",
-      code: `assert test_score is not None and 0.0 <= test_score <= 1.0, f"test_score {test_score} is not a valid accuracy"`,
+      description: "Final test accuracy is high and in [0, 1]",
+      code: `assert test_score is not None and 0.0 <= test_score <= 1.0, f"test_score {test_score} is not a valid accuracy"
+assert test_score > 0.9, f"Expected strong held-out accuracy, got {test_score}"`,
     },
   ]}
 />

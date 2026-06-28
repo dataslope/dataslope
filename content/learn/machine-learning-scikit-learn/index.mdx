@@ -113,45 +113,68 @@ important idea in machine learning is not any particular algorithm — it is
 whether a model works on data it has never seen. We establish that idea
 early and return to it on nearly every page.
 
-## A taste of what is coming
+## Train your first model right now
 
-Here is a complete machine learning program. It loads a famous tiny
-dataset of iris flowers, trains a model to tell three species apart from
-their petal and sepal measurements, and reports how often it is right on
-flowers it was never trained on. Press **Run**.
+Here is a complete machine learning program — and it runs **in this
+browser tab**, with no Python installed on your machine. It loads a real
+dataset of 344 penguins observed near Palmer Station in Antarctica, trains
+a model to tell three species apart from their body measurements, and
+reports how often it is right on penguins it was never trained on. Press
+**Run**.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
+      initCode: `import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
-# Load 150 flowers: 4 measurements each, 3 species.
-X, y = load_iris(return_X_y=True)
+penguins = pd.read_csv("penguins.csv").dropna(
+    subset=["bill_length_mm", "flipper_length_mm", "body_mass_g", "species"]
+)`,
+      starterCode: `# Pick the measurements we'll learn from, and the answer we want to predict.
+features = ["bill_length_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]
 
-# Hold out 30% of the flowers so we can test on data the model never saw.
+# Hold out 30% of the penguins so we can test on birds the model never saw.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
-# Train a model and measure accuracy on the held-out flowers.
-model = KNeighborsClassifier(n_neighbors=5)
-model.fit(X_train, y_train)
+# Train a model, then measure accuracy on the held-out penguins.
+model = KNeighborsClassifier(n_neighbors=5).fit(X_train, y_train)
 
 accuracy = model.score(X_test, y_test)
-print(f"Correct on {accuracy:.0%} of flowers the model had never seen.")
+print(f"Correct on {accuracy:.0%} of penguins the model had never seen.")
 `,
     },
   ]}
 />
 
-Five lines of real modeling, and a result you can trust because it was
+A few lines of real modeling, and a result you can trust because it was
 measured on held-out data. You do not yet need to understand every line —
 that is what the next thirty pages are for. But notice the shape already:
-**load data, split it, train, evaluate on what was held out**. That shape
-never changes. Every model in this course, from a one-line linear
-regression to a hundred-tree random forest, follows it.
+**load data, choose features and a target, split, train, evaluate on what
+was held out.** That shape never changes. Every model in this course, from
+a one-line linear regression to a hundred-tree random forest, follows it.
+
+Now **change one thing and run it again.** Drop `"body_mass_g"` from the
+`features` list — does accuracy fall? Set `test_size=0.5` so the model
+trains on fewer birds — does it get worse? Swap `n_neighbors=5` for
+`n_neighbors=1`. There are no wrong moves here; the gap between what you
+predicted and what you got is the whole point of an interactive course.
+
+<Callout type="info" title="Why penguins and not irises?">
+For decades the standard first dataset in machine learning was Ronald
+Fisher's 1936 table of iris flowers. It is being quietly retired. Fisher
+was a founder of modern statistics *and* a prominent eugenicist, and the
+community has increasingly adopted the **Palmer Penguins** dataset —
+collected by Dr. Kristen Gorman near Palmer Station, Antarctica — as a
+friendly, ethically clean replacement with the same teaching shape. We use
+it throughout this course.
+</Callout>
 
 ## How the interactive widgets work
 

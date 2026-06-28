@@ -98,24 +98,28 @@ where scaling comes in.
 
 ## Your first KNN classifier
 
-Let us classify iris flowers. The API is, as always, identical to every
-other scikit-learn estimator.
+Let us classify penguins by species. The API is, as always, identical to
+every other scikit-learn estimator. (We will see in a moment that raw KNN is
+held back here by the feature scales — but it is a fine starting point.)
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
-X, y = load_iris(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X, y = penguins[features], penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )
 
-# Predict each flower's species from the vote of its 5 nearest neighbors.
+# Predict each penguin's species from the vote of its 5 nearest neighbors.
 knn = KNeighborsClassifier(n_neighbors=5)
 knn.fit(X_train, y_train)
 
@@ -126,10 +130,11 @@ print(f"Test accuracy with k=5: {knn.score(X_test, y_test):.3f}")
 />
 
 Notice that `fit` returns instantly: there is nothing to optimize. All the
-work happens inside `score` (and `predict`), where each test flower searches
-the training set for its five nearest neighbors and takes their majority
-vote. On the well-separated iris data, this naive strategy is remarkably
-accurate.
+work happens inside `score` (and `predict`), where each test penguin
+searches the training set for its five nearest neighbors and takes their
+majority vote. This works, but it is *not yet as accurate as it could be* —
+and the reason, as the next sections show, is that one feature (body mass,
+in the thousands of grams) dominates the distance.
 
 ## The dial that controls everything: choosing `k`
 
@@ -156,14 +161,17 @@ Let us watch test accuracy respond to `k`.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
-X, y = load_iris(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X, y = penguins[features], penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )
@@ -274,18 +282,22 @@ how naturally it fits KNN.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_wine
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import make_pipeline
 
-# Wine features span very different ranges (e.g. proline near 1000 vs.
-# hue near 1), so this dataset punishes unscaled KNN hard.
-X, y = load_wine(return_X_y=True)
+# Penguin features span very different ranges: body_mass_g is in the
+# thousands while bill_length_mm is near 40. The mass feature dominates
+# the raw distance, so this dataset punishes unscaled KNN hard.
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X, y = penguins[features], penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )
@@ -460,32 +472,37 @@ the closest data speak is a sturdy first move.
   title="Prove that scaling rescues KNN"
   category="models · k-nearest neighbors"
   estimatedTime="~7 min"
-  instructions={`The wine dataset has features on wildly different scales,
-so unscaled KNN does poorly — and scaling fixes it. Show both.
+  instructions={`The penguins dataset has features on wildly different scales —
+body mass in the thousands of grams next to a bill length near 40 mm — so
+unscaled KNN does poorly and scaling fixes it. Show both. \`X\` (four numeric
+measurements) and \`y\` (the species) are already prepared for you.
 
-1. Load the data with \`load_wine(return_X_y=True)\` into \`X\` and \`y\`.
-2. Split into train/test with **30%** in the test set, \`random_state=0\`,
+1. Split into train/test with **30%** in the test set, \`random_state=0\`,
    and **stratified** on \`y\`.
-3. Train a plain \`KNeighborsClassifier(n_neighbors=5)\` on the raw training
+2. Train a plain \`KNeighborsClassifier(n_neighbors=5)\` on the raw training
    data and store its test accuracy in \`raw_acc\`.
-4. Build a pipeline with \`make_pipeline(StandardScaler(),
+3. Build a pipeline with \`make_pipeline(StandardScaler(),
    KNeighborsClassifier(n_neighbors=5))\`, fit it on the training data, and
    store its test accuracy in \`scaled_acc\`. Name the pipeline \`pipe\`.
 
 The tests check that \`pipe\` really contains a \`StandardScaler\`,
 that the scaled accuracy is high (above 0.92), and — the key lesson — that
 scaling improved the test accuracy (\`scaled_acc > raw_acc\`).`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      initCode: `from sklearn.datasets import load_wine
+      initCode: `import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import make_pipeline`,
-      starterCode: `X, y = load_wine(return_X_y=True)
+from sklearn.pipeline import make_pipeline
 
-# 1. Split (30% test, random_state=0, stratified on y)
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]`,
+      starterCode: `# 1. Split (30% test, random_state=0, stratified on y)
 X_train, X_test, y_train, y_test = None, None, None, None
 
 # 2. Raw KNN, no scaling
@@ -497,16 +514,17 @@ scaled_acc = None
 
 print("raw:", raw_acc, "scaled:", scaled_acc)
 `,
-      solutionCode: `X, y = load_wine(return_X_y=True)
-
+      solutionCode: `# 1. Split (30% test, random_state=0, stratified on y)
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )
 
+# 2. Raw KNN, no scaling
 raw = KNeighborsClassifier(n_neighbors=5)
 raw.fit(X_train, y_train)
 raw_acc = raw.score(X_test, y_test)
 
+# 3. Scaling pipeline
 pipe = make_pipeline(StandardScaler(), KNeighborsClassifier(n_neighbors=5))
 pipe.fit(X_train, y_train)
 scaled_acc = pipe.score(X_test, y_test)

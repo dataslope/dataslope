@@ -105,21 +105,27 @@ be almost all hyperparameter (KNN) or almost all parameter
 (`LinearRegression`).
 
 Let us watch a single hyperparameter change a model's behavior, without any
-parameter ever being "wrong." We will sweep `n_neighbors` on the wine
-dataset and watch the cross-validated accuracy move.
+parameter ever being "wrong." We will sweep `n_neighbors` on the
+[Palmer penguins](https://allisonhorst.github.io/palmerpenguins/) dataset —
+predicting one of three species from four body measurements — and watch the
+cross-validated accuracy move.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_wine
-from sklearn.pipeline import make_pipeline
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import cross_val_score
 
-X, y = load_wine(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]
 
 # KNN needs scaled features, so we scale inside a pipeline (more on why
 # in the pipelines chapter). The only thing changing below is k.
@@ -268,14 +274,18 @@ hyperparameter, wrapped around a small model, judged by cross-validation.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_wine
-from sklearn.model_selection import train_test_split, GridSearchCV
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.tree import DecisionTreeClassifier
 
-X, y = load_wine(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]
 
 # Lock the test set away BEFORE tuning. We will not touch it until the end.
 X_train, X_test, y_train, y_test = train_test_split(
@@ -331,14 +341,18 @@ test set. We evaluate `best_estimator_` on it exactly once.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_wine
-from sklearn.model_selection import train_test_split, GridSearchCV
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.tree import DecisionTreeClassifier
 
-X, y = load_wine(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0, stratify=y
 )
@@ -384,16 +398,20 @@ underscores, then the **parameter name**, like `model__C`.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import train_test_split, GridSearchCV
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 
-X, y = load_breast_cancer(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0, stratify=y
 )
@@ -460,6 +478,14 @@ cross-validation and expose the same `best_params_` / `best_score_` /
 We keep this course's examples on `GridSearchCV` with tiny grids so they
 run instantly, but reach for the randomized version the moment your grid
 grows past a few dozen combinations.
+
+<Callout type="info" title="Why no setting wins everywhere: the No Free Lunch theorem">
+Wolpert and Macready's 1997 **No Free Lunch** theorem proves that, averaged
+over all possible problems, no learning algorithm beats any other — every
+method that wins on some datasets loses on others. That is the deep reason
+tuning cannot be skipped: there is no universally best `max_depth` or `C` to
+memorize, so you have to search for what works on *your* data.
+</Callout>
 
 ## The misconception that ruins careful tuning
 
@@ -544,8 +570,9 @@ choice on data that was never part of the decision.
   title="Run a tiny grid search and read the results"
   category="tuning · grid search"
   estimatedTime="~8 min"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   instructions={`You will tune a single hyperparameter of a decision tree on
-the wine dataset, honestly.
+the Palmer penguins dataset (three species, four body measurements), honestly.
 
 1. The test set is already split off for you (\`X_train\`, \`X_test\`,
    \`y_train\`, \`y_test\`). Do **not** touch the test set until step 5.
@@ -559,17 +586,20 @@ the wine dataset, honestly.
 5. Evaluate \`search.best_estimator_\` on the test set with \`.score(...)\`
    and store that in \`test_score\`.
 
-The tests check that the grid was the right size, that
-\`best_params\` chose a depth from your grid, that \`best_cv_score\` is a
-sensible accuracy, and that you produced a \`test_score\`.`}
+The tests check that the grid was the right size, that \`search\` is fitted,
+that \`best_params\` chose a depth from your grid, that \`best_cv_score\` is a
+believable accuracy, and that your \`test_score\` is a valid accuracy.`}
   files={[
     {
       filename: "main.py",
-      initCode: `from sklearn.datasets import load_wine
+      initCode: `import pandas as pd
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.tree import DecisionTreeClassifier
 
-X, y = load_wine(return_X_y=True)
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0, stratify=y
 )`,
@@ -636,15 +666,17 @@ assert sorted(param_grid.get("max_depth", [])) == [2, 3, 4], f"Expected max_dept
     },
     {
       id: "cv_score_sane",
-      name: "Best CV score is a sensible accuracy",
-      description: "best_cv_score is a high-ish accuracy in [0, 1]",
-      code: `assert 0.5 <= best_cv_score <= 1.0, f"best_cv_score {best_cv_score} is not a believable accuracy"`,
+      name: "Best CV score is a believable accuracy",
+      description: "best_cv_score is a high accuracy a tuned tree should reach",
+      code: `assert best_cv_score is not None, "best_cv_score was not set"
+assert 0.8 < best_cv_score <= 1.0, f"best_cv_score {best_cv_score} is not the high accuracy a tuned tree should reach on penguins"`,
     },
     {
       id: "test_evaluated",
-      name: "Test score was produced",
-      description: "test_score is an accuracy in [0, 1]",
-      code: `assert test_score is not None and 0.0 <= test_score <= 1.0, f"test_score {test_score} is not a valid accuracy"`,
+      name: "Test score is a valid, strong accuracy",
+      description: "test_score is a high accuracy on the held-out test set",
+      code: `assert test_score is not None, "test_score was not set"
+assert 0.8 < test_score <= 1.0, f"test_score {test_score} is not a valid, strong accuracy"`,
     },
   ]}
 />
