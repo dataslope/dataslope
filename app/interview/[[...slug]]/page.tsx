@@ -21,6 +21,7 @@ import { getMDXComponents } from "@/mdx-components";
 import { OG_IMAGE } from "@/lib/site";
 import { getCourseMeta } from "@/lib/courseMeta";
 import { JsonLd } from "@/app/_components/JsonLd";
+import { MarkdownDescription } from "@/app/_components/MarkdownDescription";
 import {
   absUrl,
   breadcrumbLd,
@@ -81,7 +82,9 @@ export default async function InterviewPage(props: InterviewPageProps) {
       <JsonLd data={structuredData} />
       <DocsTitle>{page.data.title}</DocsTitle>
       {page.data.description ? (
-        <DocsDescription>{page.data.description}</DocsDescription>
+        <DocsDescription>
+          <MarkdownDescription>{page.data.description}</MarkdownDescription>
+        </DocsDescription>
       ) : null}
       <DocsBody>
         <MDX components={getMDXComponents()} />
