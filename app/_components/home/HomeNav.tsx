@@ -118,7 +118,7 @@ function BrandLogo() {
       <img
         src="/dataslope-logo-blue.svg"
         alt=""
-        className="h-4 w-auto"
+        className="relative top-px h-[13px] w-auto"
         aria-hidden="true"
       />
       <span className="text-lg font-semibold tracking-tight text-[#121212] dark:text-white">

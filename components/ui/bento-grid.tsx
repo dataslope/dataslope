@@ -99,10 +99,10 @@ const BentoCard = ({
         {hasCta && (
           <a
             href={href}
-            className="pointer-events-auto mt-3 inline-flex items-center font-medium text-[var(--ds-green-500)] dark:text-[var(--ds-green-400)]"
+            className="group/cta pointer-events-auto mt-3 inline-flex items-center font-medium text-[var(--ds-green-500)] transition-colors hover:text-[var(--ds-green-600)] dark:text-[var(--ds-green-400)] dark:hover:text-[var(--ds-green-300)]"
           >
             {cta}
-            <ArrowRightIcon className="ms-2 size-[1em] rtl:rotate-180" />
+            <ArrowRightIcon className="ms-2 size-[1em] transition-transform group-hover/cta:translate-x-0.5 rtl:rotate-180" />
           </a>
         )}
       </div>
