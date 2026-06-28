@@ -219,6 +219,53 @@ use this exact instinct later to judge forecasting models: fit is good when
 the residuals are boring.
 </Callout>
 
+### The Keeling Curve is the opposite case: additive
+
+Not every real series is multiplicative. The airline swing grows with the
+level; the **CO₂** swing does not. The atmosphere's annual breath is a roughly
+**constant ±3 ppm** whether CO₂ sits at 320 or at 420 — the seasonal
+amplitude barely changes across sixty years. That constant-size swing is the
+signature of an **additive** series, so CO₂ decomposes cleanly with
+`model="additive"`.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "NOAA_mauna_loa_co2_monthly.csv", stageAs: "co2.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("co2.csv")
+df["date"] = pd.to_datetime(df[["year", "month"]].assign(day=1))
+co2 = df.set_index("date")["average"]`,
+      starterCode: `from statsmodels.tsa.seasonal import seasonal_decompose
+import matplotlib.pyplot as plt
+
+result = seasonal_decompose(co2, model="additive", period=12)
+fig = result.plot()
+fig.set_size_inches(9, 7)
+plt.tight_layout()
+plt.show()
+
+# The seasonal panel repeats the SAME shape every year - its size never grows.
+season = result.seasonal.iloc[:12]
+print(f"Seasonal swing (max - min): {season.max() - season.min():.2f} ppm")
+print(f"Peak month  : {season.idxmax().strftime('%B')} (CO2 highest, before plants draw it down)")
+print(f"Trough month: {season.idxmin().strftime('%B')} (CO2 lowest, end of the growing season)")
+print()
+print("The swing is a fixed ~6 ppm peak-to-trough across the whole record,")
+print("regardless of the level -> ADDITIVE, no log needed (unlike the airline data).")
+`,
+    },
+  ]}
+/>
+
+The seasonal component is the same few-ppm wave repeated identically every
+year — Northern-Hemisphere forests pulling CO₂ down through summer and
+releasing it through winter. Because that swing does not scale with the
+rising level, an *additive* model fits without a log. Two real series, two
+different answers: always let the data tell you which model it wants.
+
 <MultipleChoice
   markdown={`A monthly series sits near 200 in its early years with a summer peak about +20 above trend, and near 1000 in its later years with a summer peak about +100 above trend. Additive or multiplicative?
 
