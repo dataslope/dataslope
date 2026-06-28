@@ -143,7 +143,7 @@ function MobileDrawer() {
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity duration-200 data-[ending-style]:opacity-0 data-[starting-style]:opacity-0" />
-        <Dialog.Popup className="fixed inset-y-0 right-0 z-50 flex h-dvh w-[min(82vw,320px)] flex-col gap-1 border-l border-[var(--ds-gray-200)] bg-white p-4 shadow-2xl transition-transform duration-200 data-[ending-style]:translate-x-full data-[starting-style]:translate-x-full dark:border-white/10 dark:bg-[#1a1a1a]">
+        <Dialog.Popup className="fixed inset-y-0 right-0 z-50 flex h-dvh w-[min(82vw,320px)] flex-col border-l border-[var(--ds-gray-200)] bg-white p-4 shadow-2xl transition-transform duration-200 data-[ending-style]:translate-x-full data-[starting-style]:translate-x-full dark:border-white/10 dark:bg-[#1a1a1a]">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-sm font-semibold uppercase tracking-wide text-[var(--ds-gray-500)]">
               Menu
@@ -156,24 +156,27 @@ function MobileDrawer() {
             </Dialog.Close>
           </div>
 
-          <Dialog.Close
-            render={<Link href="/learn" prefetch={false} />}
-            className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10"
-          >
-            Courses
-          </Dialog.Close>
+          {/* One unified scroll for all nav items (rather than a nested
+              scrollbar on just the playground list). The header above and the
+              footer below stay pinned. */}
+          <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
+            <Dialog.Close
+              render={<Link href="/learn" prefetch={false} />}
+              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10"
+            >
+              Courses
+            </Dialog.Close>
 
-          <Dialog.Close
-            render={<Link href="/interview" prefetch={false} />}
-            className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10"
-          >
-            Interview Prep
-          </Dialog.Close>
+            <Dialog.Close
+              render={<Link href="/interview" prefetch={false} />}
+              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10"
+            >
+              Interview Prep
+            </Dialog.Close>
 
-          <div className="mt-2 px-3 text-xs font-semibold uppercase tracking-wide text-[var(--ds-gray-400)]">
-            Playground
-          </div>
-          <div className="flex max-h-[40vh] flex-col overflow-y-auto">
+            <div className="mt-2 px-3 text-xs font-semibold uppercase tracking-wide text-[var(--ds-gray-400)]">
+              Playground
+            </div>
             {PLAYGROUNDS.map((p) => (
               <Dialog.Close
                 key={p.id}
@@ -189,7 +192,7 @@ function MobileDrawer() {
             ))}
           </div>
 
-          <div className="mt-auto flex items-center justify-between border-t border-[var(--ds-gray-200)] pt-3 dark:border-white/10">
+          <div className="mt-3 flex items-center justify-between border-t border-[var(--ds-gray-200)] pt-3 dark:border-white/10">
             <button
               type="button"
               onClick={toggle}
