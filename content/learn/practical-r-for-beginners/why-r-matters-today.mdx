@@ -1,5 +1,5 @@
 ---
-title: Why R Matters Today
+title: "Deeper History: Why R Matters Today"
 description: In a world full of programming languages, what is the case for R in 2025? A look at why statisticians, scientists, journalists, and analysts keep choosing it — and where it sits in the modern data-science stack.
 ---
 
@@ -187,9 +187,9 @@ forever.
 
 ## A taste of what makes R feel like R
 
-To wrap up the "story" portion of this course, here are three small
-examples that, taken together, give a flavor of what R is like as a
-working tool.
+To bring this history chapter back down to earth, here are three
+small examples that, taken together, give a flavor of what R is like
+as a working tool.
 
 **1. Statistics as one-liners.** A simple two-sample t-test:
 
@@ -213,24 +213,23 @@ p-value, confidence interval, and the means. There is no
 "library import," no "create a model object then call .fit()."
 
 **2. Plots from a single layered expression.** A scatter plot of
-the famous `iris` dataset, colored by species, with a smooth
-trend line:
+the **Palmer penguins**, colored by species, with a smooth trend
+line:
 
 <CodeBlock
   adapter="r"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.r",
-      starterCode: `library(ggplot2)
-data(iris)
-
-ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color = Species)) +
+      initCode: `library(ggplot2)\npenguins <- read.csv("penguins.csv")\npenguins <- na.omit(penguins)`,
+      starterCode: `ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g, color = species)) +
   geom_point(size = 2, alpha = 0.7) +
   geom_smooth(method = "lm", se = FALSE) +
   labs(
-    title = "Sepal vs. Petal length by iris species",
-    x     = "Sepal length (cm)",
-    y     = "Petal length (cm)"
+    title = "Flipper length vs. body mass by penguin species",
+    x     = "Flipper length (mm)",
+    y     = "Body mass (g)"
   )
 `,
     },
@@ -238,7 +237,11 @@ ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color = Species)) +
 />
 
 That code reads almost like a description of what you want, and
-you get a publication-quality figure.
+you get a publication-quality figure. (We use the penguins rather
+than R's famous `iris` flowers throughout this course: `iris` was
+popularized by R. A. Fisher, a brilliant statistician who was also
+an advocate of eugenics, and the penguins are a friendly,
+ethically-clean modern alternative.)
 
 **3. A pipeline of transformations.** With `dplyr`, the verbs of
 data manipulation become a readable chain:
@@ -312,7 +315,7 @@ it later.
   > R runs on Windows, macOS, Linux, and even in the browser (which is how this very page runs it).`}
 />
 
-In the next page, we will look at the last big idea from this
-narrative section: **reproducible analysis**, which is the practice
-that ties everything together — and the cultural shift R helped
-make mainstream.
+The final history chapter looks at the idea that ties everything
+together: **reproducible analysis**, the cultural shift R helped
+make mainstream — and the reason "trust me, I clicked the right
+buttons" is no longer good enough.

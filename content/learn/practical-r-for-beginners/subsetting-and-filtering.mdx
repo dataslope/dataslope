@@ -172,16 +172,16 @@ combine many `==` with `|`. Use `%in%`:
 
 <CodeBlock
   adapter="r"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.r",
-      starterCode: `data(iris)
-
-# Tedious and error-prone:
-sub1 <- iris[iris$Species == "setosa" | iris$Species == "virginica", ]
+      initCode: `penguins <- read.csv("penguins.csv")\npenguins <- na.omit(penguins)`,
+      starterCode: `# Tedious and error-prone:
+sub1 <- penguins[penguins$species == "Adelie" | penguins$species == "Gentoo", ]
 
 # Idiomatic:
-sub2 <- iris[iris$Species %in% c("setosa", "virginica"), ]
+sub2 <- penguins[penguins$species %in% c("Adelie", "Gentoo"), ]
 
 # Confirm they're the same
 identical(sub1, sub2)
@@ -271,15 +271,15 @@ then use those positions as row indices.
 />
 
 <MultipleChoice
-  markdown={`Which expression filters \`iris\` to rows where the species is either "setosa" or "versicolor"?
+  markdown={`Which expression filters \`penguins\` to rows where the species is either "Adelie" or "Gentoo"?
 
-- \`iris[iris$Species == "setosa" == "versicolor", ]\`
-  > Chaining \`==\` like this does not test membership; it compares the first result to \`"versicolor"\` and gives nonsense.
-- [o] \`iris[iris$Species %in% c("setosa", "versicolor"), ]\`
+- \`penguins[penguins$species == "Adelie" == "Gentoo", ]\`
+  > Chaining \`==\` like this does not test membership; it compares the first result to \`"Gentoo"\` and gives nonsense.
+- [o] \`penguins[penguins$species %in% c("Adelie", "Gentoo"), ]\`
   > \`%in%\` is the idiomatic way to match against a set of values.
-- \`iris[iris$Species = "setosa" | "versicolor", ]\`
-  > A single \`=\` is assignment, not comparison, and \`| "versicolor"\` is not a valid condition.
-- \`iris[in(iris$Species, "setosa", "versicolor"), ]\`
+- \`penguins[penguins$species = "Adelie" | "Gentoo", ]\`
+  > A single \`=\` is assignment, not comparison, and \`| "Gentoo"\` is not a valid condition.
+- \`penguins[in(penguins$species, "Adelie", "Gentoo"), ]\`
   > There is no \`in()\` function in R; the membership operator is \`%in%\`.`}
 />
 

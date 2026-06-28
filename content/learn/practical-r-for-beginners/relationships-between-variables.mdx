@@ -192,19 +192,18 @@ what you see:
 
 <CodeBlock
   adapter="r"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.r",
-      starterCode: `library(dplyr)
-data(iris)
-
-# Numbers
-iris |>
-  group_by(Species) |>
+      initCode: `library(dplyr)\npenguins <- read.csv("penguins.csv")\npenguins <- na.omit(penguins)`,
+      starterCode: `# Numbers
+penguins |>
+  group_by(species) |>
   summarise(
-    mean_petal  = mean(Petal.Length),
-    sd_petal    = sd(Petal.Length),
-    .groups     = "drop"
+    mean_mass = mean(body_mass_g),
+    sd_mass   = sd(body_mass_g),
+    .groups   = "drop"
   )
 `,
     },
@@ -213,24 +212,24 @@ iris |>
 
 <CodeBlock
   adapter="r"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.r",
-      starterCode: `data(iris)
-
-boxplot(Petal.Length ~ Species,
-  data = iris,
+      initCode: `penguins <- read.csv("penguins.csv")\npenguins <- na.omit(penguins)`,
+      starterCode: `boxplot(body_mass_g ~ species,
+  data = penguins,
   col = c("lightblue", "lightgreen", "lightpink"),
-  main = "Petal length by species",
-  ylab = "Petal length (cm)"
+  main = "Body mass by species",
+  ylab = "Body mass (g)"
 )
 `,
     },
   ]}
 />
 
-Setosa is clearly different from the other two. Versicolor and
-virginica overlap but differ. The picture and the table tell the
+Gentoo is clearly heavier than the other two. Adelie and Chinstrap
+overlap but differ a little. The picture and the table tell the
 same story.
 
 ## The most important warning: correlation ≠ causation

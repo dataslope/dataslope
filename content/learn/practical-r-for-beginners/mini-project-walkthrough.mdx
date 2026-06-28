@@ -343,60 +343,58 @@ R gives you.
 
 ## The full challenge
 
-Now you do one yourself. Use the built-in `iris` dataset.
-Compute, for each species, the **median** and **mean** petal
-length, into a tibble (or data frame) named `iris_summary` with
-three columns: `Species`, `median_petal_length`,
-`mean_petal_length`.
+Now you do one yourself. Use the **Palmer penguins** dataset
+(already loaded from `penguins.csv`). Compute, for each species, the
+**median** and **mean** body mass, into a data frame named
+`penguin_summary` with three columns: `species`,
+`median_body_mass`, `mean_body_mass`.
 
 <ChallengeCard
   adapter="r"
-  title="Per-species petal length summary"
-  instructions={`Using dplyr, build \`iris_summary\` from \`iris\`: group by \`Species\` and summarise to produce columns \`median_petal_length\` and \`mean_petal_length\`. There should be 3 rows (one per species).`}
+  title="Per-species body mass summary"
+  instructions={`Using dplyr, build \`penguin_summary\` from \`penguins\`: group by \`species\` and summarise to produce columns \`median_body_mass\` and \`mean_body_mass\`. There should be 3 rows (one per species).`}
   entryFilename="main.R"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.R",
-      starterCode: `library(dplyr)
+      initCode: `library(dplyr)\npenguins <- read.csv("penguins.csv")\npenguins <- na.omit(penguins)`,
+      starterCode: `penguin_summary <- NULL   # build me
 
-iris_summary <- NULL   # build me
-
-print(iris_summary)
+print(penguin_summary)
 `,
-      solutionCode: `library(dplyr)
-
-iris_summary <- iris |>
-  group_by(Species) |>
+      solutionCode: `penguin_summary <- penguins |>
+  group_by(species) |>
   summarise(
-    median_petal_length = median(Petal.Length),
-    mean_petal_length   = mean(Petal.Length),
+    median_body_mass = median(body_mass_g),
+    mean_body_mass   = mean(body_mass_g),
     .groups = "drop"
   )
 
-print(iris_summary)
+print(penguin_summary)
 `,
     },
   ]}
   tests={[
     {
       id: "exists",
-      name: "iris_summary exists and is a data frame",
-      code: `if (!exists("iris_summary") || !is.data.frame(iris_summary)) stop("iris_summary should be a data frame")`,
+      name: "penguin_summary exists and is a data frame",
+      code: `if (!exists("penguin_summary") || !is.data.frame(penguin_summary)) stop("penguin_summary should be a data frame")`,
     },
     {
       id: "rows",
       name: "Three rows (one per species)",
-      code: `if (nrow(iris_summary) != 3) stop(sprintf("expected 3 rows, got %s", nrow(iris_summary)))`,
+      code: `if (nrow(penguin_summary) != 3) stop(sprintf("expected 3 rows, got %s", nrow(penguin_summary)))`,
     },
     {
       id: "cols",
       name: "Has the required columns",
-      code: `if (!all(c("Species","median_petal_length","mean_petal_length") %in% names(iris_summary))) stop("missing required columns")`,
+      code: `if (!all(c("species","median_body_mass","mean_body_mass") %in% names(penguin_summary))) stop("missing required columns")`,
     },
     {
       id: "values",
       name: "Mean values match a direct computation",
-      code: `ref <- tapply(iris$Petal.Length, iris$Species, mean); got <- setNames(iris_summary$mean_petal_length, as.character(iris_summary$Species)); if (any(abs(ref[names(got)] - got) > 1e-9)) stop("mean_petal_length values are wrong")`,
+      code: `ref <- tapply(penguins$body_mass_g, penguins$species, mean); got <- setNames(penguin_summary$mean_body_mass, as.character(penguin_summary$species)); if (any(abs(ref[names(got)] - got) > 1e-9)) stop("mean_body_mass values are wrong")`,
     },
   ]}
 />
@@ -446,5 +444,8 @@ real analysis is a longer, deeper version of the same loop.
   > A p-value is one number from one test — without context, an interpretation, and an understanding of effect size, it tells the reader almost nothing on its own.`}
 />
 
-You've reached the last conceptual page of the course. The next
-page wraps everything up and points you to what's next.
+You've reached the last hands-on page of the course. What follows
+is an optional set of "deeper history" chapters — the full story of
+where statistics, statistical computing, and R itself came from —
+and then a closing page pointing you toward what to learn next. If
+you'd rather skip the history, jump straight to **Next Steps**.

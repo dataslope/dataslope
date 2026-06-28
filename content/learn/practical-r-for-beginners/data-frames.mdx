@@ -205,7 +205,9 @@ is then stored as a new column.
 ## Built-in datasets: your sandbox
 
 R comes with dozens of built-in datasets you can experiment with
-freely. A few favorites we'll use throughout the course:
+freely — `mtcars`, `airquality`, and others load with a single
+`data()` call and need no setup. We lean on those throughout the
+course:
 
 <CodeBlock
   adapter="r"
@@ -215,19 +217,34 @@ freely. A few favorites we'll use throughout the course:
       starterCode: `# mtcars: 32 cars (1974 Motor Trend magazine), 11 variables
 head(mtcars)
 
-# iris: 150 flowers, 4 measurements, 3 species
-head(iris)
-
-# airquality: New York air quality measurements
+# airquality: New York air quality measurements, May–Sep 1973
 head(airquality)
 `,
     },
   ]}
 />
 
-Real datasets, even classics like these, have quirks: missing
-values, weird scales, oddly-named columns. Half the joy of EDA is
-finding them.
+When we want a friendly table of *categorical* groups, we reach for
+the **Palmer penguins** — body measurements of 333 penguins from
+three Antarctic species. It is not built into R, so we stage it as a
+CSV; the setup line that reads it is shown above the editable code:
+
+<CodeBlock
+  adapter="r"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.r",
+      initCode: `penguins <- read.csv("penguins.csv")\npenguins <- na.omit(penguins)`,
+      starterCode: `head(penguins)
+`,
+    },
+  ]}
+/>
+
+Real datasets, even tidy teaching ones like these, have quirks:
+missing values, odd scales, oddly-named columns. Half the joy of EDA
+is finding them.
 
 ## Test your understanding
 

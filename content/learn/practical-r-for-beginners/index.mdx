@@ -3,8 +3,35 @@ title: Welcome
 description: A friendly, narrative-driven introduction to R for learners who want to understand data, statistics, and computational thinking — no programming background required.
 ---
 
-Welcome to **Practical R for Beginners**. This course is for you if any
-of these sound familiar:
+Welcome to **Practical R for Beginners**. Before a single word of
+theory, here is R doing what R is for. The block below is **live** —
+this whole course runs R inside your browser, with nothing to install.
+Click **Run**, then change `c(68, 71, 70, 74, 72, 69, 75)` to your own
+numbers and run it again.
+
+<CodeBlock
+  adapter="r"
+  files={[
+    {
+      filename: "main.r",
+      starterCode: `# A week of afternoon temperatures (°F). Edit them, then Run.
+temps <- c(68, 71, 70, 74, 72, 69, 75)
+
+cat("days recorded:", length(temps), "\\n")
+cat("average:", mean(temps), "\\n")
+cat("warmest:", max(temps), "  coolest:", min(temps), "\\n")
+`,
+    },
+  ]}
+/>
+
+That is the entire shape of data analysis in R: name a collection of
+numbers, then ask questions of the whole collection at once. You did
+not loop over the seven days — you said `mean(temps)` and got one
+answer. By the end of this course that same gesture will summarize
+thousands of rows just as easily.
+
+This course is for you if any of these sound familiar:
 
 - You have heard that "data is the new oil" but you have never actually
   *worked* with data on a computer.
@@ -59,22 +86,19 @@ sketching a graph on a notebook page.
 
 ## How this course is organized
 
-We start with a story, not with syntax. The first chapters walk
-through how humanity went from counting sheep on clay tablets to
-analyzing terabytes of genomic data — and why, somewhere along the
-way, a language called **R** quietly became one of the most
-important tools in science and business.
+We open with one short chapter on *why* R exists — the shift from a
+world starved for data to one drowning in it — and then we start
+writing code almost immediately. Every concept after that is grounded
+in a question a data analyst actually asks: *What does this dataset
+look like? Are these two groups really different? Is this number more
+interesting than random chance?*
 
-Only after you understand *why* R exists do we start writing code.
-And when we do, every concept is grounded in a question a data
-analyst actually asks: *What does this dataset look like? Are these
-two groups really different? Is this number more interesting than
-random chance?*
-
-From there the path is steady: the story, then computational
-thinking, then vectors, tabular data, transformation, exploration,
-visualization, and statistical reasoning — closing with a mini
-project that ties every piece together.
+From there the path is steady: computational thinking, then vectors,
+tabular data, transformation, exploration, visualization, and
+statistical reasoning — closing with a mini project that ties every
+piece together. A few optional "deeper history" chapters near the end
+tell the fuller story of where R came from, for when you are curious;
+they are asides, not prerequisites.
 
 ## What you will be able to do
 
@@ -128,29 +152,30 @@ run; after that, it is instant for the rest of the session.
 ## A taste of what's coming
 
 Here is a small example of the kind of analysis we will build
-toward. Do not worry about understanding every line yet — by the
-middle of the course you will.
+toward — on a real dataset, the **Palmer penguins**: body
+measurements of 333 penguins from three species, collected at a
+research station in Antarctica. Do not worry about understanding
+every line yet; by the middle of the course you will.
 
 <CodeBlock
   adapter="r"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.r",
-      starterCode: `# Built-in dataset: measurements of 150 iris flowers
-data(iris)
+      initCode: `penguins <- read.csv("penguins.csv")\npenguins <- na.omit(penguins)`,
+      starterCode: `# How many penguins? How many of each species?
+cat("Rows:", nrow(penguins), "  Columns:", ncol(penguins), "\\n")
+print(table(penguins$species))
 
-# How many flowers? How many of each species?
-cat("Rows:", nrow(iris), "  Columns:", ncol(iris), "\\n")
-print(table(iris$Species))
-
-# Average petal length per species
-aggregate(Petal.Length ~ Species, data = iris, FUN = mean)
+# Average body mass per species
+aggregate(body_mass_g ~ species, data = penguins, FUN = mean)
 `,
     },
   ]}
 />
 
-In four lines, we loaded a famous dataset, counted it, and computed
-a group-level summary. The output is a small table comparing the
-three species. This is what data analysis looks like in R: short,
+In a few lines, we loaded a dataset, counted it, and computed a
+group-level summary. The output is a small table comparing the three
+species. This is what data analysis looks like in R: short,
 expressive, and built around *thinking* rather than typing.
