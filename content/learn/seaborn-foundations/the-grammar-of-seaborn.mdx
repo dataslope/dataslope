@@ -78,13 +78,15 @@ the legend:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import matplotlib.pyplot as plt
-import seaborn as sns  # only used here to fetch the example data
+      starterCode: `import pandas as pd
+import matplotlib.pyplot as plt
 
-penguins = sns.load_dataset("penguins")
+# No seaborn at all in this block -- this is the "by hand" version.
+penguins = pd.read_csv("penguins.csv")
 
 fig, ax = plt.subplots(figsize=(6, 4))
 
@@ -130,13 +132,15 @@ the labels.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # One call. Name the columns and their roles; Seaborn does the rest.
 sns.relplot(
@@ -277,13 +281,15 @@ adjusting:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # A figure-level call returns a grid object, here named g.
 g = sns.relplot(
@@ -451,6 +457,27 @@ practical consequence of that relationship?
 Declarative convenience on top, full imperative control underneath — you get
 both.`}
 />
+
+## Interesting discussions
+
+Two small pieces of lore make the "Seaborn sits on matplotlib" relationship
+more memorable.
+
+**Where matplotlib came from.** The library underneath Seaborn began as one
+scientist's tool for his own work. John D. Hunter created matplotlib in 2003
+while doing epilepsy research, to visualize the brain's electrical activity
+(EEG) in Python rather than the proprietary software his lab was using. He
+modeled its plotting commands on MATLAB so colleagues could switch easily —
+which is why so many matplotlib calls still look the way they do. Seaborn is a
+higher-level statistical layer built on top of that foundation, two decades
+later.
+
+**Where the name (and `sns`) came from.** You have typed `import seaborn as
+sns` in every example, and the alias has a backstory. By its author Michael
+Waskom's own account, "seaborn" is named after **Samuel "Sam" Seaborn**, a
+character from the television series *The West Wing* — and the otherwise
+puzzling `sns` alias nods to that character's initials. It is the kind of
+detail that makes a library feel made by a person, not a committee.
 
 You now have the mental model the rest of the course rests on: **a tidy table,
 columns assigned to roles, statistics computed for you, and matplotlib

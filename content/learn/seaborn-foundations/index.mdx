@@ -138,35 +138,37 @@ any block in isolation. For a longer-lived workspace, open the
 [Python Playground](/playground/python) in a new tab.
 </Callout>
 
-## A taste of where we are going
+## Try it right now
 
-Here is a complete, multi-panel Seaborn figure. Do not worry about the
-details yet — by the end of this course every line will feel *obvious*,
-and you will be able to say what each one is *for*.
+Enough preamble — here is a real Seaborn figure you can run this second.
+**This whole course runs in your browser:** there is nothing to install,
+and pandas, Seaborn, and the example data are already loaded. Press
+**Run** and watch a few hundred penguins sort themselves into three
+species.
+
+Do not worry about the details yet — by the end of this course every line
+will feel *obvious*, and you will be able to say what each one is *for*.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      initCode: `import pandas as pd
+import seaborn as sns
 
-# A clean, modern look in one line.
 sns.set_theme(style="whitegrid")
-
-# A small, famous dataset that ships with Seaborn: 344 penguins.
-penguins = sns.load_dataset("penguins")
-
-# "Flipper length vs. body mass, colored by species,
-#  split into one panel per sex."
+# A small, famous dataset of 344 Antarctic penguins.
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `# "Flipper length vs. body mass, colored by species."
 sns.relplot(
     data=penguins,
     x="flipper_length_mm",
     y="body_mass_g",
     hue="species",
-    col="sex",
-    height=4,
-    aspect=0.9,
+    height=4.5,
+    aspect=1.3,
 )
 `,
     },
@@ -174,9 +176,22 @@ sns.relplot(
 />
 
 Notice what you did *not* have to do: no loop over species, no manual
-color assignment, no legend code, no two-subplot scaffolding. You named
-the columns and the *roles* they should play — `x`, `y`, `hue`, `col` —
-and Seaborn did the rest. That is the whole game.
+color assignment, no legend code. You named the columns and the *roles*
+they should play — `x`, `y`, `hue` — and Seaborn did the rest. That is the
+whole game.
+
+<Callout type="tip" title="Now change one thing">
+The fastest way to build intuition is to *poke*. In the block above, try
+**one** edit and re-run:
+
+- swap the y-axis: change `y="body_mass_g"` to `y="bill_length_mm"`;
+- recolor by a different grouping: change `hue="species"` to `hue="island"`;
+- split it into panels: add `col="sex"` on its own line inside the call.
+
+Each tiny change asks Seaborn a different question, and the picture answers
+instantly. That loop — tweak, run, look — is the whole rhythm of this
+course.
+</Callout>
 
 <Callout type="tip" title="The one habit to build">
 As you go, keep asking three questions of every chart: **What does it

@@ -82,13 +82,15 @@ variable's spread at once.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="ticks")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # One call: every numeric column against every other.
 sns.pairplot(penguins)
@@ -125,13 +127,15 @@ once:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="ticks")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # Color every panel by species — clusters and group distributions appear.
 sns.pairplot(penguins, hue="species")
@@ -176,13 +180,15 @@ care about:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="ticks")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # Only three columns -> a compact, readable 3x3 grid.
 sns.pairplot(
@@ -202,13 +208,15 @@ the ink and the clutter:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="ticks")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # corner=True keeps only the lower triangle (drops the mirror-image half).
 sns.pairplot(penguins, hue="species", corner=True)
@@ -223,13 +231,15 @@ than several overlaid histograms because the curves don't visually collide:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="ticks")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # Smooth per-group density curves on the diagonal.
 sns.pairplot(penguins, hue="species", diag_kind="kde")
@@ -277,13 +287,15 @@ onto the diagonal and onto the off-diagonal cells yourself:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="ticks")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # Build the empty grid, then decide what each region draws.
 g = sns.PairGrid(penguins)
@@ -317,6 +329,7 @@ fast, sensible default (which is most of the time), and drop down to
 
 <ChallengeCard
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Build a focused pair plot"
   instructions={`Using the \`penguins\` dataset, build a **pair plot** with \`sns.pairplot\`
 that:
@@ -330,18 +343,20 @@ keeps it a tidy 3×3 grid.)`}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="ticks")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # Build the pair plot and assign it to g:
 g = None
 `,
-      solutionCode: `import seaborn as sns
+      solutionCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="ticks")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 g = sns.pairplot(
     penguins,

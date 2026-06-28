@@ -76,22 +76,23 @@ information that summaries compress away.** Let's prove it.
 
 In 1973 the statistician Francis Anscombe built four small datasets to make
 exactly this point. Each has 11 `(x, y)` pairs. They are now a rite of
-passage, and they ship right inside Seaborn — `sns.load_dataset("anscombe")`
-returns all four stacked in a tidy table with three columns: `dataset` (the
-group label, `"I"` through `"IV"`), `x`, and `y`.
+passage. We load them from a tidy table where every row carries a `dataset`
+label (the group, `"I"` through `"IV"`) alongside its `x` and `y` — all four
+groups stacked into one long DataFrame.
 
 Let's start the way many people start with a new dataset: by computing
 summary statistics per group and reading the numbers off a table.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "anscombes_quartet.csv", stageAs: "anscombe.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
 
-# Four datasets (I-IV), stacked tidy: columns dataset, x, y.
-anscombe = sns.load_dataset("anscombe")
+# Four datasets (I-IV), stacked tidy: a dataset label, plus x and y.
+anscombe = pd.read_csv("anscombe.csv")
 
 # Summarize each group: mean of x, mean of y, their standard deviations,
 # and the correlation between x and y.
@@ -138,13 +139,15 @@ straight regression line that those identical statistics describe.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "anscombes_quartet.csv", stageAs: "anscombe.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-anscombe = sns.load_dataset("anscombe")
+anscombe = pd.read_csv("anscombe.csv")
 
 # One panel per dataset; a regression line in each.
 sns.lmplot(
@@ -235,18 +238,122 @@ it reveal, what does it hide, and when would it break?
 
 ## It is not a fluke: the Datasaurus
 
-If you suspect Anscombe rigged a rare special case, the **Datasaurus dozen**
-puts that to rest. It is a modern set of thirteen datasets — including one
-shaped, unmistakably, like a **dinosaur** — that all share the same means,
-the same standard deviations, and the same correlation to two decimal places.
-You can morph a blob of points into a star, an X, parallel lines, or the
-dinosaur while every summary statistic holds rock-steady.
+If you suspect Anscombe rigged a rare special case in 1973, a modern sequel
+puts that to rest. In 2017 Justin Matejka and George Fitzmaurice published
+the **Datasaurus dozen**: thirteen datasets that all share the same means,
+the same standard deviations, and the same correlation to two decimal
+places — and one of them is shaped, unmistakably, like a **dinosaur**. (The
+dino itself was drawn by Alberto Cairo; Matejka and Fitzmaurice built the
+twelve siblings around it with an optimization that nudges points into a new
+shape while pinning the summary statistics in place.)
 
-The takeaway is not subtle: *for any* set of summary numbers there are
-endlessly many datasets that produce them. Summaries narrow the possibilities;
-only a picture pins down which one you actually have. (We don't load the
-Datasaurus here — Seaborn doesn't ship it — but it is worth a web search; the
-animations are unforgettable.)
+Let's confirm the "identical statistics" half first, the way we did with
+Anscombe. Group the thirteen shapes and read off their summaries.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "datasaurus_dozen.csv", stageAs: "datasaurus.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+datasaurus = pd.read_csv("datasaurus.csv")`,
+      starterCode: `# Mean and spread of x and y, per shape.
+summary = datasaurus.groupby("dataset").agg(
+    x_mean=("x", "mean"),
+    y_mean=("y", "mean"),
+    x_std=("x", "std"),
+    y_std=("y", "std"),
+)
+display(summary.round(2))
+`,
+    },
+  ]}
+/>
+
+Thirteen rows, and every column is essentially constant: each shape centers
+near `(54.3, 47.8)` with the same spreads. By the numbers, these are the
+same dataset thirteen times over. Now plot a few of them.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "datasaurus_dozen.csv", stageAs: "datasaurus.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+datasaurus = pd.read_csv("datasaurus.csv")`,
+      starterCode: `# Pick four shapes that share the same summary statistics.
+shapes = ["dino", "star", "x_shape", "bullseye"]
+subset = datasaurus[datasaurus["dataset"].isin(shapes)]
+
+sns.relplot(
+    data=subset,
+    x="x",
+    y="y",
+    col="dataset",
+    col_wrap=2,
+    height=2.6,
+)
+`,
+    },
+  ]}
+/>
+
+A dinosaur, a star, an X, and a bullseye — four pictures that could not be
+more different, sharing one set of summary numbers. The takeaway is not
+subtle: *for any* set of summary statistics there are endlessly many datasets
+that produce them. Summaries narrow the possibilities; only a picture pins
+down which one you actually have.
+
+<ChallengeCard
+  adapter="python"
+  title="Even the spread is identical"
+  instructions={`The means coincide — but so does the *spread*. Prove it with your
+own code. Using the \`datasaurus\` DataFrame (columns \`dataset\`, \`x\`, \`y\`):
+
+1. Group by \`dataset\` and compute the **standard deviation of \`y\`** for each
+   shape.
+2. Round each value to **1 decimal place**.
+3. Store the result in a Series named \`y_stds\` (indexed by shape name).
+
+If the dozen really are statistically twins, all thirteen standard
+deviations should collapse to the **same** number.`}
+  datasets={[{ path: "datasaurus_dozen.csv", stageAs: "datasaurus.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+datasaurus = pd.read_csv("datasaurus.csv")`,
+      starterCode: `# Per-shape standard deviation of y, rounded to 1 decimal, into y_stds:
+y_stds = None
+
+display(y_stds)
+`,
+      solutionCode: `y_stds = datasaurus.groupby("dataset")["y"].std().round(1)
+
+display(y_stds)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "thirteen_shapes",
+      name: "One std per shape",
+      description: "y_stds covers all thirteen shapes",
+      code: "assert y_stds is not None, 'Assign the per-shape standard deviations to y_stds'\nassert len(y_stds) == 13, f'Expected 13 shapes, got {len(y_stds)}'",
+    },
+    {
+      id: "all_equal",
+      name: "Every shape shares the same spread in y",
+      description: "All thirteen rounded standard deviations are identical",
+      code: "vals = set(round(float(v), 1) for v in y_stds)\nassert len(vals) == 1, f'Expected one shared value; got {sorted(vals)}'",
+    },
+  ]}
+/>
 
 ## Your turn
 
@@ -256,6 +363,7 @@ they really do collapse to the same value.
 
 <ChallengeCard
   adapter="python"
+  datasets={[{ path: "anscombes_quartet.csv", stageAs: "anscombe.csv" }]}
   title="Confirm the four means agree"
   instructions={`Anscombe's quartet hides four different shapes behind identical
 statistics. Prove the "identical" half yourself.
@@ -271,18 +379,18 @@ If the legend of Anscombe holds, all four values should round to **7.50**.`}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
 
-anscombe = sns.load_dataset("anscombe")
+anscombe = pd.read_csv("anscombe.csv")
 
 # Compute the per-group mean of y, rounded to 2 decimals, into y_means:
 y_means = None
 
 display(y_means)
 `,
-      solutionCode: `import seaborn as sns
+      solutionCode: `import pandas as pd
 
-anscombe = sns.load_dataset("anscombe")
+anscombe = pd.read_csv("anscombe.csv")
 
 y_means = anscombe.groupby("dataset")["y"].mean().round(2)
 

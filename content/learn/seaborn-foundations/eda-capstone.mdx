@@ -78,12 +78,13 @@ conclusion.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
 
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # How big is it? (rows, columns)
 print("shape:", penguins.shape)
@@ -131,13 +132,15 @@ Here is `body_mass_g`, the penguins' weight:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # The distribution of one numeric column: where does weight pile up?
 sns.displot(penguins, x="body_mass_g", kind="hist", bins=20, height=4)
@@ -158,6 +161,7 @@ so the groups show up in color.
 
 <ChallengeCard
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Histogram of flipper length, colored by species"
   instructions={`Using the \`penguins\` dataset, draw a **histogram** of
 \`flipper_length_mm\` with \`sns.displot\`:
@@ -170,18 +174,20 @@ Assign the result to a variable named \`g\`.`}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # Build the histogram and assign it to g:
 g = None
 `,
-      solutionCode: `import seaborn as sns
+      solutionCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 g = sns.displot(
     penguins,
@@ -227,13 +233,15 @@ Body mass by species:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # Category on x, number on y: compare each species' weight distribution.
 sns.catplot(
@@ -260,6 +268,7 @@ vary by *where* a penguin lives, the way it varies by species? Find out.
 
 <ChallengeCard
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Compare body mass across islands"
   instructions={`Using the \`penguins\` dataset, draw a categorical plot with
 \`sns.catplot\` comparing \`body_mass_g\` across islands:
@@ -272,18 +281,20 @@ Assign the result to a variable named \`g\`.`}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # Build the catplot and assign it to g:
 g = None
 `,
-      solutionCode: `import seaborn as sns
+      solutionCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 g = sns.catplot(
     data=penguins,
@@ -329,13 +340,15 @@ Flipper length against body mass:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # Two numbers on the axes; the third variable (species) as color.
 sns.relplot(
@@ -365,6 +378,7 @@ recall from earlier) hide a surprise when you split by species.
 
 <ChallengeCard
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Regression lines for bill shape by species"
   instructions={`Using the \`penguins\` dataset, draw a regression plot with
 \`sns.lmplot\`:
@@ -377,18 +391,20 @@ Assign the result to a variable named \`g\`.`}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # Build the lmplot and assign it to g:
 g = None
 `,
-      solutionCode: `import seaborn as sns
+      solutionCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 g = sns.lmplot(
     data=penguins,
@@ -440,13 +456,15 @@ fastest way to scan an entire numeric dataset for structure.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # Every numeric column vs every other, colored by species.
 sns.pairplot(penguins, hue="species", height=1.8)
@@ -468,13 +486,15 @@ together, from `-1` (perfect opposite) through `0` (no linear relation) to
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="white")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # One number per pair: how strongly do the measurements move together?
 corr = penguins.corr(numeric_only=True)
@@ -501,6 +521,7 @@ correlation matrix.
 
 <ChallengeCard
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Build and sanity-check a correlation matrix"
   instructions={`A **correlation matrix** is square (one row and one column per
 numeric variable) and every variable correlates perfectly with itself, so
@@ -518,16 +539,16 @@ The tests will confirm that \`corr\` is square and that its top-left entry
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
 
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # Build the correlation matrix of the numeric columns:
 corr = None
 `,
-      solutionCode: `import seaborn as sns
+      solutionCode: `import pandas as pd
 
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 corr = penguins.corr(numeric_only=True)
 `,
@@ -568,13 +589,15 @@ is that scatter, dressed for an audience: a title that says what the chart
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid", context="talk")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 g = sns.relplot(
     data=penguins,

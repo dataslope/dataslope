@@ -120,6 +120,17 @@ Tidy data, the chart families, and the reveal/hide/break questions all
 apply unchanged — only the way you *spell* a plot becomes more composable.
 </Callout>
 
+The phrase "grammar of graphics" is not marketing. It traces to a real book:
+Leland Wilkinson's 1999 *The Grammar of Graphics*, which argued that the
+sprawl of named chart types ("bar chart", "scatter plot", "pie chart") could
+be replaced by a small set of composable parts — data, a mapping from columns
+to visual properties, geometric marks, statistical transforms, and scales.
+Hadley Wickham turned that idea into R's **ggplot2**, and Seaborn's objects
+interface brings the same layered grammar to Python. The lineage is worth
+knowing because it explains *why* the objects interface looks the way it
+does: it is one library in a thirty-year tradition of treating a chart as a
+sentence you assemble from grammar, not a template you pick off a shelf.
+
 ### Deeper matplotlib, modeling, and your own data
 
 - **Matplotlib for total control.** Seaborn draws on top of matplotlib, so

@@ -45,13 +45,15 @@ By default the center is a scatter plot and the margins are histograms:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="white")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 sns.jointplot(data=penguins, x="bill_length_mm", y="bill_depth_mm")
 `,
@@ -110,13 +112,15 @@ useful when you care about *where the mass is* rather than each observation:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="white")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 sns.jointplot(data=penguins, x="bill_length_mm", y="bill_depth_mm", kind="kde")
 `,
@@ -138,15 +142,17 @@ dataset:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="white")
 
 # diamonds is large, so take a random sample to keep it snappy.
-diamonds = sns.load_dataset("diamonds").sample(n=2000, random_state=0)
+diamonds = pd.read_csv("diamonds.csv").sample(n=2000, random_state=0)
 
 sns.jointplot(data=diamonds, x="carat", y="price", kind="hex")
 `,
@@ -192,13 +198,15 @@ distribution per group, so you see how the categories differ on each axis:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="white")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 sns.jointplot(
     data=penguins,
@@ -242,6 +250,7 @@ combination `jointplot` doesn't offer out of the box. For everyday use,
 
 <ChallengeCard
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Build a joint plot with marginals"
   instructions={`Using the \`penguins\` dataset, build a **joint plot** with \`sns.jointplot\`:
 
@@ -254,18 +263,20 @@ should appear automatically along the top and right.`}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="white")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # Build the joint plot and assign it to g:
 g = None
 `,
-      solutionCode: `import seaborn as sns
+      solutionCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="white")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 g = sns.jointplot(
     data=penguins,

@@ -109,14 +109,16 @@ A short decluttering checklist:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 # A clean canvas plus despine is the fastest decluttering move.
 sns.set_theme(style="ticks")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 g = sns.relplot(
     data=penguins,
@@ -284,13 +286,15 @@ it a message-style title.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="ticks")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 g = sns.relplot(
     data=penguins,
@@ -327,6 +331,7 @@ questions turn an exploratory sketch into a communicative figure.
 
 <ChallengeCard
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Give a chart a message-style title"
   instructions={`Build a clear scatter of the \`penguins\` dataset showing the relationship
 between flipper length and body mass, then title it with its *message*.
@@ -339,20 +344,22 @@ between flipper length and body mass, then title it with its *message*.
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="ticks")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # Draw the scatter and capture the Axes in ax:
 ax = None
 
 # Give it a message-style title:
 `,
-      solutionCode: `import seaborn as sns
+      solutionCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="ticks")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 ax = sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
 ax.set_title("Heavier penguins have longer flippers")

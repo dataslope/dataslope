@@ -67,13 +67,15 @@ scatter plot:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 sns.relplot(
     data=penguins,
@@ -97,13 +99,15 @@ scatter plots become genuinely powerful: a hidden grouping snaps into view.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 sns.relplot(
     data=penguins,
@@ -138,13 +142,15 @@ numeric one):
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 sns.relplot(
     data=penguins,
@@ -182,15 +188,17 @@ the structure you came to see. The first and easiest fix is **`alpha`**
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
 
 # diamonds is large, so take a manageable random sample to plot.
-diamonds = sns.load_dataset("diamonds").sample(n=2000, random_state=0)
+diamonds = pd.read_csv("diamonds.csv").sample(n=2000, random_state=0)
 
 sns.relplot(
     data=diamonds,
@@ -228,6 +236,7 @@ one chart on an Axes you control.
 
 <ChallengeCard
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Color a scatter by group"
   instructions={`Using the \`penguins\` dataset, draw a **scatter plot** with
 \`sns.relplot\`:
@@ -240,18 +249,20 @@ Assign the result to a variable named \`g\`.`}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # Build the relplot and assign it to g:
 g = None
 `,
-      solutionCode: `import seaborn as sns
+      solutionCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 g = sns.relplot(
     data=penguins,

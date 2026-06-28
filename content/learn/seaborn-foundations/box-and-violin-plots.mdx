@@ -267,13 +267,15 @@ the smoothing assumptions of a violin:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-diamonds = sns.load_dataset("diamonds").sample(n=3000, random_state=0)
+diamonds = pd.read_csv("diamonds.csv").sample(n=3000, random_state=0)
 
 sns.catplot(
     data=diamonds,
@@ -303,6 +305,7 @@ And remember the option from the next page: when groups are small, just show
 
 <ChallengeCard
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Compare distributions with a violin plot"
   instructions={`Using \`penguins\`, draw a **violin plot** with \`sns.catplot\` that
 compares \`body_mass_g\` across the three \`species\`:
@@ -314,18 +317,20 @@ distribution, not just its quartiles.`}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # Build the violin plot and assign it to g:
 g = None
 `,
-      solutionCode: `import seaborn as sns
+      solutionCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 g = sns.catplot(
     data=penguins,
@@ -354,6 +359,66 @@ g = sns.catplot(
       id: "y_mass",
       name: "Body mass on the y-axis",
       code: "assert g.ax.get_ylabel() == 'body_mass_g', f'y-axis should be body_mass_g, got {g.ax.get_ylabel()!r}'",
+    },
+  ]}
+/>
+
+A box plot is only useful if you can *read* the numbers it draws. The line
+inside each box is the **median**, and the box spans the middle 50% of the
+data (the 25th to the 75th percentile — the **interquartile range, or IQR**).
+Let's compute those directly so the picture and the numbers line up.
+
+<ChallengeCard
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  title="Read a box plot off the data"
+  instructions={`A box plot encodes a five-number summary. For the **Adelie**
+penguins specifically, compute the two values a box's *core* shows and store
+each as a plain Python \`float\`:
+
+1. \`adelie_median\` — the **median** \`body_mass_g\` of Adelie penguins (the
+   line inside the box).
+2. \`adelie_iqr\` — the **interquartile range** of their \`body_mass_g\`: the
+   75th percentile minus the 25th percentile (the box's height).
+
+Hint: filter to \`species == "Adelie"\`, then use \`.median()\` and
+\`.quantile(0.75) - .quantile(0.25)\` on \`body_mass_g\`.`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `adelie = penguins[penguins["species"] == "Adelie"]["body_mass_g"].dropna()
+
+# The line inside the box:
+adelie_median = None
+
+# The height of the box (Q3 - Q1):
+adelie_iqr = None
+
+print("median:", adelie_median, "| IQR:", adelie_iqr)
+`,
+      solutionCode: `adelie = penguins[penguins["species"] == "Adelie"]["body_mass_g"].dropna()
+
+adelie_median = float(adelie.median())
+adelie_iqr = float(adelie.quantile(0.75) - adelie.quantile(0.25))
+
+print("median:", adelie_median, "| IQR:", adelie_iqr)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "median",
+      name: "Median is the Adelie body-mass median",
+      description: "Around 3700 g",
+      code: "assert adelie_median is not None, 'Assign the median to adelie_median'\nassert abs(float(adelie_median) - 3700.0) < 1e-6, f'Adelie median body mass should be 3700.0 g, got {adelie_median}'",
+    },
+    {
+      id: "iqr",
+      name: "IQR is Q3 minus Q1",
+      description: "The box spans the middle 50%",
+      code: "assert adelie_iqr is not None, 'Assign the IQR to adelie_iqr'\nassert abs(float(adelie_iqr) - 650.0) < 1e-6, f'Adelie body-mass IQR should be 650.0 g, got {adelie_iqr}'",
     },
   ]}
 />
