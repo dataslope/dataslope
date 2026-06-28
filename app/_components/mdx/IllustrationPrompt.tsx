@@ -18,6 +18,10 @@
  */
 import { useCallback, useState } from "react";
 import { Check, Copy, ImageIcon } from "lucide-react";
+import {
+  buildIllustrationPrompt,
+  illustrationFileSlug,
+} from "@/lib/illustrationPrompt";
 import styles from "./IllustrationPrompt.module.css";
 
 interface IllustrationPromptProps {
@@ -30,17 +34,11 @@ interface IllustrationPromptProps {
   photo?: boolean;
 }
 
-function buildPrompt(subject: string, photo: boolean): string {
-  const reference = photo ? " (photo attached)" : "";
-  return (
-    `Create a line art-styled illustration of ${subject}${reference}. ` +
-    `Use Recraft Vector V4.1. Use a transparent background. ` +
-    `The illustration should work well in both light (#ffffff) and dark backgrounds (#121212).`
-  );
-}
-
 export function IllustrationPrompt({ subject, photo = false }: IllustrationPromptProps) {
-  const prompt = buildPrompt(subject, photo);
+  const prompt = buildIllustrationPrompt(subject, photo);
+  // Deep-link target: the `/illustration-prompts` gallery links back here using
+  // the same semantic file slug, so each placeholder is addressable by anchor.
+  const slug = illustrationFileSlug(subject, photo);
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(() => {
@@ -51,7 +49,13 @@ export function IllustrationPrompt({ subject, photo = false }: IllustrationPromp
   }, [prompt]);
 
   return (
-    <div className={styles.placeholder} role="group" aria-label="Illustration placeholder">
+    <div
+      id={slug}
+      data-illustration-file={`${slug}.svg`}
+      className={styles.placeholder}
+      role="group"
+      aria-label="Illustration placeholder"
+    >
       <div className={styles.header}>
         <span className={styles.label}>
           <ImageIcon className={styles.labelIcon} aria-hidden="true" />
