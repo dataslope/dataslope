@@ -2,7 +2,7 @@
 
 **Date:** 2026-06-27
 **Scope:** `content/learn/*` courses (27 total)
-**Result:** 24 reviewed · 3 not yet reviewed
+**Result:** 27 reviewed · 0 not yet reviewed — **all courses complete**
 
 > **Update 2026-06-28 (PR #537):** ran the editorial pass on nine more
 > courses — the entire Python data-science / R / data-viz / DuckDB-analytics
@@ -12,9 +12,13 @@
 > `time-series-analysis-python`, `statistics-for-data-science-python`. Second
 > batch: `machine-learning-scikit-learn`, `seaborn-foundations`,
 > `intro-data-viz-plotly`, `mastering-ggplot2`, `scientific-computing-python`,
-> `sql-analytics-duckdb`. Only `python-basics`, `practical-r-for-beginners`,
-> and `natural-language-processing-python` remain. Tables and the per-PR log
-> below reflect this.
+> `sql-analytics-duckdb`. Third batch (the remaining fundamentals / NLP
+> courses): `python-basics`, `practical-r-for-beginners`,
+> `natural-language-processing-python`. **All 27 courses now have an editorial
+> pass.** Separately, this PR removed every fumadocs sidebar separator entry
+> (`"---"` and labeled) from all 27 course `meta.json` files — they rendered as
+> non-clickable dividers that hurt navigation. Tables and the per-PR log below
+> reflect this.
 
 ## Background
 
@@ -36,7 +40,7 @@ The five editorial PRs all landed on 2026-06-12.
 
 ## Status by course
 
-### ✅ Editorial pass complete (24)
+### ✅ Editorial pass complete (27)
 
 | Course | PR |
 |--------|----|
@@ -64,20 +68,13 @@ The five editorial PRs all landed on 2026-06-12.
 | mastering-ggplot2 | #537 |
 | scientific-computing-python | #537 |
 | sql-analytics-duckdb | #537 |
+| python-basics | #537 |
+| practical-r-for-beginners | #537 |
+| natural-language-processing-python | #537 |
 
-### ⬜ Not yet reviewed (3)
+### ⬜ Not yet reviewed (0)
 
-| Course |
-|--------|
-| python-basics |
-| practical-r-for-beginners |
-| natural-language-processing-python |
-
-These 3 have only been touched by project-wide cosmetic/infra commits (SVG font
-& contrast fixes, course-tag metadata, "hidden test" wording removal, mermaid
-fixes) — never an editorial content pass. They are the two general
-programming-fundamentals courses (Python, R) plus the text-corpus NLP course,
-where the tabular `dataslope/datasets` files fit least.
+None — every `content/learn/*` course has now received an editorial pass.
 
 **Pattern:** the completed set is the general programming-language track (JS, C,
 C++, C#, TypeScript, Java) plus the relational-SQL courses (Postgres, SQLite, DB
@@ -207,6 +204,31 @@ pinned remote URLs.
   with no download (DuckDB's signature move); merged the OLAP/OLTP opener;
   wired dataslope Parquet/CSV via `read_parquet`/`read_csv_auto` on pinned
   URLs; stories (DuckDB's CWI origins and the duck Wilbur, MonetDB/C-Store).
+
+**Third batch (python-basics · practical-r · NLP):**
+- **python-basics:** interactive welcome; deleted `installation.mdx` (a
+  browser-run course needs no install) and relocated `python-history` to an
+  end-of-course "Interesting discussions" deep dive; added a real penguins-CSV
+  reading example to the files page; stories (Guido/CWI 1989, the Monty Python
+  name, the Zen of Python, the walrus operator and the BDFL stepping down, the
+  GIL).
+- **practical-r-for-beginners:** interactive R welcome; moved five deep-history
+  pages to the back (reader runs R by page 3–4 instead of 8); replaced every
+  `data(iris)` with Palmer Penguins staged from dataslope while keeping
+  idiomatic `mtcars`/`airquality`; stories (Ihaka/Gentleman, S/Chambers, CRAN,
+  the `<-` arrow, Tukey/EDA).
+- **natural-language-processing-python:** instant zero-download tokenize+count
+  welcome; added a TF-IDF chapter and an "Interesting discussions" history page
+  (Turing test, Georgetown–IBM/ALPAC, Shannon n-grams, ELIZA, Zipf, word2vec);
+  kept the course's NLTK corpora; fixed two invalid `<Callout type="danger">`.
+
+**Sidebar separator removal (whole repo):** removed every `"---"` and labeled
+separator entry from the `pages` array of all 27 course `meta.json` files (243
+entries total). They rendered in the fumadocs course sidebar as dividers that
+looked clickable but were not; grouping is now conveyed by page titles and
+order. Also bumped `DATASETS_REF` in `app/_components/runtime/remoteDatasets.ts`
+so the data-track courses resolve the new `dataslope/datasets` CSV/Parquet
+files.
 
 ## How this was determined
 
