@@ -75,33 +75,31 @@ the per-group top-N pattern analysts use constantly.
 
 The fastest way to learn something about a dataset is to look at its
 biggest and smallest values. `ORDER BY ... DESC` brings the largest to the
-top; `LIMIT` lets you read just those.
+top; `LIMIT` lets you read just those. Here it is over the real 53,940-row
+diamonds file — the five most expensive stones, with no download step:
 
 <SqlCodeBlock
   dialect="duckdb"
-  title="The five biggest orders"
-  initSql={`CREATE TABLE orders AS
-SELECT
-  i AS id,
-  ['West', 'East', 'North'] [(i % 3) + 1] AS region,
-  (i * 37) % 500 + 10 AS amount
-FROM
-  range(1, 201) t (i);`}
+  title="The five most expensive diamonds"
   starterCode={`SELECT
-  id,
-  region,
-  amount
+  carat,
+  cut,
+  color,
+  price
 FROM
-  orders
+  read_parquet(
+    'https://cdn.jsdelivr.net/gh/dataslope/datasets@f7f08485960fe4a774359a43d1eb50a84514daf2/diamonds.parquet'
+  )
 ORDER BY
-  amount DESC
+  price DESC
 LIMIT
   5;`}
 />
 
 Flip `DESC` to `ASC` (or drop it — ascending is the default) to find the
-*smallest*. The "top 5 / bottom 5" glance is often the very first thing an
-analyst does after slicing.
+*cheapest*. The "top 5 / bottom 5" glance is often the very first thing an
+analyst does after slicing — and DuckDB scanned all 53,940 rows to find
+them in the time it took to read this sentence.
 
 ## Sorting by more than one key
 
@@ -193,30 +191,26 @@ pairs a window function (which you will meet properly soon) with
 
 <SqlCodeBlock
   dialect="duckdb"
-  title="Top 2 orders within each region"
-  initSql={`CREATE TABLE orders AS
-SELECT
-  i AS id,
-  ['West', 'East', 'North'] [(i % 3) + 1] AS region,
-  (i * 37) % 500 + 10 AS amount
-FROM
-  range(1, 31) t (i);`}
+  title="The two most expensive diamonds in each cut"
   starterCode={`SELECT
-  region,
-  id,
-  amount
+  cut,
+  carat,
+  color,
+  price
 FROM
-  orders
+  read_parquet(
+    'https://cdn.jsdelivr.net/gh/dataslope/datasets@f7f08485960fe4a774359a43d1eb50a84514daf2/diamonds.parquet'
+  )
 QUALIFY
   ROW_NUMBER() OVER (
     PARTITION BY
-      region
+      cut
     ORDER BY
-      amount DESC
+      price DESC
   ) <= 2
 ORDER BY
-  region,
-  amount DESC;`}
+  cut,
+  price DESC;`}
 />
 
 Do not worry about the `OVER (...)` mechanics yet — the Window Functions

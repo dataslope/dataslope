@@ -91,35 +91,26 @@ else in this section is a variation on it.
 | `MAX(col)` | What is the largest? | biggest sale |
 
 A single query can compute several at once — each reads the same rows and
-produces its own number.
+produces its own number. Run all five over the real 53,940-row diamonds
+file:
 
 <SqlCodeBlock
   dialect="duckdb"
-  title="A one-line revenue report"
-  initSql={`CREATE TABLE orders (id INTEGER, customer TEXT, amount DECIMAL(8, 2));
-
-INSERT INTO
-  orders
-VALUES
-  (1, 'Ada', 120),
-  (2, 'Bo', 80),
-  (3, 'Ada', 45),
-  (4, 'Cy', 200),
-  (5, 'Bo', 60),
-  (6, 'Cy', 95),
-  (7, 'Ada', 30);`}
+  title="A one-line price report over 53,940 diamonds"
   starterCode={`SELECT
-  COUNT(*) AS num_orders,
-  SUM(amount) AS revenue,
-  ROUND(AVG(amount), 2) AS avg_order,
-  MIN(amount) AS smallest,
-  MAX(amount) AS largest
+  COUNT(*) AS n_diamonds,
+  ROUND(AVG(price), 0) AS avg_price,
+  MIN(price) AS cheapest,
+  MAX(price) AS priciest,
+  ROUND(AVG(carat), 2) AS avg_carat
 FROM
-  orders;`}
+  read_parquet(
+    'https://cdn.jsdelivr.net/gh/dataslope/datasets@f7f08485960fe4a774359a43d1eb50a84514daf2/diamonds.parquet'
+  );`}
 />
 
-Seven rows became one line of five numbers — a complete summary that would
-take real effort to compute by hand.
+Tens of thousands of rows became one line of five numbers — a complete
+summary that would be hopeless to compute by hand.
 
 ## `COUNT(*)` vs `COUNT(column)` vs `COUNT(DISTINCT ...)`
 

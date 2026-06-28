@@ -27,9 +27,7 @@
     "pages": [
         "index",
         "---",
-        "analytics-vs-application-development",
-        "analytical-vs-transactional-workloads",
-        "thinking-in-datasets",
+        "olap-vs-oltp",
         "why-duckdb",
         "---",
         "your-first-analytical-query",
@@ -56,6 +54,8 @@
         "subqueries-in-analytics",
         "---",
         "building-business-metrics",
+        "---",
+        "thinking-in-datasets",
         "reproducible-analytical-workflows",
         "---",
         "next-steps"

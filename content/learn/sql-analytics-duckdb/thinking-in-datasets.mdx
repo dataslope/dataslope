@@ -10,6 +10,13 @@ shape** through summaries. This page is about that mindset: how to think
 when the data is too big to see, and how SQL becomes your instrument for
 "looking."
 
+<Callout type="info" title="An optional deep dive">
+This is one of the course's *Interesting discussions* — the mental
+toolkit behind exploratory analysis. Nothing later strictly depends on it,
+so read it whenever you like. Many readers enjoy it most after they have
+run a few queries and felt the exploratory loop firsthand.
+</Callout>
+
 <svg
   viewBox="0 0 640 230"
   role="img"
@@ -134,57 +141,46 @@ You do **not** dump all the detail at once — that just recreates the
 unreadable million-row spreadsheet. You add a dimension at a time, follow
 the surprises, and stop when the picture is clear.
 
-Run this and notice how three small queries build a mental model of a
-dataset you never scrolled through:
+Run this against a real 53,940-row file of diamond sales and notice how
+two small queries build a mental model of a dataset you never scrolled
+through. First, *how big is it, and what does price span?*
 
 <SqlCodeBlock
   dialect="duckdb"
-  title="Building a mental picture in three questions"
-  initSql={`CREATE TABLE events AS
-SELECT
-  i AS id,
-  DATE '2024-01-01' + (i % 120) AS day,
-  ['signup', 'login', 'purchase', 'refund'] [(i % 4) + 1] AS kind,
-  (i * 17) % 200 AS value
-FROM
-  range(1, 4001) t (i);`}
+  title="Building a mental picture — size and span"
   starterCode={`-- Question 1: how big, and what does it span?
 SELECT
   COUNT(*) AS rows,
-  MIN(day) AS first_day,
-  MAX(day) AS last_day,
-  COUNT(DISTINCT kind) AS kinds
+  COUNT(DISTINCT cut) AS cuts,
+  MIN(price) AS cheapest,
+  MAX(price) AS priciest
 FROM
-  events;`}
+  read_parquet(
+    'https://cdn.jsdelivr.net/gh/dataslope/datasets@f7f08485960fe4a774359a43d1eb50a84514daf2/diamonds.parquet'
+  );`}
 />
 
-Now sharpen the question — *what kinds of events, and how common is each?*
+Now sharpen the question — *what cuts exist, and how common is each?*
 
 <SqlCodeBlock
   dialect="duckdb"
-  title="Drill down: the mix of event kinds"
-  initSql={`CREATE TABLE events AS
-SELECT
-  i AS id,
-  DATE '2024-01-01' + (i % 120) AS day,
-  ['signup', 'login', 'purchase', 'refund'] [(i % 4) + 1] AS kind,
-  (i * 17) % 200 AS value
-FROM
-  range(1, 4001) t (i);`}
+  title="Drill down: the mix of cuts"
   starterCode={`SELECT
-  kind,
+  cut,
   COUNT(*) AS n,
   ROUND(100.0 * COUNT(*) / SUM(COUNT(*)) OVER (), 1) AS pct
 FROM
-  events
+  read_parquet(
+    'https://cdn.jsdelivr.net/gh/dataslope/datasets@f7f08485960fe4a774359a43d1eb50a84514daf2/diamonds.parquet'
+  )
 GROUP BY
-  kind
+  cut
 ORDER BY
   n DESC;`}
 />
 
-You just turned 4,000 invisible rows into a four-line story — without
-ever reading a single individual event. That is thinking in datasets.
+You just turned 53,940 invisible rows into a few lines of story — without
+ever reading a single individual diamond. That is thinking in datasets.
 
 ## Three habits worth keeping
 
@@ -244,5 +240,9 @@ Drill-down means going from coarse to fine, one dimension at a time,
 guided by what looks worth investigating.`}
 />
 
-You now have the analyst's mindset. Next, let us meet the tool this
-course uses to practice it — and understand *why DuckDB* in particular.
+That is the analyst's mindset in miniature: summarize before you conclude,
+follow the surprises, add detail gradually. Everything else in the course
+is this loop, sharpened with better tools. If you arrived here from the
+opening pages, head back to
+[Your First Analytical Query](/learn/sql-analytics-duckdb/your-first-analytical-query)
+to start practising it hands-on.
