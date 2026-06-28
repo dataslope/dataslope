@@ -385,7 +385,8 @@ at it?
 Bag-of-words has no semantics; embeddings are the conceptual answer to that gap.`}
 />
 
-You can now turn documents into numeric features. In the final page we put the
-*entire* course together — preprocessing choices, features, and a touch of
-n-gram thinking — to build a small but complete **rule-based sentiment
-classifier** from scratch, and watch every earlier lesson pay off.
+You can now turn documents into numeric features. But raw counts have the same
+weakness we met when counting words: the most common words dominate and tell you
+the least. The next page fixes that with **TF-IDF** — a way to weight each word
+by how *distinctive* it is — before we assemble everything into a working
+classifier.
