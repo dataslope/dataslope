@@ -57,11 +57,12 @@ of the most valuable intuitions in classical machine learning.
 
 ## The intuition: the wisdom of crowds
 
-There is a famous story: at a county fair, hundreds of people guessed the
-weight of an ox. No individual guess was exact, but the *average* of all the
-guesses was within a pound of the truth — better than any single expert.
-Each person's error was partly random; averaging cancelled the random part
-and left the collective signal.
+There is a famous story. At a 1906 country fair, the statistician Francis
+Galton collected the roughly 800 entries in a contest to guess the weight of
+an ox. No individual guess was exact, but the *middle* of all the guesses
+came out astonishingly close to the ox's true weight — closer than the cattle
+experts present. Each person's error was partly random; combining the guesses
+cancelled the random part and left the collective signal.
 
 An **ensemble** applies this to models. Take many models that are each
 individually mediocre and somewhat *independent* in their mistakes, then
@@ -86,7 +87,10 @@ flowchart TD
 
 That diagram is the entire random forest in one picture: many trees, each
 trained a little differently, all feeding one aggregation step. The art is
-entirely in *how* you make the trees diverse.
+entirely in *how* you make the trees diverse. The method was introduced by
+Leo Breiman in 2001 — the same year as his essay "Statistical Modeling: The
+Two Cultures," which argued that predictive, algorithmic models like this one
+deserved a seat alongside classical statistics.
 
 <Callout type="info" title="Ensemble, bagging, random forest — the nesting dolls">
 An **ensemble** is any combination of models. **Bagging** (bootstrap
@@ -160,20 +164,23 @@ idea that makes a random forest better than plain bagging.
 ## A random forest beats a single tree
 
 Enough theory — let us see it. We will pit one unconstrained (overfit-prone)
-decision tree against a random forest of many such trees, on the breast
-cancer dataset, and compare their **test** accuracy.
+decision tree against a random forest of many such trees, on the penguins
+dataset, and compare their **test** accuracy.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 
-X, y = load_breast_cancer(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X, y = penguins[features], penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )
@@ -227,15 +234,20 @@ single regression tree's blocky steps.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_diabetes
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+diamonds = pd.read_csv("diamonds.csv")`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor
 
-X, y = load_diabetes(return_X_y=True)
+# A 4,000-row sample keeps a 200-tree forest fast on this 54k-row dataset.
+sample = diamonds.sample(n=4000, random_state=0)
+X = sample[["carat", "depth", "table", "x", "y", "z"]]
+y = sample["price"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
 tree = DecisionTreeRegressor(random_state=0).fit(X_train, y_train)
@@ -249,9 +261,9 @@ print(f"Random forest test R^2: {forest.score(X_test, y_test):.3f}")
   ]}
 />
 
-The lone regression tree, grown without limit, overfits and posts a weak
-test R^2 — sometimes barely above zero. The forest's averaging lifts the
-test R^2 substantially. Same data, same kind of base model; the only new
+The lone regression tree, grown without limit, overfits and posts a decent
+but noisy test R^2. The forest's averaging lifts the test R^2 higher and
+makes it steadier. Same data, same kind of base model; the only new
 ingredient is "many trees, averaged."
 
 ## How many trees? `n_estimators` and diminishing returns
@@ -269,14 +281,17 @@ not for risk.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_wine
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 
-X, y = load_wine(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X, y = penguins[features], penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )
@@ -321,24 +336,26 @@ leaned on.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
       starterCode: `import numpy as np
-from sklearn.datasets import load_wine
 from sklearn.ensemble import RandomForestClassifier
 
-data = load_wine()
-X, y = data.data, data.target
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X, y = penguins[features], penguins["species"]
 
 forest = RandomForestClassifier(n_estimators=200, random_state=0)
 forest.fit(X, y)
 
 # Rank features by how much they reduced impurity across all trees.
 order = np.argsort(forest.feature_importances_)[::-1]
-print("Top 5 features by importance:")
-for i in order[:5]:
-    print(f"  {data.feature_names[i]:<28} {forest.feature_importances_[i]:.3f}")
+print("Features by importance:")
+for i in order:
+    print(f"  {features[i]:<20} {forest.feature_importances_[i]:.3f}")
 `,
     },
   ]}
@@ -427,14 +444,14 @@ extra effort.
   category="models · ensembles and random forests"
   estimatedTime="~7 min"
   instructions={`Demonstrate the headline result: averaging many trees
-beats one overfit tree on held-out data.
+beats one overfit tree on held-out data. \`X\` (four numeric measurements)
+and \`y\` (the penguin species) are already prepared for you.
 
-1. Load the data with \`load_wine(return_X_y=True)\` into \`X\` and \`y\`.
-2. Split into train/test with **30%** in the test set, \`random_state=0\`,
+1. Split into train/test with **30%** in the test set, \`random_state=0\`,
    and **stratified** on \`y\`.
-3. Train a single \`DecisionTreeClassifier(random_state=0)\` (no depth limit)
+2. Train a single \`DecisionTreeClassifier(random_state=0)\` (no depth limit)
    on the training set. Store its **test** accuracy in \`tree_acc\`.
-4. Train a \`RandomForestClassifier(n_estimators=200, random_state=0)\` on the
+3. Train a \`RandomForestClassifier(n_estimators=200, random_state=0)\` on the
    training set. Name it \`forest\` and store its **test** accuracy in
    \`forest_acc\`.
 
@@ -442,16 +459,20 @@ The tests check that \`forest\` is a 200-tree
 \`RandomForestClassifier\`, that the forest is accurate (test accuracy above
 0.95), and — the key point of the page — that the forest's test accuracy is
 **at least as high as** the single tree's (\`forest_acc >= tree_acc\`).`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      initCode: `from sklearn.datasets import load_wine
+      initCode: `import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier`,
-      starterCode: `X, y = load_wine(return_X_y=True)
+from sklearn.ensemble import RandomForestClassifier
 
-# 1. Split (30% test, random_state=0, stratified on y)
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]`,
+      starterCode: `# 1. Split (30% test, random_state=0, stratified on y)
 X_train, X_test, y_train, y_test = None, None, None, None
 
 # 2. Single unrestricted tree -> its TEST accuracy
@@ -463,16 +484,17 @@ forest_acc = None
 
 print("single tree test:", tree_acc, " forest test:", forest_acc)
 `,
-      solutionCode: `X, y = load_wine(return_X_y=True)
-
+      solutionCode: `# 1. Split (30% test, random_state=0, stratified on y)
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )
 
+# 2. Single unrestricted tree -> its TEST accuracy
 tree = DecisionTreeClassifier(random_state=0)
 tree.fit(X_train, y_train)
 tree_acc = tree.score(X_test, y_test)
 
+# 3. Random forest of 200 trees -> its TEST accuracy
 forest = RandomForestClassifier(n_estimators=200, random_state=0)
 forest.fit(X_train, y_train)
 forest_acc = forest.score(X_test, y_test)

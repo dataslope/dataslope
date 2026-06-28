@@ -130,6 +130,45 @@ df.isna().mean().sort_values(ascending=False)
 That gives you the fraction of missing values per column, sorted
 worst-first.
 
+## A real audit: the penguins
+
+Toy DataFrames make the mechanics clear, but real missingness has
+*texture* — it clusters, and the clustering tells a story. The
+penguins dataset has 19 missing cells, and they are not scattered
+at random. Run the audit and look at *which rows* are affected:
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `# Fraction missing per column, worst first
+print(penguins.isna().mean().round(3).sort_values(ascending=False))
+print()
+
+# Which rows are missing at least one value?
+incomplete = penguins[penguins.isna().any(axis=1)]
+print(f"{len(incomplete)} of {len(penguins)} penguins have a gap")
+print(incomplete[["species", "island", "body_mass_g", "sex"]])
+`,
+    },
+  ]}
+/>
+
+The pattern is exactly the kind of thing the *First Look* chapter
+told you to watch for. **Two** penguins are missing *every*
+measurement — the observer clearly never got a full reading on
+those birds, so those rows are nearly worthless and are good
+candidates to **drop**. The other **nine** are missing only `sex`
+(harder to determine in the field) but have perfectly good
+measurements — dropping them would needlessly throw away real data,
+so for a body-mass analysis you would **keep** them. Same dataset,
+two different remedies, decided by *where* the holes are. That
+judgment — not the syntax — is the actual skill.
+
 ## Where do NaNs come from?
 
 Knowing the source guides the fix:
@@ -408,6 +447,65 @@ print(df.isna().sum())
 
 If the count is not what you expected, fix it. The mistake is
 almost always a missed column or a sentinel you forgot about.
+
+## A quick win
+
+<ChallengeCard
+  adapter="python"
+  title="Clean the penguins, deliberately"
+  instructions={`The penguins file is staged as \`penguins.csv\` and loaded into \`penguins\` for you. Apply the two-remedy logic from this chapter:
+
+1. Build \`measured\` — the penguins that have a \`body_mass_g\` value (i.e. drop only the rows where \`body_mass_g\` is missing). This removes the two rows with no measurements at all.
+2. From \`measured\`, compute \`mean_mass\` — the mean of \`body_mass_g\`, rounded to 1 decimal place.
+
+Keep every penguin that has a body mass, even if its \`sex\` is missing.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `measured = None   # TODO: drop rows where body_mass_g is missing
+mean_mass = None  # TODO: mean body mass of the remaining penguins
+
+print(len(measured) if measured is not None else "None", mean_mass)
+`,
+      solutionCode: `measured = penguins.dropna(subset=["body_mass_g"])
+mean_mass = round(measured["body_mass_g"].mean(), 1)
+
+print(len(measured), mean_mass)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "measured_rows",
+      name: "measured keeps the 342 penguins with a body mass",
+      description: "Only the 2 fully-unmeasured rows are dropped",
+      code: `import pandas as pd
+assert isinstance(measured, pd.DataFrame)
+assert len(measured) == 342, f"Expected 342 rows, got {len(measured)}"`,
+    },
+    {
+      id: "kept_missing_sex",
+      name: "Penguins with missing sex are still kept",
+      description: "Do not over-drop",
+      code: `assert measured["sex"].isna().sum() == 9, "Rows with missing sex but a measured mass should be kept"`,
+    },
+    {
+      id: "no_missing_mass",
+      name: "No missing body_mass_g remains",
+      description: "Every kept row has a measurement",
+      code: `assert measured["body_mass_g"].isna().sum() == 0`,
+    },
+    {
+      id: "mean_mass",
+      name: "mean_mass is the rounded mean body mass",
+      description: "round(mean, 1)",
+      code: `assert abs(mean_mass - 4201.8) < 0.1, f"Got {mean_mass}"`,
+    },
+  ]}
+/>
 
 ## Check your understanding
 

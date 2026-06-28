@@ -268,6 +268,49 @@ Color scales and fill scales are separate families. Style the aesthetic
 you actually mapped — \`fill\` for bar interiors.`}
 />
 
+## Quick challenge: match the scale to the aesthetic
+
+The bars below map `drv` to **fill**, so they must be styled with a
+`scale_fill_*`. Build a ggplot object `p` that fills the bars with the
+ColorBrewer `"Set2"` palette using the *correct* scale family — then the
+test confirms a fill scale (not a color scale) was added.
+
+<ChallengeCard
+  adapter="r"
+  title="Style the aesthetic you mapped"
+  instructions={`Assign to \`p\` a bar chart of \`mpg\` with \`x = class\` and \`fill = drv\`, styled with the \`"Set2"\` Brewer palette. Use the scale family that matches the \`fill\` aesthetic.`}
+  files={[
+    {
+      filename: "main.r",
+      initCode: `library(ggplot2)`,
+      starterCode: `p <- NULL # TODO: bar chart with fill = drv, Brewer "Set2" on the fill scale
+
+print(p)
+`,
+      solutionCode: `p <- ggplot(mpg, aes(x = class, fill = drv)) +
+  geom_bar() +
+  scale_fill_brewer(palette = "Set2")
+
+print(p)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "is_ggplot",
+      name: "p is a ggplot",
+      description: "Should be a ggplot object",
+      code: `if (!inherits(p, "ggplot")) stop("p must be a ggplot object")`,
+    },
+    {
+      id: "has_fill_scale",
+      name: "A fill scale was added",
+      description: "scale_fill_* matches the mapped fill aesthetic",
+      code: `aes_used <- unlist(lapply(p$scales$scales, function(s) s$aesthetics)); if (!"fill" %in% aes_used) stop("add a scale_fill_* (not scale_color_*) to style the fill aesthetic")`,
+    },
+  ]}
+/>
+
 ## Key takeaways
 
 - **`color`** styles outlines/lines; **`fill`** styles interiors —

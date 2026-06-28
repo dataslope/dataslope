@@ -305,55 +305,47 @@ print(df)
 
 ## A composite example
 
-Put several techniques together — an HR dataset with derived
-fields.
+Put several techniques together — the penguins dataset with four
+derived fields, one per technique from this chapter.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import pandas as pd
+      initCode: `import pandas as pd
 import numpy as np
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `# 1. Arithmetic: grams to kilograms
+penguins["body_mass_kg"] = penguins["body_mass_g"] / 1000
 
-df = pd.read_csv(
-    "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
+# 2. Binning: flipper length into size bands
+penguins["size_band"] = pd.cut(
+    penguins["flipper_length_mm"],
+    bins=[0, 190, 210, 1000],
+    labels=["small", "medium", "large"],
 )
 
-# Annual income from monthly
-df["AnnualIncome"] = df["MonthlyIncome"] * 12
-
-# Tenure buckets
-df["TenureBand"] = pd.cut(
-    df["YearsAtCompany"],
-    bins=[-1, 1, 3, 7, 100],
-    labels=["new", "early", "mid", "veteran"],
+# 3. Mapping: a short code per island
+penguins["island_code"] = penguins["island"].map(
+    {"Biscoe": "BIS", "Dream": "DRM", "Torgersen": "TOR"}
 )
 
-# Job-satisfaction label
-df["SatLabel"] = df["JobSatisfaction"].map(
-    {
-        1: "low",
-        2: "med-low",
-        3: "med-high",
-        4: "high",
-    }
-)
-
-# Composite flag: at-risk = high tenure but low satisfaction
-df["AtRisk"] = np.where(
-    (df["TenureBand"].isin(["mid", "veteran"])) & (df["JobSatisfaction"] <= 2),
+# 4. Conditional flag: "jumbo" = heavy AND long-flippered
+penguins["jumbo"] = np.where(
+    (penguins["body_mass_g"] > 5000) & (penguins["flipper_length_mm"] > 215),
     True,
     False,
 )
 
 print(
-    df[
-        ["Age", "YearsAtCompany", "JobSatisfaction", "TenureBand", "SatLabel", "AtRisk"]
+    penguins[
+        ["species", "body_mass_kg", "flipper_length_mm", "size_band", "island_code", "jumbo"]
     ].head(10)
 )
 print()
-print("At-risk fraction:", df["AtRisk"].mean().round(3))
+print("Jumbo fraction:", penguins["jumbo"].mean().round(3))
 `,
     },
   ]}

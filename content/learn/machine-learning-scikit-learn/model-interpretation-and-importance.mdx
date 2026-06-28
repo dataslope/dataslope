@@ -4,13 +4,13 @@ description: A model that works is not enough — you usually need to know why i
 ---
 
 Suppose you have built a model that predicts, with 96% accuracy, which
-breast tumors are malignant. Wonderful — but a doctor about to act on that
-prediction will immediately ask a question your accuracy score cannot
-answer: **why?** Which measurements made the model say "malignant"? Would
-it have said the same thing if one value were a little different? A number
-on a held-out set tells you *that* the model is good. It does not tell you
-*how* the model thinks, and for most real decisions, that second question
-matters just as much.
+species a penguin belongs to. Wonderful — but a field biologist about to
+act on that prediction will immediately ask a question your accuracy score
+cannot answer: **why?** Which measurements made the model say "Gentoo"?
+Would it have said the same thing if one value were a little different? A
+number on a held-out set tells you *that* the model is good. It does not
+tell you *how* the model thinks, and for most real decisions, that second
+question matters just as much.
 
 This page is about **interpretation** — opening the box and asking a
 trained model which features it leaned on, and how much. You will learn the
@@ -89,21 +89,29 @@ strongly that feature pushes the prediction.
 
 This is the appeal of linear models: their parameters *are* an explanation,
 for free. Let us read the coefficients of a logistic regression on the
-breast-cancer data, which ships with named features.
+penguins data, whose four body measurements have plain, interpretable
+names. We narrow to the two most separable species — Adelie and Gentoo —
+so a single set of coefficients carries a clean sign: positive raises the
+probability of "Gentoo," negative lowers it.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
       starterCode: `import numpy as np
-from sklearn.datasets import load_breast_cancer
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 
-data = load_breast_cancer()
-X, y = data.data, data.target
-names = data.feature_names
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+
+# Two most separable species -> a binary problem with cleanly signed coefficients.
+binary = penguins[penguins["species"].isin(["Adelie", "Gentoo"])]
+X = binary[features].values
+y = (binary["species"] == "Gentoo").astype(int).values
 
 # Scale first so coefficients are comparable across features (see warning below).
 Xs = StandardScaler().fit_transform(X)
@@ -113,9 +121,9 @@ coefs = model.coef_[0]
 order = np.argsort(np.abs(coefs))[::-1]  # sort by magnitude, largest first
 
 print("Most influential features (by |coefficient|):")
-for i in order[:5]:
-    direction = "raises P(benign)" if coefs[i] > 0 else "lowers P(benign)"
-    print(f"  {names[i]:<24} {coefs[i]:+.2f}  ({direction})")
+for i in order:
+    direction = "raises P(Gentoo)" if coefs[i] > 0 else "lowers P(Gentoo)"
+    print(f"  {features[i]:<20} {coefs[i]:+.2f}  ({direction})")
 `,
     },
   ]}
@@ -149,8 +157,9 @@ If two features carry overlapping information, a linear model may load all
 the weight onto one and starve the other, even reversing a coefficient's
 sign. The pair *together* matters, but neither coefficient alone tells you
 that. With correlated features, treat individual coefficients with
-suspicion. The breast-cancer data, for instance, has several near-duplicate
-"mean / worst / error" measurements of the same quantity.
+suspicion. In the penguins data, for instance, `flipper_length_mm` and
+`body_mass_g` move together closely — bigger penguins have longer
+flippers — so the model can shuffle credit between them.
 </Callout>
 
 ## Tree and forest importances — `feature_importances_`
@@ -167,16 +176,18 @@ This works for a single tree and, more reliably, for a whole random forest
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
       starterCode: `import numpy as np
-from sklearn.datasets import load_wine
 from sklearn.ensemble import RandomForestClassifier
 
-data = load_wine()
-X, y = data.data, data.target
-names = data.feature_names
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
 
 forest = RandomForestClassifier(n_estimators=200, random_state=0)
 forest.fit(X, y)
@@ -185,8 +196,8 @@ importances = forest.feature_importances_
 order = np.argsort(importances)[::-1]
 
 print("Impurity-based importances (random forest):")
-for i in order[:6]:
-    print(f"  {names[i]:<28} {importances[i]:.3f}")
+for i in order:
+    print(f"  {features[i]:<20} {importances[i]:.3f}")
 print(f"\\nThey sum to {importances.sum():.2f} (always 1.0).")
 `,
     },
@@ -246,18 +257,20 @@ model memorized.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
       starterCode: `import numpy as np
-from sklearn.datasets import load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.inspection import permutation_importance
 
-data = load_wine()
-X, y = data.data, data.target
-names = data.feature_names
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
@@ -271,14 +284,18 @@ result = permutation_importance(forest, X_test, y_test, n_repeats=20, random_sta
 
 order = np.argsort(result.importances_mean)[::-1]
 print("Permutation importances (mean drop in accuracy on held-out data):")
-for i in order[:6]:
+for i in order:
     print(
-        f"  {names[i]:<28} {result.importances_mean[i]:.3f}  +/- {result.importances_std[i]:.3f}"
+        f"  {features[i]:<20} {result.importances_mean[i]:.3f}  +/- {result.importances_std[i]:.3f}"
     )
 `,
     },
   ]}
 />
+
+Run both blocks and the rankings line up: the forest's top features and
+permutation importance agree on which measurements carry the model — a
+reassuring sign that the two lenses are seeing the same structure.
 
 Because the shuffle is random, permutation importance is itself a *random*
 quantity — that is why we repeat it (`n_repeats=20`) and get a mean and a
@@ -325,25 +342,30 @@ matplotlib — the kind of plot you will make constantly.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
       starterCode: `import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.datasets import load_wine
 from sklearn.ensemble import RandomForestClassifier
 
-data = load_wine()
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
+
 forest = RandomForestClassifier(n_estimators=200, random_state=0)
-forest.fit(data.data, data.target)
+forest.fit(X, y)
 
 importances = forest.feature_importances_
-order = np.argsort(importances)[::-1][:8]  # top 8
+order = np.argsort(importances)[::-1]  # most important first
 
 fig, ax = plt.subplots(figsize=(7, 4))
-ax.barh([data.feature_names[i] for i in order][::-1], importances[order][::-1])
+ax.barh([features[i] for i in order][::-1], importances[order][::-1])
 ax.set_xlabel("Importance (impurity-based)")
-ax.set_title("Top features: wine random forest")
+ax.set_title("Feature importances: penguin random forest")
 fig.tight_layout()
 plt.show()
 `,
@@ -359,12 +381,12 @@ work.*
 ## Global vs. local explanations
 
 Everything so far has been a **global** explanation: a single ranking that
-summarizes the model's behavior *across the whole dataset*. "Flavanoids and
-color intensity drive this wine classifier" is a global statement.
+summarizes the model's behavior *across the whole dataset*. "Bill length and
+flipper length drive this penguin classifier" is a global statement.
 
 There is a second flavor: **local** explanations, which explain *one
-specific prediction*. "For *this particular* patient, the high worst-radius
-value is what pushed the model toward 'malignant'" is a local statement.
+specific prediction*. "For *this particular* penguin, the long flipper is
+what pushed the model toward 'Gentoo'" is a local statement.
 Global tells you how the model behaves on average; local tells you why it
 made the call it made for a single case — which is often exactly what a
 person affected by the decision wants to know.
@@ -415,8 +437,8 @@ takes an experiment, or careful causal reasoning, to know.
 
 <Callout type="danger" title="Do not read importance as a to-do list">
 The deadliest misuse of feature importance is treating it as advice for
-action: "color intensity is the most important feature, so let us change
-color intensity to change the outcome." Importance describes *prediction*,
+action: "flipper length is the most important feature, so let us change
+flipper length to change the outcome." Importance describes *prediction*,
 not *intervention*. A feature can dominate a model and yet be a useless lever
 in reality, because changing it would not change the cause it was merely
 standing in for. To learn what to *do*, you need causal evidence, not an
@@ -456,10 +478,12 @@ opened the door, but its interpretability is what let people walk through it.
   title="Fit a forest and extract the top features"
   category="interpretation · feature importance"
   estimatedTime="~7 min"
-  instructions={`You will train a random forest on the wine dataset and pull
-out its most important features.
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  instructions={`You will train a random forest on the penguins dataset and
+pull out its most important measurements.
 
-1. The data is loaded for you: \`X\`, \`y\`, and \`feature_names\`.
+1. The data is loaded for you: \`X\`, \`y\`, and \`feature_names\` (the four
+   body measurements).
 2. Fit a \`RandomForestClassifier(n_estimators=200, random_state=0)\` and
    store it in \`forest\`.
 3. Read its \`feature_importances_\` into a variable called
@@ -477,12 +501,13 @@ correct name, and that \`top3\` has the right three names in order.`}
     {
       filename: "main.py",
       initCode: `import numpy as np
-from sklearn.datasets import load_wine
+import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 
-data = load_wine()
-X, y = data.data, data.target
-feature_names = list(data.feature_names)`,
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])
+feature_names = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[feature_names].values
+y = penguins["species"].values`,
       starterCode: `# 1. Fit the random forest
 forest = None
 
@@ -527,7 +552,7 @@ print("top 3:", top3)
     {
       id: "importances_shape",
       name: "One importance per feature, summing to ~1",
-      description: "importances has 13 values that sum to about 1.0",
+      description: "importances has one value per feature and they sum to about 1.0",
       code: `import numpy as np
 assert len(importances) == len(feature_names), f"Expected {len(feature_names)} importances, got {len(importances)}"
 assert abs(float(np.sum(importances)) - 1.0) < 1e-6, f"Importances should sum to 1, got {float(np.sum(importances))}"`,

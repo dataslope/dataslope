@@ -84,6 +84,49 @@ print("A mean and an SD cannot tell these apart — only a plot can.")
   ]}
 />
 
+That's the one-dimensional version of the trap. The two-dimensional
+version is Anscombe's quartet itself, and it's worth seeing on the real
+data. The four datasets share the same mean of `x`, mean of `y`,
+standard deviations, and correlation — yet a scatter plot of each tells
+a different story. Run the summary first:
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "anscombes_quartet.csv", stageAs: "anscombe.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+aq = pd.read_csv("anscombe.csv")`,
+      starterCode: `print(aq.groupby("dataset")[["x", "y"]].agg(["mean", "std"]).round(2))
+print("\\nFour datasets, indistinguishable summaries.")
+`,
+    },
+  ]}
+/>
+
+Now plot them. The numbers said "identical"; the pictures say anything
+but. This is the canonical argument for plotting before you summarize.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "anscombes_quartet.csv", stageAs: "anscombe.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+import plotly.express as px
+aq = pd.read_csv("anscombe.csv")`,
+      starterCode: `fig = px.scatter(
+    aq, x="x", y="y", facet_col="dataset", facet_col_wrap=2,
+    title="Anscombe's quartet — identical summaries, four shapes",
+)
+fig.show()
+`,
+    },
+  ]}
+/>
+
 <Callout type="danger" title="Misconception: a mean and standard deviation fully describe a distribution">
 They describe *center and spread* and nothing else — not the number of
 peaks, not the skew, not the tails, not the outliers. Two datasets with

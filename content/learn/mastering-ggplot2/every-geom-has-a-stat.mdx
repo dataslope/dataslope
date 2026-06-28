@@ -218,6 +218,48 @@ Separating *what is computed* from *how it is drawn* mirrors the
 mapping/scale split and is a key reason ggplot2 generalizes so well.`}
 />
 
+## Quick challenge: be the stat
+
+`geom_bar()` does its counting in `stat_count`. Do that step *by hand*
+to prove there is no magic. Using the built-in `mpg`, build a named
+integer vector `class_counts` giving the number of cars in each `class`
+— exactly the heights `geom_bar(aes(x = class))` would draw.
+
+<ChallengeCard
+  adapter="r"
+  title="Count rows per category"
+  instructions={`Create \`class_counts\`: the number of rows of \`mpg\` in each vehicle \`class\`. \`table()\` does precisely this. The total across all classes must equal the number of rows in \`mpg\`.`}
+  files={[
+    {
+      filename: "main.r",
+      initCode: `library(ggplot2)`,
+      starterCode: `# mpg ships with ggplot2 and is attached above.
+class_counts <- NULL # TODO: count rows per class
+
+print(class_counts)
+`,
+      solutionCode: `class_counts <- table(mpg$class)
+
+print(class_counts)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "total",
+      name: "Counts sum to the row total",
+      description: "Every row falls in exactly one class",
+      code: `if (sum(class_counts) != nrow(ggplot2::mpg)) stop(sprintf("counts should sum to %d", nrow(ggplot2::mpg)))`,
+    },
+    {
+      id: "matches",
+      name: "Per-class counts are correct",
+      description: "Matches table(mpg$class)",
+      code: `expected <- table(ggplot2::mpg$class); if (!isTRUE(all.equal(as.integer(class_counts[names(expected)]), as.integer(expected)))) stop("class counts do not match table(mpg$class)")`,
+    },
+  ]}
+/>
+
 ## Key takeaways
 
 - **Every layer runs a stat before drawing**: `data → stat → geom`.

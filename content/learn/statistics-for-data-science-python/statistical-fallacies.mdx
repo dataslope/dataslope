@@ -372,7 +372,11 @@ ones, simply because part of any extreme value was *luck*, and luck
 doesn't repeat. An unusually high reading is high partly because the
 random component happened to be high that time; next time, the random
 part is typically closer to average, so the value drifts back toward the
-mean — **with no intervention required**.
+mean — **with no intervention required**. The very word "regression"
+comes from this phenomenon: Francis Galton, studying the heights of
+parents and their children in the 1880s, noticed that exceptionally tall
+parents tended to have children closer to average height, and called it
+"regression toward mediocrity."
 
 **Concrete example.** The "Sports Illustrated jinx": athletes featured on
 the cover often slump afterward. No curse — they made the cover after a
@@ -547,6 +551,81 @@ was shaped by the data instead of decided in advance.* The antidote is
 always the same — decide first, then look, then **confirm on fresh
 data**. That discipline is the heart of *Exploratory Statistical
 Analysis*.
+</Callout>
+
+## Trusting a summary without looking
+
+Every fallacy above is a way of reasoning past the data. The simplest
+one of all is reasoning past the *picture*: trusting summary statistics
+without ever plotting. We met **Anscombe's quartet** earlier — four
+datasets with the same mean, variance, and correlation but four
+different shapes. In 2017, Justin Matejka and George Fitzmaurice at
+Autodesk pushed the joke to its limit. Starting from Alberto Cairo's
+"Datasaurus" — a scatter of points that forms a cartoon dinosaur yet has
+unremarkable summary statistics — they generated **twelve more**
+datasets that share the *same* mean, standard deviation, and correlation
+to two decimal places, while looking like stars, circles, lines, and
+slanted clouds.
+
+Run this on the real **Datasaurus Dozen**: thirteen datasets, one set of
+summary statistics.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "datasaurus_dozen.csv", stageAs: "datasaurus.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+dd = pd.read_csv("datasaurus.csv")`,
+      starterCode: `summary = dd.groupby("dataset").agg(
+    mean_x=("x", "mean"), mean_y=("y", "mean"),
+    std_x=("x", "std"), std_y=("y", "std"),
+).round(1)
+summary["corr"] = dd.groupby("dataset").apply(
+    lambda g: g["x"].corr(g["y"])
+).round(2)
+
+print(summary)
+print("\\n13 datasets. The summary statistics are essentially identical.")
+`,
+    },
+  ]}
+/>
+
+The means hover around 54 and 48, the standard deviations around 17 and
+26, the correlation near −0.06 — for every single one, including the
+dinosaur. Now plot them and the summaries fall apart completely:
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "datasaurus_dozen.csv", stageAs: "datasaurus.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+import plotly.express as px
+dd = pd.read_csv("datasaurus.csv")`,
+      starterCode: `# Same stats in every panel. Find the dinosaur.
+fig = px.scatter(
+    dd, x="x", y="y", facet_col="dataset", facet_col_wrap=4,
+    height=700, title="The Datasaurus Dozen — identical statistics, wildly different shapes",
+)
+fig.update_xaxes(matches=None, showticklabels=False)
+fig.update_yaxes(matches=None, showticklabels=False)
+fig.show()
+`,
+    },
+  ]}
+/>
+
+<Callout type="warn" title="The cheapest fallacy to avoid">
+Of every trap on this page, this is the one a single line of code
+prevents. Mean, standard deviation, and correlation are a three-number
+summary of a cloud that may contain a dinosaur. Before you summarize,
+before you test, **scatter the data and look at it.** The shapes you'd
+otherwise miss — curves, clusters, outliers, two populations mixed
+together — are exactly the ones that change the conclusion.
 </Callout>
 
 ## Practice

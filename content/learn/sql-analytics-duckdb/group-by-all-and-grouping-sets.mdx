@@ -59,43 +59,31 @@ BY`, and you get an error (or worse, a wrong result in databases that
 allow it).
 
 `GROUP BY ALL` tells DuckDB: *group by every selected column that is not
-inside an aggregate.* You write the dimensions once.
+inside an aggregate.* You write the dimensions once. Here it is over a real
+file of Lending Club loan results — default rate by loan `grade` and
+`home_ownership`, two dimensions you name only in the `SELECT`:
 
 <SqlCodeBlock
   dialect="duckdb"
-  title="GROUP BY ALL infers the grouping columns"
-  initSql={`CREATE TABLE sales (
-  region TEXT,
-  product TEXT,
-  channel TEXT,
-  amount DECIMAL(8, 2)
-);
-
-INSERT INTO
-  sales
-VALUES
-  ('West', 'Widget', 'online', 120),
-  ('West', 'Gadget', 'store', 80),
-  ('East', 'Widget', 'online', 200),
-  ('East', 'Gadget', 'online', 50),
-  ('North', 'Widget', 'store', 75),
-  ('West', 'Widget', 'online', 60);`}
+  title="GROUP BY ALL infers the grouping columns — over a real loan file"
   starterCode={`SELECT
-  region,
-  product,
-  channel,
-  COUNT(*) AS orders,
-  SUM(amount) AS revenue
+  grade,
+  home_ownership,
+  COUNT(*) AS loans,
+  ROUND(100 * AVG(did_default::INT), 1) AS default_rate_pct
 FROM
-  sales
-GROUP BY ALL -- = GROUP BY region, product, channel
+  read_parquet(
+    'https://cdn.jsdelivr.net/gh/dataslope/datasets@f7f08485960fe4a774359a43d1eb50a84514daf2/lending-club-loan-results.parquet'
+  )
+GROUP BY ALL -- = GROUP BY grade, home_ownership
 ORDER BY
-  revenue DESC;`}
+  default_rate_pct DESC;`}
 />
 
-The result is identical to writing `GROUP BY region, product, channel`,
-but the intent is clearer and the query is harder to get wrong. This is
-one of the small ergonomics that make DuckDB pleasant for fast analysis.
+The result is identical to writing `GROUP BY grade, home_ownership`, but
+the intent is clearer and the query is harder to get wrong — you cannot
+add a dimension to `SELECT` and forget it below. This is one of the small
+ergonomics that make DuckDB pleasant for fast analysis.
 
 ```mermaid
 flowchart TD

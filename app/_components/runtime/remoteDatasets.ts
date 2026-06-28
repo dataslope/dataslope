@@ -53,7 +53,7 @@ export interface RemoteDatasetSource {
 // to the new commit SHA (or a tag, once the repo starts tagging):
 //
 //   git ls-remote https://github.com/dataslope/datasets.git refs/heads/main
-export const DATASETS_REF = "6e5577bc130df05f5bdd3c7e6606d0c991f2414d";
+export const DATASETS_REF = "f7f08485960fe4a774359a43d1eb50a84514daf2";
 
 /** The companion repository holding the playgrounds' sample databases:
  *  https://github.com/dataslope/datasets */

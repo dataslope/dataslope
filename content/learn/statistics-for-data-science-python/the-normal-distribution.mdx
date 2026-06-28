@@ -121,6 +121,52 @@ fig.show()
   ]}
 />
 
+### A real measurement that's close to normal
+
+Theory says measurements that accumulate many small effects should look
+bell-shaped. Does that hold on real data? The **Palmer penguins**
+dataset gives us a clean test: the flipper lengths of a *single* species
+(Adelie) are exactly the kind of "sum of many small biological nudges"
+that the CLT predicts. Plot a histogram with a fitted normal overlaid.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+import pandas as pd
+import plotly.express as px
+from scipy import stats
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `flippers = penguins.loc[
+    penguins["species"] == "Adelie", "flipper_length_mm"
+].dropna()
+
+mu, sigma = flippers.mean(), flippers.std()
+grid = np.linspace(flippers.min(), flippers.max(), 200)
+
+fig = px.histogram(
+    flippers, x="flipper_length_mm", histnorm="probability density", nbins=20,
+    title=f"Adelie flipper length vs a fitted normal (mu={mu:.0f}, sigma={sigma:.1f})",
+)
+fig.add_scatter(x=grid, y=stats.norm(mu, sigma).pdf(grid), mode="lines", name="normal fit")
+fig.show()
+
+print(f"mean = {mu:.1f} mm,  std = {sigma:.1f} mm")
+`,
+    },
+  ]}
+/>
+
+It's not a textbook-perfect bell — real data never is — but the fitted
+normal tracks the histogram closely. That "close enough" is what lets us
+use normal-based tools on measurements like this. Mixing all three
+species together would *break* it: you'd get the lumpy, multi-peaked
+shape of three different bells stacked on top of each other, which is the
+warning the last section of this page makes precise.
+
 ## The 68–95–99.7 empirical rule
 
 The normal's most useful everyday fact is the **empirical rule**: for

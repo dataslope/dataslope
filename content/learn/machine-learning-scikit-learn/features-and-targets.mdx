@@ -187,12 +187,16 @@ do I have* (rows) and *how many features describe each one* (columns).
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
-
-X, y = load_iris(return_X_y=True)
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `# Four numeric measurements describe each penguin; species is the target.
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]
 
 n_samples, n_features = X.shape
 print("X.shape:", X.shape)
@@ -594,18 +598,18 @@ The *type of the target* tells you the task: continuous number means regression.
 />
 
 <MultipleChoice
-  markdown={`What does \`X.shape\` of \`(150, 4)\` tell you?
+  markdown={`What does \`X.shape\` of \`(342, 4)\` tell you?
 
-- 150 features describing 4 samples
-  > In scikit-learn, the shape convention is \`(n_samples, n_features)\`: the first number is the number of rows (samples), the second is the number of columns (features). So 150 is the sample count, not the feature count.
-- 150 target values and 4 predictions
-  > Target values belong in the separate vector \`y\`, not in \`X\`. \`X.shape = (150, 4)\` tells you there are 150 samples and 4 features, with no information about predictions.
-- [o] 150 samples (rows), each described by 4 features (columns)
+- 342 features describing 4 samples
+  > In scikit-learn, the shape convention is \`(n_samples, n_features)\`: the first number is the number of rows (samples), the second is the number of columns (features). So 342 is the sample count, not the feature count.
+- 342 target values and 4 predictions
+  > Target values belong in the separate vector \`y\`, not in \`X\`. \`X.shape = (342, 4)\` tells you there are 342 samples and 4 features, with no information about predictions.
+- [o] 342 samples (rows), each described by 4 features (columns)
   > \`shape\` is always \`(n_samples, n_features)\`: the first number is how many examples you have, the second is how many features describe each one.
-- A 150-by-4 image
-  > An image would require additional context about pixel layout and color channels. \`X.shape = (150, 4)\` describes a tabular feature matrix with 150 rows and 4 feature columns.
+- A 342-by-4 image
+  > An image would require additional context about pixel layout and color channels. \`X.shape = (342, 4)\` describes a tabular feature matrix with 342 rows and 4 feature columns.
 
-Shape is read rows-first: 150 examples, 4 features each.`}
+Shape is read rows-first: 342 examples, 4 features each.`}
 />
 
 <MultipleChoice

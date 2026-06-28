@@ -85,7 +85,7 @@ flowchart TD
 <Callout type="info" title="Tell them apart by the output, every time">
 When you are unsure which task you face, ignore the algorithm name and ask
 one question: *what does a single prediction look like?* A dollar amount or a
-temperature is regression. A label like "spam" or "setosa" is
+temperature is regression. A label like "spam" or "Gentoo" is
 classification. A group id assigned to unlabeled data is clustering. The
 shape of the output is the surest classifier of the task.
 </Callout>
@@ -100,37 +100,42 @@ not just on a few fixed options.
 The mental image is a **line (or curve) through a cloud of points.** The
 model learns the trend relating the input to the output, and to predict, it
 reads the height of that trend at a new input. Let us train the simplest
-regressor, `LinearRegression`, on synthetic data with one feature, and draw
-the line it learns.
+regressor, `LinearRegression`, on real diamond data — predicting a diamond's
+price from its carat weight — and draw the line it learns.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+diamonds = pd.read_csv("diamonds.csv")`,
       starterCode: `import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.datasets import make_regression
 from sklearn.linear_model import LinearRegression
 
-# One feature, a noisy linear relationship.
-X, y = make_regression(n_samples=50, n_features=1, noise=15, random_state=0)
+# 53,940 real diamonds. Predict price (a number) from carat weight.
+# Sample a few thousand to keep the scatter plot readable.
+sample = diamonds.sample(n=3000, random_state=0)
+X = sample[["carat"]].to_numpy()
+y = sample["price"].to_numpy()
 
 model = LinearRegression()
 model.fit(X, y)
 
-# The model can predict a number for ANY input, including new ones.
-new_x = 1.5
-predicted = model.predict([[new_x]])[0]
-print(f"For input {new_x}, the model predicts the number {predicted:.1f}.")
+# The model can predict a price for ANY carat weight, including new ones.
+new_carat = 1.0
+predicted = model.predict([[new_carat]])[0]
+print(f"For a {new_carat}-carat diamond, the model predicts \${predicted:,.0f}.")
 
 # Draw the data and the line the model learned.
 grid = np.linspace(X.min(), X.max(), 100).reshape(-1, 1)
 plt.figure(figsize=(5, 3.2))
-plt.scatter(X, y, alpha=0.6, label="training data")
+plt.scatter(X, y, alpha=0.3, s=10, label="diamonds")
 plt.plot(grid, model.predict(grid), color="crimson", linewidth=2, label="learned line")
-plt.xlabel("feature")
-plt.ylabel("target (a number)")
+plt.xlabel("carat")
+plt.ylabel("price (a number)")
 plt.title("Regression: a line through the points")
 plt.legend()
 plt.show()
@@ -139,8 +144,8 @@ plt.show()
   ]}
 />
 
-The output is a *number*, and it is continuous: nudge the input and the
-prediction slides smoothly. There is no notion of "categories" here — the
+The output is a *number*, and it is continuous: nudge the carat weight and the
+predicted price slides smoothly. There is no notion of "categories" here — the
 model is estimating a quantity. That is the unmistakable signature of
 regression. We will measure how good such predictions are (with metrics like
 mean absolute error and R²) in the *regression metrics* chapter; here, focus
@@ -148,8 +153,8 @@ on the *shape* of the task: number in, number out.
 
 <Callout type="tip" title="Is it really continuous?">
 A quick test for regression: could the true answer reasonably be a value
-*between* two of your observed answers? Between a price of 300,000 and 310,000
-sits 305,000, a perfectly sensible price — so price is continuous, and
+*between* two of your observed answers? Between a price of 4,300 and 4,310
+sits 4,305, a perfectly sensible price — so price is continuous, and
 predicting it is regression. If "in-between" answers are nonsensical
 (half-way between "cat" and "dog"?), you are not looking at regression.
 </Callout>
@@ -157,46 +162,49 @@ predicting it is regression. If "in-between" answers are nonsensical
 ## Classification: predicting a category
 
 Classification predicts a **category** — one label from a fixed, finite set.
-Spam or not spam (two classes); the species of an iris (three classes); which
-of five products a customer will buy (five classes). The output is not a
+Spam or not spam (two classes); the species of a penguin (three classes);
+which of five products a customer will buy (five classes). The output is not a
 quantity but a *choice among options*, and "in-between" answers do not exist:
 an email is spam or it is not.
 
 The mental image is a **boundary that carves up the feature space into
 regions**, one region per class. To classify a new point, the model sees
-which region it falls in. We will train `LogisticRegression` on two iris
-features (so we can plot it in 2-D) and color each flower by its species.
+which region it falls in. We will train `LogisticRegression` on two penguin
+measurements (so we can plot it in 2-D) and color each penguin by its species.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
       starterCode: `import matplotlib.pyplot as plt
-from sklearn.datasets import load_iris
+import pandas as pd
 from sklearn.linear_model import LogisticRegression
 
-data = load_iris()
 # Use just two features so we can see it in 2-D.
-X = data.data[:, 2:4]  # petal length, petal width
-y = data.target  # species: 0, 1, 2
+X = penguins[["bill_length_mm", "flipper_length_mm"]].to_numpy()
+y = penguins["species"]  # "Adelie", "Chinstrap", "Gentoo"
 
-model = LogisticRegression(max_iter=1000)
+model = LogisticRegression(max_iter=2000)
 model.fit(X, y)
 
 # The output is a CATEGORY: which species, from a fixed set of three.
-sample = [[4.0, 1.2]]
+sample = [[45.0, 210.0]]
 predicted_class = model.predict(sample)[0]
-print("Prediction is a category (species index):", predicted_class)
-print("That is:", data.target_names[predicted_class])
+print("Prediction is a category (species):", predicted_class)
 
-# Color each flower by its species -- distinct groups, not a scale.
+# Color each penguin by its species -- distinct groups, not a scale.
+species_names = sorted(y.unique())
+color_index = pd.Categorical(y, categories=species_names).codes
 plt.figure(figsize=(5, 3.2))
-scatter = plt.scatter(X[:, 0], X[:, 1], c=y, cmap="viridis", edgecolor="k", s=40)
-plt.xlabel("petal length (cm)")
-plt.ylabel("petal width (cm)")
+scatter = plt.scatter(X[:, 0], X[:, 1], c=color_index, cmap="viridis", edgecolor="k", s=40)
+plt.xlabel("bill length (mm)")
+plt.ylabel("flipper length (mm)")
 plt.title("Classification: points colored by class")
-plt.legend(handles=scatter.legend_elements()[0], labels=list(data.target_names))
+plt.legend(handles=scatter.legend_elements()[0], labels=species_names)
 plt.show()
 `,
     },
@@ -206,12 +214,12 @@ plt.show()
 The output is a *label*, drawn from a fixed set of three species. There is no
 "2.5th species." That discreteness — a choice among named classes — is what
 makes this classification rather than regression, even though the *inputs*
-(petal measurements) are themselves continuous numbers. Remember: the task
+(the measurements) are themselves continuous numbers. Remember: the task
 type is defined by the **output**, not the inputs.
 
 <Callout type="warn" title="Numbers used as class labels are still categories">
-A frequent confusion: iris classes are stored as 0, 1, 2 — numbers! — so
-people assume the task is regression. It is not. Those integers are just
+A frequent confusion: penguin species are often stored as 0, 1, 2 — numbers! —
+so people assume the task is regression. It is not. Those integers are just
 *names* for categories; class 2 is not "twice" class 1, and there is no
 class 1.5. Whenever the target is a fixed set of labels — whatever symbols
 encode them — the task is classification. The math underneath treats them as
@@ -244,9 +252,11 @@ tells the algorithm what the groups are or even what they mean; it finds them
 from the structure of the features alone.
 
 The mental image is **points falling into natural clumps**, with the
-algorithm drawing a circle around each clump. We will run `KMeans` on blobs,
-asking it to find three groups, and color the points by the group it
-assigns. Notice we never pass any labels.
+algorithm drawing a circle around each clump. We will run `KMeans` on synthetic
+blobs — a deliberate choice, since making the data ourselves means we *know*
+there are three real groups and can see whether the algorithm recovers them.
+We ask it to find three groups and color the points by the group it assigns.
+Notice we never pass any labels.
 
 <CodeBlock
   adapter="python"
@@ -325,34 +335,39 @@ category is classification. Two questions, three tasks, every time.
 ## One dataset, three framings
 
 The claim that "the task is set by the question, not the data" sounds
-abstract, so let us prove it on a single dataset. We will take the diabetes
-dataset — whose target is a continuous measure of disease progression — and
+abstract, so let us prove it on a single dataset. We will take the diamonds
+dataset — 53,940 real diamonds whose target is a continuous price — and
 frame *the same data* as all three task types, just by changing the question
 we ask. This is the most direct way to see that the task type lives in your
 intent, not in the rows.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+diamonds = pd.read_csv("diamonds.csv")`,
       starterCode: `import numpy as np
-from sklearn.datasets import load_diabetes
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.cluster import KMeans
 
-X, y = load_diabetes(return_X_y=True)  # y: continuous disease-progression score
+# Numeric features only; price is the continuous target.
+features = ["carat", "depth", "table", "x", "y", "z"]
+X = diamonds[features].to_numpy()
+y = diamonds["price"].to_numpy()
 
-# 1) REGRESSION: predict the continuous score directly.
+# 1) REGRESSION: predict the continuous price directly.
 reg = LinearRegression().fit(X, y)
 print("Regression  -> predicts a number:", round(float(reg.predict(X[:1])[0]), 1))
 
-# 2) CLASSIFICATION: bucket the SAME target into high vs low, then predict the class.
-y_class = (y > np.median(y)).astype(int)  # 1 = above-median progression, else 0
+# 2) CLASSIFICATION: bucket the SAME target into expensive vs cheap, then predict the class.
+y_class = (y > np.median(y)).astype(int)  # 1 = above-median price, else 0
 clf = LogisticRegression(max_iter=1000).fit(X, y_class)
 print("Classification -> predicts a category (0/1):", int(clf.predict(X[:1])[0]))
 
-# 3) CLUSTERING: ignore y entirely and discover groups of similar patients.
+# 3) CLUSTERING: ignore y entirely and discover groups of similar diamonds.
 km = KMeans(n_clusters=3, n_init=10, random_state=0).fit(X)
 print("Clustering  -> discovers a group id:", int(km.labels_[0]))
 `,
@@ -361,28 +376,28 @@ print("Clustering  -> discovers a group id:", int(km.labels_[0]))
 />
 
 Nothing about the underlying measurements changed between the three blocks.
-What changed was the *question*: "what is the exact score?" (regression),
-"is the score high or low?" (classification, after bucketing the target), and
-"which patients resemble each other?" (clustering, ignoring the target
-entirely). Same rows, three tasks — because the task type is a property of
-what you are trying to learn, not of the data sitting on disk.
+What changed was the *question*: "what is the exact price?" (regression),
+"is the diamond expensive or cheap?" (classification, after bucketing the
+target), and "which diamonds resemble each other?" (clustering, ignoring the
+target entirely). Same rows, three tasks — because the task type is a property
+of what you are trying to learn, not of the data sitting on disk.
 
 <Callout type="info" title="Bucketing trades precision for simplicity">
 Turning a continuous target into categories (regression → classification by
 "bucketing") is a real and common choice, not a trick. You might do it because
-a coarse "high / medium / low risk" decision is all the business needs, or
+a coarse "premium / mid / budget" decision is all the business needs, or
 because classes are easier to act on. The cost is thrown-away precision: you
-no longer distinguish a score of 81 from 250 if both land in "high." Whether
-that trade is worth it depends entirely on how the prediction will be used —
-a recurring theme in framing problems well.
+no longer distinguish a price of 3,500 from 15,000 if both land in "expensive."
+Whether that trade is worth it depends entirely on how the prediction will be
+used — a recurring theme in framing problems well.
 </Callout>
 
 ## Common misconceptions
 
 - **"The inputs decide the task."** They do not — the *output* does. A model
-  with continuous numeric inputs can be a classifier (iris petals → species);
-  a model with categorical inputs can be a regressor (neighborhood → price).
-  Look at what comes *out*.
+  with continuous numeric inputs can be a classifier (penguin measurements →
+  species); a model with categorical inputs can be a regressor (neighborhood →
+  price). Look at what comes *out*.
 - **"Integer labels mean regression."** No. Class labels are often stored as
   integers (0, 1, 2) for convenience, but they are categories, not
   quantities. If there is no meaningful "in-between," it is classification.
@@ -533,7 +548,7 @@ Look at what comes out of the model; the output type names the task.`}
 />
 
 <MultipleChoice
-  markdown={`The iris target is stored as the integers 0, 1, and 2 for the three species. Is predicting it regression or classification, and why?
+  markdown={`A penguin-species target is encoded as the integers 0, 1, and 2 for the three species. Is predicting it regression or classification, and why?
 
 - Regression, because the target values are numbers
   > The storage format of labels (integers) does not determine the task. These integers name three distinct species; there is no meaningful "species 1.5," so the task is classification.

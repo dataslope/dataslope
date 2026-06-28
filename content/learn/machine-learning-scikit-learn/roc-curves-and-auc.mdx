@@ -90,21 +90,28 @@ flowchart TD
     C --> A["Area under the curve<br/>= AUC"]
 ```
 
-Let us draw a real one. `roc_curve` returns the FPR and TPR at every useful
-threshold; `roc_auc_score` returns the area underneath.
+Let us draw a real one on the **penguins** dataset, posing the clean binary
+question Adelie vs. Gentoo. `roc_curve` returns the FPR and TPR at every
+useful threshold; `roc_auc_score` returns the area underneath.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
       starterCode: `import matplotlib.pyplot as plt
-from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_curve, roc_auc_score
 
-X, y = load_breast_cancer(return_X_y=True)
+# Two species, with Gentoo as the positive class (1).
+two = penguins[penguins["species"].isin(["Adelie", "Gentoo"])]
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = two[features]
+y = (two["species"] == "Gentoo").astype(int)
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )
@@ -172,16 +179,21 @@ equivalence by brute force.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
       starterCode: `import numpy as np
-from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
 
-X, y = load_breast_cancer(return_X_y=True)
+two = penguins[penguins["species"].isin(["Adelie", "Gentoo"])]
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = two[features]
+y = (two["species"] == "Gentoo").astype(int).to_numpy()
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )
@@ -215,17 +227,22 @@ genuine model is compared against a deliberately weak one.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
       starterCode: `import matplotlib.pyplot as plt
-from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import roc_curve, roc_auc_score
 
-X, y = load_breast_cancer(return_X_y=True)
+two = penguins[penguins["species"].isin(["Adelie", "Gentoo"])]
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = two[features]
+y = (two["species"] == "Gentoo").astype(int)
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )
@@ -317,8 +334,9 @@ things ROC analysis keeps cleanly apart.
   title="Score and rank models by AUC"
   category="model evaluation · ROC and AUC"
   estimatedTime="~7 min"
-  instructions={`Two models are trained on the breast cancer data. Your job is to
-score them by AUC on the test set.
+  instructions={`Two models are trained on the penguins data (Adelie vs.
+Gentoo, with Gentoo the positive class). Your job is to score them by AUC on
+the test set.
 
 1. For each fitted model, get the positive-class probabilities with
    \`model.predict_proba(X_test)[:, 1]\`.
@@ -326,18 +344,24 @@ score them by AUC on the test set.
 3. Set \`better\` to the string \`"logreg"\` or \`"tree"\` — whichever has the
    higher AUC.
 
-The tests confirm both AUCs are valid probabilities (between 0 and 1) and
-that \`better\` correctly names the higher-AUC model.`}
+The tests confirm both AUCs are valid probabilities (between 0 and 1), that
+the logistic model's AUC is high on this very separable data, and that
+\`better\` correctly names the higher-AUC model.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      initCode: `from sklearn.datasets import load_breast_cancer
+      initCode: `import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import roc_auc_score
 
-X, y = load_breast_cancer(return_X_y=True)
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])
+two = penguins[penguins["species"].isin(["Adelie", "Gentoo"])]
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = two[features]
+y = (two["species"] == "Gentoo").astype(int)
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )
@@ -372,7 +396,7 @@ assert 0.0 <= auc_logreg <= 1.0 and 0.0 <= auc_tree <= 1.0`,
     {
       id: "logreg_strong",
       name: "The logistic model ranks very well here",
-      description: "AUC should be high on this clean dataset",
+      description: "Adelie vs. Gentoo is very separable, so AUC is high",
       code: `assert auc_logreg > 0.95, f"Expected a strong AUC, got {auc_logreg}"`,
     },
     {

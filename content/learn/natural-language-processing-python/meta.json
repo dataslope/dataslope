@@ -25,22 +25,20 @@
     },
     "pages": [
         "index",
-        "---Foundations---",
         "what-is-nlp",
         "the-nlp-pipeline",
-        "---Tokenization & Normalization---",
         "tokenization",
         "text-normalization",
         "stopwords",
         "stemming-and-lemmatization",
-        "---Counting & Structure---",
         "frequency-distributions",
         "pos-tagging",
         "ngrams",
-        "---Putting It Together---",
         "choosing-your-pipeline",
         "bag-of-words",
+        "tf-idf",
         "rule-based-sentiment",
+        "interesting-discussions",
         "next-steps"
     ]
 }

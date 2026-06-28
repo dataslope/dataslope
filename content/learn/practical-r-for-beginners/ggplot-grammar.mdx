@@ -167,22 +167,21 @@ variable. ggplot makes this trivial with `facet_wrap()` and
 
 <CodeBlock
   adapter="r"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.r",
-      starterCode: `library(ggplot2)
-data(iris)
-
-ggplot(iris, aes(x = Sepal.Length, y = Petal.Length)) +
+      initCode: `library(ggplot2)\npenguins <- read.csv("penguins.csv")\npenguins <- na.omit(penguins)`,
+      starterCode: `ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
   geom_point(color = "steelblue") +
-  facet_wrap(~Species) +
-  labs(title = "Sepal length vs. petal length, by species")
+  facet_wrap(~species) +
+  labs(title = "Flipper length vs. body mass, by species")
 `,
     },
   ]}
 />
 
-One line — `facet_wrap(~ Species)` — and you get three
+One line — `facet_wrap(~ species)` — and you get three
 side-by-side panels, one per species. *Small multiples*, the
 single most powerful visualization technique for spotting
 group-level differences.
@@ -241,15 +240,14 @@ A grouped boxplot (numeric y by categorical x):
 
 <CodeBlock
   adapter="r"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.r",
-      starterCode: `library(ggplot2)
-data(iris)
-
-ggplot(iris, aes(x = Species, y = Petal.Length, fill = Species)) +
+      initCode: `library(ggplot2)\npenguins <- read.csv("penguins.csv")\npenguins <- na.omit(penguins)`,
+      starterCode: `ggplot(penguins, aes(x = species, y = body_mass_g, fill = species)) +
   geom_boxplot() +
-  labs(y = "Petal length (cm)") +
+  labs(y = "Body mass (g)") +
   theme(legend.position = "none")
 `,
     },
@@ -347,60 +345,56 @@ flowchart TB
 />
 
 <MultipleChoice
-  markdown={`To split a ggplot into one small panel per Species in \`iris\`, you add:
+  markdown={`To split a ggplot into one small panel per species in \`penguins\`, you add:
 
-- [o] \`facet_wrap(~ Species)\`
+- [o] \`facet_wrap(~ species)\`
   > \`facet_wrap()\` creates one panel per unique value, laid out in a wrapping grid.
-- \`group_by(Species)\`
+- \`group_by(species)\`
   > \`group_by()\` is a dplyr verb for grouping rows before summarization; it has no effect inside a ggplot call.
-- \`color = Species\`
-  > Setting \`color = Species\` inside \`aes()\` colors the points by species in a single panel — it does not split the chart into separate panels.
-- \`split(Species)\`
+- \`color = species\`
+  > Setting \`color = species\` inside \`aes()\` colors the points by species in a single panel — it does not split the chart into separate panels.
+- \`split(species)\`
   > \`split()\` is a base R function that partitions a vector or data frame into a list; it is not a ggplot2 layer and cannot be added to a plot with \`+\`.`}
 />
 
-## Mini challenge: a publication-ready iris plot
+## Mini challenge: a publication-ready penguin plot
 
-Build a ggplot of `iris` showing **Sepal.Length** on the x axis,
-**Petal.Length** on the y axis, colored by **Species**, with a
-linear smoother per species, faceted by species, with a real
-title and axis labels.
+Build a ggplot of `penguins` showing **flipper_length_mm** on the x
+axis, **body_mass_g** on the y axis, colored by **species**, with a
+linear smoother per species, faceted by species, with a real title
+and axis labels.
 
 <ChallengeCard
   adapter="r"
   title="Compose a real ggplot"
   instructions={`Assign the plot to a variable called \`p\`. It should:
-- use \`iris\` as data
-- map \`Sepal.Length\` to x, \`Petal.Length\` to y, \`Species\` to color
+- use \`penguins\` as data (already loaded from \`penguins.csv\`)
+- map \`flipper_length_mm\` to x, \`body_mass_g\` to y, \`species\` to color
 - include \`geom_point()\` and \`geom_smooth(method = "lm")\`
-- be faceted by \`Species\`
+- be faceted by \`species\`
 - have a title and meaningful axis labels (use \`labs()\`)
 
 Then print(p) to render it.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.r",
-      starterCode: `library(ggplot2)
-data(iris)
-
-p <- NULL # build the plot
+      initCode: `library(ggplot2)\npenguins <- read.csv("penguins.csv")\npenguins <- na.omit(penguins)`,
+      starterCode: `p <- NULL # build the plot
 
 print(p)
 `,
-      solutionCode: `library(ggplot2)
-data(iris)
-
-p <- ggplot(iris, aes(
-  x = Sepal.Length, y = Petal.Length,
-  color = Species
+      solutionCode: `p <- ggplot(penguins, aes(
+  x = flipper_length_mm, y = body_mass_g,
+  color = species
 )) +
   geom_point(size = 2, alpha = 0.7) +
   geom_smooth(method = "lm", se = FALSE) +
-  facet_wrap(~Species) +
+  facet_wrap(~species) +
   labs(
-    title = "Sepal length vs. petal length, by species",
-    x = "Sepal length (cm)",
-    y = "Petal length (cm)"
+    title = "Flipper length vs. body mass, by species",
+    x = "Flipper length (mm)",
+    y = "Body mass (g)"
   )
 print(p)
 `,
@@ -414,15 +408,15 @@ print(p)
     },
     {
       id: "mapping",
-      name: "Maps Sepal.Length and Petal.Length",
+      name: "Maps flipper_length_mm and body_mass_g",
       code: `m <- p$mapping
 xs <- rlang::as_label(m$x); ys <- rlang::as_label(m$y)
-if (!grepl("Sepal.Length", xs)) stop("x should be Sepal.Length")
-if (!grepl("Petal.Length", ys)) stop("y should be Petal.Length")`,
+if (!grepl("flipper_length_mm", xs)) stop("x should be flipper_length_mm")
+if (!grepl("body_mass_g", ys)) stop("y should be body_mass_g")`,
     },
     {
       id: "facet",
-      name: "Faceted by Species",
+      name: "Faceted by species",
       code: `if (!inherits(p$facet, "FacetWrap")) stop("must use facet_wrap")`,
     },
   ]}

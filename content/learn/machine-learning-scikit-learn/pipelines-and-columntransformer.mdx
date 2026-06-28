@@ -125,16 +125,20 @@ Here is the simplest possible pipeline, end to end:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_wine
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 
-X, y = load_wine(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )
@@ -178,16 +182,20 @@ object and names each step after its class automatically:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_wine
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline
 
-X, y = load_wine(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )
@@ -220,16 +228,20 @@ structurally impossible.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_wine
-from sklearn.model_selection import cross_val_score
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline
 
-X, y = load_wine(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]
 
 # Passing the whole pipeline to cross_val_score re-fits the scaler INSIDE
 # each fold, on that fold's training data only. No leakage, automatically.
@@ -279,30 +291,25 @@ flowchart TD
     J --> M["one feature matrix<br/>(all numeric, ready for the model)"]
 ```
 
-Let us build a realistic mixed dataset inline and assemble the full thing:
-a `ColumnTransformer` for preprocessing feeding a `LogisticRegression`, all
-wrapped in one `Pipeline`.
+Let us load a genuinely mixed real dataset — lending-club loan records — and
+assemble the full thing: a `ColumnTransformer` for preprocessing feeding a
+`LogisticRegression`, all wrapped in one `Pipeline`. The numeric columns
+(loan amount, interest rate, income) need scaling; the categorical ones
+(loan grade, home ownership, purpose) need encoding — exactly the mixed case
+`ColumnTransformer` exists for.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "lending-club-loan-results.csv", stageAs: "loans.csv" }]}
   files={[
     {
       filename: "main.py",
-      initCode: `import numpy as np
-import pandas as pd
+      initCode: `import pandas as pd
+loans = pd.read_csv("loans.csv")
 
-# A tiny, realistic "customer" table: two numeric, two categorical columns,
-# plus a binary target (did the customer upgrade?).
-rng = np.random.default_rng(0)
-n = 40
-df = pd.DataFrame({
-    "age":    rng.integers(18, 70, n),
-    "income": rng.integers(20000, 90000, n),
-    "city":   rng.choice(["NY", "LA", "SF"], n),
-    "plan":   rng.choice(["free", "pro"], n),
-})
-# The target depends on both a numeric and a categorical feature.
-df["upgraded"] = ((df["income"] > 50000) | (df["plan"] == "pro")).astype(int)`,
+# The full file is large and the classes are imbalanced (most loans do not
+# default); sample for speed with a fixed seed so the run is reproducible.
+loans = loans.sample(n=5000, random_state=0)`,
       starterCode: `from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
@@ -310,11 +317,11 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
 
 # Separate the columns by type.
-numeric_cols = ["age", "income"]
-categorical_cols = ["city", "plan"]
+numeric_cols = ["loan_amnt", "int_rate", "annual_inc"]
+categorical_cols = ["grade", "home_ownership", "purpose"]
 
-X = df[numeric_cols + categorical_cols]
-y = df["upgraded"]
+X = loans[numeric_cols + categorical_cols]
+y = loans["did_default"]
 
 # Route each column group to its own transformer.
 preprocess = ColumnTransformer(
@@ -347,11 +354,14 @@ print(f"Test accuracy: {pipe.score(X_test, y_test):.3f}")
   ]}
 />
 
-One `pipe.fit(X_train, y_train)` call: it scaled `age` and `income`, one-hot
-encoded `city` and `plan`, glued the columns together, and trained the
-classifier — each preprocessing step fit on the training data only. You
-handed it a raw mixed DataFrame and got a trained model, with leakage ruled
-out by construction.
+One `pipe.fit(X_train, y_train)` call: it scaled `loan_amnt`, `int_rate`,
+and `annual_inc`, one-hot encoded `grade`, `home_ownership`, and `purpose`,
+glued the columns together, and trained the classifier — each preprocessing
+step fit on the training data only. You handed it a raw mixed DataFrame and
+got a trained model, with leakage ruled out by construction. (Because
+defaults are rare, accuracy here is high largely by predicting "no default"
+— a reminder that on imbalanced data accuracy alone can flatter a model, as
+the classification-metrics page explores.)
 
 ### Seeing the columns the model actually receives
 
@@ -360,24 +370,17 @@ the model never sees your original columns — it sees the transformed ones.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "lending-club-loan-results.csv", stageAs: "loans.csv" }]}
   files={[
     {
       filename: "main.py",
-      initCode: `import numpy as np
-import pandas as pd
-rng = np.random.default_rng(0)
-n = 40
-df = pd.DataFrame({
-    "age":    rng.integers(18, 70, n),
-    "income": rng.integers(20000, 90000, n),
-    "city":   rng.choice(["NY", "LA", "SF"], n),
-    "plan":   rng.choice(["free", "pro"], n),
-})`,
+      initCode: `import pandas as pd
+loans = pd.read_csv("loans.csv").sample(n=5000, random_state=0)`,
       starterCode: `from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
-numeric_cols = ["age", "income"]
-categorical_cols = ["city", "plan"]
+numeric_cols = ["loan_amnt", "int_rate", "annual_inc"]
+categorical_cols = ["grade", "home_ownership", "purpose"]
 
 preprocess = ColumnTransformer(
     [
@@ -390,20 +393,21 @@ preprocess = ColumnTransformer(
     ]
 )
 
-transformed = preprocess.fit_transform(df[numeric_cols + categorical_cols])
+transformed = preprocess.fit_transform(loans[numeric_cols + categorical_cols])
 
 print("Original columns:", numeric_cols + categorical_cols)
 print("After transform, the model sees these columns:")
 print(preprocess.get_feature_names_out())
-print("Shape:", transformed.shape, "(2 scaled numeric + one-hot of city and plan)")
+print("Shape:", transformed.shape, "(3 scaled numeric + one-hot of the 3 categoricals)")
 `,
     },
   ]}
 />
 
-The two numeric columns stay as two columns (now scaled), while `city` and
-`plan` expand into one 0/1 column per category. The `num__` and `cat__`
-prefixes tell you which transformer produced each column.
+The three numeric columns stay as three columns (now scaled), while `grade`,
+`home_ownership`, and `purpose` each expand into one 0/1 column per category
+— so the output is much wider than the six raw columns you started with. The
+`num__` and `cat__` prefixes tell you which transformer produced each column.
 
 <Callout type="info" title="remainder: what happens to columns you did not list">
 By default, `ColumnTransformer` **drops** any column you did not assign to a
@@ -433,29 +437,22 @@ and encoding it learned at training time.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "lending-club-loan-results.csv", stageAs: "loans.csv" }]}
   files={[
     {
       filename: "main.py",
-      initCode: `import numpy as np
-import pandas as pd
-rng = np.random.default_rng(0)
-n = 40
-df = pd.DataFrame({
-    "age":    rng.integers(18, 70, n),
-    "income": rng.integers(20000, 90000, n),
-    "city":   rng.choice(["NY", "LA", "SF"], n),
-    "plan":   rng.choice(["free", "pro"], n),
-})
-df["upgraded"] = ((df["income"] > 50000) | (df["plan"] == "pro")).astype(int)`,
+      initCode: `import pandas as pd
+loans = pd.read_csv("loans.csv").sample(n=5000, random_state=0)`,
       starterCode: `from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
+import pandas as pd
 
-numeric_cols = ["age", "income"]
-categorical_cols = ["city", "plan"]
-X = df[numeric_cols + categorical_cols]
-y = df["upgraded"]
+numeric_cols = ["loan_amnt", "int_rate", "annual_inc"]
+categorical_cols = ["grade", "home_ownership", "purpose"]
+X = loans[numeric_cols + categorical_cols]
+y = loans["did_default"]
 
 pipe = Pipeline(
     [
@@ -478,24 +475,27 @@ pipe = Pipeline(
 pipe.fit(X, y)
 
 # Brand-new raw records: the pipeline scales and encodes them automatically.
-new_customers = pd.DataFrame(
+new_loans = pd.DataFrame(
     {
-        "age": [25, 55],
-        "income": [80000, 30000],
-        "city": ["NY", "Tokyo"],  # 'Tokyo' was never seen -> handled by handle_unknown
-        "plan": ["free", "pro"],
+        "loan_amnt": [10000, 30000],
+        "int_rate": [7.5, 22.0],
+        "annual_inc": [85000, 40000],
+        "grade": ["A", "G"],
+        "home_ownership": ["MORTGAGE", "MARS_BASE"],  # 'MARS_BASE' was never seen -> handled by handle_unknown
+        "purpose": ["car", "small_business"],
     }
 )
-print("Predictions for new customers:", pipe.predict(new_customers))
+print("Predictions for new loans:", pipe.predict(new_loans))
 `,
     },
   ]}
 />
 
-The new batch included `Tokyo`, a city the encoder never saw at training
-time. Because the encoder was created with `handle_unknown="ignore"`, the
-pipeline handled it gracefully instead of crashing — the exact robustness the
-encoding page described, now happening automatically inside the pipeline.
+The new batch included a `home_ownership` value (`MARS_BASE`) the encoder
+never saw at training time. Because the encoder was created with
+`handle_unknown="ignore"`, the pipeline handled it gracefully instead of
+crashing — the exact robustness the encoding page described, now happening
+automatically inside the pipeline.
 
 ## When NOT to reach for a pipeline (and misconceptions)
 
@@ -554,15 +554,17 @@ encode categorical) → model — all inside one Pipeline you fit once.**
   title="Assemble a full ColumnTransformer + Pipeline"
   category="pipelines · columntransformer · leak-free"
   estimatedTime="~9 min"
-  instructions={`A mixed DataFrame is provided as \`df\` with numeric columns
-\`hours\` and \`prior_score\`, a categorical column \`subject\`, and a binary
-target column \`passed\`. The features are already separated for you into
-\`X\` (the four feature columns) and \`y\` (the target).
+  instructions={`The penguins data is loaded as \`penguins\`, with the four
+numeric measurement columns plus categorical columns \`island\` and \`sex\`
+as features, and \`species\` as the target. The features are already
+separated for you into \`X\` (numeric + categorical columns) and \`y\` (the
+target), and the train/test split is done.
 
 1. Build a \`ColumnTransformer\` named \`preprocess\` with two blocks:
-   - a \`StandardScaler\` applied to \`numeric_cols\` (\`["hours", "prior_score"]\`),
+   - a \`StandardScaler\` applied to \`numeric_cols\`
+     (\`["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]\`),
    - a \`OneHotEncoder(handle_unknown="ignore", sparse_output=False)\` applied
-     to \`categorical_cols\` (\`["subject"]\`).
+     to \`categorical_cols\` (\`["island", "sex"]\`).
 2. Build a \`Pipeline\` named \`pipe\` with two steps: \`("prep", preprocess)\`
    then \`("clf", LogisticRegression(max_iter=1000))\`.
 3. Fit \`pipe\` on \`X_train\`, \`y_train\` (the split is done for you).
@@ -570,33 +572,30 @@ target column \`passed\`. The features are already separated for you into
 
 The tests check that \`pipe\` is a fitted \`Pipeline\` whose final step
 is a \`LogisticRegression\`, that its preprocessing step is a
-\`ColumnTransformer\`, that the transformer outputs the right number of columns
-(2 scaled numeric + one column per distinct subject), and that \`test_acc\` is
-a sensible accuracy between 0 and 1.`}
+\`ColumnTransformer\`, that the transformer outputs more columns than the raw
+features (four scaled numeric columns plus one per category seen in the
+training split), and that \`test_acc\` clears a sensible accuracy threshold.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      initCode: `import numpy as np
-import pandas as pd
+      initCode: `import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 from sklearn.model_selection import train_test_split
 
-rng = np.random.default_rng(0)
-n = 60
-df = pd.DataFrame({
-    "hours":       rng.integers(0, 12, n),
-    "prior_score": rng.integers(40, 100, n),
-    "subject":     rng.choice(["math", "history", "art"], n),
-})
-df["passed"] = ((df["hours"] + df["prior_score"] / 10) > 9).astype(int)
+numeric_cols = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+categorical_cols = ["island", "sex"]
 
-numeric_cols = ["hours", "prior_score"]
-categorical_cols = ["subject"]
-X = df[numeric_cols + categorical_cols]
-y = df["passed"]
+# Drop rows missing any feature we use (sex has 11 NaN) or the target.
+penguins = pd.read_csv("penguins.csv").dropna(
+    subset=numeric_cols + categorical_cols + ["species"]
+)
+
+X = penguins[numeric_cols + categorical_cols]
+y = penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )`,
@@ -665,19 +664,22 @@ assert len(preds) == len(X_test), f"Expected {len(X_test)} predictions, got {len
     },
     {
       id: "n_features_out",
-      name: "Transformer outputs the right number of columns",
-      description: "2 scaled numeric + one column per distinct subject",
+      name: "Transformer outputs more columns than the raw features",
+      description: "Scaled numeric columns plus one per category seen in training",
       code: `ct = pipe.steps[0][1]
-n_expected = 2 + df["subject"].nunique()
 out_cols = ct.transform(X_train).shape[1]
-assert out_cols == n_expected, f"Expected {n_expected} transformed columns, got {out_cols}"`,
+# 4 scaled numeric columns + one per category present in the training split.
+n_expected = len(numeric_cols) + sum(X_train[c].nunique() for c in categorical_cols)
+assert out_cols == n_expected, f"Expected {n_expected} transformed columns, got {out_cols}"
+assert out_cols > X_train.shape[1], f"Transformed width {out_cols} should exceed the {X_train.shape[1]} raw columns"`,
     },
     {
       id: "acc_range",
-      name: "Test accuracy is a valid fraction",
-      description: "Between 0 and 1",
+      name: "Test accuracy is a sensible fraction",
+      description: "A scaled + encoded pipeline should classify the penguins well",
       code: `assert test_acc is not None, "test_acc is still None"
-assert 0.0 <= test_acc <= 1.0, f"Accuracy should be in [0, 1], got {test_acc}"`,
+assert 0.0 <= test_acc <= 1.0, f"Accuracy should be in [0, 1], got {test_acc}"
+assert test_acc > 0.85, f"Expected a strong accuracy on penguins, got {test_acc}"`,
     },
   ]}
 />

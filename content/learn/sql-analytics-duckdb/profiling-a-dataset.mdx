@@ -205,25 +205,27 @@ trustworthy or needs cleaning before analysis.
 DuckDB bundles the whole profiling checklist into one keyword:
 **`SUMMARIZE`**. Prefix any table or query with it and DuckDB returns, per
 column, the count, number of distinct values, null percentage, min, max,
-average, and approximate quantiles.
+average, and approximate quantiles. Point it at a real 53,940-row file you
+have never seen, straight from the web, and read off the whole shape in
+one shot:
 
 <SqlCodeBlock
   dialect="duckdb"
-  title="Profile every column at once with SUMMARIZE"
-  initSql={`CREATE TABLE orders AS
+  title="Profile every column of a remote file with SUMMARIZE"
+  starterCode={`SUMMARIZE
 SELECT
-  i AS id,
-  DATE '2024-01-01' + (i % 90) AS order_date,
-  ['Books', 'Electronics', 'Home'] [(i % 3) + 1] AS category,
-  (i * 13) % 300 + 20 AS amount
+  *
 FROM
-  range(1, 501) t (i);`}
-  starterCode={`SUMMARIZE orders;`}
+  read_parquet(
+    'https://cdn.jsdelivr.net/gh/dataslope/datasets@f7f08485960fe4a774359a43d1eb50a84514daf2/diamonds.parquet'
+  );`}
 />
 
-One line, a complete profile. `SUMMARIZE` is the first thing many DuckDB
-analysts type when they meet a new table — it answers size, range,
-distinctness, and nulls for *every* column simultaneously.
+One line of intent, a complete profile of ten columns. Scan the `min` and
+`max` of `price` and `carat`, the distinct counts of `cut` / `color` /
+`clarity`, and the null percentages — in seconds you know more about this
+file than scrolling it for an hour would tell you. `SUMMARIZE` is the
+first thing many DuckDB analysts type when they meet a new dataset.
 
 ```mermaid
 flowchart TD

@@ -332,6 +332,48 @@ at the threshold because strong seasonality remains. It takes a **seasonal**
 difference, on the next page, to push it firmly into stationary territory.
 That preview is the entire motivation for what comes next.
 
+The real **Keeling Curve** makes a cleaner contrast. Its trend is so
+overwhelming that the raw ADF p-value is essentially 1.0 — about as
+non-stationary as a series gets — yet a single ordinary difference is
+enough to collapse it well below 0.05. Run it and watch.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "NOAA_mauna_loa_co2_monthly.csv", stageAs: "co2.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+import pandas as pd
+import warnings
+warnings.filterwarnings("ignore")
+from statsmodels.tsa.stattools import adfuller
+df = pd.read_csv("co2.csv")
+df["date"] = pd.to_datetime(df[["year", "month"]].assign(day=1))
+co2 = df.set_index("date")["average"]
+
+def adf_report(series, name):
+    p = adfuller(pd.Series(series).dropna())[1]
+    verdict = "STATIONARY" if p < 0.05 else "NON-stationary"
+    print(f"{name:34s} p-value = {p:7.4f}  ->  {verdict}")`,
+      starterCode: `adf_report(co2, "Raw CO2 (the rising trend)")
+adf_report(co2.diff(), "First difference of CO2")
+
+print()
+print("Raw CO2: p ~ 1.0 -> emphatically non-stationary (the trend dominates).")
+print("One ordinary difference is enough to make it stationary here -- the trend")
+print("is steady and near-linear, so 'monthly change in CO2' has a stable mean.")
+print("(A seasonal difference would also tidy up the leftover 12-month wiggle.)")
+`,
+    },
+  ]}
+/>
+
+So the *amount* of differencing a series needs is itself a property of the
+series. CO₂'s steady, near-linear climb yields to one difference; the
+airline series' growing, strongly seasonal swing needs more work. Same
+test, same logic — different answers, because the data is different.
+
 <svg
   viewBox="0 0 640 170"
   role="img"

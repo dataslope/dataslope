@@ -7,16 +7,59 @@ Welcome to **Scientific Computing with Python**. This course is for
 learners who already know Python as a *programming language* and now
 want to use it as a *mathematical instrument* — a way to model the
 physical world, solve equations that have no closed-form solution,
-simulate systems that are too complex to reason about by hand, and
-analyze data that arrives in matrices rather than rows.
+simulate systems too complex to reason about by hand, and analyze
+data that arrives in matrices rather than rows.
 
-We will not teach you how to write a for-loop, how to build a Flask
-app, or how to fine-tune a transformer. We will teach you how to
-think about numbers when they are stored in 64 bits, how to choose a
-linear solver based on the structure of a matrix, how to integrate a
-differential equation that describes a planet's orbit, and how to
-build experiments that other scientists can reproduce a decade from
-now.
+Here is the kind of thing that lies ahead. The two snippets below
+compute exactly the same million sine-squared values — one with a
+Python loop, one as a single NumPy array expression. **Run it**, then
+change `N` to `5_000_000` and run again. Watch the gap widen.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+import time`,
+      starterCode: `# >>> CHANGE ME and re-run: try 5_000_000 <<<
+N = 1_000_000
+
+x = np.linspace(0, 2 * np.pi, N)
+
+# 1) A plain Python loop, element by element
+t0 = time.perf_counter()
+loop = [0.0] * N
+for i in range(N):
+    loop[i] = np.sin(x[i]) ** 2
+t1 = time.perf_counter()
+
+# 2) The same math as one vectorized array expression
+t2 = time.perf_counter()
+vec = np.sin(x) ** 2
+t3 = time.perf_counter()
+
+print(f"Python loop : {t1 - t0:7.3f} s")
+print(f"NumPy array : {t3 - t2:7.3f} s")
+print(f"Speedup     : {(t1 - t0) / (t3 - t2):7.0f}x faster, same answer")
+`,
+    },
+  ]}
+/>
+
+That hundred-to-thousand-fold speedup, from *one line* of NumPy, is
+the first idea of the course. **This whole course runs in your
+browser** — there is nothing to install, no kernel to configure, no
+cloud account. Every code block, including the one you just ran, is a
+live CPython interpreter compiled to WebAssembly, with the full
+scientific stack already loaded.
+
+We will not teach you how to write a for-loop, build a Flask app, or
+fine-tune a transformer. We will teach you how to think about numbers
+when they are stored in 64 bits, how to choose a linear solver based
+on the structure of a matrix, how to integrate a differential
+equation that describes a planet's orbit, and how to build
+experiments other scientists can reproduce a decade from now.
 
 <svg
   viewBox="0 0 640 220"
@@ -87,9 +130,9 @@ flowchart TD
 
 The course has six pillars:
 
-1. **The story.** Where scientific computing came from — from Babbage
-   to FORTRAN to MATLAB to NumPy — and why the field looks the way
-   it does today.
+1. **The story.** Where scientific computing came from — from human
+   "computers" to FORTRAN to MATLAB to NumPy — and why the field
+   looks the way it does today. Two short chapters, then we compute.
 2. **Numerical foundations.** Floating point, stability, error,
    condition number, and the *vectorized* style of thinking that
    NumPy makes possible.
@@ -128,11 +171,14 @@ If you want a persistent, long-lived workspace to experiment in,
 open the [Python Playground](/playground/python) in a new tab.
 </Callout>
 
-## A taste of what is coming
+## A taste of the deep end
 
-Here is a complete scientific computation you will be able to write
-and *understand deeply* by the end of the course — simulating a
-damped pendulum and visualizing its phase portrait.
+The opening benchmark was one line. Here is a complete scientific
+computation you will be able to write — and *understand deeply* — by
+the end: simulating a damped pendulum and visualizing its phase
+portrait. Run it now if you like; the point is not to follow every
+line yet, but to see where two short story chapters and a handful of
+foundations will take you.
 
 <CodeBlock
   adapter="python"

@@ -101,8 +101,8 @@ and are they the thing I actually want to predict?*
 In supervised learning the model learns a function from inputs to a known
 output: `y = f(X)`. You show it examples *with* their answers, it learns the
 relationship, and then it predicts answers for inputs it has never seen. This
-is the setting of every example so far in the course — iris species, wine
-classes, house prices — because supervised learning is the most common and
+is the setting of every example so far in the course — penguin species, house
+prices, loan defaults — because supervised learning is the most common and
 most directly useful kind.
 
 Supervised learning splits in two by the type of `y`:
@@ -112,33 +112,37 @@ Supervised learning splits in two by the type of `y`:
   of five products).
 
 Here is a compact supervised example. We train a `LogisticRegression`
-classifier on the iris flowers — a supervised task, because every training
-flower comes labeled with its true species — and then *score* it on held-out
-flowers. The crucial detail: we pass both `X` and `y` to `fit`, because
+classifier on the Palmer penguins — a supervised task, because every training
+penguin comes labeled with its true species — and then *score* it on held-out
+penguins. The crucial detail: we pass both `X` and `y` to `fit`, because
 supervised learning needs the answers to learn from.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
 # SUPERVISED: we have features X *and* labels y (the species).
-X, y = load_iris(return_X_y=True)
-print("We have labels. First few:", y[:8], "(species 0, 1, 2)")
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]
+print("We have labels. First few:", list(y[:5]))
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
 # Note: fit receives BOTH X and y -- the answers are the teacher.
-model = LogisticRegression(max_iter=1000)
+model = LogisticRegression(max_iter=2000)
 model.fit(X_train, y_train)
 
 # Because we have true labels for the test set, we can score accuracy.
 accuracy = model.score(X_test, y_test)
-print(f"Accuracy on held-out flowers: {accuracy:.0%}")
+print(f"Accuracy on held-out penguins: {accuracy:.0%}")
 `,
     },
   ]}
@@ -164,10 +168,13 @@ The most common form is **clustering**: grouping examples so that members of
 a group are similar to each other and different from other groups — without
 anyone ever telling the model what the "right" groups are.
 
-We will cluster synthetic data made of three natural blobs of points.
-Critically, although `make_blobs` *can* hand back the true blob labels, we
-**throw them away** and never give them to the model. `KMeans` sees only the
-point coordinates `X` and must discover the groupings on its own.
+We will cluster synthetic data made of three natural blobs of points. Synthetic
+blobs are the right choice here precisely *because* we control them: we know
+there really are three groups, so we can judge whether the algorithm recovers
+the structure we built in. Critically, although `make_blobs` *can* hand back
+the true blob labels, we **throw them away** and never give them to the model.
+`KMeans` sees only the point coordinates `X` and must discover the groupings on
+its own.
 
 <CodeBlock
   adapter="python"
@@ -217,16 +224,20 @@ Same library, same `fit` method — but one gets answers and one does not.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris, make_blobs
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.datasets import make_blobs
 from sklearn.linear_model import LogisticRegression
 from sklearn.cluster import KMeans
 
 # --- SUPERVISED: features AND labels ---
-Xs, ys = load_iris(return_X_y=True)
-sup = LogisticRegression(max_iter=1000)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+Xs, ys = penguins[features], penguins["species"]
+sup = LogisticRegression(max_iter=2000)
 sup.fit(Xs, ys)  # <-- two arguments: X and y
 print("Supervised  : fit(X, y)  -- learns mapping to a KNOWN target")
 print("              can predict the labeled answer for new data")
@@ -294,17 +305,21 @@ contrast in what is even *possible* is the clearest way to feel the divide.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris, make_blobs
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.datasets import make_blobs
 from sklearn.linear_model import LogisticRegression
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
 # --- SUPERVISED: known answers -> we can compute ACCURACY ---
-Xs, ys = load_iris(return_X_y=True)
-clf = LogisticRegression(max_iter=1000).fit(Xs, ys)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+Xs, ys = penguins[features], penguins["species"]
+clf = LogisticRegression(max_iter=2000).fit(Xs, ys)
 accuracy = clf.score(Xs, ys)  # compares predictions to KNOWN labels
 print("Supervised   -> accuracy is well-defined:", round(accuracy, 3))
 

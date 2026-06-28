@@ -65,14 +65,52 @@ lemmatization. That judgment is the real subject of this course.
   </g>
 </svg>
 
+## Your first taste, right now
+
+Enough preamble — let us actually *do* some NLP. The block below takes a
+sentence, splits it into words, and counts how often each one appears. It uses
+nothing but plain Python, so it runs the instant you press **Run** — no
+downloads, no waiting. **This whole course runs inside your browser**, and this
+is the first proof.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `from collections import Counter
+
+# Change this sentence to anything you like, then press Run again.
+sentence = "the cat sat on the mat and the cat purred"
+
+# Lowercase, split on spaces, and count each word.
+words = sentence.lower().split()
+counts = Counter(words)
+
+print("Words:        ", words)
+print("Most common:  ", counts.most_common(3))
+print("Distinct words:", len(counts))
+`,
+    },
+  ]}
+/>
+
+Three lines of real work — split, count, rank — and you already have a tiny
+text analysis. Try the one tweak the comment invites: **change the sentence**
+to a line of your own and run it again. Notice that "the" almost certainly tops
+the chart; that lopsidedness is a deep fact about language we will return to.
+And notice the catch already lurking: `"mat"` and `"mat,"` would count as two
+different words, because `.split()` knows nothing about punctuation. Fixing that
+properly is the first real lesson of the course.
+
 <Callout type="info" title="No setup required">
 Every code block on every page runs a full Python environment right here, in
 this page. There is nothing to install — no Python, no NLTK, no data
 packages. Edit the code, press **Run**, and the output appears beneath the
 editor. The challenge cards work the same way: write a solution, press
-**Check Answer**, and see which tests pass. Each interactive block quietly
-loads the NLTK data it needs in a collapsed, read-only setup section so you
-can focus entirely on the NLP code.
+**Check Answer**, and see which tests pass. The blocks that use NLTK quietly
+load the data they need in a collapsed, read-only setup section so you can
+focus entirely on the NLP code.
 </Callout>
 
 ## Who this course is for
@@ -136,13 +174,15 @@ text pipeline is really a tokenization or normalization mistake that
 propagated downstream. We establish those habits early and return to them on
 nearly every page.
 
-## A taste of what is coming
+## A taste of the full pipeline
 
-Here is a complete, classic NLP pipeline. It takes a short paragraph and runs
-it through the whole journey of this course: split into words, normalize,
-drop stopwords, reduce to dictionary roots, and count what is left. Press
-**Run** — and then open the collapsed setup section above the editor if you
-are curious what is being loaded for you.
+The counting demo above was pure Python. Here is what the *real* toolkit looks
+like: a complete, classic NLP pipeline that takes a short paragraph and runs it
+through the whole journey of this course — split into words, normalize, drop
+stopwords, reduce to dictionary roots, and count what is left. This one uses
+NLTK, so the first run pauses briefly to load the data it needs; press **Run**,
+and open the collapsed setup section above the editor if you are curious what is
+being loaded for you.
 
 <CodeBlock
   adapter="python"

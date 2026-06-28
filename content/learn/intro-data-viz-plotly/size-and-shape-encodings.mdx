@@ -44,23 +44,27 @@ We met `size=` in the chapter on bubble charts. The summary:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import plotly.express as px
+      initCode: `import pandas as pd
+import plotly.express as px
 
-df = px.data.iris()
-
-fig = px.scatter(
-    df,
-    x="sepal_width",
-    y="sepal_length",
+# Palmer Penguins — the friendly stand-in for the iris dataset.
+penguins = pd.read_csv("penguins.csv").dropna(
+    subset=["bill_depth_mm", "bill_length_mm", "flipper_length_mm"]
+)`,
+      starterCode: `fig = px.scatter(
+    penguins,
+    x="bill_depth_mm",
+    y="bill_length_mm",
     color="species",
-    size="petal_length",  # the extra variable
+    size="flipper_length_mm",  # the extra variable
     size_max=22,
     template="simple_white",
-    title="Iris: size encodes petal length",
-    labels={"sepal_width": "Sepal width (cm)", "sepal_length": "Sepal length (cm)"},
+    title="Penguins: size encodes flipper length",
+    labels={"bill_depth_mm": "Bill depth (mm)", "bill_length_mm": "Bill length (mm)"},
 )
 fig.show()
 `,
@@ -68,8 +72,8 @@ fig.show()
   ]}
 />
 
-The reader instantly sees that *setosa* (purple) has the smallest
-petals — without needing to read any individual value.
+The reader instantly sees that *Gentoo* penguins have the largest
+flippers — without needing to read any individual value.
 
 ### When `size` goes wrong
 
@@ -87,22 +91,23 @@ marker shape: circle, square, triangle, diamond, cross, etc.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import plotly.express as px
+      initCode: `import pandas as pd
+import plotly.express as px
 
-df = px.data.iris()
-
-fig = px.scatter(
-    df,
-    x="sepal_width",
-    y="sepal_length",
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `fig = px.scatter(
+    penguins,
+    x="bill_depth_mm",
+    y="bill_length_mm",
     color="species",
     symbol="species",
     template="simple_white",
-    title="Iris: redundant color and shape (helpful for B&W or colorblind)",
-    labels={"sepal_width": "Sepal width (cm)", "sepal_length": "Sepal length (cm)"},
+    title="Penguins: redundant color and shape (helpful for B&W or colorblind)",
+    labels={"bill_depth_mm": "Bill depth (mm)", "bill_length_mm": "Bill length (mm)"},
 )
 fig.show()
 `,

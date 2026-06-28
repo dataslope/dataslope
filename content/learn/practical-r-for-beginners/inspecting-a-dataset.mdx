@@ -260,22 +260,23 @@ and join.
 </Step>
 </Steps>
 
-## A multi-file walkthrough: meet `iris`
+## A multi-file walkthrough: meet the penguins
 
-Let's apply the ritual to a fresh dataset, with the inspection
+Let's apply the ritual to a fresh dataset — the **Palmer penguins**,
+staged as `penguins.csv` and loaded for you — with the inspection
 split across files so you can see each step clearly:
 
 <ChallengeCard
   adapter="r"
-  title="Inspect the iris dataset"
-  instructions={`Use the inspection ritual on \`iris\`. The starter code already loads the data, and there's a helper file with a "report" function. Complete \`main.R\` so the script prints shape, head, structure, and a summary. The test just checks that nothing errors.`}
+  title="Inspect the penguins dataset"
+  instructions={`Use the inspection ritual on \`penguins\` (already loaded from \`penguins.csv\`). There's a helper file \`report.R\` with a \`report()\` function. Complete \`main.R\` so the script prints shape, head, structure, a summary, and NAs per column. The test just checks that nothing errors.`}
   entryFilename="main.R"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.R",
+      initCode: `penguins <- read.csv("penguins.csv")`,
       starterCode: `source("report.R")
-
-data(iris)
 
 # 1. Shape
 # 2. head
@@ -287,13 +288,11 @@ data(iris)
 `,
       solutionCode: `source("report.R")
 
-data(iris)
-
-report("Shape", dim(iris))
-report("Head",  head(iris))
-report("Structure", str(iris))
-report("Summary", summary(iris))
-report("NAs per column", colSums(is.na(iris)))
+report("Shape", dim(penguins))
+report("Head",  head(penguins))
+report("Structure", str(penguins))
+report("Summary", summary(penguins))
+report("NAs per column", colSums(is.na(penguins)))
 `,
     },
     {

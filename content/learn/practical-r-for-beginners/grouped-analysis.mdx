@@ -259,27 +259,26 @@ mtcars |>
 column. Siblings: `slice_min()`, `slice_head()`, `slice_tail()`,
 `slice_sample()`.
 
-## A realistic example: iris by species
+## A realistic example: penguins by species
 
-`iris` has 150 flowers, 50 of each of three species. Per-species
-summary statistics are the natural question:
+The Palmer penguins come in three species. Per-species summary
+statistics are the natural question:
 
 <CodeBlock
   adapter="r"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.r",
-      starterCode: `library(dplyr)
-data(iris)
-
-iris |>
-  group_by(Species) |>
+      initCode: `library(dplyr)\npenguins <- read.csv("penguins.csv")\npenguins <- na.omit(penguins)`,
+      starterCode: `penguins |>
+  group_by(species) |>
   summarise(
-    n             = n(),
-    avg_sepal_len = mean(Sepal.Length),
-    avg_petal_len = mean(Petal.Length),
-    sd_petal_len  = sd(Petal.Length),
-    .groups       = "drop"
+    n           = n(),
+    avg_flipper = mean(flipper_length_mm),
+    avg_mass    = mean(body_mass_g),
+    sd_mass     = sd(body_mass_g),
+    .groups     = "drop"
   )
 `,
     },

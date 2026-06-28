@@ -8,11 +8,44 @@ basics — `SELECT`, `WHERE`, `JOIN`, maybe `GROUP BY` — and you can read a
 simple query without flinching. This course is about the *next* leap:
 using SQL not to power an application, but to **think with data**.
 
-That shift is bigger than it sounds. The same `SELECT` keyword that
-fetches one user's profile in an app can, with a different mindset,
-summarize ten million sales into a single trend line. Learning *how
-analysts wield SQL* — and *why* analytical queries are shaped the way
-they are — is the whole point of what follows.
+Here is what that looks like. The query below reaches across the internet
+to a 53,940-row Parquet file of diamond sales, summarizes it by cut, and
+hands you back five lines — **without downloading the file first.** Click
+*Run*, wait a second for the engine to wake up, and read the result. Then
+change one thing — swap `cut` for `color` in both the `SELECT` and the
+`GROUP BY` — and run it again.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="Query a file on the web, straight from your browser"
+  starterCode={`SELECT
+  cut,
+  COUNT(*) AS n,
+  ROUND(AVG(price), 0) AS avg_price
+FROM
+  read_parquet(
+    'https://cdn.jsdelivr.net/gh/dataslope/datasets@f7f08485960fe4a774359a43d1eb50a84514daf2/diamonds.parquet'
+  )
+GROUP BY
+  cut
+ORDER BY
+  avg_price DESC;`}
+/>
+
+Read what just happened. There was no upload, no import, no `CREATE
+TABLE` — DuckDB opened a remote file and scanned it in place, and the
+whole thing ran on a real database engine **inside this browser tab**.
+That is the shape of analytical SQL, and the shape of this entire course:
+the same `SELECT` keyword that fetches one user's profile in an app can,
+with a different mindset, condense tens of thousands of sales into a
+single ranked summary.
+
+<Callout type="info" title="This whole course runs in your browser">
+Every SQL example on every page runs on a real DuckDB engine — the actual
+database compiled to WebAssembly and loaded on demand. There is no server,
+no signup, and nothing to install. Edit the query, click *Run*, and the
+result appears right below the editor.
+</Callout>
 
 <svg
   viewBox="0 0 640 250"
@@ -71,13 +104,6 @@ they are — is the whole point of what follows.
     <rect x="369" y="154" width="17" height="24" rx="5" fillOpacity="0.4" />
   </g>
 </svg>
-
-<Callout type="info" title="Nothing to install">
-Every SQL example on every page runs **inside your browser** on a real
-DuckDB engine (DuckDB compiled to WebAssembly). There is no server, no
-signup, and nothing to install. Edit the query, click *Run*, and the
-results appear right below the editor.
-</Callout>
 
 ## Who this course is for
 
@@ -141,11 +167,14 @@ what an analyst reaches for when asking questions of data.
 
 ## How the course is organized
 
-We start with **mindset, not syntax**. The first section explains how
-analytical thinking differs from the application-development SQL you may
-have seen, and why a tool like DuckDB exists. Only then do we start
-querying — and from that point on, every new technique answers a *real
-analytical question* you already care about.
+Two short opening pages set the frame: how analytical (**OLAP**) work
+differs from the transactional (**OLTP**) SQL behind a typical app, and
+*why DuckDB* exists. After that you are querying real data on every page,
+and each new technique answers an analytical question you already care
+about. Near the end, an **Interesting discussions** section collects a
+couple of optional deep dives — the analyst's exploratory mindset, and the
+reproducibility habits that make analysis trustworthy — kept out of the
+main path so it never delays the hands-on work.
 
 ## The three kinds of interactive widgets
 
@@ -167,42 +196,9 @@ itself. If you want a single long-lived workspace to experiment in, open
 the [DuckDB Playground](/playground/duckdb) in a new tab.
 </Callout>
 
-## A first taste
-
-You do not need to understand this yet. Just click *Run* and notice how
-few lines it takes to turn a pile of individual sales into a ranked,
-per-region summary — the essence of analytical SQL.
-
-<SqlCodeBlock
-  dialect="duckdb"
-  title="From raw sales to a ranked summary"
-  initSql={`CREATE TABLE sales (region TEXT, product TEXT, amount DECIMAL(10, 2));
-
-INSERT INTO
-  sales
-VALUES
-  ('West', 'Widget', 120.00),
-  ('West', 'Gadget', 80.50),
-  ('East', 'Widget', 200.00),
-  ('East', 'Gadget', 50.00),
-  ('North', 'Widget', 75.25),
-  ('West', 'Widget', 60.00),
-  ('East', 'Widget', 90.00);`}
-  starterCode={`SELECT
-  region,
-  COUNT(*) AS orders,
-  SUM(amount) AS revenue,
-  ROUND(AVG(amount), 2) AS avg_order
-FROM
-  sales
-GROUP BY
-  region
-ORDER BY
-  revenue DESC;`}
-/>
-
-That query says, in almost plain English: *"For each region, how many
-orders were placed, how much money came in, and how big was the typical
-order — and show me the biggest regions first."* Reading the raw rows,
-you could not answer that in your head. The query does it instantly, and
-would do it just as instantly over ten million rows.
+The diamonds query at the top of this page was your first taste:
+*"for each cut, how many diamonds and what is the average price — biggest
+first."* You could not answer that by reading the raw rows. The query does
+it instantly, and would do it just as instantly over ten million. With the
+mindset set, let us make the difference between this kind of work and
+ordinary application SQL precise.

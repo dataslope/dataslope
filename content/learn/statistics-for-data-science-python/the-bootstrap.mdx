@@ -285,6 +285,48 @@ the bootstrap is a data scientist's Swiss-army knife: when you can't find
 (or trust) a formula, you can almost always bootstrap.
 </Callout>
 
+### On real data: a CI for a median penguin
+
+The synthetic income data made the point; a real dataset makes it stick.
+The **Palmer penguins** dataset records body mass for 123 Gentoo
+penguins. What's a 95% confidence interval for their *median* mass? No
+formula required — resample and read off the percentiles.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+import pandas as pd
+rng = np.random.default_rng(0)
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `gentoo_mass = penguins.loc[
+    penguins["species"] == "Gentoo", "body_mass_g"
+].dropna().to_numpy()
+
+B = 5000
+boot_medians = np.array([
+    np.median(rng.choice(gentoo_mass, size=len(gentoo_mass), replace=True))
+    for _ in range(B)
+])
+ci_low, ci_high = np.percentile(boot_medians, [2.5, 97.5])
+
+print(f"observed median mass : {np.median(gentoo_mass):,.0f} g")
+print(f"95% bootstrap CI     : ({ci_low:,.0f} g, {ci_high:,.0f} g)")
+print(f"based on n = {len(gentoo_mass)} Gentoo penguins")
+`,
+    },
+  ]}
+/>
+
+The interval is the honest version of "the typical Gentoo weighs about
+5 kg": a range that accounts for the fact that these 123 penguins are
+just a sample of all Gentoo penguins. Notice the CI is narrow because the
+sample is decent-sized and body mass isn't wildly skewed — exactly the
+conditions where the bootstrap behaves well.
+
 ## When to use the bootstrap — and when to be careful
 
 The bootstrap is general, but it is **not** magic. It estimates

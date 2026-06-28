@@ -146,6 +146,37 @@ time `n` is in the hundreds, t and normal are nearly identical, but
 reaching for `stats.t.interval` is the safe default that's never wrong.
 </Callout>
 
+The same three lines work on any real sample. Here's a 95% CI for the
+mean body mass of **Adelie penguins** — a real population parameter we
+can only estimate from the 151 birds that were measured.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+import pandas as pd
+from scipy import stats
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `mass = penguins.loc[penguins["species"] == "Adelie", "body_mass_g"].dropna()
+
+n = mass.size
+se = mass.std(ddof=1) / np.sqrt(n)
+low, high = stats.t.interval(0.95, df=n - 1, loc=mass.mean(), scale=se)
+
+print(f"n            = {n} Adelie penguins")
+print(f"sample mean  = {mass.mean():.0f} g")
+print(f"95% CI       = ({low:.0f} g, {high:.0f} g)")
+print()
+print("We measured 151 birds; this interval is our honest claim about")
+print("the mean mass of ALL Adelie penguins, not just the ones we weighed.")
+`,
+    },
+  ]}
+/>
+
 ## What "95% confidence" really means
 
 Here is the sentence almost everyone gets wrong. A 95% confidence level

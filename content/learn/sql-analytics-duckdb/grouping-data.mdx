@@ -81,37 +81,32 @@ flowchart TB
 ```
 
 The result has **one row per group**, with the grouping column(s) plus
-whatever you aggregated.
+whatever you aggregated. Here it is over the real diamonds file: one line
+per cut, summarizing 53,940 stones.
 
 <SqlCodeBlock
   dialect="duckdb"
-  title="Revenue per region"
-  initSql={`CREATE TABLE orders (id INTEGER, region TEXT, amount DECIMAL(8, 2));
-
-INSERT INTO
-  orders
-VALUES
-  (1, 'West', 120),
-  (2, 'East', 80),
-  (3, 'West', 45),
-  (4, 'East', 200),
-  (5, 'North', 60),
-  (6, 'West', 95),
-  (7, 'East', 30);`}
+  title="Count, average carat, and average price per cut"
   starterCode={`SELECT
-  region,
-  COUNT(*) AS orders,
-  SUM(amount) AS revenue,
-  ROUND(AVG(amount), 2) AS avg_order
+  cut,
+  COUNT(*) AS n,
+  ROUND(AVG(carat), 2) AS avg_carat,
+  ROUND(AVG(price), 0) AS avg_price
 FROM
-  orders
+  read_parquet(
+    'https://cdn.jsdelivr.net/gh/dataslope/datasets@f7f08485960fe4a774359a43d1eb50a84514daf2/diamonds.parquet'
+  )
 GROUP BY
-  region
+  cut
 ORDER BY
-  revenue DESC;`}
+  avg_price DESC;`}
 />
 
-Read the result as a small report: each line is one region, summarized.
+Read the result as a small report: each line is one cut, summarized. Look
+closely and the order may surprise you — average price does *not* simply
+track cut quality, because the cuts differ in their typical `carat`, and
+size drives price hard. Noticing that mismatch, then asking *why*, is
+exactly the kind of thread an analyst pulls on next.
 
 ## The golden rule of `GROUP BY`
 
@@ -308,6 +303,60 @@ The golden rule: every selected column must be grouped or aggregated.`}
 
 Grouping by multiple columns yields one summary row per combination of
 their values.`}
+/>
+
+## Your turn
+
+A quick win on real data. The diamonds file is loaded into a table called
+`diamonds`; group it by `color` and report the count and average price.
+
+<SqlChallengeCard
+  dialect="duckdb"
+  title="Average price per diamond color"
+  instructions={`The table \`diamonds\` is pre-loaded. Return one row per \`color\` with columns \`color\`, \`n\` (the row count), and \`avg_price\` (the average \`price\` rounded to the nearest whole number). Sort by \`avg_price\` descending.`}
+  initSql={`CREATE TABLE diamonds AS
+SELECT
+  *
+FROM
+  read_parquet(
+    'https://cdn.jsdelivr.net/gh/dataslope/datasets@f7f08485960fe4a774359a43d1eb50a84514daf2/diamonds.parquet'
+  );`}
+  starterCode={`SELECT
+  color,
+  COUNT(*) AS n,
+  -- replace the 0 with the rounded average price
+  0 AS avg_price
+FROM
+  diamonds
+GROUP BY
+  color
+ORDER BY
+  avg_price DESC;`}
+  solutionSql={`SELECT
+  color,
+  COUNT(*) AS n,
+  ROUND(AVG(price), 0) AS avg_price
+FROM
+  diamonds
+GROUP BY
+  color
+ORDER BY
+  avg_price DESC;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Has the required columns",
+      description: "color, n, avg_price",
+      expectedColumnsInclude: ["color", "n", "avg_price"],
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Same rows, same order",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
 />
 
 `GROUP BY` is so central that DuckDB adds conveniences to make it terser

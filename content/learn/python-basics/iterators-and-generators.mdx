@@ -579,8 +579,10 @@ Example: \`list(batched([1, 2, 3, 4, 5], 2))\` returns \`[(1, 2), (3, 4), (5,)]\
   files={[
     {
       filename: "main.py",
+      initCode: `from itertools import islice
+`,
       starterCode: `def batched(iterable, n):
-    # your code here
+    # your code here. Hint: islice(iterator, n) takes the next n items.
     if False:
         yield ()
 `,
@@ -591,9 +593,6 @@ Example: \`list(batched([1, 2, 3, 4, 5], 2))\` returns \`[(1, 2), (3, 4), (5,)]\
         if not batch:
             break
         yield batch
-
-
-from itertools import islice
 `,
     },
   ]}

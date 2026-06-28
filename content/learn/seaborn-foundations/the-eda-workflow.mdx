@@ -96,12 +96,13 @@ the first few rows look like? Which columns have missing values?
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
 
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # How big is the table? (rows, columns)
 print("shape:", penguins.shape)
@@ -139,13 +140,15 @@ spread is, and whether there is more than one peak.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # Distribution of a single numeric variable.
 sns.displot(
@@ -176,13 +179,15 @@ measurements — **flipper length** and **body mass** — and coloring by
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # Two numeric variables, colored by a categorical group.
 sns.relplot(
@@ -292,6 +297,7 @@ as a settled conclusion.
 
 <ChallengeCard
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Run step 1 on penguins"
   instructions={`Practice the very first move of the loop: understanding a dataset's
 structure. Using the \`penguins\` dataset, compute two facts and store each in
@@ -306,9 +312,9 @@ Hint: \`df.shape\` is a \`(rows, columns)\` tuple, and
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
 
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # How many rows are there?
 n_rows = None
@@ -318,9 +324,9 @@ missing_sex = None
 
 print("rows:", n_rows, "| missing sex:", missing_sex)
 `,
-      solutionCode: `import seaborn as sns
+      solutionCode: `import pandas as pd
 
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 n_rows = penguins.shape[0]
 missing_sex = int(penguins["sex"].isna().sum())

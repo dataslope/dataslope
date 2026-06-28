@@ -322,6 +322,44 @@ a huge sample yet have a tiny d. We treat effect sizes properly in
 a difference *matters*.
 </Callout>
 
+### The same test on real data: do two penguin species differ?
+
+Synthetic A/B numbers are convenient, but the test works identically on
+real measurements. The **Palmer penguins** dataset records body
+measurements for 344 penguins of three species. A natural question: do
+**Adelie** and **Gentoo** penguins have different average flipper
+lengths? We drop the missing values, then run the exact same Welch's
+test.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+from scipy import stats
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `# Flipper length (mm), one group per species. dropna() removes missing rows.
+adelie = penguins.loc[penguins["species"] == "Adelie", "flipper_length_mm"].dropna()
+gentoo = penguins.loc[penguins["species"] == "Gentoo", "flipper_length_mm"].dropna()
+
+res = stats.ttest_ind(adelie, gentoo, equal_var=False)  # Welch's
+
+print(f"Adelie mean : {adelie.mean():.1f} mm  (n = {len(adelie)})")
+print(f"Gentoo mean : {gentoo.mean():.1f} mm  (n = {len(gentoo)})")
+print(f"Welch t = {res.statistic:.1f},  p = {res.pvalue:.2e}")
+`,
+    },
+  ]}
+/>
+
+The gap is enormous — Gentoo flippers average about 27 mm longer — and
+the p-value is so small it's printed in scientific notation. This is the
+*easy* case: a difference this large in samples this size leaves no doubt
+the species differ. Real analyses are rarely this clean, which is exactly
+why we needed a test rather than eyeballing the means.
+
 ## Paired t-test: the same units, measured twice
 
 **The question it answers:** when you measure the *same* unit under two

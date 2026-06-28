@@ -137,12 +137,13 @@ Let's actually look at a couple of them rather than just listing columns.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
 
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 display(penguins.head())
 `,
     },
@@ -163,6 +164,18 @@ display(flights.head())
     },
   ]}
 />
+
+<Callout type="info" title="Why some blocks read a CSV instead of load_dataset">
+You'll notice the `penguins` block above used
+`pd.read_csv("penguins.csv")` while the `flights` block used
+`sns.load_dataset("flights")`. They reach the *same* kind of object — a
+pandas DataFrame — but by different roads. `sns.load_dataset` downloads
+from Seaborn's online example repository each time. For the two datasets
+this course leans on most, **penguins** and **diamonds**, we instead stage
+a pinned, cached copy and read it as a local file, so those examples load
+fast and identically every run. Seaborn plots any DataFrame, so the plot
+code that follows is exactly the same either way.
+</Callout>
 
 <Callout type="tip" title="See what's available">
 Curious what else ships with Seaborn? `sns.get_dataset_names()` returns the
@@ -245,13 +258,15 @@ Here is `whitegrid` — a white canvas with subtle gridlines.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
 `,
@@ -264,13 +279,15 @@ marks on the axes — a tidy, minimal look favored in many publications.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="ticks")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
 `,
@@ -283,13 +300,15 @@ colored points stand out.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="dark")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 sns.scatterplot(data=penguins, x="flipper_length_mm", y="body_mass_g")
 `,

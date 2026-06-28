@@ -106,27 +106,31 @@ yet from the outside they are nearly indistinguishable.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import make_regression, load_iris, make_blobs
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.datasets import make_regression, make_blobs
 from sklearn.linear_model import LinearRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.cluster import KMeans
 
-# 1) REGRESSION -- predict a number
+# 1) REGRESSION -- predict a number (synthetic data, just to show the shape)
 Xr, yr = make_regression(n_samples=80, n_features=3, noise=10, random_state=0)
 reg = LinearRegression()
 reg.fit(Xr, yr)  # <-- fit
 print("Regressor predicts:  ", round(float(reg.predict(Xr[:1])[0]), 1))  # <-- predict
 
-# 2) CLASSIFICATION -- predict a category
-Xc, yc = load_iris(return_X_y=True)
+# 2) CLASSIFICATION -- predict a category (real penguin species)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+Xc, yc = penguins[features], penguins["species"]
 clf = KNeighborsClassifier(n_neighbors=5)
 clf.fit(Xc, yc)  # <-- fit  (same method!)
 print("Classifier predicts: ", clf.predict(Xc[:1])[0])  # <-- predict
 
-# 3) CLUSTERING -- discover a group
+# 3) CLUSTERING -- discover a group (synthetic blobs, just to show the shape)
 Xk, _ = make_blobs(n_samples=80, centers=3, random_state=0)
 km = KMeans(n_clusters=3, n_init=10, random_state=0)
 km.fit(Xk)  # <-- fit  (same method again!)
@@ -188,14 +192,17 @@ and unit variance — and confirm it exposes `transform`, not `predict`.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
       starterCode: `from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LinearRegression
-from sklearn.datasets import load_iris
 
-X, y = load_iris(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
 
 # A TRANSFORMER: learns column stats with fit, then RESHAPES data with transform.
 scaler = StandardScaler()
@@ -241,17 +248,20 @@ perfect).
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
-X, y = load_iris(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X, y = penguins[features], penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
-model = LogisticRegression(max_iter=1000).fit(X_train, y_train)
+model = LogisticRegression(max_iter=2000).fit(X_train, y_train)
 
 # score on held-out data: for a classifier this is accuracy.
 print(f"Default score (accuracy here): {model.score(X_test, y_test):.3f}")
@@ -282,15 +292,17 @@ classes sum to 1 for each row.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
-from sklearn.linear_model import LogisticRegression
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.linear_model import LogisticRegression
 
-data = load_iris()
-X, y = data.data, data.target
-model = LogisticRegression(max_iter=1000).fit(X, y)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X, y = penguins[features], penguins["species"]
+model = LogisticRegression(max_iter=2000).fit(X, y)
 
 # Hard prediction: a single class label.
 print("predict gives a label:      ", model.predict(X[:1])[0])
@@ -299,7 +311,7 @@ print("predict gives a label:      ", model.predict(X[:1])[0])
 proba = model.predict_proba(X[:1])[0]
 print("predict_proba gives a vector:", proba.round(3))
 print("Probabilities sum to:        ", round(float(proba.sum()), 3))
-print("Most likely class:           ", data.target_names[proba.argmax()])
+print("Most likely class:           ", model.classes_[proba.argmax()])
 `,
     },
   ]}
@@ -328,14 +340,17 @@ same model, all with the standard methods.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_wine
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
-X, y = load_wine(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X, y = penguins[features], penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
 clf = KNeighborsClassifier(n_neighbors=5)
@@ -411,8 +426,9 @@ it works the same regardless of which estimator sits behind it.
   category="foundations · scikit-learn API"
   estimatedTime="~7 min"
   instructions={`A classifier object \`model\` (a \`KNeighborsClassifier\`) and a
-train/test split (\`X_train, X_test, y_train, y_test\` from the wine dataset)
-are already provided. Drive the model through the standard scikit-learn API.
+train/test split (\`X_train, X_test, y_train, y_test\` from the Palmer penguins
+dataset) are already provided. Drive the model through the standard
+scikit-learn API.
 
 1. **Train** the model on the training data using \`.fit(...)\`.
 2. Use \`.predict(...)\` on \`X_test\` and store the resulting array in
@@ -426,11 +442,14 @@ label per test row, that each row of \`probs\` sums to 1, and that
   files={[
     {
       filename: "main.py",
-      initCode: `from sklearn.datasets import load_wine
+      datasets: [{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }],
+      initCode: `import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
-X, y = load_wine(return_X_y=True)
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X, y = penguins[features], penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0
 )
@@ -486,6 +505,7 @@ assert len(predictions) == X_test.shape[0], f"Expected {X_test.shape[0]} predict
       code: `import numpy as np
 assert probs is not None, "probs is still None"
 assert probs.shape[0] == X_test.shape[0], "probs should have one row per test example"
+assert probs.shape[1] == len(model.classes_), "probs should have one column per class (three penguin species)."
 assert np.allclose(probs.sum(axis=1), 1.0), "Each row of predict_proba should sum to 1."`,
     },
     {
@@ -493,7 +513,8 @@ assert np.allclose(probs.sum(axis=1), 1.0), "Each row of predict_proba should su
       name: "Accuracy matches test-set score",
       description: "accuracy equals model.score on the test set",
       code: `assert accuracy is not None, "accuracy is still None"
-assert abs(accuracy - model.score(X_test, y_test)) < 1e-9, "accuracy should be model.score(X_test, y_test)."`,
+assert abs(accuracy - model.score(X_test, y_test)) < 1e-9, "accuracy should be model.score(X_test, y_test)."
+assert accuracy > 0.6, f"Accuracy on penguins should clear 0.6; got {accuracy}."`,
     },
   ]}
 />

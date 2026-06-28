@@ -199,30 +199,29 @@ Combine `dplyr` with the summary statistics we know:
 
 <CodeBlock
   adapter="r"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.r",
-      starterCode: `library(dplyr)
-data(iris)
-
-iris |>
-  group_by(Species) |>
+      initCode: `library(dplyr)\npenguins <- read.csv("penguins.csv")\npenguins <- na.omit(penguins)`,
+      starterCode: `penguins |>
+  group_by(species) |>
   summarise(
-    n            = n(),
-    mean_petal   = mean(Petal.Length),
-    median_petal = median(Petal.Length),
-    sd_petal     = sd(Petal.Length),
-    iqr_petal    = IQR(Petal.Length),
-    .groups      = "drop"
+    n           = n(),
+    mean_mass   = mean(body_mass_g),
+    median_mass = median(body_mass_g),
+    sd_mass     = sd(body_mass_g),
+    iqr_mass    = IQR(body_mass_g),
+    .groups     = "drop"
   )
 `,
     },
   ]}
 />
 
-In one table, you can see that *setosa* petals are much shorter
-and tighter than the others, while *virginica* petals are longer
-and more variable.
+In one table, you can see that *Gentoo* penguins are much heavier
+than the others, while *Adelie* and *Chinstrap* sit closer together
+and lighter.
 
 ## A subtlety: which mean for which question?
 

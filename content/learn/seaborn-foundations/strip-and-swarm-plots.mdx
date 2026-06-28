@@ -246,6 +246,7 @@ line — it changes only their horizontal placement, never the value.`}
 
 <ChallengeCard
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Show every penguin"
   instructions={`Use \`sns.catplot\` on the \`penguins\` dataset to show **every penguin's
 body mass**, grouped by species.
@@ -256,18 +257,20 @@ body mass**, grouped by species.
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # Build the plot showing every observation, and assign it to g:
 g = None
 `,
-      solutionCode: `import seaborn as sns
+      solutionCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 g = sns.catplot(data=penguins, x="species", y="body_mass_g", kind="swarm", height=4)
 `,

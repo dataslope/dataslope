@@ -61,31 +61,30 @@ flowchart TD
 
 ## Ranges with `BETWEEN`
 
-Numeric and date ranges come up constantly — a price band, a date window,
-an age bracket. `BETWEEN` reads naturally and is **inclusive** on both
-ends.
+Numeric ranges come up constantly — a price band, a carat bracket, an age
+window. `BETWEEN` reads naturally and is **inclusive** on both ends. Here
+we slice the real diamonds file down to a specific shopping bracket:
+one-carat stones priced between \$4,000 and \$5,000.
 
 <SqlCodeBlock
   dialect="duckdb"
-  title="Orders in a price band and a date window"
-  initSql={`CREATE TABLE orders AS
-SELECT
-  i AS id,
-  DATE '2024-01-01' + (i % 120) AS order_date,
-  (i * 13) % 300 + 10 AS amount
-FROM
-  range(1, 401) t (i);`}
+  title="Slice a price band and a carat band out of 53,940 diamonds"
   starterCode={`SELECT
-  id,
-  order_date,
-  amount
+  carat,
+  cut,
+  color,
+  price
 FROM
-  orders
+  read_parquet(
+    'https://cdn.jsdelivr.net/gh/dataslope/datasets@f7f08485960fe4a774359a43d1eb50a84514daf2/diamonds.parquet'
+  )
 WHERE
-  amount BETWEEN 100 AND 200
-  AND order_date BETWEEN DATE '2024-02-01' AND DATE  '2024-02-29'
+  price BETWEEN 4000 AND 5000
+  AND carat BETWEEN 1.0 AND 1.1
 ORDER BY
-  amount DESC;`}
+  price DESC
+LIMIT
+  10;`}
 />
 
 <Callout type="info" title="BETWEEN includes both endpoints">

@@ -61,22 +61,26 @@ score — and the *way* you summarize them encodes what you care about.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+diamonds = pd.read_csv("diamonds.csv")`,
       starterCode: `import numpy as np
-from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 
-X, y = load_diabetes(return_X_y=True)
+# Predict a diamond's price (in dollars) from its numeric measurements.
+X = diamonds[["carat", "depth", "table", "x", "y", "z"]]
+y = diamonds["price"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
 model = LinearRegression().fit(X_train, y_train)
 y_pred = model.predict(X_test)
 
-residuals = y_test - y_pred
-print("First five actuals:   ", np.round(y_test[:5], 1))
+residuals = y_test.to_numpy() - y_pred
+print("First five actuals:   ", np.round(y_test[:5].to_numpy(), 1))
 print("First five predicted: ", np.round(y_pred[:5], 1))
 print("First five residuals: ", np.round(residuals[:5], 1))
 `,
@@ -106,14 +110,16 @@ $$
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
-      initCode: `import numpy as np
-from sklearn.datasets import load_diabetes
+      initCode: `import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
-X, y = load_diabetes(return_X_y=True)
+diamonds = pd.read_csv("diamonds.csv")
+X = diamonds[["carat", "depth", "table", "x", "y", "z"]]
+y = diamonds["price"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 model = LinearRegression().fit(X_train, y_train)
 y_pred = model.predict(X_test)`,
@@ -122,8 +128,8 @@ y_pred = model.predict(X_test)`,
 mae = mean_absolute_error(y_test, y_pred)
 print(f"MAE: {mae:.1f}")
 print(
-    "Interpretation: on average the prediction is off by about",
-    f"{mae:.0f} units of the target.",
+    "Interpretation: on average the predicted price is off by about",
+    f"\${mae:.0f}.",
 )
 `,
     },
@@ -175,14 +181,16 @@ outlier predictions doing a lot of damage.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
-      initCode: `import numpy as np
-from sklearn.datasets import load_diabetes
+      initCode: `import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
-X, y = load_diabetes(return_X_y=True)
+diamonds = pd.read_csv("diamonds.csv")
+X = diamonds[["carat", "depth", "table", "x", "y", "z"]]
+y = diamonds["price"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 model = LinearRegression().fit(X_train, y_train)
 y_pred = model.predict(X_test)`,
@@ -264,17 +272,20 @@ error of a dumb baseline that always predicts the mean. So:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+diamonds = pd.read_csv("diamonds.csv")`,
       starterCode: `import numpy as np
-from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.dummy import DummyRegressor
 from sklearn.metrics import r2_score
 
-X, y = load_diabetes(return_X_y=True)
+X = diamonds[["carat", "depth", "table", "x", "y", "z"]]
+y = diamonds["price"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
 # The real model
@@ -322,20 +333,23 @@ randomly around zero with no pattern.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+diamonds = pd.read_csv("diamonds.csv")`,
       starterCode: `import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 
-X, y = load_diabetes(return_X_y=True)
+X = diamonds[["carat", "depth", "table", "x", "y", "z"]]
+y = diamonds["price"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 model = LinearRegression().fit(X_train, y_train)
 y_pred = model.predict(X_test)
-residuals = y_test - y_pred
+residuals = y_test.to_numpy() - y_pred
 
 plt.figure(figsize=(8, 5))
 plt.scatter(y_pred, residuals, color="#4f8ef7", alpha=0.7)
@@ -403,8 +417,9 @@ tolerate.
   title="Score a regression model three ways"
   category="model evaluation · regression metrics"
   estimatedTime="~7 min"
-  instructions={`A \`LinearRegression\` is already fit on the diabetes training set,
-and \`y_test\` / \`y_pred\` are available.
+  instructions={`A \`LinearRegression\` is already fit on the diamonds training
+set (predicting \`price\` from the numeric features), and \`y_test\` /
+\`y_pred\` are available.
 
 Compute and store:
 1. \`mae\` — the mean absolute error,
@@ -415,17 +430,20 @@ Compute and store:
 all comparing \`y_test\` to \`y_pred\`.
 
 The tests verify each value, confirm \`rmse >= mae\` (always true), and
-confirm \`r2\` is between 0 and 1 for this model.`}
+confirm \`r2\` lands in the range a numeric-feature linear model reaches on
+diamonds (around 0.85).`}
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
-      initCode: `import numpy as np
-from sklearn.datasets import load_diabetes
+      initCode: `import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error, root_mean_squared_error, r2_score
 
-X, y = load_diabetes(return_X_y=True)
+diamonds = pd.read_csv("diamonds.csv")
+X = diamonds[["carat", "depth", "table", "x", "y", "z"]]
+y = diamonds["price"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 model = LinearRegression().fit(X_train, y_train)
 y_pred = model.predict(X_test)`,
@@ -465,11 +483,11 @@ assert rmse >= mae, "RMSE should never be smaller than MAE"`,
     },
     {
       id: "r2_ok",
-      name: "R² is correct and in (0, 1) here",
-      description: "This model beats the mean baseline but is not perfect",
+      name: "R² is correct and in a sensible range for diamonds",
+      description: "This numeric-feature model explains most of the price variance",
       code: `from sklearn.metrics import r2_score
 assert r2 is not None and abs(r2 - r2_score(y_test, y_pred)) < 1e-6
-assert 0 < r2 < 1, f"Expected 0 < R2 < 1, got {r2}"`,
+assert 0.8 < r2 < 0.92, f"Expected 0.8 < R2 < 0.92 on diamonds, got {r2}"`,
     },
   ]}
 />

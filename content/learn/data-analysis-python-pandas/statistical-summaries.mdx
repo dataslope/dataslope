@@ -70,11 +70,12 @@ analyst needs.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+df = pd.read_csv("diamonds.csv")`,
       starterCode: `print(df.describe().round(2).T)
 `,
     },
@@ -89,11 +90,12 @@ For non-numeric columns:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+df = pd.read_csv("diamonds.csv")`,
       starterCode: `print(df.describe(include="object"))
 `,
     },
@@ -185,15 +187,16 @@ spread. IQR is more robust to outliers; std is more sensitive.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
-      starterCode: `print(df["Department"].value_counts())
+df = pd.read_csv("diamonds.csv")`,
+      starterCode: `print(df["cut"].value_counts())
 print()
 print("As percentages:")
-print((df["Department"].value_counts(normalize=True) * 100).round(1))
+print((df["cut"].value_counts(normalize=True) * 100).round(1))
 `,
     },
   ]}
@@ -206,11 +209,12 @@ for "what share of our customers are in each tier?".
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
+df = pd.read_csv("diamonds.csv")`,
       starterCode: `numeric = df.select_dtypes(include="number")
 corr = numeric.corr().round(2)
 print(corr)
@@ -235,19 +239,49 @@ driven by a third variable, or it could be coincidence. Always
 investigate further before claiming a cause.
 </Callout>
 
+The diamond columns are mostly about *size*, so they tend to move
+together. Correlation gets more revealing on a dataset whose columns
+measure genuinely different things. **California Housing** is all
+numeric — median income, house age, average rooms, location — so
+`.corr()` summarizes every pairing at once.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "california_housing.csv", stageAs: "housing.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+housing = pd.read_csv("housing.csv")`,
+      starterCode: `print(housing.corr().round(2))
+`,
+    },
+  ]}
+/>
+
+Two numbers stand out. `AveRooms` and `AveBedrms` correlate at
+**0.85** — no surprise, since bigger homes have more of both. But
+`Latitude` and `Longitude` correlate at **-0.92**, and that one is a
+trap: latitude does not *cause* longitude. They move together only
+because California is a long diagonal strip — head north and you tend
+to head west too. It is exactly the third-variable illusion the
+callout just warned about, hiding in plain sight in a dataset about
+houses.
+
 ## Grouped summaries
 
 The natural extension — `describe` per group:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
-df = pd.read_csv("https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv")`,
-      starterCode: `# Tenure summary per department
-print(df.groupby("Department")["time_spend_company"].describe().round(2))
+df = pd.read_csv("diamonds.csv")`,
+      starterCode: `# Price summary per cut
+print(df.groupby("cut")["price"].describe().round(0))
 `,
     },
   ]}

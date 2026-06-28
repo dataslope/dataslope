@@ -1,11 +1,11 @@
 ---
-title: Hello, World!
-description: Your first Python program, the print function, and comments
+title: Your First Python Program
+description: print, comments, docstrings, and the Zen of Python — writing real code from line one
 ---
 
-Tradition demands that the first program in any language print the
-words "Hello, World!". Python makes that exactly as short as you would
-hope.
+There is a tradition, almost as old as programming itself, that the first
+program you write in any language should print the words "Hello, World!".
+Python makes that exactly as short as you would hope.
 
 <CodeBlock
   adapter="python"
@@ -18,8 +18,11 @@ hope.
   ]}
 />
 
-That is the entire program. No `main`, no semicolons, no header
-files, no compilation step. Just one line.
+That is the entire program. No `main`, no semicolons, no header files, no
+compilation step. One line, and it runs. Compare that to the same program in
+C, which needs an `#include`, a `main` function, a `return`, and curly braces
+just to print one line. Python's brevity here is not an accident — it is a
+design value, and we will see where that value came from in a moment.
 
 <svg
   viewBox="0 0 640 190"
@@ -48,90 +51,80 @@ files, no compilation step. Just one line.
   </g>
 </svg>
 
+<Callout type="info" title="You don't need to install anything">
+Everything in this course runs in the browser, so there is nothing to set up.
+Later — when you want to run scripts on your own machine, install third-party
+libraries, and wire Python into your editor — you will install Python locally
+and create a *virtual environment*. We cover exactly how to do that near the
+end of the course, on the **Virtual Environments and pip** page. For now, the
+browser is your Python.
+</Callout>
+
 ## Why "Hello, World"?
 
-The phrase dates back to Brian Kernighan's 1972 tutorial for the B
-programming language, which later appeared in the classic book *The C
-Programming Language* (1978). It has been the ritual first program ever
-since. The choice is practical: printing output is the simplest form of
-**input/output (I/O)**, and every program is fundamentally about I/O —
-reading data, transforming it, and writing results. `print` is your
-first taste of that loop.
+The phrase has a real origin. It dates to Brian Kernighan, who used it in a
+1972 tutorial for the **B** programming language at Bell Labs, and it became
+famous when it reappeared in *The C Programming Language* (1978), the book he
+wrote with Dennis Ritchie. It has been the ritual first program ever since.
 
-## How it works: source to output
-
-When you write a Python program and run it, here is what happens:
-
-```mermaid
-sequenceDiagram
-    participant You as Your Editor
-    participant Interpreter as Python Interpreter
-    participant Output as Standard Output (stdout)
-    
-    You->>Interpreter: Save hello.py and run `python3 hello.py`
-    Interpreter->>Interpreter: Parse source code into bytecode
-    Interpreter->>Interpreter: Execute bytecode line-by-line
-    Interpreter->>Output: Write "Hello, World!" to stdout
-    Output->>You: Text appears in terminal
-```
-
-The Python interpreter reads your source code, compiles it to bytecode
-(a lower-level representation), and executes it instruction by
-instruction. When it hits `print(...)`, it writes to **standard
-output** — usually your terminal.
+The choice is also practical. Printing output is the simplest possible form of
+**input/output** — I/O — and every program is, at bottom, about I/O: it reads
+some data, transforms it, and writes some results. `print` is your first taste
+of that loop, which is why we begin here rather than with arithmetic or
+variables.
 
 ## The `print` function
 
-`print` is a built-in function that writes its arguments to standard
-output. It is more flexible than it might look at first.
+`print` is a built-in function that writes its arguments to **standard
+output** — usually the terminal, or in our case the output panel below each
+block. It is more flexible than it first looks.
 
-### Multiple arguments
+When you pass several arguments, `print` joins them with a space:
 
 <CodeBlock
   adapter="python"
   files={[
     {
       filename: "main.py",
-      starterCode: `# Multiple arguments are joined with spaces.
-print("Hello,", "World!")
+      starterCode: `print("Hello,", "World!")
 `,
     },
   ]}
 />
 
-### Changing the separator
+You can change that separator with the `sep` keyword. This is handy for joining
+fields without building a string by hand:
 
 <CodeBlock
   adapter="python"
   files={[
     {
       filename: "main.py",
-      starterCode: `# 'sep' changes the separator.
-print("2025", "11", "30", sep="-")
+      starterCode: `print("2025", "11", "30", sep="-")
 `,
     },
   ]}
 />
 
-### Changing the ending
+And you can change what gets printed *after* the arguments with `end`. By
+default that is a newline (`"\\n"`), which is why each `print` lands on its own
+line. Override it and two prints share a line:
 
 <CodeBlock
   adapter="python"
   files={[
     {
       filename: "main.py",
-      starterCode: `# 'end' changes what is appended (default is "\\n").
-print("loading", end="...")
+      starterCode: `print("loading", end="...")
 print("done")
 `,
     },
   ]}
 />
 
-### Printing any object
-
-You can print numbers, lists, dictionaries, and most other objects
-directly. Python will call `str(obj)` on each argument:
+Finally, `print` is not limited to strings. You can hand it numbers, lists,
+dictionaries, almost anything — Python calls `str()` on each argument to turn
+it into text first:
 
 <CodeBlock
   adapter="python"
@@ -149,17 +142,16 @@ print(3.14, type(3.14))
 
 ## Comments
 
-Comments start with `#` and run to the end of the line. Python has no
-native multi-line comment syntax; people sometimes use triple-quoted
-string literals for that, but a string is not the same as a comment.
+A comment is a note to humans that the interpreter ignores. In Python, a comment
+starts with `#` and runs to the end of the line.
 
 <CodeBlock
   adapter="python"
   files={[
     {
       filename: "main.py",
-      starterCode: `# This is a comment. The interpreter skips it.
-x = 1 + 2  # Comments can sit at the end of a line, too.
+      starterCode: `# This is a comment. The interpreter skips it entirely.
+x = 1 + 2  # A comment can also sit at the end of a line.
 
 print(x)
 `,
@@ -167,13 +159,12 @@ print(x)
   ]}
 />
 
-### Why not multi-line comments?
-
-Many languages have `/* ... */` or `(* ... *)` for multi-line comments.
-Python does not, by design. Guido's rationale was that long comments
-should be broken into shorter lines anyway for readability, and
-triple-quoted strings serve the "comment out a block" use case well
-enough.
+Notice what Python does *not* have: a `/* ... */` style for multi-line comments.
+That omission is deliberate. The rationale was that long comments should be
+broken into short lines anyway, and a block of `#` lines does that job fine.
+People sometimes use a triple-quoted string to "comment out" a block, but be
+careful — that is a string the interpreter actually evaluates and then throws
+away, not a true comment:
 
 <CodeBlock
   adapter="python"
@@ -181,10 +172,9 @@ enough.
     {
       filename: "main.py",
       starterCode: `"""
-This is a string literal, not a comment.
-Python does evaluate it, then immediately throws it away
-because nothing keeps a reference. It is fine for short
-notes at the top of a file, but '#' is the real comment.
+This is a string literal, not a comment. Python evaluates it,
+then discards it because nothing keeps a reference. It is fine
+for short notes at the top of a file, but '#' is the real comment.
 """
 
 x = 10
@@ -196,9 +186,10 @@ print(x)
 
 ## Docstrings
 
-A string at the very top of a module, function, or class is called a
-**docstring**. Tools like `help()`, IDEs, and the `pydoc` command read
-these to show documentation.
+There is one place where that "string at the top" trick is not a throwaway. A
+string written as the **first statement** of a module, function, or class is
+called a **docstring**, and Python keeps it around. Tools like `help()`, your
+editor, and documentation generators read it to show what your code does.
 
 <CodeBlock
   adapter="python"
@@ -216,17 +207,42 @@ help(add)
   ]}
 />
 
-Docstrings are a convention, not a language feature, but they are so
-ubiquitous that Python treats them specially: they are stored in the
-`__doc__` attribute of the object.
+Run that and you will see Python report the docstring back to you. It is stored
+in the function's `__doc__` attribute. Docstrings are a convention rather than a
+language keyword, but they are so universal that the whole Python tooling
+ecosystem is built around them.
 
-<Callout type="info" title="PEP 257: Docstring conventions">
-[PEP 257](https://peps.python.org/pep-0257/) lays out the conventions:
-use triple double-quotes `"""like this"""`, write a one-line summary
-first, and add details in subsequent paragraphs. Most documentation
-generators (Sphinx, MkDocs, pdoc) parse these docstrings to build API
-references.
+<Callout type="info" title="PEP 257: how to write a docstring">
+[PEP 257](https://peps.python.org/pep-0257/) lays out the conventions: use
+triple double-quotes (`"""like this"""`), put a one-line summary first, and add
+details in later paragraphs. Documentation tools such as Sphinx, MkDocs, and
+pdoc parse these docstrings to build entire API references automatically.
 </Callout>
+
+## The Zen of Python
+
+Python's brevity, its dislike of boilerplate, its preference for one obvious way
+to do things — these are not random. They are written down. Run the line below:
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import this
+`,
+    },
+  ]}
+/>
+
+What prints is **the Zen of Python**, a set of 19 guiding aphorisms — "Beautiful
+is better than ugly," "Explicit is better than implicit," "Simple is better than
+complex," "Readability counts." They were written by **Tim Peters**, one of
+Python's most prolific early contributors, and they have been hidden inside
+Python as an Easter egg since 2004. You can return to them any time by running
+`import this`. They explain a surprising amount of why Python looks the way it
+does — including the most famous decision of all, which we tackle on the next
+page: significant whitespace.
 
 ## Your first challenges
 
@@ -239,9 +255,9 @@ references.
 Hello, Grace!
 \`\`\`
 
-Do not hardcode the literal string \`"Hello, Grace!"\`; instead, define a
-variable \`name = "Grace"\` and use it in your \`print\` call. You can use
-string concatenation, f-strings, or \`.format()\`.`}
+Do not hardcode the literal string \`"Hello, Grace!"\`. The variable \`name = "Grace"\`
+is already defined for you — use it in your \`print\` call. You can use string
+concatenation, an f-string, or \`.format()\`.`}
   files={[
     {
       filename: "main.py",
@@ -267,14 +283,15 @@ print(f"Hello, {name}!")
 
 <ChallengeCard
   adapter="python"
-  title="Print with custom separator"
+  title="Print with a custom separator"
   instructions={`Use a single \`print\` call to output:
 
 \`\`\`
 apple:banana:cherry
 \`\`\`
 
-Pass three separate arguments to \`print\` (not one concatenated string) and use the \`sep\` parameter to join them with \`":"\`.`}
+Pass three separate arguments to \`print\` (not one pre-joined string) and use the
+\`sep\` parameter to join them with \`":"\`.`}
   files={[
     {
       filename: "main.py",
@@ -329,7 +346,7 @@ print("a", "b", "c", sep="-", end="!")
 />
 
 <MultipleChoice
-  markdown={`Which of the following is the correct way to print "Hello" without a trailing newline?
+  markdown={`Which of the following prints "Hello" with no trailing newline?
 
 - \`print("Hello", newline=False)\`
   > The parameter is named \`end\`, not \`newline\`.
@@ -341,5 +358,7 @@ print("a", "b", "c", sep="-", end="!")
   > \`sep\` controls how multiple arguments are joined, not the ending.`}
 />
 
-You have run code, written a comment, and added a docstring. Next we
-will look at why those four spaces of indentation matter so much.
+You have run code, printed in three different ways, written a comment, added a
+docstring, and met the Zen of Python. Next we will look at why those four
+spaces of indentation matter so much — the one rule that defines how Python
+looks.

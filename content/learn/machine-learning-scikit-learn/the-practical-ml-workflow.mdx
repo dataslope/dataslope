@@ -147,21 +147,26 @@ most common class; for regression, `DummyRegressor` always predicts the
 mean. These are deliberately stupid — and that is the point.
 
 A baseline answers the question "is my real model actually adding value, or
-just clearing a bar a coin flip could clear?" If your dataset is 90% one
-class, a baseline scores 90% accuracy by doing nothing. A "great" 91% model
-suddenly looks far less great. Without a baseline, you cannot tell skill
-from the appearance of skill.
+just clearing a bar a coin flip could clear?" If your dataset is mostly one
+class, a baseline scores that fraction by doing nothing. Our penguins are
+mildly lopsided — Adelie is the largest of the three species — so a
+majority-class guess already gets a meaningful slice right. Without a
+baseline, you cannot tell skill from the appearance of skill.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.dummy import DummyClassifier
 
-X, y = load_breast_cancer(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0, stratify=y
 )
@@ -197,9 +202,10 @@ is not a convenience; it is the mechanism that makes leak-free evaluation
 preprocessing step on each fold's training portion only — so test-fold
 statistics never leak into the fit.
 
-For the breast-cancer data, the model is a `LogisticRegression`, which
-benefits from scaled features, so the pipeline is a `StandardScaler`
-followed by the model.
+For the penguins data, the model is a `LogisticRegression`, which benefits
+from scaled features — the four measurements live on very different scales
+(body mass in grams dwarfs bill depth in millimetres) — so the pipeline is a
+`StandardScaler` followed by the model.
 
 <CodeBlock
   adapter="python"
@@ -215,7 +221,7 @@ from sklearn.linear_model import LogisticRegression
 pipe = Pipeline(
     [
         ("scaler", StandardScaler()),
-        ("model", LogisticRegression(max_iter=5000)),
+        ("model", LogisticRegression(max_iter=2000)),
     ]
 )
 
@@ -238,16 +244,20 @@ Run it on the training data only. The test set is still sealed.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import train_test_split, cross_val_score
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 
-X, y = load_breast_cancer(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0, stratify=y
 )
@@ -255,7 +265,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 pipe = Pipeline(
     [
         ("scaler", StandardScaler()),
-        ("model", LogisticRegression(max_iter=5000)),
+        ("model", LogisticRegression(max_iter=2000)),
     ]
 )
 
@@ -282,16 +292,20 @@ the CV score risks overfitting the validation folds.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import train_test_split, GridSearchCV
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 
-X, y = load_breast_cancer(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0, stratify=y
 )
@@ -299,7 +313,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 pipe = Pipeline(
     [
         ("scaler", StandardScaler()),
-        ("model", LogisticRegression(max_iter=5000)),
+        ("model", LogisticRegression(max_iter=2000)),
     ]
 )
 
@@ -334,16 +348,20 @@ real-world performance, the one you report and the one you can defend.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import train_test_split, GridSearchCV
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 
-X, y = load_breast_cancer(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0, stratify=y
 )
@@ -351,7 +369,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 pipe = Pipeline(
     [
         ("scaler", StandardScaler()),
-        ("model", LogisticRegression(max_iter=5000)),
+        ("model", LogisticRegression(max_iter=2000)),
     ]
 )
 search = GridSearchCV(pipe, {"model__C": [0.1, 1.0, 10.0]}, cv=5)
@@ -401,28 +419,32 @@ work through the steps again with new data in hand.
 
 ## The complete worked example, start to finish
 
-Here is the entire workflow in one runnable block — frame (binary tumor
-classification, scored by accuracy against a baseline), inspect, split,
-baseline, pipeline, cross-validate, tune, and the single final test
-evaluation. This is the shape of nearly every honest scikit-learn project.
+Here is the entire workflow in one runnable block — frame (predict penguin
+species from four body measurements, scored by accuracy against a baseline),
+inspect, split, baseline, pipeline, cross-validate, tune, the single final
+test evaluation, and a quick look at what the model leaned on. This is the
+shape of nearly every honest scikit-learn project.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.dummy import DummyClassifier
 
 # Step 2: inspect
-data = load_breast_cancer()
-X, y = data.data, data.target
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]
 print(f"Rows: {X.shape[0]}, Features: {X.shape[1]}")
-print(f"Class balance: {int((y == 1).sum())} benign, {int((y == 0).sum())} malignant")
+print("Class balance:", y.value_counts().to_dict())
 
 # Step 3: split FIRST, then lock the test set away
 X_train, X_test, y_train, y_test = train_test_split(
@@ -438,7 +460,7 @@ print(f"\\nBaseline CV accuracy: {base_cv:.3f}")
 pipe = Pipeline(
     [
         ("scaler", StandardScaler()),
-        ("model", LogisticRegression(max_iter=5000)),
+        ("model", LogisticRegression(max_iter=2000)),
     ]
 )
 
@@ -455,17 +477,25 @@ print(f"Best C: {search.best_params_['model__C']}, tuned CV: {search.best_score_
 test_acc = search.best_estimator_.score(X_test, y_test)
 print(f"\\nFINAL test accuracy: {test_acc:.3f}")
 print(f"(Baseline was {base_cv:.3f} -- the model clears it comfortably.)")
+
+# Step 9: interpret -- which measurements drive the predictions?
+import numpy as np
+model = search.best_estimator_.named_steps["model"]
+strength = np.abs(model.coef_).mean(axis=0)
+for name, weight in sorted(zip(features, strength), key=lambda p: -p[1]):
+    print(f"  {name}: {weight:.2f}")
 `,
     },
   ]}
 />
 
-Read the output as a story: the data is mildly imbalanced, the baseline sits
-in the low-sixties, the pipeline leaps far above it under cross-validation,
-a tiny grid search nudges it a touch further, and a single test-set
-evaluation confirms the gain is real. Every number was earned honestly,
-because the test set sat untouched until the final line. That is the
-workflow.
+Read the output as a story: the three species are mildly imbalanced (Adelie
+is the largest group), the majority-class baseline sits in the low-forties,
+the scaled pipeline leaps far above it under cross-validation, a tiny grid
+search nudges it a touch further, and a single test-set evaluation confirms
+the gain is real. The closing lines rank the four measurements by how hard
+the model leans on them. Every number was earned honestly, because the test
+set sat untouched until the final line. That is the workflow.
 
 <Callout type="success" title="The shape never changes">
 Frame, inspect, split, baseline, pipeline, cross-validate, tune, test once,
@@ -507,17 +537,18 @@ and metrics change; the disciplined order does not.
 
 <ChallengeCard
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Run a mini end-to-end workflow"
   category="workflow · end-to-end"
   estimatedTime="~9 min"
-  instructions={`Walk the core of the workflow on the wine dataset, in order.
+  instructions={`Walk the core of the workflow on the penguins dataset, in order.
 
-1. The data is loaded as \`X\`, \`y\`. **Split first**: 25% test,
-   \`random_state=0\`, stratified on \`y\`, into \`X_train\`, \`X_test\`,
-   \`y_train\`, \`y_test\`.
+1. The data is loaded as \`X\` (four body measurements) and \`y\` (species).
+   **Split first**: 25% test, \`random_state=0\`, stratified on \`y\`, into
+   \`X_train\`, \`X_test\`, \`y_train\`, \`y_test\`.
 2. Build a \`Pipeline\` called \`pipe\` with two steps named exactly
    \`"scaler"\` (a \`StandardScaler\`) and \`"model"\` (a
-   \`LogisticRegression(max_iter=5000)\`).
+   \`LogisticRegression(max_iter=2000)\`).
 3. Cross-validate \`pipe\` on the **training** data with \`cv=5\` and store
    the mean accuracy in \`cv_mean\` (use \`cross_val_score(...).mean()\`).
 4. Fit \`pipe\` on the full training data, then evaluate it **once** on the
@@ -529,13 +560,16 @@ accuracy, and that \`test_score\` is a valid accuracy.`}
   files={[
     {
       filename: "main.py",
-      initCode: `from sklearn.datasets import load_wine
+      initCode: `import pandas as pd
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 
-X, y = load_wine(return_X_y=True)`,
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]`,
       starterCode: `# 1. Split FIRST (25% test, random_state=0, stratified)
 X_train, X_test, y_train, y_test = None, None, None, None
 
@@ -560,7 +594,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 pipe = Pipeline(
     [
         ("scaler", StandardScaler()),
-        ("model", LogisticRegression(max_iter=5000)),
+        ("model", LogisticRegression(max_iter=2000)),
     ]
 )
 
@@ -580,9 +614,11 @@ print("Test score:", test_score)
     {
       id: "split_sizes",
       name: "Split is 25% test, stratified",
-      description: "133 train rows and 45 test rows for 178 wine samples",
-      code: `assert X_train.shape[0] == 133, f"Expected 133 train rows, got {X_train.shape[0]}"
-assert X_test.shape[0] == 45, f"Expected 45 test rows, got {X_test.shape[0]}"`,
+      description: "Test set is 25% of the rows and train + test covers them all",
+      code: `n = len(X)
+expected_test = round(n * 0.25)
+assert X_test.shape[0] == expected_test, f"Expected {expected_test} test rows, got {X_test.shape[0]}"
+assert X_train.shape[0] + X_test.shape[0] == n, f"Train + test should equal {n}, got {X_train.shape[0] + X_test.shape[0]}"`,
     },
     {
       id: "pipeline_shape",
@@ -596,14 +632,14 @@ assert step_names == ["scaler", "model"], f"Expected steps ['scaler', 'model'], 
     {
       id: "cv_mean_sane",
       name: "cv_mean is a believable CV accuracy",
-      description: "Cross-validated accuracy is high and in [0, 1]",
-      code: `assert cv_mean is not None and 0.5 <= cv_mean <= 1.0, f"cv_mean {cv_mean} is not a believable accuracy"`,
+      description: "Cross-validated accuracy is strong and in [0, 1]",
+      code: `assert cv_mean is not None and 0.9 <= cv_mean <= 1.0, f"cv_mean {cv_mean} is not a believable scaled-pipeline accuracy"`,
     },
     {
       id: "test_valid",
       name: "test_score is a valid accuracy",
-      description: "Final test accuracy is in [0, 1]",
-      code: `assert test_score is not None and 0.0 <= test_score <= 1.0, f"test_score {test_score} is not a valid accuracy"`,
+      description: "Final test accuracy is strong and in [0, 1]",
+      code: `assert test_score is not None and 0.85 <= test_score <= 1.0, f"test_score {test_score} is not a valid accuracy"`,
     },
   ]}
 />

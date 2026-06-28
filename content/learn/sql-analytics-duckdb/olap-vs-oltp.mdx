@@ -1,0 +1,322 @@
+---
+title: OLAP vs. OLTP — a Needle and a Net
+description: The same SQL keywords serve two very different jobs. Why analytical (OLAP) work scans columns while transactional (OLTP) work touches rows — and why that difference rewards a column-oriented, vectorized engine like DuckDB.
+---
+
+Most people meet SQL inside an **application**: a website saves a user's
+order, then reads it back on the "My Orders" page. That is real, useful
+SQL — but it is a *different job* from what an analyst does, even though
+both use the word `SELECT`. This page makes the difference precise,
+because almost every habit you build in this course flows from it: the
+shape of analytical questions, and the kind of engine that answers them
+fast.
+
+<svg
+  viewBox="0 0 640 215"
+  role="img"
+  aria-label="On the left a thin blue needle dives onto one highlighted cell among faint row strips; on the right a wide translucent net gathers a whole school of dots toward a single green summary value — application SQL finds one row fast, analytical SQL weighs the entire catch"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.11">
+    <rect x="48" y="58" width="172" height="13" rx="6.5" />
+    <rect x="48" y="80" width="172" height="13" rx="6.5" />
+    <rect x="48" y="102" width="172" height="13" rx="6.5" />
+    <rect x="48" y="124" width="172" height="13" rx="6.5" />
+    <rect x="48" y="146" width="172" height="13" rx="6.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="123" cy="108" r="16" fillOpacity="0.15" />
+    <rect x="106" y="102" width="34" height="13" rx="6.5" />
+    <path d="M 86 20 L 118 95 L 128 91 Z" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="262" cy="106" r="2.5" />
+    <circle cx="276" cy="106" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <ellipse cx="392" cy="112" rx="112" ry="80" fillOpacity="0.1" />
+    <ellipse cx="392" cy="112" rx="86" ry="60" fillOpacity="0.1" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="330" cy="92" r="4" />
+    <circle cx="356" cy="132" r="4" />
+    <circle cx="384" cy="72" r="4" />
+    <circle cx="402" cy="150" r="4" />
+    <circle cx="428" cy="96" r="4" />
+    <circle cx="442" cy="136" r="4" />
+    <circle cx="368" cy="106" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="346" cy="78" r="4.5" fillOpacity="0.8" />
+    <circle cx="412" cy="118" r="4.5" fillOpacity="0.8" />
+    <circle cx="378" cy="142" r="4.5" fillOpacity="0.8" />
+    <circle cx="436" cy="70" r="4.5" fillOpacity="0.8" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="514" cy="112" r="3" />
+    <circle cx="536" cy="112" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <circle cx="580" cy="112" r="22" fillOpacity="0.18" />
+    <circle cx="580" cy="112" r="13" />
+  </g>
+</svg>
+
+## Two jobs, one language
+
+Think of a busy online store.
+
+- The **application** asks tiny, sharply targeted questions, millions of
+  times a day: *"What is in cart #84213?"*, *"Save this new order."*,
+  *"Mark order #91 as shipped."* Each touches a handful of rows and must
+  return in milliseconds.
+- The **analyst** asks broad, exploratory questions, a few times a day:
+  *"Which product categories grew fastest last quarter?"*, *"Do
+  first-time buyers spend less than returning ones?"* Each sweeps across
+  *millions* of rows to produce a *small* summary.
+
+Same keywords, opposite shape. An application query is a **needle**: find
+this one row, fast. An analytical query is a **net**: drag it across the
+whole ocean and weigh the catch. These two patterns have formal names —
+**OLTP** (*Online Transaction Processing*, the needle) and **OLAP**
+(*Online Analytical Processing*, the net). You will not be quizzed on the
+acronyms, but what each workload *demands* explains everything that
+follows.
+
+A one-line way to remember it: **OLTP records what happened; OLAP explains
+what it means.** Every order an OLTP system saves becomes a row that, much
+later, an OLAP query sweeps up to find a trend.
+
+| Dimension | OLTP (transactional) | OLAP (analytical) |
+| --- | --- | --- |
+| Typical operation | Insert / update / point read | Large aggregating read |
+| Rows touched per query | A few | Thousands to billions |
+| Columns touched | Most of the row | A few of many |
+| Acceptable latency | Milliseconds | Seconds |
+| Concurrency | Many users at once | Few analysts at once |
+| Goal | Run the business | Understand the business |
+
+This course lives entirely on the OLAP side of that table.
+
+## What the analyst is really doing
+
+When you write SQL for analysis you are not maintaining the data — you are
+**interrogating** it. A typical analytical query **reads** data but rarely
+changes it; it **touches many rows to produce few** (a thousand orders
+become one average); and it **cares about columns, not rows** ("average
+`amount`" reads one column across every row). It is also *exploratory* —
+you rarely know the final query in advance, so you run one, look, and let
+the result suggest the next.
+
+The query below is deeply analytical: it reads *every* diamond in a remote
+53,940-row file but returns just **one summarizing line per cut**. No
+single diamond is the answer; the *pattern across diamonds* is.
+
+<SqlCodeBlock
+  dialect="duckdb"
+  title="A net, not a needle — 53,940 diamonds, five lines out"
+  starterCode={`SELECT
+  cut,
+  COUNT(*) AS n,
+  ROUND(AVG(carat), 2) AS avg_carat,
+  ROUND(AVG(price), 0) AS avg_price
+FROM
+  read_parquet(
+    'https://cdn.jsdelivr.net/gh/dataslope/datasets@f7f08485960fe4a774359a43d1eb50a84514daf2/diamonds.parquet'
+  )
+GROUP BY
+  cut
+ORDER BY
+  avg_price DESC;`}
+/>
+
+Notice there is no "find diamond #5" here. We deliberately *forgot* about
+individual stones to see the shape of the whole.
+
+## Why the *physical* shape differs: rows vs. columns
+
+Here is the idea that ties everything together — and the reason a tool
+like DuckDB feels fast for analysis. A database can store a table two ways.
+
+- **Row storage** keeps all of a row's values together. Perfect for OLTP:
+  "give me everything about order #4821" reads one contiguous chunk.
+- **Column storage** keeps all values of *one column* together. Perfect
+  for OLAP: "average `price` over 53,940 diamonds" reads just the `price`
+  column and skips everything else.
+
+Row store (good for OLTP) keeps each row's values together on disk:
+
+```text
+[id1 cut1 price1 carat1] [id2 cut2 price2 carat2] [id3 cut3 price3 carat3]
+```
+
+Column store (good for OLAP) keeps each column together instead:
+
+```text
+[id1 id2 id3] [cut1 cut2 cut3] [price1 price2 price3] [carat1 carat2 carat3]
+```
+
+When the diamonds query needed only `cut`, `carat`, and `price`, a column
+store reads *only* those stripes — never the columns it does not touch. On
+a wide table that can mean reading a small fraction of the data instead of
+all of it. That single design choice is most of why purpose-built
+analytical engines crush row-oriented databases on summary queries.
+
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="The same table stored two ways: on the left each row keeps its four mixed-color values side by side and one whole row is lit for a point read; on the right every column's values stand together as one vertical stripe and only the green column stripe glows — a column store reads just what the question needs"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="56" y="36" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="56" y="60" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="56" y="84" width="44" height="16" rx="5" fillOpacity="0.9" />
+    <rect x="56" y="108" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="56" y="132" width="44" height="16" rx="5" fillOpacity="0.22" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="106" y="36" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="106" y="60" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="106" y="84" width="44" height="16" rx="5" fillOpacity="0.9" />
+    <rect x="106" y="108" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="106" y="132" width="44" height="16" rx="5" fillOpacity="0.22" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="156" y="36" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="156" y="60" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="156" y="84" width="44" height="16" rx="5" fillOpacity="0.9" />
+    <rect x="156" y="108" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="156" y="132" width="44" height="16" rx="5" fillOpacity="0.22" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="206" y="36" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="206" y="60" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="206" y="84" width="44" height="16" rx="5" fillOpacity="0.9" />
+    <rect x="206" y="108" width="44" height="16" rx="5" fillOpacity="0.22" />
+    <rect x="206" y="132" width="44" height="16" rx="5" fillOpacity="0.22" />
+  </g>
+  <g fill="currentColor" opacity="0.25">
+    <rect x="86" y="168" width="134" height="4" rx="2" />
+  </g>
+  <g fill="currentColor" opacity="0.28">
+    <circle cx="306" cy="92" r="2.5" />
+    <circle cx="320" cy="92" r="2.5" />
+    <circle cx="334" cy="92" r="2.5" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <rect x="388" y="36" width="40" height="112" rx="8" fillOpacity="0.14" />
+    <rect x="396" y="44" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="396" y="64" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="396" y="84" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="396" y="104" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="396" y="124" width="24" height="14" rx="4" fillOpacity="0.3" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="438" y="30" width="44" height="124" rx="8" fillOpacity="0.3" />
+    <rect x="448" y="44" width="24" height="14" rx="4" />
+    <rect x="448" y="64" width="24" height="14" rx="4" />
+    <rect x="448" y="84" width="24" height="14" rx="4" />
+    <rect x="448" y="104" width="24" height="14" rx="4" />
+    <rect x="448" y="124" width="24" height="14" rx="4" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
+    <rect x="492" y="36" width="40" height="112" rx="8" fillOpacity="0.14" />
+    <rect x="500" y="44" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="500" y="64" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="500" y="84" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="500" y="104" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="500" y="124" width="24" height="14" rx="4" fillOpacity="0.3" />
+  </g>
+  <g style={{ color: "var(--ds-red-500)" }} fill="currentColor">
+    <rect x="542" y="36" width="40" height="112" rx="8" fillOpacity="0.14" />
+    <rect x="550" y="44" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="550" y="64" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="550" y="84" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="550" y="104" width="24" height="14" rx="4" fillOpacity="0.3" />
+    <rect x="550" y="124" width="24" height="14" rx="4" fillOpacity="0.3" />
+  </g>
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="448" y="168" width="24" height="4" rx="2" fillOpacity="0.7" />
+  </g>
+</svg>
+
+## Vectorized execution: the second half of the speed
+
+Storing data by column is only half the story. The other half is how the
+engine *processes* it. A traditional database often walks one row at a
+time, evaluating the whole query for each row — a lot of bookkeeping per
+value. A modern analytical engine instead processes a **batch** of values
+from a column at once, in a tight loop the CPU can run efficiently. This
+is called **vectorized execution**, and column storage is what makes it
+natural: the values are already lined up together, ready to stream through
+in chunks.
+
+Column storage plus vectorized execution is the lineage of decades of
+column-store research — notably **MonetDB**, built at the CWI research
+institute in Amsterdam, and the **C-Store** project associated with
+Michael Stonebraker. DuckDB, which this course runs on, inherits exactly
+this design — and it was created at the very same Amsterdam institute that
+produced MonetDB. (More on DuckDB's origins on the next page.)
+
+<Callout type="info" title="You write the same SQL either way">
+Reassuringly, you do **not** change your SQL to get these benefits. You
+write the same `SELECT ... GROUP BY` you already know; the engine's
+columnar storage and vectorized execution do the rest. The lesson is not
+"write different SQL for OLAP" — it is that the *questions* you ask, and
+the *engine* you ask them on, are tuned for analysis.
+</Callout>
+
+## Check your understanding
+
+<MultipleChoice
+  markdown={`Which question is **analytical** (OLAP) rather than application-oriented (OLTP)?
+
+- Save a new order to the database.
+  > Writing a single new record is classic transactional (OLTP) work, not analysis.
+- Show the details of order #4821 on a confirmation page.
+  > Fetching one specific row to display is an OLTP read, not an analytical summary.
+- [o] Compare average order value between first-time and returning customers across the last year.
+  > This scans many rows to produce a small comparison — the essence of analytical (OLAP) SQL.
+- Update the shipping status of order #91 to "shipped".
+  > Updating one row's state is transactional application work.
+
+Analytical questions sweep across many rows to produce a summary or
+comparison; transactional questions read or change a few specific rows.`}
+/>
+
+<MultipleChoice
+  markdown={`Why does a **column-oriented** store make analytical queries faster?
+
+- It compresses rows so transactions commit faster.
+  > Faster commits help OLTP writes, not the analytical reads in question; this also misstates how column stores help.
+- [o] A query that needs only a few columns can read just those columns and skip the rest of each row.
+  > Storing each column together lets the engine read \`price\` alone instead of every value in every row — a huge saving on wide tables.
+- It guarantees every query touches every column.
+  > That is the opposite of the benefit; column stores let queries *avoid* unneeded columns.
+- It removes the need to write \`GROUP BY\`.
+  > Storage layout does not change the SQL you write; you still use \`GROUP BY\`.
+
+Column stores shine when a query reads a few columns across many rows —
+the typical analytical pattern.`}
+/>
+
+<MultipleChoice
+  markdown={`What is **vectorized execution**, and why does it suit OLAP?
+
+- Running each query on a separate CPU core.
+  > That describes parallelism across cores; vectorization is about processing batches of values per operation, regardless of core count.
+- [o] Processing a batch of column values at a time in a tight loop, instead of evaluating the whole query one row at a time.
+  > Batching values cuts per-row overhead, and column storage lines the values up ready to stream — together they make scans fast.
+- Storing each row as a single vector on disk.
+  > That is closer to row storage; vectorized execution is about *processing* batches, and pairs with column storage.
+- Converting SQL into spreadsheet formulas.
+  > Vectorization is an engine technique for fast batch processing, unrelated to spreadsheets.
+
+Vectorized execution processes columns in batches, which is why analytical
+engines fly through large scans.`}
+/>
+
+You now know *why* analytical SQL is shaped the way it is, and what kind
+of engine answers it fast. Next: meet that engine, and understand *why
+DuckDB* in particular.

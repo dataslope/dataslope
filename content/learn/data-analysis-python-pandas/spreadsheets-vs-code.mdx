@@ -3,10 +3,38 @@ title: Spreadsheets vs Code
 description: A side-by-side look at how the same analysis feels in Excel versus Pandas — and why analysts increasingly choose code even when the data is small.
 ---
 
-You have already heard the high-level argument: spreadsheets are
-manual, code is reproducible. This chapter makes the comparison
-concrete with side-by-side scenarios so you can feel, in your
-bones, where each tool wins and where each one loses.
+The previous chapter ended on a cliffhanger: spreadsheet work
+leaves no reproducible trail, and that is the gap code was built to
+close. This chapter makes the comparison concrete with side-by-side
+scenarios so you can feel, in your bones, where each tool wins and
+where each one loses — and it opens with the most expensive
+spreadsheet mistake in modern economics.
+
+## A five-row error that shaped austerity policy
+
+In 2010 two Harvard economists, Carmen Reinhart and Kenneth Rogoff,
+published a result that governments around the world cited to
+justify austerity: countries whose public debt crossed 90% of GDP
+suffered sharply negative average growth. It was influential enough
+to be quoted in budget debates on two continents.
+
+In 2013 a graduate student named **Thomas Herndon**, trying to
+reproduce the finding for a class assignment, asked for the original
+spreadsheet. When he finally got it, he found that an Excel formula
+meant to average a column of countries had been written to stop a
+few rows short — it **accidentally omitted five countries** from the
+calculation (along with some debatable weighting choices). Correct
+the formula and the dramatic cliff at 90% softens into something far
+less alarming. A selection error inside a single spreadsheet cell
+had helped shape real fiscal policy, and it took an outsider with a
+copy of the file *years later* to catch it.
+
+That is the whole argument of this chapter in one story. Not that
+spreadsheets are evil — they are wonderful — but that a manual,
+click-by-click analysis is nearly impossible to audit, and the
+errors hide in plain sight. Code is not immune to bugs, but a script
+is a *written record of exactly what was done*, which means it can
+be re-run, reviewed line by line, and corrected.
 
 <svg
   viewBox="0 0 640 230"

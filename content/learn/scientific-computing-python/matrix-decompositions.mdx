@@ -195,8 +195,7 @@ y = 1 - 2 * x + 0.5 * x**3 + 0.2 * rng.standard_normal(x.size)
 
 A = np.vander(x, N=4, increasing=True)  # design matrix [1, x, x², x³]
 Q, R = np.linalg.qr(A)
-coeffs = np.linalg.solve_triangular if False else np.linalg.solve
-beta = np.linalg.solve(R, Q.T @ y)  # back substitution
+beta = np.linalg.solve(R, Q.T @ y)  # R is triangular -> back substitution
 
 print("Fitted coefficients:", beta.round(3))
 print("True coefficients : [1.000, -2.000, 0.000, 0.500]")
@@ -422,6 +421,80 @@ If you remember only one rule from this chapter, remember this:
 **SVD when in doubt, QR for least squares, Cholesky for SPD, LU
 for general systems, eigendecomposition only when you really need
 eigenvectors.**
+
+## Practice: rank-$k$ approximation
+
+<ChallengeCard
+  adapter="python"
+  title="Truncated SVD reconstruction"
+  instructions={`Implement \`low_rank_approx(A, k)\` that returns the best rank-$k$ approximation of matrix \`A\` in the Frobenius/2-norm sense (the Eckart–Young theorem).
+
+Compute \`U, s, Vt = np.linalg.svd(A, full_matrices=False)\`, keep the top \`k\` singular values, and reconstruct $U_k \\, \\mathrm\{diag\}(s_k) \\, V_k^\\mathsf\{T\}$. Return a NumPy array the same shape as \`A\`.`}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+
+def low_rank_approx(A, k):
+    # TODO: SVD, keep top k singular values, reconstruct
+    return A
+
+
+# Quick check: a rank-1 matrix is reproduced exactly by k=1
+A = np.outer([1.0, 2.0, 3.0], [4.0, 5.0])
+print(np.allclose(low_rank_approx(A, 1), A))  # True
+`,
+      solutionCode: `import numpy as np
+
+
+def low_rank_approx(A, k):
+    A = np.asarray(A, dtype=float)
+    U, s, Vt = np.linalg.svd(A, full_matrices=False)
+    return (U[:, :k] * s[:k]) @ Vt[:k, :]
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "rank1_exact",
+      name: "Reproduces a rank-1 matrix at k=1",
+      code: `import numpy as np
+A = np.outer([1.0, 2.0, 3.0], [4.0, 5.0])
+assert np.allclose(low_rank_approx(A, 1), A)`,
+    },
+    {
+      id: "full_rank_exact",
+      name: "Exact when k equals the full rank",
+      code: `import numpy as np
+rng = np.random.default_rng(0)
+A = rng.standard_normal((6, 4))
+assert np.allclose(low_rank_approx(A, 4), A, atol=1e-9)`,
+    },
+    {
+      id: "is_truly_rank_k",
+      name: "Output really is rank k",
+      code: `import numpy as np
+rng = np.random.default_rng(1)
+A = rng.standard_normal((20, 10))   # full rank 10
+approx = low_rank_approx(A, 3)
+# A genuine rank-3 reconstruction must lose information vs the full matrix
+assert np.linalg.matrix_rank(approx, tol=1e-8) <= 3
+assert np.linalg.norm(A - approx) > 1e-6, "rank-3 of a full-rank matrix cannot be exact"`,
+    },
+    {
+      id: "matches_eckart_young",
+      name: "Matches the optimal error from the singular values",
+      code: `import numpy as np
+rng = np.random.default_rng(2)
+A = rng.standard_normal((15, 8))
+s = np.linalg.svd(A, compute_uv=False)
+expected = np.sqrt((s[3:] ** 2).sum())   # Eckart-Young: error = norm of dropped sigmas
+got = np.linalg.norm(A - low_rank_approx(A, 3))
+assert abs(got - expected) < 1e-8`,
+    },
+  ]}
+/>
 
 ## Check your understanding
 

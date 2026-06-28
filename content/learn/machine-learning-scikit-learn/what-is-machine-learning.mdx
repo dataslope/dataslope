@@ -18,6 +18,14 @@ recognize spam, you *show* it thousands of emails already labeled "spam" or
 writing rules to learning them from examples — is the entire idea, and once
 it clicks, every algorithm in this course is a variation on it.
 
+The phrase itself is older than you might guess. In 1959 an IBM engineer
+named Arthur Samuel coined the term **machine learning** to describe a
+checkers program he had written — one that got better not because Samuel
+kept improving its rules, but because it played thousands of games against
+*itself* and adjusted from the outcomes. The machine improved without its
+author touching the code. That was the whole shock of the idea then, and it
+is still the whole idea now.
+
 <svg
   viewBox="0 0 640 210"
   role="img"
@@ -204,92 +212,109 @@ here — it is a law. A spam filter trained only on English email will be
 helpless on Spanish spam, and it will never tell you so.
 </Callout>
 
-## A tiny taste: learning to tell flowers apart
+## A tiny taste: learning to tell penguins apart
 
-Talk is cheap, so let us actually do it. The classic teaching dataset is a
-table of 150 iris flowers. Each flower has four measurements — the length
-and width of its petals and sepals — and belongs to one of three species.
-No human could write a clean rule like "if petal length > 2.45 cm then
-species A," because the species overlap and the boundaries are fuzzy. But a
-model can learn the pattern from examples.
+Talk is cheap, so let us actually do it. Our teaching dataset is a table of
+344 penguins observed near Palmer Station, Antarctica. Each penguin has a
+handful of body measurements — the length and depth of its bill, the length
+of its flipper, its body mass — and belongs to one of three species
+(Adelie, Gentoo, Chinstrap). No human could write a clean rule like "if bill
+length > 45 mm then Gentoo," because the species overlap and the boundaries
+are fuzzy. But a model can learn the pattern from examples.
+
+<Callout type="info" title="A note on the dataset">
+For most of machine learning's history this lesson used Ronald Fisher's
+1936 table of iris flowers. The community now largely prefers Palmer
+Penguins: it teaches exactly the same shape, but Fisher was a prominent
+eugenicist, and the penguin data — collected by Dr. Kristen Gorman — carries
+none of that baggage. We use penguins throughout.
+</Callout>
 
 The algorithm below is **k-nearest neighbors**, and its rule is almost
-suspiciously simple: to classify a new flower, find the few training flowers
-most similar to it (nearest in measurement-space) and let them vote on the
-species. We will study it properly later; for now, just watch the *shape* of
-the program.
+suspiciously simple: to classify a new penguin, find the few training
+penguins most similar to it (nearest in measurement-space) and let them vote
+on the species. We will study it properly later; for now, just watch the
+*shape* of the program.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
+      initCode: `import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
-# 1. Get the examples: 150 flowers, 4 measurements each, labeled by species.
-X, y = load_iris(return_X_y=True)
-print("Each flower has", X.shape[1], "measurements; we have", X.shape[0], "flowers.")
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+penguins = pd.read_csv("penguins.csv").dropna(subset=features + ["species"])`,
+      starterCode: `# 1. Get the examples: penguins with 4 measurements each, labeled by species.
+X = penguins[features]
+y = penguins["species"]
+print("Each penguin has", X.shape[1], "measurements; we have", X.shape[0], "penguins.")
 
-# 2. Hold some flowers back so we can test on ones the model never saw.
+# 2. Hold some penguins back so we can test on ones the model never saw.
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
-# 3. TRAIN: let the model learn the pattern from the training flowers.
+# 3. TRAIN: let the model learn the pattern from the training penguins.
 model = KNeighborsClassifier(n_neighbors=5)
 model.fit(X_train, y_train)
 
-# 4. PREDICT: ask it about flowers it has never seen.
+# 4. PREDICT: ask it about penguins it has never seen.
 accuracy = model.score(X_test, y_test)
-print(f"It correctly identified {accuracy:.0%} of brand-new flowers.")
+print(f"It correctly identified {accuracy:.0%} of brand-new penguins.")
 `,
     },
   ]}
 />
 
-Look at what just happened. You did not write a single rule about petals or
-sepals. You loaded examples, called `fit`, and the model worked out — on its
-own — how to separate three species from four numbers, then proved it on
-flowers held back from training. That is machine learning in five lines, and
-the shape is identical to what you saw on the welcome page: **load, split,
-fit, evaluate on the unseen.**
+Look at what just happened. You did not write a single rule about bills or
+flippers. You loaded examples, called `fit`, and the model worked out — on
+its own — how to separate three species from four numbers, then proved it on
+penguins held back from training. That is machine learning in a few lines,
+and the shape is identical to what you saw on the welcome page: **load,
+split, fit, evaluate on the unseen.**
 
 <Callout type="info" title="Notice what we are NOT celebrating">
-We reported accuracy on the *held-out* flowers, not on the training
-flowers. That choice — measuring success on data the model never trained on
-— is the habit that separates honest machine learning from self-deception.
+We reported accuracy on the *held-out* penguins, not on the training
+penguins. That choice — measuring success on data the model never trained
+on — is the habit that separates honest machine learning from
+self-deception.
 The train/test page made the case; from here on we simply assume it.
 </Callout>
 
 ### Peeking at a single prediction
 
 Accuracy is a summary. Let us slow down and watch the model classify one new
-flower, so "prediction" stops being abstract.
+penguin, so "prediction" stops being abstract.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
+      initCode: `import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
-X, y = load_iris(return_X_y=True)
-species = load_iris().target_names  # ['setosa' 'versicolor' 'virginica']
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+penguins = pd.read_csv("penguins.csv").dropna(subset=features + ["species"])`,
+      starterCode: `X = penguins[features].reset_index(drop=True)
+y = penguins["species"].reset_index(drop=True)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 model = KNeighborsClassifier(n_neighbors=5).fit(X_train, y_train)
 
-# Take one held-out flower and look at its four measurements.
-one_flower = X_test[0]
-print("Measurements (cm):", one_flower)
+# Take one held-out penguin and look at its four measurements.
+one_penguin = X_test.iloc[[0]]
+print("Measurements:", one_penguin.to_dict("records")[0])
 
 # The model turns those four numbers into a species guess.
-guess = model.predict([one_flower])[0]
-truth = y_test[0]
-print("Model predicts:", species[guess])
-print("Actually was:  ", species[truth])
+guess = model.predict(one_penguin)[0]
+truth = y_test.iloc[0]
+print("Model predicts:", guess)
+print("Actually was:  ", truth)
 `,
     },
   ]}
@@ -421,17 +446,16 @@ not the specific model; it is that the *shape* is always the same.
   title="Walk the full machine learning lifecycle"
   category="foundations · what is machine learning"
   estimatedTime="~7 min"
-  instructions={`The wine dataset has 178 samples in 3 classes, each described
-by 13 chemical measurements. Walk the same load-split-train-evaluate shape
-you saw above.
+  instructions={`The penguins are already loaded and cleaned. The features
+\`X\` (four body measurements) and labels \`y\` (species) are prepared for
+you. Walk the same load-split-train-evaluate shape you saw above.
 
-1. The features and labels are already loaded into \`X\` and \`y\`.
-2. Split them with \`train_test_split\` using \`test_size=0.25\` and
-   \`random_state=0\`. Name the four results
+1. Split \`X\` and \`y\` with \`train_test_split\` using \`test_size=0.25\`
+   and \`random_state=0\`. Name the four results
    \`X_train, X_test, y_train, y_test\` (in that order).
-3. Create a \`KNeighborsClassifier(n_neighbors=5)\` and \`fit\` it on the
+2. Create a \`KNeighborsClassifier(n_neighbors=5)\` and \`fit\` it on the
    **training** set. Store the fitted model in \`model\`.
-4. Measure accuracy on the **test** set with \`model.score(...)\` and store
+3. Measure accuracy on the **test** set with \`model.score(...)\` and store
    the number in \`accuracy\`.
 
 The tests check the split sizes, that \`model\` is fitted, and that
@@ -439,12 +463,15 @@ The tests check the split sizes, that \`model\` is fitted, and that
   files={[
     {
       filename: "main.py",
-      initCode: `from sklearn.datasets import load_wine
+      initCode: `import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.neighbors import KNeighborsClassifier`,
-      starterCode: `X, y = load_wine(return_X_y=True)
+from sklearn.neighbors import KNeighborsClassifier
 
-# 1. Split off a test set (25% test, random_state=0)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+penguins = pd.read_csv("penguins.csv").dropna(subset=features + ["species"])
+X = penguins[features]
+y = penguins["species"]`,
+      starterCode: `# 1. Split off a test set (25% test, random_state=0)
 X_train, X_test, y_train, y_test = None, None, None, None
 
 # 2. Train a 5-neighbor classifier on the training set
@@ -455,9 +482,7 @@ accuracy = None
 
 print("Test accuracy:", accuracy)
 `,
-      solutionCode: `X, y = load_wine(return_X_y=True)
-
-X_train, X_test, y_train, y_test = train_test_split(
+      solutionCode: `X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0
 )
 
@@ -470,18 +495,22 @@ print("Test accuracy:", accuracy)
 `,
     },
   ]}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   tests={[
     {
       id: "test_size",
       name: "Test set is 25% of the data",
-      description: "45 of 178 rows held out",
-      code: `assert X_test.shape[0] == 45, f"Expected 45 test rows, got {X_test.shape[0]}"`,
+      description: "About a quarter of the penguins held out",
+      code: `import math
+expected = math.ceil(0.25 * len(X))
+assert X_test.shape[0] == expected, f"Expected {expected} test rows, got {X_test.shape[0]}"`,
     },
     {
       id: "train_size",
       name: "Training set is the other 75%",
-      description: "133 rows used for training",
-      code: `assert X_train.shape[0] == 133, f"Expected 133 train rows, got {X_train.shape[0]}"`,
+      description: "Train and test together cover every row exactly once",
+      code: `assert X_train.shape[0] + X_test.shape[0] == len(X), "train and test sizes should sum to the full dataset"
+assert X_train.shape[0] > X_test.shape[0], "the training set should be the larger split"`,
     },
     {
       id: "model_fitted",

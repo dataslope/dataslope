@@ -356,6 +356,69 @@ g = sns.catplot(data=titanic, x="class", kind="count", height=4)
   ]}
 />
 
+For the next one, add a *second* category with `hue`. A grouped bar splits
+each bar into one sub-bar per `hue` level, which is the right tool for
+comparing a mean across two categorical variables at once.
+
+<ChallengeCard
+  adapter="python"
+  title="Group a bar plot with hue"
+  instructions={`Using the \`penguins\` DataFrame, draw a **grouped bar plot** of
+average body mass.
+
+- Use \`sns.catplot\` with \`kind="bar"\`.
+- Put \`species\` on the x-axis and \`body_mass_g\` on the y-axis (Seaborn
+  takes the **mean** per group automatically).
+- Split each species into one bar per \`sex\` by mapping \`hue="sex"\`.
+- Assign the result to a variable named \`g\`.
+
+You should see three species along the bottom, each with a male and a
+female bar side by side.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `# Build the grouped bar plot and assign it to g:
+g = None
+`,
+      solutionCode: `g = sns.catplot(
+    data=penguins,
+    x="species",
+    y="body_mass_g",
+    hue="sex",
+    kind="bar",
+    height=4,
+)
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "is_facetgrid",
+      name: "Uses a bar catplot",
+      description: "g is a Seaborn FacetGrid",
+      code: "import seaborn as sns\nassert isinstance(g, sns.axisgrid.FacetGrid), 'Assign the result of sns.catplot(..., kind=\"bar\") to g'",
+    },
+    {
+      id: "axes",
+      name: "species on x, body_mass_g on y",
+      description: "The mean mass is compared across species",
+      code: "ax = g.ax\nassert ax.get_xlabel() == 'species', f'x should be species, got {ax.get_xlabel()!r}'\nassert ax.get_ylabel() == 'body_mass_g', f'y should be body_mass_g, got {ax.get_ylabel()!r}'",
+    },
+    {
+      id: "grouped_by_sex",
+      name: "Split into sub-bars by sex",
+      description: "Mapping hue=sex produces a legend with two groups",
+      code: "assert g._legend is not None, 'Map hue=\"sex\" so each species splits into male and female bars'\nlabels = [t.get_text() for t in g._legend.get_texts()]\nassert any('female' in l.lower() or 'male' in l.lower() for l in labels), f'Legend should distinguish sexes; got {labels}'",
+    },
+  ]}
+/>
+
 ## Check your understanding
 
 <MultipleChoice

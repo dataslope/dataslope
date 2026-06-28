@@ -1,70 +1,59 @@
 {
-  "title": "Beginner's Guide to JavaScript",
-  "description": "A from-zero JavaScript course focused on computational thinking, language fundamentals, and building strong programming foundations.",
-  "root": true,
-  "tags": {
-    "language": [
-      "javascript"
-    ],
-    "libraries": [],
-    "domain": [
-      "programming-fundamentals",
-      "web-development"
-    ],
-    "skills": [
-      "computational-thinking",
-      "problem-solving",
-      "functions",
-      "asynchronous-programming",
-      "debugging"
-    ],
-    "tools": [],
-    "level": [
-      "beginner"
+    "title": "Beginner's Guide to JavaScript",
+    "description": "A from-zero JavaScript course focused on computational thinking, language fundamentals, and building strong programming foundations.",
+    "root": true,
+    "tags": {
+        "language": [
+            "javascript"
+        ],
+        "libraries": [],
+        "domain": [
+            "programming-fundamentals",
+            "web-development"
+        ],
+        "skills": [
+            "computational-thinking",
+            "problem-solving",
+            "functions",
+            "asynchronous-programming",
+            "debugging"
+        ],
+        "tools": [],
+        "level": [
+            "beginner"
+        ]
+    },
+    "pages": [
+        "index",
+        "birth-of-javascript",
+        "javascript-today",
+        "how-computers-execute-programs",
+        "computational-thinking",
+        "problem-solving",
+        "values-and-types",
+        "variables-and-state",
+        "numbers-and-arithmetic",
+        "strings-and-text",
+        "booleans-and-logic",
+        "conditionals",
+        "loops-and-iteration",
+        "functions-basics",
+        "parameters-and-returns",
+        "scope-and-scope-chain",
+        "closures",
+        "arrays",
+        "objects",
+        "nested-data",
+        "map-filter-reduce",
+        "functional-intuition",
+        "how-javascript-runs",
+        "asynchronous-thinking",
+        "promises-and-async-await",
+        "debugging-and-reasoning",
+        "maintainable-code",
+        "modular-organization",
+        "scripting-and-glue",
+        "javascript-beyond-the-browser",
+        "next-steps"
     ]
-  },
-  "pages": [
-    "index",
-    "---",
-    "birth-of-javascript",
-    "javascript-today",
-    "---",
-    "how-computers-execute-programs",
-    "computational-thinking",
-    "problem-solving",
-    "---",
-    "values-and-types",
-    "variables-and-state",
-    "numbers-and-arithmetic",
-    "strings-and-text",
-    "booleans-and-logic",
-    "---",
-    "conditionals",
-    "loops-and-iteration",
-    "---",
-    "functions-basics",
-    "parameters-and-returns",
-    "scope-and-scope-chain",
-    "closures",
-    "---",
-    "arrays",
-    "objects",
-    "nested-data",
-    "---",
-    "map-filter-reduce",
-    "functional-intuition",
-    "---",
-    "how-javascript-runs",
-    "asynchronous-thinking",
-    "promises-and-async-await",
-    "---",
-    "debugging-and-reasoning",
-    "maintainable-code",
-    "modular-organization",
-    "---",
-    "scripting-and-glue",
-    "javascript-beyond-the-browser",
-    "---",
-    "next-steps"
-  ]
 }

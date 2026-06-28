@@ -166,31 +166,30 @@ solution is a mark of seniority, not a lack of ambition.
 ## A concrete contrast: rule vs. model
 
 Let us make the tradeoff tangible with a tiny example. Suppose we want to
-classify iris flowers, and we *try the rule-first approach*. With a quick
-look at the data, a single threshold on petal length perfectly separates one
-species (*setosa*) from the others. For that part of the problem, a one-line
-rule is not just adequate — it is *better* than a model: simpler, exact, and
-instantly explainable.
+classify Palmer penguins by species, and we *try the rule-first approach*.
+With a quick look at the data, a single threshold on flipper length nearly
+perfectly separates one species (*Gentoo*, the big-flippered one) from the
+other two. For that part of the problem, a one-line rule is not just adequate
+— it is *better* than a model: simpler, exact, and instantly explainable.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `# 'penguins' is provided above (342 rows after dropping missing measurements).
 
-data = load_iris()
-X, y = data.data, data.target
-# Column 2 is petal length (cm). Class 0 is 'setosa'.
+flipper = penguins["flipper_length_mm"]
 
-petal_length = X[:, 2]
+# A hand-written rule: "long flippers -> Gentoo".
+rule_says_gentoo = flipper > 206
+actually_gentoo = penguins["species"] == "Gentoo"
 
-# A hand-written rule: "short petals -> setosa".
-rule_says_setosa = petal_length < 2.5
-actually_setosa = y == 0
-
-correct = (rule_says_setosa == actually_setosa).sum()
-print(f"A one-line rule separates setosa perfectly: {correct}/{len(y)} correct.")
+correct = (rule_says_gentoo == actually_gentoo).sum()
+print(f"A one-line rule separates Gentoo almost perfectly: {correct}/{len(penguins)} correct.")
 `,
     },
   ]}
@@ -198,42 +197,43 @@ print(f"A one-line rule separates setosa perfectly: {correct}/{len(y)} correct."
 
 A simple rule nailed it, and you should be delighted — that is the
 rule-first principle paying off. But now try to separate the *other* two
-species, *versicolor* and *virginica*. Their measurements overlap heavily;
-no single clean threshold divides them. This is where rule-writing stalls
-and a learned model earns its place.
+species, *Adelie* and *Chinstrap*. Their flippers and bodies are nearly the
+same size; no single clean threshold divides them. This is where rule-writing
+stalls and a learned model earns its place.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 import numpy as np
 
-data = load_iris()
-X, y = data.data, data.target
+# Keep only the two hard-to-separate species.
+two = penguins[penguins["species"].isin(["Adelie", "Chinstrap"])]
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X2 = two[features].to_numpy()
+y2 = two["species"].to_numpy()
 
-# Keep only the two hard-to-separate species (1 and 2).
-mask = y != 0
-X2, y2 = X[mask], y[mask]
-
-# Try a hand-written threshold on petal length for these two.
-petal_length = X2[:, 2]
-threshold = 4.9  # a reasonable hand-picked guess
-rule_pred = np.where(petal_length < threshold, 1, 2)
+# Try a hand-written threshold on flipper length for these two.
+flipper = X2[:, 2]
+threshold = 196  # a reasonable hand-picked guess
+rule_pred = np.where(flipper < threshold, "Adelie", "Chinstrap")
 rule_acc = (rule_pred == y2).mean()
 
-# Now let a model learn the boundary from all four features.
+# Now let a model learn the boundary from all four measurements.
 X_train, X_test, y_train, y_test = train_test_split(
     X2, y2, test_size=0.3, random_state=0
 )
-model = LogisticRegression(max_iter=1000).fit(X_train, y_train)
+model = LogisticRegression(max_iter=2000).fit(X_train, y_train)
 model_acc = model.score(X_test, y_test)
 
 print(f"Hand-picked threshold rule: {rule_acc:.0%} on these two species.")
-print(f"Learned model:              {model_acc:.0%} on held-out flowers.")
+print(f"Learned model:              {model_acc:.0%} on held-out penguins.")
 `,
     },
   ]}
@@ -241,10 +241,11 @@ print(f"Learned model:              {model_acc:.0%} on held-out flowers.")
 
 For the easy split, a rule won. For the hard split, the learned model pulls
 ahead by using all four measurements together in a way no tidy threshold
-could. That is the whole argument of this page in one example: **rules for
-the simple, models for the complex.** A mature solution often uses *both* —
-cheap rules where they suffice and a model only where the problem genuinely
-needs one.
+could — *Adelie* and *Chinstrap* overlap on flipper length but separate
+cleanly once bill shape is added in. That is the whole argument of this page
+in one example: **rules for the simple, models for the complex.** A mature
+solution often uses *both* — cheap rules where they suffice and a model only
+where the problem genuinely needs one.
 
 <Callout type="success" title="The lesson of the contrast">
 The question is never "rules or machine learning?" in the abstract. It is
@@ -294,9 +295,11 @@ A model, by contrast, can be *retrained on fresh data* and absorb the new
 pattern automatically.
 
 We can watch this in miniature. Below, the "world" changes between an old
-regime and a new one (the relationship between input and output shifts). A
-fixed rule, tuned to the old world, grows stale. A model simply retrained on
-new data tracks the change.
+regime and a new one (the relationship between input and output shifts). We
+use *synthetic* data here on purpose: to demonstrate drift cleanly we need to
+*dictate* the true relationship and then change it on cue (slope 2, then slope
+5), which no real dataset would let us do. A fixed rule, tuned to the old
+world, grows stale. A model simply retrained on new data tracks the change.
 
 <CodeBlock
   adapter="python"
@@ -422,6 +425,15 @@ ever notice the model has gone bad.
 Let us collect the cases — already hinted at above — where you should
 deliberately *not* reach for a model. This list will save you more grief
 than any algorithm.
+
+History offers a humbling reminder that learning has limits, too. Frank
+Rosenblatt's *perceptron* (1957–58) was an early learning machine greeted with
+enormous excitement. Then in 1969 Marvin Minsky and Seymour Papert proved, in
+their book *Perceptrons*, that a single-layer perceptron cannot even learn the
+simple XOR function — and the disappointment helped trigger the first "AI
+winter," a long funding drought. The lesson endures: a learning method is only
+as good as the patterns it is *capable* of representing, and reaching for a
+model is never a guarantee that one exists for your problem.
 
 - **A simple rule already works.** The golden case. If "orders over 10,000
   units get a discount" solves it, write that. Do not model it.

@@ -3,20 +3,23 @@ title: When Mathematics Meets Computation
 description: How floating-point arithmetic, finite precision, and discrete approximation change the way we have to think about mathematics
 ---
 
-We close the story half of this course with a meditation. The
-previous three pages were history; this page is *philosophy*.
+The two story chapters are behind us; this page is the bridge from
+*history* into *practice*. It is the one genuinely philosophical page
+of the course, and it earns its place because the mindset it builds
+underlies everything that follows.
 
 When a mathematician writes $\sin(x)$, they mean an exact, infinitely
-precise function defined for every real number. When a Python
-program writes `math.sin(x)`, it means an *approximation* of that
-function, evaluated at a *finite* number of bits, with a *bounded*
-error. Those two `sin`s do not behave the same way, and the gap
-between them is where computational science lives.
+precise function defined for every real number. When a Python program
+writes `math.sin(x)`, it means an *approximation* of that function,
+evaluated at a *finite* number of bits, with a *bounded* error. Those
+two `sin`s do not behave the same way, and the gap between them is
+where computational science lives.
 
-This page does not introduce many new tools. It introduces a
-*mindset* — the conviction that **every number on a computer is
-slightly wrong**, and that doing science well means making the
-wrongness controllable.
+This page introduces a *mindset* — the conviction that **every number
+on a computer is slightly wrong**, and that doing science well means
+making the wrongness controllable. The chapters that follow will make
+each idea precise; here we just want to internalize the shape of the
+problem.
 
 <svg
   viewBox="0 0 640 170"
@@ -152,39 +155,16 @@ Some interactions are catastrophic:
   factor (the *condition number*). A small input error becomes a
   huge output error.
 
-Here is a single number that captures how good your "data" needs to
-be for a *problem* (not an algorithm — a *problem*) to be solvable
-at all. Multiplying a matrix by a vector might be well-conditioned;
-*inverting* the same matrix might be wildly ill-conditioned.
-
-<CodeBlock
-  adapter="python"
-  files={[
-    {
-      filename: "main.py",
-      starterCode: `import numpy as np
-
-
-# A "Hilbert matrix" — famously ill-conditioned
-def hilbert(n):
-    i, j = np.indices((n, n))
-    return 1.0 / (i + j + 1)
-
-
-for n in [4, 8, 12, 16]:
-    H = hilbert(n)
-    kappa = np.linalg.cond(H)
-    print(f"H_{n:>2}: condition number = {kappa:.2e}")
-`,
-    },
-  ]}
-/>
-
-A condition number of $10^{18}$ means a relative input error of
-$\epsilon \approx 10^{-16}$ becomes a relative *output* error of
-$\epsilon \cdot 10^{18} = 100$ — utterly useless. No clever
-algorithm can fix this; the *problem* itself is broken at 64-bit
-precision.
+There is a single number that captures how good your *data* needs to
+be for a *problem* (not an algorithm — a *problem*) to be solvable at
+all: the **condition number**. If a problem has a condition number of
+$10^{18}$, then a relative input error of $\epsilon \approx 10^{-16}$
+becomes a relative output error of $\epsilon \cdot 10^{18} = 100$ —
+utterly useless. No clever algorithm can fix this; the *problem*
+itself is broken at 64-bit precision. We will meet condition numbers
+properly, with runnable examples, in *Numerical Stability and
+Conditioning* — for now, just hold onto the idea that some problems
+amplify error and some do not, regardless of how you compute.
 
 ## Approximation: a finite version of an infinite idea
 
@@ -244,57 +224,6 @@ Two lessons fall out of this picture:
   *truncation error* but each additional addition contributes
   *round-off error*. There is always an optimum, and finding it is
   part of numerical analysis.
-
-## Reproducibility: same code, same numbers
-
-Reproducibility in science used to mean "another scientist can
-follow your steps and get the same answer." In computational
-science it has a sharper meaning: **the bits should match**. The
-same code, run with the same library versions on the same hardware,
-should produce the same floating-point output.
-
-This is harder than it sounds. Three things can break bit-for-bit
-reproducibility:
-
-1. **BLAS implementations differ.** OpenBLAS, MKL, Apple's Accelerate
-   all implement matrix multiplication slightly differently and can
-   produce different rounding in the last bit.
-2. **Threading order changes results.** A parallel sum that adds
-   floats in a non-deterministic order will round differently each
-   run.
-3. **Random number generators must be seeded.** `np.random` without a
-   seed produces different sequences every run.
-
-The minimum hygiene is to *always* seed your RNG and to *always*
-pin your library versions. Here is the canonical setup we will use
-throughout the course.
-
-<CodeBlock
-  adapter="python"
-  files={[
-    {
-      filename: "main.py",
-      starterCode: `import numpy as np
-
-# Reproducibility starts here:
-rng = np.random.default_rng(seed=42)
-
-# Always use 'rng' methods — never the legacy 'np.random.rand' globals,
-# which read from a hidden, mutable global state.
-sample = rng.standard_normal(5)
-print("Sample 1:", sample.round(4))
-
-# Re-seed to confirm reproducibility:
-rng = np.random.default_rng(seed=42)
-print("Sample 2:", rng.standard_normal(5).round(4))
-`,
-    },
-  ]}
-/>
-
-The two prints will always agree, on any machine, today and a
-decade from now (as long as NumPy keeps its RNG contract — which
-it has guaranteed for `default_rng` since NumPy 1.17).
 
 ## The role of computational science in the modern world
 

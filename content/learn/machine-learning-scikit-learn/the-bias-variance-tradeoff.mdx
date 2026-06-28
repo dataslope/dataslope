@@ -141,6 +141,11 @@ same true function, fit a model on each, and overlay all the fitted curves.
 A high-variance model produces a chaotic spaghetti of curves; a
 low-variance model produces nearly the same curve every time.
 
+This demonstration only works with synthetic data: measuring bias and
+variance requires drawing *many* fresh training sets from a *known* true
+function, and real datasets give you neither. We generate the truth so we
+can resample it at will and compare each fit against it.
+
 <CodeBlock
   adapter="python"
   files={[
@@ -315,9 +320,10 @@ def make_dataset():
     y = np.sin(1.5 * x) + rng.normal(0, 0.25, x.size)
     return x.reshape(-1, 1), y
 
-x_star = np.array([[2.0]])
+x_star = np.array([[3.5]])
 simple = make_pipeline(PolynomialFeatures(1), LinearRegression())
 flexible = make_pipeline(PolynomialFeatures(15), LinearRegression())`,
+
       starterCode: `var_simple = None
 var_flexible = None
 

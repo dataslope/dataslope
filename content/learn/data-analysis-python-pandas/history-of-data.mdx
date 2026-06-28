@@ -1,197 +1,272 @@
 ---
-title: History of Data
-description: From tally marks on bones to relational databases — a brief tour through five thousand years of humans counting things and writing them down.
+title: A Short History of Data
+description: From tally marks on bone to a hedge-fund researcher's side project — how tabular data, spreadsheets, and finally Pandas came to be, in two pages.
 ---
 
-Before we touch a line of Python, it is worth asking a strange
-question: *what is data, and why do humans collect it in the first
-place?* The answer turns out to be older than writing itself, and
-understanding it will quietly make every later chapter make more
-sense.
+Before we touch a line of Python, here is a strange fact worth
+sitting with: *the dataset you will load in a few chapters has the
+same shape as a five-thousand-year-old clay receipt.* Rows of
+similar things, columns of attributes, a total at the bottom. The
+medium changed — clay, paper, silicon — but the shape did not.
+This chapter is the two-page story of how that shape traveled from
+a Sumerian temple to a library called Pandas. (If you want the
+longer version of any thread here, the **Interesting discussions**
+section near the end of the course expands several of them.)
 
 <svg
-  viewBox="0 0 640 220"
+  viewBox="0 0 640 210"
   role="img"
-  aria-label="A clay tablet carrying rows of colored wedge-shaped tally marks separated by faint ruling lines — the first datasets, pressed into clay long before writing"
-  style={{ display: "block", width: "100%", maxWidth: "560px", height: "auto", margin: "2.5rem auto" }}
+  aria-label="A dotted trail climbs from clay tally marks through a grid of spreadsheet cells and a tiny bar chart toward an arrow pointing onward — the journey from ancient counting to modern data analysis"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
-  <rect x="225" y="25" width="190" height="170" rx="20" fill="currentColor" opacity="0.08" />
-  <rect x="248" y="79" width="144" height="3" rx="1.5" fill="currentColor" opacity="0.12" />
-  <rect x="248" y="123" width="144" height="3" rx="1.5" fill="currentColor" opacity="0.12" />
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <polygon points="256,48 268,48 262,64" />
-    <polygon points="284,48 296,48 290,64" />
-    <polygon points="312,48 324,48 318,64" />
-    <polygon points="340,48 352,48 346,64" />
-    <polygon points="368,48 380,48 374,64" />
+    <rect x="80" y="140" width="6" height="32" rx="3" />
+    <rect x="92" y="140" width="6" height="32" rx="3" />
+    <rect x="104" y="140" width="6" height="32" rx="3" />
+    <polygon points="76,168 110,144 113,150 79,174" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="140" cy="150" r="3" />
+    <circle cx="170" cy="139" r="3" />
+    <circle cx="198" cy="128" r="3" />
   </g>
   <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <polygon points="256,92 268,92 262,108" />
-    <polygon points="284,92 296,92 290,108" />
-    <polygon points="312,92 324,92 318,108" />
-    <polygon points="340,92 352,92 346,108" />
+    <rect x="222" y="90" width="22" height="16" rx="4" />
+    <rect x="248" y="90" width="22" height="16" rx="4" fillOpacity="0.55" />
+    <rect x="222" y="112" width="22" height="16" rx="4" fillOpacity="0.55" />
+    <rect x="248" y="112" width="22" height="16" rx="4" />
+  </g>
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="300" cy="110" r="3" />
+    <circle cx="330" cy="102" r="3" />
+    <circle cx="358" cy="94" r="3" />
   </g>
   <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <polygon points="256,136 268,136 262,152" />
-    <polygon points="284,136 296,136 290,152" />
-    <polygon points="312,136 324,136 318,152" fillOpacity="0.45" />
-    <polygon points="340,136 352,136 346,152" fillOpacity="0.25" />
+    <rect x="382" y="96" width="14" height="34" rx="4" />
+    <rect x="402" y="78" width="14" height="52" rx="4" />
+    <rect x="422" y="60" width="14" height="70" rx="4" />
   </g>
-  <g fill="currentColor" opacity="0.2">
-    <circle cx="262" cy="174" r="3" />
-    <circle cx="282" cy="174" r="3" />
-    <circle cx="302" cy="174" r="3" />
+  <g fill="currentColor" opacity="0.3">
+    <circle cx="462" cy="86" r="3" />
+    <circle cx="490" cy="76" r="3" />
+    <circle cx="516" cy="66" r="3" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <polygon points="540,72 568,44 578,70" />
   </g>
 </svg>
 
-## The first datasets were bones
+## Rows and columns are older than writing
 
-The oldest known dataset is the **Ishango bone**, found near a
-volcano in central Africa and dated to roughly 20,000 years ago.
-Carved along three rows of its surface are clusters of notches —
-groups of 11, 13, 17, 19 and others — that mathematicians still
-argue about today. Whether they recorded prime numbers, a lunar
-calendar, or simply a count of livestock, the impulse was the
-same: **something happened repeatedly, and the carver wanted a
-durable record of it**.
+The oldest records humans kept were not stories — they were
+*counts*. About 5,000 years ago the Sumerians of Mesopotamia
+pressed wedge-shaped marks into wet clay, and most of those tablets
+are not poetry or scripture. They are **receipts**: sheep
+delivered, beer rationed, wages owed. A typical temple ledger has a
+heading row, repeated rows of transactions, columns that align so a
+scribe can scan down, and a total at the bottom.
 
-That impulse — to externalize counting so we can come back to it
-later — is the seed of every spreadsheet, every CSV file, and every
-SQL table you will ever see.
+Tilt your head and it is a spreadsheet. This is the key idea to
+carry into the whole course: **tabular data — rows of similar
+things, columns of their attributes — is not a Python invention or
+an Excel invention.** It is how humans have organized records for
+millennia, because it matches how we reason about *categories of
+things with properties*. Pandas inherits that shape; it did not
+create it.
 
 ```mermaid
 flowchart TD
-    A[Real-world<br/>event] --> B[Symbol or<br/>notch]
-    B --> C[Durable<br/>medium]
-    C --> D[Re-read by<br/>future humans]
-    D --> E[Decision or<br/>insight]
+    A["Real-world<br/>event"] --> B["Symbol, mark,<br/>or row"]
+    B --> C["Durable<br/>medium"]
+    C --> D["Re-read<br/>later"]
+    D --> E["Decision<br/>or insight"]
 ```
 
-## Clay tablets and the first ledgers
+For most of history the largest datasets in the world were
+government records — Roman censuses, the Domesday Book, Qing
+household registers. Then two ideas turned counting into a science.
+In the 1600s, **probability theory** (Pascal, Fermat, then
+Bernoulli and Bayes) gave humans a way to reason about *uncertain*
+data. By the 1800s **statistics** was a discipline with real
+stakes: Florence Nightingale used a polar-area chart to convince
+Parliament that soldiers were dying of bad sanitation, not bullets,
+and John Snow mapped London cholera deaths to a single contaminated
+water pump. These were not just numbers; they were *analyses with a
+conclusion* that changed policy.
 
-About 5,000 years ago, the Sumerians of Mesopotamia started
-pressing wedge-shaped marks into wet clay. Most of those tablets
-are not poetry or religious texts — they are **receipts**. Sheep
-delivered. Beer rationed. Land surveyed. Wages owed.
+One more lineage matters. In 1970 an IBM researcher named **Edgar
+F. Codd** proposed the **relational model**: store data as
+relations — sets of rows, each a tuple of typed values — and query
+them with a mathematical algebra. That model underlies every SQL
+database today, and Pandas quietly borrows its vocabulary. When we
+reach *joins*, *merges*, and *group-bys* later, you will be using
+ideas that have worked for fifty-plus years.
 
-A typical Sumerian temple ledger looks shockingly modern. It has:
+## The spreadsheet won the business world
 
-- A heading row (who, what, when).
-- Repeated rows of transactions.
-- Columns that align across rows so the scribe can scan down.
-- A total at the bottom.
+If the clay tablet is the DataFrame's deep ancestor, the
+**spreadsheet** is its parent — and to understand why Pandas
+exists, you have to understand why spreadsheets won.
 
-If you tilt your head, it is a spreadsheet. The technology has
-changed; the *shape* of the information has not.
+In 1979 the personal computer was a curiosity; companies could not
+say why their accounting department needed one. Then two people,
+**Dan Bricklin** and **Bob Frankston**, shipped **VisiCalc** — an
+"electronic blackboard" where each cell could hold a number or a
+formula, and changing one cell rippled automatically through the
+rest. Suddenly there was a reason to spend $2,000 on an Apple II:
+it turned a week of financial modeling into ten minutes. VisiCalc
+was the personal computer's first *killer app*.
 
-<Callout type="info" title="Why does this matter?">
-Tabular data — rows of similar things with columns of attributes —
-is not a Python invention or an Excel invention. It is the way
-humans have organized records for thousands of years, because it
-matches how our minds reason about *categories of things with
-properties*. Pandas inherits that shape.
+**Lotus 1-2-3** (1983) made it faster and added charts; by 1985 it
+was the best-selling software on Earth and the tool of corporate
+finance. A new job appeared — the **business analyst** — whose
+description (*take raw numbers, clean them up, summarize them,
+communicate them*) is almost word-for-word the modern data
+analyst's. **Microsoft Excel** then inherited the throne in the
+1990s and never gave it back. The reasons it won are still the
+reasons spreadsheets dominate today: you click a cell and type;
+every value is visible at once; edits recalculate instantly;
+`.xlsx` is how humans email each other data; and `=SUM(A1:A10)` is
+a real program anyone can read without a programming background.
+
+<Callout type="info" title="Spreadsheets are programming">
+A spreadsheet formula has inputs, outputs, conditionals (`IF`),
+aggregations (`SUM`, `AVERAGE`), even function composition. The
+grid is a *visual programming environment* — both data store and
+user interface. Most "non-technical" analysts have been programming
+for decades; they just were not calling it that. Pandas has to earn
+its place against a tool this good.
 </Callout>
 
-## Census, navigation, and the rise of statistics
+## Then the data outgrew the grid
 
-For most of history, the largest datasets in the world were
-**government records**: censuses, tax rolls, military rosters,
-land registries. Rome counted citizens; Domesday Book counted
-English villages; Qing officials counted households across China.
+The spreadsheet was designed for small, slow, expensive computers
+holding small datasets typed in by hand. Within twenty years every
+one of those assumptions was demolished. In 1990 the world had
+about 300,000 internet hosts; by 2020, over four *billion* people
+were producing clicks, posts, searches, purchases, and GPS pings
+every second — each one a row in some dataset somewhere. Three
+forces drove the flood:
 
-Two big shifts happened in the 1600s and 1700s:
+1. **Cheap storage.** A megabyte of disk cost on the order of
+   hundreds of thousands of dollars in 1980 and a tiny fraction of
+   a cent by 2020. There was no longer a reason to throw data away.
+2. **Cheap sensors.** A single smartphone carries a GPS, an
+   accelerometer, cameras, a microphone, and more — all producing
+   data constantly.
+3. **Cheap collection.** One line of JavaScript can send a click
+   event to a server in microseconds, with no form to fill in.
 
-1. **Probability theory** was invented (Pascal, Fermat, then
-   Bernoulli and Bayes), giving humans a way to reason about
-   *uncertain* data.
-2. **Navigation** demanded the first big precomputed tables —
-   logarithms, trigonometric values, ephemerides — so that
-   sailors could fix their position at sea.
+Spreadsheets started to creak. The classic Excel format capped a
+sheet at 65,536 rows; even modern Excel stops near one million, and
+real datasets routinely exceed that. Worse, spreadsheet work leaves
+*no reproducible trail* — six months later, when an auditor asks
+"show me exactly how this number was computed," the honest answer is
+often "we cannot." (The next chapter makes that failure concrete,
+with a famous example.) The gap between what businesses needed and
+what the grid could do is exactly the gap that code — and Pandas —
+was built to close.
 
-By the 1800s, **statistics** was a discipline. Florence
-Nightingale used a polar area chart to convince Parliament that
-soldiers were dying from sanitation, not bullets. John Snow mapped
-cholera cases in London to a single contaminated water pump. These
-were not just numbers — they were *data analyses with a
-conclusion*, and they changed government policy.
+## Three trades that became one job
+
+By the late 2000s, three communities discovered they were doing the
+same work from different angles. **Statisticians** had rigorous
+methods but worked in expensive proprietary tools on small, tidy
+datasets. **Computer scientists** could move and store terabytes
+but rarely *interpreted* them. **Business analysts** knew the
+questions and the domain but hit a ceiling at modest data sizes and
+left no audit trail. Their union picked up a name that stuck:
+**data science**.
+
+```mermaid
+flowchart LR
+    S["Statistics<br/>methodology"] --> DS["Data<br/>Science"]
+    CS["Computer Science<br/>engineering"] --> DS
+    BA["Business Analysis<br/>domain knowledge"] --> DS
+    DS --> O["Insights and<br/>data products"]
+```
+
+Whatever the title — data analyst, data scientist — the day-to-day
+is dominated by four activities: **acquiring** data, **cleaning**
+it, **exploring** it, and **communicating** the result. Cleaning is
+the big one. It is frequently reported that data scientists spend
+most of their time preparing and cleaning data rather than running
+the eventual analysis — the 2014 *New York Times* piece "For
+Big-Data Scientists, 'Janitor Work' Is Key Hurdle" is the usual
+citation. This course gives that "janitor work" several chapters,
+because the decisions you make about a bad row quietly shape every
+conclusion built on top of it.
+
+## One frustrated researcher, one library
+
+Which brings us to the library this course is named for. By 2007 you
+could *technically* do data analysis in Python. **NumPy** (unified
+by Travis Oliphant around 2005–2006 from two earlier array
+libraries) gave Python a fast, C-backed n-dimensional array;
+**Matplotlib** gave it plots; **SciPy** gave it algorithms. But
+none of them understood a *labeled column*. Spreadsheets had labels.
+R had its `data.frame`. Python had arrays of anonymous numbers plus
+a notebook of side-scripts to remember which column meant what.
+
+That year, **Wes McKinney** was a researcher at **AQR Capital
+Management**, a quantitative hedge fund, analyzing financial time
+series — the kind of cross-sectional, multi-period data
+econometricians call **panel data**. His tools each failed him
+differently: Excel was hopeless at scale, MATLAB was expensive and
+weak at messy tables, R was awkward to wire into the firm's Python
+systems, and plain NumPy made him hand-write the logic to align two
+time series on a date, pad missing holidays, or compute a rolling
+average. He wanted *one* library with Python's general-purpose
+power and R's friendly, label-aware data semantics. None existed, so
+he wrote one — and named it after **"pan**el **da**ta," with a nod
+to **Python data analysis**.
+
+<Callout type="info" title="Where the name comes from">
+"Pandas" is a contraction of "panel data" — not the bear. The cute
+animal coincidence helped it stick, but the name encodes what the
+library was built for: labeled, multi-dimensional, tabular data.
+</Callout>
+
+McKinney open-sourced pandas in 2009 under a permissive license,
+left AQR in 2010 to work on it nearly full-time, and in 2012 wrote
+*Python for Data Analysis*, the book that taught a generation. The
+library's vocabulary is a quiet museum of everything it borrowed:
+**DataFrame** from R, **index** from databases,
+**split-apply-combine** (the engine of `groupby`) from a 2011 paper
+by Hadley Wickham, and **merge** / **join** straight from SQL. That
+magpie instinct — take the best idea from each adjacent tradition —
+is a large part of why pandas won.
 
 ```mermaid
 timeline
-    title Milestones in the history of recorded data
-    20000 BCE : Ishango bone tally marks
-    3000 BCE  : Sumerian clay ledgers
-    100 CE    : Roman census
-    1086 CE   : Domesday Book
-    1662      : Graunt's "Bills of Mortality"
-    1854      : John Snow's cholera map
-    1890      : Hollerith punch cards (US Census)
-    1970      : Codd's relational model
-    1989      : Excel for Windows
-    2008      : pandas first release
+    title From clay to DataFrame
+    3000 BCE : Sumerian clay ledgers
+    1854 : John Snow's cholera map
+    1970 : Codd's relational model
+    1979 : VisiCalc, the first spreadsheet
+    1989 : Excel for Windows
+    2005 : NumPy unifies Python arrays
+    2009 : pandas open-sourced
+    2012 : "Python for Data Analysis"
+    2023 : pandas 2.0, Apache Arrow backend
 ```
-
-## Punch cards and the first machines
-
-The 1890 US Census was a turning point. The country had grown so
-fast that hand-tabulating the previous census had taken **eight
-years**, and the next one was due before the previous one was
-finished. Herman Hollerith built an electromechanical tabulator
-that read punched cards — one per person — and the 1890 count was
-done in roughly one. The company he founded would later become
-**IBM**.
-
-Punch cards were the dominant data medium for the next seventy
-years. Every payroll system, airline reservation system, and
-scientific simulation in the 1950s and 60s ate boxes of cards. The
-*column* on a card became the *field* in a record, which became
-the *column* of a database table, which became the *column* of a
-DataFrame. The vocabulary has barely changed.
-
-## The relational model
-
-In 1970, an IBM researcher named **Edgar F. Codd** published a
-paper titled *A Relational Model of Data for Large Shared Data
-Banks*. It proposed a radical idea: instead of programmers
-hand-crafting the file layouts and traversal paths for each
-application, data should be stored as **relations** — sets of
-rows, each row a tuple of typed values — and queried with a
-mathematical algebra.
-
-This is the model behind every SQL database in the world today,
-and it is also the model Pandas borrows from when it talks about
-*joins*, *merges*, *groups*, and *aggregates*. When we cover those
-operations later in the course, you will be using ideas that have
-been around for fifty-plus years and have survived because they
-*work*.
-
-<Callout type="info" title="Pandas is not a database">
-Pandas is an in-memory analytical library — it loads your data
-into RAM and works on it there. Databases are designed for
-persistent storage, concurrent access, and queries that may run
-across machines. But the *conceptual vocabulary* — tables, rows,
-columns, joins, aggregations — is shared. Learning Pandas
-indirectly teaches you a great deal about databases.
-</Callout>
 
 ## Why this story matters to you
 
-A common mistake of new analysts is to think of "data" as
-something that lives inside a particular tool — an Excel file, a
-Pandas DataFrame, a Tableau workbook. It does not. *Data is a
-record of something that happened in the world.* The tools come
-and go (clay → cards → spreadsheets → DataFrames → cloud
-warehouses), but the work — turning recorded observations into
-useful decisions — is the same job humans have been doing for
-millennia.
+A common mistake of new analysts is to think "data" lives inside a
+particular tool — an Excel file, a Pandas DataFrame, a Tableau
+workbook. It does not. *Data is a record of something that happened
+in the world.* The tools come and go (clay → punch cards →
+spreadsheets → DataFrames → cloud warehouses); the work — turning
+recorded observations into trustworthy decisions — is the same job
+humans have done for millennia. Every time you load a CSV in this
+course, you are a Sumerian scribe with a faster stylus.
 
-Every time you load a CSV in this course, picture the Sumerian
-scribe with their reed stylus. The medium is different. The job
-is exactly the same.
+## A first piece of analysis, by hand
 
-## A tiny historical experiment
-
-Let us do our first piece of "data analysis" — on a dataset that
-looks a lot like a Sumerian ledger.
+Let us do the oldest data operation in the world on a very
+Sumerian-looking ledger — no Pandas yet, just plain Python, so you
+can feel the underlying *thought process* before we automate it.
 
 <CodeBlock
   adapter="python"
@@ -200,7 +275,6 @@ looks a lot like a Sumerian ledger.
       filename: "main.py",
       starterCode: `# A fictional but very Sumerian-looking ledger:
 # rows = transactions, columns = (item, quantity, recipient)
-
 ledger = [
     ("barley", 120, "temple kitchen"),
     ("beer", 30, "scribe school"),
@@ -211,7 +285,7 @@ ledger = [
     ("barley", 45, "scribe school"),
 ]
 
-# Question: how much barley did each recipient get?
+# Question: how much barley did each recipient receive?
 totals = {}
 for item, qty, recipient in ledger:
     if item == "barley":
@@ -224,13 +298,14 @@ for recipient, total in totals.items():
   ]}
 />
 
-Take a moment to appreciate this. We just **filtered** by item,
-**grouped** by recipient, and **aggregated** by sum — three core
-operations that we will spend entire chapters on in Pandas. The
-scribe was doing the same calculation with a reed stylus on clay.
-You did it in twelve lines of Python. The underlying *thought
-process* — pick the rows you care about, slice by a category,
-total something up — is unchanged.
+You just **filtered** by item, **grouped** by recipient, and
+**aggregated** by sum — three operations we will spend whole
+chapters on in Pandas. The scribe did the same with a reed stylus
+on clay; you did it in a dozen lines of Python. The thought process
+— pick the rows you care about, split by a category, total
+something up — has not changed in five thousand years. The rest of
+this course is mostly about doing that thought process *faster,
+more reliably, and on far bigger ledgers.*
 
 ## Check your understanding
 
@@ -240,26 +315,41 @@ total something up — is unchanged.
 - A Sumerian clay tablet listing daily grain rations
   > A grain-ration ledger has repeated rows of transactions with aligned columns of item, quantity, and recipient — exactly the tabular shape the chapter describes.
 - A Roman census enumerating citizens by household
-  > A census has repeated rows (one per household) with columns of attributes (name, property, family members) — a canonical tabular dataset.
-- The 1890 US census tabulated on Hollerith punch cards
-  > The 1890 census is explicitly cited in the chapter as a milestone in tabular data; each punch card was one row (one person) with columns of attributes.
+  > A census has repeated rows (one per household) with columns of attributes — a canonical tabular dataset.
+- An Excel sheet of weekly sales by region
+  > A sales sheet is rows of records (weeks) with columns of attributes (regions) — squarely tabular.
 - [o] A handwritten love poem on parchment
-  > A poem is unstructured prose — it has no repeated rows of similar things with aligned columns of attributes. A tabular dataset is defined by its row-and-column structure, where each row represents one "thing" and each column one attribute of that thing.
+  > A poem is unstructured prose — no repeated rows of similar things with aligned columns. Tabular data is defined by its row-and-column structure, where each row is one "thing" and each column one attribute of that thing.
 
 Tabular structure — repeated rows of similar entities with aligned columns — is the defining shape of data analysis from clay tablets to Pandas.`}
+/>
+
+<MultipleChoice
+  markdown={`Where does the name "pandas" come from?
+
+- The animal, because the logo is cute
+  > The panda branding is a later coincidence, not the origin.
+- A clever acronym for its features
+  > "Pandas" is not an acronym; it is a contraction of "panel data," the financial time-series data McKinney worked with at AQR.
+- [o] "Panel data" — an econometrics term for multi-dimensional structured data — with a nod to "Python data analysis"
+  > McKinney built the library for panel data at a hedge fund; the name encodes that purpose. The bear coincidence helped it stick.
+- The initials of its first five contributors
+  > The name predates a large contributor base and derives from "panel data," not anyone's initials.
+
+Knowing the origin explains why pandas takes labeled, multi-dimensional data so seriously.`}
 />
 
 <MultipleChoice
   markdown={`Why is the relational model (Codd, 1970) relevant to a course about Pandas?
 
 - Pandas is itself a relational database
-  > The chapter explicitly states that Pandas is an in-memory analytical library, not a database; it does not provide persistent storage or concurrent access.
+  > Pandas is an in-memory analytical library, not a database; it provides no persistent storage or concurrent access.
 - Codd invented the CSV format
-  > Codd's 1970 paper proposed the relational model and relational algebra; the CSV format predates and postdates that work independently and was not part of his contribution.
-- [o] Pandas borrows the same conceptual vocabulary — tables, rows, columns, joins, group-bys — and the same mental model of operating on whole sets of rows at once
-  > Pandas is an in-memory analytical library, not a database, but its operations are deeply inspired by relational algebra. Understanding "joins" and "group bys" in Pandas means understanding ideas that have been around for over fifty years.
-- Pandas requires you to use SQL syntax internally
-  > Pandas uses Python method calls, not SQL; the connection to Codd is conceptual (shared vocabulary and mental models), not syntactic.
+  > Codd's 1970 paper proposed the relational model and relational algebra; the CSV format is unrelated to that work.
+- [o] Pandas borrows the same vocabulary — tables, rows, columns, joins, group-bys — and the same idea of operating on whole sets of rows at once
+  > Pandas's operations are deeply inspired by relational algebra. Learning "joins" and "group-bys" in Pandas means learning ideas that have worked for over fifty years.
+- Pandas requires you to write SQL internally
+  > Pandas uses Python method calls; the connection to Codd is conceptual (shared vocabulary), not syntactic.
 
-The historical continuity between databases and DataFrames is one reason the same vocabulary keeps appearing in this course.`}
+The continuity between databases and DataFrames is why the same words keep reappearing in this course.`}
 />

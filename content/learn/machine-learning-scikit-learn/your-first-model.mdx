@@ -8,8 +8,8 @@ and you have seen `train_test_split` carve a dataset into a part to learn
 from and a part to be honest with. Now we put the whole thing together and
 build a real, working model from start to finish.
 
-By the end of this page you will have trained a classifier on the famous
-iris flowers, asked it to label flowers it never saw, and measured exactly
+By the end of this page you will have trained a classifier on real penguin
+measurements, asked it to label penguins it never saw, and measured exactly
 how often it was right. More importantly, you will have internalized a
 shape — **load, split, train, evaluate** — that every model in this course
 repeats without exception. Once that shape is automatic, learning a new
@@ -61,8 +61,8 @@ that page first; everything here builds on it.
 ## The problem this workflow solves
 
 You have a table of data and a question you want answered automatically.
-*Given a flower's measurements, which species is it? Given a patient's
-labs, is this tumor malignant? Given a house's features, what will it
+*Given a penguin's measurements, which species is it? Given a patient's
+labs, is this condition present? Given a house's features, what will it
 sell for?* Each of these is the same kind of task: learn a rule from
 labeled examples, then apply that rule to new, unlabeled cases.
 
@@ -83,7 +83,7 @@ once and every new model is just a one-line substitution.
 
 Here is the entire workflow as a picture. Read it top to bottom: data comes
 in, gets split, one half teaches the model, the other half grades it, and
-finally the finished model labels brand-new flowers.
+finally the finished model labels brand-new penguins.
 
 ```mermaid
 flowchart TD
@@ -95,7 +95,7 @@ flowchart TD
     D --> G["<code>model.score(X_test, y_test)</code><br/>GRADE on unseen data"]
     F --> G
     G --> H["Accuracy:<br/>an honest estimate"]
-    F --> I["<code>model.predict(new_flower)</code><br/>USE it in the wild"]
+    F --> I["<code>model.predict(new_penguin)</code><br/>USE it in the wild"]
     I --> J["Predicted species"]
 ```
 
@@ -107,98 +107,110 @@ set, and you *predict* on the real world.
 
 ## Move 1: load the data
 
-We will use `load_iris`, a dataset of 150 iris flowers. Each flower has
-four measurements — sepal length, sepal width, petal length, petal width —
-and belongs to one of three species: *setosa*, *versicolor*, or
-*virginica*. The features are `X` (150 rows, 4 columns) and the species
-labels are `y` (150 values, each 0, 1, or 2).
+We will use the **Palmer Penguins** dataset: body measurements of penguins
+observed near Palmer Station, Antarctica. Each penguin has four
+measurements — bill length, bill depth, flipper length, body mass — and
+belongs to one of three species: *Adelie*, *Gentoo*, or *Chinstrap*. After
+dropping the handful of rows with missing measurements we have 342
+penguins. The features are `X` (342 rows, 4 columns) and the species labels
+are `y`. (This dataset has become the community's preferred first example
+over the classic iris flowers, in part because the iris data was published
+by Ronald Fisher, a prominent eugenicist.)
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
 
-# return_X_y=True hands back the feature matrix and label vector directly.
-X, y = load_iris(return_X_y=True)
-
-print("Features X:", X.shape, "(rows = flowers, columns = measurements)")
-print("Labels   y:", y.shape, "-> values:", sorted(set(y)))
+print("Features X:", X.shape, "(rows = penguins, columns = measurements)")
+print("Labels   y:", y.shape, "-> species:", sorted(set(y)))
 print()
-print("First flower's measurements:", X[0])
-print("First flower's species code:", y[0])
+print("First penguin's measurements:", X[0])
+print("First penguin's species:     ", y[0])
 `,
     },
   ]}
 />
 
-The four numbers in `X[0]` are that flower's measurements in centimeters,
-and the `0` in `y[0]` is its species code. The model's job is to learn the
-connection between those four numbers and that code, well enough to label a
-flower it has never measured.
+The four numbers in `X[0]` are that penguin's measurements (millimeters for
+the bill and flipper, grams for the body mass), and `y[0]` is its species
+name. The model's job is to learn the connection between those four numbers
+and the species, well enough to label a penguin it has never measured.
 
-<Callout type="info" title="The numbers behind the names">
-scikit-learn stores labels as integers (0, 1, 2), not the species strings,
-because models do arithmetic on numbers, not words. The dataset keeps the
-human-readable names in `load_iris().target_names`, and we will use them
-later to print results people can actually read.
+<Callout type="info" title="Strings as labels are fine here">
+scikit-learn classifiers accept string labels like `"Adelie"` directly —
+they keep the readable names internally and handle the integer bookkeeping
+for you. (Many of scikit-learn's built-in toy datasets hand you integer
+codes instead and a separate list of names; with a real CSV the names come
+along for free.)
 </Callout>
 
-Let us peek at the names so the integer codes mean something.
+Let us count how many penguins of each species we have.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+print("Feature names:", features)
+print("Species names:", sorted(penguins["species"].unique()))
 
-iris = load_iris()  # the full object, with names attached
-print("Feature names:", iris.feature_names)
-print("Species names:", list(iris.target_names))
-
-# Map each code to its species so the labels are readable.
-for code, name in enumerate(iris.target_names):
-    count = int((iris.target == code).sum())
-    print(f"  code {code} = {name:12s} ({count} flowers)")
+# How many penguins of each species?
+for name, count in penguins["species"].value_counts().sort_index().items():
+    print(f"  {name:12s} ({count} penguins)")
 `,
     },
   ]}
 />
 
-Fifty of each species, four measurements each. A balanced, tidy dataset —
-which is exactly why it is the classic first example. Real data is rarely
-this clean, and later pages deal with the mess. For now, a clean dataset
-lets us focus on the workflow itself.
+Roughly 150 Adelie, 120 Gentoo, and 70 Chinstrap, four measurements each.
+The classes are not perfectly balanced, but they are close enough to make a
+clean first example. Real data is rarely even this tidy, and later pages
+deal with the mess. For now, a simple dataset lets us focus on the workflow
+itself.
 
 ## Move 2: split into train and test
 
-We hold back a slice of flowers so we can grade the model on examples it
+We hold back a slice of penguins so we can grade the model on examples it
 never studied. We will put 25% in the test set, fix `random_state` so the
 split is reproducible, and **stratify** on `y` so all three species stay
 proportionally represented in both halves.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 
-X, y = load_iris(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
 
 X_train, X_test, y_train, y_test = train_test_split(
     X,
     y,
-    test_size=0.25,  # 25% of flowers held out for the final grade
+    test_size=0.25,  # 25% of penguins held out for the final grade
     random_state=42,  # reproducible split
     stratify=y,  # keep all 3 species balanced in both halves
 )
 
-print("Training flowers:", X_train.shape[0])
-print("Test flowers:    ", X_test.shape[0])
+print("Training penguins:", X_train.shape[0])
+print("Test penguins:    ", X_test.shape[0])
 print("Training set is the part the model LEARNS from.")
 print("Test set is locked away until the very end.")
 `,
@@ -225,23 +237,27 @@ object with a `.fit()` method that learns from data and a `.predict()`
 method that applies what it learned. We will use
 `KNeighborsClassifier`, one of the most intuitive classifiers there is.
 
-Its idea, in one sentence: **to label a new flower, find the few training
-flowers most similar to it and let them vote.** "Similar" means closest in
-measurement-space. With `n_neighbors=5`, each new flower is labeled by the
+Its idea, in one sentence: **to label a new penguin, find the few training
+penguins most similar to it and let them vote.** "Similar" means closest in
+measurement-space. With `n_neighbors=5`, each new penguin is labeled by the
 majority species among its five nearest training neighbors. There is no
-heavy math — the model essentially *remembers* the training flowers and
+heavy math — the model essentially *remembers* the training penguins and
 compares.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
-X, y = load_iris(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=42, stratify=y
 )
@@ -252,7 +268,7 @@ model = KNeighborsClassifier(n_neighbors=5)
 # 2. Fit it: this is where learning happens, using ONLY the training data.
 model.fit(X_train, y_train)
 
-print("Model trained on", X_train.shape[0], "flowers.")
+print("Model trained on", X_train.shape[0], "penguins.")
 print(model)
 `,
     },
@@ -261,7 +277,7 @@ print(model)
 
 That is the whole of training: construct the estimator, then call `.fit()`
 on the **training** features and labels. The model has now "learned" — for
-KNN that simply means it has stored the training flowers in a way it can
+KNN that simply means it has stored the training penguins in a way it can
 search quickly.
 
 <Callout type="tip" title="The fit / predict contract">
@@ -279,20 +295,24 @@ estimators are.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
-X, y = load_iris(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=42, stratify=y
 )
 
 # The ONLY line that changed from the KNN example is this one:
-model = LogisticRegression(max_iter=1000)
+model = LogisticRegression(max_iter=2000)
 model.fit(X_train, y_train)
 
 print("Same workflow, different estimator.")
@@ -311,19 +331,22 @@ A trained model is useful in two distinct ways, and the welcome diagram
 already hinted at both.
 
 **Predict** asks the model to label specific inputs. Let us hand it the
-first few test flowers and compare its guesses to the truth.
+first few test penguins and compare its guesses to the truth.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
-iris = load_iris()
-X, y = iris.data, iris.target
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=42, stratify=y
 )
@@ -331,38 +354,41 @@ X_train, X_test, y_train, y_test = train_test_split(
 model = KNeighborsClassifier(n_neighbors=5)
 model.fit(X_train, y_train)
 
-# Predict the first 8 test flowers, then compare to the real answers.
+# Predict the first 8 test penguins, then compare to the real answers.
 predictions = model.predict(X_test[:8])
 truth = y_test[:8]
 
-names = iris.target_names
 print("predicted -> actual")
 for p, t in zip(predictions, truth):
     mark = "ok" if p == t else "WRONG"
-    print(f"  {names[p]:12s} -> {names[t]:12s}  {mark}")
+    print(f"  {p:12s} -> {t:12s}  {mark}")
 `,
     },
   ]}
 />
 
-Most or all of those eight will match. But eight flowers is far too few to
+Most or all of those eight will match. But eight penguins is far too few to
 judge a model — you could get lucky or unlucky. For an honest, stable
 number we score on the *entire* test set at once.
 
 **Score** asks the model how often it is right across all held-out
 examples. For a classifier, `.score()` returns **accuracy**: the fraction
-of test flowers labeled correctly.
+of test penguins labeled correctly.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
-X, y = load_iris(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=42, stratify=y
 )
@@ -370,9 +396,9 @@ X_train, X_test, y_train, y_test = train_test_split(
 model = KNeighborsClassifier(n_neighbors=5)
 model.fit(X_train, y_train)
 
-# Accuracy on the held-out flowers: the honest grade.
+# Accuracy on the held-out penguins: the honest grade.
 accuracy = model.score(X_test, y_test)
-print(f"Accuracy on unseen flowers: {accuracy:.1%}")
+print(f"Accuracy on unseen penguins: {accuracy:.1%}")
 
 # Score is just a convenience: accuracy = fraction predicted correctly.
 predictions = model.predict(X_test)
@@ -384,9 +410,12 @@ print(f"Same thing, computed by hand:  {manual:.1%}")
 />
 
 The two numbers are identical, because `.score()` for a classifier is
-exactly "predict everything, then take the fraction correct." Around 97% on
-unseen flowers — a genuinely trustworthy result, because not one of those
-test flowers influenced training.
+exactly "predict everything, then take the fraction correct." Around 79% on
+unseen penguins — a trustworthy result, because not one of those test
+penguins influenced training. (It is not higher because raw KNN measures
+distance, and body mass in grams dwarfs a bill length in millimeters; the
+**feature scaling** page later fixes exactly this and pushes the score well
+into the 90s.)
 
 <Callout type="info" title="What .score() means depends on the task">
 For a **classifier**, `.score()` returns accuracy (fraction correct). For a
@@ -398,37 +427,39 @@ classification-evaluation material unpack what these scores do and do *not*
 tell you. For now, treat accuracy as a first, rough headline.
 </Callout>
 
-## Predicting on a brand-new flower
+## Predicting on a brand-new penguin
 
 In the real world you do not have an answer key — that is the entire point
-of a model. You measure a flower in the field, hand the four numbers to the
+of a model. You measure a penguin in the field, hand the four numbers to the
 trained model, and it tells you the species. Let us do exactly that.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
-iris = load_iris()
-X, y = iris.data, iris.target
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=42, stratify=y
 )
 model = KNeighborsClassifier(n_neighbors=5)
 model.fit(X_train, y_train)
 
-# A flower you just measured in the field (4 numbers, same order as training):
-# sepal length, sepal width, petal length, petal width
-new_flower = [[5.1, 3.5, 1.4, 0.2]]
+# A penguin you just measured in the field (4 numbers, same order as training):
+# bill length (mm), bill depth (mm), flipper length (mm), body mass (g)
+new_penguin = [[39.1, 18.7, 181.0, 3750.0]]
 
-prediction = model.predict(new_flower)
-species = iris.target_names[prediction[0]]
-print("Measurements:", new_flower[0])
-print("Predicted species:", species)
+prediction = model.predict(new_penguin)
+print("Measurements:", new_penguin[0])
+print("Predicted species:", prediction[0])
 `,
     },
   ]}
@@ -438,26 +469,27 @@ Two details here are easy to trip over, and both are worth burning in.
 
 First, the input is a list **of lists** — `[[...]]`, not `[...]`.
 scikit-learn always expects a 2D array of shape `(n_samples, n_features)`,
-even for a single sample. One flower is "one row of four features," so it
-is `[[5.1, 3.5, 1.4, 0.2]]`. Hand it a flat list and you will get a shape
-error.
+even for a single sample. One penguin is "one row of four features," so it
+is `[[39.1, 18.7, 181.0, 3750.0]]`. Hand it a flat list and you will get a
+shape error.
 
 Second, `predict` returns an **array**, one prediction per input row, so we
 index `prediction[0]` to read the single answer.
 
 <Callout type="warn" title="The shape mistake everyone makes once">
-`model.predict([5.1, 3.5, 1.4, 0.2])` fails — that is a single flat list,
-which scikit-learn reads as ambiguous. Always pass a 2D structure:
-`[[5.1, 3.5, 1.4, 0.2]]` for one sample, or a list of such rows for many.
-The rule is "rows are samples, columns are features," even when there is
-only one row.
+`model.predict([39.1, 18.7, 181.0, 3750.0])` fails — that is a single flat
+list, which scikit-learn reads as ambiguous. Always pass a 2D structure:
+`[[39.1, 18.7, 181.0, 3750.0]]` for one sample, or a list of such rows for
+many. The rule is "rows are samples, columns are features," even when there
+is only one row.
 </Callout>
 
-Try changing those four numbers and re-running. Large petal measurements
-(say `[6.5, 3.0, 5.5, 2.0]`) will push the prediction toward *virginica*;
-tiny petals lean *setosa*. You are now using a machine learning model the
-way it is meant to be used — feeding it new inputs and trusting its output
-because you measured its accuracy first.
+Try changing those four numbers and re-running. A long bill on a long
+flipper with heavy body mass (say `[48.0, 15.0, 220.0, 5500.0]`) will push
+the prediction toward *Gentoo*; a short, deep bill on a lighter body leans
+*Adelie*. You are now using a machine learning model the way it is meant to
+be used — feeding it new inputs and trusting its output because you measured
+its accuracy first.
 
 ## The whole workflow on one screen
 
@@ -467,15 +499,19 @@ which estimator sits on the highlighted line.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
 # LOAD ----------------------------------------------------------------
-X, y = load_iris(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values
 
 # SPLIT ---------------------------------------------------------------
 X_train, X_test, y_train, y_test = train_test_split(
@@ -491,10 +527,8 @@ accuracy = model.score(X_test, y_test)
 print(f"Test accuracy: {accuracy:.1%}")
 
 # USE -----------------------------------------------------------------
-new_flower = [[6.5, 3.0, 5.5, 2.0]]
-print(
-    "New flower predicted as:", load_iris().target_names[model.predict(new_flower)[0]]
-)
+new_penguin = [[48.0, 15.0, 220.0, 5500.0]]
+print("New penguin predicted as:", model.predict(new_penguin)[0])
 `,
     },
   ]}
@@ -511,12 +545,15 @@ The four-move workflow is always the backbone, but the simple version above
 takes some shortcuts that real problems will not allow. It is worth knowing
 where the shortcuts are so you recognize when a later page is filling a gap.
 
-- **The data needed no preparation.** Iris measurements are all clean
-  numbers on similar scales. Real datasets have missing values, text
-  categories, and features on wildly different scales. The fix —
-  `Pipeline` and `ColumnTransformer` — gets its own page, and crucially it
-  keeps the prep from leaking across the split.
-- **One split can be noisy.** With only 150 flowers, a single test set is a
+- **The data needed barely any preparation.** We dropped a few rows with
+  missing measurements and used the numbers as-is. But our four features are
+  on *wildly* different scales — body mass in the thousands of grams, bill
+  depth in the tens of millimeters — which is exactly why raw KNN only
+  reached the high 70s. Real datasets pile on more: text categories, more
+  missing values, features that must be scaled. The fix — `Pipeline` and
+  `ColumnTransformer` — gets its own page, and crucially it keeps the prep
+  from leaking across the split.
+- **One split can be noisy.** With only 342 penguins, a single test set is a
   thin sample; a different `random_state` shifts the score a little.
   **Cross-validation** replaces one split with several and reports a steadier
   estimate. That, too, is a dedicated page.
@@ -558,7 +595,7 @@ learning to do each move more carefully.
 
 ## Real-world applications
 
-Strip away the flowers and this is the spine of essentially every
+Strip away the penguins and this is the spine of essentially every
 supervised machine learning system in production:
 
 - An email provider **loads** millions of labeled messages, **splits** off
@@ -569,75 +606,74 @@ supervised machine learning system in production:
   watch history to predict what you will play next.
 
 The dataset is bigger, the estimator fancier, the preparation more
-elaborate — but the four moves are identical to what you just ran on 150
-flowers. That is why this page matters more than any single algorithm: you
+elaborate — but the four moves are identical to what you just ran on 342
+penguins. That is why this page matters more than any single algorithm: you
 have learned the frame that holds all of them.
 
 ## Your turn
 
 <ChallengeCard
   adapter="python"
-  title="Build the full load to score flow on iris"
+  title="Build the full load to score flow on penguins"
   category="workflow · end to end"
   estimatedTime="~7 min"
-  instructions={`Reproduce the complete workflow on the iris dataset, then store
-the final accuracy so the tests can check it.
+  instructions={`Reproduce the complete workflow on the penguins dataset, then store
+the final accuracy so the tests can check it. \`X\` (four measurements) and
+\`y\` (the species names) are already prepared for you.
 
-1. Load iris with \`load_iris(return_X_y=True)\` into \`X\` and \`y\`.
-2. Split into train/test with **20%** in the test set, \`random_state=0\`,
+1. Split into train/test with **20%** in the test set, \`random_state=0\`,
    and **stratified** on \`y\`. Use the standard four-variable unpacking:
    \`X_train, X_test, y_train, y_test\`.
-3. Create a \`KNeighborsClassifier(n_neighbors=5)\` called \`model\` and
+2. Create a \`KNeighborsClassifier(n_neighbors=5)\` called \`model\` and
    \`.fit()\` it on the **training** data only.
-4. Store the model's accuracy on the **test** set in a variable named
+3. Store the model's accuracy on the **test** set in a variable named
    \`accuracy\` (use \`model.score(...)\`).
-5. Use the trained model to predict the species code of the single new
-   flower \`[[6.0, 2.7, 5.1, 1.6]]\` and store the integer result in
-   \`new_pred\`.
+4. Use the trained model to predict the species of the single new penguin
+   \`[[46.5, 17.9, 192.0, 3500.0]]\` and store the result in \`new_pred\`.
 
 The tests check the split sizes, that \`model\` is fitted, that
-\`accuracy\` is a sensible high number, and that \`new_pred\` is a valid
-species code (0, 1, or 2).`}
+\`accuracy\` is a sensible high number, and that \`new_pred\` is one of the
+three species names.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      initCode: `from sklearn.datasets import load_iris
+      initCode: `import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.neighbors import KNeighborsClassifier`,
-      starterCode: `# 1. Load
-X, y = None, None
+from sklearn.neighbors import KNeighborsClassifier
 
-# 2. Split (20% test, random_state=0, stratified)
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features].values
+y = penguins["species"].values`,
+      starterCode: `# 1. Split (20% test, random_state=0, stratified)
 X_train, X_test, y_train, y_test = None, None, None, None
 
-# 3. Create and fit the model
+# 2. Create and fit the model
 model = None
 
-# 4. Score on the test set
+# 3. Score on the test set
 accuracy = None
 
-# 5. Predict the new flower's species code
+# 4. Predict the new penguin's species
 new_pred = None
 
 print("accuracy:", accuracy, "new_pred:", new_pred)
 `,
-      solutionCode: `# 1. Load
-X, y = load_iris(return_X_y=True)
-
-# 2. Split (20% test, random_state=0, stratified)
+      solutionCode: `# 1. Split (20% test, random_state=0, stratified)
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=0, stratify=y
 )
 
-# 3. Create and fit the model
+# 2. Create and fit the model
 model = KNeighborsClassifier(n_neighbors=5)
 model.fit(X_train, y_train)
 
-# 4. Score on the test set
+# 3. Score on the test set
 accuracy = model.score(X_test, y_test)
 
-# 5. Predict the new flower's species code
-new_pred = int(model.predict([[6.0, 2.7, 5.1, 1.6]])[0])
+# 4. Predict the new penguin's species
+new_pred = model.predict([[46.5, 17.9, 192.0, 3500.0]])[0]
 
 print("accuracy:", accuracy, "new_pred:", new_pred)
 `,
@@ -646,15 +682,17 @@ print("accuracy:", accuracy, "new_pred:", new_pred)
   tests={[
     {
       id: "test_size",
-      name: "Test set is 20% of 150 flowers",
-      description: "30 flowers held out",
-      code: `assert X_test.shape[0] == 30, f"Expected 30 test flowers, got {X_test.shape[0]}"`,
+      name: "Test set is 20% of the penguins",
+      description: "Held-out rows match a 20% split",
+      code: `import math
+expected = math.ceil(len(X) * 0.2)
+assert X_test.shape[0] == expected, f"Expected {expected} test penguins, got {X_test.shape[0]}"`,
     },
     {
       id: "train_size",
       name: "Training set is the other 80%",
-      description: "120 flowers used to train",
-      code: `assert X_train.shape[0] == 120, f"Expected 120 train flowers, got {X_train.shape[0]}"`,
+      description: "Train and test together cover every row",
+      code: `assert X_train.shape[0] == len(X) - X_test.shape[0], f"Got {X_train.shape[0]} train penguins"`,
     },
     {
       id: "model_fitted",
@@ -666,16 +704,16 @@ assert hasattr(model, "classes_"), "model does not appear to be fitted (call .fi
     },
     {
       id: "accuracy_high",
-      name: "Accuracy on unseen flowers is high",
+      name: "Accuracy on unseen penguins is solid",
       description: "A correctly built model scores well above chance",
       code: `assert accuracy is not None, "accuracy is still None"
-assert accuracy > 0.85, f"Expected accuracy above 0.85, got {accuracy}"`,
+assert accuracy > 0.7, f"Expected accuracy above 0.7, got {accuracy}"`,
     },
     {
       id: "new_pred_valid",
-      name: "Prediction is a valid species code",
-      description: "0, 1, or 2",
-      code: `assert new_pred in (0, 1, 2), f"Expected a species code in 0/1/2, got {new_pred}"`,
+      name: "Prediction is a valid species name",
+      description: "Adelie, Gentoo, or Chinstrap",
+      code: `assert new_pred in ("Adelie", "Gentoo", "Chinstrap"), f"Expected a species name, got {new_pred}"`,
     },
   ]}
 />
@@ -698,13 +736,13 @@ The split must happen before training so the test set stays unseen.`}
 />
 
 <MultipleChoice
-  markdown={`To predict the species of a single new flower with measurements 5.1, 3.5, 1.4, 0.2, what do you pass to \`model.predict(...)\`?
+  markdown={`To predict the species of a single new penguin with measurements 39.1, 18.7, 181.0, 3750.0, what do you pass to \`model.predict(...)\`?
 
-- A flat list: \`[5.1, 3.5, 1.4, 0.2]\`
+- A flat list: \`[39.1, 18.7, 181.0, 3750.0]\`
   > scikit-learn requires a 2D input shaped \`(n_samples, n_features)\`. A flat list is 1D and will raise a shape error; it must be wrapped in another list to form a 2D array with one row.
 - The four numbers as separate arguments
   > scikit-learn's \`predict\` method takes a single array-like object, not four separate positional arguments. The four measurements must be packed into a 2D structure with one row.
-- [o] A 2D structure with one row: \`[[5.1, 3.5, 1.4, 0.2]]\`
+- [o] A 2D structure with one row: \`[[39.1, 18.7, 181.0, 3750.0]]\`
   > scikit-learn always expects input shaped (n_samples, n_features). A single sample is still one row inside a list, so it must be doubly nested.
 - The training labels \`y_train\` as well
   > \`predict\` takes only the feature matrix — no labels are needed or accepted. Labels are passed to \`fit\` during training and to \`score\` during evaluation, but never to \`predict\`.

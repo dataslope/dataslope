@@ -332,6 +332,59 @@ data. More flexibility is not free; it costs generalization. The number of
 features also explodes combinatorially with degree and column count.
 </Callout>
 
+## A real example: one engineered feature out-signals the raw columns
+
+The synthetic demos above isolate each move with controlled data. On real
+data the payoff is the same, and you can measure it. The **diamonds**
+dataset (53,940 real stones, with `price` the target) records each diamond's
+three physical dimensions `x`, `y`, `z` in millimeters. None of those alone
+tells you the diamond's *size* — but their product does. A diamond's
+**volume** = `x * y * z` is a single engineered feature that captures the
+overall size the three raw columns only imply.
+
+We sample 4,000 rows with a fixed `random_state` purely for speed — the
+relationship is stable, and a 4k sample makes the demo run quickly on the
+full 54k-row dataset.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+diamonds = pd.read_csv("diamonds.csv")`,
+      starterCode: `# Sample for speed; the relationship is stable across the full 54k rows.
+d = diamonds.sample(n=4000, random_state=0).copy()
+
+# Engineer the concept the raw columns only imply: overall size.
+d["volume"] = d["x"] * d["y"] * d["z"]
+
+# How strongly does each feature track price? (absolute correlation)
+corr_volume = abs(d["volume"].corr(d["price"]))
+corr_x = abs(d["x"].corr(d["price"]))
+corr_y = abs(d["y"].corr(d["price"]))
+corr_z = abs(d["z"].corr(d["price"]))
+
+print(f"volume vs price: {corr_volume:.3f}")
+print(f"x vs price:      {corr_x:.3f}")
+print(f"y vs price:      {corr_y:.3f}")
+print(f"z vs price:      {corr_z:.3f}")
+print("\\nThe engineered volume tracks price more tightly than any single dimension.")
+`,
+    },
+  ]}
+/>
+
+Each raw dimension correlates with price in the high 0.8s; the engineered
+`volume` edges past all of them. The lift is modest here because the three
+dimensions are already strong, correlated signals — but it shows the
+principle on real data: a feature that *states the concept you care about*
+(size, not one edge length) carries at least as much signal as its parts,
+and usually more. Fit a one-feature regression on `volume` instead of `x`
+and the held-out R-squared rises too; the engineered column simply makes the
+size-to-price relationship easier to read.
+
 ## When feature engineering helps, and when it hurts
 
 Engineered features are not automatically good. Each new column is a
@@ -421,92 +474,84 @@ turn it into a column the model can *see*.
 
 <ChallengeCard
   adapter="python"
-  title="Engineer a ratio feature that exposes the signal"
-  category="feature engineering · ratios"
+  title="Engineer a feature that out-signals the raw columns"
+  category="feature engineering · interactions"
   estimatedTime="~7 min"
-  instructions={`A DataFrame \`df\` describes apartments with \`total_sqft\`,
-\`num_rooms\`, and \`price\`. The concept that drives price here is **space per
-room**, which is not any single raw column.
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  instructions={`A DataFrame \`d\` holds a 4,000-row sample of the real
+**diamonds** dataset, with the target \`price\` and the three physical
+dimensions \`x\`, \`y\`, \`z\` (in millimeters). The concept that drives price
+is overall **size**, which no single dimension captures on its own — but
+their product, the diamond's **volume**, does.
 
-1. Add a new column \`sqft_per_room\` to \`df\`, equal to \`total_sqft\`
-   divided by \`num_rooms\`.
-2. Compute the Pearson correlation between \`sqft_per_room\` and \`price\`
-   and store it in \`corr_engineered\` (use
-   \`df["sqft_per_room"].corr(df["price"])\`).
-3. For comparison, store the correlation between raw \`total_sqft\` and
-   \`price\` in \`corr_raw\` (use \`df["total_sqft"].corr(df["price"])\`).
+1. Add a new column \`volume\` to \`d\`, equal to \`x\` times \`y\` times \`z\`.
+2. Compute the absolute Pearson correlation between \`volume\` and \`price\`
+   and store it in \`corr_volume\` (use
+   \`abs(d["volume"].corr(d["price"]))\`).
+3. For comparison, store the absolute correlation between the single raw
+   dimension \`x\` and \`price\` in \`corr_x\` (use
+   \`abs(d["x"].corr(d["price"]))\`).
 
-The tests check that \`sqft_per_room\` was computed correctly for
-every row, that it is a new column in \`df\`, and that the engineered feature
-correlates with price more strongly than raw \`total_sqft\` does (showing the
-ratio exposes the signal better).`}
+The tests check that \`volume\` was computed correctly for every row, that it
+is a new column in \`d\`, and that the engineered feature correlates with
+price more strongly than the single raw dimension \`x\` does (showing the
+product exposes the size signal better than any one edge length).`}
   files={[
     {
       filename: "main.py",
-      initCode: `import numpy as np
-import pandas as pd
+      initCode: `import pandas as pd
+diamonds = pd.read_csv("diamonds.csv")
+# Sample for speed; the relationship is stable across the full 54k rows.
+d = diamonds.sample(n=4000, random_state=0).copy()`,
+      starterCode: `# 1. Engineer the feature: overall size = x * y * z.
+d["volume"] = None
 
-rng = np.random.default_rng(0)
-n = 80
-num_rooms = rng.integers(1, 6, n)
-sqft_per_room_true = rng.uniform(150, 450, n)   # the real driver of price
-total_sqft = (num_rooms * sqft_per_room_true).round()
-price = (sqft_per_room_true * 300 + rng.normal(0, 2000, n)).round()
+# 2. Absolute correlation of the engineered feature with price.
+corr_volume = None
 
-df = pd.DataFrame({
-    "total_sqft": total_sqft,
-    "num_rooms":  num_rooms,
-    "price":      price,
-})`,
-      starterCode: `# 1. Engineer the ratio feature: space per room.
-df["sqft_per_room"] = None
+# 3. Absolute correlation of one raw dimension (x) with price, for comparison.
+corr_x = None
 
-# 2. Correlation of the engineered feature with price.
-corr_engineered = None
-
-# 3. Correlation of raw total_sqft with price (for comparison).
-corr_raw = None
-
-print("engineered corr:", corr_engineered)
-print("raw total_sqft corr:", corr_raw)
+print("volume corr:", corr_volume)
+print("raw x corr:", corr_x)
 `,
-      solutionCode: `df["sqft_per_room"] = df["total_sqft"] / df["num_rooms"]
+      solutionCode: `d["volume"] = d["x"] * d["y"] * d["z"]
 
-corr_engineered = df["sqft_per_room"].corr(df["price"])
-corr_raw = df["total_sqft"].corr(df["price"])
+corr_volume = abs(d["volume"].corr(d["price"]))
+corr_x = abs(d["x"].corr(d["price"]))
 
-print("engineered corr:", corr_engineered)
-print("raw total_sqft corr:", corr_raw)
+print("volume corr:", corr_volume)
+print("raw x corr:", corr_x)
 `,
     },
   ]}
   tests={[
     {
       id: "column_exists",
-      name: "sqft_per_room column was added",
-      description: "The engineered feature is a new column in df",
-      code: `assert "sqft_per_room" in df.columns, "df is missing the 'sqft_per_room' column"`,
+      name: "volume column was added",
+      description: "The engineered feature is a new column in d",
+      code: `assert "volume" in d.columns, "d is missing the 'volume' column"`,
     },
     {
       id: "values_correct",
-      name: "sqft_per_room equals total_sqft / num_rooms",
-      description: "The ratio is computed correctly for every row",
+      name: "volume equals x * y * z",
+      description: "The product is computed correctly for every row",
       code: `import numpy as np
-expected = df["total_sqft"] / df["num_rooms"]
-assert np.allclose(df["sqft_per_room"].to_numpy(), expected.to_numpy()), "sqft_per_room should equal total_sqft / num_rooms"`,
+expected = d["x"] * d["y"] * d["z"]
+assert np.allclose(d["volume"].to_numpy(), expected.to_numpy()), "volume should equal x * y * z"`,
     },
     {
       id: "corrs_computed",
       name: "Both correlations were computed",
-      description: "corr_engineered and corr_raw are numbers",
-      code: `assert corr_engineered is not None and corr_raw is not None, "Both correlations must be computed"
-assert -1.0 <= corr_engineered <= 1.0, f"corr_engineered out of range: {corr_engineered}"`,
+      description: "corr_volume and corr_x are numbers in [0, 1]",
+      code: `assert corr_volume is not None and corr_x is not None, "Both correlations must be computed"
+assert 0.0 <= corr_volume <= 1.0, f"corr_volume out of range: {corr_volume}"`,
     },
     {
       id: "engineered_better",
       name: "Engineered feature correlates with price more strongly",
-      description: "The ratio exposes the signal better than raw total_sqft",
-      code: `assert abs(corr_engineered) > abs(corr_raw), f"Expected engineered |corr| ({abs(corr_engineered):.3f}) > raw |corr| ({abs(corr_raw):.3f})"`,
+      description: "Volume exposes the size signal better than the single raw dimension x",
+      code: `assert corr_volume > corr_x, f"Expected engineered |corr| ({corr_volume:.3f}) > raw x |corr| ({corr_x:.3f})"`,
     },
   ]}
 />

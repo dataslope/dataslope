@@ -271,7 +271,7 @@ opposite of the truth. This is not a contrived edge case; negation is
 everywhere in opinionated text, and blindly removing stopwords before
 sentiment analysis is a classic, costly mistake.
 
-<Callout type="danger" title="Do not remove stopwords before sentiment analysis (at least not naively)">
+<Callout type="warn" title="Do not remove stopwords before sentiment analysis (at least not naively)">
 The standard stopword list contains the very words that carry sentiment
 structure: negations ("not", "no", "nor"), contrasts ("but"), and
 intensity ("very" — also a stopword). Strip them and you can flip a review's

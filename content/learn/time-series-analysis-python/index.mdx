@@ -71,6 +71,74 @@ need any prior time series, signal processing, or forecasting
 background. We build all of that from intuition.
 </Callout>
 
+## This whole course runs in your browser — try it now
+
+There is no setup, no install, no download. Every code block on every
+page is a real Python interpreter (pandas, NumPy, matplotlib, statsmodels)
+running *inside this page*. Edit a block, press **Run**, and the output
+appears underneath.
+
+So let's start with the most famous time series in science. Since 1958,
+an observatory near the summit of Mauna Loa, Hawaii, has measured the
+carbon dioxide in Earth's atmosphere, month after month, without a break.
+The result — the **Keeling Curve** — is the running real-world example for
+this entire course. The block below loads the monthly readings, puts them
+on a proper datetime timeline, and plots them.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "NOAA_mauna_loa_co2_monthly.csv", stageAs: "co2.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+import matplotlib.pyplot as plt
+
+# Monthly atmospheric CO2 (ppm) measured at Mauna Loa, Hawaii.
+# Columns: year, month, "decimal date", average, deseasonalized, ndays, sdev, unc
+df = pd.read_csv("co2.csv")
+# Build a real datetime index from the year + month columns.
+df["date"] = pd.to_datetime(df[["year", "month"]].assign(day=1))
+co2 = df.set_index("date")["average"]   # 'average' is the clean CO2 series`,
+      starterCode: `# >>> CHANGE ME and re-run: try window = 1 (raw), 12 (one year), 60 (five years) <<<
+window = 12
+
+smooth = co2.rolling(window).mean()
+
+fig, ax = plt.subplots(figsize=(10, 4))
+co2.plot(ax=ax, alpha=0.4, label="monthly CO2")
+smooth.plot(ax=ax, linewidth=2, label=f"{window}-month average")
+ax.set_title("The Keeling Curve: atmospheric CO2 at Mauna Loa")
+ax.set_ylabel("CO2 (parts per million)")
+ax.set_xlabel("")
+ax.legend()
+plt.tight_layout()
+plt.show()
+
+print(f"{len(co2)} monthly readings, {co2.index[0].date()} to {co2.index[-1].date()}")
+print(f"First reading: {co2.iloc[0]:.1f} ppm   Latest: {co2.iloc[-1]:.1f} ppm")
+`,
+    },
+  ]}
+/>
+
+Two structures jump out, and the whole course lives between them. There's
+a **relentless upward trend** — CO₂ has climbed from about 316 ppm in 1959
+to well over 420 ppm today. And riding on top of it is a small, perfectly
+regular **annual sawtooth**: every year the curve dips and rises by a few
+ppm as Northern-Hemisphere plants inhale CO₂ each growing season and
+release it each winter. Change the `window` from 12 to 1 to see the raw
+sawtooth, or to 60 to smooth it into the bare trend, and re-run.
+
+<Callout type="info" title="A true story you can verify from the data itself">
+**Charles David Keeling** began these continuous measurements in 1958 and
+maintained them for decades; the record is now the longest of its kind.
+The monthly average first crossed **400 ppm in May 2013** — a number you
+can find yourself with `co2[co2 >= 400].index[0]` in the block above. Every
+claim we make about this series is checkable in the very data you're
+running, which is exactly the spirit of the course.
+</Callout>
+
 ## See the thesis in ten seconds
 
 Here is the whole course in one experiment. We take a real monthly series
@@ -200,11 +268,9 @@ random split. We will hammer this point until it is reflex.
 
 ## The tools we use
 
-Every code block on every page is runnable. Edit it, click **Run**, and
-the output appears underneath. We lean on four libraries and nothing
-heavier — no scikit-learn, no deep learning, no automated forecasting
-frameworks. Classical time series analysis needs surprisingly little
-machinery.
+We lean on four libraries and nothing heavier — no scikit-learn, no deep
+learning, no automated forecasting frameworks. Classical time series
+analysis needs surprisingly little machinery.
 
 | Library | What we use it for |
 | --- | --- |
@@ -226,19 +292,24 @@ to inspect.
 Real time series teaching needs data with *visible* structure. We use a
 small, hand-picked cast that runs instantly in your browser:
 
-- **Airline passengers** (144 monthly points, 1949-1960) — our hero
-  series. It has a rising **trend**, a strong yearly **seasonal** swing
-  that *grows* over time, and is gloriously non-stationary. Perfect for
-  decomposition, differencing, and ARIMA.
+- **The Keeling Curve** (atmospheric CO₂ at Mauna Loa, monthly since 1959)
+  — our real-world hero series, loaded straight from a public dataset. It
+  has a textbook **trend** plus a clean **12-month seasonal** cycle, and is
+  strongly non-stationary. We return to it again and again: resampling,
+  rolling means, decomposition, differencing, ACF/PACF, and forecasting.
+- **Airline passengers** (144 monthly points, 1949-1960) — a second classic
+  hero. Unlike CO₂, its seasonal swing *grows* with the level, which makes
+  it the textbook case for multiplicative decomposition and the log
+  transform. Two real series with *different* seasonal behavior teach more
+  than one.
 - **Simulated series** with *known* trend, seasonality, and noise — so we
   can check whether a tool recovers the truth we baked in.
 - **Small, gappy sensor and traffic series** — for practicing missing-data
   strategies where the right answer depends on the assumption you make.
 
-Nothing here is bigger than a few hundred numbers. Time series intuition
-does not come from big data; it comes from *seeing* the structure, and a
-few hundred well-chosen points show it more clearly than a million noisy
-ones.
+Nothing here is bigger than a thousand numbers. Time series intuition does
+not come from big data; it comes from *seeing* the structure, and a few
+hundred well-chosen points show it more clearly than a million noisy ones.
 
 ## How the interactive widgets work
 

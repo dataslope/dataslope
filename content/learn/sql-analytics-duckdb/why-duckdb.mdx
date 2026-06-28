@@ -1,14 +1,22 @@
 ---
 title: Why DuckDB?
-description: How organizations drowning in data found a fast, zero-setup analytical engine. What makes DuckDB different from traditional databases, and why it fits modern analysis workflows so well.
+description: How a research lab in Amsterdam built a fast, zero-setup analytical engine named after a duck. What makes DuckDB different from traditional databases, and why it fits modern analysis workflows so well.
 ---
 
-Every page so far has hinted at it: analytical work has different needs
-from application work, and those needs reward a different kind of
-database. **DuckDB** is that kind of database — purpose-built for
-analysis. This page explains, concisely, *why it exists* and *why it has
-become so popular*, so the tool you are about to use stops feeling like a
-black box.
+The last page explained *why* analytical SQL rewards a column-oriented,
+vectorized engine. **DuckDB** is exactly that engine — purpose-built for
+analysis, and the one this whole course runs on. This page is the short
+version of *where it came from* and *why it became so popular*, so the
+tool you are about to use stops feeling like a black box.
+
+<Callout type="info" title="A database named after a duck">
+DuckDB was created by **Mark Raasveldt** and **Hannes Mühleisen** at the
+**CWI** research institute in Amsterdam — the same lab that produced the
+column-store database **MonetDB**, and where Guido van Rossum created
+Python. First released around **2019**, it is named after Hannes's pet
+duck, **Wilbur**: ducks are hardy and live everywhere, which is exactly
+what the authors wanted in a database.
+</Callout>
 
 <svg
   viewBox="0 0 640 225"
@@ -93,9 +101,9 @@ flowchart TD
 A few design choices, taken together, make DuckDB feel made for the
 exploratory loop you learned about.
 
-- **Column-oriented and vectorized.** Like the analytical engines in the
-  last lesson, DuckDB stores data by column and processes it in batches,
-  so summary queries over many rows fly.
+- **Column-oriented and vectorized.** It inherits the column-store,
+  batch-processing design from the last page, so summary queries over many
+  rows fly.
 - **In-process, no server.** DuckDB runs *inside* your program (or, here,
   inside your browser tab). There is no server to start, no port, no
   login. You open it and query.
@@ -103,7 +111,8 @@ exploratory loop you learned about.
   around like a spreadsheet — or live entirely in memory for a quick
   analysis.
 - **Reads files directly.** DuckDB can query CSV and Parquet files *in
-  place*, without a separate "load" step, which suits ad-hoc analysis.
+  place* — even straight from a URL — without a separate "load" step,
+  which suits ad-hoc analysis.
 - **Analyst-friendly SQL.** Conveniences like `GROUP BY ALL`,
   `SELECT * EXCLUDE (...)`, `SUMMARIZE`, and friendly list/struct types
   cut the ceremony out of common analytical queries.
@@ -124,8 +133,8 @@ flowchart TB
 
 People sometimes call DuckDB *"SQLite for analytics."* SQLite gave
 everyone a tiny, embedded **transactional** database with no server;
-DuckDB does the same for **analytical** work. Same spirit — opposite
-workload.
+DuckDB does the same for **analytical** work. It is the OLAP counterpart
+to SQLite's OLTP niche — same spirit, opposite workload.
 
 ## Where it fits in a modern workflow
 
@@ -148,39 +157,34 @@ flowchart TD
 
 The important point for this course: DuckDB lets you practice *real
 analytical SQL* with **zero friction**. The same engine runs right here
-in your browser, so every example is live.
+in your browser, so every example is live — and to prove the "reads files
+directly" point, this one queries a **CSV on the web** with `read_csv_auto`
+and never downloads it as a step you can see.
 
 <SqlCodeBlock
   dialect="duckdb"
-  title="A taste of analyst-friendly DuckDB SQL"
-  initSql={`CREATE TABLE sales AS
+  title="A taste of analyst-friendly DuckDB SQL — over a remote CSV"
+  starterCode={`-- read_csv_auto opens the file and infers its columns.
+-- GROUP BY ALL groups by every non-aggregated column automatically.
 SELECT
-  i AS id,
-  ['West', 'East', 'North', 'South'] [(i % 4) + 1] AS region,
-  ['Widget', 'Gadget', 'Gizmo'] [(i % 3) + 1] AS product,
-  (i * 29) % 400 + 20 AS amount
+  species,
+  island,
+  COUNT(*) AS n,
+  ROUND(AVG(body_mass_g), 0) AS avg_mass
 FROM
-  range(1, 1001) t (i);`}
-  starterCode={`-- GROUP BY ALL: group by every non-aggregated column automatically.
--- SUMMARIZE-style ergonomics with no extra ceremony.
-SELECT
-  region,
-  product,
-  COUNT(*) AS orders,
-  SUM(amount) AS revenue
-FROM
-  sales
+  read_csv_auto(
+    'https://cdn.jsdelivr.net/gh/dataslope/datasets@f7f08485960fe4a774359a43d1eb50a84514daf2/palmer-penguins.csv'
+  )
 GROUP BY ALL
 ORDER BY
-  revenue DESC
-LIMIT
-  5;`}
+  n DESC;`}
 />
 
-Notice `GROUP BY ALL` — you did not have to restate `region, product`. In
-a traditional database you would list every grouping column twice. Small
-conveniences like this are exactly what make DuckDB pleasant for the rapid
-question-query-look loop.
+Two conveniences in four lines: DuckDB opened a remote CSV and inferred
+its columns with no schema declaration, and `GROUP BY ALL` let you skip
+restating `species, island` (a traditional database makes you list every
+grouping column twice). Small frictions like these are exactly what make
+DuckDB pleasant for the rapid question-query-look loop.
 
 ## Check your understanding
 
@@ -233,5 +237,9 @@ and prototyping.`}
 />
 
 You now understand *why* analytical SQL, *why* the OLAP workload, and
-*why* DuckDB. Time to stop talking about analysis and start doing it —
-let us write your first analytical query.
+*why* DuckDB. Time to stop talking about analysis and start doing it — let
+us write your first analytical query. (If you want the analyst's
+*exploratory mindset* spelled out first, the
+[Thinking in Datasets](/learn/sql-analytics-duckdb/thinking-in-datasets)
+deep dive in the *Interesting discussions* section near the end covers it
+— but you can pick it up as you go.)

@@ -72,13 +72,15 @@ right; each observation steps the curve up a little, so it climbs from
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 sns.displot(penguins, x="flipper_length_mm", kind="ecdf", height=4)
 `,
@@ -135,13 +137,15 @@ several distributions at once. Just map a categorical column to `hue`:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 sns.displot(penguins, x="flipper_length_mm", hue="species", kind="ecdf", height=4)
 `,
@@ -193,13 +197,15 @@ Here it is on its own, via the axes-level `sns.rugplot`:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # One tick per penguin along the x-axis — the raw 1-D positions.
 sns.rugplot(data=penguins, x="flipper_length_mm", height=0.1)
@@ -214,13 +220,15 @@ the actual observations that produced it:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # Histogram of the shape, with a rug of the raw points underneath it.
 sns.displot(penguins, x="flipper_length_mm", kind="hist", rug=True, height=4)
@@ -235,14 +243,16 @@ dots show the joint relationship:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 import matplotlib.pyplot as plt
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 fig, ax = plt.subplots(figsize=(6, 4))
 sns.scatterplot(data=penguins, x="bill_length_mm", y="bill_depth_mm", ax=ax)
@@ -265,6 +275,7 @@ of plotting every point.
 
 <ChallengeCard
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   title="Compare distributions with an ECDF"
   instructions={`Using the \`penguins\` dataset, draw an **ECDF** with \`sns.displot\`:
 
@@ -276,18 +287,20 @@ Assign the result to a variable named \`g\`.`}
   files={[
     {
       filename: "main.py",
-      starterCode: `import seaborn as sns
+      starterCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 # Build the ECDF and assign it to g:
 g = None
 `,
-      solutionCode: `import seaborn as sns
+      solutionCode: `import pandas as pd
+import seaborn as sns
 
 sns.set_theme(style="whitegrid")
-penguins = sns.load_dataset("penguins")
+penguins = pd.read_csv("penguins.csv")
 
 g = sns.displot(penguins, x="flipper_length_mm", hue="species", kind="ecdf")
 `,

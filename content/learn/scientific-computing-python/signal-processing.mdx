@@ -127,6 +127,57 @@ The noisy time-domain plot looks like garbage; the spectrum reveals
 two clean peaks exactly at 50 and 120 Hz, with a roughly flat noise
 floor. This is the power of the FFT in one image.
 
+### A real-data spectrum: finding the year in atmospheric CO₂
+
+Synthetic sines are a fine warm-up, but the FFT earns its keep on
+*measured* signals. The monthly CO₂ record from Mauna Loa rises
+relentlessly, and riding on that rise is a regular yearly wobble. If
+we subtract the slow trend and take the FFT of what remains, a single
+sharp spike should appear at exactly **one cycle per year**. Let us
+see whether nature obliges.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "NOAA_mauna_loa_co2_monthly.csv", stageAs: "co2.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("co2.csv")
+# 'average' is the clean monthly CO2 series; sampled 12 times per year.
+co2 = df["average"].to_numpy()`,
+      starterCode: `# Remove the slow trend so the FFT sees only the seasonal wobble.
+n = co2.size
+trend = np.poly1d(np.polyfit(np.arange(n), co2, 2))(np.arange(n))
+residual = co2 - trend
+
+# Monthly sampling -> sample rate is 12 samples per year.
+spectrum = np.abs(np.fft.rfft(residual))
+freqs = np.fft.rfftfreq(n, d=1 / 12)  # cycles per year
+
+peak = freqs[1:][np.argmax(spectrum[1:])]  # skip the DC bin
+print(f"Dominant cycle: {peak:.3f} cycles per year")
+
+plt.figure(figsize=(8, 3))
+plt.plot(freqs, spectrum)
+plt.xlim(0, 6)
+plt.xlabel("frequency (cycles per year)")
+plt.ylabel("FFT magnitude")
+plt.title("Spectrum of detrended CO2")
+plt.show()
+`,
+    },
+  ]}
+/>
+
+The spectrum has one towering peak at exactly 1.0 cycle per year,
+with a smaller harmonic at 2.0 (the wobble is not a pure sine). No
+calendar was consulted; the period of Earth's orbit fell straight out
+of six decades of chemistry, recovered by a single FFT.
+
 ## Three things that bite beginners
 
 - **Aliasing.** A signal sampled at $f_s$ can only represent
@@ -353,6 +404,74 @@ def denoise(x, fs, cutoff=30.0, order=6):
 
 This pattern — generate → measure → filter → quantify — is the
 template for almost every signal-processing experiment.
+
+## Practice: recover a hidden frequency
+
+<ChallengeCard
+  adapter="python"
+  title="Find the dominant frequency"
+  instructions={`Implement \`dominant_frequency(x, fs)\` that returns the frequency (in Hz) of the strongest spectral component of a real signal \`x\` sampled at rate \`fs\`.
+
+Use \`np.fft.rfft\` for the spectrum and \`np.fft.rfftfreq\` for the matching frequency axis, then return the frequency at the largest magnitude. Ignore the DC (zero-frequency) bin so a constant offset does not win.`}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+
+def dominant_frequency(x, fs):
+    # TODO: rfft magnitude, skip the DC bin, return the peak frequency
+    return 0.0
+
+
+# Quick check: a 60 Hz tone sampled at 1000 Hz
+fs = 1000
+t = np.arange(0, 1, 1 / fs)
+sig = np.sin(2 * np.pi * 60 * t)
+print("detected:", dominant_frequency(sig, fs), "Hz")  # ~60
+`,
+      solutionCode: `import numpy as np
+
+
+def dominant_frequency(x, fs):
+    x = np.asarray(x, dtype=float)
+    mag = np.abs(np.fft.rfft(x))
+    freqs = np.fft.rfftfreq(x.size, d=1 / fs)
+    mag[0] = 0.0  # ignore the DC component
+    return float(freqs[np.argmax(mag)])
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "tone60",
+      name: "Recovers a 60 Hz tone",
+      code: `import numpy as np
+fs = 1000
+t = np.arange(0, 1, 1 / fs)
+sig = np.sin(2 * np.pi * 60 * t)
+assert abs(dominant_frequency(sig, fs) - 60.0) < 1.0`,
+    },
+    {
+      id: "tone_with_offset",
+      name: "Ignores a constant offset",
+      code: `import numpy as np
+fs = 2000
+t = np.arange(0, 2, 1 / fs)
+sig = 5.0 + np.sin(2 * np.pi * 137 * t)
+assert abs(dominant_frequency(sig, fs) - 137.0) < 1.0`,
+    },
+    {
+      id: "strongest_wins",
+      name: "Picks the strongest of several tones",
+      code: `import numpy as np
+fs = 1000
+t = np.arange(0, 1, 1 / fs)
+sig = 0.3 * np.sin(2 * np.pi * 50 * t) + 1.0 * np.sin(2 * np.pi * 200 * t)
+assert abs(dominant_frequency(sig, fs) - 200.0) < 1.0`,
+    },
+  ]}
+/>
 
 ## Check your understanding
 

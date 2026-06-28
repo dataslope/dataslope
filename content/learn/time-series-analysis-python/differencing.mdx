@@ -594,6 +594,65 @@ print("best_d:", best_d, " over-diff lag-1 ac:", round(over_diff_ac, 3))
   ]}
 />
 
+<ChallengeCard
+  adapter="python"
+  title="One difference makes the Keeling Curve stationary"
+  instructions={`The monthly CO₂ series \`co2\` is non-stationary — its trend dominates everything. Show that a single ordinary difference fixes it.
+
+Compute:
+
+- \`co2_diff\` — the first difference \`co2.diff()\` (the month-to-month *change* in CO₂)
+- \`p_raw\` — the ADF p-value of the raw \`co2\` (a float)
+- \`p_diff\` — the ADF p-value of \`co2_diff\` after dropping NaNs (a float)
+
+The raw series should be non-stationary (\`p_raw\` is very high, near 1.0) and the differenced series should be stationary (\`p_diff\` < 0.05). The first value of \`co2_diff\` must be \`NaN\` (there's no earlier month to subtract).`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+import pandas as pd
+import warnings
+warnings.filterwarnings("ignore")
+from statsmodels.tsa.stattools import adfuller
+df = pd.read_csv("co2.csv")
+df["date"] = pd.to_datetime(df[["year", "month"]].assign(day=1))
+co2 = df.set_index("date")["average"]`,
+      starterCode: `co2_diff = None  # first difference of co2
+p_raw = None     # ADF p-value of raw co2
+p_diff = None    # ADF p-value of the differenced series
+print("p_raw:", p_raw, " p_diff:", p_diff)
+`,
+      solutionCode: `co2_diff = co2.diff()
+p_raw = float(adfuller(co2.dropna())[1])
+p_diff = float(adfuller(co2_diff.dropna())[1])
+print("p_raw:", round(p_raw, 4), " p_diff:", round(p_diff, 4))
+`,
+    },
+  ]}
+  datasets={[{ path: "NOAA_mauna_loa_co2_monthly.csv", stageAs: "co2.csv" }]}
+  tests={[
+    {
+      id: "first_nan",
+      name: "first difference value is NaN",
+      description: "No earlier month to subtract",
+      code: `import pandas as pd
+assert pd.isna(co2_diff.iloc[0]), "The first differenced value must be NaN"`,
+    },
+    {
+      id: "raw_nonstationary",
+      name: "raw CO2 is non-stationary",
+      description: "The trend dominates",
+      code: `assert p_raw > 0.5, f"Raw CO2 should be clearly non-stationary, got p={p_raw}"`,
+    },
+    {
+      id: "diff_stationary",
+      name: "one difference reaches stationarity",
+      description: "Differenced series passes ADF",
+      code: `assert p_diff < 0.05, f"Differenced CO2 should be stationary, got p={p_diff}"`,
+    },
+  ]}
+/>
+
 ## Check your understanding
 
 <MultipleChoice

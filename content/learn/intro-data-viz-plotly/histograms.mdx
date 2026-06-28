@@ -244,6 +244,74 @@ When you look at a histogram, ask:
 Train yourself to ask these five questions on every histogram you
 ever see.
 
+## Practice
+
+<ChallengeCard
+  adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
+  title="Histogram body mass by species"
+  instructions={`The \`penguins\` DataFrame is loaded. Build a histogram of penguin **body mass**, split by **species** so the three distributions can be compared.
+
+1. Use \`px.histogram\` with \`x="body_mass_g"\` and \`color="species"\`.
+2. Set \`template="simple_white"\`.
+3. So the three distributions can overlap and be compared, set \`barmode="overlay"\` and \`opacity=0.6\`.
+
+Store the figure in a variable named \`fig\`.`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+import plotly.express as px
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `# Build an overlaid histogram of body mass, colored by species.
+fig = None
+`,
+      solutionCode: `fig = px.histogram(
+    penguins,
+    x="body_mass_g",
+    color="species",
+    barmode="overlay",
+    opacity=0.6,
+    template="simple_white",
+    title="Penguin body mass by species",
+    labels={"body_mass_g": "Body mass (g)"},
+)
+fig.show()
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "is-histogram",
+      name: "fig is a histogram",
+      description: "A histogram figure was built",
+      code: `import plotly.graph_objects as go
+assert isinstance(fig, go.Figure)
+assert len(fig.data) >= 1
+assert all(t.type == "histogram" for t in fig.data)`,
+    },
+    {
+      id: "by-species",
+      name: "split into three species",
+      description: "color=species produces one trace per species",
+      code: `assert len(fig.data) == penguins["species"].nunique()`,
+    },
+    {
+      id: "x-is-mass",
+      name: "x-axis is body mass",
+      description: "The histogram is over body_mass_g",
+      code: `title = (fig.layout.xaxis.title.text or "").lower()
+assert "mass" in title or "body" in title, "x-axis should be body mass"`,
+    },
+    {
+      id: "overlay",
+      name: "bars are overlaid for comparison",
+      description: "barmode is overlay",
+      code: `assert fig.layout.barmode == "overlay"`,
+    },
+  ]}
+/>
+
 ## Check your understanding
 
 <MultipleChoice

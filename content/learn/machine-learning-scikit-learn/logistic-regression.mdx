@@ -5,7 +5,7 @@ description: Despite its name, this is a classification algorithm — a linear s
 
 Let us clear up the most confusing name in machine learning before we do
 anything else. **Logistic regression is a classification algorithm.** It
-predicts *categories* — spam or not, malignant or benign, will-churn or
+predicts *categories* — spam or not, one species or another, will-churn or
 will-stay — not numbers. The word "regression" in its name is a historical
 accident about the math under the hood, and it trips up nearly every
 newcomer. Whenever you see "logistic regression," think **classifier**.
@@ -67,8 +67,8 @@ regression reuses the same weighted-sum idea.
 ## The problem it solves
 
 You want a yes-or-no answer, and ideally a *confidence* with it. Is this
-transaction fraudulent? Will this patient's tumor turn out malignant? Will
-this user click? A bare label ("fraud") is useful, but a **probability**
+transaction fraudulent? Is this penguin a Gentoo or an Adelie? Will this
+user click? A bare label ("fraud") is useful, but a **probability**
 ("87% chance of fraud") is far more useful — it lets you rank cases, set
 thresholds, and decide how much to trust each call.
 
@@ -164,26 +164,30 @@ flowchart TD
     B --> D["Class 0 side<br/>(<code>p &lt; 0.5</code>)"]
 ```
 
-## Logistic regression in practice: breast cancer
+## Logistic regression in practice: Adelie vs. Gentoo
 
-Time to train one. The `load_breast_cancer` dataset has 569 tumors, each
-described by 30 measurements (radius, texture, smoothness, and so on). The
-target is binary: **0 = malignant, 1 = benign**. We will predict which from
-the measurements.
+Time to train one. We will use the **penguins** dataset and pose a clean
+binary question: is a penguin an **Adelie** or a **Gentoo**? These two
+species separate almost perfectly on their body measurements, which makes
+them an ideal first classification target. We keep only those two species
+and predict the species from four numeric measurements.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
-# 0 = malignant, 1 = benign
-data = load_breast_cancer()
-X, y = data.data, data.target
-print("Classes:", dict(zip([0, 1], data.target_names)))
+# Keep just the two species for a binary problem.
+two = penguins[penguins["species"].isin(["Adelie", "Gentoo"])]
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X, y = two[features], two["species"]
+print("Classes:", sorted(y.unique()))
 
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0, stratify=y
@@ -199,9 +203,9 @@ print("Test accuracy:", round(model.score(X_test, y_test), 3))
   ]}
 />
 
-Around 94% accuracy from a model that is, at heart, a single weighted sum
+Near-perfect accuracy from a model that is, at heart, a single weighted sum
 passed through an S-curve. That is the appeal: cheap, fast, and remarkably
-strong on data where a straight boundary roughly separates the classes.
+strong on data where a straight boundary cleanly separates the classes.
 
 <Callout type="info" title="Why max_iter=1000?">
 Logistic regression finds its coefficients by iterative optimization. On
@@ -221,50 +225,55 @@ model's confidence.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
-data = load_breast_cancer()
-X, y = data.data, data.target
+two = penguins[penguins["species"].isin(["Adelie", "Gentoo"])]
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X, y = two[features], two["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0, stratify=y
 )
 model = LogisticRegression(max_iter=1000)
 model.fit(X_train, y_train)
 
-# Hard class labels for the first 5 test tumors.
+# Hard class labels for the first 5 test penguins.
 classes = model.predict(X_test[:5])
 
 # Probabilities: one column per class, each ROW sums to 1.
 probs = model.predict_proba(X_test[:5])
 
-print("classes_ order:", model.classes_, "(col 0 = malignant, col 1 = benign)")
+print("classes_ order:", model.classes_, "(col 0 = Adelie, col 1 = Gentoo)")
 print()
-print("P(malignant)  P(benign)   predicted   actual")
+print("P(Adelie)  P(Gentoo)   predicted   actual")
 for prob, cls, actual in zip(probs, classes, y_test[:5]):
-    print(f"   {prob[0]:.3f}        {prob[1]:.3f}        {cls}          {actual}")
+    print(f"  {prob[0]:.3f}      {prob[1]:.3f}     {cls:8s}   {actual}")
 `,
     },
   ]}
 />
 
 A few things to read off that table. `predict_proba` returns **one column
-per class**, in the order shown by `model.classes_`, and **each row sums to
-1** (the probabilities of all classes must add up). The predicted class is
-simply the column with the higher probability — that is, applying the 0.5
-threshold to the class-1 probability.
+per class**, in the order shown by `model.classes_` (alphabetical, so Adelie
+then Gentoo), and **each row sums to 1** (the probabilities of all classes
+must add up). The predicted class is simply the column with the higher
+probability — that is, applying the 0.5 threshold to the class-1 (Gentoo)
+probability.
 
 <Callout type="tip" title="predict is just predict_proba plus a threshold">
 For binary logistic regression, `model.predict(X)` is *exactly*
 `model.predict_proba(X)[:, 1] >= 0.5`. The class is the probability after
-thresholding. This means you can change the cutoff yourself: if missing a
-malignant tumor is far worse than a false alarm, you might predict
-"malignant" whenever its probability exceeds, say, 0.3 instead of 0.5 —
-trading more false alarms for fewer misses. Choosing that threshold well —
+thresholding. This means you can change the cutoff yourself: if one kind of
+mistake is far worse than the other — say, missing a fraud case versus
+flagging a clean one — you might predict the positive class whenever its
+probability exceeds, say, 0.3 instead of 0.5, trading more false alarms for
+fewer misses. Choosing that threshold well —
 using precision, recall, and ROC curves — is a core skill the course's
 classification-evaluation material covers in depth.
 </Callout>
@@ -273,40 +282,43 @@ Let us make the threshold idea tangible by moving it ourselves.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
       starterCode: `import numpy as np
-from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
-data = load_breast_cancer()
-X, y = data.data, data.target
+two = penguins[penguins["species"].isin(["Adelie", "Gentoo"])]
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X, y = two[features], two["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0, stratify=y
 )
 model = LogisticRegression(max_iter=1000)
 model.fit(X_train, y_train)
 
-# Probability of the POSITIVE class (class 1 = benign) for every test tumor.
-p_benign = model.predict_proba(X_test)[:, 1]
+# Probability of the POSITIVE class (class 1 = Gentoo) for every test penguin.
+p_gentoo = model.predict_proba(X_test)[:, 1]
 
-# Apply different thresholds ourselves and count how many are called "benign".
+# Apply different thresholds ourselves and count how many are called "Gentoo".
 for t in [0.3, 0.5, 0.7]:
-    called_benign = int((p_benign >= t).sum())
-    print(f"threshold {t}: {called_benign} of {len(p_benign)} tumors called benign")
+    called_gentoo = int((p_gentoo >= t).sum())
+    print(f"threshold {t}: {called_gentoo} of {len(p_gentoo)} penguins called Gentoo")
 
 # The default 0.5 threshold reproduces model.predict exactly.
-default = (p_benign >= 0.5).astype(int)
+default = np.where(p_gentoo >= 0.5, "Gentoo", "Adelie")
 print("Matches model.predict():", np.array_equal(default, model.predict(X_test)))
 `,
     },
   ]}
 />
 
-Raise the threshold and the model becomes more reluctant to say "benign";
-lower it and it says "benign" more freely. Same model, same probabilities —
+Raise the threshold and the model becomes more reluctant to say "Gentoo";
+lower it and it says "Gentoo" more freely. Same model, same probabilities —
 only the cutoff moved. The probability is the model's real output; the
 threshold is a *decision* you control.
 
@@ -324,31 +336,34 @@ itself. Keep it intuitive:
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
-data = load_breast_cancer()
-X, y = data.data, data.target
+two = penguins[penguins["species"].isin(["Adelie", "Gentoo"])]
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X, y = two[features], two["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0, stratify=y
 )
 model = LogisticRegression(max_iter=1000)
 model.fit(X_train, y_train)
 
-coefs = list(zip(data.feature_names, model.coef_[0]))
+coefs = list(zip(features, model.coef_[0]))
 
 # The features that most push the prediction toward each class.
 coefs.sort(key=lambda pair: pair[1])
-print("Most toward class 0 (malignant):")
-for name, c in coefs[:3]:
-    print(f"  {name:24s} {c:+.3f}")
-print("Most toward class 1 (benign):")
-for name, c in coefs[-3:]:
-    print(f"  {name:24s} {c:+.3f}")
+print("Most toward class 0 (Adelie):")
+for name, c in coefs[:2]:
+    print(f"  {name:22s} {c:+.3f}")
+print("Most toward class 1 (Gentoo):")
+for name, c in coefs[-2:]:
+    print(f"  {name:22s} {c:+.3f}")
 `,
     },
   ]}
@@ -371,21 +386,28 @@ pipeline so it stays leak-free.
 
 ## Multiclass: it is not only for two classes
 
-Logistic regression extends naturally to more than two classes. scikit-learn
-handles this for you — on iris (three species) it simply learns a score per
-class and picks the highest. The code is identical; only the number of
-probability columns changes.
+Logistic regression extends naturally to more than two classes. Bring back
+the third penguin species, Chinstrap, and scikit-learn handles three classes
+for you — it learns a score per class and picks the highest. (The classic
+teaching dataset for this was Fisher's iris flowers, but the community now
+favors the Palmer penguins, partly because Fisher was a prominent
+eugenicist.) The code is identical; only the number of probability columns
+changes.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_iris
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
-X, y = load_iris(return_X_y=True)
+# All three species now -> a multiclass problem.
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X, y = penguins[features], penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0, stratify=y
 )
@@ -436,8 +458,10 @@ The flip side is that its straight-line boundary is also its ceiling.
   coefficients unstable. Regularization (which scikit-learn applies by
   default) helps, but interpret coefficients cautiously.
 
-Here is the nonlinear failure made visible. `make_moons` produces two
-interleaving crescents that no straight line can separate.
+Here is the nonlinear failure made visible. We use synthetic data on
+purpose: `make_moons` produces two interleaving crescents whose true
+boundary is *known* to be curved, so we can be certain the model's struggle
+comes from its straight-line limitation and not from messy real data.
 
 <CodeBlock
   adapter="python"
@@ -467,8 +491,8 @@ print("A single straight boundary cannot fully separate two crescents.")
 The accuracy is mediocre — not because the model is broken, but because the
 problem's true boundary is *curved* and logistic regression can only draw a
 *straight* one. That is the assumption talking. On data with a roughly
-linear boundary (like the breast cancer set earlier), the very same model
-shines.
+linear boundary (like the Adelie-vs-Gentoo penguins earlier), the very same
+model shines.
 
 <Callout type="info" title="Evaluation goes deeper than accuracy">
 Accuracy is a fine first headline, but for classification it can badly
@@ -526,74 +550,77 @@ and speed** — a straight-line decision you can read off the coefficients.
   title="Train a classifier and read its probabilities"
   category="classification · logistic regression"
   estimatedTime="~7 min"
-  instructions={`Build a logistic regression on the breast cancer data and pull
-out both a class prediction and a probability.
+  instructions={`Build a logistic regression that tells **Adelie** from **Gentoo**
+penguins, and pull out both a class prediction and a probability. The data
+is already filtered to those two species and loaded as \`X\` (four numeric
+measurements) and \`y\` (the species).
 
-1. Load the data with \`load_breast_cancer(return_X_y=True)\` into \`X\`
-   and \`y\` (0 = malignant, 1 = benign).
-2. Split into train/test with **20%** in the test set, \`random_state=42\`,
+1. Split into train/test with **20%** in the test set, \`random_state=42\`,
    and **stratified** on \`y\`. Use \`X_train, X_test, y_train, y_test\`.
-3. Create a \`LogisticRegression(max_iter=1000)\` called \`model\` and
+2. Create a \`LogisticRegression(max_iter=1000)\` called \`model\` and
    \`.fit()\` it on the **training** data.
-4. Store its test accuracy in \`accuracy\` (via \`model.score(...)\`).
-5. For the **first test tumor** (\`X_test[:1]\`), store the probability that
-   it is **benign** (class 1) in \`p_benign\`. Hint: it is column 1 of
-   \`model.predict_proba(X_test[:1])\`.
+3. Store its test accuracy in \`accuracy\` (via \`model.score(...)\`).
+4. For the **first test penguin** (\`X_test[:1]\`), store the probability
+   that it is a **Gentoo** (class 1) in \`p_gentoo\`. Hint: it is column 1 of
+   \`model.predict_proba(X_test[:1])\`. (\`model.classes_\` is alphabetical, so
+   Adelie is column 0 and Gentoo column 1.)
 
-The tests check the split size, that \`model\` is fitted, that
-\`accuracy\` is sensibly high, and that \`p_benign\` is a valid probability
-between 0 and 1.`}
+The tests check the split is 20% of the rows, that \`model\` is fitted, that
+\`accuracy\` is very high (these two species are almost perfectly
+separable), and that \`p_gentoo\` is a valid probability between 0 and 1.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      initCode: `from sklearn.datasets import load_breast_cancer
+      initCode: `import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression`,
-      starterCode: `# 1. Load
-X, y = None, None
+from sklearn.linear_model import LogisticRegression
 
-# 2. Split (20% test, random_state=42, stratified)
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])
+two = penguins[penguins["species"].isin(["Adelie", "Gentoo"])]
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = two[features]
+y = two["species"]`,
+      starterCode: `# 1. Split (20% test, random_state=42, stratified)
 X_train, X_test, y_train, y_test = None, None, None, None
 
-# 3. Create and fit the model
+# 2. Create and fit the model
 model = None
 
-# 4. Test accuracy
+# 3. Test accuracy
 accuracy = None
 
-# 5. Probability the first test tumor is benign (class 1)
-p_benign = None
+# 4. Probability the first test penguin is a Gentoo (class 1)
+p_gentoo = None
 
-print("accuracy:", accuracy, "P(benign) for first tumor:", p_benign)
+print("accuracy:", accuracy, "P(Gentoo) for first penguin:", p_gentoo)
 `,
-      solutionCode: `# 1. Load
-X, y = load_breast_cancer(return_X_y=True)
-
-# 2. Split (20% test, random_state=42, stratified)
+      solutionCode: `# 1. Split (20% test, random_state=42, stratified)
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
 
-# 3. Create and fit the model
+# 2. Create and fit the model
 model = LogisticRegression(max_iter=1000)
 model.fit(X_train, y_train)
 
-# 4. Test accuracy
+# 3. Test accuracy
 accuracy = model.score(X_test, y_test)
 
-# 5. Probability the first test tumor is benign (class 1)
-p_benign = model.predict_proba(X_test[:1])[0, 1]
+# 4. Probability the first test penguin is a Gentoo (class 1)
+p_gentoo = model.predict_proba(X_test[:1])[0, 1]
 
-print("accuracy:", accuracy, "P(benign) for first tumor:", p_benign)
+print("accuracy:", accuracy, "P(Gentoo) for first penguin:", p_gentoo)
 `,
     },
   ]}
   tests={[
     {
       id: "test_size",
-      name: "Test set is 20% of 569 tumors",
-      description: "114 tumors held out",
-      code: `assert X_test.shape[0] == 114, f"Expected 114 test tumors, got {X_test.shape[0]}"`,
+      name: "Test set is 20% of the rows",
+      description: "Held-out count matches a 20% split",
+      code: `expected = round(len(X) * 0.2)
+assert X_test.shape[0] == expected, f"Expected {expected} test rows (20% of {len(X)}), got {X_test.shape[0]}"`,
     },
     {
       id: "model_fitted",
@@ -605,17 +632,17 @@ assert hasattr(model, "coef_"), "model does not appear to be fitted (call .fit f
     },
     {
       id: "accuracy_high",
-      name: "Test accuracy is high",
-      description: "A correct model scores well above chance",
+      name: "Test accuracy is very high",
+      description: "Adelie vs. Gentoo is almost perfectly separable",
       code: `assert accuracy is not None, "accuracy is still None"
-assert accuracy > 0.85, f"Expected accuracy above 0.85, got {accuracy}"`,
+assert accuracy > 0.95, f"Expected accuracy above 0.95, got {accuracy}"`,
     },
     {
       id: "valid_probability",
-      name: "p_benign is a valid probability",
+      name: "p_gentoo is a valid probability",
       description: "Between 0 and 1",
-      code: `assert p_benign is not None, "p_benign is still None"
-assert 0.0 <= p_benign <= 1.0, f"Expected a probability in [0, 1], got {p_benign}"`,
+      code: `assert p_gentoo is not None, "p_gentoo is still None"
+assert 0.0 <= p_gentoo <= 1.0, f"Expected a probability in [0, 1], got {p_gentoo}"`,
     },
   ]}
 />
@@ -625,7 +652,7 @@ assert 0.0 <= p_benign <= 1.0, f"Expected a probability in [0, 1], got {p_benign
 <MultipleChoice
   markdown={`Despite its name, what kind of task is logistic regression built for?
 
-- [o] Classification — predicting a category (and a probability), such as malignant versus benign
+- [o] Classification — predicting a category (and a probability), such as Adelie versus Gentoo
   > The "regression" in the name refers to the linear score it computes internally; the model's output is a class. It is a classification algorithm.
 - Predicting a continuous number, like linear regression
   > Logistic regression predicts a discrete class (and a probability), not a continuous number. That is the job of linear regression. The "regression" in its name refers to the internal linear score, not the type of output.
@@ -683,13 +710,13 @@ The remedy is engineered nonlinear features or a model that can bend its boundar
 />
 
 <MultipleChoice
-  markdown={`A feature has a large **positive** coefficient in a fitted logistic regression (target: class 1 = benign). What does that imply, intuitively?
+  markdown={`A feature has a large **positive** coefficient in a fitted logistic regression (target: class 1 = Gentoo). What does that imply, intuitively?
 
 - The feature is measured in the wrong units
   > The units of measurement do not determine the sign or meaning of a coefficient. A large positive coefficient means the feature pushes the prediction toward class 1, regardless of the units used.
 - Increasing that feature lowers the probability of class 1
   > A *negative* coefficient would lower the class-1 probability as the feature increases. A large *positive* coefficient has the opposite effect: it raises the linear score and thus raises the class-1 probability through the sigmoid.
-- [o] Increasing that feature raises the linear score, pushing the predicted probability of class 1 (benign) upward
+- [o] Increasing that feature raises the linear score, pushing the predicted probability of class 1 (Gentoo) upward
   > A positive coefficient increases the score \`z\` as the feature grows, and a higher \`z\` maps to a higher class-1 probability through the sigmoid. The sign gives the direction of the push.
 - The model has overfit the training data
   > Coefficient size is not a sign of overfitting. Overfitting is diagnosed by comparing training and test performance. A large positive coefficient simply means that feature strongly pushes the model toward predicting class 1.

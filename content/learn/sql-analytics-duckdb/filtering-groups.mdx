@@ -307,6 +307,60 @@ after \`WHERE\`.`}
 Row conditions → \`WHERE\`; aggregate conditions → \`HAVING\`.`}
 />
 
+## Your turn
+
+A quick win on real data. A table `loans` holds Lending Club results;
+report each loan grade's count and average interest rate.
+
+<SqlChallengeCard
+  dialect="duckdb"
+  title="Average interest rate per loan grade"
+  instructions={`The table \`loans\` is pre-loaded. Return one row per \`grade\` with columns \`grade\`, \`loans\` (the row count), and \`avg_rate\` (the average \`int_rate\` rounded to 2 decimals). Sort by \`avg_rate\` descending.`}
+  initSql={`CREATE TABLE loans AS
+SELECT
+  *
+FROM
+  read_parquet(
+    'https://cdn.jsdelivr.net/gh/dataslope/datasets@f7f08485960fe4a774359a43d1eb50a84514daf2/lending-club-loan-results.parquet'
+  );`}
+  starterCode={`SELECT
+  grade,
+  COUNT(*) AS loans,
+  -- replace the 0 with the rounded average interest rate
+  0 AS avg_rate
+FROM
+  loans
+GROUP BY
+  grade
+ORDER BY
+  avg_rate DESC;`}
+  solutionSql={`SELECT
+  grade,
+  COUNT(*) AS loans,
+  ROUND(AVG(int_rate), 2) AS avg_rate
+FROM
+  loans
+GROUP BY
+  grade
+ORDER BY
+  avg_rate DESC;`}
+  tests={[
+    {
+      id: "columns",
+      name: "Has the required columns",
+      description: "grade, loans, avg_rate",
+      expectedColumnsInclude: ["grade", "loans", "avg_rate"],
+    },
+    {
+      id: "matches",
+      name: "Matches the reference solution",
+      description: "Same rows, same order",
+      matchesSolution: true,
+      ordered: true,
+    },
+  ]}
+/>
+
 You have now mastered summarization: aggregates, grouping, multi-level
 subtotals, and group filtering. Next comes a different superpower —
 **window functions**, which summarize *without collapsing* the rows.

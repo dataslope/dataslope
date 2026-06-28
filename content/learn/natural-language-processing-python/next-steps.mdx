@@ -71,7 +71,8 @@ can now:
 - Measure text with **frequency distributions** and **lexical diversity**.
 - Capture local order with **bigrams and trigrams**, and explain the sparsity
   trade-off.
-- Turn documents into **bag-of-words features**.
+- Turn documents into **bag-of-words features**, and weight them with
+  **TF-IDF** so distinctive words rise and generic ones fade.
 - Assemble all of it into a working, explainable **sentiment classifier**.
 
 <Callout type="success" title="The most important takeaway">
@@ -86,12 +87,14 @@ real skill. That judgment transfers to every NLP tool you will ever use.
 Your rule-based sentiment classifier used a hand-written lexicon. The natural
 next step is to let a model **learn** word sentiment (and much more) from
 labeled examples. The classic recipe is wonderfully close to what you already
-know: take your **bag-of-words** (or TF-IDF-weighted) features and feed them to
-a simple classifier like Naive Bayes or logistic regression.
+know: take your **bag-of-words** or **TF-IDF**-weighted features — both of which
+you built by hand in this course — and feed them to a simple classifier like
+Naive Bayes or logistic regression.
 
-- **TF-IDF** is the upgrade to raw counts we flagged on the frequencies page:
-  it down-weights words that are common across *all* documents and up-weights
-  the distinctive ones, so "the" stops dominating and topical words shine.
+- **TF-IDF**, which you computed from scratch, is the standard weighting fed to
+  these classifiers: it down-weights words common across *all* documents and
+  up-weights the distinctive ones, so generic words stop dominating the
+  features.
 - **Naive Bayes** and **logistic regression** are the workhorse text
   classifiers — fast, strong baselines that consume exactly the kind of feature
   vectors you built by hand.

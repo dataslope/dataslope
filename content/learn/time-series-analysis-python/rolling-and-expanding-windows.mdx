@@ -121,44 +121,32 @@ advances:
 | 2 | mean of `y2, y3, y4` | mean of `y1, y2` |
 | 3 | mean of `y3, y4, y5` | mean of `y1, y2, y3` |
 
-Watch a 12-month moving average dissolve the airline series' seasonal hump
-and lay its trend bare. **Change the `window` and re-run** to feel the
-trade-off.
+Watch a 12-month moving average dissolve the Keeling Curve's annual
+sawtooth and lay its trend bare. **Change the `window` and re-run** to feel
+the trade-off.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "NOAA_mauna_loa_co2_monthly.csv", stageAs: "co2.csv" }]}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
-import numpy as np
-_passengers = [
-    112,118,132,129,121,135,148,148,136,119,104,118,
-    115,126,141,135,125,149,170,170,158,133,114,140,
-    145,150,178,163,172,178,199,199,184,162,146,166,
-    171,180,193,181,183,218,230,242,209,191,172,194,
-    196,196,236,235,229,243,264,272,237,211,180,201,
-    204,188,235,227,234,264,302,293,259,229,203,229,
-    242,233,267,269,270,315,364,347,312,274,237,278,
-    284,277,317,313,318,374,413,405,355,306,271,306,
-    315,301,356,348,355,422,465,467,404,347,305,336,
-    340,318,362,348,363,435,491,505,404,359,310,337,
-    360,342,406,396,420,472,548,559,463,407,362,405,
-    417,391,419,461,472,535,622,606,508,461,390,432,
-]
-idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`,
+df = pd.read_csv("co2.csv")
+df["date"] = pd.to_datetime(df[["year", "month"]].assign(day=1))
+co2 = df.set_index("date")["average"]   # monthly atmospheric CO2, ppm`,
       starterCode: `import matplotlib.pyplot as plt
 
-window = 12  # <-- change me! try 3 (noisy), 12 (kills seasonality), 36 (very smooth)
+window = 12  # <-- change me! try 3 (jagged), 12 (kills the sawtooth), 60 (very smooth)
 
-ma = air.rolling(window=window).mean()
+ma = co2.rolling(window=window).mean()
 
 fig, ax = plt.subplots(figsize=(10, 4))
-air.plot(ax=ax, alpha=0.4, label="raw (monthly)")
+co2.plot(ax=ax, alpha=0.35, label="raw (monthly)")
 ma.plot(ax=ax, linewidth=2.5, label=f"{window}-month moving average")
 ax.legend()
-ax.set_title(f"Rolling mean smooths the noise (window = {window})")
+ax.set_ylabel("CO2 (ppm)")
+ax.set_title(f"Rolling mean smooths the seasonal sawtooth (window = {window})")
 plt.tight_layout()
 plt.show()
 
@@ -170,10 +158,10 @@ print("isn't available until that many points have gone by.")
 />
 
 A 12-month window is special here: because it spans exactly one seasonal
-cycle, averaging over it *cancels the seasonality* and leaves a clean
+cycle, averaging over it *cancels the annual sawtooth* and leaves a clean
 trend. Try `window=3` and the line stays jagged (barely any smoothing);
-try `window=36` and it becomes a sweeping curve that lags far behind the
-data. That tension is the whole art of choosing a window.
+try `window=60` and it becomes a sweeping five-year curve that lags behind
+the data. That tension is the whole art of choosing a window.
 
 <Callout type="info" title="The window-size trade-off">
 - **Small window** → *responsive* but *noisy*. It hugs the data and reacts
@@ -623,6 +611,51 @@ print(
       name: "uses_future is True",
       description: "The centered window depended on a later point",
       code: `assert uses_future is True, "Centered window at index 1 does depend on s.iloc[2]"`,
+    },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="A 12-month rolling mean of the Keeling Curve"
+  instructions={`The monthly CO₂ series \`co2\` is loaded. Compute \`trend\`: a **12-month trailing** rolling mean (\`co2.rolling(12).mean()\`). Because a 12-month window spans exactly one seasonal cycle, it cancels the annual sawtooth and leaves a smooth trend.
+
+Then set \`raw_swing\` to the standard deviation of the raw \`co2\` *within the year 1995* (\`co2.loc["1995"].std()\`) and \`smooth_swing\` to the standard deviation of \`trend\` within 1995 (\`trend.loc["1995"].std()\`).
+
+The 12-month average should be far smoother inside any single year, so \`smooth_swing\` must be much smaller than \`raw_swing\`. Also, the first 11 values of \`trend\` should be \`NaN\`.`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("co2.csv")
+df["date"] = pd.to_datetime(df[["year", "month"]].assign(day=1))
+co2 = df.set_index("date")["average"]`,
+      starterCode: `trend = None        # 12-month trailing rolling mean
+raw_swing = None    # std of raw co2 within 1995
+smooth_swing = None # std of the rolling mean within 1995
+print("raw swing:", raw_swing, " smooth swing:", smooth_swing)
+`,
+      solutionCode: `trend = co2.rolling(12).mean()
+raw_swing = float(co2.loc["1995"].std())
+smooth_swing = float(trend.loc["1995"].std())
+print("raw swing:", round(raw_swing, 3), " smooth swing:", round(smooth_swing, 3))
+`,
+    },
+  ]}
+  datasets={[{ path: "NOAA_mauna_loa_co2_monthly.csv", stageAs: "co2.csv" }]}
+  tests={[
+    {
+      id: "leading_nans",
+      name: "first 11 values are NaN",
+      description: "A full 12-wide window isn't available yet",
+      code: `assert trend.iloc[:11].isna().all(), "First 11 should be NaN for a 12-month trailing window"
+assert not pd.isna(trend.iloc[11]), "The 12th value should be defined"`,
+    },
+    {
+      id: "smoother",
+      name: "the rolling mean is much smoother within a year",
+      description: "12-month average cancels the seasonal swing",
+      code: `assert smooth_swing < raw_swing / 3, f"Rolling mean should be far smoother: raw={raw_swing}, smooth={smooth_swing}"`,
     },
   ]}
 />

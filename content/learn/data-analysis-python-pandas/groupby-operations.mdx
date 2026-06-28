@@ -357,94 +357,82 @@ print(df.groupby("dept").apply(top_two, include_groups=False))
 Reach for `apply` only when neither `agg` nor `transform` will
 do.
 
-## A realistic example
+## A realistic example, at scale
 
-Compute, for the HR dataset, average monthly income and attrition
-rate by department.
+Split-apply-combine earns its keep on big tables. The diamonds
+dataset has 53,940 rows — far too many to eyeball — but a single
+`groupby` collapses them into one tidy row per cut. Let us compute,
+for each quality of `cut`, the count, the mean price, and the
+*median* price.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import pandas as pd
-
-df = pd.read_csv(
-    "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
-)
-
-# Turn Attrition (Yes/No) into 1/0 so we can take its mean
-df["left"] = (df["Attrition"] == "Yes").astype(int)
-
-summary = (
-    df.groupby("Department")
+      initCode: `import pandas as pd
+diamonds = pd.read_csv("diamonds.csv")`,
+      starterCode: `summary = (
+    diamonds.groupby("cut")
     .agg(
-        headcount=("EmployeeNumber", "count"),
-        avg_income=("MonthlyIncome", "mean"),
-        median_income=("MonthlyIncome", "median"),
-        attrition_pct=("left", "mean"),
+        count=("price", "size"),
+        avg_price=("price", "mean"),
+        median_price=("price", "median"),
     )
-    .round({"avg_income": 0, "median_income": 0, "attrition_pct": 3})
+    .round({"avg_price": 0})
+    .sort_values("avg_price", ascending=False)
 )
-
-summary["attrition_pct"] = (summary["attrition_pct"] * 100).round(1)
 print(summary)
 `,
     },
   ]}
 />
 
-This single chained call answers four business questions at
-once, per department. That economy is what makes `groupby` so
-beloved.
+This single chained call turns 53,940 rows into a five-row answer.
+Look closely at the result and you will spot something strange:
+**Ideal** diamonds — the best cut — have the *lowest* average
+price, and the mean is well above the median in every group. That
+is not a bug. It is a real pattern hiding in plain sight: ideal-cut
+diamonds skew toward smaller carats, and a handful of enormous
+stones drag every group's *mean* upward while leaving the *median*
+alone. A good analyst notices the gap and follows it — which is
+exactly the kind of thread groupby is built to pull on.
 
 ## A multi-step challenge
 
 <ChallengeCard
   adapter="python"
-  title="Department attrition summary"
-  instructions={`Load:
+  title="Price summary by cut"
+  instructions={`The diamonds file is staged as \`diamonds.csv\` and loaded into \`diamonds\` for you. Build a DataFrame called \`summary\` indexed by \`cut\` with **exactly** these columns (in this order):
 
-\`https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv\`
+1. \`count\` — number of diamonds of that cut
+2. \`avg_price\` — mean of \`price\`, rounded to the nearest integer
+3. \`avg_carat\` — mean of \`carat\`, rounded to 2 decimal places
 
-Build a DataFrame called \`summary\` indexed by \`Department\` with **exactly** these columns (in this order):
-
-1. \`headcount\` — number of employees in the department
-2. \`avg_income\` — mean of \`MonthlyIncome\`, rounded to nearest integer
-3. \`attrition_pct\` — percentage of employees with \`Attrition == "Yes"\`, rounded to 1 decimal place
-
-Sort the result by \`attrition_pct\` descending.`}
+Sort the result by \`avg_price\` descending.`}
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import pandas as pd
-
-URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
-df = pd.read_csv(URL)
-
-summary = None  # TODO
+      initCode: `import pandas as pd
+diamonds = pd.read_csv("diamonds.csv")`,
+      starterCode: `summary = None  # TODO
 
 print(summary)
 `,
-      solutionCode: `import pandas as pd
-
-URL = "https://raw.githubusercontent.com/bdi475/datasets/main/HR-dataset-v14.csv"
-df = pd.read_csv(URL)
-
-df["left"] = (df["Attrition"] == "Yes").astype(int)
-
-summary = (
-    df.groupby("Department")
+      solutionCode: `summary = (
+    diamonds.groupby("cut")
     .agg(
-        headcount=("EmployeeNumber", "count"),
-        avg_income=("MonthlyIncome", "mean"),
-        attrition_pct=("left", "mean"),
+        count=("price", "size"),
+        avg_price=("price", "mean"),
+        avg_carat=("carat", "mean"),
     )
     .assign(
-        avg_income=lambda x: x["avg_income"].round(0),
-        attrition_pct=lambda x: (x["attrition_pct"] * 100).round(1),
+        avg_price=lambda x: x["avg_price"].round(0),
+        avg_carat=lambda x: x["avg_carat"].round(2),
     )
-    .sort_values("attrition_pct", ascending=False)
+    .sort_values("avg_price", ascending=False)
 )
 
 print(summary)
@@ -461,29 +449,29 @@ assert isinstance(summary, pd.DataFrame)`,
     },
     {
       id: "index",
-      name: "Indexed by Department",
-      description: "Index name should be 'Department'",
-      code: `assert summary.index.name == "Department"`,
+      name: "Indexed by cut",
+      description: "Index name should be 'cut'",
+      code: `assert summary.index.name == "cut"`,
     },
     {
       id: "columns",
       name: "Has the right columns in the right order",
-      description: "headcount, avg_income, attrition_pct",
-      code: `expected = ["headcount", "avg_income", "attrition_pct"]
+      description: "count, avg_price, avg_carat",
+      code: `expected = ["count", "avg_price", "avg_carat"]
 assert list(summary.columns) == expected, f"Got {list(summary.columns)}"`,
     },
     {
       id: "sorted",
-      name: "Sorted descending by attrition_pct",
-      description: "Highest attrition department first",
-      code: `vals = summary["attrition_pct"].tolist()
+      name: "Sorted descending by avg_price",
+      description: "Most expensive cut first",
+      code: `vals = summary["avg_price"].tolist()
 assert all(vals[i] >= vals[i+1] for i in range(len(vals)-1))`,
     },
     {
       id: "shape",
-      name: "Has 3 departments",
-      description: "Expect 3 rows",
-      code: `assert len(summary) == 3`,
+      name: "Has 5 cuts",
+      description: "Expect 5 rows",
+      code: `assert len(summary) == 5`,
     },
   ]}
 />

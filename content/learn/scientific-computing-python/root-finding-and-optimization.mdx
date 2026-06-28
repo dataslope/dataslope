@@ -278,6 +278,68 @@ plt.show()
 The covariance matrix `pcov` gives you parameter uncertainties for
 free — invaluable for reporting confidence intervals.
 
+### Curve-fitting real data: the Keeling curve
+
+Synthetic data is convincing only up to a point. Let us fit a model
+to one of the most important measured time series in science: the
+**Keeling curve**, the monthly atmospheric CO₂ concentration recorded
+at Mauna Loa, Hawaii, continuously since 1958. The series has an
+obvious structure — a rising trend with a small yearly wobble — so a
+sensible model is a *quadratic trend plus a one-year sinusoid*:
+
+$$
+c(t) = a + b\,t + d\,t^2 + A\cos(2\pi t) + B\sin(2\pi t)
+$$
+
+where $t$ is time in years. `curve_fit` estimates all five parameters
+at once.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "NOAA_mauna_loa_co2_monthly.csv", stageAs: "co2.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+
+# 'average' is the clean monthly CO2 series in ppm.
+df = pd.read_csv("co2.csv")
+t = df["decimal date"].to_numpy()
+co2 = df["average"].to_numpy()
+t0 = t - t[0]  # years since the first reading, for numerical conditioning`,
+      starterCode: `def model(t, a, b, d, A, B):
+    return a + b * t + d * t**2 + A * np.cos(2 * np.pi * t) + B * np.sin(2 * np.pi * t)
+
+
+popt, _ = curve_fit(model, t0, co2, p0=[315, 1.5, 0, 0, 0])
+a, b, d, A, B = popt
+seasonal_amp = np.hypot(A, B)
+print(f"linear growth term b   = {b:.3f} ppm/year")
+print(f"seasonal amplitude     = {seasonal_amp:.2f} ppm")
+print(f"residual std deviation = {np.std(co2 - model(t0, *popt)):.2f} ppm")
+
+fig, ax = plt.subplots(figsize=(9, 3.5))
+ax.plot(t, co2, lw=0.6, label="measured")
+ax.plot(t, model(t0, *popt), "r", lw=1.2, label="trend + seasonal fit")
+ax.set_xlabel("year")
+ax.set_ylabel("CO2 (ppm)")
+ax.legend()
+plt.show()
+`,
+    },
+  ]}
+/>
+
+Five parameters capture six decades of data to within about a part
+per million. The fitted seasonal amplitude — a few ppm — is the
+breathing of the Northern Hemisphere's forests, inhaling CO₂ each
+spring and exhaling it each winter. This is what curve fitting is
+*for*: turning a wall of numbers into a handful of physically
+meaningful constants, each with an uncertainty.
+
 ## Global optimization
 
 Local solvers like BFGS find the *nearest* minimum. When your
@@ -409,7 +471,7 @@ Test cases use $f(x) = x^2 - 2$ and $f(x) = \\cos x - x$, both with known good i
     {
       id: "raises",
       name: "Raises when not converging",
-      code: "import pytest\nwith pytest.raises(RuntimeError):\n    newton_root(lambda x: x*x + 1, lambda x: 2*x, 1.0, max_iter=20)",
+      code: "import math, pytest\nwith pytest.raises(RuntimeError):\n    # exp(x) has no real root, so Newton can never converge\n    newton_root(lambda x: math.exp(x), lambda x: math.exp(x), 0.0, max_iter=20)",
     },
   ]}
 />

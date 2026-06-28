@@ -48,44 +48,49 @@ chapter explains why, and gives you the tools that do not lie: the
 
 ## The accuracy trap
 
-Imagine a disease that affects 2% of patients. Build a "model" that ignores
-its inputs and predicts "healthy" for everyone. Its accuracy? 98%. It is
-also completely worthless — it never catches a single sick patient. Let us
-watch this happen for real.
+Loan defaults are rare: most borrowers repay. Build a "model" that ignores
+its inputs and predicts "did not default" for everyone, and on the real
+**lending-club** data it will score a high accuracy while catching not a
+single defaulter. Let us watch this happen on genuinely imbalanced data.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "lending-club-loan-results.csv", stageAs: "loans.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import make_classification
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+loans = pd.read_csv("loans.csv")`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.dummy import DummyClassifier
 from sklearn.metrics import accuracy_score, recall_score
 
-# An imbalanced problem: only ~8% of cases are the positive class (1).
-X, y = make_classification(
-    n_samples=1000, n_features=8, weights=[0.92, 0.08], random_state=0
-)
+# Real, imbalanced classification: most loans are repaid, few default.
+features = ["loan_amnt", "int_rate", "term_in_months", "annual_inc"]
+data = loans.dropna(subset=features + ["did_default"])
+X = data[features]
+y = data["did_default"].astype(int)  # 1 = defaulted (the rare positive class)
+print(f"Share that defaulted: {y.mean():.1%}")
+
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )
 
-# A model that ALWAYS predicts the majority class "0".
+# A model that ALWAYS predicts the majority class "did not default".
 dummy = DummyClassifier(strategy="most_frequent").fit(X_train, y_train)
 y_pred = dummy.predict(X_test)
 
 print(f"Accuracy: {accuracy_score(y_test, y_pred):.1%}")
 print(f"Recall on the positive class: {recall_score(y_test, y_pred):.1%}")
-print("Positives it actually caught:", int((y_pred[y_test == 1] == 1).sum()))
+print("Defaulters it actually caught:", int((y_pred[y_test == 1] == 1).sum()))
 `,
     },
   ]}
 />
 
-Over 90% accuracy, and it caught **zero** positive cases. The accuracy is
-high only because the negative class is huge and easy. On any problem where
-the rare class is the one you care about — fraud, disease, defaults,
+A high accuracy, and it caught **zero** defaulters. The accuracy is high
+only because the repaid class is huge and easy. On any problem where the
+rare class is the one you care about — fraud, disease, defaults,
 defects — accuracy alone is dangerously misleading.
 
 <Callout type="danger" title="Accuracy hides what matters on imbalanced data">
@@ -123,17 +128,20 @@ lays it out with actual classes as rows and predicted classes as columns.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "lending-club-loan-results.csv", stageAs: "loans.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import make_classification
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+loans = pd.read_csv("loans.csv")`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix
 
-X, y = make_classification(
-    n_samples=1000, n_features=8, weights=[0.92, 0.08], random_state=0
-)
+features = ["loan_amnt", "int_rate", "term_in_months", "annual_inc"]
+data = loans.dropna(subset=features + ["did_default"])
+X = data[features]
+y = data["did_default"].astype(int)  # 1 = defaulted
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )
@@ -144,8 +152,8 @@ y_pred = model.predict(X_test)
 cm = confusion_matrix(y_test, y_pred)
 print("Confusion matrix (rows = actual, cols = predicted):")
 print("                 pred 0   pred 1")
-print(f"  actual 0 (neg)   {cm[0, 0]:4d}     {cm[0, 1]:4d}")
-print(f"  actual 1 (pos)   {cm[1, 0]:4d}     {cm[1, 1]:4d}")
+print(f"  actual 0 (neg)   {cm[0, 0]:5d}    {cm[0, 1]:5d}")
+print(f"  actual 1 (pos)   {cm[1, 0]:5d}    {cm[1, 1]:5d}")
 print()
 tn, fp, fn, tp = cm.ravel()
 print(f"TN={tn}  FP={fp}  FN={fn}  TP={tp}")

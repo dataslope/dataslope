@@ -197,23 +197,27 @@ which column is mapped to which channel.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import plotly.express as px
+      initCode: `import pandas as pd
+import plotly.express as px
 
-df = px.data.iris()
-
-fig = px.scatter(
-    df,
-    x="sepal_width",
-    y="sepal_length",
+# Palmer Penguins — the friendly stand-in for the old iris dataset.
+penguins = pd.read_csv("penguins.csv").dropna(
+    subset=["bill_depth_mm", "bill_length_mm", "flipper_length_mm"]
+)`,
+      starterCode: `fig = px.scatter(
+    penguins,
+    x="bill_depth_mm",
+    y="bill_length_mm",
     color="species",
     symbol="species",
-    size="petal_length",
+    size="flipper_length_mm",
     template="simple_white",
-    title="Iris: four encodings",
-    labels={"sepal_width": "Sepal width (cm)", "sepal_length": "Sepal length (cm)"},
+    title="Penguins: four encodings",
+    labels={"bill_depth_mm": "Bill depth (mm)", "bill_length_mm": "Bill length (mm)"},
 )
 fig.show()
 `,
@@ -221,8 +225,8 @@ fig.show()
   ]}
 />
 
-The answer: **x = sepal width**, **y = sepal length**, **color &
-shape = species**, **size = petal length**. The chart spends color
+The answer: **x = bill depth**, **y = bill length**, **color &
+shape = species**, **size = flipper length**. The chart spends color
 *and* shape on `species` (redundant encoding) which is sometimes
 useful for color-blind viewers but can also be argued as wasted
 ink. Tradeoffs.

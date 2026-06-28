@@ -145,7 +145,10 @@ tighter, never looser.
 Let us generate four blobs of points and let k-means rediscover them. The
 `make_blobs` generator gives us labeled blobs, but we will **throw the
 labels away** and pretend we only have the raw points — because that is the
-real clustering situation.
+real clustering situation. Synthetic clusters are the clearest way to learn
+the algorithm: because *we* chose the true number of clusters and their
+round shape, we can check whether k-means actually recovered them — a luxury
+real unlabeled data never gives you.
 
 <CodeBlock
   adapter="python"
@@ -453,6 +456,60 @@ Always standardize before clustering on distances, and be suspicious of any
 clustering where you did not.
 </Callout>
 
+### The same on real data
+
+Synthetic blobs make the mechanics clear, but real data clusters too. The
+California housing dataset describes ~20,000 districts with eight numeric
+columns and **no target** — exactly the unlabeled situation clustering is
+for. The columns live on wildly different scales (`Population` runs into the
+thousands while `Latitude` sits near 35), so this is the danger callout
+above made concrete: scale first, or `Population` alone decides everything.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "california_housing.csv", stageAs: "housing.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+housing = pd.read_csv("housing.csv")`,
+      starterCode: `import numpy as np
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+
+# All 8 columns are features; there is no target to predict here.
+print("districts:", housing.shape[0], " columns:", list(housing.columns))
+
+# These ranges are nowhere near comparable — scaling is mandatory.
+print(np.round(housing[["Population", "Latitude"]].describe().loc[["min", "max"]], 2))
+
+# Standardize every column to mean 0, std 1, THEN cluster.
+X_scaled = StandardScaler().fit_transform(housing)
+km = KMeans(n_clusters=6, n_init=10, random_state=0)
+labels = km.fit_predict(X_scaled)
+
+# Real data clusters: every district lands in one of 6 groups.
+ids, sizes = np.unique(labels, return_counts=True)
+print("cluster ids:", ids)
+print("cluster sizes:", sizes)
+
+# Read one cluster back in the ORIGINAL units to see what it captured.
+housing_labeled = housing.assign(cluster=labels)
+print(np.round(housing_labeled.groupby("cluster")[["MedInc", "Latitude", "Longitude"]].mean(), 2))
+`,
+    },
+  ]}
+/>
+
+Each of the six clusters is a coherent slice of California — a band of
+latitude/longitude with a characteristic income level — discovered with no
+labels at all. Crucially, this only works because of `StandardScaler`: drop
+it and `Population` (values in the thousands) swamps `Latitude` and
+`Longitude` (values near 35), and the "clusters" become little more than a
+sort on population. The lesson from the blobs holds on messy real data, and
+the elbow method from earlier is exactly how you would replace the arbitrary
+`k=6` with a defensible choice.
+
 ## Where k-means breaks: non-spherical shapes
 
 Here is the honest, load-bearing limitation. K-means assigns each point to
@@ -589,7 +646,8 @@ plausible, and only then trusts the result or switches methods.
    \`np.unique(labels, return_counts=True)\` then sort the counts.
 
 The tests check that you scaled the data, found exactly 3 clusters,
-assigned all 300 points, and that the cluster sizes sum to 300.`}
+assigned one label per point, and that the cluster sizes sum to the number
+of points.`}
   files={[
     {
       filename: "main.py",
@@ -641,10 +699,10 @@ print("cluster sizes:", cluster_sizes)
     {
       id: "scaled_shape",
       name: "X_scaled has the right shape",
-      description: "Scaling preserves the 300x2 shape",
+      description: "Scaling preserves the original shape of X",
       code: `import numpy as np
 assert X_scaled is not None, "X_scaled is still None"
-assert np.asarray(X_scaled).shape == (300, 2), f"Expected (300, 2), got {np.asarray(X_scaled).shape}"`,
+assert np.asarray(X_scaled).shape == X.shape, f"Expected {X.shape}, got {np.asarray(X_scaled).shape}"`,
     },
     {
       id: "is_standardized",
@@ -668,15 +726,15 @@ assert np.allclose(s, 1, atol=1e-6), f"Column stds not ~1: {s}"`,
       description: "labels has one entry per point",
       code: `import numpy as np
 assert labels is not None, "labels is still None"
-assert len(labels) == 300, f"Expected 300 labels, got {len(labels)}"`,
+assert len(labels) == X.shape[0], f"Expected {X.shape[0]} labels, got {len(labels)}"`,
     },
     {
       id: "sizes_sum",
       name: "Cluster sizes are correct",
-      description: "Sizes are sorted ascending and sum to 300",
+      description: "Sizes are sorted ascending and sum to the number of points",
       code: `import numpy as np
 cs = np.asarray(cluster_sizes)
-assert cs.sum() == 300, f"Sizes should sum to 300, got {cs.sum()}"
+assert cs.sum() == X.shape[0], f"Sizes should sum to {X.shape[0]}, got {cs.sum()}"
 assert list(cs) == sorted(cs.tolist()), f"Sizes should be sorted ascending, got {cs}"`,
     },
   ]}

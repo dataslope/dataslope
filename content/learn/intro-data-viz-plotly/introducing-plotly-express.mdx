@@ -3,11 +3,12 @@ title: Introducing Plotly Express
 description: Your first proper tour of the library — what it imports, what it returns, and how to read its function names
 ---
 
-You have seen Plotly Express in action through several previous
-pages. Now we slow down and look at it carefully — *as a library*,
-not as magic. By the end of this page you will understand what
-`import plotly.express as px` actually does, what a Plotly figure
-*is*, and how to read the names of all the chart functions.
+You met Plotly Express on an earlier page and saw *why* it's the
+right tool. Now we slow down and look at it carefully — *as a
+library*, not as magic. By the end of this page you will understand
+what `import plotly.express as px` actually does, what a Plotly
+figure *is*, how `fig.show()` works, and how to read the names of all
+the chart functions.
 
 <svg
   viewBox="0 0 640 250"
@@ -81,27 +82,11 @@ will begin with those two imports.
 
 ## The basic shape of a Plotly Express call
 
-Every Plotly Express function takes a DataFrame plus some
-*encoding* arguments and returns a **Figure** object. The pattern
-looks like this:
-
-```python
-fig = px.bar(
-    df,                      # the data
-    x="col_name",            # what goes on x
-    y="col_name",            # what goes on y
-    color="col_name",        # optional: color encoding
-    title="My chart",        # optional: title
-    template="simple_white", # optional: visual theme
-)
-fig.show()
-```
-
-That's the entire shape of essentially every chart call you will
-ever make. The first argument is the data; the rest are encodings
-and styling.
-
-Try it:
+Every Plotly Express function takes a DataFrame plus some *encoding*
+arguments and returns a **Figure** object: data first, then
+encodings, then styling. We'll keep meeting that pattern. Here it is
+one more time with the *separation of concerns* made explicit — try
+it:
 
 <CodeBlock
   adapter="python"
@@ -190,14 +175,17 @@ The `fig` variable returned by every Plotly Express call is a
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `import plotly.express as px
+      initCode: `import pandas as pd
+import plotly.express as px
 
-df = px.data.iris()
-
-fig = px.scatter(df, x="sepal_width", y="sepal_length", template="simple_white")
+penguins = pd.read_csv("penguins.csv")`,
+      starterCode: `fig = px.scatter(
+    penguins, x="bill_depth_mm", y="bill_length_mm", template="simple_white"
+)
 
 print("Type:", type(fig).__name__)
 print("Data traces:", len(fig.data))
@@ -219,15 +207,21 @@ customization later (`fig.update_layout(...)`,
 Throughout this course we'll use three sources of data:
 
 1. **Built-in Plotly datasets** — small, classic datasets that
-   ship with Plotly Express. Examples: `px.data.iris()`,
-   `px.data.tips()`, `px.data.gapminder()`, `px.data.stocks()`.
+   ship with Plotly Express. Examples: `px.data.tips()`,
+   `px.data.gapminder()`, `px.data.stocks()`.
 2. **Hand-built DataFrames** — small tables we type out with
    `pd.DataFrame({...})`. Useful for tiny illustrative examples.
-3. **CSV / Parquet files loaded with pandas** — the real-world
-   workflow. We will introduce these in the next chapter.
+3. **CSV files loaded with pandas** — the real-world workflow, and
+   how we'll reach for friendlier datasets the built-ins don't cover:
+   **Palmer Penguins** (`penguins.csv`), **diamonds**
+   (`diamonds.csv`), and a couple of famous teaching sets. These are
+   loaded for you when a page needs them, then read with
+   `pd.read_csv(...)`. We introduce this properly in the next chapter.
 
-The built-in datasets are perfect for learning because they are
-small, real, and don't require any file I/O.
+A note on penguins: it is the field's preferred friendly replacement
+for the old "iris" flower dataset (whose author, R.A. Fisher, was a
+prominent eugenicist). Penguins teaches every lesson iris did,
+without the baggage.
 
 ## Check your understanding
 
@@ -279,14 +273,14 @@ Pandas does the loading and reshaping; Plotly Express does the visualization. Tw
 <MultipleChoice
   markdown={`Which built-in Plotly Express dataset is most useful for **time-series** examples?
 
-- **px.data.iris()**
-  > The iris dataset contains measurements of flower petals and sepals across three species. It has no time column, making it unsuitable for time-series examples.
+- The Palmer Penguins dataset (**penguins.csv**).
+  > The penguins dataset contains bill, flipper, and body-mass measurements across three species. It has no date column, making it unsuitable for time-series examples.
 - **px.data.tips()**
-  > The tips dataset records restaurant bill and tip amounts over a few weeks. It has no date column, so it cannot be used to demonstrate time-series charts.
+  > The tips dataset records restaurant bill and tip amounts over a few weeks but has no date column, so it cannot be used to demonstrate time-series charts.
 - [o] **px.data.gapminder()** or **px.data.stocks()**
-  > **gapminder()** has yearly country-level data from 1952-2007; **stocks()** has daily stock prices. Both are excellent for line charts, faceted time-series, and animated trends. **iris** and **tips** are static datasets — no time component.
+  > **gapminder()** has yearly country-level data from 1952-2007; **stocks()** has daily stock prices. Both are excellent for line charts, faceted time-series, and animated trends. Penguins and tips are static datasets — no time component.
 - **px.data.election()**
   > The election dataset contains vote counts from a Canadian election across polling districts. It is a snapshot dataset with no time dimension, making it ill-suited for time-series examples.
 
-The built-in datasets are deliberately diverse so you have a sample for each chart type.`}
+The datasets are deliberately diverse so you have a sample for each chart type.`}
 />

@@ -9,11 +9,10 @@ neighbors measures distances. Useful, but none of them is something you
 could explain to a colleague by drawing on a whiteboard.
 
 A **decision tree** is different. It is a model you can *read*. It is
-nothing more than a flowchart of yes/no questions: "Is the petal narrower
-than 0.8 cm? If yes, it's the first species. If no, is it shorter than
-4.95 cm? ..." Follow the answers down the branches and you arrive at a
-prediction. That is the entire model — questions and answers, all the way
-down.
+nothing more than a flowchart of yes/no questions: "Is the flipper shorter
+than 206 mm? If yes, is the bill shorter than 43 mm? ..." Follow the answers
+down the branches and you arrive at a prediction. That is the entire model —
+questions and answers, all the way down.
 
 This readability is why trees matter even in an era of giant models. They
 are the most *interpretable* nontrivial model in the toolkit, they need no
@@ -115,18 +114,18 @@ together as possible (it minimizes squared error).
 
 ```mermaid
 flowchart TD
-    A["All flowers<br/>(mixed species)"] -->|"petal <code>width &lt;= 0.8</code> cm?"| B["Yes"]
-    A -->|"no"| C["petal <code>width &gt; 0.8</code> cm"]
-    B --> D["Pure leaf<br/>all setosa"]
-    C -->|"petal <code>width &lt;= 1.75</code> cm?"| E["mostly versicolor"]
-    C -->|"no"| F["mostly virginica"]
+    A["All penguins<br/>(mixed species)"] -->|"flipper <code>length &lt;= 206</code> mm?"| B["Yes"]
+    A -->|"no"| C["flipper <code>length &gt; 206</code> mm"]
+    C --> F["Pure leaf<br/>all Gentoo"]
+    B -->|"bill <code>length &lt;= 43</code> mm?"| D["mostly Adelie"]
+    B -->|"no"| E["mostly Chinstrap"]
 ```
 
-That diagram is a real (simplified) tree for the iris dataset. The very
-first question — petal width below 0.8 cm — perfectly isolates one species
-in a single cut. The rest of the tree works to separate the two harder
-species. Notice there is no arithmetic, no coefficients: just questions,
-branches, and leaves.
+That diagram is a real (simplified) tree for the penguins dataset. A single
+cut on flipper length peels off nearly all the Gentoos, which have the
+longest flippers. The rest of the tree works to separate the two harder
+species, Adelie and Chinstrap. Notice there is no arithmetic, no
+coefficients: just questions, branches, and leaves.
 
 <Callout type="tip" title="The vocabulary, once">
 A tree is made of **nodes**. The top node is the **root**. Each internal
@@ -138,20 +137,24 @@ single most important knob you will tune.
 
 ## Your first classification tree
 
-Let us train a `DecisionTreeClassifier` on the wine dataset: 178 wines, 13
-chemical measurements, 3 cultivars. We will keep it shallow so it stays
-honest, then read its accuracy on held-out data.
+Let us train a `DecisionTreeClassifier` on the penguins dataset: 342 penguins
+(after dropping rows with missing measurements), four body measurements, 3
+species. We will keep it shallow so it stays honest, then read its accuracy
+on held-out data.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_wine
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
-X, y = load_wine(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X, y = penguins[features], penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )
@@ -167,7 +170,7 @@ print(f"Test accuracy:  {tree.score(X_test, y_test):.3f}")
   ]}
 />
 
-A shallow tree already classifies most wines correctly, and the train and
+A shallow tree already classifies most penguins correctly, and the train and
 test scores are close together — a sign it has learned a real pattern
 rather than memorized noise. The API is identical to every other
 scikit-learn model: `fit` to learn, `score` to evaluate, `predict` to make
@@ -176,29 +179,31 @@ understanding what it learned.
 
 <Callout type="success" title="No scaling, no problem">
 Notice we did **not** scale the features, even though they live on wildly
-different ranges (some measurements are near 0.3, others near 1000). Trees
-ask threshold questions one feature at a time — "is this value above
-*x*?" — so the *units* of each feature are irrelevant. This is a genuine
-convenience that distance-based models like KNN do not enjoy.
+different ranges (body mass is in the thousands of grams, bill length near
+40 mm). Trees ask threshold questions one feature at a time — "is this value
+above *x*?" — so the *units* of each feature are irrelevant. This is a
+genuine convenience that distance-based models like KNN do not enjoy.
 </Callout>
 
 ## Reading the tree as a picture
 
 The best way to build intuition is to *see* a tree. scikit-learn can draw
-one with `plot_tree`. We will use the iris dataset (only 4 features, so the
-picture stays small) and cap the depth at 2 so every box is legible.
+one with `plot_tree`. We will use the penguins dataset (only 4 features, so
+the picture stays small) and cap the depth at 2 so every box is legible.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
       starterCode: `import matplotlib.pyplot as plt
-from sklearn.datasets import load_iris
 from sklearn.tree import DecisionTreeClassifier, plot_tree
 
-data = load_iris()
-X, y = data.data, data.target
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X, y = penguins[features], penguins["species"]
 
 tree = DecisionTreeClassifier(max_depth=2, random_state=0)
 tree.fit(X, y)
@@ -206,8 +211,8 @@ tree.fit(X, y)
 fig, ax = plt.subplots(figsize=(11, 6))
 plot_tree(
     tree,
-    feature_names=data.feature_names,
-    class_names=data.target_names,
+    feature_names=features,
+    class_names=tree.classes_,
     filled=True,  # color boxes by majority class
     rounded=True,
     fontsize=10,
@@ -220,17 +225,17 @@ plt.show()
 />
 
 Read each box from the top down. The first line is the **question** (e.g.
-`petal width (cm) <= 0.8`). If a sample answers "yes" it goes left; "no"
+`flipper_length_mm <= 206.5`). If a sample answers "yes" it goes left; "no"
 goes right. `samples` is how many training examples reached that node;
 `value` shows how those examples break down across the three classes; and
 `class` is the majority label the node would predict. The color intensity
 reflects purity — a deep, solid color means the node is dominated by one
 class.
 
-The very first split alone (petal width ≤ 0.8) peels off all 50 setosa
-flowers into a perfectly pure leaf. That is the tree discovering, with zero
-guidance from you, that petal width is the single most informative
-measurement.
+The very first split alone (a flipper-length threshold) peels off nearly all
+the Gentoo penguins — which have by far the longest flippers — into an almost
+pure leaf. That is the tree discovering, with zero guidance from you, that
+flipper length is one of the single most informative measurements.
 
 <Callout type="info" title="Prefer text? Trees can print themselves">
 If you want the rules as text rather than a picture, `from sklearn.tree
@@ -250,14 +255,18 @@ returning that leaf's average.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_diabetes
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+diamonds = pd.read_csv("diamonds.csv")`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
 
-X, y = load_diabetes(return_X_y=True)
+# Predict a diamond's price from its numeric measurements.
+X = diamonds[["carat", "depth", "table", "x", "y", "z"]]
+y = diamonds["price"]
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=0)
 
 tree = DecisionTreeRegressor(max_depth=3, random_state=0)
@@ -276,7 +285,9 @@ The mechanics are identical to the classifier — `fit`, `score`, `predict` —
 which is exactly the point of scikit-learn's consistent API. One important
 visual consequence: because each leaf outputs a single constant, a
 regression tree's predictions form a **staircase**, not a smooth curve. The
-next code block makes that vivid.
+next code block makes that vivid with a synthetic one-feature curve — we use
+made-up data here on purpose, because a single input plotted against a known
+smooth function is the clearest way to *see* the staircase.
 
 <CodeBlock
   adapter="python"
@@ -327,14 +338,17 @@ between train and test accuracy as depth grows.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_wine
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
-X, y = load_wine(return_X_y=True)
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X, y = penguins[features], penguins["species"]
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.3, random_state=0, stratify=y
 )
@@ -390,20 +404,22 @@ Trees have a famous weakness, and it is worth seeing once so it sticks.
 Because the tree commits to a single "best" split at the very top and
 everything below depends on it, **a small change in the data can produce a
 completely different tree.** Swap out a handful of rows and the root split
-might flip from "petal width" to "petal length," cascading into a different
-structure entirely.
+might flip from "flipper length" to "bill length," cascading into a
+different structure entirely.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      starterCode: `from sklearn.datasets import load_wine
-from sklearn.model_selection import train_test_split
+      initCode: `import pandas as pd
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])`,
+      starterCode: `from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 
-X, y = load_wine(return_X_y=True)
-feature_names = load_wine().feature_names
+feature_names = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X, y = penguins[feature_names], penguins["species"]
 
 # Train three trees on three slightly different random splits and look at
 # which feature each one chooses for its very first (root) question.
@@ -491,33 +507,37 @@ same object. When that explanation matters, a tree earns its place.
   title="Train a depth-limited tree and expose the overfitting gap"
   category="models · decision trees"
   estimatedTime="~7 min"
-  instructions={`The breast cancer dataset has 569 samples and a binary
-target (malignant vs. benign).
+  instructions={`The penguins data has 342 rows (after dropping rows with
+missing measurements) across 3 species. \`X\` (four numeric measurements) and
+\`y\` (the species) are already prepared for you.
 
-1. Load it with \`load_breast_cancer(return_X_y=True)\` into \`X\` and \`y\`.
-2. Split into train/test with **25%** in the test set, \`random_state=0\`,
+1. Split into train/test with **25%** in the test set, \`random_state=0\`,
    and **stratified** on \`y\`.
-3. Train a \`DecisionTreeClassifier\` with \`max_depth=3\` and
+2. Train a \`DecisionTreeClassifier\` with \`max_depth=3\` and
    \`random_state=0\` on the training set. Call it \`tree\`.
-4. Store the training accuracy in \`train_acc\` and the test accuracy in
+3. Store the training accuracy in \`train_acc\` and the test accuracy in
    \`test_acc\` (both via \`tree.score(...)\`).
-5. For comparison, train a second tree \`deep_tree\` with **no depth limit**
+4. For comparison, train a second tree \`deep_tree\` with **no depth limit**
    (\`max_depth=None\`, \`random_state=0\`) and store its training accuracy in
    \`deep_train_acc\`.
 
-The tests check the depth-limited tree's configuration, that it
-generalizes reasonably (test accuracy above 0.88), and that the unlimited
-tree reaches a perfect training score — the memorization you should be wary
-of.`}
+The tests check the depth-limited tree's configuration, that the split is
+the right size, that the depth-3 tree generalizes reasonably (test accuracy
+above 0.85), and that the unlimited tree reaches a perfect training
+score — the memorization you should be wary of.`}
+  datasets={[{ path: "palmer-penguins.csv", stageAs: "penguins.csv" }]}
   files={[
     {
       filename: "main.py",
-      initCode: `from sklearn.datasets import load_breast_cancer
+      initCode: `import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.tree import DecisionTreeClassifier`,
-      starterCode: `X, y = load_breast_cancer(return_X_y=True)
+from sklearn.tree import DecisionTreeClassifier
 
-# 1. Split (25% test, random_state=0, stratified on y)
+penguins = pd.read_csv("penguins.csv").dropna(subset=["bill_length_mm","bill_depth_mm","flipper_length_mm","body_mass_g","species"])
+features = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+X = penguins[features]
+y = penguins["species"]`,
+      starterCode: `# 1. Split (25% test, random_state=0, stratified on y)
 X_train, X_test, y_train, y_test = None, None, None, None
 
 # 2. Depth-limited tree
@@ -532,17 +552,18 @@ deep_train_acc = None
 print("depth-3 train/test:", train_acc, test_acc)
 print("unlimited train:", deep_train_acc)
 `,
-      solutionCode: `X, y = load_breast_cancer(return_X_y=True)
-
+      solutionCode: `# 1. Split (25% test, random_state=0, stratified on y)
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.25, random_state=0, stratify=y
 )
 
+# 2. Depth-limited tree
 tree = DecisionTreeClassifier(max_depth=3, random_state=0)
 tree.fit(X_train, y_train)
 train_acc = tree.score(X_train, y_train)
 test_acc = tree.score(X_test, y_test)
 
+# 3. Unlimited tree, for comparison
 deep_tree = DecisionTreeClassifier(max_depth=None, random_state=0)
 deep_tree.fit(X_train, y_train)
 deep_train_acc = deep_tree.score(X_train, y_train)
@@ -563,16 +584,17 @@ assert tree.max_depth == 3, f"Expected max_depth=3, got {tree.max_depth}"`,
     },
     {
       id: "split_size",
-      name: "Test set is 25% of the data",
-      description: "143 of 569 rows held out",
-      code: `assert X_test.shape[0] == 143, f"Expected 143 test rows, got {X_test.shape[0]}"`,
+      name: "Test set is 25% of the rows",
+      description: "Held-out count matches a 25% split",
+      code: `expected = round(len(X) * 0.25)
+assert X_test.shape[0] == expected, f"Expected {expected} test rows (25% of {len(X)}), got {X_test.shape[0]}"`,
     },
     {
       id: "generalizes",
       name: "Depth-3 tree generalizes reasonably",
-      description: "Test accuracy is above 0.88",
+      description: "Test accuracy is above 0.85",
       code: `assert test_acc is not None, "test_acc was not set"
-assert test_acc > 0.88, f"Expected test accuracy above 0.88, got {test_acc:.3f}"`,
+assert test_acc > 0.85, f"Expected test accuracy above 0.85, got {test_acc:.3f}"`,
     },
     {
       id: "deep_memorizes",
@@ -624,7 +646,7 @@ A perfect training score next to a much lower test score signals memorization, n
 - [o] A tree asks threshold questions on one feature at a time ("is this value above x?"), and the answer to such a question does not change if you rescale that feature
   > Because each split compares a single feature to a threshold, the units or range of features are irrelevant — multiplying a column by 1000 does not change the order of its values or the chosen split point.
 - Trees only work on data that is already normalized to [0, 1]
-  > Decision trees work on raw, unscaled data of any range. The iris, wine, and breast cancer examples on this page all use unscaled features with very different ranges.
+  > Decision trees work on raw, unscaled data of any range. The penguins and diamonds examples on this page all use unscaled features with very different ranges.
 - Scaling would make trees overfit
   > Scaling does not cause overfitting in decision trees — but it is simply unnecessary, because threshold-based splits are invariant to the scale of individual features.
 

@@ -268,53 +268,44 @@ print("The 'max' and 'min' columns show the best and worst day each week.")
   ]}
 />
 
-And monthly data downsamples further still — our airline series rolls up to
-quarterly or yearly views that make the long-run **trend** obvious:
+And monthly data downsamples further still. Here is the real Keeling Curve:
+roll its monthly CO₂ readings up to a yearly **average** and the seasonal
+sawtooth folds away, leaving the bare upward **trend**.
 
 <CodeBlock
   adapter="python"
+  datasets={[{ path: "NOAA_mauna_loa_co2_monthly.csv", stageAs: "co2.csv" }]}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
-import numpy as np
-_passengers = [
-    112,118,132,129,121,135,148,148,136,119,104,118,
-    115,126,141,135,125,149,170,170,158,133,114,140,
-    145,150,178,163,172,178,199,199,184,162,146,166,
-    171,180,193,181,183,218,230,242,209,191,172,194,
-    196,196,236,235,229,243,264,272,237,211,180,201,
-    204,188,235,227,234,264,302,293,259,229,203,229,
-    242,233,267,269,270,315,364,347,312,274,237,278,
-    284,277,317,313,318,374,413,405,355,306,271,306,
-    315,301,356,348,355,422,465,467,404,347,305,336,
-    340,318,362,348,363,435,491,505,404,359,310,337,
-    360,342,406,396,420,472,548,559,463,407,362,405,
-    417,391,419,461,472,535,622,606,508,461,390,432,
-]
-idx = pd.date_range("1949-01-01", periods=len(_passengers), freq="MS")
-air = pd.Series(_passengers, index=idx, name="passengers")`,
-      starterCode: `# Monthly -> yearly average: the trend, stripped of seasonality.
-print("Average monthly passengers, by YEAR:")
-print(air.resample("YE").mean().round(0))
+df = pd.read_csv("co2.csv")
+df["date"] = pd.to_datetime(df[["year", "month"]].assign(day=1))
+co2 = df.set_index("date")["average"]   # monthly atmospheric CO2, ppm`,
+      starterCode: `# CO2 is a LEVEL (a concentration), not a flow -> summarize with MEAN.
+annual = co2.resample("YE").mean().round(2)
+
+print("Yearly average CO2 (ppm), last 6 years:")
+print(annual.tail(6))
 print()
-# Monthly -> yearly TOTAL: total passengers flown each year (a flow -> sum).
-print("Total passengers flown each YEAR:")
-print(air.resample("YE").sum())
+print(f"1959 average: {co2.loc['1959'].mean():.2f} ppm")
+print(f"Latest year : {annual.iloc[-1]:.2f} ppm")
 print()
-print("Downsampling to yearly removes the within-year seasonal wiggle,")
-print("leaving the steady climb in air travel - the long-run trend.")
+print("Averaging over a full year folds away the 12-month seasonal wiggle,")
+print("leaving the steady rise - the long-run trend, laid bare.")
 `,
     },
   ]}
 />
 
 <Callout type="tip" title="Downsampling is a seasonality filter">
-Notice the yearly resample above has *no* summer hump — averaging a full
-year folds the 12-month seasonal cycle into a single number. Downsampling
-to the seasonal period (or a multiple of it) is a quick, crude way to
-*see the trend* without the seasonality shouting over it. We'll do this far
-more carefully with decomposition soon.
+The yearly resample above has *no* sawtooth — averaging a full year folds
+the 12-month seasonal cycle into a single number. Downsampling to the
+seasonal period (or a multiple of it) is a quick, crude way to *see the
+trend* without the seasonality shouting over it. We'll do this far more
+carefully with decomposition soon. (Note we used `mean`, not `sum`: a CO₂
+concentration is a *level*, so summing twelve monthly readings would be
+meaningless.)
 </Callout>
 
 ## Upsampling: stretching onto a finer grid
@@ -585,6 +576,61 @@ assert all(isinstance(v, float) for v in june.values())`,
       name: "aggregations are not swapped",
       description: "Sum and mean are clearly different here",
       code: `assert june["total_rain"] > june["avg_humidity"], "Looks like sum/mean were swapped"`,
+    },
+  ]}
+/>
+
+<ChallengeCard
+  adapter="python"
+  title="Roll the Keeling Curve up to annual means"
+  instructions={`The monthly CO₂ series \`co2\` (parts per million, a *level*) is loaded. Downsample it to **yearly averages** the correct way for a level, and find how fast it has been rising.
+
+Produce:
+
+- \`annual\` — a Series of each year's **mean** CO₂ (\`co2.resample("YE").mean()\`)
+- \`rise_per_year\` — the average ppm increase per year across the record, computed as \`(annual.iloc[-1] - annual.iloc[0]) / (len(annual) - 1)\` (a float)
+
+CO₂ is a concentration, so the right aggregation is \`mean\`, not \`sum\`. The series rises by a couple of ppm per year, so \`rise_per_year\` should be positive (and comfortably above 1).`}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+df = pd.read_csv("co2.csv")
+df["date"] = pd.to_datetime(df[["year", "month"]].assign(day=1))
+co2 = df.set_index("date")["average"]`,
+      starterCode: `annual = None        # yearly mean CO2
+rise_per_year = None # average ppm increase per year
+print(annual.tail() if annual is not None else None)
+print("rise per year:", rise_per_year)
+`,
+      solutionCode: `annual = co2.resample("YE").mean()
+rise_per_year = float((annual.iloc[-1] - annual.iloc[0]) / (len(annual) - 1))
+print(annual.tail().round(2))
+print("rise per year:", round(rise_per_year, 3), "ppm")
+`,
+    },
+  ]}
+  datasets={[{ path: "NOAA_mauna_loa_co2_monthly.csv", stageAs: "co2.csv" }]}
+  tests={[
+    {
+      id: "is_series",
+      name: "annual is a yearly Series",
+      description: "One value per year",
+      code: `import pandas as pd
+assert isinstance(annual, pd.Series)
+assert 50 <= len(annual) <= 80, f"Expected ~60+ yearly points, got {len(annual)}"`,
+    },
+    {
+      id: "is_mean",
+      name: "annual holds yearly MEANS, not sums",
+      description: "Each value is in the ppm range, not the thousands",
+      code: `assert 300 <= float(annual.iloc[0]) <= 360, "First-year mean should be a plausible CO2 level (~315 ppm), not a sum"`,
+    },
+    {
+      id: "rising",
+      name: "CO2 rises by more than 1 ppm/year on average",
+      description: "A clear upward trend",
+      code: `assert rise_per_year > 1.0, f"Expected a clear positive rise, got {rise_per_year}"`,
     },
   ]}
 />

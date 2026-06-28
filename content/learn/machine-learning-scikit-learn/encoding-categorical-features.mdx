@@ -256,6 +256,60 @@ which is easier to inspect and print while learning. For large datasets with
 many categories the sparse default saves a great deal of memory.
 </Callout>
 
+### The same encoder on a real dataset
+
+The toy table makes the mechanics clear, but the same call works unchanged
+on real data. The **diamonds** dataset has 53,940 rows and three categorical
+columns — `cut`, `color`, and `clarity` — alongside its numeric features. We
+sample 4,000 rows with a fixed `random_state` purely for speed; one-hot
+encoding a column does not depend on how many rows you feed it, so a sample
+is enough to see the result quickly.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import pandas as pd
+diamonds = pd.read_csv("diamonds.csv")`,
+      starterCode: `from sklearn.preprocessing import OneHotEncoder
+
+# 53,940 rows is more than we need just to demonstrate the encoding,
+# so sample for speed (random_state makes the sample reproducible).
+sample = diamonds.sample(n=4000, random_state=0)
+
+print("cut categories:", sorted(sample["cut"].unique()))
+print("distinct cuts:", sample["cut"].nunique())
+
+encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)
+encoded = encoder.fit_transform(sample[["cut"]])
+
+print("\\nEncoded shape:", encoded.shape, "(one column per distinct cut)")
+print("New columns:", encoder.get_feature_names_out())
+print("First row's cut:", sample["cut"].iloc[0], "->", encoded[0])
+`,
+    },
+  ]}
+/>
+
+The single `cut` column expands into five 0/1 columns — one for each grade
+(`Fair`, `Good`, `Very Good`, `Premium`, `Ideal`) — and every row still has
+exactly one `1`. Nothing about the call changed from the toy example; only
+the data did.
+
+<Callout type="info" title="Diamonds' categories actually have an order — so they are a judgement call">
+Unlike colors, the diamond grades are *ordinal*: `cut` runs
+Fair < Good < Very Good < Premium < Ideal, and `clarity` runs from `I1` up
+to `IF`. Because a real order exists, encoding them with `OrdinalEncoder`
+(supplying that order explicitly) is **defensible** and keeps the
+representation compact. One-hot is still a safe default — it never imposes a
+wrong order — which is why we use it here, but this is exactly the kind of
+column where you have a genuine choice. Contrast that with truly unordered
+labels like the color *names* red/green/blue, where one-hot is the only
+honest option.
+</Callout>
+
 ## Seeing the trap cost real accuracy
 
 The integer-label mistake is not just theoretically untidy — it measurably
@@ -474,36 +528,38 @@ not assert relationships the world does not contain.
 
 <ChallengeCard
   adapter="python"
-  title="One-hot encode a categorical table"
+  title="One-hot encode a real categorical column"
   category="preprocessing · encoding · one-hot"
   estimatedTime="~7 min"
-  instructions={`A small DataFrame \`df\` with two categorical columns,
-\`fruit\` and \`country\`, is provided.
+  datasets={[{ path: "diamonds.csv", stageAs: "diamonds.csv" }]}
+  instructions={`A 4,000-row sample of the **diamonds** dataset is provided
+as \`sample\` (drawn with a fixed \`random_state\`). You will one-hot encode
+its \`cut\` column.
 
 1. Create a \`OneHotEncoder\` with \`handle_unknown="ignore"\` and
    \`sparse_output=False\` and store it in \`encoder\`.
-2. Fit-transform \`df\` and store the resulting array in \`encoded\`.
+2. Fit-transform the \`cut\` column — pass \`sample[["cut"]]\` (a DataFrame,
+   note the double brackets) — and store the resulting array in \`encoded\`.
 3. Store the encoder's output column names (from
    \`get_feature_names_out()\`) in \`columns\` (as a list).
 
-The tests check that \`encoded\` has one row per original row, that
-the total number of one-hot columns equals the number of distinct categories
-across both features, that the encoded values are only 0s and 1s, and that
-each row sums to exactly 2 (one '1' for fruit, one '1' for country).`}
+The tests check that \`encoded\` has one row per sampled row, that the number
+of one-hot columns equals the number of distinct cut grades, that the encoded
+values are only 0s and 1s, and that each row sums to exactly 1 (one '1' for
+the single \`cut\` feature).`}
   files={[
     {
       filename: "main.py",
       initCode: `import pandas as pd
 from sklearn.preprocessing import OneHotEncoder
 
-df = pd.DataFrame({
-    "fruit":   ["apple", "banana", "apple", "cherry", "banana", "apple"],
-    "country": ["US", "US", "MX", "MX", "CA", "CA"],
-})`,
+diamonds = pd.read_csv("diamonds.csv")
+# Sample for speed; one-hot encoding does not depend on row count.
+sample = diamonds.sample(n=4000, random_state=0)`,
       starterCode: `# 1. Build the encoder (handle_unknown="ignore", sparse_output=False).
 encoder = None
 
-# 2. Fit and transform df into a dense array.
+# 2. Fit and transform the cut column (pass sample[["cut"]]) into a dense array.
 encoded = None
 
 # 3. Grab the output column names as a list.
@@ -513,7 +569,7 @@ print("shape:", None)
 print("columns:", columns)
 `,
       solutionCode: `encoder = OneHotEncoder(handle_unknown="ignore", sparse_output=False)
-encoded = encoder.fit_transform(df)
+encoded = encoder.fit_transform(sample[["cut"]])
 columns = list(encoder.get_feature_names_out())
 
 print("shape:", encoded.shape)
@@ -524,16 +580,16 @@ print("columns:", columns)
   tests={[
     {
       id: "row_count",
-      name: "One row per original row",
+      name: "One row per sampled row",
       description: "Encoding does not add or drop rows",
       code: `assert encoded is not None, "encoded is still None"
-assert encoded.shape[0] == len(df), f"Expected {len(df)} rows, got {encoded.shape[0]}"`,
+assert encoded.shape[0] == len(sample), f"Expected {len(sample)} rows, got {encoded.shape[0]}"`,
     },
     {
       id: "col_count",
-      name: "Columns equal total distinct categories",
-      description: "3 fruits + 3 countries = 6 one-hot columns",
-      code: `n_expected = df["fruit"].nunique() + df["country"].nunique()
+      name: "Columns equal distinct cut grades",
+      description: "One one-hot column per distinct value of cut",
+      code: `n_expected = sample["cut"].nunique()
 assert encoded.shape[1] == n_expected, f"Expected {n_expected} columns, got {encoded.shape[1]}"`,
     },
     {
@@ -546,11 +602,11 @@ assert set(vals.tolist()).issubset({0.0, 1.0}), f"Found non-binary values: {vals
     },
     {
       id: "one_hot_per_feature",
-      name: "Each row sums to 2",
-      description: "Exactly one '1' for fruit and one for country in every row",
+      name: "Each row sums to 1",
+      description: "Exactly one '1' for the single cut feature in every row",
       code: `import numpy as np
 row_sums = encoded.sum(axis=1)
-assert np.all(row_sums == 2), f"Each row should sum to 2 (one per feature), got sums {row_sums.tolist()}"`,
+assert np.all(row_sums == 1), f"Each row should sum to 1 (one per feature), got unique sums {np.unique(row_sums).tolist()}"`,
     },
     {
       id: "names",

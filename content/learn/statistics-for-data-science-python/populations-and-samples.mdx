@@ -242,6 +242,22 @@ the statistic and the parameter into one number is how overconfident
 claims are born.
 </Callout>
 
+<Callout type="info" title="A true story: the German tank problem">
+In World War II the Allies wanted to know a hidden population parameter:
+how many tanks Germany was producing. The population size `N` was a
+military secret. But captured and destroyed tanks carried sequential
+**serial numbers** on their gearboxes and chassis — a *sample* drawn
+from that population. Statisticians reasoned that if the highest serial
+number you've seen is `m` from a sample of `k` tanks, a good estimate of
+the total is roughly `m + m/k − 1` (the largest observed value, nudged
+up to account for the gap above it). The estimates this produced were
+strikingly close to actual German production figures revealed after the
+war — and far more accurate than conventional intelligence. It's a vivid
+case of the whole game: a fixed unknown parameter (`N`), a sample
+statistic (the serial numbers you happened to see), and an estimator
+built to bridge the two.
+</Callout>
+
 ## Seeing it in code: a known population
 
 Here's the trick that makes this concrete. In the real world the
