@@ -30,8 +30,6 @@
         "index",
         "---",
         "limits-of-manual-calculation",
-        "rise-of-computational-science",
-        "fortran-and-matlab",
         "python-in-science",
         "math-meets-computation",
         "---",
@@ -56,6 +54,7 @@
         "reproducible-experiments",
         "---",
         "capstone-simulation",
+        "interesting-discussions",
         "next-steps"
     ]
 }

@@ -316,6 +316,86 @@ feature regressions, even non-linear-in-parameters fits via a
 nonlinear least squares routine in `scipy.optimize` we will meet
 later.
 
+### Least squares on real data, two ways
+
+The toy example fit one line to thirty points. Real least-squares
+problems have thousands of rows and many columns, and they let us
+illustrate a subtle numerical point. We will use the **California
+Housing** dataset (~20,640 rows, all numeric) and predict the average
+number of rooms per dwelling from four other features.
+
+There are two ways to solve $\min_x \lVert A x - b \rVert$. The
+textbook route forms the **normal equations** $A^\mathsf{T} A\,x =
+A^\mathsf{T} b$ and solves them. The robust route hands $A$ and $b$
+straight to `lstsq`, which goes through a QR or SVD factorization
+instead. They usually agree — but the normal equations *square the
+condition number*, so on poorly scaled data they can disagree badly.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "california_housing.csv", stageAs: "housing.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+import pandas as pd
+
+df = pd.read_csv("housing.csv")
+features = ["MedInc", "HouseAge", "Population", "AveOccup"]
+A = np.column_stack([df[features].to_numpy(), np.ones(len(df))])  # + intercept
+b = df["AveRooms"].to_numpy()`,
+      starterCode: `# Route 1: normal equations  (A^T A) x = A^T b
+ATA = A.T @ A
+x_normal = np.linalg.solve(ATA, A.T @ b)
+
+# Route 2: numpy's least-squares solver (QR/SVD under the hood)
+x_lstsq, *_ = np.linalg.lstsq(A, b, rcond=None)
+
+print("condition number of A      :", f"{np.linalg.cond(A):.2e}")
+print("condition number of A^T A  :", f"{np.linalg.cond(ATA):.2e}  (squared!)")
+print("max coefficient difference :", np.max(np.abs(x_normal - x_lstsq)))
+`,
+    },
+  ]}
+/>
+
+Notice that $\kappa(A^\mathsf{T}A)$ is the *square* of $\kappa(A)$:
+forming the normal equations throws away half your significant
+digits before you even solve. On this raw data the two answers still
+roughly agree, but the gap grows fast as features become correlated
+or badly scaled. The standard fix is **standardization** — center
+each column and divide by its standard deviation so every feature
+sits on a comparable scale.
+
+<CodeBlock
+  adapter="python"
+  datasets={[{ path: "california_housing.csv", stageAs: "housing.csv" }]}
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+import pandas as pd
+
+df = pd.read_csv("housing.csv")
+features = ["MedInc", "HouseAge", "Population", "AveOccup"]
+X = df[features].to_numpy()`,
+      starterCode: `# Standardize: zero mean, unit standard deviation per column.
+Xs = (X - X.mean(axis=0)) / X.std(axis=0)
+A_raw = np.column_stack([X, np.ones(len(X))])
+A_std = np.column_stack([Xs, np.ones(len(X))])
+
+print(f"condition number, raw          : {np.linalg.cond(A_raw):.2e}")
+print(f"condition number, standardized : {np.linalg.cond(A_std):.2e}")
+`,
+    },
+  ]}
+/>
+
+Standardization drops the condition number by orders of magnitude.
+The lesson is general: **before you solve a linear system, look at
+the scale of your columns**. A poorly scaled matrix is needlessly
+ill-conditioned, and the cure costs two lines.
+
 ## Sparse matrices
 
 Many scientific problems produce matrices that are *mostly zero*: a

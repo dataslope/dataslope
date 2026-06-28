@@ -1,122 +1,167 @@
 ---
-title: Python in Science
-description: How an indentation-loving scripting language displaced FORTRAN and MATLAB at the center of scientific research
+title: From FORTRAN to Python
+description: How the languages of scientific computing — FORTRAN, MATLAB, and finally Python — shaped the way scientists think about numbers, and why the SciPy stack won
 ---
 
-In 1995, scientific Python did not exist. By 2015 it was the most
-widely used language in computational research. This page tells the
-story of that twenty-year transformation, and explains why the
-**SciPy ecosystem** turned out to be the right way to build a
-scientific platform.
+The first decade of computational science was written in *machine
+code*, each instruction wired by hand or punched on cards. By the
+mid-1950s the volume of scientific code had outgrown what anyone
+could hand-tune, and a radical idea took hold: a scientist should
+write the *formula they meant*, and a translator program should
+produce the machine code. That idea gave us FORTRAN, then MATLAB,
+and finally the scientific Python stack you are running right now.
+This chapter is that lineage — three languages, one continuous idea.
 
 <svg
-  viewBox="0 0 640 220"
+  viewBox="0 0 640 200"
   role="img"
-  aria-label="A large blue circle orbited by a constellation of smaller package circles joined by dotted edges — the SciPy ecosystem growing outward around Python"
+  aria-label="A green formula pill marked with a function glyph feeds along a dotted arrow into a punched card full of holes — a formula being translated into machine instructions"
   style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
 >
+  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
+    <rect x="80" y="75" width="170" height="50" rx="25" />
+  </g>
+  <g style={{ color: "var(--ds-white)" }} fill="currentColor">
+    <text x="165" y="112" textAnchor="middle" fontFamily="var(--font-sans), Georgia, serif" fontStyle="italic" fontSize="34">ƒ</text>
+  </g>
   <g fill="currentColor" opacity="0.3">
-    <circle cx="271" cy="93" r="3" />
-    <circle cx="236" cy="80" r="3" />
-    <circle cx="257" cy="120" r="3" />
-    <circle cx="203" cy="128" r="3" />
-    <circle cx="358" cy="89" r="3" />
-    <circle cx="396" cy="68" r="3" />
-    <circle cx="373" cy="124" r="3" />
-    <circle cx="425" cy="139" r="3" />
-    <circle cx="390" cy="103" r="3" />
-    <circle cx="460" cy="96" r="3" />
-    <circle cx="292" cy="136" r="3" />
-    <circle cx="264" cy="161" r="3" />
-    <circle cx="345" cy="138" r="3" />
-    <circle cx="368" cy="164" r="3" />
+    <circle cx="280" cy="100" r="3.5" />
+    <circle cx="304" cy="100" r="3.5" />
+    <circle cx="328" cy="100" r="3.5" />
   </g>
   <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
-    <circle cx="320" cy="110" r="30" />
-    <circle cx="470" cy="150" r="18" fillOpacity="0.55" />
-    <circle cx="240" cy="185" r="10" fillOpacity="0.4" />
+    <polygon points="346,90 346,110 364,100" />
+    <polygon points="400,45 560,45 560,155 380,155 380,65" fillOpacity="0.12" />
   </g>
-  <g style={{ color: "var(--ds-green-500)" }} fill="currentColor">
-    <circle cx="180" cy="60" r="16" />
-    <circle cx="140" cy="140" r="12" fillOpacity="0.8" />
-    <circle cx="530" cy="90" r="10" fillOpacity="0.7" />
-  </g>
-  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor">
-    <circle cx="430" cy="50" r="14" />
-    <circle cx="390" cy="190" r="8" fillOpacity="0.7" />
+  <g fill="currentColor" opacity="0.45">
+    <rect x="405" y="68" width="6" height="12" rx="1.5" />
+    <rect x="455" y="68" width="6" height="12" rx="1.5" />
+    <rect x="530" y="68" width="6" height="12" rx="1.5" />
+    <rect x="405" y="94" width="6" height="12" rx="1.5" />
+    <rect x="430" y="94" width="6" height="12" rx="1.5" />
+    <rect x="505" y="94" width="6" height="12" rx="1.5" />
+    <rect x="430" y="120" width="6" height="12" rx="1.5" />
+    <rect x="480" y="120" width="6" height="12" rx="1.5" />
+    <rect x="530" y="120" width="6" height="12" rx="1.5" />
+    <rect x="480" y="68" width="6" height="12" rx="1.5" />
   </g>
 </svg>
 
-## A scripting language that ate science
+## FORTRAN: scientists' first compiler
 
-Guido van Rossum released Python 1.0 in 1994. It was a *general-
-purpose, dynamically typed, indentation-sensitive* scripting
-language. Nothing about its early design suggested it would
-displace FORTRAN. It had no built-in arrays, no matrix operators,
-no plotting library, and a reputation for being slow.
+A team led by **John Backus** at IBM started work on FORTRAN — the
+**FOR**mula **TRAN**slator — in 1954 and released the first compiler
+in 1957 for the IBM 704. The goal was radical for its time: a
+scientist should write `Y(I) = A * X(I) + B` in a loop and have the
+compiler generate machine code as efficient as hand-written
+assembly. Backus argued that without that efficiency, no one would
+have used the language — and he was right. It became the first widely
+used high-level language, and programs that once took weeks to
+hand-code could now be written in an afternoon.
 
-What it did have was a culture of *making other tools accessible*.
-Python's C API made it easy to wrap a fast library and call it from
-a friendly REPL. Within a few years, three projects had each done
-exactly that — and together they became the seed of scientific
-Python.
+That choice still reaches into your browser. NumPy's `@` operator
+dispatches to a routine called **DGEMM** in the BLAS library —
+FORTRAN-lineage code, hand-tuned for every generation of CPU since
+the 1970s. LAPACK and BLAS, both rooted in FORTRAN, sit under
+virtually every NumPy and SciPy install.
 
-```mermaid
-timeline
-    title Birth of scientific Python
-    1995 : Jim Hugunin starts Numeric
-    2001 : SciPy released, bundling Numeric + algorithms
-    2003 : Matplotlib first release
-    2005 : NumPy unifies Numeric and Numarray (Travis Oliphant)
-    2008 : pandas released (Wes McKinney)
-    2010 : IPython Notebook (later Jupyter)
-    2014 : Project Jupyter formed
-    2018 : NumPy 1.16 ships type-stable array protocol
-    2020 : SciPy 1.5 ships in nearly every science container
-    2023 : NumPy 2.0 RC; array API standard adopted
-```
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+import time`,
+      starterCode: `n = 1500
+A = np.random.default_rng(0).standard_normal((n, n))
+B = np.random.default_rng(1).standard_normal((n, n))
 
-### NumPy (and its ancestors)
+t0 = time.perf_counter()
+C = A @ B  # dispatches to BLAS DGEMM
+t1 = time.perf_counter()
 
-In 1995, Jim Hugunin wrote **Numeric** — Python's first array
-package. It was good enough to attract a community but limited in
-several ways. A competing project called **Numarray** appeared in
-2001 with better support for large arrays and missing data.
-Maintaining two incompatible arrays was painful, and in 2005 Travis
-Oliphant wrote **NumPy**, which merged the best of both and became
-the canonical Python array type. Every other library on this page
-depends on it.
+flops = 2 * n**3  # multiply-add count for an n x n matmul
+gflops = flops / (t1 - t0) / 1e9
+print(f"{n}x{n} matmul: {t1 - t0:.3f}s -> {gflops:.1f} GFLOPS")
+`,
+    },
+  ]}
+/>
 
-### SciPy
+The GFLOPS your browser reports are delivered by a stack that is
+roughly: NumPy (Python) → BLAS (C wrapper) → LAPACK (FORTRAN) → CPU
+vector instructions. Sixty years of optimization, hidden behind a
+single `@`. Three FORTRAN ideas survive almost unchanged: **arrays
+as the primary data type**, **fast numerical inner loops**, and
+**shared standard libraries** (BLAS, LAPACK, ODEPACK, MINPACK — still
+the workhorses inside SciPy).
 
-**SciPy** appeared in 2001, bundling Numeric (and later NumPy) with
-the FORTRAN libraries we met in the previous chapter: BLAS,
-LAPACK, ODEPACK, MINPACK, QUADPACK, FFTPACK. Pearu Peterson, Eric
-Jones, and Travis Oliphant assembled it specifically so that
-scientists who had been writing MATLAB could find familiar
-functions: `solve`, `eig`, `fft`, `quad`, `minimize`. The package
-layout you use today — `scipy.linalg`, `scipy.optimize`,
-`scipy.integrate`, `scipy.signal`, `scipy.stats` — was largely
-fixed by 2003.
+## MATLAB: a calculator that thought in matrices
 
-### Matplotlib
+In the late 1970s, **Cleve Moler** was teaching numerical analysis at
+the University of New Mexico. He wanted students to use the new
+FORTRAN libraries LINPACK and EISPACK *without* having to learn
+FORTRAN, so he wrote a tiny interactive program that let them type
+expressions like `A * x` and `eig(A)` at a prompt. He called it
+**MATLAB** — "matrix laboratory." By 1984 it had been rewritten in
+C, commercialized by MathWorks, and was on its way to becoming the
+lingua franca of engineering education.
 
-John Hunter, a neuroscientist working on epilepsy data, released
-**Matplotlib** in 2003. He had been using MATLAB for plotting at
-work and wanted something he could use freely on his own data
-without a license server. He deliberately copied MATLAB's plotting
-API so that colleagues could switch with zero friction.
+MATLAB introduced conventions that scientific Python copied directly:
 
-### Jupyter
+| MATLAB idea | Python descendant |
+| --- | --- |
+| Everything is a matrix | NumPy `ndarray` |
+| Element-wise vs matrix multiply | `*` vs `@` |
+| `linspace`, `zeros`, `ones`, `eye` | identical NumPy names |
+| Built-in plotting | Matplotlib (consciously MATLAB-like) |
 
-In 2001, Fernando Pérez began work on **IPython** — a better
-interactive Python shell. The browser-based notebook arrived in
-2010 and quickly became the standard way to write a scientific
-computation alongside the explanation of what it does. Renamed
-Project Jupyter in 2014 (Julia + Python + R), the notebook is now
-the dominant interactive medium for science.
+If you have ever wondered why `matplotlib.pyplot` has functions named
+`plot`, `subplot`, `title`, `xlabel`, and `ylabel`, it is because
+**John Hunter**, Matplotlib's creator, deliberately mimicked MATLAB
+so engineers could switch with as little friction as possible.
 
-## Why this stack won
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np
+import matplotlib.pyplot as plt`,
+      starterCode: `# A direct translation of a typical MATLAB session.
+# Almost every line has a 1:1 MATLAB counterpart.
+t = np.linspace(0, 2 * np.pi, 200)       # MATLAB: t = linspace(0, 2*pi, 200);
+y = np.sin(t) + 0.3 * np.sin(5 * t)      # MATLAB: y = sin(t) + 0.3*sin(5*t);
+
+plt.figure(figsize=(8, 3))                # MATLAB: figure;
+plt.plot(t, y)                            # MATLAB: plot(t, y);
+plt.title("MATLAB-style plotting")
+plt.xlabel("t")
+plt.grid(True)
+plt.show()
+`,
+    },
+  ]}
+/>
+
+But MATLAB had limits that left an opening. It was *interactive and
+friendly* yet *proprietary and expensive*, with a weak module system,
+no real support for general-purpose programming, and a license cost
+that locked students out the moment they graduated. FORTRAN, mean‑
+while, was *fast* but a *compiled, batch* language with almost no
+support for strings, file formats, plotting, or the gluework that
+surrounds real science.
+
+## Why Python won
+
+In 1995, scientific Python did not exist. By 2015 it was the most
+widely used language in computational research. The transformation
+came from libraries, not from the language itself: **Travis
+Oliphant** unified the earlier Numeric and Numarray packages into
+**NumPy** in 2005–2006, and **SciPy** (started 2001 by Eric Jones,
+Travis Oliphant, and Pearu Peterson) wrapped the venerable FORTRAN
+libraries — BLAS, LAPACK, ODEPACK, MINPACK, QUADPACK — behind
+familiar calls like `solve`, `eig`, `fft`, and `quad`.
 
 ```mermaid
 flowchart TB
@@ -125,49 +170,37 @@ flowchart TB
         GLUE[Glue language<br/>for C/FORTRAN/GPU]
         GP[General<br/>purpose]
         ECO[Massive<br/>ecosystem]
-        REP[Reproducible<br/>environments]
     end
     OPEN --> WIN[SciPy wins]
     GLUE --> WIN
     GP --> WIN
     ECO --> WIN
-    REP --> WIN
 ```
 
-Several forces converged.
+Four forces converged:
 
-**Open source removed the license wall.** A graduate student in
-Nairobi or São Paulo could run the exact same software a professor
-at MIT used, with no purchase order. MATLAB and Mathematica could
-not match this.
+- **Open source removed the license wall.** A graduate student in
+  Nairobi or São Paulo could run the exact software an MIT professor
+  used, with no purchase order. MATLAB and Mathematica could not
+  match this.
+- **Python could glue.** A fast FORTRAN solver, a C data reader, and
+  a GPU kernel could all be called from one script. FORTRAN was a
+  poor glue language; MATLAB was a closed world.
+- **Python was already general-purpose.** The same language that ran
+  your simulation could parse log files, scrape an API, serve a web
+  page, and email you when the job finished.
+- **The ecosystem compounded.** Once NumPy existed, every new tool
+  used NumPy arrays — pandas, scikit-learn, scikit-image, AstroPy.
+  Each new library made the platform more valuable, a textbook
+  network effect.
 
-**Python could glue.** A scientist with a fast FORTRAN solver, a C
-data reader, and a CUDA kernel could call all three from one
-notebook. FORTRAN was a poor glue language; MATLAB was a closed
-world.
+The slowness of the interpreter turned out not to matter: when 99% of
+compute time is spent inside a BLAS call, the Python layer is free.
 
-**Python was already general-purpose.** The same language that ran
-your simulation could parse log files, scrape JSON from an API,
-serve a Flask page, and email you when the job finished. Adding
-*one* language to a workflow is much easier than adding one for
-numerics, one for scripting, and one for the web.
+## A guided tour of the stack
 
-**The ecosystem compounded.** Once NumPy existed, every new
-scientific tool used NumPy arrays — pandas (2008), scikit-learn
-(2010), scikit-image (2009), AstroPy (2011), Biopython (since the
-late 1990s, ported to NumPy). Each new library made the platform
-more valuable, which attracted more libraries, which attracted more
-users. A textbook network effect.
-
-**Reproducibility tools improved.** Conda (2012), pip wheels (2014),
-Docker (2013), and `pip-compile`/`uv` (2024) gradually made it
-practical to pin a numerical stack so a paper from 2018 could be
-re-run in 2026.
-
-## A guided tour of the SciPy ecosystem
-
-Here are the libraries that will appear repeatedly in this course.
-Each runs in your browser, right now.
+Here are the libraries that recur throughout this course. Each runs
+in your browser, right now.
 
 <CodeBlock
   adapter="python"
@@ -188,21 +221,18 @@ print("pandas     :", pd.__version__)
   ]}
 />
 
-The packages each take a slice of the scientific stack:
+Each package takes a slice of the work:
 
 | Package | What it does | Where it shines |
 | --- | --- | --- |
-| **NumPy** | N-dimensional arrays, broadcasting, basic linear algebra | The bedrock; almost every other library is built on it |
-| **SciPy** | Algorithms: optimization, integration, signal processing, statistics | When NumPy gives you arithmetic, SciPy gives you methods |
+| **NumPy** | N-dimensional arrays, broadcasting, basic linear algebra | The bedrock; almost everything else is built on it |
+| **SciPy** | Algorithms: optimization, integration, signal processing, statistics | NumPy gives arithmetic; SciPy gives methods |
 | **Matplotlib** | 2-D / 3-D static plotting | Publication-quality figures |
-| **pandas** | Labeled tabular data and time series | When your data has *meaningful* row and column labels |
-| **SymPy** | Symbolic mathematics | Algebraic manipulation, derivations, exact arithmetic |
-| **scikit-image** | Image processing | When your data is pixels |
-| **scikit-learn** | Classical machine learning | Out of scope for this course, but worth knowing it exists |
-| **Plotly** | Interactive plots | When you want to zoom and hover |
-| **Numba / Cython** | Just-in-time / ahead-of-time compilation for hot loops | When a single Python loop is the bottleneck |
+| **pandas** | Labeled tabular data and time series | When rows and columns have *meaning* |
+| **SymPy** | Symbolic mathematics | Exact derivations and algebra |
 
-A complete SciPy program often touches several of these:
+A complete experiment often touches several at once: generate a noisy
+signal, filter it, and quantify the improvement.
 
 <CodeBlock
   adapter="python"
@@ -213,30 +243,23 @@ A complete SciPy program often touches several of these:
 import pandas as pd
 from scipy import signal
 import matplotlib.pyplot as plt`,
-      starterCode: `# Generate a noisy signal: a 2 Hz sine plus 20 Hz noise
+      starterCode: `# A 2 Hz sine buried under 20 Hz interference and noise
 rng = np.random.default_rng(7)
 t = np.linspace(0, 5, 2000)
 clean = np.sin(2 * np.pi * 2 * t)
 noisy = clean + 0.5 * np.sin(2 * np.pi * 20 * t) + 0.4 * rng.standard_normal(t.size)
 
-# Low-pass Butterworth filter
+# Low-pass Butterworth filter, applied with zero phase delay
 sos = signal.butter(N=4, Wn=5, btype="low", fs=400, output="sos")
 filtered = signal.sosfiltfilt(sos, noisy)
 
 
-# pandas to compare signal-to-noise ratios
 def snr(x, ref):
     return 10 * np.log10(np.var(ref) / np.var(x - ref))
 
 
-print(
-    pd.Series(
-        {
-            "noisy_SNR_dB": snr(noisy, clean),
-            "filtered_SNR_dB": snr(filtered, clean),
-        }
-    ).round(2)
-)
+print(pd.Series({"noisy_SNR_dB": snr(noisy, clean),
+                 "filtered_SNR_dB": snr(filtered, clean)}).round(2))
 
 fig, ax = plt.subplots(figsize=(9, 3))
 ax.plot(t, noisy, alpha=0.4, label="noisy")
@@ -251,103 +274,42 @@ plt.show()
 />
 
 Six imports, twenty lines, one complete signal-processing experiment
-with a quantitative quality metric and a publishable plot.
-
-## Reproducibility, the new pillar
-
-Scientific software is only useful if other scientists — and your
-future self — can re-run it. The Python ecosystem now has several
-overlapping conventions for *pinning* the exact stack:
-
-- `requirements.txt` and `pip-compile` (lock file)
-- `conda` / `mamba` `environment.yml`
-- `pyproject.toml` plus `uv lock` (modern)
-- Containers (Docker, Apptainer/Singularity)
-- Notebook + lock file checked into Git
-
-A typical reproducible setup looks like this `pyproject.toml`
-fragment:
-
-<CodeBlock
-  adapter="python"
-  files={[
-    {
-      filename: "main.py",
-      starterCode: `# Example pyproject.toml metadata (for illustration; not executed)
-example = """
-[project]
-name = "neutron-diffusion-2026"
-version = "0.1.0"
-requires-python = ">=3.11"
-dependencies = [
-    "numpy==2.0.1",
-    "scipy==1.14.0",
-    "matplotlib==3.9.0",
-]
-"""
-print(example)
-print("Pinned versions = a paper that still runs in 5 years.")
-`,
-    },
-  ]}
-/>
-
-We dedicate an entire chapter to reproducible experiments later in
-the course.
-
-## Who uses scientific Python today
-
-Almost everyone. NumPy and SciPy alone are downloaded over
-**100 million times per month** from PyPI, and the academic
-literature now refers to "the scientific Python stack" as a single
-named entity, the way it once referred to "the Unix toolchain."
-
-Fields that have made Python their primary tool include:
-
-- **Astrophysics** — AstroPy is in the core toolchain of most
-  observatories.
-- **Climate science** — xarray + Dask is how you slice NetCDF.
-- **Bioinformatics** — Biopython, scanpy, scverse for genomics.
-- **High-energy physics** — uproot/awkward replaced ROOT for many
-  analyses.
-- **Economics and finance** — pandas was originally written for
-  hedge-fund time series.
-- **Machine learning research** — PyTorch and JAX are NumPy-shaped
-  by design.
-
-What unites them is not the *libraries* but the *style*: arrays
-first, vectorized math second, interactive notebooks third, and a
-deep willingness to call out to C, FORTRAN, or GPU code when speed
-matters.
+with a quantitative quality metric and a publishable plot. That
+composability — arrays first, vectorized math second, a deep
+willingness to call out to C or FORTRAN when speed matters — is the
+*style* that unites every field now built on scientific Python. One
+short bridge chapter remains, on the single idea that underlies all
+the numerical work to come: every number on a computer is slightly
+wrong, and good science means controlling the wrongness.
 
 ## Check your understanding
+
+<MultipleChoice
+  markdown={`Why is it accurate to say "every fast NumPy operation is really a FORTRAN operation in disguise"?
+
+- Because NumPy was written by the FORTRAN community
+  > NumPy was written primarily in C and Python; the FORTRAN connection is about the numerical libraries it calls, not who authored it.
+- Because Python compiles to FORTRAN at runtime
+  > Python is interpreted and never compiled to FORTRAN; the connection is that NumPy's inner loops call pre-compiled FORTRAN library routines at the C level.
+- [o] Because NumPy's heaviest routines dispatch to BLAS, LAPACK, and related libraries, most of which are FORTRAN code that has been hand-tuned for decades
+  > NumPy is Python at the interface and FORTRAN/C at the core. \`A @ B\` invokes a BLAS routine like DGEMM written in FORTRAN. This layering — interpreted glue on compiled kernels — is the secret to scientific Python's performance.
+- Because FORTRAN syntax is hidden inside Python source files
+  > Python source files contain only Python; there is no FORTRAN syntax inside them.
+
+Interpreted glue on top of compiled numerical kernels is what makes scientific Python both pleasant and fast.`}
+/>
 
 <MultipleChoice
   markdown={`Which of the following is the *best* explanation of why Python — a slow, interpreted, dynamically typed language — became the platform of choice for fast scientific computation?
 
 - Python's interpreter is secretly very fast
-  > CPython is a slow interpreter compared to compiled languages; Python's success in scientific computing comes from calling fast C and FORTRAN code, not from a fast interpreter.
+  > CPython is a slow interpreter compared with compiled languages; Python's success comes from calling fast C and FORTRAN code, not from a fast interpreter.
 - The Python community rewrote FORTRAN in pure Python
-  > FORTRAN was not rewritten in Python; the scientific Python stack wraps existing FORTRAN libraries (BLAS, LAPACK, ODEPACK) via C extensions.
-- [o] Python is an excellent *glue language*: heavy numerical work happens in compiled BLAS/LAPACK/C/FORTRAN code, while Python provides a friendly interactive interface, a general-purpose programming environment, and a massive ecosystem on top
-  > Python's value to science is its ability to combine fast numerical kernels (written in C and FORTRAN), an interactive REPL/Jupyter workflow, and a general-purpose language that handles file I/O, scripting, plotting, and web APIs.
+  > FORTRAN was not rewritten in Python; the scientific stack *wraps* existing FORTRAN libraries (BLAS, LAPACK, ODEPACK) via C extensions.
+- [o] Python is an excellent *glue language*: heavy numerical work runs in compiled BLAS/LAPACK/C/FORTRAN code, while Python provides a friendly interactive interface, a general-purpose environment, and a massive ecosystem on top
+  > When 99% of compute time is inside a BLAS call, the slowness of the interpreter is irrelevant. Python adds the interactive workflow, the general-purpose language, and the ecosystem.
 - The Python language was redesigned in 2005 to add fast arrays
-  > The Python language itself was not redesigned; Travis Oliphant wrote NumPy in 2005 as a third-party library, unifying the competing Numeric and Numarray packages without changing the language core.
+  > The language itself was not redesigned; Travis Oliphant wrote NumPy as a third-party library, unifying Numeric and Numarray without changing Python's core.
 
-The slowness of the interpreter is irrelevant when 99% of compute time is spent inside a BLAS call.`}
-/>
-
-<MultipleChoice
-  markdown={`The SciPy ecosystem is layered. Which of these correctly describes the layering?
-
-- pandas → NumPy → Matplotlib → SciPy
-  > This ordering is incorrect; pandas depends on NumPy, and Matplotlib is a peer of SciPy rather than a layer beneath it.
-- SciPy → NumPy → BLAS/LAPACK
-  > The arrow direction is reversed: NumPy sits below SciPy, not above it. SciPy depends on NumPy, not the other way around.
-- [o] Almost every other scientific package is built on top of NumPy; SciPy adds higher-level algorithms (optimize, integrate, signal, stats) and itself depends on NumPy and on FORTRAN libraries like BLAS/LAPACK/MINPACK
-  > NumPy is the foundation: it defines the array type and the broadcasting rules. SciPy sits on top of NumPy and provides algorithms; under the hood many of those algorithms are FORTRAN. pandas, scikit-learn, scikit-image, PyTorch, xarray, AstroPy all assume NumPy arrays.
-- All four packages are siblings with no dependency relationships
-  > The packages have clear dependency relationships: NumPy is the foundation, SciPy, pandas, and Matplotlib all depend on NumPy, and many higher-level packages depend on multiple layers.
-
-Understanding this layering helps you debug performance problems and pick the right library for a given task.`}
+The value of Python to science is composition, not raw interpreter speed.`}
 />

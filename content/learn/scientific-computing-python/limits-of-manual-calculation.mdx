@@ -1,20 +1,20 @@
 ---
-title: Limits of Manual Calculation
-description: Why humans hit a wall long before computers existed — and why the wall is shaped exactly like the problems computational science now solves
+title: When Computers Were People
+description: How human calculators hit a wall shaped exactly like the problems scientific computing now solves — and how the first machines turned simulation into a third pillar of science
 ---
 
 Before there were computers, there were **computers** — and they were
-people. From the late seventeenth century through the Second World War,
-a "computer" was someone whose job it was to perform long arithmetic
-calculations by hand, often for astronomy, navigation, ballistics, or
-engineering. The most famous of them — Mary Somerville, Henrietta
-Swan Leavitt, the women of the Harvard Observatory, the *Computers*
-of the U.S. Army's Aberdeen Proving Ground — produced the
-mathematical infrastructure on which modern science was built.
+people. From the seventeenth century through the Second World War, a
+"computer" was someone whose job was to grind through long arithmetic
+by hand, for astronomy, navigation, ballistics, or engineering.
+Teams of them — the women of the Harvard Observatory, the human
+computers of the Army's Aberdeen Proving Ground — produced the
+numerical infrastructure on which modern science was built.
 
-This page is about the wall those human computers hit, and why every
-single brick of that wall is still the focus of the field we now
-call *scientific computing*.
+This page is about the wall those human computers hit, and how, in a
+single decade in the 1940s, the machines built to break through that
+wall turned **simulation** into a new way of doing science. We will
+run numerical code before the page is over.
 
 <svg
   viewBox="0 0 640 210"
@@ -79,23 +79,18 @@ call *scientific computing*.
 ## A tiny problem that explodes
 
 Consider one of the oldest problems in physics: predicting where the
-planets will be a thousand years from now. Newton's laws describe the
-motion of any one planet around the sun perfectly — but as soon as
-you add a *third* gravitating body, the equations no longer have a
-closed-form solution. The only way forward is to *march* the system
-in tiny time steps, evaluating the forces, updating the velocities,
-updating the positions, and repeating. Billions of times.
+planets will be a thousand years from now. Newton's laws describe one
+planet orbiting the sun perfectly — but add a *third* gravitating
+body and the equations no longer have a closed-form solution. The
+only way forward is to *march* the system in tiny time steps:
+evaluate the forces, update the velocities, update the positions,
+repeat. Billions of times.
 
-A human computer working ten hours a day, six days a week, might
-manage a few thousand arithmetic operations. Predicting Jupiter for
-a century needs **billions**. The arithmetic is not hard. The volume
-is impossible.
+A human computer working ten hours a day might manage a few thousand
+operations. Predicting Jupiter for a century needs **billions**. The
+arithmetic is not hard. The volume is impossible.
 
-**Newton's laws → three-body problem → no closed-form solution →
-iterative integration → billions of tiny steps → beyond a human's
-lifetime.**
-
-Let us simulate, in Python, exactly how fast the work piles up.
+Let us measure exactly how fast the work piles up.
 
 <CodeBlock
   adapter="python"
@@ -104,10 +99,9 @@ Let us simulate, in Python, exactly how fast the work piles up.
       filename: "main.py",
       starterCode: `# How long would a human computer take to integrate
 # the Earth-Moon-Sun system for one century?
-
-# Assume a step size of 1 hour and that a single update step
-# requires ~200 arithmetic operations (forces, accelerations,
-# position and velocity updates for 3 bodies in 3D).
+#
+# Assume 1-hour steps and ~200 arithmetic operations per step
+# (forces, accelerations, position and velocity updates).
 
 years = 100
 steps_per_year = 24 * 365
@@ -115,99 +109,24 @@ ops_per_step = 200
 ops_per_second_human = 1  # one operation per second is generous
 
 total_ops = years * steps_per_year * ops_per_step
-seconds = total_ops / ops_per_second_human
-human_years = seconds / (365 * 24 * 3600)
+human_years = total_ops / ops_per_second_human / (365 * 24 * 3600)
 
 print(f"Total arithmetic operations: {total_ops:,}")
-print(f"Human-years required:        {human_years:,.0f}")
+print(f"Human-years required:        {human_years:,.1f}")
 `,
     },
   ]}
 />
 
-Nearly six human-years of nonstop arithmetic for a problem your laptop
-will solve in a fraction of a second. This gap — between what is
+Nearly six human-years of nonstop arithmetic for a problem your
+laptop solves in a fraction of a second. This gap — between what is
 *mathematically defined* and what is *humanly computable* — is the
-gap that scientific computing exists to close.
-
-## Tables of numbers were the original "API"
-
-For centuries the workaround was to *precompute* answers and publish
-them in books. Logarithm tables, trigonometric tables, astronomical
-ephemerides, ballistics tables — these were the high-bandwidth
-interfaces between mathematicians who could derive functions and
-practitioners who needed values.
-
-<Callout type="info" title="The Nautical Almanac">
-The British *Nautical Almanac*, first published in 1767, listed the
-position of the sun, moon, and planets at six-hour intervals for an
-entire year. Hundreds of human computers worked for months to
-produce each annual edition. A navigator at sea would then
-*interpolate* between the tabulated values to find the celestial
-position they needed — interpolation, by hand, in a rocking ship.
-</Callout>
-
-We still use this idea today, but the *table* lives in memory and
-the *interpolation* runs in microseconds. Try it.
-
-<CodeBlock
-  adapter="python"
-  files={[
-    {
-      filename: "main.py",
-      initCode: `import numpy as np
-from scipy.interpolate import CubicSpline
-
-# A sparse "table" of sine values at 10-degree intervals
-degrees = np.arange(0, 361, 10)
-table = np.sin(np.deg2rad(degrees))
-spline = CubicSpline(degrees, table)`,
-      starterCode: `# Look up sin(37.4°) by interpolating between table entries
-true_value = float(np.sin(np.deg2rad(37.4)))
-interpolated = float(spline(37.4))
-
-print(f"True   sin(37.4°) = {true_value:.8f}")
-print(f"Table  sin(37.4°) = {interpolated:.8f}")
-print(f"Error              = {abs(true_value - interpolated):.2e}")
-`,
-    },
-  ]}
-/>
-
-The cubic spline error is on the order of $10^{-6}$ — better than any
-printed table ever managed, computed in microseconds, with no humans
-involved.
+gap scientific computing exists to close.
 
 ## The three walls
 
-Every problem human computers ran into can be sorted into one of
-three categories. Each one is still a chapter of computational
-science.
-
-### 1. The wall of volume
-
-Some problems simply require more arithmetic than a human can ever
-perform. Numerical weather prediction is the canonical example —
-Lewis Fry Richardson famously spent six weeks in 1916 doing by hand
-what we now consider a six-hour forecast for a single grid cell, and
-his answer was wildly wrong because his time step was too large.
-
-### 2. The wall of precision
-
-Long calculations *accumulate error*. When a human computer carries
-seven decimal digits through ten thousand operations, the last
-digits become noise. We will see in the next chapter that even
-modern computers, with 16 digits of precision, can lose every
-single one to a poorly written formula.
-
-### 3. The wall of dimensionality
-
-Many problems are not just long but *high-dimensional*. Optimizing a
-function of two variables can be done with paper and pencil.
-Optimizing a function of two thousand variables — say, training the
-weights of a neural network — requires an entirely different toolbox
-of gradient methods, sparse representations, and stochastic
-sampling.
+Every problem human computers ran into falls into one of three
+categories. Each is still a chapter of computational science.
 
 ```mermaid
 graph TB
@@ -225,21 +144,29 @@ graph TB
     SC --> SIM[Simulation]
 ```
 
-## A small taste of why precision matters
+- **Volume.** Some problems simply require more arithmetic than a
+  human can ever perform. Planetary motion above is one; numerical
+  weather prediction is another.
+- **Precision.** Long calculations *accumulate error*. Carry seven
+  digits through ten thousand operations and the last digits become
+  noise. We will see that even 16-digit machines can lose every
+  digit to a poorly written formula.
+- **Dimensionality.** Many problems are not just long but
+  *high-dimensional* — optimizing a function of two thousand
+  variables needs an entirely different toolbox than optimizing one
+  of two.
 
-Here is a calculation that a careful human computer would have
-performed accurately, but that a naive computer program gets
-catastrophically wrong. The math is identical; only the *form* of
-the expression differs.
+A small taste of the precision wall, because it is the most
+surprising. The two expressions below are algebraically identical,
+yet one collapses to nonsense for tiny $x$.
 
 <CodeBlock
   adapter="python"
   files={[
     {
       filename: "main.py",
-      starterCode: `import math
-
-# Compute  f(x) = (1 - cos(x)) / x**2  for very small x.
+      initCode: `import math`,
+      starterCode: `# Compute  (1 - cos(x)) / x**2  for tiny x.
 # Mathematically this approaches 1/2 as x -> 0.
 
 for k in range(1, 12):
@@ -252,22 +179,106 @@ for k in range(1, 12):
   ]}
 />
 
-The "naive" column drifts and then collapses to zero. The
-"rewritten" column stays accurate. The math has not changed; only
-the *numerical method* has. This is the entire reason numerical
-analysis is a discipline rather than a footnote.
+The "naive" column drifts and then collapses to zero; the "rewritten"
+column stays accurate. The math has not changed, only the *numerical
+method*. This single phenomenon — **catastrophic cancellation**,
+where subtracting two nearly equal numbers destroys precision — is
+the reason numerical analysis is a discipline rather than a footnote.
+We will name it properly in the foundations chapters.
 
-## The seed of an idea
+## The third pillar: simulation
 
-By the 1930s, scientists had reached a point where the questions
-they wanted to ask — *how do shock waves form? how do neutrons
-diffuse? how do galaxies cluster?* — could be **stated** in a few
-lines of mathematics, but **answered** only by tens of millions of
-arithmetic operations. The pressure to build a machine that could do
-this work was enormous. The Second World War turned that pressure
-into funding, and computational science was born.
+When the first electronic computers came online in the 1940s, they
+did not merely speed up existing science. They invented a new way of
+doing it. Theory and experiment had been the two pillars of science
+since Galileo; a third pillar now appeared — **simulation**.
 
-That is the story of the next chapter.
+```mermaid
+flowchart LR
+    T[Theory] <--> S[Simulation]
+    S <--> E[Experiment]
+    E <--> T
+```
+
+The machine that opened the door was **ENIAC**, unveiled at the
+University of Pennsylvania in 1946. It performed about 5,000
+additions per second — roughly a month of human-computer work every
+second. Built to compute ballistics tables for the U.S. Army, its
+first major job was instead a thermonuclear-weapons calculation for
+Los Alamos, run by Stanley Frankel, Nicholas Metropolis, and Anthony
+Turkevich. That run took weeks and produced a million numerical
+results, and the vocabulary it forced into existence — *time
+stepping*, *discretization*, *iteration* — is the vocabulary of this
+entire course.
+
+## Monte Carlo: the first great idea
+
+In 1946, recovering from an illness, the mathematician **Stanislaw
+Ulam** was playing solitaire and wondering what fraction of randomly
+dealt hands could be won. The combinatorics were hopeless. Instead,
+he realized, he could just *deal a lot of hands and count*. He
+mentioned it to John von Neumann, who saw it could be applied to
+neutron diffusion, and within weeks ENIAC was running the first
+production code. They named it **Monte Carlo**, after the casino.
+
+Monte Carlo is shockingly easy to demonstrate. Drop random darts at a
+square, count how many land in the inscribed circle, and you have
+estimated $\pi$.
+
+<CodeBlock
+  adapter="python"
+  files={[
+    {
+      filename: "main.py",
+      initCode: `import numpy as np`,
+      starterCode: `# >>> CHANGE ME and re-run: try n = 10_000 then 10_000_000 <<<
+n = 1_000_000
+
+rng = np.random.default_rng(42)
+x, y = rng.uniform(-1, 1, n), rng.uniform(-1, 1, n)
+inside = (x**2 + y**2) <= 1
+pi_estimate = 4 * inside.mean()
+
+print(f"Estimate of pi from {n:,} samples: {pi_estimate:.6f}")
+print(f"True value:                      {np.pi:.6f}")
+`,
+    },
+  ]}
+/>
+
+Increase `n` and the estimate sharpens — but only as $1/\sqrt{n}$, so
+a hundredfold more samples buys you just one more digit. That slow,
+relentless convergence is *the* central law of Monte Carlo, and it is
+the same whether the problem has two dimensions or two thousand. We
+devote a whole chapter to it later.
+
+## What the early years left us
+
+The first decade of computational science handed down a remarkably
+durable toolkit, and every item appears in this course:
+
+- **Time stepping** — march a system forward in small increments.
+- **Discretization** — replace continuous fields with grids.
+- **Iteration** — solve hard problems by repeatedly applying easier
+  ones.
+- **Monte Carlo** — use random sampling to estimate integrals and
+  rare events.
+- **Stability analysis** — understand when a method amplifies error
+  and when it doesn't.
+
+None of these requires a supercomputer to learn. They all run
+beautifully in the browser kernel powering this page. The next
+chapter follows the *languages* that grew up around this toolkit —
+FORTRAN, MATLAB, and finally Python — and why scientific Python won.
+
+<Callout type="info" title="Want the longer history?">
+We have kept this opener lean so we can start computing. The fuller
+stories — the first computer weather forecast, the hardware ladder
+from ENIAC to exascale, and the Nobel Prize awarded for *simulation
+methods* — live in [Interesting
+discussions](/learn/scientific-computing-python/interesting-discussions)
+near the end of the course.
+</Callout>
 
 ## Check your understanding
 
@@ -275,28 +286,28 @@ That is the story of the next chapter.
   markdown={`Which of the following was **not** a category of "wall" that human computers ran into and that modern scientific computing was created to overcome?
 
 - Volume — sheer number of arithmetic operations required
-  > Volume is explicitly identified as the first wall: the page explains how planetary simulation alone requires billions of operations that a human computer could never complete.
+  > Volume is explicitly identified as the first wall: planetary simulation alone requires billions of operations a human computer could never complete.
 - Precision — accumulated round-off in long calculations
-  > Precision is explicitly the second wall: the page describes how carrying only seven decimal digits through thousands of operations leaves only noise in the later digits.
+  > Precision is explicitly the second wall: carrying only seven decimal digits through thousands of operations leaves only noise in the later digits.
 - Dimensionality — problems with thousands of variables
-  > Dimensionality is explicitly the third wall: the page describes optimizing a function of two thousand variables as requiring an entirely different toolbox.
+  > Dimensionality is explicitly the third wall: optimizing a function of two thousand variables requires an entirely different toolbox.
 - [o] Syntax — the absence of structured programming constructs
-  > "Syntax" is a software engineering concern, not a fundamental obstacle to scientific calculation. Human computers worked with mathematical notation, not programming languages. Volume, precision, and dimensionality are the three classical walls.
+  > "Syntax" is a software-engineering concern, not a fundamental obstacle to scientific calculation. Human computers worked with mathematical notation, not programming languages. Volume, precision, and dimensionality are the three classical walls.
 
-The three walls — volume, precision, and dimensionality — map directly onto the three main pillars of numerical analysis: efficient algorithms, stable numerical methods, and tractable high-dimensional optimization.`}
+The three walls — volume, precision, and dimensionality — map directly onto the three pillars of numerical analysis: efficient algorithms, stable methods, and tractable high-dimensional optimization.`}
 />
 
 <MultipleChoice
-  markdown={`In the page's "1 − cos(x) / x²" example, both expressions are mathematically identical. Why does the naive version collapse to zero for tiny $x$?
+  markdown={`In the page's $(1 - \\cos x) / x^2$ example, both expressions are mathematically identical. Why does the naive version collapse to zero for tiny $x$?
 
 - Python's \`math.cos\` is buggy for small arguments
-  > \`math.cos\` is correctly implemented and accurate for small arguments; the problem is in the expression that subtracts \`cos(x)\` from \`1\`, not in \`cos\` itself.
+  > \`math.cos\` is correctly implemented and accurate for small arguments; the problem is the subtraction \`1 - cos(x)\`, not \`cos\` itself.
 - The CPU is rounding $x^2$ to zero
-  > For tiny but non-zero $x$ (e.g. $10^{-6}$), $x^2 = 10^{-12}$ is well within the range of double precision and is not rounded to zero; the issue is cancellation in $1 - \\cos(x)$, not underflow of $x^2$.
-- [o] $1 - \\cos(x)$ subtracts two nearly equal numbers and loses almost all of its significant digits — a phenomenon called *catastrophic cancellation*
-  > For tiny $x$, $\\cos(x) \\approx 1$, so $1 - \\cos(x)$ is the difference of two floating-point numbers that agree in almost every digit. Subtracting them keeps only the few digits where they *disagree*, which is mostly round-off noise. The rewritten form $2\\sin^2(x/2)$ avoids the subtraction entirely.
-- The cubic spline interpolation introduced rounding error
-  > Cubic spline interpolation is used in a separate example (the sine table lookup); the collapsing-to-zero in the \`(1 - cos(x)) / x²\` example has nothing to do with splines.
+  > For tiny but nonzero $x$ (e.g. $10^{-6}$), $x^2 = 10^{-12}$ is well within double precision and is not rounded to zero; the issue is cancellation in $1 - \\cos(x)$, not underflow of $x^2$.
+- [o] $1 - \\cos(x)$ subtracts two nearly equal numbers and loses almost all of its significant digits — *catastrophic cancellation*
+  > For tiny $x$, $\\cos(x) \\approx 1$, so $1 - \\cos(x)$ is the difference of two floats that agree in almost every digit. Subtracting them keeps only the few digits where they *disagree*, mostly round-off noise. The rewritten form $2\\sin^2(x/2)$ avoids the subtraction.
+- The random number generator introduced noise
+  > No random numbers appear in this example; the collapse is a deterministic floating-point cancellation effect.
 
-This is one of the most important lessons in numerical computing: **two algebraically identical expressions can produce wildly different numerical answers**. We will return to this idea many times.`}
+Two algebraically identical expressions can produce wildly different numerical answers. We will return to this idea many times.`}
 />

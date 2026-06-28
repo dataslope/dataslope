@@ -392,6 +392,68 @@ The difference is usually 2–5$\times$. For deeply nested
 reductions, restructuring an array to make the hot axis the last
 one can be a free speedup.
 
+## Practice: vectorize a distance computation
+
+<ChallengeCard
+  adapter="python"
+  title="Nearest neighbor without loops"
+  instructions={`Given a query point \`q\` of shape \`(d,)\` and a cloud \`points\` of shape \`(n, d)\`, implement \`nearest_index(q, points)\` that returns the **integer index** of the row of \`points\` closest to \`q\` in Euclidean distance.
+
+Do it **without any explicit Python loop** — broadcast \`q\` against \`points\`, square, sum along the coordinate axis, and use \`argmin\`.`}
+  files={[
+    {
+      filename: "main.py",
+      starterCode: `import numpy as np
+
+
+def nearest_index(q, points):
+    # TODO: vectorized squared distances, then argmin
+    return 0
+
+
+# Quick check
+pts = np.array([[0.0, 0.0], [3.0, 4.0], [1.0, 1.0]])
+print("nearest to (0.9, 0.9):", nearest_index(np.array([0.9, 0.9]), pts))  # -> 2
+`,
+      solutionCode: `import numpy as np
+
+
+def nearest_index(q, points):
+    q = np.asarray(q, dtype=float)
+    points = np.asarray(points, dtype=float)
+    sq_dist = ((points - q) ** 2).sum(axis=1)
+    return int(np.argmin(sq_dist))
+`,
+    },
+  ]}
+  tests={[
+    {
+      id: "simple",
+      name: "Picks the obviously closest point",
+      code: `import numpy as np
+pts = np.array([[0.0, 0.0], [3.0, 4.0], [1.0, 1.0]])
+assert nearest_index(np.array([0.9, 0.9]), pts) == 2`,
+    },
+    {
+      id: "returns_int",
+      name: "Returns a Python int",
+      code: `import numpy as np
+pts = np.array([[0.0, 0.0], [10.0, 0.0]])
+idx = nearest_index(np.array([9.0, 0.0]), pts)
+assert isinstance(idx, int) and idx == 1`,
+    },
+    {
+      id: "higher_dim",
+      name: "Works in 5 dimensions",
+      code: `import numpy as np
+rng = np.random.default_rng(0)
+pts = rng.standard_normal((200, 5))
+q = pts[37] + 1e-6
+assert nearest_index(q, pts) == 37`,
+    },
+  ]}
+/>
+
 ## Vectorization checklist
 
 When you sit down to translate a formula into NumPy, ask:

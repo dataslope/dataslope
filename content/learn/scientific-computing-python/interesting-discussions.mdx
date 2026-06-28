@@ -1,0 +1,162 @@
+---
+title: Interesting Discussions
+description: Stories and side-quests that did not fit the main path — weather forecasting, the hardware ladder, a Turing Award for floating point, and three famous disasters caused by rounding error
+---
+
+The main chapters keep a brisk pace so you spend your time computing.
+This page is the opposite: a collection of true stories and
+historical detours that are too good to lose but would have slowed
+the path. Read them in any order. Every claim here is verifiable, and
+several connect directly to the numerical ideas you have already met.
+
+<svg
+  viewBox="0 0 640 200"
+  role="img"
+  aria-label="A constellation of small connected dots branching off a main horizontal line — side discussions hanging off the course's main path"
+  style={{ display: "block", width: "100%", maxWidth: "640px", height: "auto", margin: "2.5rem auto" }}
+>
+  <g fill="currentColor" opacity="0.25">
+    <rect x="60" y="98" width="520" height="4" rx="2" />
+  </g>
+  <g style={{ color: "var(--ds-blue-500)" }} fill="currentColor">
+    <circle cx="120" cy="100" r="6" />
+    <circle cx="260" cy="100" r="6" />
+    <circle cx="400" cy="100" r="6" />
+    <circle cx="540" cy="100" r="6" />
+  </g>
+  <g fill="currentColor" opacity="0.4">
+    <circle cx="120" cy="55" r="4" />
+    <circle cx="260" cy="150" r="4" />
+    <circle cx="400" cy="50" r="4" />
+    <circle cx="540" cy="150" r="4" />
+  </g>
+  <g style={{ color: "var(--ds-yellow-500)" }} fill="currentColor" opacity="0.5">
+    <rect x="118" y="70" width="4" height="26" rx="2" />
+    <rect x="258" y="104" width="4" height="42" rx="2" />
+    <rect x="398" y="56" width="4" height="40" rx="2" />
+    <rect x="538" y="104" width="4" height="42" rx="2" />
+  </g>
+</svg>
+
+## The first computer weather forecast
+
+In 1950, a small team led by John von Neumann and the meteorologist
+Jule Charney used ENIAC to produce the first computer weather
+forecast. They discretized the atmosphere over North America into a
+coarse grid, used a simplified set of equations (the *barotropic
+vorticity equation*), and ran a 24-hour forecast.
+
+It took about 24 hours to compute — a forecast that finished just in
+time to be irrelevant. But it was *qualitatively correct*, and it
+launched a research program that, decades later, underlies every
+weather app on your phone. The deep lesson was not about speed: it
+was that **discretizing a continuous physical field onto a grid and
+stepping it forward in time was a viable scientific method**. That
+pattern outlasted ENIAC and outlasted FORTRAN — it is still how a
+modern supercomputer thinks about the atmosphere.
+
+You met the smallest possible version of this idea — diffusion on a
+1-D grid — in the stability discussions. The 1950 forecast was the
+same idea at continental scale.
+
+## The hardware ladder
+
+Computational science is uniquely sensitive to hardware. Every time
+processors got faster or memory got cheaper, a new class of problem
+became tractable.
+
+| Era | Machine | Peak speed | New problems unlocked |
+| --- | --- | --- | --- |
+| 1946 | ENIAC | $5\times10^3$ ops/s | Ballistics, fission |
+| 1954 | IBM 704 | $4\times10^4$ ops/s | Weather, FORTRAN |
+| 1964 | CDC 6600 | $3\times10^6$ ops/s | Quantum chemistry |
+| 1976 | Cray-1 | $1.6\times10^8$ ops/s | 3-D fluid dynamics |
+| 1997 | ASCI Red | $1.3\times10^{12}$ ops/s | Full weapon simulation |
+| 2008 | Roadrunner | $1.0\times10^{15}$ ops/s | Climate ensembles |
+| 2022 | Frontier | $1.1\times10^{18}$ ops/s | Whole-cell biology, quantum-chemical AI |
+
+Each rung is roughly a thousand times faster than the one before,
+and each unlocked a research program that ran for a decade or two.
+
+## A Nobel Prize for simulation
+
+The 2013 Nobel Prize in Chemistry went to Martin Karplus, Michael
+Levitt, and Arieh Warshel "for the development of multiscale models
+for complex chemical systems." The award was not for a new chemical
+discovery — it was for the *numerical methods* that let chemists
+simulate enzymes on a computer. Computational chemistry and
+computational fluid dynamics are now research disciplines in their
+own right, the clearest sign that simulation has become a full
+partner to theory and experiment.
+
+## William Kahan, the father of floating point
+
+The reason `0.1 + 0.2` behaves identically on your phone, your
+laptop, and a supercomputer is a 1985 standard called **IEEE 754**.
+Its principal architect, the mathematician **William Kahan**, won the
+1989 Turing Award — computing's highest honor — for his work on it,
+and is widely called "the father of floating point." Before IEEE 754,
+every manufacturer rounded differently, special values like infinity
+and NaN were handled inconsistently, and a program that ran correctly
+on one machine could silently produce wrong answers on another.
+
+The standard you rely on in every code block of this course is the
+quiet reason numerical results are portable at all. The next three
+stories are about what happens when its rules are ignored.
+
+## Three disasters caused by rounding error
+
+Floating point is not an abstract concern. Each of these is a
+documented failure with real consequences, and each maps onto an idea
+from the foundations chapters.
+
+<Callout type="warn" title="The Patriot missile, Dhahran, 1991">
+A Patriot missile battery tracked time by counting tenths of a second
+in a 24-bit register. But $0.1$ has no exact binary representation,
+so each tick carried a tiny rounding error. After about **100 hours**
+of continuous uptime, the accumulated drift in the system clock grew
+to roughly a third of a second — enough to misplace a fast-moving
+target by hundreds of meters. The battery failed to intercept an
+incoming Scud missile, and **28 soldiers were killed**. The bug was
+*accumulated round-off in a long calculation* — the precision wall,
+in its deadliest form.
+</Callout>
+
+<Callout type="warn" title="The Pentium FDIV bug, 1994">
+Intel's Pentium processor shipped with a flaw in the lookup table
+used by its floating-point division unit. For certain divisions it
+returned wrong results — a famous example being $4195835 / 3145727$,
+which came out wrong in about the fifth significant digit. Once the
+bug became public, Intel was forced to offer replacements, at a cost
+of about **$475 million**. The lesson: even the *hardware* that
+implements correctly-rounded arithmetic can be wrong, which is why we
+test numerical code against independent references.
+</Callout>
+
+<Callout type="warn" title="Ariane 5 Flight 501, 1996">
+Forty seconds after launch, the European Space Agency's Ariane 5
+rocket veered off course and self-destructed, destroying a payload
+worth hundreds of millions of dollars. The cause: a 64-bit
+floating-point value (related to the rocket's horizontal velocity)
+was converted to a 16-bit signed integer. Ariane 5 flew faster than
+its predecessor, the value no longer fit in 16 bits, the conversion
+**overflowed**, and the guidance computer shut down. This is the
+*range* failure of finite precision — a number that left the
+representable interval — rather than a *rounding* failure.
+</Callout>
+
+Three failures, three distinct lessons: error accumulates, hardware
+can be wrong, and a finite format has edges you can fall off.
+Recognizing these failure modes — and writing code that guards
+against them — is a large part of what separates a programmer who
+uses NumPy from a computational scientist.
+
+## Where to read more
+
+Each of these threads has a vast literature. If you want primary
+sources, search for the GAO report on the Patriot failure, the
+Lions report on Ariane 5, and Kahan's own writing on IEEE 754 — all
+freely available, and all far more detailed than these summaries.
+The point of this page is not completeness but motivation: the
+numerical care this course teaches is not pedantry. People have died
+for the lack of it.
