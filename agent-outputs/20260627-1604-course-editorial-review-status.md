@@ -2,7 +2,13 @@
 
 **Date:** 2026-06-27
 **Scope:** `content/learn/*` courses (27 total)
-**Result:** 15 reviewed · 12 not yet reviewed
+**Result:** 18 reviewed · 9 not yet reviewed
+
+> **Update 2026-06-28 (PR #537):** ran the editorial pass on three more
+> courses — `data-analysis-python-pandas`, `time-series-analysis-python`,
+> and `statistics-for-data-science-python` — and wired them onto real
+> datasets from the companion `dataslope/datasets` repo. Tables and the
+> per-PR log below reflect this.
 
 ## Background
 
@@ -24,7 +30,7 @@ The five editorial PRs all landed on 2026-06-12.
 
 ## Status by course
 
-### ✅ Editorial pass complete (15)
+### ✅ Editorial pass complete (18)
 
 | Course | PR |
 |--------|----|
@@ -43,12 +49,14 @@ The five editorial PRs all landed on 2026-06-12.
 | database-design-postgresql | #497 |
 | intro-sql-postgres | #497 |
 | sqlite-for-beginners | #497 |
+| data-analysis-python-pandas | #537 |
+| time-series-analysis-python | #537 |
+| statistics-for-data-science-python | #537 |
 
-### ⬜ Not yet reviewed (12)
+### ⬜ Not yet reviewed (9)
 
 | Course |
 |--------|
-| data-analysis-python-pandas |
 | intro-data-viz-plotly |
 | machine-learning-scikit-learn |
 | mastering-ggplot2 |
@@ -58,10 +66,8 @@ The five editorial PRs all landed on 2026-06-12.
 | scientific-computing-python |
 | seaborn-foundations |
 | sql-analytics-duckdb |
-| statistics-for-data-science-python |
-| time-series-analysis-python |
 
-These 12 have only been touched by project-wide cosmetic/infra commits (SVG font
+These 9 have only been touched by project-wide cosmetic/infra commits (SVG font
 & contrast fixes, course-tag metadata, "hidden test" wording removal, mermaid
 fixes) — never an editorial content pass.
 
@@ -135,6 +141,29 @@ not a course edit.)*
   motivation-first openings, lore, and code debriefs across every chapter
   (arrays → strings → lists → stacks/queues → recursion → searching/sorting →
   hashing/trees/heaps/tries → graphs → DP/greedy/backtracking); Mermaid fixes.
+
+### PR #537 — Data Analysis (pandas) · Time Series · Statistics
+First pass over the Python data-science track. Also bumped `DATASETS_REF`
+in `app/_components/runtime/remoteDatasets.ts` to the `dataslope/datasets`
+HEAD that carries the new CSVs, so these courses pull real data
+(penguins, diamonds, california_housing, anscombe, datasaurus, NOAA Mauna
+Loa CO₂) by repo-relative path through the `datasets` staging prop.
+- **data-analysis-python-pandas:** collapsed a six-page history opener into
+  two pages and added an "Interesting discussions" section (data disasters
+  + a deep-history director's cut); interactive penguins welcome; migrated
+  the course off the old `bdi475` HR dataset onto penguins (primary),
+  diamonds (scale), and california_housing (a numeric-correlation example);
+  migrated/added challenge cards with every printed statistic verified.
+- **time-series-analysis-python:** interactive Keeling-curve welcome;
+  replaced labeled `meta.json` separators with plain `---`; wired the NOAA
+  Mauna Loa CO₂ series through resampling → rolling windows → decomposition
+  → stationarity → differencing as the additive counterpoint to airline;
+  added four quick-win challenge cards.
+- **statistics-for-data-science-python:** Anscombe's-quartet welcome hook;
+  replaced nine labeled separators with plain `---`; wired Anscombe, the
+  Datasaurus dozen, and Palmer penguins into 16 code blocks across eight
+  pages; added verifiable stories (German tank problem, Monty Hall sim,
+  Lady Tasting Tea, the ASA 2016 p-value statement, xkcd #882, Galton).
 
 ## How this was determined
 
