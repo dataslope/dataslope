@@ -178,9 +178,12 @@ function MobileDrawer() {
               <Dialog.Close
                 key={p.id}
                 render={<Link href={p.href} prefetch={false} />}
-                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-[var(--ds-gray-700)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-200)] dark:hover:bg-white/10"
+                className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm text-[var(--ds-gray-900)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-white dark:hover:bg-white/10"
               >
-                <LangIcon id={p.id} />
+                <LangIcon
+                  id={p.id}
+                  className="text-[var(--ds-gray-900)] dark:text-white"
+                />
                 {p.label}
               </Dialog.Close>
             ))}
