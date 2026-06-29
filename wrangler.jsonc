@@ -33,6 +33,29 @@
   "r2_buckets": [
     { "binding": "NEXT_INC_CACHE_R2_BUCKET", "bucket_name": "dataslope-inc-cache" }
   ],
+  // D1 (edge SQLite) backing user accounts and sessions for Better Auth — the
+  // accounts layer from agent-outputs/20260621-1733-…-auth-membership-….md (Q1).
+  // The binding name `DB` is what lib/auth/server.ts reads via
+  // getCloudflareContext().env.DB. The schema lives in migrations/ and is applied
+  // with `npx wrangler d1 migrations apply dataslope-auth [--remote]`.
+  // Create the database once with: `npx wrangler d1 create dataslope-auth`
+  // and paste the printed `database_id` below (it is not a secret).
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "dataslope-auth",
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "migrations_dir": "migrations"
+    }
+  ],
+  // Non-secret auth config. The OAuth client secrets and BETTER_AUTH_SECRET are
+  // NOT here — set them with `npx wrangler secret put <NAME>` (see README).
+  // BETTER_AUTH_URL must be the deployed origin so OAuth callbacks resolve; it
+  // defaults to the request origin when unset, so it's only strictly needed if
+  // that ever differs from the canonical site URL.
+  "vars": {
+    "BETTER_AUTH_URL": "https://dataslope.com"
+  },
   // Lets the worker invoke itself (used by OpenNext for cache/revalidation
   // plumbing). Must match "name" above.
   "services": [

@@ -82,3 +82,73 @@ It needs three repository secrets (Settings → Secrets and variables → Action
 
 To change how long stale/preview cache lingers, edit `THRESHOLD_DAYS` in the workflow. The cost impact is small — at ~0.6 GB per retained build against R2's 10 GB free tier, even heavy deploy volumes stay within a few cents per month.
 
+## Authentication (accounts)
+
+Accounts are powered by [Better Auth](https://better-auth.com) running inside the app Worker, with **Cloudflare D1** (edge SQLite) as the user/session store and **Google + GitHub** social login. This is the accounts layer from `agent-outputs/20260621-1733-feature-expansion-auth-membership-seo-persistence.md` (Q1).
+
+Auth gates **actions, never content**: every `/learn` lesson, exercise, and playground stays free and statically prerendered with no session. Signing in only unlocks per-user features (cloud saves, sharing, AI). The session is read client-side (`lib/auth/client.ts`), so anonymous readers still receive the exact same cached static HTML.
+
+Key files:
+
+| File | Role |
+| --- | --- |
+| `lib/auth/server.ts` | `createAuth(env)` — a **per-request** Better Auth factory bound to that request's D1 (a shared connection across requests is the classic Workers footgun). |
+| `app/api/auth/[...all]/route.ts` | Catch-all handler for `/api/auth/*` (sign-in, OAuth callbacks, session, sign-out). |
+| `lib/auth/client.ts` | Browser client + `useSession` / `signIn` / `signOut`. |
+| `app/sign-in/`, `app/account/` | Sign-in screen (Google/GitHub) and a gated account area. |
+| `migrations/` | D1 schema (Better Auth core tables), applied with `wrangler d1 migrations apply`. |
+
+> Auth is deliberately kept **out of `middleware.ts`** — `cookies()`/middleware sessions have rough edges on the Workers runtime (a known OpenNext limitation). All auth work happens in route handlers and client components instead.
+
+### One-time setup
+
+1. **Create the D1 database** and paste the printed `database_id` into `wrangler.jsonc` (the `d1_databases` entry, replacing `REPLACE_WITH_D1_DATABASE_ID` — it is not a secret):
+
+   ```bash
+   npx wrangler d1 create dataslope-auth
+   ```
+
+2. **Apply the schema** (locally, then to Cloudflare):
+
+   ```bash
+   npx wrangler d1 migrations apply dataslope-auth            # local
+   npx wrangler d1 migrations apply dataslope-auth --remote   # Cloudflare
+   ```
+
+3. **Create OAuth apps** and set their authorized redirect URIs to your origin:
+   - Google: `https://dataslope.com/api/auth/callback/google`
+   - GitHub: `https://dataslope.com/api/auth/callback/github`
+
+   (For local dev use `http://localhost:3000/api/auth/callback/<provider>`.)
+
+4. **Set the secrets** (these never live in `wrangler.jsonc`):
+
+   ```bash
+   npx wrangler secret put BETTER_AUTH_SECRET   # e.g. `openssl rand -base64 32`
+   npx wrangler secret put GOOGLE_CLIENT_ID
+   npx wrangler secret put GOOGLE_CLIENT_SECRET
+   npx wrangler secret put GITHUB_CLIENT_ID
+   npx wrangler secret put GITHUB_CLIENT_SECRET
+   ```
+
+   `BETTER_AUTH_URL` is set as a non-secret `var` in `wrangler.jsonc` (defaults to `https://dataslope.com`); change it if the deployed origin differs. A provider whose `*_CLIENT_ID`/`*_CLIENT_SECRET` pair is missing is simply not offered, so you can ship with just one provider configured.
+
+### Local development
+
+`npm run dev` reads bindings/vars from `wrangler.jsonc` via OpenNext's `initOpenNextCloudflareForDev()`. Put local secrets and any overrides in a `.dev.vars` file (gitignored), e.g.:
+
+```
+BETTER_AUTH_SECRET="dev-only-secret"
+BETTER_AUTH_URL="http://localhost:3000"
+GOOGLE_CLIENT_ID="…"
+GOOGLE_CLIENT_SECRET="…"
+GITHUB_CLIENT_ID="…"
+GITHUB_CLIENT_SECRET="…"
+```
+
+The Cloudflare bindings interface (`CloudflareEnv`, used by `getCloudflareContext()`) is **hand-maintained** in `cloudflare-env.d.ts` — keep it in sync with `wrangler.jsonc` by hand when you add a binding. We don't commit `wrangler types`' output there because it inlines the full workerd runtime type surface (a global `Response`, `fetch`, …) that conflicts with this app's DOM types; the file's header comment explains the trade-off. `npm run cf-typegen` still works but writes to a gitignored scratch file for reference only.
+
+### Adding Better Auth plugins later
+
+If you enable additional Better Auth features (e.g. email/password, 2FA, organizations), regenerate the schema delta with `npx @better-auth/cli generate` and add it as a **new** migration file in `migrations/` rather than editing the existing one.
+
