@@ -32,6 +32,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 1,
   });
 
+  // Standalone pricing page (static; reuses the home page's pricing table).
+  entries.set(abs("/pricing"), {
+    url: abs("/pricing"),
+    changeFrequency: "monthly",
+    priority: 0.8,
+  });
+
   for (const page of source.getPages()) {
     const url = abs(page.url);
     const isIndex = page.url === "/learn";
