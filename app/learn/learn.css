@@ -471,7 +471,7 @@ code.hljs {
   :where(svg *)
 ) {
   font-family: var(--font-sans);
-  font-size: 1.125rem;
+  font-size: 1rem;
   line-height: 1.75;
   font-variation-settings: normal;
   letter-spacing: -0.011em;
@@ -517,8 +517,8 @@ code.hljs {
 .prose .fd-step > p strong {
   font-weight: 600;
 }
-/* Title — the first paragraph: 600-weight, sized down from the 1.125rem
-   prose default, with a 12px gap down to its description. */
+/* Title — the first paragraph: 600-weight, matching the 1rem prose body
+   size, with a 12px gap down to its description. */
 .prose .fd-step > p:first-child {
   font-size: 1rem;
   font-weight: 600;
