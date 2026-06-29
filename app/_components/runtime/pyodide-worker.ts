@@ -174,16 +174,59 @@ from pyodide.code import find_imports as _pg_find_imports
 
 _display_outputs = []
 
+# Per-run cap on captured stdout/stderr text. Without it, a runaway program
+# (e.g. \`while True: print(x)\`) grows _display_outputs without bound — the
+# captured string balloons the worker's memory into the gigabytes while the
+# loop pegs a CPU core. Once a run crosses the cap we keep the output already
+# captured (trimmed to the limit), append a one-time notice, and raise to
+# abort the run, which also stops the spinning loop. _pg_output_truncated
+# then drops any further writes so memory stays bounded even if user code
+# swallows the exception.
+_PG_MAX_OUTPUT_CHARS = 2_000_000  # ~2 MB of text per run
+_pg_output_chars = 0
+_pg_output_truncated = False
+
+class _PgOutputLimitError(Exception):
+    """Raised when a run's captured output exceeds _PG_MAX_OUTPUT_CHARS."""
+
+def _pg_reset_output():
+    """Reset the per-run output counter. Called before each run (these names
+    survive _pg_reset_user_globals via the protected-names snapshot, so they
+    must be reset explicitly rather than recreated)."""
+    global _pg_output_chars, _pg_output_truncated
+    _pg_output_chars = 0
+    _pg_output_truncated = False
+
 def _pg_emit_text(kind, s):
     """Append stream text to the ordered output list, merging consecutive
     writes of the same stream into one segment (print() emits the text and
-    its newline as separate writes)."""
+    its newline as separate writes). Enforces a per-run size cap so a
+    runaway/infinite-output program can't grow memory without bound."""
+    global _pg_output_chars, _pg_output_truncated
     if not s:
         return
-    if _display_outputs and _display_outputs[-1].get("type") == kind:
-        _display_outputs[-1]["text"] += s
-    else:
-        _display_outputs.append({"type": kind, "text": s})
+    if _pg_output_truncated:
+        # Cap already hit this run — drop further text so memory stays
+        # bounded even if the abort below was swallowed by user code.
+        return
+    remaining = _PG_MAX_OUTPUT_CHARS - _pg_output_chars
+    if len(s) >= remaining:
+        s = s[:remaining] if remaining > 0 else ""
+        _pg_output_truncated = True
+    if s:
+        _pg_output_chars += len(s)
+        if _display_outputs and _display_outputs[-1].get("type") == kind:
+            _display_outputs[-1]["text"] += s
+        else:
+            _display_outputs.append({"type": kind, "text": s})
+    if _pg_output_truncated:
+        _display_outputs.append({
+            "type": "stderr",
+            "text": "\\n[Output truncated: exceeded %d characters. Stopping the run — check for an unbounded loop.]\\n" % _PG_MAX_OUTPUT_CHARS,
+        })
+        raise _PgOutputLimitError(
+            "Output exceeded the %d-character limit" % _PG_MAX_OUTPUT_CHARS
+        )
 
 # Tee installed over sys.stdout/sys.stderr while user code runs, so prints
 # land in _display_outputs *in order* with display() tables, figures and
@@ -376,6 +419,10 @@ _PG_PROTECTED_NAMES = set(globals().keys()) | {
     # here makes the intent obvious and guards against future reordering.
     "_PG_PROTECTED_NAMES", "_pg_reset_user_globals",
     "_pg_evict_staged_modules",
+    # Output-cap state/helpers: _pg_reset_output() reassigns the counters
+    # each run, so they must persist across the per-run global reset.
+    "_PG_MAX_OUTPUT_CHARS", "_pg_output_chars", "_pg_output_truncated",
+    "_PgOutputLimitError", "_pg_reset_output", "_pg_emit_text",
 }
 `);
 
@@ -573,7 +620,7 @@ async function runCode(
     post({ kind: "run-status", id, message: "Running…", preparing: false });
   }
 
-  await pyodide.runPythonAsync("_pg_reset_user_globals(); _display_outputs.clear()");
+  await pyodide.runPythonAsync("_pg_reset_user_globals(); _display_outputs.clear(); _pg_reset_output()");
 
   // Pass the user code as a Python string to avoid template-literal escaping
   // issues and to let _execute_with_last_display parse it with the ast module.
