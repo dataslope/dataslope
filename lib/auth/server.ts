@@ -57,10 +57,20 @@ export function createAuth(env: CloudflareEnv) {
     // request; set BETTER_AUTH_URL (wrangler `vars`, or `.dev.vars` locally)
     // when the deployed origin must be pinned.
     baseURL: env.BETTER_AUTH_URL,
-    // Social login first: no passwords stored, no reset/verification flow to
-    // own on day one (the right starting scope per the report). Email/password
-    // can be enabled later alongside a transactional email provider.
-    emailAndPassword: { enabled: false },
+    // Email + password sign-in. Passwords are hashed by Better Auth and stored
+    // in the `account` table (providerId "credential") — the existing schema
+    // already has the `password` column, so no migration change is needed.
+    //
+    // Email verification and password reset are left OFF until a transactional
+    // email provider is wired up (Resend/Postmark or Cloudflare Email Routing):
+    // both flows require a `sendVerificationEmail`/`sendResetPassword` sender,
+    // and turning them on without one would hand users a dead end. New accounts
+    // are signed in immediately (autoSignIn default). The "forgot password"
+    // flow can be enabled once that sender exists.
+    emailAndPassword: {
+      enabled: true,
+      requireEmailVerification: false,
+    },
     socialProviders,
     session: {
       // Cache the session in a short-lived signed cookie so the common

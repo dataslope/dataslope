@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "../_components/Link";
 import { GitHubIcon } from "../_components/home/icons";
-import { signIn, useSession } from "@/lib/auth/client";
+import { signIn, signUp, useSession } from "@/lib/auth/client";
 
 /** Where to land after a successful sign-in. */
 const CALLBACK_URL = "/account";
@@ -59,6 +60,116 @@ function ProviderButton({
   );
 }
 
+const INPUT_CLASS =
+  "w-full rounded-xl border border-[var(--ds-gray-200)] bg-white px-3.5 py-2.5 text-sm text-[var(--ds-gray-900)] outline-none transition-colors placeholder:text-[var(--ds-gray-400)] focus:border-[var(--ds-blue-500)] dark:border-white/15 dark:bg-white/5 dark:text-white";
+
+/** Minimum password length — mirrors Better Auth's default (`minPasswordLength`). */
+const MIN_PASSWORD = 8;
+
+/** Email + password form with a sign-in / create-account toggle. Sign-up
+ *  additionally collects a name (the user table requires it). On success the
+ *  user is signed in and sent to the account page. */
+function EmailPasswordForm({ disabled }: { disabled: boolean }) {
+  const router = useRouter();
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setSubmitting(true);
+    const { error } =
+      mode === "signup"
+        ? await signUp.email({ name, email, password, callbackURL: CALLBACK_URL })
+        : await signIn.email({ email, password, callbackURL: CALLBACK_URL });
+    if (error) {
+      setError(error.message ?? "Something went wrong. Please try again.");
+      setSubmitting(false);
+      return;
+    }
+    // Session is set; surface it on /account (and re-render the header).
+    router.push(CALLBACK_URL);
+    router.refresh();
+  }
+
+  const isSignup = mode === "signup";
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+      {isSignup && (
+        <input
+          type="text"
+          required
+          autoComplete="name"
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          disabled={disabled || submitting}
+          className={INPUT_CLASS}
+        />
+      )}
+      <input
+        type="email"
+        required
+        autoComplete="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        disabled={disabled || submitting}
+        className={INPUT_CLASS}
+      />
+      <input
+        type="password"
+        required
+        minLength={MIN_PASSWORD}
+        autoComplete={isSignup ? "new-password" : "current-password"}
+        placeholder={isSignup ? `Password (${MIN_PASSWORD}+ characters)` : "Password"}
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        disabled={disabled || submitting}
+        className={INPUT_CLASS}
+      />
+
+      {error && (
+        <p role="alert" className="text-sm text-[var(--ds-red-600,#dc2626)]">
+          {error}
+        </p>
+      )}
+
+      <button
+        type="submit"
+        disabled={disabled || submitting}
+        className="inline-flex w-full items-center justify-center rounded-xl bg-[var(--ds-blue-600)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--ds-blue-700)] disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {submitting
+          ? isSignup
+            ? "Creating account…"
+            : "Signing in…"
+          : isSignup
+            ? "Create account"
+            : "Sign in"}
+      </button>
+
+      <p className="text-center text-sm text-[var(--ds-gray-500)]">
+        {isSignup ? "Already have an account?" : "New to Dataslope?"}{" "}
+        <button
+          type="button"
+          onClick={() => {
+            setMode(isSignup ? "signin" : "signup");
+            setError(null);
+          }}
+          className="font-medium text-[var(--ds-blue-600)] hover:underline dark:text-[var(--ds-blue-400)]"
+        >
+          {isSignup ? "Sign in" : "Create one"}
+        </button>
+      </p>
+    </form>
+  );
+}
+
 export function SignInClient() {
   const { data: session, isPending } = useSession();
   const [pending, setPending] = useState<string | null>(null);
@@ -108,6 +219,18 @@ export function SignInClient() {
         pending={pending}
         onClick={start}
       />
+
+      <div className="my-1 flex items-center gap-3">
+        <span className="h-px flex-1 bg-[var(--ds-gray-200)] dark:bg-white/10" />
+        <span className="text-xs font-medium uppercase tracking-wide text-[var(--ds-gray-400)]">
+          or
+        </span>
+        <span className="h-px flex-1 bg-[var(--ds-gray-200)] dark:bg-white/10" />
+      </div>
+
+      {/* Disable the email form while a social redirect is in flight. */}
+      <EmailPasswordForm disabled={pending !== null} />
+
       <p className="mt-2 text-center text-xs leading-relaxed text-[var(--ds-gray-500)]">
         Signing in only unlocks cloud saves, sharing, and AI. Every course,
         exercise, and playground stays free — no account needed.

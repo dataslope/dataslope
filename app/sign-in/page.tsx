@@ -39,7 +39,7 @@ export default function SignInPage() {
                 Sign in to Dataslope
               </h1>
               <p className="mt-3 text-[15px] leading-relaxed text-[var(--ds-gray-600)] dark:text-[var(--ds-gray-400)]">
-                Continue with a provider below.
+                Continue with a provider, or use your email.
               </p>
             </div>
             <div className="mt-8">

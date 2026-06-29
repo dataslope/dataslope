@@ -84,7 +84,9 @@ To change how long stale/preview cache lingers, edit `THRESHOLD_DAYS` in the wor
 
 ## Authentication (accounts)
 
-Accounts are powered by [Better Auth](https://better-auth.com) running inside the app Worker, with **Cloudflare D1** (edge SQLite) as the user/session store and **Google + GitHub** social login. This is the accounts layer from `agent-outputs/20260621-1733-feature-expansion-auth-membership-seo-persistence.md` (Q1).
+Accounts are powered by [Better Auth](https://better-auth.com) running inside the app Worker, with **Cloudflare D1** (edge SQLite) as the user/session store. Sign-in is available via **Google + GitHub** social login and **email + password**. This is the accounts layer from `agent-outputs/20260621-1733-feature-expansion-auth-membership-seo-persistence.md` (Q1).
+
+> **Email verification and password reset are intentionally off** until a transactional email provider (Resend/Postmark or Cloudflare Email Routing) is wired up — both flows need a sender, and enabling them without one would be a dead end. Passwords are hashed by Better Auth and stored in the existing `account` table (no schema change), so the migration below already covers email/password. Add the `sendResetPassword`/`sendVerificationEmail` senders in `lib/auth/server.ts` to turn those flows on.
 
 Auth gates **actions, never content**: every `/learn` lesson, exercise, and playground stays free and statically prerendered with no session. Signing in only unlocks per-user features (cloud saves, sharing, AI). The session is read client-side (`lib/auth/client.ts`), so anonymous readers still receive the exact same cached static HTML.
 
