@@ -1,14 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Minus } from "lucide-react";
+import {
+  Briefcase,
+  Check,
+  CloudUpload,
+  Database,
+  GraduationCap,
+  HardDrive,
+  Play,
+  Share2,
+  Sparkles,
+  SquareTerminal,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 
 import Link from "../Link";
 
-/** A single capability line, with an optional clarifying sub-note. Set
- *  `included: false` to render it as a muted, not-available row (kept in place
- *  so the feature rows line up across plans for direct comparison). */
-type Feature = { text: string; note?: string; included?: boolean };
+/** A single capability line: an icon that maps to the feature, the text, and an
+ *  optional clarifying sub-note. Set `included: false` to render it as a
+ *  not-available row (red ✕) — kept in place so the rows line up across plans
+ *  for direct comparison. */
+type Feature = {
+  text: string;
+  icon?: LucideIcon;
+  note?: string;
+  included?: boolean;
+};
 
 interface Plan {
   name: string;
@@ -24,13 +43,11 @@ interface Plan {
   features: Feature[];
   cta: string;
   href: string;
-  /** The promoted tier — green CTA + ribbon badge (no border/shadow). */
+  /** The promoted tier — green CTA + inline badge (no border/shadow). */
   highlighted?: boolean;
   badge?: string;
 }
 
-/** Shared, order-aligned feature rows. Every plan supplies one entry per row so
- *  comparable features (e.g. cloud storage) sit at the same vertical position. */
 const FEATURE_COUNT = 8;
 
 const PLANS: Plan[] = [
@@ -42,17 +59,19 @@ const PLANS: Plan[] = [
     noteMonthly: "No sign-in required",
     noteAnnual: "No sign-in required",
     features: [
-      { text: "Full access to courses" },
-      { text: "Full access to interview prep" },
-      { text: "Full access to playgrounds" },
-      { text: "Unlimited code executions" },
+      { icon: GraduationCap, text: "Full access to courses" },
+      { icon: Briefcase, text: "Full access to interview prep" },
+      { icon: SquareTerminal, text: "Full access to playgrounds" },
+      { icon: Play, text: "Unlimited code executions" },
       {
+        icon: HardDrive,
         text: "Save workspaces locally",
         note: "Browser only — no cloud persistence",
       },
       { text: "No cloud storage", included: false },
       { text: "No playground sharing", included: false },
       {
+        icon: Sparkles,
         text: "3 “Ask AI” messages every 24 hours",
         note: "Across playgrounds, challenges, code blocks & lessons",
       },
@@ -68,28 +87,32 @@ const PLANS: Plan[] = [
     noteMonthly: "Free forever",
     noteAnnual: "Free forever",
     features: [
-      { text: "Full access to courses" },
-      { text: "Full access to interview prep" },
-      { text: "Full access to playgrounds" },
-      { text: "Unlimited code executions" },
+      { icon: GraduationCap, text: "Full access to courses" },
+      { icon: Briefcase, text: "Full access to interview prep" },
+      { icon: SquareTerminal, text: "Full access to playgrounds" },
+      { icon: Play, text: "Unlimited code executions" },
       {
+        icon: CloudUpload,
         text: "Save workspaces locally and in the cloud",
         note: "Cloud saves auto-deleted after a month of inactivity",
       },
       {
+        icon: Database,
         text: "100 MB of cloud storage",
         note: "Total across all playgrounds",
       },
       {
+        icon: Share2,
         text: "Share playgrounds",
         note: "Shared playgrounds deleted after a month of inactivity",
       },
       {
+        icon: Sparkles,
         text: "Up to 10 “Ask AI” messages every 24 hours",
         note: "Across playgrounds, challenges, code blocks & lessons",
       },
     ],
-    cta: "Sign up free",
+    cta: "Sign up for free",
     href: "/learn",
   },
   {
@@ -100,23 +123,27 @@ const PLANS: Plan[] = [
     noteMonthly: "per month",
     noteAnnual: "per year · about $3.33/mo",
     features: [
-      { text: "Full access to courses" },
-      { text: "Full access to interview prep" },
-      { text: "Full access to playgrounds" },
-      { text: "Unlimited code executions" },
+      { icon: GraduationCap, text: "Full access to courses" },
+      { icon: Briefcase, text: "Full access to interview prep" },
+      { icon: SquareTerminal, text: "Full access to playgrounds" },
+      { icon: Play, text: "Unlimited code executions" },
       {
+        icon: CloudUpload,
         text: "Save workspaces locally and in the cloud",
         note: "Kept forever while your membership is active",
       },
       {
+        icon: Database,
         text: "10 GB of cloud storage",
         note: "Total across all playgrounds",
       },
       {
+        icon: Share2,
         text: "Share playgrounds",
         note: "Shared playgrounds never deleted while subscribed",
       },
       {
+        icon: Sparkles,
         text: "Unlimited “Ask AI” messages",
         note: "Fair use policy applies",
       },
@@ -134,31 +161,23 @@ const COL_START = ["lg:col-start-1", "lg:col-start-2", "lg:col-start-3"];
 
 function FeatureRow({ feature, last }: { feature: Feature; last: boolean }) {
   const included = feature.included !== false;
+  // Supported → the feature's own icon; missing → an ✕. Both sit in a filled
+  // circle (green / red) with a white glyph.
+  const Icon = included ? (feature.icon ?? Check) : X;
   return (
     <div className={`flex gap-3 ${last ? "lg:pb-8" : ""}`}>
-      {included ? (
-        <Check
-          size={20}
-          className="mt-0.5 shrink-0 text-[var(--ds-green-600)] dark:text-[var(--ds-green-400)]"
-          aria-hidden="true"
-        />
-      ) : (
-        <Minus
-          size={20}
-          className="mt-0.5 shrink-0 text-[var(--ds-gray-300)] dark:text-[var(--ds-gray-600)]"
-          aria-hidden="true"
-        />
-      )}
       <span
-        className={`text-[15px] leading-snug ${
-          included
-            ? "text-[var(--ds-gray-700)] dark:text-[var(--ds-gray-200)]"
-            : "text-[var(--ds-gray-400)] dark:text-[var(--ds-gray-500)]"
+        className={`mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full ${
+          included ? "bg-[var(--ds-green-500)]" : "bg-[var(--ds-red-500)]"
         }`}
+        aria-hidden="true"
       >
+        <Icon size={12} strokeWidth={2.5} className="text-white" />
+      </span>
+      <span className="text-[15px] leading-snug text-[var(--ds-gray-900)] dark:text-white">
         {feature.text}
         {feature.note && (
-          <span className="mt-0.5 block text-[13px] text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+          <span className="mt-0.5 block text-[13px] text-[var(--ds-gray-400)]">
             {feature.note}
           </span>
         )}
@@ -185,18 +204,20 @@ function PlanColumn({
     // shared row tracks); top/bottom breathing room is added to the header and
     // last feature instead.
     <div
-      className={`relative flex flex-col gap-3 px-6 py-6 lg:row-span-11 lg:row-start-1 lg:grid lg:grid-rows-subgrid lg:px-8 lg:py-0 ${colClass}`}
+      className={`flex flex-col gap-3 px-6 py-6 lg:row-span-11 lg:row-start-1 lg:grid lg:grid-rows-subgrid lg:px-8 lg:py-0 ${colClass}`}
     >
       <div className="lg:pt-8">
-        {plan.badge && (
-          <span className="mb-3 inline-flex items-center rounded-full bg-[var(--ds-green-500)] px-3 py-1 text-xs font-semibold text-white lg:absolute lg:-top-3 lg:left-1/2 lg:mb-0 lg:-translate-x-1/2">
-            {plan.badge}
-          </span>
-        )}
-        <h3 className="text-lg font-semibold text-[var(--ds-gray-900)] dark:text-white">
-          {plan.name}
-        </h3>
-        <p className="mt-1 text-sm text-[var(--ds-gray-600)] dark:text-[var(--ds-gray-400)]">
+        <div className="flex items-center gap-2.5">
+          <h3 className="text-lg font-semibold text-[var(--ds-gray-900)] dark:text-white">
+            {plan.name}
+          </h3>
+          {plan.badge && (
+            <span className="inline-flex items-center rounded-full bg-[var(--ds-green-500)] px-2.5 py-0.5 text-xs font-semibold text-white">
+              {plan.badge}
+            </span>
+          )}
+        </div>
+        <p className="mt-1 text-[15px] text-[var(--ds-gray-400)]">
           {plan.description}
         </p>
       </div>
@@ -205,17 +226,18 @@ function PlanColumn({
         <span className="text-4xl font-medium tracking-tight text-[var(--ds-gray-900)] dark:text-white">
           {price}
         </span>
-        <p className="mt-1 text-sm text-[var(--ds-gray-500)] dark:text-[var(--ds-gray-400)]">
+        <p className="mt-1 text-[15px] text-[var(--ds-gray-900)] dark:text-white">
           {note}
         </p>
       </div>
 
+      {/* Extra breathing room above and below the button. */}
       <Link
         href={plan.href}
-        className={`inline-flex w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors ${
+        className={`my-3 inline-flex w-full items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors ${
           plan.highlighted
             ? "bg-[var(--ds-green-600)] text-white hover:bg-[var(--ds-green-700)]"
-            : "border border-[var(--ds-gray-300)] text-[var(--ds-gray-900)] hover:bg-[var(--ds-gray-100)] dark:border-white/15 dark:text-white dark:hover:bg-white/10"
+            : "bg-[var(--ds-green-50)] text-[var(--ds-green-700)] hover:bg-[var(--ds-green-100)] dark:bg-[var(--ds-green-500)]/10 dark:text-[var(--ds-green-300)] dark:hover:bg-[var(--ds-green-500)]/15"
         }`}
       >
         {plan.cta}
@@ -284,9 +306,9 @@ export function PricingSection() {
         </div>
       </div>
 
-      {/* Comparison: one subtle gray surface, no gaps between plans, thin
-          dividers between them, and feature rows aligned via subgrid. */}
-      <div className="rounded-2xl border border-[var(--ds-gray-200)] bg-[var(--ds-gray-50)] dark:border-white/10 dark:bg-white/[0.03]">
+      {/* Comparison: bordered (no fill), no gaps between plans, thin dividers
+          between them, and feature rows aligned via subgrid. */}
+      <div className="rounded-2xl border border-[var(--ds-gray-200)] dark:border-white/10">
         <div className="grid grid-cols-1 divide-y divide-[var(--ds-gray-200)] lg:grid-cols-3 lg:grid-rows-[repeat(11,auto)] lg:gap-y-3 lg:divide-x lg:divide-y-0 dark:divide-white/10">
           {PLANS.map((plan, i) => (
             <PlanColumn
