@@ -12,6 +12,7 @@ import {
   Share2,
   Sparkles,
   SquareTerminal,
+  WandSparkles,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -48,7 +49,7 @@ interface Plan {
   badge?: string;
 }
 
-const FEATURE_COUNT = 8;
+const FEATURE_COUNT = 9;
 
 const PLANS: Plan[] = [
   {
@@ -75,6 +76,7 @@ const PLANS: Plan[] = [
         text: "3 “Ask AI” messages every 24 hours",
         note: "Across playgrounds, challenges, code blocks & lessons",
       },
+      { text: "No AI-suggested autocomplete", included: false },
     ],
     cta: "Get started",
     href: "/learn",
@@ -111,6 +113,7 @@ const PLANS: Plan[] = [
         text: "Up to 10 “Ask AI” messages every 24 hours",
         note: "Across playgrounds, challenges, code blocks & lessons",
       },
+      { text: "No AI-suggested autocomplete", included: false },
     ],
     cta: "Sign up for free",
     href: "/learn",
@@ -146,6 +149,11 @@ const PLANS: Plan[] = [
         icon: Sparkles,
         text: "Unlimited “Ask AI” messages",
         note: "Fair use policy applies",
+      },
+      {
+        icon: WandSparkles,
+        text: "Unlimited AI-suggested autocomplete",
+        note: "Inline, context-aware code completions in every playground",
       },
     ],
     cta: "Go Pro",
@@ -204,7 +212,7 @@ function PlanColumn({
     // shared row tracks); top/bottom breathing room is added to the header and
     // last feature instead.
     <div
-      className={`flex flex-col gap-3 px-6 py-6 lg:row-span-11 lg:row-start-1 lg:grid lg:grid-rows-subgrid lg:px-8 lg:py-0 ${colClass}`}
+      className={`flex flex-col gap-3 px-6 py-6 lg:row-span-12 lg:row-start-1 lg:grid lg:grid-rows-subgrid lg:px-8 lg:py-0 ${colClass}`}
     >
       <div className="lg:pt-8">
         <div className="flex items-center gap-2.5">
@@ -254,22 +262,31 @@ function PlanColumn({
   );
 }
 
-export function PricingSection() {
+export function PricingSection({
+  /** Render the section's own "Pricing" title + blurb. The dedicated /pricing
+   *  page supplies its own page-level heading and turns this off to avoid a
+   *  duplicate; the home page leaves it on. */
+  showHeading = true,
+}: {
+  showHeading?: boolean;
+} = {}) {
   const [billing, setBilling] = useState<"monthly" | "annual">("monthly");
   const annual = billing === "annual";
 
   return (
     <section id="pricing" className="mx-auto w-full max-w-6xl px-4 sm:px-6">
-      <div className="mx-auto mb-10 max-w-2xl text-center">
-        <h2 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
-          Pricing
-        </h2>
-        <p className="mt-8 text-base text-[var(--ds-gray-900)] sm:text-lg dark:text-white">
-          Every course, interview track, and playground is free to use. Create a
-          free account for cloud saves and sharing, or go Pro for storage that
-          never expires.
-        </p>
-      </div>
+      {showHeading && (
+        <div className="mx-auto mb-10 max-w-2xl text-center">
+          <h2 className="text-4xl font-semibold tracking-tight text-[var(--ds-gray-900)] sm:text-5xl dark:text-white">
+            Pricing
+          </h2>
+          <p className="mt-8 text-base text-[var(--ds-gray-900)] sm:text-lg dark:text-white">
+            Every course, interview track, and playground is free to use. Create
+            a free account for cloud saves and sharing, or go Pro for storage
+            that never expires.
+          </p>
+        </div>
+      )}
 
       {/* Monthly / annual billing toggle — only the paid tier's price reacts. */}
       <div className="mb-10 flex items-center justify-center">
@@ -309,7 +326,7 @@ export function PricingSection() {
       {/* Comparison: bordered (no fill), no gaps between plans, thin dividers
           between them, and feature rows aligned via subgrid. */}
       <div className="rounded-2xl border border-[var(--ds-gray-200)] dark:border-white/10">
-        <div className="grid grid-cols-1 divide-y divide-[var(--ds-gray-200)] lg:grid-cols-3 lg:grid-rows-[repeat(11,auto)] lg:gap-y-3 lg:divide-x lg:divide-y-0 dark:divide-white/10">
+        <div className="grid grid-cols-1 divide-y divide-[var(--ds-gray-200)] lg:grid-cols-3 lg:grid-rows-[repeat(12,auto)] lg:gap-y-3 lg:divide-x lg:divide-y-0 dark:divide-white/10">
           {PLANS.map((plan, i) => (
             <PlanColumn
               key={plan.name}
