@@ -31,6 +31,18 @@ const nextConfig: NextConfig = {
   // graphs into every page's chunk.
   experimental: {
     optimizePackageImports: ["lucide-react", "react-icons"],
+    // Load each route's CSS in the exact order it was imported, and keep that
+    // order stable across client-side navigations. The /learn (and /interview)
+    // segment layers Tailwind's preflight, Fumadocs UI, and the app's overrides
+    // into shared cascade layers (`base`, `utilities`); their default 'loose'
+    // chunking lets the App Router merge/reorder those chunks on a soft nav,
+    // which flips same-layer source-order winners and produces intermittent,
+    // refresh-fixed glitches (black borders — see #528 — and the mobile navbar
+    // leaking onto desktop, slicing the top of the page). 'strict' preserves
+    // import order so the cascade is deterministic, fixing the whole class at
+    // the source. It can yield more, smaller CSS chunks, which is fine here.
+    // The scoped re-assertions in app/learn/learn.css remain as defense in depth.
+    cssChunking: "strict",
     // Keep prefetched/visited route payloads reusable in the client router
     // cache so re-hovers and back/forward navigations don't re-hit the edge
     // (every edge-cache miss is a billed ISR Read on Vercel). Lessons are

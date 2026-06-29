@@ -66,6 +66,40 @@
   }
 }
 
+/* ── Segment-CSS reorder hardening, part 2: layout-chrome visibility ─────────
+   Same root cause as the border-color block above (the App Router doesn't order
+   the /learn segment's CSS chunks deterministically on a client-side navigation),
+   but a different casualty — and one layer up.
+
+   Fumadocs's mobile navbar (`#nd-subnav`) carries both a base `display:flex`
+   utility and a `md:hidden` (`display:none` at ≥48rem) utility. Both live in
+   `@layer utilities`, so which one wins on desktop is decided purely by their
+   source order within that layer. On a normal load Tailwind emits the responsive
+   `md:hidden` after the base `flex`, so the navbar is hidden on desktop. When the
+   reorder flips them, `flex` wins and the mobile navbar paints on desktop — as a
+   sticky bar whose height is `--fd-header-height` (0px on desktop), so its logo +
+   search + sidebar-toggle overflow a zero-height box and the top of the page
+   looks sliced off (the "negative top margin" / cut-off-header symptom), until a
+   hard refresh restores the server cascade.
+
+   The border fix could move one layer up (components > base) because its rival
+   sits in `@layer base`. This rival sits in `@layer utilities` — the top layer —
+   so the only thing that always beats it regardless of chunk order is an
+   *unlayered* rule (unlayered styles outrank every `@layer`). Re-assert the
+   desktop-hidden invariant here, scoped to ≥48rem so the navbar still shows on
+   mobile where it's the only nav. `#id` specificity is incidental — being
+   unlayered is what makes this win the cascade no matter how the chunks land.
+
+   The companion, root-cause mitigation is `experimental.cssChunking: 'strict'`
+   in next.config.ts, which makes the segment-CSS order deterministic in the
+   first place; this rule is the belt-and-suspenders that holds even if a chunk
+   ever slips through in the wrong order. */
+@media (min-width: 48rem) {
+  #nd-subnav {
+    display: none;
+  }
+}
+
 /* Override Fumadocs's default sans stack inside the /learn route with
    Inter and apply slightly tight letter-spacing for a more polished
    editorial feel. We scope to `body` (which is shared, but layout-CSS
