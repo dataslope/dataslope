@@ -22,18 +22,23 @@
     },
     "pages": [
         "index",
+        "---",
         "why-c-for-systems",
         "c-toolchain",
         "data-types-and-memory",
+        "---",
         "pointers",
         "arrays-and-pointers",
         "strings",
+        "---",
         "memory-layout",
         "stack-and-functions",
         "heap-and-dynamic-allocation",
+        "---",
         "structs-and-unions",
         "memory-bugs",
         "real-world-disasters",
+        "---",
         "next-steps"
     ]
 }

@@ -1,0 +1,81 @@
+/* Placeholder card for a not-yet-drawn line-art illustration.
+   Theme-aware via Fumadocs's --color-fd-* tokens so it reads cleanly on both
+   the light (#ffffff) and dark (#121212) lesson backgrounds. The dashed border
+   signals "to be illustrated" rather than a finished figure. */
+
+.placeholder {
+  margin: 1.5rem 0;
+  border: 1px dashed var(--color-fd-border);
+  border-radius: 0.625rem;
+  background-color: var(--color-fd-muted);
+  padding: 0.875rem 1rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-fd-muted-foreground);
+}
+
+.labelIcon {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.copyButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 0.375rem;
+  background-color: var(--color-fd-background);
+  color: var(--color-fd-muted-foreground);
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.copyButton:hover {
+  color: var(--color-fd-foreground);
+  background-color: var(--color-fd-accent);
+  border-color: var(--color-fd-accent-foreground);
+}
+
+.copyButton:focus-visible {
+  outline: 2px solid var(--ds-focus, var(--color-fd-ring));
+  outline-offset: 2px;
+}
+
+.copyIcon {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.prompt {
+  margin: 0;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--color-fd-foreground);
+  white-space: pre-wrap;
+  word-break: break-word;
+}

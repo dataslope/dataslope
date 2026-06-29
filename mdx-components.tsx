@@ -20,6 +20,7 @@ import MdxSqlCodeBlock from "@/app/_components/MdxSqlCodeBlock";
 import MdxMultipleChoiceQuestion from "@/app/_components/multipleChoice/MdxMultipleChoiceQuestion";
 import { Mermaid } from "@/app/_components/mdx/mermaid";
 import { SvgLabel } from "@/app/_components/mdx/SvgLabel";
+import { IllustrationPrompt } from "@/app/_components/mdx/IllustrationPrompt";
 import LoadingAnimationsGallery from "@/app/_components/mdx/loadingAnimations";
 import RuntimeLoadingStates from "@/app/_components/RuntimeBootNotice";
 
@@ -33,6 +34,7 @@ export function getMDXComponents(components?: MDXComponents): MDXComponents {
     MultipleChoice: MdxMultipleChoiceQuestion,
     Mermaid,
     SvgLabel,
+    IllustrationPrompt,
     LoadingAnimationsGallery,
     RuntimeLoadingStates,
     // Fumadocs Steps/Step — a numbered vertical walkthrough. Registered

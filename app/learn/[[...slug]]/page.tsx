@@ -23,6 +23,7 @@ import { getMDXComponents } from "@/mdx-components";
 import { OG_IMAGE } from "@/lib/site";
 import { getCourseMeta } from "@/lib/courseMeta";
 import { JsonLd } from "@/app/_components/JsonLd";
+import { MarkdownDescription } from "@/app/_components/MarkdownDescription";
 import {
   absUrl,
   breadcrumbLd,
@@ -104,7 +105,9 @@ export default async function LearnPage(props: LearnPageProps) {
       <JsonLd data={structuredData} />
       <DocsTitle>{page.data.title}</DocsTitle>
       {page.data.description ? (
-        <DocsDescription>{page.data.description}</DocsDescription>
+        <DocsDescription>
+          <MarkdownDescription>{page.data.description}</MarkdownDescription>
+        </DocsDescription>
       ) : null}
       {/* Inline styles (not Tailwind utilities) on purpose: `learn.css` runs
           Tailwind with `source(none)` and only scans Fumadocs's own dist, so

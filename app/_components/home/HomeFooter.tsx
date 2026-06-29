@@ -7,6 +7,7 @@ const GITHUB_URL = "https://github.com/dataslope/dataslope/";
 const DEV_LINKS = [
   { href: "/color-test", label: "Color Theme Test", external: false },
   { href: "/svg-gallery", label: "SVG Gallery", external: false },
+  { href: "/illustration-prompts", label: "Illustration Prompts", external: false },
   { href: "/magicui-demo", label: "Magic UI Demo", external: false },
 ];
 

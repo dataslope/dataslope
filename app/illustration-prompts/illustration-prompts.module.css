@@ -1,0 +1,292 @@
+/* Theme tokens mirror /svg-gallery: light is the default; `.dark` (toggled on
+   the root) swaps in the dark palette. Page background is pure white (#ffffff)
+   in light and #121212 in dark — the two backgrounds the illustrations must
+   read well on, and the ones named in every prompt. */
+.page {
+  --bg: #ffffff;
+  --fg: #111827;
+  --muted: #4b5563;
+  --faint: #9ca3af;
+  --border: #e5e7eb;
+  --border-soft: #f3f4f6;
+  --link: var(--ds-blue-ink, #1d4ed8);
+  --card-bg: #fcfcfd;
+  --btn-bg: #ffffff;
+  --btn-hover: #f3f4f6;
+  --badge-bg: #eef2ff;
+  --badge-fg: #4338ca;
+  --badge-muted-bg: #f3f4f6;
+  --badge-muted-fg: #6b7280;
+
+  box-sizing: border-box;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans, system-ui, sans-serif);
+}
+
+.page.dark {
+  --bg: #121212;
+  --fg: #e6e6e6;
+  --muted: #a3a3a3;
+  --faint: #6b6b6b;
+  --border: #2a2a2a;
+  --border-soft: #1f1f1f;
+  --link: var(--ds-blue-400, #5ba7ff);
+  --card-bg: #181818;
+  --btn-bg: #1c1c1c;
+  --btn-hover: #262626;
+  --badge-bg: #1e1b4b;
+  --badge-fg: #c7d2fe;
+  --badge-muted-bg: #242424;
+  --badge-muted-fg: #9ca3af;
+}
+
+.inner {
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 5rem;
+  max-width: 860px;
+}
+
+.header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin: 0.75rem 0 0;
+  max-width: 64ch;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.subtitle code {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.85em;
+}
+
+.count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.themeToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--btn-bg);
+  color: var(--fg);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.themeToggle:hover {
+  background: var(--btn-hover);
+}
+
+/* ── Sections (People / Objects & scenes) ───────────────────────────────── */
+.section {
+  margin-top: 3rem;
+}
+
+.section:first-of-type {
+  margin-top: 1.5rem;
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+  margin: 0 0 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-soft);
+  font-size: 1.2rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.sectionCount {
+  margin-left: auto;
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--faint);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ── Prompt card ────────────────────────────────────────────────────────── */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 1rem 1.1rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--card-bg);
+  scroll-margin-top: 1.5rem;
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.fileWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.file {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--fg);
+  word-break: break-all;
+  user-select: all;
+}
+
+.badge {
+  flex-shrink: 0;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.badgePhoto {
+  background: var(--badge-bg);
+  color: var(--badge-fg);
+}
+
+.badgeNoPhoto {
+  background: var(--badge-muted-bg);
+  color: var(--badge-muted-fg);
+}
+
+.prompt {
+  margin: 0;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--muted);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.cardBottom {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.usages {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+  font-size: 0.8rem;
+}
+
+.usagesLabel {
+  color: var(--faint);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.usage {
+  color: var(--link);
+  text-decoration: none;
+}
+
+.usage:hover {
+  text-decoration: underline;
+}
+
+.usageCourse {
+  color: var(--muted);
+}
+
+/* Icon-only button (copy file name). */
+.iconBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  background: var(--btn-bg);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.iconBtn:hover {
+  background: var(--btn-hover);
+  color: var(--fg);
+}
+
+/* Labelled button (copy prompt). */
+.copyPrompt {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  align-self: flex-end;
+  margin-left: auto;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: var(--btn-bg);
+  color: var(--fg);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.copyPrompt:hover {
+  background: var(--btn-hover);
+}
+
+.empty {
+  margin-top: 2rem;
+  color: var(--muted);
+}
