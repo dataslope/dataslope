@@ -39,6 +39,9 @@ declare global {
     GITHUB_CLIENT_SECRET?: string;
     // Resend API key; when set, email verification + password reset turn on.
     RESEND_API_KEY?: string;
+    // Comma-separated Better Auth user IDs granted admin access to /admin
+    // (regardless of their `role` column). Bootstraps the first admin.
+    ADMIN_USER_IDS?: string;
   }
 }
 

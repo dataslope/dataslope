@@ -13,7 +13,7 @@
  */
 import { useState } from "react";
 import { Menu } from "@base-ui-components/react/menu";
-import { LogOut, User as UserIcon } from "lucide-react";
+import { LogOut, Shield, User as UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "../Link";
 import { signOut, useSession } from "@/lib/auth/client";
@@ -64,6 +64,10 @@ export function AuthMenu() {
   }
 
   const { user } = session;
+  // Role-based admins see a shortcut to /admin. `adminUserIds` admins (pinned
+  // by config, role still "user") won't see the link but can navigate directly;
+  // either way the dashboard's actions are server-enforced.
+  const isAdmin = user.role === "admin";
 
   async function handleSignOut() {
     setSigningOut(true);
@@ -99,6 +103,15 @@ export function AuthMenu() {
               <UserIcon size={16} />
               Account
             </Menu.Item>
+            {isAdmin && (
+              <Menu.Item
+                className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[var(--ds-gray-900)] outline-none transition-colors data-[highlighted]:bg-[var(--ds-gray-100)] dark:text-white dark:data-[highlighted]:bg-white/10"
+                render={<Link href="/admin" />}
+              >
+                <Shield size={16} />
+                Admin
+              </Menu.Item>
+            )}
             <Menu.Item
               className="flex cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-[var(--ds-gray-900)] outline-none transition-colors data-[highlighted]:bg-[var(--ds-gray-100)] dark:text-white dark:data-[highlighted]:bg-white/10"
               onClick={handleSignOut}

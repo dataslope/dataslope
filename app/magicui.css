@@ -32,6 +32,7 @@
 @source "./magicui-demo/**/*.{ts,tsx}";
 @source "./_components/home/**/*.{ts,tsx}";
 @source "./_components/legal/**/*.{ts,tsx}";
+@source "./admin/**/*.{ts,tsx}";
 
 /* Class-based dark mode (a `.dark` ancestor), matching the rest of the app. */
 @custom-variant dark (&:is(.dark *));

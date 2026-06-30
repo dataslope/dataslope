@@ -11,8 +11,14 @@
  * no `baseURL` is needed here.
  */
 import { createAuthClient } from "better-auth/react";
+import { adminClient } from "better-auth/client/plugins";
 
-export const authClient = createAuthClient();
+export const authClient = createAuthClient({
+  // Mirrors the server-side `admin` plugin (lib/auth/server.ts): adds the
+  // `admin.*` actions (listUsers / removeUser / banUser / …) used by the
+  // /admin dashboard and the `role`/`banned` fields on the session user.
+  plugins: [adminClient()],
+});
 
 export const {
   signIn,

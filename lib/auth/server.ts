@@ -21,8 +21,25 @@
  * route handlers / server components instead.
  */
 import { betterAuth } from "better-auth";
+import { admin } from "better-auth/plugins";
 import { D1Dialect } from "kysely-d1";
 import { resetPasswordEmail, sendEmail, verifyEmail } from "@/lib/auth/email";
+
+/**
+ * Parse the `ADMIN_USER_IDS` secret (a comma-separated list of Better Auth user
+ * IDs) into the form the admin plugin expects. These users are treated as
+ * admins regardless of their `role` column, which solves the bootstrap problem:
+ * there's no admin to promote the first admin, so the first one is pinned by
+ * config. Once someone is an admin they can promote others by setting
+ * `role = 'admin'` (in the dashboard or directly in D1).
+ */
+function parseAdminUserIds(raw: string | undefined): string[] {
+  if (!raw) return [];
+  return raw
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
+}
 
 /** Build a request-scoped Better Auth instance bound to this request's D1. */
 export function createAuth(env: CloudflareEnv) {
@@ -90,6 +107,16 @@ export function createAuth(env: CloudflareEnv) {
         }
       : undefined,
     socialProviders,
+    // Admin capabilities (list/remove/ban users) for the gated /admin
+    // dashboard. The `removeUser` action is a hard delete: it drops the `user`
+    // row, which cascades to that user's `session` + `account` rows (see the
+    // ON DELETE CASCADE in migrations/0001) and frees their unique email — so a
+    // removed user can immediately sign up again with OAuth or email/password.
+    // Authorization is enforced *server-side* on every `admin.*` endpoint, so
+    // the dashboard staying a statically-prerendered, client-read page (the
+    // codebase's "auth gates actions, not content" rule) is still safe: a
+    // non-admin who loads /admin simply gets 403s and an empty screen.
+    plugins: [admin({ adminUserIds: parseAdminUserIds(env.ADMIN_USER_IDS) })],
     session: {
       // Cache the session in a short-lived signed cookie so the common
       // "who am I" check is served from the cookie instead of a D1 read on
