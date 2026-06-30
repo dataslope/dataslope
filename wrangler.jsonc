@@ -44,7 +44,7 @@
     {
       "binding": "DB",
       "database_name": "dataslope-auth",
-      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "database_id": "827500a4-7853-4da0-98dd-70ffe6473d41",
       "migrations_dir": "migrations"
     }
   ],
