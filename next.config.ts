@@ -44,8 +44,10 @@ const nextConfig: NextConfig = {
     // The scoped re-assertions in app/learn/learn.css remain as defense in depth.
     cssChunking: "strict",
     // Keep prefetched/visited route payloads reusable in the client router
-    // cache so re-hovers and back/forward navigations don't re-hit the edge
-    // (every edge-cache miss is a billed ISR Read on Vercel). Lessons are
+    // cache so re-hovers and back/forward navigations don't re-fetch the same
+    // payload from the edge. (Historically this also mattered to avoid billed
+    // ISR Reads on Vercel; on Cloudflare those payloads are free static
+    // assets, but reusing them still trims redundant requests.) Lessons are
     // fully static and only change on deploy, so long client-side staleness
     // is safe. `dynamic` applies to links without an explicit `prefetch`
     // prop, `static` to `prefetch={true}` links.

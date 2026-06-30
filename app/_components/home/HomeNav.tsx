@@ -266,7 +266,6 @@ export function HomeNav() {
           </Link>
           <Link
             href="/interview"
-            prefetch={false}
             className="rounded-lg px-3 py-2 text-sm font-medium text-[#121212] transition-colors hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]"
           >
             Interview Prep
@@ -274,7 +273,6 @@ export function HomeNav() {
           <PlaygroundMenu />
           <Link
             href="/pricing"
-            prefetch={false}
             className="rounded-lg px-3 py-2 text-sm font-medium text-[#121212] transition-colors hover:text-[var(--ds-blue-700)] dark:text-white dark:hover:text-[var(--ds-blue-400)]"
           >
             Pricing
