@@ -28,6 +28,8 @@ declare global {
 
     // --- vars (wrangler.jsonc) ---
     BETTER_AUTH_URL: string;
+    // From address for transactional email (must be on a Resend-verified domain).
+    EMAIL_FROM?: string;
 
     // --- secrets (set via `wrangler secret put`, absent from wrangler.jsonc) ---
     BETTER_AUTH_SECRET?: string;
@@ -35,6 +37,8 @@ declare global {
     GOOGLE_CLIENT_SECRET?: string;
     GITHUB_CLIENT_ID?: string;
     GITHUB_CLIENT_SECRET?: string;
+    // Resend API key; when set, email verification + password reset turn on.
+    RESEND_API_KEY?: string;
   }
 }
 

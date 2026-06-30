@@ -34,6 +34,7 @@ export default function robots(): MetadataRoute.Robots {
           // (also marked `robots: { index: false }` in their metadata).
           "/sign-in",
           "/account",
+          "/reset-password",
           "/learn.md",
           "/learn/*.md$",
         ],

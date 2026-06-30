@@ -22,6 +22,7 @@
  */
 import { betterAuth } from "better-auth";
 import { D1Dialect } from "kysely-d1";
+import { resetPasswordEmail, sendEmail, verifyEmail } from "@/lib/auth/email";
 
 /** Build a request-scoped Better Auth instance bound to this request's D1. */
 export function createAuth(env: CloudflareEnv) {
@@ -44,6 +45,9 @@ export function createAuth(env: CloudflareEnv) {
     };
   }
 
+  // Email verification + password reset only turn on once a sender is wired up.
+  const emailConfigured = Boolean(env.RESEND_API_KEY);
+
   return betterAuth({
     // D1 via the Kysely SQLite dialect — the most Cloudflare-native path, with
     // full ownership of the tables (schema in /migrations). One dialect per
@@ -61,16 +65,30 @@ export function createAuth(env: CloudflareEnv) {
     // in the `account` table (providerId "credential") — the existing schema
     // already has the `password` column, so no migration change is needed.
     //
-    // Email verification and password reset are left OFF until a transactional
-    // email provider is wired up (Resend/Postmark or Cloudflare Email Routing):
-    // both flows require a `sendVerificationEmail`/`sendResetPassword` sender,
-    // and turning them on without one would hand users a dead end. New accounts
-    // are signed in immediately (autoSignIn default). The "forgot password"
-    // flow can be enabled once that sender exists.
+    // Verification + reset are gated on a configured email sender (Resend, via
+    // RESEND_API_KEY). This is fail-safe: with no key set, password sign-in
+    // still works exactly as before and the reset/verify flows are simply
+    // inert, so a missing key can never lock everyone out. Once the key is set,
+    // new sign-ups must verify their email before they can sign in, and the
+    // forgot-password flow goes live. See lib/auth/email.ts.
     emailAndPassword: {
       enabled: true,
-      requireEmailVerification: false,
+      requireEmailVerification: emailConfigured,
+      sendResetPassword: emailConfigured
+        ? async ({ user, url }) => {
+            await sendEmail(env, { to: user.email, ...resetPasswordEmail(url) });
+          }
+        : undefined,
     },
+    emailVerification: emailConfigured
+      ? {
+          sendOnSignUp: true,
+          autoSignInAfterVerification: true,
+          sendVerificationEmail: async ({ user, url }) => {
+            await sendEmail(env, { to: user.email, ...verifyEmail(url) });
+          },
+        }
+      : undefined,
     socialProviders,
     session: {
       // Cache the session in a short-lived signed cookie so the common

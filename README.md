@@ -86,7 +86,22 @@ To change how long stale/preview cache lingers, edit `THRESHOLD_DAYS` in the wor
 
 Accounts are powered by [Better Auth](https://better-auth.com) running inside the app Worker, with **Cloudflare D1** (edge SQLite) as the user/session store. Sign-in is available via **Google + GitHub** social login and **email + password**. This is the accounts layer from `agent-outputs/20260621-1733-feature-expansion-auth-membership-seo-persistence.md` (Q1).
 
-> **Email verification and password reset are intentionally off** until a transactional email provider (Resend/Postmark or Cloudflare Email Routing) is wired up — both flows need a sender, and enabling them without one would be a dead end. Passwords are hashed by Better Auth and stored in the existing `account` table (no schema change), so the migration below already covers email/password. Add the `sendResetPassword`/`sendVerificationEmail` senders in `lib/auth/server.ts` to turn those flows on.
+Email verification and password reset are sent via **[Resend](https://resend.com)** (`lib/auth/email.ts`) — a single authenticated `fetch`, which is what the Workers runtime supports (no SMTP/TCP sockets). Passwords are hashed by Better Auth and stored in the existing `account` table, so no schema change was needed.
+
+> **These flows are gated on `RESEND_API_KEY` being set** (`lib/auth/server.ts`). This is fail-safe: with no key, password sign-in works exactly as before and verification/reset are inert — a missing key can never lock everyone out. **Once the key is set, new sign-ups must verify their email before signing in**, and the forgot-password flow (`/reset-password`) goes live. To switch providers later (e.g. AWS SES via `aws4fetch`), change only `sendEmail` in `lib/auth/email.ts`.
+
+To enable verification + reset:
+
+1. Create a Resend account, **verify your sending domain** (add the SPF/DKIM DNS records Resend shows), and create an API key.
+2. Set the key and From address:
+
+   ```bash
+   npx wrangler secret put RESEND_API_KEY
+   # EMAIL_FROM is a non-secret var in wrangler.jsonc — change it to an address
+   # on your verified domain (default: "Dataslope <no-reply@dataslope.com>").
+   ```
+
+   For local dev, add `RESEND_API_KEY` (and optionally `EMAIL_FROM`) to `.dev.vars`. Before a domain is verified, Resend only delivers to your own account address via the `onboarding@resend.dev` sandbox From.
 
 Auth gates **actions, never content**: every `/learn` lesson, exercise, and playground stays free and statically prerendered with no session. Signing in only unlocks per-user features (cloud saves, sharing, AI). The session is read client-side (`lib/auth/client.ts`), so anonymous readers still receive the exact same cached static HTML.
 
@@ -146,6 +161,7 @@ GOOGLE_CLIENT_ID="…"
 GOOGLE_CLIENT_SECRET="…"
 GITHUB_CLIENT_ID="…"
 GITHUB_CLIENT_SECRET="…"
+RESEND_API_KEY="…"   # optional; enables email verification + password reset
 ```
 
 The Cloudflare bindings interface (`CloudflareEnv`, used by `getCloudflareContext()`) is **hand-maintained** in `cloudflare-env.d.ts` — keep it in sync with `wrangler.jsonc` by hand when you add a binding. We don't commit `wrangler types`' output there because it inlines the full workerd runtime type surface (a global `Response`, `fetch`, …) that conflicts with this app's DOM types; the file's header comment explains the trade-off. `npm run cf-typegen` still works but writes to a gitignored scratch file for reference only.

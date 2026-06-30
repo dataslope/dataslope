@@ -4,7 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "../_components/Link";
 import { GitHubIcon } from "../_components/home/icons";
-import { signIn, signUp, useSession } from "@/lib/auth/client";
+import {
+  requestPasswordReset,
+  signIn,
+  signUp,
+  useSession,
+} from "@/lib/auth/client";
 
 /** Where to land after a successful sign-in. */
 const CALLBACK_URL = "/account";
@@ -66,37 +71,94 @@ const INPUT_CLASS =
 /** Minimum password length — mirrors Better Auth's default (`minPasswordLength`). */
 const MIN_PASSWORD = 8;
 
-/** Email + password form with a sign-in / create-account toggle. Sign-up
- *  additionally collects a name (the user table requires it). On success the
- *  user is signed in and sent to the account page. */
+type Mode = "signin" | "signup" | "forgot";
+
+const SUBMIT_LABEL: Record<Mode, [idle: string, busy: string]> = {
+  signin: ["Sign in", "Signing in…"],
+  signup: ["Create account", "Creating account…"],
+  forgot: ["Send reset link", "Sending…"],
+};
+
+/** Email + password form spanning three modes: sign in, create account, and
+ *  request a password reset. Sign-up also collects a name (the user table
+ *  requires it). Success paths:
+ *   - sign in   → session set, redirect to /account
+ *   - sign up   → if verification is required, show a "check your email" notice
+ *                 and switch to sign-in; otherwise redirect to /account
+ *   - forgot    → always show a neutral "if an account exists…" notice
+ *  Verification + reset only do anything once RESEND_API_KEY is configured
+ *  server-side; until then those calls surface a friendly error. */
 function EmailPasswordForm({ disabled }: { disabled: boolean }) {
   const router = useRouter();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<Mode>("signin");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  function switchMode(next: Mode) {
+    setMode(next);
+    setError(null);
+    setNotice(null);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setNotice(null);
     setSubmitting(true);
-    const { error } =
-      mode === "signup"
-        ? await signUp.email({ name, email, password, callbackURL: CALLBACK_URL })
-        : await signIn.email({ email, password, callbackURL: CALLBACK_URL });
-    if (error) {
-      setError(error.message ?? "Something went wrong. Please try again.");
+
+    if (mode === "forgot") {
+      // Fire-and-forget: show the same neutral message whether or not the email
+      // exists, so the form can't be used to probe which addresses are registered.
+      await requestPasswordReset({ email, redirectTo: "/reset-password" });
+      setNotice("If an account exists for that email, a reset link is on its way.");
       setSubmitting(false);
       return;
     }
+
+    const { data, error } =
+      mode === "signup"
+        ? await signUp.email({ name, email, password, callbackURL: CALLBACK_URL })
+        : await signIn.email({ email, password, callbackURL: CALLBACK_URL });
+
+    if (error) {
+      // When verification is required, an unverified sign-in is rejected and a
+      // fresh verification email is sent — tell the user to check their inbox.
+      if (error.code === "EMAIL_NOT_VERIFIED") {
+        setNotice(
+          "Please verify your email first. We've sent you a new verification link.",
+        );
+      } else {
+        setError(error.message ?? "Something went wrong. Please try again.");
+      }
+      setSubmitting(false);
+      return;
+    }
+
+    // Sign-up with verification required returns no active session — prompt to
+    // verify rather than redirecting into a gated page.
+    if (mode === "signup" && data && !("token" in data && data.token)) {
+      setPassword("");
+      switchMode("signin"); // clears notice…
+      setNotice(
+        "Account created. Check your email for a verification link, then sign in.",
+      ); // …so set it after the switch
+      setSubmitting(false);
+      return;
+    }
+
     // Session is set; surface it on /account (and re-render the header).
     router.push(CALLBACK_URL);
     router.refresh();
   }
 
   const isSignup = mode === "signup";
+  const isForgot = mode === "forgot";
+  const [idleLabel, busyLabel] = SUBMIT_LABEL[mode];
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       {isSignup && (
@@ -121,21 +183,43 @@ function EmailPasswordForm({ disabled }: { disabled: boolean }) {
         disabled={disabled || submitting}
         className={INPUT_CLASS}
       />
-      <input
-        type="password"
-        required
-        minLength={MIN_PASSWORD}
-        autoComplete={isSignup ? "new-password" : "current-password"}
-        placeholder={isSignup ? `Password (${MIN_PASSWORD}+ characters)` : "Password"}
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        disabled={disabled || submitting}
-        className={INPUT_CLASS}
-      />
+      {!isForgot && (
+        <input
+          type="password"
+          required
+          minLength={MIN_PASSWORD}
+          autoComplete={isSignup ? "new-password" : "current-password"}
+          placeholder={
+            isSignup ? `Password (${MIN_PASSWORD}+ characters)` : "Password"
+          }
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          disabled={disabled || submitting}
+          className={INPUT_CLASS}
+        />
+      )}
+
+      {mode === "signin" && (
+        <button
+          type="button"
+          onClick={() => switchMode("forgot")}
+          className="-mt-1 self-end text-xs font-medium text-[var(--ds-blue-600)] hover:underline dark:text-[var(--ds-blue-400)]"
+        >
+          Forgot password?
+        </button>
+      )}
 
       {error && (
         <p role="alert" className="text-sm text-[var(--ds-red-600,#dc2626)]">
           {error}
+        </p>
+      )}
+      {notice && (
+        <p
+          role="status"
+          className="rounded-lg bg-[var(--ds-blue-50,#eff6ff)] px-3 py-2 text-sm text-[var(--ds-blue-700)] dark:bg-[var(--ds-blue-400)]/10 dark:text-[var(--ds-blue-300)]"
+        >
+          {notice}
         </p>
       )}
 
@@ -144,27 +228,30 @@ function EmailPasswordForm({ disabled }: { disabled: boolean }) {
         disabled={disabled || submitting}
         className="inline-flex w-full items-center justify-center rounded-xl bg-[var(--ds-blue-600)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--ds-blue-700)] disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {submitting
-          ? isSignup
-            ? "Creating account…"
-            : "Signing in…"
-          : isSignup
-            ? "Create account"
-            : "Sign in"}
+        {submitting ? busyLabel : idleLabel}
       </button>
 
       <p className="text-center text-sm text-[var(--ds-gray-500)]">
-        {isSignup ? "Already have an account?" : "New to Dataslope?"}{" "}
-        <button
-          type="button"
-          onClick={() => {
-            setMode(isSignup ? "signin" : "signup");
-            setError(null);
-          }}
-          className="font-medium text-[var(--ds-blue-600)] hover:underline dark:text-[var(--ds-blue-400)]"
-        >
-          {isSignup ? "Sign in" : "Create one"}
-        </button>
+        {isForgot ? (
+          <button
+            type="button"
+            onClick={() => switchMode("signin")}
+            className="font-medium text-[var(--ds-blue-600)] hover:underline dark:text-[var(--ds-blue-400)]"
+          >
+            Back to sign in
+          </button>
+        ) : (
+          <>
+            {isSignup ? "Already have an account?" : "New to Dataslope?"}{" "}
+            <button
+              type="button"
+              onClick={() => switchMode(isSignup ? "signin" : "signup")}
+              className="font-medium text-[var(--ds-blue-600)] hover:underline dark:text-[var(--ds-blue-400)]"
+            >
+              {isSignup ? "Sign in" : "Create one"}
+            </button>
+          </>
+        )}
       </p>
     </form>
   );
