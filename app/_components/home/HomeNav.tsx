@@ -1,11 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Menu } from "@base-ui-components/react/menu";
 import { Dialog } from "@base-ui-components/react/dialog";
-import { ChevronDown, Menu as Hamburger, Moon, Sun, X } from "lucide-react";
+import {
+  ChevronDown,
+  LogOut,
+  Menu as Hamburger,
+  Moon,
+  Sun,
+  User as UserIcon,
+  X,
+} from "lucide-react";
+import { signOut, useSession } from "@/lib/auth/client";
 import type { IconType } from "react-icons";
 import Link from "../Link";
+import { AuthMenu } from "../auth/AuthMenu";
 import { GitHubIcon } from "./icons";
 import { PLAYGROUNDS } from "../playgrounds";
 import {
@@ -128,6 +139,56 @@ function BrandLogo() {
   );
 }
 
+/** Auth block for the mobile drawer: a "Sign in" link when signed out, or the
+ *  account name + Account/Sign-out actions when signed in. Full-width rows
+ *  rather than the desktop avatar dropdown, to match the drawer's nav items. */
+function MobileAuthSection() {
+  const { data: session, isPending } = useSession();
+  const router = useRouter();
+  const rowClass =
+    "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--ds-gray-800)] transition-colors hover:bg-[var(--ds-gray-100)] hover:text-[var(--ds-gray-900)] dark:text-[var(--ds-gray-100)] dark:hover:bg-white/10";
+
+  if (isPending || !session) {
+    return (
+      <Dialog.Close
+        render={<Link href="/sign-in" prefetch={false} />}
+        className={rowClass}
+      >
+        <UserIcon size={16} />
+        Sign in
+      </Dialog.Close>
+    );
+  }
+
+  return (
+    <>
+      <div className="px-3 py-1.5 text-xs text-[var(--ds-gray-500)]">
+        Signed in as{" "}
+        <span className="font-medium text-[var(--ds-gray-800)] dark:text-[var(--ds-gray-200)]">
+          {session.user.email}
+        </span>
+      </div>
+      <Dialog.Close
+        render={<Link href="/account" prefetch={false} />}
+        className={rowClass}
+      >
+        <UserIcon size={16} />
+        Account
+      </Dialog.Close>
+      <button
+        type="button"
+        onClick={() => {
+          void signOut().then(() => router.refresh());
+        }}
+        className={`${rowClass} w-full text-left`}
+      >
+        <LogOut size={16} />
+        Sign out
+      </button>
+    </>
+  );
+}
+
 /** Mobile slide-in drawer (a Base UI Dialog presented as a right-edge
  *  drawer) holding the same navigation the desktop bar exposes inline. */
 function MobileDrawer() {
@@ -197,6 +258,10 @@ function MobileDrawer() {
                 {p.label}
               </Dialog.Close>
             ))}
+
+            <div className="mt-2 border-t border-[var(--ds-gray-200)] pt-2 dark:border-white/10">
+              <MobileAuthSection />
+            </div>
           </div>
 
           <div className="mt-3 flex items-center justify-between border-t border-[var(--ds-gray-200)] pt-3 dark:border-white/10">
@@ -283,6 +348,11 @@ export function HomeNav() {
         <div className="flex items-center justify-end gap-1">
           <ThemeToggle />
           <GitHubLink />
+          {/* Desktop-only: the mobile drawer carries its own auth control so
+              this one isn't crammed next to the hamburger on small screens. */}
+          <span className="ds-nav-auth">
+            <AuthMenu />
+          </span>
           <MobileDrawer />
         </div>
       </nav>

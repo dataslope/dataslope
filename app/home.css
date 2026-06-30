@@ -65,6 +65,18 @@ html.dark .ds-home {
   }
 }
 
+/* Header auth control (Sign in / avatar menu): desktop-only, mirroring the
+ * nav menu. Below md the mobile drawer carries its own auth control, so this
+ * one hides to avoid doubling up next to the hamburger. */
+.ds-home .ds-nav-auth {
+  display: none;
+}
+@media (min-width: 768px) {
+  .ds-home .ds-nav-auth {
+    display: inline-flex;
+  }
+}
+
 /* Footer: one column on mobile, three from sm up. Driven by a scoped rule
  * (rather than Tailwind grid utilities) so a leaked `.grid`/`grid-cols-*`
  * from /learn can't collapse it back to the wrong column count. */
