@@ -146,7 +146,9 @@ export default function Home() {
         <ul className={styles.list}>
           {CARDS.map((card) => (
             <li key={card.id}>
-              <Link href={card.href} className={styles.card}>
+              {/* Dense index list — don't viewport-prefetch every card (see
+                  the opt-out note in app/_components/Link.tsx). */}
+              <Link href={card.href} prefetch={false} className={styles.card}>
                 <span className={styles.logo}>
                   <LanguageLogo id={card.id} />
                 </span>

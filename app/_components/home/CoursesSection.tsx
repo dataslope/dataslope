@@ -116,6 +116,9 @@ export function CoursesSection({ courses }: { courses: Course[] }) {
             <Link
               key={slug}
               href={`/learn/${slug}`}
+              // Dense index grid — don't viewport-prefetch every course card
+              // (see the opt-out note in app/_components/Link.tsx).
+              prefetch={false}
               className="group flex items-center justify-between gap-4 rounded-xl border border-[var(--ds-gray-200)] bg-white p-5 transition-colors hover:border-[var(--ds-blue-300)] hover:bg-[var(--ds-gray-50)] dark:border-white/10 dark:bg-white/5 dark:hover:border-white/20 dark:hover:bg-white/[0.07]"
             >
               <span className="flex min-w-0 flex-col gap-2.5">
