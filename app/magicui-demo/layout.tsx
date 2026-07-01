@@ -1,6 +1,6 @@
 // Opt this route into Tailwind + the Magic UI components. Importing the shared
-// stylesheet here scopes it to the /magicui-demo bundle (see app/magicui.css).
-import "@/app/magicui.css";
+// stylesheet here scopes it to the /magicui-demo bundle (see app/tailwind.css).
+import "@/app/tailwind.css";
 
 import type { Metadata } from "next";
 

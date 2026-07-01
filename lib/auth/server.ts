@@ -138,6 +138,31 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
     // request; set BETTER_AUTH_URL (wrangler `vars`, or `.dev.vars` locally)
     // when the deployed origin must be pinned.
     baseURL: env.BETTER_AUTH_URL,
+    // CSRF origin allow-list. Better Auth always trusts `baseURL` (pinned to
+    // https://dataslope.com so OAuth callbacks resolve). Preview deployments,
+    // though, are served from the account's *.workers.dev subdomain, which is
+    // therefore NOT trusted — so email/password sign-in and sign-up on a preview
+    // fail the origin check with "Invalid origin". Trust the request's own
+    // origin when it's a workers.dev host, so previews work without per-URL
+    // config, plus any explicit TRUSTED_ORIGINS extras (custom preview/staging
+    // domains). This function's result is merged with the defaults, so baseURL
+    // stays trusted. It's not a production CSRF hole: production runs on the
+    // custom domain (never the workers.dev branch), and session cookies are
+    // SameSite=Lax. NOTE: social login still can't *complete* on a preview —
+    // its OAuth redirect_uri is pinned to baseURL, so Google/GitHub return to
+    // production; use email/password to exercise auth on a preview URL.
+    trustedOrigins: (req) => {
+      const origins = parseList(env.TRUSTED_ORIGINS);
+      try {
+        if (req) {
+          const { origin, hostname } = new URL(req.url);
+          if (hostname.endsWith(".workers.dev")) origins.push(origin);
+        }
+      } catch {
+        // A request without a parseable URL contributes no extra origin.
+      }
+      return origins;
+    },
     // Email + password sign-in. Passwords are hashed by Better Auth and stored
     // in the `account` table (providerId "credential") — the existing schema
     // already has the `password` column, so no migration change is needed.

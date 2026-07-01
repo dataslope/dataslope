@@ -30,6 +30,10 @@ declare global {
     BETTER_AUTH_URL: string;
     // From address for transactional email (must be on a Resend-verified domain).
     EMAIL_FROM?: string;
+    // Extra CSRF-trusted origins (comma-separated), on top of BETTER_AUTH_URL
+    // and the auto-trusted *.workers.dev preview origins. For custom preview or
+    // staging domains. See `trustedOrigins` in lib/auth/server.ts.
+    TRUSTED_ORIGINS?: string;
 
     // --- secrets (set via `wrangler secret put`, absent from wrangler.jsonc) ---
     // Required (not optional): signs the OAuth `state` + session cookies, so it

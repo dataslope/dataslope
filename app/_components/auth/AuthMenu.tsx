@@ -30,7 +30,7 @@ function Avatar({ image, name }: { image?: string | null; name?: string | null }
         src={image}
         alt=""
         aria-hidden="true"
-        className="size-7 rounded-full object-cover"
+        className="size-6 rounded-full object-cover"
         referrerPolicy="no-referrer"
       />
     );
@@ -39,7 +39,7 @@ function Avatar({ image, name }: { image?: string | null; name?: string | null }
   return (
     <span
       aria-hidden="true"
-      className="flex size-7 items-center justify-center rounded-full bg-[var(--ds-blue-600)] text-xs font-semibold text-white"
+      className="flex size-6 items-center justify-center rounded-full bg-[var(--ds-blue-600)] text-xs font-semibold text-white"
     >
       {initial}
     </span>

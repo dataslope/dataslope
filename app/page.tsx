@@ -1,8 +1,8 @@
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 // Opt the home route into Tailwind + the Magic UI components. Importing the
-// shared stylesheet here scopes it to the home page bundle (see app/magicui.css).
-import "@/app/magicui.css";
+// shared stylesheet here scopes it to the home page bundle (see app/tailwind.css).
+import "@/app/tailwind.css";
 // Home-only hardening against /learn's global styles leaking in after a
 // client-side back-navigation (see app/home.css).
 import "@/app/home.css";
