@@ -1,0 +1,299 @@
+/* Self-contained styles for the "Ask AI" widget. Uses plain CSS (a CSS module)
+   with explicit light/dark values so it renders identically on the Tailwind-based
+   /learn pages and the plain-CSS /playground pages, without depending on either
+   surface's tokens. `:global(html.dark)` follows the site's dark-mode class. */
+
+.launcher {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 9999px;
+  background: var(--ds-blue-600, #1f6feb);
+  color: #fff;
+  font-family: var(--font-sans, system-ui, sans-serif);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.launcher:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.24);
+}
+
+.panel {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 61;
+  display: flex;
+  flex-direction: column;
+  width: min(400px, calc(100vw - 32px));
+  height: min(620px, calc(100vh - 40px));
+  background: #fff;
+  color: #1a1a1a;
+  border: 1px solid #e2e5e9;
+  border-radius: 16px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.22);
+  font-family: var(--font-sans, system-ui, sans-serif);
+  overflow: hidden;
+}
+:global(html.dark) .panel {
+  background: #1a1a1a;
+  color: #e8eaed;
+  border-color: #2c2c2c;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #eceef1;
+}
+:global(html.dark) .header {
+  border-bottom-color: #2c2c2c;
+}
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.badge {
+  margin-left: 2px;
+  padding: 1px 7px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  background: #eef2f7;
+  color: #55606e;
+}
+:global(html.dark) .badge {
+  background: #26303c;
+  color: #9fb4cc;
+}
+.badgePro {
+  background: #ecfdf3;
+  color: #1a7f47;
+}
+:global(html.dark) .badgePro {
+  background: #10281a;
+  color: #4ade80;
+}
+.headerSpacer {
+  flex: 1;
+}
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.iconButton:hover {
+  opacity: 1;
+  background: rgba(127, 127, 127, 0.12);
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.empty {
+  margin: auto;
+  text-align: center;
+  max-width: 260px;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.msg {
+  max-width: 100%;
+  font-size: 13.5px;
+  line-height: 1.55;
+  word-wrap: break-word;
+}
+.user {
+  align-self: flex-end;
+  max-width: 85%;
+  padding: 8px 12px;
+  border-radius: 14px 14px 4px 14px;
+  background: var(--ds-blue-600, #1f6feb);
+  color: #fff;
+  white-space: pre-wrap;
+}
+.assistant {
+  align-self: flex-start;
+  max-width: 100%;
+}
+/* Markdown niceties inside an assistant message. */
+.assistant :where(p) {
+  margin: 0 0 8px;
+}
+.assistant :where(p):last-child {
+  margin-bottom: 0;
+}
+.assistant :where(pre) {
+  margin: 8px 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f4f6f8;
+  overflow-x: auto;
+  font-size: 12.5px;
+}
+:global(html.dark) .assistant :where(pre) {
+  background: #0f1216;
+}
+.assistant :where(code) {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.92em;
+}
+.assistant :where(:not(pre) > code) {
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: rgba(127, 127, 127, 0.16);
+}
+.assistant :where(ul, ol) {
+  margin: 0 0 8px;
+  padding-left: 20px;
+}
+.assistant :where(a) {
+  color: var(--ds-blue-600, #1f6feb);
+  text-decoration: underline;
+}
+
+.caret {
+  display: inline-block;
+  width: 7px;
+  height: 14px;
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  background: currentColor;
+  opacity: 0.6;
+  animation: blink 1s steps(2, start) infinite;
+}
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.error {
+  align-self: stretch;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: #b42318;
+  font-size: 12.5px;
+}
+:global(html.dark) .error {
+  background: #2a1414;
+  color: #f4a3a3;
+}
+
+.footer {
+  border-top: 1px solid #eceef1;
+  padding: 10px;
+}
+:global(html.dark) .footer {
+  border-top-color: #2c2c2c;
+}
+.inputRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+.textarea {
+  flex: 1;
+  resize: none;
+  max-height: 120px;
+  padding: 8px 10px;
+  border: 1px solid #d7dbe0;
+  border-radius: 10px;
+  background: #fff;
+  color: inherit;
+  font-family: inherit;
+  font-size: 13.5px;
+  line-height: 1.4;
+  outline: none;
+}
+.textarea:focus {
+  border-color: var(--ds-blue-500, #3b82f6);
+}
+:global(html.dark) .textarea {
+  background: #121212;
+  border-color: #333;
+}
+.sendButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  border: none;
+  border-radius: 10px;
+  background: var(--ds-blue-600, #1f6feb);
+  color: #fff;
+  cursor: pointer;
+}
+.sendButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.hint {
+  margin: 6px 2px 0;
+  font-size: 11px;
+  color: #9199a3;
+}
+
+/* Signed-out state. */
+.signedOut {
+  margin: auto;
+  text-align: center;
+  max-width: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #4b5563;
+  font-size: 13px;
+  line-height: 1.5;
+}
+:global(html.dark) .signedOut {
+  color: #b6bcc4;
+}
+.signInLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  background: var(--ds-blue-600, #1f6feb);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+}

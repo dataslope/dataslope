@@ -169,6 +169,29 @@ ADMIN_USER_IDS="…"     # optional; same, but by user id instead of email
 
 The Cloudflare bindings interface (`CloudflareEnv`, used by `getCloudflareContext()`) is **hand-maintained** in `cloudflare-env.d.ts` — keep it in sync with `wrangler.jsonc` by hand when you add a binding. We don't commit `wrangler types`' output there because it inlines the full workerd runtime type surface (a global `Response`, `fetch`, …) that conflicts with this app's DOM types; the file's header comment explains the trade-off. `npm run cf-typegen` still works but writes to a gitignored scratch file for reference only.
 
+### Ask AI
+
+A signed-in, streaming "Ask AI" chat pane on the `/learn` lessons and `/playground/*` pages (`app/api/ai/chat/route.ts` + `app/_components/ai/`). It runs on the Workers runtime and pipes an OpenAI-compatible provider's Server-Sent-Event stream straight through — no Node APIs, no filesystem (lesson context is fetched from the prerendered `${slug}.md` asset, not read from disk).
+
+**Model per membership tier.** Free members use a cheaper model via **OpenRouter**; **Pro** members use an **OpenAI** model (`lib/ai/models.ts`). The base URLs and model ids are non-secret `vars` in `wrangler.jsonc` (`AI_FREE_BASE_URL` / `AI_FREE_MODEL` / `AI_PRO_BASE_URL` / `AI_PRO_MODEL`); the API keys are secrets:
+
+```bash
+npx wrangler secret put AI_FREE_API_KEY   # OpenRouter key (free tier)
+npx wrangler secret put AI_PRO_API_KEY    # OpenAI key (pro tier)
+```
+
+If only one key is set, both tiers use that provider (a half-wired env still answers). With neither set, Ask AI stays inert (503). A user's tier comes from the `plan` column (`migrations/0003`, default `'free'`); admins and any address in `PRO_USER_EMAILS` are treated as Pro as a bootstrap before billing exists (`lib/ai/tier.ts`).
+
+**Cost / abuse controls.** Signed-in only; per-user daily request + token budgets and a global daily token ceiling (`AI_DAILY_GLOBAL_TOKEN_CAP`, default 5M) bound spend regardless of account/IP rotation (`lib/ai/limits.ts`, backed by the `ai_usage_*` tables in `migrations/0003`). Output is capped per tier. Per-minute limiting (a Durable Object / the Rate Limiting binding) and per-widget context capture are tracked as follow-ups in `agent-outputs/20260701-1107-ask-ai-cloudflare-implementation.md`.
+
+For local dev, add the keys to `.dev.vars`:
+
+```
+AI_FREE_API_KEY="sk-or-…"   # OpenRouter
+AI_PRO_API_KEY="sk-…"       # OpenAI
+PRO_USER_EMAILS="you@example.com"   # optional; grants the pro model without billing
+```
+
 ### Admin dashboard
 
 `/admin` is a gated dashboard for managing user accounts, powered by Better Auth's [`admin` plugin](https://www.better-auth.com/docs/plugins/admin) (`lib/auth/server.ts` + `lib/auth/client.ts`). It lists every user and offers two actions per account:

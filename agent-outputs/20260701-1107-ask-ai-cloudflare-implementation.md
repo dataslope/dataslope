@@ -1,8 +1,24 @@
 # "Ask AI" on Cloudflare — implementation spec & abuse-control design
 
 **Date:** 2026-07-01
-**Status:** Implementation-ready spec (feasibility confirmed against the live codebase).
+**Status:** P0 IMPLEMENTED (streaming chat + per-tier model selection). See "Implemented" below.
 **Supersedes:** §4 ("Ask AI") of `agent-outputs/20260611-0516-remote-datasets-loading-ux-ask-ai.md`.
+
+### Implemented (this PR)
+
+- **Streaming endpoint** `app/api/ai/chat/route.ts` (`force-dynamic`): signed-in-only, OpenAI-compatible SSE piped straight through, upstream aborted on client disconnect.
+- **Per-tier model selection** (`lib/ai/models.ts`, `lib/ai/tier.ts`): free members → a cheaper **OpenRouter** model, pro members → an **OpenAI** model. Tier comes from the new `plan` column (migration `0003`), with a `PRO_USER_EMAILS` allowlist + admins as bootstrap. If only one provider key is set, both tiers degrade to it.
+- **Membership field**: `plan` column + Better Auth `additionalFields` so `session.user.plan` is available.
+- **Budgets** (`lib/ai/limits.ts`, `ai_usage_*` tables in `0003`): per-user daily request + token caps and a global daily token ceiling (`AI_DAILY_GLOBAL_TOKEN_CAP`); output capped per tier.
+- **Context** (`lib/ai/context.ts`): learn = server-fetched `${slug}.md` (slug-guarded); playground = live Zustand store (files + recent output); priority-tiered token packing.
+- **Client**: `app/_components/ai/` — a floating chat pane (`AskAiWidget`) mounted once from the root layout, pathname-gated to `/learn` + `/playground`, heavy deps dynamically imported. Renders streamed Markdown, Stop, new-conversation, sign-in CTA, tier badge.
+- **Config/docs**: `wrangler.jsonc` vars, `cloudflare-env.d.ts`, README "Ask AI" section.
+- **Tests**: `__tests__/aiModels.test.ts`, `__tests__/aiContext.test.ts` (tier/model resolution, packing, slug guard).
+
+**Deferred** (still accurate below): per-widget MCQ/challenge/code-block context capture (v1 uses page-level lesson markdown, which already contains all of them); per-minute rate limiting via a Durable Object / Rate Limiting binding (v1 has daily + global caps only); SQL-playground file context; Turnstile/anonymous tier; conversation persistence; embeddings retrieval.
+
+**Operational note:** apply migration `0003` (`wrangler d1 migrations apply dataslope-auth [--remote]`) and set `AI_FREE_API_KEY` / `AI_PRO_API_KEY` secrets; until at least one key is set the endpoint returns 503 and the pane shows an error.
+
 That earlier section is still correct on the *context model* and *token packing*, but it
 predates two things that change the plan: **(a)** auth now exists (Better Auth + D1),
 and **(b)** the app now runs on **Cloudflare via OpenNext**, not Node/Vercel. The single

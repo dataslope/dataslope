@@ -35,6 +35,22 @@ declare global {
     // staging domains. See `trustedOrigins` in lib/auth/server.ts.
     TRUSTED_ORIGINS?: string;
 
+    // --- "Ask AI" model config (vars; see lib/ai/models.ts) ---
+    // Base URL + model id per membership tier. Both providers must speak the
+    // OpenAI /chat/completions streaming API. Defaults: free → OpenRouter
+    // (openai/gpt-4o-mini), pro → OpenAI (gpt-4o). The API keys are secrets
+    // (below). Leave a tier's key unset to have it degrade to the other tier's
+    // provider.
+    AI_FREE_BASE_URL?: string;
+    AI_FREE_MODEL?: string;
+    AI_PRO_BASE_URL?: string;
+    AI_PRO_MODEL?: string;
+    // Global per-day token ceiling (bounded-downside backstop). Defaults to 5M.
+    AI_DAILY_GLOBAL_TOKEN_CAP?: string;
+    // Comma-separated emails granted the pro model before billing exists
+    // (bootstrap; mirrors ADMIN_EMAILS). See lib/ai/tier.ts.
+    PRO_USER_EMAILS?: string;
+
     // --- secrets (set via `wrangler secret put`, absent from wrangler.jsonc) ---
     // Required (not optional): signs the OAuth `state` + session cookies, so it
     // must be a single stable value present on every isolate/deployment. If it
@@ -49,6 +65,11 @@ declare global {
     GITHUB_CLIENT_SECRET?: string;
     // Resend API key; when set, email verification + password reset turn on.
     RESEND_API_KEY?: string;
+    // "Ask AI" provider API keys (secrets). Set with `wrangler secret put`.
+    // Free tier calls AI_FREE_BASE_URL with this key; pro tier calls
+    // AI_PRO_BASE_URL. If only one is set, both tiers use it (see resolveModel).
+    AI_FREE_API_KEY?: string;
+    AI_PRO_API_KEY?: string;
     // Admins for /admin, regardless of their `role` column (bootstraps the
     // first admin). Both are comma-separated and merge; specify whichever is
     // handier. ADMIN_EMAILS is resolved to user IDs against D1 (see

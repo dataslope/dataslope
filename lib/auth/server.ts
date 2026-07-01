@@ -192,6 +192,23 @@ export async function createAuth(env: CloudflareEnv, request?: Request) {
         }
       : undefined,
     socialProviders,
+    // Membership tier, surfaced on the session so the "Ask AI" endpoint can
+    // pick the model by plan (free → cheaper OpenRouter model; pro → OpenAI).
+    // Backed by the `plan` column added in migrations/0003. `input: false` means
+    // users can't set their own plan via the sign-up/update API — it's changed
+    // server-side only (a future billing webhook, or an admin). Defaults to
+    // 'free'. See lib/ai/tier.ts, which also honours a PRO_USER_EMAILS allowlist
+    // and admins as a bootstrap before billing exists.
+    user: {
+      additionalFields: {
+        plan: {
+          type: "string",
+          required: false,
+          defaultValue: "free",
+          input: false,
+        },
+      },
+    },
     // Admin capabilities (list/remove/ban users) for the gated /admin
     // dashboard. The `removeUser` action is a hard delete: it drops the `user`
     // row, which cascades to that user's `session` + `account` rows (see the

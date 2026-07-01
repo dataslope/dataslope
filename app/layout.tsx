@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./brand.css";
 import "./globals.css";
 import { OG_IMAGE, SITE_URL } from "@/lib/site";
+import AskAi from "@/app/_components/ai/AskAi";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -103,7 +104,13 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://unpkg.com" />
         <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        {/* Signed-in "Ask AI" chat pane. Renders only on /learn and
+            /playground (pathname-gated inside), and its heavy deps are
+            dynamically imported so other pages don't pay for them. */}
+        <AskAi />
+      </body>
     </html>
   );
 }

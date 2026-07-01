@@ -59,7 +59,16 @@
     // domain). The RESEND_API_KEY itself is a secret — set it with
     // `npx wrangler secret put RESEND_API_KEY` (see README). Email verification
     // and password reset stay off until that key is set.
-    "EMAIL_FROM": "Dataslope <no-reply@dataslope.com>"
+    "EMAIL_FROM": "Dataslope <no-reply@dataslope.com>",
+    // "Ask AI" model selection (non-secret). Free members use a cheaper model
+    // via OpenRouter; pro members use an OpenAI model. Override the model ids
+    // here without a code change. The API keys are secrets: set them with
+    // `npx wrangler secret put AI_FREE_API_KEY` and `... AI_PRO_API_KEY`.
+    // Ask AI stays inert (503) until at least one key is set.
+    "AI_FREE_BASE_URL": "https://openrouter.ai/api/v1",
+    "AI_FREE_MODEL": "openai/gpt-4o-mini",
+    "AI_PRO_BASE_URL": "https://api.openai.com/v1",
+    "AI_PRO_MODEL": "gpt-4o"
   },
   // Lets the worker invoke itself (used by OpenNext for cache/revalidation
   // plumbing). Must match "name" above.
