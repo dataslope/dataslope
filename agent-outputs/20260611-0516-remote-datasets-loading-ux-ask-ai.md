@@ -212,6 +212,15 @@ Gate land-time warm-up behind `navigator.connection?.saveData !== true` (and opt
 
 ## 4. Q3 — "Ask AI" for signed-in users (courses + playgrounds)
 
+> **⚠ Partially superseded (2026-07-01).** See
+> `agent-outputs/20260701-1107-ask-ai-cloudflare-implementation.md` for the
+> implementation-ready spec. The context model (§4.3) and token packing (§4.4)
+> below still hold, but two things changed since: auth now exists (Better Auth +
+> D1), and the app runs on **Cloudflare/OpenNext** — so **there is no filesystem
+> at request time** and the "read lesson files from disk on the Node runtime"
+> note in §4.2 is no longer valid (fetch the prerendered `.md` asset instead).
+> The new doc also adds the IP/email abuse-control design.
+
 ### 4.1 Requirements recap
 
 - Signed-in users only (auth doesn't exist yet — design must not depend on a specific provider).

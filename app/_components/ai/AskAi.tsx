@@ -1,0 +1,72 @@
+"use client";
+
+/**
+ * Mount point for the "Ask AI" widget, rendered once from the root layout.
+ *
+ * It renders NOTHING except on `/learn/*` and `/playground/*`, and the actual
+ * widget (which pulls in react-markdown) is dynamically imported so those bytes
+ * never load on the home page, pricing, etc. Off-surface this is a bare
+ * `usePathname()` check — no session fetch, no widget code.
+ *
+ * `collectContext` is called at send time (not render), so it reads the live
+ * playground store / current slug each time the user asks.
+ */
+import { useCallback } from "react";
+import dynamic from "next/dynamic";
+import { usePathname } from "next/navigation";
+import { getPlaygroundStore } from "@/app/_components/stores/createPlaygroundStore";
+import type { AskAiClientContext } from "@/lib/ai/types";
+
+const AskAiWidget = dynamic(() => import("./AskAiWidget"), { ssr: false });
+
+// SQL playgrounds use a different store shape; send page-level context only for
+// them in v1 (their files/outputs aren't in the createPlaygroundStore registry).
+const SQL_SEGMENTS = new Set(["sqlite", "postgres", "duckdb"]);
+const MAX_FILE_CHARS = 8000;
+const MAX_FILES = 6;
+
+function collectPlayground(segment: string): AskAiClientContext {
+  const base: AskAiClientContext = { surface: "playground", adapterId: segment };
+  if (!segment || SQL_SEGMENTS.has(segment)) return base;
+  try {
+    const state = getPlaygroundStore(segment).getState();
+    const files = state.files
+      .slice(0, MAX_FILES)
+      .map((f) => ({
+        filename: f.filename,
+        content: (state.dirtyBuffers.get(f.id) ?? "").slice(0, MAX_FILE_CHARS),
+      }))
+      .filter((f) => f.content.trim());
+    const outputs = (state.outputsByFile.get(state.activeFileId) ?? [])
+      .filter((c) => c.type === "stdout" || c.type === "stderr")
+      .map((c) => c.content)
+      .filter(Boolean)
+      .slice(-4);
+    return { ...base, files, outputs };
+  } catch {
+    return base;
+  }
+}
+
+export default function AskAi() {
+  const pathname = usePathname() ?? "";
+  const onLearn = pathname === "/learn" || pathname.startsWith("/learn/");
+  const onPlayground = pathname.startsWith("/playground");
+
+  const collectContext = useCallback((): AskAiClientContext => {
+    const segments = pathname.split("/").filter(Boolean); // e.g. ["learn","a","b"]
+    if (pathname.startsWith("/learn")) {
+      return { surface: "learn", slug: segments.slice(1) };
+    }
+    return collectPlayground(segments[1] ?? "");
+  }, [pathname]);
+
+  if (!onLearn && !onPlayground) return null;
+
+  return (
+    <AskAiWidget
+      surface={onLearn ? "learn" : "playground"}
+      collectContext={collectContext}
+    />
+  );
+}
