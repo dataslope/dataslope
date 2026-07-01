@@ -32,7 +32,13 @@ declare global {
     EMAIL_FROM?: string;
 
     // --- secrets (set via `wrangler secret put`, absent from wrangler.jsonc) ---
-    BETTER_AUTH_SECRET?: string;
+    // Required (not optional): signs the OAuth `state` + session cookies, so it
+    // must be a single stable value present on every isolate/deployment. If it
+    // is ever missing, the signed state cookie can't be verified on the OAuth
+    // callback and sign-in fails with ?error=state_mismatch — so createAuth()
+    // (lib/auth/server.ts) hard-fails when it's unset rather than falling back
+    // to Better Auth's built-in key.
+    BETTER_AUTH_SECRET: string;
     GOOGLE_CLIENT_ID?: string;
     GOOGLE_CLIENT_SECRET?: string;
     GITHUB_CLIENT_ID?: string;

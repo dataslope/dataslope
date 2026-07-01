@@ -74,6 +74,35 @@ async function resolveAdminUserIds(
 
 /** Build a request-scoped Better Auth instance bound to this request's D1. */
 export async function createAuth(env: CloudflareEnv, request?: Request) {
+  // Require BETTER_AUTH_SECRET explicitly — never boot on a fallback key.
+  //
+  // Better Auth HMAC-signs the short-lived OAuth `state` cookie (and the session
+  // cookie) with this secret. A social sign-in spans *two separate requests*:
+  // `/api/auth/sign-in/social` sets the signed state cookie, then — seconds to
+  // minutes later, after the Google consent screen — `/api/auth/callback/google`
+  // must re-verify that cookie's signature against the SAME secret. Those two
+  // requests can land on different Worker isolates or straddle a new deployment.
+  // If the secret differs across the round-trip, the signature no longer
+  // verifies, Better Auth treats the state cookie as missing, and the sign-in
+  // aborts to `/?error=state_mismatch` (the user silently ends up signed out).
+  //
+  // Passing `undefined` here does NOT fail — Better Auth falls back to a
+  // built-in key whose selection depends on `process.env.NODE_ENV`, which is not
+  // reliably set on the Workers runtime. That turns a missing/misdelivered
+  // binding into intermittent, deploy-correlated `state_mismatch` failures that
+  // are miserable to debug. So fail closed and loud instead: a clear error at
+  // request time beats cookies signed with a key that won't verify later.
+  // (Rotating this secret intentionally invalidates all in-flight sign-ins and
+  // existing sessions — expected, and rare.)
+  if (!env.BETTER_AUTH_SECRET) {
+    throw new Error(
+      "BETTER_AUTH_SECRET is not set. Set it with `wrangler secret put " +
+        "BETTER_AUTH_SECRET` (and in .dev.vars locally). It signs the OAuth " +
+        "state and session cookies; without a single stable value, Google " +
+        "sign-in intermittently fails with ?error=state_mismatch.",
+    );
+  }
+
   // Only advertise a provider when both halves of its credential pair are
   // present, so a partially-configured environment fails closed (the provider
   // simply isn't offered) rather than booting with an invalid OAuth client.
