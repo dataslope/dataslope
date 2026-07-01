@@ -109,11 +109,12 @@ Key files:
 
 | File | Role |
 | --- | --- |
-| `lib/auth/server.ts` | `createAuth(env)` — a **per-request** Better Auth factory bound to that request's D1 (a shared connection across requests is the classic Workers footgun). |
+| `lib/auth/server.ts` | `createAuth(env, request)` — a **per-request** Better Auth factory bound to that request's D1 (a shared connection across requests is the classic Workers footgun). |
 | `app/api/auth/[...all]/route.ts` | Catch-all handler for `/api/auth/*` (sign-in, OAuth callbacks, session, sign-out). |
 | `lib/auth/client.ts` | Browser client + `useSession` / `signIn` / `signOut`. |
 | `app/sign-in/`, `app/account/` | Sign-in screen (Google/GitHub) and a gated account area. |
-| `migrations/` | D1 schema (Better Auth core tables), applied with `wrangler d1 migrations apply`. |
+| `app/admin/` | Gated admin dashboard (list / remove / ban users), built on the shadcn UI primitives in `components/ui`. See [Admin dashboard](#admin-dashboard). |
+| `migrations/` | D1 schema (Better Auth core tables + the admin plugin's `role`/`ban` fields), applied with `wrangler d1 migrations apply`. |
 
 > Auth is deliberately kept **out of `middleware.ts`** — `cookies()`/middleware sessions have rough edges on the Workers runtime (a known OpenNext limitation). All auth work happens in route handlers and client components instead.
 
@@ -161,12 +162,53 @@ GOOGLE_CLIENT_ID="…"
 GOOGLE_CLIENT_SECRET="…"
 GITHUB_CLIENT_ID="…"
 GITHUB_CLIENT_SECRET="…"
-RESEND_API_KEY="…"   # optional; enables email verification + password reset
+RESEND_API_KEY="…"     # optional; enables email verification + password reset
+ADMIN_EMAILS="…"       # optional; comma-separated emails granted /admin access
+ADMIN_USER_IDS="…"     # optional; same, but by user id instead of email
 ```
 
 The Cloudflare bindings interface (`CloudflareEnv`, used by `getCloudflareContext()`) is **hand-maintained** in `cloudflare-env.d.ts` — keep it in sync with `wrangler.jsonc` by hand when you add a binding. We don't commit `wrangler types`' output there because it inlines the full workerd runtime type surface (a global `Response`, `fetch`, …) that conflicts with this app's DOM types; the file's header comment explains the trade-off. `npm run cf-typegen` still works but writes to a gitignored scratch file for reference only.
 
+### Admin dashboard
+
+`/admin` is a gated dashboard for managing user accounts, powered by Better Auth's [`admin` plugin](https://www.better-auth.com/docs/plugins/admin) (`lib/auth/server.ts` + `lib/auth/client.ts`). It lists every user and offers two actions per account:
+
+- **Remove** — a **hard delete**. It drops the `user` row, which cascades to that user's `session` and `account` rows (the `ON DELETE CASCADE` in `migrations/0001`) and frees their unique email. **The person can then sign up again** from scratch with OAuth or email/password. Use this for the "let me start over" / account-reset case — e.g. someone who created an unverified email/password account and now can't sign in with Google (see [Account linking](#account-linking)).
+- **Ban** — the soft alternative. Blocks sign-in but keeps the account (and its email) in place; reversible with **Unban**.
+
+Authorization is enforced **server-side** on every `admin.*` endpoint, so the page itself can stay a statically-prerendered, client-read screen like `/account` (the "auth gates actions, not content" rule): a non-admin who opens `/admin` just gets an access-denied notice and can read or change nothing. The dashboard refuses destructive actions on your own row, so you can't lock yourself out.
+
+The admin plugin adds `role` / `banned` / `banReason` / `banExpires` to `user` and `impersonatedBy` to `session`; that delta is `migrations/0002_add_admin_plugin_fields.sql`, applied by the same `wrangler d1 migrations apply` command as the rest.
+
+**Designating admins.** Three ways, which compose. All three grant admin regardless of the `role` column, so any of them can bootstrap the *first* admin (there's no admin to promote them yet):
+
+1. **By email (recommended):** set `ADMIN_EMAILS` to a comma-separated list of addresses. You know these up front, and it works for people who already signed up — no need to look up an id first:
+
+   ```bash
+   npx wrangler secret put ADMIN_EMAILS   # e.g. "you@example.com,teammate@example.com"
+   ```
+
+   Better Auth's admin plugin only understands user *ids*, so `resolveAdminUserIds` (`lib/auth/server.ts`) resolves these to ids against D1. That lookup is one indexed read and runs **only** on the admin plugin's own `/api/auth/admin/*` endpoints, so the hot `get-session` path the cookie cache keeps off D1 is unaffected. An admin email that hasn't signed up yet simply isn't an admin until the account exists (correct — you can't be a user that doesn't exist).
+
+2. **By user id:** set `ADMIN_USER_IDS` to a comma-separated list of Better Auth user ids (no D1 lookup). Handy in automation where you already have the id:
+
+   ```bash
+   npx wrangler d1 execute dataslope-auth --remote --command "SELECT id, email FROM user;"
+   npx wrangler secret put ADMIN_USER_IDS   # e.g. "abc123,def456"
+   ```
+
+3. **By role:** an existing admin can promote another account by setting its `role` to `admin` (directly in D1, or via the plugin's `setRole`). Role-based admins also see an **Admin** link in the account menu; email/id-based admins reach the dashboard at `/admin` directly.
+
+### Account linking
+
+What happens when someone signs up with **email/password** and later tries **Google/GitHub with the same email** (or vice-versa) depends on whether the existing account's email is **verified** — Better Auth's `accountLinking` defaults (which this app keeps) only merge a social login into an existing account when that's safe:
+
+- **Existing email is _verified_** → the social account is **linked** to the existing user; they sign into the same account (now with both a password and the social provider).
+- **Existing email is _unverified_** → linking is **refused** (`account_not_linked`); the social sign-in fails and **no duplicate account is created** (email is `UNIQUE`). The user must sign in the original way.
+
+The second case is the default whenever email verification is off (no `RESEND_API_KEY`), since every email/password account is then unverified. It's a deliberate anti-takeover guard: an unverified local account could have been created by someone who doesn't own the address, so Better Auth won't let a social login silently adopt it. A user stuck this way can be unblocked by **removing** their account in the admin dashboard so they can re-register cleanly. To relax this (e.g. trust Google/GitHub to link even into unverified local accounts), set `account.accountLinking.trustedProviders` / `requireLocalEmailVerified` in `createAuth` — at the cost of that safety margin.
+
 ### Adding Better Auth plugins later
 
-If you enable additional Better Auth features (e.g. email/password, 2FA, organizations), regenerate the schema delta with `npx @better-auth/cli generate` and add it as a **new** migration file in `migrations/` rather than editing the existing one.
+If you enable additional Better Auth features (e.g. 2FA, organizations), regenerate the schema delta with `npx @better-auth/cli generate` and add it as a **new** migration file in `migrations/` rather than editing the existing one.
 

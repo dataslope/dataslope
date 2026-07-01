@@ -9,9 +9,9 @@
  * IMPORTANT — one instance per request. The D1 binding only exists at request
  * time (via `getCloudflareContext()`), and the report flags reusing a single
  * D1/Kysely connection across requests as the classic Workers footgun. So this
- * is a *factory*: the route handler calls `createAuth(env)` fresh on every
- * request (see app/api/auth/[...all]/route.ts) rather than instantiating a
- * shared module-level singleton.
+ * is a *factory*: the route handler calls `createAuth(env, request)` fresh on
+ * every request (see app/api/auth/[...all]/route.ts) rather than instantiating
+ * a shared module-level singleton.
  *
  * Auth gates *actions* (save, share, AI), never *content*: the ~800 `/learn`
  * lessons stay statically prerendered and are read with no session. The session
@@ -21,11 +21,59 @@
  * route handlers / server components instead.
  */
 import { betterAuth } from "better-auth";
+import { admin } from "better-auth/plugins";
 import { D1Dialect } from "kysely-d1";
 import { resetPasswordEmail, sendEmail, verifyEmail } from "@/lib/auth/email";
 
+/** Split a comma-separated secret into a trimmed, non-empty list. */
+function parseList(raw: string | undefined): string[] {
+  if (!raw) return [];
+  return raw
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+/**
+ * Resolve who is an admin for this request. Two config sources, which merge —
+ * both grant admin regardless of the `role` column, which solves the bootstrap
+ * problem (there's no admin to promote the first one yet):
+ *
+ *   - `ADMIN_EMAILS`   — email addresses (the friendly path: you know them up
+ *     front, and it works for people who already signed up). Better Auth's
+ *     admin plugin only understands user *ids*, so we resolve emails → ids
+ *     against D1 here.
+ *   - `ADMIN_USER_IDS` — literal Better Auth user ids (no DB lookup needed).
+ *
+ * The email→id lookup is one indexed D1 read, and `adminUserIds` is only ever
+ * consulted inside the admin plugin's own endpoints (`/api/auth/admin/*`). So
+ * we only run it for those requests; every other auth request — crucially the
+ * hot `get-session` path that the cookie cache deliberately keeps off D1 —
+ * skips it. (With no request to inspect we resolve unconditionally.)
+ */
+async function resolveAdminUserIds(
+  env: CloudflareEnv,
+  request?: Request,
+): Promise<string[]> {
+  const ids = parseList(env.ADMIN_USER_IDS);
+  const emails = parseList(env.ADMIN_EMAILS).map((e) => e.toLowerCase());
+  if (emails.length === 0) return ids;
+
+  const onAdminEndpoint =
+    !request || new URL(request.url).pathname.includes("/admin/");
+  if (!onAdminEndpoint) return ids;
+
+  const placeholders = emails.map(() => "?").join(", ");
+  const { results } = await env.DB.prepare(
+    `SELECT id FROM user WHERE lower(email) IN (${placeholders})`,
+  )
+    .bind(...emails)
+    .all<{ id: string }>();
+  return [...new Set([...ids, ...results.map((row) => row.id)])];
+}
+
 /** Build a request-scoped Better Auth instance bound to this request's D1. */
-export function createAuth(env: CloudflareEnv) {
+export async function createAuth(env: CloudflareEnv, request?: Request) {
   // Only advertise a provider when both halves of its credential pair are
   // present, so a partially-configured environment fails closed (the provider
   // simply isn't offered) rather than booting with an invalid OAuth client.
@@ -90,6 +138,16 @@ export function createAuth(env: CloudflareEnv) {
         }
       : undefined,
     socialProviders,
+    // Admin capabilities (list/remove/ban users) for the gated /admin
+    // dashboard. The `removeUser` action is a hard delete: it drops the `user`
+    // row, which cascades to that user's `session` + `account` rows (see the
+    // ON DELETE CASCADE in migrations/0001) and frees their unique email — so a
+    // removed user can immediately sign up again with OAuth or email/password.
+    // Authorization is enforced *server-side* on every `admin.*` endpoint, so
+    // the dashboard staying a statically-prerendered, client-read page (the
+    // codebase's "auth gates actions, not content" rule) is still safe: a
+    // non-admin who loads /admin simply gets 403s and an empty screen.
+    plugins: [admin({ adminUserIds: await resolveAdminUserIds(env, request) })],
     session: {
       // Cache the session in a short-lived signed cookie so the common
       // "who am I" check is served from the cookie instead of a D1 read on
@@ -102,4 +160,4 @@ export function createAuth(env: CloudflareEnv) {
   });
 }
 
-export type Auth = ReturnType<typeof createAuth>;
+export type Auth = Awaited<ReturnType<typeof createAuth>>;

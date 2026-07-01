@@ -39,6 +39,12 @@ declare global {
     GITHUB_CLIENT_SECRET?: string;
     // Resend API key; when set, email verification + password reset turn on.
     RESEND_API_KEY?: string;
+    // Admins for /admin, regardless of their `role` column (bootstraps the
+    // first admin). Both are comma-separated and merge; specify whichever is
+    // handier. ADMIN_EMAILS is resolved to user IDs against D1 (see
+    // resolveAdminUserIds in lib/auth/server.ts).
+    ADMIN_EMAILS?: string;
+    ADMIN_USER_IDS?: string;
   }
 }
 
