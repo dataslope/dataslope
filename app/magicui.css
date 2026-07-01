@@ -31,6 +31,10 @@
 @source "../components/**/*.{ts,tsx}";
 @source "./magicui-demo/**/*.{ts,tsx}";
 @source "./_components/home/**/*.{ts,tsx}";
+/* The header's account control lives here; without this glob its Tailwind
+   classes (e.g. the avatar's `size-*`) are never generated, so the avatar
+   image falls back to its intrinsic ~96px size. */
+@source "./_components/auth/**/*.{ts,tsx}";
 @source "./_components/legal/**/*.{ts,tsx}";
 @source "./admin/**/*.{ts,tsx}";
 
