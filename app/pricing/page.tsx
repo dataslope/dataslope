@@ -1,7 +1,7 @@
 // Opt the pricing route into the same Tailwind + Magic UI bundle the home page
 // uses, and pull in the home-route hardening so the reused HomeNav / HomeFooter
 // (which rely on `.ds-home`-scoped rules in home.css) lay out correctly.
-import "@/app/magicui.css";
+import "@/app/tailwind.css";
 import "@/app/home.css";
 import type { Metadata } from "next";
 import Link from "../_components/Link";

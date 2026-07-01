@@ -1,10 +1,11 @@
-// Reuse the home route's bundle and `.ds-home`-scoped chrome, like /sign-in.
-import "@/app/magicui.css";
-import "@/app/home.css";
+// Same self-contained, flat auth chrome as /sign-in (design option "2a"): a
+// top-left brand lockup plus a single centered card, styled with the shared
+// auth CSS module — no tailwind.css / HomeNav / HomeFooter. Global resets come
+// from app/globals.css (imported in the root layout).
 import type { Metadata } from "next";
-import { HomeNav } from "../_components/home/HomeNav";
-import { HomeFooter } from "../_components/home/HomeFooter";
+import Link from "../_components/Link";
 import { ResetPasswordClient } from "./ResetPasswordClient";
+import styles from "../_components/auth/authCard.module.css";
 
 export const metadata: Metadata = {
   title: "Reset password",
@@ -18,29 +19,26 @@ export default function ResetPasswordPage() {
   return (
     <>
       <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
-      <div
-        style={{ fontFamily: "var(--font-sans, Inter, system-ui, sans-serif)" }}
-        className="ds-home flex min-h-screen flex-col bg-white text-[var(--ds-gray-800)] dark:bg-[#121212] dark:text-[var(--ds-gray-100)]"
-      >
-        <HomeNav />
+      <div className={styles.page}>
+        {/* Blue Dataslope logo, top-left of the page (not inside the card). */}
+        <header className={styles.brandBar}>
+          <Link href="/" aria-label="Dataslope home" className={styles.brand}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/dataslope-logo-blue.svg"
+              alt=""
+              aria-hidden="true"
+              className={styles.brandLogo}
+            />
+            <span className={styles.brandWord}>Dataslope</span>
+          </Link>
+        </header>
 
-        <main className="flex flex-1 items-center justify-center px-4 py-16 sm:px-6">
-          <div className="w-full max-w-sm">
-            <div className="text-center">
-              <h1 className="text-3xl font-semibold tracking-tight text-[var(--ds-gray-900)] dark:text-white">
-                Reset your password
-              </h1>
-              <p className="mt-3 text-[15px] leading-relaxed text-[var(--ds-gray-600)] dark:text-[var(--ds-gray-400)]">
-                Choose a new password for your account.
-              </p>
-            </div>
-            <div className="mt-8">
-              <ResetPasswordClient />
-            </div>
+        <main className={styles.main}>
+          <div className={styles.card}>
+            <ResetPasswordClient />
           </div>
         </main>
-
-        <HomeFooter />
       </div>
     </>
   );

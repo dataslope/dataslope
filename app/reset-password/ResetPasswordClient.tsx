@@ -4,6 +4,11 @@ import { useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import Link from "../_components/Link";
 import { resetPassword } from "@/lib/auth/client";
+import { EyeIcon } from "../_components/auth/authIcons";
+import styles from "../_components/auth/authCard.module.css";
+
+/** Minimum password length — mirrors Better Auth's default (`minPasswordLength`). */
+const MIN_PASSWORD = 8;
 
 /** Read `window.location.search` without a setState-in-effect: the server
  *  snapshot is `null` (so we render a loading state during prerender/hydration),
@@ -17,16 +22,12 @@ function useLocationSearch(): string | null {
   );
 }
 
-const INPUT_CLASS =
-  "w-full rounded-xl border border-[var(--ds-gray-200)] bg-white px-3.5 py-2.5 text-sm text-[var(--ds-gray-900)] outline-none transition-colors placeholder:text-[var(--ds-gray-400)] focus:border-[var(--ds-blue-500)] dark:border-white/15 dark:bg-white/5 dark:text-white";
-
-const MIN_PASSWORD = 8;
-
 /** Landing page for the reset link emailed by Better Auth. The `/api/auth`
  *  endpoint validates the token, then redirects here as
  *  `/reset-password?token=…` (or `?error=…` for an expired/invalid token). We
  *  read those from the URL on the client (no `useSearchParams`, so the route
- *  stays a simple static shell), collect a new password, and submit it. */
+ *  stays a simple static shell), collect a new password, and submit it. The
+ *  card matches the flat "2a" sign-in design (shared auth CSS module). */
 export function ResetPasswordClient() {
   const router = useRouter();
   const search = useLocationSearch();
@@ -39,14 +40,22 @@ export function ResetPasswordClient() {
 
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [confirmTouched, setConfirmTouched] = useState(false);
+  const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+
+  const pwOk = password.length >= MIN_PASSWORD;
+  // Lazy mismatch check — only after the confirm field has been touched.
+  const mismatch =
+    confirmTouched && confirm.length > 0 && confirm !== password;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     if (password !== confirm) {
+      setConfirmTouched(true);
       setError("Passwords don't match.");
       return;
     }
@@ -54,7 +63,9 @@ export function ResetPasswordClient() {
     setSubmitting(true);
     const { error } = await resetPassword({ newPassword: password, token });
     if (error) {
-      setError(error.message ?? "Couldn't reset your password. Request a new link.");
+      setError(
+        error.message ?? "Couldn't reset your password. Request a new link.",
+      );
       setSubmitting(false);
       return;
     }
@@ -62,40 +73,48 @@ export function ResetPasswordClient() {
   }
 
   if (!ready) {
-    return (
-      <p className="text-center text-sm text-[var(--ds-gray-500)]">Loading…</p>
-    );
+    return <p className={styles.redirecting}>Loading…</p>;
   }
 
   if (linkError) {
     return (
-      <div className="text-center">
-        <p className="text-[15px] text-[var(--ds-gray-700)] dark:text-[var(--ds-gray-300)]">
-          This reset link is invalid or has expired.
-        </p>
-        <Link
-          href="/sign-in"
-          className="mt-5 inline-flex items-center justify-center rounded-xl bg-[var(--ds-blue-600)] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--ds-blue-700)]"
-        >
-          Request a new link
-        </Link>
-      </div>
-    );
-  }
-
-  if (done) {
-    return (
-      <div className="text-center">
-        <p className="text-[15px] text-[var(--ds-gray-700)] dark:text-[var(--ds-gray-300)]">
-          Your password has been updated.
-        </p>
+      <div className={styles.stack}>
+        <div>
+          <h1 className={styles.title}>Link expired</h1>
+          <p className={styles.subtitle}>
+            This reset link is invalid or has expired.
+          </p>
+        </div>
         <button
           type="button"
           onClick={() => {
             router.push("/sign-in");
             router.refresh();
           }}
-          className="mt-5 inline-flex items-center justify-center rounded-xl bg-[var(--ds-blue-600)] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--ds-blue-700)]"
+          className={styles.primary}
+        >
+          Request a new link
+        </button>
+      </div>
+    );
+  }
+
+  if (done) {
+    return (
+      <div className={styles.stack}>
+        <div>
+          <h1 className={styles.title}>Password updated</h1>
+          <p className={styles.subtitle}>
+            You can now sign in with your new password.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            router.push("/sign-in");
+            router.refresh();
+          }}
+          className={styles.primary}
         >
           Sign in
         </button>
@@ -104,41 +123,82 @@ export function ResetPasswordClient() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-      <input
-        type="password"
-        required
-        minLength={MIN_PASSWORD}
-        autoComplete="new-password"
-        placeholder={`New password (${MIN_PASSWORD}+ characters)`}
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        disabled={submitting}
-        className={INPUT_CLASS}
-      />
-      <input
-        type="password"
-        required
-        minLength={MIN_PASSWORD}
-        autoComplete="new-password"
-        placeholder="Confirm new password"
-        value={confirm}
-        onChange={(e) => setConfirm(e.target.value)}
-        disabled={submitting}
-        className={INPUT_CLASS}
-      />
-      {error && (
-        <p role="alert" className="text-sm text-[var(--ds-red-600,#dc2626)]">
-          {error}
-        </p>
-      )}
-      <button
-        type="submit"
-        disabled={submitting}
-        className="inline-flex w-full items-center justify-center rounded-xl bg-[var(--ds-blue-600)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--ds-blue-700)] disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        {submitting ? "Updating…" : "Update password"}
-      </button>
-    </form>
+    <div className={styles.stack}>
+      <div>
+        <h1 className={styles.title}>Reset your password</h1>
+        <p className={styles.subtitle}>Choose a new password for your account.</p>
+      </div>
+
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <div>
+          <div className={styles.field}>
+            <input
+              type={showPw ? "text" : "password"}
+              required
+              minLength={MIN_PASSWORD}
+              autoComplete="new-password"
+              placeholder=" "
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={submitting}
+              className={`${styles.input} ${styles.inputPw}`}
+            />
+            <label className={styles.label}>New password</label>
+            <button
+              type="button"
+              onClick={() => setShowPw((s) => !s)}
+              aria-label={showPw ? "Hide password" : "Show password"}
+              className={styles.eyeBtn}
+            >
+              <EyeIcon />
+            </button>
+          </div>
+          <div className={styles.pwRow}>
+            <span className={`${styles.pwHint} ${pwOk ? styles.pwHintOk : ""}`}>
+              {pwOk ? "Strong enough — looks good." : "At least 8 characters."}
+            </span>
+          </div>
+        </div>
+
+        <div className={`${styles.field} ${mismatch ? styles.fieldError : ""}`}>
+          <input
+            type={showPw ? "text" : "password"}
+            required
+            minLength={MIN_PASSWORD}
+            autoComplete="new-password"
+            placeholder=" "
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            onBlur={() => setConfirmTouched(true)}
+            disabled={submitting}
+            className={styles.input}
+          />
+          <label className={styles.label}>Confirm new password</label>
+          {mismatch && (
+            <p className={styles.errorText}>Passwords don&apos;t match</p>
+          )}
+        </div>
+
+        {error && (
+          <p role="alert" className={styles.formError}>
+            {error}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={submitting}
+          className={styles.primary}
+        >
+          {submitting ? "Updating…" : "Update password"}
+        </button>
+      </form>
+
+      <p className={styles.switch}>
+        <Link href="/sign-in" className={styles.link}>
+          Back to sign in
+        </Link>
+      </p>
+    </div>
   );
 }

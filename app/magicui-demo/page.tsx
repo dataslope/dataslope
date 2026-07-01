@@ -27,7 +27,7 @@ export default function MagicUIDemoPage() {
           Marquee, ShimmerButton and BlurFade rendering outside{" "}
           <code className="font-mono">/learn</code> and{" "}
           <code className="font-mono">/playground</code>, via the shared{" "}
-          <code className="font-mono">app/magicui.css</code> stylesheet.
+          <code className="font-mono">app/tailwind.css</code> stylesheet.
         </p>
       </BlurFade>
 
