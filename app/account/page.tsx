@@ -1,6 +1,6 @@
 // Reuse the home route's bundle and `.ds-home`-scoped chrome, like /pricing
 // and /sign-in.
-import "@/app/magicui.css";
+import "@/app/tailwind.css";
 import "@/app/home.css";
 import type { Metadata } from "next";
 import { HomeNav } from "../_components/home/HomeNav";

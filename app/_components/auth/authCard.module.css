@@ -8,7 +8,7 @@
  * Dark theming is driven by a global `.dark` ancestor (set pre-paint by the
  * page's THEME_BOOTSTRAP), so no JS theme read is needed and there's no flash.
  * We deliberately use a CSS module (the repo's convention for bespoke UI)
- * rather than Tailwind so this route needs neither magicui.css nor an @source
+ * rather than Tailwind so this route needs neither tailwind.css nor an @source
  * glob to render — its styling is fully self-contained. */
 
 .page {

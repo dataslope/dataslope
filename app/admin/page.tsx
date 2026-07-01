@@ -1,7 +1,7 @@
 // Reuse the home route's bundle and `.ds-home`-scoped chrome, like /account
-// and /sign-in. `magicui.css` also supplies the shadcn design tokens the
+// and /sign-in. `tailwind.css` also supplies the shadcn design tokens the
 // dashboard's UI primitives (components/ui) are styled against.
-import "@/app/magicui.css";
+import "@/app/tailwind.css";
 import "@/app/home.css";
 import type { Metadata } from "next";
 import { HomeNav } from "../_components/home/HomeNav";

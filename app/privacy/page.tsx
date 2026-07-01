@@ -1,4 +1,4 @@
-import "@/app/magicui.css";
+import "@/app/tailwind.css";
 import { LegalShell } from "../_components/legal/LegalShell";
 
 export const metadata = {
