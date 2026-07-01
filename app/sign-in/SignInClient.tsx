@@ -9,7 +9,8 @@ import {
   signUp,
   useSession,
 } from "@/lib/auth/client";
-import styles from "./signin.module.css";
+import { EyeIcon } from "../_components/auth/authIcons";
+import styles from "../_components/auth/authCard.module.css";
 
 /** Where to land after a successful sign-in. */
 const CALLBACK_URL = "/account";
@@ -63,26 +64,6 @@ function GoogleGlyph() {
         fill="#EA4335"
         d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58Z"
       />
-    </svg>
-  );
-}
-
-function EyeIcon() {
-  // Feather-style eye (stroke), lifted from the design handoff.
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
-      <circle cx="12" cy="12" r="3" />
     </svg>
   );
 }

@@ -6,7 +6,7 @@
 import type { Metadata } from "next";
 import Link from "../_components/Link";
 import { SignInClient } from "./SignInClient";
-import styles from "./signin.module.css";
+import styles from "../_components/auth/authCard.module.css";
 
 const PAGE_DESCRIPTION =
   "Sign in to Dataslope with Google or GitHub to sync your playground workspaces across devices, share them, and use AI. All courses and playgrounds stay free without an account.";
